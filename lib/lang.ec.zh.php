@@ -227,7 +227,7 @@ $ec_lang['mphl_junction_loss']='局部水头损失，h<sub>m</sub>';
 $ec_lang['mphl_total_loss']='总水头损失，h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='下游能量坡降线';
 $ec_lang['mphl_egl_2']='上游能量坡降线';
-$ec_lang['mphl_hgl_egl_tip']='当管道高于水力坡降线时，此结果可能不成立。';
+$ec_lang['mphl_hgl_egl_tip']='当管道高于测压管水头线时，此结果可能不成立。';
 $ec_lang['mphl_note_1']='<dl><dt>本计算器不模拟两端之间的管道剖面。</dt><dd>若测压管水头线在任一位置低于管顶，本计算结果可能不适用。</dd><dt>对于开口进水口（涵洞）情况，需检验进口控制条件。</dt><dd>1. 上游测压管水头线不得低于上游正常水深处高程（也不得低于管顶！）。</dd><dd>2. 涵洞水位更宜用上游能量坡降线而非测压管水头线表示。</dd><dd>3. <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">参见 2 分钟教程</a>，了解使用 <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>（美国联邦公路管理局提供的免费涵洞计算程序）进行简单标准涵洞水位计算的方法。</dd><dd>4. 本页仅求解出流控制情况：管道满流，由下游条件决定水头。涵洞设计的任务是判断进流控制还是出流控制起控制作用，因此在两者都可能起作用时应使用 HY-8。</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='曼宁梯形渠道';
@@ -866,7 +866,7 @@ $ec_lang['lpn_field_head']='水头';
 // 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
 // outright that it is a height and not a pressure, which is the exact confusion the glossary's
 // avoid list guards against.
-$ec_lang['lpn_field_head_tip']='水库的水面标高，以高度表示，而非压力。留空则水面标高取节点高程。';
+$ec_lang['lpn_field_head_tip']='水库的水面高程，以高度表示，而非压力。留空则水面高程取节点高程。';
 // ---- Tank fields (Task 248) ----
 // EVERY ONE OF THESE IS A HEIGHT IN THE ELEVATION/HEAD UNIT, the tank diameter included, and each
 // tip says so in words a reader can act on. The diameter is the one that catches people: it is a
@@ -877,7 +877,7 @@ $ec_lang['lpn_field_head_tip']='水库的水面标高，以高度表示，而非
 $ec_lang['lpn_field_tank_base_elev_tip']='水箱底部的高程，水深和容积均从此处起算。留空时，底部位于地面高程。';
 $ec_lang['lpn_field_tank_level']='水深';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_tank_level_tip']='水箱中当前水的深度，从水箱底部向上测量。水面标高等于水箱底部高程加上该深度。';
+$ec_lang['lpn_field_tank_level_tip']='水箱中当前水的深度，从水箱底部向上测量。水面高程等于水箱底部高程加上该深度。';
 $ec_lang['lpn_field_tank_minlevel']='最低水深';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_minlevel_tip']='视为水箱已排空时的水深，从水箱底部向上测量。';
@@ -1402,7 +1402,7 @@ $ec_lang['lpn_help_walkthroughs']='教程';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='删除管网';
-$ec_lang['lpn_confirm_delete_network']='删除本项目中的所有节点、管道和文字标签？背景图片、项目名称和设置会保留。';
+$ec_lang['lpn_confirm_delete_network']='删除本项目中的所有节点、管道和文字？背景图片、项目名称和设置会保留。';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -1577,7 +1577,7 @@ $ec_lang['lpn_profile_summary']='节点数：{n}，长度：{len} {u}';
 $ec_lang['lpn_profile_axis_station']='沿路线的距离（{u}）';
 $ec_lang['lpn_profile_axis_elev']='高程与水头（{u}）';
 $ec_lang['lpn_profile_ground']='地面';
-$ec_lang['lpn_profile_hgl']='水力坡降线';
+$ec_lang['lpn_profile_hgl']='测压管水头线';
 // ---- Task 509: the two operations the control column took with it ----------------------------
 // Task 506 removed the From/To pull-downs and the waypoint chips, and with them the only way to
 // change ONE end of a path or take ONE node off it. They come back in an overlay box over the map,
@@ -1778,7 +1778,7 @@ $ec_lang['lpn_net_bad_file']='这看起来是一个 EPANET .net 文件，但本�
 $ec_lang['lpn_inp_report_heading']='已导入 {file}';
 $ec_lang['lpn_inp_report_counts']='{nodes} 个节点、水库和水箱，{links} 条管道、水泵和阀门，单位为 {units}。';
 $ec_lang['lpn_inp_report_clean']='文件中的全部内容均已成功导入，没有遗漏。';
-$ec_lang['lpn_inp_report_label_anchor']='文字标签的定位方式与 EPANET 相同，均以左上角为基准点。';
+$ec_lang['lpn_inp_report_label_anchor']='文字的定位方式与 EPANET 相同，均以左上角为基准点。';
 // **R-219; Tom, 2026-09-24, answering R-190**: dropping the "These are already lat/lon" button in
 // favor of typing 1 for Step 2's Ground distance field means both Import and Convert as have to say
 // that door still exists. Shown for any file that lands as a plain XY drawing -- Feet, Meters, None
@@ -1787,7 +1787,7 @@ $ec_lang['lpn_inp_report_label_anchor']='文字标签的定位方式与 EPANET �
 $ec_lang['lpn_inp_report_no_crs']='EPANET 文件不含坐标系，因此该文件起初不会经过配准。要将其放到世界地图上，请使用“地图”、“世界地图…”；要转换其坐标，请使用“文件”、“转换为…”';
 $ec_lang['lpn_inp_report_lead']='本页面并未使用 EPANET 的全部功能，但文件中的任何数据都不会被丢弃。以下列出文件中被保留但未被使用的数据，以及导入时所做的更改：';
 $ec_lang['lpn_inp_drop_headloss']='该文件未使用 Hazen-Williams 公式。本页面按 Hazen-Williams 公式计算，因此管道糙率数值已按原样保留，但这里得到的结果将与 EPANET 中的结果不一致。';
-$ec_lang['lpn_inp_drop_tank_curve']='这些水箱不是直壁的：文件以曲线形式给出其形状。该曲线被保存在“库”框中，水箱仍引用它，延时模拟会按该曲线给出的规律为水箱充水和放水。单一时刻的结果两种情况相同，因为水面标高就是文件设定的水位。文件中所写的直径会与曲线一同保留，并作为该水箱在没有曲线时的绘制和求解依据。';
+$ec_lang['lpn_inp_drop_tank_curve']='这些水箱不是直壁的：文件以曲线形式给出其形状。该曲线被保存在“库”框中，水箱仍引用它，延时模拟会按该曲线给出的规律为水箱充水和放水。单一时刻的结果两种情况相同，因为水面高程就是文件设定的水位。文件中所写的直径会与曲线一同保留，并作为该水箱在没有曲线时的绘制和求解依据。';
 // Three outcomes a valve in a file can meet, one string each (Task 248 phase 2). Only the last is
 // a loss; the first two are reported because the reader deserves to know what became of a valve
 // their file states, not because anything was thrown away.
@@ -1824,7 +1824,7 @@ $ec_lang['lpn_net_emergency']='这是一个 EPANET .net 文件，即 EPANET 原�
 $ec_lang['lpn_inp_drop_backdrop']='该文件指定了一张背景图片，但未包含图片本身。请使用"文件"、"背景图片"、"添加图片"自行添加。';
 $ec_lang['lpn_inp_drop_dangling']='这些管道所指定的节点不在文件中，因此未被导入。';
 $ec_lang['lpn_inp_drop_units']='该文件中标明的流量单位不是本页面已知的单位，因此所有数值均按加仑每分钟读取。请在使用结果前核对每一个数值。';
-$ec_lang['lpn_inp_drop_anchor_missing']='此文本原本附着在文件中不存在的节点、水库或水箱上。它已作为独立文本导入到文件所标注的位置，现在不再依附于任何对象。';
+$ec_lang['lpn_inp_drop_anchor_missing']='此文字原本附着在文件中不存在的节点、水库或水箱上。它已作为独立文字导入到文件所标注的位置，现在不再依附于任何对象。';
 $ec_lang['lpn_import_notes_heading']='此项目是从 EPANET 文件读入的。该文件中的部分内容会被保留，但本页面不会使用它们。';
 // {name} is a project name; word order is the translator's to choose. Says where the user landed,
 // the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
@@ -2139,7 +2139,7 @@ $ec_lang['lpn_engine_wait_pct']='求解器已加载 {percent}%。';
 $ec_lang['lpn_engine_wait_bytes']='求解器目前已加载 {kb} KB。总大小未知，因此无法得知完成百分比。';
 $ec_lang['lpn_engine_needed_failed']='EPANET 求解器尚未加载，目前也无法加载，而此管网只能由它求解。连接互联网后即可加载。';
 $ec_lang['lpn_diag_valve_needs_epanet']='以下为压力或流量控制阀，只有 EPANET 求解器才能计算。由于无法加载 EPANET 求解器，缺少这些结果：';
-$ec_lang['lpn_diag_valve_on_fixed_head']='以下阀门直接连接在水库或水箱上，而水库或水箱固定了该节点处的水力坡降线，因此阀门无可控制之处。请在阀门与水库或水箱之间加入一段短管：';
+$ec_lang['lpn_diag_valve_on_fixed_head']='以下阀门直接连接在水库或水箱上，而水库或水箱固定了该节点处的测压管水头线，因此阀门无可控制之处。请在阀门与水库或水箱之间加入一段短管：';
 $ec_lang['lpn_diag_not_converged']='未找到解。请检查是否存在现实中不可能出现的数值，例如管径为零。';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
 // converge still produced the last iterate, and that is every number this page has -- refusing to
@@ -4283,7 +4283,7 @@ $ec_lang['lpn_guide_text_calib_box']='将现场测量值文件与相同位置和
 $ec_lang['lpn_guide_text_notes_popup']='列出关于本页面行为方式及其不具备功能的说明，每条为一个术语及其定义。它不会更改管网。';
 $ec_lang['lpn_guide_text_hotkeys_popup']='列出每个工具栏按钮和菜单行、键盘快捷键，以及每个框的条目。选择某一行会显示该控件所在位置，而不会运行它。要搜索，请在任何位置按 Ctrl+K，或在用户手册有焦点时按 /。';
 $ec_lang['lpn_guide_find_query_term']='查询语言';
-$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>一个条件。“搜索范围”为全部、节点、水库、水箱、管道、水泵、阀门、文字、用户或水源。属性为该范围的“属性”列表中的任一项。</td></tr><tr><td>条件</td><td>等于、大于、小于、包含、最高 n 个、最低 n 个和为空。“包含”仅适用于文字。在“最高 n 个”和“最低 n 个”中，n 是个数，如 5 highest。若“数值”框为空，或 n 是字母 n 本身，如 <code>Pipe.Velocity n highest</code>，则列出 10 个元件。“为空”查找该属性没有值的元件。“连通性”有四个条件，不需要数值。</td></tr><tr><td>数值</td><td>数字不带单位，按“属性”和“表格”窗格中显示的单位输入：40，而不是 40 psi。文字（包括 ID）用单引号或双引号括起来：<code>\'60\'</code>。</td></tr><tr><td>且、或和括号</td><td>且（AND）先于或（OR）计算，括号用于将条件分组。不提供 NOT。</td></tr><tr><td>拼写</td><td>不区分大小写。各种语言都接受英文单词，因此从本用户手册复制的查询可在任何语言的页面上运行。</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>一个条件。“搜索范围”为全部、节点、水库、水箱、管道、水泵、阀门、文字、用户或水源。属性为该范围的“属性”列表中的任一项。</td></tr><tr><td>条件</td><td>等于、大于、小于、包含、最高 n 个、最低 n 个和为空。“包含”仅适用于文本。在“最高 n 个”和“最低 n 个”中，n 是个数，如 5 highest。若“数值”框为空，或 n 是字母 n 本身，如 <code>Pipe.Velocity n highest</code>，则列出 10 个元件。“为空”查找该属性没有值的元件。“连通性”有四个条件，不需要数值。</td></tr><tr><td>数值</td><td>数字不带单位，按“属性”和“表格”窗格中显示的单位输入：40，而不是 40 psi。文本（包括 ID）用单引号或双引号括起来：<code>\'60\'</code>。</td></tr><tr><td>且、或和括号</td><td>且（AND）先于或（OR）计算，括号用于将条件分组。不提供 NOT。</td></tr><tr><td>拼写</td><td>不区分大小写。各种语言都接受英文单词，因此从本用户手册复制的查询可在任何语言的页面上运行。</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_examples_term']='Net3 上的示例';
 $ec_lang['lpn_guide_find_examples_def']='<p>打开示例 Net3 以便对照。压力单位为 psi，流速单位为 ft/s。</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>节点 60 和管道 60。节点和管道可以有相同的 ID，因此在“全部”下按 ID 搜索可能返回多个元件。</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>节点 10、40、50、20 和 153，压力最低的在前。节点 10 的压力为 -0.6 psi，这是需要复核的负压。</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>管道 60、329、125、123 和 149，流速最高的在前。管道 60 的流速为 9.3 ft/s。</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>节点 10、20、40 和 50，以及管道 60、125 和 329：低压和高流速列在同一份清单中。</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>节点 10、20、40 和 50，即位于高地的低压节点。两个条件必须指同一种元件：<code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> 没有任何匹配，因为没有元件既是节点又是管道。</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>管道 330，即 Net3 文件中唯一关闭的管道。</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>按文件原样没有结果。若关闭管道 247（见“替换与撤销”），则为节点 215、217、219 和 225：即管道 247 破裂会使其失去供水的节点。对每条管道重复此操作即为关键性分析。</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_results_term']='结果、选择与表格';
@@ -4291,7 +4291,7 @@ $ec_lang['lpn_guide_find_results_def']='<p>匹配的元件列在“查找”按�
 $ec_lang['lpn_guide_find_replace_term']='替换与撤销';
 $ec_lang['lpn_guide_find_replace_def']='<p>框中的“更改查找到的内容”部分会在查询找到的每个元件上写入一个属性。在“要更改的属性”列表中选择属性，在“新值”框中按显示单位输入新值，然后按“替换”按钮。随后框中会说明将有多少个元件发生变化，不包括已经是新值的元件。按“更改它们”按钮应用更改，或按“取消”。一次“撤销”即可撤回整个替换。</p><p>Net1 上的示例：<code>Pipe.Diameter below 10</code> 找到管道 31、122、113 和 121。选择“管径”，输入 10，然后按“替换”；框中显示“要更改 4 个元件吗？”。按“更改它们”将这四条管道全部设为 10 in。一次“撤销”使它们恢复为 6 in 和 8 in。</p><p>Net3 上的示例：<code>Pipe.ID equal to \'247\'</code> 找到管道 247。选择“关闭”，在“新值”列表中再次选择“关闭”，然后按“替换”，再按“更改它们”，即可关闭该管道，用于上述连通性示例。“撤销”会重新打开它。</p><p>替换要求只涉及一种元件，因此在“全部”下，请先在“搜索范围”列表中选择一种元件。在基础以外的方案中，替换值存储在该方案中，与在“属性”中进行同样的编辑相同。在有 Mapbox 高程数据的地方，“高程”可以用 Mapbox DEM 替换，而不用键入的值。</p>';
 $ec_lang['lpn_guide_find_notes_term']='注意事项';
-$ec_lang['lpn_guide_find_notes_def']='<ul><li>数值按完整精度比较，并列出到四位小数。“等于”很少与计算结果匹配；请使用大于和小于。</li><li>压力、水头、流量、流速和其他结果均来自上一次计算。清除“自动重新计算”设置后，它们描述的是上一次“计算”时的管网。</li><li>文字的大于和小于按字典顺序比较，数字按数值顺序：在 Net1 上，<code>Junction.ID above \'20\'</code> 找到节点 21、22、23、31 和 32。</li><li>在“全部”下，只提供 ID、说明、标记和连通性。在“搜索范围”列表中选择一种元件，可查看其完整的属性列表。</li><li>文字项没有 ID。请按其中的字词搜索，如 <code>Text.Text contains \'pump\'</code>。</li><li>节点的四个“连通性”条件为：节点无连接线、节点无开放连接线、无连接线通往水源、无开放路径通往水源。水源是水库或水箱。</li></ul>';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>数值按完整精度比较，并列出到四位小数。“等于”很少与计算结果匹配；请使用大于和小于。</li><li>压力、水头、流量、流速和其他结果均来自上一次计算。清除“自动重新计算”设置后，它们描述的是上一次“计算”时的管网。</li><li>文本的大于和小于按字典顺序比较，数字按数值顺序：在 Net1 上，<code>Junction.ID above \'20\'</code> 找到节点 21、22、23、31 和 32。</li><li>在“全部”下，只提供 ID、说明、标记和连通性。在“搜索范围”列表中选择一种元件，可查看其完整的属性列表。</li><li>文字项没有 ID。请按其中的字词搜索，如 <code>Text.Text contains \'pump\'</code>。</li><li>节点的四个“连通性”条件为：节点无连接线、节点无开放连接线、无连接线通往水源、无开放路径通往水源。水源是水库或水箱。</li></ul>';
 $ec_lang['lpn_guide_using_heading']='使用用户手册';
 $ec_lang['lpn_guide_keys_term']='用户手册键盘快捷键';
 $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>在指针下方或具有焦点的控件处打开用户手册。</td></tr><tr><td>F1</td><td>在具有焦点的框的条目处打开用户手册。</td></tr><tr><td>Ctrl+K</td><td>打开用户手册，并将所选文字放入搜索栏。</td></tr><tr><td>/</td><td>在用户手册具有焦点时选中搜索栏。</td></tr><tr><td>Esc</td><td>关闭用户手册并返回原来的位置。</td></tr></tbody></table>';

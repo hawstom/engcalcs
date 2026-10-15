@@ -121,9 +121,9 @@ $ec_lang['calc_copy_link']='ចម្លងតំណ';
 $ec_lang['ec_related_calcs']='ម៉ាស៊ីនគណនាដែលពាក់ព័ន្ធ៖';
 $ec_lang['calc_copy_link_done']='បានចម្លង!';
 // Darcy-Weisbach. See mphl_ for missing text.
-$ec_lang['dw_main_menu']='Darcy-Weisbach ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់';
-$ec_lang['dw_main_title']='ម៉ាស៊ីនគណនា Darcy-Weisbach ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់ ឥតគិតថ្លៃ';
-$ec_lang['dw_main_desc']='ការបាត់បង់ទំនាប់ក្នុងបំពង់ Darcy-Weisbach តាមប្រឡោះ ភាពរញ៉េរញ៉ៃ និងលំហូរដែលបានកំណត់';
+$ec_lang['dw_main_menu']='Darcy-Weisbach ការបាត់បង់ក្បាលទឹកក្នុងបំពង់';
+$ec_lang['dw_main_title']='ម៉ាស៊ីនគណនា Darcy-Weisbach ការបាត់បង់ក្បាលទឹកក្នុងបំពង់ ឥតគិតថ្លៃ';
+$ec_lang['dw_main_desc']='ការបាត់បង់ក្បាលទឹកក្នុងបំពង់ Darcy-Weisbach តាមប្រឡោះ ភាពរញ៉េរញ៉ៃ និងលំហូរដែលបានកំណត់';
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='កម្ពស់ភាពរញ៉េរញ៉ៃដាច់ខាត, e, នៃជញ្ជាំងបំពង់។ តម្លៃធម្មតា: ដែកថែប (ថ្មី) 0.046 mm, ដែកថែប (ចាស់) 0.15 mm, HDPE 0.003 mm, PVC/uPVC 0.0015 mm, បេតុង 0.3–3 mm។';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s សម្រាប់ទឹកស្អាតនៅ 20°C">ភាពខាប់ស៊ីណេម៉ាទិក, ν <span class="ec-tip">?</span></span>';
@@ -137,9 +137,9 @@ $ec_lang['dw_regime_turbulent']='លំហូររញ្ជួយ';
 $ec_lang['dw_friction_factor_method']='វិធីសាស្ត្រកត្តាកកិត';
 $ec_lang['dw_friction_factor']='កត្តាកកិត, f';
 // Hazen-Williams. See mphl_ for missing text.
-$ec_lang['hw_main_menu']='Hazen-Williams ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់';
-$ec_lang['hw_main_title']='ម៉ាស៊ីនគណនា Hazen-Williams ការបាត់បង់ទំនាប់ទឹកក្នុងបំពង់ ឥតគិតថ្លៃ';
-$ec_lang['hw_main_desc']='ការបាត់បង់ទំនាប់ក្នុងបំពង់ Hazen-Williams តាមប្រឡោះ ភាពរញ៉េរញ៉ៃ និងលំហូរដែលបានកំណត់';
+$ec_lang['hw_main_menu']='Hazen-Williams ការបាត់បង់ក្បាលទឹកក្នុងបំពង់';
+$ec_lang['hw_main_title']='ម៉ាស៊ីនគណនា Hazen-Williams ការបាត់បង់ក្បាលទឹកក្នុងបំពង់ ឥតគិតថ្លៃ';
+$ec_lang['hw_main_desc']='ការបាត់បង់ក្បាលទឹកក្នុងបំពង់ Hazen-Williams តាមប្រឡោះ ភាពរញ៉េរញ៉ៃ និងលំហូរដែលបានកំណត់';
 $ec_lang['hw_hgl_1']='HGL ចំហៀងក្រោម';
 $ec_lang['hw_hgl_2']='HGL ចំហៀងលើ';
 $ec_lang['hw_elev_up']='កម្ពស់ចំហៀងលើ';
@@ -195,7 +195,7 @@ $ec_lang['mpf_depth_ratio']='សមាមាត្រជម្រៅហូរ, y
 $ec_lang['mpf_flow']='លំហូរ, Q';
 $ec_lang['mpf_flow_tip']='លំហូរ និងជម្រៅត្រូវបានគណនាសម្រាប់បំពង់វែងគ្មានទីបញ្ចប់។ ដើម្បីទាញលំហូរនេះចូលទៅក្នុងបំពង់ ប្រហែលជាត្រូវការជម្រៅទឹកខាងលើខ្ពស់ជាងនេះ។ សូមមើលចំណាំខាងក្រោមសម្រាប់ព័ត៌មានលម្អិត និងវីដេអូបង្រៀន។';
 $ec_lang['mpf_velocity']='ល្បឿន, v';
-$ec_lang['mpf_velocity_head']='<span class="ec-help" title="ថាមពលស៊ីនេទិចជាកម្ពស់ជួរឈរទឹក, v²/2g">ទំនាប់ល្បឿន, h<sub>v</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['mpf_velocity_head']='<span class="ec-help" title="ថាមពលស៊ីនេទិចជាកម្ពស់ជួរឈរទឹក, v²/2g">ក្បាលទឹកល្បឿន, h<sub>v</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['mpf_flow_area']='ផ្ទៃហូរ, A';
 $ec_lang['mpf_pipe_area']='ផ្ទៃបំពង់, A<sub>0</sub>';
 $ec_lang['mpf_area_ratio']='សមាមាត្រផ្ទៃ, A/A<sub>0</sub>';
@@ -206,16 +206,16 @@ $ec_lang['mpf_froude_number']='លេខ Froude, Fr';
 $ec_lang['mpf_shear_stress']='តានតឹងកាត់មធ្យម, τ';
 $ec_lang['mpf_full_flow']='ហូរពេញ, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='សមាមាត្រទៅនឹងហូរពេញ, Q/Q<sub>0</sub>';
-$ec_lang['mpf_note_1']='<dl><dt>នេះជាការហូរ និងជម្រៅនៅខាងក្នុងបំពង់ <em>វែងឥតកំណត់</em>។</dt><dd>ការទទួលទឹកចូលបំពង់អាចត្រូវការជម្រៅទឹកខាងលើខ្ពស់ជាងច្រើន។ បន្ថែមយ៉ាងហោចណាស់ 1.5 ដងទំនាប់ល្បឿន ដើម្បីទទួលបានជម្រៅទឹកខាងលើ ឬ <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">មើលការណែនាំ 2 នាទីរបស់ខ្ញុំ</a> សម្រាប់ការគណនាទំនាប់ទឹក culvert ស្ដង់ដារ ដោយប្រើ <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> ដែលជាកម្មវិធីគណនា culvert ឥតគិតថ្លៃ ពីរដ្ឋបាលផ្លូវហាយវេសហព័ន្ធសហរដ្ឋអាមេរិក។</dd>';
+$ec_lang['mpf_note_1']='<dl><dt>នេះជាការហូរ និងជម្រៅនៅខាងក្នុងបំពង់ <em>វែងឥតកំណត់</em>។</dt><dd>ការទទួលទឹកចូលបំពង់អាចត្រូវការជម្រៅទឹកខាងលើខ្ពស់ជាងច្រើន។ បន្ថែមយ៉ាងហោចណាស់ 1.5 ដងក្បាលទឹកល្បឿន ដើម្បីទទួលបានជម្រៅទឹកខាងលើ ឬ <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">មើលការណែនាំ 2 នាទីរបស់ខ្ញុំ</a> សម្រាប់ការគណនាទឹកខាងលើ culvert ស្ដង់ដារ ដោយប្រើ <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> ដែលជាកម្មវិធីគណនា culvert ឥតគិតថ្លៃ ពីរដ្ឋបាលផ្លូវហាយវេសហព័ន្ធសហរដ្ឋអាមេរិក។</dd>';
 $ec_lang['mpf_sewer_ref']='<dl><dt>តើអ្នកកំពុងរចនាបំពង់លូទឹកកខ្វក់ (sanitary sewer)?</dt><dd>សូមមើល <a target="_blank" href="/sewslope.php">តារាងជម្រាលអប្បបរមាបំពង់លូ</a> សម្រាប់បំពង់ទំហំ 4 ដល់ 96 អ៊ិន្ឈ៍ (100 ដល់ 2400 mm) ដែលបានផ្ដល់ជា m/m, mm/m និងភាគរយ ព្រមទាំង <a target="_blank" href="/peakfact.php">ការសិក្សាអំពីមេគុណកំពូល (peaking factors) សម្រាប់លំហូរទាបខ្លាំង</a>។ ឯកសារយោងទាំងពីរនេះមានតែជាភាសាអង់គ្លេសប៉ុណ្ណោះ។</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='សូមបញ្ចូល Q គោលដៅជាចំនួនវិជ្ជមាន។';
 $ec_lang['mpf_solver_no_solution']='គ្មានដំណោះស្រាយ៖ Q លើសសមត្ថភាពបំពង់នៅ y/d0 = 93.8% (Qmax = {qmax} គិតជាឯកតាដែលបានជ្រើសរើស)។';
 $ec_lang['mpf_solve_btn']='ដោះស្រាយ';
 $ec_lang['mpf_solve_for_flow']='សម្រាប់លំហូរ, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
-$ec_lang['mphl_main_menu']='Manning ការបាត់បង់ទំនាប់ក្នុងបំពង់';
-$ec_lang['mphl_main_title']='ម៉ាស៊ីនគណនា Manning ការបាត់បង់ទំនាប់ក្នុងបំពង់ ឥតគិតថ្លៃ';
-$ec_lang['mphl_main_desc']='រូបមន្ត Manning ការបាត់បង់ទំនាប់ ជាមួយការហូរពេញ';
+$ec_lang['mphl_main_menu']='Manning ការបាត់បង់ក្បាលទឹកក្នុងបំពង់';
+$ec_lang['mphl_main_title']='ម៉ាស៊ីនគណនា Manning ការបាត់បង់ក្បាលទឹកក្នុងបំពង់ ឥតគិតថ្លៃ';
+$ec_lang['mphl_main_desc']='រូបមន្ត Manning ការបាត់បង់ក្បាលទឹក ជាមួយការហូរពេញ';
 $ec_lang['mphl_pipe_length']='ប្រវែងបំពង់, L';
 $ec_lang['mphl_area']='ផ្ទៃ, A';
 $ec_lang['mphl_total_junction_k']='មេគុណការបាត់បង់មូលដ្ឋាន, k<sub>m</sub>';
@@ -227,8 +227,8 @@ $ec_lang['mphl_junction_loss']='ការបាត់បង់មូលដ្ឋ
 $ec_lang['mphl_total_loss']='ការបាត់បង់សរុប, h<sub>L</sub>';
 $ec_lang['mphl_egl_1']='EGL ចំហៀងក្រោម';
 $ec_lang['mphl_egl_2']='EGL ចំហៀងលើ';
-$ec_lang['mphl_hgl_egl_tip']='លទ្ធផលនេះអាចមិនត្រឹមត្រូវ ក្នុងករណីបំពង់ឡើងខ្ពស់លើសខ្សែថ្ពល់ធារាសាស្ត្រ។';
-$ec_lang['mphl_note_1']='<dl><dt>ម៉ាស៊ីនគណនានេះមិនធ្វើគំរូទម្រង់បំពង់រវាងចុងទាំងពីរទេ។</dt><dd>ប្រសិនបើ HGL ធ្លាក់ចុះក្រោមផ្នែកខាងលើនៃបំពង់ត្រង់ចំណុចណាមួយ ការគណនានេះអាចមិនត្រឹមត្រូវ។</dd><dt>សម្រាប់លក្ខខណ្ឌចំហ (culvert) ចាំបាច់ត្រូវពិនិត្យលក្ខខណ្ឌត្រួតពិនិត្យធាតុចូល។</dt><dd>1. HGL ខាងលើ មិនអាចទាបជាងកម្ពស់ហូរជម្រៅធម្មតា ខាងលើ (ឬទាបជាងបំពង់!)។</dd><dd>2. ទំនាប់ទឹក culvert ត្រូវបានតំណាងប្រសើរជាងដោយ EGL ខាងលើ ជាជាង HGL ខាងលើ។</dd><dd>3. មើល <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">ការណែនាំ 2 នាទីរបស់ខ្ញុំ</a> សម្រាប់ការគណនាទំនាប់ទឹក culvert ស្ដង់ដារ ដោយប្រើ <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> ដែលជាកម្មវិធីគណនា culvert ឥតគិតថ្លៃ ពីរដ្ឋបាលផ្លូវហាយវេសហព័ន្ធសហរដ្ឋអាមេរិក។</dd><dd>4. ទំព័រនេះដោះស្រាយតែករណីត្រួតពិនិត្យផ្នែកចេញ (outlet control) ប៉ុណ្ណោះ គឺករណីបំពង់ហូរពេញ ដែលលក្ខខណ្ឌនៅខាងក្រោមជាអ្នកកំណត់ទំនាប់ទឹក។ ការរចនា culvert គឺជាការសម្រេចថាតើត្រួតពិនិត្យផ្នែកចូល (inlet control) ឬត្រួតពិនិត្យផ្នែកចេញ (outlet control) ជាអ្នកគ្រប់គ្រង ដូច្នេះប្រើ HY-8 រាល់ពេលដែលអាចជាករណីណាមួយក្នុងចំណោមទាំងពីរ។</dd></dl>';
+$ec_lang['mphl_hgl_egl_tip']='លទ្ធផលនេះអាចមិនត្រឹមត្រូវ ក្នុងករណីបំពង់ឡើងខ្ពស់លើសខ្សែក្បាលទឹកធារាសាស្ត្រ។';
+$ec_lang['mphl_note_1']='<dl><dt>ម៉ាស៊ីនគណនានេះមិនធ្វើគំរូទម្រង់បំពង់រវាងចុងទាំងពីរទេ។</dt><dd>ប្រសិនបើ HGL ធ្លាក់ចុះក្រោមផ្នែកខាងលើនៃបំពង់ត្រង់ចំណុចណាមួយ ការគណនានេះអាចមិនត្រឹមត្រូវ។</dd><dt>សម្រាប់លក្ខខណ្ឌចំហ (culvert) ចាំបាច់ត្រូវពិនិត្យលក្ខខណ្ឌត្រួតពិនិត្យធាតុចូល។</dt><dd>1. HGL ខាងលើ មិនអាចទាបជាងកម្ពស់ហូរជម្រៅធម្មតា ខាងលើ (ឬទាបជាងបំពង់!)។</dd><dd>2. ទឹកខាងលើ culvert ត្រូវបានតំណាងប្រសើរជាងដោយ EGL ខាងលើ ជាជាង HGL ខាងលើ។</dd><dd>3. មើល <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">ការណែនាំ 2 នាទីរបស់ខ្ញុំ</a> សម្រាប់ការគណនាទឹកខាងលើ culvert ស្ដង់ដារ ដោយប្រើ <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> ដែលជាកម្មវិធីគណនា culvert ឥតគិតថ្លៃ ពីរដ្ឋបាលផ្លូវហាយវេសហព័ន្ធសហរដ្ឋអាមេរិក។</dd><dd>4. ទំព័រនេះដោះស្រាយតែករណីត្រួតពិនិត្យផ្នែកចេញ (outlet control) ប៉ុណ្ណោះ គឺករណីបំពង់ហូរពេញ ដែលលក្ខខណ្ឌនៅខាងក្រោមជាអ្នកកំណត់ទឹកខាងលើ។ ការរចនា culvert គឺជាការសម្រេចថាតើត្រួតពិនិត្យផ្នែកចូល (inlet control) ឬត្រួតពិនិត្យផ្នែកចេញ (outlet control) ជាអ្នកគ្រប់គ្រង ដូច្នេះប្រើ HY-8 រាល់ពេលដែលអាចជាករណីណាមួយក្នុងចំណោមទាំងពីរ។</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning ប្រឡាយជ្រូងចតុកោណ';
 $ec_lang['mtc_main_title']='ម៉ាស៊ីនគណនា Manning ប្រឡាយជ្រូងចតុកោណ ឥតគិតថ្លៃ';
@@ -334,9 +334,9 @@ $ec_lang['mhp_vel_ok_short']='ល្អ';
 $ec_lang['mhp_vel_high_short']='ខ្ពស់';
 $ec_lang['mhp_vel_low_short']='ទាប';
 $ec_lang['mhp_vel_ok_tip']='ល្បឿននេះស្ថិតក្នុងចន្លោះមានប្រសិទ្ធភាពសម្រាប់ការរចនាបំពង់សម្ពាធ។';
-$ec_lang['mhp_hl_ok_tip']='ការបាត់បង់ថ្ពល់ក្រោម 10% នៃថ្ពល់សរុប។ ទំហំបំពង់នេះមានប្រសិទ្ធភាពសេដ្ឋកិច្ច។';
-$ec_lang['mhp_hl_warn_tip']='ការបាត់បង់ថ្ពល់លើសពី 10% នៃថ្ពល់សរុប។ សូមពិចារណាប្រើបំពង់ធំជាងនេះ។';
-$ec_lang['mhp_hl_bad_tip']='ការបាត់បង់ថ្ពល់លើសពី 20% នៃថ្ពល់សរុប។ សូមប្ដូរទំហំបំពង់។';
+$ec_lang['mhp_hl_ok_tip']='ការបាត់បង់ក្បាលទឹកក្រោម 10% នៃក្បាលទឹកសរុប។ ទំហំបំពង់នេះមានប្រសិទ្ធភាពសេដ្ឋកិច្ច។';
+$ec_lang['mhp_hl_warn_tip']='ការបាត់បង់ក្បាលទឹកលើសពី 10% នៃក្បាលទឹកសរុប។ សូមពិចារណាប្រើបំពង់ធំជាងនេះ។';
+$ec_lang['mhp_hl_bad_tip']='ការបាត់បង់ក្បាលទឹកលើសពី 20% នៃក្បាលទឹកសរុប។ សូមប្ដូរទំហំបំពង់។';
 $ec_lang['mhp_notes_1_term']='ការបាត់បង់ក្បាលទឹក';
 $ec_lang['mhp_notes_1_def']='ការបាត់បង់សរុបក្នុងបំពង់សម្ពាធ h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, ដែល h<sub>f</sub> = f(L/D)(v²/2g) ជាការបាត់បង់ដោយកកិតតាមរូបមន្ត Darcy-Weisbach ហើយ h<sub>m</sub> = k<sub>m</sub>·v²/2g គ្របដណ្ដប់ការបាត់បង់នៅច្រកចូល ការបត់ និងវ៉ាល់។ ក្បាលទឹកសុទ្ធ H<sub>net</sub> = H<sub>gross</sub> − h<sub>L</sub>។';
 $ec_lang['mhp_notes_2_term']='ល្បឿន';
@@ -512,8 +512,8 @@ $ec_lang['rc_notes_3_term']='លំហូរកាត់ស្រទាប់ថ
 $ec_lang['rc_notes_3_def']='ចំណែកមួយនៃលំហូរសរុបហូរកាត់ប្រហោងនៃថ្មការពារ (លំហូរតាមស្រទាប់ q<sub>m</sub>); ចំណែកនៅសល់ហូរនៅលើផ្ទៃថ្ម (q<sub>s</sub> = q<sub>t</sub> − q<sub>m</sub>)។ ជម្រៅទឹក d ត្រូវបានគណនាពីសមីការ Manning អនុវត្តទៅលើលំហូរផ្ទៃ q<sub>s</sub> ដោយប្រើភាពរដុបច្រក n។ ភាពប្រហោងលំនាំដើម n<sub>p</sub> = 0.45 ជាតម្លៃធម្មតាសម្រាប់ថ្មកិនជ្រួញកែងជ្រុង។';
 $ec_lang['rc_notes_5_term']='ជួរទំហំថ្មត្រឹមត្រូវ';
 $ec_lang['rc_notes_5_def']='សមីការទាំងនេះត្រូវបានបង្កើតឡើងដោយប្រើជួរ D<sub>50</sub> ពី 15 mm ដល់ 278 mm។ លទ្ធផលក្រៅជួរនេះជាតម្លៃប៉ាន់ស្មានពីក្រៅជួរ (extrapolated) ហើយគួរប្រើដោយផ្អែកលើការវិនិច្ឆ័យបន្ថែមរបស់វិស្វករ។';
-$ec_lang['rc_notes_6_term']='កម្រិតបន្ទះការពារច្រកចេញ';
-$ec_lang['rc_notes_6_def']='កម្រិតកំពូលនៃថ្មការពារនៅចម្រៀកច្រកចេញ គួរស្ថិតនៅកម្រិត ឬក្រោមកម្រិតបាតប្រឡាយខាងក្រោម។ ប្រសិនបើខ្ពស់ជាងនេះ ថ្មនៅច្រកចេញនឹងមិនមានស្ថិរភាព។';
+$ec_lang['rc_notes_6_term']='កម្ពស់បន្ទះការពារច្រកចេញ';
+$ec_lang['rc_notes_6_def']='កម្ពស់កំពូលនៃថ្មការពារនៅចម្រៀកច្រកចេញ គួរស្ថិតនៅកម្ពស់ ឬក្រោមកម្ពស់បាតប្រឡាយខាងក្រោម។ ប្រសិនបើខ្ពស់ជាងនេះ ថ្មនៅច្រកចេញនឹងមិនមានស្ថិរភាព។';
 
 $ec_lang['rc_notes_7_def']='នៅពេលជម្រៅធម្មតានៅក្នុងប្រឡាយច្រកចូល តូចជាងក្បាលទឹកស្ទីង (H<sub>p</sub>) ដែលត្រូវការសម្រាប់ឲ្យ q<sub>t</sub> ហូរកាត់បាន នោះលំហូរនឹងចង្អៀត ឬកើតមានទឹកដាំងខាងលើច្រកចូល។ ជាទូទៅនេះអាចទទួលយកបាន — ទឹកដាំងកាត់បន្ថយល្បឿន និងទប់ស្កាត់ការហូរច្រោះខាងលើ។ ដើម្បីត្រួតពិនិត្យ: ប្រើម៉ាស៊ីនគណនាលំហូរស្ទីង ដើម្បីរកតម្លៃ H<sub>p</sub> សម្រាប់ q<sub>t</sub> និងទទឹងកំពូល ដែលបានផ្ដល់ ហើយប្រៀបធៀបជាមួយជម្រៅធម្មតានៃប្រឡាយច្រកចូល។ ប្រសិនបើ H<sub>p</sub> លើសជម្រៅធម្មតា នោះទឹកដាំងនឹងកើតមាន។';
 $ec_lang['rc_notes_4_term']='ឯកសារយោង';
@@ -564,7 +564,7 @@ $ec_lang['ip_du_estimate']='<span class="ec-help" title="លំហូរដែ�
 $ec_lang['ip_worst_case_warn']='សម្ពាធនៅក្បាលបញ្ចេញទឹកសាកល្បង ស្មើ ឬលើសសម្ពាធផ្គត់ផ្គង់។ វាទំនងជាមិនមែនក្បាលបញ្ចេញទឹកករណីអាក្រក់បំផុតទេ ឬមួយក៏អាចប្រើបំពង់តូចជាងនេះបាន។';
 $ec_lang['ip_q_ratio']='<span class="ec-help" title="ខុសពីការប៉ាន់ស្មានស្តង់ដារនៃរង្វាស់ឯកសណ្ឋានភាពរបស់យើង។">លំហូរក្បាលបញ្ចេញទឹកចុងក្រោយ ÷ លំហូររចនា, q<sub>last</sub>/q<sub>design</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_no_solution']='គ្មានដំណោះស្រាយ៖ សម្ពាធផ្គត់ផ្គង់ដែលត្រូវការលើសពីសម្ពាធផ្គត់ផ្គង់ដែលបានបញ្ចូល។ បង្កើនសម្ពាធផ្គត់ផ្គង់ កាត់បន្ថយតម្រូវការ ឬប្រើបំពង់ធំជាង។';
-$ec_lang['ip_notes_1_def']='ប៉ាន់ស្មានសម្ពាធនៅក្បាលបញ្ចេញទឹកចុងក្រោយ (ឆ្ងាយបំផុត) បន្ទាប់មកតាមដានខ្សែថាមពលត្រឡប់ទៅរកការផ្គត់ផ្គង់វិញ ចម្រៀកម្ដងមួយៗ ដោយបូកបន្ថែមការបាត់បង់ដោយកកិត និងការបាត់បង់មូលដ្ឋានតាមផ្លូវ។ កម្ពស់ និងកម្ពស់ល្បឿនត្រូវបានដកចេញនៅថ្នាំងនីមួយៗ ដើម្បីរាយការណ៍សម្ពាធពិតប្រាកដនៅទីនោះ។ សម្ពាធចុងឆ្ងាយដែលបានប៉ាន់ស្មានត្រូវបានកែតម្រូវ (វិធីចែកពាក់កណ្ដាល) រហូតដល់សម្ពាធផ្គត់ផ្គង់ដែលត្រូវការដែលបានគណនា ស្មើនឹងសម្ពាធផ្គត់ផ្គង់ដែលបានបញ្ចូល — ជាបញ្ហារង្វិលបិទដូចគ្នាដែលដោះស្រាយដោយកម្មវិធីគណនាលំហូរបំពង់លើម៉ាស៊ីនគណនា Manning Pipe Flow ដែលពង្រីកទៅបណ្ដាញបែកសាខា។';
+$ec_lang['ip_notes_1_def']='ប៉ាន់ស្មានសម្ពាធនៅក្បាលបញ្ចេញទឹកចុងក្រោយ (ឆ្ងាយបំផុត) បន្ទាប់មកតាមដានខ្សែថាមពលត្រឡប់ទៅរកការផ្គត់ផ្គង់វិញ ចម្រៀកម្ដងមួយៗ ដោយបូកបន្ថែមការបាត់បង់ដោយកកិត និងការបាត់បង់មូលដ្ឋានតាមផ្លូវ។ កម្ពស់ និងក្បាលទឹកល្បឿនត្រូវបានដកចេញនៅថ្នាំងនីមួយៗ ដើម្បីរាយការណ៍សម្ពាធពិតប្រាកដនៅទីនោះ។ សម្ពាធចុងឆ្ងាយដែលបានប៉ាន់ស្មានត្រូវបានកែតម្រូវ (វិធីចែកពាក់កណ្ដាល) រហូតដល់សម្ពាធផ្គត់ផ្គង់ដែលត្រូវការដែលបានគណនា ស្មើនឹងសម្ពាធផ្គត់ផ្គង់ដែលបានបញ្ចូល — ជាបញ្ហារង្វិលបិទដូចគ្នាដែលដោះស្រាយដោយកម្មវិធីគណនាលំហូរបំពង់លើម៉ាស៊ីនគណនា Manning Pipe Flow ដែលពង្រីកទៅបណ្ដាញបែកសាខា។';
 $ec_lang['ip_notes_2_term']='ចម្រៀកបំពង់មេ ធៀបនឹងចម្រៀកបំពង់រង';
 $ec_lang['ip_notes_2_def']='ជួរនីមួយៗជាចម្រៀកមួយតាមផ្លូវអាក្រក់បំផុតខាងធារាសាស្ត្រតែមួយ (ផ្លូវសាកល្បង) ពីការផ្គត់ផ្គង់ដល់ក្បាលបញ្ចេញទឹកចុងក្រោយ។ ចម្រៀកបំពង់មេគ្រាន់តែបញ្ជូនលំហូរទៅបំពង់រងដែលមិនស្ថិតលើផ្លូវសាកល្បង ដូច្នេះការទាញយកទឹករបស់វាជាការគុណធម្មតា (លំហូររចនា × ចំនួនក្បាលបញ្ចេញទឹកសរុបនៃចម្រៀក) — គ្មានភាពរសើបនឹងសម្ពាធមូលដ្ឋានទេ។ បំពង់មេជាបំពង់ដើមរួម ដូច្នេះចម្រៀកនៅត្រង់កន្លែងបែកចេញរបស់បំពង់រងសាកល្បងខ្លួនឯង ត្រូវរាប់បញ្ចូលមិនត្រឹមតែបំពង់រងរវាងចុងទាំងពីររបស់វាទេ ប៉ុន្តែទាំងបំពង់រងទាំងឡាយដែលនៅបន្តទៀតតាមបំពង់មេហួសពីកន្លែងបែកចេញនោះ ឬដែលចែករំលែកថ្នាំងតែមួយ (ឧ. បំពង់រងនៅម្ខាងទៀត) — លំហូររបស់វាឆ្លងកាត់ចម្រៀកដដែលនោះមុននឹងបែកចេញ ទោះបីវាមាននៅកន្លែងផ្សេងក្នុងតារាងនេះឬអត់ក៏ដោយ។ ចម្រៀកបំពង់រងជាផ្នែកនៃបំពង់រងសាកល្បងខ្លួនឯង: លំហូរក្បាលបញ្ចេញទឹកត្រូវបានគណនាពីសម្ពាធមូលដ្ឋានពិតតាម q = k·H<sup>x</sup> ហើយការបាត់បង់ដោយកកិតត្រូវបានកាត់បន្ថយដោយមេគុណ F(n) របស់ Christiansen ដើម្បីគិតបញ្ចូលការថយចុះលំហូរនៅពេលក្បាលបញ្ចេញទឹកនីមួយៗក្នុងចម្រៀកទាញយកទឹក។';
 $ec_lang['ip_notes_3_term']='ដែនកំណត់';
@@ -580,7 +580,7 @@ $ec_lang['bpn_main_menu']='បណ្ដាញបំពង់បែកសាខ�
 $ec_lang['bpn_main_title']='ម៉ាស៊ីនគណនាសម្ពាធបណ្ដាញបំពង់បែកសាខា ឥតគិតថ្លៃតាមអ៊ីនធឺណិត (គ្មានរង្វិលបិទ)';
 $ec_lang['bpn_main_desc']='លំហូរ និងសម្ពាធនៃបណ្ដាញបំពង់បែកសាខា (ដូចមែកឈើ)';
 // Edited by TGH 2026-09-07
-$ec_lang['bpn_h_source_tip']='សម្ពាធផ្គត់ផ្គង់ថេរ: សម្ពាធនៃប្រភពទឹកនៅពេលគ្មានលំហូរ (លំហូរសូន្យ)។ កម្រិតទឹកអាងស្តុក ឬធុងទឹកខ្ពស់ជាងកម្ពស់ចំណុចផ្គត់ផ្គង់ ឬសម្ពាធបិទរបស់ម៉ាស៊ីនបូម។ បន្ថែមចំណុចផ្គត់ផ្គង់ទី ២ និង ៣ ដើម្បីកំណត់ខ្សែកោងម៉ាស៊ីនបូម ឬខ្សែកោងផ្គត់ផ្គង់ប្រែប្រួល; ឧបករណ៍នេះអានយកសម្ពាធត្រង់លំហូររចនា។';
+$ec_lang['bpn_h_source_tip']='ក្បាលទឹកផ្គត់ផ្គង់ថេរ: ក្បាលទឹកនៃប្រភពទឹកនៅពេលគ្មានលំហូរ (លំហូរសូន្យ)។ កម្រិតទឹកអាងស្តុក ឬធុងទឹកខ្ពស់ជាងកម្ពស់ចំណុចផ្គត់ផ្គង់ ឬក្បាលទឹកបិទរបស់ម៉ាស៊ីនបូម។ បន្ថែមចំណុចផ្គត់ផ្គង់ទី ២ និង ៣ ដើម្បីកំណត់ខ្សែកោងម៉ាស៊ីនបូម ឬខ្សែកោងផ្គត់ផ្គង់ប្រែប្រួល; ឧបករណ៍នេះអានយកក្បាលទឹកត្រង់លំហូររចនា។';
 $ec_lang['bpn_elev_source']='កម្ពស់ផ្គត់ផ្គង់';
 $ec_lang['bpn_q_total']='លំហូរសរុប';
 $ec_lang['bpn_q_total_tip']='លំហូរសរុបចេញពីប្រភព (ផលបូកនៃតម្រូវការទាំងអស់ក្នុងបណ្ដាញ)។';
@@ -627,13 +627,13 @@ $ec_lang['bpn_notes_3_def']='អ្នកអាចបន្ថែមវ៉ាល
 
 
 $ec_lang['bpn_supply2_q']='លំហូរផ្គត់ផ្គង់ ២';
-$ec_lang['bpn_supply2_h']='សម្ពាធផ្គត់ផ្គង់ ២';
+$ec_lang['bpn_supply2_h']='ក្បាលទឹកផ្គត់ផ្គង់ ២';
 $ec_lang['bpn_supply3_q']='លំហូរផ្គត់ផ្គង់ ៣';
-$ec_lang['bpn_supply3_h']='សម្ពាធផ្គត់ផ្គង់ ៣';
-$ec_lang['bpn_supply_pt_tip']='ចំណុចខ្សែកោងផ្គត់ផ្គង់ ២ និង ៣ ជាជម្រើស។ បញ្ចូលលំហូរ និងសម្ពាធសម្រាប់ចំណុចនីមួយៗ ដើម្បីតំណាងឲ្យម៉ាស៊ីនបូម ឬប្រភពណាមួយដែលសម្ពាធថយចុះនៅពេលបញ្ជូនទឹកកាន់តែច្រើន; ឧបករណ៍នេះអានយកសម្ពាធត្រង់លំហូររចនា។ ចំណុចទី ១ ខាងលើជាសម្ពាធថេរនៅពេលគ្មានលំហូរ (លំហូរសូន្យ)។ ទុកចំណុចទី ២ និង ៣ ទទេ សម្រាប់សម្ពាធអាងស្តុកថេរ។';
-$ec_lang['bpn_h_supply']='សម្ពាធផ្គត់ផ្គង់';
-$ec_lang['bpn_h_supply_tip']='សម្ពាធប្រភពត្រង់លំហូររចនា អានពីខ្សែកោងផ្គត់ផ្គង់។ ស្មើនឹងសម្ពាធប្រភពដែលបានបញ្ចូល ពេលខ្សែកោងរាបស្មើ (អាងស្តុក)។';
-$ec_lang['bpn_supply1_h']='សម្ពាធផ្គត់ផ្គង់ថេរ';
+$ec_lang['bpn_supply3_h']='ក្បាលទឹកផ្គត់ផ្គង់ ៣';
+$ec_lang['bpn_supply_pt_tip']='ចំណុចខ្សែកោងផ្គត់ផ្គង់ ២ និង ៣ ជាជម្រើស។ បញ្ចូលលំហូរ និងក្បាលទឹកសម្រាប់ចំណុចនីមួយៗ ដើម្បីតំណាងឲ្យម៉ាស៊ីនបូម ឬប្រភពណាមួយដែលក្បាលទឹកថយចុះនៅពេលបញ្ជូនទឹកកាន់តែច្រើន; ឧបករណ៍នេះអានយកក្បាលទឹកត្រង់លំហូររចនា។ ចំណុចទី ១ ខាងលើជាក្បាលទឹកថេរនៅពេលគ្មានលំហូរ (លំហូរសូន្យ)។ ទុកចំណុចទី ២ និង ៣ ទទេ សម្រាប់ក្បាលទឹកអាងស្តុកថេរ។';
+$ec_lang['bpn_h_supply']='ក្បាលទឹកផ្គត់ផ្គង់';
+$ec_lang['bpn_h_supply_tip']='ក្បាលទឹកប្រភពត្រង់លំហូររចនា អានពីខ្សែកោងផ្គត់ផ្គង់។ ស្មើនឹងក្បាលទឹកប្រភពដែលបានបញ្ចូល ពេលខ្សែកោងរាបស្មើ (អាងស្តុក)។';
+$ec_lang['bpn_supply1_h']='ក្បាលទឹកផ្គត់ផ្គង់ថេរ';
 $ec_lang['lpn_main_menu']='បណ្ដាញផ្គត់ផ្គង់ទឹក';
 $ec_lang['lpn_main_title']='ការធ្វើគំរូបណ្ដាញចែកចាយទឹកឥតគិតថ្លៃតាមអ៊ីនធឺណិត ដោយប្រើឧបករណ៍ដោះស្រាយ EPANET';
 $ec_lang['lpn_main_desc']='ការវិភាគបណ្ដាញផ្គត់ផ្គង់ទឹក៖ គូរបណ្ដាញបំពង់រង្វិលបិទ ឬនាំចូលឯកសារ EPANET';
@@ -653,7 +653,7 @@ $ec_lang['lpn_tool_add_pump']='ម៉ាស៊ីនបូម';
 // by what it does as well as by the abbreviation an engineer already knows, because the letters
 // alone teach nobody and the words alone are longer than a modeller wants to read every time.
 $ec_lang['lpn_tool_add_valve']='វ៉ាល់';
-$ec_lang['lpn_tool_add_text']='អក្សរ';
+$ec_lang['lpn_tool_add_text']='អត្ថបទ';
 $ec_lang['lpn_tool_vertices']='ចំណុចកំណត់';
 // ---- CUSTOMERS: metered demands, lumped at the nearest node (ROADMAP Task 247) ----
 // **THE FEATURE IS CALLED CUSTOMER AND NOTHING A PERSON READS SAYS METER** (Tom, 2026-09-18:
@@ -863,7 +863,7 @@ $ec_lang['lpn_field_elev']='កម្ពស់';
 // was no tank. Since Task 248 there is one, and the two are different assets: a reservoir's level
 // never moves, a tank's does. Raising a reservoir's head is still a legitimate thing to do -- it is
 // just not how you model storage any more.
-$ec_lang['lpn_field_head']='ថ្ពល់';
+$ec_lang['lpn_field_head']='ក្បាលទឹក';
 // 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
 // outright that it is a height and not a pressure, which is the exact confusion the glossary's
 // avoid list guards against.
@@ -1022,13 +1022,13 @@ $ec_lang['lpn_units_length']='ប្រវែង';
 $ec_lang['lpn_units_mapcoords']='កូអរដោនេផែនទី';
 $ec_lang['lpn_units_mapcoords_deg']='អង្សា';
 $ec_lang['lpn_units_usft']='ហ្វីតស្ទង់សហរដ្ឋអាមេរិក';
-$ec_lang['lpn_units_elevhead']='កម្ពស់ និងថ្ពល់';
+$ec_lang['lpn_units_elevhead']='កម្ពស់ និងក្បាលទឹក';
 // Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
 // mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
 // alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
 // mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
-$ec_lang['lpn_result_gradient']='ជម្រាលការបាត់បង់ថ្ពល់';
-$ec_lang['lpn_result_gradient_tip']='ការបាត់បង់ថ្ពល់ចែកនឹងប្រវែងបំពង់។ ប្រើវាដើម្បីប្រៀបធៀបបំពង់ដែលមានប្រវែងខុសគ្នា ធៀបនឹងដែនកំណត់រចនាតែមួយ។';
+$ec_lang['lpn_result_gradient']='ជម្រាលការបាត់បង់ក្បាលទឹក';
+$ec_lang['lpn_result_gradient_tip']='ការបាត់បង់ក្បាលទឹកចែកនឹងប្រវែងបំពង់។ ប្រើវាដើម្បីប្រៀបធៀបបំពង់ដែលមានប្រវែងខុសគ្នា ធៀបនឹងដែនកំណត់រចនាតែមួយ។';
 $ec_lang['lpn_result_water_age']='អាយុទឹក';
 $ec_lang['lpn_result_water_age_tip']='ពេលវេលាដែលទឹកដែលមកដល់ចំណុចនេះបានស្ថិតនៅក្នុងប្រព័ន្ធ។ កន្លែងលំហូរជួបគ្នា លេខគឺជាមធ្យមនៃអាយុទឹកដែលមកដល់ ថ្លឹងតាមលំហូរ។ នៅក្នុងធុងទឹក វាជាអាយុមធ្យមនៃទឹកដែលផ្ទុក ដូច្នេះធុងទឹកដែលផ្លាស់ប្ដូរទឹកយឺតជាធម្មតាមានទឹកចាស់បំផុតក្នុងបណ្ដាញ។ គ្មានដែនកំណត់បទប្បញ្ញត្តិសម្រាប់ប្រៀបធៀបនឹងវាទេ ដូច្នេះសូមវាយតម្លៃវាធៀបនឹងលក្ខខណ្ឌក្នុងប្រព័ន្ធដែលកំពុងធ្វើគំរូ។';
 $ec_lang['lpn_result_source_share']='ចំណែកប្រភព';
@@ -1055,13 +1055,13 @@ $ec_lang['lpn_result_reaction_rate']='អត្រាប្រតិកម្ម
 $ec_lang['lpn_result_status']='ស្ថានភាព';
 $ec_lang['lpn_result_status_open']='បើក';
 $ec_lang['lpn_result_status_closed']='បិទ';
-$ec_lang['lpn_result_head']='ថ្ពល់';
+$ec_lang['lpn_result_head']='ក្បាលទឹក';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_result_head_tip']='ថាមពលទឹកនៅថ្នាំងនេះ សរសេរជាកម្ពស់ជួរឈរទឹក។ វាជាកម្ពស់ដាច់ខាត ខណៈសម្ពាធជារង្វាស់ដោយប្រដាប់វាស់ (gauge)។';
 $ec_lang['lpn_result_pressure']='សម្ពាធ';
 $ec_lang['lpn_result_flow']='លំហូរ';
 $ec_lang['lpn_result_velocity']='ល្បឿន';
-$ec_lang['lpn_result_headloss']='ការបាត់បង់ថ្ពល់';
+$ec_lang['lpn_result_headloss']='ការបាត់បង់ក្បាលទឹក';
 // The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
 // (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
 // "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
@@ -1409,7 +1409,7 @@ $ec_lang['lpn_help_walkthroughs']='មគ្គុទ្ទេសក៍';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='លុបបណ្ដាញ';
-$ec_lang['lpn_confirm_delete_network']='លុបថ្នាំង ខ្សែបំពង់ និងស្លាកអក្សរទាំងអស់ក្នុងគម្រោងនេះមែនទេ? រូបភាពផ្ទៃខាងក្រោយ ឈ្មោះគម្រោង និងការកំណត់របស់អ្នកនៅតែរក្សាទុក។';
+$ec_lang['lpn_confirm_delete_network']='លុបថ្នាំង ខ្សែបំពង់ និងអត្ថបទទាំងអស់ក្នុងគម្រោងនេះមែនទេ? រូបភាពផ្ទៃខាងក្រោយ ឈ្មោះគម្រោង និងការកំណត់របស់អ្នកនៅតែរក្សាទុក។';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -1584,9 +1584,9 @@ $ec_lang['lpn_profile_no_path']='ថ្នាំងទាំងពីរនេ�
 $ec_lang['lpn_profile_no_solve']='មិនទាន់មានលទ្ធផលនៅឡើយទេ ដូច្នេះមានតែខ្សែផ្ទៃដីត្រូវបានគូរប៉ុណ្ណោះ។';
 $ec_lang['lpn_profile_summary']='ថ្នាំង៖ {n}, ប្រវែង៖ {len} {u}';
 $ec_lang['lpn_profile_axis_station']='ចម្ងាយតាមផ្លូវ ({u})';
-$ec_lang['lpn_profile_axis_elev']='កម្ពស់ និងថ្ពល់ ({u})';
+$ec_lang['lpn_profile_axis_elev']='កម្ពស់ និងក្បាលទឹក ({u})';
 $ec_lang['lpn_profile_ground']='ផ្ទៃដី';
-$ec_lang['lpn_profile_hgl']='ខ្សែថ្ពល់ធារាសាស្ត្រ';
+$ec_lang['lpn_profile_hgl']='ខ្សែក្បាលទឹកធារាសាស្ត្រ';
 // ---- Task 509: the two operations the control column took with it ----------------------------
 // Task 506 removed the From/To pull-downs and the waypoint chips, and with them the only way to
 // change ONE end of a path or take ONE node off it. They come back in an overlay box over the map,
@@ -1665,8 +1665,8 @@ $ec_lang['lpn_contour_support']='ផែនទីបន្ទាត់ស្ម�
 $ec_lang['lpn_contour_support_lines']='បន្ទាត់ស្មើតម្លៃរៀងរាល់ {i} {u}។';
 $ec_lang['lpn_contour_too_many']='មានបន្ទាត់ស្មើតម្លៃច្រើនពេកនៅចន្លោះនេះ សូមបង្កើនចន្លោះដើម្បីគូរវា។';
 $ec_lang['lpn_contour_dem']='ដីរវាងថ្នាំងពី Mapbox DEM';
-$ec_lang['lpn_contour_dem_tip']='រវាងថ្នាំង សម្ពាធក្លាយជាថ្ពល់ដែលបានគណនាចន្លោះ ដកកម្ពស់ដីពី Mapbox DEM ដូច្នេះវាអាចធ្លាក់ទាបជាងសម្ពាធថ្នាំងទាបបំផុត នៅលើភ្នំដែលបណ្ដាញគ្មានថ្នាំង។ សូមចាត់ទុកដីជាផែនទីបន្ទាត់ស្មើតម្លៃ មិនមែនជាការស្ទង់វាស់ទេ។';
-$ec_lang['lpn_contour_support_dem']='រវាងថ្នាំង សម្ពាធគឺជាថ្ពល់ដែលបានគណនាចន្លោះ ដកកម្ពស់ដីពី Mapbox DEM ដែលយកគំរូប្រហែលរៀងរាល់ {m} ម៉ែត្រ។';
+$ec_lang['lpn_contour_dem_tip']='រវាងថ្នាំង សម្ពាធក្លាយជាក្បាលទឹកដែលបានគណនាចន្លោះ ដកកម្ពស់ដីពី Mapbox DEM ដូច្នេះវាអាចធ្លាក់ទាបជាងសម្ពាធថ្នាំងទាបបំផុត នៅលើភ្នំដែលបណ្ដាញគ្មានថ្នាំង។ សូមចាត់ទុកដីជាផែនទីបន្ទាត់ស្មើតម្លៃ មិនមែនជាការស្ទង់វាស់ទេ។';
+$ec_lang['lpn_contour_support_dem']='រវាងថ្នាំង សម្ពាធគឺជាក្បាលទឹកដែលបានគណនាចន្លោះ ដកកម្ពស់ដីពី Mapbox DEM ដែលយកគំរូប្រហែលរៀងរាល់ {m} ម៉ែត្រ។';
 $ec_lang['lpn_contour_dem_failed']='មិនអាចអានដីពី Mapbox DEM បានទេ ដូច្នេះសម្ពាធត្រូវបានគណនាចន្លោះរវាងថ្នាំងតែប៉ុណ្ណោះ។';
 $ec_lang['lpn_contour_consent_1']='ការគូរសម្ពាធលើដី ផ្ញើតំបន់ដែលបណ្ដាញរបស់អ្នកគ្របដណ្ដប់ ជាលេខក្រឡាផែនទី Mapbox ទៅ api.mapbox.com ដើម្បីអានកម្ពស់ដីនៅទីនោះ។';
 $ec_lang['lpn_contour_consent_2']='នេះជាសំណួរខុសពីរូបភាពផែនទីនៅពីក្រោយគម្រោងរបស់អ្នក។ រូបភាពទាំងនោះគ្រាន់តែប្រាប់ថាអ្នកកំពុងមើលកន្លែងណា។ ក្រឡាទាំងនេះប្រាប់ថាបណ្ដាញរបស់អ្នកនៅឯណា។ Mapbox នឹងទទួលបានលេខក្រឡាទាំងនោះ និងអាសយដ្ឋាន IP របស់អ្នក។ យើងមិនផ្ញើអ្វីផ្សេងទៀតឡើយ៖ គ្មានឈ្មោះ គ្មានបំពង់ គ្មានគម្រោង។ យើងមិនរក្សាកំណត់ត្រាអំពីរឿងនេះទេ ហើយគ្មានអ្វីត្រូវបានរក្សាទុកនៅលើឧបករណ៍នេះ លើកលែងតែចម្លើយរបស់អ្នកចំពោះសំណួរនេះ។';
@@ -1818,7 +1818,7 @@ $ec_lang['lpn_net_bad_file']='នេះមើលទៅដូចជាឯកស�
 $ec_lang['lpn_inp_report_heading']='បាននាំចូល {file}';
 $ec_lang['lpn_inp_report_counts']='{nodes} ថ្នាំង អាងស្តុក និងធុងទឹក, {links} បំពង់ ម៉ាស៊ីនបូម និងវ៉ាល់, គិតជា {units}។';
 $ec_lang['lpn_inp_report_clean']='ទិន្នន័យទាំងអស់ក្នុងឯកសារត្រូវបាននាំចូល។ គ្មានអ្វីត្រូវបានលុបចោលទេ។';
-$ec_lang['lpn_inp_report_label_anchor']='ស្លាកអត្ថបទត្រូវបានដាក់តាមរបៀបដែល EPANET ដាក់ពួកវា គិតចាប់ពីជ្រុងខាងលើឆ្វេងរបស់វា។';
+$ec_lang['lpn_inp_report_label_anchor']='អត្ថបទត្រូវបានដាក់តាមរបៀបដែល EPANET ដាក់ពួកវា គិតចាប់ពីជ្រុងខាងលើឆ្វេងរបស់វា។';
 // **R-219; Tom, 2026-09-24, answering R-190**: dropping the "These are already lat/lon" button in
 // favor of typing 1 for Step 2's Ground distance field means both Import and Convert as have to say
 // that door still exists. Shown for any file that lands as a plain XY drawing -- Feet, Meters, None
@@ -1840,10 +1840,10 @@ $ec_lang['lpn_inp_drop_patterns']='ទំព័រនេះមិនបានអ
 $ec_lang['lpn_inp_drop_demand_pattern']='ថ្នាំងទាំងនេះមានតម្រូវការដែលប្រែប្រួលពេញការដំណើរការ។ លំនាំរបស់វាត្រូវបាននាំចូលទាំងស្រុង ហើយតម្រូវការដែលបង្ហាញគឺតម្លៃនៅពេលវេលានៅលើនាឡិកា។';
 $ec_lang['lpn_inp_drop_emitters']='ថ្នាំងទាំងនេះមានមេគុណលិចទឹក ឬកន្លែងលេច។ វាត្រូវបានរក្សាទុក និងកំពុងត្រូវបានដោះស្រាយ ហើយថ្នាំងនីមួយៗបង្ហាញវានៅក្នុងប្រអប់ មេគុណឧបករណ៍បាញ់ ក្នុងលក្ខណៈសម្បត្តិផ្ទាល់ខ្លួនរបស់វា។';
 $ec_lang['lpn_inp_drop_curve_long']='ខ្សែកោងម៉ាស៊ីនបូមនេះមានចំណុចច្រើនជាងបី។ ចំណុចទាបបំផុត កណ្ដាល និងខ្ពស់បំផុតត្រូវបានរក្សាទុក ព្រោះទំព័រនេះសម្របខ្សែកោងទៅនឹងចំណុចបីជាអតិបរមា។';
-$ec_lang['lpn_inp_drop_curve_missing']='ម៉ាស៊ីនបូមនេះសំដៅទៅខ្សែកោងដែលមិននៅក្នុងឯកសារ។ ម៉ាស៊ីនបូមត្រូវបាននាំចូលដោយគ្មានខ្សែកោង ដូច្នេះវាមិនបន្ថែមថ្ពល់ទេ។';
-$ec_lang['lpn_inp_drop_pump_other']='ម៉ាស៊ីនបូមនេះត្រូវបានពិពណ៌នាដោយថាមពលដែលវាប្រើ ជាជាងដោយខ្សែកោង។ វាត្រូវបាននាំចូលដោយគ្មានខ្សែកោង ដូច្នេះវាមិនបន្ថែមថ្ពល់ទេ។';
-$ec_lang['lpn_inp_drop_head_pattern']='អាងស្តុកទាំងនេះមានថ្ពល់ដែលប្រែប្រួលពេញការដំណើរការ។ លំនាំរបស់វាត្រូវបាននាំចូលទាំងស្រុង ហើយកម្រិតទឹកដែលបង្ហាញគឺតម្លៃនៅពេលវេលានៅលើនាឡិកា។';
-$ec_lang['lpn_inp_drop_pump_speed']='ម៉ាស៊ីនបូមទាំងនេះដំណើរការក្នុងល្បឿនផ្សេងពីល្បឿនដែលខ្សែកោងរបស់វាត្រូវបានវាស់ ឬប្ដូរល្បឿនពេញការដំណើរការ។ ល្បឿន និងលំនាំរបស់វាត្រូវបាននាំចូលទាំងស្រុង ហើយថ្ពល់ដែលបង្ហាញគឺតម្លៃនៅពេលវេលានៅលើនាឡិកា។';
+$ec_lang['lpn_inp_drop_curve_missing']='ម៉ាស៊ីនបូមនេះសំដៅទៅខ្សែកោងដែលមិននៅក្នុងឯកសារ។ ម៉ាស៊ីនបូមត្រូវបាននាំចូលដោយគ្មានខ្សែកោង ដូច្នេះវាមិនបន្ថែមក្បាលទឹកទេ។';
+$ec_lang['lpn_inp_drop_pump_other']='ម៉ាស៊ីនបូមនេះត្រូវបានពិពណ៌នាដោយថាមពលដែលវាប្រើ ជាជាងដោយខ្សែកោង។ វាត្រូវបាននាំចូលដោយគ្មានខ្សែកោង ដូច្នេះវាមិនបន្ថែមក្បាលទឹកទេ។';
+$ec_lang['lpn_inp_drop_head_pattern']='អាងស្តុកទាំងនេះមានក្បាលទឹកដែលប្រែប្រួលពេញការដំណើរការ។ លំនាំរបស់វាត្រូវបាននាំចូលទាំងស្រុង ហើយកម្រិតទឹកដែលបង្ហាញគឺតម្លៃនៅពេលវេលានៅលើនាឡិកា។';
+$ec_lang['lpn_inp_drop_pump_speed']='ម៉ាស៊ីនបូមទាំងនេះដំណើរការក្នុងល្បឿនផ្សេងពីល្បឿនដែលខ្សែកោងរបស់វាត្រូវបានវាស់ ឬប្ដូរល្បឿនពេញការដំណើរការ។ ល្បឿន និងលំនាំរបស់វាត្រូវបាននាំចូលទាំងស្រុង ហើយក្បាលទឹកដែលបង្ហាញគឺតម្លៃនៅពេលវេលានៅលើនាឡិកា។';
 $ec_lang['lpn_inp_drop_setting']='បំពង់ ម៉ាស៊ីនបូម និងវ៉ាល់ទាំងនេះមានការកំណត់ដែលទំព័រនេះមិនអាចផ្ទុកបាន។ ពួកវាត្រូវបាននាំចូលជាបើក។';
 $ec_lang['lpn_inp_drop_rules']='ឯកសារនេះមានច្បាប់ត្រួតពិនិត្យតាមក្បួន។ ទំព័រនេះអាន និងអនុវត្តវា។ នៅពេលគំរូត្រូវបានដំណើរការ ក្បួនត្រូវបានអនុវត្ត ដោយកម្រិតទឹក សម្ពាធ និងលំហូរនីមួយៗក្នុងនោះត្រូវបានបម្លែងទៅខ្នាតដែលគម្រោងនេះបង្ហាញ។ បើក ក្បួន ក្រោម បណ្ណាល័យ ដើម្បីមើល ឬកែសម្រួលក្បួន។ ក្បួនត្រូវបានរក្សាទុកយ៉ាងពិតប្រាកដតាមដែលបានចែងក្នុងឯកសារ ហើយសរសេរត្រឡប់វិញ ប្រសិនបើអ្នករក្សាទុកជាឯកសារ EPANET។';
 $ec_lang['lpn_inp_drop_eps']='ឯកសារនេះពិពណ៌នាការក្លែងធ្វើលើរយៈពេលមួយ។ ម៉ូឌុលការក្លែងធ្វើលើរយៈពេលមួយនៃទំព័រនេះមិនបានផ្ទុកទេ ដូច្នេះមានតែលក្ខខណ្ឌចាប់ផ្ដើមប៉ុណ្ណោះដែលត្រូវបាននាំចូល។';
@@ -2127,7 +2127,7 @@ $ec_lang['lpn_notes_3_def']='គម្រោងនីមួយៗគឺជាផ
 // H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='ខ្សែកោងម៉ាស៊ីនបូម';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_notes_5_def']='ម៉ាស៊ីនបូមមួយធ្វើតាម H = H₀ − aQ^b ដែល H ជាថ្ពល់ដែលម៉ាស៊ីនបូមបន្ថែម ហើយ Q ជាលំហូរឆ្លងកាត់វា។ បញ្ចូលមួយ ពីរ ឬបីចំណុចពីខ្សែកោងរបស់ក្រុមហ៊ុនផលិត។ បីចំណុច — ថ្ពល់ត្រង់លំហូរសូន្យ ចំណុចធ្វើការធម្មតា និងចំណុចលំហូរខ្ពស់បំផុត — សម្របទៅ H₀, a និង b ដោយផ្ទាល់ ហើយតាមខ្សែកោងដែលបានបោះពុម្ពស្អិតបំផុត។ ពីរចំណុចសម្របទៅប៉ារ៉ាបូល (b = 2) ដែលកំពូលរបស់វានៅត្រង់លំហូរសូន្យ។ ចំណុចមួយប្រើក្បួនធម្មតា៖ ថ្ពល់ត្រង់លំហូរសូន្យគឺ ១.៣៣ × ថ្ពល់ដែលអ្នកបញ្ចូល ហើយលំហូរខ្ពស់បំផុតគឺ ២ × លំហូរដែលអ្នកបញ្ចូល ដែលផ្ដល់ b = 2 ដដែល។ ម៉ាស៊ីនបូមមួយដែលគ្មានចំណុចត្រូវបានបញ្ចូលមិនបន្ថែមថ្ពល់ទាល់តែសោះ។ ខ្សែកោងមិនត្រូវបានកាត់ចេញត្រង់ចំណុចដែលថ្ពល់ឈានដល់សូន្យទេ ដូច្នេះការសុំម៉ាស៊ីនបូមឲ្យផ្ដល់លំហូរច្រើនជាងអ្វីដែលខ្សែកោងរបស់វាអាចផ្ដល់បាន ផ្ដល់ថ្ពល់អវិជ្ជមាន។ ដំណោះស្រាយគឺម៉ាស៊ីនបូមធំជាង ឬតម្រូវការតូចជាង មិនមែនការសម្របខ្សែកោងផ្សេងទេ។ ខ្សែកោងមួយអាចមានចំណុចច្រើនជាងបី ហើយរាល់ចំណុចដែលអ្នកបានផ្ដល់ត្រូវបានអាន។';
+$ec_lang['lpn_notes_5_def']='ម៉ាស៊ីនបូមមួយធ្វើតាម H = H₀ − aQ^b ដែល H ជាក្បាលទឹកដែលម៉ាស៊ីនបូមបន្ថែម ហើយ Q ជាលំហូរឆ្លងកាត់វា។ បញ្ចូលមួយ ពីរ ឬបីចំណុចពីខ្សែកោងរបស់ក្រុមហ៊ុនផលិត។ បីចំណុច — ក្បាលទឹកត្រង់លំហូរសូន្យ ចំណុចធ្វើការធម្មតា និងចំណុចលំហូរខ្ពស់បំផុត — សម្របទៅ H₀, a និង b ដោយផ្ទាល់ ហើយតាមខ្សែកោងដែលបានបោះពុម្ពស្អិតបំផុត។ ពីរចំណុចសម្របទៅប៉ារ៉ាបូល (b = 2) ដែលកំពូលរបស់វានៅត្រង់លំហូរសូន្យ។ ចំណុចមួយប្រើក្បួនធម្មតា៖ ក្បាលទឹកត្រង់លំហូរសូន្យគឺ ១.៣៣ × ក្បាលទឹកដែលអ្នកបញ្ចូល ហើយលំហូរខ្ពស់បំផុតគឺ ២ × លំហូរដែលអ្នកបញ្ចូល ដែលផ្ដល់ b = 2 ដដែល។ ម៉ាស៊ីនបូមមួយដែលគ្មានចំណុចត្រូវបានបញ្ចូលមិនបន្ថែមក្បាលទឹកទាល់តែសោះ។ ខ្សែកោងមិនត្រូវបានកាត់ចេញត្រង់ចំណុចដែលក្បាលទឹកឈានដល់សូន្យទេ ដូច្នេះការសុំម៉ាស៊ីនបូមឲ្យផ្ដល់លំហូរច្រើនជាងអ្វីដែលខ្សែកោងរបស់វាអាចផ្ដល់បាន ផ្ដល់ក្បាលទឹកអវិជ្ជមាន។ ដំណោះស្រាយគឺម៉ាស៊ីនបូមធំជាង ឬតម្រូវការតូចជាង មិនមែនការសម្របខ្សែកោងផ្សេងទេ។ ខ្សែកោងមួយអាចមានចំណុចច្រើនជាងបី ហើយរាល់ចំណុចដែលអ្នកបានផ្ដល់ត្រូវបានអាន។';
 // WAS "Planned additions", NAMING THREE THINGS THAT NOW SHIP (scenarios, result tables, .inp
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
@@ -2186,7 +2186,7 @@ $ec_lang['lpn_engine_wait_pct']='ឧបករណ៍ដោះស្រាយប�
 $ec_lang['lpn_engine_wait_bytes']='ឧបករណ៍ដោះស្រាយបានផ្ទុក {kb} KB រហូតមកដល់ពេលនេះ។ ចំនួនសរុបមិនមានទេ ដូច្នេះភាគរយនៃការបញ្ចប់មិនស្គាល់ទេ។';
 $ec_lang['lpn_engine_needed_failed']='ឧបករណ៍ដោះស្រាយ EPANET មិនទាន់ត្រូវបានផ្ទុកនៅឡើយទេ មិនអាចផ្ទុកបានទេ ហើយបណ្ដាញនេះអាចដោះស្រាយបានដោយវាតែប៉ុណ្ណោះ។ វានឹងត្រូវបានផ្ទុកនៅពេលអ្នកភ្ជាប់អ៊ីនធឺណិត។';
 $ec_lang['lpn_diag_valve_needs_epanet']='ទាំងនេះជាវ៉ាល់ត្រួតត្រាសម្ពាធ ឬលំហូរ ហើយមានតែឧបករណ៍ដោះស្រាយ EPANET ប៉ុណ្ណោះដែលអាចគណនាវាបាន។ មិនអាចផ្ទុកឧបករណ៍ដោះស្រាយ EPANET បានទេ ដូច្នេះលទ្ធផលទាំងនេះបាត់៖';
-$ec_lang['lpn_diag_valve_on_fixed_head']='វ៉ាល់ទាំងនេះតភ្ជាប់ដោយផ្ទាល់ទៅអាងស្តុក ឬធុងទឹក ដែលកំណត់ថ្ពល់នៅថ្នាំងនោះ ដូច្នេះវ៉ាល់គ្មានអ្វីត្រូវត្រួតត្រាទេ។ សូមដាក់បំពង់ខ្លីមួយរវាងវ៉ាល់ និងអាងស្តុក ឬធុងទឹក៖';
+$ec_lang['lpn_diag_valve_on_fixed_head']='វ៉ាល់ទាំងនេះតភ្ជាប់ដោយផ្ទាល់ទៅអាងស្តុក ឬធុងទឹក ដែលកំណត់ក្បាលទឹកនៅថ្នាំងនោះ ដូច្នេះវ៉ាល់គ្មានអ្វីត្រូវត្រួតត្រាទេ។ សូមដាក់បំពង់ខ្លីមួយរវាងវ៉ាល់ និងអាងស្តុក ឬធុងទឹក៖';
 $ec_lang['lpn_diag_not_converged']='រកមិនឃើញដំណោះស្រាយទេ។ សូមពិនិត្យរកតម្លៃដែលមិនអាចមានក្នុងជីវិតពិត ដូចជាអង្កត់ផ្ចិតសូន្យ។';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
 // converge still produced the last iterate, and that is every number this page has -- refusing to
@@ -2216,7 +2216,7 @@ $ec_lang['lpn_field_to']='ទៅ';
 // different units, and one shared label would have to be vague enough to cover all three.
 $ec_lang['lpn_field_valve_type']='ប្រភេទវ៉ាល់';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_valve_type_tip']='ប្រភេទវ៉ាល់។ វ៉ាល់ប្រភេទការបាត់បង់ថេរ (TCV) អនុវត្តការបាត់បង់ថេរ។ PRV, PSV និង FCV រក្សាសម្ពាធ ឬលំហូរ ហើយបើកពេញ បិទ ឬបិទមួយផ្នែក ទៅតាមការផ្លាស់ប្ដូរលក្ខខណ្ឌធារាសាស្ត្រ។ PBV ដកសម្ពាធថេរ ហើយ GPV ដើរតាមខ្សែកោងការបាត់បង់ថ្ពល់។ ប្រភេទទាំងនេះត្រួតត្រាលក្ខណៈធារាសាស្ត្រខុសគ្នា ដូច្នេះការកំណត់អាចបាត់បង់នៅពេលប្ដូរប្រភេទ។';
+$ec_lang['lpn_field_valve_type_tip']='ប្រភេទវ៉ាល់។ វ៉ាល់ប្រភេទការបាត់បង់ថេរ (TCV) អនុវត្តការបាត់បង់ថេរ។ PRV, PSV និង FCV រក្សាសម្ពាធ ឬលំហូរ ហើយបើកពេញ បិទ ឬបិទមួយផ្នែក ទៅតាមការផ្លាស់ប្ដូរលក្ខខណ្ឌធារាសាស្ត្រ។ PBV ដកសម្ពាធថេរ ហើយ GPV ដើរតាមខ្សែកោងការបាត់បង់ក្បាលទឹក។ ប្រភេទទាំងនេះត្រួតត្រាលក្ខណៈធារាសាស្ត្រខុសគ្នា ដូច្នេះការកំណត់អាចបាត់បង់នៅពេលប្ដូរប្រភេទ។';
 // THE ENGLISH IS ELLIPTICAL ON PURPOSE -- the noun "valve" is dropped because the dropdown above
 // already says "Valve type" -- so a translator meets a bare modifier with no head noun, and
 // "throttle" alone pulls hard toward a car accelerator. Each _syn supplies the noun plus alternates
@@ -2233,10 +2233,10 @@ $ec_lang['lpn_valve_type_gpv']='គោលបំណងទូទៅ (GPV)';
 $ec_lang['lpn_field_valve_setting_drop']='ការធ្លាក់សម្ពាធ';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_valve_setting_drop_tip']='សម្ពាធដែលវ៉ាល់ដកចេញ។ វ៉ាល់កាត់បន្ថយសម្ពាធថេរដកចេញនូវសម្ពាធនេះជានិច្ច មិនថាទឹកហូរទិសណាទេ។ វាជាការធ្លាក់សម្ពាធឆ្លងកាត់វ៉ាល់ មិនមែនជាសម្ពាធត្រូវរក្សាទេ។';
-$ec_lang['lpn_inp_drop_gpv_curve']='វ៉ាល់នេះសំដៅទៅខ្សែកោងការបាត់បង់ថ្ពល់ដែលមិននៅក្នុងឯកសារ។ វ៉ាល់ត្រូវបាននាំចូលដោយគ្មានខ្សែកោង ដូច្នេះវានៅបើកពេញ រហូតដល់ខ្សែកោងមួយត្រូវបានជ្រើសរើស។';
-$ec_lang['lpn_gpv_curve_source']='ខ្សែកោងការបាត់បង់ថ្ពល់វ៉ាល់';
+$ec_lang['lpn_inp_drop_gpv_curve']='វ៉ាល់នេះសំដៅទៅខ្សែកោងការបាត់បង់ក្បាលទឹកដែលមិននៅក្នុងឯកសារ។ វ៉ាល់ត្រូវបាននាំចូលដោយគ្មានខ្សែកោង ដូច្នេះវានៅបើកពេញ រហូតដល់ខ្សែកោងមួយត្រូវបានជ្រើសរើស។';
+$ec_lang['lpn_gpv_curve_source']='ខ្សែកោងការបាត់បង់ក្បាលទឹកវ៉ាល់';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_gpv_curve_source_tip']='ខ្សែកោងក្នុងប្រអប់ បណ្ណាល័យ ដែលផ្ដល់ការបាត់បង់ថ្ពល់កាត់វ៉ាល់នេះនៅលំហូរនីមួយៗ។ វ៉ាល់ជាច្រើនអាចប្រើខ្សែកោងតែមួយ ហើយការកែសម្រួលវានៅទីនោះផ្លាស់ប្ដូរពួកវាទាំងអស់។';
+$ec_lang['lpn_gpv_curve_source_tip']='ខ្សែកោងក្នុងប្រអប់ បណ្ណាល័យ ដែលផ្ដល់ការបាត់បង់ក្បាលទឹកកាត់វ៉ាល់នេះនៅលំហូរនីមួយៗ។ វ៉ាល់ជាច្រើនអាចប្រើខ្សែកោងតែមួយ ហើយការកែសម្រួលវានៅទីនោះផ្លាស់ប្ដូរពួកវាទាំងអស់។';
 $ec_lang['lpn_field_valve_setting_pressure']='ការកំណត់សម្ពាធ';
 $ec_lang['lpn_field_valve_setting_pressure_tip']='វ៉ាល់កាត់បន្ថយសម្ពាធរក្សាសម្ពាធនៅខាងក្រោមទឹករបស់វា ស្មើ ឬទាបជាងតម្លៃនេះ។ វ៉ាល់រក្សាសម្ពាធរក្សាសម្ពាធនៅខាងលើទឹករបស់វា ស្មើ ឬខ្ពស់ជាងតម្លៃនេះ។';
 $ec_lang['lpn_field_valve_setting_flow']='ការកំណត់លំហូរ';
@@ -2244,9 +2244,9 @@ $ec_lang['lpn_field_valve_setting_flow_tip']='លំហូរអតិបរម�
 $ec_lang['lpn_field_valve_setting']='ការកំណត់';
 $ec_lang['lpn_field_valve_setting_loss']='មេគុណការបាត់បង់';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_field_valve_setting_loss_tip']='ថ្ពល់ដែលវ៉ាល់ប្រភេទការបាត់បង់ថេរ (TCV) ដកចេញ ជាពហុគុណនៃថ្ពល់ល្បឿន។ ប្រើ 0 សម្រាប់វ៉ាល់បើកពេញ។ តម្លៃតែមួយនេះគឺជាការបាត់បង់ទាំងអស់របស់វ៉ាល់ប្រភេទនេះ។';
+$ec_lang['lpn_field_valve_setting_loss_tip']='ក្បាលទឹកដែលវ៉ាល់ប្រភេទការបាត់បង់ថេរ (TCV) ដកចេញ ជាពហុគុណនៃក្បាលទឹកល្បឿន។ ប្រើ 0 សម្រាប់វ៉ាល់បើកពេញ។ តម្លៃតែមួយនេះគឺជាការបាត់បង់ទាំងអស់របស់វ៉ាល់ប្រភេទនេះ។';
 $ec_lang['lpn_field_valve_diameter_tip']='អង្កត់ផ្ចិតនៃច្រកបើកវ៉ាល់។ ល្បឿនកាត់វ៉ាល់ត្រូវបានគណនាពីអង្កត់ផ្ចិតនេះ ហើយការបាត់បង់ត្រូវបានគណនាពីល្បឿននោះ។';
-$ec_lang['lpn_field_valve_km_tip']='ការបាត់បង់កាត់តួវ៉ាល់ នៅពេលវ៉ាល់បើកពេញ បន្ថែមលើការបាត់បង់ណាមួយពីការកំណត់វ៉ាល់។ វាត្រូវបានបង្ហាញជាពហុគុណនៃថ្ពល់ល្បឿន។ ប្រើ 0 ដើម្បីមិនអើពើវា។';
+$ec_lang['lpn_field_valve_km_tip']='ការបាត់បង់កាត់តួវ៉ាល់ នៅពេលវ៉ាល់បើកពេញ បន្ថែមលើការបាត់បង់ណាមួយពីការកំណត់វ៉ាល់។ វាត្រូវបានបង្ហាញជាពហុគុណនៃក្បាលទឹកល្បឿន។ ប្រើ 0 ដើម្បីមិនអើពើវា។';
 $ec_lang['lpn_field_km']='មេគុណការបាត់បង់មូលដ្ឋាន, k';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
 // legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
@@ -2258,9 +2258,9 @@ $ec_lang['lpn_field_km_short']='ការបាត់បង់មូលដ្ឋ
 // `lpn_pump_curve_ref_note` went with the change: they were the two halves of `curveRef`, which
 // named ANOTHER PUMP to copy points from because there was nothing else to point at. Two pumps on
 // one curve name the same curve now, so there is no borrow to describe.
-$ec_lang['lpn_pump_curve_source']='ខ្សែកោងថ្ពល់ម៉ាស៊ីនបូម';
+$ec_lang['lpn_pump_curve_source']='ខ្សែកោងក្បាលទឹកម៉ាស៊ីនបូម';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_pump_curve_source_tip']='ខ្សែកោងក្នុងប្រអប់ បណ្ណាល័យ ដែលផ្ដល់ថ្ពល់ដែលម៉ាស៊ីនបូមនេះបន្ថែមនៅលំហូរនីមួយៗ។ ម៉ាស៊ីនបូមជាច្រើនអាចប្រើខ្សែកោងតែមួយ ហើយការកែសម្រួលវានៅទីនោះផ្លាស់ប្ដូរពួកវាទាំងអស់។';
+$ec_lang['lpn_pump_curve_source_tip']='ខ្សែកោងក្នុងប្រអប់ បណ្ណាល័យ ដែលផ្ដល់ក្បាលទឹកដែលម៉ាស៊ីនបូមនេះបន្ថែមនៅលំហូរនីមួយៗ។ ម៉ាស៊ីនបូមជាច្រើនអាចប្រើខ្សែកោងតែមួយ ហើយការកែសម្រួលវានៅទីនោះផ្លាស់ប្ដូរពួកវាទាំងអស់។';
 // **"THE NOTES BELOW" DO NOT EXIST ON THIS PAGE** (Tom, 2026-09-05: *"There are no notes below.
 // It's in Help, Notes on this page."*). Every other calculator in this suite is a form with its
 // notes printed under it, and this sentence was written in that habit; the map page is a full-window
@@ -2313,10 +2313,10 @@ $ec_lang['lpn_curve_library_link_tip']='បើកប្រអប់ បណ្ណ
 // decides the two column headings and their units. EPANET states it in a `;PUMP:`-style comment
 // above the curve's own rows, which this page reads and writes back, so a curve nothing references
 // still knows what it is.
-$ec_lang['lpn_curve_kind_head']='ថ្ពល់ម៉ាស៊ីនបូម';
+$ec_lang['lpn_curve_kind_head']='ក្បាលទឹកម៉ាស៊ីនបូម';
 $ec_lang['lpn_curve_kind_effic']='ប្រសិទ្ធភាពម៉ាស៊ីនបូម';
 $ec_lang['lpn_curve_kind_volume']='ទំហំធុងទឹក';
-$ec_lang['lpn_curve_kind_headloss']='ការបាត់បង់ថ្ពល់វ៉ាល់';
+$ec_lang['lpn_curve_kind_headloss']='ការបាត់បង់ក្បាលទឹកវ៉ាល់';
 // **NOT A FIFTH KIND.** A curve whose file states no type comment and which nothing references, so
 // there is nothing to state. It is never offered as a choice; it is only shown, already selected,
 // on a curve in that state, so it can be seen and changed.
@@ -2351,7 +2351,7 @@ $ec_lang['lpn_mode_add_pump']='របៀប៖ បន្ថែមម៉ាស៊
 $ec_lang['lpn_mode_add_valve']='របៀប៖ បន្ថែមវ៉ាល់។ ចុចលើថ្នាំងមួយ បន្ទាប់មកថ្នាំងមួយទៀត ដើម្បីភ្ជាប់ពួកវា។ ចុចលើទំហំទំនេររវាងវា ដើម្បីបត់បន្ទាត់ ឬចុច Esc ដើម្បីចាប់ផ្ដើមឡើងវិញ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ និងស្លាក។';
 // Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
 // sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
-$ec_lang['lpn_mode_add_text']='របៀប៖ បន្ថែមអក្សរ។ ចុចលើផែនទីដើម្បីដាក់ស្លាកអក្សរមួយ។ ចុចជិតថ្នាំងមួយដើម្បីភ្ជាប់អក្សរនោះទៅថ្នាំងនោះ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ និងស្លាក។';
+$ec_lang['lpn_mode_add_text']='របៀប៖ បន្ថែមអត្ថបទ។ ចុចលើផែនទីដើម្បីដាក់អត្ថបទមួយ។ ចុចជិតថ្នាំងមួយដើម្បីភ្ជាប់អត្ថបទនោះទៅថ្នាំងនោះ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ និងស្លាក។';
 // Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
 // most likely to miss the point of -- that Select is what you use to edit/move things, and that a
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
@@ -2407,7 +2407,7 @@ $ec_lang['lpn_field_text_size']='កត្តាគុណទំហំ';
 // from the labeling threshold and this switch is how a note is made to fade out with the generated
 // labels instead. Unticking it is the only way a Text object has ever hidden because of the zoom.
 $ec_lang['lpn_field_text_all_zoom']='បង្ហាញនៅគ្រប់កម្រិតពង្រីកទាំងអស់';
-$ec_lang['lpn_field_text_all_zoom_tip']='រក្សាអក្សរនេះនៅលើគំនូរ ទោះបីអ្នកបង្រួមឆ្ងាយប៉ុនណាក៏ដោយ។ ដកធីកវាចេញ ហើយអក្សរនេះនឹងលាក់ជាមួយស្លាកផ្សេងទៀត នៅពេលទិដ្ឋភាពទូលាយជាងកម្រិតកំណត់ស្លាកដែលបានកំណត់នៅក្រោម ផែនទី និងទំព័រ។';
+$ec_lang['lpn_field_text_all_zoom_tip']='រក្សាអត្ថបទនេះនៅលើគំនូរ ទោះបីអ្នកបង្រួមឆ្ងាយប៉ុនណាក៏ដោយ។ ដកធីកវាចេញ ហើយអត្ថបទនេះនឹងលាក់ជាមួយស្លាកផ្សេងទៀត នៅពេលទិដ្ឋភាពទូលាយជាងកម្រិតកំណត់ស្លាកដែលបានកំណត់នៅក្រោម ផែនទី និងទំព័រ។';
 $ec_lang['lpn_tool_labels']='ស្លាក';
 $ec_lang['lpn_labels_heading_node']='ស្លាកថ្នាំង';
 $ec_lang['lpn_labels_heading_link']='ស្លាកតំណ';
@@ -2426,7 +2426,7 @@ $ec_lang['lpn_settings_apply_to_all']='អនុវត្តទៅគ្រប�
 $ec_lang['lpn_settings_apply_to_all_tip']='ធាតុគ្រប់មួយប្រភេទនេះដែលបានគូររួចហើយ ទទួលបានលេខសម្គាល់ចាប់ផ្ដើមដោយអត្ថបទនេះ។ នីមួយៗរក្សាលេខរបស់វា។ លេខសម្គាល់ដែលមិនបញ្ចប់ដោយលេខ ត្រូវបានទុកចោលមិនប៉ះពាល់។';
 $ec_lang['lpn_confirm_apply_prefix']='ប្ដូរឈ្មោះធាតុ {n} ដើម្បីឲ្យលេខសម្គាល់របស់វាចាប់ផ្ដើមដោយ {prefix} មែនទេ? នីមួយៗរក្សាលេខរបស់វា។';
 $ec_lang['lpn_prefix_applied']='បានប្ដូរឈ្មោះធាតុ {n}។ ធាតុផ្សេងទៀត {skipped} មិនត្រូវបានផ្លាស់ប្ដូរទេ។';
-$ec_lang['lpn_labels_suffix_gradient_tip']='អត្ថបទដែលបន្ថែមនៅក្រោយជម្រាលនៃការបាត់បង់ថ្ពល់លើស្លាកផែនទី។ កុំបញ្ចូលសញ្ញាភាគរយនៅទីនេះ។ វាត្រូវបានបន្ថែមដោយស្វ័យប្រវត្តិនៅពេលខ្នាតជាភាគរយ។';
+$ec_lang['lpn_labels_suffix_gradient_tip']='អត្ថបទដែលបន្ថែមនៅក្រោយជម្រាលនៃការបាត់បង់ក្បាលទឹកលើស្លាកផែនទី។ កុំបញ្ចូលសញ្ញាភាគរយនៅទីនេះ។ វាត្រូវបានបន្ថែមដោយស្វ័យប្រវត្តិនៅពេលខ្នាតជាភាគរយ។';
 $ec_lang['lpn_labels_separator']='អត្ថបទរវាងតម្លៃ';
 $ec_lang['lpn_labels_separator_tip']='អត្ថបទរវាងតម្លៃមួយ និងតម្លៃបន្ទាប់នៅលើស្លាកមួយ។ លំនាំដើមជាចន្លោះមួយ។';
 // The Drop column in the Labels box (ROADMAP Task 397; inverted by Task 445). Both tips say "1 is
@@ -2440,7 +2440,7 @@ $ec_lang['lpn_labels_priority']='អាទិភាព';
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_node_tip']='លំដាប់ដែលតម្លៃត្រូវបានលុបចោល នៅពេលស្លាកមួយមិនសមនឹងទំហំ។ តម្លៃដែលមានលេខ 1 ត្រូវបានលុបចោលមុនគេ។ នៅពេលនៅសល់តម្លៃតែមួយ ហើយស្លាកពីរនៅតែត្រួតគ្នា ស្លាកមួយត្រូវបានលាក់៖ ស្លាកដែលមានតម្រូវការទាបជាង មានសម្ពាធនៅជិតកណ្ដាលជួរជាង ឬមានកម្ពស់ ឬថ្ពល់ជិតនឹងតម្លៃរបស់ថ្នាំងជិតខាងជាង។';
+$ec_lang['lpn_labels_priority_node_tip']='លំដាប់ដែលតម្លៃត្រូវបានលុបចោល នៅពេលស្លាកមួយមិនសមនឹងទំហំ។ តម្លៃដែលមានលេខ 1 ត្រូវបានលុបចោលមុនគេ។ នៅពេលនៅសល់តម្លៃតែមួយ ហើយស្លាកពីរនៅតែត្រួតគ្នា ស្លាកមួយត្រូវបានលាក់៖ ស្លាកដែលមានតម្រូវការទាបជាង មានសម្ពាធនៅជិតកណ្ដាលជួរជាង ឬមានកម្ពស់ ឬក្បាលទឹកជិតនឹងតម្លៃរបស់ថ្នាំងជិតខាងជាង។';
 // Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
 // the row's own field name is the wide column beside them.
 $ec_lang['lpn_labels_col_before']='មុន';
@@ -2803,8 +2803,8 @@ $ec_lang['lpn_settings_unbalanced_continue']='អនុញ្ញាតឲ្យ�
 $ec_lang['lpn_settings_unbalanced_stop']='ឈប់ ហើយរាយការណ៍ជុំចុងក្រោយ';
 $ec_lang['lpn_settings_unbalanced_trials']='ជុំបន្ថែមមុននឹងរាយការណ៍';
 $ec_lang['lpn_settings_unbalanced_trials_tip']='ចំនួនជុំបន្ថែមទៀតដែលអនុញ្ញាតបន្ទាប់ពីអតិបរមាខាងលើត្រូវបានប្រើអស់ មុនពេលជុំចុងក្រោយត្រូវបានរាយការណ៍។';
-$ec_lang['lpn_settings_head_error']='កម្រិតកំហុសថ្ពល់';
-$ec_lang['lpn_settings_head_error_tip']='ការធ្វើតេស្តបន្ថែមមួយដែលឧបករណ៍ដោះស្រាយត្រូវតែឆ្លងកាត់ មុននឹងឈប់៖ កំហុសថ្ពល់ធំបំផុតដែលនៅសល់ក្នុងបំពង់មួយណាមួយ។ សូន្យមានន័យថាកុំអនុវត្តតេស្តនេះ។ មានតែឧបករណ៍ដោះស្រាយ EPANET ប៉ុណ្ណោះដែលអានប្រអប់នេះ។';
+$ec_lang['lpn_settings_head_error']='កម្រិតកំហុសក្បាលទឹក';
+$ec_lang['lpn_settings_head_error_tip']='ការធ្វើតេស្តបន្ថែមមួយដែលឧបករណ៍ដោះស្រាយត្រូវតែឆ្លងកាត់ មុននឹងឈប់៖ កំហុសក្បាលទឹកធំបំផុតដែលនៅសល់ក្នុងបំពង់មួយណាមួយ។ សូន្យមានន័យថាកុំអនុវត្តតេស្តនេះ។ មានតែឧបករណ៍ដោះស្រាយ EPANET ប៉ុណ្ណោះដែលអានប្រអប់នេះ។';
 $ec_lang['lpn_settings_flow_change']='កម្រិតការផ្លាស់ប្ដូរលំហូរ';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_flow_change_tip']='ការធ្វើតេស្តបន្ថែមមួយដែលឧបករណ៍ដោះស្រាយត្រូវតែឆ្លងកាត់ មុននឹងឈប់៖ ការផ្លាស់ប្ដូរអតិបរមានៃលំហូរបំពង់មួយណាមួយ ពីជុំមួយទៅជុំបន្ទាប់។ សូន្យមានន័យថាកុំអនុវត្តតេស្តនេះ។ មានតែឧបករណ៍ដោះស្រាយ EPANET ប៉ុណ្ណោះដែលអានប្រអប់នេះ។';
@@ -2834,7 +2834,7 @@ $ec_lang['lpn_engine_failed']='មិនអាចផ្ទុកឧបករណ�
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
 $ec_lang['lpn_engine_valve_route']='បានដោះស្រាយដោយឧបករណ៍ដោះស្រាយ EPANET ដោយសារវ៉ាល់ត្រួតត្រាសម្ពាធ និងលំហូរទាំងនេះ៖';
 $ec_lang['lpn_unit_unknown']='គំនូរនេះចែងខ្នាតដែលទំព័រនេះមិនគាំទ្រ៖ {unit}។ តម្លៃទាំងអស់ត្រូវបានរក្សាទុក និងបង្ហាញយ៉ាងពិតប្រាកដតាមដែលបាននាំចូល ហើយគ្មានអ្វីត្រូវបានផ្លាស់ប្ដូរទេ។ គ្មានអ្វីអាចគណនាបានទេ រហូតដល់ខ្នាតត្រូវបានគាំទ្រ ព្រោះកត្តាបម្លែងរបស់វាមិនស្គាល់។';
-$ec_lang['lpn_engine_manning_note']='ចំណាំ៖ ជាមួយភាពក្រញ៉ោងម៉ាន់នីង EPANET បង្គត់ថេរក្នុងសមីការម៉ាន់នីង ដូច្នេះការបាត់បង់ថ្ពល់ទាបជាងទម្រង់ពិតប្រាកដប្រហែល 0.6%។';
+$ec_lang['lpn_engine_manning_note']='ចំណាំ៖ ជាមួយភាពក្រញ៉ោងម៉ាន់នីង EPANET បង្គត់ថេរក្នុងសមីការម៉ាន់នីង ដូច្នេះការបាត់បង់ក្បាលទឹកទាបជាងទម្រង់ពិតប្រាកដប្រហែល 0.6%។';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
 // Three sentences for three different facts, on the model of lpn_unit_unknown: what would not
 // happen, what the solver itself objected to, and where the numbers on screen actually came from.
@@ -3414,12 +3414,12 @@ $ec_lang['lpn_library_menu']='បណ្ណាល័យ';
 $ec_lang['lpn_library_patterns']='លំនាំ';
 $ec_lang['lpn_library_patterns_tip']='លំនាំគឺជាបញ្ជីតម្គុណដែលធ្វើម្ដងទៀត។ តម្គុណនីមួយៗអនុវត្តសម្រាប់ចន្លោះពេលលំនាំមួយ ដូច្នេះលេខ 24 ក្នុងជំហានមួយម៉ោង បង្កើតជាថ្ងៃមួយដែលធ្វើម្ដងទៀត។ តម្រូវការ 10 ជាមួយតម្គុណ 1.5 គឺស្មើ 15 នៅភ្លែតនោះ។';
 $ec_lang['lpn_library_curves']='ខ្សែកោង';
-$ec_lang['lpn_library_curves_tip']='ថ្ពល់ ឬប្រសិទ្ធភាពម៉ាស៊ីនបូមធៀបនឹងលំហូរ ការបាត់បង់វ៉ាល់ធៀបនឹងលំហូរ ឬមាឌធុងទឹកធៀបនឹងជម្រៅ';
+$ec_lang['lpn_library_curves_tip']='ក្បាលទឹក ឬប្រសិទ្ធភាពម៉ាស៊ីនបូមធៀបនឹងលំហូរ ការបាត់បង់វ៉ាល់ធៀបនឹងលំហូរ ឬមាឌធុងទឹកធៀបនឹងជម្រៅ';
 // **CURVES IS AN EDITOR** (Task 586). It was a read-only report about pumps until the curves became
 // document objects of their own, and the note said so; it now says what the box does and where a
 // curve is pointed at an element from.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_curves_note']='ខ្សែកោងត្រូវបានភ្ជាប់ទៅនឹងម៉ាស៊ីនបូម និងវ៉ាល់។ សម្រាប់ខ្សែកោងថ្ពល់ម៉ាស៊ីនបូម ការដំណើរការប្រើខ្សែកោងដែលសមតាមចំណុចទាំងនោះ ដូចបានបង្ហាញ; សម្រាប់ប្រភេទផ្សេងទៀតទាំងអស់ វាភ្ជាប់ចំណុចទាំងនោះដោយបន្ទាត់ត្រង់ ដូចបានបង្ហាញ។';
+$ec_lang['lpn_library_curves_note']='ខ្សែកោងត្រូវបានភ្ជាប់ទៅនឹងម៉ាស៊ីនបូម និងវ៉ាល់។ សម្រាប់ខ្សែកោងក្បាលទឹកម៉ាស៊ីនបូម ការដំណើរការប្រើខ្សែកោងដែលសមតាមចំណុចទាំងនោះ ដូចបានបង្ហាញ; សម្រាប់ប្រភេទផ្សេងទៀតទាំងអស់ វាភ្ជាប់ចំណុចទាំងនោះដោយបន្ទាត់ត្រង់ ដូចបានបង្ហាញ។';
 $ec_lang['lpn_library_curve_add']='បន្ថែមខ្សែកោង';
 // **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with
 // EPANET, put pump ID (with new ID label above it) and Description on row/line 1 and Type selector
@@ -3631,8 +3631,8 @@ $ec_lang['lpn_demand_add']='បន្ថែមប្រភេទតម្រូ�
 $ec_lang['lpn_demand_remove']='ដកតម្រូវការនេះចេញ';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.
-$ec_lang['lpn_field_head_pattern']='លំនាំកម្ពស់';
-$ec_lang['lpn_field_head_pattern_tip']='លំនាំនៃកម្រិតទឹករបស់អាងស្តុកនេះពេញការដំណើរការ។ ថ្ពល់ខាងលើត្រូវបានគុណនឹងលំនាំ។';
+$ec_lang['lpn_field_head_pattern']='លំនាំក្បាលទឹក';
+$ec_lang['lpn_field_head_pattern_tip']='លំនាំនៃកម្រិតទឹករបស់អាងស្តុកនេះពេញការដំណើរការ។ ក្បាលទឹកខាងលើត្រូវបានគុណនឹងលំនាំ។';
 $ec_lang['lpn_field_pump_speed']='ល្បឿនប្រៀបធៀប';
 $ec_lang['lpn_field_pump_speed_tip']='ធៀបនឹងល្បឿនបង្វិលដែលប្រើដើម្បីបង្កើតខ្សែកោងសមត្ថភាពដែលបានផ្សព្វផ្សាយរបស់វា។ ត្រូវបានមិនអើពើ (មិនធ្វើមាត្រដ្ឋាន) ប្រសិនបើមានលំនាំល្បឿន។';
 $ec_lang['lpn_field_speed_pattern']='លំនាំល្បឿន';
@@ -4078,10 +4078,10 @@ $ec_lang['lpn_change_type_key']='មួយបន្ទាត់ៗ៖ លេខ�
 $ec_lang['lpn_change_type_line']='{id}៖ {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}៖ {property} {value} ក្នុងសេណារីយ៉ូ {scenario}';
 $ec_lang['lpn_change_type_more']='និងច្រើនទៀត {n}។';
-$ec_lang['lpn_change_type_surface']='ទាំងនេះរក្សាផ្ទៃទឹកនៅកន្លែងដដែល។ ថ្ពល់របស់អាងស្តុកគឺកម្ពស់របស់ធុងទឹកបូកនឹងជម្រៅទឹករបស់វា ហើយជម្រៅទឹករបស់ធុងទឹកគឺថ្ពល់របស់អាងស្តុកដកនឹងកម្ពស់របស់វា៖';
+$ec_lang['lpn_change_type_surface']='ទាំងនេះរក្សាផ្ទៃទឹកនៅកន្លែងដដែល។ ក្បាលទឹករបស់អាងស្តុកគឺកម្ពស់របស់ធុងទឹកបូកនឹងជម្រៅទឹករបស់វា ហើយជម្រៅទឹករបស់ធុងទឹកគឺក្បាលទឹករបស់អាងស្តុកដកនឹងកម្ពស់របស់វា៖';
 $ec_lang['lpn_change_type_meaning']='ច្បាប់ត្រួតពិនិត្យ និងក្បួនទាំងនេះសាកល្បងថ្នាំងដែលកំពុងត្រូវបានប្ដូរ ហើយនឹងអានវាខុសគ្នា៖ ថ្នាំងត្រូវបានសាកល្បងដោយសម្ពាធរបស់វា ហើយធុងទឹក ឬអាងស្តុកត្រូវបានសាកល្បងដោយកម្រិតទឹករបស់វា។';
 $ec_lang['lpn_change_type_born']='តម្លៃទាំងនេះថ្មី ត្រូវបានកំណត់ដូចធាតុដែលទើបគូរថ្មី៖';
-$ec_lang['lpn_change_type_no_curve']='{id}៖ គ្មានខ្សែកោងថ្ពល់ម៉ាស៊ីនបូម ដូច្នេះម៉ាស៊ីនបូមមិនបន្ថែមថ្ពល់ទេ រហូតដល់ខ្សែកោងមួយត្រូវបានជ្រើសរើស ហើយការនាំចេញ .inp សរសេរវាជាបំពង់';
+$ec_lang['lpn_change_type_no_curve']='{id}៖ គ្មានខ្សែកោងក្បាលទឹកម៉ាស៊ីនបូម ដូច្នេះម៉ាស៊ីនបូមមិនបន្ថែមក្បាលទឹកទេ រហូតដល់ខ្សែកោងមួយត្រូវបានជ្រើសរើស ហើយការនាំចេញ .inp សរសេរវាជាបំពង់';
 $ec_lang['lpn_change_type_becomes']='{id}៖ {property} {value} ក្នុងសេណារីយ៉ូ {scenario} ក្លាយជា {new}';
 $ec_lang['lpn_change_type_customers']='មានតែបំពង់ប៉ុណ្ណោះដែលបម្រើអតិថិជន ដូច្នេះអតិថិជនទាំងនេះត្រូវបានភ្ជាប់ជំនួសទៅថ្នាំងដែលបង្ហាញក្នុងវង់ក្រចក ដែលតម្រូវការរបស់ពួកគេត្រូវបានអនុវត្តរួចហើយ។ ពួកគេនៅកន្លែងដែលពួកគេត្រូវបានគូរ ហើយតម្រូវការរបស់ពួកគេមិនផ្លាស់ប្ដូរទេ៖';
 $ec_lang['lpn_change_type_setting']='ច្បាប់ត្រួតពិនិត្យ និងក្បួនទាំងនេះផ្ដល់ ឬសាកល្បងការកំណត់នៃតំណដែលកំពុងត្រូវបានប្ដូរ។ ការកំណត់ជាបរិមាណផ្សេងគ្នាលើបំពង់ ម៉ាស៊ីនបូម និងវ៉ាល់ ដូច្នេះទាំងនេះនឹងអានវាខុសគ្នា៖';
@@ -4094,9 +4094,9 @@ $ec_lang['lpn_profile_file_missing']='មានឈ្មោះក្នុងឯ
 $ec_lang['lpn_profile_file_short']='ឯកសារនេះដាក់ឈ្មោះថ្នាំងតិចជាងពីរនៅក្នុងបណ្ដាញនេះ ដូច្នេះគ្មានទម្រង់បណ្ដោយត្រូវគូរទេ។';
 $ec_lang['lpn_pgraph_none']='ធាតុនេះគ្មានលទ្ធផលក្នុងការដំណើរការបច្ចុប្បន្នទេ។';
 $ec_lang['lpn_pgraph_source_share_from']='ចំណែកប្រភពពី {node}';
-$ec_lang['lpn_result_pump_head']='ថ្ពល់';
-$ec_lang['lpn_result_pump_head_tip']='ថ្ពល់ដែលម៉ាស៊ីនបូមបន្ថែមពីចំណុចបឺតទៅចំណុចបញ្ចេញ បង្ហាញជាលេខវិជ្ជមាន។ ឧបករណ៍ដោះស្រាយ និងឯកសារ EPANET កត់ត្រាវាជាការបាត់បង់ថ្ពល់អវិជ្ជមាន។';
-$ec_lang['lpn_report_pump_head']='ថ្ពល់ម៉ាស៊ីនបូម';
+$ec_lang['lpn_result_pump_head']='ក្បាលទឹក';
+$ec_lang['lpn_result_pump_head_tip']='ក្បាលទឹកដែលម៉ាស៊ីនបូមបន្ថែមពីចំណុចបឺតទៅចំណុចបញ្ចេញ បង្ហាញជាលេខវិជ្ជមាន។ ឧបករណ៍ដោះស្រាយ និងឯកសារ EPANET កត់ត្រាវាជាការបាត់បង់ក្បាលទឹកអវិជ្ជមាន។';
+$ec_lang['lpn_report_pump_head']='ក្បាលទឹកម៉ាស៊ីនបូម';
 $ec_lang['lpn_contour_show']='បង្ហាញបន្ទាត់ស្មើតម្លៃ';
 $ec_lang['lpn_contour_show_tip']='ដោះធីកដើម្បីលាក់ការបំពេញពណ៌ និងបន្ទាត់ស្មើតម្លៃ ធីកវិញដើម្បីយកវាត្រឡប់មកដូចដើម។ ពណ៌ថ្នាំងនៅដដែល។';
 $ec_lang['lpn_sysflow_title']='តុល្យភាពលំហូរ';
@@ -4289,7 +4289,7 @@ $ec_lang['lpn_guide_text_calib_box']='ប្រៀបធៀបឯកសារន
 $ec_lang['lpn_guide_text_notes_popup']='រាយកំណត់ចំណាំអំពីរបៀបដែលទំព័រនេះដំណើរការ និងអ្វីដែលវាមិនធ្វើ ម្នាក់ៗជាពាក្យមួយតាមពីក្រោយដោយនិយមន័យរបស់វា។ វាមិនផ្លាស់ប្ដូរបណ្ដាញទេ។';
 $ec_lang['lpn_guide_text_hotkeys_popup']='រាយគ្រប់ប៊ូតុងរបារឧបករណ៍ និងជួរដេកម៉ឺនុយ ផ្លូវកាត់ក្តារចុច និងធាតុសម្រាប់ប្រអប់នីមួយៗ។ ការជ្រើសរើសជួរដេកមួយបង្ហាញកន្លែងដែលការគ្រប់គ្រងនោះនៅ ហើយមិនដំណើរការវាទេ។ ដើម្បីស្វែងរក ចុច Ctrl+K ពីគ្រប់ទីកន្លែង ឬ / ពេលមគ្គុទ្ទេសក៍មានការផ្ដោត។';
 $ec_lang['lpn_guide_find_query_term']='ភាសាសំណួរ';
-$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>លក្ខខណ្ឌមួយ។ វិសាលភាពគឺ ទាំងអស់ ថ្នាំង អាងស្តុក ធុងទឹក បំពង់ ម៉ាស៊ីនបូម វ៉ាល់ អក្សរ អតិថិជន ឬ ប្រភព។ លក្ខណៈសម្បត្តិគឺធាតុណាមួយក្នុងបញ្ជី លក្ខណៈសម្បត្តិ សម្រាប់វិសាលភាពនោះ។</td></tr><tr><td>លក្ខខណ្ឌ</td><td>ស្មើនឹង ធំជាង តូចជាង មាន ខ្ពស់បំផុត n ទាបបំផុត n និង ទទេ។ មាន អនុវត្តចំពោះអត្ថបទតែប៉ុណ្ណោះ។ ក្នុង ខ្ពស់បំផុត n និង ទាបបំផុត n n ជាចំនួន ដូចក្នុង ខ្ពស់បំផុត 5។ ប្រសិនបើប្រអប់ តម្លៃ ទទេ ឬ n ជាអក្សរ n ខ្លួនឯង ដូចក្នុង <code>Pipe.Velocity n highest</code> ធាតុ 10 ត្រូវបានរាយ។ ទទេ រកធាតុដែលគ្មានតម្លៃសម្រាប់លក្ខណៈសម្បត្តិ។ ការតភ្ជាប់មានលក្ខខណ្ឌបួន ហើយមិនយកតម្លៃទេ។</td></tr><tr><td>តម្លៃ</td><td>លេខត្រូវបានបញ្ចូលដោយគ្មានឯកតា ក្នុងឯកតាដែលបង្ហាញក្នុង លក្ខណៈសម្បត្តិ និងលើផ្ទាំងតារាង៖ 40 មិនមែន 40 psi។ អត្ថបទ រួមទាំងលេខសម្គាល់ ត្រូវបានដាក់ក្នុងសញ្ញាអញ្ញប្រកាសតែមួយ ឬពីរ៖ <code>\'60\'</code>។</td></tr><tr><td>AND, OR និងវង់ក្រចក</td><td>AND ត្រូវបានគណនាមុន OR ហើយវង់ក្រចកដាក់លក្ខខណ្ឌជាក្រុម។ NOT មិនមានទេ។</td></tr><tr><td>ការប្រកប</td><td>ពាក្យមិនប្រកាន់អក្សរធំតូចទេ។ ពាក្យអង់គ្លេសត្រូវបានទទួលយកក្នុងគ្រប់ភាសា ដូច្នេះសំណួរដែលចម្លងពីមគ្គុទ្ទេសក៍នេះដំណើរការលើទំព័រក្នុងភាសាណាក៏បាន។</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>លក្ខខណ្ឌមួយ។ វិសាលភាពគឺ ទាំងអស់ ថ្នាំង អាងស្តុក ធុងទឹក បំពង់ ម៉ាស៊ីនបូម វ៉ាល់ អត្ថបទ អតិថិជន ឬ ប្រភព។ លក្ខណៈសម្បត្តិគឺធាតុណាមួយក្នុងបញ្ជី លក្ខណៈសម្បត្តិ សម្រាប់វិសាលភាពនោះ។</td></tr><tr><td>លក្ខខណ្ឌ</td><td>ស្មើនឹង ធំជាង តូចជាង មាន ខ្ពស់បំផុត n ទាបបំផុត n និង ទទេ។ មាន អនុវត្តចំពោះអត្ថបទតែប៉ុណ្ណោះ។ ក្នុង ខ្ពស់បំផុត n និង ទាបបំផុត n n ជាចំនួន ដូចក្នុង ខ្ពស់បំផុត 5។ ប្រសិនបើប្រអប់ តម្លៃ ទទេ ឬ n ជាអក្សរ n ខ្លួនឯង ដូចក្នុង <code>Pipe.Velocity n highest</code> ធាតុ 10 ត្រូវបានរាយ។ ទទេ រកធាតុដែលគ្មានតម្លៃសម្រាប់លក្ខណៈសម្បត្តិ។ ការតភ្ជាប់មានលក្ខខណ្ឌបួន ហើយមិនយកតម្លៃទេ។</td></tr><tr><td>តម្លៃ</td><td>លេខត្រូវបានបញ្ចូលដោយគ្មានឯកតា ក្នុងឯកតាដែលបង្ហាញក្នុង លក្ខណៈសម្បត្តិ និងលើផ្ទាំងតារាង៖ 40 មិនមែន 40 psi។ អត្ថបទ រួមទាំងលេខសម្គាល់ ត្រូវបានដាក់ក្នុងសញ្ញាអញ្ញប្រកាសតែមួយ ឬពីរ៖ <code>\'60\'</code>។</td></tr><tr><td>AND, OR និងវង់ក្រចក</td><td>AND ត្រូវបានគណនាមុន OR ហើយវង់ក្រចកដាក់លក្ខខណ្ឌជាក្រុម។ NOT មិនមានទេ។</td></tr><tr><td>ការប្រកប</td><td>ពាក្យមិនប្រកាន់អក្សរធំតូចទេ។ ពាក្យអង់គ្លេសត្រូវបានទទួលយកក្នុងគ្រប់ភាសា ដូច្នេះសំណួរដែលចម្លងពីមគ្គុទ្ទេសក៍នេះដំណើរការលើទំព័រក្នុងភាសាណាក៏បាន។</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_examples_term']='ឧទាហរណ៍ដែលបានគណនាលើ Net3';
 $ec_lang['lpn_guide_find_examples_def']='<p>បើកឧទាហរណ៍ Net3 ដើម្បីធ្វើតាម។ សម្ពាធជា psi ហើយល្បឿនជា ft/s។</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>ថ្នាំង 60 និងបំពង់ 60។ ថ្នាំងមួយ និងបំពង់មួយអាចមានលេខសម្គាល់ដូចគ្នា ដូច្នេះការស្វែងរកលេខសម្គាល់ក្រោម ទាំងអស់ អាចត្រឡប់ធាតុច្រើនជាងមួយ។</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>ថ្នាំង 10, 40, 50, 20 និង 153 សម្ពាធទាបបំផុតមុន។ ថ្នាំង 10 នៅ -0.6 psi ជាសម្ពាធអវិជ្ជមានដែលត្រូវពិនិត្យឡើងវិញ។</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>បំពង់ 60, 329, 125, 123 និង 149 ល្បឿនខ្ពស់បំផុតមុន។ បំពង់ 60 ដឹក 9.3 ft/s។</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>ថ្នាំង 10, 20, 40 និង 50 និងបំពង់ 60, 125 និង 329៖ សម្ពាធទាប និងល្បឿនខ្ពស់ក្នុងបញ្ជីតែមួយ។</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>ថ្នាំង 10, 20, 40 និង 50 ជាសម្ពាធទាបនៅលើដីខ្ពស់។ លក្ខខណ្ឌទាំងពីរត្រូវតែនិយាយពីប្រភេទធាតុតែមួយ៖ <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> មិនត្រូវនឹងអ្វីទេ ព្រោះគ្មានធាតុណាជាទាំងថ្នាំង និងបំពង់ទេ។</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>បំពង់ 330 ជាបំពង់តែមួយដែលបិទក្នុងឯកសារ Net3។</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>គ្មានអ្វីទេ ដូចឯកសារដែលបានចែកចាយ។ ជាមួយបំពង់ 247 បិទ (មើល ជំនួស និងត្រឡប់ក្រោយ) ថ្នាំង 215, 217, 219 និង 225៖ ថ្នាំងដែលការបែកបំពង់ 247 នឹងទុកដោយគ្មានការផ្គត់ផ្គង់។ ការធ្វើបែបនេះម្ដងទៀតសម្រាប់បំពង់នីមួយៗគឺជាការវិភាគភាពសំខាន់។</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_results_term']='លទ្ធផល ការជ្រើសរើស និងតារាង';
@@ -4297,7 +4297,7 @@ $ec_lang['lpn_guide_find_results_def']='<p>ធាតុដែលត្រូវ�
 $ec_lang['lpn_guide_find_replace_term']='ជំនួស និងត្រឡប់ក្រោយ';
 $ec_lang['lpn_guide_find_replace_def']='<p>ផ្នែក ប្ដូរអ្វីដែលបានរកឃើញ នៃប្រអប់សរសេរលក្ខណៈសម្បត្តិមួយលើគ្រប់ធាតុដែលសំណួររកឃើញ។ ជ្រើសលក្ខណៈសម្បត្តិក្នុងបញ្ជី លក្ខណៈសម្បត្តិត្រូវប្ដូរ បញ្ចូលតម្លៃថ្មីក្នុងប្រអប់ តម្លៃថ្មី ក្នុងឯកតាដែលបង្ហាញ ហើយចុចប៊ូតុង ជំនួស។ បន្ទាប់មកប្រអប់ប្រាប់ចំនួនធាតុដែលនឹងផ្លាស់ប្ដូរ មិនរាប់ធាតុដែលមានតម្លៃថ្មីរួចហើយ។ ចុចប៊ូតុង ប្ដូរពួកវា ដើម្បីអនុវត្តការផ្លាស់ប្ដូរ ឬ បោះបង់។ ការត្រឡប់ក្រោយម្ដងដកចេញការជំនួសទាំងមូល។</p><p>ឧទាហរណ៍លើ Net1៖ <code>Pipe.Diameter below 10</code> រកឃើញបំពង់ 31, 122, 113 និង 121។ ជ្រើស អង្កត់ផ្ចិត បញ្ចូល 10 ហើយចុច ជំនួស៖ ប្រអប់បង្ហាញ "ប្ដូរធាតុ 4?"។ ចុច ប្ដូរពួកវា ដើម្បីកំណត់បំពង់ទាំងបួនទៅ 10 in.។ ការត្រឡប់ក្រោយម្ដងប្ដូរពួកវាត្រឡប់ទៅ 6 និង 8 in.។</p><p>ឧទាហរណ៍លើ Net3៖ <code>Pipe.ID equal to \'247\'</code> រកឃើញបំពង់ 247។ ជ្រើស បិទ ជ្រើស បិទ ម្ដងទៀតក្នុងបញ្ជី តម្លៃថ្មី ហើយចុច ជំនួស បន្ទាប់មក ប្ដូរពួកវា ដើម្បីបិទបំពង់សម្រាប់ឧទាហរណ៍ការតភ្ជាប់ខាងលើ។ ត្រឡប់ក្រោយបើកវាម្ដងទៀត។</p><p>ការជំនួសត្រូវការប្រភេទធាតុតែមួយ ដូច្នេះក្រោម ទាំងអស់ ជ្រើសប្រភេទធាតុជាមុនក្នុងបញ្ជី អ្វីត្រូវរក។ ក្នុងសេណារីយ៉ូក្រៅពី មូលដ្ឋាន ការជំនួសត្រូវបានរក្សាទុកក្នុងសេណារីយ៉ូនោះ ដូចការកែដូចគ្នាក្នុងលក្ខណៈសម្បត្តិ។ កន្លែងដែលកម្ពស់ Mapbox មាន កម្ពស់អាចត្រូវបានជំនួសពី Mapbox DEM ជំនួសតម្លៃដែលវាយ។</p>';
 $ec_lang['lpn_guide_find_notes_term']='ចំណុចដែលត្រូវកត់សម្គាល់';
-$ec_lang['lpn_guide_find_notes_def']='<ul><li>តម្លៃត្រូវបានប្រៀបធៀបដោយភាពជាក់លាក់ពេញលេញ ហើយរាយដល់ខ្ទង់ទសភាគបួន។ ស្មើនឹង កម្រត្រូវនឹងលទ្ធផលដែលបានគណនាណាស់ ដូច្នេះប្រើ ធំជាង និង តូចជាង។</li><li>សម្ពាធ ថ្ពល់ លំហូរ ល្បឿន និងលទ្ធផលផ្សេងទៀតគឺជារបស់ការគណនាចុងក្រោយ។ ពេលការកំណត់ គណនាឡើងវិញដោយស្វ័យប្រវត្តិ ត្រូវបានសម្អាត វាពិពណ៌នាបណ្ដាញដូចដែលវាជាពេលគណនាចុងក្រោយ។</li><li>ធំជាង និង តូចជាង លើអត្ថបទប្រើលំដាប់វចនានុក្រម ជាមួយលេខតាមលំដាប់លេខ៖ លើ Net1 <code>Junction.ID above \'20\'</code> រកឃើញថ្នាំង 21, 22, 23, 31 និង 32។</li><li>ក្រោម ទាំងអស់ មានតែ លេខសម្គាល់ ការពិពណ៌នា ស្លាកសម្គាល់ និង ការតភ្ជាប់ ប៉ុណ្ណោះដែលផ្ដល់ជូន។ ជ្រើសប្រភេទធាតុក្នុងបញ្ជី អ្វីត្រូវរក ដើម្បីមើលបញ្ជីលក្ខណៈសម្បត្តិពេញលេញរបស់វា។</li><li>ធាតុអក្សរមិនមានលេខសម្គាល់ទេ។ ស្វែងរកវាតាមពាក្យរបស់វា ដូចក្នុង <code>Text.Text contains \'pump\'</code>។</li><li>លក្ខខណ្ឌ ការតភ្ជាប់ បួនសម្រាប់ថ្នាំងគឺ គ្មានតំណភ្ជាប់នៅថ្នាំង គ្មានតំណភ្ជាប់បើកនៅថ្នាំង គ្មានផ្លូវតំណភ្ជាប់ទៅប្រភព និង គ្មានផ្លូវបើកទៅប្រភព។ ប្រភពគឺអាងស្តុក ឬធុងទឹក។</li></ul>';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>តម្លៃត្រូវបានប្រៀបធៀបដោយភាពជាក់លាក់ពេញលេញ ហើយរាយដល់ខ្ទង់ទសភាគបួន។ ស្មើនឹង កម្រត្រូវនឹងលទ្ធផលដែលបានគណនាណាស់ ដូច្នេះប្រើ ធំជាង និង តូចជាង។</li><li>សម្ពាធ ក្បាលទឹក លំហូរ ល្បឿន និងលទ្ធផលផ្សេងទៀតគឺជារបស់ការគណនាចុងក្រោយ។ ពេលការកំណត់ គណនាឡើងវិញដោយស្វ័យប្រវត្តិ ត្រូវបានសម្អាត វាពិពណ៌នាបណ្ដាញដូចដែលវាជាពេលគណនាចុងក្រោយ។</li><li>ធំជាង និង តូចជាង លើអត្ថបទប្រើលំដាប់វចនានុក្រម ជាមួយលេខតាមលំដាប់លេខ៖ លើ Net1 <code>Junction.ID above \'20\'</code> រកឃើញថ្នាំង 21, 22, 23, 31 និង 32។</li><li>ក្រោម ទាំងអស់ មានតែ លេខសម្គាល់ ការពិពណ៌នា ស្លាកសម្គាល់ និង ការតភ្ជាប់ ប៉ុណ្ណោះដែលផ្ដល់ជូន។ ជ្រើសប្រភេទធាតុក្នុងបញ្ជី អ្វីត្រូវរក ដើម្បីមើលបញ្ជីលក្ខណៈសម្បត្តិពេញលេញរបស់វា។</li><li>ធាតុអត្ថបទមិនមានលេខសម្គាល់ទេ។ ស្វែងរកវាតាមពាក្យរបស់វា ដូចក្នុង <code>Text.Text contains \'pump\'</code>។</li><li>លក្ខខណ្ឌ ការតភ្ជាប់ បួនសម្រាប់ថ្នាំងគឺ គ្មានតំណភ្ជាប់នៅថ្នាំង គ្មានតំណភ្ជាប់បើកនៅថ្នាំង គ្មានផ្លូវតំណភ្ជាប់ទៅប្រភព និង គ្មានផ្លូវបើកទៅប្រភព។ ប្រភពគឺអាងស្តុក ឬធុងទឹក។</li></ul>';
 $ec_lang['lpn_guide_using_heading']='ការប្រើមគ្គុទ្ទេសក៍';
 $ec_lang['lpn_guide_keys_term']='ផ្លូវកាត់ក្តារចុចមគ្គុទ្ទេសក៍';
 $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>បើកមគ្គុទ្ទេសក៍នៅការគ្រប់គ្រងក្រោមទ្រនិច ឬដែលមានការផ្ដោត។</td></tr><tr><td>F1</td><td>បើកមគ្គុទ្ទេសក៍នៅធាតុសម្រាប់ប្រអប់ដែលមានការផ្ដោត។</td></tr><tr><td>Ctrl+K</td><td>បើកមគ្គុទ្ទេសក៍ដោយដាក់អត្ថបទដែលបានជ្រើសរើសក្នុងវាលស្វែងរក។</td></tr><tr><td>/</td><td>ជ្រើសរើសវាលស្វែងរកពេលមគ្គុទ្ទេសក៍មានការផ្ដោត។</td></tr><tr><td>Esc</td><td>បិទមគ្គុទ្ទេសក៍ ហើយត្រឡប់ទៅកន្លែងដែលអ្នកនៅ។</td></tr></tbody></table>';
@@ -4311,7 +4311,7 @@ $ec_lang['lpn_msglog_hidden']='បានលាក់';
 $ec_lang['lpn_msglog_unhide']='បង្ហាញ';
 $ec_lang['lpn_status_hidden_tip']='បង្ហាញសារដែលបានលាក់លើផែនទីម្ដងទៀត។';
 $ec_lang['lpn_result_depth']='ជម្រៅ';
-$ec_lang['lpn_result_depth_tip']='ជម្រៅទឹកក្នុងធុងទឹកនៅពេលដែលបានបង្ហាញ វាស់ឡើងលើពីបាតធុង៖ ថ្ពល់ដកកម្ពស់ធុងទឹក។';
+$ec_lang['lpn_result_depth_tip']='ជម្រៅទឹកក្នុងធុងទឹកនៅពេលដែលបានបង្ហាញ វាស់ឡើងលើពីបាតធុង៖ ក្បាលទឹកដកកម្ពស់ធុងទឹក។';
 $ec_lang['lpn_result_tank_volume']='ទំហំដែលអាចប្រើបាន';
 $ec_lang['lpn_result_tank_volume_tip']='ទំហំទឹកខាងលើជម្រៅទឹកទាបបំផុត ដូច្នេះវាជាសូន្យនៅជម្រៅនោះ។ ទំហំធុងទឹក EPANET ក៏រួមទាំងទឹកខាងក្រោមជម្រៅទឹកទាបបំផុតដែរ ដែលនៅតែរាប់សម្រាប់ការលាយ និងអាយុទឹក ដូច្នេះកម្ពស់ធុងទឹកនៅបាតធុង។';
 $ec_lang['lpn_pane_copy_heads']='ចម្លងជាមួយក្បាលជួរឈរ';

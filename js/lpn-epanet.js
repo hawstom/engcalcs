@@ -922,11 +922,11 @@
 					(typeof hyd.reqPressure === 'number' ? '\n Required Pressure ' + hyd.reqPressure : '') +
 					(typeof hyd.pressureExponent === 'number' ? '\n Pressure Exponent ' + hyd.pressureExponent : '')
 				: '') +
-			// **HOW HARD TO TRY, AND THE DEFAULTS HERE ARE OURS, NOT EPANET'S.** 1e-5 / 200 is
-			// tighter than EPANET's own 0.001 / 40, deliberately, so that a disagreement between the
-			// two engines is never just tolerance. A project that STATES a value overrules that --
-			// the user asked for their file's number, and comparing engines is our concern, not
-			// theirs.
+			// **HOW HARD TO TRY.** Accuracy defaults to EPANET's own 0.001 (R-388, Tom 2026-10-15;
+			// it was 1e-5 here, and his two-system project failed to converge at that and converged
+			// at 0.001), the same number solveAccuracy() in js/looped-network.js uses and the
+			// Settings tip quotes. Trials stays ours, 200 against EPANET's 40. A project that STATES
+			// a value overrules either -- the user asked for their file's number.
 			//
 			// **THE DEFAULT WAS 1e-8 AND THAT WAS A FICTION** (Task 565): EPANET CLAMPS Accuracy to
 			// [1e-5, 1e-1] as it reads the file, so every run this bridge has ever made was solved
@@ -939,7 +939,7 @@
 			// not converge would give this page nothing to draw. **What changed is that the page
 			// no longer PRETENDS it converged** -- convergenceOf() asks, applySolveResult() says so,
 			// and the numbers are still drawn.
-			'\n Accuracy ' + (hyd.accuracy !== undefined ? hyd.accuracy : '1e-5') +
+			'\n Accuracy ' + (hyd.accuracy !== undefined ? hyd.accuracy : '0.001') +
 			'\n Trials ' + (hyd.trials !== undefined ? hyd.trials : '200') +
 			'\n Unbalanced ' + (hyd.unbalanced === 'stop' ? 'Stop'
 				: hyd.unbalanced === 'continue'

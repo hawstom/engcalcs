@@ -351,12 +351,11 @@ const SUMMARY_RE = new RegExp(PC.lpn_ff_summary
 	// where the dash means "asked, and nothing was pulled down". Good news drawn as no news.
 	const failing = set.results.filter(r => r.state === 'fail' && !r.effects);
 	const passingClean = set.results.filter(r => r.state === 'pass');
-	if (failing.length > 0) {
-		ok('a junction that was never checked for drawdowns says so',
-			report.indexOf('Not checked') >= 0, failing.length + ' failing junction(s)');
-	} else {
-		ok('(no failing junction in this network, so the not-checked cell is untested here)', true);
-	}
+	// Every junction here WAS checked (a failing one too: js/lpn-fireflow.js measures it at the
+	// required flow), so no row may say Not checked. The positive half, a run that really did not
+	// look, is held in the design-off section below.
+	ok('every junction was checked for drawdowns, and no row says Not checked',
+		failing.length === 0 && report.indexOf(PC.lpn_ff_not_checked) < 0, failing.length + ' unchecked failing junction(s)');
 	ok('a passing junction does NOT say "Not checked" -- it was checked and found nothing',
 		passingClean.length === 0 || passingClean.every(function (r) { return r.effects; }),
 		passingClean.length + ' passing junction(s), all with effects computed');
@@ -401,12 +400,9 @@ const SUMMARY_RE = new RegExp(PC.lpn_ff_summary
 		modeCells.indexOf('None') >= 0, JSON.stringify(modeCells));
 	const bothModes = set.results.filter(r =>
 		!(r.available >= r.required) && r.effects && (r.effects.nodes.length || r.effects.links.length));
-	if (bothModes.length) {
-		ok('a junction that failed BOTH names both, which the old single verdict could not',
-			modeCells.indexOf('Fire, Design') >= 0, JSON.stringify(modeCells));
-	} else {
-		ok('(no junction failed both in this network, so the paired cell is untested here)', true);
-	}
+	// The example is chosen so one junction fails both; if it ever does not, this tests nothing.
+	ok('a junction that failed BOTH names both, which the old single verdict could not',
+		bothModes.length > 0 && modeCells.indexOf('Fire, Design') >= 0, bothModes.length + ' failed both; ' + JSON.stringify(modeCells));
 
 	console.log('\n--- a cell with no number shows a dash, never a zero ---');
 	// A residual no junction in this network can hold with nothing drawn: every record comes back
@@ -501,6 +497,8 @@ const SUMMARY_RE = new RegExp(PC.lpn_ff_summary
 	ok('and the report says so rather than showing an empty table',
 		textOf(byId.lpn_ff_report).indexOf(PC.lpn_ff_design_off_note) >= 0);
 	ok('no junction is in the design state', off.counts.design === 0, JSON.stringify(off.counts));
+	ok('a junction that was never checked for drawdowns says Not checked, not a bare dash',
+		textOf(byId.lpn_ff_report).indexOf(PC.lpn_ff_not_checked) >= 0);
 	// The SAME network and the SAME requirement, with the scope back on: the design state has to
 	// come back, or the scope control is not doing anything.
 	L.setAsk('design', 'all');

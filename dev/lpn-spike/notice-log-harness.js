@@ -512,7 +512,7 @@ console.log('8. ALL messages go through one door (Tom, 2026-09-22, live on port 
 	const L4 = load();
 	console.log('  8a. setStatus() -- the door js/lpn-time.js\'s progress box already uses');
 	L4.setNotice('');
-	ok('quiet to start', L4.noticeLog().length === 0 || true); // sanity only; log persists across sections in this file's design
+	ok('quiet to start', L4.noticeLog().length === 0, L4.noticeLog().length + ' entries');
 	const before = L4.noticeLog().length;
 	// Read off the language file rather than pinned as a literal (harness_wording_check.php): a
 	// reworded string must not turn this file red. This is the exact sentence Tom saw ("Working

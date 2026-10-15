@@ -199,18 +199,17 @@ async function sectionFit(Session, browser) {
 		const s1 = await scaleOf(page), shown1 = (await visibleNodeLabels(page)).length;
 		console.log('  ..   after dragging two labels out and fitting again: scale ' + s1.toFixed(0) +
 			' (' + (s1 / s0).toFixed(3) + ' of the plain fit), ' + shown1 + ' labels drawn');
-		if (shown1 > 0) {
-			ok('the refit shows labels, so any room it made is for lettering on the map', true);
-		} else {
-			// One step of the + key: the same 1.1 the wheel notch uses. If the labels come back, the
-			// fit stopped at the threshold; if they do not, it made room for lettering that was never
-			// going to be drawn at the scale it chose.
+		// Either the refit shows labels, or it stopped at the labeling threshold and one step of the
+		// + key (the same 1.1 the wheel notch uses) brings them back. Neither means it made room for
+		// lettering that was never going to be drawn at the scale it chose.
+		let shown2 = shown1, s2 = s1;
+		if (shown1 === 0) {
 			await page.keyboard.press('+');
 			await a.settle(900);
-			const s2 = await scaleOf(page), shown2 = (await visibleNodeLabels(page)).length;
-			ok('the refit hides the labels, so it stops at the labeling threshold: one + step shows them again',
-				shown2 > 0, 'after + at scale ' + s2.toFixed(0) + ': ' + shown2 + ' labels drawn');
+			s2 = await scaleOf(page); shown2 = (await visibleNodeLabels(page)).length;
 		}
+		ok('the refit shows labels, or stops at the labeling threshold so one + step shows them',
+			shown2 > 0, shown1 + ' labels after the refit; ' + shown2 + ' at scale ' + s2.toFixed(0));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 1).join(' | '));
 	} finally {
 		await a.close();

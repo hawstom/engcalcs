@@ -564,7 +564,7 @@ $ec_lang['ip_du_estimate']='<span class="ec-help" title="የመጨረሻው ኤ�
 $ec_lang['ip_worst_case_warn']='የሙከራው ኤሚተር ግፊት ከአቅርቦት ግፊት ጋር እኩል ወይም ከፍ ያለ ነው። ይህ ምናልባት እውነተኛው መጥፎ-ጫፍ ኤሚተር ላይሆን ይችላል፣ ወይም ቧንቧዎቹ ይበልጥ ትንሽ ሊደረጉ ይችላሉ።';
 $ec_lang['ip_q_ratio']='<span class="ec-help" title="ከመደበኛው የወጥነት መለኪያ ግምታችን የተለየ ነው።">የመጨረሻው ኤሚተር ፍሰት ከዲዛይን ፍሰት ጋር, q<sub>last</sub>/q<sub>design</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_no_solution']='ውጤት የለም፦ የሚያስፈልገው የአቅርቦት ግፊት ከገባው የአቅርቦት ግፊት ይበልጣል። የአቅርቦት ግፊት ይጨምሩ፣ ፍላጎትን ይቀንሱ፣ ወይም ትልቅ ቧንቧ ይጠቀሙ።';
-$ec_lang['ip_notes_1_def']='በመጨረሻው (በጣም ሩቅ በሆነው) ኤሚተር ላይ ግፊቱን ይገምታል፣ ከዚያም የኃይል መስመሩን ወደ አቅርቦቱ በመመለስ፣ ክፍል በክፍል፣ የፍትጊያና የአካባቢ ኪሳራዎችን በመንገዱ ላይ ይጨምራል። በእያንዳንዱ ነጥብ ከፍታውና የፍጥነት ቁመቱ ተቀንሰው እዚያ ያለው ትክክለኛ ግፊት ይገለጻል። የተገመተው የሩቁ ጫፍ ግፊት (በሁለት መክፈል ዘዴ) እየተስተካከለ የተሰላው የሚያስፈልገው የአቅርቦት ግፊት ከገባው የአቅርቦት ግፊት ጋር እስኪመሳሰል ድረስ ይቀጥላል — በ Manning የቧንቧ ፍሰት ማስያ ላይ ያለው የቧንቧ ፍሰት መፍትሔ የሚፈታው ያው ዝግ ችግር ነው፣ ወደ ቅርንጫፍ አውታር የተስፋፋ።';
+$ec_lang['ip_notes_1_def']='በመጨረሻው (በጣም ሩቅ በሆነው) ኤሚተር ላይ ግፊቱን ይገምታል፣ ከዚያም የኃይል መስመሩን ወደ አቅርቦቱ በመመለስ፣ ክፍል በክፍል፣ የፍትጊያና የአካባቢ ኪሳራዎችን በመንገዱ ላይ ይጨምራል። በእያንዳንዱ ነጥብ ከፍታውና የፍጥነት ሄዱ ተቀንሰው እዚያ ያለው ትክክለኛ ግፊት ይገለጻል። የተገመተው የሩቁ ጫፍ ግፊት (በሁለት መክፈል ዘዴ) እየተስተካከለ የተሰላው የሚያስፈልገው የአቅርቦት ግፊት ከገባው የአቅርቦት ግፊት ጋር እስኪመሳሰል ድረስ ይቀጥላል — በ Manning የቧንቧ ፍሰት ማስያ ላይ ያለው የቧንቧ ፍሰት መፍትሔ የሚፈታው ያው ዝግ ችግር ነው፣ ወደ ቅርንጫፍ አውታር የተስፋፋ።';
 $ec_lang['ip_notes_2_term']='ዋና ክፍል vs. ላተራል ክፍል';
 $ec_lang['ip_notes_2_def']='እያንዳንዱ ረድፍ ከአቅርቦቱ እስከ መጨረሻው ኤሚተር ባለው በአንዱ በሃይድሮሊክ በኩል መጥፎው መንገድ (የሙከራው መንገድ) ላይ ያለ አንድ ክፍል ነው። የዋና መስመር ክፍል ፍሰቱን በሙከራው መንገድ ላይ ወደሌሉ ላተራሎች ብቻ ያስተላልፋል፣ ስለዚህ የውሃ አወሳሰዱ ቀላል ማባዛት ነው (የዲዛይን ፍሰት × የክፍሉ ጠቅላላ የኤሚተር ብዛት) — የአካባቢ ግፊት ተጽዕኖ የለውም። ዋናው መስመር የጋራ ግንድ ቧንቧ ነው፣ ስለዚህ የሙከራው ላተራል በሚወጣበት ቦታ ያለው ክፍል በጫፎቹ መካከል ያሉትን ላተራሎች ብቻ ሳይሆን ከዚያ መውጫ በኋላ በዋናው መስመር ላይ ያሉትን ላተራሎች እና ያንኑ መገናኛ የሚጋሩትን (ለምሳሌ በተቃራኒ በኩል ያለ ላተራል) ጭምር ማካተት አለበት — ፍሰታቸው ከመለያየቱ በፊት በዚሁ ክፍል በኩል ያልፋል፣ በዚህ ሠንጠረዥ ሌላ ቦታ ቢታዩም ባይታዩም። የላተራል ክፍል የሙከራው ላተራል ራሱ አካል ነው: የኤሚተር ፍሰት ከትክክለኛው የአካባቢ ግፊት በ q = k·H<sup>x</sup> ይሰላል፣ የፍትጊያ ኪሳራም እያንዳንዱ ኤሚተር ውሃ ሲወስድ ፍሰቱ ቀስ በቀስ መቀነሱን ለማካተት በ Christiansen F(n) መጠን ይቀነሳል።';
 $ec_lang['ip_notes_3_term']='ገደብ';
@@ -1401,7 +1401,7 @@ $ec_lang['lpn_help_walkthroughs']='ደረጃ በደረጃ መመሪያ';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='መረብ ሰርዝ';
-$ec_lang['lpn_confirm_delete_network']='በዚህ ፕሮጀክት ውስጥ ያሉትን ሁሉንም ነጥቦች፣ ቧንቧዎችና የጽሑፍ ምልክቶች ይሰርዙ? የበስተጀርባ ምስሉ፣ የፕሮጀክቱ ስምና ቅንብሮችዎ ይቆያሉ።';
+$ec_lang['lpn_confirm_delete_network']='በዚህ ፕሮጀክት ውስጥ ያሉትን ሁሉንም ነጥቦች፣ ቧንቧዎችና ጽሑፎች ይሰርዙ? የበስተጀርባ ምስሉ፣ የፕሮጀክቱ ስምና ቅንብሮችዎ ይቆያሉ።';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -1777,7 +1777,7 @@ $ec_lang['lpn_net_bad_file']='ይህ የEPANET .net ፋይል ይመስላል፣
 $ec_lang['lpn_inp_report_heading']='{file} ገብቷል';
 $ec_lang['lpn_inp_report_counts']='{nodes} መገናኛዎች፣ ማጠራቀሚያዎችና ታንኮች፣ {links} ቧንቧዎች፣ ፓምፖችና ቫልቮች፣ በ{units}።';
 $ec_lang['lpn_inp_report_clean']='በፋይሉ ውስጥ ያለው ሁሉ ውሂብ ገብቷል። ምንም አልተተወም።';
-$ec_lang['lpn_inp_report_label_anchor']='የጽሑፍ ምልክቶች EPANET እንደሚያደርገው ከላይኛው ግራ ጥግ ተነስተው ይቀመጣሉ።';
+$ec_lang['lpn_inp_report_label_anchor']='ጽሑፎች EPANET እንደሚያደርገው ከላይኛው ግራ ጥግ ተነስተው ይቀመጣሉ።';
 // **R-219; Tom, 2026-09-24, answering R-190**: dropping the "These are already lat/lon" button in
 // favor of typing 1 for Step 2's Ground distance field means both Import and Convert as have to say
 // that door still exists. Shown for any file that lands as a plain XY drawing -- Feet, Meters, None
@@ -2864,7 +2864,7 @@ $ec_lang['lpn_settings_map_display']='ገጽታ';
 // once, which is worse than having no tip at all.
 // The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
 // own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
-$ec_lang['lpn_settings_legend_position']='የምልክቶች መግለጫ ሳጥን ቦታ';
+$ec_lang['lpn_settings_legend_position']='የምልክቶች ማብራሪያ ሳጥን ቦታ';
 // ROADMAP Task 529. Tom, 2026-08-25, after a phone session: *"one of the legend placement options
 // must be 'Off'... Especially the labels legend. With all the control we have given the user, the
 // legend is of less value now compared to when we were distinguishing coloured numbers."*
@@ -2891,12 +2891,12 @@ $ec_lang['lpn_color_ramp_viridis']='ከወይን ጠጅ ወደ ቢጫ (አንዱ
 $ec_lang['lpn_color_ramp_gray']='ከቀላል ወደ ጥቁር ግራጫ';
 $ec_lang['lpn_settings_color_reverse']='የቀለም ቅደም ተከተል ግልብጥ';
 $ec_lang['lpn_color_none']='ቀለም የለም';
-$ec_lang['lpn_settings_color_key_position']='የቀለም መግለጫ ሳጥን ቦታ';
+$ec_lang['lpn_settings_color_key_position']='የቀለም ማብራሪያ ሳጥን ቦታ';
 $ec_lang['lpn_settings_color_breaks']='የቀለም ክልል ወሰኖች';
 $ec_lang['lpn_settings_color_equal_intervals']='እኩል ክፍተቶች';
 $ec_lang['lpn_settings_color_equal_counts']='እኩል ብዛቶች';
 $ec_lang['lpn_settings_color_no_values']='ገና የሚሠራበት ዋጋ የለም። መጀመሪያ መረቡን ይፍቱ።';
-$ec_lang['lpn_confirm_restore_defaults']='ሁሉንም ቅንብሮች (የመለያ ቅድመ ቅጥያዎች፣ የመነሻ ዋጋዎች፣ የማስያ ቅንብሮች፣ የካርታ ገጽታ፣ የመግለጫ ሳጥን ቦታ እና የሚታዩ ምልክቶች) ወደ መጀመሪያ ዋጋቸው ይመልሱ? መረብዎ አይለወጥም። ቅንብሮች የተከፈተውን ፕሮጀክት ስለሚመለከቱ፣ ሌሎች ፕሮጀክቶችዎ የራሳቸውን ይይዛሉ።';
+$ec_lang['lpn_confirm_restore_defaults']='ሁሉንም ቅንብሮች (የመለያ ቅድመ ቅጥያዎች፣ የመነሻ ዋጋዎች፣ የማስያ ቅንብሮች፣ የካርታ ገጽታ፣ የማብራሪያ ሳጥን ቦታ እና የሚታዩ ምልክቶች) ወደ መጀመሪያ ዋጋቸው ይመልሱ? መረብዎ አይለወጥም። ቅንብሮች የተከፈተውን ፕሮጀክት ስለሚመለከቱ፣ ሌሎች ፕሮጀክቶችዎ የራሳቸውን ይይዛሉ።';
 // **"Start fresh", the nuclear option named as one** (Tom, 2026-09-09, after weighing "Restart app",
 // "Clear cache", "Clear app" and "Flush cache": *"We want something that sounds like the nuclear
 // option. And we give fair warning after clicking, so a long name isn't necessary."*).
@@ -3708,7 +3708,7 @@ $ec_lang['lpn_ff_report_all']='የተፈተነው እያንዳንዱ መገና�
 $ec_lang['lpn_ff_col_junction']='መገናኛ';
 $ec_lang['lpn_ff_col_static']='ስታቲክ ግፊት';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_col_static_tip']='ምንም የእሳት ፍሰት ከመሳብ በፊት፣ የስርዓቱ መደበኛ ፍላጎቶች እየሮጡ ባሉበት፣ በዚህ መገናኛ ላይ ያለው ግፊት። ይህን ለመለካት ምንም ነገር አይዘጋም፣ ስለዚህ ይህ ለስርዓቱ የዜሮ-ፍሰት ግፊት አይደለም፤ ካርታው በዚህ መገናኛ ላይ የሚያሳየው ተመሳሳይ ግፊት ነው። AWWA M31 እና NFPA 291 ሁለቱም ይህን ንባብ የማይንቀሳቀስ ግፊት ብለው ይጠሩታል፣ የእሳት ፍሰት ምርመራም የሚጀምረው እዚህ ነው።';
+$ec_lang['lpn_ff_col_static_tip']='ምንም የእሳት ፍሰት ከመሳብ በፊት፣ የስርዓቱ መደበኛ ፍላጎቶች እየሮጡ ባሉበት፣ በዚህ መገናኛ ላይ ያለው ግፊት። ይህን ለመለካት ምንም ነገር አይዘጋም፣ ስለዚህ ይህ ለስርዓቱ የዜሮ-ፍሰት ግፊት አይደለም፤ ካርታው በዚህ መገናኛ ላይ የሚያሳየው ተመሳሳይ ግፊት ነው። AWWA M31 እና NFPA 291 ሁለቱም ይህን ንባብ ስታቲክ ግፊት ብለው ይጠሩታል፣ የእሳት ፍሰት ምርመራም የሚጀምረው እዚህ ነው።';
 $ec_lang['lpn_ff_col_available']='የሚገኝ ፍሰት';
 $ec_lang['lpn_ff_col_required']='የሚያስፈልግ ፍሰት';
 $ec_lang['lpn_ff_col_residual']='የተያዘ ቀሪ ግፊት';

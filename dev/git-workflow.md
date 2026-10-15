@@ -118,6 +118,19 @@ uncommitted; silence means commit and push.
   `git log --oneline origin/master..master` is empty. Never tell Tom to `git pull` before verifying
   the push landed.
 
+### A merge batch costs one check_all run (Tom, 2026-10-15)
+
+Five branches merged on 2026-10-15 took two full suite runs of ~57 min each; the first failed on a
+brittle harness (`epanet-topology-refusal-harness.js` pinned EPANET's give-up time, which moved by
+three hours on a 0.2% pipe-length change). The suite had grown from ~8 min on 10-02 as browser
+harnesses, which run one at a time, went from 1 to 59. Tom: *"It sounds to me like we have a huge
+overhead for merges that I did not see or foresee growing to this. (1) I need to be made very aware
+of what's going on and (2) I need to know good practices to avoid spinning wheels and burning
+daylight on overhead tasks."* He then asked for the practices to be implemented: say the wait first;
+one run per batch with the bookkeeping folded in; `run_harnesses.sh --node-only` before the gate
+(it would have caught that failure in minutes); keep branches current with master. Making the
+browser harnesses run side by side is Task 797.
+
 ### Every AI commit is authored "Claude Code for Tom Haws" (Tom, 2026-09-08)
 
 **`git commit --author="Claude Code for Tom Haws <tom.haws@gmail.com>"` on every commit an AI

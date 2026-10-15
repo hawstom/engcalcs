@@ -1406,7 +1406,7 @@ $ec_lang['lpn_help_walkthroughs']='Покрокові посібники';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Видалити мережу';
-$ec_lang['lpn_confirm_delete_network']='Видалити всі вузли, труби й текстові підписи в цьому проєкті? Фонове зображення, назва проєкту та налаштування збережуться.';
+$ec_lang['lpn_confirm_delete_network']='Видалити всі вузли, труби й тексти в цьому проєкті? Фонове зображення, назва проєкту та налаштування збережуться.';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -1814,7 +1814,7 @@ $ec_lang['lpn_net_bad_file']='Це схоже на файл EPANET .net, але 
 $ec_lang['lpn_inp_report_heading']='Імпортовано {file}';
 $ec_lang['lpn_inp_report_counts']='{nodes} вузлів, резервуарів і ємностей, {links} труб, насосів і клапанів, в одиницях {units}.';
 $ec_lang['lpn_inp_report_clean']='Усе з файлу перенесено. Нічого не пропущено.';
-$ec_lang['lpn_inp_report_label_anchor']='Текстові підписи розміщено так само, як їх розміщує EPANET, — від верхнього лівого кута.';
+$ec_lang['lpn_inp_report_label_anchor']='Тексти розміщено так само, як їх розміщує EPANET, — від верхнього лівого кута.';
 // **R-219; Tom, 2026-09-24, answering R-190**: dropping the "These are already lat/lon" button in
 // favor of typing 1 for Step 2's Ground distance field means both Import and Convert as have to say
 // that door still exists. Shown for any file that lands as a plain XY drawing -- Feet, Meters, None

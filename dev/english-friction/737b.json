@@ -1,0 +1,224 @@
+{
+ "sprint": "737b",
+ "description": "Term-centric sweep for Task 737, second pass: one word per concept in am, bn, fa, hi, km, my, pt, ru, uk, zh (Label, Tag, Description, Text, Elevation, Depth, Pressure, Head, HGL, EGL).",
+ "entries": [
+  {
+   "key": "lpn_mode_select",
+   "source": "translator",
+   "lang": "am",
+   "complaint": "English says label where only a Text can be selected or dragged (EPANET Label = our Text). Rendered as Text (ጽሑፍ) in lpn_mode_select and the eight lpn_mode_add_* strings; if English intends any annotation, revert.",
+   "readings": [
+    "Text",
+    "Label (generic annotation)"
+   ],
+   "disposition": "english",
+   "resolution": "Real English ambiguity: Select mode moves both a node's Label and a Text, and 'label' names only one. Proposed to Tom: say 'labels and Text'. Translations keep their generic word until he rules; am, fa, hi edits that narrowed it to Text were reverted."
+  },
+  {
+   "key": "lpn_cp_label",
+   "source": "translator",
+   "lang": "am",
+   "complaint": "Custom property Label is rendered መለያ, the same word as ID (lpn_field_id). Not one of the assigned concepts, so left; a collision to settle.",
+   "readings": [
+    "መለያ = ID",
+    "መለያ = custom property label"
+   ],
+   "disposition": "dismissed",
+   "resolution": "A custom property's display name is not one of the Task 737 concepts; a separate word is correct as long as it differs from Label, Tag, Description and Text, which it does in am and uk. The am clash with ID is noted for the next am audit."
+  },
+  {
+   "key": "lpn_settings_legend_position",
+   "source": "translator",
+   "lang": "am",
+   "complaint": "Legend was rendered መግለጫ, the Description word; changed to ማብራሪያ in three strings. Legend is not an assigned concept.",
+   "readings": [
+    "መግለጫ",
+    "ማብራሪያ"
+   ],
+   "disposition": "glossary",
+   "resolution": "Legend moved off the Description word in am (ማብራሪያ); recorded in the sprint record."
+  },
+  {
+   "key": "lpn_energy_currency_tip",
+   "source": "translator",
+   "lang": "am",
+   "complaint": "English calls a free currency string a label; kept ምልክት (generic sense), but it is neither the Label nor Text concept.",
+   "readings": [
+    "ምልክት",
+    "ጽሑፍ"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Generic English 'label' for a currency string, not the Label concept; the generic word is right."
+  },
+  {
+   "key": "lpn_mode_select",
+   "source": "translator",
+   "lang": "bn",
+   "complaint": "English uses \"label\" for the Text concept (an asset or a label) in the mode-hint strings (lpn_mode_select, lpn_mode_add_*, lpn_tip_select); I kept the generic লেবেল there, which may read as the page-written Label rather than Text.",
+   "readings": [
+    "Label (page-written)",
+    "Text (user-placed)"
+   ],
+   "disposition": "english",
+   "resolution": "Real English ambiguity: Select mode moves both a node's Label and a Text, and 'label' names only one. Proposed to Tom: say 'labels and Text'. Translations keep their generic word until he rules; am, fa, hi edits that narrowed it to Text were reverted."
+  },
+  {
+   "key": "lpn_confirm_delete_network",
+   "source": "translator",
+   "lang": "bn",
+   "complaint": "English says \"text label\"; I rendered Text only (টেক্সট), dropping \"label\", to keep Text and Label apart.",
+   "readings": [
+    "text label = Text",
+    "text label = Label on text"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Every language now says Text alone here, keeping Text and Label apart; the English 'text labels' should be read as Text."
+  },
+  {
+   "key": "lpn_time_no_report",
+   "source": "translator",
+   "lang": "bn",
+   "complaint": "Ordinary \"text\" (text report, text file, text size) vs the Text annotation concept. I changed standalone generic text to লেখা but left compounds টেক্সট ফাইল, টেক্সট প্রতিবেদন, টেক্সটের আকার as the usual loanword.",
+   "readings": [
+    "generic text = লেখা",
+    "generic text = টেক্সট"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Loanword compounds for text file and text report are ordinary usage, not the Text concept."
+  },
+  {
+   "key": "lpn_result_head",
+   "source": "translator",
+   "lang": "bn",
+   "complaint": "Head: glossary says জলশীর্ষ but the file used হেড in about 61 sites vs about 32 for জলশীর্ষ/পানিশীর্ষ; I unified on the loanword হেড (also the glossary rendering for velocity/weir/supply head, and the search term). Head loss unified as হেড ক্ষতি (menu titles had হেড লস).",
+   "readings": [
+    "জলশীর্ষ",
+    "হেড"
+   ],
+   "disposition": "glossary",
+   "resolution": "bn Head unified on the incumbent হেড (61 vs 32 sites); glossary note written back."
+  },
+  {
+   "key": "mpf_flow_tip",
+   "source": "translator",
+   "lang": "hi",
+   "complaint": "English 'headwater depth' is rendered 'शीर्ष जल गहराई' (mpf_flow_tip, mpf_note_1); 'शीर्ष' is no longer the Head word, so this now reads as 'top water depth'. Left unchanged.",
+   "readings": [
+    "headwater depth",
+    "top water depth"
+   ],
+   "disposition": "dismissed",
+   "resolution": "hi 'headwater depth' wording is a separate term (headwater), not Head; left for the next hi audit."
+  },
+  {
+   "key": "lpn_mode_add_text",
+   "source": "translator",
+   "lang": "hi",
+   "complaint": "'assets and labels' in English: unclear whether labels means generated Labels or Text; left as लेबल.",
+   "readings": [
+    "Label",
+    "Text"
+   ],
+   "disposition": "english",
+   "resolution": "Same as lpn_mode_select: proposed English 'assets, labels and Text' goes to Tom."
+  },
+  {
+   "key": "or_hwe",
+   "source": "translator",
+   "lang": "my",
+   "complaint": "Burmese ဖိမြင့်ဆင့် (head) ends in -ဆင့် and the glossary rendered headwater/tailwater elevation with the same ending, so elevation looked like head. Changed to ရေအမြင့် (elevation = အမြင့်). Glossary entries for headwater/tailwater/invert elevation still carry the -ဆင့် forms.",
+   "readings": [
+    "ရေတက်ဘက် ရေအမြင့် (elevation)",
+    "ရေတက်ဘက် ဖိမြင့်ဆင့် (head)"
+   ],
+   "disposition": "glossary",
+   "resolution": "my headwater/tailwater elevation moved off the Head ending; glossary note written back."
+  },
+  {
+   "key": "hw_hgl_1",
+   "source": "translator",
+   "lang": "ru",
+   "complaint": "HGL is abbreviated ГГЛ and EGL НЭЛ in the calculators, but spelled out as пьезометрическая линия / линия энергии; the abbreviations do not match the spelled terms and their expansions are not stated anywhere. Needs Tom/native decision (e.g. ПЛ).",
+   "readings": [
+    "ГГЛ",
+    "НЭЛ",
+    "пьезометрическая линия",
+    "линия энергии"
+   ],
+   "disposition": "dismissed",
+   "resolution": "ru calculator abbreviations ГГЛ/НЭЛ predate this sprint; recorded for the next ru audit, no English defect."
+  },
+  {
+   "key": "lpn_energy_currency_tip",
+   "source": "translator",
+   "lang": "ru",
+   "complaint": "English uses generic label (\"a label only\"); Russian подпись is also the Label concept. Left unchanged.",
+   "readings": [
+    "подпись",
+    "надпись"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Generic English 'label' for a currency string, not the Label concept; the generic word is right."
+  },
+  {
+   "key": "lpn_field_text_all_zoom_tip",
+   "source": "translator",
+   "lang": "ru",
+   "complaint": "Checkbox verb Отметьте/Снимите отметку uses отметка, the word for Elevation. Suggest флажок for checkbox wording; outside this sprint scope.",
+   "readings": [
+    "Снимите отметку",
+    "Снимите флажок"
+   ],
+   "disposition": "dismissed",
+   "resolution": "ru checkbox verb sharing a root with Elevation is a different part of speech in context; noted for the ru audit."
+  },
+  {
+   "key": "lpn_mode_select",
+   "source": "translator",
+   "lang": "uk",
+   "complaint": "English says 'an asset or a label' and 'move a node or a label'; the page means both Label and Text here, so the uk 'підпис' covers only one concept.",
+   "readings": [
+    "Select an asset or a Text",
+    "Select an asset, a Label or a Text"
+   ],
+   "disposition": "english",
+   "resolution": "Real English ambiguity: Select mode moves both a node's Label and a Text, and 'label' names only one. Proposed to Tom: say 'labels and Text'. Translations keep their generic word until he rules; am, fa, hi edits that narrowed it to Text were reverted."
+  },
+  {
+   "key": "lpn_cp_label",
+   "source": "translator",
+   "lang": "uk",
+   "complaint": "Custom property display name 'Label' is neither the map Label (підпис) nor Tag (Тег); uk uses 'Мітка' for it. Doubtful whether a fourth word is wanted.",
+   "readings": [
+    "Display name",
+    "Label of the custom property"
+   ],
+   "disposition": "dismissed",
+   "resolution": "A custom property's display name is not one of the Task 737 concepts; a separate word is correct as long as it differs from Label, Tag, Description and Text, which it does in am and uk. The am clash with ID is noted for the next am audit."
+  },
+  {
+   "key": "lpn_mode_select",
+   "source": "translator",
+   "lang": "zh",
+   "complaint": "English says \"labels\" in Select/Add mode strings (lpn_mode_*), where the movable thing is the Text; zh keeps 标签 (Label) to match English, but the concept is Text (文字).",
+   "readings": [
+    "标签 (Label)",
+    "文字 (Text)"
+   ],
+   "disposition": "english",
+   "resolution": "Real English ambiguity: Select mode moves both a node's Label and a Text, and 'label' names only one. Proposed to Tom: say 'labels and Text'. Translations keep their generic word until he rules; am, fa, hi edits that narrowed it to Text were reverted."
+  },
+  {
+   "key": "lpn_inp_export_flat_customers",
+   "source": "translator",
+   "lang": "zh",
+   "complaint": "English says the customer tag; unclear whether the Tag concept or the customer ID is meant. zh uses 标记 (Tag).",
+   "readings": [
+    "Tag 标记",
+    "customer name/ID"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The customer's tag is the Tag concept; zh 标记 is right."
+  }
+ ]
+}

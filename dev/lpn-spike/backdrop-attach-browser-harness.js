@@ -193,9 +193,15 @@ async function main() {
 			.replace(' R1  0  0', ' R1  -117.5  33.0').replace(' J1  100  0', ' J1  -117.4  33.05').replace(' J2  200  50', ' J2  -117.3  33.1');
 		await importInp(a, GEO);
 		let g = await probe(a);
-		ok('the degrees file opened as a geographic project', await a.page.evaluate(() => !!document.getElementById('lpn_dialog_body') || true));
 		await a.page.evaluate(() => { const d = document.getElementById('lpn_dialog'); const b = document.querySelector('#lpn_dialog_buttons button'); if (b) { b.click(); } });
 		await a.settle(500);
+		// Read off the stored project, the way shape-browser and snap-browser ask the same question.
+		const geoCoords = await a.page.evaluate(() => {
+			const idx = JSON.parse(localStorage.getItem('lpn_index') || '{}');
+			const d = JSON.parse(localStorage.getItem('lpn_project_' + idx.openId) || 'null');
+			return d && d.project ? d.project.coords : null;
+		});
+		ok('the degrees file opened as a geographic project', geoCoords === 'geo', 'project.coords = ' + JSON.stringify(geoCoords));
 		// Map > Backdrop's own door (Add), not the import's, so this is the fault master has too.
 		await a.page.setInputFiles('#lpn_backdrop_file', { name: 'pic.png', mimeType: 'image/png', buffer: png(40, 20) });
 		await a.settle(800);
