@@ -999,8 +999,8 @@ Tom's calls of 2026-10-09 (H01-H08), in his words where they govern:
   (Rename, a drag, Copy, Add child, another scenario picking it), stores it (`smMaterialize()`).
 - **The menu row is always present**; choosing it with Basic mode ticked turns Basic mode off and says so.
   The Scenarios menu's order is Tom's (2026-10-11): Scenario manager, a rule, Basic mode, New, Rename,
-  Delete, a rule, Apply Base values, then the scenarios. No separator before the scenario list (Tom,
-  2026-10-12: *"Not for now"*).
+  Delete, then the scenarios (Apply Base values and the rule before it were retired 2026-10-15, below).
+  No separator before the scenario list (Tom, 2026-10-12: *"Not for now"*).
 - **Gestures**: drag a leaf or branch onto an item to re-parent it (the row is outlined); drag between
   two items to reorder (a line); a cycle is refused. **A click selects and only selects** (Tom,
   2026-10-12: *"Single-clicking on a tree name opens it in Rename mode ... Clicking again, ostensibly
@@ -1170,8 +1170,9 @@ Base goes into it), and every scenario that inherits the category from Base inhe
 or Base gives Base its own alternative again. A Base naming any record makes the project one Basic
 mode cannot show (`basicModeMisfit()` 'base'). A Base of its own (Add base) takes nothing from Base.
 Where Base names nothing it writes the elements and the project, exactly as before (`inBaseFor()`,
-`plainBase()`). Drawing, deleting, Change type, Apply Base values, Restore defaults and the view stay
-Base's acts on the drawing itself.
+`plainBase()`). Drawing, deleting, Morph, Restore defaults and the view stay Base's acts on the drawing
+itself. **Allowed, and kept** (Task 801, Tom 2026-10-15: *"There is nothing truly circular about it. I
+suppose it shouldn't be forbidden."*): Basic mode still refuses such a project, in its own words.
 
 **The inherited ring.** *"Tanks show amber circle on map, but has overrides only in parent, not
 here."* The amber ring is an override where the open scenario writes (hasOverride()'s rule); a value
@@ -1183,6 +1184,48 @@ in the manager is drawn only on an item with children; it had been drawn on ever
 after Civil 3D's icon per node, and a leaf now keeps its width empty. **A Base picked under Base**
 blanked the Calculation select, because the blank row also read "Base"; it now reads "Base
 (inherited)". **The Settings box** starts 1.9rem wider, the gutter's width, measured.
+
+### Merge upward, and Apply Base values retired (Task 801, 2026-10-15)
+
+Tom, on Apply Base values: *"I don't think we need this command any more now that we have the circles
+and the down arrows. And this command is too confusing and dangerous."* Mary found that WaterGEMS merges
+a preferred alternative up into Base and documents no push-down command. Tom: *"Allow and retire. I
+agree. And I like the 'Merge into parent' command."*, then *"Maybe 'Merge upward' and it lets you choose
+how many steps upward to target the merge (in case you want to skip parent)?"*, and to the proposal
+below, *"Yes. Perfect."*
+
+**Retired:** the Scenarios menu row and the per-asset button in Properties (the same action, narrowed to
+one asset, with the same words), `pushBaseToScenarios()`, `pushHereButton()`, and the six
+`lpn_scenario_push_*` keys in all 27 files. The two `$ec_lang_syn` entries for them are left for Tom.
+`pushSpecList()` stays: the Settings push and Find and replace read it.
+
+**Built:** "Merge upward", a command of every alternatives tree in the Scenario manager (button and
+right-click row, after Copy; not in the Scenarios tree; greyed on a Base). It asks which ancestor, by
+name, parent first, up to the tree's Base item, then asks again saying how many overrides move. The
+selected alternative's OWN values (never what it inherits) are written into the target, the nearer
+winning by the rule they resolve by (`combineHolders()`, the demand pair included), and removed from it;
+it stays in the tree, empty, and inherits them. **A skipped level holding its own value for anything
+merged is named in the question** (one line per asset and field, "Pipe 10: Diameter", or a setting) and
+is not changed, so the source then reads that value from the skipped level. One undo step. A merge into
+the Base item writes the drawing and the project as a Base edit does (`setProp()` in Base, Base's own
+pick for the category set aside), so it reaches the elements even when the Base scenario uses another
+alternative. Results that depended on the changed inputs go stale under the snapshot rule, as after any
+scenario act (`applyScenarioChange()`).
+
+**Decided by CC, for Tom to overturn:**
+- **A Morph merges like any value into a stored ancestor** (it is an Active topology value), **and stays
+  in the source when the target is Base**, said in the question: in Base a type change is Morph in Base,
+  which rebuilds the asset and pins what other scenarios read (`morphPinBase()`), so a plain write would
+  skip both. A saved view also stays (Base holds none). The rest of the alternative still merges.
+- A scenario's own values from a file before 2026-10-12 (the derived item) are stored first and then
+  merged, like Copy and Rename do.
+- A local value an older reader left in a scenario that names an alternative for the category is
+  nearest and is not part of that alternative, so a merge of the alternative leaves it.
+- Calculation sets merge the same way; into Base the multiplier and run times become the project's.
+
+Code: `smMergeTargets()`, `smOwnContent()`, `smMergePlan()`, `smMergeUpward()` (model) and
+`smActMergeUpward()` (the two questions). Harnesses: `alternative-merge-upward-harness.js` (headless) and
+`alternative-merge-upward-browser-harness.js` (Chromium).
 
 ### Next stage: what the advisers said (recorded, not built)
 
