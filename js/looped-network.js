@@ -13710,14 +13710,34 @@ var EngCalcs = EngCalcs || {};
 			padTop = Math.max(pad, overlayReserve('lpn_mode_hint')),
 			padBottom = Math.max(pad, overlayReserve('lpn_map_footer'));
 		var items, s;
+		// **A PIECE OF INK WIDER (OR TALLER) THAN THE WINDOW ON ITS OWN IS LEFT OUT OF THAT AXIS**
+		// (R-399; Tom, 2026-10-15, on a phone in tall mode: *"Zoom to fit doesn't work for Basic
+		// example SI units ... It zooms out magnitudes wider than it should."*). A Text is a fixed
+		// size on SCREEN, so no scale makes it narrower: the Basic examples' title, "HawsEDC
+		// Calculators" at four times the text size, is about 450 px wide and a phone canvas is 410.
+		// fitScaleFor() then answers minScale(), the drawing-sized floor (since 68d6b76b, 2026-09-16),
+		// and because Texts are in step 1's MODEL items too, the model fallback below bottomed out
+		// with it -- the 1,400 m network drawn as a 4 px mark. Measured 0.00286 against a desktop
+		// 0.83. Dropping such an item from the axis it cannot fit changes nothing when everything
+		// fits, which is every desktop fit; on a narrow window the network is framed and that one
+		// Text overhangs, which is the trade the fallback below already states. Per axis, so a title
+		// too wide to fit still has its height reserved. dev/lpn-spike/phone-fit-browser-harness.js.
+		function fitsAlone(it, loKey, hiKey, span, padLo, padHi) {
+			return it[loKey] + it[hiKey] <= span - padLo - padHi;
+		}
+		function fittable(set, loKey, hiKey, span, padLo, padHi) {
+			var kept = set.filter(function (it) { return fitsAlone(it, loKey, hiKey, span, padLo, padHi); });
+			return kept.length ? kept : set;
+		}
 		function solve(extra) {
 			var e = extra || 0;
-			return Math.min(fitScaleFor(items, 'x', 'l', 'r', r.width, padLeft + e, padRight + e),
-				fitScaleFor(items, 'y', 't', 'b', r.height, padTop + e, padBottom + e));
+			return Math.min(
+				fitScaleFor(fittable(items, 'l', 'r', r.width, padLeft + e, padRight + e), 'x', 'l', 'r', r.width, padLeft + e, padRight + e),
+				fitScaleFor(fittable(items, 't', 'b', r.height, padTop + e, padBottom + e), 'y', 't', 'b', r.height, padTop + e, padBottom + e));
 		}
 		function place(v, set) {
-			return { tx: fitWindow(set, v, 'x', 'l', 'r', r.width, padLeft, padRight).t,
-				ty: fitWindow(set, v, 'y', 't', 'b', r.height, padTop, padBottom).t };
+			return { tx: fitWindow(fittable(set, 'l', 'r', r.width, padLeft, padRight), v, 'x', 'l', 'r', r.width, padLeft, padRight).t,
+				ty: fitWindow(fittable(set, 't', 'b', r.height, padTop, padBottom), v, 'y', 't', 'b', r.height, padTop, padBottom).t };
 		}
 		// **ROOM FOR LABELS IS NOT MADE AT A SCALE THAT HIDES THEM** (R-263, Tom 2026-09-25: *"some
 		// label placements cause Zoom to Fit to leave too much padding."*). Past the labeling
@@ -13882,16 +13902,24 @@ var EngCalcs = EngCalcs || {};
 		// `true` when something is outside the padded frame, the overlay's rectangle when something
 		// is under an overlay, null when all is clear.
 		function firstObstruction(all) {
-			var i, j, it, x, y, e = 0.5, furn = mapFurnitureRects(r), f, bl, br, bt, bb, outside = false;
+			var i, j, it, x, y, e = 0.5, furn = mapFurnitureRects(r), f, bl, br, bt, bb, fx, fy, outside = false;
 			for (i = 0; i < all.length; i++) {
 				it = all[i]; x = state.tx + state.s * it.x; y = state.ty + state.s * it.y;
 				bl = x - it.l; br = x + it.r; bt = y - it.t; bb = y + it.b;
-				for (j = 0; j < furn.length; j++) {
-					f = furn[j];
-					if (Math.min(br, f.r) - Math.max(bl, f.l) > e && Math.min(bb, f.b) - Math.max(bt, f.t) > e) { return f; }
+				// Ink that cannot fit the window on an axis at any scale (see fitsAlone()) overhangs
+				// on that axis by design, so it is not an obstruction there, and it is not judged
+				// against the furniture either: it covers some corner at every scale, and reserving an
+				// edge for it would only step the zoom down for nothing.
+				fx = fitsAlone(it, 'l', 'r', r.width, padLeft, padRight);
+				fy = fitsAlone(it, 't', 'b', r.height, padTop, padBottom);
+				if (fx && fy) {
+					for (j = 0; j < furn.length; j++) {
+						f = furn[j];
+						if (Math.min(br, f.r) - Math.max(bl, f.l) > e && Math.min(bb, f.b) - Math.max(bt, f.t) > e) { return f; }
+					}
 				}
-				if (bl < padLeft - e || br > r.width - padRight + e ||
-					bt < padTop - e || bb > r.height - padBottom + e) { outside = true; }
+				if ((fx && (bl < padLeft - e || br > r.width - padRight + e)) ||
+					(fy && (bt < padTop - e || bb > r.height - padBottom + e))) { outside = true; }
 			}
 			return outside || null;
 		}
