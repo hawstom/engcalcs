@@ -45439,6 +45439,10 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'help', label: pc.lpn_help_screenshots || 'Screenshot gallery', fn: ext(LPN_SCREENSHOTS_URL) },
 			// Task 286 wants the notice FINDABLE and withdrawal as easy as consent; this page has
 			// no footer, so Help is its home and always was.
+			// The suite's calculator index (Task 625, Tom 2026-10-14: *"Add 'HawsEDC Calculators' in Help
+			// menu above Privacy notice."*). The navbar brand's own target and key (menu_brand), so it
+			// reads the same under /engcalcs/ and /app/; a new tab like every row here.
+			{ icon: 'info', label: pc.menu_brand || 'HawsEDC Calculators', fn: ext(suiteUrl('index.php')) },
 			{ icon: 'info', label: pc.privacy_link || 'Privacy notice', fn: ext(suiteUrl('privacy.php')) },
 			{ icon: 'info', label: pc.terms_link || 'Terms of use', fn: ext(suiteUrl('terms.php')) },
 			// About last, where every Help menu in the world puts it, and an IN-PAGE box rather
