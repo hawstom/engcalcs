@@ -113,14 +113,9 @@ sweeps), fix/control-inactive-link (Task 796 crash: Fotobi), fix/example-id-labe
 roadmap calls (625, 643, 681, 749, 785, 789 to 100; 720, 733 to 75; 185, 221, 285 closed).
 Deleted keys: bpn_, hw_ and lpn_notes_epanet_def and _term (master, six); lpn_scenario_delete_goes_one, lpn_sm_basic_off (bentley).
 
-### Merge first, next session (Tom, 2026-10-15: "It's good as is. Merge in the handoff, not now.")
+### Landed 2026-10-16
 
-- **feat/text-halo** at 6bc34454 (all-clear pinned). Each label row is one text run; the whole-layer
-  SVG filter was tried and dropped (labels vanished on lat/lon maps, raster cost 5-10x).
-- **fix/search-zoom-accuracy** at 176bab1e (defect track): Settings search, phone fit at 90%, Accuracy
-  0.001 for all projects. His same words, which also settle the 90% limit and leave a saved view as is
-  on opening an example.
-- Merge both in one batch with this file's edits, one full check_all.
+feat/text-halo (791) and fix/search-zoom-accuracy (796, R-388, R-397, R-399, R-408), on his 10-15 words.
 
 ### Branches awaiting his word (pushed; all on the Branch previews page with test steps)
 

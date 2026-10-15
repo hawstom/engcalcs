@@ -214,20 +214,10 @@ the block.
   Perry, 2026-10-12: Copy/Paste properties and the graph bubbles open only from the asset right-click
   menu. Tom, 2026-10-14: *"Isn't long press the standard alias for right-click on a touch screen?
   Promote this to 100 and resolve promptly."* Built; merged into `feat/bentley-interop`, closes when it lands.
-- 100|791| **Text halos twice as wide, with a Map appearance setting.**
-  Tom, 2026-10-14: *"our text halos need to be bigger and maybe available as a setting under Map
-  appearance. Can we double them?"* Building on `feat/text-halo`.
 - 100|794| **Edit a Text in place on the map.**
   Tom, 2026-10-14: *"It would be really nice for Text to be editable in place instead of only in the
   properties box."* Double-click opens an editor over the Text; right-click a Text offers Edit text and
   Reset position. Built; merged into `feat/bentley-interop` (Tom: *"if that's tidy"*), closes when it lands.
-- 100|796| **The EPANET run crashed on Tom's two-system test project.**
-  Tom, 2026-10-14, on `Fotobi_US_WGS84.epp` (reservoir, pump and tank on each of two systems):
-  *"EPANET solver message: memory access out of bounds"*, and "Solve did not converge" in the pump-off
-  scenarios. Also his question: can EPANET solve a system whose only source is a tank? **Crash fixed on
-  master (889a56c2) and bentley:** controls for pumps out of the run, and an engine reused after a refusal.
-  A tank-only source is valid; a tank running dry stops the run. Open: "did not converge" goes away at
-  Accuracy 0.001 (now 1e-5). **Tom, 2026-10-15: *"Yes. And tip says 1e-9, so sync that."*** Default to 0.001; R-388.
 - 100|800| **A tidy list and count of one scenario's own overrides.**
   Tom, 2026-10-15, on Fotobi's "1-hr drain w pump off" (24 overrides vs its siblings' 23): *"I don't know how to see a tidy list of overrides to audit ... that count seems inflated ... I should see the count of only the present overrides, not the inherited overrides. I count 13 diameter overrides, 1 text override, and 2 calculation overrides."* Also his screenshot note: tanks show the amber circle while their overrides are only in the parent. Review R-386.
 - 100|801| **Retire Apply Base values; add Merge upward for alternatives.**
