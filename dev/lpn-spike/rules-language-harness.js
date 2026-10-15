@@ -220,7 +220,10 @@ console.log('\n--- a rule\'s numbers reach the engine in the engine\'s units ---
 	// -----------------------------------------------------------------------
 	console.log('\n--- and the user\'s own text is byte-identical coming back out ---');
 	ok('the document still holds the file\'s own lines',
-		(L.getDoc().rules || []).join('\n') === rulesBlockOf(FIXTURE).join('\n'),
+		// Blank lines between rules included since 2026-10-14: a blank line is what tells a
+		// heading comment from the description of the RULE under it, so it is the file's too.
+		(L.getDoc().rules || []).join('\n') === (FIXTURE.split(/^\[RULES\]/m)[1] || '').split(/^\[/m)[0]
+			.split(/\r?\n/).map(t => t.replace(/\s+$/, '')).join('\n').trim(),
 		JSON.stringify(L.getDoc().rules));
 	ok('...and the exporter writes them back character for character',
 		rulesBlockOf(L.export().inp).join('\n') === rulesBlockOf(FIXTURE).join('\n'));

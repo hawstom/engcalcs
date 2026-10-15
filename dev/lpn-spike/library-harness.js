@@ -49,8 +49,10 @@ const L = loadLoopedNetwork(
 	"\t\tpasteCells: libPasteCells, mergePaste: libMergePaste, gridPoints: libGridPoints,\n" +
 	// The Rules section (Task 248.03), by the same seam and for the same reason: these ARE the
 	// functions the box's controls call, so a check here is a check on the code path a click takes.
-	"\t\treadRule: libReadRule, ruleChunks: libRuleChunks, rulesWith: libRulesWith,\n" +
-	"\t\truleBody: libRuleBody\n"
+	"\t\treadRule: libReadRule, ruleChunks: libRuleChunks, rulesSplice: libRulesSplice,\n" +
+	"\t\truleEntries: function () { return libRuleEntries(libRulesRead()); },\n" +
+	"\t\truleBody: function (e) { return libRuleBody(libRulesRead(), e); },\n" +
+	"\t\truleDesc: function (e) { return libRuleDesc(libRulesRead(), e); }\n"
 );
 const EngCalcs = global.EngCalcs;
 require(path.join(ROOT, 'js', 'lpn-inp.js'));
@@ -387,18 +389,26 @@ function check(ok, msg, detail) {
 		const kept = doc.rules;
 		doc.rules = ['RULE A', 'IF TANK 1 LEVEL BELOW 5', 'THEN PUMP 10 STATUS IS OPEN', '',
 			'; a note about B', 'RULE B', 'IF TANK 1 LEVEL ABOVE 30', 'THEN PUMP 10 STATUS IS CLOSED'];
-		const chunks = L.ruleChunks();
+		const chunks = L.ruleEntries();
 		check(chunks.length === 2 && chunks[0].name === 'A' && chunks[1].name === 'B',
 			'the box shows one entry per rule', chunks.map((c) => c.name).join(','));
 		check(L.ruleBody(chunks[0]).length === 3,
 			'and A\'s box holds A\'s three lines, not the blank and the comment before B',
 			JSON.stringify(L.ruleBody(chunks[0])));
-		const edited = L.rulesWith(0, ['RULE A', 'IF TANK 1 LEVEL BELOW 7', 'THEN PUMP 10 STATUS IS OPEN']);
+		// **THE COMMENT DIRECTLY ABOVE B IS B'S DESCRIPTION** (Tom, 2026-10-14), not part of A.
+		check(L.ruleDesc(chunks[1]) === 'a note about B' && L.ruleDesc(chunks[0]) === '',
+			'the comment directly above B is B\'s Description, and A has none',
+			JSON.stringify([L.ruleDesc(chunks[0]), L.ruleDesc(chunks[1])]));
+		const edited = L.rulesSplice(chunks[0].start, chunks[0].end, ['RULE A', 'IF TANK 1 LEVEL BELOW 7', 'THEN PUMP 10 STATUS IS OPEN']);
 		check(edited.slice(3).join('\n') === doc.rules.slice(3).join('\n'),
 			'editing A leaves the blank line, the comment and B byte-identical',
 			JSON.stringify(edited));
-		check(L.rulesWith(1, null).length === 5, 'and deleting B removes B and nothing else',
-			JSON.stringify(L.rulesWith(1, null)));
+		const descEd = L.rulesSplice(chunks[1].descStart, chunks[1].start, [';B, rewritten']);
+		check(descEd.join('\n') === doc.rules.slice(0, 4).concat([';B, rewritten'], doc.rules.slice(5)).join('\n'),
+			'rewriting B\'s description replaces only its comment line', JSON.stringify(descEd));
+		const delB = L.rulesSplice(chunks[1].descStart, doc.rules.length, []);
+		check(delB.join('\n') === doc.rules.slice(0, 4).join('\n'),
+			'and deleting B removes B and its description, and nothing of A', JSON.stringify(delB));
 
 		// The three-state verdict, the same one a control sentence gets.
 		check(L.readRule(L.ruleBody(chunks[0]).join('\n')).ok === true, 'a rule naming real elements reads as understood');

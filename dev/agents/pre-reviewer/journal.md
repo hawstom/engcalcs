@@ -4353,3 +4353,10 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: a file opened through the picker shows the unsaved mark for v12 and v13 alike, so migration is not what marks it.
 - NOT CHECKED: Find and replace, paste, Settings push, Morph, redo, Recalculate OFF label pass (code read only), elevation-unit switch.
 - SPECULATION: re-adding a Length tip Tom deleted 2026-10-04 (commit eccbd119) needs his word.
+
+## 2026-10-14 feat/library-description @ 478c0eea (Perry)
+- CITED (fetched EPANET dev input2.c/input3.c): LineComment set only for sections PATTERNS and CURVES from a token-less line (blank line sets it empty, so it cancels); cleared on any row; pattern takes it only at the first row of a run and only if it has none. Builder's pattern rule matches.
+- OBSERVED (node probe over docFromInp/lpnExportInp, real Chromium on crafted .inp): DEFECT. [RULES] import drops blank lines but keeps comments, so a heading comment, blank, then ";desc R1" reads as ONE description ("Rules section heading desc R1"); clearing/editing R1's description or deleting R1 deletes the heading line.
+- OBSERVED: a heading comment before the first control (Net3: two comments over four controls) becomes control 1's description only; trailing comment after the last control, comments between rows of one pattern, an extra comment above a pattern's description, a trailing comment on a pattern row: gone on import with the import report's dropped list empty.
+- OBSERVED: Library spreadsheet export Patterns sheet has no Description column (Curves, Pipe types, Fittings sheets do). Empty pattern with a description writes no description to .inp.
+- OBSERVED: builder's browser harness 3 sections x en/es pass; inp harness, library harness, inp-export 4497 checks, Net3 roundtrip pass; Net1/2/3 PATTERNS/CONTROLS tokens unchanged (Net2/3 CONTROLS byte-identical, comments kept). Rule edit/delete sequences by mouse keep the right lines. Not done: mutation check of the harnesses.

@@ -4838,6 +4838,9 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 .lpn-lib-field { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 .lpn-lib-field-grow { flex: 1 1 8em; }
 .lpn-lib-fieldname { font-size: .9em; opacity: .8; }
+/* A control's or a rule's Description sits on its own line above the text it describes, as its
+   `;comment` line does in the file; the gap keeps the two boxes from reading as one. */
+.lpn-lib-desc-row { margin-bottom: 4px; }
 /* The fitted equation is an ANSWER, not a box to type in: read-only, in the digits' own face so it
    lines up with the table under it, and it wraps rather than widening the panel. */
 .lpn-lib-equation { font-family: monospace; font-size: .9em; padding: 2px 0; overflow-wrap: anywhere; }

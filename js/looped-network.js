@@ -30675,7 +30675,7 @@ var EngCalcs = EngCalcs || {};
 	// column and a lookup both key on it, the numbers as the Library box holds them (what the user
 	// typed, in the project's units, which the headings name). Controls and rules are left out: they
 	// refer to assets, not the other way round.
-	//   Patterns: one row a pattern, its multipliers across, headed by period number 1, 2, 3...
+	//   Patterns: one row a pattern, its ID and Description, then its multipliers across, headed by period number 1, 2, 3...
 	//   Curves: one sheet per curve type present, one row a point, headed as the Library heads it.
 	//   Pipe types: one row a type, one column a property it may state; blank where it states none.
 	//   Fittings: one row a fitting of a list, so a list's coefficients can be summed in place.
@@ -30685,11 +30685,12 @@ var EngCalcs = EngCalcs || {};
 		function txt(v) { return v === undefined || v === null ? '' : String(v); }
 		var pats = libPatternsRead().filter(function (p) { return p && p.id !== undefined && p.id !== null && p.id !== ''; });
 		if (pats.length) {
-			var n = 0, heads = [idH], numeric = [false], k;
+			// ID and Description, then one column a period: the other library sheets' first two.
+			var n = 0, heads = [idH, descH], numeric = [false, false], k;
 			pats.forEach(function (p) { n = Math.max(n, (p.multipliers || []).length); });
 			for (k = 1; k <= n; k++) { heads.push(String(k)); numeric.push(true); }
 			out.push({ name: pc.lpn_library_patterns || 'Patterns', heads: heads, numeric: numeric,
-				rows: pats.map(function (p) { return [txt(p.id)].concat((p.multipliers || []).map(txt)); }) });
+				rows: pats.map(function (p) { return [txt(p.id), txt(p.note)].concat((p.multipliers || []).map(txt)); }) });
 		}
 		var curves = libCurvesRead(), kinds = CURVE_KINDS.map(function (o) { return o[0]; });
 		curves.forEach(function (c) { if (kinds.indexOf(c.kind) < 0) { kinds.push(c.kind); } });
@@ -39625,6 +39626,10 @@ var EngCalcs = EngCalcs || {};
 			case 'report': return pc.lpn_inp_drop_report || 'This file contains EPANET report-format settings. The run report is available under Reports, Run, but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
 			// The ids on this one are the SECTION NAMES, which is the only true thing we can say
 			// about a part of the format nobody here has read.
+			// Comment lines a pattern or a control cannot keep: between the rows of one pattern, on
+			// the end of a pattern row, or above a control that was itself left out. The ids are the
+			// comment lines themselves, which is the only name they have.
+			case 'comments': return pc.lpn_inp_drop_comments || 'These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.';
 			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
 			// Kept AND reported, the same pairing [RULES] has: the three lines survive the round
 			// trip, and nothing on this page acts on them.
@@ -57173,17 +57178,20 @@ var EngCalcs = EngCalcs || {};
 	// lpnRuleSplit() cuts `[RULES]` into -- so it collides on that name the same way a curve
 	// collides on its id. The synthetic `{id, lines}` record below is never written to `doc.rules`
 	// itself; libImportRulesWrite()'s `push` reads only `.lines` back out of it.
+	// A rule travels with ITS OWN description (the comment lines above its RULE line) and without
+	// the next rule's, which lpnRuleSplit() would have handed it -- see libRuleEntries().
 	function libImportRuleChunks(lines) {
-		return (EngCalcs.lpnRuleSplit ? EngCalcs.lpnRuleSplit(lines || []) : [])
-			.filter(function (c) { return c.name; })
-			.map(function (c) { return { id: c.name, lines: c.lines.slice() }; });
+		lines = lines || [];
+		return libRuleEntries(lines)
+			.filter(function (e) { return e.name; })
+			.map(function (e) { return { id: e.name, lines: lines.slice(e.descStart, e.end) }; });
 	}
 	function libImportRulesSource(saved) {
 		return libImportRuleChunks(Array.isArray(saved.rules) ? saved.rules : []);
 	}
 	function libImportRulesExisting() { return libImportRuleChunks(libRulesRead()); }
 	function libImportRulesWrite() {
-		return { push: function (clone) { doc.rules = libRules().concat(clone.lines || []); } };
+		return { push: function (clone) { doc.rules = libRulesAppend(libRules(), clone.lines || []); } };
 	}
 	var LIB_IMPORTABLE = {
 		// Dimensionless, and shared with no other page, so patterns carry no unit of their own
@@ -57814,6 +57822,30 @@ var EngCalcs = EngCalcs || {};
 		b.addEventListener('click', fn);
 		return b;
 	}
+	// **ONE DESCRIPTION FIELD FOR PATTERNS, CONTROLS AND RULES**, built exactly as the Curves and
+	// Pipe types sections build theirs: the word "Description" above a box, one line, trimmed, and
+	// a blank box meaning no description at all. `get` reads what is stored now and `set` writes
+	// the trimmed text ('' to remove); the document is written on `change` only.
+	function libDescField(get, set) {
+		var pc = EngCalcs.pageConfig || {},
+			field = libEl('label', 'lpn-lib-field lpn-lib-field-grow'),
+			desc = document.createElement('input'),
+			word = pc.lpn_library_curve_note_label || 'Description';
+		field.appendChild(libEl('span', 'lpn-lib-fieldname', word));
+		desc.type = 'text';
+		desc.className = 'lpn-lib-wide lpn-lib-desc';
+		desc.value = get();
+		desc.setAttribute('aria-label', word);
+		desc.addEventListener('change', function () {
+			var t = EngCalcs.lpnDescText ? EngCalcs.lpnDescText(desc.value) : String(desc.value || '').trim();
+			if (t === get()) { return; }
+			saveUndoSnapshot();
+			set(t);
+			libCommit();
+		});
+		field.appendChild(desc);
+		return field;
+	}
 	var LIB_SECTIONS = [
 		{ id: 'patterns', label: 'lpn_library_patterns', tip: 'lpn_library_patterns_tip' },
 		{ id: 'curves', label: 'lpn_library_curves', tip: 'lpn_library_curves_tip' },
@@ -58409,8 +58441,9 @@ var EngCalcs = EngCalcs || {};
 		}
 		list.forEach(function (pat) {
 			var entry = libEl('div', 'lpn-lib-entry'),
-				headRow = libEl('div', 'lpn-lib-head'),
+				headRow = libEl('div', 'lpn-lib-head lpn-lib-curve-row'),
 				id = document.createElement('input'),
+				idField = libEl('label', 'lpn-lib-field'),
 				values = document.createElement('input'),
 				span = libEl('div', 'lpn-lib-note', libSpanText((pat.multipliers || []).length)),
 				spark = libSparkline(pat.multipliers),
@@ -58427,7 +58460,16 @@ var EngCalcs = EngCalcs || {};
 				libCommit();
 				rebuildLibraryBox();
 			});
-			headRow.appendChild(id);
+			// **ID AND DESCRIPTION ON LINE 1, EACH LABELLED, THE CURVES SECTION'S OWN LAYOUT** (Tom,
+			// 2026-10-14: *"Let's add Description to the Library Patterns, Controls, and Rules."*).
+			// EPANET's pattern editor pairs the two the same way, and the description is the
+			// `;comment` above the pattern's rows in the file (see libDescField()).
+			idField.appendChild(libEl('span', 'lpn-lib-fieldname', pc.lpn_field_id || 'ID'));
+			idField.appendChild(id);
+			headRow.appendChild(idField);
+			headRow.appendChild(libDescField(function () { return pat.note || ''; }, function (t) {
+				if (t) { pat.note = t; } else { delete pat.note; }
+			}));
 			if (effDefaultPattern() === pat.id) {
 				mark = libEl('span', 'lpn-lib-note', pc.lpn_library_pattern_default_mark || '(default)');
 				mark.title = pc.lpn_library_pattern_default_tip || 'The default demand pattern. Change it in Settings, Default demand pattern.';
@@ -59652,6 +59694,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		list.forEach(function (ctl, i) {
 			var entry = libEl('div', 'lpn-lib-entry'),
+				descRow = libEl('div', 'lpn-lib-curve-row lpn-lib-desc-row'),
 				headRow = libEl('div', 'lpn-lib-head'),
 				box = document.createElement('input'),
 				verdict = libEl('div', 'lpn-lib-verdict ec-help'),
@@ -59692,14 +59735,41 @@ var EngCalcs = EngCalcs || {};
 				libControls()[i] = read.ok ? read.rec
 					: { link: '', raw: '', action: {}, condition: null, text: {} };
 				libControls()[i].raw = box.value.trim();
+				// The DESCRIPTION is not part of the sentence and survives a rewrite of it, with
+				// where it sits in the file. The record above is new, so it is carried across.
+				['head', 'note', 'noteSrc', 'noteAt', 'tail', 'foot'].forEach(function (k) {
+					if (ctl[k] !== undefined) { libControls()[i][k] = ctl[k]; }
+				});
+				ctl = libControls()[i];
 				libCommit();
 			});
+			// The description on its own line ABOVE the sentence, which is where it sits in the
+			// file: a `;comment` line over the control (see readControlNote() in js/lpn-inp.js).
+			descRow.appendChild(libDescField(function () { return ctl.note || ''; }, function (t) {
+				if (t) { ctl.note = t; } else { delete ctl.note; delete ctl.noteAt; }
+				// The file's own comment lines no longer say what the document says; the curve's
+				// `src` rule. Where the comment sat (`noteAt`) is kept.
+				delete ctl.noteSrc;
+			}));
+			entry.appendChild(descRow);
 			headRow.appendChild(box);
 			entry.appendChild(headRow);
 			entry.appendChild(verdict);
 			del = libButton(pc.lpn_tool_delete || 'Delete', function () {
+				var all = libControls(), gone = all[i], next = all[i + 1], prev = all[i - 1];
 				saveUndoSnapshot();
-				doc.controls = libControls().filter(function (c, k) { return k !== i; });
+				// **A HEADING OR A TRAILING COMMENT BLOCK IS NOT THE CONTROL'S, AND STAYS.** The
+				// heading above it passes to the control below; the block after the last control
+				// passes to the one above. Only its own description goes with it.
+				if (gone && Array.isArray(gone.head) && gone.head.length) {
+					if (next) { next.head = gone.head.concat(next.head || []); }
+					else if (prev) { prev.foot = (prev.foot || []).concat(gone.head); }
+				}
+				if (gone && Array.isArray(gone.foot) && gone.foot.length) {
+					if (prev) { prev.foot = (prev.foot || []).concat(gone.foot); }
+					else if (next) { next.head = gone.foot.concat(next.head || []); }
+				}
+				doc.controls = all.filter(function (c, k) { return k !== i; });
 				libCommit();
 				rebuildLibraryBox();
 			});
@@ -59734,21 +59804,63 @@ var EngCalcs = EngCalcs || {};
 	function libRuleChunks() {
 		return EngCalcs.lpnRuleSplit ? EngCalcs.lpnRuleSplit(libRulesRead()) : [];
 	}
-	// The lines of a chunk a user is meant to SEE -- everything but the blank lines and comments that
-	// have run on at the end of it, which read as the introduction to the next rule and are put back
-	// untouched by libRulesWith(). See lpnRuleSplit's `trailing`.
-	function libRuleBody(chunk) { return chunk.lines.slice(0, chunk.lines.length - (chunk.trailing || 0)); }
-	// The whole `[RULES]` text, with chunk `i`'s body replaced by `lines` -- or the chunk removed
-	// altogether, for `lines` null. One function, because an edit and a delete differ only in what
-	// they put back.
-	function libRulesWith(i, lines) {
-		var out = [];
-		libRuleChunks().forEach(function (chunk, k) {
-			var trail = chunk.lines.slice(chunk.lines.length - (chunk.trailing || 0));
-			if (k !== i) { out = out.concat(chunk.lines); return; }
-			if (lines) { out = out.concat(lines, trail); }
+	// **EVERY RULE AS POSITIONS IN THE FLAT `[RULES]` TEXT**, which is what lets one rule's body or
+	// description be rewritten and every other line put back untouched. For each chunk
+	// lpnRuleSplit() cuts that has something in it besides blank lines and comments:
+	//
+	//   start..end   the lines a user is meant to SEE in the box -- the chunk without the blank
+	//                lines and comments that have run on after it (lpnRuleSplit's `trailing`).
+	//   descStart    where its DESCRIPTION begins: the whole-line comments directly above its RULE
+	//                line, with no blank line between. They sit at the end of the chunk before (or
+	//                in the preamble), so the split alone gives them to the wrong rule; that is why
+	//                this walks the text rather than the chunks. EPANET has no rule description, and
+	//                this is the same placement its GUI keeps verbatim and a pattern's uses.
+	//
+	// A preamble of comments alone is not a rule and is not listed.
+	function libRuleIsComment(line) { return /^\s*;/.test(String(line)); }
+	function libRuleEntries(lines) {
+		var out = [], at = 0;
+		(EngCalcs.lpnRuleSplit ? EngCalcs.lpnRuleSplit(lines) : []).forEach(function (chunk) {
+			var start = at, end = at + chunk.lines.length - (chunk.trailing || 0), d = start;
+			at += chunk.lines.length;
+			if (end <= start) { return; }
+			if (chunk.name) { while (d > 0 && libRuleIsComment(lines[d - 1])) { d--; } }
+			out.push({ name: chunk.name, descStart: d, start: start, end: end });
 		});
 		return out;
+	}
+	function libRuleBody(lines, e) { return lines.slice(e.start, e.end); }
+	function libRuleDesc(lines, e) {
+		return lines.slice(e.descStart, e.start).map(function (s) {
+			return EngCalcs.lpnDescText(String(s).replace(/^\s*;/, ''));
+		}).filter(Boolean).join(' ');
+	}
+	// The whole `[RULES]` text with lines [from, to) replaced by `put`.
+	function libRulesSplice(from, to, put) {
+		var lines = libRulesRead();
+		return lines.slice(0, from).concat(put || [], lines.slice(to));
+	}
+	// **DELETING RULE `i` TAKES THE RULE AND ITS OWN DESCRIPTION, AND NOTHING ELSE.** A heading a
+	// blank line separates from it stays exactly where it is, and so does the next rule's
+	// description. One of the two blank lines that would then stand together goes too, so deleting
+	// rules one by one does not leave a growing gap.
+	function libRulesWithout(i) {
+		var lines = libRulesRead(), e = libRuleEntries(lines)[i], out;
+		if (!e) { return lines.slice(); }
+		out = lines.slice(0, e.descStart).concat(lines.slice(e.end));
+		if (e.descStart < out.length && !String(out[e.descStart]).trim()
+				&& (e.descStart === 0 || !String(out[e.descStart - 1]).trim())) {
+			out.splice(e.descStart, 1);
+		}
+		while (out.length && !String(out[out.length - 1]).trim()) { out.pop(); }
+		return out;
+	}
+	// Rule lines appended after the text already there. **A BLANK LINE GOES BETWEEN WHEN THAT TEXT
+	// ENDS IN A COMMENT**: otherwise those comments would stand directly above the new RULE line and
+	// read as its description, merged with the description it brings.
+	function libRulesAppend(lines, more) {
+		var last = lines.length ? String(lines[lines.length - 1]) : '';
+		return lines.concat(libRuleIsComment(last) ? [''] : [], more || []);
 	}
 	// What a rule in the box means right now: an { ok, block, missing } verdict, where `missing` is
 	// the id of an element the rule names and this network does not have. The identical three-state
@@ -59765,7 +59877,7 @@ var EngCalcs = EngCalcs || {};
 		return { ok: true, block: block };
 	}
 	function buildRuleSection(host) {
-		var pc = EngCalcs.pageConfig || {}, chunks = libRuleChunks();
+		var pc = EngCalcs.pageConfig || {}, chunks = libRuleChunks(), entries = libRuleEntries(libRulesRead());
 		host.appendChild(libButton(pc.lpn_library_rule_add || 'Add a rule', function () {
 			// **THE STARTER RULE IS BUILT FROM THIS NETWORK**, exactly as the starter control
 			// sentence is, so the box opens on something already true rather than on a template
@@ -59777,7 +59889,7 @@ var EngCalcs = EngCalcs || {};
 			while (used['R' + n]) { n++; }
 			name = 'R' + n;
 			saveUndoSnapshot();
-			doc.rules = libRules().concat([
+			doc.rules = libRulesAppend(libRules(), [
 				'RULE ' + name,
 				'IF TANK ' + (tank ? tank.id : '1') + ' LEVEL ABOVE 0',
 				'THEN ' + (pump && pump.type === 'pump' ? 'PUMP' : 'LINK') + ' ' +
@@ -59786,18 +59898,40 @@ var EngCalcs = EngCalcs || {};
 			libCommit();
 			rebuildLibraryBox();
 		}));
-		if (!chunks.length) {
+		if (!entries.length) {
 			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
 			return;
 		}
-		chunks.forEach(function (chunk, i) {
+		// Each handler asks for the positions AGAIN, by the entry's index, rather than closing over
+		// the ones this render measured: an edit that does not rebuild the box (a description, a
+		// body) moves every line after it, and a stale position would rewrite the wrong lines.
+		function now(i) { return libRuleEntries(libRulesRead())[i]; }
+		entries.forEach(function (e, i) {
 			var entry = libEl('div', 'lpn-lib-entry'),
+				lines = libRulesRead(),
 				box = document.createElement('textarea'),
 				verdict = libEl('div', 'lpn-lib-verdict ec-help'),
-				del;
+				descRow, del;
+			// The description on its own line ABOVE the rule, which is where it sits in the file:
+			// the `;comment` lines directly over its RULE line. Only a named rule has one -- text
+			// before the first RULE line is not a rule, and a comment written above it would read
+			// back as part of it.
+			if (e.name) {
+				descRow = libEl('div', 'lpn-lib-curve-row lpn-lib-desc-row');
+				descRow.appendChild(libDescField(function () {
+					var cur = now(i);
+					return cur ? libRuleDesc(libRulesRead(), cur) : '';
+				}, function (t) {
+					var cur = now(i);
+					if (!cur) { return; }
+					// Several comment lines become the one line the box shows: the curve's `src` rule.
+					doc.rules = libRulesSplice(cur.descStart, cur.start, t ? [';' + t] : []);
+				}));
+				entry.appendChild(descRow);
+			}
 			box.className = 'lpn-lib-wide';
-			box.rows = Math.max(3, Math.min(10, libRuleBody(chunk).length));
-			box.value = libRuleBody(chunk).join('\n');
+			box.rows = Math.max(3, Math.min(10, e.end - e.start));
+			box.value = libRuleBody(lines, e).join('\n');
 			box.setAttribute('aria-label', pc.lpn_library_rules || 'Rules');
 			if (pc.lpn_library_rule_tip) { helpTip(box, pc.lpn_library_rule_tip); }
 			// The WHOLE verdict string is the tip target, not the glyph -- the suite's rule, and here
@@ -59818,15 +59952,19 @@ var EngCalcs = EngCalcs || {};
 				// one thing an editor must never do. It stays on the document and goes back into the
 				// file verbatim, and modelRules() is what leaves it out of the engine input -- so it
 				// is visibly there, plainly marked as not understood, and inert.
+				var cur = now(i);
+				if (!cur) { return; }
 				saveUndoSnapshot();
-				doc.rules = libRulesWith(i, String(box.value).split(/\r?\n/));
+				doc.rules = libRulesSplice(cur.start, cur.end, String(box.value).split(/\r?\n/));
 				libCommit();
 			});
 			entry.appendChild(box);
 			entry.appendChild(verdict);
 			del = libButton(pc.lpn_tool_delete || 'Delete', function () {
+				// The rule and its own description -- never a heading, never the next rule's.
+				if (!libRuleEntries(libRulesRead())[i]) { return; }
 				saveUndoSnapshot();
-				doc.rules = libRulesWith(i, null);
+				doc.rules = libRulesWithout(i);
 				libCommit();
 				rebuildLibraryBox();
 			});
