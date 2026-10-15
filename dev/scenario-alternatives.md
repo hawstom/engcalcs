@@ -1039,9 +1039,9 @@ Tom's calls of 2026-10-09 (H01-H08), in his words where they govern:
   5. The Scenarios tab is hidden, not removed, in Basic mode, and Ctrl+Shift+PageDown skips it.
   6. A Base of its own holds a copy of Base's values (2026-10-12); `root: true` says which row it hangs
      from. Its Parent column is blank.
-  7. The override count (badge, menu, Compare column) also counts what a scenario takes from the stored
-     alternatives it uses, folded as they resolve, so a value an alternative and its parent both state
-     counts once. It does not count values inherited from a parent scenario's own implicit values.
+  7. The override count (status strip, menu, Compare column) counts a scenario's OWN overrides only:
+     its own values and those of the alternative or calculation set it names for a category, never
+     that record's parents nor what it takes from its parent scenario (Task 800, below).
 
 Code: `smTrees()` ... `smCopyScenario()`, `compareScenarios()`, `smSharedText()` in the section "THE SCENARIO
 MANAGER'S MODEL"; the box and the table in "SCENARIOS > BASIC MODE, AND THE SCENARIO MANAGER". Harnesses:
@@ -1231,6 +1231,33 @@ scenario act (`applyScenarioChange()`).
 Code: `smMergeTargets()`, `smOwnContent()`, `smMergePlan()`, `smMergeUpward()` (model) and
 `smActMergeUpward()` (the two questions). Harnesses: `alternative-merge-upward-harness.js` (headless) and
 `alternative-merge-upward-browser-harness.js` (Chromium).
+
+### The count is a scenario's own, and List overrides audits it (Task 800, 2026-10-15)
+
+Tom, on his Fotobi project, scenario "1-hr drain w pump off" reading 24 overrides beside its siblings'
+23: *"I don't know how to see a tidy list of overrides to audit ... that count seems inflated ... I
+should see the count of only the present overrides, not the inherited overrides. I count 13 diameter
+overrides, 1 text override, and 2 calculation overrides."*
+
+**The count** is `ownOverrideItems(scn).length`: the scenario's own values, plus the values held in the
+record `writeTargetFor()` names for each category (the marker's rule), never that record's parents and
+never what the parent scenario supplies. A Base of its own counts nothing (a copy, not an override). The
+multiplier and the two times count only where they differ from the project's own, as before. The 24
+had counted inherited records: EPS Pump off's Active topology (2) and Initial settings (2, plus EPS's 2)
+and EPS's run time (1). The own count is 17, not his 16: junction J-NE-S-3's Demand is an override in
+"1-hr drain w pumps off" holding 1 gpm, the same as Base's, so nothing on screen shows it. His "2
+calculation" are the multiplier (26) and the default pattern (P1), which is filed under Demand.
+
+**List overrides**: a command of the Scenarios tree (button and right-click row, after Make current;
+greyed with no overrides). It opens the page's dialog: the count, then one table per category and
+holding alternative (Asset, Property with its unit, Override, Inherited value), the inherited value
+being what the scenario reads without the override (the alternative's parent chain, else Base). An
+asset's ID closes the list and goes to it on the map (`findGoTo()`). The delete questions already
+counted only what is deleted, so they are unchanged.
+
+Code: `ownOverrideItems()`, `ownOverrideInherited()` beside `overrideCount()`; `ownOverrideGroups()`,
+`smActListOverrides()` in the manager's section. Harness: `override-audit-browser-harness.js`, on his
+file (`fixtures/fotobi-override-audit.epp`).
 
 ### Next stage: what the advisers said (recorded, not built)
 
