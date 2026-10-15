@@ -97,6 +97,8 @@ async function main() {
 		await a.goto('Looped-Network.php?ec_nolog=1');
 		await openFixture(a);
 		const keptHead = (await a.lang('lpn_time_run_stopped_kept')).split('{time}')[0];
+		const oldTail = (await a.lang('lpn_time_run_stopped')).split('{time}')[1].split('.')[0];
+		const keptMid = (await a.lang('lpn_time_run_stopped_kept')).split('{time}')[1].split('{solved}')[0];
 		const probe = () => a.page.evaluate(() => {
 			const fr = EngCalcs.lpnTimeRunFrames(), cur = EngCalcs.lpnTimeCurrentFrame(),
 				sel = document.getElementById('lpn_time_step');
@@ -113,9 +115,9 @@ async function main() {
 		console.log('\n--- Tanks run dry ---');
 		ok('picked the scenario', await pickScenario(a, 'Tanks run dry'));
 		const st = await a.status();
-		const m = st.match(/Results run to (\d+:\d\d)/);
+		const m = st.match(new RegExp(keptMid.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(\\d+:\\d\\d)'));
 		ok('the status says it stopped and where the results run to', st.indexOf(keptHead) === 0 && !!m &&
-			st.indexOf('so it has no results') < 0, st.slice(0, 200));
+			st.indexOf(oldTail) < 0, st.slice(0, 200));
 		const p = await probe();
 		const lastT = p.ts[p.ts.length - 1];
 		ok('the series holds the solved periods only (4 to 24 reporting times)', p.ts.length >= 2 && p.ts.length < 25, JSON.stringify(p.ts));
