@@ -713,3 +713,7 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|185| CLOSED 2026-10-14: Match properties (Task 782, on `feat/bentley-interop`) is this tool; its polygon/fence selection is left to Find and replace.
 - 0|285| CLOSED 2026-10-14: first pointer reading (09-08..10-14) in dev/usage-data-log.md: coarse 7.7% of people, ~14% on Looped-Network; a real minority, no decision flips.
 - 0|221| CLOSED 2026-10-14 (`chore/retire-epanet-note`, Tom: promote to 100): the six *_notes_epanet_term/_def keys deleted from Hazen-Williams, Branched-Network and Looped-Network in all 27 languages.
+- 0|625| CLOSED 2026-10-15 (merged on Tom's word): "HawsEDC Calculators" in the Help menu above Privacy notice.
+- 0|792| CLOSED 2026-10-15 (merged on Tom's word): Description on Library patterns, controls and rules.
+- 0|793| CLOSED 2026-10-15 (merged on Tom's word): Ctrl+C in the Screenshot tool copies the picture.
+- 0|795| CLOSED 2026-10-15 (merged on Tom's word): Tank depth in the time series graphs.
