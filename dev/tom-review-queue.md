@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-402. (R-282 is taken on `feat/label-gang-search`.)
+**An ID is permanent and never reused.** Next free: R-407. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -168,3 +168,9 @@ judgement and does not belong to a script.
 - [ ] R-399 master | (Android) "Zoom to fit doesn't work for Basic example SI units on production or on feat/bentley-interop. It zooms out magnitudes wider than it should."
 - [x] R-400 -- | Answers: Morph's synonym description "Yes."; slope-length's Length tip "Yes." (english-key-rulings); Spanish Marcador for Tag "Yes. They can use any word they want as long as it is different than the other ambiguous key words we identified."; Task 617 Mapbox Outdoors "I approve."; long press "Nice!"; Fotobi crash fix "Nice!"; 1c, 1d, 1e, 1g "Yes. Good." / "Yes. Perfect."
 - [x] R-401 -- | Roadmap requests: "Allow field/reference text in Text using {}. Define/disclose the keys in the User Manual." -- Task 798; "Can we try a UI option branch for everything in the bottom pane to be available also as dockable boxes: (a) Tables and (b) Graphs?" -- Task 799
+
+- [ ] R-402 feat/bentley-interop | (Fotobi convergence, after CC's explanation) "(1) The patterns were intended to be all 0 except the time of use. But since that caused problems, I tried all 0.001 and 0.0001. It seems to me that the solver should be smart enough to handle 0. (2) I can confirm that amber is gone for the child scenarios."
+- [ ] R-403 fix/search-zoom-accuracy | (phone) "Zoom to fit on phone: All of the examples fail to Zoom to fit. Of them, Net1 is the closest to right, and Basic is magnitudes from right."
+- [?] R-404 feat/bentley-interop | (R-394) "I can't confirm that. Maybe I am not checking on the right branch." -- asked which box he tried, on bentley-interop's preview
+- [?] R-405 feat/text-halo | "I don't think we should be working at all on labels off the screen, do you? The speed cost sounds terrible especially when we have been working hard for weeks to get our labels to place faster. Halos are always by letter, not by string? And is there a better masking model we should be trying? I know that this is turning back the clock a long way for us, but I became aware that our tiny halos were making our text look fuzzy, not clear."
+- [ ] R-406 feat/leader-keep | Choices: "1. a. 2. Good. 3. We had a hysteresis rule. Did that get lost? I see that apparently it did. A label should not flip until half of its width is past the flipping point. 4. OK. 5. OK."
