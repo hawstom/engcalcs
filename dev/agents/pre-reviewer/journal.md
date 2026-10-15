@@ -4447,3 +4447,10 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: a heading comment before the first control (Net3: two comments over four controls) becomes control 1's description only; trailing comment after the last control, comments between rows of one pattern, an extra comment above a pattern's description, a trailing comment on a pattern row: gone on import with the import report's dropped list empty.
 - OBSERVED: Library spreadsheet export Patterns sheet has no Description column (Curves, Pipe types, Fittings sheets do). Empty pattern with a description writes no description to .inp.
 - OBSERVED: builder's browser harness 3 sections x en/es pass; inp harness, library harness, inp-export 4497 checks, Net3 roundtrip pass; Net1/2/3 PATTERNS/CONTROLS tokens unchanged (Net2/3 CONTROLS byte-identical, comments kept). Rule edit/delete sequences by mouse keep the right lines. Not done: mutation check of the harnesses.
+
+## 2026-10-15 feat/override-audit @ 89d2d09d, Task 800 (Perry)
+- OBSERVED (real Chromium, Tom's Fotobi fixture): counts EPS 5, EPS Pump off 5, 1-hr 17, 8-hr 16, 12-hr 16, 16-hr 16 match my hand trace of the fixture JSON (parent alternatives a12/a14/a9/a11 never counted; empty a15 child of a14 counts 0; 17th is J-NE-S-3 demand 1 = Base 1 by presence). Menu, status strip and list header agree; shared alternative counts for both scenarios.
+- OBSERVED: DEFECT, list shows an Active topology override of "not active" as a dash (EPS Pump off: Pump P-NE, Is active?, Override "—", Inherited "✓").
+- OBSERVED: calc set multiplier equal to the project's is not counted (16-hr 15, Calculation group vanishes) while a demand equal to Base is counted; delete-alternative question (storedOverrideCount) counts the multiplier by presence, so it can disagree (code read only, not run).
+- OBSERVED: phone 375 wide dialog fits, table scrolls inside; ?lang=es new keys fall back to English (expected pre-payload). Compare read by code (same function) and scenario-compare harness passes; Compare dialog not driven.
+- OBSERVED: builder harness 31/31; scenario-* harnesses, seam check pass.
