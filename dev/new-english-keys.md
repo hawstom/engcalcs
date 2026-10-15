@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**146 still to read on master**, of 156 untranslated keys, of 2763 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**155 still to read on master**, of 165 untranslated keys, of 2772 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -198,7 +198,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (156, 146 to read @@ NEEDS RULING)
+## lpn_  (165, 155 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -271,6 +271,24 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_morph_other_kind`**
   > A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}
+  @@ NEEDS RULING
+- **`lpn_ovl_col_inherited`**
+  > Inherited value
+  @@ NEEDS RULING
+- **`lpn_ovl_col_inherited_tip`**
+  > The value this scenario reads without the override: the value of the parent of the alternative, or the Base value.
+  @@ NEEDS RULING
+- **`lpn_ovl_col_override`**
+  > Override
+  @@ NEEDS RULING
+- **`lpn_ovl_group`**
+  > {category}: {alternative}
+  @@ NEEDS RULING
+- **`lpn_ovl_note`**
+  > These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Click an ID to go to the asset on the map.
+  @@ NEEDS RULING
+- **`lpn_ovl_title`**
+  > Overrides: {name}
   @@ NEEDS RULING
 - **`lpn_ovm_child_ask`**
   > Clear child overrides ({n} total)?
@@ -581,6 +599,15 @@ never edits a synonym.
 - **`lpn_sm_item_scenario`**
   > Scenario {name}
   @@ NEEDS RULING
+- **`lpn_sm_list_overrides`**
+  > List overrides
+  @@ NEEDS RULING
+- **`lpn_sm_list_overrides_none`**
+  > This scenario has no overrides of its own.
+  @@ NEEDS RULING
+- **`lpn_sm_list_overrides_tip`**
+  > List the overrides the selected scenario holds itself, by category, each with the value it replaces. Inherited values are not listed.
+  @@ NEEDS RULING
 - **`lpn_sm_make_current`**
   > Make current
   @@ NEEDS RULING
@@ -673,7 +700,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**2 still to read**, of 5 new keys across 13 unmerged branch(es).
+**3 still to read**, of 6 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -684,9 +711,18 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/tom-answers-1015b (`8a3c4f34`) — adds no English strings
+### chore/sprint-737b (`607259d8`) — 2 new, 2 to read @@ NEEDS RULING
 
-### feat/bentley-interop (`cf4455be`) — adds no English strings
+- **`lpn_settings_text_halo`**
+  > Text halo width (percent of text size)
+  @@ NEEDS RULING
+- **`lpn_settings_text_halo_tip`**
+  > Width of the solid outline behind map text, as a percent of the text size. Applies when Solid background behind labels is on.
+  @@ NEEDS RULING
+
+### feat/bentley-interop (`726001ff`) — adds no English strings
+
+### feat/description-lines (`9c2d515d`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -712,17 +748,14 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/leader-keep (`19ddef61`) — adds no English strings
+### feat/leader-keep (`81e4ffe8`) — adds no English strings
 
 ### feat/match-property (`05bda765`) — adds no English strings
 
-### feat/text-halo (`663735f4`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/override-audit (`39434091`) — adds no English strings
 
-- **`lpn_settings_text_halo`**
-  > Text halo width (percent of text size)
-  @@ NEEDS RULING
-- **`lpn_settings_text_halo_tip`**
-  > Width of the solid outline behind map text, as a percent of the text size. Applies when Solid background behind labels is on.
-  @@ NEEDS RULING
+### feat/stopped-series (`67d6307d`) — 1 new, 1 to read @@ NEEDS RULING
 
-### fix/search-zoom-accuracy (`84c29bdc`) — adds no English strings
+- **`lpn_time_run_stopped_kept`**
+  > The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.
+  @@ NEEDS RULING
