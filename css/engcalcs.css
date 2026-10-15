@@ -1086,7 +1086,7 @@ html[lang="zh"] .ec-welcome {
    urgent still). */
 .lpn-link-halo.lpn-selected { stroke: #1976d2; stroke-width: calc(2.857 * var(--lpn-lw, 0)); }
 .lpn-node.lpn-selected { stroke: #1976d2; stroke-width: calc(0.5 * var(--lpn-symf, 0)); }
-.lpn-lbl.lpn-selected { fill: #1976d2; }
+.lpn-lbl.lpn-selected, .lpn-lbl-ink.lpn-selected { fill: #1976d2; }
 /* HOVER PREVIEW, Select mode only (Ida's wishlist item 1): additive to the Task 618 cursor, which
    stays `default` over an object and over nothing on purpose -- nothing else on screen said what a
    click would hit. js/looped-network.js toggles this on the exact element selectionMarkEl() would
@@ -1098,7 +1098,7 @@ html[lang="zh"] .ec-welcome {
 :root { --lpn-hover-color: #78909e; }
 .lpn-link-halo.lpn-hover:not(.lpn-selected) { stroke: var(--lpn-hover-color); stroke-width: calc(1.8 * var(--lpn-lw, 0)); }
 .lpn-node.lpn-hover:not(.lpn-selected) { stroke: var(--lpn-hover-color); stroke-width: calc(0.32 * var(--lpn-symf, 0)); }
-.lpn-lbl.lpn-hover:not(.lpn-selected) { fill: var(--lpn-hover-color); }
+.lpn-lbl.lpn-hover:not(.lpn-selected), .lpn-lbl-ink.lpn-hover:not(.lpn-selected) { fill: var(--lpn-hover-color); }
 /* THE GO-TO MARK (Tom, 2026-09-28): the element a go-to arrived at while a selection set was
    standing, since a go-to no longer replaces the set (findGoTo() in js/looped-network.js). Orange,
    at the selection's weight, and it pulses three times so it is found; `:not(.lpn-selected)` so a
@@ -1107,7 +1107,7 @@ html[lang="zh"] .ec-welcome {
 @keyframes lpn-located-pulse { 0%, 100% { stroke-opacity: 1; } 50% { stroke-opacity: 0.25; } }
 .lpn-link-halo.lpn-located:not(.lpn-selected) { stroke: var(--lpn-located-color); stroke-width: calc(2.857 * var(--lpn-lw, 0)); animation: lpn-located-pulse 0.6s ease-in-out 3; }
 .lpn-node.lpn-located:not(.lpn-selected) { stroke: var(--lpn-located-color); stroke-width: calc(0.5 * var(--lpn-symf, 0)); animation: lpn-located-pulse 0.6s ease-in-out 3; }
-.lpn-lbl.lpn-located:not(.lpn-selected) { fill: var(--lpn-located-color); }
+.lpn-lbl.lpn-located:not(.lpn-selected), .lpn-lbl-ink.lpn-located:not(.lpn-selected) { fill: var(--lpn-located-color); }
 .lpn-meter.lpn-located:not(.lpn-selected) { fill: var(--lpn-located-color); stroke: var(--lpn-located-color); }
 /* NOT IN THIS NETWORK: drawn, but out of the model (see isActive() in js/looped-network.js). Faded
    rather than hidden, because the whole point of the inactive/active pair is to see both at once --
@@ -1232,6 +1232,13 @@ html[lang="zh"] .ec-welcome {
 	paint-order: stroke fill;
 	stroke: #fff; stroke-width: calc(var(--lpn-halo, 0.4) * 1em); stroke-linejoin: round;
 }
+/* EVERY HALO UNDER EVERY INK (Task 791, Tom R-393: "the halo of the separator comma can hide what's
+   near it, and vice versa"). paint-order works per piece of text -- each tspan, each label -- so one
+   piece's halo painted over the ink before it. Now the label in labelsLayer paints its halo only,
+   and a fill-only copy of it in the `.lpn-lbl-inks` layer just above paints the ink: all halos,
+   then all inks. splitLabelInk() in js/looped-network.js keeps the copies in step. */
+.lpn-lbl-halos .lpn-lbl { fill-opacity: 0; }
+.lpn-lbl-ink { fill: #333; stroke: none; pointer-events: none; user-select: none; }
 /* pointer-events:none, found 2026-07-30 while verifying popup placement: labelsLayer draws ABOVE the
    symbol layers, so a leader line crossing a node swallowed the click meant for that node and the
    property popup simply never opened. A leader is not a thing you can click -- a label's own grab

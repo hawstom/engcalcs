@@ -403,7 +403,8 @@ var EngCalcs = EngCalcs || {};
 	function dataLabelBoxHeight(lineCount) {
 		return Geom.dataLabelBoxHeight(lineCount, effectiveFontSize(), effectiveLineHeight());
 	}
-	// LEGIBILITY BACKING IS A HALO ON THE GLYPHS AND LIVES ENTIRELY IN css/engcalcs.css (Task 376).
+	// LEGIBILITY BACKING IS A HALO ON THE GLYPHS AND LIVES IN css/engcalcs.css (Task 376), painted
+	// in its own pass under every label's ink by splitLabelInk() (Task 791).
 	// NOT a rect: that needs an element per label, a pad constant, a transform kept in step, and a
 	// hide call at every place a label could go empty.
 	// Final per-frame layout of one node's data label -- text position and its leader. Called from
@@ -35865,7 +35866,8 @@ var EngCalcs = EngCalcs || {};
 	// Counted for the harness: a reuse that quietly never happens looks exactly like one that works.
 	var drawingsBuilt = 0, drawingsReused = 0;
 	function drawingLayers(d) {
-		return [d.shapesLayer, d.customersLayer, d.linksLayer, d.linkSymbolLayer, d.nodesLayer, d.labelsLayer];
+		return [d.shapesLayer, d.customersLayer, d.linksLayer, d.linkSymbolLayer, d.nodesLayer, d.labelsLayer,
+			d.labelsLayer && d.labelsLayer.lpnInkLayer];
 	}
 	function captureDrawing() {
 		return { shapesLayer: shapesLayer, shapeEls: shapeEls, customersLayer: customersLayer, linksLayer: linksLayer,
@@ -35891,6 +35893,7 @@ var EngCalcs = EngCalcs || {};
 		drawingLayers(d).forEach(function (L) { if (L && L.style) { L.style.display = on ? '' : 'none'; } });
 	}
 	function discardDrawing(d) {
+		if (d.labelsLayer && d.labelsLayer.lpnInkStop) { d.labelsLayer.lpnInkStop(); }
 		drawingLayers(d).forEach(function (L) { if (L && L.parentNode) { L.parentNode.removeChild(L); } });
 	}
 	function discardKeptDrawing(id) {
@@ -35916,6 +35919,7 @@ var EngCalcs = EngCalcs || {};
 			labelsLayer: twin(labelsLayer), nodeEls: {}, linkEls: {}, labelEls: {}, incidentLinks: {},
 			labelsByAnchor: {}, labelsByLinkAnchor: {}, custEls: {}, custLblEls: {}, customersByLink: {},
 			labelWorkSkipped: false, lastLayoutScale: lastLayoutScale });
+		splitLabelInk(labelsLayer);
 	}
 	// Marks that describe the MOMENT rather than the document come off before a drawing is put
 	// away: the hover ring, the half-drawn pipe's start, the meter's slide handle, the fading
@@ -47081,6 +47085,7 @@ var EngCalcs = EngCalcs || {};
 	// A deep copy of the map's SVG with every computed style written onto its element, hidden
 	// elements dropped, and every raster inlined. `out.droppedBasemap` reports a tile left out.
 	function snipCloneSvg(out) {
+		flushLabelInk();   // the ink copies are written a microtask late (Task 791)
 		var clone = svg.cloneNode(true), pending = [];
 		function walk(o, c) {
 			var cs = window.getComputedStyle(o);
@@ -48425,6 +48430,8 @@ var EngCalcs = EngCalcs || {};
 		// into nodesLayer/linksLayer makes draw order track creation order, so a later-built node's
 		// symbol paints over an earlier node's already-placed label.
 		labelsLayer = el('g', {}, modelLayer);
+		// Every label's ink, one layer over every label's halo (Task 791, see splitLabelInk()).
+		splitLabelInk(labelsLayer);
 		// Topmost layer (after labelsLayer) so the rubber-band is never hidden under a node/link
 		// while drawing a pipe/pump (Tom, 2026-07-30).
 		rubberBandEl = el('line', { 'class': 'lpn-rubberband', style: 'display:none' }, world);
@@ -52954,6 +52961,168 @@ var EngCalcs = EngCalcs || {};
 	function applyTextHalo() {
 		if (svg) { svg.style.setProperty('--lpn-halo', String(textHaloPct() / 100)); }
 	}
+	// **NO HALO EVER COVERS INK** (Task 791, Tom's browser pass R-393, 2026-10-15: *"I didn't know
+	// that halo could cover the text or neighbor text. In a pipe label, the halo of the separator
+	// comma can hide what's near it, and vice versa."*). `paint-order: stroke fill` is applied by
+	// the browser per piece of text -- each tspan, and each label -- so the separator's halo, drawn
+	// after the value before it, paints white over that value's ink, and a later label's halo does
+	// the same to an earlier label it overlaps.
+	//
+	// THE CURE IS TWO PASSES, the way every map renderer does it: every halo first, then every ink.
+	// The labels the page builds stay exactly where and what they are -- every query, measurement,
+	// hit test and leader still reads them -- but they paint ONLY their halo (`.lpn-lbl-halos` on the
+	// layer sets `fill-opacity: 0`). A sibling layer directly above, `.lpn-lbl-inks`, holds a
+	// fill-only copy of each one, kept in step by a MutationObserver rather than by every writer
+	// remembering to, so no future label path can forget. The copy drops `lpn-lbl`, `lpn-draglbl`,
+	// `id` and `data-*`, so nothing that looks a label up ever finds the copy.
+	//
+	// The copy's ROOT element is kept for the label's whole life and only its attributes and
+	// children are rewritten: a fresh element would restart the 45-second just-dragged flash.
+	// Absent MutationObserver (the node harnesses' stub DOM) nothing is split and labels draw as
+	// before.
+	var labelInkStats = { batches: 0, roots: 0, ms: 0 };
+	function splitLabelInk(L) {
+		if (!L || L.lpnInkLayer || !L.parentNode || typeof MutationObserver !== 'function') { return; }
+		var ink = document.createElementNS(NS, 'g');
+		ink.setAttribute('class', 'lpn-lbl-inks');
+		ink.setAttribute('aria-hidden', 'true');
+		L.parentNode.insertBefore(ink, L.nextSibling);
+		L.classList.add('lpn-lbl-halos');
+		var copies = new Map();
+		function isSource(n) {
+			return !!(n && n.nodeType === 1 && n.classList && n.classList.contains('lpn-lbl') &&
+				String(n.tagName).toLowerCase() === 'text');
+		}
+		function rootOf(n) {
+			while (n && n.parentNode !== L) { n = n.parentNode; }
+			return n;
+		}
+		function inkClass(src) {
+			var out = ['lpn-lbl-ink'], cl = src.classList, i;
+			for (i = 0; i < cl.length; i++) {
+				if (cl[i] !== 'lpn-lbl' && cl[i] !== 'lpn-draglbl') { out.push(cl[i]); }
+			}
+			return out.join(' ');
+		}
+		function syncAttrs(src, c) {
+			var a = src.attributes, i, n, want = Object.create(null);
+			for (i = 0; i < a.length; i++) {
+				n = a[i].name;
+				if (n === 'id' || n === 'class' || n.lastIndexOf('data-', 0) === 0) { continue; }
+				want[n] = 1;
+				if (c.getAttribute(n) !== a[i].value) { c.setAttribute(n, a[i].value); }
+			}
+			var cls = inkClass(src);
+			if (c.getAttribute('class') !== cls) { c.setAttribute('class', cls); }
+			a = c.attributes;
+			for (i = a.length - 1; i >= 0; i--) {
+				n = a[i].name;
+				if (n !== 'class' && n !== 'aria-hidden' && !want[n]) { c.removeAttribute(n); }
+			}
+		}
+		// **WRITES ONLY WHAT DIFFERS, IN PLACE.** The label pass rebuilds a label's tspans whether
+		// or not the words changed. A copy rebuilt to match would hand the browser a brand-new
+		// element to style for every row of every label on every pass; synced node by node, an
+		// unchanged label costs the copy nothing and a moved row is an `x` written, which is layout,
+		// not style.
+		function syncPlain(s, d) {
+			var a = s.attributes, i, n;
+			for (i = 0; i < a.length; i++) {
+				if (d.getAttribute(a[i].name) !== a[i].value) { d.setAttribute(a[i].name, a[i].value); }
+			}
+			a = d.attributes;
+			for (i = a.length - 1; i >= 0; i--) {
+				n = a[i].name;
+				if (!s.hasAttribute(n)) { d.removeAttribute(n); }
+			}
+		}
+		function syncKids(src, c) {
+			var sk = src.childNodes, ck = c.childNodes, i, s, d;
+			for (i = 0; i < sk.length; i++) {
+				s = sk[i]; d = ck[i];
+				if (d && s.nodeType === d.nodeType && s.nodeName === d.nodeName) {
+					if (s.nodeType === 3) { if (d.data !== s.data) { d.data = s.data; } }
+					else if (s.nodeType === 1) { syncPlain(s, d); syncKids(s, d); }
+				} else if (d) {
+					c.replaceChild(s.cloneNode(true), d);
+				} else {
+					c.appendChild(s.cloneNode(true));
+				}
+			}
+			while (ck.length > sk.length) { c.removeChild(c.lastChild); }
+		}
+		function place(src, c) {
+			// Ink order follows label order, so where two inks overlap the later label still wins.
+			var s = src.nextSibling, k = 0, next = null;
+			while (s && k < 64) {
+				if (copies.has(s)) { next = copies.get(s); break; }
+				s = s.nextSibling; k++;
+			}
+			ink.insertBefore(c, next);
+		}
+		function process(recs) {
+			if (!recs.length) { return; }
+			var t0 = performance.now(), dirty = new Map(), i, j, r, root, deep;
+			function mark(n, isDeep) {
+				if (!n) { return; }
+				dirty.set(n, (dirty.get(n) || false) || isDeep);
+			}
+			for (i = 0; i < recs.length; i++) {
+				r = recs[i];
+				if (r.target === L) {
+					for (j = 0; j < r.addedNodes.length; j++) { mark(r.addedNodes[j], true); }
+					for (j = 0; j < r.removedNodes.length; j++) { mark(r.removedNodes[j], true); }
+					continue;
+				}
+				root = rootOf(r.target);
+				if (!root) { continue; }   // detached since; its own removal record covers it
+				deep = r.type !== 'attributes' || r.target !== root;
+				mark(root, deep);
+			}
+			dirty.forEach(function (isDeep, src) {
+				var c = copies.get(src);
+				if (src.parentNode !== L || !isSource(src)) {
+					if (c) { if (c.parentNode) { c.parentNode.removeChild(c); } copies.delete(src); }
+					return;
+				}
+				if (!c) {
+					c = document.createElementNS(NS, 'text');
+					c.setAttribute('aria-hidden', 'true');
+					copies.set(src, c);
+					syncAttrs(src, c); syncKids(src, c); place(src, c);
+					return;
+				}
+				syncAttrs(src, c);
+				if (isDeep) { syncKids(src, c); }
+			});
+			labelInkStats.batches++;
+			labelInkStats.roots += dirty.size;
+			labelInkStats.ms += performance.now() - t0;
+		}
+		var mo = new MutationObserver(process);
+		mo.observe(L, { subtree: true, childList: true, attributes: true, characterData: true });
+		L.lpnInkLayer = ink;
+		// A synchronous catch-up, for a reader that must see the copies NOW (the screenshot clone).
+		L.lpnInkFlush = function () { process(mo.takeRecords()); };
+		L.lpnInkStop = function () {
+			mo.disconnect();
+			if (ink.parentNode) { ink.parentNode.removeChild(ink); }
+			copies.clear();
+		};
+		// Labels already in the layer (a split arriving after a build).
+		Array.prototype.forEach.call(L.childNodes, function (n) {
+			if (isSource(n)) {
+				var c = document.createElementNS(NS, 'text');
+				c.setAttribute('aria-hidden', 'true');
+				copies.set(n, c);
+				syncAttrs(n, c); syncKids(n, c); ink.appendChild(c);
+			}
+		});
+	}
+	function flushLabelInk() {
+		if (labelsLayer && labelsLayer.lpnInkFlush) { labelsLayer.lpnInkFlush(); }
+	}
+	EngCalcs.lpnLabelInkStats = function () { flushLabelInk(); return labelInkStats; };
 	function applyMaskLabels() {
 		if (svg) { svg.classList.toggle('lpn-masks-off', settings.maskLabels === false); }
 	}
