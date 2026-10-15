@@ -60529,10 +60529,105 @@ var EngCalcs = EngCalcs || {};
 		tgt.focus();
 		if (tgt.tagName.toLowerCase() === 'input' && (tgt.type === 'text' || tgt.type === 'number')) { tgt.select(); }
 	}
+	// **TAB OUT OF A FIELD THAT HAS JUST BEEN EDITED.** Committing the change rebuilds the whole
+	// box (refreshPopupIfOpen), and the element the browser had chosen to focus next is thrown
+	// away with it, so focus fell to the page body. Same cure as the arrow keys: blur first (which
+	// commits and rebuilds), then find the target in the NEW box. The target is named by what it is
+	// (its row's label text, its kind, and which of that name it is), not by where it sat, so a
+	// commit that adds or removes rows still lands on the right field. Only a text or number box
+	// that has a neighbour inside the popup is taken over; anything else tabs natively.
+	function popupTabbables(popup) {
+		var out = [];
+		Array.prototype.forEach.call(popup.querySelectorAll('input, select, textarea, button, a[href], [tabindex]'), function (el) {
+			if (el.disabled || el.tabIndex < 0 || (el.type || '').toLowerCase() === 'hidden') { return; }
+			if (!el.offsetParent && !el.getClientRects().length) { return; }
+			out.push(el);
+		});
+		return out;
+	}
+	function popupTabName(el) {
+		var lab = el.closest && el.closest('label'), txt = '', n;
+		if (lab) {
+			for (n = lab.firstChild; n; n = n.nextSibling) {
+				if (n.nodeType === 3 || (n.nodeType === 1 && !/^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(n.tagName))) { txt += n.textContent; }
+			}
+		} else { txt = el.id || el.getAttribute('aria-label') || el.title || ''; }
+		return el.tagName + '|' + (el.type || '') + '|' + txt.replace(/\s+/g, ' ').trim();
+	}
+	// The Nth field of that name in `list`, or null.
+	function popupTabFind(list, name, occ) {
+		var i, seen = 0;
+		for (i = 0; i < list.length; i++) {
+			if (popupTabName(list[i]) === name) { if (seen === occ) { return list[i]; } seen++; }
+		}
+		return null;
+	}
+	function popupTabOcc(list, el, name) {
+		var i, occ = 0;
+		for (i = 0; i < list.length && list[i] !== el; i++) { if (popupTabName(list[i]) === name) { occ++; } }
+		return occ;
+	}
+	function popupIsTypedBox(el) {
+		var t = el && el.tagName && el.tagName.toLowerCase() === 'input' ? (el.type || '').toLowerCase() : '';
+		return (t === 'text' || t === 'number') && !el.getAttribute('list');
+	}
+	// Blur `cur` (which commits it and rebuilds the box), then focus what `want` names in the NEW box.
+	function popupBlurThenFocus(popup, cur, want, fallbackIdx) {
+		var list, tgt;
+		cur.blur();
+		list = popupTabbables(popup);
+		tgt = popupTabFind(list, want.name, want.occ) || list[Math.max(0, Math.min(list.length - 1, fallbackIdx))];
+		if (!tgt) { return; }
+		tgt.focus();
+		if (popupIsTypedBox(tgt)) { tgt.select(); }
+	}
+	function popupTabKeyDown(e, popup) {
+		var cur = e.target, list, idx, dir, name;
+		if (e.key !== 'Tab' || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || !popupIsTypedBox(cur)) { return; }
+		list = popupTabbables(popup);
+		idx = list.indexOf(cur);
+		dir = e.shiftKey ? -1 : 1;
+		if (idx < 0 || idx + dir < 0 || idx + dir >= list.length) { return; }
+		name = popupTabName(list[idx + dir]);
+		e.preventDefault();
+		popupBlurThenFocus(popup, cur, { name: name, occ: popupTabOcc(list, list[idx + dir], name) }, idx + dir);
+	}
+	// A click on another typed box while one is being edited: the same blur-then-rebuild loses the
+	// clicked box, so the click is taken over only in that one case.
+	function popupTabMouseDown(e, popup) {
+		var cur = document.activeElement, tgt = e.target, list, idx, name;
+		if (e.button !== 0 || cur === tgt || !popupIsTypedBox(cur) || !popupIsTypedBox(tgt) || !popup.contains(cur)) { return; }
+		list = popupTabbables(popup);
+		idx = list.indexOf(tgt);
+		if (idx < 0) { return; }
+		name = popupTabName(tgt);
+		e.preventDefault();
+		popupBlurThenFocus(popup, cur, { name: name, occ: popupTabOcc(list, tgt, name) }, idx);
+	}
+	// **A REBUILD THAT ARRIVES WHILE A BOX IS BEING TYPED IN** (the debounced solve lands 300 ms
+	// after an edit and redraws the box). Focus, the caret and any text not yet committed go back
+	// into the same field of the new box, found by name.
+	function refreshPopupKeepingFocus() {
+		var popup = document.getElementById('lpn_popup'), cur = document.activeElement, list, name, occ, v, a, b, tgt, typed;
+		if (!popup || !cur || cur === popup || !popup.contains(cur) || popupTabbables(popup).indexOf(cur) < 0) { refreshPopupIfOpen(); return; }
+		list = popupTabbables(popup);
+		name = popupTabName(cur); occ = popupTabOcc(list, cur, name);
+		typed = popupIsTypedBox(cur);
+		v = cur.value;
+		try { a = cur.selectionStart; b = cur.selectionEnd; } catch (e) { a = b = null; }
+		refreshPopupIfOpen();
+		tgt = popupTabFind(popupTabbables(popup), name, occ);
+		if (!tgt || tgt === document.activeElement) { return; }
+		tgt.focus();
+		if (!typed) { return; }
+		if (tgt.value !== v) { tgt.value = v; }
+		try { if (a !== null) { tgt.setSelectionRange(a, b); } } catch (e) { /* number boxes refuse a range */ }
+	}
 	function wirePopup() {
 		var popup = document.getElementById('lpn_popup');
 		document.getElementById('lpn_popup_close').addEventListener('click', function () { closePopup(true); });
-		popup.addEventListener('keydown', function (e) { popupArrowKey(e, popup); });
+		popup.addEventListener('keydown', function (e) { popupArrowKey(e, popup); popupTabKeyDown(e, popup); });
+		popup.addEventListener('mousedown', function (e) { popupTabMouseDown(e, popup); });
 		makePanelDraggable(popup, function (at) { popupUserPos = at; });
 		popup.addEventListener('dblclick', function (e) {
 			if (e.target !== popup) { return; }
@@ -72108,7 +72203,7 @@ var EngCalcs = EngCalcs || {};
 		// junction's Pressure/Head rows are read straight off lastSolveResult at render time, so
 		// the popup simply kept showing the number it had drawn a third of a second earlier,
 		// disagreeing with its own map label and table row until the popup was closed and reopened.
-		refreshPopupIfOpen();
+		refreshPopupKeepingFocus();
 		// And the energy report, on the same seam and for the same reason: a run that has just
 		// been re-done, or whose frames an edit dropped, must not leave last time's money on
 		// screen with nothing saying it is stale.
