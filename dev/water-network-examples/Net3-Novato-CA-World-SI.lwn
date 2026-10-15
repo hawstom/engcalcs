@@ -2608,6 +2608,10 @@
 				1.24,
 				1.67
 			],
+			"note": "General Default Demand Pattern",
+			"head": [
+				";ID              \tMultipliers"
+			],
 			"tok": {
 				"m4": ".76",
 				"m5": ".92",
@@ -2650,7 +2654,8 @@
 				1814,
 				1840,
 				1859
-			]
+			],
+			"note": "Demand Pattern for Node 123"
 		},
 		{
 			"id": "3",
@@ -2679,7 +2684,8 @@
 				0,
 				360,
 				360
-			]
+			],
+			"note": "Demand Pattern for Node 15"
 		},
 		{
 			"id": "4",
@@ -2708,7 +2714,8 @@
 				1627,
 				1671,
 				1668
-			]
+			],
+			"note": "Demand Pattern for Node 35"
 		},
 		{
 			"id": "5",
@@ -2737,7 +2744,8 @@
 				4399,
 				4470,
 				4480
-			]
+			],
+			"note": "Demand Pattern for Node 203"
 		}
 	],
 	"defaultPattern": "1",
@@ -2831,7 +2839,8 @@
 			},
 			"text": {
 				"time": "1"
-			}
+			},
+			"note": "Lake source operates only part of the day"
 		},
 		{
 			"link": "10",
@@ -2862,7 +2871,12 @@
 			},
 			"text": {
 				"value": "5.212"
-			}
+			},
+			"note": "Pump 335 controlled by level in Tank 1 When pump is closed, bypass pipe is opened",
+			"noteSrc": [
+				";Pump 335 controlled by level in Tank 1",
+				";When pump is closed, bypass pipe is opened"
+			]
 		},
 		{
 			"link": "335",

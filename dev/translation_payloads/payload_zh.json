@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 2629,
-        "delta_key_count": 5,
+        "expected_key_count": 2632,
+        "delta_key_count": 8,
         "exempt_key_count": 23,
         "exempt_keys": [
             "calc_units_us",
@@ -706,14 +706,20 @@
         "lpn_ex_net1_si_title": "EPANET Net1 plus rule-based controls, L\/s (SI)",
         "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
         "lpn_tool_zoom_selection_tip": "Fit the selected assets to the map window. Select one or more assets first.",
-        "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why."
+        "lpn_inp_drop_comments": "These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.",
+        "lpn_field_length_slope_tip": "Pipe length. When Auto is checked, the length is measured along the slope: the drawn length combined with the difference in elevation between the two end nodes.",
+        "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why.",
+        "lpn_snip_tip_copy": "Copy (Ctrl+C)"
     },
     "keys": {
         "lpn_tool_zoom_selection": "Zoom to selection",
         "lpn_ex_net1_si_title": "EPANET Net1 plus rule-based controls, L\/s (SI)",
         "lpn_ex_net1_si_desc": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
         "lpn_tool_zoom_selection_tip": "Fit the selected assets to the map window. Select one or more assets first.",
-        "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why."
+        "lpn_inp_drop_comments": "These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.",
+        "lpn_field_length_slope_tip": "Pipe length. When Auto is checked, the length is measured along the slope: the drawn length combined with the difference in elevation between the two end nodes.",
+        "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why.",
+        "lpn_snip_tip_copy": "Copy (Ctrl+C)"
     },
     "key_context": {
         "lpn_tool_zoom_selection": {
@@ -780,6 +786,38 @@
                 }
             }
         },
+        "lpn_inp_drop_comments": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_sections",
+                    "value": "此文件包含一个本页面完全不读取的部分。这里不会用到它。它会被完整保留，如果您保存为 EPANET 文件，会被写回。",
+                    "english": "This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_quality_options",
+                    "value": "此文件给出了 EPANET 水质选项：Quality 选项（指明水质分析的种类），以及与化学物质相关的两项设置，即相对扩散系数和水质容差。这三项均会被保留并使用。水龄、来源追踪和化学物质均在本页面计算，运行化学物质时会使用其中两项化学物质设置。如果您保存为 EPANET 文件，全部内容都会被写回。",
+                    "english": "This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file."
+                }
+            }
+        },
+        "lpn_field_length_slope_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length",
+                    "value": "长度",
+                    "english": "Length"
+                },
+                "next_translated": {
+                    "key": "lpn_field_from",
+                    "value": "起点",
+                    "english": "From"
+                }
+            }
+        },
         "lpn_time_run_stopped": {
             "reason": "missing",
             "current_value": null,
@@ -793,6 +831,22 @@
                     "key": "lpn_time_run_fell_back",
                     "value": "屏幕上显示的数值改由内置求解器提供。它每次只计算一个时刻，因此这仅是 {time} 时刻的管网状态，所有水箱仍处于初始水位。",
                     "english": "The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level."
+                }
+            }
+        },
+        "lpn_snip_tip_copy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_snip_tip_redo",
+                    "value": "重做 (Ctrl+Y)",
+                    "english": "Redo (Ctrl+Y)"
+                },
+                "next_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
                 }
             }
         }

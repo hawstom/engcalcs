@@ -2343,6 +2343,7 @@ $ec_lang['lpn_inp_drop_tags']='This file assigns tags to some junctions, pipes, 
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_inp_drop_report']='This file contains EPANET report-format settings. The run report is available under Reports, Run, but it uses the standard EPANET format rather than the format these settings specify. The lines are kept and are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_sections']='This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
+$ec_lang['lpn_inp_drop_comments']='These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.';
 $ec_lang['lpn_inp_drop_quality_options']='This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and used. Water age, source trace, and a chemical are each computed here, and the two chemical settings are used when a chemical is run. All of them are written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_file_options']='This file refers to an auxiliary file: Map, which holds coordinates, or Hydraulics, which holds previously computed hydraulics. This page cannot open either, so the lines are kept as they are and written back if you save an EPANET file.';
 $ec_lang['lpn_inp_drop_other_options']='This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file.';
@@ -2713,6 +2714,8 @@ $ec_lang['lpn_field_roughness']='Roughness';
 // selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C. A higher number means a smoother pipe: about 150 for new plastic, 130 for new steel or iron, and 100 for old pipe.';
 $ec_lang['lpn_field_length']='Length';
+// Task 643 (Tom, 2026-10-14): an Auto length is the slope distance. No claim about accuracy (Task 641).
+$ec_lang['lpn_field_length_slope_tip']='Pipe length. When Auto is checked, the length is measured along the slope: the drawn length combined with the difference in elevation between the two end nodes.';
 $ec_lang['lpn_field_from']='From';
 $ec_lang['lpn_field_to']='To';
 // Tom, 2026-10-09: From and To are editable text. Said in the box a refused ID is said in.
@@ -4930,4 +4933,5 @@ $ec_lang['lpn_snip_tip_pen']='Pen';
 $ec_lang['lpn_snip_tip_eraser']='Eraser: click a stroke to remove it (E)';
 $ec_lang['lpn_snip_tip_undo']='Undo (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Redo (Ctrl+Y)';
+$ec_lang['lpn_snip_tip_copy']='Copy (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='The picture\'s size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file.';
