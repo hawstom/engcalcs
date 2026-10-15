@@ -236,7 +236,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**312 still to read**, of 315 new keys across 11 unmerged branch(es).
+**313 still to read**, of 316 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -1216,4 +1216,10 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_tsb_resize`**
   > Drag to resize
+  @@ NEEDS RULING
+
+### feat/stopped-series (`67d6307d`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_time_run_stopped_kept`**
+  > The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.
   @@ NEEDS RULING

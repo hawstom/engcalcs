@@ -121,9 +121,9 @@ $ec_lang['calc_copy_link']='লিঙ্ক কপি করুন';
 $ec_lang['ec_related_calcs']='সম্পর্কিত ক্যালকুলেটর:';
 $ec_lang['calc_copy_link_done']='কপি করা হয়েছে!';
 // Darcy-Weisbach. See mphl_ for missing text.
-$ec_lang['dw_main_menu']='ড্যার্সি-ওয়েইসবাখ পাইপ হেড লস';
-$ec_lang['dw_main_title']='বিনামূল্যে অনলাইন ড্যার্সি-ওয়েইসবাখ পাইপ হেড লস ক্যালকুলেটর';
-$ec_lang['dw_main_desc']='নির্দিষ্ট ব্যাস, রুক্ষতা ও প্রবাহে ড্যার্সি-ওয়েইসবাখ পাইপ হেড লস';
+$ec_lang['dw_main_menu']='ড্যার্সি-ওয়েইসবাখ পাইপ হেড ক্ষতি';
+$ec_lang['dw_main_title']='বিনামূল্যে অনলাইন ড্যার্সি-ওয়েইসবাখ পাইপ হেড ক্ষতি ক্যালকুলেটর';
+$ec_lang['dw_main_desc']='নির্দিষ্ট ব্যাস, রুক্ষতা ও প্রবাহে ড্যার্সি-ওয়েইসবাখ পাইপ হেড ক্ষতি';
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='পাইপের দেয়ালের পরম রুক্ষতার উচ্চতা, e। সাধারণ মান: ইস্পাত (নতুন) 0.046 mm, ইস্পাত (ব্যবহৃত) 0.15 mm, HDPE 0.003 mm, PVC/uPVC 0.0015 mm, কংক্রিট 0.3–3 mm।';
 $ec_lang['dw_kinematic_viscosity']='<span class="ec-help" title="1×10⁻⁶ m²/s, ২০°সে তাপমাত্রায় বিশুদ্ধ পানির জন্য">গতিগত সান্দ্রতা, ν <span class="ec-tip">?</span></span>';
@@ -137,9 +137,9 @@ $ec_lang['dw_regime_turbulent']='অশান্ত';
 $ec_lang['dw_friction_factor_method']='ঘর্ষণ গুণাঙ্ক পদ্ধতি';
 $ec_lang['dw_friction_factor']='ঘর্ষণ গুণাঙ্ক, f';
 // Hazen-Williams. See mphl_ for missing text.
-$ec_lang['hw_main_menu']='হেজেন-উইলিয়ামস পাইপ হেড লস';
-$ec_lang['hw_main_title']='বিনামূল্যে অনলাইন হেজেন-উইলিয়ামস পাইপ হেড লস ক্যালকুলেটর';
-$ec_lang['hw_main_desc']='নির্দিষ্ট ব্যাস, রুক্ষতা ও প্রবাহে হেজেন-উইলিয়ামস পাইপ হেড লস';
+$ec_lang['hw_main_menu']='হেজেন-উইলিয়ামস পাইপ হেড ক্ষতি';
+$ec_lang['hw_main_title']='বিনামূল্যে অনলাইন হেজেন-উইলিয়ামস পাইপ হেড ক্ষতি ক্যালকুলেটর';
+$ec_lang['hw_main_desc']='নির্দিষ্ট ব্যাস, রুক্ষতা ও প্রবাহে হেজেন-উইলিয়ামস পাইপ হেড ক্ষতি';
 $ec_lang['hw_hgl_1']='ভাটির HGL';
 $ec_lang['hw_hgl_2']='উজানের HGL';
 $ec_lang['hw_elev_up']='উজানের উচ্চতা';
@@ -149,9 +149,9 @@ $ec_lang['hw_pressure_down']='ভাটির চাপ';
 $ec_lang['hw_pressure_check']='চাপ পরীক্ষা';
 $ec_lang['hw_pressure_ok_short']='ধনাত্মক চাপ';
 $ec_lang['hw_pressure_neg_short']='ঋণাত্মক চাপ';
-$ec_lang['hw_pressure_neg']='ভাটির চাপ শূন্যের নিচে। হাইড্রলিক গ্রেড লাইন পাইপের নিচে নেমে যায়, তাই পাইপ পূর্ণ প্রবাহিত হবে না এবং এই ফলাফল বৈধ নাও হতে পারে।';
+$ec_lang['hw_pressure_neg']='ভাটির চাপ শূন্যের নিচে। হাইড্রোলিক গ্রেড লাইন পাইপের নিচে নেমে যায়, তাই পাইপ পূর্ণ প্রবাহিত হবে না এবং এই ফলাফল বৈধ নাও হতে পারে।';
 $ec_lang['hw_roughness']='হেজেন-উইলিয়ামস সহগ, C';
-$ec_lang['hw_note_1']='<dl><dt>এই ক্যালকুলেটর দুই প্রান্তের মধ্যে পাইপের প্রোফাইল অনুকরণ করে না।</dt><dd>এটি শুধুমাত্র আপনার দেওয়া উজান ও ভাটির উচ্চতা ব্যবহার করে। যদি মাঝখানে কোথাও ভূমি যেকোনো প্রান্তের চেয়ে উঁচু হয়ে ওঠে, তবে সেই উঁচু বিন্দুর চাপ এখানে দেখানো যেকোনো চাপের চেয়ে কম হবে। তা যাচাই করতে উজান প্রান্ত থেকে উঁচু বিন্দু পর্যন্ত দৈর্ঘ্য দিয়ে আবার হিসাব করুন।</dd><dd>যেখানে হাইড্রলিক গ্রেড লাইন পাইপের নিচে নেমে যায়, সেখানে পানি ঋণাত্মক চাপে থাকে। দ্রবীভূত বাতাস বের হয়ে আসে, পাতলা দেয়ালের পাইপ চুপসে যেতে পারে, এবং জোড়ার মধ্য দিয়ে দূষিত ভূগর্ভস্থ পানি প্রবেশ করতে পারে। সর্বত্র লাইনটি ধনাত্মক চাপে রাখুন এবং প্রতিটি উঁচু বিন্দুতে একটি এয়ার ভালভ বিবেচনা করুন।</dd><dt>উজানের চাপ আপনার দেওয়া একটি সীমানা শর্ত।</dt><dd>এটি একটি গেজ থেকে, ট্যাংকের পানির স্তর (পাইপের উপরে পানির উচ্চতা) থেকে, অথবা একটি পাম্প কার্ভ থেকে পড়ুন। প্রবাহ বাড়ার সাথে সাথে পাম্প কম চাপ সরবরাহ করে, তাই উপরে দেওয়া প্রবাহের সাথে মিলে যাওয়া কার্ভের বিন্দুটি ব্যবহার করুন।</dd><dt>ক্ষুদ্র (স্থানীয়) ক্ষতির সহগগুলো নিজে যোগ করুন।</dt><dd>লাইনের প্রতিটি ভালভ, বাঁক, টি, মিটার এবং প্রবেশপথের জন্য K মান যোগ করুন এবং সেই মোট মান লিখুন। সাধারণ মানের জন্য সেই ইনপুটের লিংক অনুসরণ করুন। একটি দীর্ঘ ট্রান্সমিশন মেইনে এই ক্ষতিগুলো ঘর্ষণের তুলনায় ছোট, কিন্তু ছোট স্টেশন পাইপিং-এ এগুলোই বেশিরভাগ ক্ষতি হতে পারে।</dd></dl>';
+$ec_lang['hw_note_1']='<dl><dt>এই ক্যালকুলেটর দুই প্রান্তের মধ্যে পাইপের প্রোফাইল অনুকরণ করে না।</dt><dd>এটি শুধুমাত্র আপনার দেওয়া উজান ও ভাটির উচ্চতা ব্যবহার করে। যদি মাঝখানে কোথাও ভূমি যেকোনো প্রান্তের চেয়ে উঁচু হয়ে ওঠে, তবে সেই উঁচু বিন্দুর চাপ এখানে দেখানো যেকোনো চাপের চেয়ে কম হবে। তা যাচাই করতে উজান প্রান্ত থেকে উঁচু বিন্দু পর্যন্ত দৈর্ঘ্য দিয়ে আবার হিসাব করুন।</dd><dd>যেখানে হাইড্রোলিক গ্রেড লাইন পাইপের নিচে নেমে যায়, সেখানে পানি ঋণাত্মক চাপে থাকে। দ্রবীভূত বাতাস বের হয়ে আসে, পাতলা দেয়ালের পাইপ চুপসে যেতে পারে, এবং জোড়ার মধ্য দিয়ে দূষিত ভূগর্ভস্থ পানি প্রবেশ করতে পারে। সর্বত্র লাইনটি ধনাত্মক চাপে রাখুন এবং প্রতিটি উঁচু বিন্দুতে একটি এয়ার ভালভ বিবেচনা করুন।</dd><dt>উজানের চাপ আপনার দেওয়া একটি সীমানা শর্ত।</dt><dd>এটি একটি গেজ থেকে, ট্যাংকের পানির স্তর (পাইপের উপরে পানির উচ্চতা) থেকে, অথবা একটি পাম্প কার্ভ থেকে পড়ুন। প্রবাহ বাড়ার সাথে সাথে পাম্প কম চাপ সরবরাহ করে, তাই উপরে দেওয়া প্রবাহের সাথে মিলে যাওয়া কার্ভের বিন্দুটি ব্যবহার করুন।</dd><dt>ক্ষুদ্র (স্থানীয়) ক্ষতির সহগগুলো নিজে যোগ করুন।</dt><dd>লাইনের প্রতিটি ভালভ, বাঁক, টি, মিটার এবং প্রবেশপথের জন্য K মান যোগ করুন এবং সেই মোট মান লিখুন। সাধারণ মানের জন্য সেই ইনপুটের লিংক অনুসরণ করুন। একটি দীর্ঘ ট্রান্সমিশন মেইনে এই ক্ষতিগুলো ঘর্ষণের তুলনায় ছোট, কিন্তু ছোট স্টেশন পাইপিং-এ এগুলোই বেশিরভাগ ক্ষতি হতে পারে।</dd></dl>';
 
 
 // Manning Irregular
@@ -213,9 +213,9 @@ $ec_lang['mpf_solver_no_solution']='কোনো সমাধান নেই: y
 $ec_lang['mpf_solve_btn']='সমাধান করুন';
 $ec_lang['mpf_solve_for_flow']='প্রবাহের জন্য, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
-$ec_lang['mphl_main_menu']='ম্যানিং পাইপ হেড লস';
-$ec_lang['mphl_main_title']='বিনামূল্যে অনলাইন ম্যানিং পাইপ হেড লস ক্যালকুলেটর';
-$ec_lang['mphl_main_desc']='নির্দিষ্ট পূর্ণ প্রবাহে ম্যানিং ফর্মুলা হেড লস';
+$ec_lang['mphl_main_menu']='ম্যানিং পাইপ হেড ক্ষতি';
+$ec_lang['mphl_main_title']='বিনামূল্যে অনলাইন ম্যানিং পাইপ হেড ক্ষতি ক্যালকুলেটর';
+$ec_lang['mphl_main_desc']='নির্দিষ্ট পূর্ণ প্রবাহে ম্যানিং ফর্মুলা হেড ক্ষতি';
 $ec_lang['mphl_pipe_length']='দৈর্ঘ্য, L';
 $ec_lang['mphl_area']='ক্ষেত্রফল, A';
 $ec_lang['mphl_total_junction_k']='স্থানীয় ক্ষতি সহগ, k<sub>m</sub>';
@@ -319,13 +319,13 @@ $ec_lang['or_notes_4_def']='যখন TWE খোলার ইনভার্ট�
 $ec_lang['mhp_main_menu']='মাইক্রো-হাইড্রো বিদ্যুৎ';
 $ec_lang['mhp_main_title']='বিনামূল্যে অনলাইন মাইক্রো-হাইড্রো বিদ্যুৎ ক্যালকুলেটর';
 $ec_lang['mhp_main_desc']='স্বাভাবিক নদীপ্রবাহ (রান-অব-রিভার) মাইক্রো-হাইড্রো বিদ্যুৎ উৎপাদন ক্যালকুলেটর';
-$ec_lang['mhp_gross_head']='মোট জলশীর্ষ, H<sub>gross</sub>';
+$ec_lang['mhp_gross_head']='মোট হেড, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='<span class="ec-help" title="চাপ পাইপ (সরবরাহ পাইপ) ব্যাস">চাপ পাইপ ব্যাস, D <span class="ec-tip">?</span></span>';
 $ec_lang['mhp_length']='দৈর্ঘ্য, L';
 $ec_lang['mhp_efficiency']='প্লান্ট দক্ষতা, η (0–1)';
 $ec_lang['mhp_vel_check']='বেগ পরীক্ষা';
-$ec_lang['mhp_hl_check']='পানিশীর্ষ ক্ষতি পরীক্ষা';
-$ec_lang['mhp_hnet']='নিট জলশীর্ষ, H<sub>net</sub>';
+$ec_lang['mhp_hl_check']='হেড ক্ষতি পরীক্ষা';
+$ec_lang['mhp_hnet']='নিট হেড, H<sub>net</sub>';
 $ec_lang['mhp_power']='শক্তি আউটপুট, P';
 $ec_lang['mhp_annual_kwh']='বার্ষিক শক্তি (P)';
 $ec_lang['mhp_vel_low']='বেগ কম; পলি জমা ও বাতাস প্রবেশের ঝুঁকি।';
@@ -334,15 +334,15 @@ $ec_lang['mhp_vel_ok_short']='ঠিক আছে';
 $ec_lang['mhp_vel_high_short']='বেশি';
 $ec_lang['mhp_vel_low_short']='কম';
 $ec_lang['mhp_vel_ok_tip']='বেগ চাপ পাইপ নকশার জন্য কার্যকর সীমার মধ্যে রয়েছে।';
-$ec_lang['mhp_hl_ok_tip']='জলশীর্ষ ক্ষতি মোট জলশীর্ষের ১০%-এর কম। এই পাইপের আকারটি অর্থনৈতিক।';
-$ec_lang['mhp_hl_warn_tip']='জলশীর্ষ ক্ষতি মোট জলশীর্ষের ১০%-এর বেশি। একটি বড় পাইপ বিবেচনা করুন।';
-$ec_lang['mhp_hl_bad_tip']='জলশীর্ষ ক্ষতি মোট জলশীর্ষের ২০%-এর বেশি। পাইপের আকার পরিবর্তন করুন।';
-$ec_lang['mhp_notes_1_term']='পানিশীর্ষ ক্ষতি';
-$ec_lang['mhp_notes_1_def']='মোট চাপ পাইপ (সরবরাহ পাইপ) ক্ষতি h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, যেখানে h<sub>f</sub> = f(L/D)(v²/2g) হলো ডার্সি-ওয়েইসবাক ঘর্ষণ ক্ষতি এবং h<sub>m</sub> = k<sub>m</sub>·v²/2g প্রবেশ, বাঁক ও ভালভের ক্ষতি অন্তর্ভুক্ত করে। নিট জলশীর্ষ H<sub>net</sub> = H<sub>gross</sub> − h<sub>L</sub>।';
+$ec_lang['mhp_hl_ok_tip']='হেড ক্ষতি মোট হেডের ১০%-এর কম। এই পাইপের আকারটি অর্থনৈতিক।';
+$ec_lang['mhp_hl_warn_tip']='হেড ক্ষতি মোট হেডের ১০%-এর বেশি। একটি বড় পাইপ বিবেচনা করুন।';
+$ec_lang['mhp_hl_bad_tip']='হেড ক্ষতি মোট হেডের ২০%-এর বেশি। পাইপের আকার পরিবর্তন করুন।';
+$ec_lang['mhp_notes_1_term']='হেড ক্ষতি';
+$ec_lang['mhp_notes_1_def']='মোট চাপ পাইপ (সরবরাহ পাইপ) ক্ষতি h<sub>L</sub> = h<sub>f</sub> + h<sub>m</sub>, যেখানে h<sub>f</sub> = f(L/D)(v²/2g) হলো ডার্সি-ওয়েইসবাক ঘর্ষণ ক্ষতি এবং h<sub>m</sub> = k<sub>m</sub>·v²/2g প্রবেশ, বাঁক ও ভালভের ক্ষতি অন্তর্ভুক্ত করে। নিট হেড H<sub>net</sub> = H<sub>gross</sub> − h<sub>L</sub>।';
 $ec_lang['mhp_notes_2_term']='বেগ';
 $ec_lang['mhp_notes_2_def']='উপলব্ধ পতন ও পাইপ খরচের জন্য বেগ যুক্তিসঙ্গত কিনা তা পরীক্ষা করুন। খুব কম বেগ অতিরিক্ত বড় আকারের ইঙ্গিত দিতে পারে; খুব বেশি বেগ ঘর্ষণ ক্ষতি ও জল-হাতুড়ির (ওয়াটার হ্যামার) ঝুঁকি বাড়াতে পারে।';
-$ec_lang['mhp_notes_3_term']='পানিশীর্ষ ক্ষতির লক্ষ্যমাত্রা';
-$ec_lang['mhp_notes_3_def']='মোট জলশীর্ষের 10% এর নিচে পেনস্টক (সরবরাহ পাইপ) ক্ষতি সাধারণত অর্থনৈতিক। পাইপ খরচ ও হারানো শক্তির মধ্যে সর্বোত্তম ভারসাম্য প্রায়ই সেসব স্থানে 4–6% এর কাছাকাছি হয় যেখানে বিদ্যুতের দাম বেশি সীমার দিকে থাকে।';
+$ec_lang['mhp_notes_3_term']='হেড ক্ষতির লক্ষ্যমাত্রা';
+$ec_lang['mhp_notes_3_def']='মোট হেডের 10% এর নিচে পেনস্টক (সরবরাহ পাইপ) ক্ষতি সাধারণত অর্থনৈতিক। পাইপ খরচ ও হারানো শক্তির মধ্যে সর্বোত্তম ভারসাম্য প্রায়ই সেসব স্থানে 4–6% এর কাছাকাছি হয় যেখানে বিদ্যুতের দাম বেশি সীমার দিকে থাকে।';
 $ec_lang['mhp_notes_6_term']='দক্ষতা';
 $ec_lang['mhp_notes_6_def']='মাইক্রো-হাইড্রোতে প্রচলিত Pelton ও ক্রস-ফ্লো টার্বাইনের জন্য সাধারণ প্লান্ট দক্ষতা η সাধারণত 0.70 থেকে 0.85 পর্যন্ত হয়। রক্ষণশীল প্রাথমিক অনুমান হিসেবে 0.75 ব্যবহার করুন।';
 $ec_lang['mhp_notes_7_term']='বার্ষিক শক্তি';
@@ -564,7 +564,7 @@ $ec_lang['ip_du_estimate']='<span class="ec-help" title="শেষ ড্রি�
 $ec_lang['ip_worst_case_warn']='পরীক্ষা ড্রিপারের চাপ ≥ সরবরাহ চাপ। এটি সম্ভবত সবচেয়ে খারাপ ক্ষেত্রের ড্রিপার নয়, অথবা পাইপগুলো ছোট করা যেতে পারে।';
 $ec_lang['ip_q_ratio']='<span class="ec-help" title="এটি প্রমিত সমতা পরিমাপের আমাদের আনুমানিক রূপ থেকে ভিন্ন।">শেষ ড্রিপার প্রবাহ ÷ নকশা প্রবাহ, q<sub>last</sub>/q<sub>design</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['ip_no_solution']='কোনো সমাধান নেই: প্রয়োজনীয় সরবরাহ চাপ প্রবেশ করা সরবরাহ চাপকে ছাড়িয়ে যায়। সরবরাহ চাপ বাড়ান, চাহিদা কমান, অথবা বড় পাইপ ব্যবহার করুন।';
-$ec_lang['ip_notes_1_def']='শেষ (সবচেয়ে দূরবর্তী) ড্রিপারে চাপ অনুমান করে, তারপর শক্তি রেখা ধাপে ধাপে সরবরাহের দিকে ফিরিয়ে নিয়ে যায়, অংশ অনুযায়ী অংশ, পথে ঘর্ষণ ও স্থানীয় ক্ষতি যোগ করতে করতে। প্রতিটি নোডে প্রকৃত চাপ জানাতে উচ্চতা ও বেগ মাথা বিয়োগ করা হয়। অনুমিত দূর-প্রান্তের চাপ সমন্বয় করা হয় (দ্বিভাজন) যতক্ষণ না গণিত প্রয়োজনীয় সরবরাহ চাপ প্রবেশ করা সরবরাহ চাপের সাথে মেলে — ম্যানিং পাইপ ফ্লো ক্যালকুলেটরের পাইপ-প্রবাহ সমাধানকারী দ্বারা সমাধান করা একই বদ্ধ-লুপ সমস্যা, একটি শাখাযুক্ত নেটওয়ার্কে বিস্তৃত।';
+$ec_lang['ip_notes_1_def']='শেষ (সবচেয়ে দূরবর্তী) ড্রিপারে চাপ অনুমান করে, তারপর এনার্জি গ্রেড লাইন ধাপে ধাপে সরবরাহের দিকে ফিরিয়ে নিয়ে যায়, অংশ অনুযায়ী অংশ, পথে ঘর্ষণ ও স্থানীয় ক্ষতি যোগ করতে করতে। প্রতিটি নোডে প্রকৃত চাপ জানাতে উচ্চতা ও বেগ হেড বিয়োগ করা হয়। অনুমিত দূর-প্রান্তের চাপ সমন্বয় করা হয় (দ্বিভাজন) যতক্ষণ না গণিত প্রয়োজনীয় সরবরাহ চাপ প্রবেশ করা সরবরাহ চাপের সাথে মেলে — ম্যানিং পাইপ ফ্লো ক্যালকুলেটরের পাইপ-প্রবাহ সমাধানকারী দ্বারা সমাধান করা একই বদ্ধ-লুপ সমস্যা, একটি শাখাযুক্ত নেটওয়ার্কে বিস্তৃত।';
 $ec_lang['ip_notes_2_term']='প্রধান বনাম ল্যাটারাল অংশ';
 $ec_lang['ip_notes_2_def']='প্রতিটি সারি সরবরাহ থেকে শেষ ড্রিপার পর্যন্ত একক হাইড্রলিকভাবে সবচেয়ে খারাপ পথের (পরীক্ষা পথের) একটি অংশ। একটি প্রধান লাইন অংশ শুধুমাত্র পরীক্ষা পথে নেই এমন ল্যাটারালে প্রবাহ পাঠায়, তাই এর গ্রহণ একটি সরল গুণফল (নকশা প্রবাহ × অংশের মোট ড্রিপার সংখ্যা) — কোনো স্থানীয় চাপ সংবেদনশীলতা নেই। প্রধান লাইন একটি ভাগ করা ট্রাঙ্ক পাইপ, তাই পরীক্ষা ল্যাটারাল লাইনে শেষ হওয়া প্রধান লাইনের অংশে শুধু নিজের প্রান্তবিন্দুর মধ্যবর্তী ল্যাটারালই নয়, বরং সেই বিন্দুর পরে প্রধান লাইন বরাবর যেকোনো ল্যাটারাল, বা একই জাংশন শেয়ার করা (যেমন বিপরীত-পাশের ল্যাটারাল)ও অন্তর্ভুক্ত করতে হবে — তাদের প্রবাহ বিচ্ছিন্ন হওয়ার আগে এই একই অংশের মধ্য দিয়ে যায়, এই টেবিলে অন্য কোথাও দেখা যাক বা না যাক। একটি ল্যাটারাল অংশ পরীক্ষা ল্যাটারালের নিজেরই একটি সেগমেন্ট: ড্রিপার নিঃসরণ প্রকৃত স্থানীয় চাপ থেকে q = k·H<sup>x</sup> দিয়ে গণনা করা হয়, এবং প্রতিটি ড্রিপার পানি গ্রহণ করায় প্রবাহ কমে যাওয়ার হিসাব রাখতে ঘর্ষণ ক্ষতি ক্রিস্টিয়ানসেনের F(n) ফ্যাক্টর দ্বারা হ্রাস করা হয়।';
 $ec_lang['ip_notes_3_term']='সীমাবদ্ধতা';
@@ -695,7 +695,7 @@ $ec_lang['lpn_meter_pipe_unknown']='এই প্রকল্পে {id} না�
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
 $ec_lang['lpn_meter_pattern_unknown']='এই প্রকল্পে {id} নামে কোনো প্যাটার্ন নেই, তাই গ্রাহককে যেমন ছিল তেমনই রাখা হয়েছে।';
-$ec_lang['lpn_meter_placed']='গ্রাহক {id} যোগ করা হয়েছে। এর বর্ণনা ও চাহিদা গ্রাহক সারণিতে লিখুন, অথবা এর বৈশিষ্ট্য বাক্স খুলতে নির্বাচন মোডে এটি নির্বাচন করুন।';
+$ec_lang['lpn_meter_placed']='গ্রাহক {id} যোগ করা হয়েছে। এর বিবরণ ও চাহিদা গ্রাহক সারণিতে লিখুন, অথবা এর বৈশিষ্ট্য বাক্স খুলতে নির্বাচন মোডে এটি নির্বাচন করুন।';
 $ec_lang['lpn_field_meter_pipe_tip']='এই সংযোগ যে উপাদানের সাথে যুক্ত। এটি বদলাতে এখানে বা গ্রাহক সারণিতে অন্য একটি লিখুন, অথবা সংযোগ বিন্দুটি অন্য উপাদানে টেনে আনুন।';
 $ec_lang['lpn_field_meter_station']='পাইপ বরাবর অবস্থান (%)';
 $ec_lang['lpn_field_meter_station_tip']='পাইপ ধরে সেবা সংযোগ পর্যন্ত দূরত্ব, পাইপের প্রথম নোড থেকে দ্বিতীয় নোড পর্যন্ত পাইপের শতাংশ হিসেবে। 0 এক প্রান্তে এবং 100 অন্য প্রান্তে। পাইপের ওপরের বৃত্তটি পয়েন্টার দিয়ে একই কাজ করে।';
@@ -869,7 +869,7 @@ $ec_lang['lpn_field_elev']='উচ্চতা';
 // was no tank. Since Task 248 there is one, and the two are different assets: a reservoir's level
 // never moves, a tank's does. Raising a reservoir's head is still a legitimate thing to do -- it is
 // just not how you model storage any more.
-$ec_lang['lpn_field_head']='জলশীর্ষ';
+$ec_lang['lpn_field_head']='হেড';
 // 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
 // outright that it is a height and not a pressure, which is the exact confusion the glossary's
 // avoid list guards against.
@@ -1025,13 +1025,13 @@ $ec_lang['lpn_units_length']='দৈর্ঘ্য';
 $ec_lang['lpn_units_mapcoords']='মানচিত্র স্থানাঙ্ক';
 $ec_lang['lpn_units_mapcoords_deg']='ডিগ্রি';
 $ec_lang['lpn_units_usft']='US survey ft';
-$ec_lang['lpn_units_elevhead']='উচ্চতা ও জলশীর্ষ';
+$ec_lang['lpn_units_elevhead']='উচ্চতা ও হেড';
 // Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
 // mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
 // alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
 // mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
-$ec_lang['lpn_result_gradient']='জলশীর্ষ ক্ষতির ঢাল';
-$ec_lang['lpn_result_gradient_tip']='পাইপের দৈর্ঘ্য দিয়ে ভাগ করা জলশীর্ষ ক্ষতি। ভিন্ন দৈর্ঘ্যের পাইপগুলোকে একই নকশা সীমার সাথে তুলনা করতে এটি ব্যবহার করুন।';
+$ec_lang['lpn_result_gradient']='হেড ক্ষতির ঢাল';
+$ec_lang['lpn_result_gradient_tip']='পাইপের দৈর্ঘ্য দিয়ে ভাগ করা হেড ক্ষতি। ভিন্ন দৈর্ঘ্যের পাইপগুলোকে একই নকশা সীমার সাথে তুলনা করতে এটি ব্যবহার করুন।';
 $ec_lang['lpn_result_water_age']='পানির বয়স';
 $ec_lang['lpn_result_water_age_tip']='এই বিন্দুতে পৌঁছানো পানি সিস্টেমে যে সময় কাটিয়েছে। যেখানে প্রবাহ মেলে, সংখ্যাটি আগত বয়সগুলোর প্রবাহ-ভারযুক্ত গড়। ট্যাংকে এটি ধরে রাখা পানির গড় বয়স, তাই যে ট্যাংকে পানি ধীরে বদলায় সেটি সাধারণত নেটওয়ার্কের সবচেয়ে পুরোনো পানি ধরে রাখে। তুলনা করার মতো কোনো নিয়ন্ত্রক সীমা নেই, তাই মডেল করা সিস্টেমের অবস্থার সাপেক্ষে এটি মূল্যায়ন করুন।';
 $ec_lang['lpn_result_source_share']='উৎস অংশ';
@@ -1058,13 +1058,13 @@ $ec_lang['lpn_result_reaction_rate']='বিক্রিয়ার হার';
 $ec_lang['lpn_result_status']='অবস্থা';
 $ec_lang['lpn_result_status_open']='খোলা';
 $ec_lang['lpn_result_status_closed']='বন্ধ';
-$ec_lang['lpn_result_head']='জলশীর্ষ';
+$ec_lang['lpn_result_head']='হেড';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_result_head_tip']='এই নোডে পানির বিভব শক্তি, পানির স্তম্ভের উচ্চতা হিসেবে লেখা। এটি একটি পরম উচ্চতা, যেখানে চাপ একটি গেজ পরিমাপ।';
 $ec_lang['lpn_result_pressure']='চাপ';
 $ec_lang['lpn_result_flow']='প্রবাহ';
 $ec_lang['lpn_result_velocity']='বেগ';
-$ec_lang['lpn_result_headloss']='জলশীর্ষ ক্ষতি';
+$ec_lang['lpn_result_headloss']='হেড ক্ষতি';
 // The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
 // (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
 // "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
@@ -1154,7 +1154,7 @@ $ec_lang['lpn_convas_round_tip']='যে ধাপে রাউন্ড কর�
 $ec_lang['lpn_convas_round_none']='কোনো রাউন্ডিং নয়';
 $ec_lang['lpn_convas_round_flow']='চাহিদা ও প্রবাহ';
 $ec_lang['lpn_convas_label_col']='প্রত্যয়';
-$ec_lang['lpn_convas_label_tip']='কপির মানচিত্র লেবেলে এই মানের পরে যোগ করা টেক্সট, যেমন \' mm\' বা \' gpm\'। উপরে বেছে নেওয়া একক থেকে আগে থেকে পূরণ করা; কোনো প্রত্যয় না চাইলে এটি খালি করুন।';
+$ec_lang['lpn_convas_label_tip']='কপির মানচিত্র লেবেলে এই মানের পরে যোগ করা লেখা, যেমন \' mm\' বা \' gpm\'। উপরে বেছে নেওয়া একক থেকে আগে থেকে পূরণ করা; কোনো প্রত্যয় না চাইলে এটি খালি করুন।';
 $ec_lang['lpn_convas_oneway']='ফিরিয়ে রূপান্তর করা একটি দ্বিতীয় রূপান্তর, আনডু নয়। রূপান্তরিত এবং আবার ফিরিয়ে রূপান্তরিত একটি সংখ্যা ঠিক যেমন লেখা হয়েছিল তেমন নাও ফিরতে পারে।';
 $ec_lang['lpn_convas_ok']='রূপান্তর করুন';
 // {crs} is the coordinate system's own name, or its code if this build does not know it (Tom,
@@ -1411,7 +1411,7 @@ $ec_lang['lpn_help_walkthroughs']='ধাপে ধাপে নির্দে�
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='নেটওয়ার্ক মুছুন';
-$ec_lang['lpn_confirm_delete_network']='এই প্রকল্পের প্রতিটি নোড, পাইপ ও টেক্সট লেবেল মুছবেন? পটভূমি চিত্র, প্রকল্পের নাম ও সেটিংস রাখা হয়।';
+$ec_lang['lpn_confirm_delete_network']='এই প্রকল্পের প্রতিটি নোড, পাইপ ও টেক্সট মুছবেন? পটভূমি চিত্র, প্রকল্পের নাম ও সেটিংস রাখা হয়।';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -1512,7 +1512,7 @@ $ec_lang['lpn_find_conn_no_fixed']='এই নেটওয়ার্কে ক
 // Task 540: the query written as one line, above the Find button -- and typed into. The controls
 // write it and it writes the controls, so it teaches the shape of a search by being operated from
 // either end.
-$ec_lang['lpn_find_query_tip']='টেক্সট কোয়েরি হিসেবে দেওয়া অনুসন্ধান। কোয়েরি বদলালে ওপরের নিয়ন্ত্রণগুলো হালনাগাদ হয়।';
+$ec_lang['lpn_find_query_tip']='লেখা কোয়েরি হিসেবে দেওয়া অনুসন্ধান। কোয়েরি বদলালে ওপরের নিয়ন্ত্রণগুলো হালনাগাদ হয়।';
 $ec_lang['lpn_find_query_label']='কোয়েরি';
 // Tom's own line, 2026-08-26, and "expandable" is his word: it says the grammar will grow.
 $ec_lang['lpn_find_query_hint']='শর্তগুলোকে এবং, অথবা ও () দিয়ে একত্র করুন';
@@ -1537,8 +1537,8 @@ $ec_lang['lpn_find_q_err_dot']='যা অনুসন্ধান করবে�
 $ec_lang['lpn_find_q_err_prop']='{scope}-এর কোনো বৈশিষ্ট্য নয়: {w}। এর একটি চেষ্টা করুন: {list}';
 $ec_lang['lpn_find_q_err_op']='{prop}-এর জন্য কোনো শর্ত নয়: {w}। এর একটি চেষ্টা করুন: {list}';
 $ec_lang['lpn_find_q_err_value']='এই শর্তের পরে একটি মান দরকার: {op}';
-$ec_lang['lpn_find_q_err_quote']='টেক্সট মানের চারপাশে উদ্ধৃতি চিহ্ন দিন: {w} কোনো সংখ্যা নয়।';
-$ec_lang['lpn_find_q_err_quote_end']='এই উদ্ধৃত টেক্সটের কোনো সমাপনী উদ্ধৃতি চিহ্ন নেই।';
+$ec_lang['lpn_find_q_err_quote']='লেখা মানের চারপাশে উদ্ধৃতি চিহ্ন দিন: {w} কোনো সংখ্যা নয়।';
+$ec_lang['lpn_find_q_err_quote_end']='এই উদ্ধৃত লেখার কোনো সমাপনী উদ্ধৃতি চিহ্ন নেই।';
 $ec_lang['lpn_find_q_err_close']='এই বন্ধনী ( খোলা হয়েছিল কিন্তু কখনো বন্ধ হয়নি।';
 $ec_lang['lpn_find_q_err_open']='এই বন্ধনী ) কিছুই বন্ধ করে না।';
 $ec_lang['lpn_find_q_err_end']='এর পরে কিছু আশা করা হয়নি। দুটি অনুসন্ধান {and} বা {or} দিয়ে জোড়া দিন।';
@@ -1585,7 +1585,7 @@ $ec_lang['lpn_profile_no_path']='এই দুটি নোড কোনো প�
 $ec_lang['lpn_profile_no_solve']='এখনও কোনো ফলাফল নেই, তাই শুধু ভূমির রেখাটিই আঁকা হয়েছে।';
 $ec_lang['lpn_profile_summary']='নোড: {n}, দৈর্ঘ্য: {len} {u}';
 $ec_lang['lpn_profile_axis_station']='পথ ধরে দূরত্ব ({u})';
-$ec_lang['lpn_profile_axis_elev']='উচ্চতা ও জলশীর্ষ ({u})';
+$ec_lang['lpn_profile_axis_elev']='উচ্চতা ও হেড ({u})';
 $ec_lang['lpn_profile_ground']='ভূপৃষ্ঠ';
 $ec_lang['lpn_profile_hgl']='হাইড্রোলিক গ্রেড লাইন';
 // ---- Task 509: the two operations the control column took with it ----------------------------
@@ -1788,7 +1788,7 @@ $ec_lang['lpn_net_bad_file']='এটি একটি EPANET .net ফাইলে
 $ec_lang['lpn_inp_report_heading']='{file} আমদানি করা হয়েছে';
 $ec_lang['lpn_inp_report_counts']='{nodes}টি জাংশন, জলাধার ও ট্যাংক, {links}টি পাইপ, পাম্প ও ভালভ, {units} এককে।';
 $ec_lang['lpn_inp_report_clean']='ফাইলের সব তথ্য আমদানি করা হয়েছে। কিছুই বাদ পড়েনি।';
-$ec_lang['lpn_inp_report_label_anchor']='টেক্সট লেবেলগুলো EPANET যেভাবে বসায় সেভাবেই বসানো হয়েছে, তাদের উপরের বাম কোণ থেকে।';
+$ec_lang['lpn_inp_report_label_anchor']='টেক্সটগুলো EPANET যেভাবে বসায় সেভাবেই বসানো হয়েছে, তাদের উপরের বাম কোণ থেকে।';
 // **R-219; Tom, 2026-09-24, answering R-190**: dropping the "These are already lat/lon" button in
 // favor of typing 1 for Step 2's Ground distance field means both Import and Convert as have to say
 // that door still exists. Shown for any file that lands as a plain XY drawing -- Feet, Meters, None
@@ -2197,7 +2197,7 @@ $ec_lang['lpn_field_valve_setting_drop']='চাপ পতন';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_valve_setting_drop_tip']='ভালভটি যে চাপ কমিয়ে দেয়। একটি চাপ ভাঙার ভালভ পানি যেদিকেই যাক না কেন, সবসময় ঠিক এই পরিমাণ চাপ সরিয়ে দেয়। এটি ভালভ জুড়ে একটি পতন, ধরে রাখার মতো কোনো চাপ নয়।';
 $ec_lang['lpn_inp_drop_gpv_curve']='এই ভালভ এমন একটি হেড ক্ষতি কার্ভের উল্লেখ করে যা ফাইলে নেই। ভালভটি কার্ভ ছাড়াই আমদানি করা হয়েছে, তাই কার্ভ নির্বাচন না করা পর্যন্ত এটি পুরোপুরি খোলা থাকে।';
-$ec_lang['lpn_gpv_curve_source']='ভালভ জলশীর্ষ ক্ষতির কার্ভ';
+$ec_lang['lpn_gpv_curve_source']='ভালভ হেড ক্ষতির কার্ভ';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_gpv_curve_source_tip']='লাইব্রেরি বাক্সের যে কার্ভ প্রতিটি প্রবাহে এই ভালভের মধ্য দিয়ে হেড ক্ষতি দেয়। একাধিক ভালভ একই কার্ভ ব্যবহার করতে পারে, এবং সেখানে সম্পাদনা করলে সবগুলো বদলায়।';
 $ec_lang['lpn_field_valve_setting_pressure']='চাপ সেটিং';
@@ -2221,7 +2221,7 @@ $ec_lang['lpn_field_km_short']='স্থানীয় ক্ষতি, k';
 // `lpn_pump_curve_ref_note` went with the change: they were the two halves of `curveRef`, which
 // named ANOTHER PUMP to copy points from because there was nothing else to point at. Two pumps on
 // one curve name the same curve now, so there is no borrow to describe.
-$ec_lang['lpn_pump_curve_source']='পাম্প জলশীর্ষ কার্ভ';
+$ec_lang['lpn_pump_curve_source']='পাম্প হেড কার্ভ';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_pump_curve_source_tip']='লাইব্রেরি বাক্সের যে কার্ভ প্রতিটি প্রবাহে এই পাম্প যে হেড যোগ করে তা দেয়। একাধিক পাম্প একই কার্ভ ব্যবহার করতে পারে, এবং সেখানে সম্পাদনা করলে সবগুলো বদলায়।';
 // **"THE NOTES BELOW" DO NOT EXIST ON THIS PAGE** (Tom, 2026-09-05: *"There are no notes below.
@@ -2276,10 +2276,10 @@ $ec_lang['lpn_curve_library_link_tip']='লাইব্রেরি বাক্
 // decides the two column headings and their units. EPANET states it in a `;PUMP:`-style comment
 // above the curve's own rows, which this page reads and writes back, so a curve nothing references
 // still knows what it is.
-$ec_lang['lpn_curve_kind_head']='পাম্প জলশীর্ষ';
+$ec_lang['lpn_curve_kind_head']='পাম্প হেড';
 $ec_lang['lpn_curve_kind_effic']='পাম্প দক্ষতা';
 $ec_lang['lpn_curve_kind_volume']='ট্যাংক আয়তন';
-$ec_lang['lpn_curve_kind_headloss']='ভালভ জলশীর্ষ ক্ষতি';
+$ec_lang['lpn_curve_kind_headloss']='ভালভ হেড ক্ষতি';
 // **NOT A FIFTH KIND.** A curve whose file states no type comment and which nothing references, so
 // there is nothing to state. It is never offered as a choice; it is only shown, already selected,
 // on a curve in that state, so it can be seen and changed.
@@ -2386,12 +2386,12 @@ $ec_lang['lpn_labels_mark_extrema_tip']='মানচিত্রে প্র�
 // you draw from now on, and this is the way to say "I meant the ones already here". {n} and
 // {skipped} are whole numbers; {prefix} is the text the user typed.
 $ec_lang['lpn_settings_apply_to_all']='সব কিছুতে প্রয়োগ করুন';
-$ec_lang['lpn_settings_apply_to_all_tip']='এই ধরনের ইতিমধ্যে আঁকা প্রতিটি উপাদান এই টেক্সট দিয়ে শুরু হওয়া একটি ID পায়। প্রতিটি তার সংখ্যা ধরে রাখে। সংখ্যায় শেষ হয় না এমন ID বদলায় না।';
+$ec_lang['lpn_settings_apply_to_all_tip']='এই ধরনের ইতিমধ্যে আঁকা প্রতিটি উপাদান এই লেখা দিয়ে শুরু হওয়া একটি ID পায়। প্রতিটি তার সংখ্যা ধরে রাখে। সংখ্যায় শেষ হয় না এমন ID বদলায় না।';
 $ec_lang['lpn_confirm_apply_prefix']='{n}টি উপাদানের নাম পরিবর্তন করে তাদের ID {prefix} দিয়ে শুরু করবেন? প্রতিটি তার নিজের সংখ্যা ধরে রাখবে।';
 $ec_lang['lpn_prefix_applied']='{n}টি উপাদানের নাম বদলানো হয়েছে। অন্য {skipped}টি বদলানো হয়নি।';
-$ec_lang['lpn_labels_suffix_gradient_tip']='মানচিত্র লেবেলে হেড ক্ষতির ঢালের পরে যোগ করা টেক্সট। এখানে শতাংশ চিহ্ন লিখবেন না। একক শতাংশ হলে এটি স্বয়ংক্রিয়ভাবে যোগ হয়।';
-$ec_lang['lpn_labels_separator']='মানগুলোর মধ্যে টেক্সট';
-$ec_lang['lpn_labels_separator_tip']='একটি লেবেলে একটি বৈশিষ্ট্য থেকে পরেরটির মধ্যে টেক্সট। ডিফল্টে একটি স্পেস।';
+$ec_lang['lpn_labels_suffix_gradient_tip']='মানচিত্র লেবেলে হেড ক্ষতির ঢালের পরে যোগ করা লেখা। এখানে শতাংশ চিহ্ন লিখবেন না। একক শতাংশ হলে এটি স্বয়ংক্রিয়ভাবে যোগ হয়।';
+$ec_lang['lpn_labels_separator']='মানগুলোর মধ্যে লেখা';
+$ec_lang['lpn_labels_separator_tip']='একটি লেবেলে একটি বৈশিষ্ট্য থেকে পরেরটির মধ্যে লেখা। ডিফল্টে একটি স্পেস।';
 // The Drop column in the Labels box (ROADMAP Task 397; inverted by Task 445). Both tips say "1 is
 // dropped first", because that one sentence is what the two columns share; what differs is WHAT the
 // number orders, and each tip says which. Kept plain and short: these sit on a small box in a
@@ -2418,7 +2418,7 @@ $ec_lang['lpn_labels_show_tip']='লেবেলে মানগুলো যে
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='একক ব্যবহার করুন';
-$ec_lang['lpn_labels_use_units_tip']='পরে বাক্সে ও লেবেলে একক দেখাতে, এবং একক বদলালে তা হালনাগাদ করতে টিক দিন। নিজের পরে টেক্সট লিখতে টিক তুলে দিন।';
+$ec_lang['lpn_labels_use_units_tip']='পরে বাক্সে ও লেবেলে একক দেখাতে, এবং একক বদলালে তা হালনাগাদ করতে টিক দিন। নিজের পরে লেখা লিখতে টিক তুলে দিন।';
 // EPANET's own name for a link's starting state, beside the Status row, which is the run's answer.
 $ec_lang['lpn_labels_init_status']='শুরুর অবস্থা';
 // The Symbology index, reworked (Tom, R-333: "Node labels, Node colors, Link labels, Link colors,
@@ -2795,7 +2795,7 @@ $ec_lang['lpn_engine_failed']='EPANET সমাধানকারী লোড �
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
 $ec_lang['lpn_engine_valve_route']='EPANET সমাধানকারী দিয়ে সমাধান করা হয়েছে, এই চাপ ও প্রবাহ নিয়ন্ত্রণ ভালভগুলোর কারণে:';
 $ec_lang['lpn_unit_unknown']='এই অঙ্কনে এমন একটি একক উল্লেখ আছে যা এই পেজ সমর্থন করে না: {unit}। সব মান যেমন আমদানি করা হয়েছে ঠিক তেমন রাখা ও দেখানো হয়েছে, এবং কিছুই বদলানো হয়নি। একক সমর্থিত না হওয়া পর্যন্ত কিছু হিসাব করা যায় না, কারণ এর রূপান্তর গুণক জানা নেই।';
-$ec_lang['lpn_engine_manning_note']='দ্রষ্টব্য: ম্যানিং রাফনেসের ক্ষেত্রে EPANET ম্যানিং সমীকরণের ধ্রুবকটি রাউন্ড করে, তাই জলশীর্ষ ক্ষতি সঠিক রূপের চেয়ে প্রায় 0.6% কম হয়।';
+$ec_lang['lpn_engine_manning_note']='দ্রষ্টব্য: ম্যানিং রাফনেসের ক্ষেত্রে EPANET ম্যানিং সমীকরণের ধ্রুবকটি রাউন্ড করে, তাই হেড ক্ষতি সঠিক রূপের চেয়ে প্রায় 0.6% কম হয়।';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
 // Three sentences for three different facts, on the model of lpn_unit_unknown: what would not
 // happen, what the solver itself objected to, and where the numbers on screen actually came from.
@@ -3341,7 +3341,7 @@ $ec_lang['lpn_library_curves_tip']='প্রবাহের বিপরীত�
 // document objects of their own, and the note said so; it now says what the box does and where a
 // curve is pointed at an element from.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_curves_note']='একটি কার্ভ একটি প্রকল্পের অংশ, এবং একটি পাম্প বা ভালভ তার নিজস্ব বৈশিষ্ট্যে জানায় সে কোনটি ব্যবহার করে। একাধিক উপাদান একই কার্ভ ব্যবহার করতে পারে, এবং এখানে সেটি পরিবর্তন করলে সবগুলোই বদলে যায়। একটি পাম্প জলশীর্ষ কার্ভের জন্য চালানো বিন্দুগুলোর মধ্য দিয়ে মেলানো একটি কার্ভ ব্যবহার করে; অন্য প্রতিটি ধরনের জন্য এটি দেখানো বিন্দুগুলোকে সরলরেখা দিয়ে যুক্ত করে।';
+$ec_lang['lpn_library_curves_note']='একটি কার্ভ একটি প্রকল্পের অংশ, এবং একটি পাম্প বা ভালভ তার নিজস্ব বৈশিষ্ট্যে জানায় সে কোনটি ব্যবহার করে। একাধিক উপাদান একই কার্ভ ব্যবহার করতে পারে, এবং এখানে সেটি পরিবর্তন করলে সবগুলোই বদলে যায়। একটি পাম্প হেড কার্ভের জন্য চালানো বিন্দুগুলোর মধ্য দিয়ে মেলানো একটি কার্ভ ব্যবহার করে; অন্য প্রতিটি ধরনের জন্য এটি দেখানো বিন্দুগুলোকে সরলরেখা দিয়ে যুক্ত করে।';
 $ec_lang['lpn_library_curve_add']='একটি কার্ভ যোগ করুন';
 // **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with
 // EPANET, put pump ID (with new ID label above it) and Description on row/line 1 and Type selector
@@ -3553,7 +3553,7 @@ $ec_lang['lpn_demand_add']='চাহিদা শ্রেণি যোগ ক�
 $ec_lang['lpn_demand_remove']='এই চাহিদা সরান';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.
-$ec_lang['lpn_field_head_pattern']='জলশীর্ষের প্যাটার্ন';
+$ec_lang['lpn_field_head_pattern']='হেডের প্যাটার্ন';
 $ec_lang['lpn_field_head_pattern_tip']='রান জুড়ে এই জলাধারের পানির স্তরের প্যাটার্ন। ওপরের হেডকে প্যাটার্ন দিয়ে গুণ করা হয়।';
 $ec_lang['lpn_field_pump_speed']='আপেক্ষিক গতি';
 $ec_lang['lpn_field_pump_speed_tip']='পাম্পের প্রকাশিত কর্মক্ষমতা কার্ভ তৈরিতে ব্যবহৃত ঘূর্ণন গতির সাপেক্ষে। গতির প্যাটার্ন থাকলে উপেক্ষা করা হয় (স্কেল করা হয় না)।';
@@ -3810,7 +3810,7 @@ $ec_lang['lpn_ff_err_unknown']='কোনো ফলাফল নেই। ত্
 // cannot tell a mistake from a place; a file of eastings and northings is refused by name, because
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='জরিপকৃত বিন্দু ইম্পোর্ট করুন…';
-$ec_lang['lpn_file_import_survey_tip']='একটি টেক্সট ফাইল থেকে জরিপ করা বিন্দুর তালিকা পড়ুন এবং প্রতিটি বিন্দুতে একটি সংযোগস্থল তৈরি করুন; ফাইল যা উল্লেখ করে না তার জন্য নতুন-অ্যাসেটের সেটিং নেওয়া হয়। বর্ণনাকে ফিল্ড কোড হিসেবে পড়ুন-এ টিক না দিলে কোনো পাইপ আঁকা হয় না, এবং কোনো সারি নাম উল্লেখ ছাড়া বাদ পড়ে না। এই প্রকল্প ইতিমধ্যে যে স্থানাঙ্ক পদ্ধতি ব্যবহার করছে, জিওরেফারেন্স করা হোক বা না হোক, সেটিই পড়া হয়।';
+$ec_lang['lpn_file_import_survey_tip']='একটি টেক্সট ফাইল থেকে জরিপ করা বিন্দুর তালিকা পড়ুন এবং প্রতিটি বিন্দুতে একটি সংযোগস্থল তৈরি করুন; ফাইল যা উল্লেখ করে না তার জন্য নতুন-অ্যাসেটের সেটিং নেওয়া হয়। বিবরণকে ফিল্ড কোড হিসেবে পড়ুন-এ টিক না দিলে কোনো পাইপ আঁকা হয় না, এবং কোনো সারি নাম উল্লেখ ছাড়া বাদ পড়ে না। এই প্রকল্প ইতিমধ্যে যে স্থানাঙ্ক পদ্ধতি ব্যবহার করছে, জিওরেফারেন্স করা হোক বা না হোক, সেটিই পড়া হয়।';
 $ec_lang['lpn_file_import_shapes']='GeoJSON চিত্র ইম্পোর্ট করুন…';
 $ec_lang['lpn_file_import_shapes_tip']='একটি GeoJSON ফাইলের বিন্দু, রেখা ও বহুভুজ এই প্রকল্পে চিত্র হিসেবে পড়ুন। ফাইলের নেটওয়ার্ক অ্যাসেট ইম্পোর্ট করা হয় না; নেটওয়ার্ক একটি EPANET ফাইল থেকে ইম্পোর্ট করুন। প্রকল্পটি জিওরেফারেন্সড হতে হবে অথবা একটি স্থানাঙ্ক পদ্ধতি উল্লেখ করতে হবে।';
 $ec_lang['lpn_geojson_import_done']='{file} থেকে {n}টি চিত্র ইম্পোর্ট করা হয়েছে।';
@@ -4219,8 +4219,8 @@ $ec_lang['lpn_ds_bad_multiplier']='শূন্য বা তার বেশি
 $ec_lang['lpn_ds_stale']='অঙ্কন বদলে গেছে, তাই চাহিদা স্কেলিংয়ের ফলাফল মুছে ফেলা হয়েছে। আবার রান করুন।';
 $ec_lang['lpn_analyze_at_time']='সময় ধাপ: {time}।';
 $ec_lang['lpn_analyze_time_moved']='⚠ এটি {time}-এ হিসাব করা হয়েছিল, আর ঘড়ি এখন {now}-এ। স্ক্রিনে দেখানো সময় ধাপের জন্য আবার রান করুন।';
-$ec_lang['lpn_survey_codes_toggle']='বর্ণনাকে ফিল্ড কোড হিসেবে পড়ুন';
-$ec_lang['lpn_survey_codes_tip']='প্রতিটি বর্ণনার প্রথম শব্দটিকে সারণির একটি কোড হিসেবে পড়ুন। একই লাইন কোডের বিন্দুগুলো ফাইলের ক্রমে একটি পাইপে যুক্ত হয়, আর WL1 ও WL2 আলাদা লাইন। +0 একটি লাইন শুরু করে, -0 একটি শেষ করে, এবং CLO একটি বন্ধ করে। JPN-এর পরে একটি বিন্দুর নাম থাকলে সেই বিন্দুর সাথে যুক্ত হয় (Carlson), আর Civil 3D এটি CPN লেখে।';
+$ec_lang['lpn_survey_codes_toggle']='বিবরণকে ফিল্ড কোড হিসেবে পড়ুন';
+$ec_lang['lpn_survey_codes_tip']='প্রতিটি বিবরণের প্রথম শব্দটিকে সারণির একটি কোড হিসেবে পড়ুন। একই লাইন কোডের বিন্দুগুলো ফাইলের ক্রমে একটি পাইপে যুক্ত হয়, আর WL1 ও WL2 আলাদা লাইন। +0 একটি লাইন শুরু করে, -0 একটি শেষ করে, এবং CLO একটি বন্ধ করে। JPN-এর পরে একটি বিন্দুর নাম থাকলে সেই বিন্দুর সাথে যুক্ত হয় (Carlson), আর Civil 3D এটি CPN লেখে।';
 $ec_lang['lpn_survey_codes_col_code']='কোড';
 $ec_lang['lpn_survey_codes_col_type']='অ্যাসেটের ধরন';
 $ec_lang['lpn_survey_codes_add']='কোড যোগ করুন';
@@ -4229,14 +4229,14 @@ $ec_lang['lpn_survey_confirm_coded']='{j}টি সংযোগস্থল, {r}
 $ec_lang['lpn_survey_report_coded']='{j}টি সংযোগস্থল, {r}টি জলাধার, {t}টি ট্যাংক ও {p}টি পাইপ আমদানি করা হয়েছে, নোডগুলোর মধ্যে {m}টির উচ্চতা আছে।';
 $ec_lang['lpn_survey_note_code_unknown']='কোড সারণিতে নেই, ওপরে বেছে নেওয়া অ্যাসেটের ধরন হিসেবে আমদানি করা হয়েছে।';
 $ec_lang['lpn_survey_note_code_two_nodes']='একাধিক নোড কোড আছে, প্রথমটি ব্যবহার করা হয়েছে।';
-$ec_lang['lpn_survey_note_code_unread']='প্রতিটি শব্দ এই পেজের পড়া কোড নয়, বর্ণনায় রাখা হয়েছে।';
-$ec_lang['lpn_survey_note_vertex_text']='প্রতিটি শব্দ এই পেজের পড়া কোড নয়, এবং শীর্ষবিন্দু কোনো বর্ণনা রাখে না।';
+$ec_lang['lpn_survey_note_code_unread']='প্রতিটি শব্দ এই পেজের পড়া কোড নয়, বিবরণে রাখা হয়েছে।';
+$ec_lang['lpn_survey_note_vertex_text']='প্রতিটি শব্দ এই পেজের পড়া কোড নয়, এবং শীর্ষবিন্দু কোনো বিবরণ রাখে না।';
 $ec_lang['lpn_survey_note_join_missing']='JPN বা CPN এমন একটি বিন্দুর নাম দিয়েছে যা এই ফাইল বা প্রকল্পে নেই, এর জন্য কোনো পাইপ আঁকা হয়নি।';
 $ec_lang['lpn_survey_note_join_no_line']='লাইন কোড ছাড়া একটি বিন্দুতে JPN বা CPN আছে, এর জন্য কোনো পাইপ আঁকা হয়নি।';
 $ec_lang['lpn_survey_note_pipe_one_node']='এই লাইন মাঝখানে অন্য কোনো নোড ছাড়াই একই নোডে ফিরে আসে, এর জন্য কোনো পাইপ আঁকা হয়নি।';
 $ec_lang['lpn_survey_note_line_one_point']='লাইনে একমাত্র বিন্দু, এ থেকে কোনো পাইপ আঁকা হয়নি।';
-$ec_lang['lpn_survey_note_vertices']='যে বিন্দুগুলো পাইপের শীর্ষবিন্দু হয়েছে: {detail}। শীর্ষবিন্দু কোনো নাম, উচ্চতা বা বর্ণনা রাখে না।';
-$ec_lang['lpn_survey_note_no_desc']='ফিল্ড কোড চালু আছে, কিন্তু এই ফাইলে কোনো বর্ণনা কলাম নেই, তাই কোনো কোড পড়া হয়নি।';
+$ec_lang['lpn_survey_note_vertices']='যে বিন্দুগুলো পাইপের শীর্ষবিন্দু হয়েছে: {detail}। শীর্ষবিন্দু কোনো নাম, উচ্চতা বা বিবরণ রাখে না।';
+$ec_lang['lpn_survey_note_no_desc']='ফিল্ড কোড চালু আছে, কিন্তু এই ফাইলে কোনো বিবরণ কলাম নেই, তাই কোনো কোড পড়া হয়নি।';
 $ec_lang['lpn_survey_note_ring_junction']='বৃত্তটি বন্ধ করার জন্য এই বিন্দুটি একটি সংযোগস্থল হয়েছে।';
 $ec_lang['lpn_survey_note_pipe_zero_length']='এই বিন্দুটি আগের নোডের একই স্থানে, তাই তাদের মধ্যবর্তী পাইপের কোনো দৈর্ঘ্য নেই।';
 $ec_lang['lpn_survey_note_node_on_pipe']='এই বিন্দুটি ঠিক এমন একটি পাইপের ওপর, যার সাথে এটি যুক্ত নয়। তারা সংযুক্ত হলে তা বোঝাতে JPN যোগ করুন।';
@@ -4308,7 +4308,7 @@ $ec_lang['lpn_guide_text_calib_box']='মাঠ পরিমাপের এক�
 $ec_lang['lpn_guide_text_notes_popup']='এই পৃষ্ঠা কীভাবে আচরণ করে এবং কী করে না তার নোট তালিকাভুক্ত করে, প্রতিটি একটি পদ ও তার সংজ্ঞা হিসেবে। এটি নেটওয়ার্ক বদলায় না।';
 $ec_lang['lpn_guide_text_hotkeys_popup']='টুলবারের প্রতিটি বোতাম ও মেনু সারি, কীবোর্ড শর্টকাট এবং প্রতিটি বাক্সের জন্য একটি এন্ট্রি তালিকাভুক্ত করে। একটি সারি বেছে নিলে সেই নিয়ন্ত্রণ কোথায় আছে তা দেখায়; এটি কখনো সেটি চালায় না। অনুসন্ধান করতে যেকোনো জায়গা থেকে Ctrl+K চাপুন, অথবা নির্দেশিকায় ফোকাস থাকলে / চাপুন।';
 $ec_lang['lpn_guide_find_query_term']='কোয়েরি ভাষা';
-$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>একটি শর্ত। Scope হলো কী অনুসন্ধান করবেন তালিকার একটি এন্ট্রি: সবকিছু, সংযোগস্থল, জলাধার, ট্যাংক, পাইপ, পাম্প, ভালভ, টেক্সট, গ্রাহক বা উৎস। Property হলো সেই scope-এর বৈশিষ্ট্য তালিকার যেকোনো এন্ট্রি।</td></tr><tr><td>শর্ত</td><td>সমান, বেশি, কম, ধারণ করে, n-টি সর্বোচ্চ, n-টি সর্বনিম্ন এবং খালি (কোয়েরিতে equal to, above, below, contains, n highest, n lowest এবং empty)। ধারণ করে শুধু টেক্সটের ক্ষেত্রে প্রযোজ্য। n-টি সর্বোচ্চ ও n-টি সর্বনিম্নে n একটি গণনা, যেমন 5 highest। মান বাক্স খালি থাকলে, অথবা n অক্ষরটি নিজে লিখলে, যেমন <code>Pipe.Velocity n highest</code>, 10টি উপাদান তালিকাভুক্ত হয়। খালি সেই উপাদানগুলো খুঁজে বের করে যাদের ওই বৈশিষ্ট্যের কোনো মান নেই। সংযোগের চারটি শর্ত আছে এবং কোনো মান নেয় না।</td></tr><tr><td>মান</td><td>একটি সংখ্যা এককছাড়া লেখা হয়, যে এককে তা বৈশিষ্ট্যসমূহ বাক্সে ও টেবিল প্যানেলে দেখানো হয়: 40, 40 psi নয়। ID সহ টেক্সট একক বা দ্বৈত উদ্ধৃতি চিহ্নে ঘিরে লেখা হয়: <code>\'60\'</code>।</td></tr><tr><td>এবং, অথবা ও বন্ধনী</td><td>এবং (AND)-এর মূল্যায়ন অথবা (OR)-এর আগে হয়, এবং বন্ধনী শর্তগুলো গোষ্ঠীবদ্ধ করে। NOT পাওয়া যায় না।</td></tr><tr><td>বানান</td><td>শব্দগুলো ছোট-বড় হাতের অক্ষরে সংবেদনশীল নয়। ইংরেজি শব্দগুলো প্রতিটি ভাষায় গ্রহণ করা হয়, তাই এই নির্দেশিকা থেকে কপি করা কোয়েরি যেকোনো ভাষার পৃষ্ঠায় চলে।</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>একটি শর্ত। Scope হলো কী অনুসন্ধান করবেন তালিকার একটি এন্ট্রি: সবকিছু, সংযোগস্থল, জলাধার, ট্যাংক, পাইপ, পাম্প, ভালভ, টেক্সট, গ্রাহক বা উৎস। Property হলো সেই scope-এর বৈশিষ্ট্য তালিকার যেকোনো এন্ট্রি।</td></tr><tr><td>শর্ত</td><td>সমান, বেশি, কম, ধারণ করে, n-টি সর্বোচ্চ, n-টি সর্বনিম্ন এবং খালি (কোয়েরিতে equal to, above, below, contains, n highest, n lowest এবং empty)। ধারণ করে শুধু লেখার ক্ষেত্রে প্রযোজ্য। n-টি সর্বোচ্চ ও n-টি সর্বনিম্নে n একটি গণনা, যেমন 5 highest। মান বাক্স খালি থাকলে, অথবা n অক্ষরটি নিজে লিখলে, যেমন <code>Pipe.Velocity n highest</code>, 10টি উপাদান তালিকাভুক্ত হয়। খালি সেই উপাদানগুলো খুঁজে বের করে যাদের ওই বৈশিষ্ট্যের কোনো মান নেই। সংযোগের চারটি শর্ত আছে এবং কোনো মান নেয় না।</td></tr><tr><td>মান</td><td>একটি সংখ্যা এককছাড়া লেখা হয়, যে এককে তা বৈশিষ্ট্যসমূহ বাক্সে ও টেবিল প্যানেলে দেখানো হয়: 40, 40 psi নয়। ID সহ লেখা একক বা দ্বৈত উদ্ধৃতি চিহ্নে ঘিরে লেখা হয়: <code>\'60\'</code>।</td></tr><tr><td>এবং, অথবা ও বন্ধনী</td><td>এবং (AND)-এর মূল্যায়ন অথবা (OR)-এর আগে হয়, এবং বন্ধনী শর্তগুলো গোষ্ঠীবদ্ধ করে। NOT পাওয়া যায় না।</td></tr><tr><td>বানান</td><td>শব্দগুলো ছোট-বড় হাতের অক্ষরে সংবেদনশীল নয়। ইংরেজি শব্দগুলো প্রতিটি ভাষায় গ্রহণ করা হয়, তাই এই নির্দেশিকা থেকে কপি করা কোয়েরি যেকোনো ভাষার পৃষ্ঠায় চলে।</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_examples_term']='Net3-এ কাজের উদাহরণ';
 $ec_lang['lpn_guide_find_examples_def']='<p>এগুলো অনুসরণ করতে Net3 উদাহরণটি খুলুন। চাপ psi-তে এবং বেগ ft/s-এ।</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>সংযোগস্থল 60 ও পাইপ 60। একটি সংযোগস্থল ও একটি পাইপের ID একই হতে পারে, তাই সবকিছু বেছে নিয়ে ID অনুসন্ধানে একাধিক উপাদান আসতে পারে।</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>সংযোগস্থল 10, 40, 50, 20 ও 153, সর্বনিম্ন চাপ প্রথমে। সংযোগস্থল 10-এ চাপ -0.6 psi, একটি ঋণাত্মক চাপ যা পর্যালোচনা প্রয়োজন।</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>পাইপ 60, 329, 125, 123 ও 149, সর্বোচ্চ বেগ প্রথমে। পাইপ 60 বহন করে 9.3 ft/s।</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>সংযোগস্থল 10, 20, 40 ও 50, এবং পাইপ 60, 125 ও 329: কম চাপ ও বেশি বেগ একটি তালিকায়।</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>সংযোগস্থল 10, 20, 40 ও 50, উঁচু জমিতে কম চাপ। দুটি শর্তকেই একই ধরনের উপাদানের নাম দিতে হবে: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> কিছুই মেলে না, কারণ কোনো উপাদান একই সাথে সংযোগস্থল ও পাইপ নয়।</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>পাইপ 330, Net3 ফাইলে বন্ধ থাকা একমাত্র পাইপ।</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>কিছুই নয়, ফাইলটি যেভাবে বিতরণ করা হয় সেভাবে। পাইপ 247 বন্ধ থাকলে (পরিবর্তন করুন ও পূর্বাবস্থায় ফিরুন দেখুন), সংযোগস্থল 215, 217, 219 ও 225: পাইপ 247-এ ভাঙন হলে যে সংযোগস্থলগুলো সরবরাহ ছাড়া থাকত। প্রতিটি পাইপের জন্য এটি পুনরাবৃত্তি করা হলো সংকটাপন্নতা বিশ্লেষণ।</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_results_term']='ফলাফল, নির্বাচন ও টেবিল';
@@ -4316,10 +4316,10 @@ $ec_lang['lpn_guide_find_results_def']='<p>মিলে যাওয়া উ�
 $ec_lang['lpn_guide_find_replace_term']='পরিবর্তন করুন ও পূর্বাবস্থায় ফিরুন';
 $ec_lang['lpn_guide_find_replace_def']='<p>বাক্সের যা পাওয়া গেছে তা পরিবর্তন করুন অংশ কোয়েরি যে প্রতিটি উপাদান খুঁজে পেয়েছে তাতে একটি বৈশিষ্ট্য লেখে। পরিবর্তনযোগ্য বৈশিষ্ট্য তালিকা থেকে বৈশিষ্ট্যটি বেছে নিন, নতুন মান বাক্সে প্রদর্শিত এককে নতুন মান লিখুন, এবং পরিবর্তন করুন বোতাম চাপুন। তখন বাক্সটি জানায় কতগুলো উপাদান বদলাবে, যেগুলোতে ইতিমধ্যে নতুন মান আছে সেগুলো গণনা না করে। পরিবর্তন প্রয়োগ করতে সেগুলো পরিবর্তন করুন বোতাম চাপুন, অথবা বাতিল চাপুন। পূর্বাবস্থায় ফিরুন একবার চাপলে পুরো পরিবর্তন ফিরে যায়।</p><p>Net1-এ উদাহরণ: <code>Pipe.Diameter below 10</code> পাইপ 31, 122, 113 ও 121 খুঁজে পায়। বৈশিষ্ট্য তালিকায় ব্যাস বেছে নিন, 10 লিখুন এবং পরিবর্তন করুন চাপুন; বাক্সটি "4টি উপাদান পরিবর্তন করবেন?" দেখায়। চারটি পাইপকেই 10 in. করতে সেগুলো পরিবর্তন করুন চাপুন। পূর্বাবস্থায় ফিরুন একবার চাপলে সেগুলো 6 ও 8 in.-এ ফিরে যায়।</p><p>Net3-এ উদাহরণ: <code>Pipe.ID equal to \'247\'</code> পাইপ 247 খুঁজে পায়। বৈশিষ্ট্য তালিকায় বন্ধ বেছে নিন, নতুন মান তালিকায় আবার বন্ধ বেছে নিন, এবং পরিবর্তন করুন চাপুন, তারপর সেগুলো পরিবর্তন করুন, ওপরের সংযোগ উদাহরণের জন্য পাইপটি বন্ধ করতে। পূর্বাবস্থায় ফিরুন চাপলে এটি আবার খোলে।</p><p>পরিবর্তন করুন-এর জন্য এক ধরনের উপাদান দরকার, তাই সবকিছুর ক্ষেত্রে প্রথমে কী অনুসন্ধান করবেন তালিকায় একটি উপাদানের ধরন বেছে নিন। ভিত্তি ছাড়া অন্য দৃশ্যকল্পে, বৈশিষ্ট্যসমূহ বাক্সে একই সম্পাদনার মতোই, পরিবর্তনটি সেই দৃশ্যকল্পে সংরক্ষিত হয়। যেখানে Mapbox উচ্চতা পাওয়া যায়, সেখানে উচ্চতা টাইপ করা মানের বদলে Mapbox DEM থেকে পরিবর্তন করা যায়।</p>';
 $ec_lang['lpn_guide_find_notes_term']='লক্ষণীয় বিষয়';
-$ec_lang['lpn_guide_find_notes_def']='<ul><li>মানগুলো পূর্ণ নির্ভুলতায় তুলনা করা হয় এবং চার দশমিক স্থান পর্যন্ত তালিকাভুক্ত হয়। সমান গণনা করা ফলাফলের সাথে কদাচিৎ মেলে; বেশি ও কম ব্যবহার করুন।</li><li>চাপ, জলশীর্ষ, প্রবাহ, বেগ ও অন্যান্য ফলাফল সর্বশেষ গণনার। স্বয়ংক্রিয়ভাবে পুনরায় গণনা করুন সেটিং বন্ধ থাকলে, এগুলো সর্বশেষ চালান চাপার সময় নেটওয়ার্ক যেমন ছিল তার বর্ণনা দেয়।</li><li>টেক্সটে বেশি ও কম অভিধান ক্রম ব্যবহার করে, সংখ্যা সাংখ্যিক ক্রমে: Net1-এ <code>Junction.ID above \'20\'</code> সংযোগস্থল 21, 22, 23, 31 ও 32 খুঁজে পায়।</li><li>সবকিছু বেছে নিলে শুধু ID, বিবরণ, ট্যাগ ও সংযোগ দেওয়া হয়। একটি উপাদানের পূর্ণ বৈশিষ্ট্য তালিকা দেখতে কী অনুসন্ধান করবেন তালিকায় একটি উপাদানের ধরন বেছে নিন।</li><li>একটি টেক্সট আইটেমের ID নেই। এটি তার শব্দ দিয়ে অনুসন্ধান করুন, যেমন <code>Text.Text contains \'pump\'</code>।</li><li>একটি নোডের সংযোগের চারটি শর্ত হলো নোডে কোনো লিংক নেই, নোডে কোনো খোলা লিংক নেই, উৎস পর্যন্ত কোনো লিংক পথ নেই এবং উৎস পর্যন্ত কোনো খোলা পথ নেই। উৎস হলো একটি জলাধার বা ট্যাংক।</li></ul>';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>মানগুলো পূর্ণ নির্ভুলতায় তুলনা করা হয় এবং চার দশমিক স্থান পর্যন্ত তালিকাভুক্ত হয়। সমান গণনা করা ফলাফলের সাথে কদাচিৎ মেলে; বেশি ও কম ব্যবহার করুন।</li><li>চাপ, হেড, প্রবাহ, বেগ ও অন্যান্য ফলাফল সর্বশেষ গণনার। স্বয়ংক্রিয়ভাবে পুনরায় গণনা করুন সেটিং বন্ধ থাকলে, এগুলো সর্বশেষ চালান চাপার সময় নেটওয়ার্ক যেমন ছিল তার বর্ণনা দেয়।</li><li>লেখায় বেশি ও কম অভিধান ক্রম ব্যবহার করে, সংখ্যা সাংখ্যিক ক্রমে: Net1-এ <code>Junction.ID above \'20\'</code> সংযোগস্থল 21, 22, 23, 31 ও 32 খুঁজে পায়।</li><li>সবকিছু বেছে নিলে শুধু ID, বিবরণ, ট্যাগ ও সংযোগ দেওয়া হয়। একটি উপাদানের পূর্ণ বৈশিষ্ট্য তালিকা দেখতে কী অনুসন্ধান করবেন তালিকায় একটি উপাদানের ধরন বেছে নিন।</li><li>একটি টেক্সট আইটেমের ID নেই। এটি তার শব্দ দিয়ে অনুসন্ধান করুন, যেমন <code>Text.Text contains \'pump\'</code>।</li><li>একটি নোডের সংযোগের চারটি শর্ত হলো নোডে কোনো লিংক নেই, নোডে কোনো খোলা লিংক নেই, উৎস পর্যন্ত কোনো লিংক পথ নেই এবং উৎস পর্যন্ত কোনো খোলা পথ নেই। উৎস হলো একটি জলাধার বা ট্যাংক।</li></ul>';
 $ec_lang['lpn_guide_using_heading']='নির্দেশিকা ব্যবহার';
 $ec_lang['lpn_guide_keys_term']='নির্দেশিকার কীবোর্ড শর্টকাট';
-$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>পয়েন্টারের নিচের বা ফোকাসযুক্ত নিয়ন্ত্রণের জন্য নির্দেশিকা খুলুন।</td></tr><tr><td>F1</td><td>ফোকাসযুক্ত বাক্সের এন্ট্রিতে নির্দেশিকা খুলুন।</td></tr><tr><td>Ctrl+K</td><td>নির্বাচিত টেক্সটসহ অনুসন্ধান ক্ষেত্রে নির্দেশিকা খুলুন।</td></tr><tr><td>/</td><td>নির্দেশিকায় ফোকাস থাকলে অনুসন্ধান ক্ষেত্র নির্বাচন করুন।</td></tr><tr><td>Esc</td><td>নির্দেশিকা বন্ধ করুন এবং যেখানে ছিলেন সেখানে ফিরে যান।</td></tr></tbody></table>';
+$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>পয়েন্টারের নিচের বা ফোকাসযুক্ত নিয়ন্ত্রণের জন্য নির্দেশিকা খুলুন।</td></tr><tr><td>F1</td><td>ফোকাসযুক্ত বাক্সের এন্ট্রিতে নির্দেশিকা খুলুন।</td></tr><tr><td>Ctrl+K</td><td>নির্বাচিত লেখাসহ অনুসন্ধান ক্ষেত্রে নির্দেশিকা খুলুন।</td></tr><tr><td>/</td><td>নির্দেশিকায় ফোকাস থাকলে অনুসন্ধান ক্ষেত্র নির্বাচন করুন।</td></tr><tr><td>Esc</td><td>নির্দেশিকা বন্ধ করুন এবং যেখানে ছিলেন সেখানে ফিরে যান।</td></tr></tbody></table>';
 $ec_lang['lpn_guide_also']='{menu}-এ আরও';
 $ec_lang['lpn_guide_how_popup']='আপনি কোনো উপাদান বা টেক্সট নির্বাচন করলে বৈশিষ্ট্য খোলে।';
 $ec_lang['lpn_guide_how_alt']='সাধারণ মোড বন্ধ থাকলে বিকল্পগুলোর প্রিভিউ পানি, দৃশ্যকল্প-এর অধীনে তালিকাভুক্ত থাকে।';
@@ -4330,7 +4330,7 @@ $ec_lang['lpn_msglog_hidden']='লুকানো';
 $ec_lang['lpn_msglog_unhide']='দেখান';
 $ec_lang['lpn_status_hidden_tip']='লুকানো বার্তাটি আবার মানচিত্রে দেখান।';
 $ec_lang['lpn_result_depth']='গভীরতা';
-$ec_lang['lpn_result_depth_tip']='দেখানো সময়ে ট্যাংকের পানির গভীরতা, ট্যাংকের তলা থেকে ওপরের দিকে পরিমাপ করা: জলশীর্ষ বিয়োগ ট্যাংকের উচ্চতা।';
+$ec_lang['lpn_result_depth_tip']='দেখানো সময়ে ট্যাংকের পানির গভীরতা, ট্যাংকের তলা থেকে ওপরের দিকে পরিমাপ করা: হেড বিয়োগ ট্যাংকের উচ্চতা।';
 $ec_lang['lpn_result_tank_volume']='ব্যবহারযোগ্য আয়তন';
 $ec_lang['lpn_result_tank_volume_tip']='সর্বনিম্ন পানির গভীরতার ওপরের পানির আয়তন, তাই সেই গভীরতায় এটি শূন্য। EPANET ট্যাংক আয়তনে সর্বনিম্ন পানির গভীরতার নিচের পানিও থাকে, যা এখনও মিশ্রণ ও পানির বয়সে গণনা হয়, তাই ট্যাংকের উচ্চতা ট্যাংকের তলায় থাকে।';
 $ec_lang['lpn_pane_copy_heads']='কলামের শিরোনামসহ কপি করুন';
@@ -4353,7 +4353,7 @@ $ec_lang['lpn_dxf_note_grid']='স্থানাঙ্ক: এই প্রক�
 $ec_lang['lpn_dxf_note_crs']='স্থানাঙ্ক: {crs}, এই প্রকল্প যেভাবে উল্লেখ করেছে হুবহু সেভাবে।';
 $ec_lang['lpn_dxf_note_geo']='স্থানাঙ্ক: {crs}, মিটারে, অক্ষাংশ ও দ্রাঘিমাংশে নয়। প্রকল্পের অক্ষাংশ ও দ্রাঘিমাংশ সেই গ্রিডে রূপান্তর করা হয়েছে।';
 $ec_lang['lpn_dxf_exported_geo']='{file} এক্সপোর্ট করা হয়েছে। এর স্থানাঙ্ক {crs}, মিটারে, অক্ষাংশ ও দ্রাঘিমাংশে নয়।';
-$ec_lang['lpn_dxf_note_blocks']='লেয়ারের নাম {prefix}, উপাদানের কোড, একটি হাইফেন এবং বিকল্প নিয়ে গঠিত, যেমন {example}। প্রতিটি উপাদান স্কেল 1-এ বসানো একটি ব্লক, যার অ্যাট্রিবিউটের উচ্চতা 1 একক; টেক্সটের উচ্চতা ঠিক করতে ব্লকগুলো স্কেল করুন। প্রতিটি অ্যাট্রিবিউট দৃশ্যমান; একটি উপাদানের অ্যাট্রিবিউটগুলো তার প্রতীকের পাশে একটি কলামে সাজানো থাকে।';
+$ec_lang['lpn_dxf_note_blocks']='লেয়ারের নাম {prefix}, উপাদানের কোড, একটি হাইফেন এবং বিকল্প নিয়ে গঠিত, যেমন {example}। প্রতিটি উপাদান স্কেল 1-এ বসানো একটি ব্লক, যার অ্যাট্রিবিউটের উচ্চতা 1 একক; লেখার উচ্চতা ঠিক করতে ব্লকগুলো স্কেল করুন। প্রতিটি অ্যাট্রিবিউট দৃশ্যমান; একটি উপাদানের অ্যাট্রিবিউটগুলো তার প্রতীকের পাশে একটি কলামে সাজানো থাকে।';
 $ec_lang['lpn_dxf_note_shortened']='{n}টি মান DXF ফাইলের অনুমোদিত দৈর্ঘ্যের ({max} অক্ষর) চেয়ে লম্বা ছিল, তাই প্রতিটি ছোট করা হয়েছে এবং তিনটি বিন্দুতে শেষ হয়।';
 $ec_lang['lpn_dxf_note_categories']='{n}টি সংযোগস্থলে একাধিক চাহিদা শ্রেণি আছে। তাদের {tag} অ্যাট্রিবিউটে সব শ্রেণির মূল চাহিদার যোগফল থাকে।';
 $ec_lang['lpn_file_export_item_workspace']='ওয়ার্কস্পেস…';
