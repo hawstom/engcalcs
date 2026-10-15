@@ -4315,7 +4315,7 @@ var EngCalcs = EngCalcs || {};
 		// override above, so a length the user typed in this scenario still wins; and gated on an
 		// END having moved, so the ordinary case is two hash lookups and no polyline walk.
 		if (prop === 'length' && el.lenAuto && !inBaseScenario() && linkEndIsMoved(el)) {
-			return linkGeomLength(el);
+			return linkAutoLength(el);
 		}
 		if (LPN_TYPE_PROP_SET[prop]) {
 			tid = (ov && Object.prototype.hasOwnProperty.call(ov, 'typeId')) ? ov.typeId : el._typeId;
@@ -7838,8 +7838,11 @@ var EngCalcs = EngCalcs || {};
 	// 40 degrees. So each vertex is taken back to longitude and latitude (drawLonLat(), the closed
 	// form in js/lpn-crs.js) and the polyline is measured with the same geodesicPolylineMeters()
 	// as a lat/lon project, never hypot() on the plane.
-	function linkGeomLength(l) {
-		var pts = linkPointList(l), ll, bad = false;
+	// `pts` is optional: linkAutoLength() passes Base's own points so a length written to Base is
+	// measured on Base's drawing even while a scenario that moved an end is showing.
+	function linkGeomLength(l, pts) {
+		var ll, bad = false;
+		pts = pts || linkPointList(l);
 		if (isWebMercProject()) {
 			ll = pts.map(function (p) {
 				var q = drawLonLat(p.x, p.y);
@@ -7852,6 +7855,107 @@ var EngCalcs = EngCalcs || {};
 		return Geom.geodesicPolylineMeters(pts.map(function (p) {
 			return { x: outwardX(p.x), y: outwardY(p.y) };
 		})) * unitFactor('lpn_u_length');
+	}
+
+	// Base's drawing of a link, ignoring any position the showing scenario has moved an end to.
+	function linkBasePointList(l) {
+		var a = nodeById(l.from), b = nodeById(l.to);
+		return [a ? { x: a.x, y: a.y } : a].concat(l.verts, [b ? { x: b.x, y: b.y } : b]);
+	}
+	// **THE ELEVATION A PIPE MEETS AT ONE END** (Task 643), in the Elevation/Head unit, or null
+	// where the node states none. It is the elevation the hydraulics stand on at that node:
+	// - a junction: its elevation.
+	// - a tank: its BASE (`bottomElev`, EPANET's [TANKS] Elevation; Task 787), not the ground under
+	//   it. Water leaves and enters a tank at the vessel, so on an elevated tank the riser up to the
+	//   base is real pipe; a blank base is at the ground, the rule tankBottom() already states.
+	// - a reservoir: its stated elevation (the ground), never its head. A head is a water surface,
+	//   which no pipe runs to, and a reservoir imported from an .inp states a head and no elevation
+	//   (Task 390), so that end gives null and the pipe is measured level at that end.
+	function linkEndElev(n) {
+		if (!n) { return null; }
+		if (n.type === 'tank' && typeof n.bottomElev === 'number' && isFinite(n.bottomElev)) { return n.bottomElev; }
+		return (typeof n.elev === 'number' && isFinite(n.elev)) ? n.elev : null;
+	}
+	// **AN AUTOMATIC LENGTH IS THE SLOPE DISTANCE** (Task 643; Tom, 2026-10-14: *"Let's go ahead and
+	// use slope distance for our calculations in case it's significant which occasionally will be
+	// true."*). The horizontal length along the drawn polyline (linkGeomLength(), geodesic where the
+	// project is geographic) is combined with the rise between the two end elevations. A vertex
+	// carries no elevation, so the rise is shared along the polyline in proportion to each leg's
+	// horizontal length; every leg then has the same grade, and the legs sum to exactly
+	// sqrt(Lh^2 + dz^2) -- which is therefore computed directly. Where either end states no
+	// elevation the length is the horizontal one. The rise crosses from the Elevation/Head unit
+	// into the length unit, a conversion of a DERIVED value, never of a number anybody typed.
+	// `base` measures Base's own drawing, which is what every write of `_length` wants.
+	function linkAutoLength(l, base) {
+		var h = linkGeomLength(l, base ? linkBasePointList(l) : undefined),
+			za = linkEndElev(nodeById(l.from)), zb = linkEndElev(nodeById(l.to)), dz;
+		if (za === null || zb === null || !isFinite(h)) { return h; }
+		dz = toDisplay(toSI(zb - za, 'lpn_u_elevhead'), 'lpn_u_length');
+		return (dz && isFinite(dz)) ? Math.sqrt(h * h + dz * dz) : h;
+	}
+	// The rise between a link's two ends, in the LENGTH unit, given its two end elevations and the
+	// ratio (length factor / elevation factor) that carries one unit into the other; 0 where either
+	// end states no elevation.
+	function autoLenRise(za, zb, ratio) {
+		return (za === null || zb === null) ? 0 : (zb - za) * ratio;
+	}
+	function autoLenRatio() { return unitFactor('lpn_u_length') / unitFactor('lpn_u_elevhead'); }
+	// **EVERY AUTOMATIC LENGTH FOLLOWS ITS END ELEVATIONS, WHOEVER WROTE THEM** (Task 643). An
+	// elevation is written from the Properties box, the Tables pane, Find and replace, the Settings
+	// push, a paste, a terrain fill, a type change, a survey import and a unit switch -- and a pipe's
+	// length depends on two of them. Rather than trust every one of those doors to remember the
+	// pipes beside it, this sweep runs where every edit already passes: scheduleSolve(),
+	// assembleModel() and buildDom(). It compares two elevations and the unit ratio per Auto link
+	// against what it last saw, so it costs a lookup per pipe and touches only a pipe whose end
+	// elevation (or the vertical or horizontal unit) has actually moved.
+	//
+	// **ONLY THE VERTICAL PART IS REPLACED; THE HORIZONTAL PART STORED IN `_length` IS KEPT.** The
+	// drawn length is re-measured where the drawing changes (updateLinkGeometry()), never here, so
+	// an elevation edit cannot re-measure a pipe nobody reshaped -- a placed project keeps the grid
+	// lengths it was placed with, exactly as before this task. The horizontal part is what is left
+	// of the stored length once the rise it was last measured with is taken out of it.
+	//
+	// **A DIFFERENT DOCUMENT IS SEEN, NEVER ADJUSTED.** Opening a file, switching projects and undo
+	// all hand over a whole document whose lengths already agree with its elevations (an older file
+	// is brought up to slope distance once, by the v12 -> v13 migration), so the first look at one
+	// only records what it holds. Always Base, because `_length` is Base's.
+	var autoLenSeen = {}, autoLenDoc = null;
+	function noteAutoLength(l) {
+		autoLenSeen[l.id] = { za: linkEndElev(nodeById(l.from)), zb: linkEndElev(nodeById(l.to)), r: autoLenRatio(), len: l._length };
+	}
+	function syncAutoLengths() {
+		var changed = [], ratio = autoLenRatio(), fresh = doc !== autoLenDoc, i, l, c, za, zb, h2, dz, v;
+		if (fresh) { autoLenSeen = {}; autoLenDoc = doc; }
+		for (i = 0; i < doc.links.length; i++) {
+			l = doc.links[i];
+			if (!l.lenAuto) { continue; }
+			za = linkEndElev(nodeById(l.from)); zb = linkEndElev(nodeById(l.to));
+			c = autoLenSeen[l.id];
+			autoLenSeen[l.id] = { za: za, zb: zb, r: ratio, len: l._length };
+			// A length somebody else has written since the last look -- a new link, a reshaped one,
+			// Auto ticked again -- was measured whole with the elevations of its moment, so it is
+			// recorded, not adjusted.
+			if (!c || c.len !== l._length || (c.za === za && c.zb === zb && c.r === ratio)) { continue; }
+			if (typeof l._length !== 'number' || !isFinite(l._length)) { continue; }
+			dz = autoLenRise(c.za, c.zb, c.r);
+			h2 = Math.max(0, l._length * l._length - dz * dz);
+			dz = autoLenRise(za, zb, ratio);
+			v = Math.sqrt(h2 + dz * dz);
+			if (isFinite(v) && Math.abs(v - l._length) > 1e-9 * Math.max(1, Math.abs(l._length))) {
+				l._length = v;   // base-write: an Auto length follows Base's elevations, which every scenario shares
+				autoLenSeen[l.id].len = v;
+				changed.push(l);
+			}
+		}
+		return changed;
+	}
+	// The sweep, plus what an edit owes the screen: each changed pipe's own label and the Tables
+	// pane, and never a network-wide label pass (CLAUDE.md, Recalculate OFF).
+	function syncAutoLengthsShown() {
+		var changed = syncAutoLengths();
+		if (!changed.length) { return; }
+		changed.forEach(function (l) { if (linkEls[l.id]) { refreshOneLabelInPlace(l); } });
+		refreshPaneIfOpen();
 	}
 
 	// ---- one-time DOM build per element + incremental per-frame updates ----
@@ -12441,6 +12545,10 @@ var EngCalcs = EngCalcs || {};
 		buildAllShapeEls();
 		// A wholesale rebuild is a new drawing as far as the symbol cap knows (Task 705).
 		invalidateLinkLengths();
+		// And every Auto length follows its end elevations (Task 643): a terrain fill arrives here
+		// with new elevations on the same document; an opened file, an undo and a project switch
+		// arrive with a new one, which is only recorded.
+		syncAutoLengths();
 		nodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};
 		labelsByLinkAnchor = {};
 		// **ONE CANVAS MEASUREMENT AND ONE SEGMENT INDEX FOR THE WHOLE REBUILD** (Task 680, and it
@@ -12537,7 +12645,7 @@ var EngCalcs = EngCalcs || {};
 		// scenario's length into Base under every other scenario at once. That is defect 2 of
 		// dev/scenario-seam-repair.md, against this same line, arriving by a new door. In a scenario
 		// the auto length is DERIVED instead and stored nowhere: see effective()'s `length` fork.
-		if (l.lenAuto && inBaseScenario()) { l._length = linkGeomLength(l); }   // base-write: in Base the drawing IS the document
+		if (l.lenAuto && inBaseScenario()) { l._length = linkAutoLength(l); noteAutoLength(l); }   // base-write: in Base the drawing IS the document
 		updateArrow(id);
 		positionPumpSymbol(id);
 	}
@@ -33396,7 +33504,7 @@ var EngCalcs = EngCalcs || {};
 			_roughness: settings.defaults.roughness, _length: 0, lenAuto: true, _status: 'open',
 			_k: settings.defaults.k // pump ignores k -- only the pipe friction branch reads it
 		};
-		l._length = linkGeomLength(l);   // base-write: construction: a link is born in Base before any scenario can override it
+		l._length = linkAutoLength(l, true);   // base-write: construction: a link is born in Base before any scenario can override it
 		if (type === 'valve') {
 			// A VALVE IS A ZERO-LENGTH LINK, exactly rather than a small number standing in for one:
 			// EngCalcs.lpnResistance returns r = 0, so the friction term vanishes and what is left is
@@ -34185,7 +34293,7 @@ var EngCalcs = EngCalcs || {};
 		// pump the New assets diameter, so a converted pump gets the same.
 		if (type === 'pump') { return { _diameter: settings.defaults.diameter }; }
 		return { _diameter: settings.defaults.diameter, _roughness: settings.defaults.roughness,
-			lenAuto: true, _length: linkGeomLength(l), _k: settings.defaults.k };
+			lenAuto: true, _length: linkAutoLength(l, true), _k: settings.defaults.k };
 	}
 	// Is this row discarded by changing `l` to `to`? The node rule, on a {type, valveType} pair.
 	function linkChangeDrops(spec, from, to) {
@@ -34837,7 +34945,11 @@ var EngCalcs = EngCalcs || {};
 	// hydraulics stand. Every v11 tank's `elev` WAS its base, so migrateTankBottoms() copies it into
 	// `bottomElev` and leaves the ground at the same number: nothing moves, hydraulically or on
 	// screen. The stamp is also the guard -- an older page would read the ground as the base.
-	var LPN_STORAGE_VERSION = 12;
+	// 13 (Task 643; Tom, 2026-10-14): an AUTOMATIC length is the SLOPE distance -- the drawn,
+	// horizontal length combined with the rise between the pipe's end elevations. Every v12 Auto
+	// length was horizontal, so migrateSlopeLengths() adds the rise once on open. The stamp is also
+	// the guard -- an older page would re-measure the length level on the first edit.
+	var LPN_STORAGE_VERSION = 13;
 	// ---- ROADMAP Task 274, second half ----
 	//
 	// From v4 the FILE stores Cartesian Y (up is positive), matching what the user sees and what
@@ -36206,6 +36318,25 @@ var EngCalcs = EngCalcs || {};
 			if (n.tok && typeof n.tok.elev === 'string') { n.tok.bottomElev = n.tok.elev; }
 		});
 	}
+	// **v12 -> v13: AN AUTOMATIC LENGTH BECOMES THE SLOPE DISTANCE** (Task 643). Every Auto length
+	// in an older document is a horizontal one, so the rise between its two end elevations is
+	// added to it once, here: sqrt(L^2 + dz^2), keeping the stored horizontal length exactly as it
+	// was rather than re-measuring the drawing. The rise crosses from the document's own
+	// Elevation/Head unit into its own length unit, read off the document and never off the page,
+	// which may still be showing the project before it. A typed length (Auto off) is the user's
+	// number and is not touched; neither is a scenario's typed override.
+	function migrateSlopeLengths(saved) {
+		var units = saved.units || {}, byId = {}, fL, fE;
+		fL = units.lpn_u_length ? EngCalcs.unitFactor(units.lpn_u_length) : unitFactor('lpn_u_length');
+		fE = units.lpn_u_elevhead ? EngCalcs.unitFactor(units.lpn_u_elevhead) : unitFactor('lpn_u_elevhead');
+		(saved.nodes || []).forEach(function (n) { if (n && n.id !== undefined) { byId[n.id] = n; } });
+		(saved.links || []).forEach(function (l) {
+			var dz;
+			if (!l || !l.lenAuto || typeof l._length !== 'number' || !isFinite(l._length)) { return; }
+			dz = autoLenRise(linkEndElev(byId[l.from]), linkEndElev(byId[l.to]), fL / fE);
+			if (dz && isFinite(dz)) { l._length = Math.sqrt(l._length * l._length + dz * dz); }   // base-write: migration of a saved document, before any scenario is showing
+		});
+	}
 	function migrateSaved(saved) {
 		// RUN ON EVERY DOCUMENT, NOT ONLY AS THE v7 -> v8 STEP, and v2 is the whole reason. A v2
 		// document deliberately lags at v2 until the user answers its units question, so it reaches
@@ -36400,6 +36531,15 @@ var EngCalcs = EngCalcs || {};
 		if (saved.v === 2 || saved.v === 11) {
 			migrateTankBottoms(saved);
 			if (saved.v === 11) { saved.v = 12; }
+		}
+		// ---- v12 -> v13: AN AUTOMATIC LENGTH IS THE SLOPE DISTANCE (Task 643) ---------------------
+		// See migrateSlopeLengths(). A LAGGING v2 DOCUMENT is left alone: its units are the question
+		// still open, so the rise has no unit to cross from. Answering stamps it current without
+		// this step, so its Auto lengths take the slope as each one is reshaped or as an end
+		// elevation is edited.
+		if (saved.v === 12) {
+			migrateSlopeLengths(saved);
+			saved.v = 13;
 		}
 		// **There is deliberately NO v2 -> v3 step here, and v2 is the ONLY version that lags.**
 		// Every other migration converts and stamps; this one cannot, because the conversion is the
@@ -60793,14 +60933,14 @@ var EngCalcs = EngCalcs || {};
 			// so "follow the drawing" is a statement about the drawing, which every scenario shares.
 			// `lenAuto` itself is that same kind of flag and is deliberately not overridable.
 			if (l.lenAuto) {
-				l._length = linkGeomLength(l);   // base-write: Auto reverts to the drawing, which every scenario shares; the override is cleared on the next line
+				l._length = linkAutoLength(l, true);   // base-write: Auto reverts to the drawing, which every scenario shares; the override is cleared on the next line
 				if (!inBaseScenario()) { clearOverride(l, 'length'); }
 				input.value = effective(l, 'length').toFixed(2);
 				refreshPopupIfOpen();
 			}
 			scheduleSolve();
 		});
-		setFieldLabel(label, (pc.lpn_field_length || 'Length') + ' (' + unitLabel('lpn_u_length') + ')');
+		setFieldLabel(label, (pc.lpn_field_length || 'Length') + ' (' + unitLabel('lpn_u_length') + ')', pc.lpn_field_length_slope_tip);
 		label.appendChild(input);
 		valueWarnPaint(label, valueWarnText('length', l, effective(l, 'length')));   // dev/value-warning.md
 		autoLabel.appendChild(auto);
@@ -65078,6 +65218,7 @@ var EngCalcs = EngCalcs || {};
 	// `keepDisconnected` is for the one reader that asks WHICH nodes have no path to a source (Find's
 	// Connectivity): it must see the whole network, not the one the solver is handed.
 	function assembleModel(keepDisconnected) {
+		syncAutoLengths();   // Task 643: no solve reads an Auto length its end elevations have left behind
 		var live = {};
 		doc.nodes.forEach(function (n) { if (isActive(n)) { live[n.id] = true; } });
 		var nodes = doc.nodes.filter(isActive).map(function (n) {
@@ -71863,6 +72004,9 @@ var EngCalcs = EngCalcs || {};
 		// scheduleArrivalSolve() and the project-open path, neither of which is an edit.
 		if (solveTimer) { clearTimeout(solveTimer); }
 		solveTimer = null;
+		// An end elevation may have moved under an Auto length (Task 643): measured before the gate
+		// below, because a length is an input the Tables pane shows, not an answer.
+		syncAutoLengthsShown();
 		// **OFF MEANS OFF** (Tom, 2026-09-19: *"With recalculate off and no zooms happening, there
 		// should be nothing happening when I change inputs. It should be lightning fast."*).
 		//

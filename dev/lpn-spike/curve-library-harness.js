@@ -31,6 +31,7 @@ const L = loadLoopedNetwork(
 	"\t\tdocFromInp: docFromInp, inpUnitSelections: inpUnitSelections,\n" +
 	"\t\tapplyUnitSelections: applyUnitSelections, seedDefaultInputs: seedDefaultInputs,\n" +
 	"\t\tserializeProject: serializeProject, applySaved: applySaved, migrateSaved: migrateSaved,\n" +
+	"\t\tstorageVersion: LPN_STORAGE_VERSION,\n" +
 	"\t\tmintCurveLibrary: mintCurveLibrary, assembleModel: assembleModel,\n" +
 	"\t\tlibPasteCells: libPasteCells, libPasteIsGrid: libPasteIsGrid,\n" +
 	"\t\tlibMergePaste: libMergePaste, libGridPoints: libGridPoints,\n" +
@@ -197,7 +198,7 @@ const FIVE = [
 	const near = (a, b) => Math.abs(a - b) <= 1e-12 * Math.max(1, Math.abs(b));
 
 	const migrated = L.migrateSaved(JSON.parse(JSON.stringify(v10)));
-	check(migrated.v === 12, `the project is stamped v12 (the current version): ${migrated.v}`);
+	check(migrated.v === L.storageVersion && migrated.v >= 12, `the project is stamped the current version (v12 or later): ${migrated.v}`);
 	L.applySaved(migrated);
 	const mDoc = L.getDoc();
 	check((mDoc.curves || []).length === 2,

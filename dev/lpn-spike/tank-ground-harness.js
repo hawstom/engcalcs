@@ -189,7 +189,7 @@ function tokens(text, section) {
 		ok(f + ' is an old project (v' + raw.v + ') with tanks and no base field',
 			raw.v < 12 && Object.keys(oldTanks).length > 0 && Object.values(oldTanks).every((n) => !('bottomElev' in n)));
 		const migrated = L.migrateSaved(raw);
-		ok(f + ' migrates to v' + L.storageVersion, migrated.v === L.storageVersion && L.storageVersion === 12, String(migrated.v));
+		ok(f + ' migrates to v' + L.storageVersion, migrated.v === L.storageVersion && L.storageVersion >= 12, String(migrated.v));
 		L.applySaved(migrated);
 		Object.keys(oldTanks).forEach((id) => {
 			const o = oldTanks[id], n = tankOf(id), lvl = o._level || 0;
@@ -205,7 +205,7 @@ function tokens(text, section) {
 			}
 		});
 		const again = L.serializeProject();
-		ok(f + ' saves back as v12 carrying the base', again.v === 12 &&
+		ok(f + ' saves back as the current version carrying the base', again.v === L.storageVersion &&
 			again.nodes.filter((n) => n.type === 'tank').every((n) => typeof n.bottomElev === 'number'));
 		// Typing the real ground under an old raised tank must not drag the tank down with it.
 		const id0 = Object.keys(oldTanks)[0], n0 = tankOf(id0), h0 = L.nodeFixedHead(n0);

@@ -331,7 +331,11 @@ Rules, stated as rules because each is silently wrong when broken:
   from the Phase 0 spike was a two-level control, not a single toggle. Per-link, in the Pipe
   property popup: an Auto/manual switch for *this* link only — **done**: the Length field pairs
   with an Auto checkbox; typing a value clears it (manual override), re-checking it snaps back to
-  the live geometric distance (`linkGeomLength()` in `js/looped-network.js`). **Still not built**:
+  the live geometric distance (`linkAutoLength()` in `js/looped-network.js`). **That distance is the
+  slope distance** (Task 643, Tom 2026-10-14): the drawn horizontal length combined with the rise
+  between the end elevations (a tank's base, a reservoir's stated elevation), sqrt(Lh^2 + dz^2).
+  An end elevation edit replaces only the vertical part; the drawing is re-measured only when it
+  changes. **Still not built**:
   the suite-wide half, in the gear/settings panel — a default for new links (auto by default) plus
   bulk operations over existing links, "force all to auto," and some release/disconnect verb for
   the opposite (Tom's own words: "orphan/freeze/disconnect/release all auto lengths") for taking a

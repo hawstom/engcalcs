@@ -2834,6 +2834,7 @@ EngCalcs.pageConfig = {
 	// of these tables now reads from (Task 500). The KEYS here are the pageConfig contract.
 	lpn_roughness_urls: <?=json_encode(ecRefRoughnessUrls())?>,
 	lpn_field_length: <?=json_encode($ec_lang['lpn_field_length'])?>,
+	lpn_field_length_slope_tip: <?=json_encode($ec_lang['lpn_field_length_slope_tip'])?>,
 	lpn_field_from: <?=json_encode($ec_lang['lpn_field_from'])?>,
 	lpn_link_end_unknown: <?=json_encode($ec_lang['lpn_link_end_unknown'])?>,
 	lpn_link_end_same: <?=json_encode($ec_lang['lpn_link_end_same'])?>,
