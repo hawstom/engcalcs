@@ -259,8 +259,10 @@ async function reachSection() {
 	L.buildLayers();
 	openExample(L, 'us');
 
+	// Accuracy 1e-5 is STATED: these assertions are about Trials and If unbalanced, and were
+	// measured at the 1e-5 an empty Accuracy meant before R-388 made it EPANET's own 0.001.
 	async function solveWith(h) {
-		L.getSettings().hydraulics = h;
+		L.getSettings().hydraulics = Object.assign({ accuracy: 1e-5 }, h);
 		EngCalcs.lpnEpanetReset();
 		return EngCalcs.lpnSolveEpanet(L.assembleModel(), { moduleUrl: ENGINE });
 	}
