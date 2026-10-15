@@ -1858,6 +1858,8 @@
         "lpn_settings_readability_bias": "Label flip angle adjustment (degrees)",
         "lpn_settings_readability_bias_tip": "Flip a label to keep it right side up when it leans more than this many degrees left of vertical.",
         "lpn_settings_mask_labels": "Solid background behind labels",
+        "lpn_settings_text_halo": "Text halo width (percent of text size)",
+        "lpn_settings_text_halo_tip": "Width of the solid outline behind map text, as a percent of the text size. Applies when Solid background behind labels is on.",
         "lpn_settings_leader_snap": "Snap leader lines to set angles",
         "lpn_settings_label_max_width": "Show labels when zoomed to this map width or less",
         "lpn_settings_label_max_width_tip": "Labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Enter 0 to never draw a label, at any zoom.",
@@ -2634,7 +2636,7 @@
         "lpn_snip_tip_copy": "Copy (Ctrl+C)",
         "lpn_screenshot_scale_tip": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
     },
-    "count": 2632,
+    "count": 2634,
     "active_prefixes": [
         "about",
         "bpn",

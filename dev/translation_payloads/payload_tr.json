@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "tr",
-        "expected_key_count": 2632,
-        "delta_key_count": 8,
+        "expected_key_count": 2634,
+        "delta_key_count": 10,
         "exempt_key_count": 32,
         "exempt_keys": [
             "calc_units_us",
@@ -718,6 +718,8 @@
         "lpn_inp_drop_comments": "These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.",
         "lpn_field_length_slope_tip": "Pipe length. When Auto is checked, the length is measured along the slope: the drawn length combined with the difference in elevation between the two end nodes.",
         "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why.",
+        "lpn_settings_text_halo": "Text halo width (percent of text size)",
+        "lpn_settings_text_halo_tip": "Width of the solid outline behind map text, as a percent of the text size. Applies when Solid background behind labels is on.",
         "lpn_snip_tip_copy": "Copy (Ctrl+C)"
     },
     "keys": {
@@ -728,6 +730,8 @@
         "lpn_inp_drop_comments": "These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.",
         "lpn_field_length_slope_tip": "Pipe length. When Auto is checked, the length is measured along the slope: the drawn length combined with the difference in elevation between the two end nodes.",
         "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why.",
+        "lpn_settings_text_halo": "Text halo width (percent of text size)",
+        "lpn_settings_text_halo_tip": "Width of the solid outline behind map text, as a percent of the text size. Applies when Solid background behind labels is on.",
         "lpn_snip_tip_copy": "Copy (Ctrl+C)"
     },
     "key_context": {
@@ -840,6 +844,38 @@
                     "key": "lpn_time_run_fell_back",
                     "value": "Ekrandaki sayılar bunun yerine yerleşik çözücüden geldi. Bu çözücü bir seferde tek bir anı hesaplar, bu yüzden bu, yalnızca {time} anındaki şebekedir; her depo hâlâ başlangıç seviyesindedir.",
                     "english": "The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level."
+                }
+            }
+        },
+        "lpn_settings_text_halo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_mask_labels",
+                    "value": "Etiketlerin arkasında dolgu arka plan",
+                    "english": "Solid background behind labels"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_leader_snap",
+                    "value": "Bağlantı çizgilerini belirli açılara yasla",
+                    "english": "Snap leader lines to set angles"
+                }
+            }
+        },
+        "lpn_settings_text_halo_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_mask_labels",
+                    "value": "Etiketlerin arkasında dolgu arka plan",
+                    "english": "Solid background behind labels"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_leader_snap",
+                    "value": "Bağlantı çizgilerini belirli açılara yasla",
+                    "english": "Snap leader lines to set angles"
                 }
             }
         },
