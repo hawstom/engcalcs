@@ -108,7 +108,7 @@ console.log('--- 2. detaching ---');
 	(function walk(e) {
 		if (input) { return; }
 		if (e._tag === 'label' && (e.textContent || '').indexOf(global.EngCalcs.pageConfig.lpn_field_text_attached) >= 0) {
-			(e.children || []).forEach(function (c) { if (c.type === 'text') { input = c; } });
+			(e.children || []).forEach(function (c) { if (c.type === 'text' || c._tag === 'textarea') { input = c; } });
 		}
 		(e.children || []).forEach(walk);
 	})(L.popupFields());
@@ -139,7 +139,7 @@ console.log('--- 3. Description ---');
 	(function walk(e) {
 		if (input) { return; }
 		if (e._tag === 'label' && (e.textContent || '').indexOf(pc.lpn_field_desc) >= 0) {
-			(e.children || []).forEach(function (c) { if (c.type === 'text') { input = c; } });
+			(e.children || []).forEach(function (c) { if (c.type === 'text' || c._tag === 'textarea') { input = c; } });
 		}
 		(e.children || []).forEach(walk);
 	})(L.popupFields());

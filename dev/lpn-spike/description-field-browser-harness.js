@@ -84,7 +84,7 @@ async function main() {
 		const descSel = async () => page.evaluate((t) => {
 			const l = Array.from(document.querySelectorAll('#lpn_popup_fields label'))
 				.filter((l) => (l.textContent || '').trim().indexOf(t) === 0)[0];
-			const i = l && l.querySelector('input');
+			const i = l && l.querySelector('input, textarea');
 			if (!i) { return false; }
 			i.setAttribute('data-test-desc', '1');
 			return true;
@@ -93,20 +93,20 @@ async function main() {
 		const boxValue = () => page.evaluate((t) => {
 			const l = Array.from(document.querySelectorAll('#lpn_popup_fields label'))
 				.filter((l) => (l.textContent || '').trim().indexOf(t) === 0)[0];
-			const i = l && l.querySelector('input');
+			const i = l && l.querySelector('input, textarea');
 			return i ? i.value + (i === document.activeElement ? '' : '  [NOT FOCUSED]') : null;
 		}, descLabel);
 		// what Properties shows after a fresh render, and what the Tables pane shows, and what is saved
 		const propsFresh = () => page.evaluate((t) => {
 			const l = Array.from(document.querySelectorAll('#lpn_popup_fields label'))
 				.filter((l) => (l.textContent || '').trim().indexOf(t) === 0)[0];
-			return l ? l.querySelector('input').value : null;
+			return l ? l.querySelector('input, textarea').value : null;
 		}, descLabel);
 		const tableValue = () => page.evaluate(([kind, id]) => {
 			const tds = Array.from(document.querySelectorAll('#lpn_pane_' + kind + ' td.lpn-pane-col-desc'));
 			const td = tds.filter((t) => t._lpnPaneId === id)[0];
 			if (!td) { return null; }
-			const inp = td.querySelector('input');
+			const inp = td.querySelector('input, textarea');
 			return inp ? inp.value : td.textContent;
 		}, [paneKind, nodeId]);
 		const stored = () => page.evaluate((id) => {

@@ -41,10 +41,10 @@ function ok(label, cond, detail) {
 	console.log((cond ? '  ok   ' : '  FAIL ') + label + (detail === undefined ? '' : '   ' + detail));
 }
 
-// What the sheet holds, and what a Description keeps: lpnDescText() folds a line break to a space (a
-// description is one line, so the .inp can carry it), so the third cell reads back folded. A tab stays.
+// What the sheet holds, and what a Description keeps: a line break is kept (Task 806), so the third
+// cell reads back as sent. A tab stays.
 const SENT = ['Lot, "B" 7', 'a\tb', 'line1\nline2', '"quoted" start'];
-const WANT = ['Lot, "B" 7', 'a\tb', 'line1 line2', '"quoted" start'];
+const WANT = ['Lot, "B" 7', 'a\tb', 'line1\nline2', '"quoted" start'];
 const q = (s) => '"' + s.replace(/"/g, '""') + '"';
 const SHEET = SENT.map(q);
 // A cell with a tab, line break or quote is quoted; a space or comma alone is not a reason to.
@@ -84,7 +84,7 @@ async function main() {
 			for (let k = f; k < f + c; k++) {
 				const td = Array.from(document.querySelectorAll('#lpn_pane_' + t + ' table tbody tr:nth-child(' + k + ') td')).find((x) => x._lpnPaneKey === 'desc');
 				const i = td && td.querySelector('input, textarea');
-				out.push(i ? i.value : (td ? td.textContent : null));
+				out.push(i ? (i.title && i.classList.contains('lpn-pane-multi') ? i.title : i.value) : (td ? td.textContent : null));
 			}
 			return out;
 		}, [tab, from, count]);

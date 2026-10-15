@@ -11766,7 +11766,7 @@ var EngCalcs = EngCalcs || {};
 		// The two identity strings, printed as the words they are. An absent one prints NOTHING
 		// rather than an empty slot: a blank where a description would be is a separator with no
 		// value beside it, which reads as a defect on every unlabelled service in the drawing.
-		if (ls.customer.desc && c.desc) { lines.push(affix('customer', 'desc', { text: String(c.desc) })); }
+		if (ls.customer.desc && c.desc) { lines.push(affix('customer', 'desc', { text: descLabelText(c.desc) })); }
 		if (ls.customer.tag && c.tag) { lines.push(affix('customer', 'tag', { text: String(c.tag) })); }
 		if (ls.customer.count) {
 			lines.push(affix('customer', 'count', { text: String((typeof c.count === 'number' && isFinite(c.count) && c.count > 0) ? c.count : 1) }));
@@ -24199,7 +24199,7 @@ var EngCalcs = EngCalcs || {};
 	 * and no more; a tag is one token of somebody's asset register.
 	 */
 	function paneColDesc() {
-		return { key: 'desc', label: 'lpn_field_desc', str: true, em: 8,
+		return { key: 'desc', label: 'lpn_field_desc', str: true, multiline: true, em: 8,
 			get: function (el) { return el.desc || ''; },
 			set: function (el, v) {
 				var t = EngCalcs.lpnDescText ? EngCalcs.lpnDescText(v) : String(v || '').trim();
@@ -24676,7 +24676,7 @@ var EngCalcs = EngCalcs || {};
 			choices: function () {
 				var pc = EngCalcs.pageConfig || {},
 					out = [['', pc.lpn_pipetype_none || 'No pipe type chosen']];
-				libPipeTypesRead().forEach(function (t) { out.push([t.id, t.note ? (t.id + ' - ' + t.note) : t.id]); });
+				libPipeTypesRead().forEach(function (t) { out.push([t.id, t.note ? (t.id + ' - ' + EngCalcs.lpnDescOneLine(t.note)) : t.id]); });
 				return out;
 			},
 			get: function (l) { return effective(l, 'typeId') || ''; },
@@ -24687,7 +24687,7 @@ var EngCalcs = EngCalcs || {};
 			choices: function () {
 				var pc = EngCalcs.pageConfig || {},
 					out = [['', pc.lpn_fittings_none || 'No fittings list chosen']];
-				libFittingSetsRead().forEach(function (f) { out.push([f.id, f.note ? (f.id + ' - ' + f.note) : f.id]); });
+				libFittingSetsRead().forEach(function (f) { out.push([f.id, f.note ? (f.id + ' - ' + EngCalcs.lpnDescOneLine(f.note)) : f.id]); });
 				return out;
 			},
 			get: function (l) { return effective(l, 'fittingsId') || ''; },
@@ -24994,7 +24994,7 @@ var EngCalcs = EngCalcs || {};
 			// Written out here rather than borrowed because a customer's every write goes through
 			// `customerEdited()`, which redraws the symbol and re-solves, and neither borrowed cell
 			// knows that.
-			{ key: 'desc', label: 'lpn_field_desc', str: true, em: 8,
+			{ key: 'desc', label: 'lpn_field_desc', str: true, multiline: true, em: 8,
 				get: function (c) { return c.desc || ''; },
 				set: function (c, v) {
 					var t = EngCalcs.lpnDescText ? EngCalcs.lpnDescText(v) : String(v || '').trim();
@@ -25974,7 +25974,7 @@ var EngCalcs = EngCalcs || {};
 				if (!panePresent(v) || v === '') { continue; }
 				text = Object.prototype.hasOwnProperty.call(choiceMap, v) ? choiceMap[v] : String(v);
 			} else {
-				text = paneCellText(c, el);
+				text = paneCellInputText(c, el);
 			}
 			if (!text) { continue; }
 			best = Math.max(best, (c.choices && !plain) ? paneSelBoxEm(text)
@@ -26629,6 +26629,32 @@ var EngCalcs = EngCalcs || {};
 	// coordinates, whose axis follows the kind of project and is therefore a function (paneColCoord).
 	// One reader, so a cell edit, a paste and a multi-properties row cannot disagree about it.
 	function paneColProp(c) { return c.prop || (c.propFn ? c.propFn() : undefined); }
+	/**
+	 * **A MULTI-LINE CELL SHOWS ITS FIRST LINE AND CARRIES THE REST IN ITS TIP** (Task 806). A text
+	 * `<input>` cannot hold a line break (the browser deletes it from `.value`), so a Description of
+	 * several lines is shown as its first line, in italics, with the whole text in the tip. Typing in
+	 * it edits the FIRST line and keeps every line after it (paneCellTyped()); the whole text is
+	 * edited in Properties. A copy still carries the whole text, quoted (paneQuoteCell()).
+	 */
+	function paneCellInputText(c, el) {
+		var t = paneCellText(c, el);
+		return c.multiline ? EngCalcs.lpnDescFirstLine(t) : t;
+	}
+	function paneCellTip(input, c, el) {
+		var full;
+		if (!c.multiline) { return; }
+		full = paneCellText(c, el);
+		input.title = full.indexOf('\n') >= 0 ? full : '';
+		input.classList.toggle('lpn-pane-multi', full.indexOf('\n') >= 0);
+	}
+	function paneCellTyped(input, c, el) {
+		var full, first, typed = input.value;
+		if (!c.multiline) { return typed; }
+		full = paneCellText(c, el);
+		first = EngCalcs.lpnDescFirstLine(full);
+		if (typed === first) { return full; }
+		return typed.replace(/[\r\n]+/g, ' ') + full.slice(first.length);
+	}
 	function paneCellText(c, el) {
 		// **THE PER-ROW PLAIN WORD COMES FIRST**, because a column that is plain for THIS row is a
 		// column whose stored value is not the answer: see paneTextAttachedWord(). One function
@@ -27548,7 +27574,8 @@ var EngCalcs = EngCalcs || {};
 				// a flag alone would leave the browser still moving a caret underneath it.
 				input.readOnly = true;
 				paneApplyColWidth(input, c, spec);
-				input.value = paneCellText(c, el);
+				input.value = paneCellInputText(c, el);
+				paneCellTip(input, c, el);
 				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + paneRowLabel(el));
 				input._lpnCell = { spec: spec, c: c, el: el };
 				input.addEventListener('change', function () { paneCommitCell(input); });
@@ -27663,8 +27690,9 @@ var EngCalcs = EngCalcs || {};
 					// with the caret in it, which was the same thing when focus WAS editing; now a
 					// person can sit on a cell for a minute without typing, and a solve that
 					// refused to refresh it would leave one stale number in a live table.
-					text = paneCellText(c, el);
+					text = paneCellInputText(c, el);
 					if (target.value !== text) { target.value = text; }
+					paneCellTip(target, c, el);
 					if (c.cp) { customPropPaintFlag(target, c.cp, target.value); }
 				}
 				// After the write: a plain cell's textContent just took its children with it.
@@ -28225,7 +28253,7 @@ var EngCalcs = EngCalcs || {};
 	function paneCancelEdit(input) {
 		var ctx = input && input._lpnCell;
 		if (!ctx || !paneInEdit(input)) { return false; }
-		input.value = (input._lpnWas !== undefined) ? input._lpnWas : paneCellText(ctx.c, ctx.el);
+		input.value = (input._lpnWas !== undefined) ? input._lpnWas : paneCellInputText(ctx.c, ctx.el);
 		paneLeaveEdit(input);
 		return true;
 	}
@@ -28244,9 +28272,9 @@ var EngCalcs = EngCalcs || {};
 		if (!ctx) { return false; }
 		c = ctx.c; el = ctx.el;
 		// A checkbox cell carries its answer in `checked`; every other cell in its text.
-		p = paneParseCellText(c, (c.bool && input.type === 'checkbox') ? (input.checked ? '1' : '0') : input.value);
+		p = paneParseCellText(c, (c.bool && input.type === 'checkbox') ? (input.checked ? '1' : '0') : paneCellTyped(input, c, el));
 		if (!p.ok) {
-			input.value = paneCellText(c, el);
+			input.value = paneCellInputText(c, el);
 			paneLeaveEdit(input);
 			return false;
 		}
@@ -28289,7 +28317,8 @@ var EngCalcs = EngCalcs || {};
 		// location is snapped onto its own pipe. In both cases the document and the box would
 		// otherwise disagree until the next solve, with the box showing the version that was not
 		// kept -- which is the reading a person would act on.
-		if (c.reread) { input.value = paneCellText(c, el); paneApplyHint(input, c, el); }
+		if (c.reread) { input.value = paneCellInputText(c, el); paneApplyHint(input, c, el); }
+		paneCellTip(input, c, el);
 		// A Show scenarios row ends on its ELEMENT, redrawn for the scenario actually showing.
 		el = paneRowEl(el);
 		completeEdit(paneColProp(c) ? { el: el, prop: paneColProp(c) } : null);
@@ -57832,11 +57861,10 @@ var EngCalcs = EngCalcs || {};
 	function libDescField(get, set) {
 		var pc = EngCalcs.pageConfig || {},
 			field = libEl('label', 'lpn-lib-field lpn-lib-field-grow'),
-			desc = document.createElement('input'),
+			desc = descTextarea(),
 			word = pc.lpn_library_curve_note_label || 'Description';
 		field.appendChild(libEl('span', 'lpn-lib-fieldname', word));
-		desc.type = 'text';
-		desc.className = 'lpn-lib-wide lpn-lib-desc';
+		desc.className = 'lpn-lib-wide lpn-lib-desc lpn-desc-ta';
 		desc.value = get();
 		desc.setAttribute('aria-label', word);
 		desc.addEventListener('change', function () {
@@ -58712,7 +58740,7 @@ var EngCalcs = EngCalcs || {};
 			headRow = libEl('div', 'lpn-lib-head lpn-lib-row'),
 			propRow = libEl('div', 'lpn-lib-row'),
 			id = document.createElement('input'),
-			desc = document.createElement('input'),
+			desc = descTextarea(),
 			idField = libEl('label', 'lpn-lib-field'),
 			descField = libEl('label', 'lpn-lib-field lpn-lib-field-grow'),
 			users = pipeTypeUsers(t.id),
@@ -58736,12 +58764,11 @@ var EngCalcs = EngCalcs || {};
 		// is how such a table is keyed (dev/pipe-library-design.md §2).
 		descField.appendChild(libEl('span', 'lpn-lib-fieldname',
 			pc.lpn_library_curve_note_label || 'Description'));
-		desc.type = 'text';
-		desc.className = 'lpn-lib-wide';
+		desc.className = 'lpn-lib-wide lpn-desc-ta';
 		desc.value = t.note || '';
 		desc.setAttribute('aria-label', pc.lpn_library_curve_note_label || 'Description');
 		desc.addEventListener('change', function () {
-			var s = String(desc.value || '').trim();
+			var s = EngCalcs.lpnDescText(desc.value);
 			if (s === (t.note || '')) { return; }
 			saveUndoSnapshot();
 			if (s) { t.note = s; } else { delete t.note; }
@@ -58836,7 +58863,7 @@ var EngCalcs = EngCalcs || {};
 		libFittingSetsRead().forEach(function (f) {
 			var o = document.createElement('option');
 			o.value = f.id;
-			o.textContent = f.note ? (f.id + ' - ' + f.note) : f.id;
+			o.textContent = f.note ? (f.id + ' - ' + EngCalcs.lpnDescOneLine(f.note)) : f.id;
 			if (f.id === cur) { o.selected = true; found = true; }
 			sel.appendChild(o);
 		});
@@ -58974,7 +59001,7 @@ var EngCalcs = EngCalcs || {};
 			entry = libEl('div', 'lpn-lib-entry'),
 			headRow = libEl('div', 'lpn-lib-head lpn-lib-row'),
 			id = document.createElement('input'),
-			desc = document.createElement('input'),
+			desc = descTextarea(),
 			idField = libEl('label', 'lpn-lib-field'),
 			descField = libEl('label', 'lpn-lib-field lpn-lib-field-grow'),
 			users = fittingSetUsers(set.id),
@@ -58996,12 +59023,11 @@ var EngCalcs = EngCalcs || {};
 		headRow.appendChild(idField);
 		descField.appendChild(libEl('span', 'lpn-lib-fieldname',
 			pc.lpn_library_curve_note_label || 'Description'));
-		desc.type = 'text';
-		desc.className = 'lpn-lib-wide';
+		desc.className = 'lpn-lib-wide lpn-desc-ta';
 		desc.value = set.note || '';
 		desc.setAttribute('aria-label', pc.lpn_library_curve_note_label || 'Description');
 		desc.addEventListener('change', function () {
-			var t = String(desc.value || '').trim();
+			var t = EngCalcs.lpnDescText(desc.value);
 			if (t === (set.note || '')) { return; }
 			saveUndoSnapshot();
 			if (t) { set.note = t; } else { delete set.note; }
@@ -59151,7 +59177,7 @@ var EngCalcs = EngCalcs || {};
 			typeRow = libEl('div', 'lpn-lib-curve-row'),
 			id = document.createElement('input'),
 			kindSel = document.createElement('select'),
-			desc = document.createElement('input'),
+			desc = descTextarea(),
 			idField = libEl('label', 'lpn-lib-field'),
 			descField = libEl('label', 'lpn-lib-field lpn-lib-field-grow'),
 			kindField = libEl('label', 'lpn-lib-field'),
@@ -59192,12 +59218,11 @@ var EngCalcs = EngCalcs || {};
 		// unreadable by the person who wrote it.
 		descField.appendChild(libEl('span', 'lpn-lib-fieldname',
 			pc.lpn_library_curve_note_label || 'Description'));
-		desc.type = 'text';
-		desc.className = 'lpn-lib-wide';
+		desc.className = 'lpn-lib-wide lpn-desc-ta';
 		desc.value = c.note || '';
 		desc.setAttribute('aria-label', pc.lpn_library_curve_note_label || 'Description');
 		desc.addEventListener('change', function () {
-			var t = String(desc.value || '').trim();
+			var t = EngCalcs.lpnDescText(desc.value);
 			if (t === (c.note || '')) { return; }
 			saveUndoSnapshot();
 			if (t) { c.note = t; } else { delete c.note; }
@@ -62670,7 +62695,8 @@ var EngCalcs = EngCalcs || {};
 			// The DESCRIPTION, in the column the account number used to hold (Tom, 2026-09-19). It
 			// is the wider of the two identity fields a customer now carries and the one a sentence
 			// goes in, so it is what tells two services on one junction apart at a glance.
-			descCell.textContent = c.desc || '';
+			descCell.textContent = descLabelText(c.desc);
+			if (descLabelText(c.desc) !== (c.desc || '')) { descCell.title = c.desc; }
 			demCell.textContent = (typeof flow === 'number' && isFinite(flow)) ? String(+flow.toFixed(6)) : '';
 			tr.appendChild(idCell); tr.appendChild(descCell); tr.appendChild(demCell);
 			tbody.appendChild(tr);
@@ -62895,7 +62921,7 @@ var EngCalcs = EngCalcs || {};
 		libPipeTypesRead().forEach(function (t) {
 			var o = document.createElement('option');
 			o.value = t.id;
-			o.textContent = t.note ? (t.id + ' - ' + t.note) : t.id;
+			o.textContent = t.note ? (t.id + ' - ' + EngCalcs.lpnDescOneLine(t.note)) : t.id;
 			if (t.id === cur) { o.selected = true; }
 			sel.appendChild(o);
 		});
@@ -63043,12 +63069,9 @@ var EngCalcs = EngCalcs || {};
 	 * or the reverse is exactly the inconsistency he called embarrassing. Making both overridable is
 	 * a one-line change at each of two write sites if he rules that way.
 	 *
-	 * **FREE TEXT, AND ONLY THE LINE BREAK IS REFUSED** -- unlike the tag beside it, which EPANET
-	 * truncates at the first space. A trailing comment runs to the end of its line, so a `;` inside
-	 * a description round-trips exactly and so does a tab; a newline cannot be written as one at all.
-	 * `lpnDescText()` states that in the one place the exporter reads it from, exactly as
-	 * `lpnTagText()` does for the space, and it is applied on `input` so the rule is visible at the
-	 * moment somebody pastes a paragraph in rather than after they have looked away.
+	 * **FREE TEXT, LINES AND PARAGRAPHS INCLUDED** (Task 806). Stored with `\n`. An .inp holds one
+	 * line as a trailing comment, so a description of several lines goes out as the first line in
+	 * that place and each later line on a `;|` comment line after it; see `lpnDescText()`.
 	 */
 	// `after` is the one thing a CUSTOMER needs that a node and a link do not: every write to a
 	// customer goes through customerEdited(), which redraws its symbol and its label and re-solves.
@@ -63064,20 +63087,48 @@ var EngCalcs = EngCalcs || {};
 		refreshPaneIfOpen();
 		scheduleSave();
 	}
+	/**
+	 * **A DESCRIPTION BOX IS A TEXTAREA THAT GROWS** (Task 806; Tom, 2026-10-15: *"all Description
+	 * fields should allow multiple lines and paragraphs like most software to allow internal
+	 * documentation"*). One row at rest so it looks like the line it was; Enter types a newline, which
+	 * is what a textarea does and what makes a paragraph possible; Ctrl+Enter leaves the box and
+	 * commits, and Tab moves on, so keyboard entry down a form is as fast as it was. The one helper
+	 * serves the Properties box, the Library's descriptions and any later one.
+	 */
+	function descGrow(ta) {
+		if (typeof ta.getClientRects !== 'function' || !ta.getClientRects().length) { return; }
+		ta.style.height = 'auto';
+		if (ta.scrollHeight > ta.clientHeight) {
+			ta.style.height = (ta.scrollHeight + ta.offsetHeight - ta.clientHeight) + 'px';
+		}
+	}
+	function descTextarea() {
+		var ta = document.createElement('textarea');
+		ta.rows = 1;
+		ta.className = 'lpn-desc-ta';
+		ta.addEventListener('input', function () { descGrow(ta); });
+		ta.addEventListener('focus', function () { descGrow(ta); });
+		ta.addEventListener('keydown', function (e) {
+			if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+				e.preventDefault();
+				ta.blur();
+			}
+		});
+		// Sized once it is in the document, where its width (and so its wrapping) is known.
+		if (typeof requestAnimationFrame === 'function') { requestAnimationFrame(function () { descGrow(ta); }); }
+		return ta;
+	}
 	function descField(fields, el, after) {
 		var pc = EngCalcs.pageConfig || {},
 			label = document.createElement('label'),
-			input = document.createElement('input');
-		input.type = 'text';
+			input = descTextarea();
 		input.value = el.desc || '';
 		// **THE BOX IS NEVER REWRITTEN WHILE SOMEBODY IS TYPING** (Task 774; Tom, 2026-10-06: *"it
-		// first wouldn't accept a space"*). This used to put the trimmed text back into the box on
-		// every keystroke, so a space typed after a word was trimmed away at once -- "Corner of Elm"
-		// came out "CornerofElm". Only the stored value is trimmed (the file cannot hold a leading
-		// or trailing space); the box is tidied on `change`, when the field is being left.
+		// first wouldn't accept a space"*). Only the stored value is trimmed (the file cannot hold a
+		// leading or trailing space); the box is tidied on `change`, when the field is being left.
 		function commit(tidy) {
-			var t = EngCalcs.lpnDescText ? EngCalcs.lpnDescText(input.value) : String(input.value || '').trim();
-			if (tidy && input.value !== t) { input.value = t; }
+			var t = EngCalcs.lpnDescText(input.value);
+			if (tidy && input.value !== t) { input.value = t; descGrow(input); }
 			if (t === (el.desc || '')) { return; }
 			saveUndoSnapshot();
 			if (t) { el.desc = t; } else { delete el.desc; }   // base-write: a description is identity, not an overridable property -- see this function's own note
@@ -63086,12 +63137,7 @@ var EngCalcs = EngCalcs || {};
 			// landed in the document and nowhere anybody could see it until the project was reopened.
 			if (after) { after(); } else { identityEdited(el); }
 		}
-		input.addEventListener('input', function () {
-			// A pasted line break is the one thing the box itself refuses as it lands (collapsed to a
-			// space, nothing trimmed); the rest of the tidy waits for `change`.
-			if (/[\r\n]/.test(input.value)) { input.value = input.value.replace(/[\r\n]+/g, ' '); }
-			commit(false);
-		});
+		input.addEventListener('input', function () { commit(false); });
 		// `change` as well, for the reason the tag's does: a field can lose focus without ever firing
 		// `input` -- a value restored by the browser, or an autofill.
 		input.addEventListener('change', function () { commit(true); refreshPopupIfOpen(); });
@@ -67029,6 +67075,12 @@ var EngCalcs = EngCalcs || {};
 	// single-label refresh and the hover card all read their lines from here, so they cannot come to
 	// print different things. `ls` is the label settings to read; `extrema` is the network-wide high/low table, or null for no marks. Returns the lines
 	// in show order, possibly none: the empty placeholder is the caller's business.
+	// **A MAP LABEL HAS ROOM FOR ONE LINE OF A DESCRIPTION** (Task 806): the first, with an ellipsis
+	// when the text has more. The whole text is in Properties and the Tables pane's tip.
+	function descLabelText(d) {
+		var t = EngCalcs.lpnDescText(d), first = t.split('\n')[0];
+		return t.length > first.length ? first + ' \u2026' : first;
+	}
 	function nodeLabelFieldLines(n, ls, extrema) {
 		var nd = ls.decimals.node, ex = extrema || {}, lines = [];
 			// Order (Tom, 2026-07-30, thinking physically): ID, Demand, Head, Pressure, Elevation --
@@ -67038,7 +67090,7 @@ var EngCalcs = EngCalcs || {};
 			// **THE TWO IDENTITY WORDS** (Tom's table, R-327), printed as the words they are and only
 			// where one is stated -- a customer's own rule (customerLabelLines()): a blank slot where
 			// a description would be reads as a defect on every node that has none.
-			if (ls.node.desc && n.desc) { lines.push(affix('node', 'desc', { text: String(n.desc) })); }
+			if (ls.node.desc && n.desc) { lines.push(affix('node', 'desc', { text: descLabelText(n.desc) })); }
 			if (ls.node.tag && n.tag) { lines.push(affix('node', 'tag', { text: String(n.tag) })); }
 			// **DEMAND FIRST, BASE DEMAND UNDER IT.** Two quantities and two rows -- see
 			// resolvedDemand(). rawLine() for both: neither number ever crossed into SI.
@@ -67089,7 +67141,7 @@ var EngCalcs = EngCalcs || {};
 	function linkLabelFieldLines(l, ls, extrema) {
 		var ld = ls.decimals.link, ex = extrema || {}, lines = [];
 			if (ls.link.id) { lines.push(affix('link', 'id', { text: l.id })); }
-			if (ls.link.desc && l.desc) { lines.push(affix('link', 'desc', { text: String(l.desc) })); }
+			if (ls.link.desc && l.desc) { lines.push(affix('link', 'desc', { text: descLabelText(l.desc) })); }
 			if (ls.link.tag && l.tag) { lines.push(affix('link', 'tag', { text: String(l.tag) })); }
 			// **THE STATUS THE DOCUMENT STATES, BEFORE ANY RUN** (Tom's table, R-327: "Initial
 			// status"), beside the Status row below, which is the run's answer where there is one.
