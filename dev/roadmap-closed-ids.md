@@ -717,3 +717,4 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|792| CLOSED 2026-10-15 (merged on Tom's word): Description on Library patterns, controls and rules.
 - 0|793| CLOSED 2026-10-15 (merged on Tom's word): Ctrl+C in the Screenshot tool copies the picture.
 - 0|795| CLOSED 2026-10-15 (merged on Tom's word): Tank depth in the time series graphs.
+- 0|797| CLOSED 2026-10-15 (`chore/browser-lanes`): browser harnesses run in three lanes with a lock each; a full check_all went from ~57 to ~19 min.

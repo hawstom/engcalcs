@@ -228,11 +228,6 @@ the block.
   master (889a56c2) and bentley:** controls for pumps out of the run, and an engine reused after a refusal.
   A tank-only source is valid; a tank running dry stops the run. Open: "did not converge" goes away at
   Accuracy 0.001 (now 1e-5). **Tom, 2026-10-15: *"Yes. And tip says 1e-9, so sync that."*** Default to 0.001; R-388.
-- 100|797| **Run the browser harnesses side by side to cut check_all time.**
-  Tom, 2026-10-15: *"a huge overhead for merges that I did not see or foresee"*. One suite took ~8 min on
-  10-02 and ~57 min on 10-15: browser harnesses, run one at a time, are 52.6 of those minutes. Audit
-  (`dev/check-all-audit-2026-10-15.md`): a lane and lock each, 3 lanes ~18 min; first move
-  sw-precache-log-harness to EC_TEST_LOG_DIR, the one real collision.
 - 100|800| **A tidy list and count of one scenario's own overrides.**
   Tom, 2026-10-15, on Fotobi's "1-hr drain w pump off" (24 overrides vs its siblings' 23): *"I don't know how to see a tidy list of overrides to audit ... that count seems inflated ... I should see the count of only the present overrides, not the inherited overrides. I count 13 diameter overrides, 1 text override, and 2 calculation overrides."* Also his screenshot note: tanks show the amber circle while their overrides are only in the parent. Review R-386.
 - 100|801| **Retire Apply Base values; add Merge upward for alternatives.**
