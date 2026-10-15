@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-407. (R-282 is taken on `feat/label-gang-search`.)
+**An ID is permanent and never reused.** Next free: R-409. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -174,3 +174,5 @@ judgement and does not belong to a script.
 - [?] R-404 feat/bentley-interop | (R-394) "I can't confirm that. Maybe I am not checking on the right branch." -- asked which box he tried, on bentley-interop's preview
 - [?] R-405 feat/text-halo | "I don't think we should be working at all on labels off the screen, do you? The speed cost sounds terrible especially when we have been working hard for weeks to get our labels to place faster. Halos are always by letter, not by string? And is there a better masking model we should be trying? I know that this is turning back the clock a long way for us, but I became aware that our tiny halos were making our text look fuzzy, not clear."
 - [ ] R-406 feat/leader-keep | Choices: "1. a. 2. Good. 3. We had a hysteresis rule. Did that get lost? I see that apparently it did. A label should not flip until half of its width is past the flipping point. 4. OK. 5. OK."
+- [ ] R-407 feat/bentley-interop | (Merge upward) "(1) It only works for alternatives? I guess that's nice and tidy. (2) Wording '... it inherits them instead of overriding them.' (3) Why can't Morph or a saved view be used in the Base alternative? (4) Wording 'The alternative {name} has no overrides to merge.' (4) Help text: Change, but of course don't translate until later. (5) syn, yes delete them." -- build agent on feat/bentley-interop; (5) is his written permission to delete $ec_lang_syn lpn_scenario_push_values and lpn_scenario_push_tip
+- [x] R-408 fix/search-zoom-accuracy | (Accuracy 0.001 for projects that state none, or only new ones) "All projects." -- as built on fix/search-zoom-accuracy
