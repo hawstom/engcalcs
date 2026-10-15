@@ -222,6 +222,8 @@ $ovAllowed = [
     'sanitizeScenarioTree', 'mergeAlternativeInto', 'combineHolders', 'scenarioHoldsLocal', 'takeScenarioLocals', 'promoteStored',
     // the one write seam, and the scenario's own count beside its name
     'setOverride', 'clearOverride', 'overrideCount',
+    // that count's items and the value each replaces (Task 800): one scenario's own holders, read only
+    'ownOverrideItems', 'ownOverrideInherited',
     // what Delete scenario says it removes: the values of the alternatives that go with it, read only
     'scenarioDeletePlan', 'storedOverrideCount',
     // the down triangle (Task 790): the holder each child scenario writes to, read, and on a yes cleared
