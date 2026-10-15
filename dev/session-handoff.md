@@ -21,7 +21,7 @@ lines rather than appending corrections.
 - **Never wrap `run_harnesses.sh` or `check_all.sh` in the browser lock**: each browser harness
   takes that lock itself, so the wrapper deadlocks every one (2026-09-25, 280 s NOT RUN apiece).
   Brief agents to write journals to the scratchpad while a suite runs in the main checkout.
-- Since 2026-10-02 (jasmine, 24 threads) `check_all.sh` runs four suites at once in slots, ~25 min
+- Since 2026-10-02 (jasmine, 24 threads) `check_all.sh` runs four suites at once in slots, ~57 min
   each by 2026-10-15 (Task 797); run it with no outer flock. A branch cut before `f9829cee` still uses the single browser lock,
   so its browser harnesses can print `NOT RUN` under load: merge master into it first.
 

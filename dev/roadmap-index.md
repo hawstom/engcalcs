@@ -28,7 +28,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 796 — The EPANET run crashed on Tom's two-system test project.
 - Task 797 — Run the browser harnesses side by side to cut check_all time.
 - Task 800 — A tidy list and count of one scenario's own overrides.
-- Task 801 — Retire Apply Base values; may Base use a non-Base alternative?
+- Task 801 — Retire Apply Base values; add Merge upward for alternatives.
 - Task 807 — Leave a leader exactly where the user put it.
 
 ## 75 — Soon (21)
