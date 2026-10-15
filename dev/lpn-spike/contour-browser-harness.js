@@ -148,8 +148,15 @@ async function sectionDesk(Session, browser) {
 			e.value = String(val); e.dispatchEvent(new Event('change', { bubbles: true }));
 			return performance.now() - t0;
 		}, [id, v]);
-		const cold = Math.min(await timeChange('lpn_contour_buffer', 2.6), await timeChange('lpn_contour_buffer', 2.5));
-		const warm = Math.min(await timeChange('lpn_contour_opacity', 50), await timeChange('lpn_contour_opacity', 40));
+		// ALTERNATED, AND THE FASTEST OF FIVE (dev/testing-notes.md): a rebuild and an opacity change
+		// take turns, so load that arrives and stays falls on both, and the minimum discards a spike.
+		// The bound stays absolute because the claim is ("interactive"); measured 33 ms alone, so
+		// 500 ms is 15x headroom for the browser lanes and the other suites beside them.
+		let cold = Infinity, warm = Infinity;
+		for (let i = 0; i < 5; i++) {
+			cold = Math.min(cold, await timeChange('lpn_contour_buffer', i % 2 ? 2.5 : 2.6));
+			warm = Math.min(warm, await timeChange('lpn_contour_opacity', i % 2 ? 40 : 50));
+		}
 		console.log('         Net3 in Chromium: a new reach ' + cold.toFixed(0) + ' ms, an opacity change ' + warm.toFixed(0) + ' ms');
 		ok('Net3 stays interactive: a full rebuild in under half a second', cold < 500, cold.toFixed(0) + ' ms');
 		await setBox(a, 'lpn_contour_opacity', 60);

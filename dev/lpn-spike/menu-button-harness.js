@@ -22,8 +22,9 @@ const fs = require('fs');
 const { execFileSync } = require('child_process');
 const env = require('../browser-pass/lib/env');
 
+// Screenshots go to MENU_HARNESS_SCREEN_DIR if set, else a fresh temporary directory per run.
 const SCREEN_DIR = process.env.MENU_HARNESS_SCREEN_DIR ||
-	'/tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/18aaeba2-9c8b-4f6e-91f8-821a6f774f1f/scratchpad';
+	fs.mkdtempSync(path.join(require('os').tmpdir(), 'engcalcs-menu-button-'));
 
 let fails = 0;
 function ok(name, cond, extra) {

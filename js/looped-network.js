@@ -25088,7 +25088,10 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'anchor', label: 'lpn_field_text_anchor', str: true, em: 5, reread: true,
 				get: function (lb) { return lb.anchorNode || lb.anchorLink || ''; },
 				set: function (lb, v) {
-					if (String(v === null || v === undefined ? '' : v).trim() === '') { detachText(lb); }
+					var t = String(v === null || v === undefined ? '' : v).trim();
+					if (t === '') { detachText(lb); return; }
+					// Refused, and SAID so: paneWriteCellText() counts a false as refused, not written.
+					if (t !== (lb.anchorNode || lb.anchorLink || '')) { return false; }
 				} },
 			paneColActive(),
 			// The words and the presence are the label's two OVERRIDABLE properties (Task 407) and
@@ -28309,8 +28312,8 @@ var EngCalcs = EngCalcs || {};
 		if (paneCellIsPlain(c, el) || !c.set) { return false; }
 		p = paneParseCellText(c, text);
 		if (!p.ok) { return false; }
-		c.set(el, p.v);
-		return true;
+		// A set() that refuses a well-formed value (the Text Anchor cell) returns false.
+		return c.set(el, p.v) !== false;
 	}
 	/**
 	 * **THE PASTE TILES, AND THE RULE IS TOM'S OWN** (2026-09-07): *"Pasting a single cell or row

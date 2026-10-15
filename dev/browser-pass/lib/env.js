@@ -65,18 +65,26 @@ function pageUrl(rel) {
 
 // Chromium: whatever Playwright downloaded, or CHROME_PATH. Searched rather than pinned so a
 // browser update does not silently break the pass with a "file not found" a long way from the cause.
+//
+// NOT FOUND THROWS, unless EC_ALLOW_BROWSER_SKIP=1. Some 90 harnesses answer a null here by printing
+// SKIPPING and exiting 0, so a broken browser install used to turn all of them green at once.
+// Skipping is now something a person asks for, never something a missing browser does to the gate.
 function findChromium() {
 	if (process.env.CHROME_PATH) { return process.env.CHROME_PATH; }
 	const cache = path.join(os.homedir(), '.cache', 'ms-playwright');
-	if (!fs.existsSync(cache)) { return null; }
-	for (const dir of fs.readdirSync(cache)) {
-		if (!/^chromium-/.test(dir)) { continue; }
-		for (const rel of ['chrome-linux64/chrome', 'chrome-linux/chrome']) {
-			const exe = path.join(cache, dir, rel);
-			if (fs.existsSync(exe)) { return exe; }
+	if (fs.existsSync(cache)) {
+		for (const dir of fs.readdirSync(cache)) {
+			if (!/^chromium-/.test(dir)) { continue; }
+			for (const rel of ['chrome-linux64/chrome', 'chrome-linux/chrome']) {
+				const exe = path.join(cache, dir, rel);
+				if (fs.existsSync(exe)) { return exe; }
+			}
 		}
 	}
-	return null;
+	if (process.env.EC_ALLOW_BROWSER_SKIP === '1') { return null; }
+	stopServer();
+	throw new Error('No Chromium found (set CHROME_PATH, or run: npx playwright install chromium). ' +
+		'A missing browser is a FAILURE; set EC_ALLOW_BROWSER_SKIP=1 to skip the browser harnesses on purpose.');
 }
 
 /** A port nothing is listening on, asked of the OS rather than guessed. */

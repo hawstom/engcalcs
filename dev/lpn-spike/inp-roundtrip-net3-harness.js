@@ -148,7 +148,7 @@ console.log('  elements carrying the file\'s own text (tok): ' +
 L.applySaved(JSON.parse(JSON.stringify(shipped)));
 const galleryDoc = L.serializeProject();
 const galleryOut = EngCalcs.lpnExportInp(galleryDoc);
-if (!galleryOut.ok) { console.log('  EXPORT REFUSED: ' + JSON.stringify(galleryOut)); process.exit(0); }
+if (!galleryOut.ok) { console.log('  FAIL: EXPORT REFUSED: ' + JSON.stringify(galleryOut)); process.exit(1); }
 console.log('  the seven selectors the writer compared: ' + JSON.stringify(galleryDoc.units));
 console.log('  units the writer reports converting: ' +
 	JSON.stringify(galleryOut.differences.filter((d) => d.code === 'unit-converted' || d.code === 'flow-units-not-epanet')));
@@ -165,6 +165,7 @@ console.log('  elements carrying the file\'s own text (tok): ' +
 	(freshDoc.nodes.concat(freshDoc.links).filter((e) => e && e.tok).length) +
 	' of ' + (freshDoc.nodes.length + freshDoc.links.length));
 const freshOut = EngCalcs.lpnExportInp(freshDoc);
+if (!freshOut.ok) { console.log('  FAIL: CONTROL EXPORT REFUSED: ' + JSON.stringify(freshOut)); process.exit(1); }
 const fresh = compare('reference/Net3.inp  ->  import  ->  .inp   vs   EPA Net3.inp', REF, freshOut.inp);
 report(fresh);
 
@@ -178,11 +179,14 @@ console.log('  REFORMATTED (the user\'s characters were spent): ' + reformatted.
 console.log('  RENAMED     (a token the writer replaces): ' + renamed.length);
 console.log('  the same model imported from its .inp today: ' + fresh.findings.length + ' differences');
 
-const clean = gallery.findings.length === 0;
+// Both legs are judged: a control that stops coming back byte-identical is the reader's defect, and
+// it is as much a failure as the gallery's.
+const clean = gallery.findings.length === 0 && fresh.findings.length === 0;
 if (clean) {
 	console.log('\nall Net3 round-trip checks passed');
 } else if (EXPECT_CLEAN) {
-	console.log('\nFAIL: the Net3 round trip is not byte-identical');
+	console.log('\nFAIL: the Net3 round trip is not byte-identical (gallery ' + gallery.findings.length +
+		', control ' + fresh.findings.length + ' differences)');
 	process.exit(1);
 } else {
 	console.log('\n*** KNOWN FAILING (Task 430) *** ' + gallery.findings.length +

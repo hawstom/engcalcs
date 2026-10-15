@@ -10,11 +10,13 @@
 //   load (LANG_LOG) nor from any of the four beacon writers; the same request without it does.
 // Part B (real Chromium, fresh profile): load one calculator, wait for the worker to finish
 //   installing and precaching, and exactly one LANG_LOG row results.
-// The server serves THIS checkout, so the rows land in this checkout's log/ ; the harness moves any
-// existing log files aside and puts them back.
+// The rows land in a temporary directory, never this checkout's log/: lib/config.inc.php honours
+// EC_TEST_LOG_DIR under `php -S` only, and env.startServer() passes it on. The counts below are
+// exact, so a shared log/ would let any other harness loading a page beside this one break them.
 'use strict';
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 const { execFileSync, spawnSync } = require('child_process');
 const REPO = path.resolve(__dirname, '..', '..');
 const LOCK_FILE = process.env.EC_BROWSER_LOCK || '/tmp/engcalcs-browser.lock';
@@ -31,7 +33,8 @@ if (process.env[LOCK_ENV] !== '1') {
 	}
 }
 
-const LOGDIR = path.join(REPO, 'log');
+const LOGDIR = fs.mkdtempSync(path.join(os.tmpdir(), 'engcalcs-sw-precache-log-'));
+process.env.EC_TEST_LOG_DIR = LOGDIR;
 const LOGS = {
 	lang: 'engcalcs-lang.log', human: 'engcalcs-human-view.log', calc: 'engcalcs-calc-usage.log',
 	title: 'engcalcs-title.log', signal: 'engcalcs-signal.log'
@@ -45,24 +48,18 @@ function rows(key) {
 	const f = path.join(LOGDIR, LOGS[key]);
 	return fs.existsSync(f) ? fs.readFileSync(f, 'utf8').split('\n').filter(Boolean) : [];
 }
-const aside = [];
-function moveAside() {
-	fs.mkdirSync(LOGDIR, { recursive: true });
-	for (const k of Object.keys(LOGS)) {
-		const f = path.join(LOGDIR, LOGS[k]);
-		if (fs.existsSync(f)) { fs.renameSync(f, f + '.harness-aside'); aside.push(f); }
-	}
-}
-function putBack() {
+function clearLogs() {
 	for (const k of Object.keys(LOGS)) { try { fs.unlinkSync(path.join(LOGDIR, LOGS[k])); } catch (e) { /* none */ } }
-	for (const f of aside) { try { fs.renameSync(f + '.harness-aside', f); } catch (e) { /* none */ } }
+}
+function removeLogDir() {
+	try { fs.rmSync(LOGDIR, { recursive: true, force: true }); } catch (e) { /* best effort */ }
 }
 
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
 	const { chromium } = require(path.join(REPO, 'dev', 'browser-pass', 'node_modules', 'playwright-core'));
 	await env.startServer();
-	moveAside();
+	clearLogs();
 	let browser;
 	try {
 		// ---- Part A: the marker, writer by writer ------------------------------------------
@@ -91,10 +88,9 @@ async function main() {
 		const plain = await fetch(url('Manning-Pipe-Flow.php'), { headers: hdr });
 		await plain.text();
 		ok('an unmarked page load writes one LANG_LOG row (control)', rows('lang').length === 1, 'rows=' + rows('lang').length);
-		moveAside(); putBack(); // clear for part B
+		clearLogs(); // clear for part B
 
 		// ---- Part B: a real fresh browser ---------------------------------------------------
-		moveAside();
 		const executablePath = env.findChromium();
 		if (!executablePath) { console.error('sw-precache-log-harness: no Chromium; part B SKIPPED.'); return; }
 		browser = await chromium.launch({ executablePath });
@@ -120,9 +116,9 @@ async function main() {
 	} finally {
 		if (browser) { await browser.close(); }
 		env.stopServer();
-		putBack();
+		removeLogDir();
 	}
 	console.log(fails ? 'FAILED: ' + fails : 'ALL PASS');
 	process.exit(fails ? 1 : 0);
 }
-main().catch((e) => { console.error(e); putBack(); process.exit(1); });
+main().catch((e) => { console.error(e); removeLogDir(); process.exit(1); });

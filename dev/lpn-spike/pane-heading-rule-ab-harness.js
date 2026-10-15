@@ -1,6 +1,6 @@
 // Part (ab) of pane-heading-rule-harness.js -- see that file's head for what is asserted and why
 // it runs in three parts (run_harnesses.sh's 300 s per file). This file only chooses the part.
-// It drives a real Chromium through playwright, so run_harnesses.sh runs it alone.
+// It drives a real Chromium through playwright, so run_harnesses.sh runs it in a browser lane.
 //
 //   node dev/lpn-spike/pane-heading-rule-ab-harness.js
 //

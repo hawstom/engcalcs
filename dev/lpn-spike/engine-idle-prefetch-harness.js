@@ -150,9 +150,9 @@ async function main() {
 		await e.context.addInitScript(IDLE_STUB);
 		await e.context.addInitScript(FETCH_LOG_STUB);
 		const prio = [];
-		let delayed = 0;
+		let delayed = 0, released = false;
 		await e.context.route(/\/js\/vendor\/epanet-js\.js/, async (route) => {
-			if (delayed++ === 0) { await new Promise((r) => setTimeout(r, 5000)); }	// the prefetch's request, held
+			if (delayed++ === 0) { await new Promise((r) => setTimeout(r, 5000)); released = true; }	// the prefetch's request, held
 			try { await route.continue(); } catch (err) { /* aborted while held: expected */ }
 		});
 		const cdp = await e.context.newCDPSession(e.page);
@@ -165,8 +165,10 @@ async function main() {
 		await e.settle(500);
 		const t0 = Date.now();
 		await e.page.evaluate(() => EngCalcs.lpnEpanetLoad());
-		const took = Date.now() - t0;
-		ok('the Run did not wait behind the held prefetch', took < 3500, took + ' ms');
+		const took = Date.now() - t0, heldStill = !released;
+		// ORDER, NOT A STOPWATCH: the Run must finish while the prefetch's request is still held. A
+		// fixed bound in ms (it was < 3500) only approximated that, and a loaded machine moves it.
+		ok('the Run did not wait behind the held prefetch', heldStill, took + ' ms, the held request ' + (heldStill ? 'still held' : 'already released'));
 		await e.page.waitForTimeout(6000);
 		ok('exactly one completed engine download', downloads(ENGINE) === e0 + 1, String(downloads(ENGINE) - e0));
 		ok('the prefetch was low priority and the Run was not', prio.length >= 2 && /low/i.test(prio[0]) && !/low/i.test(prio[prio.length - 1]), JSON.stringify(prio));

@@ -124,11 +124,12 @@ console.log('\n--- a project a visitor already started drawing must not be re-ho
 	// the camera out from under real work -- the same discipline `pendingViewFor` observes.
 	const L = boot();
 	L.getDoc().nodes.push({ id: 'J1', kind: 'junction', x: 0, y: 0 });
-	L.armMapSizing();
 	// No assertion on the exact camera here (an edited document is free to fit however
-	// restoreViewOrFit()'s own rules say) -- only that the harness reaches this line without an
-	// unhandled exception from the guard reading a document mid-edit.
-	check(true, 'sizing after an edit does not throw');
+	// restoreViewOrFit()'s own rules say) -- only that the guard reading a document mid-edit does
+	// not throw.
+	let threw = null;
+	try { L.armMapSizing(); } catch (err) { threw = err; }
+	check(threw === null, 'sizing after an edit does not throw' + (threw ? ': ' + threw.message : ''));
 }
 
 console.log('\n' + (failures ? failures + ' FAILED of ' : 'all ') + checks + ' checks');
