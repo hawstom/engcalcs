@@ -87,7 +87,7 @@ console.log('--- 2. detaching ---');
 	const before = L.textLabelPoint(lb);
 	L.saveUndoSnapshot();
 	ok('2.2 typing another id is refused and changes nothing',
-		(L.paneWriteCellText(textSpec, col, lb, 'J9') || true) && lb.anchorNode === n1.id);
+		L.paneWriteCellText(textSpec, col, lb, 'J9') === false && lb.anchorNode === n1.id);
 	ok('2.3 clearing the Anchor cell is accepted', L.paneWriteCellText(textSpec, col, lb, '') === true);
 	ok('2.4 the Text is free', !lb.anchorNode && !lb.anchorLink && lb.anchorT === undefined);
 	const after = L.textLabelPoint(lb);
