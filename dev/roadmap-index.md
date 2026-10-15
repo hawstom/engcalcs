@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**100 open tasks.** Next (100): 18 · Soon (75): 21 · Someday (50): 27 · Maybe (25): 15 · Parked (5): 19
+**98 open tasks.** Next (100): 16 · Soon (75): 21 · Someday (50): 27 · Maybe (25): 15 · Parked (5): 19
 
-## 100 — Next (18)
+## 100 — Next (16)
 
 - Task 643 — Slope distance for automatic lengths, and whether anyone offers a length factor.
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
@@ -23,9 +23,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 785 — Rewrite the Guide's chapters to the Find and replace model.
 - Task 789 — Long press opens the asset menu on a touch screen.
 - Task 790 — One override marker: overridden or inherited, in every scenario view.
-- Task 791 — Text halos twice as wide, with a Map appearance setting.
 - Task 794 — Edit a Text in place on the map.
-- Task 796 — The EPANET run crashed on Tom's two-system test project.
 - Task 800 — A tidy list and count of one scenario's own overrides.
 - Task 801 — Retire Apply Base values; add Merge upward for alternatives.
 - Task 807 — Leave a leader exactly where the user put it.
@@ -128,5 +126,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-91 of 100 titles are within 4–12 words. `!` marks the rest;
+89 of 98 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
