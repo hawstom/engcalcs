@@ -18,20 +18,18 @@ const en = fs.readFileSync(path.join(ROOT, 'lib', 'lang.ec.en.php'), 'utf8');
 
 // key -> the placeholders that carry a count (others, such as {unit} or {ids}, are text)
 const COUNTS = {
-	lpn_node_customers_sum: ['n'], lpn_customer_detached_count: ['n'], lpn_inp_export_flat_customers: ['n'],
-	lpn_pane_pasted: ['n', 'skipped'], lpn_pane_pasted_rows: ['n', 'created'],
-	lpn_pane_pasted_rows_skipped: ['n', 'created', 'skipped'],
-	lpn_pane_paste_overflow: ['n', 'fit', 'extra'], lpn_pane_paste_overflow_bad: ['n', 'fit', 'extra'],
-	lpn_pane_paste_overflow_add: ['extra'], lpn_pane_paste_overflow_fit: ['fit'],
-	lpn_pane_paste_ids_differ: ['n'], lpn_pane_filled: ['n', 'skipped'], lpn_pane_ctrlenter_filled: ['n', 'skipped'],
-	lpn_status_reinterpreted: ['n'], lpn_status_converted: ['n'], lpn_replace_asked: ['n'],
-	lpn_replace_preview: ['n'], lpn_replace_done: ['n'], lpn_confirm_apply_prefix: ['n'],
-	lpn_prefix_applied: ['n', 'skipped'], lpn_crit_summary: ['n', 'total'],
-	lpn_library_curve_in_use: ['count'], lpn_library_pipetype_in_use: ['count'], lpn_library_fittings_in_use: ['count'],
-	lpn_scenario_delete_confirm: ['n'], lpn_delete_drops_overrides: ['n'], lpn_full_row_count: ['n'],
-	lpn_dxf_note_shortened: ['n'], lpn_dxf_note_categories: ['n'], lpn_calib_file: ['n', 'm'],
-	lpn_library_pattern_span: ['n'], lpn_terrain_confirm_default_2: ['n'], lpn_ff_summary_error: ['n'],
-	lpn_inp_export_flat_types: ['n', 't'], lpn_inp_export_flat_fittings: ['n']
+	lpn_prefix_applied: ['n', 'skipped'],
+	lpn_status_reinterpreted: ['n'],
+	lpn_status_converted: ['n'],
+	lpn_replace_preview: ['n'],
+	lpn_replace_done: ['n'],
+	lpn_confirm_apply_prefix: ['n'],
+	lpn_scenario_delete_confirm: ['n'],
+	lpn_delete_drops_overrides: ['n'],
+	lpn_dxf_note_shortened: ['n'],
+	lpn_dxf_note_categories: ['n'],
+	lpn_library_pattern_span: ['n'],
+	lpn_terrain_confirm_default_2: ['n']
 };
 
 let fails = 0;
