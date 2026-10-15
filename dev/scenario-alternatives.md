@@ -1196,8 +1196,9 @@ below, *"Yes. Perfect."*
 
 **Retired:** the Scenarios menu row and the per-asset button in Properties (the same action, narrowed to
 one asset, with the same words), `pushBaseToScenarios()`, `pushHereButton()`, and the six
-`lpn_scenario_push_*` keys in all 27 files. The two `$ec_lang_syn` entries for them are left for Tom.
-`pushSpecList()` stays: the Settings push and Find and replace read it.
+`lpn_scenario_push_*` keys in all 27 files.
+`pushSpecList()` stays: the Settings push and Find and replace read it. Tom gave written permission
+(2026-10-15) and the two stale `$ec_lang_syn` entries are deleted.
 
 **Built:** "Merge upward", a command of every alternatives tree in the Scenario manager (button and
 right-click row, after Copy; not in the Scenarios tree; greyed on a Base). It asks which ancestor, by
@@ -1213,10 +1214,14 @@ alternative. Results that depended on the changed inputs go stale under the snap
 scenario act (`applyScenarioChange()`).
 
 **Decided by CC, for Tom to overturn:**
-- **A Morph merges like any value into a stored ancestor** (it is an Active topology value), **and stays
-  in the source when the target is Base**, said in the question: in Base a type change is Morph in Base,
-  which rebuilds the asset and pins what other scenarios read (`morphPinBase()`), so a plain write would
-  skip both. A saved view also stays (Base holds none). The rest of the alternative still merges.
+- **A Morph and a saved view merge into Base too** (Tom, 2026-10-15: *"Why can't Morph or a saved view
+  be used in the Base alternative?"*; first built keeping both in the source). A type change merged into
+  Base is Morph in Base: the asset is rebuilt in place (`applyNodeTypeChange()`, `applyLinkTypeChange()`,
+  a valve taking the merged valve type), in the merge's one undo step, and the question carries Morph's
+  own list of what is lost or read differently. A saved view becomes Base's view, which is the map as the
+  reader left it in Base (the file's `view`): the map moves there, or, while the open scenario holds a
+  view of its own, Base's is set for the return. A view is never an undo step, so Ctrl+Z gives the
+  alternative its view back but does not move the map.
 - A scenario's own values from a file before 2026-10-12 (the derived item) are stored first and then
   merged, like Copy and Rename do.
 - A local value an older reader left in a scenario that names an alternative for the category is

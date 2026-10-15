@@ -353,14 +353,6 @@
             "english": "Base",
             "syn": "Base case, Baseline, Canonical, Source, Root, Trunk | gloss: scenario; avoid: a chemical base; a foundation; a military base; a base amount"
         },
-        "lpn_scenario_push_tip": {
-            "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded.",
-            "syn": "labels here = the map labels (Settings, Symbology, Labels) | avoid: the captions of form fields"
-        },
-        "lpn_scenario_push_values": {
-            "english": "Values thrown away:",
-            "syn": "Values thrown away, Values discarded, Values lost, Values wiped, Values replaced, Values displaced, Values cleared, Custom values cleared | a count follows this label, not a list of values"
-        },
         "lpn_settings_defaults": {
             "english": "Values",
             "syn": "Values, Values for new assets, Values given to new assets, Values used when an asset is created | avoid: starting values in the sense of the initial condition of a run; the current values of the selected asset"

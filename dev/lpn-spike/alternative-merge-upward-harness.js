@@ -15,8 +15,11 @@
 //   5. Skip a level that holds nothing merged: no warning, and the source reads the merged value.
 //   6. Into the alternative the Base scenario uses: Base itself shows the merged value.
 //   7. Into Base (the drawing): the elements take the values, as a Base edit does; undo restores.
-//   8. Morph: into a stored ancestor the type goes like any value; into Base it stays in the source
-//      and the question says so, while the rest (an `active`) still goes.
+//   8. Morph: into a stored ancestor the type goes like any value; into Base it is Morph in Base
+//      (Tom, 2026-10-15: "Why can't Morph or a saved view be used in the Base alternative?"): the
+//      junction becomes a tank and the pipe a PRV in the drawing, one undo step with the rest, and
+//      the question lists what the rebuild loses, in Morph's words. A saved view merged into Base
+//      becomes Base's view: the map goes there.
 //   9. A calculation set: its demand multiplier moves up, and into Base it becomes the project's.
 //  10. A scenario's own values in a file from before 2026-10-12 (an implicit alternative) merge too.
 //  11. A scenario-level local value written by an older reader into a category the scenario names
@@ -56,7 +59,7 @@ const INJECT =
 	"\t\tsmMergeTargets: smMergeTargets, smMergePlan: smMergePlan, smMergeUpward: smMergeUpward, smTry: smTry,\n" +
 	"\t\tsmActMergeUpward: smActMergeUpward, smCommands: smCommands, smSetTree: function (t) { smState.tree = t; },\n" +
 	"\t\tsmSel: function () { return smState.sel; }, scenarioMenuRows: scenarioMenuRows, setBasicMode: setScenarioBasicMode,\n" +
-	"\t\tlastNotice: function () { return lastNoticeText; },\n" +
+	"\t\tlastNotice: function () { return lastNoticeText; }, \n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -205,13 +208,32 @@ act(() => L.smMergeUpward(TT, T2.id, T1.id));
 ok('8.2 ...and is there', L.smRecord(TT, T1.id).values['n:22'].type === 'tank' && !L.smRecord(TT, T2.id).values);
 L.undo();
 ok('8.3 undo', snap() === before8);
+L.smRecord(TT, T2.id).values = { 'n:22': { type: 'tank' }, 'n:23': { active: false }, 'l:10': { type: 'valve', valveType: 'PRV' } };
+L.touchTree('harness');
+const before8b = snap();
 plan = L.smMergePlan(TT, T2.id, L.smBaseKey(TT));
-ok('8.4 into Base the type stays, and the plan says so', plan.n === 1 && plan.keepsMorph === true);
+ok('8.4 into Base the plan rebuilds two assets and counts all four overrides', plan.n === 4 && plan.morphs.length === 2, plan.n + ' / ' + plan.morphs.length);
 act(() => L.smMergeUpward(TT, T2.id, L.smBaseKey(TT)));
-ok('8.5 junction 23 is inactive in the drawing; junction 22 is still a junction there', L.nodeById('23')._active === false && J22().type === 'junction', [L.nodeById('23')._active, J22().type].join());
-ok('8.6 ...and the type is still T2\'s own', JSON.stringify(L.smRecord(TT, T2.id).values) === JSON.stringify({ 'n:22': { type: 'tank' } }), JSON.stringify(L.smRecord(TT, T2.id).values));
+ok('8.5 in the drawing junction 22 is now a tank, pipe 10 a PRV, junction 23 inactive', J22().type === 'tank' && P10().type === 'valve' && P10().valveType === 'PRV' && L.nodeById('23')._active === false,
+	[J22().type, P10().type, P10().valveType, L.nodeById('23')._active].join());
+ok('8.6 ...the tank was rebuilt as Morph in Base does it: it has its depths, and lost the junction demand', typeof J22().maxLevel === 'number' && J22()._demand === undefined, JSON.stringify(J22()));
+ok('8.7 ...and T2 is emptied', !L.smRecord(TT, T2.id).values, JSON.stringify(L.smRecord(TT, T2.id)));
 L.undo();
-ok('8.7 undo', snap() === before8);
+ok('8.8 one Ctrl+Z puts the junction, the pipe and T2 back', snap() === before8b && J22().type === 'junction' && P10().type === 'pipe', [J22().type, P10().type].join());
+const PT = 'presentation', PV = L.smAdd(PT, L.smBaseKey(PT), false);
+const vNew = { cx: 30, cy: 60, mpp: 2 };
+L.smRecord(PT, PV.id).settings = { view: vNew };
+L.touchTree('harness');
+plan = L.smMergePlan(PT, PV.id, L.smBaseKey(PT));
+ok('8.9 a saved view merges into Base too', plan.n === 1 && plan.view !== undefined);
+act(() => L.smMergeUpward(PT, PV.id, L.smBaseKey(PT)));
+// The headless page has no map window, so where the map then stands is held by the browser harness.
+ok('8.10 ...and leaves the alternative', !L.smRecord(PT, PV.id).settings, JSON.stringify(L.smRecord(PT, PV.id)));
+L.undo();
+ok('8.11 undo gives the alternative its view back', !!(L.smRecord(PT, PV.id).settings || {}).view);
+L.smRecord(PT, PV.id).settings = undefined;
+delete L.smRecord(PT, PV.id).settings;
+L.touchTree('harness');
 
 console.log('--- 9. a calculation set ---');
 const CT = 'calculation', K1 = L.smAdd(CT, L.smBaseKey(CT), false), K2 = L.smAdd(CT, K1.id, false);
@@ -291,9 +313,13 @@ asked.length = 0; answers = [L.smBaseKey(TT), true];
 L.smSetTree(TT);
 L.smRecord(TT, T2.id).values = { 'n:22': { type: 'tank' } };
 L.touchTree('harness');
+const before12b = snap();
 L.smActMergeUpward(T2.id);
-ok('12.11 a Morph alone, into Base: says it holds nothing to merge, and why', asked.length === 2 && asked[1].kind === 'alert' &&
-	asked[1].text.indexOf(PC.lpn_sm_merge_keeps_morph.replace('{name}', L.smName(TT, T2.id))) > 0, JSON.stringify(asked[1] && asked[1].text));
+ok('12.11 a Morph into Base asks first, with Morph\'s own list of what is lost', asked.length === 2 && asked[1].kind === 'confirm' &&
+	asked[1].text.indexOf(PC.lpn_change_type_lost) > 0, JSON.stringify(asked[1] && asked[1].text));
+ok('12.12 ...then rebuilds junction 22 as a tank in Base', J22().type === 'tank');
+L.undo();
+ok('12.13 ...and Ctrl+Z undoes it', snap() === before12b && J22().type === 'junction');
 L.smSetTree(T);
 
 console.log('--- 13. Apply Base values is retired ---');

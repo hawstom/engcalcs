@@ -6355,10 +6355,14 @@ var EngCalcs = EngCalcs || {};
 	// Apply Base values (Tom: *"this command is too confusing and dangerous"*).
 	//
 	// Into a stored alternative every value goes, a Morph's `type` included: it is an Active
-	// topology value like any other. Into the Base item (the drawing and the project themselves) two
-	// things stay in the source, and the question says so: a Morph, because a type change in Base is
-	// Morph in Base, which rebuilds the asset and pins what other scenarios read (morphPinBase()); and
-	// a saved view, because Base holds none (heldView() stops before Base).
+	// topology value like any other. **Into the Base item (the drawing and the project) a Morph is
+	// Morph in Base** (Tom, 2026-10-15: *"Why can't Morph or a saved view be used in the Base
+	// alternative?"*): the asset is rebuilt in place exactly as Water > Morph does there
+	// (applyNodeTypeChange(), applyLinkTypeChange()), and the question lists what that rebuild
+	// loses or reads differently, in Morph's own words. **A saved view becomes Base's view**: Base
+	// holds none of its own (heldView() stops before it); its view is the map as the reader left it in
+	// Base, the one the file records, so the map goes there now, or, while the open scenario holds a
+	// view of its own, Base's is set to it for the return.
 	//
 	// The ancestors of an item, parent first, as [{key, name}]; empty for a root and for scenarios.
 	function smMergeTargets(tree, key) {
@@ -6427,12 +6431,13 @@ var EngCalcs = EngCalcs || {};
 	 * **WHAT A MERGE OF `key` INTO `targetKey` WOULD DO**, read only, or null for a target that is
 	 * not an ancestor: {items: [{k, prop, v}], leaves: [{path, value}], n (merged), own (every own
 	 * value, kept ones included), skipped: [{name, lines}] (each skipped alternative holding its own
-	 * value for something merged, and which), keepsMorph, keepsView}. A whole demand list shadows
+	 * value for something merged, and which), morphs: [{el, type, valveType}] (Base only: the
+	 * assets to rebuild), view (Base only: the saved view)}. A whole demand list shadows
 	 * the same holder's row-0 `demand`, so only the list is merged (and both leave the source).
 	 */
 	function smMergePlan(tree, key, targetKey) {
 		var ups = smMergeTargets(tree, key), at = -1, own = smOwnContent(tree, key), toBase = smIsBaseKey(tree, targetKey),
-			out = { items: [], leaves: [], n: 0, own: 0, skipped: [], keepsMorph: false, keepsView: false }, between, has = Object.prototype.hasOwnProperty;
+			out = { items: [], leaves: [], n: 0, own: 0, skipped: [], morphs: [], view: undefined }, between, has = Object.prototype.hasOwnProperty, morphAt = {};
 		ups.forEach(function (u, i) { if (at < 0 && u.key === targetKey) { at = i; } });
 		if (at < 0) { return null; }
 		between = ups.slice(0, at).map(function (u) { return { name: u.name, c: smOwnContent(tree, u.key), lines: [] }; });
@@ -6441,8 +6446,14 @@ var EngCalcs = EngCalcs || {};
 			Object.keys(ov).forEach(function (prop) {
 				out.own++;
 				if (prop === 'demand' && has.call(ov, 'demands')) { return; }
-				if (toBase && (LPN_MORPH_PROP[prop] || !smMergeElement(k))) { if (LPN_MORPH_PROP[prop]) { out.keepsMorph = true; } return; }
-				out.items.push({ k: k, prop: prop, v: ov[prop] });
+				if (toBase && !smMergeElement(k)) { return; }
+				if (toBase && LPN_MORPH_PROP[prop]) {
+					// One rebuild per asset, its type and (a valve's) valve type together.
+					if (!morphAt[k]) { morphAt[k] = { el: smMergeElement(k), k: k }; out.morphs.push(morphAt[k]); }
+					morphAt[k][prop] = ov[prop];
+				} else {
+					out.items.push({ k: k, prop: prop, v: ov[prop] });
+				}
 				between.forEach(function (b) {
 					var bo = b.c.values[k];
 					if (!plainObject(bo)) { return; }
@@ -6455,13 +6466,24 @@ var EngCalcs = EngCalcs || {};
 		});
 		own.leaves.forEach(function (l) {
 			out.own++;
-			if (toBase && l.path[0] === 'view') { out.keepsView = true; return; }
-			out.leaves.push(l);
+			if (toBase && l.path[0] === 'view') { out.view = l.value; } else { out.leaves.push(l); }
 			between.forEach(function (b) {
 				if (b.c.leaves.some(function (bl) { return smPathsMeet(bl.path, l.path); })) { b.lines.push(smMergeLeafText(l.path)); }
 			});
 		});
-		out.n = out.items.length + out.leaves.length;
+		// A morph's type and valve type are each an override, counted as such, as is the view.
+		out.n = out.items.length + out.leaves.length + out.morphs.reduce(function (n, m) { return n + (m.type !== undefined ? 1 : 0) + (m.valveType !== undefined ? 1 : 0); }, 0) +
+			(out.view !== undefined ? 1 : 0);
+		// The skipped levels are checked for a morph too: a type is a value like any other.
+		out.morphs.forEach(function (m) {
+			between.forEach(function (b) {
+				var bo = b.c.values[m.k];
+				if (plainObject(bo) && (has.call(bo, 'type') || has.call(bo, 'valveType'))) { b.lines.push(smMergeItemText(m.k, 'type')); }
+			});
+		});
+		if (out.view !== undefined) {
+			between.forEach(function (b) { if (b.c.leaves.some(function (bl) { return bl.path[0] === 'view'; })) { b.lines.push(smMergeLeafText(['view'])); } });
+		}
 		out.skipped = between.filter(function (b) { return b.lines.length; }).map(function (b) { return { name: b.name, lines: b.lines }; });
 		return out;
 	}
@@ -6484,6 +6506,71 @@ var EngCalcs = EngCalcs || {};
 			node = node[path[i]];
 		}
 		node[path[path.length - 1]] = altCopy(v);
+	}
+	// **A MORPH MERGED INTO BASE IS MORPH IN BASE**: each asset rebuilt in place as Water > Morph does
+	// it there (changeSelectedTypeIn()'s proceed()), with the result it showed held until the next
+	// Calculate and every control naming it read again. A valve's own type follows its rebuild.
+	// Called with Base laid out (paneInScenario()), inside the merge's one undo step.
+	function smMergeBaseMorphs(list) {
+		var ids = {};
+		(list || []).forEach(function (m) {
+			var el = m.el, isNode = elGroup(el) === 'node', was = null;
+			if (!el) { return; }
+			if (typeof m.type === 'string' && morphTypeValid(el, m.type) && el.type !== m.type) {
+				if (isNode && lastSolveResult) { was = { head: colorNodeValue(el, 'head'), pressure: colorNodeValue(el, 'pressure') }; }
+				if (isNode) { applyNodeTypeChange(el, m.type); } else { applyLinkTypeChange(el, m.type); }
+				if (!isNode && lastSolveResult) { typeChangeHeldLink[el.id] = { result: lastSolveResult, type: el.type }; }
+				if (was) { typeChangeHeld[el.id] = { result: lastSolveResult, type: el.type, sig: typeChangeSig(el), head: was.head, pressure: was.pressure }; }
+				ids[ovKey(el)] = true;
+			}
+			if (!isNode && el.type === 'valve' && typeof m.valveType === 'string' && m.valveType) {
+				el.valveType = m.valveType.toUpperCase();   // base-write: a morph merged into Base is Morph in Base, and a valve's type is Base's there
+				ids[ovKey(el)] = true;
+			}
+		});
+		libControlsRead().forEach(function (c) {
+			if (c && (ids[ovKeyFor('link', c.link)] || (c.condition && c.condition.kind === 'node' && ids[ovKeyFor('node', c.condition.node)]))) { libAnnotateControl(c); }
+		});
+	}
+	// What the rebuilds would lose or read differently, in Morph's own words (changeSelectedTypeIn()),
+	// as paragraphs for the merge's question. Read with Base laid out.
+	function smMergeMorphText(list) {
+		var pc = EngCalcs.pageConfig || {}, lost = [], meaning = [], surface = [], born = [], moved = [], rules = [], setting = [], text = [];
+		paneInScenario(baseScenario(), function () {
+			(list || []).forEach(function (m) {
+				var el = m.el, r;
+				if (!el || typeof m.type !== 'string' || !morphTypeValid(el, m.type) || el.type === m.type) { return; }
+				if (elGroup(el) === 'node') {
+					r = nodeTypeChangeReport(el, m.type);
+					lost = lost.concat(r.lost); meaning = meaning.concat(r.meaning); surface = surface.concat(r.surface);
+				} else {
+					r = linkTypeChangeReport(el, m.type);
+					lost = lost.concat(r.lost); setting = setting.concat(r.meaning); born = born.concat(r.born);
+					moved = moved.concat(r.moved); rules = rules.concat(r.rules);
+				}
+			});
+		});
+		function para(key, fallback, lines) { if (lines.length) { text.push([pc[key] || fallback].concat(lines).join('\n')); } }
+		// The key to the lost lines first, as Morph's own box has it.
+		if (lost.length > 0) { text.push(String(pc.lpn_change_type_key || 'Each line: ID: the property and value that would be lost')); }
+		para('lpn_change_type_surface', 'These keep the water surface where it was. A reservoir\'s head is the tank\'s elevation plus its water depth, and a tank\'s water depth is the reservoir\'s head minus its elevation:', surface);
+		para('lpn_change_type_lost', 'These values will be lost:', lost);
+		para('lpn_change_type_born', 'These values are new, set as on a newly drawn asset:', born);
+		para('lpn_change_type_customers', 'Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand is already applied. They stay where they are drawn, and their demand is unchanged:', moved);
+		para('lpn_change_type_meaning', 'These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.', meaning);
+		para('lpn_change_type_setting', 'These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:', setting);
+		para('lpn_change_type_rules', 'These rule lines name a link by its kind, and will name its new kind instead:', rules);
+		return text;
+	}
+	// **A SAVED VIEW MERGED INTO BASE BECOMES BASE'S VIEW**: the map as Base shows it. Where the open
+	// scenario still holds a view of its own, the map stays on that one and Base's is set for the
+	// return (followScenarioView()); otherwise the map goes there now. A view is where the reader is
+	// looking, so Ctrl+Z does not move the map back, as it never does.
+	function smMergeBaseView(v) {
+		var iv = inwardViewOf(v);
+		if (!iv) { return; }
+		if (heldView(activeScenario())) { viewBeforeScenarioView = iv; return; }
+		if (viewShowsModel(iv)) { applyView(iv); }
 	}
 	// Removes one merged leaf from a stored record: a calculation set's multiplier and times have
 	// homes of their own.
@@ -6525,6 +6612,8 @@ var EngCalcs = EngCalcs || {};
 			b = baseScenario();
 			paneInScenario(b, function () {
 				withBasePick(b, tree, null, function () {
+					// The rebuild first, so the values merged with it land on the asset's new type.
+					smMergeBaseMorphs(plan.morphs);
 					plan.items.forEach(function (it) { setProp(smMergeElement(it.k), it.prop, altCopy(it.v)); });
 					plan.leaves.forEach(function (l) { smMergeBaseLeaf(l.path, l.value); });
 				});
@@ -6556,6 +6645,14 @@ var EngCalcs = EngCalcs || {};
 		});
 		if (plainObject(src.values) && !Object.keys(src.values).length) { delete src.values; }
 		plan.leaves.forEach(function (l) { smMergeDropLeaf(kind, src, l.path); });
+		plan.morphs.forEach(function (m) {
+			var ov = plainObject(src.values) ? src.values[m.k] : null;
+			if (!ov) { return; }
+			delete ov.type; delete ov.valveType;
+			if (!Object.keys(ov).length) { delete src.values[m.k]; }
+		});
+		if (plainObject(src.values) && !Object.keys(src.values).length) { delete src.values; }
+		if (plan.view !== undefined) { settingDelete(src, ['view']); smMergeBaseView(plan.view); }
 		treeDropEmpty();
 		touchTree('smMergeUpward');
 		return { source: key, target: targetKey, merged: plan.n };
@@ -77413,7 +77510,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!ups.length) { return; }
 		name = smName(tree, key);
 		first = smMergePlan(tree, key, ups[0].key);
-		if (!first || !first.own) { tellNotice((pc.lpn_sm_merge_none || 'The alternative {name} holds no overrides to merge.').replace('{name}', name)); return; }
+		if (!first || !first.own) { tellNotice((pc.lpn_sm_merge_none || 'The alternative {name} has no overrides to merge.').replace('{name}', name)); return; }
 		askDialog({ kind: 'choice', text: (pc.lpn_sm_merge_pick || 'Merge the overrides of {name} into which alternative? Its parent is listed first.').replace('{name}', name),
 			choices: ups.map(function (u, i) { return { label: u.name, value: u.key, isDefault: i === 0 }; })
 				.concat([{ label: pc.lpn_cancel || 'Cancel', value: null, cancel: true }]) }, function (tk) {
@@ -77423,18 +77520,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!plan) { return; }
 			tname = smName(tree, tk);
 			if (!plan.n) {
-				// Only what stays (a Morph, a view) was there to merge into Base.
-				tellNotice([(pc.lpn_sm_merge_none || 'The alternative {name} holds no overrides to merge.').replace('{name}', name)]
-					.concat(smMergeKeptText(plan, name)).join('\n\n'));
+				tellNotice((pc.lpn_sm_merge_none || 'The alternative {name} has no overrides to merge.').replace('{name}', name));
 				return;
 			}
-			parts = [(pc.lpn_sm_merge_ask || 'Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of holding them. You can undo this.')
+			parts = [(pc.lpn_sm_merge_ask || 'Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of overriding them. You can undo this.')
 				.replace(/\{name\}/g, name).replace('{n}', String(plan.n)).replace('{target}', tname)];
 			plan.skipped.forEach(function (s) {
 				parts.push((pc.lpn_sm_merge_skipped || '{between} also overrides these values. It is skipped and not changed, so {name} will read them from {between}, not from {target}:')
 					.replace(/\{between\}/g, s.name).replace('{name}', name).replace('{target}', tname) + '\n' + s.lines.join('\n'));
 			});
-			parts = parts.concat(smMergeKeptText(plan, name));
+			parts = parts.concat(smMergeMorphText(plan.morphs));
 			askDialog({ kind: 'confirm', text: parts.join('\n\n') }, function (yes) {
 				var res;
 				if (!yes) { return; }
@@ -77444,13 +77539,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				smAfter(true, false);
 			});
 		});
-	}
-	// What a merge into Base leaves in the source, said in the question.
-	function smMergeKeptText(plan, name) {
-		var pc = EngCalcs.pageConfig || {}, out = [];
-		if (plan.keepsMorph) { out.push((pc.lpn_sm_merge_keeps_morph || 'A change of type made with Morph is not merged into Base. It stays in {name}. To change the type in Base, use Morph in the Base scenario.').replace(/\{name\}/g, name)); }
-		if (plan.keepsView) { out.push((pc.lpn_sm_merge_keeps_view || 'A saved view is not merged into Base. It stays in {name}.').replace(/\{name\}/g, name)); }
-		return out;
 	}
 	// The Scenarios menu's Copy scenario: the open scenario, copied, and the copy made current.
 	function copyCurrentScenario() {

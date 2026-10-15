@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**148 still to read on master**, of 158 untranslated keys, of 2765 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**146 still to read on master**, of 156 untranslated keys, of 2763 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -75,7 +75,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED English: 'Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.'
   @@ NEEDS RULING
 
-## Synonym entries to approve  (17, 16 to read @@ NEEDS RULING)
+## Synonym entries to approve  (15, 14 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
@@ -175,22 +175,6 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-- **`lpn_scenario_push_tip`**
-  > (this key no longer exists in lib/lang.ec.en.php)
-  *Why stale:* the key no longer exists, so this entry describes nothing
-  *Written against:* Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded.
-  *Current synonym:* labels here = the map labels (Settings, Symbology, Labels) | avoid: the captions of form fields
-  **What this asks for:** WRITTEN PERMISSION to remove this `$ec_lang_syn` entry.
-  @@ NEEDS RULING
-
-- **`lpn_scenario_push_values`**
-  > (this key no longer exists in lib/lang.ec.en.php)
-  *Why stale:* the key no longer exists, so this entry describes nothing
-  *Written against:* Values thrown away:
-  *Current synonym:* Values thrown away, Values discarded, Values lost, Values wiped, Values replaced, Values displaced, Values cleared, Custom values cleared | a count follows this label, not a list of values
-  **What this asks for:** WRITTEN PERMISSION to remove this `$ec_lang_syn` entry.
-  @@ NEEDS RULING
-
 - **`lpn_snip_tip_mode`**
   > Snip shape
   *Why stale:* no record of the English it was written against
@@ -214,7 +198,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (158, 148 to read @@ NEEDS RULING)
+## lpn_  (156, 146 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -583,7 +567,7 @@ never edits a synonym.
   > Delete the alternative {name}?
   @@ NEEDS RULING
 - **`lpn_sm_help`**
-  > How scenarios and alternatives work:\n\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\n\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\n\nProperties and settings belong to alternatives categories that appear as columns of the Scenarios table and as management options in Scenario manager.\n\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\n\nExample: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\n\nHow to manage scenarios:\n\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\n\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\n\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\n\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\n\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\n\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
+  > How scenarios and alternatives work:\n\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\n\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\n\nProperties and settings belong to alternatives categories that appear as columns of the Scenarios table and as management options in Scenario manager.\n\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\n\nExample: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\n\nHow to manage scenarios:\n\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\n\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\n\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\n\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\n\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\n\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
   @@ NEEDS RULING
 - **`lpn_sm_in_use`**
   > {item}\ncannot be deleted while it is used by\n{list}
@@ -604,19 +588,13 @@ never edits a synonym.
   > Scenario manager…
   @@ NEEDS RULING
 - **`lpn_sm_merge_ask`**
-  > Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of holding them. You can undo this.
-  @@ NEEDS RULING
-- **`lpn_sm_merge_keeps_morph`**
-  > A change of type made with Morph is not merged into Base. It stays in {name}. To change the type in Base, use Morph in the Base scenario.
-  @@ NEEDS RULING
-- **`lpn_sm_merge_keeps_view`**
-  > A saved view is not merged into Base. It stays in {name}.
+  > Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of overriding them. You can undo this.
   @@ NEEDS RULING
 - **`lpn_sm_merge_line`**
   > {asset}: {property}
   @@ NEEDS RULING
 - **`lpn_sm_merge_none`**
-  > The alternative {name} holds no overrides to merge.
+  > The alternative {name} has no overrides to merge.
   @@ NEEDS RULING
 - **`lpn_sm_merge_pick`**
   > Merge the overrides of {name} into which alternative? Its parent is listed first.
@@ -706,9 +684,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/tom-answers-1015b (`2d6949ab`) — adds no English strings
+### chore/tom-answers-1015b (`8a3c4f34`) — adds no English strings
 
-### feat/bentley-interop (`2c2591d8`) — adds no English strings
+### feat/bentley-interop (`cf4455be`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -734,11 +712,11 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/leader-keep (`4e80e08e`) — adds no English strings
+### feat/leader-keep (`19ddef61`) — adds no English strings
 
 ### feat/match-property (`05bda765`) — adds no English strings
 
-### feat/text-halo (`c939d71b`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/text-halo (`663735f4`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_settings_text_halo`**
   > Text halo width (percent of text size)
@@ -747,4 +725,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Width of the solid outline behind map text, as a percent of the text size. Applies when Solid background behind labels is on.
   @@ NEEDS RULING
 
-### fix/search-zoom-accuracy (`9ab76a69`) — adds no English strings
+### fix/search-zoom-accuracy (`84c29bdc`) — adds no English strings

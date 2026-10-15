@@ -12,7 +12,10 @@
 //       untouched, C is emptied; the stale results stay on screen (Recalculate off);
 //   M5  one Ctrl+Z puts all of it back;
 //   M6  from the right-click menu, into the parent B: no skipped level is named; and into Base the
-//       drawing itself takes the values.
+//       drawing itself takes the values;
+//   M7  into Base, a Morph is Morph in Base (junction 22 becomes a tank in the drawing, the question
+//       listing what is lost in Morph's words), and a saved view becomes Base's view: the map moves
+//       there (Tom, 2026-10-15: "Why can't Morph or a saved view be used in the Base alternative?").
 // Wording is read from the page's own language strings.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -57,7 +60,9 @@ async function main() {
 		d.alternatives = [
 			{ id: 'a1', category: 'physical', name: 'A', parent: null },
 			{ id: 'a2', category: 'physical', name: 'B', parent: 'a1', values: { 'l:10': { diameter: 16 } } },
-			{ id: 'a3', category: 'physical', name: 'C', parent: 'a2', values: { 'l:10': { diameter: 20 }, 'n:22': { elev: 900 } } }];
+			{ id: 'a3', category: 'physical', name: 'C', parent: 'a2', values: { 'l:10': { diameter: 20 }, 'n:22': { elev: 900 } } },
+			{ id: 'a4', category: 'topology', name: 'Tank at 22', parent: null, values: { 'n:22': { type: 'tank' } } },
+			{ id: 'a5', category: 'presentation', name: 'Close up', parent: null, settings: { view: { cx: 20, cy: 40, s: 12 } } }];
 		d.scenarios.push({ id: 's1', name: 'Uses C', overrides: {}, alternatives: { physical: 'a3' } });
 		d.project = Object.assign({}, d.project, { activeScenario: 'base' });
 		// Recalculate off: a merge then leaves the answers on screen as a snapshot (CLAUDE.md, lpn_).
@@ -190,6 +195,30 @@ async function main() {
 		ok('M6 into Base: the drawing takes pipe 10\'s diameter and junction 22\'s elevation', byId(sv.links, '10')._diameter === 20 && byId(sv.nodes, '22').elev === 900,
 			JSON.stringify([byId(sv.links, '10')._diameter, byId(sv.nodes, '22').elev]));
 		ok('M6 ...B keeps its own 16', vals(sv, 'a2')['l:10'].diameter === 16);
+
+		console.log('--- M7. a Morph and a saved view, into Base ---');
+		await page.selectOption('#lpn_sm_tree_select', 'topology');
+		await settle(600);
+		await clickRow('Tank at 22');
+		await click('#lpn_sm_merge');
+		await press(await L('lpn_scenario_base'));
+		const q7 = await dialogText();
+		ok('M7 the question lists what Morph in Base loses', !!q7 && q7.indexOf(await L('lpn_change_type_lost')) > 0, JSON.stringify(q7));
+		await press(await L('lpn_dialog_ok'));
+		await flush();
+		sv = await saved();
+		ok('M7 junction 22 is a tank in the drawing, and the alternative is empty', byId(sv.nodes, '22').type === 'tank' && !vals(sv, 'a4'), JSON.stringify(byId(sv.nodes, '22')));
+		const v0 = sv.view;
+		await page.selectOption('#lpn_sm_tree_select', 'presentation');
+		await settle(600);
+		await clickRow('Close up');
+		await click('#lpn_sm_merge');
+		await press(await L('lpn_scenario_base'));
+		await press(await L('lpn_dialog_ok'));
+		await flush();
+		sv = await saved();
+		ok('M7 the saved view is Base\'s view now: the map moved there', !!sv.view && Math.abs(sv.view.cx - 20) < 0.5 && Math.abs(sv.view.s - 12) < 0.01 && !(byId(sv.alternatives, 'a5') || {}).settings,
+			JSON.stringify([v0, sv.view]));
 
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {
