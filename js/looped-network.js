@@ -6861,7 +6861,7 @@ var EngCalcs = EngCalcs || {};
 	// (leader-angle-harness.js counts the leader snap's) does not count this table.
 	[['presentation', ['textSize', 'symbolSize', 'linkWidth', 'symbolOpacity', 'symbolCapMultiple',
 		'symbolCapPercentile', 'labelMaxWidth', 'alignPipeLabels', 'labelFlipLeftOfVertical',
-		'maskLabels', 'showArrows', 'leaderSnapDeg', 'legendPosition', 'basemapStyle', 'backdropOpacity',
+		'maskLabels', 'textHalo', 'showArrows', 'leaderSnapDeg', 'legendPosition', 'basemapStyle', 'backdropOpacity',
 		'colorNodeField', 'colorLinkField', 'colorRampNode', 'colorRampLink', 'colorClassesNode',
 		'colorClassesLink', 'colorReverseNode', 'colorReverseLink', 'colorBreaks', 'colorModes',
 		'colorLegendPosition', 'contourFill', 'contourLines', 'contourLabels', 'contourOpacity',
@@ -29331,7 +29331,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		idPrefixes: 'lpn_settings_id_prefixes', textSize: 'lpn_settings_text_size', symbolSize: 'lpn_settings_symbol_size',
 		linkWidth: 'lpn_settings_link_width', symbolOpacity: 'lpn_settings_symbol_opacity',
 		labelMaxWidth: 'lpn_settings_label_max_width', alignPipeLabels: 'lpn_settings_align_labels',
-		labelFlipLeftOfVertical: 'lpn_settings_readability_bias', maskLabels: 'lpn_settings_mask_labels',
+		labelFlipLeftOfVertical: 'lpn_settings_readability_bias', maskLabels: 'lpn_settings_mask_labels', textHalo: 'lpn_settings_text_halo',
 		showArrows: 'lpn_settings_show_arrows', leaderSnapDeg: 'lpn_settings_leader_snap',
 		legendPosition: 'lpn_settings_legend_position', basemapStyle: 'lpn_settings_basemap_style',
 		backdropOpacity: 'lpn_settings_backdrop_opacity', colorNodeField: 'lpn_settings_color_node_field',
@@ -57809,7 +57809,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		relayoutLabels();
 	}
 	function textHaloPct() {
-		var v = settings.textHalo;
+		var v = scnSetting('textHalo');
 		return (typeof v === 'number' && isFinite(v) && v >= 0) ? v : 40;
 	}
 	function applyTextHalo() {
