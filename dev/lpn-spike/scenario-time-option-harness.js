@@ -137,11 +137,13 @@ function timesLines(inp) {
 		m2.time && JSON.stringify(m2.time.times));
 	ok('...and the one the transport steps through', EC.lpnReportTimes(L.effectiveTimes()).length === 49);
 	ok('the badge counts each as a custom value', L.overrideCount(s2) === 2, L.overrideCount(s2));
-	ok('typing the project\'s own value counts nothing', (function () {
+	// By presence, as every override counts (Task 800; Tom, 2026-10-06: "We can't treat any value
+	// overrides differently."): the project's own value typed in a scenario is still its override.
+	ok('typing the project\'s own value still counts, as an override equal to its parent does', (function () {
 		type(two.id, 'hydraulicStep', '1:00');
 		const n = L.overrideCount(L.byIdScn(two.id));
 		type(two.id, 'hydraulicStep', '0:30');
-		return n === 1;
+		return n === 2;
 	}()));
 	L.switchScenario('base');
 	ok('Base still runs 24 hours', L.effectiveTimes() === doc.times && L.assembleModel().time.times.duration === 86400);

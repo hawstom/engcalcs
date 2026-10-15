@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**156 still to read on master**, of 167 untranslated keys, of 2774 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**158 still to read on master**, of 169 untranslated keys, of 2776 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -198,7 +198,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (167, 156 to read @@ NEEDS RULING)
+## lpn_  (169, 158 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -286,6 +286,12 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_ovl_note`**
   > These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Click an ID to go to the asset on the map.
+  @@ NEEDS RULING
+- **`lpn_ovl_same`**
+  > (same)
+  @@ NEEDS RULING
+- **`lpn_ovl_same_tip`**
+  > Equal to the inherited value. It is still an override, and it is counted.
   @@ NEEDS RULING
 - **`lpn_ovl_title`**
   > Overrides: {name}
@@ -749,7 +755,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/match-property (`05bda765`) — adds no English strings
 
-### feat/override-audit (`2d0dd38f`) — adds no English strings
+### feat/override-audit (`c60face5`) — adds no English strings
 
 ### feat/plural (`8c9f8730`) — adds no English strings
 

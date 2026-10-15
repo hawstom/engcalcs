@@ -20,8 +20,10 @@
 //       Physical (13), Demand (2), Text (1), Calculation (1), and the groups add up to the count;
 //   O4  each row: the asset, the field as the Tables pane heads it, this scenario's value and the
 //       value it replaces (a diameter's Base value; the multiplier's project value; a dash for no
-//       default pattern); nothing anywhere reads "1 overrides";
+//       default pattern), an override equal to it marked "(same)"; nothing reads "1 overrides";
 //   O5  clicking an asset's ID closes the list and goes to it on the map, selected.
+//   O6  a yes/no reads in words both ways (a pump switched off: No, replacing Yes); and deleting an
+//       alternative says the number of overrides the list showed for it (13, 2, 1).
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -153,7 +155,11 @@ async function main() {
 		ok('O4 pipe L7: 1.75 replacing Base\'s 1', !!l7 && l7[2] === '1.75' && l7[3] === '1', JSON.stringify(l7));
 		const dem = got.groups[1].rows;
 		const jn = dem.filter((r) => r[0].indexOf('J-NE-S-3') >= 0)[0];
-		ok('O4 the override Tom did not see: junction J-NE-S-3\'s Demand, 1 replacing Base\'s 1', !!jn && jn[0] === (await L('lpn_tool_add_junction')) + ' J-NE-S-3' && jn[2] === '1' && jn[3] === '1', JSON.stringify(dem));
+		ok('O4 the override Tom did not see: junction J-NE-S-3\'s Demand, 1 replacing Base\'s 1', !!jn && jn[0] === (await L('lpn_tool_add_junction')) + ' J-NE-S-3' && jn[2] === '1 ' + (await L('lpn_ovl_same')) && jn[3] === '1', JSON.stringify(dem));
+		ok('O4 ...marked "' + (await L('lpn_ovl_same')) + '", with a tip saying it still counts', await page.evaluate(() => {
+			const m = Array.from(document.querySelectorAll('#lpn_dialog_body .lpn-ovl-same'));
+			return m.length === 1 && !!m[0].title;
+		}));
 		const pat = dem.filter((r) => r[0].indexOf('J-NE-S-3') < 0)[0];
 		ok('O4 the default pattern P1, replacing none (a dash)', !!pat && pat[2] === 'P1' && pat[3] === '–', JSON.stringify(pat));
 		const txt = got.groups[2].rows[0];
@@ -171,6 +177,32 @@ async function main() {
 		ok('O5 ...and pipe L10 is selected on the map', sel === 1, String(sel));
 		const v1 = await page.evaluate(() => { const g = document.querySelector('#lpn_canvas g'); return g ? g.getAttribute('transform') : null; });
 		ok('O5 ...the map moved to it', v0 !== v1, JSON.stringify([v0, v1]));
+
+
+		console.log('--- O6. a yes/no in words; Delete counts what the list shows ---');
+		await clickRow('EPS Pump off');
+		await click('#lpn_sm_overrides');
+		const topo = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_dialog_body .lpn-ovl-group[data-cat="topology"] tbody tr')).map((tr) => Array.from(tr.children).map((td) => td.textContent)));
+		const yes = await L('lpn_settings_table_yes'), no = await L('lpn_settings_table_no');
+		ok('O6 EPS Pump off: each pump switched off reads "' + no + '", replacing "' + yes + '" (never a dash)', topo.length === 2 && topo.every((r) => r[2] === no && r[3] === yes), JSON.stringify(topo));
+		await page.evaluate(() => { const b = Array.from(document.querySelectorAll('#lpn_dialog_buttons button'))[0]; b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })); });
+		await settle(500);
+		// Deleting 1-hr (Basic mode off) keeps its alternatives, unused; deleting one then asks, counting.
+		await clickRow(ONE_HR);
+		await click('#lpn_sm_del');
+		await page.evaluate(() => { const b = Array.from(document.querySelectorAll('#lpn_dialog_buttons button'))[0]; b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })); });
+		await settle(800);
+		const goes = await L('lpn_scenario_delete_goes');
+		for (const [tree, name, n] of [['physical', ONE_HR, 13], ['demand', '1-hr drain w pumps off', 2], ['calculation', ONE_HR, 1]]) {
+			await page.selectOption('#lpn_sm_tree_select', tree);
+			await settle(500);
+			await clickRow(name);
+			await click('#lpn_sm_del');
+			const q = await page.evaluate(() => { const m = document.querySelector('#lpn_dialog .lpn-dialog-msg'); return m ? m.textContent : ''; });
+			ok('O6 deleting the ' + tree + ' alternative ' + name + ' says ' + n + ' go, as the list showed', q.indexOf(goes.replace('{n}', String(n))) >= 0, q);
+			await page.evaluate((c) => { const b = Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).find((x) => x.textContent.trim() === c); if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })); } }, await L('lpn_cancel'));
+			await settle(400);
+		}
 
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {

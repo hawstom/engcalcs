@@ -163,7 +163,7 @@ holds. It is the minimum honest view of a model that otherwise has no screen, **
 it.**
 
 **The demand multiplier, run time and time step are counted in the Calculation column** (Q7), by
-`overrideCount()`'s rule (only where they differ from the project's own), so a row's counts add up
+`overrideCount()`'s rule (by presence, as every override counts; Task 800), so a row's counts add up
 to the number beside the scenario's name. Their own three columns retired with the Settings table,
 which is where they are typed. No editing, no Bentley import or export, no Google Sheets: the
 Advanced UX is not designed.
@@ -1241,8 +1241,10 @@ overrides, 1 text override, and 2 calculation overrides."*
 
 **The count** is `ownOverrideItems(scn).length`: the scenario's own values, plus the values held in the
 record `writeTargetFor()` names for each category (the marker's rule), never that record's parents and
-never what the parent scenario supplies. A Base of its own counts nothing (a copy, not an override). The
-multiplier and the two times count only where they differ from the project's own, as before. The 24
+never what the parent scenario supplies. A Base of its own counts nothing (a copy, not an override).
+**Every value counts by presence** (Tom, 2026-10-06: *"We can't treat any value overrides
+differently."*): the multiplier and the two times now count like a demand, even when equal to the
+project's own, so a new project's "4. Average Day" (multiplier 1) reads (1). The 24
 had counted inherited records: EPS Pump off's Active topology (2) and Initial settings (2, plus EPS's 2)
 and EPS's run time (1). The own count is 17, not his 16: junction J-NE-S-3's Demand is an override in
 "1-hr drain w pumps off" holding 1 gpm, the same as Base's, so nothing on screen shows it. His "2
@@ -1252,11 +1254,17 @@ calculation" are the multiplier (26) and the default pattern (P1), which is file
 greyed with no overrides). It opens the page's dialog: the count, then one table per category and
 holding alternative (Asset, Property with its unit, Override, Inherited value), the inherited value
 being what the scenario reads without the override (the alternative's parent chain, else Base). An
+override equal to it carries a muted "(same)", with a tip saying it still counts. A yes/no reads Yes or
+No (the Properties line's dash for "no" read as "no value" in a table). Delete alternative counts the
+same items (`storedOwnItems()`), so its "Its overrides ({n})" is the list's number. The Status column's
+heading is the Tables pane's own, "Closed", while the values are EPANET's tokens (open/closed); left as
+is. An
 asset's ID closes the list and goes to it on the map (`findGoTo()`). The delete questions already
 counted only what is deleted, so they are unchanged.
 
-Code: `ownOverrideItems()`, `ownOverrideInherited()` beside `overrideCount()`; `ownOverrideGroups()`,
-`smActListOverrides()` in the manager's section. Harness: `override-audit-browser-harness.js`, on his
+Code: `ownOverrideItems()`, `storedOwnItems()`, `ownOverrideInherited()` beside `overrideCount()`; `ownOverrideGroups()`,
+`smActListOverrides()` in the manager's section. Harnesses: `override-audit-harness.js` (headless: the
+rule, and Delete against the list for every record) and `override-audit-browser-harness.js`, on his
 file (`fixtures/fotobi-override-audit.epp`).
 
 ### Next stage: what the advisers said (recorded, not built)

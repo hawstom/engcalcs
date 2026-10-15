@@ -4905,10 +4905,9 @@ var EngCalcs = EngCalcs || {};
 	 * nothing. Each item is {cat, kind: 'scn' | 'alt' | 'calc', obj (the holder), key and prop (an
 	 * element value) or path (a setting), value}.
 	 *
-	 * **A DEMAND MULTIPLIER, RUN TIME OR TIME STEP COUNTS ONLY WHERE IT DIFFERS FROM THE PROJECT'S
-	 * OWN** (Task 721, 755): a scenario stating the project's own multiplier changes nothing, and a
-	 * document that states none means 1. Every other value counts by presence, as the marker reads it:
-	 * an override equal to its parent's value is still an override (Tom, 2026-10-05).
+	 * **EVERY VALUE COUNTS BY PRESENCE**, as the marker reads it: an override equal to its parent's
+	 * value is still an override (Tom, 2026-10-05), the demand multiplier and the two times included
+	 * (calcOptionLeaves()).
 	 */
 	function ownOverrideItems(scn) {
 		var out = [];
@@ -4932,17 +4931,23 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (!isExplicitTree()) { return out; }
 		LPN_ALT_CATEGORIES.forEach(function (cat) {
-			var t = writeTargetFor(scn, cat), r;
+			var t = writeTargetFor(scn, cat);
 			if (!t || t.kind === 'scn' || t.obj.root === true) { return; }
-			r = t.obj;
-			if (t.kind === 'alt') {
-				elementValues(cat, 'alt', r, r.values, true);
-				settingLeaves(r.settings).forEach(function (l) { out.push({ cat: cat, kind: 'alt', obj: r, path: l.path, value: l.value }); });
-			} else {
-				settingLeaves(r.settings).forEach(function (l) { out.push({ cat: cat, kind: 'calc', obj: r, path: l.path, value: l.value }); });
-				calcOptionLeaves(r).forEach(function (l) { out.push({ cat: cat, kind: 'calc', obj: r, path: l.path, value: l.value }); });
-			}
+			out = out.concat(storedOwnItems(t.kind, t.obj));
 		});
+		return out;
+	}
+	// One stored alternative's or calculation set's own values, as items of the list: what the list
+	// shows for it, and what Delete says goes with it (storedOverrideCount()).
+	function storedOwnItems(kind, r) {
+		var out = [], cat = kind === 'calc' ? 'calculation' : r.category, map = kind === 'alt' && plainObject(r.values) ? r.values : {};
+		Object.keys(map).forEach(function (key) {
+			Object.keys(plainObject(map[key]) ? map[key] : {}).forEach(function (prop) {
+				if (categoryOf(prop, ovKeyGroup(key)) === cat) { out.push({ cat: cat, kind: kind, obj: r, key: key, prop: prop, value: map[key][prop] }); }
+			});
+		});
+		settingLeaves(r.settings).forEach(function (l) { out.push({ cat: cat, kind: kind, obj: r, path: l.path, value: l.value }); });
+		if (kind === 'calc') { calcOptionLeaves(r).forEach(function (l) { out.push({ cat: cat, kind: kind, obj: r, path: l.path, value: l.value }); }); }
 		return out;
 	}
 	/**
@@ -4987,19 +4992,20 @@ var EngCalcs = EngCalcs || {};
 		}
 		return { value: p.length > 1 ? settingGet(settingRootValue(p[0]), p.slice(1)) : settingRootValue(p[0]) };
 	}
-	// The three calculation options with homes of their own that this scenario COUNTS: each only
-	// where it differs from the project's own (see overrideCount()). Read by the count and by the
-	// Calculation alternative (Q7), so the counts across a row add up to the number by the name.
+	// The three calculation options with homes of their own that this scenario (or calculation set)
+	// HOLDS, each by presence, as every other override counts (Task 800; Tom, 2026-10-06: *"We can't
+	// treat any value overrides differently."*). A multiplier equal to the project's is still an
+	// override, as a demand equal to Base's is. Read by the count, the list, the delete questions and
+	// the Calculation alternative (Q7), so they all agree.
 	function calcOptionLeaves(scn) {
-		var out = [], docDm = (settings.hydraulics || {}).demandMultiplier;
+		var out = [];
 		if (!scn || scn.isBase) { return out; }
-		if (!(typeof docDm === 'number' && isFinite(docDm))) { docDm = 1; }
-		if (typeof scn.demandMultiplier === 'number' && isFinite(scn.demandMultiplier) && scn.demandMultiplier !== docDm) {
+		if (typeof scn.demandMultiplier === 'number' && isFinite(scn.demandMultiplier)) {
 			out.push({ path: ['settings', 'hydraulics', 'demandMultiplier'], value: scn.demandMultiplier });
 		}
 		LPN_SCENARIO_TIME_KEYS.forEach(function (key) {
 			var v = scenarioTimeValue(scn, key);
-			if (v !== undefined && v !== projectTimes()[key]) { out.push({ path: ['times', key], value: v }); }
+			if (v !== undefined) { out.push({ path: ['times', key], value: v }); }
 		});
 		return out;
 	}
@@ -7454,16 +7460,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	// How many overrides one stored alternative or calculation set holds: its element values, its
 	// settings, and a calculation set's demand multiplier and two times.
-	function storedOverrideCount(kind, rec) {
-		var m = combineHolders([rec]), n = 0;
-		Object.keys(m.values).forEach(function (k) { n += Object.keys(m.values[k]).length; });
-		n += settingLeaves(m.settings).length;
-		if (kind === 'calc') {
-			if (typeof rec.demandMultiplier === 'number') { n++; }
-			LPN_SCENARIO_TIME_KEYS.forEach(function (key) { if (scenarioTimeValue(rec, key) !== undefined) { n++; } });
-		}
-		return n;
-	}
+	// The same items the override list shows for that record (Task 800), so the two never disagree.
+	function storedOverrideCount(kind, rec) { return storedOwnItems(kind, rec).length; }
 	// "Its overrides ({n}) are deleted with it.", or '' (Tom, 2026-10-13: one form, no singular).
 	function overridesGoText(n) {
 		var pc = EngCalcs.pageConfig || {};
@@ -77824,6 +77822,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			o.value = own.text; o.valueTip = own.tip;
 			own = inh.none ? { text: FF_DASH, tip: '' } : ovlValueText(inh.value, parts && it.key !== undefined ? parts : null, it.path);
 			o.inherited = own.text; o.inhTip = own.tip;
+			// Equal to what it replaces, and still counted (Tom, 2026-10-05: *"It's still an override?
+			// Yes."*): said beside the value, so the count needs no explaining.
+			o.same = !inh.none && o.value === o.inherited && (o.valueTip || '') === (o.inhTip || '');
 			g.items.push(o);
 		});
 		groups.sort(function (a, b) {
@@ -77858,6 +77859,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			for (i = 0; i < ch.length; i++) { if (ch[i][0] === v) { return { text: String(ch[i][1]), tip: '' }; } }
 		}
 		if (path && path[0] === 'times' && typeof v === 'number' && EngCalcs.lpnFormatTime) { return { text: EngCalcs.lpnFormatTime(v), tip: '' }; }
+		// A yes/no in words, both ways: the Properties line's mark for "no" is a dash, which in a
+		// table reads as "no value" (Perry, 2026-10-15: an asset switched off showed a dash).
+		if (typeof v === 'boolean') { return { text: v ? settingTableYes() : settingTableNo(), tip: '' }; }
 		full = String(typeof v === 'object' ? JSON.stringify(v) : formatPropValue(v));
 		text = full.split('\n')[0];
 		if (text === full && text.length <= 60) { return { text: full, tip: '' }; }
@@ -77905,6 +77909,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					ffCell(row, o.property);
 					c = ffCell(row, o.value, 'lpn-ovl-value');
 					if (o.valueTip) { c.title = o.valueTip; }
+					if (o.same) {
+						b = ffEl('span', 'lpn-ovl-same', ' ' + (pc.lpn_ovl_same || '(same)'), c);
+						b.title = pc.lpn_ovl_same_tip || 'Equal to the inherited value. It is still an override, and it is counted.';
+					}
 					c = ffCell(row, o.inherited, 'lpn-ovl-inherited');
 					if (o.inhTip) { c.title = o.inhTip; }
 				});

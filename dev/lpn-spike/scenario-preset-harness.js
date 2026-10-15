@@ -110,7 +110,9 @@ check(!L.indexEntry(L.getLibrary().openId).dirty, 'first visit: the presets do n
 {
 	const byId2 = {};
 	L.getScenarios().forEach((s) => { byId2[s.id] = s; });
-	check(L.overrideCount(byId2.average_day) === 0, '4. Average Day (multiplier 1) counts as no change on a document stating none');
+	// By presence (Task 800): the preset states a multiplier of 1, the value a document stating none
+	// solves with, and that is one override, shown in its list as "(same)".
+	check(L.overrideCount(byId2.average_day) === 1, '4. Average Day (multiplier 1) counts its one override, equal to the project\'s');
 	check(L.overrideCount(byId2.max_day) === 1, '5. Max Day counts its multiplier as one change');
 	L.switchScenario('peak_hour');
 	check(L.docDM() === 3, 'switching to 6. Peak hour solves at 3 x demand', String(L.docDM()));
