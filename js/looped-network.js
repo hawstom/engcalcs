@@ -6311,11 +6311,6 @@ var EngCalcs = EngCalcs || {};
 	//
 	// NOT annotation: the network itself and the user's own Text labels, which are authored content.
 	// A Text label is hidden or shown per label in applyLabelVisibility(), by scenario membership.
-	// Where a leader line is drawn: the leaders layer just under the labels, so the label layer's halo
-	// filter (Task 791) never widens a hairline. The fallback is for a layer stack built without one.
-	function leaderHost() {
-		return (labelsLayer && labelsLayer.lpnLeaders) || labelsLayer;
-	}
 	function annotationEl(tag, attrs, parent) {
 		var e = el(tag, attrs, parent), cls = e.getAttribute('class');
 		e.setAttribute('class', (cls ? cls + ' ' : '') + 'lpn-annotation');
@@ -6361,7 +6356,6 @@ var EngCalcs = EngCalcs || {};
 		// While it is DETACHED it must not move on the screen at all, which takes an equal and
 		// opposite transform on its own group, and a re-derivation once the gesture settles.
 		georefDetachTick();
-		noteViewMoving();   // the moving map wears the cheap halo (Task 791)
 	}
 	// ---- ROADMAP Task 274: the user works in CARTESIAN coordinates (Y increases upward) ----
 	//
@@ -10414,7 +10408,7 @@ var EngCalcs = EngCalcs || {};
 		// Leader+text go in labelsLayer, the topmost layer, so this label is never covered by a
 		// LATER node/link's own symbol. The leader starts hidden until layoutNodeLabel() below
 		// positions it for real.
-		var leader = annotationEl('line', { 'class': 'lpn-leader', style: 'display:none' }, leaderHost());
+		var leader = annotationEl('line', { 'class': 'lpn-leader', style: 'display:none' }, labelsLayer);
 		// font-size inline, NOT the .lpn-lbl CSS class's 11px: SVG font-size is interpreted in the
 		// local (world-unit) coordinate system, so an "11-unit" font is enormous next to nodes spaced
 		// 10-40 units apart. Same effectiveFontSize() as a user Text label -- the two are told apart
@@ -10505,7 +10499,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		// Link label: a multi-line <text>, same convention as a node's. Content is filled in by
 		// refreshLabelText(); this only creates the element, empty.
-		var leader = annotationEl('line', { 'class': 'lpn-leader', style: 'display:none' }, leaderHost());
+		var leader = annotationEl('line', { 'class': 'lpn-leader', style: 'display:none' }, labelsLayer);
 		var text = annotationEl('text', {
 			'class': 'lpn-lbl lpn-draglbl', 'data-linklbl': l.id, style: 'font-size:' + effectiveFontSize() + 'px'
 		}, labelsLayer);
@@ -11100,12 +11094,12 @@ var EngCalcs = EngCalcs || {};
 			px = pt.x, py = pt.y,
 			leader = null, text;
 		if (an) {
-			leader = el('line', { x1: an.x, y1: an.y, x2: px, y2: py, 'class': 'lpn-leader' }, leaderHost());
+			leader = el('line', { x1: an.x, y1: an.y, x2: px, y2: py, 'class': 'lpn-leader' }, labelsLayer);
 		}
 		text = el('text', {
 			x: px, y: py, 'class': 'lpn-lbl lpn-draglbl',
 			'data-lbl': lb.id, style: textLabelStyle(lb)
-		}, labelHaloHost(lb.sizeMult));
+		}, labelsLayer);
 		applyTextLabelJustification(lb, { text: text });
 		setTextLabelContent(text, lb, px);
 		// MEASURED AFTER THE STYLE IS ON THE ELEMENT: bold glyphs are wider, so a width taken before
@@ -12532,8 +12526,6 @@ var EngCalcs = EngCalcs || {};
 	function buildDom() {
 		var i;
 		linksLayer.innerHTML = ''; nodesLayer.innerHTML = ''; labelsLayer.innerHTML = '';
-		if (labelsLayer.lpnLeaders) { labelsLayer.lpnLeaders.innerHTML = ''; }
-		labelsLayer.lpnSizeGroups = null;   // emptied with it (Task 791)
 		// **THE SYMBOL LAYER IS THE FOURTH ONE AND IT WAS NOT BEING EMPTIED** (Tom, 2026-09-12:
 		// *"I drew two junctions and a pump on a blank Project1 map. Then I closed the project
 		// without saving. The pump symbol remained. I can drag it around. I can't edit it or
@@ -12670,7 +12662,6 @@ var EngCalcs = EngCalcs || {};
 	function updateLabelGeometry(id) {
 		labelCacheTaint();
 		var lb = labelById(id), le = labelEls[id], an = textAnchorPoint(lb), px, py, box, halfW, att;
-		seatTextLabel(lb, le);   // a changed size changes which halo group it needs (Task 791)
 		if (!an) {
 			// repositionMultilineText(), not two setAttribute()s: every ROW of a multi-line label
 			// carries its own x, so moving the parent alone would strand the rows where they were
@@ -13681,8 +13672,7 @@ var EngCalcs = EngCalcs || {};
 	function drawnInkItems() {
 		var out = [], sc = state.s || 1, rr = svg.getBoundingClientRect(), els, i, e, b, cs, ax, ay, n, h, id;
 		if (!labelsLayer || !labelsLayer.querySelectorAll || !window.getComputedStyle) { return out; }
-		els = Array.prototype.slice.call(labelsLayer.querySelectorAll('text'));
-		if (labelsLayer.lpnLeaders) { els = els.concat(Array.prototype.slice.call(labelsLayer.lpnLeaders.querySelectorAll('line.lpn-leader'))); }
+		els = labelsLayer.querySelectorAll('text, line.lpn-leader');
 		for (i = 0; i < els.length; i++) {
 			e = els[i];
 			if (e.tagName.toLowerCase() === 'text' && !(e.textContent || '').trim()) { continue; }
@@ -35875,8 +35865,7 @@ var EngCalcs = EngCalcs || {};
 	// Counted for the harness: a reuse that quietly never happens looks exactly like one that works.
 	var drawingsBuilt = 0, drawingsReused = 0;
 	function drawingLayers(d) {
-		return [d.shapesLayer, d.customersLayer, d.linksLayer, d.linkSymbolLayer, d.nodesLayer,
-			d.labelsLayer && d.labelsLayer.lpnLeaders, d.labelsLayer];
+		return [d.shapesLayer, d.customersLayer, d.linksLayer, d.linkSymbolLayer, d.nodesLayer, d.labelsLayer];
 	}
 	function captureDrawing() {
 		return { shapesLayer: shapesLayer, shapeEls: shapeEls, customersLayer: customersLayer, linksLayer: linksLayer,
@@ -35897,7 +35886,6 @@ var EngCalcs = EngCalcs || {};
 		custEls = d.custEls; custLblEls = d.custLblEls; customersByLink = d.customersByLink;
 		labelWorkSkipped = d.labelWorkSkipped; lastLayoutScale = d.lastLayoutScale;
 		custHandleEl = null;
-		applyLabelHaloRadius();   // a kept drawing's Text size groups were sized at another zoom
 	}
 	function showDrawing(d, on) {
 		drawingLayers(d).forEach(function (L) { if (L && L.style) { L.style.display = on ? '' : 'none'; } });
@@ -35923,11 +35911,9 @@ var EngCalcs = EngCalcs || {};
 			L.parentNode.insertBefore(n, L);
 			return n;
 		}
-		var freshLabels = twin(labelsLayer);
-		if (labelsLayer && labelsLayer.lpnLeaders && freshLabels !== labelsLayer) { freshLabels.lpnLeaders = twin(labelsLayer.lpnLeaders); }
 		adoptDrawing({ shapesLayer: twin(shapesLayer), shapeEls: {}, customersLayer: twin(customersLayer), linksLayer: twin(linksLayer),
 			linkSymbolLayer: twin(linkSymbolLayer), nodesLayer: twin(nodesLayer),
-			labelsLayer: freshLabels, nodeEls: {}, linkEls: {}, labelEls: {}, incidentLinks: {},
+			labelsLayer: twin(labelsLayer), nodeEls: {}, linkEls: {}, labelEls: {}, incidentLinks: {},
 			labelsByAnchor: {}, labelsByLinkAnchor: {}, custEls: {}, custLblEls: {}, customersByLink: {},
 			labelWorkSkipped: false, lastLayoutScale: lastLayoutScale });
 	}
@@ -46740,8 +46726,7 @@ var EngCalcs = EngCalcs || {};
 		'opacity', 'visibility', 'filter', 'paint-order', 'vector-effect', 'mix-blend-mode',
 		'font-family', 'font-size', 'font-weight', 'font-style', 'letter-spacing',
 		'text-anchor', 'dominant-baseline', 'alignment-baseline', 'baseline-shift', 'direction', 'unicode-bidi',
-		'marker-start', 'marker-mid', 'marker-end', 'shape-rendering', 'text-rendering', 'image-rendering', 'color',
-		'flood-color', 'flood-opacity'];   // the label halo's paper (Task 791)
+		'marker-start', 'marker-mid', 'marker-end', 'shape-rendering', 'text-rendering', 'image-rendering', 'color'];
 	var snipVeil = null;
 	// 'rect' or 'free' (lasso): the shape the next snip is dragged in. Session only, never stored.
 	var snipMode = 'rect';
@@ -48439,12 +48424,7 @@ var EngCalcs = EngCalcs || {};
 		// element it belongs to, so ALL labels sit above ALL node/link symbols. Building each label
 		// into nodesLayer/linksLayer makes draw order track creation order, so a later-built node's
 		// symbol paints over an earlier node's already-placed label.
-		// Leaders get their own layer just under the labels, so the label layer's halo (Task 791,
-		// labelHaloFilter()) backs lettering only: a leader is a hairline and was never haloed.
-		var leadersLayer = el('g', { 'class': 'lpn-leaders' }, modelLayer);
-		labelsLayer = el('g', { 'class': 'lpn-lbl-layer' }, modelLayer);
-		labelsLayer.lpnLeaders = leadersLayer;
-		labelHaloFilter();
+		labelsLayer = el('g', {}, modelLayer);
 		// Topmost layer (after labelsLayer) so the rubber-band is never hidden under a node/link
 		// while drawing a pipe/pump (Tom, 2026-07-30).
 		rubberBandEl = el('line', { 'class': 'lpn-rubberband', style: 'display:none' }, world);
@@ -52720,7 +52700,6 @@ var EngCalcs = EngCalcs || {};
 	// content or size really changed. The ZOOM path does not use it -- it sets font sizes without
 	// measuring, because a measured width is banked in pixels and rescaled on read.
 	function refreshTextLabelSizes() {
-		applyLabelHaloRadius();
 		Object.keys(labelEls).forEach(function (id) {
 			var le = labelEls[id], lb = labelById(id);
 			le.text.style.fontSize = effectiveFontSize(lb && lb.sizeMult) + 'px';
@@ -52780,7 +52759,6 @@ var EngCalcs = EngCalcs || {};
 				le.text.style.fontSize = effectiveFontSize(lb && lb.sizeMult) + 'px';
 			});
 		});
-		applyLabelHaloRadius();   // the halo is screen pixels too (Task 791)
 		perfDebugTime('  symSizes', function () { refreshSymbolSizes(); });
 		// publishes --lpn-sym / --lpn-lw, both of which are state.s-dependent too
 		if (!deferLayout) {
@@ -52975,112 +52953,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function applyTextHalo() {
 		if (svg) { svg.style.setProperty('--lpn-halo', String(textHaloPct() / 100)); }
-		applyLabelHaloRadius();
 	}
-	// **THE HALO IS ONE FILTER ON THE WHOLE LABEL LAYER, NOT A STROKE ON EACH LABEL** (Task 791;
-	// Tom's browser pass, R-393: *"In a pipe label, the halo of the separator comma can hide what's
-	// near it, and vice versa"*, and R-405: *"our tiny halos were making our text look fuzzy, not
-	// clear"*). `paint-order: stroke fill` was applied per tspan and per label, so each piece's
-	// stroke painted over the ink before it, and the half of the stroke inside the glyph softened
-	// its edges. Now the ink is a plain fill, and #lpn-lbl-halo takes the layer's coverage
-	// (SourceAlpha), widens it by the radius (feMorphology dilate), floods it with the paper colour
-	// and merges it UNDER the layer's own drawing. A halo can only ever sit beneath ink, touching
-	// halos merge, and nothing is drawn twice -- the two-pass copy that did the same cost 19-67%
-	// more label time, which is why it was reverted.
-	//
-	// **THE RADIUS IS THE OLD STROKE'S OUTSIDE HALF, IN SCREEN PIXELS**: Text halo width (a percent
-	// of the text size) / 2 x the text size, divided by the zoom because the layer is inside the
-	// scaled `world`. It is an attribute, not a style, so it is rewritten wherever the font sizes are
-	// (refreshFontSizes(), refreshTextLabelSizes(), applyTextHalo(), adoptDrawing()).
-	//
-	// **A TEXT AT 2x OR 3x NEEDS A 2x OR 3x HALO, AND ONE LAYER RADIUS CANNOT GIVE IT.** So a Text
-	// bigger than 1x lives in a size group (labelHaloHost()), nested FIRST inside the label layer
-	// and inside each other in rising size, each with its own filter adding the difference: the
-	// layer's r, plus (2 - 1)r for the 2x group, plus (3 - 2)r for the 3x group inside it. Dilations
-	// add, so a 3x Text gets 3r. First-in-its-parent is what keeps the promise: a group's own halo
-	// can only fall on what is painted after it, and everything painted after it is ink drawn over
-	// it. A Text below 1x stays in the layer and gets the 1x halo.
-	var LBL_HALO_ID = 'lpn-lbl-halo', lblHaloMorph = null, lblSizeSeq = 0;
-	function labelHaloFilterEl(parent, id) {
-		var f = el('filter', { id: id, x: '-50%', y: '-50%', width: '200%', height: '200%',
-			'color-interpolation-filters': 'sRGB' }, parent);
-		var m = el('feMorphology', { 'in': 'SourceAlpha', operator: 'dilate', radius: '0', result: 'grown' }, f);
-		el('feFlood', { 'class': 'lpn-lbl-halo-flood', result: 'paper' }, f);
-		el('feComposite', { 'in': 'paper', in2: 'grown', operator: 'in', result: 'halo' }, f);
-		var mg = el('feMerge', {}, f);
-		el('feMergeNode', { 'in': 'halo' }, mg);
-		el('feMergeNode', { 'in': 'SourceGraphic' }, mg);
-		return m;
-	}
-	function labelHaloFilter() {
-		if (!svg || lblHaloMorph) { return; }
-		var defs = el('defs', {}, null);
-		svg.insertBefore(defs, svg.firstChild);
-		lblHaloMorph = labelHaloFilterEl(defs, LBL_HALO_ID);
-		applyLabelHaloRadius();
-	}
-	// **WHILE THE MAP MOVES, THE OLD STROKE HALO STANDS IN, AND THE FILTER COMES BACK WHEN IT STOPS.**
-	// The filter costs at raster, not in script, and a pan or a zoom re-rasters every frame: on
-	// the 1,600-label test drawing a pan took 5 to 10 times the raster time of the stroke halo and
-	// up to half as long again on the clock (Task 791, measured in the report on feat/text-halo).
-	// So every view change -- pan, wheel, pinch, fit, all through setTransform() -- marks the <svg>
-	// `lpn-moving`, and 160 ms after the last one the mark comes off. The reader reads a map at
-	// rest; at rest it is the filter, painted once.
-	var LPN_MOVING_MS = 160, movingTimer = null;
-	function noteViewMoving() {
-		if (!svg || !svg.classList) { return; }
-		if (!movingTimer) { svg.classList.add('lpn-moving'); } else { clearTimeout(movingTimer); }
-		movingTimer = setTimeout(function () {
-			movingTimer = null;
-			if (svg) { svg.classList.remove('lpn-moving'); }
-		}, LPN_MOVING_MS);
-	}
-	// World units, at the zoom in force: the old stroke's outside half (0.5 x --lpn-halo em).
-	function labelHaloRadius() {
-		return (textHaloPct() / 100) / 2 * settings.textSize / (state.s || 1);
-	}
-	function setHaloRadius(m, r) {
-		var v = (r > 0 && isFinite(r)) ? String(+r.toPrecision(6)) : '0';
-		if (m && m.getAttribute('radius') !== v) { m.setAttribute('radius', v); }
-	}
-	function labelSizeGroups(L) {
-		var G = (L && L.lpnSizeGroups) || [];
-		return G.filter(function (x) { return !L.contains || L.contains(x.g); });
-	}
-	function applyLabelHaloRadius() {
-		if (!svg) { return; }
-		var r = labelHaloRadius(), prev = 1;
-		if (svg.classList) { svg.classList.toggle('lpn-halo-none', !(r > 0)); }
-		setHaloRadius(lblHaloMorph, r);
-		labelSizeGroups(labelsLayer).forEach(function (x) { setHaloRadius(x.morph, (x.m - prev) * r); prev = x.m; });
-	}
-	// Where a Text of this size multiplier is drawn: the label layer itself at 1x or below, else
-	// its size group, made on first need and nested in rising size (see above).
-	function labelHaloHost(mult) {
-		var L = labelsLayer, G, i, x, id, parent;
-		if (!L || !(mult > 1) || !L.appendChild) { return L; }
-		G = labelSizeGroups(L);
-		for (i = 0; i < G.length; i++) { if (G[i].m === mult) { return G[i].g; } }
-		id = LBL_HALO_ID + '-' + (++lblSizeSeq);
-		x = { m: mult, g: el('g', { 'class': 'lpn-lbl-size', filter: 'url(#' + id + ')' }, null) };
-		x.morph = labelHaloFilterEl(x.g, id);
-		G.push(x);
-		G.sort(function (a, b) { return a.m - b.m; });
-		L.lpnSizeGroups = G;
-		parent = L;
-		G.forEach(function (y) {
-			if (y.g.parentNode !== parent || parent.firstChild !== y.g) { parent.insertBefore(y.g, parent.firstChild); }
-			parent = y.g;
-		});
-		applyLabelHaloRadius();
-		return x.g;
-	}
-	function seatTextLabel(lb, le) {
-		if (!le || !le.text) { return; }
-		var host = labelHaloHost(lb && lb.sizeMult);
-		if (host && host.appendChild && le.text.parentNode !== host) { host.appendChild(le.text); }
-	}
-	EngCalcs.lpnLabelHaloRadius = labelHaloRadius;
 	function applyMaskLabels() {
 		if (svg) { svg.classList.toggle('lpn-masks-off', settings.maskLabels === false); }
 	}
