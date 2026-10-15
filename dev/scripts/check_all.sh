@@ -32,6 +32,7 @@
 # Usage:
 #   sh dev/scripts/check_all.sh          # all checks; exit 1 if any blocking check fails
 #   sh dev/scripts/check_all.sh --quiet  # only failures and the summary
+#   sh dev/scripts/check_all.sh --fast   # everything but the harnesses; never stamps
 set -u
 
 # CONCURRENCY: up to EC_CHECK_SLOTS suites (default 4) run at once, each in its own slot, and each
@@ -58,7 +59,13 @@ export EC_CHECK_SLOT EC_BROWSER_LOCK
 DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$DIR/../.." && pwd)"
 QUIET=0
-[ "${1:-}" = "--quiet" ] && QUIET=1
+# --fast (2026-10-15): every check but the harness runs, in a minute or two, so a stale generated
+# file or a broken convention surfaces before the ~25-minute full run. It never stamps.
+FAST=0
+for a in "$@"; do
+	[ "$a" = "--quiet" ] && QUIET=1
+	[ "$a" = "--fast" ] && FAST=1
+done
 
 FAILED=""
 ADVISORY=""
@@ -512,7 +519,11 @@ run_check "harvest selftest"            blocking php dev/scripts/harvest_rulings
 # run_harnesses.sh globs and nothing tied the number to the glob. A stale count in a checklist is
 # the same defect this file exists to remove.
 LPN_HARNESS_N=$(ls dev/lpn-spike/*harness*.js dev/lpn-spike/validate*.js 2>/dev/null | wc -l | tr -d ' ')
-run_check "lpn harnesses ($LPN_HARNESS_N)"  blocking sh dev/scripts/run_harnesses.sh
+if [ $FAST -eq 1 ]; then
+	printf '  SKIP  lpn harnesses (--fast)\n'
+else
+	run_check "lpn harnesses ($LPN_HARNESS_N)"  blocking sh dev/scripts/run_harnesses.sh
+fi
 run_check "label bench selftest"        blocking node dev/lpn-spike/label-bench/selftest-harness.js
 
 # --- the other 19 calculators ------------------------------------------------------------------
@@ -520,7 +531,11 @@ run_check "label bench selftest"        blocking node dev/lpn-spike/label-bench/
 # them on their factory defaults in both unit presets, plus worked examples for the two core
 # calculators (mpf, mtc). Same derived count as above -- never typed.
 CALC_HARNESS_N=$(ls dev/calc-spike/*harness*.js 2>/dev/null | wc -l | tr -d ' ')
-run_check "calculator harnesses ($CALC_HARNESS_N)" blocking sh dev/scripts/run_calc_harnesses.sh
+if [ $FAST -eq 1 ]; then
+	printf '  SKIP  calculator harnesses (--fast)\n'
+else
+	run_check "calculator harnesses ($CALC_HARNESS_N)" blocking sh dev/scripts/run_calc_harnesses.sh
+fi
 # Task 322 half B. A harness that spells a shipped English string out as a literal turns a rewording
 # into a red build in a file about hydraulics -- three did on 2026-09-08 and 199 more can. Ratchet
 # at the measured baseline: the number may fall and may not rise.
@@ -611,7 +626,9 @@ echo "All blocking checks pass."
 # clean tree: a pass measured against uncommitted edits says nothing about the commit that will
 # actually be pushed, and a stamp that lies is worse than none. In .git/, so it is never committed
 # and never travels to another clone -- a stamp is a fact about THIS machine's last run.
-if [ -d .git ] && [ -z "$(git status --porcelain 2>/dev/null)" ]; then
+if [ $FAST -eq 1 ]; then
+	echo "--fast: harnesses skipped, so nothing is stamped. Run without --fast before pushing master."
+elif [ -d .git ] && [ -z "$(git status --porcelain 2>/dev/null)" ]; then
 	git rev-parse HEAD > .git/check-all-passed 2>/dev/null && \
 		echo "Stamped $(git rev-parse --short HEAD) as verified (dev/hooks/pre-push reads this)."
 fi

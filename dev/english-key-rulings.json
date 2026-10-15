@@ -2119,6 +2119,11 @@
             "ruled": "2026-09-28",
             "answer": "Tom, 2026-09-28: \"Vertices column heading: Change to 'Vertices (Lat/Lon|Lat/Lon|...)'\""
         },
+        "lpn_field_length_slope_tip": {
+            "on": "Pipe length. When Auto is checked, the length is measured along the slope: the drawn length combined with the difference in elevation between the two end nodes.",
+            "ruled": "2026-10-15",
+            "answer": "Yes."
+        },
         "lpn_field_lon_abbr": {
             "on": "Lon",
             "ruled": "2026-09-28",

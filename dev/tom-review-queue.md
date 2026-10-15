@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-385. (R-282 is taken on `feat/label-gang-search`.)
+**An ID is permanent and never reused.** Next free: R-402. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -145,3 +145,23 @@ judgement and does not belong to a script.
 - [ ] R-382 feat/keyboard-menu | "What Declan really needs are menu mnemonics ... once in keyboard mode, the mnemonic for all the menus should highlight or underline." -- Ida consulted; building on feat/keyboard-menu
 - [x] R-383 -- | Merged on his word 2026-10-03: graph-menu, drawing-keep ("simply a performance improvement that prevents placement recalc on switching"), property-arrow-key, fix/undo-label, bentley-interop (recut as the long-term branch)
 - [x] R-384 feat/desktop | "Such consents are usually given on install." -- written into dev/desktop-platforms-plan.md on feat/desktop
+
+## Round of 2026-10-15 -- his pass over bentley-interop (8116) and text-halo, plus Android
+
+- [ ] R-385 feat/bentley-interop | (tanks as the only source; a dry tank stops the run) "It would be nice to see truncated time series graphs if those are available." -- Task 808 at 75
+- [ ] R-386 feat/bentley-interop | (1a, run every Fotobi scenario) "'The solver did not converge' feels like a kind of a crash. And I still don't understand the difference between '1-hr drain w pump off' and the other children of EPS Pump off scenario that would make it fail to converge while they don't. I see that it has 24 overrides vs their 23, but I don't know how to see a tidy list of overrides to audit ... that count seems inflated ... I should see the count of only the present overrides, not the inherited overrides. I count 13 diameter overrides, 1 text override, and 2 calculation overrides." Screenshot note on '8-hr drain w pump off': "Solve did not converge. But I see no physical difference from its grandparent scenario." and "Tanks show amber circle on map, but has overrides only in parent, not here." Latest file: ~/tom-files/2026-10-15/Fotobi_US_WGS84.epp -- Task 800 at 100; why it fails to converge still to explain
+- [ ] R-387 feat/bentley-interop | (1b, Apply Base values) "(1) I don't think we need this command any more now that we have the circles and the down arrows. And this command is too confusing and dangerous. I can't understand what it's trying to do and not to do. (2) I am not sure that it is meaningful to put a non-base alternative with the Base scenario. Doesn't that violate the idea of a base scenario? It seems to create a certain circularity that we should avoid. What do you and Mary find?" -- Task 801 at 100
+- [ ] R-388 -- | (Accuracy default 0.001) "Yes. And tip says 1e-9, so sync that." -- Task 796
+- [x] R-389 feat/bentley-interop | (1h1) "The Scenarios table is functional, but maybe not optimal for UX. Could we stick that table onto the right side of the Scenario Manager to accomplish (a) that both are available in the same gesture and (b) that it flies out over the map instead of displacing the map?" -- Task 802 at 75
+- [x] R-390 feat/bentley-interop | (1h2) "I'd like a way to see at a glance all unused alternatives. Maybe an 'Unused alternatives' button ... unless the selector (instead of a button) includes 'All unused' (and 'All'?), where all the headings are listed with a scrollbar." -- Task 803 at 75
+- [x] R-391 feat/bentley-interop | (1h3) "The Time series balloons/bubbles should be a Presentation override." -- Task 804 at 75
+- [ ] R-392 feat/bentley-interop | (1f, Text on a phone) "On a phone, the text opens for editing, but when the on-screen keyboard appears, it closes."
+- [ ] R-393 feat/text-halo | "It all works. But there is an issue. I didn't know that halo could cover the text or neighbor text. In a pipe label, the halo of the separator comma can hide what's near it, and vice versa."
+- [ ] R-394 feat/bentley-interop | (Properties) "The Properties text editor box is initially too narrow, and it won't drag wider. It drags taller (more rows). And I think it should always adjust for its width to fill the properties box width." And: "The Text Properties Size multiplier, on the other hand, is 5 times longer than it ever needs to be. It's like a tinyint."
+- [x] R-395 -- | "I think that all Description fields should allow multiple lines and paragraphs like most software to allow internal documentation." -- Task 806 at 75
+- [x] R-396 -- | "It would be good to be able to hide the amber override indicators from the map. Maybe a Map, Clean map button is a good idea after all with zoom buttons, error messenger, ambers, and satellite button hiding." -- Task 805 at 75
+- [ ] R-397 -- | "Settings search has what appears to be a regression. When I type a search term, the scrollbar doesn't go to the top. So my results appear empty."
+- [x] R-398 -- | (placement rules) "Let's try leaving exactly in place the leader locations set by the user. I think that our stretching them is frustrating to them. If they want to give us control, they will reset the leader." -- Task 807 at 100
+- [ ] R-399 master | (Android) "Zoom to fit doesn't work for Basic example SI units on production or on feat/bentley-interop. It zooms out magnitudes wider than it should."
+- [x] R-400 -- | Answers: Morph's synonym description "Yes."; slope-length's Length tip "Yes." (english-key-rulings); Spanish Marcador for Tag "Yes. They can use any word they want as long as it is different than the other ambiguous key words we identified."; Task 617 Mapbox Outdoors "I approve."; long press "Nice!"; Fotobi crash fix "Nice!"; 1c, 1d, 1e, 1g "Yes. Good." / "Yes. Perfect."
+- [x] R-401 -- | Roadmap requests: "Allow field/reference text in Text using {}. Define/disclose the keys in the User Manual." -- Task 798; "Can we try a UI option branch for everything in the bottom pane to be available also as dockable boxes: (a) Tables and (b) Graphs?" -- Task 799
