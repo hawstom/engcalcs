@@ -55169,6 +55169,24 @@ var EngCalcs = EngCalcs || {};
 		});
 		return shown;
 	}
+	/**
+	 * **A NEW SEARCH STARTS AT THE TOP OF ITS RESULTS** (R-397; Tom, 2026-10-15: *"When I type a
+	 * search term, the scrollbar doesn't go to the top. So my results appear empty."*).
+	 *
+	 * Regressed by 4de96172 (2026-09-04), which put one pane-height of blank room after the content
+	 * (`.lpn-setbox-content::after`) so the last section can scroll to the top. Before that, a
+	 * filter that shrank the content below the pane clamped the scroll back to 0 by itself; with the
+	 * blank room the old scroll position is still reachable, so a reader scrolled halfway down saw
+	 * only the blank. Only a CHANGE OF THE SEARCH TEXT resets it: a rebuild of the box (a setting
+	 * changed) re-runs applySetboxFilter() too, and must leave the reader where they were.
+	 */
+	function filterSetboxFromTop() {
+		var content = document.getElementById('lpn_setbox_content'),
+			index = document.getElementById('lpn_setbox_index');
+		applySetboxFilter();
+		if (content) { content.scrollTop = 0; }
+		if (index) { index.scrollTop = 0; }
+	}
 	function applySetboxFilter() {
 		var box = setboxEl(), input = document.getElementById('lpn_setbox_filter'),
 			none = document.getElementById('lpn_setbox_none'), pc = EngCalcs.pageConfig || {},
@@ -55693,14 +55711,14 @@ var EngCalcs = EngCalcs || {};
 			// PHP tip helpers build a label-plus-glyph, which is the wrong shape for a bare input.
 			helpTip(filter, filter.title);
 			// `input`, not `change`: a filter that waits for blur is not a filter.
-			filter.addEventListener('input', applySetboxFilter);
+			filter.addEventListener('input', filterSetboxFromTop);
 			// Escape inside the box CLEARS THE FILTER before it closes the box -- the convention
 			// every search field has, and the alternative loses the box over a typo.
 			filter.addEventListener('keydown', function (e) {
 				if (e.key === 'Escape' && filter.value) {
 					e.stopPropagation();
 					filter.value = '';
-					applySetboxFilter();
+					filterSetboxFromTop();
 				}
 			});
 		}
