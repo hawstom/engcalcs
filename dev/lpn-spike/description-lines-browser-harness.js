@@ -142,6 +142,18 @@ async function main() {
 		ok('the Tables cell shows the first line only', c1 && c1.value === TEXT[0], JSON.stringify(c1));
 		ok('...with the whole text in its tip and marked as longer', c1 && c1.title === WHOLE && c1.multi, JSON.stringify(c1));
 
+		// the tip keeps the line breaks (a name tip collapses them unless it asks to keep them)
+		await page.locator(`#lpn_pane_${kind} td.lpn-pane-col-desc input`).nth(await page.evaluate(([k, id]) =>
+			Array.from(document.querySelectorAll('#lpn_pane_' + k + ' td.lpn-pane-col-desc')).findIndex((t) => t._lpnPaneId === id), [kind, nodeId])).hover();
+		await page.waitForTimeout(1200);
+		const tipInfo = await page.evaluate(() => {
+			const t = document.querySelector('.tooltip.ec-tip-lines .tooltip-inner');
+			return t ? { ws: getComputedStyle(t).whiteSpace, text: t.textContent, h: t.getBoundingClientRect().height, lh: parseFloat(getComputedStyle(t).lineHeight) || 20 } : null;
+		});
+		ok('the cell tip keeps its line breaks (white-space pre-line, text with newlines)',
+			tipInfo && tipInfo.ws === 'pre-line' && tipInfo.text === WHOLE, JSON.stringify(tipInfo));
+		ok('...and is as tall as its four lines', tipInfo && tipInfo.h > tipInfo.lh * 3.5, JSON.stringify(tipInfo));
+		await page.mouse.move(5, 5);
 		// edit the first line in the cell; the rest must survive
 		const sel = `#lpn_pane_${kind} td.lpn-pane-col-desc input`;
 		const idx = await page.evaluate(([k, id]) => Array.from(document.querySelectorAll('#lpn_pane_' + k + ' td.lpn-pane-col-desc'))

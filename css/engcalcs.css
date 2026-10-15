@@ -5634,3 +5634,5 @@ textarea.lpn-desc-ta {
 /* A Tables pane cell whose Description has more than the first line shown: italic, with the whole
    text in its tip. */
 .lpn-pane input.lpn-pane-multi, input.lpn-pane-multi { font-style: italic; }
+/* A name tip that keeps its text's line breaks (data-ec-tip-lines: a multi-line Description). */
+.tooltip.ec-tip-lines .tooltip-inner { white-space: pre-line; text-align: start; max-width: 28em; }

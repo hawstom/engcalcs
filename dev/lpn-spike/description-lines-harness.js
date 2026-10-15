@@ -92,8 +92,8 @@ const SRC = [
 	' P3\tJ2\tJ3\t600\t6\t100\t0\tOpen',
 	' P4\tJ3\tT1\t500\t8\t100\t0\tOpen',
 	'[VALVES]', ' V1\tJ1\tJ3\t6\tTCV\t2\t0\t;Vault 14', ';|north side',
-	'[PATTERNS]', ';Morning peak', ';|second line of it', ' PA\t1\t2\t3',
-	'[CURVES]', ';PUMP: Pump 10', ';|rated 2019', ' C1\t0\t100', ' C1\t500\t60',
+	'[PATTERNS]', ';|second line of it', ';Morning peak', ' PA\t1\t2\t3',
+	'[CURVES]', ';|rated 2019', ';PUMP: Pump 10', ' C1\t0\t100', ' C1\t500\t60',
 	'[CONTROLS]', ';Fill the tank', ';|and no more', 'LINK P1 OPEN IF NODE T1 BELOW 5',
 	'[OPTIONS]', ' UNITS\tGPM', ' HEADLOSS\tH-W',
 	'[END]', ''
@@ -119,9 +119,9 @@ ok('J2 is written: first line on the row, then ;| lines, a bare ;| for the blank
 	Jn.some((l, k) => /^\s*J2\s.*\t;First line$/.test(l) && Jn[k + 1] === ';|Second line' && Jn[k + 2] === ';|' && Jn[k + 3] === ';|Third paragraph'), J(Jn));
 ok('J1 single line written exactly as before', Jn.some((l) => /^\s*J1\s+100(\.0+)?\s+.*\t;Corner of Elm and Main$/.test(l) || /\t;Corner of Elm and Main$/.test(l)), J(Jn));
 ok('J1 gets no continuation line', Jn[Jn.findIndex((l) => /^\s*J1\s/.test(l)) + 1].indexOf(';|') !== 0);
-ok('the pattern writes ;first then ;|second above its rows',
-	J(lines(out.inp, 'PATTERNS').filter(Boolean).slice(0, 3).map((l) => l.replace(/\s+/g, ' '))) === J([';Morning peak', ';|second line of it', ' PA 1 2 3']), J(lines(out.inp, 'PATTERNS')));
-ok('the curve writes its type line then the ;| line', (() => { const c = lines(out.inp, 'CURVES').filter(Boolean); return c[0] === ';PUMP: Pump 10' && c[1] === ';|rated 2019'; })(), J(lines(out.inp, 'CURVES')));
+ok('the pattern writes the ;| lines, then the first line LAST above its rows',
+	J(lines(out.inp, 'PATTERNS').filter(Boolean).slice(0, 3).map((l) => l.replace(/\s+/g, ' '))) === J([';|second line of it', ';Morning peak', ' PA 1 2 3']), J(lines(out.inp, 'PATTERNS')));
+ok('the curve writes the ;| line, then its type line last above its rows', (() => { const c = lines(out.inp, 'CURVES').filter(Boolean); return c[0] === ';|rated 2019' && c[1] === ';PUMP: Pump 10'; })(), J(lines(out.inp, 'CURVES')));
 ok('the control writes its two lines above it', (() => { const c = lines(out.inp, 'CONTROLS').filter(Boolean); return c[0] === ';Fill the tank' && c[1] === ';|and no more' && /^LINK P1/.test(c[2]); })(), J(lines(out.inp, 'CONTROLS')));
 const b = importText(out.inp, 'lines.inp');
 const dump = (d) => J({ n: d.nodes.map((x) => [x.id, x.desc]), l: d.links.map((x) => [x.id, x.desc]),
@@ -132,6 +132,32 @@ ok('re-import reads the same descriptions', dump(b.doc) === dump(a.doc), dump(b.
 ok('no text of any description is lost: every source line is in the export',
 	['First line', 'Second line', 'Third paragraph', 'discharge, 24 in', 'north hill', 'replaced 2019', 'north side', 'second line of it', 'rated 2019', 'and no more']
 		.every((t) => out.inp.indexOf(t) >= 0));
+
+// ---- 2b. EPANET ITSELF SEES THE FIRST LINE EVERYWHERE ------------------------------------------
+// Runs the vendored epanet-js engine on the export (EPANET 2.2 keeps the LAST comment-only line
+// above a pattern's or curve's rows -- src/input2.c, "Store full line comment" -- so the first
+// line must be that one) and reads each comment back through its own getComment.
+console.log('\n2b. The vendored EPANET engine reads the first line of every description');
+const done2b = (async () => {
+	const mod = await import(require('url').pathToFileURL(ROOT + 'js/vendor/epanet-js.js').href);
+	const ws = new mod.Workspace(); await ws.loadModule();
+	const p = new mod.Project(ws);
+	ws.writeFile('d.inp', out.inp);
+	p.open('d.inp', 'd.rpt', 'd.out');
+	const T = mod.ObjectType, idx = (t, id) => ({ [T.Node]: () => p.getNodeIndex(id), [T.Link]: () => p.getLinkIndex(id),
+		[T.TimePat]: () => p.getPatternIndex(id), [T.Curve]: () => p.getCurveIndex(id) })[t]();
+	const c = (t, id) => p.getComment(t, idx(t, id));
+	ok('junction J2 (three lines)', c(T.Node, 'J2') === 'First line', J(c(T.Node, 'J2')));
+	ok('junction J1 (one line)', c(T.Node, 'J1') === 'Corner of Elm and Main');
+	ok('junction J3 (none) is not handed a stray line', c(T.Node, 'J3') === '', J(c(T.Node, 'J3')));
+	ok('reservoir R1', c(T.Node, 'R1') === 'Plant');
+	ok('tank T1', c(T.Node, 'T1') === 'Standpipe');
+	ok('pipe P1', c(T.Link, 'P1') === '1962 main', J(c(T.Link, 'P1')));
+	ok('valve V1', c(T.Link, 'V1') === 'Vault 14', J(c(T.Link, 'V1')));
+	ok('pattern PA', c(T.TimePat, 'PA') === 'Morning peak', J(c(T.TimePat, 'PA')));
+	ok('curve C1 (EPANET keeps the type line whole)', c(T.Curve, 'C1') === 'PUMP: Pump 10', J(c(T.Curve, 'C1')));
+	p.close();
+})().catch((e) => { ok('the engine read the export: ' + e.message, false); });
 
 // ---- 3. an edit made on the page -----------------------------------------------------------------
 console.log('\n3. A description typed on the page (with paragraphs) exports and comes back');
@@ -168,5 +194,7 @@ console.log('\n5. CSV quotes a newline; GeoJSON is JSON');
 	ok('GeoJSON properties escape the newline', gj.indexOf('\\n\\n') > 0 && JSON.parse(gj).properties.description === 'A\n\nB');
 }
 
+done2b.then(() => {
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall description-lines checks passed');
 process.exit(fails ? 1 : 0);
+});

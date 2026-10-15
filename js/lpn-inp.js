@@ -389,6 +389,7 @@
 		var pendingCurveType = null;
 		// The last row read in one of the six sections that carry a description, which a `;|` line
 		// after it continues; and which sections those are.
+		var pendingCurveCont = { more: [], raw: [] };
 		var lastDescRow = null,
 			DESC_ROW_SECTIONS = { JUNCTIONS: 1, RESERVOIRS: 1, TANKS: 1, PIPES: 1, PUMPS: 1, VALVES: 1 };
 		// The file's own comment and blank lines since the last row of [PATTERNS] or [CONTROLS],
@@ -421,9 +422,10 @@
 					(lastDescRow.more = lastDescRow.more || []).push(lines[i].slice(semi + 2).replace(/\s+$/, ''));
 					continue;
 				}
-				if (section === 'CURVES' && pendingCurveType) {
-					pendingCurveType.more.push(lines[i].slice(semi + 2).replace(/\s+$/, ''));
-					pendingCurveType.rawMore.push(lines[i].replace(/\s+$/, ''));
+				// A curve's `;|` lines sit ABOVE its `;TYPE:` line (see lpnDescText for why).
+				if (section === 'CURVES') {
+					pendingCurveCont.more.push(lines[i].slice(semi + 2).replace(/\s+$/, ''));
+					pendingCurveCont.raw.push(lines[i].replace(/\s+$/, ''));
 					continue;
 				}
 			}
@@ -441,8 +443,9 @@
 						raw: lines[i].replace(/\s+$/, ''),
 						type: ctm[1].toUpperCase(),
 						note: ctm[2].trim(),
-						more: [], rawMore: []
+						more: pendingCurveCont.more, rawMore: pendingCurveCont.raw
 					};
+					pendingCurveCont = { more: [], raw: [] };
 				}
 			}
 			// **A DESCRIPTION IN [PATTERNS], [CONTROLS] AND [RULES] IS A WHOLE-LINE COMMENT ABOVE
@@ -512,6 +515,7 @@
 			if (section === 'CURVES') {
 				toks.raw = lines[i].replace(/\s+$/, '');
 				if (pendingCurveType) { toks.typeLine = pendingCurveType; pendingCurveType = null; }
+				pendingCurveCont = { more: [], raw: [] };
 			}
 			if (section === 'PATTERNS' || section === 'CONTROLS') {
 				if (pendingRaw.some(function (l) { return l.trim(); })) { toks.preLines = pendingRaw; }
@@ -780,7 +784,7 @@
 			var runStart = (i === 0 || rows[i - 1][0] !== r[0]);
 			if (r.preLines) {
 				var psp = EngCalcs.lpnInpSplitPre(r.preLines, true),
-					pnote = psp.desc.length ? EngCalcs.lpnInpDescFromLines(psp.desc) : '';
+					pnote = psp.desc.length ? EngCalcs.lpnInpDescFromLinesAbove(psp.desc) : '';
 				if (!pnote) { psp.head = psp.head.concat(psp.desc); }
 				if (runStart && !pat.note && pnote) { pat.note = pnote; pnote = ''; }
 				if (runStart && pat.multipliers.length === 0 && EngCalcs.lpnInpHasComment(psp.head)) {
@@ -1176,7 +1180,7 @@
 			// edited writes its own line back with the rest of its own characters.
 			if (r.typeLine) {
 				curveTyped(r[0], r.typeLine);
-				if (!crec.src.length) { crec.src.push(r.typeLine.raw); r.typeLine.rawMore.forEach(function (l) { crec.src.push(l); }); }
+				if (!crec.src.length) { r.typeLine.rawMore.forEach(function (l) { crec.src.push(l); }); crec.src.push(r.typeLine.raw); }
 			}
 			if (r.raw) { crec.src.push(r.raw); }
 			if (r.length < 3) { continue; }
@@ -2281,9 +2285,10 @@
 		while (k > 0 && L[k - 1].trim()) { k--; }
 		var out = { head: L.slice(0, k), desc: L.slice(k) };
 		if (onlyLast && out.desc.length > 1) {
-			// The last description is the last plain comment line AND the `;|` lines that continue it.
+			// The last description is the last comment line AND the `;|` lines directly above it, which
+			// continue it (a pattern's first line is the LAST comment line over its rows).
 			var g = out.desc.length - 1;
-			while (g > 0 && /^\s*;\|/.test(out.desc[g])) { g--; }
+			while (g > 0 && /^\s*;\|/.test(out.desc[g - 1])) { g--; }
 			out.head = out.head.concat(out.desc.slice(0, g));
 			out.desc = out.desc.slice(g);
 		}
@@ -2305,9 +2310,18 @@
 	 * the first `;`), or for a pattern or curve the one comment line above its first row (input2.c
 	 * `LineComment`). It has no continuation syntax, and a raw newline in a comment would turn the
 	 * next line into a data row. So the FIRST line goes exactly where EPANET puts a description, and
-	 * each later line goes on a whole-line comment `;|` directly after the row (directly after the
-	 * `;TYPE:` or description line for a curve, pattern or control). EPANET reads a comment as
-	 * nothing, so its own tools open the file unharmed; this page reads the run back into one
+	 * each later line goes on a whole-line comment `;|`:
+	 *   - a node or link: directly AFTER the row (its first line is the row's trailing comment, which
+	 *     EPANET keeps, and a comment line after a row is not given to the next row);
+	 *   - a pattern or curve: directly ABOVE the first line, which stays the last comment line over
+	 *     the rows. EPANET 2.2 keeps the LAST comment-only line above a pattern's or curve's first row
+	 *     (src/input2.c, the "Store full line comment" block: `LineComment` is overwritten by each
+	 *     comment line and handed to the next pattern or curve), so the other order would give EPANET
+	 *     the description "|second line". Verified by running the vendored epanet-js on the export
+	 *     (description-lines-harness.js);
+	 *   - a control: after its comment lines (EPANET has no description for a control).
+	 * EPANET's own re-save of a file keeps only the first line (one comment slot per element), so the
+	 * `;|` lines survive this page's round trip, not EPANET's. This page reads the run back into one
 	 * description. A blank paragraph line is a bare `;|`. A single-line description is written
 	 * exactly as before.
 	 */
@@ -2337,6 +2351,13 @@
 	 * (joined to the one before by a space, as several comment lines always were read), and a `;|`
 	 * line continues the one before on a new line.
 	 */
+	/** The same for a pattern, whose first line is the LAST comment line and whose `;|` lines precede it. */
+	EngCalcs.lpnInpDescFromLinesAbove = function (lines) {
+		var L = (lines || []).map(function (l) { return String(l).replace(/^\s*;/, ''); }), first;
+		if (!L.length) { return ''; }
+		first = L.pop().trim();
+		return EngCalcs.lpnDescJoin(first, L.map(function (s) { return (s.charAt(0) === '|' ? s.slice(1) : s).replace(/\s+$/, ''); }));
+	};
 	EngCalcs.lpnInpDescFromLines = function (lines) {
 		var res = '';
 		(lines || []).forEach(function (l, k) {
@@ -2546,8 +2567,8 @@
 		// there is nothing to state.
 		if (word) {
 			var cn = EngCalcs.lpnDescText(curve.note);
-			out.push(';' + word + ':' + (cn ? ' ' + cn.split('\n')[0] : ''));
 			EngCalcs.lpnDescContLines(cn).forEach(function (l) { out.push(l); });
+			out.push(';' + word + ':' + (cn ? ' ' + cn.split('\n')[0] : ''));
 		}
 		pts.forEach(function (p, i) {
 			out.push(reactRow([curve.id,
@@ -3212,9 +3233,11 @@
 			// loop over the factors -- so this does too. A pattern with no rows cannot be stated in
 			// an .inp at all, so a blank line follows it: both EPANET's reader (a blank line
 			// empties `LineComment`, input2.c) and this one then keep it off the next pattern.
+			// The `;|` lines go ABOVE the first line, which stays the last comment line over the rows:
+			// that is the one EPANET keeps (see lpnDescText).
 			if (note) {
-				patternRows.push(';' + note.split('\n')[0]);
 				EngCalcs.lpnDescContLines(note).forEach(function (l) { patternRows.push(l); });
+				patternRows.push(';' + note.split('\n')[0]);
 			}
 			if (note && !mults.length) { patternRows.push(''); }
 			// SIX PER LINE, which is EPANET's own layout and the one Net3 is written in. The id

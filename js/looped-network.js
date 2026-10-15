@@ -26645,6 +26645,7 @@ var EngCalcs = EngCalcs || {};
 		if (!c.multiline) { return; }
 		full = paneCellText(c, el);
 		input.title = full.indexOf('\n') >= 0 ? full : '';
+		input.dataset.ecTipLines = '1';
 		input.classList.toggle('lpn-pane-multi', full.indexOf('\n') >= 0);
 	}
 	function paneCellTyped(input, c, el) {

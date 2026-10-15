@@ -242,13 +242,21 @@ normalizer (CRLF to LF, trailing blanks off each line, blank lines at the ends o
 **The .inp.** EPANET holds one line (a trailing `;comment`; for a pattern or curve the one comment
 line above its rows) and has no continuation syntax; a raw newline would turn the next line into a
 data row. The first line goes exactly where EPANET puts a description and each later line goes on a
-whole-line `;|` comment directly after it (a bare `;|` is a blank line). EPANET reads a comment as
-nothing. This page reads the run back into one description; a `;|` line that follows no element row
-is an ordinary comment. A one-line description is written exactly as before. Rejected: escaping `\n`
-inside the trailing comment (ambiguous with a real backslash, unreadable in EPANET's own GUI).
+whole-line `;|` comment (a bare `;|` is a blank line). A node or link: the `;|` lines follow the row.
+A pattern or curve: they sit ABOVE the first line, which stays the LAST comment line over the rows,
+because EPANET 2.2 keeps the last comment-only line above a pattern's or curve's first row
+(`src/input2.c`, the "Store full line comment" block: `LineComment` is overwritten by each comment
+line and given to the next pattern or curve), so the other order would give EPANET the description
+"|second line". A control: after its comment lines (EPANET has no description for a control).
+`description-lines-harness.js` section 2b runs the vendored epanet-js engine on the export and reads
+every comment back with `getComment`: EPANET sees the first line everywhere. EPANET's own re-save of
+a file keeps only that first line (one comment slot per element), so the `;|` lines survive this
+page's round trip and not EPANET's. This page reads the run back into one description. A one-line
+description is written exactly as before. Rejected: escaping `\n` inside the trailing comment
+(ambiguous with a real backslash, unreadable in EPANET's own GUI).
 
 **Display.** A map label shows the first line and an ellipsis. A Tables cell shows the first line (a
-text input cannot hold a line break), italic, with the whole text in its tip; typing in it edits the
+text input cannot hold a line break), italic, with the whole text in its tip (`data-ec-tip-lines` makes the shared name tip keep line breaks); typing in it edits the
 first line and keeps the rest. A copy carries the whole text, quoted. CSV and XLSX/ODS quote or
 break lines, GeoJSON is JSON, and DXF writes the caret escape `^J`. `description-lines-harness.js`,
 `description-lines-browser-harness.js`.
