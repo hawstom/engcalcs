@@ -137,9 +137,10 @@ Deleted keys: bpn_, hw_ and lpn_notes_epanet_def and _term (master, six); lpn_sc
 - All of 10-14's were answered 2026-10-15 (R-400, Tasks 617, 796). Open now: why Fotobi's "1-hr drain
   w pump off" fails to converge while its siblings do not (R-386), and CC + Mary on Base with a
   non-Base alternative (Task 801).
-- Trickle flows (R-402): at Accuracy 0.001 a zero-demand hour can leave ~0.005 L/s circling a loop.
-  Tom, 10-15: "How can there be flows in zero-demand hours? Something tells me we may have gone down a
-  bad road." Answered 10-15; his call on showing them as zero is still open.
+- Trickle flows (R-402), settled 10-15: "I don't think we should fake results. We should show the ugly
+  truth." Never round a small solved flow to zero for display. On his real Fotobi (a tree, not a loop)
+  with patterns at exact 0, every hour of every scenario converges at 0.001 and 1e-5; idle flows are
+  at most 0.002 gpm, tanks hold to 0.001 ft. Tell him to set his patterns to 0.
 
 ### Next job
 
