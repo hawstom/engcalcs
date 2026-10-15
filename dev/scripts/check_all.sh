@@ -36,8 +36,8 @@
 set -u
 
 # CONCURRENCY: up to EC_CHECK_SLOTS suites (default 4) run at once, each in its own slot, and each
-# slot has its own browser lock, so browser harnesses stay one at a time WITHIN a suite but run side
-# by side across suites. The single /tmp/engcalcs-checkall.lock was sized for WSL's 4 cores; on
+# slot has its own browser lock, from which run_harnesses.sh derives one lock per browser lane
+# (default 3 lanes), so no suite's browser harnesses queue behind another's. The single /tmp/engcalcs-checkall.lock was sized for WSL's 4 cores; on
 # jasmine (24 threads) eight queued suites waited ~28 min apiece at a load average near 1. Measured
 # 2026-10-02: two suites unlocked beside a third took 765 s and 799 s, both green, vs 444 s alone.
 # `flock -o` closes the lock's fd before the suite starts, so a leaked `php -S` child can never
@@ -60,7 +60,7 @@ DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$DIR/../.." && pwd)"
 QUIET=0
 # --fast (2026-10-15): every check but the harness runs, in a minute or two, so a stale generated
-# file or a broken convention surfaces before the ~25-minute full run. It never stamps.
+# file or a broken convention surfaces before the ~20-minute full run. It never stamps.
 FAST=0
 for a in "$@"; do
 	[ "$a" = "--quiet" ] && QUIET=1

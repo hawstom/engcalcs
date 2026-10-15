@@ -257,15 +257,20 @@ function buildPage(mutate) {
 	// whatever else is on it, and a single slow cell -- a garbage collection landing inside one --
 	// moves a mean of forty by more than the whole effect being measured. The median says what a
 	// typical cell costs, which is the question.
-	function perCellMs(page, n) {
-		const links = page.doc.links.slice(0, n);
-		links.forEach(function (l) { page.typeCell(l, 'roughness', 111); });   // warm, untimed
-		const ms = links.map(function (l, i) {
-			const t0 = process.hrtime.bigint();
-			page.typeCell(l, 'roughness', 150 + (i % 7));
-			return Number(process.hrtime.bigint() - t0) / 1e6;
-		}).sort(function (a, b) { return a - b; });
-		return ms[Math.floor(ms.length / 2)];
+	// **ALTERNATED** (dev/testing-notes.md): the three configurations take turns cell by cell, so
+	// load that arrives part-way and stays falls on all three rather than on whichever ran last.
+	function perCellMs(pages, n) {
+		const links = pages.map(function (page) { return page.doc.links.slice(0, n); });
+		pages.forEach(function (page, k) { links[k].forEach(function (l) { page.typeCell(l, 'roughness', 111); }); });   // warm, untimed
+		const ms = pages.map(function () { return []; });
+		for (let i = 0; i < n; i++) {
+			pages.forEach(function (page, k) {
+				const t0 = process.hrtime.bigint();
+				page.typeCell(links[k][i], 'roughness', 150 + (i % 7));
+				ms[k].push(Number(process.hrtime.bigint() - t0) / 1e6);
+			});
+		}
+		return ms.map(function (m) { m.sort(function (a, b) { return a - b; }); return m[Math.floor(m.length / 2)]; });
 	}
 	// Three configurations, so the two repairs are attributed rather than lumped: the page as
 	// Declan found it, the page with only the whole-map mark scan still in it, and the page as it
@@ -274,9 +279,7 @@ function buildPage(mutate) {
 	before.L.settings().autoRun = false;
 	const marksOnly = buildPage(UNSCOPE);
 	marksOnly.L.settings().autoRun = false;
-	const beforeMs = perCellMs(before, 40);
-	const marksMs = perCellMs(marksOnly, 40);
-	const afterMs = perCellMs(p, 40);
+	const [beforeMs, marksMs, afterMs] = perCellMs([before, marksOnly, p], 40);
 	console.log('    before  -- whole project written, whole map re-marked: ' + beforeMs.toFixed(3) + ' ms');
 	console.log('    partway -- write deferred, whole map still re-marked:  ' + marksMs.toFixed(3) + ' ms');
 	console.log('    after   -- nothing until the pause, one element marked:' + afterMs.toFixed(3) + ' ms');
