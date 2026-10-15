@@ -43,7 +43,10 @@ function ok(name, cond, extra) {
 async function openFixture(a) {
 	const page = a.page;
 	await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
-	await a.writeFile('fotobi-topology.epp', fs.readFileSync(FIXTURE, 'utf8'));
+	const fx = JSON.parse(fs.readFileSync(FIXTURE, 'utf8'));
+	// The project asks for a Maximum statistic, which a truncated run cannot give (point 5 below).
+	fx.times = Object.assign({}, fx.times || {}, { statistic: 'MAXIMUM' });
+	await a.writeFile('fotobi-topology.epp', JSON.stringify(fx));
 	await a.queuePick('fotobi-topology.epp');
 	await a.menuClick(await a.lang('lpn_file_open'));
 	await a.settle(2500);
@@ -108,7 +111,8 @@ async function main() {
 				finite: fr.every((f) => Object.values(f.heads).every(isFinite) && Object.values(f.flows).every(isFinite)),
 				first: fr.length ? Object.keys(fr[0].heads).length : 0,
 				curHeads: cur ? Object.keys(cur.heads).length : 0,
-				opts, t: EngCalcs.lpnTimeRunState().t
+				opts, t: EngCalcs.lpnTimeRunState().t,
+				disabled: sel ? Array.from(sel.options).filter((o) => o.disabled).map((o) => o.textContent.trim()) : []
 			};
 		});
 
@@ -124,13 +128,58 @@ async function main() {
 		ok('...it starts at 0 and steps by the reporting step', p.ts[0] === 0 && p.ts.every((t, k) => t === k * 3600));
 		ok('...the "results run to" time is its last period', !!m && m[1] === Math.floor(lastT / 3600) + ':00', m && m[1] + ' vs ' + lastT);
 		ok('...every value in it is a real number, and the map holds the last period', p.finite && p.first > 0 && p.curHeads === p.first, JSON.stringify([p.finite, p.first, p.curHeads]));
-		ok('the transport offers no moment past the last solved period', p.opts.length === p.ts.length, JSON.stringify(p.opts));
+		const timeOpts = p.opts.filter((o) => p.disabled.indexOf(o) < 0);
+		ok('the transport offers no moment past the last solved period', timeOpts.length === p.ts.length, JSON.stringify(p.opts));
+		const statSaid = (await a.lang('lpn_time_stat_stopped')).replace('{statistic}', '');
+		ok('the Maximum statistic is not silently dropped: a disabled row says why', p.disabled.length === 1 && p.disabled[0].indexOf(statSaid.trim()) >= 0 && /Max/.test(p.disabled[0]), JSON.stringify(p.disabled));
+		const held = async (what) => { const s2 = await a.status(); ok('the stop notice is still on the status line ' + what, s2.indexOf(keptHead) === 0 && !!s2.match(new RegExp(keptMid.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))), s2.slice(0, 120)); };
+		await held('on arrival');
+		const click = (id) => a.page.evaluate((i) => document.getElementById(i).dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })), id);
+		const btnId = await a.page.evaluate(() => { const o = {}; document.querySelectorAll('#lpn_time_strip button, [id*=time] button').forEach((b) => { o[b.id] = b.title || b.getAttribute('aria-label') || ''; }); return o; });
+		void btnId;
+		await a.page.evaluate(() => EngCalcs.lpnTimeGoTo(7200));
+		await a.settle(500);
+		await held('after a time pick');
+		const st1 = await a.page.evaluate(() => EngCalcs.lpnTimeRunState().t);
+		ok('...and the stored current time is the picked period', st1 === 7200, String(st1));
 		ok('...and sits on one of them', p.ts.indexOf(p.t) >= 0, 't=' + p.t);
 		await a.page.evaluate(() => EngCalcs.lpnTimeGoTo(20 * 3600));
 		await a.settle(600);
 		const q = await probe();
+		ok('the stored current time is clamped to the last solved period, not 20 h', q.t === lastT, 't=' + q.t);
+		await held('after asking for hour 20');
 		ok('asking for hour 20 does not conjure a period', q.ts.length === p.ts.length && q.ts[q.ts.length - 1] === lastT, JSON.stringify(q.ts));
 		ok('...the map shows the last solved period', q.curHeads === p.first);
+
+		// Step forward, Last, Play and a tab round trip, as a person does.
+		const tool = async (label) => a.page.evaluate((l) => {
+			const b = Array.from(document.querySelectorAll('button')).find((x) => (x.title || x.getAttribute('aria-label') || x.textContent.trim()) === l);
+			if (!b) { return false; }
+			b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })); return true;
+		}, label);
+		await a.page.evaluate(() => EngCalcs.lpnTimeGoTo(0));
+		await a.settle(300);
+		const lbl = async (k) => (await a.lang(k));
+		ok('Step forward found', await tool(await lbl('lpn_time_next')));
+		await a.settle(400);
+		await held('after Step forward');
+		ok('Last found', await tool(await lbl('lpn_time_last')));
+		await a.settle(400);
+		await held('after Last');
+		ok('...Last stops at the last solved period', (await probe()).t === lastT);
+		await a.page.evaluate(() => EngCalcs.lpnTimeGoTo(0));
+		ok('Play found', await tool(await lbl('lpn_time_play')));
+		await a.settle(1800);
+		await held('after Play');
+		await a.page.evaluate(() => EngCalcs.lpnTimeRunState());
+		// Tab round trip: a new project, then back to the fixture's tab.
+		await a.newProject('us');
+		await a.settle(1500);
+		await a.page.click('#lpn_tabs .lpn-tab:has-text("fotobi-topology")');
+		await a.settle(3500);
+		const back = await probe();
+		ok('after a tab round trip the solved periods are still there', back.ts.length === p.ts.length, JSON.stringify(back.ts));
+		await held('after a tab round trip');
 
 		console.log('\n--- a run that finishes is untouched ---');
 		ok('picked the scenario', await pickScenario(a, 'EPS Pump off'));

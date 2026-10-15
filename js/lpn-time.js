@@ -160,7 +160,11 @@
 			linkRates: f.linkRates,
 			// Carried but NOT part of the steady-state contract: only this file's own readouts look
 			// at them, and only a run can produce them.
-			demands: f.demands, demandDeficits: f.demandDeficits, levels: f.levels, statuses: f.statuses, t: f.t
+			demands: f.demands, demandDeficits: f.demandDeficits, levels: f.levels, statuses: f.statuses, t: f.t,
+			// **A STOPPED RUN'S NOTICE RIDES EVERY FRAME IT SHOWS** (Task 808), so the status line
+			// the host writes on each apply() keeps it until the next solve, as every failure
+			// notice does. Absent for a run that finished.
+			stoppedNote: run.partial ? stoppedNoteOf(run) : undefined
 		};
 	};
 
@@ -539,6 +543,8 @@
 			// A run EPANET started and could not finish (Tom, 2026-10-14: a tank emptied, the
 			// junctions it fed lost their only source, Error 110 at 7:24). "Did not start" was false.
 			runStoppedKept: pageConfig.lpn_time_run_stopped_kept || 'The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.',
+			statStopped: pageConfig.lpn_time_stat_stopped || '{statistic} not shown: the run stopped before the end of the period.',
+			stoppedNoQuality: pageConfig.lpn_time_stopped_no_quality || 'No water quality results were computed, because the quality analysis starts after the hydraulic run ends.',
 			runStopped: pageConfig.lpn_time_run_stopped || 'The EPANET run stopped at {time}, so it has no results. Its run report says why.',
 			runFellBack: pageConfig.lpn_time_run_fell_back || 'The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level.',
 			runReport: pageConfig.lpn_time_run_report || 'Run report',
@@ -999,7 +1005,6 @@
 		state.statView = false;
 		clampTime();
 		showFrame();
-		host.status(refusedText(run), 'time-run-refused');
 		return true;
 	}
 	function runFinished() {
@@ -1027,6 +1032,9 @@
 	 * it through, so it can never answer out of a run that has been superseded -- the frames and
 	 * the money are dropped together, by construction, because they are the same object.
 	 */
+	// Did the run in hand stop part-way? The energy and quality boxes say so instead of asking for
+	// a run that was made.
+	EC.lpnTimeRunStopped = function () { return !!(state.run && state.run.partial); };
 	EC.lpnTimeRunEnergy = function () { return state.run ? (state.run.energy || null) : null; };
 
 	// **WHY THE FRAMES ARE JUDGED AT THE SOLVE AND NOT AT THE EDIT.** There was briefly a
@@ -1087,6 +1095,8 @@
 			state.wanted = false;
 			state.wantedByUser = false;
 			renderPanel();
+			// A stopped run's notice came back with it: the host does not repaint a kept solve's status.
+			if (state.run.partial) { host.status(stoppedNoteOf(state.run), 'time-run-refused'); }
 			return true;
 		}
 		state.lastRunMs = null;
@@ -1239,6 +1249,10 @@
 	}
 	// What the refusal itself says, without the fallback sentence -- the status bar wants all three
 	// and the run box wants only these two, so the shared part is composed once.
+	function stoppedNoteOf(run) {
+		var S = strings();
+		return refusedText(run) + (run.qualityNotRun ? ' ' + S.stoppedNoQuality : '');
+	}
 	function refusedText(run) {
 		var S = strings(), why = (run && run.engineError) || '',
 			head = (run && typeof run.stoppedAt === 'number')
@@ -1251,11 +1265,14 @@
 	}
 
 	// The statistic the project asks for, or null (Task 735).
+	function rawStat() {
+		var t = docTimes(), n = t && t.statistic;
+		return (n && n !== 'NONE' && EC.LPN_STATISTICS && EC.LPN_STATISTICS.indexOf(n) > 0) ? n : null;
+	}
 	function statName() {
 		// A statistic over a truncated run would pass for one over the whole period.
 		if (state.run && state.run.partial) { return null; }
-		var t = docTimes(), n = t && t.statistic;
-		return (n && n !== 'NONE' && EC.LPN_STATISTICS && EC.LPN_STATISTICS.indexOf(n) > 0) ? n : null;
+		return rawStat();
 	}
 	// What the transport is showing: the statistic frame, or the frame at state.t.
 	function currentResult() {
@@ -2040,7 +2057,7 @@
 	};
 
 	function renderTransport() {
-		var stops, labels, clocks, sig, i, statLabel;
+		var stops, labels, clocks, sig, i, statLabel, stoppedStat;
 		if (!ui || !ui.step) { return; }
 		stops = stepTimes();
 		labels = stops.map(function (t) { return stepText(t); });
@@ -2054,7 +2071,8 @@
 		// ARE IN THE KEY EVEN THOUGH THEY ARE NO LONGER IN THE LABEL** -- they are in the tip, and
 		// a stale tip is the same defect one surface further in.
 		statLabel = state.run && statName() ? statLabelOf(statName()) : null;
-		sig = labels.join('|') + '\u0001' + clocks.join('|') + '\u0001' + (statLabel || '');
+		stoppedStat = state.run && state.run.partial && rawStat() ? strings().statStopped.replace('{statistic}', statLabelOf(rawStat())) : null;
+		sig = labels.join('|') + '\u0001' + clocks.join('|') + '\u0001' + (statLabel || '') + '\u0001' + (stoppedStat || '');
 		if (ui.sig !== sig) {
 			ui.sig = sig;
 			ui.step.textContent = '';
@@ -2062,6 +2080,9 @@
 				ui.step.appendChild(el('option', { value: String(k), title: clocks[k] }, text));
 			});
 			if (statLabel) { ui.step.appendChild(el('option', { value: 'stat' }, statLabel)); }
+			// The statistic the project asks for cannot be had from a truncated run: said where it
+			// would appear, as a row that cannot be chosen.
+			if (stoppedStat) { ui.step.appendChild(el('option', { value: 'stat-stopped', disabled: 'disabled' }, stoppedStat)); }
 		}
 		i = stops.indexOf(state.t);
 		if (i < 0) {

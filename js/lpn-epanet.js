@@ -2310,7 +2310,7 @@
 							// would leave frames with no water age beside the ones that have it.
 							// `solvedTo` is the last of them; nothing is carried past it, estimated or
 							// zeroed.
-							warnings: built.warnings, frames: kept, partial: kept.length > 0, solvedTo: last,
+							warnings: built.warnings, frames: kept, partial: kept.length > 0, solvedTo: last, qualityNotRun: !!qualOn,
 							report: failedReport, stoppedAt: t,
 							duration: duration, reportStart: reportStart, reportStep: reportStep
 						}));

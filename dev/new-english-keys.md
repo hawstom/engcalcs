@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**8 still to read on master**, of 9 untranslated keys, of 2633 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**11 still to read on master**, of 12 untranslated keys, of 2636 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,8 +199,11 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (9, 8 to read @@ NEEDS RULING)
+## lpn_  (12, 11 to read @@ NEEDS RULING)
 
+- **`lpn_energy_stopped`**
+  > The EPANET run stopped before the end of the period, so no pump energy figures were kept.
+  @@ NEEDS RULING
 - **`lpn_ex_net1_si_desc`**
   > Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.
   @@ NEEDS RULING
@@ -221,6 +224,12 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_time_run_stopped_kept`**
   > The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.
+  @@ NEEDS RULING
+- **`lpn_time_stat_stopped`**
+  > {statistic} not shown: the run stopped before the end of the period.
+  @@ NEEDS RULING
+- **`lpn_time_stopped_no_quality`**
+  > No water quality results were computed, because the quality analysis starts after the hydraulic run ends.
   @@ NEEDS RULING
 - **`lpn_tool_zoom_selection`**
   > Zoom to selection
@@ -243,15 +252,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### chore/sprint-737b (`607259d8`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_settings_text_halo`**
-  > Text halo width (percent of text size)
-  @@ NEEDS RULING
-- **`lpn_settings_text_halo_tip`**
-  > Width of the solid outline behind map text, as a percent of the text size. Applies when Solid background behind labels is on.
-  @@ NEEDS RULING
 
 ### feat/bentley-interop (`726001ff`) — 151 new, 151 to read @@ NEEDS RULING
 
@@ -709,7 +709,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Drag to resize
   @@ NEEDS RULING
 
-### feat/description-lines (`015b7484`) — adds no English strings
+### feat/description-lines (`4ebca4e0`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -770,7 +770,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
 
-### feat/override-audit (`2939e872`) — 160 new, 160 to read @@ NEEDS RULING
+### feat/override-audit (`89d2d09d`) — 160 new, 160 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -1253,4 +1253,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Drag to resize
   @@ NEEDS RULING
 
-### feat/stopped-series (`67d6307d`) — adds no English strings
+### feat/plural (`37b19af3`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_settings_text_halo`**
+  > Text halo width (percent of text size)
+  @@ NEEDS RULING
+- **`lpn_settings_text_halo_tip`**
+  > Width of the solid outline behind map text, as a percent of the text size. Applies when Solid background behind labels is on.
+  @@ NEEDS RULING
+
+### feat/stopped-series (`21821cff`) — adds no English strings

@@ -3404,6 +3404,9 @@ $ec_lang['lpn_engine_refused_fallback']='The numbers on screen came from the bui
 // A run EPANET started and could not finish, for example when a tank empties and the junctions it
 // fed have no other source (Error 110). {time} is the run time it stopped at, H:MM.
 $ec_lang['lpn_time_run_stopped']='The EPANET run stopped at {time}, so it has no results. Its run report says why.';
+$ec_lang['lpn_time_stat_stopped']='{statistic} not shown: the run stopped before the end of the period.';
+$ec_lang['lpn_time_stopped_no_quality']='No water quality results were computed, because the quality analysis starts after the hydraulic run ends.';
+$ec_lang['lpn_energy_stopped']='The EPANET run stopped before the end of the period, so no pump energy figures were kept.';
 $ec_lang['lpn_time_run_stopped_kept']='The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.';
 // The run's own version of that last sentence: a period run has a moment and a tank level to name,
 // and a one-moment solve does not, which is where the shared label stops.
