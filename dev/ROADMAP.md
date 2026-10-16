@@ -222,7 +222,7 @@ the block.
   Tom, 2026-10-14: *"It would be really nice for Text to be editable in place instead of only in the
   properties box."* Double-click opens an editor over the Text; right-click a Text offers Edit text and
   Reset position. Built; merged into `feat/bentley-interop` (Tom: *"if that's tidy"*), closes when it lands.
-- 100|800| **A tidy list and count of one scenario's own overrides.** **BUILT 2026-10-15 on `feat/override-audit`** (on bentley-interop): own-override count and List overrides.
+- 100|800| **A tidy list and count of one scenario's own overrides.** **BUILT on `feat/bentley-interop`** (override-audit merged in 2026-10-16, with Tom's wording and a List overrides row on the Scenarios menu, greyed at 0).
   Tom, 2026-10-15, on Fotobi's "1-hr drain w pump off" (24 overrides vs its siblings' 23): *"I don't know how to see a tidy list of overrides to audit ... that count seems inflated ... I should see the count of only the present overrides, not the inherited overrides. I count 13 diameter overrides, 1 text override, and 2 calculation overrides."* Also his screenshot note: tanks show the amber circle while their overrides are only in the parent. Review R-386.
 - 100|801| **Retire Apply Base values; add Merge upward for alternatives.**
   Tom, 2026-10-15: *"I don't think we need this command any more now that we have the circles and the down arrows. And this command is too confusing and dangerous."* And: *"I am not sure that it is meaningful to put a non-base alternative with the Base scenario ... It seems to create a certain circularity that we should avoid. What do you and Mary find?"* **Mary, 2026-10-15:** Bentley documents no circularity and no push-down command; WaterGEMS merges a preferred alternative UP into Base; skeletonization requires Base on parent alternatives only. **Tom, 2026-10-15: *"Allow and retire. I agree. And I like the 'Merge into parent' command. Good find on Mary's part."*** So: Base may keep a non-Base alternative (a WaterGEMS file may arrive that way, Task 749; nothing is circular); retire Apply Base values; add Merge into parent (an alternative's own values move up into its parent, Bentley's merge to base). Then: *"Maybe 'Merge upward' and it lets you choose how many steps upward to target the merge (in case you want to skip parent)?"* Settled with him (*"Yes. Perfect."*): pick the target ancestor by name; if a skipped alternative holds its own value for anything merged, name those assets and fields before merging and leave them untouched. R-387.
@@ -463,13 +463,13 @@ the block.
   Tom, 2026-10-15: *"Allow field/reference text in Text using {}. Define/disclose the keys in the User Manual."*
 - 75|799| **Try Tables and Graphs as dockable boxes too, on an option branch.**
   Tom, 2026-10-15: *"Can we try a UI option branch for everything in the bottom pane to be available also as dockable boxes: (a) Tables and (b) Graphs?"* Seam with the bottom-pane tab strip.
-- 75|802| **The Scenarios table flies out from the Scenario Manager's right side.**
+- 75|802| **The Scenarios table flies out from the Scenario Manager's right side.** **BUILT 2026-10-16 on `feat/bentley-interop`.**
   Tom, 2026-10-15: *"Could we stick that table onto the right side of the Scenario Manager to accomplish (a) that both are available in the same gesture and (b) that it flies out over the map instead of displacing the map?"* R-389.
-- 75|803| **See every unused alternative at a glance.**
+- 75|803| **See every unused alternative at a glance.** **BUILT 2026-10-16 on `feat/bentley-interop`.**
   Tom, 2026-10-15: *"Maybe an 'Unused alternatives' button ... unless the selector (instead of a button) includes 'All unused' (and 'All'?), where all the headings are listed with a scrollbar."* R-390.
-- 75|804| **Time series balloons become a Presentation override.**
+- 75|804| **Time series balloons become a Presentation override.** **BUILT 2026-10-16 on `feat/bentley-interop`.**
   Tom, 2026-10-15: *"The Time series balloons/bubbles should be a Presentation override."* R-391.
-- 75|805| **A clean map: hide the override ambers and the map's own controls.**
+- 75|805| **A clean map: hide the override ambers and the map's own controls.** **BUILT 2026-10-16 on `feat/bentley-interop`.**
   Tom, 2026-10-15: *"It would be good to be able to hide the amber override indicators from the map. Maybe a Map, Clean map button is a good idea after all with zoom buttons, error messenger, ambers, and satellite button hiding."* R-396.
 - 75|806| **Descriptions take several lines and paragraphs.** **BUILT 2026-10-15 on `feat/description-lines`; 2026-10-16 a line break is " \P " wherever it sits on one line (.inp, Tables cell, copy), on Tom's call.**
   Tom, 2026-10-15: *"I think that all Description fields should allow multiple lines and paragraphs like most software to allow internal documentation."* R-395.
