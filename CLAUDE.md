@@ -35,7 +35,7 @@ to leave something uncommitted.
 - **Merge FROM master often. Merge a capability branch INTO master only on Tom's typed word in
   the conversation.** Green is not done. Claude Code's permission check enforces it; there is no
   all-clear file. `dev/hooks/pre-merge-commit` refuses only what `dev/branch-policy.json` switches
-  on — `feature_freeze.active` refuses any `feat/` branch (only Tom lifts it), `freeze.active` is
+  on — `feature_freeze.active` refuses any branch named feat/... (only Tom lifts it), `freeze.active` is
   the emergency stop refusing everything but a `hotfix:` — and an open `dev/deploy-blockers.json`
   entry. A defect or tooling track merges on green alone.
 - **A batch of merges costs one `check_all` run, about 19 minutes (three browser lanes, 2026-10-15); tell Tom the wait before
