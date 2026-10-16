@@ -190,18 +190,8 @@ fi
 #    not carry is a constraint living in a transcript, which dev/deploy-blockers.json exists to end.
 # ---------------------------------------------------------------------------
 hr "WHAT CANNOT MERGE TO master"
-# REWRITTEN 2026-09-15. It printed four raw JSON values -- "freeze active: false", "protected:",
-# "all-clears:", "open blockers:" -- and Tom, who is the only reader, did not know what three of
-# them meant and called the fourth dangerous. He was right on both counts, and a line the reader
-# cannot interpret is noise however true it is.
-#
-# THE DANGEROUS ONE WAS "freeze active: false" DURING A FEATURE FREEZE. Both statements are true
-# and they are about different things, which is exactly why printing the boolean alone misleads:
-# `freeze.active` is an EMERGENCY STOP that refuses every merge but a `hotfix:`, and it is off
-# deliberately, because turning it on once blocked a day of bug fixes that Tom was waiting for. The
-# FEATURE freeze is held branch by branch, by the list below. So the report now says what each
-# mechanism actually does, and says out loud the gap between them -- a NEW feature branch is
-# refused by nothing until somebody adds it to that list.
+# Says what each switch does in plain words: Tom called the raw "freeze active: false" printed during
+# a feature freeze dangerous (2026-09-15), because the emergency stop and the feature freeze differ.
 "$PHP" -r '$root = $argv[1];
 $g = function ($f) use ($root) {
     $p = "$root/dev/$f";
@@ -210,7 +200,6 @@ $g = function ($f) use ($root) {
     return is_array($j) ? $j : null;
 };
 $p = $g("branch-policy.json");
-$c = $g("branch-all-clears.json");
 $b = $g("deploy-blockers.json");
 
 if ($p === null) { echo "   NOT MEASURED: dev/branch-policy.json unreadable\n"; }
@@ -221,8 +210,7 @@ else {
     $ff = !empty($p["feature_freeze"]["active"]);
     printf("   FEATURE FREEZE -- %s\n", $ff ? "ON" : "off");
     if ($ff) {
-        echo "     No feature merges, and YOUR OWN ALL-CLEAR DOES NOT OVERRIDE IT. An approval\n";
-        echo "     you give now keeps standing and takes effect when the freeze is lifted.\n";
+        echo "     No feat/ branch merges until you lift it.\n";
         foreach (array("since" => "frozen since", "until" => "until") as $k => $lbl) {
             if (!empty($p["feature_freeze"][$k])) {
                 printf("     %s: %s\n", $lbl, $p["feature_freeze"][$k]);
@@ -230,7 +218,7 @@ else {
         }
         echo "     Defect and tooling work is UNAFFECTED and still merges on a green suite.\n";
     } else {
-        echo "     Features may merge, with your written all-clear, one branch at a time.\n";
+        echo "     Features may merge, on your typed word in the conversation.\n";
     }
 
     $a = !empty($p["freeze"]["active"]);
@@ -244,24 +232,8 @@ else {
         echo "     switching this one on stops the defect fixes you are waiting for too.\n";
     }
 
-    $prot = empty($p["protected"]) ? array() : $p["protected"];
-    echo "\n   Branches treated as FEATURES, each needing your written all-clear:\n";
-    if (!$prot) { echo "     none listed\n"; }
-    else { foreach ($prot as $one) { echo "     $one\n"; } }
-    echo "     This is a POLICY, not an inventory: a name here may be a branch that no\n";
-    echo "     longer exists, and BRANCHES above is the inventory. The two need not agree.\n";
-    echo "     A branch NOT on this list counts as a defect or tooling track and merges on\n";
-    echo "     a green suite alone -- so a NEW feature branch is refused by nothing until\n";
-    echo "     somebody adds it here.\n";
 }
 
-if ($c === null) { echo "   NOT MEASURED: dev/branch-all-clears.json unreadable\n"; }
-else {
-    $k = isset($c["cleared"]) && is_array($c["cleared"]) ? array_keys($c["cleared"]) : array();
-    echo "\n   All-clears you have given, still valid: " . ($k ? implode(", ", $k) : "none") . "\n";
-    echo "     Your own words, pinned to the exact commit you cleared, so the permission\n";
-    echo "     EXPIRES BY ITSELF the moment that branch moves.\n";
-}
 
 if ($b === null) { echo "   NOT MEASURED: dev/deploy-blockers.json unreadable\n"; }
 else {

@@ -32,12 +32,12 @@ to leave something uncommitted.
   deployed. A hotfix: branch off `release/ewb`, fix, `check_all`, merge, push; he pulls that; the
   same fix is merged to master separately. A clean release can always be cut from a pre-merge SHA
   and fixes cherry-picked on — never tell him otherwise.
-- **Merge FROM master often. Merge a capability branch INTO master only on Tom's all-clear.**
-  Green is not done. `dev/hooks/pre-merge-commit` enforces it for branches listed in
-  `dev/branch-policy.json`; `dev/branch-all-clears.json` pins his words to the commit he cleared,
-  so the approval lapses when the branch moves. `feature_freeze.active` refuses a protected merge
-  even with an all-clear (only Tom lifts it); `freeze.active` is the separate emergency stop that
-  refuses everything but a `hotfix:`. A defect or tooling track merges on green alone.
+- **Merge FROM master often. Merge a capability branch INTO master only on Tom's typed word in
+  the conversation.** Green is not done. Claude Code's permission check enforces it; there is no
+  all-clear file. `dev/hooks/pre-merge-commit` refuses only what `dev/branch-policy.json` switches
+  on — `feature_freeze.active` refuses any branch named feat/... (only Tom lifts it), `freeze.active` is
+  the emergency stop refusing everything but a `hotfix:` — and an open `dev/deploy-blockers.json`
+  entry. A defect or tooling track merges on green alone.
 - **A batch of merges costs one `check_all` run, about 19 minutes (three browser lanes, 2026-10-15); tell Tom the wait before
   starting it.** Merge the whole batch, then fold in the payload regeneration, roadmap closures and
   handoff edits, all before the run: every later master commit is another full run. On the merge

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**149 still to read on master**, of 171 untranslated keys, of 2793 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**146 still to read on master**, of 171 untranslated keys, of 2793 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -198,7 +198,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (171, 149 to read @@ NEEDS RULING)
+## lpn_  (171, 146 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -216,8 +216,8 @@ never edits a synonym.
   > Clean map
   _Ruled 2026-10-15: Approved._
 - **`lpn_clean_map_tip`**
-  > Checked: The zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.
-  _Ruled 2026-10-15: Map > Clean map: It works, but remove the 'shows only the drawing' sentence of the tip. Start with 'Checked: The zoom....'_
+  > Checked: the zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.
+  _Ruled 2026-10-16: Asked whether to lowercase "The" after "Checked:" like the other tips: "Yes. Make your proposed correction. Thank you for checking."_
 - **`lpn_control_inactive_note`**
   > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
   @@ NEEDS RULING
@@ -391,7 +391,7 @@ never edits a synonym.
   _Ruled 2026-10-15: Approved._
 - **`lpn_settings_override_marks_tip`**
   > Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.
-  @@ NEEDS RULING
+  _Ruled 2026-10-16: I approve all three._
 - **`lpn_settings_restore_base_only`**
   > Switch to Base to restore the defaults.
   @@ NEEDS RULING
@@ -565,7 +565,7 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_sm_all_row_tip`**
   > Double-click to open it in its category tree.
-  @@ NEEDS RULING
+  _Ruled 2026-10-16: I approve all three._
 - **`lpn_sm_base_kept`**
   > The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.
   @@ NEEDS RULING
@@ -676,7 +676,7 @@ never edits a synonym.
   _Ruled 2026-10-15: Approved._
 - **`lpn_sm_unused_none`**
   > None
-  @@ NEEDS RULING
+  _Ruled 2026-10-16: I approve all three._
 - **`lpn_sm_used_by`**
   > Used by scenarios: {n}
   @@ NEEDS RULING
@@ -729,7 +729,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`139e9eb84`) — adds no English strings
+### feat/bentley-interop (`1d0cd4814`) — adds no English strings
 
 ### feat/description-lines (`7e68251a3`) — adds no English strings
 

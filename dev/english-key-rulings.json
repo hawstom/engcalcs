@@ -415,9 +415,9 @@
             "answer": "This is obsolete. It doesn't go anywhere. Delete key."
         },
         "lpn_clean_map_tip": {
-            "on": "Checked: The zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.",
-            "ruled": "2026-10-15",
-            "answer": "Map > Clean map: It works, but remove the 'shows only the drawing' sentence of the tip. Start with 'Checked: The zoom....'"
+            "on": "Checked: the zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.",
+            "ruled": "2026-10-16",
+            "answer": "Asked whether to lowercase \"The\" after \"Checked:\" like the other tips: \"Yes. Make your proposed correction. Thank you for checking.\""
         },
         "lpn_confirm_labels_restore": {
             "on": "Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.",
@@ -5890,6 +5890,21 @@
             "on": "Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.",
             "ruled": "2026-10-15",
             "answer": "R-402 status messages: Approved."
+        },
+        "lpn_settings_override_marks_tip": {
+            "on": "Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.",
+            "ruled": "2026-10-16",
+            "answer": "I approve all three."
+        },
+        "lpn_sm_unused_none": {
+            "on": "None",
+            "ruled": "2026-10-16",
+            "answer": "I approve all three."
+        },
+        "lpn_sm_all_row_tip": {
+            "on": "Double-click to open it in its category tree.",
+            "ruled": "2026-10-16",
+            "answer": "I approve all three."
         }
     }
 }
