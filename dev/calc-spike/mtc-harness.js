@@ -439,4 +439,24 @@ solver.EngCalcs.solveForY();
 r.eq(solver.text('solver_msg'), '', 'a large target Q is solved rather than refused');
 r.close(solver.num('q'), 5000, 1e-3, 'and a 5000 cfs channel is found');
 
+// ---- vertical sides: side-slope rock size is not applicable ---------------------------------
+r.section('vertical sides (z = 0) have no side-slope rock size');
+{
+	const v0 = loadCalculator('Manning-Trap.php', { lang: 'en' });
+	v0.set({ z1: 0, z2: 0 }).run();
+	r.eq(v0.html('d50_z1'), 'N/A', 'z1 = 0 shows N/A for the side 1 rock size');
+	r.eq(v0.html('d50_z2'), 'N/A', 'z2 = 0 shows N/A for the side 2 rock size');
+	r.ok(isFinite(v0.num('d50_bottom')), 'the bottom rock size is still a number');
+	for (const z of [-1, 1e-12]) {
+		const q = loadCalculator('Manning-Trap.php', { lang: 'en' });
+		q.set({ z1: z }).run();
+		const t = q.html('d50_z1');
+		r.ok(t === 'N/A' || (isFinite(parseFloat(t)) && parseFloat(t) >= 0 && parseFloat(t) < 1e6), 'z1 = ' + z + ' never prints an absurd value: ' + t);
+	}
+	const z2 = loadCalculator('Manning-Trap.php', { lang: 'en' });
+	z2.run();
+	// 0.7274 is the page's output at the default z = 2 before the vertical-side fix.
+	r.close(z2.num('d50_z1'), 0.7274, 1e-3, 'z = 2 side rock size unchanged from before the fix');
+}
+
 r.finish();

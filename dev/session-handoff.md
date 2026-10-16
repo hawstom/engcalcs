@@ -111,26 +111,26 @@ Earlier the same day: help-calculators (625), screenshot-copy (793), tank-depth-
 (643), library-description (792). Tom's Android reaches the previews through Termux.
 
 Landed 2026-10-16: feat/stopped-series (808) to master; feat/override-audit (800) into bentley-interop
-(`c72f83eb`), branch deleted.
+(`c72f83eb`); fix/wording-1016 (his word calls on 808 and the mode prompts), fix/mtc-vertical-sides
+(z = 0 side rock size reads N/A, new key `mtc_not_applicable`), feat/plural (35 count strings in the
+"cells (n)" form, 27 of them ruled). `chore/ledger-wording` holds HIS commit 37092cd7 (the ledger heading
+and CLAUDE.md line): the classifier refuses CC merging it ("self-modification"); his to merge.
 
 ### Branches awaiting his word (pushed; all on the Branch previews page with test steps)
 
 - **feat/bentley-interop** (Tasks 721, 790, 782, 784, 789, 794, 781 Morph, 801 Merge upward): master merged
   in 2026-10-15 (ead9c118, then 93a3aeef: text halo is a Presentation setting). Its `$ec_lang_syn` Transform
   description is CC's wording, awaiting his OK. After it lands delete match-property, graph-bubble.
-- **feat/description-lines** (Task 806): Descriptions in lines and paragraphs; .inp later lines on `;|`
-  comments (pattern/curve order verified against EPANET's input2.c by Perry). No new keys.
-- **feat/plural**: 12 English count strings reworded to his "overrides (1)" form (none he had approved);
-  wording only, no preview. The 23 he approved still read "1 cells" etc. at n=1; his call.
+- **feat/description-lines** (Task 806): Descriptions in lines and paragraphs; one line break is " \P "
+  wherever it sits on one line (.inp comment, Tables cell, copy), his 10-16 call. No new keys.
+- **feat/override-wording**, **fix/text-edit-phone**: on bentley-interop (800 wording + Scenarios menu row;
+  R-392 phone zoom closed the Text editor). Merge into bentley-interop.
 - feat/leader-keep (807): he typed "Merge feat/leader-keep" 2026-10-15 and again 2026-10-16, but the auto-mode
   classifier refuses CC writing his all-clear into `dev/branch-all-clears.json`. Needs a permission rule or his own entry.
 
 ### Questions out to him
 
-- km Tag: ស្លាកសម្គាល់ contains the Label word ស្លាក; his own 09-07 edit used it. Change it?
-- Select/Add mode prompts say "labels" for Labels and Text both; proposed "labels and Text".
-- Task 806: the `;|` marker; a Tables cell edits only the first line; " …" after a first-line label.
-- Task 800: keep J-NE-S-3's equal override? List overrides in the Scenarios menu for Basic mode?
+- Task 800: keep J-NE-S-3's equal override?
 
 ### Next job
 

@@ -13,7 +13,12 @@ EngCalcs.Manning.mc_riprap_size = function(y, a, v, g, z, s0, c, sgrock) {
 	var
 	d50,
 	hvmax = v * v * 1.33 * 1.33 / (2 * g) ;
-	// Isbash
+	// Isbash. The side-slope factor cos(atan(1/z)) = z / sqrt(1 + z^2) goes to zero as z goes to
+	// zero, so the rock size grows without bound on a vertical wall and is negative for z < 0.
+	// Side-slope sizing has no meaning there: return NaN, which the page shows as not applicable.
+	// Below z = 0.01 the factor is under 0.01 and the size is over 100 times the bottom's: a wall,
+	// not a slope. Rounding noise near zero must not print a number either.
+	if (!(isFinite(z) && z >= 0.01)) { return NaN; }
 	d50 = hvmax / (c * c * Math.cos(Math.atan(1 / z)) * (sgrock - 1));
 	return d50;
 };
@@ -149,7 +154,8 @@ EngCalcs.Manning.mtc_iterate = function(p) {
 		d50_searcy = 0.022 * Math.pow(v, 2);
 		switch (p.d50_radio) {
 			case 'isbash':
-				d50_calc = Math.max(d50_bottom, d50_z1, d50_z2);
+				// A side with no valid slope (vertical wall) is skipped, not counted.
+				d50_calc = Math.max(d50_bottom, isNaN(d50_z1) ? 0 : d50_z1, isNaN(d50_z2) ? 0 : d50_z2);
 				break;
 			case 'maynord':
 				d50_calc = d50_mra;
