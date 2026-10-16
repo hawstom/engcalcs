@@ -232,7 +232,7 @@ never edits a synonym.
   > These features have no attribute fields.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_crs`**
-  > The file states the coordinate system {crs}, which is WGS 84 longitude and latitude, the system RFC 7946 requires. Positions were read as stated.
+  > The file states the coordinate system {crs}, which is WGS 84 latitude and longitude, the system RFC 7946 requires. Positions were read as stated.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_default_demand`**
   > These junctions state no base demand and have the default base demand, {value}.
@@ -316,7 +316,7 @@ never edits a synonym.
   > Not imported: the start or end node named is not in the file.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_skip_position`**
-  > Not imported: a position is not a valid longitude and latitude.
+  > Not imported: a position is not a valid latitude and longitude.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_unmapped_demand`**
   > No field was chosen for the base demand, so every junction has the default base demand, {value}.
@@ -352,7 +352,7 @@ never edits a synonym.
   > Point fields (junctions, reservoirs, and tanks)
   @@ NEEDS RULING
 - **`lpn_gjnet_refuse_crs`**
-  > {file} states the coordinate system {crs}. GeoJSON positions are WGS 84 longitude and latitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.
+  > {file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.
   @@ NEEDS RULING
 - **`lpn_gjnet_refuse_empty`**
   > {file} contains no points or lines.
@@ -396,7 +396,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### chore/handoff-1016c (`cc73b6242`) — adds no English strings
 
-### chore/plain-sentences (`8301b0524`) — adds no English strings
+### chore/plain-sentences (`307c6a742`) — adds no English strings
 
 ### feat/basemap-outdoors (`2a45b1cc2`) — 1 new, 1 to read @@ NEEDS RULING
 
@@ -931,7 +931,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/geojson-import (`f66c73ce2`) — adds no English strings
+### feat/geojson-import (`abe2b9929`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 

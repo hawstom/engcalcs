@@ -40101,7 +40101,7 @@ var EngCalcs = EngCalcs || {};
 		scan = EngCalcs.lpnGeoJsonNetScan ? EngCalcs.lpnGeoJsonNetScan(text) : { ok: false, error: 'unreadable', detail: '' };
 		if (!scan.ok) {
 			var msg = scan.error === 'crs'
-				? (pc.lpn_gjnet_refuse_crs || '{file} states the coordinate system {crs}. GeoJSON positions are WGS 84 longitude and latitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.')
+				? (pc.lpn_gjnet_refuse_crs || '{file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.')
 					.replace('{crs}', scan.detail)
 				: scan.error === 'empty'
 					? (pc.lpn_gjnet_refuse_empty || '{file} contains no points or lines.')
@@ -40196,7 +40196,7 @@ var EngCalcs = EngCalcs || {};
 			td.appendChild(sel); tr.appendChild(td);
 			td = document.createElement('td');
 			usel = document.createElement('select');
-			usel.setAttribute('data-unit-for', f.name);
+			usel.setAttribute('data-gjnet-unit', f.name);
 			usel.setAttribute('aria-label', (pc.lpn_gjnet_col_unit || 'Unit') + ': ' + f.name);
 			td.appendChild(usel); tr.appendChild(td);
 			r.sel = sel; r.usel = usel;
@@ -40386,10 +40386,10 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, tol = String(net.tolerance === undefined ? LPN_GJNET_TOLERANCE : net.tolerance) + ' m';
 		function v(x) { return String(x === undefined || x === null ? '' : x); }
 		var T = {
-			'crs-named': ['lpn_gjnet_note_crs', 'The file states the coordinate system {crs}, which is WGS 84 longitude and latitude, the system RFC 7946 requires. Positions were read as stated.'],
+			'crs-named': ['lpn_gjnet_note_crs', 'The file states the coordinate system {crs}, which is WGS 84 latitude and longitude, the system RFC 7946 requires. Positions were read as stated.'],
 			'skip-geometry': ['lpn_gjnet_note_skip_geometry', 'Not imported: the feature is not a point or a line.'],
 			'skip-kind': ['lpn_gjnet_note_skip_kind', 'Not imported: the feature states no node_type or link_type.'],
-			'skip-position': ['lpn_gjnet_note_skip_position', 'Not imported: a position is not a valid longitude and latitude.'],
+			'skip-position': ['lpn_gjnet_note_skip_position', 'Not imported: a position is not a valid latitude and longitude.'],
 			'skip-id': ['lpn_gjnet_note_skip_id', 'Not imported: the name is not a valid ID, or another element of the same kind has it.'],
 			'skip-no-node': ['lpn_gjnet_note_skip_no_node', 'Not imported: the start or end node named is not in the file.'],
 			'skip-loop': ['lpn_gjnet_note_skip_loop', 'Not imported: both ends of the line join the same node.'],

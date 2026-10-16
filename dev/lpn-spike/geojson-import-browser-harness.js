@@ -172,7 +172,7 @@ async function main() {
 			(await L('lpn_gjnet_title')).replace('{file}', 'water_assets.geojson'));
 		ok('it says how many points and lines were found', !!d && d.text.indexOf((await L('lpn_gjnet_intro')).replace('{points}', '4').replace('{lines}', '5')) >= 0, d && d.text.slice(0, 200));
 		const sel = (kind, field) => P.$eval('table[data-kind="' + kind + '"] select[data-field="' + field + '"]', (s) => s.value);
-		const unit = (kind, field) => P.$eval('table[data-kind="' + kind + '"] select[data-unit-for="' + field + '"]', (s) => s.style.display === 'none' ? '' : s.value);
+		const unit = (kind, field) => P.$eval('table[data-kind="' + kind + '"] select[data-gjnet-unit="' + field + '"]', (s) => s.style.display === 'none' ? '' : s.value);
 		ok('the guesses are shown: FACILITYID the ID, ELEV_FT the elevation in ft, OWNER a custom property',
 			await sel('point', 'FACILITYID') === 'id' && await sel('point', 'ELEV_FT') === 'elev' && await unit('point', 'ELEV_FT') === 'fth2o' && await sel('point', 'OWNER') === 'custom');
 		ok('PIPE_ID the ID, C the roughness (no unit under Hazen-Williams)', await sel('line', 'PIPE_ID') === 'id' && await sel('line', 'C') === 'roughness' && await unit('line', 'C') === '');
@@ -181,7 +181,7 @@ async function main() {
 		// The user's choices: DIAM_MM fills the diameter, in mm; LEN is left out.
 		await P.selectOption('table[data-kind="line"] select[data-field="DIAM_MM"]', 'diameter');
 		ok('a field chosen as the diameter shows the diameter units, on the project unit', await unit('line', 'DIAM_MM') === 'in');
-		await P.selectOption('table[data-kind="line"] select[data-unit-for="DIAM_MM"]', 'mm');
+		await P.selectOption('table[data-kind="line"] select[data-gjnet-unit="DIAM_MM"]', 'mm');
 		await P.selectOption('table[data-kind="line"] select[data-field="LEN"]', 'skip');
 		// One field per property: choosing PIPE_ID's property for MATERIAL hands PIPE_ID back to custom.
 		await P.selectOption('table[data-kind="line"] select[data-field="MATERIAL"]', 'id');
