@@ -2605,17 +2605,23 @@ var EngCalcs = EngCalcs || {};
 			if (!recs.length) { break; }   // nothing left to give up: the drops stand and go whole
 			// EVERY WRITE, THEN EVERY READ -- one forced layout for the rung instead of one per
 			// label. Exactly shedToSegmentBatch()'s seam, for exactly its reason.
-			recs.forEach(function (rec) {
-				writeNodeLabelGlyphs(rec.ne, rec.n,
-					keptLines(rec.all, shedKeepSet(rec.all, rec.order, rec.gone + 1)), fsNow);
+			// **THE TWO HALVES OF A RUNG ARE TIMED APART** (?debug=perf): the glyph rewrite and the
+			// re-fit. Measured 2026-10-16 on the 600-junction downtown arrival, 28 ms and 248 ms over
+			// five rungs. Reusing the re-fit's unchanged verdicts was tried (Task 681) and saved
+			// about a tenth: most labels on a crowded view shed on every rung, so few verdicts hold.
+			perfDebugAccum('  ns:glyphs', function () {
+				recs.forEach(function (rec) {
+					writeNodeLabelGlyphs(rec.ne, rec.n,
+						keptLines(rec.all, shedKeepSet(rec.all, rec.order, rec.gone + 1)), fsNow);
+				});
+				recs.forEach(function (rec) { measureLabelWidths(rec.ne); });
+				recs.forEach(function (rec) {
+					rec.lbl.w = labelBoxWidth(rec.ne);
+					rec.lbl.h = dataLabelBoxHeight(rec.ne.lineCount);
+					rec.lbl.lines = labelRowWidths(rec.ne);
+				});
 			});
-			recs.forEach(function (rec) { measureLabelWidths(rec.ne); });
-			recs.forEach(function (rec) {
-				rec.lbl.w = labelBoxWidth(rec.ne);
-				rec.lbl.h = dataLabelBoxHeight(rec.ne.lineCount);
-				rec.lbl.lines = labelRowWidths(rec.ne);
-			});
-			placed = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
+			placed = perfDebugAccum('  ns:refit', function () { return Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad }); });
 			rungs++;
 		}
 		lastNodeShedRungs = rungs;

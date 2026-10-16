@@ -23,6 +23,12 @@
 // switch + 128 ms settle; downtown n600 1,830 + 1,393. With the settle banking what is on screen
 // (labelCacheSettle()): 178 + 1.5 and 1,734 + 2.6.
 //
+// Then the crossing shed (cl:crossShed), 488 ms of the n600 switch: it counted every crossing in the
+// drawing afresh on each of its rounds, and asked again each round which labels cover which, for
+// answers that only ever lose the pairs of the label just hidden. Counted once, 488 -> 29 ms; the
+// switch 1,773 -> 1,338. The node shed's re-fits (cl:nodeShed, ns:refit 248 ms) were tried the same
+// way and kept: reusing unchanged verdicts saved about a tenth (see shedNodeLabelsForCrowding()).
+//
 // **WHAT MUST NOT CHANGE: A SINGLE LABEL.** For each network the label layers are serialised after a
 // cold arrival -- every element, text, rows, leaders, visibility -- and compared with the same arrival
 // made through a REFERENCE copy of the page script in which the cut is undone (REF_REWRITES below,
