@@ -78,19 +78,15 @@ uncommitted; silence means commit and push.
       `custom-property` with a validator that does not validate and that he never asked for. No
       suite can see either.
     - **A DEFECT TRACK STILL MERGES ON THE OLD RULE** -- green on the merge result, and push.
-    - **HIS WORD IS THE ALL-CLEAR, AND NO FILE COPIES IT** (retired on his word, 2026-10-15). From
-      2026-09-13 a per-branch file pinned his words to the commit he cleared, read by
-      `dev/hooks/pre-merge-commit` for every branch on a `protected` list. It outlived its reason:
-      Claude Code's own permission check came to refuse any merge into master without his typed
-      word in that conversation, and it also refused Claude Code writing the file, so he was
-      hand-editing JSON; and bringing a cleared branch up to date moved its head and voided the
-      clearance. He: *"Its safeties have become its undoing. We were doing just fine. Can we relax
-      whatever has grown up and choked us?"* **Do not rebuild a file-based all-clear.**
-    - **THE FREEZES STAY.** `feature_freeze.active` in `dev/branch-policy.json` refuses any `feat/`
-      branch until he lifts it (*"even if I were to approve a merge, the scripts must block it until
-      the freeze is removed"*, 2026-09-15). `freeze.active` is the separate emergency stop refusing
-      every merge but a `hotfix:`; switching it on once cost a full day of bug fixes he was waiting
-      for, so a defect or tooling track is never touched by the feature freeze.
+    - **HIS WORD IS THE ALL-CLEAR, AND NO FILE OR HOOK COPIES IT** (retired on his word, 2026-10-15
+      and 10-16). From 2026-09-13 a per-branch all-clear file, a feature freeze, an emergency freeze
+      and a deploy-blocker list were read by a pre-merge hook. They outlived their reason: Claude
+      Code's own permission check came to refuse any merge into master without his typed word, and
+      refused Claude Code writing the file, so he hand-edited JSON; bringing a cleared branch up to
+      date voided the clearance; neither freeze had been on since 09-17 (the emergency one only ever
+      by a session's misreading), and no blocker was ever written. He: *"Its safeties have become its
+      undoing. We were doing just fine. Can we relax whatever has grown up and choked us?"* **Do not
+      rebuild them.** A release is held still by a release branch (`release/ewb`), which stops nobody.
     - The four capability branches are large, speculative and abandonable, which is what a branch is
       genuinely for -- and is exactly why finishing one is a judgement about the product rather than
       about the build.

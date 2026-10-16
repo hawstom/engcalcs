@@ -185,68 +185,6 @@ else
     miss "no PHP 7+ binary at $PHP"
 fi
 
-# ---------------------------------------------------------------------------
-# 5. GATES. Read out of the JSON, never restated. A freeze or an open blocker that the report does
-#    not carry is a constraint living in a transcript, which dev/deploy-blockers.json exists to end.
-# ---------------------------------------------------------------------------
-hr "WHAT CANNOT MERGE TO master"
-# Says what each switch does in plain words: Tom called the raw "freeze active: false" printed during
-# a feature freeze dangerous (2026-09-15), because the emergency stop and the feature freeze differ.
-"$PHP" -r '$root = $argv[1];
-$g = function ($f) use ($root) {
-    $p = "$root/dev/$f";
-    if (!is_readable($p)) { return null; }
-    $j = json_decode(file_get_contents($p), true);
-    return is_array($j) ? $j : null;
-};
-$p = $g("branch-policy.json");
-$b = $g("deploy-blockers.json");
-
-if ($p === null) { echo "   NOT MEASURED: dev/branch-policy.json unreadable\n"; }
-else {
-    /* THE FEATURE FREEZE LEADS, because it is the one usually on and the one Tom means when he
-       says "we are in a freeze". Printing the EMERGENCY flag first and alone is what produced
-       "freeze active: false" during a huge freeze, which he called dangerous and was right to. */
-    $ff = !empty($p["feature_freeze"]["active"]);
-    printf("   FEATURE FREEZE -- %s\n", $ff ? "ON" : "off");
-    if ($ff) {
-        echo "     No feat/ branch merges until you lift it.\n";
-        foreach (array("since" => "frozen since", "until" => "until") as $k => $lbl) {
-            if (!empty($p["feature_freeze"][$k])) {
-                printf("     %s: %s\n", $lbl, $p["feature_freeze"][$k]);
-            }
-        }
-        echo "     Defect and tooling work is UNAFFECTED and still merges on a green suite.\n";
-    } else {
-        echo "     Features may merge, on your typed word in the conversation.\n";
-    }
-
-    $a = !empty($p["freeze"]["active"]);
-    printf("\n   Emergency stop, refusing EVERY merge but a 'hotfix:' one -- %s\n",
-        $a ? "ON" : "off");
-    if ($a) {
-        printf("     NOTHING merges until this is turned off, bug fixes included.%s\n",
-            !empty($p["freeze"]["until"]) ? " Set until: " . $p["freeze"]["until"] : "");
-    } else {
-        echo "     Off on purpose, and it is a DIFFERENT thing from the feature freeze above:\n";
-        echo "     switching this one on stops the defect fixes you are waiting for too.\n";
-    }
-
-}
-
-
-if ($b === null) { echo "   NOT MEASURED: dev/deploy-blockers.json unreadable\n"; }
-else {
-    $l = array();
-    foreach ((isset($b["blockers"]) && is_array($b["blockers"])) ? $b["blockers"] : array() as $one) {
-        $l[] = isset($one["id"]) ? $one["id"] : "(unnamed)";
-    }
-    echo "\n   Things you have said must not ship yet: " . ($l ? strtoupper(implode(", ", $l)) : "none") . "\n";
-    echo "     Written down the moment you say one, because a constraint that lives only\n";
-    echo "     in a conversation is one a later session cannot look up.\n";
-}' "$HERE"
-
-
 # 6. THE ENGLISH QUEUE. Tom's reading is the critical path, not the building -- dev/session-handoff
 #    §1. new_english_keys.php prints the unread count FIRST, deliberately, because this repository
 #    once reported the untranslated count as the unread one and he caught it.

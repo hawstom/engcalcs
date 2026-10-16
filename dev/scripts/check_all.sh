@@ -569,7 +569,6 @@ run_check "stale claim worklist"        advisory php dev/scripts/stale_claim_che
 # only in the context of the session that read it.
 run_check "Tom's review queue"          advisory php dev/scripts/review_queue_check.php --open
 run_check "git hooks installed"          blocking php dev/scripts/hook_install_check.php
-run_check "branch policy selftest"       blocking php dev/scripts/branch_policy_selftest.php
 # A BACKGROUND WAIT LOOP THAT CANNOT FINISH. Eight of them were left sleeping on 2026-09-13 and
 # were still there ten hours later; the only symptom Tom could see was that Claude Code would not
 # exit. The guard lives in .claude/hooks/ rather than here because the defect never reaches this

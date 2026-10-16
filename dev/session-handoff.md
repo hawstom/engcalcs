@@ -8,8 +8,8 @@ lines rather than appending corrections.
 
 ## Before merging anything
 
-- **Feature branches alive, each awaiting Tom's browser pass** (`feature_freeze` is OFF): see STATE
-  below. A feature merges into master on his typed word; there is no all-clear file. Plus `feat/label-placer` (the seam; round-5 bench), `feat/label-gang-search` (bench only), and
+- **Feature branches alive, each awaiting Tom's browser pass**: see STATE below. A feature merges
+  into master on his typed word; there is no all-clear file, freeze or merge hook. Plus `feat/label-placer` (the seam; round-5 bench), `feat/label-gang-search` (bench only), and
   builders `feat/label-placer-a`..`-d`, which never merge alone.
 - **A branch that adds a key fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
@@ -128,15 +128,13 @@ If a branch's `git log` shows no commit after 10-15 22:00, that agent's work was
   approved its status messages. Don't call a fixture by its filename to him; name his project.
 - **feat/description-lines** (806): his call changed to "\P" with no spaces (was " \P ").
 
-### Proposed to him 2026-10-15 night, awaiting his yes
+### Proposed to him 2026-10-15/16, awaiting his word
 
 - Independent review of how a clarification reaches a translator (halo read as "hello"; "translating
   too often?"): `dev/translation-clarification-review.md`. Its halo glossary wording, its sprint cadence
   (once before each production pull) await him. Its tooling fix landed 10-16: the packet now sends
   the syn notes, reworded keys (no resync list), tip pairs, and only the glossary terms a batch uses.
   He forbids translating without his approval.
-- **Retire the two freezes and the empty deploy-blocker list** (and branch_gate.php with them)? Asked
-  10-16; neither freeze has been on since 09-17, no blocker has ever been written.
 
 ### Questions out to him
 
@@ -153,8 +151,8 @@ harness helper that starts a scenario from the UI (Perry).
 ### Traps met 2026-10-15 (twenty-first session)
 
 - **"Ledger" was CC's word; he did not know it.** Relay in his words.
-- **He retired the all-clear file and its hook (10-15 night)**: they duplicated the classifier and
-  choked merges. Do not rebuild one.
+- **He retired the all-clear file, both freezes, the deploy-blocker list and the pre-merge hook**
+  (10-15/16): they duplicated the classifier and choked merges. Do not rebuild them.
 
 - **A pipe hides a refusal.** `new_english_keys.php --write | tail` exits 0 when the generator REFUSED,
   and the next `git add` committed a conflicted file. Never pipe a guard into tail inside an && chain.

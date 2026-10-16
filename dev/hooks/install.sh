@@ -26,7 +26,7 @@ git config --unset core.hooksPath 2>/dev/null || true
 hooks_dir=$(git rev-parse --git-path hooks)
 
 mkdir -p "$hooks_dir"
-for h in pre-commit pre-push pre-merge-commit; do
+for h in pre-commit pre-push; do
 	cp "dev/hooks/$h" "$hooks_dir/$h"
 	chmod +x "$hooks_dir/$h"
 	echo "installed $h"
@@ -34,7 +34,6 @@ done
 echo ""
 echo "  pre-commit  refuses a commit on master (a merge commit is allowed)"
 echo "  pre-push    refuses a push of master that check_all.sh has not passed on"
-echo "  pre-merge-commit  refuses a merge a freeze or an open deploy blocker forbids"
 echo ""
-echo "All are bypassable with --no-verify, deliberately. They stop drift, not you."
+echo "Both are bypassable with --no-verify, deliberately. They stop drift, not you."
 echo "Re-run this after editing dev/hooks/* -- check_all.sh fails until you do."
