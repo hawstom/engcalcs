@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**157 still to read on master**, of 170 untranslated keys, of 2792 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**149 still to read on master**, of 168 untranslated keys, of 2790 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -198,7 +198,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (170, 157 to read @@ NEEDS RULING)
+## lpn_  (168, 149 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -214,10 +214,10 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_clean_map`**
   > Clean map
-  @@ NEEDS RULING
+  _Ruled 2026-10-16: Approved._
 - **`lpn_clean_map_tip`**
-  > Checked: the map shows only the drawing. The zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.
-  @@ NEEDS RULING
+  > Checked: The zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.
+  _Ruled 2026-10-16: Map > Clean map: It works, but remove the 'shows only the drawing' sentence of the tip. Start with 'Checked: The zoom....'_
 - **`lpn_control_inactive_note`**
   > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
   @@ NEEDS RULING
@@ -388,7 +388,7 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_settings_override_marks`**
   > Show override markers on the map
-  @@ NEEDS RULING
+  _Ruled 2026-10-16: Approved._
 - **`lpn_settings_override_marks_tip`**
   > Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.
   @@ NEEDS RULING
@@ -409,7 +409,7 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_settings_row_bubbles`**
   > Time series graphs on the map
-  @@ NEEDS RULING
+  _Ruled 2026-10-16: Approved._
 - **`lpn_settings_row_check_freq`**
   > Status check frequency
   @@ NEEDS RULING
@@ -665,21 +665,15 @@ never edits a synonym.
 - **`lpn_sm_shared_note`**
   > Shared with: {list}
   @@ NEEDS RULING
-- **`lpn_sm_table`**
-  > Scenarios table
-  @@ NEEDS RULING
-- **`lpn_sm_table_tip`**
-  > Show or hide the Scenarios table beside the Scenario manager.
-  @@ NEEDS RULING
 - **`lpn_sm_title`**
   > Scenario manager
   @@ NEEDS RULING
 - **`lpn_sm_tree_all`**
   > All
-  @@ NEEDS RULING
+  _Ruled 2026-10-16: Approved._
 - **`lpn_sm_tree_unused`**
   > All unused
-  @@ NEEDS RULING
+  _Ruled 2026-10-16: Approved._
 - **`lpn_sm_unused_none`**
   > None
   @@ NEEDS RULING
@@ -726,9 +720,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`95663d00c`) — adds no English strings
+### feat/bentley-interop (`04a714813`) — adds no English strings
 
-### feat/description-lines (`ed8215176`) — adds no English strings
+### feat/description-lines (`7e68251a3`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -756,7 +750,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/match-property (`05bda7651`) — adds no English strings
 
-### fix/zero-demand-solve (`7eac193f5`) — 3 new, 3 to read @@ NEEDS RULING
+### fix/zero-demand-solve (`f06e7b4fe`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_time_run_cut_off`**
   > EPANET had closed {link} and then could not solve for {nodes}.
