@@ -3080,17 +3080,6 @@ var EngCalcs = EngCalcs || {};
 	// idiom; every later segment in a row carries NO x, which is what makes it flow inline after
 	// its predecessor.
 	//
-	// THE EXTREMA MARK IS THE SEGMENT'S OWN text-decoration, never a separate badge. A badge hung off
-	// the end of a number has to be POSITIONED: measure the digits, know which row they are on,
-	// inherit the label's transform, and be rebuilt whenever any of that moves -- orphaned glyphs
-	// beside a rotated label, a badge left behind by a deleted pipe, a footprint four other things
-	// measured wrongly. A text-decoration is drawn by the text engine at the exact extent of the
-	// characters it marks, at any rotation, in any row, for free. It is unambiguous only because each
-	// value carries a PREFIX naming its quantity and the values sit on one line.
-	//
-	// Set as a presentation ATTRIBUTE rather than only a class: text-decoration on a tspan is SVG
-	// 1.1, and an attribute needs no stylesheet to have loaded. The class rides along for anyone
-	// who wants to restyle it.
 	// `firstDy` (optional, in em) shifts the WHOLE block up or down without moving the <text>'s own
 	// y. A data label leaves it out: its first row sits on the anchor point and the rest hang below,
 	// which is what a leader line points at. A Text OBJECT passes a negative value so a three-line
@@ -3102,8 +3091,8 @@ var EngCalcs = EngCalcs || {};
 	// fill`, which the browser applies piece by piece: every tspan's white stroke is painted after the
 	// ink of the tspans before it, so a unit mark, a separator or the next value nibbled the last
 	// glyph before it (`10"` read `1C"`, `5280'` read `528C'`). Inside one run the stroke is laid
-	// down for the whole run before any of its ink, so a row is now one tspan, broken only where a
-	// segment needs its own (an extrema mark's text-decoration). Fewer elements is cheaper, too.
+	// down for the whole run before any of its ink, so a row is now one tspan. Fewer elements is cheaper,
+	// too.
 	// NOT a filter on the label layer, tried and measured: in Chromium it erased every label on a
 	// latitude/longitude map and cost 5 to 10 times the stroke's raster time on 1,600 labels.
 	function setMultilineText(textEl, x, rows, firstDy) {
@@ -12992,7 +12981,7 @@ var EngCalcs = EngCalcs || {};
 	// There were TWO such lists and only deleteLink()'s knew about the repeat chain, so adding or
 	// removing a bend on a pipe long enough to repeat its label left one permanent stale copy per
 	// repeat station. One list, so a future element on the holder cannot be forgotten by half the
-	// callers -- and the extrema mark needs no line here, being the text's own text-decoration.
+	// callers.
 	function removeLinkEls(id) {
 		var le = linkEls[id];
 		if (!le) { return; }
@@ -13023,8 +13012,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	// **THE ONE LABEL A SINGLE EDIT OWES, AND NOTHING ELSE'S.** Builds this element's own content
 	// lines with the same per-field formatting refreshLabelTextPass() uses, writes its glyphs and
-	// repositions only IT -- no network-wide extrema (a decoration mark may lag one edit behind,
-	// which is a smaller wrong than repainting a drawing nobody touched), no shed cascade against
+	// repositions only IT -- no shed cascade against
 	// its neighbours, no collision avoidance. The next real content pass (a solve, a unit switch, a
 	// project reopen) recomputes everything properly; this is only what has to be true the instant
 	// an edit lands, with recalculate off and no solve running.
