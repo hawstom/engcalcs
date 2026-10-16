@@ -4836,6 +4836,23 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
 .lpn-sm-tools button[aria-disabled="true"], .lpn-sm-menu button[aria-disabled="true"] { color: var(--ec-gray-888); cursor: default; }
 .lpn-sm-menu button[aria-disabled="true"]:hover { background: none; }
 .lpn-sm-menusep { margin: 3px 0; border-top: 1px solid var(--ec-border-strong); }
+/* All and All unused (Task 803): each category a heading, its items beneath, in the tree's own frame. */
+.lpn-sm-cathead { position: sticky; top: 0; z-index: 1; padding: 3px 6px; font-weight: bold; background: var(--ec-gray-f2f2f2); color: var(--ec-ink); border-bottom: 1px solid var(--ec-border); }
+.lpn-sm-none { padding: 2px 8px; color: var(--ec-ink-muted); font-style: italic; }
+.lpn-sm-tools button[aria-pressed="true"] { background: var(--ec-pressed-bg); border-color: var(--ec-pressed-border); }
+/* The Scenarios table flown out beside the manager (Task 802): a fixed layer over the map, never a
+   column, so the map keeps its size. Placed by smFlyPlace(); it scrolls inside itself. */
+.lpn-sm-fly { position: fixed; display: none; flex-direction: column; box-sizing: border-box; min-height: 0; background: var(--ec-bg); color: var(--ec-ink); border: 1px solid var(--ec-ink); box-shadow: 2px 2px 6px var(--ec-a-0-0-0-3); padding: 28px 4px 4px; }
+.lpn-sm-fly-x { position: absolute; top: 2px; inset-inline-end: 2px; }
+.lpn-sm-fly-scroll { flex: 1 1 auto; min-height: 0; overflow: auto; }
+.lpn-sm-fly-table { border-collapse: separate; border-spacing: 0; font-size: 0.9em; }
+.lpn-sm-fly-table th, .lpn-sm-fly-table td { padding: 2px 4px; border-bottom: 1px solid var(--ec-border); text-align: start; white-space: nowrap; background: var(--ec-bg); }
+.lpn-sm-fly-table thead th { position: sticky; top: 0; z-index: 2; background: var(--ec-gray-f2f2f2); border-bottom-color: var(--ec-border-strong); }
+.lpn-sm-fly-table tbody th { position: sticky; inset-inline-start: 0; z-index: 1; font-weight: normal; max-width: 12em; overflow: hidden; text-overflow: ellipsis; }
+.lpn-sm-fly-table thead th:first-child { inset-inline-start: 0; z-index: 3; position: sticky; }
+.lpn-sm-fly-table tr.lpn-sm-fly-current th { font-weight: bold; }
+.lpn-sm-fly-table select { max-width: 11em; }
+.lpn-sm-fly-table td.lpn-sm-fly-inh select { color: var(--ec-ink-muted); }
 /* ---- THE RUN'S OWN DIALOG (ROADMAP Task 530) --------------------------------------------------
 
    Progress, Stop, nothing else (Tom, 2026-08-30). It borrows .lpn-popover for the viewport caps and

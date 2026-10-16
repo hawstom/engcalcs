@@ -146,7 +146,7 @@ async function main() {
 
 		console.log('\n--- 2. add, rename, delete ---');
 		await clickRow(await L('lpn_scenario_base'));
-		const toolbar = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_body .lpn-sm-tools button')).map((b) => b.textContent));
+		const toolbar = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_body .lpn-sm-tools button[data-sm-cmd]')).map((b) => b.textContent));
 		ok('1.9 the toolbar is Make current, List overrides (Task 800), Add child, Add base, Rename, Copy, then minus (the menu\'s order)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_make_current'), await L('lpn_sm_list_overrides'), await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), '\u2212']) && (await L('lpn_sm_add_base')) === 'Add base' && (await L('lpn_sm_add_child')) === 'Add child', JSON.stringify(await toolbar()));
 		const tipOf = (id) => page.evaluate((i) => { const b = document.getElementById(i); return b ? [b.getAttribute('aria-disabled'), b.title] : null; }, id);
 		ok('1.10a on Base, the current scenario, Make current is greyed and its tip says why', JSON.stringify(await tipOf('lpn_sm_current')) === JSON.stringify(['true', await L('lpn_sm_current_already')]), JSON.stringify(await tipOf('lpn_sm_current')));

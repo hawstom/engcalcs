@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**147 still to read on master**, of 160 untranslated keys, of 2782 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**153 still to read on master**, of 166 untranslated keys, of 2788 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -198,7 +198,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (160, 147 to read @@ NEEDS RULING)
+## lpn_  (166, 153 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -551,6 +551,9 @@ never edits a synonym.
 - **`lpn_sm_add_child`**
   > Add child
   @@ NEEDS RULING
+- **`lpn_sm_all_row_tip`**
+  > Double-click to open it in its category tree.
+  @@ NEEDS RULING
 - **`lpn_sm_base_kept`**
   > The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.
   @@ NEEDS RULING
@@ -650,8 +653,23 @@ never edits a synonym.
 - **`lpn_sm_shared_note`**
   > Shared with: {list}
   @@ NEEDS RULING
+- **`lpn_sm_table`**
+  > Scenarios table
+  @@ NEEDS RULING
+- **`lpn_sm_table_tip`**
+  > Show or hide the Scenarios table beside the Scenario manager.
+  @@ NEEDS RULING
 - **`lpn_sm_title`**
   > Scenario manager
+  @@ NEEDS RULING
+- **`lpn_sm_tree_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_sm_tree_unused`**
+  > All unused
+  @@ NEEDS RULING
+- **`lpn_sm_unused_none`**
+  > None
   @@ NEEDS RULING
 - **`lpn_sm_used_by`**
   > Used by scenarios: {n}
@@ -700,9 +718,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### chore/ledger-wording (`37092cd70`) — adds no English strings
 
-### feat/balloon-presentation (`efdda99d8`) — adds no English strings
+### feat/balloon-presentation (`2789c6641`) — adds no English strings
 
-### feat/bentley-interop (`efdda99d8`) — adds no English strings
+### feat/bentley-interop (`2789c6641`) — adds no English strings
 
 ### feat/clean-map (`efdda99d8`) — adds no English strings
 
@@ -736,7 +754,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/match-property (`05bda7651`) — adds no English strings
 
-### feat/scenario-flyout (`efdda99d8`) — adds no English strings
+### feat/scenario-flyout (`0ddb8124c`) — adds no English strings
 
 ### fix/zero-demand-solve (`c4b5fd714`) — 3 new, 3 to read @@ NEEDS RULING
 
