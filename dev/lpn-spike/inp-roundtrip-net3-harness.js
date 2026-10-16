@@ -169,6 +169,28 @@ if (!freshOut.ok) { console.log('  FAIL: CONTROL EXPORT REFUSED: ' + JSON.string
 const fresh = compare('reference/Net3.inp  ->  import  ->  .inp   vs   EPA Net3.inp', REF, freshOut.inp);
 report(fresh);
 
+// ---- 2b. multi-line descriptions ride along (Task 806) -----------------------------------------
+// Tom, 2026-10-16: a line break in a Description goes on its one `;` comment as " \P ". Net3 with a
+// multi-line description on a junction, a pipe, a pattern and a curve: every data token is still
+// EPA's own, each description sits on one comment line, and the page's reader gives it back whole.
+console.log('\n2b. Net3 with multi-line descriptions');
+const descDoc = JSON.parse(JSON.stringify(freshDoc));
+const DESC = 'Pump house feed\nValve key at the office\n\nSecond paragraph';
+descDoc.nodes[3].desc = DESC; descDoc.links[5].desc = DESC;
+descDoc.patterns[0].note = DESC;
+if (descDoc.curves && descDoc.curves[0]) { descDoc.curves[0].note = DESC; delete descDoc.curves[0].src; }
+const descOut = EngCalcs.lpnExportInp(descDoc);
+const descCmp = compare('Net3 + multi-line descriptions  ->  .inp   vs   EPA Net3.inp', REF, descOut.inp);
+report(descCmp);
+const INL = 'Pump house feed \\P Valve key at the office \\P  \\P Second paragraph';
+const descLines = descOut.inp.split(/\r?\n/).filter((l) => l.indexOf(INL) >= 0).length;
+const descBack = L.docFromInp(EngCalcs.lpnInpParse(descOut.inp), 'Net3.inp');
+const descOk = descCmp.findings.length === 0 && !/^\s*;\|/m.test(descOut.inp)
+	&& descLines === (descDoc.curves && descDoc.curves[0] ? 4 : 3)
+	&& descBack.nodes[3].desc === DESC && descBack.links[5].desc === DESC && descBack.patterns[0].note === DESC
+	&& (!descDoc.curves[0] || descBack.curves[0].note === DESC);
+console.log((descOk ? '  ok   ' : '  FAIL ') + 'each description on one comment line (' + descLines + '), tokens untouched, read back whole');
+
 // ---- 3. the verdict ---------------------------------------------------------------------------
 const converted = gallery.findings.filter((f) => f.kind === 'CONVERTED');
 const reformatted = gallery.findings.filter((f) => f.kind === 'REFORMATTED');
@@ -181,7 +203,7 @@ console.log('  the same model imported from its .inp today: ' + fresh.findings.l
 
 // Both legs are judged: a control that stops coming back byte-identical is the reader's defect, and
 // it is as much a failure as the gallery's.
-const clean = gallery.findings.length === 0 && fresh.findings.length === 0;
+const clean = gallery.findings.length === 0 && fresh.findings.length === 0 && descOk;
 if (clean) {
 	console.log('\nall Net3 round-trip checks passed');
 } else if (EXPECT_CLEAN) {

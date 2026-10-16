@@ -22083,8 +22083,9 @@ var EngCalcs = EngCalcs || {};
 			// "Corner of Elm and Main" survives a bulk write -- and replaceValueOf() still refuses
 			// an empty box under either flag, because erasing a description on 400 assets must not
 			// be spelled the same way as leaving the box alone. The newline a paste could carry is
-			// refused by lpnDescText() at the write below, the one place that rule lives.
-			{ key: 'desc', group: 'any', field: 'desc', str: true,
+			// tidied by lpnDescText() at the write below, the one place that rule lives; the value box
+			// is one line, so " \P " in it is a line break, as in the Tables pane (replaceValueOf()).
+			{ key: 'desc', group: 'any', field: 'desc', str: true, multiline: true,
 				label: pc.lpn_field_desc || 'Description',
 				applies: function () { return true; },
 				get: function (el) { return el.desc || ''; },
@@ -22443,7 +22444,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			return undefined;
 		}
-		if (spec && spec.str) { return raw === '' ? undefined : raw; }
+		if (spec && spec.str) { return raw === '' ? undefined : (spec.multiline ? EngCalcs.lpnDescText(EngCalcs.lpnDescFromInline(raw)) : raw); }
 		if (spec && spec.text) {
 			v = EngCalcs.lpnTagText ? EngCalcs.lpnTagText(raw) : raw.split(/\s+/)[0] || '';
 			return v === '' ? undefined : v;
@@ -24288,9 +24289,9 @@ var EngCalcs = EngCalcs || {};
 	 * the column, and they are the two properties most likely to be pasted rather than typed.
 	 *
 	 * **BOTH SETTERS GO THROUGH THE SAME ONE-PLACE RULE THE POPUP USES**, so the two editors of one
-	 * property cannot disagree: `lpnDescText()` refuses the line break a trailing comment cannot
-	 * hold, `lpnTagText()` keeps the one word EPANET's reader stops at. A paste is where that
-	 * matters -- a spreadsheet cell really can carry a newline, and a popup field cannot.
+	 * property cannot disagree: `lpnDescText()` tidies a description's lines (the cell writes each
+	 * line break as " \P ", see paneCellInputText()), `lpnTagText()` keeps the one word EPANET's
+	 * reader stops at.
 	 *
 	 * **NO `prop`**: neither is in LPN_OVERRIDABLE (see descField() and tagField()), so a plain
 	 * write is correct here in Base and in a scenario alike.
@@ -25090,8 +25091,8 @@ var EngCalcs = EngCalcs || {};
 				} },
 			// **THE DESCRIPTION AND THE TAG, IN PLACE OF THE ACCOUNT NUMBER** (Tom, 2026-09-19). The
 			// same two cells `paneColDesc()` and `paneColTag()` build for a node and a link, through
-			// the same two one-place rules -- `lpnDescText()` refuses the line break a trailing
-			// comment cannot hold, `lpnTagText()` keeps the one word EPANET's reader stops at.
+			// the same two one-place rules -- `lpnDescText()` tidies a description's lines,
+			// `lpnTagText()` keeps the one word EPANET's reader stops at.
 			// Written out here rather than borrowed because a customer's every write goes through
 			// `customerEdited()`, which redraws the symbol and re-solves, and neither borrowed cell
 			// knows that.
@@ -26731,15 +26732,17 @@ var EngCalcs = EngCalcs || {};
 	// One reader, so a cell edit, a paste and a multi-properties row cannot disagree about it.
 	function paneColProp(c) { return c.prop || (c.propFn ? c.propFn() : undefined); }
 	/**
-	 * **A MULTI-LINE CELL SHOWS ITS FIRST LINE AND CARRIES THE REST IN ITS TIP** (Task 806). A text
-	 * `<input>` cannot hold a line break (the browser deletes it from `.value`), so a Description of
-	 * several lines is shown as its first line, in italics, with the whole text in the tip. Typing in
-	 * it edits the FIRST line and keeps every line after it (paneCellTyped()); the whole text is
-	 * edited in Properties. A copy still carries the whole text, quoted (paneQuoteCell()).
+	 * **A MULTI-LINE CELL SHOWS THE WHOLE TEXT ON ONE LINE, EACH LINE BREAK AS " \P "** (Task 806;
+	 * Tom, 2026-10-16: *"Let's follow whatever we do above. Maybe " \P ", since it's both intuitive,
+	 * and it's what Autodesk historically used in Dimensions."*). A text `<input>` cannot hold a line
+	 * break, so a Description goes into it as the .inp writes it (EngCalcs.lpnDescInline()), is edited
+	 * whole, and paneParseCellText() turns each " \P " back into a line break. Every door that hands
+	 * cell text to that reader -- the box, a copy, a fill, the multi-properties box -- reads it from
+	 * here, so they all speak the one convention. The tip shows the lines as lines.
 	 */
 	function paneCellInputText(c, el) {
 		var t = paneCellText(c, el);
-		return c.multiline ? EngCalcs.lpnDescFirstLine(t) : t;
+		return c.multiline ? EngCalcs.lpnDescInline(t) : t;
 	}
 	function paneCellTip(input, c, el) {
 		var full;
@@ -26747,15 +26750,6 @@ var EngCalcs = EngCalcs || {};
 		full = paneCellText(c, el);
 		input.title = full.indexOf('\n') >= 0 ? full : '';
 		input.dataset.ecTipLines = '1';
-		input.classList.toggle('lpn-pane-multi', full.indexOf('\n') >= 0);
-	}
-	function paneCellTyped(input, c, el) {
-		var full, first, typed = input.value;
-		if (!c.multiline) { return typed; }
-		full = paneCellText(c, el);
-		first = EngCalcs.lpnDescFirstLine(full);
-		if (typed === first) { return full; }
-		return typed.replace(/[\r\n]+/g, ' ') + full.slice(first.length);
 	}
 	function paneCellText(c, el) {
 		// **THE PER-ROW PLAIN WORD COMES FIRST**, because a column that is plain for THIS row is a
@@ -26825,7 +26819,8 @@ var EngCalcs = EngCalcs || {};
 			// leaves the reference out and says so, instead of refusing the whole paste.
 			return { ok: !!c.lenient || c.choices().some(function (o) { return o[0] === t; }), v: t };
 		}
-		if (c.str) { return { ok: true, v: t }; }
+		// A Description reads its " \P " back as a line break (paneCellInputText()).
+		if (c.str) { return { ok: true, v: c.multiline ? EngCalcs.lpnDescFromInline(t) : t }; }
 		if (t !== '' && !isFinite(+t)) { return { ok: false }; }
 		return { ok: true, v: (c.blank && t === '') ? undefined : +t };
 	}
@@ -28230,7 +28225,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		for (r = box.r0; r <= box.r1; r++) {
 			line = [];
-			for (c = box.c0; c <= box.c1; c++) { line.push(paneQuoteCell(paneCellText(cols[c], rows[r]))); }
+			for (c = box.c0; c <= box.c1; c++) { line.push(paneQuoteCell(paneCellInputText(cols[c], rows[r]))); }
 			out.push(line.join('\t'));
 		}
 		return out.join('\n');
@@ -28374,7 +28369,7 @@ var EngCalcs = EngCalcs || {};
 		if (!ctx) { return false; }
 		c = ctx.c; el = ctx.el;
 		// A checkbox cell carries its answer in `checked`; every other cell in its text.
-		p = paneParseCellText(c, (c.bool && input.type === 'checkbox') ? (input.checked ? '1' : '0') : paneCellTyped(input, c, el));
+		p = paneParseCellText(c, (c.bool && input.type === 'checkbox') ? (input.checked ? '1' : '0') : input.value);
 		if (!p.ok) {
 			input.value = paneCellInputText(c, el);
 			paneLeaveEdit(input);
@@ -28397,7 +28392,7 @@ var EngCalcs = EngCalcs || {};
 		 * PARSED values rather than as text, so "42.0" typed over a stored 42 is the no-change it
 		 * looks like.
 		 */
-		was = paneParseCellText(c, paneCellText(c, el));
+		was = paneParseCellText(c, paneCellInputText(c, el));
 		// **ONE CANVAS MEASUREMENT FOR THE WHOLE COMMIT, SNAPSHOT INCLUDED** (Task 690). The
 		// snapshot records the camera, which means it reads the canvas -- and it is taken between
 		// the previous keystroke's drawing writes and this one's, which is the worst possible
@@ -29013,7 +29008,7 @@ var EngCalcs = EngCalcs || {};
 		for (c = box.c0; c <= box.c1; c++) {
 			col = cols[c];
 			if (col.key === 'id') { continue; }
-			text = paneCellText(col, rows[box.r0]);
+			text = paneCellInputText(col, rows[box.r0]);
 			for (r = box.r0 + 1; r <= box.r1; r++) {
 				el = rows[r];
 				if (paneWriteCellText(spec, col, el, text)) { wrote++; } else { refused++; }
@@ -29076,7 +29071,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		saveUndoSnapshot();
 		if (pendingCommit) { paneCommitCell(pendingCommit, { noSnapshot: true }); }
-		text = paneCellText(cols[box.ac], anchorEl);
+		text = paneCellInputText(cols[box.ac], anchorEl);
 		for (r = box.r0; r <= box.r1; r++) {
 			for (c = box.c0; c <= box.c1; c++) {
 				if (r === box.ar && c === box.ac) { continue; }
@@ -29263,7 +29258,7 @@ var EngCalcs = EngCalcs || {};
 				if (col.key === 'id') { refused++; continue; }
 				pr = rowExtend ? (((r - srcBox.r0) % srcRowsN) + srcRowsN) % srcRowsN : (r - srcBox.r0);
 				pc2 = rowExtend ? (c - srcBox.c0) : (((c - srcBox.c0) % srcColsN) + srcColsN) % srcColsN;
-				text = paneCellText(cols[srcBox.c0 + pc2], rows[srcBox.r0 + pr]);
+				text = paneCellInputText(cols[srcBox.c0 + pc2], rows[srcBox.r0 + pr]);
 				if (paneWriteCellText(spec, col, el, text)) { wrote++; } else { refused++; }
 			}
 		}
@@ -59996,9 +59991,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function libRuleBody(lines, e) { return lines.slice(e.start, e.end); }
 	function libRuleDesc(lines, e) {
-		return lines.slice(e.descStart, e.start).map(function (s) {
-			return EngCalcs.lpnDescText(String(s).replace(/^\s*;/, ''));
-		}).filter(Boolean).join(' ');
+		return EngCalcs.lpnInpDescFromLines(lines.slice(e.descStart, e.start));
 	}
 	// The whole `[RULES]` text with lines [from, to) replaced by `put`.
 	function libRulesSplice(from, to, put) {
@@ -60090,7 +60083,8 @@ var EngCalcs = EngCalcs || {};
 					var cur = now(i);
 					if (!cur) { return; }
 					// Several comment lines become the one line the box shows: the curve's `src` rule.
-					doc.rules = libRulesSplice(cur.descStart, cur.start, t ? [';' + t] : []);
+					// A line break goes on that one line as " \P ", as everywhere in an .inp.
+					doc.rules = libRulesSplice(cur.descStart, cur.start, t ? [';' + EngCalcs.lpnDescInline(t)] : []);
 				}));
 				entry.appendChild(descRow);
 			}
@@ -63302,8 +63296,8 @@ var EngCalcs = EngCalcs || {};
 	 * a one-line change at each of two write sites if he rules that way.
 	 *
 	 * **FREE TEXT, LINES AND PARAGRAPHS INCLUDED** (Task 806). Stored with `\n`. An .inp holds one
-	 * line as a trailing comment, so a description of several lines goes out as the first line in
-	 * that place and each later line on a `;|` comment line after it; see `lpnDescText()`.
+	 * line as a trailing comment, so a description of several lines goes out on that one line with
+	 * each line break as " \P "; see `lpnDescText()`.
 	 */
 	// `after` is the one thing a CUSTOMER needs that a node and a link do not: every write to a
 	// customer goes through customerEdited(), which redraws its symbol and its label and re-solves.
@@ -63869,7 +63863,7 @@ var EngCalcs = EngCalcs || {};
 	function multiCommonText(c, els) {
 		var first = null, i, t;
 		for (i = 0; i < els.length; i++) {
-			t = paneCellText(c, els[i]);
+			t = paneCellInputText(c, els[i]);
 			if (i === 0) { first = t; } else if (t !== first) { return undefined; }
 		}
 		return first;

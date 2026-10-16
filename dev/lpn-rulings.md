@@ -239,24 +239,24 @@ curve's, control's, pipe type's and fitting list's in the Library) is a growing 
 a newline, Ctrl+Enter commits and leaves, Tab moves on. Stored with `\n`; `lpnDescText()` is the one
 normalizer (CRLF to LF, trailing blanks off each line, blank lines at the ends off the text).
 
-**The .inp.** EPANET holds one line (a trailing `;comment`; for a pattern or curve the one comment
-line above its rows) and has no continuation syntax; a raw newline would turn the next line into a
-data row. The first line goes exactly where EPANET puts a description and each later line goes on a
-whole-line `;|` comment (a bare `;|` is a blank line). A node or link: the `;|` lines follow the row.
-A pattern or curve: they sit ABOVE the first line, which stays the LAST comment line over the rows,
-because EPANET 2.2 keeps the last comment-only line above a pattern's or curve's first row
-(`src/input2.c`, the "Store full line comment" block: `LineComment` is overwritten by each comment
-line and given to the next pattern or curve), so the other order would give EPANET the description
-"|second line". A control: after its comment lines (EPANET has no description for a control).
-`description-lines-harness.js` section 2b runs the vendored epanet-js engine on the export and reads
-every comment back with `getComment`: EPANET sees the first line everywhere. EPANET's own re-save of
-a file keeps only that first line (one comment slot per element), so the `;|` lines survive this
-page's round trip and not EPANET's. This page reads the run back into one description. A one-line
-description is written exactly as before. Rejected: escaping `\n` inside the trailing comment
-(ambiguous with a real backslash, unreadable in EPANET's own GUI).
+**One line, " \P " for each line break, wherever a Description must sit on one line** (Tom,
+2026-10-16: *"Maybe " \P ", since it's both intuitive, and it's what Autodesk historically used in
+Dimensions."*). EPANET holds one line (a trailing `;comment`; for a pattern or curve the one comment
+line above its rows) and has no continuation syntax. So the whole description goes in that one
+place with each line break written as space, backslash, capital P, space (`lpnDescInline()`); a
+blank paragraph line is two markers. EPANET keeps the whole text, markers and all, and gives it back
+on its own re-save (`description-lines-harness.js` 2b reads it with the vendored engine's
+`getComment`). Reading back (`lpnDescFromInline()`), `\P` with or without its spaces is a line
+break, and at most one space on each side belongs to the marker, so an indent survives. A
+backslash-P the person typed is written `\\P` and read back as typed; a comment from elsewhere
+saying `C:\Pumps` reads as a line break. A comment with no `\P` reads exactly as before, so Net1/2/3
+round-trip character for character. Rejected: the later lines on extra `;|` comment lines (Tom: *"the
+.inp doesn't allow for extra lines"*; EPANET's own re-save dropped them). Files written that way
+still read, and go back out in one line.
 
-**Display.** A map label shows the first line and an ellipsis. A Tables cell shows the first line (a
-text input cannot hold a line break), italic, with the whole text in its tip (`data-ec-tip-lines` makes the shared name tip keep line breaks); typing in it edits the
-first line and keeps the rest. A copy carries the whole text, quoted. CSV and XLSX/ODS quote or
-break lines, GeoJSON is JSON, and DXF writes the caret escape `^J`. `description-lines-harness.js`,
-`description-lines-browser-harness.js`.
+**Display.** The Tables cell shows and edits the whole text in the same " \P " form, and so do a
+copy, a fill and the multi-element Properties box; the cell's tip shows the lines as lines
+(`data-ec-tip-lines`). Find and replace's one-line value box reads " \P " as a line break too. A
+map label shows the first line and an ellipsis. CSV and XLSX/ODS keep real line breaks (a
+spreadsheet cell holds them), GeoJSON is JSON, and DXF writes the caret escape `^J`.
+`description-lines-harness.js`, `description-lines-browser-harness.js`.

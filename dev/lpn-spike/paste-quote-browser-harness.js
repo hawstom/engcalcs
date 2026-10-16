@@ -47,8 +47,10 @@ const SENT = ['Lot, "B" 7', 'a\tb', 'line1\nline2', '"quoted" start'];
 const WANT = ['Lot, "B" 7', 'a\tb', 'line1\nline2', '"quoted" start'];
 const q = (s) => '"' + s.replace(/"/g, '""') + '"';
 const SHEET = SENT.map(q);
-// A cell with a tab, line break or quote is quoted; a space or comma alone is not a reason to.
-const COPIED = WANT.map((w) => (/[\t\r\n"]/.test(w) ? q(w) : w));
+// A cell with a tab, line break or quote is quoted; a space or comma alone is not a reason to. A
+// Description copies as its cell shows it, each line break as " \P " (Tom, 2026-10-16), so it
+// needs no quoting for that.
+const COPIED = WANT.map((w) => w.replace(/\n/g, ' \\P ')).map((w) => (/[\t\r\n"]/.test(w) ? q(w) : w));
 
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
@@ -84,7 +86,7 @@ async function main() {
 			for (let k = f; k < f + c; k++) {
 				const td = Array.from(document.querySelectorAll('#lpn_pane_' + t + ' table tbody tr:nth-child(' + k + ') td')).find((x) => x._lpnPaneKey === 'desc');
 				const i = td && td.querySelector('input, textarea');
-				out.push(i ? (i.title && i.classList.contains('lpn-pane-multi') ? i.title : i.value) : (td ? td.textContent : null));
+				out.push(i ? EngCalcs.lpnDescFromInline(i.value) : (td ? td.textContent : null));   // a line break shows as " \P " (Task 806)
 			}
 			return out;
 		}, [tab, from, count]);
