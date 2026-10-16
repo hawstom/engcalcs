@@ -7665,6 +7665,14 @@ var EngCalcs = EngCalcs || {};
 				});
 			}
 		});
+		// **LIST OVERRIDES HERE TOO, SO BASIC MODE REACHES IT** (Tom, 2026-10-16: "Yes."). The same
+		// action as the Scenario manager's button, on the active scenario; greyed on Base and at 0.
+		rows.push({
+			label: pc.lpn_sm_list_overrides || 'List overrides',
+			disabled: scn.isBase || !overrideCount(scn),
+			tip: (scn.isBase || !overrideCount(scn)) ? (pc.lpn_sm_list_overrides_none || 'This scenario has no overrides.') : pc.lpn_sm_list_overrides_tip,
+			fn: function () { smActListOverrides(scn.id); }
+		});
 		scenariosForDisplay().forEach(function (s) {
 			rows.push({
 				// scenarioId is what makes a row a scenario, so a reader of the rows (the harness)
@@ -77381,7 +77389,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// 2026-10-15: *"I don't know how to see a tidy list of overrides to audit"*).
 			out.push({ id: 'overrides', label: pc.lpn_sm_list_overrides || 'List overrides', tip: pc.lpn_sm_list_overrides_tip,
 				off: !valid || !scenarioById(key) || !overrideCount(scenarioById(key)),
-				offTip: !valid ? noSel : (pc.lpn_sm_list_overrides_none || 'This scenario has no overrides of its own.'),
+				offTip: !valid ? noSel : (pc.lpn_sm_list_overrides_none || 'This scenario has no overrides.'),
 				fn: function () { smActListOverrides(key); } });
 		}
 		out.push({ id: 'add', label: pc.lpn_sm_add_child || 'Add child', fn: function () { smActAdd(valid ? key : smBaseKey(tree)); } });

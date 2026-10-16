@@ -22,6 +22,7 @@
 //       value it replaces (a diameter's Base value; the multiplier's project value; a dash for no
 //       default pattern), an override equal to it marked "(same)"; nothing reads "1 overrides";
 //   O5  clicking an asset's ID closes the list and goes to it on the map, selected.
+//   O7  (Task 800 wording) the Scenarios menu has List overrides in Basic mode, opening the same dialog; greyed at 0 overrides.
 //   O6  a yes/no reads in words both ways (a pump switched off: No, replacing Yes); and deleting an
 //       alternative says the number of overrides the list showed for it (13, 2, 1).
 //
@@ -52,6 +53,7 @@ function ok(label, cond, detail) {
 	console.log((cond ? '  ok   ' : '  FAIL ') + label + (detail === undefined ? '' : '   ' + detail));
 }
 const ONE_HR = '1-hr drain w pump off';
+const EIGHT_HR = '8-hr drain w pump off';
 const WANT = { 'EPS': 5, 'EPS Pump off': 5, [ONE_HR]: 17, '8-hr drain w pump off': 16, '12-hr drain w pump off': 16, '16-hr drain w pump off': 16 };
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
@@ -203,6 +205,64 @@ async function main() {
 			await page.evaluate((c) => { const b = Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).find((x) => x.textContent.trim() === c); if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })); } }, await L('lpn_cancel'));
 			await settle(400);
 		}
+
+		console.log('--- O7. the Scenarios menu row, in Basic mode; greyed at 0 ---');
+		await page.evaluate(() => { localStorage.setItem('lpn_scnbasic', 'on'); });
+		await a.reload();
+		await a.answerTrainingPanel().catch(() => {});
+		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
+		await settle(2000);
+		const menuRow = async () => {
+			if (!(await page.evaluate(() => getComputedStyle(document.getElementById('lpn_menu_popup')).display !== 'none'))) { await page.click('#lpn_scenario_btn'); }
+			await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+			return page.evaluate((label) => {
+				const r = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).find((x) => x.textContent.trim() === label);
+				return r ? { off: r.disabled, title: r.title || r.getAttribute('data-bs-original-title') || '' } : null;
+			}, LO);
+		};
+		await page.click('#lpn_scenario_btn');
+		await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+		for (const r of await page.$$('#lpn_menu_list button.lpn-menu-row')) {
+			if ((await r.textContent()).replace(/^[✓\s]+/, '').trim() === EIGHT_HR + ' (16)') { await r.click(); break; }
+		}
+		await settle(900);
+		let mr = await menuRow();
+		ok('O7 Basic mode: the Scenarios menu has "' + LO + '", live on ' + EIGHT_HR, !!mr && mr.off === false, JSON.stringify(mr));
+		for (const r of await page.$$('#lpn_menu_list button.lpn-menu-row')) {
+			if ((await r.textContent()).trim() === LO) { await r.click(); break; }
+		}
+		await settle(700);
+		ok('O7 ...it opens the same dialog, titled for ' + EIGHT_HR + ', counting 16', await dialogOpen() && await page.evaluate(() => document.getElementById('lpn_dialog_title').textContent) === (await L('lpn_ovl_title')).replace('{name}', EIGHT_HR) &&
+			await page.evaluate(() => document.querySelector('#lpn_dialog_body .lpn-dialog-msg').textContent) === (await L('lpn_scenario_overrides')) + ': 16');
+		await page.evaluate(() => { const b = Array.from(document.querySelectorAll('#lpn_dialog_buttons button'))[0]; b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })); });
+		await settle(400);
+		// A new scenario holds no overrides: the row is greyed and says why.
+		await page.evaluate(() => { window.lpnDialogAnswerer = (req) => (req.kind === 'prompt' ? 'Empty one' : undefined); });
+		await page.click('#lpn_scenario_btn');
+		await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+		for (const r of await page.$$('#lpn_menu_list button.lpn-menu-row')) {
+			if ((await r.textContent()).trim() === (await L('lpn_scenario_new')).trim()) { await r.click(); break; }
+		}
+		await settle(1200);
+		await page.evaluate(() => { delete window.lpnDialogAnswerer; });
+		mr = await menuRow();
+		ok('O7 a scenario with 0 overrides: the row is greyed, its tip readable', !!mr && mr.off === true && mr.title === await L('lpn_sm_list_overrides_none'), JSON.stringify(mr));
+		await page.keyboard.press('Escape');
+		await settle(300);
+		await page.evaluate((n) => { localStorage.setItem('lpn_scnbasic', 'off'); }, 0);
+		await a.reload();
+		await a.answerTrainingPanel().catch(() => {});
+		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
+		await settle(1500);
+		await page.click('#lpn_scenario_btn');
+		await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+		for (const r of await page.$$('#lpn_menu_list button.lpn-menu-row')) {
+			if ((await r.textContent()).trim() === (await L('lpn_sm_menu')).trim()) { await r.click(); break; }
+		}
+		await settle(900);
+		await clickRow('Empty one');
+		lb = await listBtn();
+		ok('O7 the manager button is greyed too on the 0-override scenario, tip readable', lb.off === true && lb.title === await L('lpn_sm_list_overrides_none'), JSON.stringify(lb));
 
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {

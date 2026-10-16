@@ -5748,6 +5748,21 @@
             "on": "These alternatives it uses stay in the project: {list}.",
             "ruled": "2026-10-13",
             "answer": "Approved as written."
+        },
+        "lpn_sm_list_overrides": {
+            "on": "List overrides",
+            "ruled": "2026-10-16",
+            "answer": "Approved."
+        },
+        "lpn_sm_list_overrides_tip": {
+            "on": "List the scenario's overrides by category, each with the inherited value it overrides.",
+            "ruled": "2026-10-16",
+            "answer": "Revised."
+        },
+        "lpn_sm_list_overrides_none": {
+            "on": "This scenario has no overrides.",
+            "ruled": "2026-10-16",
+            "answer": "Revised. But should be obvious when count = 0."
         }
     }
 }
