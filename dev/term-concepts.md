@@ -16,7 +16,19 @@ annotation and a custom property's display name (`lpn_cp_label`). EPANET's own L
 tr giving Tag and Label one word, so the Properties box showed two fields with one name. A translator
 who starts from the English word inherits every one of those collisions.
 
-## The design
+## The source is dev/terms.md (2026-10-16)
+
+Tom, 2026-10-16: *"I am very eager to base the glossary on a human-editable terms file."* He named
+every concept in plain words a five-year-old might use, with synonyms joined by "or", and
+`dev/terms.md` holds those names, his own definitions (two so far), and the uniqueness attention
+groups ("Find unique names for each"; necessary and few). The plain name is the source a translator
+works from; English is one rendering. `terms_to_glossary.php --write` carries the file into
+`glossary.json` as `plain`, `definition` and `uniqueness_group`; a CC-written definition it
+replaces is kept as `old_definition` and never sent. Everything below about `definition` as the
+source describes the layer before this change; the ids, `key_concepts.json` and the citation
+mechanics are unchanged.
+
+## The design (2026-09-29)
 
 **Every `glossary.json` term is a row of the concept table.** Beside its existing fields it carries:
 

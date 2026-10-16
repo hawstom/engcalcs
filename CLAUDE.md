@@ -108,6 +108,7 @@ provenance rules: `dev/agents/README.md`.
 |------|---------|
 | `dev/session-handoff.md` | **Read first.** RULINGS, TRAPS and dated STATE; delete a state line once checked |
 | `dev/ROADMAP.md` | OPEN tasks only. Format `Priority\|ID\|status Description` |
+| `dev/terms.md` | **The concept source translators work from**: plain-words names, Tom's definitions, uniqueness attention groups. Tom edits it |
 | `dev/roadmap-closed-ids.md` | One line per closed ID, so a cited `Task N` resolves |
 | `dev/tom-review-queue.md` | Tom's browser-pass comments, quoted, until cleared |
 | `dev/real-world-reviews.md` | What outside testers did and said, one entry per session |
@@ -258,7 +259,8 @@ mismatch; (D) single-quoted values only.
 - **Suggestions only, no prohibitions.** A translator gets what a word means and what to call it,
   never a "do not" line; a wrong translation means the definition needs fixing.
 - **Routing:** an English reader also stumbles → fix the English; English is fine but untranslatable
-  → `$ec_lang_syn`; the concept recurs → `glossary.json`.
+  → `$ec_lang_syn`; the concept recurs → `dev/terms.md`, Tom's plain-words concept list, which
+  `terms_to_glossary.php --write` carries into `glossary.json`. Never edit those glossary fields by hand.
 - **Never rename a key by hand** — `php dev/scripts/rename_lang_key.php old new --apply`.
 - **English style: standard professional civil-engineering technical English**, the register of
   FHWA HEC circulars, USACE HEC manuals, the EPA EPANET 2.2 manual, and AWWA M-series manuals. No

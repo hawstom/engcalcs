@@ -26,6 +26,11 @@
         "lpn_units_elevhead": ["elevation", "hydraulic-head"],
         "lpn_profile_axis_elev": ["elevation", "hydraulic-head"],
         "mphl_egl_1": ["egl"],
-        "mphl_egl_2": ["egl"]
+        "mphl_egl_2": ["egl"],
+        "lpn_geomap": ["georeferenced-project"],
+        "lpn_xymap": ["local-project"],
+        "lpn_result_gradient": ["head-loss-gradient"],
+        "lpn_result_gradient_tip": ["head-loss-gradient"],
+        "lpn_field_id": ["element-id"]
     }
 }

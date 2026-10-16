@@ -196,6 +196,7 @@ function buildPayloads(array $opts, bool $quiet = false): array
         $prefixesInDelta = detectPrefixes($deltaKeys);
         $batchTerms = selectBatchTerms($deltaKeys, $glossaryData['terms'], $keyConcepts, $enIntent, $termIndex, $prefixMap);
         $glossaryText = buildPromptContext($batchTerms, $lang);
+        $uniqueness = collectUniqueness($batchTerms, $glossaryData['terms'], $lang);
 
         $payload = [
             'meta' => [
@@ -227,12 +228,13 @@ function buildPayloads(array $opts, bool $quiet = false): array
                 // nothing the reader can find on the screen.
                 'placeholder_notes' => 'A word in curly braces ({n}, {ids}, {flow}, {iterations}, {name}) is a PLACEHOLDER the page replaces at runtime. Keep every one of them, spelled exactly as in English, braces included. Never translate the word inside the braces. You MAY move a placeholder to wherever your language needs it in the sentence.',
                 'control_name_notes' => 'Where an English string names a control, it names it in one of two shapes. A single control is written as its label followed by the widget word: "press the Calculate button", "the Recalculate automatically setting", "the Required fire flow box". A menu path is written as comma-separated labels: "File, Save as"; "Settings, Calculation, Hydraulics". In BOTH shapes the label is another key\'s value. Translate it with exactly the words you used for that key, so the sentence still names what is on the screen; translate the widget word and the surrounding prose normally.',
-                'glossary_notes' => 'glossary lists the defined technical terms that the strings in this batch use, each with your language\'s preferred translation where one exists, and what the term MEANS. Use the preferred translation wherever the term appears, unless your language\'s genuine standard term is better; then use that and say so in your report.',
+                'glossary_notes' => 'glossary lists the technical terms that the strings in this batch use, each named in plain words, with your language\'s preferred translation where one exists. Use the preferred translation wherever the term appears, unless your language\'s genuine standard term is better; then use that and say so in your report.',
                 'context_notes' => 'Use key_context[key].neighbors to keep register consistent with nearby translated strings. key_context[key].tip is the help text shown for that label, and key_context[key].label is the label a tip explains: read the pair together, and give the same thing the same word in both. Where the partner already has a translation in your file, its value is shown.',
                 'syn_notes' => 'key_syn[key] gives other English wordings of that one string; any of them could stand in its place. Use whichever your language expresses most naturally and compactly; you are not bound to the literal English wording.',
                 'key_notes_notes' => 'key_notes[key] are notes about that one string: how much room it has, symbols to keep exactly, what it refers to. Follow them. They are instructions to you, never text to put in your file.',
                 'suggestion_box_notes' => 'Read suggestion_box and follow it. It is part of your instructions, not a footnote: a sprint does not close while a translator complaint is unanswered.',
-                'concept_notes' => 'Read concept_source and follow it. key_concepts lists, for a key that names a defined concept, the definition you translate from; English is one rendering of it.',
+                'concept_notes' => 'Read concept_source and follow it. key_concepts lists, for a key that names a concept, its plain-words name, which is what you translate from; English is one rendering of it.',
+                'uniqueness_notes' => 'uniqueness_attention lists the few groups of concepts that sit side by side on one screen. Find unique names for each, and use each name the same way everywhere.',
             ],
             // ROADMAP Task 239. Extracted verbatim from dev/translation-process.md so it reaches
             // every agent, every language, every batch size, without being retyped per sprint.
@@ -250,6 +252,7 @@ function buildPayloads(array $opts, bool $quiet = false): array
             'key_syn' => $keySyn,
             'key_notes' => $keyNotes,
             'key_concepts' => $keyConceptMap,
+            'uniqueness_attention' => $uniqueness,
         ];
 
         $files["payload_{$lang}.json"] = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
@@ -473,10 +476,9 @@ function loadFencedBlock(string $heading): string
 }
 
 /**
- * ROADMAP Task 737. For each delta key that cites a concept with a NON-EMPTY definition, the
- * concept record the translator translates from. A key citing only concepts whose definition is
- * empty gets no entry at all, so its payload is exactly what it was before the concept layer:
- * English stays the source. Citations come from key_concepts.json and from `gloss:` pointers.
+ * ROADMAP Task 737. For each delta key that cites a concept, the concept record the translator
+ * translates from: its plain-words name from dev/terms.md, Tom's definition where he wrote one,
+ * and English as one rendering. A key citing no concept gets no entry: English stays the source. Citations come from key_concepts.json and from `gloss:` pointers.
  */
 function collectKeyConcepts(array $deltaKeys, array $keyConcepts, array $synMap, array $termIndex, array $conceptIndex, string $lang): array
 {
@@ -485,16 +487,18 @@ function collectKeyConcepts(array $deltaKeys, array $keyConcepts, array $synMap,
         $entries = [];
         foreach (ecConceptsCitedByKey($key, $keyConcepts, $synMap, $termIndex) as $id) {
             $term = $conceptIndex[$id] ?? null;
-            if ($term === null || trim((string)($term['definition'] ?? '')) === '') {
+            if ($term === null || trim((string)($term['plain'] ?? '')) === '') {
                 continue;
             }
             $entry = [
                 'concept' => $id,
-                'source' => 'definition',
-                'definition' => (string)$term['definition'],
-                'english_rendering' => ecConceptEnglish($term),
-                'preferred_translation' => (string)($term['translations'][$lang] ?? ''),
+                'plain_name' => (string)$term['plain'],
             ];
+            if (trim((string)($term['definition'] ?? '')) !== '') {
+                $entry['definition'] = (string)$term['definition'];
+            }
+            $entry['english_rendering'] = ecConceptEnglish($term);
+            $entry['preferred_translation'] = (string)($term['translations'][$lang] ?? '');
             if (($term['symbol'] ?? '') !== '') {
                 $entry['symbol'] = (string)$term['symbol'];
             }
@@ -942,6 +946,32 @@ function termIndexByName(array $terms): array
     return $index;
 }
 
+/**
+ * The uniqueness attention groups (dev/terms.md) that a term in this batch belongs to, each with
+ * ALL its members, so the translator sees the siblings the batch's term must stay apart from.
+ */
+function collectUniqueness(array $batchTerms, array $allTerms, string $language): array
+{
+    $wanted = [];
+    foreach ($batchTerms as $term) {
+        if (isset($term['uniqueness_group'])) { $wanted[(int)$term['uniqueness_group']] = true; }
+    }
+    $out = [];
+    foreach (array_keys($wanted) as $g) {
+        $members = [];
+        foreach ($allTerms as $term) {
+            if ((int)($term['uniqueness_group'] ?? 0) !== $g) { continue; }
+            $members[] = [
+                'plain_name' => (string)($term['plain'] ?? ''),
+                'english_rendering' => ecConceptEnglish($term),
+                'preferred_translation' => (string)($term['translations'][$language] ?? ''),
+            ];
+        }
+        $out[] = ['instruction' => 'Find unique names for each.', 'members' => $members];
+    }
+    return $out;
+}
+
 function buildPromptContext(array $terms, string $language): string
 {
     if (count($terms) === 0) {
@@ -959,22 +989,20 @@ function buildPromptContext(array $terms, string $language): string
         $translation = $term['translations'][$language] ?? '';
         $translationDisplay = ($translation === '') ? '(no preferred translation yet: use your language\'s standard term)' : $translation;
 
-        $line = '- ' . $name;
-        if ($symbol !== '') {
-            $line .= ' (' . $symbol . ')';
-        }
-        $line .= ': ' . $translationDisplay;
-
-        // Task 737: a non-empty definition is the source; English (the name above) renders it.
+        // The plain-words name from dev/terms.md is the source; English is one rendering of it.
+        $plain = trim((string)($term['plain'] ?? ''));
+        $line = '- ' . ($plain !== '' ? $plain : $name);
+        $line .= "\n    English: " . $name . ($symbol !== '' ? ' (' . $symbol . ')' : '');
+        $line .= "\n    Your language: " . $translationDisplay;
         $definition = trim((string)($term['definition'] ?? ''));
         if ($definition !== '') {
-            $line .= "\n    MEANS: " . $definition;
+            $line .= "\n    Definition: " . $definition;
         }
 
         $lines[] = $line;
     }
 
-    return "Technical terms used by the strings in this batch, each as: term (symbol): your language's preferred translation.\n" . implode("\n", $lines);
+    return "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n" . implode("\n", $lines);
 }
 
 /**

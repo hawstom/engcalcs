@@ -137,7 +137,8 @@ if (!is_array($p)) {
     $shape(isset($p['key_syn']['mi_station']) && strpos($p['key_syn']['mi_station'], '|') === false,
         'key_syn carries the synonyms only, never the commentary');
     $shape(!isset($p['key_notes']['or_head']), 'a gloss:-only commentary adds no key note (its term arrives in glossary)');
-    $shape(strpos((string)($p['glossary'] ?? ''), "\n- head (") !== false, 'a cited term (or_head gloss: head) is in glossary');
+    $shape(strpos((string)($p['glossary'] ?? ''), "\n    English: head (") !== false, 'a cited term (or_head gloss: head) is in glossary');
+    $shape(strpos((string)($p['glossary'] ?? ''), "\n- energy per weight of water as an elevation") !== false, 'a glossary term leads with its plain-words name');
     $shape(($p['key_context']['lpn_settings_text_halo']['tip']['key'] ?? '') === 'lpn_settings_text_halo_tip',
         'a label carries its tip in key_context');
     $shape(($p['key_context']['lpn_settings_text_halo_tip']['label']['key'] ?? '') === 'lpn_settings_text_halo',

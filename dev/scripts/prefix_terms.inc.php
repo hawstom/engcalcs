@@ -93,10 +93,11 @@ function prefixToTermNames(): array
             // account page; 'hydraulic grade line' keeps the chart legend and the prose beside it
             // from becoming two different phrases; 'demand pattern' is a named time series, not a
             // repeating design; 'imperial gallon' is what separates IMGD from MGD; 'pressure
-            // breaker valve' has an electrical homonym; 'project mode name' says lat/lon and XY are
-            // carried unchanged; 'alignment (text)' is not justification.
+            // breaker valve' has an electrical homonym; the two project modes (split from 'project mode
+            // name', 2026-10-16) are coined names; 'alignment (text)' is not justification.
             'profile (long section)', 'hydraulic grade line', 'demand pattern', 'imperial gallon',
-            'pressure breaker valve', 'project mode name', 'alignment (text)',
+            'pressure breaker valve', 'georeferenced (project mode)', 'local (project mode)',
+            'alignment (text)', 'head loss gradient', 'ID (element identifier)',
             // Added 2026-08-19 (Task 438 Wave 0, second pass over the resync set). 'drop (a label)'
             // guards a three-character column heading whose word is also a drop in head; 'run (a
             // simulation)' guards a one-word button whose word is also a run of pipe, and it is

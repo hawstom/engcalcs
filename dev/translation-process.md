@@ -351,20 +351,26 @@ or escalates as `refer-to-human` and stays open. See `dev/english-friction/READM
 ## Concepts are the source — the sibling block, extracted the same way
 
 Tom, 2026-09-29: *"We need to have a source that is more primary and more authoritative than the
-English, and the English can be a translation of it."* Each `glossary.json` term carries a `concept`
-id and a `definition`; a key cites a concept through `dev/scripts/key_concepts.json` or a `gloss:`
-pointer, and its payload then carries `key_concepts`. The fenced block below reaches every agent as
-`concept_source`, exactly as the suggestion box does, and editing it makes every payload stale.
-Design: `dev/term-concepts.md`.
+English, and the English can be a translation of it."* The source is `dev/terms.md`, which Tom
+edits: each concept named in plain words, his definition where he wrote one, and the uniqueness
+attention groups. `php dev/scripts/terms_to_glossary.php --write` carries it into `glossary.json`
+(`plain`, `definition`, `uniqueness_group`); `concept_check.php` fails until the two agree. A key
+cites a concept through `dev/scripts/key_concepts.json` or a `gloss:` pointer, and its payload then
+carries `key_concepts`. The fenced block below reaches every agent as `concept_source`, exactly as
+the suggestion box does, and editing it makes every payload stale. Design: `dev/term-concepts.md`.
 
 ```
 ## Concepts are the source
 
-Where key_concepts lists a concept for a key, its definition is the authoritative source
-and the English string is one rendering of it: translate the thing the definition
-describes, and give that concept the same word in every key that cites it, a word no
-neighbouring concept in the definition shares. Where a key has no key_concepts entry,
-the English is the source, as before.
+Each concept is named in plain words, with its synonyms joined by "or". That plain name
+is the authoritative source; the English term is one rendering of it, as yours will be.
+Where key_concepts lists a concept for a key, translate the thing the plain name
+describes, and give that concept the same word in every key that cites it. Where a
+concept also has a definition, it is the author's own and outranks everything else.
+Where a key has no key_concepts entry, the English is the source, as before.
+
+uniqueness_attention lists the few groups of concepts that sit side by side on one
+screen. Find unique names for each.
 ```
 
 ## English-drift tripwire (staleness detection)

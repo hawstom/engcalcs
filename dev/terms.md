@@ -558,7 +558,6 @@ Find unique names for each. A group is added only where two meanings sit side by
 - English: head loss gradient
 - id: `head-loss-gradient`
 - Uniqueness attention: group 2
-- New entry, awaiting your OK
 
 ### Which edge or side the words line up on
 
@@ -582,15 +581,13 @@ Find unique names for each. A group is added only where two meanings sit side by
 
 ### Project placed on the earth, with real-world coordinates
 
-- English: georeferenced
+- English: georeferenced (project mode)
 - id: `georeferenced-project`
-- New entry, awaiting your OK
 
 ### Project drawn on its own flat grid, with no place on the earth
 
-- English: local
+- English: local (project mode)
 - id: `local-project`
-- New entry, awaiting your OK
 
 ### Leave a value off the map when there is no room or space
 
@@ -661,10 +658,9 @@ Find unique names for each. A group is added only where two meanings sit side by
 
 ### Short code that names one item, like J-1 or P-12
 
-- English: ID
+- English: ID (element identifier)
 - id: `element-id`
 - Uniqueness attention: group 1
-- New entry, awaiting your OK
 
 ### Rule, method, or formula for turning earth coordinates into paper, map, or flat coordinates
 
