@@ -26896,7 +26896,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return { ok: true, v: pts };
 	}
 	function paneColVerts() {
-		return { key: 'verts', str: true, em: 8, noMulti: true, parse: paneParseVerts,
+		// **SIZED BY ITS HEADING ALONE** (Tom, 2026-10-16: *"the Pipes table Vertices column should
+		// always be sized based on the heading rule ignoring the contents"*): one bent pipe's
+		// coordinate list would otherwise set the width of the whole column.
+		return { key: 'verts', str: true, em: 8, noMulti: true, headingWidthOnly: true, parse: paneParseVerts,
 			label: function () { return (EngCalcs.pageConfig || {}).lpn_tool_vertices || 'Vertices'; },
 			// The heading says which number comes first, as the clerk's spec requires: a reader
 			// should never have to open a popup to learn the order of a cell.
@@ -26942,8 +26945,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// velocity is a fallback 0 that reads as "no flow"), so it is declared by the tables that can
 	// show it rather than filtered out of a shared list at render time.
 	function paneColLinkResult(key, label, unit) {
-		return { key: key, label: label, result: true, unit: unit,
+		return { key: key, label: label, result: true, unit: unit, dec: paneResultDecimals('link', key),
 			get: function (l) { return colorLinkValue(l, key); } };
+	}
+	// **A RESULT CELL PRINTS THE LABEL'S DECIMALS, TRAILING ZEROS AND ALL** (Tom, 2026-10-16: a zero
+	// velocity read "0", *"which is not appropriate in engineering"*). The count is the one Settings >
+	// Pipe labels (or Junction labels) already holds for that field; a result with no such row keeps
+	// the old two-place rounding.
+	function paneResultDecimals(group, key) {
+		return function () {
+			var d = labelSettings.decimals[group] || {};
+			return key === 'quality' ? qualityDecimals(d) : d[key];
+		};
 	}
 	// **A LINK'S STATUS AT THE TIME STEP ON SCREEN, AS A RESULT** (Tom, 2026-09-25: Net3's pump 10
 	// opens at 1:00 by its control, and the Tables kept calling it closed). The Shut column is the
@@ -26954,7 +26967,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			get: function (l) { return lastSolveResult ? linkStatusText(l) : undefined; } };
 	}
 	function paneColNodeResult(key, label, unit) {
-		return { key: key, label: label, result: true, unit: unit,
+		return { key: key, label: label, result: true, unit: unit, dec: paneResultDecimals('node', key),
 			get: function (n) { return colorNodeValue(n, key); } };
 	}
 	// **WHAT A JUNCTION RECEIVES UNDER PRESSURE-DRIVEN ANALYSIS** (Task 762), as two result
@@ -28610,7 +28623,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var v = 0, contentEm, headingEm, hf, headPad;
 		if (!spec.initEmCache) { spec.initEmCache = {}; }
 		if (Object.prototype.hasOwnProperty.call(spec.initEmCache, c.key)) { return spec.initEmCache[c.key]; }
-		contentEm = paneColContentEm(c, paneTableRowsInOrder(spec));
+		contentEm = c.headingWidthOnly ? 0 : paneColContentEm(c, paneTableRowsInOrder(spec));
 		headingEm = paneHeadingInitEm(c);
 		hf = paneHeadFont();
 		headPad = panePadEm(hf ? hf.px : 0);
@@ -30246,13 +30259,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// column whose stored value is not the answer: see paneTextAttachedWord(). One function
 		// decides what a cell says, so the screen, the refill and the printed sheet all say it.
 		if (c.plainWord && c.plainFor && c.plainFor(el)) { return c.plainWord(); }
-		var v = c.get(el);
+		var v = c.get(el), d;
 		// **A COLUMN MAY BE A YES/NO, A CHOICE OR A LINE OF TEXT** (Tom, 2026-09-08: the Text table
 		// and the Active column). A yes/no reads as 1 or 0 -- what a pasted sheet can carry and
 		// what a typed cell can be parsed back from; a choice and a text read verbatim.
 		if (c.bool) { return v ? '1' : '0'; }
 		if (!panePresent(v)) { return ''; }
-		if (c.result) { return c.str ? String(v) : String(plainRound(v, 2)); }
+		if (c.result) {
+			if (c.str) { return String(v); }
+			d = c.dec ? c.dec() : undefined;
+			if (typeof d === 'number' && typeof v === 'number' && isFinite(v)) {
+				d = Math.max(0, Math.min(20, d));
+				// Never "-0.00": a value that rounds to zero prints as zero.
+				return (Math.abs(v) < 0.5 * Math.pow(10, -d) ? 0 : v).toFixed(d);
+			}
+			return String(plainRound(v, 2));
+		}
 		if (!c.set || c.choices || c.str) { return String(v); }
 		return paneNumText(v);
 	}
@@ -56893,6 +56915,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			spec.onChange(v);
 			saveToStorage();
 			requestLabelRefresh();
+			// A results column prints this same count (paneResultDecimals()).
+			refreshPaneIfOpen();
 		});
 		return box;
 	}
