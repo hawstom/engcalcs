@@ -1394,6 +1394,7 @@ $ec_lang['lpn_menu_map']='Map';
 // were deleted with the rows -- nothing else read them.
 $ec_lang['lpn_basemap_show']='Show street map';
 $ec_lang['lpn_basemap_satellite_show']='Show satellite images';
+$ec_lang['lpn_basemap_outdoors_show']='Show outdoors map';
 // **THE PAIR OF NOUNS IS 'local' and 'georeferenced', LOWER CASE** (Tom's own edit of this block,
 // 2026-09-16, dev/tom-coordinate-vocabulary-2026-09-16.md: *"The terms we need to use are
 // 'Georeferenced' vs. 'Local or Arbitrary'"*). They replaced 'lat/lon' and 'xy'. Nothing renders

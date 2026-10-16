@@ -330,7 +330,12 @@ ok('turning it back on says so on the project', L.getProject().basemap === 'osm'
 	p.basemap = 'satellite';
 	ok('no token: satellite is unavailable and falls back to the street map',
 		!L.satAvailable() && L.style() === 'osm' && /openstreetmap/.test(L.tileUrl()));
+	p.basemap = 'outdoors';
+	ok('no token: a saved Outdoors choice falls back to the street map too (Task 617)',
+		L.style() === 'osm' && /openstreetmap/.test(L.tileUrl()));
 	global.EngCalcs.pageConfig.lpn_mapbox_token = 'pk.harness.token';
+	ok('with a token, Outdoors is the mapbox/outdoors-v12 style at 256 px',
+		L.style() === 'outdoors' && /^https:\/\/api\.mapbox\.com\/styles\/v1\/mapbox\/outdoors-v12\/tiles\/256\/\{z\}\/\{x\}\/\{y\}\?access_token=pk\./.test(L.tileUrl()), L.tileUrl());
 
 	// **ASKING FOR THE STYLE ALREADY SHOWING LEAVES IT SHOWING** (reversed 2026-09-22). It used to
 	// turn the basemap OFF, a rule for the retired Hide/Show rows; once World map, Attach went
@@ -421,11 +426,16 @@ console.log('\n--- the corner teaser appears where the menu row does, and nowher
 	click();
 	ok('clicking it turns the satellite images on', L.basemapOn() && L.style() === 'satellite');
 	L.refreshTeaser();
-	ok('...and the tile then offers the STREET map, not "hide"',
+	ok('...and the tile then offers the OUTDOORS map (Task 617), not "hide"',
 		btn.getAttribute('aria-pressed') === 'true' &&
-		btn.getAttribute('aria-label') === PC.lpn_basemap_show, btn.getAttribute('aria-label'));
-	ok('...and shows the other source, which is what a toggle\'s picture is for',
-		String(btn.getAttribute('class')).indexOf('lpn-basemap-teaser-on') >= 0);
+		btn.getAttribute('aria-label') === PC.lpn_basemap_outdoors_show, btn.getAttribute('aria-label'));
+	ok('...and shows the next source, which is what the picture is for',
+		String(btn.getAttribute('class')).indexOf('lpn-basemap-teaser-outdoors') >= 0);
+	click();
+	L.refreshTeaser();
+	ok('...then outdoors offers the STREET map',
+		L.style() === 'outdoors' && btn.getAttribute('aria-label') === PC.lpn_basemap_show &&
+		String(btn.getAttribute('class')).indexOf('lpn-basemap-teaser-on') >= 0, L.style());
 	click();
 	ok('...and clicking again returns the street map rather than nothing',
 		L.basemapOn() && L.style() === 'osm', 'on=' + L.basemapOn() + ' style=' + L.style());
