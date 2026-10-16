@@ -721,3 +721,7 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|791| CLOSED 2026-10-15 (merged on Tom's word): text halos one run per label row, wider, with a Map appearance setting.
 - 0|796| CLOSED 2026-10-15 (merged): the Fotobi EPANET crash fixed; Accuracy defaults to 0.001 for every project, tip in step.
 - 0|808| CLOSED 2026-10-15 (merged): a stopped EPANET run keeps its solved periods, says where it stopped, and why statistic, energy and quality are missing.
+- 0|806| CLOSED 2026-10-16 (merged on Tom's word, `feat/description-lines`): a Description takes several lines; \P with no spaces is the line break wherever it sits on one line.
+- 0|807| CLOSED 2026-10-16 (merged 2026-10-15, `feat/leader-keep`): a dragged leader stays exactly where the user put it.
+- 0|643| CLOSED 2026-10-16: an automatic length is the slope distance (merged 2026-10-15). Rejected: a project length adjustment factor; Mary found no tool offering one and a reviewer cannot audit it; a typed length is the per-pipe override.
+- 0|786| CLOSED 2026-10-16: Net1, Net2 and Net3 ship as US and SI pairs. KYPipe networks (CC BY-NC) would need the authors' permission first.
