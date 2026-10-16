@@ -136,7 +136,8 @@ async function main() {
 		ok('1.4 Basic mode is off (the preference says so)', (await store('lpn_scnbasic')) === 'off');
 		const notice = await page.evaluate(() => (document.getElementById('lpn_map_notice') || document.body).textContent);
 		ok('1.5 ...by first turning Basic mode off, the door the greyed row points to (no notice said so)', notice.indexOf(await L('lpn_sm_basic_on')) < 0);
-		ok('1.6 the Scenarios tab is shown', await page.evaluate(() => { const b = document.getElementById('lpn_pane_tab_scenarios'); return !!b && getComputedStyle(b).display !== 'none'; }));
+		// With the manager open, the Scenarios table is beside it (Task 802), so the pane's tab gives way.
+		ok('1.6 the Scenarios table is beside the manager, and the pane\'s tab gives way to it', await page.evaluate(() => { const b = document.getElementById('lpn_pane_tab_scenarios'), p = document.getElementById('lpn_pane_scenarios'); return !!b && getComputedStyle(b).display === 'none' && !!p && !!p.closest('#lpn_sm_fly'); }));
 		ok('1.7 the box starts on the Scenarios tree with Base', JSON.stringify(await names()) === JSON.stringify([await L('lpn_scenario_base')]), JSON.stringify(await names()));
 
 		await page.evaluate(() => document.querySelector('#lpn_sm_box [data-dock="right"]').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
@@ -331,9 +332,14 @@ async function main() {
 		ok('4.8 the copy deletes (nothing uses it), leaving Dry year', JSON.stringify(await names()) === JSON.stringify(['Base', '-Dry year', 'Base2']), JSON.stringify(await names()));
 
 		console.log('\n--- 5. the Scenarios table ---');
+		// The pane's tab when it shows; while the manager is open the table is in its flyout instead,
+		// the same panel, so every '#lpn_pane_scenarios' read below is the same table either way.
+		const scnTab = async () => {
+			if (await page.evaluate(() => { const b = document.getElementById('lpn_pane_tab_scenarios'); return !!b && getComputedStyle(b).display !== 'none'; })) { await page.click('#lpn_pane_tab_scenarios'); }
+		};
 		await a.toolbarClick(await L('lpn_pane_toggle'));
 		await settle(600);
-		await page.click('#lpn_pane_tab_scenarios');
+		await scnTab();
 		await settle(900);
 		const hdr = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_pane_scenarios thead th')).map((t) => t.textContent.replace(/[­​]/g, '').trim()));
 		ok('5.1 a column per category after Scenario and Parent', hdr.length === 13, JSON.stringify(hdr));
@@ -366,7 +372,7 @@ async function main() {
 		await settle(2500);
 		const pPeak = await pressure();
 		ok('5.4a Peak Hour\'s own demand changes the solve (pressure at the first junction)', !!pBase && !!pPeak && pBase !== pPeak, pBase + ' -> ' + pPeak);
-		await page.click('#lpn_pane_tab_scenarios');
+		await scnTab();
 		await settle(700);
 		const pc = await cellSel(peakRow, 'demand');
 		// Peak Hour's demand stored its own alternative, named Peak Hour (Tom, 2026-10-12: a
@@ -388,7 +394,7 @@ async function main() {
 		await settle(1500);
 		const pDry = await pressure();
 		ok('5.5b ...and the solve changes: Peak Hour\'s own demand is set aside, so the pressure is Base\'s again', pDry === pBase && pDry !== pPeak, pPeak + ' -> ' + pDry);
-		await page.click('#lpn_pane_tab_scenarios');
+		await scnTab();
 		await settle(700);
 		await page.selectOption('#lpn_sm_tree_select', 'demand');
 		await settle(400);
@@ -429,7 +435,7 @@ async function main() {
 		await settle(600);
 		await a.toolbarClick(await L('lpn_pane_toggle'));
 		await settle(600);
-		await page.click('#lpn_pane_tab_scenarios');
+		await scnTab();
 		await settle(800);
 		const rowIdx = (name) => page.evaluate((n) => Array.from(document.querySelectorAll('#lpn_pane_scenarios tbody tr')).findIndex((r) => r.querySelector('td').textContent.trim() === n), name);
 		const cellSelect = async (name, cat) => (await page.evaluateHandle(([n, cat]) => {
@@ -469,7 +475,7 @@ async function main() {
 		await page.click('#lpn_pane_tab_junctions');
 		await settle(1500);
 		ok('5b.7 Kid, on Base\'s Demand, solves as Base does, not as Peak Hour', (await pressure()) === pBase, pBase + ' / ' + (await pressure()));
-		await page.click('#lpn_pane_tab_scenarios');
+		await scnTab();
 		await settle(600);
 		await a.toolbarClick(await L('lpn_pane_toggle'));
 		await settle(400);
