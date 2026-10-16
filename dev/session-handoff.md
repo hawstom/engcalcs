@@ -103,7 +103,7 @@ lines rather than appending corrections.
 
 ### Master: see the pushed SHA in the last report. Production: b7c99102 (10-09) when last read; ask, About box
 
-Landed on master 2026-10-15: feat/stopped-series (808); his word calls on the 808 strings and the mode
+Landed on master 2026-10-15: feat/leader-keep (807, night); feat/stopped-series (808); his word calls on the 808 strings and the mode
 prompts ("labels, and Text"); fix/mtc-vertical-sides (z = 0 side rock reads N/A, `mtc_not_applicable`);
 feat/plural (35 count strings in the "cells (n)" form); sprint 1016 (15 new, 44 resynced, 26 languages;
 `dev/english-friction/1016.json`; halo had been rendered "hello" in am bn hi my, fixed; tr N/A "Uygulanmaz");
@@ -113,37 +113,50 @@ Earlier the same day: twentieth session's list (text-halo, search-zoom-accuracy,
 
 ### Branches awaiting his word (pushed; all on the Branch previews page with test steps)
 
-- **feat/bentley-interop** (721, 790, 782, 784, 789, 794, 781 Morph, 801 Merge upward, 800 List overrides,
-  and 10-16: 802 Scenarios table flyout, 803 All / All unused, 804 balloons as a Presentation override,
-  805 Clean map, R-392 phone Text editor): master merged in 10-16 (3a074022). Its `$ec_lang_syn` Transform
-  description is CC's wording, awaiting his OK. 805 adds two localStorage keys, `lpn_cleanmap` and
-  `lpn_ovrmarks` (furniture, written only when not default; inventory updated): TELL HIM before it merges.
-  New English to rule on: Clean map and its tip, Show override markers on the map, Scenarios table,
-  All, All unused, Time series graphs on the map. After it lands delete match-property, graph-bubble.
-- **feat/description-lines** (806): a line break is " \P " wherever a Description sits on one line, his
-  10-16 call. No new keys.
-- **fix/zero-demand-solve** (R-402): a stopped EPANET run names the full or empty tank, the pipe EPANET
-  closed and the nodes it could not solve; three new English sentences for his word. Stock EPANET fails
-  the same way (a full tank with no flow); options for him: keep the message (recommended), or a per-tank
-  "can overflow" setting.
-- feat/leader-keep (807): he typed "Merge feat/leader-keep" 10-15 and 10-16; the auto-mode classifier refuses
-  CC writing the ledger entry. **He decides: add a permission rule (Edit of dev/branch-all-clears.json) to
-  .claude/settings.json himself, or write the entry.** `chore/ledger-wording` holds HIS commit 37092cd7 (the
-  ledger heading and CLAUDE.md line), which the classifier also refuses CC merging; his to merge.
+His browser pass of 2026-10-15 night came back; four agents were sent that night, one per item below.
+If a branch's `git log` shows no commit after 10-15 22:00, that agent's work was lost: re-brief it.
+
+- **feat/bentley-interop**: he APPROVED all its new English. His changes: the Scenarios table flies out
+  AUTOMATICALLY with the manager (no button), as the spreadsheet version, and widens by dragging; All
+  unused omits categories with nothing unused; Clean map's tip loses the "shows only the drawing"
+  sentence and starts "Checked: The zoom...". He says per-scenario graphs are not new (they changed
+  with scenario two days earlier). The `$ec_lang_syn` Transform description still awaits his OK.
+  `lpn_cleanmap`, `lpn_ovrmarks` (and any flyout width key): TELL HIM before it merges. After it lands
+  delete match-property, graph-bubble.
+- **EPS defects he found on bentley-interop, worked on fix/zero-demand-solve**: (1) the "1-hr drain"
+  scenario reports it ended at 15:07:33; (2) tanks drain with no demand; (3) a pattern of mostly 0s
+  stops EPANET at 0:00 ("Surely it's smarter than this"); (4) on the 8108 preview his Fotobi shows no
+  EPS and no animation controls. R-402: he accepted keeping his numbers and the message ("OK"), and
+  approved its status messages. Don't call a fixture by its filename to him; name his project.
+- **feat/description-lines** (806): his call changed to "\P" with no spaces (was " \P ").
+
+### Proposed to him 2026-10-15 night, awaiting his yes
+
+- **Retire the all-clear file and its merge hook.** He asked to relax the safeties that "have become
+  its undoing": the classifier already refuses a master merge without his typed word, so the file
+  duplicates it, and CC may not write it, so he hand-edits JSON. Keep check_all, the pre-push stamp and
+  the freeze. His `~/.claude/settings.json` rule `Edit(/dev/branch-all-clears.json)` is a string where
+  a list belongs, and a leading `/` there means `~/.claude/`, so it matches nothing.
+- Independent review of how a clarification reaches a translator (halo read as "hello"; "translating
+  too often?"); report in that night's scratchpad, to be relayed to him and banked in a dev/*.md.
 
 ### Questions out to him
 
 - Task 800: keep J-NE-S-3's equal override?
 - Task 681: the node shed's re-fits are what is left (~250 ms on n600); cheaper means changing the layout.
-- Task 802: retire the bottom-pane Scenarios tab now the flyout exists? `lpn_sm_help` still names the pane.
+- Task 802: retire the bottom-pane Scenarios tab now the flyout opens with the manager?
 
 ### Next job
 
-His browser pass over bentley-interop's 10-16 list, then its merge. Wish lists: New junction without a
-canvas click (Declan, open design question), Number of services decimals (Mary), a harness helper that
-starts a scenario from the UI (Perry).
+Merge the agents' work into their branches, update the previews page, and ask for his browser pass.
+Wish lists: New junction without a canvas click (Declan), Number of services decimals (Mary), a
+harness helper that starts a scenario from the UI (Perry).
 
 ### Traps met 2026-10-15 (twenty-first session)
+
+- **Merging master into a cleared branch voids his all-clear** (the pin is the branch head). Merge the
+  cleared head straight into master; the suite on the merge result tests the same code.
+- **"Ledger" was CC's word; he did not know it.** The all-clears file is his all-clears.
 
 - **A pipe hides a refusal.** `new_english_keys.php --write | tail` exits 0 when the generator REFUSED,
   and the next `git add` committed a conflicted file. Never pipe a guard into tail inside an && chain.
