@@ -138,7 +138,14 @@ var EngCalcs = EngCalcs || {};
 	// than off it, clamped well inside the ends so it never crowds a node.
 	// `along` overrides the half-way station, passed only by the aligned-label station search: an
 	// aligned label cannot be nudged sideways without leaving its pipe, so it SLIDES.
+	// **A DRAGGED LABEL'S LEADER STARTS AT THE TRUE HALF-WAY POINT, NEVER THE DODGED ONE** (Task
+	// 807). The dodge depends on the arrows, which come and go with a solve and whose size is in
+	// screen pixels, so measuring a user's offset from it moved his label on every recalculation
+	// and every zoom step. His offset is a fact about the drawing; it is measured from one.
 	function linkLabelMid(l, along) {
+		if (along === undefined && labelIsDragged(l)) {
+			return Geom.pointAlongPolyline(linkPointList(l), LINK_LABEL_ALONG);
+		}
 		var clear = (ARROW_NOMINAL_LEN * arrowFactor()) * 1.5;
 		return Geom.dodgeAlongPolyline(linkPointList(l), along === undefined ? LINK_LABEL_ALONG : along,
 			arrowAlongDistances(l), clear, 0.12, 0.88);
@@ -295,11 +302,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Final rendered offset from the anchor = the persisted drag offset (or default) PLUS this
 	// element's current placement nudge.
-	// **A MANUALLY PLACED LABEL MOVES ONLY ALONG ITS OWN LEADER, GUARANTEED WHERE THE NUDGE IS
-	// COMPUTED, NOT HERE.** Goal 1 of dev/label-placement-goals.md gives a dragged label candidates
-	// on the RAY through its stored endpoint and nowhere else: pushed further out at the same angle,
-	// never sideways or nearer. Every nudge is re-derived from scratch on every pass and none is
-	// written into n.lx/n.ly.
+	// **A MANUALLY PLACED LABEL DOES NOT MOVE, GUARANTEED WHERE THE NUDGE IS COMPUTED, NOT HERE.**
+	// Goal 1 of dev/label-placement-goals.md gives a dragged label one candidate, its stored
+	// endpoint (Task 807), so its nudge is zero. Every nudge is re-derived from scratch on every
+	// pass and none is written into n.lx/n.ly.
 	// A nudge computed for an AUTO-placed label is meaningless the instant that label becomes
 	// dragged, and the other way round -- it was searched for on a different candidate set. The pass
 	// stamps which kind it was solving (holder.nudgeManual) and this refuses the nudge until the
@@ -347,13 +353,14 @@ var EngCalcs = EngCalcs || {};
 	// allowed to move with the zoom, unlike B itself. labelBoxWidth() rather than tw directly, so
 	// the box concept stays in one place (since Task 333 the two are equal).
 	//
-	// **THE HYSTERESIS IS FOR A HAND ON A LABEL, AND FOR NOTHING ELSE.** Tom, 2026-08-16: *"we only
+	// **THE HYSTERESIS IS FOR A LABEL THE USER MOVED, AND FOR NOTHING ELSE** (in the hand and after
+	// it, Task 807; see movedLabelSide()). Tom, 2026-08-16: *"we only
 	// have to check for violation on the nearest side. We have no reason to check the other side
 	// because we will never use it."* labelSideAtEnd() holds the PREVIOUS side (in holder.side)
 	// inside a dead band either side of the anchor's vertical line, which can leave the box on the
 	// anchor's side with the leader running the width of the text to reach its endpoint. That is
-	// right while a user DRAGS -- without it a label pulled just past the line flickers a full
-	// box-width from side to side -- and wrong otherwise.
+	// right for a label the user placed -- without it a label pulled just past the line flickers a
+	// full box-width from side to side, and one let go there jumps -- and wrong otherwise.
 	//
 	// An auto-placed label is not dragged: its endpoint comes from seventeen discrete candidates, so
 	// there is no continuous sweep to damp. Taking the nearest side unconditionally also makes
@@ -367,14 +374,14 @@ var EngCalcs = EngCalcs || {};
 	// follows the cursor rigidly -- `gx` is how far from the box's left edge it was picked up -- and
 	// the end is wherever that puts it on the side the rule leaves standing. Where the box straddles
 	// the anchor's line neither side stands; the box sits at the rule's edge on the nearer side, so it
-	// lags the cursor by under a quarter of its width instead of jumping its width.
+	// lags the cursor by under half its width instead of jumping its width.
 	// dev/lpn-spike/label-drag-track-harness.js.
 	function heldLabelEnd(holder, anchor, cw, d) {
-		var w = labelBoxWidth(holder), left = cw.x - d.gx, hyst = (w / 2) * (2 * ADVERSE_FRAC - 1),
+		var w = labelBoxWidth(holder), left = cw.x - d.gx, hyst = (w / 2) * (2 * DATA_LABEL_FLIP_FRAC - 1),
 			prev = holder.side || 'right', order = [prev, prev === 'right' ? 'left' : 'right'], i, e, x, er, el, side;
 		for (i = 0; i < 2; i++) {
 			e = order[i] === 'right' ? left : left + w;
-			if (Geom.labelSideAtEnd(order[i], e, anchor.x, w / 2, ADVERSE_FRAC) === order[i]) {
+			if (Geom.labelSideAtEnd(order[i], e, anchor.x, w / 2, DATA_LABEL_FLIP_FRAC) === order[i]) {
 				holder.side = order[i];
 				return { x: e, y: cw.y + d.offY };
 			}
@@ -389,11 +396,33 @@ var EngCalcs = EngCalcs || {};
 		x = side === 'right' ? left + er : left + w - el;
 		return { x: x, y: cw.y + d.offY };
 	}
-	function dataLabelOrigin(holder, anchor, end, dragged) {
+	// **A MOVED LABEL KEEPS ITS SIDE UNTIL ITS LEADER END IS HALF ITS WIDTH PAST THE NODE'S LINE**
+	// (Tom, 2026-10-15: *"We had a hysteresis rule. Did that get lost? ... A label should not flip
+	// until half of its width is past the flipping point."*). The flipping point is the vertical
+	// line through the anchor. The rule holds in the hand, on release, on every redraw and across a
+	// reload: the side is stored with the label (`lside`, beside lx/ly), because a side remembered
+	// only by the drawing came back from a reload as "right" and laid N103's label across its own
+	// node. An automatic label still takes the nearest side: it has no sweep to damp.
+	var DATA_LABEL_FLIP_FRAC = 1;   // labelSideAtEnd()'s band is halfW * (2f - 1): f = 1 is half the width
+	function labelInHand(holder) {
+		if (!drag || drag.id === undefined) { return false; }
+		return (drag.type === 'nodelbl' && nodeEls[drag.id] === holder) ||
+			(drag.type === 'linklbl' && linkEls[drag.id] === holder);
+	}
+	// The side a MOVED label's text hangs on, with nothing written: the placer asks this before the
+	// renderer does, so the two agree. In the hand, heldLabelEnd() has just decided it; otherwise
+	// the stored side is the one to hold, and a file from before `lside` starts from the nearest.
+	function movedLabelSide(holder, owner, anchor, end, inHand) {
+		var near = end.x >= anchor.x ? 'right' : 'left',
+			prev = inHand ? (holder.side || near) : ((owner && owner.lside) || holder.side || near);
+		return Geom.labelSideAtEnd(prev, end.x, anchor.x, labelBoxWidth(holder) / 2, DATA_LABEL_FLIP_FRAC);
+	}
+	// `owner` is the node or pipe of a MOVED label (or `true`), else falsy for an automatic one.
+	function dataLabelOrigin(holder, anchor, end, owner, inHand) {
 		var w = labelBoxWidth(holder);
-		holder.side = dragged
-			? Geom.labelSideAtEnd(holder.side, end.x, anchor.x, w / 2, ADVERSE_FRAC)
+		holder.side = owner ? movedLabelSide(holder, owner, anchor, end, inHand)
 			: (end.x >= anchor.x ? 'right' : 'left');
+		if (owner && owner !== true && owner.lside !== holder.side) { owner.lside = holder.side; }
 		return { x: holder.side === 'right' ? end.x : end.x - w, y: end.y };
 	}
 	// Approximate vertical box of a left-anchored, top-down multi-line <text> (node/link labels).
@@ -419,7 +448,7 @@ var EngCalcs = EngCalcs || {};
 		// repair (Task 539 phase three) and KEEPS the ground it stands on. See shedCrossingLabels().
 		setLabelAssemblyHidden(ne, !!ne.hiddenDropped || !!ne.hiddenCrossed);
 		var anchor = nodeAt(n), end = nodeLabelPos(n),
-			org = dataLabelOrigin(ne, anchor, end, labelIsDragged(n));
+			org = dataLabelOrigin(ne, anchor, end, n.lx !== undefined ? n : null, labelInHand(ne));
 		repositionMultilineText(ne.text, org.x, org.y);
 		updateDataLeader(ne, anchor, end);
 	}
@@ -916,6 +945,32 @@ var EngCalcs = EngCalcs || {};
 	//
 	// The cost is one extra placeLabelsFirstFit() on a CONTENT pass and none on a drag frame: this
 	// runs where the shed runs.
+	// **A DRAGGED LABEL IS A FIXED OBSTACLE TO EVERY AUTOMATIC NODE LABEL** (Task 807). It no
+	// longer moves, so the stretch that used to carry it clear of a crowd is gone and the crowd has
+	// to keep clear of it instead. Its rows and its drawn leader, exactly where the user put them;
+	// the node first-fit, its shed and the gang repair are handed these alongside the drawing's
+	// own obstacles. A drawing with no dragged label gets back the obstacles it came with.
+	function withDraggedLabels(obs, fs) {
+		var boxes = [], segs = [], min = leaderThreshold();
+		function add(key, holder, anchor, home, owner) {
+			if (!holder || holder.empty) { return; }
+			var spec = { id: key, anchor: anchor, home: home, w: labelBoxWidth(holder),
+				side: movedLabelSide(holder, owner, anchor, home, labelInHand(holder)),
+				h: dataLabelBoxHeight(holder.lineCount), yOff: -fs * 0.85, lines: labelRowWidths(holder) };
+			Collide.labelLineBoxes(spec, home).forEach(function (b) { boxes.push(b); });
+			if (Math.hypot(home.x - anchor.x, home.y - anchor.y) > min) {
+				segs.push(Collide.segment(anchor.x, anchor.y, home.x, home.y, 'leader', key));
+			}
+		}
+		doc.nodes.forEach(function (n) {
+			if (n.lx !== undefined) { add(nodeLabelKey(n.id), nodeEls[n.id], nodeAt(n), nodeLabelBase(n), n); }
+		});
+		doc.links.forEach(function (l) {
+			if (l.lx !== undefined) { add(linkLabelKey(l.id), linkEls[l.id], linkLabelMid(l), linkLabelBase(l), l); }
+		});
+		if (!boxes.length && !segs.length) { return obs; }
+		return { boxes: obs.boxes.concat(boxes), segments: obs.segments.concat(segs) };
+	}
 	function predictNodeLabelBoxes(fs) {
 		var specs = [], obs = staticObstacles(), stationed = [];
 		// **THE PIPE LABELS ARE IN THE PREDICTION, AT FULL CONTENT, and leaving them out costs
@@ -940,7 +995,7 @@ var EngCalcs = EngCalcs || {};
 			specs.push(nodeFirstFitSpec(n, ne, fs));
 		});
 		if (!specs.length) { return []; }
-		return Collide.placeLabelsFirstFit(rankNodeLabels(specs), obs,
+		return Collide.placeLabelsFirstFit(rankNodeLabels(specs), withDraggedLabels(obs, fs),
 			{ pad: fs * LPN_ALIGNED_PAD_FRAC });
 	}
 	function shedAlignedForConflicts(fsNow, fs) {
@@ -972,7 +1027,7 @@ var EngCalcs = EngCalcs || {};
 			// link label against ground nothing occupies, clearing a conflict that is really there.
 			var at = nodeLabelBase(n),
 				w = labelBoxWidth(ne), h = dataLabelBoxHeight(ne.lineCount),
-				b = Collide.boxFromRect({ x: at.x >= nodeDrawX(n) ? at.x : at.x - w,
+				b = Collide.boxFromRect({ x: movedLabelSide(ne, n, nodeAt(n), at, labelInHand(ne)) === 'right' ? at.x : at.x - w,
 					y: at.y - fs * 0.85, w: w, h: h });
 			b.kind = 'label';
 			obs.boxes.push(b);
@@ -1445,7 +1500,7 @@ var EngCalcs = EngCalcs || {};
 			mid = lone ? linkLabelMid(l) : linkLabelMid(l, along),
 			anchor = { x: mid.x, y: mid.y },
 			end = lone ? linkLabelPos(l) : { x: mid.x + d.x, y: mid.y + d.y },
-			org = dataLabelOrigin(isPrimary ? le : part, anchor, end, labelIsDragged(l));
+			org = dataLabelOrigin(isPrimary ? le : part, anchor, end, (lone && l.lx !== undefined) ? l : null, isPrimary && labelInHand(le));
 		repositionMultilineText(part.text, org.x, org.y);
 		if (isPrimary) { updateDataLeader(le, anchor, end); }
 	}
@@ -1510,14 +1565,14 @@ var EngCalcs = EngCalcs || {};
 	function resetNodeLabelHome(id) {
 		var n = nodeById(id); if (!n || n.lx === undefined) { return; }
 		saveUndoSnapshot();
-		delete n.lx; delete n.ly;
+		delete n.lx; delete n.ly; delete n.lside;
 		layoutNodeLabel(id);
 		scheduleSolve();
 	}
 	function resetLinkLabelHome(id) {
 		var l = linkById(id); if (!l || l.lx === undefined) { return; }
 		saveUndoSnapshot();
-		delete l.lx; delete l.ly;
+		delete l.lx; delete l.ly; delete l.lside;
 		layoutLinkLabel(id);
 		scheduleSolve();
 	}
@@ -1528,10 +1583,9 @@ var EngCalcs = EngCalcs || {};
 	// handles and the current font size into plain boxes and segments, which is what lets the
 	// placement be tested without a browser.
 	//
-	// A MANUALLY DRAGGED LABEL (n.lx/l.lx defined) keeps the endpoint the user gave it: its
-	// candidates lie on the RAY through that endpoint, pushed further out along the same line, never
-	// sideways and never nearer. The nudge is our transient extension -- re-derived from scratch on
-	// every pass, never written into n.lx/l.ly -- so it is neither undo-tracked nor persisted.
+	// A MANUALLY DRAGGED LABEL (n.lx/l.lx defined) keeps the endpoint the user gave it, exactly:
+	// its only candidate is that endpoint, so its nudge is always zero (Task 807). Only a reset
+	// (double-click) hands it back to the placer.
 	//
 	// **THE REACH IS A MULTIPLE OF THE LABEL'S OWN SIZE, NOT A PIXEL COUNT.** At 28 screen pixels a
 	// 3-line label at the default text size is 50 x 38.5 px, so the whole search disc fits INSIDE the
@@ -1984,6 +2038,16 @@ var EngCalcs = EngCalcs || {};
 		var t1 = (typeof performance !== 'undefined' ? performance.now() : Date.now());
 		perfDebugRows.push(name + ' ' + (t1 - t0).toFixed(1) + 'ms');
 		return out;
+	}
+	// **LAPS, FOR A STRETCH OF ONE FUNCTION THAT SHARES ITS LOCALS** (Task 681): a closure handed to
+	// perfDebugTime() would scope them away. `perfDebugLap(null)` starts the stopwatch; each named
+	// call records the time since the previous one.
+	var perfLapT = 0;
+	function perfDebugLap(name) {
+		if (!perfDebugOn() || perfDebugQuiet) { return; }
+		var t = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+		if (name && perfLapT) { perfDebugRows.push(name + ' ' + (t - perfLapT).toFixed(1) + 'ms'); }
+		perfLapT = t;
 	}
 	// The hint is part of the box and not part of the DATA, so it is stripped before the rows are
 	// read back -- otherwise eight switches would stack eight copies of it into the history.
@@ -2595,17 +2659,23 @@ var EngCalcs = EngCalcs || {};
 			if (!recs.length) { break; }   // nothing left to give up: the drops stand and go whole
 			// EVERY WRITE, THEN EVERY READ -- one forced layout for the rung instead of one per
 			// label. Exactly shedToSegmentBatch()'s seam, for exactly its reason.
-			recs.forEach(function (rec) {
-				writeNodeLabelGlyphs(rec.ne, rec.n,
-					keptLines(rec.all, shedKeepSet(rec.all, rec.order, rec.gone + 1)), fsNow);
+			// **THE TWO HALVES OF A RUNG ARE TIMED APART** (?debug=perf): the glyph rewrite and the
+			// re-fit. Measured 2026-10-15 on the 600-junction downtown arrival, 28 ms and 248 ms over
+			// five rungs. Reusing the re-fit's unchanged verdicts was tried (Task 681) and saved
+			// about a tenth: most labels on a crowded view shed on every rung, so few verdicts hold.
+			perfDebugAccum('  ns:glyphs', function () {
+				recs.forEach(function (rec) {
+					writeNodeLabelGlyphs(rec.ne, rec.n,
+						keptLines(rec.all, shedKeepSet(rec.all, rec.order, rec.gone + 1)), fsNow);
+				});
+				recs.forEach(function (rec) { measureLabelWidths(rec.ne); });
+				recs.forEach(function (rec) {
+					rec.lbl.w = labelBoxWidth(rec.ne);
+					rec.lbl.h = dataLabelBoxHeight(rec.ne.lineCount);
+					rec.lbl.lines = labelRowWidths(rec.ne);
+				});
 			});
-			recs.forEach(function (rec) { measureLabelWidths(rec.ne); });
-			recs.forEach(function (rec) {
-				rec.lbl.w = labelBoxWidth(rec.ne);
-				rec.lbl.h = dataLabelBoxHeight(rec.ne.lineCount);
-				rec.lbl.lines = labelRowWidths(rec.ne);
-			});
-			placed = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
+			placed = perfDebugAccum('  ns:refit', function () { return Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad }); });
 			rungs++;
 		}
 		lastNodeShedRungs = rungs;
@@ -2773,18 +2843,11 @@ var EngCalcs = EngCalcs || {};
 	var lastCrossingShed = null;
 	function runLabelCollisionAvoidance(shedNodes) {
 		var fs = effectiveFontSize(), fsNow = fs + 'px', labels = [], nodeLabels = [], stationed = [],
-			obs = staticObstacles(), holders = {};
+			obs = perfDebugAccum('  cl:obstacles', staticObstacles), holders = {};
 		// **EVERY NODE LABEL STARTS FROM ITS FULL CONTENT** (Task 469), before anything is measured
 		// into a placement spec. Shedding down from whatever survived the last pass is a ratchet.
 		if (shedNodes) { unshedNodeLabels(fsNow); }
-		// The one data label the pointer is carrying right now, if any. It is placed exactly where
-		// the pointer puts it (js/lpn-collide.js candidatesFor()), never pushed along its leader.
-		function labelHeldByDrag(key) {
-			if (!drag || drag.id === undefined) { return false; }
-			return (drag.type === 'nodelbl' && key === nodeLabelKey(drag.id)) ||
-				(drag.type === 'linklbl' && key === linkLabelKey(drag.id));
-		}
-		function addDataLabel(key, holder, anchor, home, dragged, lineCount) {
+		function addDataLabel(key, holder, anchor, home, dragged, lineCount, owner) {
 			// Every nudge is cleared and re-derived from scratch on every pass, dragged or not, so
 			// the pass is IDEMPOTENT: running it twice on an unchanged drawing gives the same answer
 			// as running it once. Keeping the previous nudge and searching from there is what made
@@ -2794,7 +2857,8 @@ var EngCalcs = EngCalcs || {};
 			if (holder.empty) { return; }   // nothing rendered -- no box to place
 			holders[key] = holder;
 			labels.push({
-				id: key, anchor: anchor, home: home, dragged: !!dragged, held: labelHeldByDrag(key),
+				id: key, anchor: anchor, home: home, dragged: !!dragged,
+				side: dragged ? movedLabelSide(holder, owner, anchor, home, labelInHand(holder)) : undefined,
 				w: labelBoxWidth(holder), h: dataLabelBoxHeight(lineCount), yOff: -fs * 0.85,
 				lines: labelRowWidths(holder)
 			});
@@ -2809,13 +2873,13 @@ var EngCalcs = EngCalcs || {};
 			nodeLabels.push(nodeFirstFitSpec(n, ne, fs));
 		}
 		// **NODE LABELS TAKE THE FIRST-FIT NOW, NOT THE RING** (Task 398). A dragged one is the
-		// exception and keeps the ring: goal 1 gives it candidates along the ray through its own
-		// stored endpoint, it is never dropped, and it never jumps sides -- the user put it there.
+		// exception and keeps the ring, where its one candidate is the endpoint the user stored
+		// (Task 807): it is never moved, never dropped, and never jumps sides -- the user put it there.
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id]; if (!ne) { return; }
 			ne.hiddenDropped = false;
 			if (n.lx !== undefined) {
-				addDataLabel(nodeLabelKey(n.id), ne, nodeAt(n), nodeLabelBase(n), true, ne.lineCount);
+				addDataLabel(nodeLabelKey(n.id), ne, nodeAt(n), nodeLabelBase(n), true, ne.lineCount, n);
 				return;
 			}
 			addNodeFirstFit(n, ne);
@@ -2839,22 +2903,22 @@ var EngCalcs = EngCalcs || {};
 				return;
 			}
 			addDataLabel(linkLabelKey(l.id), le, linkLabelMid(l), linkLabelBase(l),
-				l.lx !== undefined, le.lineCount);
+				l.lx !== undefined, le.lineCount, l);
 		});
 		// **LINKS PLACE FIRST, NODES SURVIVE FIRST** -- two different orders answering two different
 		// questions, exactly the split ESRI Maplex draws between label priority and what is left
 		// unplaced. A link label is bound to its pipe and has the fewest choices, so it chooses while
 		// it can; when something has to go it is the link, yielding by SHEDDING values in
 		// shedAlignedForConflicts(), which has already run by the time this pass places anything.
-		placeStationedLabels(stationed, obs, fs, true);
+		perfDebugAccum('  cl:stationed', function () { placeStationedLabels(stationed, obs, fs, true); });
 		rankNodeLabels(nodeLabels);
 		// **NO REPAIR PASS: a node label never takes a blocking link label's ground and hides it
 		// WHOLE.** shedAlignedForConflicts() makes the link label give up VALUES for the node label
 		// before this pass runs, which is the graceful form of the same ruling; a repair on top is a
 		// second, cruder mechanism reaching the same situation by another door, and a reader cannot
 		// tell the two apart. If a node label still cannot fit once link labels have shed, it drops.
-		var pad = fs * LPN_ALIGNED_PAD_FRAC,
-			nodePlaced = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
+		var pad = fs * LPN_ALIGNED_PAD_FRAC, nodeObs = withDraggedLabels(obs, fs),
+			nodePlaced = perfDebugAccum('  cl:firstFit', function () { return Collide.placeLabelsFirstFit(nodeLabels, nodeObs, { pad: pad }); });
 		// **AND THEN THE ONES THAT DID NOT FIT GIVE UP A PROPERTY AND TRY AGAIN** (Task 469). This
 		// is the graceful rung the node half never had; the drop above is now its terminal one.
 		//
@@ -2865,16 +2929,16 @@ var EngCalcs = EngCalcs || {};
 		// debounced scheduleReshed() -- which is exactly where the link cascade lives. A drag frame
 		// places whatever content the last content pass decided, and re-decides on the way out.
 		if (shedNodes) {
-			nodePlaced = shedNodeLabelsForCrowding(nodeLabels, nodePlaced, obs, pad, fsNow);
+			nodePlaced = perfDebugAccum('  cl:nodeShed', function () { return shedNodeLabelsForCrowding(nodeLabels, nodePlaced, nodeObs, pad, fsNow); });
 		}
 		// Every number the ring pass is steered by goes through ONE place, so ?debug=labels can
 		// override them live without a second code path deciding anything (see labelTuning()). It
 		// now serves free link labels and DRAGGED labels of either kind -- see addNodeFirstFit().
 		var t = labelTuning(),
-			placed = Collide.placeLabels(labels, obs, {
+			placed = perfDebugAccum('  cl:ring', function () { return Collide.placeLabels(labels, obs, {
 				inner: t.inner * fs, outer: t.reach * fs,
 				steps: parseRingSteps(t.steps), k: t.k
-			});
+			}); });
 		// **AND THEN THE GANGS ARE REPAIRED** (Task 539). The first-fit places one label at a time,
 		// each treating the last as an obstacle, which is how two labels end up each locally
 		// reasonable and jointly absurd -- crossed leaders, or one label lying across the other's
@@ -2899,20 +2963,20 @@ var EngCalcs = EngCalcs || {};
 		// flicker every pass here is written to avoid. Measured, so the price is on the record: on
 		// Net3-World with every label field on the whole repair is 19-58 ms a pass, against 25-90 ms
 		// for ONE of the four to six placeLabelsFirstFit() calls the same pass already makes.
-		var repaired = Collide.repairCrossingGangs(nodeLabels, nodePlaced, obs, {
+		var repaired = perfDebugAccum('  cl:repair', function () { return Collide.repairCrossingGangs(nodeLabels, nodePlaced, nodeObs, {
 			pad: pad, leaderMin: leaderThreshold(),
 			// The closing count is a second sweep of the whole drawing for a number no decision
 			// reads, so it is taken only when the bench is open to print it.
 			report: debugOn('labels'),
 			foreign: crossingForeigners(obs).concat(ringForeigners(placed))
-		});
+		}); });
 		nodePlaced = repaired.results;
 		lastGangRepair = repaired.stats;
 		// **AND WHATEVER SURVIVED THAT, ONE OF THE TWO LABELS GOES** (Task 539 phase three). The
 		// repair moves what it can show an improvement for; this closes the remainder, which is the
 		// only rung left once moving has run out. It must run HERE, after both placements and before
 		// the holders are written, because a hide is a DROP and the drop seam is the loop below.
-		lastCrossingShed = shedCrossingLabels(nodeLabels, nodePlaced, labels, placed, obs);
+		lastCrossingShed = perfDebugAccum('  cl:crossShed', function () { return shedCrossingLabels(nodeLabels, nodePlaced, labels, placed, obs); });
 		placed.concat(nodePlaced).forEach(function (r) {
 			var h = holders[r.id];
 			if (!h) { return; }
@@ -2922,14 +2986,14 @@ var EngCalcs = EngCalcs || {};
 		});
 		// **THE YIELDER HAS TO ACTUALLY LEAVE, and until 2026-08-23 it never did.** See
 		// yieldStationedLabels() -- this is the one call site, and it must run after BOTH placements.
-		yieldStationedLabels(nodePlaced, obs);
+		perfDebugAccum('  cl:yield', function () { yieldStationedLabels(nodePlaced, obs); });
 		labelDebugReport(labels.concat(nodeLabels), placed.concat(nodePlaced), obs);
 		// **THE METERS GO LAST, ON THE GROUND EVERYTHING ELSE HAS LEFT** (Task 247). They are the
 		// only labels on this page with two fixed positions and no relaxation, so they can only be
 		// placed once every label that CAN move has finished moving -- and they must see those
 		// final positions rather than a fresh reading of the drawing, which is why the obstacle set
 		// is handed over rather than rebuilt.
-		layoutCustomerLabels(obs);
+		perfDebugAccum('  cl:customers', function () { layoutCustomerLabels(obs); });
 	}
 	// **`yields` GRANTS THE GROUND; THIS IS WHAT MAKES THE HOLDER LEAVE IT** (Task 469, Tom's
 	// screenshot of 2026-08-23: a node's stacked readout printed straight through a `Q=` rotated
@@ -5267,7 +5331,7 @@ var EngCalcs = EngCalcs || {};
 			fn: function () {
 				// The count is the whole of the warning: a scenario holding nothing is worth no
 				// question, and one holding forty values is worth a specific one.
-				var msg = (pc.lpn_scenario_delete_confirm || 'Delete the scenario {name}, and its {n} overrides? The drawing itself is not changed.')
+				var msg = (pc.lpn_scenario_delete_confirm || 'Delete the scenario {name}, and its overrides ({n})? The drawing itself is not changed.')
 					.replace('{name}', scenarioDisplayName(scn)).replace('{n}', overrideCount(scn));
 				askDialog({ kind: 'confirm', text: msg }, function (yes) {
 					if (!yes) { return; }
@@ -13823,8 +13887,8 @@ var EngCalcs = EngCalcs || {};
 		//      piece of lettering and every leader as drawn, and if any of it is outside the frame,
 		//      solve again with those measured boxes. Repeat until nothing is outside.
 		// Step 3 exists because the home boxes are not where the labels end up: the placement pass
-		// pushes a label out along its own leader to clear its neighbours (a dragged one by ~80 px on
-		// the Basic SI example), and that push is decided at the scale being drawn, so only a layout
+		// moves an automatic label to clear its neighbours (a dragged one no longer moves, Task 807),
+		// and that move is decided at the scale being drawn, so only a layout
 		// AT the target scale can say where the lettering is -- a fixed point, solved by iterating.
 		// **IT STILL CANNOT DEPEND ON THE VIEW WE ARRIVED FROM**: the settle starts from step 2's
 		// answer, never from state.s, and the scale only ever steps DOWN, so it ends, and a second
@@ -22563,7 +22627,7 @@ var EngCalcs = EngCalcs || {};
 			var demIds = replacePending.refs.map(function (r) { return r.id; });
 			replacePending = null;
 			EngCalcs.lpnTerrainFillFor(terrainPointsForIds(demIds), { replaceAny: true });
-			renderReplace(String(pc.lpn_replace_asked || 'Elevations requested for {n} nodes. Results appear when they are received.').replace('{n}', String(demIds.length)));
+			renderReplace(String(pc.lpn_replace_asked || 'Elevations requested for nodes ({n}). Results appear when they are received.').replace('{n}', String(demIds.length)));
 			return demIds.length;
 		}
 		// **ONE SNAPSHOT FOR THE WHOLE SET, so it is ONE undo step.** Snapshotting per element would
@@ -22590,7 +22654,7 @@ var EngCalcs = EngCalcs || {};
 		// claim about the map: after "diameter equal to 6, set to 8" that list is correctly empty.
 		findResults = replaceFoundSet();
 		renderFindResults(null);
-		renderReplace(String(pc.lpn_replace_done || '{n} assets changed. This can be undone in one step.').replace('{n}', String(n)));
+		renderReplace(String(pc.lpn_replace_done || 'Assets changed: {n}. This can be undone in one step.').replace('{n}', String(n)));
 		return n;
 	}
 	// The preview line and its two buttons. `message` is a state the write cannot start from -- no
@@ -22609,7 +22673,7 @@ var EngCalcs = EngCalcs || {};
 		if (!replacePending) { return; }
 		head = document.createElement('div');
 		head.style.margin = '6px 0 2px';
-		head.textContent = String(pc.lpn_replace_preview || 'Change {n} assets?')
+		head.textContent = String(pc.lpn_replace_preview || 'Change assets ({n})?')
 			.replace('{n}', String(replacePending.refs.length));
 		box.appendChild(head);
 		apply = document.createElement('button');
@@ -28805,7 +28869,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function paneAskIdChanges(spec, raw, n) {
 		var pc = EngCalcs.pageConfig || {},
-			text = String(pc.lpn_pane_paste_ids_differ || '{n} IDs don\'t match. Paste anyway?').replace('{n}', String(n));
+			text = String(pc.lpn_pane_paste_ids_differ || 'IDs that do not match ({n}). Paste anyway?').replace('{n}', String(n));
 		openDialog(function (body) {
 			var p = document.createElement('p');
 			p.style.margin = '0';
@@ -28825,19 +28889,19 @@ var EngCalcs = EngCalcs || {};
 			}, text, buttons;
 		if (errs.length) {
 			text = say(pc.lpn_pane_paste_overflow_bad ||
-				'This paste has {n} rows, and {fit} of them fit in the table. The other {extra} cannot be added as new rows: {reasons}')
+				'Rows in this paste ({n}). Rows that fit in the table ({fit}). The other rows ({extra}) cannot be added as new rows: {reasons}')
 				.replace('{reasons}', errs.slice(0, 5).join(' ') + (errs.length > 5
 					? ' ' + String(pc.lpn_pane_paste_more || 'Rows with problems not shown here: {n}.').replace('{n}', String(errs.length - 5)) : ''));
 		} else {
 			text = say(pc.lpn_pane_paste_overflow ||
-				'This paste has {n} rows, and {fit} of them fit in the table. Add the other {extra} as new rows at the bottom?');
+				'Rows in this paste ({n}). Rows that fit in the table ({fit}). Add the other rows ({extra}) as new rows at the bottom?');
 		}
 		buttons = [];
 		if (!errs.length) {
-			buttons.push({ label: say(pc.lpn_pane_paste_overflow_add || 'Add {extra} rows'),
+			buttons.push({ label: say(pc.lpn_pane_paste_overflow_add || 'Add rows ({extra})'),
 				fn: function () { panePasteAt(spec, raw, { overflow: 'add', raw: raw, idsOk: true }); } });
 		}
-		buttons.push({ label: say(pc.lpn_pane_paste_overflow_fit || 'Paste only the {fit} that fit'),
+		buttons.push({ label: say(pc.lpn_pane_paste_overflow_fit || 'Paste only the rows that fit ({fit})'),
 			fn: function () { panePasteAt(spec, raw, { overflow: 'fit', raw: raw, idsOk: true }); } });
 		buttons.push({ label: pc.lpn_cancel || 'Cancel', fn: function () {} });
 		openDialog(function (body) {
@@ -28965,13 +29029,13 @@ var EngCalcs = EngCalcs || {};
 		// cells changed.
 		if (created.length) {
 			setNotice(String(refused + dropped
-				? (pc.lpn_pane_pasted_rows_skipped || 'Pasted {n} rows and added {created} of them to the network. {skipped} cells were not changed.')
-				: (pc.lpn_pane_pasted_rows || 'Pasted {n} rows and added {created} of them to the network.'))
+				? (pc.lpn_pane_pasted_rows_skipped || 'Pasted rows ({n}). Rows added to the network ({created}). Cells not changed ({skipped}).')
+				: (pc.lpn_pane_pasted_rows || 'Pasted rows ({n}). Rows added to the network ({created}).'))
 				.replace('{n}', String(nRows))
 				.replace('{created}', String(created.length))
 				.replace('{skipped}', String(refused + dropped)));
 		} else {
-			setNotice(String(pc.lpn_pane_pasted || 'Pasted {n} cells. {skipped} were not changed.')
+			setNotice(String(pc.lpn_pane_pasted || 'Pasted cells ({n}). Cells not changed ({skipped}).')
 				.replace('{n}', String(wrote))
 				.replace('{skipped}', String(refused + dropped)));
 		}
@@ -29017,7 +29081,7 @@ var EngCalcs = EngCalcs || {};
 		completeEdit(null);
 		refreshPopupIfOpen();
 		renderPaneTable(spec);
-		setNotice(String(pc.lpn_pane_filled || 'Filled down {n} cells. {skipped} were not changed.')
+		setNotice(String(pc.lpn_pane_filled || 'Filled down cells ({n}). Cells not changed ({skipped}).')
 			.replace('{n}', String(wrote))
 			.replace('{skipped}', String(refused)));
 		return true;
@@ -29088,7 +29152,7 @@ var EngCalcs = EngCalcs || {};
 		refreshPopupIfOpen();
 		renderPaneTable(spec);
 		paneSelPaint(spec, paneTableRowsInOrder(spec), paneCols(spec));
-		setNotice(String(pc.lpn_pane_ctrlenter_filled || 'Filled {n} cells. {skipped} were not changed.')
+		setNotice(String(pc.lpn_pane_ctrlenter_filled || 'Filled cells ({n}). Cells not changed ({skipped}).')
 			.replace('{n}', String(wrote))
 			.replace('{skipped}', String(refused)));
 		return true;
@@ -29267,7 +29331,7 @@ var EngCalcs = EngCalcs || {};
 		spec.sel = { aId: rows[target.r0].id, aKey: cols[target.c0].key,
 			fId: rows[target.r1].id, fKey: cols[target.c1].key };
 		renderPaneTable(spec);
-		setNotice(String(pc.lpn_pane_ctrlenter_filled || 'Filled {n} cells. {skipped} were not changed.')
+		setNotice(String(pc.lpn_pane_ctrlenter_filled || 'Filled cells ({n}). Cells not changed ({skipped}).')
 			.replace('{n}', String(wrote))
 			.replace('{skipped}', String(refused)));
 		return true;
@@ -33735,7 +33799,7 @@ var EngCalcs = EngCalcs || {};
 		nl.verts = newVerts;   // base-write: construction: whole copies, so a vertex keeps its typed characters
 		// Everything the pipe carries comes across, except what is its own place or identity.
 		Object.keys(clone).forEach(function (k) {
-			if (k === 'id' || k === 'from' || k === 'to' || k === 'verts' || k === 'lx' || k === 'ly' ||
+			if (k === 'id' || k === 'from' || k === 'to' || k === 'verts' || k === 'lx' || k === 'ly' || k === 'lside' ||
 				k === 'tag' || k === '_k' || k === 'fittingsId' || k === '_fittingsId') { return; }
 			nl[k] = clone[k];   // base-write: construction: the new half is born in Base as a copy of the pipe it came from
 		});
@@ -34003,7 +34067,7 @@ var EngCalcs = EngCalcs || {};
 			}
 		}
 		if (!lost) { proceed(); return; }
-		askDialog({ kind: 'confirm', text: (pc.lpn_delete_drops_overrides || 'Deleting this asset also deletes {n} scenario overrides for it. Continue?').replace('{n}', lost) }, function (yes) {
+		askDialog({ kind: 'confirm', text: (pc.lpn_delete_drops_overrides || 'Deleting this asset also deletes its scenario overrides ({n}). Continue?').replace('{n}', lost) }, function (yes) {
 			if (yes) { proceed(); }
 		});
 	}
@@ -34029,7 +34093,7 @@ var EngCalcs = EngCalcs || {};
 		if (orphaned) {
 			refreshCustomerHandle();
 			setNotice(String((EngCalcs.pageConfig || {}).lpn_customer_detached_count ||
-				'{n} customers are no longer connected to a pipe. Their demand is not in the answers.')
+				'Customers not connected to a pipe ({n}). Their demand is not accounted for.')
 				.replace('{n}', String(orphaned)));
 		}
 		labelsByAnchor[id].slice().forEach(function (lid) { deleteLabelById(lid); });
@@ -35007,7 +35071,7 @@ var EngCalcs = EngCalcs || {};
 		var loose = detachCustomersFromLink(id);
 		if (loose) {
 			setNotice(String((EngCalcs.pageConfig || {}).lpn_customer_detached_count ||
-				'{n} customers are no longer connected to a pipe. Their demand is not in the answers.')
+				'Customers not connected to a pipe ({n}). Their demand is not accounted for.')
 				.replace('{n}', String(loose)));
 		}
 		incidentLinks[l.from] = incidentLinks[l.from].filter(function (x) { return x !== id; });
@@ -36423,12 +36487,12 @@ var EngCalcs = EngCalcs || {};
 		(saved.nodes || []).forEach(function (n) {
 			if (n.lx === undefined && n.ly === undefined) { return; }
 			if (!absurd(n.lx, n.ly)) { return; }
-			delete n.lx; delete n.ly; dropped++;
+			delete n.lx; delete n.ly; delete n.lside; dropped++;
 		});
 		(saved.links || []).forEach(function (l) {
 			if (l.lx === undefined && l.ly === undefined) { return; }
 			if (!absurd(l.lx, l.ly)) { return; }
-			delete l.lx; delete l.ly; dropped++;
+			delete l.lx; delete l.ly; delete l.lside; dropped++;
 		});
 		// An ANCHORED Text's x/y is an offset from its anchor; a FREE one's is a position, and a
 		// position is never absurd -- it is just somewhere. Telling those two apart is the whole
@@ -38830,11 +38894,11 @@ var EngCalcs = EngCalcs || {};
 		// More than one demand category: BASE_DEMAND holds their sum, and the read-me says so.
 		var multi = doc.nodes.filter(function (n) { return n.type === 'junction' && dxfBaseDemand(n).more; }).length;
 		if (multi) {
-			readme.push((pc.lpn_dxf_note_categories || '{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.')
+			readme.push((pc.lpn_dxf_note_categories || 'Junctions with more than one demand category: {n}. Their {tag} attribute holds the sum of the base demands of all categories.')
 				.replace('{n}', String(multi)).replace('{tag}', tt.tagOf('junction', 'DEMAND')));
 		}
 		if (longOnes) {
-			readme.push((pc.lpn_dxf_note_shortened || '{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.')
+			readme.push((pc.lpn_dxf_note_shortened || 'Values longer than a DXF file allows ({max} characters): {n}. Each was shortened and ends in three periods.')
 				.replace('{n}', String(longOnes)).replace('{max}', String(EngCalcs.lpnDxfLimit)));
 		}
 		return {
@@ -38923,11 +38987,11 @@ var EngCalcs = EngCalcs || {};
 		});
 		if (!types && !fittings && !coords && !custs) { return; }
 		if (types) {
-			said.push((pc.lpn_inp_export_flat_types || '{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so the link between one definition and every pipe that uses it is recorded only in the project file.')
+			said.push((pc.lpn_inp_export_flat_types || 'Pipes ({n}) here refer to pipe types ({t}). In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so the link between one definition and every pipe that uses it is recorded only in the project file.')
 				.replace('{n}', String(types.ids.length)).replace('{t}', String(types.detail || '?')));
 		}
 		if (custs) {
-			said.push((pc.lpn_inp_export_flat_customers || 'An EPANET file has no customers. The demand of the {n} customers in this project is written as a demand row on the junction each customer is assigned to, named with the customer\'s tag. The file does not record the customer itself: its location, the pipe that serves it, where along that pipe the service connects, or how many services it represents. That information remains in the project; save the project file to keep it.')
+			said.push((pc.lpn_inp_export_flat_customers || 'An EPANET file has no customers. The demand of the customers in this project ({n}) is written as a demand row on the junction each customer is assigned to, named with the customer\'s tag. The file does not record the customer itself: its location, the pipe that serves it, where along that pipe the service connects, or how many services it represents. That information remains in the project; save the project file to keep it.')
 				.replace('{n}', String(custs.ids.length)));
 		}
 		if (coords) {
@@ -38935,7 +38999,7 @@ var EngCalcs = EngCalcs || {};
 				.replace('{n}', String(coords.ids.length)));
 		}
 		if (fittings) {
-			said.push((pc.lpn_inp_export_flat_fittings || 'An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.')
+			said.push((pc.lpn_inp_export_flat_fittings || 'An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of pipes here ({n}) is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.')
 				.replace('{n}', String(fittings.ids.length)));
 		}
 		openDialog(function (body) {
@@ -49730,7 +49794,10 @@ var EngCalcs = EngCalcs || {};
 			// gesture whose whole point is that nothing in the drawing changed. The cull keeps a
 			// full view-span of margin on every side, so a pan shorter than a screen never reaches
 			// a stretch that has not been labelled yet, and a longer one fills in on release.
-			var wasPan = drag && drag.type === 'pan';
+			var wasPan = drag && drag.type === 'pan',
+				// A data label let go takes its nearest side (labelInHand()); laid out once more
+				// with the hand gone, so it does so at the drop and not at some later redraw.
+				wasLabel = drag && drag.pointerId === e.pointerId && (drag.type === 'nodelbl' || drag.type === 'linklbl');
 			// **THE PATH HANDLE COMMITS ON RELEASE**, before `drag` is dropped -- it is the one drag
 			// type whose whole result is decided by where the pointer let go (Task 509).
 			if (drag && drag.type === 'profilehandle' && drag.pointerId === e.pointerId) { profileHandleDrop(); }
@@ -49778,6 +49845,7 @@ var EngCalcs = EngCalcs || {};
 			// Task 647: a pan is the gesture that can put the whole network off screen by hand,
 			// and its release is the "at rest" moment -- never mid-drag.
 			if (wasPan && !drag) { relayoutLabels(); updateOffscreenNotice(); }
+			if (wasLabel && !drag) { relayoutLabels(); }
 		}
 		svg.addEventListener('pointerup', function (e) { endPointer(e, false); });
 		svg.addEventListener('pointercancel', function (e) { endPointer(e, true); });
@@ -51168,7 +51236,7 @@ var EngCalcs = EngCalcs || {};
 				applyOneUnit(name, to);
 				rememberUnitSelections();
 				afterUnitChange(unitFromMap(name, from));
-				setNotice(String(pc.lpn_status_reinterpreted || '{n} values now mean {unit}. Nothing was rewritten.')
+				setNotice(String(pc.lpn_status_reinterpreted || 'Values ({n}) now mean {unit}. Nothing was rewritten.')
 					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
 			} },
 			// **THE UNDO SNAPSHOT IS THE BACKUP, AND NO SECOND COPY IS OFFERED** (Task 425's open
@@ -51197,7 +51265,7 @@ var EngCalcs = EngCalcs || {};
 				n = (fOld && fNew) ? convertUnitValues(name, fNew / fOld) : 0;
 				rememberUnitSelections();
 				afterUnitChange(unitFromMap(name, from));
-				setNotice(String(pc.lpn_status_converted || '{n} values were rewritten into {unit}.')
+				setNotice(String(pc.lpn_status_converted || 'Values ({n}) were rewritten into {unit}.')
 					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
 			} },
 			// Cancel does nothing on purpose, and there is nothing for it to do: the select was put
@@ -53381,6 +53449,7 @@ var EngCalcs = EngCalcs || {};
 	// relayoutLabels() ends with. No shed, no placement, no measurement.
 	function applyLabelBucket(e) {
 		var fsNow = effectiveFontSize() + 'px';
+		contentPassAt = null;   // the screen is now the bucket's picture -- see relayoutLabels()
 		beginLinkGeomHold();
 		try {
 			doc.nodes.forEach(function (n) {
@@ -53441,6 +53510,25 @@ var EngCalcs = EngCalcs || {};
 		k = labelBucketOf(s);
 		sc = C.anchor * Math.pow(LABEL_BUCKET_STEP, k);
 		e = C.entries[k];
+		// **A CONTENT PASS AT THIS VERY SCALE, AND NOTHING WRITTEN SINCE, IS THIS BUCKET'S ANSWER**
+		// (Task 681). A project switch lays its labels out once, at the view it arrives at, and the
+		// view change that brought it there queued this settle 120 ms later -- which then ran the
+		// whole pass again at the same scale, for the same picture: 1.3 s on a 600-junction network
+		// with every field on, as much as the switch's own pass. The zoom pass and the content pass
+		// draw the identical layout at one scale (dev/lpn-spike/switch-cost-browser-harness.js
+		// compares the two, element for element), so the screen is banked as it stands. Not a
+		// shortcut past the rule that a bucket's answer is final: it IS the bucket's answer, laid
+		// out at the bucket's own scale, and it is never revisited.
+		if (!e && sameScale(sc, s) && contentPassAt && contentPassAt.gen === labelCacheGen &&
+				sameScale(contentPassAt.s, s) && labelCacheInvalidates) {
+			labelCacheMiss = (labelCacheMiss ? labelCacheMiss + ', so ' : '') + 'banked as laid out';
+			C.entries[k] = withBucketView(s, function () { return captureLabelBucket(s); });
+			C.order = C.order.filter(function (x) { return x !== k; });
+			C.order.push(k);
+			while (C.order.length > LABEL_BUCKET_MAX) { delete C.entries[C.order.shift()]; }
+			lastLayoutScale = s;
+			return;
+		}
 		if (e) {
 			// The bucket's own scale, or the one on screen when they are the same notch: a scale
 			// reached by ten wheel notches differs from anchor x 1.1^10 in the last bits.
@@ -57830,7 +57918,7 @@ var EngCalcs = EngCalcs || {};
 			times = doc.times || (EngCalcs.lpnTimesDefaults ? EngCalcs.lpnTimesDefaults() : { patternStep: 3600 }),
 			step = times.patternStep > 0 ? times.patternStep : 3600,
 			fmt = EngCalcs.lpnFormatTime || function (s) { return String(s); };
-		return (pc.lpn_library_pattern_span || '{n} multipliers, {step} apart, covering {span}')
+		return (pc.lpn_library_pattern_span || 'Multipliers: {n}, {step} apart, covering {span}')
 			.replace('{n}', String(n))
 			.replace('{step}', fmt(step))
 			.replace('{span}', fmt(step * n));
@@ -58912,7 +59000,7 @@ var EngCalcs = EngCalcs || {};
 			var inUse = pipeTypeUsers(t.id);
 			if (inUse.length) {
 				setWarning((pc.lpn_library_pipetype_in_use
-					|| 'This pipe type is used by {count} pipes: {ids}. Detach it from them before deleting it.')
+					|| 'This pipe type is used by pipes ({count}): {ids}. Detach it from them before deleting it.')
 					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
 				return;
 			}
@@ -59174,7 +59262,7 @@ var EngCalcs = EngCalcs || {};
 			var inUse = fittingSetUsers(set.id);
 			if (inUse.length) {
 				setWarning((pc.lpn_library_fittings_in_use
-					|| 'This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it.')
+					|| 'This fittings list is used by pipes ({count}): {ids}. Detach it from them before deleting it.')
 					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
 				return;
 			}
@@ -59423,7 +59511,7 @@ var EngCalcs = EngCalcs || {};
 			var inUse = curveUsers(c.id);
 			if (inUse.length) {
 				setWarning((pc.lpn_library_curve_in_use
-					|| 'This curve is used by {count} elements: {ids}. Assign another curve to them first, then delete this one.')
+					|| 'This curve is used by elements ({count}): {ids}. Assign another curve to them first, then delete this one.')
 					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
 				return;
 			}
@@ -62262,11 +62350,11 @@ var EngCalcs = EngCalcs || {};
 			});
 		} while (dropped && plan.length);
 		if (!plan.length) {
-			setNotice((pc.lpn_prefix_applied || 'Renamed {n} assets. {skipped} others were not changed.')
+			setNotice((pc.lpn_prefix_applied || 'Assets renamed: {n}. Assets not changed: {skipped}.')
 				.replace('{n}', '0').replace('{skipped}', String(skipped)));
 			return;
 		}
-		askDialog({ kind: 'confirm', text: (pc.lpn_confirm_apply_prefix || 'Rename {n} assets so their IDs start with {prefix}? Each one keeps its number.')
+		askDialog({ kind: 'confirm', text: (pc.lpn_confirm_apply_prefix || 'Rename assets ({n}) so their IDs start with {prefix}? Each one keeps its number.')
 			.replace('{n}', String(plan.length)).replace('{prefix}', prefix) }, function (yes) {
 			if (!yes) { return; }
 			saveUndoSnapshot();
@@ -62285,7 +62373,7 @@ var EngCalcs = EngCalcs || {};
 			requestLabelRefresh();
 			scheduleSolve();
 			saveToStorage();
-			setNotice((pc.lpn_prefix_applied || 'Renamed {n} assets. {skipped} others were not changed.')
+			setNotice((pc.lpn_prefix_applied || 'Assets renamed: {n}. Assets not changed: {skipped}.')
 				.replace('{n}', String(plan.length)).replace('{skipped}', String(skipped)));
 		});
 	}
@@ -62878,7 +62966,7 @@ var EngCalcs = EngCalcs || {};
 		// from the meters: how many, and how much.
 		count = document.createElement('span');
 		count.className = 'lpn-node-customers-count';
-		count.textContent = (pc.lpn_node_customers_sum || '{total} {unit} from {n} Customers')
+		count.textContent = (pc.lpn_node_customers_sum || '{total} {unit} from Customers ({n})')
 			.split('{n}').join(String(list.length))
 			.split('{total}').join(String(+total.toFixed(6)))
 			.split('{unit}').join(unitLabel('lpn_u_flow'));
@@ -67294,7 +67382,14 @@ var EngCalcs = EngCalcs || {};
 		beginMapBoxHold();
 		beginLinkGeomHold();
 		try { refreshLabelTextPass(); } finally { endMapBoxHold(); endLinkGeomHold(); }
+		// Stamped LAST, so a writer inside the pass's own tail moves the generation past it.
+		contentPassAt = { gen: labelCacheGen, s: state.s };
 	}
+	// **THE SCALE THE LAST CONTENT PASS LAID THE LABELS OUT AT, and the bank generation it left**
+	// (Task 681). A zoom settle that lands on that same scale with no label writer in between has
+	// the answer on screen already: the bank keeps it rather than computing it a second time. See
+	// labelCacheSettle().
+	var contentPassAt = null;
 	// The end of a content pass that is NOT about the lettering, so it can be run on its own when
 	// the lettering is skipped. One definition and two callers rather than two copies.
 	function refreshLabelPassTail() {
@@ -67434,6 +67529,7 @@ var EngCalcs = EngCalcs || {};
 		var ls = labelSettings, nd = ls.decimals.node, ld = ls.decimals.link,
 			// One string, computed once for the whole pass -- see the measurement comment below.
 			fsNow = effectiveFontSize() + 'px';
+		perfDebugLap(null);
 		// Every field below is rounded through the same displayRound()/per-field-decimals rule the
 		// label text uses, so a tie in what is printed is always a tie in what gets decorated.
 		//
@@ -67566,6 +67662,7 @@ var EngCalcs = EngCalcs || {};
 			rate: fieldExtrema(doc.links.map(function (l) { return plainRound(linkReactionRate(l), ld.rate); }))
 		};
 		var nodeLines = {}, linkLines = {};
+		perfDebugLap('  lblValues');
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id]; if (!ne) { return; }
 			var lines = nodeLabelFieldLines(n, ls, extrema);
@@ -67593,10 +67690,12 @@ var EngCalcs = EngCalcs || {};
 		// the writes finished, the first read lays out once and the other 255 are free. The font size
 		// is set in the loop above for the reason its comment gives -- a width measured at one scale
 		// and banked at another is wrong by the zoom ratio -- and it is a WRITE, so it belongs there.
+		perfDebugLap('  lblNodeWrite');
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id]; if (!ne) { return; }
 			measureLabelWidths(ne);
 		});
+		perfDebugLap('  lblNodeMeasure');
 		// **THE LINK HALF IS THREE PASSES FOR THE SAME REASON THE NODE HALF IS TWO** (Task 440), with
 		// one extra turn of the screw: its shed cascade is itself a write-then-read loop, so the
 		// cascade too is iterated a RUNG at a time across every label rather than run to the bottom
@@ -67651,8 +67750,10 @@ var EngCalcs = EngCalcs || {};
 			ce.allLines = cLines;
 			custWork.push(ce);
 		});
+		perfDebugLap('  lblLinkWrite');
 		custWork.forEach(function (ce) { measureLabelWidths(ce); });
 		linkWork.forEach(function (rec) { measureLabelWidths(rec.le); });
+		perfDebugLap('  lblLinkMeasure');
 		// **A DRAGGED LABEL NEVER SHEDS**, the same hedge and the same reasoning that exempts it
 		// from the short-pipe rule: dragging a label off a stub is exactly what you do when you
 		// want that number on the sheet, so the gesture that reveals the intent is one the user
@@ -67666,6 +67767,7 @@ var EngCalcs = EngCalcs || {};
 			rec.le.shedCount = rec.all.length - rec.le.lines.length;
 			linkLines[rec.l.id] = rec.le.lines;
 		});
+		perfDebugLap('  lblLinkShed');
 		// **CONTENT DECISIONS HERE, POSITION DECISIONS IN THE COLLISION PASS** (Task 399). The
 		// length-driven cascade above only fires when a label is wider than its own pipe, which
 		// measured 45-84% on a normal drawing; the shed a reader actually meets is the CROWDING one,
@@ -67824,6 +67926,10 @@ var EngCalcs = EngCalcs || {};
 	var lastLayoutScale = null;
 	function relayoutLabels(shedNodes) {
 		labelCacheTaint();   // the zoom-bucket bank: any layout it did not ask for empties it
+		// The bank's OWN passes do not move the generation, so the stamp is dropped here as well:
+		// whatever this lays out is no longer the content pass's picture (refreshLabelText() sets it
+		// again once its own pass, which runs through here, is done).
+		contentPassAt = null;
 		// Placing text that a requested content pass is about to rewrite would place the old text
 		// (Task 653). Inside the pass itself nothing is owed, so this is a no-op there.
 		flushLabelRefresh();
@@ -67855,9 +67961,13 @@ var EngCalcs = EngCalcs || {};
 		beginMapBoxHold();   // one canvas measurement for the whole pass -- see mapBox()
 		beginLinkGeomHold(); // one segment index for the whole pass -- see linkSegIndex()
 		try {
+			perfDebugLap(null);
 			runLabelCollisionAvoidance(shedNodes);
+			perfDebugLap('   rlCollide');
 			doc.nodes.forEach(function (n) { if (nodeEls[n.id]) { layoutNodeLabel(n.id); } });
+			perfDebugLap('   rlNodes');
 			doc.links.forEach(function (l) { if (linkEls[l.id]) { layoutLinkLabel(l.id); } });
+			perfDebugLap('   rlLinks');
 			doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
 		} finally { endMapBoxHold(); endLinkGeomHold(); }
 	}
@@ -69155,7 +69265,7 @@ var EngCalcs = EngCalcs || {};
 		ffEl('p', 'lpn-ff-summary', ffSummaryText(set), host);
 		dsTimeLines(host, fireFlowRunT);
 		if (set.counts.error) {
-			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_summary_error || '{n} junctions could not be solved.')
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_summary_error || 'Junctions that could not be solved ({n}).')
 				.replace('{n}', String(set.counts.error)), host);
 		}
 		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
@@ -69325,7 +69435,7 @@ var EngCalcs = EngCalcs || {};
 		// dialog and the table it turns into would count the same run two different ways.
 		text = ffSummaryText({ modes: modes || { fire: 0, design: 0, clean: 0 } });
 		if (counts.error) {
-			text += ' ' + (pc.lpn_ff_summary_error || '{n} junctions could not be solved.')
+			text += ' ' + (pc.lpn_ff_summary_error || 'Junctions that could not be solved ({n}).')
 				.replace('{n}', String(counts.error));
 		}
 		ffRunUi.tally.textContent = text;
@@ -69686,7 +69796,7 @@ var EngCalcs = EngCalcs || {};
 		// the minimum. A link that cuts off only zero-demand junctions shows them in its row, but it
 		// cut off no demand, so it is not counted here.
 		hit = set.results.filter(function (r) { return r.unserved > 0 || (r.below && r.below.length > 0); }).length;
-		ffEl('p', 'lpn-ff-summary', (pc.lpn_crit_summary || '{n} of {total} assets leave demand unserved or drop a junction below {pressure}.')
+		ffEl('p', 'lpn-ff-summary', (pc.lpn_crit_summary || 'Assets that leave demand unserved or drop a junction below {pressure} ({n} of {total}).')
 			.replace('{n}', String(hit)).replace('{total}', String(set.results.length))
 			.split('{pressure}').join(ffQty(set.minPressure, 'lpn_u_pressure')), host);
 		dsTimeLines(host, critRunT);
@@ -70422,7 +70532,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (!sum && EngCalcs.lpnTimeRunStopped && EngCalcs.lpnTimeRunStopped()) {
 			ffEl('p', 'lpn-ff-note', pc.lpn_energy_stopped ||
-				'The EPANET run stopped before the end of the period, so no pump energy figures were kept.', host);
+				'The EPANET run stopped before the end of the period, so no pump energy results were computed.', host);
 			return;
 		}
 		if (!sum) {
@@ -71605,7 +71715,7 @@ var EngCalcs = EngCalcs || {};
 		frames = reportFrames();
 		if (!frames.length && lastSolveResult) { frames = [lastSolveResult]; }
 		ffEl('p', 'lpn-ff-note', pc.lpn_full_note || 'One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.', host);
-		ffEl('p', 'lpn-ff-note', (pc.lpn_full_row_count || '{n} rows.').replace('{n}', String(rows.length)), host);
+		ffEl('p', 'lpn-ff-note', (pc.lpn_full_row_count || 'Rows ({n}).').replace('{n}', String(rows.length)), host);
 		if (fullReportStepIndex >= frames.length || fullReportStepIndex < 0) { fullReportStepIndex = 0; }
 		if (frames.length > 1) {
 			sel = document.createElement('select');
@@ -71800,7 +71910,7 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		res = calibCompute(def.key);
-		ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_file || '{file}: {n} measurements at {m} locations.')
+		ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_file || '{file}: measurements ({n}) at locations ({m}).')
 			.replace('{file}', file.name).replace('{n}', String(file.parsed.obs.length))
 			.replace('{m}', String(file.parsed.order.length)), host);
 		if (unit) {
@@ -72551,6 +72661,19 @@ var EngCalcs = EngCalcs || {};
 	// The heads and flows on screen, for dev/lpn-spike/snap-browser-harness.js (Task 782): it asserts
 	// that a model edited by snapping still solves.
 	EngCalcs.lpnSolveProbe = function () { return lastSolveResult; };
+	// One data label as stored and as drawn, in drawing units, for
+	// dev/lpn-spike/label-leader-keep-harness.js (Task 807): a dragged label must not move.
+	EngCalcs.lpnLabelProbe = function (kind, id) {
+		var x = kind === 'node' ? nodeById(id) : linkById(id),
+			h = kind === 'node' ? nodeEls[id] : linkEls[id], L = h && h.leader;
+		if (!x || !h) { return null; }
+		return { lx: x.lx, ly: x.ly, nudge: h.nudge ? { x: h.nudge.x, y: h.nudge.y } : null,
+			end: kind === 'node' ? nodeLabelPos(x) : linkLabelPos(x),
+			anchor: kind === 'node' ? nodeAt(x) : linkLabelMid(x),
+			leader: (L && L.style.display !== 'none') ? { x1: +L.getAttribute('x1'), y1: +L.getAttribute('y1'),
+				x2: +L.getAttribute('x2'), y2: +L.getAttribute('y2') } : null,
+			hidden: !!(h.text && h.text.style.visibility === 'hidden'), side: h.side, lside: x.lside, w: labelBoxWidth(h) };
+	};
 	// The Full report's Type column harness opens the box through this, not through the menu.
 	EngCalcs.lpnOpenFullReportBox = function () { return openFullReportBox(); };
 

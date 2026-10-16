@@ -143,15 +143,13 @@ const LBL = { id: 'n:J1', anchor: { x: 0, y: 0 }, home: { x: 4, y: -4 }, w: 20, 
 		return d <= Math.PI / 4 + 1e-9;
 	}), 'a candidate neighbours the NEAREST direction on the next circle out');
 
-	// GOAL 1: a dragged label's candidates lie on the RAY through the endpoint the user gave it.
+	// GOAL 1 (Task 807): a dragged label's one candidate is the endpoint the user gave it.
 	const dragged = Object.assign({}, LBL, { dragged: true, home: { x: 30, y: -40 } });
 	const ray = C.candidatesFor(dragged, 10, 25);
-	report(ray[0].x === 30 && ray[0].y === -40, 'the stored endpoint is the first candidate');
-	const cross = ray.every(c => near(c.x * -40 - c.y * 30, 0, 1e-9));
-	report(cross, 'and every other candidate is collinear with it -- stretched, never turned');
-	report(ray.every(c => Math.hypot(c.x, c.y) >= 50 - 1e-9), '...and never nearer than the user put it');
+	report(ray.length === 1 && ray[0].x === 30 && ray[0].y === -40,
+		'a dragged label has exactly one candidate, the stored endpoint -- never stretched');
 	report(C.candidatesFor(Object.assign({}, LBL, { dragged: true, home: { x: 0, y: 0 } }), 10, 25).length === 1,
-		'a dragged label sitting on its own anchor has no ray, and does not produce NaN');
+		'a dragged label sitting on its own anchor has one candidate, and does not produce NaN');
 }
 
 // ---- 3. the ranking ---------------------------------------------------------------------------
@@ -249,16 +247,14 @@ console.log('\n--- the pass itself ---');
 	report(order.indexOf('n:J12') < order.indexOf('n:J0'),
 		'the most crowded label chooses before the one in the corner', order.slice(0, 5).join(' '));
 
-	// GOAL 1 END TO END: a dragged label in the middle of the crowd stays on its own ray.
+	// GOAL 1 END TO END: a dragged label in the middle of the crowd stays exactly where it was put.
 	const dl = crowd(0);
 	dl.labels[12].dragged = true;
 	dl.labels[12].home = { x: 20 + 12, y: 20 - 9 };
 	const res = C.placeLabels(dl.labels, dl.obs, { inner: 6, outer: 15, k: 0.5 })
 		.filter(r => r.id === 'n:J12')[0];
-	report(near((res.x - 20) * -9 - (res.y - 20) * 12, 0, 1e-6),
-		'a dragged label placed among 24 others is still on the line the user drew', res.x + ',' + res.y);
-	report(Math.hypot(res.x - 20, res.y - 20) >= 15 - 1e-9,
-		'...and is never pulled back nearer than the endpoint it was given');
+	report(res.x === 32 && res.y === 11 && res.dx === 0 && res.dy === 0,
+		'a dragged label placed among 24 others is exactly where the user put it', res.x + ',' + res.y);
 }
 
 console.log('\n--- the index agrees with the definition it stands in for ---');
@@ -531,16 +527,21 @@ console.log("\n--- goal 3: an auto-placed label never sits on its own leader (To
 {
 	const geom = require('../../js/lpn-geom.js').lpnGeom;
 	const page = fs.readFileSync(path.join(__dirname, '../../js/looped-network.js'), 'utf8');
-	const at = page.search(/function dataLabelOrigin\s*\(/);
-	let i = page.indexOf('{', at), depth = 0, end = i;
-	for (; end < page.length; end++) {
-		if (page[end] === '{') { depth++; }
-		else if (page[end] === '}') { depth--; if (depth === 0) { end++; break; } }
+	function fnSrc(name) {
+		const at = page.search(new RegExp('function ' + name + '\\s*\\('));
+		let i = page.indexOf('{', at), depth = 0, end = i;
+		for (; end < page.length; end++) {
+			if (page[end] === '{') { depth++; }
+			else if (page[end] === '}') { depth--; if (depth === 0) { end++; break; } }
+		}
+		return page.slice(at, end);
 	}
 	const W = 40;
-	const Geom = geom, ADVERSE_FRAC = 0.75;
+	const Geom = geom;
+	const DATA_LABEL_FLIP_FRAC = +/var DATA_LABEL_FLIP_FRAC = ([0-9.]+)/.exec(page)[1];
 	const labelBoxWidth = () => W;
-	const dataLabelOrigin = eval('(' + page.slice(at, end) + ')');
+	const movedLabelSide = eval('(' + fnSrc('movedLabelSide') + ')');
+	const dataLabelOrigin = eval('(' + fnSrc('dataLabelOrigin') + ')');
 
 	const anchor = { x: 0, y: 0 };
 	// Sweep both prior sides across the whole dead band and well past it.
@@ -558,14 +559,28 @@ console.log("\n--- goal 3: an auto-placed label never sits on its own leader (To
 	report(onNearSide === 0, 'an auto-placed box never contains its own anchor, at any endpoint or prior side',
 		swept + ' swept');
 
-	// ...and the hysteresis is still there for a hand on a label, which is what it was for.
+	// ...and a label the user MOVED holds its side until its leader end is HALF ITS WIDTH past the
+	// anchor's line (Tom, 2026-10-15), in the hand and after it, and from its stored side on reload.
 	const held = { side: 'left' };
-	const dragged = dataLabelOrigin(held, anchor, { x: 6, y: -20 }, true);
+	const dragged = dataLabelOrigin(held, anchor, { x: 6, y: -20 }, true, true);
 	report(held.side === 'left' && dragged.x === 6 - W,
 		'a DRAGGED label keeps the hysteresis -- it is what stops a flicker under the hand');
 	const auto = { side: 'left' };
 	dataLabelOrigin(auto, anchor, { x: 6, y: -20 }, false);
 	report(auto.side === 'right', '...and the same endpoint auto-placed takes the nearest side instead');
+	let firstFlip = null;
+	for (let endX = 0; endX <= W; endX += 0.5) {
+		const owner = { lside: 'left' }, h = {};
+		dataLabelOrigin(h, anchor, { x: endX, y: 0 }, owner, false);
+		if (h.side === 'right') { firstFlip = endX; break; }
+	}
+	report(firstFlip === W / 2 + 0.5, 'a moved label let go flips only once its end is past half its width (' + W / 2 + ')', 'flipped at ' + firstFlip);
+	const reloaded = { lside: 'right' }, h2 = {};
+	dataLabelOrigin(h2, anchor, { x: -W / 2, y: 0 }, reloaded, false);
+	report(h2.side === 'right', 'after a reload the stored side holds right up to half the width');
+	const fresh = {}, h3 = {};
+	dataLabelOrigin(h3, anchor, { x: -3, y: 0 }, fresh, false);
+	report(h3.side === 'left' && fresh.lside === 'left', 'a file with no stored side starts from the nearest side, and stores it');
 }
 
 console.log('\n--- the measured constants are the ones that SHIP --------------------------------');
