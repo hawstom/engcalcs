@@ -61,6 +61,10 @@
 		EN_EMITTER = 3,
 		EN_HEAD = 10,
 		EN_PRESSURE = 11,
+		// A tank's limits, in the same length unit as its head, so full and empty are EPANET's
+		// own comparison and not one of ours (R-402).
+		EN_MINLEVEL = 20,
+		EN_MAXLEVEL = 21,
 		EN_DEMANDDEFICIT = 27,
 		// The node's water-quality value at the moment the quality clock is standing on. What it
 		// MEANS is whatever [OPTIONS] Quality asked for: HOURS for water age, PERCENT for a source
@@ -1573,6 +1577,76 @@
 	 * which is the part a user can act on, and nothing of ours could reconstruct them. The caller
 	 * says the rest in the user's language.
 	 */
+	/**
+	 * **WHICH LINK EPANET HAD CLOSED WHEN A RUN STOPPED, AND WHY** (R-402; Tom, 2026-10-15:
+	 * "It seems to me that the solver should be smart enough to handle 0"). Error 110 says only
+	 * that EPANET "cannot solve network hydraulic equations". Its status report says more, at the
+	 * stop: "System ill-conditioned at node X", "Pipe L temporarily closed" (or "changed from open
+	 * to temporarily closed"), and sometimes "Node Y disconnected at ...". This reads those back
+	 * and adds the one fact the report leaves out: whether L joins a tank that stood full or empty,
+	 * which is why EPANET closes such a link (to keep water out of a full tank, or in an empty one).
+	 *
+	 * Measured on Tom's Fotobi project with its demand patterns at 0 (dev/lpn-spike/zero-demand-stop-harness.js): a
+	 * full tank, no water moving, pipes with minor losses. EPANET closes and reopens the pipe beside
+	 * the tank on flows of next to nothing, and at one of those closures its matrix gives out. Stock
+	 * EPANET on the exported .inp stops identically, and no [OPTIONS] value changes it. Nothing here
+	 * changes a number; it only says which link, which tank and which nodes.
+	 *
+	 * Returns { link, nodes, tank, tankState } or null where the report names no closed link at
+	 * the stop.
+	 */
+	EngCalcs.lpnRunCutOff = function (report, model, tankStates) {
+		var lines = String(report || '').split(/\r?\n/), i, m, stopAt = -1, clock = null, link = null,
+			nodes = [], seen = {}, lk, ends, k, tank = null, st = null;
+		// The stop is the last time-stamped line before the error line.
+		for (i = 0; i < lines.length; i++) {
+			if (/Error 110\b/.test(lines[i])) { stopAt = i; break; }
+		}
+		if (stopAt < 0) { return null; }
+		for (i = stopAt - 1; i >= 0 && clock === null; i--) {
+			m = /^\s*(\d+:\d\d:\d\d):/.exec(lines[i]);
+			if (m) { clock = m[1]; }
+		}
+		if (clock === null) { return null; }
+		function add(id) { if (!seen[id]) { seen[id] = true; nodes.push(id); } }
+		for (i = 0; i < stopAt; i++) {
+			m = /^\s*(\d+:\d\d:\d\d):\s+(?:Pipe|Pump|Valve|\w+) (\S+) (?:temporarily closed|changed from \S+ to (?:temporarily )?closed)\s*$/.exec(lines[i]);
+			if (m && m[1] === clock) { link = m[2]; }
+		}
+		// A link closed earlier and still closed is not logged again at the stop; EPANET then names
+		// it in its own "System disconnected because of Link L" warning.
+		if (link === null) {
+			for (i = 0; i < stopAt; i++) {
+				m = /System disconnected because of Link (\S+)/.exec(lines[i]);
+				if (m) { link = m[1]; }
+			}
+		}
+		if (link === null) { return null; }
+		// The nodes the engine itself names at the stop: disconnected ones where it lists them,
+		// else the node it could not solve for.
+		for (i = 0; i < stopAt; i++) {
+			m = /WARNING: Node (\S+) disconnected at (\S+) hrs/.exec(lines[i]);
+			if (m && m[2] === clock) { add(m[1]); }
+		}
+		if (!nodes.length) {
+			for (i = 0; i < stopAt; i++) {
+				m = /^\s*(\d+:\d\d:\d\d):\s+System ill-conditioned at node (\S+)/.exec(lines[i]);
+				if (m && m[1] === clock) { add(m[2]); }
+			}
+		}
+		if (!nodes.length) { return null; }
+		lk = ((model && model.links) || []).filter(function (l) { return String(l.id) === link; })[0];
+		if (lk) {
+			ends = [lk.from, lk.to];
+			for (k = 0; k < ends.length; k++) {
+				if (tankStates && (tankStates[ends[k]] === 'full' || tankStates[ends[k]] === 'empty')) {
+					tank = String(ends[k]); st = tankStates[ends[k]]; break;
+				}
+			}
+		}
+		return { link: link, nodes: nodes, tank: tank, tankState: st };
+	};
+
 	function engineRefusal(err, extra) {
 		var out = {
 			ok: false, refused: true, engine: 'epanet', issues: [], warnings: [],
@@ -2294,8 +2368,29 @@
 							report: report
 						});
 					}
+					// 'full', 'empty' or absent per tank, from the engine's own numbers at this
+					// moment, all in one unit so no conversion can disagree with EPANET's test.
+					function tankStatesNow() {
+						var out = {}, k, n, ix, h, el, tol = 1e-3;
+						for (k = 0; k < model.nodes.length; k++) {
+							n = model.nodes[k];
+							if (n.type !== 'tank') { continue; }
+							try {
+								ix = nodeIdx[n.id];
+								h = p.getNodeValue(ix, EN_HEAD);
+								el = p.getNodeValue(ix, EN_ELEVATION);
+								if (h >= el + p.getNodeValue(ix, EN_MAXLEVEL) - tol) { out[n.id] = 'full'; }
+								else if (h <= el + p.getNodeValue(ix, EN_MINLEVEL) + tol) { out[n.id] = 'empty'; }
+							} catch (err) { /* the engine could not be asked; no state is claimed */ }
+						}
+						return out;
+					}
 					function failed(e) {
 						var kept = hydPhase ? frames : [], last = kept.length ? kept[kept.length - 1].t : null;
+						// Read BEFORE shutdown(): whether each tank stood full or empty at the
+						// period that stopped, which is what decides WHY EPANET closed a link
+						// beside it (R-402). See EngCalcs.lpnRunCutOff().
+						var tankStates = hydPhase ? tankStatesNow() : {};
 						// A run that threw part-way is the same damaged engine as a refusal.
 						var failedReport = shutdown();
 						if (ws === workspace) { retireEngine(); }
@@ -2312,6 +2407,7 @@
 							// zeroed.
 							warnings: built.warnings, frames: kept, partial: kept.length > 0, solvedTo: last, qualityNotRun: !!qualOn,
 							report: failedReport, stoppedAt: t,
+							cutOff: hydPhase ? EngCalcs.lpnRunCutOff(failedReport, model, tankStates) : null,
 							duration: duration, reportStart: reportStart, reportStep: reportStep
 						}));
 					}

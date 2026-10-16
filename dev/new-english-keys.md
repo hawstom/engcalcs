@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**10 still to read on master**, of 15 untranslated keys, of 2639 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**13 still to read on master**, of 18 untranslated keys, of 2642 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,7 +199,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (14, 9 to read @@ NEEDS RULING)
+## lpn_  (17, 12 to read @@ NEEDS RULING)
 
 - **`lpn_energy_stopped`**
   > The EPANET run stopped before the end of the period, so no pump energy results were computed.
@@ -224,6 +224,15 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_snip_tip_copy`**
   > Copy (Ctrl+C)
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off`**
+  > EPANET had closed {link} and then could not solve for {nodes}.
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off_empty`**
+  > Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off_full`**
+  > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
   @@ NEEDS RULING
 - **`lpn_time_run_stopped`**
   > The EPANET run stopped at {time}, so it has no results. Its run report says why.
@@ -254,7 +263,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**496 still to read**, of 499 new keys across 18 unmerged branch(es).
+**496 still to read**, of 499 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -265,11 +274,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/batch-1016 (`d1c51dca`) — adds no English strings
-
 ### chore/ledger-wording (`37092cd7`) — adds no English strings
 
-### feat/bentley-interop (`c72f83eb`) — 162 new, 162 to read @@ NEEDS RULING
+### feat/bentley-interop (`bf5908c2`) — 162 new, 162 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -677,10 +684,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > List overrides
   @@ NEEDS RULING
 - **`lpn_sm_list_overrides_none`**
-  > This scenario has no overrides of its own.
+  > This scenario has no overrides.
   @@ NEEDS RULING
 - **`lpn_sm_list_overrides_tip`**
-  > List the overrides the selected scenario holds itself, by category, each with the value it replaces. Inherited values are not listed.
+  > List the scenario's overrides by category, each with the inherited value it overrides.
   @@ NEEDS RULING
 - **`lpn_sm_make_current`**
   > Make current
@@ -1308,10 +1315,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Drag to resize
   @@ NEEDS RULING
 
-### feat/plural (`daa905a8`) — adds no English strings
-
-### fix/mtc-vertical-sides (`09836047`) — adds no English strings
-
 ### fix/text-edit-phone (`e3ab83b8`) — 162 new, 162 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
@@ -1800,5 +1803,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_tsb_resize`**
   > Drag to resize
   @@ NEEDS RULING
-
-### fix/wording-1016 (`c8cdcae8`) — adds no English strings
