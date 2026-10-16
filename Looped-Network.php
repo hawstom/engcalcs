@@ -3940,6 +3940,7 @@ EngCalcs.pageConfig = {
 	lpn_settings_row_customer_max_width: <?=json_encode($ec_lang['lpn_settings_row_customer_max_width'])?>,
 	lpn_settings_row_quality_step: <?=json_encode($ec_lang['lpn_settings_row_quality_step'])?>,
 	lpn_settings_row_view: <?=json_encode($ec_lang['lpn_settings_row_view'])?>,
+	lpn_settings_row_bubbles: <?=json_encode($ec_lang['lpn_settings_row_bubbles'])?>,
 	lpn_settings_row_contour_fill: <?=json_encode($ec_lang['lpn_settings_row_contour_fill'])?>,
 	lpn_settings_row_contour_opacity: <?=json_encode($ec_lang['lpn_settings_row_contour_opacity'])?>,
 	lpn_settings_row_contour_interval: <?=json_encode($ec_lang['lpn_settings_row_contour_interval'])?>,

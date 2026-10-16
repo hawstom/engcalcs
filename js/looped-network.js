@@ -5534,6 +5534,7 @@ var EngCalcs = EngCalcs || {};
 						var cat = categoryOfSetting(leaf.path);
 						if (cat === null || (cat !== undefined && cat !== r.category) || settingHasOtherHome(leaf.path)) { settingDelete(r, leaf.path); }
 					});
+					tsbCleanHeld(r);
 				} else {
 					sanitizeCalcHolder(r);
 				}
@@ -6594,6 +6595,7 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		if (path[0] === 'defaultPattern') { doc.defaultPattern = v; return; }
+		if (path[0] === 'bubbles') { doc.bubbles = tsbClean(v); if (!doc.bubbles.length) { delete doc.bubbles; } return; }
 		root = settingProjectRoot(path[0]);
 		if (!root) { return; }
 		undoTopHoldsSettingPaths([path]);
@@ -6854,6 +6856,9 @@ var EngCalcs = EngCalcs || {};
 		// contours' would do that."*). Stored OUTWARD, as a node's position override is, so no Y flip,
 		// origin shift or projection ever touches it: see outwardViewOf().
 		view: 'presentation',
+		// **THE TIME SERIES GRAPHS ON THE MAP** (Task 804, Tom 2026-10-15: *"The Time series
+		// balloons/bubbles should be a Presentation override."*): the whole set, one value.
+		bubbles: 'presentation',
 		'project.basemap': 'presentation', 'project.basemapLast': 'presentation',
 		labelSettings: 'presentation', times: 'calculation', defaultPattern: 'demand'
 	};
@@ -6894,14 +6899,15 @@ var EngCalcs = EngCalcs || {};
 	LPN_SETTING_CATEGORY_OF['settings.defaults.demand'] = 'demand';
 	// An object overridden whole rather than member by member: mode and trace node are one choice.
 	// So is a view: a centre without its scale is no place to look.
-	var LPN_SETTING_ATOMIC = { 'settings.quality': true, view: true };
+	// The graphs on the map are one set: a scenario holds all of them or none (tsbOwn()).
+	var LPN_SETTING_ATOMIC = { 'settings.quality': true, view: true, bubbles: true };
 	// Calculation options that already vary by scenario and KEEP THE HOMES THEY HAVE (Tasks 721,
 	// 755): `scenario.demandMultiplier` and `scenario.times`. scenario.settings refuses them, so a
 	// fact never has two homes; settingFor() reads them where they are.
 	var LPN_SETTING_ELSEWHERE = { 'settings.hydraulics.demandMultiplier': true,
 		'times.duration': true, 'times.hydraulicStep': true,
 		'times.text.duration': true, 'times.text.hydraulicStep': true };
-	var LPN_SETTING_ROOTS = ['settings', 'labelSettings', 'project', 'times', 'defaultPattern', 'view'];
+	var LPN_SETTING_ROOTS = ['settings', 'labelSettings', 'project', 'times', 'defaultPattern', 'view', 'bubbles'];
 	function settingPath(path) { return Array.isArray(path) ? path.slice() : String(path).split('.'); }
 	function plainObject(v) { return !!v && typeof v === 'object' && !Array.isArray(v); }
 	/**
@@ -6928,6 +6934,7 @@ var EngCalcs = EngCalcs || {};
 			case 'defaultPattern': return doc.defaultPattern || null;
 			// Where the reader is looking, in the frame a scenario's own view is stored in.
 			case 'view': return outwardViewOf(currentView());
+			case 'bubbles': return doc.bubbles;
 		}
 		return undefined;
 	}
@@ -7129,6 +7136,7 @@ var EngCalcs = EngCalcs || {};
 			});
 			// A view that is no place to look goes, on the rule a file's own view is read by.
 			if (plainObject(s.settings) && s.settings.view !== undefined && !inwardViewOf(s.settings.view)) { settingDelete(s, ['view']); }
+			tsbCleanHeld(s);
 			if (plainObject(s.settings) && !Object.keys(s.settings).length) { delete s.settings; }
 		});
 	}
@@ -7356,6 +7364,8 @@ var EngCalcs = EngCalcs || {};
 		// open would leave that field showing the number belonging to the scenario you just left --
 		// and the next keystroke would write it into the wrong place.
 		perfDebugTime('settings', function () { rebuildSettingsBox(); });
+		// Each scenario shows its own time series graphs (Task 804).
+		tsbFollow();
 		// A scenario may run on its own clock (Task 755), so the transport is redrawn for it.
 		if (EngCalcs.lpnTimeTimesChanged) { EngCalcs.lpnTimeTimesChanged(); }
 		scheduleSolve();
@@ -29267,7 +29277,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return own || 'lpn_set_sub_nodeLink';
 		}
 		if (p[0] === 'customProps') { return 'lpn_set_sub_customProps'; }
-		if (p[0] === 'project' || p[0] === 'view') { return 'lpn_set_sub_mapDisplay'; }
+		if (p[0] === 'project' || p[0] === 'view' || p[0] === 'bubbles') { return 'lpn_set_sub_mapDisplay'; }
 		if (p[0] === 'times') { return 'lpn_set_sub_time'; }
 		if (p[0] === 'defaultPattern') { return 'lpn_set_sub_hydraulics'; }
 		if (/^(basemapStyle|backdropOpacity|contour|legendPosition|colorLegendPosition)/.test(m)) { return 'lpn_set_sub_mapDisplay'; }
@@ -29400,7 +29410,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'settings.nodeElevSource': 'lpn_settings_row_elev_source_old',
 		'project.basemap': 'lpn_settings_row_basemap', 'project.basemapLast': 'lpn_settings_row_basemap_last',
 		'labelSettings.customerMaxWidth': 'lpn_settings_row_customer_max_width',
-		'times.qualityStep': 'lpn_settings_row_quality_step', view: 'lpn_settings_row_view'
+		'times.qualityStep': 'lpn_settings_row_quality_step', view: 'lpn_settings_row_view',
+		bubbles: 'lpn_settings_row_bubbles'
 	};
 	// **"SHOW ORDER" AND "DROP ORDER", NEVER "RANK"** (Tom, 2026-10-07: *"You called this Rank, but
 	// that is a very dangerous term."*). Rank was the Labels box's heading of the drop column before
@@ -29595,7 +29606,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		[['settings', 'energy', 'globalEfficiency'], 75], [['settings', 'energy', 'globalPrice'], 0],
 		[['settings', 'energy', 'globalPattern'], undefined], [['settings', 'energy', 'demandCharge'], 0],
 		[['settings', 'energy', 'currency'], undefined],
-		[['defaultPattern'], undefined], [['view'], undefined],
+		[['defaultPattern'], undefined], [['view'], undefined], [['bubbles'], undefined],
 		[['project', 'basemap'], 'osm']
 	];
 	// A legacy setting a project may still carry, hidden while the setting that replaced it is
@@ -29688,7 +29699,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (typeof sample === 'number') { return 'num'; }
 		if (typeof sample === 'boolean') { return 'bool'; }
 		if (sample && typeof sample === 'object') { return 'json'; }
-		if (p[0] === 'view') { return 'json'; }
+		if (p[0] === 'view' || p[0] === 'bubbles') { return 'json'; }
 		// Nothing stated anywhere yet (a new-asset default before it is seeded): a typed number is
 		// a number, except where the setting names something (a pattern, a node, a word).
 		if ((sample === null || sample === undefined) && !/(pattern|node|currency|prefix|suffix|separator|basemap)/i.test(p[p.length - 1] + p[0])) {
@@ -29829,6 +29840,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function settingRowSummary(row, v) {
 		var pc = EngCalcs.pageConfig || {}, modes;
 		if (row.path[0] === 'view' && v && typeof v === 'object') { return viewSummaryText(v); }
+		if (row.path[0] === 'bubbles') { return tsbSummaryText(v); }
 		if (row.path.join('.') === 'settings.quality' && v && typeof v === 'object') {
 			modes = { none: pc.lpn_quality_none || 'Nothing', age: pc.lpn_result_water_age || 'Water age',
 				trace: pc.lpn_quality_trace || 'Source trace', chemical: pc.lpn_quality_chemical || 'A reactive chemical' };
@@ -36564,11 +36576,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Properties graph does). Nothing here plots, solves or stores a result, so Recalculate OFF is
 	// honoured for free: the run is kept until Calculate replaces it, and a bubble shows that snapshot.
 	//
-	// **THE ARRANGEMENT IS PRESENTATION AND RIDES IN THE FILE.** `doc.bubbles` = [{id, g, n, x, y, w}]:
+	// **THE ARRANGEMENT IS PRESENTATION AND RIDES IN THE FILE.** A set is [{id, g, n, x, y, w, f}]:
 	// group ('node'|'link'), asset id, the bubble's top-left as a SCREEN-pixel offset from the asset,
-	// and its width. Written by serializeProject() only when there is one, so a file without bubbles is
-	// byte-identical to what it was. It is project-wide: a per-scenario presentation does not exist on
-	// this branch's base. Never localStorage: an arrangement worth saving is worth sending with the file.
+	// its width, and the quantity graphed. Never localStorage: an arrangement worth saving is worth
+	// sending with the file.
+	//
+	// **THE SET IS A PRESENTATION OVERRIDE, WHOLE** (Task 804, Tom 2026-10-15: *"The Time series
+	// balloons/bubbles should be a Presentation override."*). Base's set is `doc.bubbles`, written by
+	// serializeProject() only when there is one, so a file without bubbles is byte-identical to what
+	// it was. A scenario's set is the setting `bubbles` in its Presentation alternative, read through
+	// settingFor() like any other Presentation value, so a child inherits its parent's set until it
+	// CHANGES it: opens a graph, closes one, moves one, resizes one, or picks another quantity in one.
+	// The first such change copies the inherited set into the scenario's own alternative (tsbOwn())
+	// and then applies the change, so from then on the scenario holds the whole set, an override like
+	// any other, cleared by Clear override (the Settings table, or the dot on the Settings box row).
+	// Whole set rather than per graph: a graph has no identity of its own outside its set, and "which
+	// graphs are on the map" is one answer. Panning, zooming and bringing a graph to the front change
+	// nothing stored, so they are not changes.
 	//
 	// **THE OFFSET IS IN PIXELS, NOT WORLD UNITS**, so a zoom keeps the bubble's size and its distance
 	// from the asset and moves only the asset under the tail. The tail is recomputed on every pan, zoom,
@@ -36576,7 +36600,80 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	var TSB_MIN_W = 200, TSB_MAX_W = 400, TSB_DEF_W = 300, TSB_HEAD_PX = 24, TSB_MAX = 12,
 		TSB_TAIL_HALF = 9, TSB_GAP = 28, TSB_PAD = 4;
 	var tsbLayer = null, tsbTails = null, tsbEls = {}, tsbQueued = false, tsbZ = 1;
-	function tsbList() { return doc.bubbles || []; }
+	// The set the open scenario stores itself, writable, or null when it inherits one: Base writing the
+	// project reads `doc.bubbles`; anything else, the record it writes Presentation to.
+	function tsbHeldList() {
+		var scn = activeScenario(), t = scn ? writeTargetFor(scn, 'presentation') : null;
+		if (!t) { return scn && !scn.isBase ? null : (doc.bubbles || null); }
+		return plainObject(t.obj.settings) && Array.isArray(t.obj.settings.bubbles) ? t.obj.settings.bubbles : null;
+	}
+	// The set on the map: the open scenario's, held or inherited. Read-only unless tsbHeldList() gave it.
+	function tsbList() {
+		var own = tsbHeldList(), v;
+		if (own) { return own; }
+		v = effectiveSetting(['bubbles']);
+		return Array.isArray(v) ? v : [];
+	}
+	// **THE OPEN SCENARIO'S OWN SET, MADE SO IF IT INHERITS ONE** -- called on the first change, never on a
+	// look. Base writing the project holds `doc.bubbles`; a scenario stores a copy of what it inherited,
+	// through setScenarioSetting(), which makes its own Presentation alternative if it has none.
+	function tsbOwn() {
+		var scn = activeScenario(), held = tsbHeldList();
+		if (held) { return held; }
+		if (!scn || (scn.isBase && !writeTargetFor(scn, 'presentation'))) { doc.bubbles = []; return doc.bubbles; }
+		setScenarioSetting(scn, ['bubbles'], tsbClean(tsbList()));
+		return tsbHeldList() || [];
+	}
+	function tsbOwnRec(id) {
+		var own = tsbOwn(), i;
+		for (i = 0; i < own.length; i++) { if (own[i].id === id) { return own[i]; } }
+		return null;
+	}
+	function tsbRec(id) {
+		var list = tsbList(), i;
+		for (i = 0; i < list.length; i++) { if (list[i].id === id) { return list[i]; } }
+		return null;
+	}
+	// After a change: Base's empty set is no set; every holder's cache, the override count, the
+	// Settings box row and the Settings table follow; the file is saved.
+	function tsbCommit() {
+		var scn = activeScenario();
+		if (doc.bubbles && !doc.bubbles.length && (!scn || (scn.isBase && !writeTargetFor(scn, 'presentation')))) { delete doc.bubbles; }
+		touchTree('tsbCommit');
+		refreshScenarioStatus();
+		tsbRefreshSetbox();
+		if (typeof refreshPaneIfOpen === 'function') { refreshPaneIfOpen(); }
+		saveToStorage();
+	}
+	// The set in words, for the Settings table and the Settings box: each graph's asset and quantity.
+	function tsbSummaryText(list) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!Array.isArray(list) || !list.length) { return pc.lpn_settings_legend_off || 'None'; }
+		return list.map(function (b) {
+			var s = tsbSubject(b);
+			return b.n + (b.f ? ' (' + pgFieldLabel(b.g === 'link' ? 'link' : 'node', b.f, s ? s.e : null) + ')' : '');
+		}).join('; ');
+	}
+	// The Settings box row (settingsBubbleRow()) shows the set and its override mark.
+	function tsbRefreshSetbox() {
+		var v = document.getElementById('lpn_set_bubbles_value');
+		if (!v) { return; }
+		v.textContent = tsbSummaryText(tsbList());
+		markHeldSetboxRows();
+	}
+	// A file's set, cleaned on arrival wherever a scenario or an alternative holds one.
+	function tsbCleanHeld(o) {
+		if (o && plainObject(o.settings) && o.settings.bubbles !== undefined) { o.settings.bubbles = tsbClean(o.settings.bubbles); }
+	}
+	// A scenario switch, an undo, a cleared override: the map shows the open scenario's set.
+	function tsbFollow() {
+		if (!tsbLayer && !tsbList().length) { return; }
+		tsbEnsureLayer();
+		tsbSync();
+		tsbList().forEach(tsbDraw);
+		tsbPlaceAll();
+		tsbRefreshSetbox();
+	}
 	function tsbClampW(w) { return Math.max(TSB_MIN_W, Math.min(TSB_MAX_W, Math.round(w) || TSB_DEF_W)); }
 	function tsbChartH(w) { return Math.round(w * 0.6); }
 	function tsbSubject(b) {
@@ -36621,13 +36718,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return { left: l, top: t, width: Math.max(0, rr - l), height: Math.max(0, b - t) };
 	}
 	function tsbSchedule() {
-		if (tsbQueued || !doc.bubbles || !doc.bubbles.length) { return; }
+		if (tsbQueued || !tsbList().length) { return; }
 		tsbQueued = true;
 		window.requestAnimationFrame(function () { tsbQueued = false; tsbPlaceAll(); });
 	}
 	// A new run, a new frame of the transport, a new document: redraw every chart as well as place it.
 	function tsbRefresh() {
-		if (!doc.bubbles || !doc.bubbles.length) { return; }
+		if (!tsbList().length) { return; }
 		window.requestAnimationFrame(function () { tsbEnsureLayer(); tsbSync(); tsbList().forEach(tsbDraw); tsbPlaceAll(); });
 	}
 	// Builds the elements for the list and removes those whose record is gone.
@@ -36640,8 +36737,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			delete tsbEls[id];
 		});
 	}
+	// The element is built for an id; every handler finds its record by that id in the set on the map,
+	// because the set itself is replaced when a scenario switch or its first change makes a new one.
 	function tsbBuild(b) {
-		var pc = EngCalcs.pageConfig || {}, root = document.createElement('div'), head = document.createElement('div'),
+		var id = b.id, pc = EngCalcs.pageConfig || {}, root = document.createElement('div'), head = document.createElement('div'),
 			title = document.createElement('span'), close = document.createElement('button'),
 			host = document.createElement('div'), grip = document.createElement('div'),
 			quant = document.createElement('select');
@@ -36662,7 +36761,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		quant.className = 'lpn-tsb-q';
 		quant.setAttribute('aria-label', pc.lpn_tsb_quantity || 'Quantity to graph');
 		quant.title = pc.lpn_tsb_quantity || 'Quantity to graph';
-		quant.addEventListener('change', function () { b.f = quant.value; tsbDraw(b); saveToStorage(); });
+		quant.addEventListener('change', function () {
+			var o = tsbOwnRec(id);
+			if (!o) { return; }
+			o.f = quant.value;
+			tsbDraw(o);
+			tsbCommit();
+		});
 		head.appendChild(title); head.appendChild(quant); head.appendChild(close);
 		root.appendChild(head); root.appendChild(host); root.appendChild(grip);
 		tsbLayer.insertBefore(root, tsbTails);
@@ -36670,16 +36775,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		root.addEventListener('pointerdown', function () { root.style.zIndex = String(++tsbZ); });
 		head.addEventListener('pointerdown', function (e) {
 			if (e.target === close || e.target.closest('select') || e.button > 0) { return; }
-			tsbDrag(e, b, 'move');
+			tsbDrag(e, id, 'move');
 		});
-		grip.addEventListener('pointerdown', function (e) { if (e.button > 0) { return; } tsbDrag(e, b, 'size'); });
-		close.addEventListener('click', function () { tsbClose(b.id); });
+		grip.addEventListener('pointerdown', function (e) { if (e.button > 0) { return; } tsbDrag(e, id, 'size'); });
+		close.addEventListener('click', function () { tsbClose(id); });
 	}
-	function tsbDrag(e, b, mode) {
-		var sx = e.clientX, sy = e.clientY, x0 = b.x, y0 = b.y, w0 = b.w, moved = false;
+	function tsbDrag(e, id, mode) {
+		var sx = e.clientX, sy = e.clientY, b = tsbRec(id), x0, y0, w0, moved = false;
+		if (!b) { return; }
+		x0 = b.x; y0 = b.y; w0 = b.w;
 		e.preventDefault();
 		function mv(ev) {
 			var dx = ev.clientX - sx, dy = ev.clientY - sy;
+			// The first movement is the change: an inherited set becomes the scenario's own here.
+			if (!moved) { b = tsbOwnRec(id) || b; }
 			if (mode === 'move') { b.x = Math.round(x0 + dx); b.y = Math.round(y0 + dy); }
 			else {
 				b.w = tsbClampW(w0 + dx);
@@ -36692,18 +36801,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			window.removeEventListener('pointermove', mv);
 			window.removeEventListener('pointerup', up);
 			window.removeEventListener('pointercancel', up);
-			if (moved) { saveToStorage(); }
+			if (moved) { tsbCommit(); }
 		}
 		window.addEventListener('pointermove', mv);
 		window.addEventListener('pointerup', up);
 		window.addEventListener('pointercancel', up);
 	}
 	function tsbClose(id) {
-		doc.bubbles = tsbList().filter(function (b) { return b.id !== id; });
-		if (!doc.bubbles.length) { delete doc.bubbles; }
+		var own = tsbOwn(), i;
+		for (i = own.length - 1; i >= 0; i--) { if (own[i].id === id) { own.splice(i, 1); } }
 		tsbSync();
 		tsbPlaceAll();
-		saveToStorage();
+		tsbCommit();
 	}
 	function tsbDefaultField(s, avail) {
 		var want = s.group === 'link' ? 'flow' : (s.e.type === 'tank' || s.e.type === 'reservoir' ? 'head' : 'pressure'), i;
@@ -36860,12 +36969,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			avail = pgAvailable(s.group, s.e, EngCalcs.lpnTimeRunFrames());
 			if (avail.length) { b.f = tsbPick(b, s, avail).field; }
 		}
-		doc.bubbles = list.concat([b]);
+		list = tsbOwn();
+		list.push(b);
+		b = list[list.length - 1];
 		tsbBuild(b);
 		tsbEls[b.id].root.style.zIndex = String(++tsbZ);
 		tsbDraw(b);
 		tsbPlaceAll();
-		saveToStorage();
+		tsbCommit();
 	}
 	// A document arrives (a file, a tab, a new project): its bubbles are drawn, the previous one's go.
 	function tsbArrived() {
@@ -36876,7 +36987,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			tsbEls = {};
 			while (tsbTails.firstChild) { tsbTails.removeChild(tsbTails.firstChild); }
 		}
-		if (doc.bubbles && doc.bubbles.length) { tsbRefresh(); }
+		if (tsbList().length) { tsbRefresh(); }
+		tsbRefreshSetbox();
 	}
 
 	// ---- FREQUENCY PLOT (ROADMAP Task 600, first slice) --------------------------------------------
@@ -59139,6 +59251,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// obviously belongs to.
 		setboxTag(row(mapBody, pc.lpn_settings_legend_position || 'Labels legend position', legendSelect), [['settings', 'legendPosition']]);
 		settingsViewRows(mapBody, row);
+		// The time series graphs on the map (Task 804): read-only here, a Presentation value whose
+		// override is marked and cleared like any other. Opened from an asset's right-click menu.
+		(function () {
+			var v = document.createElement('span');
+			v.id = 'lpn_set_bubbles_value';
+			v.className = 'lpn-set-note';
+			v.textContent = tsbSummaryText(tsbList());
+			setboxTag(row(mapBody, pc.lpn_settings_row_bubbles || 'Time series graphs on the map', v), [['bubbles']]);
+		}());
 		// There is no "Saving to a file" section (Task 211): nothing is written to a file on a timer.
 		// Its 60-180 s range protected a coupling rather than the user -- one number doing three jobs
 		// (write interval, lock heartbeat, takeover threshold).
@@ -70680,6 +70801,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		updateEmptyHint();
 		chainResyncAfterUndo();
 		refreshScenarioStatus();
+		tsbFollow();
 		// A step that put settings back redraws what a setting edit redraws.
 		if (snap.settingPaths || scnSettingsChanged) {
 			refreshSymbolSizes(); refreshValueColors(); refreshBasemap(); refreshContour();

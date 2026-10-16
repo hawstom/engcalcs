@@ -201,7 +201,7 @@ code's table is `LPN_SETTING_CATEGORY_OF`, and the harness fails a key a saved p
 the table does not name. A path naming an object covers everything under it; the longest named
 path wins.
 
-**Presentation (`presentation`), 48 paths.** Everything about how the drawing looks, and where the
+**Presentation (`presentation`), 49 paths.** Everything about how the drawing looks, and where the
 map is looking.
 
 | Where it lives | Paths | Read by |
@@ -213,6 +213,7 @@ map is looking.
 | `settings`, colour by value | `colorNodeField`, `colorLinkField`, `colorRampNode`, `colorRampLink`, `colorClassesNode`, `colorClassesLink`, `colorReverseNode`, `colorReverseLink`, `colorBreaks`, `colorModes`, `colorLegendPosition` | `colorFieldOf()`, `colorRampKey()`, `colorClassCount()`, `colorReverseOf()`, `storedBreaks()`, `effectiveBreaks()`, `colorModeOf()`, `renderColorLegend()` |
 | `settings`, contours | `contourFill`, `contourLines`, `contourLabels`, `contourOpacity`, `contourInterval`, `contourBuffer`, `contourTerrain` | `contourFillMode()`, `contourIsOn()`, `drawContourLabels()`, `contourOpacityOf()`, `contourIntervalOf()`, `contourBufferOf()`, `contourTerrainWanted()` |
 | `view` (Tom, 2026-10-06, Q2) | the window: centre and scale, one atomic value | `followScenarioView()` on a switch. **Stored outward**, as a node's position override is (longitude and latitude, or the grid's absolute x and y), so the Y flip, the origin shift and the projection never touch it. Written only when a scenario deliberately holds one (`setScenarioView()`, called by the Settings box's Save this view in this scenario), as centre plus ground metres per CSS pixel. |
+| `bubbles` (Task 804, Tom 2026-10-15: *"The Time series balloons/bubbles should be a Presentation override."*) | the time series graphs on the map, **one value, the whole set** (asset, quantity, width, pixel offset from the asset, per graph). Base's set is the document's `bubbles`. A scenario holds its own set from its first CHANGE to it (open, close, move, resize, or another quantity picked in a graph), which copies the inherited set into its Presentation alternative first; panning, zooming and bringing a graph to the front change nothing stored. Whole set rather than per graph: a graph has no identity outside its set. | `tsbList()`, `tsbOwn()`; `tsbFollow()` on a switch, an undo and a cleared override. Shown read-only in the Settings box (Map display) and the Settings table, marked and cleared like any other Presentation value. |
 
 **Calculation (`calculation`), 9 paths, two of them whole groups.** What the solver is told, other
 than the network itself.
