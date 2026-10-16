@@ -537,6 +537,10 @@ async function main() {
 		const b2 = sv.scenarios.filter((x) => x.root === true)[0];
 		const b2phys = b2 && byId(sv.alternatives, (b2.alternatives || {}).physical);
 		ok('q07 the new Base names its own Base Physical alternative, holding Base\'s elevations', !!b2phys && b2phys.root === true && String(b2phys.values['n:10'].elev) === e10, JSON.stringify(b2phys && b2phys.values['n:10']));
+		// The manager's box, with its Scenarios table in it (Tom, 2026-10-16: one box), is wide enough
+		// to lie over the Tables pane's cells; it is closed before a cell is typed into, as a person would.
+		await page.evaluate(() => { const x = document.getElementById('lpn_sm_close'); if (x && x.offsetParent !== null) { x.click(); } });
+		await a.settle(300);
 		await a.toolbarClick(await L('lpn_pane_toggle'));
 		await a.settle(500);
 		await tab('junctions');
