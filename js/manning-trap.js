@@ -84,8 +84,16 @@ EngCalcs.pageCalculator = function(objForm) {
 		lowTip: EngCalcs.pageConfig.mtc_vel_low
 	});
 	this.writeFormResult(objForm, 'd50_bottom', precision = 4, hasUnits = true);
-	this.writeFormResult(objForm, 'd50_z1', precision = 4, hasUnits = true);
-	this.writeFormResult(objForm, 'd50_z2', precision = 4, hasUnits = true);
+	if (isNaN(this.var.d50_z1)) {
+		document.getElementById('d50_z1').innerHTML = EngCalcs.pageConfig.mtc_not_applicable;
+	} else {
+		this.writeFormResult(objForm, 'd50_z1', precision = 4, hasUnits = true);
+	}
+	if (isNaN(this.var.d50_z2)) {
+		document.getElementById('d50_z2').innerHTML = EngCalcs.pageConfig.mtc_not_applicable;
+	} else {
+		this.writeFormResult(objForm, 'd50_z2', precision = 4, hasUnits = true);
+	}
 	this.writeFormResult(objForm, 'd50_mra', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'd50_searcy', precision = 4, hasUnits = true);
 	// Sketch

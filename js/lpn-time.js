@@ -160,7 +160,11 @@
 			linkRates: f.linkRates,
 			// Carried but NOT part of the steady-state contract: only this file's own readouts look
 			// at them, and only a run can produce them.
-			demands: f.demands, demandDeficits: f.demandDeficits, levels: f.levels, statuses: f.statuses, t: f.t
+			demands: f.demands, demandDeficits: f.demandDeficits, levels: f.levels, statuses: f.statuses, t: f.t,
+			// **A STOPPED RUN'S NOTICE RIDES EVERY FRAME IT SHOWS** (Task 808), so the status line
+			// the host writes on each apply() keeps it until the next solve, as every failure
+			// notice does. Absent for a run that finished.
+			stoppedNote: run.partial ? stoppedNoteOf(run) : undefined
 		};
 	};
 
@@ -538,6 +542,9 @@
 			runRefusedWhy: pageConfig.lpn_engine_refused_why || 'EPANET solver message: {message}',
 			// A run EPANET started and could not finish (Tom, 2026-10-14: a tank emptied, the
 			// junctions it fed lost their only source, Error 110 at 7:24). "Did not start" was false.
+			runStoppedKept: pageConfig.lpn_time_run_stopped_kept || 'The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.',
+			statStopped: pageConfig.lpn_time_stat_stopped || '{statistic} not shown: the run stopped before the end of the period.',
+			stoppedNoQuality: pageConfig.lpn_time_stopped_no_quality || 'No water quality results were computed, because the quality analysis starts after the hydraulic run ends.',
 			runStopped: pageConfig.lpn_time_run_stopped || 'The EPANET run stopped at {time}, so it has no results. Its run report says why.',
 			runFellBack: pageConfig.lpn_time_run_fell_back || 'The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level.',
 			runReport: pageConfig.lpn_time_run_report || 'Run report',
@@ -947,6 +954,9 @@
 					lastReport = run.report || ''; lastReportMs = state.lastRunMs;
 					lastReportFrames = 0;
 					boxFailed(token, refusedText(run));
+					// **A STOP WITH SOLVED PERIODS KEEPS THEM** (Task 808): the run is held, marked
+					// partial, and everything that reads it ends at its last frame.
+					if (keptPartial(model, run, sig)) { return; }
 					engineRefused(model, run);
 					return;
 				}
@@ -982,6 +992,24 @@
 			if (root.console && console.warn) { console.warn('EPANET extended-period run failed:', err); }
 		});
 	}
+	/**
+	 * **A RUN THAT STOPPED PART-WAY, KEPT TO WHERE IT STOPPED** (Task 808; Tom, 2026-10-15: "It would
+	 * be nice to see truncated time series graphs if those are available."). js/lpn-epanet.js hands
+	 * back the periods EPANET actually solved before the stop, and nothing after them: no later period
+	 * is estimated, repeated or zeroed. The run is held like a finished one, flagged `partial`, so
+	 * the map, the Tables, the graphs and the report dialogs read it unchanged, and the transport
+	 * ends at `solvedTo` (see stopsOf()). Returns false where there is nothing solved to keep.
+	 */
+	function keptPartial(model, run, sig) {
+		if (!run.partial || !run.frames || !run.frames.length || typeof run.solvedTo !== 'number') { return false; }
+		state.run = run;
+		state.runSig = sig;
+		state.failed = 'run';
+		state.statView = false;
+		clampTime();
+		showFrame();
+		return true;
+	}
 	function runFinished() {
 		state.busy = false;
 		// The queued request keeps whatever it was asked with: a Run pressed during a slow run is
@@ -1007,6 +1035,9 @@
 	 * it through, so it can never answer out of a run that has been superseded -- the frames and
 	 * the money are dropped together, by construction, because they are the same object.
 	 */
+	// Did the run in hand stop part-way? The energy and quality boxes say so instead of asking for
+	// a run that was made.
+	EC.lpnTimeRunStopped = function () { return !!(state.run && state.run.partial); };
 	EC.lpnTimeRunEnergy = function () { return state.run ? (state.run.energy || null) : null; };
 
 	// **WHY THE FRAMES ARE JUDGED AT THE SOLVE AND NOT AT THE EDIT.** There was briefly a
@@ -1067,6 +1098,8 @@
 			state.wanted = false;
 			state.wantedByUser = false;
 			renderPanel();
+			// A stopped run's notice came back with it: the host does not repaint a kept solve's status.
+			if (state.run.partial) { host.status(stoppedNoteOf(state.run), 'time-run-refused'); }
 			return true;
 		}
 		state.lastRunMs = null;
@@ -1219,17 +1252,30 @@
 	}
 	// What the refusal itself says, without the fallback sentence -- the status bar wants all three
 	// and the run box wants only these two, so the shared part is composed once.
+	function stoppedNoteOf(run) {
+		var S = strings();
+		return refusedText(run) + (run.qualityNotRun ? ' ' + S.stoppedNoQuality : '');
+	}
 	function refusedText(run) {
 		var S = strings(), why = (run && run.engineError) || '',
 			head = (run && typeof run.stoppedAt === 'number')
-				? S.runStopped.replace('{time}', EC.lpnTimeElapsedText(run.stoppedAt)) : S.runRefused;
+				? ((run.partial && run.frames && run.frames.length && typeof run.solvedTo === 'number')
+					? S.runStoppedKept.replace('{time}', EC.lpnTimeElapsedText(run.stoppedAt))
+						.replace('{solved}', EC.lpnTimeElapsedText(run.solvedTo))
+					: S.runStopped.replace('{time}', EC.lpnTimeElapsedText(run.stoppedAt)))
+				: S.runRefused;
 		return why ? head + ' ' + S.runRefusedWhy.replace('{message}', why) : head;
 	}
 
 	// The statistic the project asks for, or null (Task 735).
-	function statName() {
+	function rawStat() {
 		var t = docTimes(), n = t && t.statistic;
 		return (n && n !== 'NONE' && EC.LPN_STATISTICS && EC.LPN_STATISTICS.indexOf(n) > 0) ? n : null;
+	}
+	function statName() {
+		// A statistic over a truncated run would pass for one over the whole period.
+		if (state.run && state.run.partial) { return null; }
+		return rawStat();
 	}
 	// What the transport is showing: the statistic frame, or the frame at state.t.
 	function currentResult() {
@@ -1248,8 +1294,16 @@
 		showFrame();
 	}
 
+	// **THE REPORTING TIMES THE TRANSPORT MAY STAND ON.** All of them, except after a stopped run:
+	// then only those the engine solved, so no control can land on a moment with no result.
+	function stopsOf() {
+		var all = EC.lpnReportTimes(docTimes()), run = state.run, cut;
+		if (!run || !run.partial || typeof run.solvedTo !== 'number') { return all; }
+		cut = all.filter(function (t) { return t <= run.solvedTo + 1e-6; });
+		return cut.length ? cut : all.slice(0, 1);
+	}
 	function clampTime() {
-		var stops = EC.lpnReportTimes(docTimes()), i, best = stops[0];
+		var stops = stopsOf(), i, best = stops[0];
 		for (i = 0; i < stops.length; i++) { if (stops[i] <= state.t) { best = stops[i]; } }
 		state.t = best;
 	}
@@ -1266,6 +1320,7 @@
 
 	function setTime(t) {
 		state.t = t;
+		if (state.run && state.run.partial) { clampTime(); }
 		state.statView = false;
 		if (state.run) { showFrame(); return; }
 		renderPanel();
@@ -1282,14 +1337,14 @@
 		}
 	}
 	function stepBy(n) {
-		var stops = EC.lpnReportTimes(docTimes()),
+		var stops = stopsOf(),
 			i = EC.lpnTimeFrameIndexAt(stops.map(function (s) { return { t: s }; }), state.t) + n;
 		if (i < 0) { i = 0; }
 		if (i > stops.length - 1) { i = stops.length - 1; }
 		setTime(stops[i]);
 	}
 	function play() {
-		var stops = EC.lpnReportTimes(docTimes());
+		var stops = stopsOf();
 		if (state.playing || stops.length < 2) { return; }
 		// **PLAY STOPS AT THE END; IT DOES NOT LOOP** (Tom, 2026-08-20: "for this application, it's
 		// best not to offer autoloop. The beginning and end often aren't obvious, so it's good to
@@ -1306,7 +1361,7 @@
 		// a MULTIPLIER on that rather than a millisecond box, because the only question a viewer has
 		// is "faster or slower than this", and epanet-js's own control asks it the same way.
 		state.timer = setInterval(function () {
-			var s = EC.lpnReportTimes(docTimes()),
+			var s = stopsOf(),
 				i = s.indexOf(state.t);
 			if (i < 0 || i >= s.length - 1) { pause(); return; }
 			setTime(s[i + 1]);
@@ -1853,7 +1908,7 @@
 		var S = strings();
 		return { AVERAGED: S.statAveraged, MINIMUM: S.statMinimum, MAXIMUM: S.statMaximum, RANGE: S.statRange, NONE: S.statNone }[n] || n;
 	}
-	function stepTimes() { return EC.lpnReportTimes(docTimes()); }
+	function stepTimes() { return stopsOf(); }
 	// **THE LABEL IS ONE INSTANT, NEVER A RANGE.** `EC.lpnReportTimes()` is a flat list of discrete
 	// reporting INSTANTS; it was never a list of intervals, so pairing one with the next one to
 	// manufacture a span was inventing a quantity this page does not compute. Every comparable
@@ -2009,7 +2064,7 @@
 	};
 
 	function renderTransport() {
-		var stops, labels, clocks, sig, i, statLabel;
+		var stops, labels, clocks, sig, i, statLabel, stoppedStat;
 		if (!ui || !ui.step) { return; }
 		stops = stepTimes();
 		labels = stops.map(function (t) { return stepText(t); });
@@ -2023,7 +2078,8 @@
 		// ARE IN THE KEY EVEN THOUGH THEY ARE NO LONGER IN THE LABEL** -- they are in the tip, and
 		// a stale tip is the same defect one surface further in.
 		statLabel = state.run && statName() ? statLabelOf(statName()) : null;
-		sig = labels.join('|') + '\u0001' + clocks.join('|') + '\u0001' + (statLabel || '');
+		stoppedStat = state.run && state.run.partial && rawStat() ? strings().statStopped.replace('{statistic}', statLabelOf(rawStat())) : null;
+		sig = labels.join('|') + '\u0001' + clocks.join('|') + '\u0001' + (statLabel || '') + '\u0001' + (stoppedStat || '');
 		if (ui.sig !== sig) {
 			ui.sig = sig;
 			ui.step.textContent = '';
@@ -2031,6 +2087,9 @@
 				ui.step.appendChild(el('option', { value: String(k), title: clocks[k] }, text));
 			});
 			if (statLabel) { ui.step.appendChild(el('option', { value: 'stat' }, statLabel)); }
+			// The statistic the project asks for cannot be had from a truncated run: said where it
+			// would appear, as a row that cannot be chosen.
+			if (stoppedStat) { ui.step.appendChild(el('option', { value: 'stat-stopped', disabled: 'disabled' }, stoppedStat)); }
 		}
 		i = stops.indexOf(state.t);
 		if (i < 0) {

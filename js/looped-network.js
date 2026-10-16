@@ -24967,7 +24967,7 @@ var EngCalcs = EngCalcs || {};
 			var demIds = replacePending.refs.map(function (r) { return r.id; });
 			replacePending = null;
 			EngCalcs.lpnTerrainFillFor(terrainPointsForIds(demIds), { replaceAny: true });
-			renderReplace(String(pc.lpn_replace_asked || 'Elevations requested for {n} nodes. Results appear when they are received.').replace('{n}', String(demIds.length)));
+			renderReplace(String(pc.lpn_replace_asked || 'Elevations requested for nodes ({n}). Results appear when they are received.').replace('{n}', String(demIds.length)));
 			return demIds.length;
 		}
 		// **ONE SNAPSHOT FOR THE WHOLE SET, so it is ONE undo step.** Snapshotting per element would
@@ -24995,7 +24995,7 @@ var EngCalcs = EngCalcs || {};
 		// claim about the map: after "diameter equal to 6, set to 8" that list is correctly empty.
 		findResults = replaceFoundSet();
 		renderFindResults(null);
-		renderReplace(String(pc.lpn_replace_done || '{n} assets changed. This can be undone in one step.').replace('{n}', String(n)));
+		renderReplace(String(pc.lpn_replace_done || 'Assets changed: {n}. This can be undone in one step.').replace('{n}', String(n)));
 		return n;
 	}
 	// The preview line and its two buttons. `message` is a state the write cannot start from -- no
@@ -25014,7 +25014,7 @@ var EngCalcs = EngCalcs || {};
 		if (!replacePending) { return; }
 		head = document.createElement('div');
 		head.style.margin = '6px 0 2px';
-		head.textContent = String(pc.lpn_replace_preview || 'Change {n} assets?')
+		head.textContent = String(pc.lpn_replace_preview || 'Change assets ({n})?')
 			.replace('{n}', String(replacePending.refs.length));
 		box.appendChild(head);
 		apply = document.createElement('button');
@@ -32257,7 +32257,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function paneAskIdChanges(spec, raw, n) {
 		var pc = EngCalcs.pageConfig || {},
-			text = String(pc.lpn_pane_paste_ids_differ || '{n} IDs don\'t match. Paste anyway?').replace('{n}', String(n));
+			text = String(pc.lpn_pane_paste_ids_differ || 'IDs that do not match ({n}). Paste anyway?').replace('{n}', String(n));
 		openDialog(function (body) {
 			var p = document.createElement('p');
 			p.style.margin = '0';
@@ -32277,19 +32277,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}, text, buttons;
 		if (errs.length) {
 			text = say(pc.lpn_pane_paste_overflow_bad ||
-				'This paste has {n} rows, and {fit} of them fit in the table. The other {extra} cannot be added as new rows: {reasons}')
+				'Rows in this paste ({n}). Rows that fit in the table ({fit}). The other rows ({extra}) cannot be added as new rows: {reasons}')
 				.replace('{reasons}', errs.slice(0, 5).join(' ') + (errs.length > 5
 					? ' ' + String(pc.lpn_pane_paste_more || 'Rows with problems not shown here: {n}.').replace('{n}', String(errs.length - 5)) : ''));
 		} else {
 			text = say(pc.lpn_pane_paste_overflow ||
-				'This paste has {n} rows, and {fit} of them fit in the table. Add the other {extra} as new rows at the bottom?');
+				'Rows in this paste ({n}). Rows that fit in the table ({fit}). Add the other rows ({extra}) as new rows at the bottom?');
 		}
 		buttons = [];
 		if (!errs.length) {
-			buttons.push({ label: say(pc.lpn_pane_paste_overflow_add || 'Add {extra} rows'),
+			buttons.push({ label: say(pc.lpn_pane_paste_overflow_add || 'Add rows ({extra})'),
 				fn: function () { panePasteAt(spec, raw, { overflow: 'add', raw: raw, idsOk: true }); } });
 		}
-		buttons.push({ label: say(pc.lpn_pane_paste_overflow_fit || 'Paste only the {fit} that fit'),
+		buttons.push({ label: say(pc.lpn_pane_paste_overflow_fit || 'Paste only the rows that fit ({fit})'),
 			fn: function () { panePasteAt(spec, raw, { overflow: 'fit', raw: raw, idsOk: true }); } });
 		buttons.push({ label: pc.lpn_cancel || 'Cancel', fn: function () {} });
 		openDialog(function (body) {
@@ -32417,13 +32417,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// cells changed.
 		if (created.length) {
 			setNotice(String(refused + dropped
-				? (pc.lpn_pane_pasted_rows_skipped || 'Pasted {n} rows and added {created} of them to the network. {skipped} cells were not changed.')
-				: (pc.lpn_pane_pasted_rows || 'Pasted {n} rows and added {created} of them to the network.'))
+				? (pc.lpn_pane_pasted_rows_skipped || 'Pasted rows ({n}). Rows added to the network ({created}). Cells not changed ({skipped}).')
+				: (pc.lpn_pane_pasted_rows || 'Pasted rows ({n}). Rows added to the network ({created}).'))
 				.replace('{n}', String(nRows))
 				.replace('{created}', String(created.length))
 				.replace('{skipped}', String(refused + dropped)));
 		} else {
-			setNotice(String(pc.lpn_pane_pasted || 'Pasted {n} cells. {skipped} were not changed.')
+			setNotice(String(pc.lpn_pane_pasted || 'Pasted cells ({n}). Cells not changed ({skipped}).')
 				.replace('{n}', String(wrote))
 				.replace('{skipped}', String(refused + dropped)));
 		}
@@ -32469,7 +32469,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		completeEdit(null);
 		refreshPopupIfOpen();
 		renderPaneTable(spec);
-		setNotice(String(pc.lpn_pane_filled || 'Filled down {n} cells. {skipped} were not changed.')
+		setNotice(String(pc.lpn_pane_filled || 'Filled down cells ({n}). Cells not changed ({skipped}).')
 			.replace('{n}', String(wrote))
 			.replace('{skipped}', String(refused)));
 		return true;
@@ -32540,7 +32540,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		refreshPopupIfOpen();
 		renderPaneTable(spec);
 		paneSelPaint(spec, paneTableRowsInOrder(spec), paneCols(spec));
-		setNotice(String(pc.lpn_pane_ctrlenter_filled || 'Filled {n} cells. {skipped} were not changed.')
+		setNotice(String(pc.lpn_pane_ctrlenter_filled || 'Filled cells ({n}). Cells not changed ({skipped}).')
 			.replace('{n}', String(wrote))
 			.replace('{skipped}', String(refused)));
 		return true;
@@ -32719,7 +32719,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		spec.sel = { aId: rows[target.r0].id, aKey: cols[target.c0].key,
 			fId: rows[target.r1].id, fKey: cols[target.c1].key };
 		renderPaneTable(spec);
-		setNotice(String(pc.lpn_pane_ctrlenter_filled || 'Filled {n} cells. {skipped} were not changed.')
+		setNotice(String(pc.lpn_pane_ctrlenter_filled || 'Filled cells ({n}). Cells not changed ({skipped}).')
 			.replace('{n}', String(wrote))
 			.replace('{skipped}', String(refused)));
 		return true;
@@ -37841,7 +37841,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 		}
 		if (!lost) { proceed(); return; }
-		askDialog({ kind: 'confirm', text: (pc.lpn_delete_drops_overrides || 'Deleting this asset also deletes {n} scenario overrides for it. Continue?').replace('{n}', lost) }, function (yes) {
+		askDialog({ kind: 'confirm', text: (pc.lpn_delete_drops_overrides || 'Deleting this asset also deletes its scenario overrides ({n}). Continue?').replace('{n}', lost) }, function (yes) {
 			if (yes) { proceed(); }
 		});
 	}
@@ -37867,7 +37867,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (orphaned) {
 			refreshCustomerHandle();
 			setNotice(String((EngCalcs.pageConfig || {}).lpn_customer_detached_count ||
-				'{n} customers are no longer connected to a pipe. Their demand is not in the answers.')
+				'Customers not connected to a pipe ({n}). Their demand is not accounted for.')
 				.replace('{n}', String(orphaned)));
 		}
 		labelsByAnchor[id].slice().forEach(function (lid) { deleteLabelById(lid); });
@@ -39303,7 +39303,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var loose = detachCustomersFromLink(id);
 		if (loose) {
 			setNotice(String((EngCalcs.pageConfig || {}).lpn_customer_detached_count ||
-				'{n} customers are no longer connected to a pipe. Their demand is not in the answers.')
+				'Customers not connected to a pipe ({n}). Their demand is not accounted for.')
 				.replace('{n}', String(loose)));
 		}
 		incidentLinks[l.from] = incidentLinks[l.from].filter(function (x) { return x !== id; });
@@ -43182,11 +43182,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// More than one demand category: BASE_DEMAND holds their sum, and the read-me says so.
 		var multi = doc.nodes.filter(function (n) { return n.type === 'junction' && dxfBaseDemand(n).more; }).length;
 		if (multi) {
-			readme.push((pc.lpn_dxf_note_categories || '{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.')
+			readme.push((pc.lpn_dxf_note_categories || 'Junctions with more than one demand category: {n}. Their {tag} attribute holds the sum of the base demands of all categories.')
 				.replace('{n}', String(multi)).replace('{tag}', tt.tagOf('junction', 'DEMAND')));
 		}
 		if (longOnes) {
-			readme.push((pc.lpn_dxf_note_shortened || '{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.')
+			readme.push((pc.lpn_dxf_note_shortened || 'Values longer than a DXF file allows ({max} characters): {n}. Each was shortened and ends in three periods.')
 				.replace('{n}', String(longOnes)).replace('{max}', String(EngCalcs.lpnDxfLimit)));
 		}
 		return {
@@ -43280,11 +43280,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		if (!types && !fittings && !coords && !custs && !offNames.length) { return; }
 		if (types) {
-			said.push((pc.lpn_inp_export_flat_types || '{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so the link between one definition and every pipe that uses it is recorded only in the project file.')
+			said.push((pc.lpn_inp_export_flat_types || 'Pipes ({n}) here refer to pipe types ({t}). In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so the link between one definition and every pipe that uses it is recorded only in the project file.')
 				.replace('{n}', String(types.ids.length)).replace('{t}', String(types.detail || '?')));
 		}
 		if (custs) {
-			said.push((pc.lpn_inp_export_flat_customers || 'An EPANET file has no customers. The demand of the {n} customers in this project is written as a demand row on the junction each customer is assigned to, named with the customer\'s tag. The file does not record the customer itself: its location, the pipe that serves it, where along that pipe the service connects, or how many services it represents. That information remains in the project; save the project file to keep it.')
+			said.push((pc.lpn_inp_export_flat_customers || 'An EPANET file has no customers. The demand of the customers in this project ({n}) is written as a demand row on the junction each customer is assigned to, named with the customer\'s tag. The file does not record the customer itself: its location, the pipe that serves it, where along that pipe the service connects, or how many services it represents. That information remains in the project; save the project file to keep it.')
 				.replace('{n}', String(custs.ids.length)) +
 				(offCust ? ' ' + (pc.lpn_inp_export_flat_customers_inactive || '{n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.')
 					.replace('{n}', String(offCust.ids.length)) : ''));
@@ -43298,7 +43298,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				.replace('{n}', String(coords.ids.length)));
 		}
 		if (fittings) {
-			said.push((pc.lpn_inp_export_flat_fittings || 'An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.')
+			said.push((pc.lpn_inp_export_flat_fittings || 'An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of pipes here ({n}) is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.')
 				.replace('{n}', String(fittings.ids.length)));
 		}
 		openDialog(function (body) {
@@ -55905,7 +55905,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				applyOneUnit(name, to);
 				rememberUnitSelections();
 				afterUnitChange(unitFromMap(name, from));
-				setNotice(String(pc.lpn_status_reinterpreted || '{n} values now mean {unit}. Nothing was rewritten.')
+				setNotice(String(pc.lpn_status_reinterpreted || 'Values ({n}) now mean {unit}. Nothing was rewritten.')
 					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
 			} },
 			// **THE UNDO SNAPSHOT IS THE BACKUP, AND NO SECOND COPY IS OFFERED** (Task 425's open
@@ -55934,7 +55934,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				n = (fOld && fNew) ? convertUnitValues(name, fNew / fOld) : 0;
 				rememberUnitSelections();
 				afterUnitChange(unitFromMap(name, from));
-				setNotice(String(pc.lpn_status_converted || '{n} values were rewritten into {unit}.')
+				setNotice(String(pc.lpn_status_converted || 'Values ({n}) were rewritten into {unit}.')
 					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
 			} },
 			// Cancel does nothing on purpose, and there is nothing for it to do: the select was put
@@ -63162,7 +63162,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			times = effectiveTimes() || (EngCalcs.lpnTimesDefaults ? EngCalcs.lpnTimesDefaults() : { patternStep: 3600 }),
 			step = times.patternStep > 0 ? times.patternStep : 3600,
 			fmt = EngCalcs.lpnFormatTime || function (s) { return String(s); };
-		return (pc.lpn_library_pattern_span || '{n} multipliers, {step} apart, covering {span}')
+		return (pc.lpn_library_pattern_span || 'Multipliers: {n}, {step} apart, covering {span}')
 			.replace('{n}', String(n))
 			.replace('{step}', fmt(step))
 			.replace('{span}', fmt(step * n));
@@ -64286,7 +64286,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var inUse = pipeTypeUsers(t.id);
 			if (inUse.length) {
 				setWarning((pc.lpn_library_pipetype_in_use
-					|| 'This pipe type is used by {count} pipes: {ids}. Detach it from them before deleting it.')
+					|| 'This pipe type is used by pipes ({count}): {ids}. Detach it from them before deleting it.')
 					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
 				return;
 			}
@@ -64549,7 +64549,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var inUse = fittingSetUsers(set.id);
 			if (inUse.length) {
 				setWarning((pc.lpn_library_fittings_in_use
-					|| 'This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it.')
+					|| 'This fittings list is used by pipes ({count}): {ids}. Detach it from them before deleting it.')
 					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
 				return;
 			}
@@ -64799,7 +64799,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var inUse = curveUsers(c.id);
 			if (inUse.length) {
 				setWarning((pc.lpn_library_curve_in_use
-					|| 'This curve is used by {count} elements: {ids}. Assign another curve to them first, then delete this one.')
+					|| 'This curve is used by elements ({count}): {ids}. Assign another curve to them first, then delete this one.')
 					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
 				return;
 			}
@@ -67871,11 +67871,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		} while (dropped && plan.length);
 		if (!plan.length) {
-			setNotice((pc.lpn_prefix_applied || 'Renamed {n} assets. {skipped} others were not changed.')
+			setNotice((pc.lpn_prefix_applied || 'Assets renamed: {n}. Assets not changed: {skipped}.')
 				.replace('{n}', '0').replace('{skipped}', String(skipped)));
 			return;
 		}
-		askDialog({ kind: 'confirm', text: (pc.lpn_confirm_apply_prefix || 'Rename {n} assets so their IDs start with {prefix}? Each one keeps its number.')
+		askDialog({ kind: 'confirm', text: (pc.lpn_confirm_apply_prefix || 'Rename assets ({n}) so their IDs start with {prefix}? Each one keeps its number.')
 			.replace('{n}', String(plan.length)).replace('{prefix}', prefix) }, function (yes) {
 			if (!yes) { return; }
 			saveUndoSnapshot();
@@ -67894,7 +67894,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			requestLabelRefresh();
 			scheduleSolve();
 			saveToStorage();
-			setNotice((pc.lpn_prefix_applied || 'Renamed {n} assets. {skipped} others were not changed.')
+			setNotice((pc.lpn_prefix_applied || 'Assets renamed: {n}. Assets not changed: {skipped}.')
 				.replace('{n}', String(plan.length)).replace('{skipped}', String(skipped)));
 		});
 	}
@@ -68487,7 +68487,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// from the meters: how many, and how much.
 		count = document.createElement('span');
 		count.className = 'lpn-node-customers-count';
-		count.textContent = (pc.lpn_node_customers_sum || '{total} {unit} from {n} Customers')
+		count.textContent = (pc.lpn_node_customers_sum || '{total} {unit} from Customers ({n})')
 			.split('{n}').join(String(list.length))
 			.split('{total}').join(String(+total.toFixed(6)))
 			.split('{unit}').join(unitLabel('lpn_u_flow'));
@@ -75155,7 +75155,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		ffEl('p', 'lpn-ff-summary', ffSummaryText(set), host);
 		dsTimeLines(host, fireFlowRunT);
 		if (set.counts.error) {
-			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_summary_error || '{n} junctions could not be solved.')
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_summary_error || 'Junctions that could not be solved ({n}).')
 				.replace('{n}', String(set.counts.error)), host);
 		}
 		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
@@ -75325,7 +75325,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// dialog and the table it turns into would count the same run two different ways.
 		text = ffSummaryText({ modes: modes || { fire: 0, design: 0, clean: 0 } });
 		if (counts.error) {
-			text += ' ' + (pc.lpn_ff_summary_error || '{n} junctions could not be solved.')
+			text += ' ' + (pc.lpn_ff_summary_error || 'Junctions that could not be solved ({n}).')
 				.replace('{n}', String(counts.error));
 		}
 		ffRunUi.tally.textContent = text;
@@ -75686,7 +75686,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// the minimum. A link that cuts off only zero-demand junctions shows them in its row, but it
 		// cut off no demand, so it is not counted here.
 		hit = set.results.filter(function (r) { return r.unserved > 0 || (r.below && r.below.length > 0); }).length;
-		ffEl('p', 'lpn-ff-summary', (pc.lpn_crit_summary || '{n} of {total} assets leave demand unserved or drop a junction below {pressure}.')
+		ffEl('p', 'lpn-ff-summary', (pc.lpn_crit_summary || 'Assets that leave demand unserved or drop a junction below {pressure} ({n} of {total}).')
 			.replace('{n}', String(hit)).replace('{total}', String(set.results.length))
 			.split('{pressure}').join(ffQty(set.minPressure, 'lpn_u_pressure')), host);
 		dsTimeLines(host, critRunT);
@@ -76418,6 +76418,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!energyPumpCount()) {
 			ffEl('p', 'lpn-ff-note', pc.lpn_energy_no_pumps ||
 				'This network has no pumps, so there is nothing drawing power.', host);
+			return;
+		}
+		if (!sum && EngCalcs.lpnTimeRunStopped && EngCalcs.lpnTimeRunStopped()) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_energy_stopped ||
+				'The EPANET run stopped before the end of the period, so no pump energy results were computed.', host);
 			return;
 		}
 		if (!sum) {
@@ -78403,7 +78408,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		frames = reportFrames();
 		if (!frames.length && lastSolveResult) { frames = [lastSolveResult]; }
 		ffEl('p', 'lpn-ff-note', pc.lpn_full_note || 'One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.', host);
-		ffEl('p', 'lpn-ff-note', (pc.lpn_full_row_count || '{n} rows.').replace('{n}', String(rows.length)), host);
+		ffEl('p', 'lpn-ff-note', (pc.lpn_full_row_count || 'Rows ({n}).').replace('{n}', String(rows.length)), host);
 		if (fullReportStepIndex >= frames.length || fullReportStepIndex < 0) { fullReportStepIndex = 0; }
 		if (frames.length > 1) {
 			sel = document.createElement('select');
@@ -78598,7 +78603,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return;
 		}
 		res = calibCompute(def.key);
-		ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_file || '{file}: {n} measurements at {m} locations.')
+		ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_file || '{file}: measurements ({n}) at locations ({m}).')
 			.replace('{file}', file.name).replace('{n}', String(file.parsed.obs.length))
 			.replace('{m}', String(file.parsed.order.length)), host);
 		if (unit) {
@@ -79016,7 +79021,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pdaNote = pdaShort > 0
 			? (pc.lpn_pda_deficit_note || 'Junctions receiving less than their demand: {n}.').replace('{n}', String(pdaShort))
 			: '';
-		setStatus([notConvergedNote, valveRouteNote, pdaNote, omittedNote,
+		setStatus([result.stoppedNote || '', notConvergedNote, valveRouteNote, pdaNote, omittedNote,
 			droppedNote('control-dangling', 'lpn_control_dangling_note',
 				'These controls name an element that is no longer in this project, so they were left out: {ids}'),
 			droppedNote('control-unreadable', 'lpn_control_unreadable_note',

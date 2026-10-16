@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**98 open tasks.** Next (100): 16 · Soon (75): 21 · Someday (50): 27 · Maybe (25): 15 · Parked (5): 19
+**97 open tasks.** Next (100): 16 · Soon (75): 20 · Someday (50): 27 · Maybe (25): 15 · Parked (5): 19
 
 ## 100 — Next (16)
 
@@ -28,7 +28,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 801 — Retire Apply Base values; add Merge upward for alternatives.
 - Task 807 — Leave a leader exactly where the user put it.
 
-## 75 — Soon (21)
+## 75 — Soon (20)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
@@ -50,7 +50,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 804 — Time series balloons become a Presentation override.
 - Task 805 — A clean map: hide the override ambers and the map's own controls.
 - Task 806 — Descriptions take several lines and paragraphs.
-- Task 808 — Show the time series up to where a stopped run ended.
 
 ## 50 — Someday (27)
 
@@ -126,5 +125,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-89 of 98 titles are within 4–12 words. `!` marks the rest;
+88 of 97 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

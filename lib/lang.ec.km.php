@@ -74,21 +74,17 @@ $ec_lang['template_printable_subtitle']='ចំណងជើងរងដែលអ
 // cannot read is not consent. The long-form privacy notice and terms are a separate question --
 // English-authoritative, and translated by a human later if at all.
 // Edited by TGH 2026-09-07; the word "cookie" approved by TGH 2026-09-09.
-// **IT SAYS "COOKIE" BECAUSE THAT IS THE WORD PEOPLE KNOW** (Tom, 2026-09-09, watching a
-// first-time reader: *"We should use the word 'cookie'. 'May we save a one-digit cookie...?' That
-// is the word people know."*). "One digit in this browser" was accurate and taught nobody what was
-// being asked; a reader who has met a hundred cookie banners knows instantly what this one is
-// about, and can then notice that this one is asking for far less than the others did.
+// **REWRITTEN 2026-10-08 (Tom, call F01: "Go (random code, new consent text)")**, his draft used
+// exactly. The yes now also covers a random browser code (EC_CODE_COOKIE in lib/config.inc.php), so
+// "a one-digit cookie" was no longer the whole of what is asked for. The code is what the sentence
+// names because it is what the yes newly buys: counting browsers, not only page loads.
 //
-// **AND IT IS STILL LITERALLY TRUE, which is the only reason the word is allowed here.** What is
-// stored IS a cookie, and it holds one base-32 digit per page visited -- five bits, maximum 31.
-// The arithmetic is in lib/config.inc.php beside the bits themselves. If that ever stops being one
-// digit, this sentence is the thing that has to change first.
-//
-// NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
-// moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
-// has already answered, for no change they could act on.
+// EC_CONSENT_VERSION WENT FROM 1 TO 2 WITH IT, because what is stored changed. Everybody who chose
+// "Allow this" is asked again; "Allow all" and "Refuse all" are not. The other 26 languages keep
+// their old sentence until the next translation sprint, under the same version.
 $ec_lang['consent_body']='តើយើងអាចរក្សាទុកកូដចៃដន្យមួយក្នុងកម្មវិធីរុករកនេះ ដើម្បីរាប់ថាមានកម្មវិធីរុករកប៉ុន្មានប្រើផ្នែកនីមួយៗនៃគេហទំព័រនេះបានទេ? កូដនេះត្រូវបានបង្កើតឡើងភ្លាមៗ មិនប្រាប់អ្វីអំពីអ្នក ឬឧបករណ៍របស់អ្នកទេ ហើយមិនកត់ត្រាអ្វីដែលអ្នកបញ្ចូលឡើយ។ បើគ្មានវា យើងមិនអាចញែកការចូលមើលលើកទីពីររបស់អ្នក ពីការចូលមើលលើកទីមួយរបស់អ្នកផ្សេងបានទេ។';
+// Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='ដោះស្រាយបណ្ដាញនេះនៅរាល់ជំហានពេលវេលាធារាសាស្ត្ររបស់វា។';
 $ec_lang['consent_accept']='យល់ព្រមលើសំណើនេះ';
 $ec_lang['consent_accept_all']='យល់ព្រមជានិច្ច';
 $ec_lang['consent_decline']='បដិសេធជានិច្ច';
@@ -108,8 +104,11 @@ $ec_lang['calc_defaults']='កំណត់ឡើងវិញតម្លៃល�
 $ec_lang['calc_defaults_confirm']='កំណត់ឡើងវិញម៉ាស៊ីនគណនាទៅតម្លៃលំនាំដើមដែលបានកំណត់ដើម?';
 $ec_lang['points_data_note']='(ឬ ចម្លង/បិទភ្ជាប់ ដោយប្រើផ្ទៃទិន្នន័យ)';
 $ec_lang['points_data_heading']='ទិន្នន័យម៉ាស៊ីនគណនា<br />(ប្រើ ចម្លង ដើម្បីមើលទម្រង់)';
+$ec_lang['points_data_points_heading']='ទិន្នន័យចំណុច<br />(ប្រើ ចម្លង ដើម្បីមើលទម្រង់)';
 $ec_lang['points_data_copy']='ចម្លង';
 $ec_lang['points_data_paste']='បិទភ្ជាប់';
+$ec_lang['points_data_msg_line']='គ្មានអ្វីត្រូវបានបិទភ្ជាប់ទេ។ មិនអាចអានបន្ទាត់ {n} ជាស្ថានីយ និងកម្ពស់បានទេ។';
+$ec_lang['points_data_msg_none']='គ្មានអ្វីត្រូវបានបិទភ្ជាប់ទេ។ រកមិនឃើញគូស្ថានីយ និងកម្ពស់ទេ។';
 $ec_lang['calc_inputs']='ទិន្នន័យបញ្ចូល';
 $ec_lang['calc_results']='លទ្ធផល';
 $ec_lang['view_hide_line']='លាក់បន្ទាត់នេះ';
@@ -152,8 +151,6 @@ $ec_lang['hw_pressure_neg_short']='សម្ពាធអវិជ្ជមាន
 $ec_lang['hw_pressure_neg']='សម្ពាធចំហៀងក្រោមទាបជាងសូន្យ។ HGL ធ្លាក់ចុះក្រោមបំពង់ ដូច្នេះបំពង់នឹងមិនហូរពេញទេ ហើយលទ្ធផលនេះអាចមិនត្រឹមត្រូវ។';
 $ec_lang['hw_roughness']='មេគុណ Hazen-Williams, C';
 $ec_lang['hw_note_1']='<dl><dt>ម៉ាស៊ីនគណនានេះមិនធ្វើគំរូទម្រង់បំពង់រវាងចុងទាំងពីរទេ។</dt><dd>វាប្រើតែកម្ពស់ចំហៀងលើ និងចំហៀងក្រោមដែលអ្នកបញ្ចូលប៉ុណ្ណោះ។ ប្រសិនបើដីលើកកម្ពស់ខ្ពស់ជាងចុងទាំងពីរនៅចំណុចណាមួយចន្លោះនោះ សម្ពាធនៅចំណុចខ្ពស់នោះនឹងទាបជាងសម្ពាធណាមួយដែលបានរាយការណ៍នៅទីនេះ។ សូមគណនាម្ដងទៀតសម្រាប់ប្រវែងពីចុងខាងលើដល់ចំណុចខ្ពស់នោះ ដើម្បីត្រួតពិនិត្យ។</dd><dd>កន្លែងណាដែល HGL ធ្លាក់ចុះក្រោមបំពង់ ទឹកស្ថិតនៅក្រោមសម្ពាធអវិជ្ជមាន។ ខ្យល់នឹងចេញពីទឹក បំពង់ជញ្ជាំងស្ដើងអាចរលំបាក់ ហើយទឹកក្រោមដីកខ្វក់អាចត្រូវបានទាញចូលតាមថ្នាំបំពង់។ រក្សាបំពង់ឲ្យស្ថិតនៅក្រោមសម្ពាធវិជ្ជមានគ្រប់ទីកន្លែង ហើយពិចារណាដាក់វ៉ាល់ខ្យល់ (air valve) នៅរាល់ចំណុចខ្ពស់។</dd><dt>សម្ពាធចំហៀងលើ គឺជាលក្ខខណ្ឌព្រំដែនដែលអ្នកផ្ដល់ឲ្យ។</dt><dd>អានតម្លៃពីម៉ែត្រ (gauge) ពីកម្រិតទឹកក្នុងធុងស្តុក (កម្ពស់ទឹកខាងលើបំពង់) ឬពីខ្សែកោងម៉ាស៊ីនបូម។ ម៉ាស៊ីនបូមផ្ដល់សម្ពាធតិចជាងនៅពេលលំហូរកើនឡើង ដូច្នេះសូមប្រើចំណុចលើខ្សែកោងដែលត្រូវនឹងលំហូរដែលបានបញ្ចូលខាងលើ។</dd><dt>សូមបូកសរុបមេគុណការបាត់បង់មូលដ្ឋាន (local) ដោយខ្លួនអ្នក។</dt><dd>បូកសរុបតម្លៃ K សម្រាប់រាល់វ៉ាល់ ចំណុចកោង តភ្ជាប់បីផ្លូវ (tee) ម៉ែត្រ និងច្រកចូលនីមួយៗនៅលើបន្ទាត់ ហើយបញ្ចូលផលបូកនោះ។ តាមតំណភ្ជាប់នៅចំណុចបញ្ចូលនោះ ដើម្បីមើលតម្លៃធម្មតា។ លើបំពង់មេបញ្ជូនទឹកវែង ការបាត់បង់ទាំងនេះមានទំហំតូចបើប្រៀបធៀបនឹងកកិត ប៉ុន្តែក្នុងបំពង់ខាងក្នុងស្ថានីយខ្លីៗ ការបាត់បង់ទាំងនេះអាចជាភាគច្រើននៃការបាត់បង់សរុប។</dd></dl>';
-
-
 // Manning Irregular
 $ec_lang['mi_menu']='Manning ប្រឡាយខណ្ឌកាត់មិនទៀងទាត់';
 $ec_lang['mi_main_title']='ម៉ាស៊ីនគណនា Manning សម្រាប់ប្រឡាយខណ្ឌកាត់មិនទៀងទាត់ ឥតគិតថ្លៃ';
@@ -249,13 +246,13 @@ $ec_lang['mtc_blodgett_v_bathurst']='Blodgett ទល់នឹង Bathurst';
 $ec_lang['mtc_pi_range_check']='ការត្រួតពិនិត្យដែនកំណត់ P&I';
 $ec_lang['mtc_pi_ok']='d50 ស្ថិតក្នុងដែនកំណត់ P&I';
 $ec_lang['mtc_pi_ok_tip']='0.28–0.36 ហ្វីត (Phillips & Ingersoll, 1998)';
+$ec_lang['mtc_not_applicable']='មិនអនុវត្ត';
 $ec_lang['mtc_pi_out_of_range']='ក្រៅដែនកំណត់';
 $ec_lang['mtc_pi_tip']='កំពុងប៉ាន់ស្មានលើសពីដែនទិន្នន័យ 0.28–0.36 ហ្វីត ដែលសមីការនេះបានមកពី — សូមចាត់ទុកជាការត្រួតពិនិត្យប្រហាក់ប្រហែល មិនមែនជាមូលដ្ឋានរចនាឡើយ';
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="តាមលោក Isbash (1936) និង Maricopa County រដ្ឋ Arizona សហរដ្ឋអាមេរិក។">ទំហំថ្មខ្ចាញ់ខាងក្រោមដែលត្រូវការ, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="តាមលោក Isbash (1936) និង Maricopa County រដ្ឋ Arizona សហរដ្ឋអាមេរិក។">ទំហំថ្មខ្ចាញ់ជម្រាលចំហៀង 1 ដែលត្រូវការ, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="តាមលោក Isbash (1936) និង Maricopa County រដ្ឋ Arizona សហរដ្ឋអាមេរិក។">ទំហំថ្មខ្ចាញ់ជម្រាលចំហៀង 2 ដែលត្រូវការ, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_time_run_tip']='ដោះស្រាយបណ្ដាញនេះនៅរាល់ជំហានពេលវេលាធារាសាស្ត្ររបស់វា។';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="តាមលោក Maynord, Ruff, and Abt (1989)។ នៅចំណុចបត់ ថ្មត្រូវបានកំណត់ទំហំសម្រាប់ល្បឿននៅចំណុចបត់ស្មើនឹង 4/3 នៃល្បឿនមធ្យម តាម California Division of Highways (1970); ចំណែកតម្លៃ 1.5 ផ្ទាល់ខ្លួនរបស់ Maynord អនុវត្តចំពោះប្រឡាយធម្មជាតិ។">ទំហំថ្មខ្ចាញ់ដែលត្រូវការ, D<sub>50</sub> (Maynord, Ruff, and Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='ទំហំថ្មខ្ចាញ់ដែលត្រូវការ, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='ល្បឿនសមស្របសម្រាប់សន្មតការហូរឯកសណ្ឋាន។';
@@ -624,8 +621,6 @@ $ec_lang['bpn_notes_2_term']='តែបណ្ដាញបែកសាខា គ�
 $ec_lang['bpn_notes_2_def']='ខ្សែបំពង់នីមួយៗមានខ្សែខាងលើតែមួយប៉ុណ្ណោះ (មែកធាង)។ ឧបករណ៍នេះមិនដោះស្រាយបណ្ដាញរង្វិលបិទទេ ដែលត្រូវការវិធីសាស្ត្រធ្វើម្ដងទៀត (EPANET ឬស្រដៀងគ្នា)។ ដោយសារបណ្ដាញគ្មានរង្វិលបិទ ដំណោះស្រាយគឺផ្ទាល់ និងពិតប្រាកដ។';
 $ec_lang['bpn_notes_3_term']='គ្មានឧបករណ៍បញ្ជាសម្ពាធសកម្ម';
 $ec_lang['bpn_notes_3_def']='អ្នកអាចបន្ថែមវ៉ាល់បាត់បង់មូលដ្ឋានថេរមួយ (តម្លៃ k) ប៉ុន្តែមិនអាចបន្ថែមវ៉ាល់កាត់បន្ថយសម្ពាធ ឬវ៉ាល់រក្សាសម្ពាធ (PRV/PSV) បានទេ។ ស្ថានភាពបើក/បិទរបស់វ៉ាល់ទាំងនោះអាស្រ័យលើលំហូរ និងសម្ពាធ ដែលនឹងបង្ខំឲ្យធ្វើការគណនាម្ដងទៀត។';
-
-
 $ec_lang['bpn_supply2_q']='លំហូរផ្គត់ផ្គង់ ២';
 $ec_lang['bpn_supply2_h']='ក្បាលទឹកផ្គត់ផ្គង់ ២';
 $ec_lang['bpn_supply3_q']='លំហូរផ្គត់ផ្គង់ ៣';
@@ -654,6 +649,8 @@ $ec_lang['lpn_tool_add_pump']='ម៉ាស៊ីនបូម';
 // alone teach nobody and the words alone are longer than a modeller wants to read every time.
 $ec_lang['lpn_tool_add_valve']='វ៉ាល់';
 $ec_lang['lpn_tool_add_text']='អត្ថបទ';
+// Junction and Pipe (Task 719): Tom's WaterCAD command, a junction, a pipe, a junction, a pipe, until Escape.
+$ec_lang['lpn_tool_add_chain']='ខ្សែសង្វាក់ថ្នាំង-បំពង់';
 $ec_lang['lpn_tool_vertices']='ចំណុចកំណត់';
 // ---- CUSTOMERS: metered demands, lumped at the nearest node (ROADMAP Task 247) ----
 // **THE FEATURE IS CALLED CUSTOMER AND NOTHING A PERSON READS SAYS METER** (Tom, 2026-09-18:
@@ -668,6 +665,9 @@ $ec_lang['lpn_tool_add_meter']='អតិថិជន';
 $ec_lang['lpn_tool_add_meter_tip']='ចុចចំណុចអតិថិជន បន្ទាប់មកការតភ្ជាប់របស់វា៖ តំណ ឬថ្នាំង។ តម្រូវការដែលអ្នកផ្ដល់ឲ្យអតិថិជនត្រូវបានបន្ថែមទៅថ្នាំងនៅចុងដែលនៅជិតបំផុតនៃតំណនោះ។';
 $ec_lang['lpn_mode_add_meter']='អតិថិជន៖ ចុចលើកន្លែងដែលអតិថិជននៅ រួចចុចលើបំពង់ ឬថ្នាំងដែលបម្រើវា។ ឬចុច Esc ដើម្បីបោះបង់។';
 $ec_lang['lpn_pane_tab_customers']='អតិថិជន';
+// The Shape table (Task 779). Closed is a polygon's closure, not a pipe's or valve's status, so it
+// is a key of its own and not lpn_field_closed: many languages use different words for the two.
+// Points is the column of the Shape's points, "Shape S1, point 2" in lpn_snap_shape_point.
 $ec_lang['lpn_pane_tab_shapes']='រូបគូរ';
 $ec_lang['lpn_pane_shape_closed']='បិទ';
 $ec_lang['lpn_pane_shape_points']='ចំណុច';
@@ -705,12 +705,13 @@ $ec_lang['lpn_field_meter_lumped']='បន្ថែមទៅថ្នាំង';
 $ec_lang['lpn_field_meter_lumped_tip']='ថ្នាំងដែលនៅជិតបំផុត; តម្រូវការរបស់អតិថិជននេះត្រូវបានបន្ថែមទៅទីនោះ។';
 $ec_lang['lpn_node_customers']='តម្រូវការអតិថិជន';
 $ec_lang['lpn_node_customers_tip']='បញ្ជីអតិថិជនដែលបានបន្ថែមនៅថ្នាំងនេះ (ព្រោះនេះជាថ្នាំងដែលនៅជិតបំផុត)។ តម្រូវការអតិថិជនគឺបន្ថែមលើតម្រូវការផ្សេងទៀតដែលរាយនៅទីនេះ។ អតិថិជនមួយត្រូវបានកែសម្រួលនៅកន្លែងវាស្ថិតនៅលើផែនទី ឬនៅក្នុងតារាងអតិថិជន។';
-$ec_lang['lpn_node_customers_sum']='{total} {unit} ពីអតិថិជន {n}';
+$ec_lang['lpn_node_customers_sum']='{total} {unit} ពីអតិថិជន ({n})';
 $ec_lang['lpn_customer_detached']='⚠ អតិថិជននេះមិនបានភ្ជាប់ទៅបំពង់ណាមួយទេ ដូច្នេះតម្រូវការរបស់វាមិននៅក្នុងចម្លើយទេ។ លុបវាចោល ឬគូរបំពង់មួយ រួចផ្លាស់ទីអតិថិជនទៅលើវា។';
 $ec_lang['lpn_customer_fixed_head']='⚠ ចុងដែលនៅជិតនៃបំពង់នោះមានផ្ទៃទឹកថេរមួយ ដូច្នេះតម្រូវការនេះមិនប៉ះពាល់ដល់ការក្លែងធ្វើទេ។';
-$ec_lang['lpn_customer_detached_count']='អតិថិជន {n} មិនបានភ្ជាប់ទៅបំពង់ណាមួយទេ។ តម្រូវការរបស់ពួកគេមិនត្រូវបានរាប់បញ្ចូលទេ។';
+
+$ec_lang['lpn_customer_detached_count']='អតិថិជនដែលមិនបានភ្ជាប់ទៅបំពង់ ({n})។ តម្រូវការរបស់ពួកគេមិនត្រូវបានរាប់បញ្ចូលទេ។';
 $ec_lang['lpn_meter_pick_pipe']='ឥឡូវជ្រើសរើសបំពង់ ឬថ្នាំងដែលបម្រើអតិថិជននេះ។ អតិថិជននៅកន្លែងដែលអ្នកបានដាក់វា។ ចុច Esc ដើម្បីបោះបង់។';
-$ec_lang['lpn_inp_export_flat_customers']='ឯកសារ EPANET គ្មានអតិថិជនទេ។ តម្រូវការរបស់អតិថិជន {n} ក្នុងគម្រោងនេះត្រូវបានសរសេរជាជួរតម្រូវការលើថ្នាំងដែលអតិថិជននីមួយៗត្រូវបានកំណត់ ដោយដាក់ឈ្មោះតាមស្លាកសម្គាល់របស់អតិថិជន។ ឯកសារមិនកត់ត្រាអតិថិជនខ្លួនឯងទេ៖ ទីតាំងរបស់វា បំពង់ដែលបម្រើវា កន្លែងតាមបណ្ដោយបំពង់ដែលសេវាភ្ជាប់ ឬចំនួនសេវាដែលវាតំណាង។ ព័ត៌មានទាំងនោះនៅក្នុងគម្រោង។ សូមរក្សាទុកឯកសារគម្រោងដើម្បីរក្សាវា។';
+$ec_lang['lpn_inp_export_flat_customers']='ឯកសារ EPANET គ្មានអតិថិជនទេ។ តម្រូវការរបស់អតិថិជនក្នុងគម្រោងនេះ ({n}) ត្រូវបានសរសេរជាជួរតម្រូវការលើថ្នាំងដែលអតិថិជននីមួយៗត្រូវបានកំណត់ ដោយដាក់ឈ្មោះតាមស្លាកសម្គាល់របស់អតិថិជន។ ឯកសារមិនកត់ត្រាអតិថិជនខ្លួនឯងទេ៖ ទីតាំងរបស់វា បំពង់ដែលបម្រើវា កន្លែងតាមបណ្ដោយបំពង់ដែលសេវាភ្ជាប់ ឬចំនួនសេវាដែលវាតំណាង។ ព័ត៌មានទាំងនោះនៅក្នុងគម្រោង។ សូមរក្សាទុកឯកសារគម្រោងដើម្បីរក្សាវា។';
 
 $ec_lang['lpn_area_hint_window_start']='ចុចលើជ្រុងមួយនៃបង្អួច។';
 $ec_lang['lpn_area_hint_window_go']='ចុចលើជ្រុងម្ខាងទៀតដើម្បីបញ្ចប់។';
@@ -733,12 +734,12 @@ $ec_lang['lpn_multi_title']='បានជ្រើសរើស {n}';
 $ec_lang['lpn_multi_varies']='ខុសៗគ្នា';
 $ec_lang['lpn_multi_applied']='បានកំណត់ {prop} លើ {n}។';
 $ec_lang['lpn_multi_no_fields']='ធាតុទាំងនេះគ្មានអ្វីអាចកំណត់ជាមួយគ្នានៅទីនេះទេ។';
-$ec_lang['lpn_pane_pasted']='បានបិទភ្ជាប់ក្រឡា {n}។ ក្រឡា {skipped} មិនបានផ្លាស់ប្ដូរទេ។';
+$ec_lang['lpn_pane_pasted']='ក្រឡាដែលបានបិទភ្ជាប់ ({n})។ ក្រឡាដែលមិនបានផ្លាស់ប្ដូរ ({skipped})។';
 // PASTE THAT ADDS ROWS (Task 610). A block pasted into a table past its last row adds new
 // junctions, pipes and so on. {n} is how many rows were pasted, {created} how many of them are new,
 // {skipped} how many cells were left as they were.
-$ec_lang['lpn_pane_pasted_rows']='បានបិទភ្ជាប់ជួរដេក {n} ហើយបានបន្ថែម {created} ក្នុងចំណោមនោះទៅបណ្ដាញ។';
-$ec_lang['lpn_pane_pasted_rows_skipped']='បានបិទភ្ជាប់ជួរដេក {n} ហើយបានបន្ថែម {created} ក្នុងចំណោមនោះទៅបណ្ដាញ។ ក្រឡា {skipped} មិនត្រូវបានផ្លាស់ប្ដូរទេ។';
+$ec_lang['lpn_pane_pasted_rows']='ជួរដេកដែលបានបិទភ្ជាប់ ({n})។ ជួរដេកដែលបានបន្ថែមទៅបណ្ដាញ ({created})។';
+$ec_lang['lpn_pane_pasted_rows_skipped']='ជួរដេកដែលបានបិទភ្ជាប់ ({n})។ ជួរដេកដែលបានបន្ថែមទៅបណ្ដាញ ({created})។ ក្រឡាដែលមិនបានផ្លាស់ប្ដូរ ({skipped})។';
 // Added after "This network has none of these yet." on an empty table, which is where a paste lands.
 $ec_lang['lpn_pane_paste_here']='ជ្រើសរើសតំបន់នេះ ហើយបិទភ្ជាប់ជួរដេកពីសៀវភៅបញ្ជីដើម្បីបន្ថែមពួកវា។';
 // The menu action that adds the clipboard's rows as new elements below the last row (an ordinary
@@ -750,14 +751,14 @@ $ec_lang['lpn_pane_paste_append']='បិទភ្ជាប់ជាជួរដ
 $ec_lang['lpn_pane_paste_armed']='ចុច Ctrl+V ដើម្បីបន្ថែមជួរដេកដែលបានចម្លងទៅខាងក្រោមតារាងនេះ។ ចុច Esc ដើម្បីបោះបង់។';
 // Asked when an ordinary paste runs past the last row of a table. {n} is how many rows were
 // pasted, {fit} how many land on rows that exist, {extra} how many are left over.
-$ec_lang['lpn_pane_paste_overflow']='ការបិទភ្ជាប់នេះមានជួរដេក {n} ហើយមាន {fit} ក្នុងចំណោមនោះសមនឹងតារាង។ បន្ថែម {extra} ទៀតជាជួរដេកថ្មីនៅខាងក្រោមដែរឬទេ?';
-$ec_lang['lpn_pane_paste_overflow_add']='បន្ថែមជួរដេក {extra}';
-$ec_lang['lpn_pane_paste_overflow_fit']='បិទភ្ជាប់តែ {fit} ដែលសមប៉ុណ្ណោះ';
+$ec_lang['lpn_pane_paste_overflow']='ជួរដេកក្នុងការបិទភ្ជាប់នេះ ({n})។ ជួរដេកដែលសមនឹងតារាង ({fit})។ បន្ថែមជួរដេកផ្សេងទៀត ({extra}) ជាជួរដេកថ្មីនៅខាងក្រោមដែរឬទេ?';
+$ec_lang['lpn_pane_paste_overflow_add']='បន្ថែមជួរដេក ({extra})';
+$ec_lang['lpn_pane_paste_overflow_fit']='បិទភ្ជាប់តែជួរដេកដែលសមប៉ុណ្ណោះ ({fit})';
 // The same question when the left-over rows could not be added; {reasons} names the rows and why.
-$ec_lang['lpn_pane_paste_overflow_bad']='ការបិទភ្ជាប់នេះមានជួរដេក {n} ហើយមាន {fit} ក្នុងចំណោមនោះសមនឹងតារាង។ {extra} ទៀតមិនអាចបន្ថែមជាជួរដេកថ្មីបានទេ៖ {reasons}';
+$ec_lang['lpn_pane_paste_overflow_bad']='ជួរដេកក្នុងការបិទភ្ជាប់នេះ ({n})។ ជួរដេកដែលសមនឹងតារាង ({fit})។ ជួរដេកផ្សេងទៀត ({extra}) មិនអាចបន្ថែមជាជួរដេកថ្មីបានទេ៖ {reasons}';
 // Tom's own wording (2026-09-26). Asked when an ordinary paste would change the ID of {n} rows
 // that already exist; the buttons are Paste and Cancel.
-$ec_lang['lpn_pane_paste_ids_differ']='លេខសម្គាល់ {n} មិនត្រូវគ្នាទេ។ នៅតែបិទភ្ជាប់ដែរឬទេ?';
+$ec_lang['lpn_pane_paste_ids_differ']='លេខសម្គាល់ដែលមិនត្រូវគ្នា ({n})។ នៅតែបិទភ្ជាប់ដែរឬទេ?';
 // A paste that would add rows is refused whole when any row fails. {reasons} is one or more of the
 // Row sentences below, each naming the row of the pasted block, counted from 1.
 $ec_lang['lpn_pane_paste_refused']='គ្មានអ្វីត្រូវបានបិទភ្ជាប់ទេ។ {reasons}';
@@ -780,22 +781,24 @@ $ec_lang['lpn_pane_paste_text_no_position']='ជួរដេក {row}៖ អត�
 $ec_lang['lpn_pane_paste_no_anchor']='ជួរដេក {row}៖ {id} មិនមែនជាថ្នាំង ឬបំពង់នៅក្នុងបណ្ដាញនេះនៅឡើយទេ។ សូមបិទភ្ជាប់វាមុនសិន រួចទើបអត្ថបទនេះ។';
 $ec_lang['lpn_pane_paste_customer_no_position']='ជួរដេក {row}៖ អតិថិជនថ្មីម្នាក់ត្រូវការទាំង {first} និង {second}។';
 $ec_lang['lpn_pane_paste_shape_no_points']='ជួរដេក {row}៖ រូបគូរថ្មីត្រូវការចំណុចរបស់វា។';
+// {pair} is the Points heading's own pair in this project's axis words: X/Y, N/E or Lat/Lon.
 $ec_lang['lpn_pane_paste_shape_bad_points']='ជួរដេក {row}៖ {text} មិនមែនជាបញ្ជីចំណុចទេ។ សរសេរចំណុចនីមួយៗជា {pair} ដោយប្រើចំណុច (.) ជាសញ្ញាទសភាគ ហើយបំបែកចំណុចដោយ |។';
 $ec_lang['lpn_pane_paste_shape_closed_few']='ជួរដេក {row}៖ រូបគូរបិទត្រូវការចំណុចយ៉ាងតិចបី។';
 $ec_lang['lpn_pane_paste_no_customer_ref']='ជួរដេក {row}៖ អតិថិជនថ្មីម្នាក់ត្រូវការបំពង់ ឬថ្នាំងដែលបានភ្ជាប់មួយ។';
 $ec_lang['lpn_pane_paste_no_pipe']='ជួរដេក {row}៖ បំពង់ {id} មិនទាន់មាននៅឡើយទេ។ សូមបិទភ្ជាប់បំពង់របស់អ្នកមុនសិន រួចទើបអតិថិជនរបស់អ្នក។';
 $ec_lang['lpn_pane_paste_no_customer_node']='ជួរដេក {row}៖ ថ្នាំង {id} មិនទាន់មាននៅឡើយទេ។ សូមបិទភ្ជាប់ថ្នាំងរបស់អ្នកមុនសិន រួចទើបអតិថិជនរបស់អ្នក។';
 $ec_lang['lpn_pane_paste_customer_node_no_pipe']='ជួរដេក {row}៖ ថ្នាំង {id} គ្មានបំពង់ណាមួយសម្រាប់អតិថិជនម្នាក់ភ្ជាប់ចូលទេ។';
-
-
-$ec_lang['lpn_pane_filled']='បានបំពេញចុះក្រោមក្រឡា {n}។ {skipped} មិនត្រូវបានផ្លាស់ប្ដូរទេ។';
+$ec_lang['lpn_pane_filled']='ក្រឡាដែលបានបំពេញចុះក្រោម ({n})។ ក្រឡាដែលមិនបានផ្លាស់ប្ដូរ ({skipped})។';
 $ec_lang['lpn_pane_filldown']='បំពេញចុះក្រោម';
+$ec_lang['lpn_pane_delete_element']='លុបធាតុ';
+$ec_lang['lpn_pane_delete_elements']='លុបធាតុទាំងនេះ';
 $ec_lang['lpn_pane_fill_none']='គ្មានអ្វីនៅក្នុងជម្រើសនេះអាចបំពេញចុះក្រោមបានទេ។';
-$ec_lang['lpn_pane_ctrlenter_filled']='បានបំពេញក្រឡា {n}។ {skipped} មិនត្រូវបានផ្លាស់ប្ដូរទេ។';
+$ec_lang['lpn_pane_ctrlenter_filled']='ក្រឡាដែលបានបំពេញ ({n})។ ក្រឡាដែលមិនបានផ្លាស់ប្ដូរ ({skipped})។';
 $ec_lang['lpn_pane_hide_col']='លាក់ជួរឈរនេះ';
 $ec_lang['lpn_pane_hide_cols']='លាក់ជួរឈរទាំងនេះ';
 $ec_lang['lpn_pane_show_all_cols']='បង្ហាញជួរឈរទាំងអស់';
 $ec_lang['lpn_pane_sort_asc']='តម្រៀបឡើង';
+$ec_lang['lpn_pane_sort_desc']='តម្រៀបចុះ';
 $ec_lang['lpn_pane_manage_cols']='គ្រប់គ្រងជួរឈរ…';
 $ec_lang['lpn_pane_manage_cols_title']='គ្រប់គ្រងជួរឈរ';
 $ec_lang['lpn_pane_manage_cols_show']='បង្ហាញ';
@@ -803,12 +806,15 @@ $ec_lang['lpn_pane_manage_cols_up']='ផ្លាស់ទីឡើងលើ';
 $ec_lang['lpn_pane_manage_cols_down']='ផ្លាស់ទីចុះក្រោម';
 $ec_lang['lpn_pane_manage_cols_top']='ផ្លាស់ទីទៅដើម';
 $ec_lang['lpn_pane_manage_cols_bottom']='ផ្លាស់ទីទៅចុង';
+$ec_lang['lpn_pane_manage_cols_width']='ទទឹង (em)';
+$ec_lang['lpn_pane_width_tip']='ទទឹងជួរឈរត្រូវបានរក្សាទុកក្នុងកម្មវិធីរុករកនេះ មិនមែនក្នុងគម្រោងទេ។ ចុចទ្វេដងលើខ្សែបែងចែកជួរឈរ ដើម្បីស្ដារទទឹងលំនាំដើម។';
 $ec_lang['lpn_pane_colmenu_tip']='លាក់ ឬគ្រប់គ្រងជួរឈរ';
 $ec_lang['lpn_tool_area_window']='ជ្រើសរើសបង្អួច';
 $ec_lang['lpn_tool_area_lasso']='ជ្រើសរើសដោយខ្សែរូបភាព';
 $ec_lang['lpn_tool_area_polygon']='ជ្រើសរើសពហុកោណ';
 $ec_lang['lpn_tool_delete']='លុប';
 $ec_lang['lpn_tool_zoom_extent']='ពង្រីកឲ្យសមនឹងអេក្រង់';
+$ec_lang['lpn_tool_zoom_selection']='ពង្រីកទៅធាតុដែលបានជ្រើស';
 $ec_lang['lpn_tool_zoom_window']='បង្អួចពង្រីក';
 $ec_lang['lpn_zoom_in']='ពង្រីក';
 $ec_lang['lpn_zoom_out']='បង្រួម';
@@ -875,7 +881,12 @@ $ec_lang['lpn_field_head_tip']='កម្រិតផ្ទៃទឹកនៅក
 // pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
 // "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
 // a tank level from the vessel floor, not from the same zero the elevations use.
+// A tank has two elevations (Tom, 2026-10-11): Elevation is the ground, the pressure datum as at a
+// junction; Base elevation is the tank bottom, EPANET's [TANKS] Elevation, from which depth and
+// volume are measured.
+$ec_lang['lpn_field_tank_base_elev']='កម្ពស់បាត';
 $ec_lang['lpn_field_tank_base_elev_tip']='កម្ពស់បាតធុងទឹក ដែលជម្រៅទឹក និងទំហំត្រូវបានវាស់ពីទីនោះ។ ប្រសិនបើទុកទទេ បាតស្ថិតនៅកម្ពស់ដី។';
+$ec_lang['lpn_tank_ground_elev_tip']='កម្ពស់ដីនៅធុងទឹក។ សម្ពាធនៅធុងទឹកត្រូវបានវាស់ពីទីនេះ ដូចនៅថ្នាំង។';
 $ec_lang['lpn_field_tank_level']='ជម្រៅទឹក';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_level_tip']='ជម្រៅទឹកនៅក្នុងធុងទឹក វាស់ឡើងលើពីបាតធុង។ ផ្ទៃទឹកគឺជាកម្ពស់បាតធុងបូកនឹងជម្រៅនេះ។';
@@ -893,10 +904,19 @@ $ec_lang['lpn_field_tank_diameter_tip']='ទទឹងធុងទឹកពីច
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tank_head_tip']='កម្ពស់ផ្ទៃទឹកក្នុងធុងទឹក៖ កម្ពស់បាតបូកជម្រៅទឹក។';
 $ec_lang['lpn_close']='បិទ';
+// The corner buttons beside every standing box's X (Task 441). Each is an icon-only button, so the
+// value is its name: the hover tip and the screen reader's label at once. Auto-hide is a toggle and
+// says its state through aria-pressed, so one wording serves both states (AutoCAD's own word).
+$ec_lang['lpn_dock_left']='ភ្ជាប់នៅខាងឆ្វេងនៃផែនទី';
+$ec_lang['lpn_dock_right']='ភ្ជាប់នៅខាងស្ដាំនៃផែនទី';
+$ec_lang['lpn_dock_float']='អណ្ដែត';
+$ec_lang['lpn_dock_autohide']='លាក់ស្វ័យប្រវត្តិ';
 // The property popup's own name, in its drag bar (Tom, 2026-09-08: *"maybe the right title is
 // 'Properties'"*). It names the BOX, not the element in it: lpn_popup_title below the bar carries
 // the element's id and its rename box, and the two are read one under the other.
 $ec_lang['lpn_popup_boxtitle']='លក្ខណៈសម្បត្តិ';
+// What a docked Properties box says while nothing is selected: it stays in its dock (Tom, 2026-10-07).
+$ec_lang['lpn_popup_none']='គ្មានអ្វីត្រូវបានជ្រើសរើសទេ។ ជ្រើសរើសធាតុមួយនៅលើផែនទី ដើម្បីមើលលក្ខណៈសម្បត្តិរបស់វា។';
 $ec_lang['lpn_empty_hint']='ប្រើម៉ឺនុយឯកសារ, គម្រោងថ្មី ដើម្បីបើកគំរូមួយ។ ឬចាប់ផ្ដើមដោយបន្ថែមអាងស្តុក ថ្នាំង និងបំពង់ពីរបារឧបករណ៍។';
 // ROADMAP Task 647, Tom 2026-09-13: a project with elements, none of which the current view can
 // see, reads exactly like a lost project unless something says otherwise. Shown in a centred
@@ -919,10 +939,11 @@ $ec_lang['lpn_examples_sub']='គំរូនីមួយៗបើកជាច�
 $ec_lang['lpn_examples_open']='បើក';
 $ec_lang['lpn_examples_menu']='បើកគំរូ…';
 $ec_lang['lpn_examples_blank']='ឬចាប់ផ្ដើមជាមួយផែនទីទទេ';
-// The SAME exit, worded for the other way in. Opened from File the user already has work on
-// screen, so "start with a blank map" reads as "discard it" and they do not dare press the
-// only button that leaves (Tom, 2026-08-17: "I can't back out of the gallery... I am forced to
-// open an example"). Closing never touches a project either way.
+// The SAME exit, worded for the other way in, is lpn_close (Task 699 merged its own 'Close' key
+// into it). Opened from File the user already has work on screen, so "start with a blank map"
+// reads as "discard it" and they do not dare press the only button that leaves (Tom, 2026-08-17:
+// "I can't back out of the gallery... I am forced to open an example"). Closing never touches a
+// project either way.
 $ec_lang['lpn_examples_size']='ថ្នាំង៖ {nodes}, តំណ៖ {links}';
 $ec_lang['lpn_examples_failed']='មិនអាចផ្ទុកគំរូបានទេ។ សូមប្រើម៉ឺនុយឯកសារ, គម្រោងថ្មី ដើម្បីចាប់ផ្ដើមគំនូរមួយ។';
 $ec_lang['lpn_examples_loading']='កំពុងផ្ទុកគំរូ…';
@@ -932,25 +953,130 @@ $ec_lang['lpn_examples_loading']='កំពុងផ្ទុកគំរូ…'
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='ជួសជុលអ្វីមួយ';
 $ec_lang['lpn_help_notes']='កំណត់ចំណាំអំពីទំព័រនេះ';
+$ec_lang['lpn_guide_about_heading']='អំពីម៉ាស៊ីនគណនានេះ';
+$ec_lang['lpn_guide_group_from']='ពីម៉ឺនុយ {menu}';
+$ec_lang['lpn_guide_menu_named']='ម៉ឺនុយ {menu}';
+// **THE NEW BOX, TASK 745** (Tom, 2026-09-29: reorganize Help into three groups, with a new
+// "Tables and Hotkeys" box gathering all table help and all keyboard shortcuts). One key names
+// both the Help row and the box's own title bar, the same pattern lpn_help_notes already carries
+// for the Notes box.
 $ec_lang['lpn_help_hotkeys']='តារាង និងគ្រាប់ចុចផ្លូវកាត់';
+// **THE USER GUIDE** (Tom, 2026-10-06: "Maybe items 2 and 3 combined into a simple User Manual or
+// whatever the 2026 thing is?"; Ida's design). Names both the Help row and the box's title bar. It
+// replaces lpn_help_hotkeys and the Help > Toolbar fly-out (lpn_help_icons, which still heads the
+// box's Toolbar section).
+$ec_lang['lpn_help_manual']='មគ្គុទ្ទេសក៍';
+// The Guide's contents rail, its search, its Boxes section and the "?" in every box's title bar.
+$ec_lang['lpn_guide_contents']='មាតិកា';
+$ec_lang['lpn_guide_rail_hide']='លាក់មាតិកា';
+$ec_lang['lpn_guide_rail_show']='បង្ហាញមាតិកា';
+$ec_lang['lpn_guide_search']='ស្វែងរកក្នុងមគ្គុទ្ទេសក៍';
+$ec_lang['lpn_guide_boxes_heading']='ប្រអប់';
+$ec_lang['lpn_guide_boxes_intro']='ប្រអប់នីមួយៗអាចត្រូវបានផ្លាស់ទី ប្ដូរទំហំ ភ្ជាប់នៅខាងឆ្វេង ឬខាងស្ដាំនៃផែនទី ឬបិទ។ ? នៅរបារចំណងជើងរបស់ប្រអប់បើកជំនួយរបស់វា។';
+// Tom's own wording, 2026-10-07 (his typo "to not" corrected). Below lpn_guide_boxes_intro.
+$ec_lang['lpn_guide_boxes_autohide']='នៅពេលទ្រនិចចេញទៅ ប្រអប់ដែលគ្មានការផ្ដោតនឹងលាក់បន្ទាប់ពីពេលខ្លីមួយ។ ប្រអប់ដែលមានការផ្ដោតលាក់នៅពេលអ្នកចុចខាងក្រៅវា ចុច Esc ឬចុច Tab ចេញពីវា ខណៈទ្រនិចនៅកន្លែងផ្សេង។';
+$ec_lang['lpn_guide_box_help']='ជំនួយសម្រាប់ប្រអប់នេះ';
+// A Boxes entry whose box shares its name with a section of the Guide ("Screenshot"), in the Guide
+// only, so its Contents list does not show one word twice. Keep {box} as it is.
+$ec_lang['lpn_guide_box_named']='ប្រអប់ {box}';
+// Above the Toolbar rows, shown only while some are dimmed (on a phone, or Calculate while
+// Recalculate automatically is on): a grey name otherwise reads as a disabled button.
+$ec_lang['lpn_guide_dimmed']='ឈ្មោះដែលស្រអាប់គឺជាប៊ូតុងដែលកំពុងត្រូវបានលាក់នៅលើរបារឧបករណ៍។';
+// One entry in the Guide's Boxes section for each box, shown by the "?" in its title bar. Fire flow,
+// Critical assets, and Demand scaling carry theirs in lpn_ff_intro and the keys that follow it.
+$ec_lang['lpn_guide_text_popup']='បង្ហាញលក្ខណៈសម្បត្តិរបស់ធាតុ ឬអត្ថបទដែលបានជ្រើសរើស ឬរបស់ធាតុជាច្រើនដែលបានជ្រើសរើស នៅជាប់នឹងការជ្រើសរើស ឬនៅកន្លែងដែលប្រអប់ត្រូវបានផ្លាស់ទីចុងក្រោយ។ តម្លៃដែលបានកែប្រែផ្លាស់ប្ដូរបណ្ដាញភ្លាមៗ ហើយស្លាកផែនទីរបស់ធាតុ និងផ្ទាំងតារាងធ្វើតាម។ លទ្ធផលនៃការគណនាចុងក្រោយត្រូវបានរាយនៅខាងក្រោមធាតុបញ្ចូល ហើយមិនអាចកែសម្រួលបានទេ។';
+$ec_lang['lpn_guide_text_find_popup']='រកធាតុដែលបំពេញលក្ខខណ្ឌមួយ ដូចជាបំពង់ទាំងអស់ដែលតូចជាង 8 in. ឬថ្នាំងទាំងអស់ដែលមានសម្ពាធក្រោម 40 psi ហើយអាចប្ដូរលក្ខណៈសម្បត្តិមួយនៅលើធាតុទាំងអស់នោះក្នុងប្រតិបត្តិការតែមួយ។ ប្រើវាដើម្បីពិនិត្យគំរូមុនពេលដោះស្រាយ (កម្ពស់ដែលខ្វះ ឬអង្កត់ផ្ចិតដែលបញ្ចូលក្នុងឯកតាខុស) ដើម្បីរាយទីតាំងដែលមានបញ្ហាបន្ទាប់ពីដោះស្រាយ (សម្ពាធទាប ល្បឿនខ្ពស់) និងដើម្បីកែតែមួយលើធាតុជាច្រើន។\n\nបញ្ជី អ្វីត្រូវរក លក្ខណៈសម្បត្តិ លក្ខខណ្ឌ និង តម្លៃ បង្កើតលក្ខខណ្ឌមួយ ហើយសរសេរវាជាបន្ទាត់អត្ថបទក្នុងប្រអប់ សំណួរ។ បន្ទាត់នេះក៏អាចកែសម្រួលដោយផ្ទាល់បានដែរ ហើយបញ្ជីធ្វើតាម។ សំណួរដែលបញ្ជីមិនអាចបង្ហាញបាន ដូចជាលក្ខខណ្ឌពីរភ្ជាប់ដោយ OR លាក់បញ្ជី រហូតដល់ប៊ូតុង ប្រើប្រដាប់ត្រួតត្រាវិញ ត្រូវបានចុច។ ដើម្បីស្វែងរក ចុច Enter ក្នុងប្រអប់ សំណួរ ឬចុចប៊ូតុង រក។';
+$ec_lang['lpn_guide_text_settings_box']='ការកំណត់ទាំងអស់ និងប៊ូតុងកំណត់ឡើងវិញពីរ នៅក្នុងប្រអប់ការកំណត់។ គ្មានកន្លែងផ្សេងទៀតដើម្បីរកការកំណត់ទេ។ ប្រអប់នេះអាចស្វែងរកបាន៖ វាយពាក្យមួយ ឬច្រើនក្នុង ស្វែងរកការកំណត់ ដើម្បីរាយតែការកំណត់ដែលនិយាយពីពាក្យទាំងនោះទាំងអស់។ ការកំណត់ត្រូវបានរក្សាទុកជាមួយគម្រោង លើកលែងតែ បង្ហាញប្រអប់វឌ្ឍនភាពនៃការដំណើរការ និងការកំណត់ក្រោម ទំព័រ ដែលត្រូវបានរក្សាទុកក្នុងកម្មវិធីរុករកនេះ។ ទីតាំង និងទំហំរបស់ប្រអប់នេះក៏ត្រូវបានរក្សាទុកក្នុងកម្មវិធីរុករកនេះតែប៉ុណ្ណោះ។';
+$ec_lang['lpn_guide_text_library_box']='រក្សាលំនាំ ខ្សែកោង ប្រភេទបំពង់ គ្រឿងបំពង់ ច្បាប់ត្រួតពិនិត្យ និងក្បួនរបស់គម្រោង។ ធាតុមួយសំដៅទៅលំនាំ ខ្សែកោង ប្រភេទបំពង់ ឬគ្រឿងបំពង់ដោយលេខសម្គាល់របស់វា ហើយធាតុនោះត្រូវបានកែសម្រួលនៅទីនេះ។ ច្បាប់ត្រួតពិនិត្យ និងក្បួនអនុវត្តចំពោះបណ្ដាញទាំងមូល។ ក្បួនត្រូវបានអនុវត្តដោយម៉ាស៊ីន EPANET តែប៉ុណ្ណោះ។ ទាំងអស់ត្រូវបានរក្សាទុកជាមួយគម្រោង។';
+$ec_lang['lpn_guide_text_energy_box']='រាយការណ៍ការប្រើប្រាស់ថាមពល ថាមពលកំពូល និងថ្លៃដើមរបស់ម៉ាស៊ីនបូមនីមួយៗ លើការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់ចុងក្រោយ ដោយប្រើប្រសិទ្ធភាពរបស់ម៉ាស៊ីនបូមនីមួយៗ និងតម្លៃថាមពលដែលបានកំណត់ក្រោម ការកំណត់ ថាមពល។ វាត្រូវការ រយៈពេលដំណើរការសរុប ក្នុងការកំណត់ និងបណ្ដាញដែលបានដោះស្រាយ។ វាមិនផ្លាស់ប្ដូរបណ្ដាញទេ។';
+$ec_lang['lpn_guide_text_contour_box']='គ្រប់គ្រងផែនការបន្ទាត់ស្មើតម្លៃដែលគូរលើផែនទីពីតម្លៃថ្នាំងដែលបានជ្រើសក្នុង ដាក់ពណ៌ថ្នាំងតាម៖ គម្រោងពណ៌ ការបំពេញ និងភាពស្រអាប់របស់វា ចន្លោះ និងស្លាកនៃបន្ទាត់ស្មើតម្លៃ និងចម្ងាយដែលពណ៌ដល់ពីបំពង់នីមួយៗ។ ការបិទវាលាក់ផែនការ ហើយទុកពណ៌ថ្នាំង។ វាផ្លាស់ប្ដូរតែការបង្ហាញ មិនមែនបណ្ដាញទេ។';
+$ec_lang['lpn_guide_text_scncmp_box']='ដោះស្រាយគ្រប់សេណារីយ៉ូពីច្បាប់ចម្លងនៃគំនូរ ហើយតារាងសម្រាប់ម្នាក់ៗ នូវចំនួនតម្លៃជំនួស សម្ពាធទាបបំផុត និងល្បឿនខ្ពស់បំផុត។ វាមិនផ្លាស់ប្ដូរគម្រោងទេ ហើយសេណារីយ៉ូដែលកំពុងបើកនៅដដែល។';
+$ec_lang['lpn_guide_text_rptbox']='បង្ហាញរបាយការណ៍អត្ថបទដែលសរសេរដោយម៉ាស៊ីន EPANET សម្រាប់ការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់ចុងក្រោយ រួមទាំងការព្រមាន និងសេចក្តីសង្ខេបបណ្ដាញ។ ការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់នីមួយៗជំនួសវា ការដោះស្រាយនៅពេលតែមួយមិនជំនួសទេ ហើយការកែសម្រួលទុករបាយការណ៍មុននៅនឹងកន្លែង។';
+$ec_lang['lpn_guide_text_status_box']='រាយតាមលំដាប់ពេលវេលា រាល់ការផ្លាស់ប្ដូរក្នុងការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់ចុងក្រោយ៖ ម៉ាស៊ីនបូម វ៉ាល់ ឬបំពង់បើក ឬបិទ ធុងទឹកចាប់ផ្ដើមបំពេញ ឬបន្ទោរបង់ ឬពេញ ឬទទេ និងជំហានពេលវេលាណាមួយដែលមិនបានប្រសព្វគ្នាពេញលេញ។ មានតែការផ្លាស់ប្ដូរប៉ុណ្ណោះដែលត្រូវបានរាយ មិនមែនគ្រប់ជំហានពេលវេលាទេ។';
+$ec_lang['lpn_guide_text_full_box']='រាយគ្រប់ថ្នាំង និងគ្រប់តំណនៅគ្រប់ជំហានពេលវេលារាយការណ៍ ក្នុងឯកតាដែលបង្ហាញលើផ្ទាំងតារាង។ បើគ្មានការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់ វាបង្ហាញដំណោះស្រាយបច្ចុប្បន្ននៅពេលតែមួយ។ ទាញយក ឬបោះពុម្ពមានគ្រប់ជំហានពេលវេលា ហើយតារាងបង្ហាញម្ដងមួយ។';
+$ec_lang['lpn_guide_text_calib_box']='ប្រៀបធៀបឯកសារនៃការវាស់នៅវាល ជាមួយលទ្ធផលដែលបានគណនានៅទីតាំង និងពេលវេលាដូចគ្នា ឯកសារមួយសម្រាប់ប៉ារ៉ាម៉ែត្រនីមួយៗ។ ឯកសារត្រូវបានរក្សាទុកសម្រាប់សម័យបច្ចុប្បន្នតែប៉ុណ្ណោះ ហើយមិនត្រូវបានរក្សាទុកជាមួយគម្រោងទេ។';
+$ec_lang['lpn_guide_text_notes_popup']='រាយកំណត់ចំណាំអំពីរបៀបដែលទំព័រនេះដំណើរការ និងអ្វីដែលវាមិនធ្វើ ម្នាក់ៗជាពាក្យមួយតាមពីក្រោយដោយនិយមន័យរបស់វា។ វាមិនផ្លាស់ប្ដូរបណ្ដាញទេ។';
+$ec_lang['lpn_guide_text_hotkeys_popup']='រាយគ្រប់ប៊ូតុងរបារឧបករណ៍ និងជួរដេកម៉ឺនុយ ផ្លូវកាត់ក្តារចុច និងធាតុសម្រាប់ប្រអប់នីមួយៗ។ ការជ្រើសរើសជួរដេកមួយបង្ហាញកន្លែងដែលការគ្រប់គ្រងនោះនៅ ហើយមិនដំណើរការវាទេ។ ដើម្បីស្វែងរក ចុច Ctrl+K ពីគ្រប់ទីកន្លែង ឬ / ពេលមគ្គុទ្ទេសក៍មានការផ្ដោត។';
+// The Find and replace chapter beyond its opening paragraphs, in the Guide's Boxes section
+// (Tom, 2026-10-07). Each _def is HTML: keep the tags. A query inside <code> runs as written in
+// English on a page in any language; translate it with the words the Find box shows in your
+// language, or leave it in English. Asset IDs (60, 247, 330) and the numbers are measured on Net1
+// and Net3 by dev/lpn-spike/user-guide-find-harness.js: never change them in translation.
+$ec_lang['lpn_guide_find_query_term']='ភាសាសំណួរ';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>លក្ខខណ្ឌមួយ។ វិសាលភាពគឺ ទាំងអស់ ថ្នាំង អាងស្តុក ធុងទឹក បំពង់ ម៉ាស៊ីនបូម វ៉ាល់ អត្ថបទ អតិថិជន ឬ ប្រភព។ លក្ខណៈសម្បត្តិគឺធាតុណាមួយក្នុងបញ្ជី លក្ខណៈសម្បត្តិ សម្រាប់វិសាលភាពនោះ។</td></tr><tr><td>លក្ខខណ្ឌ</td><td>ស្មើនឹង ធំជាង តូចជាង មាន ខ្ពស់បំផុត n ទាបបំផុត n និង ទទេ។ មាន អនុវត្តចំពោះអត្ថបទតែប៉ុណ្ណោះ។ ក្នុង ខ្ពស់បំផុត n និង ទាបបំផុត n n ជាចំនួន ដូចក្នុង ខ្ពស់បំផុត 5។ ប្រសិនបើប្រអប់ តម្លៃ ទទេ ឬ n ជាអក្សរ n ខ្លួនឯង ដូចក្នុង <code>Pipe.Velocity n highest</code> ធាតុ 10 ត្រូវបានរាយ។ ទទេ រកធាតុដែលគ្មានតម្លៃសម្រាប់លក្ខណៈសម្បត្តិ។ ការតភ្ជាប់មានលក្ខខណ្ឌបួន ហើយមិនយកតម្លៃទេ។</td></tr><tr><td>តម្លៃ</td><td>លេខត្រូវបានបញ្ចូលដោយគ្មានឯកតា ក្នុងឯកតាដែលបង្ហាញក្នុង លក្ខណៈសម្បត្តិ និងលើផ្ទាំងតារាង៖ 40 មិនមែន 40 psi។ អត្ថបទ រួមទាំងលេខសម្គាល់ ត្រូវបានដាក់ក្នុងសញ្ញាអញ្ញប្រកាសតែមួយ ឬពីរ៖ <code>\'60\'</code>។</td></tr><tr><td>AND, OR និងវង់ក្រចក</td><td>AND ត្រូវបានគណនាមុន OR ហើយវង់ក្រចកដាក់លក្ខខណ្ឌជាក្រុម។ NOT មិនមានទេ។</td></tr><tr><td>ការប្រកប</td><td>ពាក្យមិនប្រកាន់អក្សរធំតូចទេ។ ពាក្យអង់គ្លេសត្រូវបានទទួលយកក្នុងគ្រប់ភាសា ដូច្នេះសំណួរដែលចម្លងពីមគ្គុទ្ទេសក៍នេះដំណើរការលើទំព័រក្នុងភាសាណាក៏បាន។</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_examples_term']='ឧទាហរណ៍ដែលបានគណនាលើ Net3';
+$ec_lang['lpn_guide_find_examples_def']='<p>បើកឧទាហរណ៍ Net3 ដើម្បីធ្វើតាម។ សម្ពាធជា psi ហើយល្បឿនជា ft/s។</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>ថ្នាំង 60 និងបំពង់ 60។ ថ្នាំងមួយ និងបំពង់មួយអាចមានលេខសម្គាល់ដូចគ្នា ដូច្នេះការស្វែងរកលេខសម្គាល់ក្រោម ទាំងអស់ អាចត្រឡប់ធាតុច្រើនជាងមួយ។</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>ថ្នាំង 10, 40, 50, 20 និង 153 សម្ពាធទាបបំផុតមុន។ ថ្នាំង 10 នៅ -0.6 psi ជាសម្ពាធអវិជ្ជមានដែលត្រូវពិនិត្យឡើងវិញ។</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>បំពង់ 60, 329, 125, 123 និង 149 ល្បឿនខ្ពស់បំផុតមុន។ បំពង់ 60 ដឹក 9.3 ft/s។</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>ថ្នាំង 10, 20, 40 និង 50 និងបំពង់ 60, 125 និង 329៖ សម្ពាធទាប និងល្បឿនខ្ពស់ក្នុងបញ្ជីតែមួយ។</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>ថ្នាំង 10, 20, 40 និង 50 ជាសម្ពាធទាបនៅលើដីខ្ពស់។ លក្ខខណ្ឌទាំងពីរត្រូវតែនិយាយពីប្រភេទធាតុតែមួយ៖ <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> មិនត្រូវនឹងអ្វីទេ ព្រោះគ្មានធាតុណាជាទាំងថ្នាំង និងបំពង់ទេ។</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>បំពង់ 330 ជាបំពង់តែមួយដែលបិទក្នុងឯកសារ Net3។</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>គ្មានអ្វីទេ ដូចឯកសារដែលបានចែកចាយ។ ជាមួយបំពង់ 247 បិទ (មើល ជំនួស និងត្រឡប់ក្រោយ) ថ្នាំង 215, 217, 219 និង 225៖ ថ្នាំងដែលការបែកបំពង់ 247 នឹងទុកដោយគ្មានការផ្គត់ផ្គង់។ ការធ្វើបែបនេះម្ដងទៀតសម្រាប់បំពង់នីមួយៗគឺជាការវិភាគភាពសំខាន់។</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_results_term']='លទ្ធផល ការជ្រើសរើស និងតារាង';
+$ec_lang['lpn_guide_find_results_def']='<p>ធាតុដែលត្រូវគ្នាត្រូវបានរាយនៅខាងក្រោមប៊ូតុង រក។ ធំជាង និង ខ្ពស់បំផុត n រាយតម្លៃខ្ពស់បំផុតមុន តូចជាង និង ទាបបំផុត n រាយតម្លៃទាបបំផុតមុន ហើយលក្ខខណ្ឌផ្សេងទៀតរាយតាមតម្លៃដែលរកឃើញ បន្ទាប់មកតាមលេខសម្គាល់។ សំណួរដែលមាន AND ឬ OR រាយថ្នាំង បន្ទាប់មកតំណ ម្នាក់ៗតាមលេខសម្គាល់។ ការត្រូវគ្នាតែមួយត្រូវបានបង្ហាញលើផែនទីភ្លាមៗ។ ជ្រើសរើសជួរដេកមួយដើម្បីដាក់ផែនទីនៅចំកណ្ដាលធាតុនោះ។ បើគ្មានអ្វីត្រូវបានជ្រើសរើស ធាតុក៏ត្រូវបានជ្រើសរើសដែរ បើមាន ធាតុត្រូវបានគូសបញ្ជាក់ ហើយការជ្រើសរើសមិនប្ដូរទេ។ Shift+click ឬ Ctrl+click ជួរដេកមួយដើម្បីបន្ថែមវាទៅការជ្រើសរើស ឬដកវាចេញ។ ប៊ូតុង រក មិនជ្រើសរើសការត្រូវគ្នាទាំងអស់ដោយខ្លួនឯងទេ។</p><p>ប៊ូតុង ត្រងក្នុងតារាងបច្ចុប្បន្ន អនុវត្តសំណួរដូចគ្នាទៅផ្ទាំងតារាង។ តារាងនីមួយៗដែលសំណួរអនុវត្តបង្ហាញតែជួរដេកដែលត្រូវគ្នា ជាមួយសំណួរ និងចំនួនជួរដេកនៅខាងលើ។ ដើម្បីជ្រើសរើសការត្រូវគ្នាទាំងអស់លើផែនទី ជ្រើសរើសជួរដេកទាំងនោះ ហើយជ្រើស ជ្រើសរើសលើផែនទី ពីម៉ឺនុយចុចស្ដាំ។ តម្រងតារាងមិនត្រូវបានរក្សាទុកជាមួយគម្រោងទេ ហើយបញ្ចប់ពេលទំព័រត្រូវបានផ្ទុកឡើងវិញ។ ជួរដេកដែលត្រូវបានកែរហូតមិនត្រូវគ្នាទៀតនៅក្នុងតារាង ស្រអាប់ និងមានសញ្ញាព្រមាន រហូតដល់ប៊ូតុង ត្រងក្នុងតារាងបច្ចុប្បន្ន ត្រូវបានចុចម្ដងទៀត។</p>';
+$ec_lang['lpn_guide_find_replace_term']='ជំនួស និងត្រឡប់ក្រោយ';
+$ec_lang['lpn_guide_find_replace_def']='<p>ផ្នែក ប្ដូរអ្វីដែលបានរកឃើញ នៃប្រអប់សរសេរលក្ខណៈសម្បត្តិមួយលើគ្រប់ធាតុដែលសំណួររកឃើញ។ ជ្រើសលក្ខណៈសម្បត្តិក្នុងបញ្ជី លក្ខណៈសម្បត្តិត្រូវប្ដូរ បញ្ចូលតម្លៃថ្មីក្នុងប្រអប់ តម្លៃថ្មី ក្នុងឯកតាដែលបង្ហាញ ហើយចុចប៊ូតុង ជំនួស។ បន្ទាប់មកប្រអប់ប្រាប់ចំនួនធាតុដែលនឹងផ្លាស់ប្ដូរ មិនរាប់ធាតុដែលមានតម្លៃថ្មីរួចហើយ។ ចុចប៊ូតុង ប្ដូរពួកវា ដើម្បីអនុវត្តការផ្លាស់ប្ដូរ ឬ បោះបង់។ ការត្រឡប់ក្រោយម្ដងដកចេញការជំនួសទាំងមូល។</p><p>ឧទាហរណ៍លើ Net1៖ <code>Pipe.Diameter below 10</code> រកឃើញបំពង់ 31, 122, 113 និង 121។ ជ្រើស អង្កត់ផ្ចិត បញ្ចូល 10 ហើយចុច ជំនួស៖ ប្រអប់បង្ហាញ "ប្ដូរធាតុ 4?"។ ចុច ប្ដូរពួកវា ដើម្បីកំណត់បំពង់ទាំងបួនទៅ 10 in.។ ការត្រឡប់ក្រោយម្ដងប្ដូរពួកវាត្រឡប់ទៅ 6 និង 8 in.។</p><p>ឧទាហរណ៍លើ Net3៖ <code>Pipe.ID equal to \'247\'</code> រកឃើញបំពង់ 247។ ជ្រើស បិទ ជ្រើស បិទ ម្ដងទៀតក្នុងបញ្ជី តម្លៃថ្មី ហើយចុច ជំនួស បន្ទាប់មក ប្ដូរពួកវា ដើម្បីបិទបំពង់សម្រាប់ឧទាហរណ៍ការតភ្ជាប់ខាងលើ។ ត្រឡប់ក្រោយបើកវាម្ដងទៀត។</p><p>ការជំនួសត្រូវការប្រភេទធាតុតែមួយ ដូច្នេះក្រោម ទាំងអស់ ជ្រើសប្រភេទធាតុជាមុនក្នុងបញ្ជី អ្វីត្រូវរក។ ក្នុងសេណារីយ៉ូក្រៅពី មូលដ្ឋាន ការជំនួសត្រូវបានរក្សាទុកក្នុងសេណារីយ៉ូនោះ ដូចការកែដូចគ្នាក្នុងលក្ខណៈសម្បត្តិ។ កន្លែងដែលកម្ពស់ Mapbox មាន កម្ពស់អាចត្រូវបានជំនួសពី Mapbox DEM ជំនួសតម្លៃដែលវាយ។</p>';
+$ec_lang['lpn_guide_find_notes_term']='ចំណុចដែលត្រូវកត់សម្គាល់';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>តម្លៃត្រូវបានប្រៀបធៀបដោយភាពជាក់លាក់ពេញលេញ ហើយរាយដល់ខ្ទង់ទសភាគបួន។ ស្មើនឹង កម្រត្រូវនឹងលទ្ធផលដែលបានគណនាណាស់ ដូច្នេះប្រើ ធំជាង និង តូចជាង។</li><li>សម្ពាធ ក្បាលទឹក លំហូរ ល្បឿន និងលទ្ធផលផ្សេងទៀតគឺជារបស់ការគណនាចុងក្រោយ។ ពេលការកំណត់ គណនាឡើងវិញដោយស្វ័យប្រវត្តិ ត្រូវបានសម្អាត វាពិពណ៌នាបណ្ដាញដូចដែលវាជាពេលគណនាចុងក្រោយ។</li><li>ធំជាង និង តូចជាង លើអត្ថបទប្រើលំដាប់វចនានុក្រម ជាមួយលេខតាមលំដាប់លេខ៖ លើ Net1 <code>Junction.ID above \'20\'</code> រកឃើញថ្នាំង 21, 22, 23, 31 និង 32។</li><li>ក្រោម ទាំងអស់ មានតែ លេខសម្គាល់ ការពិពណ៌នា ស្លាកសម្គាល់ និង ការតភ្ជាប់ ប៉ុណ្ណោះដែលផ្ដល់ជូន។ ជ្រើសប្រភេទធាតុក្នុងបញ្ជី អ្វីត្រូវរក ដើម្បីមើលបញ្ជីលក្ខណៈសម្បត្តិពេញលេញរបស់វា។</li><li>ធាតុអត្ថបទមិនមានលេខសម្គាល់ទេ។ ស្វែងរកវាតាមពាក្យរបស់វា ដូចក្នុង <code>Text.Text contains \'pump\'</code>។</li><li>លក្ខខណ្ឌ ការតភ្ជាប់ បួនសម្រាប់ថ្នាំងគឺ គ្មានតំណភ្ជាប់នៅថ្នាំង គ្មានតំណភ្ជាប់បើកនៅថ្នាំង គ្មានផ្លូវតំណភ្ជាប់ទៅប្រភព និង គ្មានផ្លូវបើកទៅប្រភព។ ប្រភពគឺអាងស្តុក ឬធុងទឹក។</li></ul>';
+// Where the Guide lists its own keys, so that a search for one finds it.
+$ec_lang['lpn_guide_using_heading']='ការប្រើមគ្គុទ្ទេសក៍';
+$ec_lang['lpn_guide_keys_term']='ផ្លូវកាត់ក្តារចុចមគ្គុទ្ទេសក៍';
+$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>បើកមគ្គុទ្ទេសក៍នៅការគ្រប់គ្រងក្រោមទ្រនិច ឬដែលមានការផ្ដោត។</td></tr><tr><td>F1</td><td>បើកមគ្គុទ្ទេសក៍នៅធាតុសម្រាប់ប្រអប់ដែលមានការផ្ដោត។</td></tr><tr><td>Ctrl+K</td><td>បើកមគ្គុទ្ទេសក៍ដោយដាក់អត្ថបទដែលបានជ្រើសរើសក្នុងវាលស្វែងរក។</td></tr><tr><td>/</td><td>ជ្រើសរើសវាលស្វែងរកពេលមគ្គុទ្ទេសក៍មានការផ្ដោត។</td></tr><tr><td>Esc</td><td>បិទមគ្គុទ្ទេសក៍ ហើយត្រឡប់ទៅកន្លែងដែលអ្នកនៅ។</td></tr></tbody></table>';
+// Under a toolbar button in the User guide, naming the menu row that does the same thing.
+// {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
+$ec_lang['lpn_guide_also']='ក៏នៅក្នុងម៉ឺនុយ {menu}';
+$ec_lang['lpn_guide_how_popup']='លក្ខណៈសម្បត្តិបើកពេលអ្នកជ្រើសរើសធាតុ ឬអត្ថបទ។';
+$ec_lang['lpn_guide_not_shown']='ការគ្រប់គ្រងនេះមិននៅលើអេក្រង់ឥឡូវនេះទេ។';
+// The box's two context headings. "Tables" holds the two table-help entries that used to sit only
+// in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
+// keys, Undo and the zoom keys had never been gathered anywhere before.
 $ec_lang['lpn_hotkeys_tables_heading']='តារាង';
 $ec_lang['lpn_hotkeys_map_heading']='ផែនទី';
 $ec_lang['lpn_hotkeys_map_term']='ផ្លូវកាត់ក្តារចុចផែនទី';
+// Same shape as lpn_notes_7_def: one table, one row per key. The ten digits are LPN_TOOL_KEYS in
+// js/looped-network.js; Select also answers to Esc and Delete to the Delete key
+// (LPN_TOOL_ALT_KEYS); Ctrl+Z is undo(); +/- and = are keyZoom() (ROADMAP Task 682).
 $ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>0 ឬ Esc</td><td>ជ្រើសរើស។</td></tr><tr><td>2</td><td>បន្ថែមថ្នាំង។</td></tr><tr><td>3</td><td>បន្ថែមអាងស្តុក។</td></tr><tr><td>4</td><td>បន្ថែមធុងទឹក។</td></tr><tr><td>5</td><td>បន្ថែមបំពង់។</td></tr><tr><td>6</td><td>បន្ថែមម៉ាស៊ីនបូម។</td></tr><tr><td>7</td><td>បន្ថែមវ៉ាល់។</td></tr><tr><td>8</td><td>បន្ថែមអតិថិជន។</td></tr><tr><td>9</td><td>បន្ថែមអត្ថបទ។</td></tr><tr><td>Delete</td><td>លុបអ្វីដែលបានជ្រើសរើស។</td></tr><tr><td>Ctrl+Z</td><td>ត្រឡប់ការផ្លាស់ប្ដូរចុងក្រោយ។</td></tr><tr><td>+ ឬ =</td><td>ពង្រីក។</td></tr><tr><td>-</td><td>បង្រួម។</td></tr></tbody></table>';
+// The W row of the Map table. Its own key, spliced into the table by Looped-Network.php, because a new row in
+// lpn_hotkeys_map_def is new markup that 'lang markup matches English' refuses until all 26 languages carry it.
+$ec_lang['lpn_hotkeys_zoomwin_def']='បង្អួចពង្រីក៖ អូសចតុកោណលើផែនទីដើម្បីពង្រីកទៅតំបន់នោះ។';
+// The menu chords (Task 748): Alt+Shift+letter on Windows and Linux, Ctrl+Option on a Mac, and F10.
+// Exactly two rows (Tom, 2026-10-03: "show only the Alt+Shift and the F10"); the letters themselves
+// are assigned per language by menuMnemonics() and shown on the menus, never listed here.
+// A separate block rather than rows in lpn_hotkeys_map_def, because a new row there is new markup
+// that 'lang markup matches English' refuses until all 26 languages carry it.
 $ec_lang['lpn_hotkeys_menu_heading']='ម៉ឺនុយ';
 $ec_lang['lpn_hotkeys_menu_term']='ផ្លូវកាត់ក្តារចុចម៉ឺនុយ';
 $ec_lang['lpn_hotkeys_menu_def']='<table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+អក្សរ</td><td>បើកម៉ឺនុយដែលមានអក្សរនោះ រួចចុចអក្សររបស់ជួរដេកណាមួយ ដើម្បីជ្រើសយកវា។ អក្សរទាំងនោះបង្ហាញពេលអ្នកប្រើក្តារចុច។ នៅលើ Mac សូមប្រើ Ctrl+Option។</td></tr><tr><td>F10</td><td>ទៅកាន់របារម៉ឺនុយ។</td></tr></tbody></table>';
-// ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
-// The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
-// with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
-// strip, and the same control inside the solver's diagnostic box when one is on screen.
-// THE TIP SAYS EXACTLY WHAT THE TAP SENDS, because a control that posts on one press and does not
-// say what it posts is asking for trust it has not earned. It also says no reply is coming, which
-// is the honesty boundary that document draws: a thank-you must never imply an answer.
+// The Screenshot keys. A separate block, for the reason given above the menu block.
+$ec_lang['lpn_hotkeys_snip_heading']='រូបថតអេក្រង់';
+$ec_lang['lpn_hotkeys_snip_term']='ផ្លូវកាត់ក្តារចុចសម្រាប់រូបថតអេក្រង់';
+$ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>S</td><td>កាត់យក ខណៈពេលរូបថតអេក្រង់កំពុងបើក។</td></tr><tr><td>E</td><td>ជ័រលុប នៅក្នុងទិដ្ឋភាពគូសចំណាំ។</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>ត្រឡប់ក្រោយ និងធ្វើឡើងវិញ នៅក្នុងទិដ្ឋភាពគូសចំណាំ។</td></tr><tr><td>Esc</td><td>បោះបង់ការកាត់យក ឬចាកចេញពីជ័រលុប។ នៅក្នុងទិដ្ឋភាពគូសចំណាំ បិទវា នៅពេលមិនទាន់មានអ្វីត្រូវបានគូរ។</td></tr></tbody></table>';
+// ---- "Something wrong here?" (ROADMAP Tasks 207 and 768) ----
+// Two sites, one behaviour -- a standing cell in the map's bottom strip, and the same control inside
+// the solver's diagnostic box when one is on screen. The first click opens a box; Send is the second.
+// The thank-you must never imply an answer: a reply comes only to somebody who left an address.
 $ec_lang['lpn_wrong_btn']='មានអ្វីខុសនៅទីនេះ?';
-// Edited by TGH 2026-09-07
+// The standing message's own Hide control. A hidden message leaves the map and waits as the top row of the
+// message history (the down-arrow glyph), marked by lpn_msglog_hidden, with lpn_msglog_unhide to bring it back.
+$ec_lang['lpn_status_dismiss']='លាក់សារនេះ';
+$ec_lang['lpn_msglog_hidden']='បានលាក់';
+$ec_lang['lpn_msglog_unhide']='បង្ហាញ';
+$ec_lang['lpn_status_hidden_tip']='បង្ហាញសារដែលបានលាក់លើផែនទីម្ដងទៀត។';
+// Rewritten for the two-click box (Task 768); TGH's 2026-09-07 wording described one press.
 $ec_lang['lpn_wrong_tip']='រាយការណ៍កំហុសនៅលើទំព័រនេះ។ វាបើកប្រអប់មួយដើម្បីជ្រើសរើសបញ្ហា បន្ថែមមតិយោបល់ និងបញ្ចូលអាសយដ្ឋានអ៊ីមែលប្រសិនបើចង់បានចម្លើយតប។ គ្រប់វាលទាំងអស់ជាស្រេចចិត្ត ហើយគ្មានអ្វីត្រូវបានផ្ញើទេ រហូតដល់អ្នកចុច ផ្ញើ។';
 $ec_lang['lpn_wrong_thanks']='អរគុណ។ របាយការណ៍របស់អ្នកបានទទួលហើយ។';
+// The box "Something wrong here?" opens (ROADMAP Task 768). Every field is optional; Send with
+// nothing in it posts only the anonymous tally the button always posted. The four picks are canned
+// phrases a visitor may toggle in any combination. lpn_fb_sends must stay true to send-feedback.php
+// and to the "Messages you send us" row of privacy.php.
+$ec_lang['lpn_fb_intro']='សារដែលបានរៀបចំទុកជាមុន (ស្រេចចិត្ត)។ គ្មានអ្វីត្រូវបានផ្ញើទេ រហូតដល់អ្នកចុច ផ្ញើ។';
+$ec_lang['lpn_fb_pick_numbers']='លេខមើលទៅមិនត្រឹមត្រូវ';
+$ec_lang['lpn_fb_pick_broken']='មានអ្វីមួយមិនដំណើរការ';
+$ec_lang['lpn_fb_pick_wording']='ពាក្យសម្ដី ឬការបកប្រែមិនត្រឹមត្រូវ';
+$ec_lang['lpn_fb_pick_confusing']='នេះធ្វើឲ្យច្រឡំ';
+$ec_lang['lpn_fb_comment']='មតិយោបល់ (ស្រេចចិត្ត)';
+$ec_lang['lpn_fb_email']='អ៊ីមែល (ស្រេចចិត្ត ដាក់តែបើអ្នកចង់បានចម្លើយតប)';
+$ec_lang['lpn_fb_sends']='អ្វីដែលនេះផ្ញើ៖ ឈ្មោះទំព័រនេះ ភាសារបស់អ្នក កំណែនៃគេហទំព័រ លេខកូដនៃសារនៅលើផែនទី ប្រសិនបើមាន និងអ្វីដែលអ្នកបានជ្រើសរើស ឬវាយ។ មិនដែលផ្ញើគំនូរ ឬបណ្ដាញរបស់អ្នកទេ។ អាសយដ្ឋានអ៊ីមែលរបស់អ្នកត្រូវបានប្រើតែដើម្បីឆ្លើយតបទៅអ្នកប៉ុណ្ណោះ។';
+$ec_lang['lpn_fb_send']='ផ្ញើ';
+$ec_lang['lpn_fb_sending']='កំពុងផ្ញើ…';
+$ec_lang['lpn_fb_failed']='សារនោះមិនបានទៅដល់យើងទេ។ អ្វីដែលអ្នកបានសរសេរនៅតែនៅទីនេះ ដូច្នេះអ្នកអាចព្យាយាមម្ដងទៀត។';
+$ec_lang['lpn_fb_bad_email']='អាសយដ្ឋានអ៊ីមែលនោះមើលទៅមិនត្រឹមត្រូវ។ សូមកែវា ឬទុកឲ្យទទេ។';
+$ec_lang['lpn_fb_busy']='សារច្រើនពេកបានមកដល់ក្នុងប៉ុន្មាននាទីចុងក្រោយនេះ។ អ្វីដែលអ្នកបានសរសេរនៅតែនៅទីនេះ ដូច្នេះអ្នកអាចព្យាយាមម្ដងទៀតនៅពេលក្រោយ។';
 $ec_lang['lpn_status_example_opened']='បានបើក {name} ជាច្បាប់ចម្លង។ រក្សាទុកវាដោយ ឯកសារ, រក្សាទុកជា។';
 // Stands while the fault stands, rather than expiring like every other notice on the map: it
 // reports a page that cannot lay itself out, which is true until a measurement recovers.
@@ -973,6 +1099,8 @@ $ec_lang['lpn_ex_basic_us_desc']='អាងស្តុកពីរ ម៉ាស
 $ec_lang['lpn_ex_net1_title']='EPANET Net1';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net1_desc']='ឧទាហរណ៍ EPANET ប្រឌិតមួយដែលមានក្លរីន អាងស្តុក 1 និងធុងទឹក 1។';
+$ec_lang['lpn_ex_net1_si_title']='EPANET Net1 បូកការគ្រប់គ្រងផ្អែកលើច្បាប់, L/s (ប្រព័ន្ធម៉ែត្រិក)';
+$ec_lang['lpn_ex_net1_si_desc']='លីត្រក្នុងមួយវិនាទី ជាមួយម៉ែត្រ និងមីលីម៉ែត្រ។ ឧទាហរណ៍ EPANET ប្រឌិតមួយបម្លែងពីហ្គាឡុងក្នុងមួយនាទី ហ្វីត និងអ៊ីញ ដែលមានក្លរីន អាងស្តុក 1 ធុងទឹក 1 ម៉ាស៊ីនបូម 1 និងការគ្រប់គ្រងផ្អែកលើច្បាប់ពីរ។';
 $ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (ប្រព័ន្ធម៉ែត្រិក)';
 $ec_lang['lpn_ex_net2_si_desc']='លីត្រក្នុងមួយវិនាទី ជាមួយម៉ែត្រ និងមីលីម៉ែត្រ។ ឧទាហរណ៍ EPANET នៅ Branford រដ្ឋ Connecticut បម្លែងពីហ្គាឡុងក្នុងមួយនាទី ហ្វីត និងអ៊ីញ៖ ថ្នាំង 35 និងធុងទឹក 1 ដោយគ្មានអាងស្តុក គ្មានម៉ាស៊ីនបូម និងគ្មានវ៉ាល់ ប្រហែល 2 km គុណ 4 km។ ហ្វ្លុយអូរ ជាសារធាតុមិនមានប្រតិកម្ម ចូលនៅប្រភពមួយ។';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (សហរដ្ឋអាមេរិក)';
@@ -1009,11 +1137,16 @@ $ec_lang['lpn_units_nondestructive_desc']='មិនកែប្រែលេខ�
 $ec_lang['lpn_units_destructive']='កែប្រែលេខ';
 $ec_lang['lpn_units_destructive_desc']='កែប្រែលេខ៖ សរសេរចំណុចបញ្ចូលនីមួយៗឡើងវិញដោយការបំលែងគណិតវិទ្យា ដូច្នេះបណ្ដាញនៅតែស្ទើរតែដូចដើមផ្នែករូបវិទ្យា ក្នុងដែនកំណត់នៃការបំលែង។ វាបាត់បង់ចំណុចបញ្ចូលដើម។ ត្រឡប់ក្រោយនាំវាមកវិញ។';
 // {n} is a whole number.
-$ec_lang['lpn_status_reinterpreted']='{n} តម្លៃឥឡូវនេះមានន័យ {unit}។ គ្មានអ្វីត្រូវបានសរសេរឡើងវិញឡើយ។';
-$ec_lang['lpn_status_converted']='{n} តម្លៃត្រូវបានសរសេរឡើងវិញទៅជា {unit}។';
+$ec_lang['lpn_status_reinterpreted']='តម្លៃ ({n}) ឥឡូវនេះមានន័យ {unit}។ គ្មានអ្វីត្រូវបានសរសេរឡើងវិញឡើយ។';
+$ec_lang['lpn_status_converted']='តម្លៃ ({n}) ត្រូវបានសរសេរឡើងវិញទៅជា {unit}។';
 // The toolbar's one-control colour-by-value (Task 327). No label of its own: the select's own
 // options say what it does, and the toolbar is where space is scarcest.
 // Edited by TGH 2026-09-07
+// **THE NATURAL ENGLISH GOES ON THE CONTROL; the ultra-simple rendering goes to the translator**
+// (Tom, 2026-08-18: *"'Input units' and 'Results units'... both more natural than the ultra simple
+// English you used. While I like that you are thinking simple for translators, this should go in
+// _syn and the more natural in English."*). That is the routing rule stated on a real case: simple
+// English is for when an English reader would stumble, and here one would not.
 // **LENGTH ONLY** (Task 693, folded into 696; Tom 2026-09-18: *"when the map unit is lat/lon, this
 // unit label is a lie"*). What the coordinates are in is a separate, derived, read-only line below.
 $ec_lang['lpn_units_length']='ប្រវែង';
@@ -1058,6 +1191,13 @@ $ec_lang['lpn_result_status_closed']='បិទ';
 $ec_lang['lpn_result_head']='ក្បាលទឹក';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_result_head_tip']='ថាមពលទឹកនៅថ្នាំងនេះ សរសេរជាកម្ពស់ជួរឈរទឹក។ វាជាកម្ពស់ដាច់ខាត ខណៈសម្ពាធជារង្វាស់ដោយប្រដាប់វាស់ (gauge)។';
+// A tank's depth and usable volume (Task 783). Depth is head minus the tank bottom, which is our
+// Elevation. Volume is zero at the Lowest water depth, so it is NOT EPANET's tank volume, which also
+// counts the water below the lowest water depth (that water is in the mixing volume, it just cannot be drawn down).
+$ec_lang['lpn_result_depth']='ជម្រៅ';
+$ec_lang['lpn_result_depth_tip']='ជម្រៅទឹកក្នុងធុងទឹកនៅពេលដែលបានបង្ហាញ វាស់ឡើងលើពីបាតធុង៖ ក្បាលទឹកដកកម្ពស់ធុងទឹក។';
+$ec_lang['lpn_result_tank_volume']='ទំហំដែលអាចប្រើបាន';
+$ec_lang['lpn_result_tank_volume_tip']='ទំហំទឹកខាងលើជម្រៅទឹកទាបបំផុត ដូច្នេះវាជាសូន្យនៅជម្រៅនោះ។ ទំហំធុងទឹក EPANET ក៏រួមទាំងទឹកខាងក្រោមជម្រៅទឹកទាបបំផុតដែរ ដែលនៅតែរាប់សម្រាប់ការលាយ និងអាយុទឹក ដូច្នេះកម្ពស់ធុងទឹកនៅបាតធុង។';
 $ec_lang['lpn_result_pressure']='សម្ពាធ';
 $ec_lang['lpn_result_flow']='លំហូរ';
 $ec_lang['lpn_result_velocity']='ល្បឿន';
@@ -1135,7 +1275,8 @@ $ec_lang['lpn_file_convert_as']='បម្លែងជា…';
 $ec_lang['lpn_copy_of']='ច្បាប់ចម្លងនៃ {name}';
 // ---- THE CONVERT AS BOX (Task 696) ------------------------------------------------------------
 // The three coordinate cases are Tom's own (R-155, 2026-09-22): "EPSG, unnamed (local) georeference,
-// and not georeferenced". lat/lon is one EPSG system (EPSG:3857 on this page), not a fourth case.
+// and not georeferenced". lat/lon is one EPSG system (EPSG:4326), not a fourth case; EPSG:3857 is a
+// projected system in meters since Task 775.
 $ec_lang['lpn_convas_title']='បម្លែងជា';
 $ec_lang['lpn_convas_coordsys_tip']='ប្រព័ន្ធកូអរដោនេដែលច្បាប់ចម្លងត្រូវបានបម្លែងទៅ។ នៅពេលវាខុសពីប្រព័ន្ធរបស់គម្រោងនេះ ជំហានកំណត់ទីតាំងពីរតាមក្រោយមក។ គម្រោងមួយដែលដឹងរួចហើយថាខ្លួនស្ថិតនៅទីណា បើកជំហានទាំងពីរនោះជាមួយចម្លើយរួចហើយ ដូច្នេះអ្នកអាចទទួលយកវាដូចដែលវាមាន ឬធ្វើការផ្លាស់ប្ដូរ។';
 // {crs} is the name the map status strip shows for this project's coordinate system.
@@ -1182,6 +1323,10 @@ $ec_lang['lpn_tip_join']='{name} — {tip}';
 // with a keyboard handler. It is appended to each tool's own tip rather than written into it.
 $ec_lang['lpn_tool_key_hint']='ផ្លូវកាត់៖ ចុច {key}។';
 $ec_lang['lpn_tool_key_hint_two']='ផ្លូវកាត់៖ ចុច {key} ឬ {key2}។';
+$ec_lang['lpn_tool_add_chain_tip']='ភ្ជាប់ថ្នាំង និងបំពង់ជាខ្សែសង្វាក់៖ ចុចចំណុចមួយនៅលើផែនទីដើម្បីបន្ថែមថ្នាំង បន្ទាប់មកចុចចំណុចបន្ទាប់នីមួយៗដើម្បីបន្ថែមបំពង់ និងថ្នាំង។ ចុចថ្នាំងដែលមានស្រាប់ ដើម្បីបន្តពីវា។ ចុច Esc ដើម្បីបញ្ចប់ខ្សែសង្វាក់។';
+// The Shape tool (Task 779). The word is Tom's: "we call it a 'Shape'".
+$ec_lang['lpn_tool_add_shape']='រូបគូរ';
+$ec_lang['lpn_tool_add_shape_tip']='គូរចំណុច ខ្សែពហុបន្ទាត់ ឬពហុកោណលើផែនទី។ រូបគូរជាចំណារពន្យល់ ហើយមិនមែនជាផ្នែកនៃបណ្ដាញទេ។ ចុចចំណុចនីមួយៗ បន្ទាប់មកចុចចំណុចចុងក្រោយម្ដងទៀត ចុច Enter ឬចុចស្ដាំ ដើម្បីបញ្ចប់។ ចុចចំណុចដំបូងម្ដងទៀត ដើម្បីបិទរូបគូរជាពហុកោណ។';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
 $ec_lang['lpn_tool_area_tip']='ជ្រើសរើសតំបន់ដោយបង្អួច ខ្សែរូបភាព ឬពហុកោណ។';
@@ -1193,6 +1338,7 @@ $ec_lang['lpn_tool_vertices_tip']='បន្ថែម និងដកចំណ�
 $ec_lang['lpn_tool_undo_tip']='ប្រវែងប្រវត្តិត្រឡប់ក្រោយ = 20 សកម្មភាព';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_zoom_extent_tip']='ដាក់បណ្ដាញទាំងមូលឲ្យសមនឹងបង្អួចផែនទី។ ដើម្បីពង្រីកទៅចតុកោណកែងដែលអ្នកអូសជំនួសវិញ ចុច W ឬជ្រើសរើសត្រីកោណតូចនៅជ្រុងនៃប៊ូតុងរបារឧបករណ៍ ពង្រីកឲ្យសមនឹងអេក្រង់។ មើលផងដែរការគ្រប់គ្រងពង្រីកផែនទីនៅខាងស្ដាំខាងលើ។';
+$ec_lang['lpn_tool_zoom_selection_tip']='ដាក់ធាតុដែលបានជ្រើសឲ្យសមនឹងបង្អួចផែនទី។ សូមជ្រើសរើសធាតុមួយ ឬច្រើនជាមុនសិន។';
 $ec_lang['lpn_tool_zoom_window_tip']='ចុចជ្រុង ឬអូសចតុកោណកែង។ ចុចម្ដងទៀតសម្រាប់ ពង្រីកឲ្យសមនឹងអេក្រង់។';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='ពង្រីក។ ផ្លូវកាត់៖ +';
@@ -1200,12 +1346,10 @@ $ec_lang['lpn_zoom_in_tip']='ពង្រីក។ ផ្លូវកាត់�
 $ec_lang['lpn_zoom_out_tip']='បង្រួម។ ផ្លូវកាត់៖ -';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='រក និងជំនួសបែបសាមញ្ញ ឬស្មុគស្មាញ';
-// **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
+// **"Toolbar"** (Tom renamed it from "Toolbar key" to "Toolbar" on 2026-09-30).
 // The row is not a second toolbar and not a repeat of one -- it is the LEGEND for an icon-only
 // strip, derived from toolbarIconIndex, and on a touch screen it is the only way to read the
-// strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
-// it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
-// key?"* The row earns its place; only the label was lying about what it is.
+// strip at all without a deliberate press-and-hold. The row earns its place.
 $ec_lang['lpn_help_icons']='អត្ថន័យរបារឧបករណ៍';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='ភាពមើលឃើញ';
@@ -1313,10 +1457,42 @@ $ec_lang['lpn_pane_not_used']='មិនបានប្រើ';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='បានត្រងដោយ {q}។ កំពុងបង្ហាញ {n} ក្នុងចំណោម {all}។';
 $ec_lang['lpn_pane_filter_clear']='បង្ហាញទាំងអស់';
+// Added to the filtered table's line (Task 738): rows edited since Filter in table was pressed stay
+// in the table even when they no longer match, dimmed and marked, until it is pressed again. {n} is
+// how many. Worded as a label and a count so no plural form is needed.
 $ec_lang['lpn_pane_filter_stale']='ជួរដេកដែលលែងត្រូវគ្នា៖ {n}។';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='គ្មានអ្វីនៅក្នុងតារាងនេះត្រូវនឹងតម្រងទេ។';
+// Selection only (Task 757): the Tables pane filtered to what is selected on the map. Parallel to
+// lpn_pane_filter_note. The line names the Find filter too when both are on.
+$ec_lang['lpn_pane_filter_sel_note']='ការជ្រើសរើសតែប៉ុណ្ណោះ។ កំពុងបង្ហាញ {n} ក្នុងចំណោម {all}។';
+$ec_lang['lpn_pane_filter_sel_and']='បានត្រងដោយ {q} និងការជ្រើសរើសតែប៉ុណ្ណោះ។ កំពុងបង្ហាញ {n} ក្នុងចំណោម {all}។';
+$ec_lang['lpn_pane_filter_sel_none']='ធាតុដែលបានជ្រើសរើសគ្មានមួយណានៅក្នុងតារាងនេះទេ។';
+$ec_lang['lpn_pane_sel_only']='ការជ្រើសរើសតែប៉ុណ្ណោះ';
+$ec_lang['lpn_pane_sel_only_none']='គ្មានធាតុណាមួយត្រូវបានជ្រើសរើសទេ។ សូមជ្រើសរើសធាតុនៅលើផែនទីជាមុនសិន។';
+// Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
+// scenario, with a Scenario column after ID.
+$ec_lang['lpn_pane_scn_show']='បង្ហាញសេណារីយ៉ូ';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+
+
+
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+
+// The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
+// scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+
+
+
+
+$ec_lang['lpn_pane_clear_override']='សម្អាតតម្លៃផ្ទាល់ខ្លួន';
+// The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
+// Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
+// in Basic mode is its scenario's.
+$ec_lang['lpn_pane_scn_alt_tip']='{category} ជម្រើសជំនួស៖ {alternative}';
 // The pin beside the ID in the first column. The ID itself was this control until 2026-09-19,
 // underlined and turning link blue; the ID is an ordinary editable cell now and this is the way
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
@@ -1325,10 +1501,17 @@ $ec_lang['lpn_pane_goto_tip']='ពង្រីក និងជ្រើសរើ
 $ec_lang['lpn_goto_on_map']='បង្ហាញលើផែនទី';
 $ec_lang['lpn_pane_select_on_map']='ជ្រើសរើសលើផែនទី';
 $ec_lang['lpn_pane_unselect_on_map']='ដកជ្រើសរើសលើផែនទី';
-
-
-
 $ec_lang['lpn_pane_print']='បោះពុម្ពតារាង';
+// Tom, 2026-10-06. Copy with headings puts the heading line, unit included, above the selected cells; plain
+// Copy never does. The two Export rows download the whole table as shown.
+$ec_lang['lpn_pane_copy_heads']='ចម្លងជាមួយក្បាលជួរឈរ';
+// Tom, 2026-10-07. File, Export to, ODS/XLSX/CSV file: a box asking which tables and which scenarios.
+// {format} is ODS, XLSX or CSV, the file format's own name, never translated.
+$ec_lang['lpn_export_table_title']='នាំចេញទៅ {format}';
+$ec_lang['lpn_export_table_current']='បច្ចុប្បន្ន';
+$ec_lang['lpn_export_table_all']='ទាំងអស់';
+$ec_lang['lpn_export_table_go']='នាំចេញ';
+$ec_lang['lpn_export_table_scn_note']='លទ្ធផលត្រូវបាននាំចេញសម្រាប់សេណារីយ៉ូដែលបានគណនាចុងក្រោយតែប៉ុណ្ណោះ។';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1360,6 +1543,41 @@ $ec_lang['lpn_menu_project']='ទឹក';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='អ្វីៗទាំងអស់ដែលជាក់លាក់ចំពោះការធ្វើគំរូបណ្ដាញទឹក (លើកលែងតែប៊ូតុងបញ្ជាចាក់ចលនា)';
 $ec_lang['lpn_tables_menu']='តារាង';
+// Water > Morph (Task 781; Tom, 2026-10-14: *"I like the term 'Morph' (Transform) for this feature"*;
+// first built as Change type, Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// to Change node type for any asset, where if it has information that can't be ported to the new
+// type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
+// asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
+// popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
+// dev/asset-type.md.
+$ec_lang['lpn_morph_menu']='ប្ដូរប្រភេទ';
+$ec_lang['lpn_morph_tip']='ប្ដូរថ្នាំងដែលបានជ្រើសរើសទៅជាថ្នាំង អាងស្តុក ឬធុងទឹក ឬប្ដូរតំណដែលបានជ្រើសរើសទៅជាបំពង់ ម៉ាស៊ីនបូម ឬវ៉ាល់។ ធាតុនីមួយៗរក្សាលេខសម្គាល់ ទីតាំង ការតភ្ជាប់ និងគ្រប់តម្លៃដែលប្រភេទថ្មីក៏មានដែរ។ ប្រសិនបើមានអ្វីនឹងបាត់បង់ អ្នកនឹងត្រូវបានសួរជាមុន។';
+$ec_lang['lpn_morph_ok']='ប្ដូរ';
+// {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
+// when a node type was chosen), separated by commas.
+
+// The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
+// scenario, beside the override marker.
+
+
+$ec_lang['lpn_change_type_lost']='តម្លៃទាំងនេះនឹងបាត់បង់៖';
+// The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
+$ec_lang['lpn_change_type_key']='មួយបន្ទាត់ៗ៖ លេខសម្គាល់៖ លក្ខណៈសម្បត្តិ និងតម្លៃដែលនឹងបាត់បង់';
+$ec_lang['lpn_change_type_line']='{id}៖ {property} {value}';
+$ec_lang['lpn_change_type_line_scenario']='{id}៖ {property} {value} ក្នុងសេណារីយ៉ូ {scenario}';
+
+$ec_lang['lpn_change_type_more']='និងច្រើនទៀត {n}។';
+// Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
+// water surface is carried, so the new head or water depth is listed with its value.
+$ec_lang['lpn_change_type_surface']='ទាំងនេះរក្សាផ្ទៃទឹកនៅកន្លែងដដែល។ ក្បាលទឹករបស់អាងស្តុកគឺកម្ពស់របស់ធុងទឹកបូកនឹងជម្រៅទឹករបស់វា ហើយជម្រៅទឹករបស់ធុងទឹកគឺក្បាលទឹករបស់អាងស្តុកដកនឹងកម្ពស់របស់វា៖';
+$ec_lang['lpn_change_type_meaning']='ច្បាប់ត្រួតពិនិត្យ និងក្បួនទាំងនេះសាកល្បងថ្នាំងដែលកំពុងត្រូវបានប្ដូរ ហើយនឹងអានវាខុសគ្នា៖ ថ្នាំងត្រូវបានសាកល្បងដោយសម្ពាធរបស់វា ហើយធុងទឹក ឬអាងស្តុកត្រូវបានសាកល្បងដោយកម្រិតទឹករបស់វា។';
+// The link half (Tom, 2026-10-06: "Proceed."). Each heads a list of "ID: entry" lines.
+$ec_lang['lpn_change_type_born']='តម្លៃទាំងនេះថ្មី ត្រូវបានកំណត់ដូចធាតុដែលទើបគូរថ្មី៖';
+$ec_lang['lpn_change_type_no_curve']='{id}៖ គ្មានខ្សែកោងក្បាលទឹកម៉ាស៊ីនបូម ដូច្នេះម៉ាស៊ីនបូមមិនបន្ថែមក្បាលទឹកទេ រហូតដល់ខ្សែកោងមួយត្រូវបានជ្រើសរើស ហើយការនាំចេញ .inp សរសេរវាជាបំពង់';
+$ec_lang['lpn_change_type_becomes']='{id}៖ {property} {value} ក្នុងសេណារីយ៉ូ {scenario} ក្លាយជា {new}';
+$ec_lang['lpn_change_type_customers']='មានតែបំពង់ប៉ុណ្ណោះដែលបម្រើអតិថិជន ដូច្នេះអតិថិជនទាំងនេះត្រូវបានភ្ជាប់ជំនួសទៅថ្នាំងដែលបង្ហាញក្នុងវង់ក្រចក ដែលតម្រូវការរបស់ពួកគេត្រូវបានអនុវត្តរួចហើយ។ ពួកគេនៅកន្លែងដែលពួកគេត្រូវបានគូរ ហើយតម្រូវការរបស់ពួកគេមិនផ្លាស់ប្ដូរទេ៖';
+$ec_lang['lpn_change_type_setting']='ច្បាប់ត្រួតពិនិត្យ និងក្បួនទាំងនេះផ្ដល់ ឬសាកល្បងការកំណត់នៃតំណដែលកំពុងត្រូវបានប្ដូរ។ ការកំណត់ជាបរិមាណផ្សេងគ្នាលើបំពង់ ម៉ាស៊ីនបូម និងវ៉ាល់ ដូច្នេះទាំងនេះនឹងអានវាខុសគ្នា៖';
+$ec_lang['lpn_change_type_rules']='បន្ទាត់ក្បួនទាំងនេះដាក់ឈ្មោះតំណតាមប្រភេទរបស់វា ហើយនឹងដាក់ឈ្មោះប្រភេទថ្មីរបស់វាជំនួសវិញ៖';
 $ec_lang['lpn_tables_menu_tip']='មើល និងកែសម្រួលធាតុជាតារាងក្នុងបន្ទះខាងក្រោម។';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the
@@ -1384,8 +1602,6 @@ $ec_lang['lpn_settings_auto_run_tip']='បិទប្រសិនបើកា�
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='បណ្ដាញនេះចំណាយពេល {secs} វិនាទីដើម្បីគណនា ហើយវាត្រូវបានកំណត់ឲ្យគណនាឡើងវិញបន្ទាប់ពីរាល់ការផ្លាស់ប្ដូរ។ ដើម្បីបញ្ឈប់វា ហើយឲ្យប៊ូតុង គណនា ត្រឡប់មកវិញ សូមបិទ “គណនាឡើងវិញដោយស្វ័យប្រវត្តិ” នៅក្នុង ការកំណត់ ក្រោម ការគណនា, ធារាសាស្ត្រ។';
 $ec_lang['lpn_time_no_report']='មិនទាន់មានរបាយការណ៍ដំណើរការនៅឡើយទេ។ របាយការណ៍នេះជាអត្ថបទផ្ទាល់របស់ EPANET ដូច្នេះវានឹងបង្ហាញនៅពេលបណ្ដាញនេះត្រូវបានគណនាដោយឧបករណ៍ដោះស្រាយ EPANET។';
-// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
-// this one, and of the three, Settings is the word a person is most likely to look for first.
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -1418,9 +1634,37 @@ $ec_lang['lpn_confirm_delete_network']='លុបថ្នាំង ខ្សែ
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='រក និងជំនួស';
+// Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
+// placement are never pasted.
+
+
+
+
+
+
+
+
+
+
+// The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
+// opens the in-place editor; Reset position sends a dragged label or an attached Text home.
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_find_title']='រក និងជំនួស';
 $ec_lang['lpn_find_scope']='អ្វីត្រូវរក';
 $ec_lang['lpn_find_scope_all']='ទាំងអស់';
+$ec_lang['lpn_find_scope_source']='ប្រភព';
+$ec_lang['lpn_find_source_no_chemical']='គ្មានសារធាតុគីមីណាមួយកំពុងត្រូវបានតាមដានទេ ដូច្នេះគ្មានថ្នាំងណាមានប្រភពទេ។';
 $ec_lang['lpn_find_property']='លក្ខណៈសម្បត្តិ';
 $ec_lang['lpn_find_condition']='លក្ខខណ្ឌ';
 $ec_lang['lpn_find_value']='តម្លៃ';
@@ -1463,7 +1707,6 @@ $ec_lang['lpn_find_op_empty']='ទទេ';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} ត្រូវបានរកឃើញ។ ចុចមួយដើម្បីទៅកាន់វា។';
 $ec_lang['lpn_find_shift_hint']='ចុច Shift ព្រមទាំងចុច ដើម្បីបិទ/បើក៖ បន្ថែមប្រសិនបើវាមិននៅក្នុងសំណុំដែលបានជ្រើសរើស ឬដកចេញប្រសិនបើវានៅក្នុងសំណុំនោះរួចហើយ។';
-
 $ec_lang['lpn_find_none']='គ្មានអ្វីត្រូវគ្នាទេ។';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1500,9 +1743,10 @@ $ec_lang['lpn_find_op_conn_unlinked']='គ្មានតំណភ្ជាប�
 $ec_lang['lpn_find_op_conn_noopen']='គ្មានតំណភ្ជាប់បើកនៅថ្នាំង';
 $ec_lang['lpn_find_op_conn_nolinksource']='គ្មានផ្លូវតំណភ្ជាប់ទៅប្រភព';
 $ec_lang['lpn_find_op_conn_noopensource']='គ្មានផ្លូវបើកទៅប្រភព';
-// What a result row prints beside the node id: the fault it has, in three words.
-// What a result row prints beside the id: the NARROWEST condition true of that node, because "no
-// links" says more than "no open path to a source" and both are true of the same node.
+// A result row prints the NARROWEST condition true of that node beside its id, because "no links"
+// says more than "no open path to a source" and both are true of the same node. It prints the
+// SAME four keys above with the first letter capitalized in code (findConnLabel()), not a second
+// capitalized copy of each (Task 699, Tom 2026-09-30: "do the Find redesign").
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='ថ្នាំងទាំងអស់ត្រូវបានតភ្ជាប់។';
@@ -1547,13 +1791,13 @@ $ec_lang['lpn_replace_title']='ប្ដូរអ្វីដែលបានរ�
 $ec_lang['lpn_replace_prop']='លក្ខណៈសម្បត្តិត្រូវប្ដូរ';
 $ec_lang['lpn_replace_value']='តម្លៃថ្មី';
 $ec_lang['lpn_replace_source']='ប្រភពតម្លៃថ្មី';
-$ec_lang['lpn_replace_asked']='បានស្នើសុំកម្ពស់សម្រាប់ថ្នាំង {n}។ លទ្ធផលនឹងបង្ហាញនៅពេលទទួលបាន។';
+$ec_lang['lpn_replace_asked']='កម្ពស់ដែលបានស្នើសុំសម្រាប់ថ្នាំង ({n})។ លទ្ធផលនឹងបង្ហាញនៅពេលទទួលបាន។';
 $ec_lang['lpn_replace_btn']='ជំនួស';
 // The count IS the confirmation: a bulk write reaches assets spread over a map the user is not
 // looking at, so it is shown, and answered, before anything is written. {n} is a whole number.
-$ec_lang['lpn_replace_preview']='ប្ដូរធាតុ {n}?';
+$ec_lang['lpn_replace_preview']='ប្ដូរធាតុ ({n}) មែនទេ?';
 $ec_lang['lpn_replace_apply']='ប្ដូរពួកវា';
-$ec_lang['lpn_replace_done']='ធាតុ {n} ត្រូវបានប្ដូរ។ សកម្មភាពនេះអាចត្រឡប់ក្រោយក្នុងជំហានតែមួយ។';
+$ec_lang['lpn_replace_done']='ធាតុដែលបានប្ដូរ៖ {n}។ សកម្មភាពនេះអាចត្រឡប់ក្រោយក្នុងជំហានតែមួយ។';
 $ec_lang['lpn_replace_none']='គ្មានអ្វីនឹងផ្លាស់ប្ដូរទេ។';
 $ec_lang['lpn_replace_no_value']='បញ្ចូលតម្លៃថ្មី។';
 $ec_lang['lpn_replace_scope']='ជ្រើសរើសប្រភេទធាតុមួយខាងលើ ដើម្បីប្ដូរតម្លៃលើវា។';
@@ -1609,6 +1853,10 @@ $ec_lang['lpn_profile_new']='ផ្លូវរក្សាទុកថ្មី
 $ec_lang['lpn_profile_new_name']='ផ្លូវ {n}';
 $ec_lang['lpn_profile_rename']='ប្ដូរឈ្មោះផ្លូវ…';
 $ec_lang['lpn_profile_delete']='លុបផ្លូវ';
+$ec_lang['lpn_profile_open']='បើកឯកសារទម្រង់បណ្ដោយ EPANET…';
+$ec_lang['lpn_profile_file_done']='ទម្រង់បណ្ដោយត្រូវបានអានពីឯកសារ៖ រកឃើញថ្នាំង {used} ក្នុងចំណោម {total} នៅក្នុងបណ្ដាញនេះ។';
+$ec_lang['lpn_profile_file_missing']='មានឈ្មោះក្នុងឯកសារ ប៉ុន្តែមិននៅក្នុងបណ្ដាញនេះ៖ {ids}។';
+$ec_lang['lpn_profile_file_short']='ឯកសារនេះដាក់ឈ្មោះថ្នាំងតិចជាងពីរនៅក្នុងបណ្ដាញនេះ ដូច្នេះគ្មានទម្រង់បណ្ដោយត្រូវគូរទេ។';
 $ec_lang['lpn_profile_prompt_name']='ឈ្មោះសម្រាប់ផ្លូវនេះ';
 $ec_lang['lpn_profile_delete_confirm']='លុបផ្លូវដែលបានរក្សាទុក {name} មែនទេ? គំនូរខ្លួនវាមិនត្រូវបានផ្លាស់ប្ដូរទេ។';
 $ec_lang['lpn_profile_none_saved']='មិនទាន់មានផ្លូវដែលបានរក្សាទុកនៅឡើយទេ';
@@ -1628,6 +1876,17 @@ $ec_lang['lpn_ts_tip']='គូរក្រាបធាតុមួយ ឬច្�
 $ec_lang['lpn_ts_title']='តម្លៃតាមពេលវេលា';
 $ec_lang['lpn_ts_group_nodes']='ថ្នាំង';
 $ec_lang['lpn_ts_group_links']='តំណ';
+$ec_lang['lpn_pgraph_none']='ធាតុនេះគ្មានលទ្ធផលក្នុងការដំណើរការបច្ចុប្បន្នទេ។';
+// The Properties graph's own selector entry for a source share (Tom, 2026-09-30: "In selector, use
+// 'Source share from {trace node}'"). Distinct from the shared lpn_result_source_share, which still
+// labels the bare quantity everywhere else -- the Tables column, Find's property list, the Labels
+// popover and the colour legend -- where naming the trace node in every heading would be clutter.
+$ec_lang['lpn_pgraph_source_share_from']='ចំណែកប្រភពពី {node}';
+$ec_lang['lpn_result_pump_head']='ក្បាលទឹក';
+$ec_lang['lpn_result_pump_head_tip']='ក្បាលទឹកដែលម៉ាស៊ីនបូមបន្ថែមពីចំណុចបឺតទៅចំណុចបញ្ចេញ បង្ហាញជាលេខវិជ្ជមាន។ ឧបករណ៍ដោះស្រាយ និងឯកសារ EPANET កត់ត្រាវាជាការបាត់បង់ក្បាលទឹកអវិជ្ជមាន។';
+// The Full report puts every node and link in one table, where a node's Head column already sits, so a
+// pump's column there says whose head it is. Elsewhere the pump's own row or tab says so, and lpn_result_pump_head is enough.
+$ec_lang['lpn_report_pump_head']='ក្បាលទឹកម៉ាស៊ីនបូម';
 $ec_lang['lpn_ts_add']='បន្ថែមអ្វីបានជ្រើស';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
 $ec_lang['lpn_ts_add_none']='រកមិនឃើញអ្វីដើម្បីបន្ថែមទេ។';
@@ -1640,6 +1899,10 @@ $ec_lang['lpn_ts_none']='មិនទាន់មានអ្វីត្រូ�
 $ec_lang['lpn_ts_no_frames']='មិនទាន់មានលទ្ធផលការក្លែងធ្វើលើរយៈពេលមួយនៅឡើយទេ។ ចុច ដំណើរការ ដើម្បីធ្វើការក្លែងធ្វើនេះ។';
 $ec_lang['lpn_ts_summary']='ធាតុ៖ {n} ពេលវេលារាយការណ៍៖ {steps}';
 $ec_lang['lpn_ts_axis_time']='ពេលវេលាកន្លងផុត';
+// EPANET's Frequency Plot (Task 600): one value over every junction or every pipe, at the time the
+// map shows, against the percent of them less than it. "Percent less than" is EPANET's own axis
+// title. {n} and {total} are counts, {time} an elapsed time; all substituted, never concatenated.
+// The Junctions/Pipes choice reuses lpn_pane_tab_junctions and lpn_pane_tab_pipes.
 $ec_lang['lpn_freq_menu']='ប្រេកង់';
 $ec_lang['lpn_freq_tip']='ការចែកចាយប្រេកង់សម្រាប់លក្ខណៈមួយ';
 $ec_lang['lpn_freq_title']='ការចែកចាយតម្លៃ';
@@ -1647,9 +1910,16 @@ $ec_lang['lpn_freq_none']='មិនទាន់មានលទ្ធផលស�
 $ec_lang['lpn_freq_summary']='បានគូរ៖ {n} នៃ {total}';
 $ec_lang['lpn_freq_summary_time']='បានគូរ៖ {n} នៃ {total} នៅ {time}';
 $ec_lang['lpn_freq_axis_percent']='ភាគរយតិចជាង';
+// EPANET's Contour Plot (Task 600), drawn as a layer under the map rather than in a window of its
+// own, from the pipes outward. {n} and {p} are counts, {k} and {i} numbers, {u} a unit symbol, {m} a
+// distance in metres; all substituted. lpn_contour_buffer_unit follows the Buffer number box.
+// lpn_contour_consent_1..4 are the terrain question's four paragraphs, reworded for what the contour
+// plot sends: tile numbers for the network's area, not each node's latitude and longitude.
 $ec_lang['lpn_contour_menu']='បន្ទាត់ស្មើតម្លៃ';
 $ec_lang['lpn_contour_tip']='បង្ហាញផែនទីបន្ទាត់ស្មើតម្លៃលើផែនទី៖ ពណ៌របស់ថ្នាំងលាតសន្ធឹងតាមបណ្ដោយ និងនៅជាប់នឹងបំពង់ ជាមួយបន្ទាត់ស្មើតម្លៃដែលមានស្លាក។ បើកប្រអប់មួយដើម្បីកែតម្រូវ ឬបិទវា។';
 $ec_lang['lpn_contour_plot']='ផែនទីបន្ទាត់ស្មើតម្លៃ';
+$ec_lang['lpn_contour_show']='បង្ហាញបន្ទាត់ស្មើតម្លៃ';
+$ec_lang['lpn_contour_show_tip']='ដោះធីកដើម្បីលាក់ការបំពេញពណ៌ និងបន្ទាត់ស្មើតម្លៃ ធីកវិញដើម្បីយកវាត្រឡប់មកដូចដើម។ ពណ៌ថ្នាំងនៅដដែល។';
 $ec_lang['lpn_contour_fill']='ការបំពេញពណ៌';
 $ec_lang['lpn_contour_fill_tip']='រលូន លាយពណ៌ពីថ្នាក់មួយទៅថ្នាក់មួយទៀត។ ជាក្រុម បំពេញពណ៌ថ្នាក់នីមួយៗនៃកូនសោពណ៌ឲ្យស្មើគ្នា។';
 $ec_lang['lpn_contour_fill_smooth']='រលូន';
@@ -1672,8 +1942,13 @@ $ec_lang['lpn_contour_consent_1']='ការគូរសម្ពាធលើដ
 $ec_lang['lpn_contour_consent_2']='នេះជាសំណួរខុសពីរូបភាពផែនទីនៅពីក្រោយគម្រោងរបស់អ្នក។ រូបភាពទាំងនោះគ្រាន់តែប្រាប់ថាអ្នកកំពុងមើលកន្លែងណា។ ក្រឡាទាំងនេះប្រាប់ថាបណ្ដាញរបស់អ្នកនៅឯណា។ Mapbox នឹងទទួលបានលេខក្រឡាទាំងនោះ និងអាសយដ្ឋាន IP របស់អ្នក។ យើងមិនផ្ញើអ្វីផ្សេងទៀតឡើយ៖ គ្មានឈ្មោះ គ្មានបំពង់ គ្មានគម្រោង។ យើងមិនរក្សាកំណត់ត្រាអំពីរឿងនេះទេ ហើយគ្មានអ្វីត្រូវបានរក្សាទុកនៅលើឧបករណ៍នេះ លើកលែងតែចម្លើយរបស់អ្នកចំពោះសំណួរនេះ។';
 $ec_lang['lpn_contour_consent_3']='តើយើងអាចផ្ញើលេខក្រឡានៃតំបន់បណ្ដាញរបស់អ្នកទៅ Mapbox បានទេ?';
 $ec_lang['lpn_contour_consent_4']='ប្រសិនបើអ្នកឆ្លើយថាទេ អ្វីៗផ្សេងទៀតនៅលើទំព័រនេះនៅតែដំណើរការដូចឥឡូវនេះ ហើយផែនទីបន្ទាត់ស្មើតម្លៃត្រូវបានគូរចន្លោះរវាងថ្នាំងតែប៉ុណ្ណោះ។ យើងចងចាំចម្លើយថាបាន ដើម្បីកុំឲ្យសួរម្ដងទៀត។ ចម្លើយថាទេ មិនត្រូវបានរក្សាទុកទាល់តែសោះ។';
+// EPANET's System Flow plot (Task 600). "System flow" is its Graph Selection name, "System flow
+// balance" its window title, "Produced" and "Consumed" its series. The definition is its own code
+// (Fgraph.pas GetSysFlow): junction and reservoir demands only, split by sign; tanks in neither.
+// The axis reuses lpn_result_flow and lpn_ts_axis_time.
 $ec_lang['lpn_sysflow_menu']='តុល្យភាពលំហូរ';
 $ec_lang['lpn_sysflow_tip']='គូរក្រាបលំហូរសរុបដែលផលិត និងលំហូរសរុបដែលប្រើប្រាស់ ទល់នឹងពេលវេលា ពេញការក្លែងធ្វើរយៈពេលបន្ត។ ធុងទឹកមិនស្ថិតក្នុងផលបូកណាមួយទេ ដូច្នេះកន្លែងណាដែលបន្ទាត់ទាំងពីរបែកគ្នា ធុងទឹកកំពុងបំពេញ ឬបង្ហូរចេញ។';
+$ec_lang['lpn_sysflow_title']='តុល្យភាពលំហូរ';
 $ec_lang['lpn_sysflow_produced']='ផលិត';
 $ec_lang['lpn_sysflow_produced_tip']='លំហូរសរុបចូលបណ្ដាញពីអាងស្តុក និងពីតម្រូវការអវិជ្ជមាន។';
 $ec_lang['lpn_sysflow_consumed']='ប្រើប្រាស់';
@@ -1717,8 +1992,9 @@ $ec_lang['lpn_new_coordsys_local_tip']='មិនមានប្រព័ន្�
 // system" on 2026-09-25 -- don't expose the word "projection".) Two filters over one catalogue, and
 // the catalogue itself is not keyed: a coordinate system's NAME is the EPSG register's own, exactly
 // as the OpenStreetMap credit is, and a GIS reader in any language looks for those characters.
-// **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25). Shared by the New project box and Convert as, so
-// it names the box's own subject rather than either caller's radio label.
+// **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25) is lpn_new_coordsys, as are its list label and
+// the New project box's chooser button (Task 699): it names the box's own subject rather than
+// either caller's radio label.
 // The spatial filter. A zoned system covers a strip of the Earth and nothing outside it, so a place
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
@@ -1741,6 +2017,8 @@ $ec_lang['lpn_crs_count_network']='{n} នៃប្រព័ន្ធកូអ�
 // when this page has no transform for it. Short on purpose: it sits at the end of a register name
 // that can already run to 50 characters.
 $ec_lang['lpn_crs_unplaceable_mark']='(គ្មានផែនទី)';
+// Shown beside WGS 84 (EPSG:4326) in the chooser only (Task 775), never on the status strip.
+$ec_lang['lpn_crs_suggested_mark']='(ដែលបានស្នើ)';
 // The same fact in a sentence: when such a project is created, and when Go to or place name search
 // is used on one. File, Convert as says it in its own words (lpn_convas_no_transform).
 $ec_lang['lpn_crs_unplaceable']='{crs} គឺជាមួយក្នុងចំណោមប្រព័ន្ធកូអរដោនេមួយចំនួនតូចដែលរាយក្នុងបញ្ជី ដោយគ្មានព័ត៌មានប្រែក្លាយដែលអាចប្រើបាន។ នេះមានន័យថា ផែនទីពិភពលោក ការស្វែងរកឈ្មោះកន្លែង និងកម្ពស់ DEM មិនដំណើរការទេ។ កូអរដោនេរបស់អ្នកមិនរងផលប៉ះពាល់ទេ។';
@@ -1797,19 +2075,82 @@ $ec_lang['lpn_import_no_room']='ទំហំផ្ទុករបស់កម្
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='យល់ព្រម';
+// **TASK 718** (Tom, 2026-09-25: *"We have three import items. It's probably time for an Import
+// sub-menu."*). The three rows -- surveyed points, an EPANET file, and libraries -- now open as a
+// fly-out off one row, the same submenu idiom Help > Toolbar already uses. Each row keeps its
+// own existing key and tip; only this one row is new.
 $ec_lang['lpn_file_import_menu']='នាំចូល…';
 $ec_lang['lpn_file_import_inp']='នាំចូលឯកសារ EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='អានបណ្ដាញចេញពីឯកសារ EPANET ទាំងឯកសារអត្ថបទ .inp ឬឯកសារ .net ដែល EPANET រក្សាទុក រួចរក្សាទុកវានៅក្នុងកម្មវិធីរុករកនេះជាគម្រោងថ្មី។';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
+// File > Export is a submenu (Tom, 2026-10-06), so its rows drop the verb the heading carries. The
+// two keys above are what the rows were called before it.
+$ec_lang['lpn_file_export_menu']='នាំចេញ…';
+$ec_lang['lpn_file_export_item_inp']='ឯកសារ EPANET…';
+$ec_lang['lpn_file_export_item_geojson']='ឯកសារ GeoJSON…';
+$ec_lang['lpn_file_export_item_ods']='ឯកសារ ODS…';
+$ec_lang['lpn_file_export_item_xlsx']='ឯកសារ XLSX…';
+$ec_lang['lpn_file_export_item_csv']='ឯកសារ CSV…';
+$ec_lang['lpn_file_export_tables_tip']='ទាញយកតារាងដូចផ្ទាំងតារាងបង្ហាញ ក្នុងសៀវភៅការងារតែមួយ ដែលមានសន្លឹកមួយសម្រាប់តារាងនីមួយៗ (និងសម្រាប់សេណារីយ៉ូនីមួយៗដែលអ្នកជ្រើស) បូកសន្លឹកមួយសម្រាប់បណ្ណាល័យនីមួយៗដែលលេខសម្គាល់របស់ពួកវាសំដៅទៅ៖ លំនាំ ខ្សែកោង ប្រភេទបំពង់ និងគ្រឿងបំពង់។ លទ្ធផលត្រូវបានរួមបញ្ចូលសម្រាប់សេណារីយ៉ូដែលបានគណនាចុងក្រោយតែប៉ុណ្ណោះ។';
+$ec_lang['lpn_file_export_csv_tip']='ទាញយកតារាងមួយដូចផ្ទាំងតារាងបង្ហាញ។ តារាងមួយមកជាឯកសារ CSV តែមួយ ដោយគ្មានបណ្ណាល័យ។ តារាង ឬសេណារីយ៉ូច្រើនមកជាឯកសារ zip មួយនៃឯកសារ CSV ជាមួយឯកសារមួយសម្រាប់បណ្ណាល័យនីមួយៗដែលលេខសម្គាល់របស់ពួកវាសំដៅទៅ។ លទ្ធផលត្រូវបានរួមបញ្ចូលសម្រាប់សេណារីយ៉ូដែលបានគណនាចុងក្រោយតែប៉ុណ្ណោះ។';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='ទាញយកបណ្ដាញនេះជាឯកសារ EPANET .inp (ក្នុងឯកសារ zip ជាមួយរូបភាពរបស់វា ប្រសិនបើមាន)។ អ្វីៗដែលទម្រង់ .inp មិនអាចផ្ទុកបាន ត្រូវបានរាយនៅពេលក្រោយ។';
 $ec_lang['lpn_status_inp_exported']='បាននាំចេញ {file}។';
+$ec_lang['lpn_status_inp_exported_picture']='បាននាំចេញ {zip} ដែលផ្ទុកឯកសារ EPANET {file} រូបភាពផ្ទៃខាងក្រោយរបស់វា {picture} និងឯកសារកូអរដោនេផែនទី {world}។ ស្រង់ចេញទាំងបីទៅក្នុងថតតែមួយ រួចបើក .inp នៅទីនោះក្នុង EPANET ហើយរូបភាពនឹងមកជាមួយ។';
+$ec_lang['lpn_status_inp_exported_no_picture']='បាននាំចេញ {file}។ មិនអាចរក្សាទុករូបភាពផ្ទៃខាងក្រោយបានទេ ដូច្នេះ .inp មិនដាក់ឈ្មោះរូបភាពណាមួយទេ។ ក្នុង EPANET សូមបន្ថែមវាដោយ View > Backdrop > Load។';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+
+
 $ec_lang['lpn_inp_export_differences']='{n} រឿងដែលទម្រង់ .inp មិនអាចផ្ទុកបាន។';
+$ec_lang['lpn_inp_export_difference_one']='រឿងមួយដែលទម្រង់ .inp មិនអាចផ្ទុកបាន។';
 $ec_lang['lpn_inp_export_refused']='គម្រោងនេះមិនអាចសរសេរជាឯកសារ EPANET បានទេ៖ {detail}';
+// Task 772: File > Export DXF file. The model's data for AutoCAD and other CAD programs.
+$ec_lang['lpn_file_export_item_dxf']='ឯកសារ DXF…';
+$ec_lang['lpn_file_export_dxf_tip']='ទាញយកបណ្ដាញនេះសម្រាប់ AutoCAD និងកម្មវិធី CAD ផ្សេងទៀត៖ ថ្នាំងជាប្លុកសញ្ញា បំពង់ ម៉ាស៊ីនបូម និងវ៉ាល់ជា polyline ហើយគ្រប់ធាតុជាប្លុកដែលគុណលក្ខណៈរបស់វាមានលេខសម្គាល់ និងតម្លៃលក្ខណៈសម្បត្តិក្នុងឯកតាគម្រោង។';
+$ec_lang['lpn_dxf_export_no_utm']='ឯកសារ DXF មិនត្រូវបានសរសេរទេ៖ បណ្ដាញនេះស្ថិតនៅក្រៅរយៈទទឹងដែល UTM គ្របដណ្ដប់ (80° S ដល់ 84° N) ហើយគំនូរត្រូវការក្រឡាចត្រង្គសំប៉ែតដើម្បីគូរលើ។';
+$ec_lang['lpn_dxf_export_refused']='ឯកសារ DXF មិនត្រូវបានសរសេរទេ៖ ការបំលែងកូអរដោនេដែលវាត្រូវការមិនបានផ្ទុកទេ។ ពិនិត្យការតភ្ជាប់ ហើយព្យាយាមម្ដងទៀត។';
+$ec_lang['lpn_dxf_export_failed']='ឯកសារ DXF មិនត្រូវបានសរសេរទេ៖ កំហុសក្នុងទំព័រនេះបានបញ្ឈប់វា ({error})។';
+// The read-me written into the file as a block of attributes, on a layer that does not plot; the
+// file writes it in capital letters. Each says what
+// the coordinates are and claims no coordinate system the file does not have. {unit} is a length
+// unit as written in English (ft, m), not translated; {crs} is a coordinate system name with its EPSG code.
+$ec_lang['lpn_dxf_note_grid']='កូអរដោនេ៖ X និង Y របស់គម្រោងនេះ ក្នុង {unit}។ គ្មានប្រព័ន្ធកូអរដោនេត្រូវបានបញ្ជាក់ទេ។';
+$ec_lang['lpn_dxf_note_crs']='កូអរដោនេ៖ {crs} ដូចដែលគម្រោងនេះបញ្ជាក់ទាំងស្រុង។';
+$ec_lang['lpn_dxf_note_geo']='កូអរដោនេ៖ {crs} ក្នុងម៉ែត្រ មិនមែនរយៈទទឹង និងរយៈបណ្ដោយទេ។ រយៈទទឹង និងរយៈបណ្ដោយរបស់គម្រោងត្រូវបានបំលែងទៅក្រឡាចត្រង្គនោះ។';
+$ec_lang['lpn_dxf_exported_geo']='បាននាំចេញ {file}។ កូអរដោនេរបស់វាគឺ {crs} ក្នុងម៉ែត្រ មិនមែនរយៈទទឹង និងរយៈបណ្ដោយទេ។';
+// {prefix} is the layer-name prefix, C-WATR-MODL-; {example} is a whole layer name such as
+// C-WATR-MODL-NODE-BASE.
+$ec_lang['lpn_dxf_note_blocks']='ស្រទាប់ត្រូវបានដាក់ឈ្មោះ {prefix} កូដធាតុ សហសញ្ញា និងជម្រើសជំនួស ដូចក្នុង {example}។ ធាតុនីមួយៗជាប្លុកដែលបញ្ចូលនៅមាត្រដ្ឋាន 1 ជាមួយគុណលក្ខណៈខ្ពស់ 1 ឯកតា៖ ធ្វើមាត្រដ្ឋានប្លុកដើម្បីកំណត់កម្ពស់អក្សរ។ រាល់គុណលក្ខណៈមើលឃើញ គុណលក្ខណៈរបស់ធាតុមួយត្រូវបានជង់ក្នុងជួរឈរមួយនៅជាប់និមិត្តសញ្ញារបស់វា។';
+// {n} is a whole number; {max} is 2049. Each shortened value ends in three periods (...).
+$ec_lang['lpn_dxf_note_shortened']='តម្លៃដែលវែងជាងដែលឯកសារ DXF អនុញ្ញាត ({max} តួអក្សរ) ({n})។ នីមួយៗត្រូវបានកាត់ខ្លី ហើយបញ្ចប់ដោយចុចបីដង។';
+// {n} is a whole number; {tag} is an attribute tag in capitals, BASE_DEMAND in English.
+$ec_lang['lpn_dxf_note_categories']='ថ្នាំងដែលមានប្រភេទតម្រូវការច្រើនជាងមួយ ({n})។ គុណលក្ខណៈ {tag} របស់ពួកវាផ្ទុកផលបូកនៃតម្រូវការមូលដ្ឋានរបស់គ្រប់ប្រភេទ។';
+// GeoJSON export (Task 728). The command is worded like Export EPANET file. Positions in a GeoJSON
+// file are always longitude and latitude (RFC 7946), so a project with no place on the Earth is
+// refused and told how to get one, never written with an invented coordinate system.
+$ec_lang['lpn_file_export_geojson_tip']='ទាញយកបណ្ដាញនេះជាឯកសារ GeoJSON សម្រាប់ QGIS, ArcGIS Pro និងកម្មវិធី GIS ផ្សេងទៀត។ ថ្នាំង ធុងទឹក និងអាងស្តុកជាចំណុច ហើយបំពង់ ម៉ាស៊ីនបូម និងវ៉ាល់ជាបន្ទាត់ដែលដើរតាមចំណុចកំណត់របស់វា។ ទីតាំងជាទទឹង និងបណ្ដោយ។ លទ្ធផលត្រូវបានបញ្ចូលតែនៅពេលបណ្ដាញត្រូវបានដោះស្រាយប៉ុណ្ណោះ។';
+// Workspace export and import (Tom, 2026-10-07). {file}, {n}, {r}, {u} and {version} are filled in by the page.
+$ec_lang['lpn_file_export_item_workspace']='កន្លែងធ្វើការ…';
+$ec_lang['lpn_file_export_workspace_tip']='ទាញយកឯកសារតូចមួយដែលផ្ទុកកន្លែងដែលប្រអប់របស់អ្នកនៅ ទំហំរបស់ពួកវា ប្រអប់ណាបើក ឬភ្ជាប់ និងទំហំផ្ទាំង និងជួរឈររបស់អ្នក បូកជម្រើសបង្ហាញនៃទំព័រនេះ ដូចជាពពុះជំនួយ និងកាតពេលដាក់ទ្រនិចណាដែលបង្ហាញ។ គម្រោង ការកំណត់គម្រោង និងខូគីរបស់អ្នក (ភាសា ការយល់ព្រម ឯកតា) មិននៅក្នុងវាទេ។ ផ្ទុកវាលើអេក្រង់ ឬកម្មវិធីរុករកផ្សេងដោយ ឯកសារ នាំចូល កន្លែងធ្វើការ។';
+$ec_lang['lpn_file_import_workspace']='កន្លែងធ្វើការ…';
+$ec_lang['lpn_file_import_workspace_tip']='អនុវត្តឯកសារកន្លែងធ្វើការដែលបានរក្សាទុកដោយ ឯកសារ នាំចេញ កន្លែងធ្វើការ៖ ទីតាំង និងទំហំប្រអប់ ការភ្ជាប់ ទំហំផ្ទាំង និងជម្រើសបង្ហាញនៃទំព័រនេះ ដូចជាពពុះជំនួយ និងកាតពេលដាក់ទ្រនិចណាដែលបង្ហាញ។ គម្រោង និងខូគីរបស់អ្នកមិនត្រូវបានប៉ះពាល់ទេ។';
+$ec_lang['lpn_workspace_exported']='កន្លែងធ្វើការត្រូវបានរក្សាទុកទៅ {file}៖ ការកំណត់ {n}។';
+$ec_lang['lpn_workspace_imported']='កន្លែងធ្វើការត្រូវបានអនុវត្តពី {file}។ ការកំណត់ដែលបានអនុវត្ត៖ {n}។ ត្រឡប់ទៅលំនាំដើម៖ {r}។';
+$ec_lang['lpn_workspace_ignored']='ធាតុដែលមិនបានអើពើ ព្រោះមិនត្រូវបានទទួលស្គាល់៖ {u}។';
+$ec_lang['lpn_workspace_refused_unreadable']='ឯកសារនេះមិនអាចអានជាកន្លែងធ្វើការបានទេ ដូច្នេះគ្មានអ្វីត្រូវបានផ្លាស់ប្ដូរ។';
+$ec_lang['lpn_workspace_refused_format']='នេះមិនមែនជាឯកសារកន្លែងធ្វើការដែលរក្សាទុកដោយទំព័រនេះទេ ដូច្នេះគ្មានអ្វីត្រូវបានផ្លាស់ប្ដូរ។';
+$ec_lang['lpn_workspace_refused_newer']='ឯកសារកន្លែងធ្វើការនេះត្រូវបានរក្សាទុកដោយកំណែថ្មីជាងនៃទំព័រនេះ (ទម្រង់ {version}) ដូច្នេះគ្មានអ្វីត្រូវបានផ្លាស់ប្ដូរ។';
+$ec_lang['lpn_workspace_confirm']='ជំនួសប្លង់កន្លែងធ្វើការរបស់កម្មវិធីរុករកនេះដោយប្លង់ក្នុងឯកសារ?';
+$ec_lang['lpn_workspace_refused_storage']='ទំហំផ្ទុករបស់កម្មវិធីរុករកពេញ ឬមិនមាន ដូច្នេះកន្លែងធ្វើការមិនត្រូវបានអនុវត្តទេ។';
+$ec_lang['lpn_geojson_refused_local']='ឯកសារ GeoJSON ផ្ទុកតែទទឹង និងបណ្ដោយប៉ុណ្ណោះ ហើយគម្រោងនេះត្រូវបានគូរលើក្រឡាចត្រង្គមូលដ្ឋានដែលគ្មានទីតាំងលើផែនដី។ ដាក់តម្រៀបភូមិសាស្ត្រវាជាមុនសិនដោយ ផែនទី, ផែនទីពិភពលោក, ភ្ជាប់ រួចនាំចេញម្ដងទៀត។';
+$ec_lang['lpn_geojson_refused_range']='ទីតាំងទាំងនេះមិនមែនជាទទឹង និងបណ្ដោយត្រឹមត្រូវទេ៖ {detail}';
+$ec_lang['lpn_geojson_refused_crs']='ទំព័រនេះមិនស្គាល់ប្រព័ន្ធកូអរដោនេនៃគម្រោងនេះ ({detail}) ដូច្នេះទីតាំងរបស់វាមិនអាចបម្លែងទៅជាទទឹង និងបណ្ដោយបានទេ។ ប្រើ បម្លែងជា… ដើម្បីចម្លងគម្រោងទៅក្នុងប្រព័ន្ធដែលទំព័រនេះស្គាល់ រួចនាំចេញម្ដងទៀត។';
+$ec_lang['lpn_geojson_refused_empty']='មិនទាន់មានអ្វីត្រូវនាំចេញទេ។ សូមគូរ ឬបើកបណ្ដាញជាមុនសិន។';
+$ec_lang['lpn_geojson_results_in']='លទ្ធផលនៅលើអេក្រង់ត្រូវបានបញ្ចូល។';
+$ec_lang['lpn_geojson_results_out']='គ្មានលទ្ធផលត្រូវបានបញ្ចូលទេ ព្រោះបណ្ដាញមិនទាន់ត្រូវបានដោះស្រាយ។';
 $ec_lang['lpn_inp_bad_file']='ឯកសារនោះមិនអាចអានជាឯកសារបណ្ដាញ EPANET បានទេ។';
 // EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
 // the way out named here always works, so keep the instruction in the message rather than leaving
@@ -1825,6 +2166,10 @@ $ec_lang['lpn_inp_report_label_anchor']='អត្ថបទត្រូវបា
 // or no [BACKDROP] line at all, never only "None" -- because none of those states a real coordinate
 // system either. See showInpReport() in js/looped-network.js.
 $ec_lang['lpn_inp_report_no_crs']='ឯកសារ EPANET មិនមានប្រព័ន្ធកូអរដោនេទេ ដូច្នេះឯកសារនេះនឹងមិនត្រូវបានតម្រៀបភូមិសាស្ត្រតាំងពីដំបូងទេ។ ដើម្បីដាក់វានៅលើផែនទីពិភពលោក សូមប្រើ ផែនទី, ផែនទីពិភពលោក… ដើម្បីបម្លែងកូអរដោនេរបស់វា សូមប្រើ ឯកសារ, បម្លែងជា…';
+$ec_lang['lpn_inp_backdrop_attach']='ភ្ជាប់ {file}…';
+$ec_lang['lpn_inp_backdrop_attach_tip']='ទំព័រគេហទំព័រមិនអាចបើករូបភាពតាមឈ្មោះរបស់វាបានទេ។ ជ្រើសរើសវាលើឧបករណ៍របស់អ្នក ហើយវានឹងត្រូវបានដាក់នៅកន្លែងដែលឯកសារបញ្ជាក់ថាវាស្ថិតនៅ។';
+$ec_lang['lpn_inp_backdrop_attached']='បានភ្ជាប់ {file} ដាក់នៅកន្លែងដែលឯកសារបញ្ជាក់ថាវាស្ថិតនៅ។';
+$ec_lang['lpn_inp_backdrop_attached_other']='បានភ្ជាប់ {picked} ដាក់នៅកន្លែងដែលឯកសារបញ្ជាក់ថាវាស្ថិតនៅ។ ឯកសារនេះដាក់ឈ្មោះ {file} ដែលជាឈ្មោះផ្សេង។';
 $ec_lang['lpn_inp_report_lead']='ទំព័រនេះមិនប្រើគ្រប់លក្ខណៈពិសេសរបស់ EPANET ទេ ប៉ុន្តែគ្មានទិន្នន័យក្នុងឯកសារត្រូវបានបោះបង់ទេ។ បញ្ជីខាងក្រោមបង្ហាញទិន្នន័យក្នុងឯកសារដែលត្រូវបានរក្សាទុកប៉ុន្តែមិនបានប្រើ និងការផ្លាស់ប្ដូរណាមួយដែលបានធ្វើអំឡុងពេលនាំចូល៖';
 $ec_lang['lpn_inp_drop_headloss']='ឯកសារនេះមិនប្រើរូបមន្ត Hazen-Williams ទេ។ ទំព័រនេះគណនា Hazen-Williams ដូច្នេះលេខភាពរដិបរដុបបំពង់ត្រូវបានរក្សាទុកដូចដែលបានសរសេរ ប៉ុន្តែលទ្ធផលនៅទីនេះនឹងមិនត្រូវនឹងលទ្ធផលក្នុង EPANET ទេ។';
 $ec_lang['lpn_inp_drop_tank_curve']='ធុងទឹកទាំងនេះមិនមានជ្រុងត្រង់ទេ៖ ឯកសារផ្ដល់រូបរាងរបស់វាជាខ្សែកោងមាឌ។ ខ្សែកោងត្រូវបានរក្សាទុកក្នុងប្រអប់ បណ្ណាល័យ ធុងទឹកនៅតែសំដៅទៅវា ហើយការក្លែងធ្វើលើរយៈពេលមួយប្រើវាដើម្បីគណនាកម្រិតទឹកនៅពេលធុងទឹកបំពេញ និងបង្ហូរ។ ការវិភាគរយៈពេលតែមួយមិនត្រូវបានប៉ះពាល់ទេ ព្រោះផ្ទៃទឹកស្ថិតនៅកម្រិតដែលបានចែងក្នុងឯកសារ។ អង្កត់ផ្ចិតក្នុងឯកសារត្រូវបានរក្សាទុកនៅជាប់ខ្សែកោង ហើយត្រូវបានប្រើដើម្បីគូរ និងដោះស្រាយធុងទឹកដែលគ្មានខ្សែកោង។';
@@ -1855,6 +2200,7 @@ $ec_lang['lpn_inp_drop_tags']='ឯកសារនេះកំណត់ស្ល�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_inp_drop_report']='ឯកសារនេះមានការកំណត់ទ្រង់ទ្រាយរបាយការណ៍របស់ EPANET។ របាយការណ៍ការដំណើរការមាននៅក្រោម របាយការណ៍, ការដំណើរការ ប៉ុន្តែវាប្រើទ្រង់ទ្រាយស្ដង់ដារ EPANET ជាជាងទ្រង់ទ្រាយដែលការកំណត់ទាំងនេះបញ្ជាក់។ បន្ទាត់ទាំងនោះត្រូវបានរក្សាទុក ហើយសរសេរត្រឡប់វិញ ប្រសិនបើអ្នករក្សាទុកជាឯកសារ EPANET។';
 $ec_lang['lpn_inp_drop_sections']='ឯកសារនេះផ្ទុកផ្នែកមួយដែលទំព័រនេះមិនអានទាល់តែសោះ។ គ្មានអ្វីនៅទីនេះប្រើវាទេ។ វាត្រូវបានរក្សាទុកទាំងស្រុង ហើយត្រូវបានសរសេរត្រឡប់វិញ ប្រសិនបើអ្នករក្សាទុកជាឯកសារ EPANET។';
+$ec_lang['lpn_inp_drop_comments']='បន្ទាត់មតិយោបល់ទាំងនេះក្នុងលំនាំ ឬការគ្រប់គ្រងសាមញ្ញនៃឯកសារនេះមិនត្រូវបាននាំចូលទេ ព្រោះទំព័រនេះគ្មានកន្លែងរក្សាទុកពួកវា (ឧទាហរណ៍ រវាងជួរដេកនៃលំនាំមួយ)។ លំនាំ និងការគ្រប់គ្រងទាំងអស់ត្រូវបាននាំចូលពេញលេញ។';
 $ec_lang['lpn_inp_drop_quality_options']='ឯកសារនេះចែងជម្រើសគុណភាពទឹករបស់ EPANET៖ ជម្រើស Quality ដែលដាក់ឈ្មោះប្រភេទនៃការវិភាគគុណភាពទឹក និងការកំណត់ពីរដែលទៅជាមួយសារធាតុគីមី គឺ Relative diffusivity និង Quality tolerance។ ទាំងបីត្រូវបានរក្សាទុក និងប្រើ។ អាយុទឹក ការតាមដានប្រភព និងសារធាតុគីមីមួយ ត្រូវបានគណនានៅទីនេះរៀងៗខ្លួន ហើយការកំណត់សារធាតុគីមីទាំងពីរត្រូវបានប្រើនៅពេលដំណើរការសារធាតុគីមី។ ទាំងអស់ត្រូវបានសរសេរត្រឡប់វិញ ប្រសិនបើអ្នករក្សាទុកជាឯកសារ EPANET។';
 $ec_lang['lpn_inp_drop_file_options']='ឯកសារនេះយោងទៅឯកសារជំនួយមួយ៖ Map ដែលផ្ទុកកូអរដោនេ ឬ Hydraulics ដែលផ្ទុកលទ្ធផលធារាសាស្ត្រដែលបានគណនារួច។ ទំព័រនេះមិនអាចបើកឯកសារទាំងពីរប្រភេទនេះទេ ដូច្នេះបន្ទាត់ទាំងនោះត្រូវបានរក្សាទុកដដែល ហើយត្រូវបានសរសេរត្រឡប់វិញ ប្រសិនបើអ្នករក្សាទុកជាឯកសារ EPANET។';
 $ec_lang['lpn_inp_drop_other_options']='ឯកសារនេះចែងជម្រើសដែលទំព័រនេះមិនអានទេ។ គ្មានអ្វីនៅទីនេះប្រើវាទេ។ ពួកវាត្រូវបានរក្សាទុក ហើយត្រូវបានសរសេរត្រឡប់វិញ ប្រសិនបើអ្នករក្សាទុកជាឯកសារ EPANET។';
@@ -1980,8 +2326,9 @@ $ec_lang['lpn_lock_age_unknown']='គ្មានកំណត់ត្រាអ�
 // Cancel that needed a sentence would not be a Cancel.
 $ec_lang['lpn_lock_open_choices_ask']='"សួរ" ប្រាប់អ្នកណាដែលកំពុងបើកឯកសារនេះថាអ្នកចង់បានវា ហើយមិនផ្លាស់ប្ដូរអ្វីផ្សេងទៀតទេ។ "បើកបានតែអាន" អនុញ្ញាតឲ្យអ្នកមើលវា និងផ្លាស់ប្ដូរអ្វីក៏ដោយ ដោយមិនអាចរក្សាទុកនៅទីនេះបានទេ។ "បំបែកការចាក់សោ" អនុញ្ញាតឲ្យអ្នករក្សាទុកជាន់ពីលើឯកសារ; ការងារដែលពួកគេមិនទាន់រក្សាទុករបស់ពួកគេមិនបាត់បង់ទេ ប៉ុន្តែពួកគេនឹងលែងអាចរក្សាទុកវានៅទីនេះទៀតហើយ ហើយនរណាម្នាក់ប្រហែលជាត្រូវបញ្ចូលគ្នាទាំងពីរដោយដៃ។';
 $ec_lang['lpn_lock_ask']='សួរ';
-// Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
-// this computer for it, which is the whole point of moving the question here.
+// Asked at the one moment the name is useful. Nothing is written to this computer for it; the lock
+// broker keeps it in that file's lock record for the holder to read (Tom, 2026-09-29, correcting a
+// prompt that said "stored only in this browser").
 $ec_lang['lpn_lock_ask_prompt']='តើយើងគួរប្រាប់ថាអ្នកណាកំពុងសួរ? ឧទាហរណ៍ បញ្ចូលអក្សរកាត់ឈ្មោះរបស់អ្នក។ វាត្រូវបានរក្សាទុកជាមួយសោនៃឯកសារនេះនៅលើម៉ាស៊ីនមេរបស់យើង សម្រាប់អ្នកណាដែលបើកវា ហើយត្រូវបានលុបក្នុងរយៈពេល 30 ថ្ងៃ។';
 $ec_lang['lpn_lock_ask_sent']='យើងបានសួរអ្នកណាដែលកំពុងបើកឯកសារនេះឲ្យបិទវា។ ពួកគេនឹងឃើញវាក្នុងរយៈពេលមិនដល់មួយនាទី ប្រសិនបើទំព័ររបស់ពួកគេនៅតែបើក។ គ្មានអ្វីផ្សេងទៀតបានផ្លាស់ប្ដូរទេ ហើយឯកសារនេះនៅតែជារបស់ពួកគេរហូតដល់ពួកគេបិទវា។';
 $ec_lang['lpn_lock_ask_failed']='សារបស់អ្នកមិនអាចផ្ញើបានទេ។ ប្រហែលជាគ្មាននរណាម្នាក់កំពុងបើកឯកសារនេះឥឡូវនេះទេ ឬម៉ាស៊ីនមេមិនអាចទាក់ទងបានទេ។';
@@ -1989,13 +2336,21 @@ $ec_lang['lpn_lock_ask_failed']='សារបស់អ្នកមិនអា�
 // out of the locked-file dialog used to say nothing at all, so a reader who pressed Cancel by
 // reflex had no way to learn what had just been offered. It says what did not happen, and why.
 $ec_lang['lpn_lock_open_cancelled']='ឯកសារនោះមិនត្រូវបានបើកទេ ហើយគ្មានអ្វីនៅទីនេះផ្លាស់ប្ដូរទេ។ អ្នកណាម្នាក់ផ្សេងទៀតនៅតែកំពុងបើកវា។';
+// Task 747: a file copied outside this page keeps its original's document ID, and so its lock. Asked
+// whenever this browser cannot guarantee it already knows the file (Tom, 2026-09-30). {date} is when
+// the ID was minted, in the visitor's own regional date-time format.
 $ec_lang['lpn_copy_title']='សម្គាល់ឯកសារជាច្បាប់ចម្លងថ្មីឬ?';
 $ec_lang['lpn_copy_body']='ឯកសារនេះប្រាប់ថាវាត្រូវបានបង្កើតនៅ {date} ហើយកម្មវិធីរុករកនេះមិនស្គាល់វាទេ។ តើនេះជាឯកសារដើម (រក្សាសោដដែល) ឬជាច្បាប់ចម្លង (បង្កើតសោថ្មី)?';
 $ec_lang['lpn_copy_body_nodate']='កម្មវិធីរុករកនេះមិនស្គាល់ឯកសារនេះទេ។ តើនេះជាឯកសារដើម (រក្សាសោដដែល) ឬជាច្បាប់ចម្លង (បង្កើតសោថ្មី)?';
 $ec_lang['lpn_copy_original']='ឯកសារដើម៖ រក្សាសោដដែល';
 $ec_lang['lpn_copy_copy']='ច្បាប់ចម្លង៖ បង្កើតសោថ្មី';
+// What "Original" does when the file's id is already open in a tab here with a different file:
+// switch to the tab, without changing the tab's file.
 $ec_lang['lpn_copy_kept_link']='បានបើក {name} ជាឯកសារដើមដែលបានផ្លាស់ទៅកន្លែងថ្មី។ ការរក្សាទុកឥឡូវនេះសរសេរទៅឯកសារនេះ។';
+// Tom, 2026-10-05: the copy is saved the moment it is chosen, so nobody has to remember to.
 $ec_lang['lpn_copy_opened']='បានបើក {file} ជាច្បាប់ចម្លង ហើយរក្សាទុកវា ជាមួយសោថ្មី។';
+// Said only when that save did not happen (permission refused, file gone); the tab stays unsaved.
+$ec_lang['lpn_copy_opened_unsaved']='បានបើក {file} ជាច្បាប់ចម្លង ជាមួយសោថ្មីដែលនឹងត្រូវបានរក្សាទុកនៅពេលរក្សាទុកឯកសារលើកក្រោយ។';
 // The other end of the back channel, shown to the holder.
 $ec_lang['lpn_lock_requested']='{name} ចង់កែសម្រួលឯកសារនេះ។ នៅពេលអ្នកត្រៀមរួច សូមរក្សាទុកការងាររបស់អ្នក ហើយប្រើ ឯកសារ, បិទគម្រោង ដើម្បីប្រគល់វា។';
 $ec_lang['lpn_ago_seconds']='{n} វិនាទី';
@@ -2135,8 +2490,10 @@ $ec_lang['lpn_notes_5_def']='ម៉ាស៊ីនបូមមួយធ្វើ
 $ec_lang['lpn_notes_6_term']='ជំនួយជួរឈរតារាង';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one
-// because its own wording pairs a command with a GESTURE, on the same "action, then gesture" shape
-// every row here already has -- the Hide/Show row beside it names the identical menu.
+// because its own wording pairs a command with a GESTURE -- the Hide/Show row beside it names the
+// identical menu. **GESTURE FIRST, THEN ACTION, SINCE 2026-10-06** (Ida, User guide): the cells were
+// swapped in all 27 files, by script and unchanged, so this table reads in the same order as the
+// key-then-action tables beside it (lpn_notes_7_def, lpn_hotkeys_map_def).
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>ចុចលើក្បាល</td><td>ជ្រើសរើសជួរឈរ</td></tr><tr><td>Ctrl+ចុច ឬ Shift+ចុចលើក្បាលមួយទៀត</td><td>បន្ថែម ឬពង្រីកជម្រើសជួរឈរ</td></tr><tr><td>អូស ឬប្រើ គ្រប់គ្រងជួរឈរ… នៅក្នុងម៉ឺនុយចុចខាងស្ដាំ ឬ ⋮</td><td>ផ្លាស់ទី (តម្រៀបលំដាប់ឡើងវិញ) ជួរឈរដែលបានជ្រើសរើស</td></tr><tr><td>ដាក់ទ្រនិចលើជ្រុងខាងលើនៃក្បាលមួយ ឬជ្រើសរើស ឬចុច Tab ចូលក្បាលមួយ</td><td>ម៉ឺនុយ ⋮ និងព្រួញតម្រៀប។</td></tr><tr><td>ចុចស្ដាំលើក្បាល ឬម៉ឺនុយ ⋮ នៅជ្រុងខាងលើស្ដាំនៃក្បាល</td><td>លាក់ បង្ហាញទាំងអស់ ឬគ្រប់គ្រងភាពមើលឃើញ និងលំដាប់</td></tr><tr><td>រូបតំណាងព្រួញនៅជ្រុងខាងលើស្ដាំនៃក្បាល</td><td>តម្រៀបតាមជួរឈរ</td></tr><tr><td>ចុចស្ដាំ ម៉ឺនុយ ⋮ នៅជ្រុងខាងលើស្ដាំនៃក្បាល ឬ Ctrl+Shift+V</td><td>បិទភ្ជាប់ជាជួរដេកថ្មីនៅចុងតារាង</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='ផ្លូវកាត់ក្តារចុចតារាង';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
@@ -2154,6 +2511,10 @@ $ec_lang['lpn_id_taken']='លេខសម្គាល់នោះកំពុង
 $ec_lang['lpn_diag_no_fixed_head']='បន្ថែមអាងស្តុក ឬធុងទឹកមួយ។ បណ្ដាញនេះត្រូវការកម្រិតទឹកដែលដឹងហើយយ៉ាងតិចមួយ មុននឹងអាចដោះស្រាយបាន។';
 $ec_lang['lpn_diag_dangling_link']='បំពង់ ឬម៉ាស៊ីនបូមមួយភ្ជាប់ទៅថ្នាំងមួយដែលលែងមានទៀតហើយ៖';
 $ec_lang['lpn_diag_unreachable']='ថ្នាំងទាំងនេះគ្មានផ្លូវទៅអាងស្តុក ឬធុងទឹកទេ៖';
+// Tom, 2026-10-09: a node nothing connects to a source is left out of the run, not refused. The
+// ids stand in the status bar until the network changes. Said in EPANET's own terms (junction,
+// reservoir, tank) and never as an error, because the run happened.
+$ec_lang['lpn_omitted_note']='ត្រូវបានលុបចេញពីការដំណើរការនេះ ព្រោះគ្មានផ្លូវពីពួកវាទៅអាងស្តុក ឬធុងទឹក៖ {ids}';
 // BOTH OF THESE NAME THE VALVES. The page ends each one with a list of IDs, which is the reason
 // this calculator writes its own messages instead of showing EPANET\'s numbered errors: a person
 // looking at a drawing can act on \'V3\' and can do nothing at all with \'error 110\'.
@@ -2173,6 +2534,9 @@ $ec_lang['lpn_engine_ready']='ឧបករណ៍ដោះស្រាយ EPANET 
 $ec_lang['lpn_engine_fetching_valve']='កំពុងទាញយកឧបករណ៍ដោះស្រាយ EPANET ដូច្នេះវ៉ាល់នេះអាចដោះស្រាយបានឥឡូវនេះ និងដោយគ្មានអ៊ីនធឺណិតនៅពេលក្រោយ។';
 $ec_lang['lpn_engine_ready_valve']='ឧបករណ៍ដោះស្រាយ EPANET ស្ថិតនៅក្នុងឧបករណ៍នេះឥឡូវនេះ។ វ៉ាល់ត្រួតត្រាសម្ពាធ និងលំហូរ (PRV, PSV, FCV) អាចដោះស្រាយបានក្រៅបណ្ដាញឥឡូវនេះ។';
 $ec_lang['lpn_engine_unavailable']='មិនអាចទាញយកឧបករណ៍ដោះស្រាយ EPANET បានទេ ដែលត្រូវការដើម្បីដោះស្រាយវ៉ាល់ត្រួតត្រាសម្ពាធ និងលំហូរ (PRV, PSV, FCV)។ បន្ទាប់ពីតភ្ជាប់អ៊ីនធឺណិតម្ដង ឧបករណ៍ដោះស្រាយត្រូវបានរក្សាទុកនៅក្នុងឧបករណ៍នេះ។';
+// The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
+// Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
+$ec_lang['lpn_engine_unavailable_why']='វ៉ាល់ត្រួតត្រាសម្ពាធ និងលំហូរ (PRV, PSV, FCV) មិនអាចដោះស្រាយបានដោយគ្មានឧបករណ៍ដោះស្រាយ EPANET ទេ។ {reason}';
 $ec_lang['lpn_engine_needed_loading']='កំពុងផ្ទុកឧបករណ៍ដោះស្រាយ EPANET ខណៈអ្នកកំពុងកសាង។ លទ្ធផលនឹងអាចប្រើបានពេលផ្ទុករួចទាំងស្រុង។';
 // **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
 // own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
@@ -2185,6 +2549,7 @@ $ec_lang['lpn_engine_wait']='កំពុងផ្ទុកឧបករណ៍ដ
 $ec_lang['lpn_engine_wait_pct']='ឧបករណ៍ដោះស្រាយបានផ្ទុក {percent}%។';
 $ec_lang['lpn_engine_wait_bytes']='ឧបករណ៍ដោះស្រាយបានផ្ទុក {kb} KB រហូតមកដល់ពេលនេះ។ ចំនួនសរុបមិនមានទេ ដូច្នេះភាគរយនៃការបញ្ចប់មិនស្គាល់ទេ។';
 $ec_lang['lpn_engine_needed_failed']='ឧបករណ៍ដោះស្រាយ EPANET មិនទាន់ត្រូវបានផ្ទុកនៅឡើយទេ មិនអាចផ្ទុកបានទេ ហើយបណ្ដាញនេះអាចដោះស្រាយបានដោយវាតែប៉ុណ្ណោះ។ វានឹងត្រូវបានផ្ទុកនៅពេលអ្នកភ្ជាប់អ៊ីនធឺណិត។';
+$ec_lang['lpn_engine_needed_failed_why']='បណ្ដាញនេះអាចដោះស្រាយបានដោយឧបករណ៍ដោះស្រាយ EPANET តែប៉ុណ្ណោះ។ {reason}';
 $ec_lang['lpn_diag_valve_needs_epanet']='ទាំងនេះជាវ៉ាល់ត្រួតត្រាសម្ពាធ ឬលំហូរ ហើយមានតែឧបករណ៍ដោះស្រាយ EPANET ប៉ុណ្ណោះដែលអាចគណនាវាបាន។ មិនអាចផ្ទុកឧបករណ៍ដោះស្រាយ EPANET បានទេ ដូច្នេះលទ្ធផលទាំងនេះបាត់៖';
 $ec_lang['lpn_diag_valve_on_fixed_head']='វ៉ាល់ទាំងនេះតភ្ជាប់ដោយផ្ទាល់ទៅអាងស្តុក ឬធុងទឹក ដែលកំណត់ក្បាលទឹកនៅថ្នាំងនោះ ដូច្នេះវ៉ាល់គ្មានអ្វីត្រូវត្រួតត្រាទេ។ សូមដាក់បំពង់ខ្លីមួយរវាងវ៉ាល់ និងអាងស្តុក ឬធុងទឹក៖';
 $ec_lang['lpn_diag_not_converged']='រកមិនឃើញដំណោះស្រាយទេ។ សូមពិនិត្យរកតម្លៃដែលមិនអាចមានក្នុងជីវិតពិត ដូចជាអង្កត់ផ្ចិតសូន្យ។';
@@ -2205,8 +2570,29 @@ $ec_lang['lpn_field_roughness']='ភាពរដិបរដុប';
 // selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C។ លេខខ្ពស់ជាងមានន័យថាបំពង់រលោងជាង៖ ប្រហែល ១៥០ សម្រាប់ប្លាស្ទិកថ្មី ១៣០ សម្រាប់ដែក ឬដែកថ្មី និង ១០០ សម្រាប់បំពង់ចាស់។';
 $ec_lang['lpn_field_length']='ប្រវែង';
+// Task 643 (Tom, 2026-10-14): an Auto length is the slope distance. No claim about accuracy (Task 641).
+$ec_lang['lpn_field_length_slope_tip']='ប្រវែងបំពង់។ នៅពេលបានធីក ស្វ័យប្រវត្តិ ប្រវែងត្រូវបានវាស់តាមជម្រាល៖ ប្រវែងដែលបានគូរផ្សំនឹងភាពខុសគ្នានៃកម្ពស់រវាងថ្នាំងចុងទាំងពីរ។';
 $ec_lang['lpn_field_from']='ពី';
 $ec_lang['lpn_field_to']='ទៅ';
+// Tom, 2026-10-09: From and To are editable text. Said in the box a refused ID is said in.
+$ec_lang['lpn_link_end_unknown']='គ្មានថ្នាំងណាមានលេខសម្គាល់ {id} ទេ។';
+$ec_lang['lpn_link_end_same']='ចំណុចចាប់ផ្ដើម និងចំណុចបញ្ចប់ត្រូវតែជាថ្នាំងផ្សេងគ្នា។';
+// Tom, 2026-10-09: "Break link for node?", adapted to name the pipe. The two answers are Yes and No
+// because No is not a cancel: it places the node where it was pressed, joined to nothing.
+$ec_lang['lpn_split_pipe_ask']='បំបែកបំពង់ {id} នៅថ្នាំងនេះ?';
+$ec_lang['lpn_split_yes']='បាទ/ចាស';
+$ec_lang['lpn_split_no']='ទេ';
+// Object snap (Task 782). The tip beside the snap glyph on a pipe vertex: "Pipe 10, vertex 2". A node
+// or a pipe is named by its type word and ID alone.
+$ec_lang['lpn_snap_vertex']='{link} ចំណុចកំណត់ {n}';
+// A tank, reservoir or junction snapped onto a node of another type is placed at exactly that
+// position. Two nodes at one point are legal in EPANET, and the map cannot show that they are separate.
+$ec_lang['lpn_snap_node_on_node']='{new} ត្រូវបានដាក់នៅទីតាំងរបស់ {target}។ ថ្នាំងទាំងពីរមិនត្រូវបានតភ្ជាប់ទេ។';
+// The same, for a node DRAGGED onto another node.
+$ec_lang['lpn_snap_moved_on_node']='{moved} ត្រូវបានផ្លាស់ទីទៅទីតាំងរបស់ {target}។ ថ្នាំងទាំងពីរមិនត្រូវបានតភ្ជាប់ទេ។';
+// The Shape (Task 779): map annotation, a point, a polyline or a polygon. Tom, 2026-10-06: "Either
+// way, we call it a 'Shape'". The tip beside the snap glyph on a Shape point: "Shape S1, point 2".
+$ec_lang['lpn_snap_shape_point']='{shape}, ចំណុច {n}';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
@@ -2335,7 +2721,7 @@ $ec_lang['lpn_pump_effic_unstated']='ម៉ាស៊ីនបូមនេះស�
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_mode_select']='របៀប៖ ជ្រើសរើស។ ចុចធាតុ ឬស្លាកមួយ ដើម្បីមើល ឬផ្លាស់ប្ដូរវា។ អូសដើម្បីផ្លាស់ទីថ្នាំង ឬស្លាកមួយ។ ប្រើឧបករណ៍ ចំណុចកំណត់ ដើម្បីបន្ថែម ឬដកចំណុចកោងក្នុងបំពង់មួយ។';
+$ec_lang['lpn_mode_select']='របៀប៖ ជ្រើសរើស។ ចុចធាតុ ស្លាក ឬអត្ថបទមួយ ដើម្បីមើល ឬផ្លាស់ប្ដូរវា។ អូសដើម្បីផ្លាស់ទីថ្នាំង ស្លាក ឬអត្ថបទមួយ។ ប្រើឧបករណ៍ ចំណុចកំណត់ ដើម្បីបន្ថែម ឬដកចំណុចកោងក្នុងបំពង់មួយ។';
 $ec_lang['lpn_mode_delete']='របៀប៖ លុប។ ចុចធាតុមួយដើម្បីលុបវា។';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_mode_vertices']='របៀប៖ ចំណុចកំណត់។ ចំណុចកំណត់របស់បំពង់នីមួយៗត្រូវបានបង្ហាញជាដងអូសការ៉េតូចៗ។ ចុចលើបំពង់ដើម្បីបន្ថែមចំណុចកំណត់ ចុចលើដងអូសដើម្បីលុបវា ឬអូសដងអូសដើម្បីផ្លាស់ទីវា។ គ្មានអ្វីផ្សេងទៀតនៅលើផែនទីត្រូវបានផ្លាស់ប្ដូរនៅក្នុងរបៀបនេះទេ។';
@@ -2343,15 +2729,17 @@ $ec_lang['lpn_mode_zoom_window']='របៀប៖ បង្អួចពង្រ
 // One-shot notice when the Delete key is pressed with nothing picked (Task 415). It has to name the
 // gesture, because the whole point of the change is that the order is now subject, then verb.
 $ec_lang['lpn_select_first']='គ្មានអ្វីត្រូវបានជ្រើសរើសទេ។ ចុចលើធាតុមួយនៅលើផែនទីជាមុនសិន រួចចុច លុប។';
-$ec_lang['lpn_mode_add_junction']='របៀប៖ បន្ថែមថ្នាំង។ ចុចលើផែនទីដើម្បីដាក់ថ្នាំងមួយ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ និងស្លាក។';
-$ec_lang['lpn_mode_add_reservoir']='របៀប៖ បន្ថែមអាងស្តុក។ ចុចលើផែនទីដើម្បីដាក់អាងស្តុកមួយ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ និងស្លាក។';
-$ec_lang['lpn_mode_add_tank']='របៀប៖ បន្ថែមធុងទឹក។ ចុចលើផែនទីដើម្បីដាក់ធុងទឹកមួយ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ និងស្លាក។';
-$ec_lang['lpn_mode_add_pipe']='របៀប៖ បន្ថែមបំពង់។ ចុចថ្នាំងមួយ រួចថ្នាំងមួយទៀត ដើម្បីភ្ជាប់វា។ ចុចលើទំហំទំនេររវាងវា ដើម្បីបត់បន្ទាត់ ឬចុច Esc ដើម្បីចាប់ផ្ដើមឡើងវិញ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ និងស្លាក។';
-$ec_lang['lpn_mode_add_pump']='របៀប៖ បន្ថែមម៉ាស៊ីនបូម។ ចុចថ្នាំងមួយ រួចថ្នាំងមួយទៀត ដើម្បីភ្ជាប់វា។ ចុចលើទំហំទំនេររវាងវា ដើម្បីបត់បន្ទាត់ ឬចុច Esc ដើម្បីចាប់ផ្ដើមឡើងវិញ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ និងស្លាក។';
-$ec_lang['lpn_mode_add_valve']='របៀប៖ បន្ថែមវ៉ាល់។ ចុចលើថ្នាំងមួយ បន្ទាប់មកថ្នាំងមួយទៀត ដើម្បីភ្ជាប់ពួកវា។ ចុចលើទំហំទំនេររវាងវា ដើម្បីបត់បន្ទាត់ ឬចុច Esc ដើម្បីចាប់ផ្ដើមឡើងវិញ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ និងស្លាក។';
+$ec_lang['lpn_mode_add_junction']='របៀប៖ បន្ថែមថ្នាំង។ ចុចលើផែនទីដើម្បីដាក់ថ្នាំងមួយ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ ស្លាក និងអត្ថបទ។';
+$ec_lang['lpn_mode_add_reservoir']='របៀប៖ បន្ថែមអាងស្តុក។ ចុចលើផែនទីដើម្បីដាក់អាងស្តុកមួយ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ ស្លាក និងអត្ថបទ។';
+$ec_lang['lpn_mode_add_tank']='របៀប៖ បន្ថែមធុងទឹក។ ចុចលើផែនទីដើម្បីដាក់ធុងទឹកមួយ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ ស្លាក និងអត្ថបទ។';
+$ec_lang['lpn_mode_add_pipe']='របៀប៖ បន្ថែមបំពង់។ ចុចថ្នាំងមួយ រួចថ្នាំងមួយទៀត ដើម្បីភ្ជាប់វា។ ចុចលើទំហំទំនេររវាងវា ដើម្បីបត់បន្ទាត់ ឬចុច Esc ដើម្បីចាប់ផ្ដើមឡើងវិញ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ ស្លាក និងអត្ថបទ។';
+$ec_lang['lpn_mode_add_pump']='របៀប៖ បន្ថែមម៉ាស៊ីនបូម។ ចុចថ្នាំងមួយ រួចថ្នាំងមួយទៀត ដើម្បីភ្ជាប់វា។ ចុចលើទំហំទំនេររវាងវា ដើម្បីបត់បន្ទាត់ ឬចុច Esc ដើម្បីចាប់ផ្ដើមឡើងវិញ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ ស្លាក និងអត្ថបទ។';
+$ec_lang['lpn_mode_add_valve']='របៀប៖ បន្ថែមវ៉ាល់។ ចុចលើថ្នាំងមួយ បន្ទាប់មកថ្នាំងមួយទៀត ដើម្បីភ្ជាប់ពួកវា។ ចុចលើទំហំទំនេររវាងវា ដើម្បីបត់បន្ទាត់ ឬចុច Esc ដើម្បីចាប់ផ្ដើមឡើងវិញ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ ស្លាក និងអត្ថបទ។';
 // Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
 // sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
-$ec_lang['lpn_mode_add_text']='របៀប៖ បន្ថែមអត្ថបទ។ ចុចលើផែនទីដើម្បីដាក់អត្ថបទមួយ។ ចុចជិតថ្នាំងមួយដើម្បីភ្ជាប់អត្ថបទនោះទៅថ្នាំងនោះ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ និងស្លាក។';
+$ec_lang['lpn_mode_add_text']='របៀប៖ បន្ថែមអត្ថបទ។ ចុចលើផែនទីដើម្បីដាក់អត្ថបទមួយ។ ចុចជិតថ្នាំងមួយដើម្បីភ្ជាប់អត្ថបទនោះទៅថ្នាំងនោះ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ ស្លាក និងអត្ថបទ។';
+$ec_lang['lpn_mode_add_chain']='របៀប៖ ខ្សែសង្វាក់ថ្នាំង-បំពង់។ ចុចចំណុចមួយនៅលើផែនទីដើម្បីបន្ថែមថ្នាំង បន្ទាប់មកចុចចំណុចបន្ទាប់នីមួយៗដើម្បីបន្ថែមបំពង់ និងថ្នាំង។ ចុចថ្នាំងដែលមានស្រាប់ ដើម្បីបន្តពីវា។ ចុច Esc ដើម្បីបញ្ចប់ខ្សែសង្វាក់។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ ស្លាក និងអត្ថបទ។';
+$ec_lang['lpn_mode_add_shape']='របៀប៖ បន្ថែមរូបគូរ។ ចុចចំណុចនីមួយៗ។ ចុចចំណុចចុងក្រោយម្ដងទៀត ឬចុច Enter ដើម្បីបញ្ចប់ ចុចចំណុចដំបូងដើម្បីបិទពហុកោណ។';
 // Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
 // most likely to miss the point of -- that Select is what you use to edit/move things, and that a
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
@@ -2393,7 +2781,6 @@ $ec_lang['lpn_field_easting_abbr']='ក';
 // own customary abbreviation.
 $ec_lang['lpn_field_lat_abbr']='ទ';
 $ec_lang['lpn_field_lon_abbr']='ប';
-
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
@@ -2424,8 +2811,8 @@ $ec_lang['lpn_labels_mark_extrema_tip']='គូរបន្ទាត់មួយ
 // {skipped} are whole numbers; {prefix} is the text the user typed.
 $ec_lang['lpn_settings_apply_to_all']='អនុវត្តទៅគ្រប់ធាតុ';
 $ec_lang['lpn_settings_apply_to_all_tip']='ធាតុគ្រប់មួយប្រភេទនេះដែលបានគូររួចហើយ ទទួលបានលេខសម្គាល់ចាប់ផ្ដើមដោយអត្ថបទនេះ។ នីមួយៗរក្សាលេខរបស់វា។ លេខសម្គាល់ដែលមិនបញ្ចប់ដោយលេខ ត្រូវបានទុកចោលមិនប៉ះពាល់។';
-$ec_lang['lpn_confirm_apply_prefix']='ប្ដូរឈ្មោះធាតុ {n} ដើម្បីឲ្យលេខសម្គាល់របស់វាចាប់ផ្ដើមដោយ {prefix} មែនទេ? នីមួយៗរក្សាលេខរបស់វា។';
-$ec_lang['lpn_prefix_applied']='បានប្ដូរឈ្មោះធាតុ {n}។ ធាតុផ្សេងទៀត {skipped} មិនត្រូវបានផ្លាស់ប្ដូរទេ។';
+$ec_lang['lpn_confirm_apply_prefix']='ប្ដូរឈ្មោះធាតុ ({n}) ដើម្បីឲ្យលេខសម្គាល់របស់វាចាប់ផ្ដើមដោយ {prefix} មែនទេ? នីមួយៗរក្សាលេខរបស់វា។';
+$ec_lang['lpn_prefix_applied']='ធាតុដែលបានប្ដូរឈ្មោះ៖ {n}។ ធាតុដែលមិនបានផ្លាស់ប្ដូរ៖ {skipped}។';
 $ec_lang['lpn_labels_suffix_gradient_tip']='អត្ថបទដែលបន្ថែមនៅក្រោយជម្រាលនៃការបាត់បង់ក្បាលទឹកលើស្លាកផែនទី។ កុំបញ្ចូលសញ្ញាភាគរយនៅទីនេះ។ វាត្រូវបានបន្ថែមដោយស្វ័យប្រវត្តិនៅពេលខ្នាតជាភាគរយ។';
 $ec_lang['lpn_labels_separator']='អត្ថបទរវាងតម្លៃ';
 $ec_lang['lpn_labels_separator_tip']='អត្ថបទរវាងតម្លៃមួយ និងតម្លៃបន្ទាប់នៅលើស្លាកមួយ។ លំនាំដើមជាចន្លោះមួយ។';
@@ -2526,6 +2913,7 @@ $ec_lang['lpn_map_attach_none']='មិនទាន់មានផែនទី�
 $ec_lang['lpn_map_attach_remove']='ផ្ដាច់';
 $ec_lang['lpn_map_attach_remove_tip']='ផ្ដាច់ផែនទីពិភពលោក។ មិនប៉ះពាល់ដល់បណ្ដាញទេ។';
 $ec_lang['lpn_map_attach_done']='ឥឡូវនេះផែនទីពិភពលោកត្រូវបានបង្ហាញនៅពីក្រោយគំនូរ ហើយគម្រោងមិនផ្លាស់ប្ដូរទេ។ ប្រើ ផែនទី, ផែនទីពិភពលោក, ផ្ដាច់ ដើម្បីដកវាចេញ។';
+// Edited by TGH 2026-10-07
 $ec_lang['lpn_map_attach_removed']='ផែនទីពិភពលោកត្រូវបានផ្ដាច់ ហើយបណ្ដាញមិនត្រូវបានប៉ះពាល់ទេ។';
 // **THE CUSTOM GEOREFERENCE WIZARD, IN TOM'S OWN THREE STEPS** (2026-09-18, and
 // dev/tom-coordinate-vocabulary-2026-09-16.md). Georeferencing here means attaching the world map,
@@ -2577,6 +2965,9 @@ $ec_lang['lpn_backdrop_target_free']='ចំណុចណាមួយលើផែ
 $ec_lang['lpn_backdrop_target_coords']='កូអរដោនេដែលអ្នកវាយបញ្ចូល';
 $ec_lang['lpn_backdrop_coords_prompt']='វាយ X,Y ដែលចំណុចនោះគួរផ្លាស់ទីទៅ';
 $ec_lang['lpn_backdrop_continue']='បន្ត';
+// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
+// this one, and of the three, Settings is the word a person is most likely to look for first.
+// One key for the toolbar button, the Project menu row and the Settings box's own title (Task 699).
 $ec_lang['lpn_tool_settings']='ការកំណត់';
 $ec_lang['lpn_settings_show_titles']='បង្ហាញចំណងជើងទំព័រ';
 // Edited by TGH 2026-09-07
@@ -2587,6 +2978,8 @@ $ec_lang['lpn_hide_titles']='លាក់ចំណងជើងទាំងនេ
 // bubble and reads 'Show this'; this one has to name what it is talking about.
 $ec_lang['lpn_settings_area_hint']='បង្ហាញជំនួយការជ្រើសរើស';
 $ec_lang['lpn_settings_area_hint_tip']='បង្ហាញការជំរុញលើផែនទីដែលផ្ដល់ជំហានបន្ទាប់ ខណៈអ្នកកំពុងជ្រើសរើសតំបន់។';
+$ec_lang['lpn_settings_hover_card']='បង្ហាញស្លាកពេញលេញពេលដាក់ទ្រនិច';
+$ec_lang['lpn_settings_hover_card_tip']='ដាក់ទ្រនិចលើថ្នាំង តំណ ឬអតិថិជន ដើម្បីមើលស្លាករបស់វាដូចដែលបានកំណត់ក្នុងការកំណត់ នៅមាត្រដ្ឋានណាក៏បាន មិនថាស្លាកសមលើផែនទីឬអត់។ នេះជាការកំណត់សម្រាប់កម្មវិធីរុករកនេះ មិនមែនសម្រាប់គម្រោងទេ។';
 $ec_lang['lpn_settings_id_prefixes']='បុព្វបទលេខសម្គាល់';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a
@@ -2634,6 +3027,8 @@ $ec_lang['lpn_cp_validate']='ផ្ទៀងផ្ទាត់ជា';
 $ec_lang['lpn_cp_validate_tip']='ផ្ទៀងផ្ទាត់ជា៖ ទម្រង់ដែលតម្លៃត្រឹមត្រូវត្រូវតែមាន។ ច្បាប់អក្សរធំតូចអនុវត្តចំពោះអក្ខរក្រមអង់គ្លេសប៉ុណ្ណោះ។ ជ្រើសរើស កុំផ្ទៀងផ្ទាត់ ដើម្បីទទួលយកតម្លៃណាមួយ។';
 $ec_lang['lpn_cp_restrict']='ដាក់កម្រិតតួអក្សរទាំងនេះ';
 $ec_lang['lpn_cp_restrict_tip']='ដាក់កម្រិតតួអក្សរទាំងនេះ៖';
+$ec_lang['lpn_cp_allow_tip']='អនុញ្ញាតតែតួអក្សរទាំងនេះ៖';
+$ec_lang['lpn_cp_characters_tip']='"@" មានន័យថាអក្សរណាមួយ; "#" មានន័យថាខ្ទង់លេខណាមួយ ហើយអ្នកត្រូវរាយ "-", ".", និង "," ដោយឡែកពីគ្នា ប្រសិនបើវាត្រូវបានអនុញ្ញាត; ហើយចន្លោះណាមួយត្រូវនៅរវាងតួអក្សរផ្សេងទៀត។';
 $ec_lang['lpn_cp_restrict_mode']='អនុញ្ញាត ឬដាក់កម្រិត';
 $ec_lang['lpn_cp_restrict_mode_tip']='អនុញ្ញាត ឬដាក់កម្រិត៖ តួអក្សរដែលបានផ្ដល់ ជាតួដែលតម្លៃមួយអាចប្រើបានតែប៉ុណ្ណោះ ឬតួដែលវាមិនអាចប្រើបានឡើយ។';
 $ec_lang['lpn_cp_restrict_allow']='អនុញ្ញាតតែតួអក្សរទាំងនេះ';
@@ -2661,6 +3056,13 @@ $ec_lang['lpn_cp_val_hyphen']='hyphen-case';
 // is a way of asking a question about the data, so nothing is ever cleared or refused: the value
 // stays exactly as it was typed and says what is wrong with it.
 $ec_lang['lpn_cp_flag']='{label}៖ {reason} តម្លៃនេះនៅតែដដែលដូចអ្នកបានវាយបញ្ចូល។';
+$ec_lang['lpn_valwarn_diameter']='អង្កត់ផ្ចិតបំពង់ ឬវ៉ាល់ជាធម្មតាស្ថិតនៅចន្លោះ {min} និង {max} {unit}។ សូមពិនិត្យលេខ និងខ្នាតអង្កត់ផ្ចិត។';
+$ec_lang['lpn_valwarn_hw']='តម្លៃ C របស់ Hazen-Williams ជាធម្មតាស្ថិតនៅចន្លោះ {min} និង {max}។ លេខនៅក្រៅជួរនោះច្រើនតែជាភាពរដិបរដុបសម្រាប់វិធីសាស្ត្រកកិតផ្សេង។';
+$ec_lang['lpn_valwarn_manning']='តម្លៃ n របស់ Manning ជាធម្មតាស្ថិតនៅចន្លោះ {min} និង {max}។ លេខនៅក្រៅជួរនោះច្រើនតែជាភាពរដិបរដុបសម្រាប់វិធីសាស្ត្រកកិតផ្សេង។';
+$ec_lang['lpn_valwarn_dw']='ភាពរដិបរដុបរបស់ Darcy-Weisbach ជាធម្មតាធំជាង 0 និងមិនលើស {max} {unit}។ លេខធំជាងនេះច្រើនតែជា C របស់ Hazen-Williams ឬ n របស់ Manning។';
+$ec_lang['lpn_valwarn_positive']='EPANET មិនទទួលយកលេខសូន្យ ឬលេខអវិជ្ជមាននៅទីនេះទេ។';
+$ec_lang['lpn_valwarn_negative']='EPANET មិនទទួលយកលេខអវិជ្ជមាននៅទីនេះទេ។';
+$ec_lang['lpn_valwarn_tank_levels']='EPANET មិនទទួលយកធុងទឹកនេះទេ។ ជម្រៅទឹកទាបបំផុតមិនត្រូវលើសពីជម្រៅទឹក ហើយជម្រៅទឹកមិនត្រូវលើសពីជម្រៅទឹកខ្ពស់បំផុតទេ។';
 $ec_lang['lpn_cp_bad_number']='តម្លៃនេះមិនមែនជាលេខតាមដែលលក្ខណៈសម្បត្តិនេះទាមទារឡើយ។';
 $ec_lang['lpn_cp_bad_integer']='តម្លៃនេះមិនមែនជាលេខគត់តាមដែលលក្ខណៈសម្បត្តិនេះទាមទារឡើយ។';
 $ec_lang['lpn_cp_bad_case']='តម្លៃនេះមិនមែនជាអក្សរធំទាំងអស់តាមដែលលក្ខណៈសម្បត្តិនេះទាមទារឡើយ។';
@@ -2679,18 +3081,13 @@ $ec_lang['lpn_cp_key_taken']='លក្ខណៈសម្បត្តិផ្�
 // question it answers is how much of this scenario is its own rather than inherited.
 $ec_lang['lpn_scenario_label']='សេណារីយ៉ូ';
 $ec_lang['lpn_scenario_base']='មូលដ្ឋាន';
-// "Custom", not "Own" (Tom, 2026-08-14: *"I love 'custom'. 'Changed' is a little dangerous."*),
-// and the reason is a TRANSLATION reason rather than an English one -- which is why it is worth
-// a comment. "Own values" calques directly onto the standard term for EIGENVALUES in most of
-// Europe: es valores propios, pt valores proprios, de Eigenwerte, cs vlastni hodnota, hr vlastita
-// vrijednost, bg/ru/sr sobstveni. Ten languages in sprint 316 had to detect and route around that
-// independently, and three of them, forced off the calque, landed on "CHANGED values" -- which is
-// FALSE here, because a scenario's custom value may be identical to Base's (see
-// lpn_scenario_override_tip, and the assertion in dev/lpn-spike/scenario-harness.js).
-// "Custom" has no calque path into mathematics in any of them, so the trap does not exist to be
-// routed around, and it says ownership without implying difference. Seven languages had already
-// chosen exactly this family unprompted (fr personnalisees, it personalizzati, es exclusivos,
-// pt individuais, ar mukhassasa, fa ekhtesasi, ro specifice).
+// "Overrides" (Tom, 2026-10-04: *"I believe that the technical term may be 'Enter the scenario's
+// override'"*; Mary found it is Bentley WaterGEMS's word, "Overriding Inheritance"). It replaced
+// "custom values" (2026-08-14). The rejected alternative stays rejected for a TRANSLATION reason:
+// "own values" calques onto the standard term for EIGENVALUES in most of Europe (es valores propios,
+// de Eigenwerte, ru sobstvennye), and "changed values" is FALSE, because an override may equal
+// Base's number (lpn_scenario_override_tip; dev/lpn-spike/scenario-harness.js). "Override" has no
+// mathematical calque and says the scenario's value stands in for the parent's.
 $ec_lang['lpn_scenario_overrides']='ចំនួនតម្លៃផ្ទាល់ខ្លួន';
 // ROADMAP Task 512. The amber ring was designed, correct, and silent: two independent users read it
 // as a stuck highlight they could not turn off. These two strings are the ring's own explanation and
@@ -2698,6 +3095,7 @@ $ec_lang['lpn_scenario_overrides']='ចំនួនតម្លៃផ្ទា�
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='រង្វង់ពណ៌លឿងទុំមានន័យថាធាតុនេះមានតម្លៃផ្ទាល់ខ្លួនក្នុងសេណារីយ៉ូ {name}។';
+
 $ec_lang['lpn_scenario_overrides_tip']='តម្លៃផ្ទាល់ខ្លួននីមួយៗត្រូវបានសម្គាល់លើផែនទីដោយរង្វង់ពណ៌លឿងទុំ។ ប្ដូរទៅ {base} ឬសេណារីយ៉ូមេផ្សេងទៀតដើម្បីមើលគំនូរដោយគ្មានពួកវា។';
 $ec_lang['lpn_scenario_menu']='សេណារីយ៉ូ';
 $ec_lang['lpn_scenario_tip']='សំណុំតម្លៃដែលគំនូរកំពុងបង្ហាញ និងទំព័រកំពុងដោះស្រាយឥឡូវនេះ។ ចុចដើម្បីប្ដូរសេណារីយ៉ូ ឬដើម្បីបន្ថែម ប្ដូរឈ្មោះ ឬលុបមួយ។';
@@ -2706,6 +3104,10 @@ $ec_lang['lpn_scenario_new_name']='សេណារីយ៉ូ {n}';
 $ec_lang['lpn_scenario_prompt_name']='ឈ្មោះសម្រាប់សេណារីយ៉ូនេះ';
 $ec_lang['lpn_scenario_rename']='ប្ដូរឈ្មោះសេណារីយ៉ូ…';
 $ec_lang['lpn_scenario_delete']='លុបសេណារីយ៉ូ';
+
+
+
+
 // Edited by TGH 2026-09-07
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
@@ -2714,19 +3116,147 @@ $ec_lang['lpn_scenario_delete']='លុបសេណារីយ៉ូ';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='សេណារីយ៉ូមូលដ្ឋាន៖ {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} ត្រូវបានដកចេញពីបណ្ដាញក្នុង {scenario}។ វានៅតែស្ថិតក្នុងគំនូរ និងក្នុងសេណារីយ៉ូផ្សេងទៀត។';
+$ec_lang['lpn_scenario_delete_in_base']='ដើម្បីដកវាចេញពីគំនូរ សូមលុបវាក្នុងសេណារីយ៉ូ {base}។';
+$ec_lang['lpn_scenario_only_deleted']='{id} ត្រូវបានលុប។ វាជាផ្នែកនៃ {scenario} តែប៉ុណ្ណោះ។';
+$ec_lang['lpn_scenario_delete_blocked']='{id} មិនត្រូវបានលុបទេ ព្រោះតំណ {link} បញ្ចប់នៅលើវា ហើយតំណនោះក៏មានក្រៅ {scenario} ដែរ។ ដើម្បីលុបទាំងពីរ សូមលុបពួកវាក្នុងសេណារីយ៉ូ {base}។';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_basic']='របៀបមូលដ្ឋាន';
 $ec_lang['lpn_scenario_basic_tip']='ធីក៖ សេណារីយ៉ូមានតែតម្លៃដែលបានកំណត់ក្នុងវាប៉ុណ្ណោះ។ ដោះធីក៖ ម៉ឺនុយនេះក៏ផ្ដល់តារាងមើលជាមុនជម្រើសជំនួស ដែលបង្ហាញពីរបៀបដែលតម្លៃទាំងនោះត្រូវបានដាក់ជាក្រុមតាមប្រភេទ ហើយអនុញ្ញាតឲ្យសេណារីយ៉ូមានរយៈពេលដំណើរការសរុប និងជំហានពេលវេលាធារាសាស្ត្រដាច់ដោយឡែក។ ស្វាគមន៍មតិកែលម្អអំពីលក្ខណៈពិសេសនេះ។';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$ec_lang['lpn_time_scn_overrides']='តម្លៃផ្ទាល់ខ្លួនរបស់សេណារីយ៉ូ៖';
+
+
+
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+
+
+
+
+
+
+
+
+
+
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+
+
+
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_alt_cat_physical']='រូបវន្ត';
 $ec_lang['lpn_alt_cat_demand']='តម្រូវការ';
 $ec_lang['lpn_alt_cat_topology']='ការធ្វើឲ្យធាតុសកម្ម';
+
 $ec_lang['lpn_alt_cat_initial']='ការកំណត់ដំបូង';
 $ec_lang['lpn_alt_cat_constituent']='សមាសធាតុ';
 $ec_lang['lpn_alt_cat_fireflow']='លំហូរពន្លត់អគ្គីភ័យ';
 $ec_lang['lpn_alt_cat_energy']='ថ្លៃថាមពល';
 $ec_lang['lpn_alt_cat_userdata']='លក្ខណៈសម្បត្តិផ្ទាល់ខ្លួន';
 $ec_lang['lpn_alt_cat_text']='អត្ថបទ';
+
+
 // Edited by TGH 2026-09-07
+// Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
+// by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. តេស្តលំហូរ៖ ឋិតិ';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='ការក្រិតតាមតេស្តលំហូរសម្រាប់បណ្ដាញរចនាមួយនៅលំហូរ 0។ នៅក្នុងសេណារីយ៉ូនេះ សូមកំណត់តម្រូវការនៅថ្នាំងទាំងអស់ទៅ 0។';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. តេស្តលំហូរ៖ កណ្ដាល';
@@ -2736,10 +3266,11 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='ការក្រិតតាម�
 $ec_lang['lpn_scenario_preset_average_day']='4. ថ្ងៃមធ្យម';
 $ec_lang['lpn_scenario_preset_average_day_tip']='កត្តាគុណតម្រូវការ 1៖ តម្រូវការនីមួយៗដូចដែលបានបញ្ចូល ដែលត្រូវបានចាត់ទុកថាជាតម្រូវការថ្ងៃមធ្យម។';
 $ec_lang['lpn_scenario_preset_max_day']='5. ថ្ងៃអតិបរមា';
+$ec_lang['lpn_scenario_preset_mult_tip']='កត្តាគុណតម្រូវការ {mult} ដងនៃថ្ងៃមធ្យម ជាតម្លៃកន្លែងទុក។ ប្រព័ន្ធភាគច្រើនស្ថិតនៅចន្លោះ {lo} និង {hi} (National Research Council, 2006)។ កំណត់តម្លៃសម្រាប់ប្រព័ន្ធដែលកំពុងធ្វើគំរូ នៅក្នុង ការកំណត់, ការគណនា, ធារាសាស្ត្រ, កត្តាគុណតម្រូវការ។';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. ម៉ោងកំពូល';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. អគ្គីភ័យបូកថ្ងៃអតិបរមា';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='តម្រូវការថ្ងៃអតិបរមា (កត្តាគុណ 2.0)។ ដំណើរការ ការវិភាគលំហូរពន្លត់អគ្គីភ័យ នៅក្នុងសេណារីយ៉ូនេះ៖ វាបន្ថែមលំហូរពន្លត់អគ្គីភ័យនៅថ្នាំងនីមួយៗលើតម្រូវការនេះ។';
-$ec_lang['lpn_delete_drops_overrides']='ការលុបធាតុនេះក៏លុបតម្លៃផ្ទាល់ខ្លួនរបស់សេណារីយ៉ូ {n} សម្រាប់វាដែរ។ បន្តទេ?';
+$ec_lang['lpn_delete_drops_overrides']='ការលុបធាតុនេះក៏លុបតម្លៃផ្ទាល់ខ្លួនរបស់សេណារីយ៉ូសម្រាប់វា ({n}) ដែរ។ បន្តទេ?';
 $ec_lang['lpn_push_base_only']='សកម្មភាពនេះផ្លាស់ប្ដូរគំនូរខ្លួនវា ដូច្នេះវាអាចធ្វើបានតែនៅក្នុង {base} ប៉ុណ្ណោះ។ សូមប្ដូរទៅ {base} ហើយសាកល្បងម្ដងទៀត។';
 $ec_lang['lpn_field_active']='សកម្មឬទេ?';
 // Edited by TGH 2026-09-07
@@ -2829,6 +3360,7 @@ $ec_lang['lpn_settings_engine_native']='ប្រើឧបករណ៍ដោះ�
 $ec_lang['lpn_settings_engine_native_tip']='បើកវាដើម្បីប្រើឧបករណ៍ដោះស្រាយខាងក្នុងនៅទីណាដែលអាចធ្វើបាន។ បើមិនដូច្នោះទេ ឧបករណ៍ដោះស្រាយ EPANET ពី US EPA ត្រូវបានប្រើជានិច្ច។ ឧបករណ៍ដោះស្រាយខាងក្នុងមិនត្រូវបានប្រើសម្រាប់ការក្លែងធ្វើលើរយៈពេលមួយ ឬ PRV, PSV ឬ FCV សកម្មទេ។ លើកទីមួយដែលឧបករណ៍ដោះស្រាយ EPANET ត្រូវបានប្រើ ទិន្នន័យប្រមាណ 650 KB ត្រូវបានទាញយក ហើយរក្សាទុកនៅក្នុងឧបករណ៍នេះ។ នៅកន្លែងដែលបំពង់មានការបាត់បង់មូលដ្ឋាន (local) ឧបករណ៍ដោះស្រាយទាំងពីរខុសគ្នាត្រង់ខ្ទង់ចុងក្រោយ៖ EPANET ប្រើតម្លៃបង្គត់នៃសំទុះទំនាញ ដូច្នេះការបាត់បង់មូលដ្ឋានរបស់វាទាបជាងទម្រង់ពិតប្រាកដបន្តិចបន្តួច។';
 $ec_lang['lpn_engine_loading']='កំពុងផ្ទុកឧបករណ៍ដោះស្រាយ EPANET…';
 $ec_lang['lpn_engine_failed']='មិនអាចផ្ទុកឧបករណ៍ដោះស្រាយ EPANET បានទេ។ កំពុងបង្ហាញឧបករណ៍ដោះស្រាយដែលភ្ជាប់មកជាមួយជំនួសវិញ។';
+$ec_lang['lpn_engine_failed_why']='{reason} កំពុងបង្ហាញឧបករណ៍ដោះស្រាយដែលភ្ជាប់មកជាមួយជំនួសវិញ។';
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
@@ -2845,6 +3377,13 @@ $ec_lang['lpn_engine_refused']='ឧបករណ៍ដោះស្រាយ EPANE
 // is the only part a user can act on, and nothing of ours could reconstruct it.
 $ec_lang['lpn_engine_refused_why']='សារពីឧបករណ៍ដោះស្រាយ EPANET៖ {message}';
 $ec_lang['lpn_engine_refused_fallback']='លេខនៅលើអេក្រង់មកពីឧបករណ៍ដោះស្រាយដែលភ្ជាប់មកជាមួយជំនួសវិញ។';
+// A run EPANET started and could not finish, for example when a tank empties and the junctions it
+// fed have no other source (Error 110). {time} is the run time it stopped at, H:MM.
+$ec_lang['lpn_time_run_stopped']='ការដំណើរការ EPANET បានឈប់នៅ {time} ដូច្នេះគ្មានលទ្ធផលទេ។ របាយការណ៍ដំណើរការរបស់វាប្រាប់មូលហេតុ។';
+$ec_lang['lpn_time_stat_stopped']='{statistic} មិនបង្ហាញ៖ ការដំណើរការបានឈប់មុនចុងបញ្ចប់នៃរយៈពេល។';
+$ec_lang['lpn_time_stopped_no_quality']='គ្មានលទ្ធផលគុណភាពទឹកត្រូវបានគណនាទេ ព្រោះការវិភាគគុណភាពចាប់ផ្ដើមបន្ទាប់ពីការដំណើរការធារាសាស្ត្រចប់។';
+$ec_lang['lpn_energy_stopped']='ការដំណើរការ EPANET បានឈប់មុនចុងបញ្ចប់នៃរយៈពេល ដូច្នេះគ្មានលទ្ធផលថាមពលម៉ាស៊ីនបូមត្រូវបានគណនាទេ។';
+$ec_lang['lpn_time_run_stopped_kept']='ការដំណើរការ EPANET បានឈប់នៅ {time}។ លទ្ធផលមានដល់ {solved} ជារយៈពេលចុងក្រោយដែលវាបានដោះស្រាយ ហើយគ្មានលទ្ធផលបង្ហាញបន្ទាប់ពីនោះទេ។ របាយការណ៍ដំណើរការរបស់វាប្រាប់មូលហេតុ។';
 // The run's own version of that last sentence: a period run has a moment and a tank level to name,
 // and a one-moment solve does not, which is where the shared label stops.
 $ec_lang['lpn_time_run_fell_back']='លេខនៅលើអេក្រង់មកពីឧបករណ៍ដោះស្រាយដែលភ្ជាប់មកជាមួយជំនួសវិញ។ វាគណនាតែមួយភ្លែតម្ដងៗ ដូច្នេះនេះជាបណ្ដាញនៅ {time} ប៉ុណ្ណោះ ជាមួយធុងទឹកនីមួយៗនៅតែជាប់នឹងកម្រិតចាប់ផ្ដើមរបស់វា។';
@@ -2855,6 +3394,8 @@ $ec_lang['lpn_time_run_fell_back']='លេខនៅលើអេក្រង់�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='ច្បាប់ត្រួតពិនិត្យទាំងនេះនិយាយពីធាតុមួយដែលលែងមាននៅក្នុងគម្រោងនេះទៀតហើយ ដូច្នេះពួកវាត្រូវបានលុបចេញ៖ {ids}';
 $ec_lang['lpn_control_unreadable_note']='ច្បាប់ត្រួតពិនិត្យទាំងនេះមិនអាចអានបានទេ ដូច្នេះពួកវាត្រូវបានលុបចេញ៖ {ids}';
+
+
 $ec_lang['lpn_rule_dangling_note']='ក្បួនទាំងនេះសំដៅលើធាតុមួយដែលលែងមាននៅក្នុងគម្រោងនេះទៀតហើយ ដូច្នេះពួកវាត្រូវបានមិនអើពើក្នុងការដំណើរការនេះ៖ {ids}';
 $ec_lang['lpn_rule_unreadable_note']='ក្បួនទាំងនេះមិនអាចអានបានទេ ដូច្នេះពួកវាត្រូវបានមិនអើពើក្នុងការដំណើរការនេះ៖ {ids}';
 $ec_lang['lpn_settings_text_size']='ទំហំអក្សរ (ភិចសែល)';
@@ -2873,6 +3414,8 @@ $ec_lang['lpn_settings_align_labels']='តម្រឹមស្លាកបំ�
 $ec_lang['lpn_settings_readability_bias']='អង្សាពីខាងឆ្វេងបន្ទាត់បញ្ឈរ មុននឹងស្លាកមួយត្រូវបានបង្វិលត្រឡប់';
 $ec_lang['lpn_settings_readability_bias_tip']='បង្វិលស្លាកមួយត្រឡប់ ដើម្បីរក្សាទុកឲ្យវានៅត្រង់ នៅពេលវាទេពីខាងឆ្វេងបន្ទាត់បញ្ឈរលើសពីចំនួនអង្សានេះ។';
 $ec_lang['lpn_settings_mask_labels']='ផ្ទៃខាងក្រោយតាន់ពណ៌ពីក្រោយស្លាក';
+$ec_lang['lpn_settings_text_halo']='ទទឹងគ្រោងជុំវិញអក្សរ (ភាគរយនៃទំហំអក្សរ)';
+$ec_lang['lpn_settings_text_halo_tip']='ទទឹងនៃគ្រោងរឹងនៅពីក្រោយអក្សរលើផែនទី ជាភាគរយនៃទំហំអក្សរ។ អនុវត្តនៅពេលបើក ផ្ទៃខាងក្រោយរឹងនៅពីក្រោយស្លាក។';
 // Task 408: dragging a label away from its node draws a leader line, and this pulls that line onto
 // a round angle when the drag comes close to one. The values are numbers and the degree sign, which
 // need no translation; "Off" borrows lpn_settings_legend_off, the same word for the same idea.
@@ -2911,6 +3454,12 @@ $ec_lang['lpn_settings_symbol_opacity']='ភាពស្រអាប់សញ្
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='ភាពស្រអាប់រូបភាពផ្ទៃខាងក្រោយ (០ ដល់ ១)';
+// Task 617: a display-time filter on the street or satellite tiles only; the drawing and the credit are untouched.
+$ec_lang['lpn_settings_basemap_style']='រចនាប័ទ្មផែនទីមូលដ្ឋាន';
+$ec_lang['lpn_basemap_style_normal']='ធម្មតា';
+$ec_lang['lpn_basemap_style_muted']='ស្រទន់';
+$ec_lang['lpn_basemap_style_faded']='ស្រាល';
+$ec_lang['lpn_basemap_style_grayscale']='ពណ៌ប្រផេះ';
 $ec_lang['lpn_settings_map_display']='រូបរាងផែនទី';
 // PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
 // to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
@@ -2993,10 +3542,22 @@ $ec_lang['lpn_time_pattern_start']='ពេលចាប់ផ្ដើមលំ�
 $ec_lang['lpn_time_report_step']='ចន្លោះពេលរបាយការណ៍';
 $ec_lang['lpn_time_report_start']='ពេលចាប់ផ្ដើមរបាយការណ៍';
 $ec_lang['lpn_time_clock_start']='ម៉ោងនាឡិកានៅពេលចាប់ផ្ដើម';
+$ec_lang['lpn_time_statistic']='ស្ថិតិ';
+$ec_lang['lpn_time_stat_none']='គ្មាន';
+$ec_lang['lpn_time_stat_averaged']='មធ្យម';
+$ec_lang['lpn_time_stat_minimum']='អប្បបរមា';
+$ec_lang['lpn_time_stat_maximum']='អតិបរមា';
+$ec_lang['lpn_time_stat_range']='ជួរ';
 $ec_lang['lpn_time_clock_day']='ថ្ងៃទី {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='សរសេរពេលវេលាជាម៉ោង និងនាទី ដូចជា 2:30។ លេខធម្មតាមានន័យជាម៉ោង ដូច្នេះ 8 មានន័យប្រាំបីម៉ោង។ កន្លះម៉ោងគឺ 0:30។';
 $ec_lang['lpn_time_running']='កំពុងគណនាការក្លែងធ្វើលើរយៈពេលមួយ។';
 $ec_lang['lpn_time_no_engine']='ឧបករណ៍ដោះស្រាយខាងក្នុងគណនាតែមួយភ្លែតម្ដងៗ ដូច្នេះនេះជាបណ្ដាញនៅ {time} ប៉ុណ្ណោះ៖ តម្គុណលំនាំគ្រប់មួយត្រូវបានអានត្រង់ភ្លែតនោះ ហើយធុងទឹកនីមួយៗនៅតែជាប់នឹងកម្រិតចាប់ផ្ដើមរបស់វា ជំនួសឲ្យការបំពេញ និងបង្ហូរ។ ភ្ជាប់អ៊ីនធឺណិតម្ដង ដើម្បីទាញយកឧបករណ៍ដោះស្រាយ EPANET ដែលដំណើរការការក្លែងធ្វើលើរយៈពេលមួយ។';
+// lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
+// of a failed extended period run the same note ends in {reason}, one of the three sentences below.
+$ec_lang['lpn_time_no_engine_why']='ឧបករណ៍ដោះស្រាយខាងក្នុងគណនាតែមួយភ្លែតម្ដងៗ ដូច្នេះនេះជាបណ្ដាញនៅ {time} ប៉ុណ្ណោះ៖ លំនាំគ្រប់មួយត្រូវបានអានត្រង់ភ្លែតនោះ ហើយធុងទឹកនីមួយៗនៅតែជាប់នឹងកម្រិតចាប់ផ្ដើមរបស់វា ជំនួសឲ្យការបំពេញ និងបង្ហូរ។ {reason}';
+$ec_lang['lpn_time_engine_fetch_failed']='ការទាញយកឧបករណ៍ដោះស្រាយ EPANET បានបរាជ័យ។ ផ្ទុកទំព័រឡើងវិញដើម្បីព្យាយាមម្ដងទៀត។ ជញ្ជាំងភ្លើង ប្រូកស៊ី ឬផ្នែកបន្ថែមកម្មវិធីរុករកអាចកំពុងទប់ស្កាត់វា។';
+$ec_lang['lpn_time_engine_start_failed']='កម្មវិធីរុករកមិនព្រមចាប់ផ្ដើមឧបករណ៍ដោះស្រាយ EPANET ទេ។ WebAssembly អាចត្រូវបានបិទដោយការកំណត់សុវត្ថិភាព ឬផ្នែកបន្ថែម។';
+$ec_lang['lpn_time_engine_run_failed']='ការដំណើរការ EPANET បានបរាជ័យ។ នោះជាកំហុសនៅក្នុងទំព័រនេះ។ ប្រើតំណ {wrong} ដើម្បីរាយការណ៍វា។';
 $ec_lang['lpn_time_slider']='ពេលវេលាកន្លងទៅនៃការក្លែងធ្វើ';
 $ec_lang['lpn_time_no_period']='គម្រោងនេះមិនមានការក្លែងធ្វើលើរយៈពេលមួយកំណត់ទេ ដូច្នេះមានតែភ្លែតមួយប៉ុណ្ណោះដែលត្រូវបង្ហាញ។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្នុង ការកំណត់, ការគណនា, ពេលវេលា ដើម្បីដំណើរការការក្លែងធ្វើលើរយៈពេលមួយ។';
 $ec_lang['lpn_time_first']='ទៅដើម';
@@ -3087,6 +3648,9 @@ $ec_lang['lpn_labels_customer_width_tip']='ស្លាកអតិថិជន�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='ប្រើទិដ្ឋភាពបច្ចុប្បន្ន';
 $ec_lang['lpn_settings_page']='ទំព័រ';
+$ec_lang['lpn_saved_project']='បានរក្សាទុកជាមួយគម្រោង';
+$ec_lang['lpn_saved_browser']='បានរក្សាទុកក្នុងកម្មវិធីរុករកនេះ';
+$ec_lang['lpn_saved_session']='មិនបានរក្សាទុក';
 $ec_lang['lpn_settings_hydraulics']='ធារាសាស្ត្រ';
 $ec_lang['lpn_settings_quality']='គុណភាពទឹក';
 $ec_lang['lpn_settings_quality_track']='ប៉ារ៉ាម៉ែត្រគុណភាព';
@@ -3233,6 +3797,8 @@ $ec_lang['lpn_settings_energy']='ថាមពល';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='របាយការណ៍';
 // Edited by TGH 2026-09-07
+// Row label only (the box title is lpn_time_run_report). Tom, 2026-10-07: no row carries '(EPANET)';
+// the tips say where a report comes from. Run is EPANET's verbatim report.
 $ec_lang['lpn_reports_epanet']='ការដំណើរការ';
 $ec_lang['lpn_energy_title']='របាយការណ៍ថាមពលម៉ាស៊ីនបូម';
 $ec_lang['lpn_energy_menu']='ថាមពលម៉ាស៊ីនបូម';
@@ -3268,6 +3834,9 @@ $ec_lang['lpn_scncmp_running']='កំពុងដោះស្រាយសេណ
 $ec_lang['lpn_scncmp_empty']='គ្មានអ្វីត្រូវបានគូរនៅឡើយទេ ដូច្នេះគ្មានអ្វីត្រូវដោះស្រាយឡើយ។';
 $ec_lang['lpn_scncmp_col_maxvelocity']='ល្បឿនខ្ពស់បំផុត';
 $ec_lang['lpn_scncmp_at']='{value} នៅ {id}';
+$ec_lang['lpn_scncmp_at_time']='{value} នៅ {id}, {time}';
+$ec_lang['lpn_scncmp_same']='ដូចគ្នានៅក្នុងសេណារីយ៉ូគ្រប់មួយ';
+$ec_lang['lpn_scncmp_period_note']='នៅកន្លែងដែលសេណារីយ៉ូមានរយៈពេលដំណើរការសរុប សម្ពាធទាបបំផុត និងល្បឿនខ្ពស់បំផុតរបស់វាជាតម្លៃខ្លាំងនៃបណ្ដាញទាំងមូល នៅពេលវេលាដែលបានបង្ហាញ។';
 $ec_lang['lpn_scncmp_current']='(កំពុងបើកឥឡូវនេះ)';
 $ec_lang['lpn_scncmp_note']='សេណារីយ៉ូគ្រប់មួយត្រូវបានដោះស្រាយពីច្បាប់ចម្លងនៃគំនូរ។ គ្មានអ្វីនៅទីនេះផ្លាស់ប្ដូរគម្រោងទេ ហើយសេណារីយ៉ូដែលអ្នកកំពុងធ្វើការនៅត្រូវបានទុកឲ្យនៅដដែល។';
 $ec_lang['lpn_energy_over']='សម្រាប់ការគណនាឆ្លងកាត់ពេលវេលា {time}';
@@ -3290,9 +3859,7 @@ $ec_lang['lpn_energy_total_cost']='ចំណាយសរុប';
 // EPANET's own Report menu, Status and Full: Status lists what changed over an extended period
 // simulation, in time order; Full lists every node and every link at every reporting time step.
 // Both read the run's own frames (js/lpn-time.js), so neither is a second computation.
-// **THE ROW SAYS "Status", NOT "Status report"** -- the Reports fly-out carries the word so no row
-// has to (js/looped-network.js:4630's own rule, already followed by "EPANET run"). The box title,
-// lpn_status_title, keeps the full name.
+// **THE ROW AND THE BOX TITLE BOTH SAY "Status changes"** (Tom, 2026-10-07), so menu and box agree.
 $ec_lang['lpn_reports_status']='ការផ្លាស់ប្ដូរស្ថានភាព';
 $ec_lang['lpn_reports_status_tip']='តារាងតាមលំដាប់ពេលវេលានៃការផ្លាស់ប្ដូរស្ថានភាពដែលអានពីជំហានពេលវេលា EPANET នៃការក្លែងធ្វើលើរយៈពេលចុងក្រោយ៖ ម៉ាស៊ីនបូម និងវ៉ាល់បើក ឬបិទ ធុងទឹកបំពេញ ទទេ ពេញ ឬស្ងួត និងជំហានដែលមិនប្រសព្វពេញលេញ។';
 $ec_lang['lpn_status_title']='ការផ្លាស់ប្ដូរស្ថានភាព';
@@ -3320,7 +3887,13 @@ $ec_lang['lpn_full_print']='បោះពុម្ពរបាយការណ៍'
 $ec_lang['lpn_full_col_time']='ពេលវេលា';
 $ec_lang['lpn_full_col_type']='ប្រភេទ';
 $ec_lang['lpn_full_col_id']='លេខសម្គាល់';
-$ec_lang['lpn_full_row_count']='ជួរដេក {n}។';
+$ec_lang['lpn_full_row_count']='ជួរដេក ({n})។';
+
+// ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
+// EPANET's Report > Calibration and its three tabbed pages, with EPANET's own column names (EPANET
+// 2.2 manual, section 9.6). Mean error is EPANET's term for the mean ABSOLUTE difference. "Num obs"
+// is EPANET's own column heading, kept short because results columns are narrow.
+// lpn_calib_missing: keep in step with feat/profile-file's lpn_profile_file_missing (Task 604), the same sentence.
 $ec_lang['lpn_reports_calib']='ការក្រិតតាមទិន្នន័យ';
 $ec_lang['lpn_reports_calib_tip']='ប្រៀបធៀបទិន្នន័យវាលដែលបានវាស់ពីឯកសារក្រិត ជាមួយការដំណើរការចុងក្រោយ៖ ស្ថិតិ ក្រាបទំនាក់ទំនង និងការប្រៀបធៀបមធ្យម។';
 $ec_lang['lpn_calib_title']='របាយការណ៍ការក្រិត';
@@ -3330,7 +3903,7 @@ $ec_lang['lpn_calib_load']='ផ្ទុកឯកសារក្រិត…';
 $ec_lang['lpn_calib_load_tip']='ឯកសារអត្ថបទដែលមានលេខសម្គាល់ទីតាំង ពេលវេលា និងតម្លៃដែលបានវាស់ នៅលើបន្ទាត់នីមួយៗ។ ពេលវេលាត្រូវបានវាស់ពីការចាប់ផ្ដើមនៃការក្លែងធ្វើ ជាម៉ោងទសភាគ ឬម៉ោង៖នាទី។ សញ្ញាចុចក្បៀសចាប់ផ្ដើមមតិយោបល់។ បន្ទាត់ដែលមានតែពេលវេលា និងតម្លៃ ជារបស់ទីតាំងនៅខាងលើវា។';
 $ec_lang['lpn_calib_none']='គ្មានឯកសារក្រិតត្រូវបានផ្ទុកសម្រាប់ប៉ារ៉ាម៉ែត្រនេះទេ។';
 $ec_lang['lpn_calib_session']='ឯកសារក្រិតត្រូវបានរក្សាទុកសម្រាប់សម័យនេះតែប៉ុណ្ណោះ។ វាមិនត្រូវបានរក្សាទុកជាមួយគម្រោង ឬនៅលើឧបករណ៍នេះទេ។';
-$ec_lang['lpn_calib_file']='{file}៖ ការវាស់ {n} នៅទីតាំង {m}។';
+$ec_lang['lpn_calib_file']='{file}៖ ការវាស់ ({n}) នៅទីតាំង ({m})។';
 $ec_lang['lpn_calib_units']='តម្លៃរបស់ឯកសារត្រូវបានអានជាឯកតារបស់គម្រោងនេះ៖ {unit}។';
 $ec_lang['lpn_calib_missing']='មានឈ្មោះនៅក្នុងឯកសារ ប៉ុន្តែមិនមាននៅក្នុងបណ្ដាញនេះ៖ {ids}។';
 $ec_lang['lpn_calib_missing_count']='ការវាស់ដែលត្រូវបានរំលង ព្រោះទីតាំងរបស់វាមិននៅក្នុងបណ្ដាញនេះ៖ {n}។';
@@ -3453,7 +4026,7 @@ $ec_lang['lpn_library_curve_unused']='គ្មានអ្វីកំពុង
 // clearing a pattern reference is harmless; a pump with no curve is a lossless connection, so the
 // same gesture would quietly turn a pumped system into an open one. {count} and {ids} are
 // placeholders, not concatenation (Task 193).
-$ec_lang['lpn_library_curve_in_use']='ខ្សែកោងនេះកំពុងប្រើដោយធាតុ {count}៖ {ids}។ សូមប្ដូរពួកវាឲ្យប្រើខ្សែកោងផ្សេងជាមុនសិន រួចលុបខ្សែកោងនេះ។';
+$ec_lang['lpn_library_curve_in_use']='ខ្សែកោងនេះកំពុងប្រើដោយធាតុ ({count})៖ {ids}។ សូមប្ដូរពួកវាឲ្យប្រើខ្សែកោងផ្សេងជាមុនសិន រួចលុបខ្សែកោងនេះ។';
 // The two column headings for a curve this page does not compute with -- a tank volume curve, or one
 // a file stated that nothing here reads. Naming a quantity would be inventing one.
 $ec_lang['lpn_library_curve_x']='X';
@@ -3475,7 +4048,7 @@ $ec_lang['lpn_library_pipetype_unused']='គ្មានអ្វីកំពុ
 // A TYPE IN USE IS NOT DELETED, for the reason the curve above is not: deleting it would change the
 // diameter and the roughness of every pipe that stated it, in silence. {count} and {ids} are
 // placeholders, not concatenation (Task 193).
-$ec_lang['lpn_library_pipetype_in_use']='ប្រភេទបំពង់នេះកំពុងប្រើដោយបំពង់ {count}៖ {ids}។ សូមផ្ដាច់វាចេញពីពួកវាមុននឹងលុប។';
+$ec_lang['lpn_library_pipetype_in_use']='ប្រភេទបំពង់នេះកំពុងប្រើដោយបំពង់ ({count})៖ {ids}។ សូមផ្ដាច់វាចេញពីពួកវាមុននឹងលុប។';
 // The pipe popup\'s own selector and the two controls beside it.
 $ec_lang['lpn_field_pipetype']='ប្រភេទបំពង់';
 $ec_lang['lpn_field_pipetype_tip']='ប្រភេទបំពង់នៅក្នុងបណ្ណាល័យគម្រោងដែលបំពង់នេះប្រើ។ លក្ខណៈសម្បត្តិដែលមាននៅក្នុងប្រភេទបំពង់ត្រូវបានបិទមិនឲ្យកែសម្រួលនៅទីនេះទេ។ ផ្ដាច់ប្រភេទបំពង់ដើម្បីបើកការកែសម្រួលនៅទីនេះ។';
@@ -3502,7 +4075,7 @@ $ec_lang['lpn_library_fittings_used_by']='បំពង់ដែលកំពុ�
 $ec_lang['lpn_library_fittings_unused']='គ្មានអ្វីកំពុងប្រើបញ្ជីគ្រឿងបំពង់នេះទេ។';
 // A LIST IN USE IS NOT DELETED, for the reason a pipe type in use is not: it would change the minor
 // loss of every pipe that referred to it, in silence. {count} and {ids} are placeholders (Task 193).
-$ec_lang['lpn_library_fittings_in_use']='បញ្ជីគ្រឿងបំពង់នេះកំពុងប្រើដោយបំពង់ {count}៖ {ids}។ សូមផ្ដាច់វាចេញពីពួកវាមុននឹងលុប។';
+$ec_lang['lpn_library_fittings_in_use']='បញ្ជីគ្រឿងបំពង់នេះកំពុងប្រើដោយបំពង់ ({count})៖ {ids}។ សូមផ្ដាច់វាចេញពីពួកវាមុននឹងលុប។';
 // Importing libraries out of another project file (ROADMAP Task 611). ONE WIZARD, ONE DOOR: the
 // Import libraries row under File, and nothing in the Libraries box (Tom, 2026-09-18: 'Remove
 // buttons except at the File menu.'). The label and its tip name no particular library, because
@@ -3573,9 +4146,9 @@ $ec_lang['lpn_fitting_other']='គ្រឿងបំពង់ផ្សេងទ�
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
 $ec_lang['lpn_inp_export_flat_heading']='បានរក្សាទុក {file}';
 $ec_lang['lpn_inp_export_flat_lead']='ឯកសារ EPANET ដែលបាននាំចេញ ស្មើនឹងគម្រោងនេះខាងលេខ។ ប៉ុន្តែវាគ្មានកន្លែងសម្រាប់អ្វីៗខាងក្រោមទេ៖';
-$ec_lang['lpn_inp_export_flat_types']='{n} បំពង់នៅទីនេះយោងទៅប្រភេទបំពង់ {t}។ នៅក្នុងឯកសារ បំពង់នីមួយៗមានច្បាប់ចម្លងលេខរបស់ខ្លួន ដូច្នេះលទ្ធផលដូចគ្នា។ អ្វីដែលឯកសារមិនអាចផ្ទុកបានគឺប្រភេទបំពង់ខ្លួនវា ដូច្នេះតំណរវាងនិយមន័យមួយ និងបំពង់ទាំងអស់ដែលប្រើវាត្រូវបានកត់ត្រាតែក្នុងឯកសារគម្រោងប៉ុណ្ណោះ។';
+$ec_lang['lpn_inp_export_flat_types']='បំពង់នៅទីនេះ ({n}) យោងទៅប្រភេទបំពង់ ({t})។ នៅក្នុងឯកសារ បំពង់នីមួយៗមានច្បាប់ចម្លងលេខរបស់ខ្លួន ដូច្នេះលទ្ធផលដូចគ្នា។ អ្វីដែលឯកសារមិនអាចផ្ទុកបានគឺប្រភេទបំពង់ខ្លួនវា ដូច្នេះតំណរវាងនិយមន័យមួយ និងបំពង់ទាំងអស់ដែលប្រើវាត្រូវបានកត់ត្រាតែក្នុងឯកសារគម្រោងប៉ុណ្ណោះ។';
 $ec_lang['lpn_inp_export_flat_coords']='ឯកសារ EPANET ផ្ទុកទីតាំងមួយសម្រាប់ថ្នាំងនីមួយៗ។ សេណារីយ៉ូនេះដាក់ {n} ក្នុងចំណោមវាទៅកន្លែងផ្សេង ហើយទាំងនោះគឺជាទីតាំងក្នុងឯកសារ។ សេណារីយ៉ូផ្សេងទៀតរក្សាទីតាំងរបស់វាក្នុងឯកសារគម្រោងប៉ុណ្ណោះ។';
-$ec_lang['lpn_inp_export_flat_fittings']='ឯកសារ EPANET មិនអាចផ្ទុកបញ្ជីកែង វ៉ាល់ និងសន្លាក់ T នៅក្នុងឯកសារគម្រោងរបស់អ្នកបានទេ។ មេគុណនៃការបាត់បង់មូលដ្ឋានរបស់បំពង់ {n} នៅទីនេះ ត្រូវបានរួមបូកពីបញ្ជីគ្រឿងបំពង់មួយ។ ចំនួនសរុបចូលទៅក្នុងឯកសារដូចវាឈរនោះឯង ដូច្នេះគ្មានអ្វីអំពីចម្លើយផ្លាស់ប្ដូរទេ។';
+$ec_lang['lpn_inp_export_flat_fittings']='ឯកសារ EPANET មិនអាចផ្ទុកបញ្ជីកែង វ៉ាល់ និងសន្លាក់ T នៅក្នុងឯកសារគម្រោងរបស់អ្នកបានទេ។ មេគុណនៃការបាត់បង់មូលដ្ឋានរបស់បំពង់នៅទីនេះ ({n}) ត្រូវបានរួមបូកពីបញ្ជីគ្រឿងបំពង់មួយ។ ចំនួនសរុបចូលទៅក្នុងឯកសារដូចវាឈរនោះឯង ដូច្នេះគ្មានអ្វីអំពីចម្លើយផ្លាស់ប្ដូរទេ។';
 $ec_lang['lpn_library_controls']='ច្បាប់ត្រួតពិនិត្យ';
 $ec_lang['lpn_library_controls_tip']='ច្បាប់ត្រួតពិនិត្យគឺជាសេចក្ដីមួយដែលបើក ឬបិទតំណ ឬប្ដូរការកំណត់របស់វា ដោយផ្អែកលើកម្រិតទឹកធុងទឹក សម្ពាធថ្នាំង ឬពេលវេលា។';
 // A verb and its object, not a bare "Add": a bare imperative is the hardest kind of string to
@@ -3585,10 +4158,23 @@ $ec_lang['lpn_library_pattern_values']='តម្គុណ';
 $ec_lang['lpn_library_pattern_values_tip']='តម្គុណនានា បំបែកដោយចន្លោះ ឬសញ្ញាក្បៀស។ បិទភ្ជាប់ជួរឈរពីសៀវភៅបញ្ជីអេឡិចត្រូនិកបើអ្នកមាន។ បញ្ជីនេះធ្វើម្ដងទៀតរហូតដល់ការដំណើរការចប់ ដូច្នេះវាមិនចាំបាច់គ្របដណ្ដប់ពេញការដំណើរការទាំងមូលទេ។';
 // {n} values, {step} apart, covering {span}. Placeholders rather than three joined fragments
 // (Task 193): the order of the three differs by language and a sandwich cannot express that.
-$ec_lang['lpn_library_pattern_span']='តម្គុណ {n}, ដាច់ពីគ្នា {step}, គ្របដណ្ដប់ {span}';
+$ec_lang['lpn_library_pattern_span']='តម្គុណ៖ {n}, ដាច់ពីគ្នា {step}, គ្របដណ្ដប់ {span}';
 $ec_lang['lpn_library_pattern_none']='គ្មានលំនាំ';
+// The blank first option of a selector whose blank follows a project-wide default (a junction's or
+// customer's demand pattern, a pump's price pattern and efficiency curve). Tom, 2026-10-04.
+$ec_lang['lpn_choice_default']='លំនាំដើម';
 $ec_lang['lpn_settings_default_pattern']='លំនាំតម្រូវការលំនាំដើម';
 $ec_lang['lpn_settings_default_pattern_tip']='ថ្នាំងគ្រប់ដែលគ្មានលំនាំប្រើលំនាំនេះ។';
+$ec_lang['lpn_junction_pattern_unknown']='គ្មានលំនាំណាក្នុងគម្រោងនេះមានលេខសម្គាល់ {id} ទេ ដូច្នេះថ្នាំងត្រូវបានទុកដូចដើម។';
+$ec_lang['lpn_settings_default_pattern_none']='គ្មាន (ថេរ)';
+$ec_lang['lpn_demand_pattern_default']='(លំនាំដើម៖ {id})';
+$ec_lang['lpn_demand_pattern_constant']='(ថេរ)';
+$ec_lang['lpn_library_pattern_default_mark']='(លំនាំដើម)';
+$ec_lang['lpn_library_pattern_default_tip']='លំនាំតម្រូវការលំនាំដើម។ ប្ដូរវាក្នុង ការកំណត់ លំនាំតម្រូវការលំនាំដើម។';
+$ec_lang['lpn_library_pattern_default_deleted_to']='លំនាំ {id} គឺជាលំនាំតម្រូវការលំនាំដើម។ ថ្នាំងដែលគ្មានលំនាំឥឡូវនេះប្រើលំនាំ {now}។';
+$ec_lang['lpn_library_pattern_default_deleted_none']='លំនាំ {id} គឺជាលំនាំតម្រូវការលំនាំដើម។ ថ្នាំងដែលគ្មានលំនាំឥឡូវនេះប្រើតម្រូវការថេរ។';
+
+
 $ec_lang['lpn_library_control_add']='បន្ថែមច្បាប់ត្រួតពិនិត្យមួយ';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -3689,7 +4275,7 @@ $ec_lang['lpn_terrain_refused']='កម្ពស់មិនត្រូវប�
 // numbers. Substituted, never concatenated.
 $ec_lang['lpn_terrain_confirm']='បំពេញកម្ពស់ថ្នាំង {n} ពី Mapbox DEM មែនទេ?';
 $ec_lang['lpn_terrain_confirm_default_1']='ថ្នាំងទាំងអស់មានកម្ពស់រួចហើយ ហើយ {n} ក្នុងចំណោមនោះនៅតែនៅ {v} ដែលជាកម្ពស់ដែលថ្នាំងថ្មីចាប់ផ្ដើម ជាជាងតម្លៃដែលអ្នកបានបញ្ចូល។';
-$ec_lang['lpn_terrain_confirm_default_2']='ជំនួសកម្ពស់ថ្នាំង {n} នោះដោយតម្លៃពី Mapbox DEM មែនទេ?';
+$ec_lang['lpn_terrain_confirm_default_2']='ជំនួសកម្ពស់នៃថ្នាំងទាំងនោះ ({n}) ដោយតម្លៃពី Mapbox DEM មែនទេ?';
 $ec_lang['lpn_terrain_keep']='ថ្នាំង {k} មានកម្ពស់រួចហើយ ហើយនឹងមិនត្រូវប៉ះពាល់ទេ។';
 $ec_lang['lpn_terrain_undo']='ត្រឡប់ក្រោយម្ដង (Ctrl-Z) នាំពួកវាទាំងអស់មកវិញ។';
 $ec_lang['lpn_terrain_requests']='{n} សំណើទៅ api.mapbox.com។';
@@ -3718,8 +4304,6 @@ $ec_lang['lpn_terrain_keep_ids']='ថ្នាំងទាំងនោះគឺ�
 $ec_lang['lpn_terrain_filled_ids']='ថ្នាំងទាំងនេះទទួលបានកម្ពស់៖ {ids}';
 $ec_lang['lpn_terrain_blank_ids']='ថ្នាំងទាំងនេះនៅតែគ្មានកម្ពស់៖ {ids}';
 $ec_lang['lpn_terrain_ids_more']='{ids} និងមានទៀត {n}';
-$ec_lang['lpn_analyze_menu']='វិភាគ';
-$ec_lang['lpn_analyze_menu_tip']='ការវិភាគដែលដំណើរការបណ្ដាញលើច្បាប់ចម្លង៖ លំហូរពន្លត់អគ្គីភ័យនៅថ្នាំងនីមួយៗ ការបាត់បង់របស់បំពង់ ម៉ាស៊ីនបូម និងវ៉ាល់នីមួយៗ និងតម្រូវការដែលបានគុណឡើង ឬចុះ។';
 
 // ---- Fire flow: the whole-system sweep (ROADMAP Task 530) ---------------------------------------
 // Tom's question, 2026-08-27: which junctions can provide the fire flow their code asks for, and
@@ -3733,6 +4317,8 @@ $ec_lang['lpn_analyze_menu_tip']='ការវិភាគដែលដំណើ�
 // {flow} and {velocity} are quantities with their units, {pressure} a pressure with its unit,
 // {id} a junction or pipe name, and {done}, {total}, {n}, {pass}, {fail}, {design} and {solves}
 // are whole numbers. Every one is substituted, never concatenated.
+$ec_lang['lpn_analyze_menu']='វិភាគ';
+$ec_lang['lpn_analyze_menu_tip']='ការវិភាគដែលដំណើរការបណ្ដាញលើច្បាប់ចម្លង៖ លំហូរពន្លត់អគ្គីភ័យនៅថ្នាំងនីមួយៗ ការបាត់បង់របស់បំពង់ ម៉ាស៊ីនបូម និងវ៉ាល់នីមួយៗ និងតម្រូវការដែលបានគុណឡើង ឬចុះ។';
 $ec_lang['lpn_ff_menu']='ការវិភាគលំហូរពន្លត់អគ្គីភ័យ…';
 $ec_lang['lpn_ff_menu_tip']='សាកល្បងថ្នាំងដែលបានជ្រើសរើសនីមួយៗសម្រាប់លំហូរពន្លត់អគ្គីភ័យ ហើយពិនិត្យផលប៉ះពាល់លើផ្នែកផ្សេងទៀតនៃប្រព័ន្ធ';
 $ec_lang['lpn_ff_title']='ការវិភាគលំហូរពន្លត់អគ្គីភ័យ';
@@ -3798,7 +4384,7 @@ $ec_lang['lpn_ff_clear']='សម្អាតរង្វង់';
 // down -- so these three do not add up to the number of junctions, and that is correct rather than
 // a rounding slip. Said as three separate facts for that reason.
 $ec_lang['lpn_ff_summary']='{clean} ថ្នាំងបានឆ្លងកាត់ការត្រួតពិនិត្យទាំងអស់។ {fire} ថ្នាំងមិនបានឆ្លងកាត់លំហូរពន្លត់អគ្គីភ័យ។ {design} ថ្នាំងបានប៉ះពាល់ដល់ផ្នែកផ្សេងទៀតនៃប្រព័ន្ធ។';
-$ec_lang['lpn_ff_summary_error']='{n} ថ្នាំងមិនអាចដោះស្រាយបានទេ។';
+$ec_lang['lpn_ff_summary_error']='ថ្នាំងដែលមិនអាចដោះស្រាយបាន ({n})។';
 // ONE WIDE TABLE, NOT TWO REPORTS (Tom, 2026-08-30, with a competitor's own table in front of him:
 // "Normally they are kind of wide and they include the information from both tables in one table.")
 // One run has always produced one result set holding both answers per junction, so two headings
@@ -3876,6 +4462,14 @@ $ec_lang['lpn_ff_err_converge']='បណ្ដាញមិនប្រសព្�
 $ec_lang['lpn_ff_err_solve']='ឧបករណ៍ដោះស្រាយបានរាយការណ៍កំហុសមួយ ហើយមិនបានផ្ដល់ចម្លើយទេ។';
 $ec_lang['lpn_ff_err_not_junction']='មិនមែនជាថ្នាំង';
 $ec_lang['lpn_ff_err_unknown']='គ្មានលទ្ធផលទេ។ កូដកំហុស៖ {code}';
+
+// ---- Water > Criticality analysis (Tom, 2026-09-30) -------------------------------------------
+//
+// Break each asset in turn, on a copy, and report what the system loses. "Criticality analysis" is
+// the industry's term (WaterGEMS, InfoWater); EPANET has no such tool and no word for it. The run
+// dialog, Run, Stop, the engine sentence and the cost line are fire flow's own keys.
+//
+// {n}, {done} and {total} are whole numbers; {pressure} is a pressure with its unit.
 $ec_lang['lpn_crit_menu']='ការវិភាគភាពសំខាន់…';
 $ec_lang['lpn_crit_menu_tip']='យកបំពង់ ម៉ាស៊ីនបូម និងវ៉ាល់នីមួយៗចេញពីបណ្ដាញម្ដងមួយៗ ហើយរាយការណ៍ពីផលប៉ះពាល់លើប្រព័ន្ធ។';
 $ec_lang['lpn_crit_title']='ការវិភាគភាពសំខាន់';
@@ -3890,7 +4484,7 @@ $ec_lang['lpn_crit_col_asset']='ធាតុ';
 $ec_lang['lpn_crit_col_unserved']='តម្រូវការមិនបានបម្រើ';
 $ec_lang['lpn_crit_col_cutoff']='ថ្នាំងដែលត្រូវផ្ដាច់';
 $ec_lang['lpn_crit_col_below']='ថ្នាំងក្រោមអប្បបរមា';
-$ec_lang['lpn_crit_summary']='ធាតុ {n} ក្នុងចំណោម {total} ធ្វើឲ្យតម្រូវការមិនបានបម្រើ ឬធ្វើឲ្យថ្នាំងមួយធ្លាក់ក្រោម {pressure}។';
+$ec_lang['lpn_crit_summary']='ធាតុដែលធ្វើឲ្យតម្រូវការមិនបានបម្រើ ឬធ្វើឲ្យថ្នាំងមួយធ្លាក់ក្រោម {pressure} ({n} ក្នុងចំណោម {total})។';
 $ec_lang['lpn_crit_baseline_below']='ថ្នាំងដែលនៅក្រោមវារួចហើយ ពេលមិនមានអ្វីខូច៖ {n}។ ពួកវាមិនត្រូវបានរាប់ទេ។';
 $ec_lang['lpn_crit_working']='កំពុងដំណើរការ៖ ធាតុ {done} ក្នុងចំណោម {total}។';
 $ec_lang['lpn_crit_stopped']='បានបញ្ឈប់បន្ទាប់ពីធាតុ {done} ក្នុងចំណោម {total}។ លទ្ធផលខាងក្រោមគឺអ្វីដែលបានបញ្ចប់រួចហើយ។';
@@ -3902,6 +4496,57 @@ $ec_lang['lpn_crit_stale']='គំនូរបានផ្លាស់ប្ដ�
 $ec_lang['lpn_crit_skipdead']='រំលងចុងបំពង់តន់';
 $ec_lang['lpn_crit_skipdead_tip']='តំណចុងបំពង់តន់ គឺតំណដែលការយកវាចេញផ្ដាច់ថ្នាំងដែលអាចទៅដល់បានតែតាមរយៈវា ដោយគ្មានអាងស្តុក ឬធុងទឹកនៅពីក្រោយ។ ការបាត់បង់របស់វាគឺអ្វីៗទាំងអស់នៅពីក្រោយវា ដូច្នេះវាមិនត្រូវបានដោះស្រាយទេ។ សេចក្ដីសង្ខេបប្រាប់ថាមានប៉ុន្មានត្រូវបានរំលង។';
 $ec_lang['lpn_crit_skipped_dead']='តំណចុងបំពង់តន់ដែលបានរំលង៖ {n}។ នីមួយៗផ្ដាច់អ្វីៗទាំងអស់នៅពីក្រោយវា។';
+
+// ---- Water > Analyze > Demand scaling (ROADMAP Task 754) ----------------------------------------
+//
+// Tom, 2026-09-30 and 2026-10-01: the demands multiplied on a copy, like Fire flow, and "What demand
+// scale can the system handle with this pressure limit?" The run dialog's Stop, the engine sentence,
+// the cost line, the Junction heading and the solver's reasons are fire flow's own keys.
+//
+// {m} and {max} are demand scales printed as numbers (1.37); {step} is the search's tolerance
+// (0.01); {n} is a whole number, always after a colon so no plural has to agree with it; {time} and
+// {now} are elapsed times (6:00); {pressure} is a pressure with its unit; {id} becomes a link to the
+// junction on the map; {reason} is a whole sentence saying why the solver gave no answer.
+$ec_lang['lpn_ds_menu']='ការធ្វើមាត្រដ្ឋានតម្រូវការ…';
+$ec_lang['lpn_ds_menu_tip']='គុណតម្រូវការលើច្បាប់ចម្លងនៃបណ្ដាញ ហើយមើលសម្ពាធ និងល្បឿន ឬរកមាត្រដ្ឋានតម្រូវការធំបំផុតដែលប្រព័ន្ធអាចទទួលបាន។';
+$ec_lang['lpn_ds_title']='ការធ្វើមាត្រដ្ឋានតម្រូវការ';
+$ec_lang['lpn_ds_intro']='ចុចប៊ូតុង ដំណើរការ ដើម្បីគុណតម្រូវការនៅថ្នាំងដែលបានជ្រើសរើស ដោយមាត្រដ្ឋានតម្រូវការ ហើយមើលសម្ពាធ និងល្បឿន។\n\nចុចប៊ូតុង រក ដើម្បីរកមាត្រដ្ឋានតម្រូវការធំបំផុត ដល់ {step} ជិតបំផុត ដែលថ្នាំងទាំងនេះទាំងអស់រក្សាសម្ពាធទាបបំផុតដែលអនុញ្ញាតយ៉ាងតិច។ វារកពី 0 ដល់ {max}។\n\nទាំងពីរធ្វើការលើច្បាប់ចម្លងនៃបណ្ដាញ ដែលដោះស្រាយនៅជំហានពេលវេលាដែលនៅលើអេក្រង់ក្នុងសេណារីយ៉ូសកម្ម ដូច្នេះគ្មានអ្វីក្នុងគម្រោងត្រូវបានផ្លាស់ប្ដូរទេ។ មានតែជំហានពេលវេលានោះប៉ុណ្ណោះដែលត្រូវបានធ្វើមាត្រដ្ឋាន ហើយកម្រិត និងស្ថានភាពត្រូវបានយកពីវា។ ដើម្បីសាកល្បងកំពូល សូមផ្លាស់ទីនាឡិកាទៅតម្រូវការកំពូលមុនពេលដំណើរការ។';
+$ec_lang['lpn_ds_scope']='ថ្នាំងដែលត្រូវធ្វើមាត្រដ្ឋាន';
+$ec_lang['lpn_ds_scope_all']='ថ្នាំងទាំងអស់';
+$ec_lang['lpn_ds_scope_selected']='ថ្នាំងដែលបានជ្រើសរើស';
+$ec_lang['lpn_ds_minpressure']='សម្ពាធទាបបំផុតដែលអនុញ្ញាត';
+$ec_lang['lpn_ds_minpressure_tip']='នេះជាលេខដូចគ្នានឹង សម្ពាធទាបបំផុតដែលអនុញ្ញាត នៅកន្លែងផ្សេងក្នុងការវិភាគលំហូរពន្លត់អគ្គីភ័យ។ ការផ្លាស់ប្ដូរវានៅទីនេះផ្លាស់ប្ដូរវានៅទីនោះ។';
+$ec_lang['lpn_ds_head_scale']='ធ្វើមាត្រដ្ឋានតម្រូវការ';
+$ec_lang['lpn_ds_multiplier']='មាត្រដ្ឋានតម្រូវការ';
+$ec_lang['lpn_ds_multiplier_tip']='កត្តាដែលតម្រូវការនីមួយៗត្រូវបានគុណ។ 1.5 គឺការកើនឡើង 50%។ វាអនុវត្តបន្ថែមលើកត្តាគុណតម្រូវការនៃសេណារីយ៉ូសកម្ម ដែលមាននៅក្នុងតម្រូវការរួចហើយ ហើយវាមិនត្រូវបានរក្សាទុកក្នុងគម្រោងទេ។';
+$ec_lang['lpn_ds_run']='ដំណើរការ';
+$ec_lang['lpn_ds_head_search']='តើប្រព័ន្ធអាចទទួលបានមាត្រដ្ឋានតម្រូវការប៉ុន្មាន?';
+$ec_lang['lpn_ds_head_search_selected']='តើថ្នាំងទាំងនេះអាចទទួលបានមាត្រដ្ឋានតម្រូវការប៉ុន្មាន?';
+$ec_lang['lpn_ds_outside_below']='នៅមាត្រដ្ឋានតម្រូវការ {m} ថ្នាំងដែលមិនបានជ្រើសរើសហើយទាបជាង {pressure}៖ {n} ({ids})។ ពួកវាមិនកំណត់ចម្លើយនេះទេ។';
+$ec_lang['lpn_ds_holds_max']='✓ ថ្នាំងគ្រប់មួយរក្សា {pressure} រហូតដល់មាត្រដ្ឋានតម្រូវការ {max} ដែលជាកំពូលនៃការស្វែងរក។';
+$ec_lang['lpn_ds_below_zero']='⚠ យ៉ាងតិចមានថ្នាំងមួយទាបជាង {pressure} ទោះបីតម្រូវការដែលបានធ្វើមាត្រដ្ឋានស្មើសូន្យក៏ដោយ។';
+$ec_lang['lpn_ds_found']='✓ ថ្នាំងគ្រប់មួយដែលបានពិនិត្យរក្សា {pressure} យ៉ាងតិច រហូតដល់មាត្រដ្ឋានតម្រូវការ {m}។';
+$ec_lang['lpn_ds_found_below']='⚠ យ៉ាងតិចមានថ្នាំងមួយទាបជាង {pressure} ដោយគ្មានការធ្វើមាត្រដ្ឋានតម្រូវការ។ មាត្រដ្ឋានតម្រូវការធំបំផុតដែលរក្សាថ្នាំងគ្រប់មួយនៅ {pressure} ឬខ្ពស់ជាងគឺ {m}។';
+$ec_lang['lpn_ds_search_stopped']='ការស្វែងរកត្រូវបានបញ្ឈប់មុនពេលវារកឃើញចម្លើយ។';
+$ec_lang['lpn_ds_lowest_at']='នៅមាត្រដ្ឋានតម្រូវការ {m} សម្ពាធទាបបំផុតគឺ {pressure} នៅថ្នាំង {id}។';
+$ec_lang['lpn_ds_nosolve_at']='នៅមាត្រដ្ឋានតម្រូវការ {m} បណ្ដាញមិនបានផ្ដល់ចម្លើយទេ។ {reason}';
+$ec_lang['lpn_ds_scale_ok']='✓ នៅមាត្រដ្ឋានតម្រូវការ {m} ថ្នាំងគ្រប់មួយរក្សា {pressure}។';
+$ec_lang['lpn_ds_scale_below']='⚠ នៅមាត្រដ្ឋានតម្រូវការ {m} ថ្នាំងទាបជាង {pressure}៖ {n}។';
+$ec_lang['lpn_ds_scaled_selected']='ថ្នាំងដែលបានធ្វើមាត្រដ្ឋាន និងពិនិត្យ៖ {n}។';
+$ec_lang['lpn_ds_head_lowest']='សម្ពាធទាបបំផុត';
+$ec_lang['lpn_ds_head_velocity']='ល្បឿនខ្ពស់បំផុត';
+$ec_lang['lpn_ds_col_link']='តំណ';
+$ec_lang['lpn_ds_col_scaled']='ធ្វើមាត្រដ្ឋាន';
+$ec_lang['lpn_ds_col_scaled_tip']='ជាមួយតម្រូវការដែលគុណដោយមាត្រដ្ឋានតម្រូវការ។';
+$ec_lang['lpn_ds_col_unscaled']='មិនធ្វើមាត្រដ្ឋាន';
+$ec_lang['lpn_ds_col_unscaled_tip']='ជាមួយតម្រូវការដូចនៅក្នុងសេណារីយ៉ូសកម្មនៅជំហានពេលវេលានេះ ដែលជាតម្លៃដូចគ្នាដែលផែនទីបង្ហាញ។';
+$ec_lang['lpn_ds_no_junctions']='គម្រោងនេះមិនទាន់មានថ្នាំងទេ ដូច្នេះគ្មានតម្រូវការត្រូវធ្វើមាត្រដ្ឋានទេ។';
+$ec_lang['lpn_ds_no_selection']='គ្មានថ្នាំងណាមួយត្រូវបានជ្រើសរើសទេ។ សូមជ្រើសរើសថ្នាំង ឬជ្រើសរើស ថ្នាំងទាំងអស់។';
+$ec_lang['lpn_ds_skipped']='ធាតុដែលបានជ្រើសរើសដែលមិនមែនជាថ្នាំង ទុកដូចដើម៖ {n}។';
+$ec_lang['lpn_ds_bad_multiplier']='បញ្ចូលមាត្រដ្ឋានតម្រូវការសូន្យ ឬច្រើនជាងនេះ ដូចជា 1.5។';
+$ec_lang['lpn_ds_stale']='គំនូរបានផ្លាស់ប្ដូរ ដូច្នេះលទ្ធផលនៃការធ្វើមាត្រដ្ឋានតម្រូវការត្រូវបានសម្អាត។ សូមដំណើរការវាម្ដងទៀត។';
+$ec_lang['lpn_analyze_at_time']='ជំហានពេលវេលា៖ {time}។';
+$ec_lang['lpn_analyze_time_moved']='⚠ នេះត្រូវបានគណនានៅ {time} ហើយនាឡិកាឥឡូវនៅ {now}។ សូមដំណើរការវាម្ដងទៀតសម្រាប់ជំហានពេលវេលាដែលនៅលើអេក្រង់។';
 
 // ---- Settings > New assets > Import surveyed points: CSV and GPX (ROADMAP Task 592) -----------
 //
@@ -3920,6 +4565,8 @@ $ec_lang['lpn_crit_skipped_dead']='តំណចុងបំពង់តន់ដ
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='នាំចូលចំណុចស្ទង់…';
 $ec_lang['lpn_file_import_survey_tip']='អានបញ្ជីចំណុចស្ទង់ពីឯកសារអត្ថបទ ហើយបង្កើតថ្នាំងមួយនៅចំណុចនីមួយៗ ដោយយកការកំណត់ធាតុថ្មីសម្រាប់អ្វីៗដែលឯកសារមិនបានចែង។ គ្មានបំពង់ត្រូវបានគូរទេ លុះត្រាតែអ្នកធីក អានការពិពណ៌នាជាលេខកូដវាល ហើយគ្មានជួរដេកណាត្រូវបានលុបដោយមិនបានដាក់ឈ្មោះទេ។ វាអានប្រព័ន្ធកូអរដោនេដែលគម្រោងនេះប្រើរួចហើយ ទោះបានតម្រៀបភូមិសាស្ត្រ ឬអត់ក៏ដោយ។';
+// GeoJSON import of Shapes (Task 779). Only points, lines and polygons come in, as Shapes; the
+// network is imported from an EPANET file. Every feature not imported is named in the report.
 $ec_lang['lpn_file_import_shapes']='នាំចូលរូបគូរ GeoJSON…';
 $ec_lang['lpn_file_import_shapes_tip']='អានចំណុច បន្ទាត់ និងពហុកោណនៃឯកសារ GeoJSON ចូលគម្រោងនេះជារូបគូរ។ ធាតុបណ្ដាញក្នុងឯកសារមិនត្រូវបាននាំចូលទេ ត្រូវនាំចូលបណ្ដាញពីឯកសារ EPANET។ គម្រោងត្រូវតែបានតម្រៀបភូមិសាស្ត្រ ឬចែងប្រព័ន្ធកូអរដោនេ។';
 $ec_lang['lpn_geojson_import_done']='រូបគូរ {n} ត្រូវបាននាំចូលពី {file}។';
@@ -4030,176 +4677,7 @@ $ec_lang['lpn_survey_note_blank_rows']='បន្ទាត់ទទេត្រ�
 $ec_lang['lpn_survey_note_id_duplicate']='ឈ្មោះត្រូវបានប្រើពីមុននៅក្នុងឯកសារនេះរួចហើយ ឈ្មោះថ្មីមួយត្រូវបានផ្ដល់ជូន។';
 $ec_lang['lpn_survey_note_id_taken']='ឈ្មោះមាននៅក្នុងគម្រោងរួចហើយ ឈ្មោះថ្មីមួយត្រូវបានផ្ដល់ជូន។';
 $ec_lang['lpn_survey_note_id_invalid']='ឈ្មោះនេះមិនអាចប្រើនៅទីនេះបានទេ ឈ្មោះថ្មីមួយត្រូវបានផ្ដល់ជូន។';
-$ec_lang['points_data_msg_line']='គ្មានអ្វីត្រូវបានបិទភ្ជាប់ទេ។ មិនអាចអានបន្ទាត់ {n} ជាស្ថានីយ និងកម្ពស់បានទេ។';
-$ec_lang['points_data_msg_none']='គ្មានអ្វីត្រូវបានបិទភ្ជាប់ទេ។ រកមិនឃើញគូស្ថានីយ និងកម្ពស់ទេ។';
-$ec_lang['lpn_tool_add_chain']='ខ្សែសង្វាក់ថ្នាំង-បំពង់';
-$ec_lang['lpn_pane_delete_element']='លុបធាតុ';
-$ec_lang['lpn_pane_delete_elements']='លុបធាតុទាំងនេះ';
-$ec_lang['lpn_pane_sort_desc']='តម្រៀបចុះ';
-$ec_lang['lpn_pane_manage_cols_width']='ទទឹង (em)';
-$ec_lang['lpn_pane_width_tip']='ទទឹងជួរឈរត្រូវបានរក្សាទុកក្នុងកម្មវិធីរុករកនេះ មិនមែនក្នុងគម្រោងទេ។ ចុចទ្វេដងលើខ្សែបែងចែកជួរឈរ ដើម្បីស្ដារទទឹងលំនាំដើម។';
-$ec_lang['lpn_dock_left']='ភ្ជាប់នៅខាងឆ្វេងនៃផែនទី';
-$ec_lang['lpn_dock_right']='ភ្ជាប់នៅខាងស្ដាំនៃផែនទី';
-$ec_lang['lpn_dock_float']='អណ្ដែត';
-$ec_lang['lpn_dock_autohide']='លាក់ស្វ័យប្រវត្តិ';
-$ec_lang['lpn_popup_none']='គ្មានអ្វីត្រូវបានជ្រើសរើសទេ។ ជ្រើសរើសធាតុមួយនៅលើផែនទី ដើម្បីមើលលក្ខណៈសម្បត្តិរបស់វា។';
-$ec_lang['lpn_hotkeys_snip_heading']='រូបថតអេក្រង់';
-$ec_lang['lpn_hotkeys_snip_term']='ផ្លូវកាត់ក្តារចុចសម្រាប់រូបថតអេក្រង់';
-$ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>S</td><td>កាត់យក ខណៈពេលរូបថតអេក្រង់កំពុងបើក។</td></tr><tr><td>E</td><td>ជ័រលុប នៅក្នុងទិដ្ឋភាពគូសចំណាំ។</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>ត្រឡប់ក្រោយ និងធ្វើឡើងវិញ នៅក្នុងទិដ្ឋភាពគូសចំណាំ។</td></tr><tr><td>Esc</td><td>បោះបង់ការកាត់យក ឬចាកចេញពីជ័រលុប។ នៅក្នុងទិដ្ឋភាពគូសចំណាំ បិទវា នៅពេលមិនទាន់មានអ្វីត្រូវបានគូរ។</td></tr></tbody></table>';
-$ec_lang['lpn_fb_intro']='សារដែលបានរៀបចំទុកជាមុន (ស្រេចចិត្ត)។ គ្មានអ្វីត្រូវបានផ្ញើទេ រហូតដល់អ្នកចុច ផ្ញើ។';
-$ec_lang['lpn_fb_pick_numbers']='លេខមើលទៅមិនត្រឹមត្រូវ';
-$ec_lang['lpn_fb_pick_broken']='មានអ្វីមួយមិនដំណើរការ';
-$ec_lang['lpn_fb_pick_wording']='ពាក្យសម្ដី ឬការបកប្រែមិនត្រឹមត្រូវ';
-$ec_lang['lpn_fb_pick_confusing']='នេះធ្វើឲ្យច្រឡំ';
-$ec_lang['lpn_fb_comment']='មតិយោបល់ (ស្រេចចិត្ត)';
-$ec_lang['lpn_fb_email']='អ៊ីមែល (ស្រេចចិត្ត ដាក់តែបើអ្នកចង់បានចម្លើយតប)';
-$ec_lang['lpn_fb_sends']='អ្វីដែលនេះផ្ញើ៖ ឈ្មោះទំព័រនេះ ភាសារបស់អ្នក កំណែនៃគេហទំព័រ លេខកូដនៃសារនៅលើផែនទី ប្រសិនបើមាន និងអ្វីដែលអ្នកបានជ្រើសរើស ឬវាយ។ មិនដែលផ្ញើគំនូរ ឬបណ្ដាញរបស់អ្នកទេ។ អាសយដ្ឋានអ៊ីមែលរបស់អ្នកត្រូវបានប្រើតែដើម្បីឆ្លើយតបទៅអ្នកប៉ុណ្ណោះ។';
-$ec_lang['lpn_fb_send']='ផ្ញើ';
-$ec_lang['lpn_fb_sending']='កំពុងផ្ញើ…';
-$ec_lang['lpn_fb_failed']='សារនោះមិនបានទៅដល់យើងទេ។ អ្វីដែលអ្នកបានសរសេរនៅតែនៅទីនេះ ដូច្នេះអ្នកអាចព្យាយាមម្ដងទៀត។';
-$ec_lang['lpn_fb_bad_email']='អាសយដ្ឋានអ៊ីមែលនោះមើលទៅមិនត្រឹមត្រូវ។ សូមកែវា ឬទុកឲ្យទទេ។';
-$ec_lang['lpn_fb_busy']='សារច្រើនពេកបានមកដល់ក្នុងប៉ុន្មាននាទីចុងក្រោយនេះ។ អ្វីដែលអ្នកបានសរសេរនៅតែនៅទីនេះ ដូច្នេះអ្នកអាចព្យាយាមម្ដងទៀតនៅពេលក្រោយ។';
-$ec_lang['lpn_tool_add_chain_tip']='ភ្ជាប់ថ្នាំង និងបំពង់ជាខ្សែសង្វាក់៖ ចុចចំណុចមួយនៅលើផែនទីដើម្បីបន្ថែមថ្នាំង បន្ទាប់មកចុចចំណុចបន្ទាប់នីមួយៗដើម្បីបន្ថែមបំពង់ និងថ្នាំង។ ចុចថ្នាំងដែលមានស្រាប់ ដើម្បីបន្តពីវា។ ចុច Esc ដើម្បីបញ្ចប់ខ្សែសង្វាក់។';
-$ec_lang['lpn_tool_add_shape']='រូបគូរ';
-$ec_lang['lpn_tool_add_shape_tip']='គូរចំណុច ខ្សែពហុបន្ទាត់ ឬពហុកោណលើផែនទី។ រូបគូរជាចំណារពន្យល់ ហើយមិនមែនជាផ្នែកនៃបណ្ដាញទេ។ ចុចចំណុចនីមួយៗ បន្ទាប់មកចុចចំណុចចុងក្រោយម្ដងទៀត ចុច Enter ឬចុចស្ដាំ ដើម្បីបញ្ចប់។ ចុចចំណុចដំបូងម្ដងទៀត ដើម្បីបិទរូបគូរជាពហុកោណ។';
-$ec_lang['lpn_pane_filter_sel_note']='ការជ្រើសរើសតែប៉ុណ្ណោះ។ កំពុងបង្ហាញ {n} ក្នុងចំណោម {all}។';
-$ec_lang['lpn_pane_filter_sel_and']='បានត្រងដោយ {q} និងការជ្រើសរើសតែប៉ុណ្ណោះ។ កំពុងបង្ហាញ {n} ក្នុងចំណោម {all}។';
-$ec_lang['lpn_pane_filter_sel_none']='ធាតុដែលបានជ្រើសរើសគ្មានមួយណានៅក្នុងតារាងនេះទេ។';
-$ec_lang['lpn_pane_sel_only']='ការជ្រើសរើសតែប៉ុណ្ណោះ';
-$ec_lang['lpn_pane_sel_only_none']='គ្មានធាតុណាមួយត្រូវបានជ្រើសរើសទេ។ សូមជ្រើសរើសធាតុនៅលើផែនទីជាមុនសិន។';
-$ec_lang['lpn_pane_scn_show']='បង្ហាញសេណារីយ៉ូ';
-$ec_lang['lpn_pane_clear_override']='សម្អាតតម្លៃផ្ទាល់ខ្លួន';
-$ec_lang['lpn_pane_scn_alt_tip']='{category} ជម្រើសជំនួស៖ {alternative}';
-$ec_lang['lpn_morph_menu']='ប្ដូរប្រភេទ';
-$ec_lang['lpn_morph_tip']='ប្ដូរថ្នាំងដែលបានជ្រើសរើសទៅជាថ្នាំង អាងស្តុក ឬធុងទឹក ឬប្ដូរតំណដែលបានជ្រើសរើសទៅជាបំពង់ ម៉ាស៊ីនបូម ឬវ៉ាល់។ ធាតុនីមួយៗរក្សាលេខសម្គាល់ ទីតាំង ការតភ្ជាប់ និងគ្រប់តម្លៃដែលប្រភេទថ្មីក៏មានដែរ។ ប្រសិនបើមានអ្វីនឹងបាត់បង់ អ្នកនឹងត្រូវបានសួរជាមុន។';
-$ec_lang['lpn_morph_ok']='ប្ដូរ';
-$ec_lang['lpn_change_type_lost']='តម្លៃទាំងនេះនឹងបាត់បង់៖';
-$ec_lang['lpn_change_type_key']='មួយបន្ទាត់ៗ៖ លេខសម្គាល់៖ លក្ខណៈសម្បត្តិ និងតម្លៃដែលនឹងបាត់បង់';
-$ec_lang['lpn_change_type_line']='{id}៖ {property} {value}';
-$ec_lang['lpn_change_type_line_scenario']='{id}៖ {property} {value} ក្នុងសេណារីយ៉ូ {scenario}';
-$ec_lang['lpn_change_type_more']='និងច្រើនទៀត {n}។';
-$ec_lang['lpn_change_type_surface']='ទាំងនេះរក្សាផ្ទៃទឹកនៅកន្លែងដដែល។ ក្បាលទឹករបស់អាងស្តុកគឺកម្ពស់របស់ធុងទឹកបូកនឹងជម្រៅទឹករបស់វា ហើយជម្រៅទឹករបស់ធុងទឹកគឺក្បាលទឹករបស់អាងស្តុកដកនឹងកម្ពស់របស់វា៖';
-$ec_lang['lpn_change_type_meaning']='ច្បាប់ត្រួតពិនិត្យ និងក្បួនទាំងនេះសាកល្បងថ្នាំងដែលកំពុងត្រូវបានប្ដូរ ហើយនឹងអានវាខុសគ្នា៖ ថ្នាំងត្រូវបានសាកល្បងដោយសម្ពាធរបស់វា ហើយធុងទឹក ឬអាងស្តុកត្រូវបានសាកល្បងដោយកម្រិតទឹករបស់វា។';
-$ec_lang['lpn_change_type_born']='តម្លៃទាំងនេះថ្មី ត្រូវបានកំណត់ដូចធាតុដែលទើបគូរថ្មី៖';
-$ec_lang['lpn_change_type_no_curve']='{id}៖ គ្មានខ្សែកោងក្បាលទឹកម៉ាស៊ីនបូម ដូច្នេះម៉ាស៊ីនបូមមិនបន្ថែមក្បាលទឹកទេ រហូតដល់ខ្សែកោងមួយត្រូវបានជ្រើសរើស ហើយការនាំចេញ .inp សរសេរវាជាបំពង់';
-$ec_lang['lpn_change_type_becomes']='{id}៖ {property} {value} ក្នុងសេណារីយ៉ូ {scenario} ក្លាយជា {new}';
-$ec_lang['lpn_change_type_customers']='មានតែបំពង់ប៉ុណ្ណោះដែលបម្រើអតិថិជន ដូច្នេះអតិថិជនទាំងនេះត្រូវបានភ្ជាប់ជំនួសទៅថ្នាំងដែលបង្ហាញក្នុងវង់ក្រចក ដែលតម្រូវការរបស់ពួកគេត្រូវបានអនុវត្តរួចហើយ។ ពួកគេនៅកន្លែងដែលពួកគេត្រូវបានគូរ ហើយតម្រូវការរបស់ពួកគេមិនផ្លាស់ប្ដូរទេ៖';
-$ec_lang['lpn_change_type_setting']='ច្បាប់ត្រួតពិនិត្យ និងក្បួនទាំងនេះផ្ដល់ ឬសាកល្បងការកំណត់នៃតំណដែលកំពុងត្រូវបានប្ដូរ។ ការកំណត់ជាបរិមាណផ្សេងគ្នាលើបំពង់ ម៉ាស៊ីនបូម និងវ៉ាល់ ដូច្នេះទាំងនេះនឹងអានវាខុសគ្នា៖';
-$ec_lang['lpn_change_type_rules']='បន្ទាត់ក្បួនទាំងនេះដាក់ឈ្មោះតំណតាមប្រភេទរបស់វា ហើយនឹងដាក់ឈ្មោះប្រភេទថ្មីរបស់វាជំនួសវិញ៖';
-$ec_lang['lpn_find_scope_source']='ប្រភព';
-$ec_lang['lpn_find_source_no_chemical']='គ្មានសារធាតុគីមីណាមួយកំពុងត្រូវបានតាមដានទេ ដូច្នេះគ្មានថ្នាំងណាមានប្រភពទេ។';
-$ec_lang['lpn_profile_open']='បើកឯកសារទម្រង់បណ្ដោយ EPANET…';
-$ec_lang['lpn_profile_file_done']='ទម្រង់បណ្ដោយត្រូវបានអានពីឯកសារ៖ រកឃើញថ្នាំង {used} ក្នុងចំណោម {total} នៅក្នុងបណ្ដាញនេះ។';
-$ec_lang['lpn_profile_file_missing']='មានឈ្មោះក្នុងឯកសារ ប៉ុន្តែមិននៅក្នុងបណ្ដាញនេះ៖ {ids}។';
-$ec_lang['lpn_profile_file_short']='ឯកសារនេះដាក់ឈ្មោះថ្នាំងតិចជាងពីរនៅក្នុងបណ្ដាញនេះ ដូច្នេះគ្មានទម្រង់បណ្ដោយត្រូវគូរទេ។';
-$ec_lang['lpn_pgraph_none']='ធាតុនេះគ្មានលទ្ធផលក្នុងការដំណើរការបច្ចុប្បន្នទេ។';
-$ec_lang['lpn_pgraph_source_share_from']='ចំណែកប្រភពពី {node}';
-$ec_lang['lpn_result_pump_head']='ក្បាលទឹក';
-$ec_lang['lpn_result_pump_head_tip']='ក្បាលទឹកដែលម៉ាស៊ីនបូមបន្ថែមពីចំណុចបឺតទៅចំណុចបញ្ចេញ បង្ហាញជាលេខវិជ្ជមាន។ ឧបករណ៍ដោះស្រាយ និងឯកសារ EPANET កត់ត្រាវាជាការបាត់បង់ក្បាលទឹកអវិជ្ជមាន។';
-$ec_lang['lpn_report_pump_head']='ក្បាលទឹកម៉ាស៊ីនបូម';
-$ec_lang['lpn_contour_show']='បង្ហាញបន្ទាត់ស្មើតម្លៃ';
-$ec_lang['lpn_contour_show_tip']='ដោះធីកដើម្បីលាក់ការបំពេញពណ៌ និងបន្ទាត់ស្មើតម្លៃ ធីកវិញដើម្បីយកវាត្រឡប់មកដូចដើម។ ពណ៌ថ្នាំងនៅដដែល។';
-$ec_lang['lpn_sysflow_title']='តុល្យភាពលំហូរ';
-$ec_lang['lpn_crs_suggested_mark']='(ដែលបានស្នើ)';
-$ec_lang['lpn_file_export_menu']='នាំចេញ…';
-$ec_lang['lpn_file_export_item_inp']='ឯកសារ EPANET…';
-$ec_lang['lpn_file_export_item_geojson']='ឯកសារ GeoJSON…';
-$ec_lang['lpn_status_inp_exported_picture']='បាននាំចេញ {zip} ដែលផ្ទុកឯកសារ EPANET {file} រូបភាពផ្ទៃខាងក្រោយរបស់វា {picture} និងឯកសារកូអរដោនេផែនទី {world}។ ស្រង់ចេញទាំងបីទៅក្នុងថតតែមួយ រួចបើក .inp នៅទីនោះក្នុង EPANET ហើយរូបភាពនឹងមកជាមួយ។';
-$ec_lang['lpn_status_inp_exported_no_picture']='បាននាំចេញ {file}។ មិនអាចរក្សាទុករូបភាពផ្ទៃខាងក្រោយបានទេ ដូច្នេះ .inp មិនដាក់ឈ្មោះរូបភាពណាមួយទេ។ ក្នុង EPANET សូមបន្ថែមវាដោយ View > Backdrop > Load។';
-$ec_lang['lpn_inp_export_difference_one']='រឿងមួយដែលទម្រង់ .inp មិនអាចផ្ទុកបាន។';
-$ec_lang['lpn_file_export_geojson_tip']='ទាញយកបណ្ដាញនេះជាឯកសារ GeoJSON សម្រាប់ QGIS, ArcGIS Pro និងកម្មវិធី GIS ផ្សេងទៀត។ ថ្នាំង ធុងទឹក និងអាងស្តុកជាចំណុច ហើយបំពង់ ម៉ាស៊ីនបូម និងវ៉ាល់ជាបន្ទាត់ដែលដើរតាមចំណុចកំណត់របស់វា។ ទីតាំងជាទទឹង និងបណ្ដោយ។ លទ្ធផលត្រូវបានបញ្ចូលតែនៅពេលបណ្ដាញត្រូវបានដោះស្រាយប៉ុណ្ណោះ។';
-$ec_lang['lpn_geojson_refused_local']='ឯកសារ GeoJSON ផ្ទុកតែទទឹង និងបណ្ដោយប៉ុណ្ណោះ ហើយគម្រោងនេះត្រូវបានគូរលើក្រឡាចត្រង្គមូលដ្ឋានដែលគ្មានទីតាំងលើផែនដី។ ដាក់តម្រៀបភូមិសាស្ត្រវាជាមុនសិនដោយ ផែនទី, ផែនទីពិភពលោក, ភ្ជាប់ រួចនាំចេញម្ដងទៀត។';
-$ec_lang['lpn_geojson_refused_range']='ទីតាំងទាំងនេះមិនមែនជាទទឹង និងបណ្ដោយត្រឹមត្រូវទេ៖ {detail}';
-$ec_lang['lpn_geojson_refused_crs']='ទំព័រនេះមិនស្គាល់ប្រព័ន្ធកូអរដោនេនៃគម្រោងនេះ ({detail}) ដូច្នេះទីតាំងរបស់វាមិនអាចបម្លែងទៅជាទទឹង និងបណ្ដោយបានទេ។ ប្រើ បម្លែងជា… ដើម្បីចម្លងគម្រោងទៅក្នុងប្រព័ន្ធដែលទំព័រនេះស្គាល់ រួចនាំចេញម្ដងទៀត។';
-$ec_lang['lpn_geojson_refused_empty']='មិនទាន់មានអ្វីត្រូវនាំចេញទេ។ សូមគូរ ឬបើកបណ្ដាញជាមុនសិន។';
-$ec_lang['lpn_geojson_results_in']='លទ្ធផលនៅលើអេក្រង់ត្រូវបានបញ្ចូល។';
-$ec_lang['lpn_geojson_results_out']='គ្មានលទ្ធផលត្រូវបានបញ្ចូលទេ ព្រោះបណ្ដាញមិនទាន់ត្រូវបានដោះស្រាយ។';
-$ec_lang['lpn_inp_backdrop_attach']='ភ្ជាប់ {file}…';
-$ec_lang['lpn_inp_backdrop_attach_tip']='ទំព័រគេហទំព័រមិនអាចបើករូបភាពតាមឈ្មោះរបស់វាបានទេ។ ជ្រើសរើសវាលើឧបករណ៍របស់អ្នក ហើយវានឹងត្រូវបានដាក់នៅកន្លែងដែលឯកសារបញ្ជាក់ថាវាស្ថិតនៅ។';
-$ec_lang['lpn_inp_backdrop_attached']='បានភ្ជាប់ {file} ដាក់នៅកន្លែងដែលឯកសារបញ្ជាក់ថាវាស្ថិតនៅ។';
-$ec_lang['lpn_inp_backdrop_attached_other']='បានភ្ជាប់ {picked} ដាក់នៅកន្លែងដែលឯកសារបញ្ជាក់ថាវាស្ថិតនៅ។ ឯកសារនេះដាក់ឈ្មោះ {file} ដែលជាឈ្មោះផ្សេង។';
-$ec_lang['lpn_copy_opened_unsaved']='បានបើក {file} ជាច្បាប់ចម្លង ជាមួយសោថ្មីដែលនឹងត្រូវបានរក្សាទុកនៅពេលរក្សាទុកឯកសារលើកក្រោយ។';
-$ec_lang['lpn_engine_unavailable_why']='វ៉ាល់ត្រួតត្រាសម្ពាធ និងលំហូរ (PRV, PSV, FCV) មិនអាចដោះស្រាយបានដោយគ្មានឧបករណ៍ដោះស្រាយ EPANET ទេ។ {reason}';
-$ec_lang['lpn_engine_needed_failed_why']='បណ្ដាញនេះអាចដោះស្រាយបានដោយឧបករណ៍ដោះស្រាយ EPANET តែប៉ុណ្ណោះ។ {reason}';
-$ec_lang['lpn_mode_add_chain']='របៀប៖ ខ្សែសង្វាក់ថ្នាំង-បំពង់។ ចុចចំណុចមួយនៅលើផែនទីដើម្បីបន្ថែមថ្នាំង បន្ទាប់មកចុចចំណុចបន្ទាប់នីមួយៗដើម្បីបន្ថែមបំពង់ និងថ្នាំង។ ចុចថ្នាំងដែលមានស្រាប់ ដើម្បីបន្តពីវា។ ចុច Esc ដើម្បីបញ្ចប់ខ្សែសង្វាក់។ ប្ដូរទៅរបៀប ជ្រើសរើស ដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ និងស្លាក។';
-$ec_lang['lpn_mode_add_shape']='របៀប៖ បន្ថែមរូបគូរ។ ចុចចំណុចនីមួយៗ។ ចុចចំណុចចុងក្រោយម្ដងទៀត ឬចុច Enter ដើម្បីបញ្ចប់ ចុចចំណុចដំបូងដើម្បីបិទពហុកោណ។';
-$ec_lang['lpn_cp_allow_tip']='អនុញ្ញាតតែតួអក្សរទាំងនេះ៖';
-$ec_lang['lpn_cp_characters_tip']='"@" មានន័យថាអក្សរណាមួយ; "#" មានន័យថាខ្ទង់លេខណាមួយ ហើយអ្នកត្រូវរាយ "-", ".", និង "," ដោយឡែកពីគ្នា ប្រសិនបើវាត្រូវបានអនុញ្ញាត; ហើយចន្លោះណាមួយត្រូវនៅរវាងតួអក្សរផ្សេងទៀត។';
-$ec_lang['lpn_valwarn_diameter']='អង្កត់ផ្ចិតបំពង់ ឬវ៉ាល់ជាធម្មតាស្ថិតនៅចន្លោះ {min} និង {max} {unit}។ សូមពិនិត្យលេខ និងខ្នាតអង្កត់ផ្ចិត។';
-$ec_lang['lpn_valwarn_hw']='តម្លៃ C របស់ Hazen-Williams ជាធម្មតាស្ថិតនៅចន្លោះ {min} និង {max}។ លេខនៅក្រៅជួរនោះច្រើនតែជាភាពរដិបរដុបសម្រាប់វិធីសាស្ត្រកកិតផ្សេង។';
-$ec_lang['lpn_valwarn_manning']='តម្លៃ n របស់ Manning ជាធម្មតាស្ថិតនៅចន្លោះ {min} និង {max}។ លេខនៅក្រៅជួរនោះច្រើនតែជាភាពរដិបរដុបសម្រាប់វិធីសាស្ត្រកកិតផ្សេង។';
-$ec_lang['lpn_valwarn_dw']='ភាពរដិបរដុបរបស់ Darcy-Weisbach ជាធម្មតាធំជាង 0 និងមិនលើស {max} {unit}។ លេខធំជាងនេះច្រើនតែជា C របស់ Hazen-Williams ឬ n របស់ Manning។';
-$ec_lang['lpn_valwarn_positive']='EPANET មិនទទួលយកលេខសូន្យ ឬលេខអវិជ្ជមាននៅទីនេះទេ។';
-$ec_lang['lpn_valwarn_negative']='EPANET មិនទទួលយកលេខអវិជ្ជមាននៅទីនេះទេ។';
-$ec_lang['lpn_valwarn_tank_levels']='EPANET មិនទទួលយកធុងទឹកនេះទេ។ ជម្រៅទឹកទាបបំផុតមិនត្រូវលើសពីជម្រៅទឹក ហើយជម្រៅទឹកមិនត្រូវលើសពីជម្រៅទឹកខ្ពស់បំផុតទេ។';
-$ec_lang['lpn_alt_calc_options']='ជម្រើសនៃការគណនា';
-$ec_lang['lpn_scenario_duration_tip']='ទុកឲ្យទទេដើម្បីទទួលតម្លៃពីមេ។ រយៈពេលដំណើរការសរុប 0:00 គឺជាការដំណើរការស្ថានភាពថេរ។';
-$ec_lang['lpn_scenario_hyd_step_tip']='ទុកឲ្យទទេដើម្បីទទួលតម្លៃពីមេ។';
-$ec_lang['lpn_time_scn_overrides']='តម្លៃផ្ទាល់ខ្លួនរបស់សេណារីយ៉ូ៖';
-$ec_lang['lpn_scenario_preset_mult_tip']='កត្តាគុណតម្រូវការ {mult} ដងនៃថ្ងៃមធ្យម ជាតម្លៃកន្លែងទុក។ ប្រព័ន្ធភាគច្រើនស្ថិតនៅចន្លោះ {lo} និង {hi} (National Research Council, 2006)។ កំណត់តម្លៃសម្រាប់ប្រព័ន្ធដែលកំពុងធ្វើគំរូ នៅក្នុង ការកំណត់, ការគណនា, ធារាសាស្ត្រ, កត្តាគុណតម្រូវការ។';
-$ec_lang['lpn_engine_failed_why']='{reason} កំពុងបង្ហាញឧបករណ៍ដោះស្រាយដែលភ្ជាប់មកជាមួយជំនួសវិញ។';
-$ec_lang['lpn_settings_basemap_style']='រចនាប័ទ្មផែនទីមូលដ្ឋាន';
-$ec_lang['lpn_basemap_style_normal']='ធម្មតា';
-$ec_lang['lpn_basemap_style_muted']='ស្រទន់';
-$ec_lang['lpn_basemap_style_faded']='ស្រាល';
-$ec_lang['lpn_basemap_style_grayscale']='ពណ៌ប្រផេះ';
-$ec_lang['lpn_time_statistic']='ស្ថិតិ';
-$ec_lang['lpn_time_stat_none']='គ្មាន';
-$ec_lang['lpn_time_stat_averaged']='មធ្យម';
-$ec_lang['lpn_time_stat_minimum']='អប្បបរមា';
-$ec_lang['lpn_time_stat_maximum']='អតិបរមា';
-$ec_lang['lpn_time_stat_range']='ជួរ';
-$ec_lang['lpn_time_no_engine_why']='ឧបករណ៍ដោះស្រាយខាងក្នុងគណនាតែមួយភ្លែតម្ដងៗ ដូច្នេះនេះជាបណ្ដាញនៅ {time} ប៉ុណ្ណោះ៖ លំនាំគ្រប់មួយត្រូវបានអានត្រង់ភ្លែតនោះ ហើយធុងទឹកនីមួយៗនៅតែជាប់នឹងកម្រិតចាប់ផ្ដើមរបស់វា ជំនួសឲ្យការបំពេញ និងបង្ហូរ។ {reason}';
-$ec_lang['lpn_time_engine_fetch_failed']='ការទាញយកឧបករណ៍ដោះស្រាយ EPANET បានបរាជ័យ។ ផ្ទុកទំព័រឡើងវិញដើម្បីព្យាយាមម្ដងទៀត។ ជញ្ជាំងភ្លើង ប្រូកស៊ី ឬផ្នែកបន្ថែមកម្មវិធីរុករកអាចកំពុងទប់ស្កាត់វា។';
-$ec_lang['lpn_time_engine_start_failed']='កម្មវិធីរុករកមិនព្រមចាប់ផ្ដើមឧបករណ៍ដោះស្រាយ EPANET ទេ។ WebAssembly អាចត្រូវបានបិទដោយការកំណត់សុវត្ថិភាព ឬផ្នែកបន្ថែម។';
-$ec_lang['lpn_time_engine_run_failed']='ការដំណើរការ EPANET បានបរាជ័យ។ នោះជាកំហុសនៅក្នុងទំព័រនេះ។ ប្រើតំណ {wrong} ដើម្បីរាយការណ៍វា។';
-$ec_lang['lpn_saved_project']='បានរក្សាទុកជាមួយគម្រោង';
-$ec_lang['lpn_saved_browser']='បានរក្សាទុកក្នុងកម្មវិធីរុករកនេះ';
-$ec_lang['lpn_saved_session']='មិនបានរក្សាទុក';
-$ec_lang['lpn_scncmp_at_time']='{value} នៅ {id}, {time}';
-$ec_lang['lpn_scncmp_same']='ដូចគ្នានៅក្នុងសេណារីយ៉ូគ្រប់មួយ';
-$ec_lang['lpn_scncmp_period_note']='នៅកន្លែងដែលសេណារីយ៉ូមានរយៈពេលដំណើរការសរុប សម្ពាធទាបបំផុត និងល្បឿនខ្ពស់បំផុតរបស់វាជាតម្លៃខ្លាំងនៃបណ្ដាញទាំងមូល នៅពេលវេលាដែលបានបង្ហាញ។';
-$ec_lang['lpn_choice_default']='លំនាំដើម';
-$ec_lang['lpn_ds_menu']='ការធ្វើមាត្រដ្ឋានតម្រូវការ…';
-$ec_lang['lpn_ds_menu_tip']='គុណតម្រូវការលើច្បាប់ចម្លងនៃបណ្ដាញ ហើយមើលសម្ពាធ និងល្បឿន ឬរកមាត្រដ្ឋានតម្រូវការធំបំផុតដែលប្រព័ន្ធអាចទទួលបាន។';
-$ec_lang['lpn_ds_title']='ការធ្វើមាត្រដ្ឋានតម្រូវការ';
-$ec_lang['lpn_ds_intro']='ចុចប៊ូតុង ដំណើរការ ដើម្បីគុណតម្រូវការនៅថ្នាំងដែលបានជ្រើសរើស ដោយមាត្រដ្ឋានតម្រូវការ ហើយមើលសម្ពាធ និងល្បឿន។\n\nចុចប៊ូតុង រក ដើម្បីរកមាត្រដ្ឋានតម្រូវការធំបំផុត ដល់ {step} ជិតបំផុត ដែលថ្នាំងទាំងនេះទាំងអស់រក្សាសម្ពាធទាបបំផុតដែលអនុញ្ញាតយ៉ាងតិច។ វារកពី 0 ដល់ {max}។\n\nទាំងពីរធ្វើការលើច្បាប់ចម្លងនៃបណ្ដាញ ដែលដោះស្រាយនៅជំហានពេលវេលាដែលនៅលើអេក្រង់ក្នុងសេណារីយ៉ូសកម្ម ដូច្នេះគ្មានអ្វីក្នុងគម្រោងត្រូវបានផ្លាស់ប្ដូរទេ។ មានតែជំហានពេលវេលានោះប៉ុណ្ណោះដែលត្រូវបានធ្វើមាត្រដ្ឋាន ហើយកម្រិត និងស្ថានភាពត្រូវបានយកពីវា។ ដើម្បីសាកល្បងកំពូល សូមផ្លាស់ទីនាឡិកាទៅតម្រូវការកំពូលមុនពេលដំណើរការ។';
-$ec_lang['lpn_ds_scope']='ថ្នាំងដែលត្រូវធ្វើមាត្រដ្ឋាន';
-$ec_lang['lpn_ds_scope_all']='ថ្នាំងទាំងអស់';
-$ec_lang['lpn_ds_scope_selected']='ថ្នាំងដែលបានជ្រើសរើស';
-$ec_lang['lpn_ds_minpressure']='សម្ពាធទាបបំផុតដែលអនុញ្ញាត';
-$ec_lang['lpn_ds_minpressure_tip']='នេះជាលេខដូចគ្នានឹង សម្ពាធទាបបំផុតដែលអនុញ្ញាត នៅកន្លែងផ្សេងក្នុងការវិភាគលំហូរពន្លត់អគ្គីភ័យ។ ការផ្លាស់ប្ដូរវានៅទីនេះផ្លាស់ប្ដូរវានៅទីនោះ។';
-$ec_lang['lpn_ds_head_scale']='ធ្វើមាត្រដ្ឋានតម្រូវការ';
-$ec_lang['lpn_ds_multiplier']='មាត្រដ្ឋានតម្រូវការ';
-$ec_lang['lpn_ds_multiplier_tip']='កត្តាដែលតម្រូវការនីមួយៗត្រូវបានគុណ។ 1.5 គឺការកើនឡើង 50%។ វាអនុវត្តបន្ថែមលើកត្តាគុណតម្រូវការនៃសេណារីយ៉ូសកម្ម ដែលមាននៅក្នុងតម្រូវការរួចហើយ ហើយវាមិនត្រូវបានរក្សាទុកក្នុងគម្រោងទេ។';
-$ec_lang['lpn_ds_run']='ដំណើរការ';
-$ec_lang['lpn_ds_head_search']='តើប្រព័ន្ធអាចទទួលបានមាត្រដ្ឋានតម្រូវការប៉ុន្មាន?';
-$ec_lang['lpn_ds_head_search_selected']='តើថ្នាំងទាំងនេះអាចទទួលបានមាត្រដ្ឋានតម្រូវការប៉ុន្មាន?';
-$ec_lang['lpn_ds_outside_below']='នៅមាត្រដ្ឋានតម្រូវការ {m} ថ្នាំងដែលមិនបានជ្រើសរើសហើយទាបជាង {pressure}៖ {n} ({ids})។ ពួកវាមិនកំណត់ចម្លើយនេះទេ។';
-$ec_lang['lpn_ds_holds_max']='✓ ថ្នាំងគ្រប់មួយរក្សា {pressure} រហូតដល់មាត្រដ្ឋានតម្រូវការ {max} ដែលជាកំពូលនៃការស្វែងរក។';
-$ec_lang['lpn_ds_below_zero']='⚠ យ៉ាងតិចមានថ្នាំងមួយទាបជាង {pressure} ទោះបីតម្រូវការដែលបានធ្វើមាត្រដ្ឋានស្មើសូន្យក៏ដោយ។';
-$ec_lang['lpn_ds_found']='✓ ថ្នាំងគ្រប់មួយដែលបានពិនិត្យរក្សា {pressure} យ៉ាងតិច រហូតដល់មាត្រដ្ឋានតម្រូវការ {m}។';
-$ec_lang['lpn_ds_found_below']='⚠ យ៉ាងតិចមានថ្នាំងមួយទាបជាង {pressure} ដោយគ្មានការធ្វើមាត្រដ្ឋានតម្រូវការ។ មាត្រដ្ឋានតម្រូវការធំបំផុតដែលរក្សាថ្នាំងគ្រប់មួយនៅ {pressure} ឬខ្ពស់ជាងគឺ {m}។';
-$ec_lang['lpn_ds_search_stopped']='ការស្វែងរកត្រូវបានបញ្ឈប់មុនពេលវារកឃើញចម្លើយ។';
-$ec_lang['lpn_ds_lowest_at']='នៅមាត្រដ្ឋានតម្រូវការ {m} សម្ពាធទាបបំផុតគឺ {pressure} នៅថ្នាំង {id}។';
-$ec_lang['lpn_ds_nosolve_at']='នៅមាត្រដ្ឋានតម្រូវការ {m} បណ្ដាញមិនបានផ្ដល់ចម្លើយទេ។ {reason}';
-$ec_lang['lpn_ds_scale_ok']='✓ នៅមាត្រដ្ឋានតម្រូវការ {m} ថ្នាំងគ្រប់មួយរក្សា {pressure}។';
-$ec_lang['lpn_ds_scale_below']='⚠ នៅមាត្រដ្ឋានតម្រូវការ {m} ថ្នាំងទាបជាង {pressure}៖ {n}។';
-$ec_lang['lpn_ds_scaled_selected']='ថ្នាំងដែលបានធ្វើមាត្រដ្ឋាន និងពិនិត្យ៖ {n}។';
-$ec_lang['lpn_ds_head_lowest']='សម្ពាធទាបបំផុត';
-$ec_lang['lpn_ds_head_velocity']='ល្បឿនខ្ពស់បំផុត';
-$ec_lang['lpn_ds_col_link']='តំណ';
-$ec_lang['lpn_ds_col_scaled']='ធ្វើមាត្រដ្ឋាន';
-$ec_lang['lpn_ds_col_scaled_tip']='ជាមួយតម្រូវការដែលគុណដោយមាត្រដ្ឋានតម្រូវការ។';
-$ec_lang['lpn_ds_col_unscaled']='មិនធ្វើមាត្រដ្ឋាន';
-$ec_lang['lpn_ds_col_unscaled_tip']='ជាមួយតម្រូវការដូចនៅក្នុងសេណារីយ៉ូសកម្មនៅជំហានពេលវេលានេះ ដែលជាតម្លៃដូចគ្នាដែលផែនទីបង្ហាញ។';
-$ec_lang['lpn_ds_no_junctions']='គម្រោងនេះមិនទាន់មានថ្នាំងទេ ដូច្នេះគ្មានតម្រូវការត្រូវធ្វើមាត្រដ្ឋានទេ។';
-$ec_lang['lpn_ds_no_selection']='គ្មានថ្នាំងណាមួយត្រូវបានជ្រើសរើសទេ។ សូមជ្រើសរើសថ្នាំង ឬជ្រើសរើស ថ្នាំងទាំងអស់។';
-$ec_lang['lpn_ds_skipped']='ធាតុដែលបានជ្រើសរើសដែលមិនមែនជាថ្នាំង ទុកដូចដើម៖ {n}។';
-$ec_lang['lpn_ds_bad_multiplier']='បញ្ចូលមាត្រដ្ឋានតម្រូវការសូន្យ ឬច្រើនជាងនេះ ដូចជា 1.5។';
-$ec_lang['lpn_ds_stale']='គំនូរបានផ្លាស់ប្ដូរ ដូច្នេះលទ្ធផលនៃការធ្វើមាត្រដ្ឋានតម្រូវការត្រូវបានសម្អាត។ សូមដំណើរការវាម្ដងទៀត។';
-$ec_lang['lpn_analyze_at_time']='ជំហានពេលវេលា៖ {time}។';
-$ec_lang['lpn_analyze_time_moved']='⚠ នេះត្រូវបានគណនានៅ {time} ហើយនាឡិកាឥឡូវនៅ {now}។ សូមដំណើរការវាម្ដងទៀតសម្រាប់ជំហានពេលវេលាដែលនៅលើអេក្រង់។';
+// Field codes (Task 771): the Description read as Carlson-style codes. See dev/survey-codes.md.
 $ec_lang['lpn_survey_codes_toggle']='អានការពិពណ៌នាជាលេខកូដវាល';
 $ec_lang['lpn_survey_codes_tip']='អានពាក្យទីមួយនៃការពិពណ៌នានីមួយៗជាលេខកូដពីតារាង។ ចំណុចដែលមានលេខកូដបន្ទាត់ដូចគ្នាភ្ជាប់គ្នាជាបំពង់មួយតាមលំដាប់ឯកសារ ហើយ WL1 និង WL2 ជាបន្ទាត់ដាច់ដោយឡែក។ +0 ចាប់ផ្ដើមបន្ទាត់ -0 បញ្ចប់មួយ ហើយ CLO បិទមួយ។ JPN បន្ទាប់ដោយឈ្មោះចំណុចភ្ជាប់ទៅចំណុចនោះ (Carlson) ហើយ Civil 3D សរសេរវាជា CPN។';
 $ec_lang['lpn_survey_codes_col_code']='លេខកូដ';
@@ -4240,6 +4718,8 @@ $ec_lang['lpn_result_demand_deficit_tip']='តម្រូវការនៅថ�
 $ec_lang['lpn_pda_deficit_note']='ថ្នាំងដែលទទួលតិចជាងតម្រូវការរបស់ពួកវា៖ {n}។';
 $ec_lang['lpn_diag_pda_pressures']='សម្ពាធដែលត្រូវការត្រូវតែធំជាងសម្ពាធអប្បបរមា។ សូមប្ដូរមួយក្នុងចំណោមពួកវានៅក្នុង ការកំណត់។';
 $ec_lang['lpn_inp_drop_pressure_unit']='ឯកសារនេះបញ្ជាក់ខ្នាតសម្ពាធក្រៅពីខ្នាតដែលទំព័រនេះអានសម្រាប់ខ្នាតលំហូររបស់វា ដែលជា psi សម្រាប់ខ្នាតអាមេរិក និងម៉ែត្រសម្រាប់ផ្សេងទៀត។ សម្ពាធទាំងអស់ក្នុងឯកសារត្រូវបានអានតាមរបៀបនោះ ដូច្នេះសូមពិនិត្យការកំណត់វ៉ាល់ ឧបករណ៍ចំណោចទឹក និងដែនកំណត់ផ្អែកលើសម្ពាធដែលវាមាន។ បន្ទាត់នេះត្រូវបានរក្សាទុក ហើយត្រូវបានសរសេរត្រឡប់វិញ។';
+
+// Map > Screenshot (Tom, 2026-10-05): a snipping tool that re-draws the dragged map area larger than its screen size (3x unless the Screenshot box says otherwise).
 $ec_lang['lpn_screenshot_menu']='រូបថតអេក្រង់';
 $ec_lang['lpn_screenshot_tip']='ថតរូបភាពនៃតំបន់ផែនទីដែលអ្នកអូស ដោយច្បាស់ជាងអេក្រង់។ គូសចំណាំលើវា រួចចម្លងវាទៅក្នុងរបាយការណ៍ដោយប៊ូតុង ចម្លង។ ចុចដោយមិនអូសដើម្បីថតផែនទីទាំងមូល។';
 $ec_lang['lpn_screenshot_hint']='អូសចតុកោណកែងលើផែនទី ឬចុចសម្រាប់ផែនទីទាំងមូល។ Esc បោះបង់។';
@@ -4256,119 +4736,5 @@ $ec_lang['lpn_snip_tip_pen']='ប៊ិច';
 $ec_lang['lpn_snip_tip_eraser']='ជ័រលុប៖ ចុចលើខ្សែដើម្បីដកវាចេញ (E)';
 $ec_lang['lpn_snip_tip_undo']='ត្រឡប់ក្រោយ (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='ធ្វើឡើងវិញ (Ctrl+Y)';
-$ec_lang['lpn_screenshot_scale_tip']='ទំហំរូបភាពជាច្រើនដងនៃតំបន់នៅលើអេក្រង់។ ធំជាងច្បាស់ជាង ហើយធ្វើឲ្យឯកសារធំជាង។';
-$ec_lang['points_data_points_heading']='ទិន្នន័យចំណុច<br />(ប្រើ ចម្លង ដើម្បីមើលទម្រង់)';
-$ec_lang['lpn_field_tank_base_elev']='កម្ពស់បាត';
-$ec_lang['lpn_tank_ground_elev_tip']='កម្ពស់ដីនៅធុងទឹក។ សម្ពាធនៅធុងទឹកត្រូវបានវាស់ពីទីនេះ ដូចនៅថ្នាំង។';
-$ec_lang['lpn_guide_about_heading']='អំពីម៉ាស៊ីនគណនានេះ';
-$ec_lang['lpn_guide_group_from']='ពីម៉ឺនុយ {menu}';
-$ec_lang['lpn_guide_menu_named']='ម៉ឺនុយ {menu}';
-$ec_lang['lpn_help_manual']='មគ្គុទ្ទេសក៍';
-$ec_lang['lpn_guide_contents']='មាតិកា';
-$ec_lang['lpn_guide_rail_hide']='លាក់មាតិកា';
-$ec_lang['lpn_guide_rail_show']='បង្ហាញមាតិកា';
-$ec_lang['lpn_guide_search']='ស្វែងរកក្នុងមគ្គុទ្ទេសក៍';
-$ec_lang['lpn_guide_boxes_heading']='ប្រអប់';
-$ec_lang['lpn_guide_boxes_intro']='ប្រអប់នីមួយៗអាចត្រូវបានផ្លាស់ទី ប្ដូរទំហំ ភ្ជាប់នៅខាងឆ្វេង ឬខាងស្ដាំនៃផែនទី ឬបិទ។ ? នៅរបារចំណងជើងរបស់ប្រអប់បើកជំនួយរបស់វា។';
-$ec_lang['lpn_guide_boxes_autohide']='នៅពេលទ្រនិចចេញទៅ ប្រអប់ដែលគ្មានការផ្ដោតនឹងលាក់បន្ទាប់ពីពេលខ្លីមួយ។ ប្រអប់ដែលមានការផ្ដោតលាក់នៅពេលអ្នកចុចខាងក្រៅវា ចុច Esc ឬចុច Tab ចេញពីវា ខណៈទ្រនិចនៅកន្លែងផ្សេង។';
-$ec_lang['lpn_guide_box_help']='ជំនួយសម្រាប់ប្រអប់នេះ';
-$ec_lang['lpn_guide_box_named']='ប្រអប់ {box}';
-$ec_lang['lpn_guide_dimmed']='ឈ្មោះដែលស្រអាប់គឺជាប៊ូតុងដែលកំពុងត្រូវបានលាក់នៅលើរបារឧបករណ៍។';
-$ec_lang['lpn_guide_text_popup']='បង្ហាញលក្ខណៈសម្បត្តិរបស់ធាតុ ឬអត្ថបទដែលបានជ្រើសរើស ឬរបស់ធាតុជាច្រើនដែលបានជ្រើសរើស នៅជាប់នឹងការជ្រើសរើស ឬនៅកន្លែងដែលប្រអប់ត្រូវបានផ្លាស់ទីចុងក្រោយ។ តម្លៃដែលបានកែប្រែផ្លាស់ប្ដូរបណ្ដាញភ្លាមៗ ហើយស្លាកផែនទីរបស់ធាតុ និងផ្ទាំងតារាងធ្វើតាម។ លទ្ធផលនៃការគណនាចុងក្រោយត្រូវបានរាយនៅខាងក្រោមធាតុបញ្ចូល ហើយមិនអាចកែសម្រួលបានទេ។';
-$ec_lang['lpn_guide_text_find_popup']='រកធាតុដែលបំពេញលក្ខខណ្ឌមួយ ដូចជាបំពង់ទាំងអស់ដែលតូចជាង 8 in. ឬថ្នាំងទាំងអស់ដែលមានសម្ពាធក្រោម 40 psi ហើយអាចប្ដូរលក្ខណៈសម្បត្តិមួយនៅលើធាតុទាំងអស់នោះក្នុងប្រតិបត្តិការតែមួយ។ ប្រើវាដើម្បីពិនិត្យគំរូមុនពេលដោះស្រាយ (កម្ពស់ដែលខ្វះ ឬអង្កត់ផ្ចិតដែលបញ្ចូលក្នុងឯកតាខុស) ដើម្បីរាយទីតាំងដែលមានបញ្ហាបន្ទាប់ពីដោះស្រាយ (សម្ពាធទាប ល្បឿនខ្ពស់) និងដើម្បីកែតែមួយលើធាតុជាច្រើន។\n\nបញ្ជី អ្វីត្រូវរក លក្ខណៈសម្បត្តិ លក្ខខណ្ឌ និង តម្លៃ បង្កើតលក្ខខណ្ឌមួយ ហើយសរសេរវាជាបន្ទាត់អត្ថបទក្នុងប្រអប់ សំណួរ។ បន្ទាត់នេះក៏អាចកែសម្រួលដោយផ្ទាល់បានដែរ ហើយបញ្ជីធ្វើតាម។ សំណួរដែលបញ្ជីមិនអាចបង្ហាញបាន ដូចជាលក្ខខណ្ឌពីរភ្ជាប់ដោយ OR លាក់បញ្ជី រហូតដល់ប៊ូតុង ប្រើប្រដាប់ត្រួតត្រាវិញ ត្រូវបានចុច។ ដើម្បីស្វែងរក ចុច Enter ក្នុងប្រអប់ សំណួរ ឬចុចប៊ូតុង រក។';
-$ec_lang['lpn_guide_text_settings_box']='ការកំណត់ទាំងអស់ និងប៊ូតុងកំណត់ឡើងវិញពីរ នៅក្នុងប្រអប់ការកំណត់។ គ្មានកន្លែងផ្សេងទៀតដើម្បីរកការកំណត់ទេ។ ប្រអប់នេះអាចស្វែងរកបាន៖ វាយពាក្យមួយ ឬច្រើនក្នុង ស្វែងរកការកំណត់ ដើម្បីរាយតែការកំណត់ដែលនិយាយពីពាក្យទាំងនោះទាំងអស់។ ការកំណត់ត្រូវបានរក្សាទុកជាមួយគម្រោង លើកលែងតែ បង្ហាញប្រអប់វឌ្ឍនភាពនៃការដំណើរការ និងការកំណត់ក្រោម ទំព័រ ដែលត្រូវបានរក្សាទុកក្នុងកម្មវិធីរុករកនេះ។ ទីតាំង និងទំហំរបស់ប្រអប់នេះក៏ត្រូវបានរក្សាទុកក្នុងកម្មវិធីរុករកនេះតែប៉ុណ្ណោះ។';
-$ec_lang['lpn_guide_text_library_box']='រក្សាលំនាំ ខ្សែកោង ប្រភេទបំពង់ គ្រឿងបំពង់ ច្បាប់ត្រួតពិនិត្យ និងក្បួនរបស់គម្រោង។ ធាតុមួយសំដៅទៅលំនាំ ខ្សែកោង ប្រភេទបំពង់ ឬគ្រឿងបំពង់ដោយលេខសម្គាល់របស់វា ហើយធាតុនោះត្រូវបានកែសម្រួលនៅទីនេះ។ ច្បាប់ត្រួតពិនិត្យ និងក្បួនអនុវត្តចំពោះបណ្ដាញទាំងមូល។ ក្បួនត្រូវបានអនុវត្តដោយម៉ាស៊ីន EPANET តែប៉ុណ្ណោះ។ ទាំងអស់ត្រូវបានរក្សាទុកជាមួយគម្រោង។';
-$ec_lang['lpn_guide_text_energy_box']='រាយការណ៍ការប្រើប្រាស់ថាមពល ថាមពលកំពូល និងថ្លៃដើមរបស់ម៉ាស៊ីនបូមនីមួយៗ លើការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់ចុងក្រោយ ដោយប្រើប្រសិទ្ធភាពរបស់ម៉ាស៊ីនបូមនីមួយៗ និងតម្លៃថាមពលដែលបានកំណត់ក្រោម ការកំណត់ ថាមពល។ វាត្រូវការ រយៈពេលដំណើរការសរុប ក្នុងការកំណត់ និងបណ្ដាញដែលបានដោះស្រាយ។ វាមិនផ្លាស់ប្ដូរបណ្ដាញទេ។';
-$ec_lang['lpn_guide_text_contour_box']='គ្រប់គ្រងផែនការបន្ទាត់ស្មើតម្លៃដែលគូរលើផែនទីពីតម្លៃថ្នាំងដែលបានជ្រើសក្នុង ដាក់ពណ៌ថ្នាំងតាម៖ គម្រោងពណ៌ ការបំពេញ និងភាពស្រអាប់របស់វា ចន្លោះ និងស្លាកនៃបន្ទាត់ស្មើតម្លៃ និងចម្ងាយដែលពណ៌ដល់ពីបំពង់នីមួយៗ។ ការបិទវាលាក់ផែនការ ហើយទុកពណ៌ថ្នាំង។ វាផ្លាស់ប្ដូរតែការបង្ហាញ មិនមែនបណ្ដាញទេ។';
-$ec_lang['lpn_guide_text_scncmp_box']='ដោះស្រាយគ្រប់សេណារីយ៉ូពីច្បាប់ចម្លងនៃគំនូរ ហើយតារាងសម្រាប់ម្នាក់ៗ នូវចំនួនតម្លៃជំនួស សម្ពាធទាបបំផុត និងល្បឿនខ្ពស់បំផុត។ វាមិនផ្លាស់ប្ដូរគម្រោងទេ ហើយសេណារីយ៉ូដែលកំពុងបើកនៅដដែល។';
-$ec_lang['lpn_guide_text_rptbox']='បង្ហាញរបាយការណ៍អត្ថបទដែលសរសេរដោយម៉ាស៊ីន EPANET សម្រាប់ការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់ចុងក្រោយ រួមទាំងការព្រមាន និងសេចក្តីសង្ខេបបណ្ដាញ។ ការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់នីមួយៗជំនួសវា ការដោះស្រាយនៅពេលតែមួយមិនជំនួសទេ ហើយការកែសម្រួលទុករបាយការណ៍មុននៅនឹងកន្លែង។';
-$ec_lang['lpn_guide_text_status_box']='រាយតាមលំដាប់ពេលវេលា រាល់ការផ្លាស់ប្ដូរក្នុងការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់ចុងក្រោយ៖ ម៉ាស៊ីនបូម វ៉ាល់ ឬបំពង់បើក ឬបិទ ធុងទឹកចាប់ផ្ដើមបំពេញ ឬបន្ទោរបង់ ឬពេញ ឬទទេ និងជំហានពេលវេលាណាមួយដែលមិនបានប្រសព្វគ្នាពេញលេញ។ មានតែការផ្លាស់ប្ដូរប៉ុណ្ណោះដែលត្រូវបានរាយ មិនមែនគ្រប់ជំហានពេលវេលាទេ។';
-$ec_lang['lpn_guide_text_alt_box']='បង្ហាញសម្រាប់សេណារីយ៉ូនីមួយៗ ថាវាប្រើជម្រើសជំនួសអ្វីក្នុងប្រភេទនីមួយៗ ដូចជា រូបវន្ត តម្រូវការ និង ការធ្វើឲ្យធាតុសកម្ម និងជម្រើសគណនារបស់វា៖ កត្តាគុណតម្រូវការ រយៈពេលដំណើរការសរុប និងចន្លោះពេលធារាសាស្ត្រ។ ជម្រើសជំនួសអាចអានបានតែប៉ុណ្ណោះ។ ជម្រើសគណនារបស់សេណារីយ៉ូអាចវាយនៅទីនេះបាន ហើយប្រអប់ទទេប្រើតម្លៃរបស់សេណារីយ៉ូមេ។ បើកវាពីម៉ឺនុយ សេណារីយ៉ូ បន្ទាប់ពីសម្អាត របៀបមូលដ្ឋាន។';
-$ec_lang['lpn_guide_text_full_box']='រាយគ្រប់ថ្នាំង និងគ្រប់តំណនៅគ្រប់ជំហានពេលវេលារាយការណ៍ ក្នុងឯកតាដែលបង្ហាញលើផ្ទាំងតារាង។ បើគ្មានការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់ វាបង្ហាញដំណោះស្រាយបច្ចុប្បន្ននៅពេលតែមួយ។ ទាញយក ឬបោះពុម្ពមានគ្រប់ជំហានពេលវេលា ហើយតារាងបង្ហាញម្ដងមួយ។';
-$ec_lang['lpn_guide_text_calib_box']='ប្រៀបធៀបឯកសារនៃការវាស់នៅវាល ជាមួយលទ្ធផលដែលបានគណនានៅទីតាំង និងពេលវេលាដូចគ្នា ឯកសារមួយសម្រាប់ប៉ារ៉ាម៉ែត្រនីមួយៗ។ ឯកសារត្រូវបានរក្សាទុកសម្រាប់សម័យបច្ចុប្បន្នតែប៉ុណ្ណោះ ហើយមិនត្រូវបានរក្សាទុកជាមួយគម្រោងទេ។';
-$ec_lang['lpn_guide_text_notes_popup']='រាយកំណត់ចំណាំអំពីរបៀបដែលទំព័រនេះដំណើរការ និងអ្វីដែលវាមិនធ្វើ ម្នាក់ៗជាពាក្យមួយតាមពីក្រោយដោយនិយមន័យរបស់វា។ វាមិនផ្លាស់ប្ដូរបណ្ដាញទេ។';
-$ec_lang['lpn_guide_text_hotkeys_popup']='រាយគ្រប់ប៊ូតុងរបារឧបករណ៍ និងជួរដេកម៉ឺនុយ ផ្លូវកាត់ក្តារចុច និងធាតុសម្រាប់ប្រអប់នីមួយៗ។ ការជ្រើសរើសជួរដេកមួយបង្ហាញកន្លែងដែលការគ្រប់គ្រងនោះនៅ ហើយមិនដំណើរការវាទេ។ ដើម្បីស្វែងរក ចុច Ctrl+K ពីគ្រប់ទីកន្លែង ឬ / ពេលមគ្គុទ្ទេសក៍មានការផ្ដោត។';
-$ec_lang['lpn_guide_find_query_term']='ភាសាសំណួរ';
-$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>លក្ខខណ្ឌមួយ។ វិសាលភាពគឺ ទាំងអស់ ថ្នាំង អាងស្តុក ធុងទឹក បំពង់ ម៉ាស៊ីនបូម វ៉ាល់ អត្ថបទ អតិថិជន ឬ ប្រភព។ លក្ខណៈសម្បត្តិគឺធាតុណាមួយក្នុងបញ្ជី លក្ខណៈសម្បត្តិ សម្រាប់វិសាលភាពនោះ។</td></tr><tr><td>លក្ខខណ្ឌ</td><td>ស្មើនឹង ធំជាង តូចជាង មាន ខ្ពស់បំផុត n ទាបបំផុត n និង ទទេ។ មាន អនុវត្តចំពោះអត្ថបទតែប៉ុណ្ណោះ។ ក្នុង ខ្ពស់បំផុត n និង ទាបបំផុត n n ជាចំនួន ដូចក្នុង ខ្ពស់បំផុត 5។ ប្រសិនបើប្រអប់ តម្លៃ ទទេ ឬ n ជាអក្សរ n ខ្លួនឯង ដូចក្នុង <code>Pipe.Velocity n highest</code> ធាតុ 10 ត្រូវបានរាយ។ ទទេ រកធាតុដែលគ្មានតម្លៃសម្រាប់លក្ខណៈសម្បត្តិ។ ការតភ្ជាប់មានលក្ខខណ្ឌបួន ហើយមិនយកតម្លៃទេ។</td></tr><tr><td>តម្លៃ</td><td>លេខត្រូវបានបញ្ចូលដោយគ្មានឯកតា ក្នុងឯកតាដែលបង្ហាញក្នុង លក្ខណៈសម្បត្តិ និងលើផ្ទាំងតារាង៖ 40 មិនមែន 40 psi។ អត្ថបទ រួមទាំងលេខសម្គាល់ ត្រូវបានដាក់ក្នុងសញ្ញាអញ្ញប្រកាសតែមួយ ឬពីរ៖ <code>\'60\'</code>។</td></tr><tr><td>AND, OR និងវង់ក្រចក</td><td>AND ត្រូវបានគណនាមុន OR ហើយវង់ក្រចកដាក់លក្ខខណ្ឌជាក្រុម។ NOT មិនមានទេ។</td></tr><tr><td>ការប្រកប</td><td>ពាក្យមិនប្រកាន់អក្សរធំតូចទេ។ ពាក្យអង់គ្លេសត្រូវបានទទួលយកក្នុងគ្រប់ភាសា ដូច្នេះសំណួរដែលចម្លងពីមគ្គុទ្ទេសក៍នេះដំណើរការលើទំព័រក្នុងភាសាណាក៏បាន។</td></tr></tbody></table>';
-$ec_lang['lpn_guide_find_examples_term']='ឧទាហរណ៍ដែលបានគណនាលើ Net3';
-$ec_lang['lpn_guide_find_examples_def']='<p>បើកឧទាហរណ៍ Net3 ដើម្បីធ្វើតាម។ សម្ពាធជា psi ហើយល្បឿនជា ft/s។</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>ថ្នាំង 60 និងបំពង់ 60។ ថ្នាំងមួយ និងបំពង់មួយអាចមានលេខសម្គាល់ដូចគ្នា ដូច្នេះការស្វែងរកលេខសម្គាល់ក្រោម ទាំងអស់ អាចត្រឡប់ធាតុច្រើនជាងមួយ។</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>ថ្នាំង 10, 40, 50, 20 និង 153 សម្ពាធទាបបំផុតមុន។ ថ្នាំង 10 នៅ -0.6 psi ជាសម្ពាធអវិជ្ជមានដែលត្រូវពិនិត្យឡើងវិញ។</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>បំពង់ 60, 329, 125, 123 និង 149 ល្បឿនខ្ពស់បំផុតមុន។ បំពង់ 60 ដឹក 9.3 ft/s។</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>ថ្នាំង 10, 20, 40 និង 50 និងបំពង់ 60, 125 និង 329៖ សម្ពាធទាប និងល្បឿនខ្ពស់ក្នុងបញ្ជីតែមួយ។</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>ថ្នាំង 10, 20, 40 និង 50 ជាសម្ពាធទាបនៅលើដីខ្ពស់។ លក្ខខណ្ឌទាំងពីរត្រូវតែនិយាយពីប្រភេទធាតុតែមួយ៖ <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> មិនត្រូវនឹងអ្វីទេ ព្រោះគ្មានធាតុណាជាទាំងថ្នាំង និងបំពង់ទេ។</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>បំពង់ 330 ជាបំពង់តែមួយដែលបិទក្នុងឯកសារ Net3។</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>គ្មានអ្វីទេ ដូចឯកសារដែលបានចែកចាយ។ ជាមួយបំពង់ 247 បិទ (មើល ជំនួស និងត្រឡប់ក្រោយ) ថ្នាំង 215, 217, 219 និង 225៖ ថ្នាំងដែលការបែកបំពង់ 247 នឹងទុកដោយគ្មានការផ្គត់ផ្គង់។ ការធ្វើបែបនេះម្ដងទៀតសម្រាប់បំពង់នីមួយៗគឺជាការវិភាគភាពសំខាន់។</td></tr></tbody></table>';
-$ec_lang['lpn_guide_find_results_term']='លទ្ធផល ការជ្រើសរើស និងតារាង';
-$ec_lang['lpn_guide_find_results_def']='<p>ធាតុដែលត្រូវគ្នាត្រូវបានរាយនៅខាងក្រោមប៊ូតុង រក។ ធំជាង និង ខ្ពស់បំផុត n រាយតម្លៃខ្ពស់បំផុតមុន តូចជាង និង ទាបបំផុត n រាយតម្លៃទាបបំផុតមុន ហើយលក្ខខណ្ឌផ្សេងទៀតរាយតាមតម្លៃដែលរកឃើញ បន្ទាប់មកតាមលេខសម្គាល់។ សំណួរដែលមាន AND ឬ OR រាយថ្នាំង បន្ទាប់មកតំណ ម្នាក់ៗតាមលេខសម្គាល់។ ការត្រូវគ្នាតែមួយត្រូវបានបង្ហាញលើផែនទីភ្លាមៗ។ ជ្រើសរើសជួរដេកមួយដើម្បីដាក់ផែនទីនៅចំកណ្ដាលធាតុនោះ។ បើគ្មានអ្វីត្រូវបានជ្រើសរើស ធាតុក៏ត្រូវបានជ្រើសរើសដែរ បើមាន ធាតុត្រូវបានគូសបញ្ជាក់ ហើយការជ្រើសរើសមិនប្ដូរទេ។ Shift+click ឬ Ctrl+click ជួរដេកមួយដើម្បីបន្ថែមវាទៅការជ្រើសរើស ឬដកវាចេញ។ ប៊ូតុង រក មិនជ្រើសរើសការត្រូវគ្នាទាំងអស់ដោយខ្លួនឯងទេ។</p><p>ប៊ូតុង ត្រងក្នុងតារាងបច្ចុប្បន្ន អនុវត្តសំណួរដូចគ្នាទៅផ្ទាំងតារាង។ តារាងនីមួយៗដែលសំណួរអនុវត្តបង្ហាញតែជួរដេកដែលត្រូវគ្នា ជាមួយសំណួរ និងចំនួនជួរដេកនៅខាងលើ។ ដើម្បីជ្រើសរើសការត្រូវគ្នាទាំងអស់លើផែនទី ជ្រើសរើសជួរដេកទាំងនោះ ហើយជ្រើស ជ្រើសរើសលើផែនទី ពីម៉ឺនុយចុចស្ដាំ។ តម្រងតារាងមិនត្រូវបានរក្សាទុកជាមួយគម្រោងទេ ហើយបញ្ចប់ពេលទំព័រត្រូវបានផ្ទុកឡើងវិញ។ ជួរដេកដែលត្រូវបានកែរហូតមិនត្រូវគ្នាទៀតនៅក្នុងតារាង ស្រអាប់ និងមានសញ្ញាព្រមាន រហូតដល់ប៊ូតុង ត្រងក្នុងតារាងបច្ចុប្បន្ន ត្រូវបានចុចម្ដងទៀត។</p>';
-$ec_lang['lpn_guide_find_replace_term']='ជំនួស និងត្រឡប់ក្រោយ';
-$ec_lang['lpn_guide_find_replace_def']='<p>ផ្នែក ប្ដូរអ្វីដែលបានរកឃើញ នៃប្រអប់សរសេរលក្ខណៈសម្បត្តិមួយលើគ្រប់ធាតុដែលសំណួររកឃើញ។ ជ្រើសលក្ខណៈសម្បត្តិក្នុងបញ្ជី លក្ខណៈសម្បត្តិត្រូវប្ដូរ បញ្ចូលតម្លៃថ្មីក្នុងប្រអប់ តម្លៃថ្មី ក្នុងឯកតាដែលបង្ហាញ ហើយចុចប៊ូតុង ជំនួស។ បន្ទាប់មកប្រអប់ប្រាប់ចំនួនធាតុដែលនឹងផ្លាស់ប្ដូរ មិនរាប់ធាតុដែលមានតម្លៃថ្មីរួចហើយ។ ចុចប៊ូតុង ប្ដូរពួកវា ដើម្បីអនុវត្តការផ្លាស់ប្ដូរ ឬ បោះបង់។ ការត្រឡប់ក្រោយម្ដងដកចេញការជំនួសទាំងមូល។</p><p>ឧទាហរណ៍លើ Net1៖ <code>Pipe.Diameter below 10</code> រកឃើញបំពង់ 31, 122, 113 និង 121។ ជ្រើស អង្កត់ផ្ចិត បញ្ចូល 10 ហើយចុច ជំនួស៖ ប្រអប់បង្ហាញ "ប្ដូរធាតុ 4?"។ ចុច ប្ដូរពួកវា ដើម្បីកំណត់បំពង់ទាំងបួនទៅ 10 in.។ ការត្រឡប់ក្រោយម្ដងប្ដូរពួកវាត្រឡប់ទៅ 6 និង 8 in.។</p><p>ឧទាហរណ៍លើ Net3៖ <code>Pipe.ID equal to \'247\'</code> រកឃើញបំពង់ 247។ ជ្រើស បិទ ជ្រើស បិទ ម្ដងទៀតក្នុងបញ្ជី តម្លៃថ្មី ហើយចុច ជំនួស បន្ទាប់មក ប្ដូរពួកវា ដើម្បីបិទបំពង់សម្រាប់ឧទាហរណ៍ការតភ្ជាប់ខាងលើ។ ត្រឡប់ក្រោយបើកវាម្ដងទៀត។</p><p>ការជំនួសត្រូវការប្រភេទធាតុតែមួយ ដូច្នេះក្រោម ទាំងអស់ ជ្រើសប្រភេទធាតុជាមុនក្នុងបញ្ជី អ្វីត្រូវរក។ ក្នុងសេណារីយ៉ូក្រៅពី មូលដ្ឋាន ការជំនួសត្រូវបានរក្សាទុកក្នុងសេណារីយ៉ូនោះ ដូចការកែដូចគ្នាក្នុងលក្ខណៈសម្បត្តិ។ កន្លែងដែលកម្ពស់ Mapbox មាន កម្ពស់អាចត្រូវបានជំនួសពី Mapbox DEM ជំនួសតម្លៃដែលវាយ។</p>';
-$ec_lang['lpn_guide_find_notes_term']='ចំណុចដែលត្រូវកត់សម្គាល់';
-$ec_lang['lpn_guide_find_notes_def']='<ul><li>តម្លៃត្រូវបានប្រៀបធៀបដោយភាពជាក់លាក់ពេញលេញ ហើយរាយដល់ខ្ទង់ទសភាគបួន។ ស្មើនឹង កម្រត្រូវនឹងលទ្ធផលដែលបានគណនាណាស់ ដូច្នេះប្រើ ធំជាង និង តូចជាង។</li><li>សម្ពាធ ក្បាលទឹក លំហូរ ល្បឿន និងលទ្ធផលផ្សេងទៀតគឺជារបស់ការគណនាចុងក្រោយ។ ពេលការកំណត់ គណនាឡើងវិញដោយស្វ័យប្រវត្តិ ត្រូវបានសម្អាត វាពិពណ៌នាបណ្ដាញដូចដែលវាជាពេលគណនាចុងក្រោយ។</li><li>ធំជាង និង តូចជាង លើអត្ថបទប្រើលំដាប់វចនានុក្រម ជាមួយលេខតាមលំដាប់លេខ៖ លើ Net1 <code>Junction.ID above \'20\'</code> រកឃើញថ្នាំង 21, 22, 23, 31 និង 32។</li><li>ក្រោម ទាំងអស់ មានតែ លេខសម្គាល់ ការពិពណ៌នា ស្លាកសម្គាល់ និង ការតភ្ជាប់ ប៉ុណ្ណោះដែលផ្ដល់ជូន។ ជ្រើសប្រភេទធាតុក្នុងបញ្ជី អ្វីត្រូវរក ដើម្បីមើលបញ្ជីលក្ខណៈសម្បត្តិពេញលេញរបស់វា។</li><li>ធាតុអត្ថបទមិនមានលេខសម្គាល់ទេ។ ស្វែងរកវាតាមពាក្យរបស់វា ដូចក្នុង <code>Text.Text contains \'pump\'</code>។</li><li>លក្ខខណ្ឌ ការតភ្ជាប់ បួនសម្រាប់ថ្នាំងគឺ គ្មានតំណភ្ជាប់នៅថ្នាំង គ្មានតំណភ្ជាប់បើកនៅថ្នាំង គ្មានផ្លូវតំណភ្ជាប់ទៅប្រភព និង គ្មានផ្លូវបើកទៅប្រភព។ ប្រភពគឺអាងស្តុក ឬធុងទឹក។</li></ul>';
-$ec_lang['lpn_guide_using_heading']='ការប្រើមគ្គុទ្ទេសក៍';
-$ec_lang['lpn_guide_keys_term']='ផ្លូវកាត់ក្តារចុចមគ្គុទ្ទេសក៍';
-$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>បើកមគ្គុទ្ទេសក៍នៅការគ្រប់គ្រងក្រោមទ្រនិច ឬដែលមានការផ្ដោត។</td></tr><tr><td>F1</td><td>បើកមគ្គុទ្ទេសក៍នៅធាតុសម្រាប់ប្រអប់ដែលមានការផ្ដោត។</td></tr><tr><td>Ctrl+K</td><td>បើកមគ្គុទ្ទេសក៍ដោយដាក់អត្ថបទដែលបានជ្រើសរើសក្នុងវាលស្វែងរក។</td></tr><tr><td>/</td><td>ជ្រើសរើសវាលស្វែងរកពេលមគ្គុទ្ទេសក៍មានការផ្ដោត។</td></tr><tr><td>Esc</td><td>បិទមគ្គុទ្ទេសក៍ ហើយត្រឡប់ទៅកន្លែងដែលអ្នកនៅ។</td></tr></tbody></table>';
-$ec_lang['lpn_guide_also']='ក៏នៅក្នុងម៉ឺនុយ {menu}';
-$ec_lang['lpn_guide_how_popup']='លក្ខណៈសម្បត្តិបើកពេលអ្នកជ្រើសរើសធាតុ ឬអត្ថបទ។';
-$ec_lang['lpn_guide_how_alt']='ការមើលជាមុនជម្រើសជំនួសត្រូវបានរាយក្រោម ទឹក សេណារីយ៉ូ ពេល របៀបមូលដ្ឋាន បិទ។';
-$ec_lang['lpn_guide_not_shown']='ការគ្រប់គ្រងនេះមិននៅលើអេក្រង់ឥឡូវនេះទេ។';
-$ec_lang['lpn_hotkeys_zoomwin_def']='បង្អួចពង្រីក៖ អូសចតុកោណលើផែនទីដើម្បីពង្រីកទៅតំបន់នោះ។';
-$ec_lang['lpn_status_dismiss']='លាក់សារនេះ';
-$ec_lang['lpn_msglog_hidden']='បានលាក់';
-$ec_lang['lpn_msglog_unhide']='បង្ហាញ';
-$ec_lang['lpn_status_hidden_tip']='បង្ហាញសារដែលបានលាក់លើផែនទីម្ដងទៀត។';
-$ec_lang['lpn_result_depth']='ជម្រៅ';
-$ec_lang['lpn_result_depth_tip']='ជម្រៅទឹកក្នុងធុងទឹកនៅពេលដែលបានបង្ហាញ វាស់ឡើងលើពីបាតធុង៖ ក្បាលទឹកដកកម្ពស់ធុងទឹក។';
-$ec_lang['lpn_result_tank_volume']='ទំហំដែលអាចប្រើបាន';
-$ec_lang['lpn_result_tank_volume_tip']='ទំហំទឹកខាងលើជម្រៅទឹកទាបបំផុត ដូច្នេះវាជាសូន្យនៅជម្រៅនោះ។ ទំហំធុងទឹក EPANET ក៏រួមទាំងទឹកខាងក្រោមជម្រៅទឹកទាបបំផុតដែរ ដែលនៅតែរាប់សម្រាប់ការលាយ និងអាយុទឹក ដូច្នេះកម្ពស់ធុងទឹកនៅបាតធុង។';
-$ec_lang['lpn_pane_copy_heads']='ចម្លងជាមួយក្បាលជួរឈរ';
-$ec_lang['lpn_export_table_title']='នាំចេញទៅ {format}';
-$ec_lang['lpn_export_table_current']='បច្ចុប្បន្ន';
-$ec_lang['lpn_export_table_all']='ទាំងអស់';
-$ec_lang['lpn_export_table_go']='នាំចេញ';
-$ec_lang['lpn_export_table_scn_note']='លទ្ធផលត្រូវបាននាំចេញសម្រាប់សេណារីយ៉ូដែលបានគណនាចុងក្រោយតែប៉ុណ្ណោះ។';
-$ec_lang['lpn_file_export_item_ods']='ឯកសារ ODS…';
-$ec_lang['lpn_file_export_item_xlsx']='ឯកសារ XLSX…';
-$ec_lang['lpn_file_export_item_csv']='ឯកសារ CSV…';
-$ec_lang['lpn_file_export_tables_tip']='ទាញយកតារាងដូចផ្ទាំងតារាងបង្ហាញ ក្នុងសៀវភៅការងារតែមួយ ដែលមានសន្លឹកមួយសម្រាប់តារាងនីមួយៗ (និងសម្រាប់សេណារីយ៉ូនីមួយៗដែលអ្នកជ្រើស) បូកសន្លឹកមួយសម្រាប់បណ្ណាល័យនីមួយៗដែលលេខសម្គាល់របស់ពួកវាសំដៅទៅ៖ លំនាំ ខ្សែកោង ប្រភេទបំពង់ និងគ្រឿងបំពង់។ លទ្ធផលត្រូវបានរួមបញ្ចូលសម្រាប់សេណារីយ៉ូដែលបានគណនាចុងក្រោយតែប៉ុណ្ណោះ។';
-$ec_lang['lpn_file_export_csv_tip']='ទាញយកតារាងមួយដូចផ្ទាំងតារាងបង្ហាញ។ តារាងមួយមកជាឯកសារ CSV តែមួយ ដោយគ្មានបណ្ណាល័យ។ តារាង ឬសេណារីយ៉ូច្រើនមកជាឯកសារ zip មួយនៃឯកសារ CSV ជាមួយឯកសារមួយសម្រាប់បណ្ណាល័យនីមួយៗដែលលេខសម្គាល់របស់ពួកវាសំដៅទៅ។ លទ្ធផលត្រូវបានរួមបញ្ចូលសម្រាប់សេណារីយ៉ូដែលបានគណនាចុងក្រោយតែប៉ុណ្ណោះ។';
-$ec_lang['lpn_file_export_item_dxf']='ឯកសារ DXF…';
-$ec_lang['lpn_file_export_dxf_tip']='ទាញយកបណ្ដាញនេះសម្រាប់ AutoCAD និងកម្មវិធី CAD ផ្សេងទៀត៖ ថ្នាំងជាប្លុកសញ្ញា បំពង់ ម៉ាស៊ីនបូម និងវ៉ាល់ជា polyline ហើយគ្រប់ធាតុជាប្លុកដែលគុណលក្ខណៈរបស់វាមានលេខសម្គាល់ និងតម្លៃលក្ខណៈសម្បត្តិក្នុងឯកតាគម្រោង។';
-$ec_lang['lpn_dxf_export_no_utm']='ឯកសារ DXF មិនត្រូវបានសរសេរទេ៖ បណ្ដាញនេះស្ថិតនៅក្រៅរយៈទទឹងដែល UTM គ្របដណ្ដប់ (80° S ដល់ 84° N) ហើយគំនូរត្រូវការក្រឡាចត្រង្គសំប៉ែតដើម្បីគូរលើ។';
-$ec_lang['lpn_dxf_export_refused']='ឯកសារ DXF មិនត្រូវបានសរសេរទេ៖ ការបំលែងកូអរដោនេដែលវាត្រូវការមិនបានផ្ទុកទេ។ ពិនិត្យការតភ្ជាប់ ហើយព្យាយាមម្ដងទៀត។';
-$ec_lang['lpn_dxf_export_failed']='ឯកសារ DXF មិនត្រូវបានសរសេរទេ៖ កំហុសក្នុងទំព័រនេះបានបញ្ឈប់វា ({error})។';
-$ec_lang['lpn_dxf_note_grid']='កូអរដោនេ៖ X និង Y របស់គម្រោងនេះ ក្នុង {unit}។ គ្មានប្រព័ន្ធកូអរដោនេត្រូវបានបញ្ជាក់ទេ។';
-$ec_lang['lpn_dxf_note_crs']='កូអរដោនេ៖ {crs} ដូចដែលគម្រោងនេះបញ្ជាក់ទាំងស្រុង។';
-$ec_lang['lpn_dxf_note_geo']='កូអរដោនេ៖ {crs} ក្នុងម៉ែត្រ មិនមែនរយៈទទឹង និងរយៈបណ្ដោយទេ។ រយៈទទឹង និងរយៈបណ្ដោយរបស់គម្រោងត្រូវបានបំលែងទៅក្រឡាចត្រង្គនោះ។';
-$ec_lang['lpn_dxf_exported_geo']='បាននាំចេញ {file}។ កូអរដោនេរបស់វាគឺ {crs} ក្នុងម៉ែត្រ មិនមែនរយៈទទឹង និងរយៈបណ្ដោយទេ។';
-$ec_lang['lpn_dxf_note_blocks']='ស្រទាប់ត្រូវបានដាក់ឈ្មោះ {prefix} កូដធាតុ សហសញ្ញា និងជម្រើសជំនួស ដូចក្នុង {example}។ ធាតុនីមួយៗជាប្លុកដែលបញ្ចូលនៅមាត្រដ្ឋាន 1 ជាមួយគុណលក្ខណៈខ្ពស់ 1 ឯកតា៖ ធ្វើមាត្រដ្ឋានប្លុកដើម្បីកំណត់កម្ពស់អក្សរ។ រាល់គុណលក្ខណៈមើលឃើញ គុណលក្ខណៈរបស់ធាតុមួយត្រូវបានជង់ក្នុងជួរឈរមួយនៅជាប់និមិត្តសញ្ញារបស់វា។';
-$ec_lang['lpn_dxf_note_shortened']='តម្លៃ {n} វែងជាងដែលឯកសារ DXF អនុញ្ញាត ({max} តួអក្សរ) ដូច្នេះនីមួយៗត្រូវបានកាត់ខ្លី ហើយបញ្ចប់ដោយចុចបីដង។';
-$ec_lang['lpn_dxf_note_categories']='ថ្នាំង {n} មានប្រភេទតម្រូវការច្រើនជាងមួយ។ គុណលក្ខណៈ {tag} របស់ពួកវាផ្ទុកផលបូកនៃតម្រូវការមូលដ្ឋាននៃគ្រប់ប្រភេទ។';
-$ec_lang['lpn_file_export_item_workspace']='កន្លែងធ្វើការ…';
-$ec_lang['lpn_file_export_workspace_tip']='ទាញយកឯកសារតូចមួយដែលផ្ទុកកន្លែងដែលប្រអប់របស់អ្នកនៅ ទំហំរបស់ពួកវា ប្រអប់ណាបើក ឬភ្ជាប់ និងទំហំផ្ទាំង និងជួរឈររបស់អ្នក បូកជម្រើសបង្ហាញនៃទំព័រនេះ ដូចជាពពុះជំនួយ និងកាតពេលដាក់ទ្រនិចណាដែលបង្ហាញ។ គម្រោង ការកំណត់គម្រោង និងខូគីរបស់អ្នក (ភាសា ការយល់ព្រម ឯកតា) មិននៅក្នុងវាទេ។ ផ្ទុកវាលើអេក្រង់ ឬកម្មវិធីរុករកផ្សេងដោយ ឯកសារ នាំចូល កន្លែងធ្វើការ។';
-$ec_lang['lpn_file_import_workspace']='កន្លែងធ្វើការ…';
-$ec_lang['lpn_file_import_workspace_tip']='អនុវត្តឯកសារកន្លែងធ្វើការដែលបានរក្សាទុកដោយ ឯកសារ នាំចេញ កន្លែងធ្វើការ៖ ទីតាំង និងទំហំប្រអប់ ការភ្ជាប់ ទំហំផ្ទាំង និងជម្រើសបង្ហាញនៃទំព័រនេះ ដូចជាពពុះជំនួយ និងកាតពេលដាក់ទ្រនិចណាដែលបង្ហាញ។ គម្រោង និងខូគីរបស់អ្នកមិនត្រូវបានប៉ះពាល់ទេ។';
-$ec_lang['lpn_workspace_exported']='កន្លែងធ្វើការត្រូវបានរក្សាទុកទៅ {file}៖ ការកំណត់ {n}។';
-$ec_lang['lpn_workspace_imported']='កន្លែងធ្វើការត្រូវបានអនុវត្តពី {file}។ ការកំណត់ដែលបានអនុវត្ត៖ {n}។ ត្រឡប់ទៅលំនាំដើម៖ {r}។';
-$ec_lang['lpn_workspace_ignored']='ធាតុដែលមិនបានអើពើ ព្រោះមិនត្រូវបានទទួលស្គាល់៖ {u}។';
-$ec_lang['lpn_workspace_refused_unreadable']='ឯកសារនេះមិនអាចអានជាកន្លែងធ្វើការបានទេ ដូច្នេះគ្មានអ្វីត្រូវបានផ្លាស់ប្ដូរ។';
-$ec_lang['lpn_workspace_refused_format']='នេះមិនមែនជាឯកសារកន្លែងធ្វើការដែលរក្សាទុកដោយទំព័រនេះទេ ដូច្នេះគ្មានអ្វីត្រូវបានផ្លាស់ប្ដូរ។';
-$ec_lang['lpn_workspace_refused_newer']='ឯកសារកន្លែងធ្វើការនេះត្រូវបានរក្សាទុកដោយកំណែថ្មីជាងនៃទំព័រនេះ (ទម្រង់ {version}) ដូច្នេះគ្មានអ្វីត្រូវបានផ្លាស់ប្ដូរ។';
-$ec_lang['lpn_workspace_confirm']='ជំនួសប្លង់កន្លែងធ្វើការរបស់កម្មវិធីរុករកនេះដោយប្លង់ក្នុងឯកសារ?';
-$ec_lang['lpn_workspace_refused_storage']='ទំហំផ្ទុករបស់កម្មវិធីរុករកពេញ ឬមិនមាន ដូច្នេះកន្លែងធ្វើការមិនត្រូវបានអនុវត្តទេ។';
-$ec_lang['lpn_omitted_note']='ត្រូវបានលុបចេញពីការដំណើរការនេះ ព្រោះគ្មានផ្លូវពីពួកវាទៅអាងស្តុក ឬធុងទឹក៖ {ids}';
-$ec_lang['lpn_link_end_unknown']='គ្មានថ្នាំងណាមានលេខសម្គាល់ {id} ទេ។';
-$ec_lang['lpn_link_end_same']='ចំណុចចាប់ផ្ដើម និងចំណុចបញ្ចប់ត្រូវតែជាថ្នាំងផ្សេងគ្នា។';
-$ec_lang['lpn_split_pipe_ask']='បំបែកបំពង់ {id} នៅថ្នាំងនេះ?';
-$ec_lang['lpn_split_yes']='បាទ/ចាស';
-$ec_lang['lpn_split_no']='ទេ';
-$ec_lang['lpn_snap_vertex']='{link} ចំណុចកំណត់ {n}';
-$ec_lang['lpn_snap_node_on_node']='{new} ត្រូវបានដាក់នៅទីតាំងរបស់ {target}។ ថ្នាំងទាំងពីរមិនត្រូវបានតភ្ជាប់ទេ។';
-$ec_lang['lpn_snap_moved_on_node']='{moved} ត្រូវបានផ្លាស់ទីទៅទីតាំងរបស់ {target}។ ថ្នាំងទាំងពីរមិនត្រូវបានតភ្ជាប់ទេ។';
-$ec_lang['lpn_snap_shape_point']='{shape}, ចំណុច {n}';
-$ec_lang['lpn_settings_hover_card']='បង្ហាញស្លាកពេញលេញពេលដាក់ទ្រនិច';
-$ec_lang['lpn_settings_hover_card_tip']='ដាក់ទ្រនិចលើថ្នាំង តំណ ឬអតិថិជន ដើម្បីមើលស្លាករបស់វាដូចដែលបានកំណត់ក្នុងការកំណត់ នៅមាត្រដ្ឋានណាក៏បាន មិនថាស្លាកសមលើផែនទីឬអត់។ នេះជាការកំណត់សម្រាប់កម្មវិធីរុករកនេះ មិនមែនសម្រាប់គម្រោងទេ។';
-$ec_lang['lpn_scenario_delete_in_base']='ដើម្បីដកវាចេញពីគំនូរ សូមលុបវាក្នុងសេណារីយ៉ូ {base}។';
-$ec_lang['lpn_scenario_only_deleted']='{id} ត្រូវបានលុប។ វាជាផ្នែកនៃ {scenario} តែប៉ុណ្ណោះ។';
-$ec_lang['lpn_scenario_delete_blocked']='{id} មិនត្រូវបានលុបទេ ព្រោះតំណ {link} បញ្ចប់នៅលើវា ហើយតំណនោះក៏មានក្រៅ {scenario} ដែរ។ ដើម្បីលុបទាំងពីរ សូមលុបពួកវាក្នុងសេណារីយ៉ូ {base}។';
-$ec_lang['lpn_junction_pattern_unknown']='គ្មានលំនាំណាក្នុងគម្រោងនេះមានលេខសម្គាល់ {id} ទេ ដូច្នេះថ្នាំងត្រូវបានទុកដូចដើម។';
-$ec_lang['lpn_settings_default_pattern_none']='គ្មាន (ថេរ)';
-$ec_lang['lpn_demand_pattern_default']='(លំនាំដើម៖ {id})';
-$ec_lang['lpn_demand_pattern_constant']='(ថេរ)';
-$ec_lang['lpn_library_pattern_default_mark']='(លំនាំដើម)';
-$ec_lang['lpn_library_pattern_default_tip']='លំនាំតម្រូវការលំនាំដើម។ ប្ដូរវាក្នុង ការកំណត់ លំនាំតម្រូវការលំនាំដើម។';
-$ec_lang['lpn_library_pattern_default_deleted_to']='លំនាំ {id} គឺជាលំនាំតម្រូវការលំនាំដើម។ ថ្នាំងដែលគ្មានលំនាំឥឡូវនេះប្រើលំនាំ {now}។';
-$ec_lang['lpn_library_pattern_default_deleted_none']='លំនាំ {id} គឺជាលំនាំតម្រូវការលំនាំដើម។ ថ្នាំងដែលគ្មានលំនាំឥឡូវនេះប្រើតម្រូវការថេរ។';
+$ec_lang['lpn_snip_tip_copy']='ចម្លង (Ctrl+C)';
+$ec_lang['lpn_screenshot_scale_tip']='ទំហំរូបភាពជាច្រើនដងនៃតំបន់នៅលើអេក្រង់។ ធំជាងច្បាស់ជាង ហើយធ្វើឲ្យឯកសារធំជាង។';$ec_lang['lpn_guide_text_alt_box']='បង្ហាញសម្រាប់សេណារីយ៉ូនីមួយៗ ថាវាប្រើជម្រើសជំនួសអ្វីក្នុងប្រភេទនីមួយៗ ដូចជា រូបវន្ត តម្រូវការ និង ការធ្វើឲ្យធាតុសកម្ម និងជម្រើសគណនារបស់វា៖ កត្តាគុណតម្រូវការ រយៈពេលដំណើរការសរុប និងចន្លោះពេលធារាសាស្ត្រ។ ជម្រើសជំនួសអាចអានបានតែប៉ុណ្ណោះ។ ជម្រើសគណនារបស់សេណារីយ៉ូអាចវាយនៅទីនេះបាន ហើយប្រអប់ទទេប្រើតម្លៃរបស់សេណារីយ៉ូមេ។ បើកវាពីម៉ឺនុយ សេណារីយ៉ូ បន្ទាប់ពីសម្អាត របៀបមូលដ្ឋាន។';$ec_lang['lpn_guide_how_alt']='ការមើលជាមុនជម្រើសជំនួសត្រូវបានរាយក្រោម ទឹក សេណារីយ៉ូ ពេល របៀបមូលដ្ឋាន បិទ។';$ec_lang['lpn_alt_calc_options']='ជម្រើសនៃការគណនា';$ec_lang['lpn_scenario_duration_tip']='ទុកឲ្យទទេដើម្បីទទួលតម្លៃពីមេ។ រយៈពេលដំណើរការសរុប 0:00 គឺជាការដំណើរការស្ថានភាពថេរ។';$ec_lang['lpn_scenario_hyd_step_tip']='ទុកឲ្យទទេដើម្បីទទួលតម្លៃពីមេ។';

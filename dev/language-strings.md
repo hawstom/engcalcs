@@ -476,6 +476,10 @@ and that a `nav item` is not merely a pull-down row.
 
 A control never borrows another control's key just because the English word matches. If in any language the borrowed value would fail to agree (gender, number, case) with what the control actually covers, the control gets its own key, and English may carry the same value. Example: the Design check's None/All/Selected (`lpn_ff_design_off`, `_all`, `_selected`) cover pipes and junctions, where `lpn_ff_all` agrees only with junctions.
 
+### Counts read correctly at 1 without plural logic
+
+Write counts so they read correctly at 1 without plural logic, e.g. "overrides (1)" or "Overrides: {n}"; do not add `_one`/`_other` keys or a plural mechanism (Tom, 2026-10-15).
+
 ### Renaming a key, and finding key debt
 
 - **Never rename a key by hand.** `php dev/scripts/rename_lang_key.php old new --apply` does all 27

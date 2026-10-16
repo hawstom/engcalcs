@@ -4454,3 +4454,10 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: calc set multiplier equal to the project's is not counted (16-hr 15, Calculation group vanishes) while a demand equal to Base is counted; delete-alternative question (storedOverrideCount) counts the multiplier by presence, so it can disagree (code read only, not run).
 - OBSERVED: phone 375 wide dialog fits, table scrolls inside; ?lang=es new keys fall back to English (expected pre-payload). Compare read by code (same function) and scenario-compare harness passes; Compare dialog not driven.
 - OBSERVED: builder harness 31/31; scenario-* harnesses, seam check pass.
+
+## 2026-10-15 feat/stopped-series (Task 808) @ 8ddac6da (Perry)
+- OBSERVED (real Chromium, fotobi "Tanks run dry"): graph draws 0:00 to 4:00 only (polyline x 58..1572 = the whole plot frame, axis ticks 0:00..4:00), Flow balance axis also ends 4:00, Full report has 5 time steps, Status changes lists nothing past 1:00, step menu 0:00..4:00, Last/Next stop at 4:00, Play stops at 4:00, goto 20 h clamps. Tab switch and re-adding a junction keep/redo the partial run correctly. es page works (English sentence, key untranslated, as the older key is).
+- OBSERVED: DEFECT (moderate). The "stopped, results run to 4:00" notice lives on the status line and is replaced by the first Next/Last/Play/time change; after that nothing on screen says the run was cut short (also gone after a tab round trip).
+- OBSERVED: with Statistic set to Maximum on a partial run the setting is silently ignored (no statistic offered, nothing said).
+- OBSERVED: builder harness passes; emptying the kept frames makes it fail 8 checks; reverting clampTime's cut does NOT fail it (it never asserts the stored time).
+- SPECULATION (code read, fixture has no pumps): Pump energy box on a partial run with pumps would say "needs an extended period simulation, press Calculate" (run.energy absent). Partial frames carry no water age/quality, so those columns are blank, unexplained.

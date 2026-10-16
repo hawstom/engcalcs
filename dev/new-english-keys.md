@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**155 still to read on master**, of 169 untranslated keys, of 2776 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**146 still to read on master**, of 159 untranslated keys, of 2781 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -198,7 +198,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (169, 155 to read @@ NEEDS RULING)
+## lpn_  (159, 146 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -239,23 +239,11 @@ never edits a synonym.
 - **`lpn_customer_node_inactive`**
   > This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.
   @@ NEEDS RULING
-- **`lpn_ex_net1_si_desc`**
-  > Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.
-  @@ NEEDS RULING
-- **`lpn_ex_net1_si_title`**
-  > EPANET Net1 plus rule-based controls, L/s (SI)
-  @@ NEEDS RULING
-- **`lpn_field_length_slope_tip`**
-  > Pipe length. When Auto is checked, the length is measured along the slope: the drawn length combined with the difference in elevation between the two end nodes.
-  _Ruled 2026-10-15: Yes._
 - **`lpn_field_type`**
   > Type
   @@ NEEDS RULING
 - **`lpn_field_type_tip`**
   > The type of this asset in this scenario, set by Morph. Clear the override to use the parent scenario's type.
-  @@ NEEDS RULING
-- **`lpn_inp_drop_comments`**
-  > These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.
   @@ NEEDS RULING
 - **`lpn_inp_export_flat_customers_inactive`**
   > {n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.
@@ -524,12 +512,6 @@ never edits a synonym.
 - **`lpn_settings_table_yes`**
   > Yes
   @@ NEEDS RULING
-- **`lpn_settings_text_halo`**
-  > Text halo width (percent of text size)
-  @@ NEEDS RULING
-- **`lpn_settings_text_halo_tip`**
-  > Width of the solid outline behind map text, as a percent of the text size. Applies when Solid background behind labels is on.
-  @@ NEEDS RULING
 - **`lpn_settings_units_one_project`**
   > Units are the same in every scenario.
   @@ NEEDS RULING
@@ -677,18 +659,6 @@ never edits a synonym.
 - **`lpn_sm_used_by_tip`**
   > Used by: {list}
   @@ NEEDS RULING
-- **`lpn_snip_tip_copy`**
-  > Copy (Ctrl+C)
-  @@ NEEDS RULING
-- **`lpn_time_run_stopped`**
-  > The EPANET run stopped at {time}, so it has no results. Its run report says why.
-  @@ NEEDS RULING
-- **`lpn_tool_zoom_selection`**
-  > Zoom to selection
-  @@ NEEDS RULING
-- **`lpn_tool_zoom_selection_tip`**
-  > Fit the selected assets to the map window. Select one or more assets first.
-  @@ NEEDS RULING
 - **`lpn_tsb_close`**
   > Close graph
   @@ NEEDS RULING
@@ -712,7 +682,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**12 still to read**, of 15 new keys across 15 unmerged branch(es).
+**3 still to read**, of 6 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -723,37 +693,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/ledger-wording (`37092cd7`) — 4 new, 4 to read @@ NEEDS RULING
+### chore/ledger-wording (`37092cd7`) — adds no English strings
 
-- **`lpn_energy_stopped`**
-  > The EPANET run stopped before the end of the period, so no pump energy figures were kept.
-  @@ NEEDS RULING
-- **`lpn_time_run_stopped_kept`**
-  > The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.
-  @@ NEEDS RULING
-- **`lpn_time_stat_stopped`**
-  > {statistic} not shown: the run stopped before the end of the period.
-  @@ NEEDS RULING
-- **`lpn_time_stopped_no_quality`**
-  > No water quality results were computed, because the quality analysis starts after the hydraulic run ends.
-  @@ NEEDS RULING
+### feat/bentley-interop (`bf5908c2`) — adds no English strings
 
-### feat/bentley-interop (`c72f83eb`) — adds no English strings
-
-### feat/description-lines (`43cd6b0a`) — 4 new, 4 to read @@ NEEDS RULING
-
-- **`lpn_energy_stopped`**
-  > The EPANET run stopped before the end of the period, so no pump energy figures were kept.
-  @@ NEEDS RULING
-- **`lpn_time_run_stopped_kept`**
-  > The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.
-  @@ NEEDS RULING
-- **`lpn_time_stat_stopped`**
-  > {statistic} not shown: the run stopped before the end of the period.
-  @@ NEEDS RULING
-- **`lpn_time_stopped_no_quality`**
-  > No water quality results were computed, because the quality analysis starts after the hydraulic run ends.
-  @@ NEEDS RULING
+### feat/description-lines (`895d34b7`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -783,21 +727,18 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/match-property (`05bda765`) — adds no English strings
 
-### feat/override-wording (`c72f83eb`) — adds no English strings
+### feat/override-wording (`7b26971f`) — adds no English strings
 
-### feat/plural (`947ad672`) — 4 new, 4 to read @@ NEEDS RULING
+### fix/text-edit-phone (`e3ab83b8`) — adds no English strings
 
-- **`lpn_energy_stopped`**
-  > The EPANET run stopped before the end of the period, so no pump energy figures were kept.
-  @@ NEEDS RULING
-- **`lpn_time_run_stopped_kept`**
-  > The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.
-  @@ NEEDS RULING
-- **`lpn_time_stat_stopped`**
-  > {statistic} not shown: the run stopped before the end of the period.
-  @@ NEEDS RULING
-- **`lpn_time_stopped_no_quality`**
-  > No water quality results were computed, because the quality analysis starts after the hydraulic run ends.
-  @@ NEEDS RULING
+### fix/zero-demand-solve (`c4b5fd71`) — 3 new, 3 to read @@ NEEDS RULING
 
-### fix/text-edit-phone (`c72f83eb`) — adds no English strings
+- **`lpn_time_run_cut_off`**
+  > EPANET had closed {link} and then could not solve for {nodes}.
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off_empty`**
+  > Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off_full`**
+  > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
+  @@ NEEDS RULING

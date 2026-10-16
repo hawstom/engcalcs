@@ -74,21 +74,17 @@ $ec_lang['template_printable_subtitle']='မှတ်တမ်းတင်ရာ
 // cannot read is not consent. The long-form privacy notice and terms are a separate question --
 // English-authoritative, and translated by a human later if at all.
 // Edited by TGH 2026-09-07; the word "cookie" approved by TGH 2026-09-09.
-// **IT SAYS "COOKIE" BECAUSE THAT IS THE WORD PEOPLE KNOW** (Tom, 2026-09-09, watching a
-// first-time reader: *"We should use the word 'cookie'. 'May we save a one-digit cookie...?' That
-// is the word people know."*). "One digit in this browser" was accurate and taught nobody what was
-// being asked; a reader who has met a hundred cookie banners knows instantly what this one is
-// about, and can then notice that this one is asking for far less than the others did.
+// **REWRITTEN 2026-10-08 (Tom, call F01: "Go (random code, new consent text)")**, his draft used
+// exactly. The yes now also covers a random browser code (EC_CODE_COOKIE in lib/config.inc.php), so
+// "a one-digit cookie" was no longer the whole of what is asked for. The code is what the sentence
+// names because it is what the yes newly buys: counting browsers, not only page loads.
 //
-// **AND IT IS STILL LITERALLY TRUE, which is the only reason the word is allowed here.** What is
-// stored IS a cookie, and it holds one base-32 digit per page visited -- five bits, maximum 31.
-// The arithmetic is in lib/config.inc.php beside the bits themselves. If that ever stops being one
-// digit, this sentence is the thing that has to change first.
-//
-// NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
-// moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
-// has already answered, for no change they could act on.
+// EC_CONSENT_VERSION WENT FROM 1 TO 2 WITH IT, because what is stored changed. Everybody who chose
+// "Allow this" is asked again; "Allow all" and "Refuse all" are not. The other 26 languages keep
+// their old sentence until the next translation sprint, under the same version.
 $ec_lang['consent_body']='ဤဆိုက်၏ အပိုင်းတစ်ခုစီကို ဘရောက်ဇာ အရေအတွက် မည်မျှ အသုံးပြုသည်ကို ရေတွက်နိုင်ရန် ဤဘရောက်ဇာတွင် ကျပန်းကုဒ်တစ်ခု သိမ်းဆည်းခွင့်ပြုပါမည်လား။ ကုဒ်ကို ထိုအချိန်တွင်ပင် ဖန်တီးထားခြင်းဖြစ်ပြီး သင့်အကြောင်းလည်းကောင်း၊ သင့်စက်အကြောင်းလည်းကောင်း ဘာမျှ မပြောပြပါ။ သင်ရိုက်ထည့်သည့်အရာကိုလည်း မှတ်တမ်းမတင်ပါ။ ၎င်းမပါလျှင် သင်၏ ဒုတိယအကြိမ် ဝင်ရောက်မှုနှင့် အခြားသူတစ်ဦး၏ ပထမအကြိမ် ဝင်ရောက်မှုကို ကျွန်ုပ်တို့ ခွဲခြား၍ မရပါ။';
+// Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='ဤကွန်ရက်ကို ဟိုက်ဒရောလစ် အချိန်အဆင့်တိုင်းတွင် ဖြေရှင်းသည်။';
 $ec_lang['consent_accept']='ဤတောင်းဆိုချက်ကို လက်ခံမည်';
 $ec_lang['consent_accept_all']='အမြဲတမ်း လက်ခံမည်';
 $ec_lang['consent_decline']='အမြဲတမ်း ငြင်းပယ်မည်';
@@ -108,8 +104,11 @@ $ec_lang['calc_defaults']='ပုံမှန်သို့ ပြန်ယူ�
 $ec_lang['calc_defaults_confirm']='တွက်ချက်မှုကိရိယာကို မူလ ပုံမှန် တန်ဖိုးများသို့ ပြန်လည်သတ်မှတ်မလား?';
 $ec_lang['points_data_note']='(သို့မဟုတ် ဒေတာနေရာကို အသုံးပြု၍ ကူးယူ/ကူးထည့်ပါ)';
 $ec_lang['points_data_heading']='တွက်ချက်စက် ဒေတာ<br />(ပုံစံကြည့်ရန် ကူးယူ ကို သုံးပါ)';
+$ec_lang['points_data_points_heading']='အမှတ်များ ဒေတာ<br />(ပုံစံကြည့်ရန် ကူးယူ ကို သုံးပါ)';
 $ec_lang['points_data_copy']='ကူးယူ';
 $ec_lang['points_data_paste']='ကူးထည့်';
+$ec_lang['points_data_msg_line']='ဘာမျှ မကူးထည့်ထားပါ။ လိုင်း {n} ကို အကွာအဝေးနှင့် အမြင့်အဖြစ် ဖတ်၍ မရပါ။';
+$ec_lang['points_data_msg_none']='ဘာမျှ မကူးထည့်ထားပါ။ အကွာအဝေးနှင့် အမြင့် အတွဲများ မတွေ့ပါ။';
 $ec_lang['calc_inputs']='ထည့်သွင်းချက်များ';
 $ec_lang['calc_results']='ရလဒ်များ';
 $ec_lang['view_hide_line']='[ဤစာကြောင်း ဝှက်ရန်]';
@@ -152,8 +151,6 @@ $ec_lang['hw_pressure_neg_short']='အနုတ်ဖိအား';
 $ec_lang['hw_pressure_neg']='အောက်ဘက်ဖိအားသည် သုညအောက် ကျဆင်းနေသည်။ HGL သည် ပိုက်အောက်သို့ ကျဆင်းနေသဖြင့် ပိုက်သည် အပြည့်မစီးနိုင်ဘဲ ဤရလဒ်သည် မှန်ကန်မှု မရှိနိုင်ပါ။';
 $ec_lang['hw_roughness']='Hazen-Williams ကိန်း, C';
 $ec_lang['hw_note_1']='<dl><dt>ဤတွက်ချက်စက်သည် အစွန်းနှစ်ဖက်ကြား ပိုက်၏ အနေအထား (profile) ကို ထည့်သွင်းတွက်ချက်ခြင်း မရှိပါ။</dt><dd>၎င်းသည် သင်ထည့်သွင်းသော အပေါ်ဘက်နှင့် အောက်ဘက် အမြင့်များကိုသာ အသုံးပြုသည်။ ကြားရှိ တစ်နေရာရာတွင် မြေပြင်သည် အစွန်းနှစ်ဖက်ထက် ပိုမြင့်တက်နေပါက ထိုမြင့်ရာနေရာ၏ ဖိအားသည် ဤနေရာတွင် တင်ပြထားသော ဖိအားများထက် နိမ့်ပါသည်။ ၎င်းကို စစ်ဆေးရန် အပေါ်ဘက်စွန်းမှ မြင့်ရာနေရာအထိ အလျားဖြင့် တွက်ချက်စက်ကို ထပ်မံအသုံးပြုပါ။</dd><dd>HGL သည် ပိုက်အောက်သို့ ကျဆင်းသည့်နေရာများတွင် ရေသည် အနုတ်ဖိအားအောက်တွင် ရှိသည်။ လေသည် ရေထဲမှ ခွဲထွက်လာနိုင်ပြီး၊ နံရံပါးသော ပိုက်ပြိုကျနိုင်ကာ၊ ညစ်ညမ်းသော မြေအောက်ရေသည် ဆက်စပ်ချိတ်ဆက်ရာနေရာများမှ ဝင်ရောက်လာနိုင်သည်။ တစ်လျှောက်လုံးတွင် အပေါင်းဖိအားအောက်တွင် ပိုက်လိုင်းကို ထိန်းထားပြီး၊ မြင့်ရာနေရာတိုင်းတွင် လေထွက်ပေါက် (air valve) တပ်ဆင်ရန် စဉ်းစားပါ။</dd><dt>အပေါ်ဘက်ဖိအားသည် သင်ပေးသွင်းသော နယ်နိမိတ်အခြေအနေ (boundary condition) တစ်ခုဖြစ်သည်။</dt><dd>၎င်းကို ဖိအားတိုင်းစက်မှ၊ ရေတိုင်ကီ ရေမျက်နှာပြင်အမြင့် (ပိုက်အထက်ရှိ ရေအမြင့်) မှ၊ သို့မဟုတ် ရေတင်စက်မျဉ်းကွေး (pump curve) မှ ဖတ်ယူပါ။ ရေတင်စက်သည် ရေစီးနှုန်း မြင့်တက်လာသည်နှင့်အမျှ ဖိအားနည်းလာသောကြောင့်၊ အထက်တွင် ထည့်သွင်းထားသော ရေစီးနှုန်းနှင့် ကိုက်ညီသည့် မျဉ်းကွေးပေါ်ရှိအမှတ်ကို အသုံးပြုပါ။</dd><dt>ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်းများ (minor/local loss coefficients) ကို သင်ကိုယ်တိုင် ပေါင်းထည့်ပါ။</dt><dd>ပိုက်လိုင်းပေါ်ရှိ ရေတံခါး၊ ကွေးကွေးနေရာ၊ တီးချိတ်၊ မီတာနှင့် ဝင်ပေါက် တိုင်း၏ K တန်ဖိုးများကို စုစုပေါင်းလုပ်ပြီး ၎င်းစုစုပေါင်းကို ထည့်သွင်းပါ။ ပုံမှန်တန်ဖိုးများအတွက် ထိုထည့်သွင်းရေးနေရာရှိ လင့်ခ်ကို လိုက်ပါ။ ရေရှည်ပို့ဆောင်ရေးပင်မပိုက် (long transmission main) တွင် ဤဆုံးရှုံးမှုများသည် ပွတ်တိုက်ဆုံးရှုံးမှုနှင့်နှိုင်းယှဉ်လျှင် သေးငယ်သော်လည်း၊ တိုတောင်းသော စခန်းပိုက်လိုင်း (station piping) တွင် ၎င်းတို့သည် ဆုံးရှုံးမှု အများစုဖြစ်နိုင်သည်။</dd></dl>';
-
-
 // Manning Irregular
 $ec_lang['mi_menu']='Manning မညီမညာ မြောင်းကြောင်း';
 $ec_lang['mi_main_title']='အခမဲ့ အွန်လိုင်း Manning ဖြတ်ပိုင်းမညီမညာသော မြောင်းကြောင်း တွက်ချက်မှုကိရိယာ';
@@ -249,13 +246,13 @@ $ec_lang['mtc_blodgett_v_bathurst']='Blodgett နှင့် Bathurst နှိ
 $ec_lang['mtc_pi_range_check']='P&I အပိုင်းအခြားစစ်ဆေးမှု';
 $ec_lang['mtc_pi_ok']='d50 သည် P&I အပိုင်းအခြားအတွင်းရှိသည်';
 $ec_lang['mtc_pi_ok_tip']='0.28–0.36 ft (Phillips & Ingersoll, 1998)';
+$ec_lang['mtc_not_applicable']='မသက်ဆိုင်';
 $ec_lang['mtc_pi_out_of_range']='အပိုင်းအခြားပြင်ပ';
 $ec_lang['mtc_pi_tip']='ဤညီမျှခြင်း ရေတွက်ချက်ရာတွင်အခြေခံခဲ့သော 0.28–0.36 ft ဒေတာအပိုင်းအခြားအပြင်သို့ ရောက်ရှိနေခြင်းဖြစ်သည်— ဒီဇိုင်းအခြေခံအဖြစ်မဟုတ်ဘဲ ခန့်မှန်းစစ်ဆေးမှုတစ်ခုအဖြစ်သာ သဘောထားပါ';
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Isbash (1936) နှင့် Maricopa County, Arizona, US အရ.">လိုအပ်သောအောက်ပိုင်းထောင့်ချောင်းကျောက်တုံးအရွယ်, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Isbash (1936) နှင့် Maricopa County, Arizona, US အရ.">လိုအပ်သောဘေးစောက် ၁ ထောင့်ချောင်းကျောက်တုံးအရွယ်, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Isbash (1936) နှင့် Maricopa County, Arizona, US အရ.">လိုအပ်သောဘေးစောက် ၂ ထောင့်ချောင်းကျောက်တုံးအရွယ်, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_time_run_tip']='ဤကွန်ရက်ကို ဟိုက်ဒရောလစ် အချိန်အဆင့်တိုင်းတွင် ဖြေရှင်းသည်။';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Maynord, Ruff, and Abt (1989) အရ။ ချောင်းကွေးတစ်ခုတွင် ကျောက်တုံးကို California Division of Highways (1970) အရ ပျမ်းမျှနှုန်း၏ 4/3 ဖြစ်သော ကွေးအရွယ်အနေဖြင့် ချိန်ညှိထားသည်; Maynord ကိုယ်ပိုင် 1.5 မှာ သဘာဝချောင်းများ အတွက် အသုံးပြုသည်။">လိုအပ်သောထောင့်ချောင်းကျောက်တုံးအရွယ်, D<sub>50</sub> (Maynord, Ruff, and Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='လိုအပ်သောထောင့်ချောင်းကျောက်တုံးအရွယ်, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='တစ်သမတ်တည်းစီးဆင်းမှုဆင်ခြင်ချက်များအတွက် ရေအလျင်နှုန်း သင့်တော်သည်။';
@@ -624,8 +621,6 @@ $ec_lang['bpn_notes_2_term']='ဌာနခွဲကွန်ရက်သာ၊ �
 $ec_lang['bpn_notes_2_def']='လိုင်းတိုင်းတွင် ရေအထက်ဘက်လိုင်း တစ်ခုတည်း ရှိသည် (သစ်ပင်ပုံစံ)။ ဤကိရိယာသည် ထပ်ခါထပ်ခါ တွက်ချက်သည့် နည်းလမ်းများ (EPANET သို့မဟုတ် ဆင်တူများ) လိုအပ်သော ပတ်ကွင်းပါ ကွန်ရက်များကို မဖြေရှင်းပါ။ ကွန်ရက်တွင် ပတ်ကွင်း မရှိသဖြင့် ဖြေရှင်းချက်သည် တိုက်ရိုက်ဖြစ်ပြီး တိကျသည်။';
 $ec_lang['bpn_notes_3_term']='လက်ရှိ ဖိအားထိန်းချုပ်မှု မပါ';
 $ec_lang['bpn_notes_3_def']='သတ်မှတ် ဒေသဆိုင်ရာဆုံးရှုံးမှု ဗားဗ်တစ်ခု (k-value) ကို ထည့်နိုင်သော်လည်း၊ ဖိအားလျှော့ချသော သို့မဟုတ် ဖိအားထိန်းထားသော ဗားဗ်များ (PRV/PSV) ကို မထည့်နိုင်ပါ။ ၎င်းတို့၏ ဖွင့်/ပိတ် အခြေအနေသည် ရေစီးနှုန်းနှင့် ဖိအားပေါ် မူတည်သောကြောင့် ထပ်ခါထပ်ခါ တွက်ချက်ရန် လိုအပ်စေသည်။';
-
-
 $ec_lang['bpn_supply2_q']='ပေးသွင်း ရေစီးနှုန်း ၂';
 $ec_lang['bpn_supply2_h']='ပေးသွင်း ဖိမြင့်ဆင့် ၂';
 $ec_lang['bpn_supply3_q']='ပေးသွင်း ရေစီးနှုန်း ၃';
@@ -654,6 +649,8 @@ $ec_lang['lpn_tool_add_pump']='ရေတင်စက်';
 // alone teach nobody and the words alone are longer than a modeller wants to read every time.
 $ec_lang['lpn_tool_add_valve']='ဗားလ်';
 $ec_lang['lpn_tool_add_text']='စာသား';
+// Junction and Pipe (Task 719): Tom's WaterCAD command, a junction, a pipe, a junction, a pipe, until Escape.
+$ec_lang['lpn_tool_add_chain']='ဆက်စပ်နေရာ ပိုက်လိုင်း ဆက်တိုက်';
 $ec_lang['lpn_tool_vertices']='အကွေ့မှတ်များ';
 // ---- CUSTOMERS: metered demands, lumped at the nearest node (ROADMAP Task 247) ----
 // **THE FEATURE IS CALLED CUSTOMER AND NOTHING A PERSON READS SAYS METER** (Tom, 2026-09-18:
@@ -668,6 +665,9 @@ $ec_lang['lpn_tool_add_meter']='ဖောက်သည်';
 $ec_lang['lpn_tool_add_meter_tip']='ဖောက်သည်အမှတ်ကို သတ်မှတ်ပါ၊ ထို့နောက် ၎င်း၏ ချိတ်ဆက်မှုဖြစ်သော link သို့မဟုတ် node ကို သတ်မှတ်ပါ။ ဖောက်သည်အတွက် သင်ပေးသော လိုအင်ကို ထို link ၏ အနီးဆုံးအစွန်းရှိ node သို့ ပေါင်းထည့်သည်။';
 $ec_lang['lpn_mode_add_meter']='ဖောက်သည် - ဖောက်သည်ရှိရာနေရာကို သတ်မှတ်ပါ၊ ထို့နောက် ၎င်းကို ဝန်ဆောင်ပေးသော ပိုက်လိုင်း သို့မဟုတ် node ကို ရွေးချယ်ပါ။ သို့မဟုတ် ပယ်ဖျက်ရန် Esc သုံးပါ။';
 $ec_lang['lpn_pane_tab_customers']='ဖောက်သည်များ';
+// The Shape table (Task 779). Closed is a polygon's closure, not a pipe's or valve's status, so it
+// is a key of its own and not lpn_field_closed: many languages use different words for the two.
+// Points is the column of the Shape's points, "Shape S1, point 2" in lpn_snap_shape_point.
 $ec_lang['lpn_pane_tab_shapes']='ရေးဆွဲပုံများ';
 $ec_lang['lpn_pane_shape_closed']='ပိတ်ထားသည်';
 $ec_lang['lpn_pane_shape_points']='အမှတ်များ';
@@ -705,12 +705,13 @@ $ec_lang['lpn_field_meter_lumped']='ဆက်စပ်နေရာသို့ �
 $ec_lang['lpn_field_meter_lumped_tip']='အနီးဆုံး ဆက်စပ်နေရာ။ ဤဖောက်သည်\'၏ လိုအင်များကို ထိုနေရာတွင် ပေါင်းထည့်ထားသည်။';
 $ec_lang['lpn_node_customers']='ဖောက်သည် လိုအင်များ';
 $ec_lang['lpn_node_customers_tip']='ဤနေရာသည် အနီးဆုံး node ဖြစ်သောကြောင့် ဤနေရာတွင် ထည့်သွင်းထားသော ဖောက်သည်များစာရင်း။ ဖောက်သည်လိုအင်များသည် ဤနေရာတွင် စာရင်းပြုထားသော အခြားလိုအင်များအပြင် ထပ်ပေါင်းသည်။ ဖောက်သည်ကို မြေပုံပေါ်တွင် ၎င်းရှိရာ သို့မဟုတ် ဖောက်သည်များဇယားတွင် တည်းဖြတ်သည်။';
-$ec_lang['lpn_node_customers_sum']='ဖောက်သည် {n} ဦးမှ {total} {unit}';
+$ec_lang['lpn_node_customers_sum']='{total} {unit} (ဖောက်သည်များ ({n}) မှ)';
 $ec_lang['lpn_customer_detached']='⚠ ဤဖောက်သည်သည် ပိုက်လိုင်းနှင့် ချိတ်ဆက်မထားသောကြောင့်၊ ၎င်း၏ လိုအင်သည် အဖြေများတွင် မပါဝင်ပါ။ ၎င်းကို ဖျက်ပါ၊ (သို့) ပိုက်လိုင်းတစ်ခု ဆွဲပြီး ဖောက်သည်ကို ၎င်းပေါ်သို့ ရွှေ့ပါ။';
 $ec_lang['lpn_customer_fixed_head']='⚠ ထိုပိုက်လိုင်း၏ အနီးဆုံးအစွန်းသည် ပုံသေ ရေမျက်နှာပြင်တစ်ခု ဖြစ်နေသောကြောင့်၊ ဤလိုအင်သည် ပုံဖော်တွက်ချက်မှုကို သက်ရောက်မှု မရှိပါ။';
-$ec_lang['lpn_customer_detached_count']='ဖောက်သည် {n} ဦးသည် ပိုက်လိုင်းနှင့် ချိတ်ဆက်မထားပါ။ ၎င်းတို့၏ လိုအင်ကို ထည့်တွက်မထားပါ။';
+
+$ec_lang['lpn_customer_detached_count']='ပိုက်လိုင်းနှင့် ချိတ်ဆက်မထားသော ဖောက်သည်များ ({n})။ ၎င်းတို့၏ လိုအင်ကို ထည့်တွက်မထားပါ။';
 $ec_lang['lpn_meter_pick_pipe']='ယခု ဤဖောက်သည်ကို ဝန်ဆောင်ပေးသော ပိုက်လိုင်း သို့မဟုတ် node ကို ရွေးချယ်ပါ။ ဖောက်သည်သည် သင်ထားသည့်နေရာတွင် ဆက်ရှိသည်။ ပယ်ဖျက်ရန် Escape နှိပ်ပါ။';
-$ec_lang['lpn_inp_export_flat_customers']='EPANET ဖိုင်တွင် ဖောက်သည်များ မရှိပါ။ ဤပရောဂျက်ရှိ ဖောက်သည် {n} ဦး၏ လိုအင်ကို ဖောက်သည်တစ်ဦးစီ သတ်မှတ်ထားသော ဆက်စပ်နေရာပေါ်ရှိ လိုအင်အတန်းတစ်ခုအဖြစ် ဖောက်သည်၏ တဂ်ဖြင့် အမည်ပေး၍ ရေးသည်။ ဖိုင်သည် ဖောက်သည်ကိုယ်တိုင်ကို မမှတ်တမ်းတင်ပါ - ၎င်း၏ တည်နေရာ၊ ၎င်းကို ဝန်ဆောင်သော ပိုက်လိုင်း၊ ထိုပိုက်လိုင်းတစ်လျှောက် ဝန်ဆောင်မှု ချိတ်ဆက်သည့်နေရာ သို့မဟုတ် ၎င်းကိုယ်စားပြုသော ဝန်ဆောင်မှုအရေအတွက်။ ထိုအချက်အလက်သည် ပရောဂျက်တွင် ဆက်ရှိသည်၊ ၎င်းကို ထိန်းရန် ပရောဂျက်ဖိုင်ကို သိမ်းပါ။';
+$ec_lang['lpn_inp_export_flat_customers']='EPANET ဖိုင်တွင် ဖောက်သည်များ မရှိပါ။ ဤပရောဂျက်ရှိ ဖောက်သည်များ ({n}) ၏ လိုအင်ကို ဖောက်သည်တစ်ဦးစီ သတ်မှတ်ထားသော ဆက်စပ်နေရာပေါ်ရှိ လိုအင်အတန်းတစ်ခုအဖြစ် ဖောက်သည်၏ တဂ်ဖြင့် အမည်ပေး၍ ရေးသည်။ ဖိုင်သည် ဖောက်သည်ကိုယ်တိုင်ကို မမှတ်တမ်းတင်ပါ - ၎င်း၏ တည်နေရာ၊ ၎င်းကို ဝန်ဆောင်သော ပိုက်လိုင်း၊ ထိုပိုက်လိုင်းတစ်လျှောက် ဝန်ဆောင်မှု ချိတ်ဆက်သည့်နေရာ သို့မဟုတ် ၎င်းကိုယ်စားပြုသော ဝန်ဆောင်မှုအရေအတွက်။ ထိုအချက်အလက်သည် ပရောဂျက်တွင် ဆက်ရှိသည်၊ ၎င်းကို ထိန်းရန် ပရောဂျက်ဖိုင်ကို သိမ်းပါ။';
 
 $ec_lang['lpn_area_hint_window_start']='ဝင်းဒိုး၏ ထောင့်တစ်ခုကို သတ်မှတ်ပါ။';
 $ec_lang['lpn_area_hint_window_go']='အပြီးသတ်ရန် ဆန့်ကျင်ဘက်ထောင့်ကို သတ်မှတ်ပါ။';
@@ -733,12 +734,12 @@ $ec_lang['lpn_multi_title']='{n} ခု ရွေးချယ်ထားသည�
 $ec_lang['lpn_multi_varies']='အမျိုးမျိုး';
 $ec_lang['lpn_multi_applied']='{n} ခုပေါ်တွင် {prop} ကို သတ်မှတ်ခဲ့သည်။';
 $ec_lang['lpn_multi_no_fields']='ဤနေရာတွင် ၎င်းတို့ အတူတကွ သတ်မှတ်နိုင်သော အရာ တစ်ခုမျှ မရှိပါ။';
-$ec_lang['lpn_pane_pasted']='ဆဲလ် {n} ခုကို ကူးထည့်ခဲ့သည်။ {skipped} ခုကို မပြောင်းလဲခဲ့ပါ။';
+$ec_lang['lpn_pane_pasted']='ကူးထည့်ခဲ့သော ဆဲလ်များ ({n})။ မပြောင်းလဲသော ဆဲလ်များ ({skipped})။';
 // PASTE THAT ADDS ROWS (Task 610). A block pasted into a table past its last row adds new
 // junctions, pipes and so on. {n} is how many rows were pasted, {created} how many of them are new,
 // {skipped} how many cells were left as they were.
-$ec_lang['lpn_pane_pasted_rows']='အတန်း {n} ကို ကူးထည့်ပြီး ၎င်းတို့ထဲမှ {created} ခုကို ကွန်ရက်သို့ ထည့်သွင်းလိုက်သည်။';
-$ec_lang['lpn_pane_pasted_rows_skipped']='အတန်း {n} ကို ကူးထည့်ပြီး ၎င်းတို့ထဲမှ {created} ခုကို ကွန်ရက်သို့ ထည့်သွင်းလိုက်သည်။ ဆဲလ် {skipped} ခုကို မပြောင်းလဲခဲ့ပါ။';
+$ec_lang['lpn_pane_pasted_rows']='ကူးထည့်ခဲ့သော အတန်းများ ({n})။ ကွန်ရက်သို့ ထည့်သွင်းသော အတန်းများ ({created})။';
+$ec_lang['lpn_pane_pasted_rows_skipped']='ကူးထည့်ခဲ့သော အတန်းများ ({n})။ ကွန်ရက်သို့ ထည့်သွင်းသော အတန်းများ ({created})။ မပြောင်းလဲသော ဆဲလ်များ ({skipped})။';
 // Added after "This network has none of these yet." on an empty table, which is where a paste lands.
 $ec_lang['lpn_pane_paste_here']='ဤနေရာကို ရွေးချယ်ပြီး spreadsheet မှ အတန်းများကို ကူးထည့်၍ ထည့်ပါ။';
 // The menu action that adds the clipboard's rows as new elements below the last row (an ordinary
@@ -750,14 +751,14 @@ $ec_lang['lpn_pane_paste_append']='ဇယားအဆုံးတွင် အ�
 $ec_lang['lpn_pane_paste_armed']='ကူးယူထားသော အတန်းများကို ဤဇယား၏ အောက်ခြေတွင် ထည့်ရန် Ctrl+V ကို နှိပ်ပါ။ ပယ်ဖျက်ရန် Esc ကို နှိပ်ပါ။';
 // Asked when an ordinary paste runs past the last row of a table. {n} is how many rows were
 // pasted, {fit} how many land on rows that exist, {extra} how many are left over.
-$ec_lang['lpn_pane_paste_overflow']='ဤကူးထည့်မှုတွင် အတန်း {n} ခု ပါဝင်ပြီး၊ ၎င်းတို့ထဲမှ {fit} ခုသည် ဇယားထဲတွင် ဝင်ဆံ့သည်။ ကျန် {extra} ခုကို အောက်ခြေတွင် အတန်းအသစ်များအဖြစ် ထည့်မလား။';
-$ec_lang['lpn_pane_paste_overflow_add']='အတန်း {extra} ခု ထည့်ရန်';
-$ec_lang['lpn_pane_paste_overflow_fit']='ဝင်ဆံ့သော {fit} ခုကိုသာ ကူးထည့်ရန်';
+$ec_lang['lpn_pane_paste_overflow']='ဤကူးထည့်မှုရှိ အတန်းများ ({n})။ ဇယားထဲတွင် ဝင်ဆံ့သော အတန်းများ ({fit})။ ကျန်အတန်းများ ({extra}) ကို အောက်ခြေတွင် အတန်းအသစ်များအဖြစ် ထည့်မလား။';
+$ec_lang['lpn_pane_paste_overflow_add']='အတန်းများ ({extra}) ထည့်ရန်';
+$ec_lang['lpn_pane_paste_overflow_fit']='ဝင်ဆံ့သော အတန်းများ ({fit}) ကိုသာ ကူးထည့်ရန်';
 // The same question when the left-over rows could not be added; {reasons} names the rows and why.
-$ec_lang['lpn_pane_paste_overflow_bad']='ဤကူးထည့်မှုတွင် အတန်း {n} ခု ပါဝင်ပြီး၊ ၎င်းတို့ထဲမှ {fit} ခုသည် ဇယားထဲတွင် ဝင်ဆံ့သည်။ ကျန် {extra} ခုကို အတန်းအသစ်များအဖြစ် ထည့်၍မရပါ - {reasons}';
+$ec_lang['lpn_pane_paste_overflow_bad']='ဤကူးထည့်မှုရှိ အတန်းများ ({n})။ ဇယားထဲတွင် ဝင်ဆံ့သော အတန်းများ ({fit})။ ကျန်အတန်းများ ({extra}) ကို အတန်းအသစ်များအဖြစ် ထည့်၍မရပါ - {reasons}';
 // Tom's own wording (2026-09-26). Asked when an ordinary paste would change the ID of {n} rows
 // that already exist; the buttons are Paste and Cancel.
-$ec_lang['lpn_pane_paste_ids_differ']='ID {n} ခု မကိုက်ညီပါ။ မည်သို့ပင်ဖြစ်စေ ကူးထည့်မလား။';
+$ec_lang['lpn_pane_paste_ids_differ']='မကိုက်ညီသော ID များ ({n})။ မည်သို့ပင်ဖြစ်စေ ကူးထည့်မလား။';
 // A paste that would add rows is refused whole when any row fails. {reasons} is one or more of the
 // Row sentences below, each naming the row of the pasted block, counted from 1.
 $ec_lang['lpn_pane_paste_refused']='မည်သည့်အရာမျှ မကူးထည့်ခဲ့ပါ။ {reasons}';
@@ -780,20 +781,24 @@ $ec_lang['lpn_pane_paste_text_no_position']='အတန်း {row}: စာသာ
 $ec_lang['lpn_pane_paste_no_anchor']='အတန်း {row}: {id} သည် ဤကွန်ရက်တွင် ဆက်စပ်နေရာ (သို့) ပိုက်လိုင်း မဟုတ်သေးပါ။ ၎င်းကို ဦးစွာ ကူးထည့်ပြီးမှ ဤစာသားကို ကူးထည့်ပါ။';
 $ec_lang['lpn_pane_paste_customer_no_position']='အတန်း {row}: ဖောက်သည်အသစ်တစ်ခုသည် {first} နှင့် {second} နှစ်ခုစလုံး လိုအပ်သည်။';
 $ec_lang['lpn_pane_paste_shape_no_points']='အတန်း {row}: ရေးဆွဲပုံအသစ်တစ်ခုသည် ၎င်း၏ အမှတ်များ လိုအပ်သည်။';
+// {pair} is the Points heading's own pair in this project's axis words: X/Y, N/E or Lat/Lon.
 $ec_lang['lpn_pane_paste_shape_bad_points']='အတန်း {row}: {text} သည် အမှတ်စာရင်း မဟုတ်ပါ။ အမှတ်တစ်ခုစီကို {pair} အဖြစ် ရေးပြီး ဒဿမအမှတ်အဖြစ် အစက် (.) ကို သုံးကာ အမှတ်များကို | ဖြင့် ခြားပါ။';
 $ec_lang['lpn_pane_paste_shape_closed_few']='အတန်း {row}: ပိတ်ထားသော ရေးဆွဲပုံသည် အနည်းဆုံး အမှတ်သုံးခု လိုအပ်သည်။';
 $ec_lang['lpn_pane_paste_no_customer_ref']='အတန်း {row}: ဖောက်သည်အသစ်တစ်ခုသည် ချိတ်ဆက်ထားသော ပိုက်လိုင်း (သို့) ဆက်စပ်နေရာ လိုအပ်သည်။';
 $ec_lang['lpn_pane_paste_no_pipe']='အတန်း {row}: ပိုက်လိုင်း {id} မရှိသေးပါ။ ပိုက်လိုင်းများကို ဦးစွာ ကူးထည့်ပြီးမှ ဖောက်သည်များကို ကူးထည့်ပါ။';
 $ec_lang['lpn_pane_paste_no_customer_node']='အတန်း {row}: ဆက်စပ်နေရာ {id} မရှိသေးပါ။ ဆက်စပ်နေရာများကို ဦးစွာ ကူးထည့်ပြီးမှ ဖောက်သည်များကို ကူးထည့်ပါ။';
 $ec_lang['lpn_pane_paste_customer_node_no_pipe']='အတန်း {row}: ဆက်စပ်နေရာ {id} တွင် ဖောက်သည်တစ်ဦး ချိတ်ဆက်ရန် ပိုက်လိုင်း မရှိပါ။';
-$ec_lang['lpn_pane_filled']='ဆဲလ် {n} ကို အောက်သို့ဖြည့်ခဲ့သည်။ {skipped} ခုကို မပြောင်းလဲခဲ့ပါ။';
+$ec_lang['lpn_pane_filled']='အောက်သို့ဖြည့်ခဲ့သော ဆဲလ်များ ({n})။ မပြောင်းလဲသော ဆဲလ်များ ({skipped})။';
 $ec_lang['lpn_pane_filldown']='အောက်သို့ဖြည့်ရန်';
+$ec_lang['lpn_pane_delete_element']='အစိတ်အပိုင်း ဖျက်ရန်';
+$ec_lang['lpn_pane_delete_elements']='အစိတ်အပိုင်းများ ဖျက်ရန်';
 $ec_lang['lpn_pane_fill_none']='ဤရွေးချယ်မှုတွင် အောက်သို့ ဖြည့်နိုင်သည့် မည်သည့်အရာမျှ မရှိပါ။';
-$ec_lang['lpn_pane_ctrlenter_filled']='ဆဲလ် {n} ကို ဖြည့်ခဲ့သည်။ {skipped} ခုကို မပြောင်းလဲခဲ့ပါ။';
+$ec_lang['lpn_pane_ctrlenter_filled']='ဖြည့်ခဲ့သော ဆဲလ်များ ({n})။ မပြောင်းလဲသော ဆဲလ်များ ({skipped})။';
 $ec_lang['lpn_pane_hide_col']='ဤကော်လံကို ဖျောက်ရန်';
 $ec_lang['lpn_pane_hide_cols']='ဤကော်လံများကို ဖျောက်ရန်';
 $ec_lang['lpn_pane_show_all_cols']='ကော်လံအားလုံးကို ပြရန်';
 $ec_lang['lpn_pane_sort_asc']='အငယ်မှအကြီး စီရန်';
+$ec_lang['lpn_pane_sort_desc']='ကြီးစဉ်ငယ်လိုက် စီရန်';
 $ec_lang['lpn_pane_manage_cols']='ကော်လံများ စီမံရန်…';
 $ec_lang['lpn_pane_manage_cols_title']='ကော်လံများ စီမံရန်';
 $ec_lang['lpn_pane_manage_cols_show']='ပြရန်';
@@ -801,12 +806,15 @@ $ec_lang['lpn_pane_manage_cols_up']='အပေါ်သို့ ရွှေ့
 $ec_lang['lpn_pane_manage_cols_down']='အောက်သို့ ရွှေ့ရန်';
 $ec_lang['lpn_pane_manage_cols_top']='အစသို့ ရွှေ့ရန်';
 $ec_lang['lpn_pane_manage_cols_bottom']='အဆုံးသို့ ရွှေ့ရန်';
+$ec_lang['lpn_pane_manage_cols_width']='အကျယ် (em)';
+$ec_lang['lpn_pane_width_tip']='ကော်လံအကျယ်များကို ပရောဂျက်ထဲတွင် မဟုတ်ဘဲ ဤဘရောက်ဇာထဲတွင် သိမ်းထားသည်။ မူလအကျယ်သို့ ပြန်ရန် ကော်လံ ခြားမျဉ်းကို နှစ်ချက်နှိပ်ပါ။';
 $ec_lang['lpn_pane_colmenu_tip']='ကော်လံများကို ဖျောက်ရန် (သို့) စီမံရန်';
 $ec_lang['lpn_tool_area_window']='ဘောင်ဖြင့် ရွေးချယ်ရန်';
 $ec_lang['lpn_tool_area_lasso']='ဘောင်ဝိုင်းဖြင့် ရွေးချယ်ရန်';
 $ec_lang['lpn_tool_area_polygon']='ပုံစံကွက်ဖြင့် ရွေးချယ်ရန်';
 $ec_lang['lpn_tool_delete']='ဖျက်ရန်';
 $ec_lang['lpn_tool_zoom_extent']='ပုံလုံးပြရန်';
+$ec_lang['lpn_tool_zoom_selection']='ရွေးထားသည်ကို ပုံလုံးပြရန်';
 $ec_lang['lpn_tool_zoom_window']='ဇူးမ် ဘောင်';
 $ec_lang['lpn_zoom_in']='ဇူးမ် ချဲ့ရန်';
 $ec_lang['lpn_zoom_out']='ဇူးမ် လျှော့ရန်';
@@ -873,7 +881,12 @@ $ec_lang['lpn_field_head_tip']='ရေကန်ရှိ ရေမျက်န�
 // pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
 // "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
 // a tank level from the vessel floor, not from the same zero the elevations use.
+// A tank has two elevations (Tom, 2026-10-11): Elevation is the ground, the pressure datum as at a
+// junction; Base elevation is the tank bottom, EPANET's [TANKS] Elevation, from which depth and
+// volume are measured.
+$ec_lang['lpn_field_tank_base_elev']='ကြမ်းပြင် အမြင့်';
 $ec_lang['lpn_field_tank_base_elev_tip']='ရေတိုက်ကြမ်းပြင်၏ အမြင့်၊ ၎င်းမှ ရေအနက်နှင့် ထုထည်ကို တိုင်းတာသည်။ ဗလာထားလျှင် ကြမ်းပြင်သည် မြေအမြင့်တွင် ရှိသည်။';
+$ec_lang['lpn_tank_ground_elev_tip']='ရေတိုက်တည်ရှိရာ မြေအမြင့်။ ဆက်စပ်နေရာတွင်ကဲ့သို့ ရေတိုက်ရှိ ဖိအားကို ဤနေရာမှ တိုင်းတာသည်။';
 $ec_lang['lpn_field_tank_level']='ရေနက်ရှိုင်းမှု';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_level_tip']='ရေတိုက်ထဲတွင် ရပ်နေသော ရေ၏ နက်ရှိုင်းမှု၊ ရေတိုက်ကြမ်းပြင်မှ အပေါ်သို့ တိုင်းတာသည်။ ရေမျက်နှာပြင်မှာ ရေတိုက်ကြမ်းပြင်၏ အမြင့်နှင့် ဤနက်ရှိုင်းမှု ပေါင်းထားသည့် တန်ဖိုးဖြစ်သည်။';
@@ -891,10 +904,19 @@ $ec_lang['lpn_field_tank_diameter_tip']='ရေတိုက်၏ တစ်ဖ�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tank_head_tip']='ရေတိုက်ရှိ ရေမျက်နှာပြင် အမြင့် - ကြမ်းပြင်အမြင့်နှင့် ရေအနက် ပေါင်းထားသည့် တန်ဖိုးဖြစ်သည်။';
 $ec_lang['lpn_close']='ပိတ်ရန်';
+// The corner buttons beside every standing box's X (Task 441). Each is an icon-only button, so the
+// value is its name: the hover tip and the screen reader's label at once. Auto-hide is a toggle and
+// says its state through aria-pressed, so one wording serves both states (AutoCAD's own word).
+$ec_lang['lpn_dock_left']='မြေပုံ၏ ဘယ်ဘက်တွင် ချထားရန်';
+$ec_lang['lpn_dock_right']='မြေပုံ၏ ညာဘက်တွင် ချထားရန်';
+$ec_lang['lpn_dock_float']='မျောထားရန်';
+$ec_lang['lpn_dock_autohide']='အလိုအလျောက် ဖျောက်ရန်';
 // The property popup's own name, in its drag bar (Tom, 2026-09-08: *"maybe the right title is
 // 'Properties'"*). It names the BOX, not the element in it: lpn_popup_title below the bar carries
 // the element's id and its rename box, and the two are read one under the other.
 $ec_lang['lpn_popup_boxtitle']='ဂုဏ်သတ္တိများ';
+// What a docked Properties box says while nothing is selected: it stays in its dock (Tom, 2026-10-07).
+$ec_lang['lpn_popup_none']='မည်သည့်အရာမျှ မရွေးချယ်ထားပါ။ ဂုဏ်သတ္တိများကို ကြည့်ရန် မြေပုံပေါ်ရှိ အစိတ်အပိုင်းတစ်ခုကို ရွေးချယ်ပါ။';
 $ec_lang['lpn_empty_hint']='ဥပမာတစ်ခု ဖွင့်ရန် ဖိုင် > ပရောဂျက်အသစ် ကိုသုံးပါ။ သို့မဟုတ် ကိရိယာဘားမှ ရေကန်၊ ဆက်စပ်နေရာနှင့် ပိုက်လိုင်း ထည့်ခြင်းဖြင့် စတင်ပါ။';
 // ROADMAP Task 647, Tom 2026-09-13: a project with elements, none of which the current view can
 // see, reads exactly like a lost project unless something says otherwise. Shown in a centred
@@ -917,10 +939,11 @@ $ec_lang['lpn_examples_sub']='နမူနာတစ်ခုစီကို မ�
 $ec_lang['lpn_examples_open']='ဖွင့်ရန်';
 $ec_lang['lpn_examples_menu']='ဥပမာ ဖွင့်ရန်…';
 $ec_lang['lpn_examples_blank']='(သို့) ဤနေရာမှ စတင်ပါ';
-// The SAME exit, worded for the other way in. Opened from File the user already has work on
-// screen, so "start with a blank map" reads as "discard it" and they do not dare press the
-// only button that leaves (Tom, 2026-08-17: "I can't back out of the gallery... I am forced to
-// open an example"). Closing never touches a project either way.
+// The SAME exit, worded for the other way in, is lpn_close (Task 699 merged its own 'Close' key
+// into it). Opened from File the user already has work on screen, so "start with a blank map"
+// reads as "discard it" and they do not dare press the only button that leaves (Tom, 2026-08-17:
+// "I can't back out of the gallery... I am forced to open an example"). Closing never touches a
+// project either way.
 $ec_lang['lpn_examples_size']='နေရာ - {nodes}၊ ဆက်သွယ်မှု - {links}';
 $ec_lang['lpn_examples_failed']='ဥပမာများကို ဖွင့်၍မရခဲ့ပါ။ ပုံဆွဲမှုတစ်ခု စတင်ရန် ဖိုင် > ပရောဂျက်အသစ် ကိုသုံးပါ။';
 $ec_lang['lpn_examples_loading']='ဥပမာများ ဖွင့်နေသည်…';
@@ -930,25 +953,130 @@ $ec_lang['lpn_examples_loading']='ဥပမာများ ဖွင့်နေ
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='တစ်ခုခု ပြင်ရန်';
 $ec_lang['lpn_help_notes']='ဤစာမျက်နှာအကြောင်း မှတ်ချက်များ';
+$ec_lang['lpn_guide_about_heading']='ဤတွက်ချက်စက်အကြောင်း';
+$ec_lang['lpn_guide_group_from']='{menu} မှ';
+$ec_lang['lpn_guide_menu_named']='{menu} မီနူး';
+// **THE NEW BOX, TASK 745** (Tom, 2026-09-29: reorganize Help into three groups, with a new
+// "Tables and Hotkeys" box gathering all table help and all keyboard shortcuts). One key names
+// both the Help row and the box's own title bar, the same pattern lpn_help_notes already carries
+// for the Notes box.
 $ec_lang['lpn_help_hotkeys']='ဇယားများနှင့် ဖြတ်လမ်းခလုတ်များ';
+// **THE USER GUIDE** (Tom, 2026-10-06: "Maybe items 2 and 3 combined into a simple User Manual or
+// whatever the 2026 thing is?"; Ida's design). Names both the Help row and the box's title bar. It
+// replaces lpn_help_hotkeys and the Help > Toolbar fly-out (lpn_help_icons, which still heads the
+// box's Toolbar section).
+$ec_lang['lpn_help_manual']='လမ်းညွှန်';
+// The Guide's contents rail, its search, its Boxes section and the "?" in every box's title bar.
+$ec_lang['lpn_guide_contents']='မာတိကာ';
+$ec_lang['lpn_guide_rail_hide']='မာတိကာကို ဖျောက်ရန်';
+$ec_lang['lpn_guide_rail_show']='မာတိကာကို ပြရန်';
+$ec_lang['lpn_guide_search']='လမ်းညွှန်တွင် ရှာဖွေရန်';
+$ec_lang['lpn_guide_boxes_heading']='ဘောက်စ်များ';
+$ec_lang['lpn_guide_boxes_intro']='ဘောက်စ်တစ်ခုစီကို ရွှေ့နိုင်သည်၊ အရွယ်အစားပြောင်းနိုင်သည်၊ မြေပုံ၏ ဘယ်ဘက် သို့မဟုတ် ညာဘက်တွင် ကပ်ထားနိုင်သည်၊ သို့မဟုတ် ပိတ်နိုင်သည်။ ဘောက်စ်၏ ခေါင်းစဉ်ဘားရှိ ? သည် ၎င်း၏ အကူအညီကို ဖွင့်သည်။';
+// Tom's own wording, 2026-10-07 (his typo "to not" corrected). Below lpn_guide_boxes_intro.
+$ec_lang['lpn_guide_boxes_autohide']='ညွှန်တံ ထွက်သွားသောအခါ ဖိုကပ်စ်မရှိသော ဘောက်စ်သည် အချိန်အနည်းငယ်ကြာမှ ပျောက်သွားသည်။ ဖိုကပ်စ်ရှိသော ဘောက်စ်သည် ၎င်းအပြင်ဘက်ကို နှိပ်သောအခါ၊ Esc နှိပ်သောအခါ၊ သို့မဟုတ် ညွှန်တံ အခြားနေရာတွင်ရှိစဉ် Tab ဖြင့် ထွက်သောအခါ ပျောက်သွားသည်။';
+$ec_lang['lpn_guide_box_help']='ဤဘောက်စ်အတွက် အကူအညီ';
+// A Boxes entry whose box shares its name with a section of the Guide ("Screenshot"), in the Guide
+// only, so its Contents list does not show one word twice. Keep {box} as it is.
+$ec_lang['lpn_guide_box_named']='{box} ဘောက်စ်';
+// Above the Toolbar rows, shown only while some are dimmed (on a phone, or Calculate while
+// Recalculate automatically is on): a grey name otherwise reads as a disabled button.
+$ec_lang['lpn_guide_dimmed']='မှိန်နေသော အမည်သည် ကိရိယာဘားတွင် လက်ရှိ ဖျောက်ထားသော ခလုတ်ဖြစ်သည်။';
+// One entry in the Guide's Boxes section for each box, shown by the "?" in its title bar. Fire flow,
+// Critical assets, and Demand scaling carry theirs in lpn_ff_intro and the keys that follow it.
+$ec_lang['lpn_guide_text_popup']='ရွေးချယ်ထားသော အစိတ်အပိုင်း သို့မဟုတ် စာသား၊ သို့မဟုတ် ရွေးချယ်ထားသော အစိတ်အပိုင်းများစွာ၏ ဂုဏ်သတ္တိများကို ရွေးချယ်မှုဘေး၌ သို့မဟုတ် ဘောက်စ်ကို နောက်ဆုံးရွှေ့ထားသည့်နေရာ၌ ပြသည်။ တည်းဖြတ်ထားသော တန်ဖိုးသည် ကွန်ရက်ကို ချက်ချင်းပြောင်းလဲစေပြီး အစိတ်အပိုင်း၏ မြေပုံအညွှန်းနှင့် ဇယားများ ပင်န်တို့ လိုက်ပြောင်းသည်။ နောက်ဆုံး တွက်ချက်မှု၏ ရလဒ်များကို ထည့်သွင်းမှုများအောက်တွင် စာရင်းပြထားပြီး တည်းဖြတ်၍ မရပါ။';
+$ec_lang['lpn_guide_text_find_popup']='ဥပမာ 8 in ထက်ငယ်သော ပိုက်လိုင်းတိုင်း သို့မဟုတ် 40 psi အောက်ရှိ ဆက်စပ်နေရာတိုင်းကဲ့သို့ စည်းကမ်းချက်တစ်ခုနှင့် ကိုက်ညီသော အစိတ်အပိုင်းများကို ရှာပေးပြီး ၎င်းအားလုံးရှိ ဂုဏ်သတ္တိတစ်ခုကို တစ်ကြိမ်တည်းဖြင့် ပြောင်းနိုင်သည်။ မဖြေရှင်းမီ မော်ဒယ်ကို စစ်ဆေးရန် (အမြင့် မပါခြင်း၊ ယူနစ်မှားထည့်သော အချင်း)၊ ဖြေရှင်းပြီးနောက် ပြဿနာရှိသော နေရာများကို စာရင်းပြုစုရန် (ဖိအားနိမ့်ခြင်း၊ ရေအလျင်နှုန်း မြင့်ခြင်း)၊ နှင့် အစိတ်အပိုင်းများစွာတွင် ပြင်ဆင်မှုတစ်ခု ပြုလုပ်ရန် သုံးပါ။\n\nမည်သည်ကို ရှာမည်၊ ဂုဏ်သတ္တိ၊ စည်းကမ်းချက်နှင့် တန်ဖိုး စာရင်းများက စည်းကမ်းချက်တစ်ခုကို တည်ဆောက်ပြီး ရှာဖွေချက် ကွက်တွင် စာကြောင်းတစ်ကြောင်းအဖြစ် ရေးသည်။ ထိုစာကြောင်းကို တိုက်ရိုက်လည်း တည်းဖြတ်နိုင်ပြီး စာရင်းများက လိုက်ပြောင်းသည်။ စာရင်းများဖြင့် မဖော်ပြနိုင်သော ရှာဖွေချက် (ဥပမာ “သို့မဟုတ်” ဖြင့် ချိတ်ထားသော စည်းကမ်းချက်နှစ်ခု) သည် ထိန်းချုပ်ကိရိယာများကို အစား အသုံးပြုပါ ခလုတ်ကို မနှိပ်မချင်း စာရင်းများကို ဖျောက်ထားသည်။ ရှာဖွေရန် ရှာဖွေချက် ကွက်တွင် Enter နှိပ်ပါ သို့မဟုတ် ရှာဖွေရန် ခလုတ်ကို နှိပ်ပါ။';
+$ec_lang['lpn_guide_text_settings_box']='ဆက်တင်အားလုံးနှင့် ပြန်သတ်မှတ်ရန် ခလုတ်နှစ်ခုသည် ဆက်တင်များ ဘောက်စ်တွင် ရှိသည်။ ဆက်တင်များကို အခြားမည်သည့်နေရာတွင်မျှ မတွေ့နိုင်ပါ။ ဘောက်စ်တွင် ရှာဖွေနိုင်သည်၊ ဆက်တင်များ ရှာဖွေရန်တွင် စကားလုံးတစ်လုံး သို့မဟုတ် ပိုမိုရိုက်ထည့်လျှင် ထိုစကားလုံးအားလုံးပါသော ဆက်တင်များကိုသာ စာရင်းပြသည်။ ဆက်တင်များကို ပရောဂျက်နှင့်အတူ သိမ်းသည်၊ လည်ပတ်မှုတိုးတက်ပုံ ဘောက်စ်ကို ပြရန်နှင့် စာမျက်နှာ အောက်ရှိ ဆက်တင်များမှလွဲ၍ ဖြစ်ပြီး ၎င်းတို့ကို ဤဘရောက်ဇာတွင်သာ သိမ်းသည်။ ဤဘောက်စ်၏ တည်နေရာနှင့် အရွယ်အစားကိုလည်း ဤဘရောက်ဇာတွင်သာ သိမ်းသည်။';
+$ec_lang['lpn_guide_text_library_box']='ပရောဂျက်၏ ပုံစံများ (patterns)၊ ကွေးမျဉ်းများ၊ ပိုက်အမျိုးအစားများ၊ ချိတ်ဆက်ပစ္စည်းများ၊ ထိန်းချုပ်မှုများနှင့် စည်းမျဉ်းများကို ထိန်းသိမ်းထားသည်။ အစိတ်အပိုင်းတစ်ခုသည် ပုံစံ၊ ကွေးမျဉ်း၊ ပိုက်အမျိုးအစား သို့မဟုတ် ချိတ်ဆက်ပစ္စည်းကို ၎င်း၏ ID ဖြင့် ရည်ညွှန်းပြီး ထိုအရာကို ဤနေရာတွင် တည်းဖြတ်သည်။ ထိန်းချုပ်မှုများနှင့် စည်းမျဉ်းများသည် ကွန်ရက်တစ်ခုလုံးအတွက် ဖြစ်သည်။ စည်းမျဉ်းများကို EPANET အင်ဂျင်က သာ အသုံးပြုသည်။ အားလုံးကို ပရောဂျက်နှင့်အတူ သိမ်းဆည်းသည်။';
+$ec_lang['lpn_guide_text_energy_box']='နောက်ဆုံး အချိန်ကာလရှည် ပုံတူလည်ပတ်မှုအတွင်း ရေတင်စက်တစ်ခုစီ၏ စွမ်းအင်သုံးစွဲမှု၊ အမြင့်ဆုံး ပါဝါနှင့် ကုန်ကျစရိတ်ကို ရေတင်စက်တစ်ခုစီ၏ ထိရောက်မှုနှင့် ဆက်တင်များ၊ စွမ်းအင်အောက်တွင် သတ်မှတ်ထားသော စွမ်းအင်စျေးနှုန်းတို့ကို အသုံးပြု၍ အစီရင်ခံသည်။ ဆက်တင်များတွင် စုစုပေါင်း လည်ပတ်ချိန်နှင့် ဖြေရှင်းပြီးသော ကွန်ရက်တစ်ခု လိုအပ်သည်။ ကွန်ရက်ကို မပြောင်းလဲပါ။';
+$ec_lang['lpn_guide_text_contour_box']='အရောင်ခြယ်ရန် နေရာများ ဘောင်တွင် ရွေးထားသော နေရာတန်ဖိုးမှ မြေပုံပေါ်တွင် ဆွဲသော contour ပုံကို ထိန်းချုပ်သည်။ အရောင်စနစ်၊ ဖြည့်ခြင်းနှင့် ၎င်း၏ အတိမ်းအမြင်၊ contour မျဉ်း ကြားခြားနှင့် အညွှန်းများ၊ ပိုက်တစ်ခုစီမှ အရောင် ဘယ်လောက်ဝေးဝေး ရောက်သည်တို့ ပါဝင်သည်။ ပိတ်လိုက်လျှင် ပုံကို ဖျောက်ပြီး နေရာအရောင်များ ကျန်ရစ်သည်။ ပြသမှုကိုသာ ပြောင်းပြီး ကွန်ရက်ကို မပြောင်းပါ။';
+$ec_lang['lpn_guide_text_scncmp_box']='အခြေအနေတိုင်းကို ပုံဆွဲမှု၏ မိတ္တူမှ ဖြေရှင်းပြီး တစ်ခုချင်းစီအတွက် ကျော်လွန်သတ်မှတ်မှု အရေအတွက်၊ အနိမ့်ဆုံးဖိအားနှင့် အမြင့်ဆုံးရေအလျင်နှုန်းကို ဇယားပြုလုပ်သည်။ ပရောဂျက်ကို မပြောင်းလဲပါ၊ ဖွင့်ထားသော အခြေအနေကို ယခင်အတိုင်း ထားရစ်သည်။';
+$ec_lang['lpn_guide_text_rptbox']='နောက်ဆုံး အချိန်ကာလရှည် ပုံတူလည်ပတ်မှုအတွက် EPANET အင်ဂျင်က ရေးသားသော စာသားအစီရင်ခံစာကို သတိပေးချက်များနှင့် ကွန်ရက်အကျဉ်းချုပ်အပါအဝင် ပြသည်။ အချိန်ကာလရှည် ပုံတူလည်ပတ်မှုတိုင်းက ၎င်းကို အစားထိုးသည်၊ အချိန်တစ်ခုတည်းတွင် ဖြေရှင်းခြင်းက အစားမထိုးပါ၊ တည်းဖြတ်မှုက ယခင်အစီရင်ခံစာကို ထားရစ်သည်။';
+$ec_lang['lpn_guide_text_status_box']='နောက်ဆုံး အချိန်ကာလရှည် ပုံတူလည်ပတ်မှုအတွင်း ပြောင်းလဲမှုတစ်ခုစီကို အချိန်စဉ်လိုက် စာရင်းပြသည်။ ရေတင်စက်၊ ဗားလ် သို့မဟုတ် ပိုက်လိုင်း ဖွင့်ခြင်း/ပိတ်ခြင်း၊ ရေတိုက် ဖြည့်စ ဖြစ်ခြင်း၊ ဗလာစ ဖြစ်ခြင်း၊ ပြည့်ခြင်း သို့မဟုတ် ကုန်ခြင်း၊ နှင့် အပြည့်အဝ မညီမျှသွားသော အချိန်အဆင့်များ ပါဝင်သည်။ ပြောင်းလဲမှုများကိုသာ စာရင်းပြပြီး အချိန်အဆင့်တိုင်းကို မပြပါ။';
+$ec_lang['lpn_guide_text_full_box']='ဇယားများ ပင်န်တွင် ပြသော ယူနစ်များဖြင့် အစီရင်ခံချိန် အဆင့်တိုင်းရှိ နေရာတိုင်းနှင့် ပိုက်လိုင်းတိုင်းကို စာရင်းပြသည်။ အချိန်ကာလရှည် ပုံတူလည်ပတ်မှု မရှိလျှင် အချိန်တစ်ခုတည်းရှိ လက်ရှိ ဖြေရှင်းချက်ကို ပြသည်။ ဒေါင်းလုဒ် သို့မဟုတ် ပုံနှိပ်ခြင်းတွင် အချိန်အဆင့်အားလုံး ပါသော်လည်း ဇယားတွင် တစ်ကြိမ်လျှင် တစ်ခုသာ ပြသည်။';
+$ec_lang['lpn_guide_text_calib_box']='နယ်ပယ်တွင် တိုင်းတာထားသော တန်ဖိုးများပါသည့် ဖိုင်ကို တူညီသော နေရာနှင့် အချိန်များရှိ တွက်ချက်ထားသော ရလဒ်များနှင့် နှိုင်းယှဉ်သည်၊ ဘောင်တစ်ခုချင်းစီအတွက် ဖိုင်တစ်ခုစီ ဖြစ်သည်။ ဖိုင်ကို လက်ရှိ ဆက်ရှင်အတွက်သာ ထိန်းထားပြီး ပရောဂျက်နှင့်အတူ မသိမ်းပါ။';
+$ec_lang['lpn_guide_text_notes_popup']='ဤစာမျက်နှာ မည်သို့ အလုပ်လုပ်သည်နှင့် မည်သည်ကို မလုပ်သည်ဆိုသော မှတ်စုများကို ဝေါဟာရတစ်ခုနှင့် ၎င်း၏ အဓိပ္ပာယ်ဖွင့်ဆိုချက် ပုံစံဖြင့် စာရင်းပြသည်။ ကွန်ရက်ကို မပြောင်းလဲပါ။';
+$ec_lang['lpn_guide_text_hotkeys_popup']='ကိရိယာဘား ခလုတ်တိုင်း၊ မီနူးတန်းတိုင်း၊ ကီးဘုတ် ဖြတ်လမ်းများနှင့် ဘောက်စ်တစ်ခုစီအတွက် ထည့်သွင်းချက်ကို စာရင်းပြသည်။ တန်းတစ်ခုကို ရွေးလျှင် ထိုထိန်းချုပ်မှု ရှိရာကို ပြသည်၊ ၎င်းကို မည်သည့်အခါမျှ မလုပ်ဆောင်ပါ။ ရှာဖွေရန် မည်သည့်နေရာမှမဆို Ctrl+K နှိပ်ပါ၊ သို့မဟုတ် လမ်းညွှန်တွင် ဖိုကပ်စ်ရှိစဉ် / နှိပ်ပါ။';
+// The Find and replace chapter beyond its opening paragraphs, in the Guide's Boxes section
+// (Tom, 2026-10-07). Each _def is HTML: keep the tags. A query inside <code> runs as written in
+// English on a page in any language; translate it with the words the Find box shows in your
+// language, or leave it in English. Asset IDs (60, 247, 330) and the numbers are measured on Net1
+// and Net3 by dev/lpn-spike/user-guide-find-harness.js: never change them in translation.
+$ec_lang['lpn_guide_find_query_term']='ရှာဖွေချက် ဘာသာစကား';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>စည်းကမ်းချက်တစ်ခု။ ပထမအပိုင်းသည် မည်သည်ကို ရှာမည် စာရင်းမှ အားလုံး၊ ဆက်စပ်နေရာ၊ ရေကန်၊ ရေတိုက်၊ ပိုက်လိုင်း၊ ရေတင်စက်၊ ဗားလ်၊ စာသား၊ ဖောက်သည် သို့မဟုတ် ရင်းမြစ် ဖြစ်သည်။ ဒုတိယအပိုင်းသည် ထိုရှာမည့်အရာအတွက် ဂုဏ်သတ္တိ စာရင်းရှိ ထည့်သွင်းချက်တစ်ခုခု ဖြစ်သည်။</td></tr><tr><td>စည်းကမ်းချက်များ</td><td>နှင့်ညီသည်၊ ထက်ကြီးသည်၊ ထက်နည်းသည်၊ ပါဝင်သည်၊ အမြင့်ဆုံး n၊ အနိမ့်ဆုံး n နှင့် ဗလာဖြစ်သည်။ ပါဝင်သည် သည် စာသားအတွက်သာ ဖြစ်သည်။ အမြင့်ဆုံး n နှင့် အနိမ့်ဆုံး n တွင် n သည် အရေအတွက်ဖြစ်ပြီး ဥပမာ အမြင့်ဆုံး 5။ <code>Pipe.Velocity n highest</code> ကဲ့သို့ စာလုံး n ကိုယ်တိုင် ရေးလျှင် သို့မဟုတ် တန်ဖိုးကွက် ဗလာဖြစ်လျှင် အစိတ်အပိုင်း 10 ခုကို စာရင်းပြသည်။ ဗလာဖြစ်သည် သည် ထိုဂုဏ်သတ္တိအတွက် တန်ဖိုးမရှိသော အစိတ်အပိုင်းများကို ရှာသည်။ ဆက်စပ်မှုတွင် စည်းကမ်းချက် လေးခုရှိပြီး တန်ဖိုး မလိုပါ။</td></tr><tr><td>တန်ဖိုးများ</td><td>ဂဏန်းကို ယူနစ်မပါဘဲ ဂုဏ်သတ္တိများနှင့် ဇယားများ ပင်န်တွင် ပြသော ယူနစ်ဖြင့် ရိုက်ထည့်သည်၊ 40 psi မဟုတ်ဘဲ 40။ ID အပါအဝင် စာသားကို တစ်ထပ် သို့မဟုတ် နှစ်ထပ် ကိုးကားပုဒ်ဖြင့် ဝိုင်းသည်၊ <code>\'60\'</code>။</td></tr><tr><td>“နှင့်”၊ “သို့မဟုတ်” နှင့် ကွင်းစကွင်းပိတ်</td><td>“နှင့်” ကို “သို့မဟုတ်” မတိုင်မီ တွက်ချက်ပြီး ကွင်းစကွင်းပိတ်က စည်းကမ်းချက်များကို အုပ်စုဖွဲ့သည်။ NOT မရနိုင်ပါ။</td></tr><tr><td>စာလုံးပေါင်း</td><td>စကားလုံးများသည် အကြီးအသေး မခွဲပါ။ အင်္ဂလိပ်စကားလုံးများကို ဘာသာစကားတိုင်းတွင် လက်ခံသည်၊ ထို့ကြောင့် ဤလမ်းညွှန်မှ ကူးယူထားသော ရှာဖွေချက်သည် မည်သည့်ဘာသာစကားရှိ စာမျက်နှာတွင်မဆို အလုပ်လုပ်သည်။</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_examples_term']='Net3 ပေါ်ရှိ လက်တွေ့ ဥပမာများ';
+$ec_lang['lpn_guide_find_examples_def']='<p>ဤဥပမာများကို လိုက်လုပ်ရန် Net3 ဥပမာကို ဖွင့်ပါ။ ဖိအားကို psi ဖြင့်၊ ရေအလျင်နှုန်းကို ft/s ဖြင့် ဖော်ပြထားသည်။</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>ဆက်စပ်နေရာ 60 နှင့် ပိုက်လိုင်း 60။ ဆက်စပ်နေရာတစ်ခုနှင့် ပိုက်လိုင်းတစ်ခုတွင် ID တူနိုင်သဖြင့် အားလုံး အောက်ရှိ ID ရှာဖွေမှုက အစိတ်အပိုင်း တစ်ခုထက်ပို ပြန်ပေးနိုင်သည်။</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>ဆက်စပ်နေရာ 10၊ 40၊ 50၊ 20 နှင့် 153၊ အနိမ့်ဆုံးဖိအားကို ဦးစွာ ပြသည်။ ဆက်စပ်နေရာ 10 သည် -0.6 psi ဖြစ်ပြီး ပြန်လည်စစ်ဆေးရန် လိုအပ်သော အနုတ်ဖိအား ဖြစ်သည်။</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>ပိုက်လိုင်း 60၊ 329၊ 125၊ 123 နှင့် 149၊ အမြင့်ဆုံးရေအလျင်နှုန်းကို ဦးစွာ ပြသည်။ ပိုက်လိုင်း 60 တွင် 9.3 ft/s ရှိသည်။</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>ဆက်စပ်နေရာ 10၊ 20၊ 40 နှင့် 50၊ ပိုက်လိုင်း 60၊ 125 နှင့် 329၊ စာရင်းတစ်ခုတည်းတွင် ဖိအားနိမ့်ခြင်းနှင့် ရေအလျင်နှုန်းမြင့်ခြင်း။</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>ဆက်စပ်နေရာ 10၊ 20၊ 40 နှင့် 50၊ မြင့်သောမြေပေါ်ရှိ ဖိအားနိမ့်သော နေရာများ။ အခြေအနေနှစ်ခုစလုံးသည် အစိတ်အပိုင်းအမျိုးအစား တူညီရမည်၊ <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> သည် ဘာမျှ မကိုက်ညီပါ၊ အကြောင်းမှာ အစိတ်အပိုင်းတစ်ခုသည် ဆက်စပ်နေရာရော ပိုက်လိုင်းရော မဖြစ်နိုင်သောကြောင့်ဖြစ်သည်။</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>ပိုက်လိုင်း 330၊ Net3 ဖိုင်တွင် ပိတ်ထားသော တစ်ခုတည်းသော ပိုက်လိုင်း။</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>ဖိုင်ကို ဖြန့်ဝေထားသည့်အတိုင်းဆိုလျှင် ဘာမျှမရှိပါ။ ပိုက်လိုင်း 247 ကို ပိတ်ထားလျှင် (အစားထိုးခြင်းနှင့် ပြန်ဖျက်ခြင်း ကိုကြည့်ပါ) ဆက်စပ်နေရာ 215၊ 217၊ 219 နှင့် 225 ဖြစ်ပြီး ပိုက်လိုင်း 247 ပျက်စီးလျှင် ရေပေးသွင်းမှုမရှိတော့မည့် ဆက်စပ်နေရာများ ဖြစ်သည်။ ၎င်းကို ပိုက်လိုင်းတစ်ခုချင်းစီအတွက် ထပ်လုပ်ခြင်းသည် အရေးပါမှု ခွဲခြမ်းစိတ်ဖြာမှု ဖြစ်သည်။</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_results_term']='ရလဒ်များ၊ ရွေးချယ်မှုနှင့် ဇယားများ';
+$ec_lang['lpn_guide_find_results_def']='<p>ကိုက်ညီသော အစိတ်အပိုင်းများကို ရှာဖွေရန် ခလုတ်အောက်တွင် စာရင်းပြသည်။ ထက်ကြီးသည် နှင့် အမြင့်ဆုံး n သည် အမြင့်ဆုံးတန်ဖိုးကို ဦးစွာ၊ ထက်နည်းသည် နှင့် အနိမ့်ဆုံး n သည် အနိမ့်ဆုံးတန်ဖိုးကို ဦးစွာ စာရင်းပြပြီး အခြားစည်းကမ်းချက်များသည် တွေ့ရှိသောတန်ဖိုးအလိုက်၊ ထို့နောက် ID အလိုက် စာရင်းပြသည်။ “နှင့်” သို့မဟုတ် “သို့မဟုတ်” ပါသော ရှာဖွေချက်သည် နေရာများကို ဦးစွာ၊ ထို့နောက် ပိုက်လိုင်းများကို ID အလိုက် စာရင်းပြသည်။ ကိုက်ညီမှုတစ်ခုတည်းကို မြေပုံပေါ်တွင် ချက်ချင်း ပြသည်။ အတန်းတစ်ခုကို ရွေးလျှင် မြေပုံကို ထိုအစိတ်အပိုင်းတွင် အလယ်ဆုံးထားသည်။ ဘာမျှ မရွေးထားလျှင် ထိုအစိတ်အပိုင်းကိုလည်း ရွေးချယ်သည်၊ တစ်ခုခုရွေးထားလျှင် ထိုအစိတ်အပိုင်းကို မီးမောင်းထိုးပြသည်၊ ရွေးချယ်မှုကို မပြောင်းပါ။ အတန်းတစ်ခုကို ရွေးချယ်မှုထဲသို့ ထည့်ရန် သို့မဟုတ် ဖယ်ရန် Shift+click သို့မဟုတ် Ctrl+click လုပ်ပါ။ ရှာဖွေခြင်းက ကိုက်ညီသမျှကို ကိုယ်တိုင် မရွေးပါ။</p><p>လက်ရှိဇယားတွင် စစ်ထုတ်ရန် ခလုတ်က တူညီသော ရှာဖွေချက်ကို ဇယားများ ပင်န်တွင် သုံးသည်။ ရှာဖွေချက် သက်ရောက်သော ဇယားတစ်ခုစီသည် ကိုက်ညီသော အတန်းများကိုသာ ပြပြီး ရှာဖွေချက်နှင့် အတန်းအရေအတွက်ကို ၎င်းတို့အပေါ်တွင် ပြသည်။ ကိုက်ညီသမျှကို မြေပုံပေါ်တွင် ရွေးရန် ထိုအတန်းများကို ရွေးပြီး ညာဘက်ကလစ်မီနူးမှ မြေပုံပေါ်တွင် ရွေးချယ်ရန် ကို ရွေးပါ။ ဇယားစစ်ထုတ်မှုကို ပရောဂျက်နှင့်အတူ မသိမ်းဘဲ စာမျက်နှာ ပြန်ဖွင့်သောအခါ ပြီးဆုံးသည်။ တည်းဖြတ်ပြီး မကိုက်ညီတော့သော အတန်းသည် ဇယားတွင် မှိန်ပြီး သတိပေးသင်္ကေတဖြင့် မှတ်ထားကာ လက်ရှိဇယားတွင် စစ်ထုတ်ရန် ခလုတ်ကို ထပ်နှိပ်မချင်း ကျန်နေသည်။</p>';
+$ec_lang['lpn_guide_find_replace_term']='အစားထိုးခြင်းနှင့် ပြန်ဖျက်ခြင်း';
+$ec_lang['lpn_guide_find_replace_def']='<p>ဘောက်စ်၏ တွေ့ရှိသည့်အရာကို ပြောင်းရန် အပိုင်းသည် ရှာဖွေချက်က တွေ့ရှိသော အစိတ်အပိုင်းတိုင်းတွင် ဂုဏ်သတ္တိတစ်ခုကို ရေးသည်။ ပြောင်းမည့် ဂုဏ်သတ္တိ စာရင်းမှ ဂုဏ်သတ္တိကို ရွေးပါ၊ တန်ဖိုးအသစ် ကွက်တွင် ပြသထားသော ယူနစ်ဖြင့် တန်ဖိုးအသစ်ကို ရိုက်ထည့်ပြီး အစားထိုးရန် ခလုတ်ကို နှိပ်ပါ။ ထို့နောက် ဘောက်စ်က တန်ဖိုးအသစ် ရှိပြီးသား အစိတ်အပိုင်းများကို မရေတွက်ဘဲ အစိတ်အပိုင်း ဘယ်နှစ်ခု ပြောင်းမည်ကို ဖော်ပြသည်။ ပြောင်းလဲမှုကို အကောင်အထည်ဖော်ရန် ၎င်းတို့ကို ပြောင်းရန် ခလုတ်ကို နှိပ်ပါ၊ သို့မဟုတ် ပယ်ဖျက်ရန် ကို နှိပ်ပါ။ ပြန်ဖျက်ရန် တစ်ကြိမ်က အစားထိုးမှုတစ်ခုလုံးကို ပြန်ပြောင်းပေးသည်။</p><p>Net1 ပေါ်ရှိ ဥပမာ - <code>Pipe.Diameter below 10</code> သည် ပိုက်လိုင်း 31၊ 122၊ 113 နှင့် 121 ကို တွေ့ရှိသည်။ အချင်းကို ရွေးပြီး 10 ရိုက်ကာ အစားထိုးရန် ကို နှိပ်ပါ၊ ဘောက်စ်တွင် “အစိတ်အပိုင်း 4 ခုကို ပြောင်းမလား။” ပြသည်။ ၎င်းတို့ကို ပြောင်းရန် ကို နှိပ်လျှင် ပိုက်လိုင်းလေးခုလုံးကို 10 in သို့ သတ်မှတ်သည်။ ပြန်ဖျက်ရန် တစ်ကြိမ်က ၎င်းတို့ကို 6 နှင့် 8 in သို့ ပြန်လည်ထားသည်။</p><p>Net3 ပေါ်ရှိ ဥပမာ - <code>Pipe.ID equal to \'247\'</code> သည် ပိုက်လိုင်း 247 ကို တွေ့ရှိသည်။ အထက်ပါ ချိတ်ဆက်မှု ဥပမာအတွက် ပိုက်ကို ပိတ်ရန် ပိတ် ကို ရွေးပြီး တန်ဖိုးအသစ် စာရင်းတွင် ပိတ်ထားသည် ကို ရွေးကာ အစားထိုးရန် ကို နှိပ်ပြီး ၎င်းတို့ကို ပြောင်းရန် ကို နှိပ်ပါ။ ပြန်ဖျက်ရန်က ပြန်ဖွင့်ပေးသည်။</p><p>အစားထိုးရာတွင် အစိတ်အပိုင်း အမျိုးအစားတစ်ခုတည်း လိုအပ်သဖြင့် အားလုံး အောက်တွင် မည်သည်ကို ရှာမည် စာရင်းမှ အစိတ်အပိုင်းအမျိုးအစားကို အရင်ရွေးပါ။ အခြေခံ မဟုတ်သော အခြေအနေတွင် အစားထိုးမှုကို ဂုဏ်သတ္တိများတွင် တူညီသော တည်းဖြတ်မှုကဲ့သို့ ထိုအခြေအနေတွင် သိမ်းသည်။ Mapbox အမြင့်များ ရနိုင်သည့်နေရာတွင် အမြင့် ကို ရိုက်ထည့်သော တန်ဖိုးအစား Mapbox DEM မှ အစားထိုးနိုင်သည်။</p>';
+$ec_lang['lpn_guide_find_notes_term']='သတိပြုရန် အချက်များ';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>တန်ဖိုးများကို တိကျမှုအပြည့်ဖြင့် နှိုင်းယှဉ်ပြီး ဒဿမ လေးနေရာဖြင့် စာရင်းပြသည်။ နှင့်ညီသည် သည် တွက်ချက်ထားသော ရလဒ်နှင့် ရှားရှားပါးပါး ကိုက်ညီသည်၊ ထက်ကြီးသည် နှင့် ထက်နည်းသည် ကို သုံးပါ။</li><li>ဖိအား၊ ဖိမြင့်ဆင့်၊ ရေစီးနှုန်း၊ ရေအလျင်နှုန်းနှင့် အခြားရလဒ်များသည် နောက်ဆုံး တွက်ချက်မှု၏ ရလဒ်များဖြစ်သည်။ အလိုအလျောက် ပြန်တွက်ချက်ရန် ဆက်တင်ကို ရှင်းထားလျှင် ၎င်းတို့သည် နောက်ဆုံး တွက်ချက်ရန်ကို နှိပ်ချိန်က ကွန်ရက်အခြေအနေကို ဖော်ပြသည်။</li><li>စာသားတွင် ထက်ကြီးသည် နှင့် ထက်နည်းသည် သည် အဘိဓာန်အစီအစဉ်ကို သုံးပြီး ဂဏန်းများကို ဂဏန်းအစီအစဉ်ဖြင့် စီသည်၊ Net1 တွင် <code>Junction.ID above \'20\'</code> သည် ဆက်စပ်နေရာ 21၊ 22၊ 23၊ 31 နှင့် 32 ကို တွေ့ရှိသည်။</li><li>အားလုံး အောက်တွင် ID၊ ဖော်ပြချက်၊ တဂ်နှင့် ဆက်စပ်မှု ကိုသာ ပေးသည်။ ဂုဏ်သတ္တိစာရင်းအပြည့်အစုံကို ကြည့်ရန် မည်သည်ကို ရှာမည် စာရင်းမှ အစိတ်အပိုင်း အမျိုးအစားတစ်ခုကို ရွေးပါ။</li><li>စာသားပစ္စည်းတွင် ID မရှိပါ။ <code>Text.Text contains \'pump\'</code> ကဲ့သို့ ၎င်း၏ စကားလုံးများဖြင့် ရှာပါ။</li><li>နေရာတစ်ခုအတွက် ဆက်စပ်မှု စည်းကမ်းချက် လေးခုမှာ နေရာတွင် ဆက်သွယ်မှု မရှိ၊ နေရာတွင် ဖွင့်ထားသော ဆက်သွယ်မှု မရှိ၊ ရင်းမြစ်သို့ ဆက်သွယ်မှု လမ်းကြောင်း မရှိ နှင့် ရင်းမြစ်သို့ ဖွင့်ထားသော လမ်းကြောင်း မရှိ ဖြစ်သည်။ ရင်းမြစ် ဆိုသည်မှာ ရေကန် သို့မဟုတ် ရေတိုက် ဖြစ်သည်။</li></ul>';
+// Where the Guide lists its own keys, so that a search for one finds it.
+$ec_lang['lpn_guide_using_heading']='လမ်းညွှန်ကို အသုံးပြုခြင်း';
+$ec_lang['lpn_guide_keys_term']='လမ်းညွှန် ကီးဘုတ် ဖြတ်လမ်းများ';
+$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>ညွှန်တံအောက် သို့မဟုတ် ဖိုကပ်စ်ရှိသော ထိန်းချုပ်မှုနေရာတွင် လမ်းညွှန်ကို ဖွင့်ရန်။</td></tr><tr><td>F1</td><td>ဖိုကပ်စ်ရှိသော ဘောက်စ်၏ ထည့်သွင်းချက်တွင် လမ်းညွှန်ကို ဖွင့်ရန်။</td></tr><tr><td>Ctrl+K</td><td>ရွေးချယ်ထားသော စာသားကို ရှာဖွေရေးကွက်တွင်ထည့်၍ လမ်းညွှန်ကို ဖွင့်ရန်။</td></tr><tr><td>/</td><td>လမ်းညွှန်တွင် ဖိုကပ်စ်ရှိစဉ် ရှာဖွေရေးကွက်ကို ရွေးရန်။</td></tr><tr><td>Esc</td><td>လမ်းညွှန်ကို ပိတ်ပြီး မူလနေရာသို့ ပြန်သွားရန်။</td></tr></tbody></table>';
+// Under a toolbar button in the User guide, naming the menu row that does the same thing.
+// {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
+$ec_lang['lpn_guide_also']='{menu} တွင်လည်း';
+$ec_lang['lpn_guide_how_popup']='အစိတ်အပိုင်း သို့မဟုတ် စာသားကို ရွေးချယ်သောအခါ ဂုဏ်သတ္တိများ ပွင့်လာသည်။';
+$ec_lang['lpn_guide_not_shown']='ဤထိန်းချုပ်မှုသည် ယခု မျက်နှာပြင်ပေါ်တွင် မရှိပါ။';
+// The box's two context headings. "Tables" holds the two table-help entries that used to sit only
+// in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
+// keys, Undo and the zoom keys had never been gathered anywhere before.
 $ec_lang['lpn_hotkeys_tables_heading']='ဇယားများ';
 $ec_lang['lpn_hotkeys_map_heading']='မြေပုံ';
 $ec_lang['lpn_hotkeys_map_term']='မြေပုံ ဖြတ်လမ်းခလုတ်များ';
+// Same shape as lpn_notes_7_def: one table, one row per key. The ten digits are LPN_TOOL_KEYS in
+// js/looped-network.js; Select also answers to Esc and Delete to the Delete key
+// (LPN_TOOL_ALT_KEYS); Ctrl+Z is undo(); +/- and = are keyZoom() (ROADMAP Task 682).
 $ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>0 (သို့) Esc</td><td>ရွေးချယ်ရန်။</td></tr><tr><td>2</td><td>ဆက်စပ်နေရာ ထည့်ရန်။</td></tr><tr><td>3</td><td>ရေကန် ထည့်ရန်။</td></tr><tr><td>4</td><td>ရေတိုက် ထည့်ရန်။</td></tr><tr><td>5</td><td>ပိုက်လိုင်း ထည့်ရန်။</td></tr><tr><td>6</td><td>ရေတင်စက် ထည့်ရန်။</td></tr><tr><td>7</td><td>ဗားလ် ထည့်ရန်။</td></tr><tr><td>8</td><td>ဖောက်သည် ထည့်ရန်။</td></tr><tr><td>9</td><td>စာသား ထည့်ရန်။</td></tr><tr><td>Delete</td><td>ရွေးချယ်ထားသည်ကို ဖျက်ရန်။</td></tr><tr><td>Ctrl+Z</td><td>နောက်ဆုံးပြောင်းလဲမှုကို ပြန်ဖျက်ရန်။</td></tr><tr><td>+ (သို့) =</td><td>ချဲ့ရန်။</td></tr><tr><td>-</td><td>ချုံ့ရန်။</td></tr></tbody></table>';
+// The W row of the Map table. Its own key, spliced into the table by Looped-Network.php, because a new row in
+// lpn_hotkeys_map_def is new markup that 'lang markup matches English' refuses until all 26 languages carry it.
+$ec_lang['lpn_hotkeys_zoomwin_def']='ဇူးမ်ဝင်းဒိုး - ထိုနေရာကို ဇူးမ်ဆွဲရန် မြေပုံပေါ်တွင် စတုဂံတစ်ခု ဆွဲပါ။';
+// The menu chords (Task 748): Alt+Shift+letter on Windows and Linux, Ctrl+Option on a Mac, and F10.
+// Exactly two rows (Tom, 2026-10-03: "show only the Alt+Shift and the F10"); the letters themselves
+// are assigned per language by menuMnemonics() and shown on the menus, never listed here.
+// A separate block rather than rows in lpn_hotkeys_map_def, because a new row there is new markup
+// that 'lang markup matches English' refuses until all 26 languages carry it.
 $ec_lang['lpn_hotkeys_menu_heading']='မီနူးများ';
 $ec_lang['lpn_hotkeys_menu_term']='မီနူး ဖြတ်လမ်းခလုတ်များ';
 $ec_lang['lpn_hotkeys_menu_def']='<table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+စာလုံး</td><td>ထိုစာလုံးဖြင့် မီနူးကို ဖွင့်ပါ၊ ထို့နောက် အတန်းတစ်ခု၏ စာလုံးကို နှိပ်၍ ၎င်းကို ရွေးပါ။ ကီးဘုတ် သုံးနေစဉ် စာလုံးများ ပေါ်လာသည်။ Mac တွင် Ctrl+Option ကို သုံးပါ။</td></tr><tr><td>F10</td><td>မီနူးဘားသို့ သွားရန်။</td></tr></tbody></table>';
-// ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
-// The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
-// with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
-// strip, and the same control inside the solver's diagnostic box when one is on screen.
-// THE TIP SAYS EXACTLY WHAT THE TAP SENDS, because a control that posts on one press and does not
-// say what it posts is asking for trust it has not earned. It also says no reply is coming, which
-// is the honesty boundary that document draws: a thank-you must never imply an answer.
+// The Screenshot keys. A separate block, for the reason given above the menu block.
+$ec_lang['lpn_hotkeys_snip_heading']='ဖန်သားပြင်ပုံ';
+$ec_lang['lpn_hotkeys_snip_term']='ဖန်သားပြင်ပုံ ကီးဘုတ် အတိုကောက်များ';
+$ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>S</td><td>ဖန်သားပြင်ပုံ ဖွင့်ထားစဉ် ဖြတ်ယူရန်။</td></tr><tr><td>E</td><td>မှတ်သားမြင်ကွင်းတွင် ခဲဖျက်။</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>မှတ်သားမြင်ကွင်းတွင် ပြန်ဖျက်ရန်နှင့် ပြန်လုပ်ရန်။</td></tr><tr><td>Esc</td><td>ဖြတ်ယူခြင်းကို ပယ်ဖျက်ရန် သို့မဟုတ် ခဲဖျက်မှ ထွက်ရန်။ မှတ်သားမြင်ကွင်းတွင် ဘာမျှ မရေးဆွဲထားလျှင် ပိတ်ရန်။</td></tr></tbody></table>';
+// ---- "Something wrong here?" (ROADMAP Tasks 207 and 768) ----
+// Two sites, one behaviour -- a standing cell in the map's bottom strip, and the same control inside
+// the solver's diagnostic box when one is on screen. The first click opens a box; Send is the second.
+// The thank-you must never imply an answer: a reply comes only to somebody who left an address.
 $ec_lang['lpn_wrong_btn']='ဤနေရာတွင် တစ်ခုခု မှားနေပါသလား?';
-// Edited by TGH 2026-09-07
+// The standing message's own Hide control. A hidden message leaves the map and waits as the top row of the
+// message history (the down-arrow glyph), marked by lpn_msglog_hidden, with lpn_msglog_unhide to bring it back.
+$ec_lang['lpn_status_dismiss']='ဤမက်ဆေ့ချ်ကို ဖျောက်ရန်';
+$ec_lang['lpn_msglog_hidden']='ဖျောက်ထားသည်';
+$ec_lang['lpn_msglog_unhide']='ပြရန်';
+$ec_lang['lpn_status_hidden_tip']='ဖျောက်ထားသော မက်ဆေ့ချ်ကို မြေပုံပေါ်တွင် ပြန်ပြပါ။';
+// Rewritten for the two-click box (Task 768); TGH's 2026-09-07 wording described one press.
 $ec_lang['lpn_wrong_tip']='ဤစာမျက်နှာရှိ အမှားတစ်ခုကို အစီရင်ခံပါ။ ပြဿနာကို ရွေးချယ်ရန်၊ မှတ်ချက်ထည့်ရန်နှင့် အကြောင်းပြန်လိုလျှင် အီးမေးလ်လိပ်စာ ထည့်သွင်းရန် ဘောက်စ်တစ်ခု ပွင့်လာသည်။ အကွက်အားလုံးသည် မဖြည့်လည်းရသည်၊ ပို့ရန်ကို မနှိပ်မချင်း ဘာမျှ မပို့ပါ။';
 $ec_lang['lpn_wrong_thanks']='ကျေးဇူးတင်ပါသည်။ သင့်အစီရင်ခံချက်ကို လက်ခံရရှိပြီး။';
+// The box "Something wrong here?" opens (ROADMAP Task 768). Every field is optional; Send with
+// nothing in it posts only the anonymous tally the button always posted. The four picks are canned
+// phrases a visitor may toggle in any combination. lpn_fb_sends must stay true to send-feedback.php
+// and to the "Messages you send us" row of privacy.php.
+$ec_lang['lpn_fb_intro']='ကြိုတင်ရေးသား စာများ (မဖြစ်မနေမဟုတ်ပါ)။ ပို့ရန်ကို မနှိပ်မချင်း ဘာမျှ မပို့ပါ။';
+$ec_lang['lpn_fb_pick_numbers']='ဂဏန်းများ မမှန်ပုံရသည်';
+$ec_lang['lpn_fb_pick_broken']='တစ်ခုခု အလုပ်မလုပ်ပါ';
+$ec_lang['lpn_fb_pick_wording']='စကားလုံး သို့မဟုတ် ဘာသာပြန်ချက် မှားနေသည်';
+$ec_lang['lpn_fb_pick_confusing']='ရှုပ်ထွေးနေသည်';
+$ec_lang['lpn_fb_comment']='မှတ်ချက်များ (မဖြစ်မနေမဟုတ်ပါ)';
+$ec_lang['lpn_fb_email']='အီးမေးလ် (မဖြစ်မနေမဟုတ်ပါ၊ အကြောင်းပြန်စာ လိုချင်မှသာ)';
+$ec_lang['lpn_fb_sends']='ပို့မည့်အရာ - ဤစာမျက်နှာ၏ အမည်၊ သင့်ဘာသာစကား၊ ဆိုက်၏ ဗားရှင်း၊ မြေပုံပေါ်တွင် မက်ဆေ့ချ်ရှိလျှင် ၎င်း၏ ကုဒ်၊ နှင့် သင်ရွေးချယ်ခဲ့သည့် သို့မဟုတ် ရိုက်ထည့်ခဲ့သည့်အရာ။ သင်၏ ပုံဆွဲမှု သို့မဟုတ် ကွန်ရက်ကို ဘယ်တော့မျှ မပို့ပါ။ သင်၏ အီးမေးလ်လိပ်စာကို အကြောင်းပြန်ရန်အတွက်သာ အသုံးပြုသည်။';
+$ec_lang['lpn_fb_send']='ပို့ရန်';
+$ec_lang['lpn_fb_sending']='ပို့နေသည်…';
+$ec_lang['lpn_fb_failed']='ထိုစာ ကျွန်ုပ်တို့ထံ မရောက်ပါ။ သင်ရေးထားသည်များ ဤနေရာတွင် ရှိနေသေးသဖြင့် ထပ်မံကြိုးစားနိုင်သည်။';
+$ec_lang['lpn_fb_bad_email']='ထိုအီးမေးလ်လိပ်စာ မမှန်ပုံရပါ။ ပြင်ပါ၊ သို့မဟုတ် အလွတ်ထားပါ။';
+$ec_lang['lpn_fb_busy']='လွန်ခဲ့သော မိနစ်အနည်းငယ်အတွင်း မက်ဆေ့ချ်များ အလွန်များစွာ ရောက်ရှိထားသည်။ သင်ရေးထားသည်များ ဤနေရာတွင် ရှိနေသေးသဖြင့် နောက်မှ ထပ်မံကြိုးစားနိုင်သည်။';
 $ec_lang['lpn_status_example_opened']='{name} ကို မိတ္တူအဖြစ် ဖွင့်ပြီး။ ဖိုင်၊ တခြားအမည်ဖြင့် သိမ်းရန် ဖြင့် သိမ်းပါ။';
 // Stands while the fault stands, rather than expiring like every other notice on the map: it
 // reports a page that cannot lay itself out, which is true until a measurement recovers.
@@ -971,6 +1099,8 @@ $ec_lang['lpn_ex_basic_us_desc']='ရေကန်နှစ်ခု၊ ရေတ
 $ec_lang['lpn_ex_net1_title']='EPANET Net1 နှင့် စည်းမျဉ်းအခြေပြု ထိန်းချုပ်မှုများ';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net1_desc']='ကလိုရင်း၊ ရေကန် ၁ ခုနှင့် ရေတိုက် ၁ ခု ပါသော စိတ်ကူးယဉ် EPANET နမူနာ။';
+$ec_lang['lpn_ex_net1_si_title']='EPANET Net1 နှင့် စည်းမျဉ်းအခြေပြု ထိန်းချုပ်မှုများ, L/s (SI)';
+$ec_lang['lpn_ex_net1_si_desc']='တစ်စက္ကန့်လျှင် လီတာ၊ မီတာနှင့် မီလီမီတာ ဖြင့်။ တစ်မိနစ်လျှင် ဂါလန်၊ ပေနှင့် လက်မမှ ပြောင်းထားသော စိတ်ကူးယဉ် EPANET နမူနာ - ကလိုရင်း၊ ရေကန် ၁ ခု၊ ရေတိုက် ၁ ခု၊ ရေတင်စက် ၁ ခုနှင့် စည်းမျဉ်းအခြေပြု ထိန်းချုပ်မှု နှစ်ခု ပါသည်။';
 $ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (SI)';
 $ec_lang['lpn_ex_net2_si_desc']='တစ်စက္ကန့်လျှင် လီတာ၊ မီတာနှင့် မီလီမီတာ ဖြင့်။ ကော်နက်တီကတ်ပြည်နယ် ဘရန်ဖို့ဒ်ရှိ EPANET နမူနာတစ်ခုကို တစ်မိနစ်လျှင် ဂါလန်၊ ပေနှင့် လက်မမှ ပြောင်းထားသည် - ဆက်စပ်နေရာ ၃၅ ခုနှင့် ရေတိုက် ၁ ခု၊ ရေကန်၊ ရေတင်စက်နှင့် ဗားလ် မပါဘဲ၊ ၂ ကီလိုမီတာ × ၄ ကီလိုမီတာခန့်။ ဓာတ်မပြုသော ဖလိုရိုက်သည် ရင်းမြစ်တစ်ခုမှ ဝင်ရောက်သည်။';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (US)';
@@ -1007,11 +1137,16 @@ $ec_lang['lpn_units_nondestructive_desc']='ဖျက်ဆီးခြင်း 
 $ec_lang['lpn_units_destructive']='ဖျက်ဆီးသည်';
 $ec_lang['lpn_units_destructive_desc']='ဖျက်ဆီးသည် - အကွက်တိုင်းကို သင်္ချာနည်းဖြင့် ပြောင်းလဲရေးသားသဖြင့်၊ ကွန်ရက်သည် ပြောင်းလဲမှု သည်းခံချက်အတွင်း ရုပ်ပိုင်းဆိုင်ရာ အတူတူနီးပါး ကျန်ရှိနေသည်။ မူလ ရိုက်ထည့်ချက်များ ပျောက်သွားသည်။ Undo ဖြင့် ၎င်းတို့ ပြန်ရောက်နိုင်သည်။';
 // {n} is a whole number.
-$ec_lang['lpn_status_reinterpreted']='ယခု တန်ဖိုး {n} ခုသည် {unit} ဟု အဓိပ္ပာယ်ရှိလာသည်။ မည်သည့်အရာမျှ ပြန်ရေးထားခြင်း မရှိပါ။';
-$ec_lang['lpn_status_converted']='တန်ဖိုး {n} ခုကို {unit} အဖြစ် ပြန်ရေးလိုက်ပါသည်။';
+$ec_lang['lpn_status_reinterpreted']='ယခု {unit} ဟု အဓိပ္ပာယ်ရှိလာသော တန်ဖိုးများ ({n})။ မည်သည့်အရာမျှ ပြန်ရေးထားခြင်း မရှိပါ။';
+$ec_lang['lpn_status_converted']='ပြန်ရေးလိုက်သော တန်ဖိုးများ ({n}) ကို {unit} အဖြစ် ပြောင်းထားသည်။';
 // The toolbar's one-control colour-by-value (Task 327). No label of its own: the select's own
 // options say what it does, and the toolbar is where space is scarcest.
 // Edited by TGH 2026-09-07
+// **THE NATURAL ENGLISH GOES ON THE CONTROL; the ultra-simple rendering goes to the translator**
+// (Tom, 2026-08-18: *"'Input units' and 'Results units'... both more natural than the ultra simple
+// English you used. While I like that you are thinking simple for translators, this should go in
+// _syn and the more natural in English."*). That is the routing rule stated on a real case: simple
+// English is for when an English reader would stumble, and here one would not.
 // **LENGTH ONLY** (Task 693, folded into 696; Tom 2026-09-18: *"when the map unit is lat/lon, this
 // unit label is a lie"*). What the coordinates are in is a separate, derived, read-only line below.
 $ec_lang['lpn_units_length']='အရှည်';
@@ -1056,6 +1191,13 @@ $ec_lang['lpn_result_status_closed']='ပိတ်ထားသည်';
 $ec_lang['lpn_result_head']='ဖိမြင့်ဆင့်';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_result_head_tip']='ဤ node ရှိ ရေ၏ အလားအလာစွမ်းအင်ကို ရေတိုင်အမြင့်အဖြစ် ရေးထားသည်။ ၎င်းသည် ပကတိအမြင့်ဖြစ်ပြီး ဖိအားမှာ gauge တိုင်းတာမှု ဖြစ်သည်။';
+// A tank's depth and usable volume (Task 783). Depth is head minus the tank bottom, which is our
+// Elevation. Volume is zero at the Lowest water depth, so it is NOT EPANET's tank volume, which also
+// counts the water below the lowest water depth (that water is in the mixing volume, it just cannot be drawn down).
+$ec_lang['lpn_result_depth']='အနက်';
+$ec_lang['lpn_result_depth_tip']='ပြသထားသည့်အချိန်၌ ရေတိုက်ကြမ်းပြင်မှ အပေါ်သို့ တိုင်းတာသော ရေတိုက်ရှိ ရေအနက် - ဖိမြင့်ဆင့်မှ ရေတိုက်အမြင့်ကို နုတ်ထားသည်။';
+$ec_lang['lpn_result_tank_volume']='ရရှိနိုင်သော ထုထည်';
+$ec_lang['lpn_result_tank_volume_tip']='အနိမ့်ဆုံးရေအနက်အထက်ရှိ ရေထုထည်ဖြစ်သဖြင့် ထိုအနက်တွင် သုည ဖြစ်သည်။ EPANET ရေတိုက်ထုထည်တွင် အနိမ့်ဆုံးရေအနက်အောက်ရှိ ရေလည်း ပါဝင်ပြီး ၎င်းသည် ရောနှောမှုနှင့် ရေအသက်အရွယ်တွင် ရေတွက်သဖြင့် ရေတိုက်အမြင့်သည် ရေတိုက်ကြမ်းပြင်တွင် ရှိနေသည်။';
 $ec_lang['lpn_result_pressure']='ဖိအား';
 $ec_lang['lpn_result_flow']='ရေစီးနှုန်း';
 $ec_lang['lpn_result_velocity']='ရေအလျင်နှုန်း';
@@ -1133,7 +1275,8 @@ $ec_lang['lpn_file_convert_as']='ပြောင်းလဲရန်…';
 $ec_lang['lpn_copy_of']='{name} ၏ မိတ္တူ';
 // ---- THE CONVERT AS BOX (Task 696) ------------------------------------------------------------
 // The three coordinate cases are Tom's own (R-155, 2026-09-22): "EPSG, unnamed (local) georeference,
-// and not georeferenced". lat/lon is one EPSG system (EPSG:3857 on this page), not a fourth case.
+// and not georeferenced". lat/lon is one EPSG system (EPSG:4326), not a fourth case; EPSG:3857 is a
+// projected system in meters since Task 775.
 $ec_lang['lpn_convas_title']='ပြောင်းလဲရန်';
 $ec_lang['lpn_convas_coordsys_tip']='မိတ္တူကို ပြောင်းလဲမည့် သြဒီနိတ်စနစ်။ ဤပရောဂျက်၏ စနစ်နှင့် ကွဲပြားလျှင် နေရာချထားမှု အဆင့်နှစ်ဆင့် ဆက်လာသည်။ ကမ္ဘာမြေပေါ်နေရာ သတ်မှတ်ပြီးသော ပရောဂျက်အတွက် အဆင့်နှစ်ဆင့်လုံး ပြီးစီးပြီးသား ပွင့်လာ၍ လက်ခံရန် သို့မဟုတ် ပြောင်းလဲရန် အဆင်သင့်ဖြစ်သည်။';
 // {crs} is the name the map status strip shows for this project's coordinate system.
@@ -1180,6 +1323,10 @@ $ec_lang['lpn_tip_join']='{name} — {tip}';
 // with a keyboard handler. It is appended to each tool's own tip rather than written into it.
 $ec_lang['lpn_tool_key_hint']='ဖြတ်လမ်း - {key} ကို နှိပ်ပါ။';
 $ec_lang['lpn_tool_key_hint_two']='ဖြတ်လမ်း - {key} (သို့) {key2} ကို နှိပ်ပါ။';
+$ec_lang['lpn_tool_add_chain_tip']='ဆက်စပ်နေရာများနှင့် ပိုက်လိုင်းများကို ဆက်တိုက် ချိတ်ရန် - ဆက်စပ်နေရာတစ်ခု ထည့်ရန် မြေပုံပေါ်တွင် အမှတ်တစ်ခု သတ်မှတ်ပါ၊ ထို့နောက် ပိုက်လိုင်းတစ်ခုနှင့် ဆက်စပ်နေရာတစ်ခု ထည့်ရန် နောက်အမှတ်တစ်ခုစီကို သတ်မှတ်ပါ။ ရှိပြီးသား အမှတ်တစ်ခု (node) ကို သတ်မှတ်၍ ၎င်းမှ ဆက်လက်နိုင်သည်။ ဆက်တိုက်ကို အဆုံးသတ်ရန် Escape နှိပ်ပါ။';
+// The Shape tool (Task 779). The word is Tom's: "we call it a 'Shape'".
+$ec_lang['lpn_tool_add_shape']='ရေးဆွဲပုံ';
+$ec_lang['lpn_tool_add_shape_tip']='မြေပုံပေါ်တွင် အမှတ်၊ polyline (သို့) ပိုလီဂွန် ရေးဆွဲပါ။ ရေးဆွဲပုံသည် မှတ်ချက်ဖြစ်ပြီး ကွန်ရက်၏ အစိတ်အပိုင်း မဟုတ်ပါ။ အမှတ်တစ်ခုစီကို သတ်မှတ်ပါ၊ ထို့နောက် အပြီးသတ်ရန် နောက်ဆုံးအမှတ်ကို ထပ်မံသတ်မှတ်ပါ၊ Enter နှိပ်ပါ (သို့) ညာဘက်ကလစ်နှိပ်ပါ။ ရေးဆွဲပုံကို ပိုလီဂွန်အဖြစ် ပိတ်ရန် ပထမအမှတ်ကို ထပ်မံသတ်မှတ်ပါ။';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
 $ec_lang['lpn_tool_area_tip']='ဧရိယာရွေးချယ်ခြင်း - ဘောင်/ဘောင်ဝိုင်း/ပိုလီဂွန်။';
@@ -1191,6 +1338,7 @@ $ec_lang['lpn_tool_vertices_tip']='ပိုက်လိုင်းအကွေ
 $ec_lang['lpn_tool_undo_tip']='ပြန်ဖျက်မှတ်တမ်းအရှည် = လုပ်ဆောင်ချက် ၂၀';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_zoom_extent_tip']='ကွန်ရက်တစ်ခုလုံးကို မြေပုံဝင်းဒိုးတွင် ဆန့်ညီစေပါ။ ဆွဲလိုက်သော လေးထောင့်ကွက်သို့ ချဲ့လိုလျှင် W ကို နှိပ်ပါ၊ (သို့) ပုံလုံးပြရန် ကိရိယာဘားခလုတ်၏ ထောင့်ရှိ တြိဂံငယ်ကို ရွေးချယ်ပါ။ မြေပုံ၏ ညာဘက်အပေါ်ရှိ ချဲ့ချုံ့ခလုတ်များကိုလည်း ကြည့်ပါ။';
+$ec_lang['lpn_tool_zoom_selection_tip']='ရွေးထားသော အစိတ်အပိုင်းများကို မြေပုံဝင်းဒိုးတွင် ဆန့်ညီစေပါ။ အစိတ်အပိုင်း တစ်ခု သို့မဟုတ် ပိုများကို အရင်ရွေးချယ်ပါ။';
 $ec_lang['lpn_tool_zoom_window_tip']='ထောင့်များကို သတ်မှတ်ပါ သို့မဟုတ် လေးထောင့်တစ်ခု ဆွဲပါ။ ပုံလုံးပြရန်အတွက် ထပ်နှိပ်ပါ။';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='ဇူးမ် ချဲ့ရန်။ ဖြတ်လမ်း - +';
@@ -1198,12 +1346,10 @@ $ec_lang['lpn_zoom_in_tip']='ဇူးမ် ချဲ့ရန်။ ဖြတ�
 $ec_lang['lpn_zoom_out_tip']='ဇူးမ် လျှော့ရန်။ ဖြတ်လမ်း - -';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='ရိုးရှင်းသော သို့မဟုတ် ရှုပ်ထွေးသော ရှာဖွေခြင်းနှင့် အစားထိုးခြင်း';
-// **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
+// **"Toolbar"** (Tom renamed it from "Toolbar key" to "Toolbar" on 2026-09-30).
 // The row is not a second toolbar and not a repeat of one -- it is the LEGEND for an icon-only
 // strip, derived from toolbarIconIndex, and on a touch screen it is the only way to read the
-// strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
-// it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
-// key?"* The row earns its place; only the label was lying about what it is.
+// strip at all without a deliberate press-and-hold. The row earns its place.
 $ec_lang['lpn_help_icons']='ကိရိယာဘား';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='မြင်နိုင်မှု';
@@ -1311,10 +1457,42 @@ $ec_lang['lpn_pane_not_used']='အသုံးမပြုပါ';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='{q} ဖြင့် စစ်ထုတ်ထားသည်။ {all} အနက် {n} ခု ပြသနေသည်။';
 $ec_lang['lpn_pane_filter_clear']='အားလုံး ပြရန်';
+// Added to the filtered table's line (Task 738): rows edited since Filter in table was pressed stay
+// in the table even when they no longer match, dimmed and marked, until it is pressed again. {n} is
+// how many. Worded as a label and a count so no plural form is needed.
 $ec_lang['lpn_pane_filter_stale']='ကိုက်ညီမှု မရှိတော့သော အတန်းများ - {n}။';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='ဤဇယားတွင် စစ်ထုတ်မှုနှင့် ကိုက်ညီသော အရာ တစ်ခုမျှ မရှိပါ။';
+// Selection only (Task 757): the Tables pane filtered to what is selected on the map. Parallel to
+// lpn_pane_filter_note. The line names the Find filter too when both are on.
+$ec_lang['lpn_pane_filter_sel_note']='ရွေးချယ်ထားသည်များသာ။ {all} ထဲမှ {n} ခု ပြထားသည်။';
+$ec_lang['lpn_pane_filter_sel_and']='{q} ဖြင့် စစ်ထုတ်ထားပြီး ရွေးချယ်ထားသည်များသာ။ {all} ထဲမှ {n} ခု ပြထားသည်။';
+$ec_lang['lpn_pane_filter_sel_none']='ရွေးချယ်ထားသော အစိတ်အပိုင်းများထဲမှ မည်သည့်အရာမျှ ဤဇယားထဲတွင် မပါပါ။';
+$ec_lang['lpn_pane_sel_only']='ရွေးချယ်ထားသည်များသာ';
+$ec_lang['lpn_pane_sel_only_none']='မည်သည့်အစိတ်အပိုင်းမျှ မရွေးချယ်ထားပါ။ အရင်ဆုံး မြေပုံပေါ်တွင် အစိတ်အပိုင်းများကို ရွေးချယ်ပါ။';
+// Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
+// scenario, with a Scenario column after ID.
+$ec_lang['lpn_pane_scn_show']='အခြေအနေများ ပြရန်';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+
+
+
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+
+// The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
+// scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+
+
+
+
+$ec_lang['lpn_pane_clear_override']='ကိုယ်ပိုင်တန်ဖိုး ဖယ်ရှားရန်';
+// The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
+// Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
+// in Basic mode is its scenario's.
+$ec_lang['lpn_pane_scn_alt_tip']='{category} အစားထိုး - {alternative}';
 // The pin beside the ID in the first column. The ID itself was this control until 2026-09-19,
 // underlined and turning link blue; the ID is an ordinary editable cell now and this is the way
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
@@ -1324,6 +1502,16 @@ $ec_lang['lpn_goto_on_map']='မြေပုံပေါ်တွင် ပြ�
 $ec_lang['lpn_pane_select_on_map']='မြေပုံပေါ်တွင် ရွေးချယ်ရန်';
 $ec_lang['lpn_pane_unselect_on_map']='မြေပုံပေါ်တွင် ရွေးချယ်မှု ပယ်ဖျက်ရန်';
 $ec_lang['lpn_pane_print']='ဇယားကို ပုံနှိပ်ရန်';
+// Tom, 2026-10-06. Copy with headings puts the heading line, unit included, above the selected cells; plain
+// Copy never does. The two Export rows download the whole table as shown.
+$ec_lang['lpn_pane_copy_heads']='ကော်လံခေါင်းစဉ်များနှင့်အတူ ကူးယူရန်';
+// Tom, 2026-10-07. File, Export to, ODS/XLSX/CSV file: a box asking which tables and which scenarios.
+// {format} is ODS, XLSX or CSV, the file format's own name, never translated.
+$ec_lang['lpn_export_table_title']='{format} သို့ ထုတ်ယူရန်';
+$ec_lang['lpn_export_table_current']='လက်ရှိ';
+$ec_lang['lpn_export_table_all']='အားလုံး';
+$ec_lang['lpn_export_table_go']='ထုတ်ယူရန်';
+$ec_lang['lpn_export_table_scn_note']='နောက်ဆုံး တွက်ချက်ထားသော အခြေအနေအတွက်သာ ရလဒ်များကို ထုတ်ယူသည်။';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1355,6 +1543,41 @@ $ec_lang['lpn_menu_project']='ရေ';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='ရေကွန်ရက် မော်ဒယ်ပြုလုပ်ခြင်းနှင့် သက်ဆိုင်သမျှ (လှုပ်ရှားပုံ ဖွင့်ထိန်းချုပ်မှုများ မှလွဲ၍)';
 $ec_lang['lpn_tables_menu']='ဇယားများ';
+// Water > Morph (Task 781; Tom, 2026-10-14: *"I like the term 'Morph' (Transform) for this feature"*;
+// first built as Change type, Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// to Change node type for any asset, where if it has information that can't be ported to the new
+// type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
+// asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
+// popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
+// dev/asset-type.md.
+$ec_lang['lpn_morph_menu']='အမျိုးအစား ပြောင်းရန်';
+$ec_lang['lpn_morph_tip']='ရွေးချယ်ထားသော node များကို ဆက်စပ်နေရာ၊ ရေကန် သို့မဟုတ် ရေတိုက်အဖြစ်၊ သို့မဟုတ် ရွေးချယ်ထားသော link များကို ပိုက်လိုင်း၊ ရေတင်စက် သို့မဟုတ် ဗားလ်အဖြစ် ပြောင်းပါ။ တစ်ခုစီသည် ၎င်း၏ ID၊ တည်နေရာ၊ ချိတ်ဆက်မှုများနှင့် အမျိုးအစားအသစ်တွင်လည်း ရှိသော တန်ဖိုးအားလုံးကို ဆက်ထားသည်။ တစ်စုံတစ်ရာ ဆုံးရှုံးမည်ဆိုပါက အရင်မေးသည်။';
+$ec_lang['lpn_morph_ok']='ပြောင်းရန်';
+// {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
+// when a node type was chosen), separated by commas.
+
+// The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
+// scenario, beside the override marker.
+
+
+$ec_lang['lpn_change_type_lost']='ဤတန်ဖိုးများ ဆုံးရှုံးမည်။';
+// The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
+$ec_lang['lpn_change_type_key']='တစ်ကြောင်းချင်းစီ - ID - ဆုံးရှုံးမည့် ဂုဏ်သတ္တိနှင့် တန်ဖိုး';
+$ec_lang['lpn_change_type_line']='{id}: {property} {value}';
+$ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}၊ အခြေအနေ {scenario} တွင်';
+
+$ec_lang['lpn_change_type_more']='နောက်ထပ် {n} ခု။';
+// Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
+// water surface is carried, so the new head or water depth is listed with its value.
+$ec_lang['lpn_change_type_surface']='ဤတန်ဖိုးများသည် ရေမျက်နှာပြင်ကို မူလအတိုင်း ထိန်းထားသည်။ ရေကန်၏ ဖိမြင့်ဆင့်သည် ရေတိုက်၏ အမြင့်နှင့် ရေအနက်ပေါင်းလဒ် ဖြစ်ပြီး၊ ရေတိုက်၏ ရေအနက်သည် ရေကန်၏ ဖိမြင့်ဆင့်မှ အမြင့်ကို နုတ်ထားသည့်တန်ဖိုး ဖြစ်သည်။';
+$ec_lang['lpn_change_type_meaning']='ပြောင်းလဲမည့် node ကို စမ်းသပ်သော ဤထိန်းချုပ်မှုများနှင့် စည်းမျဉ်းများသည် ၎င်းကို မတူညီစွာ ဖတ်ပါမည် - ဆက်စပ်နေရာကို ဖိအားဖြင့် စမ်းသပ်ပြီး ရေတိုက် သို့မဟုတ် ရေကန်ကို ရေမျက်နှာပြင်အမြင့်ဖြင့် စမ်းသပ်သည်။';
+// The link half (Tom, 2026-10-06: "Proceed."). Each heads a list of "ID: entry" lines.
+$ec_lang['lpn_change_type_born']='ဤတန်ဖိုးများသည် အသစ်ဖြစ်ပြီး အသစ်ရေးဆွဲထားသော အစိတ်အပိုင်းကဲ့သို့ သတ်မှတ်ထားသည်။';
+$ec_lang['lpn_change_type_no_curve']='{id}: ရေတင်စက် ဖိမြင့်ဆင့် ကွေးမျဉ်း မရှိသဖြင့် ကွေးမျဉ်းတစ်ခု မရွေးမချင်း ရေတင်စက်က ဖိမြင့်ဆင့် မထည့်ပေးပါ၊ .inp ထုတ်ယူသောအခါလည်း ၎င်းကို ပိုက်လိုင်းအဖြစ် ရေးသည်';
+$ec_lang['lpn_change_type_becomes']='{id}: {property} {value}၊ အခြေအနေ {scenario} တွင်၊ {new} ဖြစ်လာသည်';
+$ec_lang['lpn_change_type_customers']='ပိုက်လိုင်းတစ်ခုသာ ဖောက်သည်များကို ဝန်ဆောင်သဖြင့် ဤဖောက်သည်များကို ၎င်းတို့၏ လိုအင်ကို ထည့်သွင်းပြီးသား ကွင်းအတွင်း ပြထားသော node သို့ ပြောင်း၍ ချိတ်ထားသည်။ ၎င်းတို့သည် ရေးဆွဲထားသည့်နေရာတွင် ဆက်ရှိနေပြီး ၎င်းတို့၏ လိုအင် မပြောင်းလဲပါ။';
+$ec_lang['lpn_change_type_setting']='ပြောင်းလဲမည့် link ၏ သတ်မှတ်ချက်ကို ပေး သို့မဟုတ် စမ်းသပ်သော ဤထိန်းချုပ်မှုများနှင့် စည်းမျဉ်းများ။ သတ်မှတ်ချက်သည် ပိုက်လိုင်း၊ ရေတင်စက်နှင့် ဗားလ်တို့တွင် မတူညီသော ပမာဏ ဖြစ်သဖြင့် ၎င်းတို့ကို မတူညီစွာ ဖတ်ပါမည်။';
+$ec_lang['lpn_change_type_rules']='ဤစည်းမျဉ်းလိုင်းများသည် link တစ်ခုကို ၎င်း၏ အမျိုးအစားဖြင့် ခေါ်ထားပြီး ၎င်း၏ အမျိုးအစားသစ်ဖြင့် ခေါ်တော့မည်။';
 $ec_lang['lpn_tables_menu_tip']='အောက်ခြေ panel ရှိ ဇယားများတွင် အစိတ်အပိုင်းများကို ကြည့်ပြီး တည်းဖြတ်ပါ။';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the
@@ -1379,8 +1602,6 @@ $ec_lang['lpn_settings_auto_run_tip']='ပြန်တွက်ချက်ခ�
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='ဤကွန်ရက်ကို တွက်ချက်ရန် {secs} စက္ကန့် ကြာခဲ့ပြီး၊ ပြောင်းလဲမှုတိုင်းနောက်တွင် ပြန်တွက်ချက်ရန် သတ်မှတ်ထားသည်။ ၎င်းကို ရပ်တန့်ပြီး Calculate ခလုတ် ပြန်ရရန်၊ ဆက်တင်များ ထဲ၊ တွက်ချက်မှု၊ ဟိုက်ဒရောလစ် အောက်ရှိ “အလိုအလျောက် ပြန်တွက်ချက်ရန်” ကို ပိတ်ပါ။';
 $ec_lang['lpn_time_no_report']='လည်ပတ်မှုအစီရင်ခံစာ မရှိသေးပါ။ အစီရင်ခံစာသည် EPANET စာသားအစီရင်ခံစာဖြစ်သဖြင့် ဤကွန်ရက်ကို တွက်ချက်ပြီးနောက် ပေါ်လာမည်။';
-// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
-// this one, and of the three, Settings is the word a person is most likely to look for first.
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -1413,9 +1634,37 @@ $ec_lang['lpn_confirm_delete_network']='ဤပရောဂျက်ရှိ nod
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='ရှာဖွေရန်နှင့် အစားထိုးရန်';
+// Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
+// placement are never pasted.
+
+
+
+
+
+
+
+
+
+
+// The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
+// opens the in-place editor; Reset position sends a dragged label or an attached Text home.
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_find_title']='ရှာဖွေရန်နှင့် အစားထိုးရန်';
 $ec_lang['lpn_find_scope']='မည်သည်ကို ရှာမည်';
 $ec_lang['lpn_find_scope_all']='အားလုံး';
+$ec_lang['lpn_find_scope_source']='ရင်းမြစ်';
+$ec_lang['lpn_find_source_no_chemical']='ဓာတုပစ္စည်း မခြေရာခံထားသဖြင့် မည်သည့် node တွင်မျှ ရင်းမြစ် မရှိပါ။';
 $ec_lang['lpn_find_property']='ဂုဏ်သတ္တိ';
 $ec_lang['lpn_find_condition']='စည်းကမ်းချက်';
 $ec_lang['lpn_find_value']='တန်ဖိုး';
@@ -1494,9 +1743,10 @@ $ec_lang['lpn_find_op_conn_unlinked']='နေရာတွင် ဆက်သွ�
 $ec_lang['lpn_find_op_conn_noopen']='နေရာတွင် ဖွင့်ထားသော ဆက်သွယ်မှု မရှိ';
 $ec_lang['lpn_find_op_conn_nolinksource']='ရင်းမြစ်သို့ ဆက်သွယ်မှု လမ်းကြောင်း မရှိ';
 $ec_lang['lpn_find_op_conn_noopensource']='ရင်းမြစ်သို့ ဖွင့်ထားသော လမ်းကြောင်း မရှိ';
-// What a result row prints beside the node id: the fault it has, in three words.
-// What a result row prints beside the id: the NARROWEST condition true of that node, because "no
-// links" says more than "no open path to a source" and both are true of the same node.
+// A result row prints the NARROWEST condition true of that node beside its id, because "no links"
+// says more than "no open path to a source" and both are true of the same node. It prints the
+// SAME four keys above with the first letter capitalized in code (findConnLabel()), not a second
+// capitalized copy of each (Task 699, Tom 2026-09-30: "do the Find redesign").
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='နေရာတိုင်း ဆက်သွယ်ထားသည်။';
@@ -1541,13 +1791,13 @@ $ec_lang['lpn_replace_title']='တွေ့ရှိသည့်အရာကိ�
 $ec_lang['lpn_replace_prop']='ပြောင်းမည့် ဂုဏ်သတ္တိ';
 $ec_lang['lpn_replace_value']='တန်ဖိုးအသစ်';
 $ec_lang['lpn_replace_source']='တန်ဖိုးအသစ် ရင်းမြစ်';
-$ec_lang['lpn_replace_asked']='node {n} ခုအတွက် အမြင့်များကို တောင်းဆိုထားသည်။ လက်ခံရရှိသောအခါ ရလဒ်များ ပေါ်လာမည်။';
+$ec_lang['lpn_replace_asked']='အမြင့်ကို တောင်းဆိုထားသော node များ ({n})။ လက်ခံရရှိသောအခါ ရလဒ်များ ပေါ်လာမည်။';
 $ec_lang['lpn_replace_btn']='အစားထိုးရန်';
 // The count IS the confirmation: a bulk write reaches assets spread over a map the user is not
 // looking at, so it is shown, and answered, before anything is written. {n} is a whole number.
-$ec_lang['lpn_replace_preview']='အစိတ်အပိုင်း {n} ခုကို ပြောင်းမလား။';
+$ec_lang['lpn_replace_preview']='အစိတ်အပိုင်းများ ({n}) ကို ပြောင်းမလား။';
 $ec_lang['lpn_replace_apply']='၎င်းတို့ကို ပြောင်းရန်';
-$ec_lang['lpn_replace_done']='အစိတ်အပိုင်း {n} ခု ပြောင်းပြီး။ ၎င်းကို တစ်ဆင့်တည်းဖြင့် ပြန်ဖျက်နိုင်သည်။';
+$ec_lang['lpn_replace_done']='ပြောင်းထားသော အစိတ်အပိုင်းများ - {n}။ ၎င်းကို တစ်ဆင့်တည်းဖြင့် ပြန်ဖျက်နိုင်သည်။';
 $ec_lang['lpn_replace_none']='မည်သည့်အရာမျှ ပြောင်းလဲမည် မဟုတ်ပါ။';
 $ec_lang['lpn_replace_no_value']='တန်ဖိုးအသစ်ကို ထည့်သွင်းပါ။';
 $ec_lang['lpn_replace_scope']='တန်ဖိုးများ ပြောင်းရန် အထက်တွင် အစိတ်အပိုင်း အမျိုးအစားတစ်ခုကို ရွေးချယ်ပါ။';
@@ -1603,6 +1853,10 @@ $ec_lang['lpn_profile_new']='လမ်းကြောင်းအသစ် သ�
 $ec_lang['lpn_profile_new_name']='လမ်းကြောင်း {n}';
 $ec_lang['lpn_profile_rename']='လမ်းကြောင်း အမည်ပြောင်းရန်…';
 $ec_lang['lpn_profile_delete']='လမ်းကြောင်း ဖျက်ရန်';
+$ec_lang['lpn_profile_open']='EPANET ပရိုဖိုင်းဖိုင် ဖွင့်ရန်…';
+$ec_lang['lpn_profile_file_done']='ဖိုင်မှ ပရိုဖိုင်းကို ဖတ်ပြီး - ဤကွန်ရက်တွင် node {total} ခုအနက် {used} ခု တွေ့ရှိသည်။';
+$ec_lang['lpn_profile_file_missing']='ဖိုင်တွင် အမည်ပါသော်လည်း ဤကွန်ရက်တွင် မရှိသည်များ - {ids}။';
+$ec_lang['lpn_profile_file_short']='ဖိုင်တွင် ဤကွန်ရက်ရှိ node နှစ်ခုထက်နည်း အမည်ပါသဖြင့် ရေးဆွဲရန် ပရိုဖိုင်း မရှိပါ။';
 $ec_lang['lpn_profile_prompt_name']='ဤလမ်းကြောင်းအတွက် အမည်';
 $ec_lang['lpn_profile_delete_confirm']='သိမ်းဆည်းထားသော လမ်းကြောင်း {name} ကို ဖျက်မလား? ပုံဆွဲချက်ကိုယ်တိုင် မပြောင်းလဲပါ။';
 $ec_lang['lpn_profile_none_saved']='သိမ်းဆည်းထားသော လမ်းကြောင်း မရှိသေးပါ';
@@ -1622,6 +1876,17 @@ $ec_lang['lpn_ts_tip']='extended period simulation တစ်လျှောက�
 $ec_lang['lpn_ts_title']='အချိန်ပေါ် တန်ဖိုးများ';
 $ec_lang['lpn_ts_group_nodes']='အမှတ်များ';
 $ec_lang['lpn_ts_group_links']='မျဉ်းများ';
+$ec_lang['lpn_pgraph_none']='ဤအစိတ်အပိုင်းတွင် လက်ရှိ run၌ ရလဒ် မရှိပါ။';
+// The Properties graph's own selector entry for a source share (Tom, 2026-09-30: "In selector, use
+// 'Source share from {trace node}'"). Distinct from the shared lpn_result_source_share, which still
+// labels the bare quantity everywhere else -- the Tables column, Find's property list, the Labels
+// popover and the colour legend -- where naming the trace node in every heading would be clutter.
+$ec_lang['lpn_pgraph_source_share_from']='{node} မှ ရင်းမြစ်ဝေစု';
+$ec_lang['lpn_result_pump_head']='ဖိမြင့်ဆင့်';
+$ec_lang['lpn_result_pump_head_tip']='ရေတင်စက်က စုပ်ဘက်မှ ထုတ်ဘက်သို့ ပေါင်းထည့်ပေးသော ဖိမြင့်ဆင့်ကို အပေါင်းကိန်းအဖြစ် ပြထားသည်။ ဖြေရှင်းစက်နှင့် EPANET ဖိုင်များတွင် ၎င်းကို အနှုတ်လက္ခဏာ ဖိမြင့်ဆင့်ဆုံးရှုံးမှုအဖြစ် သိမ်းဆည်းသည်။';
+// The Full report puts every node and link in one table, where a node's Head column already sits, so a
+// pump's column there says whose head it is. Elsewhere the pump's own row or tab says so, and lpn_result_pump_head is enough.
+$ec_lang['lpn_report_pump_head']='ရေတင်စက် ဖိမြင့်ဆင့်';
 $ec_lang['lpn_ts_add']='ရွေးထားသည်များကို ထည့်ရန်';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
 $ec_lang['lpn_ts_add_none']='ထည့်စရာ မတွေ့ပါ။';
@@ -1634,6 +1899,10 @@ $ec_lang['lpn_ts_none']='ဂရပ်ဆွဲရန် မည်သည့်အ
 $ec_lang['lpn_ts_no_frames']='အချိန်ကာလ အတုယူတွက်ချက်မှု အဖြေများ မရှိသေးပါ။ ပုံဖော်တွက်ချက်မှုကို လည်ပတ်ရန် တွက်ချက်ရန် ကို နှိပ်ပါ။';
 $ec_lang['lpn_ts_summary']='အစိတ်အပိုင်းများ - {n}၊ အစီရင်ခံ အချိန်များ - {steps}';
 $ec_lang['lpn_ts_axis_time']='ကုန်ဆုံးအချိန်';
+// EPANET's Frequency Plot (Task 600): one value over every junction or every pipe, at the time the
+// map shows, against the percent of them less than it. "Percent less than" is EPANET's own axis
+// title. {n} and {total} are counts, {time} an elapsed time; all substituted, never concatenated.
+// The Junctions/Pipes choice reuses lpn_pane_tab_junctions and lpn_pane_tab_pipes.
 $ec_lang['lpn_freq_menu']='ကြိမ်နှုန်း';
 $ec_lang['lpn_freq_tip']='ဂုဏ်သတ္တိတစ်ခု၏ ကြိမ်နှုန်းဖြန့်ဝေမှု';
 $ec_lang['lpn_freq_title']='တန်ဖိုးများ ဖြန့်ဝေမှု';
@@ -1641,9 +1910,16 @@ $ec_lang['lpn_freq_none']='ဤတန်ဖိုးအတွက် အဖြေ�
 $ec_lang['lpn_freq_summary']='ဂရပ်ဆွဲထားသည် - {total} အနက် {n}';
 $ec_lang['lpn_freq_summary_time']='ဂရပ်ဆွဲထားသည် - {total} အနက် {n}၊ {time} တွင်';
 $ec_lang['lpn_freq_axis_percent']='ထက်နည်းသော ရာခိုင်နှုန်း';
+// EPANET's Contour Plot (Task 600), drawn as a layer under the map rather than in a window of its
+// own, from the pipes outward. {n} and {p} are counts, {k} and {i} numbers, {u} a unit symbol, {m} a
+// distance in metres; all substituted. lpn_contour_buffer_unit follows the Buffer number box.
+// lpn_contour_consent_1..4 are the terrain question's four paragraphs, reworded for what the contour
+// plot sends: tile numbers for the network's area, not each node's latitude and longitude.
 $ec_lang['lpn_contour_menu']='တန်ဖိုးတူမျဉ်း';
 $ec_lang['lpn_contour_tip']='မြေပုံပေါ်တွင် တန်ဖိုးတူမျဉ်း ပုံကို ပြရန် - ပိုက်လိုင်းများ တစ်လျှောက်နှင့် ၎င်းတို့၏ ဘေးတွင် ဆက်စပ်နေရာ အရောင်များ ပျံ့နှံ့ပြီး၊ အမည်တပ်ထားသော တန်ဖိုးတူမျဉ်းများ ပါသည်။ ချိန်ညှိရန် (သို့) ပိတ်ရန် ဘောက်စ်တစ်ခု ပွင့်လာသည်။';
 $ec_lang['lpn_contour_plot']='တန်ဖိုးတူမျဉ်း ပုံ';
+$ec_lang['lpn_contour_show']='အမြင့်မျဉ်းများ ပြရန်';
+$ec_lang['lpn_contour_show_tip']='အရောင်ဖြည့်မှုနှင့် အမြင့်မျဉ်းများကို ဖျောက်ရန် ရွေးချယ်မှုကို ဖယ်ပါ၊ မူလအတိုင်း ပြန်ပြရန် ရွေးချယ်ပါ။ node အရောင်များ ဆက်ရှိနေသည်။';
 $ec_lang['lpn_contour_fill']='အရောင်ဖြည့်ပုံ';
 $ec_lang['lpn_contour_fill_tip']='ချောမွေ့ ဆိုသည်မှာ အရောင်များကို အတန်းတစ်ခုမှ နောက်တစ်ခုသို့ ဖြည်းဖြည်း ရောနှောပေးခြင်း။ အလွှာများ ဆိုသည်မှာ အရောင်ကီးရှိ အတန်းတစ်ခုစီကို အရောင်တစ်မျိုးတည်းဖြင့် ပြားပြားဖြည့်ခြင်း။';
 $ec_lang['lpn_contour_fill_smooth']='ချောမွေ့';
@@ -1666,8 +1942,13 @@ $ec_lang['lpn_contour_consent_1']='မြေပြင်ပေါ်တွင်
 $ec_lang['lpn_contour_consent_2']='ဤသည်မှာ သင့်ပရောဂျက်နောက်ခံရှိ မြေပုံပုံများနှင့် မတူသော မေးခွန်းတစ်ခုဖြစ်သည်။ ထိုပုံများက သင်ကြည့်နေသော နေရာကိုသာ ပြောပြသည်။ ဤအကွက်များက သင့်ကွန်ရက် ရှိရာနေရာကို ပြောပြသည်။ Mapbox သည် ထိုအကွက်နံပါတ်များနှင့် သင့် IP လိပ်စာကို လက်ခံရရှိမည်။ အခြားအရာ မည်သည့်အရာမျှ မပို့ပါ - အမည်၊ ပိုက်လိုင်းများ၊ ပရောဂျက် မပါပါ။ ကျွန်ုပ်တို့ မှတ်တမ်းမထားပါ၊ ဤမေးခွန်းအတွက် သင့်အဖြေမှလွဲ၍ ဤစက်ပေါ်တွင် မည်သည့်အရာမျှ မသိမ်းဆည်းပါ။';
 $ec_lang['lpn_contour_consent_3']='သင့်ကွန်ရက်ဧရိယာ၏ အကွက်နံပါတ်များကို Mapbox သို့ ပို့ရမလား။';
 $ec_lang['lpn_contour_consent_4']='မပို့ရန် ဆိုပါက ဤစာမျက်နှာရှိ အခြားအရာအားလုံးသည် ယခုကဲ့သို့ပင် ဆက်လည်ပတ်ပြီး၊ တန်ဖိုးတူမျဉ်း ပုံကို အမှတ်များကြားတွင်သာ ဆွဲမည်။ "ပို့ပါ" ဟု ဆိုလျှင် နောက်ထပ်မမေးရန် မှတ်ထားမည်။ "မပို့ပါ" ဟူသော အဖြေကို လုံးဝ မသိမ်းဆည်းပါ။';
+// EPANET's System Flow plot (Task 600). "System flow" is its Graph Selection name, "System flow
+// balance" its window title, "Produced" and "Consumed" its series. The definition is its own code
+// (Fgraph.pas GetSysFlow): junction and reservoir demands only, split by sign; tanks in neither.
+// The axis reuses lpn_result_flow and lpn_ts_axis_time.
 $ec_lang['lpn_sysflow_menu']='ရေစီးနှုန်း ချိန်ခွင်လျှာ';
 $ec_lang['lpn_sysflow_tip']='အချိန်ကာလ အတုယူတွက်ချက်မှု တစ်လျှောက် ထုတ်လုပ်ပေးသော စုစုပေါင်း ရေစီးနှုန်းနှင့် သုံးစွဲသော စုစုပေါင်း ရေစီးနှုန်းကို အချိန်ပေါ်အခြေခံ၍ ဂရပ်ဆွဲရန်။ ရေတိုက်များသည် စုစုပေါင်းနှစ်ခုလုံးတွင် မပါသောကြောင့်၊ မျဉ်းနှစ်ကြောင်း ကွဲထွက်သည့်နေရာတွင် ရေတိုက်များ ရေတက်နေသည် (သို့) ရေကျနေသည်။';
+$ec_lang['lpn_sysflow_title']='ရေစီးနှုန်း ဟန်ချက်';
 $ec_lang['lpn_sysflow_produced']='ထုတ်လုပ်သည်';
 $ec_lang['lpn_sysflow_produced_tip']='ရေကန်များနှင့် အနုတ်လိုအပ်ချက်များမှ ကွန်ရက်ထဲသို့ ဝင်သော စုစုပေါင်း ရေစီးနှုန်း။';
 $ec_lang['lpn_sysflow_consumed']='သုံးစွဲသည်';
@@ -1711,8 +1992,9 @@ $ec_lang['lpn_new_coordsys_local_tip']='ပထဝီရည်ညွှန်း 
 // system" on 2026-09-25 -- don't expose the word "projection".) Two filters over one catalogue, and
 // the catalogue itself is not keyed: a coordinate system's NAME is the EPSG register's own, exactly
 // as the OpenStreetMap credit is, and a GIS reader in any language looks for those characters.
-// **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25). Shared by the New project box and Convert as, so
-// it names the box's own subject rather than either caller's radio label.
+// **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25) is lpn_new_coordsys, as are its list label and
+// the New project box's chooser button (Task 699): it names the box's own subject rather than
+// either caller's radio label.
 // The spatial filter. A zoned system covers a strip of the Earth and nothing outside it, so a place
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
@@ -1735,6 +2017,8 @@ $ec_lang['lpn_crs_count_network']='ကိုဩဒိနိတ် စနစ် {
 // when this page has no transform for it. Short on purpose: it sits at the end of a register name
 // that can already run to 50 characters.
 $ec_lang['lpn_crs_unplaceable_mark']='(မြေပုံ မရှိ)';
+// Shown beside WGS 84 (EPSG:4326) in the chooser only (Task 775), never on the status strip.
+$ec_lang['lpn_crs_suggested_mark']='(အကြံပြုထားသည်)';
 // The same fact in a sentence: when such a project is created, and when Go to or place name search
 // is used on one. File, Convert as says it in its own words (lpn_convas_no_transform).
 $ec_lang['lpn_crs_unplaceable']='{crs} သည် အသုံးပြုနိုင်သော ပရိုဂျက်ရှင် အချက်အလက် မပါသော စာရင်းပါ ကိုဩဒိနိတ် စနစ် အနည်းငယ်အနက် တစ်ခု ဖြစ်သည်။ ဆိုလိုသည်မှာ ကမ္ဘာ့မြေပုံ၊ နေရာအမည် ရှာဖွေခြင်းနှင့် DEM အမြင့်များ အလုပ်မလုပ်ပါ။ သင့် ကိုဩဒိနိတ်များကို မထိခိုက်ပါ။';
@@ -1791,19 +2075,82 @@ $ec_lang['lpn_import_no_room']='ဤပရောဂျက်ကို ထည့�
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='အိုကေ';
+// **TASK 718** (Tom, 2026-09-25: *"We have three import items. It's probably time for an Import
+// sub-menu."*). The three rows -- surveyed points, an EPANET file, and libraries -- now open as a
+// fly-out off one row, the same submenu idiom Help > Toolbar already uses. Each row keeps its
+// own existing key and tip; only this one row is new.
 $ec_lang['lpn_file_import_menu']='တင်သွင်းရန်…';
 $ec_lang['lpn_file_import_inp']='EPANET ဖိုင် တင်သွင်းရန်…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='EPANET ဖိုင်တစ်ခု - .inp စာသားဖိုင် (သို့) EPANET သိမ်းဆည်းသော .net ဖိုင် တစ်ခုခုမှ ကွန်ရက်တစ်ခုကို ဖတ်ယူပြီး၊ ဤဘရောက်ဇာထဲတွင် ပရောဂျက်အသစ်တစ်ခုအဖြစ် သိမ်းဆည်းသည်။';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
+// File > Export is a submenu (Tom, 2026-10-06), so its rows drop the verb the heading carries. The
+// two keys above are what the rows were called before it.
+$ec_lang['lpn_file_export_menu']='ထုတ်ယူရန်…';
+$ec_lang['lpn_file_export_item_inp']='EPANET ဖိုင်…';
+$ec_lang['lpn_file_export_item_geojson']='GeoJSON ဖိုင်…';
+$ec_lang['lpn_file_export_item_ods']='ODS ဖိုင်…';
+$ec_lang['lpn_file_export_item_xlsx']='XLSX ဖိုင်…';
+$ec_lang['lpn_file_export_item_csv']='CSV ဖိုင်…';
+$ec_lang['lpn_file_export_tables_tip']='ဇယားများ ပင်န်တွင် ပြသည့်အတိုင်း ဇယားများကို workbook တစ်ခုတည်းတွင် ဇယားတစ်ခုစီအတွက် (နှင့် သင်ရွေးသော အခြေအနေတစ်ခုစီအတွက်) စာရွက်တစ်ရွက်စီ၊ ထို့အပြင် ၎င်းတို့၏ ID များ ရည်ညွှန်းသော စာရင်းတစ်ခုစီ (ပုံစံများ၊ ကွေးမျဉ်းများ၊ ပိုက်အမျိုးအစားများနှင့် ချိတ်ဆက်ပစ္စည်းများ) အတွက် စာရွက်တစ်ရွက်စီဖြင့် ဒေါင်းလုဒ်လုပ်ပါ။ နောက်ဆုံး တွက်ချက်ထားသော အခြေအနေအတွက်သာ ရလဒ်များ ပါဝင်သည်။';
+$ec_lang['lpn_file_export_csv_tip']='ဇယားများ ပင်န်တွင် ပြသည့်အတိုင်း ဇယားတစ်ခုကို ဒေါင်းလုဒ်လုပ်ပါ။ ဇယားတစ်ခုသည် စာရင်းများမပါသော CSV ဖိုင်တစ်ဖိုင်တည်း ဖြစ်သည်။ ဇယားများစွာ သို့မဟုတ် အခြေအနေများစွာသည် CSV ဖိုင်များပါသော zip ဖိုင်တစ်ခုအဖြစ် ထွက်လာပြီး ၎င်းတို့၏ ID များ ရည်ညွှန်းသော စာရင်းတစ်ခုစီအတွက် ဖိုင်တစ်ခုစီ ပါဝင်သည်။ နောက်ဆုံး တွက်ချက်ထားသော အခြေအနေအတွက်သာ ရလဒ်များ ပါဝင်သည်။';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='ဤကွန်ရက်ကို EPANET .inp ဖိုင်အဖြစ် ဒေါင်းလုဒ်လုပ်ပါ (သက်ဆိုင်ပါက ၎င်း၏ပုံနှင့်အတူ zip ဖိုင်ထဲတွင်)။ .inp ဖော်မတ်က မသိမ်းနိုင်သည်များကို နောက်မှ စာရင်းပြပေးသည်။';
 $ec_lang['lpn_status_inp_exported']='{file} ကို ထုတ်ပြီးပါပြီ။';
+$ec_lang['lpn_status_inp_exported_picture']='{zip} ကို ထုတ်ယူပြီး - EPANET ဖိုင် {file}၊ ၎င်း၏ နောက်ခံပုံ {picture} နှင့် ပုံနေရာသတ်မှတ်ဖိုင် {world} တို့ ပါသည်။ ဖိုင်သုံးခုလုံးကို ဖိုလ်ဒါတစ်ခုတည်းတွင် ဖြေချပြီး EPANET တွင် .inp ကို ဖွင့်ပါ၊ ပုံလည်း ၎င်းနှင့်အတူ လာမည်။';
+$ec_lang['lpn_status_inp_exported_no_picture']='{file} ကို ထုတ်ယူပြီး။ နောက်ခံပုံကို သိမ်း၍ မရသဖြင့် .inp တွင် မည်သည့်ပုံမျှ မပါပါ၊ EPANET တွင် View > Backdrop > Load ဖြင့် ထည့်ပါ။';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+
+
 $ec_lang['lpn_inp_export_differences']='.inp ဖော်မတ်က မသိမ်းနိုင်သည့် အရာ {n} ခု။';
+$ec_lang['lpn_inp_export_difference_one']='.inp ဖော်မတ်က မသိမ်းနိုင်သော အချက်တစ်ခု။';
 $ec_lang['lpn_inp_export_refused']='ဤပရောဂျက်ကို EPANET ဖိုင်အဖြစ် ရေး၍မရပါ - {detail}';
+// Task 772: File > Export DXF file. The model's data for AutoCAD and other CAD programs.
+$ec_lang['lpn_file_export_item_dxf']='DXF ဖိုင်…';
+$ec_lang['lpn_file_export_dxf_tip']='ဤကွန်ရက်ကို AutoCAD နှင့် အခြား CAD ပရိုဂရမ်များအတွက် ဒေါင်းလုဒ်လုပ်ပါ - နေရာများကို သင်္ကေတ ဘလောက်များအဖြစ်၊ ပိုက်လိုင်းများ၊ ရေတင်စက်များနှင့် ဗားလ်များကို polyline များအဖြစ်၊ အစိတ်အပိုင်းတိုင်းကို ၎င်း၏ ID နှင့် ဂုဏ်သတ္တိတန်ဖိုးများကို ပရောဂျက်ယူနစ်များဖြင့် attribute များတွင် ထားသော ဘလောက်တစ်ခုအဖြစ် ထုတ်ပေးသည်။';
+$ec_lang['lpn_dxf_export_no_utm']='DXF ဖိုင်ကို မရေးသားခဲ့ပါ - ဤကွန်ရက်သည် UTM ကာမိသော လတ္တီတွဒ်များ (80° S မှ 84° N) ပြင်ပတွင် ရှိပြီး ပုံဆွဲရန်အတွက် ပြားချပ်သော ဂရစ်တစ်ခု လိုအပ်သည်။';
+$ec_lang['lpn_dxf_export_refused']='DXF ဖိုင်ကို မရေးသားခဲ့ပါ - လိုအပ်သော ကိုအော်ဒိနိတ် ပြောင်းလဲမှု မတင်နိုင်ခဲ့ပါ။ ချိတ်ဆက်မှုကို စစ်ဆေးပြီး ထပ်ကြိုးစားပါ။';
+$ec_lang['lpn_dxf_export_failed']='DXF ဖိုင်ကို မရေးသားခဲ့ပါ - ဤစာမျက်နှာရှိ အမှားတစ်ခုကြောင့် ရပ်သွားသည် ({error})။';
+// The read-me written into the file as a block of attributes, on a layer that does not plot; the
+// file writes it in capital letters. Each says what
+// the coordinates are and claims no coordinate system the file does not have. {unit} is a length
+// unit as written in English (ft, m), not translated; {crs} is a coordinate system name with its EPSG code.
+$ec_lang['lpn_dxf_note_grid']='ကိုအော်ဒိနိတ်များ - ဤပရောဂျက်၏ X နှင့် Y ကို {unit} ဖြင့်။ ကိုအော်ဒိနိတ်စနစ် မဖော်ပြထားပါ။';
+$ec_lang['lpn_dxf_note_crs']='ကိုအော်ဒိနိတ်များ - {crs}၊ ဤပရောဂျက်က ဖော်ပြထားသည့်အတိုင်း။';
+$ec_lang['lpn_dxf_note_geo']='ကိုအော်ဒိနိတ်များ - {crs}၊ မီတာဖြင့်၊ လတ္တီတွဒ်နှင့် လောင်ဂျီတွဒ် မဟုတ်ပါ။ ပရောဂျက်၏ လတ္တီတွဒ်နှင့် လောင်ဂျီတွဒ်များကို ထိုဂရစ်သို့ ပြောင်းထားသည်။';
+$ec_lang['lpn_dxf_exported_geo']='{file} ကို ထုတ်ယူပြီးပါပြီ။ ၎င်း၏ ကိုအော်ဒိနိတ်များမှာ {crs} ဖြစ်ပြီး မီတာဖြင့်ဖြစ်ကာ လတ္တီတွဒ်နှင့် လောင်ဂျီတွဒ် မဟုတ်ပါ။';
+// {prefix} is the layer-name prefix, C-WATR-MODL-; {example} is a whole layer name such as
+// C-WATR-MODL-NODE-BASE.
+$ec_lang['lpn_dxf_note_blocks']='အလွှာများကို {prefix}၊ အစိတ်အပိုင်းကုဒ်၊ ကြားကပ်မျဉ်းတို နှင့် အခြားရွေးစရာ အစီအစဉ်ဖြင့် အမည်ပေးထားသည်၊ ဥပမာ {example}။ အစိတ်အပိုင်းတစ်ခုစီသည် စကေး 1 ဖြင့် ထည့်ထားသော ဘလောက်တစ်ခုဖြစ်ပြီး attribute များသည် အမြင့် ယူနစ် 1 ရှိသည်၊ စာလုံးအမြင့်ကို သတ်မှတ်ရန် ဘလောက်များကို စကေးချဲ့ပါ။ attribute တိုင်းကို မြင်ရပြီး အစိတ်အပိုင်းတစ်ခု၏ attribute များကို ၎င်း၏ သင်္ကေတဘေးတွင် ကော်လံတစ်ခုအဖြစ် ထပ်ထားသည်။';
+// {n} is a whole number; {max} is 2049. Each shortened value ends in three periods (...).
+$ec_lang['lpn_dxf_note_shortened']='DXF ဖိုင်က ခွင့်ပြုသည်ထက် ပိုရှည်သော တန်ဖိုးများ ({max} လုံး) - {n}။ တစ်ခုစီကို အတိုချုံ့ပြီး အစက်သုံးစက်ဖြင့် အဆုံးသတ်ထားသည်။';
+// {n} is a whole number; {tag} is an attribute tag in capitals, BASE_DEMAND in English.
+$ec_lang['lpn_dxf_note_categories']='လိုအင်အမျိုးအစား တစ်ခုထက်ပိုရှိသော ဆက်စပ်နေရာများ - {n}။ ၎င်းတို့၏ {tag} attribute သည် အမျိုးအစားအားလုံး၏ အခြေခံလိုအင်များ၏ ပေါင်းလဒ်ကို ထိန်းထားသည်။';
+// GeoJSON export (Task 728). The command is worded like Export EPANET file. Positions in a GeoJSON
+// file are always longitude and latitude (RFC 7946), so a project with no place on the Earth is
+// refused and told how to get one, never written with an invented coordinate system.
+$ec_lang['lpn_file_export_geojson_tip']='QGIS၊ ArcGIS Pro နှင့် အခြား GIS ပရိုဂရမ်များအတွက် ဤကွန်ရက်ကို GeoJSON ဖိုင်အဖြစ် ဒေါင်းလုဒ်လုပ်ပါ။ ဆက်စပ်နေရာများ၊ ရေတိုက်များနှင့် ရေကန်များသည် အမှတ်များ ဖြစ်ပြီး ပိုက်လိုင်းများ၊ ရေတင်စက်များနှင့် ဗားလ်များသည် ၎င်းတို့၏ အကွေ့မှတ်များအတိုင်း လိုက်သော မျဉ်းများ ဖြစ်သည်။ တည်နေရာများသည် လတ္တီတွဒ်နှင့် လောင်ဂျီတွဒ် ဖြစ်သည်။ ရလဒ်များကို ကွန်ရက် ဖြေရှင်းပြီးမှသာ ထည့်သွင်းသည်။';
+// Workspace export and import (Tom, 2026-10-07). {file}, {n}, {r}, {u} and {version} are filled in by the page.
+$ec_lang['lpn_file_export_item_workspace']='လုပ်ငန်းခွင်…';
+$ec_lang['lpn_file_export_workspace_tip']='သင့်ဘောက်စ်များ တည်ရှိရာ၊ ၎င်းတို့၏ အရွယ်အစား၊ မည်သည်တို့ ပွင့်နေသည် သို့မဟုတ် ကပ်ထားသည်၊ သင့်ပင်န်နှင့် ကော်လံ အရွယ်အစားများ၊ ထို့အပြင် မည်သည့် အကူအညီပူဖောင်းများနှင့် hover ကတ်ကို ပြသည်ဟူသော ဤစာမျက်နှာ၏ ပြသမှု ရွေးစရာများပါသော ဖိုင်အသေးတစ်ခုကို ဒေါင်းလုဒ်လုပ်ပါ။ သင့်ပရောဂျက်များ၊ ပရောဂျက်ဆက်တင်များနှင့် ကွတ်ကီးများ (ဘာသာစကား၊ ခွင့်ပြုချက်၊ ယူနစ်များ) မပါဝင်ပါ။ အခြားစခရင် သို့မဟုတ် ဘရောက်ဇာတွင် ဖိုင်၊ တင်သွင်းရန်၊ လုပ်ငန်းခွင် ဖြင့် တင်ပါ။';
+$ec_lang['lpn_file_import_workspace']='လုပ်ငန်းခွင်…';
+$ec_lang['lpn_file_import_workspace_tip']='ဖိုင်၊ ထုတ်ယူရန်၊ လုပ်ငန်းခွင် ဖြင့် သိမ်းထားသော လုပ်ငန်းခွင်ဖိုင်ကို အသုံးပြုပါ - ဘောက်စ်တည်နေရာနှင့် အရွယ်အစားများ၊ ကပ်ထားမှု၊ ပင်န်အရွယ်အစားများနှင့် မည်သည့် အကူအညီပူဖောင်းများနှင့် hover ကတ်ကို ပြသည်ဟူသော ဤစာမျက်နှာ၏ ပြသမှု ရွေးစရာများ။ သင့်ပရောဂျက်များနှင့် ကွတ်ကီးများကို မထိပါ။';
+$ec_lang['lpn_workspace_exported']='လုပ်ငန်းခွင်ကို {file} သို့ သိမ်းပြီးပါပြီ - ဆက်တင် {n} ခု။';
+$ec_lang['lpn_workspace_imported']='လုပ်ငန်းခွင်ကို {file} မှ အသုံးပြုပြီးပါပြီ။ အသုံးပြုထားသော ဆက်တင်များ - {n}။ မူလတန်ဖိုးသို့ ပြန်ထားသည်များ - {r}။';
+$ec_lang['lpn_workspace_ignored']='အသိအမှတ်မပြုသောကြောင့် လျစ်လျူရှုထားသော ထည့်သွင်းချက်များ - {u}။';
+$ec_lang['lpn_workspace_refused_unreadable']='ဤဖိုင်ကို လုပ်ငန်းခွင်အဖြစ် ဖတ်၍မရသဖြင့် ဘာမျှ မပြောင်းလဲခဲ့ပါ။';
+$ec_lang['lpn_workspace_refused_format']='ဤစာမျက်နှာက သိမ်းထားသော လုပ်ငန်းခွင်ဖိုင် မဟုတ်သဖြင့် ဘာမျှ မပြောင်းလဲခဲ့ပါ။';
+$ec_lang['lpn_workspace_refused_newer']='ဤလုပ်ငန်းခွင်ဖိုင်ကို ဤစာမျက်နှာ၏ ဗားရှင်းအသစ်က သိမ်းထားသဖြင့် (ဖော်မတ် {version}) ဘာမျှ မပြောင်းလဲခဲ့ပါ။';
+$ec_lang['lpn_workspace_confirm']='ဤဘရောက်ဇာ၏ လုပ်ငန်းခွင် အပြင်အဆင်ကို ဖိုင်ထဲရှိ အပြင်အဆင်ဖြင့် အစားထိုးမလား။';
+$ec_lang['lpn_workspace_refused_storage']='ဘရောက်ဇာ သိုလှောင်ခန်း ပြည့်နေသည် သို့မဟုတ် မရနိုင်သဖြင့် လုပ်ငန်းခွင်ကို မအသုံးပြုခဲ့ပါ။';
+$ec_lang['lpn_geojson_refused_local']='GeoJSON ဖိုင်တွင် လတ္တီတွဒ်နှင့် လောင်ဂျီတွဒ်သာ ရှိပြီး ဤပရောဂျက်ကို ကမ္ဘာမြေပေါ်တွင် နေရာမရှိသော ဒေသတွင်းကွက်ကွက်ပေါ်တွင် ရေးဆွဲထားသည်။ အရင်ဆုံး မြေပုံ၊ ကမ္ဘာ့မြေပုံ၊ တွဲထည့်ရန် ဖြင့် ကမ္ဘာမြေပေါ်သို့ တွဲပြီးမှ ထပ်မံထုတ်ယူပါ။';
+$ec_lang['lpn_geojson_refused_range']='ဤတည်နေရာများသည် မှန်ကန်သော လတ္တီတွဒ်နှင့် လောင်ဂျီတွဒ် မဟုတ်ပါ - {detail}';
+$ec_lang['lpn_geojson_refused_crs']='ဤပရောဂျက်၏ သြဒီနိတ်စနစ် ({detail}) ကို ဤစာမျက်နှာက မသိသဖြင့် ၎င်း၏ တည်နေရာများကို လတ္တီတွဒ်နှင့် လောင်ဂျီတွဒ်သို့ ပြောင်း၍ မရပါ။ ဤစာမျက်နှာ သိသောစနစ်တစ်ခုသို့ ပရောဂျက်ကို ကူးရန် ပြောင်းလဲရန်… ကို အသုံးပြုပြီးမှ ထပ်မံထုတ်ယူပါ။';
+$ec_lang['lpn_geojson_refused_empty']='ထုတ်ယူစရာ မရှိသေးပါ။ အရင်ဆုံး ကွန်ရက်တစ်ခု ရေးဆွဲပါ သို့မဟုတ် ဖွင့်ပါ။';
+$ec_lang['lpn_geojson_results_in']='မျက်နှာပြင်ပေါ်ရှိ ရလဒ်များ ပါဝင်သည်။';
+$ec_lang['lpn_geojson_results_out']='ကွန်ရက်ကို မဖြေရှင်းရသေးသဖြင့် ရလဒ်များ မပါဝင်ပါ။';
 $ec_lang['lpn_inp_bad_file']='ထိုဖိုင်ကို EPANET ကွန်ရက်ဖိုင်တစ်ခုအဖြစ် ဖတ်၍မရပါ။';
 // EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
 // the way out named here always works, so keep the instruction in the message rather than leaving
@@ -1819,6 +2166,10 @@ $ec_lang['lpn_inp_report_label_anchor']='စာသား အညွှန်း�
 // or no [BACKDROP] line at all, never only "None" -- because none of those states a real coordinate
 // system either. See showInpReport() in js/looped-network.js.
 $ec_lang['lpn_inp_report_no_crs']='EPANET ဖိုင်များတွင် ကိုဩဒိနိတ် စနစ် မပါဝင်ပါ၊ သို့ဖြစ်၍ ဤဖိုင်ကို အစပိုင်းတွင် ပထဝီအညွှန်း မတပ်ထားပါ။ ကမ္ဘာ့မြေပုံပေါ်တွင် ချထားလိုပါက၊ မြေပုံ > ကမ္ဘာ့မြေပုံ… ကို သုံးပါ။ ၎င်း၏ ကိုဩဒိနိတ်များကို ပြောင်းလဲလိုပါက၊ ဖိုင် > ပြောင်းလဲရန်… ကို သုံးပါ။';
+$ec_lang['lpn_inp_backdrop_attach']='{file} ကို တွဲထည့်ရန်…';
+$ec_lang['lpn_inp_backdrop_attach_tip']='ဝက်ဘ်စာမျက်နှာသည် ပုံကို အမည်ဖြင့် ဖွင့်၍ မရပါ။ သင့်စက်ထဲမှ ရွေးချယ်ပါ၊ ဖိုင်က သတ်မှတ်ထားသည့် နေရာတွင် ထားမည်။';
+$ec_lang['lpn_inp_backdrop_attached']='{file} ကို တွဲထည့်ပြီး၊ ဖိုင်က သတ်မှတ်ထားသည့် နေရာတွင် ထားသည်။';
+$ec_lang['lpn_inp_backdrop_attached_other']='{picked} ကို တွဲထည့်ပြီး၊ ဖိုင်က သတ်မှတ်ထားသည့် နေရာတွင် ထားသည်။ ဖိုင်တွင် အမည်ပါသည်မှာ {file} ဖြစ်ပြီး မတူညီသော အမည်ဖြစ်သည်။';
 $ec_lang['lpn_inp_report_lead']='ဤစာမျက်နှာသည် EPANET ၏ အင်္ဂါရပ်အားလုံးကို မသုံးသော်လည်း ဖိုင်ရှိ ဒေတာတစ်ခုမျှ မဖယ်ပစ်ပါ။ အောက်ပါစာရင်းသည် ဖိုင်တွင်ရှိပြီး ထိန်းထားသော်လည်း မသုံးသည့် ဒေတာနှင့် တင်သွင်းစဉ်အတွင်း ပြုလုပ်ခဲ့သော ပြောင်းလဲမှုများကို ပြသည် -';
 $ec_lang['lpn_inp_drop_headloss']='ဤဖိုင်သည် Hazen-Williams ဖော်မြူလာကို မသုံးပါ။ ဤစာမျက်နှာသည် Hazen-Williams ဖြင့် တွက်ချက်သဖြင့် ပိုက်လိုင်းကြမ်းတမ်းမှုဂဏန်းများကို ရေးထားသည့်အတိုင်း ထားသော်လည်း ဤနေရာရှိ ရလဒ်များသည် EPANET ရှိ ရလဒ်များနှင့် မကိုက်ညီပါ။';
 $ec_lang['lpn_inp_drop_tank_curve']='ဤရေတိုက်များသည် နံရံတည့်သော ရေတိုက်များ မဟုတ်ပါ - ဖိုင်သည် ၎င်းတို့၏ ပုံသဏ္ဍာန်ကို ပမာဏကွေးမျဉ်းအဖြစ် ပေးထားသည်။ ကွေးမျဉ်းကို စာရင်းများ ဘောက်စ်တွင် ထားပြီး ရေတိုက်က ၎င်းကို ဆက်ရည်ညွှန်းကာ extended period simulation သည် ရေတိုက်ပြည့်ခြင်း၊ ကျခြင်းအတွက် ရေအနက်ကို တွက်ရာတွင် သုံးသည်။ ရေမျက်နှာပြင်သည် ဖိုင်တွင် ဖော်ပြထားသော အနက်တွင် ရှိသဖြင့် တစ်ကာလတည်း ခွဲခြမ်းစိတ်ဖြာမှုကို မထိခိုက်ပါ။ ဖိုင်ရှိ အချင်းကို ကွေးမျဉ်းဘေးတွင် ထားပြီး ကွေးမျဉ်းမရှိသော ရေတိုက်ကို ရေးဆွဲရန်နှင့် ဖြေရှင်းရန် သုံးသည်။';
@@ -1849,6 +2200,7 @@ $ec_lang['lpn_inp_drop_tags']='ဤဖိုင်သည် ဆက်စပ်န
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_inp_drop_report']='ဤဖိုင်တွင် EPANET အစီရင်ခံစာဖော်မတ် ဆက်တင်များ ပါသည်။ လည်ပတ်မှု အစီရင်ခံစာကို အစီရင်ခံစာများ၊ လည်ပတ်မှု တွင် ရနိုင်သော်လည်း ဤဆက်တင်များ သတ်မှတ်သော ဖော်မတ်အစား စံ EPANET ဖော်မတ်ကို သုံးသည်။ လိုင်းများကို ထားပြီး EPANET ဖိုင်သိမ်းလျှင် ပြန်ရေးသည်။';
 $ec_lang['lpn_inp_drop_sections']='ဤဖိုင်တွင် ဤစာမျက်နှာက လုံးဝ မဖတ်သော အပိုင်းတစ်ခု ပါရှိသည်။ ဤနေရာတွင် ၎င်းကို အသုံးမပြုပါ။ ၎င်းကို အပြည့်အစုံ ဆက်ထိန်းသိမ်းထားပြီး၊ EPANET ဖိုင်တစ်ခု သိမ်းလိုက်ပါက ၎င်းကို ပြန်ရေးပေးမည်။';
+$ec_lang['lpn_inp_drop_comments']='ဤဖိုင်၏ ပုံစံများ သို့မဟုတ် ရိုးရိုးထိန်းချုပ်မှုများရှိ ဤမှတ်ချက်လိုင်းများကို မတင်သွင်းခဲ့ပါ၊ အကြောင်းမှာ ဤစာမျက်နှာတွင် ၎င်းတို့ကို ထားရန် နေရာမရှိသောကြောင့် ဖြစ်သည် (ဥပမာ ပုံစံတစ်ခု၏ အတန်းများကြား)။ ပုံစံတိုင်းနှင့် ထိန်းချုပ်မှုတိုင်းကို အပြည့်အဝ တင်သွင်းခဲ့သည်။';
 $ec_lang['lpn_inp_drop_quality_options']='ဤဖိုင်သည် EPANET ရေအရည်အသွေး ရွေးစရာများကို ဖော်ပြသည် - ရေအရည်အသွေး ခွဲခြမ်းစိတ်ဖြာမှု အမျိုးအစားကို အမည်ပေးသော Quality option နှင့် ဓာတုပစ္စည်းနှင့် တွဲပါသော ဆက်တင်နှစ်ခု Relative diffusivity နှင့် Quality tolerance။ သုံးခုလုံးကို ထားပြီး သုံးသည်။ ရေအသက်၊ ရင်းမြစ်ခြေရာခံခြင်းနှင့် ဓာတုပစ္စည်းတစ်ခုကို ဤနေရာတွင် တစ်ခုစီ တွက်ချက်ပြီး ဓာတုပစ္စည်းဆက်တင်နှစ်ခုကို ဓာတုပစ္စည်းတစ်ခု လည်ပတ်သည့်အခါ သုံးသည်။ EPANET ဖိုင်သိမ်းလျှင် ၎င်းတို့အားလုံးကို ပြန်ရေးသည်။';
 $ec_lang['lpn_inp_drop_file_options']='ဤဖိုင်သည် အကူအညီဖိုင်တစ်ခုကို ရည်ညွှန်းသည် - သြဒီနိတ်များပါသော Map သို့မဟုတ် ယခင်တွက်ချက်ပြီး ဟိုက်ဒရောလစ်များပါသော Hydraulics။ ဤစာမျက်နှာသည် နှစ်ခုလုံးကို မဖွင့်နိုင်သဖြင့် လိုင်းများကို ရှိသည့်အတိုင်း ထားပြီး EPANET ဖိုင်သိမ်းလျှင် ပြန်ရေးသည်။';
 $ec_lang['lpn_inp_drop_other_options']='ဤဖိုင်သည် ဤစာမျက်နှာက မဖတ်သော ရွေးချယ်စရာများကို ဖော်ပြသည်။ ဤနေရာတွင် ၎င်းတို့ကို အသုံးမပြုပါ။ ၎င်းတို့ကို ဆက်ထိန်းသိမ်းထားပြီး၊ EPANET ဖိုင်တစ်ခု သိမ်းလိုက်ပါက ၎င်းတို့ကို ပြန်ရေးပေးမည်။';
@@ -1974,8 +2326,9 @@ $ec_lang['lpn_lock_age_unknown']='၎င်းကို မည်မျှကြ
 // Cancel that needed a sentence would not be a Cancel.
 $ec_lang['lpn_lock_open_choices_ask']='“မေးမြန်းရန်” သည် ဤဖိုင်ကို ဖွင့်ထားသူကို သင်လိုချင်ကြောင်း ပြောပြပေးပြီး၊ အခြားမည်သည့်အရာကိုမျှ ပြောင်းလဲမည် မဟုတ်ပါ။ “ဖတ်ရန်သီးသန့် ဖွင့်ရန်” က သင့်အား ၎င်းကို ကြည့်ခွင့်နှင့် မည်သည့်အရာကိုမဆို လိုသလို ပြောင်းလဲခွင့် ပေးသော်လည်း၊ ဤနေရာတွင် သိမ်းဆည်း၍ မရပါ။ “လော့ခ် ချိုးဖျက်ရန်” က သင့်အား ဖိုင်အပေါ်မှ ထပ်၍ သိမ်းဆည်းခွင့် ပေးသည်၊ ၎င်းတို့၏ မသိမ်းရသေးသော အလုပ်ကို ဆုံးရှုံးမည် မဟုတ်သော်လည်း၊ ၎င်းတို့သည် ဤနေရာတွင် နောက်တစ်ကြိမ် မသိမ်းနိုင်တော့ပါ၊ တစ်ယောက်ယောက်က နှစ်ခုကို လက်ဖြင့် ပေါင်းစည်းပေးရန် လိုအပ်နိုင်သည်။';
 $ec_lang['lpn_lock_ask']='မေးမြန်းရန်';
-// Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
-// this computer for it, which is the whole point of moving the question here.
+// Asked at the one moment the name is useful. Nothing is written to this computer for it; the lock
+// broker keeps it in that file's lock record for the holder to read (Tom, 2026-09-29, correcting a
+// prompt that said "stored only in this browser").
 $ec_lang['lpn_lock_ask_prompt']='မည်သူက တောင်းဆိုနေသည်ဟု ပြောရမည်နည်း။ ဥပမာ သင့်အမည်ကြီးစာလုံးအတိုကောက်ကို ထည့်သွင်းပါ။ ၎င်းတို့ကို ဖိုင်ဖွင့်ထားသူအတွက် ကျွန်ုပ်တို့ဆာဗာရှိ ဤဖိုင်၏ သော့နှင့်အတူ ထားပြီး ရက် ၃၀ အတွင်း ဖျက်သည်။';
 $ec_lang['lpn_lock_ask_sent']='ဤဖိုင်ကို ဖွင့်ထားသူအား ပိတ်ပေးရန် မေးမြန်းလိုက်ပါပြီ။ ၎င်းတို့၏ စာမျက်နှာ ဖွင့်ထားဆဲဖြစ်ပါက၊ တစ်မိနစ်အတွင်း တွေ့ရပါလိမ့်မည်။ အခြားမည်သည့်အရာမျှ ပြောင်းလဲခြင်း မရှိပါ၊ ၎င်းတို့ မပိတ်မချင်း ဖိုင်သည် ၎င်းတို့ပိုင်ဆိုင်ဆဲ ဖြစ်သည်။';
 $ec_lang['lpn_lock_ask_failed']='သင့်စာကို ပေးပို့၍ မရပါ။ ယခု ဤဖိုင်ကို ဖွင့်ထားသူ တစ်ဦးမျှ မရှိခြင်း (သို့) ဆာဗာသို့ မရောက်ရှိနိုင်ခြင်း ဖြစ်နိုင်သည်။';
@@ -1983,13 +2336,21 @@ $ec_lang['lpn_lock_ask_failed']='သင့်စာကို ပေးပို�
 // out of the locked-file dialog used to say nothing at all, so a reader who pressed Cancel by
 // reflex had no way to learn what had just been offered. It says what did not happen, and why.
 $ec_lang['lpn_lock_open_cancelled']='ထိုဖိုင်ကို မဖွင့်ခဲ့ပါ၊ ဤနေရာတွင် မည်သည့်အရာမျှ ပြောင်းလဲခြင်း မရှိပါ။ အခြားတစ်ဦးက ၎င်းကို ဖွင့်ထားဆဲ ဖြစ်သည်။';
+// Task 747: a file copied outside this page keeps its original's document ID, and so its lock. Asked
+// whenever this browser cannot guarantee it already knows the file (Tom, 2026-09-30). {date} is when
+// the ID was minted, in the visitor's own regional date-time format.
 $ec_lang['lpn_copy_title']='ဖိုင်ကို မိတ္တူအသစ်အဖြစ် မှတ်မလား။';
 $ec_lang['lpn_copy_body']='ဤဖိုင်က {date} တွင် ဖန်တီးခဲ့သည်ဟု ဆိုပြီး၊ ဤဘရောင်ဇာက ၎င်းကို မသိပါ။ ၎င်းသည် မူရင်းဖိုင် (သော့တူ ဆက်ထားရန်) လား၊ မိတ္တူ (သော့အသစ် ပြုလုပ်ရန်) လား။';
 $ec_lang['lpn_copy_body_nodate']='ဤဘရောင်ဇာက ဤဖိုင်ကို မသိပါ။ ၎င်းသည် မူရင်းဖိုင် (သော့တူ ဆက်ထားရန်) လား၊ မိတ္တူ (သော့အသစ် ပြုလုပ်ရန်) လား။';
 $ec_lang['lpn_copy_original']='မူရင်း၊ သော့တူ ဆက်ထားရန်';
 $ec_lang['lpn_copy_copy']='မိတ္တူ၊ သော့အသစ် ပြုလုပ်ရန်';
+// What "Original" does when the file's id is already open in a tab here with a different file:
+// switch to the tab, without changing the tab's file.
 $ec_lang['lpn_copy_kept_link']='{name} ကို မူရင်းအဖြစ် ဖွင့်ပြီးပါပြီ။ ၎င်းကို နေရာအသစ်သို့ ရွှေ့ထားသည်။ ယခု သိမ်းလျှင် ဤဖိုင်ထဲသို့ ရေးမည်။';
+// Tom, 2026-10-05: the copy is saved the moment it is chosen, so nobody has to remember to.
 $ec_lang['lpn_copy_opened']='{file} ကို မိတ္တူအဖြစ် ဖွင့်ပြီး သိမ်းထားပြီး၊ သော့အသစ်တစ်ခု ပါသည်။';
+// Said only when that save did not happen (permission refused, file gone); the tab stays unsaved.
+$ec_lang['lpn_copy_opened_unsaved']='{file} ကို မိတ္တူအဖြစ် ဖွင့်ပြီး၊ နောက်ဖိုင်သိမ်းချိန်တွင် သိမ်းမည့် သော့အသစ်တစ်ခု ပါသည်။';
 // The other end of the back channel, shown to the holder.
 $ec_lang['lpn_lock_requested']='{name} က ဤဖိုင်ကို တည်းဖြတ်လိုသည်။ အဆင်သင့်ဖြစ်လျှင်၊ သင့်အလုပ်ကို သိမ်းဆည်းပြီး လွှဲပြောင်းပေးရန် ဖိုင် > ပရောဂျက် ပိတ်ရန် ကို သုံးပါ။';
 $ec_lang['lpn_ago_seconds']='{n} စက္ကန့်';
@@ -2129,8 +2490,10 @@ $ec_lang['lpn_notes_5_def']='ရေတင်စက်တစ်ခုသည် H 
 $ec_lang['lpn_notes_6_term']='ဇယား ကော်လံများ အကူအညီ';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one
-// because its own wording pairs a command with a GESTURE, on the same "action, then gesture" shape
-// every row here already has -- the Hide/Show row beside it names the identical menu.
+// because its own wording pairs a command with a GESTURE -- the Hide/Show row beside it names the
+// identical menu. **GESTURE FIRST, THEN ACTION, SINCE 2026-10-06** (Ida, User guide): the cells were
+// swapped in all 27 files, by script and unchanged, so this table reads in the same order as the
+// key-then-action tables beside it (lpn_notes_7_def, lpn_hotkeys_map_def).
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>ခေါင်းစီးကို နှိပ်ပါ</td><td>ကော်လံကို ရွေးချယ်ရန်</td></tr><tr><td>အခြားခေါင်းစီးကို Ctrl+click (သို့) Shift+click နှိပ်ပါ</td><td>ကော်လံ ရွေးချယ်မှုကို ထပ်ထည့်ရန် (သို့) ချဲ့ရန်</td></tr><tr><td>ဖိဆွဲပါ (သို့) right-click (သို့) ⋮ မီနူးရှိ ကော်လံများ စီမံရန်… ကို သုံးပါ</td><td>ရွေးထားသော ကော်လံ(များ)ကို ရွှေ့ရန် (စီစဉ်ပြန်ရန်)</td></tr><tr><td>ခေါင်းစီး၏ ထောင့်အပေါ်ကို ကာဆာထားပါ၊ (သို့) ခေါင်းစီးထဲသို့ ရွေးချယ် (သို့) Tab ဖြင့် ဝင်ပါ</td><td>မီနူး ⋮ နှင့် စီမြှားညွှန်။</td></tr><tr><td>ခေါင်းစီးကို right-click နှိပ်ပါ (သို့) ခေါင်းစီး၏ ညာဘက်အပေါ်ထောင့်ရှိ ⋮ မီနူး</td><td>ဖျောက်ရန်၊ အားလုံးပြရန်၊ (သို့) မြင်နိုင်မှုနှင့် အစီအစဉ်ကို စီမံရန်</td></tr><tr><td>ခေါင်းစီး၏ ညာဘက်အပေါ်ထောင့်ရှိ မြှားသင်္ကေတ</td><td>ကော်လံအလိုက် စီရန်</td></tr><tr><td>Right-click၊ ခေါင်းစီး၏ ညာဘက်အပေါ်ထောင့်ရှိ ⋮ မီနူး၊ (သို့) Ctrl+Shift+V</td><td>ဇယားအဆုံးတွင် အတန်းအသစ်များအဖြစ် ကူးထည့်ရန်</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='ဇယား ကီးဘုတ် ဖြတ်လမ်းများ';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
@@ -2148,6 +2511,10 @@ $ec_lang['lpn_id_taken']='ထို ID ကို အသုံးပြုပြ�
 $ec_lang['lpn_diag_no_fixed_head']='ရေကန် (သို့) ရေတိုက်တစ်ခု ထည့်ပါ။ ကွန်ရက်ကို မဖြေရှင်းနိုင်မီ သိရှိပြီးသား ရေမျက်နှာပြင်အဆင့် အနည်းဆုံး တစ်ခု လိုအပ်ပါသည်။';
 $ec_lang['lpn_diag_dangling_link']='ပိုက်လိုင်း (သို့) ရေတင်စက်တစ်ခုသည် မရှိတော့သော နေရာတစ်ခုနှင့် ချိတ်ဆက်နေသည် -';
 $ec_lang['lpn_diag_unreachable']='ဤနေရာများတွင် ရေကန် သို့မဟုတ် ရေတိုက်သို့ လမ်းကြောင်း မရှိပါ -';
+// Tom, 2026-10-09: a node nothing connects to a source is left out of the run, not refused. The
+// ids stand in the status bar until the network changes. Said in EPANET's own terms (junction,
+// reservoir, tank) and never as an error, because the run happened.
+$ec_lang['lpn_omitted_note']='ရေကန် သို့မဟုတ် ရေတိုက်သို့ လမ်းကြောင်း မရှိသောကြောင့် ဤအတွက် မထည့်သွင်းထားပါ - {ids}';
 // BOTH OF THESE NAME THE VALVES. The page ends each one with a list of IDs, which is the reason
 // this calculator writes its own messages instead of showing EPANET\'s numbered errors: a person
 // looking at a drawing can act on \'V3\' and can do nothing at all with \'error 110\'.
@@ -2167,6 +2534,9 @@ $ec_lang['lpn_engine_ready']='EPANET ဖြေရှင်းစက်ကို 
 $ec_lang['lpn_engine_fetching_valve']='EPANET ဖြေရှင်းစက်ကို ဒေါင်းလုဒ်လုပ်နေသဖြင့် ဤဗားလ်ကို ယခုနှင့် နောက်ပိုင်း အင်တာနက်မလိုဘဲ ဖြေရှင်းနိုင်မည်။';
 $ec_lang['lpn_engine_ready_valve']='EPANET ဖြေရှင်းစက်ကို ယခု ဤစက်ပေါ်တွင် သိမ်းထားသည်။ ဖိအားနှင့် ရေစီးနှုန်း ထိန်းချုပ်ဗားလ်များ (PRV, PSV, FCV) ကို ယခု အင်တာနက်မလိုဘဲ ဖြေရှင်းနိုင်သည်။';
 $ec_lang['lpn_engine_unavailable']='ဖိအားနှင့် ရေစီးနှုန်း ထိန်းချုပ်ဗားလ်များ (PRV, PSV, FCV) ကို ဖြေရှင်းရန် လိုအပ်သော EPANET ဖြေရှင်းစက်ကို ဒေါင်းလုဒ်လုပ်၍ မရခဲ့ပါ။ အင်တာနက်ကို တစ်ကြိမ်ချိတ်ဆက်ပြီးနောက် ဖြေရှင်းစက်ကို ဤစက်ပေါ်တွင် သိမ်းထားသည်။';
+// The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
+// Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
+$ec_lang['lpn_engine_unavailable_why']='ဖိအားနှင့် ရေစီးနှုန်း ထိန်းချုပ်ဗားလ်များ (PRV, PSV, FCV) ကို EPANET ဖြေရှင်းစက်မပါဘဲ ဖြေရှင်း၍ မရပါ။ {reason}';
 $ec_lang['lpn_engine_needed_loading']='သင်တည်ဆောက်နေစဉ် EPANET ဖြေရှင်းစက်ကို ဖွင့်နေသည်။ အပြည့်အဝ ဖွင့်ပြီးသောအခါ အဖြေများ ရရှိနိုင်ပါလိမ့်မည်။';
 // **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
 // own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
@@ -2179,6 +2549,7 @@ $ec_lang['lpn_engine_wait']='ဖြေရှင်းစက် ဖွင့်�
 $ec_lang['lpn_engine_wait_pct']='ဖြေရှင်းစက် {percent}% ဖွင့်ပြီးပါပြီ။';
 $ec_lang['lpn_engine_wait_bytes']='ဖြေရှင်းစက် {kb} KB ယခုအထိ ဖွင့်ပြီးပါပြီ။ စုစုပေါင်း မရနိုင်သောကြောင့်၊ ပြီးဆုံးသည့် ရာခိုင်နှုန်းကို မသိနိုင်ပါ။';
 $ec_lang['lpn_engine_needed_failed']='EPANET ဖြေရှင်းစက်ကို မရရှိသေးပါ၊ ဖွင့်၍လည်း မရနိုင်ပါ၊ ဤကွန်ရက်ကို ၎င်းဖြင့်သာ ဖြေရှင်းနိုင်ပါသည်။ အင်တာနက်ချိတ်ဆက်ထားသောအခါ ၎င်းကို ဖွင့်ပါလိမ့်မည်။';
+$ec_lang['lpn_engine_needed_failed_why']='ဤကွန်ရက်ကို EPANET ဖြေရှင်းစက်ဖြင့်သာ ဖြေရှင်းနိုင်သည်။ {reason}';
 $ec_lang['lpn_diag_valve_needs_epanet']='ဤဗားလ်များသည် ဖိအား သို့မဟုတ် ရေစီးနှုန်း ထိန်းချုပ်ဗားလ်များဖြစ်ပြီး EPANET ဖြေရှင်းစက်သာ ၎င်းတို့ကို တွက်ချက်နိုင်သည်။ EPANET ဖြေရှင်းစက်ကို မတင်နိုင်သဖြင့် ဤရလဒ်များ ပျောက်နေသည် -';
 $ec_lang['lpn_diag_valve_on_fixed_head']='ဤဗားလ်များသည် ရေကန် သို့မဟုတ် ရေတိုက်သို့ တိုက်ရိုက်ချိတ်ထားပြီး ထို node ၏ HGL ကို ပုံသေသတ်မှတ်ထားသဖြင့် ဗားလ်တွင် ထိန်းချုပ်စရာ မရှိပါ။ ဗားလ်နှင့် ရေကန် သို့မဟုတ် ရေတိုက်ကြားတွင် ပိုက်လိုင်းတိုတစ်ခု ထည့်ပါ -';
 $ec_lang['lpn_diag_not_converged']='အဖြေ မတွေ့ရှိခဲ့ပါ။ အချင်းသုည ကဲ့သို့ လက်တွေ့ဘဝတွင် မဖြစ်နိုင်သော တန်ဖိုးများကို စစ်ဆေးပါ။';
@@ -2199,8 +2570,29 @@ $ec_lang['lpn_field_roughness']='ကြမ်းတမ်းမှု';
 // selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C။ ဂဏန်းမြင့်လေ ပိုက်ချောမွေ့လေဖြစ်သည် - ပလပ်စတစ်အသစ်အတွက် ခန့်မှန်းခြေ 150၊ သံမဏိ (သို့) သံအသစ်အတွက် 130 နှင့် ပိုက်ဟောင်းအတွက် 100 ခန့်ဖြစ်သည်။';
 $ec_lang['lpn_field_length']='အလျား';
+// Task 643 (Tom, 2026-10-14): an Auto length is the slope distance. No claim about accuracy (Task 641).
+$ec_lang['lpn_field_length_slope_tip']='ပိုက်အလျား။ အလိုအလျောက် ကို Check လုပ်ထားလျှင် အလျားကို ဆင်ခြေလျှောတစ်လျှောက် တိုင်းသည် - ဆွဲထားသော အလျားကို အဆုံး node နှစ်ခုကြား အမြင့်ကွာခြားချက်နှင့် ပေါင်းစပ်ထားသည်။';
 $ec_lang['lpn_field_from']='မှ';
 $ec_lang['lpn_field_to']='သို့';
+// Tom, 2026-10-09: From and To are editable text. Said in the box a refused ID is said in.
+$ec_lang['lpn_link_end_unknown']='ID {id} ဖြင့် နေရာ မရှိပါ။';
+$ec_lang['lpn_link_end_same']='မှ နှင့် သို့ သည် မတူညီသော နေရာများ ဖြစ်ရမည်။';
+// Tom, 2026-10-09: "Break link for node?", adapted to name the pipe. The two answers are Yes and No
+// because No is not a cancel: it places the node where it was pressed, joined to nothing.
+$ec_lang['lpn_split_pipe_ask']='ပိုက်လိုင်း {id} ကို ဤနေရာတွင် ခွဲမလား။';
+$ec_lang['lpn_split_yes']='ဟုတ်ကဲ့';
+$ec_lang['lpn_split_no']='မဟုတ်ပါ';
+// Object snap (Task 782). The tip beside the snap glyph on a pipe vertex: "Pipe 10, vertex 2". A node
+// or a pipe is named by its type word and ID alone.
+$ec_lang['lpn_snap_vertex']='{link}၊ အကွေ့မှတ် {n}';
+// A tank, reservoir or junction snapped onto a node of another type is placed at exactly that
+// position. Two nodes at one point are legal in EPANET, and the map cannot show that they are separate.
+$ec_lang['lpn_snap_node_on_node']='{new} ကို {target} ၏ တည်နေရာတွင် ထားခဲ့သည်။ နေရာနှစ်ခုကို မချိတ်ဆက်ထားပါ။';
+// The same, for a node DRAGGED onto another node.
+$ec_lang['lpn_snap_moved_on_node']='{moved} ကို {target} ၏ တည်နေရာသို့ ရွှေ့ခဲ့သည်။ နေရာနှစ်ခုကို မချိတ်ဆက်ထားပါ။';
+// The Shape (Task 779): map annotation, a point, a polyline or a polygon. Tom, 2026-10-06: "Either
+// way, we call it a 'Shape'". The tip beside the snap glyph on a Shape point: "Shape S1, point 2".
+$ec_lang['lpn_snap_shape_point']='{shape}၊ အမှတ် {n}';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
@@ -2329,7 +2721,7 @@ $ec_lang['lpn_pump_effic_unstated']='ဤရေတင်စက်သည် {name}
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_mode_select']='မုဒ် - ရွေးချယ်ရန်။ အစိတ်အပိုင်း သို့မဟုတ် အညွှန်းတစ်ခုကို ကြည့်ရန် သို့မဟုတ် ပြောင်းရန် ရွေးချယ်ပါ။ node သို့မဟုတ် အညွှန်းတစ်ခုကို ရွှေ့ရန် ဆွဲပါ။ ပိုက်လိုင်းတစ်ခု၏ အကွေ့များကို ထည့်ရန် သို့မဟုတ် ဖယ်ရန် အကွေ့မှတ်များ ကိရိယာကို သုံးပါ။';
+$ec_lang['lpn_mode_select']='မုဒ် - ရွေးချယ်ရန်။ အစိတ်အပိုင်း၊ အညွှန်း သို့မဟုတ် စာသားတစ်ခုကို ကြည့်ရန် သို့မဟုတ် ပြောင်းရန် ရွေးချယ်ပါ။ node၊ အညွှန်း သို့မဟုတ် စာသားတစ်ခုကို ရွှေ့ရန် ဆွဲပါ။ ပိုက်လိုင်းတစ်ခု၏ အကွေ့များကို ထည့်ရန် သို့မဟုတ် ဖယ်ရန် အကွေ့မှတ်များ ကိရိယာကို သုံးပါ။';
 $ec_lang['lpn_mode_delete']='မုဒ် - ဖျက်ရန်။ အစိတ်အပိုင်းတစ်ခုကို ဖယ်ရှားရန် ရွေးချယ်ပါ။';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_mode_vertices']='မုဒ် - အကွေ့မှတ်များ။ ပိုက်လိုင်းတိုင်း၏ အကွေ့မှတ်များကို လေးထောင့်သေးသေး လက်ကိုင်များအဖြစ် ပြသည်။ အကွေ့မှတ်ထည့်ရန် ပိုက်လိုင်းပေါ်ရှိ အမှတ်တစ်ခု သတ်မှတ်ပါ၊ ဖယ်ရန် လက်ကိုင်ကို ရွေးချယ်ပါ၊ သို့မဟုတ် ရွှေ့ရန် လက်ကိုင်ကို ဆွဲပါ။ ဤမုဒ်တွင် မြေပုံပေါ်ရှိ အခြားအရာများကို ပြောင်း၍ မရပါ။';
@@ -2337,15 +2729,17 @@ $ec_lang['lpn_mode_zoom_window']='မုဒ် - ဇူးမ်ဝင်းဒ�
 // One-shot notice when the Delete key is pressed with nothing picked (Task 415). It has to name the
 // gesture, because the whole point of the change is that the order is now subject, then verb.
 $ec_lang['lpn_select_first']='မည်သည့်အရာမျှ မရွေးချယ်ထားပါ။ မြေပုံပေါ်ရှိ အစိတ်အပိုင်းတစ်ခုကို အရင်ရွေးချယ်ပြီး Delete ကို နှိပ်ပါ။';
-$ec_lang['lpn_mode_add_junction']='မုဒ် - ဆက်စပ်နေရာ ထည့်ရန်။ ဆက်စပ်နေရာတစ်ခု ထားရန် မြေပုံပေါ်တွင် တည်နေရာတစ်ခု သတ်မှတ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းရန် သို့မဟုတ် ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
-$ec_lang['lpn_mode_add_reservoir']='မုဒ် - ရေကန် ထည့်ရန်။ ရေကန်တစ်ခု ထားရန် မြေပုံပေါ်တွင် တည်နေရာတစ်ခု သတ်မှတ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းရန် သို့မဟုတ် ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
-$ec_lang['lpn_mode_add_tank']='မုဒ် - ရေတိုက် ထည့်ရန်။ ရေတိုက်တစ်ခု ထားရန် မြေပုံပေါ်တွင် တည်နေရာတစ်ခု သတ်မှတ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းရန် သို့မဟုတ် ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
-$ec_lang['lpn_mode_add_pipe']='မုဒ် - ပိုက်လိုင်း ထည့်ရန်။ စတင် node တစ်ခုကို ရွေးပြီး ၎င်းတို့ကို ချိတ်ရန် ဆုံးမည့် node ကို ရွေးချယ်ပါ။ မျဉ်းကို ကွေ့စေရန် ကြားရှိ နေရာလွတ်တွင် အမှတ်များ သတ်မှတ်ပါ၊ သို့မဟုတ် ပြန်စရန် Escape နှိပ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းရန် သို့မဟုတ် ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
-$ec_lang['lpn_mode_add_pump']='မုဒ် - ရေတင်စက် ထည့်ရန်။ စတင် node တစ်ခုကို ရွေးပြီး ၎င်းတို့ကို ချိတ်ရန် ဆုံးမည့် node ကို ရွေးချယ်ပါ။ မျဉ်းကို ကွေ့စေရန် ကြားရှိ နေရာလွတ်တွင် အမှတ်များ သတ်မှတ်ပါ၊ သို့မဟုတ် ပြန်စရန် Escape နှိပ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းရန် သို့မဟုတ် ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
-$ec_lang['lpn_mode_add_valve']='မုဒ် - ဗားလ် ထည့်ရန်။ စတင် node တစ်ခုကို ရွေးပြီး ၎င်းတို့ကို ချိတ်ရန် ဆုံးမည့် node ကို ရွေးချယ်ပါ။ မျဉ်းကို ကွေ့စေရန် ကြားရှိ နေရာလွတ်တွင် အမှတ်များ သတ်မှတ်ပါ၊ သို့မဟုတ် ပြန်စရန် Escape နှိပ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းရန် သို့မဟုတ် ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
+$ec_lang['lpn_mode_add_junction']='မုဒ် - ဆက်စပ်နေရာ ထည့်ရန်။ ဆက်စပ်နေရာတစ်ခု ထားရန် မြေပုံပေါ်တွင် တည်နေရာတစ်ခု သတ်မှတ်ပါ။ အစိတ်အပိုင်းများ၊ အညွှန်းများနှင့် စာသားများကို ပြောင်းရန် သို့မဟုတ် ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
+$ec_lang['lpn_mode_add_reservoir']='မုဒ် - ရေကန် ထည့်ရန်။ ရေကန်တစ်ခု ထားရန် မြေပုံပေါ်တွင် တည်နေရာတစ်ခု သတ်မှတ်ပါ။ အစိတ်အပိုင်းများ၊ အညွှန်းများနှင့် စာသားများကို ပြောင်းရန် သို့မဟုတ် ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
+$ec_lang['lpn_mode_add_tank']='မုဒ် - ရေတိုက် ထည့်ရန်။ ရေတိုက်တစ်ခု ထားရန် မြေပုံပေါ်တွင် တည်နေရာတစ်ခု သတ်မှတ်ပါ။ အစိတ်အပိုင်းများ၊ အညွှန်းများနှင့် စာသားများကို ပြောင်းရန် သို့မဟုတ် ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
+$ec_lang['lpn_mode_add_pipe']='မုဒ် - ပိုက်လိုင်း ထည့်ရန်။ စတင် node တစ်ခုကို ရွေးပြီး ၎င်းတို့ကို ချိတ်ရန် ဆုံးမည့် node ကို ရွေးချယ်ပါ။ မျဉ်းကို ကွေ့စေရန် ကြားရှိ နေရာလွတ်တွင် အမှတ်များ သတ်မှတ်ပါ၊ သို့မဟုတ် ပြန်စရန် Escape နှိပ်ပါ။ အစိတ်အပိုင်းများ၊ အညွှန်းများနှင့် စာသားများကို ပြောင်းရန် သို့မဟုတ် ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
+$ec_lang['lpn_mode_add_pump']='မုဒ် - ရေတင်စက် ထည့်ရန်။ စတင် node တစ်ခုကို ရွေးပြီး ၎င်းတို့ကို ချိတ်ရန် ဆုံးမည့် node ကို ရွေးချယ်ပါ။ မျဉ်းကို ကွေ့စေရန် ကြားရှိ နေရာလွတ်တွင် အမှတ်များ သတ်မှတ်ပါ၊ သို့မဟုတ် ပြန်စရန် Escape နှိပ်ပါ။ အစိတ်အပိုင်းများ၊ အညွှန်းများနှင့် စာသားများကို ပြောင်းရန် သို့မဟုတ် ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
+$ec_lang['lpn_mode_add_valve']='မုဒ် - ဗားလ် ထည့်ရန်။ စတင် node တစ်ခုကို ရွေးပြီး ၎င်းတို့ကို ချိတ်ရန် ဆုံးမည့် node ကို ရွေးချယ်ပါ။ မျဉ်းကို ကွေ့စေရန် ကြားရှိ နေရာလွတ်တွင် အမှတ်များ သတ်မှတ်ပါ၊ သို့မဟုတ် ပြန်စရန် Escape နှိပ်ပါ။ အစိတ်အပိုင်းများ၊ အညွှန်းများနှင့် စာသားများကို ပြောင်းရန် သို့မဟုတ် ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
 // Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
 // sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
-$ec_lang['lpn_mode_add_text']='မုဒ် - စာသား ထည့်ရန်။ စာသားတစ်ခု ထားရန် မြေပုံပေါ်တွင် တည်နေရာတစ်ခု သတ်မှတ်ပါ။ စာသားကို node တစ်ခုနှင့် တွဲရန် ထို node အနီးရှိ တည်နေရာကို သတ်မှတ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းရန် သို့မဟုတ် ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
+$ec_lang['lpn_mode_add_text']='မုဒ် - စာသား ထည့်ရန်။ စာသားတစ်ခု ထားရန် မြေပုံပေါ်တွင် တည်နေရာတစ်ခု သတ်မှတ်ပါ။ စာသားကို node တစ်ခုနှင့် တွဲရန် ထို node အနီးရှိ တည်နေရာကို သတ်မှတ်ပါ။ အစိတ်အပိုင်းများ၊ အညွှန်းများနှင့် စာသားများကို ပြောင်းရန် သို့မဟုတ် ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
+$ec_lang['lpn_mode_add_chain']='မုဒ် - ဆက်စပ်နေရာ ပိုက်လိုင်း ဆက်တိုက်။ ဆက်စပ်နေရာတစ်ခု ထည့်ရန် မြေပုံပေါ်တွင် အမှတ်တစ်ခု သတ်မှတ်ပါ၊ ထို့နောက် ပိုက်လိုင်းတစ်ခုနှင့် ဆက်စပ်နေရာတစ်ခု ထည့်ရန် နောက်အမှတ်တစ်ခုစီကို သတ်မှတ်ပါ။ ရှိပြီးသား node တစ်ခုကို သတ်မှတ်၍ ၎င်းမှ ဆက်လက်နိုင်သည်။ ဆက်တိုက်ကို အဆုံးသတ်ရန် Escape နှိပ်ပါ။ အစိတ်အပိုင်းများ၊ အညွှန်းများနှင့် စာသားများကို ပြောင်းရန် သို့မဟုတ် ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
+$ec_lang['lpn_mode_add_shape']='မုဒ် - ရေးဆွဲပုံ ထည့်ခြင်း။ အမှတ်တစ်ခုစီကို သတ်မှတ်ပါ။ အပြီးသတ်ရန် နောက်ဆုံးအမှတ်ကို ထပ်မံသတ်မှတ်ပါ (သို့) Enter နှိပ်ပါ၊ ပိုလီဂွန်ကို ပိတ်ရန် ပထမအမှတ်ကို သတ်မှတ်ပါ။';
 // Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
 // most likely to miss the point of -- that Select is what you use to edit/move things, and that a
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
@@ -2417,8 +2811,8 @@ $ec_lang['lpn_labels_mark_extrema_tip']='မြေပုံပေါ်တွင
 // {skipped} are whole numbers; {prefix} is the text the user typed.
 $ec_lang['lpn_settings_apply_to_all']='အားလုံးအပေါ် အသုံးချရန်';
 $ec_lang['lpn_settings_apply_to_all_tip']='ဆွဲပြီးသား ဤအမျိုးအစား အစိတ်အပိုင်းတိုင်းသည် ဤစာသားဖြင့် စသော ID ရသည်။ တစ်ခုစီသည် ၎င်း၏ နံပါတ်ကို ထိန်းထားသည်။ နံပါတ်ဖြင့် မဆုံးသော ID ကို မပြောင်းပါ။';
-$ec_lang['lpn_confirm_apply_prefix']='အစိတ်အပိုင်း {n} ခု၏ ID များကို {prefix} ဖြင့် အစပြုစေရန် အမည်ပြန်ပေးမလား? တစ်ခုစီသည် ၎င်း၏ နံပါတ်ကို ဆက်ထိန်းထားပါလိမ့်မည်။';
-$ec_lang['lpn_prefix_applied']='အစိတ်အပိုင်း {n} ခု အမည်ပြောင်းပြီး။ အခြား {skipped} ခုကို မပြောင်းပါ။';
+$ec_lang['lpn_confirm_apply_prefix']='အစိတ်အပိုင်းများ ({n}) ၏ ID များကို {prefix} ဖြင့် အစပြုစေရန် အမည်ပြန်ပေးမလား? တစ်ခုစီသည် ၎င်း၏ နံပါတ်ကို ဆက်ထိန်းထားပါလိမ့်မည်။';
+$ec_lang['lpn_prefix_applied']='အမည်ပြောင်းထားသော အစိတ်အပိုင်းများ - {n}။ မပြောင်းထားသော အစိတ်အပိုင်းများ - {skipped}။';
 $ec_lang['lpn_labels_suffix_gradient_tip']='မြေပုံအညွှန်းများပေါ်ရှိ ဖိမြင့်ဆင့်ဆုံးရှုံးမှု အဆင့်အနားနောက်သို့ ထည့်သော စာသား။ ဤနေရာတွင် ရာခိုင်နှုန်းသင်္ကေတ မထည့်ပါနှင့်။ ယူနစ်သည် ရာခိုင်နှုန်းဖြစ်လျှင် အလိုအလျောက် ထည့်သည်။';
 $ec_lang['lpn_labels_separator']='တန်ဖိုးများကြား စာသား';
 $ec_lang['lpn_labels_separator_tip']='အညွှန်းတစ်ခုပေါ်ရှိ တန်ဖိုးတစ်ခုနှင့် နောက်တစ်ခုကြား စာသား။ မူလအားဖြင့် ကွက်လပ်တစ်ခု။';
@@ -2519,6 +2913,7 @@ $ec_lang['lpn_map_attach_none']='ဤပရောဂျက်တွင် ကမ�
 $ec_lang['lpn_map_attach_remove']='ဖြုတ်ရန်';
 $ec_lang['lpn_map_attach_remove_tip']='ကမ္ဘာ့မြေပုံကို ဖြုတ်ပါ။ ကွန်ရက်ကို မထိခိုက်ပါ။';
 $ec_lang['lpn_map_attach_done']='ကမ္ဘာ့မြေပုံကို ယခု ပုံဆွဲမှုနောက်ကွယ်တွင် ပြထားပြီး ပရောဂျက်ကို မပြောင်းလဲပါ။ ၎င်းကို ဖယ်ရှားရန် မြေပုံ၊ ကမ္ဘာ့မြေပုံ၊ ဖြုတ်ရန် ကို သုံးပါ။';
+// Edited by TGH 2026-10-07
 $ec_lang['lpn_map_attach_removed']='ကမ္ဘာ့မြေပုံကို ဖြုတ်ပြီး ကွန်ရက်ကို မထိခိုက်ပါ။';
 // **THE CUSTOM GEOREFERENCE WIZARD, IN TOM'S OWN THREE STEPS** (2026-09-18, and
 // dev/tom-coordinate-vocabulary-2026-09-16.md). Georeferencing here means attaching the world map,
@@ -2570,6 +2965,9 @@ $ec_lang['lpn_backdrop_target_free']='မြေပုံပေါ်ရှိ �
 $ec_lang['lpn_backdrop_target_coords']='သင်ထည့်သွင်းသော သြဒီနိတ်များ';
 $ec_lang['lpn_backdrop_coords_prompt']='ထိုအမှတ် ရွှေ့ရမည့် X,Y ကို ထည့်သွင်းပါ';
 $ec_lang['lpn_backdrop_continue']='ဆက်လုပ်ရန်';
+// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
+// this one, and of the three, Settings is the word a person is most likely to look for first.
+// One key for the toolbar button, the Project menu row and the Settings box's own title (Task 699).
 $ec_lang['lpn_tool_settings']='ဆက်တင်များ';
 $ec_lang['lpn_settings_show_titles']='စာမျက်နှာ ခေါင်းစဉ်များ ပြရန်';
 // Edited by TGH 2026-09-07
@@ -2580,6 +2978,8 @@ $ec_lang['lpn_hide_titles']='ဤခေါင်းစဉ်များကို
 // bubble and reads 'Show this'; this one has to name what it is talking about.
 $ec_lang['lpn_settings_area_hint']='ရွေးချယ်မှု အကူအညီကို ပြရန်';
 $ec_lang['lpn_settings_area_hint_tip']='ဧရိယာတစ်ခု ရွေးချယ်နေစဉ် နောက်အဆင့်ကို ပေးသော အချက်ပြစာကို မြေပုံပေါ်တွင် ပြပါ။';
+$ec_lang['lpn_settings_hover_card']='hover လုပ်သောအခါ အညွှန်းအပြည့်အစုံကို ပြရန်';
+$ec_lang['lpn_settings_hover_card_tip']='ဆက်တင်များတွင် သတ်မှတ်ထားသည့်အတိုင်း နေရာ၊ ပိုက်လိုင်း သို့မဟုတ် ဖောက်သည်၏ အညွှန်းကို မည်သည့်စကေးတွင်မဆို၊ မြေပုံပေါ်တွင် အညွှန်းဆန့်သည်ဖြစ်စေ မဆန့်သည်ဖြစ်စေ ကြည့်ရန် ညွှန်တံကို ၎င်းပေါ်တွင် ရပ်ထားပါ။ ၎င်းသည် ပရောဂျက်အတွက် မဟုတ်ဘဲ ဤဘရောက်ဇာအတွက် ဆက်တင်ဖြစ်သည်။';
 $ec_lang['lpn_settings_id_prefixes']='ID ရှေ့ဆက်များ';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a
@@ -2627,6 +3027,8 @@ $ec_lang['lpn_cp_validate']='အတည်ပြုနည်း';
 $ec_lang['lpn_cp_validate_tip']='အတည်ပြုရန် ပုံစံ - မှန်ကန်သော တန်ဖိုးတစ်ခု ရှိရမည့် ဖော်မတ်။ စာလုံးအကြီးအသေး စည်းမျဉ်းများသည် အင်္ဂလိပ်အက္ခရာများတွင်သာ သက်ရောက်သည်။ မည်သည့်တန်ဖိုးကိုမဆို လက်ခံရန် အတည်မပြုပါနှင့် ကို ရွေးပါ။';
 $ec_lang['lpn_cp_restrict']='ဤအက္ခရာများကို ကန့်သတ်ရန်';
 $ec_lang['lpn_cp_restrict_tip']='ဤစာလုံးများကို ကန့်သတ်ရန် -';
+$ec_lang['lpn_cp_allow_tip']='ဤစာလုံးများကိုသာ ခွင့်ပြုရန် -';
+$ec_lang['lpn_cp_characters_tip']='"@" သည် မည်သည့်အက္ခရာမဆို၊ "#" သည် မည်သည့်ဂဏန်းမဆို ဆိုလိုသည်။ "-"၊ "." နှင့် "," တို့ကို ခွင့်ပြုလိုပါက သီးခြား စာရင်းပြုစုရမည်။ ကွက်လပ်စာလုံးများသည် အခြားစာလုံးများကြားတွင်သာ ရှိရမည်။';
 $ec_lang['lpn_cp_restrict_mode']='ခွင့်ပြု (သို့) ကန့်သတ်ရန်';
 $ec_lang['lpn_cp_restrict_mode_tip']='ခွင့်ပြု (သို့) ကန့်သတ်ရန် - ပေးထားသော အက္ခရာများသည် တန်ဖိုးတစ်ခု အသုံးပြုနိုင်သည့် တစ်ခုတည်းသော အက္ခရာများ ဖြစ်စေ၊ (သို့) အသုံးမပြုနိုင်သည့် အက္ခရာများ ဖြစ်စေ ဖြစ်သည်။';
 $ec_lang['lpn_cp_restrict_allow']='ဤအက္ခရာများကိုသာ ခွင့်ပြုရန်';
@@ -2654,6 +3056,13 @@ $ec_lang['lpn_cp_val_hyphen']='hyphen-case';
 // is a way of asking a question about the data, so nothing is ever cleared or refused: the value
 // stays exactly as it was typed and says what is wrong with it.
 $ec_lang['lpn_cp_flag']='{label}: {reason} တန်ဖိုးကို ထည့်သွင်းခဲ့သည့်အတိုင်း အတိအကျ ဆက်ထားသည်။';
+$ec_lang['lpn_valwarn_diameter']='ပိုက်လိုင်း သို့မဟုတ် ဗားလ် အချင်းသည် ပုံမှန်အားဖြင့် {min} နှင့် {max} {unit} ကြားတွင် ရှိသည်။ ဂဏန်းနှင့် အချင်းယူနစ်ကို စစ်ဆေးပါ။';
+$ec_lang['lpn_valwarn_hw']='Hazen-Williams C သည် ပုံမှန်အားဖြင့် {min} နှင့် {max} ကြားတွင် ရှိသည်။ ထိုအပိုင်းအခြားပြင်ပ ဂဏန်းသည် အခြား ပွတ်တိုက်မှု နည်းလမ်းအတွက် ရည်ရွယ်သော ကြမ်းတမ်းမှု ဖြစ်တတ်သည်။';
+$ec_lang['lpn_valwarn_manning']='Manning n သည် ပုံမှန်အားဖြင့် {min} နှင့် {max} ကြားတွင် ရှိသည်။ ထိုအပိုင်းအခြားပြင်ပ ဂဏန်းသည် အခြား ပွတ်တိုက်မှု နည်းလမ်းအတွက် ရည်ရွယ်သော ကြမ်းတမ်းမှု ဖြစ်တတ်သည်။';
+$ec_lang['lpn_valwarn_dw']='Darcy-Weisbach ကြမ်းတမ်းမှုသည် ပုံမှန်အားဖြင့် 0 ထက်ကြီးပြီး အများဆုံး {max} {unit} ဖြစ်သည်။ ပိုကြီးသော ဂဏန်းသည် Hazen-Williams C သို့မဟုတ် Manning n ဖြစ်တတ်သည်။';
+$ec_lang['lpn_valwarn_positive']='EPANET သည် ဤနေရာတွင် သုညကို သို့မဟုတ် အနှုတ်ဂဏန်းကို လက်မခံပါ။';
+$ec_lang['lpn_valwarn_negative']='EPANET သည် ဤနေရာတွင် အနှုတ်ဂဏန်းကို လက်မခံပါ။';
+$ec_lang['lpn_valwarn_tank_levels']='EPANET သည် ဤရေတိုက်ကို လက်မခံပါ။ အနိမ့်ဆုံးရေအနက်သည် ရေအနက်ထက် မကြီးရ၊ ရေအနက်သည် အမြင့်ဆုံးရေအနက်ထက် မကြီးရပါ။';
 $ec_lang['lpn_cp_bad_number']='ဤတန်ဖိုးသည် ဤဂုဏ်သတ္တိအတွက် လိုအပ်သည့်အတိုင်း ဂဏန်းတစ်ခု မဟုတ်ပါ။';
 $ec_lang['lpn_cp_bad_integer']='ဤတန်ဖိုးသည် ဤဂုဏ်သတ္တိအတွက် လိုအပ်သည့်အတိုင်း ကိန်းပြည့်တစ်ခု မဟုတ်ပါ။';
 $ec_lang['lpn_cp_bad_case']='ဤတန်ဖိုးသည် ဤဂုဏ်သတ္တိအတွက် လိုအပ်သည့်အတိုင်း စာလုံးကြီးအားလုံး မဟုတ်ပါ။';
@@ -2672,18 +3081,13 @@ $ec_lang['lpn_cp_key_taken']='အခြားစိတ်ကြိုက် ဂ�
 // question it answers is how much of this scenario is its own rather than inherited.
 $ec_lang['lpn_scenario_label']='အခြေအနေ';
 $ec_lang['lpn_scenario_base']='အခြေခံ';
-// "Custom", not "Own" (Tom, 2026-08-14: *"I love 'custom'. 'Changed' is a little dangerous."*),
-// and the reason is a TRANSLATION reason rather than an English one -- which is why it is worth
-// a comment. "Own values" calques directly onto the standard term for EIGENVALUES in most of
-// Europe: es valores propios, pt valores proprios, de Eigenwerte, cs vlastni hodnota, hr vlastita
-// vrijednost, bg/ru/sr sobstveni. Ten languages in sprint 316 had to detect and route around that
-// independently, and three of them, forced off the calque, landed on "CHANGED values" -- which is
-// FALSE here, because a scenario's custom value may be identical to Base's (see
-// lpn_scenario_override_tip, and the assertion in dev/lpn-spike/scenario-harness.js).
-// "Custom" has no calque path into mathematics in any of them, so the trap does not exist to be
-// routed around, and it says ownership without implying difference. Seven languages had already
-// chosen exactly this family unprompted (fr personnalisees, it personalizzati, es exclusivos,
-// pt individuais, ar mukhassasa, fa ekhtesasi, ro specifice).
+// "Overrides" (Tom, 2026-10-04: *"I believe that the technical term may be 'Enter the scenario's
+// override'"*; Mary found it is Bentley WaterGEMS's word, "Overriding Inheritance"). It replaced
+// "custom values" (2026-08-14). The rejected alternative stays rejected for a TRANSLATION reason:
+// "own values" calques onto the standard term for EIGENVALUES in most of Europe (es valores propios,
+// de Eigenwerte, ru sobstvennye), and "changed values" is FALSE, because an override may equal
+// Base's number (lpn_scenario_override_tip; dev/lpn-spike/scenario-harness.js). "Override" has no
+// mathematical calque and says the scenario's value stands in for the parent's.
 $ec_lang['lpn_scenario_overrides']='ကိုယ်ပိုင်တန်ဖိုး အရေအတွက်';
 // ROADMAP Task 512. The amber ring was designed, correct, and silent: two independent users read it
 // as a stuck highlight they could not turn off. These two strings are the ring's own explanation and
@@ -2691,6 +3095,7 @@ $ec_lang['lpn_scenario_overrides']='ကိုယ်ပိုင်တန်ဖ�
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='အမ်ဘာရောင်စက်ဝိုင်းသည် ဤအစိတ်အပိုင်းတွင် အခြေအနေ {name} ၌ ကိုယ်ပိုင်တန်ဖိုး ရှိကြောင်း ဆိုလိုသည်။';
+
 $ec_lang['lpn_scenario_overrides_tip']='ကိုယ်ပိုင်တန်ဖိုးတစ်ခုစီကို မြေပုံပေါ်တွင် အမ်ဘာရောင် စက်ဝိုင်းဖြင့် အမှတ်အသားပြုသည်။ ၎င်းတို့မပါဘဲ ပုံဆွဲမှုကို ကြည့်ရန် {base} သို့မဟုတ် အခြားမိဘအခြေအနေသို့ ပြောင်းပါ။';
 $ec_lang['lpn_scenario_menu']='အခြေအနေများ';
 $ec_lang['lpn_scenario_tip']='ပုံတွင် ပြသနေပြီး၊ ဤစာမျက်နှာက ယခုဖြေရှင်းနေသော တန်ဖိုးအစုအဝေး။ အခြေအနေများ ပြောင်းရန်၊ (သို့) တစ်ခု ထပ်ထည့်ရန်၊ အမည်ပြောင်းရန်၊ ဖျက်ရန် နှိပ်ပါ။';
@@ -2699,6 +3104,10 @@ $ec_lang['lpn_scenario_new_name']='အခြေအနေ {n}';
 $ec_lang['lpn_scenario_prompt_name']='ဤအခြေအနေအတွက် အမည်';
 $ec_lang['lpn_scenario_rename']='အခြေအနေ အမည်ပြောင်းရန်…';
 $ec_lang['lpn_scenario_delete']='အခြေအနေ ဖျက်ရန်';
+
+
+
+
 // Edited by TGH 2026-09-07
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
@@ -2707,19 +3116,147 @@ $ec_lang['lpn_scenario_delete']='အခြေအနေ ဖျက်ရန်';
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='အခြေခံ အခြေအနေ - {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} ကို {scenario} တွင် ကွန်ရက်မှ ဖယ်ထားသည်။ ၎င်းသည် ပုံဆွဲမှုတွင်နှင့် အခြားအခြေအနေများတွင် ဆက်ရှိသည်။';
+$ec_lang['lpn_scenario_delete_in_base']='ပုံဆွဲမှုမှ ဖယ်ရှားရန် {base} အခြေအနေတွင် ဖျက်ပါ။';
+$ec_lang['lpn_scenario_only_deleted']='{id} ကို ဖျက်ပြီးပါပြီ။ ၎င်းသည် {scenario} တွင်သာ ပါဝင်ခဲ့သည်။';
+$ec_lang['lpn_scenario_delete_blocked']='{id} ကို မဖျက်ခဲ့ပါ၊ အကြောင်းမှာ ပိုက်လိုင်း {link} သည် ၎င်းတွင် အဆုံးသတ်ပြီး ထိုပိုက်လိုင်းသည် {scenario} ပြင်ပတွင်လည်း ရှိသောကြောင့် ဖြစ်သည်။ နှစ်ခုစလုံးကို ဖျက်ရန် {base} အခြေအနေတွင် ဖျက်ပါ။';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_basic']='အခြေခံ မုဒ်';
 $ec_lang['lpn_scenario_basic_tip']='ရွေးချယ်ထားလျှင် - အခြေအနေတစ်ခုတွင် ၎င်းထဲတွင် သတ်မှတ်ထားသော တန်ဖိုးများသာ ပါသည်။ ဖယ်ထားလျှင် - ဤမီနူးတွင် တန်ဖိုးများကို အမျိုးအစားအလိုက် အုပ်စုဖွဲ့ပုံကို ပြသော အစားထိုးရွေးချယ်မှု ကြိုတင်ကြည့်ဇယားကိုလည်း ပေးပြီး အခြေအနေတစ်ခုတွင် သီးခြား စုစုပေါင်းလည်ပတ်ချိန်နှင့် ဟိုက်ဒရောလစ် အချိန်အဆင့် ထားခွင့်ပြုသည်။ ဤလုပ်ဆောင်ချက်အတွက် တုံ့ပြန်ချက်ကို ကြိုဆိုသည်။';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$ec_lang['lpn_time_scn_overrides']='အခြေအနေ၏ ကိုယ်ပိုင်တန်ဖိုးများ -';
+
+
+
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+
+
+
+
+
+
+
+
+
+
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+
+
+
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_alt_cat_physical']='ရုပ်ပိုင်းဆိုင်ရာ';
 $ec_lang['lpn_alt_cat_demand']='လိုအပ်ချက်';
 $ec_lang['lpn_alt_cat_topology']='အစိတ်အပိုင်း ဖွင့်ပိတ်မှု';
+
 $ec_lang['lpn_alt_cat_initial']='စတင်ချိန် ဆက်တင်များ';
 $ec_lang['lpn_alt_cat_constituent']='ပါဝင်ပစ္စည်း';
 $ec_lang['lpn_alt_cat_fireflow']='မီးငြိမ်းသတ်ရေးစီးနှုန်း';
 $ec_lang['lpn_alt_cat_energy']='စွမ်းအင် ကုန်ကျစရိတ်';
 $ec_lang['lpn_alt_cat_userdata']='စိတ်ကြိုက် ဂုဏ်သတ္တိများ';
 $ec_lang['lpn_alt_cat_text']='စာသား';
+
+
 // Edited by TGH 2026-09-07
+// Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
+// by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. ရေစီးနှုန်း စမ်းသပ်မှု - တည်ငြိမ်';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='ရေစီးနှုန်း 0 ဖြင့် ဒီဇိုင်းကွန်ရက်တစ်ခုအတွက် ရေစီးနှုန်း စမ်းသပ်မှု ချိန်ညှိခြင်း။ ဤအခြေအနေတွင် ဆက်စပ်နေရာအားလုံးရှိ လိုအပ်ချက်ကို 0 အဖြစ် သတ်မှတ်ပါ။';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. ရေစီးနှုန်း စမ်းသပ်မှု - အလယ်';
@@ -2729,10 +3266,11 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='အစီရင်ခံထား�
 $ec_lang['lpn_scenario_preset_average_day']='4. ပျမ်းမျှနေ့';
 $ec_lang['lpn_scenario_preset_average_day_tip']='လိုအပ်ချက် မြှောက်ကိန်း 1 - လိုအပ်ချက်တိုင်းကို ထည့်သွင်းထားသည့်အတိုင်း ယူသည်၊ ၎င်းကို ပျမ်းမျှနေ့ လိုအပ်ချက်ဟု မှတ်ယူသည်။';
 $ec_lang['lpn_scenario_preset_max_day']='5. အမြင့်ဆုံးနေ့';
+$ec_lang['lpn_scenario_preset_mult_tip']='လိုအင် မြှောက်ကိန်း {mult} ဆသည် ပျမ်းမျှနေ့၏ ယာယီတန်ဖိုးဖြစ်သည်။ စနစ်အများစုသည် {lo} နှင့် {hi} ကြားတွင် ရှိသည် (National Research Council, 2006)။ မော်ဒယ်လုပ်နေသော စနစ်အတွက် တန်ဖိုးကို ဆက်တင်များ၊ တွက်ချက်မှု၊ ဟိုက်ဒရောလစ်၊ လိုအင် မြှောက်ကိန်း တွင် သတ်မှတ်ပါ။';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. အထွတ်အထိပ်နာရီ';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. မီးငြိမ်းသတ်ခြင်းနှင့် အမြင့်ဆုံးနေ့';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='အမြင့်ဆုံးနေ့ လိုအပ်ချက် (မြှောက်ကိန်း 2.0)။ ဤအခြေအနေတွင် မီးငြိမ်းသတ်ရေးစီးနှုန်း ခွဲခြမ်းစိတ်ဖြာမှုကို run ပါ - ၎င်းသည် ဤလိုအပ်ချက်ပေါ်တွင် ဆက်စပ်နေရာတစ်ခုစီ၌ မီးငြိမ်းသတ်ရေးစီးနှုန်းကို ထပ်ပေါင်းသည်။';
-$ec_lang['lpn_delete_drops_overrides']='ဤအစိတ်အပိုင်းကို ဖျက်လျှင် ၎င်းအတွက် အခြေအနေ၏ ကိုယ်ပိုင်တန်ဖိုး {n} ခုကိုလည်း ဖျက်မည်။ ဆက်လုပ်မလား။';
+$ec_lang['lpn_delete_drops_overrides']='ဤအစိတ်အပိုင်းကို ဖျက်လျှင် ၎င်း၏ အခြေအနေအလိုက် ကိုယ်ပိုင်တန်ဖိုးများ ({n}) ကိုလည်း ဖျက်မည်။ ဆက်လုပ်မလား။';
 $ec_lang['lpn_push_base_only']='ဤလုပ်ဆောင်ချက်သည် ပုံကိုယ်တိုင်ကို ပြောင်းလဲသောကြောင့်၊ {base} တွင်သာ ပြုလုပ်နိုင်သည်။ {base} သို့ ပြောင်းပြီး ထပ်ကြိုးစားပါ။';
 $ec_lang['lpn_field_active']='အသက်ဝင်သလား။';
 // Edited by TGH 2026-09-07
@@ -2822,6 +3360,7 @@ $ec_lang['lpn_settings_engine_native']='ဖြစ်နိုင်သည့်�
 $ec_lang['lpn_settings_engine_native_tip']='ဖြစ်နိုင်သည့်နေရာတွင် တွင်ပါ ဖြေရှင်းစက်ကို သုံးရန် ဤအရာကို ဖွင့်ပါ။ မဟုတ်လျှင် US EPA ၏ EPANET ဖြေရှင်းစက်ကို အမြဲသုံးသည်။ တွင်ပါ ဖြေရှင်းစက်ကို extended period simulation များ သို့မဟုတ် အလုပ်လုပ်နေသော PRV, PSV သို့မဟုတ် FCV အတွက် မသုံးပါ။ EPANET ဖြေရှင်းစက်ကို ပထမအကြိမ်သုံးသောအခါ 650 KB ခန့် ဒေါင်းလုဒ်လုပ်ပြီး ဤစက်ပေါ်တွင် သိမ်းထားသည်။ ပိုက်လိုင်းတွင် ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ရှိလျှင် ဖြေရှင်းစက်နှစ်ခုသည် နောက်ဆုံးဂဏန်းများတွင် ကွာသည် - EPANET သည် ဆွဲငင်အားအရှိန်ကို ဝိုင်းထားသော တန်ဖိုးကို သုံးသဖြင့် ၎င်း၏ ဒေသဆိုင်ရာဆုံးရှုံးမှုများသည် တိကျသောပုံစံထက် အနည်းငယ် နိမ့်သည်။';
 $ec_lang['lpn_engine_loading']='EPANET ဖြေရှင်းစက်ကို ဖွင့်နေသည်…';
 $ec_lang['lpn_engine_failed']='EPANET ဖြေရှင်းစက်ကို ဖွင့်၍မရခဲ့ပါ။ ယင်းအစား တွဲထားသော ဖြေရှင်းစက်ကို ပြသနေပါသည်။';
+$ec_lang['lpn_engine_failed_why']='{reason} ထိုကြောင့် တွင်ပါ ဖြေရှင်းစက်ကို ပြထားသည်။';
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
@@ -2838,6 +3377,13 @@ $ec_lang['lpn_engine_refused']='EPANET ဖြေရှင်းစက်က ဤ�
 // is the only part a user can act on, and nothing of ours could reconstruct it.
 $ec_lang['lpn_engine_refused_why']='EPANET ဖြေရှင်းစက် မက်ဆေ့ချ် - {message}';
 $ec_lang['lpn_engine_refused_fallback']='စခရင်ပေါ်ရှိ ဂဏန်းများသည် တွင်းထဲပါ ဖြေရှင်းစက်မှ ရခဲ့ခြင်း ဖြစ်သည်။';
+// A run EPANET started and could not finish, for example when a tank empties and the junctions it
+// fed have no other source (Error 110). {time} is the run time it stopped at, H:MM.
+$ec_lang['lpn_time_run_stopped']='EPANET လည်ပတ်မှုသည် {time} တွင် ရပ်သွားသဖြင့် ရလဒ်မရှိပါ။ ရပ်သွားရသည့်အကြောင်းကို ၎င်း၏ လည်ပတ်မှုအစီရင်ခံစာတွင် ဖော်ပြထားသည်။';
+$ec_lang['lpn_time_stat_stopped']='{statistic} ကို မပြပါ - ကာလမပြီးမီ လည်ပတ်မှု ရပ်သွားသည်။';
+$ec_lang['lpn_time_stopped_no_quality']='ရေအရည်အသွေး ခွဲခြမ်းစိတ်ဖြာမှုသည် ဟိုက်ဒရောလစ် လည်ပတ်မှု ပြီးဆုံးပြီးမှ စတင်သောကြောင့် ရေအရည်အသွေး ရလဒ်များကို မတွက်ချက်ခဲ့ပါ။';
+$ec_lang['lpn_energy_stopped']='EPANET လည်ပတ်မှုသည် ကာလမပြီးမီ ရပ်သွားသဖြင့် ရေတင်စက် စွမ်းအင် ရလဒ်များကို မတွက်ချက်ခဲ့ပါ။';
+$ec_lang['lpn_time_run_stopped_kept']='EPANET လည်ပတ်မှုသည် {time} တွင် ရပ်သွားသည်။ ရလဒ်များသည် ၎င်းဖြေရှင်းနိုင်သော နောက်ဆုံးကာလ {solved} အထိ ရှိပြီး ထိုနောက်ပိုင်း မည်သည့်ရလဒ်မျှ မပြပါ။ ရပ်သွားရသည့်အကြောင်းကို ၎င်း၏ လည်ပတ်မှုအစီရင်ခံစာတွင် ဖော်ပြထားသည်။';
 // The run's own version of that last sentence: a period run has a moment and a tank level to name,
 // and a one-moment solve does not, which is where the shared label stops.
 $ec_lang['lpn_time_run_fell_back']='မျက်နှာပြင်ပေါ်ရှိ ဂဏန်းများသည် တွင်ပါ ဖြေရှင်းစက်မှ ရခဲ့သည်။ ၎င်းသည် တစ်ကြိမ်လျှင် အချိန်တစ်ခုကို ဖြေရှင်းသဖြင့် ဤသည်မှာ {time} ရှိ ကွန်ရက်သာဖြစ်ပြီး ရေတိုက်တိုင်းသည် စတင်အဆင့်တွင် ရှိသည်။';
@@ -2848,6 +3394,8 @@ $ec_lang['lpn_time_run_fell_back']='မျက်နှာပြင်ပေါ�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='ဤထိန်းချုပ်မှုများသည် ဤပရောဂျက်ထဲတွင် မရှိတော့သော အစိတ်အပိုင်းတစ်ခု၏ အမည်ကို ဆောင်ထားသောကြောင့် ချန်ခဲ့သည် - {ids}';
 $ec_lang['lpn_control_unreadable_note']='ဤထိန်းချုပ်မှုများကို ဖတ်၍ မရသောကြောင့် ချန်ခဲ့သည် - {ids}';
+
+
 $ec_lang['lpn_rule_dangling_note']='ဤစည်းမျဉ်းများသည် ဤပရောဂျက်တွင် မရှိတော့သော အစိတ်အပိုင်းတစ်ခုကို ရည်ညွှန်းထားသောကြောင့်၊ ဤ run တွင် လျစ်လျူရှုခဲ့သည် - {ids}';
 $ec_lang['lpn_rule_unreadable_note']='ဤစည်းမျဉ်းများကို မဖတ်နိုင်ခဲ့သောကြောင့်၊ ဤ run တွင် လျစ်လျူရှုခဲ့သည် - {ids}';
 $ec_lang['lpn_settings_text_size']='စာသား အရွယ်အစား (ပစ်ဆယ်များ)';
@@ -2866,6 +3414,8 @@ $ec_lang['lpn_settings_align_labels']='ပိုက်အညွှန်းမ�
 $ec_lang['lpn_settings_readability_bias']='အညွှန်းသည် ဒေါင်လိုက်မှ ဘယ်ဘက်သို့ ဒီဂရီ ဤမျှထက်ပိုစောင်းလျှင် အောက်ခေါင်းစိုက် ပြန်လှည့်ပါ';
 $ec_lang['lpn_settings_readability_bias_tip']='အညွှန်းသည် ဒေါင်လိုက်မှ ဘယ်ဘက်သို့ ဤဒီဂရီအရေအတွက်ထက် ပိုစောင်းနေလျှင်၊ တည့်မတ်နေစေရန် အညွှန်းကို ပြန်လှည့်ပေးသည်။';
 $ec_lang['lpn_settings_mask_labels']='အညွှန်းများ၏နောက်ကွယ်တွင် အစိုင်အခဲ နောက်ခံ';
+$ec_lang['lpn_settings_text_halo']='စာသား အနားကွပ်အကျယ် (စာသားအရွယ်အစား၏ ရာခိုင်နှုန်း)';
+$ec_lang['lpn_settings_text_halo_tip']='မြေပုံစာသား၏ နောက်ကွယ်ရှိ အစိုင်အခဲ အနားကွပ်၏ အကျယ်ကို စာသားအရွယ်အစား၏ ရာခိုင်နှုန်းဖြင့် ဖော်ပြသည်။ အညွှန်းများ၏နောက်ကွယ်တွင် အစိုင်အခဲ နောက်ခံ ကို ဖွင့်ထားသောအခါ သက်ရောက်သည်။';
 // Task 408: dragging a label away from its node draws a leader line, and this pulls that line onto
 // a round angle when the drag comes close to one. The values are numbers and the degree sign, which
 // need no translation; "Off" borrows lpn_settings_legend_off, the same word for the same idea.
@@ -2904,6 +3454,12 @@ $ec_lang['lpn_settings_symbol_opacity']='သင်္ကေတ မြင်န�
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='နောက်ခံပုံ မြင်နိုင်မှု (0 မှ 1)';
+// Task 617: a display-time filter on the street or satellite tiles only; the drawing and the credit are untouched.
+$ec_lang['lpn_settings_basemap_style']='မြေပုံနောက်ခံ ပုံစံ';
+$ec_lang['lpn_basemap_style_normal']='ပုံမှန်';
+$ec_lang['lpn_basemap_style_muted']='မှိန်သော';
+$ec_lang['lpn_basemap_style_faded']='ဖျော့သော';
+$ec_lang['lpn_basemap_style_grayscale']='မီးခိုးရောင်ဆင့်';
 $ec_lang['lpn_settings_map_display']='အသွင်အပြင်';
 // PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
 // to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
@@ -2986,10 +3542,22 @@ $ec_lang['lpn_time_pattern_start']='ပုံစံ စတင်ချိန်'
 $ec_lang['lpn_time_report_step']='အစီရင်ခံ အချိန်အဆင့်';
 $ec_lang['lpn_time_report_start']='အစီရင်ခံ စတင်ချိန်';
 $ec_lang['lpn_time_clock_start']='အစတွင် နာရီအချိန်';
+$ec_lang['lpn_time_statistic']='ကိန်းဂဏန်းစာရင်း';
+$ec_lang['lpn_time_stat_none']='မရှိ';
+$ec_lang['lpn_time_stat_averaged']='ပျမ်းမျှ';
+$ec_lang['lpn_time_stat_minimum']='အနည်းဆုံး';
+$ec_lang['lpn_time_stat_maximum']='အများဆုံး';
+$ec_lang['lpn_time_stat_range']='အပိုင်းအခြား';
 $ec_lang['lpn_time_clock_day']='နေ့ {day}၊ {clock}';
 $ec_lang['lpn_time_format_tip']='အချိန်ကို 2:30 ကဲ့သို့ နာရီနှင့် မိနစ်ဖြင့် ရေးပါ။ ဂဏန်းရိုးရိုးသည် နာရီကို ဆိုလိုသည်၊ ထို့ကြောင့် 8 ဆိုလျှင် ရှစ်နာရီ ဖြစ်သည်။ တစ်နာရီ ထက်ဝက်ကို 0:30 ဟု ရေးသည်။';
 $ec_lang['lpn_time_running']='extended period simulation ကို လည်ပတ်နေသည်။';
 $ec_lang['lpn_time_no_engine']='တွင်ပါ ဖြေရှင်းစက်သည် တစ်ကြိမ်လျှင် အချိန်တစ်ခုကို ဖြေရှင်းသဖြင့် ဤသည်မှာ {time} ရှိ ကွန်ရက်သာ ဖြစ်သည် - ပုံစံတိုင်းကို ထိုအချိန်တွင် ဖတ်ပြီး ရေတိုက်တိုင်းသည် ပြည့်ခြင်း၊ ကျခြင်း မလုပ်ဘဲ စတင်အဆင့်တွင် ရှိနေသည်။ extended period simulation ကို လည်ပတ်သော EPANET ဖြေရှင်းစက်ကို ဒေါင်းလုဒ်လုပ်ရန် အင်တာနက်သို့ တစ်ကြိမ် ချိတ်ဆက်ပါ။';
+// lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
+// of a failed extended period run the same note ends in {reason}, one of the three sentences below.
+$ec_lang['lpn_time_no_engine_why']='တွင်ပါ ဖြေရှင်းစက်သည် တစ်ကြိမ်လျှင် အချိန်တစ်ခုကိုသာ ဖြေရှင်းသဖြင့် ဤသည်မှာ {time} ရှိ ကွန်ရက်သာ ဖြစ်သည် - ပုံစံတိုင်းကို ထိုအချိန်တွင် ဖတ်ပြီး ရေတိုက်တိုင်းသည် ရေပြည့်ခြင်း၊ ကျခြင်း မလုပ်ဘဲ မူလအဆင့်တွင် ရှိနေသည်။ {reason}';
+$ec_lang['lpn_time_engine_fetch_failed']='EPANET ဖြေရှင်းစက် ဒေါင်းလုဒ်လုပ်ခြင်း မအောင်မြင်ပါ။ ထပ်မံကြိုးစားရန် စာမျက်နှာကို ပြန်လည်ဖွင့်ပါ၊ ဖိုင်ယာဝေါ၊ ပရောက်စီ သို့မဟုတ် ဘရောက်ဇာ တိုးချဲ့ဆော့ဖ်ဝဲက ပိတ်ဆို့နေနိုင်သည်။';
+$ec_lang['lpn_time_engine_start_failed']='ဘရောက်ဇာက EPANET ဖြေရှင်းစက်ကို စတင်ရန် ငြင်းပယ်သည်။ လုံခြုံရေးဆက်တင် သို့မဟုတ် တိုးချဲ့ဆော့ဖ်ဝဲကြောင့် WebAssembly ပိတ်ထားနိုင်သည်။';
+$ec_lang['lpn_time_engine_run_failed']='EPANET run မအောင်မြင်ပါ။ ၎င်းသည် ဤစာမျက်နှာ၏ အမှားတစ်ခုဖြစ်သည်၊ တင်ပြရန် {wrong} လင့်ခ်ကို အသုံးပြုပါ။';
 $ec_lang['lpn_time_slider']='ကုန်လွန်သွားသော simulation အချိန်';
 $ec_lang['lpn_time_no_period']='ဤပရောဂျက်တွင် အချိန်ကာလ အတုယူတွက်ချက်မှု သတ်မှတ်ထားခြင်း မရှိသောကြောင့်၊ ပြရန် အခိုက်တစ်ခုသာ ရှိသည်။ အချိန်ကာလ အတုယူတွက်ချက်မှုတစ်ခု run လုပ်ရန်၊ ဆက်တင်များ၊ တွက်ချက်မှု၊ အချိန် တွင် စုစုပေါင်း လည်ပတ်ချိန် ကို သတ်မှတ်ပါ။';
 $ec_lang['lpn_time_first']='အစသို့ သွားရန်';
@@ -3080,6 +3648,9 @@ $ec_lang['lpn_labels_customer_width_tip']='ဖောက်သည်အညွှ�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='လက်ရှိ ကြည့်ရှုမှုကို သုံးရန်';
 $ec_lang['lpn_settings_page']='စာမျက်နှာ';
+$ec_lang['lpn_saved_project']='ပရောဂျက်နှင့်အတူ သိမ်းထားသည်';
+$ec_lang['lpn_saved_browser']='ဤဘရောက်ဇာတွင် သိမ်းထားသည်';
+$ec_lang['lpn_saved_session']='မသိမ်းထားပါ';
 $ec_lang['lpn_settings_hydraulics']='ဟိုက်ဒရောလစ်';
 $ec_lang['lpn_settings_quality']='ရေအရည်အသွေး';
 $ec_lang['lpn_settings_quality_track']='အရည်အသွေး ကန့်သတ်ချက်';
@@ -3226,6 +3797,8 @@ $ec_lang['lpn_settings_energy']='စွမ်းအင်';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='အစီရင်ခံစာများ';
 // Edited by TGH 2026-09-07
+// Row label only (the box title is lpn_time_run_report). Tom, 2026-10-07: no row carries '(EPANET)';
+// the tips say where a report comes from. Run is EPANET's verbatim report.
 $ec_lang['lpn_reports_epanet']='လည်ပတ်မှု';
 $ec_lang['lpn_energy_title']='ရေတင်စက် စွမ်းအင် အစီရင်ခံစာ';
 $ec_lang['lpn_energy_menu']='ရေတင်စက် စွမ်းအင်';
@@ -3261,6 +3834,9 @@ $ec_lang['lpn_scncmp_running']='အခြေအနေတိုင်းကို
 $ec_lang['lpn_scncmp_empty']='မည်သည့်အရာမျှ မရေးဆွဲထားသေးသောကြောင့်၊ ဖြေရှင်းရန် မည်သည့်အရာမျှ မရှိပါ။';
 $ec_lang['lpn_scncmp_col_maxvelocity']='အမြင့်ဆုံးအလျင်';
 $ec_lang['lpn_scncmp_at']='{id} တွင် {value}';
+$ec_lang['lpn_scncmp_at_time']='{id} တွင် {value}၊ {time}';
+$ec_lang['lpn_scncmp_same']='အခြေအနေတိုင်းတွင် တူညီသည်';
+$ec_lang['lpn_scncmp_period_note']='အခြေအနေတစ်ခုတွင် စုစုပေါင်း လည်ပတ်ချိန် ရှိလျှင် ၎င်း၏ အနိမ့်ဆုံးဖိအားနှင့် အမြင့်ဆုံးရေအလျင်နှုန်းသည် ပြထားသောအချိန်တွင် ကွန်ရက်တစ်ခုလုံး၏ အစွန်းတန်ဖိုးများ ဖြစ်သည်။';
 $ec_lang['lpn_scncmp_current']='(ယခုဖွင့်ထားသည်)';
 $ec_lang['lpn_scncmp_note']='အခြေအနေတိုင်းကို ပုံကြမ်း၏ မိတ္တူတစ်စောင်မှ ဖြေရှင်းသည်။ ဤနေရာရှိ မည်သည့်အရာမျှ ပရောဂျက်ကို မပြောင်းလဲစေပါ၊ သင်အလုပ်လုပ်နေသော အခြေအနေကိုလည်း ယခင်အတိုင်းပင် ချန်ထားသည်။';
 $ec_lang['lpn_energy_over']='{time} ၏ အချိန်ကာလ အတုယူတွက်ချက်မှုအတွက်';
@@ -3283,9 +3859,7 @@ $ec_lang['lpn_energy_total_cost']='စုစုပေါင်း ကုန်�
 // EPANET's own Report menu, Status and Full: Status lists what changed over an extended period
 // simulation, in time order; Full lists every node and every link at every reporting time step.
 // Both read the run's own frames (js/lpn-time.js), so neither is a second computation.
-// **THE ROW SAYS "Status", NOT "Status report"** -- the Reports fly-out carries the word so no row
-// has to (js/looped-network.js:4630's own rule, already followed by "EPANET run"). The box title,
-// lpn_status_title, keeps the full name.
+// **THE ROW AND THE BOX TITLE BOTH SAY "Status changes"** (Tom, 2026-10-07), so menu and box agree.
 $ec_lang['lpn_reports_status']='အခြေအနေ ပြောင်းလဲမှုများ';
 $ec_lang['lpn_reports_status_tip']='နောက်ဆုံး extended period simulation ၏ EPANET အချိန်အဆင့်များမှ ဖတ်ထားသော အခြေအနေပြောင်းလဲမှုများ၏ အချိန်စဉ်ဇယား - ရေတင်စက်များနှင့် ဗားလ်များ ဖွင့်ခြင်း သို့မဟုတ် ပိတ်ခြင်း၊ ရေတိုက်များ ပြည့်ခြင်း၊ ကုန်ခြင်း၊ ပြည့်သွားခြင်း သို့မဟုတ် ခန်းခြောက်ခြင်း၊ ပြီးပြည့်စုံစွာ converge မဖြစ်သော အဆင့်များ။';
 $ec_lang['lpn_status_title']='အခြေအနေ ပြောင်းလဲမှုများ';
@@ -3313,7 +3887,13 @@ $ec_lang['lpn_full_print']='အစီရင်ခံစာ ပရင့်ထု
 $ec_lang['lpn_full_col_time']='အချိန်';
 $ec_lang['lpn_full_col_type']='အမျိုးအစား';
 $ec_lang['lpn_full_col_id']='ID';
-$ec_lang['lpn_full_row_count']='အတန်း {n} ခု။';
+$ec_lang['lpn_full_row_count']='အတန်းများ ({n})။';
+
+// ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
+// EPANET's Report > Calibration and its three tabbed pages, with EPANET's own column names (EPANET
+// 2.2 manual, section 9.6). Mean error is EPANET's term for the mean ABSOLUTE difference. "Num obs"
+// is EPANET's own column heading, kept short because results columns are narrow.
+// lpn_calib_missing: keep in step with feat/profile-file's lpn_profile_file_missing (Task 604), the same sentence.
 $ec_lang['lpn_reports_calib']='ချိန်ညှိမှု';
 $ec_lang['lpn_reports_calib_tip']='ချိန်ညှိမှု ဖိုင်မှ ကွင်းဆင်း တိုင်းတာထားသော အချက်အလက်များကို နောက်ဆုံး တွက်ချက်မှုနှင့် နှိုင်းယှဉ်ရန် - စာရင်းအင်းများ၊ ဆက်စပ်မှု ပုံနှင့် ပျမ်းမျှတန်ဖိုး နှိုင်းယှဉ်ချက်များ။';
 $ec_lang['lpn_calib_title']='ချိန်ညှိမှု အစီရင်ခံစာ';
@@ -3323,7 +3903,7 @@ $ec_lang['lpn_calib_load']='ချိန်ညှိမှု ဖိုင် �
 $ec_lang['lpn_calib_load_tip']='စာကြောင်းတစ်ကြောင်းစီတွင် တည်နေရာ ID၊ အချိန်နှင့် တိုင်းတာထားသော တန်ဖိုး ပါသည့် စာသားဖိုင်။ အချိန်ကို အတုယူတွက်ချက်မှု စတင်ချိန်မှ စ၍ ဒသမနာရီ (သို့) နာရီ:မိနစ် ဖြင့် တိုင်းသည်။ ဆီမီကိုလံ တစ်ခုက မှတ်ချက်ကို စသည်။ အချိန်နှင့် တန်ဖိုးသာ ပါသော စာကြောင်းသည် ၎င်း၏ အထက်ရှိ တည်နေရာနှင့် သက်ဆိုင်သည်။';
 $ec_lang['lpn_calib_none']='ဤပါရာမီတာအတွက် ချိန်ညှိမှု ဖိုင် မဖွင့်ထားပါ။';
 $ec_lang['lpn_calib_session']='ချိန်ညှိမှု ဖိုင်ကို ဤအသုံးပြုမှုကာလအတွက်သာ ထိန်းထားသည်။ ပရောဂျက်နှင့်အတူ (သို့) ဤစက်ပေါ်တွင် မသိမ်းဆည်းပါ။';
-$ec_lang['lpn_calib_file']='{file} - တည်နေရာ {m} ခုတွင် တိုင်းတာမှု {n} ခု။';
+$ec_lang['lpn_calib_file']='{file} - တိုင်းတာမှုများ ({n}) ၊ တည်နေရာများ ({m})။';
 $ec_lang['lpn_calib_units']='ဖိုင်၏ တန်ဖိုးများကို ဤပရောဂျက်၏ ယူနစ်ဖြင့် ဖတ်သည် - {unit}။';
 $ec_lang['lpn_calib_missing']='ဖိုင်တွင် အမည်ပါသော်လည်း ဤကွန်ရက်တွင် မရှိသည်များ - {ids}။';
 $ec_lang['lpn_calib_missing_count']='တည်နေရာသည် ဤကွန်ရက်တွင် မရှိသောကြောင့် ကျော်ခဲ့သော တိုင်းတာမှုများ - {n}။';
@@ -3446,7 +4026,7 @@ $ec_lang['lpn_library_curve_unused']='ဤကွေးမျဉ်းကို �
 // clearing a pattern reference is harmless; a pump with no curve is a lossless connection, so the
 // same gesture would quietly turn a pumped system into an open one. {count} and {ids} are
 // placeholders, not concatenation (Task 193).
-$ec_lang['lpn_library_curve_in_use']='ဤကွေးမျဉ်းကို အစိတ်အပိုင်း {count} ခု သုံးသည် - {ids}။ ၎င်းတို့ကို အခြားကွေးမျဉ်းတစ်ခု အရင်သတ်မှတ်ပြီးမှ ဤတစ်ခုကို ဖျက်ပါ။';
+$ec_lang['lpn_library_curve_in_use']='ဤကွေးမျဉ်းကို အသုံးပြုသော အစိတ်အပိုင်းများ ({count}) - {ids}။ ၎င်းတို့ကို အခြားကွေးမျဉ်းတစ်ခု အရင်သတ်မှတ်ပြီးမှ ဤတစ်ခုကို ဖျက်ပါ။';
 // The two column headings for a curve this page does not compute with -- a tank volume curve, or one
 // a file stated that nothing here reads. Naming a quantity would be inventing one.
 $ec_lang['lpn_library_curve_x']='X';
@@ -3468,7 +4048,7 @@ $ec_lang['lpn_library_pipetype_unused']='ဤပိုက်အမျိုးအ
 // A TYPE IN USE IS NOT DELETED, for the reason the curve above is not: deleting it would change the
 // diameter and the roughness of every pipe that stated it, in silence. {count} and {ids} are
 // placeholders, not concatenation (Task 193).
-$ec_lang['lpn_library_pipetype_in_use']='ဤပိုက်အမျိုးအစားကို ပိုက် {count} ခု အသုံးပြုနေသည် - {ids}။ ဖျက်ခြင်းမပြုမီ ၎င်းတို့မှ ဖြုတ်ချပါ။';
+$ec_lang['lpn_library_pipetype_in_use']='ဤပိုက်အမျိုးအစားကို အသုံးပြုသော ပိုက်များ ({count}) - {ids}။ ဖျက်ခြင်းမပြုမီ ၎င်းတို့မှ ဖြုတ်ချပါ။';
 // The pipe popup\'s own selector and the two controls beside it.
 $ec_lang['lpn_field_pipetype']='ပိုက်အမျိုးအစား';
 $ec_lang['lpn_field_pipetype_tip']='ဤပိုက် အသုံးပြုနေသော ပရောဂျက် စာရင်းရှိ ပိုက်အမျိုးအစား။ ပိုက်အမျိုးအစားတွင် ပါဝင်သော ဂုဏ်သတ္တိများကို ဤနေရာတွင် တည်းဖြတ်၍မရအောင် ပိတ်ထားသည်။ ဤနေရာတွင် တည်းဖြတ်နိုင်ရန် ပိုက်အမျိုးအစားမှ ဖြုတ်ချပါ။';
@@ -3495,7 +4075,7 @@ $ec_lang['lpn_library_fittings_used_by']='ဤချိတ်ဆက်ပစ္�
 $ec_lang['lpn_library_fittings_unused']='ဤချိတ်ဆက်ပစ္စည်း စာရင်းကို မည်သည့်အရာမျှ မသုံးပါ။';
 // A LIST IN USE IS NOT DELETED, for the reason a pipe type in use is not: it would change the minor
 // loss of every pipe that referred to it, in silence. {count} and {ids} are placeholders (Task 193).
-$ec_lang['lpn_library_fittings_in_use']='ဤချိတ်ဆက်ပစ္စည်း စာရင်းကို ပိုက် {count} ခု အသုံးပြုနေသည် - {ids}။ ဖျက်ခြင်းမပြုမီ ၎င်းတို့မှ ဖြုတ်ချပါ။';
+$ec_lang['lpn_library_fittings_in_use']='ဤချိတ်ဆက်ပစ္စည်း စာရင်းကို အသုံးပြုသော ပိုက်များ ({count}) - {ids}။ ဖျက်ခြင်းမပြုမီ ၎င်းတို့မှ ဖြုတ်ချပါ။';
 // Importing libraries out of another project file (ROADMAP Task 611). ONE WIZARD, ONE DOOR: the
 // Import libraries row under File, and nothing in the Libraries box (Tom, 2026-09-18: 'Remove
 // buttons except at the File menu.'). The label and its tip name no particular library, because
@@ -3566,9 +4146,9 @@ $ec_lang['lpn_fitting_other']='အခြား ချိတ်ဆက်ပစ္
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
 $ec_lang['lpn_inp_export_flat_heading']='{file} ကို သိမ်းဆည်းပြီးပါပြီ';
 $ec_lang['lpn_inp_export_flat_lead']='ထုတ်ယူထားသော EPANET ဖိုင်သည် ဤပရောဂျက်နှင့် ဂဏန်းအရ ညီမျှသည်။ သို့သော် အောက်ပါအရာများအတွက် နေရာမရှိပါ -';
-$ec_lang['lpn_inp_export_flat_types']='ဤနေရာရှိ ပိုက်လိုင်း {n} ခုသည် ပိုက်အမျိုးအစား {t} မျိုးကို ရည်ညွှန်းသည်။ ဖိုင်တွင် ထိုပိုက်လိုင်းတစ်ခုစီသည် ဂဏန်းများ၏ ကိုယ်ပိုင်မိတ္တူကို ဆောင်သဖြင့် အဖြေများ တူညီသည်။ ဖိုင်က မသိမ်းနိုင်သည်မှာ ပိုက်အမျိုးအစားကိုယ်တိုင်ဖြစ်သဖြင့် အဓိပ္ပာယ်ဖွင့်ဆိုချက်တစ်ခုနှင့် ၎င်းကိုသုံးသော ပိုက်လိုင်းတိုင်းကြား ချိတ်ဆက်မှုကို ပရောဂျက်ဖိုင်တွင်သာ မှတ်တမ်းတင်သည်။';
+$ec_lang['lpn_inp_export_flat_types']='ဤနေရာရှိ ပိုက်လိုင်းများ ({n}) သည် ပိုက်အမျိုးအစားများ ({t}) ကို ရည်ညွှန်းသည်။ ဖိုင်တွင် ထိုပိုက်လိုင်းတစ်ခုစီသည် ဂဏန်းများ၏ ကိုယ်ပိုင်မိတ္တူကို ဆောင်သဖြင့် အဖြေများ တူညီသည်။ ဖိုင်က မသိမ်းနိုင်သည်မှာ ပိုက်အမျိုးအစားကိုယ်တိုင်ဖြစ်သဖြင့် အဓိပ္ပာယ်ဖွင့်ဆိုချက်တစ်ခုနှင့် ၎င်းကိုသုံးသော ပိုက်လိုင်းတိုင်းကြား ချိတ်ဆက်မှုကို ပရောဂျက်ဖိုင်တွင်သာ မှတ်တမ်းတင်သည်။';
 $ec_lang['lpn_inp_export_flat_coords']='EPANET ဖိုင်သည် node တစ်ခုစီအတွက် တည်နေရာတစ်ခုကို သိမ်းသည်။ ဤအခြေအနေသည် ၎င်းတို့အနက် {n} ခုကို အခြားနေရာတွင် ထားပြီး ဖိုင်ရှိ တည်နေရာများမှာ ထိုနေရာများဖြစ်သည်။ အခြားအခြေအနေတိုင်းသည် ၎င်း၏ တည်နေရာများကို ပရောဂျက်ဖိုင်တွင်သာ ထားသည်။';
-$ec_lang['lpn_inp_export_flat_fittings']='EPANET ဖိုင်သည် သင့်ပရောဂျက်ဖိုင်ရှိ ဒေါင့်ကွေ့၊ ဗားလ်နှင့် တီးချိတ်များ၏ စာရင်းကို မထားနိုင်ပါ။ ဤနေရာရှိ ပိုက် {n} ခု၏ ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်းကို ချိတ်ဆက်ပစ္စည်း စာရင်းမှ ပေါင်းလဒ်ထုတ်ထားသည်။ စုစုပေါင်းသည် ရှိနေသည့်အတိုင်း ဖိုင်ထဲသို့ ဝင်သောကြောင့် အဖြေများအတွက် မည်သည့်အရာမျှ မပြောင်းလဲပါ။';
+$ec_lang['lpn_inp_export_flat_fittings']='EPANET ဖိုင်သည် သင့်ပရောဂျက်ဖိုင်ရှိ ဒေါင့်ကွေ့၊ ဗားလ်နှင့် တီးချိတ်များ၏ စာရင်းကို မထားနိုင်ပါ။ ဤနေရာရှိ ပိုက်များ ({n}) ၏ ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်းကို ချိတ်ဆက်ပစ္စည်း စာရင်းမှ ပေါင်းလဒ်ထုတ်ထားသည်။ စုစုပေါင်းသည် ရှိနေသည့်အတိုင်း ဖိုင်ထဲသို့ ဝင်သောကြောင့် အဖြေများအတွက် မည်သည့်အရာမျှ မပြောင်းလဲပါ။';
 $ec_lang['lpn_library_controls']='ထိန်းချုပ်မှုများ';
 $ec_lang['lpn_library_controls_tip']='ထိန်းချုပ်မှုတစ်ခုသည် ရေတိုက်ရေအနက်၊ node ဖိအား သို့မဟုတ် အချိန်အပေါ် အခြေခံ၍ link တစ်ခုကို ဖွင့်ခြင်း၊ ပိတ်ခြင်း သို့မဟုတ် ၎င်း၏ သတ်မှတ်ချက်ကို ပြောင်းခြင်း ပြုသော ဖော်ပြချက်တစ်ခု ဖြစ်သည်။';
 // A verb and its object, not a bare "Add": a bare imperative is the hardest kind of string to
@@ -3578,10 +4158,23 @@ $ec_lang['lpn_library_pattern_values']='မြှောက်ကိန်းမ�
 $ec_lang['lpn_library_pattern_values_tip']='မြှောက်ကိန်းများကို space (သို့) comma ဖြင့် ခြားပါ။ spreadsheet ကော်လံတစ်ခု ရှိပါက ကူးထည့်နိုင်သည်။ စာရင်းသည် လည်ပတ်မှု ကြာချိန်တစ်လျှောက် ထပ်ခါထပ်ခါ ဖြစ်နေသောကြောင့်၊ လည်ပတ်မှု တစ်ခုလုံးကို လွှမ်းခြုံရန် မလိုအပ်ပါ။';
 // {n} values, {step} apart, covering {span}. Placeholders rather than three joined fragments
 // (Task 193): the order of the three differs by language and a sandwich cannot express that.
-$ec_lang['lpn_library_pattern_span']='မြှောက်ကိန်း {n} လုံး၊ {step} စီ ကွာဝေး၍ {span} ကို လွှမ်းခြုံသည်';
+$ec_lang['lpn_library_pattern_span']='မြှောက်ကိန်းများ ({n})၊ {step} စီ ကွာဝေး၍ {span} ကို လွှမ်းခြုံသည်';
 $ec_lang['lpn_library_pattern_none']='ပုံစံ မရှိပါ';
+// The blank first option of a selector whose blank follows a project-wide default (a junction's or
+// customer's demand pattern, a pump's price pattern and efficiency curve). Tom, 2026-10-04.
+$ec_lang['lpn_choice_default']='ပုံမှန်';
 $ec_lang['lpn_settings_default_pattern']='မူလ လိုအင် ပုံစံ';
 $ec_lang['lpn_settings_default_pattern_tip']='ပုံစံ မရှိသော ဆက်စပ်နေရာတိုင်းသည် ဤတစ်ခုကို အသုံးပြုသည်။';
+$ec_lang['lpn_junction_pattern_unknown']='ဤပရောဂျက်တွင် ID {id} ပါသော ပုံစံ မရှိသဖြင့် ဆက်စပ်နေရာကို ယခင်အတိုင်း ထားခဲ့သည်။';
+$ec_lang['lpn_settings_default_pattern_none']='မရှိ (ကိန်းသေ)';
+$ec_lang['lpn_demand_pattern_default']='(မူလ - {id})';
+$ec_lang['lpn_demand_pattern_constant']='(ကိန်းသေ)';
+$ec_lang['lpn_library_pattern_default_mark']='(မူလ)';
+$ec_lang['lpn_library_pattern_default_tip']='မူလ လိုအင်ပုံစံ။ ဆက်တင်များ၊ မူလ လိုအင်ပုံစံ တွင် ပြောင်းပါ။';
+$ec_lang['lpn_library_pattern_default_deleted_to']='ပုံစံ {id} သည် မူလ လိုအင်ပုံစံ ဖြစ်ခဲ့သည်။ ပုံစံမရှိသော ဆက်စပ်နေရာများသည် ယခု ပုံစံ {now} ကို သုံးသည်။';
+$ec_lang['lpn_library_pattern_default_deleted_none']='ပုံစံ {id} သည် မူလ လိုအင်ပုံစံ ဖြစ်ခဲ့သည်။ ပုံစံမရှိသော ဆက်စပ်နေရာများသည် ယခု ကိန်းသေ လိုအင်ကို သုံးသည်။';
+
+
 $ec_lang['lpn_library_control_add']='ထိန်းချုပ်မှုတစ်ခု ထည့်ရန်';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -3682,7 +4275,7 @@ $ec_lang['lpn_terrain_refused']='အမြင့်များကို မဖ�
 // numbers. Substituted, never concatenated.
 $ec_lang['lpn_terrain_confirm']='ဆက်စပ်နေရာ {n} ခု၏ ရေအမြင့်ကို Mapbox DEM မှ ဖြည့်မလား?';
 $ec_lang['lpn_terrain_confirm_default_1']='node တိုင်းတွင် အမြင့် ရှိပြီးဖြစ်ပြီး ၎င်းတို့အနက် {n} ခုသည် သင်ထည့်သွင်းထားသော တန်ဖိုးမဟုတ်ဘဲ node အသစ်စတင်သည့် အမြင့်ဖြစ်သော {v} တွင် ရှိနေဆဲဖြစ်သည်။';
-$ec_lang['lpn_terrain_confirm_default_2']='ထို ဆက်စပ်နေရာ {n} ခု၏ ရေအမြင့်ကို Mapbox DEM မှ တန်ဖိုးများဖြင့် အစားထိုးမလား?';
+$ec_lang['lpn_terrain_confirm_default_2']='ထို node များ ({n}) ၏ အမြင့်ကို Mapbox DEM မှ တန်ဖိုးများဖြင့် အစားထိုးမလား?';
 $ec_lang['lpn_terrain_keep']='node {k} ခုတွင် အမြင့်ရှိပြီးဖြစ်သဖြင့် မပြောင်းပါ။';
 $ec_lang['lpn_terrain_undo']='Undo တစ်ကြိမ် (Ctrl-Z) ဖြင့် ၎င်းတို့အားလုံးကို ပြန်ရောက်စေနိုင်သည်။';
 $ec_lang['lpn_terrain_requests']='api.mapbox.com သို့ တောင်းဆိုမှု {n} ခု။';
@@ -3711,8 +4304,6 @@ $ec_lang['lpn_terrain_keep_ids']='ထိုဆက်စပ်နေရာမျ�
 $ec_lang['lpn_terrain_filled_ids']='ဤဆက်စပ်နေရာများသည် ရေအမြင့် ရရှိခဲ့သည် - {ids}';
 $ec_lang['lpn_terrain_blank_ids']='ဤဆက်စပ်နေရာများတွင် ရေအမြင့် လုံးဝ မရှိသေးပါ - {ids}';
 $ec_lang['lpn_terrain_ids_more']='{ids}၊ နှင့် နောက်ထပ် {n} ခု';
-$ec_lang['lpn_analyze_menu']='ခွဲခြမ်းစိတ်ဖြာရန်';
-$ec_lang['lpn_analyze_menu_tip']='ကွန်ရက်၏ မိတ္တူပေါ်တွင် လည်ပတ်စေသော ခွဲခြမ်းစိတ်ဖြာမှုများ - ဆက်စပ်နေရာတစ်ခုစီရှိ မီးငြိမ်းသတ်ရေးစီးနှုန်း၊ ပိုက်လိုင်း၊ ရေတင်စက်နှင့် ဗားလ်တစ်ခုစီ၏ ဆုံးရှုံးမှုနှင့် အတိုးအလျှော့ လုပ်ထားသော လိုအပ်ချက်များ။';
 
 // ---- Fire flow: the whole-system sweep (ROADMAP Task 530) ---------------------------------------
 // Tom's question, 2026-08-27: which junctions can provide the fire flow their code asks for, and
@@ -3726,6 +4317,8 @@ $ec_lang['lpn_analyze_menu_tip']='ကွန်ရက်၏ မိတ္တူပ
 // {flow} and {velocity} are quantities with their units, {pressure} a pressure with its unit,
 // {id} a junction or pipe name, and {done}, {total}, {n}, {pass}, {fail}, {design} and {solves}
 // are whole numbers. Every one is substituted, never concatenated.
+$ec_lang['lpn_analyze_menu']='ခွဲခြမ်းစိတ်ဖြာရန်';
+$ec_lang['lpn_analyze_menu_tip']='ကွန်ရက်၏ မိတ္တူပေါ်တွင် လည်ပတ်စေသော ခွဲခြမ်းစိတ်ဖြာမှုများ - ဆက်စပ်နေရာတစ်ခုစီရှိ မီးငြိမ်းသတ်ရေးစီးနှုန်း၊ ပိုက်လိုင်း၊ ရေတင်စက်နှင့် ဗားလ်တစ်ခုစီ၏ ဆုံးရှုံးမှုနှင့် အတိုးအလျှော့ လုပ်ထားသော လိုအပ်ချက်များ။';
 $ec_lang['lpn_ff_menu']='မီးငြိမ်းသတ်ရေးစီးနှုန်း ခွဲခြမ်းစိတ်ဖြာချက်…';
 $ec_lang['lpn_ff_menu_tip']='ရွေးချယ်ထားသော ဆက်စပ်နေရာတစ်ခုစီကို မီးငြိမ်းသတ်ရေးစီးနှုန်းအတွက် စမ်းသပ်ပြီး စနစ်၏ ကျန်အပိုင်းအပေါ် သက်ရောက်မှုကို စစ်ဆေးပါ';
 $ec_lang['lpn_ff_title']='မီးငြိမ်းသတ်ရေးစီးနှုန်း ခွဲခြမ်းစိတ်ဖြာမှု';
@@ -3791,7 +4384,7 @@ $ec_lang['lpn_ff_clear']='ဝိုင်းကွင်းများ ရှ�
 // down -- so these three do not add up to the number of junctions, and that is correct rather than
 // a rounding slip. Said as three separate facts for that reason.
 $ec_lang['lpn_ff_summary']='ဆက်စပ်နေရာ {clean} ခုသည် စစ်ဆေးမှုအားလုံး အောင်မြင်သည်။ ဆက်စပ်နေရာ {fire} ခုသည် မီးငြိမ်းသတ်ရေးစီးနှုန်း မအောင်မြင်ပါ။ ဆက်စပ်နေရာ {design} ခုသည် စနစ်၏ ကျန်အပိုင်းကို ထိခိုက်သည်။';
-$ec_lang['lpn_ff_summary_error']='ဆက်စပ်နေရာ {n} ခုကို ဖြေရှင်း၍ မရခဲ့ပါ။';
+$ec_lang['lpn_ff_summary_error']='ဖြေရှင်း၍ မရခဲ့သော ဆက်စပ်နေရာများ ({n})။';
 // ONE WIDE TABLE, NOT TWO REPORTS (Tom, 2026-08-30, with a competitor's own table in front of him:
 // "Normally they are kind of wide and they include the information from both tables in one table.")
 // One run has always produced one result set holding both answers per junction, so two headings
@@ -3869,6 +4462,14 @@ $ec_lang['lpn_ff_err_converge']='ကွန်ရက်၏ အဖြေ မတွ
 $ec_lang['lpn_ff_err_solve']='ဖြေရှင်းစက်က အမှားတစ်ခု အစီရင်ခံပြီး အဖြေ မပေးခဲ့ပါ။';
 $ec_lang['lpn_ff_err_not_junction']='ဆက်စပ်နေရာ မဟုတ်ပါ';
 $ec_lang['lpn_ff_err_unknown']='ရလဒ် မရှိပါ။ အမှားကုဒ် - {code}';
+
+// ---- Water > Criticality analysis (Tom, 2026-09-30) -------------------------------------------
+//
+// Break each asset in turn, on a copy, and report what the system loses. "Criticality analysis" is
+// the industry's term (WaterGEMS, InfoWater); EPANET has no such tool and no word for it. The run
+// dialog, Run, Stop, the engine sentence and the cost line are fire flow's own keys.
+//
+// {n}, {done} and {total} are whole numbers; {pressure} is a pressure with its unit.
 $ec_lang['lpn_crit_menu']='အရေးပါမှု ခွဲခြမ်းစိတ်ဖြာမှု…';
 $ec_lang['lpn_crit_menu_tip']='ပိုက်လိုင်း၊ ရေတင်စက်နှင့် ဗားလ်တစ်ခုစီကို ကွန်ရက်မှ တစ်ခုပြီးတစ်ခု ဖယ်ရှားပြီး စနစ်အပေါ် သက်ရောက်မှုကို အစီရင်ခံပါ။';
 $ec_lang['lpn_crit_title']='အရေးပါမှု ခွဲခြမ်းစိတ်ဖြာမှု';
@@ -3883,7 +4484,7 @@ $ec_lang['lpn_crit_col_asset']='အစိတ်အပိုင်း';
 $ec_lang['lpn_crit_col_unserved']='ဝန်ဆောင်မှု မရသော လိုအပ်ချက်';
 $ec_lang['lpn_crit_col_cutoff']='ဖြတ်တောက်ခံရသော ဆက်စပ်နေရာများ';
 $ec_lang['lpn_crit_col_below']='အနိမ့်ဆုံးအောက် ဆက်စပ်နေရာများ';
-$ec_lang['lpn_crit_summary']='အစိတ်အပိုင်း {total} ခုအနက် {n} ခုသည် လိုအပ်ချက်ကို ဝန်ဆောင်မှု မပေးနိုင်စေခြင်း (သို့) ဆက်စပ်နေရာတစ်ခုကို {pressure} အောက် ကျဆင်းစေခြင်း ဖြစ်စေသည်။';
+$ec_lang['lpn_crit_summary']='လိုအပ်ချက်ကို ဝန်ဆောင်မှု မပေးနိုင်စေသော သို့မဟုတ် ဆက်စပ်နေရာတစ်ခုကို {pressure} အောက် ကျဆင်းစေသော အစိတ်အပိုင်းများ ({n} / {total})။';
 $ec_lang['lpn_crit_baseline_below']='ဘာမျှ မပျက်စီးဘဲ ၎င်းအောက် ရှိပြီးသား ဆက်စပ်နေရာများ - {n}။ ၎င်းတို့ကို မရေတွက်ပါ။';
 $ec_lang['lpn_crit_working']='လုပ်ဆောင်နေသည် - အစိတ်အပိုင်း {total} ခုအနက် {done} ခု။';
 $ec_lang['lpn_crit_stopped']='အစိတ်အပိုင်း {total} ခုအနက် {done} ခုပြီးနောက် ရပ်လိုက်သည်။ အောက်ပါ ရလဒ်များသည် ပြီးစီးပြီးသားများ ဖြစ်သည်။';
@@ -3895,6 +4496,57 @@ $ec_lang['lpn_crit_stale']='ပုံဆွဲထားမှု ပြောင
 $ec_lang['lpn_crit_skipdead']='အဆုံးသတ်ပိတ်ပိုက်များကို ကျော်ရန်';
 $ec_lang['lpn_crit_skipdead_tip']='အဆုံးသတ်ပိတ်မျဉ်းဆိုသည်မှာ ၎င်းကို ဖယ်ထုတ်လျှင် ၎င်းမှတစ်ဆင့်သာ ရောက်နိုင်သော ဆက်စပ်နေရာများ ဖြတ်တောက်ခံရပြီး၊ ၎င်း၏ အဝေးဘက်တွင် ရေကန် (သို့) ရေတိုက် မရှိသော မျဉ်း ဖြစ်သည်။ ၎င်း၏ ဆုံးရှုံးမှုသည် ၎င်းနောက်ရှိ အရာအားလုံး ဖြစ်သောကြောင့် ၎င်းကို မဖြေရှင်းပါ။ အနှစ်ချုပ်က မည်မျှ ကျော်ခဲ့သည်ကို ပြောပြသည်။';
 $ec_lang['lpn_crit_skipped_dead']='ကျော်ခဲ့သော အဆုံးသတ်ပိတ်မျဉ်းများ - {n}။ တစ်ခုစီသည် ၎င်းနောက်ရှိ အရာအားလုံးကို ဖြတ်တောက်သည်။';
+
+// ---- Water > Analyze > Demand scaling (ROADMAP Task 754) ----------------------------------------
+//
+// Tom, 2026-09-30 and 2026-10-01: the demands multiplied on a copy, like Fire flow, and "What demand
+// scale can the system handle with this pressure limit?" The run dialog's Stop, the engine sentence,
+// the cost line, the Junction heading and the solver's reasons are fire flow's own keys.
+//
+// {m} and {max} are demand scales printed as numbers (1.37); {step} is the search's tolerance
+// (0.01); {n} is a whole number, always after a colon so no plural has to agree with it; {time} and
+// {now} are elapsed times (6:00); {pressure} is a pressure with its unit; {id} becomes a link to the
+// junction on the map; {reason} is a whole sentence saying why the solver gave no answer.
+$ec_lang['lpn_ds_menu']='လိုအင် စကေးချဲ့ခြင်း…';
+$ec_lang['lpn_ds_menu_tip']='ကွန်ရက်မိတ္တူတစ်ခုပေါ်တွင် လိုအင်များကို မြှောက်ပြီး ဖိအားများနှင့် ရေအလျင်နှုန်းများကို ကြည့်ပါ၊ သို့မဟုတ် စနစ်ထမ်းနိုင်သော အကြီးဆုံး လိုအင်စကေးကို ရှာပါ။';
+$ec_lang['lpn_ds_title']='လိုအင် စကေးချဲ့ခြင်း';
+$ec_lang['lpn_ds_intro']='ရွေးချယ်ထားသော ဆက်စပ်နေရာများရှိ လိုအင်များကို လိုအင်စကေးဖြင့် မြှောက်ပြီး ဖိအားများနှင့် ရေအလျင်နှုန်းများကို ကြည့်ရန် လည်ပတ်ရန် ခလုတ်ကို နှိပ်ပါ။\n\nဤဆက်စပ်နေရာအားလုံးတွင် ခွင့်ပြုထားသော အနိမ့်ဆုံးဖိအားကို အနည်းဆုံး ထိန်းထားနိုင်သည့် အကြီးဆုံး လိုအင်စကေးကို {step} အနီးဆုံးအထိ ရှာရန် ရှာဖွေရန် ခလုတ်ကို နှိပ်ပါ၊ ၎င်းသည် 0 မှ {max} အထိ ရှာသည်။\n\nနှစ်ခုစလုံးသည် ကွန်ရက်၏ မိတ္တူပေါ်တွင် အလုပ်လုပ်ပြီး မျက်နှာပြင်ပေါ်ရှိ အချိန်အဆင့်တွင် လက်ရှိအခြေအနေဖြင့် ဖြေရှင်းသဖြင့် ပရောဂျက်ထဲရှိ မည်သည့်အရာမျှ မပြောင်းလဲပါ။ ထိုအချိန်အဆင့်ကိုသာ စကေးချဲ့ပြီး ရေမျက်နှာပြင်အဆင့်များနှင့် အခြေအနေများကို ၎င်းမှ ယူသည်၊ အမြင့်ဆုံးလိုအင်ကို စမ်းရန် လည်ပတ်မီ နာရီကို အမြင့်ဆုံးလိုအင်သို့ ရွှေ့ပါ။';
+$ec_lang['lpn_ds_scope']='စကေးချဲ့မည့် ဆက်စပ်နေရာများ';
+$ec_lang['lpn_ds_scope_all']='ဆက်စပ်နေရာအားလုံး';
+$ec_lang['lpn_ds_scope_selected']='ရွေးချယ်ထားသော ဆက်စပ်နေရာများ';
+$ec_lang['lpn_ds_minpressure']='ခွင့်ပြုထားသော အနိမ့်ဆုံးဖိအား';
+$ec_lang['lpn_ds_minpressure_tip']='ဤသည်မှာ မီးငြိမ်းသတ်ရေးစီးနှုန်း ခွဲခြမ်းစိတ်ဖြာမှုတွင် ရှိသော ခွင့်ပြုထားသော အနိမ့်ဆုံးဖိအားနှင့် တူညီသော ဂဏန်းဖြစ်သည်။ ဤနေရာတွင် ပြောင်းလျှင် ထိုနေရာတွင်ပါ ပြောင်းသည်။';
+$ec_lang['lpn_ds_head_scale']='လိုအင်များကို စကေးချဲ့ရန်';
+$ec_lang['lpn_ds_multiplier']='လိုအင်စကေး';
+$ec_lang['lpn_ds_multiplier_tip']='လိုအင်တစ်ခုစီကို မြှောက်သည့် ကိန်း၊ 1.5 သည် 50% တိုးခြင်း ဖြစ်သည်။ ၎င်းသည် လက်ရှိအခြေအနေ၏ လိုအင်မြှောက်ကိန်းအပြင် ထပ်မံသက်ရောက်ပြီး ထိုမြှောက်ကိန်းသည် လိုအင်များထဲတွင် ပါပြီးသားဖြစ်သည်၊ ၎င်းကို ပရောဂျက်တွင် ဘယ်တော့မျှ မသိမ်းပါ။';
+$ec_lang['lpn_ds_run']='လည်ပတ်ရန်';
+$ec_lang['lpn_ds_head_search']='စနစ်က မည်သည့် လိုအင်စကေးကို ထမ်းနိုင်သနည်း။';
+$ec_lang['lpn_ds_head_search_selected']='ဤဆက်စပ်နေရာများက မည်သည့် လိုအင်စကေးကို ထမ်းနိုင်သနည်း။';
+$ec_lang['lpn_ds_outside_below']='လိုအင်စကေး {m} တွင် မရွေးချယ်ထားသော ဆက်စပ်နေရာများအနက် {pressure} အောက်ရှိသည်များ - {n} ({ids})။ ၎င်းတို့သည် ဤအဖြေကို မကန့်သတ်ပါ။';
+$ec_lang['lpn_ds_holds_max']='✓ ရှာဖွေမှု၏ အပေါ်ဆုံး လိုအင်စကေး {max} အထိ ဆက်စပ်နေရာတိုင်းတွင် {pressure} ကို ထိန်းထားသည်။';
+$ec_lang['lpn_ds_below_zero']='⚠ စကေးချဲ့ထားသော လိုအင်များ သုညဖြစ်နေသည့်တိုင် အနည်းဆုံး ဆက်စပ်နေရာတစ်ခုသည် {pressure} အောက်တွင် ရှိသည်။';
+$ec_lang['lpn_ds_found']='✓ စစ်ဆေးထားသော ဆက်စပ်နေရာတိုင်းသည် လိုအင်စကေး {m} အထိ အနည်းဆုံး {pressure} ကို ထိန်းထားသည်။';
+$ec_lang['lpn_ds_found_below']='⚠ လိုအင်ကို စကေးမချဲ့ဘဲပင် အနည်းဆုံး ဆက်စပ်နေရာတစ်ခုသည် {pressure} အောက်တွင် ရှိသည်။ ဆက်စပ်နေရာတိုင်းကို {pressure} သို့မဟုတ် ထို့ထက်မြင့်စွာ ထိန်းထားသည့် အကြီးဆုံး လိုအင်စကေးမှာ {m} ဖြစ်သည်။';
+$ec_lang['lpn_ds_search_stopped']='အဖြေမတွေ့မီ ရှာဖွေမှုကို ရပ်လိုက်သည်။';
+$ec_lang['lpn_ds_lowest_at']='လိုအင်စကေး {m} တွင် အနိမ့်ဆုံးဖိအားမှာ ဆက်စပ်နေရာ {id} တွင် {pressure} ဖြစ်သည်။';
+$ec_lang['lpn_ds_nosolve_at']='လိုအင်စကေး {m} တွင် ကွန်ရက်က အဖြေ မပေးပါ။ {reason}';
+$ec_lang['lpn_ds_scale_ok']='✓ လိုအင်စကေး {m} တွင် ဆက်စပ်နေရာတိုင်းသည် {pressure} ကို ထိန်းထားသည်။';
+$ec_lang['lpn_ds_scale_below']='⚠ လိုအင်စကေး {m} တွင် {pressure} အောက်ရှိသော ဆက်စပ်နေရာများ - {n}။';
+$ec_lang['lpn_ds_scaled_selected']='စကေးချဲ့ပြီး စစ်ဆေးထားသော ဆက်စပ်နေရာများ - {n}။';
+$ec_lang['lpn_ds_head_lowest']='အနိမ့်ဆုံးဖိအားများ';
+$ec_lang['lpn_ds_head_velocity']='အမြင့်ဆုံး ရေအလျင်နှုန်းများ';
+$ec_lang['lpn_ds_col_link']='မျဉ်း';
+$ec_lang['lpn_ds_col_scaled']='စကေးချဲ့';
+$ec_lang['lpn_ds_col_scaled_tip']='လိုအင်များကို လိုအင်စကေးဖြင့် မြှောက်ထားသည့်အခါ။';
+$ec_lang['lpn_ds_col_unscaled']='မချဲ့';
+$ec_lang['lpn_ds_col_unscaled_tip']='ဤအချိန်အဆင့်တွင် လက်ရှိအခြေအနေ၏ လိုအင်များ ရှိသည့်အတိုင်း၊ မြေပုံပြသော တန်ဖိုးအတိုင်း။';
+$ec_lang['lpn_ds_no_junctions']='ဤပရောဂျက်တွင် ဆက်စပ်နေရာ မရှိသေးသဖြင့် စကေးချဲ့စရာ လိုအင် မရှိပါ။';
+$ec_lang['lpn_ds_no_selection']='မည်သည့်ဆက်စပ်နေရာမျှ မရွေးချယ်ထားပါ။ ဆက်စပ်နေရာများကို ရွေးချယ်ပါ သို့မဟုတ် ဆက်စပ်နေရာအားလုံးကို ရွေးပါ။';
+$ec_lang['lpn_ds_skipped']='ဆက်စပ်နေရာ မဟုတ်သဖြင့် မူလအတိုင်း ထားခဲ့သော ရွေးချယ်ထားသည့် အစိတ်အပိုင်းများ - {n}။';
+$ec_lang['lpn_ds_bad_multiplier']='သုည သို့မဟုတ် ထို့ထက်ကြီးသော လိုအင်စကေးကို ထည့်သွင်းပါ၊ ဥပမာ 1.5။';
+$ec_lang['lpn_ds_stale']='ပုံဆွဲမှု ပြောင်းလဲသွားသဖြင့် လိုအင်စကေးချဲ့ခြင်း ရလဒ်များကို ရှင်းလင်းလိုက်သည်။ ထပ်မံ လည်ပတ်ပါ။';
+$ec_lang['lpn_analyze_at_time']='အချိန်အဆင့် - {time}။';
+$ec_lang['lpn_analyze_time_moved']='⚠ ဤသည်ကို {time} တွင် တွက်ချက်ခဲ့ပြီး ယခု နာရီသည် {now} တွင် ရှိသည်။ မျက်နှာပြင်ပေါ်ရှိ အချိန်အဆင့်အတွက် ထပ်မံ လည်ပတ်ပါ။';
 
 // ---- Settings > New assets > Import surveyed points: CSV and GPX (ROADMAP Task 592) -----------
 //
@@ -3913,6 +4565,8 @@ $ec_lang['lpn_crit_skipped_dead']='ကျော်ခဲ့သော အဆု�
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='စစ်တမ်းကောက်ယူထားသော အမှတ်များ တင်သွင်းရန်…';
 $ec_lang['lpn_file_import_survey_tip']='စာသားဖိုင်မှ စစ်တမ်းကောက်ယူထားသော အမှတ်စာရင်းကို ဖတ်ပြီး အမှတ်တစ်ခုစီတွင် ဆက်စပ်နေရာတစ်ခု ပြုလုပ်ပါ၊ ဖိုင်က မဖော်ပြသည့်အရာအားလုံးအတွက် အစိတ်အပိုင်းအသစ် ဆက်တင်များကို သုံးသည်။ ဖော်ပြချက်ကို ကွင်းဆင်းကုဒ်များအဖြစ် ဖတ်ရန် ကို မရွေးလျှင် ပိုက်လိုင်း မရေးဆွဲပါ၊ အတန်းတစ်ခုမျှ အမည်မဖော်ဘဲ မကျန်ရစ်ပါ။ ဤပရောဂျက် သုံးပြီးသား သြဒီနိတ်စနစ်ကို ဖတ်သည်၊ ကမ္ဘာမြေပေါ်နေရာ သတ်မှတ်ထားသည်ဖြစ်စေ မဖြစ်စေ။';
+// GeoJSON import of Shapes (Task 779). Only points, lines and polygons come in, as Shapes; the
+// network is imported from an EPANET file. Every feature not imported is named in the report.
 $ec_lang['lpn_file_import_shapes']='GeoJSON ရေးဆွဲပုံများ တင်သွင်းရန်…';
 $ec_lang['lpn_file_import_shapes_tip']='GeoJSON ဖိုင်တစ်ခုရှိ အမှတ်များ၊ လိုင်းများနှင့် ပိုလီဂွန်များကို ဤပရောဂျက်ထဲသို့ ရေးဆွဲပုံများအဖြစ် ဖတ်ယူသည်။ ဖိုင်ထဲရှိ ကွန်ရက်အစိတ်အပိုင်းများကို မတင်သွင်းပါ၊ ကွန်ရက်ကို EPANET ဖိုင်မှ တင်သွင်းပါ။ ပရောဂျက်သည် မြေပေါ်နေရာ တွဲထားရမည် (သို့) သြဒီနိတ်စနစ် သတ်မှတ်ထားရမည်။';
 $ec_lang['lpn_geojson_import_done']='{file} မှ ရေးဆွဲပုံ {n} ခု တင်သွင်းခဲ့သည်။';
@@ -4023,176 +4677,7 @@ $ec_lang['lpn_survey_note_blank_rows']='ဗလာ စာကြောင်းမ
 $ec_lang['lpn_survey_note_id_duplicate']='အမည်ကို ဤဖိုင်တွင် ယခင်က အသုံးပြုပြီးသားဖြစ်ပြီး၊ အမည်အသစ် သတ်မှတ်ပေးထားသည်။';
 $ec_lang['lpn_survey_note_id_taken']='အမည်သည် ပရောဂျက်တွင် ရှိပြီးသားဖြစ်ပြီး၊ အမည်အသစ် သတ်မှတ်ပေးထားသည်။';
 $ec_lang['lpn_survey_note_id_invalid']='အမည်ကို ဤနေရာတွင် အသုံးပြု၍ မရပါ၊ အမည်အသစ် သတ်မှတ်ပေးထားသည်။';
-$ec_lang['points_data_msg_line']='ဘာမျှ မကူးထည့်ထားပါ။ လိုင်း {n} ကို အကွာအဝေးနှင့် အမြင့်အဖြစ် ဖတ်၍ မရပါ။';
-$ec_lang['points_data_msg_none']='ဘာမျှ မကူးထည့်ထားပါ။ အကွာအဝေးနှင့် အမြင့် အတွဲများ မတွေ့ပါ။';
-$ec_lang['lpn_tool_add_chain']='ဆက်စပ်နေရာ ပိုက်လိုင်း ဆက်တိုက်';
-$ec_lang['lpn_pane_delete_element']='အစိတ်အပိုင်း ဖျက်ရန်';
-$ec_lang['lpn_pane_delete_elements']='အစိတ်အပိုင်းများ ဖျက်ရန်';
-$ec_lang['lpn_pane_sort_desc']='ကြီးစဉ်ငယ်လိုက် စီရန်';
-$ec_lang['lpn_pane_manage_cols_width']='အကျယ် (em)';
-$ec_lang['lpn_pane_width_tip']='ကော်လံအကျယ်များကို ပရောဂျက်ထဲတွင် မဟုတ်ဘဲ ဤဘရောက်ဇာထဲတွင် သိမ်းထားသည်။ မူလအကျယ်သို့ ပြန်ရန် ကော်လံ ခြားမျဉ်းကို နှစ်ချက်နှိပ်ပါ။';
-$ec_lang['lpn_dock_left']='မြေပုံ၏ ဘယ်ဘက်တွင် ချထားရန်';
-$ec_lang['lpn_dock_right']='မြေပုံ၏ ညာဘက်တွင် ချထားရန်';
-$ec_lang['lpn_dock_float']='မျောထားရန်';
-$ec_lang['lpn_dock_autohide']='အလိုအလျောက် ဖျောက်ရန်';
-$ec_lang['lpn_popup_none']='မည်သည့်အရာမျှ မရွေးချယ်ထားပါ။ ဂုဏ်သတ္တိများကို ကြည့်ရန် မြေပုံပေါ်ရှိ အစိတ်အပိုင်းတစ်ခုကို ရွေးချယ်ပါ။';
-$ec_lang['lpn_hotkeys_snip_heading']='ဖန်သားပြင်ပုံ';
-$ec_lang['lpn_hotkeys_snip_term']='ဖန်သားပြင်ပုံ ကီးဘုတ် အတိုကောက်များ';
-$ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>S</td><td>ဖန်သားပြင်ပုံ ဖွင့်ထားစဉ် ဖြတ်ယူရန်။</td></tr><tr><td>E</td><td>မှတ်သားမြင်ကွင်းတွင် ခဲဖျက်။</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>မှတ်သားမြင်ကွင်းတွင် ပြန်ဖျက်ရန်နှင့် ပြန်လုပ်ရန်။</td></tr><tr><td>Esc</td><td>ဖြတ်ယူခြင်းကို ပယ်ဖျက်ရန် သို့မဟုတ် ခဲဖျက်မှ ထွက်ရန်။ မှတ်သားမြင်ကွင်းတွင် ဘာမျှ မရေးဆွဲထားလျှင် ပိတ်ရန်။</td></tr></tbody></table>';
-$ec_lang['lpn_fb_intro']='ကြိုတင်ရေးသား စာများ (မဖြစ်မနေမဟုတ်ပါ)။ ပို့ရန်ကို မနှိပ်မချင်း ဘာမျှ မပို့ပါ။';
-$ec_lang['lpn_fb_pick_numbers']='ဂဏန်းများ မမှန်ပုံရသည်';
-$ec_lang['lpn_fb_pick_broken']='တစ်ခုခု အလုပ်မလုပ်ပါ';
-$ec_lang['lpn_fb_pick_wording']='စကားလုံး သို့မဟုတ် ဘာသာပြန်ချက် မှားနေသည်';
-$ec_lang['lpn_fb_pick_confusing']='ရှုပ်ထွေးနေသည်';
-$ec_lang['lpn_fb_comment']='မှတ်ချက်များ (မဖြစ်မနေမဟုတ်ပါ)';
-$ec_lang['lpn_fb_email']='အီးမေးလ် (မဖြစ်မနေမဟုတ်ပါ၊ အကြောင်းပြန်စာ လိုချင်မှသာ)';
-$ec_lang['lpn_fb_sends']='ပို့မည့်အရာ - ဤစာမျက်နှာ၏ အမည်၊ သင့်ဘာသာစကား၊ ဆိုက်၏ ဗားရှင်း၊ မြေပုံပေါ်တွင် မက်ဆေ့ချ်ရှိလျှင် ၎င်း၏ ကုဒ်၊ နှင့် သင်ရွေးချယ်ခဲ့သည့် သို့မဟုတ် ရိုက်ထည့်ခဲ့သည့်အရာ။ သင်၏ ပုံဆွဲမှု သို့မဟုတ် ကွန်ရက်ကို ဘယ်တော့မျှ မပို့ပါ။ သင်၏ အီးမေးလ်လိပ်စာကို အကြောင်းပြန်ရန်အတွက်သာ အသုံးပြုသည်။';
-$ec_lang['lpn_fb_send']='ပို့ရန်';
-$ec_lang['lpn_fb_sending']='ပို့နေသည်…';
-$ec_lang['lpn_fb_failed']='ထိုစာ ကျွန်ုပ်တို့ထံ မရောက်ပါ။ သင်ရေးထားသည်များ ဤနေရာတွင် ရှိနေသေးသဖြင့် ထပ်မံကြိုးစားနိုင်သည်။';
-$ec_lang['lpn_fb_bad_email']='ထိုအီးမေးလ်လိပ်စာ မမှန်ပုံရပါ။ ပြင်ပါ၊ သို့မဟုတ် အလွတ်ထားပါ။';
-$ec_lang['lpn_fb_busy']='လွန်ခဲ့သော မိနစ်အနည်းငယ်အတွင်း မက်ဆေ့ချ်များ အလွန်များစွာ ရောက်ရှိထားသည်။ သင်ရေးထားသည်များ ဤနေရာတွင် ရှိနေသေးသဖြင့် နောက်မှ ထပ်မံကြိုးစားနိုင်သည်။';
-$ec_lang['lpn_tool_add_chain_tip']='ဆက်စပ်နေရာများနှင့် ပိုက်လိုင်းများကို ဆက်တိုက် ချိတ်ရန် - ဆက်စပ်နေရာတစ်ခု ထည့်ရန် မြေပုံပေါ်တွင် အမှတ်တစ်ခု သတ်မှတ်ပါ၊ ထို့နောက် ပိုက်လိုင်းတစ်ခုနှင့် ဆက်စပ်နေရာတစ်ခု ထည့်ရန် နောက်အမှတ်တစ်ခုစီကို သတ်မှတ်ပါ။ ရှိပြီးသား အမှတ်တစ်ခု (node) ကို သတ်မှတ်၍ ၎င်းမှ ဆက်လက်နိုင်သည်။ ဆက်တိုက်ကို အဆုံးသတ်ရန် Escape နှိပ်ပါ။';
-$ec_lang['lpn_tool_add_shape']='ရေးဆွဲပုံ';
-$ec_lang['lpn_tool_add_shape_tip']='မြေပုံပေါ်တွင် အမှတ်၊ polyline (သို့) ပိုလီဂွန် ရေးဆွဲပါ။ ရေးဆွဲပုံသည် မှတ်ချက်ဖြစ်ပြီး ကွန်ရက်၏ အစိတ်အပိုင်း မဟုတ်ပါ။ အမှတ်တစ်ခုစီကို သတ်မှတ်ပါ၊ ထို့နောက် အပြီးသတ်ရန် နောက်ဆုံးအမှတ်ကို ထပ်မံသတ်မှတ်ပါ၊ Enter နှိပ်ပါ (သို့) ညာဘက်ကလစ်နှိပ်ပါ။ ရေးဆွဲပုံကို ပိုလီဂွန်အဖြစ် ပိတ်ရန် ပထမအမှတ်ကို ထပ်မံသတ်မှတ်ပါ။';
-$ec_lang['lpn_pane_filter_sel_note']='ရွေးချယ်ထားသည်များသာ။ {all} ထဲမှ {n} ခု ပြထားသည်။';
-$ec_lang['lpn_pane_filter_sel_and']='{q} ဖြင့် စစ်ထုတ်ထားပြီး ရွေးချယ်ထားသည်များသာ။ {all} ထဲမှ {n} ခု ပြထားသည်။';
-$ec_lang['lpn_pane_filter_sel_none']='ရွေးချယ်ထားသော အစိတ်အပိုင်းများထဲမှ မည်သည့်အရာမျှ ဤဇယားထဲတွင် မပါပါ။';
-$ec_lang['lpn_pane_sel_only']='ရွေးချယ်ထားသည်များသာ';
-$ec_lang['lpn_pane_sel_only_none']='မည်သည့်အစိတ်အပိုင်းမျှ မရွေးချယ်ထားပါ။ အရင်ဆုံး မြေပုံပေါ်တွင် အစိတ်အပိုင်းများကို ရွေးချယ်ပါ။';
-$ec_lang['lpn_pane_scn_show']='အခြေအနေများ ပြရန်';
-$ec_lang['lpn_pane_clear_override']='ကိုယ်ပိုင်တန်ဖိုး ဖယ်ရှားရန်';
-$ec_lang['lpn_pane_scn_alt_tip']='{category} အစားထိုး - {alternative}';
-$ec_lang['lpn_morph_menu']='အမျိုးအစား ပြောင်းရန်';
-$ec_lang['lpn_morph_tip']='ရွေးချယ်ထားသော node များကို ဆက်စပ်နေရာ၊ ရေကန် သို့မဟုတ် ရေတိုက်အဖြစ်၊ သို့မဟုတ် ရွေးချယ်ထားသော link များကို ပိုက်လိုင်း၊ ရေတင်စက် သို့မဟုတ် ဗားလ်အဖြစ် ပြောင်းပါ။ တစ်ခုစီသည် ၎င်း၏ ID၊ တည်နေရာ၊ ချိတ်ဆက်မှုများနှင့် အမျိုးအစားအသစ်တွင်လည်း ရှိသော တန်ဖိုးအားလုံးကို ဆက်ထားသည်။ တစ်စုံတစ်ရာ ဆုံးရှုံးမည်ဆိုပါက အရင်မေးသည်။';
-$ec_lang['lpn_morph_ok']='ပြောင်းရန်';
-$ec_lang['lpn_change_type_lost']='ဤတန်ဖိုးများ ဆုံးရှုံးမည်။';
-$ec_lang['lpn_change_type_key']='တစ်ကြောင်းချင်းစီ - ID - ဆုံးရှုံးမည့် ဂုဏ်သတ္တိနှင့် တန်ဖိုး';
-$ec_lang['lpn_change_type_line']='{id}: {property} {value}';
-$ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}၊ အခြေအနေ {scenario} တွင်';
-$ec_lang['lpn_change_type_more']='နောက်ထပ် {n} ခု။';
-$ec_lang['lpn_change_type_surface']='ဤတန်ဖိုးများသည် ရေမျက်နှာပြင်ကို မူလအတိုင်း ထိန်းထားသည်။ ရေကန်၏ ဖိမြင့်ဆင့်သည် ရေတိုက်၏ အမြင့်နှင့် ရေအနက်ပေါင်းလဒ် ဖြစ်ပြီး၊ ရေတိုက်၏ ရေအနက်သည် ရေကန်၏ ဖိမြင့်ဆင့်မှ အမြင့်ကို နုတ်ထားသည့်တန်ဖိုး ဖြစ်သည်။';
-$ec_lang['lpn_change_type_meaning']='ပြောင်းလဲမည့် node ကို စမ်းသပ်သော ဤထိန်းချုပ်မှုများနှင့် စည်းမျဉ်းများသည် ၎င်းကို မတူညီစွာ ဖတ်ပါမည် - ဆက်စပ်နေရာကို ဖိအားဖြင့် စမ်းသပ်ပြီး ရေတိုက် သို့မဟုတ် ရေကန်ကို ရေမျက်နှာပြင်အမြင့်ဖြင့် စမ်းသပ်သည်။';
-$ec_lang['lpn_change_type_born']='ဤတန်ဖိုးများသည် အသစ်ဖြစ်ပြီး အသစ်ရေးဆွဲထားသော အစိတ်အပိုင်းကဲ့သို့ သတ်မှတ်ထားသည်။';
-$ec_lang['lpn_change_type_no_curve']='{id}: ရေတင်စက် ဖိမြင့်ဆင့် ကွေးမျဉ်း မရှိသဖြင့် ကွေးမျဉ်းတစ်ခု မရွေးမချင်း ရေတင်စက်က ဖိမြင့်ဆင့် မထည့်ပေးပါ၊ .inp ထုတ်ယူသောအခါလည်း ၎င်းကို ပိုက်လိုင်းအဖြစ် ရေးသည်';
-$ec_lang['lpn_change_type_becomes']='{id}: {property} {value}၊ အခြေအနေ {scenario} တွင်၊ {new} ဖြစ်လာသည်';
-$ec_lang['lpn_change_type_customers']='ပိုက်လိုင်းတစ်ခုသာ ဖောက်သည်များကို ဝန်ဆောင်သဖြင့် ဤဖောက်သည်များကို ၎င်းတို့၏ လိုအင်ကို ထည့်သွင်းပြီးသား ကွင်းအတွင်း ပြထားသော node သို့ ပြောင်း၍ ချိတ်ထားသည်။ ၎င်းတို့သည် ရေးဆွဲထားသည့်နေရာတွင် ဆက်ရှိနေပြီး ၎င်းတို့၏ လိုအင် မပြောင်းလဲပါ။';
-$ec_lang['lpn_change_type_setting']='ပြောင်းလဲမည့် link ၏ သတ်မှတ်ချက်ကို ပေး သို့မဟုတ် စမ်းသပ်သော ဤထိန်းချုပ်မှုများနှင့် စည်းမျဉ်းများ။ သတ်မှတ်ချက်သည် ပိုက်လိုင်း၊ ရေတင်စက်နှင့် ဗားလ်တို့တွင် မတူညီသော ပမာဏ ဖြစ်သဖြင့် ၎င်းတို့ကို မတူညီစွာ ဖတ်ပါမည်။';
-$ec_lang['lpn_change_type_rules']='ဤစည်းမျဉ်းလိုင်းများသည် link တစ်ခုကို ၎င်း၏ အမျိုးအစားဖြင့် ခေါ်ထားပြီး ၎င်း၏ အမျိုးအစားသစ်ဖြင့် ခေါ်တော့မည်။';
-$ec_lang['lpn_find_scope_source']='ရင်းမြစ်';
-$ec_lang['lpn_find_source_no_chemical']='ဓာတုပစ္စည်း မခြေရာခံထားသဖြင့် မည်သည့် node တွင်မျှ ရင်းမြစ် မရှိပါ။';
-$ec_lang['lpn_profile_open']='EPANET ပရိုဖိုင်းဖိုင် ဖွင့်ရန်…';
-$ec_lang['lpn_profile_file_done']='ဖိုင်မှ ပရိုဖိုင်းကို ဖတ်ပြီး - ဤကွန်ရက်တွင် node {total} ခုအနက် {used} ခု တွေ့ရှိသည်။';
-$ec_lang['lpn_profile_file_missing']='ဖိုင်တွင် အမည်ပါသော်လည်း ဤကွန်ရက်တွင် မရှိသည်များ - {ids}။';
-$ec_lang['lpn_profile_file_short']='ဖိုင်တွင် ဤကွန်ရက်ရှိ node နှစ်ခုထက်နည်း အမည်ပါသဖြင့် ရေးဆွဲရန် ပရိုဖိုင်း မရှိပါ။';
-$ec_lang['lpn_pgraph_none']='ဤအစိတ်အပိုင်းတွင် လက်ရှိ run၌ ရလဒ် မရှိပါ။';
-$ec_lang['lpn_pgraph_source_share_from']='{node} မှ ရင်းမြစ်ဝေစု';
-$ec_lang['lpn_result_pump_head']='ဖိမြင့်ဆင့်';
-$ec_lang['lpn_result_pump_head_tip']='ရေတင်စက်က စုပ်ဘက်မှ ထုတ်ဘက်သို့ ပေါင်းထည့်ပေးသော ဖိမြင့်ဆင့်ကို အပေါင်းကိန်းအဖြစ် ပြထားသည်။ ဖြေရှင်းစက်နှင့် EPANET ဖိုင်များတွင် ၎င်းကို အနှုတ်လက္ခဏာ ဖိမြင့်ဆင့်ဆုံးရှုံးမှုအဖြစ် သိမ်းဆည်းသည်။';
-$ec_lang['lpn_report_pump_head']='ရေတင်စက် ဖိမြင့်ဆင့်';
-$ec_lang['lpn_contour_show']='အမြင့်မျဉ်းများ ပြရန်';
-$ec_lang['lpn_contour_show_tip']='အရောင်ဖြည့်မှုနှင့် အမြင့်မျဉ်းများကို ဖျောက်ရန် ရွေးချယ်မှုကို ဖယ်ပါ၊ မူလအတိုင်း ပြန်ပြရန် ရွေးချယ်ပါ။ node အရောင်များ ဆက်ရှိနေသည်။';
-$ec_lang['lpn_sysflow_title']='ရေစီးနှုန်း ဟန်ချက်';
-$ec_lang['lpn_crs_suggested_mark']='(အကြံပြုထားသည်)';
-$ec_lang['lpn_file_export_menu']='ထုတ်ယူရန်…';
-$ec_lang['lpn_file_export_item_inp']='EPANET ဖိုင်…';
-$ec_lang['lpn_file_export_item_geojson']='GeoJSON ဖိုင်…';
-$ec_lang['lpn_status_inp_exported_picture']='{zip} ကို ထုတ်ယူပြီး - EPANET ဖိုင် {file}၊ ၎င်း၏ နောက်ခံပုံ {picture} နှင့် ပုံနေရာသတ်မှတ်ဖိုင် {world} တို့ ပါသည်။ ဖိုင်သုံးခုလုံးကို ဖိုလ်ဒါတစ်ခုတည်းတွင် ဖြေချပြီး EPANET တွင် .inp ကို ဖွင့်ပါ၊ ပုံလည်း ၎င်းနှင့်အတူ လာမည်။';
-$ec_lang['lpn_status_inp_exported_no_picture']='{file} ကို ထုတ်ယူပြီး။ နောက်ခံပုံကို သိမ်း၍ မရသဖြင့် .inp တွင် မည်သည့်ပုံမျှ မပါပါ၊ EPANET တွင် View > Backdrop > Load ဖြင့် ထည့်ပါ။';
-$ec_lang['lpn_inp_export_difference_one']='.inp ဖော်မတ်က မသိမ်းနိုင်သော အချက်တစ်ခု။';
-$ec_lang['lpn_file_export_geojson_tip']='QGIS၊ ArcGIS Pro နှင့် အခြား GIS ပရိုဂရမ်များအတွက် ဤကွန်ရက်ကို GeoJSON ဖိုင်အဖြစ် ဒေါင်းလုဒ်လုပ်ပါ။ ဆက်စပ်နေရာများ၊ ရေတိုက်များနှင့် ရေကန်များသည် အမှတ်များ ဖြစ်ပြီး ပိုက်လိုင်းများ၊ ရေတင်စက်များနှင့် ဗားလ်များသည် ၎င်းတို့၏ အကွေ့မှတ်များအတိုင်း လိုက်သော မျဉ်းများ ဖြစ်သည်။ တည်နေရာများသည် လတ္တီတွဒ်နှင့် လောင်ဂျီတွဒ် ဖြစ်သည်။ ရလဒ်များကို ကွန်ရက် ဖြေရှင်းပြီးမှသာ ထည့်သွင်းသည်။';
-$ec_lang['lpn_geojson_refused_local']='GeoJSON ဖိုင်တွင် လတ္တီတွဒ်နှင့် လောင်ဂျီတွဒ်သာ ရှိပြီး ဤပရောဂျက်ကို ကမ္ဘာမြေပေါ်တွင် နေရာမရှိသော ဒေသတွင်းကွက်ကွက်ပေါ်တွင် ရေးဆွဲထားသည်။ အရင်ဆုံး မြေပုံ၊ ကမ္ဘာ့မြေပုံ၊ တွဲထည့်ရန် ဖြင့် ကမ္ဘာမြေပေါ်သို့ တွဲပြီးမှ ထပ်မံထုတ်ယူပါ။';
-$ec_lang['lpn_geojson_refused_range']='ဤတည်နေရာများသည် မှန်ကန်သော လတ္တီတွဒ်နှင့် လောင်ဂျီတွဒ် မဟုတ်ပါ - {detail}';
-$ec_lang['lpn_geojson_refused_crs']='ဤပရောဂျက်၏ သြဒီနိတ်စနစ် ({detail}) ကို ဤစာမျက်နှာက မသိသဖြင့် ၎င်း၏ တည်နေရာများကို လတ္တီတွဒ်နှင့် လောင်ဂျီတွဒ်သို့ ပြောင်း၍ မရပါ။ ဤစာမျက်နှာ သိသောစနစ်တစ်ခုသို့ ပရောဂျက်ကို ကူးရန် ပြောင်းလဲရန်… ကို အသုံးပြုပြီးမှ ထပ်မံထုတ်ယူပါ။';
-$ec_lang['lpn_geojson_refused_empty']='ထုတ်ယူစရာ မရှိသေးပါ။ အရင်ဆုံး ကွန်ရက်တစ်ခု ရေးဆွဲပါ သို့မဟုတ် ဖွင့်ပါ။';
-$ec_lang['lpn_geojson_results_in']='မျက်နှာပြင်ပေါ်ရှိ ရလဒ်များ ပါဝင်သည်။';
-$ec_lang['lpn_geojson_results_out']='ကွန်ရက်ကို မဖြေရှင်းရသေးသဖြင့် ရလဒ်များ မပါဝင်ပါ။';
-$ec_lang['lpn_inp_backdrop_attach']='{file} ကို တွဲထည့်ရန်…';
-$ec_lang['lpn_inp_backdrop_attach_tip']='ဝက်ဘ်စာမျက်နှာသည် ပုံကို အမည်ဖြင့် ဖွင့်၍ မရပါ။ သင့်စက်ထဲမှ ရွေးချယ်ပါ၊ ဖိုင်က သတ်မှတ်ထားသည့် နေရာတွင် ထားမည်။';
-$ec_lang['lpn_inp_backdrop_attached']='{file} ကို တွဲထည့်ပြီး၊ ဖိုင်က သတ်မှတ်ထားသည့် နေရာတွင် ထားသည်။';
-$ec_lang['lpn_inp_backdrop_attached_other']='{picked} ကို တွဲထည့်ပြီး၊ ဖိုင်က သတ်မှတ်ထားသည့် နေရာတွင် ထားသည်။ ဖိုင်တွင် အမည်ပါသည်မှာ {file} ဖြစ်ပြီး မတူညီသော အမည်ဖြစ်သည်။';
-$ec_lang['lpn_copy_opened_unsaved']='{file} ကို မိတ္တူအဖြစ် ဖွင့်ပြီး၊ နောက်ဖိုင်သိမ်းချိန်တွင် သိမ်းမည့် သော့အသစ်တစ်ခု ပါသည်။';
-$ec_lang['lpn_engine_unavailable_why']='ဖိအားနှင့် ရေစီးနှုန်း ထိန်းချုပ်ဗားလ်များ (PRV, PSV, FCV) ကို EPANET ဖြေရှင်းစက်မပါဘဲ ဖြေရှင်း၍ မရပါ။ {reason}';
-$ec_lang['lpn_engine_needed_failed_why']='ဤကွန်ရက်ကို EPANET ဖြေရှင်းစက်ဖြင့်သာ ဖြေရှင်းနိုင်သည်။ {reason}';
-$ec_lang['lpn_mode_add_chain']='မုဒ် - ဆက်စပ်နေရာ ပိုက်လိုင်း ဆက်တိုက်။ ဆက်စပ်နေရာတစ်ခု ထည့်ရန် မြေပုံပေါ်တွင် အမှတ်တစ်ခု သတ်မှတ်ပါ၊ ထို့နောက် ပိုက်လိုင်းတစ်ခုနှင့် ဆက်စပ်နေရာတစ်ခု ထည့်ရန် နောက်အမှတ်တစ်ခုစီကို သတ်မှတ်ပါ။ ရှိပြီးသား node တစ်ခုကို သတ်မှတ်၍ ၎င်းမှ ဆက်လက်နိုင်သည်။ ဆက်တိုက်ကို အဆုံးသတ်ရန် Escape နှိပ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းရန် သို့မဟုတ် ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။';
-$ec_lang['lpn_mode_add_shape']='မုဒ် - ရေးဆွဲပုံ ထည့်ခြင်း။ အမှတ်တစ်ခုစီကို သတ်မှတ်ပါ။ အပြီးသတ်ရန် နောက်ဆုံးအမှတ်ကို ထပ်မံသတ်မှတ်ပါ (သို့) Enter နှိပ်ပါ၊ ပိုလီဂွန်ကို ပိတ်ရန် ပထမအမှတ်ကို သတ်မှတ်ပါ။';
-$ec_lang['lpn_cp_allow_tip']='ဤစာလုံးများကိုသာ ခွင့်ပြုရန် -';
-$ec_lang['lpn_cp_characters_tip']='"@" သည် မည်သည့်အက္ခရာမဆို၊ "#" သည် မည်သည့်ဂဏန်းမဆို ဆိုလိုသည်။ "-"၊ "." နှင့် "," တို့ကို ခွင့်ပြုလိုပါက သီးခြား စာရင်းပြုစုရမည်။ ကွက်လပ်စာလုံးများသည် အခြားစာလုံးများကြားတွင်သာ ရှိရမည်။';
-$ec_lang['lpn_valwarn_diameter']='ပိုက်လိုင်း သို့မဟုတ် ဗားလ် အချင်းသည် ပုံမှန်အားဖြင့် {min} နှင့် {max} {unit} ကြားတွင် ရှိသည်။ ဂဏန်းနှင့် အချင်းယူနစ်ကို စစ်ဆေးပါ။';
-$ec_lang['lpn_valwarn_hw']='Hazen-Williams C သည် ပုံမှန်အားဖြင့် {min} နှင့် {max} ကြားတွင် ရှိသည်။ ထိုအပိုင်းအခြားပြင်ပ ဂဏန်းသည် အခြား ပွတ်တိုက်မှု နည်းလမ်းအတွက် ရည်ရွယ်သော ကြမ်းတမ်းမှု ဖြစ်တတ်သည်။';
-$ec_lang['lpn_valwarn_manning']='Manning n သည် ပုံမှန်အားဖြင့် {min} နှင့် {max} ကြားတွင် ရှိသည်။ ထိုအပိုင်းအခြားပြင်ပ ဂဏန်းသည် အခြား ပွတ်တိုက်မှု နည်းလမ်းအတွက် ရည်ရွယ်သော ကြမ်းတမ်းမှု ဖြစ်တတ်သည်။';
-$ec_lang['lpn_valwarn_dw']='Darcy-Weisbach ကြမ်းတမ်းမှုသည် ပုံမှန်အားဖြင့် 0 ထက်ကြီးပြီး အများဆုံး {max} {unit} ဖြစ်သည်။ ပိုကြီးသော ဂဏန်းသည် Hazen-Williams C သို့မဟုတ် Manning n ဖြစ်တတ်သည်။';
-$ec_lang['lpn_valwarn_positive']='EPANET သည် ဤနေရာတွင် သုညကို သို့မဟုတ် အနှုတ်ဂဏန်းကို လက်မခံပါ။';
-$ec_lang['lpn_valwarn_negative']='EPANET သည် ဤနေရာတွင် အနှုတ်ဂဏန်းကို လက်မခံပါ။';
-$ec_lang['lpn_valwarn_tank_levels']='EPANET သည် ဤရေတိုက်ကို လက်မခံပါ။ အနိမ့်ဆုံးရေအနက်သည် ရေအနက်ထက် မကြီးရ၊ ရေအနက်သည် အမြင့်ဆုံးရေအနက်ထက် မကြီးရပါ။';
-$ec_lang['lpn_alt_calc_options']='တွက်ချက်မှု ရွေးစရာများ';
-$ec_lang['lpn_scenario_duration_tip']='မိဘထံမှ ဆက်ခံရန် အလွတ်ထားပါ။ စုစုပေါင်း လည်ပတ်ချိန် 0:00 သည် တည်ငြိမ်အခြေအနေ run ဖြစ်သည်။';
-$ec_lang['lpn_scenario_hyd_step_tip']='မိဘထံမှ ဆက်ခံရန် အလွတ်ထားပါ။';
-$ec_lang['lpn_time_scn_overrides']='အခြေအနေ၏ ကိုယ်ပိုင်တန်ဖိုးများ -';
-$ec_lang['lpn_scenario_preset_mult_tip']='လိုအင် မြှောက်ကိန်း {mult} ဆသည် ပျမ်းမျှနေ့၏ ယာယီတန်ဖိုးဖြစ်သည်။ စနစ်အများစုသည် {lo} နှင့် {hi} ကြားတွင် ရှိသည် (National Research Council, 2006)။ မော်ဒယ်လုပ်နေသော စနစ်အတွက် တန်ဖိုးကို ဆက်တင်များ၊ တွက်ချက်မှု၊ ဟိုက်ဒရောလစ်၊ လိုအင် မြှောက်ကိန်း တွင် သတ်မှတ်ပါ။';
-$ec_lang['lpn_engine_failed_why']='{reason} ထိုကြောင့် တွင်ပါ ဖြေရှင်းစက်ကို ပြထားသည်။';
-$ec_lang['lpn_settings_basemap_style']='မြေပုံနောက်ခံ ပုံစံ';
-$ec_lang['lpn_basemap_style_normal']='ပုံမှန်';
-$ec_lang['lpn_basemap_style_muted']='မှိန်သော';
-$ec_lang['lpn_basemap_style_faded']='ဖျော့သော';
-$ec_lang['lpn_basemap_style_grayscale']='မီးခိုးရောင်ဆင့်';
-$ec_lang['lpn_time_statistic']='ကိန်းဂဏန်းစာရင်း';
-$ec_lang['lpn_time_stat_none']='မရှိ';
-$ec_lang['lpn_time_stat_averaged']='ပျမ်းမျှ';
-$ec_lang['lpn_time_stat_minimum']='အနည်းဆုံး';
-$ec_lang['lpn_time_stat_maximum']='အများဆုံး';
-$ec_lang['lpn_time_stat_range']='အပိုင်းအခြား';
-$ec_lang['lpn_time_no_engine_why']='တွင်ပါ ဖြေရှင်းစက်သည် တစ်ကြိမ်လျှင် အချိန်တစ်ခုကိုသာ ဖြေရှင်းသဖြင့် ဤသည်မှာ {time} ရှိ ကွန်ရက်သာ ဖြစ်သည် - ပုံစံတိုင်းကို ထိုအချိန်တွင် ဖတ်ပြီး ရေတိုက်တိုင်းသည် ရေပြည့်ခြင်း၊ ကျခြင်း မလုပ်ဘဲ မူလအဆင့်တွင် ရှိနေသည်။ {reason}';
-$ec_lang['lpn_time_engine_fetch_failed']='EPANET ဖြေရှင်းစက် ဒေါင်းလုဒ်လုပ်ခြင်း မအောင်မြင်ပါ။ ထပ်မံကြိုးစားရန် စာမျက်နှာကို ပြန်လည်ဖွင့်ပါ၊ ဖိုင်ယာဝေါ၊ ပရောက်စီ သို့မဟုတ် ဘရောက်ဇာ တိုးချဲ့ဆော့ဖ်ဝဲက ပိတ်ဆို့နေနိုင်သည်။';
-$ec_lang['lpn_time_engine_start_failed']='ဘရောက်ဇာက EPANET ဖြေရှင်းစက်ကို စတင်ရန် ငြင်းပယ်သည်။ လုံခြုံရေးဆက်တင် သို့မဟုတ် တိုးချဲ့ဆော့ဖ်ဝဲကြောင့် WebAssembly ပိတ်ထားနိုင်သည်။';
-$ec_lang['lpn_time_engine_run_failed']='EPANET run မအောင်မြင်ပါ။ ၎င်းသည် ဤစာမျက်နှာ၏ အမှားတစ်ခုဖြစ်သည်၊ တင်ပြရန် {wrong} လင့်ခ်ကို အသုံးပြုပါ။';
-$ec_lang['lpn_saved_project']='ပရောဂျက်နှင့်အတူ သိမ်းထားသည်';
-$ec_lang['lpn_saved_browser']='ဤဘရောက်ဇာတွင် သိမ်းထားသည်';
-$ec_lang['lpn_saved_session']='မသိမ်းထားပါ';
-$ec_lang['lpn_scncmp_at_time']='{id} တွင် {value}၊ {time}';
-$ec_lang['lpn_scncmp_same']='အခြေအနေတိုင်းတွင် တူညီသည်';
-$ec_lang['lpn_scncmp_period_note']='အခြေအနေတစ်ခုတွင် စုစုပေါင်း လည်ပတ်ချိန် ရှိလျှင် ၎င်း၏ အနိမ့်ဆုံးဖိအားနှင့် အမြင့်ဆုံးရေအလျင်နှုန်းသည် ပြထားသောအချိန်တွင် ကွန်ရက်တစ်ခုလုံး၏ အစွန်းတန်ဖိုးများ ဖြစ်သည်။';
-$ec_lang['lpn_choice_default']='ပုံမှန်';
-$ec_lang['lpn_ds_menu']='လိုအင် စကေးချဲ့ခြင်း…';
-$ec_lang['lpn_ds_menu_tip']='ကွန်ရက်မိတ္တူတစ်ခုပေါ်တွင် လိုအင်များကို မြှောက်ပြီး ဖိအားများနှင့် ရေအလျင်နှုန်းများကို ကြည့်ပါ၊ သို့မဟုတ် စနစ်ထမ်းနိုင်သော အကြီးဆုံး လိုအင်စကေးကို ရှာပါ။';
-$ec_lang['lpn_ds_title']='လိုအင် စကေးချဲ့ခြင်း';
-$ec_lang['lpn_ds_intro']='ရွေးချယ်ထားသော ဆက်စပ်နေရာများရှိ လိုအင်များကို လိုအင်စကေးဖြင့် မြှောက်ပြီး ဖိအားများနှင့် ရေအလျင်နှုန်းများကို ကြည့်ရန် လည်ပတ်ရန် ခလုတ်ကို နှိပ်ပါ။\n\nဤဆက်စပ်နေရာအားလုံးတွင် ခွင့်ပြုထားသော အနိမ့်ဆုံးဖိအားကို အနည်းဆုံး ထိန်းထားနိုင်သည့် အကြီးဆုံး လိုအင်စကေးကို {step} အနီးဆုံးအထိ ရှာရန် ရှာဖွေရန် ခလုတ်ကို နှိပ်ပါ၊ ၎င်းသည် 0 မှ {max} အထိ ရှာသည်။\n\nနှစ်ခုစလုံးသည် ကွန်ရက်၏ မိတ္တူပေါ်တွင် အလုပ်လုပ်ပြီး မျက်နှာပြင်ပေါ်ရှိ အချိန်အဆင့်တွင် လက်ရှိအခြေအနေဖြင့် ဖြေရှင်းသဖြင့် ပရောဂျက်ထဲရှိ မည်သည့်အရာမျှ မပြောင်းလဲပါ။ ထိုအချိန်အဆင့်ကိုသာ စကေးချဲ့ပြီး ရေမျက်နှာပြင်အဆင့်များနှင့် အခြေအနေများကို ၎င်းမှ ယူသည်၊ အမြင့်ဆုံးလိုအင်ကို စမ်းရန် လည်ပတ်မီ နာရီကို အမြင့်ဆုံးလိုအင်သို့ ရွှေ့ပါ။';
-$ec_lang['lpn_ds_scope']='စကေးချဲ့မည့် ဆက်စပ်နေရာများ';
-$ec_lang['lpn_ds_scope_all']='ဆက်စပ်နေရာအားလုံး';
-$ec_lang['lpn_ds_scope_selected']='ရွေးချယ်ထားသော ဆက်စပ်နေရာများ';
-$ec_lang['lpn_ds_minpressure']='ခွင့်ပြုထားသော အနိမ့်ဆုံးဖိအား';
-$ec_lang['lpn_ds_minpressure_tip']='ဤသည်မှာ မီးငြိမ်းသတ်ရေးစီးနှုန်း ခွဲခြမ်းစိတ်ဖြာမှုတွင် ရှိသော ခွင့်ပြုထားသော အနိမ့်ဆုံးဖိအားနှင့် တူညီသော ဂဏန်းဖြစ်သည်။ ဤနေရာတွင် ပြောင်းလျှင် ထိုနေရာတွင်ပါ ပြောင်းသည်။';
-$ec_lang['lpn_ds_head_scale']='လိုအင်များကို စကေးချဲ့ရန်';
-$ec_lang['lpn_ds_multiplier']='လိုအင်စကေး';
-$ec_lang['lpn_ds_multiplier_tip']='လိုအင်တစ်ခုစီကို မြှောက်သည့် ကိန်း၊ 1.5 သည် 50% တိုးခြင်း ဖြစ်သည်။ ၎င်းသည် လက်ရှိအခြေအနေ၏ လိုအင်မြှောက်ကိန်းအပြင် ထပ်မံသက်ရောက်ပြီး ထိုမြှောက်ကိန်းသည် လိုအင်များထဲတွင် ပါပြီးသားဖြစ်သည်၊ ၎င်းကို ပရောဂျက်တွင် ဘယ်တော့မျှ မသိမ်းပါ။';
-$ec_lang['lpn_ds_run']='လည်ပတ်ရန်';
-$ec_lang['lpn_ds_head_search']='စနစ်က မည်သည့် လိုအင်စကေးကို ထမ်းနိုင်သနည်း။';
-$ec_lang['lpn_ds_head_search_selected']='ဤဆက်စပ်နေရာများက မည်သည့် လိုအင်စကေးကို ထမ်းနိုင်သနည်း။';
-$ec_lang['lpn_ds_outside_below']='လိုအင်စကေး {m} တွင် မရွေးချယ်ထားသော ဆက်စပ်နေရာများအနက် {pressure} အောက်ရှိသည်များ - {n} ({ids})။ ၎င်းတို့သည် ဤအဖြေကို မကန့်သတ်ပါ။';
-$ec_lang['lpn_ds_holds_max']='✓ ရှာဖွေမှု၏ အပေါ်ဆုံး လိုအင်စကေး {max} အထိ ဆက်စပ်နေရာတိုင်းတွင် {pressure} ကို ထိန်းထားသည်။';
-$ec_lang['lpn_ds_below_zero']='⚠ စကေးချဲ့ထားသော လိုအင်များ သုညဖြစ်နေသည့်တိုင် အနည်းဆုံး ဆက်စပ်နေရာတစ်ခုသည် {pressure} အောက်တွင် ရှိသည်။';
-$ec_lang['lpn_ds_found']='✓ စစ်ဆေးထားသော ဆက်စပ်နေရာတိုင်းသည် လိုအင်စကေး {m} အထိ အနည်းဆုံး {pressure} ကို ထိန်းထားသည်။';
-$ec_lang['lpn_ds_found_below']='⚠ လိုအင်ကို စကေးမချဲ့ဘဲပင် အနည်းဆုံး ဆက်စပ်နေရာတစ်ခုသည် {pressure} အောက်တွင် ရှိသည်။ ဆက်စပ်နေရာတိုင်းကို {pressure} သို့မဟုတ် ထို့ထက်မြင့်စွာ ထိန်းထားသည့် အကြီးဆုံး လိုအင်စကေးမှာ {m} ဖြစ်သည်။';
-$ec_lang['lpn_ds_search_stopped']='အဖြေမတွေ့မီ ရှာဖွေမှုကို ရပ်လိုက်သည်။';
-$ec_lang['lpn_ds_lowest_at']='လိုအင်စကေး {m} တွင် အနိမ့်ဆုံးဖိအားမှာ ဆက်စပ်နေရာ {id} တွင် {pressure} ဖြစ်သည်။';
-$ec_lang['lpn_ds_nosolve_at']='လိုအင်စကေး {m} တွင် ကွန်ရက်က အဖြေ မပေးပါ။ {reason}';
-$ec_lang['lpn_ds_scale_ok']='✓ လိုအင်စကေး {m} တွင် ဆက်စပ်နေရာတိုင်းသည် {pressure} ကို ထိန်းထားသည်။';
-$ec_lang['lpn_ds_scale_below']='⚠ လိုအင်စကေး {m} တွင် {pressure} အောက်ရှိသော ဆက်စပ်နေရာများ - {n}။';
-$ec_lang['lpn_ds_scaled_selected']='စကေးချဲ့ပြီး စစ်ဆေးထားသော ဆက်စပ်နေရာများ - {n}။';
-$ec_lang['lpn_ds_head_lowest']='အနိမ့်ဆုံးဖိအားများ';
-$ec_lang['lpn_ds_head_velocity']='အမြင့်ဆုံး ရေအလျင်နှုန်းများ';
-$ec_lang['lpn_ds_col_link']='မျဉ်း';
-$ec_lang['lpn_ds_col_scaled']='စကေးချဲ့';
-$ec_lang['lpn_ds_col_scaled_tip']='လိုအင်များကို လိုအင်စကေးဖြင့် မြှောက်ထားသည့်အခါ။';
-$ec_lang['lpn_ds_col_unscaled']='မချဲ့';
-$ec_lang['lpn_ds_col_unscaled_tip']='ဤအချိန်အဆင့်တွင် လက်ရှိအခြေအနေ၏ လိုအင်များ ရှိသည့်အတိုင်း၊ မြေပုံပြသော တန်ဖိုးအတိုင်း။';
-$ec_lang['lpn_ds_no_junctions']='ဤပရောဂျက်တွင် ဆက်စပ်နေရာ မရှိသေးသဖြင့် စကေးချဲ့စရာ လိုအင် မရှိပါ။';
-$ec_lang['lpn_ds_no_selection']='မည်သည့်ဆက်စပ်နေရာမျှ မရွေးချယ်ထားပါ။ ဆက်စပ်နေရာများကို ရွေးချယ်ပါ သို့မဟုတ် ဆက်စပ်နေရာအားလုံးကို ရွေးပါ။';
-$ec_lang['lpn_ds_skipped']='ဆက်စပ်နေရာ မဟုတ်သဖြင့် မူလအတိုင်း ထားခဲ့သော ရွေးချယ်ထားသည့် အစိတ်အပိုင်းများ - {n}။';
-$ec_lang['lpn_ds_bad_multiplier']='သုည သို့မဟုတ် ထို့ထက်ကြီးသော လိုအင်စကေးကို ထည့်သွင်းပါ၊ ဥပမာ 1.5။';
-$ec_lang['lpn_ds_stale']='ပုံဆွဲမှု ပြောင်းလဲသွားသဖြင့် လိုအင်စကေးချဲ့ခြင်း ရလဒ်များကို ရှင်းလင်းလိုက်သည်။ ထပ်မံ လည်ပတ်ပါ။';
-$ec_lang['lpn_analyze_at_time']='အချိန်အဆင့် - {time}။';
-$ec_lang['lpn_analyze_time_moved']='⚠ ဤသည်ကို {time} တွင် တွက်ချက်ခဲ့ပြီး ယခု နာရီသည် {now} တွင် ရှိသည်။ မျက်နှာပြင်ပေါ်ရှိ အချိန်အဆင့်အတွက် ထပ်မံ လည်ပတ်ပါ။';
+// Field codes (Task 771): the Description read as Carlson-style codes. See dev/survey-codes.md.
 $ec_lang['lpn_survey_codes_toggle']='ဖော်ပြချက်ကို ကွင်းဆင်းကုဒ်များအဖြစ် ဖတ်ရန်';
 $ec_lang['lpn_survey_codes_tip']='ဖော်ပြချက်တစ်ခုစီ၏ ပထမစကားလုံးကို ဇယားထဲမှ ကုဒ်အဖြစ် ဖတ်ပါ။ လိုင်းကုဒ်တူသော အမှတ်များကို ဖိုင်အစီအစဉ်အတိုင်း ပိုက်လိုင်းတစ်ခုအဖြစ် ဆက်ပြီး WL1 နှင့် WL2 သည် သီးခြားလိုင်းများ ဖြစ်သည်။ +0 သည် လိုင်းတစ်ခု စတင်ပြီး -0 က အဆုံးသတ်ကာ CLO က ပိတ်သည်။ JPN နောက်တွင် အမှတ်အမည်ပါလျှင် ထိုအမှတ်နှင့် ချိတ်သည် (Carlson)၊ Civil 3D က CPN ဟု ရေးသည်။';
 $ec_lang['lpn_survey_codes_col_code']='ကုဒ်';
@@ -4233,6 +4718,8 @@ $ec_lang['lpn_result_demand_deficit_tip']='ဖိအားသည် လိုအ
 $ec_lang['lpn_pda_deficit_note']='၎င်းတို့၏ လိုအင်ထက်နည်း ရရှိသော ဆက်စပ်နေရာများ - {n}။';
 $ec_lang['lpn_diag_pda_pressures']='လိုအပ်သော ဖိအားသည် အနည်းဆုံး ဖိအားထက် ကြီးရမည်။ ဆက်တင်များတွင် တစ်ခုကို ပြောင်းပါ။';
 $ec_lang['lpn_inp_drop_pressure_unit']='ဤဖိုင်သည် ၎င်း၏ ရေစီးနှုန်းယူနစ်အတွက် ဤစာမျက်နှာ ဖတ်သော ဖိအားယူနစ် (US ယူနစ်များအတွက် psi၊ အခြားအခါများတွင် မီတာ) မဟုတ်သည့် ဖိအားယူနစ်ကို ဖော်ပြထားသည်။ ဖိုင်ရှိ ဖိအားတိုင်းကို ထိုနည်းဖြင့် ဖတ်သဖြင့် ၎င်းတွင်ပါသော ဗားလ်သတ်မှတ်ချက်များ၊ emitter များနှင့် ဖိအားဖြင့်မောင်းသည့် ကန့်သတ်ချက်များကို စစ်ဆေးပါ။ လိုင်းကို ဆက်ထားပြီး ပြန်ရေးသည်။';
+
+// Map > Screenshot (Tom, 2026-10-05): a snipping tool that re-draws the dragged map area larger than its screen size (3x unless the Screenshot box says otherwise).
 $ec_lang['lpn_screenshot_menu']='ဖန်သားပြင်ပုံ';
 $ec_lang['lpn_screenshot_tip']='သင်ဆွဲသည့် မြေပုံနယ်ပယ်၏ ပုံကို မျက်နှာပြင်ထက် ပိုမြင့်သော ကြည်လင်ပြတ်သားမှုဖြင့် ရိုက်ယူပါ။ မှတ်သားပြီးနောက် ကူးယူရန် ခလုတ်ဖြင့် အစီရင်ခံစာထဲသို့ ကူးထည့်ပါ။ မဆွဲဘဲ နှိပ်လျှင် မြေပုံတစ်ခုလုံးကို ယူသည်။';
 $ec_lang['lpn_screenshot_hint']='မြေပုံပေါ်တွင် လေးထောင့်ပုံ ဆွဲပါ၊ သို့မဟုတ် မြေပုံတစ်ခုလုံးအတွက် နှိပ်ပါ။ Esc က ပယ်ဖျက်သည်။';
@@ -4249,119 +4736,5 @@ $ec_lang['lpn_snip_tip_pen']='ခဲတံ';
 $ec_lang['lpn_snip_tip_eraser']='ခဲဖျက် - မျဉ်းတစ်ကြောင်းကို နှိပ်၍ ဖယ်ရှားရန် (E)';
 $ec_lang['lpn_snip_tip_undo']='ပြန်ဖျက်ရန် (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='ပြန်လုပ်ရန် (Ctrl+Y)';
-$ec_lang['lpn_screenshot_scale_tip']='မျက်နှာပြင်ပေါ်ရှိ နယ်ပယ်၏ ဆအဖြစ် ပြသော ပုံအရွယ်။ ပိုကြီးလျှင် ပိုကြည်လင်ပြီး ဖိုင်ပိုကြီးသည်။';
-$ec_lang['points_data_points_heading']='အမှတ်များ ဒေတာ<br />(ပုံစံကြည့်ရန် ကူးယူ ကို သုံးပါ)';
-$ec_lang['lpn_field_tank_base_elev']='ကြမ်းပြင် အမြင့်';
-$ec_lang['lpn_tank_ground_elev_tip']='ရေတိုက်တည်ရှိရာ မြေအမြင့်။ ဆက်စပ်နေရာတွင်ကဲ့သို့ ရေတိုက်ရှိ ဖိအားကို ဤနေရာမှ တိုင်းတာသည်။';
-$ec_lang['lpn_guide_about_heading']='ဤတွက်ချက်စက်အကြောင်း';
-$ec_lang['lpn_guide_group_from']='{menu} မှ';
-$ec_lang['lpn_guide_menu_named']='{menu} မီနူး';
-$ec_lang['lpn_help_manual']='လမ်းညွှန်';
-$ec_lang['lpn_guide_contents']='မာတိကာ';
-$ec_lang['lpn_guide_rail_hide']='မာတိကာကို ဖျောက်ရန်';
-$ec_lang['lpn_guide_rail_show']='မာတိကာကို ပြရန်';
-$ec_lang['lpn_guide_search']='လမ်းညွှန်တွင် ရှာဖွေရန်';
-$ec_lang['lpn_guide_boxes_heading']='ဘောက်စ်များ';
-$ec_lang['lpn_guide_boxes_intro']='ဘောက်စ်တစ်ခုစီကို ရွှေ့နိုင်သည်၊ အရွယ်အစားပြောင်းနိုင်သည်၊ မြေပုံ၏ ဘယ်ဘက် သို့မဟုတ် ညာဘက်တွင် ကပ်ထားနိုင်သည်၊ သို့မဟုတ် ပိတ်နိုင်သည်။ ဘောက်စ်၏ ခေါင်းစဉ်ဘားရှိ ? သည် ၎င်း၏ အကူအညီကို ဖွင့်သည်။';
-$ec_lang['lpn_guide_boxes_autohide']='ညွှန်တံ ထွက်သွားသောအခါ ဖိုကပ်စ်မရှိသော ဘောက်စ်သည် အချိန်အနည်းငယ်ကြာမှ ပျောက်သွားသည်။ ဖိုကပ်စ်ရှိသော ဘောက်စ်သည် ၎င်းအပြင်ဘက်ကို နှိပ်သောအခါ၊ Esc နှိပ်သောအခါ၊ သို့မဟုတ် ညွှန်တံ အခြားနေရာတွင်ရှိစဉ် Tab ဖြင့် ထွက်သောအခါ ပျောက်သွားသည်။';
-$ec_lang['lpn_guide_box_help']='ဤဘောက်စ်အတွက် အကူအညီ';
-$ec_lang['lpn_guide_box_named']='{box} ဘောက်စ်';
-$ec_lang['lpn_guide_dimmed']='မှိန်နေသော အမည်သည် ကိရိယာဘားတွင် လက်ရှိ ဖျောက်ထားသော ခလုတ်ဖြစ်သည်။';
-$ec_lang['lpn_guide_text_popup']='ရွေးချယ်ထားသော အစိတ်အပိုင်း သို့မဟုတ် စာသား၊ သို့မဟုတ် ရွေးချယ်ထားသော အစိတ်အပိုင်းများစွာ၏ ဂုဏ်သတ္တိများကို ရွေးချယ်မှုဘေး၌ သို့မဟုတ် ဘောက်စ်ကို နောက်ဆုံးရွှေ့ထားသည့်နေရာ၌ ပြသည်။ တည်းဖြတ်ထားသော တန်ဖိုးသည် ကွန်ရက်ကို ချက်ချင်းပြောင်းလဲစေပြီး အစိတ်အပိုင်း၏ မြေပုံအညွှန်းနှင့် ဇယားများ ပင်န်တို့ လိုက်ပြောင်းသည်။ နောက်ဆုံး တွက်ချက်မှု၏ ရလဒ်များကို ထည့်သွင်းမှုများအောက်တွင် စာရင်းပြထားပြီး တည်းဖြတ်၍ မရပါ။';
-$ec_lang['lpn_guide_text_find_popup']='ဥပမာ 8 in ထက်ငယ်သော ပိုက်လိုင်းတိုင်း သို့မဟုတ် 40 psi အောက်ရှိ ဆက်စပ်နေရာတိုင်းကဲ့သို့ စည်းကမ်းချက်တစ်ခုနှင့် ကိုက်ညီသော အစိတ်အပိုင်းများကို ရှာပေးပြီး ၎င်းအားလုံးရှိ ဂုဏ်သတ္တိတစ်ခုကို တစ်ကြိမ်တည်းဖြင့် ပြောင်းနိုင်သည်။ မဖြေရှင်းမီ မော်ဒယ်ကို စစ်ဆေးရန် (အမြင့် မပါခြင်း၊ ယူနစ်မှားထည့်သော အချင်း)၊ ဖြေရှင်းပြီးနောက် ပြဿနာရှိသော နေရာများကို စာရင်းပြုစုရန် (ဖိအားနိမ့်ခြင်း၊ ရေအလျင်နှုန်း မြင့်ခြင်း)၊ နှင့် အစိတ်အပိုင်းများစွာတွင် ပြင်ဆင်မှုတစ်ခု ပြုလုပ်ရန် သုံးပါ။\n\nမည်သည်ကို ရှာမည်၊ ဂုဏ်သတ္တိ၊ စည်းကမ်းချက်နှင့် တန်ဖိုး စာရင်းများက စည်းကမ်းချက်တစ်ခုကို တည်ဆောက်ပြီး ရှာဖွေချက် ကွက်တွင် စာကြောင်းတစ်ကြောင်းအဖြစ် ရေးသည်။ ထိုစာကြောင်းကို တိုက်ရိုက်လည်း တည်းဖြတ်နိုင်ပြီး စာရင်းများက လိုက်ပြောင်းသည်။ စာရင်းများဖြင့် မဖော်ပြနိုင်သော ရှာဖွေချက် (ဥပမာ “သို့မဟုတ်” ဖြင့် ချိတ်ထားသော စည်းကမ်းချက်နှစ်ခု) သည် ထိန်းချုပ်ကိရိယာများကို အစား အသုံးပြုပါ ခလုတ်ကို မနှိပ်မချင်း စာရင်းများကို ဖျောက်ထားသည်။ ရှာဖွေရန် ရှာဖွေချက် ကွက်တွင် Enter နှိပ်ပါ သို့မဟုတ် ရှာဖွေရန် ခလုတ်ကို နှိပ်ပါ။';
-$ec_lang['lpn_guide_text_settings_box']='ဆက်တင်အားလုံးနှင့် ပြန်သတ်မှတ်ရန် ခလုတ်နှစ်ခုသည် ဆက်တင်များ ဘောက်စ်တွင် ရှိသည်။ ဆက်တင်များကို အခြားမည်သည့်နေရာတွင်မျှ မတွေ့နိုင်ပါ။ ဘောက်စ်တွင် ရှာဖွေနိုင်သည်၊ ဆက်တင်များ ရှာဖွေရန်တွင် စကားလုံးတစ်လုံး သို့မဟုတ် ပိုမိုရိုက်ထည့်လျှင် ထိုစကားလုံးအားလုံးပါသော ဆက်တင်များကိုသာ စာရင်းပြသည်။ ဆက်တင်များကို ပရောဂျက်နှင့်အတူ သိမ်းသည်၊ လည်ပတ်မှုတိုးတက်ပုံ ဘောက်စ်ကို ပြရန်နှင့် စာမျက်နှာ အောက်ရှိ ဆက်တင်များမှလွဲ၍ ဖြစ်ပြီး ၎င်းတို့ကို ဤဘရောက်ဇာတွင်သာ သိမ်းသည်။ ဤဘောက်စ်၏ တည်နေရာနှင့် အရွယ်အစားကိုလည်း ဤဘရောက်ဇာတွင်သာ သိမ်းသည်။';
-$ec_lang['lpn_guide_text_library_box']='ပရောဂျက်၏ ပုံစံများ (patterns)၊ ကွေးမျဉ်းများ၊ ပိုက်အမျိုးအစားများ၊ ချိတ်ဆက်ပစ္စည်းများ၊ ထိန်းချုပ်မှုများနှင့် စည်းမျဉ်းများကို ထိန်းသိမ်းထားသည်။ အစိတ်အပိုင်းတစ်ခုသည် ပုံစံ၊ ကွေးမျဉ်း၊ ပိုက်အမျိုးအစား သို့မဟုတ် ချိတ်ဆက်ပစ္စည်းကို ၎င်း၏ ID ဖြင့် ရည်ညွှန်းပြီး ထိုအရာကို ဤနေရာတွင် တည်းဖြတ်သည်။ ထိန်းချုပ်မှုများနှင့် စည်းမျဉ်းများသည် ကွန်ရက်တစ်ခုလုံးအတွက် ဖြစ်သည်။ စည်းမျဉ်းများကို EPANET အင်ဂျင်က သာ အသုံးပြုသည်။ အားလုံးကို ပရောဂျက်နှင့်အတူ သိမ်းဆည်းသည်။';
-$ec_lang['lpn_guide_text_energy_box']='နောက်ဆုံး အချိန်ကာလရှည် ပုံတူလည်ပတ်မှုအတွင်း ရေတင်စက်တစ်ခုစီ၏ စွမ်းအင်သုံးစွဲမှု၊ အမြင့်ဆုံး ပါဝါနှင့် ကုန်ကျစရိတ်ကို ရေတင်စက်တစ်ခုစီ၏ ထိရောက်မှုနှင့် ဆက်တင်များ၊ စွမ်းအင်အောက်တွင် သတ်မှတ်ထားသော စွမ်းအင်စျေးနှုန်းတို့ကို အသုံးပြု၍ အစီရင်ခံသည်။ ဆက်တင်များတွင် စုစုပေါင်း လည်ပတ်ချိန်နှင့် ဖြေရှင်းပြီးသော ကွန်ရက်တစ်ခု လိုအပ်သည်။ ကွန်ရက်ကို မပြောင်းလဲပါ။';
-$ec_lang['lpn_guide_text_contour_box']='အရောင်ခြယ်ရန် နေရာများ ဘောင်တွင် ရွေးထားသော နေရာတန်ဖိုးမှ မြေပုံပေါ်တွင် ဆွဲသော contour ပုံကို ထိန်းချုပ်သည်။ အရောင်စနစ်၊ ဖြည့်ခြင်းနှင့် ၎င်း၏ အတိမ်းအမြင်၊ contour မျဉ်း ကြားခြားနှင့် အညွှန်းများ၊ ပိုက်တစ်ခုစီမှ အရောင် ဘယ်လောက်ဝေးဝေး ရောက်သည်တို့ ပါဝင်သည်။ ပိတ်လိုက်လျှင် ပုံကို ဖျောက်ပြီး နေရာအရောင်များ ကျန်ရစ်သည်။ ပြသမှုကိုသာ ပြောင်းပြီး ကွန်ရက်ကို မပြောင်းပါ။';
-$ec_lang['lpn_guide_text_scncmp_box']='အခြေအနေတိုင်းကို ပုံဆွဲမှု၏ မိတ္တူမှ ဖြေရှင်းပြီး တစ်ခုချင်းစီအတွက် ကျော်လွန်သတ်မှတ်မှု အရေအတွက်၊ အနိမ့်ဆုံးဖိအားနှင့် အမြင့်ဆုံးရေအလျင်နှုန်းကို ဇယားပြုလုပ်သည်။ ပရောဂျက်ကို မပြောင်းလဲပါ၊ ဖွင့်ထားသော အခြေအနေကို ယခင်အတိုင်း ထားရစ်သည်။';
-$ec_lang['lpn_guide_text_rptbox']='နောက်ဆုံး အချိန်ကာလရှည် ပုံတူလည်ပတ်မှုအတွက် EPANET အင်ဂျင်က ရေးသားသော စာသားအစီရင်ခံစာကို သတိပေးချက်များနှင့် ကွန်ရက်အကျဉ်းချုပ်အပါအဝင် ပြသည်။ အချိန်ကာလရှည် ပုံတူလည်ပတ်မှုတိုင်းက ၎င်းကို အစားထိုးသည်၊ အချိန်တစ်ခုတည်းတွင် ဖြေရှင်းခြင်းက အစားမထိုးပါ၊ တည်းဖြတ်မှုက ယခင်အစီရင်ခံစာကို ထားရစ်သည်။';
-$ec_lang['lpn_guide_text_status_box']='နောက်ဆုံး အချိန်ကာလရှည် ပုံတူလည်ပတ်မှုအတွင်း ပြောင်းလဲမှုတစ်ခုစီကို အချိန်စဉ်လိုက် စာရင်းပြသည်။ ရေတင်စက်၊ ဗားလ် သို့မဟုတ် ပိုက်လိုင်း ဖွင့်ခြင်း/ပိတ်ခြင်း၊ ရေတိုက် ဖြည့်စ ဖြစ်ခြင်း၊ ဗလာစ ဖြစ်ခြင်း၊ ပြည့်ခြင်း သို့မဟုတ် ကုန်ခြင်း၊ နှင့် အပြည့်အဝ မညီမျှသွားသော အချိန်အဆင့်များ ပါဝင်သည်။ ပြောင်းလဲမှုများကိုသာ စာရင်းပြပြီး အချိန်အဆင့်တိုင်းကို မပြပါ။';
-$ec_lang['lpn_guide_text_alt_box']='အခြေအနေတစ်ခုစီအတွက် ရုပ်ပိုင်းဆိုင်ရာ၊ လိုအင်နှင့် အစိတ်အပိုင်း အသက်သွင်းခြင်းကဲ့သို့ အမျိုးအစားတစ်ခုစီတွင် မည်သည့် အခြားရွေးစရာကို သုံးသည်ကို ပြပြီး ၎င်း၏ တွက်ချက်မှု ရွေးစရာများဖြစ်သော လိုအင် မြှောက်ကိန်း၊ စုစုပေါင်း လည်ပတ်ချိန်နှင့် ဟိုက်ဒရောလစ် အချိန်အဆင့်ကို ပြသည်။ အခြားရွေးစရာများသည် ဖတ်ရန်သာ ဖြစ်သည်။ အခြေအနေတစ်ခု၏ တွက်ချက်မှု ရွေးစရာများကို ဤနေရာတွင် ရိုက်ထည့်နိုင်ပြီး ဗလာထားလျှင် ၎င်း၏ မိဘ၏ တန်ဖိုးကို သုံးသည်။ အခြေခံ မုဒ်ကို ရှင်းပြီးနောက် အခြေအနေများ မီနူးမှ ဖွင့်ပါ။';
-$ec_lang['lpn_guide_text_full_box']='ဇယားများ ပင်န်တွင် ပြသော ယူနစ်များဖြင့် အစီရင်ခံချိန် အဆင့်တိုင်းရှိ နေရာတိုင်းနှင့် ပိုက်လိုင်းတိုင်းကို စာရင်းပြသည်။ အချိန်ကာလရှည် ပုံတူလည်ပတ်မှု မရှိလျှင် အချိန်တစ်ခုတည်းရှိ လက်ရှိ ဖြေရှင်းချက်ကို ပြသည်။ ဒေါင်းလုဒ် သို့မဟုတ် ပုံနှိပ်ခြင်းတွင် အချိန်အဆင့်အားလုံး ပါသော်လည်း ဇယားတွင် တစ်ကြိမ်လျှင် တစ်ခုသာ ပြသည်။';
-$ec_lang['lpn_guide_text_calib_box']='နယ်ပယ်တွင် တိုင်းတာထားသော တန်ဖိုးများပါသည့် ဖိုင်ကို တူညီသော နေရာနှင့် အချိန်များရှိ တွက်ချက်ထားသော ရလဒ်များနှင့် နှိုင်းယှဉ်သည်၊ ဘောင်တစ်ခုချင်းစီအတွက် ဖိုင်တစ်ခုစီ ဖြစ်သည်။ ဖိုင်ကို လက်ရှိ ဆက်ရှင်အတွက်သာ ထိန်းထားပြီး ပရောဂျက်နှင့်အတူ မသိမ်းပါ။';
-$ec_lang['lpn_guide_text_notes_popup']='ဤစာမျက်နှာ မည်သို့ အလုပ်လုပ်သည်နှင့် မည်သည်ကို မလုပ်သည်ဆိုသော မှတ်စုများကို ဝေါဟာရတစ်ခုနှင့် ၎င်း၏ အဓိပ္ပာယ်ဖွင့်ဆိုချက် ပုံစံဖြင့် စာရင်းပြသည်။ ကွန်ရက်ကို မပြောင်းလဲပါ။';
-$ec_lang['lpn_guide_text_hotkeys_popup']='ကိရိယာဘား ခလုတ်တိုင်း၊ မီနူးတန်းတိုင်း၊ ကီးဘုတ် ဖြတ်လမ်းများနှင့် ဘောက်စ်တစ်ခုစီအတွက် ထည့်သွင်းချက်ကို စာရင်းပြသည်။ တန်းတစ်ခုကို ရွေးလျှင် ထိုထိန်းချုပ်မှု ရှိရာကို ပြသည်၊ ၎င်းကို မည်သည့်အခါမျှ မလုပ်ဆောင်ပါ။ ရှာဖွေရန် မည်သည့်နေရာမှမဆို Ctrl+K နှိပ်ပါ၊ သို့မဟုတ် လမ်းညွှန်တွင် ဖိုကပ်စ်ရှိစဉ် / နှိပ်ပါ။';
-$ec_lang['lpn_guide_find_query_term']='ရှာဖွေချက် ဘာသာစကား';
-$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Scope.Property condition value</code></td><td>စည်းကမ်းချက်တစ်ခု။ ပထမအပိုင်းသည် မည်သည်ကို ရှာမည် စာရင်းမှ အားလုံး၊ ဆက်စပ်နေရာ၊ ရေကန်၊ ရေတိုက်၊ ပိုက်လိုင်း၊ ရေတင်စက်၊ ဗားလ်၊ စာသား၊ ဖောက်သည် သို့မဟုတ် ရင်းမြစ် ဖြစ်သည်။ ဒုတိယအပိုင်းသည် ထိုရှာမည့်အရာအတွက် ဂုဏ်သတ္တိ စာရင်းရှိ ထည့်သွင်းချက်တစ်ခုခု ဖြစ်သည်။</td></tr><tr><td>စည်းကမ်းချက်များ</td><td>နှင့်ညီသည်၊ ထက်ကြီးသည်၊ ထက်နည်းသည်၊ ပါဝင်သည်၊ အမြင့်ဆုံး n၊ အနိမ့်ဆုံး n နှင့် ဗလာဖြစ်သည်။ ပါဝင်သည် သည် စာသားအတွက်သာ ဖြစ်သည်။ အမြင့်ဆုံး n နှင့် အနိမ့်ဆုံး n တွင် n သည် အရေအတွက်ဖြစ်ပြီး ဥပမာ အမြင့်ဆုံး 5။ <code>Pipe.Velocity n highest</code> ကဲ့သို့ စာလုံး n ကိုယ်တိုင် ရေးလျှင် သို့မဟုတ် တန်ဖိုးကွက် ဗလာဖြစ်လျှင် အစိတ်အပိုင်း 10 ခုကို စာရင်းပြသည်။ ဗလာဖြစ်သည် သည် ထိုဂုဏ်သတ္တိအတွက် တန်ဖိုးမရှိသော အစိတ်အပိုင်းများကို ရှာသည်။ ဆက်စပ်မှုတွင် စည်းကမ်းချက် လေးခုရှိပြီး တန်ဖိုး မလိုပါ။</td></tr><tr><td>တန်ဖိုးများ</td><td>ဂဏန်းကို ယူနစ်မပါဘဲ ဂုဏ်သတ္တိများနှင့် ဇယားများ ပင်န်တွင် ပြသော ယူနစ်ဖြင့် ရိုက်ထည့်သည်၊ 40 psi မဟုတ်ဘဲ 40။ ID အပါအဝင် စာသားကို တစ်ထပ် သို့မဟုတ် နှစ်ထပ် ကိုးကားပုဒ်ဖြင့် ဝိုင်းသည်၊ <code>\'60\'</code>။</td></tr><tr><td>“နှင့်”၊ “သို့မဟုတ်” နှင့် ကွင်းစကွင်းပိတ်</td><td>“နှင့်” ကို “သို့မဟုတ်” မတိုင်မီ တွက်ချက်ပြီး ကွင်းစကွင်းပိတ်က စည်းကမ်းချက်များကို အုပ်စုဖွဲ့သည်။ NOT မရနိုင်ပါ။</td></tr><tr><td>စာလုံးပေါင်း</td><td>စကားလုံးများသည် အကြီးအသေး မခွဲပါ။ အင်္ဂလိပ်စကားလုံးများကို ဘာသာစကားတိုင်းတွင် လက်ခံသည်၊ ထို့ကြောင့် ဤလမ်းညွှန်မှ ကူးယူထားသော ရှာဖွေချက်သည် မည်သည့်ဘာသာစကားရှိ စာမျက်နှာတွင်မဆို အလုပ်လုပ်သည်။</td></tr></tbody></table>';
-$ec_lang['lpn_guide_find_examples_term']='Net3 ပေါ်ရှိ လက်တွေ့ ဥပမာများ';
-$ec_lang['lpn_guide_find_examples_def']='<p>ဤဥပမာများကို လိုက်လုပ်ရန် Net3 ဥပမာကို ဖွင့်ပါ။ ဖိအားကို psi ဖြင့်၊ ရေအလျင်နှုန်းကို ft/s ဖြင့် ဖော်ပြထားသည်။</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>ဆက်စပ်နေရာ 60 နှင့် ပိုက်လိုင်း 60။ ဆက်စပ်နေရာတစ်ခုနှင့် ပိုက်လိုင်းတစ်ခုတွင် ID တူနိုင်သဖြင့် အားလုံး အောက်ရှိ ID ရှာဖွေမှုက အစိတ်အပိုင်း တစ်ခုထက်ပို ပြန်ပေးနိုင်သည်။</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>ဆက်စပ်နေရာ 10၊ 40၊ 50၊ 20 နှင့် 153၊ အနိမ့်ဆုံးဖိအားကို ဦးစွာ ပြသည်။ ဆက်စပ်နေရာ 10 သည် -0.6 psi ဖြစ်ပြီး ပြန်လည်စစ်ဆေးရန် လိုအပ်သော အနုတ်ဖိအား ဖြစ်သည်။</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>ပိုက်လိုင်း 60၊ 329၊ 125၊ 123 နှင့် 149၊ အမြင့်ဆုံးရေအလျင်နှုန်းကို ဦးစွာ ပြသည်။ ပိုက်လိုင်း 60 တွင် 9.3 ft/s ရှိသည်။</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>ဆက်စပ်နေရာ 10၊ 20၊ 40 နှင့် 50၊ ပိုက်လိုင်း 60၊ 125 နှင့် 329၊ စာရင်းတစ်ခုတည်းတွင် ဖိအားနိမ့်ခြင်းနှင့် ရေအလျင်နှုန်းမြင့်ခြင်း။</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>ဆက်စပ်နေရာ 10၊ 20၊ 40 နှင့် 50၊ မြင့်သောမြေပေါ်ရှိ ဖိအားနိမ့်သော နေရာများ။ အခြေအနေနှစ်ခုစလုံးသည် အစိတ်အပိုင်းအမျိုးအစား တူညီရမည်၊ <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> သည် ဘာမျှ မကိုက်ညီပါ၊ အကြောင်းမှာ အစိတ်အပိုင်းတစ်ခုသည် ဆက်စပ်နေရာရော ပိုက်လိုင်းရော မဖြစ်နိုင်သောကြောင့်ဖြစ်သည်။</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>ပိုက်လိုင်း 330၊ Net3 ဖိုင်တွင် ပိတ်ထားသော တစ်ခုတည်းသော ပိုက်လိုင်း။</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>ဖိုင်ကို ဖြန့်ဝေထားသည့်အတိုင်းဆိုလျှင် ဘာမျှမရှိပါ။ ပိုက်လိုင်း 247 ကို ပိတ်ထားလျှင် (အစားထိုးခြင်းနှင့် ပြန်ဖျက်ခြင်း ကိုကြည့်ပါ) ဆက်စပ်နေရာ 215၊ 217၊ 219 နှင့် 225 ဖြစ်ပြီး ပိုက်လိုင်း 247 ပျက်စီးလျှင် ရေပေးသွင်းမှုမရှိတော့မည့် ဆက်စပ်နေရာများ ဖြစ်သည်။ ၎င်းကို ပိုက်လိုင်းတစ်ခုချင်းစီအတွက် ထပ်လုပ်ခြင်းသည် အရေးပါမှု ခွဲခြမ်းစိတ်ဖြာမှု ဖြစ်သည်။</td></tr></tbody></table>';
-$ec_lang['lpn_guide_find_results_term']='ရလဒ်များ၊ ရွေးချယ်မှုနှင့် ဇယားများ';
-$ec_lang['lpn_guide_find_results_def']='<p>ကိုက်ညီသော အစိတ်အပိုင်းများကို ရှာဖွေရန် ခလုတ်အောက်တွင် စာရင်းပြသည်။ ထက်ကြီးသည် နှင့် အမြင့်ဆုံး n သည် အမြင့်ဆုံးတန်ဖိုးကို ဦးစွာ၊ ထက်နည်းသည် နှင့် အနိမ့်ဆုံး n သည် အနိမ့်ဆုံးတန်ဖိုးကို ဦးစွာ စာရင်းပြပြီး အခြားစည်းကမ်းချက်များသည် တွေ့ရှိသောတန်ဖိုးအလိုက်၊ ထို့နောက် ID အလိုက် စာရင်းပြသည်။ “နှင့်” သို့မဟုတ် “သို့မဟုတ်” ပါသော ရှာဖွေချက်သည် နေရာများကို ဦးစွာ၊ ထို့နောက် ပိုက်လိုင်းများကို ID အလိုက် စာရင်းပြသည်။ ကိုက်ညီမှုတစ်ခုတည်းကို မြေပုံပေါ်တွင် ချက်ချင်း ပြသည်။ အတန်းတစ်ခုကို ရွေးလျှင် မြေပုံကို ထိုအစိတ်အပိုင်းတွင် အလယ်ဆုံးထားသည်။ ဘာမျှ မရွေးထားလျှင် ထိုအစိတ်အပိုင်းကိုလည်း ရွေးချယ်သည်၊ တစ်ခုခုရွေးထားလျှင် ထိုအစိတ်အပိုင်းကို မီးမောင်းထိုးပြသည်၊ ရွေးချယ်မှုကို မပြောင်းပါ။ အတန်းတစ်ခုကို ရွေးချယ်မှုထဲသို့ ထည့်ရန် သို့မဟုတ် ဖယ်ရန် Shift+click သို့မဟုတ် Ctrl+click လုပ်ပါ။ ရှာဖွေခြင်းက ကိုက်ညီသမျှကို ကိုယ်တိုင် မရွေးပါ။</p><p>လက်ရှိဇယားတွင် စစ်ထုတ်ရန် ခလုတ်က တူညီသော ရှာဖွေချက်ကို ဇယားများ ပင်န်တွင် သုံးသည်။ ရှာဖွေချက် သက်ရောက်သော ဇယားတစ်ခုစီသည် ကိုက်ညီသော အတန်းများကိုသာ ပြပြီး ရှာဖွေချက်နှင့် အတန်းအရေအတွက်ကို ၎င်းတို့အပေါ်တွင် ပြသည်။ ကိုက်ညီသမျှကို မြေပုံပေါ်တွင် ရွေးရန် ထိုအတန်းများကို ရွေးပြီး ညာဘက်ကလစ်မီနူးမှ မြေပုံပေါ်တွင် ရွေးချယ်ရန် ကို ရွေးပါ။ ဇယားစစ်ထုတ်မှုကို ပရောဂျက်နှင့်အတူ မသိမ်းဘဲ စာမျက်နှာ ပြန်ဖွင့်သောအခါ ပြီးဆုံးသည်။ တည်းဖြတ်ပြီး မကိုက်ညီတော့သော အတန်းသည် ဇယားတွင် မှိန်ပြီး သတိပေးသင်္ကေတဖြင့် မှတ်ထားကာ လက်ရှိဇယားတွင် စစ်ထုတ်ရန် ခလုတ်ကို ထပ်နှိပ်မချင်း ကျန်နေသည်။</p>';
-$ec_lang['lpn_guide_find_replace_term']='အစားထိုးခြင်းနှင့် ပြန်ဖျက်ခြင်း';
-$ec_lang['lpn_guide_find_replace_def']='<p>ဘောက်စ်၏ တွေ့ရှိသည့်အရာကို ပြောင်းရန် အပိုင်းသည် ရှာဖွေချက်က တွေ့ရှိသော အစိတ်အပိုင်းတိုင်းတွင် ဂုဏ်သတ္တိတစ်ခုကို ရေးသည်။ ပြောင်းမည့် ဂုဏ်သတ္တိ စာရင်းမှ ဂုဏ်သတ္တိကို ရွေးပါ၊ တန်ဖိုးအသစ် ကွက်တွင် ပြသထားသော ယူနစ်ဖြင့် တန်ဖိုးအသစ်ကို ရိုက်ထည့်ပြီး အစားထိုးရန် ခလုတ်ကို နှိပ်ပါ။ ထို့နောက် ဘောက်စ်က တန်ဖိုးအသစ် ရှိပြီးသား အစိတ်အပိုင်းများကို မရေတွက်ဘဲ အစိတ်အပိုင်း ဘယ်နှစ်ခု ပြောင်းမည်ကို ဖော်ပြသည်။ ပြောင်းလဲမှုကို အကောင်အထည်ဖော်ရန် ၎င်းတို့ကို ပြောင်းရန် ခလုတ်ကို နှိပ်ပါ၊ သို့မဟုတ် ပယ်ဖျက်ရန် ကို နှိပ်ပါ။ ပြန်ဖျက်ရန် တစ်ကြိမ်က အစားထိုးမှုတစ်ခုလုံးကို ပြန်ပြောင်းပေးသည်။</p><p>Net1 ပေါ်ရှိ ဥပမာ - <code>Pipe.Diameter below 10</code> သည် ပိုက်လိုင်း 31၊ 122၊ 113 နှင့် 121 ကို တွေ့ရှိသည်။ အချင်းကို ရွေးပြီး 10 ရိုက်ကာ အစားထိုးရန် ကို နှိပ်ပါ၊ ဘောက်စ်တွင် “အစိတ်အပိုင်း 4 ခုကို ပြောင်းမလား။” ပြသည်။ ၎င်းတို့ကို ပြောင်းရန် ကို နှိပ်လျှင် ပိုက်လိုင်းလေးခုလုံးကို 10 in သို့ သတ်မှတ်သည်။ ပြန်ဖျက်ရန် တစ်ကြိမ်က ၎င်းတို့ကို 6 နှင့် 8 in သို့ ပြန်လည်ထားသည်။</p><p>Net3 ပေါ်ရှိ ဥပမာ - <code>Pipe.ID equal to \'247\'</code> သည် ပိုက်လိုင်း 247 ကို တွေ့ရှိသည်။ အထက်ပါ ချိတ်ဆက်မှု ဥပမာအတွက် ပိုက်ကို ပိတ်ရန် ပိတ် ကို ရွေးပြီး တန်ဖိုးအသစ် စာရင်းတွင် ပိတ်ထားသည် ကို ရွေးကာ အစားထိုးရန် ကို နှိပ်ပြီး ၎င်းတို့ကို ပြောင်းရန် ကို နှိပ်ပါ။ ပြန်ဖျက်ရန်က ပြန်ဖွင့်ပေးသည်။</p><p>အစားထိုးရာတွင် အစိတ်အပိုင်း အမျိုးအစားတစ်ခုတည်း လိုအပ်သဖြင့် အားလုံး အောက်တွင် မည်သည်ကို ရှာမည် စာရင်းမှ အစိတ်အပိုင်းအမျိုးအစားကို အရင်ရွေးပါ။ အခြေခံ မဟုတ်သော အခြေအနေတွင် အစားထိုးမှုကို ဂုဏ်သတ္တိများတွင် တူညီသော တည်းဖြတ်မှုကဲ့သို့ ထိုအခြေအနေတွင် သိမ်းသည်။ Mapbox အမြင့်များ ရနိုင်သည့်နေရာတွင် အမြင့် ကို ရိုက်ထည့်သော တန်ဖိုးအစား Mapbox DEM မှ အစားထိုးနိုင်သည်။</p>';
-$ec_lang['lpn_guide_find_notes_term']='သတိပြုရန် အချက်များ';
-$ec_lang['lpn_guide_find_notes_def']='<ul><li>တန်ဖိုးများကို တိကျမှုအပြည့်ဖြင့် နှိုင်းယှဉ်ပြီး ဒဿမ လေးနေရာဖြင့် စာရင်းပြသည်။ နှင့်ညီသည် သည် တွက်ချက်ထားသော ရလဒ်နှင့် ရှားရှားပါးပါး ကိုက်ညီသည်၊ ထက်ကြီးသည် နှင့် ထက်နည်းသည် ကို သုံးပါ။</li><li>ဖိအား၊ ဖိမြင့်ဆင့်၊ ရေစီးနှုန်း၊ ရေအလျင်နှုန်းနှင့် အခြားရလဒ်များသည် နောက်ဆုံး တွက်ချက်မှု၏ ရလဒ်များဖြစ်သည်။ အလိုအလျောက် ပြန်တွက်ချက်ရန် ဆက်တင်ကို ရှင်းထားလျှင် ၎င်းတို့သည် နောက်ဆုံး တွက်ချက်ရန်ကို နှိပ်ချိန်က ကွန်ရက်အခြေအနေကို ဖော်ပြသည်။</li><li>စာသားတွင် ထက်ကြီးသည် နှင့် ထက်နည်းသည် သည် အဘိဓာန်အစီအစဉ်ကို သုံးပြီး ဂဏန်းများကို ဂဏန်းအစီအစဉ်ဖြင့် စီသည်၊ Net1 တွင် <code>Junction.ID above \'20\'</code> သည် ဆက်စပ်နေရာ 21၊ 22၊ 23၊ 31 နှင့် 32 ကို တွေ့ရှိသည်။</li><li>အားလုံး အောက်တွင် ID၊ ဖော်ပြချက်၊ တဂ်နှင့် ဆက်စပ်မှု ကိုသာ ပေးသည်။ ဂုဏ်သတ္တိစာရင်းအပြည့်အစုံကို ကြည့်ရန် မည်သည်ကို ရှာမည် စာရင်းမှ အစိတ်အပိုင်း အမျိုးအစားတစ်ခုကို ရွေးပါ။</li><li>စာသားပစ္စည်းတွင် ID မရှိပါ။ <code>Text.Text contains \'pump\'</code> ကဲ့သို့ ၎င်း၏ စကားလုံးများဖြင့် ရှာပါ။</li><li>နေရာတစ်ခုအတွက် ဆက်စပ်မှု စည်းကမ်းချက် လေးခုမှာ နေရာတွင် ဆက်သွယ်မှု မရှိ၊ နေရာတွင် ဖွင့်ထားသော ဆက်သွယ်မှု မရှိ၊ ရင်းမြစ်သို့ ဆက်သွယ်မှု လမ်းကြောင်း မရှိ နှင့် ရင်းမြစ်သို့ ဖွင့်ထားသော လမ်းကြောင်း မရှိ ဖြစ်သည်။ ရင်းမြစ် ဆိုသည်မှာ ရေကန် သို့မဟုတ် ရေတိုက် ဖြစ်သည်။</li></ul>';
-$ec_lang['lpn_guide_using_heading']='လမ်းညွှန်ကို အသုံးပြုခြင်း';
-$ec_lang['lpn_guide_keys_term']='လမ်းညွှန် ကီးဘုတ် ဖြတ်လမ်းများ';
-$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>ညွှန်တံအောက် သို့မဟုတ် ဖိုကပ်စ်ရှိသော ထိန်းချုပ်မှုနေရာတွင် လမ်းညွှန်ကို ဖွင့်ရန်။</td></tr><tr><td>F1</td><td>ဖိုကပ်စ်ရှိသော ဘောက်စ်၏ ထည့်သွင်းချက်တွင် လမ်းညွှန်ကို ဖွင့်ရန်။</td></tr><tr><td>Ctrl+K</td><td>ရွေးချယ်ထားသော စာသားကို ရှာဖွေရေးကွက်တွင်ထည့်၍ လမ်းညွှန်ကို ဖွင့်ရန်။</td></tr><tr><td>/</td><td>လမ်းညွှန်တွင် ဖိုကပ်စ်ရှိစဉ် ရှာဖွေရေးကွက်ကို ရွေးရန်။</td></tr><tr><td>Esc</td><td>လမ်းညွှန်ကို ပိတ်ပြီး မူလနေရာသို့ ပြန်သွားရန်။</td></tr></tbody></table>';
-$ec_lang['lpn_guide_also']='{menu} တွင်လည်း';
-$ec_lang['lpn_guide_how_popup']='အစိတ်အပိုင်း သို့မဟုတ် စာသားကို ရွေးချယ်သောအခါ ဂုဏ်သတ္တိများ ပွင့်လာသည်။';
-$ec_lang['lpn_guide_how_alt']='အခြေခံ မုဒ်ကို ပိတ်ထားသောအခါ အခြားရွေးစရာများ ကြိုတင်ကြည့်ရှုမှုကို ရေ၊ အခြေအနေများ အောက်တွင် စာရင်းပြသည်။';
-$ec_lang['lpn_guide_not_shown']='ဤထိန်းချုပ်မှုသည် ယခု မျက်နှာပြင်ပေါ်တွင် မရှိပါ။';
-$ec_lang['lpn_hotkeys_zoomwin_def']='ဇူးမ်ဝင်းဒိုး - ထိုနေရာကို ဇူးမ်ဆွဲရန် မြေပုံပေါ်တွင် စတုဂံတစ်ခု ဆွဲပါ။';
-$ec_lang['lpn_status_dismiss']='ဤမက်ဆေ့ချ်ကို ဖျောက်ရန်';
-$ec_lang['lpn_msglog_hidden']='ဖျောက်ထားသည်';
-$ec_lang['lpn_msglog_unhide']='ပြရန်';
-$ec_lang['lpn_status_hidden_tip']='ဖျောက်ထားသော မက်ဆေ့ချ်ကို မြေပုံပေါ်တွင် ပြန်ပြပါ။';
-$ec_lang['lpn_result_depth']='အနက်';
-$ec_lang['lpn_result_depth_tip']='ပြသထားသည့်အချိန်၌ ရေတိုက်ကြမ်းပြင်မှ အပေါ်သို့ တိုင်းတာသော ရေတိုက်ရှိ ရေအနက် - ဖိမြင့်ဆင့်မှ ရေတိုက်အမြင့်ကို နုတ်ထားသည်။';
-$ec_lang['lpn_result_tank_volume']='ရရှိနိုင်သော ထုထည်';
-$ec_lang['lpn_result_tank_volume_tip']='အနိမ့်ဆုံးရေအနက်အထက်ရှိ ရေထုထည်ဖြစ်သဖြင့် ထိုအနက်တွင် သုည ဖြစ်သည်။ EPANET ရေတိုက်ထုထည်တွင် အနိမ့်ဆုံးရေအနက်အောက်ရှိ ရေလည်း ပါဝင်ပြီး ၎င်းသည် ရောနှောမှုနှင့် ရေအသက်အရွယ်တွင် ရေတွက်သဖြင့် ရေတိုက်အမြင့်သည် ရေတိုက်ကြမ်းပြင်တွင် ရှိနေသည်။';
-$ec_lang['lpn_pane_copy_heads']='ကော်လံခေါင်းစဉ်များနှင့်အတူ ကူးယူရန်';
-$ec_lang['lpn_export_table_title']='{format} သို့ ထုတ်ယူရန်';
-$ec_lang['lpn_export_table_current']='လက်ရှိ';
-$ec_lang['lpn_export_table_all']='အားလုံး';
-$ec_lang['lpn_export_table_go']='ထုတ်ယူရန်';
-$ec_lang['lpn_export_table_scn_note']='နောက်ဆုံး တွက်ချက်ထားသော အခြေအနေအတွက်သာ ရလဒ်များကို ထုတ်ယူသည်။';
-$ec_lang['lpn_file_export_item_ods']='ODS ဖိုင်…';
-$ec_lang['lpn_file_export_item_xlsx']='XLSX ဖိုင်…';
-$ec_lang['lpn_file_export_item_csv']='CSV ဖိုင်…';
-$ec_lang['lpn_file_export_tables_tip']='ဇယားများ ပင်န်တွင် ပြသည့်အတိုင်း ဇယားများကို workbook တစ်ခုတည်းတွင် ဇယားတစ်ခုစီအတွက် (နှင့် သင်ရွေးသော အခြေအနေတစ်ခုစီအတွက်) စာရွက်တစ်ရွက်စီ၊ ထို့အပြင် ၎င်းတို့၏ ID များ ရည်ညွှန်းသော စာရင်းတစ်ခုစီ (ပုံစံများ၊ ကွေးမျဉ်းများ၊ ပိုက်အမျိုးအစားများနှင့် ချိတ်ဆက်ပစ္စည်းများ) အတွက် စာရွက်တစ်ရွက်စီဖြင့် ဒေါင်းလုဒ်လုပ်ပါ။ နောက်ဆုံး တွက်ချက်ထားသော အခြေအနေအတွက်သာ ရလဒ်များ ပါဝင်သည်။';
-$ec_lang['lpn_file_export_csv_tip']='ဇယားများ ပင်န်တွင် ပြသည့်အတိုင်း ဇယားတစ်ခုကို ဒေါင်းလုဒ်လုပ်ပါ။ ဇယားတစ်ခုသည် စာရင်းများမပါသော CSV ဖိုင်တစ်ဖိုင်တည်း ဖြစ်သည်။ ဇယားများစွာ သို့မဟုတ် အခြေအနေများစွာသည် CSV ဖိုင်များပါသော zip ဖိုင်တစ်ခုအဖြစ် ထွက်လာပြီး ၎င်းတို့၏ ID များ ရည်ညွှန်းသော စာရင်းတစ်ခုစီအတွက် ဖိုင်တစ်ခုစီ ပါဝင်သည်။ နောက်ဆုံး တွက်ချက်ထားသော အခြေအနေအတွက်သာ ရလဒ်များ ပါဝင်သည်။';
-$ec_lang['lpn_file_export_item_dxf']='DXF ဖိုင်…';
-$ec_lang['lpn_file_export_dxf_tip']='ဤကွန်ရက်ကို AutoCAD နှင့် အခြား CAD ပရိုဂရမ်များအတွက် ဒေါင်းလုဒ်လုပ်ပါ - နေရာများကို သင်္ကေတ ဘလောက်များအဖြစ်၊ ပိုက်လိုင်းများ၊ ရေတင်စက်များနှင့် ဗားလ်များကို polyline များအဖြစ်၊ အစိတ်အပိုင်းတိုင်းကို ၎င်း၏ ID နှင့် ဂုဏ်သတ္တိတန်ဖိုးများကို ပရောဂျက်ယူနစ်များဖြင့် attribute များတွင် ထားသော ဘလောက်တစ်ခုအဖြစ် ထုတ်ပေးသည်။';
-$ec_lang['lpn_dxf_export_no_utm']='DXF ဖိုင်ကို မရေးသားခဲ့ပါ - ဤကွန်ရက်သည် UTM ကာမိသော လတ္တီတွဒ်များ (80° S မှ 84° N) ပြင်ပတွင် ရှိပြီး ပုံဆွဲရန်အတွက် ပြားချပ်သော ဂရစ်တစ်ခု လိုအပ်သည်။';
-$ec_lang['lpn_dxf_export_refused']='DXF ဖိုင်ကို မရေးသားခဲ့ပါ - လိုအပ်သော ကိုအော်ဒိနိတ် ပြောင်းလဲမှု မတင်နိုင်ခဲ့ပါ။ ချိတ်ဆက်မှုကို စစ်ဆေးပြီး ထပ်ကြိုးစားပါ။';
-$ec_lang['lpn_dxf_export_failed']='DXF ဖိုင်ကို မရေးသားခဲ့ပါ - ဤစာမျက်နှာရှိ အမှားတစ်ခုကြောင့် ရပ်သွားသည် ({error})။';
-$ec_lang['lpn_dxf_note_grid']='ကိုအော်ဒိနိတ်များ - ဤပရောဂျက်၏ X နှင့် Y ကို {unit} ဖြင့်။ ကိုအော်ဒိနိတ်စနစ် မဖော်ပြထားပါ။';
-$ec_lang['lpn_dxf_note_crs']='ကိုအော်ဒိနိတ်များ - {crs}၊ ဤပရောဂျက်က ဖော်ပြထားသည့်အတိုင်း။';
-$ec_lang['lpn_dxf_note_geo']='ကိုအော်ဒိနိတ်များ - {crs}၊ မီတာဖြင့်၊ လတ္တီတွဒ်နှင့် လောင်ဂျီတွဒ် မဟုတ်ပါ။ ပရောဂျက်၏ လတ္တီတွဒ်နှင့် လောင်ဂျီတွဒ်များကို ထိုဂရစ်သို့ ပြောင်းထားသည်။';
-$ec_lang['lpn_dxf_exported_geo']='{file} ကို ထုတ်ယူပြီးပါပြီ။ ၎င်း၏ ကိုအော်ဒိနိတ်များမှာ {crs} ဖြစ်ပြီး မီတာဖြင့်ဖြစ်ကာ လတ္တီတွဒ်နှင့် လောင်ဂျီတွဒ် မဟုတ်ပါ။';
-$ec_lang['lpn_dxf_note_blocks']='အလွှာများကို {prefix}၊ အစိတ်အပိုင်းကုဒ်၊ ကြားကပ်မျဉ်းတို နှင့် အခြားရွေးစရာ အစီအစဉ်ဖြင့် အမည်ပေးထားသည်၊ ဥပမာ {example}။ အစိတ်အပိုင်းတစ်ခုစီသည် စကေး 1 ဖြင့် ထည့်ထားသော ဘလောက်တစ်ခုဖြစ်ပြီး attribute များသည် အမြင့် ယူနစ် 1 ရှိသည်၊ စာလုံးအမြင့်ကို သတ်မှတ်ရန် ဘလောက်များကို စကေးချဲ့ပါ။ attribute တိုင်းကို မြင်ရပြီး အစိတ်အပိုင်းတစ်ခု၏ attribute များကို ၎င်း၏ သင်္ကေတဘေးတွင် ကော်လံတစ်ခုအဖြစ် ထပ်ထားသည်။';
-$ec_lang['lpn_dxf_note_shortened']='တန်ဖိုး {n} ခုသည် DXF ဖိုင်က ခွင့်ပြုသည်ထက် ပိုရှည်သဖြင့် ({max} လုံး) တစ်ခုစီကို အတိုချုံ့ပြီး အစက်သုံးစက်ဖြင့် အဆုံးသတ်ထားသည်။';
-$ec_lang['lpn_dxf_note_categories']='ဆက်စပ်နေရာ {n} ခုတွင် လိုအင်အမျိုးအစား တစ်ခုထက်ပိုရှိသည်။ ၎င်းတို့၏ {tag} attribute သည် အမျိုးအစားအားလုံး၏ အခြေခံလိုအင်များ၏ ပေါင်းလဒ်ကို ထိန်းထားသည်။';
-$ec_lang['lpn_file_export_item_workspace']='လုပ်ငန်းခွင်…';
-$ec_lang['lpn_file_export_workspace_tip']='သင့်ဘောက်စ်များ တည်ရှိရာ၊ ၎င်းတို့၏ အရွယ်အစား၊ မည်သည်တို့ ပွင့်နေသည် သို့မဟုတ် ကပ်ထားသည်၊ သင့်ပင်န်နှင့် ကော်လံ အရွယ်အစားများ၊ ထို့အပြင် မည်သည့် အကူအညီပူဖောင်းများနှင့် hover ကတ်ကို ပြသည်ဟူသော ဤစာမျက်နှာ၏ ပြသမှု ရွေးစရာများပါသော ဖိုင်အသေးတစ်ခုကို ဒေါင်းလုဒ်လုပ်ပါ။ သင့်ပရောဂျက်များ၊ ပရောဂျက်ဆက်တင်များနှင့် ကွတ်ကီးများ (ဘာသာစကား၊ ခွင့်ပြုချက်၊ ယူနစ်များ) မပါဝင်ပါ။ အခြားစခရင် သို့မဟုတ် ဘရောက်ဇာတွင် ဖိုင်၊ တင်သွင်းရန်၊ လုပ်ငန်းခွင် ဖြင့် တင်ပါ။';
-$ec_lang['lpn_file_import_workspace']='လုပ်ငန်းခွင်…';
-$ec_lang['lpn_file_import_workspace_tip']='ဖိုင်၊ ထုတ်ယူရန်၊ လုပ်ငန်းခွင် ဖြင့် သိမ်းထားသော လုပ်ငန်းခွင်ဖိုင်ကို အသုံးပြုပါ - ဘောက်စ်တည်နေရာနှင့် အရွယ်အစားများ၊ ကပ်ထားမှု၊ ပင်န်အရွယ်အစားများနှင့် မည်သည့် အကူအညီပူဖောင်းများနှင့် hover ကတ်ကို ပြသည်ဟူသော ဤစာမျက်နှာ၏ ပြသမှု ရွေးစရာများ။ သင့်ပရောဂျက်များနှင့် ကွတ်ကီးများကို မထိပါ။';
-$ec_lang['lpn_workspace_exported']='လုပ်ငန်းခွင်ကို {file} သို့ သိမ်းပြီးပါပြီ - ဆက်တင် {n} ခု။';
-$ec_lang['lpn_workspace_imported']='လုပ်ငန်းခွင်ကို {file} မှ အသုံးပြုပြီးပါပြီ။ အသုံးပြုထားသော ဆက်တင်များ - {n}။ မူလတန်ဖိုးသို့ ပြန်ထားသည်များ - {r}။';
-$ec_lang['lpn_workspace_ignored']='အသိအမှတ်မပြုသောကြောင့် လျစ်လျူရှုထားသော ထည့်သွင်းချက်များ - {u}။';
-$ec_lang['lpn_workspace_refused_unreadable']='ဤဖိုင်ကို လုပ်ငန်းခွင်အဖြစ် ဖတ်၍မရသဖြင့် ဘာမျှ မပြောင်းလဲခဲ့ပါ။';
-$ec_lang['lpn_workspace_refused_format']='ဤစာမျက်နှာက သိမ်းထားသော လုပ်ငန်းခွင်ဖိုင် မဟုတ်သဖြင့် ဘာမျှ မပြောင်းလဲခဲ့ပါ။';
-$ec_lang['lpn_workspace_refused_newer']='ဤလုပ်ငန်းခွင်ဖိုင်ကို ဤစာမျက်နှာ၏ ဗားရှင်းအသစ်က သိမ်းထားသဖြင့် (ဖော်မတ် {version}) ဘာမျှ မပြောင်းလဲခဲ့ပါ။';
-$ec_lang['lpn_workspace_confirm']='ဤဘရောက်ဇာ၏ လုပ်ငန်းခွင် အပြင်အဆင်ကို ဖိုင်ထဲရှိ အပြင်အဆင်ဖြင့် အစားထိုးမလား။';
-$ec_lang['lpn_workspace_refused_storage']='ဘရောက်ဇာ သိုလှောင်ခန်း ပြည့်နေသည် သို့မဟုတ် မရနိုင်သဖြင့် လုပ်ငန်းခွင်ကို မအသုံးပြုခဲ့ပါ။';
-$ec_lang['lpn_omitted_note']='ရေကန် သို့မဟုတ် ရေတိုက်သို့ လမ်းကြောင်း မရှိသောကြောင့် ဤအတွက် မထည့်သွင်းထားပါ - {ids}';
-$ec_lang['lpn_link_end_unknown']='ID {id} ဖြင့် နေရာ မရှိပါ။';
-$ec_lang['lpn_link_end_same']='မှ နှင့် သို့ သည် မတူညီသော နေရာများ ဖြစ်ရမည်။';
-$ec_lang['lpn_split_pipe_ask']='ပိုက်လိုင်း {id} ကို ဤနေရာတွင် ခွဲမလား။';
-$ec_lang['lpn_split_yes']='ဟုတ်ကဲ့';
-$ec_lang['lpn_split_no']='မဟုတ်ပါ';
-$ec_lang['lpn_snap_vertex']='{link}၊ အကွေ့မှတ် {n}';
-$ec_lang['lpn_snap_node_on_node']='{new} ကို {target} ၏ တည်နေရာတွင် ထားခဲ့သည်။ နေရာနှစ်ခုကို မချိတ်ဆက်ထားပါ။';
-$ec_lang['lpn_snap_moved_on_node']='{moved} ကို {target} ၏ တည်နေရာသို့ ရွှေ့ခဲ့သည်။ နေရာနှစ်ခုကို မချိတ်ဆက်ထားပါ။';
-$ec_lang['lpn_snap_shape_point']='{shape}၊ အမှတ် {n}';
-$ec_lang['lpn_settings_hover_card']='hover လုပ်သောအခါ အညွှန်းအပြည့်အစုံကို ပြရန်';
-$ec_lang['lpn_settings_hover_card_tip']='ဆက်တင်များတွင် သတ်မှတ်ထားသည့်အတိုင်း နေရာ၊ ပိုက်လိုင်း သို့မဟုတ် ဖောက်သည်၏ အညွှန်းကို မည်သည့်စကေးတွင်မဆို၊ မြေပုံပေါ်တွင် အညွှန်းဆန့်သည်ဖြစ်စေ မဆန့်သည်ဖြစ်စေ ကြည့်ရန် ညွှန်တံကို ၎င်းပေါ်တွင် ရပ်ထားပါ။ ၎င်းသည် ပရောဂျက်အတွက် မဟုတ်ဘဲ ဤဘရောက်ဇာအတွက် ဆက်တင်ဖြစ်သည်။';
-$ec_lang['lpn_scenario_delete_in_base']='ပုံဆွဲမှုမှ ဖယ်ရှားရန် {base} အခြေအနေတွင် ဖျက်ပါ။';
-$ec_lang['lpn_scenario_only_deleted']='{id} ကို ဖျက်ပြီးပါပြီ။ ၎င်းသည် {scenario} တွင်သာ ပါဝင်ခဲ့သည်။';
-$ec_lang['lpn_scenario_delete_blocked']='{id} ကို မဖျက်ခဲ့ပါ၊ အကြောင်းမှာ ပိုက်လိုင်း {link} သည် ၎င်းတွင် အဆုံးသတ်ပြီး ထိုပိုက်လိုင်းသည် {scenario} ပြင်ပတွင်လည်း ရှိသောကြောင့် ဖြစ်သည်။ နှစ်ခုစလုံးကို ဖျက်ရန် {base} အခြေအနေတွင် ဖျက်ပါ။';
-$ec_lang['lpn_junction_pattern_unknown']='ဤပရောဂျက်တွင် ID {id} ပါသော ပုံစံ မရှိသဖြင့် ဆက်စပ်နေရာကို ယခင်အတိုင်း ထားခဲ့သည်။';
-$ec_lang['lpn_settings_default_pattern_none']='မရှိ (ကိန်းသေ)';
-$ec_lang['lpn_demand_pattern_default']='(မူလ - {id})';
-$ec_lang['lpn_demand_pattern_constant']='(ကိန်းသေ)';
-$ec_lang['lpn_library_pattern_default_mark']='(မူလ)';
-$ec_lang['lpn_library_pattern_default_tip']='မူလ လိုအင်ပုံစံ။ ဆက်တင်များ၊ မူလ လိုအင်ပုံစံ တွင် ပြောင်းပါ။';
-$ec_lang['lpn_library_pattern_default_deleted_to']='ပုံစံ {id} သည် မူလ လိုအင်ပုံစံ ဖြစ်ခဲ့သည်။ ပုံစံမရှိသော ဆက်စပ်နေရာများသည် ယခု ပုံစံ {now} ကို သုံးသည်။';
-$ec_lang['lpn_library_pattern_default_deleted_none']='ပုံစံ {id} သည် မူလ လိုအင်ပုံစံ ဖြစ်ခဲ့သည်။ ပုံစံမရှိသော ဆက်စပ်နေရာများသည် ယခု ကိန်းသေ လိုအင်ကို သုံးသည်။';
+$ec_lang['lpn_snip_tip_copy']='ကူးယူရန် (Ctrl+C)';
+$ec_lang['lpn_screenshot_scale_tip']='မျက်နှာပြင်ပေါ်ရှိ နယ်ပယ်၏ ဆအဖြစ် ပြသော ပုံအရွယ်။ ပိုကြီးလျှင် ပိုကြည်လင်ပြီး ဖိုင်ပိုကြီးသည်။';$ec_lang['lpn_guide_text_alt_box']='အခြေအနေတစ်ခုစီအတွက် ရုပ်ပိုင်းဆိုင်ရာ၊ လိုအင်နှင့် အစိတ်အပိုင်း အသက်သွင်းခြင်းကဲ့သို့ အမျိုးအစားတစ်ခုစီတွင် မည်သည့် အခြားရွေးစရာကို သုံးသည်ကို ပြပြီး ၎င်း၏ တွက်ချက်မှု ရွေးစရာများဖြစ်သော လိုအင် မြှောက်ကိန်း၊ စုစုပေါင်း လည်ပတ်ချိန်နှင့် ဟိုက်ဒရောလစ် အချိန်အဆင့်ကို ပြသည်။ အခြားရွေးစရာများသည် ဖတ်ရန်သာ ဖြစ်သည်။ အခြေအနေတစ်ခု၏ တွက်ချက်မှု ရွေးစရာများကို ဤနေရာတွင် ရိုက်ထည့်နိုင်ပြီး ဗလာထားလျှင် ၎င်း၏ မိဘ၏ တန်ဖိုးကို သုံးသည်။ အခြေခံ မုဒ်ကို ရှင်းပြီးနောက် အခြေအနေများ မီနူးမှ ဖွင့်ပါ။';$ec_lang['lpn_guide_how_alt']='အခြေခံ မုဒ်ကို ပိတ်ထားသောအခါ အခြားရွေးစရာများ ကြိုတင်ကြည့်ရှုမှုကို ရေ၊ အခြေအနေများ အောက်တွင် စာရင်းပြသည်။';$ec_lang['lpn_alt_calc_options']='တွက်ချက်မှု ရွေးစရာများ';$ec_lang['lpn_scenario_duration_tip']='မိဘထံမှ ဆက်ခံရန် အလွတ်ထားပါ။ စုစုပေါင်း လည်ပတ်ချိန် 0:00 သည် တည်ငြိမ်အခြေအနေ run ဖြစ်သည်။';$ec_lang['lpn_scenario_hyd_step_tip']='မိဘထံမှ ဆက်ခံရန် အလွတ်ထားပါ။';
