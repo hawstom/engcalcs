@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**149 still to read on master**, of 168 untranslated keys, of 2790 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**152 still to read on master**, of 171 untranslated keys, of 2793 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -198,7 +198,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (168, 149 to read @@ NEEDS RULING)
+## lpn_  (171, 152 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -686,6 +686,15 @@ never edits a synonym.
 - **`lpn_sm_used_by_tip`**
   > Used by: {list}
   @@ NEEDS RULING
+- **`lpn_time_run_cut_off`**
+  > EPANET had closed {link} and then could not solve for {nodes}.
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off_empty`**
+  > Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off_full`**
+  > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
+  @@ NEEDS RULING
 - **`lpn_tsb_close`**
   > Close graph
   @@ NEEDS RULING
@@ -709,7 +718,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**3 still to read**, of 6 new keys across 11 unmerged branch(es).
+**0 still to read**, of 3 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -720,7 +729,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`04a714813`) — adds no English strings
+### feat/bentley-interop (`3e96554d3`) — adds no English strings
 
 ### feat/description-lines (`7e68251a3`) — adds no English strings
 
@@ -750,14 +759,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/match-property (`05bda7651`) — adds no English strings
 
-### fix/zero-demand-solve (`f06e7b4fe`) — 3 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_time_run_cut_off`**
-  > EPANET had closed {link} and then could not solve for {nodes}.
-  @@ NEEDS RULING
-- **`lpn_time_run_cut_off_empty`**
-  > Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.
-  @@ NEEDS RULING
-- **`lpn_time_run_cut_off_full`**
-  > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
-  @@ NEEDS RULING
+### fix/zero-demand-solve (`f06e7b4fe`) — adds no English strings

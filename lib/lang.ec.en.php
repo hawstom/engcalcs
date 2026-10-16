@@ -3583,6 +3583,12 @@ $ec_lang['lpn_time_stat_stopped']='{statistic} not shown: the run stopped before
 $ec_lang['lpn_time_stopped_no_quality']='No water quality results were computed, because the quality analysis starts after the hydraulic run ends.';
 $ec_lang['lpn_energy_stopped']='The EPANET run stopped before the end of the period, so no pump energy results were computed.';
 $ec_lang['lpn_time_run_stopped_kept']='The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.';
+// Why a stopped run stopped, read from EPANET's own run report (R-402). {link} is the link EPANET
+// had just closed, {tank} the tank at one end of it, {nodes} the ids of the nodes EPANET then could
+// not solve for, comma-separated. Follows lpn_time_run_stopped or lpn_time_run_stopped_kept.
+$ec_lang['lpn_time_run_cut_off']='EPANET had closed {link} and then could not solve for {nodes}.';
+$ec_lang['lpn_time_run_cut_off_full']='Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.';
+$ec_lang['lpn_time_run_cut_off_empty']='Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.';
 // The run's own version of that last sentence: a period run has a moment and a tank level to name,
 // and a one-moment solve does not, which is where the shared label stops.
 $ec_lang['lpn_time_run_fell_back']='The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level.';
