@@ -62,7 +62,7 @@ A **content pass** (`refreshLabelTextPass()`, `js/looped-network.js:34792`) in o
 | 4 | **right-of-way #1: the placement order.** Salience becomes one number per label | `rankNodeLabels()`, `:739` |
 | 5 | **place node labels, first fit, in that order.** No clear side and no yielding one = DROPPED | `Collide.placeLabelsFirstFit()`, `js/lpn-collide.js:1109` |
 | 6 | **only the labels DROPPED at 5, and whoever blocked them, shed one value.** Re-place. Repeat | `shedNodeLabelsForCrowding()`, `:2186` |
-| 7 | free pipe labels and dragged labels are scored on a ring | `Collide.placeLabels()`, `js/lpn-collide.js:993` |
+| 7 | free pipe labels are scored on a ring; dragged labels go first, each at its one stored spot (Task 807) | `Collide.placeLabels()`, `js/lpn-collide.js:993` |
 | 8 | **gangs are repaired** -- flagged labels re-placed jointly | `Collide.repairCrossingGangs()`, `js/lpn-collide.js:1460` |
 | 9 | **right-of-way #3: any crossing still standing, one of the two labels is hidden** | `shedCrossingLabels()`, `:2326`; `Collide.shedCrossingSurvivors()`, `js/lpn-collide.js:1854` |
 | 10 | **right-of-way #2 collected:** a pipe label a node label is standing on is hidden | `yieldStationedLabels()`, `:2596` |
