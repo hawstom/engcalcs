@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**152 still to read on master**, of 171 untranslated keys, of 2793 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**149 still to read on master**, of 171 untranslated keys, of 2793 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -198,7 +198,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (171, 152 to read @@ NEEDS RULING)
+## lpn_  (171, 149 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -214,10 +214,10 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_clean_map`**
   > Clean map
-  _Ruled 2026-10-16: Approved._
+  _Ruled 2026-10-15: Approved._
 - **`lpn_clean_map_tip`**
   > Checked: The zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.
-  _Ruled 2026-10-16: Map > Clean map: It works, but remove the 'shows only the drawing' sentence of the tip. Start with 'Checked: The zoom....'_
+  _Ruled 2026-10-15: Map > Clean map: It works, but remove the 'shows only the drawing' sentence of the tip. Start with 'Checked: The zoom....'_
 - **`lpn_control_inactive_note`**
   > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
   @@ NEEDS RULING
@@ -388,7 +388,7 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_settings_override_marks`**
   > Show override markers on the map
-  _Ruled 2026-10-16: Approved._
+  _Ruled 2026-10-15: Approved._
 - **`lpn_settings_override_marks_tip`**
   > Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.
   @@ NEEDS RULING
@@ -409,7 +409,7 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_settings_row_bubbles`**
   > Time series graphs on the map
-  _Ruled 2026-10-16: Approved._
+  _Ruled 2026-10-15: Approved._
 - **`lpn_settings_row_check_freq`**
   > Status check frequency
   @@ NEEDS RULING
@@ -670,10 +670,10 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_sm_tree_all`**
   > All
-  _Ruled 2026-10-16: Approved._
+  _Ruled 2026-10-15: Approved._
 - **`lpn_sm_tree_unused`**
   > All unused
-  _Ruled 2026-10-16: Approved._
+  _Ruled 2026-10-15: Approved._
 - **`lpn_sm_unused_none`**
   > None
   @@ NEEDS RULING
@@ -688,13 +688,13 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_time_run_cut_off`**
   > EPANET had closed {link} and then could not solve for {nodes}.
-  @@ NEEDS RULING
+  _Ruled 2026-10-15: R-402 status messages: Approved._
 - **`lpn_time_run_cut_off_empty`**
   > Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.
-  @@ NEEDS RULING
+  _Ruled 2026-10-15: R-402 status messages: Approved._
 - **`lpn_time_run_cut_off_full`**
   > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
-  @@ NEEDS RULING
+  _Ruled 2026-10-15: R-402 status messages: Approved._
 - **`lpn_tsb_close`**
   > Close graph
   @@ NEEDS RULING
@@ -729,7 +729,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`3e96554d3`) — adds no English strings
+### feat/bentley-interop (`139e9eb84`) — adds no English strings
 
 ### feat/description-lines (`7e68251a3`) — adds no English strings
 
@@ -759,4 +759,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/match-property (`05bda7651`) — adds no English strings
 
-### fix/zero-demand-solve (`f06e7b4fe`) — adds no English strings
+### fix/zero-demand-solve (`fbfbc28b6`) — adds no English strings
