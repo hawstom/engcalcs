@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sw",
-        "expected_key_count": 2634,
-        "delta_key_count": 10,
+        "expected_key_count": 2638,
+        "delta_key_count": 14,
         "exempt_key_count": 39,
         "exempt_keys": [
             "u_imgd",
@@ -725,6 +725,10 @@
         "lpn_inp_drop_comments": "These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.",
         "lpn_field_length_slope_tip": "Pipe length. When Auto is checked, the length is measured along the slope: the drawn length combined with the difference in elevation between the two end nodes.",
         "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why.",
+        "lpn_time_stat_stopped": "{statistic} not shown: the run stopped before the end of the period.",
+        "lpn_time_stopped_no_quality": "No water quality results were computed, because the quality analysis starts after the hydraulic run ends.",
+        "lpn_energy_stopped": "The EPANET run stopped before the end of the period, so no pump energy figures were kept.",
+        "lpn_time_run_stopped_kept": "The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.",
         "lpn_settings_text_halo": "Text halo width (percent of text size)",
         "lpn_settings_text_halo_tip": "Width of the solid outline behind map text, as a percent of the text size. Applies when Solid background behind labels is on.",
         "lpn_snip_tip_copy": "Copy (Ctrl+C)"
@@ -737,6 +741,10 @@
         "lpn_inp_drop_comments": "These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.",
         "lpn_field_length_slope_tip": "Pipe length. When Auto is checked, the length is measured along the slope: the drawn length combined with the difference in elevation between the two end nodes.",
         "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why.",
+        "lpn_time_stat_stopped": "{statistic} not shown: the run stopped before the end of the period.",
+        "lpn_time_stopped_no_quality": "No water quality results were computed, because the quality analysis starts after the hydraulic run ends.",
+        "lpn_energy_stopped": "The EPANET run stopped before the end of the period, so no pump energy figures were kept.",
+        "lpn_time_run_stopped_kept": "The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.",
         "lpn_settings_text_halo": "Text halo width (percent of text size)",
         "lpn_settings_text_halo_tip": "Width of the solid outline behind map text, as a percent of the text size. Applies when Solid background behind labels is on.",
         "lpn_snip_tip_copy": "Copy (Ctrl+C)"
@@ -839,6 +847,70 @@
             }
         },
         "lpn_time_run_stopped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_refused_fallback",
+                    "value": "Namba zilizo kwenye skrini zilitoka kwenye kitatuzi cha ndani badala yake.",
+                    "english": "The numbers on screen came from the built-in solver instead."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_fell_back",
+                    "value": "Namba zilizo kwenye skrini zilitoka kwenye kitatuzi kilichojengwa ndani badala yake. Hutatua wakati mmoja kwa wakati, hivyo huu ni mtandao katika {time} pekee, huku kila tanki likiwa kwenye kiwango chake cha mwanzo.",
+                    "english": "The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level."
+                }
+            }
+        },
+        "lpn_time_stat_stopped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_refused_fallback",
+                    "value": "Namba zilizo kwenye skrini zilitoka kwenye kitatuzi cha ndani badala yake.",
+                    "english": "The numbers on screen came from the built-in solver instead."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_fell_back",
+                    "value": "Namba zilizo kwenye skrini zilitoka kwenye kitatuzi kilichojengwa ndani badala yake. Hutatua wakati mmoja kwa wakati, hivyo huu ni mtandao katika {time} pekee, huku kila tanki likiwa kwenye kiwango chake cha mwanzo.",
+                    "english": "The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level."
+                }
+            }
+        },
+        "lpn_time_stopped_no_quality": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_refused_fallback",
+                    "value": "Namba zilizo kwenye skrini zilitoka kwenye kitatuzi cha ndani badala yake.",
+                    "english": "The numbers on screen came from the built-in solver instead."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_fell_back",
+                    "value": "Namba zilizo kwenye skrini zilitoka kwenye kitatuzi kilichojengwa ndani badala yake. Hutatua wakati mmoja kwa wakati, hivyo huu ni mtandao katika {time} pekee, huku kila tanki likiwa kwenye kiwango chake cha mwanzo.",
+                    "english": "The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level."
+                }
+            }
+        },
+        "lpn_energy_stopped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_refused_fallback",
+                    "value": "Namba zilizo kwenye skrini zilitoka kwenye kitatuzi cha ndani badala yake.",
+                    "english": "The numbers on screen came from the built-in solver instead."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_fell_back",
+                    "value": "Namba zilizo kwenye skrini zilitoka kwenye kitatuzi kilichojengwa ndani badala yake. Hutatua wakati mmoja kwa wakati, hivyo huu ni mtandao katika {time} pekee, huku kila tanki likiwa kwenye kiwango chake cha mwanzo.",
+                    "english": "The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level."
+                }
+            }
+        },
+        "lpn_time_run_stopped_kept": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

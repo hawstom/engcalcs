@@ -1844,6 +1844,10 @@
         "lpn_engine_refused_why": "EPANET solver message: {message}",
         "lpn_engine_refused_fallback": "The numbers on screen came from the built-in solver instead.",
         "lpn_time_run_stopped": "The EPANET run stopped at {time}, so it has no results. Its run report says why.",
+        "lpn_time_stat_stopped": "{statistic} not shown: the run stopped before the end of the period.",
+        "lpn_time_stopped_no_quality": "No water quality results were computed, because the quality analysis starts after the hydraulic run ends.",
+        "lpn_energy_stopped": "The EPANET run stopped before the end of the period, so no pump energy figures were kept.",
+        "lpn_time_run_stopped_kept": "The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.",
         "lpn_time_run_fell_back": "The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level.",
         "lpn_control_dangling_note": "These controls refer to an element that is no longer in this project, so they were ignored: {ids}",
         "lpn_control_unreadable_note": "These controls could not be read, so they were left out: {ids}",
@@ -2636,7 +2640,7 @@
         "lpn_snip_tip_copy": "Copy (Ctrl+C)",
         "lpn_screenshot_scale_tip": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
     },
-    "count": 2634,
+    "count": 2638,
     "active_prefixes": [
         "about",
         "bpn",
