@@ -302,6 +302,7 @@ $ec_lang_syn['mtc_blodgett_v_bathurst']='which of the two roughness methods appl
 $ec_lang['mtc_pi_range_check']='P&I range check';
 $ec_lang['mtc_pi_ok']='d50 in P&I range';
 $ec_lang['mtc_pi_ok_tip']='0.28–0.36 ft (Phillips & Ingersoll, 1998)';
+$ec_lang['mtc_not_applicable']='N/A';
 $ec_lang['mtc_pi_out_of_range']='Outside range';
 $ec_lang['mtc_pi_tip']='Extrapolating outside the 0.28–0.36 ft dataset range this equation was developed from — treat as a rough check, not a design basis';
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Per Isbash (1936) and Maricopa County, Arizona, US.">Required bottom angular rock size, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
