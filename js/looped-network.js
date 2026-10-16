@@ -39781,7 +39781,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// page-title toggle went with the titles; a browser that used it before still carries
 			// the key, and "exactly as a brand-new visitor would see it" has to mean that too.
 			// Erasing a key we no longer write is the one direction that is always safe.
-			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY, LPN_SCNBASIC_KEY, LPN_HOVERCARD_KEY];
+			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY, LPN_SCNBASIC_KEY, LPN_HOVERCARD_KEY,
+			LPN_CLEANMAP_KEY, LPN_OVRMARKS_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -39789,6 +39790,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			doomed.forEach(function (k) { localStorage.removeItem(k); });
 		} catch (err) { /* private mode -- nothing to remove */ }
+		// Read again from the (now empty) store, so a wipe without a reload is not still clean.
+		cleanMapState = null; overrideMarksPref = null;
 		// ALSO expire the suite unit cookie, or the promise this button makes is not kept.
 		// Looped-Network.php calls echoCookieScript() and echoUnitSelect() hardcodes
 		// onchange="EngCalcs.submitForm()", so the unit dropdowns ARE saved to a cookie and ARE
@@ -51082,6 +51085,67 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **THE ROWS, APART FROM THE OPENING OF THEM** (Task 542). Split out so a harness can ask what
 	// this menu offers without driving a popup: the assertion that the terrain row is GONE is a
 	// claim about this list, and reading it through openMenu() would be a claim about the DOM.
+	// ---- CLEAN MAP, AND THE OVERRIDE MARKERS' OWN SWITCH (Task 805; Tom, 2026-10-15, R-396) ----
+	//
+	// **TWO SWITCHES, BECAUSE TOM ASKED FOR TWO THINGS.** First *"to be able to hide the amber
+	// override indicators from the map"*, and then a Clean map that hides those AND the furniture
+	// over the drawing. Somebody who wants the rings gone while still zooming with the chip needs
+	// the first without the second, so the rings have their own row in Settings, Map and page,
+	// Page, and Clean map overrides it while on: overrideMarksShown() is the one place both are read.
+	//
+	// **BOTH ARE THE BROWSER'S, NEVER THE PROJECT'S** (CLAUDE.md: settings belong to the PROJECT or
+	// the BROWSER). Which furniture a reader wants over the drawing is a fact about the screen, so a
+	// colleague opening the file must not inherit it. Written only when away from the default, like
+	// lpn_hovercard: a browser that never touched them holds nothing.
+	//
+	// **WHAT IS HIDDEN IS LISTED ONCE, IN css/engcalcs.css** under `.lpn-clean-map`: one class on the
+	// map wrapper, so turning it off restores exactly what was there, inline display and all, because
+	// nothing the page set on those elements was touched. The ERRORS stay: #lpn_status, the standing
+	// message, is not in the list, and every notice still goes to the message history. The Map menu
+	// is on the toolbar, which this never hides, so a keyboard user can always turn it off again.
+	var LPN_CLEANMAP_KEY = 'lpn_cleanmap';
+	var LPN_OVRMARKS_KEY = 'lpn_ovrmarks';
+	var cleanMapState = null, overrideMarksPref = null;   // null: not read from storage yet
+	function cleanMapOn() {
+		if (cleanMapState === null) {
+			try { cleanMapState = localStorage.getItem(LPN_CLEANMAP_KEY) === 'on'; } catch (e) { cleanMapState = false; }
+		}
+		return cleanMapState;
+	}
+	function overrideMarksPrefOn() {
+		if (overrideMarksPref === null) {
+			try { overrideMarksPref = localStorage.getItem(LPN_OVRMARKS_KEY) !== 'off'; } catch (e) { overrideMarksPref = true; }
+		}
+		return overrideMarksPref;
+	}
+	// What nodeScenarioMarks() and linkScenarioMarks() ask before drawing a ring.
+	function overrideMarksShown() { return overrideMarksPrefOn() && !cleanMapOn(); }
+	function applyCleanMap() {
+		var wrap = svg && svg.parentNode;
+		if (wrap && wrap.classList) { wrap.classList.toggle('lpn-clean-map', cleanMapOn()); }
+		// The history panel's button is hidden with it, so an open panel would have no way to close.
+		if (cleanMapOn() && msglogPanelOpen) { closeMessageLogPanel(); }
+	}
+	function setCleanMap(on) {
+		cleanMapState = !!on;
+		try {
+			if (cleanMapState) { localStorage.setItem(LPN_CLEANMAP_KEY, 'on'); }
+			else { localStorage.removeItem(LPN_CLEANMAP_KEY); }
+		} catch (e) { /* private mode: clean for this page view only */ }
+		applyCleanMap();
+		refreshScenarioMarks();
+	}
+	function setOverrideMarksPref(on) {
+		overrideMarksPref = !!on;
+		try {
+			if (overrideMarksPref) { localStorage.removeItem(LPN_OVRMARKS_KEY); }
+			else { localStorage.setItem(LPN_OVRMARKS_KEY, 'off'); }
+		} catch (e) {}
+		refreshScenarioMarks();
+	}
+	// For dev/lpn-spike/clean-map-browser-harness.js, which proves the project file never changes.
+	EngCalcs.lpnCleanMap = { on: cleanMapOn, set: setCleanMap, marksShown: overrideMarksShown,
+		projectText: function () { return JSON.stringify(serializeProject()); } };
 	function mapMenuRows() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
@@ -51139,10 +51203,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Hide/Show street map and satellite images rows. Detach and attach provide the same
 			// functionality."*). World map, Attach/Detach now turns the tiles on and off for
 			// every project kind, and the corner teaser (refreshBasemapTeaser()) still swaps
-			// street for satellite. `cleanMapOn()`/`setCleanMap()` went with the readouts row --
-			// nothing else called them. KEYS DELETED: lpn_clean_map, lpn_clean_map_off,
-			// lpn_clean_map_tip, lpn_basemap_hide, lpn_basemap_satellite_hide, lpn_basemap_tip,
-			// lpn_basemap_satellite_tip.
+			// street for satellite. KEYS DELETED: lpn_clean_map_off, lpn_basemap_hide,
+			// lpn_basemap_satellite_hide, lpn_basemap_tip, lpn_basemap_satellite_tip.
+			//
+			// **CLEAN MAP CAME BACK, AS A DIFFERENT COMMAND** (Task 805; Tom, 2026-10-15, R-396: *"It
+			// would be good to be able to hide the amber override indicators from the map. Maybe a Map,
+			// Clean map button is a good idea after all with zoom buttons, error messenger, ambers, and
+			// satellite button hiding."*). The retired row hid READOUTS; this one hides the CONTROLS
+			// and marks floating over the drawing, and leaves the readouts alone. See setCleanMap().
+			{ label: (cleanMapOn() ? '✓ ' : '  ') + (pc.lpn_clean_map || 'Clean map'),
+				tip: pc.lpn_clean_map_tip,
+				fn: function () { setCleanMap(!cleanMapOn()); } },
 			//
 			// **SHOWN ON EVERY PROJECT, DISABLED WHERE IT CANNOT SAY WHERE IT IS** (Tom, 2026-09-22:
 			// *"Goto and Search ... can show for unnamed CRS projects, but disabled when a world map
@@ -53108,6 +53179,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		wireOffscreenNotice();
 		wireBasemapTeaser();
 		refreshBasemapTeaser();
+		applyCleanMap();   // Task 805: a clean map stays clean across a reload (lpn_cleanmap)
 		wireTabs();
 		applyLegendPosition();
 		applyMapHeight();
@@ -59191,6 +59263,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			row(pageBody, pc.lpn_settings_hover_card || 'Show the full label on hover', hoverCardInput,
 				pc.lpn_settings_hover_card_tip);
 		}
+		// The override rings' own switch (Task 805): the same section and the same reason as the two
+		// rows above, kept in this browser (LPN_OVRMARKS_KEY). Map, Clean map hides the rings whatever
+		// this says, and its tip says so; see overrideMarksShown().
+		var ovrMarksInput = document.createElement('input');
+		ovrMarksInput.type = 'checkbox';
+		ovrMarksInput.checked = overrideMarksPrefOn();
+		ovrMarksInput.id = 'lpn_set_ovrmarks';
+		ovrMarksInput.addEventListener('change', function () { setOverrideMarksPref(ovrMarksInput.checked); });
+		row(pageBody, pc.lpn_settings_override_marks || 'Show override markers on the map', ovrMarksInput,
+			pc.lpn_settings_override_marks_tip);
 		var tail = document.createElement('div');
 		tail.style.marginTop = '6px';
 		pageBody.appendChild(tail);
@@ -73766,8 +73848,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function nodeScenarioMarks(el) {
 		var ne = el ? nodeEls[el.id] : null, off, ov, inh;
 		if (!ne) { return; }
-		off = !isActive(el); ov = hasDisplayedOverride(el);
-		inh = !ov && hasInheritedDisplayedOverride(el);
+		// Neither ring while the reader has switched them off or the map is clean (Task 805).
+		off = !isActive(el); ov = overrideMarksShown() && hasDisplayedOverride(el);
+		inh = !ov && overrideMarksShown() && hasInheritedDisplayedOverride(el);
 		ne.circle.classList.toggle('lpn-override', ov);
 		ne.circle.classList.toggle('lpn-override-inh', inh);
 		setOverrideTitle(ne.circle, ov || inh, inh);
@@ -73780,9 +73863,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!le) { return; }
 		// **A LINK WHOSE END IS INACTIVE IS DRAWN INACTIVE** (Task 781): it is out of the solve
 		// (assembleModel()), and Bentley greys what it leaves out.
-		off = !linkLive(el); ov = hasDisplayedOverride(el);
+		off = !linkLive(el); ov = overrideMarksShown() && hasDisplayedOverride(el);
 		if (le.halo) {
-			inh = !ov && hasInheritedDisplayedOverride(el);
+			inh = !ov && overrideMarksShown() && hasInheritedDisplayedOverride(el);
 			le.halo.classList.toggle('lpn-override', ov);
 			le.halo.classList.toggle('lpn-override-inh', inh);
 			setOverrideTitle(le.halo, ov || inh, inh);

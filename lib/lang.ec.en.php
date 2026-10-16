@@ -1653,7 +1653,8 @@ $ec_lang['lpn_export_table_scn_note']='Results are exported only for the scenari
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
-// lpn_clean_map_tip were deleted with the row; nothing else read them.
+// lpn_clean_map_tip were deleted with the row; nothing else read them. lpn_clean_map and
+// lpn_clean_map_tip are back since Task 805 for a DIFFERENT command (it hides controls, not readouts).
 // THE PROJECT MENU (ROADMAP Task 467). Tom, 2026-08-20: "Maybe we can have a Project menu with
 // Settings, Library, and Report under it?" Its rows borrow the names they already have --
 // lpn_tool_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
@@ -3148,6 +3149,14 @@ $ec_lang['lpn_settings_area_hint']='Show the selection help';
 $ec_lang['lpn_settings_area_hint_tip']='Show the prompt over the map that gives the next step while you are selecting an area.';
 $ec_lang['lpn_settings_hover_card']='Show the full label on hover';
 $ec_lang['lpn_settings_hover_card_tip']='Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.';
+// Task 805 (Tom, 2026-10-15, R-396: "It would be good to be able to hide the amber override
+// indicators from the map. Maybe a Map, Clean map button is a good idea after all"). The rings'
+// own switch, in Settings, Map and page, Page; and the Map menu row that hides them with the
+// controls over the drawing. Both are browser settings.
+$ec_lang['lpn_settings_override_marks']='Show override markers on the map';
+$ec_lang['lpn_settings_override_marks_tip']='Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.';
+$ec_lang['lpn_clean_map']='Clean map';
+$ec_lang['lpn_clean_map_tip']='Checked: the map shows only the drawing. The zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a

@@ -162,6 +162,10 @@ const EC_LPN_FURNITURE = [
     // short hash of each hidden message's words, never the words. A colleague opening the file must
     // not inherit it.
     'lpn_msghidden'   => 'which standing messages this reader hid (hashes, never the words), for this browser',
+    // Map, Clean map and Settings, Page, Show override markers on the map (Task 805). Which controls
+    // and marks float over the drawing is a fact about the screen; nothing in the document changes.
+    'lpn_cleanmap'    => 'whether Map > Clean map is checked, for this browser',
+    'lpn_ovrmarks'    => 'whether the override rings are drawn on the map, for this browser',
     // **WHICH WAY ROUND THE LAST SURVEY FILE WAS WRITTEN IS A FACT ABOUT THAT PERSON'S DATA
     // COLLECTOR, not about this network** (Task 592). It is the remembered answer to the import
     // chooser's one question -- northing first or easting first -- and a file read from it has
