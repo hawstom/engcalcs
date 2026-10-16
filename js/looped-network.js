@@ -57888,27 +57888,46 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {},
 			times = doc.times || (EngCalcs.lpnTimesDefaults ? EngCalcs.lpnTimesDefaults() : { patternStep: 3600 }),
 			ax = EngCalcs.lpnPatternAxis(mult, times.patternStep),
+			timeTitle = pc.lpn_time_menu || 'Time',
+			stepTitle = pc.lpn_library_pattern_axis_step || 'Step',
 			wrap = libEl('div', 'lpn-lib-plot'),
 			y = libEl('div', 'lpn-lib-yaxis'),
 			rows = libEl('div', 'lpn-lib-xaxes'),
 			timeRow = libEl('div', 'lpn-lib-xrow'),
-			perRow = libEl('div', 'lpn-lib-xrow');
+			perRow = libEl('div', 'lpn-lib-xrow'),
+			lastW = -1;
 		function num(v) { return String(+(+v).toFixed(3)); }
+		// The tick interval follows the room: the labels are measured at the row's own font and the
+		// interval chosen so no two touch (EngCalcs.lpnPatternAxis). Redrawn whenever the row's width
+		// changes, which is how a narrow Library box and a wide one both read cleanly.
+		function layout() {
+			var W = timeRow.clientWidth, cv, cx, longest, lt, lp, tw, ptw, a2;
+			if (!(W > 0) || W === lastW || !mult.length) { return; }
+			lastW = W;
+			cv = layout.cv || (layout.cv = document.createElement('canvas'));
+			cx = cv.getContext('2d');
+			cx.font = getComputedStyle(timeRow).font;
+			lt = EngCalcs.lpnFormatTime((mult.length - 1) * (times.patternStep > 0 ? times.patternStep : 3600));
+			lp = String(mult.length);
+			longest = Math.max(cx.measureText(lt).width, cx.measureText(lp).width);
+			tw = Math.max(cx.measureText(timeTitle).width, cx.measureText(stepTitle).width);
+			a2 = EngCalcs.lpnPatternAxis(mult, times.patternStep, { width: W, labelPx: Math.ceil(longest), titlePx: Math.ceil(tw), gapPx: 8 });
+			while (timeRow.firstChild) { timeRow.removeChild(timeRow.firstChild); }
+			while (perRow.firstChild) { perRow.removeChild(perRow.firstChild); }
+			a2.ticks.forEach(function (t) {
+				var cls = t.frac ? 'lpn-lib-tick' : 'lpn-lib-tick lpn-lib-tick-first',
+					a = libEl('span', cls, t.time), b = libEl('span', cls, String(t.period));
+				a.style.left = b.style.left = (t.frac * 100).toFixed(2) + '%';
+				timeRow.appendChild(a);
+				perRow.appendChild(b);
+			});
+			timeRow.appendChild(libEl('span', 'lpn-lib-xtitle', timeTitle));
+			perRow.appendChild(libEl('span', 'lpn-lib-xtitle', stepTitle));
+		}
 		if (ax.ticks.length) {
 			y.appendChild(libEl('span', '', num(ax.hi)));
 			y.appendChild(libEl('span', 'lpn-lib-ytitle', pc.lpn_library_pattern_values || 'Multipliers'));
 			y.appendChild(libEl('span', '', num(ax.lo)));
-		}
-		ax.ticks.forEach(function (t) {
-			var a = libEl('span', t.frac ? 'lpn-lib-tick' : 'lpn-lib-tick lpn-lib-tick-first', t.time),
-				b = libEl('span', t.frac ? 'lpn-lib-tick' : 'lpn-lib-tick lpn-lib-tick-first', String(t.period));
-			a.style.left = b.style.left = (t.frac * 100).toFixed(2) + '%';
-			timeRow.appendChild(a);
-			perRow.appendChild(b);
-		});
-		if (ax.ticks.length) {
-			timeRow.insertBefore(libEl('span', 'lpn-lib-xtitle', pc.lpn_time_menu || 'Time'), timeRow.firstChild);
-			perRow.insertBefore(libEl('span', 'lpn-lib-xtitle', pc.lpn_library_pattern_axis_period || 'Period'), perRow.firstChild);
 		}
 		rows.appendChild(timeRow);
 		rows.appendChild(perRow);
@@ -57916,6 +57935,7 @@ var EngCalcs = EngCalcs || {};
 		wrap.appendChild(libSparkline(mult));
 		wrap.appendChild(libEl('div', 'lpn-lib-xspacer'));
 		wrap.appendChild(rows);
+		if (typeof ResizeObserver === 'function') { new ResizeObserver(layout).observe(timeRow); }
 		return wrap;
 	}
 	// "24 multipliers, 1:00 apart, covering 24:00" -- the sentence that answers "is my daily pattern

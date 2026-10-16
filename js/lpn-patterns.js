@@ -309,22 +309,63 @@
 	 * The numbers on the Library's pattern graph axes, pure so a harness can hold them.
 	 * `mult` is the multiplier list, `stepSec` the pattern time step in seconds. Returns the vertical
 	 * range the graph is drawn over (a flat pattern gets the same band around itself the drawing
-	 * gives it) and about six ticks along the horizontal axis. Each tick is the START of a period:
+	 * gives it) and the ticks along the horizontal axis. Each tick is the START of a step:
 	 * `period` is its ordinal (1, 2, 3...) and `time` its elapsed pattern time as H:MM, i.e.
-	 * (period - 1) x step. Pattern start time is not added: it decides which period a run begins in,
-	 * not when a period of the pattern itself begins.
+	 * (period - 1) x step. Pattern start time is not added: it decides which step a run begins in,
+	 * not when a step of the pattern itself begins.
+	 *
+	 * `opts` makes the tick interval follow the room: { width, labelPx, titlePx, gapPx } are the axis
+	 * width, the widest tick label, the widest row title (which sits at the right end) and the least
+	 * clear space between two labels, all in pixels. The interval is the smallest ROUND one (a whole
+	 * number of steps, or a step count that makes a round clock time: 1, 2, 3, 4, 6, 12 steps, 30
+	 * minutes, 1, 2, 3, 4, 6, 12, 24 hours...) for which no two labels touch and the last one stays
+	 * clear of the title. The first step is always labelled. Without `opts` it aims for about six.
 	 */
-	EC.lpnPatternAxis = function (mult, stepSec) {
+	EC.lpnPatternAxis = function (mult, stepSec, opts) {
 		var n = mult ? mult.length : 0, step = stepSec > 0 ? stepSec : 3600,
-			lo = Infinity, hi = -Infinity, i, stride, ticks = [];
+			lo = Infinity, hi = -Infinity, i, stride = 1, ticks = [], cands, c, k, w, gap, avail;
 		if (!n) { return { lo: 0, hi: 0, ticks: ticks }; }
 		for (i = 0; i < n; i++) { lo = Math.min(lo, mult[i]); hi = Math.max(hi, mult[i]); }
 		if (!(hi > lo)) { lo -= 0.5; hi += 0.5; }
-		stride = Math.max(1, Math.ceil(n / 6));
+		cands = EC.lpnPatternStrides(n, step);
+		if (opts && opts.width > 0) {
+			gap = opts.gapPx > 0 ? opts.gapPx : 8;
+			w = opts.labelPx > 0 ? opts.labelPx : 0;
+			avail = opts.width - (opts.titlePx > 0 ? opts.titlePx + gap : 0);
+			stride = cands[cands.length - 1];
+			for (k = 0; k < cands.length; k++) {
+				c = cands[k];
+				if (c < n && c * opts.width / n < w + gap) { continue; }          // two labels would touch
+				if (c < n && opts.width * (Math.floor((n - 1) / c) * c) / n + w / 2 > avail) { continue; }   // last label meets the title
+				stride = c; break;
+			}
+		} else {
+			for (k = 0; k < cands.length; k++) { if (n / cands[k] <= 6) { stride = cands[k]; break; } stride = cands[k]; }
+		}
 		for (i = 0; i < n; i += stride) {
 			ticks.push({ frac: i / n, period: i + 1, time: EC.lpnFormatTime(i * step) });
 		}
 		return { lo: lo, hi: hi, ticks: ticks };
+	};
+
+	/**
+	 * The tick intervals worth trying, in steps, smallest first: plain counts that people read
+	 * easily, and every count that makes a round elapsed time at this step (a minute multiple up to a
+	 * day or a week). The last entry is a whole pattern, i.e. only the first step is labelled.
+	 */
+	EC.lpnPatternStrides = function (n, step) {
+		var seen = {}, out = [], counts = [1, 2, 3, 4, 6, 12, 24],
+			durs = [60, 120, 300, 600, 900, 1800, 3600, 7200, 10800, 14400, 21600, 43200, 86400, 172800, 259200, 345600, 604800],
+			j, c;
+		for (j = 0; j < counts.length; j++) { seen[counts[j]] = true; }
+		for (j = 0; j < durs.length; j++) {
+			c = durs[j] / step;
+			if (c >= 1 && Math.abs(c - Math.round(c)) < 1e-9) { seen[Math.round(c)] = true; }
+		}
+		Object.keys(seen).forEach(function (key) { if (+key < n) { out.push(+key); } });
+		out.sort(function (x, y) { return x - y; });
+		out.push(Math.max(n, 1));
+		return out;
 	};
 
 	/**
