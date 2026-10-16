@@ -82,12 +82,12 @@ if (isset($html_desc) && trim((string)$html_desc) !== '') :
 // the visitor set (dev/cookie-storage-inventory.md).
 if ($type === 'EngCalcsApp') :
 ?>
-	<script>(function(){var d=document.documentElement,q=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null,k='lpn_theme',c='system',m=null;
-	function g(){if(m){return m;}try{var t=localStorage.getItem(k);return t==='light'||t==='dark'?t:'system';}catch(e){return 'system';}}
+	<script>(function(){var d=document.documentElement,q=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null,c='system',m=null;
+	function g(){if(m){return m;}try{var t=localStorage.getItem('lpn_theme');return t==='light'||t==='dark'?t:'system';}catch(e){return 'system';}}
 	function a(){c=g();d.setAttribute('data-theme',c);
 	d.setAttribute('data-bs-theme',c==='dark'||(c==='system'&&q&&q.matches)?'dark':'light');}
 	a();if(q&&q.addEventListener){q.addEventListener('change',a);}
-	window.ecTheme={get:g,set:function(t){m=t==='light'||t==='dark'?t:null;try{if(t==='light'||t==='dark'){localStorage.setItem(k,t);}else{localStorage.removeItem(k);}}catch(e){}a();}};})();</script>
+	window.ecTheme={get:g,set:function(t){m=t==='light'||t==='dark'?t:null;try{if(t==='light'||t==='dark'){localStorage.setItem('lpn_theme',t);}else{localStorage.removeItem('lpn_theme');}}catch(e){}a();}};})();</script>
 <?php endif; ?>
 	<title><?=$calc_name ? $safe_name . ' — ' . $html_title : $html_title?></title>
 <?php
