@@ -265,7 +265,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/batch-1016 (`c8cdcae8`) — adds no English strings
+### chore/batch-1016 (`d1c51dca`) — adds no English strings
 
 ### chore/ledger-wording (`37092cd7`) — adds no English strings
 
@@ -819,7 +819,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
 
-### feat/override-wording (`c72f83eb`) — 162 new, 162 to read @@ NEEDS RULING
+### feat/override-wording (`7b26971f`) — 162 new, 162 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -1227,10 +1227,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > List overrides
   @@ NEEDS RULING
 - **`lpn_sm_list_overrides_none`**
-  > This scenario has no overrides of its own.
+  > This scenario has no overrides.
   @@ NEEDS RULING
 - **`lpn_sm_list_overrides_tip`**
-  > List the overrides the selected scenario holds itself, by category, each with the value it replaces. Inherited values are not listed.
+  > List the scenario's overrides by category, each with the inherited value it overrides.
   @@ NEEDS RULING
 - **`lpn_sm_make_current`**
   > Make current

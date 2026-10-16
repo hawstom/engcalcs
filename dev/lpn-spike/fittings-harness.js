@@ -364,7 +364,7 @@ head('7. THE EXPORT ALERT: ONE MESSAGE PER KIND, AND SILENCE WHERE NEITHER HAPPE
 	clearDialog();
 	L.showInpExportFlattening(out.differences, 'net.inp');
 	let said = dialogText();
-	check(/2 pipes here refer to 1 pipe types/.test(said),
+	check(/Pipes \(2\) here refer to pipe types \(1\)/.test(said),
 		`the alert states both counts: ${JSON.stringify(said)}`);
 	// **ASSERT THE STRING THE PAGE ACTUALLY USES, NEVER A COPY OF ITS WORDS.** This line pinned the
 	// literal phrase "none of them changed" and broke the day Tom reworded the key (2026-09-08),
