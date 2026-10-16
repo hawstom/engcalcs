@@ -74,6 +74,7 @@ EngCalcs.pageConfig = {
 	mhp_vel_low_short: <?=json_encode($ec_lang['mhp_vel_low_short'])?>,
 	mtc_pi_ok: <?=json_encode($ec_lang['mtc_pi_ok'])?>,
 	mtc_pi_ok_tip: <?=json_encode($ec_lang['mtc_pi_ok_tip'])?>,
+	mtc_not_applicable: <?=json_encode($ec_lang['mtc_not_applicable'])?>,
 	mtc_pi_out_of_range: <?=json_encode($ec_lang['mtc_pi_out_of_range'])?>,
 	mtc_pi_tip: <?=json_encode($ec_lang['mtc_pi_tip'])?>,
 	mpf_solver_enter_positive_q: <?=json_encode($ec_lang['mpf_solver_enter_positive_q'])?>,

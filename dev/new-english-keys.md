@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**9 still to read on master**, of 14 untranslated keys, of 2638 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**10 still to read on master**, of 15 untranslated keys, of 2639 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -244,11 +244,17 @@ never edits a synonym.
   > Fit the selected assets to the map window. Select one or more assets first.
   @@ NEEDS RULING
 
+## mtc_  (1, 1 to read @@ NEEDS RULING)
+
+- **`mtc_not_applicable`**
+  > N/A
+  @@ NEEDS RULING
+
 ---
 
 # Strings waiting on a branch
 
-**496 still to read**, of 499 new keys across 15 unmerged branch(es).
+**496 still to read**, of 499 new keys across 18 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -258,6 +264,8 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### chore/batch-1016 (`c8cdcae8`) — adds no English strings
 
 ### chore/ledger-wording (`37092cd7`) — adds no English strings
 
@@ -750,7 +758,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Drag to resize
   @@ NEEDS RULING
 
-### feat/description-lines (`67d089c4`) — adds no English strings
+### feat/description-lines (`895d34b7`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -1300,9 +1308,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > Drag to resize
   @@ NEEDS RULING
 
-### feat/plural (`947ad672`) — adds no English strings
+### feat/plural (`daa905a8`) — adds no English strings
 
-### fix/text-edit-phone (`c72f83eb`) — 162 new, 162 to read @@ NEEDS RULING
+### fix/mtc-vertical-sides (`09836047`) — adds no English strings
+
+### fix/text-edit-phone (`e3ab83b8`) — 162 new, 162 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -1790,3 +1800,5 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_tsb_resize`**
   > Drag to resize
   @@ NEEDS RULING
+
+### fix/wording-1016 (`c8cdcae8`) — adds no English strings
