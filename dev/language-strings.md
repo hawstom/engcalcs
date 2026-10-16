@@ -386,10 +386,12 @@ parenthetical cannot.
 from the glossary? If yes, keep both — the pointer *accompanies* the synonyms. If the entry was only
 `X (Y)` where Y is the concept gloss, the pointer alone is better.
 
-**A pointer buys efficiency with a DEPENDENCY.** A glossary term reaches an agent only if the key's
-prefix is wired in `prefixToTermNames()`. **`php dev/scripts/gloss_ref_check.php` must exit 0 before
-any sprint** — it verifies every `gloss:` names a real term AND that the term is wired to that key's
-prefix.
+**A pointer buys efficiency with a DEPENDENCY: the term must exist.** The payload generator sends
+every glossary term a batch key cites (by `gloss:` or `key_concepts.json`), plus every term whose
+English appears in a batch string; a sense-qualified term ("run (a simulation)") is matched by its
+bare word only in strings whose prefix wires it in `prefixToTermNames()`. **`php
+dev/scripts/gloss_ref_check.php` must exit 0 before any sprint** — it verifies every `gloss:` names
+a real term.
 
 **Positive guidance beats negative guidance.** An `avoid` list tells a translator which ditch to
 miss, not where the road is. Reach for `avoid` only for a genuine polysemy trap (financial "default",
@@ -434,8 +436,12 @@ The `avoid` arrays are the single source of truth for the trap-term watchlist
 ### `$ec_lang_syn` format: `<synonyms> | <commentary>`
 
 Split on the first pipe. **Left:** the synonyms — the translatable payload, every phrase passing the
-substitution test. May freely contain parentheses. **Right:** production/layout notes, not
-translated; the payload generator strips it. No pipe means the whole string is synonyms.
+substitution test. May freely contain parentheses; the payload sends it as `key_syn`. **Right:**
+instructions to the translator, never translated into the file. The payload sends them as
+`key_notes`, each tag rendered as its full instruction from the table below (read from this table
+by `generate_translation_payloads.php`, so edit the wording here); free prose goes as a "Note:"; a
+`gloss:` adds no note, because its term arrives in `key_concepts` and `glossary`. No pipe means the
+whole string is synonyms.
 
 **Never put commentary in bare parentheses on the left** — parentheses are reserved for synonyms and
 are ambiguous with real content (e.g. `(as in HEC-RAS)`).

@@ -86,8 +86,8 @@ The payload carries `concept_source`, the fenced block under "Concepts are the s
 definition, a `key_concepts` entry: the id, the definition, the English rendering, the preferred
 translation and any `avoid` list. The definition is the source; the English string is one rendering
 of it. A key whose concepts all have empty definitions gets no entry, so its payload is exactly what
-it was before. `prompt_context_by_prefix` also prints each defined term's definition as a `MEANS:`
-line, and `glossary_terms_by_prefix` carries `concept` and `definition`.
+it was before. The payload's `glossary` text also prints each term the batch uses with its
+definition as a `MEANS:` line.
 
 ## How a sprint uses it
 
