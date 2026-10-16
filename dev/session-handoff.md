@@ -132,7 +132,11 @@ If a branch's `git log` shows no commit after 10-15 22:00, that agent's work was
 
 - Independent review of how a clarification reaches a translator (halo read as "hello"; "translating
   too often?"): `dev/translation-clarification-review.md`. Its halo glossary wording, its sprint cadence
-  (once before each production pull) and its tooling fix (send the notes already written) await him.
+  (once before each production pull) await him. Its tooling fix landed 10-16: the packet now sends
+  the syn notes, reworded keys (no resync list), tip pairs, and only the glossary terms a batch uses.
+  He forbids translating without his approval.
+- **Retire the two freezes and the empty deploy-blocker list** (and branch_gate.php with them)? Asked
+  10-16; neither freeze has been on since 09-17, no blocker has ever been written.
 
 ### Questions out to him
 
