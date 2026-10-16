@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**153 still to read on master**, of 166 untranslated keys, of 2788 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**157 still to read on master**, of 170 untranslated keys, of 2792 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -198,7 +198,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (166, 153 to read @@ NEEDS RULING)
+## lpn_  (170, 157 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -211,6 +211,12 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_change_type_line_alternative`**
   > {id}: {property} {value}, in alternative {alternative}
+  @@ NEEDS RULING
+- **`lpn_clean_map`**
+  > Clean map
+  @@ NEEDS RULING
+- **`lpn_clean_map_tip`**
+  > Checked: the map shows only the drawing. The zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.
   @@ NEEDS RULING
 - **`lpn_control_inactive_note`**
   > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
@@ -379,6 +385,12 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_settings_held_in`**
   > Override in {scenario}.
+  @@ NEEDS RULING
+- **`lpn_settings_override_marks`**
+  > Show override markers on the map
+  @@ NEEDS RULING
+- **`lpn_settings_override_marks_tip`**
+  > Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.
   @@ NEEDS RULING
 - **`lpn_settings_restore_base_only`**
   > Switch to Base to restore the defaults.
@@ -720,9 +732,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/balloon-presentation (`2789c6641`) — adds no English strings
 
-### feat/bentley-interop (`2789c6641`) — adds no English strings
+### feat/bentley-interop (`51a0b3d52`) — adds no English strings
 
-### feat/clean-map (`efdda99d8`) — adds no English strings
+### feat/clean-map (`43e46b24e`) — adds no English strings
 
 ### feat/description-lines (`895d34b7b`) — adds no English strings
 

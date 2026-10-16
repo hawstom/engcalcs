@@ -351,7 +351,7 @@ const MUTATIONS = [
 	['Morph in Base is not made in place', (src) => src.replace(
 		"\t\tchangeSelectedTypeIn(to);\n\t}", "\t\tmorphInScenario(to);\n\t}")],
 	['a link whose end is inactive is drawn active', (src) => src.replace(
-		"off = !linkLive(el); ov = hasDisplayedOverride(el);", "off = !isActive(el); ov = hasDisplayedOverride(el);")],
+		"off = !linkLive(el); ov = overrideMarksShown()", "off = !isActive(el); ov = overrideMarksShown()")],
 	['the solve keeps a link whose end is inactive', (src) => src.replace(
 		"\t\tvar links = doc.links.filter(function (l) {\n\t\t\treturn isActive(l) && live[l.from] && live[l.to];",
 		"\t\tvar links = doc.links.filter(function (l) {\n\t\t\treturn isActive(l);")],

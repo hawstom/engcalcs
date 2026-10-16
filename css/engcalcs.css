@@ -4224,6 +4224,23 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    an ordinary save confirmation. */
 .lpn-msglog-btn.lpn-msglog-active { background: var(--ec-hue-05a); border-color: var(--ec-hue-05a); color: var(--ec-bg); }
 .lpn-msglog-btn.lpn-msglog-active:hover, .lpn-msglog-btn.lpn-msglog-active:focus { color: var(--ec-bg); border-color: var(--ec-hue-037); }
+/* ---- CLEAN MAP (Task 805; Tom, 2026-10-15, R-396), Map menu, setCleanMap() ----
+   THE ONE LIST of what Clean map hides: the controls and transient marks floating over the drawing.
+   display:none, not opacity, so a hidden control can be neither seen nor reached by Tab. !important
+   because several of these carry an inline display the page sets (the teaser, the notice), and
+   that inline value is left alone so turning Clean map off restores it exactly. NOT here, on
+   purpose: #lpn_status (the standing error stays visible), the readouts in the bottom strip and the
+   mode line (Tom retired hiding readouts, 2026-09-22), the basemap credit (required attribution),
+   the offscreen notice and the empty-map examples (the way back to a drawing), the placement bars
+   (a tool in progress), and the toolbar, which holds the Map menu and the way out. The override
+   rings are not CSS: overrideMarksShown() keeps their classes off. */
+.lpn-map-wrap.lpn-clean-map #lpn_zoom_control,
+.lpn-map-wrap.lpn-clean-map #lpn_map_notice,
+.lpn-map-wrap.lpn-clean-map #lpn_msglog_btn,
+.lpn-map-wrap.lpn-clean-map #lpn_msglog_panel,
+.lpn-map-wrap.lpn-clean-map #lpn_area_hint,
+.lpn-map-wrap.lpn-clean-map #lpn_basemap_teaser,
+.lpn-map-wrap.lpn-clean-map #lpn_wrong_btn { display: none !important; }
 /* The list inside the dialog. Capped and scrolled rather than allowed to push the buttons off a
    short window: the modal is positioned at 20% from the top, so an unbounded list on a laptop
    takes the Close button with it. */
