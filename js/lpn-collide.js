@@ -46,7 +46,7 @@ EngCalcs.lpnCollide = (function () {
 	//
 	// The numbers are the RANKS in dev/label-placement-goals.md §1 and nothing else -- read the
 	// order off the key names. Goals 1 and 7 are absent on purpose: goal 1 (a dragged label's stored
-	// endpoint) is a candidate GENERATOR, and goal 7 (leaders avoid orthogonality) is satisfied by
+	// endpoint) is its ONLY candidate, and goal 7 (leaders avoid orthogonality) is satisfied by
 	// the angles the generator uses, so an orthogonal placement is never proposed rather than
 	// proposed and then penalised. Goal 9 (leave padding for later) and goal 11 (seek the direction
 	// of least congestion) are the neighbourhood term, not a penalty -- see effectiveScores().
@@ -304,42 +304,18 @@ EngCalcs.lpnCollide = (function () {
 		});
 		return out;
 	}
-	// A DRAGGED LABEL'S CANDIDATES LIE ON A RAY, NOT ON A RING (goal 1). The user placed the
-	// endpoint, so every candidate passes through it or is further out along the same line: *"They
-	// can be stretched longer at the same angle."* The stored endpoint is first, and the distance
-	// term keeps it there unless something is genuinely in the way -- so a dragged label that is
-	// clear of everything does not move at all.
-	//
-	// **THE STRETCH IS MEASURED ON AT MOST `reach` OF THE LEADER, NEVER ON ALL OF IT** (Tom,
-	// 2026-09-25: *"labels being dragged jump double distance (twice as far at the cursor
-	// location) at unpredictable locations"*). Multiplying the whole leader made the push grow with
-	// the drag: a label pulled 300 px out went 660 px out the moment its endpoint touched anything,
-	// and Zoom to fit then made room for a push that was gone at the scale it chose. A leader
-	// shorter than `reach` stretches exactly as before; a longer one moves by the same few label
-	// heights. dev/lpn-spike/label-drag-fit-harness.js.
-	var RAY_STRETCH = [1, 1.3, 1.7, 2.2];
-	function rayCandidates(anchor, home, reach) {
-		var dx = home.x - anchor.x, dy = home.y - anchor.y, out = [], i, len, k;
-		if (!dx && !dy) { return [{ x: home.x, y: home.y, neighbours: [] }]; }
-		len = Math.hypot(dx, dy);
-		k = (reach > 0 && reach < len) ? reach / len : 1;
-		for (i = 0; i < RAY_STRETCH.length; i++) {
-			out.push({
-				x: anchor.x + dx * (1 + (RAY_STRETCH[i] - 1) * k), y: anchor.y + dy * (1 + (RAY_STRETCH[i] - 1) * k),
-				neighbours: i === 0 ? [1] : (i === RAY_STRETCH.length - 1 ? [i - 1] : [i - 1, i + 1])
-			});
-		}
-		return out;
-	}
 	// Every candidate a label will be scored at. `home` -- where it sits now -- is always in the set
 	// so that "leave it alone" is a placement the pass can choose rather than a case it has to
 	// special-case, and it carries the ring's two nearest directions as its neighbours.
 	function candidatesFor(lbl, inner, outer, steps) {
 		var cands, i, best = [0, 1], bestD = [Infinity, Infinity], d;
-		// **THE LABEL UNDER THE HAND STAYS UNDER THE HAND.** While it is being dragged its only
-		// candidate is the endpoint the pointer gives it; everything else moves round it.
-		if (lbl.dragged && lbl.held) { return [{ x: lbl.home.x, y: lbl.home.y, neighbours: [] }]; }
-		if (lbl.dragged) { return rayCandidates(lbl.anchor, lbl.home, inner); }
+		// **A DRAGGED LABEL HAS ONE CANDIDATE: WHERE THE USER PUT IT** (goal 1; Task 807, Tom
+		// 2026-10-15: *"Let's try leaving exactly in place the leader locations set by the user. I
+		// think that our stretching them is frustrating to them. If they want to give us control,
+		// they will reset the leader."*). It used to be stretched along its own leader when anything
+		// touched it; now it is fixed, is committed as an obstacle, and everything else moves round
+		// it -- in the hand and after. dev/lpn-spike/label-leader-keep-harness.js.
+		if (lbl.dragged) { return [{ x: lbl.home.x, y: lbl.home.y, neighbours: [] }]; }
 		cands = ringCandidates(lbl.anchor, inner, outer, steps);
 		for (i = 0; i < cands.length; i++) {
 			d = Math.hypot(cands[i].x - lbl.home.x, cands[i].y - lbl.home.y);
@@ -562,8 +538,11 @@ EngCalcs.lpnCollide = (function () {
 	// Tom: *"we only have to check for violation on the nearest side. We have no reason to check the
 	// other side because we will never use it."* The hysteresis now applies only while a user drags
 	// a label, so the far side is genuinely unreachable here and there is nothing to model.
+	// A label the user moved says which side its text hangs on (`side`, the page's hysteresis rule,
+	// Task 807); every other label hangs on the nearest side.
+	function hangsRight(lbl, c) { return lbl.side ? lbl.side === 'right' : c.x >= lbl.anchor.x; }
 	function labelBoxAtEnd(lbl, c) {
-		var left = c.x >= lbl.anchor.x ? c.x : c.x - lbl.w;
+		var left = hangsRight(lbl, c) ? c.x : c.x - lbl.w;
 		return box(left + lbl.w / 2, c.y + lbl.yOff + lbl.h / 2, lbl.w, lbl.h, 0, 'label', lbl.id);
 	}
 	// **ONE BOX PER LINE, NOT ONE BOX FOR THE STACK** (ROADMAP Task 406).
@@ -584,7 +563,7 @@ EngCalcs.lpnCollide = (function () {
 	// nearly invisible on screen.
 	function labelLineBoxes(lbl, c) {
 		var whole = labelBoxAtEnd(lbl, c), n = lbl.lines && lbl.lines.length,
-			toRight = c.x >= lbl.anchor.x, top = whole.cy - lbl.h / 2, lh, out = [], i, w, left;
+			toRight = hangsRight(lbl, c), top = whole.cy - lbl.h / 2, lh, out = [], i, w, left;
 		if (!n || n < 2) { return [whole]; }
 		lh = lbl.h / n;
 		for (i = 0; i < n; i++) {
@@ -1985,7 +1964,7 @@ EngCalcs.lpnCollide = (function () {
 	// covered are off the map before this pass starts and may not be half of a crossing. `covers`
 	// marks the entries that can hide a yielder (the node placements, which is what
 	// stationedYieldSet() reads); `yields` marks the ones that can be hidden by them. Unlike the
-	// repair one pass down, this does NOT have to re-ask it as it goes -- see coveredNow(), where a
+	// repair one pass down, this does NOT have to re-ask it as it goes -- see the reservation note in the body, where a
 	// hidden label keeps its reservation and the reason that is not thrift.
 	//
 	// Entries are `{id, boxes, leader, hideable, rank, yields, covers}`. Terminates because every
@@ -1994,30 +1973,28 @@ EngCalcs.lpnCollide = (function () {
 		opts = opts || {};
 		var live = (entries || []).slice(),
 			maxRounds = opts.maxRounds > 0 ? opts.maxRounds : live.length + 1,
-			hidden = {}, order = [], residual = [], before = 0, after = 0, rounds = 0, r;
-		function coveredNow(e) {
-			var j, o;
+			hidden = {}, order = [], residual = [], before = 0, after = 0, rounds = 0,
+			covered = [], drawn = [], pairs, deg = {}, i, j, o, e;
+		// **A HIDDEN LABEL KEEPS ITS RESERVATION, which reads backwards and is what makes this
+		// stable.** The label is not drawn, but the ground it stands on is still its own, so a
+		// yielding label under it does NOT come back when it goes. Releasing it instead was measured
+		// on Net3-World and produced a two-cycle -- five passes over an untouched drawing hid
+		// {185,199}, {184,205}, {185,199}, {184,205}, {185,199}, which on screen is a pair of labels
+		// blinking on a map nobody touched. It is the same ruling yieldStationedLabels() already
+		// makes for the same reason, and it keeps the coverage answer FIXED for the whole run --
+		// which is why it is asked once, here, and not once a round (Task 681).
+		for (i = 0; i < live.length; i++) {
+			e = live[i];
+			covered[i] = false;
+			if (!e.yields) { continue; }
 			for (j = 0; j < live.length; j++) {
 				o = live[j];
-				// **A HIDDEN LABEL KEEPS ITS RESERVATION, which reads backwards and is what makes
-				// this stable.** The label is not drawn, but the ground it stands on is still its
-				// own, so a yielding label under it does NOT come back when it goes. Releasing it
-				// instead was measured on Net3-World and produced a two-cycle -- five passes over an
-				// untouched drawing hid {185,199}, {184,205}, {185,199}, {184,205}, {185,199}, which
-				// on screen is a pair of labels blinking on a map nobody touched. It is the same
-				// ruling yieldStationedLabels() already makes for the same reason, and it also
-				// keeps the shed's coverage answer fixed for the whole run rather than per round.
 				if (o === e || !o.covers) { continue; }
 				if (labelsApart(o, e)) { continue; }
-				if (anyBoxOverlapAny(o.boxes, e.boxes)) { return true; }
+				if (anyBoxOverlapAny(o.boxes, e.boxes)) { covered[i] = true; break; }
 			}
-			return false;
 		}
-		function drawnNow() {
-			return live.filter(function (e) {
-				return !hidden[e.id] && (!e.yields || !coveredNow(e));
-			});
-		}
+		for (i = 0; i < live.length; i++) { if (!covered[i]) { drawn.push(live[i]); } }
 		function leaderLen(e) {
 			return e.leader ? Math.hypot(e.leader.bx - e.leader.ax, e.leader.by - e.leader.ay) : 0;
 		}
@@ -2027,27 +2004,43 @@ EngCalcs.lpnCollide = (function () {
 			if (a.len !== b.len) { return a.len > b.len; }
 			return a.id > b.id;
 		}
+		// **THE CROSSINGS ARE COUNTED ONCE, AND EACH ROUND ONLY TAKES AWAY** (Task 681). Whether two
+		// labels cross is a fact about those two alone, so hiding one removes exactly the pairs it
+		// is in and changes no other: the pair list labelCrossings() would give for the smaller
+		// drawn set is this one with the victim's pairs filtered out, in the same order. Counting
+		// the drawing afresh every round was 480 ms of a 600-junction switch for that same list.
+		pairs = labelCrossings(drawn).pairs;
+		pairs.forEach(function (p) {
+			deg[p[0]] = (deg[p[0]] || 0) + 1;
+			deg[p[1]] = (deg[p[1]] || 0) + 1;
+		});
 		for (rounds = 0; rounds <= maxRounds; rounds++) {
-			var drawn = drawnNow(), deg = {}, pool, victim;
-			r = labelCrossings(drawn);
-			if (rounds === 0) { before = r.counts.pairs; }
-			after = r.counts.pairs;
-			residual = r.pairs;
-			if (!r.pairs.length) { break; }
-			r.pairs.forEach(function (p) {
-				deg[p[0]] = (deg[p[0]] || 0) + 1;
-				deg[p[1]] = (deg[p[1]] || 0) + 1;
-			});
-			pool = drawn.filter(function (e) { return e.hideable && deg[e.id]; });
+			var victim = null, vid;
+			if (rounds === 0) { before = pairs.length; }
+			after = pairs.length;
+			residual = pairs;
+			if (!pairs.length) { break; }
+			// The pool, in drawn order: every drawn label that may be hidden and is in a pair. The
+			// first is the starting victim and a later one replaces it only when strictly worse,
+			// exactly as a filtered pool scanned from its head.
+			for (i = 0; i < drawn.length; i++) {
+				e = drawn[i];
+				if (hidden[e.id] || !e.hideable || !deg[e.id]) { continue; }
+				e.deg = deg[e.id]; e.len = leaderLen(e);
+				if (!victim || worse(e, victim)) { victim = e; }
+			}
 			// **EVERY REMAINING PAIR IS THE USER'S OWN, so it stands and is REPORTED.** This is the
 			// one exit that does not reach zero and it is the correct one: two hand-placed labels
 			// crossing is a drawing somebody made on purpose.
-			if (!pool.length) { break; }
-			pool.forEach(function (e) { e.deg = deg[e.id]; e.len = leaderLen(e); });
-			victim = pool[0];
-			pool.forEach(function (e) { if (worse(e, victim)) { victim = e; } });
-			hidden[victim.id] = true;
-			order.push(victim.id);
+			if (!victim) { break; }
+			vid = victim.id;
+			hidden[vid] = true;
+			order.push(vid);
+			pairs = pairs.filter(function (p) {
+				if (p[0] !== vid && p[1] !== vid) { return true; }
+				deg[p[0]]--; deg[p[1]]--;
+				return false;
+			});
 		}
 		return { hidden: order, hiddenSet: hidden, residual: residual, rounds: rounds,
 			before: before, after: after };
@@ -2069,7 +2062,6 @@ EngCalcs.lpnCollide = (function () {
 		boxesClearOf: boxesClearOf,
 		labelLineBoxes: labelLineBoxes,
 		RING_ANGLES: RING_ANGLES,
-		RAY_STRETCH: RAY_STRETCH,
 		box: box,
 		segment: segment,
 		boxFromRect: boxFromRect,

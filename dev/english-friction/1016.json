@@ -1,0 +1,15 @@
+{
+    "sprint": "1016",
+    "description": "Wave 0 adversarial English pass over the 10 keys wave0_keyset.php --new-and-changed leaves for review (49 new or changed; 39 already ruled by Tom on their exact English: the mode prompts, the Task 808 strings and 27 count strings in the \"cells (n)\" form). Each string was asked for every plausible reading. One entry filed; the other nine read one way only.",
+    "entries": [
+        {
+            "key": "mtc_not_applicable",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"N/A\" is read as \"not available\" as often as \"not applicable\"; a translator may render the wrong abbreviation.",
+            "readings": ["not applicable (the quantity has no meaning here)", "not available (the value is missing)"],
+            "disposition": "dismissed",
+            "resolution": "The key name says not_applicable and the payload carries it; it fills a results cell for side-slope rock size on a vertical wall, where the quantity has no meaning. Translators use their language's short form of \"not applicable\"."
+        }
+    ]
+}
