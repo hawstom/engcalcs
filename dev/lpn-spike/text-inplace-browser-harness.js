@@ -15,7 +15,10 @@
 //   8. empty words delete the Text, as one Undo step, from the editor and from Properties;
 //   9. a window resize that moves the words commits the editor;
 //  10. on a touch phone, the on-screen keyboard opening (the window shortens, the map with it) keeps
-//      the editor open and moves it with the words (R-392), and closing it again does the same.
+//      the editor open and moves it with the words (R-392), and closing it again does the same;
+//      so do the visual viewport's own resize and scroll, and the zoom a phone makes onto a small
+//      field (innerWidth changes, the layout's width does not); and the words box in Properties
+//      keeps its focus and its typing when the keyboard opens under it.
 //
 //   node dev/lpn-spike/text-inplace-browser-harness.js   (takes the browser lock itself)
 'use strict';
@@ -361,8 +364,55 @@ async function main() {
 			pe = await k.editor();
 			pc = await k.textCentre(pid);
 			ok('the keyboard closing leaves it open over the words too', !!pe && Math.abs(pe.cy - pc.y) < 12, JSON.stringify({ editor: pe, words: pc }));
+			// A keyboard that shrinks only the visual viewport (Chrome's default on Android since
+			// 108, and iOS): its resize and scroll, with no window resize at all.
+			await PP.evaluate(() => { visualViewport.dispatchEvent(new Event('resize')); visualViewport.dispatchEvent(new Event('scroll')); });
+			await k.settle(500);
+			pe = await k.editor();
+			ok('the visual viewport resizing under it leaves it open and focused', !!pe && pe.focused && pe.value === 'Keyed', JSON.stringify(pe));
+			// The zoom a phone makes onto a field typed in at a small size: innerWidth reports the
+			// zoomed width, the layout keeps its own.
+			await PP.evaluate(() => {
+				window.__iw = Object.getOwnPropertyDescriptor(window, 'innerWidth');
+				Object.defineProperty(window, 'innerWidth', { configurable: true, get: () => 300 });
+				window.dispatchEvent(new Event('resize'));
+				visualViewport.dispatchEvent(new Event('resize'));
+			});
+			await k.settle(500);
+			pe = await k.editor();
+			await PP.evaluate(() => { Object.defineProperty(window, 'innerWidth', window.__iw); });
+			ok('a zoom onto the field (innerWidth changes, the layout width does not) leaves it open and focused',
+				!!pe && pe.focused && pe.value === 'Keyed', JSON.stringify(pe));
+			await PP.keyboard.type('!');
 			await PP.keyboard.press('Control+Enter');
-			ok('...and what was typed under the keyboard is written', (await k.storedTexts())[0]._text === 'Keyed', JSON.stringify(await k.storedTexts()));
+			ok('...and what was typed under the keyboard is written', (await k.storedTexts())[0]._text === 'Keyed!', JSON.stringify(await k.storedTexts()));
+			// The same keyboard over the words box in Properties.
+			pc = await k.textCentre(pid);
+			await PP.touchscreen.tap(pc.x, pc.y);
+			await k.settle(900);
+			const wb = await PP.evaluate(() => {
+				const t = document.querySelector('#lpn_popup_fields textarea'), p = document.getElementById('lpn_popup');
+				if (!t || p.style.display === 'none') { return null; }
+				const r = t.getBoundingClientRect();
+				return { x: r.x + r.width - 10, y: r.y + 10 };
+			});
+			ok('a tap on the Text opens Properties on the phone', !!wb, JSON.stringify(wb));
+			if (wb) {
+				await PP.touchscreen.tap(wb.x, wb.y);
+				await k.settle(300);
+				await PP.setViewportSize({ width: 412, height: 450 });
+				await PP.evaluate(() => { visualViewport.dispatchEvent(new Event('resize')); });
+				await k.settle(800);
+				await PP.keyboard.press('End');
+				await PP.keyboard.type(' 2');
+				const wst = await PP.evaluate(() => {
+					const t = document.querySelector('#lpn_popup_fields textarea'), p = document.getElementById('lpn_popup');
+					return { open: !!t && p.style.display !== 'none', focused: !!t && t === document.activeElement, value: t && t.value };
+				});
+				ok('...its words box keeps the focus and the typing when the keyboard opens', wst.open && wst.focused && wst.value === 'Keyed! 2', JSON.stringify(wst));
+				await PP.setViewportSize({ width: 412, height: 800 });
+				await k.settle(300);
+			}
 			await ph.close();
 		}
 
