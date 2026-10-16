@@ -5,8 +5,10 @@
 // 'speech bubble' 200px to 400 px ... so that four or six could be arranged on the map. And it would
 // be really cool if that presentation scenario could be saved."*
 //   1. a steady-state project: the row is there and greyed, with its tip, and does nothing;
-//   2. Net3 after its run: the row is enabled; choosing it opens a 300 px bubble holding a chart with
+//   2. Net3 after its run: the row is enabled; choosing it opens a 200 px bubble (the smallest) holding a chart with
 //      a line and the `now` mark, and a tail whose tip sits at the asset;
+//      (Tom, 2026-10-16: "Make the time series bubbles/balloons open by default at their smallest size."
+//      A bubble saved at another width keeps it: graph-bubble-scenario-browser-harness.js stores 300.)
 //   3. the header drags it, the corner grip resizes it and holds 200..400 px;
 //   4. six at once, all closable one by one; choosing the same asset again does not double it;
 //   5. a pan and a zoom keep the tail on the asset and the bubble's distance from it;
@@ -160,7 +162,7 @@ async function main() {
 		await openBubble(a, 'node', '10', LBL);
 		let bs = await bubbles(a);
 		ok('one bubble opened', bs.length === 1, JSON.stringify(bs.map((b) => b.title)));
-		ok('300 px wide by default', bs[0] && Math.abs(bs[0].w - 300) <= 2, bs[0] && String(bs[0].w));
+		ok('a new bubble opens at the smallest size, 200 px (miniatures)', bs[0] && Math.abs(bs[0].w - 200) <= 2, bs[0] && String(bs[0].w));
 		ok('it is titled with the asset and its quantity (pressure for a junction)', bs[0] && /10/.test(bs[0].title) && /ressure/.test(bs[0].title), bs[0] && bs[0].title);
 		ok('it holds a line and the now mark', bs[0] && bs[0].lines >= 1 && bs[0].now === 1, bs[0] && JSON.stringify([bs[0].lines, bs[0].now]));
 		let tp = await tips(a), pt = await pointOf(a.page, 'node', '10');
@@ -195,7 +197,9 @@ async function main() {
 
 		// ---- 4. six at once ----
 		console.log('4. six at once');
-		for (const id of ['15', '20', '35', '40', '50', '60', '101', '103', '105', '107', '109', '111', '113']) {
+		// Every node on the map, in turn: a smaller bubble covers a different set of assets.
+		const allNodeIds = await a.page.evaluate(() => Array.from(new Set(Array.from(document.querySelectorAll('#lpn_canvas [data-node]')).map((e) => e.getAttribute('data-node')))));
+		for (const id of allNodeIds) {
 			if ((await bubbles(a)).length >= 6) { break; }
 			await openBubble(a, 'node', id, LBL);
 		}
@@ -365,7 +369,7 @@ async function main() {
 		await pa.waitFor(() => pa.page.evaluate(() => EngCalcs.lpnTimeRunState().frames > 1), 'EPS frames', 120000);
 		await pa.settle(800);
 		const nodeIds = await pa.page.evaluate(() => Array.from(new Set(Array.from(document.querySelectorAll('#lpn_canvas [data-node]')).map((e) => e.getAttribute('data-node')))));
-		for (const id of nodeIds) { if ((await bubbles(pa)).length) { break; } await openBubble(pa, 'node', id, LBL).catch(() => {}); }
+		for (const id of allNodeIds) { if ((await bubbles(pa)).length) { break; } await openBubble(pa, 'node', id, LBL).catch(() => {}); }
 		const pb = await bubbles(pa);
 		ok('a bubble opens on the phone', pb.length === 1, String(pb.length));
 		const sw = await pa.page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: window.innerWidth }));

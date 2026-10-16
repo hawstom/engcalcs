@@ -36688,7 +36688,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **THE OFFSET IS IN PIXELS, NOT WORLD UNITS**, so a zoom keeps the bubble's size and its distance
 	// from the asset and moves only the asset under the tail. The tail is recomputed on every pan, zoom,
 	// resize and scroll (setTransform() is the one seam), coalesced to one frame.
-	var TSB_MIN_W = 200, TSB_MAX_W = 400, TSB_DEF_W = 300, TSB_HEAD_PX = 24, TSB_MAX = 12,
+	// A new bubble opens at the smallest size (Tom, 2026-10-16: "I love miniatures."); a saved one keeps its width.
+	var TSB_MIN_W = 200, TSB_MAX_W = 400, TSB_DEF_W = TSB_MIN_W, TSB_HEAD_PX = 24, TSB_MAX = 12,
 		TSB_TAIL_HALF = 9, TSB_GAP = 28, TSB_PAD = 4;
 	var tsbLayer = null, tsbTails = null, tsbEls = {}, tsbQueued = false, tsbZ = 1;
 	// The set the open scenario stores itself, writable, or null when it inherits one: Base writing the
