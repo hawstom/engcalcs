@@ -5,13 +5,13 @@
 // like most software to allow internal documentation."
 //
 // Tom, 2026-10-16, on how the .inp holds them: "Maybe " \P ", since it's both intuitive, and it's
-// what Autodesk historically used in Dimensions."
+// what Autodesk historically used in Dimensions." Then: "Change it from " \P " to "\P"."
 //
 // EPANET holds one line per description (a trailing `;comment`; a pattern's or curve's one comment
 // line above its rows) and has no continuation syntax. The rule under test: the WHOLE description
-// goes in that one place, each line break written as " \P ". Asserted here: a multi-line description
-// of every kind survives export and re-import, a blank paragraph line is two markers, a bare "\P"
-// reads as a break too, a backslash-P the person typed survives as typed, a single-line description
+// goes in that one place, each line break written as "\P", no spaces. Asserted here: a multi-line description
+// of every kind survives export and re-import, a blank paragraph line is two markers, " \P " (the
+// earlier build's spelling) reads as a break too and an unedited one goes back out as it came, a backslash-P the person typed survives as typed, a single-line description
 // is written exactly as it always was, a file in the early `;|` layout still reads and goes back out
 // as one line, and nothing is silently dropped.
 
@@ -75,14 +75,17 @@ console.log('1. lpnDescText keeps lines and paragraphs');
 	ok('trailing blanks per line and blank lines at the ends go', d('\n A  \nB \n\n') === 'A\nB');
 	ok('first line / one line helpers', EngCalcs.lpnDescFirstLine('A\nB') === 'A' && EngCalcs.lpnDescOneLine('A\n\nB') === 'A B');
 	const I = EngCalcs.lpnDescInline, F = (s) => EngCalcs.lpnDescText(EngCalcs.lpnDescFromInline(s));
-	ok('inline: a line break is " \\P ", a blank line two markers', I('A\nB\n\nC') === 'A \\P B \\P  \\P C', J(I('A\nB\n\nC')));
+	ok('inline: a line break is "\\P", a blank line two markers', I('A\nB\n\nC') === 'A\\PB\\P\\PC', J(I('A\nB\n\nC')));
+	ok('inline: an indent after a line break is the next line\'s own', I('A\n  two') === 'A\\P  two', J(I('A\n  two')));
+	ok('inline: a line ending in a backslash keeps a space before the marker', I('end\\\nx') === 'end\\ \\Px' && I('end\\\n x') === 'end\\ \\P  x', J([I('end\\\nx'), I('end\\\n x')]));
 	ok('inline: one line is unchanged, a backslash without P too', I('C:\\temp; a') === 'C:\\temp; a');
 	ok('inline: a typed backslash-P gains one backslash', I('C:\\Pumps') === 'C:\\\\Pumps' && I('x\\\\Py') === 'x\\\\\\Py', J(I('C:\\Pumps')));
 	ok('read back: " \\P ", bare "\\P", and a run of markers', F('A \\P B') === 'A\nB' && F('A\\PB') === 'A\nB' && F('A \\P  \\P B') === 'A\n\nB');
-	ok('read back: one space each side belongs to the marker, so an indent survives', F('A \\P   two') === 'A\n  two', J(F('A \\P   two')));
+	ok('read back: the earlier " \\P " takes one space each side, so an indent survives', F('A \\P   two') === 'A\n  two', J(F('A \\P   two')));
+	ok('read back: with no space before the marker, every space after is the line\'s', F('A\\P  two') === 'A\n  two' && F('A\\P\\PB') === 'A\n\nB', J(F('A\\P  two')));
 	ok('read back: "\\\\P" is a typed backslash-P', F('C:\\\\Pumps') === 'C:\\Pumps' && F('x\\\\\\Py') === 'x\\\\Py');
 	ok('read back: text with no \\P is returned as it came', EngCalcs.lpnDescFromInline('  C:\\temp  ') === '  C:\\temp  ');
-	['A\nB', 'A\n\nB', 'C:\\Pumps\nsecond \\P literal', 'A\n  indented', 'tab\there', '\\', 'end\\', 'P\\\\P\\']
+	['A\nB', 'A\n\nB', 'C:\\Pumps\nsecond \\P literal', 'A\n  indented', 'tab\there', '\\', 'end\\', 'P\\\\P\\', 'end\\\nx', 'end\\\n  x', 'a\\\n\\Pb', 'x \\P y\n z']
 		.forEach((t) => ok('round trip ' + J(t), F(I(t)) === EngCalcs.lpnDescText(t), J(I(t)) + ' -> ' + J(F(I(t)))));
 	ok('DXF carries a newline as the caret escape ^J, not a raw line break', EngCalcs.lpnDxfString('A\nB') === 'A^JB', EngCalcs.lpnDxfString('A\nB'));
 }
@@ -128,14 +131,14 @@ ok('nothing about the ;| lines is reported lost', !(a.parsed.dropped || []).some
 const out = EngCalcs.lpnExportInp(a.doc);
 ok('it exports', out.ok === true, J(out.error));
 const Jn = lines(out.inp, 'JUNCTIONS').filter(Boolean);
-ok('J2 is written whole on its row, " \\P " for each line break',
-	Jn.some((l) => /^\s*J2\s/.test(l) && l.endsWith('\t;First line \\P Second line \\P  \\P Third paragraph')), J(Jn));
+ok('J2 is written whole on its row, "\\P" for each line break',
+	Jn.some((l) => /^\s*J2\s/.test(l) && l.endsWith('\t;First line\\PSecond line\\P\\PThird paragraph')), J(Jn));
 ok('no ;| line is written anywhere', !out.inp.split(/\r?\n/).some((l) => /^\s*;\|/.test(l)));
 ok('J1 single line written exactly as before', Jn.some((l) => /^\s*J1\s+100(\.0+)?\s+.*\t;Corner of Elm and Main$/.test(l) || /\t;Corner of Elm and Main$/.test(l)), J(Jn));
 ok('the pattern writes one comment line above its rows',
-	J(lines(out.inp, 'PATTERNS').filter(Boolean).slice(0, 2).map((l) => l.replace(/\s+/g, ' '))) === J([';Morning peak \\P second line of it', ' PA 1 2 3']), J(lines(out.inp, 'PATTERNS')));
-ok('the curve writes one type line above its rows', (() => { const c = lines(out.inp, 'CURVES').filter(Boolean); return c[0] === ';PUMP: Pump 10 \\P rated 2019' && /^\s*C1\s/.test(c[1]); })(), J(lines(out.inp, 'CURVES')));
-ok('the control writes one line above it', (() => { const c = lines(out.inp, 'CONTROLS').filter(Boolean); return c[0] === ';Fill the tank \\P and no more' && /^LINK P1/.test(c[1]); })(), J(lines(out.inp, 'CONTROLS')));
+	J(lines(out.inp, 'PATTERNS').filter(Boolean).slice(0, 2).map((l) => l.replace(/\s+/g, ' '))) === J([';Morning peak\\Psecond line of it', ' PA 1 2 3']), J(lines(out.inp, 'PATTERNS')));
+ok('the curve writes one type line above its rows', (() => { const c = lines(out.inp, 'CURVES').filter(Boolean); return c[0] === ';PUMP: Pump 10\\Prated 2019' && /^\s*C1\s/.test(c[1]); })(), J(lines(out.inp, 'CURVES')));
+ok('the control writes one line above it', (() => { const c = lines(out.inp, 'CONTROLS').filter(Boolean); return c[0] === ';Fill the tank\\Pand no more' && /^LINK P1/.test(c[1]); })(), J(lines(out.inp, 'CONTROLS')));
 const b = importText(out.inp, 'lines.inp');
 const dump = (d) => J({ n: d.nodes.map((x) => [x.id, x.desc]), l: d.links.map((x) => [x.id, x.desc]),
 	p: d.patterns.map((x) => [x.id, x.note]), c: d.curves.map((x) => [x.id, x.note]), k: d.controls.map((x) => x.note) });
@@ -148,7 +151,7 @@ ok('no text of any description is lost: every source line is in the export',
 
 // ---- 2b. EPANET ITSELF SEES THE WHOLE TEXT EVERYWHERE -------------------------------------------
 // Runs the vendored epanet-js engine on the export and reads each comment back through its own
-// getComment: the one comment slot holds the whole description, " \P " and all.
+// getComment: the one comment slot holds the whole description, "\P" and all.
 console.log('\n2b. The vendored EPANET engine reads every description whole');
 const done2b = (async () => {
 	const mod = await import(require('url').pathToFileURL(ROOT + 'js/vendor/epanet-js.js').href);
@@ -159,19 +162,19 @@ const done2b = (async () => {
 	const T = mod.ObjectType, idx = (t, id) => ({ [T.Node]: () => p.getNodeIndex(id), [T.Link]: () => p.getLinkIndex(id),
 		[T.TimePat]: () => p.getPatternIndex(id), [T.Curve]: () => p.getCurveIndex(id) })[t]();
 	const c = (t, id) => p.getComment(t, idx(t, id));
-	ok('junction J2 (three lines)', c(T.Node, 'J2') === 'First line \\P Second line \\P  \\P Third paragraph', J(c(T.Node, 'J2')));
+	ok('junction J2 (three lines)', c(T.Node, 'J2') === 'First line\\PSecond line\\P\\PThird paragraph', J(c(T.Node, 'J2')));
 	ok('junction J1 (one line)', c(T.Node, 'J1') === 'Corner of Elm and Main');
 	ok('junction J3 (none) is not handed a stray line', c(T.Node, 'J3') === '', J(c(T.Node, 'J3')));
-	ok('reservoir R1', c(T.Node, 'R1') === 'Plant \\P discharge, 24 in', J(c(T.Node, 'R1')));
-	ok('tank T1', c(T.Node, 'T1') === 'Standpipe \\P north hill');
-	ok('pipe P1', c(T.Link, 'P1') === '1962 main \\P replaced 2019', J(c(T.Link, 'P1')));
-	ok('valve V1', c(T.Link, 'V1') === 'Vault 14 \\P north side', J(c(T.Link, 'V1')));
-	ok('pattern PA', c(T.TimePat, 'PA') === 'Morning peak \\P second line of it', J(c(T.TimePat, 'PA')));
-	ok('curve C1 (EPANET keeps the type line whole)', c(T.Curve, 'C1') === 'PUMP: Pump 10 \\P rated 2019', J(c(T.Curve, 'C1')));
+	ok('reservoir R1', c(T.Node, 'R1') === 'Plant\\Pdischarge, 24 in', J(c(T.Node, 'R1')));
+	ok('tank T1', c(T.Node, 'T1') === 'Standpipe\\Pnorth hill');
+	ok('pipe P1', c(T.Link, 'P1') === '1962 main\\Preplaced 2019', J(c(T.Link, 'P1')));
+	ok('valve V1', c(T.Link, 'V1') === 'Vault 14\\Pnorth side', J(c(T.Link, 'V1')));
+	ok('pattern PA', c(T.TimePat, 'PA') === 'Morning peak\\Psecond line of it', J(c(T.TimePat, 'PA')));
+	ok('curve C1 (EPANET keeps the type line whole)', c(T.Curve, 'C1') === 'PUMP: Pump 10\\Prated 2019', J(c(T.Curve, 'C1')));
 	p.close();
 })().catch((e) => { ok('the engine read the export: ' + e.message, false); });
 
-// ---- 2c. a file in the " \P " layout -----------------------------------------------------------
+// ---- 2c. a file in the earlier " \P " layout -----------------------------------------------------------
 console.log('\n2c. A file that says \\P reads it as a line break; an unedited one writes back character for character');
 const SRC2 = [
 	'[JUNCTIONS]',
@@ -205,11 +208,16 @@ const SRC2 = [
 	const o = EngCalcs.lpnExportInp(d).inp, has = (l) => o.split(/\r?\n/).some((x) => x.replace(/\s+$/, '').endsWith(l));
 	ok('J1, J3, J4 and P1 written back character for character', has('\t;Corner of Elm \\P and Main') && has('\t;Share is \\\\Public\\docs')
 		&& has('\t;C:\\temp, no marker') && has('\t;1962 main \\P  \\P replaced 2019'), J(lines(o, 'JUNCTIONS')));
-	ok('the bare "\\P" goes back out in the spaced spelling', has('\t;Bare \\P marker'));
+	ok('the bare "\\P" goes back out as it came', has('\t;Bare\\Pmarker'));
 	ok('pattern, curve and both controls written back as they came', has(';Morning peak \\P weekdays') && has(';PUMP: Pump 10 \\P rated 2019')
 		&& has(';Fill the tank \\P and no more') && has('ABOVE 90 ;close it \\P at night'), J(lines(o, 'CONTROLS')));
 	{ const o2 = EngCalcs.lpnExportInp(importText(o, 'p.inp').doc).inp, a1 = o.split('\n'), a2 = o2.split('\n'), at = a1.findIndex((l, k) => l !== a2[k]);
 		ok('a second round trip is stable', o2 === o, at + ': ' + J(a1[at]) + ' vs ' + J(a2[at])); }
+	byId(d.nodes, 'J1').desc = 'Corner of Elm\nand Main Street';
+	d.controls[1].note = 'close it\nat night\nalways';
+	{ const o3 = EngCalcs.lpnExportInp(d).inp, h3 = (l) => o3.split(/\r?\n/).some((x) => x.replace(/\s+$/, '').endsWith(l));
+		ok('once edited, it goes out in the new spelling', h3('\t;Corner of Elm\\Pand Main Street') && h3('ABOVE 90 ;close it\\Pat night\\Palways')
+			&& h3('\t;1962 main \\P  \\P replaced 2019'), J(lines(o3, 'JUNCTIONS'))); }
 }
 
 // ---- 3. an edit made on the page -----------------------------------------------------------------
@@ -222,11 +230,11 @@ console.log('\n3. A description typed on the page (with paragraphs) exports and 
 	byId(doc.nodes, 'J1').desc = 'Typed C:\\Pumps\nand a second line';
 	doc.controls[0].note = 'One\nTwo';
 	const o = EngCalcs.lpnExportInp(doc).inp;
-	ok('J3 is written on its row with the markers', o.indexOf('\t;Meter vault \\P  \\P Key at the office \\P   indented\n') > 0, J(lines(o, 'JUNCTIONS')));
-	ok('a typed backslash-P is written with one more backslash', o.indexOf('\t;Typed C:\\\\Pumps \\P and a second line') > 0);
+	ok('J3 is written on its row with the markers', o.indexOf('\t;Meter vault\\P\\PKey at the office\\P  indented\n') > 0, J(lines(o, 'JUNCTIONS')));
+	ok('a typed backslash-P is written with one more backslash', o.indexOf('\t;Typed C:\\\\Pumps\\Pand a second line') > 0);
 	const r = importText(o, 'edited.inp').doc;
 	ok('...and reads back as typed', byId(r.nodes, 'J1').desc === 'Typed C:\\Pumps\nand a second line', J(byId(r.nodes, 'J1').desc));
-	ok('an edited control note goes out on one line', lines(o, 'CONTROLS').filter(Boolean)[0] === ';One \\P Two' && r.controls[0].note === 'One\nTwo', J(lines(o, 'CONTROLS')));
+	ok('an edited control note goes out on one line', lines(o, 'CONTROLS').filter(Boolean)[0] === ';One\\PTwo' && r.controls[0].note === 'One\nTwo', J(lines(o, 'CONTROLS')));
 	ok('J3 comes back with its paragraphs and indent', byId(r.nodes, 'J3').desc === 'Meter vault\n\nKey at the office\n  indented', J(byId(r.nodes, 'J3').desc));
 	ok('P2 one line stays one line', byId(r.links, 'P2').desc === 'one line only');
 	ok('the pattern edit', r.patterns[0].note === 'Edited\nlines');

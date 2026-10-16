@@ -1,10 +1,10 @@
 // **A DESCRIPTION TAKES LINES AND PARAGRAPHS** (Task 806), in real Chromium with real key presses:
 //   1. Properties' Description is a textarea that grows; Enter types a newline, Ctrl+Enter commits;
 //   2. the two-paragraph text is saved in the project file with \n and is intact after a reload;
-//   3. the Tables pane shows the whole text on one line, each line break as " \P " (Tom, 2026-10-16),
-//      with the lines in the cell's tip; typing in that cell edits all of it, and a " \P " typed
+//   3. the Tables pane shows the whole text on one line, each line break as "\P" with no spaces (Tom,
+//      2026-10-16), with the lines in the cell's tip; typing in that cell edits all of it, and a "\P" typed
 //      there becomes a line break;
-//   4. the .inp export puts the whole text on the row's one comment, line breaks as " \P ", and the
+//   4. the .inp export puts the whole text on the row's one comment, line breaks as "\P", and the
 //      page's own reader gives the same text back.
 //
 //   node dev/lpn-spike/description-lines-browser-harness.js   (takes the browser lock itself)
@@ -58,7 +58,7 @@ function unzip(buf) {
 
 const TEXT = ['Pump house feed', 'Valve key at the office', '', 'Second paragraph: replaced 2019.'];
 const WHOLE = TEXT.join('\n');
-const INLINE = TEXT.join(' \\P ');
+const INLINE = TEXT.join('\\P');
 const WANT = 'Main ' + WHOLE + '\nAdded line';
 
 async function main() {
@@ -142,7 +142,7 @@ async function main() {
 			return i ? { value: i.value, title: i.getAttribute('data-bs-original-title') || i.title } : null;
 		}, [kind, nodeId]);
 		const c1 = await cell();
-		ok('the Tables cell shows the whole text, each line break as " \\P "', c1 && c1.value === INLINE, JSON.stringify(c1));
+		ok('the Tables cell shows the whole text, each line break as "\\P"', c1 && c1.value === INLINE, JSON.stringify(c1));
 		ok('...with the lines in its tip', c1 && c1.title === WHOLE, JSON.stringify(c1));
 
 		// the tip keeps the line breaks (a name tip collapses them unless it asks to keep them)
@@ -157,7 +157,7 @@ async function main() {
 			tipInfo && tipInfo.ws === 'pre-line' && tipInfo.text === WHOLE, JSON.stringify(tipInfo));
 		ok('...and is as tall as its four lines', tipInfo && tipInfo.h > tipInfo.lh * 3.5, JSON.stringify(tipInfo));
 		await page.mouse.move(5, 5);
-		// edit the cell at both ends: the start of the first line, and a new line typed as " \P "
+		// edit the cell at both ends: the start of the first line, and a new line typed as "\P"
 		const sel = `#lpn_pane_${kind} td.lpn-pane-col-desc input`;
 		const idx = await page.evaluate(([k, id]) => Array.from(document.querySelectorAll('#lpn_pane_' + k + ' td.lpn-pane-col-desc'))
 			.findIndex((t) => t._lpnPaneId === id), [kind, nodeId]);
@@ -165,12 +165,12 @@ async function main() {
 		await page.keyboard.press('Home');
 		await page.keyboard.type('Main ');
 		await page.keyboard.press('End');
-		await page.keyboard.type(' \\P Added line');
+		await page.keyboard.type('\\PAdded line');
 		await page.keyboard.press('Enter');
 		await a.settle(600);
 		const c2 = await cell();
-		ok('editing the cell edits the whole text, and a typed " \\P " is a line break',
-			c2 && c2.title === WANT && c2.value === 'Main ' + INLINE + ' \\P Added line', JSON.stringify(c2));
+		ok('editing the cell edits the whole text, and a typed "\\P" is a line break',
+			c2 && c2.title === WANT && c2.value === 'Main ' + INLINE + '\\PAdded line', JSON.stringify(c2));
 		ok('Properties shows the edit as lines', await page.evaluate((w) => {
 			const t = Array.from(document.querySelectorAll('#lpn_popup_fields textarea')).filter((x) => x.value.indexOf('Main ') === 0)[0];
 			return !!t && t.value === w;
@@ -214,8 +214,8 @@ async function main() {
 		const inp = buf.toString('utf8');
 		const L = inp.split(/\r?\n/);
 		const at = L.findIndex((l) => l.indexOf(';Main Pump house feed') >= 0);
-		ok('the whole text sits on the element row as one trailing comment, line breaks as " \\P "',
-			at > 0 && /^\s*\S+/.test(L[at]) && L[at].replace(/\s+$/, '').endsWith('\t;Main ' + INLINE + ' \\P Added line'), L[at]);
+		ok('the whole text sits on the element row as one trailing comment, line breaks as "\\P"',
+			at > 0 && /^\s*\S+/.test(L[at]) && L[at].replace(/\s+$/, '').endsWith('\t;Main ' + INLINE + '\\PAdded line'), L[at]);
 		ok('no ;| line follows it, or anywhere', !L.some((l) => /^\s*;\|/.test(l)), JSON.stringify(L.slice(at, at + 2)));
 		const back = await page.evaluate((text) => {
 			const p = EngCalcs.lpnInpParse(text);

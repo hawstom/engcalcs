@@ -415,7 +415,7 @@
 			// data.
 			if (semi >= 0) { cmt = line.slice(semi + 1).trim(); line = line.slice(0, semi); }
 			// **A `;|` LINE CONTINUES THE DESCRIPTION ABOVE IT**, in a file written by an early build of
-			// Task 806, before line breaks went on the one comment as " \P " (EngCalcs.lpnDescText).
+			// Task 806, before line breaks went on the one comment as "\P" (EngCalcs.lpnDescText).
 			// Still read, never written. On the row of one of the six element sections, or on the
 			// `;TYPE:` line of a curve. Anywhere else it is an ordinary comment and is treated as one.
 			if (semi >= 0 && !line.trim() && lines[i].charAt(semi + 1) === '|') {
@@ -787,7 +787,10 @@
 				var psp = EngCalcs.lpnInpSplitPre(r.preLines, true),
 					pnote = psp.desc.length ? EngCalcs.lpnInpDescFromLinesAbove(psp.desc) : '';
 				if (!pnote) { psp.head = psp.head.concat(psp.desc); }
-				if (runStart && !pat.note && pnote) { pat.note = pnote; pnote = ''; }
+				if (runStart && !pat.note && pnote) {
+					pat.note = pnote; pnote = '';
+					if (psp.desc.length === 1) { EngCalcs.lpnDescTokSet(pat, 'note', psp.desc[0].replace(/^\s*;/, ''), pat.note); }
+				}
 				if (runStart && pat.multipliers.length === 0 && EngCalcs.lpnInpHasComment(psp.head)) {
 					pat.head = psp.head;
 				} else {
@@ -857,7 +860,10 @@
 		// comment must read as no description at all -- which is what lpnDescText's trim gives.
 		function readDesc(el, r) {
 			var d = EngCalcs.lpnDescJoin(r.cmt, r.more);
-			if (d) { el.desc = d; }
+			if (d) {
+				el.desc = d;
+				if (!(r.more && r.more.length)) { EngCalcs.lpnDescTokSet(el, 'desc', r.cmt, d); }
+			}
 			return el;
 		}
 		// **A CONTROL'S DESCRIPTION** is the whole-line comments above it, back to the control
@@ -883,10 +889,11 @@
 				// out as one line (lpnDescText()).
 				if ((sp.desc.length !== 1 || sp.desc[0] !== ';' + note)
 						&& !sp.desc.some(function (l) { return /^\s*;\|/.test(l); })) { ctl.noteSrc = sp.desc; }
-				if (trail) { ctl.tail = trail; }
+				if (trail) { ctl.tail = trail; EngCalcs.lpnDescTokSet(ctl, 'tail', r.cmt, trail); }
 			} else if (trail) {
 				ctl.note = trail;
 				ctl.noteAt = 'end';
+				EngCalcs.lpnDescTokSet(ctl, 'note', r.cmt, trail);
 			}
 		}
 		// A control that is not kept takes its comments with it, and the report says so.
@@ -1185,7 +1192,7 @@
 			if (r.typeLine) {
 				curveTyped(r[0], r.typeLine);
 				// A type line an early Task 806 build continued on `;|` lines goes back as the one line
-				// it now is, its line breaks as " \P " (lpnDescText()).
+				// it now is, its line breaks as "\P" (lpnDescText()).
 				if (!crec.src.length) {
 					crec.src.push(r.typeLine.rawMore.length
 						? ';' + r.typeLine.type + ': ' + EngCalcs.lpnDescInline(EngCalcs.lpnDescJoin(r.typeLine.note, r.typeLine.more))
@@ -2315,21 +2322,22 @@
 	 * text loses its leading and trailing blank lines. A blank line in the middle is a paragraph break
 	 * and is kept as typed. It used to collapse every line break to a space.
 	 *
-	 * **ONE LINE, WITH " \P " FOR EACH LINE BREAK, WHEREVER A DESCRIPTION MUST SIT ON ONE LINE**
+	 * **ONE LINE, WITH "\P" FOR EACH LINE BREAK, WHEREVER A DESCRIPTION MUST SIT ON ONE LINE**
 	 * (Tom, 2026-10-16: *"Maybe " \P ", since it's both intuitive, and it's what Autodesk
-	 * historically used in Dimensions."*). EPANET holds one line per description: a trailing
-	 * `;comment` on the row, or for a pattern or curve the one comment line above its first row
-	 * (input2.c `LineComment`), with no continuation syntax. So the whole description goes in that
-	 * one place, each line break written as space, backslash, capital P, space; and the Tables pane's
-	 * cell shows and edits it the same way. EPANET keeps the whole text, `\P` and all, on its own
-	 * re-save. A blank paragraph line is two markers in a row (`a \P  \P b`).
+	 * historically used in Dimensions."*, then *"Change it from " \P " to "\P"."*). EPANET holds
+	 * one line per description: a trailing `;comment` on the row, or for a pattern or curve the one
+	 * comment line above its first row (input2.c `LineComment`), with no continuation syntax. So the
+	 * whole description goes in that one place, each line break written as backslash, capital P,
+	 * with no spaces; and the Tables pane's cell shows and edits it the same way. EPANET keeps the
+	 * whole text, `\P` and all, on its own re-save. A blank paragraph line is two markers in a row
+	 * (`a\P\Pb`).
 	 *
-	 * Reading one back, `\P` with or without its spaces is a line break, and at most one space on
-	 * each side belongs to the marker (so an indent after it survives). A backslash-P the person
+	 * Reading one back, `\P` with or without spaces round it is a line break (lpnDescFromInline()
+	 * says which spaces are the marker's, so an indent after it survives). A backslash-P the person
 	 * TYPED is written with one more backslash (`\\P`) and read back as typed, so the text is never
 	 * changed by a round trip; a file from elsewhere whose comment says `C:\Pumps` is read as a line
-	 * break, which is the price of the convention. A comment with no `\P` in it is read exactly as
-	 * it always was.
+	 * break, which is the price of the convention, and is written back as the file spelled it
+	 * (lpnDescTokSet()). A comment with no `\P` in it is read exactly as it always was.
 	 *
 	 * Files this branch wrote before that call carried the later lines on `;|` comment lines; the
 	 * reader still takes those (lpnInpParse), and nothing writes them.
@@ -2347,19 +2355,59 @@
 	EngCalcs.lpnDescOneLine = function (v) {
 		return EngCalcs.lpnDescText(v).replace(/\n+/g, ' ');
 	};
-	/** The description on one line to be read back and edited: each line break as " \P ". */
+	/**
+	 * The description on one line to be read back and edited: each line break as "\P", no spaces
+	 * (Tom, 2026-10-16: *"Change it from " \P " to "\P"."*). Two cases need a space before the
+	 * marker, which the reader drops: a line ending in a backslash (so the run stays the line's own),
+	 * and then one after it too when the next line starts with a space (so its indent survives).
+	 */
 	EngCalcs.lpnDescInline = function (v) {
-		return EngCalcs.lpnDescText(v).split('\n').map(function (l) {
+		var L = EngCalcs.lpnDescText(v).split('\n').map(function (l) {
 			return l.replace(/(\\+)P/g, '\\$1P');
-		}).join(' \\P ');
+		}), out = L[0], k;
+		for (k = 1; k < L.length; k++) {
+			if (/\\$/.test(L[k - 1])) { out += ' \\P' + (L[k].charAt(0) === ' ' ? ' ' : ''); }
+			else { out += '\\P'; }
+			out += L[k];
+		}
+		return out;
 	};
-	/** lpnDescInline() read back: " \P " (or a bare "\P") is a line break, "\\P" a typed "\P". */
+	/**
+	 * lpnDescInline() read back: "\P" is a line break, "\\P" a typed "\P". A space before the marker
+	 * belongs to it (a line never ends in one), and then so does one space after it: that is the
+	 * " \P " an earlier build wrote, and the backslash case above. With no space before, every
+	 * space after is the next line's own.
+	 */
 	EngCalcs.lpnDescFromInline = function (s) {
 		var t = (s === undefined || s === null) ? '' : String(s);
 		if (t.indexOf('\\P') < 0) { return t; }
 		return t.replace(/( ?)(\\+)P( ?)/g, function (m, a, bs, b) {
-			return bs.length === 1 ? '\n' : a + bs.slice(1) + 'P' + b;
+			return bs.length === 1 ? (a ? '\n' : '\n' + b) : a + bs.slice(1) + 'P' + b;
 		});
+	};
+	/**
+	 * **A DESCRIPTION READ FROM A FILE GOES BACK OUT AS THE FILE SPELLED IT** while it still says the
+	 * same text: CLAUDE.md's "only the user touches a file's numbers", applied to its words. A file
+	 * from the earlier " \P " build, or one that writes a bare `C:\Pumps`, is not re-spelled by an
+	 * export nobody asked for. Kept in `rec.tok[key]` only when it differs from what the writer would
+	 * say, and checked again at write time, so an edit retires it by itself (lpnNumText()'s rule).
+	 */
+	EngCalcs.lpnDescTokSet = function (rec, key, raw, text) {
+		var r = (typeof raw === 'string') ? raw.replace(/\s+$/, '') : null;
+		if (r !== null && r !== EngCalcs.lpnDescInline(text)
+				&& EngCalcs.lpnDescText(EngCalcs.lpnDescFromInline(r)) === EngCalcs.lpnDescText(text)) {
+			(rec.tok || (rec.tok = {}))[key] = r;
+		} else if (rec.tok) {
+			delete rec.tok[key];
+			if (!Object.keys(rec.tok).length) { delete rec.tok; }
+		}
+	};
+	/** The one-line text a description is written as: the file's own spelling while it still holds. */
+	EngCalcs.lpnDescInlineOf = function (rec, key, text) {
+		var t = rec && rec.tok ? rec.tok[key] : undefined;
+		if (typeof t === 'string' && EngCalcs.lpnDescText(text)
+				&& EngCalcs.lpnDescText(EngCalcs.lpnDescFromInline(t)) === EngCalcs.lpnDescText(text)) { return t; }
+		return EngCalcs.lpnDescInline(text);
 	};
 	/** A first line plus the `;|` continuation texts the reader gathered, back into one description. */
 	EngCalcs.lpnDescJoin = function (first, more) {
@@ -2819,7 +2867,7 @@
 		 * tokens with comments stripped.
 		 */
 		function descOf(el) {
-			var d = EngCalcs.lpnDescInline(el && el.desc);
+			var d = EngCalcs.lpnDescInlineOf(el, 'desc', el && el.desc);
 			return d ? '\t;' + d : '';
 		}
 
@@ -3251,8 +3299,8 @@
 			// loop over the factors -- so this does too. A pattern with no rows cannot be stated in
 			// an .inp at all, so a blank line follows it: both EPANET's reader (a blank line
 			// empties `LineComment`, input2.c) and this one then keep it off the next pattern.
-			// One line, its line breaks as " \P " (see lpnDescText).
-			if (note) { patternRows.push(';' + EngCalcs.lpnDescInline(note)); }
+			// One line, its line breaks as "\P" (see lpnDescText).
+			if (note) { patternRows.push(';' + EngCalcs.lpnDescInlineOf(pat, 'note', note)); }
 			if (note && !mults.length) { patternRows.push(''); }
 			// SIX PER LINE, which is EPANET's own layout and the one Net3 is written in. The id
 			// repeats on each line and the values concatenate; that is the format, not a nicety.
@@ -3280,7 +3328,7 @@
 			// A heading the file stated above it, blank line and all (readControlNote()).
 			if (Array.isArray(ctl.head)) { ctl.head.forEach(function (l) { controlRows.push(String(l)); }); }
 			if (note && ctl.noteAt === 'end') {
-				line += ' ;' + EngCalcs.lpnDescInline(note);
+				line += ' ;' + EngCalcs.lpnDescInlineOf(ctl, 'note', note);
 			} else if (note) {
 				src = Array.isArray(ctl.noteSrc) ? ctl.noteSrc : null;
 				if (src && EngCalcs.lpnInpDescFromLines(src) === note) {
@@ -3289,7 +3337,7 @@
 					controlRows.push(';' + EngCalcs.lpnDescInline(note));
 				}
 			}
-			if (ctl.tail && ctl.noteAt !== 'end') { line += ' ;' + EngCalcs.lpnDescInline(ctl.tail); }
+			if (ctl.tail && ctl.noteAt !== 'end') { line += ' ;' + EngCalcs.lpnDescInlineOf(ctl, 'tail', ctl.tail); }
 			controlRows.push(line);
 			if (Array.isArray(ctl.foot)) { ctl.foot.forEach(function (l) { controlRows.push(String(l)); }); }
 		});

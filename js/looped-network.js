@@ -22148,7 +22148,7 @@ var EngCalcs = EngCalcs || {};
 			// an empty box under either flag, because erasing a description on 400 assets must not
 			// be spelled the same way as leaving the box alone. The newline a paste could carry is
 			// tidied by lpnDescText() at the write below, the one place that rule lives; the value box
-			// is one line, so " \P " in it is a line break, as in the Tables pane (replaceValueOf()).
+			// is one line, so "\P" in it is a line break, as in the Tables pane (replaceValueOf()).
 			{ key: 'desc', group: 'any', field: 'desc', str: true, multiline: true,
 				label: pc.lpn_field_desc || 'Description',
 				applies: function () { return true; },
@@ -24354,7 +24354,7 @@ var EngCalcs = EngCalcs || {};
 	 *
 	 * **BOTH SETTERS GO THROUGH THE SAME ONE-PLACE RULE THE POPUP USES**, so the two editors of one
 	 * property cannot disagree: `lpnDescText()` tidies a description's lines (the cell writes each
-	 * line break as " \P ", see paneCellInputText()), `lpnTagText()` keeps the one word EPANET's
+	 * line break as "\P", see paneCellInputText()), `lpnTagText()` keeps the one word EPANET's
 	 * reader stops at.
 	 *
 	 * **NO `prop`**: neither is in LPN_OVERRIDABLE (see descField() and tagField()), so a plain
@@ -26796,11 +26796,12 @@ var EngCalcs = EngCalcs || {};
 	// One reader, so a cell edit, a paste and a multi-properties row cannot disagree about it.
 	function paneColProp(c) { return c.prop || (c.propFn ? c.propFn() : undefined); }
 	/**
-	 * **A MULTI-LINE CELL SHOWS THE WHOLE TEXT ON ONE LINE, EACH LINE BREAK AS " \P "** (Task 806;
+	 * **A MULTI-LINE CELL SHOWS THE WHOLE TEXT ON ONE LINE, EACH LINE BREAK AS "\P"** (Task 806;
 	 * Tom, 2026-10-16: *"Let's follow whatever we do above. Maybe " \P ", since it's both intuitive,
-	 * and it's what Autodesk historically used in Dimensions."*). A text `<input>` cannot hold a line
+	 * and it's what Autodesk historically used in Dimensions."*, then *"Change it from " \P " to
+	 * "\P"."*). A text `<input>` cannot hold a line
 	 * break, so a Description goes into it as the .inp writes it (EngCalcs.lpnDescInline()), is edited
-	 * whole, and paneParseCellText() turns each " \P " back into a line break. Every door that hands
+	 * whole, and paneParseCellText() turns each "\P" back into a line break. Every door that hands
 	 * cell text to that reader -- the box, a copy, a fill, the multi-properties box -- reads it from
 	 * here, so they all speak the one convention. The tip shows the lines as lines.
 	 */
@@ -26883,7 +26884,7 @@ var EngCalcs = EngCalcs || {};
 			// leaves the reference out and says so, instead of refusing the whole paste.
 			return { ok: !!c.lenient || c.choices().some(function (o) { return o[0] === t; }), v: t };
 		}
-		// A Description reads its " \P " back as a line break (paneCellInputText()).
+		// A Description reads its "\P" back as a line break (paneCellInputText()).
 		if (c.str) { return { ok: true, v: c.multiline ? EngCalcs.lpnDescFromInline(t) : t }; }
 		if (t !== '' && !isFinite(+t)) { return { ok: false }; }
 		return { ok: true, v: (c.blank && t === '') ? undefined : +t };
@@ -39220,6 +39221,9 @@ var EngCalcs = EngCalcs || {};
 		if (!t) { return dst; }
 		for (k in t) {
 			if (!Object.prototype.hasOwnProperty.call(t, k)) { continue; }
+			// A Description's own spelling (EngCalcs.lpnDescTokSet()) is text, not a number; the
+			// writer checks it still says the description (lpnDescInlineOf()), so it rides as is.
+			if (k === 'desc') { if (typeof t[k] === 'string') { (out || (out = {})).desc = t[k]; } continue; }
 			dk = map[k];
 			if (!dk || parseFloat(t[k]) !== dst[dk]) { continue; }
 			(out || (out = {}))[dk] = t[k];
@@ -60171,7 +60175,7 @@ var EngCalcs = EngCalcs || {};
 					var cur = now(i);
 					if (!cur) { return; }
 					// Several comment lines become the one line the box shows: the curve's `src` rule.
-					// A line break goes on that one line as " \P ", as everywhere in an .inp.
+					// A line break goes on that one line as "\P", as everywhere in an .inp.
 					doc.rules = libRulesSplice(cur.descStart, cur.start, t ? [';' + EngCalcs.lpnDescInline(t)] : []);
 				}));
 				entry.appendChild(descRow);
@@ -63385,7 +63389,7 @@ var EngCalcs = EngCalcs || {};
 	 *
 	 * **FREE TEXT, LINES AND PARAGRAPHS INCLUDED** (Task 806). Stored with `\n`. An .inp holds one
 	 * line as a trailing comment, so a description of several lines goes out on that one line with
-	 * each line break as " \P "; see `lpnDescText()`.
+	 * each line break as "\P"; see `lpnDescText()`.
 	 */
 	// `after` is the one thing a CUSTOMER needs that a node and a link do not: every write to a
 	// customer goes through customerEdited(), which redraws its symbol and its label and re-solves.

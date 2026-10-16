@@ -170,9 +170,9 @@ const fresh = compare('reference/Net3.inp  ->  import  ->  .inp   vs   EPA Net3.
 report(fresh);
 
 // ---- 2b. multi-line descriptions ride along (Task 806) -----------------------------------------
-// Tom, 2026-10-16: a line break in a Description goes on its one `;` comment as " \P ". Net3 with a
-// multi-line description on a junction, a pipe, a pattern and a curve: every data token is still
-// EPA's own, each description sits on one comment line, and the page's reader gives it back whole.
+// Tom, 2026-10-16: a line break in a Description goes on its one `;` comment as "\P", no spaces.
+// Net3 with a multi-line description on a junction, a pipe, a pattern and a curve: every data token
+// is still EPA's own, each description sits on one comment line, and the page's reader gives it back whole.
 console.log('\n2b. Net3 with multi-line descriptions');
 const descDoc = JSON.parse(JSON.stringify(freshDoc));
 const DESC = 'Pump house feed\nValve key at the office\n\nSecond paragraph';
@@ -182,7 +182,7 @@ if (descDoc.curves && descDoc.curves[0]) { descDoc.curves[0].note = DESC; delete
 const descOut = EngCalcs.lpnExportInp(descDoc);
 const descCmp = compare('Net3 + multi-line descriptions  ->  .inp   vs   EPA Net3.inp', REF, descOut.inp);
 report(descCmp);
-const INL = 'Pump house feed \\P Valve key at the office \\P  \\P Second paragraph';
+const INL = 'Pump house feed\\PValve key at the office\\P\\PSecond paragraph';
 const descLines = descOut.inp.split(/\r?\n/).filter((l) => l.indexOf(INL) >= 0).length;
 const descBack = L.docFromInp(EngCalcs.lpnInpParse(descOut.inp), 'Net3.inp');
 const descOk = descCmp.findings.length === 0 && !/^\s*;\|/m.test(descOut.inp)

@@ -120,8 +120,8 @@ Earlier the same day: twentieth session's list (text-halo, search-zoom-accuracy,
   `lpn_ovrmarks` (furniture, written only when not default; inventory updated): TELL HIM before it merges.
   New English to rule on: Clean map and its tip, Show override markers on the map, Scenarios table,
   All, All unused, Time series graphs on the map. After it lands delete match-property, graph-bubble.
-- **feat/description-lines** (806): a line break is " \P " wherever a Description sits on one line, his
-  10-16 call. No new keys.
+- **feat/description-lines** (806): a line break is "\P" (no spaces) wherever a Description sits on one line,
+  his 10-16 call. No new keys.
 - **fix/zero-demand-solve** (R-402): a stopped EPANET run names the full or empty tank, the pipe EPANET
   closed and the nodes it could not solve; three new English sentences for his word. Stock EPANET fails
   the same way (a full tank with no flow); options for him: keep the message (recommended), or a per-tank
