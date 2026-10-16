@@ -120,11 +120,12 @@ async function main() {
 			return !!r && r.disabled === true;
 		}, SMMENU));
 		// Tom, 2026-10-11: "Scenario manager..., -, Basic mode, New, Rename, Delete, -, Apply Base, list of scenarios."
-		// Apply Base values and the rule before it are retired (Task 801, 2026-10-15).
+		// Apply Base values and the rule before it are retired (Task 801, 2026-10-15). List overrides follows
+		// Delete (Tom, 2026-10-16: "Yes", reachable in Basic mode).
 		const menuSeq = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_menu_list > *')).filter((e) => e.offsetParent !== null || e.tagName === 'HR')
 			.map((e) => e.tagName === 'HR' ? '-' : e.textContent.trim()));
 		const wantSeq = [SMMENU, '-', '✓ ' + await L('lpn_scenario_basic'), await L('lpn_scenario_new'), await L('lpn_scenario_copy'), await L('lpn_scenario_rename'), await L('lpn_scenario_delete'),
-			'✓ ' + await L('lpn_scenario_base')];
+			await L('lpn_sm_list_overrides'), '✓ ' + await L('lpn_scenario_base')];
 		ok('1.1a the menu is in Tom\'s order: Scenario manager, Basic mode and the commands, then the scenarios (no Apply Base values)',
 			JSON.stringify(menuSeq.map((t) => t.replace(/\s+/g, ' '))) === JSON.stringify(wantSeq.map((t) => t.replace(/\s+/g, ' '))), JSON.stringify(menuSeq));
 		await page.keyboard.press('Escape');
