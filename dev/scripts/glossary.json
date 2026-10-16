@@ -4874,6 +4874,47 @@
                 "zh": "形状"
             },
             "source": "wave0-1014"
+        },
+        "101": {
+            "term": "N/A",
+            "concept": "not-applicable",
+            "definition": "Not applicable: the quantity has no meaning for these inputs (side-slope rock size on a vertical wall). Never \"not available\" (a value that exists but is missing).",
+            "symbol": "",
+            "avoid": [
+                "a short form meaning not available or no data"
+            ],
+            "context": "A results-table cell (mtc_not_applicable).",
+            "translation_notes": "[2026-10-16, sprint 1016 write-back] Harvested from each language's shipped mtc_not_applicable. tr changed from Y/D to Uygulanmaz by the orchestrator: Y/D is not a recognised Turkish abbreviation.",
+            "translations": {
+                "en": "N/A",
+                "am": "አይመለከትም",
+                "ar": "غ/م",
+                "bg": "н/п",
+                "bn": "প্রযোজ্য নয়",
+                "cs": "n/a",
+                "de": "n. z.",
+                "es": "N/A",
+                "fa": "قابل‌اجرا نیست",
+                "fr": "s.o.",
+                "he": "לא רלוונטי",
+                "hi": "लागू नहीं",
+                "hr": "n/p",
+                "id": "T/B",
+                "it": "N/A",
+                "km": "មិនអនុវត្ត",
+                "my": "မသက်ဆိုင်",
+                "ps": "د تطبیق وړ نه",
+                "pt": "N/A",
+                "ro": "N/A",
+                "ru": "Н/П",
+                "sr": "Н/П",
+                "sw": "Haihusiki",
+                "tr": "Uygulanmaz",
+                "uk": "н/з",
+                "ur": "قابل اطلاق نہیں",
+                "zh": "不适用"
+            },
+            "source": "sprint-1016"
         }
     }
 }

@@ -74,21 +74,17 @@ $ec_lang['template_printable_subtitle']='Podnaslov za ispis';
 // cannot read is not consent. The long-form privacy notice and terms are a separate question --
 // English-authoritative, and translated by a human later if at all.
 // Edited by TGH 2026-09-07; the word "cookie" approved by TGH 2026-09-09.
-// **IT SAYS "COOKIE" BECAUSE THAT IS THE WORD PEOPLE KNOW** (Tom, 2026-09-09, watching a
-// first-time reader: *"We should use the word 'cookie'. 'May we save a one-digit cookie...?' That
-// is the word people know."*). "One digit in this browser" was accurate and taught nobody what was
-// being asked; a reader who has met a hundred cookie banners knows instantly what this one is
-// about, and can then notice that this one is asking for far less than the others did.
+// **REWRITTEN 2026-10-08 (Tom, call F01: "Go (random code, new consent text)")**, his draft used
+// exactly. The yes now also covers a random browser code (EC_CODE_COOKIE in lib/config.inc.php), so
+// "a one-digit cookie" was no longer the whole of what is asked for. The code is what the sentence
+// names because it is what the yes newly buys: counting browsers, not only page loads.
 //
-// **AND IT IS STILL LITERALLY TRUE, which is the only reason the word is allowed here.** What is
-// stored IS a cookie, and it holds one base-32 digit per page visited -- five bits, maximum 31.
-// The arithmetic is in lib/config.inc.php beside the bits themselves. If that ever stops being one
-// digit, this sentence is the thing that has to change first.
-//
-// NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
-// moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
-// has already answered, for no change they could act on.
+// EC_CONSENT_VERSION WENT FROM 1 TO 2 WITH IT, because what is stored changed. Everybody who chose
+// "Allow this" is asked again; "Allow all" and "Refuse all" are not. The other 26 languages keep
+// their old sentence until the next translation sprint, under the same version.
 $ec_lang['consent_body']='Smijemo li u ovaj preglednik spremiti nasumični kod kako bismo mogli brojiti koliko preglednika koristi pojedini dio ove stranice? Kod se stvara na licu mjesta, ne govori ništa o vama ni o vašem uređaju i ne bilježi ništa što unesete. Bez njega ne možemo razlikovati vaš drugi posjet od nečijeg prvog.';
+// Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Riješi ovu mrežu u svakom hidrauličkom vremenskom koraku.';
 $ec_lang['consent_accept']='Prihvati ovo';
 $ec_lang['consent_accept_all']='Prihvati uvijek';
 $ec_lang['consent_decline']='Odbij uvijek';
@@ -108,8 +104,11 @@ $ec_lang['calc_defaults']='Vrati zadane vrijednosti';
 $ec_lang['calc_defaults_confirm']='Resetiraj kalkulator na izvorne zadane vrijednosti?';
 $ec_lang['points_data_note']='(ili Kopiraj/Zalijepi pomoću područja podataka)';
 $ec_lang['points_data_heading']='Podaci kalkulatora<br />(za format upotrijebite Kopiraj)';
+$ec_lang['points_data_points_heading']='Podaci o točkama<br />(za format upotrijebite Kopiraj)';
 $ec_lang['points_data_copy']='Kopiraj';
 $ec_lang['points_data_paste']='Zalijepi';
+$ec_lang['points_data_msg_line']='Ništa nije zalijepljeno. Redak {n} nije moguće pročitati kao stacionažu i kotu.';
+$ec_lang['points_data_msg_none']='Ništa nije zalijepljeno. Nisu pronađeni parovi stacionaže i kote.';
 $ec_lang['calc_inputs']='Unosi';
 $ec_lang['calc_results']='Rezultati';
 $ec_lang['view_hide_line']='Sakrij ovaj redak';
@@ -152,8 +151,6 @@ $ec_lang['hw_pressure_neg_short']='Negativan tlak';
 $ec_lang['hw_pressure_neg']='Nizvodni tlak je ispod nule. Hidraulička linija (HGL) pada ispod cijevi, pa cijev ne bi tekla puna i ovaj rezultat možda nije valjan.';
 $ec_lang['hw_roughness']='Hazen-Williams koeficijent, C';
 $ec_lang['hw_note_1']='<dl><dt>Ovaj kalkulator ne modelira profil cijevi između dva kraja.</dt><dd>Koristi samo uzvodnu i nizvodnu kotu koje unesete. Ako teren negdje između ta dva kraja raste više od bilo kojeg od njih, tlak na toj najvišoj točki niži je od bilo kojeg tlaka prikazanog ovdje. Pokrenite kalkulator ponovno za dužinu od uzvodnog kraja do najviše točke kako biste to provjerili.</dd><dd>Tamo gdje hidraulička linija (HGL) padne ispod cijevi, voda je pod negativnim tlakom. Zrak izlazi iz otopine, tankostjena cijev može se urušiti, a onečišćena podzemna voda može se uvući kroz spojeve. Održavajte pozitivan tlak u cijeloj dionici i razmotrite ugradnju zračnog ventila na svakoj visokoj točki.</dd><dt>Uzvodni tlak je rubni uvjet koji sami unosite.</dt><dd>Očitajte ga s manometra, s razine vode u spremniku (visina vode iznad cijevi) ili s krivulje pumpe. Pumpa isporučuje niži tlak kako protok raste, stoga koristite točku na krivulji koja odgovara protoku unesenom iznad.</dd><dt>Zbrojite koeficijente lokalnih (manjih) gubitaka sami.</dt><dd>Zbrojite K vrijednosti za svaki ventil, koljeno, T-komad, mjerač i ulaz na dionici i unesite taj zbroj. Slijedite poveznicu uz to polje za tipične vrijednosti. Na dugom transportnom cjevovodu ti su gubici mali u odnosu na trenje, ali u kratkim cjevovodima unutar postrojenja mogu činiti većinu ukupnog gubitka.</dd></dl>';
-
-
 // Manning Irregular
 $ec_lang['mi_menu']='Manning kanal nepravilnog presjeka';
 $ec_lang['mi_main_title']='Besplatni online Manningov kalkulator za kanal nepravilnog presjeka';
@@ -249,13 +246,13 @@ $ec_lang['mtc_blodgett_v_bathurst']='Blodgett nasuprot Bathurstu';
 $ec_lang['mtc_pi_range_check']='P&I provjera raspona';
 $ec_lang['mtc_pi_ok']='d50 u P&I rasponu';
 $ec_lang['mtc_pi_ok_tip']='0,28–0,36 ft (Phillips & Ingersoll, 1998)';
+$ec_lang['mtc_not_applicable']='n/p';
 $ec_lang['mtc_pi_out_of_range']='Izvan raspona';
 $ec_lang['mtc_pi_tip']='Ekstrapolacija izvan raspona podataka od 0,28–0,36 ft na kojem je ova jednadžba razvijena — smatrajte je okvirnom provjerom, a ne osnovom za projektiranje';
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Prema Isbash (1936) i Maricopa County, Arizona, US.">Potrebna veličina uglatog kamena dna, D<sub>50</sub> (Isbash i MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Prema Isbash (1936) i Maricopa County, Arizona, US.">Potrebna veličina uglatog kamena bočne strane 1, D<sub>50</sub> (Isbash i MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Prema Isbash (1936) i Maricopa County, Arizona, US.">Potrebna veličina uglatog kamena bočne strane 2, D<sub>50</sub> (Isbash i MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_time_run_tip']='Riješi ovu mrežu u svakom hidrauličkom vremenskom koraku.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Prema Maynordu, Ruffu i Abtu (1989). U zavoju je kamen dimenzioniran za brzinu u zavoju od 4/3 prosječne brzine, prema California Division of Highways (1970); Maynordova vlastita vrijednost 1,5 primjenjuje se na prirodne kanale.">Potrebna veličina uglatog kamena, D<sub>50</sub> (Maynord, Ruff i Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Potrebna veličina uglatog kamena, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Brzina prihvatljiva za pretpostavke jednolikog tečenja.';
@@ -624,8 +621,6 @@ $ec_lang['bpn_notes_2_term']='Samo razgranate mreže, bez petlji';
 $ec_lang['bpn_notes_2_def']='Svaka dionica ima točno jednu uzvodnu dionicu (stablo). Ovaj alat ne rješava prstenaste mreže, za koje su potrebne iterativne metode (EPANET ili slično). Budući da mreža nema petlji, rješenje je izravno i točno.';
 $ec_lang['bpn_notes_3_term']='Bez aktivnih regulatora tlaka';
 $ec_lang['bpn_notes_3_def']='Možete dodati fiksni ventil s lokalnim gubitkom (k-vrijednost), ali ne i ventile za redukciju ili održavanje tlaka (PRV/PSV). Njihovo stanje otvoreno/zatvoreno ovisi o protoku i tlaku, što bi zahtijevalo iteraciju.';
-
-
 $ec_lang['bpn_supply2_q']='Protok opskrbe 2';
 $ec_lang['bpn_supply2_h']='Tlačna visina opskrbe 2';
 $ec_lang['bpn_supply3_q']='Protok opskrbe 3';
@@ -654,6 +649,8 @@ $ec_lang['lpn_tool_add_pump']='Pumpa';
 // alone teach nobody and the words alone are longer than a modeller wants to read every time.
 $ec_lang['lpn_tool_add_valve']='Ventil';
 $ec_lang['lpn_tool_add_text']='Tekst';
+// Junction and Pipe (Task 719): Tom's WaterCAD command, a junction, a pipe, a junction, a pipe, until Escape.
+$ec_lang['lpn_tool_add_chain']='Lanac čvor-cijev';
 $ec_lang['lpn_tool_vertices']='Točke loma';
 // ---- CUSTOMERS: metered demands, lumped at the nearest node (ROADMAP Task 247) ----
 // **THE FEATURE IS CALLED CUSTOMER AND NOTHING A PERSON READS SAYS METER** (Tom, 2026-09-18:
@@ -668,6 +665,9 @@ $ec_lang['lpn_tool_add_meter']='Korisnik';
 $ec_lang['lpn_tool_add_meter_tip']='Odredite točku korisnika, zatim njegov priključak: vod ili čvor. Potražnja koju dodijelite korisniku dodaje se čvoru na bližem kraju tog voda.';
 $ec_lang['lpn_mode_add_meter']='Korisnik: odredite gdje se korisnik nalazi, zatim odaberite cijev ili čvor koji ga opskrbljuje. Ili pritisnite Esc za odustajanje.';
 $ec_lang['lpn_pane_tab_customers']='Korisnici';
+// The Shape table (Task 779). Closed is a polygon's closure, not a pipe's or valve's status, so it
+// is a key of its own and not lpn_field_closed: many languages use different words for the two.
+// Points is the column of the Shape's points, "Shape S1, point 2" in lpn_snap_shape_point.
 $ec_lang['lpn_pane_tab_shapes']='Likovi';
 $ec_lang['lpn_pane_shape_closed']='Zatvoren';
 $ec_lang['lpn_pane_shape_points']='Točke';
@@ -705,12 +705,12 @@ $ec_lang['lpn_field_meter_lumped']='Dodano čvoru';
 $ec_lang['lpn_field_meter_lumped_tip']='Najbliži čvor; potražnja ovog korisnika se ondje dodaje.';
 $ec_lang['lpn_node_customers']='Potražnje korisnika';
 $ec_lang['lpn_node_customers_tip']='Popis korisnika dodanih ovdje jer je ovo bio njihov najbliži čvor. Potražnje korisnika dodaju se ostalim ovdje navedenim potražnjama. Korisnik se uređuje ondje gdje se nalazi na karti ili u tablici Korisnici.';
-$ec_lang['lpn_node_customers_sum']='{total} {unit} od {n} korisnika';
+$ec_lang['lpn_node_customers_sum']='{total} {unit} od korisnika ({n})';
 $ec_lang['lpn_customer_detached']='⚠ Ovaj korisnik nije povezan s cijevi, pa njegova potražnja nije uključena u rezultate. Izbrišite ga, ili nacrtajte cijev i premjestite korisnika na nju.';
 $ec_lang['lpn_customer_fixed_head']='⚠ Bliži kraj te cijevi ima fiksnu vodenu površinu, pa ova potražnja ne utječe na simulaciju.';
-$ec_lang['lpn_customer_detached_count']='{n} korisnika nije povezano s cijevi. Njihova potražnja nije uzeta u obzir.';
+$ec_lang['lpn_customer_detached_count']='Korisnici koji nisu povezani s cijevi ({n}). Njihova potražnja nije uzeta u obzir.';
 $ec_lang['lpn_meter_pick_pipe']='Sada odaberite cijev ili čvor koji opskrbljuje ovog korisnika. Korisnik ostaje ondje gdje ste ga postavili. Pritisnite Escape za odustajanje.';
-$ec_lang['lpn_inp_export_flat_customers']='EPANET datoteka nema korisnika. Potražnja {n} korisnika u ovom projektu zapisuje se kao redak potražnje na čvoru kojemu je svaki korisnik dodijeljen, nazvan etiketom korisnika. Datoteka ne bilježi samog korisnika: njegov položaj, cijev koja ga opskrbljuje, mjesto duž te cijevi gdje se priključak spaja ni koliko priključaka predstavlja. Ti podaci ostaju u projektu; spremite datoteku projekta da ih zadržite.';
+$ec_lang['lpn_inp_export_flat_customers']='EPANET datoteka nema korisnika. Potražnja korisnika u ovom projektu ({n}) zapisuje se kao redak potražnje na čvoru kojemu je svaki korisnik dodijeljen, nazvan etiketom korisnika. Datoteka ne bilježi samog korisnika: njegov položaj, cijev koja ga opskrbljuje, mjesto duž te cijevi gdje se priključak spaja ni koliko priključaka predstavlja. Ti podaci ostaju u projektu; spremite datoteku projekta da ih zadržite.';
 
 $ec_lang['lpn_area_hint_window_start']='Odredite jedan kut prozora.';
 $ec_lang['lpn_area_hint_window_go']='Odredite suprotni kut da završite.';
@@ -733,12 +733,12 @@ $ec_lang['lpn_multi_title']='{n} odabrano';
 $ec_lang['lpn_multi_varies']='Razlikuje se';
 $ec_lang['lpn_multi_applied']='Postavljeno {prop} na {n}.';
 $ec_lang['lpn_multi_no_fields']='Ovi elementi nemaju ništa što se ovdje može zajednički postaviti.';
-$ec_lang['lpn_pane_pasted']='Zalijepljeno {n} ćelija. {skipped} nije promijenjeno.';
+$ec_lang['lpn_pane_pasted']='Zalijepljene ćelije ({n}). Nepromijenjene ćelije ({skipped}).';
 // PASTE THAT ADDS ROWS (Task 610). A block pasted into a table past its last row adds new
 // junctions, pipes and so on. {n} is how many rows were pasted, {created} how many of them are new,
 // {skipped} how many cells were left as they were.
-$ec_lang['lpn_pane_pasted_rows']='Zalijepljeno {n} redaka, dodano {created} od njih u mrežu.';
-$ec_lang['lpn_pane_pasted_rows_skipped']='Zalijepljeno {n} redaka, dodano {created} od njih u mrežu. {skipped} ćelija nije promijenjeno.';
+$ec_lang['lpn_pane_pasted_rows']='Zalijepljeni retci ({n}). Retci dodani u mrežu ({created}).';
+$ec_lang['lpn_pane_pasted_rows_skipped']='Zalijepljeni retci ({n}). Retci dodani u mrežu ({created}). Nepromijenjene ćelije ({skipped}).';
 // Added after "This network has none of these yet." on an empty table, which is where a paste lands.
 $ec_lang['lpn_pane_paste_here']='Odaberite ovo područje i zalijepite retke iz proračunske tablice da ih dodate.';
 // The menu action that adds the clipboard's rows as new elements below the last row (an ordinary
@@ -750,14 +750,14 @@ $ec_lang['lpn_pane_paste_append']='Zalijepi kao nove retke na kraju tablice';
 $ec_lang['lpn_pane_paste_armed']='Pritisnite Ctrl+V da dodate kopirane retke na dno ove tablice. Pritisnite Esc za prekid.';
 // Asked when an ordinary paste runs past the last row of a table. {n} is how many rows were
 // pasted, {fit} how many land on rows that exist, {extra} how many are left over.
-$ec_lang['lpn_pane_paste_overflow']='Ovo lijepljenje ima {n} redaka, a {fit} od njih stane u tablicu. Dodati ostalih {extra} kao nove retke na dnu?';
-$ec_lang['lpn_pane_paste_overflow_add']='Dodaj {extra} redaka';
-$ec_lang['lpn_pane_paste_overflow_fit']='Zalijepi samo {fit} koji stanu';
+$ec_lang['lpn_pane_paste_overflow']='Retci u ovom lijepljenju ({n}). Retci koji stanu u tablicu ({fit}). Dodati ostale retke ({extra}) kao nove retke na dnu?';
+$ec_lang['lpn_pane_paste_overflow_add']='Dodaj retke ({extra})';
+$ec_lang['lpn_pane_paste_overflow_fit']='Zalijepi samo retke koji stanu ({fit})';
 // The same question when the left-over rows could not be added; {reasons} names the rows and why.
-$ec_lang['lpn_pane_paste_overflow_bad']='Ovo lijepljenje ima {n} redaka, a {fit} od njih stane u tablicu. Ostalih {extra} ne mogu se dodati kao novi retci: {reasons}';
+$ec_lang['lpn_pane_paste_overflow_bad']='Retci u ovom lijepljenju ({n}). Retci koji stanu u tablicu ({fit}). Ostali retci ({extra}) ne mogu se dodati kao novi retci: {reasons}';
 // Tom's own wording (2026-09-26). Asked when an ordinary paste would change the ID of {n} rows
 // that already exist; the buttons are Paste and Cancel.
-$ec_lang['lpn_pane_paste_ids_differ']='{n} ID-ova se ne podudara. Ipak zalijepiti?';
+$ec_lang['lpn_pane_paste_ids_differ']='ID-ovi koji se ne podudaraju ({n}). Ipak zalijepiti?';
 // A paste that would add rows is refused whole when any row fails. {reasons} is one or more of the
 // Row sentences below, each naming the row of the pasted block, counted from 1.
 $ec_lang['lpn_pane_paste_refused']='Ništa nije zalijepljeno. {reasons}';
@@ -780,22 +780,24 @@ $ec_lang['lpn_pane_paste_text_no_position']='Redak {row}: novi Tekst treba i {fi
 $ec_lang['lpn_pane_paste_no_anchor']='Redak {row}: {id} još nije čvor ni cijev u ovoj mreži. Prvo zalijepite njega, zatim ovaj Tekst.';
 $ec_lang['lpn_pane_paste_customer_no_position']='Redak {row}: novi Korisnik treba i {first} i {second}.';
 $ec_lang['lpn_pane_paste_shape_no_points']='Redak {row}: novi Lik treba Točke.';
+// {pair} is the Points heading's own pair in this project's axis words: X/Y, N/E or Lat/Lon.
 $ec_lang['lpn_pane_paste_shape_bad_points']='Redak {row}: {text} nije popis točaka. Svaku točku napišite kao {pair}, s točkom (.) kao decimalnim znakom, a točke odvojite znakom |.';
 $ec_lang['lpn_pane_paste_shape_closed_few']='Redak {row}: zatvoren Lik treba najmanje tri točke.';
 $ec_lang['lpn_pane_paste_no_customer_ref']='Redak {row}: novi Korisnik treba povezanu cijev ili čvor.';
 $ec_lang['lpn_pane_paste_no_pipe']='Redak {row}: cijev {id} još ne postoji. Prvo zalijepite svoje cijevi, zatim svoje korisnike.';
 $ec_lang['lpn_pane_paste_no_customer_node']='Redak {row}: čvor {id} još ne postoji. Prvo zalijepite svoje čvorove, zatim svoje korisnike.';
 $ec_lang['lpn_pane_paste_customer_node_no_pipe']='Redak {row}: čvor {id} nema cijev na koju bi se Korisnik mogao priključiti.';
-
-
-$ec_lang['lpn_pane_filled']='Popunjeno prema dolje {n} ćelija. {skipped} nije promijenjeno.';
+$ec_lang['lpn_pane_filled']='Ćelije popunjene prema dolje ({n}). Nepromijenjene ćelije ({skipped}).';
 $ec_lang['lpn_pane_filldown']='Popuni prema dolje';
+$ec_lang['lpn_pane_delete_element']='Izbriši element';
+$ec_lang['lpn_pane_delete_elements']='Izbriši elemente';
 $ec_lang['lpn_pane_fill_none']='Ništa u ovom odabiru ne može se popuniti prema dolje.';
-$ec_lang['lpn_pane_ctrlenter_filled']='Popunjeno {n} ćelija. {skipped} nije promijenjeno.';
+$ec_lang['lpn_pane_ctrlenter_filled']='Popunjene ćelije ({n}). Nepromijenjene ćelije ({skipped}).';
 $ec_lang['lpn_pane_hide_col']='Sakrij ovaj stupac';
 $ec_lang['lpn_pane_hide_cols']='Sakrij ove stupce';
 $ec_lang['lpn_pane_show_all_cols']='Prikaži sve stupce';
 $ec_lang['lpn_pane_sort_asc']='Razvrstaj uzlazno';
+$ec_lang['lpn_pane_sort_desc']='Razvrstaj silazno';
 $ec_lang['lpn_pane_manage_cols']='Upravljaj stupcima…';
 $ec_lang['lpn_pane_manage_cols_title']='Upravljanje stupcima';
 $ec_lang['lpn_pane_manage_cols_show']='Prikaži';
@@ -803,12 +805,15 @@ $ec_lang['lpn_pane_manage_cols_up']='Pomakni gore';
 $ec_lang['lpn_pane_manage_cols_down']='Pomakni dolje';
 $ec_lang['lpn_pane_manage_cols_top']='Pomakni na početak';
 $ec_lang['lpn_pane_manage_cols_bottom']='Pomakni na kraj';
+$ec_lang['lpn_pane_manage_cols_width']='Širina (em)';
+$ec_lang['lpn_pane_width_tip']='Širine stupaca spremaju se u ovom pregledniku, ne u projektu. Dvaput kliknite razdjelnik stupca da vratite zadanu širinu.';
 $ec_lang['lpn_pane_colmenu_tip']='Sakrij ili upravljaj stupcima';
 $ec_lang['lpn_tool_area_window']='Odaberi prozor';
 $ec_lang['lpn_tool_area_lasso']='Odaberi laso';
 $ec_lang['lpn_tool_area_polygon']='Odaberi poligon';
 $ec_lang['lpn_tool_delete']='Izbriši';
 $ec_lang['lpn_tool_zoom_extent']='Prikaži sve';
+$ec_lang['lpn_tool_zoom_selection']='Zumiraj na odabir';
 $ec_lang['lpn_tool_zoom_window']='Zumiraj prozor';
 $ec_lang['lpn_zoom_in']='Uvećaj';
 $ec_lang['lpn_zoom_out']='Umanji';
@@ -875,7 +880,12 @@ $ec_lang['lpn_field_head_tip']='Razina vodene površine u rezervoaru, izražena 
 // pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
 // "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
 // a tank level from the vessel floor, not from the same zero the elevations use.
+// A tank has two elevations (Tom, 2026-10-11): Elevation is the ground, the pressure datum as at a
+// junction; Base elevation is the tank bottom, EPANET's [TANKS] Elevation, from which depth and
+// volume are measured.
+$ec_lang['lpn_field_tank_base_elev']='Kota dna';
 $ec_lang['lpn_field_tank_base_elev_tip']='Kota dna spremnika, od koje se mjere dubina vode i volumen. Ako je prazno, dno je na koti terena.';
+$ec_lang['lpn_tank_ground_elev_tip']='Kota terena na spremniku. Tlak u spremniku mjeri se od ove kote, kao u čvoru.';
 $ec_lang['lpn_field_tank_level']='Dubina vode';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tank_level_tip']='Dubina vode u spremniku, mjerena od dna spremnika prema gore. Razina vodene površine jednaka je koti dna spremnika uvećanoj za ovu dubinu.';
@@ -893,10 +903,19 @@ $ec_lang['lpn_field_tank_diameter_tip']='Širina spremnika od jedne strane do dr
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tank_head_tip']='Kota vodene površine u spremniku: kota dna uvećana za dubinu vode.';
 $ec_lang['lpn_close']='Zatvori';
+// The corner buttons beside every standing box's X (Task 441). Each is an icon-only button, so the
+// value is its name: the hover tip and the screen reader's label at once. Auto-hide is a toggle and
+// says its state through aria-pressed, so one wording serves both states (AutoCAD's own word).
+$ec_lang['lpn_dock_left']='Usidri lijevo od karte';
+$ec_lang['lpn_dock_right']='Usidri desno od karte';
+$ec_lang['lpn_dock_float']='Plutajuće';
+$ec_lang['lpn_dock_autohide']='Automatsko skrivanje';
 // The property popup's own name, in its drag bar (Tom, 2026-09-08: *"maybe the right title is
 // 'Properties'"*). It names the BOX, not the element in it: lpn_popup_title below the bar carries
 // the element's id and its rename box, and the two are read one under the other.
 $ec_lang['lpn_popup_boxtitle']='Svojstva';
+// What a docked Properties box says while nothing is selected: it stays in its dock (Tom, 2026-10-07).
+$ec_lang['lpn_popup_none']='Ništa nije odabrano. Odaberite element na karti da vidite njegova svojstva.';
 $ec_lang['lpn_empty_hint']='Upotrijebite Datoteka, Novi projekt da otvorite primjer. Ili počnite dodavanjem rezervoara, čvora i cijevi s alatne trake.';
 // ROADMAP Task 647, Tom 2026-09-13: a project with elements, none of which the current view can
 // see, reads exactly like a lost project unless something says otherwise. Shown in a centred
@@ -919,10 +938,11 @@ $ec_lang['lpn_examples_sub']='Svaki primjer otvara se kao kopija. Uredite je i s
 $ec_lang['lpn_examples_open']='Otvori';
 $ec_lang['lpn_examples_menu']='Otvori primjer…';
 $ec_lang['lpn_examples_blank']='Ili počnite ovdje';
-// The SAME exit, worded for the other way in. Opened from File the user already has work on
-// screen, so "start with a blank map" reads as "discard it" and they do not dare press the
-// only button that leaves (Tom, 2026-08-17: "I can't back out of the gallery... I am forced to
-// open an example"). Closing never touches a project either way.
+// The SAME exit, worded for the other way in, is lpn_close (Task 699 merged its own 'Close' key
+// into it). Opened from File the user already has work on screen, so "start with a blank map"
+// reads as "discard it" and they do not dare press the only button that leaves (Tom, 2026-08-17:
+// "I can't back out of the gallery... I am forced to open an example"). Closing never touches a
+// project either way.
 $ec_lang['lpn_examples_size']='Čvorovi: {nodes}, vodovi: {links}';
 $ec_lang['lpn_examples_failed']='Primjere nije bilo moguće učitati. Upotrijebite Datoteka, Novi projekt da započnete crtež.';
 $ec_lang['lpn_examples_loading']='Učitavanje primjera…';
@@ -932,22 +952,132 @@ $ec_lang['lpn_examples_loading']='Učitavanje primjera…';
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='Ispravi nešto';
 $ec_lang['lpn_help_notes']='Napomene na ovoj stranici';
+$ec_lang['lpn_guide_about_heading']='O ovom kalkulatoru';
+$ec_lang['lpn_guide_group_from']='Iz izbornika {menu}';
+$ec_lang['lpn_guide_menu_named']='Izbornik {menu}';
+// **THE NEW BOX, TASK 745** (Tom, 2026-09-29: reorganize Help into three groups, with a new
+// "Tables and Hotkeys" box gathering all table help and all keyboard shortcuts). One key names
+// both the Help row and the box's own title bar, the same pattern lpn_help_notes already carries
+// for the Notes box.
 $ec_lang['lpn_help_hotkeys']='Tablice i tipkovnički prečaci';
+// **THE USER GUIDE** (Tom, 2026-10-06: "Maybe items 2 and 3 combined into a simple User Manual or
+// whatever the 2026 thing is?"; Ida's design). Names both the Help row and the box's title bar. It
+// replaces lpn_help_hotkeys and the Help > Toolbar fly-out (lpn_help_icons, which still heads the
+// box's Toolbar section).
+$ec_lang['lpn_help_manual']='Priručnik';
+// The Guide's contents rail, its search, its Boxes section and the "?" in every box's title bar.
+$ec_lang['lpn_guide_contents']='Sadržaj';
+$ec_lang['lpn_guide_rail_hide']='Sakrij sadržaj';
+$ec_lang['lpn_guide_rail_show']='Prikaži sadržaj';
+$ec_lang['lpn_guide_search']='Pretraži priručnik';
+$ec_lang['lpn_guide_boxes_heading']='Okviri';
+$ec_lang['lpn_guide_boxes_intro']='Svaki okvir može se pomicati, mijenjati mu se veličina, usidriti lijevo ili desno od karte ili zatvoriti. Znak ? u naslovnoj traci okvira otvara njegovu pomoć.';
+// Tom's own wording, 2026-10-07 (his typo "to not" corrected). Below lpn_guide_boxes_intro.
+$ec_lang['lpn_guide_boxes_autohide']='Kada pokazivač napusti okvir bez fokusa, okvir se skriva nakon kratke odgode. Okvir s fokusom skriva se kada kliknete izvan njega, pritisnete Esc ili tipkom Tab izađete iz njega dok je pokazivač drugdje.';
+$ec_lang['lpn_guide_box_help']='Pomoć za ovaj okvir';
+// A Boxes entry whose box shares its name with a section of the Guide ("Screenshot"), in the Guide
+// only, so its Contents list does not show one word twice. Keep {box} as it is.
+$ec_lang['lpn_guide_box_named']='Okvir {box}';
+// Above the Toolbar rows, shown only while some are dimmed (on a phone, or Calculate while
+// Recalculate automatically is on): a grey name otherwise reads as a disabled button.
+$ec_lang['lpn_guide_dimmed']='Zatamnjen naziv je gumb koji je trenutačno skriven na alatnoj traci.';
+// One entry in the Guide's Boxes section for each box, shown by the "?" in its title bar. Fire flow,
+// Critical assets, and Demand scaling carry theirs in lpn_ff_intro and the keys that follow it.
+$ec_lang['lpn_guide_text_popup']='Prikazuje svojstva odabranog elementa ili teksta, ili više odabranih elemenata, pokraj odabira ili na mjestu na koje je okvir zadnje pomaknut. Uređena vrijednost odmah mijenja mrežu, a oznaka elementa na karti i ploča Tablice prate promjenu. Rezultati posljednjeg izračuna navedeni su ispod ulaznih podataka i ne mogu se uređivati.';
+$ec_lang['lpn_guide_text_find_popup']='Pronalazi elemente koji zadovoljavaju uvjet, primjerice sve cijevi manje od 8 in ili sve čvorove s tlakom ispod 40 psi, a može promijeniti jedno svojstvo na svima njima u jednoj operaciji. Koristite ga za provjeru modela prije rješavanja (kota koja nedostaje, promjer unesen u pogrešnoj jedinici), za popis problematičnih lokacija nakon rješavanja (nizak tlak, velika brzina) i za jedan ispravak na mnogo elemenata.\n\nPopisi Što pretražiti, Svojstvo, Uvjet i Vrijednost grade jedan uvjet i zapisuju ga kao redak teksta u okviru Upit. Redak se može i izravno uređivati, a popisi ga prate. Upit koji se popisima ne može izraziti, primjerice dva uvjeta povezana veznikom ILI, skriva popise dok ne pritisnete gumb Umjesto toga koristi kontrole. Za pretraživanje pritisnite Enter u okviru Upit ili pritisnite gumb Pronađi.';
+$ec_lang['lpn_guide_text_settings_box']='Sve postavke i dva gumba za vraćanje nalaze se u okviru Postavke. Postavke se ne nalaze nigdje drugdje. Okvir se može pretraživati: upišite jednu ili više riječi u Pretraži postavke da se prikažu samo postavke koje spominju sve te riječi. Postavke se spremaju s projektom, osim Prikaži okvir napretka izvođenja i onih pod Stranica, koje se čuvaju u ovom pregledniku. Položaj i veličina ovog okvira također se čuvaju samo u ovom pregledniku.';
+$ec_lang['lpn_guide_text_library_box']='Sadrži obrasce, krivulje, vrste cijevi, armaturu, kontrole i pravila projekta. Element upućuje na obrazac, krivulju, vrstu cijevi ili armaturu pomoću njezina ID-a, a ta se stavka uređuje ovdje. Kontrole i pravila vrijede za cijelu mrežu. Pravila primjenjuje samo EPANET mehanizam. Sve se sprema s projektom.';
+$ec_lang['lpn_guide_text_energy_box']='Izvještava o potrošnji energije, vršnoj snazi i trošku svake pumpe tijekom posljednje simulacije produljenog razdoblja, na temelju učinkovitosti svake pumpe i cijene energije postavljene u Postavke, Energija. Potrebni su Ukupno vrijeme rada u Postavkama i riješena mreža. Ne mijenja mrežu.';
+$ec_lang['lpn_guide_text_contour_box']='Upravlja konturnim prikazom na karti, nacrtanim iz vrijednosti čvora odabrane u Boji čvorove prema: shema boja, ispuna i njezina neprozirnost, razmak konturnih linija i oznake te koliko daleko boja seže od svake cijevi. Isključivanje skriva prikaz, a boje čvorova ostaju. Mijenja samo prikaz, ne i mrežu.';
+$ec_lang['lpn_guide_text_scncmp_box']='Rješava svaki scenarij na kopiji crteža i za svaki tablično prikazuje broj zamjena, najniži tlak i najveću brzinu. Ne mijenja projekt, a otvoreni scenarij ostaje kakav je bio.';
+$ec_lang['lpn_guide_text_rptbox']='Prikazuje tekstualni izvještaj koji je napisao EPANET mehanizam za posljednju simulaciju produljenog razdoblja, uključujući upozorenja i sažetak mreže. Svaka simulacija produljenog razdoblja zamjenjuje ga; rješavanje u jednom trenutku ne zamjenjuje ga, a ni uređivanje ne briše prethodni izvještaj.';
+$ec_lang['lpn_guide_text_status_box']='Navodi, redom po vremenu, svaku promjenu tijekom posljednje simulacije produljenog razdoblja: otvaranje ili zatvaranje pumpe, ventila ili cijevi, početak punjenja ili pražnjenja spremnika ili njegovo punjenje ili pražnjenje do kraja te svaki vremenski korak koji nije potpuno konvergirao. Navode se samo promjene, a ne svaki vremenski korak.';
+$ec_lang['lpn_guide_text_alt_box']='Prikazuje za svaki scenarij koju alternativu koristi u svakoj kategoriji, primjerice Fizičko, Potražnja i Aktivacija elemenata, te njegove opcije izračuna: množitelj potražnje, ukupno vrijeme rada i hidraulički vremenski korak. Alternative su samo za čitanje. Opcije izračuna scenarija mogu se upisati ovdje, a prazno polje koristi vrijednost nadređenog scenarija. Otvara se iz izbornika Scenariji nakon isključivanja Osnovnog načina.';
+$ec_lang['lpn_guide_text_full_box']='Navodi svaki čvor i svaku vezu u svakom izvještajnom vremenskom koraku, u jedinicama prikazanima na ploči Tablice. Bez simulacije produljenog razdoblja prikazuje trenutno rješenje u jednom trenutku. Preuzimanje ili ispis obuhvaća sve vremenske korake, a tablica prikazuje jedan po jedan.';
+$ec_lang['lpn_guide_text_calib_box']='Uspoređuje datoteku terenskih mjerenja s izračunanim rezultatima na istim lokacijama i u istim trenucima, po jedna datoteka za svaki parametar. Datoteka se drži samo za tekuću sesiju i ne sprema se s projektom.';
+$ec_lang['lpn_guide_text_notes_popup']='Navodi napomene o tome kako se ova stranica ponaša i što ne radi, svaku kao pojam iza kojeg slijedi njegova definicija. Ne mijenja mrežu.';
+$ec_lang['lpn_guide_text_hotkeys_popup']='Navodi svaki gumb alatne trake i svaki redak izbornika, tipkovničke prečace i stavku za svaki okvir. Odabir retka pokazuje gdje se ta kontrola nalazi; nikada je ne pokreće. Za pretraživanje pritisnite Ctrl+K s bilo kojeg mjesta ili / dok priručnik ima fokus.';
+// The Find and replace chapter beyond its opening paragraphs, in the Guide's Boxes section
+// (Tom, 2026-10-07). Each _def is HTML: keep the tags. A query inside <code> runs as written in
+// English on a page in any language; translate it with the words the Find box shows in your
+// language, or leave it in English. Asset IDs (60, 247, 330) and the numbers are measured on Net1
+// and Net3 by dev/lpn-spike/user-guide-find-harness.js: never change them in translation.
+$ec_lang['lpn_guide_find_query_term']='Jezik upita';
+$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Opseg.Svojstvo uvjet vrijednost</code></td><td>Jedan uvjet. Opseg je Sve, Čvor, Rezervoar, Spremnik, Cijev, Pumpa, Ventil, Tekst, Korisnik ili Izvor. Svojstvo je bilo koja stavka na popisu Svojstvo za taj opseg.</td></tr><tr><td>Uvjeti</td><td>jednako, veće od, manje od, sadrži, n najvećih, n najmanjih i prazno. Sadrži se odnosi samo na tekst. U n najvećih i n najmanjih n je broj, kao u 5 najvećih. Sa samim slovom n, kao u <code>Pipe.Velocity n highest</code>, ili s praznim poljem Vrijednost navodi se 10 elemenata. Prazno pronalazi elemente koji nemaju vrijednost svojstva. Povezanost ima četiri uvjeta i ne prima vrijednost.</td></tr><tr><td>Vrijednosti</td><td>Broj se upisuje bez jedinice, u jedinici prikazanoj u Svojstvima i na ploči Tablice: 40, a ne 40 psi. Tekst, uključujući ID, stavlja se u jednostruke ili dvostruke navodnike: <code>\'60\'</code>.</td></tr><tr><td>I, ILI i zagrade</td><td>Veznik I izračunava se prije veznika ILI, a zagrade grupiraju uvjete. NOT nije dostupan.</td></tr><tr><td>Pisanje</td><td>Velika i mala slova se ne razlikuju. Engleske riječi prihvaćaju se u svakom jeziku, pa se upit kopiran iz ovog priručnika izvodi na stranici na bilo kojem jeziku.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_examples_term']='Riješeni primjeri na Net3';
+$ec_lang['lpn_guide_find_examples_def']='<p>Otvorite primjer Net3 da biste ih slijedili. Tlak je u psi, a brzina u ft/s.</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>Čvor 60 i cijev 60. Čvor i cijev mogu imati isti ID, pa pretraga ID-a pod Sve može vratiti više od jednog elementa.</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>Čvorovi 10, 40, 50, 20 i 153, najprije najniži tlak. Čvor 10 ima -0,6 psi, negativan tlak koji zahtijeva provjeru.</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>Cijevi 60, 329, 125, 123 i 149, najprije najveća brzina. Cijev 60 prenosi 9,3 ft/s.</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>Čvorovi 10, 20, 40 i 50 te cijevi 60, 125 i 329: niski tlakovi i velike brzine na jednom popisu.</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>Čvorovi 10, 20, 40 i 50, niski tlakovi na visokom terenu. Oba uvjeta moraju imenovati istu vrstu elementa: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> ne podudara se ni s čim, jer nijedan element nije istodobno čvor i cijev.</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>Cijev 330, jedina cijev koja je zatvorena u datoteci Net3.</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>Ništa, u datoteci kakva se distribuira. Sa zatvorenom cijevi 247 (vidi Zamijeni i Poništi), čvorovi 215, 217, 219 i 225: čvorovi koje bi puknuće na cijevi 247 ostavilo bez opskrbe. Ponavljanje ovoga za svaku cijev je analiza kritičnosti.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_find_results_term']='Rezultati, odabir i Tablice';
+$ec_lang['lpn_guide_find_results_def']='<p>Pronađeni elementi navedeni su ispod gumba Pronađi. Veće od i n najvećih navode najprije najvišu vrijednost, manje od i n najmanjih najprije najnižu, a ostali uvjeti navode po pronađenoj vrijednosti, zatim po ID-u. Upit s veznikom I ili ILI navodi čvorove, zatim veze, svaku skupinu po ID-u. Jedno podudaranje odmah se prikazuje na karti. Odaberite redak da karta bude usredotočena na taj element. Ako ništa nije odabrano, element se i odabire; ako jest, element se ističe, a odabir se ne mijenja. Shift+klik ili Ctrl+klik na redak dodaje ga u odabir ili ga uklanja. Pronađi sam ne odabire sva podudaranja.</p><p>Gumb Filtriraj u trenutnoj tablici primjenjuje isti upit na ploču Tablice. Svaka tablica na koju se upit odnosi prikazuje samo podudarne retke, s upitom i brojem redaka iznad njih. Da biste na karti odabrali sva podudaranja, odaberite te retke i u izborniku desnog klika odaberite Odaberi na karti. Filtar tablice ne sprema se s projektom i prestaje kada se stranica ponovno učita. Redak uređen tako da se više ne podudara ostaje u tablici, zatamnjen i označen znakom upozorenja, dok ponovno ne pritisnete gumb Filtriraj u trenutnoj tablici.</p>';
+$ec_lang['lpn_guide_find_replace_term']='Zamijeni i Poništi';
+$ec_lang['lpn_guide_find_replace_def']='<p>Dio okvira Promijeni pronađeno upisuje jedno svojstvo na svaki element koji je upit pronašao. Odaberite svojstvo na popisu Svojstvo koje treba promijeniti, unesite novu vrijednost u okvir Nova vrijednost u prikazanoj jedinici i pritisnite gumb Zamijeni. Okvir tada navodi koliko bi se elemenata promijenilo, ne računajući one koji već imaju novu vrijednost. Pritisnite gumb Promijeni ih da primijenite promjenu ili Odustani. Jedno Poništi poništava cijelu zamjenu.</p><p>Primjer na Net1: <code>Pipe.Diameter below 10</code> pronalazi cijevi 31, 122, 113 i 121. Odaberite Promjer, unesite 10 i pritisnite Zamijeni; okvir prikazuje „Promijeniti 4 elemenata?”. Pritisnite Promijeni ih da sve četiri cijevi postavite na 10 in. Jedno Poništi vraća ih na 6 i 8 in.</p><p>Primjer na Net3: <code>Pipe.ID equal to \'247\'</code> pronalazi cijev 247. Odaberite Zatvoreno, ponovno odaberite Zatvoreno na popisu Nova vrijednost, pa pritisnite Zamijeni, zatim Promijeni ih, da zatvorite cijev za gornji primjer povezanosti. Poništi je ponovno otvara.</p><p>Zamjena zahtijeva jednu vrstu elementa, pa pod Sve najprije odaberite vrstu elementa na popisu Što pretražiti. U scenariju koji nije Baza zamjena se pohranjuje u tom scenariju, kao i isto uređivanje u Svojstvima. Gdje su dostupne Mapbox kote, Kota se može zamijeniti iz Mapbox DEM-a umjesto upisane vrijednosti.</p>';
+$ec_lang['lpn_guide_find_notes_term']='Napomene';
+$ec_lang['lpn_guide_find_notes_def']='<ul><li>Vrijednosti se uspoređuju u punoj preciznosti, a navode na četiri decimale. Jednako se rijetko podudara s izračunanim rezultatom; koristite veće od i manje od.</li><li>Tlak, tlačna visina, protok, brzina i ostali rezultati su oni posljednjeg izračuna. Kada je isključena postavka Izračunavaj automatski, opisuju mrežu kakva je bila pri posljednjem izračunu.</li><li>Veće od i manje od na tekstu koriste rječnički poredak, a brojevi se poredaju brojčano: na Net1, <code>Junction.ID above \'20\'</code> pronalazi čvorove 21, 22, 23, 31 i 32.</li><li>Pod Sve nude se samo ID, Opis, Etiketa i Povezanost. Odaberite vrstu elementa na popisu Što pretražiti da biste vidjeli cijeli popis njezinih svojstava.</li><li>Stavka Tekst nema ID. Pretražite je po njezinim riječima, kao u <code>Text.Text contains \'pump\'</code>.</li><li>Četiri uvjeta povezanosti za čvor su nema veza na čvoru, nema otvorenih veza na čvoru, nema puta preko veza do izvora i nema otvorenog puta do izvora. Izvor je rezervoar ili spremnik.</li></ul>';
+// Where the Guide lists its own keys, so that a search for one finds it.
+$ec_lang['lpn_guide_using_heading']='Korištenje priručnika';
+$ec_lang['lpn_guide_keys_term']='Tipkovnički prečaci priručnika';
+$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>Otvori priručnik na kontroli ispod pokazivača ili na kontroli s fokusom.</td></tr><tr><td>F1</td><td>Otvori priručnik na stavci za okvir koji ima fokus.</td></tr><tr><td>Ctrl+K</td><td>Otvori priručnik s odabranim tekstom u polju za pretraživanje.</td></tr><tr><td>/</td><td>Odaberi polje za pretraživanje dok priručnik ima fokus.</td></tr><tr><td>Esc</td><td>Zatvori priručnik i vrati se na mjesto na kojem ste bili.</td></tr></tbody></table>';
+// Under a toolbar button in the User guide, naming the menu row that does the same thing.
+// {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
+$ec_lang['lpn_guide_also']='Također u izborniku {menu}';
+$ec_lang['lpn_guide_how_popup']='Svojstva se otvaraju kada odaberete element ili tekst.';
+$ec_lang['lpn_guide_how_alt']='Pregled alternativa naveden je pod Voda, Scenariji kada je Osnovni način isključen.';
+$ec_lang['lpn_guide_not_shown']='Ova kontrola trenutačno nije na zaslonu.';
+// The box's two context headings. "Tables" holds the two table-help entries that used to sit only
+// in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
+// keys, Undo and the zoom keys had never been gathered anywhere before.
 $ec_lang['lpn_hotkeys_tables_heading']='Tablice';
 $ec_lang['lpn_hotkeys_map_heading']='Karta';
 $ec_lang['lpn_hotkeys_map_term']='Tipkovnički prečaci karte';
+// Same shape as lpn_notes_7_def: one table, one row per key. The ten digits are LPN_TOOL_KEYS in
+// js/looped-network.js; Select also answers to Esc and Delete to the Delete key
+// (LPN_TOOL_ALT_KEYS); Ctrl+Z is undo(); +/- and = are keyZoom() (ROADMAP Task 682).
 $ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>0 ili Esc</td><td>Odabir.</td></tr><tr><td>2</td><td>Dodaj čvor.</td></tr><tr><td>3</td><td>Dodaj rezervoar.</td></tr><tr><td>4</td><td>Dodaj spremnik.</td></tr><tr><td>5</td><td>Dodaj cijev.</td></tr><tr><td>6</td><td>Dodaj pumpu.</td></tr><tr><td>7</td><td>Dodaj ventil.</td></tr><tr><td>8</td><td>Dodaj korisnika.</td></tr><tr><td>9</td><td>Dodaj tekst.</td></tr><tr><td>Delete</td><td>Izbriši odabir.</td></tr><tr><td>Ctrl+Z</td><td>Poništi posljednju promjenu.</td></tr><tr><td>+ ili =</td><td>Povećaj prikaz.</td></tr><tr><td>-</td><td>Smanji prikaz.</td></tr></tbody></table>';
-// ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
-// The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
-// with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
-// strip, and the same control inside the solver's diagnostic box when one is on screen.
-// THE TIP SAYS EXACTLY WHAT THE TAP SENDS, because a control that posts on one press and does not
-// say what it posts is asking for trust it has not earned. It also says no reply is coming, which
-// is the honesty boundary that document draws: a thank-you must never imply an answer.
+// The W row of the Map table. Its own key, spliced into the table by Looped-Network.php, because a new row in
+// lpn_hotkeys_map_def is new markup that 'lang markup matches English' refuses until all 26 languages carry it.
+$ec_lang['lpn_hotkeys_zoomwin_def']='Zumiraj prozor: povucite pravokutnik na karti da zumirate na to područje.';
+// The menu chords (Task 748): Alt+Shift+letter on Windows and Linux, Ctrl+Option on a Mac, and F10.
+// Exactly two rows (Tom, 2026-10-03: "show only the Alt+Shift and the F10"); the letters themselves
+// are assigned per language by menuMnemonics() and shown on the menus, never listed here.
+// A separate block rather than rows in lpn_hotkeys_map_def, because a new row there is new markup
+// that 'lang markup matches English' refuses until all 26 languages carry it.
+$ec_lang['lpn_hotkeys_menu_heading']='Izbornici';
+$ec_lang['lpn_hotkeys_menu_term']='Tipkovnički prečaci izbornika';
+$ec_lang['lpn_hotkeys_menu_def']='<table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+slovo</td><td>Otvorite izbornik s tim slovom, zatim pritisnite slovo retka da ga izaberete. Slova se vide dok koristite tipkovnicu. Na Macu koristite Ctrl+Option.</td></tr><tr><td>F10</td><td>Idi na traku izbornika.</td></tr></tbody></table>';
+// The Screenshot keys. A separate block, for the reason given above the menu block.
+$ec_lang['lpn_hotkeys_snip_heading']='Snimka zaslona';
+$ec_lang['lpn_hotkeys_snip_term']='Tipkovnički prečaci snimke zaslona';
+$ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>S</td><td>Izreži isječak, dok je snimka zaslona otvorena.</td></tr><tr><td>E</td><td>Gumica, u prikazu bilježenja.</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>Poništi i ponovi, u prikazu bilježenja.</td></tr><tr><td>Esc</td><td>Odustani od isječka ili napusti gumicu. U prikazu bilježenja zatvara ga kada ništa nije nacrtano.</td></tr></tbody></table>';
+// ---- "Something wrong here?" (ROADMAP Tasks 207 and 768) ----
+// Two sites, one behaviour -- a standing cell in the map's bottom strip, and the same control inside
+// the solver's diagnostic box when one is on screen. The first click opens a box; Send is the second.
+// The thank-you must never imply an answer: a reply comes only to somebody who left an address.
 $ec_lang['lpn_wrong_btn']='Nešto ovdje ne valja?';
-// Edited by TGH 2026-09-07
+// The standing message's own Hide control. A hidden message leaves the map and waits as the top row of the
+// message history (the down-arrow glyph), marked by lpn_msglog_hidden, with lpn_msglog_unhide to bring it back.
+$ec_lang['lpn_status_dismiss']='Sakrij ovu poruku';
+$ec_lang['lpn_msglog_hidden']='Skriveno';
+$ec_lang['lpn_msglog_unhide']='Prikaži';
+$ec_lang['lpn_status_hidden_tip']='Ponovno prikaži skrivenu poruku na karti.';
+// Rewritten for the two-click box (Task 768); TGH's 2026-09-07 wording described one press.
 $ec_lang['lpn_wrong_tip']='Prijavite pogrešku na ovoj stranici. Otvara se okvir u kojem odabirete problem, dodajete komentar i unosite adresu e-pošte ako želite odgovor. Sva polja su neobavezna i ništa se ne šalje dok ne pritisnete Pošalji.';
 $ec_lang['lpn_wrong_thanks']='Hvala. Vaša prijava je primljena.';
+// The box "Something wrong here?" opens (ROADMAP Task 768). Every field is optional; Send with
+// nothing in it posts only the anonymous tally the button always posted. The four picks are canned
+// phrases a visitor may toggle in any combination. lpn_fb_sends must stay true to send-feedback.php
+// and to the "Messages you send us" row of privacy.php.
+$ec_lang['lpn_fb_intro']='Gotove poruke (neobavezno). Ništa se ne šalje dok ne pritisnete Pošalji.';
+$ec_lang['lpn_fb_pick_numbers']='Brojevi izgledaju pogrešno';
+$ec_lang['lpn_fb_pick_broken']='Nešto nije radilo';
+$ec_lang['lpn_fb_pick_wording']='Tekst ili prijevod je pogrešan';
+$ec_lang['lpn_fb_pick_confusing']='Ovo je zbunjujuće';
+$ec_lang['lpn_fb_comment']='Komentari (neobavezno)';
+$ec_lang['lpn_fb_email']='E-pošta (neobavezno, samo ako želite odgovor)';
+$ec_lang['lpn_fb_sends']='Što se šalje: naziv ove stranice, vaš jezik, inačica web-mjesta, šifra poruke na karti ako postoji te ono što ste odabrali ili upisali. Nikada vaš crtež ni vaša mreža. Vaša adresa e-pošte koristi se samo za odgovor.';
+$ec_lang['lpn_fb_send']='Pošalji';
+$ec_lang['lpn_fb_sending']='Slanje…';
+$ec_lang['lpn_fb_failed']='Poruka nije stigla do nas. Ono što ste napisali još je ovdje, pa možete pokušati ponovno.';
+$ec_lang['lpn_fb_bad_email']='Ta adresa e-pošte ne izgleda ispravno. Ispravite je ili je ostavite praznom.';
+$ec_lang['lpn_fb_busy']='U posljednjih nekoliko minuta stiglo je previše poruka. Ono što ste napisali još je ovdje, pa možete pokušati kasnije.';
 $ec_lang['lpn_status_example_opened']='Otvoreno {name} kao kopija. Spremite je pomoću Datoteka, Spremi kao.';
 // Stands while the fault stands, rather than expiring like every other notice on the map: it
 // reports a page that cannot lay itself out, which is true until a measurement recovers.
@@ -970,6 +1100,8 @@ $ec_lang['lpn_ex_basic_us_desc']='Dva rezervoara, pumpa i mala petlja. Galoni po
 $ec_lang['lpn_ex_net1_title']='EPANET Net1 uz upravljanje pravilima';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net1_desc']='Izmišljeni EPANET primjer s klorom, 1 rezervoarom i 1 spremnikom.';
+$ec_lang['lpn_ex_net1_si_title']='EPANET Net1 uz upravljanje pravilima, L/s (SI)';
+$ec_lang['lpn_ex_net1_si_desc']='Litre u sekundi, s metrima i milimetrima. Izmišljeni EPANET primjer pretvoren iz galona u minuti, stopa i inča, s klorom, 1 rezervoarom, 1 spremnikom, 1 pumpom i dva upravljanja pravilima.';
 $ec_lang['lpn_ex_net2_si_title']='EPANET Net2, l/s (SI)';
 $ec_lang['lpn_ex_net2_si_desc']='Litre u sekundi, uz metre i milimetre. EPANET-ov primjer u Branfordu, Connecticut, pretvoren iz galona po minuti, stopa i inča: 35 čvorova i 1 spremnik, bez rezervoara, pumpe i ventila, dimenzija otprilike 2 × 4 km. Fluorid, nereaktivna tvar, ulazi na jednom izvoru.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (US)';
@@ -1006,11 +1138,16 @@ $ec_lang['lpn_units_nondestructive_desc']='Nedestruktivno: svaki unos ostavlja o
 $ec_lang['lpn_units_destructive']='Destruktivno';
 $ec_lang['lpn_units_destructive_desc']='Destruktivno: matematičkom pretvorbom prepisuje svaki unos, tako da mreža ostaje fizički gotovo ista, unutar tolerancija pretvorbe. Time se gube izvorni unosi. Poništi ih vraća natrag.';
 // {n} is a whole number.
-$ec_lang['lpn_status_reinterpreted']='{n} vrijednosti sada znače {unit}. Ništa nije prepisano.';
-$ec_lang['lpn_status_converted']='{n} vrijednosti je prepisano u {unit}.';
+$ec_lang['lpn_status_reinterpreted']='Vrijednosti koje sada znače {unit} ({n}). Ništa nije prepisano.';
+$ec_lang['lpn_status_converted']='Vrijednosti prepisane u {unit} ({n}).';
 // The toolbar's one-control colour-by-value (Task 327). No label of its own: the select's own
 // options say what it does, and the toolbar is where space is scarcest.
 // Edited by TGH 2026-09-07
+// **THE NATURAL ENGLISH GOES ON THE CONTROL; the ultra-simple rendering goes to the translator**
+// (Tom, 2026-08-18: *"'Input units' and 'Results units'... both more natural than the ultra simple
+// English you used. While I like that you are thinking simple for translators, this should go in
+// _syn and the more natural in English."*). That is the routing rule stated on a real case: simple
+// English is for when an English reader would stumble, and here one would not.
 // **LENGTH ONLY** (Task 693, folded into 696; Tom 2026-09-18: *"when the map unit is lat/lon, this
 // unit label is a lie"*). What the coordinates are in is a separate, derived, read-only line below.
 $ec_lang['lpn_units_length']='Duljina';
@@ -1055,6 +1192,13 @@ $ec_lang['lpn_result_status_closed']='Zatvoreno';
 $ec_lang['lpn_result_head']='Tlačna visina';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_result_head_tip']='Potencijalna energija vode na ovom čvoru, zapisana kao visina vodenog stupca. To je apsolutna visina, dok je tlak manometarsko mjerenje.';
+// A tank's depth and usable volume (Task 783). Depth is head minus the tank bottom, which is our
+// Elevation. Volume is zero at the Lowest water depth, so it is NOT EPANET's tank volume, which also
+// counts the water below the lowest water depth (that water is in the mixing volume, it just cannot be drawn down).
+$ec_lang['lpn_result_depth']='Dubina';
+$ec_lang['lpn_result_depth_tip']='Dubina vode u spremniku u prikazanom trenutku, mjerena od dna spremnika prema gore: tlačna visina umanjena za kotu spremnika.';
+$ec_lang['lpn_result_tank_volume']='Raspoloživi volumen';
+$ec_lang['lpn_result_tank_volume_tip']='Volumen vode iznad najniže dubine vode, pa je na toj dubini jednak nuli. Volumen spremnika u EPANET-u uključuje i vodu ispod najniže dubine vode, koja se i dalje računa u miješanje i starost vode, pa kota spremnika ostaje na dnu spremnika.';
 $ec_lang['lpn_result_pressure']='Tlak';
 $ec_lang['lpn_result_flow']='Protok';
 $ec_lang['lpn_result_velocity']='Brzina';
@@ -1132,7 +1276,8 @@ $ec_lang['lpn_file_convert_as']='Pretvori kao…';
 $ec_lang['lpn_copy_of']='Kopija od {name}';
 // ---- THE CONVERT AS BOX (Task 696) ------------------------------------------------------------
 // The three coordinate cases are Tom's own (R-155, 2026-09-22): "EPSG, unnamed (local) georeference,
-// and not georeferenced". lat/lon is one EPSG system (EPSG:3857 on this page), not a fourth case.
+// and not georeferenced". lat/lon is one EPSG system (EPSG:4326), not a fourth case; EPSG:3857 is a
+// projected system in meters since Task 775.
 $ec_lang['lpn_convas_title']='Pretvori kao';
 $ec_lang['lpn_convas_coordsys_tip']='Koordinatni sustav u koji se kopija pretvara. Kada se razlikuje od sustava ovog projekta, slijede dva koraka postavljanja. Za projekt koji je već georeferenciran, oba se koraka otvaraju dovršena, spremna za prihvaćanje ili promjenu.';
 // {crs} is the name the map status strip shows for this project's coordinate system.
@@ -1179,6 +1324,10 @@ $ec_lang['lpn_tip_join']='{name}: {tip}';
 // with a keyboard handler. It is appended to each tool's own tip rather than written into it.
 $ec_lang['lpn_tool_key_hint']='Prečac: pritisnite {key}.';
 $ec_lang['lpn_tool_key_hint_two']='Prečac: pritisnite {key} ili {key2}.';
+$ec_lang['lpn_tool_add_chain_tip']='Lanac čvorova i cijevi: odredite točku na karti da dodate čvor, zatim odredite svaku sljedeću točku da dodate cijev i čvor. Odredite postojeći čvor da nastavite od njega. Pritisnite Escape da završite lanac.';
+// The Shape tool (Task 779). The word is Tom's: "we call it a 'Shape'".
+$ec_lang['lpn_tool_add_shape']='Lik';
+$ec_lang['lpn_tool_add_shape_tip']='Nacrtajte točku, poliliniju ili poligon na karti. Lik je bilješka i nije dio mreže. Odredite svaku točku, zatim ponovno odredite posljednju točku, pritisnite Enter ili kliknite desnom tipkom da završite. Ponovno odredite prvu točku da zatvorite Lik u poligon.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
 $ec_lang['lpn_tool_area_tip']='Odabir područja prozorom, lasom ili poligonom.';
@@ -1190,6 +1339,7 @@ $ec_lang['lpn_tool_vertices_tip']='Dodajte i uklonite točke loma cijevi. Odredi
 $ec_lang['lpn_tool_undo_tip']='Duljina povijesti poništavanja = 20 radnji';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_zoom_extent_tip']='Prilagodite cijelu mrežu prozoru karte. Za zumiranje na pravokutnik koji povučete pritisnite W ili kliknite mali trokut u kutu gumba alatne trake Prikaži sve. Pogledajte i kontrole zumiranja karte gore desno.';
+$ec_lang['lpn_tool_zoom_selection_tip']='Prilagodite odabrane elemente prozoru karte. Prvo odaberite jedan ili više elemenata.';
 $ec_lang['lpn_tool_zoom_window_tip']='Odredite kutove ili povucite pravokutnik. Ponovno pritisnite za Zumiraj na cijelo.';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='Uvećaj. Prečac: +';
@@ -1197,12 +1347,10 @@ $ec_lang['lpn_zoom_in_tip']='Uvećaj. Prečac: +';
 $ec_lang['lpn_zoom_out_tip']='Umanji. Prečac: -';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='Jednostavno ili složeno pronalaženje i zamjena';
-// **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
+// **"Toolbar"** (Tom renamed it from "Toolbar key" to "Toolbar" on 2026-09-30).
 // The row is not a second toolbar and not a repeat of one -- it is the LEGEND for an icon-only
 // strip, derived from toolbarIconIndex, and on a touch screen it is the only way to read the
-// strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
-// it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
-// key?"* The row earns its place; only the label was lying about what it is.
+// strip at all without a deliberate press-and-hold. The row earns its place.
 $ec_lang['lpn_help_icons']='Legenda alatne trake';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Vidljivost';
@@ -1310,10 +1458,30 @@ $ec_lang['lpn_pane_not_used']='Ne koristi se';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='Filtrirano po {q}. Prikazano {n} od {all}.';
 $ec_lang['lpn_pane_filter_clear']='Prikaži sve';
+// Added to the filtered table's line (Task 738): rows edited since Filter in table was pressed stay
+// in the table even when they no longer match, dimmed and marked, until it is pressed again. {n} is
+// how many. Worded as a label and a count so no plural form is needed.
 $ec_lang['lpn_pane_filter_stale']='Retci koji više ne odgovaraju: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='Ništa u ovoj tablici ne odgovara filtru.';
+// Selection only (Task 757): the Tables pane filtered to what is selected on the map. Parallel to
+// lpn_pane_filter_note. The line names the Find filter too when both are on.
+$ec_lang['lpn_pane_filter_sel_note']='Samo odabrano. Prikazano {n} od {all}.';
+$ec_lang['lpn_pane_filter_sel_and']='Filtrirano po {q} i samo odabrano. Prikazano {n} od {all}.';
+$ec_lang['lpn_pane_filter_sel_none']='Nijedan od odabranih elemenata nije u ovoj tablici.';
+$ec_lang['lpn_pane_sel_only']='Samo odabrano';
+$ec_lang['lpn_pane_sel_only_none']='Nijedan element nije odabran. Najprije odaberite elemente na karti.';
+// Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
+// scenario, with a Scenario column after ID.
+$ec_lang['lpn_pane_scn_show']='Prikaži scenarije';
+// The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
+// scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+$ec_lang['lpn_pane_clear_override']='Ukloni vrijednost scenarija';
+// The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
+// Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
+// in Basic mode is its scenario's.
+$ec_lang['lpn_pane_scn_alt_tip']='{category} alt.: {alternative}';
 // The pin beside the ID in the first column. The ID itself was this control until 2026-09-19,
 // underlined and turning link blue; the ID is an ordinary editable cell now and this is the way
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
@@ -1323,6 +1491,16 @@ $ec_lang['lpn_goto_on_map']='Prikaži na karti';
 $ec_lang['lpn_pane_select_on_map']='Odaberi na karti';
 $ec_lang['lpn_pane_unselect_on_map']='Poništi odabir na karti';
 $ec_lang['lpn_pane_print']='Ispiši tablicu';
+// Tom, 2026-10-06. Copy with headings puts the heading line, unit included, above the selected cells; plain
+// Copy never does. The two Export rows download the whole table as shown.
+$ec_lang['lpn_pane_copy_heads']='Kopiraj sa zaglavljima stupaca';
+// Tom, 2026-10-07. File, Export to, ODS/XLSX/CSV file: a box asking which tables and which scenarios.
+// {format} is ODS, XLSX or CSV, the file format's own name, never translated.
+$ec_lang['lpn_export_table_title']='Izvoz u {format}';
+$ec_lang['lpn_export_table_current']='Trenutna';
+$ec_lang['lpn_export_table_all']='Sve';
+$ec_lang['lpn_export_table_go']='Izvezi';
+$ec_lang['lpn_export_table_scn_note']='Rezultati se izvoze samo za scenarij koji je posljednji izračunan.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1354,6 +1532,32 @@ $ec_lang['lpn_menu_project']='Voda';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='Sve što je specifično za modeliranje vodovodne mreže (osim tipki za reprodukciju animacije)';
 $ec_lang['lpn_tables_menu']='Tablice';
+// Water > Change type (Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// to Change node type for any asset, where if it has information that can't be ported to the new
+// type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
+// asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
+// popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
+// dev/asset-type.md.
+$ec_lang['lpn_change_type_menu']='Promijeni vrstu';
+$ec_lang['lpn_change_type_tip']='Promijenite vrstu odabranih čvorova (čvor, rezervoar ili spremnik) ili vodova (cijev, pumpa ili ventil). Svaki zadržava svoj ID, položaj, spojeve i svaku vrijednost koju ima i nova vrsta. Ako bi se nešto izgubilo, prvo se traži potvrda.';
+$ec_lang['lpn_change_type_ok']='Promijeni';
+$ec_lang['lpn_change_type_lost']='Ove vrijednosti bit će izgubljene:';
+// The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
+$ec_lang['lpn_change_type_key']='Svaki redak: ID: svojstvo i vrijednost koji bi se izgubili';
+$ec_lang['lpn_change_type_line']='{id}: {property} {value}';
+$ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, u scenariju {scenario}';
+$ec_lang['lpn_change_type_more']='I još {n}.';
+// Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
+// water surface is carried, so the new head or water depth is listed with its value.
+$ec_lang['lpn_change_type_surface']='Ove vrijednosti zadržavaju vodno lice na istom mjestu. Tlačna visina rezervoara jednaka je koti spremnika plus dubina vode u njemu, a dubina vode u spremniku jednaka je tlačnoj visini rezervoara minus kota:';
+$ec_lang['lpn_change_type_meaning']='Ove kontrole i pravila ispituju čvor koji se mijenja i čitat će ga drukčije: čvor se ispituje prema tlaku, a spremnik ili rezervoar prema razini vode.';
+// The link half (Tom, 2026-10-06: "Proceed."). Each heads a list of "ID: entry" lines.
+$ec_lang['lpn_change_type_born']='Ove vrijednosti su nove, postavljene kao na novocrtanom elementu:';
+$ec_lang['lpn_change_type_no_curve']='{id}: nema krivulje tlačne visine pumpe, pa pumpa ne daje tlačnu visinu dok se ne odabere, a izvoz u .inp upisuje je kao cijev';
+$ec_lang['lpn_change_type_becomes']='{id}: {property} {value}, u scenariju {scenario}, postaje {new}';
+$ec_lang['lpn_change_type_customers']='Cijev je jedina koja opskrbljuje korisnike, pa se ovi korisnici umjesto toga spajaju na čvor prikazan u zagradama, gdje je njihova potražnja već primijenjena. Ostaju gdje su nacrtani, a njihova potražnja ostaje nepromijenjena:';
+$ec_lang['lpn_change_type_setting']='Ove kontrole i pravila zadaju ili ispituju postavku voda koja se mijenja. Postavka je druga veličina na cijevi, pumpi i ventilu, pa će je čitati drukčije:';
+$ec_lang['lpn_change_type_rules']='Ovi retci pravila navode vod prema njegovoj vrsti i umjesto toga navodit će njegovu novu vrstu:';
 $ec_lang['lpn_tables_menu_tip']='Pregledajte i uređujte elemente u tablicama na donjoj ploči.';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the
@@ -1378,8 +1582,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Isključite ako je ponovni izračun presp
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='Izračun ove mreže trajao je {secs} s, a postavljena je da se ponovno izračunava nakon svake promjene. Da to zaustavite i vratite gumb Izračunaj, isključite „Izračunavaj automatski” u Postavkama, pod Izračun, Hidraulika.';
 $ec_lang['lpn_time_no_report']='Izvještaj o pokretanju još ne postoji. Izvještaj je EPANET tekstualni izvještaj, pa se pojavljuje nakon što je ova mreža izračunata.';
-// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
-// this one, and of the three, Settings is the word a person is most likely to look for first.
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -1415,6 +1617,8 @@ $ec_lang['lpn_find_menu']='Pronađi i zamijeni';
 $ec_lang['lpn_find_title']='Pronađi i zamijeni';
 $ec_lang['lpn_find_scope']='Što pretražiti';
 $ec_lang['lpn_find_scope_all']='Sve';
+$ec_lang['lpn_find_scope_source']='Izvor';
+$ec_lang['lpn_find_source_no_chemical']='Ne prati se nijedna kemikalija, pa nijedan čvor nema izvor.';
 $ec_lang['lpn_find_property']='Svojstvo';
 $ec_lang['lpn_find_condition']='Uvjet';
 $ec_lang['lpn_find_value']='Vrijednost';
@@ -1493,9 +1697,10 @@ $ec_lang['lpn_find_op_conn_unlinked']='nema veza na čvoru';
 $ec_lang['lpn_find_op_conn_noopen']='nema otvorenih veza na čvoru';
 $ec_lang['lpn_find_op_conn_nolinksource']='nema puta preko veza do izvora';
 $ec_lang['lpn_find_op_conn_noopensource']='nema otvorenog puta do izvora';
-// What a result row prints beside the node id: the fault it has, in three words.
-// What a result row prints beside the id: the NARROWEST condition true of that node, because "no
-// links" says more than "no open path to a source" and both are true of the same node.
+// A result row prints the NARROWEST condition true of that node beside its id, because "no links"
+// says more than "no open path to a source" and both are true of the same node. It prints the
+// SAME four keys above with the first letter capitalized in code (findConnLabel()), not a second
+// capitalized copy of each (Task 699, Tom 2026-09-30: "do the Find redesign").
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='Svaki čvor je povezan.';
@@ -1540,13 +1745,13 @@ $ec_lang['lpn_replace_title']='Promijeni pronađeno';
 $ec_lang['lpn_replace_prop']='Svojstvo koje treba promijeniti';
 $ec_lang['lpn_replace_value']='Nova vrijednost';
 $ec_lang['lpn_replace_source']='Izvor nove vrijednosti';
-$ec_lang['lpn_replace_asked']='Zatražene su kote za {n} čvorova. Rezultati se prikazuju kada se prime.';
+$ec_lang['lpn_replace_asked']='Zatražene kote za čvorove ({n}). Rezultati se prikazuju kada se prime.';
 $ec_lang['lpn_replace_btn']='Zamijeni';
 // The count IS the confirmation: a bulk write reaches assets spread over a map the user is not
 // looking at, so it is shown, and answered, before anything is written. {n} is a whole number.
-$ec_lang['lpn_replace_preview']='Promijeniti {n} elemenata?';
+$ec_lang['lpn_replace_preview']='Promijeniti elemente ({n})?';
 $ec_lang['lpn_replace_apply']='Promijeni ih';
-$ec_lang['lpn_replace_done']='Promijenjeno elemenata: {n}. Ovo se može poništiti u jednom koraku.';
+$ec_lang['lpn_replace_done']='Promijenjeni elementi: {n}. Ovo se može poništiti u jednom koraku.';
 $ec_lang['lpn_replace_none']='Ništa se ne bi promijenilo.';
 $ec_lang['lpn_replace_no_value']='Unesite novu vrijednost.';
 $ec_lang['lpn_replace_scope']='Odaberite jednu vrstu elementa iznad na kojoj ćete mijenjati vrijednosti.';
@@ -1555,6 +1760,7 @@ $ec_lang['lpn_replace_scope']='Odaberite jednu vrstu elementa iznad na kojoj će
 // {u} is a unit name, {n} a count and {len} a length; they are substituted, not concatenated, so a
 // language that puts the unit somewhere else can.
 $ec_lang['lpn_profile_menu']='Profil';
+$ec_lang['lpn_graphs_menu']='Grafikoni';
 // **THE SYNONYMS ARE IN THE SYNONYM CHANNEL, WHICH IS WHERE THEY WERE ALWAYS MEANT TO BE.** They
 // shipped as `lpn_profile_tip_syn` / `lpn_profile_title_syn` -- ordinary $ec_lang keys with no call
 // site, which nothing rendered and which a sprint would have translated into 26 languages for
@@ -1601,6 +1807,10 @@ $ec_lang['lpn_profile_new']='Nova spremljena ruta…';
 $ec_lang['lpn_profile_new_name']='Ruta {n}';
 $ec_lang['lpn_profile_rename']='Preimenuj rutu…';
 $ec_lang['lpn_profile_delete']='Izbriši rutu';
+$ec_lang['lpn_profile_open']='Otvori EPANET datoteku profila…';
+$ec_lang['lpn_profile_file_done']='Profil je pročitan iz datoteke: pronađeno je {used} od {total} čvorova u ovoj mreži.';
+$ec_lang['lpn_profile_file_missing']='Navedeno u datoteci, a nema u ovoj mreži: {ids}.';
+$ec_lang['lpn_profile_file_short']='Datoteka navodi manje od dva čvora iz ove mreže, pa nema profila za crtanje.';
 $ec_lang['lpn_profile_prompt_name']='Naziv ove rute';
 $ec_lang['lpn_profile_delete_confirm']='Izbrisati spremljenu rutu {name}? Sam crtež se ne mijenja.';
 $ec_lang['lpn_profile_none_saved']='Još nema spremljenih ruta';
@@ -1620,6 +1830,17 @@ $ec_lang['lpn_ts_tip']='Prikažite grafikon jednog ili više elemenata tijekom s
 $ec_lang['lpn_ts_title']='Vrijednosti u odnosu na vrijeme';
 $ec_lang['lpn_ts_group_nodes']='Čvorovi';
 $ec_lang['lpn_ts_group_links']='Vodovi';
+$ec_lang['lpn_pgraph_none']='Ovaj element nema rezultata u trenutačnom pokretanju.';
+// The Properties graph's own selector entry for a source share (Tom, 2026-09-30: "In selector, use
+// 'Source share from {trace node}'"). Distinct from the shared lpn_result_source_share, which still
+// labels the bare quantity everywhere else -- the Tables column, Find's property list, the Labels
+// popover and the colour legend -- where naming the trace node in every heading would be clutter.
+$ec_lang['lpn_pgraph_source_share_from']='Udio izvora iz čvora {node}';
+$ec_lang['lpn_result_pump_head']='Tlačna visina';
+$ec_lang['lpn_result_pump_head_tip']='Tlačna visina koju pumpa dodaje od usisa do potiska, prikazana kao pozitivan broj. Rješavač i EPANET datoteke bilježe je kao negativan gubitak tlačne visine.';
+// The Full report puts every node and link in one table, where a node's Head column already sits, so a
+// pump's column there says whose head it is. Elsewhere the pump's own row or tab says so, and lpn_result_pump_head is enough.
+$ec_lang['lpn_report_pump_head']='Tlačna visina pumpe';
 $ec_lang['lpn_ts_add']='Dodaj odabrano';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
 $ec_lang['lpn_ts_add_none']='Nema ničega za dodavanje.';
@@ -1632,6 +1853,10 @@ $ec_lang['lpn_ts_none']='Za sada nema ničega za prikaz. Odaberite elemente na k
 $ec_lang['lpn_ts_no_frames']='Još nema rezultata proširenog razdoblja. Pritisnite Izračunaj da pokrenete simulaciju.';
 $ec_lang['lpn_ts_summary']='Elementi: {n}, vremena izvještavanja: {steps}';
 $ec_lang['lpn_ts_axis_time']='Proteklo vrijeme';
+// EPANET's Frequency Plot (Task 600): one value over every junction or every pipe, at the time the
+// map shows, against the percent of them less than it. "Percent less than" is EPANET's own axis
+// title. {n} and {total} are counts, {time} an elapsed time; all substituted, never concatenated.
+// The Junctions/Pipes choice reuses lpn_pane_tab_junctions and lpn_pane_tab_pipes.
 $ec_lang['lpn_freq_menu']='Učestalost';
 $ec_lang['lpn_freq_tip']='Razdioba učestalosti za svojstvo';
 $ec_lang['lpn_freq_title']='Raspodjela vrijednosti';
@@ -1639,6 +1864,49 @@ $ec_lang['lpn_freq_none']='Za ovu vrijednost još nema rezultata, pa nema ništa
 $ec_lang['lpn_freq_summary']='Prikazano: {n} od {total}';
 $ec_lang['lpn_freq_summary_time']='Prikazano: {n} od {total}, u {time}';
 $ec_lang['lpn_freq_axis_percent']='Postotak manje od';
+// EPANET's Contour Plot (Task 600), drawn as a layer under the map rather than in a window of its
+// own, from the pipes outward. {n} and {p} are counts, {k} and {i} numbers, {u} a unit symbol, {m} a
+// distance in metres; all substituted. lpn_contour_buffer_unit follows the Buffer number box.
+// lpn_contour_consent_1..4 are the terrain question's four paragraphs, reworded for what the contour
+// plot sends: tile numbers for the network's area, not each node's latitude and longitude.
+$ec_lang['lpn_contour_menu']='Izolinije';
+$ec_lang['lpn_contour_tip']='Prikažite na karti prikaz izolinija: boje čvorova šire se uzduž cijevi i pored njih, s označenim izolinijama. Otvara okvir za podešavanje ili isključivanje.';
+$ec_lang['lpn_contour_plot']='Prikaz izolinija';
+$ec_lang['lpn_contour_show']='Prikaži izolinije';
+$ec_lang['lpn_contour_show_tip']='Isključite da sakrijete ispunu i izolinije; uključite da ih vratite kakve su bile. Boje čvorova ostaju.';
+$ec_lang['lpn_contour_fill']='Ispuna';
+$ec_lang['lpn_contour_fill_tip']='Glatko stapa boje iz jednog razreda u drugi. Pojasevi boje svaki razred legende boja jednolično.';
+$ec_lang['lpn_contour_fill_smooth']='Glatko';
+$ec_lang['lpn_contour_fill_bands']='Pojasevi';
+$ec_lang['lpn_contour_opacity']='Neprozirnost ispune';
+$ec_lang['lpn_contour_lines']='Izolinije';
+$ec_lang['lpn_contour_interval']='Razmak';
+$ec_lang['lpn_contour_buffer']='Zona';
+$ec_lang['lpn_contour_buffer_unit']='× medijan duljine cijevi';
+$ec_lang['lpn_contour_buffer_tip']='Doseg boje od svake cijevi, kao višekratnik medijana duljine cijevi. U vanjskom dijelu postupno blijedi.';
+$ec_lang['lpn_contour_few']='Premalo čvorova za izolinije.';
+$ec_lang['lpn_contour_support']='Prikaz izolinija: {n} čvorova, interpolirano uzduž {p} cijevi i do {k} puta medijana duljine cijevi pored njih. Nema boje preko pumpi, ventila ni zatvorenih vodova.';
+$ec_lang['lpn_contour_support_lines']='Izolinije svakih {i} {u}.';
+$ec_lang['lpn_contour_too_many']='Previše izolinija pri ovom razmaku; povećajte ga da bi se iscrtale.';
+$ec_lang['lpn_contour_dem']='Teren između čvorova iz Mapbox DEM-a';
+$ec_lang['lpn_contour_dem_tip']='Između čvorova tlak postaje interpolirana tlačna visina minus visina terena iz Mapbox DEM-a, pa može pasti ispod najnižeg tlaka čvora na brdu na kojem mreža nema čvora. Teren shvatite kao kartu slojnica, a ne kao geodetsko mjerenje.';
+$ec_lang['lpn_contour_support_dem']='Između čvorova tlak je interpolirana tlačna visina minus kota terena iz Mapbox DEM-a, očitana otprilike svakih {m} m.';
+$ec_lang['lpn_contour_dem_failed']='Teren se nije mogao očitati iz Mapbox DEM-a, pa se tlak interpolira samo između čvorova.';
+$ec_lang['lpn_contour_consent_1']='Crtanje tlaka preko terena šalje područje koje vaša mreža pokriva, kao brojeve Mapbox pločica karte, na api.mapbox.com, radi očitanja visine terena tamo.';
+$ec_lang['lpn_contour_consent_2']='Ovo je drugo pitanje od slika karte iza vašeg projekta. Slike samo govore gdje gledate. Ove pločice govore gdje je vaša mreža. Mapbox će primiti te brojeve pločica i vašu IP adresu. Ne šaljemo ništa drugo: ni ime, ni cijevi, ni projekt. Ne vodimo nikakav zapis o tome, a na ovom uređaju ne pohranjuje se ništa osim vašeg odgovora na ovo pitanje.';
+$ec_lang['lpn_contour_consent_3']='Smijemo li poslati Mapboxu brojeve pločica područja vaše mreže?';
+$ec_lang['lpn_contour_consent_4']='Ako odgovorite ne, sve ostalo na ovoj stranici radi točno kao i sada, a prikaz izolinija crta se samo između čvorova. Odgovor „da“ pamtimo kako ne bismo ponovno pitali. Odgovor „ne“ ne pohranjuje se uopće.';
+// EPANET's System Flow plot (Task 600). "System flow" is its Graph Selection name, "System flow
+// balance" its window title, "Produced" and "Consumed" its series. The definition is its own code
+// (Fgraph.pas GetSysFlow): junction and reservoir demands only, split by sign; tanks in neither.
+// The axis reuses lpn_result_flow and lpn_ts_axis_time.
+$ec_lang['lpn_sysflow_menu']='Bilanca protoka';
+$ec_lang['lpn_sysflow_tip']='Prikažite grafikonom ukupni proizvedeni i ukupni potrošeni protok u odnosu na vrijeme, tijekom simulacije proširenog razdoblja. Spremnici nisu ni u jednom zbroju, pa gdje se dvije linije razilaze, spremnici se pune ili prazne.';
+$ec_lang['lpn_sysflow_title']='Bilanca protoka';
+$ec_lang['lpn_sysflow_produced']='Proizvedeno';
+$ec_lang['lpn_sysflow_produced_tip']='Ukupni protok u mrežu iz rezervoara i iz negativnih potražnji.';
+$ec_lang['lpn_sysflow_consumed']='Potrošeno';
+$ec_lang['lpn_sysflow_consumed_tip']='Zbroj svake pozitivne potražnje: voda povučena iz mreže na čvorovima i svaki protok u rezervoar.';
 $ec_lang['lpn_view_units']='Jedinice';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Spremi sve';
@@ -1678,8 +1946,9 @@ $ec_lang['lpn_new_coordsys_local_tip']='Nije georeferencirano. Pridružite vlast
 // system" on 2026-09-25 -- don't expose the word "projection".) Two filters over one catalogue, and
 // the catalogue itself is not keyed: a coordinate system's NAME is the EPSG register's own, exactly
 // as the OpenStreetMap credit is, and a GIS reader in any language looks for those characters.
-// **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25). Shared by the New project box and Convert as, so
-// it names the box's own subject rather than either caller's radio label.
+// **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25) is lpn_new_coordsys, as are its list label and
+// the New project box's chooser button (Task 699): it names the box's own subject rather than
+// either caller's radio label.
 // The spatial filter. A zoned system covers a strip of the Earth and nothing outside it, so a place
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
@@ -1702,6 +1971,8 @@ $ec_lang['lpn_crs_count_network']='{n} od {total} koordinatnih sustava pokriva o
 // when this page has no transform for it. Short on purpose: it sits at the end of a register name
 // that can already run to 50 characters.
 $ec_lang['lpn_crs_unplaceable_mark']='(bez karte)';
+// Shown beside WGS 84 (EPSG:4326) in the chooser only (Task 775), never on the status strip.
+$ec_lang['lpn_crs_suggested_mark']='(predloženo)';
 // The same fact in a sentence: when such a project is created, and when Go to or place name search
 // is used on one. File, Convert as says it in its own words (lpn_convas_no_transform).
 $ec_lang['lpn_crs_unplaceable']='{crs} jedan je od rijetkih navedenih koordinatnih sustava bez upotrebljivih podataka o projekciji. To znači da karta svijeta, pretraga naziva mjesta i DEM kote ne rade. Vaše koordinate nisu pogođene.';
@@ -1758,19 +2029,80 @@ $ec_lang['lpn_import_no_room']='Nema dovoljno preostalog prostora u pohrani preg
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='U redu';
+// **TASK 718** (Tom, 2026-09-25: *"We have three import items. It's probably time for an Import
+// sub-menu."*). The three rows -- surveyed points, an EPANET file, and libraries -- now open as a
+// fly-out off one row, the same submenu idiom Help > Toolbar already uses. Each row keeps its
+// own existing key and tip; only this one row is new.
 $ec_lang['lpn_file_import_menu']='Uvezi…';
 $ec_lang['lpn_file_import_inp']='Uvezi EPANET datoteku…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='Učitajte mrežu iz EPANET datoteke, bilo iz tekstualne .inp datoteke ili .net datoteke koju sprema EPANET, i spremite je u ovom pregledniku kao novi projekt.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
+// File > Export is a submenu (Tom, 2026-10-06), so its rows drop the verb the heading carries. The
+// two keys above are what the rows were called before it.
+$ec_lang['lpn_file_export_menu']='Izvezi…';
+$ec_lang['lpn_file_export_item_inp']='EPANET datoteka…';
+$ec_lang['lpn_file_export_item_geojson']='GeoJSON datoteka…';
+$ec_lang['lpn_file_export_item_ods']='ODS datoteka…';
+$ec_lang['lpn_file_export_item_xlsx']='XLSX datoteka…';
+$ec_lang['lpn_file_export_item_csv']='CSV datoteka…';
+$ec_lang['lpn_file_export_tables_tip']='Preuzmite tablice onako kako ih prikazuje ploča Tablice, u jednoj radnoj knjizi s listom za svaku tablicu (i za svaki scenarij koji odaberete), plus list za svaku knjižnicu na koju se upućuje njihovim ID-ovima: obrasci, krivulje, vrste cijevi i armatura. Rezultati su uključeni samo za scenarij koji je posljednji izračunan.';
+$ec_lang['lpn_file_export_csv_tip']='Preuzmite tablicu onako kako je prikazuje ploča Tablice. Jedna tablica dolazi kao jedna CSV datoteka, bez knjižnica. Više tablica ili scenarija dolazi kao jedna zip datoteka CSV datoteka, s datotekom za svaku knjižnicu na koju se upućuje njihovim ID-ovima. Rezultati su uključeni samo za scenarij koji je posljednji izračunan.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Preuzmite ovu mrežu kao EPANET .inp datoteku (u zip datoteci sa slikom, ako postoji). Sve što .inp format ne može sadržavati navedeno je poslije.';
 $ec_lang['lpn_status_inp_exported']='Izvezeno {file}.';
+$ec_lang['lpn_status_inp_exported_picture']='Izvezeno {zip}, koji sadrži EPANET datoteku {file}, pozadinsku sliku {picture} i datoteku za georeferenciranje {world}. Raspakirajte sve tri u jednu mapu, zatim tamo otvorite .inp u EPANET-u; slika se otvara s njom.';
+$ec_lang['lpn_status_inp_exported_no_picture']='Izvezeno {file}. Pozadinsku sliku nije bilo moguće spremiti, pa .inp ne navodi nijednu; u EPANET-u je dodajte pomoću Pogled > Pozadina > Učitaj.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
 $ec_lang['lpn_inp_export_differences']='{n} stvari koje .inp format ne može sadržavati.';
+$ec_lang['lpn_inp_export_difference_one']='Jedna stvar koju .inp format ne može sadržavati.';
 $ec_lang['lpn_inp_export_refused']='Ovaj projekt se ne može zapisati kao EPANET datoteka: {detail}';
+// Task 772: File > Export DXF file. The model's data for AutoCAD and other CAD programs.
+$ec_lang['lpn_file_export_item_dxf']='DXF datoteka…';
+$ec_lang['lpn_file_export_dxf_tip']='Preuzmite ovu mrežu za AutoCAD i druge CAD programe: čvorovi kao blokovi simbola, cijevi, pumpe i ventili kao polilinije, a svaki element kao blok čiji atributi nose njegov ID i vrijednosti svojstava u jedinicama projekta.';
+$ec_lang['lpn_dxf_export_no_utm']='DXF datoteka nije napisana: ova mreža leži izvan geografskih širina koje UTM pokriva (80° J do 84° S), a crtežu je potrebna ravna mreža na kojoj će se crtati.';
+$ec_lang['lpn_dxf_export_refused']='DXF datoteka nije napisana: nije se učitala pretvorba koordinata koja je potrebna. Provjerite vezu i pokušajte ponovno.';
+$ec_lang['lpn_dxf_export_failed']='DXF datoteka nije napisana: zaustavila ju je pogreška na ovoj stranici ({error}).';
+// The read-me written into the file as a block of attributes, on a layer that does not plot; the
+// file writes it in capital letters. Each says what
+// the coordinates are and claims no coordinate system the file does not have. {unit} is a length
+// unit as written in English (ft, m), not translated; {crs} is a coordinate system name with its EPSG code.
+$ec_lang['lpn_dxf_note_grid']='Koordinate: X i Y ovog projekta, u {unit}. Koordinatni sustav nije naveden.';
+$ec_lang['lpn_dxf_note_crs']='Koordinate: {crs}, točno onako kako ih ovaj projekt navodi.';
+$ec_lang['lpn_dxf_note_geo']='Koordinate: {crs}, u metrima, a ne geografska širina i dužina. Geografske širine i dužine projekta pretvorene su u tu mrežu.';
+$ec_lang['lpn_dxf_exported_geo']='Izvezeno {file}. Njegove koordinate su {crs}, u metrima, a ne geografska širina i dužina.';
+// {prefix} is the layer-name prefix, C-WATR-MODL-; {example} is a whole layer name such as
+// C-WATR-MODL-NODE-BASE.
+$ec_lang['lpn_dxf_note_blocks']='Slojevi se nazivaju {prefix}, šifra elementa, crtica i alternativa, kao u {example}. Svaki element je blok umetnut u mjerilu 1 s atributima visine 1 jedinica; promijenite mjerilo blokova da postavite visinu teksta. Svaki atribut je vidljiv; atributi jednog elementa složeni su u stupac pokraj njegova simbola.';
+// {n} is a whole number; {max} is 2049. Each shortened value ends in three periods (...).
+$ec_lang['lpn_dxf_note_shortened']='Vrijednosti dulje nego što DXF datoteka dopušta ({max} znakova): {n}. Svaka je skraćena i završava s tri točke.';
+// {n} is a whole number; {tag} is an attribute tag in capitals, BASE_DEMAND in English.
+$ec_lang['lpn_dxf_note_categories']='Čvorovi s više od jedne kategorije potražnje: {n}. Njihov atribut {tag} sadrži zbroj baznih potražnji svih kategorija.';
+// GeoJSON export (Task 728). The command is worded like Export EPANET file. Positions in a GeoJSON
+// file are always longitude and latitude (RFC 7946), so a project with no place on the Earth is
+// refused and told how to get one, never written with an invented coordinate system.
+$ec_lang['lpn_file_export_geojson_tip']='Preuzmite ovu mrežu kao GeoJSON datoteku za QGIS, ArcGIS Pro i druge GIS programe. Čvorovi, spremnici i rezervoari su točke, a cijevi, pumpe i ventili linije koje prate svoje vrhove. Položaji su geografska širina i dužina. Rezultati su uključeni samo kada je mreža riješena.';
+// Workspace export and import (Tom, 2026-10-07). {file}, {n}, {r}, {u} and {version} are filled in by the page.
+$ec_lang['lpn_file_export_item_workspace']='Radni prostor…';
+$ec_lang['lpn_file_export_workspace_tip']='Preuzmite malu datoteku koja sadrži gdje se nalaze vaši okviri, njihove veličine, koji su otvoreni ili usidreni te veličine vaših ploča i stupaca, uz opcije prikaza ove stranice, primjerice koji se baloni pomoći i kartica pri prelasku pokazivačem prikazuju. U njoj nisu vaši projekti, postavke projekta ni kolačići (jezik, privola, jedinice). Učitajte je na drugom zaslonu ili pregledniku pomoću Datoteka, Uvezi, Radni prostor.';
+$ec_lang['lpn_file_import_workspace']='Radni prostor…';
+$ec_lang['lpn_file_import_workspace_tip']='Primijenite datoteku radnog prostora spremljenu pomoću Datoteka, Izvezi, Radni prostor: položaje i veličine okvira, sidrenje, veličine ploča i opcije prikaza ove stranice, primjerice koji se baloni pomoći i kartica pri prelasku pokazivačem prikazuju. Vaši projekti i kolačići ne mijenjaju se.';
+$ec_lang['lpn_workspace_exported']='Radni prostor spremljen u {file}: postavki {n}.';
+$ec_lang['lpn_workspace_imported']='Radni prostor primijenjen iz {file}. Primijenjene postavke: {n}. Vraćeno na zadano: {r}.';
+$ec_lang['lpn_workspace_ignored']='Zanemareni unosi jer nisu prepoznati: {u}.';
+$ec_lang['lpn_workspace_refused_unreadable']='Ova se datoteka nije mogla pročitati kao radni prostor, pa ništa nije promijenjeno.';
+$ec_lang['lpn_workspace_refused_format']='Ovo nije datoteka radnog prostora koju je spremila ova stranica, pa ništa nije promijenjeno.';
+$ec_lang['lpn_workspace_refused_newer']='Ovu datoteku radnog prostora spremila je novija inačica ove stranice (format {version}), pa ništa nije promijenjeno.';
+$ec_lang['lpn_workspace_confirm']='Zamijeniti raspored radnog prostora u ovom pregledniku rasporedom iz datoteke?';
+$ec_lang['lpn_workspace_refused_storage']='Pohrana preglednika je puna ili nedostupna, pa radni prostor nije primijenjen.';
+$ec_lang['lpn_geojson_refused_local']='GeoJSON datoteka sadrži samo geografsku širinu i dužinu, a ovaj projekt je nacrtan na lokalnoj mreži bez mjesta na Zemlji. Najprije ga georeferencirajte pomoću Karta, Karta svijeta, Pridruži, zatim ponovno izvezite.';
+$ec_lang['lpn_geojson_refused_range']='Ovi položaji nisu ispravne geografske širine i dužine: {detail}';
+$ec_lang['lpn_geojson_refused_crs']='Koordinatni sustav ovog projekta ({detail}) ova stranica ne poznaje, pa se njegovi položaji ne mogu pretvoriti u geografsku širinu i dužinu. Pomoću Pretvori kao… kopirajte projekt u sustav koji ova stranica poznaje, zatim ponovno izvezite.';
+$ec_lang['lpn_geojson_refused_empty']='Još nema ničega za izvoz. Najprije nacrtajte ili otvorite mrežu.';
+$ec_lang['lpn_geojson_results_in']='Rezultati na zaslonu su uključeni.';
+$ec_lang['lpn_geojson_results_out']='Rezultati nisu uključeni jer mreža nije riješena.';
 $ec_lang['lpn_inp_bad_file']='Tu datoteku nije moguće pročitati kao EPANET datoteku mreže.';
 // EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
 // the way out named here always works, so keep the instruction in the message rather than leaving
@@ -1786,6 +2118,10 @@ $ec_lang['lpn_inp_report_label_anchor']='Tekstualne oznake postavljene su onako 
 // or no [BACKDROP] line at all, never only "None" -- because none of those states a real coordinate
 // system either. See showInpReport() in js/looped-network.js.
 $ec_lang['lpn_inp_report_no_crs']='EPANET datoteke ne sadrže koordinatni sustav, pa ova datoteka isprva neće biti georeferencirana. Da je postavite na kartu svijeta, koristite Karta, Karta svijeta… Da pretvorite njezine koordinate, koristite Datoteka, Pretvori kao…';
+$ec_lang['lpn_inp_backdrop_attach']='Pridruži {file}…';
+$ec_lang['lpn_inp_backdrop_attach_tip']='Web-stranica ne može otvoriti sliku prema njezinu nazivu. Odaberite je na svom uređaju i bit će postavljena tamo gdje datoteka kaže da pripada.';
+$ec_lang['lpn_inp_backdrop_attached']='Pridruženo {file}, postavljeno tamo gdje datoteka kaže da pripada.';
+$ec_lang['lpn_inp_backdrop_attached_other']='Pridruženo {picked}, postavljeno tamo gdje datoteka kaže da pripada. Datoteka navodi {file}, što je drugi naziv.';
 $ec_lang['lpn_inp_report_lead']='Ova stranica ne koristi svaku EPANET značajku, ali nijedan podatak u datoteci se ne odbacuje. Popis ispod prikazuje podatke u datoteci koji se zadržavaju, ali ne koriste, i sve promjene učinjene pri uvozu:';
 $ec_lang['lpn_inp_drop_headloss']='Ova datoteka ne koristi Hazen-Williamsovu formulu. Ova stranica računa prema Hazen-Williamsu, pa su brojevi hrapavosti cijevi zadržani točno onako kako su zapisani, ali rezultati ovdje neće odgovarati rezultatima u EPANET-u.';
 $ec_lang['lpn_inp_drop_tank_curve']='Ovi spremnici nemaju ravne stijenke: datoteka zadaje njihov oblik krivuljom volumena. Krivulja se čuva u okviru Knjižnice, spremnik se i dalje na nju poziva, a simulacija produljenog razdoblja koristi je za izračun razine dok se spremnik puni i prazni. Analiza jednog razdoblja nije zahvaćena jer je vodno lice na razini navedenoj u datoteci. Promjer iz datoteke čuva se uz krivulju i koristi se za crtanje i rješavanje spremnika bez krivulje.';
@@ -1816,6 +2152,7 @@ $ec_lang['lpn_inp_drop_tags']='Ova datoteka dodjeljuje etikete nekim čvorovima,
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_inp_drop_report']='Ova datoteka sadrži EPANET postavke formata izvještaja. Izvještaj pokretanja dostupan je pod Izvještaji, Pokretanje, ali koristi standardni EPANET format, a ne format koji te postavke određuju. Retci se zadržavaju i zapisuju natrag ako spremite EPANET datoteku.';
 $ec_lang['lpn_inp_drop_sections']='Ova datoteka sadrži odjeljak koji ova stranica uopće ne čita. Ovdje se ništa od toga ne koristi. Zadržava se u cijelosti i zapisuje natrag ako spremite EPANET datoteku.';
+$ec_lang['lpn_inp_drop_comments']='Ovi retci komentara u obrascima ili jednostavnim upravljanjima ove datoteke nisu uvezeni jer ova stranica nema mjesta za njihovo čuvanje (na primjer, između redaka jednog obrasca). Svaki obrazac i upravljanje uvezeni su u cijelosti.';
 $ec_lang['lpn_inp_drop_quality_options']='Ova datoteka navodi EPANET opcije kvalitete vode: opciju Quality, koja imenuje vrstu analize kvalitete vode, i dvije postavke koje idu uz kemikaliju, Relative diffusivity i Quality tolerance. Sve tri se zadržavaju i koriste. Starost vode, praćenje izvora i kemikalija izračunavaju se ovdje, a dvije postavke kemikalije koriste se kada se kemikalija pokrene. Sve se zapisuju natrag ako spremite EPANET datoteku.';
 $ec_lang['lpn_inp_drop_file_options']='Ova datoteka upućuje na pomoćnu datoteku: Map, koja sadrži koordinate, ili Hydraulics, koja sadrži već izračunatu hidrauliku. Ova stranica ne može otvoriti nijednu od njih, pa se retci zadržavaju kakvi jesu i zapisuju natrag ako spremite EPANET datoteku.';
 $ec_lang['lpn_inp_drop_other_options']='Ova datoteka navodi opcije koje ova stranica ne čita. Ovdje se ništa od toga ne koristi. Zadržavaju se i zapisuju natrag ako spremite EPANET datoteku.';
@@ -1941,8 +2278,9 @@ $ec_lang['lpn_lock_age_unknown']='Ne postoji zapis o tome koliko je dugo u upotr
 // Cancel that needed a sentence would not be a Cancel.
 $ec_lang['lpn_lock_open_choices_ask']='„Pitaj” obavještava onoga tko ima ovu datoteku otvorenu da biste je željeli, i ništa drugo ne mijenja. „Otvori samo za čitanje” omogućuje vam da je pregledate i mijenjate što god želite, bez mogućnosti spremanja ovdje. „Prekini zaključavanje” omogućuje vam da spremite preko datoteke; njihov nespremljeni rad se ne gubi, ali više neće moći spremati ovdje, pa će netko možda morati ručno spojiti ta dva.';
 $ec_lang['lpn_lock_ask']='Pitaj';
-// Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
-// this computer for it, which is the whole point of moving the question here.
+// Asked at the one moment the name is useful. Nothing is written to this computer for it; the lock
+// broker keeps it in that file's lock record for the holder to read (Tom, 2026-09-29, correcting a
+// prompt that said "stored only in this browser").
 $ec_lang['lpn_lock_ask_prompt']='Koga da navedemo kao onoga tko traži? Unesite primjerice svoje inicijale. Čuvaju se uz zaključavanje ove datoteke na našem poslužitelju, za onoga tko je ima otvorenu, i brišu se u roku od 30 dana.';
 $ec_lang['lpn_lock_ask_sent']='Zamolili smo onoga tko ima ovu datoteku otvorenu da je zatvori. Vidjet će to u roku od minute, ako je njegova stranica još otvorena. Ništa se drugo nije promijenilo, a datoteka je i dalje njegova dok je ne zatvori.';
 $ec_lang['lpn_lock_ask_failed']='Vaša poruka nije mogla biti dostavljena. Ili nitko trenutačno nema ovu datoteku otvorenu, ili poslužitelj nije bio dostupan.';
@@ -1950,6 +2288,21 @@ $ec_lang['lpn_lock_ask_failed']='Vaša poruka nije mogla biti dostavljena. Ili n
 // out of the locked-file dialog used to say nothing at all, so a reader who pressed Cancel by
 // reflex had no way to learn what had just been offered. It says what did not happen, and why.
 $ec_lang['lpn_lock_open_cancelled']='Ta datoteka nije otvorena, a ništa se ovdje nije promijenilo. Netko drugi je i dalje ima otvorenu.';
+// Task 747: a file copied outside this page keeps its original's document ID, and so its lock. Asked
+// whenever this browser cannot guarantee it already knows the file (Tom, 2026-09-30). {date} is when
+// the ID was minted, in the visitor's own regional date-time format.
+$ec_lang['lpn_copy_title']='Označiti datoteku kao novu kopiju?';
+$ec_lang['lpn_copy_body']='Ova datoteka kaže da je nastala {date}, a ovaj je preglednik ne prepoznaje. Je li to izvornik (zadržati isto zaključavanje) ili kopija (napraviti novo zaključavanje)?';
+$ec_lang['lpn_copy_body_nodate']='Ovaj preglednik ne prepoznaje ovu datoteku. Je li to izvornik (zadržati isto zaključavanje) ili kopija (napraviti novo zaključavanje)?';
+$ec_lang['lpn_copy_original']='Izvornik; zadrži isto zaključavanje';
+$ec_lang['lpn_copy_copy']='Kopija; napravi novo zaključavanje';
+// What "Original" does when the file's id is already open in a tab here with a different file:
+// switch to the tab, without changing the tab's file.
+$ec_lang['lpn_copy_kept_link']='Otvoreno {name} kao izvornik, premješten na novo mjesto. Spremanje sada piše u ovu datoteku.';
+// Tom, 2026-10-05: the copy is saved the moment it is chosen, so nobody has to remember to.
+$ec_lang['lpn_copy_opened']='Otvoreno {file} kao kopija i spremljeno, s novim zaključavanjem.';
+// Said only when that save did not happen (permission refused, file gone); the tab stays unsaved.
+$ec_lang['lpn_copy_opened_unsaved']='Otvoreno {file} kao kopija, s novim zaključavanjem koje će se spremiti sljedećim spremanjem datoteke.';
 // The other end of the back channel, shown to the holder.
 $ec_lang['lpn_lock_requested']='{name} bi želio urediti ovu datoteku. Kada budete spremni, spremite svoj rad i koristite Datoteka, Zatvori projekt da je predate.';
 $ec_lang['lpn_ago_seconds']='{n} sekundi';
@@ -2089,8 +2442,10 @@ $ec_lang['lpn_notes_5_def']='Pumpa slijedi H = H₀ − aQ^b, gdje je H tlačna 
 $ec_lang['lpn_notes_6_term']='Pomoć za stupce tablice';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one
-// because its own wording pairs a command with a GESTURE, on the same "action, then gesture" shape
-// every row here already has -- the Hide/Show row beside it names the identical menu.
+// because its own wording pairs a command with a GESTURE -- the Hide/Show row beside it names the
+// identical menu. **GESTURE FIRST, THEN ACTION, SINCE 2026-10-06** (Ida, User guide): the cells were
+// swapped in all 27 files, by script and unchanged, so this table reads in the same order as the
+// key-then-action tables beside it (lpn_notes_7_def, lpn_hotkeys_map_def).
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Klik na zaglavlje</td><td>Odaberi stupac</td></tr><tr><td>Ctrl+klik ili Shift+klik na drugo zaglavlje</td><td>Dodaj ili proširi odabir stupaca</td></tr><tr><td>Povucite ili koristite Upravljaj stupcima… u izborniku desnog klika ili ⋮</td><td>Pomakni (promijeni redoslijed) odabranih stupaca</td></tr><tr><td>Pređite mišem preko gornjeg kuta zaglavlja, ili odaberite ili se Tabom prebacite u zaglavlje</td><td>Izbornik ⋮ i strelica za razvrstavanje.</td></tr><tr><td>Desni klik na zaglavlje ili izbornik ⋮ u gornjem desnom kutu zaglavlja</td><td>Sakrij, Prikaži sve, ili Upravljaj vidljivošću i redoslijedom</td></tr><tr><td>Ikona strelice u gornjem desnom kutu zaglavlja</td><td>Razvrstaj prema stupcu</td></tr><tr><td>Desni klik, izbornik ⋮ u gornjem desnom kutu zaglavlja, ili Ctrl+Shift+V</td><td>Zalijepi kao nove retke na kraju tablice</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Tipkovnički prečaci tablice';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
@@ -2108,6 +2463,10 @@ $ec_lang['lpn_id_taken']='Taj ID je već u upotrebi.';
 $ec_lang['lpn_diag_no_fixed_head']='Dodajte rezervoar ili spremnik. Mreža treba barem jednu poznatu razinu vode prije nego što se može riješiti.';
 $ec_lang['lpn_diag_dangling_link']='Cijev ili pumpa spaja se na čvor koji više ne postoji:';
 $ec_lang['lpn_diag_unreachable']='Ovi čvorovi nemaju put do rezervoara ili spremnika:';
+// Tom, 2026-10-09: a node nothing connects to a source is left out of the run, not refused. The
+// ids stand in the status bar until the network changes. Said in EPANET's own terms (junction,
+// reservoir, tank) and never as an error, because the run happened.
+$ec_lang['lpn_omitted_note']='Izostavljeno iz ovog pokretanja jer od njih ne vodi put do rezervoara ili spremnika: {ids}';
 // BOTH OF THESE NAME THE VALVES. The page ends each one with a list of IDs, which is the reason
 // this calculator writes its own messages instead of showing EPANET\'s numbered errors: a person
 // looking at a drawing can act on \'V3\' and can do nothing at all with \'error 110\'.
@@ -2127,6 +2486,9 @@ $ec_lang['lpn_engine_ready']='EPANET rješavač sada je pohranjen na ovom uređa
 $ec_lang['lpn_engine_fetching_valve']='Preuzimanje EPANET rješavača, kako bi se ovaj ventil mogao riješiti sada, a poslije i bez internetske veze.';
 $ec_lang['lpn_engine_ready_valve']='EPANET rješavač sada je pohranjen na ovom uređaju. Ventili za regulaciju tlaka i protoka (PRV, PSV, FCV) sada se mogu riješiti bez internetske veze.';
 $ec_lang['lpn_engine_unavailable']='EPANET rješavač nije bilo moguće preuzeti, a potreban je za rješavanje ventila za regulaciju tlaka i protoka (PRV, PSV, FCV). Nakon jednog povezivanja s internetom rješavač se pohranjuje na ovom uređaju.';
+// The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
+// Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
+$ec_lang['lpn_engine_unavailable_why']='Ventili za regulaciju tlaka i protoka (PRV, PSV, FCV) ne mogu se riješiti bez EPANET rješavača. {reason}';
 $ec_lang['lpn_engine_needed_loading']='Učitavanje EPANET rješavača dok gradite. Rezultati će biti dostupni kada bude potpuno učitan.';
 // **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
 // own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
@@ -2139,6 +2501,7 @@ $ec_lang['lpn_engine_wait']='Učitavanje rješavača. Rezultati su trenutačno o
 $ec_lang['lpn_engine_wait_pct']='Rješavač učitan {percent}%.';
 $ec_lang['lpn_engine_wait_bytes']='Rješavač učitan {kb} KB dosad. Ukupna veličina nije dostupna, pa je postotak dovršenosti nepoznat.';
 $ec_lang['lpn_engine_needed_failed']='EPANET rješavač još nije učitan, ne može se učitati, a ova mreža može se riješiti samo njime. Bit će učitan kada budete povezani s internetom.';
+$ec_lang['lpn_engine_needed_failed_why']='Ova se mreža može riješiti samo EPANET rješavačem. {reason}';
 $ec_lang['lpn_diag_valve_needs_epanet']='Ovo su ventili za regulaciju tlaka ili protoka, a izračunati ih može samo EPANET rješavač. EPANET rješavač nije se mogao učitati, pa ovi rezultati nedostaju:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='Ovi ventili spojeni su izravno na rezervoar ili spremnik, koji na tom čvoru određuje hidrauličku liniju, pa ventil nema što regulirati. Umetnite kratku cijev između ventila i rezervoara ili spremnika:';
 $ec_lang['lpn_diag_not_converged']='Rješenje nije pronađeno. Provjerite ima li fizički nemogućih vrijednosti, poput promjera nula.';
@@ -2159,8 +2522,29 @@ $ec_lang['lpn_field_roughness']='Hrapavost';
 // selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C. Veći broj znači glađu cijev: oko 150 za novu plastiku, 130 za novi čelik ili željezo, i 100 za staru cijev.';
 $ec_lang['lpn_field_length']='Duljina';
+// Task 643 (Tom, 2026-10-14): an Auto length is the slope distance. No claim about accuracy (Task 641).
+$ec_lang['lpn_field_length_slope_tip']='Duljina cijevi. Kada je označeno Automatski, duljina se mjeri duž nagiba: nacrtana duljina u kombinaciji s razlikom kota između dvaju krajnjih čvorova.';
 $ec_lang['lpn_field_from']='Od';
 $ec_lang['lpn_field_to']='Do';
+// Tom, 2026-10-09: From and To are editable text. Said in the box a refused ID is said in.
+$ec_lang['lpn_link_end_unknown']='Nijedan čvor nema ID {id}.';
+$ec_lang['lpn_link_end_same']='Početak i kraj moraju biti različiti čvorovi.';
+// Tom, 2026-10-09: "Break link for node?", adapted to name the pipe. The two answers are Yes and No
+// because No is not a cancel: it places the node where it was pressed, joined to nothing.
+$ec_lang['lpn_split_pipe_ask']='Podijeliti cijev {id} na ovom čvoru?';
+$ec_lang['lpn_split_yes']='Da';
+$ec_lang['lpn_split_no']='Ne';
+// Object snap (Task 782). The tip beside the snap glyph on a pipe vertex: "Pipe 10, vertex 2". A node
+// or a pipe is named by its type word and ID alone.
+$ec_lang['lpn_snap_vertex']='{link}, točka loma {n}';
+// A tank, reservoir or junction snapped onto a node of another type is placed at exactly that
+// position. Two nodes at one point are legal in EPANET, and the map cannot show that they are separate.
+$ec_lang['lpn_snap_node_on_node']='{new} postavljen na lokaciju {target}. Ta dva čvora nisu povezana.';
+// The same, for a node DRAGGED onto another node.
+$ec_lang['lpn_snap_moved_on_node']='{moved} pomaknut na lokaciju {target}. Ta dva čvora nisu povezana.';
+// The Shape (Task 779): map annotation, a point, a polyline or a polygon. Tom, 2026-10-06: "Either
+// way, we call it a 'Shape'". The tip beside the snap glyph on a Shape point: "Shape S1, point 2".
+$ec_lang['lpn_snap_shape_point']='{shape}, točka {n}';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
@@ -2289,7 +2673,7 @@ $ec_lang['lpn_pump_effic_unstated']='Ova pumpa navodi krivulju učinkovitosti po
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_mode_select']='Način rada: Odabir. Odaberite element ili oznaku da ga vidite ili promijenite. Povucite da pomaknete čvor ili oznaku. Alatom Točke loma dodajte ili uklonite savijanja cijevi.';
+$ec_lang['lpn_mode_select']='Način rada: Odabir. Odaberite element, oznaku ili tekst da ga vidite ili promijenite. Povucite da pomaknete čvor, oznaku ili tekst. Alatom Točke loma dodajte ili uklonite savijanja cijevi.';
 $ec_lang['lpn_mode_delete']='Način rada: Brisanje. Odaberite element da ga uklonite.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_mode_vertices']='Način rada: Točke loma. Točke loma svake cijevi prikazane su kao mala kvadratna hvatišta. Odredite točku na cijevi da dodate točku loma, odaberite hvatište da je uklonite ili povucite hvatište da je pomaknete. U ovom načinu rada ništa se drugo na karti ne može mijenjati.';
@@ -2297,15 +2681,17 @@ $ec_lang['lpn_mode_zoom_window']='Način rada: Zumiraj prozor. Odredite dva nasu
 // One-shot notice when the Delete key is pressed with nothing picked (Task 415). It has to name the
 // gesture, because the whole point of the change is that the order is now subject, then verb.
 $ec_lang['lpn_select_first']='Ništa nije odabrano. Najprije odaberite element na karti, zatim pritisnite Delete.';
-$ec_lang['lpn_mode_add_junction']='Način rada: Dodaj čvor. Odredite položaj na karti da postavite čvor. Prebacite se u način Odabir da promijenite ili pomaknete elemente i oznake.';
-$ec_lang['lpn_mode_add_reservoir']='Način rada: Dodaj rezervoar. Odredite položaj na karti da postavite rezervoar. Prebacite se u način Odabir da promijenite ili pomaknete elemente i oznake.';
-$ec_lang['lpn_mode_add_tank']='Način rada: Dodaj spremnik. Odredite položaj na karti da postavite spremnik. Prebacite se u način Odabir da promijenite ili pomaknete elemente i oznake.';
-$ec_lang['lpn_mode_add_pipe']='Način rada: Dodaj cijev. Odaberite početni čvor, a zatim završni čvor da ih povežete. Odredite točke u otvorenom prostoru između da savijete liniju ili pritisnite Escape da počnete iznova. Prebacite se u način Odabir da promijenite ili pomaknete elemente i oznake.';
-$ec_lang['lpn_mode_add_pump']='Način rada: Dodaj pumpu. Odaberite početni čvor, a zatim završni čvor da ih povežete. Odredite točke u otvorenom prostoru između da savijete liniju ili pritisnite Escape da počnete iznova. Prebacite se u način Odabir da promijenite ili pomaknete elemente i oznake.';
-$ec_lang['lpn_mode_add_valve']='Način rada: Dodaj ventil. Odaberite početni čvor, a zatim završni čvor da ih povežete. Odredite točke u otvorenom prostoru između da savijete liniju ili pritisnite Escape da počnete iznova. Prebacite se u način Odabir da promijenite ili pomaknete elemente i oznake.';
+$ec_lang['lpn_mode_add_junction']='Način rada: Dodaj čvor. Odredite položaj na karti da postavite čvor. Prebacite se u način Odabir da promijenite ili pomaknete elemente, oznake i tekstove.';
+$ec_lang['lpn_mode_add_reservoir']='Način rada: Dodaj rezervoar. Odredite položaj na karti da postavite rezervoar. Prebacite se u način Odabir da promijenite ili pomaknete elemente, oznake i tekstove.';
+$ec_lang['lpn_mode_add_tank']='Način rada: Dodaj spremnik. Odredite položaj na karti da postavite spremnik. Prebacite se u način Odabir da promijenite ili pomaknete elemente, oznake i tekstove.';
+$ec_lang['lpn_mode_add_pipe']='Način rada: Dodaj cijev. Odaberite početni čvor, a zatim završni čvor da ih povežete. Odredite točke u otvorenom prostoru između da savijete liniju ili pritisnite Escape da počnete iznova. Prebacite se u način Odabir da promijenite ili pomaknete elemente, oznake i tekstove.';
+$ec_lang['lpn_mode_add_pump']='Način rada: Dodaj pumpu. Odaberite početni čvor, a zatim završni čvor da ih povežete. Odredite točke u otvorenom prostoru između da savijete liniju ili pritisnite Escape da počnete iznova. Prebacite se u način Odabir da promijenite ili pomaknete elemente, oznake i tekstove.';
+$ec_lang['lpn_mode_add_valve']='Način rada: Dodaj ventil. Odaberite početni čvor, a zatim završni čvor da ih povežete. Odredite točke u otvorenom prostoru između da savijete liniju ili pritisnite Escape da počnete iznova. Prebacite se u način Odabir da promijenite ili pomaknete elemente, oznake i tekstove.';
 // Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
 // sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
-$ec_lang['lpn_mode_add_text']='Način rada: Dodaj tekst. Odredite položaj na karti da postavite tekst. Odredite položaj blizu čvora da tekst pridružite tom čvoru. Prebacite se u način Odabir da promijenite ili pomaknete elemente i oznake.';
+$ec_lang['lpn_mode_add_text']='Način rada: Dodaj tekst. Odredite položaj na karti da postavite tekst. Odredite položaj blizu čvora da tekst pridružite tom čvoru. Prebacite se u način Odabir da promijenite ili pomaknete elemente, oznake i tekstove.';
+$ec_lang['lpn_mode_add_chain']='Način rada: Lanac čvor-cijev. Odredite točku na karti da dodate čvor, zatim odredite svaku sljedeću točku da dodate cijev i čvor. Odredite postojeći čvor da nastavite od njega. Pritisnite Escape da završite lanac. Prebacite se u način Odabir da promijenite ili pomaknete elemente, oznake i tekstove.';
+$ec_lang['lpn_mode_add_shape']='Način rada: Dodaj lik. Odredite svaku točku. Ponovno odredite posljednju točku ili pritisnite Enter da završite; odredite prvu točku da zatvorite poligon.';
 // Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
 // most likely to miss the point of -- that Select is what you use to edit/move things, and that a
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
@@ -2377,8 +2763,8 @@ $ec_lang['lpn_labels_mark_extrema_tip']='Označite najvišu vrijednost svakog oz
 // {skipped} are whole numbers; {prefix} is the text the user typed.
 $ec_lang['lpn_settings_apply_to_all']='Primijeni na sve';
 $ec_lang['lpn_settings_apply_to_all_tip']='Svaki već nacrtan element ove vrste dobiva ID koji počinje ovim tekstom. Svaki zadržava svoj broj. ID koji ne završava brojem ne mijenja se.';
-$ec_lang['lpn_confirm_apply_prefix']='Preimenovati {n} elemenata tako da njihovi ID-ovi počinju s {prefix}? Svaki zadržava svoj broj.';
-$ec_lang['lpn_prefix_applied']='Preimenovano elemenata: {n}. Nepromijenjeno drugih: {skipped}.';
+$ec_lang['lpn_confirm_apply_prefix']='Preimenovati elemente ({n}) tako da njihovi ID-ovi počinju s {prefix}? Svaki zadržava svoj broj.';
+$ec_lang['lpn_prefix_applied']='Preimenovani elementi: {n}. Nepromijenjeni elementi: {skipped}.';
 $ec_lang['lpn_labels_suffix_gradient_tip']='Tekst dodan iza gradijenta gubitka tlačne visine na oznakama karte. Ovdje ne unosite znak postotka. Dodaje se automatski kada su jedinice postotak.';
 $ec_lang['lpn_labels_separator']='Tekst između vrijednosti';
 $ec_lang['lpn_labels_separator_tip']='Tekst između jednog svojstva i sljedećeg na oznaci. Prema zadanome, razmak.';
@@ -2479,6 +2865,7 @@ $ec_lang['lpn_map_attach_none']='Ovom projektu još nije pridružena karta svije
 $ec_lang['lpn_map_attach_remove']='Odvoji';
 $ec_lang['lpn_map_attach_remove_tip']='Odvojite kartu svijeta. Ne utječe na mrežu.';
 $ec_lang['lpn_map_attach_done']='Karta svijeta sada se prikazuje iza crteža, a projekt je nepromijenjen. Upotrijebite Karta, Karta svijeta, Odvoji da je uklonite.';
+// Edited by TGH 2026-10-07
 $ec_lang['lpn_map_attach_removed']='Karta svijeta je odvojena, a mreža je nepromijenjena.';
 // **THE CUSTOM GEOREFERENCE WIZARD, IN TOM'S OWN THREE STEPS** (2026-09-18, and
 // dev/tom-coordinate-vocabulary-2026-09-16.md). Georeferencing here means attaching the world map,
@@ -2530,6 +2917,9 @@ $ec_lang['lpn_backdrop_target_free']='Bilo koju točku na karti';
 $ec_lang['lpn_backdrop_target_coords']='Koordinate koje unesete';
 $ec_lang['lpn_backdrop_coords_prompt']='Unesite X,Y na koje se ta točka treba pomaknuti';
 $ec_lang['lpn_backdrop_continue']='Nastavi';
+// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
+// this one, and of the three, Settings is the word a person is most likely to look for first.
+// One key for the toolbar button, the Project menu row and the Settings box's own title (Task 699).
 $ec_lang['lpn_tool_settings']='Postavke';
 $ec_lang['lpn_settings_show_titles']='Prikaži naslove stranice';
 // Edited by TGH 2026-09-07
@@ -2540,6 +2930,8 @@ $ec_lang['lpn_hide_titles']='Sakrij ove naslove';
 // bubble and reads 'Show this'; this one has to name what it is talking about.
 $ec_lang['lpn_settings_area_hint']='Prikaži pomoć za odabir';
 $ec_lang['lpn_settings_area_hint_tip']='Prikažite upit iznad karte koji daje sljedeći korak dok odabirete područje.';
+$ec_lang['lpn_settings_hover_card']='Prikaži punu oznaku pri prelasku pokazivačem';
+$ec_lang['lpn_settings_hover_card_tip']='Zadržite pokazivač na čvoru, vezi ili korisniku da vidite njegovu oznaku onako kako je određena u Postavkama, u bilo kojem mjerilu, bez obzira stane li oznaka na kartu. Ovo je postavka za ovaj preglednik, a ne za projekt.';
 $ec_lang['lpn_settings_id_prefixes']='Prefiksi ID-a';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a
@@ -2587,6 +2979,8 @@ $ec_lang['lpn_cp_validate']='Provjeri kao';
 $ec_lang['lpn_cp_validate_tip']='Provjeri kao: oblik koji mora imati valjana vrijednost. Pravila o veličini slova primjenjuju se samo na englesku abecedu. Odaberite Ne provjeravaj da prihvatite bilo koju vrijednost.';
 $ec_lang['lpn_cp_restrict']='Ograniči ove znakove';
 $ec_lang['lpn_cp_restrict_tip']='Ograniči ove znakove:';
+$ec_lang['lpn_cp_allow_tip']='Dopusti samo ove znakove:';
+$ec_lang['lpn_cp_characters_tip']='»@« znači bilo koje slovo; »#« znači bilo koju znamenku, a »-«, ».« i »,« morate zasebno navesti ako su dopušteni; svi razmaci moraju biti između drugih znakova.';
 $ec_lang['lpn_cp_restrict_mode']='Dopusti ili ograniči';
 $ec_lang['lpn_cp_restrict_mode_tip']='Dopusti ili ograniči: Navedeni znakovi su ili jedini koje vrijednost smije koristiti ili oni koje ne smije.';
 $ec_lang['lpn_cp_restrict_allow']='Dopusti samo ove znakove';
@@ -2614,6 +3008,13 @@ $ec_lang['lpn_cp_val_hyphen']='hyphen-case';
 // is a way of asking a question about the data, so nothing is ever cleared or refused: the value
 // stays exactly as it was typed and says what is wrong with it.
 $ec_lang['lpn_cp_flag']='{label}: {reason} Vrijednost se zadržava točno onako kako je unesena.';
+$ec_lang['lpn_valwarn_diameter']='Promjer cijevi ili ventila obično je između {min} i {max} {unit}. Provjerite broj i jedinicu promjera.';
+$ec_lang['lpn_valwarn_hw']='Hazen-Williamsov C obično je između {min} i {max}. Broj izvan tog raspona često je hrapavost namijenjena drugoj metodi trenja.';
+$ec_lang['lpn_valwarn_manning']='Manningov n obično je između {min} i {max}. Broj izvan tog raspona često je hrapavost namijenjena drugoj metodi trenja.';
+$ec_lang['lpn_valwarn_dw']='Darcy-Weisbachova hrapavost obično je veća od 0 i najviše {max} {unit}. Veći broj često je Hazen-Williamsov C ili Manningov n.';
+$ec_lang['lpn_valwarn_positive']='EPANET ovdje ne prihvaća nulu ni negativan broj.';
+$ec_lang['lpn_valwarn_negative']='EPANET ovdje ne prihvaća negativan broj.';
+$ec_lang['lpn_valwarn_tank_levels']='EPANET ne prihvaća ovaj spremnik. Najmanja dubina vode ne smije premašiti dubinu vode, a dubina vode ne smije premašiti najveću dubinu vode.';
 $ec_lang['lpn_cp_bad_number']='Ova vrijednost nije broj kako je potrebno za ovo svojstvo.';
 $ec_lang['lpn_cp_bad_integer']='Ova vrijednost nije cijeli broj kako je potrebno za ovo svojstvo.';
 $ec_lang['lpn_cp_bad_case']='Ova vrijednost nije napisana SVIM VELIKIM SLOVIMA kako je potrebno za ovo svojstvo.';
@@ -2632,18 +3033,13 @@ $ec_lang['lpn_cp_key_taken']='Drugo prilagođeno svojstvo već koristi taj klju�
 // question it answers is how much of this scenario is its own rather than inherited.
 $ec_lang['lpn_scenario_label']='Scenarij';
 $ec_lang['lpn_scenario_base']='Baza';
-// "Custom", not "Own" (Tom, 2026-08-14: *"I love 'custom'. 'Changed' is a little dangerous."*),
-// and the reason is a TRANSLATION reason rather than an English one -- which is why it is worth
-// a comment. "Own values" calques directly onto the standard term for EIGENVALUES in most of
-// Europe: es valores propios, pt valores proprios, de Eigenwerte, cs vlastni hodnota, hr vlastita
-// vrijednost, bg/ru/sr sobstveni. Ten languages in sprint 316 had to detect and route around that
-// independently, and three of them, forced off the calque, landed on "CHANGED values" -- which is
-// FALSE here, because a scenario's custom value may be identical to Base's (see
-// lpn_scenario_override_tip, and the assertion in dev/lpn-spike/scenario-harness.js).
-// "Custom" has no calque path into mathematics in any of them, so the trap does not exist to be
-// routed around, and it says ownership without implying difference. Seven languages had already
-// chosen exactly this family unprompted (fr personnalisees, it personalizzati, es exclusivos,
-// pt individuais, ar mukhassasa, fa ekhtesasi, ro specifice).
+// "Overrides" (Tom, 2026-10-04: *"I believe that the technical term may be 'Enter the scenario's
+// override'"*; Mary found it is Bentley WaterGEMS's word, "Overriding Inheritance"). It replaced
+// "custom values" (2026-08-14). The rejected alternative stays rejected for a TRANSLATION reason:
+// "own values" calques onto the standard term for EIGENVALUES in most of Europe (es valores propios,
+// de Eigenwerte, ru sobstvennye), and "changed values" is FALSE, because an override may equal
+// Base's number (lpn_scenario_override_tip; dev/lpn-spike/scenario-harness.js). "Override" has no
+// mathematical calque and says the scenario's value stands in for the parent's.
 $ec_lang['lpn_scenario_overrides']='Br. zamjena';
 // ROADMAP Task 512. The amber ring was designed, correct, and silent: two independent users read it
 // as a stuck highlight they could not turn off. These two strings are the ring's own explanation and
@@ -2659,7 +3055,7 @@ $ec_lang['lpn_scenario_new_name']='Scenarij {n}';
 $ec_lang['lpn_scenario_prompt_name']='Naziv ovog scenarija';
 $ec_lang['lpn_scenario_rename']='Preimenuj scenarij…';
 $ec_lang['lpn_scenario_delete']='Izbriši scenarij';
-$ec_lang['lpn_scenario_delete_confirm']='Izbrisati scenarij {name} i njegovih {n} zamjenskih vrijednosti? Sam crtež se ne mijenja.';
+$ec_lang['lpn_scenario_delete_confirm']='Izbrisati scenarij {name} i njegove zamjenske vrijednosti ({n})? Sam crtež se ne mijenja.';
 $ec_lang['lpn_scenario_override']='Zamjena u ovom scenariju';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Odabrano znači da ovaj scenarij zamjenjuje nadređeni za ovu vrijednost, čak i kada je broj isti. Isključite okvir da se koristi vrijednost nadređenog.';
@@ -2670,14 +3066,36 @@ $ec_lang['lpn_scenario_override_tip']='Odabrano znači da ovaj scenarij zamjenju
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
 $ec_lang['lpn_scenario_base_value']='Bazni scenarij: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} je isključen iz mreže u scenariju {scenario}. Ostaje u crtežu i u drugim scenarijima.';
+$ec_lang['lpn_scenario_delete_in_base']='Da biste ga uklonili iz crteža, izbrišite ga u scenariju {base}.';
+$ec_lang['lpn_scenario_only_deleted']='{id} je izbrisan. Bio je dio samo scenarija {scenario}.';
+$ec_lang['lpn_scenario_delete_blocked']='{id} nije izbrisan jer na njemu završava veza {link}, a ta veza postoji i izvan scenarija {scenario}. Da biste izbrisali oboje, izbrišite ih u scenariju {base}.';
 $ec_lang['lpn_scenario_push_btn']='Primijeni vrijednosti Baze na sve scenarije';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_tip']='Svaki scenarij vraća se na vrijednost iz Baze za svojstva čije se oznake trenutačno prikazuju. Vrijednosti koje pripadaju samo tim scenarijima se odbacuju.';
+$ec_lang['lpn_scenario_basic']='Osnovni način';
+$ec_lang['lpn_scenario_basic_tip']='Označeno: scenarij se sastoji samo od vrijednosti postavljenih u njemu. Neoznačeno: ovaj izbornik nudi i tablicu Pregled alternativa, koja prikazuje kako su te vrijednosti grupirane po kategorijama, te omogućuje da scenarij ima zasebno ukupno vrijeme rada i hidraulički vremenski korak. Povratne informacije o ovoj značajci su dobrodošle.';
+$ec_lang['lpn_alt_title']='Pregled alternativa';
+$ec_lang['lpn_alt_calc_options']='Opcije proračuna';
+$ec_lang['lpn_alt_note']='Baza koristi Osnovnu alternativu svake kategorije. Svaki scenarij ima zasebnu alternativu, potomka Osnovne alternative, za svaku promijenjenu kategoriju. Broj je količina promijenjenih vrijednosti. Posljednja tri stupca su opcije proračuna: unesite vrijednost za scenarij ili ostavite prazno da se koristi vrijednost nadređenog. Vrijednosti projekta nalaze se u Postavke, Proračun, Vrijeme.';
+$ec_lang['lpn_scenario_duration_tip']='Ostavite prazno da se naslijedi od nadređenog. Ukupno vrijeme rada 0:00 je stacionarno pokretanje.';
+$ec_lang['lpn_scenario_hyd_step_tip']='Ostavite prazno da se naslijedi od nadređenog.';
+$ec_lang['lpn_time_scn_overrides']='Vrijednosti scenarija:';
+$ec_lang['lpn_alt_cat_physical']='Fizičko';
+$ec_lang['lpn_alt_cat_demand']='Potražnja';
+$ec_lang['lpn_alt_cat_topology']='Aktivacija elemenata';
+$ec_lang['lpn_alt_cat_initial']='Početne postavke';
+$ec_lang['lpn_alt_cat_constituent']='Sastojak';
+$ec_lang['lpn_alt_cat_fireflow']='Protupožarni protok';
+$ec_lang['lpn_alt_cat_energy']='Trošak energije';
+$ec_lang['lpn_alt_cat_userdata']='Prilagođena svojstva';
+$ec_lang['lpn_alt_cat_text']='Tekst';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_confirm']='Postaviti da svi scenariji koriste vrijednosti iz Baze za ova svojstva? Vrijednosti koje pripadaju samo tim scenarijima bit će odbačene. Ovo možete poništiti.';
 $ec_lang['lpn_scenario_push_scenarios']='Scenariji na koje ovo utječe:';
 $ec_lang['lpn_scenario_push_values']='Odbačene vrijednosti:';
 $ec_lang['lpn_scenario_push_none']='Nijedan scenarij ne zamjenjuje Bazu ni za jedno od ovih svojstava, pa se ništa ne bi promijenilo. Ništa se ne odbacuje.';
+// Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
+// by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. Test protoka: statički';
 $ec_lang['lpn_scenario_preset_flow_static_tip']='Kalibracija testom protoka za projektiranu mrežu pri nultom protoku. U ovom scenariju postavite potražnju na svim čvorovima na 0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. Test protoka: srednji';
@@ -2687,10 +3105,11 @@ $ec_lang['lpn_scenario_preset_flow_max_tip']='Kalibracija testom protoka za proj
 $ec_lang['lpn_scenario_preset_average_day']='4. Prosječan dan';
 $ec_lang['lpn_scenario_preset_average_day_tip']='Množitelj potražnje 1: svaka potražnja onakva kakva je upisana, a pretpostavlja se da je to potražnja prosječnog dana.';
 $ec_lang['lpn_scenario_preset_max_day']='5. Maksimalan dan';
+$ec_lang['lpn_scenario_preset_mult_tip']='Množitelj potražnje {mult} puta prosječan dan, privremena vrijednost. Većina sustava je između {lo} i {hi} (National Research Council, 2006). Vrijednost za modelirani sustav postavite u Postavke, Proračun, Hidraulika, Množitelj potražnje.';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. Vršni sat';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Požar uz maksimalan dan';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Potražnja maksimalnog dana (množitelj 2,0). U ovom scenariju pokrenite Analizu protupožarnog protoka: ona dodaje protupožarni protok na svakom čvoru povrh ove potražnje.';
-$ec_lang['lpn_delete_drops_overrides']='Brisanjem ovog elementa brišu se i {n} vrijednosti scenarija za njega. Nastaviti?';
+$ec_lang['lpn_delete_drops_overrides']='Brisanjem ovog elementa brišu se i njegove zamjenske vrijednosti scenarija ({n}). Nastaviti?';
 $ec_lang['lpn_push_base_only']='Ova radnja mijenja sam crtež, pa se može izvesti samo u {base}. Prijeđite na {base} i pokušajte ponovno.';
 $ec_lang['lpn_field_active']='Aktivan?';
 // Edited by TGH 2026-09-07
@@ -2780,6 +3199,7 @@ $ec_lang['lpn_settings_engine_native']='Koristi ugrađeni rješavač kad je mogu
 $ec_lang['lpn_settings_engine_native_tip']='Uključite da se, gdje je moguće, koristi ugrađeni rješavač. U suprotnom se uvijek koristi EPANET rješavač američke agencije EPA. Ugrađeni rješavač ne koristi se za simulacije produljenog razdoblja ni za aktivne PRV, PSV ili FCV. Pri prvoj upotrebi EPANET rješavača preuzima se oko 650 KB, koji se zatim zadržava na ovom uređaju. Gdje cijev ima lokalni gubitak, dva rješavača razlikuju se u zadnjim znamenkama: EPANET koristi zaokruženu vrijednost gravitacijskog ubrzanja, pa su njegovi lokalni gubici neznatno niži nego u točnom obliku.';
 $ec_lang['lpn_engine_loading']='Učitavanje EPANET rješavača…';
 $ec_lang['lpn_engine_failed']='EPANET rješavač nije moguće učitati. Umjesto toga prikazuje se ugrađeni rješavač.';
+$ec_lang['lpn_engine_failed_why']='{reason} Umjesto toga prikazuje se ugrađeni rješavač.';
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
@@ -2796,6 +3216,13 @@ $ec_lang['lpn_engine_refused']='EPANET rješavač odbio je ovu mrežu, pa pokret
 // is the only part a user can act on, and nothing of ours could reconstruct it.
 $ec_lang['lpn_engine_refused_why']='Poruka EPANET rješavača: {message}';
 $ec_lang['lpn_engine_refused_fallback']='Brojevi na zaslonu umjesto toga dolaze iz ugrađenog rješavača.';
+// A run EPANET started and could not finish, for example when a tank empties and the junctions it
+// fed have no other source (Error 110). {time} is the run time it stopped at, H:MM.
+$ec_lang['lpn_time_run_stopped']='EPANET izračun zaustavljen je u {time}, pa nema rezultata. Njegov izvještaj o pokretanju navodi razlog.';
+$ec_lang['lpn_time_stat_stopped']='{statistic} nije prikazano: izračun je zaustavljen prije kraja razdoblja.';
+$ec_lang['lpn_time_stopped_no_quality']='Rezultati kvalitete vode nisu izračunati jer analiza kvalitete počinje nakon završetka hidrauličkog izračuna.';
+$ec_lang['lpn_energy_stopped']='EPANET izračun zaustavljen je prije kraja razdoblja, pa rezultati energije pumpi nisu izračunati.';
+$ec_lang['lpn_time_run_stopped_kept']='EPANET izračun zaustavljen je u {time}. Rezultati idu do {solved}, posljednjeg riješenog razdoblja, a nakon njega se ne prikazuje nijedan. Njegov izvještaj o pokretanju navodi razlog.';
 // The run's own version of that last sentence: a period run has a moment and a tank level to name,
 // and a one-moment solve does not, which is where the shared label stops.
 $ec_lang['lpn_time_run_fell_back']='Brojevi na zaslonu umjesto toga dolaze iz ugrađenog rješavača. On rješava jedan trenutak odjednom, pa je ovo mreža samo u trenutku {time}, sa svakim spremnikom na početnoj razini.';
@@ -2824,6 +3251,8 @@ $ec_lang['lpn_settings_align_labels']='Poravnaj oznake cijevi s cijevima';
 $ec_lang['lpn_settings_readability_bias']='Okreni oznaku naopako kada je nagnuta više od ovoliko stupnjeva lijevo od okomice';
 $ec_lang['lpn_settings_readability_bias_tip']='Okreće oznaku da ostane uspravna kad je nagnuta više od ovoliko stupnjeva lijevo od okomice.';
 $ec_lang['lpn_settings_mask_labels']='Neprozirna pozadina iza oznaka';
+$ec_lang['lpn_settings_text_halo']='Širina oreola teksta (postotak veličine teksta)';
+$ec_lang['lpn_settings_text_halo_tip']='Širina pune obrube iza teksta na karti, kao postotak veličine teksta. Vrijedi kada je uključena Neprozirna pozadina iza oznaka.';
 // Task 408: dragging a label away from its node draws a leader line, and this pulls that line onto
 // a round angle when the drag comes close to one. The values are numbers and the degree sign, which
 // need no translation; "Off" borrows lpn_settings_legend_off, the same word for the same idea.
@@ -2862,6 +3291,12 @@ $ec_lang['lpn_settings_symbol_opacity']='Neprozirnost simbola (0 do 1)';
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Neprozirnost pozadinske slike (0 do 1)';
+// Task 617: a display-time filter on the street or satellite tiles only; the drawing and the credit are untouched.
+$ec_lang['lpn_settings_basemap_style']='Stil podloge karte';
+$ec_lang['lpn_basemap_style_normal']='Uobičajen';
+$ec_lang['lpn_basemap_style_muted']='Prigušen';
+$ec_lang['lpn_basemap_style_faded']='Izblijedio';
+$ec_lang['lpn_basemap_style_grayscale']='Sivi tonovi';
 $ec_lang['lpn_settings_map_display']='Izgled';
 // PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
 // to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
@@ -2944,10 +3379,22 @@ $ec_lang['lpn_time_pattern_start']='Početno vrijeme obrasca potražnje';
 $ec_lang['lpn_time_report_step']='Vremenski korak izvješća';
 $ec_lang['lpn_time_report_start']='Početno vrijeme izvješća';
 $ec_lang['lpn_time_clock_start']='Vrijeme na satu na početku';
+$ec_lang['lpn_time_statistic']='Statistika';
+$ec_lang['lpn_time_stat_none']='Nema';
+$ec_lang['lpn_time_stat_averaged']='Prosj.';
+$ec_lang['lpn_time_stat_minimum']='Min.';
+$ec_lang['lpn_time_stat_maximum']='Maks.';
+$ec_lang['lpn_time_stat_range']='Raspon';
 $ec_lang['lpn_time_clock_day']='Dan {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Upišite vrijeme kao sate i minute, na primjer 2:30. Obični broj znači sate, pa 8 znači osam sati. Pola sata je 0:30.';
 $ec_lang['lpn_time_running']='Izvođenje simulacije produljenog razdoblja.';
 $ec_lang['lpn_time_no_engine']='Ugrađeni rješavač rješava jedan trenutak odjednom, pa je ovo mreža samo u trenutku {time}: svaki obrazac čita se u tom trenutku, a svaki spremnik ostaje na početnoj razini umjesto da se puni i prazni. Povežite se jednom s internetom da preuzmete EPANET rješavač, koji izvodi simulaciju produljenog razdoblja.';
+// lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
+// of a failed extended period run the same note ends in {reason}, one of the three sentences below.
+$ec_lang['lpn_time_no_engine_why']='Ugrađeni rješavač rješava jedan trenutak odjednom, pa je ovo mreža samo u trenutku {time}: svaki obrazac čita se u tom trenutku, a svaki spremnik ostaje na početnoj razini umjesto da se puni i prazni. {reason}';
+$ec_lang['lpn_time_engine_fetch_failed']='Preuzimanje EPANET rješavača nije uspjelo. Ponovno učitajte stranicu da pokušate opet; moguće ga blokira vatrozid, proxy ili dodatak preglednika.';
+$ec_lang['lpn_time_engine_start_failed']='Preglednik je odbio pokrenuti EPANET rješavač. WebAssembly je možda isključen sigurnosnom postavkom ili dodatkom.';
+$ec_lang['lpn_time_engine_run_failed']='EPANET pokretanje nije uspjelo. To je greška na ovoj stranici; upotrijebite vezu {wrong} da je prijavite.';
 $ec_lang['lpn_time_slider']='Proteklo vrijeme simulacije';
 $ec_lang['lpn_time_no_period']='Ovaj projekt nema postavljen izračun kroz vrijeme, pa postoji samo jedan trenutak za prikaz. Postavite Ukupno vrijeme rada u Postavke, Izračun, Vrijeme da izračunate mrežu kroz vrijeme.';
 $ec_lang['lpn_time_first']='Idi na početak';
@@ -3038,6 +3485,9 @@ $ec_lang['lpn_labels_customer_width_tip']='Oznake korisnika crtaju se samo dok j
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Koristi trenutačni prikaz';
 $ec_lang['lpn_settings_page']='Stranica';
+$ec_lang['lpn_saved_project']='Spremljeno s projektom';
+$ec_lang['lpn_saved_browser']='Spremljeno u ovom pregledniku';
+$ec_lang['lpn_saved_session']='Nije spremljeno';
 $ec_lang['lpn_settings_hydraulics']='Hidraulika';
 $ec_lang['lpn_settings_quality']='Kvaliteta vode';
 $ec_lang['lpn_settings_quality_track']='Parametar kvalitete';
@@ -3184,6 +3634,8 @@ $ec_lang['lpn_settings_energy']='Energija';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='Izvještaji';
 // Edited by TGH 2026-09-07
+// Row label only (the box title is lpn_time_run_report). Tom, 2026-10-07: no row carries '(EPANET)';
+// the tips say where a report comes from. Run is EPANET's verbatim report.
 $ec_lang['lpn_reports_epanet']='Pokretanje';
 $ec_lang['lpn_energy_title']='Izvještaj o energiji pumpi';
 $ec_lang['lpn_energy_menu']='Energija pumpi';
@@ -3219,6 +3671,9 @@ $ec_lang['lpn_scncmp_running']='Rješavanje svakog scenarija…';
 $ec_lang['lpn_scncmp_empty']='Ništa još nije nacrtano, pa nema što riješiti.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Najveća brzina';
 $ec_lang['lpn_scncmp_at']='{value} na {id}';
+$ec_lang['lpn_scncmp_at_time']='{value} na {id}, {time}';
+$ec_lang['lpn_scncmp_same']='Jednako u svakom scenariju';
+$ec_lang['lpn_scncmp_period_note']='Gdje scenarij ima ukupno vrijeme rada, njegov najniži tlak i najveća brzina su ekstremi cijele mreže, u prikazanom trenutku.';
 $ec_lang['lpn_scncmp_current']='(trenutačno otvoren)';
 $ec_lang['lpn_scncmp_note']='Svaki scenarij rješava se iz kopije crteža. Ništa se ovdje ne mijenja u projektu, a scenarij u kojem radite ostaje kakav je bio.';
 $ec_lang['lpn_energy_over']='Za izračun kroz vrijeme od {time}';
@@ -3241,9 +3696,7 @@ $ec_lang['lpn_energy_total_cost']='Ukupni trošak';
 // EPANET's own Report menu, Status and Full: Status lists what changed over an extended period
 // simulation, in time order; Full lists every node and every link at every reporting time step.
 // Both read the run's own frames (js/lpn-time.js), so neither is a second computation.
-// **THE ROW SAYS "Status", NOT "Status report"** -- the Reports fly-out carries the word so no row
-// has to (js/looped-network.js:4630's own rule, already followed by "EPANET run"). The box title,
-// lpn_status_title, keeps the full name.
+// **THE ROW AND THE BOX TITLE BOTH SAY "Status changes"** (Tom, 2026-10-07), so menu and box agree.
 $ec_lang['lpn_reports_status']='Promjene stanja';
 $ec_lang['lpn_reports_status_tip']='Kronološka tablica promjena stanja očitanih iz EPANET vremenskih koraka posljednje simulacije produljenog razdoblja: pumpe i ventili koji se otvaraju ili zatvaraju, spremnici koji se pune, prazne, prepune ili presuše te koraci koji nisu potpuno konvergirali.';
 $ec_lang['lpn_status_title']='Promjene stanja';
@@ -3271,7 +3724,54 @@ $ec_lang['lpn_full_print']='Ispiši izvještaj';
 $ec_lang['lpn_full_col_time']='Vrijeme';
 $ec_lang['lpn_full_col_type']='Vrsta';
 $ec_lang['lpn_full_col_id']='ID';
-$ec_lang['lpn_full_row_count']='{n} redaka.';
+$ec_lang['lpn_full_row_count']='Retci ({n}).';
+
+// ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
+// EPANET's Report > Calibration and its three tabbed pages, with EPANET's own column names (EPANET
+// 2.2 manual, section 9.6). Mean error is EPANET's term for the mean ABSOLUTE difference. "Num obs"
+// is EPANET's own column heading, kept short because results columns are narrow.
+// lpn_calib_missing: keep in step with feat/profile-file's lpn_profile_file_missing (Task 604), the same sentence.
+$ec_lang['lpn_reports_calib']='Kalibracija';
+$ec_lang['lpn_reports_calib_tip']='Usporedite izmjerene terenske podatke iz datoteke kalibracije s posljednjim pokretanjem: statistika, dijagram korelacije i usporedbe srednjih vrijednosti.';
+$ec_lang['lpn_calib_title']='Izvještaj o kalibraciji';
+$ec_lang['lpn_calib_param']='Parametar';
+$ec_lang['lpn_calib_param_tip']='Veličina koju mjeri datoteka kalibracije. Za svaki parametar drži se jedna datoteka.';
+$ec_lang['lpn_calib_load']='Učitaj datoteku kalibracije…';
+$ec_lang['lpn_calib_load_tip']='Tekstualna datoteka s ID-om lokacije, vremenom i izmjerenom vrijednošću u svakom retku. Vrijeme se mjeri od početka simulacije, u decimalnim satima ili satima:minutama. Točka sa zarezom započinje komentar. Redak samo s vremenom i vrijednošću pripada lokaciji iznad njega.';
+$ec_lang['lpn_calib_none']='Za ovaj parametar nije učitana datoteka kalibracije.';
+$ec_lang['lpn_calib_session']='Datoteka kalibracije drži se samo za ovu sesiju. Ne sprema se s projektom niti na ovom uređaju.';
+$ec_lang['lpn_calib_file']='{file}: mjerenja ({n}) na lokacijama ({m}).';
+$ec_lang['lpn_calib_units']='Vrijednosti iz datoteke čitaju se u jedinicama ovog projekta: {unit}.';
+$ec_lang['lpn_calib_missing']='Navedeno u datoteci, a nije u ovoj mreži: {ids}.';
+$ec_lang['lpn_calib_missing_count']='Preskočena mjerenja čija lokacija nije u ovoj mreži: {n}.';
+$ec_lang['lpn_calib_bad_lines']='Retci koji se nisu mogli pročitati, preskočeni: {lines}';
+$ec_lang['lpn_calib_outside']='Preskočena mjerenja izvan vremena koja je ovo pokretanje izvijestilo: {n}.';
+$ec_lang['lpn_calib_no_value']='Preskočena mjerenja bez izračunate vrijednosti u njihovo vrijeme: {n}.';
+$ec_lang['lpn_calib_single']='Ovo je pokretanje s jednim razdobljem, pa se svako mjerenje uspoređuje s njegovim jedinim rezultatom, bez obzira na vrijeme iz datoteke.';
+$ec_lang['lpn_calib_needs_run']='Još nema rezultata za usporedbu. Izvještaj se popunjava kad se mreža izračuna.';
+$ec_lang['lpn_calib_no_pairs']='Nijedno mjerenje nije se moglo usporediti, pa nema što crtati.';
+$ec_lang['lpn_calib_tab_stats']='Statistika';
+$ec_lang['lpn_calib_tab_corr']='Dijagram korelacije';
+$ec_lang['lpn_calib_tab_means']='Usporedbe srednjih vrijednosti';
+$ec_lang['lpn_calib_col_location']='Lokacija';
+$ec_lang['lpn_calib_col_n']='Br. opaž.';
+$ec_lang['lpn_calib_col_obs_mean']='Opažena srednja vr.';
+$ec_lang['lpn_calib_col_sim_mean']='Izračunata srednja vr.';
+$ec_lang['lpn_calib_col_mean_err']='Srednja pogreška';
+$ec_lang['lpn_calib_col_mean_err_tip']='Srednja vrijednost apsolutnih razlika između svake opažene vrijednosti i izračunate vrijednosti u isto vrijeme.';
+$ec_lang['lpn_calib_col_rms_err']='RMS pogreška';
+$ec_lang['lpn_calib_col_rms_err_tip']='Korijen srednje kvadratne pogreške: drugi korijen srednje vrijednosti kvadrata razlika između opaženih i izračunatih vrijednosti.';
+$ec_lang['lpn_calib_network']='Mreža';
+$ec_lang['lpn_calib_corr_means']='Korelacija između srednjih vrijednosti: {r}';
+$ec_lang['lpn_calib_corr_none']='Korelacija između srednjih vrijednosti: potrebne su najmanje dvije lokacije čije se srednje vrijednosti razlikuju.';
+$ec_lang['lpn_calib_axis_obs']='Opaženo: {q}';
+$ec_lang['lpn_calib_axis_sim']='Izračunato: {q}';
+$ec_lang['lpn_calib_observed']='Opaženo';
+$ec_lang['lpn_calib_computed']='Izračunato';
+$ec_lang['lpn_calib_point']='{id}, {time}: opaženo {o}, izračunato {s}';
+$ec_lang['lpn_calib_corr_note']='Svaka točka je jedno mjerenje. Što su točke bliže dijagonalnoj liniji, to se izračunate vrijednosti bolje podudaraju s opaženima.';
+$ec_lang['lpn_calib_ts_point']='Izmjereno na {id}, {time}: {v}';
+$ec_lang['lpn_calib_ts_note']='Prstenovi su izmjerene vrijednosti iz datoteke kalibracije.';
 $ec_lang['lpn_energy_no_price']='Nije navedena cijena energije, pa je svaki trošak ovdje nula. Postavite je pod Postavke, Energija.';
 // The sibling of the line above, and the difference between them is the whole of Task 581: a file
 // that states a price of zero is not a file that states no price, and the report must not say the
@@ -3365,7 +3865,7 @@ $ec_lang['lpn_library_curve_unused']='Ništa ne koristi ovu krivulju.';
 // clearing a pattern reference is harmless; a pump with no curve is a lossless connection, so the
 // same gesture would quietly turn a pumped system into an open one. {count} and {ids} are
 // placeholders, not concatenation (Task 193).
-$ec_lang['lpn_library_curve_in_use']='Ovu krivulju koristi {count} elemenata: {ids}. Najprije im dodijelite drugu krivulju, zatim izbrišite ovu.';
+$ec_lang['lpn_library_curve_in_use']='Ovu krivulju koriste elementi ({count}): {ids}. Najprije im dodijelite drugu krivulju, zatim izbrišite ovu.';
 // The two column headings for a curve this page does not compute with -- a tank volume curve, or one
 // a file stated that nothing here reads. Naming a quantity would be inventing one.
 $ec_lang['lpn_library_curve_x']='X';
@@ -3387,7 +3887,7 @@ $ec_lang['lpn_library_pipetype_unused']='Ništa ne koristi ovu vrstu cijevi.';
 // A TYPE IN USE IS NOT DELETED, for the reason the curve above is not: deleting it would change the
 // diameter and the roughness of every pipe that stated it, in silence. {count} and {ids} are
 // placeholders, not concatenation (Task 193).
-$ec_lang['lpn_library_pipetype_in_use']='Ovu vrstu cijevi koristi {count} cijevi: {ids}. Odvojite je od njih prije brisanja.';
+$ec_lang['lpn_library_pipetype_in_use']='Ovu vrstu cijevi koriste cijevi ({count}): {ids}. Odvojite je od njih prije brisanja.';
 // The pipe popup\'s own selector and the two controls beside it.
 $ec_lang['lpn_field_pipetype']='Vrsta cijevi';
 $ec_lang['lpn_field_pipetype_tip']='Vrsta cijevi iz knjižnice projekta koju ova cijev koristi. Svojstva uključena u vrstu cijevi ovdje su onemogućena za uređivanje. Odvojite vrstu cijevi da omogućite uređivanje ovdje.';
@@ -3414,7 +3914,7 @@ $ec_lang['lpn_library_fittings_used_by']='Cijevi koje koriste ovaj popis armatur
 $ec_lang['lpn_library_fittings_unused']='Ništa ne koristi ovaj popis armatura.';
 // A LIST IN USE IS NOT DELETED, for the reason a pipe type in use is not: it would change the minor
 // loss of every pipe that referred to it, in silence. {count} and {ids} are placeholders (Task 193).
-$ec_lang['lpn_library_fittings_in_use']='Ovaj popis armatura koristi {count} cijevi: {ids}. Odvojite ga od njih prije brisanja.';
+$ec_lang['lpn_library_fittings_in_use']='Ovaj popis armatura koriste cijevi ({count}): {ids}. Odvojite ga od njih prije brisanja.';
 // Importing libraries out of another project file (ROADMAP Task 611). ONE WIZARD, ONE DOOR: the
 // Import libraries row under File, and nothing in the Libraries box (Tom, 2026-09-18: 'Remove
 // buttons except at the File menu.'). The label and its tip name no particular library, because
@@ -3485,9 +3985,9 @@ $ec_lang['lpn_fitting_other']='Druga armatura';
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
 $ec_lang['lpn_inp_export_flat_heading']='Spremljeno {file}';
 $ec_lang['lpn_inp_export_flat_lead']='Izvezena EPANET datoteka brojčano je jednaka ovom projektu. No nema mjesta za sljedeće:';
-$ec_lang['lpn_inp_export_flat_types']='{n} cijevi ovdje upućuje na {t} vrsta cijevi. U datoteci svaka od tih cijevi nosi vlastitu kopiju brojeva, pa su rezultati isti. Datoteka ne može sadržavati samu vrstu cijevi, pa se veza između jedne definicije i svake cijevi koja je koristi bilježi samo u datoteci projekta.';
+$ec_lang['lpn_inp_export_flat_types']='Cijevi ovdje ({n}) upućuju na vrste cijevi ({t}). U datoteci svaka od tih cijevi nosi vlastitu kopiju brojeva, pa su rezultati isti. Datoteka ne može sadržavati samu vrstu cijevi, pa se veza između jedne definicije i svake cijevi koja je koristi bilježi samo u datoteci projekta.';
 $ec_lang['lpn_inp_export_flat_coords']='EPANET datoteka sadrži jedan položaj za svaki čvor. Ovaj scenarij {n} njih postavlja negdje drugdje i to su položaji u datoteci. Svaki drugi scenarij čuva svoje položaje samo u datoteci projekta.';
-$ec_lang['lpn_inp_export_flat_fittings']='EPANET datoteka ne može sadržavati popis koljena, ventila i T-komada iz vaše projektne datoteke. Koeficijent lokalnog gubitka za {n} cijevi ovdje zbrojen je iz popisa armatura. Ukupan iznos ide u datoteku točno onakav kakav jest, tako da se u odgovorima ništa ne mijenja.';
+$ec_lang['lpn_inp_export_flat_fittings']='EPANET datoteka ne može sadržavati popis koljena, ventila i T-komada iz vaše projektne datoteke. Koeficijent lokalnog gubitka cijevi ovdje ({n}) zbrojen je iz popisa armatura. Ukupan iznos ide u datoteku točno onakav kakav jest, tako da se u odgovorima ništa ne mijenja.';
 $ec_lang['lpn_library_controls']='Kontrole';
 $ec_lang['lpn_library_controls_tip']='Kontrola je jedna naredba koja otvara ili zatvara vod, ili mijenja njegovu postavku, prema razini vode u spremniku, tlaku u čvoru ili vremenu.';
 // A verb and its object, not a bare "Add": a bare imperative is the hardest kind of string to
@@ -3497,10 +3997,21 @@ $ec_lang['lpn_library_pattern_values']='Množitelji';
 $ec_lang['lpn_library_pattern_values_tip']='Množitelji, odvojeni razmacima ili zarezima. Zalijepite stupac iz proračunske tablice ako ga imate. Popis se ponavlja onoliko dugo koliko traje pokretanje, pa ne mora pokrivati cijelo razdoblje.';
 // {n} values, {step} apart, covering {span}. Placeholders rather than three joined fragments
 // (Task 193): the order of the three differs by language and a sandwich cannot express that.
-$ec_lang['lpn_library_pattern_span']='{n} množitelja, razmaknutih {step}, obuhvaćaju {span}';
+$ec_lang['lpn_library_pattern_span']='Množitelji: {n}, razmaknuti {step}, obuhvaćaju {span}';
 $ec_lang['lpn_library_pattern_none']='Bez obrasca';
+// The blank first option of a selector whose blank follows a project-wide default (a junction's or
+// customer's demand pattern, a pump's price pattern and efficiency curve). Tom, 2026-10-04.
+$ec_lang['lpn_choice_default']='Zadano';
 $ec_lang['lpn_settings_default_pattern']='Zadani obrazac potražnje';
 $ec_lang['lpn_settings_default_pattern_tip']='Svaki čvor bez obrasca koristi ovaj.';
+$ec_lang['lpn_junction_pattern_unknown']='Nijedan obrazac u ovom projektu nema ID {id}, pa je čvor ostavljen kakav je bio.';
+$ec_lang['lpn_settings_default_pattern_none']='Nema (konstantno)';
+$ec_lang['lpn_demand_pattern_default']='(zadano: {id})';
+$ec_lang['lpn_demand_pattern_constant']='(konstantno)';
+$ec_lang['lpn_library_pattern_default_mark']='(zadano)';
+$ec_lang['lpn_library_pattern_default_tip']='Zadani obrazac potražnje. Promijenite ga u Postavke, Zadani obrazac potražnje.';
+$ec_lang['lpn_library_pattern_default_deleted_to']='Obrazac {id} bio je zadani obrazac potražnje. Čvorovi bez obrasca sada koriste obrazac {now}.';
+$ec_lang['lpn_library_pattern_default_deleted_none']='Obrazac {id} bio je zadani obrazac potražnje. Čvorovi bez obrasca sada koriste konstantnu potražnju.';
 $ec_lang['lpn_library_control_add']='Dodaj kontrolu';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -3601,7 +4112,7 @@ $ec_lang['lpn_terrain_refused']='Kote nisu popunjene i ništa nije poslano. Mogu
 // numbers. Substituted, never concatenated.
 $ec_lang['lpn_terrain_confirm']='Popuniti kotu za {n} čvor(ova) iz Mapbox DEM-a?';
 $ec_lang['lpn_terrain_confirm_default_1']='Svaki čvor već ima kotu, a {n} njih još je na {v}, što je kota s kojom novi čvor počinje, a ne kota koju ste unijeli.';
-$ec_lang['lpn_terrain_confirm_default_2']='Zamijeniti kotu tih {n} čvorova vrijednostima iz Mapbox DEM-a?';
+$ec_lang['lpn_terrain_confirm_default_2']='Zamijeniti kotu tih čvorova ({n}) vrijednostima iz Mapbox DEM-a?';
 $ec_lang['lpn_terrain_keep']='{k} čvor(ova) već ima kotu i neće biti promijenjeno.';
 $ec_lang['lpn_terrain_undo']='Jedno Poništi (Ctrl-Z) vraća ih sve natrag.';
 $ec_lang['lpn_terrain_requests']='{n} zahtjev(a) prema api.mapbox.com.';
@@ -3643,6 +4154,8 @@ $ec_lang['lpn_terrain_ids_more']='{ids}, i još {n}';
 // {flow} and {velocity} are quantities with their units, {pressure} a pressure with its unit,
 // {id} a junction or pipe name, and {done}, {total}, {n}, {pass}, {fail}, {design} and {solves}
 // are whole numbers. Every one is substituted, never concatenated.
+$ec_lang['lpn_analyze_menu']='Analiza';
+$ec_lang['lpn_analyze_menu_tip']='Analize koje pokreću mrežu na kopiji: protupožarni protok na svakom čvoru, gubitak svake cijevi, pumpe i ventila te potražnje povećane ili smanjene.';
 $ec_lang['lpn_ff_menu']='Analiza protupožarnog protoka…';
 $ec_lang['lpn_ff_menu_tip']='Ispitajte protupožarni protok svakog odabranog čvora i provjerite učinak na ostatak sustava';
 $ec_lang['lpn_ff_title']='Analiza protupožarnog protoka';
@@ -3661,6 +4174,9 @@ $ec_lang['lpn_ff_residual']='Preostali tlak koji treba održati';
 $ec_lang['lpn_ff_residual_tip']='Tlak koji čvor mora i dalje održavati dok isporučuje protupožarni protok. AWWA M31 i NFPA 291 koriste 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Provjera projektnih uvjeta (učinak na sustav)';
 $ec_lang['lpn_ff_design_tip']='Zasebno pitanje od toga može li čvor isporučiti protok: pada li uz taj protok povučen ondje bilo koji drugi čvor ispod svog minimalnog tlaka ili prelazi li bilo koja cijev svoju graničnu brzinu? Ova provjera ne zahtijeva dodatni izračun.';
+$ec_lang['lpn_ff_design_off']='Nijedan';
+$ec_lang['lpn_ff_design_all']='Svi';
+$ec_lang['lpn_ff_design_selected']='Odabrani';
 $ec_lang['lpn_ff_design_no_selection']='Opseg provjere projektnih uvjeta postavljen je na Odabrano, ali nijedan element nije odabran. Odaberite elemente na karti ili izaberite Svi.';
 $ec_lang['lpn_ff_minpressure']='Najniži dopušteni tlak drugdje';
 $ec_lang['lpn_ff_minpressure_tip']='Čvor koji padne ispod ovoga dok drugi povlači svoj protupožarni protok prijavljuje se kao problem projektiranja.';
@@ -3705,7 +4221,7 @@ $ec_lang['lpn_ff_clear']='Ukloni prstenove';
 // down -- so these three do not add up to the number of junctions, and that is correct rather than
 // a rounding slip. Said as three separate facts for that reason.
 $ec_lang['lpn_ff_summary']='{clean} čvorova zadovoljilo je sve provjere. {fire} čvorova nije zadovoljilo protupožarni protok. {design} čvorova utjecalo je na ostatak sustava.';
-$ec_lang['lpn_ff_summary_error']='{n} čvorova nije bilo moguće riješiti.';
+$ec_lang['lpn_ff_summary_error']='Čvorovi koje nije bilo moguće riješiti ({n}).';
 // ONE WIDE TABLE, NOT TWO REPORTS (Tom, 2026-08-30, with a competitor's own table in front of him:
 // "Normally they are kind of wide and they include the information from both tables in one table.")
 // One run has always produced one result set holding both answers per junction, so two headings
@@ -3757,6 +4273,7 @@ $ec_lang['lpn_ff_more']='i još {n} pogođenih';
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
 // agree with one noun and would have been wrong at the other call site.
 $ec_lang['lpn_ff_rows_more']='Čvorovi koji nisu prikazani: {n}.';
+$ec_lang['lpn_ff_rows_more_links']='Vodovi koji nisu prikazani: {n}.';
 $ec_lang['lpn_ff_design_none']='Uz protupožarni protok svakog ispitanog čvora povučen redom, ništa u opsegu provjere projektnih uvjeta nije prešlo svoje granice.';
 $ec_lang['lpn_ff_design_off_note']='Učinak na ostatak sustava nije provjeren u ovom pokretanju.';
 // **WHY IT IS SAID AND NEVER APPLIED, in Tom's words (2026-09-02), and the reason is the MODEL, not
@@ -3783,6 +4300,91 @@ $ec_lang['lpn_ff_err_solve']='Rješavač je prijavio pogrešku i nije dao odgovo
 $ec_lang['lpn_ff_err_not_junction']='Nije čvor';
 $ec_lang['lpn_ff_err_unknown']='Nema rezultata. Šifra pogreške: {code}';
 
+// ---- Water > Criticality analysis (Tom, 2026-09-30) -------------------------------------------
+//
+// Break each asset in turn, on a copy, and report what the system loses. "Criticality analysis" is
+// the industry's term (WaterGEMS, InfoWater); EPANET has no such tool and no word for it. The run
+// dialog, Run, Stop, the engine sentence and the cost line are fire flow's own keys.
+//
+// {n}, {done} and {total} are whole numbers; {pressure} is a pressure with its unit.
+$ec_lang['lpn_crit_menu']='Analiza kritičnosti…';
+$ec_lang['lpn_crit_menu_tip']='Redom uklonite svaku cijev, pumpu i ventil iz mreže i izvijestite o učinku na sustav.';
+$ec_lang['lpn_crit_title']='Analiza kritičnosti';
+$ec_lang['lpn_crit_intro']='Svaki element redom se uklanja iz mreže, a mreža se rješava u vremenskom koraku na zaslonu u aktivnom scenariju. Ništa u projektu se ne mijenja; cijelo pokretanje izvodi se na kopiji.';
+$ec_lang['lpn_crit_scope']='Vodovi za prekid';
+$ec_lang['lpn_crit_scope_tip']='Sve cijevi, pumpe i ventili, ili samo oni odabrani na karti. Izaberite skup prije pokretanja.';
+$ec_lang['lpn_crit_scope_all']='Svi vodovi';
+$ec_lang['lpn_crit_scope_selected']='Odabrani vodovi';
+$ec_lang['lpn_crit_minpressure']='Najniži dopušteni tlak';
+$ec_lang['lpn_crit_minpressure_tip']='Ovo je isti broj kao Najniži dopušteni tlak drugdje u Analizi protupožarnog protoka. Promjena ovdje mijenja ga i tamo.';
+$ec_lang['lpn_crit_col_asset']='Element';
+$ec_lang['lpn_crit_col_unserved']='Neopskrbljena potražnja';
+$ec_lang['lpn_crit_col_cutoff']='Odsječeni čvorovi';
+$ec_lang['lpn_crit_col_below']='Čvorovi ispod minimuma';
+$ec_lang['lpn_crit_summary']='Elementi koji ostavljaju potražnju neopskrbljenom ili spuštaju čvor ispod {pressure} ({n} od {total}).';
+$ec_lang['lpn_crit_baseline_below']='Čvorovi koji su već ispod toga bez ikakvog kvara: {n}. Ne broje se.';
+$ec_lang['lpn_crit_working']='U tijeku: {done} od {total} elemenata.';
+$ec_lang['lpn_crit_stopped']='Zaustavljeno nakon {done} od {total} elemenata. Rezultati ispod su oni koji su već završeni.';
+$ec_lang['lpn_crit_no_selection']='Nijedan vod nije odabran. Odaberite vodove ili izaberite Svi vodovi.';
+$ec_lang['lpn_crit_no_links']='Ovaj projekt još nema vodova, pa nema što prekinuti.';
+$ec_lang['lpn_crit_busy']='Druga analiza je u tijeku. Zaustavite je ili pričekajte da završi.';
+$ec_lang['lpn_crit_skipped']='{n} odabranih elemenata nisu vodovi, pa nisu prekinuti.';
+$ec_lang['lpn_crit_stale']='Crtež se promijenio, pa su rezultati analize kritičnosti obrisani. Pokrenite ponovno.';
+$ec_lang['lpn_crit_skipdead']='Preskoči slijepe završetke';
+$ec_lang['lpn_crit_skipdead_tip']='Slijepi vod je onaj čije uklanjanje odsijeca čvorove do kojih se može doći samo kroz njega, bez rezervoara ili spremnika iza njega. Njegov gubitak je sve iza njega, pa se ne rješava. Sažetak kaže koliko ih je preskočeno.';
+$ec_lang['lpn_crit_skipped_dead']='Preskočeni slijepi vodovi: {n}. Svaki odsijeca sve iza sebe.';
+
+// ---- Water > Analyze > Demand scaling (ROADMAP Task 754) ----------------------------------------
+//
+// Tom, 2026-09-30 and 2026-10-01: the demands multiplied on a copy, like Fire flow, and "What demand
+// scale can the system handle with this pressure limit?" The run dialog's Stop, the engine sentence,
+// the cost line, the Junction heading and the solver's reasons are fire flow's own keys.
+//
+// {m} and {max} are demand scales printed as numbers (1.37); {step} is the search's tolerance
+// (0.01); {n} is a whole number, always after a colon so no plural has to agree with it; {time} and
+// {now} are elapsed times (6:00); {pressure} is a pressure with its unit; {id} becomes a link to the
+// junction on the map; {reason} is a whole sentence saying why the solver gave no answer.
+$ec_lang['lpn_ds_menu']='Skaliranje potražnje…';
+$ec_lang['lpn_ds_menu_tip']='Pomnožite potražnje na kopiji mreže i pogledajte tlakove i brzine, ili pronađite najveću skalu potražnje koju sustav može podnijeti.';
+$ec_lang['lpn_ds_title']='Skaliranje potražnje';
+$ec_lang['lpn_ds_intro']='Pritisnite gumb Pokreni da pomnožite potražnje na odabranim čvorovima skalom potražnje i vidite tlakove i brzine.\n\nPritisnite gumb Pronađi da pronađete najveću skalu potražnje, na najbliži {step}, pri kojoj svi ti čvorovi zadržavaju barem najniži dopušteni tlak; pretražuje od 0 do {max}.\n\nOba rade na kopiji mreže, riješenoj u vremenskom koraku na zaslonu u aktivnom scenariju, pa se ništa u projektu ne mijenja. Skalira se samo taj vremenski korak, a razine i stanja preuzimaju se iz njega; za ispitivanje vršne potražnje pomaknite sat na vršnu potražnju prije pokretanja.';
+$ec_lang['lpn_ds_scope']='Čvorovi za skaliranje';
+$ec_lang['lpn_ds_scope_all']='Svi čvorovi';
+$ec_lang['lpn_ds_scope_selected']='Odabrani čvorovi';
+$ec_lang['lpn_ds_minpressure']='Najniži dopušteni tlak';
+$ec_lang['lpn_ds_minpressure_tip']='To je isti broj kao Najniži dopušteni tlak drugdje u Analizi protupožarnog protoka. Promjena ovdje mijenja ga i tamo.';
+$ec_lang['lpn_ds_head_scale']='Skaliraj potražnje';
+$ec_lang['lpn_ds_multiplier']='Skala potražnje';
+$ec_lang['lpn_ds_multiplier_tip']='Faktor kojim se množi svaka potražnja; 1,5 je povećanje od 50 %. Primjenjuje se uz množitelj potražnje aktivnog scenarija, koji je već u potražnjama, i nikada se ne sprema u projekt.';
+$ec_lang['lpn_ds_run']='Pokreni';
+$ec_lang['lpn_ds_head_search']='Koju skalu potražnje sustav može podnijeti?';
+$ec_lang['lpn_ds_head_search_selected']='Koju skalu potražnje mogu podnijeti ovi čvorovi?';
+$ec_lang['lpn_ds_outside_below']='Pri skali potražnje {m}, neodabrani čvorovi ispod {pressure}: {n} ({ids}). Oni ne ograničavaju ovaj odgovor.';
+$ec_lang['lpn_ds_holds_max']='✓ Svaki čvor zadržava {pressure} do skale potražnje {max}, vrha pretraživanja.';
+$ec_lang['lpn_ds_below_zero']='⚠ Barem jedan čvor je ispod {pressure} čak i uz skalirane potražnje jednake nuli.';
+$ec_lang['lpn_ds_found']='✓ Svaki provjeren čvor zadržava barem {pressure} do skale potražnje {m}.';
+$ec_lang['lpn_ds_found_below']='⚠ Barem jedan čvor je ispod {pressure} bez skaliranja potražnje. Najveća skala potražnje pri kojoj svaki čvor ostaje na {pressure} ili iznad je {m}.';
+$ec_lang['lpn_ds_search_stopped']='Pretraživanje je zaustavljeno prije nego što je pronašlo odgovor.';
+$ec_lang['lpn_ds_lowest_at']='Pri skali potražnje {m}, najniži tlak je {pressure}, na čvoru {id}.';
+$ec_lang['lpn_ds_nosolve_at']='Pri skali potražnje {m}, mreža nije dala rješenje. {reason}';
+$ec_lang['lpn_ds_scale_ok']='✓ Pri skali potražnje {m}, svaki čvor zadržava {pressure}.';
+$ec_lang['lpn_ds_scale_below']='⚠ Pri skali potražnje {m}, čvorovi ispod {pressure}: {n}.';
+$ec_lang['lpn_ds_scaled_selected']='Skalirani i provjereni čvorovi: {n}.';
+$ec_lang['lpn_ds_head_lowest']='Najniži tlakovi';
+$ec_lang['lpn_ds_head_velocity']='Najveće brzine';
+$ec_lang['lpn_ds_col_link']='Vod';
+$ec_lang['lpn_ds_col_scaled']='Skalirano';
+$ec_lang['lpn_ds_col_scaled_tip']='S potražnjama pomnoženima skalom potražnje.';
+$ec_lang['lpn_ds_col_unscaled']='Neskalirano';
+$ec_lang['lpn_ds_col_unscaled_tip']='S potražnjama kakve su u aktivnom scenariju u ovom vremenskom koraku, ista vrijednost koju prikazuje karta.';
+$ec_lang['lpn_ds_no_junctions']='Ovaj projekt još nema čvorova, pa nema potražnji za skaliranje.';
+$ec_lang['lpn_ds_no_selection']='Nijedan čvor nije odabran. Odaberite čvorove ili izaberite Svi čvorovi.';
+$ec_lang['lpn_ds_skipped']='Odabrani elementi koji nisu čvorovi, ostavljeni kakvi jesu: {n}.';
+$ec_lang['lpn_ds_bad_multiplier']='Unesite skalu potražnje nula ili više, primjerice 1,5.';
+$ec_lang['lpn_ds_stale']='Crtež se promijenio, pa su rezultati skaliranja potražnje obrisani. Pokrenite ponovno.';
+$ec_lang['lpn_analyze_at_time']='Vremenski korak: {time}.';
+$ec_lang['lpn_analyze_time_moved']='⚠ Ovo je izračunato u {time}, a sat je sada na {now}. Pokrenite ponovno za vremenski korak na zaslonu.';
+
 // ---- Settings > New assets > Import surveyed points: CSV and GPX (ROADMAP Task 592) -----------
 //
 // A field survey produces a flat list of a name, a latitude and a longitude -- never an EPANET
@@ -3800,6 +4402,8 @@ $ec_lang['lpn_ff_err_unknown']='Nema rezultata. Šifra pogreške: {code}';
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='Uvezi izmjerene točke…';
 $ec_lang['lpn_file_import_survey_tip']='Pročitajte popis izmjerenih točaka iz tekstualne datoteke i napravite jedan čvor na svakoj točki, uzimajući postavke novih elemenata za sve što datoteka ne navodi. Cijevi se ne crtaju osim ako označite Čitaj opis kao terenske šifre, a nijedan redak nikada se ne odbacuje a da nije imenovan. Čita koordinatni sustav koji ovaj projekt već koristi, georeferenciran ili ne.';
+// GeoJSON import of Shapes (Task 779). Only points, lines and polygons come in, as Shapes; the
+// network is imported from an EPANET file. Every feature not imported is named in the report.
 $ec_lang['lpn_file_import_shapes']='Uvezi GeoJSON likove…';
 $ec_lang['lpn_file_import_shapes_tip']='Pročitajte točke, linije i poligone iz GeoJSON datoteke u ovaj projekt kao Likove. Elementi mreže u datoteci ne uvoze se; mrežu uvezite iz EPANET datoteke. Projekt mora biti georeferenciran ili imati naveden koordinatni sustav.';
 $ec_lang['lpn_geojson_import_done']='Uvezeno Likova: {n}. Datoteka: {file}.';
@@ -3910,304 +4514,7 @@ $ec_lang['lpn_survey_note_blank_rows']='Preskočeni prazni retci: {detail}.';
 $ec_lang['lpn_survey_note_id_duplicate']='Naziv je već korišten ranije u ovoj datoteci, dodijeljen je novi naziv.';
 $ec_lang['lpn_survey_note_id_taken']='Naziv je već u projektu, dodijeljen je novi naziv.';
 $ec_lang['lpn_survey_note_id_invalid']='Naziv se ovdje ne može koristiti, dodijeljen je novi naziv.';
-$ec_lang['lpn_hotkeys_menu_heading']='Izbornici';
-$ec_lang['lpn_hotkeys_menu_term']='Tipkovnički prečaci izbornika';
-$ec_lang['lpn_hotkeys_menu_def']='<table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+slovo</td><td>Otvorite izbornik s tim slovom, zatim pritisnite slovo retka da ga izaberete. Slova se vide dok koristite tipkovnicu. Na Macu koristite Ctrl+Option.</td></tr><tr><td>F10</td><td>Idi na traku izbornika.</td></tr></tbody></table>';
-$ec_lang['lpn_graphs_menu']='Grafikoni';
-$ec_lang['lpn_contour_menu']='Izolinije';
-$ec_lang['lpn_contour_tip']='Prikažite na karti prikaz izolinija: boje čvorova šire se uzduž cijevi i pored njih, s označenim izolinijama. Otvara okvir za podešavanje ili isključivanje.';
-$ec_lang['lpn_contour_plot']='Prikaz izolinija';
-$ec_lang['lpn_contour_fill']='Ispuna';
-$ec_lang['lpn_contour_fill_tip']='Glatko stapa boje iz jednog razreda u drugi. Pojasevi boje svaki razred legende boja jednolično.';
-$ec_lang['lpn_contour_fill_smooth']='Glatko';
-$ec_lang['lpn_contour_fill_bands']='Pojasevi';
-$ec_lang['lpn_contour_opacity']='Neprozirnost ispune';
-$ec_lang['lpn_contour_lines']='Izolinije';
-$ec_lang['lpn_contour_interval']='Razmak';
-$ec_lang['lpn_contour_buffer']='Zona';
-$ec_lang['lpn_contour_buffer_unit']='× medijan duljine cijevi';
-$ec_lang['lpn_contour_buffer_tip']='Doseg boje od svake cijevi, kao višekratnik medijana duljine cijevi. U vanjskom dijelu postupno blijedi.';
-$ec_lang['lpn_contour_few']='Premalo čvorova za izolinije.';
-$ec_lang['lpn_contour_support']='Prikaz izolinija: {n} čvorova, interpolirano uzduž {p} cijevi i do {k} puta medijana duljine cijevi pored njih. Nema boje preko pumpi, ventila ni zatvorenih vodova.';
-$ec_lang['lpn_contour_support_lines']='Izolinije svakih {i} {u}.';
-$ec_lang['lpn_contour_too_many']='Previše izolinija pri ovom razmaku; povećajte ga da bi se iscrtale.';
-$ec_lang['lpn_contour_dem']='Teren između čvorova iz Mapbox DEM-a';
-$ec_lang['lpn_contour_dem_tip']='Između čvorova tlak postaje interpolirana tlačna visina minus visina terena iz Mapbox DEM-a, pa može pasti ispod najnižeg tlaka čvora na brdu na kojem mreža nema čvora. Teren shvatite kao kartu slojnica, a ne kao geodetsko mjerenje.';
-$ec_lang['lpn_contour_support_dem']='Između čvorova tlak je interpolirana tlačna visina minus kota terena iz Mapbox DEM-a, očitana otprilike svakih {m} m.';
-$ec_lang['lpn_contour_dem_failed']='Teren se nije mogao očitati iz Mapbox DEM-a, pa se tlak interpolira samo između čvorova.';
-$ec_lang['lpn_contour_consent_1']='Crtanje tlaka preko terena šalje područje koje vaša mreža pokriva, kao brojeve Mapbox pločica karte, na api.mapbox.com, radi očitanja visine terena tamo.';
-$ec_lang['lpn_contour_consent_2']='Ovo je drugo pitanje od slika karte iza vašeg projekta. Slike samo govore gdje gledate. Ove pločice govore gdje je vaša mreža. Mapbox će primiti te brojeve pločica i vašu IP adresu. Ne šaljemo ništa drugo: ni ime, ni cijevi, ni projekt. Ne vodimo nikakav zapis o tome, a na ovom uređaju ne pohranjuje se ništa osim vašeg odgovora na ovo pitanje.';
-$ec_lang['lpn_contour_consent_3']='Smijemo li poslati Mapboxu brojeve pločica područja vaše mreže?';
-$ec_lang['lpn_contour_consent_4']='Ako odgovorite ne, sve ostalo na ovoj stranici radi točno kao i sada, a prikaz izolinija crta se samo između čvorova. Odgovor „da“ pamtimo kako ne bismo ponovno pitali. Odgovor „ne“ ne pohranjuje se uopće.';
-$ec_lang['lpn_sysflow_menu']='Bilanca protoka';
-$ec_lang['lpn_sysflow_tip']='Prikažite grafikonom ukupni proizvedeni i ukupni potrošeni protok u odnosu na vrijeme, tijekom simulacije proširenog razdoblja. Spremnici nisu ni u jednom zbroju, pa gdje se dvije linije razilaze, spremnici se pune ili prazne.';
-$ec_lang['lpn_sysflow_produced']='Proizvedeno';
-$ec_lang['lpn_sysflow_produced_tip']='Ukupni protok u mrežu iz rezervoara i iz negativnih potražnji.';
-$ec_lang['lpn_sysflow_consumed']='Potrošeno';
-$ec_lang['lpn_sysflow_consumed_tip']='Zbroj svake pozitivne potražnje: voda povučena iz mreže na čvorovima i svaki protok u rezervoar.';
-$ec_lang['lpn_copy_title']='Označiti datoteku kao novu kopiju?';
-$ec_lang['lpn_copy_body']='Ova datoteka kaže da je nastala {date}, a ovaj je preglednik ne prepoznaje. Je li to izvornik (zadržati isto zaključavanje) ili kopija (napraviti novo zaključavanje)?';
-$ec_lang['lpn_copy_body_nodate']='Ovaj preglednik ne prepoznaje ovu datoteku. Je li to izvornik (zadržati isto zaključavanje) ili kopija (napraviti novo zaključavanje)?';
-$ec_lang['lpn_copy_original']='Izvornik; zadrži isto zaključavanje';
-$ec_lang['lpn_copy_copy']='Kopija; napravi novo zaključavanje';
-$ec_lang['lpn_copy_kept_link']='Otvoreno {name} kao izvornik, premješten na novo mjesto. Spremanje sada piše u ovu datoteku.';
-$ec_lang['lpn_copy_opened']='Otvoreno {file} kao kopija i spremljeno, s novim zaključavanjem.';
-$ec_lang['lpn_scenario_basic']='Osnovni način';
-$ec_lang['lpn_scenario_basic_tip']='Označeno: scenarij se sastoji samo od vrijednosti postavljenih u njemu. Neoznačeno: ovaj izbornik nudi i tablicu Pregled alternativa, koja prikazuje kako su te vrijednosti grupirane po kategorijama, te omogućuje da scenarij ima zasebno ukupno vrijeme rada i hidraulički vremenski korak. Povratne informacije o ovoj značajci su dobrodošle.';
-$ec_lang['lpn_alt_title']='Pregled alternativa';
-$ec_lang['lpn_alt_note']='Baza koristi Osnovnu alternativu svake kategorije. Svaki scenarij ima zasebnu alternativu, potomka Osnovne alternative, za svaku promijenjenu kategoriju. Broj je količina promijenjenih vrijednosti. Posljednja tri stupca su opcije proračuna: unesite vrijednost za scenarij ili ostavite prazno da se koristi vrijednost nadređenog. Vrijednosti projekta nalaze se u Postavke, Proračun, Vrijeme.';
-$ec_lang['lpn_alt_cat_physical']='Fizičko';
-$ec_lang['lpn_alt_cat_demand']='Potražnja';
-$ec_lang['lpn_alt_cat_topology']='Aktivacija elemenata';
-$ec_lang['lpn_alt_cat_initial']='Početne postavke';
-$ec_lang['lpn_alt_cat_constituent']='Sastojak';
-$ec_lang['lpn_alt_cat_fireflow']='Protupožarni protok';
-$ec_lang['lpn_alt_cat_energy']='Trošak energije';
-$ec_lang['lpn_alt_cat_userdata']='Prilagođena svojstva';
-$ec_lang['lpn_alt_cat_text']='Tekst';
-$ec_lang['lpn_reports_calib']='Kalibracija';
-$ec_lang['lpn_reports_calib_tip']='Usporedite izmjerene terenske podatke iz datoteke kalibracije s posljednjim pokretanjem: statistika, dijagram korelacije i usporedbe srednjih vrijednosti.';
-$ec_lang['lpn_calib_title']='Izvještaj o kalibraciji';
-$ec_lang['lpn_calib_param']='Parametar';
-$ec_lang['lpn_calib_param_tip']='Veličina koju mjeri datoteka kalibracije. Za svaki parametar drži se jedna datoteka.';
-$ec_lang['lpn_calib_load']='Učitaj datoteku kalibracije…';
-$ec_lang['lpn_calib_load_tip']='Tekstualna datoteka s ID-om lokacije, vremenom i izmjerenom vrijednošću u svakom retku. Vrijeme se mjeri od početka simulacije, u decimalnim satima ili satima:minutama. Točka sa zarezom započinje komentar. Redak samo s vremenom i vrijednošću pripada lokaciji iznad njega.';
-$ec_lang['lpn_calib_none']='Za ovaj parametar nije učitana datoteka kalibracije.';
-$ec_lang['lpn_calib_session']='Datoteka kalibracije drži se samo za ovu sesiju. Ne sprema se s projektom niti na ovom uređaju.';
-$ec_lang['lpn_calib_file']='{file}: {n} mjerenja na {m} lokacija.';
-$ec_lang['lpn_calib_units']='Vrijednosti iz datoteke čitaju se u jedinicama ovog projekta: {unit}.';
-$ec_lang['lpn_calib_missing']='Navedeno u datoteci, a nije u ovoj mreži: {ids}.';
-$ec_lang['lpn_calib_missing_count']='Preskočena mjerenja čija lokacija nije u ovoj mreži: {n}.';
-$ec_lang['lpn_calib_bad_lines']='Retci koji se nisu mogli pročitati, preskočeni: {lines}';
-$ec_lang['lpn_calib_outside']='Preskočena mjerenja izvan vremena koja je ovo pokretanje izvijestilo: {n}.';
-$ec_lang['lpn_calib_no_value']='Preskočena mjerenja bez izračunate vrijednosti u njihovo vrijeme: {n}.';
-$ec_lang['lpn_calib_single']='Ovo je pokretanje s jednim razdobljem, pa se svako mjerenje uspoređuje s njegovim jedinim rezultatom, bez obzira na vrijeme iz datoteke.';
-$ec_lang['lpn_calib_needs_run']='Još nema rezultata za usporedbu. Izvještaj se popunjava kad se mreža izračuna.';
-$ec_lang['lpn_calib_no_pairs']='Nijedno mjerenje nije se moglo usporediti, pa nema što crtati.';
-$ec_lang['lpn_calib_tab_stats']='Statistika';
-$ec_lang['lpn_calib_tab_corr']='Dijagram korelacije';
-$ec_lang['lpn_calib_tab_means']='Usporedbe srednjih vrijednosti';
-$ec_lang['lpn_calib_col_location']='Lokacija';
-$ec_lang['lpn_calib_col_n']='Br. opaž.';
-$ec_lang['lpn_calib_col_obs_mean']='Opažena srednja vr.';
-$ec_lang['lpn_calib_col_sim_mean']='Izračunata srednja vr.';
-$ec_lang['lpn_calib_col_mean_err']='Srednja pogreška';
-$ec_lang['lpn_calib_col_mean_err_tip']='Srednja vrijednost apsolutnih razlika između svake opažene vrijednosti i izračunate vrijednosti u isto vrijeme.';
-$ec_lang['lpn_calib_col_rms_err']='RMS pogreška';
-$ec_lang['lpn_calib_col_rms_err_tip']='Korijen srednje kvadratne pogreške: drugi korijen srednje vrijednosti kvadrata razlika između opaženih i izračunatih vrijednosti.';
-$ec_lang['lpn_calib_network']='Mreža';
-$ec_lang['lpn_calib_corr_means']='Korelacija između srednjih vrijednosti: {r}';
-$ec_lang['lpn_calib_corr_none']='Korelacija između srednjih vrijednosti: potrebne su najmanje dvije lokacije čije se srednje vrijednosti razlikuju.';
-$ec_lang['lpn_calib_axis_obs']='Opaženo: {q}';
-$ec_lang['lpn_calib_axis_sim']='Izračunato: {q}';
-$ec_lang['lpn_calib_observed']='Opaženo';
-$ec_lang['lpn_calib_computed']='Izračunato';
-$ec_lang['lpn_calib_point']='{id}, {time}: opaženo {o}, izračunato {s}';
-$ec_lang['lpn_calib_corr_note']='Svaka točka je jedno mjerenje. Što su točke bliže dijagonalnoj liniji, to se izračunate vrijednosti bolje podudaraju s opaženima.';
-$ec_lang['lpn_calib_ts_point']='Izmjereno na {id}, {time}: {v}';
-$ec_lang['lpn_calib_ts_note']='Prstenovi su izmjerene vrijednosti iz datoteke kalibracije.';
-$ec_lang['lpn_analyze_menu']='Analiza';
-$ec_lang['lpn_analyze_menu_tip']='Analize koje pokreću mrežu na kopiji: protupožarni protok na svakom čvoru, gubitak svake cijevi, pumpe i ventila te potražnje povećane ili smanjene.';
-$ec_lang['lpn_ff_design_off']='Nijedan';
-$ec_lang['lpn_ff_design_all']='Svi';
-$ec_lang['lpn_ff_design_selected']='Odabrani';
-$ec_lang['lpn_ff_rows_more_links']='Vodovi koji nisu prikazani: {n}.';
-$ec_lang['lpn_crit_menu']='Analiza kritičnosti…';
-$ec_lang['lpn_crit_menu_tip']='Redom uklonite svaku cijev, pumpu i ventil iz mreže i izvijestite o učinku na sustav.';
-$ec_lang['lpn_crit_title']='Analiza kritičnosti';
-$ec_lang['lpn_crit_intro']='Svaki element redom se uklanja iz mreže, a mreža se rješava u vremenskom koraku na zaslonu u aktivnom scenariju. Ništa u projektu se ne mijenja; cijelo pokretanje izvodi se na kopiji.';
-$ec_lang['lpn_crit_scope']='Vodovi za prekid';
-$ec_lang['lpn_crit_scope_tip']='Sve cijevi, pumpe i ventili, ili samo oni odabrani na karti. Izaberite skup prije pokretanja.';
-$ec_lang['lpn_crit_scope_all']='Svi vodovi';
-$ec_lang['lpn_crit_scope_selected']='Odabrani vodovi';
-$ec_lang['lpn_crit_minpressure']='Najniži dopušteni tlak';
-$ec_lang['lpn_crit_minpressure_tip']='Ovo je isti broj kao Najniži dopušteni tlak drugdje u Analizi protupožarnog protoka. Promjena ovdje mijenja ga i tamo.';
-$ec_lang['lpn_crit_col_asset']='Element';
-$ec_lang['lpn_crit_col_unserved']='Neopskrbljena potražnja';
-$ec_lang['lpn_crit_col_cutoff']='Odsječeni čvorovi';
-$ec_lang['lpn_crit_col_below']='Čvorovi ispod minimuma';
-$ec_lang['lpn_crit_summary']='{n} od {total} elemenata ostavlja potražnju neopskrbljenom ili spušta čvor ispod {pressure}.';
-$ec_lang['lpn_crit_baseline_below']='Čvorovi koji su već ispod toga bez ikakvog kvara: {n}. Ne broje se.';
-$ec_lang['lpn_crit_working']='U tijeku: {done} od {total} elemenata.';
-$ec_lang['lpn_crit_stopped']='Zaustavljeno nakon {done} od {total} elemenata. Rezultati ispod su oni koji su već završeni.';
-$ec_lang['lpn_crit_no_selection']='Nijedan vod nije odabran. Odaberite vodove ili izaberite Svi vodovi.';
-$ec_lang['lpn_crit_no_links']='Ovaj projekt još nema vodova, pa nema što prekinuti.';
-$ec_lang['lpn_crit_busy']='Druga analiza je u tijeku. Zaustavite je ili pričekajte da završi.';
-$ec_lang['lpn_crit_skipped']='{n} odabranih elemenata nisu vodovi, pa nisu prekinuti.';
-$ec_lang['lpn_crit_stale']='Crtež se promijenio, pa su rezultati analize kritičnosti obrisani. Pokrenite ponovno.';
-$ec_lang['lpn_crit_skipdead']='Preskoči slijepe završetke';
-$ec_lang['lpn_crit_skipdead_tip']='Slijepi vod je onaj čije uklanjanje odsijeca čvorove do kojih se može doći samo kroz njega, bez rezervoara ili spremnika iza njega. Njegov gubitak je sve iza njega, pa se ne rješava. Sažetak kaže koliko ih je preskočeno.';
-$ec_lang['lpn_crit_skipped_dead']='Preskočeni slijepi vodovi: {n}. Svaki odsijeca sve iza sebe.';
-$ec_lang['points_data_msg_line']='Ništa nije zalijepljeno. Redak {n} nije moguće pročitati kao stacionažu i kotu.';
-$ec_lang['points_data_msg_none']='Ništa nije zalijepljeno. Nisu pronađeni parovi stacionaže i kote.';
-$ec_lang['lpn_tool_add_chain']='Lanac čvor-cijev';
-$ec_lang['lpn_pane_delete_element']='Izbriši element';
-$ec_lang['lpn_pane_delete_elements']='Izbriši elemente';
-$ec_lang['lpn_pane_sort_desc']='Razvrstaj silazno';
-$ec_lang['lpn_pane_manage_cols_width']='Širina (em)';
-$ec_lang['lpn_pane_width_tip']='Širine stupaca spremaju se u ovom pregledniku, ne u projektu. Dvaput kliknite razdjelnik stupca da vratite zadanu širinu.';
-$ec_lang['lpn_dock_left']='Usidri lijevo od karte';
-$ec_lang['lpn_dock_right']='Usidri desno od karte';
-$ec_lang['lpn_dock_float']='Plutajuće';
-$ec_lang['lpn_dock_autohide']='Automatsko skrivanje';
-$ec_lang['lpn_popup_none']='Ništa nije odabrano. Odaberite element na karti da vidite njegova svojstva.';
-$ec_lang['lpn_hotkeys_snip_heading']='Snimka zaslona';
-$ec_lang['lpn_hotkeys_snip_term']='Tipkovnički prečaci snimke zaslona';
-$ec_lang['lpn_hotkeys_snip_def']='<table class="lpn-notes-table"><tbody><tr><td>S</td><td>Izreži isječak, dok je snimka zaslona otvorena.</td></tr><tr><td>E</td><td>Gumica, u prikazu bilježenja.</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>Poništi i ponovi, u prikazu bilježenja.</td></tr><tr><td>Esc</td><td>Odustani od isječka ili napusti gumicu. U prikazu bilježenja zatvara ga kada ništa nije nacrtano.</td></tr></tbody></table>';
-$ec_lang['lpn_fb_intro']='Gotove poruke (neobavezno). Ništa se ne šalje dok ne pritisnete Pošalji.';
-$ec_lang['lpn_fb_pick_numbers']='Brojevi izgledaju pogrešno';
-$ec_lang['lpn_fb_pick_broken']='Nešto nije radilo';
-$ec_lang['lpn_fb_pick_wording']='Tekst ili prijevod je pogrešan';
-$ec_lang['lpn_fb_pick_confusing']='Ovo je zbunjujuće';
-$ec_lang['lpn_fb_comment']='Komentari (neobavezno)';
-$ec_lang['lpn_fb_email']='E-pošta (neobavezno, samo ako želite odgovor)';
-$ec_lang['lpn_fb_sends']='Što se šalje: naziv ove stranice, vaš jezik, inačica web-mjesta, šifra poruke na karti ako postoji te ono što ste odabrali ili upisali. Nikada vaš crtež ni vaša mreža. Vaša adresa e-pošte koristi se samo za odgovor.';
-$ec_lang['lpn_fb_send']='Pošalji';
-$ec_lang['lpn_fb_sending']='Slanje…';
-$ec_lang['lpn_fb_failed']='Poruka nije stigla do nas. Ono što ste napisali još je ovdje, pa možete pokušati ponovno.';
-$ec_lang['lpn_fb_bad_email']='Ta adresa e-pošte ne izgleda ispravno. Ispravite je ili je ostavite praznom.';
-$ec_lang['lpn_fb_busy']='U posljednjih nekoliko minuta stiglo je previše poruka. Ono što ste napisali još je ovdje, pa možete pokušati kasnije.';
-$ec_lang['lpn_tool_add_chain_tip']='Lanac čvorova i cijevi: odredite točku na karti da dodate čvor, zatim odredite svaku sljedeću točku da dodate cijev i čvor. Odredite postojeći čvor da nastavite od njega. Pritisnite Escape da završite lanac.';
-$ec_lang['lpn_tool_add_shape']='Lik';
-$ec_lang['lpn_tool_add_shape_tip']='Nacrtajte točku, poliliniju ili poligon na karti. Lik je bilješka i nije dio mreže. Odredite svaku točku, zatim ponovno odredite posljednju točku, pritisnite Enter ili kliknite desnom tipkom da završite. Ponovno odredite prvu točku da zatvorite Lik u poligon.';
-$ec_lang['lpn_pane_filter_sel_note']='Samo odabrano. Prikazano {n} od {all}.';
-$ec_lang['lpn_pane_filter_sel_and']='Filtrirano po {q} i samo odabrano. Prikazano {n} od {all}.';
-$ec_lang['lpn_pane_filter_sel_none']='Nijedan od odabranih elemenata nije u ovoj tablici.';
-$ec_lang['lpn_pane_sel_only']='Samo odabrano';
-$ec_lang['lpn_pane_sel_only_none']='Nijedan element nije odabran. Najprije odaberite elemente na karti.';
-$ec_lang['lpn_pane_scn_show']='Prikaži scenarije';
-$ec_lang['lpn_pane_clear_override']='Ukloni vrijednost scenarija';
-$ec_lang['lpn_pane_scn_alt_tip']='{category} alt.: {alternative}';
-$ec_lang['lpn_change_type_menu']='Promijeni vrstu';
-$ec_lang['lpn_change_type_tip']='Promijenite vrstu odabranih čvorova (čvor, rezervoar ili spremnik) ili vodova (cijev, pumpa ili ventil). Svaki zadržava svoj ID, položaj, spojeve i svaku vrijednost koju ima i nova vrsta. Ako bi se nešto izgubilo, prvo se traži potvrda.';
-$ec_lang['lpn_change_type_ok']='Promijeni';
-$ec_lang['lpn_change_type_lost']='Ove vrijednosti bit će izgubljene:';
-$ec_lang['lpn_change_type_key']='Svaki redak: ID: svojstvo i vrijednost koji bi se izgubili';
-$ec_lang['lpn_change_type_line']='{id}: {property} {value}';
-$ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, u scenariju {scenario}';
-$ec_lang['lpn_change_type_more']='I još {n}.';
-$ec_lang['lpn_change_type_surface']='Ove vrijednosti zadržavaju vodno lice na istom mjestu. Tlačna visina rezervoara jednaka je koti spremnika plus dubina vode u njemu, a dubina vode u spremniku jednaka je tlačnoj visini rezervoara minus kota:';
-$ec_lang['lpn_change_type_meaning']='Ove kontrole i pravila ispituju čvor koji se mijenja i čitat će ga drukčije: čvor se ispituje prema tlaku, a spremnik ili rezervoar prema razini vode.';
-$ec_lang['lpn_change_type_born']='Ove vrijednosti su nove, postavljene kao na novocrtanom elementu:';
-$ec_lang['lpn_change_type_no_curve']='{id}: nema krivulje tlačne visine pumpe, pa pumpa ne daje tlačnu visinu dok se ne odabere, a izvoz u .inp upisuje je kao cijev';
-$ec_lang['lpn_change_type_becomes']='{id}: {property} {value}, u scenariju {scenario}, postaje {new}';
-$ec_lang['lpn_change_type_customers']='Cijev je jedina koja opskrbljuje korisnike, pa se ovi korisnici umjesto toga spajaju na čvor prikazan u zagradama, gdje je njihova potražnja već primijenjena. Ostaju gdje su nacrtani, a njihova potražnja ostaje nepromijenjena:';
-$ec_lang['lpn_change_type_setting']='Ove kontrole i pravila zadaju ili ispituju postavku voda koja se mijenja. Postavka je druga veličina na cijevi, pumpi i ventilu, pa će je čitati drukčije:';
-$ec_lang['lpn_change_type_rules']='Ovi retci pravila navode vod prema njegovoj vrsti i umjesto toga navodit će njegovu novu vrstu:';
-$ec_lang['lpn_find_scope_source']='Izvor';
-$ec_lang['lpn_find_source_no_chemical']='Ne prati se nijedna kemikalija, pa nijedan čvor nema izvor.';
-$ec_lang['lpn_profile_open']='Otvori EPANET datoteku profila…';
-$ec_lang['lpn_profile_file_done']='Profil je pročitan iz datoteke: pronađeno je {used} od {total} čvorova u ovoj mreži.';
-$ec_lang['lpn_profile_file_missing']='Navedeno u datoteci, a nema u ovoj mreži: {ids}.';
-$ec_lang['lpn_profile_file_short']='Datoteka navodi manje od dva čvora iz ove mreže, pa nema profila za crtanje.';
-$ec_lang['lpn_pgraph_none']='Ovaj element nema rezultata u trenutačnom pokretanju.';
-$ec_lang['lpn_pgraph_source_share_from']='Udio izvora iz čvora {node}';
-$ec_lang['lpn_result_pump_head']='Tlačna visina';
-$ec_lang['lpn_result_pump_head_tip']='Tlačna visina koju pumpa dodaje od usisa do potiska, prikazana kao pozitivan broj. Rješavač i EPANET datoteke bilježe je kao negativan gubitak tlačne visine.';
-$ec_lang['lpn_report_pump_head']='Tlačna visina pumpe';
-$ec_lang['lpn_contour_show']='Prikaži izolinije';
-$ec_lang['lpn_contour_show_tip']='Isključite da sakrijete ispunu i izolinije; uključite da ih vratite kakve su bile. Boje čvorova ostaju.';
-$ec_lang['lpn_sysflow_title']='Bilanca protoka';
-$ec_lang['lpn_crs_suggested_mark']='(predloženo)';
-$ec_lang['lpn_file_export_menu']='Izvezi…';
-$ec_lang['lpn_file_export_item_inp']='EPANET datoteka…';
-$ec_lang['lpn_file_export_item_geojson']='GeoJSON datoteka…';
-$ec_lang['lpn_status_inp_exported_picture']='Izvezeno {zip}, koji sadrži EPANET datoteku {file}, pozadinsku sliku {picture} i datoteku za georeferenciranje {world}. Raspakirajte sve tri u jednu mapu, zatim tamo otvorite .inp u EPANET-u; slika se otvara s njom.';
-$ec_lang['lpn_status_inp_exported_no_picture']='Izvezeno {file}. Pozadinsku sliku nije bilo moguće spremiti, pa .inp ne navodi nijednu; u EPANET-u je dodajte pomoću Pogled > Pozadina > Učitaj.';
-$ec_lang['lpn_inp_export_difference_one']='Jedna stvar koju .inp format ne može sadržavati.';
-$ec_lang['lpn_file_export_geojson_tip']='Preuzmite ovu mrežu kao GeoJSON datoteku za QGIS, ArcGIS Pro i druge GIS programe. Čvorovi, spremnici i rezervoari su točke, a cijevi, pumpe i ventili linije koje prate svoje vrhove. Položaji su geografska širina i dužina. Rezultati su uključeni samo kada je mreža riješena.';
-$ec_lang['lpn_geojson_refused_local']='GeoJSON datoteka sadrži samo geografsku širinu i dužinu, a ovaj projekt je nacrtan na lokalnoj mreži bez mjesta na Zemlji. Najprije ga georeferencirajte pomoću Karta, Karta svijeta, Pridruži, zatim ponovno izvezite.';
-$ec_lang['lpn_geojson_refused_range']='Ovi položaji nisu ispravne geografske širine i dužine: {detail}';
-$ec_lang['lpn_geojson_refused_crs']='Koordinatni sustav ovog projekta ({detail}) ova stranica ne poznaje, pa se njegovi položaji ne mogu pretvoriti u geografsku širinu i dužinu. Pomoću Pretvori kao… kopirajte projekt u sustav koji ova stranica poznaje, zatim ponovno izvezite.';
-$ec_lang['lpn_geojson_refused_empty']='Još nema ničega za izvoz. Najprije nacrtajte ili otvorite mrežu.';
-$ec_lang['lpn_geojson_results_in']='Rezultati na zaslonu su uključeni.';
-$ec_lang['lpn_geojson_results_out']='Rezultati nisu uključeni jer mreža nije riješena.';
-$ec_lang['lpn_inp_backdrop_attach']='Pridruži {file}…';
-$ec_lang['lpn_inp_backdrop_attach_tip']='Web-stranica ne može otvoriti sliku prema njezinu nazivu. Odaberite je na svom uređaju i bit će postavljena tamo gdje datoteka kaže da pripada.';
-$ec_lang['lpn_inp_backdrop_attached']='Pridruženo {file}, postavljeno tamo gdje datoteka kaže da pripada.';
-$ec_lang['lpn_inp_backdrop_attached_other']='Pridruženo {picked}, postavljeno tamo gdje datoteka kaže da pripada. Datoteka navodi {file}, što je drugi naziv.';
-$ec_lang['lpn_copy_opened_unsaved']='Otvoreno {file} kao kopija, s novim zaključavanjem koje će se spremiti sljedećim spremanjem datoteke.';
-$ec_lang['lpn_engine_unavailable_why']='Ventili za regulaciju tlaka i protoka (PRV, PSV, FCV) ne mogu se riješiti bez EPANET rješavača. {reason}';
-$ec_lang['lpn_engine_needed_failed_why']='Ova se mreža može riješiti samo EPANET rješavačem. {reason}';
-$ec_lang['lpn_mode_add_chain']='Način rada: Lanac čvor-cijev. Odredite točku na karti da dodate čvor, zatim odredite svaku sljedeću točku da dodate cijev i čvor. Odredite postojeći čvor da nastavite od njega. Pritisnite Escape da završite lanac. Prebacite se u način Odabir da promijenite ili pomaknete elemente i oznake.';
-$ec_lang['lpn_mode_add_shape']='Način rada: Dodaj lik. Odredite svaku točku. Ponovno odredite posljednju točku ili pritisnite Enter da završite; odredite prvu točku da zatvorite poligon.';
-$ec_lang['lpn_cp_allow_tip']='Dopusti samo ove znakove:';
-$ec_lang['lpn_cp_characters_tip']='»@« znači bilo koje slovo; »#« znači bilo koju znamenku, a »-«, ».« i »,« morate zasebno navesti ako su dopušteni; svi razmaci moraju biti između drugih znakova.';
-$ec_lang['lpn_valwarn_diameter']='Promjer cijevi ili ventila obično je između {min} i {max} {unit}. Provjerite broj i jedinicu promjera.';
-$ec_lang['lpn_valwarn_hw']='Hazen-Williamsov C obično je između {min} i {max}. Broj izvan tog raspona često je hrapavost namijenjena drugoj metodi trenja.';
-$ec_lang['lpn_valwarn_manning']='Manningov n obično je između {min} i {max}. Broj izvan tog raspona često je hrapavost namijenjena drugoj metodi trenja.';
-$ec_lang['lpn_valwarn_dw']='Darcy-Weisbachova hrapavost obično je veća od 0 i najviše {max} {unit}. Veći broj često je Hazen-Williamsov C ili Manningov n.';
-$ec_lang['lpn_valwarn_positive']='EPANET ovdje ne prihvaća nulu ni negativan broj.';
-$ec_lang['lpn_valwarn_negative']='EPANET ovdje ne prihvaća negativan broj.';
-$ec_lang['lpn_valwarn_tank_levels']='EPANET ne prihvaća ovaj spremnik. Najmanja dubina vode ne smije premašiti dubinu vode, a dubina vode ne smije premašiti najveću dubinu vode.';
-$ec_lang['lpn_alt_calc_options']='Opcije proračuna';
-$ec_lang['lpn_scenario_duration_tip']='Ostavite prazno da se naslijedi od nadređenog. Ukupno vrijeme rada 0:00 je stacionarno pokretanje.';
-$ec_lang['lpn_scenario_hyd_step_tip']='Ostavite prazno da se naslijedi od nadređenog.';
-$ec_lang['lpn_time_scn_overrides']='Vrijednosti scenarija:';
-$ec_lang['lpn_scenario_preset_mult_tip']='Množitelj potražnje {mult} puta prosječan dan, privremena vrijednost. Većina sustava je između {lo} i {hi} (National Research Council, 2006). Vrijednost za modelirani sustav postavite u Postavke, Proračun, Hidraulika, Množitelj potražnje.';
-$ec_lang['lpn_engine_failed_why']='{reason} Umjesto toga prikazuje se ugrađeni rješavač.';
-$ec_lang['lpn_settings_basemap_style']='Stil podloge karte';
-$ec_lang['lpn_basemap_style_normal']='Uobičajen';
-$ec_lang['lpn_basemap_style_muted']='Prigušen';
-$ec_lang['lpn_basemap_style_faded']='Izblijedio';
-$ec_lang['lpn_basemap_style_grayscale']='Sivi tonovi';
-$ec_lang['lpn_time_statistic']='Statistika';
-$ec_lang['lpn_time_stat_none']='Nema';
-$ec_lang['lpn_time_stat_averaged']='Prosj.';
-$ec_lang['lpn_time_stat_minimum']='Min.';
-$ec_lang['lpn_time_stat_maximum']='Maks.';
-$ec_lang['lpn_time_stat_range']='Raspon';
-$ec_lang['lpn_time_no_engine_why']='Ugrađeni rješavač rješava jedan trenutak odjednom, pa je ovo mreža samo u trenutku {time}: svaki obrazac čita se u tom trenutku, a svaki spremnik ostaje na početnoj razini umjesto da se puni i prazni. {reason}';
-$ec_lang['lpn_time_engine_fetch_failed']='Preuzimanje EPANET rješavača nije uspjelo. Ponovno učitajte stranicu da pokušate opet; moguće ga blokira vatrozid, proxy ili dodatak preglednika.';
-$ec_lang['lpn_time_engine_start_failed']='Preglednik je odbio pokrenuti EPANET rješavač. WebAssembly je možda isključen sigurnosnom postavkom ili dodatkom.';
-$ec_lang['lpn_time_engine_run_failed']='EPANET pokretanje nije uspjelo. To je greška na ovoj stranici; upotrijebite vezu {wrong} da je prijavite.';
-$ec_lang['lpn_saved_project']='Spremljeno s projektom';
-$ec_lang['lpn_saved_browser']='Spremljeno u ovom pregledniku';
-$ec_lang['lpn_saved_session']='Nije spremljeno';
-$ec_lang['lpn_scncmp_at_time']='{value} na {id}, {time}';
-$ec_lang['lpn_scncmp_same']='Jednako u svakom scenariju';
-$ec_lang['lpn_scncmp_period_note']='Gdje scenarij ima ukupno vrijeme rada, njegov najniži tlak i najveća brzina su ekstremi cijele mreže, u prikazanom trenutku.';
-$ec_lang['lpn_choice_default']='Zadano';
-$ec_lang['lpn_ds_menu']='Skaliranje potražnje…';
-$ec_lang['lpn_ds_menu_tip']='Pomnožite potražnje na kopiji mreže i pogledajte tlakove i brzine, ili pronađite najveću skalu potražnje koju sustav može podnijeti.';
-$ec_lang['lpn_ds_title']='Skaliranje potražnje';
-$ec_lang['lpn_ds_intro']='Pritisnite gumb Pokreni da pomnožite potražnje na odabranim čvorovima skalom potražnje i vidite tlakove i brzine.\n\nPritisnite gumb Pronađi da pronađete najveću skalu potražnje, na najbliži {step}, pri kojoj svi ti čvorovi zadržavaju barem najniži dopušteni tlak; pretražuje od 0 do {max}.\n\nOba rade na kopiji mreže, riješenoj u vremenskom koraku na zaslonu u aktivnom scenariju, pa se ništa u projektu ne mijenja. Skalira se samo taj vremenski korak, a razine i stanja preuzimaju se iz njega; za ispitivanje vršne potražnje pomaknite sat na vršnu potražnju prije pokretanja.';
-$ec_lang['lpn_ds_scope']='Čvorovi za skaliranje';
-$ec_lang['lpn_ds_scope_all']='Svi čvorovi';
-$ec_lang['lpn_ds_scope_selected']='Odabrani čvorovi';
-$ec_lang['lpn_ds_minpressure']='Najniži dopušteni tlak';
-$ec_lang['lpn_ds_minpressure_tip']='To je isti broj kao Najniži dopušteni tlak drugdje u Analizi protupožarnog protoka. Promjena ovdje mijenja ga i tamo.';
-$ec_lang['lpn_ds_head_scale']='Skaliraj potražnje';
-$ec_lang['lpn_ds_multiplier']='Skala potražnje';
-$ec_lang['lpn_ds_multiplier_tip']='Faktor kojim se množi svaka potražnja; 1,5 je povećanje od 50 %. Primjenjuje se uz množitelj potražnje aktivnog scenarija, koji je već u potražnjama, i nikada se ne sprema u projekt.';
-$ec_lang['lpn_ds_run']='Pokreni';
-$ec_lang['lpn_ds_head_search']='Koju skalu potražnje sustav može podnijeti?';
-$ec_lang['lpn_ds_head_search_selected']='Koju skalu potražnje mogu podnijeti ovi čvorovi?';
-$ec_lang['lpn_ds_outside_below']='Pri skali potražnje {m}, neodabrani čvorovi ispod {pressure}: {n} ({ids}). Oni ne ograničavaju ovaj odgovor.';
-$ec_lang['lpn_ds_holds_max']='✓ Svaki čvor zadržava {pressure} do skale potražnje {max}, vrha pretraživanja.';
-$ec_lang['lpn_ds_below_zero']='⚠ Barem jedan čvor je ispod {pressure} čak i uz skalirane potražnje jednake nuli.';
-$ec_lang['lpn_ds_found']='✓ Svaki provjeren čvor zadržava barem {pressure} do skale potražnje {m}.';
-$ec_lang['lpn_ds_found_below']='⚠ Barem jedan čvor je ispod {pressure} bez skaliranja potražnje. Najveća skala potražnje pri kojoj svaki čvor ostaje na {pressure} ili iznad je {m}.';
-$ec_lang['lpn_ds_search_stopped']='Pretraživanje je zaustavljeno prije nego što je pronašlo odgovor.';
-$ec_lang['lpn_ds_lowest_at']='Pri skali potražnje {m}, najniži tlak je {pressure}, na čvoru {id}.';
-$ec_lang['lpn_ds_nosolve_at']='Pri skali potražnje {m}, mreža nije dala rješenje. {reason}';
-$ec_lang['lpn_ds_scale_ok']='✓ Pri skali potražnje {m}, svaki čvor zadržava {pressure}.';
-$ec_lang['lpn_ds_scale_below']='⚠ Pri skali potražnje {m}, čvorovi ispod {pressure}: {n}.';
-$ec_lang['lpn_ds_scaled_selected']='Skalirani i provjereni čvorovi: {n}.';
-$ec_lang['lpn_ds_head_lowest']='Najniži tlakovi';
-$ec_lang['lpn_ds_head_velocity']='Najveće brzine';
-$ec_lang['lpn_ds_col_link']='Vod';
-$ec_lang['lpn_ds_col_scaled']='Skalirano';
-$ec_lang['lpn_ds_col_scaled_tip']='S potražnjama pomnoženima skalom potražnje.';
-$ec_lang['lpn_ds_col_unscaled']='Neskalirano';
-$ec_lang['lpn_ds_col_unscaled_tip']='S potražnjama kakve su u aktivnom scenariju u ovom vremenskom koraku, ista vrijednost koju prikazuje karta.';
-$ec_lang['lpn_ds_no_junctions']='Ovaj projekt još nema čvorova, pa nema potražnji za skaliranje.';
-$ec_lang['lpn_ds_no_selection']='Nijedan čvor nije odabran. Odaberite čvorove ili izaberite Svi čvorovi.';
-$ec_lang['lpn_ds_skipped']='Odabrani elementi koji nisu čvorovi, ostavljeni kakvi jesu: {n}.';
-$ec_lang['lpn_ds_bad_multiplier']='Unesite skalu potražnje nula ili više, primjerice 1,5.';
-$ec_lang['lpn_ds_stale']='Crtež se promijenio, pa su rezultati skaliranja potražnje obrisani. Pokrenite ponovno.';
-$ec_lang['lpn_analyze_at_time']='Vremenski korak: {time}.';
-$ec_lang['lpn_analyze_time_moved']='⚠ Ovo je izračunato u {time}, a sat je sada na {now}. Pokrenite ponovno za vremenski korak na zaslonu.';
+// Field codes (Task 771): the Description read as Carlson-style codes. See dev/survey-codes.md.
 $ec_lang['lpn_survey_codes_toggle']='Čitaj opis kao terenske šifre';
 $ec_lang['lpn_survey_codes_tip']='Čitajte prvu riječ svakog opisa kao šifru iz tablice. Točke s istom šifrom linije spajaju se u jednu cijev redom u datoteci, a WL1 i WL2 su zasebne linije. +0 započinje liniju, -0 je završava, a CLO je zatvara. JPN iza kojeg slijedi naziv točke spaja se s tom točkom (Carlson), a Civil 3D to piše kao CPN.';
 $ec_lang['lpn_survey_codes_col_code']='Šifra';
@@ -4248,6 +4555,8 @@ $ec_lang['lpn_result_demand_deficit_tip']='Potražnja na ovom čvoru koja nije i
 $ec_lang['lpn_pda_deficit_note']='Čvorovi koji primaju manje od svoje potražnje: {n}.';
 $ec_lang['lpn_diag_pda_pressures']='Potrebni tlak mora biti veći od minimalnog tlaka. Promijenite jedan od njih u Postavkama.';
 $ec_lang['lpn_inp_drop_pressure_unit']='Ova datoteka navodi jedinicu tlaka različitu od one koju ova stranica čita za njezinu jedinicu protoka, a to je psi za američke jedinice, inače metri. Svaki tlak u datoteci čita se na taj način, pa provjerite postavke ventila, emitere i granice vođene tlakom koje sadrži. Redak se zadržava i zapisuje natrag.';
+
+// Map > Screenshot (Tom, 2026-10-05): a snipping tool that re-draws the dragged map area larger than its screen size (3x unless the Screenshot box says otherwise).
 $ec_lang['lpn_screenshot_menu']='Snimka zaslona';
 $ec_lang['lpn_screenshot_tip']='Snimite sliku područja karte koje povučete, u višoj razlučivosti od zaslona. Označite je, zatim je kopirajte u izvještaj gumbom Kopiraj. Kliknite bez povlačenja da snimite cijelu kartu.';
 $ec_lang['lpn_screenshot_hint']='Povucite pravokutnik preko karte ili kliknite za cijelu kartu. Esc odustaje.';
@@ -4264,119 +4573,5 @@ $ec_lang['lpn_snip_tip_pen']='Olovka';
 $ec_lang['lpn_snip_tip_eraser']='Gumica: kliknite potez da ga uklonite (E)';
 $ec_lang['lpn_snip_tip_undo']='Poništi (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Ponovi (Ctrl+Y)';
+$ec_lang['lpn_snip_tip_copy']='Kopiraj (Ctrl+C)';
 $ec_lang['lpn_screenshot_scale_tip']='Veličina slike kao višekratnik područja na zaslonu. Veća je oštrija i daje veću datoteku.';
-$ec_lang['points_data_points_heading']='Podaci o točkama<br />(za format upotrijebite Kopiraj)';
-$ec_lang['lpn_field_tank_base_elev']='Kota dna';
-$ec_lang['lpn_tank_ground_elev_tip']='Kota terena na spremniku. Tlak u spremniku mjeri se od ove kote, kao u čvoru.';
-$ec_lang['lpn_guide_about_heading']='O ovom kalkulatoru';
-$ec_lang['lpn_guide_group_from']='Iz izbornika {menu}';
-$ec_lang['lpn_guide_menu_named']='Izbornik {menu}';
-$ec_lang['lpn_help_manual']='Priručnik';
-$ec_lang['lpn_guide_contents']='Sadržaj';
-$ec_lang['lpn_guide_rail_hide']='Sakrij sadržaj';
-$ec_lang['lpn_guide_rail_show']='Prikaži sadržaj';
-$ec_lang['lpn_guide_search']='Pretraži priručnik';
-$ec_lang['lpn_guide_boxes_heading']='Okviri';
-$ec_lang['lpn_guide_boxes_intro']='Svaki okvir može se pomicati, mijenjati mu se veličina, usidriti lijevo ili desno od karte ili zatvoriti. Znak ? u naslovnoj traci okvira otvara njegovu pomoć.';
-$ec_lang['lpn_guide_boxes_autohide']='Kada pokazivač napusti okvir bez fokusa, okvir se skriva nakon kratke odgode. Okvir s fokusom skriva se kada kliknete izvan njega, pritisnete Esc ili tipkom Tab izađete iz njega dok je pokazivač drugdje.';
-$ec_lang['lpn_guide_box_help']='Pomoć za ovaj okvir';
-$ec_lang['lpn_guide_box_named']='Okvir {box}';
-$ec_lang['lpn_guide_dimmed']='Zatamnjen naziv je gumb koji je trenutačno skriven na alatnoj traci.';
-$ec_lang['lpn_guide_text_popup']='Prikazuje svojstva odabranog elementa ili teksta, ili više odabranih elemenata, pokraj odabira ili na mjestu na koje je okvir zadnje pomaknut. Uređena vrijednost odmah mijenja mrežu, a oznaka elementa na karti i ploča Tablice prate promjenu. Rezultati posljednjeg izračuna navedeni su ispod ulaznih podataka i ne mogu se uređivati.';
-$ec_lang['lpn_guide_text_find_popup']='Pronalazi elemente koji zadovoljavaju uvjet, primjerice sve cijevi manje od 8 in ili sve čvorove s tlakom ispod 40 psi, a može promijeniti jedno svojstvo na svima njima u jednoj operaciji. Koristite ga za provjeru modela prije rješavanja (kota koja nedostaje, promjer unesen u pogrešnoj jedinici), za popis problematičnih lokacija nakon rješavanja (nizak tlak, velika brzina) i za jedan ispravak na mnogo elemenata.\n\nPopisi Što pretražiti, Svojstvo, Uvjet i Vrijednost grade jedan uvjet i zapisuju ga kao redak teksta u okviru Upit. Redak se može i izravno uređivati, a popisi ga prate. Upit koji se popisima ne može izraziti, primjerice dva uvjeta povezana veznikom ILI, skriva popise dok ne pritisnete gumb Umjesto toga koristi kontrole. Za pretraživanje pritisnite Enter u okviru Upit ili pritisnite gumb Pronađi.';
-$ec_lang['lpn_guide_text_settings_box']='Sve postavke i dva gumba za vraćanje nalaze se u okviru Postavke. Postavke se ne nalaze nigdje drugdje. Okvir se može pretraživati: upišite jednu ili više riječi u Pretraži postavke da se prikažu samo postavke koje spominju sve te riječi. Postavke se spremaju s projektom, osim Prikaži okvir napretka izvođenja i onih pod Stranica, koje se čuvaju u ovom pregledniku. Položaj i veličina ovog okvira također se čuvaju samo u ovom pregledniku.';
-$ec_lang['lpn_guide_text_library_box']='Sadrži obrasce, krivulje, vrste cijevi, armaturu, kontrole i pravila projekta. Element upućuje na obrazac, krivulju, vrstu cijevi ili armaturu pomoću njezina ID-a, a ta se stavka uređuje ovdje. Kontrole i pravila vrijede za cijelu mrežu. Pravila primjenjuje samo EPANET mehanizam. Sve se sprema s projektom.';
-$ec_lang['lpn_guide_text_energy_box']='Izvještava o potrošnji energije, vršnoj snazi i trošku svake pumpe tijekom posljednje simulacije produljenog razdoblja, na temelju učinkovitosti svake pumpe i cijene energije postavljene u Postavke, Energija. Potrebni su Ukupno vrijeme rada u Postavkama i riješena mreža. Ne mijenja mrežu.';
-$ec_lang['lpn_guide_text_contour_box']='Upravlja konturnim prikazom na karti, nacrtanim iz vrijednosti čvora odabrane u Boji čvorove prema: shema boja, ispuna i njezina neprozirnost, razmak konturnih linija i oznake te koliko daleko boja seže od svake cijevi. Isključivanje skriva prikaz, a boje čvorova ostaju. Mijenja samo prikaz, ne i mrežu.';
-$ec_lang['lpn_guide_text_scncmp_box']='Rješava svaki scenarij na kopiji crteža i za svaki tablično prikazuje broj zamjena, najniži tlak i najveću brzinu. Ne mijenja projekt, a otvoreni scenarij ostaje kakav je bio.';
-$ec_lang['lpn_guide_text_rptbox']='Prikazuje tekstualni izvještaj koji je napisao EPANET mehanizam za posljednju simulaciju produljenog razdoblja, uključujući upozorenja i sažetak mreže. Svaka simulacija produljenog razdoblja zamjenjuje ga; rješavanje u jednom trenutku ne zamjenjuje ga, a ni uređivanje ne briše prethodni izvještaj.';
-$ec_lang['lpn_guide_text_status_box']='Navodi, redom po vremenu, svaku promjenu tijekom posljednje simulacije produljenog razdoblja: otvaranje ili zatvaranje pumpe, ventila ili cijevi, početak punjenja ili pražnjenja spremnika ili njegovo punjenje ili pražnjenje do kraja te svaki vremenski korak koji nije potpuno konvergirao. Navode se samo promjene, a ne svaki vremenski korak.';
-$ec_lang['lpn_guide_text_alt_box']='Prikazuje za svaki scenarij koju alternativu koristi u svakoj kategoriji, primjerice Fizičko, Potražnja i Aktivacija elemenata, te njegove opcije izračuna: množitelj potražnje, ukupno vrijeme rada i hidraulički vremenski korak. Alternative su samo za čitanje. Opcije izračuna scenarija mogu se upisati ovdje, a prazno polje koristi vrijednost nadređenog scenarija. Otvara se iz izbornika Scenariji nakon isključivanja Osnovnog načina.';
-$ec_lang['lpn_guide_text_full_box']='Navodi svaki čvor i svaku vezu u svakom izvještajnom vremenskom koraku, u jedinicama prikazanima na ploči Tablice. Bez simulacije produljenog razdoblja prikazuje trenutno rješenje u jednom trenutku. Preuzimanje ili ispis obuhvaća sve vremenske korake, a tablica prikazuje jedan po jedan.';
-$ec_lang['lpn_guide_text_calib_box']='Uspoređuje datoteku terenskih mjerenja s izračunanim rezultatima na istim lokacijama i u istim trenucima, po jedna datoteka za svaki parametar. Datoteka se drži samo za tekuću sesiju i ne sprema se s projektom.';
-$ec_lang['lpn_guide_text_notes_popup']='Navodi napomene o tome kako se ova stranica ponaša i što ne radi, svaku kao pojam iza kojeg slijedi njegova definicija. Ne mijenja mrežu.';
-$ec_lang['lpn_guide_text_hotkeys_popup']='Navodi svaki gumb alatne trake i svaki redak izbornika, tipkovničke prečace i stavku za svaki okvir. Odabir retka pokazuje gdje se ta kontrola nalazi; nikada je ne pokreće. Za pretraživanje pritisnite Ctrl+K s bilo kojeg mjesta ili / dok priručnik ima fokus.';
-$ec_lang['lpn_guide_find_query_term']='Jezik upita';
-$ec_lang['lpn_guide_find_examples_term']='Riješeni primjeri na Net3';
-$ec_lang['lpn_guide_find_results_term']='Rezultati, odabir i Tablice';
-$ec_lang['lpn_guide_find_results_def']='<p>Pronađeni elementi navedeni su ispod gumba Pronađi. Veće od i n najvećih navode najprije najvišu vrijednost, manje od i n najmanjih najprije najnižu, a ostali uvjeti navode po pronađenoj vrijednosti, zatim po ID-u. Upit s veznikom I ili ILI navodi čvorove, zatim veze, svaku skupinu po ID-u. Jedno podudaranje odmah se prikazuje na karti. Odaberite redak da karta bude usredotočena na taj element. Ako ništa nije odabrano, element se i odabire; ako jest, element se ističe, a odabir se ne mijenja. Shift+klik ili Ctrl+klik na redak dodaje ga u odabir ili ga uklanja. Pronađi sam ne odabire sva podudaranja.</p><p>Gumb Filtriraj u trenutnoj tablici primjenjuje isti upit na ploču Tablice. Svaka tablica na koju se upit odnosi prikazuje samo podudarne retke, s upitom i brojem redaka iznad njih. Da biste na karti odabrali sva podudaranja, odaberite te retke i u izborniku desnog klika odaberite Odaberi na karti. Filtar tablice ne sprema se s projektom i prestaje kada se stranica ponovno učita. Redak uređen tako da se više ne podudara ostaje u tablici, zatamnjen i označen znakom upozorenja, dok ponovno ne pritisnete gumb Filtriraj u trenutnoj tablici.</p>';
-$ec_lang['lpn_guide_find_replace_term']='Zamijeni i Poništi';
-$ec_lang['lpn_guide_find_notes_term']='Napomene';
-$ec_lang['lpn_guide_using_heading']='Korištenje priručnika';
-$ec_lang['lpn_guide_keys_term']='Tipkovnički prečaci priručnika';
-$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>Otvori priručnik na kontroli ispod pokazivača ili na kontroli s fokusom.</td></tr><tr><td>F1</td><td>Otvori priručnik na stavci za okvir koji ima fokus.</td></tr><tr><td>Ctrl+K</td><td>Otvori priručnik s odabranim tekstom u polju za pretraživanje.</td></tr><tr><td>/</td><td>Odaberi polje za pretraživanje dok priručnik ima fokus.</td></tr><tr><td>Esc</td><td>Zatvori priručnik i vrati se na mjesto na kojem ste bili.</td></tr></tbody></table>';
-$ec_lang['lpn_guide_also']='Također u izborniku {menu}';
-$ec_lang['lpn_guide_how_popup']='Svojstva se otvaraju kada odaberete element ili tekst.';
-$ec_lang['lpn_guide_how_alt']='Pregled alternativa naveden je pod Voda, Scenariji kada je Osnovni način isključen.';
-$ec_lang['lpn_guide_not_shown']='Ova kontrola trenutačno nije na zaslonu.';
-$ec_lang['lpn_hotkeys_zoomwin_def']='Zumiraj prozor: povucite pravokutnik na karti da zumirate na to područje.';
-$ec_lang['lpn_status_dismiss']='Sakrij ovu poruku';
-$ec_lang['lpn_msglog_hidden']='Skriveno';
-$ec_lang['lpn_msglog_unhide']='Prikaži';
-$ec_lang['lpn_status_hidden_tip']='Ponovno prikaži skrivenu poruku na karti.';
-$ec_lang['lpn_result_depth']='Dubina';
-$ec_lang['lpn_result_depth_tip']='Dubina vode u spremniku u prikazanom trenutku, mjerena od dna spremnika prema gore: tlačna visina umanjena za kotu spremnika.';
-$ec_lang['lpn_result_tank_volume']='Raspoloživi volumen';
-$ec_lang['lpn_result_tank_volume_tip']='Volumen vode iznad najniže dubine vode, pa je na toj dubini jednak nuli. Volumen spremnika u EPANET-u uključuje i vodu ispod najniže dubine vode, koja se i dalje računa u miješanje i starost vode, pa kota spremnika ostaje na dnu spremnika.';
-$ec_lang['lpn_pane_copy_heads']='Kopiraj sa zaglavljima stupaca';
-$ec_lang['lpn_export_table_title']='Izvoz u {format}';
-$ec_lang['lpn_export_table_current']='Trenutna';
-$ec_lang['lpn_export_table_all']='Sve';
-$ec_lang['lpn_export_table_go']='Izvezi';
-$ec_lang['lpn_export_table_scn_note']='Rezultati se izvoze samo za scenarij koji je posljednji izračunan.';
-$ec_lang['lpn_file_export_item_ods']='ODS datoteka…';
-$ec_lang['lpn_file_export_item_xlsx']='XLSX datoteka…';
-$ec_lang['lpn_file_export_item_csv']='CSV datoteka…';
-$ec_lang['lpn_file_export_tables_tip']='Preuzmite tablice onako kako ih prikazuje ploča Tablice, u jednoj radnoj knjizi s listom za svaku tablicu (i za svaki scenarij koji odaberete), plus list za svaku knjižnicu na koju se upućuje njihovim ID-ovima: obrasci, krivulje, vrste cijevi i armatura. Rezultati su uključeni samo za scenarij koji je posljednji izračunan.';
-$ec_lang['lpn_file_export_csv_tip']='Preuzmite tablicu onako kako je prikazuje ploča Tablice. Jedna tablica dolazi kao jedna CSV datoteka, bez knjižnica. Više tablica ili scenarija dolazi kao jedna zip datoteka CSV datoteka, s datotekom za svaku knjižnicu na koju se upućuje njihovim ID-ovima. Rezultati su uključeni samo za scenarij koji je posljednji izračunan.';
-$ec_lang['lpn_file_export_item_dxf']='DXF datoteka…';
-$ec_lang['lpn_file_export_dxf_tip']='Preuzmite ovu mrežu za AutoCAD i druge CAD programe: čvorovi kao blokovi simbola, cijevi, pumpe i ventili kao polilinije, a svaki element kao blok čiji atributi nose njegov ID i vrijednosti svojstava u jedinicama projekta.';
-$ec_lang['lpn_dxf_export_no_utm']='DXF datoteka nije napisana: ova mreža leži izvan geografskih širina koje UTM pokriva (80° J do 84° S), a crtežu je potrebna ravna mreža na kojoj će se crtati.';
-$ec_lang['lpn_dxf_export_refused']='DXF datoteka nije napisana: nije se učitala pretvorba koordinata koja je potrebna. Provjerite vezu i pokušajte ponovno.';
-$ec_lang['lpn_dxf_export_failed']='DXF datoteka nije napisana: zaustavila ju je pogreška na ovoj stranici ({error}).';
-$ec_lang['lpn_dxf_note_grid']='Koordinate: X i Y ovog projekta, u {unit}. Koordinatni sustav nije naveden.';
-$ec_lang['lpn_dxf_note_crs']='Koordinate: {crs}, točno onako kako ih ovaj projekt navodi.';
-$ec_lang['lpn_dxf_note_geo']='Koordinate: {crs}, u metrima, a ne geografska širina i dužina. Geografske širine i dužine projekta pretvorene su u tu mrežu.';
-$ec_lang['lpn_dxf_exported_geo']='Izvezeno {file}. Njegove koordinate su {crs}, u metrima, a ne geografska širina i dužina.';
-$ec_lang['lpn_dxf_note_blocks']='Slojevi se nazivaju {prefix}, šifra elementa, crtica i alternativa, kao u {example}. Svaki element je blok umetnut u mjerilu 1 s atributima visine 1 jedinica; promijenite mjerilo blokova da postavite visinu teksta. Svaki atribut je vidljiv; atributi jednog elementa složeni su u stupac pokraj njegova simbola.';
-$ec_lang['lpn_dxf_note_shortened']='{n} vrijednosti bilo je dulje nego što DXF datoteka dopušta ({max} znakova), pa je svaka skraćena i završava s tri točke.';
-$ec_lang['lpn_dxf_note_categories']='{n} čvorova ima više od jedne kategorije potražnje. Njihov atribut {tag} sadrži zbroj baznih potražnji svih kategorija.';
-$ec_lang['lpn_file_export_item_workspace']='Radni prostor…';
-$ec_lang['lpn_file_export_workspace_tip']='Preuzmite malu datoteku koja sadrži gdje se nalaze vaši okviri, njihove veličine, koji su otvoreni ili usidreni te veličine vaših ploča i stupaca, uz opcije prikaza ove stranice, primjerice koji se baloni pomoći i kartica pri prelasku pokazivačem prikazuju. U njoj nisu vaši projekti, postavke projekta ni kolačići (jezik, privola, jedinice). Učitajte je na drugom zaslonu ili pregledniku pomoću Datoteka, Uvezi, Radni prostor.';
-$ec_lang['lpn_file_import_workspace']='Radni prostor…';
-$ec_lang['lpn_file_import_workspace_tip']='Primijenite datoteku radnog prostora spremljenu pomoću Datoteka, Izvezi, Radni prostor: položaje i veličine okvira, sidrenje, veličine ploča i opcije prikaza ove stranice, primjerice koji se baloni pomoći i kartica pri prelasku pokazivačem prikazuju. Vaši projekti i kolačići ne mijenjaju se.';
-$ec_lang['lpn_workspace_exported']='Radni prostor spremljen u {file}: postavki {n}.';
-$ec_lang['lpn_workspace_imported']='Radni prostor primijenjen iz {file}. Primijenjene postavke: {n}. Vraćeno na zadano: {r}.';
-$ec_lang['lpn_workspace_ignored']='Zanemareni unosi jer nisu prepoznati: {u}.';
-$ec_lang['lpn_workspace_refused_unreadable']='Ova se datoteka nije mogla pročitati kao radni prostor, pa ništa nije promijenjeno.';
-$ec_lang['lpn_workspace_refused_format']='Ovo nije datoteka radnog prostora koju je spremila ova stranica, pa ništa nije promijenjeno.';
-$ec_lang['lpn_workspace_refused_newer']='Ovu datoteku radnog prostora spremila je novija inačica ove stranice (format {version}), pa ništa nije promijenjeno.';
-$ec_lang['lpn_workspace_confirm']='Zamijeniti raspored radnog prostora u ovom pregledniku rasporedom iz datoteke?';
-$ec_lang['lpn_workspace_refused_storage']='Pohrana preglednika je puna ili nedostupna, pa radni prostor nije primijenjen.';
-$ec_lang['lpn_omitted_note']='Izostavljeno iz ovog pokretanja jer od njih ne vodi put do rezervoara ili spremnika: {ids}';
-$ec_lang['lpn_link_end_unknown']='Nijedan čvor nema ID {id}.';
-$ec_lang['lpn_link_end_same']='Početak i kraj moraju biti različiti čvorovi.';
-$ec_lang['lpn_split_pipe_ask']='Podijeliti cijev {id} na ovom čvoru?';
-$ec_lang['lpn_split_yes']='Da';
-$ec_lang['lpn_split_no']='Ne';
-$ec_lang['lpn_snap_vertex']='{link}, točka loma {n}';
-$ec_lang['lpn_snap_node_on_node']='{new} postavljen na lokaciju {target}. Ta dva čvora nisu povezana.';
-$ec_lang['lpn_snap_moved_on_node']='{moved} pomaknut na lokaciju {target}. Ta dva čvora nisu povezana.';
-$ec_lang['lpn_snap_shape_point']='{shape}, točka {n}';
-$ec_lang['lpn_settings_hover_card']='Prikaži punu oznaku pri prelasku pokazivačem';
-$ec_lang['lpn_settings_hover_card_tip']='Zadržite pokazivač na čvoru, vezi ili korisniku da vidite njegovu oznaku onako kako je određena u Postavkama, u bilo kojem mjerilu, bez obzira stane li oznaka na kartu. Ovo je postavka za ovaj preglednik, a ne za projekt.';
-$ec_lang['lpn_scenario_delete_in_base']='Da biste ga uklonili iz crteža, izbrišite ga u scenariju {base}.';
-$ec_lang['lpn_scenario_only_deleted']='{id} je izbrisan. Bio je dio samo scenarija {scenario}.';
-$ec_lang['lpn_scenario_delete_blocked']='{id} nije izbrisan jer na njemu završava veza {link}, a ta veza postoji i izvan scenarija {scenario}. Da biste izbrisali oboje, izbrišite ih u scenariju {base}.';
-$ec_lang['lpn_junction_pattern_unknown']='Nijedan obrazac u ovom projektu nema ID {id}, pa je čvor ostavljen kakav je bio.';
-$ec_lang['lpn_settings_default_pattern_none']='Nema (konstantno)';
-$ec_lang['lpn_demand_pattern_default']='(zadano: {id})';
-$ec_lang['lpn_demand_pattern_constant']='(konstantno)';
-$ec_lang['lpn_library_pattern_default_mark']='(zadano)';
-$ec_lang['lpn_library_pattern_default_tip']='Zadani obrazac potražnje. Promijenite ga u Postavke, Zadani obrazac potražnje.';
-$ec_lang['lpn_library_pattern_default_deleted_to']='Obrazac {id} bio je zadani obrazac potražnje. Čvorovi bez obrasca sada koriste obrazac {now}.';
-$ec_lang['lpn_library_pattern_default_deleted_none']='Obrazac {id} bio je zadani obrazac potražnje. Čvorovi bez obrasca sada koriste konstantnu potražnju.';
-$ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Opseg.Svojstvo uvjet vrijednost</code></td><td>Jedan uvjet. Opseg je Sve, Čvor, Rezervoar, Spremnik, Cijev, Pumpa, Ventil, Tekst, Korisnik ili Izvor. Svojstvo je bilo koja stavka na popisu Svojstvo za taj opseg.</td></tr><tr><td>Uvjeti</td><td>jednako, veće od, manje od, sadrži, n najvećih, n najmanjih i prazno. Sadrži se odnosi samo na tekst. U n najvećih i n najmanjih n je broj, kao u 5 najvećih. Sa samim slovom n, kao u <code>Pipe.Velocity n highest</code>, ili s praznim poljem Vrijednost navodi se 10 elemenata. Prazno pronalazi elemente koji nemaju vrijednost svojstva. Povezanost ima četiri uvjeta i ne prima vrijednost.</td></tr><tr><td>Vrijednosti</td><td>Broj se upisuje bez jedinice, u jedinici prikazanoj u Svojstvima i na ploči Tablice: 40, a ne 40 psi. Tekst, uključujući ID, stavlja se u jednostruke ili dvostruke navodnike: <code>\'60\'</code>.</td></tr><tr><td>I, ILI i zagrade</td><td>Veznik I izračunava se prije veznika ILI, a zagrade grupiraju uvjete. NOT nije dostupan.</td></tr><tr><td>Pisanje</td><td>Velika i mala slova se ne razlikuju. Engleske riječi prihvaćaju se u svakom jeziku, pa se upit kopiran iz ovog priručnika izvodi na stranici na bilo kojem jeziku.</td></tr></tbody></table>';
-$ec_lang['lpn_guide_find_examples_def']='<p>Otvorite primjer Net3 da biste ih slijedili. Tlak je u psi, a brzina u ft/s.</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>Čvor 60 i cijev 60. Čvor i cijev mogu imati isti ID, pa pretraga ID-a pod Sve može vratiti više od jednog elementa.</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>Čvorovi 10, 40, 50, 20 i 153, najprije najniži tlak. Čvor 10 ima -0,6 psi, negativan tlak koji zahtijeva provjeru.</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>Cijevi 60, 329, 125, 123 i 149, najprije najveća brzina. Cijev 60 prenosi 9,3 ft/s.</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>Čvorovi 10, 20, 40 i 50 te cijevi 60, 125 i 329: niski tlakovi i velike brzine na jednom popisu.</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>Čvorovi 10, 20, 40 i 50, niski tlakovi na visokom terenu. Oba uvjeta moraju imenovati istu vrstu elementa: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> ne podudara se ni s čim, jer nijedan element nije istodobno čvor i cijev.</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>Cijev 330, jedina cijev koja je zatvorena u datoteci Net3.</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>Ništa, u datoteci kakva se distribuira. Sa zatvorenom cijevi 247 (vidi Zamijeni i Poništi), čvorovi 215, 217, 219 i 225: čvorovi koje bi puknuće na cijevi 247 ostavilo bez opskrbe. Ponavljanje ovoga za svaku cijev je analiza kritičnosti.</td></tr></tbody></table>';
-$ec_lang['lpn_guide_find_replace_def']='<p>Dio okvira Promijeni pronađeno upisuje jedno svojstvo na svaki element koji je upit pronašao. Odaberite svojstvo na popisu Svojstvo koje treba promijeniti, unesite novu vrijednost u okvir Nova vrijednost u prikazanoj jedinici i pritisnite gumb Zamijeni. Okvir tada navodi koliko bi se elemenata promijenilo, ne računajući one koji već imaju novu vrijednost. Pritisnite gumb Promijeni ih da primijenite promjenu ili Odustani. Jedno Poništi poništava cijelu zamjenu.</p><p>Primjer na Net1: <code>Pipe.Diameter below 10</code> pronalazi cijevi 31, 122, 113 i 121. Odaberite Promjer, unesite 10 i pritisnite Zamijeni; okvir prikazuje „Promijeniti 4 elemenata?”. Pritisnite Promijeni ih da sve četiri cijevi postavite na 10 in. Jedno Poništi vraća ih na 6 i 8 in.</p><p>Primjer na Net3: <code>Pipe.ID equal to \'247\'</code> pronalazi cijev 247. Odaberite Zatvoreno, ponovno odaberite Zatvoreno na popisu Nova vrijednost, pa pritisnite Zamijeni, zatim Promijeni ih, da zatvorite cijev za gornji primjer povezanosti. Poništi je ponovno otvara.</p><p>Zamjena zahtijeva jednu vrstu elementa, pa pod Sve najprije odaberite vrstu elementa na popisu Što pretražiti. U scenariju koji nije Baza zamjena se pohranjuje u tom scenariju, kao i isto uređivanje u Svojstvima. Gdje su dostupne Mapbox kote, Kota se može zamijeniti iz Mapbox DEM-a umjesto upisane vrijednosti.</p>';
-$ec_lang['lpn_guide_find_notes_def']='<ul><li>Vrijednosti se uspoređuju u punoj preciznosti, a navode na četiri decimale. Jednako se rijetko podudara s izračunanim rezultatom; koristite veće od i manje od.</li><li>Tlak, tlačna visina, protok, brzina i ostali rezultati su oni posljednjeg izračuna. Kada je isključena postavka Izračunavaj automatski, opisuju mrežu kakva je bila pri posljednjem izračunu.</li><li>Veće od i manje od na tekstu koriste rječnički poredak, a brojevi se poredaju brojčano: na Net1, <code>Junction.ID above \'20\'</code> pronalazi čvorove 21, 22, 23, 31 i 32.</li><li>Pod Sve nude se samo ID, Opis, Etiketa i Povezanost. Odaberite vrstu elementa na popisu Što pretražiti da biste vidjeli cijeli popis njezinih svojstava.</li><li>Stavka Tekst nema ID. Pretražite je po njezinim riječima, kao u <code>Text.Text contains \'pump\'</code>.</li><li>Četiri uvjeta povezanosti za čvor su nema veza na čvoru, nema otvorenih veza na čvoru, nema puta preko veza do izvora i nema otvorenog puta do izvora. Izvor je rezervoar ili spremnik.</li></ul>';
