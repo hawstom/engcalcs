@@ -1,6 +1,6 @@
 {
  "_comment": [
-  "Claude Code's merge ledger. Claude Code writes every entry, quoting the words Tom typed in the conversation, tied to the commit those words     were about. Tom never edits this file.",
+  "TOM'S ALL-CLEARS, one per protected branch, pinned to the commit he cleared.",
   "",
   "Keyed and pinned the way dev/english-key-rulings.json is keyed on the exact English text,",
   "and for the same reason: AN APPROVAL MUST LAPSE BY ITSELF WHEN WHAT WAS APPROVED CHANGES.",
@@ -707,6 +707,13 @@
    "words": "feat/text-halo: It's good as is. Merge in the handoff, not now.",
    "context": "Typed in the session on 2026-10-15 after the report on the renovated halo (one run per label row; the whole-layer filter dropped). Same message: \"fix/search-zoom-accuracy: It's good as is. Merge in the handoff, not now.\"",
    "pin_note": "He cleared the previewed head 6bc34454, the pin itself."
+  },
+  "feat/leader-keep": {
+   "head": "81e4ffe8024283eff24d25f701a7893d8be046d8",
+   "date": "2026-10-15",
+   "words": "Merge feat/stopped-series and feat/leader-keep",
+   "context": "His typed word, twice on 2026-10-15.",
+   "pin_note": "Pinned to the branch head; unchanged since."
   }
  }
 }
