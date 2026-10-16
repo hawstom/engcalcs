@@ -3,7 +3,12 @@
 // real Chromium with real key presses, on Net1: type into a junction's fields and Tab through five
 // in a row (each Tab lands on the next field and typing goes there), Shift+Tab goes back one, a
 // pipe's fields do the same, the typed value is committed (and undo restores it), a click on
-// another field is undisturbed, and Enter still commits.
+// another field is undisturbed, and Enter still commits. The Description box is a multi-line field
+// (Task 806): typed into, Tab and Shift+Tab leave it for its neighbours with the text kept.
+//
+// A tab stop is named by its tag, its row's label and WHICH of that name it is (`#2`), because a
+// row's checkbox, its tip and an unlabelled box would otherwise share a name and the expected stop
+// would be the first of them anywhere in the box.
 //
 //   node dev/lpn-spike/properties-tab-focus-browser-harness.js   (takes the browser lock itself)
 'use strict';
@@ -60,12 +65,29 @@ async function main() {
 		// The editable text and number boxes of the open Properties box, in tab order, by row label.
 		const rows = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup_fields input'))
 			.filter((i) => (i.type === 'text' || i.type === 'number') && !i.readOnly && !i.disabled && i.offsetParent)
-			.map((i) => { const l = i.closest('label'); return (l ? l.firstChild.textContent : '').trim(); }));
+			.map((i) => { const l = i.closest('label'); return (l ? l.firstChild.textContent : '').trim(); })
+			.filter((t) => t));   // a box with no row label cannot be found again by name
 		const active = () => page.evaluate(() => {
 			const e = document.activeElement, l = e && e.closest && e.closest('label');
 			return { tag: e ? e.tagName : null, inPopup: !!(e && e.closest && e.closest('#lpn_popup')),
 				label: l ? l.firstChild.textContent.trim() : '', type: e ? e.type : '' };
 		});
+		// every tab stop of the box in DOM order, named tag|row label, with `#n` on the nth repeat of
+		// a name; and the index of the one that has focus
+		const stops = () => page.evaluate(() => {
+			const els = Array.from(document.querySelectorAll('#lpn_popup input, #lpn_popup select, #lpn_popup textarea, #lpn_popup button, #lpn_popup a[href], #lpn_popup [tabindex]'))
+				.filter((e) => !e.disabled && e.tabIndex >= 0 && e.type !== 'hidden' && (e.offsetParent || e.getClientRects().length));
+			const seen = {};
+			const x = els.map((e) => {
+				const l = e.closest('label'), n = e.tagName + '|' + (l ? l.firstChild.textContent.trim() : (e.id || e.title || ''));
+				seen[n] = (seen[n] || 0) + 1;
+				return seen[n] > 1 ? n + '#' + seen[n] : n;
+			});
+			return { x, at: els.indexOf(document.activeElement) };
+		});
+		// A number box shows a committed number in its own format (a length to two places), so a
+		// number is compared as a number.
+		const sameValue = (got, typed) => got === typed || (/^-?\d+(\.\d+)?$/.test(typed) && got !== null && got !== '' && Number(got) === Number(typed));
 		const valueOf = (label) => page.evaluate((t) => {
 			const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => x.firstChild.textContent.trim() === t)[0];
 			return l ? l.querySelector('input').value : null;
@@ -106,11 +128,7 @@ async function main() {
 			ok(kind + ': the box is on a ' + kind, await page.evaluate((k) => { const f = document.getElementById('lpn_popup_fields'); return k === 'pipe' ? /Length|Diameter/i.test(f.textContent) && !/Demand/i.test(f.textContent) : /Elevation/.test(f.textContent); }, kind));
 			ok(kind + ': Properties has at least 5 editable boxes', labels.length >= 5, labels.join(' | '));
 			const first = labels.length > 5 ? labels[0] : labels[0];
-			// every tab stop of the box, as tag + row label, in DOM order; and which one has focus
-			const stops = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup input, #lpn_popup select, #lpn_popup textarea, #lpn_popup button, #lpn_popup a[href], #lpn_popup [tabindex]'))
-				.filter((e) => !e.disabled && e.tabIndex >= 0 && e.type !== 'hidden' && (e.offsetParent || e.getClientRects().length))
-				.map((e) => { const l = e.closest('label'); return e.tagName + '|' + (l ? l.firstChild.textContent.trim() : (e.id || e.title || '')); }));
-			const where = async () => { const x = await stops(), ac = await active(); return { x, at: x.indexOf(ac.tag + '|' + ac.label), ac }; };
+			const where = async () => { const st = await stops(), ac = await active(); return { x: st.x, at: st.at, name: st.x[st.at], ac }; };
 			// forward: type + Tab, five typed boxes in a row; each Tab lands on the next tab stop,
 			// and where that is a typed box the next round types straight into it
 			await focusRow(labels[0]);
@@ -123,10 +141,10 @@ async function main() {
 				await page.keyboard.type(val);
 				await page.keyboard.press('Tab');
 				await a.settle(150);
-				const ac = await active();
-				ok(kind + ' Tab ' + (k + 1) + ': ' + cur + ' -> ' + expect, ac.inPopup && (ac.tag + '|' + ac.label) === expect, JSON.stringify(ac));
+				const ac = await active(), landed = (await where()).name;
+				ok(kind + ' Tab ' + (k + 1) + ': ' + cur + ' -> ' + expect, ac.inPopup && landed === expect, landed + ' ' + JSON.stringify(ac));
 				const committed = await valueOf(cur);
-				ok(kind + ' Tab ' + (k + 1) + ': the typed value was committed', committed === val, cur + '=' + committed);
+				ok(kind + ' Tab ' + (k + 1) + ': the typed value was committed', sameValue(committed, val), cur + '=' + committed);
 				if (ac.type === 'text' || ac.type === 'number') {
 					const nv = await typeFor(ac.label, 40 + k);
 					await page.keyboard.type(nv);
@@ -143,8 +161,39 @@ async function main() {
 				const w = await where();
 				await page.keyboard.press('Tab');
 				await a.settle(100);
+				const ac = await active(), landed = (await where()).name;
+				ok(kind + ' untouched Tab goes to ' + w.x[w.at + 1], ac.inPopup && landed === w.x[w.at + 1], w.name + ' -> ' + landed);
+			}
+			// the multi-line Description: type, Tab out, Shift+Tab out; the text is kept and focus
+			// lands on its neighbour each way
+			{
+				const desc = () => page.evaluate(() => { const t = document.querySelector('#lpn_popup_fields textarea'); return t ? t.value : null; });
+				const focusDesc = () => page.evaluate(() => { const t = document.querySelector('#lpn_popup_fields textarea'); t.focus(); t.setSelectionRange(t.value.length, t.value.length); });
+				ok(kind + ': Description is a multi-line box in the tab order', (await stops()).x.indexOf('TEXTAREA|Description') >= 0, (await stops()).x.slice(0, 4).join(', '));
+				for (const [key, step, word] of [['Tab', 1, 'Tab'], ['Shift+Tab', -1, 'Shift+Tab']]) {
+					await focusDesc();
+					const w = await where(), expect = w.x[w.at + step], before = await desc();
+					await page.keyboard.type(word === 'Tab' ? 'first' : ' second');
+					await page.keyboard.press(key);
+					await a.settle(250);
+					const landed = (await where()).name, ac = await active();
+					ok(kind + ' ' + word + ' out of an edited Description goes to ' + expect, ac.inPopup && landed === expect, w.name + ' -> ' + landed);
+					ok(kind + ' ' + word + ' out of Description keeps what was typed', (await desc()) === before + (word === 'Tab' ? 'first' : ' second'), JSON.stringify(await desc()));
+				}
+				// typed into, then a click on a typed box: focus stays on the clicked box
+				await focusDesc();
+				await page.keyboard.type(' third');
+				const tgt = (await rows())[1];
+				const box = await page.evaluate((t) => {
+					const l = Array.from(document.querySelectorAll('#lpn_popup_fields label')).filter((x) => x.firstChild.textContent.trim() === t)[0];
+					const r = l.querySelector('input').getBoundingClientRect();
+					return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+				}, tgt);
+				await page.mouse.click(box.x, box.y);
+				await a.settle(250);
 				const ac = await active();
-				ok(kind + ' untouched Tab goes to ' + w.x[w.at + 1], (ac.tag + '|' + ac.label) === w.x[w.at + 1], JSON.stringify(ac));
+				ok(kind + ' a click from an edited Description onto ' + tgt + ' leaves focus there', ac.inPopup && ac.label === tgt, JSON.stringify(ac));
+				ok(kind + ' ...and the Description kept its text', /first second third$/.test(await desc()), JSON.stringify(await desc()));
 			}
 			// a click elsewhere in the box is not disturbed
 			{
@@ -171,7 +220,7 @@ async function main() {
 				await page.keyboard.press('Enter');
 				await a.settle(200);
 				const v = await valueOf(now[1]);
-				ok(kind + ' Enter commits the typed value', v === val, now[1] + '=' + v);
+				ok(kind + ' Enter commits the typed value', sameValue(v, val), now[1] + '=' + v);
 			}
 		}
 

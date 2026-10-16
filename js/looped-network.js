@@ -60601,8 +60601,9 @@ var EngCalcs = EngCalcs || {};
 	// away with it, so focus fell to the page body. Same cure as the arrow keys: blur first (which
 	// commits and rebuilds), then find the target in the NEW box. The target is named by what it is
 	// (its row's label text, its kind, and which of that name it is), not by where it sat, so a
-	// commit that adds or removes rows still lands on the right field. Only a text or number box
-	// that has a neighbour inside the popup is taken over; anything else tabs natively.
+	// commit that adds or removes rows still lands on the right field. Only a text or number box,
+	// or the multi-line Description (its `change` rebuilds the box the same way), that has a
+	// neighbour inside the popup is taken over; anything else tabs natively.
 	function popupTabbables(popup) {
 		var out = [];
 		Array.prototype.forEach.call(popup.querySelectorAll('input, select, textarea, button, a[href], [tabindex]'), function (el) {
@@ -60638,6 +60639,10 @@ var EngCalcs = EngCalcs || {};
 		var t = el && el.tagName && el.tagName.toLowerCase() === 'input' ? (el.type || '').toLowerCase() : '';
 		return (t === 'text' || t === 'number') && !el.getAttribute('list');
 	}
+	// A box the user types into whose commit rebuilds the popup: a typed box or a textarea.
+	function popupIsTextBox(el) {
+		return popupIsTypedBox(el) || !!(el && el.tagName && el.tagName.toLowerCase() === 'textarea');
+	}
 	// Blur `cur` (which commits it and rebuilds the box), then focus what `want` names in the NEW box.
 	function popupBlurThenFocus(popup, cur, want, fallbackIdx) {
 		var list, tgt;
@@ -60647,10 +60652,11 @@ var EngCalcs = EngCalcs || {};
 		if (!tgt) { return; }
 		tgt.focus();
 		if (popupIsTypedBox(tgt)) { tgt.select(); }
+		else if (popupIsTextBox(tgt)) { tgt.setSelectionRange(tgt.value.length, tgt.value.length); }   // a note is added to, not retyped
 	}
 	function popupTabKeyDown(e, popup) {
 		var cur = e.target, list, idx, dir, name;
-		if (e.key !== 'Tab' || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || !popupIsTypedBox(cur)) { return; }
+		if (e.key !== 'Tab' || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || !popupIsTextBox(cur)) { return; }
 		list = popupTabbables(popup);
 		idx = list.indexOf(cur);
 		dir = e.shiftKey ? -1 : 1;
@@ -60663,7 +60669,7 @@ var EngCalcs = EngCalcs || {};
 	// clicked box, so the click is taken over only in that one case.
 	function popupTabMouseDown(e, popup) {
 		var cur = document.activeElement, tgt = e.target, list, idx, name;
-		if (e.button !== 0 || cur === tgt || !popupIsTypedBox(cur) || !popupIsTypedBox(tgt) || !popup.contains(cur)) { return; }
+		if (e.button !== 0 || cur === tgt || !popupIsTextBox(cur) || !popupIsTextBox(tgt) || !popup.contains(cur)) { return; }
 		list = popupTabbables(popup);
 		idx = list.indexOf(tgt);
 		if (idx < 0) { return; }
@@ -60679,7 +60685,7 @@ var EngCalcs = EngCalcs || {};
 		if (!popup || !cur || cur === popup || !popup.contains(cur) || popupTabbables(popup).indexOf(cur) < 0) { refreshPopupIfOpen(); return; }
 		list = popupTabbables(popup);
 		name = popupTabName(cur); occ = popupTabOcc(list, cur, name);
-		typed = popupIsTypedBox(cur);
+		typed = popupIsTextBox(cur);
 		v = cur.value;
 		try { a = cur.selectionStart; b = cur.selectionEnd; } catch (e) { a = b = null; }
 		refreshPopupIfOpen();
