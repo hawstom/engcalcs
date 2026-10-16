@@ -161,8 +161,6 @@ console.log('\n--- a panel that opens comes to the front ---');
 			+ 'the toolbar and the georeference bar are both called `bar` in their own functions '
 			+ 'and a row reading `bar` would excuse all three (Tom, 2026-09-19: *"Why would the run '
 			+ 'progress bar do anything to the bottom panel?"* -- it does not)'],
-		[/^fly @/, 'smFlyShow(): the Scenario Manager\'s Scenarios table, part of the manager\'s box and '
-			+ 'stacked at its level by smFlyPlace(), so raising it alone would put it above its own box'],
 		[/^back @/, 'the modal dialog backdrop -- an empty scrim, holding no control'],
 		[/^dlg @/, 'the modal dialog itself, centred by CSS and outranking everything'],
 		[/^panel @/, 'openPanelAtAnchor(): the menus, their fly-outs and the panels that hang off a '

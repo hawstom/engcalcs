@@ -136,8 +136,8 @@ async function main() {
 		ok('1.4 Basic mode is off (the preference says so)', (await store('lpn_scnbasic')) === 'off');
 		const notice = await page.evaluate(() => (document.getElementById('lpn_map_notice') || document.body).textContent);
 		ok('1.5 ...by first turning Basic mode off, the door the greyed row points to (no notice said so)', notice.indexOf(await L('lpn_sm_basic_on')) < 0);
-		// With the manager open, the Scenarios table is beside it (Task 802), so the pane's tab gives way.
-		ok('1.6 the Scenarios table is beside the manager, and the pane\'s tab gives way to it', await page.evaluate(() => { const b = document.getElementById('lpn_pane_tab_scenarios'), p = document.getElementById('lpn_pane_scenarios'); return !!b && getComputedStyle(b).display === 'none' && !!p && !!p.closest('#lpn_sm_fly'); }));
+		// With the manager open, the Scenarios table is a pane of its box (Task 802); the pane's tab stays (Tom, 2026-10-16).
+		ok('1.6 the Scenarios table is in the manager\'s box, and the pane\'s tab stays', await page.evaluate(() => { const b = document.getElementById('lpn_pane_tab_scenarios'), p = document.getElementById('lpn_pane_scenarios'); return !!b && getComputedStyle(b).display !== 'none' && !!p && !!p.closest('#lpn_sm_box #lpn_sm_table'); }));
 		ok('1.7 the box starts on the Scenarios tree with Base', JSON.stringify(await names()) === JSON.stringify([await L('lpn_scenario_base')]), JSON.stringify(await names()));
 
 		await page.evaluate(() => document.querySelector('#lpn_sm_box [data-dock="right"]').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
@@ -332,7 +332,7 @@ async function main() {
 		ok('4.8 the copy deletes (nothing uses it), leaving Dry year', JSON.stringify(await names()) === JSON.stringify(['Base', '-Dry year', 'Base2']), JSON.stringify(await names()));
 
 		console.log('\n--- 5. the Scenarios table ---');
-		// The pane's tab when it shows; while the manager is open the table is in its flyout instead,
+		// The pane's tab when it shows; while the manager is open the table is in its box instead,
 		// the same panel, so every '#lpn_pane_scenarios' read below is the same table either way.
 		const scnTab = async () => {
 			if (await page.evaluate(() => { const b = document.getElementById('lpn_pane_tab_scenarios'); return !!b && getComputedStyle(b).display !== 'none'; })) { await page.click('#lpn_pane_tab_scenarios'); }
