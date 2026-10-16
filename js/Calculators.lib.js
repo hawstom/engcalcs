@@ -294,7 +294,10 @@ function ecWireTipEl(el) {
 			// delay, since nothing auto-triggers it.
 			// A control may ask for a longer wait before its tip (data-ec-tip-delay, ms): the column
 			// divider in the Looped-Network tables, which the pointer crosses on its way elsewhere.
-			delay: { show: parseInt((el.dataset || {}).ecTipDelay, 10) || EngCalcs.tipShowDelay, hide: 100 }
+			delay: { show: parseInt((el.dataset || {}).ecTipDelay, 10) || EngCalcs.tipShowDelay, hide: 100 },
+			// A tip whose text holds line breaks that matter (a multi-line Description) asks to keep
+			// them with data-ec-tip-lines; every other tip is unchanged.
+			customClass: (el.dataset && el.dataset.ecTipLines) ? 'ec-tip-lines' : ''
 		});
 		// A control also hides its tip on click: hide() clears every active trigger at once, so
 		// the tip cannot hang over the panel the button just opened. Kept for the long-press case

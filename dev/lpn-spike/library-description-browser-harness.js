@@ -125,7 +125,7 @@ async function main() {
 		// The description field of the FIRST entry: its heading and its value.
 		const firstDesc = () => P(() => {
 			const e = document.querySelector('#lpn_libbox_content .lpn-lib-entry');
-			const i = e && e.querySelector('input.lpn-lib-desc');
+			const i = e && e.querySelector('textarea.lpn-lib-desc');
 			if (!i) { return null; }
 			const head = i.closest('label').querySelector('.lpn-lib-fieldname');
 			return { value: i.value, head: head ? head.textContent : null };
@@ -161,7 +161,7 @@ async function main() {
 			ok(sec + ': the first entry has a Description field headed "' + word + '"',
 				!!before && before.head === word, JSON.stringify(before));
 			if (!before) { continue; }
-			const box = a.page.locator('#lpn_libbox_content .lpn-lib-entry').first().locator('input.lpn-lib-desc');
+			const box = a.page.locator('#lpn_libbox_content .lpn-lib-entry').first().locator('textarea.lpn-lib-desc');
 			await box.click();
 			await box.fill(DESC[sec]);
 			await box.press('Tab');
@@ -260,7 +260,7 @@ async function main() {
 			}, sec);
 			await b.settle(300);
 			const h = await b.page.evaluate(() => {
-				const i = document.querySelector('#lpn_libbox_content .lpn-lib-entry input.lpn-lib-desc');
+				const i = document.querySelector('#lpn_libbox_content .lpn-lib-entry textarea.lpn-lib-desc');
 				return i ? i.closest('label').querySelector('.lpn-lib-fieldname').textContent : null;
 			});
 			ok('es ' + sec + ': the field is headed "' + esWord + '"', h === esWord && esWord !== word, JSON.stringify(h));
