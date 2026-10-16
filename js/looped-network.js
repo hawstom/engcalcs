@@ -45739,8 +45739,8 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
 			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
 			// A GeoJSON file as a network, through one mapping step (Task 728).
-			{ icon: 'open', label: pc.lpn_file_import_geojson_net || 'Import GeoJSON network…',
-			  tip: pc.lpn_file_import_geojson_net_tip, fn: pickGeoJsonNetFile },
+			{ icon: 'open', label: pc.lpn_file_import_gjnet || 'Import GeoJSON network…',
+			  tip: pc.lpn_file_import_gjnet_tip, fn: pickGeoJsonNetFile },
 			// The points, lines and polygons of a GeoJSON file, as Shapes (Task 779).
 			{ icon: 'open', label: pc.lpn_file_import_shapes || 'Import GeoJSON shapes…',
 			  tip: pc.lpn_file_import_shapes_tip, fn: pickGeoJsonFile },

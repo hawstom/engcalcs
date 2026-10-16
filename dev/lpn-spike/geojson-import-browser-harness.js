@@ -76,7 +76,7 @@ function helpers(a) {
 		await P.keyboard.press('Escape'); await P.keyboard.press('Escape');
 		const [chooser] = await Promise.all([
 			P.waitForEvent('filechooser', { timeout: 10000 }),
-			a.menuClickSub(await a.lang('lpn_file_import_menu'), await a.lang('lpn_file_import_geojson_net'), 'file')
+			a.menuClickSub(await a.lang('lpn_file_import_menu'), await a.lang('lpn_file_import_gjnet'), 'file')
 		]);
 		await chooser.setFiles(file);
 		await settle(900);
@@ -236,7 +236,7 @@ async function main() {
 			!!d && d.text === (await L('lpn_gjnet_refuse_crs')).replace('{crs}', 'urn:ogc:def:crs:EPSG::2223').replace('{file}', 'stateplane.geojson'), d && d.text);
 		if (d) { await a.dialogClick(d.buttons[0]); }
 		ok('...and nothing is imported', (await h.stored()).count === n0);
-		ok('the menu row has its tip', await P.evaluate(() => !!(window.EngCalcs.pageConfig || {}).lpn_file_import_geojson_net_tip));
+		ok('the menu row has its tip', await P.evaluate(() => !!(window.EngCalcs.pageConfig || {}).lpn_file_import_gjnet_tip));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 	} finally {

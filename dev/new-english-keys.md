@@ -201,10 +201,10 @@ never edits a synonym.
 
 ## lpn_  (59, 59 to read @@ NEEDS RULING)
 
-- **`lpn_file_import_geojson_net`**
+- **`lpn_file_import_gjnet`**
   > Import GeoJSON network…
   @@ NEEDS RULING
-- **`lpn_file_import_geojson_net_tip`**
+- **`lpn_file_import_gjnet_tip`**
   > Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.
   @@ NEEDS RULING
 - **`lpn_gjnet_and_more`**
@@ -931,7 +931,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/geojson-import (`abe2b9929`) — adds no English strings
+### feat/geojson-import (`526455d7c`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -955,7 +955,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/manage-override (`23577b620`) — 180 new, 180 to read @@ NEEDS RULING
+### feat/manage-override (`5a5f90f52`) — 180 new, 180 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -1537,7 +1537,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Step
   @@ NEEDS RULING
 
-### feat/scenario-box (`d49f40568`) — 174 new, 174 to read @@ NEEDS RULING
+### feat/scenario-box (`d4d566a71`) — 174 new, 174 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -2080,7 +2080,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > System
   @@ NEEDS RULING
 
-### fix/elevation-override (`9b9f74f33`) — 174 new, 174 to read @@ NEEDS RULING
+### fix/elevation-override (`515322bc3`) — 174 new, 174 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -2605,7 +2605,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Drag to resize
   @@ NEEDS RULING
 
-### fix/merge-1016 (`f717ff560`) — adds no English strings
+### fix/merge-1016 (`0f6e3e23f`) — adds no English strings
 
 ### fix/zero-demand-solve (`fbfbc28b6`) — 3 new, 3 to read @@ NEEDS RULING
 

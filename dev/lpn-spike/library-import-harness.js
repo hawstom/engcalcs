@@ -739,7 +739,7 @@ head('12. the wizard has a row in the File menu, beside the rows that open a pro
 	check(subRows.length === 8 &&
 		subRows[0].indexOf(String(pc.lpn_file_import_survey)) >= 0 &&
 		subRows[1].indexOf(String(pc.lpn_file_import_inp)) >= 0 &&
-		subRows[2].indexOf(String(pc.lpn_file_import_geojson_net)) >= 0 &&
+		subRows[2].indexOf(String(pc.lpn_file_import_gjnet)) >= 0 &&
 		subRows[3].indexOf(String(pc.lpn_file_import_shapes)) >= 0 &&
 		subRows[4].indexOf(String(pc.lpn_file_import_dxf)) >= 0 &&
 		subRows[5].indexOf(String(pc.lpn_file_import_shp)) >= 0 &&

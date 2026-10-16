@@ -4613,8 +4613,8 @@ $ec_lang['lpn_file_import_survey_tip']='Read a list of surveyed points from a te
 // network is imported from an EPANET file. Every feature not imported is named in the report.
 $ec_lang['lpn_file_import_shapes']='Import GeoJSON shapes…';
 $ec_lang['lpn_file_import_shapes_tip']='Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file. The project must be georeferenced or state a coordinate system.';
-$ec_lang['lpn_file_import_geojson_net']='Import GeoJSON network…';
-$ec_lang['lpn_file_import_geojson_net_tip']='Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.';
+$ec_lang['lpn_file_import_gjnet']='Import GeoJSON network…';
+$ec_lang['lpn_file_import_gjnet_tip']='Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.';
 $ec_lang['lpn_gjnet_refuse_crs']='{file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.';
 $ec_lang['lpn_gjnet_refuse_empty']='{file} contains no points or lines.';
 $ec_lang['lpn_gjnet_target_node_type']='Node type';
