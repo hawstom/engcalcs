@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-410. (R-282 is taken on `feat/label-gang-search`.)
+**An ID is permanent and never reused.** Next free: R-417. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -179,3 +179,10 @@ judgement and does not belong to a script.
 - [ ] R-407 feat/bentley-interop | (Merge upward) "(1) It only works for alternatives? I guess that's nice and tidy. (2) Wording '... it inherits them instead of overriding them.' (3) Why can't Morph or a saved view be used in the Base alternative? (4) Wording 'The alternative {name} has no overrides to merge.' (4) Help text: Change, but of course don't translate until later. (5) syn, yes delete them." -- build agent on feat/bentley-interop; (5) is his written permission to delete $ec_lang_syn lpn_scenario_push_values and lpn_scenario_push_tip
 - [x] R-408 fix/search-zoom-accuracy | (Accuracy 0.001 for projects that state none, or only new ones) "All projects." -- as built on fix/search-zoom-accuracy
 - [ ] R-409 feat/bentley-interop | "(1) Peripherally, the Pipes table Vertices column should always be sized based on the heading rule igoring the contents. (2) Peripherally, the Pipes table Velocity, head loss, head loss gradient, and all other applicable results in all tables should respect the Settings, Pipe labels decimals setting even when the result is zero. I am seeing 0 decimals, which is not appropriate in engineering, I think. (3) We need a way to manage the bubble/balloon graph overrides. ... I suppose the only practical way is a right-click on the asset or the graph. Ideas? Leave as is? (4) My comments about the expanded Scenario manager dockable box haven't been implemented, and I don't understand why not." And: "Make the time series bubbles/balloons open by default at their smallest size. I love miniatures, and I hope that our users do too." -- 2026-10-16: (1), (2), (4) and the miniatures built (9b9f74f3); (4) had been written into the handoff and never dispatched; (3) proposal out to him
+- [ ] R-410 feat/bentley-interop | (Scenario Manager with its table) "I think we need only one x and one title bar; this is a consolidated box now; I fear that you are still thinking of it as two." -- 2026-10-16 build agent on feat/scenario-box
+- [x] R-411 feat/bentley-interop | (bubbles open at 200 px) "This makes me very happy." (decimals, Vertices column) "Good." -- 9b9f74f3
+- [ ] R-412 feat/pattern-axis | "Good, but can the number of steps labeled be sensitive to the available width? They are overlapping each other when narrow." ("Period") "How about 'Step'?" (pattern time ignores Pattern start time) "Yes." -- 2026-10-16 build agent on feat/pattern-axis
+- [ ] R-413 feat/bentley-interop | (bubble overrides, right-click remove) "This is not the action I want." (bubbles as rows in List overrides) "This sounds very promising as a general upgrade to List Overrides (which could become 'Manage overrides'), but I don't see any such actions available currently. Do this. I'd love to see it." -- 2026-10-16 build agent on feat/manage-override
+- [ ] R-414 feat/bentley-interop | (Elevation in a child scenario) "I like graying it out, though I am inclined to ask why it can't be a Physical override." -- 2026-10-16 agent on fix/elevation-override
+- [?] R-415 feat/bentley-interop | (units back to US) "Fotobi." "I don't have a good answer, and I am inclined to just keep observing." -- watching; no steps yet
+- [x] R-416 feat/description-lines, chore/retire-mark-extrema | "Good." "Nice." -- merged 2026-10-16 on his typed word
