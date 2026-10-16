@@ -185,4 +185,4 @@ judgement and does not belong to a script.
 - [ ] R-413 feat/bentley-interop | (bubble overrides, right-click remove) "This is not the action I want." (bubbles as rows in List overrides) "This sounds very promising as a general upgrade to List Overrides (which could become 'Manage overrides'), but I don't see any such actions available currently. Do this. I'd love to see it." -- 2026-10-16 build agent on feat/manage-override
 - [ ] R-414 feat/bentley-interop | (Elevation in a child scenario) "I like graying it out, though I am inclined to ask why it can't be a Physical override." -- 2026-10-16 agent on fix/elevation-override
 - [?] R-415 feat/bentley-interop | (units back to US) "Fotobi." "I don't have a good answer, and I am inclined to just keep observing." -- watching; no steps yet
-- [x] R-416 feat/description-lines, chore/retire-mark-extrema | "Good." "Nice." -- merged 2026-10-16 on his typed word
+- [x] R-416 feat/description-lines | "Good." (and chore/retire-mark-extrema) "Nice." -- merged 2026-10-16 on his typed word
