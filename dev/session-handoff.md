@@ -136,11 +136,32 @@ If a branch's `git log` shows no commit after 10-15 22:00, that agent's work was
   the syn notes, reworded keys (no resync list), tip pairs, and only the glossary terms a batch uses.
   He forbids translating without his approval.
 
+### His answers of 2026-10-16 (early), being built or awaiting design
+
+- **Language**: halo is a saint's halo, its only meaning; his glossary definition is "Halo, aura, or
+  background mask applied to every stroke." Source trace's is "Share from a given source at a given
+  point." (both in glossary.json 10-16). He wants a TRANSCENDENT concept list, ~100 prime concepts,
+  more authoritative than English, that translators audit their terminology against first, and he
+  wants to REVIEW the glossary, which is JSON he cannot read. Design it with him before building.
+  Translate only with his approval.
+- **EPS (bentley-interop, his Fotobi)**: a run stops with Error 110 when tank T-NE runs EMPTY
+  (15:07:33, 14:01:42): EPANET closes L22 and the junctions it fed have no source. 15:07:33 was the
+  simulation time, NOT the wall clock as CC told him. He asks why lowering a full tank's initial
+  depth avoids the 0:00 stop when flow is zero either way. Candidate answer to "surely it's smarter":
+  pressure-driven demand. Also: his units went back to US (possible defect); pattern graph in the
+  Library wants axis labels (factor; time and ordinal).
+- **bentley-interop Scenarios table**: keep the bottom-pane Scenarios tab on a PC too (continuity);
+  the manager's table must be PART of the manager: hovering off the manager closes the table with
+  it, and the divider must be the slim one Settings uses between its index and main pane.
+- **description-lines**: drop the legacy " \P " reading; it never shipped.
+- **Retire Settings' "Mark highest and lowest values"**: Tables and Find replaced it.
+- **A pipe-label artifact** in a new project (one pipe label, while stretching nodes): his screenshot
+  was the wrong file; ask for it.
+
 ### Questions out to him
 
 - Task 800: keep J-NE-S-3's equal override?
 - Task 681: the node shed's re-fits are what is left (~250 ms on n600); cheaper means changing the layout.
-- Task 802: retire the bottom-pane Scenarios tab now the flyout opens with the manager?
 
 ### Next job
 

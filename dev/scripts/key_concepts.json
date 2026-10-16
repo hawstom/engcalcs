@@ -3,6 +3,8 @@
         "description": "Which language keys NAME which glossary concept. A key listed here cites the concept id (glossary.json terms[].concept); generate_translation_payloads.php hands the translator that concept's definition as the source for the key, with English as one rendering of it. A key may cite more than one concept. A key also cites a concept through an existing `gloss: <term>` pointer in $ec_lang_syn, so it is not repeated here. Checked by concept_check.php: every key must exist in lib/lang.ec.en.php and every id must exist in glossary.json. Design: dev/term-concepts.md (ROADMAP Task 737)."
     },
     "keys": {
+        "lpn_settings_text_halo": ["halo"],
+        "lpn_settings_text_halo_tip": ["halo"],
         "lpn_tool_labels": ["label-sym-sally"],
         "lpn_labels_heading_node": ["label-sym-sally"],
         "lpn_labels_heading_link": ["label-sym-sally"],

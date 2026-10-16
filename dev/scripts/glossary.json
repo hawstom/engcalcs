@@ -1,6 +1,6 @@
 {
     "meta": {
-        "version": "1.36",
+        "version": "1.37",
         "description": "Engineering term glossary for EngCalcs translation prompts. Preferred translations per language to prevent term drift across calculators and sprints. Covers all calculators including Rock Chute Design (Robinson), Micro-Hydro Power, and Manning series.",
         "usage": "Inject relevant entries as context in translation prompts: 'Use these preferred translations for technical terms: [terms for this calculator prefix]'. Entries with empty strings need a sprint to fill.",
         "language_codes": [
@@ -4163,7 +4163,7 @@
         "source trace": {
             "term": "source trace",
             "concept": "source-trace",
-            "definition": "The water-quality analysis that reports at every node what share of the water arriving there came from one chosen node, the trace node. The analysis, not the percentage it reports (the source share).",
+            "definition": "Share from a given source at a given point.",
             "symbol": "",
             "avoid": [
                 "translating it as tracing the ORIGIN of a value, a setting or a file -- 'source' on this page also names where a replacement value comes from, and that is a different thing",
@@ -4915,6 +4915,19 @@
                 "zh": "不适用"
             },
             "source": "sprint-1016"
+        },
+        "halo": {
+            "term": "halo",
+            "concept": "halo",
+            "definition": "Halo, aura, or background mask applied to every stroke.",
+            "symbol": "",
+            "avoid": [],
+            "context": "",
+            "translation_notes": "Tom's wording, 2026-10-16.",
+            "translations": {
+                "en": "halo"
+            },
+            "source": "Tom, 2026-10-16"
         }
     }
 }
