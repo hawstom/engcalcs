@@ -5891,6 +5891,8 @@ var EngCalcs = EngCalcs || {};
 	function smBaseKey(tree) { return tree === 'scenarios' ? baseScenario().id : 'base'; }
 	function smTreeLabel(tree) {
 		var pc = EngCalcs.pageConfig || {};
+		if (tree === '*all') { return pc.lpn_sm_tree_all || 'All'; }
+		if (tree === '*unused') { return pc.lpn_sm_tree_unused || 'All unused'; }
 		return tree === 'scenarios' ? (pc.lpn_pane_tab_scenarios || 'Scenarios') : altCategoryLabel(tree);
 	}
 	// The records of one tree in stored order, the Base item excluded; in a category tree, the
@@ -77331,7 +77333,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return !!box && box.style.display !== 'none' && box.style.display !== '';
 	}
 	// What the box is showing: the tree, the selected item's key, the key being renamed, the drag.
-	var smState = { tree: 'scenarios', sel: null, editing: null, drag: null };
+	// `allSel`: the item selected in the All and All unused views, as {cat, key}.
+	var smState = { tree: 'scenarios', sel: null, editing: null, drag: null, allSel: null };
 	function smSelValid() {
 		return smState.sel !== null && (smIsBaseKey(smState.tree, smState.sel) || !!smRecord(smState.tree, smState.sel));
 	}
@@ -77480,9 +77483,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (t === smState.tree) { o.selected = true; }
 			sel.appendChild(o);
 		});
-		sel.addEventListener('change', function () { smState.tree = sel.value; smState.sel = null; smState.editing = null; rebuildScenarioManager(); });
+		// **ALL, AND ALL UNUSED** (Task 803; Tom, 2026-10-15, R-390: *"I'd like a way to see at a glance
+		// all unused alternatives ... unless the selector (instead of a button) includes 'All unused'
+		// (and 'All'?), where all the headings are listed with a scrollbar."*). After the trees, as two
+		// more views of the same alternatives; see smAllList().
+		SM_ALL_VIEWS.forEach(function (t) {
+			var o = document.createElement('option');
+			o.value = t;
+			o.textContent = smTreeLabel(t);
+			if (t === smState.tree) { o.selected = true; }
+			sel.appendChild(o);
+		});
+		sel.addEventListener('change', function () { smState.tree = sel.value; smState.sel = null; smState.editing = null; smState.allSel = null; rebuildScenarioManager(); });
 		tools.appendChild(sel);
+		// **THE SCENARIOS TABLE FLIES OUT BESIDE THE MANAGER** (Task 802), in the same row as the selector.
+		smFlyToggleButton(tools);
 		host.appendChild(tools);
+		if (smIsAllView(smState.tree)) { smAllList(host, scroll, hadFocus); smFlyRefresh(); return; }
 		tools = document.createElement('div');
 		tools.className = 'lpn-sm-tools';
 		// The buttons act on the selected item, the right-click menu on the item clicked; both are
@@ -77517,6 +77534,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		initTipsIn(host);
 		if (smState.editing !== null) { smFocusEditor(); }
 		else if (hadFocus && tree.focus) { tree.focus(); }
+		smFlyRefresh();
 	}
 	function smUsedByText(tree, key) {
 		var pc = EngCalcs.pageConfig || {}, users = smUsedBy(tree, key);
@@ -78117,6 +78135,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (smboxLayout.dock && !smboxLayout.open) { saveSmboxLayout(); }
 	}
 	function closeScenarioManager() {
+		smFlyClose();
 		if (smBoxIsOpen()) { hidePanel(smBoxEl()); }
 		if (smboxLayout.open) { saveSmboxLayout(); }
 	}
@@ -78131,6 +78150,334 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function refreshScenarioManagerIfOpen() {
 		if (smBoxIsOpen() && smState.editing === null) { rebuildScenarioManager(); }
+	}
+	// ---- ALL AND ALL UNUSED: every category's alternatives in one scrolling list (Task 803) -------
+	//
+	// Tom, 2026-10-15 (R-390): *"I'd like a way to see at a glance all unused alternatives."* The
+	// selector's two last entries. Each category is a heading, in the selector's order, with its items
+	// beneath: All lists every item as its tree draws it (indented, with Used by); All unused lists only
+	// the unused ones, and "None" under a heading that has none.
+	//
+	// **UNUSED IS THE DELETE COMMAND'S OWN TEST** (smInUseItems()): no scenario names the alternative
+	// (Base's pick included) and no alternative inherits from it. A scenario that only inherits it
+	// through a parent scenario uses it through that parent, which names it. A Base item is never
+	// unused, and a scenario's own alternative from a file before 2026-10-12 is used by its scenario.
+	// So every item listed as unused is one Delete removes.
+	var SM_ALL_VIEWS = ['*all', '*unused'];
+	function smIsAllView(tree) { return SM_ALL_VIEWS.indexOf(tree) >= 0; }
+	function smIsUnused(cat, key) {
+		return !smIsBaseKey(cat, key) && !!smRecord(cat, key) && !smInUseItems(cat, key).length;
+	}
+	// The rows of one category in a view: [{key, depth, name}].
+	function smAllRows(view, cat) {
+		var rows = smRows(cat);
+		if (view !== '*unused') { return rows; }
+		return rows.filter(function (r) { return smIsUnused(cat, r.key); }).map(function (r) { return { key: r.key, depth: 0, name: r.name, isBase: false }; });
+	}
+	function smAllSelValid() {
+		var a = smState.allSel;
+		return !!a && LPN_ALT_CATEGORIES.indexOf(a.cat) >= 0 && (smIsBaseKey(a.cat, a.key) || !!smRecord(a.cat, a.key)) &&
+			(smState.tree !== '*unused' || smIsUnused(a.cat, a.key));
+	}
+	// Runs `fn` with the manager on one category's tree, so a command written for the tree on show
+	// (smActDelete()) acts on that category; the view is put back after, and drawn again.
+	function smInCategory(cat, fn) {
+		var view = smState.tree;
+		smState.tree = cat;
+		try { fn(); } finally { smState.tree = view; smState.sel = null; smState.editing = null; }
+		rebuildScenarioManager();
+	}
+	// Opens an item in its own category tree, selected.
+	function smAllOpen(cat, key) {
+		smState.tree = cat;
+		smState.sel = key;
+		smState.editing = null;
+		smState.allSel = null;
+		rebuildScenarioManager();
+	}
+	function smAllDelete() {
+		var a = smState.allSel;
+		if (!smAllSelValid()) { return; }
+		smInCategory(a.cat, function () { smActDelete(a.key); });
+		if (!smAllSelValid()) { smState.allSel = null; rebuildScenarioManager(); }
+	}
+	function smAllList(host, scroll, hadFocus) {
+		var pc = EngCalcs.pageConfig || {}, view = smState.tree, tools, del, list, a, any = false, rowTip;
+		if (!smAllSelValid()) { smState.allSel = null; }
+		a = smState.allSel;
+		tools = document.createElement('div');
+		tools.className = 'lpn-sm-tools';
+		// Delete is the one command here: the commands of a tree belong to that tree, opened by a
+		// double-click on an item.
+		del = smButton(tools, '−', a ? (pc.lpn_sm_delete || 'Delete the selected item. A used item is not deleted.') : (pc.lpn_sm_none_selected || 'Select an item in the tree first.'),
+			function () { if (smState.allSel) { smAllDelete(); } });
+		del.id = 'lpn_sm_del';
+		del.setAttribute('data-sm-cmd', 'del');
+		if (!a || smIsBaseKey(a.cat, a.key)) { del.setAttribute('aria-disabled', 'true'); }
+		if (a && smIsBaseKey(a.cat, a.key)) { del.title = pc.lpn_sm_base_kept || del.title; del.setAttribute('aria-label', del.title); }
+		host.appendChild(tools);
+		list = document.createElement('div');
+		list.className = 'lpn-sm-tree lpn-sm-all';
+		list.id = 'lpn_sm_tree';
+		list.setAttribute('role', 'tree');
+		list.setAttribute('aria-label', smTreeLabel(view));
+		list.tabIndex = 0;
+		rowTip = pc.lpn_sm_all_row_tip || 'Double-click to open it in its category tree.';
+		LPN_ALT_CATEGORIES.forEach(function (cat) {
+			var head = document.createElement('div'), rows = smAllRows(view, cat), none;
+			head.className = 'lpn-sm-cathead';
+			head.setAttribute('role', 'presentation');
+			head.setAttribute('data-cat', cat);
+			head.textContent = altCategoryLabel(cat);
+			list.appendChild(head);
+			if (!rows.length) {
+				none = document.createElement('div');
+				none.className = 'lpn-sm-none';
+				none.setAttribute('data-cat', cat);
+				none.textContent = pc.lpn_sm_unused_none || 'None';
+				list.appendChild(none);
+				return;
+			}
+			rows.forEach(function (r) {
+				var row = document.createElement('div'), name = document.createElement('span'), meta = document.createElement('span'), used,
+					isSel = !!a && a.cat === cat && a.key === r.key;
+				any = true;
+				row.className = 'lpn-sm-row' + (isSel ? ' lpn-sm-sel' : '');
+				row.setAttribute('role', 'treeitem');
+				row.setAttribute('aria-level', String(r.depth + 1));
+				row.setAttribute('aria-selected', isSel ? 'true' : 'false');
+				row.setAttribute('data-key', r.key);
+				row.setAttribute('data-cat', cat);
+				row.style.paddingInlineStart = (8 + r.depth * 16) + 'px';
+				name.className = 'lpn-sm-name';
+				name.textContent = r.name;
+				name.title = rowTip;
+				row.appendChild(name);
+				meta.className = 'lpn-sm-meta';
+				used = smUsedByText(cat, r.key);
+				meta.textContent = used.text;
+				if (used.tip) { meta.title = used.tip; }
+				row.appendChild(meta);
+				row.addEventListener('click', function () { smState.allSel = { cat: cat, key: r.key }; rebuildScenarioManager(); smAllFocus(); });
+				row.addEventListener('dblclick', function () { smAllOpen(cat, r.key); });
+				list.appendChild(row);
+			});
+		});
+		list.addEventListener('keydown', function (e) {
+			var rows = Array.prototype.slice.call(list.querySelectorAll('.lpn-sm-row')), i = -1, go;
+			rows.forEach(function (r, n) { if (r.classList.contains('lpn-sm-sel')) { i = n; } });
+			if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+				if (e.preventDefault) { e.preventDefault(); }
+				go = rows[Math.max(0, Math.min(rows.length - 1, i + (e.key === 'ArrowDown' ? 1 : -1)))];
+				if (go) { smState.allSel = { cat: go.getAttribute('data-cat'), key: go.getAttribute('data-key') }; rebuildScenarioManager(); smAllFocus(); }
+			} else if (e.key === 'Enter' && smState.allSel) {
+				if (e.preventDefault) { e.preventDefault(); }
+				smAllOpen(smState.allSel.cat, smState.allSel.key);
+			} else if (e.key === 'Delete' && smState.allSel) {
+				if (e.preventDefault) { e.preventDefault(); }
+				if (e.stopPropagation) { e.stopPropagation(); }
+				smAllDelete();
+			}
+		});
+		host.appendChild(list);
+		list.scrollTop = scroll || 0;
+		initTipsIn(host);
+		smAllScrollSel(list);
+		if (hadFocus && list.focus) { list.focus(); }
+	}
+	function smAllScrollSel(list) {
+		var t = list.querySelector('.lpn-sm-sel');
+		if (t && t.scrollIntoView) { try { t.scrollIntoView({ block: 'nearest' }); } catch (e) { /* none */ } }
+	}
+	function smAllFocus() { var t = document.getElementById('lpn_sm_tree'); if (t && t.focus) { t.focus(); } }
+
+	// ---- THE SCENARIOS TABLE, FLOWN OUT BESIDE THE MANAGER (Task 802) ---------------------------
+	//
+	// Tom, 2026-10-15 (R-389): *"Could we stick that table onto the right side of the Scenario Manager
+	// to accomplish (a) that both are available in the same gesture and (b) that it flies out over the
+	// map instead of displacing the map?"* A button in the manager's top row shows it beside the
+	// box, at the box's height, over the map: a fixed layer of the page, never a column, so the map
+	// keeps its size. It scrolls within itself, follows the box when it moves or is resized, and
+	// closes with the box. Where there is no room beside the box (a phone, or a box against both
+	// edges) it lies over the box's own lower part instead.
+	//
+	// **THE SAME TABLE AS THE TABLES PANE'S SCENARIOS TAB, NOT A SECOND STATE.** Every cell is drawn
+	// from smCellChoices() and smCellValue() and writes through smSetCell(), the pane's own column
+	// functions (scenarioTableCols()), so both read and write the project and nothing is kept twice.
+	// The pane's tab stays as it was (Tom decides later); this one is a pick-list per cell, without the
+	// pane's spreadsheet selection, fill and paste. Whether it is showing is this page load's only, like
+	// the manager's collapsed items: nothing is stored on the device.
+	var smFlyOn = false, smFlyWatch = null;
+	function smFlyEl() { return document.getElementById('lpn_sm_fly'); }
+	function smFlyIsOpen() { var f = smFlyEl(); return !!f && f.style.display !== 'none' && f.style.display !== ''; }
+	function smFlyToggleButton(host) {
+		var pc = EngCalcs.pageConfig || {}, b = smButton(host, pc.lpn_sm_table || 'Scenarios table',
+			pc.lpn_sm_table_tip || 'Show or hide the Scenarios table beside the Scenario manager.', function () { smFlySet(!smFlyOn); });
+		b.id = 'lpn_sm_table_btn';
+		b.setAttribute('aria-pressed', smFlyOn ? 'true' : 'false');
+		b.setAttribute('aria-controls', 'lpn_sm_fly');
+		return b;
+	}
+	function smFlySet(on) {
+		var b = document.getElementById('lpn_sm_table_btn');
+		smFlyOn = !!on && smBoxIsOpen();
+		if (b) { b.setAttribute('aria-pressed', smFlyOn ? 'true' : 'false'); }
+		if (smFlyOn) { smFlyBuild(); smFlyWatchBox(); smFlyPlace(); }
+		else {
+			var f = smFlyEl();
+			if (f) { hideTipsIn(f); f.style.display = 'none'; }
+		}
+	}
+	function smFlyClose() { if (smFlyOn || smFlyIsOpen()) { smFlySet(false); } }
+	// Called at the end of every rebuild of the manager, which every scenario act already reaches.
+	function smFlyRefresh() { if (smFlyOn && smBoxIsOpen()) { smFlyBuild(); smFlyPlace(); } }
+	function smFlyBuild() {
+		var pc = EngCalcs.pageConfig || {}, f = smFlyEl(), x, wrap, table, thead, tbody, tr, scroll = { t: 0, l: 0 };
+		if (!f) {
+			f = document.createElement('div');
+			f.id = 'lpn_sm_fly';
+			f.className = 'lpn-sm-fly d-print-none';
+			f.setAttribute('role', 'region');
+			document.body.appendChild(f);
+		}
+		f.setAttribute('aria-label', pc.lpn_sm_table || 'Scenarios table');
+		wrap = f.querySelector('.lpn-sm-fly-scroll');
+		if (wrap) { scroll = { t: wrap.scrollTop, l: wrap.scrollLeft }; }
+		hideTipsIn(f);
+		f.innerHTML = '';
+		x = document.createElement('button');
+		x.type = 'button';
+		x.className = 'lpn-popover-x lpn-sm-fly-x';
+		x.id = 'lpn_sm_fly_close';
+		x.title = pc.lpn_close || 'Close';
+		x.setAttribute('aria-label', x.title);
+		x.textContent = '×';
+		x.addEventListener('click', function () { smFlySet(false); });
+		f.appendChild(x);
+		wrap = document.createElement('div');
+		wrap.className = 'lpn-sm-fly-scroll';
+		table = document.createElement('table');
+		table.className = 'lpn-sm-fly-table';
+		thead = document.createElement('thead');
+		tr = document.createElement('tr');
+		[pc.lpn_scenario_label || 'Scenario', pc.lpn_sm_col_parent || 'Parent'].concat(LPN_ALT_CATEGORIES.map(altCategoryLabel)).forEach(function (t, i) {
+			var th = document.createElement('th');
+			th.textContent = t;
+			th.setAttribute('scope', 'col');
+			if (i >= 2) { th.setAttribute('data-cat', LPN_ALT_CATEGORIES[i - 2]); }
+			if (i >= 2 && LPN_ALT_CATEGORIES[i - 2] === 'topology' && pc.lpn_alt_cat_topology_tip) { th.title = pc.lpn_alt_cat_topology_tip; }
+			tr.appendChild(th);
+		});
+		thead.appendChild(tr);
+		table.appendChild(thead);
+		tbody = document.createElement('tbody');
+		scenariosForDisplay().forEach(function (scn) {
+			var row = document.createElement('tr'), th = document.createElement('th'), td, p;
+			row.setAttribute('data-scn', scn.id);
+			th.setAttribute('scope', 'row');
+			th.className = 'lpn-sm-fly-name';
+			th.textContent = scenarioDisplayName(scn);
+			if (scn.id === project.activeScenario) { row.className = 'lpn-sm-fly-current'; th.setAttribute('aria-current', 'true'); }
+			// A double-click on the name makes the scenario current, as in the Tables pane.
+			th.addEventListener('dblclick', function () {
+				if (scn.id === project.activeScenario) { return; }
+				switchScenario(scn.id);
+				rebuildScenarioManager();
+			});
+			row.appendChild(th);
+			td = document.createElement('td');
+			p = scn.root === true ? null : parentScenarioOf(scn);
+			td.textContent = p ? scenarioDisplayName(p) : '';
+			row.appendChild(td);
+			LPN_ALT_CATEGORIES.forEach(function (cat) {
+				var cell = document.createElement('td'), sel = document.createElement('select'), val = smCellValue(scn, cat);
+				cell.setAttribute('data-cat', cat);
+				sel.setAttribute('aria-label', scenarioDisplayName(scn) + ', ' + altCategoryLabel(cat));
+				smCellChoices(scn, cat).forEach(function (c) {
+					var o = document.createElement('option');
+					o.value = c[0];
+					o.textContent = c[1];
+					if (c[0] === val) { o.selected = true; }
+					sel.appendChild(o);
+				});
+				// The blank choice inherits: shown muted, as the pane's "inherited" text.
+				if (val === '') { cell.className = 'lpn-sm-fly-inh'; }
+				sel.addEventListener('change', function () {
+					if (smSetCell(scn, cat, sel.value) === false) { smFlyBuild(); }
+				});
+				cell.appendChild(sel);
+				row.appendChild(cell);
+			});
+			tbody.appendChild(row);
+		});
+		table.appendChild(tbody);
+		wrap.appendChild(table);
+		f.appendChild(wrap);
+		wrap.scrollTop = scroll.t;
+		wrap.scrollLeft = scroll.l;
+		f.style.display = 'flex';
+		initTipsIn(f);
+	}
+	// Beside the box at its inline end (the right, or the left on a right-to-left page), else at the
+	// other side, else over the box below its two rows of controls. The box's own stacking level, so a
+	// box raised above it is raised above the table too.
+	function smFlyPlace() {
+		var f = smFlyEl(), box = smBoxEl(), r, vw, vh, edge = POPUP_EDGE, rtl, endRoom, startRoom, want, tools, top, z;
+		if (!f || !box || !smFlyOn) { return; }
+		if (!smBoxIsOpen() || box.classList.contains('lpn-dock-collapsed')) { f.style.display = 'none'; return; }
+		f.style.display = 'flex';
+		r = box.getBoundingClientRect();
+		vw = window.innerWidth || document.documentElement.clientWidth || 0;
+		vh = window.innerHeight || document.documentElement.clientHeight || 0;
+		rtl = (document.documentElement.getAttribute('dir') || '').toLowerCase() === 'rtl';
+		endRoom = rtl ? r.left - edge : vw - r.right - edge;
+		startRoom = rtl ? vw - r.right - edge : r.left - edge;
+		// 18rem: a name column and two categories, the least that is a table.
+		want = 18 * (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
+		z = getComputedStyle(box).zIndex;
+		f.style.zIndex = z && z !== 'auto' ? z : '1050';
+		f.style.left = f.style.right = f.style.top = f.style.bottom = f.style.width = f.style.height = f.style.maxWidth = '';
+		f.classList.remove('lpn-sm-fly-over');
+		if (!smallScreen() && (endRoom >= want || startRoom >= want)) {
+			var atEnd = endRoom >= want || endRoom >= startRoom, onRight = atEnd !== rtl;
+			f.style.top = Math.max(edge, r.top) + 'px';
+			f.style.height = Math.max(120, Math.min(r.height, vh - edge - Math.max(edge, r.top))) + 'px';
+			// At most 64rem: the table is wider than that only with long alternative names, and it scrolls.
+			f.style.maxWidth = Math.floor(Math.min(atEnd ? endRoom : startRoom, want * 64 / 18)) + 'px';
+			if (onRight) { f.style.left = Math.round(r.right - 1) + 'px'; }
+			else { f.style.right = Math.round(vw - r.left - 1) + 'px'; }
+			f.setAttribute('data-side', onRight ? 'right' : 'left');
+			return;
+		}
+		// No room beside the box: over its lower part, below the selector and the commands.
+		tools = box.querySelectorAll('.lpn-sm-tools');
+		top = tools.length ? tools[tools.length - 1].getBoundingClientRect().bottom + 4 : r.top + 80;
+		f.classList.add('lpn-sm-fly-over');
+		f.style.left = Math.max(edge, r.left) + 'px';
+		f.style.width = Math.max(0, Math.min(r.right, vw - edge) - Math.max(edge, r.left)) + 'px';
+		f.style.maxWidth = f.style.width;
+		f.style.top = top + 'px';
+		f.style.height = Math.max(120, Math.min(r.bottom, vh - edge) - top) + 'px';
+		f.setAttribute('data-side', 'over');
+	}
+	// The table follows the box: a drag or a dock writes the box's style or class, a resize its size,
+	// and the window its own size. Closing the box (any door, including Basic mode) closes it.
+	function smFlyWatchBox() {
+		var box = smBoxEl();
+		if (smFlyWatch || !box) { return; }
+		smFlyWatch = { mo: null, ro: null };
+		if (window.MutationObserver) {
+			smFlyWatch.mo = new MutationObserver(function () {
+				if (!smBoxIsOpen()) { smFlyClose(); return; }
+				if (smFlyOn) { smFlyPlace(); }
+			});
+			smFlyWatch.mo.observe(box, { attributes: true, attributeFilter: ['style', 'class'] });
+		}
+		if (window.ResizeObserver) {
+			smFlyWatch.ro = new ResizeObserver(function () { if (smFlyOn) { smFlyPlace(); } });
+			smFlyWatch.ro.observe(box);
+		}
+		window.addEventListener('resize', function () { if (smFlyOn) { smFlyPlace(); } });
 	}
 	// ---- the Scenarios table: one row per scenario, one column per category -------------------
 	function scenarioTableRows() {

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**146 still to read on master**, of 159 untranslated keys, of 2781 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**152 still to read on master**, of 165 untranslated keys, of 2787 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -198,7 +198,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (159, 146 to read @@ NEEDS RULING)
+## lpn_  (165, 152 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -548,6 +548,9 @@ never edits a synonym.
 - **`lpn_sm_add_child`**
   > Add child
   @@ NEEDS RULING
+- **`lpn_sm_all_row_tip`**
+  > Double-click to open it in its category tree.
+  @@ NEEDS RULING
 - **`lpn_sm_base_kept`**
   > The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.
   @@ NEEDS RULING
@@ -647,8 +650,23 @@ never edits a synonym.
 - **`lpn_sm_shared_note`**
   > Shared with: {list}
   @@ NEEDS RULING
+- **`lpn_sm_table`**
+  > Scenarios table
+  @@ NEEDS RULING
+- **`lpn_sm_table_tip`**
+  > Show or hide the Scenarios table beside the Scenario manager.
+  @@ NEEDS RULING
 - **`lpn_sm_title`**
   > Scenario manager
+  @@ NEEDS RULING
+- **`lpn_sm_tree_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_sm_tree_unused`**
+  > All unused
+  @@ NEEDS RULING
+- **`lpn_sm_unused_none`**
+  > None
   @@ NEEDS RULING
 - **`lpn_sm_used_by`**
   > Used by scenarios: {n}
@@ -682,7 +700,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**3 still to read**, of 6 new keys across 15 unmerged branch(es).
+**3 still to read**, of 6 new keys across 19 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -693,15 +711,21 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/ledger-wording (`37092cd7`) — adds no English strings
+### chore/handoff-1016 (`a5b2945d9`) — adds no English strings
 
-### feat/bentley-interop (`bf5908c2`) — adds no English strings
+### chore/ledger-wording (`37092cd70`) — adds no English strings
 
-### feat/description-lines (`895d34b7`) — adds no English strings
+### feat/balloon-presentation (`efdda99d8`) — adds no English strings
 
-### feat/desktop (`baba0f04`) — adds no English strings
+### feat/bentley-interop (`efdda99d8`) — adds no English strings
 
-### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
+### feat/clean-map (`efdda99d8`) — adds no English strings
+
+### feat/description-lines (`895d34b7b`) — adds no English strings
+
+### feat/desktop (`baba0f04d`) — adds no English strings
+
+### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
 - **`lpn_confirm_labels_restore`**
   > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
@@ -713,25 +737,23 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/label-placer (`eaa25d02`) — adds no English strings
+### feat/label-placer (`eaa25d025`) — adds no English strings
 
-### feat/label-placer-a (`2883c033`) — adds no English strings
+### feat/label-placer-a (`2883c0334`) — adds no English strings
 
-### feat/label-placer-b (`18cac708`) — adds no English strings
+### feat/label-placer-b (`18cac7083`) — adds no English strings
 
-### feat/label-placer-c (`4dc27ea1`) — adds no English strings
+### feat/label-placer-c (`4dc27ea10`) — adds no English strings
 
-### feat/label-placer-d (`2e5e81c4`) — adds no English strings
+### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/leader-keep (`81e4ffe8`) — adds no English strings
+### feat/leader-keep (`81e4ffe80`) — adds no English strings
 
-### feat/match-property (`05bda765`) — adds no English strings
+### feat/match-property (`05bda7651`) — adds no English strings
 
-### feat/override-wording (`7b26971f`) — adds no English strings
+### feat/scenario-flyout (`efdda99d8`) — adds no English strings
 
-### fix/text-edit-phone (`e3ab83b8`) — adds no English strings
-
-### fix/zero-demand-solve (`c4b5fd71`) — 3 new, 3 to read @@ NEEDS RULING
+### fix/zero-demand-solve (`c4b5fd714`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_time_run_cut_off`**
   > EPANET had closed {link} and then could not solve for {nodes}.
@@ -742,3 +764,7 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_time_run_cut_off_full`**
   > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
   @@ NEEDS RULING
+
+### perf/cross-shed (`7673e0c73`) — adds no English strings
+
+### perf/switch-cost (`2ece408d1`) — adds no English strings
