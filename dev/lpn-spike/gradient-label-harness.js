@@ -102,19 +102,15 @@ ok('...and is the same quantity, 100x smaller',
 	rawNums.every(function (v, i) { return Math.abs(v * 100 - pctNums[i]) < 0.51 * Math.pow(10, -2); }),
 	JSON.stringify(raw) + ' vs ' + JSON.stringify(pct));
 
-// THE BADGE. It reads the rounded NUMBER, never the text, so the suffix must not change which
-// pipes tie for the network max/min. Both forms are compared against each other rather than
-// against a hardcoded expectation -- the example network is free to change.
+// The retired extrema tick: no pipe carries one, with the suffix or without it.
 setGradientUnit('grade');
 L.refreshLabelText();
 const decorRaw = pipes.map(function (l) { return L.linkDecor(l.id)[0]; });
 setGradientUnit('gradePercent');
 L.refreshLabelText();
 const decorPct = pipes.map(function (l) { return L.linkDecor(l.id)[0]; });
-ok('the extrema badge lands on the same pipes with the suffix as without',
-	decorRaw.join(',') === decorPct.join(','), decorRaw.join(',') + ' vs ' + decorPct.join(','));
-ok('...and it actually marks something, so the check above is not vacuous',
-	decorPct.some(function (d) { return d; }), decorPct.join(','));
+ok('no pipe carries an extrema tick, with the suffix or without',
+	decorRaw.concat(decorPct).every(function (d) { return !d; }), decorRaw.join(',') + ' vs ' + decorPct.join(','));
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
 process.exit(fails ? 1 : 0);
