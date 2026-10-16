@@ -78,6 +78,43 @@ const REF_REWRITES = [
 	// Without the stamp it never can, and the settle runs the whole pass again -- as shipped before.
 	['contentPassAt = { gen: labelCacheGen, s: state.s };', 'contentPassAt = null;']
 ];
+// **A CUT THAT REWRITES A WHOLE FUNCTION IS UNDONE WHOLE**: the reference serves the named function
+// exactly as it stood at REF_BASE (the commit before the cut), spliced into the otherwise shipped
+// file. Task 681: the crossing shed counted every crossing afresh each round; it now counts once
+// and takes each victim's pairs away.
+const REF_BASE = '2ece408d';
+const REF_FUNCS = [
+	{ file: 'js/lpn-collide.js', fn: 'shedCrossingSurvivors' }
+];
+
+// One top-level function of a file's text: from its `\tfunction NAME(` line to the first line that
+// is a lone `\t}` after it. Both files indent their functions one tab inside their IIFE.
+function functionText(src, fn) {
+	const head = '\n\tfunction ' + fn + '(';
+	const a = src.indexOf(head);
+	if (a < 0 || src.indexOf(head, a + 1) >= 0) { return null; }
+	const b = src.indexOf('\n\t}\n', a + 1);
+	return b < 0 ? null : src.slice(a, b + 4);
+}
+// [shipped text, reference text] for every REF_FUNCS entry of one file, read from REF_BASE.
+function funcRewrites(file) {
+	const shipped = fs.readFileSync(path.join(REPO, file), 'utf8');
+	const base = execFileSync('git', ['-C', REPO, 'show', REF_BASE + ':' + file], { encoding: 'utf8', maxBuffer: 1 << 26 });
+	return REF_FUNCS.filter((f) => f.file === file).map((f) => {
+		const from = functionText(shipped, f.fn), to = functionText(base, f.fn);
+		if (!from || !to) { throw new Error('cannot find function ' + f.fn + ' in ' + file + (from ? ' at ' + REF_BASE : '')); }
+		return [from, to];
+	});
+}
+const REF_FILES = ['js/looped-network.js', 'js/lpn-collide.js'];
+// What each served file is rewritten with: the shipped page gets nothing, the reference everything.
+function refRewrites() {
+	const out = {};
+	REF_FILES.forEach((f) => { out[f] = funcRewrites(f); });
+	out['js/looped-network.js'] = out['js/looped-network.js'].concat(REF_REWRITES);
+	return out;
+}
+const NO_REWRITES = {};
 
 const MARKER = "\tdocument.addEventListener('DOMContentLoaded'";
 // The harness's handles on the page: the Task 680 keep switch, the bank's pass counter and reason,
@@ -86,6 +123,7 @@ const HOOK = '\twindow.__lpnSwitch = { setKeep: function (v) { keepLayoutEnabled
 	'\t\tpasses: function () { return labelCachePasses; }, bankMiss: function () { return labelCacheMiss; },\n' +
 	'\t\tsolved: function () { return !!lastSolveResult; },\n' +
 	'\t\tbank: function () { return { anchor: labelCache.anchor, keys: Object.keys(labelCache.entries), s: state.s, miss: labelCacheMiss, hits: labelCacheHits, passes: labelCachePasses }; },\n' +
+	'\t\tdecisions: function () { var c = lastCrossingShed; return { nodeShedRungs: lastNodeShedRungs, crossShed: c && { hidden: c.hidden, residual: c.residual, rounds: c.rounds, before: c.before, after: c.after } }; },\n' +
 	'\t\tbusy: function () { return !!(reshedTimer || labelRefreshPending); } };\n';
 
 const NODE_FIELDS = ['id', 'desc', 'tag', 'demand', 'elev', 'initQuality', 'demandActual', 'level', 'head', 'pressure', 'quality'];
@@ -142,12 +180,15 @@ function parseRows(line) {
 async function openPage(Session, browser, rewrites) {
 	const a = await Session.open(browser, NAME, { serviceWorkers: 'block' });
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
-	const st = { fetched: 0, rewritten: 0, hooked: 0 };
-	await a.page.route(/\/js\/looped-network\.js/, async (route) => {
+	const st = { fetched: 0, rewritten: 0, hooked: 0, expected: 0 };
+	await a.page.route(/\/js\/(looped-network|lpn-collide)\.js/, async (route) => {
+		const file = 'js/' + /\/js\/([a-z-]+\.js)/.exec(route.request().url())[1];
+		const list = rewrites[file] || [];
 		st.fetched++;
+		st.expected += list.length;
 		const resp = await route.fetch();
 		let body = await resp.text();
-		rewrites.forEach(([from, to]) => {
+		list.forEach(([from, to]) => {
 			const n = body.split(from).length - 1;
 			body = body.split(from).join(to);
 			st.rewritten += n;
@@ -277,6 +318,7 @@ async function layouts(Session, browser, rewrites) {
 				return { x: b.left + b.width / 2 + 37, y: b.top + b.height / 2 - 23 };
 			});
 			out[t.title] = [await drawn(a.page)];
+			out[t.title + ' decisions'] = [await a.page.evaluate(() => window.__lpnSwitch.decisions())];
 			// **A BURST IS DISPATCHED IN ONE TASK, NOT WHEELED WITH GAPS.** Real wheel events 60 ms apart
 			// sometimes straddle the 120 ms settle debounce, and a burst split into two settles visits
 			// a bucket the other run never did -- which moved hit boxes by a few parts in 10^5 between
@@ -292,6 +334,7 @@ async function layouts(Session, browser, rewrites) {
 				await quiet(a);
 				if (process.env.SWITCH_DEBUG) { console.log('      ' + t.title + ' ' + JSON.stringify(await a.page.evaluate(() => window.__lpnSwitch.bank()))); }
 				out[t.title].push(await drawn(a.page));
+				out[t.title + ' decisions'].push(await a.page.evaluate(() => window.__lpnSwitch.decisions()));
 			}
 		}
 		out.errors = a.errors.slice();
@@ -316,24 +359,30 @@ async function main() {
 		const src = fs.readFileSync(path.join(REPO, 'js', 'looped-network.js'), 'utf8');
 		ok('the hook marker is in the page script', src.indexOf(MARKER) >= 0);
 		REF_REWRITES.forEach(([from]) => ok('the cut the reference undoes is in the page script once', src.split(from).length === 2, from.slice(0, 80)));
+		const REF = refRewrites();
+		REF_FUNCS.forEach((f) => {
+			const pair = REF[f.file].find((p) => p[0].indexOf('function ' + f.fn + '(') >= 0);
+			ok(f.fn + '(): the reference serves it as it stood at ' + REF_BASE + ', and that differs from the shipped one',
+				!!pair && pair[0] !== pair[1]);
+		});
 		if (MEASURE) {
 			// SWITCH_BEFORE=1 measures the reference page too, which is the "before" of the cut.
 			if (process.env.SWITCH_BEFORE === '1') {
 				console.log('=== where a switch goes (reference page, the cut undone) ===');
-				table(await measure(Session, browser, 'measure reference', REF_REWRITES));
+				table(await measure(Session, browser, 'measure reference', REF));
 			}
 			console.log('\n=== where a switch goes (shipped page) ===');
-			table(await measure(Session, browser, 'measure', []));
+			table(await measure(Session, browser, 'measure', NO_REWRITES));
 		}
 		if (SAME) {
 			console.log('\n=== the same labels, with the cut and without it ===');
 			// SWITCH_PAIR=ref,ref (or ship,ship) compares a page with itself: the noise floor.
 			const pair = (process.env.SWITCH_PAIR || 'ship,ref').split(',');
-			const ship = await layouts(Session, browser, pair[0] === 'ref' ? REF_REWRITES : []);
-			const ref = await layouts(Session, browser, pair[1] === 'ship' ? [] : REF_REWRITES);
+			const ship = await layouts(Session, browser, pair[0] === 'ref' ? REF : NO_REWRITES);
+			const ref = await layouts(Session, browser, pair[1] === 'ship' ? NO_REWRITES : REF);
 			ok('the page script was hooked on both runs', ship.st.hooked >= 2 && ref.st.hooked >= 2, ship.st.hooked + '/' + ref.st.hooked);
-			ok('the reference run really served the page without the cut', ref.st.rewritten === REF_REWRITES.length * ref.st.fetched,
-				'rewritten ' + ref.st.rewritten + ' over ' + ref.st.fetched + ' loads');
+			ok('the reference run really served the page without the cut', ref.st.expected > 0 && ref.st.rewritten === ref.st.expected,
+				'rewritten ' + ref.st.rewritten + ' of ' + ref.st.expected + ' over ' + ref.st.fetched + ' loads');
 			ok('no page errors', !ship.errors.length && !ref.errors.length, (ship.errors.concat(ref.errors)[0] || '').slice(0, 200));
 			TARGETS.forEach((t) => {
 				// **AND THE CUT HAS TO HAVE HAPPENED**, or the comparison below compares a page with itself.
@@ -343,6 +392,16 @@ async function main() {
 					ok(t.title + ': ...where the page without the cut ran one', ref[t.title + ' settle passes'] === 1,
 						ref[t.title + ' settle passes'] + ' passes; bank: ' + ref[t.title + ' settle miss']);
 				}
+				// **THE SAME DECISIONS IN THE SAME ORDER**, not only the same picture: every label the
+				// crossing shed hid, in the order it hid them, its residual pairs and rounds, and the
+				// rungs the node shed ran.
+				const crossHid = ship[t.title + ' decisions'].reduce((n, d) => n + ((d.crossShed && d.crossShed.hidden.length) || 0), 0);
+				ok(t.title + ': the crossing shed hid labels in these views, so its sameness is tested', crossHid > 0, crossHid + ' hides over 5 views');
+				ship[t.title + ' decisions'].forEach((d, i) => {
+					const A = JSON.stringify(d), B = JSON.stringify(ref[t.title + ' decisions'][i]);
+					ok(t.title + ', view ' + i + ': the same shed decisions in the same order', A === B,
+						A === B ? 'hid ' + ((d.crossShed && d.crossShed.hidden.length) || 0) + ', node rungs ' + d.nodeShedRungs : around(A, B));
+				});
 				ship[t.title].forEach((A, i) => {
 					const B = ref[t.title][i];
 					const shown = A.filter((s) => s.indexOf('<text') === 0).length;
