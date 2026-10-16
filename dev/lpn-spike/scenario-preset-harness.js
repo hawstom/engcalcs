@@ -77,7 +77,7 @@ function checkPresets(where) {
 		JSON.stringify(names));
 	// Tom's order (2026-10-11): "Scenario manager..., -, Basic mode, New, Rename, Delete, -, Apply Base,
 	// list of scenarios." Apply Base values and its rule are retired (Task 801, 2026-10-15). List overrides
-	// follows Delete (Tom, 2026-10-16: "Yes", reachable in Basic mode).
+	// follows Delete (Tom, 2026-10-15: "Yes", reachable in Basic mode).
 	{
 		const P = global.EngCalcs.pageConfig || {};
 		const kind = (r) => r.separator ? '-' : r.scenarioId !== undefined ? 'S'

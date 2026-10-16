@@ -7677,7 +7677,7 @@ var EngCalcs = EngCalcs || {};
 				});
 			}
 		});
-		// **LIST OVERRIDES HERE TOO, SO BASIC MODE REACHES IT** (Tom, 2026-10-16: "Yes."). The same
+		// **LIST OVERRIDES HERE TOO, SO BASIC MODE REACHES IT** (Tom, 2026-10-15: "Yes."). The same
 		// action as the Scenario manager's button, on the active scenario; greyed on Base and at 0.
 		rows.push({
 			label: pc.lpn_sm_list_overrides || 'List overrides',

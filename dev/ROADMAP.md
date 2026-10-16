@@ -98,7 +98,7 @@ the block.
   Tom, 2026-10-14: mnemonic, definitional keys over coined names (*"we don't need more confusion"*).
   **WHAT IS LEFT: every language gives each concept below its own word, used everywhere, and no two
   concepts share a word.** Known collisions: Tag and Label are one word in es (Etiqueta), it
-  **SPRINT 737 DONE 2026-10-14** for the collisions: Tag is Marcador (es), Tag (it), Künye (tr), Etiketa (hr); cs Reservoir Zdroj, quality Source Dávkování; fr Label Étiquette; he Head עומד, HGL fixed. **SPRINT 737b DONE 2026-10-15**: the same sweep in am, bn, fa, hi, km, my, pt, ru, uk, zh (Head unified in bn, hi, km, my; HGL split from the gradient in ru, zh; `dev/english-friction/737b.json`). Tom, 2026-10-16: km Tag stays (*"a significant disambiguator"*); the mode prompts now say "labels, and Text" (master), so their translations are owed.
+  **SPRINT 737 DONE 2026-10-14** for the collisions: Tag is Marcador (es), Tag (it), Künye (tr), Etiketa (hr); cs Reservoir Zdroj, quality Source Dávkování; fr Label Étiquette; he Head עומד, HGL fixed. **SPRINT 737b DONE 2026-10-15**: the same sweep in am, bn, fa, hi, km, my, pt, ru, uk, zh (Head unified in bn, hi, km, my; HGL split from the gradient in ru, zh; `dev/english-friction/737b.json`). Tom, 2026-10-15: km Tag stays (*"a significant disambiguator"*); the mode prompts now say "labels, and Text" (master), so their translations are owed.
   (Etichetta) and tr (Etiket); cs uses Zdroj for both Reservoir and Source.
   | Concept | English |
   |---|---|
@@ -468,7 +468,7 @@ the block.
   Tom, 2026-10-15: *"The Time series balloons/bubbles should be a Presentation override."* R-391.
 - 75|805| **A clean map: hide the override ambers and the map's own controls.**
   Tom, 2026-10-15: *"It would be good to be able to hide the amber override indicators from the map. Maybe a Map, Clean map button is a good idea after all with zoom buttons, error messenger, ambers, and satellite button hiding."* R-396.
-- 75|806| **Descriptions take several lines and paragraphs.** **BUILT 2026-10-15 on `feat/description-lines`; 2026-10-16 a line break is " \P " wherever it sits on one line (.inp, Tables cell, copy), on Tom's call.**
+- 75|806| **Descriptions take several lines and paragraphs.** **BUILT 2026-10-15 on `feat/description-lines`; 2026-10-15 a line break is " \P " wherever it sits on one line (.inp, Tables cell, copy), on Tom's call.**
   Tom, 2026-10-15: *"I think that all Description fields should allow multiple lines and paragraphs like most software to allow internal documentation."* R-395.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:

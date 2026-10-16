@@ -613,13 +613,13 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_sm_list_overrides`**
   > List overrides
-  _Ruled 2026-10-16: Approved._
+  _Ruled 2026-10-15: Approved._
 - **`lpn_sm_list_overrides_none`**
   > This scenario has no overrides.
-  _Ruled 2026-10-16: Revised. But should be obvious when count = 0._
+  _Ruled 2026-10-15: Revised. But should be obvious when count = 0._
 - **`lpn_sm_list_overrides_tip`**
   > List the scenario's overrides by category, each with the inherited value it overrides.
-  _Ruled 2026-10-16: Revised._
+  _Ruled 2026-10-15: Revised._
 - **`lpn_sm_make_current`**
   > Make current
   @@ NEEDS RULING

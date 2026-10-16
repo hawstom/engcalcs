@@ -121,7 +121,7 @@ async function main() {
 		}, SMMENU));
 		// Tom, 2026-10-11: "Scenario manager..., -, Basic mode, New, Rename, Delete, -, Apply Base, list of scenarios."
 		// Apply Base values and the rule before it are retired (Task 801, 2026-10-15). List overrides follows
-		// Delete (Tom, 2026-10-16: "Yes", reachable in Basic mode).
+		// Delete (Tom, 2026-10-15: "Yes", reachable in Basic mode).
 		const menuSeq = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_menu_list > *')).filter((e) => e.offsetParent !== null || e.tagName === 'HR')
 			.map((e) => e.tagName === 'HR' ? '-' : e.textContent.trim()));
 		const wantSeq = [SMMENU, '-', '✓ ' + await L('lpn_scenario_basic'), await L('lpn_scenario_new'), await L('lpn_scenario_copy'), await L('lpn_scenario_rename'), await L('lpn_scenario_delete'),

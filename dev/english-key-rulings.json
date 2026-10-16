@@ -281,7 +281,7 @@
         },
         "lpn_calib_file": {
             "on": "{file}: measurements ({n}) at locations ({m}).",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_calib_load": {
@@ -1086,7 +1086,7 @@
         },
         "lpn_crit_summary": {
             "on": "Assets that leave demand unserved or drop a junction below {pressure} ({n} of {total}).",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_crit_title": {
@@ -1233,7 +1233,7 @@
         },
         "lpn_customer_detached_count": {
             "on": "Customers not connected to a pipe ({n}). Their demand is not accounted for.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_customer_fixed_head": {
@@ -2041,7 +2041,7 @@
         },
         "lpn_ff_summary_error": {
             "on": "Junctions that could not be solved ({n}).",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_ff_title": {
@@ -2619,7 +2619,7 @@
         },
         "lpn_full_row_count": {
             "on": "Rows ({n}).",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_full_step_label": {
@@ -2805,12 +2805,12 @@
         },
         "lpn_inp_export_flat_customers": {
             "on": "An EPANET file has no customers. The demand of the customers in this project ({n}) is written as a demand row on the junction each customer is assigned to, named with the customer's tag. The file does not record the customer itself: its location, the pipe that serves it, where along that pipe the service connects, or how many services it represents. That information remains in the project; save the project file to keep it.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_inp_export_flat_fittings": {
             "on": "An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of pipes here ({n}) is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_inp_export_flat_heading": {
@@ -2825,7 +2825,7 @@
         },
         "lpn_inp_export_flat_types": {
             "on": "Pipes ({n}) here refer to pipe types ({t}). In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so the link between one definition and every pipe that uses it is recorded only in the project file.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_inp_report_no_crs": {
@@ -2914,7 +2914,7 @@
         },
         "lpn_library_curve_in_use": {
             "on": "This curve is used by elements ({count}): {ids}. Assign another curve to them first, then delete this one.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_library_curve_note_label": {
@@ -2963,7 +2963,7 @@
         },
         "lpn_library_fittings_in_use": {
             "on": "This fittings list is used by pipes ({count}): {ids}. Detach it from them before deleting it.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_library_fittings_note": {
@@ -3078,7 +3078,7 @@
         },
         "lpn_library_pipetype_in_use": {
             "on": "This pipe type is used by pipes ({count}): {ids}. Detach it from them before deleting it.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_library_pipetype_unused": {
@@ -3438,7 +3438,7 @@
         },
         "lpn_mode_add_chain": {
             "on": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Approved. (proposal: \"labels and Text\")"
         },
         "lpn_mode_add_meter": {
@@ -3549,7 +3549,7 @@
         },
         "lpn_node_customers_sum": {
             "on": "{total} {unit} from Customers ({n})",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_node_customers_tip": {
@@ -3594,7 +3594,7 @@
         },
         "lpn_pane_ctrlenter_filled": {
             "on": "Filled cells ({n}). Cells not changed ({skipped}).",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_pane_fill_none": {
@@ -3609,7 +3609,7 @@
         },
         "lpn_pane_filled": {
             "on": "Filled down cells ({n}). Cells not changed ({skipped}).",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_pane_filter_clear": {
@@ -3754,7 +3754,7 @@
         },
         "lpn_pane_paste_ids_differ": {
             "on": "IDs that do not match ({n}). Paste anyway?",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_pane_paste_more": {
@@ -3809,22 +3809,22 @@
         },
         "lpn_pane_paste_overflow": {
             "on": "Rows in this paste ({n}). Rows that fit in the table ({fit}). Add the other rows ({extra}) as new rows at the bottom?",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_pane_paste_overflow_add": {
             "on": "Add rows ({extra})",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_pane_paste_overflow_bad": {
             "on": "Rows in this paste ({n}). Rows that fit in the table ({fit}). The other rows ({extra}) cannot be added as new rows: {reasons}",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_pane_paste_overflow_fit": {
             "on": "Paste only the rows that fit ({fit})",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_pane_paste_refused": {
@@ -3844,17 +3844,17 @@
         },
         "lpn_pane_pasted": {
             "on": "Pasted cells ({n}). Cells not changed ({skipped}).",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_pane_pasted_rows": {
             "on": "Pasted rows ({n}). Rows added to the network ({created}).",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_pane_pasted_rows_skipped": {
             "on": "Pasted rows ({n}). Rows added to the network ({created}). Cells not changed ({skipped}).",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_pane_sel_only": {
@@ -4189,7 +4189,7 @@
         },
         "lpn_replace_asked": {
             "on": "Elevations requested for nodes ({n}). Results appear when they are received.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
         "lpn_replace_q_bad": {
@@ -5753,17 +5753,17 @@
         },
         "lpn_sm_list_overrides": {
             "on": "List overrides",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Approved."
         },
         "lpn_sm_list_overrides_tip": {
             "on": "List the scenario's overrides by category, each with the inherited value it overrides.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Revised."
         },
         "lpn_sm_list_overrides_none": {
             "on": "This scenario has no overrides.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Revised. But should be obvious when count = 0."
         },
         "lpn_alt_calc_options": {
@@ -5783,77 +5783,77 @@
         },
         "lpn_mode_select": {
             "on": "Mode: Select. Select an asset, a label, or a Text to see or change it. Drag to move a node, a label, or a Text. Use the Vertices tool to add or remove the bends in a pipe.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Approved. (proposal: \"labels and Text\")"
         },
         "lpn_mode_add_junction": {
             "on": "Mode: Add Junction. Specify a location on the map to place a junction. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Approved. (proposal: \"labels and Text\")"
         },
         "lpn_mode_add_reservoir": {
             "on": "Mode: Add Reservoir. Specify a location on the map to place a reservoir. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Approved. (proposal: \"labels and Text\")"
         },
         "lpn_mode_add_tank": {
             "on": "Mode: Add Tank. Specify a location on the map to place a tank. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Approved. (proposal: \"labels and Text\")"
         },
         "lpn_mode_add_pipe": {
             "on": "Mode: Add Pipe. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Approved. (proposal: \"labels and Text\")"
         },
         "lpn_mode_add_pump": {
             "on": "Mode: Add Pump. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Approved. (proposal: \"labels and Text\")"
         },
         "lpn_mode_add_valve": {
             "on": "Mode: Add Valve. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Approved. (proposal: \"labels and Text\")"
         },
         "lpn_mode_add_text": {
             "on": "Mode: Add Text. Specify a location on the map to place a Text. Specify a location near a node to attach the Text to that node. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Approved. (proposal: \"labels and Text\")"
         },
         "lpn_time_run_stopped_kept": {
             "on": "The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Approved."
         },
         "lpn_time_stat_stopped": {
             "on": "{statistic} not shown: the run stopped before the end of the period.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Approved."
         },
         "lpn_time_stopped_no_quality": {
             "on": "No water quality results were computed, because the quality analysis starts after the hydraulic run ends.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Approved."
         },
         "lpn_energy_stopped": {
             "on": "The EPANET run stopped before the end of the period, so no pump energy results were computed.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Revised. Does that work? If not, correct and try again."
         },
         "lpn_replace_preview": {
             "on": "Change assets ({n})?",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Approved."
         },
         "lpn_replace_done": {
             "on": "Assets changed: {n}. This can be undone in one step.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Approved."
         },
         "lpn_status_converted": {
             "on": "Values ({n}) were rewritten into {unit}.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-15",
             "answer": "Approved."
         }
     }

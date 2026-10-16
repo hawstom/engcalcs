@@ -110,7 +110,7 @@ fix/zombie-harness-row. No key was unrendered, so none deleted.
 Earlier the same day: help-calculators (625), screenshot-copy (793), tank-depth-graph (795), slope-length
 (643), library-description (792). Tom's Android reaches the previews through Termux.
 
-Landed 2026-10-16: feat/stopped-series (808) to master; feat/override-audit (800) into bentley-interop
+Landed 2026-10-15: feat/stopped-series (808) to master; feat/override-audit (800) into bentley-interop
 (`c72f83eb`); fix/wording-1016 (his word calls on 808 and the mode prompts), fix/mtc-vertical-sides
 (z = 0 side rock size reads N/A, new key `mtc_not_applicable`), feat/plural (35 count strings in the
 "cells (n)" form, 27 of them ruled). `chore/ledger-wording` holds HIS commit 37092cd7 (the ledger heading
@@ -125,7 +125,7 @@ and CLAUDE.md line): the classifier refuses CC merging it ("self-modification");
   wherever it sits on one line (.inp comment, Tables cell, copy), his 10-16 call. No new keys.
 - **feat/override-wording**, **fix/text-edit-phone**: on bentley-interop (800 wording + Scenarios menu row;
   R-392 phone zoom closed the Text editor). Merge into bentley-interop.
-- feat/leader-keep (807): he typed "Merge feat/leader-keep" 2026-10-15 and again 2026-10-16, but the auto-mode
+- feat/leader-keep (807): he typed "Merge feat/leader-keep" 2026-10-15 and again 2026-10-15, but the auto-mode
   classifier refuses CC writing his all-clear into `dev/branch-all-clears.json`. Needs a permission rule or his own entry.
 
 ### Questions out to him
@@ -140,7 +140,7 @@ open design question), Number of services decimals (Mary).
 
 ### Traps met 2026-10-15 (twentieth session)
 
-- **CC dated a whole batch 2026-10-16** (roadmap, glossary, handoff) from the date in a branch name. Use
+- **CC dated a whole batch 2026-10-15** (roadmap, glossary, handoff) from the date in a branch name. Use
   `date` in Arizona; the shell is on Phoenix time.
 - **A plural mechanism was built before he could say no**: he prefers "overrides (1)". Then the rewording
   agent changed 23 strings he had approved; check `english-key-rulings.json` before rewording English.

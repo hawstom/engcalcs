@@ -1268,7 +1268,7 @@ Code: `ownOverrideItems()`, `storedOwnItems()`, `ownOverrideInherited()` beside 
 rule, and Delete against the list for every record) and `override-audit-browser-harness.js`, on his
 file (`fixtures/fotobi-override-audit.epp`).
 
-### The Scenarios table beside the manager, and All unused (Tasks 802, 803; 2026-10-16)
+### The Scenarios table beside the manager, and All unused (Tasks 802, 803; 2026-10-15)
 
 Tom, 2026-10-15 (R-389): *"Could we stick that table onto the right side of the Scenario Manager to
 accomplish (a) that both are available in the same gesture and (b) that it flies out over the map
