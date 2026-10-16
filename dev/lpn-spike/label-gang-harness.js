@@ -239,7 +239,7 @@ function runFixtures() {
 		// (f) **A HIDDEN LABEL KEEPS ITS RESERVATION: the pipe label under it does NOT come back.**
 		// A covered yielder is off the map before this pass starts and stays off, so hiding the node
 		// label standing on it cannot reveal it and cannot conjure a new crossing. Releasing it
-		// instead oscillates -- see coveredNow() in js/lpn-collide.js for the measurement.
+		// instead oscillates -- see the reservation note in shedCrossingSurvivors(), js/lpn-collide.js, for the measurement.
 		const cover = ent('n:C', 0, 0, 30, 20, { covers: true }),
 			other = ent('n:O', 0, 20, 30, 0, { covers: true }),
 			under = { id: 'l:P', boxes: Collide.labelLineBoxes(spec('l:P', 0, 0, []), { x: 30, y: 20 }),

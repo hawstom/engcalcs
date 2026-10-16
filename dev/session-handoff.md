@@ -99,44 +99,61 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-15 (twentieth session, Arizona time)
+## STATE — 2026-10-16 (twenty-first session, Arizona time)
 
 ### Master: see the pushed SHA in the last report. Production: b7c99102 (10-09) when last read; ask, About box
 
-Landed 2026-10-15 (twentieth): feat/text-halo (791), fix/search-zoom-accuracy (796, R-388, R-397, R-399,
-R-408), sprint 737b (one word per concept in am bn fa hi km my pt ru uk zh; `dev/english-friction/737b.json`),
-fix/properties-tab-focus (Tab after typing in Properties now reaches the next field; found by Perry on 806),
-fix/zombie-harness-row. No key was unrendered, so none deleted.
-Earlier the same day: help-calculators (625), screenshot-copy (793), tank-depth-graph (795), slope-length
-(643), library-description (792). Tom's Android reaches the previews through Termux.
-
-Landed 2026-10-16: feat/stopped-series (808) to master; feat/override-audit (800) into bentley-interop
-(`c72f83eb`); fix/wording-1016 (his word calls on 808 and the mode prompts), fix/mtc-vertical-sides
-(z = 0 side rock size reads N/A, new key `mtc_not_applicable`), feat/plural (35 count strings in the
-"cells (n)" form, 27 of them ruled). `chore/ledger-wording` holds HIS commit 37092cd7 (the ledger heading
-and CLAUDE.md line): the classifier refuses CC merging it ("self-modification"); his to merge.
+Landed on master 2026-10-16: feat/stopped-series (808); his word calls on the 808 strings and the mode
+prompts ("labels, and Text"); fix/mtc-vertical-sides (z = 0 side rock reads N/A, `mtc_not_applicable`);
+feat/plural (35 count strings in the "cells (n)" form); sprint 1016 (15 new, 44 resynced, 26 languages;
+`dev/english-friction/1016.json`; halo had been rendered "hello" in am bn hi my, fixed; tr N/A "Uygulanmaz");
+perf/switch-cost + perf/cross-shed (Task 681: no second label pass on arrival, crossing shed counted once;
+identical output; n600 cold switch 3.2 s to 1.3 s). No key was unrendered, so none deleted.
+Earlier the same day: twentieth session's list (text-halo, search-zoom-accuracy, sprint 737b, ...).
 
 ### Branches awaiting his word (pushed; all on the Branch previews page with test steps)
 
-- **feat/bentley-interop** (Tasks 721, 790, 782, 784, 789, 794, 781 Morph, 801 Merge upward): master merged
-  in 2026-10-15 (ead9c118, then 93a3aeef: text halo is a Presentation setting). Its `$ec_lang_syn` Transform
-  description is CC's wording, awaiting his OK. After it lands delete match-property, graph-bubble.
-- **feat/description-lines** (Task 806): Descriptions in lines and paragraphs; one line break is " \P "
-  wherever it sits on one line (.inp comment, Tables cell, copy), his 10-16 call. No new keys.
-- **feat/override-wording**, **fix/text-edit-phone**: on bentley-interop (800 wording + Scenarios menu row;
-  R-392 phone zoom closed the Text editor). Merge into bentley-interop.
-- feat/leader-keep (807): he typed "Merge feat/leader-keep" 2026-10-15 and again 2026-10-16, but the auto-mode
-  classifier refuses CC writing his all-clear into `dev/branch-all-clears.json`. Needs a permission rule or his own entry.
+- **feat/bentley-interop** (721, 790, 782, 784, 789, 794, 781 Morph, 801 Merge upward, 800 List overrides,
+  and 10-16: 802 Scenarios table flyout, 803 All / All unused, 804 balloons as a Presentation override,
+  805 Clean map, R-392 phone Text editor): master merged in 10-16 (3a074022). Its `$ec_lang_syn` Transform
+  description is CC's wording, awaiting his OK. 805 adds two localStorage keys, `lpn_cleanmap` and
+  `lpn_ovrmarks` (furniture, written only when not default; inventory updated): TELL HIM before it merges.
+  New English to rule on: Clean map and its tip, Show override markers on the map, Scenarios table,
+  All, All unused, Time series graphs on the map. After it lands delete match-property, graph-bubble.
+- **feat/description-lines** (806): a line break is " \P " wherever a Description sits on one line, his
+  10-16 call. No new keys.
+- **fix/zero-demand-solve** (R-402): a stopped EPANET run names the full or empty tank, the pipe EPANET
+  closed and the nodes it could not solve; three new English sentences for his word. Stock EPANET fails
+  the same way (a full tank with no flow); options for him: keep the message (recommended), or a per-tank
+  "can overflow" setting.
+- feat/leader-keep (807): he typed "Merge feat/leader-keep" 10-15 and 10-16; the auto-mode classifier refuses
+  CC writing the ledger entry. **He decides: add a permission rule (Edit of dev/branch-all-clears.json) to
+  .claude/settings.json himself, or write the entry.** `chore/ledger-wording` holds HIS commit 37092cd7 (the
+  ledger heading and CLAUDE.md line), which the classifier also refuses CC merging; his to merge.
 
 ### Questions out to him
 
 - Task 800: keep J-NE-S-3's equal override?
+- Task 681: the node shed's re-fits are what is left (~250 ms on n600); cheaper means changing the layout.
+- Task 802: retire the bottom-pane Scenarios tab now the flyout exists? `lpn_sm_help` still names the pane.
 
 ### Next job
 
-A sprint for the keys the
-branches add (plus the 12 plural rewordings). Wish lists: New junction without a canvas click (Declan,
-open design question), Number of services decimals (Mary).
+His browser pass over bentley-interop's 10-16 list, then its merge. Wish lists: New junction without a
+canvas click (Declan, open design question), Number of services decimals (Mary), a harness helper that
+starts a scenario from the UI (Perry).
+
+### Traps met 2026-10-16 (twenty-first session)
+
+- **A pipe hides a refusal.** `new_english_keys.php --write | tail` exits 0 when the generator REFUSED,
+  and the next `git add` committed a conflicted file. Never pipe a guard into tail inside an && chain.
+- **json.dumps on a hand-indented JSON reformats all of it.** Check `git diff --stat` before committing;
+  english-key-rulings.json and glossary.json round-trip only with indent=4, ensure_ascii False.
+- **The sprint brief's grep loop was mis-escaped** (`\$` in double quotes); agents fell back to python.
+- **A transliterated "halo" reads "hello"** in am, bn, hi, my. Read new loanwords back.
+- **The tip-door harness's "link's WORDS" check failed once under load** and passed 75/75 twice alone.
+- **The classifier refuses CC editing the gate files and settings** ("self-modification"), even on his
+  typed word; it allowed committing his own edit of them under his name but not merging that to master.
 
 ### Traps met 2026-10-15 (twentieth session)
 
