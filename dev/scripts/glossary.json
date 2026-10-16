@@ -4884,7 +4884,7 @@
                 "a short form meaning not available or no data"
             ],
             "context": "A results-table cell (mtc_not_applicable).",
-            "translation_notes": "[2026-10-16, sprint 1016 write-back] Harvested from each language's shipped mtc_not_applicable. tr changed from Y/D to Uygulanmaz by the orchestrator: Y/D is not a recognised Turkish abbreviation.",
+            "translation_notes": "[2026-10-15, sprint 1016 write-back] Harvested from each language's shipped mtc_not_applicable. tr changed from Y/D to Uygulanmaz by the orchestrator: Y/D is not a recognised Turkish abbreviation.",
             "translations": {
                 "en": "N/A",
                 "am": "አይመለከትም",

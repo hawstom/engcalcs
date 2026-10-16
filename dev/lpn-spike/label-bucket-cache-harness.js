@@ -192,7 +192,7 @@ const seq = runSequence();
 const A = seq[0].s;
 ok('the labels are drawn at the starting view (or nothing below means anything)', !L.labelsHidden() && seq[0].o.labels > 50,
 	seq[0].o.labels + ' labels drawn');
-// **THE STARTING BUCKET COSTS NOTHING** (Task 681, 2026-10-16): the zoom to it revived the labels
+// **THE STARTING BUCKET COSTS NOTHING** (Task 681, 2026-10-15): the zoom to it revived the labels
 // with a content pass AT THIS SCALE, so its settle banks the picture on screen instead of laying
 // it out a second time. "...every first visit is exactly the uncached pass" below still holds it to
 // the uncached answer.

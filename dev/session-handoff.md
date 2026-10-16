@@ -99,11 +99,11 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-16 (twenty-first session, Arizona time)
+## STATE — 2026-10-15 (twenty-first session, the evening, Arizona time)
 
 ### Master: see the pushed SHA in the last report. Production: b7c99102 (10-09) when last read; ask, About box
 
-Landed on master 2026-10-16: feat/stopped-series (808); his word calls on the 808 strings and the mode
+Landed on master 2026-10-15: feat/stopped-series (808); his word calls on the 808 strings and the mode
 prompts ("labels, and Text"); fix/mtc-vertical-sides (z = 0 side rock reads N/A, `mtc_not_applicable`);
 feat/plural (35 count strings in the "cells (n)" form); sprint 1016 (15 new, 44 resynced, 26 languages;
 `dev/english-friction/1016.json`; halo had been rendered "hello" in am bn hi my, fixed; tr N/A "Uygulanmaz");
@@ -143,7 +143,7 @@ His browser pass over bentley-interop's 10-16 list, then its merge. Wish lists: 
 canvas click (Declan, open design question), Number of services decimals (Mary), a harness helper that
 starts a scenario from the UI (Perry).
 
-### Traps met 2026-10-16 (twenty-first session)
+### Traps met 2026-10-15 (twenty-first session)
 
 - **A pipe hides a refusal.** `new_english_keys.php --write | tail` exits 0 when the generator REFUSED,
   and the next `git add` committed a conflicted file. Never pipe a guard into tail inside an && chain.
@@ -152,12 +152,14 @@ starts a scenario from the UI (Perry).
 - **The sprint brief's grep loop was mis-escaped** (`\$` in double quotes); agents fell back to python.
 - **A transliterated "halo" reads "hello"** in am, bn, hi, my. Read new loanwords back.
 - **The tip-door harness's "link's WORDS" check failed once under load** and passed 75/75 twice alone.
+- **CC dated the whole day 2026-10-16 from the session's date and PHP's UTC clock**; Arizona was still the
+  15th. Run `date` before writing any date; PHP scripts stamp UTC (english_string_hashes "updated").
 - **The classifier refuses CC editing the gate files and settings** ("self-modification"), even on his
   typed word; it allowed committing his own edit of them under his name but not merging that to master.
 
 ### Traps met 2026-10-15 (twentieth session)
 
-- **CC dated a whole batch 2026-10-16** (roadmap, glossary, handoff) from the date in a branch name. Use
+- **CC dated a whole batch 2026-10-15** (roadmap, glossary, handoff) from the date in a branch name. Use
   `date` in Arizona; the shell is on Phoenix time.
 - **A plural mechanism was built before he could say no**: he prefers "overrides (1)". Then the rewording
   agent changed 23 strings he had approved; check `english-key-rulings.json` before rewording English.
