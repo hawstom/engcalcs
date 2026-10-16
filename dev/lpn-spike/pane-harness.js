@@ -808,7 +808,7 @@ console.log('\n--- heading and cells share one alignment ---');
 	// `lpn-curve-table` kind rather than a layout of this section's own, and that the DESCRIPTION
 	// beside them is still on the shared wide field the Patterns section uses.
 	const curve = fnBody('buildCurveEntry');
-	report(/desc\.className = 'lpn-lib-wide'/.test(curve),
+	report(/desc\.className = 'lpn-lib-wide[ ']/.test(curve),
 		'the Libraries curve editor puts the description on the Patterns section\'s own wide field');
 	report(/libCurveGridTable\(entry, c, grid, labels\)/.test(curve),
 		'and the points are a grid, not a line of text');

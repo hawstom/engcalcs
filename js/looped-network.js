@@ -3113,18 +3113,14 @@ var EngCalcs = EngCalcs || {};
 			row.forEach(function (seg, j) {
 				// The run remembers its segments, so the shed pricing (noteRowWidths()) can still bank
 				// one width per segment without a tspan per segment.
-				if (!seg.decoration && plain) { plain.textContent += seg.text; plain.lpnSegs.push(seg.text); return; }
+				if (plain) { plain.textContent += seg.text; plain.lpnSegs.push(seg.text); return; }
 				// **dy IN `em`, NOT IN WORLD UNITS.** An em resolves against the element's own
 				// font-size, so line spacing follows a zoom by itself and the tspans never have to be
 				// rebuilt for one; in world units the attribute is stale the instant the scale
 				// changes. 1.2 is effectiveLineHeight()'s own multiple of the font size.
 				var tspan = el('tspan', j === 0 ? { x: x, dy: i === 0 ? (firstDy ? firstDy + 'em' : 0) : '1.2em' } : {}, textEl);
-				plain = seg.decoration ? null : tspan;
+				plain = tspan;
 				tspan.lpnSegs = [seg.text];
-				if (seg.decoration) {
-					tspan.setAttribute('text-decoration', seg.decoration === 'high' ? 'overline' : 'underline');
-					tspan.setAttribute('class', seg.decoration === 'high' ? 'lpn-max' : 'lpn-min');
-				}
 				tspan.textContent = seg.text;
 			});
 		});
@@ -3351,20 +3347,6 @@ var EngCalcs = EngCalcs || {};
 		if (defined.length < 3) { return null; }
 		return { min: Math.min.apply(null, defined), max: Math.max.apply(null, defined) };
 	}
-	// 'high'/'low', not a boolean -- every member of a tie is marked, not just the first found,
-	// since each element is judged independently against the same extrema.
-	function decorationFor(extrema, value) {
-		// Task 190's global toggle is enforced HERE, not by suppressing the extrema themselves: the
-		// extrema objects stay computed and correct, so turning the marks back on needs no recompute
-		// and nothing else that reads them can go stale while they are hidden.
-		if (!labelSettings.markExtrema) { return undefined; }
-		if (!extrema || typeof value !== 'number') { return undefined; }
-		if (value === extrema.max && value === extrema.min) { return undefined; }
-		if (value === extrema.max) { return 'high'; }
-		if (value === extrema.min) { return 'low'; }
-		return undefined;
-	}
-
 	// The document. nodes: Junction/Reservoir/Tank (point elements). links: Pipe/Pump (two
 	// endpoints + optional bend vertices). labels: Text elements with a leader to an
 	// anchor node (`anchorNode`), or to a station along a link (`anchorLink` + `anchorT`,
@@ -6011,10 +5993,6 @@ var EngCalcs = EngCalcs || {};
 			 */
 			show: t.show,
 			priority: t.priority,
-			// Whether a label's network-wide highest/lowest value gets its tick mark (Task 190).
-			// Global, not per field. Here rather than in `settings` because a label mark is a property
-			// of a label -- and, like the rest of labelSettings, a view preference kept out of `doc`.
-			markExtrema: true,
 			/**
 			 * **THE WIDEST VIEW THAT ATTEMPTS TO DISPLAY CUSTOMER LABELS**, in the project's own
 			 * length unit (Tom, 2026-09-18: *"Maybe we have a Setting for the widest view that
@@ -11868,7 +11846,7 @@ var EngCalcs = EngCalcs || {};
 		// The two identity strings, printed as the words they are. An absent one prints NOTHING
 		// rather than an empty slot: a blank where a description would be is a separator with no
 		// value beside it, which reads as a defect on every unlabelled service in the drawing.
-		if (ls.customer.desc && c.desc) { lines.push(affix('customer', 'desc', { text: String(c.desc) })); }
+		if (ls.customer.desc && c.desc) { lines.push(affix('customer', 'desc', { text: descLabelText(c.desc) })); }
 		if (ls.customer.tag && c.tag) { lines.push(affix('customer', 'tag', { text: String(c.tag) })); }
 		if (ls.customer.count) {
 			lines.push(affix('customer', 'count', { text: String((typeof c.count === 'number' && isFinite(c.count) && c.count > 0) ? c.count : 1) }));
@@ -22147,8 +22125,9 @@ var EngCalcs = EngCalcs || {};
 			// "Corner of Elm and Main" survives a bulk write -- and replaceValueOf() still refuses
 			// an empty box under either flag, because erasing a description on 400 assets must not
 			// be spelled the same way as leaving the box alone. The newline a paste could carry is
-			// refused by lpnDescText() at the write below, the one place that rule lives.
-			{ key: 'desc', group: 'any', field: 'desc', str: true,
+			// tidied by lpnDescText() at the write below, the one place that rule lives; the value box
+			// is one line, so "\P" in it is a line break, as in the Tables pane (replaceValueOf()).
+			{ key: 'desc', group: 'any', field: 'desc', str: true, multiline: true,
 				label: pc.lpn_field_desc || 'Description',
 				applies: function () { return true; },
 				get: function (el) { return el.desc || ''; },
@@ -22507,7 +22486,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			return undefined;
 		}
-		if (spec && spec.str) { return raw === '' ? undefined : raw; }
+		if (spec && spec.str) { return raw === '' ? undefined : (spec.multiline ? EngCalcs.lpnDescText(EngCalcs.lpnDescFromInline(raw)) : raw); }
 		if (spec && spec.text) {
 			v = EngCalcs.lpnTagText ? EngCalcs.lpnTagText(raw) : raw.split(/\s+/)[0] || '';
 			return v === '' ? undefined : v;
@@ -24352,9 +24331,9 @@ var EngCalcs = EngCalcs || {};
 	 * the column, and they are the two properties most likely to be pasted rather than typed.
 	 *
 	 * **BOTH SETTERS GO THROUGH THE SAME ONE-PLACE RULE THE POPUP USES**, so the two editors of one
-	 * property cannot disagree: `lpnDescText()` refuses the line break a trailing comment cannot
-	 * hold, `lpnTagText()` keeps the one word EPANET's reader stops at. A paste is where that
-	 * matters -- a spreadsheet cell really can carry a newline, and a popup field cannot.
+	 * property cannot disagree: `lpnDescText()` tidies a description's lines (the cell writes each
+	 * line break as "\P", see paneCellInputText()), `lpnTagText()` keeps the one word EPANET's
+	 * reader stops at.
 	 *
 	 * **NO `prop`**: neither is in LPN_OVERRIDABLE (see descField() and tagField()), so a plain
 	 * write is correct here in Base and in a scenario alike.
@@ -24364,7 +24343,7 @@ var EngCalcs = EngCalcs || {};
 	 * and no more; a tag is one token of somebody's asset register.
 	 */
 	function paneColDesc() {
-		return { key: 'desc', label: 'lpn_field_desc', str: true, em: 8,
+		return { key: 'desc', label: 'lpn_field_desc', str: true, multiline: true, em: 8,
 			get: function (el) { return el.desc || ''; },
 			set: function (el, v) {
 				var t = EngCalcs.lpnDescText ? EngCalcs.lpnDescText(v) : String(v || '').trim();
@@ -24841,7 +24820,7 @@ var EngCalcs = EngCalcs || {};
 			choices: function () {
 				var pc = EngCalcs.pageConfig || {},
 					out = [['', pc.lpn_pipetype_none || 'No pipe type chosen']];
-				libPipeTypesRead().forEach(function (t) { out.push([t.id, t.note ? (t.id + ' - ' + t.note) : t.id]); });
+				libPipeTypesRead().forEach(function (t) { out.push([t.id, t.note ? (t.id + ' - ' + EngCalcs.lpnDescOneLine(t.note)) : t.id]); });
 				return out;
 			},
 			get: function (l) { return effective(l, 'typeId') || ''; },
@@ -24852,7 +24831,7 @@ var EngCalcs = EngCalcs || {};
 			choices: function () {
 				var pc = EngCalcs.pageConfig || {},
 					out = [['', pc.lpn_fittings_none || 'No fittings list chosen']];
-				libFittingSetsRead().forEach(function (f) { out.push([f.id, f.note ? (f.id + ' - ' + f.note) : f.id]); });
+				libFittingSetsRead().forEach(function (f) { out.push([f.id, f.note ? (f.id + ' - ' + EngCalcs.lpnDescOneLine(f.note)) : f.id]); });
 				return out;
 			},
 			get: function (l) { return effective(l, 'fittingsId') || ''; },
@@ -25154,12 +25133,12 @@ var EngCalcs = EngCalcs || {};
 				} },
 			// **THE DESCRIPTION AND THE TAG, IN PLACE OF THE ACCOUNT NUMBER** (Tom, 2026-09-19). The
 			// same two cells `paneColDesc()` and `paneColTag()` build for a node and a link, through
-			// the same two one-place rules -- `lpnDescText()` refuses the line break a trailing
-			// comment cannot hold, `lpnTagText()` keeps the one word EPANET's reader stops at.
+			// the same two one-place rules -- `lpnDescText()` tidies a description's lines,
+			// `lpnTagText()` keeps the one word EPANET's reader stops at.
 			// Written out here rather than borrowed because a customer's every write goes through
 			// `customerEdited()`, which redraws the symbol and re-solves, and neither borrowed cell
 			// knows that.
-			{ key: 'desc', label: 'lpn_field_desc', str: true, em: 8,
+			{ key: 'desc', label: 'lpn_field_desc', str: true, multiline: true, em: 8,
 				get: function (c) { return c.desc || ''; },
 				set: function (c, v) {
 					var t = EngCalcs.lpnDescText ? EngCalcs.lpnDescText(v) : String(v || '').trim();
@@ -26139,7 +26118,7 @@ var EngCalcs = EngCalcs || {};
 				if (!panePresent(v) || v === '') { continue; }
 				text = Object.prototype.hasOwnProperty.call(choiceMap, v) ? choiceMap[v] : String(v);
 			} else {
-				text = paneCellText(c, el);
+				text = paneCellInputText(c, el);
 			}
 			if (!text) { continue; }
 			best = Math.max(best, (c.choices && !plain) ? paneSelBoxEm(text)
@@ -26794,6 +26773,27 @@ var EngCalcs = EngCalcs || {};
 	// coordinates, whose axis follows the kind of project and is therefore a function (paneColCoord).
 	// One reader, so a cell edit, a paste and a multi-properties row cannot disagree about it.
 	function paneColProp(c) { return c.prop || (c.propFn ? c.propFn() : undefined); }
+	/**
+	 * **A MULTI-LINE CELL SHOWS THE WHOLE TEXT ON ONE LINE, EACH LINE BREAK AS "\P"** (Task 806;
+	 * Tom, 2026-10-16: *"Let's follow whatever we do above. Maybe " \P ", since it's both intuitive,
+	 * and it's what Autodesk historically used in Dimensions."*, then *"Change it from " \P " to
+	 * "\P"."*). A text `<input>` cannot hold a line
+	 * break, so a Description goes into it as the .inp writes it (EngCalcs.lpnDescInline()), is edited
+	 * whole, and paneParseCellText() turns each "\P" back into a line break. Every door that hands
+	 * cell text to that reader -- the box, a copy, a fill, the multi-properties box -- reads it from
+	 * here, so they all speak the one convention. The tip shows the lines as lines.
+	 */
+	function paneCellInputText(c, el) {
+		var t = paneCellText(c, el);
+		return c.multiline ? EngCalcs.lpnDescInline(t) : t;
+	}
+	function paneCellTip(input, c, el) {
+		var full;
+		if (!c.multiline) { return; }
+		full = paneCellText(c, el);
+		input.title = full.indexOf('\n') >= 0 ? full : '';
+		input.dataset.ecTipLines = '1';
+	}
 	function paneCellText(c, el) {
 		// **THE PER-ROW PLAIN WORD COMES FIRST**, because a column that is plain for THIS row is a
 		// column whose stored value is not the answer: see paneTextAttachedWord(). One function
@@ -26862,7 +26862,8 @@ var EngCalcs = EngCalcs || {};
 			// leaves the reference out and says so, instead of refusing the whole paste.
 			return { ok: !!c.lenient || c.choices().some(function (o) { return o[0] === t; }), v: t };
 		}
-		if (c.str) { return { ok: true, v: t }; }
+		// A Description reads its "\P" back as a line break (paneCellInputText()).
+		if (c.str) { return { ok: true, v: c.multiline ? EngCalcs.lpnDescFromInline(t) : t }; }
 		if (t !== '' && !isFinite(+t)) { return { ok: false }; }
 		return { ok: true, v: (c.blank && t === '') ? undefined : +t };
 	}
@@ -27713,7 +27714,8 @@ var EngCalcs = EngCalcs || {};
 				// a flag alone would leave the browser still moving a caret underneath it.
 				input.readOnly = true;
 				paneApplyColWidth(input, c, spec);
-				input.value = paneCellText(c, el);
+				input.value = paneCellInputText(c, el);
+				paneCellTip(input, c, el);
 				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + paneRowLabel(el));
 				input._lpnCell = { spec: spec, c: c, el: el };
 				input.addEventListener('change', function () { paneCommitCell(input); });
@@ -27828,8 +27830,9 @@ var EngCalcs = EngCalcs || {};
 					// with the caret in it, which was the same thing when focus WAS editing; now a
 					// person can sit on a cell for a minute without typing, and a solve that
 					// refused to refresh it would leave one stale number in a live table.
-					text = paneCellText(c, el);
+					text = paneCellInputText(c, el);
 					if (target.value !== text) { target.value = text; }
+					paneCellTip(target, c, el);
 					if (c.cp) { customPropPaintFlag(target, c.cp, target.value); }
 				}
 				// After the write: a plain cell's textContent just took its children with it.
@@ -28265,7 +28268,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		for (r = box.r0; r <= box.r1; r++) {
 			line = [];
-			for (c = box.c0; c <= box.c1; c++) { line.push(paneQuoteCell(paneCellText(cols[c], rows[r]))); }
+			for (c = box.c0; c <= box.c1; c++) { line.push(paneQuoteCell(paneCellInputText(cols[c], rows[r]))); }
 			out.push(line.join('\t'));
 		}
 		return out.join('\n');
@@ -28390,7 +28393,7 @@ var EngCalcs = EngCalcs || {};
 	function paneCancelEdit(input) {
 		var ctx = input && input._lpnCell;
 		if (!ctx || !paneInEdit(input)) { return false; }
-		input.value = (input._lpnWas !== undefined) ? input._lpnWas : paneCellText(ctx.c, ctx.el);
+		input.value = (input._lpnWas !== undefined) ? input._lpnWas : paneCellInputText(ctx.c, ctx.el);
 		paneLeaveEdit(input);
 		return true;
 	}
@@ -28411,7 +28414,7 @@ var EngCalcs = EngCalcs || {};
 		// A checkbox cell carries its answer in `checked`; every other cell in its text.
 		p = paneParseCellText(c, (c.bool && input.type === 'checkbox') ? (input.checked ? '1' : '0') : input.value);
 		if (!p.ok) {
-			input.value = paneCellText(c, el);
+			input.value = paneCellInputText(c, el);
 			paneLeaveEdit(input);
 			return false;
 		}
@@ -28432,7 +28435,7 @@ var EngCalcs = EngCalcs || {};
 		 * PARSED values rather than as text, so "42.0" typed over a stored 42 is the no-change it
 		 * looks like.
 		 */
-		was = paneParseCellText(c, paneCellText(c, el));
+		was = paneParseCellText(c, paneCellInputText(c, el));
 		// **ONE CANVAS MEASUREMENT FOR THE WHOLE COMMIT, SNAPSHOT INCLUDED** (Task 690). The
 		// snapshot records the camera, which means it reads the canvas -- and it is taken between
 		// the previous keystroke's drawing writes and this one's, which is the worst possible
@@ -28454,7 +28457,8 @@ var EngCalcs = EngCalcs || {};
 		// location is snapped onto its own pipe. In both cases the document and the box would
 		// otherwise disagree until the next solve, with the box showing the version that was not
 		// kept -- which is the reading a person would act on.
-		if (c.reread) { input.value = paneCellText(c, el); paneApplyHint(input, c, el); }
+		if (c.reread) { input.value = paneCellInputText(c, el); paneApplyHint(input, c, el); }
+		paneCellTip(input, c, el);
 		// A Show scenarios row ends on its ELEMENT, redrawn for the scenario actually showing.
 		el = paneRowEl(el);
 		completeEdit(paneColProp(c) ? { el: el, prop: paneColProp(c) } : null);
@@ -29047,7 +29051,7 @@ var EngCalcs = EngCalcs || {};
 		for (c = box.c0; c <= box.c1; c++) {
 			col = cols[c];
 			if (col.key === 'id') { continue; }
-			text = paneCellText(col, rows[box.r0]);
+			text = paneCellInputText(col, rows[box.r0]);
 			for (r = box.r0 + 1; r <= box.r1; r++) {
 				el = rows[r];
 				if (paneWriteCellText(spec, col, el, text)) { wrote++; } else { refused++; }
@@ -29110,7 +29114,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		saveUndoSnapshot();
 		if (pendingCommit) { paneCommitCell(pendingCommit, { noSnapshot: true }); }
-		text = paneCellText(cols[box.ac], anchorEl);
+		text = paneCellInputText(cols[box.ac], anchorEl);
 		for (r = box.r0; r <= box.r1; r++) {
 			for (c = box.c0; c <= box.c1; c++) {
 				if (r === box.ar && c === box.ac) { continue; }
@@ -29297,7 +29301,7 @@ var EngCalcs = EngCalcs || {};
 				if (col.key === 'id') { refused++; continue; }
 				pr = rowExtend ? (((r - srcBox.r0) % srcRowsN) + srcRowsN) % srcRowsN : (r - srcBox.r0);
 				pc2 = rowExtend ? (c - srcBox.c0) : (((c - srcBox.c0) % srcColsN) + srcColsN) % srcColsN;
-				text = paneCellText(cols[srcBox.c0 + pc2], rows[srcBox.r0 + pr]);
+				text = paneCellInputText(cols[srcBox.c0 + pc2], rows[srcBox.r0 + pr]);
 				if (paneWriteCellText(spec, col, el, text)) { wrote++; } else { refused++; }
 			}
 		}
@@ -36894,7 +36898,7 @@ var EngCalcs = EngCalcs || {};
 		// that save comes back undefined instead of at its default.
 		// Groups named explicitly rather than looped over Object.keys(labelSettings): the object is
 		// no longer uniformly two flat sub-objects -- `decimals` is nested a level deeper and
-		// `markExtrema` is a bare boolean, which Object.assign() onto a primitive silently discards.
+		// some members are bare scalars, which Object.assign() onto a primitive silently discards.
 
 		labelSettings = defaultLabelSettings();
 		// Back to the shipped baseline with it, or a roughness count merged in from the file
@@ -36959,11 +36963,10 @@ var EngCalcs = EngCalcs || {};
 				});
 			});
 		}
-		// A bare string, so it takes the same guarded assignment markExtrema does. An EMPTY string
+		// A bare string, so it takes a guarded assignment. An EMPTY string
 		// is a real setting ("Q12.5", no gap) and must survive this, which is why the test is on the
 		// type and not on truthiness.
 		if (typeof savedLS.separator === 'string') { labelSettings.separator = savedLS.separator; }
-		if (typeof savedLS.markExtrema === 'boolean') { labelSettings.markExtrema = savedLS.markExtrema; }
 		// A number, and ZERO IS A REAL ANSWER here ("never label a customer"), so this is a type
 		// test and never a truthiness one -- `savedLS.customerMaxWidth || default` would silently
 		// turn the one setting that says NEVER back into the default. **NULL IS ALSO A REAL ANSWER**
@@ -39195,6 +39198,9 @@ var EngCalcs = EngCalcs || {};
 		if (!t) { return dst; }
 		for (k in t) {
 			if (!Object.prototype.hasOwnProperty.call(t, k)) { continue; }
+			// A Description's own spelling (EngCalcs.lpnDescTokSet()) is text, not a number; the
+			// writer checks it still says the description (lpnDescInlineOf()), so it rides as is.
+			if (k === 'desc') { if (typeof t[k] === 'string') { (out || (out = {})).desc = t[k]; } continue; }
 			dk = map[k];
 			if (!dk || parseFloat(t[k]) !== dst[dk]) { continue; }
 			(out || (out = {}))[dk] = t[k];
@@ -52323,16 +52329,6 @@ var EngCalcs = EngCalcs || {};
 		// blanket separator and individual prefixes and postfixes, of course").
 		if (optBox) {
 			optBox.innerHTML = '';
-			// **THE LABEL STAYS SHORT AND THE TIP CARRIES THE CONVENTION** (Tom's own rule from the
-			// same review: "we should have a shorter label with a tip ... this length goes beyond real
-			// estate issues to attention/clutter issues"). His "Mark highest (overline) and lowest
-			// (underline) values" would have made the words findable by lengthening the label, which
-			// is the move he asked to stop making everywhere else in this box -- and it would still
-			// not have told a reader which mark they were looking at. The tip does both: the search
-			// matches it, and somebody who sees an overlined number on the map can look it up.
-			labelCheckbox(optBox, pc.lpn_labels_mark_extrema || 'Mark highest and lowest values',
-				labelSettings.markExtrema, function (v) { labelSettings.markExtrema = v; },
-				null, null, null, pc.lpn_labels_mark_extrema_tip);
 			var sepRow = document.createElement('div'), sepLabel = document.createElement('span');
 			sepRow.style.display = 'flex'; sepRow.style.alignItems = 'baseline'; sepRow.style.gap = '6px';
 			sepLabel.textContent = pc.lpn_labels_separator || 'Text between values';
@@ -58093,11 +58089,10 @@ var EngCalcs = EngCalcs || {};
 	function libDescField(get, set) {
 		var pc = EngCalcs.pageConfig || {},
 			field = libEl('label', 'lpn-lib-field lpn-lib-field-grow'),
-			desc = document.createElement('input'),
+			desc = descTextarea(),
 			word = pc.lpn_library_curve_note_label || 'Description';
 		field.appendChild(libEl('span', 'lpn-lib-fieldname', word));
-		desc.type = 'text';
-		desc.className = 'lpn-lib-wide lpn-lib-desc';
+		desc.className = 'lpn-lib-wide lpn-lib-desc lpn-desc-ta';
 		desc.value = get();
 		desc.setAttribute('aria-label', word);
 		desc.addEventListener('change', function () {
@@ -58973,7 +58968,7 @@ var EngCalcs = EngCalcs || {};
 			headRow = libEl('div', 'lpn-lib-head lpn-lib-row'),
 			propRow = libEl('div', 'lpn-lib-row'),
 			id = document.createElement('input'),
-			desc = document.createElement('input'),
+			desc = descTextarea(),
 			idField = libEl('label', 'lpn-lib-field'),
 			descField = libEl('label', 'lpn-lib-field lpn-lib-field-grow'),
 			users = pipeTypeUsers(t.id),
@@ -58997,12 +58992,11 @@ var EngCalcs = EngCalcs || {};
 		// is how such a table is keyed (dev/pipe-library-design.md §2).
 		descField.appendChild(libEl('span', 'lpn-lib-fieldname',
 			pc.lpn_library_curve_note_label || 'Description'));
-		desc.type = 'text';
-		desc.className = 'lpn-lib-wide';
+		desc.className = 'lpn-lib-wide lpn-desc-ta';
 		desc.value = t.note || '';
 		desc.setAttribute('aria-label', pc.lpn_library_curve_note_label || 'Description');
 		desc.addEventListener('change', function () {
-			var s = String(desc.value || '').trim();
+			var s = EngCalcs.lpnDescText(desc.value);
 			if (s === (t.note || '')) { return; }
 			saveUndoSnapshot();
 			if (s) { t.note = s; } else { delete t.note; }
@@ -59097,7 +59091,7 @@ var EngCalcs = EngCalcs || {};
 		libFittingSetsRead().forEach(function (f) {
 			var o = document.createElement('option');
 			o.value = f.id;
-			o.textContent = f.note ? (f.id + ' - ' + f.note) : f.id;
+			o.textContent = f.note ? (f.id + ' - ' + EngCalcs.lpnDescOneLine(f.note)) : f.id;
 			if (f.id === cur) { o.selected = true; found = true; }
 			sel.appendChild(o);
 		});
@@ -59235,7 +59229,7 @@ var EngCalcs = EngCalcs || {};
 			entry = libEl('div', 'lpn-lib-entry'),
 			headRow = libEl('div', 'lpn-lib-head lpn-lib-row'),
 			id = document.createElement('input'),
-			desc = document.createElement('input'),
+			desc = descTextarea(),
 			idField = libEl('label', 'lpn-lib-field'),
 			descField = libEl('label', 'lpn-lib-field lpn-lib-field-grow'),
 			users = fittingSetUsers(set.id),
@@ -59257,12 +59251,11 @@ var EngCalcs = EngCalcs || {};
 		headRow.appendChild(idField);
 		descField.appendChild(libEl('span', 'lpn-lib-fieldname',
 			pc.lpn_library_curve_note_label || 'Description'));
-		desc.type = 'text';
-		desc.className = 'lpn-lib-wide';
+		desc.className = 'lpn-lib-wide lpn-desc-ta';
 		desc.value = set.note || '';
 		desc.setAttribute('aria-label', pc.lpn_library_curve_note_label || 'Description');
 		desc.addEventListener('change', function () {
-			var t = String(desc.value || '').trim();
+			var t = EngCalcs.lpnDescText(desc.value);
 			if (t === (set.note || '')) { return; }
 			saveUndoSnapshot();
 			if (t) { set.note = t; } else { delete set.note; }
@@ -59412,7 +59405,7 @@ var EngCalcs = EngCalcs || {};
 			typeRow = libEl('div', 'lpn-lib-curve-row'),
 			id = document.createElement('input'),
 			kindSel = document.createElement('select'),
-			desc = document.createElement('input'),
+			desc = descTextarea(),
 			idField = libEl('label', 'lpn-lib-field'),
 			descField = libEl('label', 'lpn-lib-field lpn-lib-field-grow'),
 			kindField = libEl('label', 'lpn-lib-field'),
@@ -59453,12 +59446,11 @@ var EngCalcs = EngCalcs || {};
 		// unreadable by the person who wrote it.
 		descField.appendChild(libEl('span', 'lpn-lib-fieldname',
 			pc.lpn_library_curve_note_label || 'Description'));
-		desc.type = 'text';
-		desc.className = 'lpn-lib-wide';
+		desc.className = 'lpn-lib-wide lpn-desc-ta';
 		desc.value = c.note || '';
 		desc.setAttribute('aria-label', pc.lpn_library_curve_note_label || 'Description');
 		desc.addEventListener('change', function () {
-			var t = String(desc.value || '').trim();
+			var t = EngCalcs.lpnDescText(desc.value);
 			if (t === (c.note || '')) { return; }
 			saveUndoSnapshot();
 			if (t) { c.note = t; } else { delete c.note; }
@@ -60095,9 +60087,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function libRuleBody(lines, e) { return lines.slice(e.start, e.end); }
 	function libRuleDesc(lines, e) {
-		return lines.slice(e.descStart, e.start).map(function (s) {
-			return EngCalcs.lpnDescText(String(s).replace(/^\s*;/, ''));
-		}).filter(Boolean).join(' ');
+		return EngCalcs.lpnInpDescFromLines(lines.slice(e.descStart, e.start));
 	}
 	// The whole `[RULES]` text with lines [from, to) replaced by `put`.
 	function libRulesSplice(from, to, put) {
@@ -60189,7 +60179,8 @@ var EngCalcs = EngCalcs || {};
 					var cur = now(i);
 					if (!cur) { return; }
 					// Several comment lines become the one line the box shows: the curve's `src` rule.
-					doc.rules = libRulesSplice(cur.descStart, cur.start, t ? [';' + t] : []);
+					// A line break goes on that one line as "\P", as everywhere in an .inp.
+					doc.rules = libRulesSplice(cur.descStart, cur.start, t ? [';' + EngCalcs.lpnDescInline(t)] : []);
 				}));
 				entry.appendChild(descRow);
 			}
@@ -63026,7 +63017,8 @@ var EngCalcs = EngCalcs || {};
 			// The DESCRIPTION, in the column the account number used to hold (Tom, 2026-09-19). It
 			// is the wider of the two identity fields a customer now carries and the one a sentence
 			// goes in, so it is what tells two services on one junction apart at a glance.
-			descCell.textContent = c.desc || '';
+			descCell.textContent = descLabelText(c.desc);
+			if (descLabelText(c.desc) !== (c.desc || '')) { descCell.title = c.desc; }
 			demCell.textContent = (typeof flow === 'number' && isFinite(flow)) ? String(+flow.toFixed(6)) : '';
 			tr.appendChild(idCell); tr.appendChild(descCell); tr.appendChild(demCell);
 			tbody.appendChild(tr);
@@ -63251,7 +63243,7 @@ var EngCalcs = EngCalcs || {};
 		libPipeTypesRead().forEach(function (t) {
 			var o = document.createElement('option');
 			o.value = t.id;
-			o.textContent = t.note ? (t.id + ' - ' + t.note) : t.id;
+			o.textContent = t.note ? (t.id + ' - ' + EngCalcs.lpnDescOneLine(t.note)) : t.id;
 			if (t.id === cur) { o.selected = true; }
 			sel.appendChild(o);
 		});
@@ -63399,12 +63391,9 @@ var EngCalcs = EngCalcs || {};
 	 * or the reverse is exactly the inconsistency he called embarrassing. Making both overridable is
 	 * a one-line change at each of two write sites if he rules that way.
 	 *
-	 * **FREE TEXT, AND ONLY THE LINE BREAK IS REFUSED** -- unlike the tag beside it, which EPANET
-	 * truncates at the first space. A trailing comment runs to the end of its line, so a `;` inside
-	 * a description round-trips exactly and so does a tab; a newline cannot be written as one at all.
-	 * `lpnDescText()` states that in the one place the exporter reads it from, exactly as
-	 * `lpnTagText()` does for the space, and it is applied on `input` so the rule is visible at the
-	 * moment somebody pastes a paragraph in rather than after they have looked away.
+	 * **FREE TEXT, LINES AND PARAGRAPHS INCLUDED** (Task 806). Stored with `\n`. An .inp holds one
+	 * line as a trailing comment, so a description of several lines goes out on that one line with
+	 * each line break as "\P"; see `lpnDescText()`.
 	 */
 	// `after` is the one thing a CUSTOMER needs that a node and a link do not: every write to a
 	// customer goes through customerEdited(), which redraws its symbol and its label and re-solves.
@@ -63420,20 +63409,48 @@ var EngCalcs = EngCalcs || {};
 		refreshPaneIfOpen();
 		scheduleSave();
 	}
+	/**
+	 * **A DESCRIPTION BOX IS A TEXTAREA THAT GROWS** (Task 806; Tom, 2026-10-15: *"all Description
+	 * fields should allow multiple lines and paragraphs like most software to allow internal
+	 * documentation"*). One row at rest so it looks like the line it was; Enter types a newline, which
+	 * is what a textarea does and what makes a paragraph possible; Ctrl+Enter leaves the box and
+	 * commits, and Tab moves on, so keyboard entry down a form is as fast as it was. The one helper
+	 * serves the Properties box, the Library's descriptions and any later one.
+	 */
+	function descGrow(ta) {
+		if (typeof ta.getClientRects !== 'function' || !ta.getClientRects().length) { return; }
+		ta.style.height = 'auto';
+		if (ta.scrollHeight > ta.clientHeight) {
+			ta.style.height = (ta.scrollHeight + ta.offsetHeight - ta.clientHeight) + 'px';
+		}
+	}
+	function descTextarea() {
+		var ta = document.createElement('textarea');
+		ta.rows = 1;
+		ta.className = 'lpn-desc-ta';
+		ta.addEventListener('input', function () { descGrow(ta); });
+		ta.addEventListener('focus', function () { descGrow(ta); });
+		ta.addEventListener('keydown', function (e) {
+			if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+				e.preventDefault();
+				ta.blur();
+			}
+		});
+		// Sized once it is in the document, where its width (and so its wrapping) is known.
+		if (typeof requestAnimationFrame === 'function') { requestAnimationFrame(function () { descGrow(ta); }); }
+		return ta;
+	}
 	function descField(fields, el, after) {
 		var pc = EngCalcs.pageConfig || {},
 			label = document.createElement('label'),
-			input = document.createElement('input');
-		input.type = 'text';
+			input = descTextarea();
 		input.value = el.desc || '';
 		// **THE BOX IS NEVER REWRITTEN WHILE SOMEBODY IS TYPING** (Task 774; Tom, 2026-10-06: *"it
-		// first wouldn't accept a space"*). This used to put the trimmed text back into the box on
-		// every keystroke, so a space typed after a word was trimmed away at once -- "Corner of Elm"
-		// came out "CornerofElm". Only the stored value is trimmed (the file cannot hold a leading
-		// or trailing space); the box is tidied on `change`, when the field is being left.
+		// first wouldn't accept a space"*). Only the stored value is trimmed (the file cannot hold a
+		// leading or trailing space); the box is tidied on `change`, when the field is being left.
 		function commit(tidy) {
-			var t = EngCalcs.lpnDescText ? EngCalcs.lpnDescText(input.value) : String(input.value || '').trim();
-			if (tidy && input.value !== t) { input.value = t; }
+			var t = EngCalcs.lpnDescText(input.value);
+			if (tidy && input.value !== t) { input.value = t; descGrow(input); }
 			if (t === (el.desc || '')) { return; }
 			saveUndoSnapshot();
 			if (t) { el.desc = t; } else { delete el.desc; }   // base-write: a description is identity, not an overridable property -- see this function's own note
@@ -63442,12 +63459,7 @@ var EngCalcs = EngCalcs || {};
 			// landed in the document and nowhere anybody could see it until the project was reopened.
 			if (after) { after(); } else { identityEdited(el); }
 		}
-		input.addEventListener('input', function () {
-			// A pasted line break is the one thing the box itself refuses as it lands (collapsed to a
-			// space, nothing trimmed); the rest of the tidy waits for `change`.
-			if (/[\r\n]/.test(input.value)) { input.value = input.value.replace(/[\r\n]+/g, ' '); }
-			commit(false);
-		});
+		input.addEventListener('input', function () { commit(false); });
 		// `change` as well, for the reason the tag's does: a field can lose focus without ever firing
 		// `input` -- a value restored by the browser, or an autofill.
 		input.addEventListener('change', function () { commit(true); refreshPopupIfOpen(); });
@@ -63947,7 +63959,7 @@ var EngCalcs = EngCalcs || {};
 	function multiCommonText(c, els) {
 		var first = null, i, t;
 		for (i = 0; i < els.length; i++) {
-			t = paneCellText(c, els[i]);
+			t = paneCellInputText(c, els[i]);
 			if (i === 0) { first = t; } else if (t !== first) { return undefined; }
 		}
 		return first;
@@ -67233,7 +67245,7 @@ var EngCalcs = EngCalcs || {};
 		line.field = field;
 		line.parts = [];
 		if (p) { line.parts.push({ text: p }); }
-		line.parts.push({ text: line.text, decoration: line.decoration });
+		line.parts.push({ text: line.text });
 		if (s) { line.parts.push({ text: s }); }
 		line.text = p + line.text + s;
 		return line;
@@ -67302,7 +67314,7 @@ var EngCalcs = EngCalcs || {};
 	// own suffix lands outside this one, and extrema compare the NUMBER, so neither affects ticks.
 	function numLine(siValue, unitId, extrema, decimals, suffix) {
 		var displayValue = displayRound(siValue, unitId, decimals);
-		return { text: displayValue.toFixed(fieldDecimals(decimals)) + (suffix || ''), decoration: decorationFor(extrema, displayValue) };
+		return { text: displayValue.toFixed(fieldDecimals(decimals)) + (suffix || ''), };
 	}
 	// Length is declarative, not SI-converted (see the lengthField() comment above: "1 grid unit IS
 	// 1 ft or 1 m, whichever is currently selected, by declaration") -- unlike every other field
@@ -67310,12 +67322,12 @@ var EngCalcs = EngCalcs || {};
 	// unitFactor.
 	function rawLine(value, extrema, decimals) {
 		var displayValue = plainRound(value, decimals);
-		return { text: displayValue.toFixed(fieldDecimals(decimals)), decoration: decorationFor(extrema, displayValue) };
+		return { text: displayValue.toFixed(fieldDecimals(decimals)), };
 	}
 	// Rebuilds every node's and link's map-label text from `labelSettings` + `lastSolveResult`.
 	// Extrema are computed ONCE per field, network-wide, before any label is built, so every
 	// element's decoration is judged against the same snapshot (Tom: ties all get marked, not just
-	// the first one found -- decorationFor() already does this per element).
+	// the first one found -- each element is judged on its own).
 	// The whole content pass reads the canvas box through mapSpan() (label repeat spacing, the
 	// visibility threshold), so it holds ONE measurement for its duration -- see mapBox(). A wrapper
 	// rather than a try/finally around 200 lines, so the pass itself reads exactly as it did.
@@ -67396,6 +67408,12 @@ var EngCalcs = EngCalcs || {};
 	// single-label refresh and the hover card all read their lines from here, so they cannot come to
 	// print different things. `ls` is the label settings to read; `extrema` is the network-wide high/low table, or null for no marks. Returns the lines
 	// in show order, possibly none: the empty placeholder is the caller's business.
+	// **A MAP LABEL HAS ROOM FOR ONE LINE OF A DESCRIPTION** (Task 806): the first, with an ellipsis
+	// when the text has more. The whole text is in Properties and the Tables pane's tip.
+	function descLabelText(d) {
+		var t = EngCalcs.lpnDescText(d), first = t.split('\n')[0];
+		return t.length > first.length ? first + ' \u2026' : first;
+	}
 	function nodeLabelFieldLines(n, ls, extrema) {
 		var nd = ls.decimals.node, ex = extrema || {}, lines = [];
 			// Order (Tom, 2026-07-30, thinking physically): ID, Demand, Head, Pressure, Elevation --
@@ -67405,7 +67423,7 @@ var EngCalcs = EngCalcs || {};
 			// **THE TWO IDENTITY WORDS** (Tom's table, R-327), printed as the words they are and only
 			// where one is stated -- a customer's own rule (customerLabelLines()): a blank slot where
 			// a description would be reads as a defect on every node that has none.
-			if (ls.node.desc && n.desc) { lines.push(affix('node', 'desc', { text: String(n.desc) })); }
+			if (ls.node.desc && n.desc) { lines.push(affix('node', 'desc', { text: descLabelText(n.desc) })); }
 			if (ls.node.tag && n.tag) { lines.push(affix('node', 'tag', { text: String(n.tag) })); }
 			// **DEMAND FIRST, BASE DEMAND UNDER IT.** Two quantities and two rows -- see
 			// resolvedDemand(). rawLine() for both: neither number ever crossed into SI.
@@ -67456,7 +67474,7 @@ var EngCalcs = EngCalcs || {};
 	function linkLabelFieldLines(l, ls, extrema) {
 		var ld = ls.decimals.link, ex = extrema || {}, lines = [];
 			if (ls.link.id) { lines.push(affix('link', 'id', { text: l.id })); }
-			if (ls.link.desc && l.desc) { lines.push(affix('link', 'desc', { text: String(l.desc) })); }
+			if (ls.link.desc && l.desc) { lines.push(affix('link', 'desc', { text: descLabelText(l.desc) })); }
 			if (ls.link.tag && l.tag) { lines.push(affix('link', 'tag', { text: String(l.tag) })); }
 			// **THE STATUS THE DOCUMENT STATES, BEFORE ANY RUN** (Tom's table, R-327: "Initial
 			// status"), beside the Status row below, which is the run's answer where there is one.

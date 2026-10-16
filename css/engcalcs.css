@@ -5633,3 +5633,14 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 .lpn-hovercard-anchor { position: fixed; width: 1px; height: 1px; pointer-events: none; }
 .tooltip.lpn-hovercard { pointer-events: none; }
 .tooltip.lpn-hovercard .tooltip-inner { text-align: left; }
+
+/* A DESCRIPTION IS A TEXTAREA THAT GROWS (Task 806). One row at rest so it reads as the line it
+   was; descGrow() in js/looped-network.js sets the height to the text. No scrollbar and no manual
+   handle, because the height follows the words. */
+textarea.lpn-desc-ta {
+	display: inline-block; vertical-align: top; max-width: 100%; box-sizing: border-box; min-height: 0;
+	resize: none; overflow: hidden;
+	font-family: inherit; font-size: inherit; line-height: 1.3; padding: 2px 4px;
+}
+/* A name tip that keeps its text's line breaks (data-ec-tip-lines: a multi-line Description). */
+.tooltip.ec-tip-lines .tooltip-inner { white-space: pre-line; text-align: start; max-width: 28em; }

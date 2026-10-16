@@ -20,8 +20,8 @@
 //   4. THE SHAPE FOLLOWS THE DRAG. One line normally, a stack once the user has placed the label.
 //      This is the assertion that a future collision or layout change is most likely to break
 //      without noticing, because both shapes look deliberate on screen.
-//   5. THE EXTREMA MARK IS THE SEGMENT'S OWN text-decoration, and it must land on the NUMBER
-//      segment -- never on the separator beside it, and never on a label whose value only ties.
+//   5. THE EXTREMA MARK IS RETIRED (see retire-mark-extrema-harness.js): no segment carries a
+//      text-decoration any more.
 
 const { ROOT, setUnitSet, loadLoopedNetwork, settleEpanet } = require('./lpn-dom-stub.js');
 const { EXAMPLE_EXPORTS, openExample } = require('./example-fixture.js');
@@ -233,82 +233,18 @@ ok('...each row being one whole value, however many segments that takes',
 delete P.lx; delete P.ly;
 ok('sending it home returns it to one line', showThree().length === 1);
 
-console.log('\n=== the extrema mark is the number\'s own text-decoration ===');
-Object.keys(ls.link).forEach(function (k) { ls.link[k] = (k === 'flow'); });
+console.log('\n=== the retired extrema tick draws nowhere ===');
+Object.keys(ls.link).forEach(function (k) { ls.link[k] = (k === 'id' || k === 'flow'); });
 Object.keys(ls.node).forEach(function (k) { ls.node[k] = (k === 'demand'); });
 L.refreshLabelText();
+ok('no node label line carries a decoration',
+	doc.nodes.every(function (n) { return L.nodeDecor(n.id).every(function (d) { return !d; }); }));
+ok('no link label line carries a decoration',
+	doc.links.every(function (l) { return L.linkDecor(l.id).every(function (d) { return !d; }); }));
+ok('and no label segment is drawn with a text-decoration',
+	doc.links.every(function (l) { return L.linkTspans(l.id).every(function (t) { return !t.dec; }); }));
 
-// DEMAND AND FLOW ARE JUDGED SEPARATELY, decided twice (2026-08-15: pooled in the morning at Tom's
-// request, reverted in the afternoon once the report behind it turned out to be a misreading). They
-// share the Q= prefix, which makes pooling them look obviously right, so this asserts the split
-// directly rather than leaving it to a comment.
-//
-// The reason it must stay split: a pooled Q can only ever be answered by a LINK, because a source
-// carries the sum of every demand downstream of it -- so "which junction draws the most" would stop
-// being answerable at all. That is exactly what this checks: the biggest demand is marked even
-// though a link carries more.
-const nodeQ = doc.nodes.filter(function (n) { return n.type === 'junction'; })
-	// Strip whatever prefix the field carries rather than a fixed number of characters -- this read
-	// slice(2) until base demand became 'Qb='.
-	.map(function (n) { return { id: n.id, v: parseFloat(L.nodeLabel(n.id)[0].replace(/^[^-\d.]*/, '')), dec: L.nodeDecor(n.id)[0] }; })
-	.filter(function (e) { return isFinite(e.v); });
-const linkQ = doc.links
-	.map(function (l) { return { id: l.id, v: parseFloat(L.linkLabel(l.id)[0].replace(/^[^-\d.]*/, '')), dec: L.linkDecor(l.id)[0] }; })
-	.filter(function (e) { return isFinite(e.v); });
-ok('both kinds of Q are on the drawing at once', nodeQ.length > 0 && linkQ.length > 0,
-	nodeQ.length + ' demands, ' + linkQ.length + ' flows');
-function topOf(list) { return Math.max.apply(null, list.map(function (e) { return e.v; })); }
-const topNode = topOf(nodeQ), topLink = topOf(linkQ);
-ok('a link really does carry more than any junction demands -- so the pools are distinguishable',
-	topLink > topNode, topLink + ' vs ' + topNode);
-ok('the biggest DEMAND is marked high, even though a link carries more',
-	nodeQ.filter(function (e) { return e.v === topNode; }).every(function (e) { return e.dec === 'high'; }),
-	JSON.stringify(nodeQ.filter(function (e) { return e.v === topNode; })));
-ok('the biggest FLOW is marked high too -- each pool has its own top',
-	linkQ.filter(function (e) { return e.v === topLink; }).every(function (e) { return e.dec === 'high'; }),
-	JSON.stringify(linkQ.filter(function (e) { return e.v === topLink; })));
-ok('...and no junction is judged against a link: nothing below the demand top is marked high',
-	nodeQ.filter(function (e) { return e.dec === 'high'; }).every(function (e) { return e.v === topNode; }),
-	JSON.stringify(nodeQ.filter(function (e) { return e.dec === 'high'; })));
-
-// The mark itself: on the value segment, at the value's own length.
-doc.links.filter(function (l) { return L.linkDecor(l.id)[0]; }).forEach(function (l) {
-	const segs = L.linkTspans(l.id);
-	const m = segs.filter(function (t) { return t.dec; });
-	const want = L.linkDecor(l.id)[0] === 'high' ? 'overline' : 'underline';
-	ok(l.id + ' carries ' + want + ' on exactly one segment', m.length === 1 && m[0].dec === want, JSON.stringify(segs));
-	// THE MARK'S LENGTH IS THE NUMBER'S LENGTH. Tom, 2026-08-15, of a mark spanning a whole line:
-	// "The underline needs to be only as long as the ID." A mark that also covered 'Q=' would start
-	// at the label's left edge, which in a stacked label is exactly where the row above would be
-	// underlined -- so it would read as belonging to the wrong row.
-	ok('...and that segment is the NUMBER alone, with no prefix in it',
-		m.length === 1 && /^-?[\d.]+%?$/.test(m[0].text), JSON.stringify(m));
-});
-const plain = doc.links.filter(function (l) { return !L.linkDecor(l.id)[0]; });
-ok('an unmarked value carries no decoration at all',
-	plain.every(function (l) { return L.linkTspans(l.id).every(function (t) { return !t.dec; }); }),
-	plain.length + ' unmarked');
-
-// On a one-line label the mark must land on the NUMBER, not on the separator beside it.
-Object.keys(ls.link).forEach(function (k) { ls.link[k] = (k === 'id' || k === 'flow'); });
-Object.keys(ls.node).forEach(function (k) { ls.node[k] = false; });
-L.refreshLabelText();
-const markedOneLine = doc.links.filter(function (l) { return L.linkDecor(l.id)[1]; })[0];
-if (markedOneLine) {
-	const row = rowsOf(L.linkTspans(markedOneLine.id))[0];
-	const at = row.map(function (t) { return t.dec ? 1 : 0; }).indexOf(1);
-	ok('on a one-line label exactly one segment is marked',
-		row.filter(function (t) { return t.dec; }).length === 1, JSON.stringify(row));
-	ok('...and it is the number, not the prefix or the separator beside it',
-		at >= 0 && /^-?[\d.]+$/.test(row[at].text), JSON.stringify(row));
-	ok('...nor the id (or its prefix), which has no extrema of its own -- a string has no max',
-		!row[0].dec && row[0].text.indexOf(ID_PFX.link + markedOneLine.id) === 0,
-		JSON.stringify(row[0]));
-} else {
-	ok('a link with a marked flow exists to check the one-line case', false);
-}
-
-console.log('\n=== affixes never change WHICH value is marked ===');
+console.log('\n=== affixes leave no tick behind ===');
 Object.keys(ls.link).forEach(function (k) { ls.link[k] = (k === 'flow'); });
 ls.prefix.link.flow = ''; ls.suffix.link.flow = '';
 L.refreshLabelText();
@@ -318,9 +254,8 @@ const bare = doc.links.map(function (l) { return L.linkDecor(l.id)[0]; });
 ls.prefix.link.flow = 'FLOW='; ls.suffix.link.flow = ' gpm'; ls.separator = ' | ';
 L.refreshLabelText();
 const affixed = doc.links.map(function (l) { return L.linkDecor(l.id)[0]; });
-ok('the same links are marked high/low with affixes as without',
-	bare.join(',') === affixed.join(','), bare.join(',') + ' vs ' + affixed.join(','));
-ok('...and something is actually marked, so that check is not vacuous', affixed.some(function (d) { return d; }));
+ok('no link is marked high/low, with affixes or without',
+	bare.concat(affixed).every(function (d) { return !d; }), bare.join(',') + ' vs ' + affixed.join(','));
 
 console.log('\n=== affixes are PROJECT settings and survive a save/open round trip ===');
 // The empty string is the case that a naive "saved.x || default" merge loses, and losing it means

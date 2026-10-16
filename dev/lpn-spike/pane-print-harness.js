@@ -312,7 +312,7 @@ console.log('\n--- nothing on the sheet is a control ---');
 	// A plain cell is written through paneCellDisplayText(), which is paneCellText() for every column
 	// but a choice, whose label it reads from the same list the pull-down shows (Show scenarios).
 	report(/text = paneCellDisplayText\(c, el, true\);\s*if \(target\.textContent !== text\) \{ target\.textContent = text; \}/.test(src) &&
-		/text = paneCellText\(c, el\);\s*if \(target\.value !== text\) \{ target\.value = text; \}/.test(src),
+		/text = paneCellInputText\(c, el\);\s*if \(target\.value !== text\) \{ target\.value = text; \}/.test(src),
 		'...and the live table fills its cells through it too');
 }
 

@@ -2750,14 +2750,12 @@ $ec_lang['lpn_field_text_all_zoom_tip']='无论缩小到多远，都在图上保
 $ec_lang['lpn_tool_labels']='标签';
 $ec_lang['lpn_labels_heading_node']='节点标签';
 $ec_lang['lpn_labels_heading_link']='连接线标签';
-$ec_lang['lpn_labels_mark_extrema']='标出最高值和最低值';
 // THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
 // row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line
 // below", which reads better and made both words unfindable. The Settings box searches tips, so a
 // word not on the page is a word the search cannot reach -- and $ec_lang_syn, the other place the
 // terms could have gone, is invisible to it. Plain English leads and the term is the gloss, which is
 // the same shape as "Minor (local) loss".
-$ec_lang['lpn_labels_mark_extrema_tip']='在地图上，用一条线标出每个已标注属性的最高值（上划线），并用一条线标出最低值（下划线）。';
 // "Apply to all" beside each ID prefix (ROADMAP Task 345): an ID prefix normally governs only the assets
 // you draw from now on, and this is the way to say "I meant the ones already here". {n} and
 // {skipped} are whole numbers; {prefix} is the text the user typed.

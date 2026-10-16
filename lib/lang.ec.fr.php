@@ -2750,14 +2750,12 @@ $ec_lang['lpn_field_text_all_zoom_tip']='Garde ce texte sur le dessin quel que s
 $ec_lang['lpn_tool_labels']='Étiquettes';
 $ec_lang['lpn_labels_heading_node']='Étiquettes des nœuds';
 $ec_lang['lpn_labels_heading_link']='Étiquettes des liaisons';
-$ec_lang['lpn_labels_mark_extrema']='Repérer les valeurs les plus hautes et les plus basses';
 // THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
 // row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line
 // below", which reads better and made both words unfindable. The Settings box searches tips, so a
 // word not on the page is a word the search cannot reach -- and $ec_lang_syn, the other place the
 // terms could have gone, is invisible to it. Plain English leads and the term is the gloss, which is
 // the same shape as "Minor (local) loss".
-$ec_lang['lpn_labels_mark_extrema_tip']='Marque la valeur la plus élevée de chaque propriété étiquetée sur la carte d\'un trait au-dessus (une surlignure), et la plus faible d\'un trait en dessous (un soulignement).';
 // "Apply to all" beside each ID prefix (ROADMAP Task 345): an ID prefix normally governs only the assets
 // you draw from now on, and this is the way to say "I meant the ones already here". {n} and
 // {skipped} are whole numbers; {prefix} is the text the user typed.
