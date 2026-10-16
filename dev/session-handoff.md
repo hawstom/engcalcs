@@ -138,12 +138,12 @@ If a branch's `git log` shows no commit after 10-15 22:00, that agent's work was
 
 ### His answers of 2026-10-16 (early), being built or awaiting design
 
-- **Language**: halo is a saint's halo, its only meaning; his glossary definition is "Halo, aura, or
-  background mask applied to every stroke." Source trace's is "Share from a given source at a given
-  point." (both in glossary.json 10-16). He wants a TRANSCENDENT concept list, ~100 prime concepts,
-  more authoritative than English, that translators audit their terminology against first, and he
-  wants to REVIEW the glossary, which is JSON he cannot read. Design it with him before building.
-  Translate only with his approval.
+- **Language, done 10-16**: `dev/terms.md` (his plain-words names, two uniqueness groups) is the
+  concept source; packets lead with it. A blind Spanish test from plain names alone: his picks and CC's
+  clear calls are in es (cota, profundidad del flujo, densidad relativa, LP/LE). Left for the next
+  Spanish sprint, with his word: cota and carga hidráulica file-wide. His open questions: should the
+  glossary carry abbreviations (HGL, EGL); is "N/A" the right English (he means "no meaningful
+  answer"); is "Headwater below crown" good English.
 - **EPS (bentley-interop, his Fotobi)**: a run stops with Error 110 when tank T-NE runs EMPTY
   (15:07:33, 14:01:42): EPANET closes L22 and the junctions it fed have no source. 15:07:33 was the
   simulation time, NOT the wall clock as CC told him. He asks why lowering a full tank's initial
