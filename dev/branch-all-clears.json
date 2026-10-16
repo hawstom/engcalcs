@@ -1,6 +1,6 @@
 {
  "_comment": [
-  "TOM'S ALL-CLEARS, one per protected branch, pinned to the commit he cleared.",
+  "Claude Code's merge ledger. Claude Code writes every entry, quoting the words Tom typed in the conversation, tied to the commit those words     were about. Tom never edits this file.",
   "",
   "Keyed and pinned the way dev/english-key-rulings.json is keyed on the exact English text,",
   "and for the same reason: AN APPROVAL MUST LAPSE BY ITSELF WHEN WHAT WAS APPROVED CHANGES.",
