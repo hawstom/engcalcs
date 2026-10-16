@@ -306,6 +306,28 @@
 	};
 
 	/**
+	 * The numbers on the Library's pattern graph axes, pure so a harness can hold them.
+	 * `mult` is the multiplier list, `stepSec` the pattern time step in seconds. Returns the vertical
+	 * range the graph is drawn over (a flat pattern gets the same band around itself the drawing
+	 * gives it) and about six ticks along the horizontal axis. Each tick is the START of a period:
+	 * `period` is its ordinal (1, 2, 3...) and `time` its elapsed pattern time as H:MM, i.e.
+	 * (period - 1) x step. Pattern start time is not added: it decides which period a run begins in,
+	 * not when a period of the pattern itself begins.
+	 */
+	EC.lpnPatternAxis = function (mult, stepSec) {
+		var n = mult ? mult.length : 0, step = stepSec > 0 ? stepSec : 3600,
+			lo = Infinity, hi = -Infinity, i, stride, ticks = [];
+		if (!n) { return { lo: 0, hi: 0, ticks: ticks }; }
+		for (i = 0; i < n; i++) { lo = Math.min(lo, mult[i]); hi = Math.max(hi, mult[i]); }
+		if (!(hi > lo)) { lo -= 0.5; hi += 0.5; }
+		stride = Math.max(1, Math.ceil(n / 6));
+		for (i = 0; i < n; i += stride) {
+			ticks.push({ frac: i / n, period: i + 1, time: EC.lpnFormatTime(i * step) });
+		}
+		return { lo: lo, hi: hi, ticks: ticks };
+	};
+
+	/**
 	 * lpnNumText's twin, for a quantity whose FILE TEXT IS NOT A NUMBER.
 	 *
 	 * js/lpn-inp.js's mergeTok keeps a token only while `parseFloat(tok)` still equals the value,

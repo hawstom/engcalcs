@@ -57885,6 +57885,43 @@ var EngCalcs = EngCalcs || {};
 		el.appendChild(path);
 		return el;
 	}
+	// The sparkline with its axes: multiplier up the left (its top and bottom values), and under it
+	// the clock time of each period's start and its ordinal. Labels are HTML, not SVG text, because
+	// the sparkline stretches (preserveAspectRatio none) and would stretch the letters with it.
+	function libPatternPlot(mult) {
+		var pc = EngCalcs.pageConfig || {},
+			times = doc.times || (EngCalcs.lpnTimesDefaults ? EngCalcs.lpnTimesDefaults() : { patternStep: 3600 }),
+			ax = EngCalcs.lpnPatternAxis(mult, times.patternStep),
+			wrap = libEl('div', 'lpn-lib-plot'),
+			y = libEl('div', 'lpn-lib-yaxis'),
+			rows = libEl('div', 'lpn-lib-xaxes'),
+			timeRow = libEl('div', 'lpn-lib-xrow'),
+			perRow = libEl('div', 'lpn-lib-xrow');
+		function num(v) { return String(+(+v).toFixed(3)); }
+		if (ax.ticks.length) {
+			y.appendChild(libEl('span', '', num(ax.hi)));
+			y.appendChild(libEl('span', 'lpn-lib-ytitle', pc.lpn_library_pattern_values || 'Multipliers'));
+			y.appendChild(libEl('span', '', num(ax.lo)));
+		}
+		ax.ticks.forEach(function (t) {
+			var a = libEl('span', t.frac ? 'lpn-lib-tick' : 'lpn-lib-tick lpn-lib-tick-first', t.time),
+				b = libEl('span', t.frac ? 'lpn-lib-tick' : 'lpn-lib-tick lpn-lib-tick-first', String(t.period));
+			a.style.left = b.style.left = (t.frac * 100).toFixed(2) + '%';
+			timeRow.appendChild(a);
+			perRow.appendChild(b);
+		});
+		if (ax.ticks.length) {
+			timeRow.insertBefore(libEl('span', 'lpn-lib-xtitle', pc.lpn_time_menu || 'Time'), timeRow.firstChild);
+			perRow.insertBefore(libEl('span', 'lpn-lib-xtitle', pc.lpn_library_pattern_axis_period || 'Period'), perRow.firstChild);
+		}
+		rows.appendChild(timeRow);
+		rows.appendChild(perRow);
+		wrap.appendChild(y);
+		wrap.appendChild(libSparkline(mult));
+		wrap.appendChild(libEl('div', 'lpn-lib-xspacer'));
+		wrap.appendChild(rows);
+		return wrap;
+	}
 	// "24 multipliers, 1:00 apart, covering 24:00" -- the sentence that answers "is my daily pattern
 	// really a day?", which is the question 24 numbers in a row cannot answer. Every part of it is
 	// read from the document's own clock, so it follows a change to the pattern time step.
@@ -58673,7 +58710,7 @@ var EngCalcs = EngCalcs || {};
 				idField = libEl('label', 'lpn-lib-field'),
 				values = document.createElement('input'),
 				span = libEl('div', 'lpn-lib-note', libSpanText((pat.multipliers || []).length)),
-				spark = libSparkline(pat.multipliers),
+				spark = libPatternPlot(pat.multipliers),
 				mark, del;
 			id.type = 'text';
 			id.className = 'lpn-lib-id';
@@ -58722,8 +58759,8 @@ var EngCalcs = EngCalcs || {};
 			// feedback nobody sees. **THE DOCUMENT IS WRITTEN ON `change` ONLY**, so a half-typed
 			// list never reaches a solve.
 			values.addEventListener('input', function () {
-				var mult = libParseMultipliers(values.value), fresh = libSparkline(mult);
-				entry.replaceChild(fresh, entry.querySelector('.lpn-lib-spark'));
+				var mult = libParseMultipliers(values.value), fresh = libPatternPlot(mult);
+				entry.replaceChild(fresh, entry.querySelector('.lpn-lib-plot'));
 				span.textContent = libSpanText(mult.length);
 			});
 			values.addEventListener('change', function () {
