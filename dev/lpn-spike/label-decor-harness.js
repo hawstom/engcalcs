@@ -171,42 +171,13 @@ eval([extract('labelBoxWidth'), extract('dataLabelOrigin')].join('\n'));
 	report(ADVERSE_FRAC > 0, 'the hysteresis fraction is still read out of the file', String(ADVERSE_FRAC));
 }
 
-// ---- 3. the Task 190 toggle still clears the decoration -----------------
-// Marks off means decorationFor() returns undefined, means no segment carries a text-decoration.
-// There is no second code path for the switch, which is what makes it free.
+// ---- 3. the retired tick: no code path draws it ------------------------------
 {
-	const dec = extract('decorationFor');
-	report(/if \(!labelSettings\.markExtrema\) \{ return undefined; \}/.test(dec),
-		'the toggle is enforced in decorationFor(), before anything is drawn');
-	report(/if \(value === extrema\.max && value === extrema\.min\) \{ return undefined; \}/.test(dec),
-		'a value that is simultaneously max and min earns no mark');
-	report(/seg\.decoration === 'high' \? 'overline' : 'underline'/.test(extract('setMultilineText')),
-		'and a decorated segment is marked by the text engine, not by a badge element');
+	report(!/decorationFor|markExtrema/.test(src), 'the mark-highest-and-lowest setting and its tick are gone');
+	report(!/text-decoration/.test(extract('setMultilineText')), 'and a label segment is never given a text-decoration');
+	report(fieldExtrema_present(), 'fieldExtrema() stays: the shed rule still reads the network high and low');
 }
-
-// ---- 4. the extrema rule is the plain one -----------------------------------------------
-// Deliberately NO tie rule: a mark suppressed once enough elements share it has been proposed and
-// reverted twice. Asserting the plain behaviour is what stops it coming back a third time.
-{
-	let labelSettings = { markExtrema: true };
-	eval(extract('fieldExtrema') + '\n' + extract('decorationFor'));
-
-	let ex = fieldExtrema([1, 2, 3, 4, 5]);
-	report(decorationFor(ex, 5) === 'high' && decorationFor(ex, 1) === 'low', 'a unique high and low are marked');
-	report(decorationFor(ex, 3) === undefined, 'and nothing between them is');
-
-	// Elm Street's own shape. Every zero IS the minimum and every one of them is marked; that is the
-	// rule, not a defect to be fixed here.
-	ex = fieldExtrema([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 30, 45]);
-	report(decorationFor(ex, 0) === 'low', 'a value shared by many is still marked lowest');
-	report(decorationFor(ex, 45) === 'high', 'and the one highest demand is marked highest');
-	report(ex.minHeld === undefined, 'no tie count is computed at all');
-
-	report(fieldExtrema([1, 2]) === null, 'fewer than three values is no finding at all');
-	report(decorationFor(fieldExtrema([5, 5, 5]), 5) === undefined, 'max === min is still refused');
-	labelSettings.markExtrema = false;
-	report(decorationFor(fieldExtrema([1, 2, 3]), 3) === undefined, 'and the Task 190 toggle still wins');
-}
+function fieldExtrema_present() { return /function fieldExtrema\s*\(/.test(src); }
 
 console.log(`\n${checks - failures}/${checks} passed`);
 process.exit(failures ? 1 : 0);

@@ -3113,18 +3113,14 @@ var EngCalcs = EngCalcs || {};
 			row.forEach(function (seg, j) {
 				// The run remembers its segments, so the shed pricing (noteRowWidths()) can still bank
 				// one width per segment without a tspan per segment.
-				if (!seg.decoration && plain) { plain.textContent += seg.text; plain.lpnSegs.push(seg.text); return; }
+				if (plain) { plain.textContent += seg.text; plain.lpnSegs.push(seg.text); return; }
 				// **dy IN `em`, NOT IN WORLD UNITS.** An em resolves against the element's own
 				// font-size, so line spacing follows a zoom by itself and the tspans never have to be
 				// rebuilt for one; in world units the attribute is stale the instant the scale
 				// changes. 1.2 is effectiveLineHeight()'s own multiple of the font size.
 				var tspan = el('tspan', j === 0 ? { x: x, dy: i === 0 ? (firstDy ? firstDy + 'em' : 0) : '1.2em' } : {}, textEl);
-				plain = seg.decoration ? null : tspan;
+				plain = tspan;
 				tspan.lpnSegs = [seg.text];
-				if (seg.decoration) {
-					tspan.setAttribute('text-decoration', seg.decoration === 'high' ? 'overline' : 'underline');
-					tspan.setAttribute('class', seg.decoration === 'high' ? 'lpn-max' : 'lpn-min');
-				}
 				tspan.textContent = seg.text;
 			});
 		});
@@ -3351,20 +3347,6 @@ var EngCalcs = EngCalcs || {};
 		if (defined.length < 3) { return null; }
 		return { min: Math.min.apply(null, defined), max: Math.max.apply(null, defined) };
 	}
-	// 'high'/'low', not a boolean -- every member of a tie is marked, not just the first found,
-	// since each element is judged independently against the same extrema.
-	function decorationFor(extrema, value) {
-		// Task 190's global toggle is enforced HERE, not by suppressing the extrema themselves: the
-		// extrema objects stay computed and correct, so turning the marks back on needs no recompute
-		// and nothing else that reads them can go stale while they are hidden.
-		if (!labelSettings.markExtrema) { return undefined; }
-		if (!extrema || typeof value !== 'number') { return undefined; }
-		if (value === extrema.max && value === extrema.min) { return undefined; }
-		if (value === extrema.max) { return 'high'; }
-		if (value === extrema.min) { return 'low'; }
-		return undefined;
-	}
-
 	// The document. nodes: Junction/Reservoir/Tank (point elements). links: Pipe/Pump (two
 	// endpoints + optional bend vertices). labels: Text elements with a leader to an
 	// anchor node (`anchorNode`), or to a station along a link (`anchorLink` + `anchorT`,
@@ -6011,10 +5993,6 @@ var EngCalcs = EngCalcs || {};
 			 */
 			show: t.show,
 			priority: t.priority,
-			// Whether a label's network-wide highest/lowest value gets its tick mark (Task 190).
-			// Global, not per field. Here rather than in `settings` because a label mark is a property
-			// of a label -- and, like the rest of labelSettings, a view preference kept out of `doc`.
-			markExtrema: true,
 			/**
 			 * **THE WIDEST VIEW THAT ATTEMPTS TO DISPLAY CUSTOMER LABELS**, in the project's own
 			 * length unit (Tom, 2026-09-18: *"Maybe we have a Setting for the widest view that
@@ -36894,7 +36872,7 @@ var EngCalcs = EngCalcs || {};
 		// that save comes back undefined instead of at its default.
 		// Groups named explicitly rather than looped over Object.keys(labelSettings): the object is
 		// no longer uniformly two flat sub-objects -- `decimals` is nested a level deeper and
-		// `markExtrema` is a bare boolean, which Object.assign() onto a primitive silently discards.
+		// some members are bare scalars, which Object.assign() onto a primitive silently discards.
 
 		labelSettings = defaultLabelSettings();
 		// Back to the shipped baseline with it, or a roughness count merged in from the file
@@ -36959,11 +36937,10 @@ var EngCalcs = EngCalcs || {};
 				});
 			});
 		}
-		// A bare string, so it takes the same guarded assignment markExtrema does. An EMPTY string
+		// A bare string, so it takes a guarded assignment. An EMPTY string
 		// is a real setting ("Q12.5", no gap) and must survive this, which is why the test is on the
 		// type and not on truthiness.
 		if (typeof savedLS.separator === 'string') { labelSettings.separator = savedLS.separator; }
-		if (typeof savedLS.markExtrema === 'boolean') { labelSettings.markExtrema = savedLS.markExtrema; }
 		// A number, and ZERO IS A REAL ANSWER here ("never label a customer"), so this is a type
 		// test and never a truthiness one -- `savedLS.customerMaxWidth || default` would silently
 		// turn the one setting that says NEVER back into the default. **NULL IS ALSO A REAL ANSWER**
@@ -52323,16 +52300,6 @@ var EngCalcs = EngCalcs || {};
 		// blanket separator and individual prefixes and postfixes, of course").
 		if (optBox) {
 			optBox.innerHTML = '';
-			// **THE LABEL STAYS SHORT AND THE TIP CARRIES THE CONVENTION** (Tom's own rule from the
-			// same review: "we should have a shorter label with a tip ... this length goes beyond real
-			// estate issues to attention/clutter issues"). His "Mark highest (overline) and lowest
-			// (underline) values" would have made the words findable by lengthening the label, which
-			// is the move he asked to stop making everywhere else in this box -- and it would still
-			// not have told a reader which mark they were looking at. The tip does both: the search
-			// matches it, and somebody who sees an overlined number on the map can look it up.
-			labelCheckbox(optBox, pc.lpn_labels_mark_extrema || 'Mark highest and lowest values',
-				labelSettings.markExtrema, function (v) { labelSettings.markExtrema = v; },
-				null, null, null, pc.lpn_labels_mark_extrema_tip);
 			var sepRow = document.createElement('div'), sepLabel = document.createElement('span');
 			sepRow.style.display = 'flex'; sepRow.style.alignItems = 'baseline'; sepRow.style.gap = '6px';
 			sepLabel.textContent = pc.lpn_labels_separator || 'Text between values';
@@ -67196,7 +67163,7 @@ var EngCalcs = EngCalcs || {};
 		line.field = field;
 		line.parts = [];
 		if (p) { line.parts.push({ text: p }); }
-		line.parts.push({ text: line.text, decoration: line.decoration });
+		line.parts.push({ text: line.text });
 		if (s) { line.parts.push({ text: s }); }
 		line.text = p + line.text + s;
 		return line;
@@ -67265,7 +67232,7 @@ var EngCalcs = EngCalcs || {};
 	// own suffix lands outside this one, and extrema compare the NUMBER, so neither affects ticks.
 	function numLine(siValue, unitId, extrema, decimals, suffix) {
 		var displayValue = displayRound(siValue, unitId, decimals);
-		return { text: displayValue.toFixed(fieldDecimals(decimals)) + (suffix || ''), decoration: decorationFor(extrema, displayValue) };
+		return { text: displayValue.toFixed(fieldDecimals(decimals)) + (suffix || ''), };
 	}
 	// Length is declarative, not SI-converted (see the lengthField() comment above: "1 grid unit IS
 	// 1 ft or 1 m, whichever is currently selected, by declaration") -- unlike every other field
@@ -67273,12 +67240,12 @@ var EngCalcs = EngCalcs || {};
 	// unitFactor.
 	function rawLine(value, extrema, decimals) {
 		var displayValue = plainRound(value, decimals);
-		return { text: displayValue.toFixed(fieldDecimals(decimals)), decoration: decorationFor(extrema, displayValue) };
+		return { text: displayValue.toFixed(fieldDecimals(decimals)), };
 	}
 	// Rebuilds every node's and link's map-label text from `labelSettings` + `lastSolveResult`.
 	// Extrema are computed ONCE per field, network-wide, before any label is built, so every
 	// element's decoration is judged against the same snapshot (Tom: ties all get marked, not just
-	// the first one found -- decorationFor() already does this per element).
+	// the first one found -- each element is judged on its own).
 	// The whole content pass reads the canvas box through mapSpan() (label repeat spacing, the
 	// visibility threshold), so it holds ONE measurement for its duration -- see mapBox(). A wrapper
 	// rather than a try/finally around 200 lines, so the pass itself reads exactly as it did.
