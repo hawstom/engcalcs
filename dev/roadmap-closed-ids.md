@@ -718,5 +718,5 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|793| CLOSED 2026-10-15 (merged on Tom's word): Ctrl+C in the Screenshot tool copies the picture.
 - 0|795| CLOSED 2026-10-15 (merged on Tom's word): Tank depth in the time series graphs.
 - 0|797| CLOSED 2026-10-15 (`chore/browser-lanes`): browser harnesses run in three lanes with a lock each; a full check_all went from ~57 to ~19 min.
-- 0|791| CLOSED 2026-10-16 (merged on Tom's word): text halos one run per label row, wider, with a Map appearance setting.
-- 0|796| CLOSED 2026-10-16 (merged): the Fotobi EPANET crash fixed; Accuracy defaults to 0.001 for every project, tip in step.
+- 0|791| CLOSED 2026-10-15 (merged on Tom's word): text halos one run per label row, wider, with a Map appearance setting.
+- 0|796| CLOSED 2026-10-15 (merged): the Fotobi EPANET crash fixed; Accuracy defaults to 0.001 for every project, tip in step.
