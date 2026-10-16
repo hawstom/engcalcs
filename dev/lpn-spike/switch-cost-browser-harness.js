@@ -17,7 +17,7 @@
 //         pass. This is the switch the task is about.
 //   warm  the shipped keep, switching back to a tab nobody touched.
 //
-// **WHAT IT FOUND, 2026-10-16** (median of 5, Chromium on jasmine): a cold arrival ran the label pass
+// **WHAT IT FOUND, 2026-10-15** (median of 5, Chromium on jasmine): a cold arrival ran the label pass
 // TWICE -- once in the switch, at the view it arrives at, and again 120 ms later in the zoom settle
 // the view change had queued, at the same scale, for the identical picture. Net3 geographic 186 ms
 // switch + 128 ms settle; downtown n600 1,830 + 1,393. With the settle banking what is on screen

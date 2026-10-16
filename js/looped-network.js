@@ -2606,7 +2606,7 @@ var EngCalcs = EngCalcs || {};
 			// EVERY WRITE, THEN EVERY READ -- one forced layout for the rung instead of one per
 			// label. Exactly shedToSegmentBatch()'s seam, for exactly its reason.
 			// **THE TWO HALVES OF A RUNG ARE TIMED APART** (?debug=perf): the glyph rewrite and the
-			// re-fit. Measured 2026-10-16 on the 600-junction downtown arrival, 28 ms and 248 ms over
+			// re-fit. Measured 2026-10-15 on the 600-junction downtown arrival, 28 ms and 248 ms over
 			// five rungs. Reusing the re-fit's unchanged verdicts was tried (Task 681) and saved
 			// about a tenth: most labels on a crowded view shed on every rung, so few verdicts hold.
 			perfDebugAccum('  ns:glyphs', function () {

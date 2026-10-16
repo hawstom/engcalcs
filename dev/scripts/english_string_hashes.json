@@ -1,6 +1,6 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
-    "updated": "2026-10-16",
+    "updated": "2026-10-15",
     "count": 2639,
     "partial_updates": [
         {
@@ -5546,7 +5546,7 @@
             "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
         },
         {
-            "date": "2026-10-16",
+            "date": "2026-10-15",
             "keys": [
                 "lpn_energy_stopped",
                 "lpn_time_run_stopped_kept",
@@ -5557,7 +5557,7 @@
             "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
         },
         {
-            "date": "2026-10-16",
+            "date": "2026-10-15",
             "keys": [
                 "lpn_calib_file",
                 "lpn_confirm_apply_prefix",
