@@ -121,7 +121,8 @@ If a branch's `git log` shows no commit after 10-15 22:00, that agent's work was
   unused omits categories with nothing unused; Clean map's tip loses the "shows only the drawing"
   sentence and starts "Checked: The zoom...". He says per-scenario graphs are not new (they changed
   with scenario two days earlier). The `$ec_lang_syn` Transform description still awaits his OK.
-  `lpn_cleanmap`, `lpn_ovrmarks` (and any flyout width key): TELL HIM before it merges. After it lands
+  `lpn_cleanmap`, `lpn_ovrmarks`, and the flyout width `flyW` inside `lpn_smbox`: TELL HIM before it
+  merges. Still unruled: `lpn_settings_override_marks_tip`, `lpn_sm_all_row_tip`, `lpn_sm_unused_none`. After it lands
   delete match-property, graph-bubble.
 - **EPS defects he found on bentley-interop, worked on fix/zero-demand-solve**: (1) the "1-hr drain"
   scenario reports it ended at 15:07:33; (2) tanks drain with no demand; (3) a pattern of mostly 0s
@@ -138,7 +139,8 @@ If a branch's `git log` shows no commit after 10-15 22:00, that agent's work was
   the freeze. His `~/.claude/settings.json` rule `Edit(/dev/branch-all-clears.json)` is a string where
   a list belongs, and a leading `/` there means `~/.claude/`, so it matches nothing.
 - Independent review of how a clarification reaches a translator (halo read as "hello"; "translating
-  too often?"); report in that night's scratchpad, to be relayed to him and banked in a dev/*.md.
+  too often?"): `dev/translation-clarification-review.md`. Its halo glossary wording, its sprint cadence
+  (once before each production pull) and its tooling fix (send the notes already written) await him.
 
 ### Questions out to him
 
