@@ -4448,8 +4448,10 @@ var EngCalcs = EngCalcs || {};
 		// alternative is a second copy of a number the drawing already states. Asked AFTER the
 		// override above, so a length the user typed in this scenario still wins; and gated on an
 		// END having moved, so the ordinary case is two hash lookups and no polyline walk.
-		if (prop === 'length' && el.lenAuto && !inPlainBase() && linkEndIsMoved(el)) {
-			return linkAutoLength(el);
+		if (prop === 'length' && el.lenAuto && !inPlainBase()) {
+			if (linkEndIsMoved(el)) { return linkAutoLength(el); }
+			// And where it raised or lowered an end without moving it (Task 643's slope distance).
+			if (linkEndElevIsOverridden(el)) { return linkAutoLengthReleveled(el); }
 		}
 		if (LPN_TYPE_PROP_SET[prop]) {
 			tid = (ov && Object.prototype.hasOwnProperty.call(ov, 'typeId')) ? ov.typeId : el._typeId;
@@ -10298,10 +10300,46 @@ var EngCalcs = EngCalcs || {};
 	// - a reservoir: its stated elevation (the ground), never its head. A head is a water surface,
 	//   which no pipe runs to, and a reservoir imported from an .inp states a head and no elevation
 	//   (Task 390), so that end gives null and the pipe is measured level at that end.
+	// This reads BASE's own two numbers, bare: it is what Base's stored `_length` was measured with,
+	// so syncAutoLengths(), noteAutoLength(), Base's linkAutoLength() and the migration ask it.
 	function linkEndElev(n) {
 		if (!n) { return null; }
 		if (n.type === 'tank' && typeof n.bottomElev === 'number' && isFinite(n.bottomElev)) { return n.bottomElev; }
 		return (typeof n.elev === 'number' && isFinite(n.elev)) ? n.elev : null;
+	}
+	// **THE SAME END, AS THE SCENARIO SHOWING SEES IT** (Tom, 2026-10-16: elevation is a Physical
+	// override like any other). A scenario that raises a junction raises the pipes' ends with it, so
+	// an Automatic length there is measured from effective(), never from Base's bare numbers.
+	function linkEndElevNow(n) {
+		var b, e;
+		if (!n) { return null; }
+		b = effective(n, 'bottomElev');
+		if (n.type === 'tank' && typeof b === 'number' && isFinite(b)) { return b; }
+		e = effective(n, 'elev');
+		return (typeof e === 'number' && isFinite(e)) ? e : null;
+	}
+	// Whether THIS scenario holds an elevation (or a tank's base) for either end of this link -- the
+	// one other case, beside a moved end, in which its Automatic length differs from Base's.
+	function linkEndElevIsOverridden(l) {
+		var ovs = resolvedOverrides(activeScenario());
+		function held(id) {
+			var ov = ovs[ovKeyFor('node', id)];
+			return !!ov && (Object.prototype.hasOwnProperty.call(ov, 'elev') || Object.prototype.hasOwnProperty.call(ov, 'bottomElev'));
+		}
+		return !!l && (held(l.from) || held(l.to));
+	}
+	// An Automatic length in a scenario that changed an END ELEVATION but moved neither end: Base's
+	// stored length with Base's rise taken out and the scenario's put in -- the same arithmetic
+	// syncAutoLengths() does when Base's own elevation moves, so the horizontal part Base keeps (a
+	// placed project's grid length, say) is the scenario's too. Derived, stored nowhere.
+	function linkAutoLengthReleveled(l) {
+		var len = l._length, ratio = autoLenRatio(), dz0, dz, h2, v;
+		if (typeof len !== 'number' || !isFinite(len)) { return len; }
+		dz0 = autoLenRise(linkEndElev(nodeById(l.from)), linkEndElev(nodeById(l.to)), ratio);
+		dz = autoLenRise(linkEndElevNow(nodeById(l.from)), linkEndElevNow(nodeById(l.to)), ratio);
+		h2 = Math.max(0, len * len - dz0 * dz0);
+		v = Math.sqrt(h2 + dz * dz);
+		return isFinite(v) ? v : len;
 	}
 	// **AN AUTOMATIC LENGTH IS THE SLOPE DISTANCE** (Task 643; Tom, 2026-10-14: *"Let's go ahead and
 	// use slope distance for our calculations in case it's significant which occasionally will be
@@ -10314,8 +10352,9 @@ var EngCalcs = EngCalcs || {};
 	// into the length unit, a conversion of a DERIVED value, never of a number anybody typed.
 	// `base` measures Base's own drawing, which is what every write of `_length` wants.
 	function linkAutoLength(l, base) {
-		var h = linkGeomLength(l, base ? linkBasePointList(l) : undefined),
-			za = linkEndElev(nodeById(l.from)), zb = linkEndElev(nodeById(l.to)), dz;
+		var endElev = base ? linkEndElev : linkEndElevNow,
+			h = linkGeomLength(l, base ? linkBasePointList(l) : undefined),
+			za = endElev(nodeById(l.from)), zb = endElev(nodeById(l.to)), dz;
 		if (za === null || zb === null || !isFinite(h)) { return h; }
 		dz = toDisplay(toSI(zb - za, 'lpn_u_elevhead'), 'lpn_u_length');
 		return (dz && isFinite(dz)) ? Math.sqrt(h * h + dz * dz) : h;
