@@ -439,7 +439,6 @@
 			"demandMultiplier": 1,
 			"emitterExponent": 0.5
 		},
-		"tolerance": 1e-09,
 		"engine": "epanet",
 		"defaults": {
 			"nodeElev": 0,

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**7 still to read on master**, of 8 untranslated keys, of 2632 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**13 still to read on master**, of 14 untranslated keys, of 2638 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,8 +199,11 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (8, 7 to read @@ NEEDS RULING)
+## lpn_  (14, 13 to read @@ NEEDS RULING)
 
+- **`lpn_energy_stopped`**
+  > The EPANET run stopped before the end of the period, so no pump energy figures were kept.
+  @@ NEEDS RULING
 - **`lpn_ex_net1_si_desc`**
   > Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.
   @@ NEEDS RULING
@@ -213,11 +216,26 @@ never edits a synonym.
 - **`lpn_inp_drop_comments`**
   > These comment lines in the patterns or simple controls of this file were not imported, because this page has no place to keep them (for example, between the rows of one pattern). Every pattern and control was imported in full.
   @@ NEEDS RULING
+- **`lpn_settings_text_halo`**
+  > Text halo width (percent of text size)
+  @@ NEEDS RULING
+- **`lpn_settings_text_halo_tip`**
+  > Width of the solid outline behind map text, as a percent of the text size. Applies when Solid background behind labels is on.
+  @@ NEEDS RULING
 - **`lpn_snip_tip_copy`**
   > Copy (Ctrl+C)
   @@ NEEDS RULING
 - **`lpn_time_run_stopped`**
   > The EPANET run stopped at {time}, so it has no results. Its run report says why.
+  @@ NEEDS RULING
+- **`lpn_time_run_stopped_kept`**
+  > The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.
+  @@ NEEDS RULING
+- **`lpn_time_stat_stopped`**
+  > {statistic} not shown: the run stopped before the end of the period.
+  @@ NEEDS RULING
+- **`lpn_time_stopped_no_quality`**
+  > No water quality results were computed, because the quality analysis starts after the hydraulic run ends.
   @@ NEEDS RULING
 - **`lpn_tool_zoom_selection`**
   > Zoom to selection
@@ -230,7 +248,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**163 still to read**, of 166 new keys across 12 unmerged branch(es).
+**172 still to read**, of 175 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -241,7 +259,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`726001ff`) — 151 new, 151 to read @@ NEEDS RULING
+### feat/bentley-interop (`c72f83eb`) — 162 new, 162 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -311,6 +329,30 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_morph_tip`**
   > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its location, its connections, and every value the new type also has. In Base the asset itself is changed, and you are asked first if any value would be lost. In any other scenario the new type is an override in that scenario only, and the values only the new type has start from Settings > New assets.
+  @@ NEEDS RULING
+- **`lpn_ovl_col_inherited`**
+  > Inherited value
+  @@ NEEDS RULING
+- **`lpn_ovl_col_inherited_tip`**
+  > The value this scenario reads without the override: the value of the parent of the alternative, or the Base value.
+  @@ NEEDS RULING
+- **`lpn_ovl_col_override`**
+  > Override
+  @@ NEEDS RULING
+- **`lpn_ovl_group`**
+  > {category}: {alternative}
+  @@ NEEDS RULING
+- **`lpn_ovl_note`**
+  > These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Click an ID to go to the asset on the map.
+  @@ NEEDS RULING
+- **`lpn_ovl_same`**
+  > (same)
+  @@ NEEDS RULING
+- **`lpn_ovl_same_tip`**
+  > Equal to the inherited value. It is still an override, and it is counted.
+  @@ NEEDS RULING
+- **`lpn_ovl_title`**
+  > Overrides: {name}
   @@ NEEDS RULING
 - **`lpn_ovm_child_ask`**
   > Clear child overrides ({n} total)?
@@ -621,6 +663,15 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_sm_item_scenario`**
   > Scenario {name}
   @@ NEEDS RULING
+- **`lpn_sm_list_overrides`**
+  > List overrides
+  @@ NEEDS RULING
+- **`lpn_sm_list_overrides_none`**
+  > This scenario has no overrides of its own.
+  @@ NEEDS RULING
+- **`lpn_sm_list_overrides_tip`**
+  > List the overrides the selected scenario holds itself, by category, each with the value it replaces. Inherited values are not listed.
+  @@ NEEDS RULING
 - **`lpn_sm_make_current`**
   > Make current
   @@ NEEDS RULING
@@ -697,6 +748,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > Drag to resize
   @@ NEEDS RULING
 
+### feat/description-lines (`67d089c4`) — adds no English strings
+
 ### feat/desktop (`baba0f04`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
@@ -756,13 +809,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
 
-### feat/text-halo (`663735f4`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/plural (`8c9f8730`) — adds no English strings
 
-- **`lpn_settings_text_halo`**
-  > Text halo width (percent of text size)
-  @@ NEEDS RULING
-- **`lpn_settings_text_halo_tip`**
-  > Width of the solid outline behind map text, as a percent of the text size. Applies when Solid background behind labels is on.
-  @@ NEEDS RULING
-
-### fix/search-zoom-accuracy (`176bab1e`) — adds no English strings
+### feat/stopped-series (`12340001`) — adds no English strings

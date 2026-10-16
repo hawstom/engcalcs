@@ -86,7 +86,12 @@ async function run() {
 		const native = EngCalcs.lpnSolve(model);
 		let epa;
 		try {
-			epa = await EngCalcs.lpnSolveEpanet(model, {
+			// **THE COMPARISON IS RUN AT 1e-5, STATED, NOT AT THE PAGE'S DEFAULT.** An empty Accuracy
+			// has meant EPANET's own 0.001 since R-388 (2026-10-15), which on zeroDemandCase leaves a
+			// 4e-6 m3/s flow difference: the default is a user's choice, and this harness measures
+			// whether the two engines AGREE, which needs both pushed hard. 1e-5 is EPANET's floor.
+			const hyd = Object.assign({ accuracy: 1e-5 }, model.hydraulics || {});
+			epa = await EngCalcs.lpnSolveEpanet(Object.assign({}, model, { hydraulics: hyd }), {
 				moduleUrl: 'file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js'),
 			});
 		} catch (e) {

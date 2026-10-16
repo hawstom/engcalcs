@@ -187,12 +187,13 @@ ok('three fields on an auto-placed label render as ONE row', rows.length === 1, 
 ok('...and lineCount agrees, so the mask and the collision box are sized for one line',
 	L.lineCount(P.id) === 1, String(L.lineCount(P.id)));
 ok('...with the values joined by the separator', / /.test(rowText(rows[0])) && /Q=/.test(rowText(rows[0])), rowText(rows[0]));
-// EVERY PREFIX AND EVERY SEPARATOR IS ITS OWN SEGMENT, which is what keeps an extrema mark the
-// length of the number alone: [id prefix, if the project states one], id, sep, 'Q=', value, sep, 'V=', value.
-ok('...and the prefixes and separators are their own segments',
-	rows[0].length === 7 + (ID_PFX.link ? 1 : 0), JSON.stringify(rows[0].map(function (s) { return s.text; })));
-ok('...so no segment carrying a number also carries a prefix',
-	rows[0].every(function (s) { return !/[A-Za-z]=[\d.]/.test(s.text); }),
+// PLAIN SEGMENTS SHARE ONE RUN (Task 791): the halo stroke is painted per tspan, so a separator in
+// a tspan of its own painted white over the digit before it. Only a MARKED number keeps a tspan of
+// its own, which is what keeps an extrema mark the length of the number alone.
+ok('...and no two plain pieces of a row sit in separate tspans (one run, one halo)',
+	rows[0].every(function (s, i) { return i === 0 || s.dec || rows[0][i - 1].dec; }), JSON.stringify(rows[0]));
+ok('...and a marked piece carries the number alone, never a prefix',
+	rows[0].every(function (s) { return !s.dec || /^-?[\d.]+$/.test(s.text); }),
 	JSON.stringify(rows[0].map(function (s) { return s.text; })));
 
 ls.separator = ', ';
@@ -300,10 +301,9 @@ if (markedOneLine) {
 		row.filter(function (t) { return t.dec; }).length === 1, JSON.stringify(row));
 	ok('...and it is the number, not the prefix or the separator beside it',
 		at >= 0 && /^-?[\d.]+$/.test(row[at].text), JSON.stringify(row));
-	const idSegs = row.slice(0, ID_PFX.link ? 2 : 1);
 	ok('...nor the id (or its prefix), which has no extrema of its own -- a string has no max',
-		idSegs.every(function (t) { return !t.dec; }) && idSegs.map(function (t) { return t.text; }).join('') === ID_PFX.link + markedOneLine.id,
-		JSON.stringify(idSegs));
+		!row[0].dec && row[0].text.indexOf(ID_PFX.link + markedOneLine.id) === 0,
+		JSON.stringify(row[0]));
 } else {
 	ok('a link with a marked flow exists to check the one-line case', false);
 }

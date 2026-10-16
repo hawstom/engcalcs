@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-10-14",
-    "count": 2624,
+    "count": 2634,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -5528,6 +5528,22 @@
                 "lpn_tool_zoom_extent_tip"
             ],
             "reason": "Reverted to master's English (Tom's Task 759 calls: Check for a checkbox, click for a button). Translations: the checkbox tips were never changed; zoom_extent was resynced against 'select the small triangle', the same act."
+        },
+        {
+            "date": "2026-10-15",
+            "keys": [
+                "lpn_ex_net1_si_desc",
+                "lpn_ex_net1_si_title",
+                "lpn_field_length_slope_tip",
+                "lpn_inp_drop_comments",
+                "lpn_settings_text_halo",
+                "lpn_settings_text_halo_tip",
+                "lpn_snip_tip_copy",
+                "lpn_time_run_stopped",
+                "lpn_tool_zoom_selection",
+                "lpn_tool_zoom_selection_tip"
+            ],
+            "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
         }
     ],
     "hashes": {
@@ -6235,6 +6251,8 @@
         "lpn_ex_elm_street_desc": "e4fb568e70ef442be6918c07b2252e50a91b545d",
         "lpn_ex_elm_street_title": "20c6ecf78559cd904397dc0c2b30a7726da6b2ff",
         "lpn_ex_net1_desc": "db8e0fde42983b8a1068e48da735e20247180936",
+        "lpn_ex_net1_si_desc": "d5c43be7a79207a916431bc8b18f8354e081f661",
+        "lpn_ex_net1_si_title": "2bd1f89e1d81cf459592f5d931cd825da2d4abe8",
         "lpn_ex_net1_title": "f7ce037b85a1a7ffff27ec8e296b0444e6c591ec",
         "lpn_ex_net2_desc": "d1bb81923cec4e178aacb7af1ce77eedddc8c95b",
         "lpn_ex_net2_si_desc": "8200cb6113fb20586b1a849f8fba4ceb198ed123",
@@ -6371,6 +6389,7 @@
         "lpn_field_lat": "ced3905ec8220a51e0d47124fc2d0549ce7c8472",
         "lpn_field_lat_abbr": "4b5152274022e4a3e476ccee4ce6ae0e0dfb1c9f",
         "lpn_field_length": "3bade34ecbc5d996b2f301ebd4ba689e81c7c9ea",
+        "lpn_field_length_slope_tip": "3e92997554892bc735399860295803dde02c659c",
         "lpn_field_lon": "6f9f011c5d36df6d431a68143636a75fbaa508bd",
         "lpn_field_lon_abbr": "eb9297283a5a34ca7d2cff274e9ff4c0db8ddbc5",
         "lpn_field_meter_count": "7833181000d643b63436596bf28dd9ab6195bb55",
@@ -6718,6 +6737,7 @@
         "lpn_inp_bad_file": "4c44d8c2fd5a6162a15695b4f671d271f01cd3c3",
         "lpn_inp_drop_anchor_missing": "1aec59fae090a5a3af46496f9171c7799879009a",
         "lpn_inp_drop_backdrop": "94e5a8aa28dfe204309465c4d1fe0c39dd33c6ff",
+        "lpn_inp_drop_comments": "b150c3fcb5f819b8b0db0d253881514d424e35ea",
         "lpn_inp_drop_curve_long": "d6226b38feaea5400b89e71773d7548a55a04dff",
         "lpn_inp_drop_curve_missing": "8c4377a898ea0be660a60ddabf75eb0a801dddb0",
         "lpn_inp_drop_cv": "87dc6bb191744d2bb77788058fcec3dd8de06720",
@@ -7458,6 +7478,8 @@
         "lpn_settings_symbol_cap_tip": "05fdc9ab58e18428a64cb70b62132df571b17a5d",
         "lpn_settings_symbol_opacity": "60ff3b0e2ee09b63c828a1055c6f7ca7e5a817df",
         "lpn_settings_symbol_size": "ec71574dc2e78f8ebcb52306f70ea195db0f9ed4",
+        "lpn_settings_text_halo": "b890d1ded983a3b10904fb63ff8eb12c89a4ab16",
+        "lpn_settings_text_halo_tip": "73804ffcb15d33cab44a0f15b2f588d2f8f9e806",
         "lpn_settings_text_size": "919bbf890af8d0fcbae2f6127168ffe7143f82cb",
         "lpn_settings_trials": "5a8d8be7ae9d54f5ea819d0be94c961001e890e8",
         "lpn_settings_trials_tip": "59455cc2fde7ccdfdcb416d83dfeb16a0365890b",
@@ -7504,6 +7526,7 @@
         "lpn_snap_shape_point": "bb91ef238958ca8a6aedf34973dd9ae05cea9398",
         "lpn_snap_vertex": "3505bfa79f93b3df0f7b9f5961d803078fc092fc",
         "lpn_snip_hint_free": "9b97a5d8106ed22f0d9fda929a6b44d8ae979634",
+        "lpn_snip_tip_copy": "1acac694fcbb3bf55cc3d2d03c3bca6198b9a617",
         "lpn_snip_tip_eraser": "784a499c84f20d35ca571e7e96e5b13ade5d27f2",
         "lpn_snip_tip_free": "20a81aadbcaa0cef0a377ec586a61bd6e6c08314",
         "lpn_snip_tip_map": "0de90468316e9839ad6f18c4ea9532e887e49c7d",
@@ -7698,6 +7721,7 @@
         "lpn_time_run_report_copy": "af74f7c5362aaee985bf8cda3dd75fc80751ce51",
         "lpn_time_run_report_tip": "28bd482a9fe6c630974c48e94b70cb4bb291ab05",
         "lpn_time_run_slow": "297f19c53b5ff62f064dc50796b21fbf28cb1d9e",
+        "lpn_time_run_stopped": "ca567e179672b98aea91e5104353d22f3e958e98",
         "lpn_time_run_tip": "59fe04bf387b953b94cc0c20cb11c10994664cc3",
         "lpn_time_runbox_hide": "1d17e713f131749a1e7e68a348328993c8d7270a",
         "lpn_time_running": "beafa35f92a92e2bfbbbbba1ed00d0704f881944",
@@ -7746,6 +7770,8 @@
         "lpn_tool_vertices_tip": "77dfc24631af78f81e5bf11a7fcb4842acda59bf",
         "lpn_tool_zoom_extent": "be866a8e867398648cdf09d8a972d5bbc745c029",
         "lpn_tool_zoom_extent_tip": "7babee9cbeeaf1df0d65d3019679bc6ab994341d",
+        "lpn_tool_zoom_selection": "00c1ce305cf3230bf95eeb2159ffb0b4c723cae1",
+        "lpn_tool_zoom_selection_tip": "1519add65a583290c56cfcbae125edf322dc05fa",
         "lpn_tool_zoom_window": "f3743ae9a422224f3b166001754cc973b35fd00a",
         "lpn_tool_zoom_window_tip": "af3a676e18143d8115e23d236d591072e563ee10",
         "lpn_ts_add": "b68a1120d5e8fbb4218017becd8f9000e7d82568",
@@ -10973,6 +10999,14 @@
             "words": 11,
             "ends_sentence": true
         },
+        "lpn_ex_net1_si_desc": {
+            "words": 31,
+            "ends_sentence": true
+        },
+        "lpn_ex_net1_si_title": {
+            "words": 7,
+            "ends_sentence": false
+        },
         "lpn_ex_net1_title": {
             "words": 5,
             "ends_sentence": false
@@ -11516,6 +11550,10 @@
         "lpn_field_length": {
             "words": 1,
             "ends_sentence": false
+        },
+        "lpn_field_length_slope_tip": {
+            "words": 27,
+            "ends_sentence": true
         },
         "lpn_field_lon": {
             "words": 1,
@@ -12903,6 +12941,10 @@
         },
         "lpn_inp_drop_backdrop": {
             "words": 22,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_comments": {
+            "words": 40,
             "ends_sentence": true
         },
         "lpn_inp_drop_curve_long": {
@@ -15865,6 +15907,14 @@
             "words": 3,
             "ends_sentence": false
         },
+        "lpn_settings_text_halo": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "lpn_settings_text_halo_tip": {
+            "words": 23,
+            "ends_sentence": true
+        },
         "lpn_settings_text_size": {
             "words": 3,
             "ends_sentence": false
@@ -16048,6 +16098,10 @@
         "lpn_snip_hint_free": {
             "words": 14,
             "ends_sentence": true
+        },
+        "lpn_snip_tip_copy": {
+            "words": 2,
+            "ends_sentence": false
         },
         "lpn_snip_tip_eraser": {
             "words": 8,
@@ -16825,6 +16879,10 @@
             "words": 34,
             "ends_sentence": true
         },
+        "lpn_time_run_stopped": {
+            "words": 16,
+            "ends_sentence": true
+        },
         "lpn_time_run_tip": {
             "words": 8,
             "ends_sentence": true
@@ -17015,6 +17073,14 @@
         },
         "lpn_tool_zoom_extent_tip": {
             "words": 45,
+            "ends_sentence": true
+        },
+        "lpn_tool_zoom_selection": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_tool_zoom_selection_tip": {
+            "words": 14,
             "ends_sentence": true
         },
         "lpn_tool_zoom_window": {

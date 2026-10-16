@@ -3404,6 +3404,10 @@ $ec_lang['lpn_engine_refused_fallback']='The numbers on screen came from the bui
 // A run EPANET started and could not finish, for example when a tank empties and the junctions it
 // fed have no other source (Error 110). {time} is the run time it stopped at, H:MM.
 $ec_lang['lpn_time_run_stopped']='The EPANET run stopped at {time}, so it has no results. Its run report says why.';
+$ec_lang['lpn_time_stat_stopped']='{statistic} not shown: the run stopped before the end of the period.';
+$ec_lang['lpn_time_stopped_no_quality']='No water quality results were computed, because the quality analysis starts after the hydraulic run ends.';
+$ec_lang['lpn_energy_stopped']='The EPANET run stopped before the end of the period, so no pump energy figures were kept.';
+$ec_lang['lpn_time_run_stopped_kept']='The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.';
 // The run's own version of that last sentence: a period run has a moment and a tank level to name,
 // and a one-moment solve does not, which is where the shared label stops.
 $ec_lang['lpn_time_run_fell_back']='The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level.';
@@ -3432,6 +3436,8 @@ $ec_lang['lpn_settings_align_labels']='Draw link labels along the link line';
 $ec_lang['lpn_settings_readability_bias']='Label flip angle adjustment (degrees)';
 $ec_lang['lpn_settings_readability_bias_tip']='Flip a label to keep it right side up when it leans more than this many degrees left of vertical.';
 $ec_lang['lpn_settings_mask_labels']='Solid background behind labels';
+$ec_lang['lpn_settings_text_halo']='Text halo width (percent of text size)';
+$ec_lang['lpn_settings_text_halo_tip']='Width of the solid outline behind map text, as a percent of the text size. Applies when Solid background behind labels is on.';
 // Task 408: dragging a label away from its node draws a leader line, and this pulls that line onto
 // a round angle when the drag comes close to one. The values are numbers and the degree sign, which
 // need no translation; "Off" borrows lpn_settings_legend_off, the same word for the same idea.

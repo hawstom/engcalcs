@@ -3032,15 +3032,31 @@ var EngCalcs = EngCalcs || {};
 	// which is what a leader line points at. A Text OBJECT passes a negative value so a three-line
 	// note straddles the point the user placed it on -- see textLabelFirstDy(), where the rule that
 	// one line must render pixel-identically to before is stated.
+	//
+	// **PLAIN SEGMENTS SHARE ONE RUN** (Task 791, Tom R-393: *"In a pipe label, the halo of the
+	// separator comma can hide what's near it, and vice versa"*). The halo is `paint-order: stroke
+	// fill`, which the browser applies piece by piece: every tspan's white stroke is painted after the
+	// ink of the tspans before it, so a unit mark, a separator or the next value nibbled the last
+	// glyph before it (`10"` read `1C"`, `5280'` read `528C'`). Inside one run the stroke is laid
+	// down for the whole run before any of its ink, so a row is now one tspan, broken only where a
+	// segment needs its own (an extrema mark's text-decoration). Fewer elements is cheaper, too.
+	// NOT a filter on the label layer, tried and measured: in Chromium it erased every label on a
+	// latitude/longitude map and cost 5 to 10 times the stroke's raster time on 1,600 labels.
 	function setMultilineText(textEl, x, rows, firstDy) {
 		while (textEl.firstChild) { textEl.removeChild(textEl.firstChild); }
 		rows.forEach(function (row, i) {
+			var plain = null;   // the row's current undecorated run, if the last segment was one
 			row.forEach(function (seg, j) {
+				// The run remembers its segments, so the shed pricing (noteRowWidths()) can still bank
+				// one width per segment without a tspan per segment.
+				if (!seg.decoration && plain) { plain.textContent += seg.text; plain.lpnSegs.push(seg.text); return; }
 				// **dy IN `em`, NOT IN WORLD UNITS.** An em resolves against the element's own
 				// font-size, so line spacing follows a zoom by itself and the tspans never have to be
 				// rebuilt for one; in world units the attribute is stale the instant the scale
 				// changes. 1.2 is effectiveLineHeight()'s own multiple of the font size.
 				var tspan = el('tspan', j === 0 ? { x: x, dy: i === 0 ? (firstDy ? firstDy + 'em' : 0) : '1.2em' } : {}, textEl);
+				plain = seg.decoration ? null : tspan;
+				tspan.lpnSegs = [seg.text];
 				if (seg.decoration) {
 					tspan.setAttribute('text-decoration', seg.decoration === 'high' ? 'overline' : 'underline');
 					tspan.setAttribute('class', seg.decoration === 'high' ? 'lpn-max' : 'lpn-min');
@@ -3084,14 +3100,31 @@ var EngCalcs = EngCalcs || {};
 			c = t.childNodes[i];
 			if (c.nodeType !== 1 || !c.getAttribute) { continue; }
 			w = 0;
-			try {
-				w = measuredTextWidth(t, c.textContent, fs,
-					function () { return c.getComputedTextLength(); });
-			} catch (err) { w = 0; }
-			// **THE PER-SEGMENT WIDTHS RIDE ALONG FOR FREE** (Task 436). This loop already reads
-			// every tspan; keeping the individual figures as well as the row sums costs one array
-			// and no extra layout, and it is what lets the shed cascade below stop redrawing.
-			seg.push(w);
+			// **A RUN HOLDING SEVERAL SEGMENTS IS MEASURED SEGMENT BY SEGMENT** (Task 791: plain
+			// segments share one tspan so no piece's halo covers another's ink). Each piece's width
+			// is its own substring's, through the same cache keyed on the same text a tspan of its
+			// own was, so the shed pricing below sees one width per segment exactly as before.
+			if (c.lpnSegs && c.lpnSegs.length > 1 && c.lpnSegs.join('') === c.textContent) {
+				(function (run) {
+					var off = 0;
+					run.lpnSegs.forEach(function (str) {
+						var at = off, sw = 0;
+						try {
+							sw = measuredTextWidth(t, str, fs, function () { return run.getSubStringLength(at, str.length); });
+						} catch (err) { sw = 0; }
+						seg.push(sw); w += sw; off += str.length;
+					});
+				})(c);
+			} else {
+				try {
+					w = measuredTextWidth(t, c.textContent, fs,
+						function () { return c.getComputedTextLength(); });
+				} catch (err) { w = 0; }
+				// **THE PER-SEGMENT WIDTHS RIDE ALONG FOR FREE** (Task 436). This loop already reads
+				// every tspan; keeping the individual figures as well as the row sums costs one array
+				// and no extra layout, and it is what lets the shed cascade below stop redrawing.
+				seg.push(w);
+			}
 			hasX = c.getAttribute('x') != null;
 			if (hasX || !out.length) { out.push(w); } else { out[out.length - 1] += w; }
 		}
@@ -6139,6 +6172,11 @@ var EngCalcs = EngCalcs || {};
 			// the control exists because a clean drawing with no backdrop reads better without the
 			// patches, which is a judgement about the sheet and therefore the user's to make.
 			maskLabels: true,
+			// **TEXT HALO WIDTH, percent of the text size** (Tom, 2026-10-14: "our text halos need
+			// to be bigger and maybe available as a setting ... Can we double them?"). The stroke
+			// width stays in em, so 40 is the old 0.2em doubled to 0.4em. A project saved before
+			// this reads as undefined and gets 40; applyTextHalo() writes --lpn-halo on the <svg>.
+			textHalo: 40,
 			// **FLOW-DIRECTION ARROWS, ON** (Tom, 2026-09-01: "it would be nice to have a Settings
 			// option to turn off flow direction arrows"). A switch that takes something away, so the
 			// default is what the page has always drawn -- an upgrade must not restyle anyone's map.
@@ -13593,6 +13631,9 @@ var EngCalcs = EngCalcs || {};
 	// How many times Zoom to fit may re-solve against the labels as drawn. Two is the most any
 	// example has needed; the cap exists so a layout that never settles cannot hang a click.
 	var LPN_FIT_SETTLE_PASSES = 8;
+	// Zoom to fit never shrinks the network below this share of its own lettering-free fit to make
+	// room for labels and map furniture (R-403). See capToNetwork() in zoomExtentRun().
+	var LPN_FIT_NETWORK_SHARE = 0.9;
 	// What the last Zoom to fit settled on, so a press from that same view can be answered by one
 	// measurement instead of a relayout (see zoomExtent()). In memory only; never saved.
 	var lastFit = null;
@@ -13710,14 +13751,34 @@ var EngCalcs = EngCalcs || {};
 			padTop = Math.max(pad, overlayReserve('lpn_mode_hint')),
 			padBottom = Math.max(pad, overlayReserve('lpn_map_footer'));
 		var items, s;
+		// **A PIECE OF INK WIDER (OR TALLER) THAN THE WINDOW ON ITS OWN IS LEFT OUT OF THAT AXIS**
+		// (R-399; Tom, 2026-10-15, on a phone in tall mode: *"Zoom to fit doesn't work for Basic
+		// example SI units ... It zooms out magnitudes wider than it should."*). A Text is a fixed
+		// size on SCREEN, so no scale makes it narrower: the Basic examples' title, "HawsEDC
+		// Calculators" at four times the text size, is about 450 px wide and a phone canvas is 410.
+		// fitScaleFor() then answers minScale(), the drawing-sized floor (since 68d6b76b, 2026-09-16),
+		// and because Texts are in step 1's MODEL items too, the model fallback below bottomed out
+		// with it -- the 1,400 m network drawn as a 4 px mark. Measured 0.00286 against a desktop
+		// 0.83. Dropping such an item from the axis it cannot fit changes nothing when everything
+		// fits, which is every desktop fit; on a narrow window the network is framed and that one
+		// Text overhangs, which is the trade the fallback below already states. Per axis, so a title
+		// too wide to fit still has its height reserved. dev/lpn-spike/phone-fit-browser-harness.js.
+		function fitsAlone(it, loKey, hiKey, span, padLo, padHi) {
+			return it[loKey] + it[hiKey] <= span - padLo - padHi;
+		}
+		function fittable(set, loKey, hiKey, span, padLo, padHi) {
+			var kept = set.filter(function (it) { return fitsAlone(it, loKey, hiKey, span, padLo, padHi); });
+			return kept.length ? kept : set;
+		}
 		function solve(extra) {
 			var e = extra || 0;
-			return Math.min(fitScaleFor(items, 'x', 'l', 'r', r.width, padLeft + e, padRight + e),
-				fitScaleFor(items, 'y', 't', 'b', r.height, padTop + e, padBottom + e));
+			return Math.min(
+				fitScaleFor(fittable(items, 'l', 'r', r.width, padLeft + e, padRight + e), 'x', 'l', 'r', r.width, padLeft + e, padRight + e),
+				fitScaleFor(fittable(items, 't', 'b', r.height, padTop + e, padBottom + e), 'y', 't', 'b', r.height, padTop + e, padBottom + e));
 		}
 		function place(v, set) {
-			return { tx: fitWindow(set, v, 'x', 'l', 'r', r.width, padLeft, padRight).t,
-				ty: fitWindow(set, v, 'y', 't', 'b', r.height, padTop, padBottom).t };
+			return { tx: fitWindow(fittable(set, 'l', 'r', r.width, padLeft, padRight), v, 'x', 'l', 'r', r.width, padLeft, padRight).t,
+				ty: fitWindow(fittable(set, 't', 'b', r.height, padTop, padBottom), v, 'y', 't', 'b', r.height, padTop, padBottom).t };
 		}
 		// **ROOM FOR LABELS IS NOT MADE AT A SCALE THAT HIDES THEM** (R-263, Tom 2026-09-25: *"some
 		// label placements cause Zoom to Fit to leave too much padding."*). Past the labeling
@@ -13770,6 +13831,37 @@ var EngCalcs = EngCalcs || {};
 		// press from the fitted view retraces the same steps to the same place.
 		items = fitItems(state.s, true);
 		var modelItems = items;
+		// **THE NETWORK'S OWN FIT: NODES, VERTICES AND PIPES, NO LETTERING, NO FURNITURE** (R-403).
+		// Everything below makes room -- for Texts, data labels, the legend, the scale bar -- and on
+		// a desktop that costs the network 3-12% of its size. On a phone the same lettering and
+		// furniture are the same size in PIXELS on a map a quarter as wide, and the room they took
+		// shrank the network to 19-65% of the map (Tom, 2026-10-15: *"All of the examples fail to
+		// Zoom to fit."*; measured at 360-412 px, the legend alone reserving 130-200 px of a side).
+		// So ON A PHONE (smallScreen(), the page's one phone test) the room made for them is
+		// capped: the answer is never smaller than LPN_FIT_NETWORK_SHARE of this one, and when the
+		// cap bites the frame is centred on the network and lettering may overhang or sit under the
+		// legend. **NOT ON A DESKTOP, deliberately:** there the same lettering costs the gallery's
+		// networks 1-26% (measured at 1280, 1440 and 1920 px; Elm Street at 1280 is the 26%), a
+		// cost Tom has looked at and accepted, and a cap tight enough to help a phone would move
+		// desktop fits he has not asked to change. dev/lpn-spike/phone-fit-browser-harness.js.
+		var netSubset = { node: {}, link: {}, label: {}, customer: {} };
+		doc.nodes.forEach(function (n) { netSubset.node[n.id] = 1; });
+		doc.links.forEach(function (l) { netSubset.link[l.id] = 1; });
+		var netItems = fitItems(state.s, true, netSubset), netFit,
+			basePads = [padLeft, padRight, padTop, padBottom];
+		items = netItems;
+		netFit = solve();
+		items = modelItems;
+		function capToNetwork() {
+			if (!smallScreen()) { return; }
+			var floor = LPN_FIT_NETWORK_SHARE * netFit;
+			if (!(state.s < floor && floor > minScale())) { return; }
+			// Placed inside the BASE margins: the edges the settle reserved for the legend and the
+			// scale bar are what the cap gives up, and centring in them pushed Net2's west end off
+			// the map (a 145 px right reserve on a 358 px map).
+			padLeft = basePads[0]; padRight = basePads[1]; padTop = basePads[2]; padBottom = basePads[3];
+			apply(floor, place(floor, netItems));
+		}
 		s = solve(labelTuning().fitRoom * settings.textSize);
 		// **STEP 1'S ANSWER IS KEPT AS THE FALLBACK, and it is the only one that cannot be absurd.**
 		// It is the MODEL alone -- nodes, vertices and pipes -- so it is a statement about the
@@ -13833,6 +13925,7 @@ var EngCalcs = EngCalcs || {};
 			apply(s, at);
 			settleOnDrawnInk();
 		}
+		capToNetwork();
 		lastFit = { seed: seed, s: state.s, tx: state.tx, ty: state.ty, pads: [padLeft, padRight, padTop, padBottom] };
 		// **A PRESS THAT BEAT THE RESULTS DOES NOT GET A SECOND ONE WHEN THEY LAND.** A build once
 		// re-ran this fit from applySolveResult() when a press had landed ahead of a due solve, on
@@ -13882,16 +13975,24 @@ var EngCalcs = EngCalcs || {};
 		// `true` when something is outside the padded frame, the overlay's rectangle when something
 		// is under an overlay, null when all is clear.
 		function firstObstruction(all) {
-			var i, j, it, x, y, e = 0.5, furn = mapFurnitureRects(r), f, bl, br, bt, bb, outside = false;
+			var i, j, it, x, y, e = 0.5, furn = mapFurnitureRects(r), f, bl, br, bt, bb, fx, fy, outside = false;
 			for (i = 0; i < all.length; i++) {
 				it = all[i]; x = state.tx + state.s * it.x; y = state.ty + state.s * it.y;
 				bl = x - it.l; br = x + it.r; bt = y - it.t; bb = y + it.b;
-				for (j = 0; j < furn.length; j++) {
-					f = furn[j];
-					if (Math.min(br, f.r) - Math.max(bl, f.l) > e && Math.min(bb, f.b) - Math.max(bt, f.t) > e) { return f; }
+				// Ink that cannot fit the window on an axis at any scale (see fitsAlone()) overhangs
+				// on that axis by design, so it is not an obstruction there, and it is not judged
+				// against the furniture either: it covers some corner at every scale, and reserving an
+				// edge for it would only step the zoom down for nothing.
+				fx = fitsAlone(it, 'l', 'r', r.width, padLeft, padRight);
+				fy = fitsAlone(it, 't', 'b', r.height, padTop, padBottom);
+				if (fx && fy) {
+					for (j = 0; j < furn.length; j++) {
+						f = furn[j];
+						if (Math.min(br, f.r) - Math.max(bl, f.l) > e && Math.min(bb, f.b) - Math.max(bt, f.t) > e) { return f; }
+					}
 				}
-				if (bl < padLeft - e || br > r.width - padRight + e ||
-					bt < padTop - e || bb > r.height - padBottom + e) { outside = true; }
+				if ((fx && (bl < padLeft - e || br > r.width - padRight + e)) ||
+					(fy && (bt < padTop - e || bb > r.height - padBottom + e))) { outside = true; }
 			}
 			return outside || null;
 		}
@@ -37196,6 +37297,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		refreshValueColors();
 		renderLabelsLegend();
+		applyTextHalo();
 		applyMaskLabels();   // the setting belongs to the project, so opening one can change it
 		updateEmptyHint();
 		clearStatusHidden();   // hidden messages belong to the network that was on screen
@@ -48644,6 +48746,7 @@ var EngCalcs = EngCalcs || {};
 		refreshValueColors();
 		applyLabelVisibility();
 		applyMaskLabels();
+		applyTextHalo();
 		updateEmptyHint();
 		updateModeHint(); // initial mode is 'select', set before setMode() ever runs -- render it now
 		renderTabs();
@@ -52973,6 +53076,13 @@ var EngCalcs = EngCalcs || {};
 		doc.links.forEach(function (l) { updateArrow(l.id); });
 		relayoutLabels();
 	}
+	function textHaloPct() {
+		var v = settings.textHalo;
+		return (typeof v === 'number' && isFinite(v) && v >= 0) ? v : 40;
+	}
+	function applyTextHalo() {
+		if (svg) { svg.style.setProperty('--lpn-halo', String(textHaloPct() / 100)); }
+	}
 	function applyMaskLabels() {
 		if (svg) { svg.classList.toggle('lpn-masks-off', settings.maskLabels === false); }
 	}
@@ -54103,6 +54213,16 @@ var EngCalcs = EngCalcs || {};
 			applyMaskLabels(); saveToStorage();
 		});
 		row(mapBody, pc.lpn_settings_mask_labels || 'Solid background behind labels', maskInput);
+		var haloInput = document.createElement('input');
+		haloInput.type = 'number'; haloInput.className = 'ec-spin';
+		haloInput.step = '5'; haloInput.min = '0'; haloInput.max = '100'; haloInput.value = textHaloPct();
+		haloInput.addEventListener('change', function () {
+			var v = +haloInput.value;
+			if (haloInput.value !== '' && isFinite(v) && v >= 0 && v <= 100) { settings.textHalo = v; applyTextHalo(); saveToStorage(); }
+			else { haloInput.value = textHaloPct(); }
+		});
+		row(mapBody, pc.lpn_settings_text_halo || 'Text halo width (percent of text size)', haloInput,
+			pc.lpn_settings_text_halo_tip);
 		// **ONE CONTROL, NOT A CHECKBOX AND A PICKER** (ROADMAP Task 408). Tom asked for "a toggle
 		// or picker for the increment"; Off is one of the increments, exactly as it is one of the
 		// legend placements, so there is one decision and no question of which control wins.
@@ -54337,10 +54457,8 @@ var EngCalcs = EngCalcs || {};
 		// EPANET's by total flow) and that is a refinement of the same quantity, not a different
 		// one. Two rows a reader cannot tell apart was the alternative.
 		//
-		// **THE EFFECTIVE DEFAULT DOES NOT MOVE.** Unset still means our own 1e-9 natively, which is
-		// six orders tighter than EPANET's 0.001 and is deliberate: at this page's scale the extra
-		// iterations are free, and it is what keeps a disagreement between the two engines from ever
-		// being just tolerance. Adopting EPANET's NAME is not adopting its default.
+		// **UNSET MEANS EPANET'S OWN 0.001, IN BOTH ENGINES, since R-388 (2026-10-15).** It meant
+		// 1e-9 natively and 1e-5 in EPANET before; see solveAccuracy().
 		// ---- EPANET's [OPTIONS], the ones that ACT (ROADMAP Task 553) ----
 		//
 		// Tom, 2026-08-28, naming what a person must be able to see: *"the default pattern must be
@@ -55204,6 +55322,24 @@ var EngCalcs = EngCalcs || {};
 		});
 		return shown;
 	}
+	/**
+	 * **A NEW SEARCH STARTS AT THE TOP OF ITS RESULTS** (R-397; Tom, 2026-10-15: *"When I type a
+	 * search term, the scrollbar doesn't go to the top. So my results appear empty."*).
+	 *
+	 * Regressed by 4de96172 (2026-09-04), which put one pane-height of blank room after the content
+	 * (`.lpn-setbox-content::after`) so the last section can scroll to the top. Before that, a
+	 * filter that shrank the content below the pane clamped the scroll back to 0 by itself; with the
+	 * blank room the old scroll position is still reachable, so a reader scrolled halfway down saw
+	 * only the blank. Only a CHANGE OF THE SEARCH TEXT resets it: a rebuild of the box (a setting
+	 * changed) re-runs applySetboxFilter() too, and must leave the reader where they were.
+	 */
+	function filterSetboxFromTop() {
+		var content = document.getElementById('lpn_setbox_content'),
+			index = document.getElementById('lpn_setbox_index');
+		applySetboxFilter();
+		if (content) { content.scrollTop = 0; }
+		if (index) { index.scrollTop = 0; }
+	}
 	function applySetboxFilter() {
 		var box = setboxEl(), input = document.getElementById('lpn_setbox_filter'),
 			none = document.getElementById('lpn_setbox_none'), pc = EngCalcs.pageConfig || {},
@@ -55728,14 +55864,14 @@ var EngCalcs = EngCalcs || {};
 			// PHP tip helpers build a label-plus-glyph, which is the wrong shape for a bare input.
 			helpTip(filter, filter.title);
 			// `input`, not `change`: a filter that waits for blur is not a filter.
-			filter.addEventListener('input', applySetboxFilter);
+			filter.addEventListener('input', filterSetboxFromTop);
 			// Escape inside the box CLEARS THE FILTER before it closes the box -- the convention
 			// every search field has, and the alternative loses the box over a typo.
 			filter.addEventListener('keydown', function (e) {
 				if (e.key === 'Escape' && filter.value) {
 					e.stopPropagation();
 					filter.value = '';
-					applySetboxFilter();
+					filterSetboxFromTop();
 				}
 			});
 		}
@@ -60419,10 +60555,105 @@ var EngCalcs = EngCalcs || {};
 		tgt.focus();
 		if (tgt.tagName.toLowerCase() === 'input' && (tgt.type === 'text' || tgt.type === 'number')) { tgt.select(); }
 	}
+	// **TAB OUT OF A FIELD THAT HAS JUST BEEN EDITED.** Committing the change rebuilds the whole
+	// box (refreshPopupIfOpen), and the element the browser had chosen to focus next is thrown
+	// away with it, so focus fell to the page body. Same cure as the arrow keys: blur first (which
+	// commits and rebuilds), then find the target in the NEW box. The target is named by what it is
+	// (its row's label text, its kind, and which of that name it is), not by where it sat, so a
+	// commit that adds or removes rows still lands on the right field. Only a text or number box
+	// that has a neighbour inside the popup is taken over; anything else tabs natively.
+	function popupTabbables(popup) {
+		var out = [];
+		Array.prototype.forEach.call(popup.querySelectorAll('input, select, textarea, button, a[href], [tabindex]'), function (el) {
+			if (el.disabled || el.tabIndex < 0 || (el.type || '').toLowerCase() === 'hidden') { return; }
+			if (!el.offsetParent && !el.getClientRects().length) { return; }
+			out.push(el);
+		});
+		return out;
+	}
+	function popupTabName(el) {
+		var lab = el.closest && el.closest('label'), txt = '', n;
+		if (lab) {
+			for (n = lab.firstChild; n; n = n.nextSibling) {
+				if (n.nodeType === 3 || (n.nodeType === 1 && !/^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(n.tagName))) { txt += n.textContent; }
+			}
+		} else { txt = el.id || el.getAttribute('aria-label') || el.title || ''; }
+		return el.tagName + '|' + (el.type || '') + '|' + txt.replace(/\s+/g, ' ').trim();
+	}
+	// The Nth field of that name in `list`, or null.
+	function popupTabFind(list, name, occ) {
+		var i, seen = 0;
+		for (i = 0; i < list.length; i++) {
+			if (popupTabName(list[i]) === name) { if (seen === occ) { return list[i]; } seen++; }
+		}
+		return null;
+	}
+	function popupTabOcc(list, el, name) {
+		var i, occ = 0;
+		for (i = 0; i < list.length && list[i] !== el; i++) { if (popupTabName(list[i]) === name) { occ++; } }
+		return occ;
+	}
+	function popupIsTypedBox(el) {
+		var t = el && el.tagName && el.tagName.toLowerCase() === 'input' ? (el.type || '').toLowerCase() : '';
+		return (t === 'text' || t === 'number') && !el.getAttribute('list');
+	}
+	// Blur `cur` (which commits it and rebuilds the box), then focus what `want` names in the NEW box.
+	function popupBlurThenFocus(popup, cur, want, fallbackIdx) {
+		var list, tgt;
+		cur.blur();
+		list = popupTabbables(popup);
+		tgt = popupTabFind(list, want.name, want.occ) || list[Math.max(0, Math.min(list.length - 1, fallbackIdx))];
+		if (!tgt) { return; }
+		tgt.focus();
+		if (popupIsTypedBox(tgt)) { tgt.select(); }
+	}
+	function popupTabKeyDown(e, popup) {
+		var cur = e.target, list, idx, dir, name;
+		if (e.key !== 'Tab' || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || !popupIsTypedBox(cur)) { return; }
+		list = popupTabbables(popup);
+		idx = list.indexOf(cur);
+		dir = e.shiftKey ? -1 : 1;
+		if (idx < 0 || idx + dir < 0 || idx + dir >= list.length) { return; }
+		name = popupTabName(list[idx + dir]);
+		e.preventDefault();
+		popupBlurThenFocus(popup, cur, { name: name, occ: popupTabOcc(list, list[idx + dir], name) }, idx + dir);
+	}
+	// A click on another typed box while one is being edited: the same blur-then-rebuild loses the
+	// clicked box, so the click is taken over only in that one case.
+	function popupTabMouseDown(e, popup) {
+		var cur = document.activeElement, tgt = e.target, list, idx, name;
+		if (e.button !== 0 || cur === tgt || !popupIsTypedBox(cur) || !popupIsTypedBox(tgt) || !popup.contains(cur)) { return; }
+		list = popupTabbables(popup);
+		idx = list.indexOf(tgt);
+		if (idx < 0) { return; }
+		name = popupTabName(tgt);
+		e.preventDefault();
+		popupBlurThenFocus(popup, cur, { name: name, occ: popupTabOcc(list, tgt, name) }, idx);
+	}
+	// **A REBUILD THAT ARRIVES WHILE A BOX IS BEING TYPED IN** (the debounced solve lands 300 ms
+	// after an edit and redraws the box). Focus, the caret and any text not yet committed go back
+	// into the same field of the new box, found by name.
+	function refreshPopupKeepingFocus() {
+		var popup = document.getElementById('lpn_popup'), cur = document.activeElement, list, name, occ, v, a, b, tgt, typed;
+		if (!popup || !cur || cur === popup || !popup.contains(cur) || popupTabbables(popup).indexOf(cur) < 0) { refreshPopupIfOpen(); return; }
+		list = popupTabbables(popup);
+		name = popupTabName(cur); occ = popupTabOcc(list, cur, name);
+		typed = popupIsTypedBox(cur);
+		v = cur.value;
+		try { a = cur.selectionStart; b = cur.selectionEnd; } catch (e) { a = b = null; }
+		refreshPopupIfOpen();
+		tgt = popupTabFind(popupTabbables(popup), name, occ);
+		if (!tgt || tgt === document.activeElement) { return; }
+		tgt.focus();
+		if (!typed) { return; }
+		if (tgt.value !== v) { tgt.value = v; }
+		try { if (a !== null) { tgt.setSelectionRange(a, b); } } catch (e) { /* number boxes refuse a range */ }
+	}
 	function wirePopup() {
 		var popup = document.getElementById('lpn_popup');
 		document.getElementById('lpn_popup_close').addEventListener('click', function () { closePopup(true); });
-		popup.addEventListener('keydown', function (e) { popupArrowKey(e, popup); });
+		popup.addEventListener('keydown', function (e) { popupArrowKey(e, popup); popupTabKeyDown(e, popup); });
+		popup.addEventListener('mousedown', function (e) { popupTabMouseDown(e, popup); });
 		makePanelDraggable(popup, function (at) { popupUserPos = at; });
 		popup.addEventListener('dblclick', function (e) {
 			if (e.target !== popup) { return; }
@@ -65086,18 +65317,22 @@ var EngCalcs = EngCalcs || {};
 	 * had deliberately loosened or tightened it — keeps solving to exactly the number it always did.
 	 * Nothing writes `settings.tolerance` any more.
 	 *
-	 * **1e-9 IS OURS AND STAYS OURS.** EPANET's own default for the same option is 0.001; taking its
-	 * NAME is not taking its default. At this page's scale the extra iterations are free, and the
-	 * tight number is what stops a disagreement between the two engines from ever being tolerance —
-	 * see js/lpn-solver.js's note beside `tol`.
+	 * **AN EMPTY BOX MEANS EPANET'S OWN 0.001, IN BOTH ENGINES** (R-388; Tom, 2026-10-15, asked
+	 * whether the default should be 0.001 instead of 1e-5: *"Yes. And tip says 1e-9, so sync
+	 * that."*). Until then an empty box meant 1e-5 in the EPANET engine and 1e-9 in the built-in
+	 * one, and the tip quoted the second. His two-system project reported "did not converge" at
+	 * 1e-5 and converged at 0.001 (Task 796). One number now, LPN_DEFAULT_ACCURACY, which is also
+	 * what the Settings tip quotes and what js/lpn-epanet.js writes when nothing is stated. A
+	 * project that STATES an Accuracy keeps it: nothing here rewrites a stored number.
 	 */
+	var LPN_DEFAULT_ACCURACY = 0.001;
 	function solveAccuracy() {
 		var a = (settings.hydraulics || {}).accuracy;
 		if (typeof a === 'number' && isFinite(a) && a > 0) { return a; }
 		if (typeof settings.tolerance === 'number' && isFinite(settings.tolerance) && settings.tolerance > 0) {
 			return settings.tolerance;
 		}
-		return 1e-9;
+		return LPN_DEFAULT_ACCURACY;
 	}
 	/**
 	 * The hydraulic options as an ENGINE wants them: a shallow clone, with the two unit-bearing
@@ -70191,6 +70426,11 @@ var EngCalcs = EngCalcs || {};
 				'This network has no pumps, so there is nothing drawing power.', host);
 			return;
 		}
+		if (!sum && EngCalcs.lpnTimeRunStopped && EngCalcs.lpnTimeRunStopped()) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_energy_stopped ||
+				'The EPANET run stopped before the end of the period, so no pump energy figures were kept.', host);
+			return;
+		}
 		if (!sum) {
 			ffEl('p', 'lpn-ff-note', pc.lpn_energy_needs_run || 'Pump energy is power integrated over the run, so it needs an extended period simulation. Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.', host);
 			return;
@@ -71983,7 +72223,7 @@ var EngCalcs = EngCalcs || {};
 		var pdaNote = pdaShort > 0
 			? (pc.lpn_pda_deficit_note || 'Junctions receiving less than their demand: {n}.').replace('{n}', String(pdaShort))
 			: '';
-		setStatus([notConvergedNote, valveRouteNote, pdaNote, omittedNote,
+		setStatus([result.stoppedNote || '', notConvergedNote, valveRouteNote, pdaNote, omittedNote,
 			droppedNote('control-dangling', 'lpn_control_dangling_note',
 				'These controls name an element that is no longer in this project, so they were left out: {ids}'),
 			droppedNote('control-unreadable', 'lpn_control_unreadable_note',
@@ -72021,7 +72261,7 @@ var EngCalcs = EngCalcs || {};
 		// junction's Pressure/Head rows are read straight off lastSolveResult at render time, so
 		// the popup simply kept showing the number it had drawn a third of a second earlier,
 		// disagreeing with its own map label and table row until the popup was closed and reopened.
-		refreshPopupIfOpen();
+		refreshPopupKeepingFocus();
 		// And the energy report, on the same seam and for the same reason: a run that has just
 		// been re-done, or whose frames an edit dropped, must not leave last time's money on
 		// screen with nothing saying it is stale.

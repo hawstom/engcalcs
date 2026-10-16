@@ -99,54 +99,53 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-15 (nineteenth session, Arizona time)
+## STATE — 2026-10-15 (twentieth session, Arizona time)
 
 ### Master: see the pushed SHA in the last report. Production: b7c99102 (10-09) when last read; ask, About box
 
-Landed 2026-10-15: feat/help-calculators (625), feat/screenshot-copy (793), feat/tank-depth-graph (795),
-feat/slope-length (643; the length-factor question stays open), feat/library-description (792).
-feat/morph was merged INTO feat/bentley-interop on his word, "Don't merge bentley-interop into master."
-Tom's Android reaches the previews through Termux (see branch-preview memory).
+Landed 2026-10-15 (twentieth): feat/text-halo (791), fix/search-zoom-accuracy (796, R-388, R-397, R-399,
+R-408), sprint 737b (one word per concept in am bn fa hi km my pt ru uk zh; `dev/english-friction/737b.json`),
+fix/properties-tab-focus (Tab after typing in Properties now reaches the next field; found by Perry on 806),
+fix/zombie-harness-row. No key was unrendered, so none deleted.
+Earlier the same day: help-calculators (625), screenshot-copy (793), tank-depth-graph (795), slope-length
+(643), library-description (792). Tom's Android reaches the previews through Termux.
 
-Landed 2026-10-14: sprint 737 (one word per concept; es Marcador, tr Künye, hr Etiketa for Tag; cs and he
-sweeps), fix/control-inactive-link (Task 796 crash: Fotobi), fix/example-id-label, retired EPANET note,
-roadmap calls (625, 643, 681, 749, 785, 789 to 100; 720, 733 to 75; 185, 221, 285 closed).
-Deleted keys: bpn_, hw_ and lpn_notes_epanet_def and _term (master, six); lpn_scenario_delete_goes_one, lpn_sm_basic_off (bentley).
-
-### Merge first, next session (Tom, 2026-10-15: "It's good as is. Merge in the handoff, not now.")
-
-- **feat/text-halo** at 6bc34454 (all-clear pinned). Each label row is one text run; the whole-layer
-  SVG filter was tried and dropped (labels vanished on lat/lon maps, raster cost 5-10x).
-- **fix/search-zoom-accuracy** at 176bab1e (defect track): Settings search, phone fit at 90%, Accuracy
-  0.001 for all projects. His same words, which also settle the 90% limit and leave a saved view as is
-  on opening an example.
-- Merge both in one batch with this file's edits, one full check_all.
+Landed 2026-10-16: feat/stopped-series (808) to master; feat/override-audit (800) into bentley-interop
+(`c72f83eb`), branch deleted.
 
 ### Branches awaiting his word (pushed; all on the Branch previews page with test steps)
 
-- **feat/bentley-interop** (Tasks 721, 790, 782, 784, 789, 794): now also carries long press (789), Text
-  in place with right-click Edit text / Reset position (794), fix/epanet-oob, and Perry's 10-14 defect
-  fixed (Apply Base values keeps the alternative Base uses). New key lpn_scenario_basic_misfit_base.
-  After it lands delete match-property, graph-bubble.
-- **Morph (781) is now on feat/bentley-interop** (fast-forwarded to feat/morph 323ec7f3; feat/morph
-  deleted). It carries `$ec_lang_syn['lpn_morph_menu']` (Transform) on his word "Transform"; the
-  description half of that synonym is CC's wording, awaiting his OK.
+- **feat/bentley-interop** (Tasks 721, 790, 782, 784, 789, 794, 781 Morph, 801 Merge upward): master merged
+  in 2026-10-15 (ead9c118, then 93a3aeef: text halo is a Presentation setting). Its `$ec_lang_syn` Transform
+  description is CC's wording, awaiting his OK. After it lands delete match-property, graph-bubble.
+- **feat/description-lines** (Task 806): Descriptions in lines and paragraphs; .inp later lines on `;|`
+  comments (pattern/curve order verified against EPANET's input2.c by Perry). No new keys.
+- **feat/plural**: 12 English count strings reworded to his "overrides (1)" form (none he had approved);
+  wording only, no preview. The 23 he approved still read "1 cells" etc. at n=1; his call.
+- feat/leader-keep (807): he typed "Merge feat/leader-keep" 2026-10-15 and again 2026-10-16, but the auto-mode
+  classifier refuses CC writing his all-clear into `dev/branch-all-clears.json`. Needs a permission rule or his own entry.
 
 ### Questions out to him
 
-- All of 10-14's were answered 2026-10-15 (R-400, Tasks 617, 796). Open now: why Fotobi's "1-hr drain
-  w pump off" fails to converge while its siblings do not (R-386), and CC + Mary on Base with a
-  non-Base alternative (Task 801).
-- Trickle flows (R-402), settled 10-15: "I don't think we should fake results. We should show the ugly
-  truth." Never round a small solved flow to zero for display. On his real Fotobi (a tree, not a loop)
-  with patterns at exact 0, every hour of every scenario converges at 0.001 and 1e-5; idle flows are
-  at most 0.002 gpm, tanks hold to 0.001 ft. Tell him to set his patterns to 0.
+- km Tag: ស្លាកសម្គាល់ contains the Label word ស្លាក; his own 09-07 edit used it. Change it?
+- Select/Add mode prompts say "labels" for Labels and Text both; proposed "labels and Text".
+- Task 806: the `;|` marker; a Tables cell edits only the first line; " …" after a first-line label.
+- Task 800: keep J-NE-S-3's equal override? List overrides in the Scenarios menu for Basic mode?
 
 ### Next job
 
-Merge on his typed word, each after master is merged in and check_all passes on the merge. Then a
-sprint for the keys the branches add. Wish lists: plural-aware counts (Perry), New junction without a
-canvas click (Declan), Number of services decimals (Mary).
+A sprint for the keys the
+branches add (plus the 12 plural rewordings). Wish lists: New junction without a canvas click (Declan,
+open design question), Number of services decimals (Mary).
+
+### Traps met 2026-10-15 (twentieth session)
+
+- **CC dated a whole batch 2026-10-16** (roadmap, glossary, handoff) from the date in a branch name. Use
+  `date` in Arizona; the shell is on Phoenix time.
+- **A plural mechanism was built before he could say no**: he prefers "overrides (1)". Then the rewording
+  agent changed 23 strings he had approved; check `english-key-rulings.json` before rewording English.
+- **A translator narrows an ambiguous English word** (am, fa, hi turned the Select-mode "label" into Text).
+  Read each sprint diff for the keys more than one agent flags.
 
 ### Traps met 2026-10-14 (eighteenth session)
 

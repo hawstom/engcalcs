@@ -130,6 +130,19 @@ async function main() {
 			ok(name + ': EPANET stops the run when the tanks are empty, and the result says when',
 				!!run && run.refused && /110/.test(run.engineError) && run.stoppedAt >= 15048 && run.stoppedAt < 24 * 3600 &&
 				/disconnected/.test(run.report || ''), said(run) + ' stoppedAt=' + (run && run.stoppedAt));
+			// Task 808: the periods EPANET solved before the stop are kept, real and whole, and
+			// nothing is carried past the last of them.
+			const fr = (run && run.frames) || [], lastT = fr.length ? fr[fr.length - 1].t : -1,
+				ids = fr.length ? Object.keys(fr[0].heads) : [];
+			ok(name + ': the solved periods before the stop are kept (partial, solvedTo = last frame)',
+				!!run && run.partial === true && fr.length >= 2 && run.solvedTo === lastT && lastT <= run.stoppedAt + 1e-6 &&
+				fr[0].t === 0 && fr.every((f, k) => k === 0 || f.t > fr[k - 1].t && f.t <= run.solvedTo),
+				'frames=' + fr.length + ' solvedTo=' + (run && run.solvedTo) + ' stoppedAt=' + (run && run.stoppedAt));
+			ok('...every kept frame holds finite real heads and flows, and none sits past the stop',
+				fr.every((f) => f.t <= run.stoppedAt + 1e-6 && ids.length > 0 && ids.every((id) => isFinite(f.heads[id])) &&
+					Object.keys(f.flows).every((id) => isFinite(f.flows[id]))));
+			ok('...and no period the run never reached is drawn: fewer frames than the full 25',
+				fr.length < 25 && fr.every((f) => f.t % 3600 === 0), 'frames=' + fr.length);
 			continue;
 		}
 		ok(name + ': the 24-hour run finishes with 25 reporting times', !!run && run.ok && !run.refused && (run.frames || []).length === 25,
