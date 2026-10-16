@@ -110,21 +110,20 @@ fix/zombie-harness-row. No key was unrendered, so none deleted.
 Earlier the same day: help-calculators (625), screenshot-copy (793), tank-depth-graph (795), slope-length
 (643), library-description (792). Tom's Android reaches the previews through Termux.
 
+Landed 2026-10-16: feat/stopped-series (808) to master; feat/override-audit (800) into bentley-interop
+(`c72f83eb`), branch deleted.
+
 ### Branches awaiting his word (pushed; all on the Branch previews page with test steps)
 
 - **feat/bentley-interop** (Tasks 721, 790, 782, 784, 789, 794, 781 Morph, 801 Merge upward): master merged
   in 2026-10-15 (ead9c118, then 93a3aeef: text halo is a Presentation setting). Its `$ec_lang_syn` Transform
   description is CC's wording, awaiting his OK. After it lands delete match-property, graph-bubble.
-- **feat/override-audit** (Task 800, built ON bentley-interop, merges into it first): own-override count
-  (Fotobi 1-hr reads 17: his 16 plus J-NE-S-3 Demand 1 gpm equal to Base, shown "1 (same)"), List overrides
-  dialog. One rule by presence everywhere, so preset "4. Average Day" now reads (1). 11 new keys.
-- **feat/stopped-series** (Task 808): a stopped EPANET run keeps its solved periods; 4 new keys. Test
-  file ~/tom-files/2026-10-15/fotobi-topology.epp.
 - **feat/description-lines** (Task 806): Descriptions in lines and paragraphs; .inp later lines on `;|`
   comments (pattern/curve order verified against EPANET's input2.c by Perry). No new keys.
 - **feat/plural**: 12 English count strings reworded to his "overrides (1)" form (none he had approved);
   wording only, no preview. The 23 he approved still read "1 cells" etc. at n=1; his call.
-- feat/leader-keep (807) still awaits him (R-406 hysteresis restored).
+- feat/leader-keep (807): he typed "Merge feat/leader-keep" 2026-10-15 and again 2026-10-16, but the auto-mode
+  classifier refuses CC writing his all-clear into `dev/branch-all-clears.json`. Needs a permission rule or his own entry.
 
 ### Questions out to him
 
@@ -135,7 +134,7 @@ Earlier the same day: help-calculators (625), screenshot-copy (793), tank-depth-
 
 ### Next job
 
-Merge on his typed word: override-audit into bentley-interop first. Then a sprint for the keys the
+A sprint for the keys the
 branches add (plus the 12 plural rewordings). Wish lists: New junction without a canvas click (Declan,
 open design question), Number of services decimals (Mary).
 

@@ -70373,6 +70373,11 @@ var EngCalcs = EngCalcs || {};
 				'This network has no pumps, so there is nothing drawing power.', host);
 			return;
 		}
+		if (!sum && EngCalcs.lpnTimeRunStopped && EngCalcs.lpnTimeRunStopped()) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_energy_stopped ||
+				'The EPANET run stopped before the end of the period, so no pump energy figures were kept.', host);
+			return;
+		}
 		if (!sum) {
 			ffEl('p', 'lpn-ff-note', pc.lpn_energy_needs_run || 'Pump energy is power integrated over the run, so it needs an extended period simulation. Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.', host);
 			return;
@@ -72165,7 +72170,7 @@ var EngCalcs = EngCalcs || {};
 		var pdaNote = pdaShort > 0
 			? (pc.lpn_pda_deficit_note || 'Junctions receiving less than their demand: {n}.').replace('{n}', String(pdaShort))
 			: '';
-		setStatus([notConvergedNote, valveRouteNote, pdaNote, omittedNote,
+		setStatus([result.stoppedNote || '', notConvergedNote, valveRouteNote, pdaNote, omittedNote,
 			droppedNote('control-dangling', 'lpn_control_dangling_note',
 				'These controls name an element that is no longer in this project, so they were left out: {ids}'),
 			droppedNote('control-unreadable', 'lpn_control_unreadable_note',
