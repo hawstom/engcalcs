@@ -15,7 +15,7 @@
 // On Net1, at 1600x1000 and then at a phone's 390x800:
 //   1. Opening the manager opens the table beside the box, at its right edge, over the map, with no
 //      button: the map canvas keeps its size and place within 1 px. It is the Tables pane's own
-//      Scenarios table (its panel, moved in), and the pane's Scenarios tab is hidden meanwhile.
+//      Scenarios table (its panel, moved in); the pane's Scenarios tab stays visible meanwhile.
 //   2. A pick in a cell assigns the alternative. The table's own x closes it and the pane's tab
 //      comes back with its panel; closing the box closes it too.
 //   3. The edge away from the box drags it wider, up to the room beside the box; the width is kept
@@ -23,6 +23,9 @@
 //   4. All unused lists only the categories that have an unused alternative, with only alternatives
 //      no scenario names and none inherits from; All lists every one, indented as its tree. Minus
 //      deletes an unused one from the list; a double-click opens an item in its category tree.
+//   4b. (Tom, 2026-10-16) It is one box with the manager: the seam is Settings' own slim divider;
+//      flying the manager out brings the table, pointing at the table keeps the manager out, off
+//      both the manager tucks and the table goes; choosing the pane's tab brings the table home.
 //   5. At phone width the manager opens without the table, and the pane's tab stays.
 //
 // DO NOT PREFIX THIS WITH `flock`: it takes /tmp/engcalcs-browser.lock itself.
@@ -118,7 +121,7 @@ async function main() {
 		ok('1.6 ...and lies over the map', fly1.l < map1.r && fly1.r > map1.l && fly1.t < map1.b && fly1.b > map1.t, JSON.stringify([fly1, map1]));
 		ok('1.7 it stays inside the window', fly1.r <= 1600 && fly1.b <= 1000, JSON.stringify(fly1));
 		ok('1.8 it is the Tables pane\'s own Scenarios panel, moved in', (await panelIn()) === 'fly');
-		ok('1.9 ...so the pane\'s Scenarios tab is hidden meanwhile', !(await tabShown()));
+		ok('1.9 ...and the pane\'s Scenarios tab stays visible meanwhile (continuity)', await tabShown());
 		const shape = await page.evaluate(() => ({
 			sheet: !!document.querySelector('#lpn_sm_fly table.lpn-pane-table'),
 			rows: document.querySelectorAll('#lpn_sm_fly table.lpn-pane-table tbody tr').length,
@@ -166,7 +169,7 @@ async function main() {
 		ok('2.5 picked in the spreadsheet, the manager\'s tree says the scenario uses it', used === (await L('lpn_sm_used_by')).replace('{n}', '1'), String(used));
 		await click('#lpn_sm_fly_close');
 		ok('2.6 the table\'s x closes it, the manager stays', !(await flyShown()) && (await boxShown()));
-		ok('2.7 ...and the panel goes home to the pane, its tab back', (await panelIn()) === 'pane' && (await tabShown()));
+		ok('2.7 ...and the panel goes home to the pane, its tab still there', (await panelIn()) === 'pane' && (await tabShown()));
 		await click('#lpn_pane_tab_scenarios');
 		await settle(500);
 		ok('2.8 the pane\'s Scenarios tab shows the same pick', await page.evaluate((n) => { const p = document.getElementById('lpn_pane_scenarios'); return !!p && p.classList.contains('on') && (p.textContent.indexOf(n) >= 0 || Array.from(p.querySelectorAll('select,input')).some((e) => e.value === n)); }, altA));
@@ -176,7 +179,7 @@ async function main() {
 		await openManager();
 		await settle(400);
 		ok('2.10 the manager opened again brings the table back', (await boxShown()) && (await flyShown()));
-		ok('2.11 ...and the pane, which was on Scenarios, has given way to another tab', !(await tabShown()) && (await page.evaluate(() => !document.getElementById('lpn_pane_scenarios').classList.contains('on'))));
+		ok('2.11 ...and the pane, which was on Scenarios, has given way to another tab (the tab itself stays)', (await tabShown()) && (await page.evaluate(() => !document.getElementById('lpn_pane_scenarios').classList.contains('on'))));
 		await click('#lpn_sm_close');
 		await settle(400);
 		ok('2.12 closing the manager closes the table, and the panel goes home', !(await flyShown()) && (await panelIn()) === 'pane' && (await tabShown()));
@@ -188,24 +191,24 @@ async function main() {
 		const drag = async (x0, y, x1) => { await page.mouse.move(x0, y); await page.mouse.down(); await page.mouse.move(x1, y, { steps: 6 }); await page.mouse.up(); await settle(300); };
 		const f3 = await rect('#lpn_sm_fly');
 		ok('3.0 it opens using the room beside the box, up to 40rem', f3.w >= 590, JSON.stringify(f3));
-		await drag(f3.r - 1, f3.t + f3.h / 2, f3.r - 201);
+		await drag(f3.l + 1, f3.t + f3.h / 2, f3.l - 199);
 		const f3a = await rect('#lpn_sm_fly');
-		ok('3.1 the far edge drags the table 200 px narrower', Math.abs(f3.w - f3a.w - 200) <= 3 && Math.abs(f3a.l - f3.l) <= 1, JSON.stringify([f3, f3a]));
-		await drag(f3a.r - 1, f3a.t + f3a.h / 2, f3a.r + 99);
+		ok('3.1 the divider on the seam drags the table 200 px narrower (toward the box), the seam staying put', Math.abs(f3.w - f3a.w - 200) <= 3 && Math.abs(f3a.l - f3.l) <= 1, JSON.stringify([f3, f3a]));
+		await drag(f3a.l + 1, f3a.t + f3a.h / 2, f3a.l + 101);
 		const f3b = await rect('#lpn_sm_fly');
 		ok('3.1b ...and 100 px wider again', Math.abs(f3b.w - f3a.w - 100) <= 3 && Math.abs(f3b.l - f3.l) <= 1, JSON.stringify([f3a, f3b]));
 		const stored = await page.evaluate(() => { try { return JSON.parse(localStorage.getItem('lpn_smbox') || '{}').flyW; } catch (e) { return 'x'; } });
 		ok('3.2 the width is kept with the manager\'s layout (lpn_smbox flyW)', Math.abs(stored - f3b.w) <= 3, String(stored));
-		await page.mouse.move(f3b.r - 1, f3b.t + f3b.h / 2);
+		await page.mouse.move(f3b.l + 1, f3b.t + f3b.h / 2);
 		await page.mouse.down();
 		await page.mouse.move(1700, f3b.t + f3b.h / 2, { steps: 6 });
 		await page.mouse.up();
 		await settle(300);
 		const f3c = await rect('#lpn_sm_fly');
 		ok('3.3 ...but no wider than the room beside the box', f3c.r <= 1600 && f3c.r >= 1590, JSON.stringify(f3c));
-		await page.mouse.move(f3c.r - 1, f3c.t + f3c.h / 2);
+		await page.mouse.move(f3c.l + 1, f3c.t + f3c.h / 2);
 		await page.mouse.down();
-		await page.mouse.move(f3b.r, f3c.t + f3c.h / 2, { steps: 6 });
+		await page.mouse.move(f3c.l + 1 - (f3c.w - f3b.w), f3c.t + f3c.h / 2, { steps: 6 });
 		await page.mouse.up();
 		await settle(300);
 		await click('#lpn_sm_close');
@@ -220,13 +223,13 @@ async function main() {
 		ok('3.5 docked at the right, the table lies at the box\'s left edge', (await flyShown()) && Math.abs(flyD.r - boxD.l) <= 2, JSON.stringify([boxD, flyD]));
 		ok('3.6 ...over the map', flyD.l < mapD2.r, JSON.stringify([flyD, mapD2]));
 		ok('3.7 ...inside the window', flyD.l >= 0, JSON.stringify(flyD));
-		await page.mouse.move(flyD.l + 1, flyD.t + flyD.h / 2);
+		await page.mouse.move(flyD.r - 8, flyD.t + flyD.h / 2);
 		await page.mouse.down();
-		await page.mouse.move(flyD.l - 60, flyD.t + flyD.h / 2, { steps: 6 });
+		await page.mouse.move(flyD.r - 68, flyD.t + flyD.h / 2, { steps: 6 });
 		await page.mouse.up();
 		await settle(300);
 		const flyD2 = await rect('#lpn_sm_fly');
-		ok('3.8 ...and its left edge drags it wider leftward, its right edge staying on the box', Math.abs(flyD2.w - flyD.w - 60) <= 3 && Math.abs(flyD2.r - flyD.r) <= 1, JSON.stringify([flyD, flyD2]));
+		ok('3.8 ...and its divider (on the box side) drags it wider leftward, its right edge staying on the box', Math.abs(flyD2.w - flyD.w - 60) <= 3 && Math.abs(flyD2.r - flyD.r) <= 1, JSON.stringify([flyD, flyD2]));
 		await page.evaluate(() => document.querySelector('#lpn_sm_box [data-dock="float"]').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
 		await settle(900);
 
@@ -286,6 +289,61 @@ async function main() {
 		await settle(500);
 		const after = await page.evaluate(() => [document.getElementById('lpn_sm_tree_select').value, (document.querySelector('#lpn_sm_tree .lpn-sm-sel .lpn-sm-name') || {}).textContent]);
 		ok('4.14 a double-click opens the item in its own category tree, selected', after[0] === 'demand' && after[1] === altC, JSON.stringify(after));
+
+		console.log('\n--- 4b. one box with the manager: Settings\' divider, and closing together ---');
+		await click('#lpn_sm_close');
+		await openManager();
+		await settle(500);
+		const dv = await page.evaluate(() => {
+			const d = document.querySelector('#lpn_sm_fly #lpn_sm_fly_divider'), s = document.getElementById('lpn_setbox_divider');
+			if (!d) { return null; }
+			const cs = getComputedStyle(d, '::before');
+			return { cls: d.classList.contains('lpn-setbox-divider'), role: d.getAttribute('role'), cursor: getComputedStyle(d).cursor, content: cs.content, w: cs.width, h: cs.height, bg: cs.backgroundImage.slice(0, 40) };
+		});
+		ok('4b.1 the seam carries Settings\' own divider class, slim grip and column-resize cursor', !!dv && dv.cls && dv.role === 'separator' && dv.cursor === 'col-resize' && dv.w === '2px' && dv.h === '22px', JSON.stringify(dv));
+		const bx = await rect('#lpn_sm_box'), fl = await rect('#lpn_sm_fly');
+		// Dock the manager to autohide: it flies out on a hover and tucks off it.
+		const hasAuto = await page.evaluate(() => !!document.querySelector('#lpn_sm_box [data-dock="right"]'));
+		ok('4b.2 the manager offers docking', hasAuto);
+		await page.evaluate(() => document.querySelector('#lpn_sm_box [data-dock="right"]').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+		await settle(900);
+		const autoOn = await page.evaluate(() => !!document.querySelector('#lpn_sm_box .lpn-corner-btn[data-dock="autohide"]'));
+		ok('4b.2b the manager offers Auto-hide', autoOn);
+		if (autoOn) {
+			await page.evaluate(() => document.querySelector('#lpn_sm_box .lpn-corner-btn[data-dock="autohide"]').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+			await settle(900);
+		}
+		// Hovering its tab on the strip flies the manager out, and the table with it.
+		const tb = await (await page.$('#lpn_dock_strip_right .lpn-dock-tab')).boundingBox();
+		await page.mouse.move(tb.x - 300, tb.y + 10);
+		await settle(100);
+		await page.mouse.move(tb.x + tb.width / 2, tb.y + tb.height / 2, { steps: 3 });
+		await settle(600);
+		ok('4b.2c flying the manager out brings its table out too', await flyShown());
+		const mid = await rect('#lpn_sm_fly');
+		// Pointing at the table keeps the manager out.
+		await page.mouse.move(mid.l + mid.w / 2, mid.t + 120, { steps: 4 });
+		await settle(1500);
+		ok('4b.3 pointing at the table keeps the manager out (it is one box)', (await flyShown()) && !(await page.evaluate(() => document.getElementById('lpn_sm_box').classList.contains('lpn-dock-collapsed'))), 'autohide=' + autoOn);
+		// Away from both, the manager tucks and the table goes with it.
+		await page.mouse.move(300, 500);
+		await settle(2500);
+		ok('4b.4 off both, the manager tucks and the table closes with it', !(await flyShown()) && (await page.evaluate(() => document.getElementById('lpn_sm_box').classList.contains('lpn-dock-collapsed'))));
+		await page.evaluate(() => { const b = document.querySelector('#lpn_sm_box [data-dock="float"]'); if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); } });
+		await settle(700);
+		if (!(await boxShown())) { await openManager(); }
+		await settle(400);
+		// The pane's tab, chosen while the table is out, sends the table home; the manager stays.
+		await page.evaluate(() => document.getElementById('lpn_pane_tab_scenarios').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+		await settle(600);
+		ok('4b.5 choosing the pane\'s Scenarios tab brings the table home, the manager staying', (await panelIn()) === 'pane' && (await boxShown()) && !(await flyShown()));
+		await click('#lpn_sm_close');
+		await settle(300);
+		await openManager();
+		await settle(300);
+		await click('#lpn_sm_close');
+		await settle(300);
+		ok('4b.6 closing the manager closes the table with it', !(await flyShown()));
 
 		console.log('\n--- 5. a phone ---');
 		await click('#lpn_sm_close');

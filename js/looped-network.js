@@ -25767,6 +25767,7 @@ var EngCalcs = EngCalcs || {};
 	function setPaneTab(id) {
 		var was = activePaneTab(), now = paneTabById(id);
 		if (!now) { return; }
+		if (id === 'scenarios' && smFlyOn) { smFlySet(false); }
 		if (paneState.open && was && was !== now && was.hide) { was.hide(); }
 		paneState.tab = now.id;
 		applyPaneLayout();
@@ -25782,7 +25783,9 @@ var EngCalcs = EngCalcs || {};
 	// **OPEN, NOT TOGGLE**, exactly like the Find box: a menu row that names a tab shows that tab.
 	// Only the toolbar button toggles, because a toggle is what a pressed/unpressed button IS.
 	function openPane(id) {
-		var t = paneTabById(id), was = activePaneTab();
+		var t = paneTabById(id), was;
+		if (id === 'scenarios' && smFlyOn) { smFlySet(false); }
+		was = activePaneTab();
 		if (t && t !== was) {
 			if (paneState.open && was.hide) { was.hide(); }
 			paneState.tab = t.id;
@@ -62346,7 +62349,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return !!g.lpnDragging || g.matches(':hover');
 	}
 	function dockPointerOver(d) {
-		try { return d.box.matches(':hover') || (!!d.tab && d.tab.matches(':hover')) || dockGripHeld(d) || dockOwnMenuHovered(d); } catch (e) { return false; }
+		try { return d.box.matches(':hover') || (!!d.tab && d.tab.matches(':hover')) || dockGripHeld(d) || dockOwnMenuHovered(d) || dockFlyHovered(d); } catch (e) { return false; }
+	}
+	// **THE SCENARIOS TABLE FLOWN OUT BESIDE THE MANAGER IS PART OF THE MANAGER'S BOX** (Tom,
+	// 2026-10-16): pointing at it, typing in it or pressing in it is pointing at, typing in or
+	// pressing in the manager, so the manager does not tuck from under it.
+	function dockFlyHovered(d) {
+		var f = d.box.id === 'lpn_sm_box' ? smFlyEl() : null;
+		return !!f && smFlyOn && f.style.display !== 'none' && f.matches(':hover');
+	}
+	function dockFlyHas(d, node) {
+		var f = d.box.id === 'lpn_sm_box' ? smFlyEl() : null;
+		return !!f && !!node && f.contains(node);
 	}
 	// **A RIGHT-CLICK MENU A BOX OPENED IS PART OF THAT BOX** (Tom, 2026-10-12: *"In Scenario Manager,
 	// any right-click action hides the box. (F2 does not.)"*). The menu is drawn on the page's body,
@@ -62383,13 +62397,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		clearTimeout(dockTimer);
 		dockTimer = setTimeout(function () {
 			if (dockFlyout !== d || dockPointerOver(d)) { return; }
-			if (document.activeElement && d.box.contains(document.activeElement)) { return; }
+			if (document.activeElement && (d.box.contains(document.activeElement) || dockFlyHas(d, document.activeElement))) { return; }
 			dockTuck(d);
 		}, LPN_DOCK_TUCK_MS);
 	}
 	function dockOutsidePress(e) {
 		var d = dockFlyout, t = e.target;
-		if (!d || !t || d.box.contains(t) || (d.tab && d.tab.contains(t)) || (t.classList && t.classList.contains('lpn-dock-grip'))) { return; }
+		if (!d || !t || d.box.contains(t) || dockFlyHas(d, t) || (d.tab && d.tab.contains(t)) || (t.classList && t.classList.contains('lpn-dock-grip'))) { return; }
 		if (dockOwnMenu(d, t)) { return; }
 		// A press inside a tip that box raised is still the box's.
 		if (t.closest && t.closest('.tooltip, .popover')) { return; }
@@ -77642,13 +77656,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		refreshScenariosTab();
 	}
 	loadScenarioBasicPref();
-	// The Scenarios tab of the Tables pane is shown only with Basic mode off, and not while its table
-	// is flown out beside the Scenario manager (smFlySet()). A tab left on show when either begins
-	// gives way to the first table.
+	// The Scenarios tab of the Tables pane is shown only with Basic mode off. A pane left on it when
+	// Basic mode begins, or when its table flies out beside the manager (smFlySet()), gives way to
+	// the first table.
 	function refreshScenariosTab() {
-		var b = document.getElementById('lpn_pane_tab_scenarios'), gone = scenarioBasicMode || smFlyOn;
+		var b = document.getElementById('lpn_pane_tab_scenarios'), gone = scenarioBasicMode;
 		if (b) { b.style.display = gone ? 'none' : ''; }
-		if (gone && paneState && paneState.tab === 'scenarios') { setPaneTab(paneTabs[0].id); }
+		// While the table is out beside the manager the tab stays, but the panel is not in the pane,
+		// so a pane left on it gives way to the first table; choosing the tab sends the table home.
+		if ((gone || smFlyOn) && paneState && paneState.tab === 'scenarios') { setPaneTab(paneTabs[0].id); }
 	}
 	function altCategoryLabel(cat) {
 		var pc = EngCalcs.pageConfig || {};
@@ -78649,9 +78665,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//
 	// **THE SPREADSHEET IS THE TABLES PANE'S OWN SCENARIOS TABLE, MOVED, NOT DRAWN TWICE.** While the
 	// table is out, the pane's panel element itself lives in the flyout and renderPaneTable() keeps
-	// drawing into it, with its selection, fill, paste and column widths; the pane's Scenarios tab is
-	// hidden meanwhile (one table cannot stand in two places) and comes back, with its panel, when the
-	// table is put away.
+	// drawing into it, with its selection, fill, paste and column widths. The pane's Scenarios tab
+	// stays on show meanwhile (Tom, 2026-10-16, continuity); choosing it sends the table home.
+	//
+	// **ONE BOX WITH THE MANAGER** (Tom, 2026-10-16): the table closes, tucks and flies out with the
+	// manager, and pointing at or typing in the table is pointing at or typing in the manager
+	// (dockFlyHovered(), dockFlyHas()). The seam between them is Settings' own slim divider
+	// (.lpn-setbox-divider); dragging it away from the box widens the table.
 	//
 	// **EXPANDABLE.** The edge away from the box drags it wider or narrower, up to the room beside the
 	// box. The width a drag leaves is kept with the manager's own layout (`flyW` in `lpn_smbox`).
@@ -78701,14 +78721,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			x.textContent = '×';
 			x.addEventListener('click', function () { smFlySet(false); });
 			f.appendChild(x);
+			// The slim divider Settings draws between its index and its main pane
+			// (.lpn-setbox-divider), here between the manager and its table.
 			grip = document.createElement('div');
-			grip.className = 'lpn-sm-fly-grip';
-			grip.setAttribute('aria-hidden', 'true');
+			grip.id = 'lpn_sm_fly_divider';
+			grip.className = 'lpn-setbox-divider lpn-sm-fly-grip';
+			grip.setAttribute('role', 'separator');
+			grip.setAttribute('aria-orientation', 'vertical');
+			grip.setAttribute('tabindex', '0');
 			grip.addEventListener('pointerdown', smFlyStartResize);
+			grip.addEventListener('keydown', smFlyDividerKey);
 			f.appendChild(grip);
+			// One box with the manager: the pointer on the table is the pointer on the manager.
+			f.addEventListener('pointerenter', function () { if (dockFlyout && dockFlyout.box === smBoxEl()) { clearTimeout(dockTimer); } });
+			f.addEventListener('pointerleave', function () { if (dockFlyout && dockFlyout.box === smBoxEl() && !(smBoxEl().matches(':hover'))) { dockTuckLater(dockFlyout); } });
+			f.addEventListener('focusout', function () {
+				setTimeout(function () { if (dockFlyout && dockFlyout.box === smBoxEl()) { dockTuckLater(dockFlyout); } }, 0);
+			});
 			document.body.appendChild(f);
 		}
 		f.setAttribute('aria-label', pc.lpn_pane_tab_scenarios || 'Scenarios');
+		grip = document.getElementById('lpn_sm_fly_divider');
+		if (grip) { grip.setAttribute('aria-label', pc.lpn_pane_tab_scenarios || 'Scenarios'); }
 		if (panel && panel.parentNode !== f) {
 			smFlyHome = { parent: panel.parentNode, next: panel.nextSibling };
 			hideTipsIn(panel);
@@ -78726,6 +78760,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		vw = window.innerWidth || document.documentElement.clientWidth || 0;
 		side = f.getAttribute('data-side');
 		return side === 'left' ? r.left - POPUP_EDGE : vw - r.right - POPUP_EDGE;
+	}
+	function smFlyDividerKey(e) {
+		var f = smFlyEl(), side = f && f.getAttribute('data-side'), w, toward;
+		if (!f || side === 'over') { return; }
+		w = f.getBoundingClientRect().width;
+		if (e.key === 'Home') { smboxLayout.flyW = null; smFlyPlace(); saveSmboxLayout(); }
+		else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+			toward = (e.key === 'ArrowRight' ? 1 : -1) * (side === 'left' ? -1 : 1);
+			smboxLayout.flyW = Math.round(Math.max(18 * smFlyRem(), Math.min(smFlyRoom(), w + 12 * toward)));
+			f.style.width = smboxLayout.flyW + 'px';
+			saveSmboxLayout();
+		} else { return; }
+		if (e.preventDefault) { e.preventDefault(); }
 	}
 	function smFlyStartResize(ev) {
 		var f = smFlyEl(), x0 = ev.clientX, w0, side, move, up, min = 18 * smFlyRem();
@@ -78756,6 +78803,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!f || !box || !smFlyOn) { return; }
 		if (!smBoxIsOpen() || box.classList.contains('lpn-dock-collapsed')) { f.style.display = 'none'; return; }
 		f.style.display = 'flex';
+		// A docked column has its own width grip on this same seam, in front; the divider steps inside it.
+		f.setAttribute('data-docked', box.classList.contains('lpn-docked') ? '1' : '0');
 		r = box.getBoundingClientRect();
 		vw = window.innerWidth || document.documentElement.clientWidth || 0;
 		vh = window.innerHeight || document.documentElement.clientHeight || 0;
