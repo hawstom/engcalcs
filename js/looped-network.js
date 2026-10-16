@@ -40187,8 +40187,9 @@ var EngCalcs = EngCalcs || {};
 			sel.setAttribute('data-field', f.name);
 			sel.setAttribute('aria-label', f.name);
 			EngCalcs.lpnGeoJsonNetTargets[kind].forEach(function (t) {
-				// A number target is offered only for a field of numbers.
-				if (t.family && !f.numeric) { return; }
+				// A number target is offered for a field holding any number; a value in it that is not
+				// one is named in the report and the default used. Guessed only for a field of numbers.
+				if (t.family && !f.numbers) { return; }
 				var o = document.createElement('option'); o.value = t.id; o.textContent = TLABEL[t.id]; sel.appendChild(o);
 			});
 			sel.value = guess[kind][f.name] || 'custom';

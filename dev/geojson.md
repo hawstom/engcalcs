@@ -90,8 +90,9 @@ are WNTR's (Gusnet derives them from geometry); the capitalised type values are 
 (WNTR: `diameter`, `vol_curve_name`, `pump_curve_name`, `head_pattern_name`, `speed_pattern_name`).
 Result names are Gusnet's `ResultField`-style (`flowrate`, `unit_headloss`). A tank's `elevation`
 is its GROUND, as at every node and as the DXF's ELEVATION; WNTR's tank `elevation` is the base,
-which we write as `base_elevation` (Tom, 2026-10-11: a tank has two elevations). Nothing reads
-GeoJSON back in, so there is no import to keep in step. A feature
+which we write as `base_elevation` (Tom, 2026-10-11: a tank has two elevations). **The network
+import below reads this schema back, so a field added or renamed here is a field the import must
+read** (`GJ_OURS_NODE` / `GJ_OURS_LINK` in `js/lpn-geojson.js`). A feature
 collection is not a per-layer set: Gusnet and WNTR write six files, we write one, so a user
 splits by `node_type` / `link_type` in QGIS.
 
@@ -102,4 +103,46 @@ Foreign member `lwn` (RFC 7946 section 6.1): `format`, `version`, `schema`, `pro
 
 - **Shapefile** export needs an abbreviation table (10-character names) and a `.prj`; it is next.
 - **GeoPackage**: Mary ranks it third; a QGIS partner's word outranks her ranking.
-- **Import** (shapefile and GeoJSON, behind one mapping step) is the other half of Task 728.
+- **Shapefile network import** (below).
+
+## Import: File > Import > GeoJSON network (Task 728, import half)
+
+Tom, 2026-10-06: shapefile and GeoJSON import behind one mapping step. Reader and builder:
+`EngCalcs.lpnGeoJsonNetScan` / `lpnGeoJsonNetGuess` / `lpnGeoJsonNetBuild` in `js/lpn-geojson.js`
+(pure). Page: `landGeoJsonNetText()` and its neighbours in `js/looped-network.js`, under the
+`.inp` import, which it lands exactly as: a new browser project named after the file, units strip
+moved to the file's units first, arriving saved, a report of every difference, settings cloned from
+the open project (R-342: a new-asset default typed in a unit the import changed falls back to the
+built-in one). Harnesses: `dev/lpn-spike/geojson-import-harness.js` (node) and
+`geojson-import-browser-harness.js` (Chromium); fixture `fixtures/geojson-utility-layer.geojson`.
+
+- **A file of ours (`lwn.format`) is read by its own schema and asks nothing.** Written out again
+  it is the same file byte for byte (proved on Net1 placed on the Earth, Net3 US and SI, and Net2,
+  whose positions were converted from State Plane); in the page, the same features apart from
+  results. The report always names what a GeoJSON file does not hold (controls, rules, times,
+  labels, EPANET options, the pipe type, fittings and efficiency curve libraries), any results
+  (computed again), extra demand rows, and a pipe type whose definition is absent.
+- **Any other file goes through one dialog.** One table per kind (points, lines): each attribute
+  field, an example, the property it fills, and the unit of a number. Guesses by name (`ELEV_FT`
+  is the elevation in ft); every other field is kept as a custom property (key `custom_<field>`,
+  labelled with the field name, value as typed). One field per property. A number property is
+  offered for a field holding any number and guessed only for a field of numbers. Hazen-Williams C
+  has no unit. The chosen unit per family becomes the project unit; nothing is converted.
+- **Topology from geometry.** A line end within the stated tolerance (default 0.5 m, typed in the
+  dialog) of a point joins it, else of another line end, else a junction is added there. Interior
+  positions are bends. A multipart line whose parts meet end to start is one pipe; otherwise one
+  pipe per part. A line end lying along another pipe's middle is named, not joined (no split).
+- **Every change is named**: features not imported (not a point or line, bad position, both ends on
+  one node), IDs assigned (blank, invalid, duplicate within a kind), junctions added, ends moved
+  (largest distance), a value that is not a number, a default used (per element, or one line when
+  no field was chosen), fields left out or kept as custom properties, a third coordinate ignored.
+  A pipe with no length is Auto (slope distance along the line).
+- **Coordinates.** RFC 7946: WGS 84 longitude and latitude; stored as typed, characters in `tok`.
+  A legacy `crs` naming CRS84 or EPSG:4326 is read and named; any other is refused with its name
+  and the instruction to export in EPSG:4326. Never guessed, never converted.
+- **Shapefile, still to build**: a `.shp`/`.shx`/`.dbf`/`.prj` (or `.zip`) reader already exists
+  for Shapes (`js/lpn-gisread.js`); the network import would add reading two layers (points and
+  lines are separate files), the `.prj` through proj4 to longitude and latitude (refusing a missing
+  one rather than guessing), the dBASE field types and 10-character names into the same mapping
+  dialog, and the `.cpg` code page. `lpnGeoJsonNetBuild` takes features, so the shapefile half
+  is a reader that hands it the same tree.

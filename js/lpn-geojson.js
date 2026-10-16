@@ -621,7 +621,8 @@
 	 * **READ THE FILE, AND SAY WHAT IS IN IT.** Returns
 	 *   { ok: false, error: 'unreadable' | 'crs' | 'empty', detail }
 	 *   { ok: true, ours, crsNamed, feats, counts: { point, line, other }, fields: { point: [...],
-	 *     line: [...] } }, each field { name, numeric, count, sample } in the order first seen.
+	 *     line: [...] } }, each field { name, numeric, numbers, count, sample } in the order first
+	 *     seen: `numeric` when every value stated is a number, `numbers` how many are.
 	 */
 	EngCalcs.lpnGeoJsonNetScan = function (text) {
 		var rd = readJson(text), root, feats, crsNamed = '', bad = '', counts = { point: 0, line: 0, other: 0 },
@@ -649,11 +650,11 @@
 			for (k in pr) {
 				if (!Object.prototype.hasOwnProperty.call(pr, k)) { continue; }
 				rec = seen[kind][k];
-				if (!rec) { rec = seen[kind][k] = { name: k, numeric: true, count: 0, sample: '' }; fields[kind].push(rec); }
+				if (!rec) { rec = seen[kind][k] = { name: k, numeric: true, numbers: 0, count: 0, sample: '' }; fields[kind].push(rec); }
 				if (gjBlank(pr[k])) { continue; }
 				rec.count++;
 				nv = gjNumber(pr[k]);
-				if (!nv) { rec.numeric = false; }
+				if (!nv) { rec.numeric = false; } else { rec.numbers++; }
 				if (rec.sample === '') { rec.sample = gjText(pr[k]); }
 			}
 		});
