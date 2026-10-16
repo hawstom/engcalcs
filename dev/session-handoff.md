@@ -110,8 +110,7 @@ Earlier the same day: twentieth session's list (text-halo, search-zoom-accuracy,
 
 ### Branches awaiting his word (pushed; all on the Branch previews page with test steps)
 
-His browser pass of 2026-10-15 night came back; four agents were sent that night, one per item below.
-If a branch's `git log` shows no commit after 10-15 22:00, that agent's work was lost: re-brief it.
+Twenty-second session (10-16 afternoon) built his 10-16 items below; previews page rows updated.
 
 - **feat/bentley-interop**: he APPROVED all its new English. His changes: the Scenarios table flies out
   AUTOMATICALLY with the manager (no button), as the spreadsheet version, and widens by dragging; All
@@ -120,13 +119,22 @@ If a branch's `git log` shows no commit after 10-15 22:00, that agent's work was
   with scenario two days earlier). The `$ec_lang_syn` Transform description still awaits his OK.
   `lpn_cleanmap`, `lpn_ovrmarks`, and the flyout width `flyW` inside `lpn_smbox`: TELL HIM before it
   merges. Still unruled: `lpn_settings_override_marks_tip`, `lpn_sm_all_row_tip`, `lpn_sm_unused_none`. After it lands
-  delete match-property, graph-bubble.
+  delete match-property, graph-bubble. **10-16 (9b9f74f3):** the manager's table is one box with it
+  (tucks/closes together), Settings' slim divider, pane Scenarios tab kept; new bubbles open at 200 px
+  (his "miniatures"); result cells in Tables AND Properties print the label decimals with trailing
+  zeros; Vertices column sized by heading only. Awaiting his pass (R-409).
 - **EPS defects he found on bentley-interop, worked on fix/zero-demand-solve**: (1) the "1-hr drain"
   scenario reports it ended at 15:07:33; (2) tanks drain with no demand; (3) a pattern of mostly 0s
   stops EPANET at 0:00 ("Surely it's smarter than this"); (4) on the 8108 preview his Fotobi shows no
   EPS and no animation controls. R-402: he accepted keeping his numbers and the message ("OK"), and
   approved its status messages. Don't call a fixture by its filename to him; name his project.
-- **feat/description-lines** (806): his call changed to "\P" with no spaces (was " \P ").
+- **feat/description-lines** (806): his call changed to "\P" with no spaces (was " \P "); the legacy
+  spaced reading is gone (9b55bfe7).
+- **chore/retire-mark-extrema** (3f3650f3): "Mark highest and lowest values" retired on his call;
+  deleted keys `lpn_labels_mark_extrema`, `lpn_labels_mark_extrema_tip`. Needs his merge word.
+- **feat/pattern-axis** (c6d33547): the Library pattern graph has Multipliers / Time / Period axes. New
+  English "Period" (`lpn_library_pattern_axis_period`) awaits his word; tick times are pattern time,
+  not run time (Pattern start not added) -- ask.
 
 ### Proposed to him 2026-10-15/16, awaiting his word
 
@@ -148,26 +156,25 @@ If a branch's `git log` shows no commit after 10-15 22:00, that agent's work was
   (15:07:33, 14:01:42): EPANET closes L22 and the junctions it fed have no source. 15:07:33 was the
   simulation time, NOT the wall clock as CC told him. He asks why lowering a full tank's initial
   depth avoids the 0:00 stop when flow is zero either way. Candidate answer to "surely it's smarter":
-  pressure-driven demand. Also: his units went back to US (possible defect); pattern graph in the
-  Library wants axis labels (factor; time and ordinal).
-- **bentley-interop Scenarios table**: keep the bottom-pane Scenarios tab on a PC too (continuity);
-  the manager's table must be PART of the manager: hovering off the manager closes the table with
-  it, and the divider must be the slim one Settings uses between its index and main pane.
-- **description-lines**: drop the legacy " \P " reading; it never shipped.
-- **Retire Settings' "Mark highest and lowest values"**: Tables and Find replaced it.
+  pressure-driven demand. Also: his units went back to US (possible defect; asked him for steps).
 - **A pipe-label artifact** in a new project (one pipe label, while stretching nodes): his screenshot
   was the wrong file; ask for it.
 
 ### Questions out to him
+
+- R-409 (3): how to manage the time series bubble overrides. CC proposed right-click a bubble:
+  "Remove from this scenario" / "Remove from all scenarios", plus bubbles as rows in List overrides.
+- Elevation is not overridable, so editing it in a child scenario silently changes Base (found by the
+  scenario UI helper). By design per `LPN_OVERRIDABLE`, but nothing on screen says so.
 
 - Task 800: keep J-NE-S-3's equal override?
 - Task 681: the node shed's re-fits are what is left (~250 ms on n600); cheaper means changing the layout.
 
 ### Next job
 
-Merge the agents' work into their branches, update the previews page, and ask for his browser pass.
-Wish lists: New junction without a canvas click (Declan), Number of services decimals (Mary), a
-harness helper that starts a scenario from the UI (Perry).
+His browser pass on bentley-interop (R-409), retire-mark-extrema, pattern-axis, description-lines.
+Wish lists: New junction without a canvas click (Declan). Perry's scenario UI helper merged
+(`dev/lpn-spike/scenario-ui-helper.js`). Mary's Number of services decimals is moot: the CSV is gone.
 
 ### Traps met 2026-10-15 (twenty-first session)
 
