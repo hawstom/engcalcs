@@ -72,8 +72,9 @@ scale(s))` is the one place it is applied.
 
 ## 2. The goals, in priority order (Tom, 2026-08-16)
 
-1. **User-dragged Leaders pass through their stored endpoint.** They can be stretched longer at the
-   same angle.
+1. **User-dragged Leaders stay exactly where the user put them** (Task 807, Tom 2026-10-15: *"our
+   stretching them is frustrating to them. If they want to give us control, they will reset the
+   leader."*). Replaces "they can be stretched longer at the same angle".
 2. **Labels avoid other Labels.**
 3. **Labels avoid Leaders** including their own.
 4. **Labels avoid Symbols.**
@@ -233,8 +234,8 @@ Not circular: neighbours contribute their **raw** scores. One pass, no iteration
 ring scorer only — a first-fit's two candidates are equidistant, so `k` has nothing to smooth there.
 
 **Goal 1 is not a score term either. It is a candidate generator.** A label whose leader was dragged
-gets its candidates along a RAY from the stored endpoint, not around a ring. A dragged label is never
-dropped and never jumps sides.
+gets one candidate, its stored endpoint (Task 807; until then a ray of stretches outward from it). A
+dragged label is never moved, never dropped and never jumps sides.
 
 **Candidate angles comply by construction.** The ring's own angles satisfy the old goal 7, so an
 orthogonal placement is never generated rather than generated and then penalised.

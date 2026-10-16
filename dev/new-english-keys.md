@@ -715,7 +715,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**3 still to read**, of 6 new keys across 14 unmerged branch(es).
+**3 still to read**, of 6 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -726,13 +726,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/date-fix-1015 (`0028a9459`) — adds no English strings
+### feat/bentley-interop (`95663d00c`) — adds no English strings
 
-### chore/ledger-wording (`37092cd70`) — adds no English strings
-
-### feat/bentley-interop (`97d46dfe7`) — adds no English strings
-
-### feat/description-lines (`895d34b7b`) — adds no English strings
+### feat/description-lines (`ed8215176`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -758,11 +754,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/leader-keep (`81e4ffe80`) — adds no English strings
-
 ### feat/match-property (`05bda7651`) — adds no English strings
 
-### fix/zero-demand-solve (`c4b5fd714`) — 3 new, 3 to read @@ NEEDS RULING
+### fix/zero-demand-solve (`7eac193f5`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_time_run_cut_off`**
   > EPANET had closed {link} and then could not solve for {nodes}.

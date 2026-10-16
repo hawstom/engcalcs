@@ -192,8 +192,14 @@ const seq = runSequence();
 const A = seq[0].s;
 ok('the labels are drawn at the starting view (or nothing below means anything)', !L.labelsHidden() && seq[0].o.labels > 50,
 	seq[0].o.labels + ' labels drawn');
-ok('four buckets visited for the first time cost one pass each',
-	seq.slice(0, 4).every(function (r) { return r.passes === 1; }), seq.slice(0, 4).map(r => r.passes).join(','));
+// **THE STARTING BUCKET COSTS NOTHING** (Task 681, 2026-10-15): the zoom to it revived the labels
+// with a content pass AT THIS SCALE, so its settle banks the picture on screen instead of laying
+// it out a second time. "...every first visit is exactly the uncached pass" below still holds it to
+// the uncached answer.
+ok('the starting bucket, laid out by a content pass at this very scale, is banked with no pass',
+	seq[0].passes === 0, String(seq[0].passes));
+ok('three buckets visited for the first time cost one pass each',
+	seq.slice(1, 4).every(function (r) { return r.passes === 1; }), seq.slice(1, 4).map(r => r.passes).join(','));
 ok('...and going back through three of them runs ZERO passes',
 	seq.slice(4).every(function (r) { return r.passes === 0; }), seq.slice(4).map(r => r.passes).join(','));
 const pairs = [[4, 2], [5, 1], [6, 0]];
