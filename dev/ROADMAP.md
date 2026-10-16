@@ -150,7 +150,11 @@ the block.
   factor: a reviewer cannot audit it. Our typed length is already the per-pipe override. Nothing
   about length accuracy is claimed in public until this closes (Task 641).
 - 100|681| **Economize the label layout: it is half the cost of a project switch.**
-  **PROMOTED TO 100 by Tom, 2026-10-14.** (c)/(d) and (b) shipped; what is left is to measure his switch again and find the next cost.
+  **PROMOTED TO 100 by Tom, 2026-10-14.** (c)/(d) and (b) shipped. **2026-10-16 merged (`perf/switch-cost`, `perf/cross-shed`):**
+  a cold switch no longer lays the labels out twice, and the crossing shed counts pairs once (identical output,
+  `switch-cost-browser-harness.js`): Net3 geographic 311 -> 184 ms, the 600-junction generated network 3.2 -> 1.3 s.
+  **Left, and his call:** the node shed's re-fits (~250 ms on n600, ~74 ms on Net3); cheaper means re-fitting only
+  each rung's affected area, which changes the layout. An exact memo was tried and saved only 28 ms.
   **DEMOTED TO 75 by Tom, 2026-10-11.**
   **(c)/(d) MERGED 2026-10-03** (`feat/label-cache`, Tom: *"I am impressed. This is a major efficiency
   feature. Done."*): a bank per wheel notch, rounded outward, final; revisits run no pass (Novato ~85 -> ~13 ms). (e) already existed (one pass per wheel
