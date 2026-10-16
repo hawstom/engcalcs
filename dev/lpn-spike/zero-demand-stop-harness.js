@@ -78,6 +78,8 @@ function open(mutate) {
 	const run = await EC.lpnEpanetRun(model);
 	ok('EPANET stops the run', run.ok === false && run.refused === true, JSON.stringify(run.engineError));
 	ok('...with Error 110', /\b110\b/.test(run.engineError || ''));
+	ok('...in EPANET\'s words, the code stated once', run.engineError === 'Error 110: cannot solve network hydraulic equations',
+		JSON.stringify(run.engineError));
 	ok('...at 0:00', run.stoppedAt === 0, run.stoppedAt);
 	const c = run.cutOff || {};
 	ok('the result names the link EPANET had just closed', c.link === 'L11', JSON.stringify(c));
