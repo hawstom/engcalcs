@@ -4374,3 +4374,10 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: with Statistic set to Maximum on a partial run the setting is silently ignored (no statistic offered, nothing said).
 - OBSERVED: builder harness passes; emptying the kept frames makes it fail 8 checks; reverting clampTime's cut does NOT fail it (it never asserts the stored time).
 - SPECULATION (code read, fixture has no pumps): Pump energy box on a partial run with pumps would say "needs an extended period simulation, press Calculate" (run.energy absent). Partial frames carry no water age/quality, so those columns are blank, unexplained.
+
+## 2026-10-16 feat/geojson-import @ d093cf428 (Task 728, GeoJSON half) (Perry)
+- OBSERVED (real Chromium, own QGIS-style layer: string numbers, nulls, dup ID, MultiLineString, 3D point, T-junction end mid-pipe, EPSG variants): nothing dropped unreported; typed characters kept ("250.75", "912.30", "1e3", 12-digit lon); mapped length used as typed; solve runs (Calculate hidden, auto-solved). Both builder harnesses pass (72/72, 51/51).
+- OBSERVED DEFECT: junctions added at a line end, and junctions with null elevation, get elevation 0; with a reservoir at 250.75 m they solved at P=250.75 m H2O and Auto lengths inflate (3% at 250 m drop, far worse for short pipes on high ground). Reported only as "default elevation 0".
+- OBSERVED DEFECT: a demand mapped on a reservoir/tank row is dropped with no report line (unmapped-demand text only when unmapped). "unmapped-id" says every element when only pipes lacked an ID field.
+- OBSERVED: 6589 features (3025 nodes, 3564 pipes) imports in ~10 s after Import, no busy indicator in the diff; ?lang=es dialog/report English (keys not translated yet); phone 390 px: dialog fits, Unit column clipped, reachable by sideways scroll only.
+- OBSERVED: guesses miss LEN_M, PIPE, DIA_MM-after-DIA_IN; EPSG:4269 refused. Minor loss 2 is the project's New-assets default, reported.
