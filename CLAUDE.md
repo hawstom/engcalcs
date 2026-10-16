@@ -34,7 +34,7 @@ to leave something uncommitted.
   and fixes cherry-picked on — never tell him otherwise.
 - **Merge FROM master often. Merge a capability branch INTO master only on Tom's all-clear.**
   Green is not done. `dev/hooks/pre-merge-commit` enforces it for branches listed in
-  `dev/branch-policy.json`; `dev/branch-all-clears.json` pins his words to the commit he cleared,
+  `dev/branch-policy.json`; `dev/branch-all-clears.json` records all-clears he gives,
   so the approval lapses when the branch moves. `feature_freeze.active` refuses a protected merge
   even with an all-clear (only Tom lifts it); `freeze.active` is the separate emergency stop that
   refuses everything but a `hotfix:`. A defect or tooling track merges on green alone.
