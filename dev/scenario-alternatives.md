@@ -1268,24 +1268,34 @@ Code: `ownOverrideItems()`, `storedOwnItems()`, `ownOverrideInherited()` beside 
 rule, and Delete against the list for every record) and `override-audit-browser-harness.js`, on his
 file (`fixtures/fotobi-override-audit.epp`).
 
-### The Scenarios table beside the manager, and All unused (Tasks 802, 803; 2026-10-15)
+### The Scenarios table beside the manager, and All unused (Tasks 802, 803; 2026-10-15, 10-16)
 
 Tom, 2026-10-15 (R-389): *"Could we stick that table onto the right side of the Scenario Manager to
 accomplish (a) that both are available in the same gesture and (b) that it flies out over the map
-instead of displacing the map?"* Built: a Scenarios table button in the manager's top row shows the
-table beside the box (its inline end; the other side when there is no room; over the box's lower
-part on a phone), at the box's height, as a fixed layer over the map, so the map keeps its size. It
-follows the box, scrolls within itself, and closes with it. Every cell is the pane's own pick-list
-(`smCellChoices()`, `smCellValue()`, `smSetCell()`), so the project is the one state. Not stored on
-the device. **The Tables pane's Scenarios tab is kept** (Tom decides later); the flown-out table has
-no spreadsheet selection, fill or paste. Code: `smFly*()`.
+instead of displacing the map?"* On the first build (10-16): *"Yes. But (1) I want it automatic, no
+button, (2) I want the spreadsheet version, (3) I want it expandable (it's too narrow)."*
+
+Built: the table opens with the manager and closes with it; its x puts it away until the manager is
+opened again. Beside the box (its inline end; the other side when there is no room; over the box's
+lower part when neither side has 18rem), at the box's height, as a fixed layer over the map, so the
+map keeps its size. **Not on a phone**, where it would cover the tree. **It is the Tables pane's own
+Scenarios panel, moved into the flyout** while it is out, so it is the same spreadsheet (selection,
+fill, paste, column widths) drawn by `renderPaneTable()`, never a second rendering. The pane's
+Scenarios tab is hidden meanwhile and comes back, with its panel, when the table is put away
+(`refreshScenariosTab()`). The rejected alternative: a second spec drawing the same table into the
+flyout; every spec caches its cells and selection, so two drawings of one spec fight. The edge away
+from the box drags the width, up to the room beside the box; a dragged width is kept as `flyW` in the
+manager's own `lpn_smbox` record (no new key). Opens at 40rem or the room, whichever is less.
+Code: `smFly*()`.
 
 Tom (R-390): *"I'd like a way to see at a glance all unused alternatives ... unless the selector
 (instead of a button) includes 'All unused' (and 'All'?), where all the headings are listed with a
-scrollbar."* Built: the selector ends with All and All unused: every category a heading, its items
-beneath, one scrolling list. **Unused is Delete's own test** (`smInUseItems()`): no scenario names it
-(Base's pick included) and no alternative inherits from it; a Base item is never unused. So every item
-listed is one the minus button deletes; a double-click opens it in its own tree. Code: `smAllList()`.
+scrollbar."* Built: the selector ends with All and All unused, one scrolling list, its items beneath
+category headings. **All unused leaves out a category with nothing unused** (Tom, 10-16: *"let's not
+take up room and attention listing empty categories on the unused list."*); with none at all it says
+None once. **Unused is Delete's own test** (`smInUseItems()`): no scenario names it (Base's pick
+included) and no alternative inherits from it; a Base item is never unused. So every item listed is
+one the minus button deletes; a double-click opens it in its own tree. Code: `smAllList()`.
 Harness: `scenario-flyout-browser-harness.js`.
 
 ### Next stage: what the advisers said (recorded, not built)

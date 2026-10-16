@@ -77618,12 +77618,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		refreshScenariosTab();
 	}
 	loadScenarioBasicPref();
-	// The Scenarios tab of the Tables pane is shown only with Basic mode off. A tab left on show
-	// when Basic mode is ticked again gives way to the first table.
+	// The Scenarios tab of the Tables pane is shown only with Basic mode off, and not while its table
+	// is flown out beside the Scenario manager (smFlySet()). A tab left on show when either begins
+	// gives way to the first table.
 	function refreshScenariosTab() {
-		var b = document.getElementById('lpn_pane_tab_scenarios');
-		if (b) { b.style.display = scenarioBasicMode ? 'none' : ''; }
-		if (scenarioBasicMode && paneState && paneState.tab === 'scenarios') { setPaneTab(paneTabs[0].id); }
+		var b = document.getElementById('lpn_pane_tab_scenarios'), gone = scenarioBasicMode || smFlyOn;
+		if (b) { b.style.display = gone ? 'none' : ''; }
+		if (gone && paneState && paneState.tab === 'scenarios') { setPaneTab(paneTabs[0].id); }
 	}
 	function altCategoryLabel(cat) {
 		var pc = EngCalcs.pageConfig || {};
@@ -77811,8 +77812,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		sel.addEventListener('change', function () { smState.tree = sel.value; smState.sel = null; smState.editing = null; smState.allSel = null; rebuildScenarioManager(); });
 		tools.appendChild(sel);
-		// **THE SCENARIOS TABLE FLIES OUT BESIDE THE MANAGER** (Task 802), in the same row as the selector.
-		smFlyToggleButton(tools);
 		host.appendChild(tools);
 		if (smIsAllView(smState.tree)) { smAllList(host, scroll, hadFocus); smFlyRefresh(); return; }
 		tools = document.createElement('div');
@@ -78430,7 +78429,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// the box is docked: a floating manager opens from the Scenarios menu, a docked one comes back
 	// like every other dock.
 	var LPN_SMBOX_KEY = 'lpn_smbox';
-	var smboxLayout = Object.assign(newBoxLayout(), { userSized: false });
+	var smboxLayout = Object.assign(newBoxLayout(), { userSized: false, flyW: null });
 	function saveSmboxLayout() {
 		if (boxSaveHeld()) { return; }
 		smboxLayout.open = !!(smboxLayout.dock && smBoxIsOpen());
@@ -78447,6 +78446,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		rebuildScenarioManager();
 		placePanelForScreen(box, function () { placeBoxRemembered(box, smboxLayout); });
 		initTipsIn(box);
+		smFlyAuto();
 		if (smboxLayout.dock && !smboxLayout.open) { saveSmboxLayout(); }
 	}
 	function closeScenarioManager() {
@@ -78538,21 +78538,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		list.setAttribute('aria-label', smTreeLabel(view));
 		list.tabIndex = 0;
 		rowTip = pc.lpn_sm_all_row_tip || 'Double-click to open it in its category tree.';
+		// **A CATEGORY WITH NOTHING UNUSED IS LEFT OUT** (Tom, 2026-10-16: *"let's not take up room and
+		// attention listing empty categories on the unused list."*). All always has each Base. When no
+		// category has an unused alternative, the list says None once.
 		LPN_ALT_CATEGORIES.forEach(function (cat) {
-			var head = document.createElement('div'), rows = smAllRows(view, cat), none;
+			var head = document.createElement('div'), rows = smAllRows(view, cat);
+			if (!rows.length) { return; }
 			head.className = 'lpn-sm-cathead';
 			head.setAttribute('role', 'presentation');
 			head.setAttribute('data-cat', cat);
 			head.textContent = altCategoryLabel(cat);
 			list.appendChild(head);
-			if (!rows.length) {
-				none = document.createElement('div');
-				none.className = 'lpn-sm-none';
-				none.setAttribute('data-cat', cat);
-				none.textContent = pc.lpn_sm_unused_none || 'None';
-				list.appendChild(none);
-				return;
-			}
 			rows.forEach(function (r) {
 				var row = document.createElement('div'), name = document.createElement('span'), meta = document.createElement('span'), used,
 					isSel = !!a && a.cat === cat && a.key === r.key;
@@ -78594,6 +78590,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				smAllDelete();
 			}
 		});
+		if (!any) {
+			var none = document.createElement('div');
+			none.className = 'lpn-sm-none';
+			none.textContent = pc.lpn_sm_unused_none || 'None';
+			list.appendChild(none);
+		}
 		host.appendChild(list);
 		list.scrollTop = scroll || 0;
 		initTipsIn(host);
@@ -78610,134 +78612,123 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//
 	// Tom, 2026-10-15 (R-389): *"Could we stick that table onto the right side of the Scenario Manager
 	// to accomplish (a) that both are available in the same gesture and (b) that it flies out over the
-	// map instead of displacing the map?"* A button in the manager's top row shows it beside the
-	// box, at the box's height, over the map: a fixed layer of the page, never a column, so the map
-	// keeps its size. It scrolls within itself, follows the box when it moves or is resized, and
-	// closes with the box. Where there is no room beside the box (a phone, or a box against both
-	// edges) it lies over the box's own lower part instead.
+	// map instead of displacing the map?"* Then, 2026-10-16, on the first build: *"Yes. But (1) I want
+	// it automatic, no button, (2) I want the spreadsheet version, (3) I want it expandable (it's too
+	// narrow)."*
 	//
-	// **THE SAME TABLE AS THE TABLES PANE'S SCENARIOS TAB, NOT A SECOND STATE.** Every cell is drawn
-	// from smCellChoices() and smCellValue() and writes through smSetCell(), the pane's own column
-	// functions (scenarioTableCols()), so both read and write the project and nothing is kept twice.
-	// The pane's tab stays as it was (Tom decides later); this one is a pick-list per cell, without the
-	// pane's spreadsheet selection, fill and paste. Whether it is showing is this page load's only, like
-	// the manager's collapsed items: nothing is stored on the device.
-	var smFlyOn = false, smFlyWatch = null;
+	// **AUTOMATIC.** It opens with the manager and closes with it; its × puts it away until the manager
+	// is opened again. Beside the box, at the box's height, over the map: a fixed layer of the page,
+	// never a column, so the map keeps its size. It follows the box when it moves or is resized. Where
+	// there is no room beside the box (a box against both edges) it lies over the box's own lower part.
+	// **NOT ON A PHONE**, where it would cover the tree the manager is opened for; there the Tables
+	// pane's Scenarios tab still holds the table.
+	//
+	// **THE SPREADSHEET IS THE TABLES PANE'S OWN SCENARIOS TABLE, MOVED, NOT DRAWN TWICE.** While the
+	// table is out, the pane's panel element itself lives in the flyout and renderPaneTable() keeps
+	// drawing into it, with its selection, fill, paste and column widths; the pane's Scenarios tab is
+	// hidden meanwhile (one table cannot stand in two places) and comes back, with its panel, when the
+	// table is put away.
+	//
+	// **EXPANDABLE.** The edge away from the box drags it wider or narrower, up to the room beside the
+	// box. The width a drag leaves is kept with the manager's own layout (`flyW` in `lpn_smbox`).
+	var smFlyOn = false, smFlyWatch = null, smFlyHome = null;
 	function smFlyEl() { return document.getElementById('lpn_sm_fly'); }
 	function smFlyIsOpen() { var f = smFlyEl(); return !!f && f.style.display !== 'none' && f.style.display !== ''; }
-	function smFlyToggleButton(host) {
-		var pc = EngCalcs.pageConfig || {}, b = smButton(host, pc.lpn_sm_table || 'Scenarios table',
-			pc.lpn_sm_table_tip || 'Show or hide the Scenarios table beside the Scenario manager.', function () { smFlySet(!smFlyOn); });
-		b.id = 'lpn_sm_table_btn';
-		b.setAttribute('aria-pressed', smFlyOn ? 'true' : 'false');
-		b.setAttribute('aria-controls', 'lpn_sm_fly');
-		return b;
-	}
+	function smFlyRem() { return parseFloat(getComputedStyle(document.documentElement).fontSize) || 16; }
 	function smFlySet(on) {
-		var b = document.getElementById('lpn_sm_table_btn');
 		smFlyOn = !!on && smBoxIsOpen();
-		if (b) { b.setAttribute('aria-pressed', smFlyOn ? 'true' : 'false'); }
 		if (smFlyOn) { smFlyBuild(); smFlyWatchBox(); smFlyPlace(); }
 		else {
 			var f = smFlyEl();
 			if (f) { hideTipsIn(f); f.style.display = 'none'; }
+			smFlyPanelHome();
 		}
+		refreshScenariosTab();
 	}
+	// Opened with the manager, except on a phone.
+	function smFlyAuto() { if (!smallScreen()) { smFlySet(true); } }
 	function smFlyClose() { if (smFlyOn || smFlyIsOpen()) { smFlySet(false); } }
 	// Called at the end of every rebuild of the manager, which every scenario act already reaches.
 	function smFlyRefresh() { if (smFlyOn && smBoxIsOpen()) { smFlyBuild(); smFlyPlace(); } }
+	// The pane's Scenarios panel goes back where it came from.
+	function smFlyPanelHome() {
+		var tab = paneTableById('scenarios'), panel = tab && document.getElementById(tab.panel);
+		if (!smFlyHome || !panel) { smFlyHome = null; return; }
+		hideTipsIn(panel);
+		if (smFlyHome.next && smFlyHome.next.parentNode === smFlyHome.parent) { smFlyHome.parent.insertBefore(panel, smFlyHome.next); }
+		else { smFlyHome.parent.appendChild(panel); }
+		smFlyHome = null;
+		applyPaneLayout();
+	}
 	function smFlyBuild() {
-		var pc = EngCalcs.pageConfig || {}, f = smFlyEl(), x, wrap, table, thead, tbody, tr, scroll = { t: 0, l: 0 };
+		var pc = EngCalcs.pageConfig || {}, f = smFlyEl(), x, grip, tab = paneTableById('scenarios'),
+			panel = tab && document.getElementById(tab.panel);
 		if (!f) {
 			f = document.createElement('div');
 			f.id = 'lpn_sm_fly';
 			f.className = 'lpn-sm-fly d-print-none';
 			f.setAttribute('role', 'region');
+			x = document.createElement('button');
+			x.type = 'button';
+			x.className = 'lpn-popover-x lpn-sm-fly-x';
+			x.id = 'lpn_sm_fly_close';
+			x.title = pc.lpn_close || 'Close';
+			x.setAttribute('aria-label', x.title);
+			x.textContent = '×';
+			x.addEventListener('click', function () { smFlySet(false); });
+			f.appendChild(x);
+			grip = document.createElement('div');
+			grip.className = 'lpn-sm-fly-grip';
+			grip.setAttribute('aria-hidden', 'true');
+			grip.addEventListener('pointerdown', smFlyStartResize);
+			f.appendChild(grip);
 			document.body.appendChild(f);
 		}
-		f.setAttribute('aria-label', pc.lpn_sm_table || 'Scenarios table');
-		wrap = f.querySelector('.lpn-sm-fly-scroll');
-		if (wrap) { scroll = { t: wrap.scrollTop, l: wrap.scrollLeft }; }
-		hideTipsIn(f);
-		f.innerHTML = '';
-		x = document.createElement('button');
-		x.type = 'button';
-		x.className = 'lpn-popover-x lpn-sm-fly-x';
-		x.id = 'lpn_sm_fly_close';
-		x.title = pc.lpn_close || 'Close';
-		x.setAttribute('aria-label', x.title);
-		x.textContent = '×';
-		x.addEventListener('click', function () { smFlySet(false); });
-		f.appendChild(x);
-		wrap = document.createElement('div');
-		wrap.className = 'lpn-sm-fly-scroll';
-		table = document.createElement('table');
-		table.className = 'lpn-sm-fly-table';
-		thead = document.createElement('thead');
-		tr = document.createElement('tr');
-		[pc.lpn_scenario_label || 'Scenario', pc.lpn_sm_col_parent || 'Parent'].concat(LPN_ALT_CATEGORIES.map(altCategoryLabel)).forEach(function (t, i) {
-			var th = document.createElement('th');
-			th.textContent = t;
-			th.setAttribute('scope', 'col');
-			if (i >= 2) { th.setAttribute('data-cat', LPN_ALT_CATEGORIES[i - 2]); }
-			if (i >= 2 && LPN_ALT_CATEGORIES[i - 2] === 'topology' && pc.lpn_alt_cat_topology_tip) { th.title = pc.lpn_alt_cat_topology_tip; }
-			tr.appendChild(th);
-		});
-		thead.appendChild(tr);
-		table.appendChild(thead);
-		tbody = document.createElement('tbody');
-		scenariosForDisplay().forEach(function (scn) {
-			var row = document.createElement('tr'), th = document.createElement('th'), td, p;
-			row.setAttribute('data-scn', scn.id);
-			th.setAttribute('scope', 'row');
-			th.className = 'lpn-sm-fly-name';
-			th.textContent = scenarioDisplayName(scn);
-			if (scn.id === project.activeScenario) { row.className = 'lpn-sm-fly-current'; th.setAttribute('aria-current', 'true'); }
-			// A double-click on the name makes the scenario current, as in the Tables pane.
-			th.addEventListener('dblclick', function () {
-				if (scn.id === project.activeScenario) { return; }
-				switchScenario(scn.id);
-				rebuildScenarioManager();
-			});
-			row.appendChild(th);
-			td = document.createElement('td');
-			p = scn.root === true ? null : parentScenarioOf(scn);
-			td.textContent = p ? scenarioDisplayName(p) : '';
-			row.appendChild(td);
-			LPN_ALT_CATEGORIES.forEach(function (cat) {
-				var cell = document.createElement('td'), sel = document.createElement('select'), val = smCellValue(scn, cat);
-				cell.setAttribute('data-cat', cat);
-				sel.setAttribute('aria-label', scenarioDisplayName(scn) + ', ' + altCategoryLabel(cat));
-				smCellChoices(scn, cat).forEach(function (c) {
-					var o = document.createElement('option');
-					o.value = c[0];
-					o.textContent = c[1];
-					if (c[0] === val) { o.selected = true; }
-					sel.appendChild(o);
-				});
-				// The blank choice inherits: shown muted, as the pane's "inherited" text.
-				if (val === '') { cell.className = 'lpn-sm-fly-inh'; }
-				sel.addEventListener('change', function () {
-					if (smSetCell(scn, cat, sel.value) === false) { smFlyBuild(); }
-				});
-				cell.appendChild(sel);
-				row.appendChild(cell);
-			});
-			tbody.appendChild(row);
-		});
-		table.appendChild(tbody);
-		wrap.appendChild(table);
-		f.appendChild(wrap);
-		wrap.scrollTop = scroll.t;
-		wrap.scrollLeft = scroll.l;
+		f.setAttribute('aria-label', pc.lpn_pane_tab_scenarios || 'Scenarios');
+		if (panel && panel.parentNode !== f) {
+			smFlyHome = { parent: panel.parentNode, next: panel.nextSibling };
+			hideTipsIn(panel);
+			f.appendChild(panel);
+		}
 		f.style.display = 'flex';
+		if (tab && panel) { renderPaneTable(tab); }
 		initTipsIn(f);
+	}
+	// The room the table may take beside the box, on the side it is on.
+	function smFlyRoom() {
+		var f = smFlyEl(), box = smBoxEl(), r, vw, side;
+		if (!f || !box) { return 0; }
+		r = box.getBoundingClientRect();
+		vw = window.innerWidth || document.documentElement.clientWidth || 0;
+		side = f.getAttribute('data-side');
+		return side === 'left' ? r.left - POPUP_EDGE : vw - r.right - POPUP_EDGE;
+	}
+	function smFlyStartResize(ev) {
+		var f = smFlyEl(), x0 = ev.clientX, w0, side, move, up, min = 18 * smFlyRem();
+		if (!f || f.getAttribute('data-side') === 'over' || (ev.button !== undefined && ev.button !== 0)) { return; }
+		if (ev.preventDefault) { ev.preventDefault(); }
+		w0 = f.getBoundingClientRect().width;
+		side = f.getAttribute('data-side');
+		move = function (e) {
+			var dx = (e.clientX - x0) * (side === 'left' ? -1 : 1);
+			smboxLayout.flyW = Math.round(Math.max(min, Math.min(smFlyRoom(), w0 + dx)));
+			f.style.width = smboxLayout.flyW + 'px';
+		};
+		up = function () {
+			document.removeEventListener('pointermove', move);
+			document.removeEventListener('pointerup', up);
+			document.removeEventListener('pointercancel', up);
+			saveSmboxLayout();
+		};
+		document.addEventListener('pointermove', move);
+		document.addEventListener('pointerup', up);
+		document.addEventListener('pointercancel', up);
 	}
 	// Beside the box at its inline end (the right, or the left on a right-to-left page), else at the
 	// other side, else over the box below its two rows of controls. The box's own stacking level, so a
 	// box raised above it is raised above the table too.
 	function smFlyPlace() {
-		var f = smFlyEl(), box = smBoxEl(), r, vw, vh, edge = POPUP_EDGE, rtl, endRoom, startRoom, want, tools, top, z;
+		var f = smFlyEl(), box = smBoxEl(), r, vw, vh, edge = POPUP_EDGE, rtl, endRoom, startRoom, want, tools, top, z, room, w;
 		if (!f || !box || !smFlyOn) { return; }
 		if (!smBoxIsOpen() || box.classList.contains('lpn-dock-collapsed')) { f.style.display = 'none'; return; }
 		f.style.display = 'flex';
@@ -78748,17 +78739,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		endRoom = rtl ? r.left - edge : vw - r.right - edge;
 		startRoom = rtl ? vw - r.right - edge : r.left - edge;
 		// 18rem: a name column and two categories, the least that is a table.
-		want = 18 * (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
+		want = 18 * smFlyRem();
 		z = getComputedStyle(box).zIndex;
 		f.style.zIndex = z && z !== 'auto' ? z : '1050';
 		f.style.left = f.style.right = f.style.top = f.style.bottom = f.style.width = f.style.height = f.style.maxWidth = '';
 		f.classList.remove('lpn-sm-fly-over');
-		if (!smallScreen() && (endRoom >= want || startRoom >= want)) {
+		if (endRoom >= want || startRoom >= want) {
 			var atEnd = endRoom >= want || endRoom >= startRoom, onRight = atEnd !== rtl;
+			room = Math.floor(atEnd ? endRoom : startRoom);
 			f.style.top = Math.max(edge, r.top) + 'px';
 			f.style.height = Math.max(120, Math.min(r.height, vh - edge - Math.max(edge, r.top))) + 'px';
-			// At most 64rem: the table is wider than that only with long alternative names, and it scrolls.
-			f.style.maxWidth = Math.floor(Math.min(atEnd ? endRoom : startRoom, want * 64 / 18)) + 'px';
+			// A dragged width, else 40rem: Scenario, Parent and three categories open, the rest a scroll away.
+			w = smboxLayout.flyW || 40 * smFlyRem();
+			f.style.width = Math.round(Math.max(Math.min(want, room), Math.min(w, room))) + 'px';
+			f.style.maxWidth = room + 'px';
 			if (onRight) { f.style.left = Math.round(r.right - 1) + 'px'; }
 			else { f.style.right = Math.round(vw - r.left - 1) + 'px'; }
 			f.setAttribute('data-side', onRight ? 'right' : 'left');

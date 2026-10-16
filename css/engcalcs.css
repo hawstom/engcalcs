@@ -4861,15 +4861,13 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
    column, so the map keeps its size. Placed by smFlyPlace(); it scrolls inside itself. */
 .lpn-sm-fly { position: fixed; display: none; flex-direction: column; box-sizing: border-box; min-height: 0; background: var(--ec-bg); color: var(--ec-ink); border: 1px solid var(--ec-ink); box-shadow: 2px 2px 6px var(--ec-a-0-0-0-3); padding: 28px 4px 4px; }
 .lpn-sm-fly-x { position: absolute; top: 2px; inset-inline-end: 2px; }
-.lpn-sm-fly-scroll { flex: 1 1 auto; min-height: 0; overflow: auto; }
-.lpn-sm-fly-table { border-collapse: separate; border-spacing: 0; font-size: 0.9em; }
-.lpn-sm-fly-table th, .lpn-sm-fly-table td { padding: 2px 4px; border-bottom: 1px solid var(--ec-border); text-align: start; white-space: nowrap; background: var(--ec-bg); }
-.lpn-sm-fly-table thead th { position: sticky; top: 0; z-index: 2; background: var(--ec-gray-f2f2f2); border-bottom-color: var(--ec-border-strong); }
-.lpn-sm-fly-table tbody th { position: sticky; inset-inline-start: 0; z-index: 1; font-weight: normal; max-width: 12em; overflow: hidden; text-overflow: ellipsis; }
-.lpn-sm-fly-table thead th:first-child { inset-inline-start: 0; z-index: 3; position: sticky; }
-.lpn-sm-fly-table tr.lpn-sm-fly-current th { font-weight: bold; }
-.lpn-sm-fly-table select { max-width: 11em; }
-.lpn-sm-fly-table td.lpn-sm-fly-inh select { color: var(--ec-ink-muted); }
+/* The Tables pane's own Scenarios panel, moved in: in the flow here, not stacked as in the pane. */
+#lpn_sm_fly .lpn-pane-panel.lpn-pane-scroll { display: block; position: relative; inset: auto; z-index: auto; content-visibility: visible; flex: 1 1 auto; min-height: 0; height: auto; overflow: auto; padding: 0; }
+/* The edge away from the box drags the width; none when the table lies over the box. */
+.lpn-sm-fly-grip { position: absolute; top: 0; bottom: 0; width: 7px; cursor: ew-resize; touch-action: none; z-index: 5; }
+.lpn-sm-fly[data-side="right"] .lpn-sm-fly-grip { right: -4px; }
+.lpn-sm-fly[data-side="left"] .lpn-sm-fly-grip { left: -4px; }
+.lpn-sm-fly[data-side="over"] .lpn-sm-fly-grip { display: none; }
 /* ---- THE RUN'S OWN DIALOG (ROADMAP Task 530) --------------------------------------------------
 
    Progress, Stop, nothing else (Tom, 2026-08-30). It borrows .lpn-popover for the viewport caps and

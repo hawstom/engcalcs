@@ -8,17 +8,22 @@
 // alternatives ... the selector ... includes 'All unused' (and 'All'?), where all the headings are
 // listed with a scrollbar."
 //
+// Tom, 2026-10-16, on the first build: "(1) I want it automatic, no button, (2) I want the
+// spreadsheet version, (3) I want it expandable (it's too narrow)." And of All unused: "let's not
+// take up room and attention listing empty categories on the unused list."
+//
 // On Net1, at 1600x1000 and then at a phone's 390x800:
-//   1. The manager's Scenarios table button opens the table beside the box, at its right edge, over
-//      the map: the map canvas keeps its size and place within 1 px. It scrolls within itself.
-//   2. A pick in a cell assigns the alternative (the same write as the Tables pane's Scenarios tab,
-//      which still shows it). The button again, and the box's close, close it.
-//   3. Docked at the right, the table opens at the box's left instead; the map is not resized by it.
-//   4. All unused lists every category heading, with only alternatives no scenario names and none
-//      inherits from; All lists every one, indented as its tree. Minus deletes an unused one from
-//      the list; a double-click opens an item in its category tree.
-//   5. At phone width the table lies over the box's lower part, inside the screen, and the map
-//      keeps its size.
+//   1. Opening the manager opens the table beside the box, at its right edge, over the map, with no
+//      button: the map canvas keeps its size and place within 1 px. It is the Tables pane's own
+//      Scenarios table (its panel, moved in), and the pane's Scenarios tab is hidden meanwhile.
+//   2. A pick in a cell assigns the alternative. The table's own x closes it and the pane's tab
+//      comes back with its panel; closing the box closes it too.
+//   3. The edge away from the box drags it wider, up to the room beside the box; the width is kept
+//      in lpn_smbox and the table reopens at it. Docked at the right, it opens at the box's left.
+//   4. All unused lists only the categories that have an unused alternative, with only alternatives
+//      no scenario names and none inherits from; All lists every one, indented as its tree. Minus
+//      deletes an unused one from the list; a double-click opens an item in its category tree.
+//   5. At phone width the manager opens without the table, and the pane's tab stays.
 //
 // DO NOT PREFIX THIS WITH `flock`: it takes /tmp/engcalcs-browser.lock itself.
 //
@@ -97,81 +102,131 @@ async function main() {
 			return out;
 		});
 
-		console.log('--- 1. the button opens the table beside the box, over the map ---');
-		await openManager();
-		ok('1.1 the manager is open', await boxShown());
-		const btn = await page.evaluate(() => { const b = document.getElementById('lpn_sm_table_btn'); return b ? [b.textContent, b.getAttribute('aria-pressed'), b.title] : null; });
-		ok('1.2 its top row has the Scenarios table button, not pressed, with a tip', !!btn && btn[0] === await L('lpn_sm_table') && btn[1] === 'false' && btn[2] === await L('lpn_sm_table_tip'), JSON.stringify(btn));
-		ok('1.3 the table is not shown until asked for', !(await flyShown()));
+		const tabShown = () => page.evaluate(() => { const b = document.getElementById('lpn_pane_tab_scenarios'); return !!b && b.style.display !== 'none'; });
+		const panelIn = () => page.evaluate(() => { const p = document.getElementById('lpn_pane_scenarios'); return !p ? 'none' : (p.closest('#lpn_sm_fly') ? 'fly' : (p.closest('#lpn_pane') || p.closest('.lpn-pane-body') ? 'pane' : 'elsewhere')); });
+
+		console.log('--- 1. the table opens with the manager, beside the box, over the map ---');
 		const map0 = await rect('#lpn_canvas');
-		await click('#lpn_sm_table_btn');
+		await openManager();
 		await settle(400);
-		ok('1.4 the button shows the table', await flyShown());
-		ok('1.5 ...and reads pressed', (await page.evaluate(() => document.getElementById('lpn_sm_table_btn').getAttribute('aria-pressed'))) === 'true');
+		ok('1.1 the manager is open', await boxShown());
+		ok('1.2 there is no Scenarios table button', (await page.evaluate(() => !document.getElementById('lpn_sm_table_btn'))));
+		ok('1.3 the table opened with the manager', await flyShown());
 		const box1 = await rect('#lpn_sm_box'), fly1 = await rect('#lpn_sm_fly'), map1 = await rect('#lpn_canvas');
-		ok('1.6 the map canvas keeps its size and place (within 1 px)', same(map0, map1), JSON.stringify([map0, map1]));
-		ok('1.7 the table is attached to the box\'s right edge, top aligned', Math.abs(fly1.l - box1.r) <= 2 && Math.abs(fly1.t - box1.t) <= 1, JSON.stringify([box1, fly1]));
-		ok('1.8 ...and lies over the map', fly1.l < map1.r && fly1.r > map1.l && fly1.t < map1.b && fly1.b > map1.t, JSON.stringify([fly1, map1]));
-		ok('1.9 it stays inside the window', fly1.r <= 1600 && fly1.b <= 1000, JSON.stringify(fly1));
+		ok('1.4 the map canvas keeps its size and place (within 1 px)', same(map0, map1), JSON.stringify([map0, map1]));
+		ok('1.5 the table is attached to the box\'s right edge, top aligned', Math.abs(fly1.l - box1.r) <= 2 && Math.abs(fly1.t - box1.t) <= 1, JSON.stringify([box1, fly1]));
+		ok('1.6 ...and lies over the map', fly1.l < map1.r && fly1.r > map1.l && fly1.t < map1.b && fly1.b > map1.t, JSON.stringify([fly1, map1]));
+		ok('1.7 it stays inside the window', fly1.r <= 1600 && fly1.b <= 1000, JSON.stringify(fly1));
+		ok('1.8 it is the Tables pane\'s own Scenarios panel, moved in', (await panelIn()) === 'fly');
+		ok('1.9 ...so the pane\'s Scenarios tab is hidden meanwhile', !(await tabShown()));
 		const shape = await page.evaluate(() => ({
-			rows: document.querySelectorAll('#lpn_sm_fly tbody tr').length,
-			cols: document.querySelectorAll('#lpn_sm_fly thead th').length,
-			scrolls: getComputedStyle(document.querySelector('#lpn_sm_fly .lpn-sm-fly-scroll')).overflow
+			sheet: !!document.querySelector('#lpn_sm_fly table.lpn-pane-table'),
+			rows: document.querySelectorAll('#lpn_sm_fly table.lpn-pane-table tbody tr').length,
+			cols: document.querySelectorAll('#lpn_sm_fly table.lpn-pane-table thead th').length,
+			scrolls: getComputedStyle(document.getElementById('lpn_pane_scenarios')).overflow
 		}));
-		ok('1.10 one row per scenario (Base alone on Net1), Scenario, Parent and the eleven categories', shape.rows === 1 && shape.cols === 13, JSON.stringify(shape));
+		ok('1.10 the spreadsheet: one row per scenario (Base alone on Net1), Scenario, Parent and the eleven categories', shape.sheet && shape.rows === 1 && shape.cols === 13, JSON.stringify(shape));
 		ok('1.11 it scrolls within itself', /auto|scroll/.test(shape.scrolls), shape.scrolls);
 		const flyZ = await page.evaluate(() => [getComputedStyle(document.getElementById('lpn_sm_fly')).zIndex, getComputedStyle(document.getElementById('lpn_sm_box')).zIndex]);
 		ok('1.12 at the box\'s own stacking level', flyZ[0] === flyZ[1] || flyZ[1] === 'auto', JSON.stringify(flyZ));
-		// The element at the table's centre is the table, not the map.
 		const hit = await page.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); return !!e && !!e.closest('#lpn_sm_fly'); }, [fly1.l + 30, fly1.t + 40]);
 		ok('1.13 a point on the table is the table, not the map under it', hit);
 
-		console.log('\n--- 2. a scenario and two alternatives, picked in the flown-out table ---');
+		console.log('\n--- 2. a scenario and an alternative, picked in the flown-out spreadsheet ---');
 		await selectTree('scenarios');
 		await click('#lpn_sm_add');
 		await page.keyboard.press('Enter');
 		await settle(500);
 		const scnName = (await names())[1];
-		ok('2.1 a child scenario is added, and the table gains its row', (await page.evaluate(() => document.querySelectorAll('#lpn_sm_fly tbody tr').length)) === 2, String(scnName));
+		ok('2.1 a child scenario is added, and the table gains its row', (await page.evaluate(() => document.querySelectorAll('#lpn_sm_fly table.lpn-pane-table tbody tr').length)) === 2, String(scnName));
 		await selectTree('demand');
 		await click('#lpn_sm_add');
 		await page.keyboard.press('Enter');
 		await settle(400);
 		const altA = (await names())[1];
 		ok('2.2 the table stays open while the manager changes tree', await flyShown());
-		const opts = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_fly tbody tr:nth-child(2) td[data-cat=demand] option')).map((o) => o.value));
-		ok('2.3 the new Demand alternative is a choice in the child\'s Demand cell', opts.indexOf(altA) >= 0, JSON.stringify(opts));
-		await page.selectOption('#lpn_sm_fly tbody tr:nth-child(2) td[data-cat=demand] select', altA);
+		// The Demand cell of the child's row: a select, as in the pane.
+		const mark = await page.evaluate((scn) => {
+			const tr = Array.from(document.querySelectorAll('#lpn_sm_fly table.lpn-pane-table tbody tr')).filter((r) => r.querySelector('td').textContent.trim() === scn)[0];
+			const i = Array.from(document.querySelectorAll('#lpn_sm_fly table.lpn-pane-table thead th')).findIndex((t) => t._lpnColKey === 'sc_demand');
+			const sel = tr && i >= 0 ? tr.children[i].querySelector('select') : null;
+			if (!sel) { return null; }
+			sel.setAttribute('data-h', 'dem');
+			return Array.from(sel.options).map((o) => o.value);
+		}, scnName);
+		ok('2.3 the new Demand alternative is a choice in the child\'s Demand cell', !!mark && mark.indexOf(altA) >= 0, JSON.stringify(mark));
+		if (mark) { await page.selectOption('#lpn_sm_fly select[data-h=dem]', altA); }
 		await settle(700);
-		ok('2.4 picked, the cell holds it after the table is drawn again', (await page.evaluate(() => document.querySelector('#lpn_sm_fly tbody tr:nth-child(2) td[data-cat=demand] select').value)) === altA);
+		ok('2.4 picked, the cell holds it after the table is drawn again', await page.evaluate(([scn, alt]) => {
+			const tr = Array.from(document.querySelectorAll('#lpn_sm_fly table.lpn-pane-table tbody tr')).filter((r) => r.querySelector('td').textContent.trim() === scn)[0];
+			const i = Array.from(document.querySelectorAll('#lpn_sm_fly table.lpn-pane-table thead th')).findIndex((t) => t._lpnColKey === 'sc_demand');
+			return !!tr && tr.children[i].querySelector('select').value === alt;
+		}, [scnName, altA]));
 		const used = await page.evaluate((n) => { const r = Array.from(document.querySelectorAll('#lpn_sm_tree .lpn-sm-row')).find((x) => x.querySelector('.lpn-sm-name').textContent === n); return r ? r.querySelector('.lpn-sm-meta').textContent : null; }, altA);
-		ok('2.5 ...and the manager\'s tree says the scenario uses it', used === (await L('lpn_sm_used_by')).replace('{n}', '1'), String(used));
+		ok('2.5 picked in the spreadsheet, the manager\'s tree says the scenario uses it', used === (await L('lpn_sm_used_by')).replace('{n}', '1'), String(used));
+		await click('#lpn_sm_fly_close');
+		ok('2.6 the table\'s x closes it, the manager stays', !(await flyShown()) && (await boxShown()));
+		ok('2.7 ...and the panel goes home to the pane, its tab back', (await panelIn()) === 'pane' && (await tabShown()));
 		await click('#lpn_pane_tab_scenarios');
 		await settle(500);
-		ok('2.6 the Tables pane\'s Scenarios tab is kept, and shows the same pick', await page.evaluate((n) => { const p = document.getElementById('lpn_pane_scenarios'); return !!p && (p.textContent.indexOf(n) >= 0 || Array.from(p.querySelectorAll('select,input')).some((e) => e.value === n)); }, altA));
-		// Every map size from here on is measured after the pane, which does resize the map, has settled.
-		await settle(500);
-
-		console.log('\n--- 3. close, and docking ---');
-		await click('#lpn_sm_table_btn');
-		ok('3.1 the button again hides the table', !(await flyShown()));
-		await click('#lpn_sm_table_btn');
-		ok('3.2 ...and shows it again', await flyShown());
+		ok('2.8 the pane\'s Scenarios tab shows the same pick', await page.evaluate((n) => { const p = document.getElementById('lpn_pane_scenarios'); return !!p && p.classList.contains('on') && (p.textContent.indexOf(n) >= 0 || Array.from(p.querySelectorAll('select,input')).some((e) => e.value === n)); }, altA));
 		await click('#lpn_sm_close');
 		await settle(400);
-		ok('3.3 closing the manager closes the table', !(await boxShown()) && !(await flyShown()));
+		ok('2.9 closing the manager with the table put away leaves it away', !(await boxShown()) && !(await flyShown()));
 		await openManager();
-		ok('3.4 the manager opens again without the table', (await boxShown()) && !(await flyShown()));
+		await settle(400);
+		ok('2.10 the manager opened again brings the table back', (await boxShown()) && (await flyShown()));
+		ok('2.11 ...and the pane, which was on Scenarios, has given way to another tab', !(await tabShown()) && (await page.evaluate(() => !document.getElementById('lpn_pane_scenarios').classList.contains('on'))));
+		await click('#lpn_sm_close');
+		await settle(400);
+		ok('2.12 closing the manager closes the table, and the panel goes home', !(await flyShown()) && (await panelIn()) === 'pane' && (await tabShown()));
+		await settle(500);
+
+		console.log('\n--- 3. wider by its edge, and docking ---');
+		await openManager();
+		await settle(400);
+		const drag = async (x0, y, x1) => { await page.mouse.move(x0, y); await page.mouse.down(); await page.mouse.move(x1, y, { steps: 6 }); await page.mouse.up(); await settle(300); };
+		const f3 = await rect('#lpn_sm_fly');
+		ok('3.0 it opens using the room beside the box, up to 40rem', f3.w >= 590, JSON.stringify(f3));
+		await drag(f3.r - 1, f3.t + f3.h / 2, f3.r - 201);
+		const f3a = await rect('#lpn_sm_fly');
+		ok('3.1 the far edge drags the table 200 px narrower', Math.abs(f3.w - f3a.w - 200) <= 3 && Math.abs(f3a.l - f3.l) <= 1, JSON.stringify([f3, f3a]));
+		await drag(f3a.r - 1, f3a.t + f3a.h / 2, f3a.r + 99);
+		const f3b = await rect('#lpn_sm_fly');
+		ok('3.1b ...and 100 px wider again', Math.abs(f3b.w - f3a.w - 100) <= 3 && Math.abs(f3b.l - f3.l) <= 1, JSON.stringify([f3a, f3b]));
+		const stored = await page.evaluate(() => { try { return JSON.parse(localStorage.getItem('lpn_smbox') || '{}').flyW; } catch (e) { return 'x'; } });
+		ok('3.2 the width is kept with the manager\'s layout (lpn_smbox flyW)', Math.abs(stored - f3b.w) <= 3, String(stored));
+		await page.mouse.move(f3b.r - 1, f3b.t + f3b.h / 2);
+		await page.mouse.down();
+		await page.mouse.move(1700, f3b.t + f3b.h / 2, { steps: 6 });
+		await page.mouse.up();
+		await settle(300);
+		const f3c = await rect('#lpn_sm_fly');
+		ok('3.3 ...but no wider than the room beside the box', f3c.r <= 1600 && f3c.r >= 1590, JSON.stringify(f3c));
+		await page.mouse.move(f3c.r - 1, f3c.t + f3c.h / 2);
+		await page.mouse.down();
+		await page.mouse.move(f3b.r, f3c.t + f3c.h / 2, { steps: 6 });
+		await page.mouse.up();
+		await settle(300);
+		await click('#lpn_sm_close');
+		await settle(300);
+		await openManager();
+		await settle(400);
+		const f3d = await rect('#lpn_sm_fly');
+		ok('3.4 opened again, the table has the width it was left at', Math.abs(f3d.w - f3b.w) <= 3, JSON.stringify([f3b, f3d]));
 		await page.evaluate(() => document.querySelector('#lpn_sm_box [data-dock="right"]').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
 		await settle(900);
-		const mapD = await rect('#lpn_canvas');
-		await click('#lpn_sm_table_btn');
-		await settle(400);
 		const boxD = await rect('#lpn_sm_box'), flyD = await rect('#lpn_sm_fly'), mapD2 = await rect('#lpn_canvas');
-		ok('3.5 docked at the right, the table opens at the box\'s left edge', (await flyShown()) && Math.abs(flyD.r - boxD.l) <= 2, JSON.stringify([boxD, flyD]));
-		ok('3.6 ...over the map, which keeps its size (within 1 px)', same(mapD, mapD2) && flyD.l < mapD2.r, JSON.stringify([mapD, mapD2]));
+		ok('3.5 docked at the right, the table lies at the box\'s left edge', (await flyShown()) && Math.abs(flyD.r - boxD.l) <= 2, JSON.stringify([boxD, flyD]));
+		ok('3.6 ...over the map', flyD.l < mapD2.r, JSON.stringify([flyD, mapD2]));
 		ok('3.7 ...inside the window', flyD.l >= 0, JSON.stringify(flyD));
-		await click('#lpn_sm_table_btn');
+		await page.mouse.move(flyD.l + 1, flyD.t + flyD.h / 2);
+		await page.mouse.down();
+		await page.mouse.move(flyD.l - 60, flyD.t + flyD.h / 2, { steps: 6 });
+		await page.mouse.up();
+		await settle(300);
+		const flyD2 = await rect('#lpn_sm_fly');
+		ok('3.8 ...and its left edge drags it wider leftward, its right edge staying on the box', Math.abs(flyD2.w - flyD.w - 60) <= 3 && Math.abs(flyD2.r - flyD.r) <= 1, JSON.stringify([flyD, flyD2]));
 		await page.evaluate(() => document.querySelector('#lpn_sm_box [data-dock="float"]').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
 		await settle(900);
 
@@ -201,11 +256,11 @@ async function main() {
 		ok('4.1 the selector ends with All and All unused', JSON.stringify(selOpts.slice(-2)) === JSON.stringify([['*all', await L('lpn_sm_tree_all')], ['*unused', await L('lpn_sm_tree_unused')]]) && selOpts.length === 14, JSON.stringify(selOpts.slice(-3)));
 		await selectTree('*unused');
 		const un = await allView();
-		ok('4.2 All unused lists all eleven category headings', un.length === 11 && un[0].cat === 'physical', JSON.stringify(un.map((x) => x.cat)));
+		ok('4.2 All unused lists only the two categories that have an unused alternative', JSON.stringify(un.map((x) => x.cat)) === JSON.stringify(['physical', 'demand']), JSON.stringify(un.map((x) => x.cat)));
 		const unDem = un.filter((x) => x.cat === 'demand')[0], unPhy = un.filter((x) => x.cat === 'physical')[0];
 		ok('4.3 under Demand, only the alternative nothing names and nothing inherits from', JSON.stringify(unDem.items) === JSON.stringify([altC]), JSON.stringify(unDem));
 		ok('4.4 under Physical, the unused one', JSON.stringify(unPhy.items) === JSON.stringify([altP]), JSON.stringify(unPhy));
-		ok('4.5 a heading with none says None', un.filter((x) => x.cat === 'fireflow')[0].none === true && (await page.evaluate(() => document.querySelector('.lpn-sm-none').textContent)) === await L('lpn_sm_unused_none'));
+		ok('4.5 no heading stands with nothing under it', un.every((x) => x.items.length > 0 && !x.none) && !(await page.evaluate(() => !!document.querySelector('#lpn_sm_tree .lpn-sm-none'))));
 		const scrollY = await page.evaluate(() => getComputedStyle(document.getElementById('lpn_sm_tree')).overflowY);
 		ok('4.6 the list scrolls in one frame', /auto|scroll/.test(scrollY), scrollY);
 		await selectTree('*all');
@@ -221,11 +276,12 @@ async function main() {
 		await click('#lpn_sm_del');
 		await settle(500);
 		const un2 = await allView();
-		ok('4.11 the minus deletes it, and Physical then says None', un2.filter((x) => x.cat === 'physical')[0].none === true, JSON.stringify(un2.filter((x) => x.cat === 'physical')[0]));
+		ok('4.11 the minus deletes it, and Physical then leaves the list', JSON.stringify(un2.map((x) => x.cat)) === JSON.stringify(['demand']), JSON.stringify(un2.map((x) => x.cat)));
 		ok('4.12 ...and the view is still All unused', (await page.evaluate(() => document.getElementById('lpn_sm_tree_select').value)) === '*unused');
 		await page.keyboard.press('Control+z');
 		await settle(700);
-		ok('4.13 Ctrl+Z puts it back', ((await allView()).filter((x) => x.cat === 'physical')[0].items || []).indexOf(altP) >= 0, JSON.stringify((await allView()).filter((x) => x.cat === 'physical')[0]));
+		const un3 = await allView();
+		ok('4.13 Ctrl+Z puts it back, its heading with it', ((un3.filter((x) => x.cat === 'physical')[0] || {}).items || []).indexOf(altP) >= 0, JSON.stringify(un3));
 		await page.evaluate((n) => { const r = Array.from(document.querySelectorAll('#lpn_sm_tree .lpn-sm-row')).find((x) => x.getAttribute('data-cat') === 'demand' && x.querySelector('.lpn-sm-name').textContent === n); r.dispatchEvent(new MouseEvent('dblclick', { bubbles: true, detail: 2 })); }, altC);
 		await settle(500);
 		const after = await page.evaluate(() => [document.getElementById('lpn_sm_tree_select').value, (document.querySelector('#lpn_sm_tree .lpn-sm-sel .lpn-sm-name') || {}).textContent]);
@@ -236,19 +292,11 @@ async function main() {
 		await page.setViewportSize({ width: 390, height: 800 });
 		await settle(900);
 		await openManager();
-		const mapP = await rect('#lpn_canvas');
-		await click('#lpn_sm_table_btn');
 		await settle(500);
-		const boxP = await rect('#lpn_sm_box'), flyP = await rect('#lpn_sm_fly'), mapP2 = await rect('#lpn_canvas');
-		const side = await page.evaluate(() => document.getElementById('lpn_sm_fly').getAttribute('data-side'));
-		ok('5.1 at 390 px the table opens over the box', (await flyShown()) && side === 'over', String(side));
-		ok('5.2 ...inside the screen', flyP.l >= 0 && flyP.r <= 390 && flyP.t >= 0 && flyP.b <= 800, JSON.stringify(flyP));
-		ok('5.3 ...below the selector and the button, which stay usable', await page.evaluate(([x, y]) => { const b = document.getElementById('lpn_sm_table_btn').getBoundingClientRect(); const e = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2); return !!e && !!e.closest('#lpn_sm_table_btn'); }, [0, 0]), JSON.stringify([boxP, flyP]));
-		ok('5.4 the map keeps its size (within 1 px)', same(mapP, mapP2), JSON.stringify([mapP, mapP2]));
-		const sw = await page.evaluate(() => { const s = document.querySelector('#lpn_sm_fly .lpn-sm-fly-scroll'); return [s.scrollWidth, s.clientWidth, document.documentElement.scrollWidth]; });
-		ok('5.5 the table scrolls sideways within itself; the page does not', sw[0] > sw[1] && sw[2] <= 390, JSON.stringify(sw));
-		await click('#lpn_sm_table_btn');
-		ok('5.6 the button closes it', !(await flyShown()));
+		ok('5.1 at 390 px the manager opens without the table, which would cover its tree', (await boxShown()) && !(await flyShown()));
+		ok('5.2 ...and the Scenarios table stays in the Tables pane, its tab shown', (await panelIn()) === 'pane' && (await tabShown()));
+		const sw = await page.evaluate(() => document.documentElement.scrollWidth);
+		ok('5.3 the page does not scroll sideways', sw <= 390, String(sw));
 
 		ok('no page errors', errors.length === 0, JSON.stringify(errors));
 	} finally {
