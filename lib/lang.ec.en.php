@@ -3091,6 +3091,11 @@ $ec_lang['lpn_settings_area_hint']='Show the selection help';
 $ec_lang['lpn_settings_area_hint_tip']='Show the prompt over the map that gives the next step while you are selecting an area.';
 $ec_lang['lpn_settings_hover_card']='Show the full label on hover';
 $ec_lang['lpn_settings_hover_card_tip']='Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.';
+$ec_lang['lpn_settings_theme']='Theme';
+$ec_lang['lpn_settings_theme_tip']='Choose light or dark colors for the page. System follows the setting of your device. The map drawing looks the same in every theme. This is a setting for this browser, not for the project.';
+$ec_lang['lpn_theme_system']='System';
+$ec_lang['lpn_theme_light']='Light';
+$ec_lang['lpn_theme_dark']='Dark';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a

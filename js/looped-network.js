@@ -35525,7 +35525,9 @@ var EngCalcs = EngCalcs || {};
 			// page-title toggle went with the titles; a browser that used it before still carries
 			// the key, and "exactly as a brand-new visitor would see it" has to mean that too.
 			// Erasing a key we no longer write is the one direction that is always safe.
-			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY, LPN_SCNBASIC_KEY, LPN_HOVERCARD_KEY];
+			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY, LPN_SCNBASIC_KEY, LPN_HOVERCARD_KEY,
+			// 'lpn_theme' (Task 714): a literal because the key is owned by the page head's window.ecTheme.
+			'lpn_theme'];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -54489,6 +54491,23 @@ var EngCalcs = EngCalcs || {};
 			row(pageBody, pc.lpn_settings_hover_card || 'Show the full label on hover', hoverCardInput,
 				pc.lpn_settings_hover_card_tip);
 		}
+		// The theme (Task 714, Phase 3; dev/theming-plan.md): System, Light or Dark. The same section and
+		// the same reason as the two rows above: it is a fact about the screen and the eyes at it, so it
+		// lives in this browser (`lpn_theme`, written by window.ecTheme in the page head) and never in
+		// serializeProject(). It repaints with no reload, because the head script owns the attribute.
+		var themeSelect = document.createElement('select');
+		themeSelect.id = 'lpn_set_theme';
+		[['system', pc.lpn_theme_system || 'System'], ['light', pc.lpn_theme_light || 'Light'],
+			['dark', pc.lpn_theme_dark || 'Dark']].forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0]; opt.textContent = o[1];
+			if (typeof window.ecTheme !== 'undefined' && window.ecTheme.get() === o[0]) { opt.selected = true; }
+			themeSelect.appendChild(opt);
+		});
+		themeSelect.addEventListener('change', function () {
+			if (typeof window.ecTheme !== 'undefined') { window.ecTheme.set(themeSelect.value); }
+		});
+		row(pageBody, pc.lpn_settings_theme || 'Theme', themeSelect, pc.lpn_settings_theme_tip);
 		var tail = document.createElement('div');
 		tail.style.marginTop = '6px';
 		pageBody.appendChild(tail);

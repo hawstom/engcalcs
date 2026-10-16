@@ -46,6 +46,7 @@ Derived from `EC_LPN_FURNITURE` in `dev/scripts/lpn_furniture_check.php`; the ch
 | `lpn_runbox` | Settings > Calculation > Hydraulics > Show the run progress box |
 | `lpn_scnbasic` | Scenarios > Basic mode |
 | `lpn_hovercard` | Settings > Map and page > Page > Show the full label on hover |
+| `lpn_theme` | Settings > Map and page > Page > Theme (System, Light, Dark) |
 | `lpn_msghidden` | The x on a message in the amber box on the map (and Show in the message history): which messages this reader hid |
 | `lpn_areahint` | Settings > Map and page > Page > Show the selection help, and the bubble's own checkbox |
 | `lpn_survey_format` | The column order last chosen when importing a surveyed point list |
@@ -80,9 +81,9 @@ rows) are counted only when present. Regenerate with
 | `lpn_set_sub_linkSym` | 19 | 19 | 0 | 0 |
 | `lpn_set_sub_linkColors` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_custLbl` | 8 | 8 | 0 | 0 |
-| `lpn_set_sub_nodeLink` | 2 | 2 | 0 | 0 |
+| `lpn_set_sub_nodeLink` | 1 | 1 | 0 | 0 |
 | `lpn_set_sub_mapDisplay` | 16 | 16 | 0 | 0 |
-| `lpn_set_sub_page` | 2 | 0 | 2 | 0 |
+| `lpn_set_sub_page` | 3 | 0 | 3 | 0 |
 | `lpn_set_sub_idPrefixes` | 7 | 7 | 0 | 0 |
 | `lpn_set_sub_defaults` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_customProps` | 10 | 10 | 0 | 0 |
@@ -91,11 +92,12 @@ rows) are counted only when present. Regenerate with
 | `lpn_set_sub_hydraulics` | 17 | 16 | 1 | 0 |
 | `lpn_set_sub_energy` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_quality` | 2 | 2 | 0 | 0 |
-| **Total** | 130 | 127 | 3 | 0 |
+| **Total** | 130 | 126 | 4 | 0 |
 
 Controls whose home is not their heading's default, as observed:
 
 - `lpn_set_sub_page`: Show the selection help -- browser
 - `lpn_set_sub_page`: Show the full label on hover -- browser
+- `lpn_set_sub_page`: Theme -- browser
 - `lpn_set_sub_hydraulics`: Show the run progress box -- browser
 <!-- INVENTORY:END -->

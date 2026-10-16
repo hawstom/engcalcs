@@ -68,6 +68,27 @@ if (isset($html_desc) && trim((string)$html_desc) !== '') :
 <?php endif; ?>
 	<?=$html_head?>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+<?php
+// THE THEME, SET BEFORE FIRST PAINT (Task 714, Phase 3; dev/theming-plan.md). The visitor's choice is
+// System, Light or Dark, kept in this browser alone (localStorage `lpn_theme`, written only by Settings >
+// Map and page > Page > Theme, and only for Light or Dark). It becomes <html data-theme="system|light|dark">
+// and css/engcalcs.css does the rest; System follows the operating system through prefers-color-scheme.
+// data-bs-theme is Bootstrap's own switch, so its fields and buttons follow too. THE LOOPED-NETWORK PAGE
+// ONLY: the calculator pages are not themed (a light Bootstrap navbar and the parent site's stylesheet are
+// not tokens), and a page with no data-theme stays light under any system. The script is inline and ahead
+// of the stylesheets on purpose: a dark-mode visitor must never see a white flash while a file loads.
+// window.ecTheme.set() is the one writer, and the one place the two attributes are kept in step; with
+// storage blocked the choice still holds until the page is closed. No consent is needed: a preference
+// the visitor set (dev/cookie-storage-inventory.md).
+if ($type === 'EngCalcsApp') :
+?>
+	<script>(function(){var d=document.documentElement,q=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null,k='lpn_theme',c='system',m=null;
+	function g(){if(m){return m;}try{var t=localStorage.getItem(k);return t==='light'||t==='dark'?t:'system';}catch(e){return 'system';}}
+	function a(){c=g();d.setAttribute('data-theme',c);
+	d.setAttribute('data-bs-theme',c==='dark'||(c==='system'&&q&&q.matches)?'dark':'light');}
+	a();if(q&&q.addEventListener){q.addEventListener('change',a);}
+	window.ecTheme={get:g,set:function(t){m=t==='light'||t==='dark'?t:null;try{if(t==='light'||t==='dark'){localStorage.setItem(k,t);}else{localStorage.removeItem(k);}}catch(e){}a();}};})();</script>
+<?php endif; ?>
 	<title><?=$calc_name ? $safe_name . ' — ' . $html_title : $html_title?></title>
 <?php
 // Canonical + hreflang (ROADMAP Task 149). Emitted here, in the one function every page's
