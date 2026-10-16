@@ -143,12 +143,12 @@ async function main() {
 		const st1 = await a.page.evaluate(() => EngCalcs.lpnTimeRunState().t);
 		ok('...and the stored current time is the picked period', st1 === 7200, String(st1));
 		ok('...and sits on one of them', p.ts.indexOf(p.t) >= 0, 't=' + p.t);
-		await a.page.evaluate(() => EngCalcs.lpnTimeGoTo(20 * 3600));
+		await a.page.evaluate((t) => EngCalcs.lpnTimeGoTo(t), lastT + 3600);
 		await a.settle(600);
 		const q = await probe();
-		ok('the stored current time is clamped to the last solved period, not 20 h', q.t === lastT, 't=' + q.t);
-		await held('after asking for hour 20');
-		ok('asking for hour 20 does not conjure a period', q.ts.length === p.ts.length && q.ts[q.ts.length - 1] === lastT, JSON.stringify(q.ts));
+		ok('the stored current time is clamped to the last solved period, not the hour after it', q.t === lastT, 't=' + q.t);
+		await held('after asking for the hour after it');
+		ok('asking for the hour after it does not conjure a period', q.ts.length === p.ts.length && q.ts[q.ts.length - 1] === lastT, JSON.stringify(q.ts));
 		ok('...the map shows the last solved period', q.curHeads === p.first);
 
 		// Step forward, Last, Play and a tab round trip, as a person does.
