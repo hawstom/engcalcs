@@ -36812,12 +36812,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function tsbSchedule() {
 		if (tsbQueued || !tsbList().length) { return; }
 		tsbQueued = true;
-		window.requestAnimationFrame(function () { tsbQueued = false; tsbPlaceAll(); });
+		(window.requestAnimationFrame || setTimeout)(function () { tsbQueued = false; tsbPlaceAll(); });
 	}
 	// A new run, a new frame of the transport, a new document: redraw every chart as well as place it.
 	function tsbRefresh() {
 		if (!tsbList().length) { return; }
-		window.requestAnimationFrame(function () { tsbEnsureLayer(); tsbSync(); tsbList().forEach(tsbDraw); tsbPlaceAll(); });
+		(window.requestAnimationFrame || setTimeout)(function () { tsbEnsureLayer(); tsbSync(); tsbList().forEach(tsbDraw); tsbPlaceAll(); });
 	}
 	// Builds the elements for the list and removes those whose record is gone.
 	function tsbSync() {
@@ -67142,9 +67142,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			refreshPopupIfOpen();
 		});
 	}
-	function readonlyField(fields, labelText, value, tip) {
-		var label = document.createElement('label'), span = document.createElement('span');
-		span.textContent = typeof value === 'number' ? value.toFixed(2) : value;
+	// `dec`, when given, is a result's label decimals (paneResultDecimals()), so Properties prints a
+	// result exactly as the Tables pane does; otherwise two places, as always.
+	function readonlyField(fields, labelText, value, tip, dec) {
+		var label = document.createElement('label'), span = document.createElement('span'),
+			d = typeof dec === 'number' ? Math.max(0, Math.min(20, dec)) : 2;
+		span.textContent = typeof value === 'number'
+			? (Math.abs(value) < 0.5 * Math.pow(10, -d) ? 0 : value).toFixed(d) : value;
 		setFieldLabel(label, labelText, tip);
 		label.appendChild(span);
 		fields.appendChild(label);
@@ -67224,9 +67228,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// SI value -> current display unit, read-only. Used for solve results: the property popups
 	// are the canonical results location (Tom, 2026-07-30) -- the map labels and the asset tables
 	// are presentation layers over this same computed data, not a separate source of truth.
-	function readonlyUnitField(fields, labelText, unitId, siValue, tip) {
-		readonlyField(fields, labelText + ' (' + unitLabel(unitId) + ')', siValue * unitFactor(unitId), tip);
+	function readonlyUnitField(fields, labelText, unitId, siValue, tip, dec) {
+		readonlyField(fields, labelText + ' (' + unitLabel(unitId) + ')', siValue * unitFactor(unitId), tip, dec);
 	}
+	function resultDec(group, key) { return paneResultDecimals(group, key)(); }
 	// Length pairs with an Auto checkbox (the lenAuto design logged in the scope doc): typing a
 	// value takes manual control; re-checking Auto snaps back to the live geometric distance.
 	// Auto and manual get IDENTICAL treatment (Tom, 2026-07-30) -- no SI conversion for length at
@@ -68460,11 +68465,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			mixingFields(fields, n);
 			readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'),
-				toSI(nodeFixedHead(n), 'lpn_u_elevhead'), pc.lpn_tank_head_tip);
+				toSI(nodeFixedHead(n), 'lpn_u_elevhead'), pc.lpn_tank_head_tip, resultDec('node', 'head'));
 			// The head above the GROUND, as at any node: the reading the Tables pane, the labels and
 			// the colouring take (tankPressureSI()), so it follows the two elevations as they are typed.
 			if (typeof effective(n, 'elev') === 'number') {
-				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', resultUnit('pressure'), tankPressureSI(n));
+				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', resultUnit('pressure'), tankPressureSI(n), undefined, resultDec('node', 'pressure'));
 			}
 			// Depth and usable volume, read the way the Tables pane reads them (Task 783).
 			readonlyField(fields, (pc.lpn_result_depth || 'Depth') + ' (' + unitLabel(resultUnit('elevhead')) + ')',
@@ -68506,7 +68511,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// head and no elevation, and a pressure row reading 0 asserts what the file never said.
 			if (typeof effective(n, 'elev') === 'number') {
 				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', resultUnit('pressure'),
-					toSI(reservoirHead(n) - effective(n, 'elev'), 'lpn_u_elevhead'));
+					toSI(reservoirHead(n) - effective(n, 'elev'), 'lpn_u_elevhead'), undefined, resultDec('node', 'pressure'));
 			}
 		} else {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
@@ -68586,8 +68591,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				pc.lpn_field_emitter_tip, { el: n, prop: 'emitter' });
 			if (lastSolveResult && lastSolveResult.pressures[nodeId] !== undefined) {
 				readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'), lastSolveResult.heads[nodeId],
-					pc.lpn_result_head_tip);
-				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', resultUnit('pressure'), lastSolveResult.pressures[nodeId]);
+					pc.lpn_result_head_tip, resultDec('node', 'head'));
+				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', resultUnit('pressure'), lastSolveResult.pressures[nodeId], undefined, resultDec('node', 'pressure'));
 				// **WHAT THIS JUNCTION RECEIVES, UNDER PRESSURE-DRIVEN ANALYSIS** (Task 762). The
 				// demand above is what it asks for; these two are what the engine delivered and
 				// what it withheld. Present only for a PDA run, where the engine states them.
@@ -69584,25 +69589,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		customPropFields(fields, l);
 		activeField(fields, l);
 		if (lastSolveResult && !linkResultHeld(l) && lastSolveResult.flows[linkId] !== undefined) {
-			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', resultUnit('flow'), shownFlow(lastSolveResult.flows[linkId]));
+			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', resultUnit('flow'), shownFlow(lastSolveResult.flows[linkId]), undefined, resultDec('link', 'flow'));
 			// A pump has no diameter (Tom, 2026-07-30: "how can a pump have a velocity if it has no
 			// diameter?") -- js/lpn-solver.js can only compute velocity = Q/area from a real
 			// diameter, so a pump's stored velocity is always the fallback 0, which reads as "no
 			// flow" and is actively misleading. Velocity is a pipe-only result.
 			if (l.type !== 'pump') {
-				readonlyUnitField(fields, pc.lpn_result_velocity || 'Velocity', resultUnit('velocity'), lastSolveResult.velocities[linkId]);
+				readonlyUnitField(fields, pc.lpn_result_velocity || 'Velocity', resultUnit('velocity'), lastSolveResult.velocities[linkId], undefined, resultDec('link', 'velocity'));
 			}
 			// Head loss, for a pump too, where it is shown as the pump's positive Head (shownHeadloss()).
 			if (l.type === 'pump') {
-				readonlyUnitField(fields, pc.lpn_result_pump_head || 'Head', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]));
+				readonlyUnitField(fields, pc.lpn_result_pump_head || 'Head', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]), undefined, resultDec('link', 'headloss'));
 			} else {
-				readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]));
+				readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]), undefined, resultDec('link', 'headloss'));
 			}
 			// Gradient is per unit of pipe LENGTH, so it is a pipe-only result -- a pump has no
 			// length to spread its head over. linkLengthSI(), not the declared length: see Task 255.
 			if (l.type !== 'pump' && linkLengthSI(l)) {
 				readonlyUnitField(fields, pc.lpn_result_gradient || 'Head loss gradient', 'lpn_u_gradient',
-					shownHeadloss(l, lastSolveResult.headlosses[linkId]) / linkLengthSI(l), pc.lpn_result_gradient_tip);
+					shownHeadloss(l, lastSolveResult.headlosses[linkId]) / linkLengthSI(l), pc.lpn_result_gradient_tip, resultDec('link', 'gradient'));
 			}
 			// **THE STATUS AT THIS TIME STEP, AS A RESULT** (Tom, 2026-09-25, on Net3: pump 10 opens
 			// at 1:00 by its control, and this box kept calling it closed). The Shut box above is
@@ -78678,6 +78683,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// box. The width a drag leaves is kept with the manager's own layout (`flyW` in `lpn_smbox`).
 	var smFlyOn = false, smFlyWatch = null, smFlyHome = null;
 	function smFlyEl() { return document.getElementById('lpn_sm_fly'); }
+	// Shown at the manager's own stacking level (smFlyPlace()), never raised past it: it is part of
+	// that box, not a panel of its own.
+	function smFlyShow(fly) { fly.style.display = 'flex'; }
 	function smFlyIsOpen() { var f = smFlyEl(); return !!f && f.style.display !== 'none' && f.style.display !== ''; }
 	function smFlyRem() { return parseFloat(getComputedStyle(document.documentElement).fontSize) || 16; }
 	function smFlySet(on) {
@@ -78685,7 +78693,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (smFlyOn) { smFlyBuild(); smFlyWatchBox(); smFlyPlace(); }
 		else {
 			var f = smFlyEl();
-			if (f) { hideTipsIn(f); f.style.display = 'none'; }
+			if (f) { hidePanel(f); }
 			smFlyPanelHome();
 		}
 		refreshScenariosTab();
@@ -78749,7 +78757,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			hideTipsIn(panel);
 			f.appendChild(panel);
 		}
-		f.style.display = 'flex';
+		smFlyShow(f);
 		if (tab && panel) { renderPaneTable(tab); }
 		initTipsIn(f);
 	}
@@ -78802,8 +78810,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function smFlyPlace() {
 		var f = smFlyEl(), box = smBoxEl(), r, vw, vh, edge = POPUP_EDGE, rtl, endRoom, startRoom, want, tools, top, z, room, w;
 		if (!f || !box || !smFlyOn) { return; }
-		if (!smBoxIsOpen() || box.classList.contains('lpn-dock-collapsed')) { f.style.display = 'none'; return; }
-		f.style.display = 'flex';
+		if (!smBoxIsOpen() || box.classList.contains('lpn-dock-collapsed')) { hidePanel(f); return; }
+		smFlyShow(f);
 		// A docked column has its own width grip on this same seam, in front; the divider steps inside it.
 		f.setAttribute('data-docked', box.classList.contains('lpn-docked') ? '1' : '0');
 		r = box.getBoundingClientRect();
