@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 2639 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**3 still to read on master**, of 3 untranslated keys, of 2642 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,13 +199,23 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-None on master. Every English key here is present in at least one other language.
+## lpn_  (3, 3 to read @@ NEEDS RULING)
+
+- **`lpn_time_run_cut_off`**
+  > EPANET had closed {link} and then could not solve for {nodes}.
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off_empty`**
+  > Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off_full`**
+  > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**186 still to read**, of 189 new keys across 13 unmerged branch(es).
+**183 still to read**, of 186 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -216,9 +226,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/ledger-wording (`37092cd70`) — adds no English strings
-
-### feat/bentley-interop (`a429e24d4`) — 173 new, 173 to read @@ NEEDS RULING
+### feat/bentley-interop (`95663d00c`) — 173 new, 173 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -740,7 +748,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Drag to resize
   @@ NEEDS RULING
 
-### feat/description-lines (`895d34b7b`) — adds no English strings
+### feat/description-lines (`ed8215176`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -765,8 +773,6 @@ build for that would be a gate nobody keeps. Refresh it with
 ### feat/label-placer-c (`4dc27ea10`) — adds no English strings
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
-
-### feat/leader-keep (`81e4ffe80`) — adds no English strings
 
 ### feat/match-property (`05bda7651`) — 10 new, 10 to read @@ NEEDS RULING
 
@@ -801,14 +807,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
 
-### fix/zero-demand-solve (`c4b5fd714`) — 3 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_time_run_cut_off`**
-  > EPANET had closed {link} and then could not solve for {nodes}.
-  @@ NEEDS RULING
-- **`lpn_time_run_cut_off_empty`**
-  > Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.
-  @@ NEEDS RULING
-- **`lpn_time_run_cut_off_full`**
-  > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
-  @@ NEEDS RULING
+### fix/zero-demand-solve (`4879fe1fc`) — adds no English strings
