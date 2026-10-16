@@ -831,12 +831,12 @@ $ec_lang['lpn_field_meter_lumped']='Added to node';
 $ec_lang['lpn_field_meter_lumped_tip']='Nearest node; this customer\'s demands are added there.';
 $ec_lang['lpn_node_customers']='Customer demands';
 $ec_lang['lpn_node_customers_tip']='List of customers added here because this was their nearest node. Customer demands are in addition to other demands listed here. A customer is edited where it sits on the map or in the Customers table.';
-$ec_lang['lpn_node_customers_sum']='{total} {unit} from {n} Customers';
+$ec_lang['lpn_node_customers_sum']='{total} {unit} from Customers ({n})';
 $ec_lang['lpn_customer_detached']='⚠ This customer is not connected to a pipe, so its demand is not in the answers. Delete it, or draw a pipe and move the customer onto it.';
 $ec_lang['lpn_customer_fixed_head']='⚠ The near end of that pipe holds a fixed water surface, so this demand does not affect the simulation.';
-$ec_lang['lpn_customer_detached_count']='{n} customers are not connected to a pipe. Their demand is not accounted for.';
+$ec_lang['lpn_customer_detached_count']='Customers not connected to a pipe ({n}). Their demand is not accounted for.';
 $ec_lang['lpn_meter_pick_pipe']='Now select the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.';
-$ec_lang['lpn_inp_export_flat_customers']='An EPANET file has no customers. The demand of the {n} customers in this project is written as a demand row on the junction each customer is assigned to, named with the customer\'s tag. The file does not record the customer itself: its location, the pipe that serves it, where along that pipe the service connects, or how many services it represents. That information remains in the project; save the project file to keep it.';
+$ec_lang['lpn_inp_export_flat_customers']='An EPANET file has no customers. The demand of the customers in this project ({n}) is written as a demand row on the junction each customer is assigned to, named with the customer\'s tag. The file does not record the customer itself: its location, the pipe that serves it, where along that pipe the service connects, or how many services it represents. That information remains in the project; save the project file to keep it.';
 
 $ec_lang['lpn_area_hint_window_start']='Specify one corner of the window.';
 $ec_lang['lpn_area_hint_window_go']='Specify the opposite corner to finish.';
@@ -859,12 +859,12 @@ $ec_lang['lpn_multi_title']='{n} selected';
 $ec_lang['lpn_multi_varies']='Various';
 $ec_lang['lpn_multi_applied']='Set {prop} on {n}.';
 $ec_lang['lpn_multi_no_fields']='These have nothing that can be set together here.';
-$ec_lang['lpn_pane_pasted']='Pasted {n} cells. {skipped} were not changed.';
+$ec_lang['lpn_pane_pasted']='Pasted cells ({n}). Cells not changed ({skipped}).';
 // PASTE THAT ADDS ROWS (Task 610). A block pasted into a table past its last row adds new
 // junctions, pipes and so on. {n} is how many rows were pasted, {created} how many of them are new,
 // {skipped} how many cells were left as they were.
-$ec_lang['lpn_pane_pasted_rows']='Pasted {n} rows and added {created} of them to the network.';
-$ec_lang['lpn_pane_pasted_rows_skipped']='Pasted {n} rows and added {created} of them to the network. {skipped} cells were not changed.';
+$ec_lang['lpn_pane_pasted_rows']='Pasted rows ({n}). Rows added to the network ({created}).';
+$ec_lang['lpn_pane_pasted_rows_skipped']='Pasted rows ({n}). Rows added to the network ({created}). Cells not changed ({skipped}).';
 // Added after "This network has none of these yet." on an empty table, which is where a paste lands.
 $ec_lang['lpn_pane_paste_here']='Select this area and paste rows from a spreadsheet to add them.';
 // The menu action that adds the clipboard's rows as new elements below the last row (an ordinary
@@ -876,14 +876,14 @@ $ec_lang['lpn_pane_paste_append']='Paste as new rows at end of table';
 $ec_lang['lpn_pane_paste_armed']='Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.';
 // Asked when an ordinary paste runs past the last row of a table. {n} is how many rows were
 // pasted, {fit} how many land on rows that exist, {extra} how many are left over.
-$ec_lang['lpn_pane_paste_overflow']='This paste has {n} rows, and {fit} of them fit in the table. Add the other {extra} as new rows at the bottom?';
-$ec_lang['lpn_pane_paste_overflow_add']='Add {extra} rows';
-$ec_lang['lpn_pane_paste_overflow_fit']='Paste only the {fit} that fit';
+$ec_lang['lpn_pane_paste_overflow']='Rows in this paste ({n}). Rows that fit in the table ({fit}). Add the other rows ({extra}) as new rows at the bottom?';
+$ec_lang['lpn_pane_paste_overflow_add']='Add rows ({extra})';
+$ec_lang['lpn_pane_paste_overflow_fit']='Paste only the rows that fit ({fit})';
 // The same question when the left-over rows could not be added; {reasons} names the rows and why.
-$ec_lang['lpn_pane_paste_overflow_bad']='This paste has {n} rows, and {fit} of them fit in the table. The other {extra} cannot be added as new rows: {reasons}';
+$ec_lang['lpn_pane_paste_overflow_bad']='Rows in this paste ({n}). Rows that fit in the table ({fit}). The other rows ({extra}) cannot be added as new rows: {reasons}';
 // Tom's own wording (2026-09-26). Asked when an ordinary paste would change the ID of {n} rows
 // that already exist; the buttons are Paste and Cancel.
-$ec_lang['lpn_pane_paste_ids_differ']='{n} IDs don\'t match. Paste anyway?';
+$ec_lang['lpn_pane_paste_ids_differ']='IDs that do not match ({n}). Paste anyway?';
 // A paste that would add rows is refused whole when any row fails. {reasons} is one or more of the
 // Row sentences below, each naming the row of the pasted block, counted from 1.
 $ec_lang['lpn_pane_paste_refused']='Nothing was pasted. {reasons}';
@@ -913,12 +913,12 @@ $ec_lang['lpn_pane_paste_no_customer_ref']='Row {row}: a new Customer needs a co
 $ec_lang['lpn_pane_paste_no_pipe']='Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.';
 $ec_lang['lpn_pane_paste_no_customer_node']='Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.';
 $ec_lang['lpn_pane_paste_customer_node_no_pipe']='Row {row}: node {id} has no pipe for a Customer to attach to.';
-$ec_lang['lpn_pane_filled']='Filled down {n} cells. {skipped} were not changed.';
+$ec_lang['lpn_pane_filled']='Filled down cells ({n}). Cells not changed ({skipped}).';
 $ec_lang['lpn_pane_filldown']='Fill down';
 $ec_lang['lpn_pane_delete_element']='Delete element';
 $ec_lang['lpn_pane_delete_elements']='Delete elements';
 $ec_lang['lpn_pane_fill_none']='Nothing in this selection can be filled down.';
-$ec_lang['lpn_pane_ctrlenter_filled']='Filled {n} cells. {skipped} were not changed.';
+$ec_lang['lpn_pane_ctrlenter_filled']='Filled cells ({n}). Cells not changed ({skipped}).';
 $ec_lang['lpn_pane_hide_col']='Hide this column';
 $ec_lang['lpn_pane_hide_cols']='Hide these columns';
 $ec_lang['lpn_pane_show_all_cols']='Show all columns';
@@ -1884,7 +1884,7 @@ $ec_lang['lpn_replace_title']='Change what was found';
 $ec_lang['lpn_replace_prop']='Property to change';
 $ec_lang['lpn_replace_value']='New value';
 $ec_lang['lpn_replace_source']='New value source';
-$ec_lang['lpn_replace_asked']='Elevations requested for {n} nodes. Results appear when they are received.';
+$ec_lang['lpn_replace_asked']='Elevations requested for nodes ({n}). Results appear when they are received.';
 $ec_lang['lpn_replace_btn']='Replace';
 // The count IS the confirmation: a bulk write reaches assets spread over a map the user is not
 // looking at, so it is shown, and answered, before anything is written. {n} is a whole number.
@@ -3915,7 +3915,7 @@ $ec_lang['lpn_full_print']='Print report';
 $ec_lang['lpn_full_col_time']='Time';
 $ec_lang['lpn_full_col_type']='Type';
 $ec_lang['lpn_full_col_id']='ID';
-$ec_lang['lpn_full_row_count']='{n} rows.';
+$ec_lang['lpn_full_row_count']='Rows ({n}).';
 
 // ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
 // EPANET's Report > Calibration and its three tabbed pages, with EPANET's own column names (EPANET
@@ -3931,7 +3931,7 @@ $ec_lang['lpn_calib_load']='Load calibration file…';
 $ec_lang['lpn_calib_load_tip']='A text file with a location ID, a time, and a measured value on each line. The time is measured from the start of the simulation, in decimal hours or hours:minutes. A semicolon starts a comment. A line with only a time and a value belongs to the location above it.';
 $ec_lang['lpn_calib_none']='No calibration file is loaded for this parameter.';
 $ec_lang['lpn_calib_session']='A calibration file is held for this session only. It is not saved with the project or on this device.';
-$ec_lang['lpn_calib_file']='{file}: {n} measurements at {m} locations.';
+$ec_lang['lpn_calib_file']='{file}: measurements ({n}) at locations ({m}).';
 $ec_lang['lpn_calib_units']='The file\'s values are read in this project\'s units: {unit}.';
 $ec_lang['lpn_calib_missing']='Named in the file but not in this network: {ids}.';
 $ec_lang['lpn_calib_missing_count']='Measurements skipped because their location is not in this network: {n}.';
@@ -4065,7 +4065,7 @@ $ec_lang['lpn_library_curve_unused']='Nothing uses this curve.';
 // clearing a pattern reference is harmless; a pump with no curve is a lossless connection, so the
 // same gesture would quietly turn a pumped system into an open one. {count} and {ids} are
 // placeholders, not concatenation (Task 193).
-$ec_lang['lpn_library_curve_in_use']='This curve is used by {count} elements: {ids}. Assign another curve to them first, then delete this one.';
+$ec_lang['lpn_library_curve_in_use']='This curve is used by elements ({count}): {ids}. Assign another curve to them first, then delete this one.';
 // The two column headings for a curve this page does not compute with -- a tank volume curve, or one
 // a file stated that nothing here reads. Naming a quantity would be inventing one.
 $ec_lang['lpn_library_curve_x']='X';
@@ -4087,7 +4087,7 @@ $ec_lang['lpn_library_pipetype_unused']='Nothing uses this pipe type.';
 // A TYPE IN USE IS NOT DELETED, for the reason the curve above is not: deleting it would change the
 // diameter and the roughness of every pipe that stated it, in silence. {count} and {ids} are
 // placeholders, not concatenation (Task 193).
-$ec_lang['lpn_library_pipetype_in_use']='This pipe type is used by {count} pipes: {ids}. Detach it from them before deleting it.';
+$ec_lang['lpn_library_pipetype_in_use']='This pipe type is used by pipes ({count}): {ids}. Detach it from them before deleting it.';
 // The pipe popup\'s own selector and the two controls beside it.
 $ec_lang['lpn_field_pipetype']='Pipe type';
 $ec_lang['lpn_field_pipetype_tip']='The pipe type in the project library that this pipe uses. Properties included in the pipe type are disabled for editing here. Detach the pipe type to enable editing here.';
@@ -4114,7 +4114,7 @@ $ec_lang['lpn_library_fittings_used_by']='Pipes using this fittings list';
 $ec_lang['lpn_library_fittings_unused']='Nothing uses this fittings list.';
 // A LIST IN USE IS NOT DELETED, for the reason a pipe type in use is not: it would change the minor
 // loss of every pipe that referred to it, in silence. {count} and {ids} are placeholders (Task 193).
-$ec_lang['lpn_library_fittings_in_use']='This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it.';
+$ec_lang['lpn_library_fittings_in_use']='This fittings list is used by pipes ({count}): {ids}. Detach it from them before deleting it.';
 // Importing libraries out of another project file (ROADMAP Task 611). ONE WIZARD, ONE DOOR: the
 // Import libraries row under File, and nothing in the Libraries box (Tom, 2026-09-18: 'Remove
 // buttons except at the File menu.'). The label and its tip name no particular library, because
@@ -4199,9 +4199,9 @@ $ec_lang['lpn_fitting_other']='Other fitting';
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
 $ec_lang['lpn_inp_export_flat_heading']='Saved {file}';
 $ec_lang['lpn_inp_export_flat_lead']='The exported EPANET file is numerically equivalent to this project. But it has no place for the following things:';
-$ec_lang['lpn_inp_export_flat_types']='{n} pipes here refer to {t} pipe types. In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so the link between one definition and every pipe that uses it is recorded only in the project file.';
+$ec_lang['lpn_inp_export_flat_types']='Pipes ({n}) here refer to pipe types ({t}). In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so the link between one definition and every pipe that uses it is recorded only in the project file.';
 $ec_lang['lpn_inp_export_flat_coords']='An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its positions in the project file only.';
-$ec_lang['lpn_inp_export_flat_fittings']='An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of {n} pipes here is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.';
+$ec_lang['lpn_inp_export_flat_fittings']='An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of pipes here ({n}) is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.';
 $ec_lang['lpn_library_controls']='Controls';
 $ec_lang['lpn_library_controls_tip']='A control is one statement that opens or closes a link, or changes its setting, based on a tank water level, a node pressure, or the time.';
 // A verb and its object, not a bare "Add": a bare imperative is the hardest kind of string to
@@ -4435,7 +4435,7 @@ $ec_lang['lpn_ff_clear']='Clear rings';
 // down -- so these three do not add up to the number of junctions, and that is correct rather than
 // a rounding slip. Said as three separate facts for that reason.
 $ec_lang['lpn_ff_summary']='{clean} junctions passed all checks. {fire} junctions failed the fire flow. {design} junctions affected the rest of the system.';
-$ec_lang['lpn_ff_summary_error']='{n} junctions could not be solved.';
+$ec_lang['lpn_ff_summary_error']='Junctions that could not be solved ({n}).';
 // ONE WIDE TABLE, NOT TWO REPORTS (Tom, 2026-08-30, with a competitor's own table in front of him:
 // "Normally they are kind of wide and they include the information from both tables in one table.")
 // One run has always produced one result set holding both answers per junction, so two headings
@@ -4535,7 +4535,7 @@ $ec_lang['lpn_crit_col_asset']='Asset';
 $ec_lang['lpn_crit_col_unserved']='Demand not served';
 $ec_lang['lpn_crit_col_cutoff']='Junctions cut off';
 $ec_lang['lpn_crit_col_below']='Junctions below minimum';
-$ec_lang['lpn_crit_summary']='{n} of {total} assets leave demand unserved or drop a junction below {pressure}.';
+$ec_lang['lpn_crit_summary']='Assets that leave demand unserved or drop a junction below {pressure} ({n} of {total}).';
 $ec_lang['lpn_crit_baseline_below']='Junctions already below it with nothing broken: {n}. They are not counted.';
 $ec_lang['lpn_crit_working']='Working: {done} of {total} assets.';
 $ec_lang['lpn_crit_stopped']='Stopped after {done} of {total} assets. The results below are the ones already finished.';

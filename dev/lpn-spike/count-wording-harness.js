@@ -29,7 +29,30 @@ const COUNTS = {
 	lpn_dxf_note_shortened: ['n'],
 	lpn_dxf_note_categories: ['n'],
 	lpn_library_pattern_span: ['n'],
-	lpn_terrain_confirm_default_2: ['n']
+	lpn_terrain_confirm_default_2: ['n'],
+	lpn_node_customers_sum: ['n'],
+	lpn_customer_detached_count: ['n'],
+	lpn_inp_export_flat_customers: ['n'],
+	lpn_inp_export_flat_fittings: ['n'],
+	lpn_inp_export_flat_types: ['n', 't'],
+	lpn_pane_pasted: ['n', 'skipped'],
+	lpn_pane_pasted_rows: ['n', 'created'],
+	lpn_pane_pasted_rows_skipped: ['n', 'created', 'skipped'],
+	lpn_pane_paste_overflow: ['n', 'fit', 'extra'],
+	lpn_pane_paste_overflow_add: ['extra'],
+	lpn_pane_paste_overflow_fit: ['fit'],
+	lpn_pane_paste_overflow_bad: ['n', 'fit', 'extra'],
+	lpn_pane_paste_ids_differ: ['n'],
+	lpn_pane_filled: ['n', 'skipped'],
+	lpn_pane_ctrlenter_filled: ['n', 'skipped'],
+	lpn_replace_asked: ['n'],
+	lpn_full_row_count: ['n'],
+	lpn_calib_file: ['n', 'm'],
+	lpn_library_curve_in_use: ['count'],
+	lpn_library_pipetype_in_use: ['count'],
+	lpn_library_fittings_in_use: ['count'],
+	lpn_ff_summary_error: ['n'],
+	lpn_crit_summary: ['n']
 };
 
 let fails = 0;
