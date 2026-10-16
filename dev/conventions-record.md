@@ -156,13 +156,11 @@ instead: `mi`, `mtc`, `wi`. The coverage declaration lists them by exact key for
     (the list is derived), so it is already checked for running, for not emitting NaN, and for
     opening on a passing design. What that cannot check is whether the math is right — copy
     `mpf-harness.js` and anchor against the source method. Recipe: `dev/calc-spike/README.md`.
-11. **Add the prefix to `prefixToTermNames()` in `dev/scripts/generate_translation_payloads.php`,**
-    listing the `glossary.json` terms it uses. A missing prefix silently falls back to three default
-    terms, so every glossary entry written for the calculator — definitions, `translations`,
-    and the `avoid` arrays that are the whole point of a trap term — becomes invisible to its
-    translation agents. Nothing warns you: payloads generate, `--check` says FRESH, the sprint runs,
-    and the guards were never delivered. **Verify by reading `glossary_terms_by_prefix.<prefix>` out
-    of a generated payload — exactly three entries means the map is missing.**
+11. **Add the prefix to `prefixToTermNames()` in `dev/scripts/prefix_terms.inc.php`,**
+    listing the `glossary.json` terms it uses. Since 2026-10-16 the payload sends a term when a
+    batch key cites it or its English appears in a batch string, so the map decides only where a
+    sense-qualified term ("run (a simulation)") is matched by its bare word. A missing prefix
+    loses those terms silently; `prefix_map_check.php` refuses it.
 
 ### Meta description
 

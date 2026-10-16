@@ -77,11 +77,11 @@ console.log('1. lpnDescText keeps lines and paragraphs');
 	const I = EngCalcs.lpnDescInline, F = (s) => EngCalcs.lpnDescText(EngCalcs.lpnDescFromInline(s));
 	ok('inline: a line break is "\\P", a blank line two markers', I('A\nB\n\nC') === 'A\\PB\\P\\PC', J(I('A\nB\n\nC')));
 	ok('inline: an indent after a line break is the next line\'s own', I('A\n  two') === 'A\\P  two', J(I('A\n  two')));
-	ok('inline: a line ending in a backslash keeps a space before the marker', I('end\\\nx') === 'end\\ \\Px' && I('end\\\n x') === 'end\\ \\P  x', J([I('end\\\nx'), I('end\\\n x')]));
+	ok('inline: a line ending in a backslash keeps a space before the marker', I('end\\\nx') === 'end\\ \\Px' && I('end\\\n x') === 'end\\ \\P x', J([I('end\\\nx'), I('end\\\n x')]));
 	ok('inline: one line is unchanged, a backslash without P too', I('C:\\temp; a') === 'C:\\temp; a');
 	ok('inline: a typed backslash-P gains one backslash', I('C:\\Pumps') === 'C:\\\\Pumps' && I('x\\\\Py') === 'x\\\\\\Py', J(I('C:\\Pumps')));
-	ok('read back: " \\P ", bare "\\P", and a run of markers', F('A \\P B') === 'A\nB' && F('A\\PB') === 'A\nB' && F('A \\P  \\P B') === 'A\n\nB');
-	ok('read back: the earlier " \\P " takes one space each side, so an indent survives', F('A \\P   two') === 'A\n  two', J(F('A \\P   two')));
+	ok('read back: bare "\\P" and a run of markers', F('A\\PB') === 'A\nB' && F('A\\P\\PB') === 'A\n\nB');
+	ok('read back: spaces round the marker are the text\'s own (a line\'s trailing ones are trimmed)', F('A \\P B') === 'A\n B' && F('A \\P  \\P B') === 'A\n\n B', J(F('A \\P B')));
 	ok('read back: with no space before the marker, every space after is the line\'s', F('A\\P  two') === 'A\n  two' && F('A\\P\\PB') === 'A\n\nB', J(F('A\\P  two')));
 	ok('read back: "\\\\P" is a typed backslash-P', F('C:\\\\Pumps') === 'C:\\Pumps' && F('x\\\\\\Py') === 'x\\\\Py');
 	ok('read back: text with no \\P is returned as it came', EngCalcs.lpnDescFromInline('  C:\\temp  ') === '  C:\\temp  ');
@@ -178,26 +178,26 @@ const done2b = (async () => {
 console.log('\n2c. A file that says \\P reads it as a line break; an unedited one writes back character for character');
 const SRC2 = [
 	'[JUNCTIONS]',
-	' J1\t100\t0\t;Corner of Elm \\P and Main',
+	' J1\t100\t0\t;Corner of Elm\\Pand Main',
 	' J2\t90\t12\t;Bare\\Pmarker',
 	' J3\t85\t8\t;Share is \\\\Public\\docs',
 	' J4\t80\t0\t;C:\\temp, no marker',
 	'[RESERVOIRS]', ' R1\t200',
 	'[PIPES]',
-	' P1\tR1\tJ1\t1200\t12\t100\t0\tOpen\t;1962 main \\P  \\P replaced 2019',
+	' P1\tR1\tJ1\t1200\t12\t100\t0\tOpen\t;1962 main\\P\\Preplaced 2019',
 	' P2\tJ1\tJ2\t800\t8\t100\t0\tOpen',
 	' P3\tJ2\tJ3\t600\t6\t100\t0\tOpen',
 	' P4\tJ3\tJ4\t500\t8\t100\t0\tOpen',
-	'[PATTERNS]', ';Morning peak \\P weekdays', ' PA\t1\t2\t3',
-	'[CURVES]', ';PUMP: Pump 10 \\P rated 2019', ' C1\t0\t100', ' C1\t500\t60',
-	'[CONTROLS]', ';Fill the tank \\P and no more', 'LINK P1 OPEN IF NODE J1 BELOW 5',
-	'LINK P2 CLOSED IF NODE J2 ABOVE 90 ;close it \\P at night',
+	'[PATTERNS]', ';Morning peak\\Pweekdays', ' PA\t1\t2\t3',
+	'[CURVES]', ';PUMP: Pump 10\\Prated 2019', ' C1\t0\t100', ' C1\t500\t60',
+	'[CONTROLS]', ';Fill the tank\\Pand no more', 'LINK P1 OPEN IF NODE J1 BELOW 5',
+	'LINK P2 CLOSED IF NODE J2 ABOVE 90 ;close it\\Pat night',
 	'[OPTIONS]', ' UNITS\tGPM', ' HEADLOSS\tH-W',
 	'[END]', ''
 ].join('\n');
 {
 	const r = importText(SRC2, 'p.inp'), d = r.doc;
-	ok('" \\P " is a line break', byId(d.nodes, 'J1').desc === 'Corner of Elm\nand Main', J(byId(d.nodes, 'J1').desc));
+	ok('"\\P" is a line break', byId(d.nodes, 'J1').desc === 'Corner of Elm\nand Main', J(byId(d.nodes, 'J1').desc));
 	ok('a bare "\\P" is a line break', byId(d.nodes, 'J2').desc === 'Bare\nmarker', J(byId(d.nodes, 'J2').desc));
 	ok('"\\\\P" is a typed backslash-P', byId(d.nodes, 'J3').desc === 'Share is \\Public\\docs', J(byId(d.nodes, 'J3').desc));
 	ok('a backslash with no P is text', byId(d.nodes, 'J4').desc === 'C:\\temp, no marker');
@@ -206,18 +206,18 @@ const SRC2 = [
 		&& byId(d.curves, 'C1').note === 'Pump 10\nrated 2019' && d.controls[0].note === 'Fill the tank\nand no more'
 		&& d.controls[1].note === 'close it\nat night', J([byId(d.curves, 'C1').note, d.controls.map((c) => c.note)]));
 	const o = EngCalcs.lpnExportInp(d).inp, has = (l) => o.split(/\r?\n/).some((x) => x.replace(/\s+$/, '').endsWith(l));
-	ok('J1, J3, J4 and P1 written back character for character', has('\t;Corner of Elm \\P and Main') && has('\t;Share is \\\\Public\\docs')
-		&& has('\t;C:\\temp, no marker') && has('\t;1962 main \\P  \\P replaced 2019'), J(lines(o, 'JUNCTIONS')));
+	ok('J1, J3, J4 and P1 written back character for character', has('\t;Corner of Elm\\Pand Main') && has('\t;Share is \\\\Public\\docs')
+		&& has('\t;C:\\temp, no marker') && has('\t;1962 main\\P\\Preplaced 2019'), J(lines(o, 'JUNCTIONS')));
 	ok('the bare "\\P" goes back out as it came', has('\t;Bare\\Pmarker'));
-	ok('pattern, curve and both controls written back as they came', has(';Morning peak \\P weekdays') && has(';PUMP: Pump 10 \\P rated 2019')
-		&& has(';Fill the tank \\P and no more') && has('ABOVE 90 ;close it \\P at night'), J(lines(o, 'CONTROLS')));
+	ok('pattern, curve and both controls written back as they came', has(';Morning peak\\Pweekdays') && has(';PUMP: Pump 10\\Prated 2019')
+		&& has(';Fill the tank\\Pand no more') && has('ABOVE 90 ;close it\\Pat night'), J(lines(o, 'CONTROLS')));
 	{ const o2 = EngCalcs.lpnExportInp(importText(o, 'p.inp').doc).inp, a1 = o.split('\n'), a2 = o2.split('\n'), at = a1.findIndex((l, k) => l !== a2[k]);
 		ok('a second round trip is stable', o2 === o, at + ': ' + J(a1[at]) + ' vs ' + J(a2[at])); }
 	byId(d.nodes, 'J1').desc = 'Corner of Elm\nand Main Street';
 	d.controls[1].note = 'close it\nat night\nalways';
 	{ const o3 = EngCalcs.lpnExportInp(d).inp, h3 = (l) => o3.split(/\r?\n/).some((x) => x.replace(/\s+$/, '').endsWith(l));
 		ok('once edited, it goes out in the new spelling', h3('\t;Corner of Elm\\Pand Main Street') && h3('ABOVE 90 ;close it\\Pat night\\Palways')
-			&& h3('\t;1962 main \\P  \\P replaced 2019'), J(lines(o3, 'JUNCTIONS'))); }
+			&& h3('\t;1962 main\\P\\Preplaced 2019'), J(lines(o3, 'JUNCTIONS'))); }
 }
 
 // ---- 3. an edit made on the page -----------------------------------------------------------------

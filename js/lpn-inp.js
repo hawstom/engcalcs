@@ -2332,8 +2332,8 @@
 	 * whole text, `\P` and all, on its own re-save. A blank paragraph line is two markers in a row
 	 * (`a\P\Pb`).
 	 *
-	 * Reading one back, `\P` with or without spaces round it is a line break (lpnDescFromInline()
-	 * says which spaces are the marker's, so an indent after it survives). A backslash-P the person
+	 * Reading one back, `\P` is a line break and the spaces round it are the text's own (an indent
+	 * after it survives; lpnDescText() trims a line's trailing spaces). A backslash-P the person
 	 * TYPED is written with one more backslash (`\\P`) and read back as typed, so the text is never
 	 * changed by a round trip; a file from elsewhere whose comment says `C:\Pumps` is read as a line
 	 * break, which is the price of the convention, and is written back as the file spelled it
@@ -2357,38 +2357,34 @@
 	};
 	/**
 	 * The description on one line to be read back and edited: each line break as "\P", no spaces
-	 * (Tom, 2026-10-16: *"Change it from " \P " to "\P"."*). Two cases need a space before the
-	 * marker, which the reader drops: a line ending in a backslash (so the run stays the line's own),
-	 * and then one after it too when the next line starts with a space (so its indent survives).
+	 * (Tom, 2026-10-16: *"Change it from " \P " to "\P"."*). One case needs a space before the
+	 * marker: a line ending in a backslash (so the run stays the line's own; the reader keeps the
+	 * space and lpnDescText() trims it as the line's trailing space).
 	 */
 	EngCalcs.lpnDescInline = function (v) {
 		var L = EngCalcs.lpnDescText(v).split('\n').map(function (l) {
 			return l.replace(/(\\+)P/g, '\\$1P');
 		}), out = L[0], k;
 		for (k = 1; k < L.length; k++) {
-			if (/\\$/.test(L[k - 1])) { out += ' \\P' + (L[k].charAt(0) === ' ' ? ' ' : ''); }
+			if (/\\$/.test(L[k - 1])) { out += ' \\P'; }
 			else { out += '\\P'; }
 			out += L[k];
 		}
 		return out;
 	};
 	/**
-	 * lpnDescInline() read back: "\P" is a line break, "\\P" a typed "\P". A space before the marker
-	 * belongs to it (a line never ends in one), and then so does one space after it: that is the
-	 * " \P " an earlier build wrote, and the backslash case above. With no space before, every
-	 * space after is the next line's own.
+	 * lpnDescInline() read back: "\P" is a line break, "\\P" a typed "\P". Spaces round the
+	 * marker are the text's own.
 	 */
 	EngCalcs.lpnDescFromInline = function (s) {
 		var t = (s === undefined || s === null) ? '' : String(s);
 		if (t.indexOf('\\P') < 0) { return t; }
-		return t.replace(/( ?)(\\+)P( ?)/g, function (m, a, bs, b) {
-			return bs.length === 1 ? (a ? '\n' : '\n' + b) : a + bs.slice(1) + 'P' + b;
-		});
+		return t.replace(/(\\+)P/g, function (m, bs) { return bs.length === 1 ? '\n' : bs.slice(1) + 'P'; });
 	};
 	/**
 	 * **A DESCRIPTION READ FROM A FILE GOES BACK OUT AS THE FILE SPELLED IT** while it still says the
 	 * same text: CLAUDE.md's "only the user touches a file's numbers", applied to its words. A file
-	 * from the earlier " \P " build, or one that writes a bare `C:\Pumps`, is not re-spelled by an
+	 * that writes a bare `C:\Pumps`, is not re-spelled by an
 	 * export nobody asked for. Kept in `rec.tok[key]` only when it differs from what the writer would
 	 * say, and checked again at write time, so an edit retires it by itself (lpnNumText()'s rule).
 	 */

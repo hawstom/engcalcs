@@ -85,18 +85,14 @@ adding ceremony there buys little and costs every future session.
 
 Written after the incidents, all of it live today:
 
-- **`dev/hooks/pre-merge-commit`** refuses a merge of any branch listed in `dev/branch-policy.json`
-  unless `dev/branch-all-clears.json` records Tom's words **pinned to the commit he cleared**. The
-  approval lapses by itself the moment the branch moves. A `FREEZE` block in the same file stops
-  every merge but a `hotfix:`.
+- The pre-merge hook, all-clear file, freezes and deploy-blocker list were retired on Tom's word,
+  2026-10-15/16: his typed word, which Claude Code's permission check requires, is the all-clear.
 - **`dev/hooks/pre-push`** refuses a push of master unless `check_all.sh` has passed **on that exact
   commit**, stamped in `.git/check-all-passed`. It is why a merge result gets re-verified rather
   than the branch it came from.
 - **`hook_install_check.php`** — the hooks are a COPY in `.git/`, not `core.hooksPath`, because
   hooksPath resolves into the working tree and a checkout without `dev/hooks/` silently deletes
   every guard. It failed open and silently once; this check is the price of the fix.
-- **`branch_policy_selftest.php`** — nine cases against a throwaway repository, because a hook that
-  only speaks when it refuses is indistinguishable from a broken one.
 - **`branch_hygiene_check.php`** (advisory) — every branch with its age, distance from master and
   whether it is merged.
 - **`deploy_identity_selftest.php`** — the About box's build line names the deploy, not a file, so
@@ -123,11 +119,8 @@ job on a server told a human something this repository could not.
 Tom asked: *"Do branches need naming conventions indicating their psychological or preparedness
 distance from master?"*
 
-**No, and the reason is that the same information is already in a file a hook reads.**
-`dev/branch-policy.json` LISTS the branches that need a clearance. A name says *"I intend to be
-careful with this one"*; a list says *"you cannot merge this one"*. Only the second is enforceable,
-and this project's own evidence is that a rule a machine enforces is worth roughly ten a human must
-remember.
+**No.** A name is a reminder; what stops a merge is his typed word, which Claude Code's
+permission check requires.
 
 Two further arguments against:
 
@@ -138,9 +131,7 @@ Two further arguments against:
   (`rel="noopener"`, cookie attributes) and both times the fix was a check, not a convention.
 
 **What to do instead:** keep the existing singular-capability naming (`customer`, `projection`,
-`graph`, `custom-property`), and when a branch becomes something that must not land without Tom's
-word, ADD IT TO `dev/branch-policy.json`. That is one line, it is enforced, and it can be removed
-when the branch is cleared.
+`graph`, `custom-property`).
 
 ---
 
@@ -167,10 +158,6 @@ Yes, and it is (section 2). Three real gaps remain:
 2. **Nothing gates the SIBLING repositories.** `librewaternet.org` and `not-epanet.org` are pushed
    as part of finishing work, with no suite and no hooks. The landing page is the most
    reputation-exposed surface of all three and the least guarded.
-3. **The all-clear is recorded by the AI, not by Tom.** `dev/branch-all-clears.json` holds his
-   words, but an AI writes the file. That is not a hole a script can close; it is why the pinning
-   to a commit matters — the approval lapses when the branch moves, so a forged or stale one
-   expires by itself.
 
 ---
 

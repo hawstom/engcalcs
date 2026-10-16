@@ -118,6 +118,14 @@ include __DIR__ . '/../../lib/lang.ec.en.php';
 $keyConcepts = ecLoadKeyConcepts();
 $problems = ecConceptFindings($glossary['terms'], $keyConcepts, $ec_lang);
 
+// dev/terms.md is the source; a glossary that has drifted from it sends translators stale names.
+require_once __DIR__ . '/terms_to_glossary.php';
+[, $termChanges] = ecApplyTerms($glossary, ecParseTerms((string)file_get_contents(EC_TERMS_PATH)));
+if ($termChanges) {
+    $problems[] = 'glossary.json differs from dev/terms.md (' . implode('; ', array_slice($termChanges, 0, 5))
+        . '). Run: php dev/scripts/terms_to_glossary.php --write';
+}
+
 if ($problems) {
     foreach ($problems as $p) { echo "ERROR   $p\n\n"; }
     echo count($problems) . " problem(s) in the concept table (dev/term-concepts.md).\n";
@@ -126,6 +134,6 @@ if ($problems) {
 
 $index = ecConceptIndex($glossary['terms']);
 $defined = count(array_filter($index, static function ($t) { return trim((string)$t['definition']) !== ''; }));
-printf("PASS: %d concepts, all ids unique and unambiguous (%d with a definition, %d with English as the source); %d keys cite concepts, all resolve.\n",
-    count($index), $defined, count($index) - $defined, count($keyConcepts));
+printf("PASS: %d concepts, all ids unique and unambiguous (%d with Tom's definition, all named in dev/terms.md); %d keys cite concepts, all resolve.\n",
+    count($index), $defined, count($keyConcepts));
 exit(0);

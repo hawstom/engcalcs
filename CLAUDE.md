@@ -32,12 +32,10 @@ to leave something uncommitted.
   deployed. A hotfix: branch off `release/ewb`, fix, `check_all`, merge, push; he pulls that; the
   same fix is merged to master separately. A clean release can always be cut from a pre-merge SHA
   and fixes cherry-picked on — never tell him otherwise.
-- **Merge FROM master often. Merge a capability branch INTO master only on Tom's all-clear.**
-  Green is not done. `dev/hooks/pre-merge-commit` enforces it for branches listed in
-  `dev/branch-policy.json`; `dev/branch-all-clears.json` pins his words to the commit he cleared,
-  so the approval lapses when the branch moves. `feature_freeze.active` refuses a protected merge
-  even with an all-clear (only Tom lifts it); `freeze.active` is the separate emergency stop that
-  refuses everything but a `hotfix:`. A defect or tooling track merges on green alone.
+- **Merge FROM master often. Merge a capability branch INTO master only on Tom's typed word in
+  the conversation.** Green is not done. Claude Code's permission check enforces it; no file or
+  hook does. There are no freezes; to hold a release still, cut a release branch. A defect or
+  tooling track merges on green alone.
 - **A batch of merges costs one `check_all` run, about 19 minutes (three browser lanes, 2026-10-15); tell Tom the wait before
   starting it.** Merge the whole batch, then fold in the payload regeneration, roadmap closures and
   handoff edits, all before the run: every later master commit is another full run. On the merge
@@ -110,6 +108,7 @@ provenance rules: `dev/agents/README.md`.
 |------|---------|
 | `dev/session-handoff.md` | **Read first.** RULINGS, TRAPS and dated STATE; delete a state line once checked |
 | `dev/ROADMAP.md` | OPEN tasks only. Format `Priority\|ID\|status Description` |
+| `dev/terms.md` | **The concept source translators work from**: plain-words names, Tom's definitions, uniqueness attention groups. Tom edits it |
 | `dev/roadmap-closed-ids.md` | One line per closed ID, so a cited `Task N` resolves |
 | `dev/tom-review-queue.md` | Tom's browser-pass comments, quoted, until cleared |
 | `dev/real-world-reviews.md` | What outside testers did and said, one entry per session |
@@ -261,8 +260,11 @@ mismatch; (D) single-quoted values only.
 - **`$ec_lang_syn` is OFF-LIMITS to AI** without explicit written permission in that conversation.
   Propose a diff; Tom approves; then write. No standing carve-outs. Entries are synonyms that pass
   the substitution test.
+- **Suggestions only, no prohibitions.** A translator gets what a word means and what to call it,
+  never a "do not" line; a wrong translation means the definition needs fixing.
 - **Routing:** an English reader also stumbles → fix the English; English is fine but untranslatable
-  → `$ec_lang_syn`; the concept recurs → `glossary.json`.
+  → `$ec_lang_syn`; the concept recurs → `dev/terms.md`, Tom's plain-words concept list, which
+  `terms_to_glossary.php --write` carries into `glossary.json`. Never edit those glossary fields by hand.
 - **Never rename a key by hand** — `php dev/scripts/rename_lang_key.php old new --apply`.
 - **English style: standard professional civil-engineering technical English**, the register of
   FHWA HEC circulars, USACE HEC manuals, the EPA EPANET 2.2 manual, and AWWA M-series manuals. No

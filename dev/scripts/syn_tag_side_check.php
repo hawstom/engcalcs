@@ -136,9 +136,9 @@ if ($problems) {
     }
     echo "\$ec_lang_syn is <synonyms> | <commentary>, split on the FIRST pipe. Left is what a\n";
     echo "translation agent is handed and every phrase there must pass the substitution test --\n";
-    echo "it could stand on the control as the label. Right is production notes in English that\n";
-    echo "the payload generator strips.\n";
-    echo "\nNothing downstream can tell these apart: the generator strips by position, so a tag on\n";
+    echo "it could stand on the control as the label. Right is instructions, which the payload\n";
+    echo "generator sends separately as key_notes, each tag spelled out in full.\n";
+    echo "\nNothing downstream can tell these apart: the generator splits by position, so a tag on\n";
     echo "the wrong side is shipped to 26 agents as a synonym and nothing warns anybody.\n";
     echo "\ndev/language-strings.md §format has the vocabulary and the rule. \$ec_lang_syn is\n";
     echo "OFF-LIMITS to AI without written permission, so propose the diff; do not just move it.\n";

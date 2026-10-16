@@ -141,11 +141,14 @@ section verbatim. Sequence recap:
    "go ahead" from an unrelated "proceed."
 3. **Launch**: one agent per language, single message, `run_in_background: true`, model `sonnet`
    (mandatory, no exceptions — Haiku is fully deprecated for translation, see CLAUDE.md § "Translation
-   Sprints" Model policy, 2026-07-12). Each agent gets: payload path,
-   target lang file path, full instructions (glossary terms + values + notes, relevant
-   `$ec_lang_syn` entries, HTML/symbol-preservation rules, any known wrong-sense traps carried
-   over from prior audits of related terms in that language family), **and the suggestion-box
-   block, which every payload now carries as `suggestion_box` — tell the agent to read it.** It is
+   Sprints" Model policy, 2026-07-12). Each agent gets: payload path, target lang file path,
+   HTML/symbol-preservation rules, any known wrong-sense traps carried over from prior audits of
+   related terms in that language family, and the instruction to read the payload's `meta.*_notes`
+   and follow them. **The per-key guidance is in the payload, attached to its key; do not restate it
+   in the brief:** `key_syn` (synonyms), `key_notes` (the `$ec_lang_syn` commentary as full
+   instructions), `key_concepts`, `key_context` (reason, current value, neighbours, and the label's
+   tip or the tip's label), and `glossary` (only the terms this batch's strings use). **The
+   suggestion-box block is in every payload as `suggestion_box` — tell the agent to read it.** It is
    an ingredient of the prompt, not a reminder to the orchestrator: an agent that was never given
    the block files nothing, and the sprint closes looking clean.
 4. **Post-sprint QA, in order:**
@@ -348,20 +351,26 @@ or escalates as `refer-to-human` and stays open. See `dev/english-friction/READM
 ## Concepts are the source — the sibling block, extracted the same way
 
 Tom, 2026-09-29: *"We need to have a source that is more primary and more authoritative than the
-English, and the English can be a translation of it."* Each `glossary.json` term carries a `concept`
-id and a `definition`; a key cites a concept through `dev/scripts/key_concepts.json` or a `gloss:`
-pointer, and its payload then carries `key_concepts`. The fenced block below reaches every agent as
-`concept_source`, exactly as the suggestion box does, and editing it makes every payload stale.
-Design: `dev/term-concepts.md`.
+English, and the English can be a translation of it."* The source is `dev/terms.md`, which Tom
+edits: each concept named in plain words, his definition where he wrote one, and the uniqueness
+attention groups. `php dev/scripts/terms_to_glossary.php --write` carries it into `glossary.json`
+(`plain`, `definition`, `uniqueness_group`); `concept_check.php` fails until the two agree. A key
+cites a concept through `dev/scripts/key_concepts.json` or a `gloss:` pointer, and its payload then
+carries `key_concepts`. The fenced block below reaches every agent as `concept_source`, exactly as
+the suggestion box does, and editing it makes every payload stale. Design: `dev/term-concepts.md`.
 
 ```
 ## Concepts are the source
 
-Where key_concepts lists a concept for a key, its definition is the authoritative source
-and the English string is one rendering of it: translate the thing the definition
-describes, and give that concept the same word in every key that cites it, a word no
-neighbouring concept in the definition shares. Where a key has no key_concepts entry,
-the English is the source, as before.
+Each concept is named in plain words, with its synonyms joined by "or". That plain name
+is the authoritative source; the English term is one rendering of it, as yours will be.
+Where key_concepts lists a concept for a key, translate the thing the plain name
+describes, and give that concept the same word in every key that cites it. Where a
+concept also has a definition, it is the author's own and outranks everything else.
+Where a key has no key_concepts entry, the English is the source, as before.
+
+uniqueness_attention lists the few groups of concepts that sit side by side on one
+screen. Find unique names for each.
 ```
 
 ## English-drift tripwire (staleness detection)
@@ -376,30 +385,37 @@ standing tripwire.
   `lang.ec.en.php` `$ec_lang` value *as of the last full sync*. A current-vs-manifest mismatch flags
   that key `CHANGED` = translations may be stale.
 - **When to run it:** any time you edit English `$ec_lang` values (English-reform passes, label
-  consolidation, wording fixes) — and as a cheap standing check before proposing any sprint. It is the
-  auto-generated replacement for the hand-built resync key list.
+  consolidation, wording fixes) — and as a cheap standing check before proposing any sprint.
+- **The payload carries the resync.** `generate_translation_payloads.php` reads the same manifest
+  and puts every `CHANGED` key the language file already holds into `keys_to_translate`, with
+  `key_context[key].reason = english_changed` and the stale `current_value`, so a reworded string
+  gets the same `key_syn`, `key_notes`, `key_concepts`, tip and neighbours as a new one. **There is
+  no separate resync list and the brief does not need one** (an old `resync_*.json` in
+  `dev/translation_payloads/` is a leftover, not an input). Scope is not consulted for these: a
+  translated key stays maintained whatever tier its cell is in.
 - **Workflow:**
-  1. `php dev/scripts/detect_english_drift.php` — human report of drifted keys.
-  2. `php dev/scripts/detect_english_drift.php --json` — bare `CHANGED` key list → feeds a
-     **Scenario D-style** resync (semantic per-language read vs current English; only drifted
-     languages get rewritten, as in Task 129).
-  3. After the resync brings every language into sync: `php dev/scripts/detect_english_drift.php
-     --update` to re-baseline the manifest. **Only `--update` once the resync is actually done**, or
-     you silently baseline away real drift.
+  1. `php dev/scripts/detect_english_drift.php` — human report of drifted keys, with role changes.
+     `--json` prints the bare `CHANGED` list, for inspection.
+  2. Regenerate the payloads; the `CHANGED` keys are already in them.
+  3. After the sprint brings every language into sync: re-baseline per key with
+     `--update=<keys> --reason="..."` (or `--update` once nothing is left). **Only once the resync is
+     actually done**, or you silently baseline away real drift, and the next payload drops the keys.
 - **`--check`** exits non-zero if any key is `CHANGED` (gate/CI use). `NEW`/`REMOVED` keys are
   informational only (NEW is already handled by the payload-delta).
 
 ## Scripts reference
 
 - `dev/scripts/detect_english_drift.php` — English-source staleness tripwire (see section above);
-  `--check` gates on any CHANGED key, `--json` emits the resync key list, `--update` re-baselines
+  `--check` gates on any CHANGED key, `--json` prints the CHANGED list, `--update` re-baselines
   `english_string_hashes.json`.
 - `dev/scripts/wave0_keyset.php` — assemble the Wave 0 pass set and pre-filter keys that already
   carry a `$ec_lang_syn`; `--skipped` enumerates what it dropped, `--no-filter` restores the raw set,
   `--measure=<sprint>` replays a friction log against the filter.
-- `dev/scripts/generate_translation_payloads.php` — build per-language JSON payloads;
-  `--check` verifies freshness against lang files/glossary/exempt list/coverage declaration/generator
-  (hard gate before any sprint).
+- `dev/scripts/generate_translation_payloads.php` — build per-language JSON payloads, missing and
+  reworded keys together;
+  `--check` verifies freshness against lang files/glossary/exempt list/coverage declaration/drift
+  manifest/generator (hard gate before any sprint). `<dir> --lang=xx --as-changed=k1,k2` writes a
+  probe payload to inspect exactly what a translator would receive for those keys.
 - `dev/scripts/translation_coverage.json` + `coverage.inc.php` — the (calculator × language) coverage
   declaration (see above). `coverage_selftest.php` asserts the cross, the identity floor, and the
   exempt/out-of-scope separation; run it after editing the JSON.
@@ -468,9 +484,9 @@ question about paths.
    so a disagreement between their counts is a bug. **Add a key there only when identical-to-English
    is permanently correct** — never to quiet a number you don't want to fix.
 5. **Note known quality risks** (new terms without glossary coverage, proper nouns).
-6. **Check for stale-but-present drift the delta cannot see:**
-   `php dev/scripts/detect_english_drift.php`. The delta finds only *missing* keys; this flags keys
-   whose *English changed* after a translation was written. `--json` emits the resync list.
+6. **Read the drift report:** `php dev/scripts/detect_english_drift.php`. Its `CHANGED` keys are
+   already in the payloads as `english_changed`; read the role changes, and count them in the delta
+   you state (`meta.english_changed_key_count`).
 
 **Anchor languages are declared in `glossary.json`'s `meta.anchor_languages` — read that, not this
 line.** They are `es, pt, fr, tr`: the Task 203 core languages and the measured top four by confirmed
@@ -591,7 +607,9 @@ own duplicate and removed it.
   the brief had already told them what the list meant.
 - **So a brief must say both shapes**: *most of these keys are missing and are appended; some
   already exist with a value equal to the English and must be REPLACED IN PLACE — check
-  `key_context[key].reason` before you append.*
+  `key_context[key].reason` before you append.* `english_changed` (a reworded key, since
+  2026-10-16) is the same replace-in-place shape. Every payload now says this itself, in
+  `meta.reason_notes`.
 - This is the same defect sprint 459 recorded ("a key that already exists must not arrive in
   `keys_to_translate`") arriving by a different door. 459 blamed the generator; the generator is
   behaving as designed, and what was missing is that an equal-to-English key is a REPLACEMENT

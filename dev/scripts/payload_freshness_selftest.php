@@ -20,6 +20,8 @@
  *      this file;
  *   3. a payload whose content no longer matches is STALE;
  *   4. a missing payload is STALE.
+ *   6. the payload's per-key shape: syn commentary as key_notes, reworded keys in
+ *      keys_to_translate, tip/label pairs, and one batch-scoped glossary.
  *
  * It works in a temporary output directory throughout and never touches
  * `dev/translation_payloads/`, which only the orchestrator regenerates. It does update the mtime of
@@ -101,6 +103,50 @@ file_put_contents($victim, $original);
 [$code, $out] = $run(['--check']);
 $expect(0, $code, 'FIXTURE 5: restoring the file returns the verdict to fresh', $out);
 
+// 6. THE SHAPE a translator reads (Appendix D step 1, dev/translation-clarification-review.md).
+//    Built for one language with --as-changed, so it holds whether or not today's delta is empty.
+//    Each assertion is a note that used to be lost on the way to the translator.
+foreach (glob($tmp . '/*.json') as $f) { unlink($f); }
+$probe = ['mi_station', 'lpn_settings_text_halo', 'lpn_settings_text_halo_tip', 'or_head'];
+[$code, $out] = $run(['--lang=am', '--as-changed=' . implode(',', $probe)]);
+$expect(0, $code, 'FIXTURE 6: the generator builds a probe payload with --as-changed', $out);
+$p = json_decode((string)@file_get_contents($tmp . '/payload_am.json'), true);
+$shape = function ($ok, $what) use (&$fail) {
+    if ($ok) { return; }
+    $fail++;
+    echo "FAIL  FIXTURE 6 shape: {$what}\n";
+};
+if (!is_array($p)) {
+    $shape(false, 'payload_am.json was not written or is not JSON');
+} else {
+    foreach ($probe as $k) {
+        $shape(isset($p['keys_to_translate'][$k]), "{$k} is in keys_to_translate");
+    }
+    $shape(($p['key_context']['mi_station']['reason'] ?? '') === 'english_changed'
+        && ($p['key_context']['mi_station']['current_value'] ?? '') !== '',
+        'a reworded key arrives with reason english_changed and its current_value');
+    $notes = $p['key_notes']['mi_station'] ?? [];
+    $starts = function (array $list, string $prefix) {
+        foreach ($list as $n) { if (strpos((string)$n, $prefix) === 0) { return true; } }
+        return false;
+    };
+    // SUGGESTIONS ONLY, NO PROHIBITIONS (Tom, 2026-10-16): an avoid: tag and a glossary avoid list stay unsent.
+    $shape(!$starts($notes, 'Avoid: '), 'the syn avoid: tag is NOT sent (suggestions only, no prohibitions)');
+    $shape(strpos((string)($p['glossary'] ?? ''), 'DO NOT') === false, 'the glossary carries no DO NOT line');
+    $shape($starts($notes, 'Layout (column heading): '), 'the layout: tag reaches key_notes as its full instruction');
+    $shape(isset($p['key_syn']['mi_station']) && strpos($p['key_syn']['mi_station'], '|') === false,
+        'key_syn carries the synonyms only, never the commentary');
+    $shape(!isset($p['key_notes']['or_head']), 'a gloss:-only commentary adds no key note (its term arrives in glossary)');
+    $shape(strpos((string)($p['glossary'] ?? ''), "\n    English: head (") !== false, 'a cited term (or_head gloss: head) is in glossary');
+    $shape(strpos((string)($p['glossary'] ?? ''), "\n- energy per weight of water as an elevation") !== false, 'a glossary term leads with its plain-words name');
+    $shape(($p['key_context']['lpn_settings_text_halo']['tip']['key'] ?? '') === 'lpn_settings_text_halo_tip',
+        'a label carries its tip in key_context');
+    $shape(($p['key_context']['lpn_settings_text_halo_tip']['label']['key'] ?? '') === 'lpn_settings_text_halo',
+        'a tip carries its label in key_context');
+    $shape(!isset($p['prompt_context_by_prefix']) && !isset($p['glossary_terms_by_prefix']),
+        'the glossary is sent once, as glossary, not twice by prefix');
+}
+
 foreach (glob($tmp . '/*.json') as $f) { unlink($f); }
 @rmdir($tmp);
 
@@ -108,6 +154,7 @@ if ($fail) {
     printf("\npayload_freshness_selftest: %d failure(s).\n", $fail);
     exit(1);
 }
-echo "payload_freshness_selftest: 5 fixtures pass - freshness is decided by content, a touched\n";
-echo "but unchanged input is not stale, and a real difference still blocks.\n";
+echo "payload_freshness_selftest: 6 fixtures pass - freshness is decided by content, a touched\n";
+echo "but unchanged input is not stale, a real difference still blocks, and the per-key notes,\n";
+echo "reworded keys, tip pairs and batch glossary reach the translator's payload.\n";
 exit(0);

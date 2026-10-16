@@ -16,14 +16,16 @@
  * months: payloads generated, `--check` said FRESH, sprints ran, and every avoid-array written for
  * those calculators was simply never delivered. Nothing warned anybody.
  *
- * An inline synonym always arrives. A pointer arrives only if three things line up. So the rule
- * that makes pointers safe is not "be careful" — it is this check:
+ * Since Appendix D step 1 of dev/translation-clarification-review.md (2026-10-16), the generator
+ * sends every term a batch key cites by `gloss:`, whatever its prefix is wired to, so prefix wiring
+ * is no longer what makes a pointer arrive and this check no longer asks for it. What remains:
  *
  *   1. `gloss: X` names a term that exists in glossary.json.
- *   2. That term is wired to the prefix of the key carrying the pointer.
- *   3. The entry still says something. A pointer plus nothing, where the glossary entry is also
+ *   2. The entry still says something. A pointer plus nothing, where the glossary entry is also
  *      empty of the label's own wordings, is a WARNING rather than an error — it may be right, but
  *      it is the shape that the retired Task 132 trimming exception used to produce by accident.
+ *   3. Every term named in prefixToTermNames() exists (that map still decides where a
+ *      sense-qualified term such as "run (a simulation)" is matched by its bare word).
  *
  * Usage:
  *   php dev/scripts/gloss_ref_check.php            # report; exit 1 on any error
@@ -58,11 +60,6 @@ foreach ($glossary['terms'] as $term) {
     }
 }
 
-$prefixMap = prefixToTermNames();
-// Mirror buildPrefixGlossary()'s fallback exactly. A prefix that is NOT in the map does not fail
-// open — it silently gets these three and nothing else, which is the whole trap.
-$defaultTerms = ['flow', 'velocity', 'slope'];
-
 $errors = [];
 $warnings = [];
 $ok = 0;
@@ -76,11 +73,6 @@ foreach ($syn as $key => $value) {
     // Tags are `tag: value`, semicolon-separated. A gloss value may contain spaces and parentheses
     // ("default (setting)"), so it runs to the next semicolon or the end.
     if (!preg_match_all('/\bgloss:\s*([^;]+)/', $commentary, $m)) continue;
-
-    $prefix = strpos($key, '_') !== false ? substr($key, 0, strpos($key, '_')) : $key;
-    $wired  = $prefixMap[$prefix] ?? $defaultTerms;
-    $wiredLower = array_map('strtolower', $wired);
-    $prefixIsMapped = isset($prefixMap[$prefix]);
 
     // ONE gloss tag may name SEVERAL terms, comma-separated -- `gloss: lateral, mainline, reach`
     // is the established shape in ip_ and rc_. Splitting on commas is safe because no glossary term
@@ -99,16 +91,7 @@ foreach ($syn as $key => $value) {
                 . "delivers nothing at all; a translator sees the label and no guidance.";
             continue;
         }
-        if (!in_array($termName, $wiredLower, true)) {
-            $errors[] = "$key -> gloss: $termName — term exists, but prefix '$prefix' is "
-                . ($prefixIsMapped
-                    ? "wired to " . count($wired) . " term(s) that do NOT include it"
-                    : "NOT LISTED in prefixToTermNames(), so it falls back to the three default "
-                      . "terms (flow, velocity, slope)")
-                . ". The glossary entry, including its avoid list, never reaches the agent.";
-            continue;
-        }
-        // Wired and real. Now the softer question: does the pointer actually carry anything?
+        // Real, so the generator delivers it (selectBatchTerms() sends every cited term). Now the softer question: does the pointer actually carry anything?
         //
         // DELIBERATELY NARROW. A pointer-only entry is the SHAPE Tom asked for -- "gloss ref seems
         // more efficient in the long run" -- so warning on all of them would fight the decision
@@ -173,7 +156,7 @@ foreach ($errors as $e)   { echo "ERROR   $e\n\n"; }
 foreach ($warnings as $w) { echo "WARN    $w\n\n"; }
 
 if ($verbose && $ok > 0) {
-    echo "All other pointers resolve to a real term that is wired to their key's prefix.\n";
+    echo "All other pointers resolve to a real term.\n";
 }
 
 if ($mapErrors) {
@@ -183,8 +166,7 @@ if ($mapErrors) {
 }
 if ($errors) {
     echo "A gloss pointer that does not resolve is WORSE than no pointer: the synonyms it replaced\n";
-    echo "are gone and nothing took their place. Fix the term name, or wire the prefix in\n";
-    echo "dev/scripts/prefix_terms.inc.php, before any sprint runs.\n";
+    echo "are gone and nothing took their place. Fix the term name before any sprint runs.\n";
     exit(1);
 }
 /* ---------------------------------------------------------------------------------------------
@@ -223,5 +205,5 @@ if ($dupNames) {
     exit(1);
 }
 
-echo "PASS: every gloss pointer resolves and is wired to its prefix.\n";
+echo "PASS: every gloss pointer resolves to a real glossary term.\n";
 exit(0);

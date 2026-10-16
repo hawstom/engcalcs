@@ -8,14 +8,11 @@ lines rather than appending corrections.
 
 ## Before merging anything
 
-- **Protected branches alive, each awaiting Tom's browser pass** (`feature_freeze` is OFF; every one
-  is listed in `dev/branch-policy.json`, which until 2026-09-30 named none of them): see STATE below.
-  Plus `feat/label-placer` (the seam; round-5 bench), `feat/label-gang-search` (bench only), and
+- **Feature branches alive, each awaiting Tom's browser pass**: see STATE below. A feature merges
+  into master on his typed word; there is no all-clear file, freeze or merge hook. Plus `feat/label-placer` (the seam; round-5 bench), `feat/label-gang-search` (bench only), and
   builders `feat/label-placer-a`..`-d`, which never merge alone.
 - **A branch that adds a key fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
-- The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
-  mid-build, so pin to the final head and say so in `pin_note`.
 - **Merge master into a branch before merging it to master**, then run the suite on the merge:
   2026-09-23 twice showed a clean merge breaking a harness (the lag harness and Net3's threshold).
 - **Never wrap `run_harnesses.sh` or `check_all.sh` in the browser lock**: each browser harness
@@ -103,7 +100,7 @@ lines rather than appending corrections.
 
 ### Master: see the pushed SHA in the last report. Production: b7c99102 (10-09) when last read; ask, About box
 
-Landed on master 2026-10-15: feat/stopped-series (808); his word calls on the 808 strings and the mode
+Landed on master 2026-10-15: feat/leader-keep (807, night); feat/stopped-series (808); his word calls on the 808 strings and the mode
 prompts ("labels, and Text"); fix/mtc-vertical-sides (z = 0 side rock reads N/A, `mtc_not_applicable`);
 feat/plural (35 count strings in the "cells (n)" form); sprint 1016 (15 new, 44 resynced, 26 languages;
 `dev/english-friction/1016.json`; halo had been rendered "hello" in am bn hi my, fixed; tr N/A "Uygulanmaz");
@@ -130,20 +127,69 @@ Earlier the same day: twentieth session's list (text-halo, search-zoom-accuracy,
   CC writing the ledger entry. **He decides: add a permission rule (Edit of dev/branch-all-clears.json) to
   .claude/settings.json himself, or write the entry.** `chore/ledger-wording` holds HIS commit 37092cd7 (the
   ledger heading and CLAUDE.md line), which the classifier also refuses CC merging; his to merge.
+His browser pass of 2026-10-15 night came back; four agents were sent that night, one per item below.
+If a branch's `git log` shows no commit after 10-15 22:00, that agent's work was lost: re-brief it.
+
+- **feat/bentley-interop**: he APPROVED all its new English. His changes: the Scenarios table flies out
+  AUTOMATICALLY with the manager (no button), as the spreadsheet version, and widens by dragging; All
+  unused omits categories with nothing unused; Clean map's tip loses the "shows only the drawing"
+  sentence and starts "Checked: The zoom...". He says per-scenario graphs are not new (they changed
+  with scenario two days earlier). The `$ec_lang_syn` Transform description still awaits his OK.
+  `lpn_cleanmap`, `lpn_ovrmarks`, and the flyout width `flyW` inside `lpn_smbox`: TELL HIM before it
+  merges. Still unruled: `lpn_settings_override_marks_tip`, `lpn_sm_all_row_tip`, `lpn_sm_unused_none`. After it lands
+  delete match-property, graph-bubble.
+- **EPS defects he found on bentley-interop, worked on fix/zero-demand-solve**: (1) the "1-hr drain"
+  scenario reports it ended at 15:07:33; (2) tanks drain with no demand; (3) a pattern of mostly 0s
+  stops EPANET at 0:00 ("Surely it's smarter than this"); (4) on the 8108 preview his Fotobi shows no
+  EPS and no animation controls. R-402: he accepted keeping his numbers and the message ("OK"), and
+  approved its status messages. Don't call a fixture by its filename to him; name his project.
+- **feat/description-lines** (806): his call changed to "\P" with no spaces (was " \P ").
+
+### Proposed to him 2026-10-15/16, awaiting his word
+
+- Independent review of how a clarification reaches a translator (halo read as "hello"; "translating
+  too often?"): `dev/translation-clarification-review.md`. Its halo glossary wording, its sprint cadence
+  (once before each production pull) await him. Its tooling fix landed 10-16: the packet now sends
+  the syn notes, reworded keys (no resync list), tip pairs, and only the glossary terms a batch uses.
+  He forbids translating without his approval.
+
+### His answers of 2026-10-16 (early), being built or awaiting design
+
+- **Language, done 10-16**: `dev/terms.md` (his plain-words names, two uniqueness groups) is the
+  concept source; packets lead with it. A blind Spanish test from plain names alone: his picks and CC's
+  clear calls are in es (cota, profundidad del flujo, densidad relativa, LP/LE). Left for the next
+  Spanish sprint, with his word: cota and carga hidráulica file-wide. His open questions: should the
+  glossary carry abbreviations (HGL, EGL); is "N/A" the right English (he means "no meaningful
+  answer"); is "Headwater below crown" good English.
+- **EPS (bentley-interop, his Fotobi)**: a run stops with Error 110 when tank T-NE runs EMPTY
+  (15:07:33, 14:01:42): EPANET closes L22 and the junctions it fed have no source. 15:07:33 was the
+  simulation time, NOT the wall clock as CC told him. He asks why lowering a full tank's initial
+  depth avoids the 0:00 stop when flow is zero either way. Candidate answer to "surely it's smarter":
+  pressure-driven demand. Also: his units went back to US (possible defect); pattern graph in the
+  Library wants axis labels (factor; time and ordinal).
+- **bentley-interop Scenarios table**: keep the bottom-pane Scenarios tab on a PC too (continuity);
+  the manager's table must be PART of the manager: hovering off the manager closes the table with
+  it, and the divider must be the slim one Settings uses between its index and main pane.
+- **Retire Settings' "Mark highest and lowest values"**: Tables and Find replaced it.
+- **A pipe-label artifact** in a new project (one pipe label, while stretching nodes): his screenshot
+  was the wrong file; ask for it.
 
 ### Questions out to him
 
 - Task 800: keep J-NE-S-3's equal override?
 - Task 681: the node shed's re-fits are what is left (~250 ms on n600); cheaper means changing the layout.
-- Task 802: retire the bottom-pane Scenarios tab now the flyout exists? `lpn_sm_help` still names the pane.
 
 ### Next job
 
-His browser pass over bentley-interop's 10-16 list, then its merge. Wish lists: New junction without a
-canvas click (Declan, open design question), Number of services decimals (Mary), a harness helper that
-starts a scenario from the UI (Perry).
+Merge the agents' work into their branches, update the previews page, and ask for his browser pass.
+Wish lists: New junction without a canvas click (Declan), Number of services decimals (Mary), a
+harness helper that starts a scenario from the UI (Perry).
 
 ### Traps met 2026-10-15 (twenty-first session)
+
+- **"Ledger" was CC's word; he did not know it.** Relay in his words.
+- **He retired the all-clear file, both freezes, the deploy-blocker list and the pre-merge hook**
+  (10-15/16): they duplicated the classifier and choked merges. Do not rebuild them.
 
 - **A pipe hides a refusal.** `new_english_keys.php --write | tail` exits 0 when the generator REFUSED,
   and the next `git add` committed a conflicted file. Never pipe a guard into tail inside an && chain.
@@ -234,8 +280,6 @@ starts a scenario from the UI (Perry).
 - **Merging two branches that each regenerated payloads conflicts in all 27 payloads and new-english-keys.md**:
   take either side, then `new_english_keys.php --write --force` (both sides were generated, so --force loses
   nothing) and regenerate payloads, all in the merge commit.
-- **The all-clear must be in master's working tree when the merge runs** (branch_gate reads the file there):
-  write it uncommitted, merge, set it aside for the suite's clean tree, then commit it on a chore branch.
 
 ### Traps met 2026-10-08 (tenth session)
 
@@ -303,9 +347,6 @@ starts a scenario from the UI (Perry).
 
 ### Traps met 2026-10-07 (fifth session)
 
-- **`json.dumps` with the wrong indent rewrote all of `branch-all-clears.json`** (1126 lines) and
-  was merged locally before CC saw it; master was reset to the reflog SHA (unpushed). The file is
-  `indent=1`; diff `--stat` before committing any rewritten JSON.
 - **A harness wrapped in `flock /tmp/engcalcs-browser.lock` by hand timed out** while suites held it;
   harnesses take the lock themselves. Run them bare.
 - **A stub DOM hid a real-browser crash** (`feat/dxf`: `children.forEach` on an SVG element). Any

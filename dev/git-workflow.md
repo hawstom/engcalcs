@@ -77,27 +77,16 @@ uncommitted; silence means commit and push.
       was green; `projection` went in without the projection universe he had asked for TWICE, and
       `custom-property` with a validator that does not validate and that he never asked for. No
       suite can see either.
-    - **A DEFECT TRACK STILL MERGES ON THE OLD RULE** -- green on the merge result, and push. The
-      gate is only for a branch listed in `dev/branch-policy.json`, because a gate that stops all
-      work is a gate somebody switches off.
-    - **AND SINCE 2026-09-15 THERE ARE TWO LOCKS, BECAUSE TOM'S APPROVAL IS NOT THE ONLY ONE.** He
-      asked: *"Remember that we are in a feature freeze. I will test. But even if I were to approve
-      a merge, the scripts must block it until the freeze is removed. Right?"* **As built the answer
-      was NO** -- an all-clear was the only lock, so his approval and the freeze were one key turned
-      twice. `feature_freeze.active` in `dev/branch-policy.json` is the second: it refuses a merge of
-      a `protected` branch **even with a correctly pinned all-clear on file**, and his approval keeps
-      standing until the freeze lifts. **Only he lifts it.**
-      - **IT IS NOT `freeze.active`, AND THE DIFFERENCE IS THE WHOLE POINT.** That one is an
-        EMERGENCY STOP refusing every merge but a `hotfix:`, and switching it on cost a full day of
-        bug fixes he was waiting for. `feature_freeze` refuses only what `protected` already names,
-        so **a defect or tooling track merges untouched** -- `branch_policy_selftest.php` case 8c
-        asserts exactly that, and it is the case that matters most.
-    - **IT IS A CHECK NOW, NOT THIS PARAGRAPH.** `dev/hooks/pre-merge-commit` refuses the merge;
-      `dev/branch-all-clears.json` records his exact words pinned to the commit he cleared, so the
-      approval LAPSES BY ITSELF when the branch moves, exactly as a ruling in
-      `dev/english-key-rulings.json` lapses when the English changes. A FREEZE in
-      `dev/branch-policy.json` stops every merge but a `hotfix:`, which is how development continues
-      while the production line holds still.
+    - **A DEFECT TRACK STILL MERGES ON THE OLD RULE** -- green on the merge result, and push.
+    - **HIS WORD IS THE ALL-CLEAR, AND NO FILE OR HOOK COPIES IT** (retired on his word, 2026-10-15
+      and 10-16). From 2026-09-13 a per-branch all-clear file, a feature freeze, an emergency freeze
+      and a deploy-blocker list were read by a pre-merge hook. They outlived their reason: Claude
+      Code's own permission check came to refuse any merge into master without his typed word, and
+      refused Claude Code writing the file, so he hand-edited JSON; bringing a cleared branch up to
+      date voided the clearance; neither freeze had been on since 09-17 (the emergency one only ever
+      by a session's misreading), and no blocker was ever written. He: *"Its safeties have become its
+      undoing. We were doing just fine. Can we relax whatever has grown up and choked us?"* **Do not
+      rebuild them.** A release is held still by a release branch (`release/ewb`), which stops nobody.
     - The four capability branches are large, speculative and abandonable, which is what a branch is
       genuinely for -- and is exactly why finishing one is a judgement about the product rather than
       about the build.

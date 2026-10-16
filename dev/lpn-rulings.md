@@ -247,12 +247,11 @@ place with each line break written as backslash, capital P, no spaces (`lpnDescI
 paragraph line is two markers (`a\P\Pb`). A line ending in a backslash keeps a space before the
 marker, so the run stays its own. EPANET keeps the whole text, markers and all, and gives it back
 on its own re-save (`description-lines-harness.js` 2b reads it with the vendored engine's
-`getComment`). Reading back (`lpnDescFromInline()`), `\P` with or without spaces round it is a
-line break: a space before it belongs to the marker and then so does one after (the " \P " an earlier
-build wrote); with no space before, every space after is the next line's indent. A
+`getComment`). Reading back (`lpnDescFromInline()`), `\P` is a line break and the spaces round it
+are the text's own, so an indent after it survives. A
 backslash-P the person typed is written `\\P` and read back as typed; a comment from elsewhere
 saying `C:\Pumps` reads as a line break. An imported comment nobody edited goes back out as the
-file spelled it, " \P " or `C:\Pumps` and all (`lpnDescTokSet()`, the number-token rule). A comment with no `\P` reads exactly as before, so Net1/2/3
+file spelled it, `C:\Pumps` and all (`lpnDescTokSet()`, the number-token rule). A comment with no `\P` reads exactly as before, so Net1/2/3
 round-trip character for character. Rejected: the later lines on extra `;|` comment lines (Tom: *"the
 .inp doesn't allow for extra lines"*; EPANET's own re-save dropped them). Files written that way
 still read, and go back out in one line.
