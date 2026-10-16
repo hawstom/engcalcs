@@ -1275,18 +1275,26 @@ accomplish (a) that both are available in the same gesture and (b) that it flies
 instead of displacing the map?"* On the first build (10-16): *"Yes. But (1) I want it automatic, no
 button, (2) I want the spreadsheet version, (3) I want it expandable (it's too narrow)."*
 
-Built: the table opens with the manager and closes with it; its x puts it away until the manager is
-opened again. Beside the box (its inline end; the other side when there is no room; over the box's
-lower part when neither side has 18rem), at the box's height, as a fixed layer over the map, so the
-map keeps its size. **Not on a phone**, where it would cover the tree. **It is the Tables pane's own
-Scenarios panel, moved into the flyout** while it is out, so it is the same spreadsheet (selection,
-fill, paste, column widths) drawn by `renderPaneTable()`, never a second rendering. The pane's
-Scenarios tab is hidden meanwhile and comes back, with its panel, when the table is put away
-(`refreshScenariosTab()`). The rejected alternative: a second spec drawing the same table into the
-flyout; every spec caches its cells and selection, so two drawings of one spec fight. The edge away
-from the box drags the width, up to the room beside the box; a dragged width is kept as `flyW` in the
-manager's own `lpn_smbox` record (no new key). Opens at 40rem or the room, whichever is less.
-Code: `smFly*()`.
+Then, on the second build (10-16): *"I think we need only one x and one title bar; this is a
+consolidated box now; I fear that you are still thinking of it as two."*
+
+Built: **one box.** The table is a pane inside `#lpn_sm_box`, beside the manager's tree, laid out as
+Settings lays out its index and content (`.lpn-setbox-panes`, Settings' own slim divider between,
+the visible rule on the manager column's inline-end border). So one title band, one X, one row of
+dock buttons, one border and shadow, one docked tab; the box floats, docks, auto-hides and closes as
+one thing. The rejected alternative, built first: a second fixed panel placed beside the box and made
+to look joined (a second X, a second border, hover and focus bridged by hand). **Automatic**: the
+table is in whenever the box is open, **except on a phone**, where it would cover the tree.
+**It is the Tables pane's own Scenarios panel, moved in**, so it is the same spreadsheet (selection,
+fill, paste, column widths) drawn by `renderPaneTable()`, never a second rendering (rejected: a
+second spec drawing the same table; two drawings of one spec fight over cached cells). The pane's
+Scenarios tab stays on show (continuity); choosing it sends the table home and the manager has the
+whole box until next opened. **Width**: the manager column keeps its width, the table takes the
+rest, and the box is as wide as the two, capped at the window. The divider follows the pointer:
+toward the manager widens the table, the box growing on the manager's side with its far edge still.
+The table's width is `flyW` in `lpn_smbox` (no new key); `w` stays the manager's width alone, and a
+corner drag gives the difference to the table. Docked, the column is `dockW`, widened once if too
+narrow to hold a table. Opens at 40rem of table. Code: `smTable*()`.
 
 Tom (R-390): *"I'd like a way to see at a glance all unused alternatives ... unless the selector
 (instead of a button) includes 'All unused' (and 'All'?), where all the headings are listed with a
