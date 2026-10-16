@@ -12,7 +12,7 @@
  * So this is a LIVE MUTATION: a mark is written into the real `dev/new-english-keys.md`, the real
  * check is run over the real tree, and the file is put back byte for byte whatever happens.
  *
- * Seven legs (the last three are the synonym section, see below), because the parser has several ways to go wrong:
+ * Seven legs (the last three are the plain-sentence section, see below), because the parser has several ways to go wrong:
  *   1. a mark on an entry is seen                       (the ordinary case)
  *   2. a mark in the translators' section is seen       (a DIFFERENT section, and the section keying
  *                                                        bug that ate three of Tom's six answers)
@@ -124,41 +124,38 @@ try {
         $fails[] = "leg 3: the generator's OWN furniture was reported as an unharvested mark:\n" . $txt;
     }
 
-    /* Legs 5-7: the "Synonym entries to approve" section. Planted under a heading of the plant's own
+    /* Legs 5-7: the "Plain sentences to check" section. Planted under a heading of the plant's own
      * (the parser accepts a repeated heading), with a key no real entry can have. */
-    $synKey = 'ec_selftest_syn_key';
-    $synHead = "\n## Synonym entries to approve  (1, 1 to read @@ NEEDS RULING)\n\n"
+    $synKey = 'ec_selftest_plain_key';
+    $synHead = "\n## Plain sentences to check  (1, 1 to read @@ NEEDS RULING)\n\n"
         . "- **`" . $synKey . "`**\n  > selftest English\n"
-        . "  *Why stale:* the English changed after this synonym was written\n"
+        . "  *Why stale:* the English changed after this entry was written\n"
         . "  *Written against:* older English\n"
-        . "  *Current synonym:* selftest synonym\n"
-        . "  *Proposed synonym:* selftest proposed synonym\n"
-        . "  **What this asks for:** WRITTEN PERMISSION to replace.\n";
-    /* Leg 5: the generator's own synonym furniture, flag included, is not a mark. */
+        . "  *Current plain sentence:* selftest plain sentence\n";
+    /* Leg 5: the generator's own plain-sentence furniture, flag included, is not a mark. */
     file_put_contents($md, rtrim($original, "\n") . "\n" . $synHead . "  @@ NEEDS RULING\n");
     list($rc, $txt) = ecRunCheck($script);
-    if ($rc !== 0) { $fails[] = "leg 5: the synonym section's own furniture was read as a mark:\n" . $txt; }
+    if ($rc !== 0) { $fails[] = "leg 5: the plain-sentence section's own furniture was read as a mark:\n" . $txt; }
     /* Leg 6: a mark in that section is seen, and names the key. */
     file_put_contents($md, rtrim($original, "\n") . "\n" . $synHead . "  ec_selftest_marker three\n");
     list($rc, $txt) = ecRunCheck($script);
-    if ($rc === 0) { $fails[] = 'leg 6: a mark in the synonym section was NOT reported.'; }
-    elseif (strpos($txt, $synKey) === false) { $fails[] = 'leg 6: reported a failure but did not name the synonym key.'; }
-    /* Leg 7: once syn-rulings.json holds that exact answer on that exact English and synonym text,
-     * the mark is harvested; a different synonym text (the proposal moved) makes it unharvested
-     * again. The real file is put back byte for byte, or removed if it did not exist. */
-    $synFile = $root . '/dev/syn-rulings.json';
+    if ($rc === 0) { $fails[] = 'leg 6: a mark in the plain-sentence section was NOT reported.'; }
+    elseif (strpos($txt, $synKey) === false) { $fails[] = 'leg 6: reported a failure but did not name the plain-sentence key.'; }
+    /* Leg 7: once plain-sentence-rulings.json holds that exact answer on that exact English and
+     * Plain text, the mark is harvested; a different Plain text makes it unharvested again. The real file is put back byte for byte, or removed if it did not exist. */
+    $synFile = $root . '/dev/plain-sentence-rulings.json';
     $synOrig = is_file($synFile) ? file_get_contents($synFile) : null;
     try {
         $mk = function (string $syn) use ($synKey) {
             return json_encode(array('rulings' => array($synKey => array(
-                'on' => 'selftest English', 'syn' => $syn, 'ruled' => '2026-01-01', 'answer' => 'ec_selftest_marker three'))));
+                'on' => 'selftest English', 'plain' => $syn, 'ruled' => '2026-01-01', 'answer' => 'ec_selftest_marker three'))));
         };
-        file_put_contents($synFile, $mk('selftest proposed synonym'));
+        file_put_contents($synFile, $mk('selftest plain sentence'));
         list($rc, $txt) = ecRunCheck($script);
-        if ($rc !== 0) { $fails[] = "leg 7: a stored synonym ruling was still reported as unharvested:\n" . $txt; }
-        file_put_contents($synFile, $mk('some other synonym'));
+        if ($rc !== 0) { $fails[] = "leg 7: a stored plain-sentence answer was still reported as unharvested:\n" . $txt; }
+        file_put_contents($synFile, $mk('some other plain sentence'));
         list($rc, $txt) = ecRunCheck($script);
-        if ($rc === 0) { $fails[] = 'leg 7: a ruling made on a DIFFERENT synonym text still counted as harvested.'; }
+        if ($rc === 0) { $fails[] = 'leg 7: an answer made on a DIFFERENT Plain text still counted as harvested.'; }
     } finally {
         if ($synOrig === null) { @unlink($synFile); } else { file_put_contents($synFile, $synOrig); }
     }

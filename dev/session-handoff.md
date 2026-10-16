@@ -116,7 +116,7 @@ Twenty-second session (10-16 afternoon) built his 10-16 items below; previews pa
   AUTOMATICALLY with the manager (no button), as the spreadsheet version, and widens by dragging; All
   unused omits categories with nothing unused; Clean map's tip loses the "shows only the drawing"
   sentence and starts "Checked: The zoom...". He says per-scenario graphs are not new (they changed
-  with scenario two days earlier). The `$ec_lang_syn` Transform description still awaits his OK.
+  with scenario two days earlier). The Transform description's plain sentence (once a `$ec_lang_syn` proposal) still awaits his OK.
   `lpn_cleanmap`, `lpn_ovrmarks`, and the flyout width `flyW` inside `lpn_smbox`: TELL HIM before it
   merges. Still unruled: `lpn_settings_override_marks_tip`, `lpn_sm_all_row_tip`, `lpn_sm_unused_none`. After it lands
   delete match-property, graph-bubble. **10-16 (9b9f74f3):** the manager's table is one box with it
@@ -143,6 +143,13 @@ Twenty-second session (10-16 afternoon) built his 10-16 items below; previews pa
   (once before each production pull) await him. Its tooling fix landed 10-16: the packet now sends
   the syn notes, reworded keys (no resync list), tip pairs, and only the glossary terms a batch uses.
   He forbids translating without his approval.
+
+- **Plain sentences (branch chore/plain-sentences, 10-16)**: `$ec_lang_syn` retired into
+  `dev/plain-sentences.md` (his word: "Do all of the _syn proposed work"). Awaiting his review of
+  the draft before merge: https://claude.ai/artifact/DYJ6DgunNcYGrEqqtJW3n9 (collection "review").
+  Apply his marks to the file, then merge. Lost with syn-proposals.json: an unapproved lpn_ff_selected
+  proposal; his open question on lpn_labels_priority_node_tip "Is this _syn needed?" is answered in
+  the draft (kept as a Plain line).
 
 ### His answers of 2026-10-16 (early), being built or awaiting design
 
@@ -386,7 +393,7 @@ Wish lists: New junction without a canvas click (Declan). Perry's scenario UI he
 - **The DMARC mailbox is readable from here**: `ssh jconstru`, `~/mail/constructionnotesmanager.com/dmarc/{new,cur}`;
   tar it down and parse the gz/zip XML locally. The reports are not in his Gmail.
 - **The harvester mis-filed one synonym ruling** (consent_body): it stored his edited synonym as the
-  English. Check `syn-rulings.json` by eye after any harvest with an edited synonym.
+  English. Check `plain-sentence-rulings.json` by eye after any harvest with an edited plain sentence.
 - **He wrote two different edits of one key** (lpn_ds_search_note) in two sections of the file; the
   questions-section edit was applied. Expect it when a key is both new and questioned.
 

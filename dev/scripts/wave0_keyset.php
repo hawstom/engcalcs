@@ -1,33 +1,33 @@
 <?php
 /**
- * Wave 0 key-set assembler and $ec_lang_syn pre-filter (ROADMAP Task 239).
+ * Wave 0 key-set assembler and plain-sentence pre-filter (ROADMAP Task 239).
  *
  * Wave 0 is the adversarial English pass a sprint runs before it launches: one agent, English
  * only, asking "list every plausible reading of this string; more than one means rewrite."
  * Until now the key set for that pass was assembled by hand, which meant nothing could pre-filter
  * it and nothing could measure it.
  *
- * THE PRE-FILTER: a key that already carries a non-empty $ec_lang_syn has already had this exact
- * question asked and answered -- the synonym channel exists precisely to say "the English is
- * right, here is the reading." Re-asking produces a re-flag, and a re-flag is a dismissal that
+ * THE PRE-FILTER: a key that already has an entry in dev/plain-sentences.md (until 2026-10-16 a
+ * non-empty $ec_lang_syn) has already had this exact question asked and answered -- that channel
+ * exists precisely to say "the English is right, here is the reading." Re-asking produces a re-flag, and a re-flag is a dismissal that
  * costs a human's attention. Measured on 239-wave0-calcs.json (35 entries over the fifteen
- * non-lpn calculators, against the syn state as it stood the day that pass ran): 9 of the 35
- * findings were on keys that already had a syn entry -- 7 of the 13 dismissals, 1 of the 16
+ * non-lpn calculators, against the synonym state as it stood the day that pass ran): 9 of the 35
+ * findings were on keys that already had a synonym entry -- 7 of the 13 dismissals, 1 of the 16
  * refer-to-human and 1 of the 6 confirmed English rewrites. Dismissal rate 13/35 = 37% before,
  * 6/26 = 23% after.
  *
- * THE FILTER LOSES REAL CATCHES, so it never hides what it dropped. mtc_note_1 already had a syn
- * entry and was still rewritten. That is the cost of the filter stated in the one case we can
+ * THE FILTER LOSES REAL CATCHES, so it never hides what it dropped. mtc_note_1 already had a
+ * synonym entry and was still rewritten. That is the cost of the filter stated in the one case we can
  * measure, and it is why --skipped exists and why the human-readable output always prints the
  * skipped count. A skipped key is a CHEAPER SECOND LOOK, not a key ruled correct: run the pass
- * over the reviewed set, then, if there is budget, read the skipped list against its syn entries.
+ * over the reviewed set, then, if there is budget, read the skipped list against its plain sentences.
  *
  * Usage:
  *   php dev/scripts/wave0_keyset.php --prefix=mpf,mtc      # the pass set for those calculators
  *   php dev/scripts/wave0_keyset.php --exclude-prefix=lpn  # everything but lpn_
  *   php dev/scripts/wave0_keyset.php --new-and-changed     # only keys new or edited since the
  *                                                          # last translation sync (the usual case)
- *   php dev/scripts/wave0_keyset.php --skipped             # list what the pre-filter dropped, with syn
+ *   php dev/scripts/wave0_keyset.php --skipped             # list what the pre-filter dropped, with its plain sentence
  *   php dev/scripts/wave0_keyset.php --no-filter           # the unfiltered set (what Wave 0 used to be)
  *   php dev/scripts/wave0_keyset.php --json                # machine form, for pasting into an agent prompt
  *   php dev/scripts/wave0_keyset.php --measure=239-wave0-calcs
@@ -36,6 +36,8 @@
  *
  * Exit 0 always except on a usage or parse error (2). This assembles work; it gates nothing.
  */
+
+require_once __DIR__ . '/plain_sentences.inc.php';
 
 const W0_EN_FILE   = __DIR__ . '/../../lib/lang.ec.en.php';
 const W0_MANIFEST  = __DIR__ . '/english_string_hashes.json';
@@ -74,14 +76,14 @@ function w0Main(array $argv): int
         }
     }
 
-    [$en, $syn] = w0LoadEnglish();
+    [$en, $plain] = w0LoadEnglish();
     if (count($en) === 0) {
         fwrite(STDERR, 'No keys parsed from ' . W0_EN_FILE . "\n");
         return 2;
     }
 
     if ($opts['measure'] !== null) {
-        return w0Measure($opts['measure'], $syn, $opts['json']);
+        return w0Measure($opts['measure'], $plain, $opts['json']);
     }
 
     $set = w0Scope($en, $opts);
@@ -104,15 +106,15 @@ function w0Main(array $argv): int
          * Reword the string and it is a string nobody has approved, and Wave 0 gets it back. So this
          * suppresses re-litigation and never suppresses review of anything new.
          *
-         * It is a HARDER exclusion than the $ec_lang_syn pre-filter beside it, and deliberately: a
-         * syn entry means somebody helped a translator, which is "a cheaper second look"; a ruling
+         * It is a HARDER exclusion than the plain-sentence pre-filter beside it, and deliberately: a
+         * plain sentence means somebody helped a translator, which is "a cheaper second look"; a ruling
          * means the person whose call it is has made it. */
         if (isset($ruled[$key]) && $ruled[$key] === (string)$value) {
             $alreadyRuled[$key] = (string)$value;
             continue;
         }
-        if ($opts['filter'] && isset($syn[$key]) && trim((string)$syn[$key]) !== '') {
-            $skipped[$key] = ['english' => (string)$value, 'syn' => trim((string)$syn[$key])];
+        if ($opts['filter'] && isset($plain[$key]) && trim((string)$plain[$key]) !== '') {
+            $skipped[$key] = ['english' => (string)$value, 'plain' => trim((string)$plain[$key])];
         } else {
             $reviewed[$key] = (string)$value;
         }
@@ -124,17 +126,17 @@ function w0Main(array $argv): int
                 'prefix' => $opts['prefix'],
                 'exclude_prefix' => $opts['exclude'],
                 'new_and_changed' => $opts['new_and_changed'],
-                'pre_filter' => $opts['filter'] ? 'skip keys with a non-empty $ec_lang_syn' : 'none',
+                'pre_filter' => $opts['filter'] ? 'skip keys with an entry in dev/plain-sentences.md' : 'none',
                 'ruled_excluded' => 'keys whose exact current English carries a ruling in dev/english-key-rulings.json',
             ],
             'counts' => [
                 'in_scope' => count($set),
                 'to_review' => count($reviewed),
-                'skipped_has_syn' => count($skipped),
+                'skipped_has_plain' => count($skipped),
                 'excluded_already_ruled' => count($alreadyRuled),
             ],
             'keys_to_review' => $reviewed,
-            'skipped_has_syn' => $skipped,
+            'skipped_has_plain' => $skipped,
             'excluded_already_ruled' => array_keys($alreadyRuled),
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), "\n";
         return 0;
@@ -157,7 +159,7 @@ function w0Main(array $argv): int
     }
     if ($opts['filter']) {
         $pct = count($set) > 0 ? round(100 * count($skipped) / count($set), 1) : 0.0;
-        echo 'Pre-filter: ' . count($skipped) . " skipped ({$pct}%) -- already carry a non-empty \$ec_lang_syn.\n";
+        echo 'Pre-filter: ' . count($skipped) . " skipped ({$pct}%) -- already have a plain sentence.\n";
         echo 'To review: ' . count($reviewed) . "\n";
         echo "A skipped key is a cheaper second look, not a key ruled correct. See it with --skipped.\n";
     } else {
@@ -170,11 +172,11 @@ function w0Main(array $argv): int
             echo "Nothing skipped.\n";
             return 0;
         }
-        echo "SKIPPED (English -- syn already on file):\n";
+        echo "SKIPPED (English -- plain sentence already on file):\n";
         foreach ($skipped as $key => $r) {
             echo "  {$key}\n";
             echo '      en:  ' . w0Snip($r['english']) . "\n";
-            echo '      syn: ' . w0Snip($r['syn']) . "\n";
+            echo '      plain: ' . w0Snip($r['plain']) . "\n";
         }
         return 0;
     }
@@ -234,10 +236,10 @@ function w0NewAndChanged(array $en): array
 
 /**
  * Replays a recorded friction log against the pre-filter: of the findings that pass actually
- * produced, which were on keys that already had a syn entry? Dismissals skipped are the saving;
+ * produced, which were on keys that already had a plain sentence? Dismissals skipped are the saving;
  * every other skipped disposition is the cost, and both are printed.
  */
-function w0Measure(string $sprint, array $syn, bool $json): int
+function w0Measure(string $sprint, array $plain, bool $json): int
 {
     $file = W0_FRICTION . '/' . $sprint . '.json';
     if (!is_file($file)) {
@@ -259,7 +261,7 @@ function w0Measure(string $sprint, array $syn, bool $json): int
         }
         $key = (string)($e['key'] ?? '');
         $disp = (string)($e['disposition'] ?? '?');
-        $hit = isset($syn[$key]) && trim((string)$syn[$key]) !== '';
+        $hit = isset($plain[$key]) && trim((string)$plain[$key]) !== '';
         $buckets[$disp]['total'] = ($buckets[$disp]['total'] ?? 0) + 1;
         $buckets[$disp]['skipped'] = $buckets[$disp]['skipped'] ?? [];
         if ($hit) {
@@ -292,7 +294,7 @@ function w0Measure(string $sprint, array $syn, bool $json): int
         . "; the pre-filter would have skipped {$skippedTotal}.\n";
     foreach ($buckets as $disp => $b) {
         $n = count($b['skipped']);
-        echo "  {$disp}: {$b['total']} finding" . ($b['total'] === 1 ? '' : 's') . ", {$n} on a key with a syn entry";
+        echo "  {$disp}: {$b['total']} finding" . ($b['total'] === 1 ? '' : 's') . ", {$n} on a key with a plain sentence";
         echo $n > 0 ? ' (' . implode(', ', $b['skipped']) . ")\n" : "\n";
     }
     echo "Dismissal rate {$rateBefore}% -> {$rateAfter}%.\n";
@@ -301,8 +303,8 @@ function w0Measure(string $sprint, array $syn, bool $json): int
         echo "COST: {$cost} skipped finding" . ($cost === 1 ? ' was' : 's were')
             . " NOT a dismissal. The filter hides real work; --skipped lists it.\n";
     }
-    echo "NOTE: this reads TODAY'S \$ec_lang_syn. A syn entry written as a RESULT of this pass\n";
-    echo "      inflates the saving; check the syn state at the pass's own commit before quoting it.\n";
+    echo "NOTE: this reads TODAY'S dev/plain-sentences.md. An entry written as a RESULT of this pass\n";
+    echo "      inflates the saving; check the file at the pass's own commit before quoting it.\n";
     return 0;
 }
 
@@ -326,9 +328,12 @@ function w0Rulings(): array
 function w0LoadEnglish(): array
 {
     $ec_lang = [];
-    $ec_lang_syn = [];
     include W0_EN_FILE;
-    return [is_array($ec_lang) ? $ec_lang : [], is_array($ec_lang_syn) ? $ec_lang_syn : []];
+    $plain = [];
+    foreach (ecPlainSentences() as $key => $e) {
+        $plain[$key] = $e['plain'] !== '' ? $e['plain'] : implode(' ', $e['notes']);
+    }
+    return [is_array($ec_lang) ? $ec_lang : [], $plain];
 }
 
 function w0Prefix(string $key): string
@@ -356,8 +361,8 @@ function w0Help(): void
     echo "  --prefix=a,b           only these key prefixes\n";
     echo "  --exclude-prefix=lpn   drop these key prefixes\n";
     echo "  --new-and-changed      only keys new or edited since the last translation sync\n";
-    echo "  --no-filter            do not skip keys that already carry a \$ec_lang_syn\n";
-    echo "  --skipped              list what the pre-filter dropped, with its syn entry\n";
+    echo "  --no-filter            do not skip keys that already have a plain sentence\n";
+    echo "  --skipped              list what the pre-filter dropped, with its plain sentence\n";
     echo "  --json                 machine form\n";
     echo "  --measure=<sprint>     replay a recorded friction log against the filter\n";
 }

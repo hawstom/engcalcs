@@ -19,10 +19,10 @@
  * has been documented at length the entire time, which is the argument for a check rather than for
  * reading more carefully.
  *
- * WHY IT IS NOT gloss_ref_check.php. That check reads the `gloss:` pointers written in
- * $ec_lang_syn, and it catches an unwired prefix only where somebody already wrote a pointer for
- * it. A brand-new calculator has no pointers at all, so it is exactly the case gloss_ref_check.php
- * cannot see — and a brand-new calculator is precisely when step 11 is forgotten. This check reads
+ * WHY KEY CITATIONS DO NOT COVER IT. A key's concept citations (dev/scripts/key_concepts.json;
+ * until 2026-10-16 also `gloss:` pointers in $ec_lang_syn) catch an unwired prefix only where
+ * somebody already cited a concept for it. A brand-new calculator has no citations at all, so it is
+ * exactly the case they cannot see — and a brand-new calculator is precisely when step 11 is forgotten. This check reads
  * the KEYS instead: if a prefix exists in lib/lang.ec.en.php, somebody must have decided what
  * glossary terms it needs, even if the decision was "none".
  *
@@ -131,7 +131,6 @@ if (defined('PREFIX_MAP_LIB_ONLY')) {
 require_once __DIR__ . '/prefix_terms.inc.php';
 $root = dirname(__DIR__, 2);
 $ec_lang = [];
-$ec_lang_syn = [];
 include $root . '/lib/lang.ec.en.php';
 
 $prefixMap = prefixToTermNames();

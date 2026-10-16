@@ -106,7 +106,6 @@ if (defined('PUBLIC_CLAIM_LIB_ONLY')) {
 
 $root = dirname(__DIR__, 2);
 $ec_lang = [];
-$ec_lang_syn = [];
 require $root . '/lib/lang.ec.en.php';
 
 $problems = ecStruckClaims($ec_lang);

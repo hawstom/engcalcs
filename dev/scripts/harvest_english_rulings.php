@@ -33,9 +33,9 @@
  * because it is keyed on the text, and the key reappears -- correctly, as a new string nobody has
  * approved. Self-correcting, so nothing has to be remembered.
  *
- *   - the "Synonym entries to approve" section holds stale `$ec_lang_syn` entries; an answer there
- *     goes to `dev/syn-rulings.json`, keyed on key + exact English + exact synonym text. CC then
- *     applies it to `$ec_lang_syn` by hand (never a script) and runs `syn_baseline.php --record`.
+ *   - the "Plain sentences to check" section holds stale `dev/plain-sentences.md` entries; an
+ *     answer there goes to `dev/plain-sentence-rulings.json`, keyed on key + exact English + exact
+ *     Plain text. CC then applies it to `dev/plain-sentences.md` by hand, English line included.
  *
  * Usage:
  *   php dev/scripts/harvest_english_rulings.php           # show what is unharvested (advisory)
@@ -44,7 +44,7 @@
  */
 
 $root = dirname(__DIR__, 2);
-require_once __DIR__ . '/syn_staleness.inc.php';
+require_once __DIR__ . '/plain_sentences.inc.php';
 $md   = $root . '/dev/new-english-keys.md';
 $apply = in_array('--apply', $argv, true);
 $check = in_array('--check', $argv, true);
@@ -82,30 +82,30 @@ function ecParseRulingsMd(string $text): array
     $out = array();
     $section = '';
     $key = null; $val = array(); $mark = array(); $inVal = false;
-    $synCur = ''; $synProp = '';
+    $plainCur = '';
     /* **KEYED ON SECTION *AND* KEY, because a key can appear TWICE in this file** -- once as a
      * translators' question about the shipped string and once as a new key awaiting approval.
      * Keying on the name alone let the second occurrence overwrite the first, and three of Tom's
      * six answers to the translators vanished in the parse. */
-    $flush = function () use (&$out, &$key, &$val, &$mark, &$section, &$synCur, &$synProp) {
+    $flush = function () use (&$out, &$key, &$val, &$mark, &$section, &$plainCur) {
         if ($key === null) { return; }
         $out[$section . '/' . $key] = array(
             'key'     => $key,
             'section' => $section,
             'value'   => implode("\n", $val),
             'mark'    => trim(implode("\n", $mark)),
-            /* A synonym entry's ruling is keyed on the text under discussion: the proposal when
-             * there is one, else the current synonym. Both are generated, never handwriting. */
-            'syn'     => $synProp !== '' ? $synProp : $synCur,
+            /* A plain-sentence entry's ruling is keyed on the Plain text shown, which is
+             * generated, never handwriting. */
+            'plain'   => $plainCur,
         );
-        $key = null; $val = array(); $mark = array(); $synCur = ''; $synProp = '';
+        $key = null; $val = array(); $mark = array(); $plainCur = '';
     };
     foreach (preg_split('/\r\n|\n|\r/', $text) as $line) {
         if (preg_match('/^##+\s*(.*)$/', $line, $m)) {
             $flush();
             $section = (strpos($m[1], 'Questions from the translators') !== false
                 || strpos($m[1], 'from sprint ') === 0) ? 'friction' : 'newkey';
-            if (strpos($m[1], 'Synonym entries to approve') === 0) { $section = 'syn'; }
+            if (strpos($m[1], 'Plain sentences to check') === 0) { $section = 'plain'; }
             /* `### from sprint X` sits inside the translators' section and must not reset it. */
             if (strpos($m[1], 'from sprint ') === 0) { $section = 'friction'; }
             continue;
@@ -139,11 +139,10 @@ function ecParseRulingsMd(string $text): array
         if (preg_match('/^  \*\*What this asks for:\*\*/', $line)) { continue; }
         if (preg_match('/^  \*The proposal:\*/', $line)) { continue; }
         if (preg_match('/^  \d+\. /', $line)) { continue; }
-        /* The synonym section's generated lines. The two synonym lines are read, not skipped: a
-         * ruling is keyed on them. */
-        if (preg_match('/^  \*Why stale:\*/', $line) || preg_match('/^  \*Why this proposal:\*/', $line) || preg_match('/^  \*Written against:\*/', $line)) { continue; }
-        if (preg_match('/^  \*Current synonym:\* ?(.*)$/', $line, $sm)) { $synCur = trim($sm[1]); continue; }
-        if (preg_match('/^  \*Proposed synonym:\* ?(.*)$/', $line, $sm)) { $synProp = trim($sm[1]); continue; }
+        /* The plain-sentence section's generated lines. The Plain line is read, not skipped: a
+         * ruling is keyed on it. */
+        if (preg_match('/^  \*Why stale:\*/', $line) || preg_match('/^  \*Written against:\*/', $line)) { continue; }
+        if (preg_match('/^  \*Current plain sentence:\* ?(.*)$/', $line, $sm)) { $plainCur = trim($sm[1]); continue; }
         $mark[] = trim($line);
     }
     $flush();
@@ -186,19 +185,19 @@ foreach (glob($root . '/dev/english-friction/*.json') as $f) {
     }
 }
 
-/* The synonym section's home: dev/syn-rulings.json, keyed on key + English + synonym text. */
-$synFile = $root . '/dev/syn-rulings.json';
-$synDoc = is_file($synFile) ? json_decode((string) file_get_contents($synFile), true) : null;
-if (!is_array($synDoc) || !isset($synDoc['rulings']) || !is_array($synDoc['rulings'])) {
-    $synDoc = array('_note' => 'Tom\'s answers on stale $ec_lang_syn entries, keyed on key + exact English + exact synonym text so a ruling lapses when either changes. Written by harvest_english_rulings.php; CC applies them by hand.', 'rulings' => array());
+/* The plain-sentence section's home: dev/plain-sentence-rulings.json, keyed on key + English + Plain text. */
+$plainFile = $root . '/dev/plain-sentence-rulings.json';
+$plainDoc = is_file($plainFile) ? json_decode((string) file_get_contents($plainFile), true) : null;
+if (!is_array($plainDoc) || !isset($plainDoc['rulings']) || !is_array($plainDoc['rulings'])) {
+    $plainDoc = array('_note' => 'Tom\'s answers on stale dev/plain-sentences.md entries, keyed on key + exact English + exact Plain text so an answer lapses when either changes. Written by harvest_english_rulings.php; CC applies them by hand.', 'rulings' => array());
 }
-/* The syn text a ruling stores is the one the page showed, not necessarily the current one. */
-function ecSynMarkIsStored(array $e, array $rulings): bool
+/* The Plain text an answer stores is the one the page showed. */
+function ecPlainMarkIsStored(array $e, array $rulings): bool
 {
     $k = $e['key'];
     return isset($rulings[$k]['answer']) && trim((string) $rulings[$k]['answer']) === $e['mark']
         && isset($rulings[$k]['on']) && $rulings[$k]['on'] === $e['value']
-        && isset($rulings[$k]['syn']) && $rulings[$k]['syn'] === $e['syn'];
+        && isset($rulings[$k]['plain']) && $rulings[$k]['plain'] === $e['plain'];
 }
 
 /** The English a key holds right now, or null. Read from source so a stale parse cannot hide an edit. */
@@ -285,7 +284,7 @@ foreach ($now as $id => $e) {
      * construction and the edit clears itself. Comparing against HEAD instead kept reporting an
      * applied edit until somebody committed the regenerated list, which makes --check fail for
      * having done the work. */
-    if ($e['section'] !== 'syn' && $before !== null && $before['value'] !== $e['value']) {
+    if ($e['section'] !== 'plain' && $before !== null && $before['value'] !== $e['value']) {
         $live = ecLiveEnglish($root, $k);
         if ($live === null || $live !== $e['value']) {
             $edits[$k] = array('was' => $before['value'], 'now' => $e['value']);
@@ -315,8 +314,8 @@ foreach ($now as $id => $e) {
      * reporting fifty unharvested marks after harvesting all fifty -- which would have made
      * --check unpassable until the regenerated file was committed, i.e. exactly backwards. Asking
      * the destination makes this idempotent: run it twice and the second run has nothing to do. */
-    if ($e['section'] === 'syn') {
-        if (ecSynMarkIsStored($e, $synDoc['rulings'])) { continue; }
+    if ($e['section'] === 'plain') {
+        if (ecPlainMarkIsStored($e, $plainDoc['rulings'])) { continue; }
     } elseif (ecMarkIsStored($k, $e, $doc['rulings'], $frictionAll)) { continue; }
     $pending[$id] = $e;
 }
@@ -355,10 +354,10 @@ foreach ($pending as $e) {
         }
         continue;
     }
-    if ($e['section'] === 'syn') {
-        if (!$apply) { echo "synonym   $k  ←  $answer\n"; continue; }
-        $synDoc['rulings'][$k] = array('on' => $e['value'], 'syn' => $e['syn'], 'ruled' => $date, 'answer' => $answer);
-        echo "synonym   $k  →  syn-rulings.json\n";
+    if ($e['section'] === 'plain') {
+        if (!$apply) { echo "plain     $k  ←  $answer\n"; continue; }
+        $plainDoc['rulings'][$k] = array('on' => $e['value'], 'plain' => $e['plain'], 'ruled' => $date, 'answer' => $answer);
+        echo "plain     $k  →  plain-sentence-rulings.json\n";
         continue;
     }
     if (!$apply) { echo "ruling    $k  ←  $answer\n"; continue; }
@@ -371,8 +370,8 @@ foreach ($edits as $k => $d) {
     echo "            now: " . preg_replace('/\s+/', ' ', $d['now']) . "\n";
 }
 if ($apply) {
-    ksort($synDoc['rulings']);
-    file_put_contents($synFile, json_encode($synDoc, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n");
+    ksort($plainDoc['rulings']);
+    file_put_contents($plainFile, json_encode($plainDoc, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n");
     ksort($doc['rulings']);
     file_put_contents($rulingsFile, json_encode($doc, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n");
     echo "\nharvested " . count($pending) . " mark(s). " . count($edits) . " English edit(s) still need a hand.\n";

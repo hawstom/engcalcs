@@ -75,129 +75,9 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED English: 'Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.'
   @@ NEEDS RULING
 
-## Synonym entries to approve  (15, 14 to read @@ NEEDS RULING)
+## Plain sentences to check  (0, none are stale)
 
-**These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
-English string that has since changed, or against a key that no longer exists. Say which: keep it
-as is, change it (a proposal may follow), or remove it. **Your answer on the flag line is the
-written permission** the rule requires; CC then applies it by hand and re-records it. A script
-never edits a synonym.
-
-- **`consent_body`**
-  > May we save a random code in this browser so that we can count how many browsers use each part of this site? The code is made up on the spot, says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first.
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.
-  *Current synonym:* May we save (store, keep, put) a random code (a string of letters and digits chosen by chance) in this browser so that we can count (tally) how many browsers use each part of this site? The code is made up on the spot (created at that moment), says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first.
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`consent_current_granted`**
-  > You allowed this. This browser keeps a random code so that we can count it.
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* You allowed this. We limit logging for this browser profile.
-  *Current synonym:* You allowed this. A random browser code is tracked to minimize duplicate use counts.
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`consent_region_label`**
-  > Your choice about the counting code.
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* Your choice about limiting logging.
-  *Current synonym:* Your choice about the random browser code tracking.
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`ip_is_lateral`**
-  > <span class="ec-help" title="Checked: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* <span class="ec-help" title="Checked: this reach is a segment of the test lateral, from which individual emitters withdraw water. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
-  *Current synonym:* | gloss: lateral, mainline; avoid: "test" read as typical/sample
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`lpn_cp_restrict`**
-  > Restrict these characters
-  *Why stale:* no record of the English it was written against
-  *Current synonym:* Forbid these characters; the opposite of Allow only these characters
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`lpn_cp_restrict_tip`**
-  > Restrict these characters:
-  *Why stale:* no record of the English it was written against
-  *Current synonym:* Forbid these characters; the opposite of Allow only these characters
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`lpn_fb_intro`**
-  > Canned messages (optional). Nothing is sent until you press Send.
-  *Why stale:* no record of the English it was written against
-  *Current synonym:* Ready-made messages; preset choices the visitor can pick instead of typing
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`lpn_ff_selected`**
-  > Selected junctions
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* Selected
-  *Current synonym:* Selected junctions | a pull-down option under Junctions to test; agrees with junctions, plural
-  *Proposed synonym:* Only the selected junctions, The junctions selected on the map | a pull-down option under Junctions to test; agrees with junctions, plural
-  *Why this proposal:* Each could stand in the pull-down row; the old text only repeated the English.
-  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
-  @@ NEEDS RULING
-
-- **`lpn_labels_priority_node_tip`**
-  > The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first. When only one value is left and two labels still overlap, one of them is hidden: the one with the lower demand, with pressure nearer the middle of the range, or with elevation or head more like its neighboring nodes.
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first. When only one value is left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.
-  *Current synonym:* more like neighboring nodes = numerically closer to the neighbors' values | avoid: similar in kind
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  _Ruled 2026-10-05: Is this _syn needed?_
-
-- **`lpn_pane_scn_alt_tip`**
-  > {category} alt.: {alternative}
-  *Why stale:* no record of the English it was written against
-  *Current synonym:* alt. abbreviates alternative (the scenario alternative that holds this override); abbreviate it the way your language abbreviates that word
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`lpn_reports_epanet`**
-  > Run
-  *Why stale:* no record of the English it was written against
-  *Current synonym:* Run, simulation, computation, or calculation report
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`lpn_scenario_push_values`**
-  > Values discarded:
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* Values thrown away:
-  *Current synonym:* Values thrown away, Values discarded, Values lost, Values wiped, Values replaced, Values displaced, Values cleared, Custom values cleared | a count follows this label, not a list of values
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`lpn_snip_tip_mode`**
-  > Snip shape
-  *Why stale:* no record of the English it was written against
-  *Current synonym:* Shape to specify for screenshot
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`rc_Hp`**
-  > <span class="ec-help" title="Ponding (Hp > yn) is desirable because it reduces upstream erosion. (USDA)">Inlet weir head, H<sub>p</sub> <span class="ec-tip">?</span></span>
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* <span class="ec-help" title="Ponding (Hp > yn) is good — reduces upstream erosion. (USDA)">Inlet weir head, H<sub>p</sub> <span class="ec-tip">?</span></span>
-  *Current synonym:* | gloss: weir head
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`rc_yn`**
-  > <span class="ec-help" title="Ponding (Hp > yn) is desirable because it reduces upstream erosion. (USDA)">Normal depth in inlet channel, y<sub>n</sub> <span class="ec-tip">?</span></span>
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* <span class="ec-help" title="Ponding (Hp > yn) is good — reduces upstream erosion. (USDA)">Normal depth in inlet channel, y<sub>n</sub> <span class="ec-tip">?</span></span>
-  *Current synonym:* Enter the normal depth in the channel that delivers flow to this chute. | Upstream, not downstream: ponding reduces erosion UPSTREAM of the chute inlet (above/before it, toward the source). Do not flip the direction.
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
+Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
 None on master. Every English key here is present in at least one other language.
 
@@ -205,7 +85,7 @@ None on master. Every English key here is present in at least one other language
 
 # Strings waiting on a branch
 
-**186 still to read**, of 189 new keys across 13 unmerged branch(es).
+**188 still to read**, of 191 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -216,9 +96,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/ledger-wording (`37092cd70`) — adds no English strings
+### chore/retire-mark-extrema (`3f3650f35`) — adds no English strings
 
-### feat/bentley-interop (`a429e24d4`) — 173 new, 173 to read @@ NEEDS RULING
+### feat/bentley-interop (`9b9f74f33`) — 174 new, 174 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -236,7 +116,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Clean map
   @@ NEEDS RULING
 - **`lpn_clean_map_tip`**
-  > Checked: the map shows only the drawing. The zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.
+  > Checked: the zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.
   @@ NEEDS RULING
 - **`lpn_control_inactive_note`**
   > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
@@ -694,12 +574,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_sm_shared_note`**
   > Shared with: {list}
   @@ NEEDS RULING
-- **`lpn_sm_table`**
-  > Scenarios table
-  @@ NEEDS RULING
-- **`lpn_sm_table_tip`**
-  > Show or hide the Scenarios table beside the Scenario manager.
-  @@ NEEDS RULING
 - **`lpn_sm_title`**
   > Scenario manager
   @@ NEEDS RULING
@@ -721,6 +595,15 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_sm_used_by_tip`**
   > Used by: {list}
   @@ NEEDS RULING
+- **`lpn_time_run_cut_off`**
+  > EPANET had closed {link} and then could not solve for {nodes}.
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off_empty`**
+  > Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off_full`**
+  > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
+  @@ NEEDS RULING
 - **`lpn_tsb_close`**
   > Close graph
   @@ NEEDS RULING
@@ -740,7 +623,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Drag to resize
   @@ NEEDS RULING
 
-### feat/description-lines (`895d34b7b`) — adds no English strings
+### feat/description-lines (`9b55bfe79`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -765,8 +648,6 @@ build for that would be a gate nobody keeps. Refresh it with
 ### feat/label-placer-c (`4dc27ea10`) — adds no English strings
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
-
-### feat/leader-keep (`81e4ffe80`) — adds no English strings
 
 ### feat/match-property (`05bda7651`) — 10 new, 10 to read @@ NEEDS RULING
 
@@ -801,7 +682,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
 
-### fix/zero-demand-solve (`c4b5fd714`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/pattern-axis (`c6d335475`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_library_pattern_axis_period`**
+  > Period
+  @@ NEEDS RULING
+
+### fix/zero-demand-solve (`fbfbc28b6`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_time_run_cut_off`**
   > EPANET had closed {link} and then could not solve for {nodes}.

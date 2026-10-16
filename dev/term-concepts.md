@@ -40,8 +40,7 @@ mechanics are unchanged.
   the term name without its parenthetical.
 
 Nothing else changed: `term`, `symbol`, `context`, `translation_notes`, `avoid` and the 26 target
-translations are read exactly as before, and `term` is still the name `gloss:` pointers and
-`prefixToTermNames()` use.
+translations are read exactly as before, and `term` is still the name `prefixToTermNames()` uses.
 
 Before and after, one term:
 
@@ -54,10 +53,10 @@ Before and after, one term:
  "symbol": "", "avoid": [...], "context": "...", "translations": {"en": "Tag", "am": "...", ...}}
 ```
 
-**A key cites a concept** in `dev/scripts/key_concepts.json` (`key => [concept ids]`), or through
-an existing `gloss: <term>` pointer in `$ec_lang_syn` when that term has a concept. The citation file
-is separate from `$ec_lang_syn` because that array is Tom's to approve line by line; it is separate
-from the glossary so that the table stays one row per concept and the check can ask whether a
+**A key cites a concept** in `dev/scripts/key_concepts.json` (`key => [concept ids]`). The `gloss:`
+pointers that `$ec_lang_syn` carried moved there when `dev/plain-sentences.md` replaced it
+(2026-10-16). The citation file is separate from `dev/plain-sentences.md` because that file is Tom's
+to approve line by line; it is separate from the glossary so that the table stays one row per concept and the check can ask whether a
 citation resolves.
 
 ### Tom's rows

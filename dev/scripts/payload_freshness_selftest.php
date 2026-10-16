@@ -131,13 +131,12 @@ if (!is_array($p)) {
         return false;
     };
     // SUGGESTIONS ONLY, NO PROHIBITIONS (Tom, 2026-10-16): an avoid: tag and a glossary avoid list stay unsent.
-    $shape(!$starts($notes, 'Avoid: '), 'the syn avoid: tag is NOT sent (suggestions only, no prohibitions)');
     $shape(strpos((string)($p['glossary'] ?? ''), 'DO NOT') === false, 'the glossary carries no DO NOT line');
-    $shape($starts($notes, 'Layout (column heading): '), 'the layout: tag reaches key_notes as its full instruction');
-    $shape(isset($p['key_syn']['mi_station']) && strpos($p['key_syn']['mi_station'], '|') === false,
-        'key_syn carries the synonyms only, never the commentary');
-    $shape(!isset($p['key_notes']['or_head']), 'a gloss:-only commentary adds no key note (its term arrives in glossary)');
-    $shape(strpos((string)($p['glossary'] ?? ''), "\n    English: head (") !== false, 'a cited term (or_head gloss: head) is in glossary');
+    $shape($starts($notes, 'Layout (column heading): '), 'a Layout line reaches key_notes as its full instruction');
+    $shape(strpos((string)($p['key_plain']['mi_station'] ?? ''), 'Station, chainage, or distance') === 0,
+        'the Plain line of dev/plain-sentences.md reaches key_plain');
+    $shape(!isset($p['key_notes']['or_head']), 'a key with no entry in dev/plain-sentences.md gets no key note');
+    $shape(strpos((string)($p['glossary'] ?? ''), "\n    English: head (") !== false, 'a cited term (or_head cites head) is in glossary');
     $shape(strpos((string)($p['glossary'] ?? ''), "\n- energy per weight of water as an elevation") !== false, 'a glossary term leads with its plain-words name');
     $shape(($p['key_context']['lpn_settings_text_halo']['tip']['key'] ?? '') === 'lpn_settings_text_halo_tip',
         'a label carries its tip in key_context');

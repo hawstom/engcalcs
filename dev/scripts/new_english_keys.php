@@ -36,7 +36,7 @@
  */
 
 $root = dirname(__DIR__, 2);
-require_once __DIR__ . '/syn_staleness.inc.php';
+require_once __DIR__ . '/plain_sentences.inc.php';
 $argvAll = $argv;
 $namesOnly = in_array('--names', $argvAll, true);
 $write = in_array('--write', $argvAll, true);
@@ -47,7 +47,7 @@ foreach ($argvAll as $a) {
     if (strpos($a, '--prefix=') === 0) { $prefix = substr($a, 9); }
 }
 
-$ec_lang = array(); $ec_lang_syn = array();
+$ec_lang = array();
 require $root . '/lib/lang.ec.en.php';
 $english = $ec_lang;
 
@@ -56,7 +56,7 @@ $seen = array();
 $langCount = 0;
 foreach ($others as $file) {
     if (basename($file) === 'lang.ec.en.php') { continue; }   // basename, not substr: 'ec.en.php' is nine characters and an off-by-one here silently counts English as one of the others, which makes the answer always zero.
-    $ec_lang = array(); $ec_lang_syn = array();
+    $ec_lang = array();
     require $file;
     $langCount++;
     foreach (array_keys($ec_lang) as $k) { $seen[$k] = true; }
@@ -137,7 +137,7 @@ files — which is, by construction, every string that has been written and not 
         . "Write your answer on the flag's own line. Anything is fine; \"OK\" is enough.
 ";
     $out .= ecFrictionSection($root, $langCount);
-    $out .= ecSynSection($root, EC_RULING_FLAG);
+    $out .= ecPlainSection($root, EC_RULING_FLAG);
     if (!$new) {
         return $out . "
 None on master. Every English key here is present in at least one other language.
@@ -623,9 +623,9 @@ function ecFrictionSection(string $root, int $langCount): string
  * Suggestions follow'), it would have saved me a lot of confusion and time."*
  *
  * He read them all as wording approvals, because that is what the rest of the file is. Several were
- * not: they were requests for written permission to write a `$ec_lang_syn` entry, which is a
- * different decision with a different cost -- an approval is free and a syn entry is a standing
- * instruction to 26 translators. Two kinds of question under one flag is one kind of question
+ * not: they were requests for written permission to write a translator note (then `$ec_lang_syn`,
+ * now an entry in `dev/plain-sentences.md`), which is a different decision with a different cost --
+ * an approval is free and a note is a standing instruction to 26 translators. Two kinds of question under one flag is one kind of question
  * nobody answers correctly.
  *
  * **DERIVED FROM THE FINDING'S OWN `resolution`, never typed per entry.** The wave-0 pass already
@@ -636,7 +636,8 @@ function ecFrictionSection(string $root, int $langCount): string
 function ecAskLine(array $e): string
 {
     $r = isset($e['resolution']) ? (string) $e['resolution'] : '';
-    $wantsSyn = (bool) preg_match('/\$ec_lang_syn/', $r);
+    /* Older findings name `$ec_lang_syn`, which dev/plain-sentences.md replaced (2026-10-16). */
+    $wantsSyn = (bool) preg_match('/\$ec_lang_syn|plain-sentences/', $r);
     $wantsEnglish = (bool) preg_match('/PROPOSED English/i', $r);
     $wantsGloss = (bool) preg_match('/glossary\.json|glossary term/i', $r);
     $parts = array();
@@ -645,9 +646,9 @@ function ecAskLine(array $e): string
     }
     if ($wantsSyn) {
         /* Named in full, because the standing rule is that AI never writes one without written
-         * permission IN THE CONVERSATION, and "OK" on a line that does not say the words
-         * `$ec_lang_syn` is not that permission. */
-        $parts[] = 'WRITTEN PERMISSION to add a `$ec_lang_syn` entry for this key'
+         * permission IN THE CONVERSATION, and "OK" on a line that does not name the file is not
+         * that permission. */
+        $parts[] = 'WRITTEN PERMISSION to add an entry for this key to `dev/plain-sentences.md`'
             . ' (a note to the 26 translators; it changes no English and nothing a visitor reads)';
     }
     if ($wantsGloss) {

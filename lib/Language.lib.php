@@ -441,7 +441,6 @@ function compare_langs ($baseLang, $secondLang) {
 function ecEnglishStrings(array $keys): array
 {
     $ec_lang = array();
-    $ec_lang_syn = array();
     require __DIR__ . '/lang.ec.en.php';
     $out = array();
     foreach ($keys as $k) {

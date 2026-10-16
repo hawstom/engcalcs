@@ -69,7 +69,7 @@ never edits the roadmap; promoting a row is Tom's call.
 | `dev/calc-spike/` | Headless behavioural tests for the non-lpn calculators. `calc-page.js` is the scaffolding; `README.md` is the recipe for a new worked example |
 | `dev/lpn-spike/` | Headless tests for the lpn solver and map editor |
 | `dev/translation_payloads/` | Per-language JSON payloads for translation sprints |
-| `dev/language-strings.md` | Full rules for writing `$ec_lang` / `$ec_lang_syn` values |
+| `dev/language-strings.md` | Full rules for writing `$ec_lang` values and `dev/plain-sentences.md` entries |
 | `dev/translation-process.md` | Sprint SOP and full mechanics |
 | `dev/testing-notes.md` | What actually catches defects here |
 | `dev/english-key-rulings.json` | Tom's approvals of English strings, keyed on the EXACT text ruled on, so a ruling lapses by itself when the wording changes. `new_english_keys.php` prints them back and leads with the count still to read. **Never hand-edit `dev/new-english-keys.md` expecting it to survive** — `--write` refuses over a hand-edited file, which is the guard that exists because his first pass was lost |
@@ -264,21 +264,22 @@ in `dev/language-strings.md`. Read it before editing any string value.** The non
 
 The script names the violation and the fix in its own error text. Trust it; do not add prose on top.
 
-**`$ec_lang_syn` is OFF-LIMITS to AI.** Never add, change or remove an entry without explicit written
-permission in that conversation. AI proposes a diff; the human approves; only then does AI write.
-There are **no standing carve-outs.** Its payload is SYNONYMS, not descriptions, and every phrase
-must pass the **substitution test**: it could stand on the control as the label itself.
+**`dev/plain-sentences.md` is OFF-LIMITS to AI** (it replaced `$ec_lang_syn`, 2026-10-16). Never add,
+change or remove an entry without explicit written permission in that conversation. AI proposes a
+diff; the human approves; only then does AI write. There are **no standing carve-outs.** Its Plain
+lines should pass the **substitution test**: each phrase could stand on the control as the label
+itself.
 
 **Routing — one question decides where a fix goes: does an English reader also stumble?**
 
 | Test | Home |
 |---|---|
 | An English reader must re-read, or can read it two ways | **Fix the English** — one edit fixes all 27 languages |
-| English is correct and idiomatic, but a translator cannot recover the concept from the words | **`$ec_lang_syn`** |
-| The concept recurs across labels or calculators | **`glossary.json`** |
+| English is correct and idiomatic, but a translator cannot recover the concept from the words | **`dev/plain-sentences.md`** |
+| The concept recurs across labels or calculators | **`dev/terms.md`** |
 
 **Never rename a key by hand** — `php dev/scripts/rename_lang_key.php old new --apply` does all 27
-lang files, `$ec_lang_syn`, every call site, the drift manifest, the exempt list and the coverage
+lang files, `dev/plain-sentences.md`, every call site, the drift manifest, the exempt list and the coverage
 declaration in one pass. A hand rename is ~40 edits and every miss fails **silently**.
 `key_hygiene_check.php` reports keys rendered by nothing and names that drifted from their siblings;
 It also reports keys whose only reader is itself unreachable — a reference from an uncalled function

@@ -294,7 +294,6 @@ foreach (EC_REQUEST_PURPOSES as $id => $p) {
 // that is the version bump CLAUDE.md forbids, and it would re-ask 26 languages' worth of visitors
 // the wrong question.
 $ec_lang = [];
-$ec_lang_syn = [];
 include $root . '/lib/lang.ec.en.php';
 $body = (string) ($ec_lang['consent_body'] ?? '');
 foreach (array_merge(array_keys(EC_NON_REQUEST_HOSTS), array_column(EC_REQUEST_PURPOSES, 'host'),

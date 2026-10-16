@@ -103,7 +103,6 @@ if (defined('LANG_KEY_RESOLVE_LIB_ONLY')) {
 
 $root = dirname(__DIR__, 2);
 $ec_lang = [];
-$ec_lang_syn = [];
 include $root . '/lib/lang.ec.en.php';
 $defined = $ec_lang;
 $keys = array_keys($defined);

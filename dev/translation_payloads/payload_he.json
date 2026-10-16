@@ -42,7 +42,7 @@
         "control_name_notes": "Where an English string names a control, it names it in one of two shapes. A single control is written as its label followed by the widget word: \"press the Calculate button\", \"the Recalculate automatically setting\", \"the Required fire flow box\". A menu path is written as comma-separated labels: \"File, Save as\"; \"Settings, Calculation, Hydraulics\". In BOTH shapes the label is another key's value. Translate it with exactly the words you used for that key, so the sentence still names what is on the screen; translate the widget word and the surrounding prose normally.",
         "glossary_notes": "glossary lists the technical terms that the strings in this batch use, each named in plain words, with your language's preferred translation where one exists. Use the preferred translation wherever the term appears, unless your language's genuine standard term is better; then use that and say so in your report.",
         "context_notes": "Use key_context[key].neighbors to keep register consistent with nearby translated strings. key_context[key].tip is the help text shown for that label, and key_context[key].label is the label a tip explains: read the pair together, and give the same thing the same word in both. Where the partner already has a translation in your file, its value is shown.",
-        "syn_notes": "key_syn[key] gives other English wordings of that one string; any of them could stand in its place. Use whichever your language expresses most naturally and compactly; you are not bound to the literal English wording.",
+        "plain_notes": "key_plain[key] says in plain words what that one string means, other wordings joined by \"or\". Use whichever your language expresses most naturally and compactly; you are not bound to the literal English wording.",
         "key_notes_notes": "key_notes[key] are notes about that one string: how much room it has, symbols to keep exactly, what it refers to. Follow them. They are instructions to you, never text to put in your file.",
         "suggestion_box_notes": "Read suggestion_box and follow it. It is part of your instructions, not a footnote: a sprint does not close while a translator complaint is unanswered.",
         "concept_notes": "Read concept_source and follow it. key_concepts lists, for a key that names a concept, its plain-words name, which is what you translate from; English is one rendering of it.",
@@ -54,7 +54,7 @@
     "keys_to_translate": [],
     "keys": [],
     "key_context": [],
-    "key_syn": [],
+    "key_plain": [],
     "key_notes": [],
     "key_concepts": [],
     "uniqueness_attention": []
