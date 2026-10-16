@@ -3080,17 +3080,6 @@ var EngCalcs = EngCalcs || {};
 	// idiom; every later segment in a row carries NO x, which is what makes it flow inline after
 	// its predecessor.
 	//
-	// THE EXTREMA MARK IS THE SEGMENT'S OWN text-decoration, never a separate badge. A badge hung off
-	// the end of a number has to be POSITIONED: measure the digits, know which row they are on,
-	// inherit the label's transform, and be rebuilt whenever any of that moves -- orphaned glyphs
-	// beside a rotated label, a badge left behind by a deleted pipe, a footprint four other things
-	// measured wrongly. A text-decoration is drawn by the text engine at the exact extent of the
-	// characters it marks, at any rotation, in any row, for free. It is unambiguous only because each
-	// value carries a PREFIX naming its quantity and the values sit on one line.
-	//
-	// Set as a presentation ATTRIBUTE rather than only a class: text-decoration on a tspan is SVG
-	// 1.1, and an attribute needs no stylesheet to have loaded. The class rides along for anyone
-	// who wants to restyle it.
 	// `firstDy` (optional, in em) shifts the WHOLE block up or down without moving the <text>'s own
 	// y. A data label leaves it out: its first row sits on the anchor point and the rest hang below,
 	// which is what a leader line points at. A Text OBJECT passes a negative value so a three-line
@@ -3102,8 +3091,8 @@ var EngCalcs = EngCalcs || {};
 	// fill`, which the browser applies piece by piece: every tspan's white stroke is painted after the
 	// ink of the tspans before it, so a unit mark, a separator or the next value nibbled the last
 	// glyph before it (`10"` read `1C"`, `5280'` read `528C'`). Inside one run the stroke is laid
-	// down for the whole run before any of its ink, so a row is now one tspan, broken only where a
-	// segment needs its own (an extrema mark's text-decoration). Fewer elements is cheaper, too.
+	// down for the whole run before any of its ink, so a row is now one tspan. Fewer elements is cheaper,
+	// too.
 	// NOT a filter on the label layer, tried and measured: in Chromium it erased every label on a
 	// latitude/longitude map and cost 5 to 10 times the stroke's raster time on 1,600 labels.
 	function setMultilineText(textEl, x, rows, firstDy) {
@@ -12992,7 +12981,7 @@ var EngCalcs = EngCalcs || {};
 	// There were TWO such lists and only deleteLink()'s knew about the repeat chain, so adding or
 	// removing a bend on a pipe long enough to repeat its label left one permanent stale copy per
 	// repeat station. One list, so a future element on the holder cannot be forgotten by half the
-	// callers -- and the extrema mark needs no line here, being the text's own text-decoration.
+	// callers.
 	function removeLinkEls(id) {
 		var le = linkEls[id];
 		if (!le) { return; }
@@ -13023,8 +13012,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	// **THE ONE LABEL A SINGLE EDIT OWES, AND NOTHING ELSE'S.** Builds this element's own content
 	// lines with the same per-field formatting refreshLabelTextPass() uses, writes its glyphs and
-	// repositions only IT -- no network-wide extrema (a decoration mark may lag one edit behind,
-	// which is a smaller wrong than repainting a drawing nobody touched), no shed cascade against
+	// repositions only IT -- no shed cascade against
 	// its neighbours, no collision avoidance. The next real content pass (a solve, a unit switch, a
 	// project reopen) recomputes everything properly; this is only what has to be true the instant
 	// an edit lands, with recalculate off and no solve running.
@@ -60613,8 +60601,9 @@ var EngCalcs = EngCalcs || {};
 	// away with it, so focus fell to the page body. Same cure as the arrow keys: blur first (which
 	// commits and rebuilds), then find the target in the NEW box. The target is named by what it is
 	// (its row's label text, its kind, and which of that name it is), not by where it sat, so a
-	// commit that adds or removes rows still lands on the right field. Only a text or number box
-	// that has a neighbour inside the popup is taken over; anything else tabs natively.
+	// commit that adds or removes rows still lands on the right field. Only a text or number box,
+	// or the multi-line Description (its `change` rebuilds the box the same way), that has a
+	// neighbour inside the popup is taken over; anything else tabs natively.
 	function popupTabbables(popup) {
 		var out = [];
 		Array.prototype.forEach.call(popup.querySelectorAll('input, select, textarea, button, a[href], [tabindex]'), function (el) {
@@ -60650,6 +60639,10 @@ var EngCalcs = EngCalcs || {};
 		var t = el && el.tagName && el.tagName.toLowerCase() === 'input' ? (el.type || '').toLowerCase() : '';
 		return (t === 'text' || t === 'number') && !el.getAttribute('list');
 	}
+	// A box the user types into whose commit rebuilds the popup: a typed box or a textarea.
+	function popupIsTextBox(el) {
+		return popupIsTypedBox(el) || !!(el && el.tagName && el.tagName.toLowerCase() === 'textarea');
+	}
 	// Blur `cur` (which commits it and rebuilds the box), then focus what `want` names in the NEW box.
 	function popupBlurThenFocus(popup, cur, want, fallbackIdx) {
 		var list, tgt;
@@ -60659,10 +60652,11 @@ var EngCalcs = EngCalcs || {};
 		if (!tgt) { return; }
 		tgt.focus();
 		if (popupIsTypedBox(tgt)) { tgt.select(); }
+		else if (popupIsTextBox(tgt)) { tgt.setSelectionRange(tgt.value.length, tgt.value.length); }   // a note is added to, not retyped
 	}
 	function popupTabKeyDown(e, popup) {
 		var cur = e.target, list, idx, dir, name;
-		if (e.key !== 'Tab' || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || !popupIsTypedBox(cur)) { return; }
+		if (e.key !== 'Tab' || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || !popupIsTextBox(cur)) { return; }
 		list = popupTabbables(popup);
 		idx = list.indexOf(cur);
 		dir = e.shiftKey ? -1 : 1;
@@ -60675,7 +60669,7 @@ var EngCalcs = EngCalcs || {};
 	// clicked box, so the click is taken over only in that one case.
 	function popupTabMouseDown(e, popup) {
 		var cur = document.activeElement, tgt = e.target, list, idx, name;
-		if (e.button !== 0 || cur === tgt || !popupIsTypedBox(cur) || !popupIsTypedBox(tgt) || !popup.contains(cur)) { return; }
+		if (e.button !== 0 || cur === tgt || !popupIsTextBox(cur) || !popupIsTextBox(tgt) || !popup.contains(cur)) { return; }
 		list = popupTabbables(popup);
 		idx = list.indexOf(tgt);
 		if (idx < 0) { return; }
@@ -60691,7 +60685,7 @@ var EngCalcs = EngCalcs || {};
 		if (!popup || !cur || cur === popup || !popup.contains(cur) || popupTabbables(popup).indexOf(cur) < 0) { refreshPopupIfOpen(); return; }
 		list = popupTabbables(popup);
 		name = popupTabName(cur); occ = popupTabOcc(list, cur, name);
-		typed = popupIsTypedBox(cur);
+		typed = popupIsTextBox(cur);
 		v = cur.value;
 		try { a = cur.selectionStart; b = cur.selectionEnd; } catch (e) { a = b = null; }
 		refreshPopupIfOpen();

@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-10-15",
-    "count": 2639,
+    "count": 2637,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -6860,8 +6860,6 @@
         "lpn_labels_heading_link": "4fc42eb0a2d30bdf0d4d9a4ad8fea8c9b94a07db",
         "lpn_labels_heading_node": "1aa6d7578bd4ddb3158dd09910b714b3629dbe0c",
         "lpn_labels_init_status": "e4f635321f9f01ed98a3e349863c0db23d29d420",
-        "lpn_labels_mark_extrema": "abe635279c0b23438dfed87917ef216db40e72ca",
-        "lpn_labels_mark_extrema_tip": "40b2c1e96c73d12031b3029041acfeffc26e0134",
         "lpn_labels_priority": "886cbff9d9df761ec642945e519631a23ed173a2",
         "lpn_labels_priority_node_tip": "ef6ff2d64a0b9992488443385ee187ccd934bfad",
         "lpn_labels_separator": "be7b78f8fc63d418df83bb3a26c45db2f93829a2",
@@ -13256,14 +13254,6 @@
         "lpn_labels_init_status": {
             "words": 2,
             "ends_sentence": false
-        },
-        "lpn_labels_mark_extrema": {
-            "words": 5,
-            "ends_sentence": false
-        },
-        "lpn_labels_mark_extrema_tip": {
-            "words": 28,
-            "ends_sentence": true
         },
         "lpn_labels_priority": {
             "words": 1,
