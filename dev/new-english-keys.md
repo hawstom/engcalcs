@@ -248,7 +248,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**496 still to read**, of 499 new keys across 15 unmerged branch(es).
+**497 still to read**, of 500 new keys across 17 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -1300,7 +1300,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Drag to resize
   @@ NEEDS RULING
 
-### feat/plural (`947ad672`) — adds no English strings
+### feat/plural (`a71f6f0a`) — adds no English strings
+
+### fix/mtc-vertical-sides (`09836047`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`mtc_not_applicable`**
+  > N/A
+  @@ NEEDS RULING
 
 ### fix/text-edit-phone (`c72f83eb`) — 162 new, 162 to read @@ NEEDS RULING
 
@@ -1790,3 +1796,5 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_tsb_resize`**
   > Drag to resize
   @@ NEEDS RULING
+
+### fix/wording-1016 (`c8cdcae8`) — adds no English strings

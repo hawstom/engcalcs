@@ -5726,11 +5726,6 @@
             "ruled": "2026-10-16",
             "answer": "Approved."
         },
-        "lpn_scenario_delete_confirm": {
-            "on": "Delete the scenario {name}, and its overrides ({n})? The drawing itself is not changed.",
-            "ruled": "2026-10-16",
-            "answer": "Approved."
-        },
         "lpn_status_converted": {
             "on": "Values ({n}) were rewritten into {unit}.",
             "ruled": "2026-10-16",
