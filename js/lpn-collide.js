@@ -1985,7 +1985,7 @@ EngCalcs.lpnCollide = (function () {
 	// covered are off the map before this pass starts and may not be half of a crossing. `covers`
 	// marks the entries that can hide a yielder (the node placements, which is what
 	// stationedYieldSet() reads); `yields` marks the ones that can be hidden by them. Unlike the
-	// repair one pass down, this does NOT have to re-ask it as it goes -- see coveredNow(), where a
+	// repair one pass down, this does NOT have to re-ask it as it goes -- see the reservation note in the body, where a
 	// hidden label keeps its reservation and the reason that is not thrift.
 	//
 	// Entries are `{id, boxes, leader, hideable, rank, yields, covers}`. Terminates because every
@@ -1994,30 +1994,28 @@ EngCalcs.lpnCollide = (function () {
 		opts = opts || {};
 		var live = (entries || []).slice(),
 			maxRounds = opts.maxRounds > 0 ? opts.maxRounds : live.length + 1,
-			hidden = {}, order = [], residual = [], before = 0, after = 0, rounds = 0, r;
-		function coveredNow(e) {
-			var j, o;
+			hidden = {}, order = [], residual = [], before = 0, after = 0, rounds = 0,
+			covered = [], drawn = [], pairs, deg = {}, i, j, o, e;
+		// **A HIDDEN LABEL KEEPS ITS RESERVATION, which reads backwards and is what makes this
+		// stable.** The label is not drawn, but the ground it stands on is still its own, so a
+		// yielding label under it does NOT come back when it goes. Releasing it instead was measured
+		// on Net3-World and produced a two-cycle -- five passes over an untouched drawing hid
+		// {185,199}, {184,205}, {185,199}, {184,205}, {185,199}, which on screen is a pair of labels
+		// blinking on a map nobody touched. It is the same ruling yieldStationedLabels() already
+		// makes for the same reason, and it keeps the coverage answer FIXED for the whole run --
+		// which is why it is asked once, here, and not once a round (Task 681).
+		for (i = 0; i < live.length; i++) {
+			e = live[i];
+			covered[i] = false;
+			if (!e.yields) { continue; }
 			for (j = 0; j < live.length; j++) {
 				o = live[j];
-				// **A HIDDEN LABEL KEEPS ITS RESERVATION, which reads backwards and is what makes
-				// this stable.** The label is not drawn, but the ground it stands on is still its
-				// own, so a yielding label under it does NOT come back when it goes. Releasing it
-				// instead was measured on Net3-World and produced a two-cycle -- five passes over an
-				// untouched drawing hid {185,199}, {184,205}, {185,199}, {184,205}, {185,199}, which
-				// on screen is a pair of labels blinking on a map nobody touched. It is the same
-				// ruling yieldStationedLabels() already makes for the same reason, and it also
-				// keeps the shed's coverage answer fixed for the whole run rather than per round.
 				if (o === e || !o.covers) { continue; }
 				if (labelsApart(o, e)) { continue; }
-				if (anyBoxOverlapAny(o.boxes, e.boxes)) { return true; }
+				if (anyBoxOverlapAny(o.boxes, e.boxes)) { covered[i] = true; break; }
 			}
-			return false;
 		}
-		function drawnNow() {
-			return live.filter(function (e) {
-				return !hidden[e.id] && (!e.yields || !coveredNow(e));
-			});
-		}
+		for (i = 0; i < live.length; i++) { if (!covered[i]) { drawn.push(live[i]); } }
 		function leaderLen(e) {
 			return e.leader ? Math.hypot(e.leader.bx - e.leader.ax, e.leader.by - e.leader.ay) : 0;
 		}
@@ -2027,27 +2025,43 @@ EngCalcs.lpnCollide = (function () {
 			if (a.len !== b.len) { return a.len > b.len; }
 			return a.id > b.id;
 		}
+		// **THE CROSSINGS ARE COUNTED ONCE, AND EACH ROUND ONLY TAKES AWAY** (Task 681). Whether two
+		// labels cross is a fact about those two alone, so hiding one removes exactly the pairs it
+		// is in and changes no other: the pair list labelCrossings() would give for the smaller
+		// drawn set is this one with the victim's pairs filtered out, in the same order. Counting
+		// the drawing afresh every round was 480 ms of a 600-junction switch for that same list.
+		pairs = labelCrossings(drawn).pairs;
+		pairs.forEach(function (p) {
+			deg[p[0]] = (deg[p[0]] || 0) + 1;
+			deg[p[1]] = (deg[p[1]] || 0) + 1;
+		});
 		for (rounds = 0; rounds <= maxRounds; rounds++) {
-			var drawn = drawnNow(), deg = {}, pool, victim;
-			r = labelCrossings(drawn);
-			if (rounds === 0) { before = r.counts.pairs; }
-			after = r.counts.pairs;
-			residual = r.pairs;
-			if (!r.pairs.length) { break; }
-			r.pairs.forEach(function (p) {
-				deg[p[0]] = (deg[p[0]] || 0) + 1;
-				deg[p[1]] = (deg[p[1]] || 0) + 1;
-			});
-			pool = drawn.filter(function (e) { return e.hideable && deg[e.id]; });
+			var victim = null, vid;
+			if (rounds === 0) { before = pairs.length; }
+			after = pairs.length;
+			residual = pairs;
+			if (!pairs.length) { break; }
+			// The pool, in drawn order: every drawn label that may be hidden and is in a pair. The
+			// first is the starting victim and a later one replaces it only when strictly worse,
+			// exactly as a filtered pool scanned from its head.
+			for (i = 0; i < drawn.length; i++) {
+				e = drawn[i];
+				if (hidden[e.id] || !e.hideable || !deg[e.id]) { continue; }
+				e.deg = deg[e.id]; e.len = leaderLen(e);
+				if (!victim || worse(e, victim)) { victim = e; }
+			}
 			// **EVERY REMAINING PAIR IS THE USER'S OWN, so it stands and is REPORTED.** This is the
 			// one exit that does not reach zero and it is the correct one: two hand-placed labels
 			// crossing is a drawing somebody made on purpose.
-			if (!pool.length) { break; }
-			pool.forEach(function (e) { e.deg = deg[e.id]; e.len = leaderLen(e); });
-			victim = pool[0];
-			pool.forEach(function (e) { if (worse(e, victim)) { victim = e; } });
-			hidden[victim.id] = true;
-			order.push(victim.id);
+			if (!victim) { break; }
+			vid = victim.id;
+			hidden[vid] = true;
+			order.push(vid);
+			pairs = pairs.filter(function (p) {
+				if (p[0] !== vid && p[1] !== vid) { return true; }
+				deg[p[0]]--; deg[p[1]]--;
+				return false;
+			});
 		}
 		return { hidden: order, hiddenSet: hidden, residual: residual, rounds: rounds,
 			before: before, after: after };
