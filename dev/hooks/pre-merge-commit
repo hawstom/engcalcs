@@ -1,12 +1,6 @@
 #!/bin/sh
-# Refuse a merge into master that Tom has not cleared. Installed by dev/hooks/install.sh.
-#
-# **GREEN IS NOT DONE, AND THAT IS THE WHOLE OF WHY THIS EXISTS.** On 2026-09-13 six capability
-# merges landed on master in one session, every one with check_all.sh passing and the pre-push stamp
-# in place. Both existing hooks worked perfectly and neither had anything to say, because neither
-# asks the question that mattered: is the FEATURE finished? `projection` went in carrying 183 of
-# 5,346 projections while "We won't deploy with UTM only" was a standing instruction that appeared
-# nowhere in this repository.
+# Refuse a merge into master that a freeze or an open deploy blocker forbids (dev/branch-policy.json,
+# dev/deploy-blockers.json). Installed by dev/hooks/install.sh.
 #
 # **THERE IS NO MERGE_HEAD HERE, AND THE FIRST DRAFT OF THIS HOOK DIED ON THAT.** It read
 # .git/MERGE_HEAD, which git has NOT written when pre-merge-commit runs on a clean merge -- so the

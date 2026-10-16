@@ -8,14 +8,11 @@ lines rather than appending corrections.
 
 ## Before merging anything
 
-- **Protected branches alive, each awaiting Tom's browser pass** (`feature_freeze` is OFF; every one
-  is listed in `dev/branch-policy.json`, which until 2026-09-30 named none of them): see STATE below.
-  Plus `feat/label-placer` (the seam; round-5 bench), `feat/label-gang-search` (bench only), and
+- **Feature branches alive, each awaiting Tom's browser pass** (`feature_freeze` is OFF): see STATE
+  below. A feature merges into master on his typed word; there is no all-clear file. Plus `feat/label-placer` (the seam; round-5 bench), `feat/label-gang-search` (bench only), and
   builders `feat/label-placer-a`..`-d`, which never merge alone.
 - **A branch that adds a key fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
-- The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
-  mid-build, so pin to the final head and say so in `pin_note`.
 - **Merge master into a branch before merging it to master**, then run the suite on the merge:
   2026-09-23 twice showed a clean merge breaking a harness (the lag harness and Net3's threshold).
 - **Never wrap `run_harnesses.sh` or `check_all.sh` in the browser lock**: each browser harness
@@ -133,11 +130,6 @@ If a branch's `git log` shows no commit after 10-15 22:00, that agent's work was
 
 ### Proposed to him 2026-10-15 night, awaiting his yes
 
-- **Retire the all-clear file and its merge hook.** He asked to relax the safeties that "have become
-  its undoing": the classifier already refuses a master merge without his typed word, so the file
-  duplicates it, and CC may not write it, so he hand-edits JSON. Keep check_all, the pre-push stamp and
-  the freeze. His `~/.claude/settings.json` rule `Edit(/dev/branch-all-clears.json)` is a string where
-  a list belongs, and a leading `/` there means `~/.claude/`, so it matches nothing.
 - Independent review of how a clarification reaches a translator (halo read as "hello"; "translating
   too often?"): `dev/translation-clarification-review.md`. Its halo glossary wording, its sprint cadence
   (once before each production pull) and its tooling fix (send the notes already written) await him.
@@ -156,9 +148,9 @@ harness helper that starts a scenario from the UI (Perry).
 
 ### Traps met 2026-10-15 (twenty-first session)
 
-- **Merging master into a cleared branch voids his all-clear** (the pin is the branch head). Merge the
-  cleared head straight into master; the suite on the merge result tests the same code.
-- **"Ledger" was CC's word; he did not know it.** The all-clears file is his all-clears.
+- **"Ledger" was CC's word; he did not know it.** Relay in his words.
+- **He retired the all-clear file and its hook (10-15 night)**: they duplicated the classifier and
+  choked merges. Do not rebuild one.
 
 - **A pipe hides a refusal.** `new_english_keys.php --write | tail` exits 0 when the generator REFUSED,
   and the next `git add` committed a conflicted file. Never pipe a guard into tail inside an && chain.
@@ -249,8 +241,6 @@ harness helper that starts a scenario from the UI (Perry).
 - **Merging two branches that each regenerated payloads conflicts in all 27 payloads and new-english-keys.md**:
   take either side, then `new_english_keys.php --write --force` (both sides were generated, so --force loses
   nothing) and regenerate payloads, all in the merge commit.
-- **The all-clear must be in master's working tree when the merge runs** (branch_gate reads the file there):
-  write it uncommitted, merge, set it aside for the suite's clean tree, then commit it on a chore branch.
 
 ### Traps met 2026-10-08 (tenth session)
 
@@ -318,9 +308,6 @@ harness helper that starts a scenario from the UI (Perry).
 
 ### Traps met 2026-10-07 (fifth session)
 
-- **`json.dumps` with the wrong indent rewrote all of `branch-all-clears.json`** (1126 lines) and
-  was merged locally before CC saw it; master was reset to the reflog SHA (unpushed). The file is
-  `indent=1`; diff `--stat` before committing any rewritten JSON.
 - **A harness wrapped in `flock /tmp/engcalcs-browser.lock` by hand timed out** while suites held it;
   harnesses take the lock themselves. Run them bare.
 - **A stub DOM hid a real-browser crash** (`feat/dxf`: `children.forEach` on an SVG element). Any
