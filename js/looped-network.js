@@ -4990,20 +4990,26 @@ var EngCalcs = EngCalcs || {};
 		// alternative is nearest, so it is its own too.
 		if (!scn.isBase) {
 			elementValues(null, 'scn', scn, scn.overrides, false);
-			scenarioSettingLeaves(scn).forEach(function (l) { out.push({ cat: categoryOfSetting(l.path), kind: 'scn', obj: scn, path: l.path, value: l.value }); });
+			scenarioSettingLeaves(scn).forEach(function (l) {
+				var it = { cat: categoryOfSetting(l.path), kind: 'scn', obj: scn, path: l.path, value: l.value };
+				if (ovlIsBubbleSet(it)) { out = out.concat(ovlBubbleItems(it, ownOverrideInherited(scn, it))); return; }
+				out.push(it);
+			});
 			calcOptionLeaves(scn).forEach(function (l) { out.push({ cat: 'calculation', kind: 'scn', obj: scn, path: l.path, value: l.value }); });
 		}
 		if (!isExplicitTree()) { return out; }
 		LPN_ALT_CATEGORIES.forEach(function (cat) {
 			var t = writeTargetFor(scn, cat);
 			if (!t || t.kind === 'scn' || t.obj.root === true) { return; }
-			out = out.concat(storedOwnItems(t.kind, t.obj));
+			out = out.concat(storedOwnItems(t.kind, t.obj, function (it) { return ownOverrideInherited(scn, it); }));
 		});
 		return out;
 	}
 	// One stored alternative's or calculation set's own values, as items of the list: what the list
-	// shows for it, and what Delete says goes with it (storedOverrideCount()).
-	function storedOwnItems(kind, r) {
+	// shows for it, and what Delete says goes with it (storedOverrideCount()). `inherited(it)` is what
+	// a value replaces ({value} or {none}), read only for the graphs on the map; by default the
+	// record's own parents', then Base's.
+	function storedOwnItems(kind, r, inherited) {
 		var out = [], cat = kind === 'calc' ? 'calculation' : r.category, map = kind === 'alt' && plainObject(r.values) ? r.values : {};
 		Object.keys(map).forEach(function (key) {
 			Object.keys(plainObject(map[key]) ? map[key] : {}).forEach(function (prop) {
@@ -5011,9 +5017,45 @@ var EngCalcs = EngCalcs || {};
 				out.push({ cat: cat, kind: kind, obj: r, key: key, prop: prop, value: map[key][prop] });
 			});
 		});
-		settingLeaves(r.settings).forEach(function (l) { out.push({ cat: cat, kind: kind, obj: r, path: l.path, value: l.value }); });
+		settingLeaves(r.settings).forEach(function (l) {
+			var it = { cat: cat, kind: kind, obj: r, path: l.path, value: l.value };
+			if (ovlIsBubbleSet(it)) { out = out.concat(ovlBubbleItems(it, (inherited || storedBubblesInherited)(it))); return; }
+			out.push(it);
+		});
 		if (kind === 'calc') { calcOptionLeaves(r).forEach(function (l) { out.push({ cat: cat, kind: kind, obj: r, path: l.path, value: l.value }); }); }
 		return out;
+	}
+	// **EACH GRAPH ON THE MAP IS ITS OWN ROW** (Tom, 2026-10-16, of Manage overrides: *"This sounds very
+	// promising ... Do this. I'd love to see it."*). The set is stored whole (Task 804, tsbOwn()), but
+	// what a person audits is one graph: one opened here, one closed here, one moved, resized or
+	// graphing another quantity. Each graph that differs from the inherited set is one item, `bubble`
+	// {id, own, inh} naming it on both sides; a held set no graph of which differs is the one item it
+	// always was, so a set equal to what it replaces still counts, as every override does.
+	function ovlIsBubbleSet(it) { return !!it.path && it.path.length === 1 && it.path[0] === 'bubbles'; }
+	function ovlBubbleSig(b) { return JSON.stringify(tsbClean([b])[0] || null); }
+	function ovlBubbleItems(it, inh) {
+		var own = Array.isArray(it.value) ? it.value : [], from = inh && !inh.none && Array.isArray(inh.value) ? inh.value : [],
+			byId = {}, ownIds = {}, out = [];
+		from.forEach(function (b) { if (b && typeof b.id === 'string') { byId[b.id] = b; } });
+		own.forEach(function (b) {
+			var i;
+			if (!b || typeof b.id !== 'string') { return; }
+			ownIds[b.id] = true;
+			i = byId[b.id];
+			if (!i || ovlBubbleSig(i) !== ovlBubbleSig(b)) { out.push(Object.assign({}, it, { bubble: { id: b.id, own: b, inh: i || null }, inhList: from })); }
+		});
+		from.forEach(function (b) {
+			if (b && typeof b.id === 'string' && !ownIds[b.id]) { out.push(Object.assign({}, it, { bubble: { id: b.id, own: null, inh: b }, inhList: from })); }
+		});
+		return out.length ? out : [Object.assign({}, it, { inhList: from })];
+	}
+	// What a stored alternative's set replaces, read without a scenario: its parents' nearest set, else Base's.
+	function storedBubblesInherited(it) {
+		var r = it.obj, chain = it.kind === 'alt' && r.parent !== null && r.parent !== undefined ? storedChain('alt', r.parent, 'presentation') : [], i;
+		for (i = 0; i < chain.length; i++) {
+			if (plainObject(chain[i].obj.settings) && Array.isArray(chain[i].obj.settings.bubbles)) { return { value: chain[i].obj.settings.bubbles }; }
+		}
+		return { value: doc.bubbles || [] };
 	}
 	/**
 	 * **THE VALUE AN OWN OVERRIDE REPLACES**: what the scenario would read for it without the holders
@@ -7744,7 +7786,7 @@ var EngCalcs = EngCalcs || {};
 		// **LIST OVERRIDES HERE TOO, SO BASIC MODE REACHES IT** (Tom, 2026-10-15: "Yes."). The same
 		// action as the Scenario manager's button, on the active scenario; greyed on Base and at 0.
 		rows.push({
-			label: pc.lpn_sm_list_overrides || 'List overrides',
+			label: pc.lpn_sm_list_overrides || 'Manage overrides',
 			disabled: scn.isBase || !overrideCount(scn),
 			tip: (scn.isBase || !overrideCount(scn)) ? (pc.lpn_sm_list_overrides_none || 'This scenario has no overrides.') : pc.lpn_sm_list_overrides_tip,
 			fn: function () { smActListOverrides(scn.id); }
@@ -77766,7 +77808,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				fn: function () { smActCurrent(key); } });
 			// **A TIDY LIST OF ONE SCENARIO'S OWN OVERRIDES, TO AUDIT THE COUNT** (Task 800; Tom,
 			// 2026-10-15: *"I don't know how to see a tidy list of overrides to audit"*).
-			out.push({ id: 'overrides', label: pc.lpn_sm_list_overrides || 'List overrides', tip: pc.lpn_sm_list_overrides_tip,
+			out.push({ id: 'overrides', label: pc.lpn_sm_list_overrides || 'Manage overrides', tip: pc.lpn_sm_list_overrides_tip,
 				off: !valid || !scenarioById(key) || !overrideCount(scenarioById(key)),
 				offTip: !valid ? noSel : (pc.lpn_sm_list_overrides_none || 'This scenario has no overrides.'),
 				fn: function () { smActListOverrides(key); } });
@@ -78209,6 +78251,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				g = byHolder[hid] = { cat: it.cat, kind: it.kind, name: it.kind === 'scn' ? scenarioDisplayName(it.obj) : String(it.obj.name || ''), items: [] };
 				groups.push(g);
 			}
+			if (ovlIsBubbleSet(it)) { g.items.push(ovlBubbleRow(it)); return; }
 			inh = ownOverrideInherited(scn, it);
 			if (it.key !== undefined) {
 				parts = smItemParts(it.key, it.prop, it.prop === 'demands' ? 'demand' : it.prop);
@@ -78226,6 +78269,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Equal to what it replaces, and still counted (Tom, 2026-10-05: *"It's still an override?
 			// Yes."*): said beside the value, so the count needs no explaining.
 			o.same = !inh.none && o.value === o.inherited && (o.valueTip || '') === (o.inhTip || '');
+			o.item = it;
 			g.items.push(o);
 		});
 		groups.sort(function (a, b) {
@@ -78238,6 +78282,35 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		});
 		return groups;
+	}
+	// One graph on the map as a row: the asset it graphs, "Time series graph", and what it graphs on
+	// each side ("Not on the map" where that side has no such graph). A held set that differs in no
+	// graph is one row, the set in words on each side, marked the same.
+	function ovlBubbleRow(it) {
+		var pc = EngCalcs.pageConfig || {}, b = it.bubble, rec, parts, o, own, inh, lp;
+		if (!b) {
+			lp = smLeafParts(it.path);
+			own = tsbSummaryText(it.value); inh = tsbSummaryText(it.inhList);
+			return { asset: lp.owner, id: null, group: null, gone: false, property: lp.setting, value: own, valueTip: '',
+				inherited: inh, inhTip: '', same: true, item: it };
+		}
+		rec = b.own || b.inh;
+		parts = smItemParts(ovKeyFor(rec.g === 'link' ? 'link' : 'node', rec.n), '');
+		o = { asset: parts.kind, id: parts.id, group: parts.group, gone: !parts.el, property: pc.lpn_tsb_menu || 'Time series graph', valueTip: '', inhTip: '', same: false, item: it };
+		own = b.own ? ovlBubbleQuantity(b.own, parts.el) : null;
+		inh = b.inh ? ovlBubbleQuantity(b.inh, parts.el) : null;
+		// The same quantity, graphed somewhere else or at another size.
+		if (own !== null && own === inh) { own = (pc.lpn_ovl_bubble_moved || '{quantity}, moved or resized').replace('{quantity}', own); }
+		o.value = own === null ? (pc.lpn_ovl_bubble_off || 'Not on the map') : own;
+		o.inherited = inh === null ? (pc.lpn_ovl_bubble_off || 'Not on the map') : inh;
+		return o;
+	}
+	// The quantity a graph shows, as its own quantity list names it; one that never chose graphs the
+	// default for its asset.
+	function ovlBubbleQuantity(b, e) {
+		var g = b.g === 'link' ? 'link' : 'node', f = b.f;
+		if (!f) { f = g === 'link' ? 'flow' : (e && (e.type === 'tank' || e.type === 'reservoir') ? 'head' : 'pressure'); }
+		return String(pgFieldLabel(g, f, e || null));
 	}
 	// A setting's owner and name, as the Settings table words them; a calculation set's typed run
 	// time is the same setting as the time itself.
@@ -78268,30 +78341,73 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (text === full && text.length <= 60) { return { text: full, tip: '' }; }
 		return { text: text.slice(0, 60) + ' \u2026', tip: full };
 	}
-	function smActListOverrides(key) {
-		var pc = EngCalcs.pageConfig || {}, scn = scenarioById(key), groups, n;
+	// **MANAGE OVERRIDES** (Tom, 2026-10-16: *"This sounds very promising as a general upgrade to List
+	// Overrides (which could become 'Manage overrides') ... Do this."*). The list, with a box to tick
+	// per row and Clear override on each: one row, the ticked rows, or all of them go back to what the
+	// scenario inherits, each press one undo step, redrawn everywhere at once. `scroll` keeps the
+	// reader's place when the list is drawn again after a clear.
+	function smActListOverrides(key, scroll) {
+		var pc = EngCalcs.pageConfig || {}, scn = scenarioById(key), groups, n, picks = [], clearSel;
 		if (!scn) { return; }
 		groups = ownOverrideGroups(scn);
 		n = groups.reduce(function (s, g) { return s + g.items.length; }, 0);
+		function clearNow(items) {
+			var body = document.getElementById('lpn_dialog_body'), top = body ? body.scrollTop : 0;
+			if (!ovlClearItems(scn, items)) { return; }
+			if (dialogIsOpen()) { smActListOverrides(key, top); }
+		}
 		openDialog(function (body) {
+			var bar, all;
 			ffEl('p', 'lpn-dialog-msg', (pc.lpn_scenario_overrides || 'No. of overrides') + ': ' + n, body);
-			ffEl('p', 'lpn-ff-note', pc.lpn_ovl_note || 'These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Click an ID to go to the asset on the map.', body);
+			if (!n) { ffEl('p', 'lpn-ff-note', pc.lpn_sm_list_overrides_none || 'This scenario has no overrides.', body); }
+			else { ffEl('p', 'lpn-ff-note', pc.lpn_ovl_note || 'These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Clear an override to restore the inherited value; Undo reverses it. Select an ID to go to the asset on the map.', body); }
+			if (n) {
+				bar = ffEl('div', 'lpn-ovl-bar', null, body);
+				clearSel = ffEl('button', 'lpn-ovl-clearsel', pc.lpn_ovl_clear_selected || 'Clear selected overrides', bar);
+				clearSel.type = 'button';
+				clearSel.disabled = true;
+				clearSel.addEventListener('click', function () {
+					var items = picks.filter(function (p) { return p.box.checked; }).map(function (p) { return p.o.item; });
+					if (items.length) { clearNow(items); }
+				});
+				all = ffEl('button', 'lpn-ovl-clearall', pc.lpn_ovl_clear_all || 'Clear all overrides', bar);
+				all.type = 'button';
+				all.addEventListener('click', function () {
+					closeDialog();
+					askDialog({ kind: 'confirm', text: (pc.lpn_ovl_clear_all_ask || 'Clear all the overrides ({n}) of {name}? Each value returns to the inherited value. Undo reverses this.')
+						.replace('{n}', String(n)).replace('{name}', scenarioDisplayName(scn)) }, function (yes) {
+						if (yes) { ovlClearItems(scn, ownOverrideItems(scn)); }
+						smActListOverrides(key);
+					});
+				});
+			}
 			groups.forEach(function (g) {
 				var wrap = ffEl('div', 'lpn-ovl-group', null, body), table, tr;
 				wrap.setAttribute('data-cat', g.cat);
 				ffEl('p', 'lpn-ff-summary', (pc.lpn_ovl_group || '{category}: {alternative}').replace('{category}', smTreeLabel(g.cat)).replace('{alternative}', g.name) +
 					' (' + g.items.length + ')', wrap);
-				table = ffEl('table', 'lpn-ff-table', null, ffEl('div', 'lpn-ff-tablewrap', null, wrap));
+				table = ffEl('table', 'lpn-ff-table lpn-ovl-table', null, ffEl('div', 'lpn-ff-tablewrap', null, wrap));
 				tr = ffEl('tr', null, null, ffEl('thead', null, null, table));
+				ffEl('th', 'lpn-ovl-pick', null, tr);
 				[pc.lpn_crit_col_asset || 'Asset', pc.lpn_find_property || 'Property', pc.lpn_ovl_col_override || 'Override',
 					[pc.lpn_ovl_col_inherited || 'Inherited value', pc.lpn_ovl_col_inherited_tip || 'The value this scenario reads without the override: the value of the parent of the alternative, or the Base value.']
 				].forEach(function (h) {
 					var th = ffEl('th', null, Array.isArray(h) ? h[0] : h, tr);
 					if (Array.isArray(h)) { th.title = h[1]; }
 				});
+				ffEl('th', 'lpn-ovl-act', null, tr);
 				table = ffEl('tbody', null, null, table);
 				g.items.forEach(function (o) {
-					var row = ffEl('tr', null, null, table), td = ffEl('td', null, null, row), b, c;
+					var row = ffEl('tr', null, null, table), td, b, c, box;
+					td = ffEl('td', 'lpn-ovl-pick', null, row);
+					box = ffEl('input', null, null, td);
+					box.type = 'checkbox';
+					box.title = pc.lpn_ovl_pick_tip || 'Select this override for the Clear selected overrides button.';
+					picks.push({ box: box, o: o });
+					box.addEventListener('change', function () {
+						clearSel.disabled = !picks.some(function (p) { return p.box.checked; });
+					});
+					td = ffEl('td', null, null, row);
 					if (o.id !== null) {
 						if (o.asset) { td.appendChild(document.createTextNode(o.asset + ' ')); }
 						if (o.gone) { td.appendChild(document.createTextNode(o.id)); }
@@ -78316,11 +78432,77 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					}
 					c = ffCell(row, o.inherited, 'lpn-ovl-inherited');
 					if (o.inhTip) { c.title = o.inhTip; }
+					td = ffEl('td', 'lpn-ovl-act', null, row);
+					b = ffEl('button', 'lpn-ovl-clear', pc.lpn_pane_clear_override || 'Clear override', td);
+					b.type = 'button';
+					b.addEventListener('click', function () { clearNow([o.item]); });
 				});
 			});
 			initTipsIn(body);
+			if (scroll) { body.scrollTop = scroll; }
 		}, [{ label: pc.lpn_dialog_ok || 'OK', isDefault: true, cancel: true, fn: function () { } }],
-		{ title: (pc.lpn_ovl_title || 'Overrides: {name}').replace('{name}', scenarioDisplayName(scn)) });
+		{ title: (pc.lpn_ovl_title || 'Manage overrides: {name}').replace('{name}', scenarioDisplayName(scn)) });
+	}
+	/**
+	 * **CLEAR THESE OWN OVERRIDES** (items of ownOverrideItems(scn)), each from the holder it is stored
+	 * in, so the value is what the scenario inherits again. One undo step for the lot, then everything
+	 * a scenario switch redraws: the map and its marks, Properties, the Tables pane, the graphs, the
+	 * manager and its counts. Answers whether anything was cleared.
+	 */
+	function ovlClearItems(scn, items) {
+		var did = false, labels = false, has = Object.prototype.hasOwnProperty;
+		if (!scn || !items || !items.length) { return false; }
+		saveUndoSnapshot();
+		items.forEach(function (it) {
+			var map, ov, cat, t;
+			if (it.key !== undefined) {
+				map = it.kind === 'scn' ? it.obj.overrides : it.obj.values;
+				ov = plainObject(map) ? map[it.key] : null;
+				if (!plainObject(ov) || !has.call(ov, it.prop)) { return; }
+				delete ov[it.prop];
+				if (!Object.keys(ov).length) { delete map[it.key]; }
+				if (it.kind === 'alt' && !Object.keys(map).length) { delete it.obj.values; }
+				if (ovKeyGroup(it.key) === 'label') { labels = true; }
+				did = true;
+				return;
+			}
+			if (ovlIsBubbleSet(it)) { if (ovlClearBubble(it)) { did = true; } return; }
+			cat = it.cat;
+			t = writeTargetFor(scn, cat);
+			// Where the Settings table would clear it (its own scenario's write target): its rule, the
+			// friction method's dependents and a held view's release included.
+			if (t && t.obj === it.obj) {
+				if (settingRowClear({ path: it.path, cat: cat, home: it.path.join('.') === 'settings.hydraulics.demandMultiplier' ? 'dm' :
+					(it.path[0] === 'times' && it.path.length === 2 && LPN_SCENARIO_TIME_KEYS.indexOf(it.path[1]) >= 0 && it.kind !== 'alt' ? 'time2' : '') }, scn)) { did = true; }
+				return;
+			}
+			// A stray value in a holder the scenario no longer writes to (an older reader's).
+			if (it.path.join('.') === 'settings.hydraulics.demandMultiplier' && it.kind !== 'alt') { delete it.obj.demandMultiplier; did = true; return; }
+			if (it.path[0] === 'times' && it.path.length === 2 && it.kind !== 'alt' && scenarioTimeValue(it.obj, it.path[1]) !== undefined) { setScenarioTime(it.obj, it.path[1], ''); did = true; return; }
+			settingDelete(it.obj, it.path);
+			did = true;
+		});
+		touchTree('ovlClearItems');
+		if (!did) { if (undoStack.length) { undoStack.pop(); } return false; }
+		if (labels) { relayoutLabels(); }
+		settingTableAfterEditNow();
+		smAfter(false, false);
+		return true;
+	}
+	// One graph back to what the scenario inherits: one opened here goes, one closed here comes back,
+	// one changed here takes the inherited place, size and quantity. A set left equal to the inherited
+	// one is no override any more, so it goes whole; so does the held set's own row.
+	function ovlClearBubble(it) {
+		var o = it.obj, list = plainObject(o.settings) && Array.isArray(o.settings.bubbles) ? o.settings.bubbles : null, b = it.bubble, from = it.inhList || [], i, sig;
+		if (!list) { return false; }
+		if (b) {
+			for (i = list.length - 1; i >= 0; i--) { if (list[i] && list[i].id === b.id) { list.splice(i, 1); } }
+			if (b.inh) { list.push(altCopy(b.inh)); }
+			sig = function (l) { return tsbClean(l).map(ovlBubbleSig).sort().join('|'); };
+			if (sig(list) !== sig(from)) { return true; }
+		}
+		settingDelete(o, ['bubbles']);
+		return true;
 	}
 	// An alternative (or calculation set) is copied beside itself; a scenario is copied from the
 	// Scenarios menu, in Basic mode (copyCurrentScenario()).
