@@ -3441,9 +3441,9 @@
             "answer": "OK."
         },
         "lpn_mode_add_chain": {
-            "on": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.",
-            "ruled": "2026-10-05",
-            "answer": "OK."
+            "on": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-16",
+            "answer": "Approved. (proposal: \"labels and Text\")"
         },
         "lpn_mode_add_meter": {
             "on": "Customer: click where the customer is, then click the pipe or the node that serves it. Or use Esc to cancel.",
@@ -5713,6 +5713,66 @@
             "on": "Split pipe {id} at this node?",
             "ruled": "2026-10-10",
             "answer": "I agree with Bentley that \"split\" is better than \"break\"."
+        },
+        "lpn_mode_select": {
+            "on": "Mode: Select. Select an asset, a label, or a Text to see or change it. Drag to move a node, a label, or a Text. Use the Vertices tool to add or remove the bends in a pipe.",
+            "ruled": "2026-10-16",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_add_junction": {
+            "on": "Mode: Add Junction. Specify a location on the map to place a junction. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-16",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_add_reservoir": {
+            "on": "Mode: Add Reservoir. Specify a location on the map to place a reservoir. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-16",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_add_tank": {
+            "on": "Mode: Add Tank. Specify a location on the map to place a tank. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-16",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_add_pipe": {
+            "on": "Mode: Add Pipe. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-16",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_add_pump": {
+            "on": "Mode: Add Pump. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-16",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_add_valve": {
+            "on": "Mode: Add Valve. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-16",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_add_text": {
+            "on": "Mode: Add Text. Specify a location on the map to place a Text. Specify a location near a node to attach the Text to that node. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-16",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_time_run_stopped_kept": {
+            "on": "The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.",
+            "ruled": "2026-10-16",
+            "answer": "Approved."
+        },
+        "lpn_time_stat_stopped": {
+            "on": "{statistic} not shown: the run stopped before the end of the period.",
+            "ruled": "2026-10-16",
+            "answer": "Approved."
+        },
+        "lpn_time_stopped_no_quality": {
+            "on": "No water quality results were computed, because the quality analysis starts after the hydraulic run ends.",
+            "ruled": "2026-10-16",
+            "answer": "Approved."
+        },
+        "lpn_energy_stopped": {
+            "on": "The EPANET run stopped before the end of the period, so no pump energy results were computed.",
+            "ruled": "2026-10-16",
+            "answer": "Revised. Does that work? If not, correct and try again."
         }
     }
 }

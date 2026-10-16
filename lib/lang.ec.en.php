@@ -2832,7 +2832,7 @@ $ec_lang['lpn_pump_effic_unstated']='This pump refers to an efficiency curve cal
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_mode_select']='Mode: Select. Select an asset or a label to see or change it. Drag to move a node or a label. Use the Vertices tool to add or remove the bends in a pipe.';
+$ec_lang['lpn_mode_select']='Mode: Select. Select an asset, a label, or a Text to see or change it. Drag to move a node, a label, or a Text. Use the Vertices tool to add or remove the bends in a pipe.';
 $ec_lang['lpn_mode_delete']='Mode: Delete. Select an asset to remove it.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_mode_vertices']='Mode: Vertices. The vertices of every pipe are shown as small square handles. Specify a point on a pipe to add a vertex, select a handle to remove it, or drag a handle to move it. Nothing else on the map can be changed in this mode.';
@@ -2840,16 +2840,16 @@ $ec_lang['lpn_mode_zoom_window']='Mode: Zoom window. Specify two opposite corner
 // One-shot notice when the Delete key is pressed with nothing picked (Task 415). It has to name the
 // gesture, because the whole point of the change is that the order is now subject, then verb.
 $ec_lang['lpn_select_first']='Nothing is selected. Select an asset on the map first, then press Delete.';
-$ec_lang['lpn_mode_add_junction']='Mode: Add Junction. Specify a location on the map to place a junction. Switch to Select mode to change or move assets and labels.';
-$ec_lang['lpn_mode_add_reservoir']='Mode: Add Reservoir. Specify a location on the map to place a reservoir. Switch to Select mode to change or move assets and labels.';
-$ec_lang['lpn_mode_add_tank']='Mode: Add Tank. Specify a location on the map to place a tank. Switch to Select mode to change or move assets and labels.';
-$ec_lang['lpn_mode_add_pipe']='Mode: Add Pipe. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets and labels.';
-$ec_lang['lpn_mode_add_pump']='Mode: Add Pump. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets and labels.';
-$ec_lang['lpn_mode_add_valve']='Mode: Add Valve. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets and labels.';
+$ec_lang['lpn_mode_add_junction']='Mode: Add Junction. Specify a location on the map to place a junction. Switch to Select mode to change or move assets, labels, and Text.';
+$ec_lang['lpn_mode_add_reservoir']='Mode: Add Reservoir. Specify a location on the map to place a reservoir. Switch to Select mode to change or move assets, labels, and Text.';
+$ec_lang['lpn_mode_add_tank']='Mode: Add Tank. Specify a location on the map to place a tank. Switch to Select mode to change or move assets, labels, and Text.';
+$ec_lang['lpn_mode_add_pipe']='Mode: Add Pipe. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.';
+$ec_lang['lpn_mode_add_pump']='Mode: Add Pump. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.';
+$ec_lang['lpn_mode_add_valve']='Mode: Add Valve. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.';
 // Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
 // sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
-$ec_lang['lpn_mode_add_text']='Mode: Add Text. Specify a location on the map to place a Text. Specify a location near a node to attach the Text to that node. Switch to Select mode to change or move assets and labels.';
-$ec_lang['lpn_mode_add_chain']='Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.';
+$ec_lang['lpn_mode_add_text']='Mode: Add Text. Specify a location on the map to place a Text. Specify a location near a node to attach the Text to that node. Switch to Select mode to change or move assets, labels, and Text.';
+$ec_lang['lpn_mode_add_chain']='Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets, labels, and Text.';
 $ec_lang['lpn_mode_add_shape']='Mode: Add Shape. Specify each point. Specify the last point again or press Enter to finish; specify the first point to close a polygon.';
 // Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
 // most likely to miss the point of -- that Select is what you use to edit/move things, and that a
@@ -3406,7 +3406,7 @@ $ec_lang['lpn_engine_refused_fallback']='The numbers on screen came from the bui
 $ec_lang['lpn_time_run_stopped']='The EPANET run stopped at {time}, so it has no results. Its run report says why.';
 $ec_lang['lpn_time_stat_stopped']='{statistic} not shown: the run stopped before the end of the period.';
 $ec_lang['lpn_time_stopped_no_quality']='No water quality results were computed, because the quality analysis starts after the hydraulic run ends.';
-$ec_lang['lpn_energy_stopped']='The EPANET run stopped before the end of the period, so no pump energy figures were kept.';
+$ec_lang['lpn_energy_stopped']='The EPANET run stopped before the end of the period, so no pump energy results were computed.';
 $ec_lang['lpn_time_run_stopped_kept']='The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.';
 // The run's own version of that last sentence: a period run has a moment and a tank level to name,
 // and a one-moment solve does not, which is where the shared label stops.

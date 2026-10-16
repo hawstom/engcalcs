@@ -70375,7 +70375,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (!sum && EngCalcs.lpnTimeRunStopped && EngCalcs.lpnTimeRunStopped()) {
 			ffEl('p', 'lpn-ff-note', pc.lpn_energy_stopped ||
-				'The EPANET run stopped before the end of the period, so no pump energy figures were kept.', host);
+				'The EPANET run stopped before the end of the period, so no pump energy results were computed.', host);
 			return;
 		}
 		if (!sum) {
