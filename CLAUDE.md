@@ -255,6 +255,8 @@ mismatch; (D) single-quoted values only.
 - **`$ec_lang_syn` is OFF-LIMITS to AI** without explicit written permission in that conversation.
   Propose a diff; Tom approves; then write. No standing carve-outs. Entries are synonyms that pass
   the substitution test.
+- **Suggestions only, no prohibitions.** A translator gets what a word means and what to call it,
+  never a "do not" line; a wrong translation means the definition needs fixing.
 - **Routing:** an English reader also stumbles → fix the English; English is fine but untranslatable
   → `$ec_lang_syn`; the concept recurs → `glossary.json`.
 - **Never rename a key by hand** — `php dev/scripts/rename_lang_key.php old new --apply`.

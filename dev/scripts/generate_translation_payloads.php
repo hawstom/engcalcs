@@ -227,10 +227,10 @@ function buildPayloads(array $opts, bool $quiet = false): array
                 // nothing the reader can find on the screen.
                 'placeholder_notes' => 'A word in curly braces ({n}, {ids}, {flow}, {iterations}, {name}) is a PLACEHOLDER the page replaces at runtime. Keep every one of them, spelled exactly as in English, braces included. Never translate the word inside the braces. You MAY move a placeholder to wherever your language needs it in the sentence.',
                 'control_name_notes' => 'Where an English string names a control, it names it in one of two shapes. A single control is written as its label followed by the widget word: "press the Calculate button", "the Recalculate automatically setting", "the Required fire flow box". A menu path is written as comma-separated labels: "File, Save as"; "Settings, Calculation, Hydraulics". In BOTH shapes the label is another key\'s value. Translate it with exactly the words you used for that key, so the sentence still names what is on the screen; translate the widget word and the surrounding prose normally.',
-                'glossary_notes' => 'glossary lists the defined technical terms that the strings in this batch use, each with your language\'s preferred translation where one exists, what the term MEANS, and what NOT to render it as. Use the preferred translation wherever the term appears. A DO NOT line forbids a physical error or a lazy transliteration, never a term that is your language\'s genuine standard.',
+                'glossary_notes' => 'glossary lists the defined technical terms that the strings in this batch use, each with your language\'s preferred translation where one exists, and what the term MEANS. Use the preferred translation wherever the term appears, unless your language\'s genuine standard term is better; then use that and say so in your report.',
                 'context_notes' => 'Use key_context[key].neighbors to keep register consistent with nearby translated strings. key_context[key].tip is the help text shown for that label, and key_context[key].label is the label a tip explains: read the pair together, and give the same thing the same word in both. Where the partner already has a translation in your file, its value is shown.',
                 'syn_notes' => 'key_syn[key] gives other English wordings of that one string; any of them could stand in its place. Use whichever your language expresses most naturally and compactly; you are not bound to the literal English wording.',
-                'key_notes_notes' => 'key_notes[key] are instructions about that one string: how much room it has, a sense it must not be read in, symbols to keep exactly. Obey them. They are instructions to you, never text to put in your file.',
+                'key_notes_notes' => 'key_notes[key] are notes about that one string: how much room it has, symbols to keep exactly, what it refers to. Follow them. They are instructions to you, never text to put in your file.',
                 'suggestion_box_notes' => 'Read suggestion_box and follow it. It is part of your instructions, not a footnote: a sprint does not close while a translator complaint is unanswered.',
                 'concept_notes' => 'Read concept_source and follow it. key_concepts lists, for a key that names a defined concept, the definition you translate from; English is one rendering of it.',
             ],
@@ -498,9 +498,6 @@ function collectKeyConcepts(array $deltaKeys, array $keyConcepts, array $synMap,
             if (($term['symbol'] ?? '') !== '') {
                 $entry['symbol'] = (string)$term['symbol'];
             }
-            if (!empty($term['avoid']) && is_array($term['avoid'])) {
-                $entry['avoid'] = array_values($term['avoid']);
-            }
             $entries[] = $entry;
         }
         if ($entries) {
@@ -625,7 +622,7 @@ function splitSynCommentary(string $commentary, array $knownTags): array
  * rendered as the plain instructions a translator needs, one string per instruction:
  *
  *   layout/runtime: <value>  -> "Layout (<value>): <the table's full instruction>"
- *   avoid: <sense>           -> "Avoid: <sense>. <the table's instruction>" (several avoids merge)
+ *   avoid: <sense>           -> not sent: suggestions only, no prohibitions (Tom, 2026-10-16)
  *   symbol                   -> "Symbol: <the table's instruction>"
  *   gloss: <term>            -> nothing here; the term already arrives through key_concepts and glossary
  *   free prose               -> "Note: <prose>"
@@ -646,8 +643,9 @@ function collectKeyNotes(array $deltaKeys, array $synMap, array $tagTable): arra
         if ($pipe === false) {
             continue;
         }
+        // SUGGESTIONS ONLY, NO PROHIBITIONS (Tom, 2026-10-16): an `avoid:` tag stays in the file,
+        // unsent. "We are masking our poor definitions with often very wrong prohibitions."
         $notes = [];
-        $avoids = [];
         foreach (splitSynCommentary(substr($syn, $pipe + 1), $known) as [$tag, $value, $raw]) {
             if ($tag === '') {
                 $notes[] = 'Note: ' . $raw;
@@ -657,18 +655,11 @@ function collectKeyNotes(array $deltaKeys, array $synMap, array $tagTable): arra
                 continue;
             }
             if ($tag === 'avoid') {
-                if ($value !== '') {
-                    $avoids[] = rtrim($value, '. ');
-                }
                 continue;
             }
             $instruction = $tagTable[$tag][$value] ?? $tagTable[$tag]['*'] ?? '';
             $label = ucfirst($tag) . ($value !== '' ? ' (' . $value . ')' : '');
             $notes[] = $instruction !== '' ? $label . ': ' . $instruction : $label;
-        }
-        if ($avoids) {
-            $instruction = $tagTable['avoid']['*'] ?? '';
-            array_unshift($notes, 'Avoid: ' . implode('; ', $avoids) . '.' . ($instruction !== '' ? ' ' . $instruction : ''));
         }
         if ($notes) {
             $out[$key] = $notes;
@@ -978,11 +969,6 @@ function buildPromptContext(array $terms, string $language): string
         $definition = trim((string)($term['definition'] ?? ''));
         if ($definition !== '') {
             $line .= "\n    MEANS: " . $definition;
-        }
-
-        $avoid = $term['avoid'] ?? [];
-        if (is_array($avoid) && count($avoid) > 0) {
-            $line .= "\n    DO NOT render as: " . implode('; ', $avoid);
         }
 
         $lines[] = $line;

@@ -74,14 +74,12 @@ English and need retranslating from the new wording.
 ## Terminology
 
 - `glossary` lists the technical terms this batch's strings use, with the **preferred
-  translation** for this language, what each MEANS, and what NOT to render it as. Use the
-  preferred translations. **A DO NOT entry forbids a physical/structural error or a lazy transliteration — it never
-  forbids a term that is genuinely your language's dominant standard.** We defer to your
-  language's own professional convention; we are not the judges of your terminology.
-- **Do not phonetically transliterate an English technical word** when a real term exists in
-  your language. If your language's engineers genuinely use the English loanword, that is
-  fine and correct — but reaching for a transliteration because the concept is hard is the
-  single most common defect in past sprints.
+  translation** for this language and what each MEANS. Use the preferred translations, unless
+  your language's own professional standard term is better: then use that and say so in your
+  report. We defer to your language's convention; we are not the judges of your terminology.
+- **Use the term your language's engineers actually use.** Where they use the English loanword,
+  that is correct. A word spelled out from English because the concept is hard has been the most
+  common defect in past sprints, so read every new loanword back in your language.
 - `key_syn`, when present, gives alternate English wordings of that label. Any of them could
   stand on the control. Pick whichever re-compresses most naturally in your language; you are
   not bound to the literal English wording.

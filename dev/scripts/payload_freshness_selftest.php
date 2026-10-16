@@ -130,7 +130,9 @@ if (!is_array($p)) {
         foreach ($list as $n) { if (strpos((string)$n, $prefix) === 0) { return true; } }
         return false;
     };
-    $shape($starts($notes, 'Avoid: '), 'the syn avoid: tag reaches key_notes as "Avoid: ..." (the bus-station warning)');
+    // SUGGESTIONS ONLY, NO PROHIBITIONS (Tom, 2026-10-16): an avoid: tag and a glossary avoid list stay unsent.
+    $shape(!$starts($notes, 'Avoid: '), 'the syn avoid: tag is NOT sent (suggestions only, no prohibitions)');
+    $shape(strpos((string)($p['glossary'] ?? ''), 'DO NOT') === false, 'the glossary carries no DO NOT line');
     $shape($starts($notes, 'Layout (column heading): '), 'the layout: tag reaches key_notes as its full instruction');
     $shape(isset($p['key_syn']['mi_station']) && strpos($p['key_syn']['mi_station'], '|') === false,
         'key_syn carries the synonyms only, never the commentary');
