@@ -415,16 +415,16 @@
 	 *           skipped: [{ name, why: 'network' | 'geometry' | 'position' }], holes, multipart }
 	 *      or { ok: false, detail }.
 	 */
-	EngCalcs.lpnGeoJsonShapes = function (text) {
-		var root2, out = [], skipped = [], holes = 0, multipart = 0;
-		try {
-			root2 = JSON.parse(String(text), function (key, value, ctx) {
-				if (typeof value === 'number' && ctx && typeof ctx.source === 'string') {
-					return new Num(value, ctx.source);
-				}
-				return value;
-			});
-		} catch (e) { return { ok: false, detail: String(e && e.message ? e.message : e) }; }
+	EngCalcs.lpnGeoJsonShapes = function (text, preRead) {
+		var root2, out = [], skipped = [], holes = 0, multipart = 0, rd;
+		// `preRead` is a tree readJson() already made (the network import hands over its Shape
+		// features this way, so their characters are not lost to a second JSON.stringify).
+		if (preRead) { root2 = preRead; }
+		else {
+			rd = readJson(text);
+			if (!rd.ok) { return { ok: false, detail: rd.detail }; }
+			root2 = rd.value;
+		}
 		function n(v) { return v instanceof Num ? v.v : v; }
 		function tokOf(v) { return v instanceof Num ? v.t : (typeof v === 'number' ? String(v) : undefined); }
 		function plain(v) {
@@ -521,6 +521,712 @@
 		});
 		return { ok: true, shapes: out, skipped: skipped, holes: holes, multipart: multipart };
 	};
+	// =============================================================================================
+	// **IMPORT A GeoJSON FILE AS A NETWORK** (ROADMAP Task 728, import half; Tom, 2026-10-06: *"yes
+	// to shapefile + GeoJSON import behind one mapping step"*). Pure: the page builds the document
+	// and shows the dialog and the report. dev/geojson.md holds the rules; in short:
+	//
+	//   - A file this suite wrote (`lwn.format`) is read by its own schema, the one the writer above
+	//     states, and comes back as the network it was: the same IDs, kinds, values, characters and
+	//     positions. Nothing is asked.
+	//   - Any other file goes through ONE mapping step: the page shows the attribute fields found
+	//     on its points and its lines, the user says which property each fills and what unit a
+	//     number is in, and lpnGeoJsonNetBuild() makes junctions from the points and pipes from the
+	//     lines. A line end that lands on no point within the stated tolerance gets a junction of
+	//     its own; a LineString's interior positions become the pipe's bends.
+	//   - RFC 7946 section 4: positions are WGS 84 longitude and latitude. A legacy `crs` member
+	//     naming CRS84 or EPSG:4326 is that frame and is read, and said; one naming any other frame
+	//     is refused with its name, because a guess would place the network somewhere false.
+	//   - **NOTHING IS DROPPED OR CHANGED WITHOUT BEING NAMED.** Every feature not imported, every
+	//     ID changed, every junction added, every line end moved and every default used is a note
+	//     with the IDs it concerns, and the page lists every note.
+	//   - **THE NUMBERS ARE THE USER'S CHARACTERS.** Every number keeps the text it was written as
+	//     in a `tok` bag beside it, under the key the `.inp` and GeoJSON writers read.
+	// =============================================================================================
+
+	var GJ_TYPES = { Point: 'point', MultiPoint: 'point', LineString: 'line', MultiLineString: 'line' };
+	// The legacy names (GeoJSON 2008 section 3) for the one frame RFC 7946 allows.
+	var GJ_WGS84 = /^(urn:ogc:def:crs:OGC:1\.3:CRS84|urn:ogc:def:crs:OGC::CRS84|OGC:CRS84|CRS:?84|urn:ogc:def:crs:EPSG:[0-9.]*:4326|EPSG:+4326|https?:\/\/www\.opengis\.net\/def\/crs\/(OGC\/1\.3\/CRS84|EPSG\/0\/4326))$/i;
+	// What the writer above puts on every feature. A file of ours whose features carry any other
+	// key carries it as a custom property and says so.
+	var GJ_OURS_NODE = ['name', 'node_type', 'description', 'elevation', 'base_demand', 'demand_pattern',
+		'demand_pattern_name', 'demand_rows', 'base_head', 'head_pattern', 'head_pattern_name',
+		'base_elevation', 'init_level', 'min_level', 'max_level', 'tank_diameter', 'vol_curve',
+		'vol_curve_name', 'min_vol', 'units', 'has_results', 'head', 'pressure', 'demand'];
+	var GJ_OURS_LINK = ['name', 'link_type', 'start_node_name', 'end_node_name', 'description', 'length',
+		'diameter', 'roughness', 'minor_loss', 'initial_status', 'pipe_type', 'pump_type', 'pump_curve',
+		'pump_curve_name', 'base_speed', 'speed_pattern', 'speed_pattern_name', 'valve_type',
+		'pressure_setting', 'flow_setting', 'throttle_setting', 'headloss_curve', 'headloss_curve_name',
+		'valve_status', 'units', 'has_results', 'flowrate', 'headloss', 'unit_headloss', 'velocity'];
+	var GJ_RESULT_KEYS = { head: 1, pressure: 1, demand: 1, flowrate: 1, headloss: 1, unit_headloss: 1, velocity: 1 };
+	var GJ_FORMULA_BACK = { 'H-W': 'hw', 'D-W': 'dw', 'C-M': 'manning' };
+	// A decimal number written as text, which a GIS often does with a numeric column.
+	var GJ_NUMERIC_TEXT = /^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/;
+	// The page's own ID rule (validateNewId(): no white space, no quotation marks).
+	function gjIdOk(s) { return typeof s === 'string' && s !== '' && !/[\s'"]/.test(s); }
+
+	function gjPlain(v) {
+		var o, k;
+		if (v instanceof Num) { return v.v; }
+		if (Array.isArray(v)) { return v.map(gjPlain); }
+		if (v && typeof v === 'object') { o = {}; for (k in v) { if (Object.prototype.hasOwnProperty.call(v, k)) { o[k] = gjPlain(v[k]); } } return o; }
+		return v;
+	}
+	/** A property value as a number and its characters, or null where it states none or no number. */
+	function gjNumber(v) {
+		var t;
+		if (v instanceof Num) { return { v: v.v, t: v.t }; }
+		if (typeof v === 'string') {
+			t = v.trim();
+			if (GJ_NUMERIC_TEXT.test(t)) { return { v: Number(t), t: t }; }
+		}
+		return null;
+	}
+	function gjBlank(v) { return v === undefined || v === null || (typeof v === 'string' && v.trim() === ''); }
+	/** A property value as the text it was written as. */
+	function gjText(v) {
+		if (v instanceof Num) { return v.t; }
+		if (typeof v === 'string') { return v; }
+		if (v === null || v === undefined) { return ''; }
+		return JSON.stringify(gjPlain(v));
+	}
+	/** [lon, lat] as { lon, lat, tok: {x, y}, z }, or null where it is not a longitude and latitude. */
+	function gjPos(c) {
+		var lon, lat, p;
+		if (!Array.isArray(c) || c.length < 2 || !(c[0] instanceof Num) || !(c[1] instanceof Num)) { return null; }
+		lon = c[0].v; lat = c[1].v;
+		if (!(lon >= -180 && lon <= 180 && lat >= -90 && lat <= 90)) { return null; }
+		p = { lon: lon, lat: lat, tok: { x: c[0].t, y: c[1].t } };
+		if (c.length > 2 && c[2] instanceof Num) { p.z = c[2].v; }
+		return p;
+	}
+	function gjCrsName(crs) {
+		var p;
+		if (!crs || typeof crs !== 'object') { return String(gjPlain(crs)); }
+		p = crs.properties || {};
+		if (p.name !== undefined) { return String(gjPlain(p.name)); }
+		if (p.code !== undefined) { return 'EPSG:' + gjPlain(p.code); }
+		if (p.href !== undefined) { return String(gjPlain(p.href)); }
+		return JSON.stringify(gjPlain(crs));
+	}
+	function gjFeatures(root) {
+		if (!root || typeof root !== 'object' || Array.isArray(root)) { return null; }
+		if (root.type === 'FeatureCollection') { return Array.isArray(root.features) ? root.features : null; }
+		if (root.type === 'Feature') { return [root]; }
+		if (typeof root.type === 'string') { return [{ type: 'Feature', geometry: root, properties: null }]; }
+		return null;
+	}
+
+	/**
+	 * **READ THE FILE, AND SAY WHAT IS IN IT.** Returns
+	 *   { ok: false, error: 'unreadable' | 'crs' | 'empty', detail }
+	 *   { ok: true, ours, crsNamed, feats, counts: { point, line, other }, fields: { point: [...],
+	 *     line: [...] } }, each field { name, numeric, count, sample } in the order first seen.
+	 */
+	EngCalcs.lpnGeoJsonNetScan = function (text) {
+		var rd = readJson(text), root, feats, crsNamed = '', bad = '', counts = { point: 0, line: 0, other: 0 },
+			fields = { point: [], line: [] }, seen = { point: {}, line: {} }, i;
+		if (!rd.ok) { return { ok: false, error: 'unreadable', detail: rd.detail }; }
+		root = rd.value;
+		feats = gjFeatures(root);
+		if (!feats) { return { ok: false, error: 'unreadable', detail: 'no GeoJSON type member' }; }
+		// The legacy member, on the collection or on any feature (GeoJSON 2008 allowed both).
+		function crsCheck(obj) {
+			var name;
+			if (!obj || typeof obj !== 'object' || obj.crs === undefined || obj.crs === null) { return; }
+			name = gjCrsName(obj.crs);
+			if (GJ_WGS84.test(name.trim())) { crsNamed = crsNamed || name; }
+			else if (!bad) { bad = name; }
+		}
+		crsCheck(root);
+		for (i = 0; i < feats.length; i++) { crsCheck(feats[i]); }
+		if (bad) { return { ok: false, error: 'crs', detail: bad }; }
+		feats.forEach(function (f) {
+			var kind = (f && f.geometry && GJ_TYPES[f.geometry.type]) || 'other', pr, k, rec, nv;
+			counts[kind]++;
+			if (kind === 'other') { return; }
+			pr = (f.properties && typeof f.properties === 'object') ? f.properties : {};
+			for (k in pr) {
+				if (!Object.prototype.hasOwnProperty.call(pr, k)) { continue; }
+				rec = seen[kind][k];
+				if (!rec) { rec = seen[kind][k] = { name: k, numeric: true, count: 0, sample: '' }; fields[kind].push(rec); }
+				if (gjBlank(pr[k])) { continue; }
+				rec.count++;
+				nv = gjNumber(pr[k]);
+				if (!nv) { rec.numeric = false; }
+				if (rec.sample === '') { rec.sample = gjText(pr[k]); }
+			}
+		});
+		fields.point.concat(fields.line).forEach(function (r) { if (!r.count) { r.numeric = false; } });
+		if (!counts.point && !counts.line) { return { ok: false, error: 'empty', detail: '' }; }
+		return {
+			ok: true, root: root, feats: feats, crsNamed: crsNamed, counts: counts, fields: fields,
+			ours: !!(root.lwn && gjPlain(root.lwn.format) === 'LibreWaterNet GeoJSON')
+		};
+	};
+
+	// ---- the mapping step's targets, and the guesses ----
+	// A target's family is the units-strip selector its numbers are stated in.
+	EngCalcs.lpnGeoJsonNetTargets = {
+		point: [
+			{ id: 'id' }, { id: 'nodeType' }, { id: 'elev', family: 'lpn_u_elevhead' },
+			{ id: 'demand', family: 'lpn_u_flow' }, { id: 'desc' }, { id: 'custom' }, { id: 'skip' }
+		],
+		line: [
+			{ id: 'id' }, { id: 'diameter', family: 'lpn_u_diameter' }, { id: 'roughness', family: 'lpn_u_roughness' },
+			{ id: 'length', family: 'lpn_u_length' }, { id: 'k' }, { id: 'status' }, { id: 'desc' },
+			{ id: 'custom' }, { id: 'skip' }
+		]
+	};
+	// Names a utility layer uses, lower case with `_` and spaces removed, best first. GIS internal
+	// columns (OBJECTID, Shape_Length, which is in the file's own map units) are never guessed.
+	var GJ_GUESS = {
+		point: [
+			['id', /^(name|id|nodeid|nodename|assetid|facilityid|gisid|junctionid|label)$/],
+			['nodeType', /^(nodetype|epanettype|elementtype)$/],
+			['elev', /^(elevation|elev|z|groundelevation|groundelev|grndelev|gndelev|elevft|elevm|elevationft|elevationm)$/],
+			['demand', /^(basedemand|demand|avgdemand|averagedemand|demandgpm|demandlps)$/],
+			['desc', /^(description|desc|comment|comments|notes|note)$/]
+		],
+		line: [
+			['id', /^(name|id|pipeid|pipename|linkid|assetid|facilityid|gisid|label)$/],
+			['diameter', /^(diameter|diam|dia|size|pipesize|nomdiam|nomdia|nominaldiameter|diameterin|diameterinch|diammm|diameterinmm|diain|diamin)$/],
+			['roughness', /^(roughness|rough|cfactor|hwc|hazenc|hazenwilliamsc|c)$/],
+			['length', /^(length|len|pipelength|lengthft|lengthm)$/],
+			['k', /^(minorloss|minorlosscoefficient|mloss|k|km)$/],
+			['status', /^(status|initialstatus)$/],
+			['desc', /^(description|desc|comment|comments|notes|note)$/]
+		]
+	};
+	// A unit stated at the end of a field name (`diam_in`, `elev_ft`, `demand_lps`), for each family.
+	var GJ_UNIT_SUFFIX = {
+		lpn_u_elevhead: { ft: 'fth2o', feet: 'fth2o', m: 'mh2o', meters: 'mh2o', metres: 'mh2o' },
+		lpn_u_length: { ft: 'ft', feet: 'ft', m: 'm', meters: 'm', metres: 'm', km: 'km', mi: 'mi' },
+		lpn_u_diameter: { in: 'in', inch: 'in', inches: 'in', mm: 'mm', cm: 'cm', m: 'm' },
+		lpn_u_flow: { gpm: 'gpm', mgd: 'mgd', cfs: 'ft3ps', lps: 'lps', ls: 'lps', lpm: 'lpm', cmh: 'cmh', cmd: 'cmd', mld: 'mld' },
+		lpn_u_roughness: { ft: 'ft', mm: 'mm', m: 'm', in: 'in' }
+	};
+	/**
+	 * The mapping the dialog opens on: each field's best guess by name (a target only once per
+	 * kind; the first field to match it takes it), every other field kept as a custom property.
+	 * `unitsNow` is the open project's unit per family, the default where a name states none;
+	 * `unitsOffered` lists the names each family's selector offers.
+	 * Returns { point: { field: target }, line: { field: target }, units: { 'point:field': name } }.
+	 */
+	EngCalcs.lpnGeoJsonNetGuess = function (scan, unitsNow, unitsOffered) {
+		var out = { point: {}, line: {}, units: {} };
+		unitsNow = unitsNow || {}; unitsOffered = unitsOffered || {};
+		['point', 'line'].forEach(function (kind) {
+			var taken = {};
+			(scan.fields[kind] || []).forEach(function (f) {
+				var key = String(f.name).toLowerCase().replace(/[\s_\-.]/g, ''), g = 'custom', i, rule;
+				for (i = 0; i < GJ_GUESS[kind].length; i++) {
+					rule = GJ_GUESS[kind][i];
+					if (!taken[rule[0]] && rule[1].test(key)) { g = rule[0]; break; }
+				}
+				// A numeric target wants numbers; a column of text is kept rather than misread.
+				var tg = EngCalcs.lpnGeoJsonNetTargets[kind].filter(function (t) { return t.id === g; })[0];
+				if (tg && tg.family && !f.numeric) { g = 'custom'; tg = null; }
+				if (g !== 'custom') { taken[g] = true; }
+				out[kind][f.name] = g;
+				if (tg && tg.family) {
+					var m = /[_\s\-.]([a-z]+)$/i.exec(String(f.name)), u = null, sfx = m ? m[1].toLowerCase() : '';
+					if (sfx && GJ_UNIT_SUFFIX[tg.family] && GJ_UNIT_SUFFIX[tg.family][sfx]) { u = GJ_UNIT_SUFFIX[tg.family][sfx]; }
+					if (u && unitsOffered[tg.family] && unitsOffered[tg.family].indexOf(u) < 0) { u = null; }
+					out.units[kind + ':' + f.name] = u || unitsNow[tg.family] || null;
+				}
+			});
+		});
+		return out;
+	};
+
+	/** One curve field ("(0, 104), (2000, 92)") as [[x, y], ...], or null where it does not read. */
+	function gjCurvePoints(s) {
+		var re = /\(\s*([^,()\s]+)\s*,\s*([^,()\s]+)\s*\)/g, m, pts = [], rest;
+		if (typeof s !== 'string') { return null; }
+		rest = s.replace(re, function (all, x, y) {
+			if (!GJ_NUMERIC_TEXT.test(x) || !GJ_NUMERIC_TEXT.test(y)) { pts = null; return all; }
+			if (pts) { pts.push([Number(x), Number(y)]); }
+			return '';
+		});
+		m = rest.replace(/[\s,]/g, '');
+		return (pts && pts.length && m === '') ? pts : null;
+	}
+
+	/**
+	 * **BUILD THE NETWORK.** `scan` from lpnGeoJsonNetScan(); `opts`:
+	 *   .mapping    lpnGeoJsonNetGuess()'s shape, as the user left it (not read for a file of ours)
+	 *   .units      the unit per family the user chose (a file of ours states its own)
+	 *   .tolerance  metres within which a line end joins a point or another line end
+	 *   .prefixes   the ID prefix per kind letter (J, L), for an ID made here
+	 *   .defaults   the new-asset values (nodeElev, demand, diameter, roughness, k, tankLevel,
+	 *               tankMinLevel, tankMaxLevel, tankDiameter), in the units the project will have
+	 *   .method     the friction method the project will have (a file of ours states its own)
+	 * Returns { ok: true, ours, nodes, links, shapes, patterns, curves, customProps, units, method,
+	 *   notes: [{ code, ids, detail }], counts } in the saved document's frame: x is the longitude,
+	 *   y the latitude, each with the characters it was written as in `tok`.
+	 */
+	EngCalcs.lpnGeoJsonNetBuild = function (scan, opts) {
+		opts = opts || {};
+		return scan.ours ? gjBuildOurs(scan, opts) : gjBuildMapped(scan, opts);
+	};
+
+	function gjNotes() {
+		var list = [], at = {};
+		return {
+			list: list,
+			add: function (code, id, detail) {
+				var n = at[code];
+				if (!n) { n = at[code] = { code: code, ids: [], detail: detail === undefined ? '' : detail }; list.push(n); }
+				if (id !== undefined && id !== null) { n.ids.push(String(id)); }
+				return n;
+			}
+		};
+	}
+	function gjCustomKey(field) {
+		var k = String(field).replace(/\s+/g, '');
+		while (k.indexOf('custom_') === 0) { k = k.slice(7); }
+		return 'custom_' + k;
+	}
+	function gjCustomDefs(byKey) {
+		return Object.keys(byKey).map(function (key) {
+			return { key: key, label: byKey[key].label || '', applies: Object.keys(byKey[key].letters).join(','), validate: 'none',
+				restrictMode: 'allow', restrict: '', minLength: '', maxLength: '', low: '', high: '' };
+		});
+	}
+	var GJ_TYPE_LETTER = { junction: 'J', reservoir: 'R', tank: 'T', pipe: 'L', pump: 'P', valve: 'V' };
+
+	// ---- a file this suite wrote ----
+	function gjBuildOurs(scan, opts) {
+		var notes = gjNotes(), meta = gjPlain(scan.root.lwn) || {}, nodes = [], links = [], shapeFeats = [],
+			nodeById = {}, linkIds = {}, patterns = [], patById = {}, curves = [], curveById = {}, custom = {},
+			counts = { junction: 0, reservoir: 0, tank: 0, pipe: 0, pump: 0, valve: 0, shape: 0 }, hadResults = false;
+		if (scan.crsNamed) { notes.add('crs-named', null, scan.crsNamed); }
+		function num(pr, key, dst, dkey) {
+			var n = gjNumber(pr[key]);
+			if (!n) { return; }
+			dst[dkey] = n.v;
+			(dst.tok = dst.tok || {})[dkey] = n.t;
+		}
+		function text(pr, key) { return gjBlank(pr[key]) ? '' : gjText(pr[key]); }
+		function pattern(pr, field, id) {
+			var src = pr[field], parts, pt, mult = [], tok = {}, k, same;
+			if (!id) { return; }
+			if (gjBlank(src)) { return; }
+			parts = String(gjText(src)).trim().split(/\s+/);
+			for (k = 0; k < parts.length; k++) {
+				if (!GJ_NUMERIC_TEXT.test(parts[k])) { notes.add('value-unread', id + ' ' + field + ': ' + gjText(src)); return; }
+				mult.push(Number(parts[k])); tok['m' + k] = parts[k];
+			}
+			pt = patById[id];
+			if (!pt) { pt = patById[id] = { id: id, multipliers: mult, tok: tok }; patterns.push(pt); return; }
+			same = pt.multipliers.length === mult.length && pt.multipliers.every(function (m, i) { return m === mult[i]; });
+			if (!same) { notes.add('pattern-conflict', id); }
+		}
+		function curve(pr, field, id, kind, owner) {
+			var pts;
+			if (!id || gjBlank(pr[field])) { return; }
+			pts = gjCurvePoints(gjText(pr[field]));
+			if (!pts) { notes.add('value-unread', owner + ' ' + field + ': ' + gjText(pr[field])); return; }
+			if (!curveById[id]) { curveById[id] = { id: id, kind: kind, points: pts }; curves.push(curveById[id]); }
+		}
+		function extras(pr, el, known) {
+			var k, key;
+			for (k in pr) {
+				if (!Object.prototype.hasOwnProperty.call(pr, k) || known.indexOf(k) >= 0 || gjBlank(pr[k])) { continue; }
+				key = k.indexOf('custom_') === 0 ? k : gjCustomKey(k);
+				if (key !== k) { notes.add('field-custom', k); }
+				el['_' + key] = gjText(pr[k]);
+				custom[key] = custom[key] || { letters: {} };
+				custom[key].letters[GJ_TYPE_LETTER[el.type]] = 1;
+			}
+		}
+		scan.feats.forEach(function (f, idx) {
+			var pr = (f && f.properties && typeof f.properties === 'object') ? f.properties : {},
+				g = f && f.geometry, label = text(pr, 'name') || ('#' + (idx + 1)), nt, lt;
+			if (gjPlain(pr.element) === 'Shape') { shapeFeats.push(f); return; }
+			nt = String(gjPlain(pr.node_type) || '').toLowerCase();
+			lt = String(gjPlain(pr.link_type) || '').toLowerCase();
+			if (pr.has_results === true) { hadResults = true; }
+			if (nt === 'junction' || nt === 'reservoir' || nt === 'tank') {
+				var p = (g && g.type === 'Point') ? gjPos(g.coordinates) : null, nd;
+				if (!g || g.type !== 'Point') { notes.add('skip-geometry', label); return; }
+				if (!p) { notes.add('skip-position', label); return; }
+				if (!gjIdOk(label) || nodeById[label]) { notes.add('skip-id', label); return; }
+				nd = { id: label, type: nt, x: p.lon, y: p.lat, tok: { x: p.tok.x, y: p.tok.y } };
+				if (text(pr, 'description')) { nd.desc = text(pr, 'description'); }
+				if (nt === 'junction') {
+					num(pr, 'elevation', nd, 'elev');
+					num(pr, 'base_demand', nd, '_demand');
+					if (nd._demand === undefined) { nd._demand = 0; }
+					if (text(pr, 'demand_pattern_name')) { nd.demandPattern = text(pr, 'demand_pattern_name'); }
+					pattern(pr, 'demand_pattern', nd.demandPattern);
+					if (gjNumber(pr.demand_rows) && gjNumber(pr.demand_rows).v > 1) { notes.add('demand-rows', label); }
+				} else if (nt === 'reservoir') {
+					num(pr, 'base_head', nd, '_head');
+					if (text(pr, 'head_pattern_name')) { nd.headPattern = text(pr, 'head_pattern_name'); }
+					pattern(pr, 'head_pattern', nd.headPattern);
+				} else {
+					num(pr, 'elevation', nd, 'elev');
+					num(pr, 'base_elevation', nd, 'bottomElev');
+					num(pr, 'init_level', nd, '_level');
+					num(pr, 'min_level', nd, 'minLevel');
+					num(pr, 'max_level', nd, 'maxLevel');
+					num(pr, 'tank_diameter', nd, 'tankDiameter');
+					if (text(pr, 'vol_curve_name')) { nd.volCurve = text(pr, 'vol_curve_name'); }
+					curve(pr, 'vol_curve', nd.volCurve, 'volume', label);
+				}
+				extras(pr, nd, GJ_OURS_NODE);
+				nodes.push(nd); nodeById[nd.id] = nd; counts[nt]++;
+				return;
+			}
+			if (lt === 'pipe' || lt === 'pump' || lt === 'valve') {
+				links.push({ f: f, pr: pr, label: label, lt: lt });
+				return;
+			}
+			notes.add(g && GJ_TYPES[g.type] ? 'skip-kind' : 'skip-geometry', label);
+		});
+		links = links.map(function (q) {
+			var pr = q.pr, g = q.f.geometry, cs, from = text(pr, 'start_node_name'), to = text(pr, 'end_node_name'),
+				a = nodeById[from], b = nodeById[to], lk, verts = [], i, p, first, last;
+			if (!g || g.type !== 'LineString' || !Array.isArray(g.coordinates) || g.coordinates.length < 2) { notes.add('skip-geometry', q.label); return null; }
+			if (!a || !b) { notes.add('skip-no-node', q.label); return null; }
+			if (!gjIdOk(q.label) || linkIds[q.label]) { notes.add('skip-id', q.label); return null; }
+			cs = g.coordinates;
+			for (i = 0; i < cs.length; i++) {
+				p = gjPos(cs[i]);
+				if (!p) { notes.add('skip-position', q.label); return null; }
+				if (i === 0) { first = p; } else if (i === cs.length - 1) { last = p; }
+				else { verts.push({ x: p.lon, y: p.lat, tok: { x: p.tok.x, y: p.tok.y } }); }
+			}
+			// The ends are the nodes. A file edited in a GIS may have moved one without its node.
+			if (first.lon !== a.x || first.lat !== a.y || last.lon !== b.x || last.lat !== b.y) { notes.add('end-off-node', q.label); }
+			lk = { id: q.label, type: q.lt, from: from, to: to, verts: verts, lenAuto: false };
+			if (text(pr, 'description')) { lk.desc = text(pr, 'description'); }
+			var closed = /^closed$/i.test(text(pr, q.lt === 'valve' ? 'valve_status' : 'initial_status'));
+			lk._status = closed ? 'closed' : 'open';
+			if (q.lt === 'pipe') {
+				num(pr, 'length', lk, '_length');
+				num(pr, 'diameter', lk, '_diameter');
+				num(pr, 'roughness', lk, '_roughness');
+				num(pr, 'minor_loss', lk, '_k');
+				if (text(pr, 'pipe_type')) { notes.add('pipe-type', q.label + ' (' + text(pr, 'pipe_type') + ')'); }
+			} else if (q.lt === 'pump') {
+				lk._k = 0;
+				if (text(pr, 'pump_curve_name')) { lk._curveId = text(pr, 'pump_curve_name'); }
+				curve(pr, 'pump_curve', lk._curveId, 'head', q.label);
+				num(pr, 'base_speed', lk, 'speed');
+				if (text(pr, 'speed_pattern_name')) { lk.speedPattern = text(pr, 'speed_pattern_name'); }
+				pattern(pr, 'speed_pattern', lk.speedPattern);
+			} else {
+				lk.valveType = (text(pr, 'valve_type') || 'TCV').toUpperCase();
+				num(pr, 'diameter', lk, '_diameter');
+				num(pr, 'minor_loss', lk, '_k');
+				lk._length = 0;
+				['pressure_setting', 'flow_setting', 'throttle_setting'].forEach(function (k) { if (lk._setting === undefined) { num(pr, k, lk, '_setting'); } });
+				if (lk._setting === undefined) { lk._setting = 0; }
+				if (text(pr, 'headloss_curve_name')) { lk._curveId = text(pr, 'headloss_curve_name'); }
+				curve(pr, 'headloss_curve', lk._curveId, 'headloss', q.label);
+			}
+			extras(pr, lk, GJ_OURS_LINK);
+			linkIds[lk.id] = 1; counts[q.lt]++;
+			return lk;
+		}).filter(function (l) { return l; });
+		// Shapes, through the Shape reader, from the same tree (so their characters survive).
+		var shapes = [];
+		if (shapeFeats.length) {
+			var rs = EngCalcs.lpnGeoJsonShapes(null, { type: 'FeatureCollection', features: shapeFeats }), used = {}, sn = 0;
+			nodes.forEach(function (n) { used[n.id] = 1; }); links.forEach(function (l) { used[l.id] = 1; });
+			(rs.skipped || []).forEach(function (k) { notes.add('skip-position', k.name); });
+			(rs.shapes || []).forEach(function (sh) {
+				var id = (sh.name && gjIdOk(sh.name) && !used[sh.name]) ? sh.name : null, s;
+				if (!id) { do { id = ((opts.prefixes || {}).S || 'S') + (++sn); } while (used[id]); notes.add('id-new', (sh.srcName || '?') + ' (' + id + ')'); }
+				used[id] = 1;
+				s = { id: id, closed: !!sh.closed, pts: sh.pts.map(function (q) {
+					var o = { x: q.lon, y: q.lat, tok: { x: q.tok.x, y: q.tok.y } };
+					if (typeof q.z === 'number') { o.z = q.z; if (q.tok.z) { o.tok.z = q.tok.z; } }
+					return o;
+				}) };
+				if (sh.desc) { s.desc = sh.desc; }
+				if (sh.props) { s.props = sh.props; }
+				if (sh.fid !== undefined) { s.fid = sh.fid; }
+				shapes.push(s); counts.shape++;
+			});
+		}
+		if (hadResults) { notes.add('results-dropped'); }
+		notes.add('not-in-geojson');
+		return {
+			ok: true, ours: true, nodes: nodes, links: links, shapes: shapes, patterns: patterns, curves: curves,
+			customProps: gjCustomDefs(custom), units: meta.units || null,
+			method: GJ_FORMULA_BACK[meta.headloss_formula] || opts.method || 'hw',
+			notes: notes.list, counts: counts
+		};
+	}
+
+	// ---- any other file, through the mapping the user chose ----
+	function gjBuildMapped(scan, opts) {
+		var notes = gjNotes(), map = opts.mapping || { point: {}, line: {} }, d = opts.defaults || {},
+			tol = (typeof opts.tolerance === 'number' && opts.tolerance >= 0) ? opts.tolerance : 0.5,
+			pre = opts.prefixes || {}, nodes = [], links = [], custom = {}, used = {}, nodeIds = {}, linkIds = {},
+			counts = { junction: 0, reservoir: 0, tank: 0, pipe: 0, pump: 0, valve: 0, shape: 0 },
+			fieldOf = { point: {}, line: {} }, zCount = [], minted = { J: 0, L: 0 }, lat0 = 0, nLat = 0;
+		if (scan.crsNamed) { notes.add('crs-named', null, scan.crsNamed); }
+		['point', 'line'].forEach(function (kind) {
+			Object.keys(map[kind] || {}).forEach(function (field) {
+				var t = map[kind][field];
+				if (t === 'skip') { notes.add('field-skipped', field); }
+				else if (t === 'custom') { (fieldOf[kind].custom = fieldOf[kind].custom || []).push(field); }
+				else if (!fieldOf[kind][t]) { fieldOf[kind][t] = field; }
+			});
+		});
+		// Every ID the file states is claimed first, so one made here can never take a later one's.
+		scan.feats.forEach(function (f) {
+			var kind = f && f.geometry && GJ_TYPES[f.geometry.type], pr = (f && f.properties) || {}, fid;
+			if (!kind || !fieldOf[kind].id) { return; }
+			fid = gjText(pr[fieldOf[kind].id]).trim();
+			if (fid) { used[fid] = 1; }
+		});
+		function mint(letter) {
+			var id, p = pre[letter] || letter;
+			do { id = p + (++minted[letter]); } while (used[id]);
+			used[id] = 1;
+			return id;
+		}
+		// An ID for an element: the file's where it is usable and not yet taken in its kind.
+		function idFor(kind, pr, label, letter, taken) {
+			var field = fieldOf[kind].id, raw = field ? gjText(pr[field]).trim() : '', id;
+			if (raw && gjIdOk(raw) && !taken[raw]) { taken[raw] = 1; return raw; }
+			id = mint(letter);
+			taken[id] = 1;
+			// A usable ID already taken is a duplicate; a blank or unusable one is replaced. With no
+			// ID field mapped every ID is made here, which one line says ('unmapped-id').
+			if (field) { notes.add(raw && gjIdOk(raw) ? 'id-dup' : 'id-new', (raw || label) + ' (' + id + ')'); }
+			return id;
+		}
+		function numInto(kind, target, pr, el, key, owner) {
+			var field = fieldOf[kind][target], n;
+			if (!field) { return false; }
+			if (gjBlank(pr[field])) { return false; }
+			n = gjNumber(pr[field]);
+			if (!n) { notes.add('value-unread', owner + ' ' + field + ': ' + gjText(pr[field])); return false; }
+			el[key] = n.v;
+			(el.tok = el.tok || {})[key] = n.t;
+			return true;
+		}
+		function customs(kind, pr, el) {
+			(fieldOf[kind].custom || []).forEach(function (field) {
+				var key = gjCustomKey(field);
+				if (gjBlank(pr[field])) { return; }
+				el['_' + key] = gjText(pr[field]);
+				custom[key] = custom[key] || { letters: {}, label: field };
+				custom[key].letters[GJ_TYPE_LETTER[el.type]] = 1;
+			});
+		}
+		function fill(el, key, value, code, id) {
+			if (el[key] !== undefined) { return; }
+			el[key] = value;
+			notes.add(code, id, value);
+		}
+		// ---- points: one node each ----
+		var pointFeats = [], lineFeats = [];
+		scan.feats.forEach(function (f, idx) {
+			var g = f && f.geometry, kind = g && GJ_TYPES[g.type], pr = (f && f.properties && typeof f.properties === 'object') ? f.properties : {},
+				label = '#' + (idx + 1);
+			if (fieldOf.point.id && kind === 'point' && !gjBlank(pr[fieldOf.point.id])) { label = gjText(pr[fieldOf.point.id]); }
+			if (fieldOf.line.id && kind === 'line' && !gjBlank(pr[fieldOf.line.id])) { label = gjText(pr[fieldOf.line.id]); }
+			if (!kind) {
+				// Named by whichever ID field it carries, so the report says which feature it was.
+				[fieldOf.point.id, fieldOf.line.id, 'name'].some(function (k) { if (k && !gjBlank(pr[k])) { label = gjText(pr[k]); return true; } return false; });
+				notes.add('skip-geometry', label);
+				return;
+			}
+			(kind === 'point' ? pointFeats : lineFeats).push({ f: f, pr: pr, label: label });
+		});
+		pointFeats.forEach(function (q) {
+			var g = q.f.geometry, list = g.type === 'Point' ? [g.coordinates] : (Array.isArray(g.coordinates) ? g.coordinates : []), ps = [], i, p;
+			for (i = 0; i < list.length; i++) { p = gjPos(list[i]); if (!p) { notes.add('skip-position', q.label); return; } ps.push(p); }
+			if (!ps.length) { notes.add('skip-position', q.label); return; }
+			if (ps.length > 1) { notes.add('parts-points', q.label); }
+			ps.forEach(function (p, k) {
+				var tv = fieldOf.point.nodeType ? String(gjText(q.pr[fieldOf.point.nodeType])).trim().toLowerCase() : '',
+					type = /^(junction|j)$/.test(tv) || tv === '' ? 'junction' : /^(reservoir|r)$/.test(tv) ? 'reservoir' : /^(tank|t)$/.test(tv) ? 'tank' : null,
+					nd, id;
+				if (!type) { notes.add('value-unread', q.label + ' ' + fieldOf.point.nodeType + ': ' + gjText(q.pr[fieldOf.point.nodeType])); type = 'junction'; }
+				id = idFor('point', ps.length > 1 ? {} : q.pr, q.label + (ps.length > 1 ? '/' + (k + 1) : ''), 'J', nodeIds);
+				nd = { id: id, type: type, x: p.lon, y: p.lat, tok: { x: p.tok.x, y: p.tok.y } };
+				if (typeof p.z === 'number') { zCount.push(id); }
+				numInto('point', 'elev', q.pr, nd, 'elev', id);
+				fill(nd, 'elev', d.nodeElev === undefined ? 0 : d.nodeElev, 'default-elev', id);
+				if (type === 'junction') {
+					numInto('point', 'demand', q.pr, nd, '_demand', id);
+					fill(nd, '_demand', d.demand === undefined ? 0 : d.demand, 'default-demand', id);
+				} else if (type === 'tank') {
+					nd._level = d.tankLevel; nd.minLevel = d.tankMinLevel; nd.maxLevel = d.tankMaxLevel; nd.tankDiameter = d.tankDiameter;
+					notes.add('default-tank', id);
+				}
+				if (fieldOf.point.desc && !gjBlank(q.pr[fieldOf.point.desc])) { nd.desc = gjText(q.pr[fieldOf.point.desc]); }
+				customs('point', q.pr, nd);
+				nodes.push(nd); counts[type]++;
+				lat0 += p.lat; nLat++;
+			});
+		});
+		// ---- the snapping index: a grid in metres on a plane tangent at the mean latitude ----
+		lineFeats.forEach(function (q) {
+			var c = q.f.geometry.coordinates, first = Array.isArray(c) && c.length ? (q.f.geometry.type === 'LineString' ? c[0] : (c[0] || [])[0]) : null, p = gjPos(first);
+			if (p) { lat0 += p.lat; nLat++; }
+		});
+		lat0 = nLat ? lat0 / nLat : 0;
+		var MX = 111320 * Math.cos(lat0 * Math.PI / 180), MY = 110574, cell = Math.max(tol, 1e-6), grid = {};
+		function mx(p) { return p.lon * MX; }
+		function my(p) { return p.lat * MY; }
+		function gkey(i, j) { return i + ',' + j; }
+		function addToGrid(nd) {
+			var k = gkey(Math.floor(nd.x * MX / cell), Math.floor(nd.y * MY / cell));
+			(grid[k] = grid[k] || []).push(nd);
+		}
+		function nearest(p, wantAuto) {
+			var ci = Math.floor(mx(p) / cell), cj = Math.floor(my(p) / cell), best = null, bd = Infinity, i, j, list, k, dd;
+			for (i = ci - 1; i <= ci + 1; i++) {
+				for (j = cj - 1; j <= cj + 1; j++) {
+					list = grid[gkey(i, j)];
+					if (!list) { continue; }
+					for (k = 0; k < list.length; k++) {
+						if (!!list[k].auto !== wantAuto) { continue; }
+						dd = Math.sqrt(Math.pow(list[k].x * MX - mx(p), 2) + Math.pow(list[k].y * MY - my(p), 2));
+						if (dd <= tol && dd < bd) { bd = dd; best = list[k]; }
+					}
+				}
+			}
+			return best ? { node: best, dist: bd } : null;
+		}
+		nodes.forEach(addToGrid);
+		var added = [], moved = [], maxMove = 0;
+		function nodeAt(p, pipeId) {
+			var hit = nearest(p, false) || nearest(p, true), nd;
+			if (hit) {
+				if (hit.dist > 0) { moved.push(pipeId); maxMove = Math.max(maxMove, hit.dist); }
+				return hit.node;
+			}
+			nd = { id: mint('J'), type: 'junction', x: p.lon, y: p.lat, tok: { x: p.tok.x, y: p.tok.y }, auto: true,
+				elev: d.nodeElev === undefined ? 0 : d.nodeElev, _demand: d.demand === undefined ? 0 : d.demand };
+			nodeIds[nd.id] = 1;
+			nodes.push(nd); addToGrid(nd); added.push(nd.id); counts.junction++;
+			return nd;
+		}
+		// ---- lines: one pipe per line, or per unconnected part of a multipart line ----
+		lineFeats.forEach(function (q) {
+			var g = q.f.geometry, raw = g.type === 'LineString' ? [g.coordinates] : g.coordinates, parts = [], i, k, part, p, pts;
+			if (!Array.isArray(raw)) { notes.add('skip-position', q.label); return; }
+			for (i = 0; i < raw.length; i++) {
+				if (!Array.isArray(raw[i])) { notes.add('skip-position', q.label); return; }
+				pts = [];
+				for (k = 0; k < raw[i].length; k++) { p = gjPos(raw[i][k]); if (!p) { notes.add('skip-position', q.label); return; } pts.push(p); }
+				if (pts.length < 2) { notes.add('skip-geometry', q.label); return; }
+				// A part that starts exactly where the last one ended continues it (one pipe).
+				part = parts[parts.length - 1];
+				if (part && part[part.length - 1].lon === pts[0].lon && part[part.length - 1].lat === pts[0].lat) {
+					parts[parts.length - 1] = part.concat(pts.slice(1));
+				} else { parts.push(pts); }
+			}
+			if (!parts.length) { notes.add('skip-geometry', q.label); return; }
+			if (parts.length > 1) { notes.add('parts', q.label, parts.length); }
+			parts.forEach(function (pts, pi) {
+				var lk = { type: 'pipe', verts: [], lenAuto: false, _status: 'open' }, a, b, label = parts.length > 1 ? q.label + '/' + (pi + 1) : q.label, id;
+				id = idFor('line', parts.length > 1 ? {} : q.pr, label, 'L', linkIds);
+				lk.id = id;
+				a = nodeAt(pts[0], id); b = nodeAt(pts[pts.length - 1], id);
+				if (a === b) { notes.add('skip-loop', id); return; }
+				lk.from = a.id; lk.to = b.id;
+				lk.verts = pts.slice(1, -1).map(function (v) { return { x: v.lon, y: v.lat, tok: { x: v.tok.x, y: v.tok.y } }; });
+				numInto('line', 'diameter', q.pr, lk, '_diameter', id);
+				fill(lk, '_diameter', d.diameter, 'default-diameter', id);
+				numInto('line', 'roughness', q.pr, lk, '_roughness', id);
+				fill(lk, '_roughness', d.roughness, 'default-roughness', id);
+				if (!numInto('line', 'length', q.pr, lk, '_length', id)) { lk.lenAuto = true; notes.add('length-auto', id); }
+				numInto('line', 'k', q.pr, lk, '_k', id);
+				fill(lk, '_k', d.k === undefined ? 0 : d.k, 'default-k', id);
+				if (fieldOf.line.status && !gjBlank(q.pr[fieldOf.line.status])) {
+					var sv = String(gjText(q.pr[fieldOf.line.status])).trim().toLowerCase();
+					if (/^(closed|close|c|0|false|no)$/.test(sv)) { lk._status = 'closed'; }
+					else if (!/^(open|o|1|true|yes|active)$/.test(sv)) { notes.add('value-unread', id + ' ' + fieldOf.line.status + ': ' + gjText(q.pr[fieldOf.line.status])); }
+				}
+				if (fieldOf.line.desc && !gjBlank(q.pr[fieldOf.line.desc])) { lk.desc = gjText(q.pr[fieldOf.line.desc]); }
+				customs('line', q.pr, lk);
+				links.push(lk); counts.pipe++;
+			});
+		});
+		// ---- a line end that lies along another pipe but not at its end is named, not joined ----
+		var degree = {}, onPipe = [];
+		links.forEach(function (l) { degree[l.from] = (degree[l.from] || 0) + 1; degree[l.to] = (degree[l.to] || 0) + 1; });
+		if (added.length) {
+			var SEG = Math.max(tol, 50), segGrid = {};
+			var nodeIdx = {};
+			nodes.forEach(function (n) { nodeIdx[n.id] = n; });
+			links.forEach(function (l, li) {
+				var pts = [nodeIdx[l.from]].concat(l.verts, [nodeIdx[l.to]]), s, a, b, i0, i1, j0, j1, i, j, k;
+				for (s = 0; s + 1 < pts.length; s++) {
+					a = pts[s]; b = pts[s + 1];
+					i0 = Math.floor(Math.min(a.x, b.x) * MX / SEG); i1 = Math.floor(Math.max(a.x, b.x) * MX / SEG);
+					j0 = Math.floor(Math.min(a.y, b.y) * MY / SEG); j1 = Math.floor(Math.max(a.y, b.y) * MY / SEG);
+					for (i = i0; i <= i1; i++) { for (j = j0; j <= j1; j++) { k = gkey(i, j); (segGrid[k] = segGrid[k] || []).push([li, a, b]); } }
+				}
+			});
+			added.forEach(function (id) {
+				var n = nodeIdx[id], px, py, list, k, sg, ax, ay, bx, by, t, dx, dy, dd;
+				if (degree[id] !== 1) { return; }
+				px = n.x * MX; py = n.y * MY;
+				list = segGrid[gkey(Math.floor(px / SEG), Math.floor(py / SEG))] || [];
+				for (k = 0; k < list.length; k++) {
+					sg = list[k];
+					if (links[sg[0]].from === id || links[sg[0]].to === id) { continue; }
+					ax = sg[1].x * MX; ay = sg[1].y * MY; bx = sg[2].x * MX; by = sg[2].y * MY;
+					dx = bx - ax; dy = by - ay;
+					t = (dx || dy) ? Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy))) : 0;
+					dd = Math.sqrt(Math.pow(ax + t * dx - px, 2) + Math.pow(ay + t * dy - py, 2));
+					if (dd <= tol) { onPipe.push(id + ' (' + links[sg[0]].id + ')'); return; }
+				}
+			});
+		}
+		nodes.forEach(function (n) { delete n.auto; });
+		if (added.length) { notes.add('junction-added').ids = added; }
+		if (moved.length) { notes.add('end-moved', null, maxMove).ids = moved; }
+		if (onPipe.length) { notes.add('end-on-pipe').ids = onPipe; }
+		if (zCount.length) { notes.add('z-ignored').ids = zCount; }
+		if ((pointFeats.length && !fieldOf.point.id) || (lineFeats.length && !fieldOf.line.id)) { notes.add('unmapped-id'); }
+		if (!fieldOf.line.length) { notes.list.forEach(function (x) { if (x.code === 'length-auto') { x.code = 'unmapped-length'; x.ids = []; } }); }
+		['elev', 'demand', 'diameter', 'roughness', 'k'].forEach(function (t) {
+			var kind = (t === 'elev' || t === 'demand') ? 'point' : 'line';
+			if (!fieldOf[kind][t]) {
+				// No field fills it: every element has the default, which one line says.
+				var n = null;
+				notes.list.forEach(function (x) { if (x.code === 'default-' + t) { n = x; } });
+				if (n) { n.code = 'unmapped-' + t; n.ids = []; }
+			}
+		});
+		if (fieldOf.point.custom || fieldOf.line.custom) {
+			(fieldOf.point.custom || []).concat(fieldOf.line.custom || []).forEach(function (f) { notes.add('field-custom', f); });
+		}
+		return {
+			ok: true, ours: false, nodes: nodes, links: links, shapes: [], patterns: [], curves: [],
+			customProps: gjCustomDefs(custom), units: opts.units || null, method: opts.method || 'hw',
+			notes: notes.list, counts: counts, tolerance: tol
+		};
+	}
+
 	/** A number and the characters it was written as in the file. */
 	function Num(v, t) { this.v = v; this.t = t; }
+	/**
+	 * JSON text to a tree in which every number is a Num carrying the characters it was written
+	 * as (JSON.parse source text access; where a browser does not offer it, String() of the value).
+	 */
+	function readJson(text) {
+		try {
+			return { ok: true, value: JSON.parse(String(text), function (key, value, ctx) {
+				if (typeof value === 'number') {
+					return new Num(value, (ctx && typeof ctx.source === 'string') ? ctx.source : String(value));
+				}
+				return value;
+			}) };
+		} catch (e) { return { ok: false, detail: String(e && e.message ? e.message : e) }; }
+	}
 }(typeof globalThis !== 'undefined' ? globalThis : this));

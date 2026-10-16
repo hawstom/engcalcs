@@ -40069,6 +40069,419 @@ var EngCalcs = EngCalcs || {};
 		if (input) { input.click(); }
 	}
 
+	// ---- File > Import > GeoJSON network (ROADMAP Task 728, import half) -------------------------
+	//
+	// Tom, 2026-10-06: *"yes to shapefile + GeoJSON import behind one mapping step."* The reading
+	// is js/lpn-geojson.js (lpnGeoJsonNetScan / lpnGeoJsonNetBuild, pure); this half asks the one
+	// question, builds the document and reports, and it lands EXACTLY as an `.inp` does
+	// (landInpText()): a new browser project named after the file, the units strip moved to the
+	// file's units first, arriving saved, with a report of every difference. A file this page wrote
+	// is read by its own schema and asks nothing. Rules: dev/geojson.md.
+	function pickGeoJsonNetFile() {
+		var pick = document.createElement('input');
+		pick.type = 'file';
+		pick.accept = '.geojson,.json,application/geo+json,application/json';
+		pick.addEventListener('change', function () {
+			var f = pick.files && pick.files[0];
+			if (!f) { return; }
+			var reader = new FileReader();
+			reader.onload = function (ev) { landGeoJsonNetText(String(ev.target.result), f.name); };
+			reader.onerror = function () {
+				setWarning((EngCalcs.pageConfig || {}).lpn_survey_read_error || 'That file could not be read from your disk.');
+			};
+			reader.readAsText(f);
+		});
+		pick.click();
+	}
+	// The text of a file, to a new project. `choice` (optional) is the mapping step's answer,
+	// given straight by a harness; `done(result)` is called once with what happened.
+	function landGeoJsonNetText(text, fileName, done, choice) {
+		var pc = EngCalcs.pageConfig || {}, scan;
+		logLpnFirstAction('import');
+		scan = EngCalcs.lpnGeoJsonNetScan ? EngCalcs.lpnGeoJsonNetScan(text) : { ok: false, error: 'unreadable', detail: '' };
+		if (!scan.ok) {
+			var msg = scan.error === 'crs'
+				? (pc.lpn_gjnet_refuse_crs || '{file} states the coordinate system {crs}. GeoJSON positions are WGS 84 longitude and latitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.')
+					.replace('{crs}', scan.detail)
+				: scan.error === 'empty'
+					? (pc.lpn_gjnet_refuse_empty || '{file} contains no points or lines.')
+					: (pc.lpn_geojson_import_unreadable || '{file} is not a GeoJSON file: {detail}').replace('{detail}', scan.detail || '');
+			setWarning(msg.replace('{file}', fileName));
+			if (done) { done({ ok: false, error: scan.error, message: msg.replace('{file}', fileName) }); }
+			return;
+		}
+		if (scan.ours || choice) { finishGeoJsonNet(scan, fileName, choice || null, done); return; }
+		openGeoJsonNetMapping(scan, fileName, function (ch) { finishGeoJsonNet(scan, fileName, ch, done); });
+	}
+	// The unit selectors a mapping target can name, and the names each offers.
+	function geoJsonNetUnitsOffered() {
+		var out = {};
+		['lpn_u_elevhead', 'lpn_u_flow', 'lpn_u_diameter', 'lpn_u_length', 'lpn_u_roughness'].forEach(function (n) {
+			var s = unitEl(n), i;
+			out[n] = [];
+			if (!s || !s.options) { return; }
+			for (i = 0; i < s.options.length; i++) { out[n].push(s.options[i].value); }
+		});
+		return out;
+	}
+	var LPN_GJNET_TOLERANCE = 0.5;   // metres; the dialog states it and the user may change it
+	/**
+	 * **THE ONE MAPPING STEP.** A table per kind of feature: each attribute field found, an example
+	 * value, the property it fills (guessed by name, every unguessed field kept as a custom
+	 * property) and, for a number, the unit it is in. Below it the snap tolerance, stated. `go`
+	 * receives { mapping, units, tolerance } when the user presses Import.
+	 */
+	function openGeoJsonNetMapping(scan, fileName, go) {
+		var pc = EngCalcs.pageConfig || {}, now = readUnitSelections(), offered = geoJsonNetUnitsOffered(),
+			guess = EngCalcs.lpnGeoJsonNetGuess(scan, now, offered), rows = [], tolInput,
+			dw = (settings.method || 'hw') === 'dw';
+		var TLABEL = {
+			id: pc.lpn_field_id || 'ID', nodeType: pc.lpn_gjnet_target_node_type || 'Node type',
+			elev: pc.lpn_field_elev || 'Elevation', demand: pc.lpn_field_base_demand || 'Base demand',
+			desc: pc.lpn_field_desc || 'Description', diameter: pc.lpn_field_diameter || 'Diameter',
+			roughness: pc.lpn_field_roughness || 'Roughness', length: pc.lpn_field_length || 'Length',
+			k: pc.lpn_field_km_short || 'Minor loss, k', status: pc.lpn_labels_init_status || 'Initial status',
+			custom: pc.lpn_gjnet_target_custom || 'Custom property', skip: pc.lpn_gjnet_target_skip || 'Do not import'
+		};
+		function familyOf(kind, target) {
+			var t = EngCalcs.lpnGeoJsonNetTargets[kind].filter(function (x) { return x.id === target; })[0];
+			if (!t || !t.family) { return null; }
+			// Hazen-Williams C has no unit; only a Darcy-Weisbach roughness is a length.
+			if (t.family === 'lpn_u_roughness' && !dw) { return null; }
+			return t.family;
+		}
+		function table(kind, body) {
+			var fields = scan.fields[kind] || [], tb, tr, th, head, i;
+			if (!scan.counts[kind]) { return; }
+			head = document.createElement('p');
+			head.style.margin = '10px 0 4px';
+			head.style.fontWeight = 'bold';
+			head.textContent = kind === 'point' ? (pc.lpn_gjnet_points_heading || 'Point fields (junctions, reservoirs, and tanks)')
+				: (pc.lpn_gjnet_lines_heading || 'Line fields (pipes)');
+			body.appendChild(head);
+			if (!fields.length) {
+				var none = document.createElement('p');
+				none.style.margin = '0';
+				none.textContent = pc.lpn_gjnet_no_fields || 'These features have no attribute fields.';
+				body.appendChild(none);
+				return;
+			}
+			tb = document.createElement('table');
+			tb.className = 'lpn-gjnet-table';
+			tb.setAttribute('data-kind', kind);
+			tr = document.createElement('tr');
+			[pc.lpn_gjnet_col_field || 'Field', pc.lpn_gjnet_col_example || 'Example',
+				pc.lpn_gjnet_col_fills || 'Fills', pc.lpn_gjnet_col_unit || 'Unit'].forEach(function (t) {
+				th = document.createElement('th'); th.textContent = t; th.style.textAlign = 'left'; th.style.paddingRight = '8px'; tr.appendChild(th);
+			});
+			tb.appendChild(tr);
+			for (i = 0; i < fields.length; i++) { tb.appendChild(row(kind, fields[i])); }
+			body.appendChild(tb);
+		}
+		function row(kind, f) {
+			var tr = document.createElement('tr'), td, sel, usel, r = { kind: kind, field: f.name };
+			td = document.createElement('td'); td.textContent = f.name; td.style.paddingRight = '8px'; tr.appendChild(td);
+			td = document.createElement('td'); td.textContent = String(f.sample).slice(0, 24); td.style.paddingRight = '8px'; tr.appendChild(td);
+			td = document.createElement('td');
+			sel = document.createElement('select');
+			sel.setAttribute('data-field', f.name);
+			sel.setAttribute('aria-label', f.name);
+			EngCalcs.lpnGeoJsonNetTargets[kind].forEach(function (t) {
+				// A number target is offered only for a field of numbers.
+				if (t.family && !f.numeric) { return; }
+				var o = document.createElement('option'); o.value = t.id; o.textContent = TLABEL[t.id]; sel.appendChild(o);
+			});
+			sel.value = guess[kind][f.name] || 'custom';
+			td.appendChild(sel); tr.appendChild(td);
+			td = document.createElement('td');
+			usel = document.createElement('select');
+			usel.setAttribute('data-unit-for', f.name);
+			usel.setAttribute('aria-label', (pc.lpn_gjnet_col_unit || 'Unit') + ': ' + f.name);
+			td.appendChild(usel); tr.appendChild(td);
+			r.sel = sel; r.usel = usel;
+			function syncUnit() {
+				var fam = familyOf(kind, sel.value), src = fam ? unitEl(fam) : null, i, o, want;
+				usel.innerHTML = '';
+				usel.style.display = src ? '' : 'none';
+				if (!src) { return; }
+				want = guess.units[kind + ':' + f.name] || now[fam];
+				for (i = 0; i < src.options.length; i++) {
+					o = document.createElement('option');
+					o.value = src.options[i].value; o.textContent = src.options[i].textContent;
+					usel.appendChild(o);
+				}
+				usel.value = want;
+				if (usel.selectedIndex < 0) { usel.selectedIndex = 0; }
+			}
+			sel.addEventListener('change', function () {
+				// One field per property: the field that held it before becomes a custom property.
+				if (sel.value !== 'custom' && sel.value !== 'skip') {
+					rows.forEach(function (o) { if (o !== r && o.kind === kind && o.sel.value === sel.value) { o.sel.value = 'custom'; o.sync(); } });
+				}
+				syncUnit();
+			});
+			r.sync = syncUnit;
+			syncUnit();
+			rows.push(r);
+			return tr;
+		}
+		openDialog(function (body) {
+			var p = document.createElement('p');
+			p.style.margin = '0 0 6px';
+			p.textContent = (pc.lpn_gjnet_intro || '{points} points and {lines} lines were found. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. Choose the property each field fills and the unit of each number.')
+				.replace('{points}', scan.counts.point).replace('{lines}', scan.counts.line);
+			body.appendChild(p);
+			if (scan.counts.other) {
+				var o = document.createElement('p');
+				o.style.margin = '0 0 6px';
+				o.textContent = (pc.lpn_gjnet_other || '{n} features are neither points nor lines and will not be imported; the report lists them.').replace('{n}', scan.counts.other);
+				body.appendChild(o);
+			}
+			var wrap = document.createElement('div');
+			wrap.style.maxHeight = '50vh';
+			wrap.style.overflow = 'auto';
+			table('point', wrap);
+			table('line', wrap);
+			body.appendChild(wrap);
+			if (scan.counts.line) {
+				var tl = document.createElement('p'), lab = document.createElement('label');
+				tl.style.margin = '10px 0 0';
+				lab.textContent = (pc.lpn_gjnet_tolerance || 'Join tolerance (m)') + ' ';
+				lab.title = pc.lpn_gjnet_tolerance_tip || 'A line end within this distance of a point, or of another line end, is joined to it. A line end farther than this from every point gets a new junction.';
+				tolInput = document.createElement('input');
+				tolInput.type = 'text';
+				tolInput.inputMode = 'decimal';
+				tolInput.id = 'lpn_gjnet_tolerance';
+				tolInput.size = 6;
+				tolInput.value = String(LPN_GJNET_TOLERANCE);
+				lab.appendChild(tolInput);
+				tl.appendChild(lab);
+				body.appendChild(tl);
+			}
+		}, [
+			{ label: pc.lpn_library_import_go || 'Import', isDefault: true, keepOpen: true, fn: function () {
+				var tol = LPN_GJNET_TOLERANCE, ch = { mapping: { point: {}, line: {} }, units: {}, tolerance: tol };
+				if (tolInput) {
+					var t = String(tolInput.value).trim();
+					if (!/^(\d+(\.\d*)?|\.\d+)$/.test(t)) { tolInput.style.outline = '2px solid var(--ec-bad-ink)'; tolInput.focus(); return; }
+					ch.tolerance = Number(t);
+				}
+				rows.forEach(function (r) {
+					var fam = familyOf(r.kind, r.sel.value);
+					ch.mapping[r.kind][r.field] = r.sel.value;
+					if (fam && r.usel.value) { ch.units[fam] = r.usel.value; }
+				});
+				closeDialog();
+				go(ch);
+				afterDialogAnswer();
+			} },
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
+		], { title: (pc.lpn_gjnet_title || 'Import GeoJSON network: {file}').replace('{file}', fileName) });
+	}
+	// The new-asset values in the units the new project will have (R-342): a value typed in a unit
+	// the import changed falls back to the built-in default for the new unit. Read by swapping a
+	// copy in for seedDefaultInputs(), which fills from the selectors as they now stand.
+	function geoJsonNetDefaults(changedSelectors) {
+		var keep = settings.defaults, copy = JSON.parse(JSON.stringify(keep || {})), out;
+		changedSelectors.forEach(function (s) {
+			(LPN_DEFAULTS_UNIT_FIELD[s] || []).forEach(function (k) { copy[k] = null; });
+		});
+		settings.defaults = copy;
+		try { seedDefaultInputs(); out = settings.defaults; } finally { settings.defaults = keep; }
+		return out;
+	}
+	function finishGeoJsonNet(scan, fileName, choice, done) {
+		var before = readUnitSelections(), net, units, changed, defaults, saved, id, name;
+		if (scan.ours) {
+			net = EngCalcs.lpnGeoJsonNetBuild(scan, { prefixes: settings.idPrefixes, method: settings.method || 'hw' });
+			units = Object.assign({}, before, net.units || {});
+		} else {
+			units = Object.assign({}, before, choice.units || {});
+		}
+		// The units strip moves FIRST, as for an `.inp`: the file's numbers are stored as they are,
+		// so the strip must be showing the units they are in.
+		applyUnitSelections(units);
+		changed = LPN_UNIT_SELECTS.filter(function (n) { return before[n] !== readUnitSelections()[n]; });
+		defaults = geoJsonNetDefaults(changed);
+		if (!scan.ours) {
+			net = EngCalcs.lpnGeoJsonNetBuild(scan, { mapping: choice.mapping, units: readUnitSelections(),
+				tolerance: choice.tolerance, prefixes: settings.idPrefixes, defaults: defaults, method: settings.method || 'hw' });
+		}
+		name = String(fileName).replace(/\.(geojson|json)$/i, '') || String(fileName);
+		saved = docFromGeoJsonNet(net, name, defaults);
+		id = importProject(saved);
+		if (!id) { if (done) { done({ ok: false, error: 'storage' }); } return; }
+		stampProjectSaved(id);
+		renderTabs();
+		showGeoJsonNetReport(net, fileName);
+		if (done) { done({ ok: true, id: id, net: net }); }
+	}
+	/**
+	 * The built network as a saved document, ready for importProject(): docFromInp()'s shape, in
+	 * the saved frame (a geographic project, x the longitude and y the latitude). The settings are
+	 * the open project's, as for an `.inp`, with what the file states written onto them: the
+	 * friction method, the custom property designs, and the new-asset values in the new units.
+	 */
+	function docFromGeoJsonNet(net, name, defaults) {
+		var nodeAt = {}, next = newNextId(), s = JSON.parse(JSON.stringify(settings));
+		net.nodes.forEach(function (n) { nodeAt[n.id] = n; });
+		// A pipe with no length in the file is Auto, measured as linkAutoLength() measures one: the
+		// geodesic length of the line, as slope distance between its end elevations. A number of
+		// ours, and the report says which pipes.
+		net.links.forEach(function (l) {
+			var a = nodeAt[l.from], b = nodeAt[l.to], h, za, zb, dz;
+			if (!l.lenAuto || typeof l._length === 'number' || !a || !b) { return; }
+			h = Geom.geodesicPolylineMeters([{ x: a.x, y: a.y }].concat(l.verts, [{ x: b.x, y: b.y }])) * unitFactor('lpn_u_length');
+			za = linkEndElev(a); zb = linkEndElev(b);
+			dz = (za === null || zb === null) ? 0 : toDisplay(toSI(zb - za, 'lpn_u_elevhead'), 'lpn_u_length');
+			l._length = (dz && isFinite(dz)) ? Math.sqrt(h * h + dz * dz) : h;   // base-write: import builds Base
+		});
+		s.method = net.method || s.method;
+		s.defaults = defaults || s.defaults;
+		// The file states no EPANET options, so the new project states none (docFromInp()'s sparse rule).
+		s.hydraulics = {}; s.qualityOptions = {}; s.fileOptions = {};
+		s.quality = { mode: 'none', traceNode: '' };
+		readQualitySections({}, s, net.nodes, net.links);
+		readEnergySection({}, s, net.links);
+		readSourceMixingSections({}, s, net.nodes);
+		readTagsSection({}, s, net.nodes, net.links);
+		// A design the open project already has keeps its label and rules and gains the kinds the
+		// file puts it on; a new key gets a plain design.
+		s.customProps = (s.customProps || []).slice();
+		(net.customProps || []).forEach(function (def) {
+			var have = s.customProps.filter(function (d) { return d.key === def.key; })[0], letters;
+			if (!have) { s.customProps.push(def); return; }
+			letters = String(have.applies || '').split(',').filter(function (x) { return x; });
+			def.applies.split(',').forEach(function (x) { if (x && letters.indexOf(x) < 0) { letters.push(x); } });
+			have.applies = letters.join(',');
+		});
+		function claim(id, key) {
+			var prefix = s.idPrefixes[key] || key, n;
+			if (String(id).slice(0, prefix.length) !== prefix) { return; }
+			n = parseInt(String(id).slice(prefix.length), 10);
+			if (isFinite(n) && String(n) === String(id).slice(prefix.length) && n >= next[key]) { next[key] = n + 1; }
+		}
+		net.nodes.forEach(function (n) { claim(n.id, LPN_ID_KEY[n.type] || 'J'); });
+		net.links.forEach(function (l) { claim(l.id, LPN_ID_KEY[l.type] || 'L'); });
+		(net.shapes || []).forEach(function (sh) { claim(sh.id, 'S'); });
+		return rebaseDocument({
+			v: LPN_STORAGE_VERSION,
+			project: { name: name, activeScenario: 'base', coords: LPN_COORDS_GEO },
+			origin: { x: 0, y: 0 },
+			scenarios: defaultScenarios(),
+			nodes: net.nodes, links: net.links, labels: [],
+			shapes: (net.shapes && net.shapes.length) ? net.shapes : undefined,
+			nextId: next,
+			labelSettings: JSON.parse(JSON.stringify(labelSettings)),
+			backdrop: null,
+			settings: s,
+			patterns: net.patterns || [], curves: net.curves || [],
+			defaultPattern: null, times: null, controls: [], rules: [], inpSections: {},
+			units: readUnitSelections()
+		});
+	}
+	// One sentence per kind of difference, whole sentences (CLAUDE.md's key-reuse rule).
+	function geoJsonNetNoteText(note, net) {
+		var pc = EngCalcs.pageConfig || {}, tol = String(net.tolerance === undefined ? LPN_GJNET_TOLERANCE : net.tolerance) + ' m';
+		function v(x) { return String(x === undefined || x === null ? '' : x); }
+		var T = {
+			'crs-named': ['lpn_gjnet_note_crs', 'The file states the coordinate system {crs}, which is WGS 84 longitude and latitude, the system RFC 7946 requires. Positions were read as stated.'],
+			'skip-geometry': ['lpn_gjnet_note_skip_geometry', 'Not imported: the feature is not a point or a line.'],
+			'skip-kind': ['lpn_gjnet_note_skip_kind', 'Not imported: the feature states no node_type or link_type.'],
+			'skip-position': ['lpn_gjnet_note_skip_position', 'Not imported: a position is not a valid longitude and latitude.'],
+			'skip-id': ['lpn_gjnet_note_skip_id', 'Not imported: the name is not a valid ID, or another element of the same kind has it.'],
+			'skip-no-node': ['lpn_gjnet_note_skip_no_node', 'Not imported: the start or end node named is not in the file.'],
+			'skip-loop': ['lpn_gjnet_note_skip_loop', 'Not imported: both ends of the line join the same node.'],
+			'id-new': ['lpn_gjnet_note_id_new', 'These features state no valid ID and were assigned the ID shown in parentheses.'],
+			'id-dup': ['lpn_gjnet_note_id_dup', 'These IDs are stated by more than one feature of the same kind. Each later feature was assigned the ID shown in parentheses.'],
+			'unmapped-id': ['lpn_gjnet_note_unmapped_id', 'No field was chosen for the ID, so every element was assigned an ID.'],
+			'parts': ['lpn_gjnet_note_parts', 'These multipart lines have parts that are not connected and were imported as one pipe for each part.'],
+			'parts-points': ['lpn_gjnet_note_parts_points', 'These multipoint features were imported as one node for each point.'],
+			'junction-added': ['lpn_gjnet_note_junction_added', 'These junctions were added where a line end is not within {tol} of a point. Each has the default elevation and base demand.'],
+			'end-moved': ['lpn_gjnet_note_end_moved', 'These pipes have an end within {tol} of a point or another line end, but not on it. The end was joined to it; the largest distance is {dist}.'],
+			'end-on-pipe': ['lpn_gjnet_note_end_on_pipe', 'These line ends lie on the pipe shown in parentheses, but not at its end, and are not connected to it.'],
+			'z-ignored': ['lpn_gjnet_note_z', 'These points state a third coordinate, which was not imported.'],
+			'default-elev': ['lpn_gjnet_note_default_elev', 'These nodes state no elevation and have the default elevation, {value}.'],
+			'unmapped-elev': ['lpn_gjnet_note_unmapped_elev', 'No field was chosen for the elevation, so every node has the default elevation, {value}.'],
+			'default-demand': ['lpn_gjnet_note_default_demand', 'These junctions state no base demand and have the default base demand, {value}.'],
+			'unmapped-demand': ['lpn_gjnet_note_unmapped_demand', 'No field was chosen for the base demand, so every junction has the default base demand, {value}.'],
+			'default-diameter': ['lpn_gjnet_note_default_diameter', 'These pipes state no diameter and have the default diameter, {value}.'],
+			'unmapped-diameter': ['lpn_gjnet_note_unmapped_diameter', 'No field was chosen for the diameter, so every pipe has the default diameter, {value}.'],
+			'default-roughness': ['lpn_gjnet_note_default_roughness', 'These pipes state no roughness and have the default roughness, {value}.'],
+			'unmapped-roughness': ['lpn_gjnet_note_unmapped_roughness', 'No field was chosen for the roughness, so every pipe has the default roughness, {value}.'],
+			'default-k': ['lpn_gjnet_note_default_k', 'These pipes state no minor loss coefficient and have the default, {value}.'],
+			'unmapped-k': ['lpn_gjnet_note_unmapped_k', 'No field was chosen for the minor loss coefficient, so every pipe has the default, {value}.'],
+			'default-tank': ['lpn_gjnet_note_default_tank', 'These tanks have the default water depths and tank diameter.'],
+			'length-auto': ['lpn_gjnet_note_length_auto', 'These pipes state no length. Each length is computed from the line (Auto).'],
+			'unmapped-length': ['lpn_gjnet_note_unmapped_length', 'No field was chosen for the length, so every pipe length is computed from the line (Auto).'],
+			'value-unread': ['lpn_gjnet_note_value_unread', 'These values are not numbers or are not recognized, and were not used.'],
+			'field-skipped': ['lpn_gjnet_note_field_skipped', 'These fields were not imported, as chosen.'],
+			'field-custom': ['lpn_gjnet_note_field_custom', 'These fields were imported as custom properties.'],
+			'results-dropped': ['lpn_gjnet_note_results', 'The results in the file were not imported. Calculate computes them again.'],
+			'demand-rows': ['lpn_gjnet_note_demand_rows', 'These junctions had more than one demand row. A GeoJSON file holds only the first, which was imported.'],
+			'pipe-type': ['lpn_gjnet_note_pipe_type', 'These pipes state the pipe type shown in parentheses, whose definition a GeoJSON file does not hold. The pipe type was not imported; the diameter and roughness stated in the file were.'],
+			'pattern-conflict': ['lpn_gjnet_note_pattern_conflict', 'These patterns are stated with different multipliers on different features. The first was used.'],
+			'end-off-node': ['lpn_gjnet_note_end_off_node', 'The line of each of these links does not start or end at its node. The node position was used.'],
+			'not-in-geojson': ['lpn_gjnet_note_not_held', 'A GeoJSON file does not hold controls, rules, time settings, text labels, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.']
+		};
+		var t = T[note.code] || [null, note.code], val = note.detail, s;
+		if (typeof val === 'number' && note.code.indexOf('default-') !== 0 && note.code.indexOf('unmapped-') !== 0) { val = val.toFixed(2) + ' m'; }
+		s = String((t[0] && pc[t[0]]) || t[1]);
+		var unitOf = { elev: 'lpn_u_elevhead', demand: 'lpn_u_flow', diameter: 'lpn_u_diameter', roughness: (settings.method === 'dw' ? 'lpn_u_roughness' : '') };
+		var tgt = note.code.replace(/^(default|unmapped)-/, '');
+		if (note.code !== tgt && unitOf[tgt]) { val = v(note.detail) + ' ' + unitLabel(unitOf[tgt]); }
+		return s.replace('{crs}', v(note.detail)).replace('{tol}', tol).replace('{dist}', v(val)).replace('{value}', v(val));
+	}
+	function showGeoJsonNetReport(net, fileName) {
+		var pc = EngCalcs.pageConfig || {}, CAP = 50;
+		openDialog(function (body) {
+			var h = document.createElement('p');
+			h.style.margin = '0 0 8px';
+			h.style.fontWeight = 'bold';
+			h.textContent = (pc.lpn_inp_report_heading || 'Imported {file}').replace('{file}', fileName);
+			body.appendChild(h);
+			var c = net.counts, sum = document.createElement('p');
+			sum.style.margin = '0 0 8px';
+			sum.textContent = (pc.lpn_inp_report_counts || '{nodes} junctions, reservoirs and tanks, {links} pipes, pumps and valves, in {units}.')
+				.replace('{nodes}', c.junction + c.reservoir + c.tank).replace('{links}', c.pipe + c.pump + c.valve)
+				.replace('{units}', unitLabel('lpn_u_flow'));
+			body.appendChild(sum);
+			if (c.shape) {
+				var shp = document.createElement('p');
+				shp.style.margin = '0 0 8px';
+				shp.textContent = (c.shape === 1 ? (pc.lpn_geojson_import_done_one || 'One Shape imported from {file}.')
+					: (pc.lpn_geojson_import_done || '{n} Shapes imported from {file}.').replace('{n}', c.shape)).replace('{file}', fileName);
+				body.appendChild(shp);
+			}
+			if (!net.notes.length) {
+				var ok = document.createElement('p');
+				ok.style.margin = '0';
+				ok.textContent = pc.lpn_inp_report_clean || 'All data in the file was imported. Nothing was omitted.';
+				body.appendChild(ok);
+				return;
+			}
+			var lead = document.createElement('p');
+			lead.style.margin = '0 0 6px';
+			lead.textContent = pc.lpn_gjnet_report_lead || 'Each change made during import, and each feature not imported, is listed below with the reason:';
+			body.appendChild(lead);
+			var ul = document.createElement('ul');
+			ul.id = 'lpn_gjnet_report';
+			ul.style.margin = '0';
+			ul.style.paddingLeft = '20px';
+			ul.style.maxHeight = '50vh';
+			ul.style.overflow = 'auto';
+			net.notes.forEach(function (n) {
+				var li = document.createElement('li'), ids = n.ids.slice(0, CAP).join(', ');
+				li.setAttribute('data-code', n.code);
+				li.style.marginBottom = '4px';
+				if (n.ids.length > CAP) { ids += ' ' + (pc.lpn_gjnet_and_more || 'and {n} more').replace('{n}', n.ids.length - CAP); }
+				li.textContent = geoJsonNetNoteText(n, net) + (n.ids.length ? ' (' + ids + ')' : '');
+				ul.appendChild(li);
+			});
+			body.appendChild(ul);
+		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
+	}
+
 	// ---- File > Import surveyed points (ROADMAP Task 592) ---------------------------------------
 	//
 	// **THE READING IS js/lpn-survey.js's AND THE DOCUMENT IS OURS.** That file takes text and
@@ -45324,6 +45737,9 @@ var EngCalcs = EngCalcs || {};
 			  tip: pc.lpn_file_import_survey_tip, fn: pickSurveyFile },
 			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
 			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
+			// A GeoJSON file as a network, through one mapping step (Task 728).
+			{ icon: 'open', label: pc.lpn_file_import_geojson_net || 'Import GeoJSON network…',
+			  tip: pc.lpn_file_import_geojson_net_tip, fn: pickGeoJsonNetFile },
 			// The points, lines and polygons of a GeoJSON file, as Shapes (Task 779).
 			{ icon: 'open', label: pc.lpn_file_import_shapes || 'Import GeoJSON shapes…',
 			  tip: pc.lpn_file_import_shapes_tip, fn: pickGeoJsonFile },
