@@ -5790,6 +5790,21 @@
             "on": "Values ({n}) were rewritten into {unit}.",
             "ruled": "2026-10-15",
             "answer": "Approved."
+        },
+        "lpn_time_run_cut_off": {
+            "on": "EPANET had closed {link} and then could not solve for {nodes}.",
+            "ruled": "2026-10-15",
+            "answer": "R-402 status messages: Approved."
+        },
+        "lpn_time_run_cut_off_full": {
+            "on": "Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.",
+            "ruled": "2026-10-15",
+            "answer": "R-402 status messages: Approved."
+        },
+        "lpn_time_run_cut_off_empty": {
+            "on": "Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.",
+            "ruled": "2026-10-15",
+            "answer": "R-402 status messages: Approved."
         }
     }
 }

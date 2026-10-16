@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**3 still to read on master**, of 3 untranslated keys, of 2642 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read on master**, of 3 untranslated keys, of 2642 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,23 +199,23 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (3, 3 to read @@ NEEDS RULING)
+## lpn_  (3, all ruled)
 
 - **`lpn_time_run_cut_off`**
   > EPANET had closed {link} and then could not solve for {nodes}.
-  @@ NEEDS RULING
+  _Ruled 2026-10-15: R-402 status messages: Approved._
 - **`lpn_time_run_cut_off_empty`**
   > Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.
-  @@ NEEDS RULING
+  _Ruled 2026-10-15: R-402 status messages: Approved._
 - **`lpn_time_run_cut_off_full`**
   > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
-  @@ NEEDS RULING
+  _Ruled 2026-10-15: R-402 status messages: Approved._
 
 ---
 
 # Strings waiting on a branch
 
-**183 still to read**, of 186 new keys across 11 unmerged branch(es).
+**181 still to read**, of 184 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -226,7 +226,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`95663d00c`) — 173 new, 173 to read @@ NEEDS RULING
+### feat/bentley-interop (`3e96554d3`) — 171 new, 171 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -244,7 +244,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Clean map
   @@ NEEDS RULING
 - **`lpn_clean_map_tip`**
-  > Checked: the map shows only the drawing. The zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.
+  > Checked: The zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.
   @@ NEEDS RULING
 - **`lpn_control_inactive_note`**
   > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
@@ -702,12 +702,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_sm_shared_note`**
   > Shared with: {list}
   @@ NEEDS RULING
-- **`lpn_sm_table`**
-  > Scenarios table
-  @@ NEEDS RULING
-- **`lpn_sm_table_tip`**
-  > Show or hide the Scenarios table beside the Scenario manager.
-  @@ NEEDS RULING
 - **`lpn_sm_title`**
   > Scenario manager
   @@ NEEDS RULING
@@ -748,7 +742,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Drag to resize
   @@ NEEDS RULING
 
-### feat/description-lines (`ed8215176`) — adds no English strings
+### feat/description-lines (`7e68251a3`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -807,4 +801,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
 
-### fix/zero-demand-solve (`4879fe1fc`) — adds no English strings
+### fix/zero-demand-solve (`f06e7b4fe`) — adds no English strings
