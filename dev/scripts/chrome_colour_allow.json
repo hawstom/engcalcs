@@ -32,10 +32,6 @@
 		{
 			"path": "^@media print",
 			"reason": "paper is always black on white"
-		},
-		{
-			"path": "^@media \\(prefers-color-scheme: dark\\)",
-			"reason": "the one pre-existing dark rule; Phase 2 replaces it with a token set"
 		}
 	],
 	"css_custom_properties": [
