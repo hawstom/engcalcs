@@ -26,6 +26,13 @@
  * the KEYS instead: if a prefix exists in lib/lang.ec.en.php, somebody must have decided what
  * glossary terms it needs, even if the decision was "none".
  *
+ * WHAT THE MAP DECIDES SINCE 2026-10-16 (Appendix D step 1, dev/translation-clarification-review.md).
+ * The payload generator no longer sends a prefix's whole list or falls back to three defaults. It
+ * sends a term when a batch key cites it, or when the term's English appears in a batch string. The
+ * map now decides only one thing: where a SENSE-QUALIFIED term ("run (a simulation)", "text (map
+ * annotation)") is matched by its bare word. An unwired prefix therefore loses those terms, silently,
+ * which is what this check still guards. The history above describes the old, larger failure.
+ *
  * A PREFIX OWNING NO GLOSSARY TERM IS LEGITIMATE, which is why this is a two-list check rather
  * than a one-list one. `u_` is unit symbols; `view_`, `install_`, `contact_` are page chrome with
  * no hydraulic concept in them. Silence cannot distinguish those from an oversight, so they are
@@ -133,20 +140,17 @@ $f = ecPrefixMapFindings($ec_lang, $prefixMap, EC_NO_GLOSSARY_PREFIXES);
 $fatal = count($f['unwired']) + count($f['contradictory']) + count($f['stale']);
 
 if ($f['unwired']) {
-    echo 'Prefixes reaching a translation sprint with the DEFAULT three terms: '
+    echo 'Prefixes wired to no glossary terms and not declared to own none: '
         . count($f['unwired']) . "\n\n";
     foreach ($f['unwired'] as $prefix => $n) {
         echo "  '$prefix' owns $n English key(s) and is in neither list.\n";
     }
-    echo "\nEach of these gets flow, velocity and slope and nothing else -- no definitions, no\n";
-    echo "preferred translations, and no avoid arrays, which are the whole point of a trap term.\n";
-    echo "Nothing warns: payloads generate, --check says FRESH, the sprint runs, the guards were\n";
-    echo "never delivered.\n\n";
+    echo "\nA sense-qualified glossary term (\"run (a simulation)\") reaches these prefixes' strings only\n";
+    echo "through this map, so its definition and avoid list never arrive. Nothing warns: payloads\n";
+    echo "generate, --check says FRESH, the sprint runs, the guards were never delivered.\n\n";
     echo "Two fixes, and one of them is always right:\n";
     echo "  1. Wire it. Add the prefix to prefixToTermNames() in dev/scripts/prefix_terms.inc.php,\n";
-    echo "     listing the glossary.json terms the calculator uses. Verify by reading\n";
-    echo "     glossary_terms_by_prefix.<prefix> out of a generated payload -- exactly three\n";
-    echo "     entries means it is still falling back.\n";
+    echo "     listing the glossary.json terms the calculator uses.\n";
     echo "  2. Declare it. If the prefix owns no technical concept (page chrome, unit symbols),\n";
     echo "     add it to EC_NO_GLOSSARY_PREFIXES at the top of this file WITH THE REASON.\n\n";
 }

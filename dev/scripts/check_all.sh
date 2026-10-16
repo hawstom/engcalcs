@@ -465,10 +465,9 @@ run_check "payload freshness"            blocking php dev/scripts/generate_trans
 # preserve mtimes and neither does a worktree. A blocking check that cries wolf on a clean
 # checkout is the shape that teaches people to ignore it.
 run_check "payload freshness selftest"   blocking php dev/scripts/payload_freshness_selftest.php
-# Task 322 row 4. A prefix missing from prefixToTermNames() does not fail -- it silently falls back
-# to three default terms, and every definition, preferred translation and avoid array written for
-# that calculator reaches no agent. gloss_ref_check.php can only see a prefix somebody already
-# wrote a gloss: pointer for, which a brand-new calculator has not.
+# Task 322 row 4. A prefix missing from prefixToTermNames() does not fail -- its strings silently
+# never receive a sense-qualified glossary term ("run (a simulation)"), definition and avoid list
+# included. Every prefix must be wired or declared to own no term.
 run_check "prefix glossary map"          blocking php dev/scripts/prefix_map_check.php
 run_check "prefix map selftest"          blocking php dev/scripts/prefix_map_selftest.php
 # Task 314. The served examples/ directory is GENERATED from dev/water-network-examples/, so it can

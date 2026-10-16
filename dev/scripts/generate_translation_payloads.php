@@ -17,16 +17,25 @@
  * payload['meta']['out_of_scope_key_count'] so the suppression stays visible.
  *
  * Optional sibling map support in lib/lang.ec.en.php:
- *   $ec_lang_syn['some_key'] = 'Synonyms and alternate wordings a translator can re-compress';
- * Every phrase must pass the substitution test -- it could stand in the slot as the
- * label itself. Emitted to payload['key_syn'][key]. Renamed from $ec_lang_intent
- * 2026-08-08: "intent" invited description, which is the drift the rename ends.
+ *   $ec_lang_syn['some_key'] = 'Synonyms a translator can re-compress | layout: button; avoid: X';
+ * Left of the first pipe: every phrase must pass the substitution test -- it could stand in the
+ * slot as the label itself. Emitted to payload['key_syn'][key]. Right of the pipe: commentary
+ * tags, emitted to payload['key_notes'][key] as the full instructions from the tag table in
+ * dev/language-strings.md (gloss: pointers excepted; their terms arrive in key_concepts and
+ * glossary).
+ *
+ * Per-key delivery, Appendix D step 1 of dev/translation-clarification-review.md: keys whose
+ * English was reworded since the last sync (detect_english_drift.php CHANGED) are in
+ * keys_to_translate with reason english_changed; a label and its _tip travel together in
+ * key_context; and payload['glossary'] holds only the terms this batch's strings use, once.
  *
  * Usage:
  *   php scripts/generate_translation_payloads.php
  *   php scripts/generate_translation_payloads.php --prefix=dw
  *   php scripts/generate_translation_payloads.php --lang=fr,uk --prefix=dw
  *   php scripts/generate_translation_payloads.php /tmp/payloads
+ *   php scripts/generate_translation_payloads.php /tmp/out --lang=am --as-changed=mi_station
+ *     (inspect what a translator receives for a key, treated as reworded English)
  */
 
 const DEFAULT_LANG_DIR = __DIR__ . '/../../lib';
@@ -42,6 +51,16 @@ const SUGGESTION_BOX_HEADING = '## The suggestion box';
 // the same way and for the same reason as the suggestion box.
 const CONCEPT_SOURCE_HEADING = '## Concepts are the source';
 const EN_FILE = DEFAULT_LANG_DIR . '/lang.ec.en.php';
+// Appendix D step 1 of dev/translation-clarification-review.md. The `$ec_lang_syn` commentary tags
+// (`layout:`, `avoid:`, `symbol`, `runtime:`) are shorthand for a full instruction written once, in
+// the tag table of dev/language-strings.md. The payload carries the full instruction, read from that
+// table, so the translator never has to know the shorthand and the two cannot drift apart.
+const TAG_TABLE_SOURCE = __DIR__ . '/../language-strings.md';
+const TAG_TABLE_HEADING = '### `$ec_lang_syn` format';
+// The English-drift manifest detect_english_drift.php keeps. A key whose English hash no longer
+// matches it was reworded after its translations were written; those keys travel in
+// keys_to_translate with reason english_changed instead of on a separate English-only list.
+const DRIFT_MANIFEST = __DIR__ . '/english_string_hashes.json';
 const TARGET_LANGS = [
     'am', 'ar', 'bg', 'bn', 'cs', 'de', 'es', 'fa', 'fr', 'he', 'hi', 'hr', 'id', 'it', 'km', 'my',
     'ps', 'pt', 'ro', 'ru', 'sr', 'sw', 'tr', 'uk', 'ur', 'zh',
@@ -119,6 +138,14 @@ function buildPayloads(array $opts, bool $quiet = false): array
     $prefixMap = prefixToTermNames();
     $conceptIndex = ecConceptIndex($glossaryData['terms']);
     $keyConcepts = ecLoadKeyConcepts();
+    $tagTable = loadTagTable();
+    $changedKeys = loadEnglishChangedKeys($enKeys);
+    foreach ($opts['as_changed'] as $k) {
+        if (!array_key_exists($k, $enKeys)) {
+            fail('--as-changed names a key that is not in lang.ec.en.php: ' . $k);
+        }
+        $changedKeys[$k] = true;
+    }
 
     $detectedPrefixes = detectPrefixes($enKeys);
     $activePrefixes = $detectedPrefixes;
@@ -155,37 +182,29 @@ function buildPayloads(array $opts, bool $quiet = false): array
 
         $current = loadLangArray($targetFile);
         [$deltaKeys, $keyContext, $exemptKeys, $outOfScopeKeys] =
-            collectDeltaAndContext($enKeys, $current, $activePrefixes, $lang, $exemptMap, $coverage);
+            collectDeltaAndContext($enKeys, $current, $activePrefixes, $lang, $exemptMap, $coverage, $changedKeys);
+        $keyContext = attachTipPairs($keyContext, $enKeys, $current);
         $keySyn = collectKeySyn($deltaKeys, $enKeys, $enIntent);
+        $keyNotes = collectKeyNotes($deltaKeys, $enIntent, $tagTable);
         $keyConceptMap = collectKeyConcepts($deltaKeys, $keyConcepts, $enIntent, $termIndex, $conceptIndex, $lang);
         $exemptTotal += count($exemptKeys);
         $outOfScopeTotal += count($outOfScopeKeys);
+        $changedCount = count(array_filter($keyContext, static function ($c) {
+            return ($c['reason'] ?? '') === 'english_changed';
+        }));
 
         $prefixesInDelta = detectPrefixes($deltaKeys);
-        $prefixGlossary = buildPrefixGlossary($prefixesInDelta, $termIndex, $prefixMap);
-
-        $promptByPrefix = [];
-        $termsByPrefix = [];
-        foreach ($prefixGlossary as $prefix => $terms) {
-            $promptByPrefix[$prefix] = buildPromptContext($terms, $lang);
-            $termsByPrefix[$prefix] = array_map(static function ($term) use ($lang) {
-                return [
-                    'term' => $term['term'] ?? '',
-                    'concept' => $term['concept'] ?? '',
-                    'definition' => $term['definition'] ?? '',
-                    'symbol' => $term['symbol'] ?? '',
-                    'context' => $term['context'] ?? '',
-                    'translation_notes' => $term['translation_notes'] ?? '',
-                    'preferred_translation' => $term['translations'][$lang] ?? '',
-                ];
-            }, $terms);
-        }
+        $batchTerms = selectBatchTerms($deltaKeys, $glossaryData['terms'], $keyConcepts, $enIntent, $termIndex, $prefixMap);
+        $glossaryText = buildPromptContext($batchTerms, $lang);
 
         $payload = [
             'meta' => [
                 'language' => $lang,
                 'expected_key_count' => count($enKeys),
                 'delta_key_count' => count($deltaKeys),
+                // Of those, keys the file already holds whose ENGLISH was reworded after the
+                // translation was written (detect_english_drift.php's CHANGED list).
+                'english_changed_key_count' => $changedCount,
                 // Keys that equal English legitimately (symbols, eponyms, brands, cognates) and were
                 // therefore NOT counted as delta. Listed so the suppression is visible and auditable
                 // rather than silent. See translation_exempt_keys.json (ROADMAP Task 161).
@@ -199,6 +218,7 @@ function buildPayloads(array $opts, bool $quiet = false): array
                 'active_prefixes' => $prefixesInDelta,
                 'requested_prefix' => $opts['requested_prefix'],
                 'notes' => 'Translate only keys in keys_to_translate; preserve HTML, units, and symbols.',
+                'reason_notes' => 'key_context[key].reason says what to do with each key. missing: the key is not in your file; append it as a new line. blank, equal_to_english, english_changed: the key IS already in your file, holding key_context[key].current_value; REPLACE that value in place and never append a second line for the same key. english_changed means the English was reworded after your file\'s translation was written: translate the new English, and keep words from the old translation only where they still say what the new English says.',
                 // ROADMAP Task 573 Wave 0. Two conventions that no per-key channel could carry,
                 // because they are true of every key at once. The first exists because a dropped
                 // {n} breaks a sentence in one language and nothing warns anybody; the second
@@ -207,9 +227,10 @@ function buildPayloads(array $opts, bool $quiet = false): array
                 // nothing the reader can find on the screen.
                 'placeholder_notes' => 'A word in curly braces ({n}, {ids}, {flow}, {iterations}, {name}) is a PLACEHOLDER the page replaces at runtime. Keep every one of them, spelled exactly as in English, braces included. Never translate the word inside the braces. You MAY move a placeholder to wherever your language needs it in the sentence.',
                 'control_name_notes' => 'Where an English string names a control, it names it in one of two shapes. A single control is written as its label followed by the widget word: "press the Calculate button", "the Recalculate automatically setting", "the Required fire flow box". A menu path is written as comma-separated labels: "File, Save as"; "Settings, Calculation, Hydraulics". In BOTH shapes the label is another key\'s value. Translate it with exactly the words you used for that key, so the sentence still names what is on the screen; translate the widget word and the surrounding prose normally.',
-                'glossary_injection_notes' => 'Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.',
-                'context_notes' => 'Use key_context.neighbors to keep register consistent with nearby translated strings.',
-                'syn_notes' => 'Use key_syn when present; these entries provide terse disambiguation comments only where translation risk exists.',
+                'glossary_notes' => 'glossary lists the defined technical terms that the strings in this batch use, each with your language\'s preferred translation where one exists, what the term MEANS, and what NOT to render it as. Use the preferred translation wherever the term appears. A DO NOT line forbids a physical error or a lazy transliteration, never a term that is your language\'s genuine standard.',
+                'context_notes' => 'Use key_context[key].neighbors to keep register consistent with nearby translated strings. key_context[key].tip is the help text shown for that label, and key_context[key].label is the label a tip explains: read the pair together, and give the same thing the same word in both. Where the partner already has a translation in your file, its value is shown.',
+                'syn_notes' => 'key_syn[key] gives other English wordings of that one string; any of them could stand in its place. Use whichever your language expresses most naturally and compactly; you are not bound to the literal English wording.',
+                'key_notes_notes' => 'key_notes[key] are instructions about that one string: how much room it has, a sense it must not be read in, symbols to keep exactly. Obey them. They are instructions to you, never text to put in your file.',
                 'suggestion_box_notes' => 'Read suggestion_box and follow it. It is part of your instructions, not a footnote: a sprint does not close while a translator complaint is unanswered.',
                 'concept_notes' => 'Read concept_source and follow it. key_concepts lists, for a key that names a defined concept, the definition you translate from; English is one rendering of it.',
             ],
@@ -218,13 +239,16 @@ function buildPayloads(array $opts, bool $quiet = false): array
             'suggestion_box' => $suggestionBox,
             // ROADMAP Task 737. Extracted verbatim from dev/translation-process.md, like the box above.
             'concept_source' => $conceptSource,
-            'prompt_context_by_prefix' => $promptByPrefix,
-            'glossary_terms_by_prefix' => $termsByPrefix,
+            // Only the glossary terms this batch's strings use, once, as text (Appendix D step 1).
+            // It replaced prompt_context_by_prefix and glossary_terms_by_prefix, which sent every
+            // term wired to a prefix (72 for lpn) twice over, as text and again as JSON.
+            'glossary' => $glossaryText,
             'keys_to_translate' => $deltaKeys,
             // Backward-compatibility for scripts that still expect payload["keys"].
             'keys' => $deltaKeys,
             'key_context' => $keyContext,
             'key_syn' => $keySyn,
+            'key_notes' => $keyNotes,
             'key_concepts' => $keyConceptMap,
         ];
 
@@ -249,6 +273,9 @@ function parseArgs(array $argv): array
         'requested_prefix' => null,
         'languages' => [],
         'check' => false,
+        // Keys to treat as if detect_english_drift.php reported them CHANGED. For inspecting what a
+        // translator would receive for a key (and for the self-test); never used to build a sprint.
+        'as_changed' => [],
     ];
 
     $positionals = [];
@@ -260,6 +287,10 @@ function parseArgs(array $argv): array
         }
         if (strpos($arg, '--prefix=') === 0) {
             $opts['requested_prefix'] = trim(substr($arg, strlen('--prefix=')));
+            continue;
+        }
+        if (strpos($arg, '--as-changed=') === 0) {
+            $opts['as_changed'] = splitCsv(substr($arg, strlen('--as-changed=')));
             continue;
         }
         if (strpos($arg, '--lang=') === 0) {
@@ -294,6 +325,8 @@ function printHelpAndExit(): void
     echo "Usage: php scripts/generate_translation_payloads.php [output_dir] [prefix]\n";
     echo "       php scripts/generate_translation_payloads.php --lang=fr,uk --prefix=dw\n";
     echo "       php scripts/generate_translation_payloads.php --check   (verify payloads are up to date; exit 1 if stale)\n";
+    echo "       php scripts/generate_translation_payloads.php /tmp/out --lang=am --as-changed=mi_station\n";
+    echo "           (inspect: treat the named keys as reworded English, as a translator would receive them)\n";
     exit(0);
 }
 
@@ -522,6 +555,255 @@ function collectKeySyn(array $deltaKeys, array $enKeys, array $intentMap): array
     return $result;
 }
 
+/**
+ * The tag table in dev/language-strings.md, as tag => [value => full instruction]. A value written
+ * in italics there (`*(wrong sense)*`, `*(flag)*`, `*(term)*`) is free, and is stored under '*'.
+ *
+ * Fatal on a missing or empty table, for the same reason loadFencedBlock() is: a payload that
+ * quietly shipped every key note as bare shorthand would look fine and teach nothing.
+ */
+function loadTagTable(): array
+{
+    $md = @file_get_contents(TAG_TABLE_SOURCE);
+    if (!is_string($md)) {
+        fail('Tag table source not found: ' . TAG_TABLE_SOURCE);
+    }
+    $at = strpos($md, TAG_TABLE_HEADING);
+    if ($at === false) {
+        fail('No "' . TAG_TABLE_HEADING . '" heading in ' . basename(TAG_TABLE_SOURCE)
+            . ' -- every key note is rendered from the tag table under it.');
+    }
+    $table = [];
+    $started = false;
+    foreach (explode("\n", substr($md, $at)) as $line) {
+        if (preg_match('/^\|\s*`([a-z-]+)`\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|\s*$/', $line, $m)) {
+            $started = true;
+            $value = preg_match('/^`([^`]+)`$/', $m[2], $v) ? $v[1] : '*';
+            $table[$m[1]][$value] = trim(str_replace('**', '', $m[3]));
+        } elseif ($started && trim($line) === '') {
+            break;
+        }
+    }
+    if ($table === []) {
+        fail('The tag table under "' . TAG_TABLE_HEADING . '" in ' . basename(TAG_TABLE_SOURCE) . ' is empty or unreadable.');
+    }
+    return $table;
+}
+
+/**
+ * Split `$ec_lang_syn` commentary into [tag, value, raw] parts. A new tag begins only at a known
+ * tag name, because tag values are prose and prose contains semicolons. The same rule as
+ * layout_tag_check.php's splitTags(); see the comment there for the defect that taught it.
+ * A part that does not begin with a known tag comes back with tag '' and is free commentary.
+ */
+function splitSynCommentary(string $commentary, array $knownTags): array
+{
+    $names = implode('|', array_map(static function ($t) { return preg_quote($t, '/'); }, $knownTags));
+    $parts = preg_split('/;\s*(?=(?:' . $names . ')\s*[:;]|(?:' . $names . ')\s*$)/', $commentary);
+    $out = [];
+    foreach ($parts as $part) {
+        $part = trim($part);
+        if ($part === '') {
+            continue;
+        }
+        // `symbol; <prose>`: a flag followed by a sentence.
+        if (preg_match('/^(' . $names . ')\s*;\s*(.+)$/s', $part, $mm)) {
+            $out[] = [$mm[1], '', $mm[1]];
+            $part = trim($mm[2]);
+        }
+        if (preg_match('/^(' . $names . ')\s*(?::\s*(.*))?$/s', $part, $mm)) {
+            $out[] = [$mm[1], trim($mm[2] ?? ''), $part];
+        } else {
+            $out[] = ['', '', $part];
+        }
+    }
+    return $out;
+}
+
+/**
+ * Appendix D step 1, item 1. The commentary right of the first pipe in a key's `$ec_lang_syn`,
+ * rendered as the plain instructions a translator needs, one string per instruction:
+ *
+ *   layout/runtime: <value>  -> "Layout (<value>): <the table's full instruction>"
+ *   avoid: <sense>           -> "Avoid: <sense>. <the table's instruction>" (several avoids merge)
+ *   symbol                   -> "Symbol: <the table's instruction>"
+ *   gloss: <term>            -> nothing here; the term already arrives through key_concepts and glossary
+ *   free prose               -> "Note: <prose>"
+ *
+ * Emitted whether or not the synonyms left of the pipe equal the English, unlike key_syn: a key
+ * with nothing to say on the left can still carry a warning on the right.
+ */
+function collectKeyNotes(array $deltaKeys, array $synMap, array $tagTable): array
+{
+    $known = array_keys($tagTable);
+    $out = [];
+    foreach ($deltaKeys as $key => $english) {
+        if (!isset($synMap[$key])) {
+            continue;
+        }
+        $syn = (string)$synMap[$key];
+        $pipe = strpos($syn, '|');
+        if ($pipe === false) {
+            continue;
+        }
+        $notes = [];
+        $avoids = [];
+        foreach (splitSynCommentary(substr($syn, $pipe + 1), $known) as [$tag, $value, $raw]) {
+            if ($tag === '') {
+                $notes[] = 'Note: ' . $raw;
+                continue;
+            }
+            if ($tag === 'gloss') {
+                continue;
+            }
+            if ($tag === 'avoid') {
+                if ($value !== '') {
+                    $avoids[] = rtrim($value, '. ');
+                }
+                continue;
+            }
+            $instruction = $tagTable[$tag][$value] ?? $tagTable[$tag]['*'] ?? '';
+            $label = ucfirst($tag) . ($value !== '' ? ' (' . $value . ')' : '');
+            $notes[] = $instruction !== '' ? $label . ': ' . $instruction : $label;
+        }
+        if ($avoids) {
+            $instruction = $tagTable['avoid']['*'] ?? '';
+            array_unshift($notes, 'Avoid: ' . implode('; ', $avoids) . '.' . ($instruction !== '' ? ' ' . $instruction : ''));
+        }
+        if ($notes) {
+            $out[$key] = $notes;
+        }
+    }
+    return $out;
+}
+
+/**
+ * Keys whose English no longer matches detect_english_drift.php's manifest, as key => true. The
+ * same comparison that script's diff() makes (sha1 of the English value), so the payload and its
+ * --json list name the same keys. NEW keys are absent from the manifest and are left to the
+ * missing-key delta, as there.
+ */
+function loadEnglishChangedKeys(array $enKeys): array
+{
+    $raw = @file_get_contents(DRIFT_MANIFEST);
+    if (!is_string($raw)) {
+        return [];
+    }
+    $data = json_decode($raw, true);
+    $hashes = is_array($data['hashes'] ?? null) ? $data['hashes'] : [];
+    $out = [];
+    foreach ($enKeys as $key => $value) {
+        if (isset($hashes[$key]) && $hashes[$key] !== sha1((string)$value)) {
+            $out[$key] = true;
+        }
+    }
+    return $out;
+}
+
+/**
+ * Appendix D step 1, item 3. A label and its `_tip` explain each other, so when either is in the
+ * batch the other rides along in key_context: key_context[label].tip and key_context[tip].label,
+ * each as {key, english[, value]} where value is this language's current translation, if any.
+ */
+function attachTipPairs(array $keyContext, array $enKeys, array $current): array
+{
+    $partner = static function (string $key) use ($enKeys, $current): array {
+        $entry = ['key' => $key, 'english' => (string)$enKeys[$key]];
+        $have = array_key_exists($key, $current) ? trim((string)$current[$key]) : '';
+        if ($have !== '' && normalizeForCompare($have) !== normalizeForCompare((string)$enKeys[$key])) {
+            $entry['value'] = $have;
+        }
+        return $entry;
+    };
+    foreach (array_keys($keyContext) as $key) {
+        if (substr($key, -4) === '_tip') {
+            $label = substr($key, 0, -4);
+            if (array_key_exists($label, $enKeys)) {
+                $keyContext[$key]['label'] = $partner($label);
+            }
+        } elseif (array_key_exists($key . '_tip', $enKeys)) {
+            $keyContext[$key]['tip'] = $partner($key . '_tip');
+        }
+    }
+    return $keyContext;
+}
+
+/**
+ * Appendix D step 1, item 4. The glossary terms this batch's strings actually use, in glossary
+ * order:
+ *
+ *   - every term a batch key cites, through key_concepts.json or a `gloss:` pointer;
+ *   - every term whose English rendering appears as a word or phrase in a batch string (a plural
+ *     s/es allowed), EXCEPT that a sense-qualified term, one whose name carries a parenthetical
+ *     such as "run (a simulation)" or "text (map annotation)", counts only in a string whose
+ *     prefix wires it in prefix_terms.inc.php. Its bare word ("run", "text", "open") also appears
+ *     in other senses in other calculators, and a guard written for one sense is wrong advice in
+ *     another.
+ *
+ * A term whose English appears in no batch string, and that no batch key cites, has nothing in
+ * this batch to help with. Sending it anyway is what made an lpn payload carry all 72 lpn terms.
+ */
+function selectBatchTerms(array $deltaKeys, array $terms, array $keyConcepts, array $synMap, array $termIndex, array $prefixMap): array
+{
+    if (count($deltaKeys) === 0) {
+        return [];
+    }
+    $cited = [];
+    $textAll = '';
+    $textWired = []; // lower-cased term name => the batch strings whose prefix wires it
+    foreach ($deltaKeys as $key => $english) {
+        foreach ($keyConcepts[$key] ?? [] as $id) {
+            $cited['concept:' . $id] = true;
+        }
+        if (isset($synMap[$key])) {
+            foreach (ecGlossPointerTerms((string)$synMap[$key]) as $name) {
+                $cited['term:' . $name] = true;
+            }
+        }
+        $plain = ' ' . html_entity_decode(strip_tags((string)$english), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $textAll .= $plain;
+        foreach ($prefixMap[keyPrefix((string)$key)] ?? [] as $wired) {
+            $lc = strtolower($wired);
+            $textWired[$lc] = ($textWired[$lc] ?? '') . $plain;
+        }
+    }
+    $out = [];
+    foreach ($terms as $term) {
+        if (!is_array($term) || !isset($term['term'])) {
+            continue;
+        }
+        $name = strtolower((string)$term['term']);
+        if (($termIndex[$name] ?? null) !== $term) {
+            continue; // a duplicate name; gloss_ref_check.php refuses those, termIndexByName() keeps the last
+        }
+        $take = isset($cited['term:' . $name]) || isset($cited['concept:' . ($term['concept'] ?? '')]);
+        if (!$take) {
+            $qualified = strpos($name, '(') !== false;
+            $haystack = $qualified ? ($textWired[$name] ?? '') : $textAll;
+            $forms = $haystack === '' ? [] : array_unique([
+                ecConceptEnglish($term),
+                (string)preg_replace('/\s*\([^)]*\)\s*$/', '', (string)$term['term']),
+            ]);
+            foreach ($forms as $form) {
+                $form = trim($form);
+                if ($form === '') {
+                    continue;
+                }
+                $phrase = preg_replace('/ +/', '\s+', preg_quote($form, '/'));
+                if (preg_match('/(?<![\p{L}\p{N}])' . $phrase . '(?:s|es)?(?![\p{L}\p{N}])/iu', $haystack)) {
+                    $take = true;
+                    break;
+                }
+            }
+        }
+        if ($take) {
+            $out[] = $term;
+        }
+    }
+    return $out;
+}
+
+
 function detectPrefixes(array $keys): array
 {
     $prefixes = [];
@@ -548,7 +830,8 @@ function collectDeltaAndContext(
     array $activePrefixes,
     string $lang,
     array $exemptMap,
-    array $coverage
+    array $coverage,
+    array $changedKeys = []
 ): array {
     $delta = [];
     $context = [];
@@ -577,6 +860,24 @@ function collectDeltaAndContext(
             } elseif (!ecIsUniversalKey($key, $english)) {
                 $reason = 'equal_to_english';
             }
+        }
+
+        // Reworded English (detect_english_drift.php CHANGED). The file holds a translation, so
+        // this is not a gap and scope is not consulted: an already-translated key stays
+        // maintained whatever tier its cell is in. A value still equal to English is the
+        // equal_to_english case above, or exempt, and is not stale.
+        if ($reason === null && isset($changedKeys[$key]) && $currentValue !== null && $currentValue !== ''
+            && normalizeForCompare($currentValue) !== normalizeForCompare($english)) {
+            $delta[$key] = $english;
+            $context[$key] = [
+                'reason' => 'english_changed',
+                'current_value' => $currentValue,
+                'neighbors' => [
+                    'previous_translated' => findNeighbor($orderedKeys, $enKeys, $current, $i, -1),
+                    'next_translated' => findNeighbor($orderedKeys, $enKeys, $current, $i, 1),
+                ],
+            ];
+            continue;
         }
 
         if ($reason === null) {
@@ -650,32 +951,10 @@ function termIndexByName(array $terms): array
     return $index;
 }
 
-// prefixToTermNames() lives in prefix_terms.inc.php, required at the top of this file, so
-// gloss_ref_check.php can read the same map instead of keeping a copy that could drift.
-function buildPrefixGlossary(array $activePrefixes, array $termIndex, array $prefixMap): array
-{
-    $prefixGlossary = [];
-    $defaultTerms = ['flow', 'velocity', 'slope'];
-
-    foreach ($activePrefixes as $prefix) {
-        $names = $prefixMap[$prefix] ?? $defaultTerms;
-        $entries = [];
-        foreach ($names as $name) {
-            $term = $termIndex[strtolower($name)] ?? null;
-            if ($term !== null) {
-                $entries[] = $term;
-            }
-        }
-        $prefixGlossary[$prefix] = $entries;
-    }
-
-    return $prefixGlossary;
-}
-
 function buildPromptContext(array $terms, string $language): string
 {
     if (count($terms) === 0) {
-        return 'No calculator-specific glossary terms were matched.';
+        return 'No glossary term is used by the strings in this batch.';
     }
 
     $lines = [];
@@ -687,7 +966,7 @@ function buildPromptContext(array $terms, string $language): string
 
         $symbol = $term['symbol'] ?? '';
         $translation = $term['translations'][$language] ?? '';
-        $translationDisplay = ($translation === '') ? '[needs translation sprint]' : $translation;
+        $translationDisplay = ($translation === '') ? '(no preferred translation yet: use your language\'s standard term)' : $translation;
 
         $line = '- ' . $name;
         if ($symbol !== '') {
@@ -709,7 +988,7 @@ function buildPromptContext(array $terms, string $language): string
         $lines[] = $line;
     }
 
-    return "Use these preferred technical term translations when relevant:\n" . implode("\n", $lines);
+    return "Technical terms used by the strings in this batch, each as: term (symbol): your language's preferred translation.\n" . implode("\n", $lines);
 }
 
 /**
