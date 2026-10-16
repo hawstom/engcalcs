@@ -69676,6 +69676,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// It is not a hydraulic edit, so it works with Recalculate off exactly as Properties does.
 	var textEditor = null;
 	function textEditorOpen() { return !!textEditor; }
+	// **THE LAYOUT'S WIDTH, NOT innerWidth** (R-392). Chrome on a phone reports innerWidth as the
+	// VISIBLE width, so the zoom it makes onto a field typed in at a small size reads as a narrower
+	// window, and the editor closed the moment it opened. Only rotating or resizing the window
+	// changes this one.
+	function layoutWidth() { return document.documentElement.clientWidth || window.innerWidth; }
 	function openTextEditor(labelId, fresh) {
 		var lb = labelById(labelId), le = labelEls[labelId], ta, ed, pt, s, fontPx, fx, fy, ang, cs;
 		if (!lb || !le || !le.text || !svg) { return false; }
@@ -69704,7 +69709,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		document.body.appendChild(ta);
 		ed = textEditor = { id: labelId, ta: ta, fresh: !!fresh, opened: Date.now(), orig: ta.value,
 			// The step the placement took, so a placement taken back takes its step back too.
-			placeSnap: fresh ? undoStack[undoStack.length - 1] : null, winW: window.innerWidth,
+			placeSnap: fresh ? undoStack[undoStack.length - 1] : null, winW: layoutWidth(),
 			ax: s.x, ay: s.y, fx: fx, fy: fy, ang: ang, done: false };
 		function fit() {
 			var w, h;
@@ -69750,20 +69755,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// are: a width change commits. **A HEIGHT CHANGE ALONE IS A PHONE'S KEYBOARD** (Tom,
 		// 2026-10-15: *"On a phone, the text opens for editing, but when the on-screen keyboard
 		// appears, it closes."*): an Android keyboard shortens the window, the map shortens with it
-		// and keeps its centre, so the words move up -- the box moves with them and stays open.
+		// and keeps its centre, so the words move up -- the box moves with them and stays open. The
+		// visual viewport's own resize (a keyboard or a zoom that leaves the window alone) only
+		// re-places the box too.
 		ed.onResize = function () {
 			setTimeout(function () {
 				var p, q;
 				if (textEditor !== ed) { return; }
 				p = labelById(ed.id) && textLabelPoint(labelById(ed.id));
 				q = p && worldToScreen(p.x, p.y);
-				if (window.innerWidth !== ed.winW || !q) { closeTextEditor(true); return; }
+				if (layoutWidth() !== ed.winW || !q) { closeTextEditor(true); return; }
 				if (Math.hypot(q.x - ed.ax, q.y - ed.ay) > 1) { ed.ax = q.x; ed.ay = q.y; fit(); }
 			}, 120);
 		};
 		window.addEventListener('keydown', ed.onKey, true);
 		window.addEventListener('pointerdown', ed.onPress, true);
 		window.addEventListener('resize', ed.onResize);
+		if (window.visualViewport) { window.visualViewport.addEventListener('resize', ed.onResize); }
 		svg.addEventListener('wheel', ed.onWheel, true);
 		ta.focus();
 		ta.select();
@@ -69779,6 +69787,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		window.removeEventListener('keydown', ed.onKey, true);
 		window.removeEventListener('pointerdown', ed.onPress, true);
 		window.removeEventListener('resize', ed.onResize);
+		if (window.visualViewport) { window.visualViewport.removeEventListener('resize', ed.onResize); }
 		svg.removeEventListener('wheel', ed.onWheel, true);
 		lb = labelById(ed.id); le = labelEls[ed.id];
 		if (le && le.text) { le.text.style.visibility = ''; }

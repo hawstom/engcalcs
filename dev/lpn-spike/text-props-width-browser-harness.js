@@ -7,7 +7,10 @@
 //   2. dragging the Properties box wider (an inline width, which is what the corner drag writes)
 //      widens the words box with it, and narrower again narrows it;
 //   3. the words box drags taller only;
-//   4. the Size multiplier box is short: under a third of the Description box beside it.
+//   4. the Size multiplier box is short: under a third of the Description box beside it, and
+//      under 80 px;
+//   5. on a phone (412 px, touch), Properties opened by a tap on the Text: the words box fills the
+//      box there too, and the Size box is still short.
 //
 //   node dev/lpn-spike/text-props-width-browser-harness.js   (takes the browser lock itself)
 //
@@ -90,9 +93,57 @@ async function main() {
 		const mid = await m();
 		ok('...and narrower again, it follows back', mid.ta < wide.ta && Math.abs(mid.ta - mid.inner) <= 2, JSON.stringify(mid));
 		ok('3. the words box drags taller only', r.resize === 'vertical', r.resize);
-		ok('4. the Size multiplier box is short, under a third of the Description box', r.size > 0 && r.size * 3 < r.desc && r.size >= 40, JSON.stringify(r));
+		ok('4. the Size multiplier box is short, under a third of the Description box and under 80 px',
+			r.size > 0 && r.size * 3 < r.desc && r.size >= 40 && r.size < 80, JSON.stringify(r));
 		ok('no page error', a.errors.length === 0, a.errors.join(' | '));
 		await a.close();
+
+		console.log('\n5. On a phone');
+		const ph = await Session.open(browser, NAME + '-phone', { viewport: { width: 1200, height: 800 }, hasTouch: true, isMobile: true });
+		const Q = ph.page;
+		await Q.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (route) => route.abort());
+		await ph.goto('Looped-Network.php');
+		await ph.answerTrainingPanel().catch(() => {});
+		await Q.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+		await ph.settle(800);
+		await ph.newProject('us');
+		await ph.dismissGallery();
+		await ph.settle(600);
+		// Placed while the window is wide enough to show the Text tool, then narrowed to a phone.
+		await ph.toolbarClick(await ph.lang('lpn_tool_add_text'));
+		await ph.settle(300);
+		const ps = await Q.evaluate(() => { const b = document.getElementById('lpn_canvas').getBoundingClientRect(); return { x: b.x + b.width * 0.5, y: b.y + b.height * 0.3 }; });
+		await Q.touchscreen.tap(ps.x, ps.y);
+		await ph.settle(300);
+		await Q.keyboard.type('Pump station');
+		await Q.keyboard.press('Control+Enter');
+		await ph.settle(300);
+		await Q.keyboard.press('Escape'); await Q.keyboard.press('Escape'); await ph.settle(150);
+		await Q.keyboard.press('0');
+		await Q.setViewportSize({ width: 412, height: 800 });
+		await ph.settle(1000);
+		const tc = await Q.evaluate(() => { const t = document.querySelector('#lpn_canvas text.lpn-lbl[data-lbl]'); const b = t.getBoundingClientRect(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; });
+		await Q.touchscreen.tap(tc.x, tc.y);
+		await ph.settle(900);
+		const pm = () => Q.evaluate(([d, z]) => {
+			const f = document.getElementById('lpn_popup_fields'), ta = f.querySelector('textarea');
+			const cs = getComputedStyle(f), inner = f.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+			const byLabel = (t) => Array.from(f.querySelectorAll('label')).filter((l) => l.textContent.trim().indexOf(t) === 0).map((l) => l.querySelector('input'))[0];
+			const si = byLabel(z);
+			return { open: !!ta && document.getElementById('lpn_popup').style.display !== 'none', inner: Math.round(inner),
+				box: Math.round(document.getElementById('lpn_popup').getBoundingClientRect().width),
+				ta: ta ? Math.round(ta.getBoundingClientRect().width) : null, size: si ? Math.round(si.getBoundingClientRect().width) : null };
+		}, [DESC, SIZE]);
+		const p1 = await pm();
+		ok('Properties is open on the Text on the phone', p1.open, JSON.stringify(p1));
+		ok('...the words box is as wide as the fields there', p1.ta !== null && Math.abs(p1.ta - p1.inner) <= 2, JSON.stringify(p1));
+		ok('...and the Size box is short (under 80 px)', p1.size > 0 && p1.size < 80, JSON.stringify(p1));
+		await Q.evaluate(() => { document.getElementById('lpn_popup').style.width = '380px'; });
+		await ph.settle(300);
+		const p2 = await pm();
+		ok('...dragged wider on the phone, the words box follows', p2.ta > p1.ta + 50 && Math.abs(p2.ta - p2.inner) <= 2, JSON.stringify(p2));
+		ok('no page error on the phone', ph.errors.length === 0, ph.errors.join(' | '));
+		await ph.close();
 	} catch (e) {
 		ok('harness ran to the end', false, e && e.stack);
 	} finally {
