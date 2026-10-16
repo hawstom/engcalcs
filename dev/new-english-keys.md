@@ -715,7 +715,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**3 still to read**, of 6 new keys across 19 unmerged branch(es).
+**3 still to read**, of 6 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -726,15 +726,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-1016 (`a5b2945d9`) — adds no English strings
+### chore/date-fix-1015 (`0028a9459`) — adds no English strings
 
 ### chore/ledger-wording (`37092cd70`) — adds no English strings
 
-### feat/balloon-presentation (`2789c6641`) — adds no English strings
-
-### feat/bentley-interop (`51a0b3d52`) — adds no English strings
-
-### feat/clean-map (`43e46b24e`) — adds no English strings
+### feat/bentley-interop (`97d46dfe7`) — adds no English strings
 
 ### feat/description-lines (`895d34b7b`) — adds no English strings
 
@@ -766,8 +762,6 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/match-property (`05bda7651`) — adds no English strings
 
-### feat/scenario-flyout (`0ddb8124c`) — adds no English strings
-
 ### fix/zero-demand-solve (`c4b5fd714`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_time_run_cut_off`**
@@ -779,7 +773,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_time_run_cut_off_full`**
   > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
   @@ NEEDS RULING
-
-### perf/cross-shed (`7673e0c73`) — adds no English strings
-
-### perf/switch-cost (`2ece408d1`) — adds no English strings
