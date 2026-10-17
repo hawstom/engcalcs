@@ -3173,6 +3173,7 @@ $ec_lang['lpn_sm_current_already']='This scenario is already the current scenari
 $ec_lang['lpn_sm_none_selected']='Select an item in the tree first.';
 $ec_lang['lpn_sm_base_named']='The Base of a tree is not renamed.';
 $ec_lang['lpn_sm_copy']='Copy';
+$ec_lang['lpn_sm_copy_base_tip']='Copy Base as a child alternative. The copy holds no overrides and inherits every value from Base.';
 $ec_lang['lpn_sm_merge_up']='Merge upward';
 $ec_lang['lpn_sm_merge_up_tip']='Move the overrides of the selected alternative into an alternative above it in the tree. The selected alternative then inherits those values.';
 $ec_lang['lpn_sm_merge_up_root']='A Base alternative has nothing above it to merge into.';

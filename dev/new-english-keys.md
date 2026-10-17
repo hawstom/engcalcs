@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**9 still to read on master**, of 186 untranslated keys, of 2806 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**10 still to read on master**, of 187 untranslated keys, of 2807 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -79,7 +79,7 @@ is the one you meant. "The first one" is a complete answer.
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (186, 9 to read @@ NEEDS RULING)
+## lpn_  (187, 10 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -501,6 +501,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_sm_copy`**
   > Copy
   _Ruled OK 2026-10-16._
+- **`lpn_sm_copy_base_tip`**
+  > Copy Base as a child alternative. The copy holds no overrides and inherits every value from Base.
+  @@ NEEDS RULING
 - **`lpn_sm_current_already`**
   > This scenario is already the current scenario.
   _Ruled OK 2026-10-16._
@@ -1070,4 +1073,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/scenarios-menu (`5c8b3a1c7`) — adds no English strings
+### feat/scenarios-menu (`38fae436c`) — adds no English strings
