@@ -33,7 +33,7 @@ async function main() {
 	try {
 		const shapes = {};
 		for (const basic of [true, false]) {
-			const mode = basic ? 'Basic mode ON' : 'Basic mode OFF';
+			const mode = basic ? '[basic: true]' : '[basic: false]';
 			console.log('\n--- ' + mode + ' ---');
 			const ctx = await U.openNet1(browser, NAME + (basic ? '-basic' : '-alt'));
 			await U.setBasicMode(ctx, basic);
