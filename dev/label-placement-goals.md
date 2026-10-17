@@ -283,8 +283,15 @@ reduce font → abbreviate → key-number, in the listed order. We have none of 
 is:
 
 ```
-shed trailing values (per §2.2's link order) → hide the label
+shed trailing values (per §2.2's link order) → set it level beside its pipe → hide the label
 ```
+
+**The level rung (Task 812, `placeLevelPipeLabels()`).** A lone pipe label, with "along the pipe"
+on, that shed to its last value and is still crowded, found no clear station, or yielded its ground
+to a node label, is tried level beside its pipe as a free label with a leader, after every other
+label is placed and only where it breaks no never-rule. The hide stays the terminal rung. A label
+too short for its segment still goes straight to the hide (Tom, 2026-08-14,
+`short-line-label-harness.js`); whether R1 now lets it try the level rung is his call.
 
 **THE CASCADE HAS TWO ENTRANCES AND NEEDS THE SAME EXIT FOR BOTH.** A label enters it because it is
 too long for its segment, or because it conflicts with a neighbour — and for a long time only the
