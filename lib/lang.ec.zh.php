@@ -995,7 +995,6 @@ $ec_lang['lpn_guide_text_rptbox']='显示 EPANET 引擎为上一次延时模拟�
 $ec_lang['lpn_guide_text_status_box']='按时间顺序列出上一次延时模拟中的每次变化：水泵、阀门或管道的开启或关闭，水箱开始充水或放水或变满或变空，以及任何未完全收敛的时间步。只列出变化，不列出每个时间步。';
 $ec_lang['lpn_guide_text_full_box']='列出每个报告时间步的每个节点和每条连接线，单位与“表格”窗格中显示的相同。没有延时模拟时，显示单一时刻的当前解。下载或打印包含每个时间步，表格一次显示一个。';
 $ec_lang['lpn_guide_text_calib_box']='将现场测量值文件与相同位置和时间的计算结果进行比较，每个参数一个文件。该文件仅在当前会话中保留，不随项目保存。';
-$ec_lang['lpn_guide_text_notes_popup']='列出关于本页面行为方式及其不具备功能的说明，每条为一个术语及其定义。它不会更改管网。';
 $ec_lang['lpn_guide_text_hotkeys_popup']='列出每个工具栏按钮和菜单行、键盘快捷键，以及每个框的条目。选择某一行会显示该控件所在位置，而不会运行它。要搜索，请在任何位置按 Ctrl+K，或在用户手册有焦点时按 /。';
 // The Find and replace chapter beyond its opening paragraphs, in the Guide's Boxes section
 // (Tom, 2026-10-07). Each _def is HTML: keep the tags. A query inside <code> runs as written in

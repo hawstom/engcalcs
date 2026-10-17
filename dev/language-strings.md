@@ -432,6 +432,8 @@ An entry's Layout, Symbol and Runtime lines in `dev/plain-sentences.md` are shor
 sends each as `key_notes`, rendered as its full instruction from this table (read from it by
 `generate_translation_payloads.php`, so edit the wording here); a Note line goes as written, and the
 Plain line goes as `key_plain`. `layout_tag_check.php` refuses a Layout value outside this table.
+**`box title` is never written by hand**: the generator adds it to every key that titles a dockable box, read from the page
+(`dev/scripts/dock_box_titles.inc.php`), so it cannot outlive the widget.
 
 | Tag | Value | Full instruction it stands for |
 |-----|-------|-------------------------------|
@@ -440,6 +442,7 @@ Plain line goes as `key_plain`. `layout_tag_check.php` refuses a Layout value ou
 | `layout` | `nav item` | Renders as a top-level item in a HORIZONTAL BAR, competing for width with every sibling; prefer the shortest synonym. **A row inside a pull-down is NOT a nav item** — a pop-up sizes to its own widest row and competes with nothing. |
 | `layout` | `button` | A button label competing for width with siblings; short and imperative. |
 | `layout` | `sub-heading` | A heading over a group of controls, not a command or an option; a noun phrase, never an imperative. |
+| `layout` | `box title` | The title of a box that can be docked and set to auto-hide. Tucked away, the box shows only the start of its title, on a narrow tab at the map's edge turned on its side, cut off after about 12 to 25 characters. Put the word that names the box's subject first, so each tab can be told from its neighbors; a title form with a colon is fine (Pump energy report, in Spanish: Bombas: informe de energía). Where the natural phrase already starts with that word, keep it. The same text may also be a menu row. |
 | `symbol` | *(flag)* | Contains a variable symbol; keep every letter and subscript exactly as in English in every language, including RTL. Subscripted names are symbols, not words. |
 | `runtime` | `units appended` | The page adds a unit label after this text at render time; leave room for it, and let the page supply the unit. |
 
