@@ -725,3 +725,15 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|807| CLOSED 2026-10-16 (merged 2026-10-15, `feat/leader-keep`): a dragged leader stays exactly where the user put it.
 - 0|643| CLOSED 2026-10-16: an automatic length is the slope distance (merged 2026-10-15). Rejected: a project length adjustment factor; Mary found no tool offering one and a reviewer cannot audit it; a typed length is the per-pipe override.
 - 0|786| CLOSED 2026-10-16: Net1, Net2 and Net3 ship as US and SI pairs. KYPipe networks (CC BY-NC) would need the authors' permission first.
+- 0|714| CLOSED 2026-10-16 (merged on Tom's word, `feat/bentley-interop` batch): theming: colour tokens, the check, the button base, and System/Light/Dark in Settings > Page (browser key `lpn_theme`), Looped Network page only; the other calculators' navbar is not tokenised.
+- 0|617| CLOSED 2026-10-16 (merged on Tom's word, `feat/bentley-interop` batch): more map view options: Basemap style filters, then Mapbox Outdoors as the third press of the corner tile (his word "Topo"); privacy.php names topo map imagery.
+- 0|781| CLOSED 2026-10-16 (merged on Tom's word, `feat/bentley-interop` batch): Morph changes an asset's type in one scenario, keeping its ID, location and pipes; in a scenario it is an override.
+- 0|782| CLOSED 2026-10-16 (merged on Tom's word, `feat/bentley-interop` batch): Snap to asset (merged 10-11) and Match properties, which replace Change type.
+- 0|784| CLOSED 2026-10-16 (merged on Tom's word, `feat/bentley-interop` batch): time series graph bubbles on the map, from an asset's right-click menu.
+- 0|789| CLOSED 2026-10-16 (merged on Tom's word, `feat/bentley-interop` batch): a long press opens the asset menu on a touch screen.
+- 0|790| CLOSED 2026-10-16 (merged on Tom's word, `feat/bentley-interop` batch): one override marker (dot, and a triangle for a child's override) in Properties and Settings.
+- 0|794| CLOSED 2026-10-16 (merged on Tom's word, `feat/bentley-interop` batch): a Text edits in place on the map; right-click offers Edit text and Reset position.
+- 0|801| CLOSED 2026-10-16 (merged on Tom's word, `feat/bentley-interop` batch): Apply Base values retired; Merge upward moves an alternative's overrides into one above it.
+- 0|802| CLOSED 2026-10-16 (merged on Tom's word, `feat/bentley-interop` batch): the Scenarios table and the Scenario manager are one box, one title bar.
+- 0|804| CLOSED 2026-10-16 (merged on Tom's word, `feat/bentley-interop` batch): time series bubbles are a Presentation override.
+- 0|805| CLOSED 2026-10-16 (merged on Tom's word, `feat/bentley-interop` batch): Map, Clean map hides the map's controls and the override rings (browser keys `lpn_cleanmap`, `lpn_ovrmarks`).
