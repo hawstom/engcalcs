@@ -2059,6 +2059,13 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_guide_set_assets_term']?></dt><dd><?=$ec_lang['lpn_guide_set_assets_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_set_reset_term']?></dt><dd><?=$ec_lang['lpn_guide_set_reset_def']?></dd>
 </dl></template>
+<?php // The Fire flow analysis chapter (Task 785), in the entry for its box. ?>
+<template id="lpn_guide_more_lpn_ff_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_ff_asks_term']?></dt><dd><?=$ec_lang['lpn_guide_ff_asks_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_ff_result_term']?></dt><dd><?=$ec_lang['lpn_guide_ff_result_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_ff_marks_term']?></dt><dd><?=$ec_lang['lpn_guide_ff_marks_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_ff_example_term']?></dt><dd><?=$ec_lang['lpn_guide_ff_example_def']?></dd>
+</dl></template>
 <template id="lpn_guide_more_lpn_scncmp_box"><dl>
 	<dt><?=$ec_lang['lpn_guide_cmp_cols_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_cols_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_cmp_run_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_run_def']?></dd>
