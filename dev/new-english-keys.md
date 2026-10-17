@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 2637 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**154 still to read on master**, of 177 untranslated keys, of 2797 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -154,6 +154,13 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
+- **`lpn_morph_menu`**
+  > Morph
+  *Why stale:* no record of the English it was written against
+  *Current synonym:* Transform | Change the type of an asset (a node into a junction, reservoir or tank; a link into a pipe, pump or valve) while it keeps its ID, location and connections.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
 - **`lpn_pane_scn_alt_tip`**
   > {category} alt.: {alternative}
   *Why stale:* no record of the English it was written against
@@ -165,14 +172,6 @@ never edits a synonym.
   > Run
   *Why stale:* no record of the English it was written against
   *Current synonym:* Run, simulation, computation, or calculation report
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`lpn_scenario_push_values`**
-  > Values discarded:
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* Values thrown away:
-  *Current synonym:* Values thrown away, Values discarded, Values lost, Values wiped, Values replaced, Values displaced, Values cleared, Custom values cleared | a count follows this label, not a list of values
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
@@ -199,24 +198,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-None on master. Every English key here is present in at least one other language.
-
----
-
-# Strings waiting on a branch
-
-**187 still to read**, of 190 new keys across 12 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### feat/bentley-interop (`b34e598bf`) — 174 new, 174 to read @@ NEEDS RULING
+## lpn_  (177, 154 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -232,10 +214,10 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_clean_map`**
   > Clean map
-  @@ NEEDS RULING
+  _Ruled 2026-10-15: Approved._
 - **`lpn_clean_map_tip`**
   > Checked: the zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.
-  @@ NEEDS RULING
+  _Ruled 2026-10-16: Asked whether to lowercase "The" after "Checked:" like the other tips: "Yes. Make your proposed correction. Thank you for checking."_
 - **`lpn_control_inactive_note`**
   > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
   @@ NEEDS RULING
@@ -250,7 +232,7 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_copy_props_no_overrides`**
   > No overrides to copy.
-  @@ NEEDS RULING
+  _Ruled 2026-10-13: Approved as written._
 - **`lpn_ctx_edit_text`**
   > Edit text
   @@ NEEDS RULING
@@ -281,17 +263,23 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_library_pattern_default_deleted_in`**
   > Pattern {id} was the default demand pattern in these scenarios: {list}.
   @@ NEEDS RULING
-- **`lpn_morph_menu`**
-  > Morph
-  @@ NEEDS RULING
-- **`lpn_morph_ok`**
-  > Morph
-  @@ NEEDS RULING
 - **`lpn_morph_other_kind`**
   > A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}
   @@ NEEDS RULING
-- **`lpn_morph_tip`**
-  > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its location, its connections, and every value the new type also has. In Base the asset itself is changed, and you are asked first if any value would be lost. In any other scenario the new type is an override in that scenario only, and the values only the new type has start from Settings > New assets.
+- **`lpn_ovl_bubble_moved`**
+  > {quantity}, moved or resized
+  @@ NEEDS RULING
+- **`lpn_ovl_bubble_off`**
+  > Not on the map
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_all`**
+  > Clear all overrides
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_all_ask`**
+  > Clear all the overrides ({n}) of {name}? Each value returns to the inherited value. Undo reverses this.
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_selected`**
+  > Clear selected overrides
   @@ NEEDS RULING
 - **`lpn_ovl_col_inherited`**
   > Inherited value
@@ -306,7 +294,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > {category}: {alternative}
   @@ NEEDS RULING
 - **`lpn_ovl_note`**
-  > These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Click an ID to go to the asset on the map.
+  > These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Clear an override to restore the inherited value; Undo reverses it. Select an ID to go to the asset on the map.
+  @@ NEEDS RULING
+- **`lpn_ovl_pick_tip`**
+  > Select this override for the Clear selected overrides button.
   @@ NEEDS RULING
 - **`lpn_ovl_same`**
   > (same)
@@ -315,20 +306,20 @@ build for that would be a gate nobody keeps. Refresh it with
   > Equal to the inherited value. It is still an override, and it is counted.
   @@ NEEDS RULING
 - **`lpn_ovl_title`**
-  > Overrides: {name}
+  > Manage overrides: {name}
   @@ NEEDS RULING
 - **`lpn_ovm_child_ask`**
   > Clear child overrides ({n} total)?
   @@ NEEDS RULING
 - **`lpn_ovm_child_tip`**
   > Child scenarios override this value ({n} total). Click to clear their overrides.
-  @@ NEEDS RULING
+  _Ruled 2026-10-13: Approved as written._
 - **`lpn_ovm_dot_clear`**
   > Click to clear it.
-  @@ NEEDS RULING
+  _Ruled 2026-10-13: Approved as written._
 - **`lpn_ovm_dot_set`**
   > Inherited. Click to make it an override in this scenario, holding the value shown.
-  @@ NEEDS RULING
+  _Ruled 2026-10-13: Approved as written._
 - **`lpn_pane_inactive_show`**
   > Include inactive topology
   @@ NEEDS RULING
@@ -376,19 +367,19 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_scenario_basic_misfit`**
   > This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-13._
 - **`lpn_scenario_basic_misfit_base`**
   > The Base scenario uses an alternative other than Base.
   @@ NEEDS RULING
 - **`lpn_scenario_copy`**
   > Copy scenario
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-13._
 - **`lpn_scenario_copy_off`**
   > Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-13._
 - **`lpn_scenario_copy_tip`**
   > Copies the open scenario and its overrides, and opens the copy.
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-13._
 - **`lpn_scenario_delete_ask`**
   > Delete the scenario {name}? The drawing itself is not changed.
   @@ NEEDS RULING
@@ -400,7 +391,7 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_scenario_delete_stays`**
   > These alternatives it uses stay in the project: {list}.
-  @@ NEEDS RULING
+  _Ruled 2026-10-13: Approved as written._
 - **`lpn_scenario_mark_inh_tip`**
   > The dashed gray ring means the scenario {name} inherits an override for this asset from its parent scenario or alternative.
   @@ NEEDS RULING
@@ -415,10 +406,10 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_settings_override_marks`**
   > Show override markers on the map
-  @@ NEEDS RULING
+  _Ruled 2026-10-15: Approved._
 - **`lpn_settings_override_marks_tip`**
   > Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.
-  @@ NEEDS RULING
+  _Ruled 2026-10-16: I approve all three._
 - **`lpn_settings_restore_base_only`**
   > Switch to Base to restore the defaults.
   @@ NEEDS RULING
@@ -436,7 +427,7 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_settings_row_bubbles`**
   > Time series graphs on the map
-  @@ NEEDS RULING
+  _Ruled 2026-10-15: Approved._
 - **`lpn_settings_row_check_freq`**
   > Status check frequency
   @@ NEEDS RULING
@@ -592,7 +583,7 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_sm_all_row_tip`**
   > Double-click to open it in its category tree.
-  @@ NEEDS RULING
+  _Ruled 2026-10-16: I approve all three._
 - **`lpn_sm_base_kept`**
   > The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.
   @@ NEEDS RULING
@@ -639,13 +630,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Scenario {name}
   @@ NEEDS RULING
 - **`lpn_sm_list_overrides`**
-  > List overrides
+  > Manage overrides
   @@ NEEDS RULING
 - **`lpn_sm_list_overrides_none`**
   > This scenario has no overrides.
-  @@ NEEDS RULING
+  _Ruled 2026-10-15: Revised. But should be obvious when count = 0._
 - **`lpn_sm_list_overrides_tip`**
-  > List the scenario's overrides by category, each with the inherited value it overrides.
+  > List the scenario's overrides by category, each with the inherited value it overrides, and clear any of them.
   @@ NEEDS RULING
 - **`lpn_sm_make_current`**
   > Make current
@@ -688,7 +679,7 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_sm_rename_alts_ask`**
   > Rename equally named alternatives?
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-13._
 - **`lpn_sm_shared_note`**
   > Shared with: {list}
   @@ NEEDS RULING
@@ -697,13 +688,13 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_sm_tree_all`**
   > All
-  @@ NEEDS RULING
+  _Ruled 2026-10-15: Approved._
 - **`lpn_sm_tree_unused`**
   > All unused
-  @@ NEEDS RULING
+  _Ruled 2026-10-15: Approved._
 - **`lpn_sm_unused_none`**
   > None
-  @@ NEEDS RULING
+  _Ruled 2026-10-16: I approve all three._
 - **`lpn_sm_used_by`**
   > Used by scenarios: {n}
   @@ NEEDS RULING
@@ -715,13 +706,13 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_time_run_cut_off`**
   > EPANET had closed {link} and then could not solve for {nodes}.
-  @@ NEEDS RULING
+  _Ruled 2026-10-15: R-402 status messages: Approved._
 - **`lpn_time_run_cut_off_empty`**
   > Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.
-  @@ NEEDS RULING
+  _Ruled 2026-10-15: R-402 status messages: Approved._
 - **`lpn_time_run_cut_off_full`**
   > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
-  @@ NEEDS RULING
+  _Ruled 2026-10-15: R-402 status messages: Approved._
 - **`lpn_tsb_close`**
   > Close graph
   @@ NEEDS RULING
@@ -741,9 +732,212 @@ build for that would be a gate nobody keeps. Refresh it with
   > Drag to resize
   @@ NEEDS RULING
 
-### feat/description-lines (`9b55bfe79`) — adds no English strings
+---
+
+# Strings waiting on a branch
+
+**66 still to read**, of 69 new keys across 18 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### chore/plain-sentences (`307c6a742`) — adds no English strings
+
+### feat/basemap-outdoors (`2a45b1cc2`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_basemap_outdoors_show`**
+  > Show outdoors map
+  @@ NEEDS RULING
+
+### feat/bentley-interop (`b9cdfc823`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
+
+### feat/geojson-import (`381185bb0`) — 59 new, 59 to read @@ NEEDS RULING
+
+- **`lpn_file_import_gjnet`**
+  > Import GeoJSON network…
+  @@ NEEDS RULING
+- **`lpn_file_import_gjnet_tip`**
+  > Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.
+  @@ NEEDS RULING
+- **`lpn_gjnet_and_more`**
+  > and {n} more
+  @@ NEEDS RULING
+- **`lpn_gjnet_col_example`**
+  > Example
+  @@ NEEDS RULING
+- **`lpn_gjnet_col_field`**
+  > Field
+  @@ NEEDS RULING
+- **`lpn_gjnet_col_fills`**
+  > Fills
+  @@ NEEDS RULING
+- **`lpn_gjnet_col_unit`**
+  > Unit
+  @@ NEEDS RULING
+- **`lpn_gjnet_intro`**
+  > {points} points and {lines} lines were found. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. Choose the property each field fills and the unit of each number.
+  @@ NEEDS RULING
+- **`lpn_gjnet_lines_heading`**
+  > Line fields (pipes)
+  @@ NEEDS RULING
+- **`lpn_gjnet_no_fields`**
+  > These features have no attribute fields.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_crs`**
+  > The file states the coordinate system {crs}, which is WGS 84 latitude and longitude, the system RFC 7946 requires. Positions were read as stated.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_default_demand`**
+  > These junctions state no base demand and have the default base demand, {value}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_default_diameter`**
+  > These pipes state no diameter and have the default diameter, {value}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_default_elev`**
+  > These nodes state no elevation and have the default elevation, {value}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_default_k`**
+  > These pipes state no minor loss coefficient and have the default, {value}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_default_roughness`**
+  > These pipes state no roughness and have the default roughness, {value}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_default_tank`**
+  > These tanks have the default water depths and tank diameter.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_demand_rows`**
+  > These junctions had more than one demand row. A GeoJSON file holds only the first, which was imported.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_end_moved`**
+  > These pipes have an end within {tol} of a point or another line end, but not on it. The end was joined to it; the largest distance is {dist}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_end_off_node`**
+  > The line of each of these links does not start or end at its node. The node position was used.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_end_on_pipe`**
+  > These line ends lie on the pipe shown in parentheses, but not at its end, and are not connected to it.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_field_custom`**
+  > These fields were imported as custom properties.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_field_skipped`**
+  > These fields were not imported, as chosen.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_id_dup`**
+  > These IDs are stated by more than one feature of the same kind. Each later feature was assigned the ID shown in parentheses.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_id_new`**
+  > These features state no valid ID and were assigned the ID shown in parentheses.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_junction_added`**
+  > These junctions were added where a line end is not within {tol} of a point. Each has the default elevation and base demand.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_length_auto`**
+  > These pipes state no length. Each length is computed from the line (Auto).
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_not_held`**
+  > A GeoJSON file does not hold controls, rules, time settings, text labels, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_parts`**
+  > These multipart lines have parts that are not connected and were imported as one pipe for each part.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_parts_points`**
+  > These multipoint features were imported as one node for each point.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_pattern_conflict`**
+  > These patterns are stated with different multipliers on different features. The first was used.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_pipe_type`**
+  > These pipes state the pipe type shown in parentheses, whose definition a GeoJSON file does not hold. The pipe type was not imported; the diameter and roughness stated in the file were.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_results`**
+  > The results in the file were not imported. Calculate computes them again.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_skip_geometry`**
+  > Not imported: the feature is not a point or a line.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_skip_id`**
+  > Not imported: the name is not a valid ID, or another element of the same kind has it.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_skip_kind`**
+  > Not imported: the feature states no node_type or link_type.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_skip_loop`**
+  > Not imported: both ends of the line join the same node.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_skip_no_node`**
+  > Not imported: the start or end node named is not in the file.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_skip_position`**
+  > Not imported: a position is not a valid latitude and longitude.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_unmapped_demand`**
+  > No field was chosen for the base demand, so every junction has the default base demand, {value}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_unmapped_diameter`**
+  > No field was chosen for the diameter, so every pipe has the default diameter, {value}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_unmapped_elev`**
+  > No field was chosen for the elevation, so every node has the default elevation, {value}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_unmapped_id`**
+  > No field was chosen for the ID, so every element was assigned an ID.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_unmapped_k`**
+  > No field was chosen for the minor loss coefficient, so every pipe has the default, {value}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_unmapped_length`**
+  > No field was chosen for the length, so every pipe length is computed from the line (Auto).
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_unmapped_roughness`**
+  > No field was chosen for the roughness, so every pipe has the default roughness, {value}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_value_unread`**
+  > These values are not numbers or are not recognized, and were not used.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_z`**
+  > These points state a third coordinate, which was not imported.
+  @@ NEEDS RULING
+- **`lpn_gjnet_other`**
+  > {n} features are neither points nor lines and will not be imported; the report lists them.
+  @@ NEEDS RULING
+- **`lpn_gjnet_points_heading`**
+  > Point fields (junctions, reservoirs, and tanks)
+  @@ NEEDS RULING
+- **`lpn_gjnet_refuse_crs`**
+  > {file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.
+  @@ NEEDS RULING
+- **`lpn_gjnet_refuse_empty`**
+  > {file} contains no points or lines.
+  @@ NEEDS RULING
+- **`lpn_gjnet_report_lead`**
+  > Each change made during import, and each feature not imported, is listed below with the reason:
+  @@ NEEDS RULING
+- **`lpn_gjnet_target_custom`**
+  > Custom property
+  @@ NEEDS RULING
+- **`lpn_gjnet_target_node_type`**
+  > Node type
+  @@ NEEDS RULING
+- **`lpn_gjnet_target_skip`**
+  > Do not import
+  @@ NEEDS RULING
+- **`lpn_gjnet_title`**
+  > Import GeoJSON network: {file}
+  @@ NEEDS RULING
+- **`lpn_gjnet_tolerance`**
+  > Join tolerance (m)
+  @@ NEEDS RULING
+- **`lpn_gjnet_tolerance_tip`**
+  > A line end within this distance of a point, or of another line end, is joined to it. A line end farther than this from every point gets a new junction.
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -767,49 +961,36 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/match-property (`05bda7651`) — 10 new, 10 to read @@ NEEDS RULING
+### feat/manage-override (`5a5f90f52`) — adds no English strings
 
-- **`lpn_copy_props_done`**
-  > Copied properties of {id}.
-  @@ NEEDS RULING
-- **`lpn_copy_props_menu`**
-  > Copy properties
-  @@ NEEDS RULING
-- **`lpn_paste_done_many`**
-  > Pasted properties of {id} to {m} assets. Values changed: {n}.
-  @@ NEEDS RULING
-- **`lpn_paste_done_one`**
-  > Pasted properties of {id} to {to}. Values changed: {n}.
-  @@ NEEDS RULING
-- **`lpn_paste_props_menu`**
-  > Paste properties to selection
-  @@ NEEDS RULING
-- **`lpn_paste_props_off_kind`**
-  > No selected asset can take the copied properties.
-  @@ NEEDS RULING
-- **`lpn_paste_props_off_none`**
-  > Nothing is copied. Right-click an asset and choose Copy properties.
-  @@ NEEDS RULING
-- **`lpn_paste_props_off_select`**
-  > Select the assets to paste to, then choose Paste properties to selection.
-  @@ NEEDS RULING
-- **`lpn_paste_skip_breakdown`**
-  > Not pasted: {n} (demand is a list of categories).
-  @@ NEEDS RULING
-- **`lpn_paste_skip_valve`**
-  > Not pasted: {n} (the valve types differ).
+### feat/match-property (`05bda7651`) — adds no English strings
+
+### feat/pattern-axis (`6f37c6eed`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_library_pattern_axis_step`**
+  > Step
   @@ NEEDS RULING
 
-### fix/zero-demand-solve (`fbfbc28b6`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/scenario-box (`d4d566a71`) — adds no English strings
 
-- **`lpn_time_run_cut_off`**
-  > EPANET had closed {link} and then could not solve for {nodes}.
+### feat/theme-dark (`6cde31e31`) — 5 new, 5 to read @@ NEEDS RULING
+
+- **`lpn_settings_theme`**
+  > Theme
   @@ NEEDS RULING
-- **`lpn_time_run_cut_off_empty`**
-  > Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.
+- **`lpn_settings_theme_tip`**
+  > Choose light or dark colors for the page. System follows the setting of your device. The map drawing looks the same in every theme. This is a setting for this browser, not for the project.
   @@ NEEDS RULING
-- **`lpn_time_run_cut_off_full`**
-  > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
+- **`lpn_theme_dark`**
+  > Dark
+  @@ NEEDS RULING
+- **`lpn_theme_light`**
+  > Light
+  @@ NEEDS RULING
+- **`lpn_theme_system`**
+  > System
   @@ NEEDS RULING
 
-### tool/scenario-harness-helper (`1e9fbe55b`) — adds no English strings
+### fix/elevation-override (`515322bc3`) — adds no English strings
+
+### fix/zero-demand-solve (`fbfbc28b6`) — adds no English strings
