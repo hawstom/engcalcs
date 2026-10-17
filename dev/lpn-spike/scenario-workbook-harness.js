@@ -409,6 +409,16 @@ function build(L) {
 	plan = T.bookPlan(bookT);
 	ok('W10.3 ...and the workbook typing them back is no change, as retyping them in the program is none', plan.changes.length === 0 && plan.unusable.length === 0, what(plan));
 
+	// A spreadsheet keeps 15 significant digits: a stored 0.30000000000000004 comes back as 0.3.
+	T.switchScenario(sid(T, 'Peak'));
+	T.setProp(T.linkById('11'), 'roughness', 0.1 + 0.2);
+	T.switchScenario(T.baseScenario().id);
+	const bookR = await T.bookRead(T.bookBytes());
+	ok('W10.4 the stored 0.30000000000000004 is written as JavaScript writes it', sheetOf(bookR, 'physical').rows[rowOf(sheetOf(bookR, 'physical'), 'Peak', '11')][colOf(sheetOf(bookR, 'physical'), 'roughness')] === '0.30000000000000004');
+	setCell(bookR, 'physical', 'Peak', '11', 'roughness', '0.3');
+	plan = T.bookPlan(bookR);
+	ok('W10.5 ...and the 0.3 a spreadsheet keeps of it is no change', plan.changes.length === 0, what(plan));
+
 	console.log('--- W11. headings ---');
 	const topo = sheetOf(book0, 'topology');
 	const typeHeads = topo.rows[0].filter((h, i) => ['type', 'valveType'].indexOf(String(topo.rows[1][i]).split('|')[0].replace(/^topology:/, '')) >= 0);

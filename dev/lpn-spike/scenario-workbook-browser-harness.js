@@ -10,6 +10,8 @@
 //      Cancel changes nothing, and Apply changes makes the scenario, which then holds the two values
 //      (read back through a second export).
 //   4. Undo (Ctrl+Z) takes the whole import back.
+//   3b. A column in other units is refused naming the unit by its symbol; the Sheet column never
+//      breaks inside a word; a file that is no workbook is refused in the page's dialog, no alert().
 //   5. The Spanish page offers both rows under its own Export and Import menus, and an unchanged
 //      round trip there is no difference too.
 // Every button is pressed with a real click: openDialog() ignores a click with detail 0 that no key
@@ -168,7 +170,7 @@ async function main() {
 		const out0 = await exportBook(a, 'out0');
 		ok('1.3 one .xlsx, named for the project', /-scenarios\.xlsx$/.test(out0.name), out0.name);
 		ok('1.4 its Scenarios sheet names Base, and only Base', JSON.stringify(scenarioNames(out0.book)) === JSON.stringify([await a.lang('lpn_scenario_base')]), JSON.stringify(scenarioNames(out0.book)));
-		ok('1.5 it has the twelve sheets', out0.book.length === 12, out0.book.map((s) => s.name).join(', '));
+		ok('1.5 it has the thirteen sheets', out0.book.length === 13, out0.book.map((s) => s.name).join(', '));
 
 		console.log('\n--- 2. the same file back: no differences ---');
 		let rep = await importBook(a, out0.file);
@@ -212,6 +214,46 @@ async function main() {
 		ok('3.10 the new export read back is no difference', rep.changes.length === 0 && rep.kept.length === 0 && rep.unusable.length === 0, JSON.stringify(rep));
 		await pressButton(a, await a.lang('lpn_dialog_ok'));
 
+		console.log('\n--- 3b. the report: words whole, units by their symbols, the page\'s own dialog ---');
+		const bad = JSON.parse(JSON.stringify(out0.book));
+		const dmB = sheetOf(bad, 'demand'), dk = dmB.rows[1].findIndex((k) => String(k).split('|')[0] === 'demand');
+		dmB.rows[1][dk] = 'demand|lps';
+		const brow = dmB.rows[1].map(() => ''); brow[0] = 'Base'; brow[1] = 'Junction'; brow[2] = '22'; brow[dk] = '5';
+		dmB.rows.push(brow);
+		sheetOf(bad, 'alternatives').rows.push(['demand', '', 'Night demand', '']);
+		const fb = writeBook(bad, path.join(TMP, 'bad.xlsx'));
+		rep = await importBook(a, fb);
+		const unitWhy = rep.unusable.map((u) => u[2]).filter((t) => t.indexOf('demand|') < 0 && /L\/s/.test(t));
+		ok('3b.1 a column in other units is refused, its unit said by the symbol the page shows (L/s, not lps)', unitWhy.length === 1 && !/\blps\b/.test(unitWhy[0]), JSON.stringify(rep.unusable));
+		const oneLine = await a.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_dialog_body td.lpn-scnbook-words:first-child')).map((td) => {
+			const r = document.createRange(); r.selectNodeContents(td);
+			const tops = new Set(Array.from(r.getClientRects()).map((x) => Math.round(x.top)));
+			return { t: td.textContent, lines: tops.size };
+		}));
+		ok('3b.2 every Sheet cell stands on one line, never broken inside the word', oneLine.length >= 2 && oneLine.every((c) => c.lines === 1), JSON.stringify(oneLine));
+		await pressButton(a, await a.lang('lpn_cancel'));
+		// A file that is no workbook: refused in the page's dialog, never a native alert().
+		let natives = 0;
+		const onNative = () => { natives++; };
+		a.page.on('dialog', onNative);
+		const junk = path.join(TMP, 'junk.xlsx');
+		fs.writeFileSync(junk, 'this is not a zip');
+		const [ch1] = await Promise.all([a.page.waitForEvent('filechooser', { timeout: 8000 }), pressSub(a, 'lpn_file_import_menu', 'lpn_file_import_scnbook')]);
+		await ch1.setFiles(junk);
+		await a.settle(800);
+		const junkText = await a.page.evaluate(() => (document.getElementById('lpn_dialog_body') || {}).textContent || '');
+		ok('3b.3 a file that is not an .xlsx is refused in the page\'s own dialog', await dialogShown(a) && junkText.indexOf('junk.xlsx') >= 0, junkText);
+		await pressButton(a, await a.lang('lpn_dialog_ok'));
+		const notBook = writeBook([{ name: 'S', rows: [['a'], ['b'], ['c']] }], path.join(TMP, 'notbook.xlsx'));
+		const [ch2] = await Promise.all([a.page.waitForEvent('filechooser', { timeout: 8000 }), pressSub(a, 'lpn_file_import_menu', 'lpn_file_import_scnbook')]);
+		await ch2.setFiles(notBook);
+		await a.settle(800);
+		ok('3b.4 an .xlsx that is not a scenario workbook is refused there too', await dialogShown(a) &&
+			(await a.page.evaluate(() => document.getElementById('lpn_dialog_body').textContent)) === await a.lang('lpn_scnbook_refused_not_workbook'));
+		await pressButton(a, await a.lang('lpn_dialog_ok'));
+		ok('3b.5 ...and no native alert() was raised', natives === 0, String(natives));
+		a.page.off('dialog', onNative);
+
 		console.log('\n--- 4. Undo ---');
 		await a.page.click('#lpn_canvas', { position: { x: 5, y: 5 } }).catch(() => {});
 		await a.page.keyboard.press('Escape');
@@ -240,6 +282,11 @@ async function main() {
 		await pressButton(es, await es.lang('lpn_dialog_ok'));
 		rep = await importBook(es, f3);
 		ok('5.5 the English workbook with Peak reads on the Spanish page too: the same seven changes', rep.changes.length === 7 && rep.unusable.length === 0, JSON.stringify(rep.unusable));
+		const esLines = await es.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_dialog_body td.lpn-scnbook-words:first-child')).map((td) => {
+			const r = document.createRange(); r.selectNodeContents(td);
+			return { t: td.textContent, lines: new Set(Array.from(r.getClientRects()).map((x) => Math.round(x.top))).size };
+		}));
+		ok('5.5b on the Spanish page too, every Sheet cell is one line', esLines.length >= 2 && esLines.every((c) => c.lines === 1), JSON.stringify(esLines));
 		await pressButton(es, await es.lang('lpn_cancel'));
 		ok('5.6 no uncaught page errors', es.errors.length === 0, es.errors.slice(0, 3).join(' | '));
 		await es.close();
