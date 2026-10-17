@@ -3913,6 +3913,7 @@ EngCalcs.pageConfig = {
 	lpn_ovm_dot_set: <?=json_encode($ec_lang['lpn_ovm_dot_set'])?>,
 	lpn_sm_delete_alt_ask: <?=json_encode($ec_lang['lpn_sm_delete_alt_ask'])?>,
 	lpn_sm_in_use: <?=json_encode($ec_lang['lpn_sm_in_use'])?>,
+	lpn_sm_alt_delete_has_children: <?=json_encode($ec_lang['lpn_sm_alt_delete_has_children'])?>,
 	lpn_sm_item_scenario: <?=json_encode($ec_lang['lpn_sm_item_scenario'])?>,
 	lpn_sm_item_alternative: <?=json_encode($ec_lang['lpn_sm_item_alternative'])?>,
 	lpn_sm_name_taken: <?=json_encode($ec_lang['lpn_sm_name_taken'])?>,

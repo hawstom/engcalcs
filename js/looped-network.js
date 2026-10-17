@@ -6244,14 +6244,29 @@ var EngCalcs = EngCalcs || {};
 		storedUsers(kind, key).children.forEach(function (cid) { who.push({ name: smName(tree, cid), scn: false }); });
 		return who;
 	}
-	// "Alternative {name} cannot be deleted while it is used by" and one line per user, each led by
-	// Scenario or Alternative (Tom, 2026-10-13). The key holds a literal \n, as the guide keys do.
+	// "Alternative {name} cannot be deleted while it is used by" and one line per scenario using it,
+	// each led by Scenario (Tom, 2026-10-13). The key holds a literal \n, as the guide keys do.
+	// **CHILDREN ARE SAID AS CHILDREN** (Tom, 2026-10-16: *"I think we need a message to say 'cannot
+	// be deleted while it has children'. The only message I am seeing is 'cannot be deleted while it
+	// is used'."*): an item others inherit from says so in the Scenarios menu's own sentence for a
+	// scenario, and in its parallel for an alternative; one both used and inherited from says both.
 	function smInUseText(tree, key, name) {
-		var pc = EngCalcs.pageConfig || {};
+		var pc = EngCalcs.pageConfig || {}, isScn = smKind(tree) === 'scn', items = smInUseItems(tree, key), users, kids, parts = [];
 		var label = function (scn, n) { return (scn ? (pc.lpn_sm_item_scenario || 'Scenario {name}') : (pc.lpn_sm_item_alternative || 'Alternative {name}')).replace('{name}', n); };
-		return (pc.lpn_sm_in_use || '{item}\\ncannot be deleted while it is used by\\n{list}').replace(/\\n/g, '\n')
-			.replace('{item}', label(smKind(tree) === 'scn', name))
-			.replace('{list}', smInUseItems(tree, key).map(function (x) { return label(x.scn, x.name); }).join('\n'));
+		// In the Scenarios tree everything in the way is a child scenario.
+		users = isScn ? [] : items.filter(function (x) { return x.scn; });
+		kids = isScn ? items : items.filter(function (x) { return !x.scn; });
+		if (users.length) {
+			parts.push((pc.lpn_sm_in_use || '{item}\\ncannot be deleted while it is used by\\n{list}').replace(/\\n/g, '\n')
+				.split('{item}').join(label(false, name))
+				.split('{list}').join(users.map(function (x) { return label(true, x.name); }).join('\n')));
+		}
+		if (kids.length) {
+			parts.push((isScn ? (pc.lpn_scenario_delete_has_children || 'The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or move them to another parent.')
+				: (pc.lpn_sm_alt_delete_has_children || 'The alternative {name} cannot be deleted while other alternatives inherit from it: {list}. Delete those first, or move them to another parent.'))
+				.split('{name}').join(name).split('{list}').join(kids.map(function (x) { return x.name; }).join(', ')));
+		}
+		return parts.join('\n\n');
 	}
 	// **REFUSED WHILE IN USE, NAMING WHO** (H04). Base items never go.
 	function smDelete(tree, key) {
