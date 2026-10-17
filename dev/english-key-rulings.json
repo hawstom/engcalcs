@@ -5286,8 +5286,9 @@
             "ruled": "2026-09-04"
         },
         "lpn_scncmp_menu_tip": {
-            "on": "Solve every scenario in this project and read them side by side: the lowest pressure and the highest velocity in each.",
-            "ruled": "2026-09-04"
+            "on": "Table of scenarios with count of overrides, lowest pressure, and highest velocity",
+            "ruled": "2026-10-16",
+            "answer": "Asked whether \"count of differences\" should become \"count of overrides\": \"Yes.\""
         },
         "lpn_scncmp_none_checked": {
             "on": "No scenario is checked for comparison. Check scenarios in the Scenario manager.",

@@ -3955,7 +3955,7 @@ $ec_lang['lpn_energy_no_pumps']='This network has no pumps, so there is nothing 
 // re-keying are lpn_scenario_label and lpn_scenario_overrides, which already name the same two
 // things in the scenario menu.
 $ec_lang['lpn_scncmp_title']='Scenario comparison';
-$ec_lang['lpn_scncmp_menu_tip']='Table of scenarios with count of differences, lowest pressure, and highest velocity';
+$ec_lang['lpn_scncmp_menu_tip']='Table of scenarios with count of overrides, lowest pressure, and highest velocity';
 $ec_lang['lpn_scncmp_running']='Solving every scenario…';
 $ec_lang['lpn_scncmp_empty']='Nothing has been drawn yet, so there is nothing to solve.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Highest velocity';
