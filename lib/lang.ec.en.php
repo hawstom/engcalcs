@@ -3134,7 +3134,7 @@ $ec_lang['lpn_scenario_delete']='Delete scenario';
 $ec_lang['lpn_scenario_delete_ask']='Delete the scenario {name}? The drawing itself is not changed.';
 $ec_lang['lpn_scenario_delete_goes']='Its overrides ({n}) are deleted with it.';
 $ec_lang['lpn_scenario_delete_stays']='These alternatives it uses stay in the project: {list}.';
-$ec_lang['lpn_scenario_delete_has_children']='The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or move them to another parent.';
+$ec_lang['lpn_scenario_delete_has_children']='The scenario {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.';
 // Edited by TGH 2026-09-07
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**16 still to read on master**, of 193 untranslated keys, of 2811 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**17 still to read on master**, of 193 untranslated keys, of 2811 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -79,7 +79,7 @@ is the one you meant. "The first one" is a complete answer.
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (193, 16 to read @@ NEEDS RULING)
+## lpn_  (193, 17 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -274,8 +274,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Its overrides ({n}) are deleted with it.
   _Ruled OK 2026-10-16._
 - **`lpn_scenario_delete_has_children`**
-  > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or move them to another parent.
-  _Ruled 2026-10-16: His own edit of 2026-10-16 ("move them another parent"); CC added "to"._
+  > The scenario {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.
+  @@ NEEDS RULING
 - **`lpn_scenario_delete_stays`**
   > These alternatives it uses stay in the project: {list}.
   _Ruled 2026-10-13: Approved as written._
@@ -1092,4 +1092,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/scenarios-menu (`80ded1671`) — adds no English strings
+### feat/scenarios-menu (`fb1e6baf6`) — adds no English strings

@@ -6262,7 +6262,7 @@ var EngCalcs = EngCalcs || {};
 				.split('{list}').join(users.map(function (x) { return label(true, x.name); }).join('\n')));
 		}
 		if (kids.length) {
-			parts.push((isScn ? (pc.lpn_scenario_delete_has_children || 'The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or move them to another parent.')
+			parts.push((isScn ? (pc.lpn_scenario_delete_has_children || 'The scenario {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.')
 				: (pc.lpn_sm_alt_delete_has_children || 'The alternative {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.'))
 				.split('{name}').join(name).split('{list}').join(kids.map(function (x) { return x.name; }).join(', ')));
 		}
@@ -7776,7 +7776,7 @@ var EngCalcs = EngCalcs || {};
 				// **A SCENARIO OTHERS INHERIT FROM IS NOT DELETED** (stage 5): say which, before asking.
 				var kids = scenarios.filter(function (x) { return x.parent === scn.id; });
 				if (kids.length) {
-					tellNotice((pc.lpn_scenario_delete_has_children || 'The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or move them to another parent.')
+					tellNotice((pc.lpn_scenario_delete_has_children || 'The scenario {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.')
 						.replace('{name}', scenarioDisplayName(scn))
 						.replace('{list}', kids.map(scenarioDisplayName).join(', ')));
 					return;
