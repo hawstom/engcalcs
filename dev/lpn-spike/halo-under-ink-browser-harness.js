@@ -7,13 +7,11 @@
 // time: a tspan's white stroke lands on the ink of the tspans before it. setMultilineText() now
 // writes a row's plain segments as ONE run, so within a run every stroke is laid before any ink.
 // In real Chromium, on Net1 with every node and link label field on and the separator ", ":
-//   * STRUCTURE: no two plain pieces of a row sit in separate tspans; a marked (extrema) number is
-//     the only thing with a tspan of its own; the halo is still the white stroke under the ink.
+//   * STRUCTURE: no two pieces of a row sit in separate tspans; the halo is still the white stroke
+//     under the ink.
 //   * PIXELS: with everything but the lettering hidden, every pixel of ink drawn with the halo off
 //     is still ink with the halo on, around a separator comma and around a unit mark (5280'), in
-//     every label without an extrema mark. A marked number needs a tspan of its own for its
-//     underline, so the pieces either side of it still touch it: that loss is printed, not asserted.
-//     The same probes on the page as it was (a tspan per segment, by rewriting the served script)
+//     every pipe label. The same probes on the page as it was (a tspan per segment, by rewriting the served script)
 //     must LOSE ink, or the probes prove nothing.
 //   * WHERE TWO LABELS OVERLAP the later one's halo still covers the earlier one's ink. That is
 //     printed, not asserted: the placer keeps labels apart, and the cure that would also cover this
@@ -49,7 +47,7 @@ const NODE_FIELDS = ['id', 'demand', 'elev', 'head', 'pressure'];
 const LINK_FIELDS = ['id', 'length', 'diameter', 'roughness', 'flow', 'velocity'];
 const TIMING = process.argv.indexOf('--timing') >= 0;
 // The one line that joins a plain segment onto the run before it; the reference run disables it.
-const MERGE = 'if (!seg.decoration && plain) {';
+const MERGE = 'if (plain) { plain.textContent += seg.text;';
 const LETTERING_ONLY = '.lpn-symbols, .lpn-customers, .lpn-shapes, .lpn-leader, .lpn-lbl-hit { display: none !important; }';
 
 function projectText(file) {
@@ -69,7 +67,7 @@ async function open(Session, browser, file, merged) {
 	await a.page.route(/\/js\/looped-network\.js/, async (route) => {
 		const resp = await route.fetch();
 		let body = await resp.text();
-		if (!merged) { rewritten += body.split(MERGE).length - 1; body = body.split(MERGE).join('if (false) {'); }
+		if (!merged) { rewritten += body.split(MERGE).length - 1; body = body.split(MERGE).join('if (false) { plain.textContent += seg.text;'); }
 		await route.fulfill({ response: resp, body: body });
 	});
 	await a.goto('Looped-Network.php?ec_nolog=1');
@@ -133,17 +131,16 @@ function labelRects(a, re) {
 		const rx = new RegExp(src);
 		return Array.from(document.querySelectorAll('text.lpn-lbl[data-linklbl]'))
 			.filter((t) => rx.test(t.textContent || '') && getComputedStyle(t).visibility !== 'hidden')
-			.map((t) => { const r = t.getBoundingClientRect(); return { x: r.left - 2, y: r.top - 2, w: r.width + 4, h: r.height + 4, text: t.textContent, marked: !!t.querySelector('[text-decoration]') }; });
+			.map((t) => { const r = t.getBoundingClientRect(); return { x: r.left - 2, y: r.top - 2, w: r.width + 4, h: r.height + 4, text: t.textContent }; });
 	}, re);
 }
 async function probeAll(a, re) {
 	const rects = await labelRects(a, re);
-	const out = { labels: rects.length, ink: 0, lost: 0, marked: { labels: 0, ink: 0, lost: 0 } };
+	const out = { labels: rects.length, ink: 0, lost: 0 };
 	for (const r of rects) {
-		const p = await lostInk(a, r), o = r.marked ? out.marked : out;
-		if (r.marked) { out.marked.labels++; }
-		o.ink += p.ink; o.lost += p.lost;
-		if (process.env.HALO_DEBUG) { console.log('    ' + p.lost + ' of ' + p.ink + (r.marked ? ' MARKED ' : ' ') + r.text); }
+		const p = await lostInk(a, r);
+		out.ink += p.ink; out.lost += p.lost;
+		if (process.env.HALO_DEBUG) { console.log('    ' + p.lost + ' of ' + p.ink + ' ' + r.text); }
 	}
 	return out;
 }
@@ -152,18 +149,15 @@ async function structure(a) {
 	return a.page.evaluate(() => {
 		const ls = Array.from(document.querySelectorAll('text.lpn-lbl[data-linklbl], text.lpn-lbl[data-nodelbl]'))
 			.filter((t) => (t.textContent || '').trim());
-		let splitPlain = 0, markedWithPrefix = 0, tspans = 0, marked = 0;
+		// A tspan with no `x` of its own continues the row before it: that is a row split in two.
+		let splitPlain = 0, tspans = 0;
 		ls.forEach((t) => {
 			const ts = Array.from(t.children);
 			tspans += ts.length;
-			ts.forEach((s, i) => {
-				const dec = s.hasAttribute('text-decoration');
-				if (dec) { marked++; if (!/^-?[\d.]+$/.test(s.textContent)) { markedWithPrefix++; } }
-				if (i > 0 && !dec && !s.hasAttribute('x') && !ts[i - 1].hasAttribute('text-decoration')) { splitPlain++; }
-			});
+			ts.forEach((s, i) => { if (i > 0 && !s.hasAttribute('x')) { splitPlain++; } });
 		});
 		const cs = getComputedStyle(ls[0]);
-		return { labels: ls.length, tspans, marked, splitPlain, markedWithPrefix,
+		return { labels: ls.length, tspans, splitPlain,
 			paint: cs.paintOrder, stroke: cs.stroke, sw: parseFloat(cs.strokeWidth) / parseFloat(cs.fontSize) };
 	});
 }
@@ -234,16 +228,15 @@ async function main() {
 		const a = await open(Session, browser, NET1, true);
 		const s = await structure(a);
 		console.log('  ' + JSON.stringify(s));
-		ok('no two plain pieces of a row sit in separate tspans', s.labels > 20 && s.splitPlain === 0, s.splitPlain + ' split, ' + s.tspans + ' tspans in ' + s.labels + ' labels');
-		ok('a marked (extrema) number keeps a tspan of its own, the number alone', s.marked > 0 && s.markedWithPrefix === 0, s.marked + ' marked');
+		ok('no two pieces of a row sit in separate tspans', s.labels > 20 && s.splitPlain === 0, s.splitPlain + ' split, ' + s.tspans + ' tspans in ' + s.labels + ' labels');
 		ok('the halo is still the white stroke painted under the ink', /^stroke/.test(s.paint) && /255, 255, 255/.test(s.stroke) && Math.abs(s.sw - 0.4) < 0.01, s.paint + ' ' + s.stroke + ' ' + s.sw);
 
 		const comma = await probeAll(a, ', ');
 		console.log('  separator probe:        ' + JSON.stringify(comma));
-		ok('in every unmarked pipe label with a ", " separator, no ink is lost to a halo', comma.labels - comma.marked.labels > 3 && comma.ink > 200 && comma.lost === 0, JSON.stringify(comma));
+		ok('in every pipe label with a ", " separator, no ink is lost to a halo', comma.labels > 3 && comma.ink > 200 && comma.lost === 0, JSON.stringify(comma));
 		const unit = await probeAll(a, '\\d[\'"]');
 		console.log('  unit-mark probe:        ' + JSON.stringify(unit));
-		ok('in every unmarked pipe label with a unit mark (5280\', 12"), no ink is lost to a halo', unit.labels - unit.marked.labels > 3 && unit.ink > 200 && unit.lost === 0, JSON.stringify(unit));
+		ok('in every pipe label with a unit mark (5280\', 12"), no ink is lost to a halo', unit.labels > 3 && unit.ink > 200 && unit.lost === 0, JSON.stringify(unit));
 
 		const snip = await snipHaloDiff(a);
 		console.log('  snip: ' + JSON.stringify(snip));
@@ -261,7 +254,7 @@ async function main() {
 		const refUnit = await probeAll(b, '\\d[\'"]');
 		console.log('  separator probe:        ' + JSON.stringify(refComma));
 		console.log('  unit-mark probe:        ' + JSON.stringify(refUnit));
-		ok('as it was, the probes DO find ink lost in unmarked labels, so they can see the defect', refComma.lost + refUnit.lost > 0, (refComma.lost + refUnit.lost) + ' pixels');
+		ok('as it was, the probes DO find ink lost in pipe labels, so they can see the defect', refComma.lost + refUnit.lost > 0, (refComma.lost + refUnit.lost) + ' pixels');
 		await b.close();
 
 		if (TIMING) { await timing(Session, browser); }
