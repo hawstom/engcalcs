@@ -7744,7 +7744,7 @@ var EngCalcs = EngCalcs || {};
 				// **A SCENARIO OTHERS INHERIT FROM IS NOT DELETED** (stage 5): say which, before asking.
 				var kids = scenarios.filter(function (x) { return x.parent === scn.id; });
 				if (kids.length) {
-					tellNotice((pc.lpn_scenario_delete_has_children || 'The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.')
+					tellNotice((pc.lpn_scenario_delete_has_children || 'The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or move them to another parent.')
 						.replace('{name}', scenarioDisplayName(scn))
 						.replace('{list}', kids.map(scenarioDisplayName).join(', ')));
 					return;
