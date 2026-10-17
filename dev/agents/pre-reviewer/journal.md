@@ -4485,6 +4485,13 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: focus ring on Play/step transport buttons is the browser default (dark on grey); time step/speed selects show no ring.
 - NOT CHECKED: import report (open of crafted .inp did not complete in my driver), scenario manager box, EPANET run-report dialog.
 
+## 2026-10-17 option/pane-boxes @ 2ac75bbbe (Task 799, bottom-pane tabs as boxes) (Perry)
+- OBSERVED (real Chromium, Net3, scripted): builder's harness 34/34 passes; my own walk found: two boxes (table + graph, two tables, stacked on one side) fine; edit/undo/redo, Find filter, CSV export, column-width drag, scenario switch and auto-recalc redraw, Recalculate-off snapshot, project switch, workspace export/import, ?lpn_wipe=1, dark, RTL, reload all correct.
+- OBSERVED DEFECT: a boxed Profile never starts the path chooser (second Profile press only raises the box), yet the box still says "Press Profile again to select a new path on the map."
+- OBSERVED: a new box floats 814x686 over the tab strip it came from; default dock width 832 px each, so two docked boxes leave the map ~320 px at 1600 wide; at 1100x650 docked boxes are 163 px tall (pane stays open on another tab).
+- OBSERVED: Ctrl+Shift+PageDown/Up inside a boxed table moves the PANE's tab and focus leaves the box.
+- OBSERVED: "Open in a box" is English on ar/fr pages (key not in other language files; expected until the payload step).
+
 ## 2026-10-16 feat/hover-props @ 9cb2d1f8f (Task 773, hover card shows all properties) (Perry)
 - OBSERVED (real Chromium; Net1, Net1-SI, Elm Street, Net3-World, with injected tag/desc/custom property/valve/customer): builder harness 59/59 passes. Card equals the map label's composers with every box ticked, so it is the LABEL's field list, not the Properties box's.
 - OBSERVED: DEFECT (against "all of its properties"). Never on the card though in Properties: custom properties (Route RT0 on J2), X/Y or lat/lon, From/To, Closed, Is active, valve TYPE and SETTING (PRV 45 psi not shown), pump curve/speed/price/efficiency, pipe type, fittings list, emitter coefficient, required fire flow, tank min/max level, diameter, mixing, volume, head pattern, customer demand pattern and custom properties.

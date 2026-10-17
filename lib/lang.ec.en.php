@@ -1612,6 +1612,7 @@ $ec_lang['lpn_pane_tab_pipes']='Pipes';
 $ec_lang['lpn_pane_tab_pumps']='Pumps';
 $ec_lang['lpn_pane_tab_valves']='Valves';
 $ec_lang['lpn_pane_tab_tip']='Edit assets as a spreadsheet-like table. Result columns cannot be edited. See Help, Notes for keyboard shortcuts.';
+$ec_lang['lpn_pane_popout']='Open in a box';
 $ec_lang['lpn_pane_none']='This network has none of these yet.';
 // **A PERSISTENT NOTE, NOT A HOVER TIP** (Tom, 2026-09-08, asking for wording "to the effect that
 // 'This table is intended to be ready for asset entry and creation by pasting from a spreadsheet'").

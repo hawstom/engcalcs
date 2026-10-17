@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hi",
-        "expected_key_count": 3025,
-        "delta_key_count": 434,
+        "expected_key_count": 3026,
+        "delta_key_count": 435,
         "english_changed_key_count": 27,
         "exempt_key_count": 38,
         "exempt_keys": [
@@ -222,6 +222,7 @@
         "lpn_guide_use_term": "Searching, links, and what is remembered",
         "lpn_guide_use_def": "<p>Search ignores capitals and accents and lists the rows and entries that contain the text typed. Choosing a row shows where that control is. It never runs the control. On a phone, where the toolbar is folded away, a toolbar row opens the menu row that does the same thing.<\/p><p>The address of the page follows the entry being read, as in <code>Looped-Network.php#guide<\/code>, so it can be copied as a link to that entry. Closing the user manual clears it. The user manual remembers in this browser whether it was open, its position and size, and whether its contents list is hidden. On a phone the contents list starts hidden.<\/p>",
         "lpn_basemap_topo_show": "Show topo map",
+        "lpn_pane_popout": "Open in a box",
         "lpn_pane_scn_ov_only": "Overrides only",
         "lpn_pane_scn_cur_only": "Current scenario only",
         "lpn_pane_inactive_show": "Include inactive topology",
@@ -658,6 +659,7 @@
         "lpn_guide_use_term": "Searching, links, and what is remembered",
         "lpn_guide_use_def": "<p>Search ignores capitals and accents and lists the rows and entries that contain the text typed. Choosing a row shows where that control is. It never runs the control. On a phone, where the toolbar is folded away, a toolbar row opens the menu row that does the same thing.<\/p><p>The address of the page follows the entry being read, as in <code>Looped-Network.php#guide<\/code>, so it can be copied as a link to that entry. Closing the user manual clears it. The user manual remembers in this browser whether it was open, its position and size, and whether its contents list is hidden. On a phone the contents list starts hidden.<\/p>",
         "lpn_basemap_topo_show": "Show topo map",
+        "lpn_pane_popout": "Open in a box",
         "lpn_pane_scn_ov_only": "Overrides only",
         "lpn_pane_scn_cur_only": "Current scenario only",
         "lpn_pane_inactive_show": "Include inactive topology",
@@ -3401,6 +3403,22 @@
                     "key": "lpn_geomap",
                     "value": "भू-संदर्भित",
                     "english": "georeferenced"
+                }
+            }
+        },
+        "lpn_pane_popout": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_tab_tip",
+                    "value": "तत्वों को स्प्रेडशीट जैसी तालिका के रूप में संपादित करें। परिणाम स्तंभ संपादित नहीं किए जा सकते। कीबोर्ड शॉर्टकट के लिए सहायता, नोट देखें।",
+                    "english": "Edit assets as a spreadsheet-like table. Result columns cannot be edited. See Help, Notes for keyboard shortcuts."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_none",
+                    "value": "इस नेटवर्क में अभी इनमें से कोई नहीं है।",
+                    "english": "This network has none of these yet."
                 }
             }
         },
