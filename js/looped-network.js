@@ -43656,9 +43656,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// were. The second save, after applySaved(), rewrites the key with the STRUCTURALLY REPAIRED
 	// document.
 
-	function importProject(saved) {
+	// `outgoingDone`: the caller has already flushed the project being left (landInpText(), which
+	// has to move the units strip before docFromInp() and so must save the outgoing project first).
+	function importProject(saved, outgoingDone) {
 		var pc = EngCalcs.pageConfig || {};
-		rememberOutgoingProject();
+		if (!outgoingDone) { rememberOutgoingProject(); }
 		var id = newProjectId();
 		if (!writeJSON(projectKey(id), saved)) {
 			setWarning(pc.lpn_import_no_room || 'There is not enough browser storage left to add this project. Delete a project you no longer need and try again.');
@@ -44642,13 +44644,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			setWarning(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.');
 			return;
 		}
-		// The units strip moves FIRST. docFromInp() is written against the selector state --
+		// The units strip moves BEFORE docFromInp(), which is written against the selector state --
 		// it stores the file's own numbers precisely BECAUSE the strip is already showing the
 		// file's own units -- so this ordering is the fix, not a formality.
+		//
+		// **AND THE PROJECT BEING LEFT IS SAVED BEFORE THE STRIP MOVES** (R-415). Every save writes
+		// the units the strip shows, so moving it first and letting importProject() flush the
+		// outgoing project afterwards stamped the .inp's units on that project's numbers: a metric
+		// Fotobi saved as feet and inches the moment a GPM file was imported beside it.
+		var name = String(fileName).replace(/\.inp$/i, '') || String(fileName),
+			before = readUnitSelections();
+		rememberOutgoingProject();
 		applyUnitSelections(inpUnitSelections(parsed));
-		var name = String(fileName).replace(/\.inp$/i, '') || String(fileName);
-		var id = importProject(docFromInp(parsed, name));
-		if (!id) { return; }   // importProject already reported the storage failure
+		var id = importProject(docFromInp(parsed, name), true);
+		// Refused (no room): the project still open gets its own units back on the strip.
+		if (!id) { applyUnitSelections(before); refreshMapStatus(); return; }
 		// NO RE-ANCHORING STEP HERE ANY MORE (Task 332): the labels are stored at EPANET's own
 		// point and rendered from its own corner, so there is nothing to measure and nothing to
 		// run after the document is on screen.
@@ -49163,6 +49173,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			method = a.method || frictionMethod(),
 			units = a.units || {}, id, fromUnits, changedUnits;
 		id = newProject(coords, crs);
+		// **REFUSED (a placement wizard is open) MEANS NOTHING HAPPENS** (R-415). newProject() said
+		// why and left the open project open; going on would install this box's units, method and
+		// default roughness on THAT project.
+		if (!id) { return; }
 		fromUnits = readUnitSelections();
 		// **R-342: DID THE WIZARD LEAVE ANY UNIT DIFFERENT FROM THE PROJECT IT WAS OPENED ON?** Asked
 		// here, before applyUnitSelections() moves the strip, so `fromUnits` is still the project this
