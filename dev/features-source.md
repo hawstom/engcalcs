@@ -64,64 +64,65 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 
 ## Solver
 
-- 146| Native solver available for steady state (single moment) simulation.
-- 451, 419| EPANET 2.3.5 solver for extended period simulations. Solver comparison display.
+- 146| Native solver for steady state (single moment) simulation.
+- 451, 419| EPANET 2.3.5 solver for extended period simulations, with a solver comparison display.
 - 467| Auto-recalculate option.
 
 ## Projects and Saving
 
-- 146.08, 447, 352, 360| Multiple open project tabs saved in browser or save to "lwn" file format with locking for office network collaboration.
+- 146.08, 447, 352, 360| Multiple open project tabs, saved in the browser or to an "lwn" file, with locking for office network collaboration.
 - 2, 4, 37, 246| Install for offline use.
+- 745| Searchable user manual.
 - 486| Best on PC, tested on a phone.
 
 ## Import, Export, and Map or Backdrop
 
-- 196, 483, 281| EPANET `.inp` files import and export with data fidelity and detailed accept/ignore report.
-- 314, 257, 454| Examples from EPANET and others, XY and Lat/Lon, loaded and solved in one click.
-- 145, 276| World map canvas or your own backdrop with friendly positioning options.
+- 196, 483, 281, 592, 776| Import and export formats: EPANET, ODS, XLSX, CSV, DXF, shapefile, GeoJSON, survey points, libraries, and clipboard copy/paste.
+- 314, 257, 454| Examples from EPANET and others, loaded and solved in one click.
+- 611, 792, 465, 590| Libraries of patterns, curves, controls, rules, pipe types, and fittings, copyable from another project file.
+- 793| Screenshot tool with enhanced resolution and a markup pen.
+- 145, 276| World map canvas or your own backdrop.
 - 476| XY to Lat/Lon conversion import wizard.
-- 696, 641| Convert a copy of a project to another coordinate system and other units, with a wizard that zooms, scales, and rotates your network onto the map; new projects can start in a real EPSG projection.
-- 592| Import points, lines, and polygons from GeoJSON, shapefile, and DXF files as Shapes, and import a list of surveyed points as junctions.
-- 611, 792, 465, 590| Libraries of patterns, curves, controls, rules, pipe types, and fittings, with pipes attached to a library pipe type and fittings list by reference so they stay in sync, and whole libraries copied in from another project file.
-- 776, 793| Export tables to ODS, XLSX, or CSV by table and scenario with the libraries they refer to, copy any table with its headings, and take a screenshot of the map and copy it into a report. Network export to GeoJSON and DXF, and a workspace file that carries your box layout to another screen.
-- 437, 497| Place name search and elevations from map DEM w/ preview.
+- 696, 641| Conversion of a project copy to another coordinate system and other units, and new projects in a real EPSG projection.
+- 437, 497| Place name search and elevations from map DEM.
 
 ## Adding, editing, and displaying assets and results
 
 - 146.02| Junction, reservoir, tank, pipe with vertex draw and edit mode, pump, valve, and annotation text.
-- 719| Junction Pipe Chain tool: specify points along the map to draw junction, pipe, junction until you press Escape, or specify an existing node to continue from it; a junction placed on a pipe offers to split that pipe at the new node.
-- 779| Draw Shapes (points, lines, and polygons) on the map, kept in a Shapes table; a Shape is annotation and is not part of the network.
-- 782| Snap to objects: nodes, pipe vertices, points along a pipe, and Shape points all attract the cursor, which makes imported DXF and shapefile Shapes something you can trace a network from.
-- 345, 329, 333, 336, 397, 398, 399, 469, 146.01, 383| Customizable multi- node and link labels including prefixes, suffixes, separator, and drop/shed order with auto or manual placement on leaders or aligned with links.
-- 353, 420, 389, 540| Find, replace, goto elements including complex queries in your language.
-- 434, 455| Editable, pasteable, spreadsheet-like asset tables: junctions, reservoirs, tanks, pipes, pumps and valves.
-- 266| Group edit assets three different ways: Find and replace, Select area, and spreadsheet edit Tables.
-- 384, 327| Network coloring: three to seven ranges, eight ways of choosing where the breaks fall, and 41 color ramps.
-- 337, 342, 376| Multi-line annotation text objects with bold, rotation w/ pipe match option, and association to assets.
+- 719| Junction and pipe chain draw, with pipe split offered contextually when a junction lands on a pipe.
+- 779| Draw reference Shapes (points, lines, and polygons), managed in a Shapes table.
+- 782| Snap to objects, which enhances the value of DXF and shapefile Shapes import.
+- 185| Copy and paste properties between assets.
+- 345, 329, 333, 336, 397, 398, 399, 469, 146.01, 383| Customizable node and link labels: prefixes, suffixes, separator, drop order, and automatic or manual placement.
+- 353, 420, 389, 540| Find, replace, and go to elements, including complex queries in your language.
+- 434, 455| Editable, pasteable, spreadsheet-like asset tables.
+- 266| Mass-edit assets by Find and replace, Select area, or spreadsheet Tables.
+- 384, 327| Network coloring: three to seven ranges, eight ways of placing the breaks, and 41 color ramps.
+- 337, 342, 376| Multi-line annotation text with bold, rotation, and association to assets.
 - 331, 362| Independent size settings for text, symbol, and pipes.
-- 409, 433, 506, 510| HGL profiles with modern path selection and editing.
-- 600, 640| Graphs: time series, profile, contour on the map, frequency distribution, and a flow balance of production against consumption.
-- 637, 784, 804, 795| Time series graphs at the foot of Properties and as bubbles on the map from an asset's right-click menu, including tank depth; the bubbles are a Presentation override.
+- 409, 433, 506, 510, 600, 640| Graphs: HGL profiles with path editing, time series, contour on the map, frequency distribution, and a flow balance of production against consumption.
+- 637, 784, 804, 795| Time series graphs at the foot of Properties and as bubbles on the map, including tank depth; and the bubbles are an override for Presentation.
 
 ## Extended period simulations
 
-- 248.01, 423, 410, 248.02| Extended-period simulation following patterns for demands, reservoir head, and pump speed.
+- 248.01, 423, 410, 248.02| Extended-period simulation with patterns for demands, reservoir head, and pump speed.
 - 248.03| EPANET-style rule-based controls.
-- 460, 586, 587| Pump, efficiency, head loss, and tank volume curves, defined once in the Libraries box beside the patterns and rules and stated by reference, so a manufacturer's curve keeps every point it was published with and a tank fills on its real shape.
+- 460, 586, 587| Pump, efficiency, head loss, and tank volume curves, kept in the Libraries box.
 - 450| EPANET run report.
-- 448| Color limits constant through a simulation, so a color means the same thing at every step.
+- 448| Color ranges constant through a simulation.
 - 566| Water quality: age, share from a source, chemical decay.
-- 566.01, 577| Pump energy report: for each pump, the share of the run it operates, efficiency, average and peak power, energy used, and cost including a peak demand charge.
+- 566.01, 577| Pump energy report: operating share, efficiency, power, energy used, and cost including a peak demand charge.
 
 ## Analyses
 
 - 530| Fire flow failure and collateral (design) failure analysis.
-- 751, 754| Criticality, which removes each pipe, pump, and valve in turn and reports the effect, and demand scaling, which finds the largest demand scale the system can carry, both run on a copy of the network.
+- 751| Criticality analysis, which removes each pipe, pump, and valve in turn and reports the effect.
+- 754| Demand scaling, which finds the largest demand scale the system can carry.
 
 ## Scenarios and alternatives
 
-- 201, 407, 412, 512| Scenarios whose overrides are marked on the map with an amber ring, a Manage overrides list that shows each override beside the value it replaces and clears any of them, a Copy properties command that carries an asset's overrides, and a comparison report that solves every scenario from a copy and tabulates its overrides, lowest pressure, and highest velocity.
-- 750, 765, 755, 801, 802| Alternatives that build on one another in an inheritance tree, shared among scenarios, with overrides mergeable upward into the alternative above, each alternative holding overrides in categories such as Presentation (how the map looks, including a saved map view) and Calculation (run time and time step), ready-made scenarios in every new project, and a Basic mode that hides the alternatives until you want them, and many more management features.
+- 201, 407, 412, 512| Scenarios with overrides marked on the map, Manage overrides, and a scenario comparison report.
+- 750, 765, 755, 801, 802| Alternatives with an inheritance tree, overrides mergeable upward into the alternative above, Presentation and Calculation override categories, ready-made scenarios in every new project, a Basic mode, and many more management features.
 
 ## Premium features included for everybody
 
@@ -133,6 +134,8 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 
 - see Scenarios and alternatives| Scenarios and alternatives (see Scenarios and alternatives).
 - see Analyses| Fire flow, criticality, and demand scaling analyses (see Analyses).
+- see Import, Export, and Map or Backdrop| Import and export formats (see Import, Export, and Map or Backdrop).
+- see Import, Export, and Map or Backdrop| Coordinate system and unit conversion (see Import, Export, and Map or Backdrop).
 
 
 ## The calculators
