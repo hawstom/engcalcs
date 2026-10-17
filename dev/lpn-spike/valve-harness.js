@@ -385,10 +385,14 @@ console.log('\n--- the native solver ---');
 		],
 		links: [
 			{ id: 'L1', type: 'pipe', from: 'R', to: 'J1', length: 200, diameter: 0.25, roughness: 130, k: 0, status: 'open' },
-			{ id: 'V7', type: 'valve', valveType: 'PRV', from: 'J1', to: 'J2', length: 0, diameter: 0.25, roughness: 150, setting: 40, k: 0, status: 'open' }
+			{ id: 'V7', type: 'valve', valveType: 'PBV', from: 'J1', to: 'J2', length: 0, diameter: 0.25, roughness: 150, setting: 40, k: 0, status: 'open' }
 		]
 	};
-	ok('a PRV is not native', !EngCalcs.lpnValveIsNative(prvModel.links[1]));
+	// A PBV, since Task 733 taught the built-in solver PRV, PSV and FCV (native-valve-harness.js
+	// holds those to EPANET); a pressure breaker is still EPANET's alone.
+	ok('a PBV is not native', !EngCalcs.lpnValveIsNative(prvModel.links[1]));
+	ok('a PRV, a PSV and an FCV are', ['PRV', 'PSV', 'FCV'].every((t) =>
+		EngCalcs.lpnValveIsNative({ type: 'valve', valveType: t })));
 	ok('a TCV is', EngCalcs.lpnValveIsNative({ type: 'valve', valveType: 'TCV' }));
 	ok('a pipe is', EngCalcs.lpnValveIsNative({ type: 'pipe' }));
 	ok('lpnEpanetOnlyValves names it', EngCalcs.lpnEpanetOnlyValves(prvModel).join(',') === 'V7');
@@ -402,7 +406,7 @@ console.log('\n--- the native solver ---');
 		!solved.ok && solved.issues.some((i) => i.code === 'valve-needs-epanet'));
 
 	// AND THE EPANET PATH MUST NOT INHERIT THE REFUSAL. A caller that names no engine is asking
-	// "is this network sound?", which a PRV network is.
+	// "is this network sound?", which a PBV network is.
 	ok('a caller that names no engine gets no such issue',
 		EngCalcs.lpnDiagnose(prvModel).every((i) => i.code !== 'valve-needs-epanet'),
 		JSON.stringify(EngCalcs.lpnDiagnose(prvModel)));

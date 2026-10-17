@@ -37886,9 +37886,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// distance between its nodes and quietly adds pipe friction.
 			l._length = 0;   // base-write: construction: a valve is born with zero length in Base
 			l.lenAuto = false;
-			// TCV IS THE DEFAULT TYPE, deliberately: it is the one type both engines solve, so a
-			// freshly drawn valve never changes which engine the page is using until the user asks
-			// for a type that does. See EngCalcs.lpnValveIsNative.
+			// TCV IS THE DEFAULT TYPE, deliberately: the plainest valve, and one both engines solve,
+			// so a freshly drawn valve never changes which engine the page is using until the user
+			// asks for a type that does (a PBV or GPV). See EngCalcs.lpnValveIsNative.
 			l.valveType = 'TCV';
 			l._setting = defaultValveSetting('TCV');   // base-write: construction: a valve is born with its type default in Base
 		}
@@ -60520,7 +60520,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// his own instruction, and the argument for it -- an enabled control that does nothing is a lie
 		// -- turned out to rest on a false premise. THREE THINGS ALREADY TELL THE TRUTH: this row's own
 		// tip names both cases permanently ("an extended period run always does, and so does a network
-		// holding an active PRV, PSV, or FCV"); `lpn_engine_valve_route` says it again at the moment of
+		// holding a PBV or GPV"); `lpn_engine_valve_route` says it again at the moment of
 		// the solve; and the banner says it while the engine loads. A fourth telling was a conditional
 		// duplicate of a permanent one.
 		//
@@ -70548,8 +70548,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// head-loss curve BELONGS TO THE VALVE and is named after it, which is Task 248.04's ruling
 		// for curves generally, so the pump's own three-point table serves it reading (flow, head
 		// LOSS) instead of (flow, head).
-		// Both are EPANET-only, like every other active type -- EngCalcs.lpnValveIsNative is the one
-		// place that line is drawn.
+		// Both are EPANET-only (a PRV, PSV and FCV are not, since Task 733) -- EngCalcs.lpnValveIsNative
+		// is the one place that line is drawn.
 		if (vt === 'GPV') {
 			renderGpvCurve(fields, l, linkId);
 		} else if (vt === 'PBV') {
@@ -73161,7 +73161,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'These nodes have no path to a reservoir or tank:') + ' ' + issue.ids.join(', '); }
 		// NAMES THE VALVES, which is the entire reason this page keeps its own diagnostics instead
 		// of surfacing EPANET's numeric error codes. A user staring at a drawing can act on "V3".
-		if (issue.code === 'valve-needs-epanet') { return (pc.lpn_diag_valve_needs_epanet || 'These are pressure or flow control valves, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'valve-needs-epanet') { return (pc.lpn_diag_valve_needs_epanet || 'These are pressure breaker or general purpose valves, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:') + ' ' + issue.ids.join(', '); }
 		if (issue.code === 'pda-pressures') { return pc.lpn_diag_pda_pressures || 'Required pressure must be greater than Minimum pressure. Change one of them in Settings.'; }
 		if (issue.code === 'pda-needs-epanet') { return pc.lpn_diag_pda_needs_epanet || 'The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.'; }
 		if (issue.code === 'valve-on-fixed-head') { return (pc.lpn_diag_valve_on_fixed_head || 'These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:') + ' ' + issue.ids.join(', '); }
@@ -75135,10 +75135,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// AN ACTIVE VALVE ROUTES THE SOLVE TO EPANET, whatever the engine PREFERENCE says, and the
 		// status bar says so out loud (Task 248 phase 2).
 		//
-		// The setting is a preference; the routing is a fact about THIS network. A PRV, PSV or FCV
-		// switches its own state during the solve and js/lpn-solver.js deliberately does not
-		// implement that -- EPANET already does, measured ~9x faster than our own solver at the
-		// 21-node target (Task 313). The routing is automatic, because refusing to solve a network we
+		// The setting is a preference; the routing is a fact about THIS network. A PBV or GPV is
+		// solved only by EPANET (a PRV, PSV and FCV are the built-in solver's too since Task 733,
+		// which switches their state by EPANET's rules). The routing is automatic, because refusing to solve a network we
 		// can solve would be absurd, and VISIBLE, because a user who ticked "built-in solver" and
 		// silently got a different engine has been lied to. settings.engine is NOT rewritten: delete
 		// the valve and the page goes back to the engine the user chose.
@@ -75156,7 +75155,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if ((engine === 'epanet' || epanetOnly.length > 0 || pdaRoute) && EngCalcs.lpnSolveEpanet) {
 			if (epanetOnly.length > 0 && engine !== 'epanet') {
 				valveRouteNote = ((EngCalcs.pageConfig || {}).lpn_engine_valve_route ||
-					'Solved with the EPANET solver, because of these pressure and flow control valves:') +
+					'Solved with the EPANET solver, because of these pressure breaker and general purpose valves:') +
 					' ' + epanetOnly.join(', ');
 			} else if (pdaRoute && engine !== 'epanet') {
 				// Task 762: the second thing that routes a network to EPANET by its own contents.
@@ -75367,8 +75366,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var offline = warmFailedOffline();
 			if (!quiet) {
 				setNotice(offline
-					? (pc.lpn_engine_unavailable || 'Could not download the EPANET solver, which is required to solve pressure and flow control valves (PRV, PSV, FCV). After one connection to the internet, the solver is stored on this device.')
-					: (pc.lpn_engine_unavailable_why || 'Pressure and flow control valves (PRV, PSV, FCV) cannot be solved without the EPANET solver. {reason}').replace('{reason}', EngCalcs.lpnEngineReason('fetch')));
+					? (pc.lpn_engine_unavailable || 'Could not download the EPANET solver, which is required to solve pressure breaker and general purpose valves (PBV, GPV). After one connection to the internet, the solver is stored on this device.')
+					: (pc.lpn_engine_unavailable_why || 'Pressure breaker and general purpose valves (PBV, GPV) cannot be solved without the EPANET solver. {reason}').replace('{reason}', EngCalcs.lpnEngineReason('fetch')));
 			}
 			if (window.console && console.warn) { console.warn('EPANET solver download failed:', err); }
 			refreshEpanetBanner();
@@ -75391,8 +75390,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 
 	// ---- WHEN ONLY EPANET WILL DO (Task 608, part 2) ---------------------------------------------
 	//
-	// TWO THINGS PUT A NETWORK BEYOND THE BUILT-IN SOLVER, and both lines are drawn elsewhere: an
-	// active PRV/PSV/FCV (EngCalcs.lpnValveIsNative, reached through lpnEpanetOnlyValves) and a
+	// TWO THINGS PUT A NETWORK BEYOND THE BUILT-IN SOLVER, and both lines are drawn elsewhere: a
+	// PBV or GPV (EngCalcs.lpnValveIsNative, reached through lpnEpanetOnlyValves) and a
 	// document that states a duration (EngCalcs.lpnTimeIsExtended). This is the one place the page
 	// asks the two together, so the checkbox and the banner cannot come to different answers.
 	function modelNeedsEpanet(model) {
@@ -75719,8 +75718,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// **THE ENGINE IS THE CALLER'S CHOICE AND THE COST IS THE USER'S** (js/lpn-fireflow.js takes
 	// `solve` injected for exactly this reason). The rule is runSolve()'s own: a network holding a
-	// PRV, PSV or FCV goes to EPANET whatever the preference says, because our own solver does not
-	// switch a valve's state inside the iteration.
+	// PBV or GPV goes to EPANET whatever the preference says, because our own solver does not
+	// solve those two (it does switch a PRV, PSV or FCV inside the iteration, since Task 733).
 	//
 	// **NOT FIRE FLOW'S ANY MORE**, though it was written there and still lives beside it: the
 	// scenario comparison run asks the same question of the same model, and two functions choosing
