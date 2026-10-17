@@ -562,7 +562,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Esc
   @@ NEEDS RULING
 - **`lpn_guide_map_letters_def`**
-  > <p>W starts Zoom Window, A starts selecting an area (pressing A again cycles the window, lasso, and polygon), and F draws a Shape. The plus or equals key zooms in, and the minus key zooms out, by one wheel step. These keys and the digits 0 to 9 are not taken with Ctrl, Alt, or Cmd, are not taken while typing in a field, and leave the letters of an open menu to its rows. A digit typed on a selected Tables cell overwrites the cell instead of choosing a tool.</p>
+  > <p>W starts Zoom Window, A starts selecting an area (pressing A again cycles the window, lasso, and polygon), and F draws a Shape. The plus or equals key zooms in, and the minus key zooms out, by one wheel step. These keys and the digits 0 to 9 are not taken when another key makes them a shortcut, such as Ctrl+C, are not taken while typing in a field, and leave the letters of an open menu to its rows. A digit typed on a selected Tables cell overwrites the cell instead of choosing a tool.</p>
   @@ NEEDS RULING
 - **`lpn_guide_map_letters_term`**
   > Letters, digits, and zoom keys
@@ -1307,7 +1307,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**1 still to read**, of 4 new keys across 12 unmerged branch(es).
+**1 still to read**, of 4 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -1320,9 +1320,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/guide-scenarios (`0f80f4f4b`) — adds no English strings
-
-### feat/hover-props (`9672e7859`) — already merged into merge/1017b; its strings are listed there
+### feat/guide-scenarios (`c61086410`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -1345,10 +1343,6 @@ build for that would be a gate nobody keeps. Refresh it with
 ### feat/label-placer-c (`4dc27ea10`) — adds no English strings
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
-
-### feat/native-valves (`c16fa7cab`) — already merged into merge/1017b; its strings are listed there
-
-### merge/1017b (`f3c6983bc`) — adds no English strings
 
 ### option/pane-boxes (`2ac75bbbe`) — 1 new, 1 to read @@ NEEDS RULING
 
