@@ -281,7 +281,11 @@ if (substr($type, 0, 8) === "EngCalcs") {
 }
 ?>
 
-	<?php if (function_exists('engcalcsParentCSS')) engcalcsParentCSS(); ?>
+	<?php // Not on the app page: /hawsedc.css hard-codes form and table colours, loads last, and the
+	      // whole app sits inside <form id="formInput">, so on hawsedc.com it painted dark mode's chrome
+	      // light. Its rules are already in css/engcalcs.css as tokens. Previews never showed it: a
+	      // worktree has no parent hooks file.
+	      if ($type !== 'EngCalcsApp' && function_exists('engcalcsParentCSS')) engcalcsParentCSS(); ?>
 
 </head>
 <body>

@@ -17129,7 +17129,20 @@ var EngCalcs = EngCalcs || {};
 	// satellite for somebody who was on satellite, not the street map. `basemapLast` is on the
 	// project for the same reason `basemap` is: it is a statement about this document's picture.
 	// The Map menu's basemap rows and the corner teaser: the open scenario's basemap, through the seam.
+	//
+	// **IN A SCENARIO IT WRITES THE SCENARIO, NOT THROUGH THE SEAM** (Tom, 2026-10-17, Fotobi: from
+	// street map the corner never went back to satellite). The seam routes what changed on the
+	// project, and asking for the style Base already has changed nothing there, so the press was
+	// dropped and the scenario kept its street map.
 	function setBasemapSource(style) {
+		var scn = activeScenario(), cur = scnProject('basemap');
+		if (!inBaseFor(categoryOfSetting(['project', 'basemap']))) {
+			if (style === 'off' && cur && cur !== 'off') { setScenarioSetting(scn, ['project', 'basemapLast'], cur); }
+			setScenarioSetting(scn, ['project', 'basemap'], style);
+			settingTableAfterEditNow();
+			saveToStorage();
+			return;
+		}
 		throughSettingSeam(function () {
 			if (style === 'off' && project.basemap && project.basemap !== 'off') {
 				project.basemapLast = project.basemap;
@@ -17140,7 +17153,7 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	function setBasemapOn(on) {
-		setBasemapSource(on ? (project.basemapLast || 'osm') : 'off');
+		setBasemapSource(on ? (scnProject('basemapLast') || 'osm') : 'off');
 	}
 	// **THE ATTRIBUTION IS REQUIRED BY BOTH PROVIDERS AND IS NOT DISMISSIBLE.** It appears whenever
 	// a tile can, and the only thing that removes it is turning the basemap off. The two sources

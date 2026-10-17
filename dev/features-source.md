@@ -91,6 +91,8 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 - 719| Junction and pipe chain draw, with pipe split offered contextually when a junction lands on a pipe.
 - 779| Draw reference Shapes (points, lines, and polygons), managed in a Shapes table.
 - 185| Copy and paste properties between assets.
+- 247| Customers: metered services with demand, service count, and pattern, each connected to the node or pipe that serves it.
+- 636| Custom properties on any kind of asset, with your own labels and limits, overridable by a scenario, and flagged in place when a value breaks its limits.
 - 345, 329, 333, 336, 397, 398, 399, 469, 146.01, 383| Customizable node and link labels: prefixes, suffixes, separator, drop order, and automatic or manual placement.
 - 353, 420, 389, 540| Find, replace, and go to elements, including complex queries in your language.
 - 266| Mass-edit assets by Find and replace, Select area, or spreadsheet Tables.
