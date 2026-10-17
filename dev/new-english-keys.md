@@ -67,7 +67,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED English: 'Copy with column headings'
   @@ NEEDS RULING
 - **`lpn_settings_hover_card_tip`**
-  > Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
+  > Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
   *The finding:* 'at any scale, fit or not' leaves 'fit' with no subject: fit what? The setting makes the hover card show the label even when the on-map label was dropped for lack of room (js/looped-network.js:51225). 'fit' also collides with 'zoom to fit'.
   1. whether or not the label fits on the map at the current zoom
   2. whether or not the map is zoomed to fit the network
@@ -967,7 +967,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > What a scenario is for
   @@ NEEDS RULING
 
-### feat/hover-props (`c6e8dceea`) — adds no English strings
+### feat/hover-props (`5692be50c`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -1005,4 +1005,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### fix/zero-demand-solve (`fbfbc28b6`) — already merged into feat/guide-scenarios; its strings are listed there
 
-### merge/1016e (`c2f0c28aa`) — adds no English strings
+### merge/1016e (`e756bcc29`) — already merged into feat/hover-props; its strings are listed there
