@@ -1345,4 +1345,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### option/pane-boxes (`27296e9db`) — adds no English strings
+### option/pane-boxes (`dcc1e7a2f`) — adds no English strings
