@@ -2008,6 +2008,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_notes_5_term']?></dt><dd><?=$ec_lang['lpn_notes_5_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_color_term']?></dt><dd><?=$ec_lang['lpn_notes_color_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_engine_term']?></dt><dd><?=$ec_lang['lpn_notes_engine_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_nt_example_term']?></dt><dd><?=$ec_lang['lpn_guide_nt_example_def']?></dd>
 </dl>
 </section>
 <?php // The Find and replace chapter beyond its opening paragraphs (lpn_guide_text_find_popup):
