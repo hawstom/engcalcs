@@ -120,6 +120,8 @@ function report(ok, label, detail) {
 	let forceOff = false, lastFirstFit = null, lastObs = null;
 	const realFF = Collide.placeLabelsFirstFit;
 	Collide.placeLabelsFirstFit = function (labels, obs, opts) {
+		// The level pipe labels' strict call (Task 812) is not the node labels' and is left alone.
+		if (opts && opts.strict) { return realFF.call(this, labels, obs, opts); }
 		if (forceOff) { opts = Object.assign({}, opts || {}, { clean: false }); }
 		return (lastFirstFit = realFF.call(this, labels, obs, opts));
 	};
