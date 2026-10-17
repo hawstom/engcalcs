@@ -164,7 +164,9 @@ function themeTokens(theme, css) {
 	const rules = readBlock(css || fs.readFileSync(path.join(__dirname, '..', '..', 'css', 'engcalcs.css'), 'utf8'));
 	return evaluate(tokensFor(rules, theme));
 }
-module.exports = { THEMES, pairs, contrast, colour, themeTokens };
+// The raw declarations in force for one theme (text as written), for dev/lpn-spike/css-tokens.js.
+function themeDecls(theme, css) { return tokensFor(readBlock(css), theme); }
+module.exports = { THEMES, pairs, contrast, colour, themeTokens, themeDecls };
 
 if (require.main === module) {
 	const css = fs.readFileSync(path.join(__dirname, '..', '..', 'css', 'engcalcs.css'), 'utf8');
