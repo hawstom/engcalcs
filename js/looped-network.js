@@ -6907,12 +6907,10 @@ var EngCalcs = EngCalcs || {};
 	// (`colorBreaks['node.pressure']`). Its alternatives are DERIVED from it exactly as element
 	// overrides' are (choice A): nothing about the tree is stored.
 	//
-	// **EVERY READER IS ROUTED THROUGH THE SEAM; NOTHING IN THE INTERFACE WRITES ONE YET** (stage 3
+	// **EVERY READER AND EVERY SETTINGS-BOX WRITE IS ROUTED THROUGH THE SEAM** (stage 3
 	// of the doc's long burn). Tom, 2026-10-06: a setting changed in a scenario changes that scenario
-	// only, Presentation included -- *"We can't treat any value overrides differently."* The editing
-	// half (the Settings box writing through setScenarioSetting(), and the settings table that
-	// audits it) is the next stage. Until then a hand-written block changes the map and the solve
-	// in its own scenario, and the Settings box still shows and edits the project's own values.
+	// only, Presentation included -- *"We can't treat any value overrides differently."* The Settings
+	// box writes through setScenarioSetting() for every path named below.
 	var LPN_SETTING_CATEGORY_OF = {
 		// -- the model and the file's own bookkeeping
 		format: null, app: null, v: null, nextId: null,
@@ -59940,7 +59938,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// about how hard the arithmetic tries, which is why it sits with the method above rather
 		// than among the tolerances below. See settingsDefaultPatternRow().
 		settingsDefaultPatternRow(compBody, row);
-		// **THE ONE OPTION A SCENARIO MAY CARRY ITS OWN VALUE OF**, which is what makes average
+		// **A SCENARIO CARRIES ITS OWN DEMAND MULTIPLIER**, which is what makes average
 		// day / maximum day / peak hour one number each instead of one edit per junction. The
 		// default quoted in the tip is what BLANK would inherit -- inside a scenario that is the
 		// document's own number, not the bare 1, or the tip would state a default the row does not
@@ -63649,9 +63647,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			.replace('{step}', fmt(step))
 			.replace('{span}', fmt(step * n));
 	}
-	// **EVERY PLACE A PATTERN ID IS WRITTEN, IN ONE FUNCTION** (Task 248.02). There are six now --
+	// **EVERY PLACE A PATTERN ID IS WRITTEN, IN ONE FUNCTION** (Task 248.02). There are seven now --
 	// a junction's demand, one of its demand CATEGORIES, a CUSTOMER's demand (Task 247), a
-	// reservoir's head, a pump's speed and the project's own default -- and
+	// reservoir's head, a pump's speed, a pump's price pattern and the project's own default -- and
 	// a rename or a delete that misses one leaves a reference to a name nothing answers to. None is
 	// a scenario-overridable property, so all of them are plain writes.
 	//
@@ -63667,15 +63665,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		// **AND A SCENARIO'S OWN DEMAND LIST** (R-369), which names patterns exactly as Base's rows
 		// do. The pattern is the document's, so a rename reaches every scenario at once.
-		// A head pattern and a speed pattern a scenario states (overridable since 2026-10-12) are
+		// A head, speed or price pattern a scenario states (overridable since 2026-10-12) are
 		// repointed the same way.
 		eachOverrideMap(function (map) {
 			Object.keys(map).forEach(function (k) {
 				(map[k].demands || []).forEach(function (d) { if (d.pattern === was) { d.pattern = to; } });
-				['headPattern', 'speedPattern'].forEach(function (p) { if (map[k][p] === was) { map[k][p] = to; } });
+				['headPattern', 'speedPattern', 'energyPattern'].forEach(function (p) { if (map[k][p] === was) { map[k][p] = to; } });
 			});
 		});
-		doc.links.forEach(function (l) { if (l.speedPattern === was) { l.speedPattern = to; } });   // base-write: a pattern rename is document-wide; the scenario values are repointed above
+		doc.links.forEach(function (l) {
+			if (l.speedPattern === was) { l.speedPattern = to; }   // base-write: a pattern rename is document-wide; the scenario values are repointed above
+			if (l._energyPattern === was) { l._energyPattern = to; }   // base-write: a pump's price pattern, document-wide like the others; scenario values are repointed above
+		});   // base-write: a pattern rename is document-wide; the scenario values are repointed above
 		// **A CUSTOMER IS THE SIXTH, AND IT IS THE ONE A READER WOULD NOT THINK OF** (Task 247,
 		// Tom 2026-09-18: *"A Customer demand can follow a pattern. Add that."*). A meter's demand
 		// is one of Task 468's demand rows, so it carries a pattern exactly as a category does --
@@ -64451,7 +64452,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			libCommit();
 			rebuildLibraryBox();
 		}));
-		libInactiveNote(host, 'control');
 		if (!list.length) {
 			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
 			return;
@@ -65716,6 +65716,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function buildControlSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libControlsRead();
+		libInactiveNote(host, 'control');
 		host.appendChild(libButton(pc.lpn_library_control_add || 'Add a control', function () {
 			// **THE STARTER SENTENCE IS BUILT FROM THIS NETWORK**, so the box opens on something
 			// that is already true rather than on a template with blanks in it. With nothing to
