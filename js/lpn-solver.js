@@ -267,8 +267,10 @@ EngCalcs.lpnEnvelope = function (first, n) {
 // the caller rebuilds it from scratch on the next Newton iteration anyway, and it is what keeps a
 // solve from allocating a second matrix on every iteration.
 //
-// Returns null on a non-positive-definite matrix, exactly as the dense reference does.
-EngCalcs.lpnSolvePacked = function (env, M, b) {
+// Returns null on a non-positive-definite matrix, exactly as the dense reference does. `fail`, when
+// given, is told the ROW that failed (fail.row), which is what EPANET's badvalve() needs: the node
+// at which the factorization broke, to ask whether an active control valve made it singular.
+EngCalcs.lpnSolvePacked = function (env, M, b, fail) {
 	'use strict';
 	var n = env.n,
 		first = env.first,
@@ -297,7 +299,7 @@ EngCalcs.lpnSolvePacked = function (env, M, b) {
 			sj = rowStart[j] - fj;
 			for (k = (fi > fj ? fi : fj); k < j; k++) { sum -= M[si + k] * M[sj + k]; }
 			if (i === j) {
-				if (!(sum > 0)) { return null; }
+				if (!(sum > 0)) { if (fail) { fail.row = i; } return null; }
 				M[si + i] = Math.sqrt(sum);
 			} else {
 				M[si + j] = sum / M[diag[j]];
@@ -412,27 +414,68 @@ EngCalcs.lpnPressureDatum = function (node) {
 //   TCV  -- a THROTTLE. Its setting is a minor-loss coefficient, so the whole element is
 //           k V^2 / 2g on a link with no friction. That is arithmetic this solver already does
 //           for every pipe's minor loss, so a TCV needs NO new numerics and solves natively.
-//   PRV / PSV / FCV / PBV / GPV -- ACTIVE CONTROLS. Each one is a valve that CHANGES STATE during
-//           the solve: a PRV is fully open while the downstream pressure is below its setting,
-//           active (holding that pressure) once it is reached, and shut if flow reverses. Which
-//           of the three it is depends on the pressures and flows being solved for, so the
-//           status has to be re-decided inside the iteration and the whole system re-formed when
-//           it changes. That is real numerics, not a coefficient.
-//
-// WE DO NOT WRITE THOSE NUMERICS, AND THAT IS A MEASUREMENT, NOT A SHRUG. This page ships a real
-// EPANET engine that already implements status switching, and dev/lpn-spike/engine-bench.js
-// measured it at 0.05 ms against this file's 0.43 ms on the same 21-node network -- EPANET is ~9x
-// faster here and ~46x faster at 201 nodes.
-//
-// So an active valve routes the SOLVE to EPANET (see runSolve() in js/looped-network.js), and if
-// EPANET is unreachable -- offline, blocked module -- this file refuses with a diagnostic that
-// NAMES THE VALVES. That is the whole reason the diagnostics on this page are ours and not
-// EPANET's numeric error codes: "valve V3 needs the EPANET engine" beats "error 110".
+//   PRV / PSV / FCV -- ACTIVE CONTROLS. Each one CHANGES STATE during the solve: a PRV is fully
+//           open while the downstream pressure is below its setting, active (holding that
+//           pressure) once it is reached, and shut if flow reverses. Which state it is in depends
+//           on the pressures and flows being solved for, so the status is re-decided inside the
+//           iteration. **THIS FILE DOES THAT NOW** (Task 733, phase 1), by EPANET's own rules,
+//           transcribed function by function from OWA-EPANET 2.3.5 -- the engine vendored in
+//           js/vendor/ -- and cited at each one below: the matrix coefficients from hydcoeffs.c,
+//           the state changes from hydstatus.c, and when they are checked from hydsolver.c.
+//           dev/lpn-spike/native-valve-harness.js holds both engines to the same answer.
+//   PBV / GPV -- still EPANET's alone. A PBV forces a loss whichever way the water runs and a GPV
+//           follows a head-loss curve; neither is phase 1, so they still route the solve to
+//           EPANET, and if EPANET is unreachable this file refuses with a diagnostic that NAMES
+//           THE VALVES ("valve V3 needs the EPANET engine" beats "error 110").
 EngCalcs.lpnValveTypes = ['PRV', 'PSV', 'FCV', 'TCV', 'PBV', 'GPV'];
 
-// The one place the native/EPANET-only line is drawn. A link that is not a valve is native.
+// The valves whose state this file decides inside the iteration.
+EngCalcs.lpnValveIsControl = function (link) {
+	var t = link && link.type === 'valve' ? String(link.valveType || 'TCV').toUpperCase() : '';
+	return t === 'PRV' || t === 'PSV' || t === 'FCV';
+};
+
+// The one place the native/EPANET-only line is drawn, by TYPE. A link that is not a valve is
+// native; so are a TCV and, since Task 733, a PRV, a PSV and an FCV.
 EngCalcs.lpnValveIsNative = function (link) {
-	return link.type !== 'valve' || (link.valveType || 'TCV').toUpperCase() === 'TCV';
+	return link.type !== 'valve' || (link.valveType || 'TCV').toUpperCase() === 'TCV' ||
+		EngCalcs.lpnValveIsControl(link);
+};
+
+// **EPANET REFUSES SOME VALVE PAIRS, AND THE BUILT-IN SOLVER MUST NOT QUIETLY ANSWER THEM.** Input
+// error 220, OWA-EPANET 2.3.5 project.c valvecheck(): two PRVs sharing a downstream node or in
+// series, two PSVs sharing an upstream node or in series, a PSV on a PRV's downstream node, and a
+// PRV or PSV on the wrong side of an FCV. Each such pair hands one node two boundary conditions.
+// The pair keeps routing to EPANET, which refuses it exactly as it always has, so a network that
+// was refused before this file learnt valves is refused after it. Status does not matter here:
+// EPANET checks the pair as it reads the file, before any status is applied.
+EngCalcs.lpnValveConflicts = function (model) {
+	var vs = [], out = {}, i, j, a, b;
+	for (i = 0; i < model.links.length; i++) {
+		if (EngCalcs.lpnValveIsControl(model.links[i])) { vs.push(model.links[i]); }
+	}
+	function bad(v, w) {
+		var vt = String(v.valveType).toUpperCase(), t = String(w.valveType).toUpperCase(),
+			vj1 = v.from, vj2 = v.to, j1 = w.from, j2 = w.to;
+		if (vt === 'PRV' && t === 'PRV' && (vj2 === j2 || vj2 === j1 || vj1 === j2)) { return true; }
+		if (vt === 'PSV' && t === 'PSV' && (vj1 === j1 || vj1 === j2 || vj2 === j1)) { return true; }
+		if (vt === 'PSV' && t === 'PRV' && vj1 === j2) { return true; }
+		if (vt === 'PRV' && t === 'PSV' && vj2 === j1) { return true; }
+		if (vt === 'FCV' && t === 'PSV' && vj2 === j1) { return true; }
+		if (vt === 'FCV' && t === 'PRV' && vj1 === j2) { return true; }
+		if (vt === 'PSV' && t === 'FCV' && vj1 === j2) { return true; }
+		if (vt === 'PRV' && t === 'FCV' && vj2 === j1) { return true; }
+		return false;
+	}
+	for (i = 0; i < vs.length; i++) {
+		for (j = 0; j < i; j++) {
+			a = vs[j]; b = vs[i];
+			// EPANET checks each valve against the ones read before it; the rules are written for
+			// that order, so the earlier valve is `v` and the later one `w`.
+			if (bad(a, b)) { out[a.id] = true; out[b.id] = true; }
+		}
+	}
+	return out;
 };
 
 // **PRESSURE-DRIVEN ANALYSIS IS EPANET'S ALONE** (Task 762), the second thing, after an active
@@ -446,9 +489,11 @@ EngCalcs.lpnDemandModelIsPda = function (model) {
 // Ids of every valve in the model that only the EPANET engine can solve. Exported because the UI
 // needs the same answer BEFORE it picks an engine, and two copies of this rule would drift.
 EngCalcs.lpnEpanetOnlyValves = function (model) {
-	var out = [], i;
+	var out = [], conflicts = EngCalcs.lpnValveConflicts(model), i;
 	for (i = 0; i < model.links.length; i++) {
-		if (!EngCalcs.lpnValveIsNative(model.links[i])) { out.push(model.links[i].id); }
+		if (!EngCalcs.lpnValveIsNative(model.links[i]) || conflicts[model.links[i].id]) {
+			out.push(model.links[i].id);
+		}
 	}
 	return out;
 };
@@ -532,7 +577,9 @@ EngCalcs.lpnDiagnose = function (model, options) {
 	// report it as a number with no element attached. Put a short pipe between them.
 	for (i = 0; i < model.links.length; i++) {
 		link = model.links[i];
-		if (link.type !== 'valve' || EngCalcs.lpnValveIsNative(link)) { continue; }
+		// Every type but the throttle: PRV/PSV/FCV are EPANET's rule 219 (project.c valvecheck), and
+		// PBV/GPV were refused here before the native solver learnt the first three, and still are.
+		if (link.type !== 'valve' || (link.valveType || 'TCV').toUpperCase() === 'TCV') { continue; }
 		if ((byId[link.from] && EngCalcs.lpnIsFixedHead(byId[link.from])) ||
 			(byId[link.to] && EngCalcs.lpnIsFixedHead(byId[link.to]))) {
 			badlyPlacedValves.push(link.id);
@@ -817,6 +864,223 @@ EngCalcs.lpnSolve = function (model, options) {
 		}
 	}
 
+	// ---- CONTROL VALVES (Task 733, phase 1) ---------------------------------------------------
+	//
+	// A PRV, PSV or FCV that the user has not closed starts ACTIVE, as EPANET starts it
+	// (hydraul.c inithyd(): "Start active control valves in ACTIVE position"). From there its state
+	// is one of EPANET's five, by the same names: 'active', 'open', 'closed' (closed BY THE SOLVE,
+	// against reverse flow -- not the user's Closed, which never reaches this list and is skipped
+	// like any closed link), 'xpressure' (a PRV/PSV that made the matrix singular and was forced
+	// open, hydsolver.c badvalve()) and 'xfcv' (an FCV that cannot pass its setting, or has head
+	// against it, and is acting as an open valve).
+	//
+	// EPANET WORKS IN FEET AND CFS, so each of its constants is converted here, once, by the unit it
+	// carries, and the arithmetic below is EPANET's in SI. The two BIGs are conductances (cfs per
+	// ft), the two smalls are resistances (ft per cfs), the tolerances a head and a flow.
+	var vStat = [], vc = [], vSet = [], vHset = [],
+		hydIn = model.hydraulics || {},
+		VFT = 0.3048,
+		VCFS = VFT * VFT * VFT,
+		V_CBIG = 1e8 * VCFS / VFT,          // hydcoeffs.c CBIG, as the penalty that pins a head
+		V_CBIG_INV = 1e-8 * VCFS / VFT,     // 1/CBIG, the conductance of a closed valve
+		V_CSMALL = 1e-6 * VFT / VCFS,       // hydcoeffs.c CSMALL, an open valve with no minor loss
+		V_RQTOL = 1e-7 * VFT / VCFS,        // input1.c RQTOL, the floor on a valve's loss gradient
+		V_HTOL = 0.0005 * VFT,              // input1.c HTOL
+		V_QTOL = 0.0001 * VCFS,             // input1.c QTOL
+		checkFreq = typeof hydIn.checkFreq === 'number' && hydIn.checkFreq > 0 ? hydIn.checkFreq : 2,
+		maxCheck = typeof hydIn.maxCheck === 'number' ? hydIn.maxCheck : 10,
+		dampLimit = typeof hydIn.dampLimit === 'number' && hydIn.dampLimit > 0 ? hydIn.dampLimit : 0,
+		nextCheck = checkFreq,
+		relax = 1,
+		X = null;
+	for (k = 0; k < links.length; k++) {
+		if (links[k].status === 'closed' || !EngCalcs.lpnValveIsControl(links[k])) { continue; }
+		vStat[k] = 'active';
+		vc.push(k);
+		vSet[k] = links[k].setting || 0;
+		// A PRV holds the head at its DOWNSTREAM node, a PSV at its UPSTREAM one, each at that
+		// node's elevation plus the setting (hydstatus.c valvestatus(), hydcoeffs.c prvcoeff() and
+		// psvcoeff()). The setting is in metres of head as stored, exactly what lpnToInp writes
+		// under `Units LPS`, whose pressure unit EPANET does not scale by specific gravity
+		// (input1.c: under METERS the pressure factor is MperFT alone).
+		var vt0 = String(links[k].valveType).toUpperCase();
+		if (vt0 === 'PRV') { vHset[k] = (byId[links[k].to].elev || 0) + vSet[k]; }
+		if (vt0 === 'PSV') { vHset[k] = (byId[links[k].from].elev || 0) + vSet[k]; }
+		// EPANET's first guess for a valve: the flow at 1 ft/s (hydraul.c initlinkflow()).
+		Q[k] = Math.PI * links[k].diameter * links[k].diameter / 4 * VFT;
+	}
+	if (vc.length) { X = new Float64Array(nn); }
+
+	// One off-diagonal write, with the self-loop case the main assembly also handles.
+	function addOff(a, b, val) {
+		if (a === b) { M[envDiag[a]] -= 2 * val; return; }
+		var l0 = a < b ? a : b, h0 = a < b ? b : a;
+		M[envRowStart[h0] - envFirst[h0] + l0] -= val;
+	}
+
+	// hydcoeffs.c valvecoeff(): a valve that is not holding anything -- open, closed by the solve,
+	// or forced open -- is a plain minor loss Km Q^2, with EPANET's own floors.
+	function valveOpenCoeff(k2) {
+		var q2 = Q[k2], km = linkM[k2], hg, hl;
+		if (vStat[k2] === 'closed') { G[k2] = V_CBIG_INV; y[k2] = q2; return; }
+		if (km > 0) {
+			hg = 2 * km * Math.abs(q2);
+			if (hg < V_RQTOL) { hg = V_RQTOL / 2; hl = q2 * hg; } else { hl = q2 * hg / 2; }
+			G[k2] = 1 / hg;
+			y[k2] = hl / hg;
+		} else {
+			G[k2] = 1 / V_CSMALL;
+			y[k2] = q2;
+		}
+	}
+
+	// hydcoeffs.c valvecoeffs(), prvcoeff(), psvcoeff(), fcvcoeff(): called AFTER every other link,
+	// demand and emitter is in, because an active PRV or PSV takes its flow from what the rest of
+	// the network leaves at its node (X, EPANET's Xflow). In valve order, as EPANET's Valve[] is,
+	// because an active FCV moves X for the valves after it.
+	function valveCoeffs() {
+		var v, k2, lk, i2, j2b, st, t, q2, qs;
+		for (v = 0; v < vc.length; v++) {
+			k2 = vc[v];
+			lk = links[k2];
+			i2 = junctionIndex[lk.from];
+			j2b = junctionIndex[lk.to];
+			st = vStat[k2];
+			t = String(lk.valveType).toUpperCase();
+			q2 = Q[k2];
+			if (st === 'active' && t === 'PRV') {
+				// Pin the downstream head to the setting and pass whatever that node is short of.
+				G[k2] = 0;
+				y[k2] = q2 + X[j2b];
+				F[j2b] += vHset[k2] * V_CBIG;
+				M[envDiag[j2b]] += V_CBIG;
+				if (X[j2b] < 0) { F[i2] += X[j2b]; }
+				continue;
+			}
+			if (st === 'active' && t === 'PSV') {
+				// Pin the upstream head and pass whatever that node has to spare.
+				G[k2] = 0;
+				y[k2] = q2 - X[i2];
+				F[i2] += vHset[k2] * V_CBIG;
+				M[envDiag[i2]] += V_CBIG;
+				if (X[i2] > 0) { F[j2b] += X[i2]; }
+				addOff(i2, j2b, V_CBIG_INV);   // "Preserve connectivity"
+				M[envDiag[j2b]] += V_CBIG_INV;
+				continue;
+			}
+			if (st === 'active' && t === 'FCV') {
+				// Break the network at the valve: the setting leaves the upstream node as a demand
+				// and arrives at the downstream one as a supply.
+				qs = vSet[k2];
+				X[i2] -= qs;
+				X[j2b] += qs;
+				y[k2] = q2 - qs;
+				F[i2] -= qs;
+				F[j2b] += qs;
+				G[k2] = V_CBIG_INV;
+				addOff(i2, j2b, G[k2]);
+				M[envDiag[i2]] += G[k2];
+				M[envDiag[j2b]] += G[k2];
+				continue;
+			}
+			valveOpenCoeff(k2);
+			addOff(i2, j2b, G[k2]);
+			M[envDiag[i2]] += G[k2];
+			M[envDiag[j2b]] += G[k2];
+			F[i2] += (y[k2] - q2);
+			F[j2b] -= (y[k2] - q2);
+		}
+	}
+
+	function headAt(id, Hv) {
+		var ix = junctionIndex[id];
+		return ix === undefined ? byId[id].head : Hv[ix];
+	}
+
+	// hydstatus.c prvstatus() / psvstatus(), through valvestatus(): checked after EVERY iteration
+	// (DampLimit 0, EPANET's default), with the heads and flows just solved for.
+	function pressureValveStatus(Hv) {
+		var change = false, v, k2, lk, t, s0, s1, h1, h2, hset, hml, q2;
+		for (v = 0; v < vc.length; v++) {
+			k2 = vc[v];
+			lk = links[k2];
+			t = String(lk.valveType).toUpperCase();
+			if (t !== 'PRV' && t !== 'PSV') { continue; }
+			s0 = vStat[k2];
+			s1 = s0;
+			h1 = headAt(lk.from, Hv);
+			h2 = headAt(lk.to, Hv);
+			hset = vHset[k2];
+			q2 = Q[k2];
+			hml = linkM[k2] * q2 * q2;   // head loss when fully open
+			if (t === 'PRV') {
+				if (s0 === 'active') {
+					if (q2 < -V_QTOL) { s1 = 'closed'; } else if (h1 - hml < hset - V_HTOL) { s1 = 'open'; }
+				} else if (s0 === 'open') {
+					if (q2 < -V_QTOL) { s1 = 'closed'; } else if (h2 >= hset + V_HTOL) { s1 = 'active'; }
+				} else if (s0 === 'closed') {
+					if (h1 >= hset + V_HTOL && h2 < hset - V_HTOL) { s1 = 'active'; }
+					else if (h1 < hset - V_HTOL && h1 > h2 + V_HTOL) { s1 = 'open'; }
+				} else if (s0 === 'xpressure') {
+					if (q2 < -V_QTOL) { s1 = 'closed'; }
+				}
+			} else {
+				if (s0 === 'active') {
+					if (q2 < -V_QTOL) { s1 = 'closed'; } else if (h2 + hml > hset + V_HTOL) { s1 = 'open'; }
+				} else if (s0 === 'open') {
+					if (q2 < -V_QTOL) { s1 = 'closed'; } else if (h1 < hset - V_HTOL) { s1 = 'active'; }
+				} else if (s0 === 'closed') {
+					if (h2 > hset + V_HTOL && h1 > h2 + V_HTOL) { s1 = 'open'; }
+					else if (h1 >= hset + V_HTOL && h1 > h2 + V_HTOL) { s1 = 'active'; }
+				} else if (s0 === 'xpressure') {
+					if (q2 < -V_QTOL) { s1 = 'closed'; }
+				}
+			}
+			if (s1 !== s0) { vStat[k2] = s1; change = true; }
+		}
+		return change;
+	}
+
+	// hydstatus.c fcvstatus(), through linkstatus(): checked every CheckFreq iterations up to
+	// MaxCheck, and again whenever the solve has converged.
+	function flowValveStatus(Hv) {
+		var change = false, v, k2, lk, s0, s1, dh, q2;
+		for (v = 0; v < vc.length; v++) {
+			k2 = vc[v];
+			lk = links[k2];
+			if (String(lk.valveType).toUpperCase() !== 'FCV') { continue; }
+			s0 = vStat[k2];
+			s1 = s0;
+			dh = headAt(lk.from, Hv) - headAt(lk.to, Hv);
+			q2 = Q[k2];
+			if (dh < -V_HTOL) { s1 = 'xfcv'; }
+			else if (q2 < -V_QTOL) { s1 = 'xfcv'; }
+			else if (s0 === 'xfcv' && q2 >= vSet[k2]) { s1 = 'active'; }
+			// "Active valve's loss coeff. can't be < fully open loss coeff."
+			else if (s1 === 'active' && dh / (q2 * q2) < linkM[k2]) { s1 = 'xfcv'; }
+			if (s1 !== s0) { vStat[k2] = s1; change = true; }
+		}
+		return change;
+	}
+
+	// hydsolver.c badvalve(): the factorization broke at junction row `row`. If the FIRST valve
+	// touching that node is an active PRV, PSV or FCV, its setting is what made the equations
+	// inconsistent; it is forced open and the iteration is repeated. Otherwise the network is
+	// singular for some other reason and the solve stops, as EPANET's does.
+	function badValve(row) {
+		var id = junctions[row] && junctions[row].id, k2, lk;
+		for (k2 = 0; k2 < links.length; k2++) {
+			lk = links[k2];
+			if (lk.type !== 'valve' || (lk.from !== id && lk.to !== id)) { continue; }
+			if (vStat[k2] === 'active') {
+				vStat[k2] = String(lk.valveType).toUpperCase() === 'FCV' ? 'xfcv' : 'xpressure';
+				return true;
+			}
+			return false;
+		}
+		return false;
+	}
+
 	for (iter = 1; iter <= maxIter; iter++) {
 		var link,
 			res,
@@ -828,14 +1092,20 @@ EngCalcs.lpnSolve = function (model, options) {
 			jIdx,
 			Hnew,
 			dq,
-			sumAbsDq = 0;
+			sumAbsDq = 0,
+			sumAbsQ = 0,
+			done = false,
+			valveChange = false;
 
 		M.fill(0);
 		F.fill(0);
+		if (X !== null) { X.fill(0); }
 
 		for (k = 0; k < links.length; k++) {
 			link = links[k];
 			if (link.status === 'closed') { G[k] = 0; y[k] = 0; continue; }
+			// A control valve is assembled after everything else -- see valveCoeffs().
+			if (vStat[k] !== undefined) { continue; }
 
 			q = Q[k];
 			aq = Math.abs(q);
@@ -907,6 +1177,10 @@ EngCalcs.lpnSolve = function (model, options) {
 			// substituted into continuity at each junction.
 			iIdx = junctionIndex[link.from];
 			jIdx = junctionIndex[link.to];
+			if (X !== null) {
+				if (iIdx !== undefined) { X[iIdx] -= Q[k]; }
+				if (jIdx !== undefined) { X[jIdx] += Q[k]; }
+			}
 
 			if (iIdx !== undefined) {
 				M[envDiag[iIdx]] += G[k];
@@ -951,10 +1225,20 @@ EngCalcs.lpnSolve = function (model, options) {
 						: junctions[i].emitter;
 				M[envDiag[i]] += ge;
 				F[i] += ge * H[i] - qe;
+				if (X !== null) { X[i] -= qe; }
 			}
+			if (X !== null) { X[i] -= (junctions[i].demand || 0); }
 		}
+		if (X !== null) { valveCoeffs(); }
 
-		Hnew = EngCalcs.lpnSolvePacked(env, M, F);
+		var failAt = {};
+		Hnew = EngCalcs.lpnSolvePacked(env, M, F, failAt);
+		if (Hnew === null && X !== null && failAt.row !== undefined && badValve(failAt.row)) {
+			// EPANET `continue`s without counting the trial; so does this.
+			X.fill(0);
+			iter--;
+			continue;
+		}
 		if (Hnew === null) {
 			return {
 				ok: false,
@@ -973,7 +1257,12 @@ EngCalcs.lpnSolve = function (model, options) {
 				hj = jIdx === undefined ? byId[link.to].head : Hnew[jIdx],
 				qNew = (Q[k] - y[k]) + G[k] * (hi - hj);
 			dq = qNew - Q[k];
+			// EPANET's RelaxFactor (hydsolver.c newlinkflows()): 1 unless the project states a
+			// DampLimit and the solve is already within it. Applied only then, so every network
+			// without one does exactly the arithmetic it always did.
+			if (relax !== 1) { dq *= relax; qNew = Q[k] + dq; }
 			sumAbsDq += Math.abs(dq);
+			sumAbsQ += Math.abs(qNew);
 			Q[k] = qNew;
 		}
 
@@ -991,7 +1280,22 @@ EngCalcs.lpnSolve = function (model, options) {
 		// absTol catches the no-flow network, where demandScale is zero and
 		// maxFlowChange is therefore already an absolute quantity. 1e-12 m3/s is a
 		// nanolitre per second.
-		if (maxFlowChange < tol || sumAbsDq < absTol) { converged = true; break; }
+		// THE PRESSURE VALVES ARE RE-DECIDED EVERY ITERATION, before convergence is judged
+		// (hydsolver.c hydsolve()), so a state change on the iteration that would have converged
+		// keeps the solve going. EPANET's relative error is its own, total change over total flow,
+		// and it is read here only against a stated DampLimit.
+		if (X !== null) {
+			var relErrE = sumAbsQ > 0 ? sumAbsDq / sumAbsQ : sumAbsDq;
+			relax = 1;
+			valveChange = false;
+			if (dampLimit > 0) {
+				if (relErrE <= dampLimit) { relax = 0.6; valveChange = pressureValveStatus(H); }
+			} else {
+				valveChange = pressureValveStatus(H);
+			}
+		}
+
+		if (maxFlowChange < tol || sumAbsDq < absTol) { done = true; }
 
 		// Stagnation. Newton converges quadratically until it reaches the roundoff
 		// floor of the factorization, then stops improving -- measured on a
@@ -1034,7 +1338,9 @@ EngCalcs.lpnSolve = function (model, options) {
 		// the only route, which no network reaches. This cannot resurrect the decaying-circulation
 		// mistake the comment above describes -- that case never gets here, because its absolute
 		// change is still halving every iteration, so `stall` never accumulates.
-		if (maxFlowChange < bestChange * 0.999) {
+		if (done) {
+			// (nothing: judged below)
+		} else if (maxFlowChange < bestChange * 0.999) {
 			bestChange = maxFlowChange;
 			stall = 0;
 		} else if (++stall >= 5) {
@@ -1055,27 +1361,49 @@ EngCalcs.lpnSolve = function (model, options) {
 			// because a branch no test can justify is a branch nobody can maintain.
 			if (qMax < LPN_AT_REST ||
 					sumAbsDq < Math.max(EngCalcs.lpnStallAccept * demandScale, absTol)) {
-				converged = true;
-				break;
+				done = true;
 			}
+		}
+
+		if (done) {
+			// CONVERGED, BUT ONLY IF NO VALVE WANTS TO CHANGE: the pressure valves were checked
+			// above, and the FCVs are checked now (hydsolver.c: "Quit if no status changes occur").
+			// A change restarts the count toward the next periodic check and the stall watch.
+			if (X !== null) {
+				var flowChange = flowValveStatus(H);
+				if (valveChange || flowChange) {
+					nextCheck = iter + checkFreq;
+					bestChange = Infinity;
+					stall = 0;
+					continue;
+				}
+			}
+			converged = true;
+			break;
+		}
+		// The periodic check on FCVs, every CheckFreq trials up to MaxCheck (hydsolver.c).
+		if (X !== null && iter <= maxCheck && iter === nextCheck) {
+			flowValveStatus(H);
+			nextCheck += checkFreq;
 		}
 	}
 
 	return EngCalcs.lpnReport(model, junctions, junctionIndex, byId, H, Q, method,
-		visc, iter, converged, maxFlowChange);
+		visc, iter, converged, maxFlowChange, vStat);
 };
 
 // Turns the raw H/Q vectors into per-id results, and recomputes each link's head
 // loss from the constitutive equation rather than from the head difference, so that
 // a residual check has two independent numbers to compare.
 EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, method,
-	visc, iterations, converged, maxFlowChange) {
+	visc, iterations, converged, maxFlowChange, vStat) {
 	'use strict';
 	var heads = {},
 		pressures = {},
 		flows = {},
 		headlosses = {},
 		velocities = {},
+		valveStatus = {},
 		i,
 		k,
 		link,
@@ -1083,6 +1411,7 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 		aq,
 		m,
 		kEff,
+		vs,
 		g = EngCalcs.lpnG;
 
 	// **SPECIFIC GRAVITY TURNS A HEAD INTO A PRESSURE, AND NOTHING ELSE** (Task 553). Every head in
@@ -1112,6 +1441,24 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 
 	for (k = 0; k < model.links.length; k++) {
 		link = model.links[k];
+		// **A CONTROL VALVE REPORTS AS EPANET REPORTS IT** (epanet.c EN_getlinkvalue): closed by the
+		// solve, its flow, velocity and head loss are zero; otherwise its head loss is the head
+		// difference across it, which for an active valve is the pressure it is taking out -- the
+		// minor-loss formula would report only the fully-open part of that.
+		vs = vStat ? vStat[k] : undefined;
+		if (EngCalcs.lpnValveIsControl(link)) {
+			valveStatus[link.id] = vs === undefined ? 'closed' : vs;
+		}
+		if (vs !== undefined) {
+			var vClosed = vs === 'closed';
+			flows[link.id] = vClosed ? 0 : Q[k];
+			velocities[link.id] = vClosed || !(link.diameter > 0) ? 0
+				: Math.abs(Q[k]) / (Math.PI * link.diameter * link.diameter / 4);
+			headlosses[link.id] = vClosed ? 0
+				: (junctionIndex[link.from] === undefined ? byId[link.from].head : H[junctionIndex[link.from]]) -
+				(junctionIndex[link.to] === undefined ? byId[link.to].head : H[junctionIndex[link.to]]);
+			continue;
+		}
 		flows[link.id] = Q[k];
 		// Velocity is a SPEED, so it is never negative -- |Q|/A, matching EPANET, which reports
 		// signed flow and unsigned velocity from the same solve (verified against its own output
@@ -1156,7 +1503,10 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 		pressures: pressures,
 		flows: flows,
 		headlosses: headlosses,
-		velocities: velocities
+		velocities: velocities,
+		// Each PRV, PSV and FCV's state at the answer: 'active', 'open', 'closed', 'xpressure' or
+		// 'xfcv' (see lpnSolve). A valve the user closed is 'closed'.
+		valveStatus: valveStatus
 	};
 };
 

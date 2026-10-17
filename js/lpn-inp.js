@@ -1723,7 +1723,7 @@
 		'pump-speed': 1,       // Task 248.02: the speed and its pattern are kept and solved.
 		'pump-pattern': 1,
 		'valve-tcv': 1,        // Task 248 phase 2: a throttle valve is a throttle valve; either solver.
-		'valve-active': 1      // ...and PRV/PSV/FCV come in whole and route to the EPANET engine.
+		'valve-active': 1      // ...and PRV/PSV/FCV come in whole; either solver since Task 733.
 	};
 	// **THE FILTER RUNS AT DISPLAY TIME AS WELL, and that is the half that matters to anybody who
 	// already has a project.** A note is written into the document at import, so filtering only here
