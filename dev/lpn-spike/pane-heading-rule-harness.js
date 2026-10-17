@@ -268,7 +268,15 @@ function assertTable(label, report) {
 			ok(name + ': an unset "No ..." pull-down never widens its column', c.unsetWide.length === 0 &&
 				(c.contentW > 0 || c.thW <= c.basicMax || c.narrowerBreaks === true), c.unsetWide.join(', '));
 		}
-		ok(name + ': no present value is clipped', c.clipped.length === 0, c.clipped.join(', '));
+		// The Pipes table's Vertices column is sized by its heading alone, whatever it holds (Tom,
+		// 2026-10-16: "the Pipes table Vertices column should always be sized based on the heading
+		// rule ignoring the contents"), so a long vertex list is clipped there by design.
+		if (c.key === 'verts') {
+			ok(name + ': sized by its heading alone, never widened by what it holds', c.thW <= c.basicMax || c.narrowerBreaks === true,
+				'heading cell ' + c.thW.toFixed(1) + 'px > rule ' + c.basicMax.toFixed(1) + 'px');
+		} else {
+			ok(name + ': no present value is clipped', c.clipped.length === 0, c.clipped.join(', '));
+		}
 	});
 	return report.cols.length;
 }

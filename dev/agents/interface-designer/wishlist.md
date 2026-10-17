@@ -538,6 +538,8 @@ N+5. **A check that flags one English string holding both a select word and an o
 - Instrument nothing, but ask Tom/testers: do you ever press Restart or End instead of the step selector? (decides whether they stay)
 - Consider the menu bar's bordered pills in the same hierarchy review (same "boxed" problem as the transport; Task 616 lineage).
 
+- **Show one reader the amber-edge field plus "Base: x / Reset" before the Settings box is built**, against the per-field checkbox, to see whether the border alone is read as "this differs". SPECULATION until then.
+- **Ask Tom whether the Settings table's Category must be sortable** (it decides heading-as-columns vs group rows).
 - (2026-10-05) Feedback usage data: how often does `lpn wrong:*` fire vs contact sends per week (log/lang-log-stats.sh)? Decides whether the in-page dialog is worth ~310 strings.
 N. **One in-page "User guide" box replaces Help > Tables and Hotkeys and Help > Toolbar** (Tom, 2026-10-06). The toolbar section is derived from toolbarIconIndex, tips shown in full (no hover, so touch is fixed), each row naming its menu twin ("Edit > Delete") and pulsing the real control on click; a Menus index; the existing hotkey tables; one search box; '?' opens it, landing on the hovered or focused control. Cost: 1 new key x 26, a refactor of the File/Edit/Water openers into *Rows() functions, no storage change if the box keeps `lpn_hotkeysbox`. It also becomes the home for Task 763's prose. Precedents: Excalidraw '?', Figma shortcuts panel, VS Code Keyboard Shortcuts editor. See journal, 2026-10-06.
 

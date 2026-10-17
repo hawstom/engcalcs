@@ -96,80 +96,64 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-16 (twenty-third session, the evening, Arizona time)
+## STATE — 2026-10-16 (twenty-fourth session, late evening, Arizona time)
 
-### Master: see the pushed SHA in the last report. Production: b7c99102 (10-09) when last read; ask, About box
+### Master f1b1dd1f7 (pushed 10-16, suite green). Production: b7c99102 (10-09) when last read; ask, About box
 
-Landed on master 2026-10-16 (his typed word): feat/description-lines (806), chore/retire-mark-extrema,
-feat/pattern-axis ("Step", ticks fit the width), fix/merge-1016 (those two merges broke three harnesses;
-one was a real defect: Tab out of the multi-line Description dropped focus), roadmap closures 806, 807,
-643, 786; 802 and 804 to 100; 798 to 50. Another session (engcalcs-05) merged chore/plain-sentences
-($ec_lang_syn retired into dev/plain-sentences.md, with his marks). Deleted keys: none this session
-beyond retire-mark-extrema's two (`lpn_labels_mark_extrema`, `_tip`).
+Landed on master 10-16 night, on his typed word ("Merge merge/1016e into master"): feat/bentley-interop
+(scenarios and alternatives, Morph, Match/Copy properties, graph bubbles, Manage overrides, Clean map,
+override markers, long press, edit Text in place, Merge upward), feat/theme-dark, feat/basemap-outdoors
+(Topo; privacy.php row "Satellite and topo map imagery"), fix/units-revert (Import EPANET file and a
+refused New project restamped the open project's units: his R-415 Fotobi "units back to US"; Convert as
+now converts Settings > New assets values; Settings > Units SI/US buttons ask first), fix/library-notes,
+his 251 harvested marks, his four plain-sentences changes, obsolete dev files deleted, Tasks 617 714
+781 782 784 789 790 794 801 802 804 805 closed, 809 and 810 opened. Deleted keys: the six
+`lpn_scenario_push_*` (Apply Base values retired, on bentley-interop). Storage told to him: `lpn_theme`,
+`lpn_cleanmap`, `lpn_ovrmarks`, `flyW`/`dockW` in `lpn_smbox`.
 
-### Branches awaiting his word (pushed; all on the Branch previews page with test steps)
+### Branches awaiting him (pushed; on the Branch previews page, http://localhost:8080/)
 
-- **feat/bentley-interop** (8116): his 10-16 pass items are built and merged in: feat/scenario-box (manager
-  and table ONE box, one title bar, one x; R-410), feat/manage-override (List overrides became Manage
-  overrides: Clear per row, Clear selected, Clear all, each time series graph its own row; R-413; English
-  awaits him), fix/elevation-override (elevation WAS already a Physical override on this branch, the
-  handoff note came from master's helper; the real defect was a scenario's automatic slope length using
-  Base's elevations, fixed; R-414). fix/zero-demand-solve is merged into it. An integration agent was
-  merging master into it and making its suite green (its head had 4 red harnesses before today). Check
-  its state with `git log` before anything else. Still to TELL HIM before it merges: `lpn_cleanmap`,
-  `lpn_ovrmarks` (localStorage), `flyW`/`dockW` in `lpn_smbox`. He asked whether to merge it and keep
-  building: CC's answer was yes (merge, then new branches from master; 749 gets its own branch when a
-  sample file exists). Unruled: `lpn_settings_override_marks_tip`, `lpn_sm_all_row_tip`,
-  `lpn_sm_unused_none`, the Transform plain sentence. After it lands delete match-property, graph-bubble,
-  scenario-box, manage-override, elevation-override.
-- **feat/theme-dark** (8110, Task 714): System/Light/Dark in Settings > Page, NEW localStorage key
-  `lpn_theme` (told him). Looped Network page only (other calculators' navbar is not tokenised). Perry's
-  five findings and his "colors legend doesn't respond to Dark" fixed (ced0c2db). English: Theme, its tip,
-  System, Light, Dark.
-- **feat/basemap-outdoors** (8107, Task 617): Mapbox Outdoors as the third press of the corner tile; his
-  word "Topo" (key `lpn_basemap_topo_show`, "Show topo map"; stored value stays `outdoors`). BLOCKED on
-  his word for privacy.php's "Satellite imagery" row: proposed "Satellite and topo map imagery" /
-  "Mapbox, for the satellite and topo map images"; `third_party_request_check.php` pins the old phrase.
-- **feat/geojson-import** (8108, Task 728): File > Import > Import GeoJSON network; Perry's fixes done
-  (b4c12097). ~60 new English keys await him. His calls: NAD83 (EPSG:4269) refused or read as WGS 84
-  "up to about 1 m off"; minor loss 0 on imported pipes (built); `lpn_file_import_shapes_tip` is now
-  untrue (says import networks from EPANET only). Shapefile half not built.
-
-### Proposed to him 2026-10-15/16, awaiting his word
-
-- Independent review of how a clarification reaches a translator (halo read as "hello"; "translating
-  too often?"): `dev/translation-clarification-review.md`. Its halo glossary wording, its sprint cadence
-  (once before each production pull) await him. Its tooling fix landed 10-16: the packet now sends
-  the syn notes, reworded keys (no resync list), tip pairs, and only the glossary terms a batch uses.
-  He forbids translating without his approval.
-
-### His answers of 2026-10-16 (early), being built or awaiting design
-
-- **Language, done 10-16**: `dev/terms.md` (his plain-words names, two uniqueness groups) is the
-  concept source; packets lead with it. A blind Spanish test from plain names alone: his picks and CC's
-  clear calls are in es (cota, profundidad del flujo, densidad relativa, LP/LE). Left for the next
-  Spanish sprint, with his word: cota and carga hidráulica file-wide. His open questions: should the
-  glossary carry abbreviations (HGL, EGL); is "N/A" the right English (he means "no meaningful
-  answer"); is "Headwater below crown" good English.
-- **EPS (bentley-interop, his Fotobi)**: a run stops with Error 110 when tank T-NE runs EMPTY
-  (15:07:33, 14:01:42): EPANET closes L22 and the junctions it fed have no source. 15:07:33 was the
-  simulation time, NOT the wall clock as CC told him. He asks why lowering a full tank's initial
-  depth avoids the 0:00 stop when flow is zero either way. Candidate answer to "surely it's smarter":
-  pressure-driven demand. His units going back to US on Fotobi: he has no steps and will keep observing (R-415).
-- **A pipe-label artifact** in a new project (one pipe label, while stretching nodes): his screenshot
-  was the wrong file; ask for it.
+- **feat/hover-props** (8111, Task 773): the hover card lists the Properties box's rows, named, formatted by
+  the label settings; never off-screen; RTL. Row "Show all properties on hover" and the tip are his words.
+  Perry's first pass found it showed only label fields (fixed); a second Perry pass was running at handoff.
+- **feat/guide-scenarios** (8113, Task 785): six User Manual chapters rewritten to the code, 60 new English
+  strings, plus his "count of overrides" in `lpn_scncmp_menu_tip`. Not yet merged with master f1b1dd1f7.
+- **feat/scenarios-menu** (8114): Scenarios menu reordered to his sketch (managers, Basic mode, line,
+  commands, line, scenario list). Names unchanged; CC proposed "Override manager..." for Manage overrides,
+  awaiting him. He likes "Basic mode" if the order cures the Basic/Base misclick.
+- **docs/features-update** (8112 serves `~/webdev/lwn-features-preview`, a librewaternet.org worktree on
+  branch `features-update`, Task 810): the public feature list restructured to his 15 notes (pointer rows
+  `- see <heading>|`, Analyses and Scenarios sections, Premium as pointers). PUBLIC CLAIMS: needs his OK
+  line by line. Open: pipe split has no closed ID of its own (folded into the chain line).
+- **feat/geojson-import** (8108, Task 728): Beta marker "Beta: feedback requested", Shapes tip names both
+  doors. Awaits his merge word and his NAD83 call (CC recommends: read as WGS 84 with a report note).
 
 ### Questions out to him
 
-- Task 800: keep J-NE-S-3's equal override?
-- Task 681: the node shed's re-fits are what is left (~250 ms on n600); cheaper means changing the layout.
-- Task 269 (EWB): the action is his (call Dane Whitmer); Task 728 import half is the geojson branch.
+- Bubbles after Merge upward (Fotobi EPS -> Base): CC says by design (the child inherits after a merge);
+  does he want a "copy upward" too?
+- Task 800: keep J-NE-S-3's equal override? Task 681: the node shed's re-fits.
+- Port 8202 (epanet-plus-plus.org) never reaches jasmine from his browser though 81xx does; it is also
+  served on 8109. He says he is always on ssh; the cause is on his forward list, not asked further.
 
 ### Next job
 
-His browser pass on bentley-interop (once green), theme-dark, basemap-outdoors (after the privacy word),
-geojson-import. Wish lists: New junction without a canvas click (Declan). Survey of obsolete dev/ files
-was given to him 10-16 (11 safe to delete, none deleted yet; icon-preview/render is 13 MB).
+His passes on the five branches above. Then Task 785's remaining chapters, Task 809 at the next sprint
+(needs his approval), and Declan's New junction without a canvas click (design question open).
+
+### Traps met 2026-10-16 (twenty-fourth session)
+
+- **The harvester keeps the LAST copy of a key**, so a key listed under several branches lost his marks
+  (174 of them) to an unmarked duplicate. Fixed at the source: a branch already merged into another
+  listed branch is named in one line. If a key ever appears twice again, harvest from a copy with the
+  duplicate sections stripped.
+- **"Regression" reports can be data.** Fotobi's Error 110 was metric numbers under declared US units;
+  bisecting found no code change. Read the file's declared units before bisecting.
+- **Harvest stamps UTC dates** (2026-10-17 at 19:45 MST). sed the day back before committing.
+- **Two harnesses fail only under load** (setting-scope "stored as both", table-divider-align): both
+  were harness timing, fixed 10-16. Run a red browser harness alone before calling it a defect.
+- **A bare preview link to a port's root is a 403**: link the page, or point him at the Branch
+  previews page row.
 
 ### Traps met 2026-10-16 (twenty-third session)
 

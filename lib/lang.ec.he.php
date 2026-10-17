@@ -708,6 +708,7 @@ $ec_lang['lpn_node_customers_tip']='רשימת הלקוחות שנוספו כא�
 $ec_lang['lpn_node_customers_sum']='{total} {unit} מתוך לקוחות ({n})';
 $ec_lang['lpn_customer_detached']='⚠ לקוח זה אינו מחובר לצינור, כך שדרישתו אינה כלולה בתוצאות. מחקו אותו, או ציירו צינור והעבירו את הלקוח אליו.';
 $ec_lang['lpn_customer_fixed_head']='⚠ הקצה הקרוב של אותו צינור מחזיק מפלס מים קבוע, כך שדרישה זו אינה משפיעה על הסימולציה.';
+
 $ec_lang['lpn_customer_detached_count']='לקוחות שאינם מחוברים לצינור ({n}). דרישתם אינה נכללת בחשבון.';
 $ec_lang['lpn_meter_pick_pipe']='כעת בחרו את הצינור או הצומת המשרתים לקוח זה. הלקוח נשאר במקום שבו הוצב. הקישו Escape כדי לבטל.';
 $ec_lang['lpn_inp_export_flat_customers']='לקובץ EPANET אין לקוחות. הדרישה של הלקוחות בפרויקט זה ({n}) נכתבת כשורת דרישה בצומת שכל לקוח משויך אליו, בשם תגית הלקוח. הקובץ אינו רושם את הלקוח עצמו: את מיקומו, את הצינור המשרת אותו, את המקום לאורך הצינור שבו חיבור השירות מתחבר, או כמה חיבורים הוא מייצג. מידע זה נשאר בפרויקט; שמרו את קובץ הפרויקט כדי לשמור אותו.';
@@ -992,7 +993,6 @@ $ec_lang['lpn_guide_text_contour_box']='שולטת בתרשים קווי המת�
 $ec_lang['lpn_guide_text_scncmp_box']='פותרת כל תרחיש מעותק של השרטוט ומציגה בטבלה, לכל תרחיש, את מספר הערכים המותאמים, הלחץ הנמוך ביותר והמהירות הגבוהה ביותר. היא אינה משנה את הפרויקט, והתרחיש הפתוח נשאר כפי שהיה.';
 $ec_lang['lpn_guide_text_rptbox']='מציגה את דוח הטקסט שכתב מנוע EPANET עבור הדמיית התקופה המורחבת האחרונה, כולל האזהרות שלו וסיכום הרשת. כל הדמיית תקופה מורחבת מחליפה אותו; פתרון ברגע בודד אינו מחליף אותו, ועריכה משאירה את הדוח הקודם במקומו.';
 $ec_lang['lpn_guide_text_status_box']='מפרטת, לפי סדר הזמן, כל שינוי במהלך הדמיית התקופה המורחבת האחרונה: משאבה, שסתום או צינור שנפתחים או נסגרים, מכל שמתחיל להתמלא או להתרוקן או שהופך למלא או לריק, וכל צעד זמן שלא התכנס במלואו. רק שינויים מפורטים, לא כל צעד זמן.';
-$ec_lang['lpn_guide_text_alt_box']='מציגה, לכל תרחיש, באיזו חלופה הוא משתמש בכל קטגוריה, כגון פיזיקלי, דרישה והפעלת נכסים, ואת אפשרויות החישוב שלו: מכפיל דרישה, משך ריצה כולל וצעד זמן הידראולי. החלופות הן לקריאה בלבד. אפשרויות החישוב של תרחיש ניתנות להקלדה כאן, וערך ריק משתמש בערך של ההורה. פתחו אותה מהתפריט תרחישים לאחר ניקוי מצב בסיסי.';
 $ec_lang['lpn_guide_text_full_box']='מפרטת כל צומת וכל קישור בכל צעד זמן דיווח, ביחידות המוצגות בחלונית טבלאות. ללא הדמיית תקופה מורחבת היא מציגה את הפתרון הנוכחי ברגע בודד. הורדה או הדפסה כוללות כל צעד זמן, והטבלה מציגה אחד בכל פעם.';
 $ec_lang['lpn_guide_text_calib_box']='משווה קובץ של מדידות שדה עם התוצאות המחושבות באותם מקומות ובאותם זמנים, קובץ אחד לכל פרמטר. הקובץ נשמר להפעלה הנוכחית בלבד ואינו נשמר עם הפרויקט.';
 $ec_lang['lpn_guide_text_notes_popup']='מפרטת הערות על אופן הפעולה של עמוד זה ועל מה שהוא אינו עושה, כל אחת כמונח ואחריו הגדרתו. היא אינה משנה את הרשת.';
@@ -1020,7 +1020,6 @@ $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?<
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='גם ב{menu}';
 $ec_lang['lpn_guide_how_popup']='המאפיינים נפתחים כשבוחרים נכס או טקסט.';
-$ec_lang['lpn_guide_how_alt']='תצוגה מקדימה של חלופות מופיעה תחת מים, תרחישים כשמצב בסיסי כבוי.';
 $ec_lang['lpn_guide_not_shown']='פקד זה אינו מוצג כעת על המסך.';
 // The box's two context headings. "Tables" holds the two table-help entries that used to sit only
 // in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
@@ -1475,8 +1474,20 @@ $ec_lang['lpn_pane_sel_only_none']='לא נבחרו אלמנטים. בחרו ת�
 // Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
 // scenario, with a Scenario column after ID.
 $ec_lang['lpn_pane_scn_show']='הצגת תרחישים';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+
+
+
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+
+
+
+
 $ec_lang['lpn_pane_clear_override']='ניקוי ערך מותאם';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -1532,20 +1543,29 @@ $ec_lang['lpn_menu_project']='מים';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='כל מה שמיוחד למידול רשתות מים (פרט לפקדי ההפעלה של ההנפשה)';
 $ec_lang['lpn_tables_menu']='טבלאות';
-// Water > Change type (Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// Water > Morph (Task 781; Tom, 2026-10-14: *"I like the term 'Morph' (Transform) for this feature"*;
+// first built as Change type, Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
 // to Change node type for any asset, where if it has information that can't be ported to the new
 // type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
 // asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
 // popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
 // dev/asset-type.md.
-$ec_lang['lpn_change_type_menu']='שינוי סוג';
-$ec_lang['lpn_change_type_tip']='משנה את הצמתים הנבחרים לצמתי חיבור, מאגרים או מכלים, או את הקישורים הנבחרים לצינורות, משאבות או שסתומים. כל אחד שומר על המזהה שלו, על מקומו, על חיבוריו ועל כל ערך שיש גם לסוג החדש. אם משהו עלול ללכת לאיבוד, תתבקשו לאשר קודם.';
-$ec_lang['lpn_change_type_ok']='שינוי';
+$ec_lang['lpn_morph_menu']='שינוי סוג';
+$ec_lang['lpn_morph_tip']='משנה את הצמתים הנבחרים לצמתי חיבור, מאגרים או מכלים, או את הקישורים הנבחרים לצינורות, משאבות או שסתומים. כל אחד שומר על המזהה שלו, על מקומו, על חיבוריו ועל כל ערך שיש גם לסוג החדש. אם משהו עלול ללכת לאיבוד, תתבקשו לאשר קודם.';
+$ec_lang['lpn_morph_ok']='שינוי';
+// {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
+// when a node type was chosen), separated by commas.
+
+// The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
+// scenario, beside the override marker.
+
+
 $ec_lang['lpn_change_type_lost']='הערכים האלה יאבדו:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
 $ec_lang['lpn_change_type_key']='כל שורה: מזהה: המאפיין והערך שיאבדו';
 $ec_lang['lpn_change_type_line']='{id}: {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, בתרחיש {scenario}';
+
 $ec_lang['lpn_change_type_more']='ועוד {n}.';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.
@@ -1614,6 +1634,32 @@ $ec_lang['lpn_confirm_delete_network']='למחוק כל צומת, צינור ו�
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='חיפוש והחלפה';
+// Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
+// placement are never pasted.
+
+
+
+
+
+
+
+
+
+
+// The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
+// opens the in-place editor; Reset position sends a dragged label or an attached Text home.
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_find_title']='חיפוש והחלפה';
 $ec_lang['lpn_find_scope']='מה לחפש';
 $ec_lang['lpn_find_scope_all']='הכול';
@@ -2056,6 +2102,8 @@ $ec_lang['lpn_status_inp_exported_picture']='יוצא {zip}, המכיל את ק�
 $ec_lang['lpn_status_inp_exported_no_picture']='יוצא {file}. לא ניתן היה לשמור את תמונת הרקע, ולכן ב-.inp לא מצוינת תמונה; ב-EPANET הוסיפו אותה דרך תצוגה > רקע > טעינה.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+
+
 $ec_lang['lpn_inp_export_differences']='{n} דברים שתבנית ה-‎.inp אינה יכולה להחזיק.';
 $ec_lang['lpn_inp_export_difference_one']='דבר אחד שתבנית ה-.inp אינה יכולה להחזיק.';
 $ec_lang['lpn_inp_export_refused']='לא ניתן לכתוב פרויקט זה כקובץ EPANET: {detail}';
@@ -3045,6 +3093,7 @@ $ec_lang['lpn_scenario_overrides']='מס׳ ערכים מותאמים';
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='הטבעת הכתומה פירושה שלנכס זה יש ערך מותאם בתרחיש {name}.';
+
 $ec_lang['lpn_scenario_overrides_tip']='כל ערך מותאם מסומן על המפה בטבעת כתומה. עברו אל {base} או לתרחיש הורה אחר כדי לראות את השרטוט בלעדיהם.';
 $ec_lang['lpn_scenario_menu']='תרחישים';
 $ec_lang['lpn_scenario_tip']='קבוצת הערכים שהשרטוט מציג והעמוד פותר כרגע. לחצו כדי לעבור בין תרחישים, או כדי להוסיף, לשנות שם, או למחוק אחד.';
@@ -3053,10 +3102,11 @@ $ec_lang['lpn_scenario_new_name']='תרחיש {n}';
 $ec_lang['lpn_scenario_prompt_name']='שם עבור תרחיש זה';
 $ec_lang['lpn_scenario_rename']='שינוי שם תרחיש…';
 $ec_lang['lpn_scenario_delete']='מחיקת תרחיש';
-$ec_lang['lpn_scenario_delete_confirm']='למחוק את התרחיש {name} ואת הערכים המותאמים שלו ({n})? השרטוט עצמו אינו משתנה.';
-$ec_lang['lpn_scenario_override']='ערך מותאם בתרחיש זה';
+
+
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='מסומן פירושו שתרחיש זה עוקף את ההורה שלו עבור ערך זה, גם כאשר המספר זהה. בטלו את הסימון בתיבה כדי להשתמש בערך של ההורה.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3067,31 +3117,142 @@ $ec_lang['lpn_scenario_deactivated']='{id} אינו כלול ברשת ב-{scenar
 $ec_lang['lpn_scenario_delete_in_base']='כדי להסיר אותו מהשרטוט, מחקו אותו בתרחיש {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} נמחק. הוא היה חלק מ-{scenario} בלבד.';
 $ec_lang['lpn_scenario_delete_blocked']='{id} לא נמחק, כי הקישור {link} מסתיים בו, והקישור קיים גם מחוץ ל-{scenario}. כדי למחוק את שניהם, מחקו אותם בתרחיש {base}.';
-$ec_lang['lpn_scenario_push_btn']='החלת ערכי הבסיס על כל התרחישים';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='כל תרחיש חוזר לערך הבסיס עבור התכונות שתוויותיהן מוצגות כרגע. ערכים ששייכים לתרחישים אלה בלבד נמחקים.';
 $ec_lang['lpn_scenario_basic']='מצב בסיסי';
 $ec_lang['lpn_scenario_basic_tip']='מסומן: תרחיש מורכב רק מהערכים שנקבעו בו. לא מסומן: תפריט זה מציע גם את טבלת התצוגה המקדימה של חלופות, המראה כיצד הערכים האלה מקובצים לפי קטגוריה, ומאפשרת לתרחיש זמן הרצה כולל וצעד זמן הידראולי נפרדים. משוב על תכונה זו יתקבל בברכה.';
-$ec_lang['lpn_alt_title']='תצוגה מקדימה של חלופות';
-$ec_lang['lpn_alt_calc_options']='אפשרויות חישוב';
-$ec_lang['lpn_alt_note']='הבסיס משתמש בחלופת הבסיס של כל קטגוריה. לכל תרחיש יש חלופה נפרדת, צאצאית של חלופת הבסיס, לכל קטגוריה שהשתנתה. המספר הוא כמות הערכים ששונו. שלוש העמודות האחרונות הן אפשרויות חישוב: הזינו ערך לתרחיש, או השאירו ריק כדי להשתמש בערך ההורה. ערכי הפרויקט נמצאים בהגדרות, חישוב, זמן.';
-$ec_lang['lpn_scenario_duration_tip']='השאירו ריק כדי לרשת מההורה. זמן הרצה כולל של 0:00 הוא הרצה במצב עמיד.';
-$ec_lang['lpn_scenario_hyd_step_tip']='השאירו ריק כדי לרשת מההורה.';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_time_scn_overrides']='ערכים מותאמים בתרחיש:';
+
+
+
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+
+
+
+
+
+
+
+
+
+
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+
+
+
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_alt_cat_physical']='פיזיקלי';
 $ec_lang['lpn_alt_cat_demand']='דרישה';
 $ec_lang['lpn_alt_cat_topology']='הפעלת נכסים';
+
 $ec_lang['lpn_alt_cat_initial']='הגדרות התחלתיות';
 $ec_lang['lpn_alt_cat_constituent']='מרכיב';
 $ec_lang['lpn_alt_cat_fireflow']='ספיקת כיבוי אש';
 $ec_lang['lpn_alt_cat_energy']='עלות אנרגיה';
 $ec_lang['lpn_alt_cat_userdata']='מאפיינים מותאמים אישית';
 $ec_lang['lpn_alt_cat_text']='טקסט';
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='להחיל על כל תרחיש את ערכי הבסיס עבור תכונות אלה? ערכים ששייכים לתרחישים אלה בלבד נמחקים. ניתן לבטל פעולה זו.';
-$ec_lang['lpn_scenario_push_scenarios']='תרחישים מושפעים:';
-$ec_lang['lpn_scenario_push_values']='ערכים שיימחקו:';
-$ec_lang['lpn_scenario_push_none']='אין תרחיש שערכו עוקף את הבסיס עבור אחד מהמאפיינים האלה, ולכן דבר לא ישתנה. דבר אינו נמחק.';
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. מבחן ספיקה: סטטי';
@@ -3231,6 +3392,8 @@ $ec_lang['lpn_time_run_fell_back']='המספרים על המסך הגיעו מה
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='בקרות אלה קוראות בשם אלמנט שאינו עוד בפרויקט זה, ולכן הן הושמטו: {ids}';
 $ec_lang['lpn_control_unreadable_note']='בקרות אלה לא היה ניתן לקרוא, ולכן הן הושמטו: {ids}';
+
+
 $ec_lang['lpn_rule_dangling_note']='כללים אלה מפנים לאלמנט שאינו עוד בפרויקט זה, ולכן הם הוזנחו בהרצה זו: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='לא ניתן היה לקרוא כללים אלה, ולכן הם הוזנחו בהרצה זו: {ids}';
 $ec_lang['lpn_settings_text_size']='גודל טקסט (פיקסלים)';
@@ -3783,9 +3946,7 @@ $ec_lang['lpn_energy_curve_note']='משאבות אלה מפנות לעקומת �
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='דירוג';
 $ec_lang['lpn_labels_col_drop']='נשירה';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -4010,6 +4171,8 @@ $ec_lang['lpn_library_pattern_default_mark']='(ברירת מחדל)';
 $ec_lang['lpn_library_pattern_default_tip']='תבנית הדרישה ברירת המחדל. שנו אותה בהגדרות, תבנית דרישה ברירת מחדל.';
 $ec_lang['lpn_library_pattern_default_deleted_to']='תבנית {id} הייתה תבנית הדרישה ברירת המחדל. צמתים ללא תבנית משתמשים כעת בתבנית {now}.';
 $ec_lang['lpn_library_pattern_default_deleted_none']='תבנית {id} הייתה תבנית הדרישה ברירת המחדל. צמתים ללא תבנית משתמשים כעת בדרישה קבועה.';
+
+
 $ec_lang['lpn_library_control_add']='הוספת בקרה';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -4572,4 +4735,4 @@ $ec_lang['lpn_snip_tip_eraser']='מחק: לחצו על קו כדי להסיר א
 $ec_lang['lpn_snip_tip_undo']='ביטול (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='ביצוע חוזר (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='העתקה (Ctrl+C)';
-$ec_lang['lpn_screenshot_scale_tip']='גודל התמונה כמכפלה של האזור שעל המסך. גדול יותר חד יותר ויוצר קובץ גדול יותר.';
+$ec_lang['lpn_screenshot_scale_tip']='גודל התמונה כמכפלה של האזור שעל המסך. גדול יותר חד יותר ויוצר קובץ גדול יותר.';$ec_lang['lpn_guide_text_alt_box']='מציגה, לכל תרחיש, באיזו חלופה הוא משתמש בכל קטגוריה, כגון פיזיקלי, דרישה והפעלת נכסים, ואת אפשרויות החישוב שלו: מכפיל דרישה, משך ריצה כולל וצעד זמן הידראולי. החלופות הן לקריאה בלבד. אפשרויות החישוב של תרחיש ניתנות להקלדה כאן, וערך ריק משתמש בערך של ההורה. פתחו אותה מהתפריט תרחישים לאחר ניקוי מצב בסיסי.';$ec_lang['lpn_guide_how_alt']='תצוגה מקדימה של חלופות מופיעה תחת מים, תרחישים כשמצב בסיסי כבוי.';$ec_lang['lpn_alt_calc_options']='אפשרויות חישוב';$ec_lang['lpn_scenario_duration_tip']='השאירו ריק כדי לרשת מההורה. זמן הרצה כולל של 0:00 הוא הרצה במצב עמיד.';$ec_lang['lpn_scenario_hyd_step_tip']='השאירו ריק כדי לרשת מההורה.';

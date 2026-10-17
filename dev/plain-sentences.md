@@ -567,11 +567,6 @@ Help for translators with one string at a time, where the English of that one st
 - English: Base
 - Plain: Base: the base scenario, the baseline the other scenarios start from and change.
 
-### lpn_scenario_push_values
-
-- English: Values discarded:
-- Plain: Values discarded: how many values were thrown away. A count follows.
-
 ### lpn_settings_viscosity
 
 - English: Relative viscosity
@@ -633,11 +628,6 @@ Help for translators with one string at a time, where the English of that one st
 - Plain: All: settings for all labels.
 - Layout: sub-heading
 
-### lpn_scenario_push_tip
-
-- English: Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded.
-- Plain: Every scenario goes back to the Base value for the properties whose labels show on the map right now, the labels chosen in Settings, Symbology, Labels. Values entered for those properties in any scenario are thrown away.
-
 ### lpn_labels_priority_node_tip
 
 - English: The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first. When only one value is left and two labels still overlap, one of them is hidden: the one with the lower demand, with pressure nearer the middle of the range, or with elevation or head more like its neighboring nodes.
@@ -687,3 +677,13 @@ Help for translators with one string at a time, where the English of that one st
 
 - English: Snip shape
 - Plain: Snip shape: the shape of the area to capture in a screenshot.
+
+### lpn_morph_menu
+
+- English: Morph
+- Plain: Morph: change the type of an asset (a node into a junction, reservoir or tank; a link into a pipe, pump or valve) while it keeps its ID, location and connections. Another word for it is Transform.
+
+### lpn_export_table_current
+
+- English: Current
+- Plain: Current: the table or scenario now selected, as opposed to All. It never means a flow of water or electricity.

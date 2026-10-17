@@ -81,6 +81,19 @@ function featuresParseSource($sourcePath)
             if (!isset($areas[$area])) { $areas[$area] = array(); }
             continue;
         }
+        if (preg_match('/^-\s+see\s+([^|]+?)\s*\|\s*(\S.*)$/', $line, $pm)) {
+            // A pointer: no task IDs, names the section that holds the capability.
+            if ($area === null) {
+                $errors[] = "line $n: pointer row before any `## area` heading.";
+                continue;
+            }
+            $ptext = rtrim($pm[2]);
+            if (substr($ptext, -1) !== '.') {
+                $errors[] = "line $n: a pointer sentence must end with a full stop: " . $ptext;
+            }
+            $areas[$area][] = array('ids' => array(), 'text' => $ptext, 'line' => $n, 'see' => $pm[1]);
+            continue;
+        }
         if (!preg_match('/^-\s+([0-9][0-9.,\s]*)\|\s*(\S.*)$/', $line, $m)) {
             if (preg_match('/^-\s/', $line)) {
                 $errors[] = "line $n: not a feature row (`- <ids>| <sentence>`): " . trim($line);
@@ -122,6 +135,9 @@ function featuresRender($sourcePath, $ledgerPath, &$errors)
     $citedIds  = array();
     foreach ($parsed['areas'] as $area => $rows) {
         foreach ($rows as $r) {
+            if (isset($r['see']) && !isset($parsed['areas'][$r['see']])) {
+                $errors[] = "line {$r['line']}: pointer names `## {$r['see']}`, which is not a heading here.";
+            }
             foreach ($r['ids'] as $id) {
                 $cited++;
                 $citedIds[$id] = true;
@@ -134,7 +150,9 @@ function featuresRender($sourcePath, $ledgerPath, &$errors)
     if ($errors) { return null; }
 
     $nFeatures = 0;
-    foreach ($parsed['areas'] as $rows) { $nFeatures += count($rows); }
+    foreach ($parsed['areas'] as $rows) {
+        foreach ($rows as $r) { if (!isset($r['see'])) { $nFeatures++; } }
+    }
     $undecided = $facts['total'] - $cited;
     $silent    = 0;
     foreach ($facts['stub'] as $id => $isStub) {
@@ -160,7 +178,8 @@ function featuresRender($sourcePath, $ledgerPath, &$errors)
         foreach ($rows as $r) {
             // The citation is an HTML comment: invisible where this is rendered, greppable here,
             // so a sentence can always be traced back to the thing that shipped it.
-            $out .= '- ' . $r['text'] . ' <!-- ' . implode(', ', $r['ids']) . " -->\n";
+            $cite = isset($r['see']) ? 'see: ' . $r['see'] : implode(', ', $r['ids']);
+            $out .= '- ' . $r['text'] . ' <!-- ' . $cite . " -->\n";
         }
     }
     return $out;

@@ -24,7 +24,7 @@ const COUNTS = {
 	lpn_replace_preview: ['n'],
 	lpn_replace_done: ['n'],
 	lpn_confirm_apply_prefix: ['n'],
-	lpn_scenario_delete_confirm: ['n'],
+	lpn_scenario_delete_goes: ['n'],   // bentley-interop's successor to lpn_scenario_delete_confirm
 	lpn_delete_drops_overrides: ['n'],
 	lpn_dxf_note_shortened: ['n'],
 	lpn_dxf_note_categories: ['n'],

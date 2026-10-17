@@ -398,12 +398,18 @@ console.log('\n--- one home for the concept ---');
 	// **AND ONE FEWER EACH FOR viewLonLat()** (2026-09-26): its two branches, lat/lon and projected,
 	// each crossed outward on their own; they now cross once and hand the point to placeLonLatAt(),
 	// which also answers for a grid with the world map attached (the Convert as chooser's filter).
+	// **AND ONE MORE EACH FOR A SCENARIO'S OWN VIEW** (dev/scenario-alternatives.md, Tom
+	// 2026-10-06): outwardViewOf() stores the view outward, as a node's position override is, so no
+	// flip, origin shift or projection ever has to visit it.
 	// **TASK 282 ADDED TWO OUTWARD SITES PER AXIS** (the backdrop probe reads the picture's corners out) **AND TWO
 	// INWARD** (placeBackdropByDimensions() brings the file's DIMENSIONS into the local frame).
 	// **AND TWO MORE PER AXIS FOR THE EXPORTED PICTURE'S WORLD FILE** (backdropExportPicture(): its
 	// left/right and top/bottom edges in the frame the .inp is written in).
-	ok('outwardX has one definition and 41 call sites', count(/outwardX\(/g) === 42, count(/outwardX\(/g));
-	ok('outwardY has one definition and 41 call sites', count(/outwardY\(/g) === 42, count(/outwardY\(/g));
+	// **AND ONE MORE EACH FOR A TEXT'S POSITION IN A SCENARIO** (Tom, 2026-10-12): textCoordOut()
+	// stores a free Text's override outward, as a node's position override is. Its inverse,
+	// textCoordIn(), took the place of setLabelCoordAxis()'s own inward pair, so inward is unchanged.
+	ok('outwardX has one definition and 43 call sites', count(/outwardX\(/g) === 44, count(/outwardX\(/g));
+	ok('outwardY has one definition and 43 call sites', count(/outwardY\(/g) === 44, count(/outwardY\(/g));
 	// **TASK 772 ADDED ONE SITE PER AXIS: THE DXF EXPORT.**
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
@@ -490,10 +496,11 @@ console.log('\n--- one home for the concept ---');
 	// paneCreateFromPlan()'s label and customer branches convert a pasted row's typed position
 	// through this door exactly as a node's own does, and the customer branch's node-attachment
 	// lookup (customerAttachAtNode()) needs the same inward point to find the nearest pipe.
+	// **AND ONE MORE EACH FOR A SCENARIO'S OWN VIEW COMING BACK IN** (inwardViewOf()).
 	// +1 each: the GeoJSON Shape import's one crossing (Task 779, landGeoJsonShapes()).
 	// +1 each in gisPlanarPoint() and +1 each in landShapefileShapes(): the DXF and shapefile Shape imports (Task 779).
-	ok('inwardX has one definition and 46 call sites', count(/inwardX\(/g) === 49, count(/inwardX\(/g));
-	ok('inwardY has one definition and 47 call sites', count(/inwardY\(/g) === 50, count(/inwardY\(/g));
+	ok('inwardX has one definition and 49 call sites', count(/inwardX\(/g) === 50, count(/inwardX\(/g));
+	ok('inwardY has one definition and 50 call sites', count(/inwardY\(/g) === 51, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

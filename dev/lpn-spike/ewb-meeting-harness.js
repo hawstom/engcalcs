@@ -170,6 +170,8 @@ async function main() {
 		p1.tok = { _length: '600.0', _k: '3.0' };
 		L.scenarios()[0].overrides['l:P1'] = {};
 		L.scenarios().push({ id: 's2', name: 'S2', overrides: { 'l:P1': { diameter: 300, k: 9, length: 600 } } });
+		// A stored alternative (physical) used by S2 holds a roughness override for the pipe too.
+		L.getDoc().alternatives = (L.getDoc().alternatives || []).concat([{ id: 'a9', name: 'Rough', category: 'physical', parent: null, values: { 'l:P1': { roughness: 90 } } }]);
 		const nLinks = doc.links.length;
 		L.saveUndoSnapshot();
 		const made = L.breakPipeAtPoint(p1, 'junction', 300, 7);
@@ -192,6 +194,9 @@ async function main() {
 		ok('the scenario override is copied to both, the minor loss to the original only',
 			ov['l:P1'].diameter === 300 && ov['l:P1'].k === 9 && ov['l:' + b.id].diameter === 300 &&
 			ov['l:' + b.id].k === undefined);
+		const altVals = L.getDoc().alternatives.filter((x) => x.id === 'a9')[0].values;
+		ok('a pipe\'s roughness overridden in a stored alternative is carried to both halves there',
+			altVals['l:P1'].roughness === 90 && !!altVals['l:' + b.id] && altVals['l:' + b.id].roughness === 90, JSON.stringify(altVals));
 		ok('the scenario length override is divided too', near(ov['l:P1'].length + ov['l:' + b.id].length, 600, 1e-9));
 		ok('indexes: the node has both pipes; J1 has the new one, not the old',
 			L.incident()[made.node.id].length === 2 && L.incident().J1.indexOf(b.id) >= 0 && L.incident().J1.indexOf('P1') < 0);

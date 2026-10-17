@@ -38,12 +38,15 @@ const fs = require('fs');
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, getScenarios: function () { return scenarios; },\n" +
+	// A scenario's values as it resolves them: its own map, or the alternative an override stored
+	// (2026-10-12).
+	"\t\town: function (s) { return resolvedOverrides(s); }, touchTree: touchTree,\n" +
 	"\t\taddNode: addNode, addLink: addLink, addText: addText, seedDefaultInputs: seedDefaultInputs,\n" +
 	"\t\teffective: effective, setProp: setProp, hasOverride: hasOverride, baseValue: baseValue,\n" +
 	"\t\tclearOverride: clearOverride, isOverridable: isOverridable, isActive: isActive,\n" +
 	// The key format is read through the page's own seam, never spelled here: a harness that wrote
 	// 't:' + id would be a second copy of the format, free to agree with a page that had changed.
-	"\t\tovKey: ovKey, ovKeyFor: ovKeyFor, elGroup: elGroup,\n" +
+	"\t\tovKey: ovKey, ovKeyFor: ovKeyFor, elGroup: elGroup, setTextPoint: setTextPoint, textOwnPoint: textOwnPoint,\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario,\n" +
 	"\t\tactiveScenario: activeScenario, overrideCount: function () { return overrideCount(activeScenario()); },\n" +
 	"\t\tlabelById: labelById, labelEl: function (id) { return labelEls[id]; },\n" +
@@ -156,7 +159,9 @@ ok('...and each key is the one its own group spells', L.ovKey(note) === L.ovKeyF
 	// reason section 1 created.
 	note.id = 'X99';
 	doc.labels.forEach(function () {});
-	L.getScenarios().forEach(function (s) { s.overrides = {}; });
+	L.getScenarios().forEach(function (s) { s.overrides = {}; delete s.alternatives; delete s.calc; });
+	delete L.getDoc().alternatives; delete L.getDoc().calcSets;
+	L.touchTree();
 	L.switchScenario(s1.id);
 	L.switchScenario('base');
 }
@@ -243,32 +248,36 @@ console.log('\n--- a note that is only in one scenario ---');
 }
 
 // ---------------------------------------------------------------------------
-// 4. POSITION IS THE NETWORK'S, NOT THE SCENARIO'S (Tasks 338 / 407)
+// 4. POSITION AND LOOK ARE THE SCENARIO'S TOO (Tom, 2026-10-12: "I moved a text in Fig 5 ... it
+//    moved in all scenarios."); the attachment stays Base's
 // ---------------------------------------------------------------------------
-console.log('\n--- the drawing does not fork ---');
+console.log('\n--- a Text moved in a scenario moves there only ---');
 {
-	['x', 'y', 'sizeMult', 'anchorNode', 'align', 'valign', 'rot', 'bold'].forEach(function (p) {
-		ok('`' + p + '` is not overridable', L.isOverridable(lb, p) === false);
+	['x', 'y', 'sizeMult', 'align', 'valign', 'rot', 'bold', 'allZoom'].forEach(function (p) {
+		ok('`' + p + '` is overridable', L.isOverridable(lb, p) === true);
 	});
-	ok('...while `text` and `active` are',
-		L.isOverridable(lb, 'text') && L.isOverridable(lb, 'active'));
+	ok('...while its attachment (`anchorNode`) is not', L.isOverridable(lb, 'anchorNode') === false);
 
-	// A DRAG IS A PLAIN WRITE TO lb.x/lb.y, and a pointer sequence is the half this scaffolding
-	// cannot drive -- so the write is performed here and ANCHORED to the real statement below, which
-	// is what stops this from testing a copy of the page rather than the page.
+	// The drag's write is the one door below, anchored to the page's real statement so this does not
+	// test a copy of the page.
 	const src = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
-	ok('the drag really does write the label\'s own x/y (so simulating it is not a fiction)',
-		/else \{ lb\.x = w3\.x \+ drag\.offX; lb\.y = w3\.y \+ drag\.offY; \}/.test(src));
+	ok('the drag writes through setTextPoint() (so simulating it is not a fiction)',
+		/else \{ setTextPoint\(lb, w3\.x \+ drag\.offX, w3\.y \+ drag\.offY\); \}/.test(src));
 
 	const before = { x: lb.x, y: lb.y };
-	lb.x = 777; lb.y = 888;                       // the drag, inside a scenario
-	ok('the move landed on the element itself, not in an override',
-		lb.x === 777 && L.activeScenario().overrides[L.ovKey(lb)].x === undefined);
-	ok('...and Base sees it', (L.switchScenario('base'), lb.x === 777 && lb.y === 888));
+	L.setTextPoint(lb, before.x + 50, before.y + 60);   // the drag, inside a scenario
+	const here = L.textOwnPoint(lb);
+	ok('the move is an override here, and the element itself is untouched',
+		Math.abs(here.x - (before.x + 50)) < 1e-9 && Math.abs(here.y - (before.y + 60)) < 1e-9 && lb.x === before.x && lb.y === before.y &&
+		typeof L.own(L.activeScenario())[L.ovKey(lb)].x === 'number', JSON.stringify([here, before]));
+	L.switchScenario('base');
+	ok('...and Base still has it where it was', L.textOwnPoint(lb).x === before.x && L.textOwnPoint(lb).y === before.y);
+	L.setTextPoint(lb, before.x + 1, before.y + 1);
+	ok('...and a move in Base writes the element', lb.x === before.x + 1 && lb.y === before.y + 1);
+	lb.x = before.x; lb.y = before.y;   // put Base back
 	L.switchScenario(scn.id);
-	ok('...and so does every scenario -- the map cannot move under the reader',
-		lb.x === 777 && lb.y === 888, lb.x + ', ' + lb.y);
-	lb.x = before.x; lb.y = before.y;
+	L.clearOverride(lb, 'x'); L.clearOverride(lb, 'y');
+	ok('cleared, the scenario follows Base again', L.textOwnPoint(lb).x === before.x && L.textOwnPoint(lb).y === before.y);
 }
 
 // ---------------------------------------------------------------------------
@@ -355,9 +364,10 @@ console.log('\n--- storage and deletion ---');
 	edit(n2, 'text', 'BYPASS OPEN');
 	const key = L.ovKey(n2);
 	const saved = JSON.parse(JSON.stringify(L.serializeProject()));
+	// In the scenario's own map, or in the alternative its first override stored (2026-10-12).
 	ok('the override is written under the label key', !!(saved.scenarios || []).filter(function (x) {
 		return x.overrides && x.overrides[key];
-	}).length, key);
+	}).concat((saved.alternatives || []).filter(function (a) { return a.values && a.values[key]; })).length, key);
 
 	L.applySaved(L.migrateSaved(JSON.parse(JSON.stringify(saved))));
 	L.buildDom();
@@ -380,8 +390,8 @@ console.log('\n--- storage and deletion ---');
 	L.deleteElement('label', back.id);
 	ok('deleting it in Base really deletes it', L.labelById(back.id) === null);
 	ok('...and takes every scenario\'s values on it away', L.getScenarios().every(function (x) {
-		return !x.overrides[key];
-	}));
+		return !L.own(x)[key];
+	}) && (L.getDoc().alternatives || []).every(function (a) { return !(a.values || {})[key]; }));
 }
 
 console.log(fails ? '\n' + fails + ' FAILURE(S)' : '\nALL PASS');

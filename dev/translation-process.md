@@ -452,7 +452,7 @@ question about paths.
    changed strings. It does **not** ask "is this string good?" — a fluent English reader answers yes
    to almost everything, which is why one Wave 0 that reviewed 226 keys and rewrote 51 still shipped
    "Zoom to fit" and "Restore defaults". It asks **"list every plausible reading of this string; if
-   there is more than one, propose a rewrite."** Falsification, not review. Findings go to
+   there is more than one, propose a rewrite."** Falsification, not review. **Also ask of each string whether any word in it is a loanword or an everyday word a translator could render in its everyday sense** ("halo" was read as "hello" and as a saint's halo); route such findings to `dev/terms.md` as a proposal for Tom. Findings go to
    `dev/english-friction/<sprint>.json` and route through the English/synonym/glossary rule above.
    **`php dev/scripts/friction_check.php --sprint=<id>` must exit 0.**
    **An open Wave 0 file is committed into `dev/english-friction/` at once, never kept outside the repo

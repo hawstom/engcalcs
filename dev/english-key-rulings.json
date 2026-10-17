@@ -1,6 +1,11 @@
 {
     "_note": "See dev/scripts/new_english_keys.php. A ruling is remembered against the EXACT English it was made on; change the string and the ruling lapses.",
     "rulings": {
+        "about_body_html": {
+            "on": "<h3>Mission</h3><p>HawsEDC Engineering Calculators have been offered freely online since 2010. They exist to serve engineers and field workers around the world — especially those working in water-scarce, low-resource, or underserved regions. These tools are part of a broader humanitarian mission: to tell every human being in the most practical and effective way possible <a target=\"_blank\" href=\"https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html\">that they are loved and cherished forever, that they have nothing to fear, and that they are not going to ruin everything</a>.</p><p>The calculators are the vehicle. The destination is a world free of suffering.</p><h3>Free Libre Open Source License</h3><p>All code is released under the <a target=\"_blank\" href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU General Public License v3.0 or later</a> — free as in freedom. You may use, study, modify, and redistribute the code under the same terms.</p><p>The website that serves it is offered freely today and since 2010; if one day it cannot be, the software is still yours to run.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Source Code</h3><p>The full source code is publicly available on GitHub:</p><p><a target=\"_blank\" href=\"https://github.com/hawstom/engcalcs\">github.com/hawstom/engcalcs</a></p><p>You can browse the code, file issues, or fork the repository there.</p><h3>Contributing</h3><p>All help is welcome. <a href=\"contact.php\">Contact Tom Haws</a>.</p><ul><li><strong>Translations:</strong> Suggest better wording. Improve or add a language.</li><li><strong>Bug reports:</strong> Use the feedback form on any calculator page, or file an issue on GitHub.</li><li><strong>New calculators:</strong> Ideas for hydraulic engineering tools that serve field workers and irrigation practitioners are especially welcome.</li><li><strong>Hosting:</strong> If you can mirror these calculators for a region with limited connectivity, please contact me.</li></ul><h3>Offline Use</h3><p>Open any calculator once while you are online and all of them keep working when you are not: your browser stores the whole suite as you go. The mechanism is a <strong>Progressive Web App (PWA)</strong>. After that, all calculators work offline — no internet required.</p><p>On Android or iOS, use your browser’s \"Add to Home Screen\" option to install EngCalcs as an app on your device. On desktop, look for the install icon in your browser’s address bar.</p><p>You can also save any individual calculator using your browser’s \"Save as…\" menu for one-off offline use.</p><h3>Contact</h3><p>Tom Haws, hydraulic engineer and founder of these calculators.<br />Use the feedback form on any calculator page, or reach the source code at <a target=\"_blank\" href=\"https://github.com/hawstom/engcalcs\">GitHub</a>.</p>",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
+        },
         "bpn_demand_mult": {
             "on": "Demand multiplier",
             "ruled": "2026-08-29"
@@ -34,6 +39,11 @@
             "ruled": "2026-10-05",
             "answer": "OK."
         },
+        "lpn_alt_cat_calculation": {
+            "on": "Calculation",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_alt_cat_constituent": {
             "on": "Constituent",
             "ruled": "2026-10-01",
@@ -64,6 +74,11 @@
             "ruled": "2026-10-01",
             "answer": "OK."
         },
+        "lpn_alt_cat_presentation": {
+            "on": "Presentation",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_alt_cat_text": {
             "on": "Text",
             "ruled": "2026-10-01",
@@ -73,6 +88,11 @@
             "on": "Asset activation",
             "ruled": "2026-10-01",
             "answer": "Edited."
+        },
+        "lpn_alt_cat_topology_tip": {
+            "on": "Asset activation",
+            "ruled": "2026-10-16",
+            "answer": "OK."
         },
         "lpn_alt_cat_userdata": {
             "on": "Custom properties",
@@ -208,6 +228,11 @@
             "on": "Street map images from OpenStreetMap.",
             "ruled": "2026-09-25",
             "answer": "Edited."
+        },
+        "lpn_basemap_topo_show": {
+            "on": "Show topo map",
+            "ruled": "2026-10-16",
+            "answer": "OK."
         },
         "lpn_calib_axis_obs": {
             "on": "Observed: {q}",
@@ -404,15 +429,30 @@
             "ruled": "2026-10-03",
             "answer": "OK."
         },
+        "lpn_change_type_born": {
+            "on": "These values are new, set as on a newly drawn asset:",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use proposed"
+        },
+        "lpn_change_type_key": {
+            "on": "Each line: ID: the property and value that would be lost",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October (round 2): Use proposed"
+        },
+        "lpn_change_type_line_alternative": {
+            "on": "{id}: {property} {value}, in alternative {alternative}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_choice_default": {
             "on": "Default",
             "ruled": "2026-10-05",
             "answer": "OK."
         },
         "lpn_clean_map": {
-            "on": "Hide map readouts",
-            "ruled": "2026-09-25",
-            "answer": "This is obsolete. It doesn't go anywhere. Delete key."
+            "on": "Clean map",
+            "ruled": "2026-10-15",
+            "answer": "Approved."
         },
         "lpn_clean_map_off": {
             "on": "Show map readouts",
@@ -420,9 +460,9 @@
             "answer": "This is obsolete. It doesn't go anywhere. Delete key."
         },
         "lpn_clean_map_tip": {
-            "on": "Take the status strip and the coordinate readout off the map, so a screenshot shows only the drawing. Your drawing is not touched, and this choice is not stored; reloading the page brings the readouts back.",
-            "ruled": "2026-09-25",
-            "answer": "This is obsolete. It doesn't go anywhere. Delete key.\n- **`lpn_confirm_labels_restore`**\n> Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.\n_Ruled OK 2026-09-23._"
+            "on": "Checked: the zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.",
+            "ruled": "2026-10-16",
+            "answer": "Asked whether to lowercase \"The\" after \"Checked:\" like the other tips: \"Yes. Make your proposed correction. Thank you for checking.\""
         },
         "lpn_confirm_labels_restore": {
             "on": "Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.",
@@ -564,6 +604,11 @@
             "ruled": "2026-10-03",
             "answer": "OK."
         },
+        "lpn_control_inactive_note": {
+            "on": "These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_convas_cancelled": {
             "on": "Nothing was converted. The copy is closed, and the original project is unchanged.",
             "ruled": "2026-09-25",
@@ -703,6 +748,26 @@
             "on": "Original; keep same lock",
             "ruled": "2026-10-01",
             "answer": "OK."
+        },
+        "lpn_copy_props_done": {
+            "on": "Copied properties of {id}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_copy_props_done_ov": {
+            "on": "Copied the overrides of {id} in this scenario.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_copy_props_menu": {
+            "on": "Copy properties",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_copy_props_no_overrides": {
+            "on": "No overrides to copy.",
+            "ruled": "2026-10-13",
+            "answer": "Approved as written."
         },
         "lpn_copy_title": {
             "on": "Mark file as new copy?",
@@ -1184,6 +1249,21 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
+        "lpn_ctx_edit_text": {
+            "on": "Edit text",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ctx_reset_position": {
+            "on": "Reset position",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ctx_reset_position_off_tip": {
+            "on": "Only a label or an attached Text that has been dragged from its own position can be reset.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_curve_kind_effic": {
             "on": "Pump efficiency",
             "ruled": "2026-09-05"
@@ -1249,6 +1329,11 @@
         "lpn_customer_heading": {
             "on": "Customer {id}",
             "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_customer_node_inactive": {
+            "on": "This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.",
+            "ruled": "2026-10-16",
             "answer": "OK."
         },
         "lpn_demand_add": {
@@ -1516,6 +1601,11 @@
             "ruled": "2026-10-03",
             "answer": "OK."
         },
+        "lpn_dxf_note_blocks": {
+            "on": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
+        },
         "lpn_elev_dem_none": {
             "on": "The DEM gave no height for this node.",
             "ruled": "2026-09-01"
@@ -1669,6 +1759,11 @@
         "lpn_energy_pump_price_tip": {
             "on": "What one kilowatt hour costs at this pump. Leave it empty and the pump pays the price set for the whole network under Settings, Energy.",
             "ruled": "2026-09-04"
+        },
+        "lpn_energy_stopped": {
+            "on": "The EPANET run stopped before the end of the period, so no pump energy results were computed.",
+            "ruled": "2026-10-15",
+            "answer": "Revised. Does that work? If not, correct and try again."
         },
         "lpn_energy_title": {
             "on": "Pump energy report",
@@ -2067,6 +2162,11 @@
             "ruled": "2026-09-17",
             "answer": "OK."
         },
+        "lpn_field_active": {
+            "on": "Is active?",
+            "ruled": "2026-10-06",
+            "answer": "His own wording: \"Part of network: Change to \\\"Is active?\\\" like Bentley.\""
+        },
         "lpn_field_base_demand": {
             "on": "Base demand",
             "ruled": "2026-08-29"
@@ -2258,6 +2358,21 @@
             "ruled": "2026-09-09",
             "answer": "Edited."
         },
+        "lpn_field_type": {
+            "on": "Type",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_field_type_tip": {
+            "on": "The type of this asset in this scenario, set by Morph. Clear the override to use the parent scenario's type.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_field_valve_type_tip": {
+            "on": "Valve type. A throttle valve (TCV) applies a fixed loss. PRV, PSV, and FCV maintain a pressure or a flow, and open fully, close, or partly close as hydraulic conditions change. A PBV removes a fixed pressure, and a GPV follows a head loss curve. The types control different hydraulic properties, so settings may be lost when the type is changed.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Valve type. A throttle valve (TCV) applies a fixed loss. PRV, PSV, and FCV maintain a pressure or a flow, and open fully, close, or partly close as hydraulic conditions change. A PBV removes a fixed pressure, and a GPV follows a head loss curve. The types control different hydraulic properties, so settings may be lost when the type is changed."
+        },
         "lpn_file_convert_as": {
             "on": "Convert as…",
             "ruled": "2026-09-25",
@@ -2277,6 +2392,16 @@
             "on": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
             "ruled": "2026-10-09",
             "answer": "Use proposed (Tom, calls page round 3)."
+        },
+        "lpn_file_import_gjnet": {
+            "on": "Import GeoJSON network…",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_file_import_gjnet_tip": {
+            "on": "Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
         },
         "lpn_file_import_menu": {
             "on": "Import…",
@@ -2685,6 +2810,321 @@
             "on": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.",
             "ruled": "2026-08-29"
         },
+        "lpn_gjnet_and_more": {
+            "on": "and {n} more",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_col_example": {
+            "on": "Example",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_col_field": {
+            "on": "Field",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_col_fills": {
+            "on": "Fills",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_col_unit": {
+            "on": "Unit",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_intro": {
+            "on": "{points} points and {lines} lines were found. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. Choose the property each field fills and the unit of each number.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_lines_heading": {
+            "on": "Line fields (pipes)",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_no_fields": {
+            "on": "These features have no attribute fields.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_crs": {
+            "on": "The file states the coordinate system {crs}, which is WGS 84 latitude and longitude, the system RFC 7946 requires. Positions were read as stated.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_default_demand": {
+            "on": "These junctions state no base demand and have the default base demand, {value}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_default_diameter": {
+            "on": "These pipes state no diameter and have the default diameter, {value}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_default_elev": {
+            "on": "These nodes state no elevation and have the default elevation, {value}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_default_elev_added": {
+            "on": "These junctions were added at line ends and have the default elevation, {value}, because no node in the file states an elevation.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_default_k": {
+            "on": "These pipes state no minor loss coefficient, so each has 0, as in an EPANET file that states none.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_default_roughness": {
+            "on": "These pipes state no roughness and have the default roughness, {value}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_default_tank": {
+            "on": "These tanks have the default water depths and tank diameter.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_demand_kept": {
+            "on": "A reservoir or tank has no demand, so the demand stated on these nodes was kept as the custom property {key}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_demand_rows": {
+            "on": "These junctions had more than one demand row. A GeoJSON file holds only the first, which was imported.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_elev_taken": {
+            "on": "These nodes state no elevation. Each was given the elevation of the node shown in parentheses: for a junction added at a line end, the node at the other end of its pipe, otherwise the nearest node that states one.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_end_moved": {
+            "on": "These pipes have an end within {tol} of a point or another line end, but not on it. The end was joined to it; the largest distance is {dist}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_end_off_node": {
+            "on": "The line of each of these links does not start or end at its node. The node position was used.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_end_on_pipe": {
+            "on": "These line ends lie on the pipe shown in parentheses, but not at its end, and are not connected to it.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_field_custom": {
+            "on": "These fields were imported as custom properties.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_field_skipped": {
+            "on": "These fields were not imported, as chosen.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_id_dup": {
+            "on": "These IDs are stated by more than one feature of the same kind. Each later feature was assigned the ID shown in parentheses.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_id_new": {
+            "on": "These features state no valid ID and were assigned the ID shown in parentheses.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_junction_added": {
+            "on": "These junctions were added where a line end is not within {tol} of a point. Each has the default base demand.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_length_auto": {
+            "on": "These pipes state no length. Each length is computed from the line (Auto).",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_not_held": {
+            "on": "A GeoJSON file does not hold controls, rules, time settings, text labels, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_parts": {
+            "on": "These multipart lines have parts that are not connected and were imported as one pipe for each part.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_parts_points": {
+            "on": "These multipoint features were imported as one node for each point.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_pattern_conflict": {
+            "on": "These patterns are stated with different multipliers on different features. The first was used.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_pipe_type": {
+            "on": "These pipes state the pipe type shown in parentheses, whose definition a GeoJSON file does not hold. The pipe type was not imported; the diameter and roughness stated in the file were.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_results": {
+            "on": "The results in the file were not imported. Calculate computes them again.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_skip_geometry": {
+            "on": "Not imported: the feature is not a point or a line.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_skip_id": {
+            "on": "Not imported: the name is not a valid ID, or another element of the same kind has it.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_skip_kind": {
+            "on": "Not imported: the feature states no node_type or link_type.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_skip_loop": {
+            "on": "Not imported: both ends of the line join the same node.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_skip_no_node": {
+            "on": "Not imported: the start or end node named is not in the file.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_skip_position": {
+            "on": "Not imported: a position is not a valid latitude and longitude.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_skip_short": {
+            "on": "Not imported: a line needs at least two positions.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_unmapped_demand": {
+            "on": "No field was chosen for the base demand, so every junction has the default base demand, {value}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_unmapped_diameter": {
+            "on": "No field was chosen for the diameter, so every pipe has the default diameter, {value}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_unmapped_elev": {
+            "on": "No field was chosen for the elevation, so every node has the default elevation, {value}, and automatic lengths include no elevation difference.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_unmapped_id_line": {
+            "on": "No field was chosen for the line ID, so every pipe was assigned an ID.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_unmapped_id_point": {
+            "on": "No field was chosen for the point ID, so every node imported from a point was assigned an ID.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_unmapped_k": {
+            "on": "No field was chosen for the minor loss coefficient, so every pipe has 0, as in an EPANET file that states none.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_unmapped_length": {
+            "on": "No field was chosen for the length, so every pipe length is computed from the line (Auto).",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_unmapped_roughness": {
+            "on": "No field was chosen for the roughness, so every pipe has the default roughness, {value}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_value_unread": {
+            "on": "These values are not numbers or are not recognized, and were not used.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_z": {
+            "on": "These points state a third coordinate, which was not imported.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_other": {
+            "on": "{n} features are neither points nor lines and will not be imported; the report lists them.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_points_heading": {
+            "on": "Point fields (junctions, reservoirs, and tanks)",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_refuse_crs": {
+            "on": "{file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_refuse_empty": {
+            "on": "{file} contains no points or lines.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_report_lead": {
+            "on": "Each change made during import, and each feature not imported, is listed below with the reason:",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_target_custom": {
+            "on": "Custom property",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_target_node_type": {
+            "on": "Node type",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_target_skip": {
+            "on": "Do not import",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_title": {
+            "on": "Import GeoJSON network: {file}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_tolerance": {
+            "on": "Join tolerance (m)",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_tolerance_tip": {
+            "on": "A line end within this distance of a point, or of another line end, is joined to it. A line end farther than this from every point gets a new junction.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_working": {
+            "on": "Importing {file}…",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_goto_on_map": {
             "on": "Go to on map",
             "ruled": "2026-09-29",
@@ -2703,6 +3143,16 @@
             "on": "Graphs",
             "ruled": "2026-10-03",
             "answer": "OK."
+        },
+        "lpn_guide_boxes_autohide": {
+            "on": "When the pointer leaves, a box without focus hides after a short delay. A box with focus hides when you click outside it, press Esc, or Tab out of it with the pointer elsewhere.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October (round 2): his own text"
+        },
+        "lpn_guide_dimmed": {
+            "on": "A dimmed name is a button that is currently hidden on the toolbar.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
         },
         "lpn_help_hotkeys": {
             "on": "Tables and Hotkeys",
@@ -2768,6 +3218,11 @@
             "ruled": "2026-10-07",
             "answer": "Technical-English interview: Use proposed"
         },
+        "lpn_inp_drop_headloss": {
+            "on": "This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the results here will not match the results in EPANET.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
+        },
         "lpn_inp_drop_net_options": {
             "on": "This EPANET .net file states settings that this page has no control for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
             "ruled": "2026-09-06",
@@ -2803,6 +3258,11 @@
             "on": "This file gives tags to some of its junctions, pipes or other assets. There is no place on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.",
             "ruled": "2026-09-02"
         },
+        "lpn_inp_drop_units": {
+            "on": "The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every value before using the results.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
+        },
         "lpn_inp_export_flat_coords": {
             "on": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its positions in the project file only.",
             "ruled": "2026-10-07",
@@ -2813,6 +3273,11 @@
             "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
+        "lpn_inp_export_flat_customers_inactive": {
+            "on": "{n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_inp_export_flat_fittings": {
             "on": "An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of pipes here ({n}) is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.",
             "ruled": "2026-10-15",
@@ -2822,6 +3287,11 @@
             "on": "Saved {file}",
             "ruled": "2026-09-09",
             "answer": "OK"
+        },
+        "lpn_inp_export_flat_inactive_controls": {
+            "on": "These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
         },
         "lpn_inp_export_flat_lead": {
             "on": "The exported EPANET file is numerically equivalent to this project. But it has no place for the following things:",
@@ -3069,6 +3539,21 @@
         "lpn_library_import_units_line": {
             "on": "{name}: this project shows {mine}, the file shows {theirs}.",
             "ruled": "2026-09-23",
+            "answer": "OK."
+        },
+        "lpn_library_pattern_axis_step": {
+            "on": "Step",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_library_pattern_default_deleted_also": {
+            "on": "Scenarios that also used it as their default: {list}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_library_pattern_default_deleted_in": {
+            "on": "Pattern {id} was the default demand pattern in these scenarios: {list}.",
+            "ruled": "2026-10-16",
             "answer": "OK."
         },
         "lpn_library_pipetype_add": {
@@ -3446,14 +3931,74 @@
             "ruled": "2026-10-15",
             "answer": "Approved. (proposal: \"labels and Text\")"
         },
+        "lpn_mode_add_junction": {
+            "on": "Mode: Add Junction. Specify a location on the map to place a junction. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-15",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
         "lpn_mode_add_meter": {
             "on": "Customer: click where the customer is, then click the pipe or the node that serves it. Or use Esc to cancel.",
             "ruled": "2026-09-23",
             "answer": "Edited."
         },
+        "lpn_mode_add_pipe": {
+            "on": "Mode: Add Pipe. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-15",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_add_pump": {
+            "on": "Mode: Add Pump. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-15",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_add_reservoir": {
+            "on": "Mode: Add Reservoir. Specify a location on the map to place a reservoir. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-15",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_add_tank": {
+            "on": "Mode: Add Tank. Specify a location on the map to place a tank. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-15",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_add_text": {
+            "on": "Mode: Add Text. Specify a location on the map to place a Text. Specify a location near a node to attach the Text to that node. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-15",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_add_valve": {
+            "on": "Mode: Add Valve. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-15",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_select": {
+            "on": "Mode: Select. Select an asset, a label, or a Text to see or change it. Drag to move a node, a label, or a Text. Use the Vertices tool to add or remove the bends in a pipe.",
+            "ruled": "2026-10-15",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
         "lpn_mode_zoom_window": {
             "on": "Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.",
             "ruled": "2026-09-25",
+            "answer": "OK."
+        },
+        "lpn_morph_menu": {
+            "on": "Morph",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_morph_ok": {
+            "on": "Morph",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_morph_other_kind": {
+            "on": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_morph_tip": {
+            "on": "Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its location, its connections, and every value the new type also has. In Base the asset itself is changed, and you are asked first if any value would be lost. In any other scenario the new type is an override in that scenario only, and the values only the new type has start from Settings > New assets.",
+            "ruled": "2026-10-16",
             "answer": "OK."
         },
         "lpn_msglog_ago": {
@@ -3471,6 +4016,11 @@
             "ruled": "2026-09-23",
             "answer": "OK."
         },
+        "lpn_msglog_hidden": {
+            "on": "Hidden",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
+        },
         "lpn_msglog_name": {
             "on": "Messages",
             "ruled": "2026-09-23",
@@ -3485,6 +4035,11 @@
             "on": "Read the recent messages again. They are kept only while this page is open.",
             "ruled": "2026-09-23",
             "answer": "OK."
+        },
+        "lpn_msglog_unhide": {
+            "on": "Show",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
         },
         "lpn_multi_applied": {
             "on": "Set {prop} on {n}.",
@@ -3587,6 +4142,96 @@
             "ruled": "2026-09-25",
             "answer": "OK."
         },
+        "lpn_ovl_bubble_moved": {
+            "on": "{quantity}, moved or resized",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_bubble_off": {
+            "on": "Not on the map",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_clear_all": {
+            "on": "Clear all overrides",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_clear_all_ask": {
+            "on": "Clear all the overrides ({n}) of {name}? Each value returns to the inherited value. Undo reverses this.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_clear_selected": {
+            "on": "Clear selected overrides",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_col_inherited": {
+            "on": "Inherited value",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_col_inherited_tip": {
+            "on": "The value this scenario reads without the override: the value of the parent of the alternative, or the Base value.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_col_override": {
+            "on": "Override",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_group": {
+            "on": "{category}: {alternative}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_note": {
+            "on": "These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Clear an override to restore the inherited value; Undo reverses it. Select an ID to go to the asset on the map.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_pick_tip": {
+            "on": "Select this override for the Clear selected overrides button.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_same": {
+            "on": "(same)",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_same_tip": {
+            "on": "Equal to the inherited value. It is still an override, and it is counted.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_title": {
+            "on": "Manage overrides: {name}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovm_child_ask": {
+            "on": "Clear child overrides ({n} total)?",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovm_child_tip": {
+            "on": "Child scenarios override this value ({n} total). Click to clear their overrides.",
+            "ruled": "2026-10-13",
+            "answer": "Approved as written."
+        },
+        "lpn_ovm_dot_clear": {
+            "on": "Click to clear it.",
+            "ruled": "2026-10-13",
+            "answer": "Approved as written."
+        },
+        "lpn_ovm_dot_set": {
+            "on": "Inherited. Click to make it an override in this scenario, holding the value shown.",
+            "ruled": "2026-10-13",
+            "answer": "Approved as written."
+        },
         "lpn_pane_colmenu_tip": {
             "on": "Hide or manage columns",
             "ruled": "2026-09-28",
@@ -3665,6 +4310,11 @@
         "lpn_pane_hide_cols": {
             "on": "Hide these columns",
             "ruled": "2026-09-25",
+            "answer": "OK."
+        },
+        "lpn_pane_inactive_show": {
+            "on": "Include inactive topology",
+            "ruled": "2026-10-16",
             "answer": "OK."
         },
         "lpn_pane_manage_cols": {
@@ -3862,6 +4512,21 @@
             "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
+        "lpn_pane_scn_cur_only": {
+            "on": "Current scenario only",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_pane_scn_filter_note": {
+            "on": "{filters}. Showing {n} of {all}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_pane_scn_ov_only": {
+            "on": "Overrides only",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_pane_sel_only": {
             "on": "Selection only",
             "ruled": "2026-10-05",
@@ -3897,6 +4562,11 @@
             "ruled": "2026-09-17",
             "answer": "OK."
         },
+        "lpn_pane_tab_scenarios": {
+            "on": "Scenarios",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_pane_text_attached": {
             "on": "Attached",
             "ruled": "2026-09-09",
@@ -3910,6 +4580,51 @@
         "lpn_pane_width_tip": {
             "on": "Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.",
             "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_paste_alt_created": {
+            "on": "Created {category} alternative {name} for this scenario.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_paste_done_many": {
+            "on": "Pasted properties of {id} to {m} assets. Values changed: {n}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_paste_done_one": {
+            "on": "Pasted properties of {id} to {to}. Values changed: {n}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_paste_props_menu": {
+            "on": "Paste properties to selection",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_paste_props_off_kind": {
+            "on": "No selected asset can take the copied properties.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_paste_props_off_none": {
+            "on": "Nothing is copied. Right-click or long press an asset and choose Copy properties.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_paste_props_off_select": {
+            "on": "Select the assets to paste to, then choose Paste properties to selection.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_paste_skip_breakdown": {
+            "on": "Not pasted: {n} (demand is a list of categories).",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_paste_skip_valve": {
+            "on": "Not pasted: {n} (the valve types differ).",
+            "ruled": "2026-10-16",
             "answer": "OK."
         },
         "lpn_pda_deficit_note": {
@@ -3946,6 +4661,11 @@
             "on": "Properties",
             "ruled": "2026-09-09",
             "answer": "OK"
+        },
+        "lpn_popup_none": {
+            "on": "Nothing is selected. Select an asset on the map to see its properties.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
         },
         "lpn_profile_delete": {
             "on": "Delete path",
@@ -4197,6 +4917,16 @@
             "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
+        "lpn_replace_done": {
+            "on": "Assets changed: {n}. This can be undone in one step.",
+            "ruled": "2026-10-15",
+            "answer": "Approved."
+        },
+        "lpn_replace_preview": {
+            "on": "Change assets ({n})?",
+            "ruled": "2026-10-15",
+            "answer": "Approved."
+        },
         "lpn_replace_q_bad": {
             "on": "This query cannot be read, so there is nothing to change. Fix it above first.",
             "ruled": "2026-09-01"
@@ -4359,6 +5089,11 @@
             "ruled": "2026-09-06",
             "answer": "OK."
         },
+        "lpn_rule_inactive_note": {
+            "on": "These rules refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_rule_unreadable_note": {
             "on": "These rules could not be read, so they were ignored in this run: {ids}",
             "ruled": "2026-09-05"
@@ -4383,10 +5118,55 @@
             "ruled": "2026-10-01",
             "answer": "OK."
         },
+        "lpn_scenario_basic_misfit": {
+            "on": "This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.",
+            "ruled": "2026-10-13",
+            "answer": "OK."
+        },
+        "lpn_scenario_basic_misfit_base": {
+            "on": "The Base scenario uses an alternative other than Base.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_scenario_basic_tip": {
             "on": "Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.",
             "ruled": "2026-10-01",
             "answer": "Edited."
+        },
+        "lpn_scenario_copy": {
+            "on": "Copy scenario",
+            "ruled": "2026-10-13",
+            "answer": "OK."
+        },
+        "lpn_scenario_copy_off": {
+            "on": "Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.",
+            "ruled": "2026-10-13",
+            "answer": "OK."
+        },
+        "lpn_scenario_copy_tip": {
+            "on": "Copies the open scenario and its overrides, and opens the copy.",
+            "ruled": "2026-10-13",
+            "answer": "OK."
+        },
+        "lpn_scenario_delete_ask": {
+            "on": "Delete the scenario {name}? The drawing itself is not changed.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_scenario_delete_goes": {
+            "on": "Its overrides ({n}) are deleted with it.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_scenario_delete_has_children": {
+            "on": "The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or move them to another parent.",
+            "ruled": "2026-10-16",
+            "answer": "His own edit of 2026-10-16 (\"move them another parent\"); CC added \"to\"."
+        },
+        "lpn_scenario_delete_stays": {
+            "on": "These alternatives it uses stay in the project: {list}.",
+            "ruled": "2026-10-13",
+            "answer": "Approved as written."
         },
         "lpn_scenario_duration_tip": {
             "on": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
@@ -4397,6 +5177,11 @@
             "on": "Leave blank to inherit from parent.",
             "ruled": "2026-10-05",
             "answer": "Edited"
+        },
+        "lpn_scenario_mark_inh_tip": {
+            "on": "The dashed gray ring means the scenario {name} inherits an override for this asset from its parent scenario or alternative.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
         },
         "lpn_scenario_mark_tip": {
             "on": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
@@ -4464,6 +5249,11 @@
             "ruled": "2026-10-01",
             "answer": "OK."
         },
+        "lpn_scenario_preset_mult_tip": {
+            "on": "Demand multiplier {mult} times average day, a placeholder value. Most systems fall between {lo} and {hi} (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.",
+            "ruled": "2026-10-07",
+            "answer": "Calls page 7 October: Use proposed"
+        },
         "lpn_scenario_preset_peak_hour": {
             "on": "6. Peak hour",
             "ruled": "2026-10-01",
@@ -4499,6 +5289,11 @@
             "on": "Solve every scenario in this project and read them side by side: the lowest pressure and the highest velocity in each.",
             "ruled": "2026-09-04"
         },
+        "lpn_scncmp_none_checked": {
+            "on": "No scenario is checked for comparison. Check scenarios in the Scenario manager.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_scncmp_note": {
             "on": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.",
             "ruled": "2026-09-04"
@@ -4520,6 +5315,11 @@
         "lpn_scncmp_title": {
             "on": "Scenario comparison",
             "ruled": "2026-09-04"
+        },
+        "lpn_search_refused": {
+            "on": "Place-name search is off, and nothing was sent. The Go to a latitude and longitude command still works.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use proposed"
         },
         "lpn_setbox_divider": {
             "on": "Width of the Settings section list",
@@ -4543,6 +5343,11 @@
             "on": "Shows the bubble over the map that says what your next click will do while you are selecting an area.",
             "ruled": "2026-09-09",
             "answer": "OK"
+        },
+        "lpn_settings_auto_run_tip": {
+            "on": "Turn off if recalculation is too slow. While this is on, the Calculate button is hidden.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October (round 2): Use proposed"
         },
         "lpn_settings_basemap_style": {
             "on": "Basemap style",
@@ -4637,6 +5442,16 @@
             "on": "An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero means do not apply this test. Only the EPANET solver reads this box.",
             "ruled": "2026-09-02"
         },
+        "lpn_settings_held_base": {
+            "on": "{base}: {value}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_held_in": {
+            "on": "Override in {scenario}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_settings_hover_card_tip": {
             "on": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
             "ruled": "2026-10-09",
@@ -4689,6 +5504,16 @@
             "on": "Not stated",
             "ruled": "2026-09-01"
         },
+        "lpn_settings_override_marks": {
+            "on": "Show override markers on the map",
+            "ruled": "2026-10-15",
+            "answer": "Approved."
+        },
+        "lpn_settings_override_marks_tip": {
+            "on": "Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.",
+            "ruled": "2026-10-16",
+            "answer": "I approve all three."
+        },
         "lpn_settings_pressure_exponent": {
             "on": "Pressure exponent",
             "ruled": "2026-10-05",
@@ -4727,6 +5552,196 @@
         "lpn_settings_req_pressure_tip": {
             "on": "Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.",
             "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_settings_restore_base_only": {
+            "on": "Switch to Base to restore the defaults.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_basemap": {
+            "on": "Basemap",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_basemap_last": {
+            "on": "Basemap to return to",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_basemap_osm": {
+            "on": "Street map",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_basemap_satellite": {
+            "on": "Satellite images",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_bubbles": {
+            "on": "Time series graphs on the map",
+            "ruled": "2026-10-15",
+            "answer": "Approved."
+        },
+        "lpn_settings_row_check_freq": {
+            "on": "Status check frequency",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_contour_buffer": {
+            "on": "Contour buffer",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_contour_fill": {
+            "on": "Contour fill",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_contour_interval": {
+            "on": "Contour interval",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_contour_labels": {
+            "on": "Contour labels",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_contour_opacity": {
+            "on": "Contour fill opacity",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_contour_terrain": {
+            "on": "Contour ground between nodes from Mapbox DEM",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_customer_max_width": {
+            "on": "Show customer labels when zoomed to this map width or less",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_default": {
+            "on": "{value} (default)",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_elev_source_old": {
+            "on": "Elevation source (older projects)",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_emitter_exponent_old": {
+            "on": "Emitter exponent (older projects)",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_id_prefix": {
+            "on": "ID prefix",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_label_after": {
+            "on": "Text after",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_label_before": {
+            "on": "Text before",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_label_drop": {
+            "on": "Drop order",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_label_on": {
+            "on": "Is active",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_label_show": {
+            "on": "Show order",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_labels_customer": {
+            "on": "Customer labels",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_labels_field": {
+            "on": "{labels}: {field}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_labels_part": {
+            "on": "{labels}: {field}, {part}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_max_check": {
+            "on": "Maximum status checks",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_new_asset": {
+            "on": "New assets: {setting}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_of": {
+            "on": "{setting}, {member}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_pda_src": {
+            "on": "Pressure driven options stated in the file",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_quality_option": {
+            "on": "Quality option as the file states it",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_quality_step": {
+            "on": "Quality time step",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_status_report": {
+            "on": "Status report",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_symbol_cap_multiple": {
+            "on": "Largest symbol, as a multiple of a typical pipe length",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_symbol_cap_percentile": {
+            "on": "Typical pipe length, as a percentile of all pipe lengths",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_tolerance": {
+            "on": "Accuracy (older projects)",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_view": {
+            "on": "Map view (center and scale)",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_view_value": {
+            "on": "Center {x}, {y}; scale {s}",
+            "ruled": "2026-10-16",
             "answer": "OK."
         },
         "lpn_settings_runbox": {
@@ -4790,6 +5805,41 @@
             "ruled": "2026-09-23",
             "answer": "OK."
         },
+        "lpn_settings_table_category": {
+            "on": "Category",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_table_major": {
+            "on": "Major heading",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_table_minor": {
+            "on": "Minor heading",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_table_no": {
+            "on": "No",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_table_owner": {
+            "on": "Owner",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_table_setting": {
+            "on": "Setting",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_table_yes": {
+            "on": "Yes",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_settings_trials": {
             "on": "Maximum trials",
             "ruled": "2026-08-29"
@@ -4822,6 +5872,46 @@
             "on": "How many further trials to allow after the maximum above is used up, before the last trial is reported. Only the EPANET solver reads this box.",
             "ruled": "2026-09-02"
         },
+        "lpn_settings_units_one_project": {
+            "on": "Units are the same in every scenario.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_view_bottom_right": {
+            "on": "Bottom right corner",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_view_center": {
+            "on": "Map center",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_view_save": {
+            "on": "Save this view in this scenario",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_view_save_tip": {
+            "on": "Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_view_scale": {
+            "on": "Map scale",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_view_scale_tip": {
+            "on": "The scale at the center of the map, as 1:N. Type 1:2000, or just 2000, to zoom to that scale.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_view_top_left": {
+            "on": "Top left corner",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_settings_viscosity": {
             "on": "Relative viscosity",
             "ruled": "2026-08-29"
@@ -4829,6 +5919,231 @@
         "lpn_settings_viscosity_tip": {
             "on": "The viscosity of the fluid compared with water at 20 degrees Celsius. It only changes the answer under the Darcy-Weisbach method.",
             "ruled": "2026-08-29"
+        },
+        "lpn_sm_add_base": {
+            "on": "Add base",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_add_base_alt_tip": {
+            "on": "Add another Base alternative. It starts as a copy of Base's values in this category, and later edits to Base do not change it.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_add_base_tip": {
+            "on": "Add another Base scenario. It starts as a copy of Base, with its own alternatives, and later edits to Base do not change it.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_add_child": {
+            "on": "Add child",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_all_row_tip": {
+            "on": "Double-click to open it in its category tree.",
+            "ruled": "2026-10-16",
+            "answer": "I approve all three."
+        },
+        "lpn_sm_base_kept": {
+            "on": "The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_base_named": {
+            "on": "The Base of a tree is not renamed.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_basic_on": {
+            "on": "Scenario manager is disabled when Basic mode is on.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_col_parent": {
+            "on": "Parent",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_compare_tip": {
+            "on": "Include in Scenario comparison",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_copy": {
+            "on": "Copy",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_current_already": {
+            "on": "This scenario is already the current scenario.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_cycle": {
+            "on": "{name} cannot be moved under one of its own children.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_delete": {
+            "on": "Delete the selected item. A used item is not deleted.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_delete_alt_ask": {
+            "on": "Delete the alternative {name}?",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_help": {
+            "on": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the right pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the right pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+            "ruled": "2026-10-16",
+            "answer": "His own edit of 2026-10-16."
+        },
+        "lpn_sm_in_use": {
+            "on": "{item}\\ncannot be deleted while it is used by\\n{list}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_inherited": {
+            "on": "inherited",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_item_alternative": {
+            "on": "Alternative {name}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_item_scenario": {
+            "on": "Scenario {name}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_list_overrides": {
+            "on": "Manage overrides",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_list_overrides_none": {
+            "on": "This scenario has no overrides.",
+            "ruled": "2026-10-15",
+            "answer": "Revised. But should be obvious when count = 0."
+        },
+        "lpn_sm_list_overrides_tip": {
+            "on": "List the scenario's overrides by category, each with the inherited value it overrides, and clear any of them.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_make_current": {
+            "on": "Make current",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_menu": {
+            "on": "Scenario manager…",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_merge_ask": {
+            "on": "Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of overriding them. You can undo this.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_merge_line": {
+            "on": "{asset}: {property}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_merge_none": {
+            "on": "The alternative {name} has no overrides to merge.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_merge_pick": {
+            "on": "Merge the overrides of {name} into which alternative? Its parent is listed first.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_merge_skipped": {
+            "on": "{between} also overrides these values. It is skipped and not changed, so {name} will read them from {between}, not from {target}:",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_merge_up": {
+            "on": "Merge upward",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_merge_up_root": {
+            "on": "A Base alternative has nothing above it to merge into.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_merge_up_tip": {
+            "on": "Move the overrides of the selected alternative into an alternative above it in the tree. The selected alternative then inherits those values.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_name_taken": {
+            "on": "The name {name} is already used in this tree.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_none_selected": {
+            "on": "Select an item in the tree first.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_rename": {
+            "on": "Rename",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_rename_alts_ask": {
+            "on": "Rename equally named alternatives?",
+            "ruled": "2026-10-13",
+            "answer": "OK."
+        },
+        "lpn_sm_shared_note": {
+            "on": "Shared with: {list}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_title": {
+            "on": "Scenario manager",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_tree_all": {
+            "on": "All",
+            "ruled": "2026-10-15",
+            "answer": "Approved."
+        },
+        "lpn_sm_tree_unused": {
+            "on": "All unused",
+            "ruled": "2026-10-15",
+            "answer": "Approved."
+        },
+        "lpn_sm_unused_none": {
+            "on": "None",
+            "ruled": "2026-10-16",
+            "answer": "I approve all three."
+        },
+        "lpn_sm_used_by": {
+            "on": "Used by scenarios: {n}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_used_by_none": {
+            "on": "Not used by any scenario",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_used_by_tip": {
+            "on": "Used by: {list}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
         },
         "lpn_source_pattern": {
             "on": "Source pattern",
@@ -4877,6 +6192,11 @@
             "ruled": "2026-09-06",
             "answer": "OK."
         },
+        "lpn_split_pipe_ask": {
+            "on": "Split pipe {id} at this node?",
+            "ruled": "2026-10-10",
+            "answer": "I agree with Bentley that \"split\" is better than \"break\"."
+        },
         "lpn_status_closed": {
             "on": "{type} {id} now closed",
             "ruled": "2026-10-03",
@@ -4886,6 +6206,11 @@
             "on": "Event",
             "ruled": "2026-09-26",
             "answer": "OK."
+        },
+        "lpn_status_converted": {
+            "on": "Values ({n}) were rewritten into {unit}.",
+            "ruled": "2026-10-15",
+            "answer": "Approved."
         },
         "lpn_status_dry": {
             "on": "{type} {id} is empty",
@@ -5377,6 +6702,21 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
+        "lpn_time_run_cut_off": {
+            "on": "EPANET had closed {link} and then could not solve for {nodes}.",
+            "ruled": "2026-10-15",
+            "answer": "R-402 status messages: Approved."
+        },
+        "lpn_time_run_cut_off_empty": {
+            "on": "Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.",
+            "ruled": "2026-10-15",
+            "answer": "R-402 status messages: Approved."
+        },
+        "lpn_time_run_cut_off_full": {
+            "on": "Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.",
+            "ruled": "2026-10-15",
+            "answer": "R-402 status messages: Approved."
+        },
         "lpn_time_run_report_copied": {
             "on": "Copied",
             "ruled": "2026-09-04"
@@ -5384,6 +6724,11 @@
         "lpn_time_run_report_copy": {
             "on": "Copy",
             "ruled": "2026-09-04"
+        },
+        "lpn_time_run_stopped_kept": {
+            "on": "The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.",
+            "ruled": "2026-10-15",
+            "answer": "Approved."
         },
         "lpn_time_runbox_hide": {
             "on": "Do not show this box again",
@@ -5420,10 +6765,20 @@
             "ruled": "2026-10-05",
             "answer": "OK."
         },
+        "lpn_time_stat_stopped": {
+            "on": "{statistic} not shown: the run stopped before the end of the period.",
+            "ruled": "2026-10-15",
+            "answer": "Approved."
+        },
         "lpn_time_statistic": {
             "on": "Statistic",
             "ruled": "2026-10-05",
             "answer": "OK."
+        },
+        "lpn_time_stopped_no_quality": {
+            "on": "No water quality results were computed, because the quality analysis starts after the hydraulic run ends.",
+            "ruled": "2026-10-15",
+            "answer": "Approved."
         },
         "lpn_tool_add_chain": {
             "on": "Junction Pipe Chain",
@@ -5474,6 +6829,11 @@
             "on": "Shortcut: press {key} or {key2}.",
             "ruled": "2026-09-14",
             "answer": "OK"
+        },
+        "lpn_tool_zoom_extent_tip": {
+            "on": "Fit the whole network to the map window. For Zoom Window with no fit first, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also upper right map zoom controls.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
         },
         "lpn_tool_zoom_window": {
             "on": "Zoom Window",
@@ -5550,6 +6910,36 @@
             "ruled": "2026-09-17",
             "answer": "OK."
         },
+        "lpn_tsb_close": {
+            "on": "Close graph",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_tsb_max": {
+            "on": "Close a graph before opening another. Up to {n} stay open.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_tsb_menu": {
+            "on": "Time series graph",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_tsb_off_tip": {
+            "on": "Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_tsb_quantity": {
+            "on": "Quantity to graph",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_tsb_resize": {
+            "on": "Drag to resize",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_units_mapcoords": {
             "on": "Map coordinates",
             "ruled": "2026-09-25",
@@ -5564,6 +6954,11 @@
             "on": "US survey ft",
             "ruled": "2026-09-25",
             "answer": "OK."
+        },
+        "lpn_workspace_confirm": {
+            "on": "Replace this browser's workspace layout with the one in the file?",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: his own text, \"Replace this browser's workspace layout with the one in the file?\""
         },
         "lpn_wrong_btn": {
             "on": "Something wrong here?",
@@ -5620,176 +7015,6 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
-        },
-        "lpn_field_active": {
-            "on": "Is active?",
-            "ruled": "2026-10-06",
-            "answer": "His own wording: \"Part of network: Change to \\\"Is active?\\\" like Bentley.\""
-        },
-        "about_body_html": {
-            "on": "<h3>Mission</h3><p>HawsEDC Engineering Calculators have been offered freely online since 2010. They exist to serve engineers and field workers around the world — especially those working in water-scarce, low-resource, or underserved regions. These tools are part of a broader humanitarian mission: to tell every human being in the most practical and effective way possible <a target=\"_blank\" href=\"https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html\">that they are loved and cherished forever, that they have nothing to fear, and that they are not going to ruin everything</a>.</p><p>The calculators are the vehicle. The destination is a world free of suffering.</p><h3>Free Libre Open Source License</h3><p>All code is released under the <a target=\"_blank\" href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU General Public License v3.0 or later</a> — free as in freedom. You may use, study, modify, and redistribute the code under the same terms.</p><p>The website that serves it is offered freely today and since 2010; if one day it cannot be, the software is still yours to run.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Source Code</h3><p>The full source code is publicly available on GitHub:</p><p><a target=\"_blank\" href=\"https://github.com/hawstom/engcalcs\">github.com/hawstom/engcalcs</a></p><p>You can browse the code, file issues, or fork the repository there.</p><h3>Contributing</h3><p>All help is welcome. <a href=\"contact.php\">Contact Tom Haws</a>.</p><ul><li><strong>Translations:</strong> Suggest better wording. Improve or add a language.</li><li><strong>Bug reports:</strong> Use the feedback form on any calculator page, or file an issue on GitHub.</li><li><strong>New calculators:</strong> Ideas for hydraulic engineering tools that serve field workers and irrigation practitioners are especially welcome.</li><li><strong>Hosting:</strong> If you can mirror these calculators for a region with limited connectivity, please contact me.</li></ul><h3>Offline Use</h3><p>Open any calculator once while you are online and all of them keep working when you are not: your browser stores the whole suite as you go. The mechanism is a <strong>Progressive Web App (PWA)</strong>. After that, all calculators work offline — no internet required.</p><p>On Android or iOS, use your browser’s \"Add to Home Screen\" option to install EngCalcs as an app on your device. On desktop, look for the install icon in your browser’s address bar.</p><p>You can also save any individual calculator using your browser’s \"Save as…\" menu for one-off offline use.</p><h3>Contact</h3><p>Tom Haws, hydraulic engineer and founder of these calculators.<br />Use the feedback form on any calculator page, or reach the source code at <a target=\"_blank\" href=\"https://github.com/hawstom/engcalcs\">GitHub</a>.</p>",
-            "ruled": "2026-10-07",
-            "answer": "Technical-English interview: Use proposed"
-        },
-        "lpn_field_valve_type_tip": {
-            "on": "Valve type. A throttle valve (TCV) applies a fixed loss. PRV, PSV, and FCV maintain a pressure or a flow, and open fully, close, or partly close as hydraulic conditions change. A PBV removes a fixed pressure, and a GPV follows a head loss curve. The types control different hydraulic properties, so settings may be lost when the type is changed.",
-            "ruled": "2026-10-07",
-            "answer": "Technical-English interview: Valve type. A throttle valve (TCV) applies a fixed loss. PRV, PSV, and FCV maintain a pressure or a flow, and open fully, close, or partly close as hydraulic conditions change. A PBV removes a fixed pressure, and a GPV follows a head loss curve. The types control different hydraulic properties, so settings may be lost when the type is changed."
-        },
-        "lpn_inp_drop_headloss": {
-            "on": "This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the results here will not match the results in EPANET.",
-            "ruled": "2026-10-07",
-            "answer": "Technical-English interview: Use proposed"
-        },
-        "lpn_inp_drop_units": {
-            "on": "The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every value before using the results.",
-            "ruled": "2026-10-07",
-            "answer": "Technical-English interview: Use proposed"
-        },
-        "lpn_scenario_preset_mult_tip": {
-            "on": "Demand multiplier {mult} times average day, a placeholder value. Most systems fall between {lo} and {hi} (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.",
-            "ruled": "2026-10-07",
-            "answer": "Calls page 7 October: Use proposed"
-        },
-        "lpn_change_type_born": {
-            "on": "These values are new, set as on a newly drawn asset:",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October: Use proposed"
-        },
-        "lpn_search_refused": {
-            "on": "Place-name search is off, and nothing was sent. The Go to a latitude and longitude command still works.",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October: Use proposed"
-        },
-        "lpn_popup_none": {
-            "on": "Nothing is selected. Select an asset on the map to see its properties.",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October: Use as written"
-        },
-        "lpn_guide_dimmed": {
-            "on": "A dimmed name is a button that is currently hidden on the toolbar.",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October: Use as written"
-        },
-        "lpn_tool_zoom_extent_tip": {
-            "on": "Fit the whole network to the map window. For Zoom Window with no fit first, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also upper right map zoom controls.",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October: Use as written"
-        },
-        "lpn_msglog_hidden": {
-            "on": "Hidden",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October: Use as written"
-        },
-        "lpn_msglog_unhide": {
-            "on": "Show",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October: Use as written"
-        },
-        "lpn_workspace_confirm": {
-            "on": "Replace this browser's workspace layout with the one in the file?",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October: his own text, \"Replace this browser's workspace layout with the one in the file?\""
-        },
-        "lpn_guide_boxes_autohide": {
-            "on": "When the pointer leaves, a box without focus hides after a short delay. A box with focus hides when you click outside it, press Esc, or Tab out of it with the pointer elsewhere.",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October (round 2): his own text"
-        },
-        "lpn_change_type_key": {
-            "on": "Each line: ID: the property and value that would be lost",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October (round 2): Use proposed"
-        },
-        "lpn_settings_auto_run_tip": {
-            "on": "Turn off if recalculation is too slow. While this is on, the Calculate button is hidden.",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October (round 2): Use proposed"
-        },
-        "lpn_dxf_note_blocks": {
-            "on": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October: Use as written"
-        },
-        "lpn_split_pipe_ask": {
-            "on": "Split pipe {id} at this node?",
-            "ruled": "2026-10-10",
-            "answer": "I agree with Bentley that \"split\" is better than \"break\"."
-        },
-        "lpn_mode_select": {
-            "on": "Mode: Select. Select an asset, a label, or a Text to see or change it. Drag to move a node, a label, or a Text. Use the Vertices tool to add or remove the bends in a pipe.",
-            "ruled": "2026-10-15",
-            "answer": "Approved. (proposal: \"labels and Text\")"
-        },
-        "lpn_mode_add_junction": {
-            "on": "Mode: Add Junction. Specify a location on the map to place a junction. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-15",
-            "answer": "Approved. (proposal: \"labels and Text\")"
-        },
-        "lpn_mode_add_reservoir": {
-            "on": "Mode: Add Reservoir. Specify a location on the map to place a reservoir. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-15",
-            "answer": "Approved. (proposal: \"labels and Text\")"
-        },
-        "lpn_mode_add_tank": {
-            "on": "Mode: Add Tank. Specify a location on the map to place a tank. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-15",
-            "answer": "Approved. (proposal: \"labels and Text\")"
-        },
-        "lpn_mode_add_pipe": {
-            "on": "Mode: Add Pipe. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-15",
-            "answer": "Approved. (proposal: \"labels and Text\")"
-        },
-        "lpn_mode_add_pump": {
-            "on": "Mode: Add Pump. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-15",
-            "answer": "Approved. (proposal: \"labels and Text\")"
-        },
-        "lpn_mode_add_valve": {
-            "on": "Mode: Add Valve. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-15",
-            "answer": "Approved. (proposal: \"labels and Text\")"
-        },
-        "lpn_mode_add_text": {
-            "on": "Mode: Add Text. Specify a location on the map to place a Text. Specify a location near a node to attach the Text to that node. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-15",
-            "answer": "Approved. (proposal: \"labels and Text\")"
-        },
-        "lpn_time_run_stopped_kept": {
-            "on": "The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.",
-            "ruled": "2026-10-15",
-            "answer": "Approved."
-        },
-        "lpn_time_stat_stopped": {
-            "on": "{statistic} not shown: the run stopped before the end of the period.",
-            "ruled": "2026-10-15",
-            "answer": "Approved."
-        },
-        "lpn_time_stopped_no_quality": {
-            "on": "No water quality results were computed, because the quality analysis starts after the hydraulic run ends.",
-            "ruled": "2026-10-15",
-            "answer": "Approved."
-        },
-        "lpn_energy_stopped": {
-            "on": "The EPANET run stopped before the end of the period, so no pump energy results were computed.",
-            "ruled": "2026-10-15",
-            "answer": "Revised. Does that work? If not, correct and try again."
-        },
-        "lpn_replace_preview": {
-            "on": "Change assets ({n})?",
-            "ruled": "2026-10-15",
-            "answer": "Approved."
-        },
-        "lpn_replace_done": {
-            "on": "Assets changed: {n}. This can be undone in one step.",
-            "ruled": "2026-10-15",
-            "answer": "Approved."
-        },
-        "lpn_status_converted": {
-            "on": "Values ({n}) were rewritten into {unit}.",
-            "ruled": "2026-10-15",
-            "answer": "Approved."
         }
     }
 }

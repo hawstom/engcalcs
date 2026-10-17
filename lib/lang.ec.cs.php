@@ -708,6 +708,7 @@ $ec_lang['lpn_node_customers_tip']='Seznam odběratelů přidaných zde, protož
 $ec_lang['lpn_node_customers_sum']='{total} {unit} od odběratelů ({n})';
 $ec_lang['lpn_customer_detached']='⚠ Tento odběratel není připojen k potrubí, takže jeho odběr není ve výsledcích. Smažte jej, nebo nakreslete potrubí a přesuňte na něj odběratele.';
 $ec_lang['lpn_customer_fixed_head']='⚠ Bližší konec tohoto potrubí má pevnou hladinu vody, takže tento odběr simulaci neovlivňuje.';
+
 $ec_lang['lpn_customer_detached_count']='Odběratelé nepřipojení k potrubí ({n}). Jejich odběr není zohledněn.';
 $ec_lang['lpn_meter_pick_pipe']='Nyní vyberte potrubí nebo uzel, který tohoto odběratele zásobuje. Odběratel zůstane tam, kam jste jej umístili. Akci zrušíte klávesou Escape.';
 $ec_lang['lpn_inp_export_flat_customers']='Soubor EPANET nemá odběratele. Odběr odběratelů v tomto projektu ({n}) je zapsán jako řádek odběru u uzlu, ke kterému je každý odběratel přiřazen, pojmenovaný značkou odběratele. Soubor nezaznamenává samotného odběratele: jeho umístění, potrubí, které jej zásobuje, místo podél tohoto potrubí, kde se přípojka připojuje, ani počet přípojek, které zastupuje. Tyto informace zůstávají v projektu; uložte soubor projektu, abyste je zachovali.';
@@ -992,7 +993,6 @@ $ec_lang['lpn_guide_text_contour_box']='Řídí vrstevnicový graf vykreslený n
 $ec_lang['lpn_guide_text_scncmp_box']='Vypočítá každý scénář z kopie výkresu a pro každý uvede v tabulce počet specifických hodnot, nejnižší tlak a nejvyšší rychlost. Projekt nemění a otevřený scénář zůstává tak, jak byl.';
 $ec_lang['lpn_guide_text_rptbox']='Zobrazuje textovou sestavu zapsanou výpočetním jádrem EPANET pro poslední simulaci s časovým průběhem, včetně jejích varování a souhrnu sítě. Každá simulace s časovým průběhem ji nahradí; výpočet jednoho okamžiku ne a úprava ponechá předchozí sestavu beze změny.';
 $ec_lang['lpn_guide_text_status_box']='Uvádí v časovém pořadí každou změnu během poslední simulace s časovým průběhem: otevření nebo zavření čerpadla, ventilu či potrubí, začátek plnění nebo vyprazdňování nádrže, její naplnění nebo vyprázdnění a každý časový krok, který plně nezkonvergoval. Uvedeny jsou jen změny, ne každý časový krok.';
-$ec_lang['lpn_guide_text_alt_box']='Zobrazuje pro každý scénář, kterou alternativu používá v každé kategorii, například Fyzikální, Odběr a Aktivace prvků, a jeho možnosti výpočtu: násobitel odběru, celkovou dobu běhu a hydraulický časový krok. Alternativy jsou jen ke čtení. Možnosti výpočtu scénáře lze zadat zde a prázdné pole použije hodnotu nadřazeného scénáře. Okno se otevře z nabídky Scénáře po zrušení výběru Základního režimu.';
 $ec_lang['lpn_guide_text_full_box']='Uvádí každý uzel a každé potrubí při každém časovém kroku hlášení, v jednotkách zobrazených na panelu Tabulky. Bez simulace s časovým průběhem zobrazuje aktuální řešení v jediném okamžiku. Stažení nebo tisk zahrnuje všechny časové kroky, tabulka zobrazuje vždy jeden.';
 $ec_lang['lpn_guide_text_calib_box']='Porovnává soubor terénních měření s vypočtenými výsledky na stejných místech a ve stejných časech, jeden soubor pro každou veličinu. Soubor se drží jen po dobu aktuální relace a neukládá se s projektem.';
 $ec_lang['lpn_guide_text_notes_popup']='Uvádí poznámky o tom, jak se tato stránka chová a co nedělá, každou jako pojem následovaný definicí. Síť nemění.';
@@ -1020,7 +1020,6 @@ $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?<
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='Také v nabídce {menu}';
 $ec_lang['lpn_guide_how_popup']='Vlastnosti se otevřou, když vyberete prvek nebo text.';
-$ec_lang['lpn_guide_how_alt']='Náhled alternativ je uveden v části Voda, Scénáře, je-li Základní režim vypnutý.';
 $ec_lang['lpn_guide_not_shown']='Tento ovládací prvek právě není na obrazovce.';
 // The box's two context headings. "Tables" holds the two table-help entries that used to sit only
 // in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
@@ -1475,8 +1474,20 @@ $ec_lang['lpn_pane_sel_only_none']='Není vybrán žádný prvek. Nejprve vybert
 // Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
 // scenario, with a Scenario column after ID.
 $ec_lang['lpn_pane_scn_show']='Zobrazit scénáře';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+
+
+
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+
+
+
+
 $ec_lang['lpn_pane_clear_override']='Zrušit specifickou hodnotu';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -1532,20 +1543,29 @@ $ec_lang['lpn_menu_project']='Voda';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='Vše, co se týká modelování vodovodní sítě (kromě ovládání přehrávání animace)';
 $ec_lang['lpn_tables_menu']='Tabulky';
-// Water > Change type (Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// Water > Morph (Task 781; Tom, 2026-10-14: *"I like the term 'Morph' (Transform) for this feature"*;
+// first built as Change type, Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
 // to Change node type for any asset, where if it has information that can't be ported to the new
 // type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
 // asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
 // popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
 // dev/asset-type.md.
-$ec_lang['lpn_change_type_menu']='Změnit typ';
-$ec_lang['lpn_change_type_tip']='Změní vybrané uzly na uzly, zdroje nebo nádrže, případně vybrané spoje na potrubí, čerpadla nebo ventily. Každý si ponechá své ID, své místo, svá připojení a každou hodnotu, kterou má i nový typ. Pokud by se něco ztratilo, budete nejprve dotázáni.';
-$ec_lang['lpn_change_type_ok']='Změnit';
+$ec_lang['lpn_morph_menu']='Změnit typ';
+$ec_lang['lpn_morph_tip']='Změní vybrané uzly na uzly, zdroje nebo nádrže, případně vybrané spoje na potrubí, čerpadla nebo ventily. Každý si ponechá své ID, své místo, svá připojení a každou hodnotu, kterou má i nový typ. Pokud by se něco ztratilo, budete nejprve dotázáni.';
+$ec_lang['lpn_morph_ok']='Změnit';
+// {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
+// when a node type was chosen), separated by commas.
+
+// The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
+// scenario, beside the override marker.
+
+
 $ec_lang['lpn_change_type_lost']='Tyto hodnoty budou ztraceny:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
 $ec_lang['lpn_change_type_key']='Každý řádek: ID: vlastnost a hodnota, které by se ztratily';
 $ec_lang['lpn_change_type_line']='{id}: {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, ve scénáři {scenario}';
+
 $ec_lang['lpn_change_type_more']='A dalších {n}.';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.
@@ -1614,6 +1634,32 @@ $ec_lang['lpn_confirm_delete_network']='Smazat každý uzel, potrubí a textový
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='Najít a nahradit';
+// Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
+// placement are never pasted.
+
+
+
+
+
+
+
+
+
+
+// The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
+// opens the in-place editor; Reset position sends a dragged label or an attached Text home.
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_find_title']='Najít a nahradit';
 $ec_lang['lpn_find_scope']='Kde hledat';
 $ec_lang['lpn_find_scope_all']='Vše';
@@ -2056,6 +2102,8 @@ $ec_lang['lpn_status_inp_exported_picture']='Exportováno: {zip}, který obsahuj
 $ec_lang['lpn_status_inp_exported_no_picture']='Exportováno: {file}. Podkladový obrázek se nepodařilo uložit, proto soubor .inp žádný neuvádí; v programu EPANET jej přidáte příkazem Zobrazit, Podklad, Načíst.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+
+
 $ec_lang['lpn_inp_export_differences']='Věcí, které formát .inp nedokáže uchovat: {n}.';
 $ec_lang['lpn_inp_export_difference_one']='Jedna věc, kterou formát .inp nedokáže obsáhnout.';
 $ec_lang['lpn_inp_export_refused']='Tento projekt nelze zapsat jako soubor EPANET: {detail}';
@@ -3045,6 +3093,7 @@ $ec_lang['lpn_scenario_overrides']='Počet specifických hodnot';
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='Jantarový kroužek znamená, že tento prvek má specifickou hodnotu ve scénáři {name}.';
+
 $ec_lang['lpn_scenario_overrides_tip']='Každá specifická hodnota je na mapě označena jantarovým kroužkem. Přepnutím na {base} nebo jiný nadřazený scénář zobrazíte výkres bez nich.';
 $ec_lang['lpn_scenario_menu']='Scénáře';
 $ec_lang['lpn_scenario_tip']='Sada hodnot, kterou kresba právě zobrazuje a kterou stránka právě počítá. Kliknutím přepnete scénář, nebo scénář přidáte, přejmenujete či smažete.';
@@ -3053,10 +3102,11 @@ $ec_lang['lpn_scenario_new_name']='Scénář {n}';
 $ec_lang['lpn_scenario_prompt_name']='Název tohoto scénáře';
 $ec_lang['lpn_scenario_rename']='Přejmenovat scénář…';
 $ec_lang['lpn_scenario_delete']='Smazat scénář';
-$ec_lang['lpn_scenario_delete_confirm']='Smazat scénář {name} a jeho specifické hodnoty ({n})? Samotný výkres se nemění.';
-$ec_lang['lpn_scenario_override']='Specifická hodnota v tomto scénáři';
+
+
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='Zaškrtnuto znamená, že tento scénář pro tuto hodnotu přepisuje nadřazený scénář, i když je číslo stejné. Zrušením zaškrtnutí se použije hodnota nadřazeného scénáře.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3067,31 +3117,142 @@ $ec_lang['lpn_scenario_deactivated']='{id} je ve scénáři {scenario} vyloučen
 $ec_lang['lpn_scenario_delete_in_base']='Chcete-li prvek odstranit z výkresu, smažte jej ve scénáři {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} je smazán. Byl součástí pouze scénáře {scenario}.';
 $ec_lang['lpn_scenario_delete_blocked']='{id} nebyl smazán, protože na něm končí potrubí {link}, které existuje i mimo scénář {scenario}. Chcete-li smazat obojí, smažte je ve scénáři {base}.';
-$ec_lang['lpn_scenario_push_btn']='Použít základní hodnoty ve všech scénářích';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Každý scénář se vrátí k základní hodnotě u vlastností, jejichž popisky jsou právě zobrazeny. Hodnoty patřící jen těmto scénářům se zahodí.';
 $ec_lang['lpn_scenario_basic']='Základní režim';
 $ec_lang['lpn_scenario_basic_tip']='Zaškrtnuto: scénář sestává pouze z hodnot v něm nastavených. Nezaškrtnuto: tato nabídka nabízí také tabulku Náhled alternativ, která ukazuje, jak jsou tyto hodnoty seskupeny podle kategorií, a umožňuje, aby měl scénář samostatnou celkovou dobu běhu a hydraulický časový krok. Zpětná vazba k této funkci je vítána.';
-$ec_lang['lpn_alt_title']='Náhled alternativ';
-$ec_lang['lpn_alt_calc_options']='Možnosti výpočtu';
-$ec_lang['lpn_alt_note']='Základní používá základní alternativu každé kategorie. Každý scénář má samostatnou alternativu, potomka základní alternativy, pro každou kategorii, která se změnila. Číslo udává počet změněných hodnot. Poslední tři sloupce jsou možnosti výpočtu: zadejte hodnotu pro scénář, nebo ponechte prázdné, aby se použila hodnota nadřazeného scénáře. Hodnoty projektu jsou v Nastavení, Výpočet, Čas.';
-$ec_lang['lpn_scenario_duration_tip']='Ponechte prázdné, aby se převzala hodnota nadřazeného scénáře. Celková doba běhu 0:00 je ustálený výpočet.';
-$ec_lang['lpn_scenario_hyd_step_tip']='Ponechte prázdné, aby se převzala hodnota nadřazeného scénáře.';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_time_scn_overrides']='Specifické hodnoty scénáře:';
+
+
+
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+
+
+
+
+
+
+
+
+
+
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+
+
+
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_alt_cat_physical']='Fyzikální';
 $ec_lang['lpn_alt_cat_demand']='Odběr';
 $ec_lang['lpn_alt_cat_topology']='Aktivace prvků';
+
 $ec_lang['lpn_alt_cat_initial']='Počáteční nastavení';
 $ec_lang['lpn_alt_cat_constituent']='Složka';
 $ec_lang['lpn_alt_cat_fireflow']='Požární průtok';
 $ec_lang['lpn_alt_cat_energy']='Náklady na energii';
 $ec_lang['lpn_alt_cat_userdata']='Vlastní vlastnosti';
 $ec_lang['lpn_alt_cat_text']='Text';
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Nastavit ve všech scénářích základní hodnoty pro tyto vlastnosti? Hodnoty patřící jen těmto scénářům se zahodí. Tuto akci lze vrátit zpět.';
-$ec_lang['lpn_scenario_push_scenarios']='Dotčené scénáře:';
-$ec_lang['lpn_scenario_push_values']='Zahozené hodnoty:';
-$ec_lang['lpn_scenario_push_none']='Žádný scénář nepřepisuje Základní u žádné z těchto vlastností, takže by se nic nezměnilo. Nic se nezahazuje.';
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. Zkouška průtoku: statická';
@@ -3231,6 +3392,8 @@ $ec_lang['lpn_time_run_fell_back']='Čísla na obrazovce místo toho pocházejí
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='Tato pravidla pojmenovávají prvek, který už v tomto projektu není, takže byla vynechána: {ids}';
 $ec_lang['lpn_control_unreadable_note']='Tato pravidla se nepodařilo přečíst, takže byla vynechána: {ids}';
+
+
 $ec_lang['lpn_rule_dangling_note']='Tato pravidla odkazují na prvek, který už v tomto projektu není, takže byla při tomto výpočtu ignorována: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='Tato pravidla nešlo přečíst, takže byla při tomto výpočtu ignorována: {ids}';
 $ec_lang['lpn_settings_text_size']='Velikost textu (v pixelech)';
@@ -3783,9 +3946,7 @@ $ec_lang['lpn_energy_curve_note']='Tato čerpadla odkazují na křivku účinnos
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Pořadí';
 $ec_lang['lpn_labels_col_drop']='Vynechat';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -4010,6 +4171,8 @@ $ec_lang['lpn_library_pattern_default_mark']='(výchozí)';
 $ec_lang['lpn_library_pattern_default_tip']='Výchozí vzorec odběru. Změníte jej v Nastavení, Výchozí vzorec odběru.';
 $ec_lang['lpn_library_pattern_default_deleted_to']='Vzorec {id} byl výchozím vzorcem odběru. Uzly bez vzorce nyní používají vzorec {now}.';
 $ec_lang['lpn_library_pattern_default_deleted_none']='Vzorec {id} byl výchozím vzorcem odběru. Uzly bez vzorce nyní používají konstantní odběr.';
+
+
 $ec_lang['lpn_library_control_add']='Přidat pravidlo';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -4572,4 +4735,4 @@ $ec_lang['lpn_snip_tip_eraser']='Guma: kliknutím na tah jej odstraníte (E)';
 $ec_lang['lpn_snip_tip_undo']='Zpět (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Znovu (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Kopírovat (Ctrl+C)';
-$ec_lang['lpn_screenshot_scale_tip']='Velikost obrázku jako násobek oblasti na obrazovce. Větší obrázek je ostřejší a vytvoří větší soubor.';
+$ec_lang['lpn_screenshot_scale_tip']='Velikost obrázku jako násobek oblasti na obrazovce. Větší obrázek je ostřejší a vytvoří větší soubor.';$ec_lang['lpn_guide_text_alt_box']='Zobrazuje pro každý scénář, kterou alternativu používá v každé kategorii, například Fyzikální, Odběr a Aktivace prvků, a jeho možnosti výpočtu: násobitel odběru, celkovou dobu běhu a hydraulický časový krok. Alternativy jsou jen ke čtení. Možnosti výpočtu scénáře lze zadat zde a prázdné pole použije hodnotu nadřazeného scénáře. Okno se otevře z nabídky Scénáře po zrušení výběru Základního režimu.';$ec_lang['lpn_guide_how_alt']='Náhled alternativ je uveden v části Voda, Scénáře, je-li Základní režim vypnutý.';$ec_lang['lpn_alt_calc_options']='Možnosti výpočtu';$ec_lang['lpn_scenario_duration_tip']='Ponechte prázdné, aby se převzala hodnota nadřazeného scénáře. Celková doba běhu 0:00 je ustálený výpočet.';$ec_lang['lpn_scenario_hyd_step_tip']='Ponechte prázdné, aby se převzala hodnota nadřazeného scénáře.';

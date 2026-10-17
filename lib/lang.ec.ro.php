@@ -708,6 +708,7 @@ $ec_lang['lpn_node_customers_tip']='Lista abonaților adăugați aici pentru că
 $ec_lang['lpn_node_customers_sum']='{total} {unit} de la abonați ({n})';
 $ec_lang['lpn_customer_detached']='⚠ Acest abonat nu este conectat la nicio conductă, deci cerința sa nu este inclusă în rezultate. Ștergeți-l, sau desenați o conductă și mutați abonatul pe ea.';
 $ec_lang['lpn_customer_fixed_head']='⚠ Capătul apropiat al acelei conducte are o suprafață de apă fixă, deci această cerință nu afectează simularea.';
+
 $ec_lang['lpn_customer_detached_count']='Abonați neconectați la o conductă ({n}). Cerința lor nu este luată în calcul.';
 $ec_lang['lpn_meter_pick_pipe']='Acum selectați conducta sau nodul care deservește acest abonat. Abonatul rămâne unde l-ați pus. Apăsați Escape pentru a anula.';
 $ec_lang['lpn_inp_export_flat_customers']='Un fișier EPANET nu are abonați. Cerința abonaților din acest proiect ({n}) este scrisă ca un rând de cerință pe joncțiunea la care este atribuit fiecare abonat, denumit cu marcajul abonatului. Fișierul nu înregistrează abonatul însuși: locația lui, conducta care îl deservește, locul de-a lungul acelei conducte unde se conectează branșamentul sau câte branșamente reprezintă. Aceste informații rămân în proiect; salvați fișierul de proiect pentru a le păstra.';
@@ -992,7 +993,6 @@ $ec_lang['lpn_guide_text_contour_box']='Controlează diagrama de contururi desen
 $ec_lang['lpn_guide_text_scncmp_box']='Rezolvă fiecare scenariu dintr-o copie a desenului și tabelează, pentru fiecare, numărul de valori specifice, cea mai mică presiune și cea mai mare viteză. Nu modifică proiectul, iar scenariul deschis rămâne așa cum era.';
 $ec_lang['lpn_guide_text_rptbox']='Arată raportul text scris de motorul EPANET pentru ultima simulare pe perioadă extinsă, inclusiv avertismentele și sumarul rețelei. Fiecare simulare pe perioadă extinsă îl înlocuiește; o rezolvare la un singur moment nu îl înlocuiește, iar o editare lasă raportul anterior pe loc.';
 $ec_lang['lpn_guide_text_status_box']='Listează, în ordine cronologică, fiecare schimbare din timpul ultimei simulări pe perioadă extinsă: deschiderea sau închiderea unei pompe, vane sau conducte, un bazin care începe să se umple sau să se golească ori care devine plin sau gol și orice pas de timp care nu a convergut complet. Sunt listate numai schimbările, nu fiecare pas de timp.';
-$ec_lang['lpn_guide_text_alt_box']='Arată, pentru fiecare scenariu, ce alternativă folosește în fiecare categorie, de exemplu Fizic, Cerere și Activarea elementelor, precum și opțiunile lui de calcul: multiplicatorul cererii, durata totală a rulării și pasul de timp hidraulic. Alternativele sunt numai pentru citire. Opțiunile de calcul ale unui scenariu pot fi tastate aici, iar un câmp necompletat folosește valoarea scenariului părinte. Deschideți-o din meniul Scenarii după ce debifați Mod de bază.';
 $ec_lang['lpn_guide_text_full_box']='Listează fiecare nod și fiecare legătură la fiecare pas de timp de raportare, în unitățile arătate în panoul Tabele. Fără simulare pe perioadă extinsă, arată soluția curentă la un singur moment. Descărcarea sau tipărirea cuprinde fiecare pas de timp, iar tabelul arată câte unul pe rând.';
 $ec_lang['lpn_guide_text_calib_box']='Compară un fișier de măsurători din teren cu rezultatele calculate în aceleași locuri și momente, câte un fișier pentru fiecare parametru. Fișierul este păstrat numai pe durata sesiunii curente și nu este salvat cu proiectul.';
 $ec_lang['lpn_guide_text_notes_popup']='Listează note despre comportamentul acestei pagini și despre ce nu face, fiecare ca un termen urmat de definiția lui. Nu modifică rețeaua.';
@@ -1020,7 +1020,6 @@ $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?<
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='De asemenea în {menu}';
 $ec_lang['lpn_guide_how_popup']='Proprietăți se deschide când selectați un element sau un text.';
-$ec_lang['lpn_guide_how_alt']='Previzualizarea alternativelor este listată la Apă, Scenarii când Mod de bază este dezactivat.';
 $ec_lang['lpn_guide_not_shown']='Acest control nu este pe ecran în acest moment.';
 // The box's two context headings. "Tables" holds the two table-help entries that used to sit only
 // in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
@@ -1475,8 +1474,20 @@ $ec_lang['lpn_pane_sel_only_none']='Nu este selectat niciun element. Selectați 
 // Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
 // scenario, with a Scenario column after ID.
 $ec_lang['lpn_pane_scn_show']='Afișează scenariile';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+
+
+
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+
+
+
+
 $ec_lang['lpn_pane_clear_override']='Șterge valoarea specifică';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -1532,20 +1543,29 @@ $ec_lang['lpn_menu_project']='Apă';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='Tot ce este specific modelării rețelelor de apă (cu excepția comenzilor de redare a animației)';
 $ec_lang['lpn_tables_menu']='Tabele';
-// Water > Change type (Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// Water > Morph (Task 781; Tom, 2026-10-14: *"I like the term 'Morph' (Transform) for this feature"*;
+// first built as Change type, Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
 // to Change node type for any asset, where if it has information that can't be ported to the new
 // type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
 // asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
 // popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
 // dev/asset-type.md.
-$ec_lang['lpn_change_type_menu']='Schimbare tip';
-$ec_lang['lpn_change_type_tip']='Schimbați nodurile selectate în joncțiuni, rezervoare sau bazine, ori legăturile selectate în conducte, pompe sau vane. Fiecare își păstrează ID-ul, poziția, conexiunile și fiecare valoare pe care o are și noul tip. Dacă s-ar pierde ceva, vi se cere mai întâi confirmarea.';
-$ec_lang['lpn_change_type_ok']='Schimbă';
+$ec_lang['lpn_morph_menu']='Schimbare tip';
+$ec_lang['lpn_morph_tip']='Schimbați nodurile selectate în joncțiuni, rezervoare sau bazine, ori legăturile selectate în conducte, pompe sau vane. Fiecare își păstrează ID-ul, poziția, conexiunile și fiecare valoare pe care o are și noul tip. Dacă s-ar pierde ceva, vi se cere mai întâi confirmarea.';
+$ec_lang['lpn_morph_ok']='Schimbă';
+// {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
+// when a node type was chosen), separated by commas.
+
+// The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
+// scenario, beside the override marker.
+
+
 $ec_lang['lpn_change_type_lost']='Aceste valori se vor pierde:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
 $ec_lang['lpn_change_type_key']='Fiecare linie: ID: proprietatea și valoarea care s-ar pierde';
 $ec_lang['lpn_change_type_line']='{id}: {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, în scenariul {scenario}';
+
 $ec_lang['lpn_change_type_more']='Și încă {n}.';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.
@@ -1614,6 +1634,32 @@ $ec_lang['lpn_confirm_delete_network']='Ștergeți fiecare nod, conductă și et
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='Găsire și înlocuire';
+// Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
+// placement are never pasted.
+
+
+
+
+
+
+
+
+
+
+// The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
+// opens the in-place editor; Reset position sends a dragged label or an attached Text home.
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_find_title']='Găsire și înlocuire';
 $ec_lang['lpn_find_scope']='Ce se caută';
 $ec_lang['lpn_find_scope_all']='Toate';
@@ -2056,6 +2102,8 @@ $ec_lang['lpn_status_inp_exported_picture']='S-a exportat {zip}, care conține f
 $ec_lang['lpn_status_inp_exported_no_picture']='S-a exportat {file}. Imaginea de fundal nu a putut fi salvată, deci fișierul .inp nu indică niciuna; în EPANET, adăugați-o cu Vizualizare, Fundal, Încărcare.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+
+
 $ec_lang['lpn_inp_export_differences']='{n} lucruri pe care formatul .inp nu le poate păstra.';
 $ec_lang['lpn_inp_export_difference_one']='Un lucru pe care formatul .inp nu îl poate păstra.';
 $ec_lang['lpn_inp_export_refused']='Acest proiect nu poate fi scris ca fișier EPANET: {detail}';
@@ -3045,6 +3093,7 @@ $ec_lang['lpn_scenario_overrides']='Nr. de valori specifice';
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='Inelul auriu înseamnă că acest element are o valoare specifică în scenariul {name}.';
+
 $ec_lang['lpn_scenario_overrides_tip']='Fiecare valoare specifică este marcată pe hartă cu un inel auriu. Comutați la {base} sau la alt scenariu părinte pentru a vedea desenul fără ele.';
 $ec_lang['lpn_scenario_menu']='Scenarii';
 $ec_lang['lpn_scenario_tip']='Setul de valori pe care desenul le arată și pe care pagina le rezolvă acum. Faceți clic pentru a schimba scenariile, sau pentru a adăuga, redenumi sau șterge unul.';
@@ -3053,10 +3102,11 @@ $ec_lang['lpn_scenario_new_name']='Scenariul {n}';
 $ec_lang['lpn_scenario_prompt_name']='Nume pentru acest scenariu';
 $ec_lang['lpn_scenario_rename']='Redenumire scenariu…';
 $ec_lang['lpn_scenario_delete']='Ștergere scenariu';
-$ec_lang['lpn_scenario_delete_confirm']='Ștergeți scenariul {name} și valorile lui specifice ({n})? Desenul propriu-zis nu este modificat.';
-$ec_lang['lpn_scenario_override']='Valoare specifică în acest scenariu';
+
+
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='Bifat înseamnă că acest scenariu înlocuiește valoarea părintelui pentru această valoare, chiar dacă numărul este același. Debifați caseta pentru a folosi valoarea părintelui.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3067,31 +3117,142 @@ $ec_lang['lpn_scenario_deactivated']='{id} este exclus din rețea în {scenario}
 $ec_lang['lpn_scenario_delete_in_base']='Pentru a-l elimina din desen, ștergeți-l în scenariul {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} este șters. Făcea parte numai din {scenario}.';
 $ec_lang['lpn_scenario_delete_blocked']='{id} nu este șters, deoarece legătura {link} se termină la el, iar acea legătură există și în afara scenariului {scenario}. Pentru a le șterge pe amândouă, ștergeți-le în scenariul {base}.';
-$ec_lang['lpn_scenario_push_btn']='Aplică valorile de Bază la toate scenariile';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Fiecare scenariu revine la valoarea de Bază pentru proprietățile ale căror etichete sunt afișate acum. Valorile introduse pentru ele în orice scenariu sunt eliminate.';
 $ec_lang['lpn_scenario_basic']='Mod de bază';
 $ec_lang['lpn_scenario_basic_tip']='Bifat: un scenariu constă doar din valorile stabilite în el. Debifat: acest meniu oferă și tabelul de previzualizare a Alternativelor, care arată cum sunt grupate acele valori pe categorii, și permite unui scenariu să aibă o durată totală de rulare și un pas de timp hidraulic separate. Opiniile despre această funcție sunt binevenite.';
-$ec_lang['lpn_alt_title']='Previzualizare Alternative';
-$ec_lang['lpn_alt_calc_options']='Opțiuni de calcul';
-$ec_lang['lpn_alt_note']='Baza folosește alternativa Bază a fiecărei categorii. Fiecare scenariu are o alternativă separată, subordonată alternativei Bază, pentru orice categorie modificată. Numărul este numărul de valori modificate. Ultimele trei coloane sunt opțiuni de calcul: introduceți o valoare pentru scenariu sau lăsați gol pentru a folosi valoarea părinte. Valorile proiectului se află în Setări, Calcul, Timp.';
-$ec_lang['lpn_scenario_duration_tip']='Lăsați gol pentru a moșteni de la părinte. O durată totală de rulare de 0:00 este o rulare în regim permanent.';
-$ec_lang['lpn_scenario_hyd_step_tip']='Lăsați gol pentru a moșteni de la părinte.';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_time_scn_overrides']='Valori specifice scenariului:';
+
+
+
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+
+
+
+
+
+
+
+
+
+
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+
+
+
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_alt_cat_physical']='Fizic';
 $ec_lang['lpn_alt_cat_demand']='Cerință';
 $ec_lang['lpn_alt_cat_topology']='Activarea elementelor';
+
 $ec_lang['lpn_alt_cat_initial']='Setări inițiale';
 $ec_lang['lpn_alt_cat_constituent']='Constituent chimic';
 $ec_lang['lpn_alt_cat_fireflow']='Debit de incendiu';
 $ec_lang['lpn_alt_cat_energy']='Cost energie';
 $ec_lang['lpn_alt_cat_userdata']='Proprietăți personalizate';
 $ec_lang['lpn_alt_cat_text']='Text';
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Faceți ca fiecare scenariu să folosească valorile de Bază pentru aceste proprietăți? Valorile introduse pentru ele în orice scenariu sunt eliminate. Puteți anula această acțiune.';
-$ec_lang['lpn_scenario_push_scenarios']='Scenarii afectate:';
-$ec_lang['lpn_scenario_push_values']='Valori eliminate:';
-$ec_lang['lpn_scenario_push_none']='Niciun scenariu nu înlocuiește Baza pentru vreuna dintre aceste proprietăți, deci nimic nu s-ar schimba. Nimic nu este eliminat.';
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. Test de debit: Static';
@@ -3231,6 +3392,8 @@ $ec_lang['lpn_time_run_fell_back']='În schimb, numerele de pe ecran provin din 
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='Aceste comenzi numesc un element care nu mai este în acest proiect, deci au fost omise: {ids}';
 $ec_lang['lpn_control_unreadable_note']='Aceste comenzi nu au putut fi citite, deci au fost omise: {ids}';
+
+
 $ec_lang['lpn_rule_dangling_note']='Aceste reguli indică un element care nu mai este în acest proiect, deci au fost ignorate la această rulare: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='Aceste reguli nu au putut fi citite, deci au fost ignorate la această rulare: {ids}';
 $ec_lang['lpn_settings_text_size']='Dimensiune text (pixeli)';
@@ -3783,9 +3946,7 @@ $ec_lang['lpn_energy_curve_note']='Aceste pompe indică o curbă de eficiență 
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Rang';
 $ec_lang['lpn_labels_col_drop']='Omis';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -4010,6 +4171,8 @@ $ec_lang['lpn_library_pattern_default_mark']='(implicit)';
 $ec_lang['lpn_library_pattern_default_tip']='Modelul de cerință implicit. Schimbați-l la Setări, Model de cerință implicit.';
 $ec_lang['lpn_library_pattern_default_deleted_to']='Modelul {id} era modelul de cerință implicit. Joncțiunile fără model folosesc acum modelul {now}.';
 $ec_lang['lpn_library_pattern_default_deleted_none']='Modelul {id} era modelul de cerință implicit. Joncțiunile fără model folosesc acum o cerință constantă.';
+
+
 $ec_lang['lpn_library_control_add']='Adaugă o comandă';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -4572,4 +4735,4 @@ $ec_lang['lpn_snip_tip_eraser']='Radieră: faceți clic pe un trasaj pentru a-l 
 $ec_lang['lpn_snip_tip_undo']='Anulare (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Refacere (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Copiază (Ctrl+C)';
-$ec_lang['lpn_screenshot_scale_tip']='Dimensiunea imaginii ca multiplu al zonei de pe ecran. O valoare mai mare dă o imagine mai clară și un fișier mai mare.';
+$ec_lang['lpn_screenshot_scale_tip']='Dimensiunea imaginii ca multiplu al zonei de pe ecran. O valoare mai mare dă o imagine mai clară și un fișier mai mare.';$ec_lang['lpn_guide_text_alt_box']='Arată, pentru fiecare scenariu, ce alternativă folosește în fiecare categorie, de exemplu Fizic, Cerere și Activarea elementelor, precum și opțiunile lui de calcul: multiplicatorul cererii, durata totală a rulării și pasul de timp hidraulic. Alternativele sunt numai pentru citire. Opțiunile de calcul ale unui scenariu pot fi tastate aici, iar un câmp necompletat folosește valoarea scenariului părinte. Deschideți-o din meniul Scenarii după ce debifați Mod de bază.';$ec_lang['lpn_guide_how_alt']='Previzualizarea alternativelor este listată la Apă, Scenarii când Mod de bază este dezactivat.';$ec_lang['lpn_alt_calc_options']='Opțiuni de calcul';$ec_lang['lpn_scenario_duration_tip']='Lăsați gol pentru a moșteni de la părinte. O durată totală de rulare de 0:00 este o rulare în regim permanent.';$ec_lang['lpn_scenario_hyd_step_tip']='Lăsați gol pentru a moșteni de la părinte.';

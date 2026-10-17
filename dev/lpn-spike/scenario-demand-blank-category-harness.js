@@ -43,6 +43,9 @@ global.confirm = global.window.confirm = function () { return true; };
 
 const L = loadLoopedNetwork(
 	"\t\timportInp: importInpFromFile, getDoc: function () { return doc; },\n" +
+	// A scenario's values as it resolves them: its own map, or the alternative an override stored
+	// (2026-10-12).
+	"\t\town: function (s) { return resolvedOverrides(s); },\n" +
 	"\t\tserialize: serializeProject, applySaved: applySaved,\n" +
 	"\t\teffective: effective, setProp: setProp, hasOverride: hasOverride, ovKey: ovKey,\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario,\n" +
@@ -97,7 +100,7 @@ function table(id) {
 	};
 }
 function type(input, v) { input.value = v; input._listeners.change[0](); }
-function ovOf(id) { return L.activeScenario().overrides[L.ovKey(J(id))] || {}; }
+function ovOf(id) { return L.own(L.activeScenario())[L.ovKey(J(id))] || {}; }
 
 // J4 comes from multi-category.inp's [JUNCTIONS] row alone -- no [DEMANDS] entry at all, so it is
 // exactly Tom's precondition: one demand row, `demandCategory` never set (undefined, not even '').

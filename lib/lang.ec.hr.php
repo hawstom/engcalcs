@@ -708,6 +708,7 @@ $ec_lang['lpn_node_customers_tip']='Popis korisnika dodanih ovdje jer je ovo bio
 $ec_lang['lpn_node_customers_sum']='{total} {unit} od korisnika ({n})';
 $ec_lang['lpn_customer_detached']='⚠ Ovaj korisnik nije povezan s cijevi, pa njegova potražnja nije uključena u rezultate. Izbrišite ga, ili nacrtajte cijev i premjestite korisnika na nju.';
 $ec_lang['lpn_customer_fixed_head']='⚠ Bliži kraj te cijevi ima fiksnu vodenu površinu, pa ova potražnja ne utječe na simulaciju.';
+
 $ec_lang['lpn_customer_detached_count']='Korisnici koji nisu povezani s cijevi ({n}). Njihova potražnja nije uzeta u obzir.';
 $ec_lang['lpn_meter_pick_pipe']='Sada odaberite cijev ili čvor koji opskrbljuje ovog korisnika. Korisnik ostaje ondje gdje ste ga postavili. Pritisnite Escape za odustajanje.';
 $ec_lang['lpn_inp_export_flat_customers']='EPANET datoteka nema korisnika. Potražnja korisnika u ovom projektu ({n}) zapisuje se kao redak potražnje na čvoru kojemu je svaki korisnik dodijeljen, nazvan etiketom korisnika. Datoteka ne bilježi samog korisnika: njegov položaj, cijev koja ga opskrbljuje, mjesto duž te cijevi gdje se priključak spaja ni koliko priključaka predstavlja. Ti podaci ostaju u projektu; spremite datoteku projekta da ih zadržite.';
@@ -992,7 +993,6 @@ $ec_lang['lpn_guide_text_contour_box']='Upravlja konturnim prikazom na karti, na
 $ec_lang['lpn_guide_text_scncmp_box']='Rješava svaki scenarij na kopiji crteža i za svaki tablično prikazuje broj zamjena, najniži tlak i najveću brzinu. Ne mijenja projekt, a otvoreni scenarij ostaje kakav je bio.';
 $ec_lang['lpn_guide_text_rptbox']='Prikazuje tekstualni izvještaj koji je napisao EPANET mehanizam za posljednju simulaciju produljenog razdoblja, uključujući upozorenja i sažetak mreže. Svaka simulacija produljenog razdoblja zamjenjuje ga; rješavanje u jednom trenutku ne zamjenjuje ga, a ni uređivanje ne briše prethodni izvještaj.';
 $ec_lang['lpn_guide_text_status_box']='Navodi, redom po vremenu, svaku promjenu tijekom posljednje simulacije produljenog razdoblja: otvaranje ili zatvaranje pumpe, ventila ili cijevi, početak punjenja ili pražnjenja spremnika ili njegovo punjenje ili pražnjenje do kraja te svaki vremenski korak koji nije potpuno konvergirao. Navode se samo promjene, a ne svaki vremenski korak.';
-$ec_lang['lpn_guide_text_alt_box']='Prikazuje za svaki scenarij koju alternativu koristi u svakoj kategoriji, primjerice Fizičko, Potražnja i Aktivacija elemenata, te njegove opcije izračuna: množitelj potražnje, ukupno vrijeme rada i hidraulički vremenski korak. Alternative su samo za čitanje. Opcije izračuna scenarija mogu se upisati ovdje, a prazno polje koristi vrijednost nadređenog scenarija. Otvara se iz izbornika Scenariji nakon isključivanja Osnovnog načina.';
 $ec_lang['lpn_guide_text_full_box']='Navodi svaki čvor i svaku vezu u svakom izvještajnom vremenskom koraku, u jedinicama prikazanima na ploči Tablice. Bez simulacije produljenog razdoblja prikazuje trenutno rješenje u jednom trenutku. Preuzimanje ili ispis obuhvaća sve vremenske korake, a tablica prikazuje jedan po jedan.';
 $ec_lang['lpn_guide_text_calib_box']='Uspoređuje datoteku terenskih mjerenja s izračunanim rezultatima na istim lokacijama i u istim trenucima, po jedna datoteka za svaki parametar. Datoteka se drži samo za tekuću sesiju i ne sprema se s projektom.';
 $ec_lang['lpn_guide_text_notes_popup']='Navodi napomene o tome kako se ova stranica ponaša i što ne radi, svaku kao pojam iza kojeg slijedi njegova definicija. Ne mijenja mrežu.';
@@ -1020,7 +1020,6 @@ $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?<
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='Također u izborniku {menu}';
 $ec_lang['lpn_guide_how_popup']='Svojstva se otvaraju kada odaberete element ili tekst.';
-$ec_lang['lpn_guide_how_alt']='Pregled alternativa naveden je pod Voda, Scenariji kada je Osnovni način isključen.';
 $ec_lang['lpn_guide_not_shown']='Ova kontrola trenutačno nije na zaslonu.';
 // The box's two context headings. "Tables" holds the two table-help entries that used to sit only
 // in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
@@ -1475,8 +1474,20 @@ $ec_lang['lpn_pane_sel_only_none']='Nijedan element nije odabran. Najprije odabe
 // Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
 // scenario, with a Scenario column after ID.
 $ec_lang['lpn_pane_scn_show']='Prikaži scenarije';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+
+
+
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+
+
+
+
 $ec_lang['lpn_pane_clear_override']='Ukloni vrijednost scenarija';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -1532,20 +1543,29 @@ $ec_lang['lpn_menu_project']='Voda';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='Sve što je specifično za modeliranje vodovodne mreže (osim tipki za reprodukciju animacije)';
 $ec_lang['lpn_tables_menu']='Tablice';
-// Water > Change type (Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// Water > Morph (Task 781; Tom, 2026-10-14: *"I like the term 'Morph' (Transform) for this feature"*;
+// first built as Change type, Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
 // to Change node type for any asset, where if it has information that can't be ported to the new
 // type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
 // asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
 // popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
 // dev/asset-type.md.
-$ec_lang['lpn_change_type_menu']='Promijeni vrstu';
-$ec_lang['lpn_change_type_tip']='Promijenite vrstu odabranih čvorova (čvor, rezervoar ili spremnik) ili vodova (cijev, pumpa ili ventil). Svaki zadržava svoj ID, položaj, spojeve i svaku vrijednost koju ima i nova vrsta. Ako bi se nešto izgubilo, prvo se traži potvrda.';
-$ec_lang['lpn_change_type_ok']='Promijeni';
+$ec_lang['lpn_morph_menu']='Promijeni vrstu';
+$ec_lang['lpn_morph_tip']='Promijenite vrstu odabranih čvorova (čvor, rezervoar ili spremnik) ili vodova (cijev, pumpa ili ventil). Svaki zadržava svoj ID, položaj, spojeve i svaku vrijednost koju ima i nova vrsta. Ako bi se nešto izgubilo, prvo se traži potvrda.';
+$ec_lang['lpn_morph_ok']='Promijeni';
+// {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
+// when a node type was chosen), separated by commas.
+
+// The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
+// scenario, beside the override marker.
+
+
 $ec_lang['lpn_change_type_lost']='Ove vrijednosti bit će izgubljene:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
 $ec_lang['lpn_change_type_key']='Svaki redak: ID: svojstvo i vrijednost koji bi se izgubili';
 $ec_lang['lpn_change_type_line']='{id}: {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, u scenariju {scenario}';
+
 $ec_lang['lpn_change_type_more']='I još {n}.';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.
@@ -1614,6 +1634,32 @@ $ec_lang['lpn_confirm_delete_network']='Izbrisati svaki čvor, cijev i tekst u o
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='Pronađi i zamijeni';
+// Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
+// placement are never pasted.
+
+
+
+
+
+
+
+
+
+
+// The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
+// opens the in-place editor; Reset position sends a dragged label or an attached Text home.
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_find_title']='Pronađi i zamijeni';
 $ec_lang['lpn_find_scope']='Što pretražiti';
 $ec_lang['lpn_find_scope_all']='Sve';
@@ -2056,6 +2102,8 @@ $ec_lang['lpn_status_inp_exported_picture']='Izvezeno {zip}, koji sadrži EPANET
 $ec_lang['lpn_status_inp_exported_no_picture']='Izvezeno {file}. Pozadinsku sliku nije bilo moguće spremiti, pa .inp ne navodi nijednu; u EPANET-u je dodajte pomoću Pogled > Pozadina > Učitaj.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+
+
 $ec_lang['lpn_inp_export_differences']='{n} stvari koje .inp format ne može sadržavati.';
 $ec_lang['lpn_inp_export_difference_one']='Jedna stvar koju .inp format ne može sadržavati.';
 $ec_lang['lpn_inp_export_refused']='Ovaj projekt se ne može zapisati kao EPANET datoteka: {detail}';
@@ -3045,6 +3093,7 @@ $ec_lang['lpn_scenario_overrides']='Br. zamjena';
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='Jantarni prsten znači da ovaj element ima zamjensku vrijednost u scenariju {name}.';
+
 $ec_lang['lpn_scenario_overrides_tip']='Svaka zamjena označena je na karti jantarnim prstenom. Prebacite se na {base} ili drugi nadređeni scenarij da vidite crtež bez njih.';
 $ec_lang['lpn_scenario_menu']='Scenariji';
 $ec_lang['lpn_scenario_tip']='Skup vrijednosti koje crtež trenutačno prikazuje i koje stranica upravo rješava. Kliknite da promijenite scenarij, ili da ga dodate, preimenujete ili izbrišete.';
@@ -3053,10 +3102,11 @@ $ec_lang['lpn_scenario_new_name']='Scenarij {n}';
 $ec_lang['lpn_scenario_prompt_name']='Naziv ovog scenarija';
 $ec_lang['lpn_scenario_rename']='Preimenuj scenarij…';
 $ec_lang['lpn_scenario_delete']='Izbriši scenarij';
-$ec_lang['lpn_scenario_delete_confirm']='Izbrisati scenarij {name} i njegove zamjenske vrijednosti ({n})? Sam crtež se ne mijenja.';
-$ec_lang['lpn_scenario_override']='Zamjena u ovom scenariju';
+
+
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='Odabrano znači da ovaj scenarij zamjenjuje nadređeni za ovu vrijednost, čak i kada je broj isti. Isključite okvir da se koristi vrijednost nadređenog.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3067,31 +3117,142 @@ $ec_lang['lpn_scenario_deactivated']='{id} je isključen iz mreže u scenariju {
 $ec_lang['lpn_scenario_delete_in_base']='Da biste ga uklonili iz crteža, izbrišite ga u scenariju {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} je izbrisan. Bio je dio samo scenarija {scenario}.';
 $ec_lang['lpn_scenario_delete_blocked']='{id} nije izbrisan jer na njemu završava veza {link}, a ta veza postoji i izvan scenarija {scenario}. Da biste izbrisali oboje, izbrišite ih u scenariju {base}.';
-$ec_lang['lpn_scenario_push_btn']='Primijeni vrijednosti Baze na sve scenarije';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Svaki scenarij vraća se na vrijednost iz Baze za svojstva čije se oznake trenutačno prikazuju. Vrijednosti koje pripadaju samo tim scenarijima se odbacuju.';
 $ec_lang['lpn_scenario_basic']='Osnovni način';
 $ec_lang['lpn_scenario_basic_tip']='Označeno: scenarij se sastoji samo od vrijednosti postavljenih u njemu. Neoznačeno: ovaj izbornik nudi i tablicu Pregled alternativa, koja prikazuje kako su te vrijednosti grupirane po kategorijama, te omogućuje da scenarij ima zasebno ukupno vrijeme rada i hidraulički vremenski korak. Povratne informacije o ovoj značajci su dobrodošle.';
-$ec_lang['lpn_alt_title']='Pregled alternativa';
-$ec_lang['lpn_alt_calc_options']='Opcije proračuna';
-$ec_lang['lpn_alt_note']='Baza koristi Osnovnu alternativu svake kategorije. Svaki scenarij ima zasebnu alternativu, potomka Osnovne alternative, za svaku promijenjenu kategoriju. Broj je količina promijenjenih vrijednosti. Posljednja tri stupca su opcije proračuna: unesite vrijednost za scenarij ili ostavite prazno da se koristi vrijednost nadređenog. Vrijednosti projekta nalaze se u Postavke, Proračun, Vrijeme.';
-$ec_lang['lpn_scenario_duration_tip']='Ostavite prazno da se naslijedi od nadređenog. Ukupno vrijeme rada 0:00 je stacionarno pokretanje.';
-$ec_lang['lpn_scenario_hyd_step_tip']='Ostavite prazno da se naslijedi od nadređenog.';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_time_scn_overrides']='Vrijednosti scenarija:';
+
+
+
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+
+
+
+
+
+
+
+
+
+
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+
+
+
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_alt_cat_physical']='Fizičko';
 $ec_lang['lpn_alt_cat_demand']='Potražnja';
 $ec_lang['lpn_alt_cat_topology']='Aktivacija elemenata';
+
 $ec_lang['lpn_alt_cat_initial']='Početne postavke';
 $ec_lang['lpn_alt_cat_constituent']='Sastojak';
 $ec_lang['lpn_alt_cat_fireflow']='Protupožarni protok';
 $ec_lang['lpn_alt_cat_energy']='Trošak energije';
 $ec_lang['lpn_alt_cat_userdata']='Prilagođena svojstva';
 $ec_lang['lpn_alt_cat_text']='Tekst';
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Postaviti da svi scenariji koriste vrijednosti iz Baze za ova svojstva? Vrijednosti koje pripadaju samo tim scenarijima bit će odbačene. Ovo možete poništiti.';
-$ec_lang['lpn_scenario_push_scenarios']='Scenariji na koje ovo utječe:';
-$ec_lang['lpn_scenario_push_values']='Odbačene vrijednosti:';
-$ec_lang['lpn_scenario_push_none']='Nijedan scenarij ne zamjenjuje Bazu ni za jedno od ovih svojstava, pa se ništa ne bi promijenilo. Ništa se ne odbacuje.';
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. Test protoka: statički';
@@ -3231,6 +3392,8 @@ $ec_lang['lpn_time_run_fell_back']='Brojevi na zaslonu umjesto toga dolaze iz ug
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='Ove kontrole imenuju element kojeg više nema u ovom projektu, pa su izostavljene: {ids}';
 $ec_lang['lpn_control_unreadable_note']='Ove kontrole nije bilo moguće pročitati, pa su izostavljene: {ids}';
+
+
 $ec_lang['lpn_rule_dangling_note']='Ova pravila navode element koji više nije u ovom projektu, pa su u ovom pokretanju zanemarena: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='Ova pravila nije bilo moguće pročitati, pa su u ovom pokretanju zanemarena: {ids}';
 $ec_lang['lpn_settings_text_size']='Veličina teksta (pikseli)';
@@ -3783,9 +3946,7 @@ $ec_lang['lpn_energy_curve_note']='Ove pumpe pozivaju krivulju učinkovitosti be
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Poredak';
 $ec_lang['lpn_labels_col_drop']='Izostavi';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -4010,6 +4171,8 @@ $ec_lang['lpn_library_pattern_default_mark']='(zadano)';
 $ec_lang['lpn_library_pattern_default_tip']='Zadani obrazac potražnje. Promijenite ga u Postavke, Zadani obrazac potražnje.';
 $ec_lang['lpn_library_pattern_default_deleted_to']='Obrazac {id} bio je zadani obrazac potražnje. Čvorovi bez obrasca sada koriste obrazac {now}.';
 $ec_lang['lpn_library_pattern_default_deleted_none']='Obrazac {id} bio je zadani obrazac potražnje. Čvorovi bez obrasca sada koriste konstantnu potražnju.';
+
+
 $ec_lang['lpn_library_control_add']='Dodaj kontrolu';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -4572,4 +4735,4 @@ $ec_lang['lpn_snip_tip_eraser']='Gumica: kliknite potez da ga uklonite (E)';
 $ec_lang['lpn_snip_tip_undo']='Poništi (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Ponovi (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Kopiraj (Ctrl+C)';
-$ec_lang['lpn_screenshot_scale_tip']='Veličina slike kao višekratnik područja na zaslonu. Veća je oštrija i daje veću datoteku.';
+$ec_lang['lpn_screenshot_scale_tip']='Veličina slike kao višekratnik područja na zaslonu. Veća je oštrija i daje veću datoteku.';$ec_lang['lpn_guide_text_alt_box']='Prikazuje za svaki scenarij koju alternativu koristi u svakoj kategoriji, primjerice Fizičko, Potražnja i Aktivacija elemenata, te njegove opcije izračuna: množitelj potražnje, ukupno vrijeme rada i hidraulički vremenski korak. Alternative su samo za čitanje. Opcije izračuna scenarija mogu se upisati ovdje, a prazno polje koristi vrijednost nadređenog scenarija. Otvara se iz izbornika Scenariji nakon isključivanja Osnovnog načina.';$ec_lang['lpn_guide_how_alt']='Pregled alternativa naveden je pod Voda, Scenariji kada je Osnovni način isključen.';$ec_lang['lpn_alt_calc_options']='Opcije proračuna';$ec_lang['lpn_scenario_duration_tip']='Ostavite prazno da se naslijedi od nadređenog. Ukupno vrijeme rada 0:00 je stacionarno pokretanje.';$ec_lang['lpn_scenario_hyd_step_tip']='Ostavite prazno da se naslijedi od nadređenog.';

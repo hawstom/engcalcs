@@ -97,13 +97,6 @@ const EC_TABLE_PARITY_ADVISORY = false;
 const EC_TABLE_PARITY_EXEMPT = [
     // (a) the scenario override marker: a statement about a row, drawn under it in the popup and
     // painted onto the cell in the table. Every type carries it, so every type declares it.
-    'junction/lpn_scenario_override' => 'a. the override marker is about a row, not a row',
-    'reservoir/lpn_scenario_override' => 'a. the override marker is about a row, not a row',
-    'tank/lpn_scenario_override' => 'a. the override marker is about a row, not a row',
-    'pipe/lpn_scenario_override' => 'a. the override marker is about a row, not a row',
-    'pump/lpn_scenario_override' => 'a. the override marker is about a row, not a row',
-    'valve/lpn_scenario_override' => 'a. the override marker is about a row, not a row',
-    'text/lpn_scenario_override' => 'a. the override marker is about a row, not a row',
     // (c) custom properties: paneCols() adds one column per doc.customProps entry (the `cp` columns),
     // so they are in every table already and there is no literal for the scan to match.
     'junction/fn:customPropLabel' => 'c. paneCols() builds one cp column per custom property',
@@ -135,6 +128,15 @@ const EC_TABLE_PARITY_EXEMPT = [
     // elements -- the meters attached to it -- and those have a table of their own, with a row per
     // customer. A column here would be a count in a cell that nothing can edit.
     'junction/lpn_node_customers' => 'e. a roll-up of the Customers table\'s own rows, not a junction property',
+    // (f) the table IS the type (Morph, Task 781). Each table holds one type, so a Type column would
+    // say the same word on every row; with Show scenarios a morphed asset's scenario row sits in the
+    // table of the type it is in that scenario, which is how the table states it.
+    'junction/lpn_field_type' => 'f. each table is one type; a morphed row sits in its own type\'s table',
+    'reservoir/lpn_field_type' => 'f. each table is one type; a morphed row sits in its own type\'s table',
+    'tank/lpn_field_type' => 'f. each table is one type; a morphed row sits in its own type\'s table',
+    'pipe/lpn_field_type' => 'f. each table is one type; a morphed row sits in its own type\'s table',
+    'pump/lpn_field_type' => 'f. each table is one type; a morphed row sits in its own type\'s table',
+    'valve/lpn_field_type' => 'f. each table is one type; a morphed row sits in its own type\'s table',
     // (d) a label that arrives as a nested helper's parameter.
     'text/fn:labelText' => 'd. alignRow() is declared inside renderLabelFields(); the two rows it '
         . 'builds are the lpn_field_text_align and lpn_field_text_valign columns',
