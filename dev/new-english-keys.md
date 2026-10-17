@@ -67,7 +67,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED English: 'Copy with column headings'
   @@ NEEDS RULING
 - **`lpn_settings_hover_card_tip`**
-  > Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
+  > Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
   *The finding:* 'at any scale, fit or not' leaves 'fit' with no subject: fit what? The setting makes the hover card show the label even when the on-map label was dropped for lack of room (js/looped-network.js:51225). 'fit' also collides with 'zoom to fit'.
   1. whether or not the label fits on the map at the current zoom
   2. whether or not the map is zoomed to fit the network
@@ -641,7 +641,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**62 still to read**, of 130 new keys across 22 unmerged branch(es).
+**62 still to read**, of 130 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -652,11 +652,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### docs/features-update (`6ecfd181a`) — adds no English strings
-
-### feat/basemap-outdoors (`5b8059020`) — already merged into docs/features-update; its strings are listed there
-
-### feat/bentley-interop (`1ef30b7b5`) — already merged into docs/features-update; its strings are listed there
+### docs/features-update (`26ba24ba9`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -1047,7 +1043,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Searching, links, and what is remembered
   @@ NEEDS RULING
 
-### feat/hover-props (`667111d61`) — adds no English strings
+### feat/hover-props (`820c695c4`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -1071,20 +1067,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/manage-override (`5a5f90f52`) — already merged into docs/features-update; its strings are listed there
-
-### feat/match-property (`05bda7651`) — already merged into docs/features-update; its strings are listed there
-
-### feat/scenario-box (`d4d566a71`) — already merged into docs/features-update; its strings are listed there
-
-### feat/scenarios-menu (`09cddaf19`) — already merged into merge/1016e; its strings are listed there
-
-### feat/theme-dark (`ced0c2db9`) — already merged into docs/features-update; its strings are listed there
-
-### fix/elevation-override (`515322bc3`) — already merged into docs/features-update; its strings are listed there
-
-### fix/units-revert (`7c252bbcd`) — already merged into merge/1016e; its strings are listed there
-
-### fix/zero-demand-solve (`fbfbc28b6`) — already merged into docs/features-update; its strings are listed there
-
-### merge/1016e (`14ad39485`) — adds no English strings
+### feat/scenarios-menu (`6b34a89b5`) — adds no English strings
