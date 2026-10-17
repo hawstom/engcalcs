@@ -228,6 +228,8 @@ $ovAllowed = [
     'scenarioDeletePlan', 'storedOverrideCount',
     // the down triangle (Task 790): the holder each child scenario writes to, read, and on a yes cleared
     'childOverrideHolders', 'clearChildOverrides',
+    // Manage overrides: one of a scenario's own items cleared from the very holder it was listed from
+    'ovlClearItems',
     // a new Base of its own: a snapshot of Base, written once into the record it creates
     'baseSnapshotOf', 'storeBaseSnapshot',
     // Merge upward (Task 801): one alternative's own values read, written into an ancestor, removed from it

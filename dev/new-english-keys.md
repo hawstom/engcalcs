@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**146 still to read on master**, of 171 untranslated keys, of 2793 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**154 still to read on master**, of 177 untranslated keys, of 2799 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -198,7 +198,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (171, 146 to read @@ NEEDS RULING)
+## lpn_  (177, 154 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -266,6 +266,21 @@ never edits a synonym.
 - **`lpn_morph_other_kind`**
   > A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}
   @@ NEEDS RULING
+- **`lpn_ovl_bubble_moved`**
+  > {quantity}, moved or resized
+  @@ NEEDS RULING
+- **`lpn_ovl_bubble_off`**
+  > Not on the map
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_all`**
+  > Clear all overrides
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_all_ask`**
+  > Clear all the overrides ({n}) of {name}? Each value returns to the inherited value. Undo reverses this.
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_selected`**
+  > Clear selected overrides
+  @@ NEEDS RULING
 - **`lpn_ovl_col_inherited`**
   > Inherited value
   @@ NEEDS RULING
@@ -279,7 +294,10 @@ never edits a synonym.
   > {category}: {alternative}
   @@ NEEDS RULING
 - **`lpn_ovl_note`**
-  > These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Click an ID to go to the asset on the map.
+  > These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Clear an override to restore the inherited value; Undo reverses it. Select an ID to go to the asset on the map.
+  @@ NEEDS RULING
+- **`lpn_ovl_pick_tip`**
+  > Select this override for the Clear selected overrides button.
   @@ NEEDS RULING
 - **`lpn_ovl_same`**
   > (same)
@@ -288,7 +306,7 @@ never edits a synonym.
   > Equal to the inherited value. It is still an override, and it is counted.
   @@ NEEDS RULING
 - **`lpn_ovl_title`**
-  > Overrides: {name}
+  > Manage overrides: {name}
   @@ NEEDS RULING
 - **`lpn_ovm_child_ask`**
   > Clear child overrides ({n} total)?
@@ -612,14 +630,14 @@ never edits a synonym.
   > Scenario {name}
   @@ NEEDS RULING
 - **`lpn_sm_list_overrides`**
-  > List overrides
-  _Ruled 2026-10-15: Approved._
+  > Manage overrides
+  @@ NEEDS RULING
 - **`lpn_sm_list_overrides_none`**
   > This scenario has no overrides.
   _Ruled 2026-10-15: Revised. But should be obvious when count = 0._
 - **`lpn_sm_list_overrides_tip`**
-  > List the scenario's overrides by category, each with the inherited value it overrides.
-  _Ruled 2026-10-15: Revised._
+  > List the scenario's overrides by category, each with the inherited value it overrides, and clear any of them.
+  @@ NEEDS RULING
 - **`lpn_sm_make_current`**
   > Make current
   @@ NEEDS RULING
@@ -718,7 +736,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**0 still to read**, of 3 new keys across 11 unmerged branch(es).
+**2 still to read**, of 5 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -729,9 +747,15 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`1d0cd4814`) — adds no English strings
+### chore/plain-sentences (`8301b0524`) — adds no English strings
 
-### feat/description-lines (`7e68251a3`) — adds no English strings
+### feat/basemap-outdoors (`2a45b1cc2`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_basemap_outdoors_show`**
+  > Show outdoors map
+  @@ NEEDS RULING
+
+### feat/bentley-interop (`9b9f74f33`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -757,6 +781,18 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
+### feat/manage-override (`c07f5b4d6`) — adds no English strings
+
 ### feat/match-property (`05bda7651`) — adds no English strings
+
+### feat/pattern-axis (`6f37c6eed`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_library_pattern_axis_step`**
+  > Step
+  @@ NEEDS RULING
+
+### feat/scenario-box (`d49f40568`) — adds no English strings
+
+### fix/elevation-override (`9b9f74f33`) — adds no English strings
 
 ### fix/zero-demand-solve (`fbfbc28b6`) — adds no English strings

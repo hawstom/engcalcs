@@ -76,7 +76,7 @@ function checkPresets(where) {
 	check(JSON.stringify(names.slice(1)) === JSON.stringify(TOM), where + ': the menu lists them in Tom\'s order',
 		JSON.stringify(names));
 	// Tom's order (2026-10-11): "Scenario manager..., -, Basic mode, New, Rename, Delete, -, Apply Base,
-	// list of scenarios." Apply Base values and its rule are retired (Task 801, 2026-10-15). List overrides
+	// list of scenarios." Apply Base values and its rule are retired (Task 801, 2026-10-15). Manage overrides
 	// follows Delete (Tom, 2026-10-15: "Yes", reachable in Basic mode).
 	{
 		const P = global.EngCalcs.pageConfig || {};

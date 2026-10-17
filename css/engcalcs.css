@@ -1152,6 +1152,10 @@ html[lang="zh"] .ec-welcome {
 .lpn-ov-base { margin-left: 0.6em; color: var(--ec-ink-subtle); }
 /* The override list (Task 800): an override equal to the value it replaces, still counted. */
 .lpn-ovl-same { color: var(--ec-ink-muted); white-space: nowrap; }
+/* Manage overrides: a box to select each row, Clear override at its end, the two bulk clears above. */
+.lpn-ovl-bar { display: flex; flex-wrap: wrap; gap: 6px; margin: .4em 0; }
+.lpn-ovl-table th.lpn-ovl-pick, .lpn-ovl-table td.lpn-ovl-pick { width: 1.6em; padding-inline-end: 0; }
+.lpn-ovl-table td.lpn-ovl-act { white-space: nowrap; overflow-wrap: normal; text-align: end; }
 /* Feedback for the first-picked node of a pipe/pump (Tom, 2026-07-30: "otherwise there's no
    indication that anything is working") -- a wide red ring around the existing node fill/stroke,
    cleared by setPendingLinkFrom(null) in looped-network.js on completion or cancel. */
