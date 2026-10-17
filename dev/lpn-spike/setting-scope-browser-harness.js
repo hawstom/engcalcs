@@ -187,7 +187,8 @@ async function main() {
 		// they are written by one handler into one place.
 		const controls = allControls.filter((c) => c.first && (!process.env.PROBE_ONLY || c.id.includes(process.env.PROBE_ONLY)));
 		const before = await P(SNAPSHOT);
-		for (const c of controls) {
+		for (let ci = 0; ci < controls.length; ci++) {
+			const c = controls[ci];
 			if (process.env.TRACE) { console.log('  .. ' + c.id); }
 			await P(TAG);
 			const sel = `[data-probe="${c.id.replace(/"/g, '\\"')}"]`;
@@ -196,11 +197,14 @@ async function main() {
 			let observed = 'session', tried = [];
 			// The previous row's restore may still be saving (a solve it scheduled saves the project
 			// when it lands), so wait for the store to go quiet before taking this row's "before":
-			// otherwise that late save is charged to this row.
-			for (let q = 0, prev = JSON.stringify(await P(SNAPSHOT)); q < 12; q++) {
+			// otherwise that late save is charged to this row. QUIET MEANS A WHOLE SECOND UNCHANGED, not
+			// one 250 ms gap: under a loaded suite a Net3 solve outlasts that gap, and its save then
+			// landed inside the NEXT row's window (Theme, Show the run progress box), which no project
+			// write of theirs had made -- a spy on setItem saw none after the row's "before".
+			for (let q = 0, still = 0, prev = JSON.stringify(await P(SNAPSHOT)); q < 32 && still < 4; q++) {
 				await a.settle(250);
 				const now = JSON.stringify(await P(SNAPSHOT));
-				if (now === prev) { break; }
+				still = now === prev ? still + 1 : 0;
 				prev = now;
 			}
 			const snap0 = await P(SNAPSHOT);
@@ -267,6 +271,11 @@ async function main() {
 			{ const d1 = await a.dialog(); if (d1 && d1.buttons.length) { await press(d1.buttons.length - 1); await a.settle(200); } }
 			const open = await P(() => document.getElementById('lpn_settings_box').style.display !== 'none');
 			if (!open) { await a.toolbarClick(await a.lang('lpn_tool_settings')); await a.settle(300); }
+			// **A "BOTH" IS DRIVEN ONCE MORE BEFORE IT IS BELIEVED.** It is the one verdict a stray save
+			// from an earlier row can manufacture (a browser row's own write plus somebody else's
+			// project write in the same window), and a spy on setItem caught Theme's "both" with no
+			// project write of its own. A real "both" does it again; a stray one does not.
+			if (observed === 'both' && !c.retried) { c.retried = true; await a.settle(3000); ci--; continue; }
 			inventory.push({ sub: c.sub, label: c.label, declared: c.declared, observed });
 			if (observed !== c.declared) {
 				ok(`${c.sub} / ${c.label}: marker says ${c.declared}, the page stores it as ${observed}`, false, tried.join('; '));
