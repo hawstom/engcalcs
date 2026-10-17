@@ -2030,6 +2030,15 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_guide_prop_multi_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_multi_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_prop_example_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_example_def']?></dd>
 </dl></template>
+<?php // The Settings chapter (Task 785), in the entry for the Settings box. ?>
+<template id="lpn_guide_more_lpn_settings_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_set_where_term']?></dt><dd><?=$ec_lang['lpn_guide_set_where_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_set_search_term']?></dt><dd><?=$ec_lang['lpn_guide_set_search_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_set_scn_term']?></dt><dd><?=$ec_lang['lpn_guide_set_scn_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_set_units_term']?></dt><dd><?=$ec_lang['lpn_guide_set_units_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_set_assets_term']?></dt><dd><?=$ec_lang['lpn_guide_set_assets_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_set_reset_term']?></dt><dd><?=$ec_lang['lpn_guide_set_reset_def']?></dd>
+</dl></template>
 <template id="lpn_guide_more_lpn_scncmp_box"><dl>
 	<dt><?=$ec_lang['lpn_guide_cmp_cols_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_cols_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_cmp_run_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_run_def']?></dd>

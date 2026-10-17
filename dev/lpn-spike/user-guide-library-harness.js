@@ -43,7 +43,6 @@ function exampleTimes() {
 	const b = t.match(/The last closing moves to (\d+:\d\d), and Tank N2 is now emptying at (\d+:\d\d)\./);
 	return { a: a && a.slice(1), b: b && b.slice(1) };
 }
-const codes = (key) => { const out = [], re = /<code>([^<]+)<\/code>/g; let m; const h = enString(key); while ((m = re.exec(h))) { out.push(m[1]); } return out; };
 
 async function main() {
 	const env = require(path.join(L.REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
@@ -137,8 +136,10 @@ async function main() {
 		ok('Pipe types and Fittings hold none on Net1', (await libText()).indexOf(none) >= 0 && (await (async () => { await openLib('fittings'); return libText(); })()).indexOf(none) >= 0);
 		await openLib('controls');
 		const ctl = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_libbox_content input.lpn-lib-wide')).map((i) => i.value));
-		const want = codes('lpn_guide_lib_example_def');
-		ok('Controls holds the two statements the chapter quotes, in order', JSON.stringify(ctl) === JSON.stringify(want) && want.length === 2, JSON.stringify(ctl));
+		const nums = plain(enString('lpn_guide_lib_example_def')).match(/opens Link (\d+) when Node (\d+) falls below (\d+), and the second closes it when Node \d+ rises above (\d+)\./);
+		ok('Controls holds the two statements the chapter describes: Link 9 opens when Node 2 falls below 110, and closes when it rises above 140', !!nums && ctl.length === 2
+			&& new RegExp('^LINK ' + nums[1] + ' OPEN IF NODE ' + nums[2] + ' BELOW ' + nums[3] + '$').test(ctl[0]) && new RegExp('^LINK ' + nums[1] + ' CLOSED IF NODE ' + nums[2] + ' ABOVE ' + nums[4] + '$').test(ctl[1]), JSON.stringify(ctl));
+		const want = ctl;
 		ok('...each marked ' + await T('lpn_library_control_ok'), (await libText()).split(await T('lpn_library_control_ok')).length === 3);
 		await openLib('rules');
 		const rules = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_libbox_content textarea.lpn-lib-wide, #lpn_libbox_content .lpn-lib-wide')).map((i) => i.value).filter((v) => /^RULE/.test(v)));
@@ -156,7 +157,7 @@ async function main() {
 			pumpClosed(before).join() === [times.a[0], times.a[2]].join() && pumpOpen(before).join() === times.a[1], before.join(' | '));
 		ok('...and Tank N2 now emptying at ' + times.a[3] + ' (after an earlier 11:00)', emptying(before).slice(-1)[0] === times.a[3], emptying(before).join());
 		await openLib('controls');
-		await P.evaluate(() => { const i = document.querySelectorAll('#lpn_libbox_content input.lpn-lib-wide')[1]; i.value = i.value.replace(/140$/, '135'); i.dispatchEvent(new Event('change', { bubbles: true })); });
+		await P.evaluate(() => { const i = document.querySelectorAll('#lpn_libbox_content input.lpn-lib-wide')[1]; i.value = i.value.replace(/(\d+)$/, '135'); i.dispatchEvent(new Event('change', { bubbles: true })); });
 		await settle(1200);
 		ok('the edited control is still understood', (await libText()).split(await T('lpn_library_control_ok')).length === 3);
 		await closeBox('lpn_libbox_close');
