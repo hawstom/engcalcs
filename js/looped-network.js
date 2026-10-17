@@ -25972,8 +25972,6 @@ var EngCalcs = EngCalcs || {};
 		box = document.createElement('div');
 		box.id = 'lpn_panebox_' + id;
 		box.className = 'd-print-none lpn-popover lpn-setbox lpn-ffbox lpn-panebox';
-		box.style.cssText = 'display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);' +
-			'padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)';
 		box.setAttribute('role', 'dialog');
 		title = document.createElement('div');
 		title.className = 'lpn-setbox-title';
@@ -26014,8 +26012,8 @@ var EngCalcs = EngCalcs || {};
 	function paneBoxStrip(id, away) {
 		var b = document.getElementById('lpn_pane_tab_' + id), p = b && b.parentNode;
 		if (!b) { return; }
-		b.style.display = away ? 'none' : '';
-		if (p && p.classList && p.classList.contains('lpn-pane-tab-pair')) { p.style.display = away ? 'none' : ''; }
+		b.classList.toggle('lpn-pane-tab-boxed', !!away);
+		if (p && p.classList && p.classList.contains('lpn-pane-tab-pair')) { p.classList.toggle('lpn-pane-tab-boxed', !!away); }
 	}
 	/** Open one pane tab as a box. `restoring`: the page came back with it open. */
 	function paneBoxPop(id, restoring) {
