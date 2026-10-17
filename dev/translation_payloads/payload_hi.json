@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hi",
-        "expected_key_count": 2637,
-        "delta_key_count": 0,
+        "expected_key_count": 2638,
+        "delta_key_count": 1,
         "english_changed_key_count": 0,
         "exempt_key_count": 38,
         "exempt_keys": [
@@ -47,7 +47,9 @@
         ],
         "out_of_scope_key_count": 7,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
-        "active_prefixes": [],
+        "active_prefixes": [
+            "lpn"
+        ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "reason_notes": "key_context[key].reason says what to do with each key. missing: the key is not in your file; append it as a new line. blank, equal_to_english, english_changed: the key IS already in your file, holding key_context[key].current_value; REPLACE that value in place and never append a second line for the same key. english_changed means the English was reworded after your file's translation was written: translate the new English, and keep words from the old translation only where they still say what the new English says.",
@@ -64,9 +66,30 @@
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
     "glossary": "No glossary term is used by the strings in this batch.",
-    "keys_to_translate": [],
-    "keys": [],
-    "key_context": [],
+    "keys_to_translate": {
+        "lpn_library_pattern_axis_step": "Step"
+    },
+    "keys": {
+        "lpn_library_pattern_axis_step": "Step"
+    },
+    "key_context": {
+        "lpn_library_pattern_axis_step": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_pattern_span",
+                    "value": "गुणक ({n}), {step} की दूरी पर, {span} को कवर करते हुए",
+                    "english": "Multipliers: {n}, {step} apart, covering {span}"
+                },
+                "next_translated": {
+                    "key": "lpn_library_pattern_none",
+                    "value": "कोई पैटर्न नहीं",
+                    "english": "No pattern"
+                }
+            }
+        }
+    },
     "key_plain": [],
     "key_notes": [],
     "key_concepts": [],

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 2637 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**1 still to read on master**, of 1 untranslated keys, of 2638 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -79,13 +79,17 @@ is the one you meant. "The first one" is a complete answer.
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-None on master. Every English key here is present in at least one other language.
+## lpn_  (1, 1 to read @@ NEEDS RULING)
+
+- **`lpn_library_pattern_axis_step`**
+  > Step
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**793 still to read**, of 796 new keys across 18 unmerged branch(es).
+**792 still to read**, of 795 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -96,15 +100,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/plain-sentences (`a13bf9df3`) — adds no English strings
-
 ### feat/basemap-outdoors (`2a45b1cc2`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_basemap_outdoors_show`**
   > Show outdoors map
   @@ NEEDS RULING
 
-### feat/bentley-interop (`34791a202`) — 180 new, 180 to read @@ NEEDS RULING
+### feat/bentley-interop (`c0a0f0751`) — 180 new, 180 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -1445,12 +1447,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
 
-### feat/pattern-axis (`6f37c6eed`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_library_pattern_axis_step`**
-  > Step
-  @@ NEEDS RULING
-
 ### feat/scenario-box (`d4d566a71`) — 174 new, 174 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
@@ -1976,7 +1972,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Drag to resize
   @@ NEEDS RULING
 
-### feat/theme-dark (`6cde31e31`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/theme-dark (`7058e0a16`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_settings_theme`**
   > Theme
