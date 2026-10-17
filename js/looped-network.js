@@ -4011,7 +4011,16 @@ var EngCalcs = EngCalcs || {};
 	 * which changes what every coordinate in the document MEANS -- so georefWrite() maps the
 	 * overrides through the same transform, and georefCancel() puts them back.
 	 */
-	function coordOverridesOf(n) { return (n && resolvedOverrides(activeScenario())[ovKey(n)]) || null; }
+	function coordOverridesOf(n) {
+		var m;
+		if (!n) { return null; }
+		m = labelPassMemo();
+		if (m) {
+			if (!m.ov) { m.ov = resolvedOverrides(m.scn); }
+			return m.ov[ovKey(n)] || null;
+		}
+		return resolvedOverrides(activeScenario())[ovKey(n)] || null;
+	}
 	function nodeDrawX(n) {
 		var ov = coordOverridesOf(n);
 		return (ov && typeof ov.x === 'number') ? inwardX(ov.x) : (n ? n.x : undefined);
@@ -7148,8 +7157,43 @@ var EngCalcs = EngCalcs || {};
 	// member of `project`, for the open scenario. A reader that runs per element per frame asks for
 	// a LEAF (a number, a flag), which is never copied; one that wants a whole map asks once per pass
 	// and hands the answer down.
-	function scnSetting(member) { return settingFor(activeScenario(), ['settings', member]); }
-	function scnLabels(path) { return settingFor(activeScenario(), ['labelSettings'].concat(path || [])); }
+	function scnSetting(member) {
+		var m = labelPassMemo(), k;
+		if (!m) { return settingFor(activeScenario(), ['settings', member]); }
+		k = 's\u0001' + member;
+		if (!Object.prototype.hasOwnProperty.call(m.v, k)) { m.v[k] = settingFor(m.scn, ['settings', member]); }
+		return m.v[k];
+	}
+	function scnLabels(path) {
+		var m = labelPassMemo(), k;
+		if (!m) { return settingFor(activeScenario(), ['labelSettings'].concat(path || [])); }
+		k = 'l\u0001' + (path || []).join('\u0001');
+		if (!Object.prototype.hasOwnProperty.call(m.v, k)) { m.v[k] = settingFor(m.scn, ['labelSettings'].concat(path || [])); }
+		return m.v[k];
+	}
+	// **EACH SETTING READ ONCE PER LABEL PASS** (Task 812, port-plan Step 1). Inside one
+	// refreshLabelText() the answers of scnSetting(), scnLabels() and coordOverridesOf() cannot
+	// change, yet the pass asked the scenario layer for them thousands of times. The memo lives
+	// only inside that one call, and it drops itself if anything moves the tree (a setting or
+	// alternative write bumps treeEpoch), the document, the scenario list or the open scenario, so
+	// a write part-way through a pass is read fresh. Same answers, so the same layout:
+	// dev/lpn-spike/label-pass-memo-harness.js compares every placed label before and after.
+	var passMemo = null, passMemoDepth = 0;
+	function labelPassMemo() {
+		var m = passMemo, scn;
+		if (!m) { return null; }
+		scn = activeScenario();
+		if (m.epoch !== treeEpoch || m.doc !== doc || m.scenarios !== scenarios || m.scn !== scn) {
+			m = passMemo = { epoch: treeEpoch, doc: doc, scenarios: scenarios, scn: scn, v: {}, ov: null };
+		}
+		return m;
+	}
+	function beginLabelPassMemo() {
+		if (!passMemoDepth++) { passMemo = { epoch: NaN, v: {}, ov: null }; }
+	}
+	function endLabelPassMemo() {
+		if (!--passMemoDepth) { passMemo = null; }
+	}
 	function scnProject(member) { return settingFor(activeScenario(), ['project', member]); }
 	function scnDefaultPattern() { return settingFor(activeScenario(), ['defaultPattern']) || null; }
 	// Deletes one path from a scenario's block and prunes every container it emptied, down to the
@@ -74730,7 +74774,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		perfDebugCount('labelPasses');
 		beginMapBoxHold();
 		beginLinkGeomHold();
-		try { refreshLabelTextPass(); } finally { endMapBoxHold(); endLinkGeomHold(); }
+		beginLabelPassMemo();
+		try { refreshLabelTextPass(); } finally { endLabelPassMemo(); endMapBoxHold(); endLinkGeomHold(); }
 		// Stamped LAST, so a writer inside the pass's own tail moves the generation past it.
 		contentPassAt = { gen: labelCacheGen, s: state.s };
 	}
