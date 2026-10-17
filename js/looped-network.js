@@ -513,6 +513,12 @@ var EngCalcs = EngCalcs || {};
 	function linkLabelAligned(l) {
 		return !!scnSetting('alignPipeLabels') && l.lx === undefined && l.ly === undefined;
 	}
+	// Whether the label is DRAWN along its pipe this pass: the setting asks for it, and the pass did
+	// not have to set it level beside the pipe instead (placeLevelPipeLabels(), Task 812).
+	function linkLabelDrawnAligned(l) {
+		var le = linkEls[l.id];
+		return linkLabelAligned(l) && !(le && le.levelBeside);
+	}
 	// ---- THE NEAREST OTHER PIPE IS ASKED FOR ONCE PER PASS, NOT ONCE PER LABEL -------------------
 	//
 	// alignedSideFor() below asks "how close does this candidate position come to some OTHER pipe",
@@ -1474,7 +1480,7 @@ var EngCalcs = EngCalcs || {};
 	// would read as a different label rather than the same one said again.
 	function layoutLinkLabelAt(l, le, part, along, isPrimary, single) {
 		if (!isPrimary) { syncRepeatText(le, part); part.along = along; }
-		if (linkLabelAligned(l)) {
+		if (linkLabelDrawnAligned(l)) {
 			// le.alignedAlong is the station placeAlignedLabels() settled on during the collision
 			// pass. Undefined until that has run once (and for an empty label), in which case
 			// alignedLabelPlacement() falls back to the half-way default -- the same value the
@@ -1519,8 +1525,9 @@ var EngCalcs = EngCalcs || {};
 		// still in conflict, no clear station on its pipe (placeStationedLabels()), standing on
 		// ground a node label has just taken (yieldStationedLabels()),
 		// or the losing half of a crossing nothing could repair (shedCrossingLabels(), Task 539).
-		var hideAll = le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenBlocked || !!le.hiddenYielded ||
-			!!le.hiddenCrossed;
+		// A label the pass set LEVEL BESIDE its pipe (Task 812) is drawn whatever hid it along the pipe.
+		var hideAll = le.levelBeside ? !!le.hiddenCrossed
+			: (le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenBlocked || !!le.hiddenYielded || !!le.hiddenCrossed);
 		setLabelAssemblyHidden(le, hideAll);
 		var single = linkLabelStations(l).length === 1,
 			stations = perfDebugAccum('  lkL:stations', function () {
@@ -2841,6 +2848,103 @@ var EngCalcs = EngCalcs || {};
 	// phase three). For ?debug=labels to print. Not a decision input: nothing in the pass reads it
 	// back.
 	var lastCrossingShed = null;
+	// **A PIPE LABEL THAT CANNOT LIE ALONG ITS PIPE IS TRIED LEVEL BESIDE IT BEFORE IT HIDES**
+	// (Task 812, dev/label-trials/port-plan.md Step 3). Along the pipe, a label hides when it has
+	// shed to its last value and is still crowded, when no station on its pipe is clear, or when a
+	// node label has taken its ground (and when it is too long for its segment, which stays a hide,
+	// below). Measured on master (dev/label-trials/preprocessing/hide-reasons.js), those exits hid
+	// 102 of Net3's 119 pipe labels at 2x and 237 of the 600-junction network's 343, and not one of
+	// them had tried a spot off its pipe. Here each tries one, level, as a free label with a
+	// leader: R14, *"Values outrank alignment"*, and R1, nearness to home given up before the label.
+	//
+	// **WHAT IT IS GIVEN IS ALREADY ITS SMALLEST FORM.** The crowding shed stops at one value, so a
+	// label still crowded arrives here as that last value; a blocked or yielded one keeps the
+	// content it had.
+	//
+	// **LAST, AND STRICT, SO NOTHING ALREADY ON THE MAP MOVES.** It runs after every other label is
+	// placed, against all of them, their leaders included, and takes a side only if the side breaks
+	// nothing (Collide.placeLabelsFirstFit()'s `strict`): no overlap with a symbol, a label or a Text
+	// object (N1, N5), no leader through another node's symbol (N3), through a label or across a
+	// leader, and not on its own pipe (R7). **THE HIDE STAYS THE LAST EXIT** (Tom, 2026-08-17:
+	// *"Fully shedded links need to hide if they are still in conflict"*): a label with no such
+	// side stays hidden exactly as before. Only a lone label is tried; a chain keeps its stations.
+	// Longest pipe first, as the slide orders them, so the order is a function of the drawing.
+	var LPN_LEVEL_REACH_TEXT_HEIGHTS = 3, LPN_LEVEL_PAD_FRAC = 0.1;
+	function placeLevelPipeLabels(obs, nodeObs, nodeLabels, nodePlaced, ringLabels, ringPlaced, holders, fs) {
+		var specs = [], min = leaderThreshold(), d = defaultLabelOffset(), home0 = Math.hypot(d.x, d.y),
+			reach = Math.max(home0 * 3, fs * LPN_LEVEL_REACH_TEXT_HEIGHTS), byKey = {};
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id];
+			if (!le || le.empty || le.hiddenCrossed || !linkLabelAligned(l) || linkLabelStations(l).length !== 1) { return; }
+			// **A LABEL TOO SHORT FOR ITS SEGMENT STILL HIDES** (Tom, 2026-08-14: *"If a line is too
+			// short, its label must disappear even if the map is closer than the 'all-disappear'
+			// limit."*; short-line-label-harness.js). R1 (2026-10-06) would let it try; that is his
+			// call to make, so it is not made here.
+			if (linkLabelTooShort(l, le) || !(le.hiddenCrowded || le.hiddenBlocked || le.hiddenYielded)) { return; }
+			var mid = linkLabelMid(l), dir = linkDirectionAt(l, mid),
+				deg = Math.atan2(dir.by - dir.ay, dir.bx - dir.ax) * 180 / Math.PI,
+				arcs = Collide.openArcs([deg, deg + 180]),
+				sides = Collide.cardinalSides(mid, d, arcs, {}),
+				ring = Collide.polarCandidates(mid, arcs[0], home0, reach, { rings: 4 }).concat(
+					Collide.polarCandidates(mid, arcs[1], home0, reach, { rings: 4 }));
+			ring.forEach(function (p, i) { p._r = Math.hypot(p.x - mid.x, p.y - mid.y); p._i = i; });
+			ring.sort(function (a, b) { return (a._r - b._r) || (a._i - b._i); });
+			ring.forEach(function (p) { delete p._r; delete p._i; sides.push(p); });
+			specs.push({ id: linkLabelKey(l.id), ownLink: linkLabelKey(l.id), anchor: mid, home: linkLabelBase(l),
+				dragged: false, sides: sides, len: Geom.polylineLength(linkPointList(l)),
+				w: labelBoxWidth(le), h: dataLabelBoxHeight(le.lineCount), yOff: -fs * 0.85,
+				lines: labelRowWidths(le), l: l });
+		});
+		if (!specs.length) { return; }
+		specs.sort(function (a, b) { return (b.len - a.len) || (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0)); });
+		specs.forEach(function (sp, i) { sp.priority = specs.length - i; byKey[sp.id] = sp; delete sp.len; });
+		// Everything on the map now: the drawing, the stationed labels, the dragged ones, and every
+		// node and free label the passes above placed, with the leaders the renderer will draw.
+		var ground = { boxes: nodeObs.boxes.slice(), segments: nodeObs.segments.slice() };
+		function addPlaced(spec, r) {
+			var h = holders[r.id];
+			if (!spec || r.dropped || (h && (h.hiddenDropped || h.hiddenCrossed))) { return; }
+			(r.boxes && r.boxes.length ? r.boxes : (r.box ? [r.box] : [])).forEach(function (b) {
+				var c = Collide.box(b.cx, b.cy, b.w, b.h, b.a); c.kind = 'label'; ground.boxes.push(c);
+			});
+			// **A STACK HUNG LEFT IS DRAWN WITH ITS ROWS FLUSH LEFT**, not flush right as
+			// Collide.labelLineBoxes() models it: dataLabelOrigin() puts the text's x at the box's
+			// left edge and every row starts there. So the rows as drawn are added too, or a level
+			// label fills the corner beside a short row that the drawing has covered (measured in
+			// Chromium: up to 10 px deep on Net3 at 2x).
+			if (!spec.side && spec.lines && spec.lines.length > 1 && r.x < spec.anchor.x) {
+				Collide.labelLineBoxes(Object.assign({}, spec, { side: 'right' }), { x: r.x - spec.w, y: r.y }).forEach(function (b) {
+					b.kind = 'label'; ground.boxes.push(b);
+				});
+			}
+			if (Math.hypot(r.x - spec.anchor.x, r.y - spec.anchor.y) > min) {
+				ground.segments.push(Collide.segment(spec.anchor.x, spec.anchor.y, r.x, r.y, 'leader', r.id));
+			}
+		}
+		var specOf = {};
+		nodeLabels.concat(ringLabels).forEach(function (sp) { specOf[sp.id] = sp; });
+		nodePlaced.concat(ringPlaced).forEach(function (r) { addPlaced(specOf[r.id], r); });
+		// **A LITTLE AIR ON CLEAN GROUND, THEN TOUCHING.** Every label here would otherwise hide, so it
+		// is held to real overlap, as the slide's second sweep and the shed already hold a pipe label
+		// (placeStationedLabels(), shedAlignedForConflicts()): boxes may touch, never overlap. The
+		// clean sweep asks a tenth of a font size of air. Measured against the full 0.35 pad on both
+		// sweeps (Net3 2x, the 600-junction network at 2x): 40 and 232 pipe labels shown against 35
+		// and 214.
+		var out = Collide.placeLabelsFirstFit(specs, ground, { pad: fs * LPN_LEVEL_PAD_FRAC, lastPad: 0, strict: true, leaderMin: min });
+		out.forEach(function (r) {
+			var sp = byKey[r.id], le = sp && linkEls[sp.l.id];
+			if (!le || r.dropped) { return; }
+			le.levelBeside = true;
+			le.nudge = { x: r.dx, y: r.dy };
+			le.nudgeManual = false;
+			le.placedSide = r.side;
+			// On the map now, so the meters placed next keep off it. Its own kind: the passes and
+			// harnesses that read `label` boxes back out of this list attribute them by owner.
+			(r.boxes || [r.box]).forEach(function (b) { b.kind = 'levellabel'; b.levelOwner = sp.l.id; obs.boxes.push(b); });
+			if (r.leader) { obs.segments.push(r.leader); }
+		});
+		specs.forEach(function (sp) { delete sp.l; });
+	}
 	function runLabelCollisionAvoidance(shedNodes) {
 		var fs = effectiveFontSize(), fsNow = fs + 'px', labels = [], nodeLabels = [], stationed = [],
 			obs = perfDebugAccum('  cl:obstacles', staticObstacles), holders = {};
@@ -2887,6 +2991,7 @@ var EngCalcs = EngCalcs || {};
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
 			le.hiddenBlocked = false;   // placeStationedLabels()'s own decision, made again below
+			le.levelBeside = false;     // placeLevelPipeLabels()'s, likewise
 			// A label nobody can see is not an obstacle. Skipping it here also clears its nudge, so
 			// zooming back in restores it where it belongs rather than where it was last pushed.
 			if (linkLabelTooShort(l, le)) { le.nudge = { x: 0, y: 0 }; return; }
@@ -2987,6 +3092,11 @@ var EngCalcs = EngCalcs || {};
 		// **THE YIELDER HAS TO ACTUALLY LEAVE, and until 2026-08-23 it never did.** See
 		// yieldStationedLabels() -- this is the one call site, and it must run after BOTH placements.
 		perfDebugAccum('  cl:yield', function () { yieldStationedLabels(nodePlaced, obs); });
+		// **AND A PIPE LABEL THAT COULD NOT LIE ALONG ITS PIPE IS TRIED LEVEL BESIDE IT** (Task 812).
+		// Last, on the ground every other label has left, so nothing already placed moves.
+		perfDebugAccum('  cl:level', function () {
+			placeLevelPipeLabels(obs, nodeObs, nodeLabels, nodePlaced, labels, placed, holders, fs);
+		});
 		labelDebugReport(labels.concat(nodeLabels), placed.concat(nodePlaced), obs);
 		// **THE METERS GO LAST, ON THE GROUND EVERYTHING ELSE HAS LEFT** (Task 247). They are the
 		// only labels on this page with two fixed positions and no relaxation, so they can only be
@@ -59432,7 +59542,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			hiddenShort: !!h.hiddenShort, hiddenCrowded: !!h.hiddenCrowded, hiddenYielded: !!h.hiddenYielded,
 			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
 			alignedAlong: h.alignedAlong, stationSides: h.stationSides ? h.stationSides.slice() : h.stationSides,
-			tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
+			levelBeside: !!h.levelBeside, tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
 			rowW: h.rowW ? h.rowW.slice() : null, rowWPx: h.rowWPx ? h.rowWPx.slice() : null,
 			segW: h.segW ? h.segW.slice() : null };
 	}
@@ -59485,7 +59595,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h.hiddenShort = c.hiddenShort; h.hiddenCrowded = c.hiddenCrowded; h.hiddenYielded = c.hiddenYielded;
 		h.hiddenBlocked = c.hiddenBlocked;
 		h.hiddenCrossed = c.hiddenCrossed; h.hiddenDropped = c.hiddenDropped;
-		h.alignedAlong = c.alignedAlong;
+		h.alignedAlong = c.alignedAlong; h.levelBeside = c.levelBeside;
 		h.stationSides = c.stationSides ? c.stationSides.slice() : c.stationSides;
 		h.tw = c.tw; h.twPx = c.twPx; h.width = c.width; h.widthPx = c.widthPx;
 		h.rowW = c.rowW ? c.rowW.slice() : null; h.rowWPx = c.rowWPx ? c.rowWPx.slice() : null;

@@ -1204,16 +1204,49 @@ EngCalcs.lpnCollide = (function () {
 		// 23.9 per 100 shown, leaders through a node 697 -> 407, the page pass about 8% slower.
 		// `opts.clean === false` is the old single sweep, kept for the harness that measures it.
 		var clean = opts.clean !== false, waiting = [], seat = {};
+		// **STRICT: A SIDE IS TAKEN ONLY IF IT BREAKS NOTHING** (Task 812, the level pipe label). The
+		// labels handed in strictly are ones that would otherwise hide, so there is no fallback that
+		// costs a neighbour: a side held by a yielding label is blocked, the label may not lie on its
+		// own pipe (`ownLink`, R7: beside it, not on it), and a leader long enough to be drawn
+		// (`leaderMin`) may not pass through a symbol (N3), through a label, or across another
+		// leader. Its leader is committed with its rows, so a later label keeps off it.
+		// `lastPad` is the air the last sweep asks of a strict label, which has no other spot left;
+		// the slide along a pipe makes the same bargain (touching a neighbour beats hiding).
+		var strict = !!opts.strict, leaderMin = opts.leaderMin > 0 ? opts.leaderMin : 0,
+			lastPad = opts.lastPad >= 0 ? opts.lastPad : pad;
+		function strictOk(lbl, c, b) {
+			var g, i, o;
+			if (lbl.ownLink !== undefined && boxesOnOwnLink(b, local, lbl.ownLink)) { return false; }
+			if (Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y) <= leaderMin) { return true; }
+			g = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id);
+			// Every symbol counts, the one round the anchor included: a pipe's anchor is no node's
+			// own, so a leader starting inside an end node's symbol runs through it.
+			for (i = 0; i < local.boxes.length; i++) {
+				o = local.boxes[i];
+				if (o.owner !== undefined && o.owner === lbl.id) { continue; }
+				if (segmentInBoxFraction(g, o) > 0) { return false; }
+			}
+			for (i = 0; i < local.segments.length; i++) {
+				o = local.segments[i];
+				if (o.kind === 'leader' && segmentsCross(g, o)) { return false; }
+			}
+			return true;
+		}
 		function sidesOf(lbl) { return lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home]; }
 		function commit(lbl, sides, c, b) {
 			// EVERY line box is committed, so the next label sees the staircase this one really
 			// occupies rather than a rectangle around it.
 			b.forEach(function (cb) { index.addBox(obs.boxes.push(cb) - 1); });
+			var lead = null;
+			if (strict && Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y) > leaderMin) {
+				lead = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id);
+				index.addSegment(obs.segments.push(lead) - 1);
+			}
 			return { id: lbl.id, x: c.x, y: c.y, dx: c.x - lbl.home.x, dy: c.y - lbl.home.y,
 				dropped: false, side: sides.indexOf(c),
 				// `box` stays the ONE box a reader draws and counts (?debug=boxes, the bench's
 				// overlap count); `boxes` is what the pass actually reserved.
-				box: labelBoxAtEnd(lbl, c), boxes: b, leader: null };
+				box: labelBoxAtEnd(lbl, c), boxes: b, leader: lead };
 		}
 		// The first sweep: CLEAN ground only. It also notes the first side that was not blocked
 		// outright, because ground only fills up between the sweeps: every side before that one is
@@ -1228,7 +1261,8 @@ EngCalcs.lpnCollide = (function () {
 				verdict = boxesClearOf(b, local, pad, lbl.id);
 				if (verdict === 'blocked') { continue; }
 				if (first < 0) { first = i; }
-				if (verdict === 'clear' && !boxesOnLink(b, local, lbl.id) && !leaderThroughSymbol(lbl, c, local)) {
+				if (verdict === 'clear' && !boxesOnLink(b, local, lbl.id) && !leaderThroughSymbol(lbl, c, local) &&
+						(!strict || strictOk(lbl, c, b))) {
 					return commit(lbl, sides, c, b);
 				}
 			}
@@ -1245,7 +1279,11 @@ EngCalcs.lpnCollide = (function () {
 				// The STAIRCASE, not the block (Task 406): asking about the block would call a side
 				// occupied because of ground the short rows never cover.
 				b = labelLineBoxes(lbl, c);
-				verdict = lbl.dragged ? 'clear' : boxesClearOf(b, local, pad, lbl.id);
+				verdict = lbl.dragged ? 'clear' : boxesClearOf(b, local, strict ? lastPad : pad, lbl.id);
+				if (strict) {
+					if (verdict === 'clear' && strictOk(lbl, c, b)) { return commit(lbl, sides, c, b); }
+					continue;
+				}
 				if (verdict === 'clear') { return commit(lbl, sides, c, b); }
 				// **A SIDE HELD ONLY BY SOMETHING THIS LABEL OUTRANKS IS KEPT AS A FALLBACK, not
 				// taken immediately.** A genuinely clear side on the other hand is still better, so
@@ -1344,6 +1382,19 @@ EngCalcs.lpnCollide = (function () {
 		return false;
 	}
 
+	// Does any row lie on the label's OWN pipe? The strict first-fit's R7 test: a level pipe label
+	// sits beside its pipe, not across it. `ownLink` is the owner its pipe's segments carry.
+	function boxesOnOwnLink(boxes, obs, ownLink) {
+		var i, j, o;
+		for (j = 0; j < obs.segments.length; j++) {
+			o = obs.segments[j];
+			if (o.kind !== 'link' || o.owner !== ownLink) { continue; }
+			for (i = 0; i < boxes.length; i++) {
+				if (segmentInBoxFraction(o, boxes[i]) > 0) { return true; }
+			}
+		}
+		return false;
+	}
 	// Does the leader from the anchor to this endpoint pass through a symbol not its own (N3)? The
 	// first-fit draws no leader itself, but the renderer does, so ground reached across another
 	// node's symbol is not clean. The anchor's own symbol is the one that contains the anchor.
