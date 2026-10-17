@@ -1,25 +1,26 @@
-// THE HOVER CARD: ALL OF AN ASSET'S PROPERTIES, AS THE PROPERTIES BOX LISTS THEM, FORMATTED PER
-// SETTINGS, AT ANY SCALE, FIT OR NOT, NEVER OFF-SCREEN (ROADMAP Task 773; Tom, 2026-10-16), in a
-// real Chromium. Run with:
+// THE HOVER CARD: EVERY FIELD SETTINGS > LABELS OFFERS FOR THE ASSET, FORMATTED PER SETTINGS, AT ANY
+// SCALE, FIT OR NOT, ONLY ON THE ELEMENT ITSELF, NEVER OFF-SCREEN (ROADMAP Task 773; Tom, 2026-10-16
+// and 2026-10-17), in a real Chromium. Run with:
 //   node dev/lpn-spike/hover-card-browser-harness.js
 //
 // WHAT IT PROVES.
 //   1. Net1 (a valve, a custom property and a Description added; a non-default tick set; pressure at
-//      3 decimals): resting on junction 11, pipe 111, valve 122, pump 9 and a customer shows each
-//      field BY NAME, "Name: value unit": position, Description, Tag, the custom property, Elevation,
-//      Head and Pressure (3 decimals, the label settings'); a pipe tells Length from Diameter; a
-//      valve shows its type and setting; a pump its curve; From/To, Closed and Is active.
-//   2. WHICH BOXES ARE TICKED MAKES NO DIFFERENCE: the cards with the tick set, with nothing ticked
-//      and with everything ticked are line for line equal.
-//   3. THE LABELING THRESHOLD DOES NOT HIDE THE CARD.
-//   4. NEVER OFF-SCREEN: the card's box lies inside the window at 1280x520 and at a 390x740 phone
-//      width, with an 8-line Description.
-//   5. RIGHT TO LEFT: on ?lang=ar the card reads right to left (direction rtl, alignment start).
-//   6. DELETE AND DRAWING modes still show it and a press still acts.
-//   7. HOVER COSTS NOTHING IN THE LABEL LAYER, the card takes no pointer events, a press selects
+//      3 decimals): the junction, pipe, valve, pump and customer cards each hold EXACTLY the Labels
+//      list's fields for that asset, as "Name: value" with the label's formatting (Length 5280', not
+//      5280.00; Pressure to 3 decimals), ticked or not; and none of the Properties box's extras
+//      (position, custom property, Is active, From/To, pipe type). Status reads Open or Closed.
+//   2. A Description is ONE row, its line break written \P as Tables writes it.
+//   3. REST ON A LABEL, NO CARD: the pointer resting on the asset's map label opens nothing; on the
+//      symbol or line it does.
+//   4. WHICH BOXES ARE TICKED MAKES NO DIFFERENCE: tick set, nothing ticked, everything ticked: equal.
+//   5. THE LABELING THRESHOLD DOES NOT HIDE THE CARD.
+//   6. NEVER OFF-SCREEN: inside the window at 1280x520 and at a 390x740 phone width.
+//   7. RIGHT TO LEFT: on ?lang=ar direction rtl, alignment start, values in isolates.
+//   8. DELETE AND DRAWING modes still show it and a press still acts.
+//   9. HOVER COSTS NOTHING IN THE LABEL LAYER, the card takes no pointer events, a press selects
 //      through it, sliding waits for rest, Esc / Ctrl+Z dismiss it.
-//   8. THE SETTING: the real control; unticked, no card and lpn_hovercard=off is the only thing stored.
-//   9. ?lang=es: the Spanish card differs from the English one. No page errors anywhere.
+//  10. THE SETTING: the real control; unticked, no card and lpn_hovercard=off is the only thing stored.
+//  11. ?lang=es: the Spanish card differs from the English one. No page errors anywhere.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -160,6 +161,8 @@ function cardBox(page) {
 		return { l: b.left, t: b.top, r: b.right, b: b.bottom, vw: window.innerWidth, vh: window.innerHeight };
 	});
 }
+const names = (lines) => (lines || []).map((t) => t.split(': ')[0]);
+const sameSet = (a, b) => JSON.stringify(a.slice().sort()) === JSON.stringify(b.slice().sort());
 const has = (lines, re) => !!lines && lines.some((t) => re.test(t));
 // The map label's rows: a tspan that carries an x starts a row, one without flows on from it.
 function labelRows(page, nodeId) {
@@ -216,12 +219,10 @@ async function main() {
 			const lines = await cardLines(a.page);
 			ok('resting on junction 11 shows a card', !!lines, JSON.stringify(lines));
 			ok('...led by the ID the map label shows', lines && lines[0] === 'ID: ' + PFX.node + '11', JSON.stringify(lines && lines[0]));
-			ok('...with its position by name', has(lines, /^X: 30$/) && has(lines, /^Y: 70$/), JSON.stringify(lines));
-			ok('...its Description (both lines) and Tag by name', has(lines, /^Description: Line one\nLine two$/) && has(lines, /^Tag: T1$/), JSON.stringify(lines));
-			ok('...the custom property by its name', has(lines, /^Route: RT0$/), JSON.stringify(lines));
-			ok('...Elevation as the label formats it, with its unit', has(lines, /^Elevation: 710\.00 \S+/), JSON.stringify(lines));
-			ok('...and the unticked Head and Pressure, Is active', has(lines, /^Head: \d/) && has(lines, /^Pressure: \d/) && has(lines, /^Is active\?: /), JSON.stringify(lines));
-			ok('...Pressure printed with the label settings\' three decimals', has(lines, /^Pressure: \d+\.\d{3}\b/), JSON.stringify(lines));
+			ok('...its Description is the label\'s own (first line and an ellipsis; it is in the Labels list)', has(lines, /^Description: Line one \u2026$/) && has(lines, /^Tag: T1$/), JSON.stringify(lines));
+			ok('...exactly the Labels list for a junction, ticked or not', sameSet(names(lines), ['ID', 'Description', 'Tag', 'Base demand', 'Elevation', 'Initial quality', 'Demand', 'Head', 'Pressure', 'Chlorine concentration']), JSON.stringify(names(lines)));
+			ok('...formatted as the label is: Elevation 710.00, Pressure to its three decimals', has(lines, /^Elevation: 710\.00$/) && has(lines, /^Pressure: \d+\.\d{3}$/), JSON.stringify(lines));
+			ok('...and none of the Properties box\'s extras (position, custom property, Is active)', !has(lines, /^(X|Y|Route|Is active)/), JSON.stringify(lines));
 			world.node = lines;
 			const anchorTitle = await a.page.evaluate(() => { const e = document.querySelector('.lpn-hovercard-anchor'); return e ? (e.getAttribute('title') || '') + (e.getAttribute('data-bs-original-title') || '') : 'none'; });
 			ok('the card is the styled tip on an untitled anchor, so no native tooltip can show', anchorTitle === '', JSON.stringify(anchorTitle));
@@ -230,13 +231,24 @@ async function main() {
 			const pe = await a.page.evaluate(() => getComputedStyle(document.querySelector('.tooltip.lpn-hovercard')).pointerEvents);
 			ok('the card takes no pointer events', pe === 'none', pe);
 
+			// REST ON THE LABEL: no card. (The label's centre is a hit on the label, not the symbol.)
+			await away(a);
+			const lp0 = await centreOf(a.page, 'text[data-nodelbl="11"]');
+			ok('junction 11\'s map label is on screen', !!lp0);
+			if (lp0) {
+				await rest(a, lp0);
+				ok('resting on the map label opens no card', (await cardLines(a.page)) === null);
+				await away(a);
+				await rest(a, p);
+				ok('...resting on the symbol does', (await cardLines(a.page)) !== null);
+			}
 			// the other asset types, before any press opens the bottom pane over them
 			await away(a);
 			const vl = await restOnLink(a, '122');
-			ok('resting on valve 122 shows its type and setting by name', has(vl, /^Valve type: .*PRV/) && has(vl, /^Pressure setting: 45\b/) && has(vl, /^Diameter: 6\b/), JSON.stringify(vl));
+			ok('resting on valve 122 shows its Labels fields: Diameter, and Status Closed', has(vl, /^Diameter: 6"$/) && has(vl, /^Status: Closed$/) && !has(vl, /^(Valve type|Pressure setting)/), JSON.stringify(vl));
 			await away(a);
 			const ul = await restOnLink(a, '9');
-			ok('resting on pump 9 shows its curve reference by name', has(ul, /^Pump head curve: 1$/) && has(ul, /^Relative speed: /) && has(ul, /^Route: RT3$/), JSON.stringify(ul));
+			ok('resting on pump 9 shows its Labels fields: Initial status, Head loss (the pump head), Status', has(ul, /^Initial status: Open$/) && has(ul, /^Head loss: /) && has(ul, /^Status: Open$/) && !has(ul, /^(Pump head curve|Route)/), JSON.stringify(ul));
 			await away(a);
 
 			// 5: a click goes through, and the card goes
@@ -257,9 +269,9 @@ async function main() {
 				const lblText = await a.page.evaluate(() => { const t = document.querySelector('text[data-linklbl="111"]'); return t ? t.textContent.replace(/\s+/g, '') : null; });
 				ok('resting on pipe 111 shows its card', !!pl && pl.length > 10, JSON.stringify(pl));
 				ok('...led by the ID the map label shows', pl && pl[0] === 'ID: ' + PFX.link + '111', JSON.stringify(pl && pl[0]));
-				ok('...Length and Diameter are told apart by name', has(pl, /^Length: 5280\b/) && has(pl, /^Diameter: 10\b/), JSON.stringify(pl));
-				ok('...with Roughness, Flow, From/To, Closed and the custom property', has(pl, /^Roughness/) && has(pl, /^Flow: /) && has(pl, /^From: 11$/) && has(pl, /^To: /) && has(pl, /^Closed: /) && has(pl, /^Route: RT9$/), JSON.stringify(pl));
-				ok('...and the ticked label values appear as the label prints them', lblText === '' || lblText === null || ['5280', '10'].every((v) => lblText.indexOf(v) >= 0));
+				ok('...Length and Diameter are told apart by name, formatted as the label is', has(pl, /^Length: 5280'$/) && has(pl, /^Diameter: 10"$/), JSON.stringify(pl));
+				ok('...exactly the Labels list for a pipe', sameSet(names(pl), ['ID', 'Length', 'Diameter', 'Roughness, C', 'Minor loss, k', 'Initial status', 'Bulk reaction coefficient', 'Wall reaction coefficient', 'Flow', 'Velocity', 'Head loss', 'Head loss gradient', 'Friction factor', 'Reaction rate', 'Average Chlorine concentration', 'Status']), JSON.stringify(names(pl)));
+				ok('...Status says Open', has(pl, /^Status: Open$/), JSON.stringify(pl));
 				world.link = pl;
 				await away(a);
 			}
@@ -359,7 +371,7 @@ async function main() {
 				await rest(n0, p2);
 				const cl = await cardLines(n0.page);
 				if (name === 'nothing ticked') { world.cust = cl; }
-				ok(name + ': ...and the customer card has every field', !!cl && cl.length >= 6 && has(cl, /^Description: Main Street school$/) && has(cl, /^Tag: inst$/) && has(cl, /^Number of services: 3$/), JSON.stringify(cl));
+				ok(name + ': ...and the customer card has every field', !!cl && sameSet(names(cl), ['ID', 'Description', 'Tag', 'Base demand', 'Number of services', 'Demand']) && has(cl, /^Description: Main Street school$/) && has(cl, /^Number of services: 3$/), JSON.stringify(cl));
 				if (name !== 'nothing ticked') { ok('...the same as with nothing ticked', JSON.stringify(cl) === JSON.stringify(world.cust)); }
 				ok('no page errors (' + name + ')', !n0.errors.length, (n0.errors[0] || '').slice(0, 200));
 			} finally { await n0.close(); }
@@ -437,7 +449,7 @@ async function main() {
 					const bx = await cardBox(vv.page), ln = await cardLines(vv.page);
 					ok(view.width + 'x' + view.height + ': ' + what + ' card lies inside the window', !!bx && bx.l >= -0.5 && bx.t >= -0.5 && bx.r <= bx.vw + 0.5 && bx.b <= bx.vh + 0.5, JSON.stringify(bx));
 					if (what === 'junction 11') {
-						ok('...and it kept the Description (shortened to fit if it had to be)', has(ln, /^Description: Line number 1 of the description/), JSON.stringify(ln && ln.slice(0, 5)));
+						ok('...and it kept the Description (shortened to fit if it had to be)', has(ln, /^Description: Line number 1 of the description \u2026$/), JSON.stringify(ln && ln.slice(0, 5)));
 					}
 				}
 				ok('no page errors (' + view.width + 'x' + view.height + ')', !vv.errors.length, (vv.errors[0] || '').slice(0, 200));
