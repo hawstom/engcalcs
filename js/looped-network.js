@@ -7674,9 +7674,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	function scenarioMenuRows() {
 		var pc = EngCalcs.pageConfig || {}, rows = [], scn = activeScenario();
-		// **THE ORDER IS TOM'S** (2026-10-11): *"Scenario manager..., -, Basic mode, New, Rename,
-		// Delete, -, Apply Base, list of scenarios."* Apply Base values and the rule before it are
-		// retired (Task 801; Tom, 2026-10-15: *"this command is too confusing and dangerous"*); Merge
+		// **THE ORDER IS TOM'S** (2026-10-16): *"Scenarios manager..., Overrides manager..., Advanced
+		// mode, line, New, ..., line, list of scenarios."* The mode row sits among the managers, never
+		// beside Base, so a pointer that goes for Base cannot land on Basic mode. (Apply Base values and
+		// the rule before it are retired (Task 801; Tom, 2026-10-15: *"this command is too confusing and dangerous"*); Merge
 		// upward in the Scenario manager takes its place. The Scenarios table and the Scenario manager
 		// are where scenarios are managed, so the list of scenarios comes last.
 		// **THE SCENARIO MANAGER ROW IS ALWAYS HERE, GREYED WHILE BASIC MODE IS ON** (Tom, 2026-10-13:
@@ -7687,12 +7688,20 @@ var EngCalcs = EngCalcs || {};
 			tip: scenarioBasicMode ? (pc.lpn_sm_basic_on || 'Scenario manager is disabled when Basic mode is on.') : undefined,
 			fn: function () { openScenarioManager(); }
 		});
-		rows.push({ separator: true });
+		// **LIST OVERRIDES HERE TOO, SO BASIC MODE REACHES IT** (Tom, 2026-10-15: "Yes."). The same
+		// action as the Scenario manager's button, on the active scenario; greyed on Base and at 0.
+		rows.push({
+			label: pc.lpn_sm_list_overrides || 'Manage overrides',
+			disabled: scn.isBase || !overrideCount(scn),
+			tip: (scn.isBase || !overrideCount(scn)) ? (pc.lpn_sm_list_overrides_none || 'This scenario has no overrides.') : pc.lpn_sm_list_overrides_tip,
+			fn: function () { smActListOverrides(scn.id); }
+		});
 		rows.push({
 			label: (scenarioBasicMode ? '✓ ' : '  ') + (pc.lpn_scenario_basic || 'Basic mode'),
 			tip: pc.lpn_scenario_basic_tip,
 			fn: function () { setScenarioBasicMode(!scenarioBasicMode); }
 		});
+		rows.push({ separator: true });
 		rows.push({
 			icon: 'insert', label: pc.lpn_scenario_new || 'New scenario…',
 			fn: function () {
@@ -7754,14 +7763,7 @@ var EngCalcs = EngCalcs || {};
 				});
 			}
 		});
-		// **LIST OVERRIDES HERE TOO, SO BASIC MODE REACHES IT** (Tom, 2026-10-15: "Yes."). The same
-		// action as the Scenario manager's button, on the active scenario; greyed on Base and at 0.
-		rows.push({
-			label: pc.lpn_sm_list_overrides || 'Manage overrides',
-			disabled: scn.isBase || !overrideCount(scn),
-			tip: (scn.isBase || !overrideCount(scn)) ? (pc.lpn_sm_list_overrides_none || 'This scenario has no overrides.') : pc.lpn_sm_list_overrides_tip,
-			fn: function () { smActListOverrides(scn.id); }
-		});
+		rows.push({ separator: true });
 		scenariosForDisplay().forEach(function (s) {
 			rows.push({
 				// scenarioId is what makes a row a scenario, so a reader of the rows (the harness)
