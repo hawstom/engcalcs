@@ -434,6 +434,55 @@ stylesheet coordination), the calculators' selector button; "better" #3 to #9 as
 **Waits:** Windows 9x and Aqua-class themes (bevel and gradient mechanisms), a "Map follows theme" switch,
 any custom palette, "better" #10 (Tom's call).
 
+## Branch 1 as built (build agent, 2026-10-17), and where it departs from the plan above
+
+Built on `feat/theme`: the seeds and derivation, the gallery, High contrast (both palettes), Amber, Green,
+Platinum, the extended contrast check, and "better" #1 and #2. Held by `dev/scripts/theme_contrast_check.js`
+(static, every theme) and four Chromium harnesses in `dev/lpn-spike/`: `light-tokens-browser-harness.js`,
+`theme-contrast-browser-harness.js`, `theme-gallery-browser-harness.js`, `theme-browser-harness.js`.
+Departures, each with its reason:
+
+1. **Light is derived, then pinned.** The first rule (`:root, .ec-theme-card`) holds 26 seeds and every
+   other token as `color-mix(in srgb, ...)` of them. The grey ladder, ink steps, accent translucents and
+   white translucents land on today's light values exactly. 38 hand-chosen tints (hover, pressed, select,
+   the forms' wash, most value-named hues) do not land on any formula, so a light-only rule
+   (`:root:not([data-theme]), [data-theme="light"]`) states them. Every light token is identical to the
+   pinned base SHA except the two "better" #2 inks (`light-tokens-browser-harness.js`). One visible-to-code
+   side effect: a derived token computes as `color(srgb ...)`, not `rgb(...)`; the pixels are the same,
+   and the harnesses that compared strings now read numbers.
+2. **Dark keeps its hand-chosen values.** Collapsing it to seeds moves its greys by a few units, which is a
+   visible change for Tom to approve, not a refactor. Dark changes only where a defect was found: the
+   override marker's ink was never stated for dark (light's `#8a5a00` on the dark page, 2.78:1), now
+   `#f0b84a`; Bootstrap's field edges take `--ec-control-border`.
+3. **The value-named tokens keep their names.** Each now derives from the role it plays (the comment beside
+   it says which); renaming 60 names across the CSS and JS is churn with no visible effect, left for later.
+4. **`<html data-theme>` carries the resolved theme**, not the choice: System becomes light, dark or `hc`
+   (`prefers-contrast: more`), and High contrast becomes `hc` or `hc-dark` by the colour scheme. So no
+   theme block is written twice (the old dark block was duplicated under a media query), and a gallery card
+   is painted by the same selector. `window.ecTheme.get()` is the choice.
+5. **"Better" #1: `#eef1f5`, not `#f6f7f9`.** The chrome sat on the calculator form's `#f7f9ff`, not on white,
+   so the planned value would have been invisible. The 4 px gaps between the three rows are painted by a
+   blur-free shadow, so no layout moved.
+6. **"Better" #2, the control border: Bootstrap's fields only.** Measured: the browser's own inputs and
+   drop-downs are already `#767676` (4.54:1). The failing edges are Bootstrap's `.form-select` and
+   `.form-control` (`#dee2e6`, 1.3:1): the transport's two drop-downs and the navbar's fields. They take the
+   new `--ec-control-border` (`#8f8f8f`, 3.2:1); `--ec-border-strong` is a panel rule and stays `#ccc`.
+7. **Amber and Green do not invert errors.** Error ink also sits on the page's ordinary surfaces, where an
+   inverted ink would be 1:1; errors are the bright step on a dim amber (green) wash instead. No mono font,
+   no icon stroke, and the map stays white in every theme: those are branch 2's tokens and decision. The
+   existing `--ec-btn-radius` squares their buttons (0) and Platinum's (2 px).
+8. **Platinum's bevel shipped** (`--ec-bevel`, `--ec-bevel-in`), on the menu-bar items and toolbar buttons.
+9. **High contrast**: every text pair at 7:1 needed a handful of overrides (the dim greys become the muted
+   ink, ok and bad inks deepened). Its 3 px focus ring and heavier icon stroke wait for branch 2's tokens.
+   `forced-colors` is untested.
+10. **Bootstrap is handed the tokens in the four new themes** (body text, link colour, its borders), or the
+    Settings box would be written in Bootstrap's grey and the links in its blue. Light and Dark keep
+    Bootstrap's own, as before.
+11. **Touch: a tap keeps the theme**, so no "Keep" string. `?theme=` accepts any listed name; `system`
+    clears the choice, which is the rescue.
+12. **Strings**: four names (`lpn_theme_hc`, `_amber`, `_green`, `_platinum`) and a reworded
+    `lpn_settings_theme_tip` (it said "light or dark colors").
+
 ## Proposed ROADMAP row (Tom promotes; I do not edit the roadmap)
 
 `75|NEW| Themes: seed-derived tokens, a hover-preview gallery selector in Settings > Page (values widen in lpn_theme, no new storage), High contrast, Amber, Green, Platinum first; "the same, but better" default upgrades. dev/themes-plan.md`
