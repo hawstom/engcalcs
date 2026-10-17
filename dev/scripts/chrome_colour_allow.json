@@ -22,12 +22,16 @@
 			"reason": "map symbology: the drag/move flash on a node, drawn in the drawing's red"
 		},
 		{
+			"path": "^\\.lpn-examples-(welcome|h|sub|msg|legal|blank)|^\\.lpn-example-thumb$|^#lpn_wrong_btn",
+			"reason": "text and paper that sit directly on the map's tiles or white paper, which no theme changes: the gallery's own words, the thumbnails' white paper and the strip's Something wrong here? cell keep map ink"
+		},
+		{
 			"path": "^#lpn_canvas$",
 			"reason": "map symbology: the drawing's own white paper (--lpn-map-bg)"
 		},
 		{
-			"path": "^\\.lpn-(scalebar|color-legend|color-swatch)",
-			"reason": "overlay or swatch that sits ON the always-white drawing and reports its data colours"
+			"path": "^\\.lpn-color-swatch",
+			"reason": "a swatch reports a data colour and carries its own hairline; the scale bar and the colour legend panel are themed chrome and use tokens"
 		},
 		{
 			"path": "^@media print",

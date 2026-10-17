@@ -56,6 +56,7 @@ function rgba(v) {
 	if ((m = /^#([0-9a-f]{6})$/i.exec(v))) { return [0, 2, 4].map((i) => parseInt(m[1].substr(i, 2), 16)).concat([1]); }
 	if ((m = /^rgba?\(([^)]*)\)$/.exec(v))) { const p = m[1].split(',').map(parseFloat); return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1]; }
 	if (v === 'gray') { return [128, 128, 128, 1]; }
+	if (v === 'steelblue') { return [70, 130, 180, 1]; }
 	if (v === 'blue') { return [0, 0, 255, 1]; }
 	throw new Error('theme_contrast_check: cannot read colour ' + v);
 }
@@ -74,7 +75,7 @@ function ratio(set, fgTok, bgTok, under) {
 // 2. Text on surface, 4.5:1. Every text token on every surface a page puts it on.
 const TEXT = ['ink', 'ink-strong', 'ink-muted', 'ink-subtle', 'accent', 'accent-hover', 'brand', 'warn-ink', 'ok-ink',
 	'bad-ink', 'error-ink', 'neutral-ink', 'gray-444', 'gray-777', 'hue-17406b', 'hue-5a6570', 'hue-5f6368', 'hue-667',
-	'hue-b00020', 'hue-0b0080', 'hue-12211f'].map((t) => 'ec-' + t);
+	'hue-b00020', 'hue-0b0080', 'hue-12211f', 'help-ink'].map((t) => 'ec-' + t);
 const SURFACE = ['bg', 'form-bg', 'gray-fafafa', 'gray-f7f7f7', 'gray-f6f6f6', 'gray-f2f2f2', 'gray-f0f0f0', 'hover-bg',
 	'select-bg', 'warn-bg', 'error-bg', 'error-bg-soft', 'hue-eef1f4', 'hue-eef3fd', 'hue-eef4ff', 'hue-eae7e0',
 	'accent-hover-bg', 'hue-fdd', 'hue-fff3cd', 'hue-fff4e5'].map((t) => 'ec-' + t);
@@ -89,7 +90,7 @@ const STRONG_ON = [
 ];
 // A filled control prints the page colour on the fill (a selected header, a consent button, an open menu badge).
 const ON_FILL = [['ec-bg', ['ec-select', 'ec-hue-05a', 'ec-accent-open', 'ec-brand', 'ec-brand-hover', 'ec-accent']],
-	['ec-select-bg-strong', ['ec-select']]];
+	['ec-select-bg-strong', ['ec-select']], ['ec-tip-ink', ['ec-tip-bg']]];
 // Disabled text is exempt from 4.5:1 by WCAG 1.4.3; it must still be seen (3:1).
 const DISABLED = [['ec-gray-999', ['ec-bg']], ['ec-gray-bbb', ['ec-bg']]];
 
@@ -108,7 +109,7 @@ function runSet(name, set, strict) {
 	[['ec-border-strong', 'ec-bg'], ['ec-form-border', 'ec-form-bg'], ['ec-debug-grid', 'ec-form-bg'], ['ec-debug-grid', 'ec-bg'],
 		['ec-warn-border', 'ec-warn-bg'], ['ec-gray-999', 'ec-bg'], ['ec-gray-888', 'ec-bg'], ['ec-gray-bbb', 'ec-bg'],
 		['ec-hover-border', 'ec-hover-bg'], ['ec-pressed-border', 'ec-pressed-bg'], ['ec-accent', 'ec-bg'], ['ec-select', 'ec-bg'],
-		['ec-hue-2a6ebb', 'ec-bg'], ['ec-ink-subtle', 'ec-bg'], ['ec-point', 'ec-bg']
+		['ec-hue-2a6ebb', 'ec-bg'], ['ec-ink-subtle', 'ec-bg'], ['ec-point', 'ec-bg'], ['ec-tip-edge', 'ec-bg']
 	].forEach(([b, s]) => pair(b, s, 3, 'UI border'));
 	return { worst, worstLabel };
 }

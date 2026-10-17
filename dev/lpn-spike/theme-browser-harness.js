@@ -82,6 +82,7 @@ async function main() {
 			tabsBorder: cs('#lpn_tabs', 'border-bottom-color'),
 			menuInk: cs('#lpn_menu_help', 'color'),
 			scaleInk: cs('.lpn-scalebar', 'color'),
+			scaleBg: cs('.lpn-scalebar', 'background-color'),
 			canvasPaper: cs('#lpn_canvas', 'background-color'),
 			pipeInk: cs('#lpn_canvas polyline.lpn-link-pipe', 'stroke'),
 			nodeInk: cs('#lpn_canvas circle.lpn-node-junction', 'stroke'),
@@ -107,6 +108,80 @@ async function main() {
 		}));
 		return png;
 	};
+
+	// Text that sits on the map, not on a themed panel, is read against the map's own paper (white). For every
+	// visible text element whose centre is over the canvas, walk up to the element that holds the canvas and
+	// composite the backgrounds met on the way; an element on no background of its own is on the paper. A
+	// themed panel (an overlay with its own background) is judged against that panel.
+	const mapText = (page) => page.evaluate(() => {
+		const cv = document.getElementById('lpn_canvas'), cr = cv.getBoundingClientRect();
+		const parse = (c) => { const m = c.match(/rgba?\(([^)]+)\)/); if (!m) { return [0, 0, 0, 0]; } const p = m[1].split(/[ ,\/]+/).map(parseFloat); return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1]; };
+		const lum = (c) => { const f = c.slice(0, 3).map((x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }); return 0.2126 * f[0] + 0.7152 * f[1] + 0.0722 * f[2]; };
+		const over = (f, b) => [0, 1, 2].map((i) => f[i] * f[3] + b[i] * (1 - f[3])).concat([1]);
+		const out = [];
+		document.body.querySelectorAll('*').forEach((el) => {
+			if (el.closest('svg') || el.closest('#lpn_menu_popup') || el.closest('.ec-consent')) { return; }
+			const txt = Array.from(el.childNodes).filter((n) => n.nodeType === 3 && n.textContent.trim()).map((n) => n.textContent.trim()).join(' ');
+			if (!txt) { return; }
+			const r = el.getBoundingClientRect(); if (r.width < 2 || r.height < 2) { return; }
+			const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+			if (cx < cr.left || cx > cr.right || cy < cr.top || cy > Math.min(cr.bottom, innerHeight)) { return; }
+			const cs = getComputedStyle(el); if (cs.visibility === 'hidden' || cs.display === 'none') { return; }
+			const layers = []; let n = el, solid = false;
+			while (n && n !== document.documentElement && !n.contains(cv)) { const bg = parse(getComputedStyle(n).backgroundColor); if (bg[3] > 0) { layers.push(bg); } if (bg[3] >= 1) { solid = true; break; } n = n.parentElement; }
+			let base = [255, 255, 255, 1]; if (solid) { base = layers.pop(); }
+			layers.reverse(); let b = base; layers.forEach((l) => { b = over(l, b); });
+			let fg = parse(cs.color); fg = over([fg[0], fg[1], fg[2], fg[3] * (+cs.opacity || 1)], b);
+			const a = lum(fg), bb = lum(b);
+			out.push({ sel: el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + (typeof el.className === 'string' && el.className ? '.' + el.className.split(' ')[0] : ''), txt: txt.slice(0, 28), ratio: (Math.max(a, bb) + 0.05) / (Math.min(a, bb) + 0.05) });
+		});
+		return out;
+	});
+	const checkMapText = (label, rows, mustSee) => {
+		const bad = rows.filter((x) => x.ratio < 4.5);
+		ok(label + ': every text over the map reads at 4.5:1 or better (' + rows.length + ' read)', bad.length === 0, bad.map((x) => x.sel + ' "' + x.txt + '" ' + x.ratio.toFixed(2)).join('; '));
+		mustSee.forEach((re) => ok(label + ': the scan saw ' + re, rows.some((x) => re.test(x.txt)), 'not on screen'));
+	};
+
+	// ONE TIP, IN BOTH THEMES: a name tip (hover) and an explanation (click on a ?) are both Bootstrap tooltips; both
+	// must paint the token colours, and so match each other.
+	const tipLook = async (page) => {
+		const read = () => page.evaluate(() => { const t = Array.from(document.querySelectorAll('.tooltip .tooltip-inner')).pop(); if (!t) { return null; } const cs = getComputedStyle(t); return { bg: cs.backgroundColor, ink: cs.color, ring: cs.boxShadow }; });
+		const res = {};
+		await page.mouse.move(5, 300); await page.waitForTimeout(300);
+		const btn = page.locator('#lpn_toolbar button[title], #lpn_toolbar button[data-bs-original-title]').first();
+		await btn.hover(); await page.waitForTimeout(900);
+		res.name = await read();
+		await page.mouse.move(5, 300); await page.waitForTimeout(500);
+		const q = page.locator('#lpn_settings_box .ec-tip').first();
+		if (await q.count()) { await q.click({ force: true }).catch(() => {}); await page.waitForTimeout(700); res.explain = await read(); await page.keyboard.press('Escape'); }
+		const tok = await page.evaluate(() => { const p = document.createElement('i'); document.body.appendChild(p); const g = (t) => { p.style.backgroundColor = 'var(--' + t + ')'; return getComputedStyle(p).backgroundColor; }; const r = { bg: g('ec-tip-bg'), ink: (p.style.color = 'var(--ec-tip-ink)', getComputedStyle(p).color) }; p.remove(); return r; });
+		return { res, tok };
+	};
+	// A keyboard focus ring on a transport button and on the time drop-downs: a drawn outline, 2px, in the accent.
+	const ringOf = async (page, sel) => {
+		await page.keyboard.press('Shift');
+		return page.evaluate((q) => { const e = document.querySelector(q); if (!e) { return null; } e.focus({ focusVisible: true }); const cs = getComputedStyle(e); const p = document.createElement('i'); document.body.appendChild(p); p.style.color = 'var(--ec-accent)'; const acc = getComputedStyle(p).color; p.remove(); return { style: cs.outlineStyle, width: cs.outlineWidth, color: cs.outlineColor, acc, vis: e.matches(':focus-visible') }; }, sel);
+	};
+	const checkRing = async (label, page) => {
+		for (const [what, sel] of [['Play', '.lpn-transport-btn[data-icon="play"], #lpn_toolbar_run .lpn-transport-btn:nth-of-type(3)'], ['Go to start', '#lpn_toolbar_run .lpn-transport-btn'], ['the time step drop-down', '#lpn_toolbar select'], ['the speed drop-down', '#lpn_toolbar select:nth-of-type(2), #lpn_toolbar_run select:last-of-type']]) {
+			const r = await ringOf(page, sel);
+			ok(label + ': ' + what + ' shows a clear focus ring', !!r && r.vis && r.style === 'solid' && r.width === '2px' && r.color === r.acc, JSON.stringify(r));
+		}
+	};
+
+	// The colour legend is a panel of chrome over the map (Tom: "doesn't respond to Dark"); its swatches are data and
+	// never change. One is put on the map the way the page builds it (class names are the contract).
+	const legendLook = (page) => page.evaluate(() => {
+		let el = document.getElementById('lpn_theme_probe_legend');
+		if (!el) {
+			el = document.createElement('div'); el.id = 'lpn_theme_probe_legend'; el.className = 'lpn-color-legend'; el.style.cssText = 'right:60px;top:200px';
+			el.innerHTML = 'Pressure (psi)<br><span class="lpn-color-swatch" style="background:#d73027"></span> 20 <span class="lpn-color-swatch" style="background:#1a9850"></span> 80';
+			document.getElementById('lpn_canvas').parentElement.appendChild(el);
+		}
+		const cs = getComputedStyle(el), sw = getComputedStyle(el.querySelector('.lpn-color-swatch'));
+		return { bg: cs.backgroundColor, ink: cs.color, swatch: sw.backgroundColor, swatchEdge: sw.borderTopColor };
+	});
 	const shot = async (page, name) => { if (SHOTS) { await page.screenshot({ path: path.join(SHOTS, name) }); } };
 
 	try {
@@ -118,8 +193,14 @@ async function main() {
 			const first = await attrs(a.page);
 			ok('1. first load: no stored choice, so System (data-theme=system), nothing stored', first.theme === 'system' && first.stored === null, JSON.stringify(first));
 			ok('1. ...and Bootstrap is told dark', first.bs === 'dark', first.bs);
+			await a.settle(1200);
+			checkMapText('9. gallery, dark', await mapText(a.page), [/Open a copy|example/i, /Privacy/, /Something wrong/]);
+			const thumb = await a.page.evaluate(() => { const t = document.querySelector('.lpn-example-thumb'); return t ? getComputedStyle(t).backgroundColor : null; });
+			ok('10. an example thumbnail keeps its white paper in dark', thumb === LIGHT_BG, String(thumb));
+			await shot(a.page, 'gallery-dark.png');
 			await a.openExampleCard(await a.lang('lpn_ex_net1_title'));
 			await a.settle(600);
+			checkMapText('9. Net1 open, dark', await mapText(a.page), [/Something wrong/]);
 			let c = await colours(a.page);
 			ok('1. System under a dark OS paints the page dark', c.body !== LIGHT_BG && c.menuInk !== 'rgb(6, 69, 173)', JSON.stringify(c));
 			const sysPx = await canvasPixels(a.page);
@@ -168,7 +249,7 @@ async function main() {
 
 			// 4. the drawing is the same
 			ok('4. canvas paper is white in both themes', lightColours.canvasPaper === LIGHT_BG && darkColours.canvasPaper === LIGHT_BG, lightColours.canvasPaper + ' / ' + darkColours.canvasPaper);
-			ok('4. the scale bar, which sits on the white drawing, keeps its dark text in both themes', lightColours.scaleInk !== null && lightColours.scaleInk === darkColours.scaleInk, lightColours.scaleInk + ' / ' + darkColours.scaleInk);
+			ok('4. the scale bar is themed chrome: light text on a dark panel in dark, dark on light in light', darkColours.scaleInk === 'rgb(213, 216, 220)' && darkColours.scaleBg === 'rgba(30, 31, 34, 0.8)' && lightColours.scaleBg === 'rgba(255, 255, 255, 0.8)' && lightColours.scaleInk !== darkColours.scaleInk, JSON.stringify([lightColours.scaleInk, lightColours.scaleBg, darkColours.scaleInk, darkColours.scaleBg]));
 			ok('4. a pipe\'s ink is identical in both themes', lightColours.pipeInk === darkColours.pipeInk && lightColours.pipeInk !== null, lightColours.pipeInk + ' / ' + darkColours.pipeInk);
 			ok('4. a node\'s ink and fill are identical in both themes', lightColours.nodeInk === darkColours.nodeInk && lightColours.nodeFill === darkColours.nodeFill, [lightColours.nodeInk, darkColours.nodeInk, lightColours.nodeFill, darkColours.nodeFill].join(' '));
 			ok('4. the canvas pixels (paper and ink) are byte-identical light and dark', Buffer.compare(lightPx, darkPx) === 0 && Buffer.compare(sysPx, darkPx) === 0,
@@ -178,6 +259,21 @@ async function main() {
 			ok('5. the tab rule and menu ink differ', lightColours.tabsBorder !== darkColours.tabsBorder && lightColours.menuInk !== darkColours.menuInk, JSON.stringify([lightColours.tabsBorder, darkColours.tabsBorder, lightColours.menuInk, darkColours.menuInk]));
 			await a.settle(300);
 			await shot(a.page, 'map-dark-pinned.png');
+
+			const lgD = await legendLook(a.page);
+			ok('13. the colour legend is a dark panel with light text in dark', lgD.bg === 'rgba(30, 31, 34, 0.95)' && lgD.ink === 'rgb(213, 216, 220)', JSON.stringify(lgD));
+			ok('13. ...and its swatches keep their data colours and hairline', lgD.swatch === 'rgb(215, 48, 39)' && lgD.swatchEdge === 'rgba(0, 0, 0, 0.45)', JSON.stringify(lgD));
+			checkMapText('13. legend and scale bar over the map, dark', await mapText(a.page), [/Pressure \(psi\)/]);
+			await shot(a.page, 'map-legend-dark.png');
+			// 11. one tip look, and 12. the focus ring (Dark pinned)
+			await a.page.keyboard.press('Escape');
+			const tl = await tipLook(a.page);
+			ok('11. the name tip paints the tip tokens in dark', !!tl.res.name && tl.res.name.bg === tl.tok.bg && tl.res.name.ink === tl.tok.ink, JSON.stringify(tl));
+			ok('11. the explanation tip is the same look as the name tip', !tl.res.explain || (tl.res.explain.bg === tl.res.name.bg && tl.res.explain.ink === tl.res.name.ink), JSON.stringify(tl.res));
+			ok('11. the tip has its edge ring', !!tl.res.name && tl.res.name.ring !== 'none', JSON.stringify(tl.res.name));
+			await shot(a.page, 'tooltip-dark.png');
+			await checkRing('12. dark', a.page);
+			await shot(a.page, 'focus-ring-dark.png');
 
 			// 6. furniture only: the stored project holds no theme, saved while Dark was chosen
 			await a.makeEdit();
@@ -250,7 +346,15 @@ async function main() {
 			let t = await attrs(b.page);
 			const sysTok = await b.page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--ec-bg').trim());
 			ok('1. System under a light OS paints light', t.theme === 'system' && t.bs === 'light' && sysTok === '#fff', JSON.stringify(t) + ' ' + sysTok);
+			await b.settle(1200);
+			checkMapText('9. gallery, light', await mapText(b.page), [/Open a copy|example/i, /Privacy/, /Something wrong/]);
 			await b.openExampleCard(await b.lang('lpn_ex_net1_title'));
+			checkMapText('9. Net1 open, light', await mapText(b.page), [/Something wrong/]);
+			await checkRing('12. light', b.page);
+			const lgL = await legendLook(b.page);
+			ok('13. the colour legend is a light panel with dark text in light', lgL.bg === 'rgba(255, 255, 255, 0.85)' && lgL.ink === 'rgb(51, 51, 51)', JSON.stringify(lgL));
+			checkMapText('13. legend and scale bar over the map, light', await mapText(b.page), [/Pressure \(psi\)/]);
+			await shot(b.page, 'map-legend-light.png');
 			await b.toolbarClick(await b.lang('lpn_tool_settings'));
 			await b.settle(500);
 			const row = b.page.locator('label.lpn-set-row', { hasText: await b.lang('lpn_settings_theme') }).first();
