@@ -4484,3 +4484,10 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: lpn_theme set by Light/Dark, absent for System; no project key mentions theme/dark; Start fresh removes it and reloads as System; reload keeps Dark; no white flash (CSS and script held 2.5-4 s, paint is dark); calculator page Hazen-Williams under dark OS stays light, no data-theme.
 - OBSERVED: focus ring on Play/step transport buttons is the browser default (dark on grey); time step/speed selects show no ring.
 - NOT CHECKED: import report (open of crafted .inp did not complete in my driver), scenario manager box, EPANET run-report dialog.
+
+## 2026-10-17 option/pane-boxes @ 2ac75bbbe (Task 799, bottom-pane tabs as boxes) (Perry)
+- OBSERVED (real Chromium, Net3, scripted): builder's harness 34/34 passes; my own walk found: two boxes (table + graph, two tables, stacked on one side) fine; edit/undo/redo, Find filter, CSV export, column-width drag, scenario switch and auto-recalc redraw, Recalculate-off snapshot, project switch, workspace export/import, ?lpn_wipe=1, dark, RTL, reload all correct.
+- OBSERVED DEFECT: a boxed Profile never starts the path chooser (second Profile press only raises the box), yet the box still says "Press Profile again to select a new path on the map."
+- OBSERVED: a new box floats 814x686 over the tab strip it came from; default dock width 832 px each, so two docked boxes leave the map ~320 px at 1600 wide; at 1100x650 docked boxes are 163 px tall (pane stays open on another tab).
+- OBSERVED: Ctrl+Shift+PageDown/Up inside a boxed table moves the PANE's tab and focus leaves the box.
+- OBSERVED: "Open in a box" is English on ar/fr pages (key not in other language files; expected until the payload step).
