@@ -19,7 +19,7 @@
 
 const path = require('path');
 const L = require('./user-guide-chapter-lib.js');
-const { U, ok, enString, plain, checkQuotes, openGuide, entry, searchFinds, dialogPress, finish } = L;
+const { U, ok, enString, esString, plain, checkQuotes, openGuide, entry, searchFinds, dialogPress, finish } = L;
 const NAME = 'user-guide-library-harness';
 U.takeBrowserLock(NAME, 'EC_UGLIB_LOCKED');
 
@@ -292,7 +292,7 @@ async function main() {
 		await b.settle(1200);
 		await openGuide(b);
 		const es = await entry(b.page, 'lpn_library_box');
-		ok('the Spanish page shows the Libraries entry with its seven terms and its table', !!es && TERMS.every((k, i) => es.dts[i] === enString(k)) && es.tables.length === 1, es && JSON.stringify(es.dts.slice(0, 2)));
+		ok('the Spanish page shows the Libraries entry with its seven terms and its table', !!es && TERMS.every((k, i) => es.dts[i] === esString(k)) && es.tables.length === 1, es && JSON.stringify(es.dts.slice(0, 2)));
 		ok('...titled by the Spanish box title', !!es && es.title.trim() === await b.lang('lpn_library_menu'), es && es.title);
 		ok('no page errors (Spanish)', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
 		await b.context.close().catch(() => {});

@@ -16,7 +16,7 @@
 
 const path = require('path');
 const L = require('./user-guide-chapter-lib.js');
-const { U, ok, enString, plain, checkQuotes, openGuide, finish } = L;
+const { U, ok, enString, esString, plain, checkQuotes, openGuide, finish } = L;
 const NAME = 'user-guide-notes-harness';
 U.takeBrowserLock(NAME, 'EC_UGNT_LOCKED');
 
@@ -117,7 +117,7 @@ async function main() {
 		await b.settle(1200);
 		await openGuide(b);
 		const es = await b.page.evaluate(() => Array.from(document.querySelectorAll('[data-guide-section="notes"] > dl > dt')).map((d) => d.textContent.trim()));
-		ok('the Spanish page shows the five Notes terms, the new one in English until it is translated', es.length === 5 && es[4] === enString(TERMS[4]) && es[0] !== enString(TERMS[0]), JSON.stringify(es));
+		ok('the Spanish page shows the five Notes terms, the new one as the Spanish file has it', es.length === 5 && es[4] === esString(TERMS[4]) && es[0] !== enString(TERMS[0]), JSON.stringify(es));
 		ok('no page errors (Spanish)', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
 		await b.context.close().catch(() => {});
 	} catch (e) {

@@ -17,7 +17,7 @@
 
 const path = require('path');
 const L = require('./user-guide-chapter-lib.js');
-const { U, ok, enString, plain, checkQuotes, openGuide, entry, finish } = L;
+const { U, ok, enString, esString, plain, checkQuotes, openGuide, entry, finish } = L;
 const NAME = 'user-guide-fireflow-harness';
 U.takeBrowserLock(NAME, 'EC_UGFF_LOCKED');
 
@@ -117,7 +117,7 @@ async function main() {
 		await b.settle(1200);
 		await openGuide(b);
 		const es = await entry(b.page, 'lpn_ff_box');
-		ok('the Spanish page shows the four terms', !!es && TERMS.every((k, i) => es.dts[i] === enString(k)), es && JSON.stringify(es.dts));
+		ok('the Spanish page shows the four terms', !!es && TERMS.every((k, i) => es.dts[i] === esString(k)), es && JSON.stringify(es.dts));
 		ok('no page errors (Spanish)', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
 		await b.context.close().catch(() => {});
 	} catch (e) {

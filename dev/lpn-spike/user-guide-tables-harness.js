@@ -17,7 +17,7 @@
 
 const path = require('path');
 const L = require('./user-guide-chapter-lib.js');
-const { U, ok, enString, plain, checkQuotes, openGuide, dialogPress, finish } = L;
+const { U, ok, enString, esString, plain, checkQuotes, openGuide, dialogPress, finish } = L;
 const NAME = 'user-guide-tables-harness';
 U.takeBrowserLock(NAME, 'EC_UGTBL_LOCKED');
 
@@ -154,7 +154,7 @@ async function main() {
 		await b.settle(1200);
 		await openGuide(b);
 		const es = await b.page.evaluate(() => Array.from(document.querySelectorAll('[data-guide-section="tables"] > dl > dt')).map((d) => d.textContent.trim()));
-		ok('the Spanish page shows the three new terms', es.length === 5 && TERMS.slice(2).every((k, i) => es[i + 2] === enString(k)), JSON.stringify(es));
+		ok('the Spanish page shows the three new terms', es.length === 5 && TERMS.slice(2).every((k, i) => es[i + 2] === esString(k)), JSON.stringify(es));
 		ok('no page errors (Spanish)', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
 		await b.context.close().catch(() => {});
 	} catch (e) {

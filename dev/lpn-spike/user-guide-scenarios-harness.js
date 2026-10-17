@@ -19,7 +19,7 @@
 
 const path = require('path');
 const L = require('./user-guide-chapter-lib.js');
-const { U, ok, enString, plain, checkQuotes, openGuide, entry, searchFinds, dialogPress, finish } = L;
+const { U, ok, enString, esString, plain, checkQuotes, openGuide, entry, searchFinds, dialogPress, finish } = L;
 const NAME = 'user-guide-scenarios-harness';
 U.takeBrowserLock(NAME, 'EC_UGSCN_LOCKED');
 
@@ -327,8 +327,8 @@ async function main() {
 		await b.settle(1200);
 		await openGuide(b);
 		const esSm = await entry(b.page, 'lpn_sm_box'), esCmp = await entry(b.page, 'lpn_scncmp_box');
-		ok('the Spanish page shows the Scenario manager entry with its seven terms', !!esSm && SM_TERMS.every((k, i) => esSm.dts[i] === enString(k)), esSm && JSON.stringify(esSm.dts.slice(0, 2)));
-		ok('...and the Scenario comparison entry with its three terms and its table', !!esCmp && CMP_TERMS.every((k, i) => esCmp.dts[i] === enString(k)) && esCmp.tables.length === 1);
+		ok('the Spanish page shows the Scenario manager entry with its seven terms', !!esSm && SM_TERMS.every((k, i) => esSm.dts[i] === esString(k)), esSm && JSON.stringify(esSm.dts.slice(0, 2)));
+		ok('...and the Scenario comparison entry with its three terms and its table', !!esCmp && CMP_TERMS.every((k, i) => esCmp.dts[i] === esString(k)) && esCmp.tables.length === 1);
 		ok('...the entries are titled by the Spanish box titles', !!esSm && esSm.title.trim() === await b.lang('lpn_sm_title') && !!esCmp && esCmp.title.trim() === await b.lang('lpn_scncmp_title'), esSm && esSm.title);
 		ok('no page errors (Spanish)', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
 		await b.context.close().catch(() => {});
