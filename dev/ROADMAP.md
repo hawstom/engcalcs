@@ -200,9 +200,9 @@ the block.
   `.inp`, waits on finding one. Presentation never travels through a Bentley file (Bentley keeps
   display in the `.wtg`); the project file is its only home.
 - 100|785| **Rewrite the Guide's chapters to the Find and replace model.**
-  **PROMOTED TO 100, 2026-10-14** (Tom asked to re-evaluate and close or promote). Not closable: the audit lists open gaps in every chapter. Scenarios and Library chapters wait for `feat/bentley-interop`.
-  Split from Task 763 on its close, 2026-10-11. Every chapter but Find and replace is audited, not rewritten:
-  `dev/user-guide-audit.md`.
+  **PROMOTED TO 100, 2026-10-14.** Rewritten on `feat/guide-scenarios` (2026-10-16), each with a `user-guide-*-harness.js`: Scenario manager (the Scenarios chapter), Scenario comparison, Libraries, Properties, Settings.
+  Still audited only (`dev/user-guide-audit.md`, its order): Toolbar, Menus, Map, Screenshot, Tables, Using the guide, Boxes, Fire flow, Critical assets, Demand scaling, Pump energy, Contour, Run report, Status changes, Full report, Calibration, Notes, Guide.
+  Split from Task 763 on its close, 2026-10-11.
 - 100|789| **Long press opens the asset menu on a touch screen.**
   Perry, 2026-10-12: Copy/Paste properties and the graph bubbles open only from the asset right-click
   menu. Tom, 2026-10-14: *"Isn't long press the standard alias for right-click on a touch screen?
