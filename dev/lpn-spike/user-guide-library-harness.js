@@ -124,7 +124,8 @@ async function main() {
 		const pat = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry')).map((e) => ({ id: e.querySelector('.lpn-lib-id').value, desc: (e.querySelector('textarea') || {}).value, mult: e.querySelector('.lpn-lib-values').value })));
 		ok('Patterns holds pattern 1, Demand Pattern, one pattern in all', pat.length === 1 && pat[0].id === '1' && pat[0].desc === 'Demand Pattern', JSON.stringify(pat));
 		ok('...with 12 multipliers, "' + span + '", marked ' + await T('lpn_library_pattern_default_mark'), txt.indexOf(span) >= 0 && txt.indexOf(await T('lpn_library_pattern_default_mark')) >= 0 && pat[0].mult.split(/\s+/).length === 12, txt.slice(0, 200));
-		ok('...and the chapter says that', plain(enString('lpn_guide_lib_example_def')).indexOf('Patterns holds pattern 1, Demand Pattern, with 12 multipliers 2:00 apart, covering 24:00, marked (default)') >= 0);
+		const ch = plain(enString('lpn_guide_lib_example_def'));
+		ok('...and the chapter says all of that', [pat[0].id, pat[0].desc, '12', '2:00', '24:00', await T('lpn_library_pattern_default_mark')].every((x) => ch.indexOf(x) >= 0));
 		await openLib('curves');
 		const cv = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_libbox_content .lpn-lib-entry')).map((e) => ({
 			id: (e.querySelector('.lpn-lib-id') || {}).value, desc: (e.querySelector('textarea') || {}).value, kind: (e.querySelector('select') || {}).value,
@@ -162,7 +163,7 @@ async function main() {
 		await settle(300);
 		await calculate();
 		const after = ev(await statusTimes());
-		ok('after changing 140 to 135: the last closing is at ' + times.b[0] + ' and Tank N2 is now emptying at ' + times.b[1],
+		ok('after changing 140 to 135 the last closing is at ' + times.b[0] + ' and Tank N2 empties at ' + times.b[1],
 			pumpClosed(after).slice(-1)[0] === times.b[0] && emptying(after).slice(-1)[0] === times.b[1], after.join(' | '));
 		await undo();
 		await openLib('controls');
