@@ -4374,3 +4374,12 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: with Statistic set to Maximum on a partial run the setting is silently ignored (no statistic offered, nothing said).
 - OBSERVED: builder harness passes; emptying the kept frames makes it fail 8 checks; reverting clampTime's cut does NOT fail it (it never asserts the stored time).
 - SPECULATION (code read, fixture has no pumps): Pump energy box on a partial run with pumps would say "needs an extended period simulation, press Calculate" (run.energy absent). Partial frames carry no water age/quality, so those columns are blank, unexplained.
+
+## 2026-10-16 feat/theme-dark @ 6cde31e31 (Task 714 phases 2 and 3) (Perry)
+- OBSERVED (real Chromium, colorScheme dark, scripted walk + screenshots): every menu, Settings (all sections), Find and replace, Libraries, User manual, About, Screenshot box, Properties popup, Tables pane (select, edit), time series / profile / frequency / flow balance graphs, close-unsaved confirm, consent banner, phone width 390: all dark and readable. No page errors.
+- OBSERVED: DEFECT (front door). With no network open, the gallery heading ("Open a copy of an example", the two lines under it), and the Privacy/Terms/Cookie links at the foot are light text on the unthemed pale OSM map tiles: unreadable. Light OS shows them dark.
+- OBSERVED: DEFECT. Example-card thumbnails are dark ink on dark ground (img SVG ignores currentColor): near invisible. The css comment says they keep white paper; the rule uses var(--ec-bg).
+- OBSERVED: Bootstrap tooltips (menu-row and Bottom panel tips) are a WHITE box in dark (Bootstrap inverts), unlike the dark name tips; white on the white map they lose their edge. "Something wrong here?" under the map is ~1.9:1 grey on the white map.
+- OBSERVED: lpn_theme set by Light/Dark, absent for System; no project key mentions theme/dark; Start fresh removes it and reloads as System; reload keeps Dark; no white flash (CSS and script held 2.5-4 s, paint is dark); calculator page Hazen-Williams under dark OS stays light, no data-theme.
+- OBSERVED: focus ring on Play/step transport buttons is the browser default (dark on grey); time step/speed selects show no ring.
+- NOT CHECKED: import report (open of crafted .inp did not complete in my driver), scenario manager box, EPANET run-report dialog.
