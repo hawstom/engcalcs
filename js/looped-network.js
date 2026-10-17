@@ -21444,6 +21444,9 @@ var EngCalcs = EngCalcs || {};
 	 * composed only when the 500 ms rest has run out: nothing here runs per pointer move, and it
 	 * never calls refreshLabelText() or any placement pass.
 	 *
+	 * **THE ROWS ARE THE PROPERTIES BOX'S (hoverCardRows()), THE VALUES THE LABEL'S WHERE ONE EXISTS.**
+	 * The paragraph below describes the label half.
+	 *
 	 * **THE LINES COME FROM THE MAP LABEL'S OWN COMPOSERS** (nodeLabelFieldLines(),
 	 * linkLabelFieldLines(), customerLabelLines()), handed the live label settings with EVERY
 	 * field ticked (allFieldsLabelSettings(), Tom 2026-10-16). Same units, same decimals, same order, same prefixes and suffixes; a field with
@@ -21550,6 +21553,138 @@ var EngCalcs = EngCalcs || {};
 	function hoverCardLines(sel) {
 		return hoverCardLinesWith(sel, allFieldsLabelSettings()).filter(function (l) { return l.text !== ''; });
 	}
+	// **THE CARD'S ROWS ARE THE PROPERTIES BOX'S ROWS** (Tom, 2026-10-16: *"all of its properties"*;
+	// Perry's pre-review found the first build listed only label fields). The Properties renderers
+	// run into a detached pair of elements (propHarvest) and the card reads back each row's name and
+	// value, so the field set, its order, its names and its scenario/result gating are Properties'
+	// own, with nothing re-listed here. Where the same field also exists on a map label (matched on
+	// the field's NAME, which is the one key both lists already share) the VALUE is the label's: its
+	// decimals, as Settings specifies. The unit is the Properties name's "(unit)", moved after the
+	// value. A row with no value is left out, as the label leaves out an absent Description.
+	// The words of a field's label: every text under it except the controls, the "?" glyph and, on a
+	// read-only row, the plain span that holds the value.
+	function propLabelName(label) {
+		var hasBox = !!label.querySelector('input[type=checkbox]'), out = '';
+		function walk(node) {
+			Array.prototype.forEach.call(node.childNodes, function (n) {
+				if (n.nodeType === 3) { out += n.nodeValue; return; }
+				if (n.nodeType !== 1) { return; }
+				if (/^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(n.tagName) || n.classList.contains('ec-tip')) { return; }
+				if (node === label && n.tagName === 'SPAN' && !hasBox && !n.classList.contains('ec-help') && !n.children.length) { return; }
+				walk(n);
+			});
+		}
+		walk(label);
+		return out.replace(/\s+/g, ' ').trim();
+	}
+	function propControlValue(c) {
+		if (c.tagName === 'SELECT') { return c.selectedOptions && c.selectedOptions[0] ? c.selectedOptions[0].textContent.trim() : ''; }
+		if (c.type === 'checkbox') { return c.checked ? '✓' : '—'; }
+		return c.value === undefined ? '' : String(c.value);
+	}
+	function propLabelValue(label) {
+		var c = label.querySelector('input,select,textarea'), i, k;
+		if (c) { return propControlValue(c); }
+		for (i = label.children.length - 1; i >= 0; i--) {
+			k = label.children[i];
+			if (k.tagName === 'SPAN' && !k.classList.contains('ec-help')) { return k.textContent.trim(); }
+		}
+		return '';
+	}
+	function hoverCardPropRows(sel) {
+		var holder = { fields: document.createElement('div'), title: document.createElement('span') }, rows = [], heads;
+		propHarvest = holder;
+		try {
+			if (sel.kind === 'node') { renderNodeFields(sel.id); }
+			else if (sel.kind === 'link') { renderLinkFields(sel.id); }
+			else if (sel.kind === 'customer') { renderCustomerFields(sel.id); }
+		} finally { propHarvest = null; }
+		Array.prototype.forEach.call(holder.fields.children, function (k) {
+			var tag = k.tagName;
+			if (tag === 'LABEL') {
+				// The Auto box beside Length is a mode of the row above it, not a property.
+				if (propLabelName(k) === (EngCalcs.pageConfig || {}).lpn_field_auto || propLabelName(k) === 'Auto') { return; }
+				rows.push({ name: propLabelName(k), value: propLabelValue(k) });
+			} else if (tag === 'TABLE') {
+				// A table of rows (demand categories): each non-empty cell becomes a row named by
+				// its column heading, in table order.
+				heads = Array.prototype.map.call(k.querySelectorAll('thead th'), propLabelName);
+				Array.prototype.forEach.call(k.querySelectorAll('tbody tr'), function (tr) {
+					Array.prototype.forEach.call(tr.children, function (td, i) {
+						var c = td.querySelector('input,select,textarea'), v = c ? propControlValue(c) : td.textContent.trim();
+						if (v !== '' && v !== '\u00d7' && heads[i]) { rows.push({ name: heads[i], value: v }); }
+					});
+				});
+			}
+		});
+		return rows;
+	}
+	function hoverCardFieldKeyByName(group) {
+		var pc = EngCalcs.pageConfig || {}, defs = group === 'node' ? nodeFieldDefs(pc)
+			: group === 'link' ? linkFieldDefs(pc) : customerFieldDefs(pc), out = {};
+		defs.forEach(function (d) { out[String(d[1]).replace(/\s+/g, ' ').trim()] = d[0]; });
+		return out;
+	}
+	function hoverCardRows(sel) {
+		var pc = EngCalcs.pageConfig || {}, e, lines, by = {}, keyOf, rows, out = [];
+		if (sel.kind === 'shape') { e = shapeById(sel.id); return e ? [{ text: shapeNoun(e) }] : []; }
+		lines = hoverCardLines(sel);
+		lines.forEach(function (l) { if (l.field && !by[l.field]) { by[l.field] = l; } });
+		keyOf = hoverCardFieldKeyByName(sel.kind);
+		try { rows = hoverCardPropRows(sel); } catch (err) { rows = null; }
+		if (!rows) { return lines.map(function (l) { return { text: l.text }; }); }
+		out.push({ name: pc.lpn_field_id || 'ID', value: by.id ? by.id.text : sel.id });
+		rows.forEach(function (r) {
+			var m = /^(.*?)\s*\(([^()]*)\)$/.exec(r.name), name = m ? m[1] : r.name, unit = m ? m[2] : '', key = keyOf[name] || keyOf[r.name], ln;
+			if (key === 'id') { return; }
+			ln = key ? by[key] : null;
+			if (ln && ln.bare !== undefined && ln.bare !== '') {
+				// A value that already carries its unit mark (the gradient's "%") needs no second.
+				r = { name: name, value: ln.bare, unit: (/%$/.test(ln.bare) && unit.indexOf('%') >= 0) ? '' : unit };
+			}
+			else { r = { name: name, value: r.value, unit: unit }; }
+			if (r.value === '' || r.value === undefined) { return; }
+			out.push(r);
+		});
+		return out;
+	}
+	// The card, built to a plan: how many Description lines it may keep and how many columns it may
+	// use. Logical alignment throughout (text-align: start, direction from the page), and each value
+	// with its unit in a <bdi>, so a right-to-left page reads right to left and a unit never
+	// jumps to the other side of its number.
+	var HOVERCARD_DESC_FULL = 8, HOVERCARD_DESC_SHORT = 2;
+	function hoverCardBuild(rows, descCap, cols) {
+		var host = document.createElement('div'), dir = (document.documentElement.getAttribute('dir') ||
+			(document.body && document.body.getAttribute('dir')) || '').toLowerCase() === 'rtl' ? 'rtl' : 'ltr';
+		host.className = 'lpn-hovercard-body' + (cols > 1 ? ' lpn-hovercard-cols' : '');
+		host.setAttribute('dir', dir);
+		rows.forEach(function (r) {
+			var row = document.createElement('div'), v = r.text !== undefined ? r.text : String(r.value), b, lines;
+			row.className = 'lpn-hovercard-row';
+			if (r.name) { row.appendChild(document.createTextNode(r.name + ': ')); }
+			lines = v.split('\n');
+			if (lines.length > descCap) { lines = lines.slice(0, descCap); lines[descCap - 1] += ' …'; }
+			b = document.createElement('bdi');
+			b.textContent = lines.join('\n') + (r.unit ? ' ' + r.unit : '');
+			row.appendChild(b);
+			host.appendChild(row);
+		});
+		return host;
+	}
+	function hoverCardMeasure(host, cols) {
+		var wrap = document.createElement('div'), inner = document.createElement('div'), r;
+		wrap.className = 'tooltip lpn-hovercard show';
+		wrap.style.cssText = 'visibility:hidden;position:fixed;left:0;top:0;';
+		if (cols > 1) { wrap.classList.add('lpn-hovercard-wide'); }
+		inner.className = 'tooltip-inner';
+		inner.appendChild(host);
+		wrap.appendChild(inner);
+		document.body.appendChild(wrap);
+		r = inner.getBoundingClientRect();
+		wrap.remove();
+		return { w: r.width, h: r.height };
+	}
+
 	// **THE CARD IN DELETE AND THE LINK-DRAWING MODES** (Tom, 2026-10-08): the same card, for the
 	// thing the next click would act on (what you are about to delete; the node you are about to
 	// join). It paints no highlight (those modes have their own feedback) and takes no pointer
@@ -21581,17 +21716,16 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	function hoverCardShow(sel) {
-		var lines = hoverCardLines(sel).map(function (l) { return l.text; }).filter(function (t) { return t !== ''; });
+		var rows = hoverCardRows(sel), vw = window.innerWidth, vh = window.innerHeight, room = vh - 12,
+			host, cols = 1, cap = HOVERCARD_DESC_FULL, size;
 		perfDebugCount('hoverCards');
-		if (!lines.length) { return; }
-		var host = document.createElement('div');
-		lines.forEach(function (t, i) {
-			if (i) { host.appendChild(document.createElement('br')); }
-			t.split('\n').forEach(function (part, j) {
-				if (j) { host.appendChild(document.createElement('br')); }
-				host.appendChild(document.createTextNode(part));
-			});
-		});
+		if (!rows.length) { return; }
+		// **NEVER OFF-SCREEN, IN THIS ORDER**: the whole card; then the Description cut to
+		// HOVERCARD_DESC_SHORT lines; then two columns; then (a card that is still too tall on a
+		// very short window) clipped at the window's edge, which only happens below about 300 px.
+		host = hoverCardBuild(rows, cap, cols); size = hoverCardMeasure(host, cols);
+		if (size.h > room) { cap = HOVERCARD_DESC_SHORT; host = hoverCardBuild(rows, cap, cols); size = hoverCardMeasure(host, cols); }
+		if (size.h > room && vw >= 560) { cols = 2; host = hoverCardBuild(rows, cap, cols); size = hoverCardMeasure(host, cols); }
 		if (!hoverCard.anchor) {
 			hoverCard.anchor = document.createElement('div');
 			hoverCard.anchor.className = 'lpn-hovercard-anchor';
@@ -21601,11 +21735,42 @@ var EngCalcs = EngCalcs || {};
 		hoverCard.anchor.style.top = hoverCard.y + 'px';
 		if (hoverCard.tip) { hoverCard.tip.dispose(); }
 		hoverCard.tip = bootstrap.Tooltip.getOrCreateInstance(hoverCard.anchor, {
-			trigger: 'manual', html: true, placement: 'top', customClass: 'lpn-hovercard',
-			title: host.innerHTML
+			trigger: 'manual', html: true, customClass: 'lpn-hovercard' + (cols > 1 ? ' lpn-hovercard-wide' : ''),
+			title: host,
+			// Above the pointer if the card fits there, else below, else beside it; the clamp below
+			// then keeps whatever remains inside the window.
+			placement: function () {
+				var x = hoverCard.x, y = hoverCard.y, g = 10, m = 4;
+				if (y - size.h - g >= m) { return 'top'; }
+				if (y + size.h + g <= vh - m) { return 'bottom'; }
+				if (x + size.w + g <= vw - m) { return 'right'; }
+				if (x - size.w - g >= m) { return 'left'; }
+				return y > vh / 2 ? 'top' : 'bottom';
+			},
+			popperConfig: function (cfg) {
+				cfg.modifiers = (cfg.modifiers || []).concat([{
+					name: 'lpnHoverClamp', enabled: true, phase: 'afterWrite',
+					fn: function (o) { hoverCardClamp(o.state.elements.popper); }
+				}]);
+				return cfg;
+			}
 		});
 		hoverCard.tip.show();
 		hoverCard.shown = true;
+	}
+	// Pulls the card back inside the window if placement left any of it outside (a card taller than
+	// the window, a pointer at the very edge). The card is click-through, so overlapping the
+	// pointer in the last resort costs nothing.
+	function hoverCardClamp(el) {
+		var r = el.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight, m = 4, dx = 0, dy = 0, t, mt;
+		if (r.width === 0 && r.height === 0) { return; }
+		if (r.left < m) { dx = m - r.left; } else if (r.right > vw - m) { dx = vw - m - r.right; }
+		if (r.top < m) { dy = m - r.top; } else if (r.bottom > vh - m) { dy = vh - m - r.bottom; }
+		if (!dx && !dy) { return; }
+		t = el.style.transform || '';
+		mt = /translate(?:3d)?\(\s*(-?[\d.]+)px,\s*(-?[\d.]+)px/.exec(t);
+		if (mt) { el.style.transform = 'translate3d(' + (parseFloat(mt[1]) + dx) + 'px, ' + (parseFloat(mt[2]) + dy) + 'px, 0)'; }
+		else { el.style.left = ((parseFloat(el.style.left) || 0) + dx) + 'px'; el.style.top = ((parseFloat(el.style.top) || 0) + dy) + 'px'; }
 	}
 	// The VERB. Reads the subject once, drops it, then deletes -- deleteElement() may cascade,
 	// confirm, or (inside a scenario) deactivate rather than destroy, and none of those should find
@@ -66603,6 +66768,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// `.ec-help` wraps the glyph alone. Explanatory text never goes in the anchor's own title=:
 	// js/Calculators.lib.js only activates tap-triggered tooltips on `.ec-help[title]`, so on touch
 	// a bare `<a title>` just navigates and the text is never seen.
+	// **THE PROPERTIES BOX BUILT OFF-SCREEN, FOR THE HOVER CARD** (Task 773). While `propHarvest` is
+	// set, renderNodeFields(), renderLinkFields() and renderCustomerFields() write into a detached
+	// pair of elements instead of the popup, so the card reads the very rows Properties would show
+	// (hoverCardPropRows()) and there is no second list of an asset's fields to drift.
+	var propHarvest = null;
+	function popupFieldsEl() { return propHarvest ? propHarvest.fields : document.getElementById('lpn_popup_fields'); }
+	function popupTitleEl() { return propHarvest ? propHarvest.title : document.getElementById('lpn_popup_title'); }
 	function setFieldLabel(label, text, tip, href) {
 		var help, glyph, a;
 		if (!tip && !href) { label.textContent = text + ' '; return; }
@@ -66632,6 +66804,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		label.appendChild(document.createTextNode(' '));
 	}
 	function tipsIn(root) {
+		if (propHarvest) { return; }
 		initTipsIn(root);
 	}
 	// Hover/tap tip straight on a button: the button is already the click target, so no separate "?"
@@ -68116,7 +68289,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// cascading-reference-update logic (below) only differs in which maps get re-keyed.
 	function idField(currentId, onRename, group) {
 		var pc = EngCalcs.pageConfig || {},
-			title = document.getElementById('lpn_popup_title'), input = document.createElement('input');
+			title = popupTitleEl(), input = document.createElement('input');
 		// **THE BOX SAYS WHAT IT IS** (Tom, 2026-08-18: *"Why doesn't the ID input say ID before
 		// it?"*). It sits in the popup's title bar, where a bare text box holding "J12" reads as a
 		// heading somebody made editable rather than as the element's name.
@@ -68525,7 +68698,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					: pc.lpn_result_source_share_tip);
 	}
 	function renderNodeFields(nodeId) {
-		var n = nodeById(nodeId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
+		var n = nodeById(nodeId), fields = popupFieldsEl(), pc = EngCalcs.pageConfig || {};
 		idField(n.id, function (newId) { renameNode(nodeId, newId); }, 'node');
 		clearFields(fields);
 		// **POSITION SITS IMMEDIATELY AFTER THE ID, ON TOM'S RULING OF 2026-09-15** -- `idField()`
@@ -69681,7 +69854,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		fields.appendChild(document.createElement('br'));
 	}
 	function renderLinkFields(linkId) {
-		var l = linkById(linkId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
+		var l = linkById(linkId), fields = popupFieldsEl(), pc = EngCalcs.pageConfig || {};
 		idField(l.id, function (newId) { renameLink(linkId, newId); }, 'link');
 		clearFields(fields);
 		// **THE IDENTITY BAND, AND A LINK HAS NO COORDINATES TO PUT BETWEEN** (Task 674) -- so it is
@@ -70595,8 +70768,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// its pipe silently moves flow from one junction to the other, and a reader who cannot see which
 	// junction it lumps at has no way to know that happened.
 	function renderCustomerFields(custId) {
-		var c = customerById(custId), fields = document.getElementById('lpn_popup_fields'),
-			pc = EngCalcs.pageConfig || {}, title = document.getElementById('lpn_popup_title'),
+		var c = customerById(custId), fields = popupFieldsEl(),
+			pc = EngCalcs.pageConfig || {}, title = popupTitleEl(),
 			l = c ? customerLink(c) : null, nid = c ? customerNodeId(c) : null,
 			nd = nid ? nodeById(nid) : null, atNode = c ? customerAtNodeEnd(c) : false,
 			demLabel, demInput, patLabel, patSel, cntLabel, cntInput,
@@ -73636,6 +73809,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// the shed cascade -- needs to know which quantity it is, and by the time the lines reach
 		// composeRows() they are indistinguishable strings.
 		line.field = field;
+		line.bare = line.text;
 		line.parts = [];
 		if (p) { line.parts.push({ text: p }); }
 		line.parts.push({ text: line.text });
