@@ -1,87 +1,186 @@
 /* ec-colour-tokens:begin */
-/* CHROME COLOUR TOKENS (Task 714, Phase 1; dev/theming-plan.md). Every colour of the application's own
-   chrome is declared here and used as var(--ec-...) everywhere else. Values are exactly the literals the
-   stylesheet carried before, so nothing changed on screen. A later dark set overrides these names and
-   nothing else. Map symbology and paper are NOT chrome and stay literal: dev/scripts/chrome_colour_allow.json.
-   dev/scripts/chrome_colour_check.php refuses a colour literal outside this block. */
-:root {
+/* CHROME COLOUR TOKENS (Task 714; seeds and derivation Task 811, dev/themes-plan.md). Every colour of the
+   application's own chrome is declared here and used as var(--ec-...) everywhere else. Map symbology and
+   paper are NOT chrome and stay literal: dev/scripts/chrome_colour_allow.json. chrome_colour_check.php
+   refuses a colour literal outside this block.
+
+   A THEME IS ABOUT 25 SEEDS. The first rule holds the light seeds and, once, every other token DERIVED from
+   the seeds by color-mix(in srgb): the grey ladder is a step from paper (--ec-bg) towards ink (--ec-ink),
+   a tint is a step from paper towards the accent, and so on. A theme block below re-states the seeds and
+   whatever it wants to differ from the derivation; nothing else. The rule is on `.ec-theme-card` too, so a
+   gallery card in Settings is painted by its own theme's tokens and can never drift from the real page.
+
+   Light is pinned. Where the derivation does not land on today's exact value (a tint the eye chose by hand),
+   the light-only rule below states the value, so the light page is what it always was; light-tokens-
+   browser-harness.js holds every token to the pinned master SHA. Dark keeps its hand-chosen values for the
+   same reason. The other themes are seeds alone, plus a few named overrides; theme_contrast_check.js and
+   theme-contrast-browser-harness.js hold every one of them to WCAG. */
+:root, .ec-theme-card {
+	/* ---- SEEDS ---- */
 	/* Surfaces and text */
 	--ec-bg: #fff;
+	/* The menu bar, toolbar and tab strip ("the same, but better" #1, dev/themes-plan.md): a quiet surface
+	   of their own, so the chrome recedes and the drawing comes first. */
+	--ec-chrome-bg: #eef1f5;
 	--ec-ink: #333;
-	--ec-ink-strong: #222;
-	--ec-ink-muted: #555;
-	--ec-ink-subtle: #666;
 	--ec-ink-black: #000;
 	/* Rules and borders */
-	--ec-border: #ddd;
 	--ec-border-strong: #ccc;
+	/* The edge that tells a field is a field (WCAG 1.4.11, 3:1; "better" #2). Bootstrap's own is #dee2e6. */
+	--ec-control-border: #8f8f8f;
 	/* Accent: links, outlined buttons, menu bar */
 	--ec-accent: #0645ad;
 	/* The Guide's pointer ring: the one colour no control uses for pressed, active, focused or hover. */
 	--ec-point: #c2185b;
 	--ec-accent-hover: #1f58b5;
 	--ec-accent-open: #05378a;
-	--ec-accent-hover-bg: #eaf1fc;
-	--ec-accent-open-bg: #d7e6fb;
-	/* The one button base: menu-bar items and toolbar buttons (R-202) */
-	--ec-btn-radius: 5px;
-	--ec-btn-border-w: 1px;
 	/* Brand blue: consent buttons, nav */
 	--ec-brand: #1a6faf;
 	--ec-brand-hover: #14588c;
-	/* Notice and status */
+	/* Notice and status. The warning ink is deeper than it was (#c60, 3.69:1 on the notice; "better" #2). */
 	--ec-warn-bg: #fffbe6;
 	--ec-warn-border: #a80;
-	--ec-warn-ink: #c60;
+	--ec-warn-ink: #9a4400;
 	/* A value the open scenario holds (an override): the amber the tables' override wash uses. */
 	--ec-held: #e8a33d;
-	--ec-held-bg: #fff3cd;
 	/* The override marker's own ink (Task 790): the amber family, dark enough to read as a shape. */
 	--ec-held-ink: #8a5a00;
 	--ec-ok-ink: #267326;
 	--ec-bad-ink: #c00;
 	--ec-error-ink: #a00;
 	--ec-error-bg: #fdecea;
-	--ec-error-bg-soft: #fff0f0;
-	--ec-neutral-ink: gray;
-	/* Interaction: toolbar hover and pressed, table selection */
+	/* Table and column selection */
+	--ec-select: #0b57d0;
+	/* The one tip: Bootstrap's tooltip, name tips and explanations alike (Task 714). Black with white
+	   text in light, which is what Bootstrap drew; the edge is a ring that costs no size. */
+	--ec-tip-bg: #000;
+	--ec-tip-ink: #fff;
+	--ec-tip-edge: #000;
+	/* The (?) and warning glyphs that open a tip (was steelblue, 4.11:1 on white; "better" #2) */
+	--ec-help-ink: #3a77a8;
+
+	/* ---- NOT COLOURS OF A THEME'S CHOOSING ---- */
+	/* The one button base: menu-bar items and toolbar buttons (R-202). A theme may square the corners. */
+	--ec-btn-radius: 5px;
+	--ec-btn-border-w: 1px;
+	/* A raised edge on the menu-bar and toolbar buttons, at rest and pressed. Only Platinum draws one. */
+	--ec-bevel: none;
+	--ec-bevel-in: none;
+	/* The map's own paper and ink, for the gallery cards' little map. The map itself does not follow a theme. */
+	--ec-map-paper: #fff;
+	--ec-map-ink: #000;
+	/* The basemap button's two pictures of a map (data, not chrome) */
+	--ec-hue-10304f: #10304f;
+	--ec-hue-eae7e0: #eae7e0;
+	/* Shadows and scrims */
+	--ec-a-0-0-0-12: rgba(0, 0, 0, .12);
+	--ec-a-0-0-0-18: rgba(0, 0, 0, .18);
+	--ec-a-0-0-0-2: rgba(0, 0, 0, .2);
+	--ec-a-0-0-0-25: rgba(0, 0, 0, .25);
+	--ec-a-0-0-0-3: rgba(0, 0, 0, .3);
+	--ec-a-0-0-0-35: rgba(0, 0, 0, .35);
+	--ec-a-0-0-0-4: rgba(0, 0, 0, .4);
+
+	/* ---- DERIVED FROM THE SEEDS ---- */
+	/* Text: steps from ink towards paper */
+	--ec-ink-strong: color-mix(in srgb, var(--ec-ink), var(--ec-ink-black) 35%);
+	--ec-ink-muted: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 83.3333%);
+	--ec-ink-subtle: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 75%);
+	--ec-neutral-ink: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 62.2549%);
+	/* The grey ladder: each light grey is (255 - v) / 204 of the way from paper (#fff) to ink (#333) */
+	--ec-border: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 16.6667%);
+	--ec-gray-444: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 91.6667%);
+	--ec-gray-767676: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 67.1569%);
+	--ec-gray-777: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 66.6667%);
+	--ec-gray-888: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 58.3333%);
+	--ec-gray-999: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 50%);
+	--ec-gray-aaa: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 41.6667%);
+	--ec-gray-bbb: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 33.3333%);
+	--ec-gray-d6d6d6: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 20.098%);
+	--ec-gray-dcdcdc: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 17.1569%);
+	--ec-gray-e0e0e0: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 15.1961%);
+	--ec-gray-e6e6e6: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 12.2549%);
+	--ec-gray-e8e8e8: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 11.2745%);
+	--ec-gray-eaeaea: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 10.2941%);
+	--ec-gray-ececec: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 9.3137%);
+	--ec-gray-eee: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 8.3333%);
+	--ec-gray-f0f0f0: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 7.3529%);
+	--ec-gray-f2f2f2: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 6.3725%);
+	--ec-gray-f6f6f6: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 4.4118%);
+	--ec-gray-f7f7f7: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 3.9216%);
+	--ec-gray-fafafa: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 2.451%);
+	/* Accent tints: hover, open, pressed, the forms' wash */
+	--ec-accent-hover-bg: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 8%);
+	--ec-accent-open-bg: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 16%);
+	--ec-hover-bg: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 14%);
+	--ec-hover-border: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 70%);
+	--ec-pressed-bg: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 22%);
+	--ec-pressed-border: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 80%);
+	--ec-select-bg: color-mix(in srgb, var(--ec-bg), var(--ec-select) 9%);
+	--ec-select-bg-strong: color-mix(in srgb, var(--ec-bg), var(--ec-select) 18%);
+	--ec-form-bg: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 3%);
+	--ec-form-border: color-mix(in srgb, var(--ec-accent), var(--ec-bg) 30%);
+	--ec-debug-grid: var(--ec-accent);
+	--ec-a-6-69-173-12: color-mix(in srgb, var(--ec-accent) 12%, transparent);
+	--ec-a-6-69-173-35: color-mix(in srgb, var(--ec-accent) 35%, transparent);
+	/* Status tints */
+	--ec-held-bg: color-mix(in srgb, var(--ec-bg), var(--ec-held) 15%);
+	--ec-error-bg-soft: color-mix(in srgb, var(--ec-bg), var(--ec-error-bg) 50%);
+	/* The value-named hues, each given the role it plays where it is used */
+	--ec-hue-037: color-mix(in srgb, var(--ec-accent), var(--ec-ink-black) 30%);
+	--ec-hue-05a: var(--ec-accent);
+	--ec-hue-0b0080: var(--ec-accent-open);
+	--ec-hue-12211f: var(--ec-ink-strong);
+	--ec-hue-1565c0: var(--ec-accent);
+	--ec-hue-17406b: var(--ec-accent-open);
+	--ec-hue-1976d2: var(--ec-accent);
+	--ec-hue-2a6ebb: var(--ec-accent-hover);
+	--ec-hue-3c4043: var(--ec-ink);
+	--ec-hue-5a6570: var(--ec-ink-muted);
+	--ec-hue-5f6368: var(--ec-ink-muted);
+	--ec-hue-667: var(--ec-ink-subtle);
+	--ec-hue-8ab: var(--ec-hover-border);
+	--ec-hue-b00020: var(--ec-bad-ink);
+	--ec-hue-c0392b: var(--ec-bad-ink);
+	--ec-hue-d99: color-mix(in srgb, var(--ec-bg), var(--ec-bad-ink) 45%);
+	--ec-hue-e8a33d: var(--ec-held);
+	--ec-hue-eef1f4: var(--ec-hover-bg);
+	--ec-hue-eef3fd: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 7%);
+	--ec-hue-eef4ff: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 7%);
+	--ec-hue-f4d4d4: color-mix(in srgb, var(--ec-bg), var(--ec-bad-ink) 17%);
+	--ec-hue-fdd: color-mix(in srgb, var(--ec-bg), var(--ec-bad-ink) 13%);
+	--ec-hue-fff3cd: var(--ec-held-bg);
+	--ec-hue-fff4e5: color-mix(in srgb, var(--ec-bg), var(--ec-held) 12%);
+	/* Translucent paper and ink */
+	--ec-a-60-64-67-14: color-mix(in srgb, var(--ec-ink) 14%, transparent);
+	--ec-a-60-64-67-5: color-mix(in srgb, var(--ec-ink) 50%, transparent);
+	--ec-a-128-128-128-4: color-mix(in srgb, var(--ec-neutral-ink) 40%, transparent);
+	--ec-a-128-128-128-45: color-mix(in srgb, var(--ec-neutral-ink) 45%, transparent);
+	--ec-map-overlay-bg: color-mix(in srgb, var(--ec-bg) 80%, transparent);
+	--ec-a-255-255-255-85: color-mix(in srgb, var(--ec-bg) 85%, transparent);
+	--ec-a-255-255-255-9: color-mix(in srgb, var(--ec-bg) 90%, transparent);
+	--ec-a-255-255-255-94: color-mix(in srgb, var(--ec-bg) 94%, transparent);
+}
+/* LIGHT, PINNED: the hand-chosen values the derivation does not land on exactly. A page with no data-theme
+   (the calculator pages) is light. */
+:root:not([data-theme]), :root[data-theme="light"], .ec-theme-card[data-theme="light"] {
+	--ec-ink-strong: #222;
+	--ec-accent-hover-bg: #eaf1fc;
+	--ec-accent-open-bg: #d7e6fb;
 	--ec-hover-bg: #def;
 	--ec-hover-border: #9bd;
 	--ec-pressed-bg: #cfe3f7;
 	--ec-pressed-border: #6aa6d8;
-	--ec-select: #0b57d0;
 	--ec-select-bg: #e8f0fe;
 	--ec-select-bg-strong: #d3e3fd;
-	/* Calculator forms and the debug grid */
 	--ec-form-bg: #f7f9ff;
 	--ec-form-border: #66c;
 	--ec-debug-grid: blue;
-	/* Neutral greys, named by value: one role each is a Phase 2 job */
-	--ec-gray-444: #444;
-	--ec-gray-767676: #767676;
-	--ec-gray-777: #777;
-	--ec-gray-888: #888;
-	--ec-gray-999: #999;
-	--ec-gray-aaa: #aaa;
-	--ec-gray-bbb: #bbb;
-	--ec-gray-d6d6d6: #d6d6d6;
-	--ec-gray-dcdcdc: #dcdcdc;
-	--ec-gray-e0e0e0: #e0e0e0;
-	--ec-gray-e6e6e6: #e6e6e6;
-	--ec-gray-e8e8e8: #e8e8e8;
-	--ec-gray-eaeaea: #eaeaea;
-	--ec-gray-ececec: #ececec;
-	--ec-gray-eee: #eee;
-	--ec-gray-f0f0f0: #f0f0f0;
-	--ec-gray-f2f2f2: #f2f2f2;
-	--ec-gray-f6f6f6: #f6f6f6;
-	--ec-gray-f7f7f7: #f7f7f7;
-	--ec-gray-fafafa: #fafafa;
-	/* Other hues, named by value: role not yet assigned */
+	--ec-held-bg: #fff3cd;
+	--ec-error-bg-soft: #fff0f0;
 	--ec-hue-037: #037;
 	--ec-hue-05a: #05a;
 	--ec-hue-0b0080: #0b0080;
-	--ec-hue-10304f: #10304f;
 	--ec-hue-12211f: #12211f;
 	--ec-hue-1565c0: #1565c0;
 	--ec-hue-17406b: #17406b;
@@ -95,52 +194,24 @@
 	--ec-hue-b00020: #b00020;
 	--ec-hue-c0392b: #c0392b;
 	--ec-hue-d99: #d99;
-	--ec-hue-e8a33d: #e8a33d;
-	--ec-hue-eae7e0: #eae7e0;
 	--ec-hue-eef1f4: #eef1f4;
 	--ec-hue-eef3fd: #eef3fd;
 	--ec-hue-eef4ff: #eef4ff;
 	--ec-hue-f4d4d4: #f4d4d4;
 	--ec-hue-fdd: #fdd;
-	--ec-hue-fff3cd: #fff3cd;
 	--ec-hue-fff4e5: #fff4e5;
-	/* Translucent colours (shadows, scrims, tints), named by RGB and alpha */
-	--ec-a-0-0-0-12: rgba(0, 0, 0, .12);
-	--ec-a-0-0-0-18: rgba(0, 0, 0, .18);
-	--ec-a-0-0-0-2: rgba(0, 0, 0, .2);
-	--ec-a-0-0-0-25: rgba(0, 0, 0, .25);
-	--ec-a-0-0-0-3: rgba(0, 0, 0, .3);
-	--ec-a-0-0-0-35: rgba(0, 0, 0, .35);
-	--ec-a-0-0-0-4: rgba(0, 0, 0, .4);
-	--ec-a-6-69-173-12: rgba(6, 69, 173, .12);
-	--ec-a-6-69-173-35: rgba(6, 69, 173, .35);
 	--ec-a-60-64-67-14: rgba(60, 64, 67, .14);
 	--ec-a-60-64-67-5: rgba(60, 64, 67, .5);
-	--ec-a-128-128-128-4: rgba(128, 128, 128, .4);
-	--ec-a-128-128-128-45: rgba(128, 128, 128, .45);
-	--ec-map-overlay-bg: rgba(255, 255, 255, .8);
-	--ec-a-255-255-255-85: rgba(255, 255, 255, .85);
-	--ec-a-255-255-255-9: rgba(255, 255, 255, .9);
-	--ec-a-255-255-255-94: rgba(255, 255, 255, .94);
-	/* The one tip: Bootstrap's tooltip, name tips and explanations alike (Task 714). Black with white
-	   text in light, which is what Bootstrap drew; the edge is a ring that costs no size. */
-	--ec-tip-bg: #000;
-	--ec-tip-ink: #fff;
-	--ec-tip-edge: #000;
-	/* The (?) and warning glyphs that open a tip */
-	--ec-help-ink: steelblue;
 }
-/* THE DARK SET (Task 714, Phase 2). It overrides the tokens above and nothing else, so a colour is changed
-   in one place per theme. Two selectors carry the SAME block, because CSS cannot share one: the explicit
-   choice (<html data-theme="dark">) and the operating system's preference when the choice is System
-   (<html data-theme="system">, the default). Both attributes are written by the head script of the
-   looped-network page alone (lib/HeadersFooters.lib.php, window.ecTheme); a page that carries no
-   data-theme stays light under any system, on purpose: the calculator pages keep markup (a light
-   Bootstrap navbar) and the parent site's own stylesheet that are not tokens, so they are not themed
-   yet. An explicit Light is simply the light set. theme_contrast_check.js holds the two blocks identical
-   and every text and surface pair to WCAG AA. The map drawing (paper and ink, chrome_colour_allow.json)
-   is not a token and does not change. */
-:root[data-theme="dark"] {
+/* THE THEMES. The page head (lib/HeadersFooters.lib.php, window.ecTheme) writes the RESOLVED theme on <html>:
+   System becomes light, dark or high contrast by the operating system's preferences, and High contrast
+   becomes its light or dark palette by the colour scheme, so no block is written twice. Only the looped-
+   network page carries the attribute; a calculator page has none and stays light, on purpose (a light
+   Bootstrap navbar and the parent site's stylesheet are not tokens). The map drawing is not a token. */
+/* DARK (Task 714): today's hand-chosen values, every one stated. */
+:root[data-theme="dark"], .ec-theme-card[data-theme="dark"] {
+	--ec-chrome-bg: #22262e;
+	--ec-control-border: #6b7078;
 	color-scheme: dark;
 	/* Surfaces and text */
 	--ec-bg: #1e1f22;
@@ -166,6 +237,8 @@
 	--ec-warn-bg: #3a3318;
 	--ec-warn-border: #b8960f;
 	--ec-warn-ink: #f0a04b;
+	/* The override marker (Task 790) was left at the light ink, 2.78:1 here; Task 811 states it. */
+	--ec-held-ink: #f0b84a;
 	--ec-ok-ink: #6fcf7f;
 	--ec-bad-ink: #ff7b72;
 	--ec-error-ink: #ff8a80;
@@ -252,119 +325,195 @@
 	--ec-tip-edge: #8a9099;
 	--ec-help-ink: #7fb2e0;
 }
-@media (prefers-color-scheme: dark) {
-	:root[data-theme="system"] {
-		color-scheme: dark;
-		/* Surfaces and text */
-		--ec-bg: #1e1f22;
-		--ec-ink: #d5d8dc;
-		--ec-ink-strong: #e6e8eb;
-		--ec-ink-muted: #b7bbc1;
-		--ec-ink-subtle: #a9aeb5;
-		--ec-ink-black: #fff;
-		/* Rules and borders */
-		--ec-border: #3a3d44;
-		--ec-border-strong: #6b7078;
-		/* Accent: links, outlined buttons, menu bar */
-		--ec-accent: #8ab4f8;
-		--ec-point: #ff6fa3;
-		--ec-accent-hover: #aecbfa;
-		--ec-accent-open: #aecbfa;
-		--ec-accent-hover-bg: #27354d;
-		--ec-accent-open-bg: #31456b;
-		/* Brand blue */
-		--ec-brand: #62b0ea;
-		--ec-brand-hover: #8cc4f2;
-		/* Notice and status */
-		--ec-warn-bg: #3a3318;
-		--ec-warn-border: #b8960f;
-		--ec-warn-ink: #f0a04b;
-		--ec-ok-ink: #6fcf7f;
-		--ec-bad-ink: #ff7b72;
-		--ec-error-ink: #ff8a80;
-		--ec-error-bg: #3d1f1e;
-		--ec-error-bg-soft: #3a2222;
-		--ec-neutral-ink: #a3a8ae;
-		/* Interaction */
-		--ec-hover-bg: #29384f;
-		--ec-hover-border: #6a93c4;
-		--ec-pressed-bg: #35507a;
-		--ec-pressed-border: #7aaadf;
-		--ec-select: #8ab4f8;
-		--ec-select-bg: #26364f;
-		--ec-select-bg-strong: #2f4468;
-		/* Calculator forms and the debug grid */
-		--ec-form-bg: #22262e;
-		--ec-form-border: #7a7ad6;
-		--ec-debug-grid: #5b7cff;
-		/* Neutral greys */
-		--ec-gray-444: #c8cbd0;
-		--ec-gray-767676: #9ba0a7;
-		--ec-gray-777: #a8adb4;
-		--ec-gray-888: #959ba2;
-		--ec-gray-999: #868c93;
-		--ec-gray-aaa: #70757d;
-		--ec-gray-bbb: #6a6f77;
-		--ec-gray-d6d6d6: #444850;
-		--ec-gray-dcdcdc: #41454c;
-		--ec-gray-e0e0e0: #3f434a;
-		--ec-gray-e6e6e6: #383b42;
-		--ec-gray-e8e8e8: #363940;
-		--ec-gray-eaeaea: #34373d;
-		--ec-gray-ececec: #32353b;
-		--ec-gray-eee: #30333a;
-		--ec-gray-f0f0f0: #2c2f34;
-		--ec-gray-f2f2f2: #2a2c31;
-		--ec-gray-f6f6f6: #26282c;
-		--ec-gray-f7f7f7: #25272b;
-		--ec-gray-fafafa: #232528;
-		/* Other hues */
-		--ec-hue-037: #7cb4ef;
-		--ec-hue-05a: #7ab0f0;
-		--ec-hue-0b0080: #b9b4ff;
-		--ec-hue-10304f: #10304f;
-		--ec-hue-12211f: #dfe6e4;
-		--ec-hue-1565c0: #4f9bf0;
-		--ec-hue-17406b: #8ab4e8;
-		--ec-hue-1976d2: #64a8f5;
-		--ec-hue-2a6ebb: #5b93d6;
-		--ec-hue-3c4043: #b0b4ba;
-		--ec-hue-5a6570: #aab2bb;
-		--ec-hue-5f6368: #aeb3b8;
-		--ec-hue-667: #a4a4c4;
-		--ec-hue-8ab: #5d7d94;
-		--ec-hue-b00020: #ff8a9b;
-		--ec-hue-c0392b: #ff7a6a;
-		--ec-hue-d99: #a05a5a;
-		--ec-hue-eae7e0: #2f2d29;
-		--ec-hue-eef1f4: #262b32;
-		--ec-hue-eef3fd: #26324a;
-		--ec-hue-eef4ff: #26324a;
-		--ec-hue-f4d4d4: #4a2b2b;
-		--ec-hue-fdd: #4a2828;
-		--ec-hue-fff3cd: #3b371c;
-		--ec-hue-fff4e5: #44331c;
-		/* Translucent colours */
-		--ec-a-0-0-0-12: rgba(0, 0, 0, .3);
-		--ec-a-0-0-0-18: rgba(0, 0, 0, .4);
-		--ec-a-0-0-0-2: rgba(0, 0, 0, .4);
-		--ec-a-0-0-0-25: rgba(0, 0, 0, .5);
-		--ec-a-0-0-0-3: rgba(0, 0, 0, .5);
-		--ec-a-0-0-0-35: rgba(0, 0, 0, .6);
-		--ec-a-0-0-0-4: rgba(0, 0, 0, .6);
-		--ec-a-6-69-173-12: rgba(138, 180, 248, .16);
-		--ec-a-6-69-173-35: rgba(138, 180, 248, .45);
-		--ec-a-60-64-67-14: rgba(200, 205, 215, .14);
-		--ec-a-60-64-67-5: rgba(200, 205, 215, .5);
-		--ec-map-overlay-bg: rgba(30, 31, 34, .8);
-		--ec-a-255-255-255-85: rgba(30, 31, 34, .95);
-		--ec-a-255-255-255-9: rgba(30, 31, 34, .9);
-		--ec-a-255-255-255-94: rgba(30, 31, 34, .94);
-		--ec-tip-bg: #2b2d33;
-		--ec-tip-ink: #e6e8eb;
-		--ec-tip-edge: #8a9099;
-		--ec-help-ink: #7fb2e0;
-	}
+/* HIGH CONTRAST (Task 811): pure ink on pure paper, black rules, every text pair at 7:1 (WCAG AAA). One
+   choice, two palettes: this one, and the next when the device is set to dark. System chooses it when the
+   device asks for more contrast (prefers-contrast: more). */
+:root[data-theme="hc"], .ec-theme-card[data-theme="hc"] {
+	--ec-bg: #fff;
+	--ec-chrome-bg: #fff;
+	--ec-ink: #000;
+	--ec-ink-black: #000;
+	--ec-border-strong: #000;
+	--ec-control-border: #000;
+	--ec-accent: #0000b3;
+	--ec-point: #b0004a;
+	--ec-accent-hover: #000080;
+	--ec-accent-open: #006;
+	--ec-brand: #00399e;
+	--ec-brand-hover: #002a75;
+	--ec-warn-bg: #ffc;
+	--ec-warn-border: #000;
+	--ec-warn-ink: #5c2e00;
+	--ec-held: #8a5a00;
+	--ec-held-ink: #5c3b00;
+	--ec-ok-ink: #004d1a;
+	--ec-bad-ink: #8a0000;
+	--ec-error-ink: #700000;
+	--ec-error-bg: #ffe5e5;
+	--ec-select: #0000b3;
+	--ec-tip-bg: #000;
+	--ec-tip-ink: #fff;
+	--ec-tip-edge: #000;
+	--ec-help-ink: #00399e;
+	/* The disabled and quiet greys stay readable, and the rules stay black */
+	--ec-border: #000;
+	--ec-gray-999: #595959;
+	--ec-gray-bbb: #595959;
+	--ec-gray-888: #000;
+	--ec-gray-d6d6d6: #000;
+	--ec-neutral-ink: var(--ec-ink-muted);
+	--ec-gray-777: var(--ec-ink-muted);
+}
+:root[data-theme="hc-dark"], .ec-theme-card[data-theme="hc-dark"] {
+	color-scheme: dark;
+	--ec-bg: #000;
+	--ec-chrome-bg: #000;
+	--ec-ink: #fff;
+	--ec-ink-black: #fff;
+	--ec-border-strong: #fff;
+	--ec-control-border: #fff;
+	--ec-accent: #7fd4ff;
+	--ec-point: #ff7ab8;
+	--ec-accent-hover: #b3e6ff;
+	--ec-accent-open: #fff;
+	--ec-brand: #7fd4ff;
+	--ec-brand-hover: #b3e6ff;
+	--ec-warn-bg: #1f1c00;
+	--ec-warn-border: #ff0;
+	--ec-warn-ink: #ff6;
+	--ec-held: #fc3;
+	--ec-held-ink: #ffd966;
+	--ec-ok-ink: #66ff8c;
+	--ec-bad-ink: #ffb3b3;
+	--ec-error-ink: #ffb3b3;
+	--ec-error-bg: #300;
+	--ec-select: #7fd4ff;
+	--ec-tip-bg: #fff;
+	--ec-tip-ink: #000;
+	--ec-tip-edge: #fff;
+	--ec-help-ink: #7fd4ff;
+	--ec-border: #fff;
+	--ec-gray-999: #a6a6a6;
+	--ec-gray-bbb: #a6a6a6;
+	--ec-gray-888: #fff;
+	--ec-gray-d6d6d6: #fff;
+	--ec-neutral-ink: var(--ec-ink-muted);
+	--ec-gray-777: var(--ec-ink-muted);
+	--ec-a-0-0-0-12: rgba(0, 0, 0, .5);
+	--ec-a-0-0-0-2: rgba(0, 0, 0, .6);
+	--ec-a-0-0-0-25: rgba(0, 0, 0, .6);
+}
+/* AMBER (Task 811): a monochrome amber terminal. One hue in steps of brightness; status reads by the verdict
+   glyph (a check or a warning sign) and the override marker's shape, never by colour alone (WCAG 1.4.1). */
+:root[data-theme="amber"], .ec-theme-card[data-theme="amber"] {
+	color-scheme: dark;
+	--ec-bg: #140c00;
+	--ec-chrome-bg: #1d1100;
+	--ec-ink: #ffb000;
+	--ec-ink-black: #ffd37a;
+	--ec-border-strong: #9a6600;
+	--ec-control-border: #9a6600;
+	--ec-accent: #ffd37a;
+	--ec-point: #ffe3a8;
+	--ec-accent-hover: #ffe3a8;
+	--ec-accent-open: #fff;
+	--ec-brand: #ffb000;
+	--ec-brand-hover: #ffd37a;
+	--ec-warn-bg: #3a2400;
+	--ec-warn-border: #ffb000;
+	--ec-warn-ink: #ffd37a;
+	--ec-held: #ffb000;
+	--ec-held-ink: #ffd37a;
+	--ec-ok-ink: #ffb000;
+	--ec-bad-ink: #ffd37a;
+	--ec-error-ink: #ffd37a;
+	--ec-error-bg: #3a1c00;
+	--ec-select: #ffd37a;
+	--ec-tip-bg: #ffb000;
+	--ec-tip-ink: #140c00;
+	--ec-tip-edge: #ffb000;
+	--ec-help-ink: #ffb000;
+	--ec-btn-radius: 0;
+	/* The dim steps stay readable: quiet text is the muted ink, disabled text the middle grey */
+	--ec-neutral-ink: var(--ec-ink-muted);
+	--ec-gray-777: var(--ec-ink-muted);
+	--ec-gray-bbb: var(--ec-gray-999);
+	--ec-a-0-0-0-12: rgba(0, 0, 0, .5);
+	--ec-a-0-0-0-2: rgba(0, 0, 0, .6);
+	--ec-a-0-0-0-25: rgba(0, 0, 0, .6);
+}
+/* GREEN (Task 811): the same terminal in green phosphor. It differs from Amber by hue alone. */
+:root[data-theme="green"], .ec-theme-card[data-theme="green"] {
+	color-scheme: dark;
+	--ec-bg: #031003;
+	--ec-chrome-bg: #061a06;
+	--ec-ink: #33ff66;
+	--ec-ink-black: #a6ffbd;
+	--ec-border-strong: #1f9a3e;
+	--ec-control-border: #1f9a3e;
+	--ec-accent: #a6ffbd;
+	--ec-point: #d2ffdf;
+	--ec-accent-hover: #d2ffdf;
+	--ec-accent-open: #fff;
+	--ec-brand: #33ff66;
+	--ec-brand-hover: #a6ffbd;
+	--ec-warn-bg: #0d2e0d;
+	--ec-warn-border: #33ff66;
+	--ec-warn-ink: #a6ffbd;
+	--ec-held: #33ff66;
+	--ec-held-ink: #a6ffbd;
+	--ec-ok-ink: #33ff66;
+	--ec-bad-ink: #a6ffbd;
+	--ec-error-ink: #a6ffbd;
+	--ec-error-bg: #0a2a12;
+	--ec-select: #a6ffbd;
+	--ec-tip-bg: #33ff66;
+	--ec-tip-ink: #031003;
+	--ec-tip-edge: #33ff66;
+	--ec-help-ink: #33ff66;
+	--ec-btn-radius: 0;
+	--ec-neutral-ink: var(--ec-ink-muted);
+	--ec-gray-777: var(--ec-ink-muted);
+	--ec-gray-bbb: var(--ec-gray-999);
+	--ec-a-0-0-0-12: rgba(0, 0, 0, .5);
+	--ec-a-0-0-0-2: rgba(0, 0, 0, .6);
+	--ec-a-0-0-0-25: rgba(0, 0, 0, .6);
+}
+/* PLATINUM (Task 811): an evocation of the late-1990s desktop: window-grey chrome, white content, black
+   ink, navy links, pale yellow tips, square corners and a one-pixel raised edge on the buttons. */
+:root[data-theme="platinum"], .ec-theme-card[data-theme="platinum"] {
+	--ec-bg: #fff;
+	--ec-chrome-bg: #ddd;
+	--ec-ink: #000;
+	--ec-ink-black: #000;
+	--ec-border-strong: #666;
+	--ec-control-border: #666;
+	--ec-accent: #2a2a9a;
+	--ec-point: #c2185b;
+	--ec-accent-hover: #1a1a7a;
+	--ec-accent-open: #101060;
+	--ec-brand: #2a2a9a;
+	--ec-brand-hover: #1a1a7a;
+	--ec-warn-bg: #ffc;
+	--ec-warn-border: #666;
+	--ec-warn-ink: #630;
+	--ec-held: #c80;
+	--ec-held-ink: #6b4400;
+	--ec-ok-ink: #1a6b1a;
+	--ec-bad-ink: #b00000;
+	--ec-error-ink: #a00000;
+	--ec-error-bg: #ffe0e0;
+	--ec-select: #2a2a9a;
+	--ec-tip-bg: #ffc;
+	--ec-tip-ink: #000;
+	--ec-tip-edge: #000;
+	--ec-help-ink: #2a2a9a;
+	--ec-btn-radius: 2px;
+	/* Disabled text and the tab edges read on the window grey */
+	--ec-gray-999: #777;
+	--ec-gray-bbb: #777;
+	--ec-bevel: inset 1px 1px 0 #fff, inset -1px -1px 0 #888;
+	--ec-bevel-in: inset 1px 1px 0 #888, inset -1px -1px 0 #fff;
 }
 /* ec-colour-tokens:end */
 
@@ -1876,6 +2025,13 @@ html[lang="zh"] .ec-welcome {
 .lpn-menubar-item[aria-expanded="true"], #lpn_toolbar button:not(.lpn-transport-btn)[aria-pressed="true"] {
 	background: var(--ec-accent-open-bg); border-color: var(--ec-accent-open);
 }
+/* A raised edge, at rest and pressed in (Task 811). `none` in every theme but Platinum. */
+.lpn-menubar-item, #lpn_toolbar button:not(.lpn-transport-btn):not(:disabled) { box-shadow: var(--ec-bevel); }
+.lpn-menubar-item[aria-expanded="true"], #lpn_toolbar button:not(.lpn-transport-btn)[aria-pressed="true"] { box-shadow: var(--ec-bevel-in); }
+/* The edge of a Bootstrap field: the transport's two drop-downs, the navbar's search and link fields
+   ("the same, but better" #2, Task 811). Bootstrap draws it #dee2e6, 1.3:1 on white; WCAG 1.4.11 asks 3:1 of
+   the boundary that tells a control is there. The browser's own fields are #767676 already. */
+.form-select, .form-control { border-color: var(--ec-control-border); }
 .lpn-menubar-item:focus-visible, #lpn_toolbar button:not(.lpn-transport-btn):focus-visible {
 	outline: 2px solid var(--ec-accent); outline-offset: 2px;
 }
@@ -1958,6 +2114,13 @@ html[dir="rtl"] .lpn-transport-btn[data-icon="step-fwd"] svg, html[dir="rtl"] .l
    (1080), below the registration bar (3000), which is deliberately over everything.
    `position: relative` is what makes z-index apply at all to a static block; it changes no layout. */
 #lpn_menubar, #lpn_toolbar, #lpn_tabs { position: relative; z-index: 30; }
+/* THE CHROME'S OWN SURFACE ("the same, but better" #1, Task 811; dev/themes-plan.md). The menu bar, toolbar
+   and tab strip sat on the page's own near-white, the same as the drawing below them, separated by one
+   hairline. A quiet surface of their own lets the chrome recede and the drawing come first. The 4 px gaps
+   between the three rows are margins; a shadow with no blur paints each one the same colour without
+   moving a pixel of layout. The menu items keep their white fill and blue outline (Task 616). */
+#lpn_menubar, #lpn_toolbar, #lpn_tabs { background: var(--ec-chrome-bg); }
+#lpn_menubar, #lpn_toolbar { box-shadow: 0 4px 0 var(--ec-chrome-bg); }
 /* The floor for every box makePanelDraggable() wires. raisePanel() writes a higher number inline as
    boxes are opened and touched; this is only where the stack starts, and it is what puts an untouched
    box above the chrome. */
