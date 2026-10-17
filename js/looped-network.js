@@ -6907,12 +6907,10 @@ var EngCalcs = EngCalcs || {};
 	// (`colorBreaks['node.pressure']`). Its alternatives are DERIVED from it exactly as element
 	// overrides' are (choice A): nothing about the tree is stored.
 	//
-	// **EVERY READER IS ROUTED THROUGH THE SEAM; NOTHING IN THE INTERFACE WRITES ONE YET** (stage 3
+	// **EVERY READER AND EVERY SETTINGS-BOX WRITE IS ROUTED THROUGH THE SEAM** (stage 3
 	// of the doc's long burn). Tom, 2026-10-06: a setting changed in a scenario changes that scenario
-	// only, Presentation included -- *"We can't treat any value overrides differently."* The editing
-	// half (the Settings box writing through setScenarioSetting(), and the settings table that
-	// audits it) is the next stage. Until then a hand-written block changes the map and the solve
-	// in its own scenario, and the Settings box still shows and edits the project's own values.
+	// only, Presentation included -- *"We can't treat any value overrides differently."* The Settings
+	// box writes through setScenarioSetting() for every path named below.
 	var LPN_SETTING_CATEGORY_OF = {
 		// -- the model and the file's own bookkeeping
 		format: null, app: null, v: null, nextId: null,
@@ -43656,9 +43654,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// were. The second save, after applySaved(), rewrites the key with the STRUCTURALLY REPAIRED
 	// document.
 
-	function importProject(saved) {
+	// `outgoingDone`: the caller has already flushed the project being left (landInpText(), which
+	// has to move the units strip before docFromInp() and so must save the outgoing project first).
+	function importProject(saved, outgoingDone) {
 		var pc = EngCalcs.pageConfig || {};
-		rememberOutgoingProject();
+		if (!outgoingDone) { rememberOutgoingProject(); }
 		var id = newProjectId();
 		if (!writeJSON(projectKey(id), saved)) {
 			setWarning(pc.lpn_import_no_room || 'There is not enough browser storage left to add this project. Delete a project you no longer need and try again.');
@@ -44642,13 +44642,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			setWarning(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.');
 			return;
 		}
-		// The units strip moves FIRST. docFromInp() is written against the selector state --
+		// The units strip moves BEFORE docFromInp(), which is written against the selector state --
 		// it stores the file's own numbers precisely BECAUSE the strip is already showing the
 		// file's own units -- so this ordering is the fix, not a formality.
+		//
+		// **AND THE PROJECT BEING LEFT IS SAVED BEFORE THE STRIP MOVES** (R-415). Every save writes
+		// the units the strip shows, so moving it first and letting importProject() flush the
+		// outgoing project afterwards stamped the .inp's units on that project's numbers: a metric
+		// Fotobi saved as feet and inches the moment a GPM file was imported beside it.
+		var name = String(fileName).replace(/\.inp$/i, '') || String(fileName),
+			before = readUnitSelections();
+		rememberOutgoingProject();
 		applyUnitSelections(inpUnitSelections(parsed));
-		var name = String(fileName).replace(/\.inp$/i, '') || String(fileName);
-		var id = importProject(docFromInp(parsed, name));
-		if (!id) { return; }   // importProject already reported the storage failure
+		var id = importProject(docFromInp(parsed, name), true);
+		// Refused (no room): the project still open gets its own units back on the strip.
+		if (!id) { applyUnitSelections(before); refreshMapStatus(); return; }
 		// NO RE-ANCHORING STEP HERE ANY MORE (Task 332): the labels are stored at EPANET's own
 		// point and rendered from its own corner, so there is nothing to measure and nothing to
 		// run after the document is on screen.
@@ -45694,12 +45702,29 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			applyOneUnit(name, to);
 			if (unitKey(name) !== to) { return; }   // not an option this select offers
 			convertUnitValues(name, fNew / fOld);
+			convertDefaultInputs(name, fNew / fOld);
 			changed[name] = true;
 		});
 		convasRound(changed, a.rounding || {});
 		rememberUnitSelections();
 		afterUnitChange(fromUnits);
 		return changed;
+	}
+	// **THE SETTINGS > NEW ASSETS NUMBERS GO WITH THE NETWORK'S** (Tom, 2026-10-16: "Convert as
+	// doesn't convert the Settings starting values: Fix it."). Each is a number typed in the unit
+	// `name` names, so a copy converted to millimetres drew its next pipe 4 mm across. The same
+	// factor as the network, held to six significant figures as the other Settings numbers are.
+	// Not part of convertUnitValues(): that function is also the COUNT that decides whether a unit
+	// change needs its question, and every project, an empty one too, has these numbers.
+	function convertDefaultInputs(name, k) {
+		var d = settings.defaults, keys = (LPN_DEFAULTS_UNIT_FIELD[name] || []).slice();
+		if (!d) { return; }
+		if (name === 'lpn_u_elevhead') { keys.push('tankMinLevel'); }
+		// Roughness is a length only under Darcy-Weisbach, as convertUnitValues() says of the pipes.
+		if (name === 'lpn_u_roughness' && frictionMethod() === 'dw') { keys.push('roughness'); }
+		keys.forEach(function (key) {
+			if (typeof d[key] === 'number' && isFinite(d[key])) { d[key] = +(d[key] * k).toPrecision(6); }
+		});
 	}
 	// Nearest `step`, then written with no more decimals than the step has, so 0.1 gives 12.3 and
 	// not 12.299999999999999.
@@ -49163,6 +49188,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			method = a.method || frictionMethod(),
 			units = a.units || {}, id, fromUnits, changedUnits;
 		id = newProject(coords, crs);
+		// **REFUSED (a placement wizard is open) MEANS NOTHING HAPPENS** (R-415). newProject() said
+		// why and left the open project open; going on would install this box's units, method and
+		// default roughness on THAT project.
+		if (!id) { return; }
 		fromUnits = readUnitSelections();
 		// **R-342: DID THE WIZARD LEAVE ANY UNIT DIFFERENT FROM THE PROJECT IT WAS OPENED ON?** Asked
 		// here, before applyUnitSelections() moves the strip, so `fromUnits` is still the project this
@@ -56229,23 +56258,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// would have left 26 translations carrying a placeholder the page no longer fills -- a literal
 	// "{list}" on the map, which lang_tag_parity_check.php is blocking for exactly that reason. A new
 	// key falls back to English until a sprint reaches it, which is the correct untranslated state.
-	function buildUnitDialogBody(body, sel, name, to) {
-		var pc = EngCalcs.pageConfig || {}, fields = unitServes(name);
-		var h = document.createElement('div'), lead = document.createElement('div');
-		var list = document.createElement('div'), oh = document.createElement('div');
+	// `more`, from the SI and US buttons: further [sel, name, to] the same click changes, each given
+	// its own lead line and column under the one title.
+	function buildUnitDialogBody(body, sel, name, to, more) {
+		var pc = EngCalcs.pageConfig || {};
+		var h = document.createElement('div'), oh = document.createElement('div');
 		h.style.fontWeight = 'bold';
 		h.textContent = pc.lpn_units_warn_title || 'This unit defines how your inputs are read';
 		body.appendChild(h);
-		lead.textContent = String(pc.lpn_units_warn_lead || '{unit} is the unit of what you enter for:')
-			.replace('{unit}', unitLabelFor(sel, to));
-		body.appendChild(lead);
-		list.className = 'lpn-unit-fields';
-		fields.forEach(function (f) {
-			var row = document.createElement('div');
-			row.textContent = f;
-			list.appendChild(row);
+		[[sel, name, to]].concat(more || []).forEach(function (u) {
+			var lead = document.createElement('div'), list = document.createElement('div');
+			lead.textContent = String(pc.lpn_units_warn_lead || '{unit} is the unit of what you enter for:')
+				.replace('{unit}', unitLabelFor(u[0], u[2]));
+			body.appendChild(lead);
+			list.className = 'lpn-unit-fields';
+			unitServes(u[1]).forEach(function (f) {
+				var row = document.createElement('div');
+				row.textContent = f;
+				list.appendChild(row);
+			});
+			body.appendChild(list);
 		});
-		body.appendChild(list);
 		oh.style.fontWeight = 'bold';
 		oh.textContent = pc.lpn_units_options_head || 'When you change a unit:';
 		body.appendChild(oh);
@@ -56388,6 +56421,58 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// choice, not a burst of keystrokes.
 		saveToStorage();
 	}
+	// **THE SI AND US BUTTONS ASK THE SAME QUESTION ONE UNIT SELECT ASKS** (Tom, 2026-10-16:
+	// "Settings > Units, SI and US buttons reinterpret every unit in one click without asking: Fix
+	// it."). The suite's EngCalcs.setUnits() sets every select at once and fires no `change`, so the
+	// question in onUnitChange() never ran. The click is taken here, on the way down, before the
+	// button's own listener: one dialog names every unit the click changes that decides a stored
+	// number, and its answer applies to all of them. Units that decide nothing simply change.
+	function onUnitPreset(system) {
+		var pc = EngCalcs.pageConfig || {}, preset = (EngCalcs.unitSets || {})[system] || {},
+			changes = [], asked = [], fromMap = {};
+		LPN_UNIT_SELECTS.forEach(function (name) {
+			var sel = unitEl(name), from = unitKey(name), fam = sel && sel.getAttribute('data-family'),
+				to = fam ? preset[fam] : undefined, i, offered = false;
+			if (!sel || !to || !from || to === from) { return; }
+			for (i = 0; i < sel.options.length; i++) { if (sel.options[i].value === to) { offered = true; } }
+			if (!offered) { return; }
+			changes.push({ sel: sel, name: name, from: from, to: to });
+			fromMap[name] = from;
+		});
+		if (!changes.length) { return; }
+		if (EngCalcs.logSignal) { EngCalcs.logSignal('units', 'preset:' + system); }
+		changes.forEach(function (c) { if (unitChangeNeedsDialog(c.name)) { asked.push(c); } });
+		function applyAll() { changes.forEach(function (c) { applyOneUnit(c.name, c.to); }); }
+		function finish() { rememberUnitSelections(); afterUnitChange(fromMap); }
+		function names() { return asked.map(function (c) { return unitLabel(c.name); }).join(', '); }
+		if (!asked.length) { applyAll(); finish(); return; }
+		openDialog(function (body) {
+			buildUnitDialogBody(body, asked[0].sel, asked[0].name, asked[0].to,
+				asked.slice(1).map(function (c) { return [c.sel, c.name, c.to]; }));
+		}, [
+			{ label: pc.lpn_units_nondestructive || 'Non-destructive', fn: function () {
+				var n = 0;
+				asked.forEach(function (c) { n += countUnitValues(c.name); });
+				applyAll();
+				finish();
+				setNotice(String(pc.lpn_status_reinterpreted || 'Values ({n}) now mean {unit}. Nothing was rewritten.')
+					.replace('{n}', String(n)).replace('{unit}', names()));
+			} },
+			{ label: pc.lpn_units_destructive || 'Destructive', fn: function () {
+				var n = 0;
+				saveUndoSnapshot();
+				changes.forEach(function (c) {
+					var fOld = EngCalcs.unitFactors[c.from], fNew = EngCalcs.unitFactors[c.to];
+					applyOneUnit(c.name, c.to);
+					if (fOld && fNew) { n += convertUnitValues(c.name, fNew / fOld); }
+				});
+				finish();
+				setNotice(String(pc.lpn_status_converted || 'Values ({n}) were rewritten into {unit}.')
+					.replace('{n}', String(n)).replace('{unit}', names()));
+			} },
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
+		]);
+	}
 	function wireUnitSelects() {
 		rememberUnitSelections();
 		document.addEventListener('change', function (e) {
@@ -56396,6 +56481,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (e.stopPropagation) { e.stopPropagation(); }
 			if (e.preventDefault) { e.preventDefault(); }
 			onUnitChange(t, name);
+		}, true);
+		document.addEventListener('click', function (e) {
+			var id = e.target && e.target.closest ? (e.target.closest('#set_units_si, #set_units_us') || {}).id : '';
+			if (!id) { return; }
+			if (e.stopPropagation) { e.stopPropagation(); }
+			if (e.preventDefault) { e.preventDefault(); }
+			onUnitPreset(id === 'set_units_si' ? 'si' : 'us');
 		}, true);
 	}
 	// Task 390: the select's value IS the unit's key ('in'), and the factor is a lookup from it
@@ -59940,7 +60032,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// about how hard the arithmetic tries, which is why it sits with the method above rather
 		// than among the tolerances below. See settingsDefaultPatternRow().
 		settingsDefaultPatternRow(compBody, row);
-		// **THE ONE OPTION A SCENARIO MAY CARRY ITS OWN VALUE OF**, which is what makes average
+		// **A SCENARIO CARRIES ITS OWN DEMAND MULTIPLIER**, which is what makes average
 		// day / maximum day / peak hour one number each instead of one edit per junction. The
 		// default quoted in the tip is what BLANK would inherit -- inside a scenario that is the
 		// document's own number, not the bare 1, or the tip would state a default the row does not
@@ -63649,9 +63741,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			.replace('{step}', fmt(step))
 			.replace('{span}', fmt(step * n));
 	}
-	// **EVERY PLACE A PATTERN ID IS WRITTEN, IN ONE FUNCTION** (Task 248.02). There are six now --
+	// **EVERY PLACE A PATTERN ID IS WRITTEN, IN ONE FUNCTION** (Task 248.02). There are seven now --
 	// a junction's demand, one of its demand CATEGORIES, a CUSTOMER's demand (Task 247), a
-	// reservoir's head, a pump's speed and the project's own default -- and
+	// reservoir's head, a pump's speed, a pump's price pattern and the project's own default -- and
 	// a rename or a delete that misses one leaves a reference to a name nothing answers to. None is
 	// a scenario-overridable property, so all of them are plain writes.
 	//
@@ -63667,15 +63759,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		// **AND A SCENARIO'S OWN DEMAND LIST** (R-369), which names patterns exactly as Base's rows
 		// do. The pattern is the document's, so a rename reaches every scenario at once.
-		// A head pattern and a speed pattern a scenario states (overridable since 2026-10-12) are
+		// A head, speed or price pattern a scenario states (overridable since 2026-10-12) are
 		// repointed the same way.
 		eachOverrideMap(function (map) {
 			Object.keys(map).forEach(function (k) {
 				(map[k].demands || []).forEach(function (d) { if (d.pattern === was) { d.pattern = to; } });
-				['headPattern', 'speedPattern'].forEach(function (p) { if (map[k][p] === was) { map[k][p] = to; } });
+				['headPattern', 'speedPattern', 'energyPattern'].forEach(function (p) { if (map[k][p] === was) { map[k][p] = to; } });
 			});
 		});
-		doc.links.forEach(function (l) { if (l.speedPattern === was) { l.speedPattern = to; } });   // base-write: a pattern rename is document-wide; the scenario values are repointed above
+		doc.links.forEach(function (l) {
+			if (l.speedPattern === was) { l.speedPattern = to; }   // base-write: a pattern rename is document-wide; the scenario values are repointed above
+			if (l._energyPattern === was) { l._energyPattern = to; }   // base-write: a pump's price pattern, document-wide like the others; scenario values are repointed above
+		});   // base-write: a pattern rename is document-wide; the scenario values are repointed above
 		// **A CUSTOMER IS THE SIXTH, AND IT IS THE ONE A READER WOULD NOT THINK OF** (Task 247,
 		// Tom 2026-09-18: *"A Customer demand can follow a pattern. Add that."*). A meter's demand
 		// is one of Task 468's demand rows, so it carries a pattern exactly as a category does --
@@ -64451,7 +64546,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			libCommit();
 			rebuildLibraryBox();
 		}));
-		libInactiveNote(host, 'control');
 		if (!list.length) {
 			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
 			return;
@@ -65716,6 +65810,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function buildControlSection(host) {
 		var pc = EngCalcs.pageConfig || {}, list = libControlsRead();
+		libInactiveNote(host, 'control');
 		host.appendChild(libButton(pc.lpn_library_control_add || 'Add a control', function () {
 			// **THE STARTER SENTENCE IS BUILT FROM THIS NETWORK**, so the box opens on something
 			// that is already true rather than on a template with blanks in it. With nothing to

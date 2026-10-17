@@ -78,22 +78,6 @@ the block.
   Stages, answers and code: `dev/scenario-alternatives.md` on `feat/bentley-interop`. Basic mode
   hides it until the Advanced UX is designed. Task 765 (Presentation) is folded in here. Stage 6 (the
   Scenario manager and the Scenarios table, Tom's calls of 2026-10-09) is built on the branch.
-- 100|781| **Morph: change an asset's type in one scenario, keeping its pipes.**
-  Tom, 2026-10-14: *"I would like to create a scenario called 'Tank at J1' and change the J1 junction to
-  a tank in that scenario without having to delete and reconstitute the pipes connecting to it ...
-  changing element type never creates an override. I think we need to change that."* He named it
-  *"Morph"*, with Transform as the translatable synonym. Reverses the 2026-10-10 Base-only decision.
-  *Manual:* Select the assets, then choose Water > Morph and a type. A node becomes a junction,
-  reservoir or tank; a link a pipe, pump or valve. Each keeps its ID, location and connections. In a
-  scenario the new type is that scenario's override, marked with a dot on the Type row; click the dot
-  to change back. Built on `feat/morph` (carries `feat/bentley-interop`); Perry reviewed it.
-  **As the User Manual will say it:** Morph changes a node to another node type, or a link to another
-  link type, and keeps its ID, its location and every connection. In Base it is an ordinary edit. In
-  any other scenario it is an override, held in that scenario's alternative and inherited by its
-  children: the asset is drawn, listed, solved and exported as its new type there and as its old type
-  everywhere else. Values the two types share carry across; the new type's own values start from
-  Settings > New assets and are overrides you then edit. Clearing the override restores the base type.
-  Building on `feat/morph`, cut from and kept merged with `feat/bentley-interop`; closes with it.
 - 100|737| **One canonical word per concept, so every language names each one once.**
   Tom, 2026-10-14: mnemonic, definitional keys over coined names (*"we don't need more confusion"*).
   **WHAT IS LEFT: every language gives each concept below its own word, used everywhere, and no two
@@ -121,23 +105,6 @@ the block.
   Tom, 2026-09-28, on threats to validity: *"It's all Net3. Where's the infinite map?"* A generator of
   networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
   utility-scale networks. Notes: dev/paper-notes-label-placement.md.
-- 100|782| **Snap to asset, and Match properties: the small tools that replace Change type.**
-  **SNAP MERGED 2026-10-11** (`feat/snap`); **Match properties is on `feat/bentley-interop`** (merged in from `feat/match-property`) and closes this task when that branch merges.
-  Tom, 2026-10-10: if nobody else does Change type, *"abandon the project and institute a variety of smaller
-  and better tools: Snap/magnet to asset; Match properties from one asset to others (as applicable); Change
-  link connections (done); Split pipe (done)."* Seam: Task 779 snapping to shape points.
-- 100|784| **A small time-series graph bubble on the map, from an asset's right-click.**
-  **BUILT, on `feat/bentley-interop`** (merged in from `feat/graph-bubble`); closes when that branch merges.
-  **PROMOTED TO 100 by Tom, 2026-10-11** (*"784 time-series bubbles: Promote to 100."*).
-  Tom, 2026-10-11, looking for it: *"multiple concurrent map time series graph bubbles available by right-clicking
-  an asset."* The asset right-click menu now exists on `feat/match-property` as a row list (`openMapContextMenu`).
-  Tom, 2026-10-10: *"a right-click menu at assets that includes 'Time series graph' that makes a pretty
-  'speech bubble' 200px to 400 px ... so that four or six could be arranged on the map. And it would be
-  really cool if that presentation scenario could be saved."*
-- 100|790| **One override marker: overridden or inherited, in every scenario view.**
-  Tom, 2026-10-12 (interview q03): expose override vs inherited with a single-character marker, carried
-  through Properties and Settings, after Civil 3D's Override / Child override columns. Ida: a dot gutter;
-  Mary: Bentley's and Civil 3D's per-row checkbox. Tom's call between them first. Journals 2026-10-12.
 - 100|681| **Economize the label layout: it is half the cost of a project switch.**
   **PROMOTED TO 100 by Tom, 2026-10-14.** (c)/(d) and (b) shipped. **2026-10-15 merged (`perf/switch-cost`, `perf/cross-shed`):**
   a cold switch no longer lays the labels out twice, and the crossing shed counts pairs once (identical output,
@@ -203,24 +170,14 @@ the block.
   **PROMOTED TO 100, 2026-10-14.** Rewritten on `feat/guide-scenarios` (2026-10-16), each with a `user-guide-*-harness.js`: Scenario manager (the Scenarios chapter), Scenario comparison, Libraries, Properties, Settings, Using the user manual.
   Still audited only (`dev/user-guide-audit.md`, its order): Toolbar, Menus, Map, Screenshot, Tables, Boxes, Fire flow, Critical assets, Demand scaling, Pump energy, Contour, Run report, Status changes, Full report, Calibration, Notes, Guide.
   Split from Task 763 on its close, 2026-10-11.
-- 100|789| **Long press opens the asset menu on a touch screen.**
-  Perry, 2026-10-12: Copy/Paste properties and the graph bubbles open only from the asset right-click
-  menu. Tom, 2026-10-14: *"Isn't long press the standard alias for right-click on a touch screen?
-  Promote this to 100 and resolve promptly."* Built; merged into `feat/bentley-interop`, closes when it lands.
-- 100|794| **Edit a Text in place on the map.**
-  Tom, 2026-10-14: *"It would be really nice for Text to be editable in place instead of only in the
-  properties box."* Double-click opens an editor over the Text; right-click a Text offers Edit text and
-  Reset position. Built; merged into `feat/bentley-interop` (Tom: *"if that's tidy"*), closes when it lands.
 - 100|800| **A tidy list and count of one scenario's own overrides.** **BUILT on `feat/bentley-interop`** (override-audit merged in 2026-10-15, with Tom's wording and a List overrides row on the Scenarios menu, greyed at 0).
   Tom, 2026-10-15, on Fotobi's "1-hr drain w pump off" (24 overrides vs its siblings' 23): *"I don't know how to see a tidy list of overrides to audit ... that count seems inflated ... I should see the count of only the present overrides, not the inherited overrides. I count 13 diameter overrides, 1 text override, and 2 calculation overrides."* Also his screenshot note: tanks show the amber circle while their overrides are only in the parent. Review R-386.
-- 100|801| **Retire Apply Base values; add Merge upward for alternatives.**
-  Tom, 2026-10-15: *"I don't think we need this command any more now that we have the circles and the down arrows. And this command is too confusing and dangerous."* And: *"I am not sure that it is meaningful to put a non-base alternative with the Base scenario ... It seems to create a certain circularity that we should avoid. What do you and Mary find?"* **Mary, 2026-10-15:** Bentley documents no circularity and no push-down command; WaterGEMS merges a preferred alternative UP into Base; skeletonization requires Base on parent alternatives only. **Tom, 2026-10-15: *"Allow and retire. I agree. And I like the 'Merge into parent' command. Good find on Mary's part."*** So: Base may keep a non-Base alternative (a WaterGEMS file may arrive that way, Task 749; nothing is circular); retire Apply Base values; add Merge into parent (an alternative's own values move up into its parent, Bentley's merge to base). Then: *"Maybe 'Merge upward' and it lets you choose how many steps upward to target the merge (in case you want to skip parent)?"* Settled with him (*"Yes. Perfect."*): pick the target ancestor by name; if a skipped alternative holds its own value for anything merged, name those assets and fields before merging and leave them untouched. R-387.
-- 100|802| **The Scenarios table flies out from the Scenario Manager's right side.** **BUILT 2026-10-15 on `feat/bentley-interop`.**
-  **PROMOTED TO 100 by Tom, 2026-10-16.** Closes when `feat/bentley-interop` merges.
-  Tom, 2026-10-15: *"Could we stick that table onto the right side of the Scenario Manager to accomplish (a) that both are available in the same gesture and (b) that it flies out over the map instead of displacing the map?"* R-389.
-- 100|804| **Time series balloons become a Presentation override.** **BUILT 2026-10-15 on `feat/bentley-interop`.**
-  **PROMOTED TO 100 by Tom, 2026-10-16.** Closes when `feat/bentley-interop` merges.
-  Tom, 2026-10-15: *"The Time series balloons/bubbles should be a Presentation override."* R-391.
+- 75|809| **Finish the translation-clarification follow-ups at the next sprint.** Fix cs `lpn_settings_text_halo` (*svatozář*, a saint's halo) and sw (*mwanga*, light), and their `_tip`, with the `halo` concept in `dev/terms.md`; needs Tom's approval to translate. Awaiting him: sprint cadence (once before each production pull). Open: `prefix_terms.inc.php` lists now only wire sense-qualified terms; glossary `context` and `translation_notes_xx` are not folded into `definition`/`translation_notes`; no check fails a term reaching no key.
+- 75|810| **Bring the features list up to what the software does.** Tom, 2026-10-16: *"I prefer to let you edit based on my
+  messages/prompts."* Missing from `dev/features-source.md`: scenarios and alternatives, with Presentation and Calculation overrides
+  for saved view layouts; converting coordinate systems and units; import and export of everything itemized; time series graphs on
+  the map; fire flow, criticality and demand scaling analysis; the pump energy report; every kind of graph; the extended libraries
+  (EPANET's plus pipe types and fittings). Public claims: `dev/positioning.md` rules; then librewaternet.org's build-features.php.
 - 75|539| **Gang the neighbour labels so their leaders stop crossing.**
   **DEMOTED TO 75 by Tom, 2026-10-11.**
   **PORTING THE BENCH TO MASTER, 2026-10-07** (Tom agreed D09: rules 1-3 as three defect branches;
@@ -278,34 +235,6 @@ the block.
   - **The Run concept, in Tom's own sketch (2026-08-27):** *"a Run names a scenario among its
     parameters."* A named Run would carry the scenario, the required flow, the residual and the
     frame together, so a report says what it was a report OF.
-- 75|617| **More map view options, the opacity one having shipped.**
-  **Tom, 2026-10-15, on CC's recommendation of Mapbox Outdoors as the one added tile style: *"I approve."*** Next: build it.
-  **THE CSS-FILTER STEP SHIPPED** (1233fc70, ffd4a73a, e1e05de5): Settings > Map > Basemap style, Normal/Muted/Faded/Grayscale, stored in the project; Muted is the new-project default. Next is the Mapbox Studio raster style on the existing token, which needs Tom's choice of style.
-  **RETITLED BY TOM, 2026-09-18: *"Edit and retitle the task to remove 'A basemap the reader can
-  tone down'. That is already provided by Settings background opacity. Focus the task on other map
-  view options."*** Half of what this asked for exists; what is left is the menu of tile styles and
-  whatever else belongs beside it.
-  Tom, 2026-09-09: *"Let's make a task to play with some additional selectors for the user including
-  some that are understated such as you suggest. FWIW, we are non-commercial."* Full costing of every
-  route, with named services and their terms: `dev/basemap-styling-options.md`.
-  - **START WITH A CSS FILTER, because it is free in every sense that matters here.**
-    `grayscale(60%) contrast(0.9)` on the tile layer is a display-time transform: nothing new is
-    fetched, nothing cached, nothing redistributed, no new host, no consent gate, no `privacy.php`
-    paragraph. Attribution is separate DOM, so the credit stays bright while the map recedes. No
-    authority was found either way on whether a filter touches the OSM tile policy, whose concerns
-    are serving, caching, bulk download and visible attribution.
-  - **Second cheapest is a Mapbox Studio raster style on the token already declared** -- same host
-    as satellite and terrain, so it is a peer of the existing satellite row rather than a fifth
-    purpose: no new gate, no new cookie, ~3 keys.
-  - **A NEW TILE HOST IS THE EXPENSIVE ONE and the non-commercial point does not settle it.** Every
-    free tier is framed non-commercial AND reserves classification, and nobody has asked any of them
-    whether a free GPL public tool qualifies. Price under this suite's own rule: a new gate cookie,
-    a version constant, a `wipeAllStorage()` hook, a `privacy.php` paragraph, the "four third-party
-    requests" count becoming five in three files at once, and ~5 English keys, so ~130 translated
-    strings. `consent_body` is NOT touched; each feature asks its own question.
-  - **MapLibre GL JS is not worth it**: ~750 KB gzipped, a WebGL dependency under
-    `vendor_integrity_check.php`, and a second canvas with its own projection state fighting the one
-    opinion about Mercator that `js/looped-network.js` owns.
 - 75|623| **File loss judged only by people whose files are throwaway.**
   **TOM, 2026-09-18: *"I don't see anything actionable. Describe better or remove the task."* He is
   right and the [H] tag is struck: this was never a decision waiting on him, it was a STANDING
@@ -395,15 +324,6 @@ the block.
     from `81792180`, the SHA Tom had deployed, and pushed. CLAUDE.md's Git Workflow carries the
     procedure and the correction of the 2026-09-13 advice that a clean release could not be
     extracted.
-- 75|714| **Theming: colour tokens first, then a Light/Dark choice in Settings.**
-  **Phase 1b inline colours MERGED 2026-10-04** (`chore/theme-inline`): js/*.js literals on tokens or allow-listed; the check refuses new ones. **The button base (R-202) MERGED 2026-10-14** (`feat/button-base`); next, dark mode.
-  Tom, 2026-09-24 (R-211): *"preparing for this and implementing it will force us into some
-  important code discipline."* Ida's phased plan: `dev/theming-plan.md`. Phase 1 declares semantic
-  colour tokens, folds the nine separate box styles onto them, and adds a check refusing a new
-  hard-coded chrome colour; phases 2-3 are a dark token set and the Settings row (a browser setting).
-  - **Phase 1 tokens and the check are built on `feat/theme-token` (see the end of the plan).** Phase 1b remains: the button base below, and inline colours in `js/*.js`.
-  - **MOD's phone-like buttons (R-202) belong inside phase 1**: one button base for menu items and
-    toolbar buttons, one accent colour, previewed on a branch. Retire the menu hint (R-203) once it ships.
 - 75|720| **Background layers from a GIS server.**
   **PROMOTED TO 75 by Tom, 2026-10-14.**
   Tom, 2026-09-25, on WaterCAD's background layers: *"This seems like a GIS REST server offering."*
@@ -448,8 +368,6 @@ the block.
   Tom, 2026-10-15: *"Can we try a UI option branch for everything in the bottom pane to be available also as dockable boxes: (a) Tables and (b) Graphs?"* Seam with the bottom-pane tab strip.
 - 75|803| **See every unused alternative at a glance.** **BUILT 2026-10-15 on `feat/bentley-interop`.**
   Tom, 2026-10-15: *"Maybe an 'Unused alternatives' button ... unless the selector (instead of a button) includes 'All unused' (and 'All'?), where all the headings are listed with a scrollbar."* R-390.
-- 75|805| **A clean map: hide the override ambers and the map's own controls.** **BUILT 2026-10-15 on `feat/bentley-interop`.**
-  Tom, 2026-10-15: *"It would be good to be able to hide the amber override indicators from the map. Maybe a Map, Clean map button is a good idea after all with zoom buttons, error messenger, ambers, and satellite button hiding."* R-396.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
