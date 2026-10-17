@@ -4507,3 +4507,10 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: ar: dir rtl, right-aligned, colon on the correct side; "Chlorine" and custom-property names stay Latin; no Arabic font here so glyphs are boxes (not checked visually).
 - OBSERVED leftovers: "Closed: —" for an open pipe, "Is active?: ✓", "No pipe type chosen", "No fittings list chosen", "No pattern", "Demand pattern: (default: 1)"; extra Description lines print as unlabelled rows.
 - NOT CHECKED: harness mutation, dark theme, touch, ✓ glyph in the card (boxes in this headless font).
+
+## 2026-10-17 feat/sheet-sync @ 69c29dbdf (Task 752, scenario workbook file) (Perry)
+- OBSERVED (real Chromium, crafted Net1 US and SI with two scenarios, three alternatives): menu rows, export, unchanged round trip (no differences, also after export of an edited project), hand edit report, Apply as one Ctrl+Z, Spanish-page read, no localStorage writes in the diff. Builder harnesses pass.
+- OBSERVED DEFECT: report table breaks the Sheet column mid-word ("Scenario|s", "Alternativ|es") at 1400 wide.
+- OBSERVED DEFECT (design): a Net1 workbook imported into Net2 reports 13 changes and 0 not used, because pipe and junction IDs coincide; nothing says the workbook is from another project.
+- OBSERVED: typed 6.00 stores 6 and 1e-3 stores 0.001 (no typed characters kept); unit refusal says "is in lps" / "is in mm, project uses in" (internal token); Active topology has two columns headed "Type"; refusals of a junk file are native alert() boxes.
+- NOT CHECKED: a real spreadsheet program re-save (no LibreOffice here), harness mutation, dark theme, Google Sheets opening the file, Spanish strings (payloads not regenerated).
