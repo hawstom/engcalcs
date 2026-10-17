@@ -1987,6 +1987,11 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <h2><?=$ec_lang['lpn_guide_boxes_heading']?></h2>
 <p class="lpn-guide-prose"><?=$ec_lang['lpn_guide_boxes_intro']?></p>
 <p class="lpn-guide-prose"><?=$ec_lang['lpn_guide_boxes_autohide']?></p>
+<dl>
+	<dt><?=$ec_lang['lpn_guide_bx_dock_term']?></dt><dd><?=$ec_lang['lpn_guide_bx_dock_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_bx_keep_term']?></dt><dd><?=$ec_lang['lpn_guide_bx_keep_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_bx_phone_term']?></dt><dd><?=$ec_lang['lpn_guide_bx_phone_def']?></dd>
+</dl>
 <div id="lpn_guide_boxes" class="lpn-guide-list"></div>
 </section>
 <section class="lpn-guide-section" data-guide-section="about">
