@@ -40219,6 +40219,13 @@ var EngCalcs = EngCalcs || {};
 			return tr;
 		}
 		openDialog(function (body) {
+			// Beta marker (Tom, 2026-10-16): a quiet label whose tip says where to report a problem.
+			var beta = document.createElement('p');
+			beta.className = 'lpn-gjnet-beta';
+			beta.textContent = pc.lpn_gjnet_beta || 'Beta: feedback requested';
+			beta.title = (pc.lpn_gjnet_beta_tip || 'This import has been tried on few files from GIS programs. To report a problem or suggest a change, press {button} on the page and describe the file.')
+				.replace('{button}', pc.lpn_wrong_btn || 'Something wrong here?');
+			body.appendChild(beta);
 			var p = document.createElement('p');
 			p.style.margin = '0 0 6px';
 			p.textContent = (pc.lpn_gjnet_intro || '{points} points and {lines} lines were found. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. Choose the property each field fills and the unit of each number.')

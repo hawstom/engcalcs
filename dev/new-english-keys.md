@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**66 still to read on master**, of 66 untranslated keys, of 2703 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**68 still to read on master**, of 68 untranslated keys, of 2705 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -79,7 +79,7 @@ is the one you meant. "The first one" is a complete answer.
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (66, 66 to read @@ NEEDS RULING)
+## lpn_  (68, 68 to read @@ NEEDS RULING)
 
 - **`lpn_file_import_gjnet`**
   > Import GeoJSON network…
@@ -89,6 +89,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_gjnet_and_more`**
   > and {n} more
+  @@ NEEDS RULING
+- **`lpn_gjnet_beta`**
+  > Beta: feedback requested
+  @@ NEEDS RULING
+- **`lpn_gjnet_beta_tip`**
+  > This import has been tried on few files from GIS programs. To report a problem or suggest a change, press {button} on the page and describe the file.
   @@ NEEDS RULING
 - **`lpn_gjnet_col_example`**
   > Example
@@ -846,7 +852,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/geojson-import (`b4c12097f`) — adds no English strings
+### feat/geojson-import (`787657d7a`) — adds no English strings
 
 ### feat/guide-scenarios (`8f0a1cdd6`) — 187 new, 187 to read @@ NEEDS RULING
 
@@ -3642,7 +3648,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Drag to resize
   @@ NEEDS RULING
 
-### fix/fotobi-full-tank (`1ef30b7b5`) — 180 new, 180 to read @@ NEEDS RULING
+### fix/fotobi-full-tank (`54aaf419c`) — 180 new, 180 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -4197,7 +4203,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
   @@ NEEDS RULING
 
-### merge/1016e (`8f0a1cdd6`) — 187 new, 187 to read @@ NEEDS RULING
+### merge/1016e (`18cfe7a3f`) — 187 new, 187 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation

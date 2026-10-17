@@ -188,6 +188,15 @@ async function main() {
 		ok('the mapping dialog opens, titled with the file name', !!d && await P.evaluate(() => document.getElementById('lpn_dialog_title').textContent) ===
 			(await L('lpn_gjnet_title')).replace('{file}', 'water_assets.geojson'));
 		ok('it says how many points and lines were found', !!d && d.text.indexOf((await L('lpn_gjnet_intro')).replace('{points}', '4').replace('{lines}', '5')) >= 0, d && d.text.slice(0, 200));
+		const betaText = await L('lpn_gjnet_beta');
+		const beta = await P.evaluate(() => { const e = document.querySelector('#lpn_dialog_body .lpn-gjnet-beta'); return e ? { text: e.textContent, title: e.title, shown: e.getBoundingClientRect().height > 0 } : null; });
+		ok('the dialog is marked "Beta: feedback requested", visible', !!beta && beta.text === 'Beta: feedback requested' && beta.text === betaText && beta.shown, JSON.stringify(beta));
+		ok('...and its tip names the Something wrong here? button', !!beta && beta.title.indexOf(await L('lpn_wrong_btn')) >= 0 && beta.title.indexOf('{') < 0, beta && beta.title);
+		{
+			const tip = await L('lpn_file_import_shapes_tip');
+			ok('the Import GeoJSON shapes tip names both doors, the EPANET file and the GeoJSON network', tip.indexOf('EPANET file') >= 0 && tip.indexOf('Import GeoJSON network') >= 0 &&
+				await P.evaluate((t) => (EngCalcs.pageConfig || {}).lpn_file_import_shapes_tip === t, tip), tip);
+		}
 		const sel = (kind, field) => P.$eval('table[data-kind="' + kind + '"] select[data-field="' + field + '"]', (s) => s.value);
 		const unit = (kind, field) => P.$eval('table[data-kind="' + kind + '"] select[data-gjnet-unit="' + field + '"]', (s) => s.style.display === 'none' ? '' : s.value);
 		ok('the guesses are shown: FACILITYID the ID, ELEV_FT the elevation in ft, OWNER a custom property',
@@ -337,6 +346,23 @@ async function main() {
 			ok('3,025 nodes and 3,564 pipes arrive', !!rep2 && rep2.text.indexOf('3025') >= 0 && rep2.text.indexOf('3564') >= 0, rep2 && rep2.text.slice(0, 160));
 			ok('no uncaught page errors', e.errors.length === 0, e.errors.slice(0, 2).join(' | '));
 			await e.close();
+		}
+		console.log('\n--- 5. a page in Spanish: the Beta marker falls back to English, never a raw key ---');
+		{
+			const a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 900 } });
+			await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (route) => route.abort());
+			await a.goto('Looped-Network.php?lang=es');
+			await a.answerTrainingPanel().catch(() => {});
+			await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
+			await a.settle(1000);
+			await a.newProject('us').catch(() => {});
+			await a.dismissGallery().catch(() => {});
+			const h = helpers(a);
+			await h.importVia({ name: 'agua.geojson', mimeType: 'application/geo+json', buffer: FIXTURE });
+			const d = await a.waitDialog(4000);
+			const b = await a.page.evaluate(() => { const e = document.querySelector('#lpn_dialog_body .lpn-gjnet-beta'); return e ? { text: e.textContent, title: e.title } : null; });
+			ok('Spanish page: the marker shows words, not a key, and its tip has no placeholder left', !!d && !!b && b.text.length > 0 && b.text.indexOf('lpn_') < 0 && b.title.indexOf('{') < 0 && b.title.indexOf('lpn_') < 0, JSON.stringify(b));
+			await a.close();
 		}
 	} finally {
 		await browser.close();
