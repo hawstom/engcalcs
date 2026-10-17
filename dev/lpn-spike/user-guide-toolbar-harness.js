@@ -59,7 +59,7 @@ async function main() {
 
 		console.log('\n4. Dimmed names');
 		const calc = r.filter((x) => x.n === enString('lpn_time_run'))[0];
-		ok('Calculate is dimmed while Recalculate automatically is checked', !!calc && calc.off === true && !!(await P.evaluate(() => EngCalcs.pageConfig)) && (await P.evaluate(() => document.getElementById('lpn_guide_dimnote').hidden)) === false, JSON.stringify(calc));
+		ok('the Calculate row is dimmed with the automatic setting on', !!calc && calc.off === true && !!(await P.evaluate(() => EngCalcs.pageConfig)) && (await P.evaluate(() => document.getElementById('lpn_guide_dimnote').hidden)) === false, JSON.stringify(calc));
 		const undoBtn = await P.evaluate((n) => { const b = Array.from(document.querySelectorAll('#lpn_toolbar button')).filter((x) => (x.getAttribute('aria-label') || x.title || x.textContent).indexOf(n) >= 0)[0]; return { shown: b.getClientRects().length > 0, disabled: b.disabled || b.getAttribute('aria-disabled') === 'true' }; }, await T('lpn_tool_undo'));
 		ok('Undo is on screen, and its row is not dimmed', undo.off === false && undoBtn.shown, JSON.stringify(undoBtn));
 		await P.setViewportSize({ width: 390, height: 800 });

@@ -1952,6 +1952,8 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <h2><?=$ec_lang['lpn_hotkeys_menu_heading']?></h2>
 <dl>
 	<dt><?=$ec_lang['lpn_hotkeys_menu_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_menu_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_mn_kbd_term']?></dt><dd><?=$ec_lang['lpn_guide_mn_kbd_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_mn_list_term']?></dt><dd><?=$ec_lang['lpn_guide_mn_list_def']?></dd>
 </dl>
 <div id="lpn_guide_menus" class="lpn-guide-list"></div>
 </section>
