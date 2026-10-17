@@ -124,6 +124,7 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 ## Ease of use
 
 - 763| Searchable user manual.
+- 457| Every setting in one box, searchable by the words you would use.
 - 441| Dockable boxes that auto-hide to an edge tab.
 - 543| One Water menu holds everything about water modeling, assets included.
 - 434, 455| Editable, pasteable, spreadsheet-like asset tables.

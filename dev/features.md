@@ -8,7 +8,7 @@
 LibreWaterNet landing page, the Help menu, both, neither — is his call and is not yet made.
 Nothing on any served page reads this file.
 
-55 features, citing 124 of the 711 closed task IDs. The other 587 are
+56 features, citing 125 of the 711 closed task IDs. The other 586 are
 bug fixes, refactors, rejected proposals, and work nobody outside this repository would
 call a feature — and 133 of them are ledger entries carrying no text at all, whose
 narrative is in git and which nothing here has judged either way. **This list is honest
@@ -75,6 +75,7 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 ## Ease of use
 
 - Searchable user manual. <!-- 763 -->
+- Every setting in one box, searchable by the words you would use. <!-- 457 -->
 - Dockable boxes that auto-hide to an edge tab. <!-- 441 -->
 - One Water menu holds everything about water modeling, assets included. <!-- 543 -->
 - Editable, pasteable, spreadsheet-like asset tables. <!-- 434, 455 -->
