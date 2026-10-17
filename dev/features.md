@@ -8,7 +8,7 @@
 LibreWaterNet landing page, the Help menu, both, neither — is his call and is not yet made.
 Nothing on any served page reads this file.
 
-49 features, citing 117 of the 711 closed task IDs. The other 594 are
+50 features, citing 119 of the 711 closed task IDs. The other 592 are
 bug fixes, refactors, rejected proposals, and work nobody outside this repository would
 call a feature — and 134 of them are ledger entries carrying no text at all, whose
 narrative is in git and which nothing here has judged either way. **This list is honest
@@ -33,14 +33,17 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - World map canvas or your own backdrop with friendly positioning options. <!-- 145, 276 -->
 - XY to Lat/Lon conversion import wizard. <!-- 476 -->
 - Convert a copy of a project to another coordinate system and other units, with a wizard that zooms, scales, and rotates your network onto the map; new projects can start in a real EPSG projection. <!-- 696, 641 -->
-- Import points, lines, and polygons from GeoJSON, shapefile, and DXF files as Shapes, and import a list of surveyed points as junctions. <!-- 779, 592 -->
-- Libraries of patterns, curves, controls, rules, pipe types, and fittings, and whole libraries copied in from another project file. <!-- 611, 792 -->
+- Import points, lines, and polygons from GeoJSON, shapefile, and DXF files as Shapes, and import a list of surveyed points as junctions. <!-- 592 -->
+- Libraries of patterns, curves, controls, rules, pipe types, and fittings, with pipes attached to a library pipe type and fittings list by reference so they stay in sync, and whole libraries copied in from another project file. <!-- 611, 792, 465, 590 -->
 - Export tables to ODS, XLSX, or CSV by table and scenario with the libraries they refer to, copy any table with its headings, and take a screenshot of the map and copy it into a report. Network export to GeoJSON and DXF, and a workspace file that carries your box layout to another screen. <!-- 776, 793 -->
 - Place name search and elevations from map DEM w/ preview. <!-- 437, 497 -->
 
 ## Adding, editing, and displaying assets and results
 
 - Junction, reservoir, tank, pipe with vertex draw and edit mode, pump, valve, and annotation text. <!-- 146.02 -->
+- Junction Pipe Chain tool: specify points along the map to draw junction, pipe, junction until you press Escape, or specify an existing node to continue from it; a junction placed on a pipe offers to split that pipe at the new node. <!-- 719 -->
+- Draw Shapes (points, lines, and polygons) on the map, kept in a Shapes table; a Shape is annotation and is not part of the network. <!-- 779 -->
+- Snap to objects: nodes, pipe vertices, points along a pipe, and Shape points all attract the cursor, which makes imported DXF and shapefile Shapes something you can trace a network from. <!-- 782 -->
 - Customizable multi- node and link labels including prefixes, suffixes, separator, and drop/shed order with auto or manual placement on leaders or aligned with links. <!-- 345, 329, 333, 336, 397, 398, 399, 469, 146.01, 383 -->
 - Find, replace, goto elements including complex queries in your language. <!-- 353, 420, 389, 540 -->
 - Editable, pasteable, spreadsheet-like asset tables: junctions, reservoirs, tanks, pipes, pumps and valves. <!-- 434, 455 -->
@@ -62,14 +65,20 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - Water quality: age, share from a source, chemical decay. <!-- 566 -->
 - Pump energy report: for each pump, the share of the run it operates, efficiency, average and peak power, energy used, and cost including a peak demand charge. <!-- 566.01, 577 -->
 
-## Premium features included for everybody
+## Analyses
 
 - Fire flow failure and collateral (design) failure analysis. <!-- 530 -->
 - Criticality, which removes each pipe, pump, and valve in turn and reports the effect, and demand scaling, which finds the largest demand scale the system can carry, both run on a copy of the network. <!-- 751, 754 -->
-- Scenarios: override management and report, scenario comparison report. <!-- 201, 407, 412, 512 -->
-- Alternatives that build on one another, each holding overrides in categories such as Presentation (how the map looks) and Calculation (run time and time step), with ready-made scenarios in every new project and overrides merged upward into the alternative above. <!-- 750, 765, 755, 801, 802 -->
-- Pipe types library: attached a library reference to keep a pipe in sync with the library. <!-- 465 -->
-- Fittings library: attach fittings references to pipes and library pipe types. <!-- 590 -->
+
+## Scenarios and alternatives
+
+- Scenarios whose overrides are marked on the map with an amber ring, a Manage overrides list that shows each override beside the value it replaces and clears any of them, a Copy properties command that carries an asset's overrides, and a comparison report that solves every scenario from a copy and tabulates its overrides, lowest pressure, and highest velocity. <!-- 201, 407, 412, 512 -->
+- Alternatives that build on one another in an inheritance tree, shared among scenarios, with overrides mergeable upward into the alternative above, each alternative holding overrides in categories such as Presentation (how the map looks, including a saved map view) and Calculation (run time and time step), ready-made scenarios in every new project, and a Basic mode that hides the alternatives until you want them, and many more management features. <!-- 750, 765, 755, 801, 802 -->
+
+## Premium features included for everybody
+
+- Scenarios and alternatives (see Scenarios and alternatives). <!-- see: Scenarios and alternatives -->
+- Fire flow, criticality, and demand scaling analyses (see Analyses). <!-- see: Analyses -->
 
 ## The calculators
 

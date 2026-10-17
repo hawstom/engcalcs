@@ -35,6 +35,16 @@ One line per feature, under a `##` area heading:
 - <ids>| <one sentence, present tense, written for a reader who has never seen the page>
 ```
 
+A **pointer** sends the reader to the section that holds a capability, and carries no task IDs
+(used under Premium features, whose capabilities live in their home sections):
+
+```
+- see <exact ## heading>| <sentence ending in a full stop>
+```
+
+The generator proves the named heading exists, writes the row as `<!-- see: <heading> -->`, and
+does not count a pointer as a feature.
+
 `<ids>` is one or more closed task IDs, comma-separated. Every one must exist in
 `dev/roadmap-closed-ids.md` at priority 0, and no ID may be cited by two features — the generator
 fails on either. A closed ID cited by nothing is fine and expected. Merge freely: the unit of this
@@ -71,14 +81,17 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 - 145, 276| World map canvas or your own backdrop with friendly positioning options.
 - 476| XY to Lat/Lon conversion import wizard.
 - 696, 641| Convert a copy of a project to another coordinate system and other units, with a wizard that zooms, scales, and rotates your network onto the map; new projects can start in a real EPSG projection.
-- 779, 592| Import points, lines, and polygons from GeoJSON, shapefile, and DXF files as Shapes, and import a list of surveyed points as junctions.
-- 611, 792| Libraries of patterns, curves, controls, rules, pipe types, and fittings, and whole libraries copied in from another project file.
+- 592| Import points, lines, and polygons from GeoJSON, shapefile, and DXF files as Shapes, and import a list of surveyed points as junctions.
+- 611, 792, 465, 590| Libraries of patterns, curves, controls, rules, pipe types, and fittings, with pipes attached to a library pipe type and fittings list by reference so they stay in sync, and whole libraries copied in from another project file.
 - 776, 793| Export tables to ODS, XLSX, or CSV by table and scenario with the libraries they refer to, copy any table with its headings, and take a screenshot of the map and copy it into a report. Network export to GeoJSON and DXF, and a workspace file that carries your box layout to another screen.
 - 437, 497| Place name search and elevations from map DEM w/ preview.
 
 ## Adding, editing, and displaying assets and results
 
 - 146.02| Junction, reservoir, tank, pipe with vertex draw and edit mode, pump, valve, and annotation text.
+- 719| Junction Pipe Chain tool: specify points along the map to draw junction, pipe, junction until you press Escape, or specify an existing node to continue from it; a junction placed on a pipe offers to split that pipe at the new node.
+- 779| Draw Shapes (points, lines, and polygons) on the map, kept in a Shapes table; a Shape is annotation and is not part of the network.
+- 782| Snap to objects: nodes, pipe vertices, points along a pipe, and Shape points all attract the cursor, which makes imported DXF and shapefile Shapes something you can trace a network from.
 - 345, 329, 333, 336, 397, 398, 399, 469, 146.01, 383| Customizable multi- node and link labels including prefixes, suffixes, separator, and drop/shed order with auto or manual placement on leaders or aligned with links.
 - 353, 420, 389, 540| Find, replace, goto elements including complex queries in your language.
 - 434, 455| Editable, pasteable, spreadsheet-like asset tables: junctions, reservoirs, tanks, pipes, pumps and valves.
@@ -100,6 +113,16 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 - 566| Water quality: age, share from a source, chemical decay.
 - 566.01, 577| Pump energy report: for each pump, the share of the run it operates, efficiency, average and peak power, energy used, and cost including a peak demand charge.
 
+## Analyses
+
+- 530| Fire flow failure and collateral (design) failure analysis.
+- 751, 754| Criticality, which removes each pipe, pump, and valve in turn and reports the effect, and demand scaling, which finds the largest demand scale the system can carry, both run on a copy of the network.
+
+## Scenarios and alternatives
+
+- 201, 407, 412, 512| Scenarios whose overrides are marked on the map with an amber ring, a Manage overrides list that shows each override beside the value it replaces and clears any of them, a Copy properties command that carries an asset's overrides, and a comparison report that solves every scenario from a copy and tabulates its overrides, lowest pressure, and highest velocity.
+- 750, 765, 755, 801, 802| Alternatives that build on one another in an inheritance tree, shared among scenarios, with overrides mergeable upward into the alternative above, each alternative holding overrides in categories such as Presentation (how the map looks, including a saved map view) and Calculation (run time and time step), ready-made scenarios in every new project, and a Basic mode that hides the alternatives until you want them, and many more management features.
+
 ## Premium features included for everybody
 
 <!-- **"PREMIUM" IS DELIBERATE AND IS NOT A PRICE.** Tom, 2026-09-12, asked directly whether the
@@ -108,13 +131,8 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
      and now we are giving them away for free."* The word names what this class of capability
      costs everywhere ELSE, which is the whole point of the section. Do not re-flag it. -->
 
-
-- 530| Fire flow failure and collateral (design) failure analysis.
-- 751, 754| Criticality, which removes each pipe, pump, and valve in turn and reports the effect, and demand scaling, which finds the largest demand scale the system can carry, both run on a copy of the network.
-- 201, 407, 412, 512| Scenarios: override management and report, scenario comparison report.
-- 750, 765, 755, 801, 802| Alternatives that build on one another, each holding overrides in categories such as Presentation (how the map looks) and Calculation (run time and time step), with ready-made scenarios in every new project and overrides merged upward into the alternative above.
-- 465| Pipe types library: attached a library reference to keep a pipe in sync with the library.
-- 590| Fittings library: attach fittings references to pipes and library pipe types.
+- see Scenarios and alternatives| Scenarios and alternatives (see Scenarios and alternatives).
+- see Analyses| Fire flow, criticality, and demand scaling analyses (see Analyses).
 
 
 ## The calculators
