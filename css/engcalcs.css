@@ -33,6 +33,11 @@
 	--ec-warn-bg: #fffbe6;
 	--ec-warn-border: #a80;
 	--ec-warn-ink: #c60;
+	/* A value the open scenario holds (an override): the amber the tables' override wash uses. */
+	--ec-held: #e8a33d;
+	--ec-held-bg: #fff3cd;
+	/* The override marker's own ink (Task 790): the amber family, dark enough to read as a shape. */
+	--ec-held-ink: #8a5a00;
 	--ec-ok-ink: #267326;
 	--ec-bad-ink: #c00;
 	--ec-error-ink: #a00;
@@ -541,7 +546,7 @@ html[lang="zh"] .ec-welcome {
    dev/browser-pass/specs/cursorflicker.js, and that spec still holds that bare map says the map's
    own cursor everywhere it shows through. What is superseded is the GLYPH twice over: `grab`,
    because this is not a web map, and then `pointer`, because he looked at it. */
-#lpn_canvas { touch-action: none; cursor: default; --lpn-sym: 1; --lpn-symf: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-backdrop-img-opacity: 1; --lpn-basemap-style: none; --lpn-map-bg: #fff; }
+#lpn_canvas { touch-action: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; cursor: default; --lpn-sym: 1; --lpn-symf: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-backdrop-img-opacity: 1; --lpn-basemap-style: none; --lpn-map-bg: #fff; }
 /* **AND NOTHING CHANGES WHILE THE MAP IS MOVING**, which is why there is no `#lpn_canvas.lpn-panning`
    rule here any more. It was `cursor: grabbing`, the closing half of the open hand, and it goes with
    the hand. `setPanning()` still writes the class on the one frame a pan really translates the map,
@@ -1074,6 +1079,11 @@ html[lang="zh"] .ec-welcome {
    overridden and mid-pipe-draw shows the pending ring -- that one is about what your next click
    does, and it is the more urgent of the two. */
 .lpn-node.lpn-override { stroke: #e8a33d; stroke-width: calc(0.5 * var(--lpn-sym, 0)); }
+/* INHERITED, NOT OVERRIDDEN HERE (Task 790's hollow dot, on the map; Tom, 2026-10-14): a value the
+   open scenario takes from a parent scenario or a parent alternative. Gray and dashed, and thinner,
+   so it never reads as the amber of an override made in this scenario. */
+.lpn-link-halo.lpn-override-inh { stroke: #9e9e9e; stroke-width: calc(2.857 * var(--lpn-lw, 0)); stroke-dasharray: calc(4 * var(--lpn-lw, 0)) calc(3 * var(--lpn-lw, 0)); }
+.lpn-node.lpn-override-inh { stroke: #9e9e9e; stroke-width: calc(0.3 * var(--lpn-sym, 0)); stroke-dasharray: calc(0.9 * var(--lpn-sym, 0)) calc(0.6 * var(--lpn-sym, 0)); }
 /* SELECTED: the subject of the next command (ROADMAP Task 415, setSelection() in
    js/looped-network.js). Blue, and it is not spending the map's colour budget on the model: red
    says condition, amber says override, and both are statements about the DOCUMENT, while this one
@@ -1117,8 +1127,35 @@ html[lang="zh"] .ec-welcome {
    row above stays the property and this reads as a note about it -- there is one of these under
    every editable field once you are inside a scenario, and at full weight they would outnumber and
    outshout the numbers they annotate. */
-.lpn-ov-marker { margin-left: 1.5em; font-size: 0.85em; }
+.lpn-ov-note { margin-inline-start: 1.5em; font-size: 0.85em; }
+/* THE OVERRIDE MARKER (Task 790, Ida's design): a two-cell gutter at the inline start of a row, drawn
+   in CSS so no font and no translation is involved. A filled dot is an override here, a hollow dot a
+   value inherited, a down triangle one the scenarios below override. Placed in the padding the
+   container gives up for it, so no row's text moves when a mark comes or goes, and on the right in a
+   right-to-left language. Never a tab stop. */
+#lpn_popup_fields.lpn-ovm-gut, #lpn_popup_title.lpn-ovm-gut { position: relative; padding-inline-start: 1.9em; }
+/* Base draws no dot, so its gutter is the triangle's one cell. */
+#lpn_popup_fields.lpn-ovm-gut1, #lpn_popup_title.lpn-ovm-gut1 { position: relative; padding-inline-start: 0.95em; }
+#lpn_popup_fields.lpn-ovm-gut1 .lpn-ovm { margin-inline-start: -0.95em; }
+#lpn_settings_box.lpn-ovm-gut .lpn-set-row, #lpn_settings_box.lpn-ovm-gut [data-lpn-setting] { position: relative; padding-inline-start: 1.9em; }
+/* A column heading over marked rows gives up the same room, or it sits 1.9em left of its column. */
+#lpn_settings_box.lpn-ovm-gut .lpn-set-colhead { padding-inline-start: calc(1.9em / 0.85); }   /* the heading is .85em, the rows 1em */
+.lpn-ovm { position: absolute; margin-inline-start: -1.9em; display: inline-flex; align-items: center; height: 1.3em; }
+#lpn_settings_box .lpn-ovm { margin-inline-start: 0; inset-inline-start: 0; top: 0.15em; }
+.lpn-ovm-cell { display: inline-flex; align-items: center; justify-content: center; width: 0.95em; height: 1.3em; }
+.lpn-ovm-cell[role="button"] { cursor: pointer; }
+.lpn-ovm-dot::before, .lpn-ovm-hollow::before { content: ''; display: block; width: 0.5em; height: 0.5em; border-radius: 50%; box-sizing: border-box; }
+.lpn-ovm-dot::before { background: var(--ec-held-ink); }
+.lpn-ovm-hollow::before { border: 1px solid var(--ec-ink-subtle); opacity: 0.6; }
+.lpn-ovm-hollow:hover::before { opacity: 1; border-color: var(--ec-held-ink); }
+.lpn-ovm-tri::before { content: ''; display: block; width: 0; height: 0; border-inline-start: 0.3em solid transparent; border-inline-end: 0.3em solid transparent; border-top: 0.45em solid var(--ec-held-ink); }
 .lpn-ov-base { margin-left: 0.6em; color: var(--ec-ink-subtle); }
+/* The override list (Task 800): an override equal to the value it replaces, still counted. */
+.lpn-ovl-same { color: var(--ec-ink-muted); white-space: nowrap; }
+/* Manage overrides: a box to select each row, Clear override at its end, the two bulk clears above. */
+.lpn-ovl-bar { display: flex; flex-wrap: wrap; gap: 6px; margin: .4em 0; }
+.lpn-ovl-table th.lpn-ovl-pick, .lpn-ovl-table td.lpn-ovl-pick { width: 1.6em; padding-inline-end: 0; }
+.lpn-ovl-table td.lpn-ovl-act { white-space: nowrap; overflow-wrap: normal; text-align: end; }
 /* Feedback for the first-picked node of a pipe/pump (Tom, 2026-07-30: "otherwise there's no
    indication that anything is working") -- a wide red ring around the existing node fill/stroke,
    cleared by setPendingLinkFrom(null) in looped-network.js on completion or cancel. */
@@ -1231,6 +1268,15 @@ html[lang="zh"] .ec-welcome {
 	fill: #333; pointer-events: none; user-select: none;
 	paint-order: stroke fill;
 	stroke: #fff; stroke-width: calc(var(--lpn-halo, 0.4) * 1em); stroke-linejoin: round;
+}
+/* The in-place Text editor (looped-network.js openTextEditor()): laid over the hidden map words at
+   their size, angle and alignment, so it must add no box metrics of its own. The outline marks it as
+   being edited without moving a glyph. */
+.lpn-text-inplace {
+	position: fixed; z-index: 1200; margin: 0; padding: 0; border: 0; resize: none; overflow: hidden;
+	white-space: pre; box-sizing: content-box; min-width: 0; min-height: 0;
+	background: var(--ec-bg); color: var(--ec-ink);
+	outline: 2px solid var(--ec-select); outline-offset: 2px; border-radius: 0;
 }
 /* pointer-events:none, found 2026-07-30 while verifying popup placement: labelsLayer draws ABOVE the
    symbol layers, so a leader line crossing a node swallowed the click meant for that node and the
@@ -1948,6 +1994,12 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    floor is a width, as it is on every other box here -- the property rows stop fitting first. */
 .lpn-propbox { flex-direction: column; resize: both; overflow: hidden; min-width: min(17rem, 94vw); }
 .lpn-propbox .lpn-popover-body { flex: 1 1 auto; min-height: 0; max-height: none; }
+/* A Text's words in Properties fill the box's width and follow it when the box is dragged wider;
+   the words box itself drags taller only (R-394). A short number (the Text's Size multiplier) gets
+   a short box. */
+.lpn-text-words-row { display: block; }
+.lpn-text-words { display: block; width: 100%; box-sizing: border-box; resize: vertical; }
+.lpn-num-short { width: 4em; }
 /* **PROPERTY AND CONDITION SHARE ONE LINE** (Tom, 2026-08-27, of the Find box on a phone). Two
    halves of one phrase -- "Diameter / greater than" -- each narrower than the sentence it belongs
    to, so pairing them costs nothing and buys back a whole line where lines are scarcest.
@@ -3012,7 +3064,7 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    about Ctrl+D"). Quieter than the label, so the row still reads as one action first. */
 .lpn-pane-ctxmenu-accel { color: var(--ec-gray-888); font-size: .85em; white-space: nowrap; }
 .lpn-pane-ctxmenu button:hover, .lpn-pane-ctxmenu button:focus-visible { background: var(--ec-hue-eef1f4); outline: 0; }
-.lpn-pane-ctxmenu button:disabled { color: var(--ec-gray-888); cursor: default; background: none; }
+.lpn-pane-ctxmenu button:disabled, .lpn-pane-ctxmenu button[aria-disabled="true"] { color: var(--ec-gray-888); cursor: default; background: none; }
 /* THE DIVIDER BETWEEN TWO HEADINGS, which is where a spreadsheet user aims to resize a column
    (Tom's point (d), 2026-09-18). It sits on the trailing edge of its own heading, is as tall as the
    heading row, and is the ONLY thing there that takes a col-resize cursor -- so the gesture
@@ -3366,8 +3418,15 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    split every other PC/phone difference in this box uses -- @media (max-width: 640px) below
    overrides the index unconditionally and the box's own min(_, 94vw) already governs a phone, so
    this base rule only ever reaches a screen wider than that. */
+/* **26.965rem -> 28.865rem: PLUS THE OVERRIDE GUTTER, 1.9rem** (Tom, 2026-10-14: "the Settings box
+   default width may be too small now. We will have to observe and maybe add an estimated amount for
+   the glyphs and orange line that were just added"). Measured in Chromium on his Fotobi project
+   (two or more scenarios, so the Task 790 gutter is drawn): at 26.965rem the gutter's 30.4 px made 3
+   rows taller in English and 7 in German; widening the box by 26 px (English) and 30 px (German)
+   gave back every one. The orange line is an inset shadow and takes no width. So the box grows by
+   exactly the gutter, 1.9em of the 1rem rows. */
 .lpn-setbox {
-	width: min(26.965rem, 94vw);
+	width: min(28.865rem, 94vw);
 	height: min(46rem, 92vh);
 	flex-direction: column;
 	box-sizing: border-box;
@@ -3436,6 +3495,15 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	position: absolute; top: 0; left: 0; right: 0; height: 39px; box-sizing: border-box;
 	padding: 10px 12px 0; font-weight: bold; pointer-events: none;
 	border-bottom: 1px solid var(--ec-border-strong); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+
+/* **A "?" IN THE TITLE BAND TAKES THE POINTER** (Tom, 2026-10-11, on the Scenario manager's: *"The
+   glyph isn't clickable."*). The band ignores the pointer so the box drags by it; the glyph alone
+   opts back in, so the words beside it still drag. 24 px square, the band's own height allowing,
+   so a finger finds it. */
+.lpn-setbox-title .ec-tip {
+	pointer-events: auto; cursor: pointer; display: inline-block;
+	min-width: 24px; height: 24px; line-height: 24px; margin-top: -4px; text-align: center; vertical-align: top;
 }
 
 /* ---- THE CORNER BUTTONS AND DOCKING (ROADMAP Task 441) ---------------------------------------
@@ -3577,6 +3645,11 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	border-right: 1px solid var(--ec-border); padding-right: 6px; font-size: .9em;
 }
 .lpn-setbox-content { flex: 1 1 auto; min-width: 0; overflow: auto; font-size: .9em; }
+/* **NO SCROLL ANCHORING IN THE SETTINGS BOX** (Tom, 2026-10-12: a held value's note "loses my place in
+   the settings box"). An edit rebuilds the box, so the node the browser picked to hold still was not
+   the one under the pointer, and the content jumped hundreds of pixels. setboxKeepPlace() holds the
+   control in the hand instead. */
+.lpn-setbox-content { overflow-anchor: none; }
 /* **THE DIVIDER BETWEEN THE TWO PANES** (ROADMAP Task 576; Tom, 2026-09-04: *"It might be nice...
    to let the user drag the divider between the settings panes."*). A grab strip, not a line: the
    visible rule stays on .lpn-setbox-index's own border-right, so the drawing does not change and
@@ -3849,6 +3922,13 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    text in the box that named a control and did NOT wear it, which is what he was reading as "not
    uniform". The labels lists' own names are set to match in labelCheckbox(). */
 .lpn-set-row > :first-child, .lpn-set-name { overflow-wrap: anywhere; font-size: .85em; opacity: .8; }
+/* A VALUE THE OPEN SCENARIO HOLDS (Ida's design, dev/scenario-alternatives.md): an amber edge on
+   the row, and under it what Base has with Clear override. The edge is drawn inside the row's own
+   box, so nothing beside it moves. */
+.lpn-set-held { box-shadow: inset 3px 0 0 var(--ec-held); padding-left: 6px; }
+.lpn-set-viewgroup > button { margin: 2px 0 4px; }
+/* The box's left index marks a sub-heading under which the open scenario holds a value. */
+.lpn-setbox-link.lpn-setbox-link-held { box-shadow: inset 3px 0 0 var(--ec-held); }
 /* **A TRANSIENT MARK ON THE ROW A LINK JUST SENT YOU TO** (Tom's 2026-09-08 worklist). Tom asked for the
    Show page titles label "temporarily highlighted" when Hide these titles opens the box at it.
    TRANSIENT is the whole rule: the class is taken off on a timer or on the first press inside the
@@ -4148,6 +4228,23 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    an ordinary save confirmation. */
 .lpn-msglog-btn.lpn-msglog-active { background: var(--ec-hue-05a); border-color: var(--ec-hue-05a); color: var(--ec-bg); }
 .lpn-msglog-btn.lpn-msglog-active:hover, .lpn-msglog-btn.lpn-msglog-active:focus { color: var(--ec-bg); border-color: var(--ec-hue-037); }
+/* ---- CLEAN MAP (Task 805; Tom, 2026-10-15, R-396), Map menu, setCleanMap() ----
+   THE ONE LIST of what Clean map hides: the controls and transient marks floating over the drawing.
+   display:none, not opacity, so a hidden control can be neither seen nor reached by Tab. !important
+   because several of these carry an inline display the page sets (the teaser, the notice), and
+   that inline value is left alone so turning Clean map off restores it exactly. NOT here, on
+   purpose: #lpn_status (the standing error stays visible), the readouts in the bottom strip and the
+   mode line (Tom retired hiding readouts, 2026-09-22), the basemap credit (required attribution),
+   the offscreen notice and the empty-map examples (the way back to a drawing), the placement bars
+   (a tool in progress), and the toolbar, which holds the Map menu and the way out. The override
+   rings are not CSS: overrideMarksShown() keeps their classes off. */
+.lpn-map-wrap.lpn-clean-map #lpn_zoom_control,
+.lpn-map-wrap.lpn-clean-map #lpn_map_notice,
+.lpn-map-wrap.lpn-clean-map #lpn_msglog_btn,
+.lpn-map-wrap.lpn-clean-map #lpn_msglog_panel,
+.lpn-map-wrap.lpn-clean-map #lpn_area_hint,
+.lpn-map-wrap.lpn-clean-map #lpn_basemap_teaser,
+.lpn-map-wrap.lpn-clean-map #lpn_wrong_btn { display: none !important; }
 /* The list inside the dialog. Capped and scrolled rather than allowed to push the buttons off a
    short window: the modal is positioned at 20% from the top, so an unbounded list on a laptop
    takes the Close button with it. */
@@ -4575,15 +4672,21 @@ html[dir="rtl"] .lpn-guide-railtoggle svg { transform: scaleX(-1); }
 .lpn-guide-nav-row[data-level="1"] { padding-inline-start: 12px; }
 .lpn-guide-nav-row[data-level="2"] { padding-inline-start: 24px; }
 .lpn-guide-nav-chev, .lpn-guide-nav-spacer { flex: 0 0 20px; width: 20px; height: 24px; }
-.lpn-guide-nav-chev {
+/* **ONE CHEVRON FOR EVERY TREE** (Ida, 2026-10-11: the suite's trees share one look): the Guide
+   rail's, and `.lpn-tree-chev` for any other tree (the Scenario manager's). Open points down;
+   closed points toward the end of the line, so it points left on a right-to-left page. */
+.lpn-guide-nav-chev, .lpn-tree-chev {
 	padding: 0; border: 0; background: transparent; color: var(--ec-ink); cursor: pointer;
 	display: inline-flex; align-items: center; justify-content: center;
 }
-.lpn-guide-nav-chev:hover, .lpn-guide-nav-chev:focus-visible { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
-.lpn-guide-nav-chev-svg { width: .9em; height: .9em; transition: transform .12s; }
-.lpn-guide-nav-closed > .lpn-guide-nav-chev .lpn-guide-nav-chev-svg { transform: rotate(-90deg); }
-html[dir="rtl"] .lpn-guide-nav-closed > .lpn-guide-nav-chev .lpn-guide-nav-chev-svg { transform: rotate(90deg); }
-@media (prefers-reduced-motion: reduce) { .lpn-guide-nav-chev-svg { transition: none; } }
+.lpn-guide-nav-chev:hover, .lpn-guide-nav-chev:focus-visible,
+.lpn-tree-chev:hover, .lpn-tree-chev:focus-visible { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
+.lpn-guide-nav-chev-svg, .lpn-tree-chev-svg { width: .9em; height: .9em; transition: transform .12s; }
+.lpn-guide-nav-closed > .lpn-guide-nav-chev .lpn-guide-nav-chev-svg,
+.lpn-tree-chev[aria-expanded="false"] .lpn-tree-chev-svg { transform: rotate(-90deg); }
+html[dir="rtl"] .lpn-guide-nav-closed > .lpn-guide-nav-chev .lpn-guide-nav-chev-svg,
+html[dir="rtl"] .lpn-tree-chev[aria-expanded="false"] .lpn-tree-chev-svg { transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) { .lpn-guide-nav-chev-svg, .lpn-tree-chev-svg { transition: none; } }
 .lpn-guide-nav-snip { display: block; font-weight: normal; color: var(--ec-ink-muted); font-size: .9em; }
 .lpn-guide-rail-collapsed .lpn-guide-rail { flex-basis: 34px; padding-inline-end: 2px; }
 .lpn-guide-rail-collapsed .lpn-guide-railtitle, .lpn-guide-rail-collapsed .lpn-guide-railbody { display: none; }
@@ -4725,10 +4828,57 @@ html[dir="rtl"] .lpn-guide-chev { transform: scaleX(-1); }
    own: two report tables side by side in the reading want more room than the Settings index needs,
    and less than the Library's three editors. */
 .lpn-ffbox { width: min(52rem, 94vw); }
-/* The Alternatives preview is one table of nine categories and three calculation options (Task
-   755), so it opens wide enough to show them all without scrolling where the screen allows.
-   Tom, 2026-10-04: "The box needs to be wider (like 1500 px) on PC." On a phone 94vw is unchanged. */
-#lpn_alt_box { width: min(1500px, 94vw); }
+/* ---- THE SCENARIO MANAGER (stage 6): a narrow docked tree, one tab per category ----------------
+   Rows are plain divs with a depth indent. A drop BETWEEN two rows draws a line (reorder); a drop ON a
+   row paints the whole row (re-parent), so the two read as different things. */
+#lpn_sm_box { width: min(22rem, 94vw); }
+.lpn-sm-body { display: flex; flex-direction: column; gap: 6px; min-height: 0; }
+.lpn-sm-tools { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.lpn-sm-tools select { max-width: 100%; }
+.lpn-sm-tree { overflow: auto; border: 1px solid var(--ec-border-strong); min-height: 8em; padding: 2px 0; }
+.lpn-sm-row { display: flex; align-items: center; gap: 6px; padding: 2px 6px; cursor: default; position: relative; border-top: 2px solid transparent; border-bottom: 2px solid transparent; }
+.lpn-sm-row.lpn-sm-sel { background: var(--ec-select-bg-strong); }
+.lpn-sm-row.lpn-sm-into { outline: 2px solid var(--ec-ink); outline-offset: -2px; }
+.lpn-sm-row.lpn-sm-before { border-top-color: var(--ec-ink); }
+.lpn-sm-row.lpn-sm-after { border-bottom-color: var(--ec-ink); }
+.lpn-sm-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lpn-sm-name input { width: 100%; box-sizing: border-box; }
+.lpn-sm-meta { flex: 0 0 auto; font-size: 0.85em; opacity: 0.8; }
+/* The expander is a 24 px square, a finger's target on a phone, and a row without children keeps
+   the same width so names on one level line up. */
+.lpn-sm-row { padding-block: 0; min-height: 24px; gap: 4px; }
+.lpn-sm-row .lpn-tree-chev, .lpn-sm-row .lpn-tree-spacer { flex: 0 0 24px; width: 24px; height: 24px; }
+.lpn-sm-row .lpn-tree-chev-svg { width: 14px; height: 14px; }
+.lpn-sm-icon { flex: 0 0 16px; width: 16px; height: 16px; display: inline-flex; color: var(--ec-ink-muted); }
+.lpn-sm-icon svg { width: 16px; height: 16px; }
+.lpn-sm-icon-scnbase, .lpn-sm-icon-altbase { color: var(--ec-accent); }
+html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
+/* A command that does not apply to the item is greyed, never hidden, in the buttons and the menu. */
+.lpn-sm-tools button[aria-disabled="true"], .lpn-sm-menu button[aria-disabled="true"] { color: var(--ec-gray-888); cursor: default; }
+.lpn-sm-menu button[aria-disabled="true"]:hover { background: none; }
+.lpn-sm-menusep { margin: 3px 0; border-top: 1px solid var(--ec-border-strong); }
+/* All and All unused (Task 803): each category a heading, its items beneath, in the tree's own frame. */
+.lpn-sm-cathead { position: sticky; top: 0; z-index: 1; padding: 3px 6px; font-weight: bold; background: var(--ec-gray-f2f2f2); color: var(--ec-ink); border-bottom: 1px solid var(--ec-border); }
+.lpn-sm-none { padding: 2px 8px; color: var(--ec-ink-muted); font-style: italic; }
+.lpn-sm-tools button[aria-pressed="true"] { background: var(--ec-pressed-bg); border-color: var(--ec-pressed-border); }
+/* THE SCENARIOS TABLE, A PANE OF THE MANAGER'S OWN BOX (Task 802; Tom, 2026-10-16: "this is a
+   consolidated box now"). Laid out as Settings lays out its index and its content: the manager's
+   column, Settings' own slim divider, and the table, inside one .lpn-setbox-panes, under one title
+   band. The visible line is the manager column's own inline-end border, as it is the index's in
+   Settings; the divider is the grab strip on it. The manager column keeps its width
+   (`--lpn-sm-mgr-w`, written by smTableSync()) and the table takes the rest of the box. Without the
+   table (a phone, or the table sent home to the Tables pane) the divider and the table pane are not
+   drawn and the manager has the whole box. */
+.lpn-sm-panes > .lpn-sm-body { flex: 1 1 auto; min-width: 0; overflow: auto; }
+.lpn-sm-panes > .lpn-sm-divider, .lpn-sm-panes > .lpn-sm-table { display: none; }
+.lpn-sm-has-table .lpn-sm-panes > .lpn-sm-body {
+	flex: 0 1 var(--lpn-sm-mgr-w, 22rem); min-width: 12rem; box-sizing: border-box;
+	border-inline-end: 1px solid var(--ec-border); padding-inline-end: 6px;
+}
+.lpn-sm-has-table .lpn-sm-panes > .lpn-sm-divider { display: flex; }
+.lpn-sm-has-table .lpn-sm-panes > .lpn-sm-table { display: flex; flex-direction: column; flex: 1 1 0; min-width: 12rem; min-height: 0; }
+/* The Tables pane's own Scenarios panel, moved in: in the flow here, not stacked as in the pane. */
+#lpn_sm_table .lpn-pane-panel.lpn-pane-scroll { display: block; position: relative; inset: auto; z-index: auto; content-visibility: visible; flex: 1 1 auto; min-height: 0; height: auto; overflow: auto; padding: 0; }
 /* ---- THE RUN'S OWN DIALOG (ROADMAP Task 530) --------------------------------------------------
 
    Progress, Stop, nothing else (Tom, 2026-08-30). It borrows .lpn-popover for the viewport caps and
@@ -4764,9 +4914,6 @@ html[dir="rtl"] .lpn-guide-chev { transform: scaleX(-1); }
 /* The calculation options shown beside the alternatives (the Alternatives preview's Demand
    multiplier, Total run time and Hydraulic time step, Task 755): a divider before the first, every
    one centred, and a scenario's own value in a box narrow enough for `24:00` or `1.8`. */
-.lpn-ff-table .lpn-alt-calcopt { border-inline-start: 2px solid var(--ec-gray-999); }
-.lpn-ff-table .lpn-alt-opt { text-align: center; }
-.lpn-alt-input { width: 4.5em; text-align: center; font: inherit; }
 /* An id in the fire-flow table goes to its element (Tom, 2026-09-28: "can every node have a
    hyperlink to go to it?"): a button dressed as the link he asked for. */
 .lpn-ff-goto { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: var(--ec-accent); text-decoration: underline; cursor: pointer; text-align: inherit; }
@@ -5633,6 +5780,38 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 .lpn-hovercard-anchor { position: fixed; width: 1px; height: 1px; pointer-events: none; }
 .tooltip.lpn-hovercard { pointer-events: none; }
 .tooltip.lpn-hovercard .tooltip-inner { text-align: left; }
+
+/* ---- Time series graph bubbles (Task 784) -------------------------------------------------------
+   The layer is a fixed window over the part of the canvas that is on screen, clipped to it, and does
+   not catch the pointer; each bubble does. The tail is drawn in one SVG above the bubbles: a fill
+   that hides the bubble's border where the tail joins it, and a stroke along its two slanted edges. */
+.lpn-tsb-layer { position: fixed; z-index: 1100; overflow: hidden; pointer-events: none; }
+.lpn-tsb-tails { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 100000; }
+.lpn-tsb-tailfill { fill: var(--ec-bg); stroke: none; }
+.lpn-tsb-tailline { fill: none; stroke: var(--ec-gray-999); stroke-width: 1; stroke-linejoin: round; }
+.lpn-tsb {
+	position: absolute; box-sizing: border-box; pointer-events: auto; background: var(--ec-bg); color: var(--ec-ink);
+	border: 1px solid var(--ec-gray-999); border-radius: 8px; box-shadow: 0 2px 8px var(--ec-a-0-0-0-25);
+	overflow: hidden;
+}
+.lpn-tsb-head {
+	display: flex; align-items: center; gap: 4px; height: 24px; padding: 0 2px 0 8px; cursor: move; touch-action: none;
+	background: var(--ec-gray-f6f6f6); border-bottom: 1px solid var(--ec-border); user-select: none;
+}
+.lpn-tsb-title { flex: 1; min-width: 0; font-size: 12px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lpn-tsb-q { flex: 0 1 auto; min-width: 0; max-width: 60%; height: 20px; padding: 0 2px; font: inherit; font-size: 12px; cursor: pointer; }
+.lpn-tsb-close {
+	flex: none; width: 20px; height: 20px; padding: 0; border: 0; border-radius: 10px; background: none; font: inherit;
+	font-size: 16px; line-height: 18px; color: inherit; cursor: pointer;
+}
+.lpn-tsb-close:hover, .lpn-tsb-close:focus-visible { background: var(--ec-gray-eaeaea); outline: 0; }
+.lpn-tsb-chart { width: 100%; }
+.lpn-tsb-say { padding: 8px; font-size: 12px; }
+.lpn-tsb-grip { position: absolute; right: 0; bottom: 0; width: 16px; height: 16px; cursor: nwse-resize; touch-action: none; }
+.lpn-tsb-grip::after {
+	content: ''; position: absolute; right: 3px; bottom: 3px; width: 8px; height: 8px;
+	border-right: 2px solid var(--ec-gray-888); border-bottom: 2px solid var(--ec-gray-888);
+}
 
 /* A DESCRIPTION IS A TEXTAREA THAT GROWS (Task 806). One row at rest so it reads as the line it
    was; descGrow() in js/looped-network.js sets the height to the text. No scrollbar and no manual

@@ -1,0 +1,599 @@
+{
+ "format": "hawsedc-lpn",
+ "app": "https://epanet-plus-plus.org/app/",
+ "v": 12,
+ "project": {
+  "name": "Zero demand, full tank",
+  "activeScenario": "base",
+  "coords": "geo",
+  "basemap": "normal"
+ },
+ "scenarios": [
+  {
+   "id": "base",
+   "name": "Base",
+   "isBase": true,
+   "overrides": {}
+  }
+ ],
+ "nodes": [
+  {
+   "id": "T-NW",
+   "type": "tank",
+   "x": -0.2702318143012904,
+   "y": 5.8134044822496955,
+   "_level": 23,
+   "minLevel": 15,
+   "maxLevel": 23,
+   "tankDiameter": 10,
+   "elev": 331.69,
+   "bottomElev": 331.69
+  },
+  {
+   "id": "J-NW-S-3",
+   "type": "junction",
+   "x": -0.269953,
+   "y": 5.814323,
+   "_demand": 1,
+   "_active": true,
+   "elev": 320.21,
+   "demandPattern": null
+  },
+  {
+   "id": "J-NW-S-2",
+   "type": "junction",
+   "x": -0.269921210869719,
+   "y": 5.813501356563014,
+   "_demand": 1,
+   "_active": true,
+   "elev": 333.99,
+   "demandPattern": null
+  },
+  {
+   "id": "J1",
+   "type": "junction",
+   "x": -0.2701186886946947,
+   "y": 5.8135208341501325,
+   "_demand": 0,
+   "elev": 330.38,
+   "_active": true
+  },
+  {
+   "id": "J2",
+   "type": "junction",
+   "x": -0.27022511080803674,
+   "y": 5.813412693869715,
+   "_demand": 0,
+   "elev": 331.69,
+   "_active": true
+  },
+  {
+   "id": "J-NW-S-1",
+   "type": "junction",
+   "x": -0.2702126384558423,
+   "y": 5.813403017204836,
+   "_demand": 1,
+   "elev": 331.69,
+   "_active": true,
+   "demandPattern": null
+  },
+  {
+   "id": "J-A20",
+   "type": "junction",
+   "x": -0.2699790234891055,
+   "y": 5.814134478632808,
+   "_demand": 0,
+   "elev": 319.88,
+   "lx": -2.884209792424191e-06,
+   "ly": 1.92571106986646e-06
+  },
+  {
+   "id": "J4",
+   "type": "junction",
+   "x": -0.26998878076201616,
+   "y": 5.814136700723446,
+   "_demand": 0,
+   "elev": 319.88
+  }
+ ],
+ "links": [
+  {
+   "id": "L7",
+   "type": "pipe",
+   "from": "J1",
+   "to": "J-NW-S-2",
+   "verts": [
+    {
+     "x": -0.2700102542637941,
+     "y": 5.8135162962623195
+    }
+   ],
+   "_diameter": 1.75,
+   "_roughness": 130,
+   "_length": 72.23993256370659,
+   "lenAuto": true,
+   "_status": "open",
+   "_k": 2
+  },
+  {
+   "id": "L10",
+   "type": "pipe",
+   "from": "J2",
+   "to": "J1",
+   "verts": [
+    {
+     "x": -0.27013884429072793,
+     "y": 5.81352163561404
+    }
+   ],
+   "_diameter": 2,
+   "_roughness": 130,
+   "_length": 57.77549115947183,
+   "lenAuto": true,
+   "_status": "open",
+   "_k": 2
+  },
+  {
+   "id": "L11",
+   "type": "pipe",
+   "from": "T-NW",
+   "to": "J2",
+   "verts": [],
+   "_diameter": 2,
+   "_roughness": 130,
+   "_length": 20,
+   "lenAuto": false,
+   "_status": "open",
+   "_k": 2
+  },
+  {
+   "id": "L12",
+   "type": "pipe",
+   "from": "J2",
+   "to": "J-NW-S-1",
+   "verts": [],
+   "_diameter": 1.75,
+   "_roughness": 130,
+   "_length": 25,
+   "lenAuto": false,
+   "_status": "open",
+   "_k": 2
+  },
+  {
+   "id": "L15",
+   "type": "pipe",
+   "from": "J-NW-S-3",
+   "to": "J4",
+   "verts": [],
+   "_diameter": 2,
+   "_roughness": 130,
+   "_length": 68.83097214785326,
+   "lenAuto": true,
+   "_status": "open",
+   "_k": 2
+  },
+  {
+   "id": "L16",
+   "type": "pipe",
+   "from": "J4",
+   "to": "J1",
+   "verts": [],
+   "_diameter": 2,
+   "_roughness": 130,
+   "_length": 228.37631114489005,
+   "lenAuto": true,
+   "_status": "open",
+   "_k": 1.5
+  },
+  {
+   "id": "L17",
+   "type": "pipe",
+   "from": "J-A20",
+   "to": "J4",
+   "verts": [],
+   "_diameter": 1.75,
+   "_roughness": 130,
+   "_length": 3.635864309938181,
+   "lenAuto": true,
+   "_status": "open",
+   "_k": 2
+  }
+ ],
+ "labels": [],
+ "nextId": {
+  "J": 11,
+  "R": 2,
+  "T": 1,
+  "L": 25,
+  "P": 2,
+  "V": 1,
+  "X": 44,
+  "M": 1
+ },
+ "customers": [],
+ "origin": {
+  "x": 0,
+  "y": 0
+ },
+ "labelSettings": {
+  "node": {
+   "id": false,
+   "desc": false,
+   "tag": false,
+   "demand": false,
+   "elev": false,
+   "initQuality": false,
+   "demandActual": true,
+   "level": false,
+   "head": false,
+   "pressure": true,
+   "quality": false
+  },
+  "link": {
+   "id": false,
+   "desc": false,
+   "tag": false,
+   "length": false,
+   "diameter": true,
+   "roughness": false,
+   "km": false,
+   "initStatus": false,
+   "bulkCoeff": false,
+   "wallCoeff": false,
+   "flow": true,
+   "velocity": true,
+   "headloss": false,
+   "gradient": false,
+   "friction": false,
+   "rate": false,
+   "quality": false,
+   "status": false
+  },
+  "customer": {
+   "id": false,
+   "desc": false,
+   "tag": false,
+   "demand": true,
+   "count": false,
+   "demandActual": false
+  },
+  "decimals": {
+   "node": {
+    "demand": 1,
+    "elev": 2,
+    "initQuality": 2,
+    "demandActual": 1,
+    "level": 2,
+    "head": 2,
+    "pressure": 2,
+    "quality": 1,
+    "quality:trace": 0
+   },
+   "link": {
+    "length": 0,
+    "diameter": 2,
+    "roughness": 0,
+    "km": 2,
+    "bulkCoeff": 1,
+    "wallCoeff": 1,
+    "flow": 1,
+    "velocity": 1,
+    "headloss": 2,
+    "gradient": 2,
+    "friction": 3,
+    "rate": 1,
+    "quality": 1,
+    "quality:trace": 0
+   },
+   "customer": {
+    "demand": 1,
+    "demandActual": 1
+   }
+  },
+  "prefix": {
+   "node": {},
+   "link": {},
+   "customer": {}
+  },
+  "suffix": {
+   "node": {
+    "level": " ft H2O",
+    "head": " ft H2O",
+    "demand": " gpm"
+   },
+   "link": {
+    "diameter": " in"
+   },
+   "customer": {
+    "demand": " gpm"
+   }
+  },
+  "useUnits": {
+   "node": {
+    "initQuality": true,
+    "quality": true
+   },
+   "link": {
+    "length": false,
+    "diameter": false,
+    "quality": true
+   },
+   "customer": {}
+  },
+  "separator": " ",
+  "show": {
+   "node": {
+    "id": 1,
+    "desc": 2,
+    "tag": 3,
+    "demand": 4,
+    "elev": 5,
+    "initQuality": 6,
+    "demandActual": 7,
+    "level": 9,
+    "head": 10,
+    "pressure": 11,
+    "quality:chemical": 12,
+    "quality:trace": 13,
+    "quality:age": 14
+   },
+   "link": {
+    "id": 1,
+    "desc": 2,
+    "tag": 3,
+    "length": 4,
+    "diameter": 5,
+    "roughness": 6,
+    "km": 7,
+    "initStatus": 8,
+    "bulkCoeff": 9,
+    "wallCoeff": 10,
+    "flow": 11,
+    "velocity": 12,
+    "headloss": 13,
+    "gradient": 14,
+    "friction": 15,
+    "rate": 16,
+    "quality:chemical": 17,
+    "quality:trace": 18,
+    "quality:age": 19,
+    "status": 20
+   },
+   "customer": {
+    "id": 1,
+    "desc": 2,
+    "tag": 3,
+    "demand": 4,
+    "count": 5,
+    "demandActual": 6
+   }
+  },
+  "priority": {
+   "node": {
+    "id": 2,
+    "desc": 4,
+    "tag": 6,
+    "demand": 10,
+    "elev": 8,
+    "initQuality": 16,
+    "demandActual": 26,
+    "level": 12,
+    "head": 14,
+    "pressure": 28,
+    "quality:chemical": 22,
+    "quality:trace": 20,
+    "quality:age": 18
+   },
+   "link": {
+    "id": 2,
+    "desc": 4,
+    "tag": 6,
+    "length": 18,
+    "diameter": 38,
+    "roughness": 22,
+    "km": 16,
+    "initStatus": 12,
+    "bulkCoeff": 10,
+    "wallCoeff": 8,
+    "flow": 40,
+    "velocity": 36,
+    "headloss": 28,
+    "gradient": 34,
+    "friction": 14,
+    "rate": 20,
+    "quality:chemical": 32,
+    "quality:trace": 30,
+    "quality:age": 26,
+    "status": 24
+   },
+   "customer": {
+    "id": 2,
+    "desc": 4,
+    "tag": 6,
+    "demand": 8,
+    "count": 10,
+    "demandActual": 12
+   }
+  },
+  "markExtrema": false,
+  "customerMaxWidth": 1000
+ },
+ "backdrop": null,
+ "settings": {
+  "idPrefixes": {
+   "J": "J",
+   "R": "R",
+   "T": "T",
+   "L": "L",
+   "P": "P",
+   "V": "V",
+   "X": "X",
+   "M": "C",
+   "S": "S"
+  },
+  "customProps": [],
+  "emitterExponent": 0.5,
+  "hydraulics": {
+   "demandMultiplier": 26
+  },
+  "qualityOptions": {},
+  "quality": {
+   "mode": "none",
+   "traceNode": ""
+  },
+  "fileOptions": {},
+  "engine": "epanet",
+  "autoRun": true,
+  "nodeElevSource": "value",
+  "defaults": {
+   "nodeElev": 0,
+   "demand": 0,
+   "diameter": 4,
+   "roughness": 130,
+   "k": 2,
+   "tankLevel": 20,
+   "tankMinLevel": 0,
+   "tankMaxLevel": 30,
+   "tankDiameter": 50,
+   "nodeElevSource": "dem"
+  },
+  "sectionsOpen": {
+   "idPrefixes": false,
+   "defaults": true,
+   "mapDisplay": false,
+   "colors": false,
+   "computation": false,
+   "files": false
+  },
+  "textSize": 15,
+  "symbolSize": 15,
+  "linkWidth": 8,
+  "symbolOpacity": 1,
+  "labelMaxWidth": null,
+  "symbolCapMultiple": 0.5,
+  "symbolCapPercentile": 50,
+  "basemapStyle": "normal",
+  "backdropOpacity": 1,
+  "alignPipeLabels": true,
+  "labelFlipLeftOfVertical": 20,
+  "maskLabels": true,
+  "showArrows": true,
+  "leaderSnapDeg": 0,
+  "legendPosition": "off",
+  "colorNodeField": "",
+  "colorLinkField": "",
+  "colorRampNode": "ylorbr",
+  "colorRampLink": "viridis",
+  "colorClassesNode": 7,
+  "colorClassesLink": 7,
+  "colorReverseNode": false,
+  "colorReverseLink": false,
+  "contourFill": "",
+  "contourLines": false,
+  "contourLabels": true,
+  "contourOpacity": 0.6,
+  "contourInterval": {},
+  "contourBuffer": 1.5,
+  "contourTerrain": false,
+  "colorLegendPosition": "off",
+  "colorBreaks": {
+   "node.pressure": [
+    3.05,
+    6.1,
+    9.15,
+    12.2,
+    15.2,
+    18.3
+   ]
+  },
+  "colorModes": {},
+  "reactions": {
+   "tank": {}
+  },
+  "energy": {
+   "effic": {}
+  },
+  "sources": {
+   "read": true
+  },
+  "mixing": {
+   "read": true
+  },
+  "tags": {
+   "read": true
+  },
+  "method": "hw"
+ },
+ "patterns": [
+  {
+   "id": "P1",
+   "multipliers": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  }
+ ],
+ "defaultPattern": "P1",
+ "curves": [],
+ "pipeTypes": [],
+ "fittingSets": [],
+ "profiles": [],
+ "times": {
+  "duration": 86400,
+  "hydraulicStep": 360,
+  "patternStep": 3600,
+  "patternStart": 0,
+  "reportStep": 3600,
+  "reportStart": 0,
+  "startClock": 0,
+  "text": {
+   "duration": "24:00",
+   "hydraulicStep": "0.1",
+   "patternStep": "1"
+  }
+ },
+ "controls": [],
+ "rules": [],
+ "inpSections": {},
+ "view": {
+  "cx": -0.26947853341696976,
+  "cy": 5.823772972256776,
+  "s": 469948.4054997643
+ },
+ "units": {
+  "lpn_u_length": "ft",
+  "lpn_u_diameter": "in",
+  "lpn_u_elevhead": "fth2o",
+  "lpn_u_pressure": "psi",
+  "lpn_u_flow": "gpm",
+  "lpn_u_velocity": "ftps",
+  "lpn_u_gradient": "gradePercent",
+  "lpn_u_roughness": "ft",
+  "lpn_u_age": "hr"
+ },
+ "alternatives": [],
+ "calcSets": [],
+ "bubbles": []
+}

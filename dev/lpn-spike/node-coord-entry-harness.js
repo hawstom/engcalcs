@@ -46,6 +46,9 @@ const { byId, ensure, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, getProject: function () { return project; },\n" +
 	"\t\tgetScenarios: function () { return scenarios; },\n" +
+	// A scenario's values as it resolves them: its own map, or the alternative an override stored
+	// (2026-10-12).
+	"\t\town: function (s) { return resolvedOverrides(s); },\n" +
 	"\t\taddNode: addNode, addLink: addLink, buildDom: buildDom,\n" +
 	"\t\taxisNames: axisNames, readsNorthFirst: readsNorthFirst,\n" +
 	"\t\tcoordSlotIsY: coordSlotIsY, nodeCoordAxis: nodeCoordAxis,\n" +
@@ -368,13 +371,13 @@ function project(kind, crs, origin) {
 	ok('we are in a scenario', !L.inBase());
 
 	ok('typing a coordinate in a scenario is accepted', L.setNodeCoordAxis(n, 1, 555) === true);
-	const ov = scn.overrides[L.ovKey(n)];
+	const ov = L.own(scn)[L.ovKey(n)];
 	// **THE OVERRIDE HOLDS THE PUBLIC NUMBER THE USER TYPED**, not the drawing-frame one -- see
 	// writeNodeCoord(). On a grid project slot 1 is x.
 	ok('...and it IS an override, keyed on the axis that was typed',
 		!!ov && ov.x === 555 && ov.y === undefined, JSON.stringify(ov || null));
 	ok('...which the marker machinery can see', L.hasOverride(n, 'x') === true);
-	ok('...and the scenario counts it', Object.keys(scn.overrides).length === 1);
+	ok('...and the scenario counts it', Object.keys(L.own(scn)).length === 1);
 	ok('...the popup and the tables read the scenario back', near(L.nodeCoordAxis(n, 1), 555));
 	ok('...the DRAWING follows it', near(L.nodeDrawX(n), 555) && L.nodeAt(n).x === L.nodeDrawX(n),
 		String(L.nodeDrawX(n)));
@@ -393,13 +396,13 @@ function project(kind, crs, origin) {
 	L.switchScenario(scn.id);
 	L.writeNodeCoord(n, false, 777);
 	ok('a drag inside a scenario records the same override a typed box does',
-		near(scn.overrides[L.ovKey(n)].x, L.outwardX(777)) && near(L.nodeDrawX(n), 777),
-		JSON.stringify(scn.overrides[L.ovKey(n)]));
+		near(L.own(scn)[L.ovKey(n)].x, L.outwardX(777)) && near(L.nodeDrawX(n), 777),
+		JSON.stringify(L.own(scn)[L.ovKey(n)]));
 
 	// Clearing it returns the node to Base's position, which is the marker's untick.
 	L.clearOverride(n, 'x');
 	ok('clearing the override puts the node back where Base has it', near(L.nodeDrawX(n), baseX));
-	ok('...and the scenario is empty again', Object.keys(scn.overrides).length === 0);
+	ok('...and the scenario is empty again', Object.keys(L.own(scn)).length === 0);
 }
 
 // ---- 6b. everything DERIVED from a position follows the override -------------------------------
@@ -492,7 +495,9 @@ function project(kind, crs, origin) {
 	L.setNodeCoordAxis(g, 1, 38.6);
 	L.setNodeCoordAxis(g, 2, -122.4);
 	const snap = JSON.parse(JSON.stringify(L.serialize()));
-	const savedOv = (snap.scenarios.filter(x => x.id === scn.id)[0] || {}).overrides[L.ovKey(g)];
+	// Wherever the file holds Relocated's values: its own map, or the alternative they were stored in.
+	const sv = snap.scenarios.filter(x => x.id === scn.id)[0] || {};
+	const savedOv = (sv.overrides || {})[L.ovKey(g)] || (snap.alternatives || []).filter(a => a.id === (sv.alternatives || {}).physical).map(a => (a.values || {})[L.ovKey(g)])[0];
 	ok('the file states the overridden latitude and longitude exactly',
 		savedOv && savedOv.y === 38.6 && savedOv.x === -122.4, JSON.stringify(savedOv || null));
 	// **AND BASE'S OWN SOURCE RECORD IS UNTOUCHED BY IT.** Typing inside a scenario must not file a

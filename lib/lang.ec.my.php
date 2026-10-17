@@ -708,6 +708,7 @@ $ec_lang['lpn_node_customers_tip']='ဤနေရာသည် အနီးဆု�
 $ec_lang['lpn_node_customers_sum']='{total} {unit} (ဖောက်သည်များ ({n}) မှ)';
 $ec_lang['lpn_customer_detached']='⚠ ဤဖောက်သည်သည် ပိုက်လိုင်းနှင့် ချိတ်ဆက်မထားသောကြောင့်၊ ၎င်း၏ လိုအင်သည် အဖြေများတွင် မပါဝင်ပါ။ ၎င်းကို ဖျက်ပါ၊ (သို့) ပိုက်လိုင်းတစ်ခု ဆွဲပြီး ဖောက်သည်ကို ၎င်းပေါ်သို့ ရွှေ့ပါ။';
 $ec_lang['lpn_customer_fixed_head']='⚠ ထိုပိုက်လိုင်း၏ အနီးဆုံးအစွန်းသည် ပုံသေ ရေမျက်နှာပြင်တစ်ခု ဖြစ်နေသောကြောင့်၊ ဤလိုအင်သည် ပုံဖော်တွက်ချက်မှုကို သက်ရောက်မှု မရှိပါ။';
+
 $ec_lang['lpn_customer_detached_count']='ပိုက်လိုင်းနှင့် ချိတ်ဆက်မထားသော ဖောက်သည်များ ({n})။ ၎င်းတို့၏ လိုအင်ကို ထည့်တွက်မထားပါ။';
 $ec_lang['lpn_meter_pick_pipe']='ယခု ဤဖောက်သည်ကို ဝန်ဆောင်ပေးသော ပိုက်လိုင်း သို့မဟုတ် node ကို ရွေးချယ်ပါ။ ဖောက်သည်သည် သင်ထားသည့်နေရာတွင် ဆက်ရှိသည်။ ပယ်ဖျက်ရန် Escape နှိပ်ပါ။';
 $ec_lang['lpn_inp_export_flat_customers']='EPANET ဖိုင်တွင် ဖောက်သည်များ မရှိပါ။ ဤပရောဂျက်ရှိ ဖောက်သည်များ ({n}) ၏ လိုအင်ကို ဖောက်သည်တစ်ဦးစီ သတ်မှတ်ထားသော ဆက်စပ်နေရာပေါ်ရှိ လိုအင်အတန်းတစ်ခုအဖြစ် ဖောက်သည်၏ တဂ်ဖြင့် အမည်ပေး၍ ရေးသည်။ ဖိုင်သည် ဖောက်သည်ကိုယ်တိုင်ကို မမှတ်တမ်းတင်ပါ - ၎င်း၏ တည်နေရာ၊ ၎င်းကို ဝန်ဆောင်သော ပိုက်လိုင်း၊ ထိုပိုက်လိုင်းတစ်လျှောက် ဝန်ဆောင်မှု ချိတ်ဆက်သည့်နေရာ သို့မဟုတ် ၎င်းကိုယ်စားပြုသော ဝန်ဆောင်မှုအရေအတွက်။ ထိုအချက်အလက်သည် ပရောဂျက်တွင် ဆက်ရှိသည်၊ ၎င်းကို ထိန်းရန် ပရောဂျက်ဖိုင်ကို သိမ်းပါ။';
@@ -992,7 +993,6 @@ $ec_lang['lpn_guide_text_contour_box']='အရောင်ခြယ်ရန် 
 $ec_lang['lpn_guide_text_scncmp_box']='အခြေအနေတိုင်းကို ပုံဆွဲမှု၏ မိတ္တူမှ ဖြေရှင်းပြီး တစ်ခုချင်းစီအတွက် ကျော်လွန်သတ်မှတ်မှု အရေအတွက်၊ အနိမ့်ဆုံးဖိအားနှင့် အမြင့်ဆုံးရေအလျင်နှုန်းကို ဇယားပြုလုပ်သည်။ ပရောဂျက်ကို မပြောင်းလဲပါ၊ ဖွင့်ထားသော အခြေအနေကို ယခင်အတိုင်း ထားရစ်သည်။';
 $ec_lang['lpn_guide_text_rptbox']='နောက်ဆုံး အချိန်ကာလရှည် ပုံတူလည်ပတ်မှုအတွက် EPANET အင်ဂျင်က ရေးသားသော စာသားအစီရင်ခံစာကို သတိပေးချက်များနှင့် ကွန်ရက်အကျဉ်းချုပ်အပါအဝင် ပြသည်။ အချိန်ကာလရှည် ပုံတူလည်ပတ်မှုတိုင်းက ၎င်းကို အစားထိုးသည်၊ အချိန်တစ်ခုတည်းတွင် ဖြေရှင်းခြင်းက အစားမထိုးပါ၊ တည်းဖြတ်မှုက ယခင်အစီရင်ခံစာကို ထားရစ်သည်။';
 $ec_lang['lpn_guide_text_status_box']='နောက်ဆုံး အချိန်ကာလရှည် ပုံတူလည်ပတ်မှုအတွင်း ပြောင်းလဲမှုတစ်ခုစီကို အချိန်စဉ်လိုက် စာရင်းပြသည်။ ရေတင်စက်၊ ဗားလ် သို့မဟုတ် ပိုက်လိုင်း ဖွင့်ခြင်း/ပိတ်ခြင်း၊ ရေတိုက် ဖြည့်စ ဖြစ်ခြင်း၊ ဗလာစ ဖြစ်ခြင်း၊ ပြည့်ခြင်း သို့မဟုတ် ကုန်ခြင်း၊ နှင့် အပြည့်အဝ မညီမျှသွားသော အချိန်အဆင့်များ ပါဝင်သည်။ ပြောင်းလဲမှုများကိုသာ စာရင်းပြပြီး အချိန်အဆင့်တိုင်းကို မပြပါ။';
-$ec_lang['lpn_guide_text_alt_box']='အခြေအနေတစ်ခုစီအတွက် ရုပ်ပိုင်းဆိုင်ရာ၊ လိုအင်နှင့် အစိတ်အပိုင်း အသက်သွင်းခြင်းကဲ့သို့ အမျိုးအစားတစ်ခုစီတွင် မည်သည့် အခြားရွေးစရာကို သုံးသည်ကို ပြပြီး ၎င်း၏ တွက်ချက်မှု ရွေးစရာများဖြစ်သော လိုအင် မြှောက်ကိန်း၊ စုစုပေါင်း လည်ပတ်ချိန်နှင့် ဟိုက်ဒရောလစ် အချိန်အဆင့်ကို ပြသည်။ အခြားရွေးစရာများသည် ဖတ်ရန်သာ ဖြစ်သည်။ အခြေအနေတစ်ခု၏ တွက်ချက်မှု ရွေးစရာများကို ဤနေရာတွင် ရိုက်ထည့်နိုင်ပြီး ဗလာထားလျှင် ၎င်း၏ မိဘ၏ တန်ဖိုးကို သုံးသည်။ အခြေခံ မုဒ်ကို ရှင်းပြီးနောက် အခြေအနေများ မီနူးမှ ဖွင့်ပါ။';
 $ec_lang['lpn_guide_text_full_box']='ဇယားများ ပင်န်တွင် ပြသော ယူနစ်များဖြင့် အစီရင်ခံချိန် အဆင့်တိုင်းရှိ နေရာတိုင်းနှင့် ပိုက်လိုင်းတိုင်းကို စာရင်းပြသည်။ အချိန်ကာလရှည် ပုံတူလည်ပတ်မှု မရှိလျှင် အချိန်တစ်ခုတည်းရှိ လက်ရှိ ဖြေရှင်းချက်ကို ပြသည်။ ဒေါင်းလုဒ် သို့မဟုတ် ပုံနှိပ်ခြင်းတွင် အချိန်အဆင့်အားလုံး ပါသော်လည်း ဇယားတွင် တစ်ကြိမ်လျှင် တစ်ခုသာ ပြသည်။';
 $ec_lang['lpn_guide_text_calib_box']='နယ်ပယ်တွင် တိုင်းတာထားသော တန်ဖိုးများပါသည့် ဖိုင်ကို တူညီသော နေရာနှင့် အချိန်များရှိ တွက်ချက်ထားသော ရလဒ်များနှင့် နှိုင်းယှဉ်သည်၊ ဘောင်တစ်ခုချင်းစီအတွက် ဖိုင်တစ်ခုစီ ဖြစ်သည်။ ဖိုင်ကို လက်ရှိ ဆက်ရှင်အတွက်သာ ထိန်းထားပြီး ပရောဂျက်နှင့်အတူ မသိမ်းပါ။';
 $ec_lang['lpn_guide_text_notes_popup']='ဤစာမျက်နှာ မည်သို့ အလုပ်လုပ်သည်နှင့် မည်သည်ကို မလုပ်သည်ဆိုသော မှတ်စုများကို ဝေါဟာရတစ်ခုနှင့် ၎င်း၏ အဓိပ္ပာယ်ဖွင့်ဆိုချက် ပုံစံဖြင့် စာရင်းပြသည်။ ကွန်ရက်ကို မပြောင်းလဲပါ။';
@@ -1020,7 +1020,6 @@ $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?<
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='{menu} တွင်လည်း';
 $ec_lang['lpn_guide_how_popup']='အစိတ်အပိုင်း သို့မဟုတ် စာသားကို ရွေးချယ်သောအခါ ဂုဏ်သတ္တိများ ပွင့်လာသည်။';
-$ec_lang['lpn_guide_how_alt']='အခြေခံ မုဒ်ကို ပိတ်ထားသောအခါ အခြားရွေးစရာများ ကြိုတင်ကြည့်ရှုမှုကို ရေ၊ အခြေအနေများ အောက်တွင် စာရင်းပြသည်။';
 $ec_lang['lpn_guide_not_shown']='ဤထိန်းချုပ်မှုသည် ယခု မျက်နှာပြင်ပေါ်တွင် မရှိပါ။';
 // The box's two context headings. "Tables" holds the two table-help entries that used to sit only
 // in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
@@ -1475,8 +1474,20 @@ $ec_lang['lpn_pane_sel_only_none']='မည်သည့်အစိတ်အပ�
 // Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
 // scenario, with a Scenario column after ID.
 $ec_lang['lpn_pane_scn_show']='အခြေအနေများ ပြရန်';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+
+
+
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+
+
+
+
 $ec_lang['lpn_pane_clear_override']='ကိုယ်ပိုင်တန်ဖိုး ဖယ်ရှားရန်';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -1532,20 +1543,29 @@ $ec_lang['lpn_menu_project']='ရေ';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='ရေကွန်ရက် မော်ဒယ်ပြုလုပ်ခြင်းနှင့် သက်ဆိုင်သမျှ (လှုပ်ရှားပုံ ဖွင့်ထိန်းချုပ်မှုများ မှလွဲ၍)';
 $ec_lang['lpn_tables_menu']='ဇယားများ';
-// Water > Change type (Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// Water > Morph (Task 781; Tom, 2026-10-14: *"I like the term 'Morph' (Transform) for this feature"*;
+// first built as Change type, Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
 // to Change node type for any asset, where if it has information that can't be ported to the new
 // type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
 // asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
 // popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
 // dev/asset-type.md.
-$ec_lang['lpn_change_type_menu']='အမျိုးအစား ပြောင်းရန်';
-$ec_lang['lpn_change_type_tip']='ရွေးချယ်ထားသော node များကို ဆက်စပ်နေရာ၊ ရေကန် သို့မဟုတ် ရေတိုက်အဖြစ်၊ သို့မဟုတ် ရွေးချယ်ထားသော link များကို ပိုက်လိုင်း၊ ရေတင်စက် သို့မဟုတ် ဗားလ်အဖြစ် ပြောင်းပါ။ တစ်ခုစီသည် ၎င်း၏ ID၊ တည်နေရာ၊ ချိတ်ဆက်မှုများနှင့် အမျိုးအစားအသစ်တွင်လည်း ရှိသော တန်ဖိုးအားလုံးကို ဆက်ထားသည်။ တစ်စုံတစ်ရာ ဆုံးရှုံးမည်ဆိုပါက အရင်မေးသည်။';
-$ec_lang['lpn_change_type_ok']='ပြောင်းရန်';
+$ec_lang['lpn_morph_menu']='အမျိုးအစား ပြောင်းရန်';
+$ec_lang['lpn_morph_tip']='ရွေးချယ်ထားသော node များကို ဆက်စပ်နေရာ၊ ရေကန် သို့မဟုတ် ရေတိုက်အဖြစ်၊ သို့မဟုတ် ရွေးချယ်ထားသော link များကို ပိုက်လိုင်း၊ ရေတင်စက် သို့မဟုတ် ဗားလ်အဖြစ် ပြောင်းပါ။ တစ်ခုစီသည် ၎င်း၏ ID၊ တည်နေရာ၊ ချိတ်ဆက်မှုများနှင့် အမျိုးအစားအသစ်တွင်လည်း ရှိသော တန်ဖိုးအားလုံးကို ဆက်ထားသည်။ တစ်စုံတစ်ရာ ဆုံးရှုံးမည်ဆိုပါက အရင်မေးသည်။';
+$ec_lang['lpn_morph_ok']='ပြောင်းရန်';
+// {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
+// when a node type was chosen), separated by commas.
+
+// The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
+// scenario, beside the override marker.
+
+
 $ec_lang['lpn_change_type_lost']='ဤတန်ဖိုးများ ဆုံးရှုံးမည်။';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
 $ec_lang['lpn_change_type_key']='တစ်ကြောင်းချင်းစီ - ID - ဆုံးရှုံးမည့် ဂုဏ်သတ္တိနှင့် တန်ဖိုး';
 $ec_lang['lpn_change_type_line']='{id}: {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}၊ အခြေအနေ {scenario} တွင်';
+
 $ec_lang['lpn_change_type_more']='နောက်ထပ် {n} ခု။';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.
@@ -1614,6 +1634,32 @@ $ec_lang['lpn_confirm_delete_network']='ဤပရောဂျက်ရှိ nod
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='ရှာဖွေရန်နှင့် အစားထိုးရန်';
+// Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
+// placement are never pasted.
+
+
+
+
+
+
+
+
+
+
+// The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
+// opens the in-place editor; Reset position sends a dragged label or an attached Text home.
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_find_title']='ရှာဖွေရန်နှင့် အစားထိုးရန်';
 $ec_lang['lpn_find_scope']='မည်သည်ကို ရှာမည်';
 $ec_lang['lpn_find_scope_all']='အားလုံး';
@@ -2056,6 +2102,8 @@ $ec_lang['lpn_status_inp_exported_picture']='{zip} ကို ထုတ်ယူ�
 $ec_lang['lpn_status_inp_exported_no_picture']='{file} ကို ထုတ်ယူပြီး။ နောက်ခံပုံကို သိမ်း၍ မရသဖြင့် .inp တွင် မည်သည့်ပုံမျှ မပါပါ၊ EPANET တွင် View > Backdrop > Load ဖြင့် ထည့်ပါ။';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+
+
 $ec_lang['lpn_inp_export_differences']='.inp ဖော်မတ်က မသိမ်းနိုင်သည့် အရာ {n} ခု။';
 $ec_lang['lpn_inp_export_difference_one']='.inp ဖော်မတ်က မသိမ်းနိုင်သော အချက်တစ်ခု။';
 $ec_lang['lpn_inp_export_refused']='ဤပရောဂျက်ကို EPANET ဖိုင်အဖြစ် ရေး၍မရပါ - {detail}';
@@ -3045,6 +3093,7 @@ $ec_lang['lpn_scenario_overrides']='ကိုယ်ပိုင်တန်ဖ�
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='အမ်ဘာရောင်စက်ဝိုင်းသည် ဤအစိတ်အပိုင်းတွင် အခြေအနေ {name} ၌ ကိုယ်ပိုင်တန်ဖိုး ရှိကြောင်း ဆိုလိုသည်။';
+
 $ec_lang['lpn_scenario_overrides_tip']='ကိုယ်ပိုင်တန်ဖိုးတစ်ခုစီကို မြေပုံပေါ်တွင် အမ်ဘာရောင် စက်ဝိုင်းဖြင့် အမှတ်အသားပြုသည်။ ၎င်းတို့မပါဘဲ ပုံဆွဲမှုကို ကြည့်ရန် {base} သို့မဟုတ် အခြားမိဘအခြေအနေသို့ ပြောင်းပါ။';
 $ec_lang['lpn_scenario_menu']='အခြေအနေများ';
 $ec_lang['lpn_scenario_tip']='ပုံတွင် ပြသနေပြီး၊ ဤစာမျက်နှာက ယခုဖြေရှင်းနေသော တန်ဖိုးအစုအဝေး။ အခြေအနေများ ပြောင်းရန်၊ (သို့) တစ်ခု ထပ်ထည့်ရန်၊ အမည်ပြောင်းရန်၊ ဖျက်ရန် နှိပ်ပါ။';
@@ -3053,10 +3102,11 @@ $ec_lang['lpn_scenario_new_name']='အခြေအနေ {n}';
 $ec_lang['lpn_scenario_prompt_name']='ဤအခြေအနေအတွက် အမည်';
 $ec_lang['lpn_scenario_rename']='အခြေအနေ အမည်ပြောင်းရန်…';
 $ec_lang['lpn_scenario_delete']='အခြေအနေ ဖျက်ရန်';
-$ec_lang['lpn_scenario_delete_confirm']='အခြေအနေ {name} နှင့် ၎င်း၏ ကိုယ်ပိုင်တန်ဖိုးများ ({n}) ကို ဖျက်မလား။ ပုံဆွဲမှုကိုယ်တိုင်ကို မပြောင်းလဲပါ။';
-$ec_lang['lpn_scenario_override']='ဤအခြေအနေတွင် ကိုယ်ပိုင်တန်ဖိုး';
+
+
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='ရွေးချယ်ထားလျှင် ဂဏန်းတူနေသော်လည်း ဤအခြေအနေက ဤတန်ဖိုးအတွက် ၎င်း၏ မိဘကို အစားထိုးသည်။ မိဘ၏တန်ဖိုးကို သုံးရန် ဘောက်စ်ကို ရှင်းလင်းပါ။';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3067,31 +3117,142 @@ $ec_lang['lpn_scenario_deactivated']='{id} ကို {scenario} တွင် က
 $ec_lang['lpn_scenario_delete_in_base']='ပုံဆွဲမှုမှ ဖယ်ရှားရန် {base} အခြေအနေတွင် ဖျက်ပါ။';
 $ec_lang['lpn_scenario_only_deleted']='{id} ကို ဖျက်ပြီးပါပြီ။ ၎င်းသည် {scenario} တွင်သာ ပါဝင်ခဲ့သည်။';
 $ec_lang['lpn_scenario_delete_blocked']='{id} ကို မဖျက်ခဲ့ပါ၊ အကြောင်းမှာ ပိုက်လိုင်း {link} သည် ၎င်းတွင် အဆုံးသတ်ပြီး ထိုပိုက်လိုင်းသည် {scenario} ပြင်ပတွင်လည်း ရှိသောကြောင့် ဖြစ်သည်။ နှစ်ခုစလုံးကို ဖျက်ရန် {base} အခြေအနေတွင် ဖျက်ပါ။';
-$ec_lang['lpn_scenario_push_btn']='အခြေခံ တန်ဖိုးများကို အခြေအနေအားလုံးအပေါ် အသုံးချရန်';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='ယခု ပြသနေသော ဂုဏ်သတ္တိများအတွက် အခြေအနေအားလုံးသည် အခြေခံ တန်ဖိုးသို့ ပြန်သွားမည်။ ထိုအခြေအနေများ တစ်ခုတည်း ပိုင်ဆိုင်သော တန်ဖိုးများကို ပယ်ချမည်။';
 $ec_lang['lpn_scenario_basic']='အခြေခံ မုဒ်';
 $ec_lang['lpn_scenario_basic_tip']='ရွေးချယ်ထားလျှင် - အခြေအနေတစ်ခုတွင် ၎င်းထဲတွင် သတ်မှတ်ထားသော တန်ဖိုးများသာ ပါသည်။ ဖယ်ထားလျှင် - ဤမီနူးတွင် တန်ဖိုးများကို အမျိုးအစားအလိုက် အုပ်စုဖွဲ့ပုံကို ပြသော အစားထိုးရွေးချယ်မှု ကြိုတင်ကြည့်ဇယားကိုလည်း ပေးပြီး အခြေအနေတစ်ခုတွင် သီးခြား စုစုပေါင်းလည်ပတ်ချိန်နှင့် ဟိုက်ဒရောလစ် အချိန်အဆင့် ထားခွင့်ပြုသည်။ ဤလုပ်ဆောင်ချက်အတွက် တုံ့ပြန်ချက်ကို ကြိုဆိုသည်။';
-$ec_lang['lpn_alt_title']='အခြားရွေးစရာများ ကြိုတင်ကြည့်ရှုမှု';
-$ec_lang['lpn_alt_calc_options']='တွက်ချက်မှု ရွေးစရာများ';
-$ec_lang['lpn_alt_note']='အခြေခံ (Base) သည် အမျိုးအစားတိုင်း၏ အခြေခံ အစားထိုးကို သုံးသည်။ အခြေအနေတစ်ခုစီတွင် ပြောင်းလဲထားသော အမျိုးအစားတိုင်းအတွက် အခြေခံ အစားထိုး၏ အခွဲဖြစ်သော သီးခြား အစားထိုးတစ်ခု ရှိသည်။ ဂဏန်းသည် ပြောင်းလဲထားသော တန်ဖိုးအရေအတွက် ဖြစ်သည်။ နောက်ဆုံးကော်လံသုံးခုသည် တွက်ချက်မှု ရွေးစရာများ ဖြစ်သည် - အခြေအနေအတွက် တန်ဖိုးတစ်ခု ထည့်သွင်းပါ၊ သို့မဟုတ် မိဘတန်ဖိုးကို သုံးရန် အလွတ်ထားပါ။ ပရောဂျက်တန်ဖိုးများသည် ဆက်တင်များ၊ တွက်ချက်မှု၊ အချိန် တွင် ရှိသည်။';
-$ec_lang['lpn_scenario_duration_tip']='မိဘထံမှ ဆက်ခံရန် အလွတ်ထားပါ။ စုစုပေါင်း လည်ပတ်ချိန် 0:00 သည် တည်ငြိမ်အခြေအနေ run ဖြစ်သည်။';
-$ec_lang['lpn_scenario_hyd_step_tip']='မိဘထံမှ ဆက်ခံရန် အလွတ်ထားပါ။';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_time_scn_overrides']='အခြေအနေ၏ ကိုယ်ပိုင်တန်ဖိုးများ -';
+
+
+
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+
+
+
+
+
+
+
+
+
+
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+
+
+
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_alt_cat_physical']='ရုပ်ပိုင်းဆိုင်ရာ';
 $ec_lang['lpn_alt_cat_demand']='လိုအပ်ချက်';
 $ec_lang['lpn_alt_cat_topology']='အစိတ်အပိုင်း ဖွင့်ပိတ်မှု';
+
 $ec_lang['lpn_alt_cat_initial']='စတင်ချိန် ဆက်တင်များ';
 $ec_lang['lpn_alt_cat_constituent']='ပါဝင်ပစ္စည်း';
 $ec_lang['lpn_alt_cat_fireflow']='မီးငြိမ်းသတ်ရေးစီးနှုန်း';
 $ec_lang['lpn_alt_cat_energy']='စွမ်းအင် ကုန်ကျစရိတ်';
 $ec_lang['lpn_alt_cat_userdata']='စိတ်ကြိုက် ဂုဏ်သတ္တိများ';
 $ec_lang['lpn_alt_cat_text']='စာသား';
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='ဤဂုဏ်သတ္တိများအတွက် အခြေအနေအားလုံးကို အခြေခံ တန်ဖိုးများ သုံးစေမလား။ ထိုအခြေအနေများ တစ်ခုတည်း ပိုင်ဆိုင်သော တန်ဖိုးများကို ပယ်ချမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဆွဲနိုင်ပါသည်။';
-$ec_lang['lpn_scenario_push_scenarios']='သက်ရောက်မည့် အခြေအနေများ -';
-$ec_lang['lpn_scenario_push_values']='ပယ်မည့် တန်ဖိုးများ -';
-$ec_lang['lpn_scenario_push_none']='ဤဂုဏ်သတ္တိများအတွက် မည်သည့်အခြေအနေမျှ Base ကို အစားမထိုးသဖြင့် မည်သည့်အရာမျှ မပြောင်းပါ။ မည်သည့်အရာမျှ မပယ်ပါ။';
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. ရေစီးနှုန်း စမ်းသပ်မှု - တည်ငြိမ်';
@@ -3231,6 +3392,8 @@ $ec_lang['lpn_time_run_fell_back']='မျက်နှာပြင်ပေါ�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='ဤထိန်းချုပ်မှုများသည် ဤပရောဂျက်ထဲတွင် မရှိတော့သော အစိတ်အပိုင်းတစ်ခု၏ အမည်ကို ဆောင်ထားသောကြောင့် ချန်ခဲ့သည် - {ids}';
 $ec_lang['lpn_control_unreadable_note']='ဤထိန်းချုပ်မှုများကို ဖတ်၍ မရသောကြောင့် ချန်ခဲ့သည် - {ids}';
+
+
 $ec_lang['lpn_rule_dangling_note']='ဤစည်းမျဉ်းများသည် ဤပရောဂျက်တွင် မရှိတော့သော အစိတ်အပိုင်းတစ်ခုကို ရည်ညွှန်းထားသောကြောင့်၊ ဤ run တွင် လျစ်လျူရှုခဲ့သည် - {ids}';
 $ec_lang['lpn_rule_unreadable_note']='ဤစည်းမျဉ်းများကို မဖတ်နိုင်ခဲ့သောကြောင့်၊ ဤ run တွင် လျစ်လျူရှုခဲ့သည် - {ids}';
 $ec_lang['lpn_settings_text_size']='စာသား အရွယ်အစား (ပစ်ဆယ်များ)';
@@ -3783,9 +3946,7 @@ $ec_lang['lpn_energy_curve_note']='ဤရေတင်စက်များသည
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='အဆင့်';
 $ec_lang['lpn_labels_col_drop']='ချန်ရန်';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -4010,6 +4171,8 @@ $ec_lang['lpn_library_pattern_default_mark']='(မူလ)';
 $ec_lang['lpn_library_pattern_default_tip']='မူလ လိုအင်ပုံစံ။ ဆက်တင်များ၊ မူလ လိုအင်ပုံစံ တွင် ပြောင်းပါ။';
 $ec_lang['lpn_library_pattern_default_deleted_to']='ပုံစံ {id} သည် မူလ လိုအင်ပုံစံ ဖြစ်ခဲ့သည်။ ပုံစံမရှိသော ဆက်စပ်နေရာများသည် ယခု ပုံစံ {now} ကို သုံးသည်။';
 $ec_lang['lpn_library_pattern_default_deleted_none']='ပုံစံ {id} သည် မူလ လိုအင်ပုံစံ ဖြစ်ခဲ့သည်။ ပုံစံမရှိသော ဆက်စပ်နေရာများသည် ယခု ကိန်းသေ လိုအင်ကို သုံးသည်။';
+
+
 $ec_lang['lpn_library_control_add']='ထိန်းချုပ်မှုတစ်ခု ထည့်ရန်';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -4572,4 +4735,4 @@ $ec_lang['lpn_snip_tip_eraser']='ခဲဖျက် - မျဉ်းတစ်�
 $ec_lang['lpn_snip_tip_undo']='ပြန်ဖျက်ရန် (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='ပြန်လုပ်ရန် (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='ကူးယူရန် (Ctrl+C)';
-$ec_lang['lpn_screenshot_scale_tip']='မျက်နှာပြင်ပေါ်ရှိ နယ်ပယ်၏ ဆအဖြစ် ပြသော ပုံအရွယ်။ ပိုကြီးလျှင် ပိုကြည်လင်ပြီး ဖိုင်ပိုကြီးသည်။';
+$ec_lang['lpn_screenshot_scale_tip']='မျက်နှာပြင်ပေါ်ရှိ နယ်ပယ်၏ ဆအဖြစ် ပြသော ပုံအရွယ်။ ပိုကြီးလျှင် ပိုကြည်လင်ပြီး ဖိုင်ပိုကြီးသည်။';$ec_lang['lpn_guide_text_alt_box']='အခြေအနေတစ်ခုစီအတွက် ရုပ်ပိုင်းဆိုင်ရာ၊ လိုအင်နှင့် အစိတ်အပိုင်း အသက်သွင်းခြင်းကဲ့သို့ အမျိုးအစားတစ်ခုစီတွင် မည်သည့် အခြားရွေးစရာကို သုံးသည်ကို ပြပြီး ၎င်း၏ တွက်ချက်မှု ရွေးစရာများဖြစ်သော လိုအင် မြှောက်ကိန်း၊ စုစုပေါင်း လည်ပတ်ချိန်နှင့် ဟိုက်ဒရောလစ် အချိန်အဆင့်ကို ပြသည်။ အခြားရွေးစရာများသည် ဖတ်ရန်သာ ဖြစ်သည်။ အခြေအနေတစ်ခု၏ တွက်ချက်မှု ရွေးစရာများကို ဤနေရာတွင် ရိုက်ထည့်နိုင်ပြီး ဗလာထားလျှင် ၎င်း၏ မိဘ၏ တန်ဖိုးကို သုံးသည်။ အခြေခံ မုဒ်ကို ရှင်းပြီးနောက် အခြေအနေများ မီနူးမှ ဖွင့်ပါ။';$ec_lang['lpn_guide_how_alt']='အခြေခံ မုဒ်ကို ပိတ်ထားသောအခါ အခြားရွေးစရာများ ကြိုတင်ကြည့်ရှုမှုကို ရေ၊ အခြေအနေများ အောက်တွင် စာရင်းပြသည်။';$ec_lang['lpn_alt_calc_options']='တွက်ချက်မှု ရွေးစရာများ';$ec_lang['lpn_scenario_duration_tip']='မိဘထံမှ ဆက်ခံရန် အလွတ်ထားပါ။ စုစုပေါင်း လည်ပတ်ချိန် 0:00 သည် တည်ငြိမ်အခြေအနေ run ဖြစ်သည်။';$ec_lang['lpn_scenario_hyd_step_tip']='မိဘထံမှ ဆက်ခံရန် အလွတ်ထားပါ။';

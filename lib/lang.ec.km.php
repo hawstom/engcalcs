@@ -708,6 +708,7 @@ $ec_lang['lpn_node_customers_tip']='បញ្ជីអតិថិជនដែ�
 $ec_lang['lpn_node_customers_sum']='{total} {unit} ពីអតិថិជន ({n})';
 $ec_lang['lpn_customer_detached']='⚠ អតិថិជននេះមិនបានភ្ជាប់ទៅបំពង់ណាមួយទេ ដូច្នេះតម្រូវការរបស់វាមិននៅក្នុងចម្លើយទេ។ លុបវាចោល ឬគូរបំពង់មួយ រួចផ្លាស់ទីអតិថិជនទៅលើវា។';
 $ec_lang['lpn_customer_fixed_head']='⚠ ចុងដែលនៅជិតនៃបំពង់នោះមានផ្ទៃទឹកថេរមួយ ដូច្នេះតម្រូវការនេះមិនប៉ះពាល់ដល់ការក្លែងធ្វើទេ។';
+
 $ec_lang['lpn_customer_detached_count']='អតិថិជនដែលមិនបានភ្ជាប់ទៅបំពង់ ({n})។ តម្រូវការរបស់ពួកគេមិនត្រូវបានរាប់បញ្ចូលទេ។';
 $ec_lang['lpn_meter_pick_pipe']='ឥឡូវជ្រើសរើសបំពង់ ឬថ្នាំងដែលបម្រើអតិថិជននេះ។ អតិថិជននៅកន្លែងដែលអ្នកបានដាក់វា។ ចុច Esc ដើម្បីបោះបង់។';
 $ec_lang['lpn_inp_export_flat_customers']='ឯកសារ EPANET គ្មានអតិថិជនទេ។ តម្រូវការរបស់អតិថិជនក្នុងគម្រោងនេះ ({n}) ត្រូវបានសរសេរជាជួរតម្រូវការលើថ្នាំងដែលអតិថិជននីមួយៗត្រូវបានកំណត់ ដោយដាក់ឈ្មោះតាមស្លាកសម្គាល់របស់អតិថិជន។ ឯកសារមិនកត់ត្រាអតិថិជនខ្លួនឯងទេ៖ ទីតាំងរបស់វា បំពង់ដែលបម្រើវា កន្លែងតាមបណ្ដោយបំពង់ដែលសេវាភ្ជាប់ ឬចំនួនសេវាដែលវាតំណាង។ ព័ត៌មានទាំងនោះនៅក្នុងគម្រោង។ សូមរក្សាទុកឯកសារគម្រោងដើម្បីរក្សាវា។';
@@ -992,7 +993,6 @@ $ec_lang['lpn_guide_text_contour_box']='គ្រប់គ្រងផែនក�
 $ec_lang['lpn_guide_text_scncmp_box']='ដោះស្រាយគ្រប់សេណារីយ៉ូពីច្បាប់ចម្លងនៃគំនូរ ហើយតារាងសម្រាប់ម្នាក់ៗ នូវចំនួនតម្លៃជំនួស សម្ពាធទាបបំផុត និងល្បឿនខ្ពស់បំផុត។ វាមិនផ្លាស់ប្ដូរគម្រោងទេ ហើយសេណារីយ៉ូដែលកំពុងបើកនៅដដែល។';
 $ec_lang['lpn_guide_text_rptbox']='បង្ហាញរបាយការណ៍អត្ថបទដែលសរសេរដោយម៉ាស៊ីន EPANET សម្រាប់ការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់ចុងក្រោយ រួមទាំងការព្រមាន និងសេចក្តីសង្ខេបបណ្ដាញ។ ការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់នីមួយៗជំនួសវា ការដោះស្រាយនៅពេលតែមួយមិនជំនួសទេ ហើយការកែសម្រួលទុករបាយការណ៍មុននៅនឹងកន្លែង។';
 $ec_lang['lpn_guide_text_status_box']='រាយតាមលំដាប់ពេលវេលា រាល់ការផ្លាស់ប្ដូរក្នុងការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់ចុងក្រោយ៖ ម៉ាស៊ីនបូម វ៉ាល់ ឬបំពង់បើក ឬបិទ ធុងទឹកចាប់ផ្ដើមបំពេញ ឬបន្ទោរបង់ ឬពេញ ឬទទេ និងជំហានពេលវេលាណាមួយដែលមិនបានប្រសព្វគ្នាពេញលេញ។ មានតែការផ្លាស់ប្ដូរប៉ុណ្ណោះដែលត្រូវបានរាយ មិនមែនគ្រប់ជំហានពេលវេលាទេ។';
-$ec_lang['lpn_guide_text_alt_box']='បង្ហាញសម្រាប់សេណារីយ៉ូនីមួយៗ ថាវាប្រើជម្រើសជំនួសអ្វីក្នុងប្រភេទនីមួយៗ ដូចជា រូបវន្ត តម្រូវការ និង ការធ្វើឲ្យធាតុសកម្ម និងជម្រើសគណនារបស់វា៖ កត្តាគុណតម្រូវការ រយៈពេលដំណើរការសរុប និងចន្លោះពេលធារាសាស្ត្រ។ ជម្រើសជំនួសអាចអានបានតែប៉ុណ្ណោះ។ ជម្រើសគណនារបស់សេណារីយ៉ូអាចវាយនៅទីនេះបាន ហើយប្រអប់ទទេប្រើតម្លៃរបស់សេណារីយ៉ូមេ។ បើកវាពីម៉ឺនុយ សេណារីយ៉ូ បន្ទាប់ពីសម្អាត របៀបមូលដ្ឋាន។';
 $ec_lang['lpn_guide_text_full_box']='រាយគ្រប់ថ្នាំង និងគ្រប់តំណនៅគ្រប់ជំហានពេលវេលារាយការណ៍ ក្នុងឯកតាដែលបង្ហាញលើផ្ទាំងតារាង។ បើគ្មានការក្លែងធ្វើរយៈពេលបន្តបន្ទាប់ វាបង្ហាញដំណោះស្រាយបច្ចុប្បន្ននៅពេលតែមួយ។ ទាញយក ឬបោះពុម្ពមានគ្រប់ជំហានពេលវេលា ហើយតារាងបង្ហាញម្ដងមួយ។';
 $ec_lang['lpn_guide_text_calib_box']='ប្រៀបធៀបឯកសារនៃការវាស់នៅវាល ជាមួយលទ្ធផលដែលបានគណនានៅទីតាំង និងពេលវេលាដូចគ្នា ឯកសារមួយសម្រាប់ប៉ារ៉ាម៉ែត្រនីមួយៗ។ ឯកសារត្រូវបានរក្សាទុកសម្រាប់សម័យបច្ចុប្បន្នតែប៉ុណ្ណោះ ហើយមិនត្រូវបានរក្សាទុកជាមួយគម្រោងទេ។';
 $ec_lang['lpn_guide_text_notes_popup']='រាយកំណត់ចំណាំអំពីរបៀបដែលទំព័រនេះដំណើរការ និងអ្វីដែលវាមិនធ្វើ ម្នាក់ៗជាពាក្យមួយតាមពីក្រោយដោយនិយមន័យរបស់វា។ វាមិនផ្លាស់ប្ដូរបណ្ដាញទេ។';
@@ -1020,7 +1020,6 @@ $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?<
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='ក៏នៅក្នុងម៉ឺនុយ {menu}';
 $ec_lang['lpn_guide_how_popup']='លក្ខណៈសម្បត្តិបើកពេលអ្នកជ្រើសរើសធាតុ ឬអត្ថបទ។';
-$ec_lang['lpn_guide_how_alt']='ការមើលជាមុនជម្រើសជំនួសត្រូវបានរាយក្រោម ទឹក សេណារីយ៉ូ ពេល របៀបមូលដ្ឋាន បិទ។';
 $ec_lang['lpn_guide_not_shown']='ការគ្រប់គ្រងនេះមិននៅលើអេក្រង់ឥឡូវនេះទេ។';
 // The box's two context headings. "Tables" holds the two table-help entries that used to sit only
 // in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
@@ -1475,8 +1474,20 @@ $ec_lang['lpn_pane_sel_only_none']='គ្មានធាតុណាមួយ�
 // Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
 // scenario, with a Scenario column after ID.
 $ec_lang['lpn_pane_scn_show']='បង្ហាញសេណារីយ៉ូ';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+
+
+
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+
+
+
+
 $ec_lang['lpn_pane_clear_override']='សម្អាតតម្លៃផ្ទាល់ខ្លួន';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -1532,20 +1543,29 @@ $ec_lang['lpn_menu_project']='ទឹក';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='អ្វីៗទាំងអស់ដែលជាក់លាក់ចំពោះការធ្វើគំរូបណ្ដាញទឹក (លើកលែងតែប៊ូតុងបញ្ជាចាក់ចលនា)';
 $ec_lang['lpn_tables_menu']='តារាង';
-// Water > Change type (Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// Water > Morph (Task 781; Tom, 2026-10-14: *"I like the term 'Morph' (Transform) for this feature"*;
+// first built as Change type, Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
 // to Change node type for any asset, where if it has information that can't be ported to the new
 // type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
 // asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
 // popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
 // dev/asset-type.md.
-$ec_lang['lpn_change_type_menu']='ប្ដូរប្រភេទ';
-$ec_lang['lpn_change_type_tip']='ប្ដូរថ្នាំងដែលបានជ្រើសរើសទៅជាថ្នាំង អាងស្តុក ឬធុងទឹក ឬប្ដូរតំណដែលបានជ្រើសរើសទៅជាបំពង់ ម៉ាស៊ីនបូម ឬវ៉ាល់។ ធាតុនីមួយៗរក្សាលេខសម្គាល់ ទីតាំង ការតភ្ជាប់ និងគ្រប់តម្លៃដែលប្រភេទថ្មីក៏មានដែរ។ ប្រសិនបើមានអ្វីនឹងបាត់បង់ អ្នកនឹងត្រូវបានសួរជាមុន។';
-$ec_lang['lpn_change_type_ok']='ប្ដូរ';
+$ec_lang['lpn_morph_menu']='ប្ដូរប្រភេទ';
+$ec_lang['lpn_morph_tip']='ប្ដូរថ្នាំងដែលបានជ្រើសរើសទៅជាថ្នាំង អាងស្តុក ឬធុងទឹក ឬប្ដូរតំណដែលបានជ្រើសរើសទៅជាបំពង់ ម៉ាស៊ីនបូម ឬវ៉ាល់។ ធាតុនីមួយៗរក្សាលេខសម្គាល់ ទីតាំង ការតភ្ជាប់ និងគ្រប់តម្លៃដែលប្រភេទថ្មីក៏មានដែរ។ ប្រសិនបើមានអ្វីនឹងបាត់បង់ អ្នកនឹងត្រូវបានសួរជាមុន។';
+$ec_lang['lpn_morph_ok']='ប្ដូរ';
+// {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
+// when a node type was chosen), separated by commas.
+
+// The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
+// scenario, beside the override marker.
+
+
 $ec_lang['lpn_change_type_lost']='តម្លៃទាំងនេះនឹងបាត់បង់៖';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
 $ec_lang['lpn_change_type_key']='មួយបន្ទាត់ៗ៖ លេខសម្គាល់៖ លក្ខណៈសម្បត្តិ និងតម្លៃដែលនឹងបាត់បង់';
 $ec_lang['lpn_change_type_line']='{id}៖ {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}៖ {property} {value} ក្នុងសេណារីយ៉ូ {scenario}';
+
 $ec_lang['lpn_change_type_more']='និងច្រើនទៀត {n}។';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.
@@ -1614,6 +1634,32 @@ $ec_lang['lpn_confirm_delete_network']='លុបថ្នាំង ខ្សែ
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='រក និងជំនួស';
+// Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
+// placement are never pasted.
+
+
+
+
+
+
+
+
+
+
+// The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
+// opens the in-place editor; Reset position sends a dragged label or an attached Text home.
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_find_title']='រក និងជំនួស';
 $ec_lang['lpn_find_scope']='អ្វីត្រូវរក';
 $ec_lang['lpn_find_scope_all']='ទាំងអស់';
@@ -2056,6 +2102,8 @@ $ec_lang['lpn_status_inp_exported_picture']='បាននាំចេញ {zip} �
 $ec_lang['lpn_status_inp_exported_no_picture']='បាននាំចេញ {file}។ មិនអាចរក្សាទុករូបភាពផ្ទៃខាងក្រោយបានទេ ដូច្នេះ .inp មិនដាក់ឈ្មោះរូបភាពណាមួយទេ។ ក្នុង EPANET សូមបន្ថែមវាដោយ View > Backdrop > Load។';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+
+
 $ec_lang['lpn_inp_export_differences']='{n} រឿងដែលទម្រង់ .inp មិនអាចផ្ទុកបាន។';
 $ec_lang['lpn_inp_export_difference_one']='រឿងមួយដែលទម្រង់ .inp មិនអាចផ្ទុកបាន។';
 $ec_lang['lpn_inp_export_refused']='គម្រោងនេះមិនអាចសរសេរជាឯកសារ EPANET បានទេ៖ {detail}';
@@ -3045,6 +3093,7 @@ $ec_lang['lpn_scenario_overrides']='ចំនួនតម្លៃផ្ទា�
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='រង្វង់ពណ៌លឿងទុំមានន័យថាធាតុនេះមានតម្លៃផ្ទាល់ខ្លួនក្នុងសេណារីយ៉ូ {name}។';
+
 $ec_lang['lpn_scenario_overrides_tip']='តម្លៃផ្ទាល់ខ្លួននីមួយៗត្រូវបានសម្គាល់លើផែនទីដោយរង្វង់ពណ៌លឿងទុំ។ ប្ដូរទៅ {base} ឬសេណារីយ៉ូមេផ្សេងទៀតដើម្បីមើលគំនូរដោយគ្មានពួកវា។';
 $ec_lang['lpn_scenario_menu']='សេណារីយ៉ូ';
 $ec_lang['lpn_scenario_tip']='សំណុំតម្លៃដែលគំនូរកំពុងបង្ហាញ និងទំព័រកំពុងដោះស្រាយឥឡូវនេះ។ ចុចដើម្បីប្ដូរសេណារីយ៉ូ ឬដើម្បីបន្ថែម ប្ដូរឈ្មោះ ឬលុបមួយ។';
@@ -3053,10 +3102,11 @@ $ec_lang['lpn_scenario_new_name']='សេណារីយ៉ូ {n}';
 $ec_lang['lpn_scenario_prompt_name']='ឈ្មោះសម្រាប់សេណារីយ៉ូនេះ';
 $ec_lang['lpn_scenario_rename']='ប្ដូរឈ្មោះសេណារីយ៉ូ…';
 $ec_lang['lpn_scenario_delete']='លុបសេណារីយ៉ូ';
-$ec_lang['lpn_scenario_delete_confirm']='លុបសេណារីយ៉ូ {name} និងតម្លៃផ្ទាល់ខ្លួនរបស់វា ({n}) មែនទេ? គំនូរខ្លួនវាមិនត្រូវបានផ្លាស់ប្ដូរទេ។';
-$ec_lang['lpn_scenario_override']='តម្លៃផ្ទាល់ខ្លួនក្នុងសេណារីយ៉ូនេះ';
+
+
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='ធីកមានន័យថាសេណារីយ៉ូនេះជំនួសតម្លៃរបស់មេសម្រាប់តម្លៃនេះ សូម្បីតែនៅពេលលេខដូចគ្នា។ ដោះធីកប្រអប់ដើម្បីប្រើតម្លៃរបស់មេ។';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3067,31 +3117,142 @@ $ec_lang['lpn_scenario_deactivated']='{id} ត្រូវបានដកចេ�
 $ec_lang['lpn_scenario_delete_in_base']='ដើម្បីដកវាចេញពីគំនូរ សូមលុបវាក្នុងសេណារីយ៉ូ {base}។';
 $ec_lang['lpn_scenario_only_deleted']='{id} ត្រូវបានលុប។ វាជាផ្នែកនៃ {scenario} តែប៉ុណ្ណោះ។';
 $ec_lang['lpn_scenario_delete_blocked']='{id} មិនត្រូវបានលុបទេ ព្រោះតំណ {link} បញ្ចប់នៅលើវា ហើយតំណនោះក៏មានក្រៅ {scenario} ដែរ។ ដើម្បីលុបទាំងពីរ សូមលុបពួកវាក្នុងសេណារីយ៉ូ {base}។';
-$ec_lang['lpn_scenario_push_btn']='អនុវត្តតម្លៃមូលដ្ឋានទៅគ្រប់សេណារីយ៉ូ';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='សេណារីយ៉ូគ្រប់មួយត្រឡប់ទៅតម្លៃមូលដ្ឋានវិញ សម្រាប់លក្ខណៈសម្បត្តិដែលស្លាករបស់វាកំពុងបង្ហាញឥឡូវនេះ។ តម្លៃដែលបានបញ្ចូលសម្រាប់ពួកវានៅក្នុងសេណារីយ៉ូណាមួយ ត្រូវបានបោះបង់ចោល។';
 $ec_lang['lpn_scenario_basic']='របៀបមូលដ្ឋាន';
 $ec_lang['lpn_scenario_basic_tip']='ធីក៖ សេណារីយ៉ូមានតែតម្លៃដែលបានកំណត់ក្នុងវាប៉ុណ្ណោះ។ ដោះធីក៖ ម៉ឺនុយនេះក៏ផ្ដល់តារាងមើលជាមុនជម្រើសជំនួស ដែលបង្ហាញពីរបៀបដែលតម្លៃទាំងនោះត្រូវបានដាក់ជាក្រុមតាមប្រភេទ ហើយអនុញ្ញាតឲ្យសេណារីយ៉ូមានរយៈពេលដំណើរការសរុប និងជំហានពេលវេលាធារាសាស្ត្រដាច់ដោយឡែក។ ស្វាគមន៍មតិកែលម្អអំពីលក្ខណៈពិសេសនេះ។';
-$ec_lang['lpn_alt_title']='ការមើលជាមុនជម្រើសជំនួស';
-$ec_lang['lpn_alt_calc_options']='ជម្រើសនៃការគណនា';
-$ec_lang['lpn_alt_note']='មូលដ្ឋានប្រើជម្រើសជំនួសមូលដ្ឋាននៃគ្រប់ប្រភេទ។ សេណារីយ៉ូនីមួយៗមានជម្រើសជំនួសដាច់ដោយឡែក ជាកូនរបស់ជម្រើសជំនួសមូលដ្ឋាន សម្រាប់ប្រភេទណាដែលត្រូវបានផ្លាស់ប្ដូរ។ លេខគឺជាចំនួនតម្លៃដែលបានផ្លាស់ប្ដូរ។ ជួរឈរបីចុងក្រោយគឺជាជម្រើសនៃការគណនា៖ បញ្ចូលតម្លៃសម្រាប់សេណារីយ៉ូ ឬទុកឲ្យទទេដើម្បីប្រើតម្លៃរបស់មេ។ តម្លៃរបស់គម្រោងស្ថិតនៅក្នុង ការកំណត់, ការគណនា, ពេលវេលា។';
-$ec_lang['lpn_scenario_duration_tip']='ទុកឲ្យទទេដើម្បីទទួលតម្លៃពីមេ។ រយៈពេលដំណើរការសរុប 0:00 គឺជាការដំណើរការស្ថានភាពថេរ។';
-$ec_lang['lpn_scenario_hyd_step_tip']='ទុកឲ្យទទេដើម្បីទទួលតម្លៃពីមេ។';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_time_scn_overrides']='តម្លៃផ្ទាល់ខ្លួនរបស់សេណារីយ៉ូ៖';
+
+
+
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+
+
+
+
+
+
+
+
+
+
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+
+
+
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_alt_cat_physical']='រូបវន្ត';
 $ec_lang['lpn_alt_cat_demand']='តម្រូវការ';
 $ec_lang['lpn_alt_cat_topology']='ការធ្វើឲ្យធាតុសកម្ម';
+
 $ec_lang['lpn_alt_cat_initial']='ការកំណត់ដំបូង';
 $ec_lang['lpn_alt_cat_constituent']='សមាសធាតុ';
 $ec_lang['lpn_alt_cat_fireflow']='លំហូរពន្លត់អគ្គីភ័យ';
 $ec_lang['lpn_alt_cat_energy']='ថ្លៃថាមពល';
 $ec_lang['lpn_alt_cat_userdata']='លក្ខណៈសម្បត្តិផ្ទាល់ខ្លួន';
 $ec_lang['lpn_alt_cat_text']='អត្ថបទ';
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='ធ្វើឲ្យសេណារីយ៉ូគ្រប់មួយប្រើតម្លៃមូលដ្ឋានសម្រាប់លក្ខណៈសម្បត្តិទាំងនេះ? តម្លៃដែលបានបញ្ចូលសម្រាប់ពួកវានៅក្នុងសេណារីយ៉ូណាមួយ ត្រូវបានបោះបង់ចោល។ អ្នកអាចមិនធ្វើវិញនូវសកម្មភាពនេះបាន។';
-$ec_lang['lpn_scenario_push_scenarios']='សេណារីយ៉ូដែលរងផលប៉ះពាល់៖';
-$ec_lang['lpn_scenario_push_values']='តម្លៃដែលនឹងត្រូវបោះបង់ចោល៖';
-$ec_lang['lpn_scenario_push_none']='គ្មានសេណារីយ៉ូណាជំនួសមូលដ្ឋានសម្រាប់លក្ខណៈសម្បត្តិទាំងនេះទេ ដូច្នេះគ្មានអ្វីនឹងផ្លាស់ប្ដូរទេ។ គ្មានអ្វីត្រូវបានបោះបង់ទេ។';
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. តេស្តលំហូរ៖ ឋិតិ';
@@ -3231,6 +3392,8 @@ $ec_lang['lpn_time_run_fell_back']='លេខនៅលើអេក្រង់�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='ច្បាប់ត្រួតពិនិត្យទាំងនេះនិយាយពីធាតុមួយដែលលែងមាននៅក្នុងគម្រោងនេះទៀតហើយ ដូច្នេះពួកវាត្រូវបានលុបចេញ៖ {ids}';
 $ec_lang['lpn_control_unreadable_note']='ច្បាប់ត្រួតពិនិត្យទាំងនេះមិនអាចអានបានទេ ដូច្នេះពួកវាត្រូវបានលុបចេញ៖ {ids}';
+
+
 $ec_lang['lpn_rule_dangling_note']='ក្បួនទាំងនេះសំដៅលើធាតុមួយដែលលែងមាននៅក្នុងគម្រោងនេះទៀតហើយ ដូច្នេះពួកវាត្រូវបានមិនអើពើក្នុងការដំណើរការនេះ៖ {ids}';
 $ec_lang['lpn_rule_unreadable_note']='ក្បួនទាំងនេះមិនអាចអានបានទេ ដូច្នេះពួកវាត្រូវបានមិនអើពើក្នុងការដំណើរការនេះ៖ {ids}';
 $ec_lang['lpn_settings_text_size']='ទំហំអក្សរ (ភិចសែល)';
@@ -3783,9 +3946,7 @@ $ec_lang['lpn_energy_curve_note']='ម៉ាស៊ីនបូមទាំងន
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='លំដាប់';
 $ec_lang['lpn_labels_col_drop']='ដក';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -4010,6 +4171,8 @@ $ec_lang['lpn_library_pattern_default_mark']='(លំនាំដើម)';
 $ec_lang['lpn_library_pattern_default_tip']='លំនាំតម្រូវការលំនាំដើម។ ប្ដូរវាក្នុង ការកំណត់ លំនាំតម្រូវការលំនាំដើម។';
 $ec_lang['lpn_library_pattern_default_deleted_to']='លំនាំ {id} គឺជាលំនាំតម្រូវការលំនាំដើម។ ថ្នាំងដែលគ្មានលំនាំឥឡូវនេះប្រើលំនាំ {now}។';
 $ec_lang['lpn_library_pattern_default_deleted_none']='លំនាំ {id} គឺជាលំនាំតម្រូវការលំនាំដើម។ ថ្នាំងដែលគ្មានលំនាំឥឡូវនេះប្រើតម្រូវការថេរ។';
+
+
 $ec_lang['lpn_library_control_add']='បន្ថែមច្បាប់ត្រួតពិនិត្យមួយ';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -4572,4 +4735,4 @@ $ec_lang['lpn_snip_tip_eraser']='ជ័រលុប៖ ចុចលើខ្ស�
 $ec_lang['lpn_snip_tip_undo']='ត្រឡប់ក្រោយ (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='ធ្វើឡើងវិញ (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='ចម្លង (Ctrl+C)';
-$ec_lang['lpn_screenshot_scale_tip']='ទំហំរូបភាពជាច្រើនដងនៃតំបន់នៅលើអេក្រង់។ ធំជាងច្បាស់ជាង ហើយធ្វើឲ្យឯកសារធំជាង។';
+$ec_lang['lpn_screenshot_scale_tip']='ទំហំរូបភាពជាច្រើនដងនៃតំបន់នៅលើអេក្រង់។ ធំជាងច្បាស់ជាង ហើយធ្វើឲ្យឯកសារធំជាង។';$ec_lang['lpn_guide_text_alt_box']='បង្ហាញសម្រាប់សេណារីយ៉ូនីមួយៗ ថាវាប្រើជម្រើសជំនួសអ្វីក្នុងប្រភេទនីមួយៗ ដូចជា រូបវន្ត តម្រូវការ និង ការធ្វើឲ្យធាតុសកម្ម និងជម្រើសគណនារបស់វា៖ កត្តាគុណតម្រូវការ រយៈពេលដំណើរការសរុប និងចន្លោះពេលធារាសាស្ត្រ។ ជម្រើសជំនួសអាចអានបានតែប៉ុណ្ណោះ។ ជម្រើសគណនារបស់សេណារីយ៉ូអាចវាយនៅទីនេះបាន ហើយប្រអប់ទទេប្រើតម្លៃរបស់សេណារីយ៉ូមេ។ បើកវាពីម៉ឺនុយ សេណារីយ៉ូ បន្ទាប់ពីសម្អាត របៀបមូលដ្ឋាន។';$ec_lang['lpn_guide_how_alt']='ការមើលជាមុនជម្រើសជំនួសត្រូវបានរាយក្រោម ទឹក សេណារីយ៉ូ ពេល របៀបមូលដ្ឋាន បិទ។';$ec_lang['lpn_alt_calc_options']='ជម្រើសនៃការគណនា';$ec_lang['lpn_scenario_duration_tip']='ទុកឲ្យទទេដើម្បីទទួលតម្លៃពីមេ។ រយៈពេលដំណើរការសរុប 0:00 គឺជាការដំណើរការស្ថានភាពថេរ។';$ec_lang['lpn_scenario_hyd_step_tip']='ទុកឲ្យទទេដើម្បីទទួលតម្លៃពីមេ។';

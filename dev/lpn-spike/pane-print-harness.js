@@ -177,8 +177,9 @@ console.log('\n--- one printer, seven tables ---');
 {
 	// Eight since 2026-09-15: Customers (Task 247), which prints through the one printer exactly
 	// as the seven before it do, and is the assertion that says so.
-	// Nine since 2026-10-11: Shapes (Task 779).
-	report(TABLES.length === 9, 'there are nine tables to print', TABLES.join(','));
+	// Nine since 2026-10-06: the Settings table prints through the same printer.
+	// Ten since 2026-10-09: the Scenarios table prints through it too. Eleven with Shapes (Task 779).
+	report(TABLES.length === 11, 'there are eleven tables to print', TABLES.join(','));
 	// No per-type print code. The cheap guard is that the per-type names never appear -- the same
 	// guard pane-harness.js keeps over the renderer, for the same reason.
 	report(!/function print(Junctions|Reservoirs|Tanks|Pipes|Pumps|Valves)\b/.test(src),
@@ -255,7 +256,9 @@ console.log('\n--- nothing on the sheet is a control ---');
 	const head = s.headings.map((h) => h.replace(SHY_RE, '')), order = L.tableOrder('junctions');
 	const rowFor = (id) => s.rows[order.indexOf(id)];
 	const at = (id, h) => rowFor(id)[head.findIndex((x) => x.indexOf(h) === 0)].text;
-	report(at(j2.id, 'Demand (') === '50', 'a typed demand prints as its number', at(j2.id, 'Demand ('));
+	// 'Demand (' finds the RESULT column, which prints the Junction labels decimals (gpm: 1 place,
+	// Tom 2026-10-16: a result keeps its trailing zeros).
+	report(at(j2.id, 'Demand (') === '50.0', 'a demand prints as its number, at its label decimals', at(j2.id, 'Demand ('));
 	report(at(j2.id, 'Elevation') === '10', '...and a typed elevation as its number', at(j2.id, 'Elevation'));
 	report(rowFor(j2.id)[0].text === j2.id, '...and the ID prints as the ID, not as a link',
 		rowFor(j2.id)[0].text);
@@ -265,9 +268,10 @@ console.log('\n--- nothing on the sheet is a control ---');
 	const ps = sheetOf('pipes'), pHead = ps.headings.map((h) => h.replace(SHY_RE, ''));
 	const pRow = ps.rows[L.tableOrder('pipes').indexOf(p1.id)];
 	const vAt = pHead.findIndex((x) => x.indexOf('Velocity') === 0);
-	// 1 m/s solved is 3.28084 ft/s displayed, and 3.28 printed. Stated as a number rather than as
+	// 1 m/s solved is 3.28084 ft/s displayed, and 3.3 printed. Stated as a number rather than as
 	// "whatever the cell says": the conversion and the rounding are both on trial here.
-	report(pRow[vAt].text === '3.28', 'a result prints converted and rounded as the screen has it',
+	// ft/s prints at the Pipe labels velocity decimals, 1 place (Tom, 2026-10-16).
+	report(pRow[vAt].text === '3.3', 'a result prints converted and rounded as the screen has it',
 		pRow[vAt].text);
 	report(L.tableCells('pipes')[p1.id].velocity.textContent === pRow[vAt].text,
 		'...which is the same string the live cell holds');

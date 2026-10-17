@@ -2737,6 +2737,9 @@
 	 *   doc   the saved document shape (docFromInp / serializeProject)
 	 *   opts  .effective(el, prop)  scenario resolver; default is Base (`el['_' + prop]`)
 	 *         .coordOverride(id)    {x, y} the ACTIVE SCENARIO moved this node to, or null
+	 *         .textOverride(id)     the ACTIVE SCENARIO's own {x?, y?, align?, valign?} for a Text,
+	 *                               or null: x/y an absolute outward point for a free Text, an
+	 *                               offset in this document's frame for an attached one
 	 *         .demandRows(node)     the ACTIVE SCENARIO's own demand list for this junction
 	 *                               ([{base, pattern, category, tok?}]), or null for the document's
 	 *         .demandMultiplier      the active scenario's own, if it has one; the document's otherwise
@@ -2752,9 +2755,14 @@
 	 */
 	EngCalcs.lpnExportInp = function (doc, opts) {
 		opts = opts || {};
-		var eff = typeof opts.effective === 'function'
-			? opts.effective
-			: function (el, prop) { return el['_' + prop]; };
+		// The properties a document stores under their own name rather than an underscore, which
+		// every one became overridable as (Tom, 2026-10-12; LPN_BARE_PROP in js/looped-network.js).
+		var BARE = { elev: 1, bottomElev: 1, minLevel: 1, maxLevel: 1, tankDiameter: 1, volCurve: 1, mixingModel: 1, mixingFraction: 1,
+			headPattern: 1, speed: 1, speedPattern: 1 };
+		// A caller's resolver written before then reads `_prop` only; a bare one it cannot find is
+		// read off the element, which is what Base holds.
+		var effIn = typeof opts.effective === 'function' ? opts.effective : function (el, prop) { return el['_' + prop]; },
+			eff = function (el, prop) { var v = effIn(el, prop); return (v === undefined && BARE[prop]) ? el[prop] : v; };
 		/**
 		 * **A NODE THE ACTIVE SCENARIO HAS MOVED** (ROADMAP Task 674). Deliberately NOT through
 		 * `eff()`, and the reason is the frame: this writer is handed the SERIALIZED document, whose
@@ -2766,6 +2774,8 @@
 		 * in, so it goes straight into the row.
 		 */
 		var covOf = typeof opts.coordOverride === 'function' ? opts.coordOverride : function () { return null; };
+		// A Text the active scenario moved or reshaped (Tom, 2026-10-12), on the node's rule above.
+		var txOf = typeof opts.textOverride === 'function' ? opts.textOverride : function () { return null; };
 		// A scenario that owns a junction's whole demand list (R-369) hands it over here; null is
 		// the document's own rows, read by EngCalcs.lpnDemandRows() exactly as before.
 		var ovRowsOf = typeof opts.demandRows === 'function' ? opts.demandRows : function () { return null; };
@@ -2870,7 +2880,7 @@
 		var junctions = [], reservoirs = [], tanks = [], pipes = [], pumps = [], valves = [],
 			curves = [], emitters = [], statuses = [], coords = [], verts = [], labelRows = [],
 			demandRows = [],
-			nodeById = {}, linkById = {}, omitted = {}, i, j, nd, lk, lb;
+			nodeById = {}, linkById = {}, omitted = {}, offLink = {}, i, j, nd, lk, lb;
 		// **THE CURVE LIBRARY** (Task 586), indexed by name so a reference resolves in one step.
 		// **EVERY CURVE IS WRITTEN, REFERENCED OR NOT**, which is why there is no "used" set here to
 		// filter by: a curve nothing points at is a legitimate document object now (the Library makes
@@ -2934,9 +2944,9 @@
 				// (Task 248.02) -- the same rule the junction's pattern column follows below. There
 				// is no document-wide default for a head pattern in EPANET, so a blank column here
 				// really does mean "no pattern" and writing one would state what the user never did.
-				var rpat = nd.headPattern ? [String(nd.headPattern)] : [];
+				var rpat = eff(nd, 'headPattern') ? [String(eff(nd, 'headPattern'))] : [];
 				if (rh === undefined || rh === null || rh === '') {
-					reservoirs.push(row([nd.id, n(cHead, nd, 'elev', nd.elev || 0)].concat(rpat)) + descOf(nd));
+					reservoirs.push(row([nd.id, n(cHead, nd, 'elev', eff(nd, 'elev') || 0)].concat(rpat)) + descOf(nd));
 				} else {
 					reservoirs.push(row([nd.id, n(cHead, nd, '_head', rh)].concat(rpat)) + descOf(nd));
 				}
@@ -2954,17 +2964,19 @@
 				// Elevation is the vessel floor. The ground is this page's pressure datum and has no
 				// column in [TANKS], so it is not written; a blank base is at the ground, and is
 				// written as that number in the ground's own characters.
-				var tankBaseKey = (typeof nd.bottomElev === 'number' && isFinite(nd.bottomElev)) ? 'bottomElev' : 'elev',
-					tankBase = nd[tankBaseKey] || 0;   // EngCalcs.lpnTankBottom's rule, spelled here so this module stands alone
+				// Both through eff(): a scenario may hold its own base or ground (2026-10-12).
+				var tankBottom = eff(nd, 'bottomElev'),
+					tankBaseKey = (typeof tankBottom === 'number' && isFinite(tankBottom)) ? 'bottomElev' : 'elev',
+					tankBase = eff(nd, tankBaseKey) || 0;   // EngCalcs.lpnTankBottom's rule, spelled here so this module stands alone
 				var tankRow = [nd.id,
 					n(cHead, nd, tankBaseKey, tankBase),
 					n(cHead, nd, '_level', eff(nd, 'level') || 0),
-					n(cHead, nd, 'minLevel', nd.minLevel || 0),
-					n(cHead, nd, 'maxLevel', nd.maxLevel || 0),
-					n(cLen, nd, 'tankDiameter', nd.tankDiameter || 0),
+					n(cHead, nd, 'minLevel', eff(nd, 'minLevel') || 0),
+					n(cHead, nd, 'maxLevel', eff(nd, 'maxLevel') || 0),
+					n(cLen, nd, 'tankDiameter', eff(nd, 'tankDiameter') || 0),
 					'0'];
-				if (nd.volCurve) {
-					tankRow.push(String(nd.volCurve));
+				if (eff(nd, 'volCurve')) {
+					tankRow.push(String(eff(nd, 'volCurve')));
 				}
 				tanks.push(row(tankRow) + descOf(nd));
 			} else {
@@ -2997,7 +3009,7 @@
 				// keeps every Net1/2/3 token identical (dev/lpn-spike/inp-export-harness.js).
 				if (EngCalcs.lpnDemandItemized(nd) || crows.length ||
 						(ovRows && (ovRows.length > 1 || ovRows[0].category))) {
-					junctions.push(row([nd.id, n(cHead, nd, 'elev', nd.elev || 0)]) + descOf(nd));
+					junctions.push(row([nd.id, n(cHead, nd, 'elev', eff(nd, 'elev') || 0)]) + descOf(nd));
 					for (j = 0; j < drows.length; j++) {
 						// The CATEGORY is a trailing comment, not a column -- see the reader's note
 						// at [DEMANDS]. Written verbatim, with anything that would start a second
@@ -3011,7 +3023,7 @@
 					}
 				} else {
 					junctions.push(row([nd.id,
-						n(cHead, nd, 'elev', nd.elev || 0),
+						n(cHead, nd, 'elev', eff(nd, 'elev') || 0),
 						n(cFlow, drows[0].rec, drows[0].key, drows[0].base || 0)].concat(
 						drows[0].pattern ? [String(drows[0].pattern)] : [])) + descOf(nd));
 				}
@@ -3050,11 +3062,12 @@
 		for (i = 0; i < (doc.links || []).length; i++) {
 			lk = doc.links[i];
 			linkById[lk.id] = lk;
-			if (!isActive(lk)) { continue; }
+			if (!isActive(lk)) { offLink[lk.id] = 1; continue; }
 			if (omitted[lk.from] || omitted[lk.to]) {
 				// A link to a node this scenario switched off has nowhere to land, and EPANET rejects
 				// a file naming a node it does not contain.
 				diff('inactive-node-link', [lk.id]);
+				offLink[lk.id] = 1;
 				continue;
 			}
 			var status = eff(lk, 'status') === 'closed' ? 'Closed' : 'Open',
@@ -3107,11 +3120,11 @@
 					// column in the file that the file it came from did not have. The SPEED token is
 					// kept like every other number's, so `1.20` returns as `1.20`.
 					var pumpRow = [lk.id, lk.from, lk.to, 'HEAD ' + cname],
-						psp = lk.speed;
+						psp = eff(lk, 'speed');
 					if (typeof psp === 'number' && isFinite(psp) && psp !== 1) {
 						pumpRow.push('SPEED ' + n(PLAIN, lk, 'speed', psp));
 					}
-					if (lk.speedPattern) { pumpRow.push('PATTERN ' + String(lk.speedPattern)); }
+					if (eff(lk, 'speedPattern')) { pumpRow.push('PATTERN ' + String(eff(lk, 'speedPattern'))); }
 					pumps.push(row(pumpRow) + descOf(lk));
 					if (status === 'Closed') { statuses.push(row([lk.id, 'Closed'])); }
 				} else {
@@ -3181,14 +3194,17 @@
 				anchor = linkAnchorPoint(lb);
 				linkAnchored.push(lb.id);
 			}
-			var px = (lb.x || 0) + (anchor ? (anchor.x || 0) : 0) + origin.x,
-				py = (lb.y || 0) + (anchor ? (anchor.y || 0) : 0) + origin.y,
+			var tov = txOf(lb.id) || {}, ox = typeof tov.x === 'number' ? tov.x : lb.x, oy = typeof tov.y === 'number' ? tov.y : lb.y,
+				px = (ox || 0) + (anchor ? (anchor.x || 0) : 0) + origin.x,
+				py = (oy || 0) + (anchor ? (anchor.y || 0) : 0) + origin.y,
 				// An anchored label is rendered from the side its offset points to and is vertically
 				// centred (labelHAlign/labelVAlign); a free one uses its own align/valign, which
 				// default to centre and middle.
-				hal = anchor ? (lb.x >= 0 ? 'left' : 'right') : (lb.align || 'center'),
-				val = anchor ? 'middle' : (lb.valign || 'middle'),
+				hal = anchor ? (ox >= 0 ? 'left' : 'right') : ((tov.align !== undefined && tov.align !== null ? tov.align : lb.align) || 'center'),
+				val = anchor ? 'middle' : ((tov.valign !== undefined && tov.valign !== null ? tov.valign : lb.valign) || 'middle'),
 				size = (typeof opts.labelSize === 'function') ? opts.labelSize(lb) : null;
+			if (!anchor && typeof tov.x === 'number') { px = tov.x; }
+			if (!anchor && typeof tov.y === 'number') { py = tov.y; }
 			if (hal !== 'left' || val !== 'top') {
 				if (size && isFinite(size.w) && isFinite(size.h)) {
 					if (hal === 'center') { px -= size.w / 2; } else if (hal === 'right') { px -= size.w; }
@@ -3313,12 +3329,21 @@
 		// its own text is exactly right and composing a sentence from the record could only differ
 		// from it. THE DAY A CONTROL EDITOR EXISTS this must compose from the record instead, and
 		// `raw` becomes a fallback -- an edited control would otherwise be written back unedited.
+		// **EXCEPT ONE NAMING AN ASSET THIS SCENARIO LEAVES OUT** (Task 781): EPANET rejects a file
+		// whose control names a link or node it does not contain, so the line is not written and the
+		// difference says which.
 		// **ITS DESCRIPTION GOES BACK WHERE IT CAME FROM**: the comment lines above it, verbatim
 		// while they still say the description (`noteSrc`), else one `;` line; or on the control's
 		// own line when it was a trailing comment there. See readControlNote() in the reader.
+		var offControls = [];
 		(doc.controls || []).forEach(function (ctl) {
-			var note, src, line;
+			var note, src, line, cn;
 			if (!ctl || !ctl.raw) { return; }
+			cn = ctl.condition && ctl.condition.kind === 'node' ? ctl.condition.node : null;
+			if ((ctl.link !== undefined && ctl.link !== null && offLink[ctl.link]) || (cn !== null && omitted[cn])) {
+				offControls.push(String(ctl.raw).trim());
+				return;
+			}
 			note = EngCalcs.lpnDescText(ctl.note);
 			line = ctl.raw;
 			// A heading the file stated above it, blank line and all (readControlNote()).
@@ -3337,6 +3362,19 @@
 			controlRows.push(line);
 			if (Array.isArray(ctl.foot)) { ctl.foot.forEach(function (l) { controlRows.push(String(l)); }); }
 		});
+		if (offControls.length) { diff('inactive-control', offControls); }
+		// The same for a [RULES] block (EngCalcs.lpnRuleBlocks() reads the ids it names). Only when a
+		// block is left out is the section rebuilt from the kept blocks' lines; otherwise it goes out
+		// as the text it came in as.
+		var ruleLines = doc.rules || [], offRules = [];
+		if (ruleLines.length && (Object.keys(offLink).length || Object.keys(omitted).length)) {
+			var keptRules = [];
+			EngCalcs.lpnRuleBlocks(ruleLines).forEach(function (b) {
+				var off = b.nodes.some(function (id) { return omitted[id]; }) || b.links.some(function (id) { return offLink[id]; });
+				if (off) { offRules.push(b.name || '?'); } else { keptRules = keptRules.concat(b.lines); }
+			});
+			if (offRules.length) { diff('inactive-rule', offRules); ruleLines = keptRules; }
+		}
 		// **THE OPEN SCENARIO'S OWN RUN TIME AND TIME STEP** (Task 755), when it states them, on the
 		// rule the demand multiplier follows: the export writes the scenario the user is looking at.
 		// Laid over the document's block on a COPY, so the document is not written; and where the
@@ -3346,7 +3384,10 @@
 		if (opts.times) {
 			expTimes = Object.assign({}, doc.times || {});
 			expTimes.text = Object.assign({}, (doc.times && doc.times.text) || {});
-			['duration', 'hydraulicStep'].forEach(function (k) {
+			// The run time and time step first (Task 755); any other [TIMES] value the scenario
+			// holds in its settings block rides the same way (dev/scenario-alternatives.md).
+			['duration', 'hydraulicStep', 'patternStep', 'patternStart', 'reportStep', 'reportStart',
+				'startClock'].forEach(function (k) {
 				if (typeof opts.times[k] !== 'number') { return; }
 				expTimes[k] = opts.times[k];
 				if (opts.times.text && typeof opts.times.text[k] === 'string') { expTimes.text[k] = opts.times.text[k]; }
@@ -3560,9 +3601,9 @@
 			for (i = 0; i < (doc.nodes || []).length; i++) {
 				nd5 = doc.nodes[i];
 				if (nd5.type !== 'tank' || omitted[nd5.id]) { continue; }
-				mo = nd5.mixingModel;
+				mo = eff(nd5, 'mixingModel');
 				if (!mo) { continue; }
-				fr = nd5.mixingFraction;
+				fr = eff(nd5, 'mixingFraction');
 				out[nd5.id] = (typeof fr === 'number' && isFinite(fr))
 					? { model: mo, fraction: fr } : { model: mo };
 			}
@@ -3639,7 +3680,7 @@
 			// the file's own characters are the only honest form. The section is omitted entirely
 			// when the document holds none -- an empty `[RULES]` is a statement the source never
 			// made, the same rule `[OPTIONS] Pattern` follows.
-			((doc.rules && doc.rules.length) ? '[RULES]\n' + doc.rules.join('\n') + '\n\n' : '') +
+			(ruleLines.length ? '[RULES]\n' + ruleLines.join('\n') + '\n\n' : '') +
 			// **THE ENERGY AND WATER-QUALITY SECTIONS**, in EPANET's own writer order. What is left
 			// carried here this page really does not work out, and that is exactly why those have
 			// to be written back untouched: a value we cannot use is still the user's.
@@ -3717,6 +3758,13 @@
 		if ((doc.customers || []).length) {
 			diff('customer-geometry', (doc.customers || []).map(function (c) { return c.id; }),
 				String((doc.customers || []).length));
+			// A customer whose demand lands on a junction this scenario leaves out has no row in the
+			// file (Task 781), so the export alert must not say every customer's demand is written.
+			var offCust = [];
+			Object.keys(custByNode).forEach(function (nid) {
+				if (omitted[nid]) { custByNode[nid].forEach(function (r) { offCust.push(r.customer.id); }); }
+			});
+			if (offCust.length) { diff('customer-inactive-node', offCust, String(offCust.length)); }
 		}
 		return { ok: true, inp: inp, differences: differences };
 	};

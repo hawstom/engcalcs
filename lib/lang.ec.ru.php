@@ -708,6 +708,7 @@ $ec_lang['lpn_node_customers_tip']='Список абонентов, добав�
 $ec_lang['lpn_node_customers_sum']='{total} {unit} от абонентов ({n})';
 $ec_lang['lpn_customer_detached']='⚠ Этот абонент не подключён к трубе, поэтому его расход отбора не учтён в ответах. Удалите его либо начертите трубу и переместите абонента на неё.';
 $ec_lang['lpn_customer_fixed_head']='⚠ Ближний конец этой трубы имеет фиксированный уровень воды, поэтому этот расход отбора не влияет на расчёт.';
+
 $ec_lang['lpn_customer_detached_count']='Абоненты, не подключённые к трубе ({n}). Их расход отбора не учтён.';
 $ec_lang['lpn_meter_pick_pipe']='Теперь выберите трубу или узел, который обслуживает этого абонента. Абонент остаётся там, где вы его разместили. Нажмите Escape, чтобы отменить.';
 $ec_lang['lpn_inp_export_flat_customers']='В файле EPANET нет абонентов. Расход отбора абонентов в этом проекте ({n}) записывается строкой расхода отбора на узле, к которому отнесён каждый абонент, с именем по тегу абонента. Файл не фиксирует самого абонента: его положение, обслуживающую его трубу, место присоединения вдоль этой трубы и число присоединений, которое он представляет. Эти сведения остаются в проекте; сохраните файл проекта, чтобы их не потерять.';
@@ -992,7 +993,6 @@ $ec_lang['lpn_guide_text_contour_box']='Управляет графиком из
 $ec_lang['lpn_guide_text_scncmp_box']='Рассчитывает каждый сценарий на копии чертежа и сводит в таблицу для каждого число переопределений, наименьшее давление и наибольшую скорость. Проект он не изменяет, а открытый сценарий остаётся без изменений.';
 $ec_lang['lpn_guide_text_rptbox']='Показывает текстовый отчёт, составленный расчётным ядром EPANET по последнему расчёту с продолжённым периодом, включая предупреждения и сводку по сети. Каждый новый расчёт с продолжённым периодом заменяет его; расчёт на один момент времени его не заменяет, а правка оставляет прежний отчёт на месте.';
 $ec_lang['lpn_guide_text_status_box']='Перечисляет в хронологическом порядке каждое изменение за последний расчёт с продолжённым периодом: открытие или закрытие насоса, клапана или трубы, начало наполнения или опорожнения бака или его заполнение или опорожнение, а также любой шаг по времени, на котором решение не полностью сошлось. Перечисляются только изменения, а не каждый шаг по времени.';
-$ec_lang['lpn_guide_text_alt_box']='Показывает для каждого сценария, какую альтернативу он использует в каждой категории, например «Физические», «Расход отбора» и «Включение элементов», а также его параметры расчёта: множитель расхода отбора, общую продолжительность работы и гидравлический шаг по времени. Альтернативы доступны только для чтения. Параметры расчёта сценария можно ввести здесь, а пустое значение означает значение родительского сценария. Откройте окно из меню «Сценарии» после отключения базового режима.';
 $ec_lang['lpn_guide_text_full_box']='Перечисляет все узлы и все связи на каждом шаге отчёта в единицах, показанных на панели «Таблицы». Без расчёта с продолжённым периодом показывает текущее решение на один момент времени. Загрузка и печать включают все шаги по времени, а в таблице показывается по одному.';
 $ec_lang['lpn_guide_text_calib_box']='Сравнивает файл натурных измерений с расчётными результатами в тех же местах и в те же моменты времени, по одному файлу на каждый параметр. Файл хранится только в течение текущего сеанса и не сохраняется вместе с проектом.';
 $ec_lang['lpn_guide_text_notes_popup']='Перечисляет примечания о том, как работает эта страница и чего она не делает, каждое в виде термина с определением. Сеть он не изменяет.';
@@ -1020,7 +1020,6 @@ $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?<
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='Также в меню «{menu}»';
 $ec_lang['lpn_guide_how_popup']='Окно «Свойства» открывается, когда вы выбираете элемент или текст.';
-$ec_lang['lpn_guide_how_alt']='«Предварительный просмотр альтернатив» находится в меню «Вода», «Сценарии», когда базовый режим отключён.';
 $ec_lang['lpn_guide_not_shown']='Этого элемента управления сейчас нет на экране.';
 // The box's two context headings. "Tables" holds the two table-help entries that used to sit only
 // in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
@@ -1475,8 +1474,20 @@ $ec_lang['lpn_pane_sel_only_none']='Элементы не выбраны. Сна
 // Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
 // scenario, with a Scenario column after ID.
 $ec_lang['lpn_pane_scn_show']='Показать сценарии';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+
+
+
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+
+
+
+
 $ec_lang['lpn_pane_clear_override']='Сбросить переопределение';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -1532,20 +1543,29 @@ $ec_lang['lpn_menu_project']='Вода';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='Всё, что относится к моделированию водопроводной сети (кроме элементов управления воспроизведением анимации)';
 $ec_lang['lpn_tables_menu']='Таблицы';
-// Water > Change type (Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// Water > Morph (Task 781; Tom, 2026-10-14: *"I like the term 'Morph' (Transform) for this feature"*;
+// first built as Change type, Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
 // to Change node type for any asset, where if it has information that can't be ported to the new
 // type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
 // asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
 // popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
 // dev/asset-type.md.
-$ec_lang['lpn_change_type_menu']='Изменить тип';
-$ec_lang['lpn_change_type_tip']='Преобразует выбранные узловые элементы в узлы, резервуары или баки, а выбранные связи в трубы, насосы или клапаны. Каждый объект сохраняет свой идентификатор, положение, соединения и все значения, которые есть и у нового типа. Если что-либо будет потеряно, сначала выводится запрос.';
-$ec_lang['lpn_change_type_ok']='Изменить';
+$ec_lang['lpn_morph_menu']='Изменить тип';
+$ec_lang['lpn_morph_tip']='Преобразует выбранные узловые элементы в узлы, резервуары или баки, а выбранные связи в трубы, насосы или клапаны. Каждый объект сохраняет свой идентификатор, положение, соединения и все значения, которые есть и у нового типа. Если что-либо будет потеряно, сначала выводится запрос.';
+$ec_lang['lpn_morph_ok']='Изменить';
+// {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
+// when a node type was chosen), separated by commas.
+
+// The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
+// scenario, beside the override marker.
+
+
 $ec_lang['lpn_change_type_lost']='Эти значения будут потеряны:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
 $ec_lang['lpn_change_type_key']='Каждая строка: ID: свойство и значение, которые будут потеряны';
 $ec_lang['lpn_change_type_line']='{id}: {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, в сценарии {scenario}';
+
 $ec_lang['lpn_change_type_more']='И ещё {n}.';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.
@@ -1614,6 +1634,32 @@ $ec_lang['lpn_confirm_delete_network']='Удалить все узлы, труб
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='Найти и заменить';
+// Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
+// placement are never pasted.
+
+
+
+
+
+
+
+
+
+
+// The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
+// opens the in-place editor; Reset position sends a dragged label or an attached Text home.
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_find_title']='Найти и заменить';
 $ec_lang['lpn_find_scope']='Где искать';
 $ec_lang['lpn_find_scope_all']='Везде';
@@ -2056,6 +2102,8 @@ $ec_lang['lpn_status_inp_exported_picture']='Экспортировано: {zip}
 $ec_lang['lpn_status_inp_exported_no_picture']='Экспортировано: {file}. Фоновое изображение сохранить не удалось, поэтому в .inp оно не указано; в EPANET добавьте его через «Вид > Подложка > Загрузить».';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+
+
 $ec_lang['lpn_inp_export_differences']='{n} значений, которые формат .inp не поддерживает.';
 $ec_lang['lpn_inp_export_difference_one']='Одно значение, которое формат .inp не поддерживает.';
 $ec_lang['lpn_inp_export_refused']='Этот проект нельзя записать в виде файла EPANET: {detail}';
@@ -3045,6 +3093,7 @@ $ec_lang['lpn_scenario_overrides']='Число переопределений';
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='Янтарное кольцо означает, что этот элемент хранит значение, которое принадлежит только сценарию {name}.';
+
 $ec_lang['lpn_scenario_overrides_tip']='Каждое переопределение отмечено на карте янтарным кольцом. Переключитесь на {base} или другой родительский сценарий, чтобы увидеть чертёж без них.';
 $ec_lang['lpn_scenario_menu']='Сценарии';
 $ec_lang['lpn_scenario_tip']='Набор значений, который сейчас показан на чертеже и рассчитывается страницей. Щёлкните, чтобы переключить сценарий, добавить, переименовать или удалить его.';
@@ -3053,10 +3102,11 @@ $ec_lang['lpn_scenario_new_name']='Сценарий {n}';
 $ec_lang['lpn_scenario_prompt_name']='Название этого сценария';
 $ec_lang['lpn_scenario_rename']='Переименовать сценарий…';
 $ec_lang['lpn_scenario_delete']='Удалить сценарий';
-$ec_lang['lpn_scenario_delete_confirm']='Удалить сценарий {name} и его переопределения ({n})? Сам чертёж не изменится.';
-$ec_lang['lpn_scenario_override']='Переопределить в этом сценарии';
+
+
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='Если отмечено, этот сценарий переопределяет значение родителя, даже если число совпадает. Снимите отметку, чтобы использовать значение родителя.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3067,31 +3117,142 @@ $ec_lang['lpn_scenario_deactivated']='{id} исключён из сети в с�
 $ec_lang['lpn_scenario_delete_in_base']='Чтобы удалить его из чертежа, удалите его в сценарии «{base}».';
 $ec_lang['lpn_scenario_only_deleted']='{id} удалён. Он входил только в сценарий «{scenario}».';
 $ec_lang['lpn_scenario_delete_blocked']='{id} не удалён, так как на нём оканчивается связь {link}, которая существует и вне сценария «{scenario}». Чтобы удалить оба, удалите их в сценарии «{base}».';
-$ec_lang['lpn_scenario_push_btn']='Применить значения Базы ко всем сценариям';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Все сценарии возвращаются к значениям Базы для свойств, подписи которых показаны сейчас. Значения, введённые для них в любом сценарии, будут удалены.';
 $ec_lang['lpn_scenario_basic']='Базовый режим';
 $ec_lang['lpn_scenario_basic_tip']='Если отмечено, сценарий состоит только из заданных в нём значений. Если снято, меню предлагает также таблицу предварительного просмотра «Альтернативы», которая показывает, как эти значения сгруппированы по категориям, и позволяет задать для сценария отдельные общую продолжительность расчёта и гидравлический шаг по времени. Отзывы об этой функции приветствуются.';
-$ec_lang['lpn_alt_title']='Предварительный просмотр альтернатив';
-$ec_lang['lpn_alt_calc_options']='Параметры расчёта';
-$ec_lang['lpn_alt_note']='База использует альтернативу «База» каждой категории. У каждого сценария есть отдельная альтернатива, дочерняя по отношению к альтернативе «База», для каждой изменённой категории. Число — количество изменённых значений. Последние три столбца — параметры расчёта: введите значение для сценария или оставьте поле пустым, чтобы использовать значение родителя. Значения проекта находятся в «Настройки > Расчёт > Время».';
-$ec_lang['lpn_scenario_duration_tip']='Оставьте пустым, чтобы унаследовать значение родителя. Общая продолжительность расчёта 0:00 означает расчёт установившегося режима.';
-$ec_lang['lpn_scenario_hyd_step_tip']='Оставьте пустым, чтобы унаследовать значение родителя.';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_time_scn_overrides']='Переопределения сценария:';
+
+
+
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+
+
+
+
+
+
+
+
+
+
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+
+
+
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_alt_cat_physical']='Физические';
 $ec_lang['lpn_alt_cat_demand']='Расход отбора';
 $ec_lang['lpn_alt_cat_topology']='Включение элементов';
+
 $ec_lang['lpn_alt_cat_initial']='Начальные настройки';
 $ec_lang['lpn_alt_cat_constituent']='Компонент';
 $ec_lang['lpn_alt_cat_fireflow']='Противопожарный расход';
 $ec_lang['lpn_alt_cat_energy']='Стоимость энергии';
 $ec_lang['lpn_alt_cat_userdata']='Пользовательские свойства';
 $ec_lang['lpn_alt_cat_text']='Текст';
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Заставить все сценарии использовать значения Базы для этих свойств? Значения, введённые для них в любом сценарии, будут удалены. Это действие можно отменить.';
-$ec_lang['lpn_scenario_push_scenarios']='Затронутые сценарии:';
-$ec_lang['lpn_scenario_push_values']='Удаляемые значения:';
-$ec_lang['lpn_scenario_push_none']='Ни один сценарий не имеет собственного значения ни для одного из этих свойств, поэтому ничего не изменится. Ничего не будет удалено.';
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. Проверка расхода: статика';
@@ -3231,6 +3392,8 @@ $ec_lang['lpn_time_run_fell_back']='Числа на экране получен�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='Эти управления называют элемент, которого больше нет в этом проекте, поэтому они были пропущены: {ids}';
 $ec_lang['lpn_control_unreadable_note']='Эти управления не удалось прочитать, поэтому они были пропущены: {ids}';
+
+
 $ec_lang['lpn_rule_dangling_note']='Эти правила ссылаются на элемент, которого больше нет в этом проекте, поэтому они не учитывались при этом расчёте: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='Эти правила не удалось прочитать, поэтому они не учитывались при этом расчёте: {ids}';
 $ec_lang['lpn_settings_text_size']='Размер текста (пиксели)';
@@ -3783,9 +3946,7 @@ $ec_lang['lpn_energy_curve_note']='Эти насосы ссылаются на �
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Ранг';
 $ec_lang['lpn_labels_col_drop']='Пропуск';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -4010,6 +4171,8 @@ $ec_lang['lpn_library_pattern_default_mark']='(по умолчанию)';
 $ec_lang['lpn_library_pattern_default_tip']='График расхода отбора по умолчанию. Изменяется в «Настройки», «График расхода отбора по умолчанию».';
 $ec_lang['lpn_library_pattern_default_deleted_to']='График {id} был графиком расхода отбора по умолчанию. Узлы без графика теперь используют график {now}.';
 $ec_lang['lpn_library_pattern_default_deleted_none']='График {id} был графиком расхода отбора по умолчанию. Узлы без графика теперь используют постоянный расход отбора.';
+
+
 $ec_lang['lpn_library_control_add']='Добавить управление';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -4572,4 +4735,4 @@ $ec_lang['lpn_snip_tip_eraser']='Ластик: щёлкните штрих, чт
 $ec_lang['lpn_snip_tip_undo']='Отменить (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Повторить (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Копировать (Ctrl+C)';
-$ec_lang['lpn_screenshot_scale_tip']='Размер изображения как кратное размеру области на экране. Больший масштаб даёт более чёткое изображение и больший файл.';
+$ec_lang['lpn_screenshot_scale_tip']='Размер изображения как кратное размеру области на экране. Больший масштаб даёт более чёткое изображение и больший файл.';$ec_lang['lpn_guide_text_alt_box']='Показывает для каждого сценария, какую альтернативу он использует в каждой категории, например «Физические», «Расход отбора» и «Включение элементов», а также его параметры расчёта: множитель расхода отбора, общую продолжительность работы и гидравлический шаг по времени. Альтернативы доступны только для чтения. Параметры расчёта сценария можно ввести здесь, а пустое значение означает значение родительского сценария. Откройте окно из меню «Сценарии» после отключения базового режима.';$ec_lang['lpn_guide_how_alt']='«Предварительный просмотр альтернатив» находится в меню «Вода», «Сценарии», когда базовый режим отключён.';$ec_lang['lpn_alt_calc_options']='Параметры расчёта';$ec_lang['lpn_scenario_duration_tip']='Оставьте пустым, чтобы унаследовать значение родителя. Общая продолжительность расчёта 0:00 означает расчёт установившегося режима.';$ec_lang['lpn_scenario_hyd_step_tip']='Оставьте пустым, чтобы унаследовать значение родителя.';

@@ -50,7 +50,8 @@ const L = loadLoopedNetwork(
 	"\t\tsetProp: setProp, effective: effective, baseValue: baseValue,\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario,\n" +
 	"\t\tactiveId: function () { return activeScenario().id; }, baseId: function () { return baseScenario().id; },\n" +
-	"\t\toverrides: function (scnId) { return scenarioById(scnId).overrides; },\n" +
+	// What the scenario resolves: its own map, or the alternative an override stored (2026-10-12).
+	"\t\toverrides: function (scnId) { return resolvedOverrides(scenarioById(scnId)); },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -161,9 +162,10 @@ console.log('\n--- 5. a typed cell writes into ITS row\'s scenario, through setP
 	report(L.text('junctions', rowOf(J[2], fire1.id), 'demand') === '77' &&
 		hasClass(L.td('junctions', key, 'demand'), 'lpn-pane-ovcell'),
 		'the cell reads 77 and now wears the wash');
-	report(L.plain('junctions', rowOf(J[2], fire1.id), 'elev') === true &&
+	// Every property is overridable since 2026-10-12 (Tom), elevation among them.
+	report(L.plain('junctions', rowOf(J[2], fire1.id), 'elev') === false &&
 		L.plain('junctions', rowOf(J[2], L.baseId()), 'elev') === false,
-		'elevation, which Base owns, is read-only in a scenario row and editable in the Base row');
+		'elevation is editable in a scenario row as in the Base row');
 	report(L.plain('junctions', rowOf(J[2], L.baseId()), 'id') === true, 'ID is read-only while scenarios are shown');
 }
 
@@ -243,7 +245,9 @@ console.log('\n--- 9. renaming a scenario while shown renames its rows at once -
 	report(!!td9 && td9.textContent === 'Max Hour', 'the Scenario column reads the new name with no switch or solve',
 		td9 && td9.textContent);
 	const tip9 = L.td('junctions', J[1].id + SEP + peak.id, 'demand');
-	report(!!tip9 && tipOf(tip9) === altTip('demand', 'Max Hour'), '...and so does the alternative its overrides name',
+	// Tom, 2026-10-12: "With Basic mode on, we must rename everything at once without asking": the
+	// alternative named after the scenario is renamed with it (with Basic mode off, he is asked).
+	report(!!tip9 && tipOf(tip9) === altTip('demand', 'Max Hour'), '...and in Basic mode the alternative named after it is renamed with it',
 		tipOf(tip9));
 	L.switchScenario(L.baseId());
 }

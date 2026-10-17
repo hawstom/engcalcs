@@ -76,7 +76,8 @@ the block.
   user's to edit. **First item: the full alternatives and inheritance model under the hood** (stages
   4 and 5), after advice from every angle (*"Order matters... we are likely to make mistakes"*).
   Stages, answers and code: `dev/scenario-alternatives.md` on `feat/bentley-interop`. Basic mode
-  hides it until the Advanced UX is designed. Task 765 (Presentation) is folded in here.
+  hides it until the Advanced UX is designed. Task 765 (Presentation) is folded in here. Stage 6 (the
+  Scenario manager and the Scenarios table, Tom's calls of 2026-10-09) is built on the branch.
 - 100|781| **Morph: change an asset's type in one scenario, keeping its pipes.**
   Tom, 2026-10-14: *"I would like to create a scenario called 'Tank at J1' and change the J1 junction to
   a tank in that scenario without having to delete and reconstitute the pipes connecting to it ...

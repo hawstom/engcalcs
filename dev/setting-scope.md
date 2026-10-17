@@ -39,13 +39,15 @@ Derived from `EC_LPN_FURNITURE` in `dev/scripts/lpn_furniture_check.php`; the ch
 |---|---|
 | `lpn_pane` | Height and open tab of the bottom pane (drag the pane edge, pick a tab) |
 | `lpn_rpane` | Width of the right pane (drag its edge) |
-| `lpn_setbox`, `lpn_findbox`, `lpn_libbox`, `lpn_ffbox`, `lpn_energybox`, `lpn_cmpbox`, `lpn_reportbox`, `lpn_statusbox`, `lpn_fullbox`, `lpn_notesbox` (retired 2026-10-09, only swept), `lpn_hotkeysbox`, `lpn_contourbox` | Position, size and openness of each standing box (drag, resize, close) |
+| `lpn_setbox`, `lpn_findbox`, `lpn_libbox`, `lpn_ffbox`, `lpn_energybox`, `lpn_cmpbox`, `lpn_reportbox`, `lpn_statusbox`, `lpn_fullbox`, `lpn_notesbox` (retired 2026-10-09, only swept), `lpn_hotkeysbox`, `lpn_contourbox`, `lpn_smbox` (the Scenario manager) | Position, size and openness of each standing box (drag, resize, close) |
 | `lpn_dockbox` | The dock buttons (Dock left, Dock right, Auto-hide, Float) and the X of Properties, Criticality analysis, Demand scaling, Alternatives and the Calibration report, the boxes with no record of their own: which edge, the order, the docked width, and whether each docked one is open |
 | `lpn_snipbox` | Map > Screenshot: the Screenshot box's position and size (drag, resize), and its Magnification |
 | `lpn_panecols` | Column width, order and hidden columns of the Tables (drag a divider or heading, Manage columns) |
 | `lpn_runbox` | Settings > Calculation > Hydraulics > Show the run progress box |
 | `lpn_scnbasic` | Scenarios > Basic mode |
 | `lpn_hovercard` | Settings > Map and page > Page > Show the full label on hover |
+| `lpn_ovrmarks` | Settings > Map and page > Page > Show override markers on the map |
+| `lpn_cleanmap` | Map > Clean map |
 | `lpn_msghidden` | The x on a message in the amber box on the map (and Show in the message history): which messages this reader hid |
 | `lpn_areahint` | Settings > Map and page > Page > Show the selection help, and the bubble's own checkbox |
 | `lpn_survey_format` | The column order last chosen when importing a surveyed point list |
@@ -81,8 +83,8 @@ rows) are counted only when present. Regenerate with
 | `lpn_set_sub_linkColors` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_custLbl` | 8 | 8 | 0 | 0 |
 | `lpn_set_sub_nodeLink` | 1 | 1 | 0 | 0 |
-| `lpn_set_sub_mapDisplay` | 16 | 16 | 0 | 0 |
-| `lpn_set_sub_page` | 2 | 0 | 2 | 0 |
+| `lpn_set_sub_mapDisplay` | 19 | 19 | 0 | 0 |
+| `lpn_set_sub_page` | 3 | 0 | 3 | 0 |
 | `lpn_set_sub_idPrefixes` | 7 | 7 | 0 | 0 |
 | `lpn_set_sub_defaults` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_customProps` | 10 | 10 | 0 | 0 |
@@ -91,11 +93,12 @@ rows) are counted only when present. Regenerate with
 | `lpn_set_sub_hydraulics` | 17 | 16 | 1 | 0 |
 | `lpn_set_sub_energy` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_quality` | 2 | 2 | 0 | 0 |
-| **Total** | 129 | 126 | 3 | 0 |
+| **Total** | 133 | 129 | 4 | 0 |
 
 Controls whose home is not their heading's default, as observed:
 
 - `lpn_set_sub_page`: Show the selection help -- browser
 - `lpn_set_sub_page`: Show the full label on hover -- browser
+- `lpn_set_sub_page`: Show override markers on the map -- browser
 - `lpn_set_sub_hydraulics`: Show the run progress box -- browser
 <!-- INVENTORY:END -->

@@ -259,16 +259,16 @@ function build(unitSet) {
 		L.query('tank', 'minLevel', 'equals', '0').length === 1 &&
 		L.query('tank', 'maxLevel', 'equals', '9').length === 1 &&
 		L.query('tank', 'tankDiameter', 'lt', '20').length === 1);
-	// Min/max/diameter are base-owned geometry, not in LPN_OVERRIDABLE, so a scenario write must
-	// land on the document itself rather than becoming an override nothing reads.
+	// Min/max/diameter are overridable since 2026-10-12 (Tom: every property), so a scenario write
+	// is that scenario's override and Base keeps its own.
 	const scn = L.createScenario('Bigger tank');
 	L.switchScenario(scn.id !== undefined ? scn.id : scn);
 	L.query('tank', 'tankDiameter', 'equals', '15');
 	L.setReplace('tankDiameter', '20');
 	L.preview();
 	L.apply();
-	ok('tank diameter writes the document even from inside a scenario, because it is not overridable',
-		nodeOf(n.t).tankDiameter === 20 && L.hasOverride(nodeOf(n.t), 'tankDiameter') === false);
+	ok('tank diameter replaced inside a scenario is the scenario\'s override, and Base keeps 15',
+		nodeOf(n.t).tankDiameter === 15 && L.hasOverride(nodeOf(n.t), 'tankDiameter') === true);
 	L.switchScenario('base');
 
 	// Level IS overridable, unlike its three neighbours -- the one row in this gap with a `prop`.

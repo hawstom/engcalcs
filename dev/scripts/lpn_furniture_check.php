@@ -135,6 +135,9 @@ const EC_LPN_FURNITURE = [
     'lpn_contourbox'  => 'position, size and openness of the Contour plot box (Task 600)',
     // The Screenshot box (Tom, 2026-10-05). Its magnification rides here too: how sharp a picture
     // somebody pastes into their own report is not a fact about the network.
+    // The Scenario manager (Tom, 2026-10-09), which replaced the Alternatives preview box
+    // (`lpn_altbox`, 2026-10-07, card E02: "Add the key, no first-dock limit").
+    'lpn_smbox'       => 'position, size and dock of the Scenario manager box',
     'lpn_snipbox'     => 'position and size of the Screenshot box, and its magnification',
     // NOT a box POSITION like its neighbours, and it is furniture for the same reason they are:
     // whether somebody wants a progress dialog in front of them while a run goes is a fact about
@@ -159,6 +162,10 @@ const EC_LPN_FURNITURE = [
     // short hash of each hidden message's words, never the words. A colleague opening the file must
     // not inherit it.
     'lpn_msghidden'   => 'which standing messages this reader hid (hashes, never the words), for this browser',
+    // Map, Clean map and Settings, Page, Show override markers on the map (Task 805). Which controls
+    // and marks float over the drawing is a fact about the screen; nothing in the document changes.
+    'lpn_cleanmap'    => 'whether Map > Clean map is checked, for this browser',
+    'lpn_ovrmarks'    => 'whether the override rings are drawn on the map, for this browser',
     // **WHICH WAY ROUND THE LAST SURVEY FILE WAS WRITTEN IS A FACT ABOUT THAT PERSON'S DATA
     // COLLECTOR, not about this network** (Task 592). It is the remembered answer to the import
     // chooser's one question -- northing first or easting first -- and a file read from it has

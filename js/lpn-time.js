@@ -545,6 +545,10 @@
 			runStoppedKept: pageConfig.lpn_time_run_stopped_kept || 'The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.',
 			statStopped: pageConfig.lpn_time_stat_stopped || '{statistic} not shown: the run stopped before the end of the period.',
 			stoppedNoQuality: pageConfig.lpn_time_stopped_no_quality || 'No water quality results were computed, because the quality analysis starts after the hydraulic run ends.',
+			// Which link EPANET had just closed at the stop, and why, from its own report (R-402).
+			runCutOff: pageConfig.lpn_time_run_cut_off || 'EPANET had closed {link} and then could not solve for {nodes}.',
+			runCutOffFull: pageConfig.lpn_time_run_cut_off_full || 'Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.',
+			runCutOffEmpty: pageConfig.lpn_time_run_cut_off_empty || 'Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.',
 			runStopped: pageConfig.lpn_time_run_stopped || 'The EPANET run stopped at {time}, so it has no results. Its run report says why.',
 			runFellBack: pageConfig.lpn_time_run_fell_back || 'The numbers on screen came from the built-in solver instead. It solves one instant at a time, so this is the network at {time} only, with every tank at its initial level.',
 			runReport: pageConfig.lpn_time_run_report || 'Run report',
@@ -678,7 +682,10 @@
 		});
 		model.nodes.forEach(function (m) {
 			if (!m || m.type !== 'tank') { return; }
-			var name = named[String(m.id)], curve = name ? curveById[name] : null, pts;
+			// The model states the name its scenario resolves (volCurveName, js/looped-network.js);
+			// a model built without it reads the document's own.
+			var name = m.volCurveName !== undefined ? (m.volCurveName ? String(m.volCurveName) : undefined) : named[String(m.id)],
+				curve = name ? curveById[name] : null, pts;
 			if (!curve) { return; }
 			pts = EC.lpnCurvePoints ? EC.lpnCurvePoints(curve) : null;
 			if (!volumeCurveUsable(pts)) { return; }
@@ -1261,8 +1268,21 @@
 						.replace('{solved}', EC.lpnTimeElapsedText(run.solvedTo))
 					: S.runStopped.replace('{time}', EC.lpnTimeElapsedText(run.stoppedAt)))
 				: S.runRefused;
+		head += cutOffText(run);
 		return why ? head + ' ' + S.runRefusedWhy.replace('{message}', why) : head;
 	}
+	// " Tank T1 was full, so EPANET had just closed P1 ..." or '' (R-402). js/lpn-epanet.js reads the
+	// link, the tank and the nodes out of EPANET's own report; this only puts them in a sentence.
+	function cutOffText(run) {
+		var S = strings(), c = run && run.cutOff, ids, t;
+		if (!c || !c.link || !c.nodes || !c.nodes.length) { return ''; }
+		ids = c.nodes.slice(0, 10).join(', ') + (c.nodes.length > 10 ? ', \u2026' : '');
+		t = (c.tank && c.tankState === 'full') ? S.runCutOffFull
+			: (c.tank && c.tankState === 'empty') ? S.runCutOffEmpty : S.runCutOff;
+		return ' ' + t.replace('{tank}', c.tank || '').replace('{link}', c.link).replace('{nodes}', ids);
+	}
+	EC.lpnTimeCutOffTextForTest = function (run) { return cutOffText(run); };
+	EC.lpnTimeRefusedTextForTest = function (run) { return refusedText(run); };
 
 	// The statistic the project asks for, or null (Task 735).
 	function rawStat() {
@@ -1383,12 +1403,13 @@
 	// ---- the time settings, edited ----
 
 	function ensureTimes() {
+		if (host.editTimes) { return host.editTimes(); }
 		var d = host.doc();
 		if (!d.times) { d.times = EC.lpnTimesDefaults(); d.times.text = {}; }
 		return d.times;
 	}
 	function commitStatistic(name) {
-		var times = host.doc().times, cur = (times && times.statistic) || 'NONE';
+		var times = host.editTimes ? host.editTimes() : host.doc().times, cur = (times && times.statistic) || 'NONE';
 		if (EC.LPN_STATISTICS.indexOf(name) < 0 || name === cur) { return; }
 		host.snapshot();
 		times = ensureTimes();
@@ -1463,7 +1484,7 @@
 	EC.lpnTimeRenderSettings = function () {
 		var panel = document.getElementById('lpn_set_time_fields'), S = strings(), times;
 		if (!panel || !host) { return; }
-		times = projectTimes() || EC.lpnTimesDefaults();
+		times = (host.editTimes ? host.editTimes() : projectTimes()) || EC.lpnTimesDefaults();
 		panel.textContent = '';
 		ovrNotes = {};
 		EC.LPN_TIME_FIELDS.forEach(function (pair) {
@@ -1487,6 +1508,8 @@
 					value: EC.lpnTimeText(times, pair[0], times[pair[0]] || 0)
 				});
 			input.addEventListener('change', function () { commitField(pair[0], input.value); });
+			// Which setting this row edits, for the held-value mark (setboxTag() in looped-network.js).
+			row.setAttribute('data-lpn-setting', JSON.stringify([['times', pair[0]]]));
 			row.appendChild(label);
 			row.appendChild(input);
 			panel.appendChild(row);
@@ -1507,6 +1530,7 @@
 		});
 		ssel.value = times.statistic || 'NONE';
 		ssel.addEventListener('change', function () { commitStatistic(ssel.value); });
+		srow.setAttribute('data-lpn-setting', JSON.stringify([['times', 'statistic']]));
 		srow.appendChild(el('span', {}, S.statistic));
 		srow.appendChild(ssel);
 		panel.appendChild(srow);
@@ -1516,8 +1540,8 @@
 	/**
 	 * **WHICH SCENARIOS OVERRIDE THIS PROJECT SETTING, under the setting.** Redrawn on its own, never
 	 * by rebuilding the seven inputs, because it follows every scenario edit and a rebuild would take
-	 * the focus from a box being typed in. Each scenario name is a button that opens the Alternatives
-	 * preview, where its own value is edited. The names are the visitor's own text and are set as
+	 * the focus from a box being typed in. Each scenario name is a button that opens the Settings
+	 * table on that scenario's row of this setting, where its own value is edited. The names are the visitor's own text and are set as
 	 * text, never as markup.
 	 */
 	EC.lpnTimeRenderOverrides = function () {
@@ -1532,7 +1556,7 @@
 			note.appendChild(document.createTextNode(S.scnOverrides + ' '));
 			mine.forEach(function (o, i) {
 				var b = el('button', { type: 'button', class: 'lpn-time-ovr-btn' }, o.name);
-				b.addEventListener('click', function () { if (host.openScenarioOptions) { host.openScenarioOptions(o.id); } });
+				b.addEventListener('click', function () { if (host.openScenarioOptions) { host.openScenarioOptions(o.id, key); } });
 				if (i) { note.appendChild(document.createTextNode(', ')); }
 				note.appendChild(b);
 				note.appendChild(document.createTextNode(' (' + o.text + ')'));

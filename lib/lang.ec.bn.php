@@ -708,6 +708,7 @@ $ec_lang['lpn_node_customers_tip']='এখানে যোগ হওয়া �
 $ec_lang['lpn_node_customers_sum']='গ্রাহক ({n}) থেকে {total} {unit}';
 $ec_lang['lpn_customer_detached']='⚠ এই গ্রাহক কোনো পাইপে সংযুক্ত নয়, তাই এর চাহিদা উত্তরে নেই। এটি মুছে ফেলুন, অথবা একটি পাইপ এঁকে গ্রাহককে তার উপর নিয়ে যান।';
 $ec_lang['lpn_customer_fixed_head']='⚠ সেই পাইপের কাছের প্রান্তে একটি স্থির পানির উপরিতল আছে, তাই এই চাহিদা সিমুলেশনকে প্রভাবিত করে না।';
+
 $ec_lang['lpn_customer_detached_count']='পাইপে সংযুক্ত নয় এমন গ্রাহক ({n})। তাদের চাহিদা হিসাবে নেওয়া হয়নি।';
 $ec_lang['lpn_meter_pick_pipe']='এখন এই গ্রাহককে সেবা দেয় এমন পাইপ বা নোড নির্বাচন করুন। গ্রাহক আপনি যেখানে রেখেছেন সেখানেই থাকে। বাতিল করতে Escape চাপুন।';
 $ec_lang['lpn_inp_export_flat_customers']='একটি EPANET ফাইলে কোনো গ্রাহক থাকে না। এই প্রকল্পের গ্রাহকদের ({n}) চাহিদা প্রতিটি গ্রাহক যে সংযোগস্থলে নির্ধারিত সেখানে একটি চাহিদার সারি হিসেবে লেখা হয়, গ্রাহকের ট্যাগ দিয়ে নামকরণ করে। ফাইল গ্রাহককে নিজে রেকর্ড করে না: তার অবস্থান, যে পাইপ তাকে সেবা দেয়, সেই পাইপের কোথায় সংযোগ লাগে, বা সে কতগুলো সংযোগের প্রতিনিধিত্ব করে। সেই তথ্য প্রকল্পে থাকে; তা রাখতে প্রকল্প ফাইল সংরক্ষণ করুন।';
@@ -992,7 +993,6 @@ $ec_lang['lpn_guide_text_contour_box']='রঙ অনুযায়ী নো�
 $ec_lang['lpn_guide_text_scncmp_box']='অঙ্কনের একটি অনুলিপি থেকে প্রতিটি দৃশ্যকল্প সমাধান করে এবং প্রতিটির জন্য নিজস্ব মানের সংখ্যা, সর্বনিম্ন চাপ ও সর্বোচ্চ বেগ সারণিবদ্ধ করে। এটি প্রকল্প বদলায় না, এবং খোলা দৃশ্যকল্পটি যেমন ছিল তেমনই থাকে।';
 $ec_lang['lpn_guide_text_rptbox']='সর্বশেষ বর্ধিত সময়কাল সিমুলেশনের জন্য EPANET ইঞ্জিনের লেখা টেক্সট প্রতিবেদন দেখায়, এর সতর্কতা ও নেটওয়ার্ক সারাংশসহ। প্রতিটি বর্ধিত সময়কাল সিমুলেশন এটিকে প্রতিস্থাপন করে; একক মুহূর্তের সমাধান করে না, এবং সম্পাদনা আগের প্রতিবেদন যেমন ছিল তেমন রাখে।';
 $ec_lang['lpn_guide_text_status_box']='সময়ের ক্রমে সর্বশেষ বর্ধিত সময়কাল সিমুলেশনের সময় প্রতিটি পরিবর্তন তালিকাভুক্ত করে: একটি পাম্প, ভালভ বা পাইপের খোলা বা বন্ধ হওয়া, একটি ট্যাংকের ভরা বা খালি হওয়া শুরু করা বা পূর্ণ বা খালি হয়ে যাওয়া, এবং যেকোনো সময় ধাপ যা পুরোপুরি কনভার্জ করেনি। শুধু পরিবর্তনগুলো তালিকাভুক্ত হয়, প্রতিটি সময় ধাপ নয়।';
-$ec_lang['lpn_guide_text_alt_box']='প্রতিটি দৃশ্যকল্পের জন্য দেখায় যে এটি প্রতিটি বিভাগে কোন বিকল্প ব্যবহার করে, যেমন ভৌত, চাহিদা এবং উপাদান সক্রিয়করণ, এবং এর গণনার বিকল্পগুলো: চাহিদা গুণক, মোট রান সময় ও হাইড্রোলিক সময় ধাপ। বিকল্পগুলো শুধু পড়ার জন্য। একটি দৃশ্যকল্পের গণনার বিকল্প এখানে লেখা যায়, এবং ফাঁকা রাখলে তার প্যারেন্টের মান ব্যবহার হয়। সাধারণ মোড বন্ধ করার পর দৃশ্যকল্প মেনু থেকে এটি খুলুন।';
 $ec_lang['lpn_guide_text_full_box']='টেবিল প্যানেলে দেখানো এককে প্রতিটি প্রতিবেদন সময় ধাপে প্রতিটি নোড ও প্রতিটি লিংক তালিকাভুক্ত করে। বর্ধিত সময়কাল সিমুলেশন ছাড়া এটি একক মুহূর্তের বর্তমান সমাধান দেখায়। ডাউনলোড বা প্রিন্টে প্রতিটি সময় ধাপ থাকে, আর টেবিল একবারে একটি দেখায়।';
 $ec_lang['lpn_guide_text_calib_box']='মাঠ পরিমাপের একটি ফাইলকে একই স্থান ও সময়ের গণনা করা ফলাফলের সাথে তুলনা করে, প্রতিটি প্যারামিটারের জন্য একটি ফাইল। ফাইলটি শুধু বর্তমান সেশনের জন্য রাখা হয় এবং প্রকল্পের সাথে সংরক্ষিত হয় না।';
 $ec_lang['lpn_guide_text_notes_popup']='এই পৃষ্ঠা কীভাবে আচরণ করে এবং কী করে না তার নোট তালিকাভুক্ত করে, প্রতিটি একটি পদ ও তার সংজ্ঞা হিসেবে। এটি নেটওয়ার্ক বদলায় না।';
@@ -1020,7 +1020,6 @@ $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?<
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='{menu}-এ আরও';
 $ec_lang['lpn_guide_how_popup']='আপনি কোনো উপাদান বা টেক্সট নির্বাচন করলে বৈশিষ্ট্য খোলে।';
-$ec_lang['lpn_guide_how_alt']='সাধারণ মোড বন্ধ থাকলে বিকল্পগুলোর প্রিভিউ পানি, দৃশ্যকল্প-এর অধীনে তালিকাভুক্ত থাকে।';
 $ec_lang['lpn_guide_not_shown']='এই নিয়ন্ত্রণ এখন পর্দায় নেই।';
 // The box's two context headings. "Tables" holds the two table-help entries that used to sit only
 // in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
@@ -1475,8 +1474,20 @@ $ec_lang['lpn_pane_sel_only_none']='কোনো উপাদান নির্
 // Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
 // scenario, with a Scenario column after ID.
 $ec_lang['lpn_pane_scn_show']='দৃশ্যকল্প দেখান';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+
+
+
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+
+
+
+
 $ec_lang['lpn_pane_clear_override']='নিজস্ব মান মুছুন';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -1532,20 +1543,29 @@ $ec_lang['lpn_menu_project']='পানি';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='পানি নেটওয়ার্ক মডেলিংয়ের সাথে সংশ্লিষ্ট সবকিছু (অ্যানিমেশন চালানোর নিয়ন্ত্রণ বাদে)';
 $ec_lang['lpn_tables_menu']='টেবিল';
-// Water > Change type (Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// Water > Morph (Task 781; Tom, 2026-10-14: *"I like the term 'Morph' (Transform) for this feature"*;
+// first built as Change type, Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
 // to Change node type for any asset, where if it has information that can't be ported to the new
 // type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
 // asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
 // popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
 // dev/asset-type.md.
-$ec_lang['lpn_change_type_menu']='ধরন পরিবর্তন করুন';
-$ec_lang['lpn_change_type_tip']='নির্বাচিত নোডগুলোকে সংযোগস্থল, জলাধার বা ট্যাংকে, অথবা নির্বাচিত লিংকগুলোকে পাইপ, পাম্প বা ভালভে পরিবর্তন করুন। প্রতিটি তার আইডি, অবস্থান, সংযোগ এবং নতুন ধরনেও থাকা সব মান বজায় রাখে। কিছু হারিয়ে গেলে আগে আপনাকে জিজ্ঞাসা করা হয়।';
-$ec_lang['lpn_change_type_ok']='পরিবর্তন করুন';
+$ec_lang['lpn_morph_menu']='ধরন পরিবর্তন করুন';
+$ec_lang['lpn_morph_tip']='নির্বাচিত নোডগুলোকে সংযোগস্থল, জলাধার বা ট্যাংকে, অথবা নির্বাচিত লিংকগুলোকে পাইপ, পাম্প বা ভালভে পরিবর্তন করুন। প্রতিটি তার আইডি, অবস্থান, সংযোগ এবং নতুন ধরনেও থাকা সব মান বজায় রাখে। কিছু হারিয়ে গেলে আগে আপনাকে জিজ্ঞাসা করা হয়।';
+$ec_lang['lpn_morph_ok']='পরিবর্তন করুন';
+// {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
+// when a node type was chosen), separated by commas.
+
+// The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
+// scenario, beside the override marker.
+
+
 $ec_lang['lpn_change_type_lost']='এই মানগুলো হারিয়ে যাবে:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
 $ec_lang['lpn_change_type_key']='প্রতিটি লাইন: ID: যে বৈশিষ্ট্য ও মান হারিয়ে যাবে';
 $ec_lang['lpn_change_type_line']='{id}: {property}, {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, দৃশ্যকল্প {scenario}-এ';
+
 $ec_lang['lpn_change_type_more']='আরও {n}টি।';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.
@@ -1614,6 +1634,32 @@ $ec_lang['lpn_confirm_delete_network']='এই প্রকল্পের প�
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='খুঁজুন ও প্রতিস্থাপন করুন';
+// Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
+// placement are never pasted.
+
+
+
+
+
+
+
+
+
+
+// The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
+// opens the in-place editor; Reset position sends a dragged label or an attached Text home.
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_find_title']='খুঁজুন ও প্রতিস্থাপন করুন';
 $ec_lang['lpn_find_scope']='কী অনুসন্ধান করবেন';
 $ec_lang['lpn_find_scope_all']='সবকিছু';
@@ -2056,6 +2102,8 @@ $ec_lang['lpn_status_inp_exported_picture']='{zip} এক্সপোর্ট �
 $ec_lang['lpn_status_inp_exported_no_picture']='{file} এক্সপোর্ট করা হয়েছে। পটভূমি ছবিটি সংরক্ষণ করা যায়নি, তাই .inp-তে কোনো ছবির উল্লেখ নেই; EPANET-এ View > Backdrop > Load দিয়ে এটি যোগ করুন।';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+
+
 $ec_lang['lpn_inp_export_differences']='{n}টি জিনিস যা .inp ফরম্যাট ধারণ করতে পারে না।';
 $ec_lang['lpn_inp_export_difference_one']='.inp ফরম্যাট যা ধারণ করতে পারে না এমন একটি বিষয়।';
 $ec_lang['lpn_inp_export_refused']='এই প্রকল্পটি EPANET ফাইল হিসেবে লেখা যায় না: {detail}';
@@ -3045,6 +3093,7 @@ $ec_lang['lpn_scenario_overrides']='নিজস্ব মানের সংখ
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='হলুদ বলয়ের অর্থ {name} দৃশ্যকল্পে এই উপাদানের একটি নিজস্ব মান আছে।';
+
 $ec_lang['lpn_scenario_overrides_tip']='প্রতিটি নিজস্ব মান মানচিত্রে একটি হলুদ বলয় দিয়ে চিহ্নিত। সেগুলো ছাড়া অঙ্কন দেখতে {base} বা অন্য কোনো ভিত্তি দৃশ্যকল্পে যান।';
 $ec_lang['lpn_scenario_menu']='দৃশ্যকল্প';
 $ec_lang['lpn_scenario_tip']='অঙ্কনটি এখন যে মানগুলো দেখাচ্ছে এবং পাতাটি যে মানগুলো সমাধান করছে, তার সেট। দৃশ্যকল্প পরিবর্তন করতে, অথবা একটি যোগ, নাম পরিবর্তন, বা মুছে ফেলতে ক্লিক করুন।';
@@ -3053,10 +3102,11 @@ $ec_lang['lpn_scenario_new_name']='দৃশ্যকল্প {n}';
 $ec_lang['lpn_scenario_prompt_name']='এই দৃশ্যকল্পের নাম';
 $ec_lang['lpn_scenario_rename']='দৃশ্যকল্পের নাম পরিবর্তন করুন…';
 $ec_lang['lpn_scenario_delete']='দৃশ্যকল্প মুছুন';
-$ec_lang['lpn_scenario_delete_confirm']='{name} দৃশ্যকল্প এবং তার নিজস্ব মানগুলো ({n}) মুছবেন? অঙ্কন নিজে বদলায় না।';
-$ec_lang['lpn_scenario_override']='এই দৃশ্যকল্পে নিজস্ব মান';
+
+
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='টিক দেওয়া মানে এই দৃশ্যকল্প এই মানের জন্য তার ভিত্তিকে অগ্রাহ্য করে, সংখ্যা একই হলেও। ভিত্তির মান ব্যবহার করতে বাক্সের টিক তুলে দিন।';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3067,31 +3117,142 @@ $ec_lang['lpn_scenario_deactivated']='{scenario}-এ {id} নেটওয়া�
 $ec_lang['lpn_scenario_delete_in_base']='অঙ্কন থেকে সরাতে {base} দৃশ্যকল্পে এটি মুছুন।';
 $ec_lang['lpn_scenario_only_deleted']='{id} মুছে ফেলা হয়েছে। এটি শুধু {scenario}-এর অংশ ছিল।';
 $ec_lang['lpn_scenario_delete_blocked']='{id} মোছা হয়নি, কারণ {link} লিংক এতে শেষ হয়, এবং সেই লিংক {scenario}-এর বাইরেও আছে। দুটোই মুছতে {base} দৃশ্যকল্পে মুছুন।';
-$ec_lang['lpn_scenario_push_btn']='সব দৃশ্যকল্পে ভিত্তির মান প্রয়োগ করুন';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='যেসব বৈশিষ্ট্যের লেবেল এখন দেখানো হচ্ছে, সেগুলোর জন্য প্রতিটি দৃশ্যকল্প ভিত্তির মানে ফিরে যায়। যেকোনো দৃশ্যকল্পে এগুলোর জন্য প্রবেশ করানো মানগুলো বাতিল করা হয়।';
 $ec_lang['lpn_scenario_basic']='সাধারণ মোড';
 $ec_lang['lpn_scenario_basic_tip']='টিক দেওয়া: একটি দৃশ্যকল্প শুধু তাতে নির্ধারিত মান নিয়ে গঠিত। টিক ছাড়া: এই মেনুতে বিকল্পগুলোর প্রিভিউ সারণিও পাওয়া যায়, যা দেখায় সেই মানগুলো ক্যাটাগরি অনুযায়ী কীভাবে সাজানো, এবং একটি দৃশ্যকল্পকে আলাদা মোট রান সময় ও হাইড্রোলিক টাইম স্টেপ রাখতে দেয়। এই বৈশিষ্ট্য নিয়ে মতামত স্বাগত।';
-$ec_lang['lpn_alt_title']='বিকল্পগুলোর প্রিভিউ';
-$ec_lang['lpn_alt_calc_options']='হিসাবের অপশন';
-$ec_lang['lpn_alt_note']='ভিত্তি প্রতিটি ক্যাটাগরির ভিত্তি বিকল্প ব্যবহার করে। যে ক্যাটাগরি পরিবর্তিত হয়, তার জন্য প্রতিটি দৃশ্যকল্পের একটি আলাদা বিকল্প থাকে, যা ভিত্তি বিকল্পের সন্তান। সংখ্যাটি পরিবর্তিত মানের সংখ্যা। শেষ তিনটি কলাম হিসাবের অপশন: দৃশ্যকল্পের জন্য একটি মান লিখুন, অথবা ভিত্তির মান ব্যবহার করতে ফাঁকা রাখুন। প্রকল্পের মানগুলো সেটিংস, হিসাব, সময়-এ আছে।';
-$ec_lang['lpn_scenario_duration_tip']='ভিত্তির মান পেতে ফাঁকা রাখুন। মোট রান সময় 0:00 হলো স্থিতাবস্থার রান।';
-$ec_lang['lpn_scenario_hyd_step_tip']='ভিত্তির মান পেতে ফাঁকা রাখুন।';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_time_scn_overrides']='দৃশ্যকল্পের নিজস্ব মান:';
+
+
+
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+
+
+
+
+
+
+
+
+
+
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+
+
+
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_alt_cat_physical']='ভৌত';
 $ec_lang['lpn_alt_cat_demand']='চাহিদা';
 $ec_lang['lpn_alt_cat_topology']='উপাদান সক্রিয়করণ';
+
 $ec_lang['lpn_alt_cat_initial']='প্রাথমিক সেটিংস';
 $ec_lang['lpn_alt_cat_constituent']='উপাদান-পদার্থ';
 $ec_lang['lpn_alt_cat_fireflow']='অগ্নিনির্বাপণ প্রবাহ';
 $ec_lang['lpn_alt_cat_energy']='শক্তি খরচ';
 $ec_lang['lpn_alt_cat_userdata']='কাস্টম বৈশিষ্ট্য';
 $ec_lang['lpn_alt_cat_text']='টেক্সট';
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='প্রতিটি দৃশ্যকল্পকে এই বৈশিষ্ট্যগুলোর জন্য ভিত্তির মান ব্যবহার করাবেন? যেকোনো দৃশ্যকল্পে এগুলোর জন্য প্রবেশ করানো মানগুলো বাতিল করা হবে। আপনি এটি পূর্বাবস্থায় ফেরাতে পারবেন।';
-$ec_lang['lpn_scenario_push_scenarios']='প্রভাবিত দৃশ্যকল্প:';
-$ec_lang['lpn_scenario_push_values']='বাদ যাওয়া মান:';
-$ec_lang['lpn_scenario_push_none']='এই বৈশিষ্ট্যগুলোর কোনোটির জন্য কোনো দৃশ্যকল্প ভিত্তিকে অগ্রাহ্য করে না, তাই কিছুই বদলাবে না। কিছুই বাদ যায় না।';
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. প্রবাহ পরীক্ষা: স্থির';
@@ -3231,6 +3392,8 @@ $ec_lang['lpn_time_run_fell_back']='স্ক্রিনে দেখানো 
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='এই নিয়ন্ত্রণগুলো এমন একটি উপাদানের নাম বলে যা আর এই প্রকল্পে নেই, তাই সেগুলো বাদ দেওয়া হয়েছে: {ids}';
 $ec_lang['lpn_control_unreadable_note']='এই নিয়ন্ত্রণগুলো পড়া যায়নি, তাই সেগুলো বাদ দেওয়া হয়েছে: {ids}';
+
+
 $ec_lang['lpn_rule_dangling_note']='এই নিয়মগুলো এমন একটি উপাদানের কথা বলে যা আর এই প্রকল্পে নেই, তাই এই চালানোয় সেগুলো উপেক্ষা করা হয়েছে: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='এই নিয়মগুলো পড়া যায়নি, তাই এই চালানোয় সেগুলো উপেক্ষা করা হয়েছে: {ids}';
 $ec_lang['lpn_settings_text_size']='টেক্সটের আকার (পিক্সেল)';
@@ -3783,9 +3946,7 @@ $ec_lang['lpn_energy_curve_note']='এই পাম্পগুলো একট�
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='ক্রম';
 $ec_lang['lpn_labels_col_drop']='বাদ';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -4010,6 +4171,8 @@ $ec_lang['lpn_library_pattern_default_mark']='(ডিফল্ট)';
 $ec_lang['lpn_library_pattern_default_tip']='ডিফল্ট চাহিদা প্যাটার্ন। সেটিংস, ডিফল্ট চাহিদা প্যাটার্ন-এ এটি বদলান।';
 $ec_lang['lpn_library_pattern_default_deleted_to']='{id} প্যাটার্নটি ডিফল্ট চাহিদা প্যাটার্ন ছিল। প্যাটার্নবিহীন সংযোগস্থলগুলো এখন {now} প্যাটার্ন ব্যবহার করে।';
 $ec_lang['lpn_library_pattern_default_deleted_none']='{id} প্যাটার্নটি ডিফল্ট চাহিদা প্যাটার্ন ছিল। প্যাটার্নবিহীন সংযোগস্থলগুলো এখন ধ্রুবক চাহিদা ব্যবহার করে।';
+
+
 $ec_lang['lpn_library_control_add']='একটি নিয়ন্ত্রণ যোগ করুন';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -4572,4 +4735,4 @@ $ec_lang['lpn_snip_tip_eraser']='ইরেজার: একটি আঁচড�
 $ec_lang['lpn_snip_tip_undo']='পূর্বাবস্থায় ফিরুন (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='পুনরায় করুন (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='কপি করুন (Ctrl+C)';
-$ec_lang['lpn_screenshot_scale_tip']='স্ক্রিনের এলাকার গুণিতক হিসেবে ছবির আকার। বড়টি বেশি স্পষ্ট এবং ফাইল বড় করে।';
+$ec_lang['lpn_screenshot_scale_tip']='স্ক্রিনের এলাকার গুণিতক হিসেবে ছবির আকার। বড়টি বেশি স্পষ্ট এবং ফাইল বড় করে।';$ec_lang['lpn_guide_text_alt_box']='প্রতিটি দৃশ্যকল্পের জন্য দেখায় যে এটি প্রতিটি বিভাগে কোন বিকল্প ব্যবহার করে, যেমন ভৌত, চাহিদা এবং উপাদান সক্রিয়করণ, এবং এর গণনার বিকল্পগুলো: চাহিদা গুণক, মোট রান সময় ও হাইড্রোলিক সময় ধাপ। বিকল্পগুলো শুধু পড়ার জন্য। একটি দৃশ্যকল্পের গণনার বিকল্প এখানে লেখা যায়, এবং ফাঁকা রাখলে তার প্যারেন্টের মান ব্যবহার হয়। সাধারণ মোড বন্ধ করার পর দৃশ্যকল্প মেনু থেকে এটি খুলুন।';$ec_lang['lpn_guide_how_alt']='সাধারণ মোড বন্ধ থাকলে বিকল্পগুলোর প্রিভিউ পানি, দৃশ্যকল্প-এর অধীনে তালিকাভুক্ত থাকে।';$ec_lang['lpn_alt_calc_options']='হিসাবের অপশন';$ec_lang['lpn_scenario_duration_tip']='ভিত্তির মান পেতে ফাঁকা রাখুন। মোট রান সময় 0:00 হলো স্থিতাবস্থার রান।';$ec_lang['lpn_scenario_hyd_step_tip']='ভিত্তির মান পেতে ফাঁকা রাখুন।';

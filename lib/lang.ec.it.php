@@ -708,6 +708,7 @@ $ec_lang['lpn_node_customers_tip']='Elenco dei clienti aggiunti qui perché ques
 $ec_lang['lpn_node_customers_sum']='{total} {unit} da Clienti ({n})';
 $ec_lang['lpn_customer_detached']='⚠ Questo cliente non è collegato a una tubazione, quindi la sua richiesta non è nei risultati. Eliminalo, oppure disegna una tubazione e sposta il cliente su di essa.';
 $ec_lang['lpn_customer_fixed_head']='⚠ L\'estremità più vicina di quella tubazione ha una superficie dell\'acqua fissa, quindi questa richiesta non influisce sulla simulazione.';
+
 $ec_lang['lpn_customer_detached_count']='Clienti non collegati a una tubazione ({n}). La loro richiesta non è considerata.';
 $ec_lang['lpn_meter_pick_pipe']='Ora seleziona la tubazione o il nodo che serve questo cliente. Il cliente resta dove lo hai messo. Premi Esc per annullare.';
 $ec_lang['lpn_inp_export_flat_customers']='Un file EPANET non ha clienti. La richiesta dei clienti di questo progetto ({n}) è scritta come riga di richiesta sul nodo a cui ciascun cliente è assegnato, e ogni riga prende il nome dal tag del cliente. Il file non registra il cliente stesso: la sua posizione, la tubazione che lo serve, il punto lungo quella tubazione in cui il servizio si collega, o quanti servizi rappresenta. Queste informazioni restano nel progetto; salva il file di progetto per conservarle.';
@@ -992,7 +993,6 @@ $ec_lang['lpn_guide_text_contour_box']='Controlla il tracciato delle curve di li
 $ec_lang['lpn_guide_text_scncmp_box']='Risolve ogni scenario a partire da una copia del disegno e tabula, per ciascuno, il numero di valori personalizzati, la pressione minima e la velocità massima. Non modifica il progetto, e lo scenario aperto resta com\'era.';
 $ec_lang['lpn_guide_text_rptbox']='Mostra il rapporto di testo scritto dal motore EPANET per l\'ultima simulazione a periodo esteso, compresi gli avvisi e il riepilogo della rete. Ogni simulazione a periodo esteso lo sostituisce; una soluzione in un singolo istante non lo sostituisce, e una modifica lascia il rapporto precedente al suo posto.';
 $ec_lang['lpn_guide_text_status_box']='Elenca, in ordine temporale, ogni variazione durante l\'ultima simulazione a periodo esteso: l\'apertura o la chiusura di una pompa, una valvola o una tubazione, una vasca che inizia a riempirsi o a svuotarsi o che diventa piena o vuota, e ogni passo temporale che non è giunto completamente a convergenza. Sono elencate solo le variazioni, non ogni passo temporale.';
-$ec_lang['lpn_guide_text_alt_box']='Mostra, per ogni scenario, quale alternativa usa in ciascuna categoria, come Fisica, Richiesta e Attivazione degli elementi, e le sue opzioni di calcolo: moltiplicatore della richiesta, durata totale della simulazione e passo temporale idraulico. Le alternative sono di sola lettura. Le opzioni di calcolo di uno scenario si possono digitare qui, e un campo vuoto usa il valore dello scenario da cui deriva. Si apre dal menu Scenari dopo aver deselezionato Modalità base.';
 $ec_lang['lpn_guide_text_full_box']='Elenca ogni nodo e ogni collegamento a ogni passo temporale di rapporto, nelle unità mostrate nel pannello Tabelle. Senza una simulazione a periodo esteso, mostra la soluzione corrente in un singolo istante. Scarica o Stampa include tutti i passi temporali, mentre la tabella ne mostra uno alla volta.';
 $ec_lang['lpn_guide_text_calib_box']='Confronta un file di misure di campo con i risultati calcolati negli stessi punti e agli stessi istanti, un file per ciascun parametro. Il file è conservato solo per la sessione corrente e non è salvato con il progetto.';
 $ec_lang['lpn_guide_text_notes_popup']='Elenca note su come si comporta questa pagina e su ciò che non fa, ciascuna come un termine seguito dalla sua definizione. Non modifica la rete.';
@@ -1020,7 +1020,6 @@ $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?<
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='Anche in {menu}';
 $ec_lang['lpn_guide_how_popup']='Proprietà si apre quando selezioni un elemento o un testo.';
-$ec_lang['lpn_guide_how_alt']='Anteprima Alternative è elencata sotto Acqua, Scenari quando Modalità base è deselezionata.';
 $ec_lang['lpn_guide_not_shown']='Questo controllo al momento non è sullo schermo.';
 // The box's two context headings. "Tables" holds the two table-help entries that used to sit only
 // in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
@@ -1475,8 +1474,20 @@ $ec_lang['lpn_pane_sel_only_none']='Nessun elemento è selezionato. Seleziona pr
 // Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
 // scenario, with a Scenario column after ID.
 $ec_lang['lpn_pane_scn_show']='Mostra scenari';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+
+
+
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+
+
+
+
 $ec_lang['lpn_pane_clear_override']='Cancella valore personalizzato';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -1532,20 +1543,29 @@ $ec_lang['lpn_menu_project']='Acqua';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='Tutto ciò che è specifico della modellazione di reti idriche (tranne i comandi di riproduzione dell\'animazione)';
 $ec_lang['lpn_tables_menu']='Tabelle';
-// Water > Change type (Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// Water > Morph (Task 781; Tom, 2026-10-14: *"I like the term 'Morph' (Transform) for this feature"*;
+// first built as Change type, Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
 // to Change node type for any asset, where if it has information that can't be ported to the new
 // type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
 // asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
 // popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
 // dev/asset-type.md.
-$ec_lang['lpn_change_type_menu']='Cambia tipo';
-$ec_lang['lpn_change_type_tip']='Cambia i nodi selezionati in nodi di giunzione, serbatoi o vasche, oppure i collegamenti selezionati in tubazioni, pompe o valvole. Ciascuno mantiene il proprio ID, la propria posizione, i propri collegamenti e ogni valore che anche il nuovo tipo possiede. Se qualcosa andrebbe perso, viene richiesta prima una conferma.';
-$ec_lang['lpn_change_type_ok']='Cambia';
+$ec_lang['lpn_morph_menu']='Cambia tipo';
+$ec_lang['lpn_morph_tip']='Cambia i nodi selezionati in nodi di giunzione, serbatoi o vasche, oppure i collegamenti selezionati in tubazioni, pompe o valvole. Ciascuno mantiene il proprio ID, la propria posizione, i propri collegamenti e ogni valore che anche il nuovo tipo possiede. Se qualcosa andrebbe perso, viene richiesta prima una conferma.';
+$ec_lang['lpn_morph_ok']='Cambia';
+// {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
+// when a node type was chosen), separated by commas.
+
+// The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
+// scenario, beside the override marker.
+
+
 $ec_lang['lpn_change_type_lost']='Questi valori andranno persi:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
 $ec_lang['lpn_change_type_key']='Ogni riga: ID: la proprietà e il valore che andrebbero persi';
 $ec_lang['lpn_change_type_line']='{id}: {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, nello scenario {scenario}';
+
 $ec_lang['lpn_change_type_more']='E altri {n}.';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.
@@ -1614,6 +1634,32 @@ $ec_lang['lpn_confirm_delete_network']='Eliminare ogni nodo, tubazione ed etiche
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='Trova e sostituisci';
+// Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
+// placement are never pasted.
+
+
+
+
+
+
+
+
+
+
+// The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
+// opens the in-place editor; Reset position sends a dragged label or an attached Text home.
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_find_title']='Trova e sostituisci';
 $ec_lang['lpn_find_scope']='Cosa cercare';
 $ec_lang['lpn_find_scope_all']='Tutto';
@@ -2056,6 +2102,8 @@ $ec_lang['lpn_status_inp_exported_picture']='Esportato {zip}, che contiene il fi
 $ec_lang['lpn_status_inp_exported_no_picture']='Esportato {file}. Non è stato possibile salvare l\'immagine di sfondo, quindi il file .inp non ne indica alcuna; in EPANET, aggiungila con View > Backdrop > Load.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+
+
 $ec_lang['lpn_inp_export_differences']='{n} cose che il formato .inp non può contenere.';
 $ec_lang['lpn_inp_export_difference_one']='Una cosa che il formato .inp non può contenere.';
 $ec_lang['lpn_inp_export_refused']='Questo progetto non può essere scritto come file EPANET: {detail}';
@@ -3045,6 +3093,7 @@ $ec_lang['lpn_scenario_overrides']='N. di valori personalizzati';
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='L\'anello ambra indica che questo elemento ha un valore personalizzato nello scenario {name}.';
+
 $ec_lang['lpn_scenario_overrides_tip']='Ogni valore personalizzato è segnato sulla mappa con un anello ambra. Passa a {base} o a un altro scenario di livello superiore per vedere il disegno senza di essi.';
 $ec_lang['lpn_scenario_menu']='Scenari';
 $ec_lang['lpn_scenario_tip']='L\'insieme di valori che il disegno sta mostrando e che la pagina sta risolvendo in questo momento. Fai clic per cambiare scenario, oppure per aggiungerne, rinominarne o eliminarne uno.';
@@ -3053,10 +3102,11 @@ $ec_lang['lpn_scenario_new_name']='Scenario {n}';
 $ec_lang['lpn_scenario_prompt_name']='Nome per questo scenario';
 $ec_lang['lpn_scenario_rename']='Rinomina scenario…';
 $ec_lang['lpn_scenario_delete']='Elimina scenario';
-$ec_lang['lpn_scenario_delete_confirm']='Eliminare lo scenario {name} e i suoi valori personalizzati ({n})? Il disegno stesso non viene modificato.';
-$ec_lang['lpn_scenario_override']='Valore personalizzato in questo scenario';
+
+
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='Selezionata significa che questo scenario sostituisce quello di livello superiore per questo valore, anche quando il numero è lo stesso. Deseleziona la casella per usare quello di livello superiore.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3067,31 +3117,142 @@ $ec_lang['lpn_scenario_deactivated']='{id} è escluso dalla rete in {scenario}. 
 $ec_lang['lpn_scenario_delete_in_base']='Per rimuoverlo dal disegno, eliminalo nello scenario {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} è eliminato. Faceva parte solo di {scenario}.';
 $ec_lang['lpn_scenario_delete_blocked']='{id} non è eliminato, perché il collegamento {link} termina in esso, e quel collegamento esiste anche al di fuori di {scenario}. Per eliminare entrambi, eliminali nello scenario {base}.';
-$ec_lang['lpn_scenario_push_btn']='Applica i valori di Base a tutti gli scenari';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Ogni scenario torna al valore di Base per le proprietà le cui etichette sono mostrate in questo momento. I valori che appartengono solo a quegli scenari vengono eliminati.';
 $ec_lang['lpn_scenario_basic']='Modalità base';
 $ec_lang['lpn_scenario_basic_tip']='Selezionata: uno scenario è composto solo dai valori impostati in esso. Deselezionata: questo menu offre anche la tabella di anteprima Alternative, che mostra come quei valori sono raggruppati per categoria, e consente a uno scenario di avere una durata totale della simulazione e un passo temporale idraulico separati. I commenti su questa funzione sono benvenuti.';
-$ec_lang['lpn_alt_title']='Anteprima Alternative';
-$ec_lang['lpn_alt_calc_options']='Opzioni di calcolo';
-$ec_lang['lpn_alt_note']='Base usa l\'alternativa Base di ogni categoria. Ogni scenario ha un\'alternativa separata, figlia dell\'alternativa Base, per ogni categoria modificata. Il numero indica quanti valori sono stati modificati. Le ultime tre colonne sono opzioni di calcolo: inserisci un valore per lo scenario, oppure lascia vuoto per usare il valore dello scenario di livello superiore. I valori del progetto sono in Impostazioni, Calcolo, Tempo.';
-$ec_lang['lpn_scenario_duration_tip']='Lascia vuoto per ereditare dallo scenario di livello superiore. Una durata totale della simulazione di 0:00 è una simulazione in regime stazionario.';
-$ec_lang['lpn_scenario_hyd_step_tip']='Lascia vuoto per ereditare dallo scenario di livello superiore.';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_time_scn_overrides']='Valori personalizzati dello scenario:';
+
+
+
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+
+
+
+
+
+
+
+
+
+
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+
+
+
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_alt_cat_physical']='Fisica';
 $ec_lang['lpn_alt_cat_demand']='Richiesta';
 $ec_lang['lpn_alt_cat_topology']='Attivazione degli elementi';
+
 $ec_lang['lpn_alt_cat_initial']='Impostazioni iniziali';
 $ec_lang['lpn_alt_cat_constituent']='Sostanza';
 $ec_lang['lpn_alt_cat_fireflow']='Portata antincendio';
 $ec_lang['lpn_alt_cat_energy']='Costo dell\'energia';
 $ec_lang['lpn_alt_cat_userdata']='Proprietà personalizzate';
 $ec_lang['lpn_alt_cat_text']='Testo';
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Far usare a tutti gli scenari i valori di Base per queste proprietà? I valori che appartengono solo a quegli scenari vengono eliminati. Puoi annullare questa azione.';
-$ec_lang['lpn_scenario_push_scenarios']='Scenari coinvolti:';
-$ec_lang['lpn_scenario_push_values']='Valori eliminati:';
-$ec_lang['lpn_scenario_push_none']='Nessuno scenario ha un valore personalizzato per queste proprietà, quindi non cambierebbe nulla. Non viene eliminato nulla.';
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. Prova di portata: statica';
@@ -3231,6 +3392,8 @@ $ec_lang['lpn_time_run_fell_back']='I numeri sullo schermo provengono invece dal
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='Questi controlli nominano un elemento che non è più in questo progetto, quindi sono stati esclusi: {ids}';
 $ec_lang['lpn_control_unreadable_note']='Non è stato possibile leggere questi controlli, quindi sono stati esclusi: {ids}';
+
+
 $ec_lang['lpn_rule_dangling_note']='Queste regole fanno riferimento a un elemento non più presente in questo progetto, quindi sono state ignorate in questo calcolo: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='Non è stato possibile leggere queste regole, quindi sono state ignorate in questo calcolo: {ids}';
 $ec_lang['lpn_settings_text_size']='Dimensione del testo (pixel)';
@@ -3783,9 +3946,7 @@ $ec_lang['lpn_energy_curve_note']='Queste pompe fanno riferimento a una curva di
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Posizione';
 $ec_lang['lpn_labels_col_drop']='Scarto';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -4010,6 +4171,8 @@ $ec_lang['lpn_library_pattern_default_mark']='(predefinito)';
 $ec_lang['lpn_library_pattern_default_tip']='Il modello di richiesta predefinito. Si modifica in Impostazioni, Modello di richiesta predefinito.';
 $ec_lang['lpn_library_pattern_default_deleted_to']='Il modello {id} era il modello di richiesta predefinito. I nodi senza modello ora usano il modello {now}.';
 $ec_lang['lpn_library_pattern_default_deleted_none']='Il modello {id} era il modello di richiesta predefinito. I nodi senza modello ora usano una richiesta costante.';
+
+
 $ec_lang['lpn_library_control_add']='Aggiungi un controllo';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -4572,4 +4735,4 @@ $ec_lang['lpn_snip_tip_eraser']='Gomma: fai clic su un tratto per rimuoverlo (E)
 $ec_lang['lpn_snip_tip_undo']='Annulla (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Ripristina (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Copia (Ctrl+C)';
-$ec_lang['lpn_screenshot_scale_tip']='La dimensione dell\'immagine come multiplo dell\'area sullo schermo. Un multiplo maggiore dà un\'immagine più nitida e un file più grande.';
+$ec_lang['lpn_screenshot_scale_tip']='La dimensione dell\'immagine come multiplo dell\'area sullo schermo. Un multiplo maggiore dà un\'immagine più nitida e un file più grande.';$ec_lang['lpn_guide_text_alt_box']='Mostra, per ogni scenario, quale alternativa usa in ciascuna categoria, come Fisica, Richiesta e Attivazione degli elementi, e le sue opzioni di calcolo: moltiplicatore della richiesta, durata totale della simulazione e passo temporale idraulico. Le alternative sono di sola lettura. Le opzioni di calcolo di uno scenario si possono digitare qui, e un campo vuoto usa il valore dello scenario da cui deriva. Si apre dal menu Scenari dopo aver deselezionato Modalità base.';$ec_lang['lpn_guide_how_alt']='Anteprima Alternative è elencata sotto Acqua, Scenari quando Modalità base è deselezionata.';$ec_lang['lpn_alt_calc_options']='Opzioni di calcolo';$ec_lang['lpn_scenario_duration_tip']='Lascia vuoto per ereditare dallo scenario di livello superiore. Una durata totale della simulazione di 0:00 è una simulazione in regime stazionario.';$ec_lang['lpn_scenario_hyd_step_tip']='Lascia vuoto per ereditare dallo scenario di livello superiore.';

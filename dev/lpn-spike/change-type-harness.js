@@ -61,7 +61,10 @@ const INJECT =
 	"\t\tseedDefaultInputs: seedDefaultInputs, addNode: addNode, addLink: addLink,\n" +
 	"\t\teffective: effective, setProp: setProp, setCustomProp: setCustomProp,\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario, baseScenario: baseScenario,\n" +
-	"\t\tserializeProject: serializeProject, undo: undo,\n" +
+	"\t\tserializeProject: serializeProject, undo: undo, promoteImplicitAlternative: promoteImplicitAlternative,\n" +
+	// A scenario's values as it resolves them, wherever they are held (since 2026-10-12 an override
+	// stores the scenario's own alternative).
+	"\t\town: function (s) { return resolvedOverrides(s); },\n" +
 	"\t\tsetSelectionList: setSelectionList, changeSelectedNodeType: changeSelectedType, changeSelectedType: changeSelectedType,\n" +
 	"\t\tchangeTypeRows: changeTypeRows, nodeById: nodeById, linkById: linkById,\n" +
 	"\t\tincident: function (id) { return incidentLinks[id]; },\n" +
@@ -211,13 +214,46 @@ function run(mutate, quiet) {
 		ok('4.2 ...and the scenario\'s own, by name, led by the ID and a colon', text.split('\n').some(l => l.indexOf(J + ': ') === 0 && l.indexOf('Max day') > 0 && l.indexOf(' 25') > 0), text);
 		ok('4.3 Cancel: byte-identical, scenarios included', snap() === before);
 		change(J, 'tank', true);
-		const ov = (L.getScenarios().filter(s => s.id === scn.id)[0] || {}).overrides || {};
+		const ov = L.own(L.getScenarios().filter(s => s.id === scn.id)[0] || null) || {};
 		const key = Object.keys(ov).filter(k => k.slice(-J.length - 1) === ':' + J)[0];
 		ok('4.4 the scenario\'s demand override went with the type', !key || !('demand' in ov[key]),
 			JSON.stringify(ov));
 		ok('4.5 ...and its initial-quality override, which a tank also has, stayed',
 			!!key && ov[key].initQuality === 1.2, JSON.stringify(ov));
 		ok('4.6 undo restores the scenario\'s override too', (L.undo(), snap() === before));
+	}
+
+	// feat/bentley-interop's seam (dev/asset-type.md): a value held in a STORED alternative (Advanced
+	// mode's tree) is listed by the alternative's name and goes with the type, as a scenario's does;
+	// a value the new type also has stays in it; one undo puts it all back.
+	say('\n--- 4b. a stored alternative\'s override of a lost value is listed and discarded too ---');
+	{
+		const n = L.nodeById(J);
+		const scn = L.createScenario('Peak alt');
+		L.setProp(n, 'demand', 33);
+		L.setProp(n, 'initQuality', 0.7);
+		// The two writes stored the scenario's own Demand and Constituent alternatives, both named
+		// "Peak alt" after it; renamed here so the box's lines can be told apart.
+		const altOf = (cat) => (L.getDoc().alternatives || []).filter(x => x.category === cat && x.id === (scn.alternatives || {})[cat])[0];
+		const altD = altOf('demand'), altQ = altOf('constituent');
+		if (altD) { altD.name = 'Peak demand'; }
+		if (altQ) { altQ.name = 'Peak quality'; }
+		L.switchScenario(L.baseScenario().id);
+		const alts = () => L.getDoc().alternatives || [];
+		const valuesOf = (name) => { const a = alts().filter(x => x.name === name)[0]; return a ? (a.values || {})['n:' + J] || {} : null; };
+		ok('4b.0 the demand and the initial quality now live in two stored alternatives', !!altD && !!altQ &&
+			valuesOf('Peak demand').demand === 33 && valuesOf('Peak quality').initQuality === 0.7, JSON.stringify(alts()));
+		const before = snap();
+		const q = change(J, 'tank', false);
+		const text = q[0] || '';
+		ok('4b.1 the box lists the alternative\'s demand by the alternative\'s name, led by the ID',
+			text.split('\n').some(l => l.indexOf(J + ': ') === 0 && l.indexOf('Peak demand') > 0 && l.indexOf(' 33') > 0), text);
+		ok('4b.2 Cancel: byte-identical, alternatives included', snap() === before);
+		change(J, 'tank', true);
+		ok('4b.3 the alternative\'s demand went with the type', !('demand' in (valuesOf('Peak demand') || {})), JSON.stringify(alts()));
+		ok('4b.4 ...and the other alternative\'s initial quality, which a tank also has, stayed', (valuesOf('Peak quality') || {}).initQuality === 0.7, JSON.stringify(alts()));
+		ok('4b.5 one undo restores the alternative\'s override too', (L.undo(), snap() === before));
+		ok('4b.6 ...the node a junction again', L.nodeById(J).type === 'junction');
 	}
 
 	say('\n--- 5. custom properties follow their own "Applies to" ---');
@@ -349,7 +385,7 @@ function run(mutate, quiet) {
 		const low = L.createScenario('Low tank');
 		L.setProp(t2, 'level', 100);
 		L.switchScenario(L.baseScenario().id);
-		const ovOf = () => (L.getScenarios().filter(x => x.id === low.id)[0].overrides || {})['n:2'] || {};
+		const ovOf = () => L.own(L.getScenarios().filter(x => x.id === low.id)[0])['n:2'] || {};
 		let q = change('2', 'reservoir', true);
 		ok('11.1b the scenario\'s depth 100 became its head 950, and the box names it',
 			ovOf().head === 950 && !('level' in ovOf()) && (q[0] || '').indexOf('Low tank') >= 0, JSON.stringify(ovOf()));
@@ -666,8 +702,10 @@ function run(mutate, quiet) {
 		L.setProp(L.linkById('10'), 'typeId', 'DI30');
 		L.switchScenario(L.baseScenario().id);
 		const q = changeLink('10', 'valve', true);
-		ok('19.1 the box says that scenario\'s diameter 30 in becomes Base\'s 18 in',
-			(q[0] || '').indexOf('10: ' + PC.lpn_field_diameter + ' 30 in, in scenario S1, becomes 18 in') >= 0, q[0]);
+		// The type is held in S1's own Physical alternative (an override stores it, 2026-10-12), so
+		// the line names the alternative, as every value an alternative holds is named.
+		ok('19.1 the box says that S1\'s alternative loses its diameter 30 in',
+			(q[0] || '').indexOf('10: ' + PC.lpn_field_diameter + ' 30 in, ' + PC.lpn_change_type_line_alternative.split('{value}, ')[1].replace('{alternative}', 'S1')) >= 0, q[0]);
 		L.switchScenario(s1.id);
 		ok('19.2 ...and so it is', L.effective(L.linkById('10'), 'diameter') === 18, String(L.effective(L.linkById('10'), 'diameter')));
 		L.switchScenario(L.baseScenario().id);
@@ -696,6 +734,9 @@ const MUTATIONS = [
 		"if (n._head >= e) { out.base = { value: n._head - e }; }", "")],
 	['a converted node shows freshly derived results', src => src.replace(
 		"\t\tvar held = heldTypeChange(n, 'pressure');\n\t\tif (held !== undefined) { return held; }\n", "")],
+	['a stored alternative\'s overrides are not walked', src => src.replace(
+		"\t\t\tif (owner.isBase || !plainObject(map[key])) { return; }\n\t\t\tfn(map[key], owner, map);",
+		"\t\t\tif (owner.isBase || !plainObject(map[key]) || scenarios.indexOf(owner) < 0) { return; }\n\t\t\tfn(map[key], owner, map);")],
 	['scenario overrides survive', src => src.replace(
 		"spec.props.forEach(function (p) { delete ov[p]; });", "spec.props.forEach(function (p) { void ov[p]; });")],
 	// The link half (sections 12-17).
