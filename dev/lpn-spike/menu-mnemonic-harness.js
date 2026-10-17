@@ -304,6 +304,19 @@ async function preReviewSuite(browser, open) {
 		return { got, rows: rs };
 	};
 	const before = await fixedLetters();
+	// Tom, 2026-10-16: the managers, then the mode, a rule, the commands, a rule, the scenarios (Base
+	// first), so Basic mode and Base are never neighbours. Read from the open fly-out, labels from the
+	// language file.
+	const order = await page.evaluate(() => Array.from(document.querySelector('#lpn_menu_list2').children)
+		.map((e) => e.tagName === 'HR' ? '-' : e.textContent.replace(/^[✓\s]+/, '').replace(/[▸\s]+$/, '')));
+	const starts = (e, w) => e === w || e.indexOf(w) === 0;
+	const sepAt = order.map((e, i) => e === '-' ? i : -1).filter((i) => i >= 0);
+	ok('Scenarios menu: two rules, one after the mode row and one before the scenarios', sepAt.length === 2, JSON.stringify(order));
+	ok('Scenarios menu order: Scenario manager, Manage overrides, Basic mode, rule, New...Delete, rule, Base',
+		sepAt.length === 2 && starts(order[0], pc.lpn_sm_menu) && starts(order[1], pc.lpn_sm_list_overrides) && order[2] === pc.lpn_scenario_basic
+		&& sepAt[0] === 3 && starts(order[4], pc.lpn_scenario_new) && starts(order[sepAt[1] - 1], pc.lpn_scenario_delete)
+		&& order[sepAt[1] + 1].indexOf(pc.lpn_scenario_base) === 0, JSON.stringify(order));
+	ok('Scenarios menu: the Basic mode row and the Base row are not adjacent', order.indexOf(pc.lpn_scenario_basic) + 1 < order.indexOf('-', 4) && order[order.indexOf(pc.lpn_scenario_basic) + 1] === '-', JSON.stringify(order));
 	await page.evaluate(() => { window.prompt = () => 'Delta'; window.prompt2 = 1; });
 	const newM = before.got[0];
 	await page.keyboard.press(newM);   // New scenario..., named Delta (takes D first if allowed)

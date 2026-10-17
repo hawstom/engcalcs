@@ -5159,9 +5159,9 @@
             "answer": "OK."
         },
         "lpn_scenario_delete_has_children": {
-            "on": "The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or move them to another parent.",
-            "ruled": "2026-10-16",
-            "answer": "His own edit of 2026-10-16 (\"move them another parent\"); CC added \"to\"."
+            "on": "The scenario {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.",
+            "ruled": "2026-10-17",
+            "answer": "His call: \"I would rather say 'has children' if that is precise.\" (it is)"
         },
         "lpn_scenario_delete_stays": {
             "on": "These alternatives it uses stay in the project: {list}.",
@@ -5201,16 +5201,6 @@
         },
         "lpn_scenario_preset_average_day_tip": {
             "on": "Demand multiplier 1: every demand as entered, which is taken to be average day demand.",
-            "ruled": "2026-10-01",
-            "answer": "OK."
-        },
-        "lpn_scenario_preset_fire_max_day": {
-            "on": "7. Fire plus max day",
-            "ruled": "2026-10-01",
-            "answer": "OK."
-        },
-        "lpn_scenario_preset_fire_max_day_tip": {
-            "on": "Max day demand (multiplier 2.0). Run Fire flow analysis in this scenario: it adds the fire flow at each junction on top of this demand.",
             "ruled": "2026-10-01",
             "answer": "OK."
         },
@@ -5950,6 +5940,11 @@
             "ruled": "2026-10-16",
             "answer": "I approve all three."
         },
+        "lpn_sm_alt_delete_has_children": {
+            "on": "The alternative {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.",
+            "ruled": "2026-10-17",
+            "answer": "His call: \"I would rather say 'has children' if that is precise.\" (it is)"
+        },
         "lpn_sm_base_kept": {
             "on": "The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.",
             "ruled": "2026-10-16",
@@ -6026,9 +6021,9 @@
             "answer": "OK."
         },
         "lpn_sm_list_overrides": {
-            "on": "Manage overrides",
-            "ruled": "2026-10-16",
-            "answer": "OK."
+            "on": "Override manager…",
+            "ruled": "2026-10-17",
+            "answer": "Asked \"Scenario manager…\" / \"Override manager…\": \"Yes. Proceed.\""
         },
         "lpn_sm_list_overrides_none": {
             "on": "This scenario has no overrides.",

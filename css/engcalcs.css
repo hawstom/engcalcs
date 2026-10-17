@@ -6097,3 +6097,19 @@ textarea.lpn-desc-ta {
 }
 /* A name tip that keeps its text's line breaks (data-ec-tip-lines: a multi-line Description). */
 .tooltip.ec-tip-lines .tooltip-inner { white-space: pre-line; text-align: start; max-width: 28em; }
+
+/* The Beta marker at the top of the GeoJSON network import's dialog (Task 728). */
+.lpn-gjnet-beta { margin: 0 0 6px; font-size: 0.85em; color: var(--ec-ink-muted); cursor: help; }
+
+/* The GeoJSON network import's mapping table (Task 728): one card per field on a narrow screen,
+   so the Unit select stays on screen at 390 px instead of past a sideways scroll. Each cell names
+   its column in data-label; the heading row is hidden. */
+@media (max-width: 600px) {
+	.lpn-gjnet-table, .lpn-gjnet-table tr, .lpn-gjnet-table td { display: block; }
+	.lpn-gjnet-table tr:first-child { display: none; }
+	.lpn-gjnet-table tr { padding: 4px 0; border-bottom: 1px solid var(--ec-border); }
+	.lpn-gjnet-table td { padding: 1px 0; }
+	.lpn-gjnet-table td.lpn-gjnet-field { font-weight: bold; }
+	.lpn-gjnet-table td[data-label]::before { content: attr(data-label) ": "; }
+	.lpn-gjnet-table select { max-width: 100%; }
+}

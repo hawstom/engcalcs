@@ -9,7 +9,7 @@
 //      list's fields for that asset, as "Name: value" with the label's formatting (Length 5280', not
 //      5280.00; Pressure to 3 decimals), ticked or not; and none of the Properties box's extras
 //      (position, custom property, Is active, From/To, pipe type). Status reads Open or Closed.
-//   2. A Description is ONE row, its line break written \P as Tables writes it.
+//   2. NO DESCRIPTION ROW: a node and a customer that have one show none (Tom, 2026-10-17); Tag stays.
 //   3. REST ON A LABEL, NO CARD: the pointer resting on the asset's map label opens nothing; on the
 //      symbol or line it does.
 //   4. WHICH BOXES ARE TICKED MAKES NO DIFFERENCE: tick set, nothing ticked, everything ticked: equal.
@@ -221,8 +221,8 @@ async function main() {
 			const lines = await cardLines(a.page);
 			ok('resting on junction 11 shows a card', !!lines, JSON.stringify(lines));
 			ok('...led by the ID the map label shows', lines && lines[0] === 'ID: ' + PFX.node + '11', JSON.stringify(lines && lines[0]));
-			ok('...its Description is the label\'s own (first line and an ellipsis; it is in the Labels list)', has(lines, /^Description: Line one \u2026$/) && has(lines, /^Tag: T1$/), JSON.stringify(lines));
-			ok('...exactly the Labels list for a junction, ticked or not', sameSet(names(lines), ['ID', 'Description', 'Tag', 'Base demand', 'Elevation', 'Initial quality', 'Demand', 'Head', 'Pressure', 'Chlorine concentration']), JSON.stringify(names(lines)));
+			ok('...a node WITH a Description shows no Description row (Tom: omit it), and still shows Tag', !has(lines, /^Description/) && has(lines, /^Tag: T1$/), JSON.stringify(lines));
+			ok('...exactly the Labels list for a junction, ticked or not', sameSet(names(lines), ['ID', 'Tag', 'Base demand', 'Elevation', 'Initial quality', 'Demand', 'Head', 'Pressure', 'Chlorine concentration']), JSON.stringify(names(lines)));
 			ok('...formatted as the label is: Elevation 710.00, Pressure to its three decimals', has(lines, /^Elevation: 710\.00$/) && has(lines, /^Pressure: \d+\.\d{3}$/), JSON.stringify(lines));
 			ok('...and none of the Properties box\'s extras (position, custom property, Is active)', !has(lines, /^(X|Y|Route|Is active)/), JSON.stringify(lines));
 			world.node = lines;
@@ -373,7 +373,7 @@ async function main() {
 				await rest(n0, p2);
 				const cl = await cardLines(n0.page);
 				if (name === 'nothing ticked') { world.cust = cl; }
-				ok(name + ': ...and the customer card has every field', !!cl && sameSet(names(cl), ['ID', 'Description', 'Tag', 'Base demand', PC.lpn_field_meter_count, 'Demand']) && has(cl, /^Description: Main Street school$/) && has(cl, /^Number of services: 3$/), JSON.stringify(cl));
+				ok(name + ': ...and the customer card has every field', !!cl && sameSet(names(cl), ['ID', 'Tag', 'Base demand', PC.lpn_field_meter_count, 'Demand']) && !has(cl, /^Description/) && has(cl, /^Number of services: 3$/), JSON.stringify(cl));
 				if (name !== 'nothing ticked') { ok('...the same as with nothing ticked', JSON.stringify(cl) === JSON.stringify(world.cust)); }
 				ok('no page errors (' + name + ')', !n0.errors.length, (n0.errors[0] || '').slice(0, 200));
 			} finally { await n0.close(); }
@@ -422,7 +422,7 @@ async function main() {
 			const pb = await centreOf(dm.page, '#lpn_canvas circle[data-node="13"]');
 			await rest(dm, pa);
 			const lp = await cardLines(dm.page);
-			ok('in Pipe mode, resting on the node about to start a pipe shows its card', !!lp && JSON.stringify(lp.slice(0, 7)) === JSON.stringify(world.node.slice(0, 7)), JSON.stringify(lp));
+			ok('in Pipe mode, resting on the node about to start a pipe shows its card', !!lp && JSON.stringify(lp.slice(0, 5)) === JSON.stringify(world.node.slice(0, 5)), JSON.stringify(lp));
 			await dm.page.mouse.down(); await dm.page.mouse.up();
 			await dm.page.waitForTimeout(300);
 			ok('...the press starts the pipe (the from-node is marked) and the card is gone',
@@ -451,7 +451,7 @@ async function main() {
 					const bx = await cardBox(vv.page), ln = await cardLines(vv.page);
 					ok(view.width + 'x' + view.height + ': ' + what + ' card lies inside the window', !!bx && bx.l >= -0.5 && bx.t >= -0.5 && bx.r <= bx.vw + 0.5 && bx.b <= bx.vh + 0.5, JSON.stringify(bx));
 					if (what === 'junction 11') {
-						ok('...and it kept the Description (shortened to fit if it had to be)', has(ln, /^Description: Line number 1 of the description \u2026$/), JSON.stringify(ln && ln.slice(0, 5)));
+						ok('...and carries no Description row, however long it is', !has(ln, /^Description/), JSON.stringify(ln && ln.slice(0, 5)));
 					}
 				}
 				ok('no page errors (' + view.width + 'x' + view.height + ')', !vv.errors.length, (vv.errors[0] || '').slice(0, 200));

@@ -1,0 +1,14 @@
+{"type":"FeatureCollection","name":"water_assets",
+"crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:OGC:1.3:CRS84"}},
+"features":[
+{"type":"Feature","properties":{"FACILITYID":"HY-1","ELEV_FT":1203.50,"DEMAND":"12.0","OWNER":"City"},"geometry":{"type":"Point","coordinates":[-111.90000,33.40000]}},
+{"type":"Feature","properties":{"FACILITYID":"HY-2","ELEV_FT":1201.25,"DEMAND":0,"OWNER":"City"},"geometry":{"type":"Point","coordinates":[-111.89000,33.40000]}},
+{"type":"Feature","properties":{"FACILITYID":"HY-2","ELEV_FT":1199,"OWNER":"County"},"geometry":{"type":"Point","coordinates":[-111.88000,33.40000]}},
+{"type":"Feature","properties":{"FACILITYID":"BAD","ELEV_FT":1},"geometry":{"type":"Point","coordinates":[512345.6,3712345.7]}},
+{"type":"Feature","properties":{"FACILITYID":"ZONE"},"geometry":{"type":"Polygon","coordinates":[[[-111.9,33.4],[-111.8,33.4],[-111.8,33.5],[-111.9,33.4]]]}},
+{"type":"Feature","properties":{"PIPE_ID":"M-1","DIAM_MM":150.0,"C":130,"MATERIAL":"DIP","LEN":"x"},"geometry":{"type":"LineString","coordinates":[[-111.90000,33.40000],[-111.89500,33.40100],[-111.890001,33.400001]]}},
+{"type":"Feature","properties":{"PIPE_ID":"M-2","DIAM_MM":100,"C":120,"MATERIAL":"PVC"},"geometry":{"type":"LineString","coordinates":[[-111.89000,33.40000],[-111.89000,33.39000]]}},
+{"type":"Feature","properties":{"PIPE_ID":"M-3","DIAM_MM":100,"MATERIAL":"PVC"},"geometry":{"type":"MultiLineString","coordinates":[[[-111.89000,33.39000],[-111.88500,33.39000]],[[-111.88500,33.39000],[-111.88000,33.39000]]]}},
+{"type":"Feature","properties":{"PIPE_ID":"M-4","DIAM_MM":"6 inch","MATERIAL":"AC"},"geometry":{"type":"LineString","coordinates":[[-111.88700,33.39000],[-111.88700,33.38000]]}},
+{"type":"Feature","properties":{"PIPE_ID":"M-5","DIAM_MM":80},"geometry":{"type":"MultiLineString","coordinates":[[[-111.87,33.38],[-111.86,33.38]],[[-111.85,33.38],[-111.84,33.38]]]}}
+]}
