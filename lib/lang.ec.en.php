@@ -4027,6 +4027,8 @@ $ec_lang['lpn_library_pattern_values_tip']='The multipliers, separated by spaces
 // {n} values, {step} apart, covering {span}. Placeholders rather than three joined fragments
 // (Task 193): the order of the three differs by language and a sandwich cannot express that.
 $ec_lang['lpn_library_pattern_span']='Multipliers: {n}, {step} apart, covering {span}';
+// Under the pattern graph, beside the clock-time row: the ordinal of each time period (1, 2, 3).
+$ec_lang['lpn_library_pattern_axis_step']='Step';
 $ec_lang['lpn_library_pattern_none']='No pattern';
 // The blank first option of a selector whose blank follows a project-wide default (a junction's or
 // customer's demand pattern, a pump's price pattern and efficiency curve). Tom, 2026-10-04.
