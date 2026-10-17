@@ -100,13 +100,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/basemap-outdoors (`2a45b1cc2`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/basemap-outdoors (`5b8059020`) — 1 new, 1 to read @@ NEEDS RULING
 
-- **`lpn_basemap_outdoors_show`**
-  > Show outdoors map
+- **`lpn_basemap_topo_show`**
+  > Show topo map
   @@ NEEDS RULING
 
-### feat/bentley-interop (`c0a0f0751`) — 180 new, 180 to read @@ NEEDS RULING
+### feat/bentley-interop (`c1113f136`) — 180 new, 180 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -1972,7 +1972,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Drag to resize
   @@ NEEDS RULING
 
-### feat/theme-dark (`7058e0a16`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/theme-dark (`ced0c2db9`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_settings_theme`**
   > Theme

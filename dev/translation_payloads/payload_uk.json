@@ -2,8 +2,8 @@
     "meta": {
         "language": "uk",
         "expected_key_count": 2638,
-        "delta_key_count": 1,
-        "english_changed_key_count": 0,
+        "delta_key_count": 4,
+        "english_changed_key_count": 3,
         "exempt_key_count": 28,
         "exempt_keys": [
             "u_imgd",
@@ -38,7 +38,8 @@
         "out_of_scope_key_count": 5,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
         "active_prefixes": [
-            "lpn"
+            "lpn",
+            "mtc"
         ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
@@ -55,14 +56,68 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "No glossary term is used by the strings in this batch.",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: витрата\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: ділянка\n- calculator, tool, or program that finds and tells mathematical answers\n    English: calculator\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: зʼєднання",
     "keys_to_translate": {
+        "mtc_n_pi": "n from design rock size (P&I, Phillips & Ingersoll method)",
+        "mtc_iteration_tip": "Choose a roughness option (B\/B, Blodgett–Bathurst, recommended) and a rock size option (Isbash recommended) to auto-iterate toward a uniform rock size for your target flow. See Notes below for the full method, or enter your own roughness value (follow link for guidance) and ignore rock size to skip iteration.",
+        "mtc_note_1": "<dl><dt>Automated rock size and roughness design iteration<\/dt><dd>Choose a roughness option (B\/B, Blodgett–Bathurst, recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The roughness value from the method you chose is copied into the roughness input. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.<\/dd><dt>Basic calculator (no iteration)<\/dt><dd>Enter your desired roughness value. Ignore the design rock size input area.<\/dd><\/dl>",
         "lpn_library_pattern_axis_step": "Step"
     },
     "keys": {
+        "mtc_n_pi": "n from design rock size (P&I, Phillips & Ingersoll method)",
+        "mtc_iteration_tip": "Choose a roughness option (B\/B, Blodgett–Bathurst, recommended) and a rock size option (Isbash recommended) to auto-iterate toward a uniform rock size for your target flow. See Notes below for the full method, or enter your own roughness value (follow link for guidance) and ignore rock size to skip iteration.",
+        "mtc_note_1": "<dl><dt>Automated rock size and roughness design iteration<\/dt><dd>Choose a roughness option (B\/B, Blodgett–Bathurst, recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The roughness value from the method you chose is copied into the roughness input. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.<\/dd><dt>Basic calculator (no iteration)<\/dt><dd>Enter your desired roughness value. Ignore the design rock size input area.<\/dd><\/dl>",
         "lpn_library_pattern_axis_step": "Step"
     },
     "key_context": {
+        "mtc_n_pi": {
+            "reason": "english_changed",
+            "current_value": "n за розрахунковим розміром каменю (метод Phillips & Ingersoll)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_n_bathurst",
+                    "value": "n за розрахунковим розміром каменю (метод Bathurst)",
+                    "english": "n from design rock size (Bathurst method)"
+                },
+                "next_translated": {
+                    "key": "mtc_blodgett_v_bathurst",
+                    "value": "Blodgett проти Bathurst",
+                    "english": "Blodgett vs. Bathurst"
+                }
+            }
+        },
+        "mtc_iteration_tip": {
+            "reason": "english_changed",
+            "current_value": "Виберіть варіант шорсткості (рекомендується Blodgett–Bathurst) та варіант розміру каменю (рекомендується Isbash), щоб автоматично підібрати ітерацією однорідний розмір каменю для потрібної витрати. Повний метод — у примітках нижче; або введіть власне значення шорсткості (перейдіть за посиланням для довідки) й не зважайте на розмір каменю, щоб пропустити ітерацію.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_vel_high",
+                    "value": "Швидкість висока і може бути нереалістичною — перевірте ерозію облицювання русла, додаткову глибину на поворотах і втрати енергії на розширеннях або перешкодах.",
+                    "english": "Velocity is high and may not be realistic; check erosion of the channel lining, added depth at bends, and energy loss at expansions or obstructions."
+                },
+                "next_translated": {
+                    "key": "mtc_note_1",
+                    "value": "<dl><dt>Автоматична ітерація розміру каменю та шорсткості<\/dt><dd>Виберіть варіант шорсткості (рекомендується Blodgett–Bathurst) та варіант розрахункового розміру каменю (рекомендується Isbash). Підберіть глибину та коефіцієнт запасу розміру каменю для досягнення бажаної витрати з однорідним розміром каменю. Щоразу при зміні вхідного значення калькулятор повторює ці кроки: 1. Шорсткість розраховується за розрахунковим розміром каменю. 2. Результат розрахунку шорсткості копіюється у вхідну шорсткість. 3. Розраховуються витрата русла та необхідний розмір каменю. 4. Розрахунковий розмір каменю коригується. 5. Повторювати до досягнення дуже малої похибки розміру каменю.<\/dd><dt>Базовий калькулятор (без ітерації)<\/dt><dd>Введіть бажане значення шорсткості. Поле розрахункового розміру каменю ігноруйте.<\/dd><\/dl>",
+                    "english": "<dl><dt>Automated rock size and roughness design iteration<\/dt><dd>Choose a roughness option (B\/B, Blodgett–Bathurst, recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The roughness value from the method you chose is copied into the roughness input. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.<\/dd><dt>Basic calculator (no iteration)<\/dt><dd>Enter your desired roughness value. Ignore the design rock size input area.<\/dd><\/dl>"
+                }
+            }
+        },
+        "mtc_note_1": {
+            "reason": "english_changed",
+            "current_value": "<dl><dt>Автоматична ітерація розміру каменю та шорсткості<\/dt><dd>Виберіть варіант шорсткості (рекомендується Blodgett–Bathurst) та варіант розрахункового розміру каменю (рекомендується Isbash). Підберіть глибину та коефіцієнт запасу розміру каменю для досягнення бажаної витрати з однорідним розміром каменю. Щоразу при зміні вхідного значення калькулятор повторює ці кроки: 1. Шорсткість розраховується за розрахунковим розміром каменю. 2. Результат розрахунку шорсткості копіюється у вхідну шорсткість. 3. Розраховуються витрата русла та необхідний розмір каменю. 4. Розрахунковий розмір каменю коригується. 5. Повторювати до досягнення дуже малої похибки розміру каменю.<\/dd><dt>Базовий калькулятор (без ітерації)<\/dt><dd>Введіть бажане значення шорсткості. Поле розрахункового розміру каменю ігноруйте.<\/dd><\/dl>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_iteration_tip",
+                    "value": "Виберіть варіант шорсткості (рекомендується Blodgett–Bathurst) та варіант розміру каменю (рекомендується Isbash), щоб автоматично підібрати ітерацією однорідний розмір каменю для потрібної витрати. Повний метод — у примітках нижче; або введіть власне значення шорсткості (перейдіть за посиланням для довідки) й не зважайте на розмір каменю, щоб пропустити ітерацію.",
+                    "english": "Choose a roughness option (B\/B, Blodgett–Bathurst, recommended) and a rock size option (Isbash recommended) to auto-iterate toward a uniform rock size for your target flow. See Notes below for the full method, or enter your own roughness value (follow link for guidance) and ignore rock size to skip iteration."
+                },
+                "next_translated": {
+                    "key": "mtc_note_2_term",
+                    "value": "Перевірка швидкості",
+                    "english": "Velocity check"
+                }
+            }
+        },
         "lpn_library_pattern_axis_step": {
             "reason": "missing",
             "current_value": null,

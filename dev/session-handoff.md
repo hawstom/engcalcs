@@ -143,11 +143,6 @@ beyond retire-mark-extrema's two (`lpn_labels_mark_extrema`, `_tip`).
   the syn notes, reworded keys (no resync list), tip pairs, and only the glossary terms a batch uses.
   He forbids translating without his approval.
 
-- **Trapezoidal channel, "B/B" (his comment 10-16, needs his call)**: the roughness radio button reads
-  "B/B" (hard-coded in Manning-Trap.php, untranslated), while `mtc_iteration_tip` and `mtc_note_1` say
-  "Blodgett–Bathurst". Prose should name the option as shown: spell the button out, or have the prose
-  say B/B. Ask him which.
-
 ### His answers of 2026-10-16 (early), being built or awaiting design
 
 - **Language, done 10-16**: `dev/terms.md` (his plain-words names, two uniqueness groups) is the

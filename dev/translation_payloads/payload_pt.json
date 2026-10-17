@@ -2,8 +2,8 @@
     "meta": {
         "language": "pt",
         "expected_key_count": 2638,
-        "delta_key_count": 2,
-        "english_changed_key_count": 0,
+        "delta_key_count": 5,
+        "english_changed_key_count": 3,
         "exempt_key_count": 53,
         "exempt_keys": [
             "u_imgd",
@@ -81,16 +81,38 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- does not apply here, no value, or not relevant\n    English: N\/A\n    Your language: N\/A",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: vazão\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: trecho\n- calculator, tool, or program that finds and tells mathematical answers\n    English: calculator\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: trecho\n- does not apply here, no value, or not relevant\n    English: N\/A\n    Your language: N\/A",
     "keys_to_translate": {
+        "mtc_n_pi": "n from design rock size (P&I, Phillips & Ingersoll method)",
         "mtc_not_applicable": "N\/A",
+        "mtc_iteration_tip": "Choose a roughness option (B\/B, Blodgett–Bathurst, recommended) and a rock size option (Isbash recommended) to auto-iterate toward a uniform rock size for your target flow. See Notes below for the full method, or enter your own roughness value (follow link for guidance) and ignore rock size to skip iteration.",
+        "mtc_note_1": "<dl><dt>Automated rock size and roughness design iteration<\/dt><dd>Choose a roughness option (B\/B, Blodgett–Bathurst, recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The roughness value from the method you chose is copied into the roughness input. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.<\/dd><dt>Basic calculator (no iteration)<\/dt><dd>Enter your desired roughness value. Ignore the design rock size input area.<\/dd><\/dl>",
         "lpn_library_pattern_axis_step": "Step"
     },
     "keys": {
+        "mtc_n_pi": "n from design rock size (P&I, Phillips & Ingersoll method)",
         "mtc_not_applicable": "N\/A",
+        "mtc_iteration_tip": "Choose a roughness option (B\/B, Blodgett–Bathurst, recommended) and a rock size option (Isbash recommended) to auto-iterate toward a uniform rock size for your target flow. See Notes below for the full method, or enter your own roughness value (follow link for guidance) and ignore rock size to skip iteration.",
+        "mtc_note_1": "<dl><dt>Automated rock size and roughness design iteration<\/dt><dd>Choose a roughness option (B\/B, Blodgett–Bathurst, recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The roughness value from the method you chose is copied into the roughness input. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.<\/dd><dt>Basic calculator (no iteration)<\/dt><dd>Enter your desired roughness value. Ignore the design rock size input area.<\/dd><\/dl>",
         "lpn_library_pattern_axis_step": "Step"
     },
     "key_context": {
+        "mtc_n_pi": {
+            "reason": "english_changed",
+            "current_value": "n para o tamanho de rocha de projeto (método de Phillips & Ingersoll)",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_n_bathurst",
+                    "value": "n para o tamanho de rocha de projeto (método de Bathurst)",
+                    "english": "n from design rock size (Bathurst method)"
+                },
+                "next_translated": {
+                    "key": "mtc_blodgett_v_bathurst",
+                    "value": "Blodgett x Bathurst",
+                    "english": "Blodgett vs. Bathurst"
+                }
+            }
+        },
         "mtc_not_applicable": {
             "reason": "equal_to_english",
             "current_value": "N\/A",
@@ -104,6 +126,38 @@
                     "key": "mtc_pi_out_of_range",
                     "value": "Fora da faixa",
                     "english": "Outside range"
+                }
+            }
+        },
+        "mtc_iteration_tip": {
+            "reason": "english_changed",
+            "current_value": "Escolha uma opção de rugosidade (recomenda-se Blodgett–Bathurst) e uma opção de tamanho de rocha (recomenda-se Isbash) para que a calculadora itere automaticamente até um tamanho de rocha uniforme para a vazão desejada. Veja as Notas abaixo para o método completo, ou digite seu próprio valor de rugosidade (siga o link para orientação) e ignore o tamanho de rocha para pular a iteração.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_vel_high",
+                    "value": "A velocidade é elevada e pode não ser realista; verifique a erosão do revestimento do canal, a profundidade adicional nas curvas e a perda de energia em expansões ou obstruções.",
+                    "english": "Velocity is high and may not be realistic; check erosion of the channel lining, added depth at bends, and energy loss at expansions or obstructions."
+                },
+                "next_translated": {
+                    "key": "mtc_note_1",
+                    "value": "<dl><dt>Iteração automática de tamanho de rocha e rugosidade de projeto<\/dt><dd>Escolha uma opção de rugosidade (Blodgett–Bathurst recomendado) e uma opção de tamanho de rocha de projeto (Isbash recomendado). Ajuste a profundidade e o fator de segurança do tamanho de rocha para alcançar sua vazão-alvo com um tamanho de rocha uniforme. Cada vez que você altera uma entrada, a calculadora repete estas etapas: 1. A rugosidade é calculada a partir do tamanho de rocha de projeto. 2. O valor de rugosidade do método escolhido é copiado para a entrada de rugosidade. 3. A vazão do canal e o tamanho de rocha exigido são calculados. 4. O tamanho de rocha de projeto é ajustado. 5. Repete até que o erro no tamanho de rocha de projeto seja muito pequeno.<\/dd><dt>Calculadora básica (sem iteração)<\/dt><dd>Digite o valor de rugosidade desejado. Ignore a área de entrada do tamanho de rocha de projeto.<\/dd><\/dl>",
+                    "english": "<dl><dt>Automated rock size and roughness design iteration<\/dt><dd>Choose a roughness option (B\/B, Blodgett–Bathurst, recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The roughness value from the method you chose is copied into the roughness input. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.<\/dd><dt>Basic calculator (no iteration)<\/dt><dd>Enter your desired roughness value. Ignore the design rock size input area.<\/dd><\/dl>"
+                }
+            }
+        },
+        "mtc_note_1": {
+            "reason": "english_changed",
+            "current_value": "<dl><dt>Iteração automática de tamanho de rocha e rugosidade de projeto<\/dt><dd>Escolha uma opção de rugosidade (Blodgett–Bathurst recomendado) e uma opção de tamanho de rocha de projeto (Isbash recomendado). Ajuste a profundidade e o fator de segurança do tamanho de rocha para alcançar sua vazão-alvo com um tamanho de rocha uniforme. Cada vez que você altera uma entrada, a calculadora repete estas etapas: 1. A rugosidade é calculada a partir do tamanho de rocha de projeto. 2. O valor de rugosidade do método escolhido é copiado para a entrada de rugosidade. 3. A vazão do canal e o tamanho de rocha exigido são calculados. 4. O tamanho de rocha de projeto é ajustado. 5. Repete até que o erro no tamanho de rocha de projeto seja muito pequeno.<\/dd><dt>Calculadora básica (sem iteração)<\/dt><dd>Digite o valor de rugosidade desejado. Ignore a área de entrada do tamanho de rocha de projeto.<\/dd><\/dl>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "mtc_iteration_tip",
+                    "value": "Escolha uma opção de rugosidade (recomenda-se Blodgett–Bathurst) e uma opção de tamanho de rocha (recomenda-se Isbash) para que a calculadora itere automaticamente até um tamanho de rocha uniforme para a vazão desejada. Veja as Notas abaixo para o método completo, ou digite seu próprio valor de rugosidade (siga o link para orientação) e ignore o tamanho de rocha para pular a iteração.",
+                    "english": "Choose a roughness option (B\/B, Blodgett–Bathurst, recommended) and a rock size option (Isbash recommended) to auto-iterate toward a uniform rock size for your target flow. See Notes below for the full method, or enter your own roughness value (follow link for guidance) and ignore rock size to skip iteration."
+                },
+                "next_translated": {
+                    "key": "mtc_note_2_term",
+                    "value": "Verificação de velocidade",
+                    "english": "Velocity check"
                 }
             }
         },
