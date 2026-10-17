@@ -16896,11 +16896,22 @@ var EngCalcs = EngCalcs || {};
 				return 'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.jpg90?access_token='
 					+ encodeURIComponent(mapboxToken());
 			}
+		},
+		// **MAPBOX OUTDOORS (ROADMAP Task 617; Tom, 2026-10-15: "I approve.").** A Mapbox-hosted
+		// raster style on the SAME host, token and purpose as satellite -- where the visitor is
+		// looking -- so it rides the same gate and adds no request purpose. The Static Tiles API,
+		// 256 px to match LPN_TILE_PX (the path's `256` is the tile size, not @2x).
+		outdoors: {
+			maxZ: 19,
+			url: function () {
+				return 'https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/tiles/256/{z}/{x}/{y}?access_token='
+					+ encodeURIComponent(mapboxToken());
+			}
 		}
 	};
 	function basemapSource() {
 		var st = scnProject('basemap');
-		if (st === 'satellite' && !satelliteAvailable()) { return 'osm'; }
+		if ((st === 'satellite' || st === 'outdoors') && !satelliteAvailable()) { return 'osm'; }
 		return LPN_TILE_SOURCES[st] ? st : 'osm';
 	}
 	function tileSource() { return LPN_TILE_SOURCES[basemapSource()]; }
@@ -17138,11 +17149,17 @@ var EngCalcs = EngCalcs || {};
 		// that is already showing.
 		if (!worldMapAttached() || !satelliteAvailable()) { b.style.display = 'none'; return; }
 		b.style.display = '';
-		on = basemapOn() && basemapSource() === 'satellite';
-		b.classList.toggle('lpn-basemap-teaser-on', on);
-		// The name says what the PRESS will do, not what is showing -- the button swaps the two
-		// basemaps, so from satellite it offers the street map and never "Hide".
-		var name = on ? (pc.lpn_basemap_show || 'Show street map')
+		var src = basemapOn() ? basemapSource() : 'osm';
+		on = src !== 'osm';
+		// The press goes street, satellite, outdoors, street. The picture and the name show where
+		// the NEXT press lands: `-on` offers the street map (from outdoors), `-outdoors` offers
+		// the outdoors map (from satellite), neither offers satellite.
+		b.classList.toggle('lpn-basemap-teaser-on', src === 'outdoors');
+		b.classList.toggle('lpn-basemap-teaser-outdoors', src === 'satellite');
+		// The name says what the PRESS will do, not what is showing -- the button cycles the
+		// basemaps, so it never offers "Hide".
+		var name = src === 'outdoors' ? (pc.lpn_basemap_show || 'Show street map')
+			: src === 'satellite' ? (pc.lpn_basemap_topo_show || 'Show topo map')
 			: (pc.lpn_basemap_satellite_show || 'Show satellite images');
 		b.setAttribute('aria-label', name);
 		b.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -17159,7 +17176,8 @@ var EngCalcs = EngCalcs || {};
 	function toggleBasemapTeaser() {
 		if (!worldMapAttached()) { return; }
 		saveUndoSnapshot();
-		setBasemapSource(basemapSource() === 'satellite' ? 'osm' : 'satellite');
+		var cur = basemapSource();
+		setBasemapSource(cur === 'osm' ? 'satellite' : cur === 'satellite' ? 'outdoors' : 'osm');
 	}
 	function wireBasemapTeaser() {
 		var b = document.getElementById('lpn_basemap_teaser');
@@ -17167,12 +17185,12 @@ var EngCalcs = EngCalcs || {};
 		b.addEventListener('click', toggleBasemapTeaser);
 	}
 	function refreshBasemapCredit() {
-		var c = document.getElementById('lpn_basemap_credit'), sat;
+		var c = document.getElementById('lpn_basemap_credit'), which;
 		if (!c) { return; }
 		c.style.display = basemapOn() ? 'block' : 'none';
-		sat = basemapOn() && basemapSource() === 'satellite';
+		which = basemapOn() ? basemapSource() : 'osm';
 		Array.prototype.forEach.call(c.querySelectorAll('[data-basemap-credit]'), function (el2) {
-			el2.style.display = (el2.getAttribute('data-basemap-credit') === (sat ? 'satellite' : 'osm'))
+			el2.style.display = (el2.getAttribute('data-basemap-credit') === which)
 				? 'inline' : 'none';
 		});
 	}
@@ -29779,7 +29797,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		if (s === 'project.basemap' || s === 'project.basemapLast') {
 			return [['osm', pc.lpn_settings_row_basemap_osm || 'Street map'],
-				['satellite', pc.lpn_settings_row_basemap_satellite || 'Satellite images'], ['off', pc.lpn_settings_legend_off || 'None']];
+				['satellite', pc.lpn_settings_row_basemap_satellite || 'Satellite images'],
+				['outdoors', pc.lpn_settings_row_basemap_topo || 'Topo map'], ['off', pc.lpn_settings_legend_off || 'None']];
 		}
 		if (s === 'times.statistic') {
 			return (EngCalcs.LPN_STATISTICS || []).map(function (n) {

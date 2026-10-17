@@ -1266,6 +1266,7 @@ $ec_lang['lpn_menu_map']='Map';
 // were deleted with the rows -- nothing else read them.
 $ec_lang['lpn_basemap_show']='Show street map';
 $ec_lang['lpn_basemap_satellite_show']='Show satellite images';
+$ec_lang['lpn_basemap_topo_show']='Show topo map';
 // **THE PAIR OF NOUNS IS 'local' and 'georeferenced', LOWER CASE** (Tom's own edit of this block,
 // 2026-09-16, dev/tom-coordinate-vocabulary-2026-09-16.md: *"The terms we need to use are
 // 'Georeferenced' vs. 'Local or Arbitrary'"*). They replaced 'lat/lon' and 'xy'. Nothing renders
@@ -3277,6 +3278,7 @@ $ec_lang['lpn_settings_view_save']='Save this view in this scenario';
 $ec_lang['lpn_settings_view_save_tip']='Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.';
 $ec_lang['lpn_settings_row_basemap_osm']='Street map';
 $ec_lang['lpn_settings_row_basemap_satellite']='Satellite images';
+$ec_lang['lpn_settings_row_basemap_topo']='Topo map';
 $ec_lang['lpn_settings_units_one_project']='Units are the same in every scenario.';
 $ec_lang['lpn_settings_restore_base_only']='Switch to Base to restore the defaults.';
 $ec_lang['lpn_alt_cat_physical']='Physical';

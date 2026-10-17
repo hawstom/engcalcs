@@ -82,7 +82,7 @@ const EC_REQUEST_PURPOSES = [
         'host'    => 'api.mapbox.com',
         'owner'   => 'js/looped-network.js',
         'gate'    => 'mapboxToken',
-        'privacy' => 'for the satellite images',
+        'privacy' => 'for the satellite and topo map images',
         'why'     => 'where the visitor is LOOKING, from a second source. Gated on EC_MAPBOX_TOKEN '
                    . 'as well: no token and the option does not exist, which is the state a fork of '
                    . 'this suite is in.',
