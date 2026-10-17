@@ -119,6 +119,8 @@ Ctrl+D: every old cast-iron pipe gets C = 80 in that scenario only.
 
 ## Using the guide
 
+**REWRITTEN 2026-10-16** (`dev/lpn-spike/user-guide-using-harness.js`): the keys table says what ? does (a toolbar button or menu row under the pointer or with focus, else the search field), when it and Ctrl+K do nothing, and the new term covers search, the address that follows the entry, and what is remembered.
+
 (a) Omits:
 - Ctrl+K (Cmd+K on a Mac) replaces the browser's Ctrl+K everywhere, including text fields; it now
   puts up to 80 characters of selected text into the search field (this branch).
