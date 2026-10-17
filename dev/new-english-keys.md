@@ -67,7 +67,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED English: 'Copy with column headings'
   @@ NEEDS RULING
 - **`lpn_settings_hover_card_tip`**
-  > Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
+  > Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
   *The finding:* 'at any scale, fit or not' leaves 'fit' with no subject: fit what? The setting makes the hover card show the label even when the on-map label was dropped for lack of room (js/looped-network.js:51225). 'fit' also collides with 'zoom to fit'.
   1. whether or not the label fits on the map at the current zoom
   2. whether or not the map is zoomed to fit the network
@@ -869,7 +869,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**60 still to read**, of 63 new keys across 12 unmerged branch(es).
+**91 still to read**, of 94 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -882,10 +882,26 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/geojson-import (`43101d8d9`) — already merged into merge/1017; its strings are listed there
+### feat/guide-scenarios (`667e470cc`) — 90 new, 90 to read @@ NEEDS RULING
 
-### feat/guide-scenarios (`8bd566f9f`) — 60 new, 60 to read @@ NEEDS RULING
-
+- **`lpn_guide_bx_dock_def`**
+  > <p>The corner of a box's title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap, and the box tucks back into its tab as described above. A tucked box is still open. A menu row or toolbar button that opens it brings it out of its tab.</p><p>Dragging a docked box by its title band floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_bx_dock_term`**
+  > Docking and tabs
+  @@ NEEDS RULING
+- **`lpn_guide_bx_keep_def`**
+  > <p>Each box keeps in this browser where it floats, its size, whether it is open, its dock side, whether it auto-hides, its docked width, and the place of its tab. Properties, Critical assets, Demand scaling, and Calibration keep only their dock side, auto-hide, tab place, and whether they are open; where they float lasts for one page load. A browser with no saved layout starts with some boxes docked as tabs, and nothing is stored until a box is changed.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_bx_keep_term`**
+  > What a box remembers
+  @@ NEEDS RULING
+- **`lpn_guide_bx_phone_def`**
+  > <p>At 640 px or narrower, no box docks and every box fills the window. The dock buttons are not offered. A docked layout is kept and returns on a wider window.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_bx_phone_term`**
+  > On a phone
+  @@ NEEDS RULING
 - **`lpn_guide_cmp_cols_def`**
   > <table class="lpn-notes-table"><tbody><tr><td>Scenario</td><td>The name of the scenario. The open scenario is marked (currently open).</td></tr><tr><td>No. of overrides</td><td>The overrides of the scenario itself, counted as in the Scenarios list. A calculation option such as the demand multiplier counts as one, and an override equal to the inherited value counts.</td></tr><tr><td>Demand multiplier, Total run time, Hydraulic time step</td><td>The values the scenario was solved under, its own or those of the project. A steady-state scenario shows a dash for the time step.</td></tr><tr><td>Lowest pressure</td><td>The lowest pressure at a junction, with its ID and the time it occurs. Reservoirs and tanks are left out because each has a fixed head.</td></tr><tr><td>Highest velocity</td><td>The highest velocity in a pipe or valve, with its ID and the time it occurs. Pumps are left out.</td></tr></tbody></table>
   @@ NEEDS RULING
@@ -945,6 +961,42 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_guide_lib_scn_term`**
   > Libraries and scenarios
+  @@ NEEDS RULING
+- **`lpn_guide_map_del_def`**
+  > <p>Delete or Backspace deletes the selection, except while typing in a field, where the key belongs to the field. With nothing selected, Delete says so, and Backspace does nothing. One Undo reverses the deletion of several assets. In a scenario other than Base, Delete does not remove an asset that exists in Base; the Scenario manager entry describes what it does.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_map_del_term`**
+  > Delete
+  @@ NEEDS RULING
+- **`lpn_guide_map_esc_def`**
+  > <p>An Esc that closes a menu, a pull-down, or a box does nothing else. The Properties, Settings, and Libraries boxes close only when focus is in the box and the pointer is over it. With none of those open, Esc returns the active tool to Select, and in Select it clears the selection. A half-drawn pipe takes one Esc to abandon and a second to return to Select. In a field, Esc belongs to the field.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_map_esc_term`**
+  > Esc
+  @@ NEEDS RULING
+- **`lpn_guide_map_letters_def`**
+  > <p>W starts Zoom Window, A starts selecting an area (pressing A again cycles the window, lasso, and polygon), and F draws a Shape. The plus or equals key zooms in, and the minus key zooms out, by one wheel step. These keys and the digits 0 to 9 are not taken with Ctrl, Alt, or Cmd, are not taken while typing in a field, and leave the letters of an open menu to its rows. A digit typed on a selected Tables cell overwrites the cell instead of choosing a tool.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_map_letters_term`**
+  > Letters, digits, and zoom keys
+  @@ NEEDS RULING
+- **`lpn_guide_map_undo_def`**
+  > <p>Ctrl+Z undoes the last change, and Ctrl+Y or Ctrl+Shift+Z redoes it. In a Tables cell, the keys belong to the project while the cell is only selected, and to the text of the cell once typing has begun. The page keeps the last 20 steps, in memory only, and switching projects clears them. A step restores the scenarios, the open scenario, and the units along with the drawing.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_map_undo_term`**
+  > Undo and Redo
+  @@ NEEDS RULING
+- **`lpn_guide_mn_kbd_def`**
+  > <p>The letters after Alt+Shift are keys at fixed positions, F for File, E for Edit, M for Map, W for Water, H for Help, and L for Language, on every keyboard layout and in every language. After F10, the letter of a menu alone opens it, and Esc on the menu bar returns focus to where it was.</p><p>Rows that only a pointer can use have no letter, and the arrow keys skip them. They include Vertices, the three area selections, the Insert tools, Zoom Window, and Screenshot.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_mn_kbd_term`**
+  > Menus from the keyboard
+  @@ NEEDS RULING
+- **`lpn_guide_mn_list_def`**
+  > <p>The list is drawn from the menus themselves: File, Edit, Map, Water, and Help, each under its own heading, with the rows of a fly-out indented under the row that opens it and a rule between groups. It leaves out rows that are hidden now, headings inside a menu, and rows named from the project or the browser, such as scenario names. It goes one fly-out deep, and it has no entry for the Language menu. A row that is disabled now is still listed, with no sign of it. Clicking a row opens the menu and fly-out with that row pointed at. It never runs the row.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_mn_list_term`**
+  > Reading the menu list
   @@ NEEDS RULING
 - **`lpn_guide_prop_edit_def`**
   > <p>A value takes effect when the field is committed, by leaving it or pressing Enter. It is read in the unit named in its label, with no conversion, and the map label, Tables, and the results follow. Calculated values are read-only rows with no box to type in. For a link they follow its inputs, and for a node they sit among them. They are the results of the last calculation, at the time shown, and with Recalculate automatically cleared they are those of the last Calculate.</p><p>A pipe that uses a pipe type shows the values the type states as disabled. Click Detach from pipe type to copy those values into the pipe and edit them there.</p>
@@ -1060,6 +1112,42 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_guide_set_where_term`**
   > Sections, and where settings are saved
   @@ NEEDS RULING
+- **`lpn_guide_tb_dim_def`**
+  > <p>A dimmed name belongs to a button that is not on screen now. A button that is on screen is not dimmed, whether or not it can act at that moment. Calculate is dimmed while Recalculate automatically is checked, because the button appears only when that setting is cleared.</p><p>On a phone in tall mode, only the five run controls stay on the toolbar. Every other name is dimmed, and clicking one opens the menu row that does the same thing. The Bottom panel button has no menu row, so its row can only say that the control is not on screen.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_tb_dim_term`**
+  > Dimmed names
+  @@ NEEDS RULING
+- **`lpn_guide_tb_row_def`**
+  > <p>Each row is one toolbar button, in the order of the strip, with a rule between groups. A row shows the button's icon, name, and tip, then its keys, and, where a menu row does the same thing, Also in followed by the menu path. Clicking a row points at the button on the toolbar. It never runs the button. When the button is not on screen, the row opens the menu row that does the same thing.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_tb_row_term`**
+  > Reading a row
+  @@ NEEDS RULING
+- **`lpn_guide_tb_two_def`**
+  > <p>Zoom to fit and Select a window have a small triangle in the lower-right corner. Pressing the button a second time, with nothing pressed between, changes it: Zoom to fit becomes Zoom Window, and Select a window cycles through the window, lasso, and polygon shapes. Clicking the corner of Zoom to fit enters Zoom Window at once, without fitting the view.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_tb_two_term`**
+  > Buttons with a corner triangle
+  @@ NEEDS RULING
+- **`lpn_guide_tbl_cell_def`**
+  > <p>A cell is in one of three states. While it is only selected, the arrow keys move from cell to cell, and Ctrl+Z is the Undo of the project. Typing a character over a selected cell starts an entry: the typed text replaces the value, and an arrow key commits it and moves to the next cell. F2 or a double-click opens the cell to edit it: the caret is in the value, and the arrow keys move the caret. In an entry and in an edit, Ctrl+Z undoes the typing. Esc cancels the entry or edit and leaves the cell selected.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_tbl_cell_term`**
+  > Selecting, entering, and editing a cell
+  @@ NEEDS RULING
+- **`lpn_guide_tbl_fill_def`**
+  > <p>Ctrl+D fills a selected range down from its top row, and Ctrl+Enter fills it with the value of the active cell. Both leave the ID column and read-only cells alone, and a notice states how many cells were filled and how many were not changed. Ctrl+Shift+L shows only the assets selected on the map. With a filter on, Ctrl+A and Ctrl+D act on the rows shown only, and a row edited so that it no longer matches stays until the filter is applied again.</p><p>In a scenario other than Base, a cell edit, Ctrl+D, Ctrl+Enter, and a paste are stored as overrides of the open scenario.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_tbl_fill_term`**
+  > Filling, filters, and scenarios
+  @@ NEEDS RULING
+- **`lpn_guide_tbl_tabs_def`**
+  > <p>Choose Water, Tables, or click Bottom panel, to open the pane. Its tabs, left to right, are Junctions, Reservoirs, Tanks, Pipes, Pumps, Valves, Text, Customers, Shapes, Settings, Scenarios, Time series, Profile, Frequency, and Flow balance. The Scenarios tab is shown when Basic mode is cleared. Column width, order, and visibility are kept in this browser, not in the project.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_tbl_tabs_term`**
+  > The tabs
+  @@ NEEDS RULING
 - **`lpn_guide_use_def`**
   > <p>Search ignores capitals and accents and lists the rows and entries that contain the text typed. Choosing a row shows where that control is. It never runs the control. On a phone, where the toolbar is folded away, a toolbar row opens the menu row that does the same thing.</p><p>The address of the page follows the entry being read, as in <code>Looped-Network.php#guide</code>, so it can be copied as a link to that entry. Closing the user manual clears it. The user manual remembers in this browser whether it was open, its position and size, and whether its contents list is hidden. On a phone the contents list starts hidden.</p>
   @@ NEEDS RULING
@@ -1091,6 +1179,10 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/scenarios-menu (`0f73aec80`) — already merged into merge/1017; its strings are listed there
+### feat/native-valves (`070170856`) — adds no English strings
 
-### merge/1017 (`a36480951`) — adds no English strings
+### option/pane-boxes (`bf8972209`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_pane_popout`**
+  > Open in a box
+  @@ NEEDS RULING

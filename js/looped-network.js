@@ -21425,8 +21425,10 @@ var EngCalcs = EngCalcs || {};
 	function hoverTargetFromHit(t) {
 		var d = (t && t.dataset) || {};
 		if (d.node) { return { kind: 'node', id: d.node }; }
-		if (d.nodelbl !== undefined) { return { kind: 'node', id: d.nodelbl }; }
-		if (d.linklbl !== undefined) { return { kind: 'link', id: d.linklbl }; }
+		// A hit on an element's map LABEL still lights the element (viaLabel), but opens no card:
+		// *"make it ignore labels, and only trigger when hovering over the element itself"* (Tom, 2026-10-17).
+		if (d.nodelbl !== undefined) { return { kind: 'node', id: d.nodelbl, viaLabel: true }; }
+		if (d.linklbl !== undefined) { return { kind: 'link', id: d.linklbl, viaLabel: true }; }
 		if (d.link !== undefined) { return { kind: 'link', id: d.link }; }
 		if (d.lbl !== undefined) { return { kind: 'label', id: d.lbl }; }
 		if (d.cust !== undefined) { return { kind: 'customer', id: d.cust }; }
@@ -21451,7 +21453,7 @@ var EngCalcs = EngCalcs || {};
 		if (sel && (!hoverPreview || sel.kind !== hoverPreview.kind || sel.id !== hoverPreview.id)) {
 			paintHoverPreview(sel, true);
 		}
-		var changed = !hoverPreview !== !sel || (sel && (sel.kind !== hoverPreview.kind || sel.id !== hoverPreview.id));
+		var changed = !hoverPreview !== !sel || (sel && (sel.kind !== hoverPreview.kind || sel.id !== hoverPreview.id || !sel.viaLabel !== !hoverPreview.viaLabel));
 		hoverPreview = sel;
 		if (changed) { hoverCard.x = hoverCard.nx; hoverCard.y = hoverCard.ny; hoverCardRetarget(sel); }
 	}
@@ -21469,9 +21471,12 @@ var EngCalcs = EngCalcs || {};
 	 * composed only when the 500 ms rest has run out: nothing here runs per pointer move, and it
 	 * never calls refreshLabelText() or any placement pass.
 	 *
+	 * **THE ROWS ARE THE PROPERTIES BOX'S (hoverCardRows()), THE VALUES THE LABEL'S WHERE ONE EXISTS.**
+	 * The paragraph below describes the label half.
+	 *
 	 * **THE LINES COME FROM THE MAP LABEL'S OWN COMPOSERS** (nodeLabelFieldLines(),
-	 * linkLabelFieldLines(), customerLabelLines()), handed the live label settings (the fields
-	 * ticked there, and only those; the ID alone if none). Same units, same decimals, same order, same prefixes and suffixes; a field with
+	 * linkLabelFieldLines(), customerLabelLines()), handed the live label settings with EVERY
+	 * field ticked (allFieldsLabelSettings(), Tom 2026-10-16). Same units, same decimals, same order, same prefixes and suffixes; a field with
 	 * nothing to say (no solve yet, no quality analysis) is left out exactly as the label leaves it
 	 * out. Results show what the label would show, so the stale-snapshot rule holds without a line
 	 * of code of its own. One value to a line, not the link label's one-line concatenation: a card
@@ -21528,8 +21533,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	function hoverCardRetarget(sel) {
 		hoverCardHide();
-		hoverCard.sel = (sel && sel.kind !== 'label') ? sel : null;
-		if (!sel || sel.kind === 'label' || !hoverCardOn()) { return; }
+		hoverCard.sel = (sel && sel.kind !== 'label' && !sel.viaLabel) ? sel : null;
+		if (!hoverCard.sel || !hoverCardOn()) { return; }
 		if (typeof ecCanHover === 'function' && !ecCanHover()) { return; }
 		if (!window.bootstrap || !bootstrap.Tooltip) { return; }
 		var delay = (window.EngCalcs && EngCalcs.tipShowDelay) || 500;
@@ -21538,21 +21543,30 @@ var EngCalcs = EngCalcs || {};
 			if (hoverCard.sel && hoverCard.sel.kind === sel.kind && hoverCard.sel.id === sel.id) { hoverCardShow(sel); }
 		}, delay);
 	}
-	// **THE CARD READS THE LABEL SETTINGS AS THEY STAND, NOT A COPY WITH EVERYTHING TICKED** (Tom,
-	// 2026-10-08: *"It should show per Settings. Not more and not less."*). It hands the map label's
-	// own composers the live `labelSettings`, so the fields, show order, decimals, prefixes and
-	// suffixes are the label's by construction. What it does NOT inherit is anything about the
-	// LABEL'S PLACEMENT: the labeling threshold (dataLabelsHidden) and the shed cascade (fit) act on
-	// the drawn glyphs after these composers have run, and the card never calls them, so it shows at
-	// any scale, fit or not. A group with nothing ticked (or nothing to say yet) shows the ID alone:
-	// the card has to name what it is resting on, and an asset's ID is the one field it always has.
-	function idOnlyLabelSettings() {
-		var ls = scnLabels(), only = Object.assign({}, ls);
+	// **THE CARD SHOWS EVERY FIELD THE ASSET HAS, EACH FORMATTED AS SETTINGS SPECIFIES** (Tom,
+	// 2026-10-16, Task 773, reversing 2026-10-08's "per Settings, not more and not less": *"to see
+	// all of its properties formatted as specified in Settings, at any scale, whether or not the
+	// label fits on the map"*). It hands the map label's own composers a copy of the live label
+	// settings with every field ticked, so decimals, units, prefixes, suffixes and show order are the
+	// label's by construction, and which boxes are ticked makes no difference. A field with nothing
+	// to say (no solve yet, no quality analysis, a pipe with no such property) is left out exactly as
+	// the label leaves it out. Nothing about the label's PLACEMENT is inherited: the labeling
+	// threshold and the shed cascade act on drawn glyphs after the composers have run, and the card
+	// never calls them.
+	var LPN_CARD_FIELDS = {
+		node: ['id', 'desc', 'tag', 'demandActual', 'demand', 'head', 'pressure', 'elev', 'level', 'quality', 'initQuality'],
+		link: ['id', 'desc', 'tag', 'initStatus', 'diameter', 'length', 'roughness', 'km', 'bulkCoeff', 'wallCoeff',
+			'flow', 'velocity', 'headloss', 'gradient', 'friction', 'status', 'quality', 'rate'],
+		customer: ['id', 'demandActual', 'demand', 'desc', 'tag', 'count']
+	};
+	function allFieldsLabelSettings() {
+		var ls = scnLabels(), all = Object.assign({}, ls);
 		['node', 'link', 'customer'].forEach(function (g) {
-			only[g] = {};
-			Object.keys(ls[g] || {}).forEach(function (k) { only[g][k] = (k === 'id'); });
+			all[g] = {};
+			Object.keys(ls[g] || {}).forEach(function (k) { all[g][k] = true; });
+			LPN_CARD_FIELDS[g].forEach(function (k) { all[g][k] = true; });
 		});
-		return only;
+		return all;
 	}
 	function hoverCardLinesWith(sel, ls) {
 		var e;
@@ -21563,9 +21577,65 @@ var EngCalcs = EngCalcs || {};
 		return [];
 	}
 	function hoverCardLines(sel) {
-		var lines = hoverCardLinesWith(sel, scnLabels()).filter(function (l) { return l.text !== ''; });
-		return lines.length ? lines : hoverCardLinesWith(sel, idOnlyLabelSettings());
+		return hoverCardLinesWith(sel, allFieldsLabelSettings()).filter(function (l) { return l.text !== ''; });
 	}
+	// **THE CARD'S FIELD SET IS THE FULL LIST SETTINGS > LABELS OFFERS** (Tom, 2026-10-17: *"My
+	// inclination is to show only the full list from Settings Labels as applicable for the project."*;
+	// an earlier build listed the Properties box and he turned it down for rows like "No pipe type
+	// chosen"). Each field is "Name: value": the name as that list words it (nodeFieldDefs() and its
+	// two siblings), the value the label composer's own text with its decimals and its suffix rule
+	// (*"Format as instructed in Settings, Labels"*), but not its prefix, which the name replaces.
+	// The ID keeps its prefix, which is part of the ID. A field the project does not use (quality off,
+	// no solve yet) is absent because the composer leaves it out. Description is in
+	// the Labels list, so it appears as the label formats it (first line, then an ellipsis).
+	function hoverCardRows(sel) {
+		var pc = EngCalcs.pageConfig || {}, e, names = {}, defs;
+		if (sel.kind === 'shape') { e = shapeById(sel.id); return e ? [{ text: shapeNoun(e) }] : []; }
+		defs = sel.kind === 'node' ? nodeFieldDefs(pc) : sel.kind === 'link' ? linkFieldDefs(pc) : customerFieldDefs(pc);
+		defs.forEach(function (d) { names[d[0]] = d[1]; });
+		// **ONE EXCEPTION, BY HIS WORD: NO DESCRIPTION ON THE CARD** (Tom, 2026-10-17: *"We better omit
+		// Description."*). It is in the Labels list, so the card would carry it; a multi-line text reads
+		// as a second property here. Tag and every other field stay.
+		return hoverCardLines(sel).filter(function (l) { return l.field !== 'desc'; }).map(function (l) {
+			var f = l.field;
+			if (f === 'id') { return { name: names.id || pc.lpn_field_id || 'ID', value: l.text }; }
+			return { name: names[f] || f, value: (l.bare === undefined ? l.text : l.bare) + (l.suffix || '')};
+		}).filter(function (r) { return r.value !== ''; });
+	}
+	// The card, built to a plan: how many Description lines it may keep and how many columns it may
+	// use. Logical alignment throughout (text-align: start, direction from the page), and each value
+	// with its unit in a <bdi>, so a right-to-left page reads right to left and a unit never
+	// jumps to the other side of its number.
+		function hoverCardBuild(rows, cols) {
+		var host = document.createElement('div'), dir = (document.documentElement.getAttribute('dir') ||
+			(document.body && document.body.getAttribute('dir')) || '').toLowerCase() === 'rtl' ? 'rtl' : 'ltr';
+		host.className = 'lpn-hovercard-body' + (cols > 1 ? ' lpn-hovercard-cols' : '');
+		host.setAttribute('dir', dir);
+		rows.forEach(function (r) {
+			var row = document.createElement('div'), v = r.text !== undefined ? r.text : String(r.value), b;
+			row.className = 'lpn-hovercard-row';
+			if (r.name) { row.appendChild(document.createTextNode(r.name + ': ')); }
+			b = document.createElement('bdi');
+			b.textContent = v;
+			row.appendChild(b);
+			host.appendChild(row);
+		});
+		return host;
+	}
+	function hoverCardMeasure(host, cols) {
+		var wrap = document.createElement('div'), inner = document.createElement('div'), r;
+		wrap.className = 'tooltip lpn-hovercard show';
+		wrap.style.cssText = 'visibility:hidden;position:fixed;left:0;top:0;';
+		if (cols > 1) { wrap.classList.add('lpn-hovercard-wide'); }
+		inner.className = 'tooltip-inner';
+		inner.appendChild(host);
+		wrap.appendChild(inner);
+		document.body.appendChild(wrap);
+		r = inner.getBoundingClientRect();
+		wrap.remove();
+		return { w: r.width, h: r.height };
+	}
+
 	// **THE CARD IN DELETE AND THE LINK-DRAWING MODES** (Tom, 2026-10-08): the same card, for the
 	// thing the next click would act on (what you are about to delete; the node you are about to
 	// join). It paints no highlight (those modes have their own feedback) and takes no pointer
@@ -21576,6 +21646,7 @@ var EngCalcs = EngCalcs || {};
 	var hoverCardOtherRaf = null, hoverCardOtherAt = null;
 	function hoverCardOtherTarget(x, y) {
 		var t = hoverTargetFromHit(mode === 'delete' ? shapeHitOver(x, y, mapHitAt(x, y), POINTER_REACH_PX) : mapHitAt(x, y));
+		if (t && t.viaLabel) { t = null; }
 		if (mode === 'delete') { return t && t.kind !== 'label' ? t : null; }
 		if (t && t.kind === 'node') { return t; }
 		var near = nearestNodeNearScreen(x, y, POINTER_REACH_PX);
@@ -21597,14 +21668,14 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	function hoverCardShow(sel) {
-		var lines = hoverCardLines(sel).map(function (l) { return l.text; }).filter(function (t) { return t !== ''; });
+		var rows = hoverCardRows(sel), vw = window.innerWidth, vh = window.innerHeight, room = vh - 12,
+			host, cols = 1, size;
 		perfDebugCount('hoverCards');
-		if (!lines.length) { return; }
-		var host = document.createElement('div');
-		lines.forEach(function (t, i) {
-			if (i) { host.appendChild(document.createElement('br')); }
-			host.appendChild(document.createTextNode(t));
-		});
+		if (!rows.length) { return; }
+		// **NEVER OFF-SCREEN, IN THIS ORDER**: the whole card; then two columns; then (a card that is still too tall on a
+		// very short window) clipped at the window's edge, which only happens below about 300 px.
+		host = hoverCardBuild(rows, cols); size = hoverCardMeasure(host, cols);
+		if (size.h > room && vw >= 560) { cols = 2; host = hoverCardBuild(rows, cols); size = hoverCardMeasure(host, cols); }
 		if (!hoverCard.anchor) {
 			hoverCard.anchor = document.createElement('div');
 			hoverCard.anchor.className = 'lpn-hovercard-anchor';
@@ -21614,11 +21685,42 @@ var EngCalcs = EngCalcs || {};
 		hoverCard.anchor.style.top = hoverCard.y + 'px';
 		if (hoverCard.tip) { hoverCard.tip.dispose(); }
 		hoverCard.tip = bootstrap.Tooltip.getOrCreateInstance(hoverCard.anchor, {
-			trigger: 'manual', html: true, placement: 'top', customClass: 'lpn-hovercard',
-			title: host.innerHTML
+			trigger: 'manual', html: true, customClass: 'lpn-hovercard' + (cols > 1 ? ' lpn-hovercard-wide' : ''),
+			title: host,
+			// Above the pointer if the card fits there, else below, else beside it; the clamp below
+			// then keeps whatever remains inside the window.
+			placement: function () {
+				var x = hoverCard.x, y = hoverCard.y, g = 10, m = 4;
+				if (y - size.h - g >= m) { return 'top'; }
+				if (y + size.h + g <= vh - m) { return 'bottom'; }
+				if (x + size.w + g <= vw - m) { return 'right'; }
+				if (x - size.w - g >= m) { return 'left'; }
+				return y > vh / 2 ? 'top' : 'bottom';
+			},
+			popperConfig: function (cfg) {
+				cfg.modifiers = (cfg.modifiers || []).concat([{
+					name: 'lpnHoverClamp', enabled: true, phase: 'afterWrite',
+					fn: function (o) { hoverCardClamp(o.state.elements.popper); }
+				}]);
+				return cfg;
+			}
 		});
 		hoverCard.tip.show();
 		hoverCard.shown = true;
+	}
+	// Pulls the card back inside the window if placement left any of it outside (a card taller than
+	// the window, a pointer at the very edge). The card is click-through, so overlapping the
+	// pointer in the last resort costs nothing.
+	function hoverCardClamp(el) {
+		var r = el.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight, m = 4, dx = 0, dy = 0, t, mt;
+		if (r.width === 0 && r.height === 0) { return; }
+		if (r.left < m) { dx = m - r.left; } else if (r.right > vw - m) { dx = vw - m - r.right; }
+		if (r.top < m) { dy = m - r.top; } else if (r.bottom > vh - m) { dy = vh - m - r.bottom; }
+		if (!dx && !dy) { return; }
+		t = el.style.transform || '';
+		mt = /translate(?:3d)?\(\s*(-?[\d.]+)px,\s*(-?[\d.]+)px/.exec(t);
+		if (mt) { el.style.transform = 'translate3d(' + (parseFloat(mt[1]) + dx) + 'px, ' + (parseFloat(mt[2]) + dy) + 'px, 0)'; }
+		else { el.style.left = ((parseFloat(el.style.left) || 0) + dx) + 'px'; el.style.top = ((parseFloat(el.style.top) || 0) + dy) + 'px'; }
 	}
 	// The VERB. Reads the subject once, drops it, then deletes -- deleteElement() may cascade,
 	// confirm, or (inside a scenario) deactivate rather than destroy, and none of those should find
@@ -60160,7 +60262,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			hoverCardInput.type = 'checkbox';
 			hoverCardInput.checked = hoverCardOn();
 			hoverCardInput.addEventListener('change', function () { setHoverCardOn(hoverCardInput.checked); });
-			row(pageBody, pc.lpn_settings_hover_card || 'Show the full label on hover', hoverCardInput,
+			row(pageBody, pc.lpn_settings_hover_card || 'Show all properties on hover', hoverCardInput,
 				pc.lpn_settings_hover_card_tip);
 		}
 		// The override rings' own switch (Task 805): the same section and the same reason as the two
@@ -74202,6 +74304,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// the shed cascade -- needs to know which quantity it is, and by the time the lines reach
 		// composeRows() they are indistinguishable strings.
 		line.field = field;
+		line.bare = line.text;
+		line.suffix = s;
 		line.parts = [];
 		if (p) { line.parts.push({ text: p }); }
 		line.parts.push({ text: line.text });

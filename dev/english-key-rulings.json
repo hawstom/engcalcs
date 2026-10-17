@@ -5442,10 +5442,15 @@
             "ruled": "2026-10-16",
             "answer": "OK."
         },
+        "lpn_settings_hover_card": {
+            "on": "Show all properties on hover",
+            "ruled": "2026-10-16",
+            "answer": "His own wording, 2026-10-16: yes, \"Show all properties on hover\"."
+        },
         "lpn_settings_hover_card_tip": {
-            "on": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
-            "ruled": "2026-10-09",
-            "answer": "Use proposed (Tom, calls page round 3)."
+            "on": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
+            "ruled": "2026-10-16",
+            "answer": "His own wording, 2026-10-16."
         },
         "lpn_settings_label_always": {
             "on": "Always show",
