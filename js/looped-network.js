@@ -6796,8 +6796,13 @@ var EngCalcs = EngCalcs || {};
 	 * scenario's own alternative from an older file is stored first (smMaterialize()), and with it
 	 * any ancestor's, so an implicit target is looked up again through the scenario that owned it.
 	 * No snapshot: the caller's smTry() makes it one undo step.
+	 *
+	 * **COPY UPWARD IS THE SAME ACT WITH `keep`** (Tom, 2026-10-16: *"a Copy upward might be a nice
+	 * option for the user. They can copy upward and then delete as they desire."*): the target takes
+	 * the values exactly as a merge gives them, and the source keeps its own, so nothing it reads
+	 * changes. A skipped level is still named and still not changed.
 	 */
-	function smMergeUpward(tree, key, targetKey) {
+	function smMergeUpward(tree, key, targetKey, keep) {
 		var kind = smKind(tree), owner, src, tgt, plan, values = {}, settingsTree = {}, merged, b;
 		if (kind === 'scn') { return treeRefuse('scenarios'); }
 		if (!smMergeTargets(tree, key).some(function (u) { return u.key === targetKey; })) { return treeRefuse('target'); }
@@ -6841,6 +6846,11 @@ var EngCalcs = EngCalcs || {};
 			merged = combineHolders([{ values: values, settings: settingsTree }, tgt]);
 			if (kind === 'alt') { if (Object.keys(merged.values).length) { tgt.values = merged.values; } else { delete tgt.values; } }
 			if (Object.keys(merged.settings).length) { tgt.settings = merged.settings; } else { delete tgt.settings; }
+		}
+		if (keep) {
+			if (plan.view !== undefined) { smMergeBaseView(plan.view); }
+			touchTree('smCopyUpward');
+			return { source: key, target: targetKey, merged: plan.n };
 		}
 		plan.items.forEach(function (it) {
 			var ov = plainObject(src.values) ? src.values[it.k] : null;
@@ -78091,6 +78101,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				tip: pc.lpn_sm_merge_up_tip,
 				offTip: !valid ? noSel : (pc.lpn_sm_merge_up_root || 'A Base alternative has nothing above it to merge into.'),
 				fn: function () { smActMergeUpward(key); } });
+			// **COPY UPWARD, BESIDE IT** (Tom, 2026-10-16): the same targets, the source keeping its own.
+			out.push({ id: 'copyup', label: pc.lpn_sm_copy_up || 'Copy upward', off: !valid || !smMergeTargets(tree, key).length,
+				tip: pc.lpn_sm_copy_up_tip,
+				offTip: !valid ? noSel : (pc.lpn_sm_copy_up_root || 'A Base alternative has nothing above it to copy into.'),
+				fn: function () { smActMergeUpward(key, true); } });
 		}
 		out.push({ separator: true });
 		out.push({ id: 'del', label: pc.lpn_tool_delete || 'Delete', face: '−', off: !valid || isBase,
@@ -78778,16 +78793,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		smAfter(true, false);
 	}
 	// **MERGE UPWARD** (Task 801): which ancestor, then what it does, skipped values named, then the
-	// act as one undo step. Nothing is written before the second answer.
-	function smActMergeUpward(key) {
-		var tree = smState.tree, pc = EngCalcs.pageConfig || {}, ups, name, first;
+	// act as one undo step. Nothing is written before the second answer. **COPY UPWARD** (`keep`) asks
+	// the same two questions in its own words, and the source keeps its overrides.
+	function smActMergeUpward(key, keep) {
+		var tree = smState.tree, pc = EngCalcs.pageConfig || {}, ups, name, first, none;
 		if (tree === 'scenarios' || key === null || key === undefined) { return; }
 		ups = smMergeTargets(tree, key);
 		if (!ups.length) { return; }
 		name = smName(tree, key);
+		none = keep ? (pc.lpn_sm_copy_none || 'The alternative {name} has no overrides to copy.')
+			: (pc.lpn_sm_merge_none || 'The alternative {name} has no overrides to merge.');
 		first = smMergePlan(tree, key, ups[0].key);
-		if (!first || !first.own) { tellNotice((pc.lpn_sm_merge_none || 'The alternative {name} has no overrides to merge.').replace('{name}', name)); return; }
-		askDialog({ kind: 'choice', text: (pc.lpn_sm_merge_pick || 'Merge the overrides of {name} into which alternative? Its parent is listed first.').replace('{name}', name),
+		if (!first || !first.own) { tellNotice(none.split('{name}').join(name)); return; }
+		askDialog({ kind: 'choice', text: (keep ? (pc.lpn_sm_copy_pick || 'Copy the overrides of {name} into which alternative? Its parent is listed first.')
+			: (pc.lpn_sm_merge_pick || 'Merge the overrides of {name} into which alternative? Its parent is listed first.')).split('{name}').join(name),
 			choices: ups.map(function (u, i) { return { label: u.name, value: u.key, isDefault: i === 0 }; })
 				.concat([{ label: pc.lpn_cancel || 'Cancel', value: null, cancel: true }]) }, function (tk) {
 			var plan, parts, tname;
@@ -78796,20 +78815,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!plan) { return; }
 			tname = smName(tree, tk);
 			if (!plan.n) {
-				tellNotice((pc.lpn_sm_merge_none || 'The alternative {name} has no overrides to merge.').replace('{name}', name));
+				tellNotice(none.split('{name}').join(name));
 				return;
 			}
-			parts = [(pc.lpn_sm_merge_ask || 'Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of overriding them. You can undo this.')
+			parts = [(keep ? (pc.lpn_sm_copy_ask || 'Copy the overrides ({n}) of {name} up into {target}? {name} keeps them as its own overrides. You can undo this.')
+				: (pc.lpn_sm_merge_ask || 'Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of overriding them. You can undo this.'))
 				.replace(/\{name\}/g, name).replace('{n}', String(plan.n)).replace('{target}', tname)];
 			plan.skipped.forEach(function (s) {
-				parts.push((pc.lpn_sm_merge_skipped || '{between} also overrides these values. It is skipped and not changed, so {name} will read them from {between}, not from {target}:')
+				parts.push((keep ? (pc.lpn_sm_copy_skipped || '{between} also overrides these values. It is skipped and not changed, so it keeps its own values for them:')
+					: (pc.lpn_sm_merge_skipped || '{between} also overrides these values. It is skipped and not changed, so {name} will read them from {between}, not from {target}:'))
 					.replace(/\{between\}/g, s.name).replace('{name}', name).replace('{target}', tname) + '\n' + s.lines.join('\n'));
 			});
 			parts = parts.concat(smMergeMorphText(plan.morphs));
 			askDialog({ kind: 'confirm', text: parts.join('\n\n') }, function (yes) {
 				var res;
 				if (!yes) { return; }
-				res = smTry(function () { return smMergeUpward(tree, key, tk); });
+				res = smTry(function () { return smMergeUpward(tree, key, tk, !!keep); });
 				if (!res || res.refused) { return; }
 				smState.sel = res.source;
 				smAfter(true, false);

@@ -7,6 +7,14 @@
 //       to copy a Base as a child. Right?"); pressed, it adds Copy_of_Base, a child of Base holding no
 //       overrides, shown open under Base and selected; one Ctrl+Z takes it away.
 //   C2  Copy on A still copies beside A (a sibling under A's parent, Base).
+//   U1  "Copy upward" is a button and a right-click row beside Merge upward, greyed on Base, saying why
+//       (Tom: "a Copy upward might be a nice option for the user. They can copy upward and then delete
+//       as they desire.");
+//   U2  pressed on C it asks which ancestor, B, A, Base, Cancel, as Merge upward does;
+//   U3  choosing A asks first in its own words, naming B and "Pipe 10: Diameter" (the skipped value);
+//       OK copies: A holds C's values, B is untouched, and C KEEPS its own;
+//   U4  one Ctrl+Z puts all of it back;
+//   U5  into Base, the drawing takes the values and C still keeps them.
 // Wording is read from the page's own language strings.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -140,7 +148,68 @@ async function main() {
 		await page.keyboard.press('Control+z');
 		await flush();
 
-		// @@COPY-UPWARD@@
+		console.log('--- U1. the command ---');
+		const CU = await L('lpn_sm_copy_up');
+		const cuBtn = () => page.evaluate(() => { const b = document.getElementById('lpn_sm_copyup'); return b ? { text: b.textContent, off: b.getAttribute('aria-disabled') === 'true', title: b.title } : null; });
+		await clickRow(await L('lpn_scenario_base'));
+		let ub = await cuBtn();
+		ok('U1 the alternatives tree has a "' + CU + '" button, reading exactly "Copy upward"', !!ub && ub.text === CU && CU === 'Copy upward', JSON.stringify(ub));
+		ok('U1 ...greyed on Base, saying why', !!ub && ub.off === true && ub.title === await L('lpn_sm_copy_up_root'), JSON.stringify(ub));
+		await clickRow('C');
+		ub = await cuBtn();
+		ok('U1 ...live on C, its tip saying C keeps its overrides', !!ub && ub.off === false && ub.title === await L('lpn_sm_copy_up_tip'), JSON.stringify(ub));
+		const order = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_body [data-sm-cmd]')).map((b) => b.getAttribute('data-sm-cmd')).join(','));
+		ok('U1 ...right after Merge upward', /merge,copyup/.test(order), order);
+		await rowOf('C').locator('.lpn-sm-name').click({ button: 'right' });
+		await settle(400);
+		const ctxm = await page.evaluate(() => Array.from(document.querySelectorAll('.lpn-sm-menu [role=menuitem]')).map((e) => e.textContent.trim()));
+		ok('U1 ...and a right-click row after Merge upward', ctxm.indexOf(CU) === ctxm.indexOf(await L('lpn_sm_merge_up')) + 1, JSON.stringify(ctxm));
+		await page.keyboard.press('Escape');
+		await page.evaluate(() => document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })));
+		await settle(300);
+
+		console.log('--- U2. which ancestor ---');
+		await flush();
+		const su0 = await saved();
+		await click('#lpn_sm_copyup');
+		ok('U2 it asks which alternative, naming C', (await dialogText()) === (await L('lpn_sm_copy_pick')).replace('{name}', 'C'), await dialogText());
+		ok('U2 ...offering B, A, Base, then Cancel', JSON.stringify(await dialogButtons()) === JSON.stringify(['B', 'A', await L('lpn_scenario_base'), await L('lpn_cancel')]), JSON.stringify(await dialogButtons()));
+		await press(await L('lpn_cancel'));
+		await flush();
+		ok('U2 Cancel writes nothing', JSON.stringify(await saved()) === JSON.stringify(su0));
+
+		console.log('--- U3. into A, skipping B ---');
+		await click('#lpn_sm_copyup');
+		await press('A');
+		const q = await dialogText();
+		const ask = (await L('lpn_sm_copy_ask')).replace('{n}', '2').replace(/\{name\}/g, 'C').replace('{target}', 'A');
+		const skip = (await L('lpn_sm_copy_skipped')).replace(/\{between\}/g, 'B').replace('{name}', 'C').replace('{target}', 'A');
+		ok('U3 the question names C, the count and A, and says C keeps them', !!q && q.indexOf(ask) === 0, JSON.stringify(q));
+		ok('U3 ...and, before copying, B and the value it holds', !!q && q.indexOf(skip + '\n' + (await L('lpn_tool_add_pipe')) + ' 10: ' + (await L('lpn_field_diameter'))) > 0, JSON.stringify(q));
+		await press(await L('lpn_dialog_ok'));
+		await flush();
+		sv = await saved();
+		ok('U3 A holds C\'s values', (vals(sv, 'a1') || {})['l:10'] && vals(sv, 'a1')['l:10'].diameter === 20 && vals(sv, 'a1')['n:22'].elev === 900, JSON.stringify(vals(sv, 'a1')));
+		ok('U3 ...B is untouched', JSON.stringify(vals(sv, 'a2')) === JSON.stringify({ 'l:10': { diameter: 16 } }), JSON.stringify(vals(sv, 'a2')));
+		ok('U3 ...C keeps its own overrides', JSON.stringify(vals(sv, 'a3')) === JSON.stringify(vals(su0, 'a3')), JSON.stringify(vals(sv, 'a3')));
+
+		console.log('--- U4. undo ---');
+		await unblur();
+		await page.keyboard.press('Control+z');
+		await flush();
+		ok('U4 one Ctrl+Z puts all of it back', JSON.stringify((await saved()).alternatives) === JSON.stringify(su0.alternatives), JSON.stringify((await saved()).alternatives));
+
+		console.log('--- U5. into Base ---');
+		await page.evaluate(() => { const b = document.getElementById('lpn_sm_box'); if (b && getComputedStyle(b).display === 'none') { b.style.display = 'flex'; } });
+		await clickRow('C');
+		await click('#lpn_sm_copyup');
+		await press(await L('lpn_scenario_base'));
+		await press(await L('lpn_dialog_ok'));
+		await flush();
+		sv = await saved();
+		ok('U5 into Base: the drawing takes pipe 10\'s diameter and junction 22\'s elevation', byId(sv.links, '10')._diameter === 20 && byId(sv.nodes, '22').elev === 900,
+			JSON.stringify([byId(sv.links, '10')._diameter, byId(sv.nodes, '22').elev]));
+		ok('U5 ...C still keeps its own, and B its 16', JSON.stringify(vals(sv, 'a3')) === JSON.stringify(vals(su0, 'a3')) && vals(sv, 'a2')['l:10'].diameter === 16, JSON.stringify(vals(sv, 'a3')));
 
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {

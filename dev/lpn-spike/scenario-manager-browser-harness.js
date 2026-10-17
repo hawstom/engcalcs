@@ -321,7 +321,7 @@ async function main() {
 		await settle(500);
 		ok('4.3 an alternative was added under Base', JSON.stringify(await names()) === JSON.stringify(['Base', '-Dry year', 'Base2']), JSON.stringify(await names()));
 		ok('4.4 ...used by no scenario yet', (await rows())[1].meta === await L('lpn_sm_used_by_none'), (await rows())[1].meta);
-		ok('4.5 an alternatives tree toolbar is Add child, Add base, Rename, Copy, Merge upward, minus (no Make current)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), await L('lpn_sm_merge_up'), '\u2212']), JSON.stringify(await toolbar()));
+		ok('4.5 an alternatives tree toolbar is Add child, Add base, Rename, Copy, Merge upward, Copy upward, minus (no Make current)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), await L('lpn_sm_merge_up'), await L('lpn_sm_copy_up'), '\u2212']), JSON.stringify(await toolbar()));
 		await clickRow('Dry year');
 		await click('#lpn_sm_copy');
 		await settle(400);

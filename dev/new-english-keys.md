@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**10 still to read on master**, of 187 untranslated keys, of 2807 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**17 still to read on master**, of 194 untranslated keys, of 2814 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -79,7 +79,7 @@ is the one you meant. "The first one" is a complete answer.
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (187, 10 to read @@ NEEDS RULING)
+## lpn_  (194, 17 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -501,8 +501,29 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_sm_copy`**
   > Copy
   _Ruled OK 2026-10-16._
+- **`lpn_sm_copy_ask`**
+  > Copy the overrides ({n}) of {name} up into {target}? {name} keeps them as its own overrides. You can undo this.
+  @@ NEEDS RULING
 - **`lpn_sm_copy_base_tip`**
   > Copy Base as a child alternative. The copy holds no overrides and inherits every value from Base.
+  @@ NEEDS RULING
+- **`lpn_sm_copy_none`**
+  > The alternative {name} has no overrides to copy.
+  @@ NEEDS RULING
+- **`lpn_sm_copy_pick`**
+  > Copy the overrides of {name} into which alternative? Its parent is listed first.
+  @@ NEEDS RULING
+- **`lpn_sm_copy_skipped`**
+  > {between} also overrides these values. It is skipped and not changed, so it keeps its own values for them:
+  @@ NEEDS RULING
+- **`lpn_sm_copy_up`**
+  > Copy upward
+  @@ NEEDS RULING
+- **`lpn_sm_copy_up_root`**
+  > A Base alternative has nothing above it to copy into.
+  @@ NEEDS RULING
+- **`lpn_sm_copy_up_tip`**
+  > Copy the overrides of the selected alternative into an alternative above it in the tree. The selected alternative keeps its overrides.
   @@ NEEDS RULING
 - **`lpn_sm_current_already`**
   > This scenario is already the current scenario.
@@ -658,7 +679,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### docs/features-update (`572b8b5a0`) — adds no English strings
+### docs/features-update (`fe6ab435b`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -1073,4 +1094,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/scenarios-menu (`38fae436c`) — adds no English strings
+### feat/scenarios-menu (`bd8903c0c`) — adds no English strings
