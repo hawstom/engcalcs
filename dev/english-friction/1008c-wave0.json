@@ -12,7 +12,9 @@
                 "copy the selected cells with both row and column headings"
             ],
             "disposition": "refer-to-human",
-            "resolution": "PROPOSED English: 'Copy with column headings'"
+            "resolution": "PROPOSED English: 'Copy with column headings'",
+            "human_answer": "OK.",
+            "human_answered": "2026-10-17"
         },
         {
             "key": "lpn_export_table_current",

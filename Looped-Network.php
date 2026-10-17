@@ -1935,10 +1935,16 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <h2><?=$ec_lang['lpn_guide_using_heading']?></h2>
 <dl>
 	<dt><?=$ec_lang['lpn_guide_keys_term']?></dt><dd><?=$ec_lang['lpn_guide_keys_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_use_term']?></dt><dd><?=$ec_lang['lpn_guide_use_def']?></dd>
 </dl>
 </section>
 <section class="lpn-guide-section" data-guide-section="toolbar">
 <h2><?=$ec_lang['lpn_help_icons']?></h2>
+<dl>
+	<dt><?=$ec_lang['lpn_guide_tb_row_term']?></dt><dd><?=$ec_lang['lpn_guide_tb_row_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_tb_dim_term']?></dt><dd><?=$ec_lang['lpn_guide_tb_dim_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_tb_two_term']?></dt><dd><?=$ec_lang['lpn_guide_tb_two_def']?></dd>
+</dl>
 <p id="lpn_guide_dimnote" class="lpn-guide-prose" hidden><?=$ec_lang['lpn_guide_dimmed']?></p>
 <div id="lpn_guide_toolbar" class="lpn-guide-list"></div>
 </section>
@@ -1946,6 +1952,8 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <h2><?=$ec_lang['lpn_hotkeys_menu_heading']?></h2>
 <dl>
 	<dt><?=$ec_lang['lpn_hotkeys_menu_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_menu_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_mn_kbd_term']?></dt><dd><?=$ec_lang['lpn_guide_mn_kbd_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_mn_list_term']?></dt><dd><?=$ec_lang['lpn_guide_mn_list_def']?></dd>
 </dl>
 <div id="lpn_guide_menus" class="lpn-guide-list"></div>
 </section>
@@ -1953,6 +1961,10 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <h2><?=$ec_lang['lpn_hotkeys_map_heading']?></h2>
 <dl>
 	<dt class="lpn-guide-dup"><?=$ec_lang['lpn_hotkeys_map_term']?></dt><dd><?=str_replace('</tbody></table>', '<tr><td>W</td><td>' . $ec_lang['lpn_hotkeys_zoomwin_def'] . '</td></tr></tbody></table>', preg_replace('~</tr>~', '</tr><tr><td>1</td><td>' . $ec_lang['lpn_tool_add_chain'] . '</td></tr><tr><td>A</td><td>' . rtrim($ec_lang['lpn_tool_area_tip'], '.') . '</td></tr>', $ec_lang['lpn_hotkeys_map_def'], 1))?></dd>
+	<dt><?=$ec_lang['lpn_guide_map_undo_term']?></dt><dd><?=$ec_lang['lpn_guide_map_undo_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_map_del_term']?></dt><dd><?=$ec_lang['lpn_guide_map_del_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_map_esc_term']?></dt><dd><?=$ec_lang['lpn_guide_map_esc_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_map_letters_term']?></dt><dd><?=$ec_lang['lpn_guide_map_letters_def']?></dd>
 </dl>
 </section>
 <section class="lpn-guide-section" data-guide-section="snip">
@@ -1966,12 +1978,20 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <dl>
 	<dt><?=$ec_lang['lpn_notes_6_term']?></dt><dd><?=$ec_lang['lpn_notes_6_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_7_term']?></dt><dd><?=$ec_lang['lpn_notes_7_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_tbl_tabs_term']?></dt><dd><?=$ec_lang['lpn_guide_tbl_tabs_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_tbl_cell_term']?></dt><dd><?=$ec_lang['lpn_guide_tbl_cell_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_tbl_fill_term']?></dt><dd><?=$ec_lang['lpn_guide_tbl_fill_def']?></dd>
 </dl>
 </section>
 <section class="lpn-guide-section" data-guide-section="boxes">
 <h2><?=$ec_lang['lpn_guide_boxes_heading']?></h2>
 <p class="lpn-guide-prose"><?=$ec_lang['lpn_guide_boxes_intro']?></p>
 <p class="lpn-guide-prose"><?=$ec_lang['lpn_guide_boxes_autohide']?></p>
+<dl>
+	<dt><?=$ec_lang['lpn_guide_bx_dock_term']?></dt><dd><?=$ec_lang['lpn_guide_bx_dock_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_bx_keep_term']?></dt><dd><?=$ec_lang['lpn_guide_bx_keep_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_bx_phone_term']?></dt><dd><?=$ec_lang['lpn_guide_bx_phone_def']?></dd>
+</dl>
 <div id="lpn_guide_boxes" class="lpn-guide-list"></div>
 </section>
 <section class="lpn-guide-section" data-guide-section="about">
@@ -1988,6 +2008,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_notes_5_term']?></dt><dd><?=$ec_lang['lpn_notes_5_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_color_term']?></dt><dd><?=$ec_lang['lpn_notes_color_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_engine_term']?></dt><dd><?=$ec_lang['lpn_notes_engine_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_nt_example_term']?></dt><dd><?=$ec_lang['lpn_guide_nt_example_def']?></dd>
 </dl>
 </section>
 <?php // The Find and replace chapter beyond its opening paragraphs (lpn_guide_text_find_popup):
@@ -1999,6 +2020,105 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_guide_find_results_term']?></dt><dd><?=$ec_lang['lpn_guide_find_results_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_find_replace_term']?></dt><dd><?=$ec_lang['lpn_guide_find_replace_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_find_notes_term']?></dt><dd><?=$ec_lang['lpn_guide_find_notes_def']?></dd>
+</dl></template>
+<?php // The Scenarios chapter, after the Scenario manager's own help (lpn_sm_help) in its entry, and the
+      // rest of the Scenario comparison chapter (Task 785). Same mechanism as the Find chapter above. ?>
+<template id="lpn_guide_more_lpn_sm_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_scn_use_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_use_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_scn_open_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_open_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_scn_marks_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_marks_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_scn_make_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_make_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_scn_scope_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_scope_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_scn_example_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_example_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_scn_notes_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_notes_def']?></dd>
+</dl></template>
+<?php // The Libraries chapter (Task 785), in the entry for the Libraries box. ?>
+<template id="lpn_guide_more_lpn_library_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_lib_kinds_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_kinds_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_lib_refs_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_refs_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_lib_scn_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_scn_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_lib_ctl_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_ctl_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_lib_import_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_import_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_lib_example_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_example_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_lib_notes_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_notes_def']?></dd>
+</dl></template>
+<?php // The Properties chapter (Task 785), in the entry for the Properties box. ?>
+<template id="lpn_guide_more_lpn_popup"><dl>
+	<dt><?=$ec_lang['lpn_guide_prop_open_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_open_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_prop_edit_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_edit_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_prop_id_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_id_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_prop_scn_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_scn_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_prop_multi_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_multi_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_prop_example_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_example_def']?></dd>
+</dl></template>
+<?php // The Settings chapter (Task 785), in the entry for the Settings box. ?>
+<template id="lpn_guide_more_lpn_settings_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_set_where_term']?></dt><dd><?=$ec_lang['lpn_guide_set_where_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_set_search_term']?></dt><dd><?=$ec_lang['lpn_guide_set_search_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_set_scn_term']?></dt><dd><?=$ec_lang['lpn_guide_set_scn_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_set_units_term']?></dt><dd><?=$ec_lang['lpn_guide_set_units_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_set_assets_term']?></dt><dd><?=$ec_lang['lpn_guide_set_assets_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_set_reset_term']?></dt><dd><?=$ec_lang['lpn_guide_set_reset_def']?></dd>
+</dl></template>
+<?php // The Fire flow analysis chapter (Task 785), in the entry for its box. ?>
+<template id="lpn_guide_more_lpn_ff_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_ff_asks_term']?></dt><dd><?=$ec_lang['lpn_guide_ff_asks_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_ff_result_term']?></dt><dd><?=$ec_lang['lpn_guide_ff_result_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_ff_marks_term']?></dt><dd><?=$ec_lang['lpn_guide_ff_marks_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_ff_example_term']?></dt><dd><?=$ec_lang['lpn_guide_ff_example_def']?></dd>
+</dl></template>
+<?php // The Criticality analysis chapter (Task 785). ?>
+<template id="lpn_guide_more_lpn_crit_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_cr_case_term']?></dt><dd><?=$ec_lang['lpn_guide_cr_case_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_cr_dead_term']?></dt><dd><?=$ec_lang['lpn_guide_cr_dead_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_cr_example_term']?></dt><dd><?=$ec_lang['lpn_guide_cr_example_def']?></dd>
+</dl></template>
+<?php // The Demand scaling chapter (Task 785). ?>
+<template id="lpn_guide_more_lpn_ds_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_ds_run_term']?></dt><dd><?=$ec_lang['lpn_guide_ds_run_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_ds_find_term']?></dt><dd><?=$ec_lang['lpn_guide_ds_find_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_ds_scope_term']?></dt><dd><?=$ec_lang['lpn_guide_ds_scope_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_ds_example_term']?></dt><dd><?=$ec_lang['lpn_guide_ds_example_def']?></dd>
+</dl></template>
+<?php // The Pump energy chapter (Task 785). ?>
+<template id="lpn_guide_more_lpn_energy_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_en_read_term']?></dt><dd><?=$ec_lang['lpn_guide_en_read_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_en_set_term']?></dt><dd><?=$ec_lang['lpn_guide_en_set_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_en_example_term']?></dt><dd><?=$ec_lang['lpn_guide_en_example_def']?></dd>
+</dl></template>
+<?php // The Contour plot chapter (Task 785). ?>
+<template id="lpn_guide_more_lpn_contour_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_ct_what_term']?></dt><dd><?=$ec_lang['lpn_guide_ct_what_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_ct_box_term']?></dt><dd><?=$ec_lang['lpn_guide_ct_box_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_ct_example_term']?></dt><dd><?=$ec_lang['lpn_guide_ct_example_def']?></dd>
+</dl></template>
+<?php // The Run report, Status changes, and Full report chapters (Task 785). ?>
+<template id="lpn_guide_more_lpn_rptbox"><dl>
+	<dt><?=$ec_lang['lpn_guide_rr_what_term']?></dt><dd><?=$ec_lang['lpn_guide_rr_what_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_rr_example_term']?></dt><dd><?=$ec_lang['lpn_guide_rr_example_def']?></dd>
+</dl></template>
+<template id="lpn_guide_more_lpn_status_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_st_what_term']?></dt><dd><?=$ec_lang['lpn_guide_st_what_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_st_example_term']?></dt><dd><?=$ec_lang['lpn_guide_st_example_def']?></dd>
+</dl></template>
+<template id="lpn_guide_more_lpn_full_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_fr_what_term']?></dt><dd><?=$ec_lang['lpn_guide_fr_what_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_fr_example_term']?></dt><dd><?=$ec_lang['lpn_guide_fr_example_def']?></dd>
+</dl></template>
+<?php // The user manual's own entry (Task 785). ?>
+<template id="lpn_guide_more_lpn_hotkeys_popup"><dl>
+	<dt><?=$ec_lang['lpn_guide_own_example_term']?></dt><dd><?=$ec_lang['lpn_guide_own_example_def']?></dd>
+</dl></template>
+<?php // The Calibration chapter (Task 785). ?>
+<template id="lpn_guide_more_lpn_calib_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_cal_what_term']?></dt><dd><?=$ec_lang['lpn_guide_cal_what_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_cal_file_term']?></dt><dd><?=$ec_lang['lpn_guide_cal_file_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_cal_example_term']?></dt><dd><?=$ec_lang['lpn_guide_cal_example_def']?></dd>
+</dl></template>
+<template id="lpn_guide_more_lpn_scncmp_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_cmp_cols_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_cols_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_cmp_run_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_run_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_cmp_notes_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_notes_def']?></dd>
 </dl></template>
 </div>
 </div>

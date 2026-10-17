@@ -167,9 +167,9 @@ the block.
   `.inp`, waits on finding one. Presentation never travels through a Bentley file (Bentley keeps
   display in the `.wtg`); the project file is its only home.
 - 100|785| **Rewrite the Guide's chapters to the Find and replace model.**
-  **PROMOTED TO 100, 2026-10-14** (Tom asked to re-evaluate and close or promote). Not closable: the audit lists open gaps in every chapter. Scenarios and Library chapters wait for `feat/bentley-interop`.
-  Split from Task 763 on its close, 2026-10-11. Every chapter but Find and replace is audited, not rewritten:
-  `dev/user-guide-audit.md`.
+  **PROMOTED TO 100, 2026-10-14.** Rewritten on `feat/guide-scenarios` (2026-10-16 and 17), each with a `user-guide-*-harness.js`: every chapter of the audit except Screenshot (Scenario manager, Scenario comparison, Libraries, Properties, Settings, Using the user manual, Toolbar, Menus, Map, Tables, Boxes, Fire flow, Critical assets, Demand scaling, Pump energy, Contour, Run report, Status changes, Full report, Calibration, Notes, the user manual's own entry).
+  Still audited only (`dev/user-guide-audit.md`): Screenshot. Awaits Tom's browser pass and the merge.
+  Split from Task 763 on its close, 2026-10-11.
 - 100|800| **A tidy list and count of one scenario's own overrides.** **BUILT on `feat/bentley-interop`** (override-audit merged in 2026-10-15, with Tom's wording and a List overrides row on the Scenarios menu, greyed at 0).
   Tom, 2026-10-15, on Fotobi's "1-hr drain w pump off" (24 overrides vs its siblings' 23): *"I don't know how to see a tidy list of overrides to audit ... that count seems inflated ... I should see the count of only the present overrides, not the inherited overrides. I count 13 diameter overrides, 1 text override, and 2 calculation overrides."* Also his screenshot note: tanks show the amber circle while their overrides are only in the parent. Review R-386.
 - 75|809| **Finish the translation-clarification follow-ups at the next sprint.** Fix cs `lpn_settings_text_halo` (*svatozář*, a saint's halo) and sw (*mwanga*, light), and their `_tip`, with the `halo` concept in `dev/terms.md`; needs Tom's approval to translate. Awaiting him: sprint cadence (once before each production pull). Open: `prefix_terms.inc.php` lists now only wire sense-qualified terms; glossary `context` and `translation_notes_xx` are not folded into `definition`/`translation_notes`; no check fails a term reaching no key.

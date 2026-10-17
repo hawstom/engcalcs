@@ -117,7 +117,7 @@ async function sectionFireFlow(a, lang) {
 	ok('...says where the fire flow is drawn, in full', t.text.indexOf(lang.ffAccounting) > 0);
 	ok('...carries the ISO credit limit with a number in this project\'s flow unit', /credits a single hydrant with at most [\d.,]+ \S+\./.test(t.text) && t.text.indexOf('{flow}') < 0,
 		(t.text.match(/at most [^.]*\./) || [''])[0]);
-	ok('...and ends with the engine that will run', t.text.endsWith(lang.engineNative) || t.text.endsWith(lang.engineEpanet), t.text.slice(-40));
+	ok('...and its opening paragraphs end with the engine that will run (the chapter\'s terms follow)', t.text.indexOf(lang.engineNative) > 0 || t.text.indexOf(lang.engineEpanet) > 0, t.text.slice(-40));
 	ok('...and fits the window', t.left >= 0 && t.right <= t.vw && t.top >= 0 && t.bottom <= t.vh, JSON.stringify({ top: t.top, bottom: t.bottom, vh: t.vh }));
 	await closeTip(a);
 
@@ -153,7 +153,7 @@ async function sectionDemandScale(a, lang) {
 	const t = await openCornerTip(a, 'lpn_ds_box');
 	ok('the corner `?` opens the box\'s entry in the Guide', t.shown);
 	ok('...that explains Run and Find, with the search\'s range and step filled in', t.text.indexOf(lang.dsIntro) === 0 && t.text.indexOf('{') < 0, t.text.slice(0, 80));
-	ok('...and ends with the engine that will run', t.text.endsWith(lang.engineNative) || t.text.endsWith(lang.engineEpanet), t.text.slice(-40));
+	ok('...and its opening paragraphs end with the engine that will run (the chapter\'s terms follow)', t.text.indexOf(lang.engineNative) > 0 || t.text.indexOf(lang.engineEpanet) > 0, t.text.slice(-40));
 	ok('...and fits the window', t.left >= 0 && t.right <= t.vw && t.top >= 0 && t.bottom <= t.vh);
 	await closeTip(a);
 	await page.evaluate(() => { const b = Array.from(document.querySelectorAll('#lpn_ds_controls button.lpn-ff-run'))[0]; b.click(); });
