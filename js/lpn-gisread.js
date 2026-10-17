@@ -177,6 +177,9 @@
 		return Promise.all(jobs).then(function () { return out; });
 	}
 
+	// The scenario workbook (Task 752) reads an .xlsx through the same unzip.
+	EngCalcs.lpnUnzip = unzip;
+
 	// ---- DBF ---------------------------------------------------------------------------------------
 	function readDbf(bytes, cpg) {
 		var dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength), nrec, hlen, rlen, fields = [], o = 32, rows = [], r, f, dec, p;

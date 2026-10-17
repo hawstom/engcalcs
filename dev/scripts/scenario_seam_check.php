@@ -236,6 +236,8 @@ $ovAllowed = [
     'smOwnContent', 'smMergePlan', 'smMergeUpward',
     // where a write lands, the scenario's own alternative made first (Tom, 2026-10-12)
     'ownWriteMap',
+    // the scenario workbook (Task 752): one value written into the stored alternative a workbook row names
+    'scnBookPut',
     // the derived (Basic mode) alternatives, read off each scenario's own map
     'alternativesOf', 'resolveThroughAlternatives', 'alternativeOverrides',
     // opening a file: the old key migration, and the guarantee that every scenario has a map

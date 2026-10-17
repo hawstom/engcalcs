@@ -151,7 +151,7 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 		return s;
 	}
 	function normSheet(sh) {
-		return { name: sh.name, heads: sh.heads, rows: sh.rows, numeric: sh.numeric || [] };
+		return { name: sh.name, heads: sh.heads, rows: sh.rows, numeric: sh.numeric || [], keys: sh.keys || null };
 	}
 
 	// ---- ODS ---------------------------------------------------------------------------------
@@ -281,8 +281,13 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	// Office Open XML, by hand, STORED like the ODS. Text is written inline (t="inlineStr"), so there
 	// is no shared-string part to keep in step. Style 0 is plain, 1 the heading (bold, wrapped,
 	// centred), and 2+d a number shown with d decimals.
+	// **A SHEET MAY CARRY A HIDDEN SECOND ROW OF KEYS** (`sh.keys`, the scenario workbook, Task 752):
+	// one language-free word per column under the heading a person reads, so a workbook made on a
+	// Spanish page reads back on an English one. The row is hidden (ECMA-376 18.3.1.73 row@hidden)
+	// and frozen with the heading, so the data still starts where the eye expects it.
 	function xlsxSheet(sh, first) {
-		var widths = colWidths(sh.heads, sh.rows), lines = 1, cols = '', data = '', decs = {}, fc = sh.heads.length > 1 ? 1 : 0, pane;
+		var widths = colWidths(sh.heads, sh.rows), lines = 1, cols = '', data = '', decs = {}, fc = sh.heads.length > 1 ? 1 : 0, pane,
+			top = sh.keys ? 2 : 1, a = 'A' + (top + 1), b = 'B' + (top + 1);
 		widths.forEach(function (w, i) {
 			cols += '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + (w + 1).toFixed(2) + '" customWidth="1"/>';
 			lines = Math.max(lines, headLines(sh.heads[i], w));
@@ -290,9 +295,15 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 		data = '<row r="1" ht="' + (15 * lines) + '" customHeight="1">' + sh.heads.map(function (h, i) {
 			return '<c r="' + colLetter(i) + '1" s="1" t="inlineStr"><is><t xml:space="preserve">' + xmlText(h) + '</t></is></c>';
 		}).join('') + '</row>';
+		if (sh.keys) {
+			data += '<row r="2" hidden="1">' + sh.heads.map(function (h, i) {
+				var k = sh.keys[i] === undefined || sh.keys[i] === null ? '' : String(sh.keys[i]);
+				return k === '' ? '' : '<c r="' + colLetter(i) + '2" t="inlineStr"><is><t xml:space="preserve">' + xmlText(k) + '</t></is></c>';
+			}).join('') + '</row>';
+		}
 		sh.rows.forEach(function (r, ri) {
-			data += '<row r="' + (ri + 2) + '">' + sh.heads.map(function (h, i) {
-				var v = r[i], t = v === undefined || v === null ? '' : String(v), ref = colLetter(i) + (ri + 2), nm;
+			data += '<row r="' + (ri + top + 1) + '">' + sh.heads.map(function (h, i) {
+				var v = r[i], t = v === undefined || v === null ? '' : String(v), ref = colLetter(i) + (ri + top + 1), nm;
 				if (t === '') { return ''; }
 				nm = numberCell(t, sh.numeric[i]);
 				if (nm) { return '<c r="' + ref + '" s="' + (nm.general ? 0 : 2 + nm.dec) + '"><v>' + t + '</v></c>'; }
@@ -306,15 +317,15 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 		// (18.2.1), which xlsxBook() writes; before 2026-10-07 it pointed at a workbook view that was not
 		// there: the one dangling reference in the file, and the first suspect for a freeze that did not take.
 		pane = fc
-			? '<pane xSplit="1" ySplit="1" topLeftCell="B2" activePane="bottomRight" state="frozen"/>' +
-				'<selection pane="topRight" activeCell="B1" sqref="B1"/><selection pane="bottomLeft" activeCell="A2" sqref="A2"/>' +
-				'<selection pane="bottomRight" activeCell="B2" sqref="B2"/>'
-			: '<pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/><selection pane="bottomLeft" activeCell="A2" sqref="A2"/>';
+			? '<pane xSplit="1" ySplit="' + top + '" topLeftCell="' + b + '" activePane="bottomRight" state="frozen"/>' +
+				'<selection pane="topRight" activeCell="B1" sqref="B1"/><selection pane="bottomLeft" activeCell="' + a + '" sqref="' + a + '"/>' +
+				'<selection pane="bottomRight" activeCell="' + b + '" sqref="' + b + '"/>'
+			: '<pane ySplit="' + top + '" topLeftCell="' + a + '" activePane="bottomLeft" state="frozen"/><selection pane="bottomLeft" activeCell="' + a + '" sqref="' + a + '"/>';
 		return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
 			'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
 			// CT_Worksheet is a SEQUENCE (ECMA-376 Part 1, 18.3.1.99), so order matters: sheetPr,
 			// dimension, sheetViews, sheetFormatPr, cols, sheetData, ... ignoredErrors.
-			'<dimension ref="A1:' + colLetter(Math.max(0, sh.heads.length - 1)) + (sh.rows.length + 1) + '"/>' +
+			'<dimension ref="A1:' + colLetter(Math.max(0, sh.heads.length - 1)) + (sh.rows.length + top) + '"/>' +
 			'<sheetViews><sheetView workbookViewId="0"' + (first ? ' tabSelected="1"' : '') + '>' + pane + '</sheetView></sheetViews>' +
 			'<sheetFormatPr defaultRowHeight="15"/><cols>' + cols + '</cols><sheetData>' + data + '</sheetData>' +
 			// CT_Worksheet order (ECMA-376 18.3.1.99): sheetData ... pageMargins, pageSetup, headerFooter, ...,
@@ -376,6 +387,133 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 		return xlsxBook([{ name: sheetName, heads: heads, rows: rows, numeric: numeric }]);
 	}
 
+	// ---- XLSX, READ -----------------------------------------------------------------------------
+	// **WHAT A SPREADSHEET PROGRAM WRITES BACK, NOT JUST WHAT xlsxBook() WRITES** (Task 752): Excel,
+	// LibreOffice and Google Sheets each re-save a workbook in their own way, with shared strings
+	// (ECMA-376 Part 1, 18.4), deflated entries and a namespace prefix or none. `files` is the
+	// archive as {path: bytes}, inflated by the caller (EngCalcs.lpnUnzip). Answers
+	// [{name, rows: [[text]]}] in the workbook's sheet order, each row indexed by its row number less
+	// one, every cell as TEXT: a number is the characters of its <v>, a boolean TRUE or FALSE, a
+	// string its characters. The one conversion is a time: a cell a person typed 12:00 into is
+	// stored as the fraction of a day, and a number format that shows hours, minutes or seconds
+	// (and no day, month or year) turns it back into h:mm or h:mm:ss, which is what was typed.
+	// Formulas are read as their cached value. Nothing is evaluated.
+	function xmlUnescape(s) {
+		return String(s).replace(/&(#x[0-9a-fA-F]+|#\d+|lt|gt|amp|quot|apos);/g, function (m, e) {
+			if (e === 'lt') { return '<'; }
+			if (e === 'gt') { return '>'; }
+			if (e === 'amp') { return '&'; }
+			if (e === 'quot') { return '"'; }
+			if (e === 'apos') { return "'"; }
+			return String.fromCodePoint(e.charAt(1) === 'x' ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10));
+		});
+	}
+	// ST_Xstring's own escape for a character XML cannot hold: _x000D_ (ECMA-376 Part 1, 22.9.2.19).
+	function ooxmlUnescape(s) {
+		return s.replace(/_x([0-9a-fA-F]{4})_/g, function (m, h) { return String.fromCharCode(parseInt(h, 16)); });
+	}
+	var P = '(?:[\\w.-]+:)?';
+	function tagRe(name, flags) { return new RegExp('<' + P + name + '(\\s[^>]*?)?(?:/>|>([\\s\\S]*?)</' + P + name + '>)', flags || 'g'); }
+	function attr(a, name) {
+		var m = new RegExp('(?:^|\\s)' + P + name + '\\s*=\\s*("([^"]*)"|\'([^\']*)\')').exec(a || '');
+		return m ? xmlUnescape(m[2] !== undefined ? m[2] : m[3]) : undefined;
+	}
+	// The text of a string item: every <t>, outside the phonetic runs (<rPh>), joined.
+	function runText(x) {
+		var out = '', m, re = tagRe('t');
+		x = String(x || '').replace(tagRe('rPh'), '');
+		while ((m = re.exec(x))) { out += m[2] === undefined ? '' : xmlUnescape(m[2]); }
+		return ooxmlUnescape(out);
+	}
+	function xlsxPartPath(base, target) {
+		var parts, out = [];
+		if (target.charAt(0) === '/') { return target.slice(1); }
+		parts = (base + target).split('/');
+		parts.forEach(function (p) { if (p === '..') { out.pop(); } else if (p !== '.' && p !== '') { out.push(p); } });
+		return out.join('/');
+	}
+	// The cell styles whose number format shows a time of day and no date: built-in formats 18-21
+	// and 45-47 (ECMA-376 Part 1, 18.8.30), and any custom one with h or s and no d or y.
+	function timeStyles(xml) {
+		var custom = {}, out = [], m, re = tagRe('numFmt'), xfs, x;
+		while ((m = re.exec(xml))) {
+			custom[attr(m[1], 'numFmtId')] = String(attr(m[1], 'formatCode') || '').replace(/"[^"]*"|\[[^\]h]*\]|\\./g, '');
+		}
+		xfs = tagRe('cellXfs').exec(xml);
+		if (!xfs) { return out; }
+		re = tagRe('xf');
+		while ((x = re.exec(xfs[2] || ''))) {
+			var id = attr(x[1], 'numFmtId'), n = +id, f = custom[id];
+			out.push((n >= 18 && n <= 21) || (n >= 45 && n <= 47) || (f !== undefined && /[hs]/i.test(f) && !/[dy]/i.test(f)));
+		}
+		return out;
+	}
+	function dayFractionText(v) {
+		var sec = Math.round(parseFloat(v) * 86400), h = Math.floor(sec / 3600), mi = Math.floor((sec % 3600) / 60), se = sec % 60;
+		if (!isFinite(sec)) { return v; }
+		return h + ':' + (mi < 10 ? '0' : '') + mi + (se ? ':' + (se < 10 ? '0' : '') + se : '');
+	}
+	function colIndex(ref) {
+		var m = /^([A-Z]+)/.exec(String(ref || '').toUpperCase()), n = 0, i;
+		if (!m) { return -1; }
+		for (i = 0; i < m[1].length; i++) { n = n * 26 + (m[1].charCodeAt(i) - 64); }
+		return n - 1;
+	}
+	function xlsxRead(files) {
+		var dec = new TextDecoder('utf-8'), text = function (p) { return files[p] ? dec.decode(files[p]) : null; },
+			rels, wbPath = 'xl/workbook.xml', wb, wbRels, targets = {}, shared = [], times = [], out = [], m, re, base;
+		rels = text('_rels/.rels');
+		if (rels) {
+			re = tagRe('Relationship');
+			while ((m = re.exec(rels))) {
+				if (/\/officeDocument$/.test(attr(m[1], 'Type') || '')) { wbPath = xlsxPartPath('', attr(m[1], 'Target') || wbPath); }
+			}
+		}
+		wb = text(wbPath);
+		if (wb === null) { throw new Error('no workbook part'); }
+		base = wbPath.indexOf('/') >= 0 ? wbPath.slice(0, wbPath.lastIndexOf('/') + 1) : '';
+		wbRels = text(base + '_rels/' + wbPath.slice(base.length) + '.rels') || '';
+		re = tagRe('Relationship');
+		while ((m = re.exec(wbRels))) {
+			var type = attr(m[1], 'Type') || '', tgt = xlsxPartPath(base, attr(m[1], 'Target') || '');
+			targets[attr(m[1], 'Id')] = tgt;
+			if (/\/sharedStrings$/.test(type)) {
+				var sst = text(tgt) || '', si = tagRe('si'), s;
+				while ((s = si.exec(sst))) { shared.push(runText(s[2])); }
+			}
+			if (/\/styles$/.test(type)) { times = timeStyles(text(tgt) || ''); }
+		}
+		re = tagRe('sheet');
+		while ((m = re.exec(wb))) {
+			var rid = attr(m[1], 'id'), xml = text(targets[rid] || ''), rows = [], rowRe, rm, next = 0;
+			if (xml === null) { continue; }
+			rowRe = tagRe('row');
+			while ((rm = rowRe.exec(xml))) {
+				var rn = attr(rm[1], 'r'), ri = rn !== undefined ? (+rn - 1) : next, cells = [], cRe = tagRe('c'), cm, ci = 0;
+				next = ri + 1;
+				while ((cm = cRe.exec(rm[2] || ''))) {
+					var ref = attr(cm[1], 'r'), t = attr(cm[1], 't'), st = attr(cm[1], 's'), body = cm[2] || '', vm, v, txt;
+					if (ref !== undefined && colIndex(ref) >= 0) { ci = colIndex(ref); }
+					vm = tagRe('v').exec(body);
+					v = vm && vm[2] !== undefined ? xmlUnescape(vm[2]) : '';
+					if (t === 's') { txt = shared[+v] === undefined ? '' : shared[+v]; }
+					else if (t === 'inlineStr') { var is = tagRe('is').exec(body); txt = is ? runText(is[2]) : ''; }
+					else if (t === 'b') { txt = v === '' ? '' : (v === '1' || v.toLowerCase() === 'true' ? 'TRUE' : 'FALSE'); }
+					else if (t === 'str' || t === 'e' || t === 'd') { txt = ooxmlUnescape(v); }
+					else { txt = (v !== '' && times[+st || 0]) ? dayFractionText(v) : v; }
+					cells[ci] = txt;
+					ci++;
+				}
+				for (var k = 0; k < cells.length; k++) { if (cells[k] === undefined) { cells[k] = ''; } }
+				rows[ri] = cells;
+			}
+			for (var r = 0; r < rows.length; r++) { if (!rows[r]) { rows[r] = []; } }
+			out.push({ name: attr(m[1], 'name') || '', rows: rows });
+		}
+		return out;
+	}
+
+	EngCalcs.lpnTableXlsxRead = xlsxRead;
 	EngCalcs.lpnTableTsv = tsv;
 	EngCalcs.lpnTableCsv = csv;
 	EngCalcs.lpnTableOds = ods;

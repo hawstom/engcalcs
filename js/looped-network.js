@@ -50817,6 +50817,1018 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	EngCalcs.lpnWorkspacePlan = workspacePlan;
 	EngCalcs.lpnWorkspaceCarries = workspaceCarries;
+	// ---- THE SCENARIO WORKBOOK: SYNC OUT AND SYNC IN, AS A FILE (Task 752; dev/scenario-workbook.md) ----
+	//
+	// Tom, 2026-09-30, on a master spreadsheet with a Scenarios tab naming each scenario's
+	// alternatives and then one tab per data kind keyed by element ID: *"Spreadsheet structure: I love
+	// this."* And 2026-10-07, on Bentley's Connection (a saved set of directions run for Sync In and
+	// Sync Out, not a live link): *"Nice. That's where we should head."* This is that, as a file: no
+	// account, no upload, no third-party service. File > Export writes the workbook; File > Import
+	// reads one back, shows every difference, and applies them on a yes, as one undo step.
+	//
+	// **THE WORKBOOK SAYS THE WHOLE TREE, AND ONLY WHAT IS STORED.** Scenarios (each one's parent and
+	// the alternative it names in each category), Alternatives (each one's category, ID, name and
+	// parent), one sheet per element category holding each alternative's OWN values keyed by asset
+	// ID, and Settings (each alternative's own setting values). Base's values are the drawing and the
+	// project, so they are not in it. Every value is the stored one, in the project's units, with the
+	// unit in the heading: nothing is converted, rounded or reformatted.
+	//
+	// **ROW 2 OF EVERY SHEET IS A HIDDEN ROW OF KEYS** (lpn-tablefile.js): one language-free word
+	// per column, the first naming the sheet, so a workbook read back never depends on the language
+	// of the headings or the name a person gave a sheet tab. A unit stamp rides on each value
+	// column's key, so a workbook made in other units is refused column by column, never misread.
+	//
+	// **SYNC IN NEVER DELETES.** What the project has and the workbook does not (a scenario, an
+	// alternative, a value, a blank cell where a value was) is kept and listed. Every row it cannot
+	// use is listed with the reason. An unchanged workbook changes nothing and lists nothing.
+	var SCNBOOK_ELEMENT_CATS = LPN_ALT_CATEGORIES.filter(function (c) { return c !== 'presentation' && c !== 'calculation'; });
+	var SCNBOOK_VALVE_TYPES = ['PRV', 'PSV', 'PBV', 'FCV', 'TCV', 'GPV'];
+	var SCNBOOK_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+	function scnBookPc() { return EngCalcs.pageConfig || {}; }
+	function scnBookBlankWord() { return scnBookPc().lpn_scnbook_blank || '(blank)'; }
+	function scnBookHas(o, k) { return plainObject(o) && Object.prototype.hasOwnProperty.call(o, k); }
+	// One stored value as a cell: a number as JavaScript writes it (the shortest text that reads back
+	// as the same number), a yes/no as TRUE or FALSE, a list or object as JSON, and a value set
+	// deliberately blank as the blank word, because an empty cell means "no value stated here".
+	function scnBookText(v) {
+		if (v === undefined) { return ''; }
+		if (v === null || v === '') { return scnBookBlankWord(); }
+		if (typeof v === 'boolean') { return v ? 'TRUE' : 'FALSE'; }
+		if (typeof v === 'number') { return String(v); }
+		if (typeof v === 'string') { return v; }
+		return JSON.stringify(v);
+	}
+	function scnBookIsBlankWord(t) {
+		var low = String(t).trim().toLowerCase();
+		return low === scnBookBlankWord().toLowerCase() || low === '(blank)';
+	}
+	// The same value, as a spreadsheet may hand it back: a number to the 15 significant digits a
+	// spreadsheet keeps, and a blank kept as null or as an empty string.
+	function scnBookSame(a, b) {
+		if ((a === null || a === '') && (b === null || b === '')) { return true; }
+		if (typeof a === 'number' && typeof b === 'number') {
+			return a === b || (isFinite(a) && isFinite(b) && Number(a.toPrecision(15)) === Number(b.toPrecision(15)));
+		}
+		if (a && typeof a === 'object' && b && typeof b === 'object') { return canonJSON(a) === canonJSON(b); }
+		return a === b;
+	}
+	function scnBookYesNo(t) {
+		var pc = scnBookPc(), low = String(t).trim().toLowerCase();
+		if (/^(1|true|yes|on|y|x|✓)$/.test(low) || low === String(pc.lpn_settings_table_yes || 'Yes').toLowerCase()) { return true; }
+		if (/^(0|false|no|off|n)$/.test(low) || low === String(pc.lpn_settings_table_no || 'No').toLowerCase()) { return false; }
+		return undefined;
+	}
+	/**
+	 * **ONE CELL READ BACK AS THE KIND OF VALUE IT REPLACES**: `like` is the value already held there,
+	 * else Base's, so a number stays a number, a pattern ID stays text even when it reads "2", and a
+	 * list stays a list. With nothing to go by, the column decides (a yes/no, a choice, a number).
+	 * Answers {ok, v} or {ok: false, why} with the language key of the reason.
+	 */
+	function scnBookParse(t, like, d, el, group) {
+		var raw = String(t), s = raw.trim(), yn, v, ch;
+		if (scnBookIsBlankWord(s)) { return { ok: true, v: (typeof like === 'string') ? '' : null }; }
+		if (d && d.prop === 'type') {
+			if ((group === 'node' ? ['junction', 'reservoir', 'tank'] : ['pipe', 'pump', 'valve']).indexOf(s) < 0) { return { ok: false, why: 'lpn_scnbook_why_choice' }; }
+			return { ok: true, v: s };
+		}
+		if (d && d.prop === 'valveType') {
+			if (SCNBOOK_VALVE_TYPES.indexOf(s.toUpperCase()) < 0) { return { ok: false, why: 'lpn_scnbook_why_choice' }; }
+			return { ok: true, v: s.toUpperCase() };
+		}
+		if (typeof like === 'boolean' || (like === undefined && d && d.col && d.col.bool)) {
+			yn = scnBookYesNo(s);
+			return yn === undefined ? { ok: false, why: 'lpn_scnbook_why_yesno' } : { ok: true, v: yn };
+		}
+		if ((like && typeof like === 'object') || (d && d.prop === 'demands')) {
+			try { v = JSON.parse(s); } catch (e) { return { ok: false, why: 'lpn_scnbook_why_json' }; }
+			if (Array.isArray(like) !== Array.isArray(v) || !v || typeof v !== 'object') { return { ok: false, why: 'lpn_scnbook_why_json' }; }
+			return { ok: true, v: v };
+		}
+		if (typeof like === 'number' || (like === undefined && d && d.numeric)) {
+			if (s === '' || !isFinite(+s)) { return { ok: false, why: 'lpn_scnbook_why_number' }; }
+			return { ok: true, v: +s };
+		}
+		if (d && d.col && d.col.choices && el && !d.col.lenient) {
+			ch = d.col.choices(el) || [];
+			if (!ch.some(function (o) { return o[0] === s; })) { return { ok: false, why: 'lpn_scnbook_why_choice' }; }
+			return { ok: true, v: s };
+		}
+		if (typeof like === 'string' || (d && d.col && (d.col.str || d.col.choices))) { return { ok: true, v: raw }; }
+		return { ok: true, v: (s !== '' && isFinite(+s)) ? +s : raw };
+	}
+	// The kind word an asset is shown with, as the override list shows it; an asset the drawing no
+	// longer has keeps its group's own word, so its row can still be matched.
+	function scnBookAssetText(key) {
+		var pc = scnBookPc(), g = ovKeyGroup(key), el = g === 'label' ? null : smMergeElement(key), words;
+		if (g === 'label') { return pc.lpn_tool_add_text || 'Text'; }
+		if (!el) { return g; }
+		words = { junction: pc.lpn_tool_add_junction || 'Junction', reservoir: pc.lpn_tool_add_reservoir || 'Reservoir', tank: pc.lpn_tool_add_tank || 'Tank',
+			pipe: pc.lpn_tool_add_pipe || 'Pipe', pump: pc.lpn_tool_add_pump || 'Pump', valve: pc.lpn_tool_add_valve || 'Valve' };
+		return words[morphBaseOf(el, 'type')] || g;
+	}
+	function scnBookGroupOfAsset(t) {
+		var pc = scnBookPc(), low = String(t || '').trim().toLowerCase(), out = null;
+		if (!low) { return null; }
+		[['node', ['junction', 'reservoir', 'tank', 'node'], ['lpn_tool_add_junction', 'lpn_tool_add_reservoir', 'lpn_tool_add_tank']],
+			['link', ['pipe', 'pump', 'valve', 'link'], ['lpn_tool_add_pipe', 'lpn_tool_add_pump', 'lpn_tool_add_valve']],
+			['label', ['text', 'label'], ['lpn_tool_add_text']]].forEach(function (g) {
+			if (out) { return; }
+			if (g[1].indexOf(low) >= 0 || g[2].some(function (k) { return pc[k] && String(pc[k]).toLowerCase() === low; })) { out = g[0]; }
+		});
+		return out === null ? undefined : out;
+	}
+	function scnBookIdOf(key) { return String(key).slice(ovKeyFor(ovKeyGroup(key), '').length); }
+	function scnBookSortKeys(keys) {
+		var order = { node: 0, link: 1, label: 2 };
+		return keys.slice().sort(function (a, b) {
+			return (order[ovKeyGroup(a)] - order[ovKeyGroup(b)]) ||
+				scnBookIdOf(a).localeCompare(scnBookIdOf(b), undefined, { numeric: true, sensitivity: 'base' }) || (a < b ? -1 : a > b ? 1 : 0);
+		});
+	}
+	// **A VALUE COLUMN**: its property, the group it is described from, the heading a person reads
+	// (the Tables pane's own words and unit), and the stamp of the unit the values are in.
+	var scnBookDescCache = null;
+	function scnBookDescribe(prop, group) {
+		var ck = (group || 'node') + '\u0000' + prop, d;
+		if (scnBookDescCache && scnBookDescCache[ck]) { return Object.assign({}, scnBookDescCache[ck]); }
+		d = scnBookDescribeNow(prop, group);
+		if (scnBookDescCache) { scnBookDescCache[ck] = d; }
+		return Object.assign({}, d);
+	}
+	function scnBookDescribeNow(prop, group) {
+		var pc = scnBookPc(), parts = smItemParts(ovKeyFor(group || 'node', '\u0000'), prop, prop === 'demands' ? 'demand' : prop),
+			c = parts.col, unit = c ? paneHeadingUnitText(c) : '', label, stamp;
+		label = prop === 'demands' ? (pc.lpn_scnbook_col_demands || 'Demand categories') : (parts.label === null ? prop : parts.label);
+		stamp = (c && typeof c.unit === 'function' && unitKey(c.unit())) || unit || '';
+		return { prop: prop, group: group, col: c, label: label, unit: unit, stamp: stamp,
+			head: label + (unit ? ' (' + unit + ')' : ''), key: prop + (stamp ? '|' + stamp : ''),
+			numeric: !!(c && c.set && !c.str && !c.choices && !c.bool && !c.parse) && prop !== 'demands' };
+	}
+	// The groups a property of a category belongs to, in table order.
+	function scnBookGroupsOf(cat, prop) {
+		var out = [];
+		['node', 'link', 'label'].forEach(function (g) {
+			if (categoryOf(prop, g) !== cat) { return; }
+			if (LPN_MORPH_PROP[prop] ? (g === 'link' || (g === 'node' && prop === 'type')) :
+				(!!(LPN_OVERRIDABLE[g] || {})[prop] || (cat === 'userdata' && g !== 'label'))) { out.push(g); }
+		});
+		return out;
+	}
+	// Every property of a category, in the order the code lists them, then any other a holder has.
+	function scnBookColumns(cat, extra) {
+		var out = [], seen = {};
+		function add(prop, group) {
+			if (seen[prop]) { return; }
+			seen[prop] = true;
+			out.push(scnBookDescribe(prop, group));
+		}
+		['node', 'link', 'label'].forEach(function (g) {
+			Object.keys(LPN_ALT_CATEGORY_OF[g] || {}).forEach(function (prop) {
+				if (LPN_ALT_CATEGORY_OF[g][prop] === cat && scnBookGroupsOf(cat, prop).indexOf(g) >= 0) { add(prop, g); }
+			});
+		});
+		if (cat === 'userdata') { customPropDefs().forEach(function (d) { add(d.key, 'node'); }); }
+		(extra || []).forEach(function (pg) { add(pg[0], pg[1]); });
+		return out;
+	}
+	// What a scenario names for a category, as the workbook says it: '' (it inherits), 'base' (Base,
+	// chosen), its own alternative from a file before 2026-10-12, or a stored record's id.
+	function scnBookPick(s, cat) {
+		var c = smChoice(s, cat);
+		if (c.via) { return ''; }
+		if (c.base && c.chosen) { return s.isBase ? '' : LPN_BASE_CHOICE; }
+		if (c.own) { return smImplicitKey(s, cat); }
+		return (c.id !== null && c.id !== undefined) ? c.id : '';
+	}
+	function scnBookPickText(s, cat) {
+		var k = scnBookPick(s, cat);
+		return k === '' ? '' : smName(cat, k === LPN_BASE_CHOICE ? smBaseKey(cat) : k);
+	}
+	function scnBookParentText(s) {
+		if (s.isBase || s.root === true) { return ''; }
+		return scenarioDisplayName(parentScenarioOf(s));
+	}
+	function scnBookPathText(path) {
+		return path.some(function (m) { return String(m).indexOf('.') >= 0; }) ? JSON.stringify(path) : path.join('.');
+	}
+	function scnBookPathParse(t) {
+		var s = String(t).trim(), p;
+		if (s.charAt(0) === '[') {
+			try { p = JSON.parse(s); } catch (e) { return null; }
+			return Array.isArray(p) && p.length && p.every(function (m) { return typeof m === 'string' && m !== ''; }) ? p : null;
+		}
+		p = s.split('.');
+		return s && p.every(function (m) { return m !== ''; }) ? p : null;
+	}
+	// One holder's own setting values, a typed time folded into its number: [{path, value, timeText?}].
+	function scnBookLeaves(cat, key) {
+		var all = smOwnContent(cat, key).leaves, text = {}, out = [];
+		all.forEach(function (l) { if (l.path[0] === 'times' && l.path[1] === 'text' && l.path.length === 3) { text[l.path[2]] = l.value; } });
+		all.forEach(function (l) {
+			var o;
+			if (l.path[0] === 'times' && l.path[1] === 'text') { return; }
+			o = { path: l.path, value: l.value };
+			if (l.path[0] === 'times' && l.path.length === 2 && typeof l.value === 'number') {
+				o.timeText = typeof text[l.path[1]] === 'string' ? text[l.path[1]] : (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(l.value) : String(l.value));
+			}
+			out.push(o);
+		});
+		return out;
+	}
+	function scnBookHolders(cat) { return smRows(cat).filter(function (r) { return !r.isBase; }); }
+	function scnBookSheetName(cat) {
+		var pc = scnBookPc();
+		if (cat === 'scenarios') { return pc.lpn_pane_tab_scenarios || 'Scenarios'; }
+		if (cat === 'alternatives') { return pc.lpn_scnbook_sheet_alternatives || 'Alternatives'; }
+		if (cat === 'settings') { return pc.lpn_tool_settings || 'Settings'; }
+		return altCategoryLabel(cat);
+	}
+	/**
+	 * **SYNC OUT: THE WORKBOOK'S SHEETS**, for EngCalcs.lpnTableXlsxBook(): [{name, heads, keys, rows,
+	 * numeric}]. Read only.
+	 */
+	function scnBookSheets() {
+		scnBookDescCache = {};
+		try { return scnBookSheetsNow(); } finally { scnBookDescCache = null; }
+	}
+	function scnBookSheetsNow() {
+		var pc = scnBookPc(), sheets = [], rows, heads, keys;
+		heads = [pc.lpn_field_id || 'ID', pc.lpn_scenario_label || 'Scenario', pc.lpn_sm_col_parent || 'Parent']
+			.concat(LPN_ALT_CATEGORIES.map(altCategoryLabel));
+		keys = ['scenarios:id', 'name', 'parent'].concat(LPN_ALT_CATEGORIES);
+		rows = scenariosForDisplay().map(function (s) {
+			return [s.id, scenarioDisplayName(s), scnBookParentText(s)].concat(LPN_ALT_CATEGORIES.map(function (cat) { return scnBookPickText(s, cat); }));
+		});
+		sheets.push({ name: scnBookSheetName('scenarios'), heads: heads, keys: keys, rows: rows });
+		rows = [];
+		LPN_ALT_CATEGORIES.forEach(function (cat) {
+			scnBookHolders(cat).forEach(function (r) {
+				var pk = smParentKey(cat, r.key);
+				rows.push([altCategoryLabel(cat), r.key, r.name, pk === null ? '' : smName(cat, pk)]);
+			});
+		});
+		sheets.push({ name: scnBookSheetName('alternatives'),
+			heads: [pc.lpn_settings_table_category || 'Category', pc.lpn_field_id || 'ID', pc.lpn_scnbook_col_alternative || 'Alternative', pc.lpn_sm_col_parent || 'Parent'],
+			keys: ['alternatives:category', 'id', 'name', 'parent'], rows: rows });
+		SCNBOOK_ELEMENT_CATS.forEach(function (cat) {
+			var data = [], extra = [], cols;
+			scnBookHolders(cat).forEach(function (h) {
+				var vals = smOwnContent(cat, h.key).values;
+				scnBookSortKeys(Object.keys(vals)).forEach(function (k) {
+					if (!plainObject(vals[k]) || !Object.keys(vals[k]).length) { return; }
+					data.push({ name: h.name, key: k, ov: vals[k] });
+					Object.keys(vals[k]).forEach(function (p) { extra.push([p, ovKeyGroup(k)]); });
+				});
+			});
+			cols = scnBookColumns(cat, extra);
+			sheets.push({ name: scnBookSheetName(cat),
+				heads: [pc.lpn_scnbook_col_alternative || 'Alternative', pc.lpn_crit_col_asset || 'Asset', pc.lpn_field_id || 'ID'].concat(cols.map(function (c) { return c.head; })),
+				keys: [cat + ':alternative', 'asset', 'id'].concat(cols.map(function (c) { return c.key; })),
+				numeric: [false, false, false].concat(cols.map(function (c) { return c.numeric; })),
+				rows: data.map(function (d) {
+					return [d.name, scnBookAssetText(d.key), scnBookIdOf(d.key)].concat(cols.map(function (c) {
+						return scnBookHas(d.ov, c.prop) ? scnBookText(d.ov[c.prop]) : '';
+					}));
+				}) });
+		});
+		rows = [];
+		LPN_ALT_CATEGORIES.forEach(function (cat) {
+			scnBookHolders(cat).forEach(function (h) {
+				scnBookLeaves(cat, h.key).forEach(function (l) {
+					rows.push([altCategoryLabel(cat), h.name, smMergeLeafText(l.path), scnBookPathText(l.path), l.timeText !== undefined ? l.timeText : scnBookText(l.value)]);
+				});
+			});
+		});
+		sheets.push({ name: scnBookSheetName('settings'),
+			heads: [pc.lpn_settings_table_category || 'Category', pc.lpn_scnbook_col_alternative || 'Alternative', pc.lpn_settings_table_setting || 'Setting',
+				pc.lpn_scnbook_col_path || 'Path', pc.lpn_find_value || 'Value'],
+			keys: ['settings:category', 'alternative', 'setting', 'path', 'value'], rows: rows });
+		return sheets;
+	}
+	function scnBookFileName() { return safeFileName(projectDisplayName(project)) + '-scenarios.xlsx'; }
+	function scnBookBytes() { return EngCalcs.lpnTableXlsxBook(scnBookSheets()); }
+	function exportScnBookFile() {
+		var pc = scnBookPc(), name = scnBookFileName();
+		saveToStorage();
+		downloadBlob(new Blob([scnBookBytes()], { type: SCNBOOK_MIME }), name);
+		setNotice((pc.lpn_status_inp_exported || 'Exported {file}.').split('{file}').join(name));
+	}
+	// ---- SYNC IN: READ, COMPARE, REPORT, APPLY ----
+	function scnBookSay(key, fallback, vars) {
+		var s = String(scnBookPc()[key] || fallback);
+		Object.keys(vars || {}).forEach(function (k) { s = s.split('{' + k + '}').join(String(vars[k])); });
+		return s;
+	}
+	// The category a cell names: its id, or its label on this page.
+	function scnBookCatOf(t) {
+		var low = String(t || '').trim().toLowerCase(), out;
+		if (!low) { return null; }
+		LPN_ALT_CATEGORIES.forEach(function (c) { if (!out && (c === low || altCategoryLabel(c).toLowerCase() === low)) { out = c; } });
+		return out || undefined;
+	}
+	// The tree a stored record id or a scenario's own alternative key belongs to, or null.
+	function scnBookTreeOfKey(key) {
+		var i = String(key).lastIndexOf(':'), r;
+		if (i > 0 && LPN_ALT_CATEGORIES.indexOf(String(key).slice(i + 1)) >= 0) {
+			return smImplicitOwner(String(key).slice(i + 1), key) ? String(key).slice(i + 1) : null;
+		}
+		r = altById(key);
+		if (r) { return r.category; }
+		return calcSetById(key) ? 'calculation' : null;
+	}
+	// A table of names for references: [{key, name, base?}]. A reference is a key first, then a
+	// name exactly, then a name in any case when only one matches.
+	// **A NAME THE WORKBOOK CHANGES STILL REACHES ITS RECORD BY THE OLD NAME**, so renaming Peak in
+	// its own row does not strand every row that still says Peak; the new names are asked first.
+	function scnBookResolve(table, ref) {
+		var s = String(ref === undefined || ref === null ? '' : ref).trim(), low = s.toLowerCase(), i, hit, ways;
+		if (s === '') { return ''; }
+		hit = table.filter(function (e) { return e.key === s && !e.isNew; });
+		if (hit.length) { return hit[0].key; }
+		ways = [function (e) { return e.names.indexOf(s) >= 0; },
+			function (e) { return e.names.some(function (n) { return n.toLowerCase() === low; }); },
+			function (e) { return (e.old || []).indexOf(s) >= 0; },
+			function (e) { return (e.old || []).some(function (n) { return n.toLowerCase() === low; }); }];
+		for (i = 0; i < ways.length; i++) {
+			hit = table.filter(ways[i]);
+			if (hit.length === 1) { return hit[0].key; }
+			if (hit.length > 1) { return null; }
+		}
+		return undefined;
+	}
+	/**
+	 * **WHAT A WORKBOOK WOULD DO TO THE OPEN PROJECT**, with nothing applied: `book` is
+	 * [{name, rows}] as EngCalcs.lpnTableXlsxRead() answers it. Answers {ok, changes, unusable, kept,
+	 * ops} or {ok: false, why}. `changes` and `unusable` are report rows {sheet, row, what, from, to}
+	 * and {sheet, row, why}; `kept` lines say what the project has that the workbook does not;
+	 * `ops` is what scnBookApply() carries out.
+	 */
+	function scnBookPlan(book) {
+		scnBookDescCache = {};
+		try { return scnBookPlanNow(book); } finally { scnBookDescCache = null; }
+	}
+	function scnBookPlanNow(book) {
+		var pc = scnBookPc(), ownCache = {}, out = { ok: true, changes: [], unusable: [], kept: [],
+			ops: { newScn: [], newAlt: [], renameScn: [], renameAlt: [], parentScn: [], parentAlt: [], picks: [], values: [], settings: [] } },
+			found = {}, base = baseScenario(), scnTable, altTables = {}, scnRows = [], altRows = [], inheritWord = pc.lpn_sm_inherited || 'inherited';
+		function bad(sheet, row, why) { out.unusable.push({ sheet: sheet, row: row, why: why }); }
+		function change(sheet, row, what, from, to) { out.changes.push({ sheet: sheet, row: row, what: what, from: from, to: to }); }
+		function cell(r, map, key) { var i = map[key]; return (i === undefined || r[i] === undefined || r[i] === null) ? '' : String(r[i]); }
+		function blankRow(r) { return !(r || []).some(function (c) { return String(c === undefined || c === null ? '' : c).trim() !== ''; }); }
+		function keyMap(sh) {
+			var m = {}, k = sh.rows[1] || [];
+			k.forEach(function (v, i) {
+				var s = String(v === undefined || v === null ? '' : v).trim();
+				if (i === 0 && s.indexOf(':') > 0) { s = s.slice(s.indexOf(':') + 1); }
+				if (s !== '' && m[s] === undefined) { m[s] = i; }
+			});
+			return m;
+		}
+		// ---- which sheet is which, by the first key of row 2 ----
+		(book || []).forEach(function (sh) {
+			var k = String(((sh.rows || [])[1] || [])[0] || '').trim(), kind = k.indexOf(':') > 0 ? k.slice(0, k.indexOf(':')) : '';
+			if (kind !== 'scenarios' && kind !== 'alternatives' && kind !== 'settings' && SCNBOOK_ELEMENT_CATS.indexOf(kind) < 0) {
+				if ((sh.rows || []).some(function (r, i) { return i > 0 && !blankRow(r); }) || (sh.rows || []).length) {
+					bad(sh.name, '', scnBookSay('lpn_scnbook_why_sheet', 'This sheet is not one a scenario workbook has, so it was not read.'));
+				}
+				return;
+			}
+			if (found[kind]) { bad(sh.name, '', scnBookSay('lpn_scnbook_why_sheet_twice', 'A second sheet of this kind. Only the first, {sheet}, was read.', { sheet: found[kind].name })); return; }
+			found[kind] = sh;
+		});
+		if (!found.scenarios && !found.alternatives && !SCNBOOK_ELEMENT_CATS.some(function (c) { return found[c]; }) && !found.settings) {
+			return { ok: false, why: 'lpn_scnbook_refused_not_workbook' };
+		}
+		// ---- the names every reference is resolved against: the workbook's, else the project's ----
+		scnTable = scenarios.map(function (s) {
+			return { key: s.id, names: s.isBase ? [scenarioDisplayName(s), 'Base'] : [scenarioDisplayName(s)], base: !!s.isBase };
+		});
+		LPN_ALT_CATEGORIES.forEach(function (cat) {
+			altTables[cat] = [{ key: smBaseKey(cat), names: [smName(cat, smBaseKey(cat)), 'Base'], base: true }].concat(smRecords(cat).map(function (r) {
+				return { key: r.id, names: [String(r.name || '')] };
+			}));
+		});
+		function entryIn(table, key) { var i; for (i = 0; i < table.length; i++) { if (table[i].key === key) { return table[i]; } } return null; }
+		function nameFree(table, name, key) {
+			var low = name.toLowerCase();
+			return !table.some(function (e) { return e.key !== key && e.names.some(function (n, i) { return (i === 0 || e.base) && n.toLowerCase() === low; }); });
+		}
+		// Scenarios: first the identities and names.
+		if (found.scenarios) {
+			(function () {
+				var sh = found.scenarios, m = keyMap(sh), seen = {};
+				sh.rows.slice(2).forEach(function (r, i) {
+					var row = i + 3, id = cell(r, m, 'id').trim(), name = cell(r, m, 'name').trim(), s = id ? scenarioById(id) : null, e;
+					if (blankRow(r)) { return; }
+					if (s && seen[id]) { bad(sh.name, row, scnBookSay('lpn_scnbook_why_id_twice', 'A second row with the ID {id}. Only the first was read.', { id: id })); return; }
+					if (s) {
+						seen[id] = true;
+						e = entryIn(scnTable, s.id);
+						if (s.isBase) {
+							if (name !== '' && name !== scenarioDisplayName(s) && name !== 'Base') { bad(sh.name, row, scnBookSay('lpn_scnbook_why_base_name', 'The name of Base is not changed by a workbook.')); }
+						} else if (name === '') {
+							bad(sh.name, row, scnBookSay('lpn_scnbook_why_no_name', 'This row has no name, so its name was not changed.'));
+						} else if (name !== scenarioDisplayName(s)) {
+							if (!nameFree(scnTable, name, s.id)) { bad(sh.name, row, scnBookSay('lpn_scnbook_why_name_taken', 'The name {name} is used by another item, so it was not given to this one.', { name: name })); }
+							else { e.old = e.names; e.names = [name]; e.rename = { from: scenarioDisplayName(s), to: name }; }
+						}
+						scnRows.push({ sh: sh, row: row, r: r, m: m, s: s });
+						return;
+					}
+					if (name === '') { bad(sh.name, row, scnBookSay('lpn_scnbook_why_new_no_name', 'A new scenario or alternative needs a name, so this row was not used.')); return; }
+					if (!nameFree(scnTable, name, null)) { bad(sh.name, row, scnBookSay('lpn_scnbook_why_name_taken', 'The name {name} is used by another item, so it was not given to this one.', { name: name })); return; }
+					e = { key: 'new:scn:' + row, names: [name], isNew: true };
+					scnTable.push(e);
+					scnRows.push({ sh: sh, row: row, r: r, m: m, s: null, key: e.key, name: name, id: id });
+				});
+			}());
+		}
+		// Alternatives: identities and names, per tree.
+		if (found.alternatives) {
+			(function () {
+				var sh = found.alternatives, m = keyMap(sh), seen = {};
+				sh.rows.slice(2).forEach(function (r, i) {
+					var row = i + 3, id = cell(r, m, 'id').trim(), name = cell(r, m, 'name').trim(), catText = cell(r, m, 'category'),
+						cat = scnBookCatOf(catText), tree = id ? scnBookTreeOfKey(id) : null, e, rec;
+					if (blankRow(r)) { return; }
+					if (tree) {
+						if (seen[id]) { bad(sh.name, row, scnBookSay('lpn_scnbook_why_id_twice', 'A second row with the ID {id}. Only the first was read.', { id: id })); return; }
+						seen[id] = true;
+						if (catText.trim() !== '' && cat !== tree) {
+							bad(sh.name, row, scnBookSay('lpn_scnbook_why_category', 'The alternative {id} is in the category {category}, so this row was not used.', { id: id, category: altCategoryLabel(tree) }));
+							return;
+						}
+						rec = smRecord(tree, id);
+						e = entryIn(altTables[tree], id);
+						if (name === '') { bad(sh.name, row, scnBookSay('lpn_scnbook_why_no_name', 'This row has no name, so its name was not changed.')); }
+						else if (name !== String(rec.name || '')) {
+							if (!nameFree(altTables[tree], name, id)) { bad(sh.name, row, scnBookSay('lpn_scnbook_why_name_taken', 'The name {name} is used by another item, so it was not given to this one.', { name: name })); }
+							else { e.old = e.names; e.names = [name]; e.rename = { from: String(rec.name || ''), to: name }; }
+						}
+						altRows.push({ sh: sh, row: row, r: r, m: m, cat: tree, key: id });
+						return;
+					}
+					if (!cat) {
+						bad(sh.name, row, catText.trim() === '' ? scnBookSay('lpn_scnbook_why_no_category', 'A new alternative needs a category, so this row was not used.')
+							: scnBookSay('lpn_scnbook_why_unknown_category', 'There is no category {category}, so this row was not used.', { category: catText.trim() }));
+						return;
+					}
+					if (name === '') { bad(sh.name, row, scnBookSay('lpn_scnbook_why_new_no_name', 'A new scenario or alternative needs a name, so this row was not used.')); return; }
+					if (!nameFree(altTables[cat], name, null)) { bad(sh.name, row, scnBookSay('lpn_scnbook_why_name_taken', 'The name {name} is used by another item, so it was not given to this one.', { name: name })); return; }
+					e = { key: 'new:alt:' + row, names: [name], isNew: true };
+					altTables[cat].push(e);
+					altRows.push({ sh: sh, row: row, r: r, m: m, cat: cat, key: e.key, isNew: true, name: name, id: id });
+				});
+			}());
+		}
+		function scnName(key) { var e = entryIn(scnTable, key); return e ? e.names[0] : ''; }
+		function altName(cat, key) { var e = entryIn(altTables[cat], key); return e ? e.names[0] : ''; }
+		// ---- scenarios: new ones, renames, parents ----
+		var scnParent = {};
+		scenarios.forEach(function (s) { scnParent[s.id] = s.isBase || s.root === true ? null : parentScenarioOf(s).id; });
+		scnRows.forEach(function (x) {
+			var ptext = cell(x.r, x.m, 'parent'), p = scnBookResolve(scnTable, ptext), cur;
+			if (!x.s) {
+				if (p === undefined || p === null) {
+					bad(x.sh.name, x.row, scnBookSay('lpn_scnbook_why_no_parent', 'There is no single scenario or alternative named {name} to be the parent, so this row was not used.', { name: ptext.trim() }));
+					entryIn(scnTable, x.key).dead = true;
+					return;
+				}
+				x.parent = p === '' ? base.id : p;
+				scnParent[x.key] = x.parent;
+				return;
+			}
+			if (x.s.isBase || x.s.root === true) {
+				if (ptext.trim() !== '') { bad(x.sh.name, x.row, scnBookSay('lpn_scnbook_why_root_parent', 'A Base takes no parent, so the parent in this row was not used.')); }
+				return;
+			}
+			if (p === undefined || p === null) {
+				bad(x.sh.name, x.row, scnBookSay('lpn_scnbook_why_no_parent', 'There is no single scenario or alternative named {name} to be the parent, so this row was not used.', { name: ptext.trim() }));
+				return;
+			}
+			p = p === '' ? base.id : p;
+			cur = scnParent[x.s.id];
+			if (p !== cur) { x.parent = p; scnParent[x.s.id] = p; }
+		});
+		// A parent that would make a loop is refused, the row's other cells still read.
+		function loops(map, key) {
+			var seen = {}, cur = map[key];
+			seen[key] = true;
+			while (cur !== null && cur !== undefined) {
+				if (seen[cur]) { return true; }
+				seen[cur] = true;
+				cur = map[cur];
+			}
+			return false;
+		}
+		scnRows.forEach(function (x) {
+			var k = x.s ? x.s.id : x.key;
+			if (x.parent === undefined || !loops(scnParent, k)) { return; }
+			bad(x.sh.name, x.row, scnBookSay('lpn_scnbook_why_loop', 'The parent {name} would make this item its own ancestor, so the parent was not changed.', { name: scnName(x.parent) }));
+			if (x.s) { scnParent[k] = x.s.isBase ? null : parentScenarioOf(x.s).id; delete x.parent; }
+			else { scnParent[k] = base.id; x.parent = base.id; }
+		});
+		scnRows.forEach(function (x) {
+			var e;
+			if (!x.s) {
+				e = entryIn(scnTable, x.key);
+				if (e.dead) { return; }
+				out.ops.newScn.push({ key: x.key, name: x.name, parent: x.parent });
+				change(x.sh.name, x.row, scnBookSay('lpn_scnbook_new_scenario', 'New scenario'), '', x.name + ' (' + (pc.lpn_sm_col_parent || 'Parent') + ': ' + scnName(x.parent) + ')');
+				return;
+			}
+			e = entryIn(scnTable, x.s.id);
+			if (e.rename) {
+				out.ops.renameScn.push({ id: x.s.id, name: e.rename.to });
+				change(x.sh.name, x.row, scnBookSay('lpn_scnbook_scenario_name', 'Scenario name'), e.rename.from, e.rename.to);
+			}
+			if (x.parent !== undefined) {
+				out.ops.parentScn.push({ id: x.s.id, parent: x.parent });
+				change(x.sh.name, x.row, scnBookSay('lpn_scnbook_scenario_parent', 'Parent of scenario {name}', { name: scnName(x.s.id) }),
+					scenarioDisplayName(parentScenarioOf(x.s)), scnName(x.parent));
+			}
+		});
+		// ---- alternatives: new ones, renames, parents ----
+		altRows.forEach(function (x) {
+			var ptext = cell(x.r, x.m, 'parent'), p = scnBookResolve(altTables[x.cat], ptext), cur;
+			if (x.isNew) {
+				if (p === undefined || p === null) {
+					bad(x.sh.name, x.row, scnBookSay('lpn_scnbook_why_no_parent', 'There is no single scenario or alternative named {name} to be the parent, so this row was not used.', { name: ptext.trim() }));
+					entryIn(altTables[x.cat], x.key).dead = true;
+					return;
+				}
+				x.parent = p === '' ? smBaseKey(x.cat) : p;
+				return;
+			}
+			cur = smParentKey(x.cat, x.key);
+			if (cur === null) {
+				if (ptext.trim() !== '') { bad(x.sh.name, x.row, scnBookSay('lpn_scnbook_why_root_parent', 'A Base takes no parent, so the parent in this row was not used.')); }
+				return;
+			}
+			if (p === undefined || p === null) {
+				bad(x.sh.name, x.row, scnBookSay('lpn_scnbook_why_no_parent', 'There is no single scenario or alternative named {name} to be the parent, so this row was not used.', { name: ptext.trim() }));
+				return;
+			}
+			p = p === '' ? smBaseKey(x.cat) : p;
+			if (p !== cur) { x.parent = p; }
+		});
+		LPN_ALT_CATEGORIES.forEach(function (cat) {
+			var map = {};
+			smRecords(cat).forEach(function (r) { var k = smParentKey(cat, r.id); map[r.id] = (k === null || k === smBaseKey(cat)) ? null : k; });
+			altRows.forEach(function (x) { if (x.cat === cat && x.parent !== undefined) { map[x.key] = x.parent === smBaseKey(cat) ? null : x.parent; } });
+			altRows.forEach(function (x) {
+				if (x.cat !== cat || x.parent === undefined || !loops(map, x.key)) { return; }
+				bad(x.sh.name, x.row, scnBookSay('lpn_scnbook_why_loop', 'The parent {name} would make this item its own ancestor, so the parent was not changed.', { name: altName(cat, x.parent) }));
+				if (x.isNew) { x.parent = smBaseKey(cat); map[x.key] = null; } else { delete x.parent; map[x.key] = (function (k) { return k === smBaseKey(cat) ? null : k; }(smParentKey(cat, x.key))); }
+			});
+		});
+		altRows.forEach(function (x) {
+			var e = entryIn(altTables[x.cat], x.key), catWord = altCategoryLabel(x.cat);
+			if (x.isNew) {
+				if (e.dead) { return; }
+				out.ops.newAlt.push({ key: x.key, cat: x.cat, name: x.name, parent: x.parent });
+				change(x.sh.name, x.row, scnBookSay('lpn_scnbook_new_alternative', 'New alternative ({category})', { category: catWord }), '',
+					x.name + ' (' + (pc.lpn_sm_col_parent || 'Parent') + ': ' + altName(x.cat, x.parent) + ')');
+				return;
+			}
+			if (e.rename) {
+				out.ops.renameAlt.push({ cat: x.cat, key: x.key, name: e.rename.to });
+				change(x.sh.name, x.row, scnBookSay('lpn_scnbook_alternative_name', 'Alternative name ({category})', { category: catWord }), e.rename.from, e.rename.to);
+			}
+			if (x.parent !== undefined) {
+				out.ops.parentAlt.push({ cat: x.cat, key: x.key, parent: x.parent });
+				change(x.sh.name, x.row, scnBookSay('lpn_scnbook_alternative_parent', 'Parent of alternative {name} ({category})', { name: altName(x.cat, x.key), category: catWord }),
+					smName(x.cat, smParentKey(x.cat, x.key)), altName(x.cat, x.parent));
+			}
+		});
+		// ---- the alternative each scenario names in each category ----
+		scnRows.forEach(function (x) {
+			if (!x.s && entryIn(scnTable, x.key).dead) { return; }
+			LPN_ALT_CATEGORIES.forEach(function (cat) {
+				var t = cell(x.r, x.m, cat), want, cur, e;
+				if (x.m[cat] === undefined) { return; }
+				want = scnBookResolve(altTables[cat], t);
+				if (want === undefined || want === null) {
+					bad(x.sh.name, x.row, scnBookSay('lpn_scnbook_why_no_alternative', 'There is no single alternative named {name} in {category}, so it was not used.', { name: t.trim(), category: altCategoryLabel(cat) }));
+					return;
+				}
+				e = entryIn(altTables[cat], want);
+				if (e && e.dead) { return; }
+				if (want === smBaseKey(cat)) { want = (x.s && x.s.isBase) ? '' : LPN_BASE_CHOICE; }
+				cur = x.s ? scnBookPick(x.s, cat) : '';
+				if (want === cur) { return; }
+				// A scenario's own alternative of a file before 2026-10-12 belongs to it alone.
+				if (want !== '' && want !== LPN_BASE_CHOICE && smImplicitOwner(cat, want) && smImplicitOwner(cat, want) === x.s) { return; }
+				out.ops.picks.push({ scn: x.s ? x.s.id : x.key, cat: cat, key: want });
+				change(x.sh.name, x.row, scnBookSay('lpn_scnbook_pick', '{scenario}: {category}', { scenario: x.s ? scnName(x.s.id) : x.name, category: altCategoryLabel(cat) }),
+					x.s ? (scnBookPickText(x.s, cat) || '(' + inheritWord + ')') : '', want === '' ? '(' + inheritWord + ')' : (want === LPN_BASE_CHOICE ? smName(cat, smBaseKey(cat)) : altName(cat, want)));
+			});
+		});
+		// ---- element values, a sheet per category ----
+		SCNBOOK_ELEMENT_CATS.forEach(function (cat) {
+			var sh = found[cat], m, cols = [], stated = {}, seenRow = {};
+			if (sh) {
+				m = keyMap(sh);
+				(sh.rows[1] || []).forEach(function (k, i) {
+					var key = String(k === undefined || k === null ? '' : k).trim(), bar, prop, stamp, groups, d, filled;
+					if (i === 0 || key === '' || key === 'asset' || key === 'id' || key === 'alternative') { return; }
+					bar = key.indexOf('|');
+					prop = bar >= 0 ? key.slice(0, bar) : key;
+					stamp = bar >= 0 ? key.slice(bar + 1) : '';
+					groups = scnBookGroupsOf(cat, prop);
+					filled = sh.rows.slice(2).some(function (r) { return String(r[i] === undefined ? '' : r[i]).trim() !== ''; });
+					d = scnBookDescribe(prop, groups[0] || 'node');
+					d.index = i;
+					if (!groups.length && !scnBookHas(customPropDefByKeyOrNull(prop), 'key')) {
+						d.bad = scnBookSay('lpn_scnbook_why_column_property', 'The column {column} is not a property of {category}, so its values were not read.', { column: String((sh.rows[0] || [])[i] || prop), category: altCategoryLabel(cat) });
+					} else if (stamp !== d.stamp) {
+						d.bad = scnBookSay('lpn_scnbook_why_column_unit', 'The column {column} is in {unit}, and this project uses {project}, so its values were not read.',
+							{ column: String((sh.rows[0] || [])[i] || prop), unit: stamp || (pc.lpn_scnbook_no_unit || 'no unit'), project: d.stamp || (pc.lpn_scnbook_no_unit || 'no unit') });
+					}
+					if (d.bad && filled) { bad(sh.name, '', d.bad); }
+					cols.push(d);
+				});
+				sh.rows.slice(2).forEach(function (r, ri) {
+					var row = ri + 3, altText = cell(r, m, 'alternative'), hk = scnBookResolve(altTables[cat], altText), e, group, id = cell(r, m, 'id').trim(),
+						assetText = cell(r, m, 'asset'), cur, k, el, cand, hits, holderVals;
+					if (blankRow(r)) { return; }
+					if (hk === undefined || hk === null || hk === '') {
+						bad(sh.name, row, scnBookSay('lpn_scnbook_why_no_alternative', 'There is no single alternative named {name} in {category}, so it was not used.', { name: altText.trim(), category: altCategoryLabel(cat) }));
+						return;
+					}
+					if (hk === smBaseKey(cat)) { bad(sh.name, row, scnBookSay('lpn_scnbook_why_base_values', 'The values of Base are the drawing itself; edit them on the map or in the Tables pane. This row was not used.')); return; }
+					e = entryIn(altTables[cat], hk);
+					if (e && e.dead) { return; }
+					if (cat === 'calculation') { return; }
+					holderVals = e && e.isNew ? {} : (ownCache[cat + '\u0000' + hk] = ownCache[cat + '\u0000' + hk] || smOwnContent(cat, hk).values);
+					group = scnBookGroupOfAsset(assetText);
+					if (group === undefined) { bad(sh.name, row, scnBookSay('lpn_scnbook_why_asset_kind', 'There is no kind of asset called {asset}, so this row was not used.', { asset: assetText.trim() })); return; }
+					cand = group ? [group] : (cat === 'text' ? ['label'] : ['node', 'link']);
+					if (id === '') { bad(sh.name, row, scnBookSay('lpn_scnbook_why_no_id', 'This row has no asset ID, so it was not used.')); return; }
+					hits = cand.filter(function (g) { return !!smMergeElement(ovKeyFor(g, id)); });
+					if (hits.length !== 1) { hits = cand.filter(function (g) { return scnBookHas(holderVals, ovKeyFor(g, id)); }); }
+					if (hits.length !== 1) {
+						bad(sh.name, row, scnBookSay('lpn_scnbook_why_no_asset', 'The project has no single asset {asset} {id}, so this row was not used.', { asset: assetText.trim(), id: id }).replace('  ', ' '));
+						return;
+					}
+					k = ovKeyFor(hits[0], id);
+					el = smMergeElement(k);
+					if (seenRow[hk + '\u0000' + k]) { bad(sh.name, row, scnBookSay('lpn_scnbook_why_asset_twice', 'A second row for {asset} {id} in this alternative. Only the first was read.', { asset: scnBookAssetText(k), id: id })); return; }
+					seenRow[hk + '\u0000' + k] = true;
+					cur = plainObject(holderVals[k]) ? holderVals[k] : {};
+					cols.forEach(function (d) {
+						var t = String(r[d.index] === undefined || r[d.index] === null ? '' : r[d.index]), has = scnBookHas(cur, d.prop), like, p, what;
+						if (t.trim() === '') { return; }
+						(stated[hk] = stated[hk] || {})[k + '\u0000' + d.prop] = true;
+						if (d.bad) { return; }
+						if (has && t === scnBookText(cur[d.prop])) { return; }
+						like = has ? cur[d.prop] : (el && isOverridable(el, d.prop) ? baseValue(el, d.prop) : undefined);
+						p = scnBookParse(t, like, d, el, ovKeyGroup(k));
+						what = scnBookSay('lpn_scnbook_value', '{alternative}, {asset} {id}: {property}', { alternative: altName(cat, hk), asset: scnBookAssetText(k), id: id, property: d.label });
+						if (!p.ok) { bad(sh.name, row, what + ': ' + scnBookSay(p.why, LPN_SCNBOOK_WHY[p.why] || p.why)); return; }
+						if (has && scnBookSame(p.v, cur[d.prop])) { return; }
+						if (!el) { bad(sh.name, row, what + ': ' + scnBookSay('lpn_scnbook_why_gone', 'the drawing has no such asset, so the value was not changed.')); return; }
+						if (!isOverridable(el, d.prop) || categoryOf(d.prop, ovKeyGroup(k)) !== cat) {
+							bad(sh.name, row, what + ': ' + scnBookSay('lpn_scnbook_why_not_property', 'this asset has no such property in this category, so the value was not used.'));
+							return;
+						}
+						out.ops.values.push({ cat: cat, key: hk, ovKey: k, prop: d.prop, v: p.v });
+						change(sh.name, row, has ? what : scnBookSay('lpn_scnbook_new_value', 'New override: {what}', { what: what }), has ? scnBookText(cur[d.prop]) : '', t);
+					});
+				});
+			}
+			// What the project holds and the workbook does not state: kept, and said.
+			scnBookHolders(cat).forEach(function (h) {
+				var vals = smOwnContent(cat, h.key).values, left = [];
+				scnBookSortKeys(Object.keys(vals)).forEach(function (k) {
+					Object.keys(plainObject(vals[k]) ? vals[k] : {}).forEach(function (p) {
+						if (!(stated[h.key] && stated[h.key][k + '\u0000' + p])) { left.push(scnBookAssetText(k) + ' ' + scnBookIdOf(k) + ': ' + scnBookDescribe(p, ovKeyGroup(k)).label); }
+					});
+				});
+				if (left.length) {
+					out.kept.push(scnBookSay('lpn_scnbook_kept_values', '{category}, {alternative}: values not in the workbook, kept ({n}): {list}',
+						{ category: altCategoryLabel(cat), alternative: h.name, n: left.length, list: left.slice(0, 12).join('; ') + (left.length > 12 ? '; …' : '') }));
+				}
+			});
+		});
+		// ---- settings ----
+		(function () {
+			var sh = found.settings, m, stated = {}, seenRow = {};
+			if (sh) {
+				m = keyMap(sh);
+				sh.rows.slice(2).forEach(function (r, ri) {
+					var row = ri + 3, catText = cell(r, m, 'category'), cat = scnBookCatOf(catText), altText = cell(r, m, 'alternative'), hk, e, path, t = cell(r, m, 'value'),
+						leaves, leaf, pt, sec, like, p, what, cur, kind;
+					if (blankRow(r)) { return; }
+					if (!cat) {
+						bad(sh.name, row, catText.trim() === '' ? scnBookSay('lpn_scnbook_why_no_category', 'A new alternative needs a category, so this row was not used.')
+							: scnBookSay('lpn_scnbook_why_unknown_category', 'There is no category {category}, so this row was not used.', { category: catText.trim() }));
+						return;
+					}
+					hk = scnBookResolve(altTables[cat], altText);
+					if (hk === undefined || hk === null || hk === '') {
+						bad(sh.name, row, scnBookSay('lpn_scnbook_why_no_alternative', 'There is no single alternative named {name} in {category}, so it was not used.', { name: altText.trim(), category: altCategoryLabel(cat) }));
+						return;
+					}
+					if (hk === smBaseKey(cat)) { bad(sh.name, row, scnBookSay('lpn_scnbook_why_base_settings', 'The settings of Base are the project\'s own; change them in the Settings box. This row was not used.')); return; }
+					e = entryIn(altTables[cat], hk);
+					if (e && e.dead) { return; }
+					path = scnBookPathParse(cell(r, m, 'path'));
+					if (!path) { bad(sh.name, row, scnBookSay('lpn_scnbook_why_path', 'This row names no setting this page knows, so it was not used.')); return; }
+					pt = scnBookPathText(path);
+					if (seenRow[cat + '\u0000' + hk + '\u0000' + pt]) { bad(sh.name, row, scnBookSay('lpn_scnbook_why_setting_twice', 'A second row for this setting in this alternative. Only the first was read.')); return; }
+					seenRow[cat + '\u0000' + hk + '\u0000' + pt] = true;
+					if (t.trim() === '') { return; }
+					(stated[cat + '\u0000' + hk] = stated[cat + '\u0000' + hk] || {})[pt] = true;
+					leaves = e && e.isNew ? [] : scnBookLeaves(cat, hk);
+					leaf = leaves.filter(function (l) { return scnBookPathText(l.path) === pt; })[0];
+					if (leaf && t === (leaf.timeText !== undefined ? leaf.timeText : scnBookText(leaf.value))) { return; }
+					what = scnBookSay('lpn_scnbook_setting', '{alternative}: {setting}', { alternative: altName(cat, hk), setting: smMergeLeafText(path) });
+					if (path[0] === 'view' || path[0] === 'bubbles' || (path[0] === 'times' && path[1] === 'text')) {
+						bad(sh.name, row, what + ': ' + scnBookSay('lpn_scnbook_why_on_map', 'this is changed on the map, not by a workbook, so it was not changed.'));
+						return;
+					}
+					if (categoryOfSetting(path) !== cat || (cat !== 'calculation' && settingHasOtherHome(path))) {
+						bad(sh.name, row, what + ': ' + scnBookSay('lpn_scnbook_why_setting_category', 'this setting is not in the category {category}, so it was not used.', { category: altCategoryLabel(cat) }));
+						return;
+					}
+					if (path[0] === 'times' && path.length === 2) {
+						sec = EngCalcs.lpnParseTime ? EngCalcs.lpnParseTime(t.trim().split(/\s+/), { typed: true }) : null;
+						if (sec === null || sec === undefined || !isFinite(sec) || sec < 0 || (path[1] === 'hydraulicStep' && !(sec > 0))) {
+							bad(sh.name, row, what + ': ' + scnBookSay('lpn_scnbook_why_time', 'not a time this page can read, so it was not used.'));
+							return;
+						}
+						if (leaf && leaf.value === sec) { return; }
+						out.ops.settings.push({ cat: cat, key: hk, path: path, v: sec, text: t.trim() });
+						change(sh.name, row, leaf ? what : scnBookSay('lpn_scnbook_new_value', 'New override: {what}', { what: what }), leaf ? leaf.timeText : '', t.trim());
+						return;
+					}
+					cur = leaf ? leaf.value : undefined;
+					like = leaf ? cur : settingFor(base, path);
+					kind = (like !== null && like !== undefined && typeof like === 'object') ? { prop: 'json' } : null;
+					p = scnBookParse(t, like, kind, null, null);
+					if (!p.ok) { bad(sh.name, row, what + ': ' + scnBookSay(p.why, LPN_SCNBOOK_WHY[p.why] || p.why)); return; }
+					if (leaf && scnBookSame(p.v, cur)) { return; }
+					out.ops.settings.push({ cat: cat, key: hk, path: path, v: p.v });
+					change(sh.name, row, leaf ? what : scnBookSay('lpn_scnbook_new_value', 'New override: {what}', { what: what }), leaf ? scnBookText(cur) : '', t);
+				});
+			}
+			LPN_ALT_CATEGORIES.forEach(function (cat) {
+				scnBookHolders(cat).forEach(function (h) {
+					var left = scnBookLeaves(cat, h.key).filter(function (l) {
+						return !(stated[cat + '\u0000' + h.key] && stated[cat + '\u0000' + h.key][scnBookPathText(l.path)]);
+					}).map(function (l) { return smMergeLeafText(l.path); });
+					if (left.length) {
+						out.kept.push(scnBookSay('lpn_scnbook_kept_settings', '{category}, {alternative}: settings not in the workbook, kept ({n}): {list}',
+							{ category: altCategoryLabel(cat), alternative: h.name, n: left.length, list: left.slice(0, 12).join('; ') + (left.length > 12 ? '; …' : '') }));
+					}
+				});
+			});
+		}());
+		// ---- scenarios and alternatives the workbook does not list: kept ----
+		if (found.scenarios) {
+			scenarios.forEach(function (s) {
+				if (!scnRows.some(function (x) { return x.s === s; })) {
+					out.kept.push(scnBookSay('lpn_scnbook_kept_scenario', 'Scenario {name} is not in the workbook, and is kept.', { name: scenarioDisplayName(s) }));
+				}
+			});
+		}
+		if (found.alternatives) {
+			LPN_ALT_CATEGORIES.forEach(function (cat) {
+				scnBookHolders(cat).forEach(function (h) {
+					if (!altRows.some(function (x) { return x.cat === cat && x.key === h.key; })) {
+						out.kept.push(scnBookSay('lpn_scnbook_kept_alternative', 'Alternative {name} ({category}) is not in the workbook, and is kept.', { name: h.name, category: altCategoryLabel(cat) }));
+					}
+				});
+			});
+		}
+		return out;
+	}
+	var LPN_SCNBOOK_WHY = {
+		lpn_scnbook_why_number: 'not a number, so it was not used.',
+		lpn_scnbook_why_yesno: 'not TRUE or FALSE, so it was not used.',
+		lpn_scnbook_why_json: 'not a list this page can read, so it was not used.',
+		lpn_scnbook_why_choice: 'not one of the choices this property has, so it was not used.'
+	};
+	function customPropDefByKeyOrNull(prop) { return customPropDefs().length ? (customPropDefByKey(prop) || null) : null; }
+	// **THE ONE WRITE OF AN ELEMENT VALUE INTO A STORED ALTERNATIVE**, from a workbook. The demand
+	// pair is one value (R-369): a row-0 `demand` written where the holder keeps the whole list lands
+	// on the list's first row, as setProp() does.
+	function scnBookPut(key, ovk, prop, v) {
+		var r = altById(key), map, ov;
+		if (!r) { return false; }
+		map = plainObject(r.values) ? r.values : (r.values = {});
+		ov = plainObject(map[ovk]) ? map[ovk] : (map[ovk] = {});
+		if (prop === 'demand' && Array.isArray(ov.demands) && ov.demands.length) {
+			ov.demands = altCopy(ov.demands);
+			ov.demands[0].base = v;
+			if (scnBookHas(ov, 'demand')) { ov.demand = v; }
+			return true;
+		}
+		ov[prop] = (v === undefined) ? null : v;
+		return true;
+	}
+	function scnBookPutPath(obj, path, v) {
+		var node = obj, i;
+		for (i = 0; i < path.length - 1; i++) {
+			if (!plainObject(node[path[i]])) { node[path[i]] = {}; }
+			node = node[path[i]];
+		}
+		node[path[path.length - 1]] = v;
+	}
+	function scnBookPutSetting(cat, key, path, v, text) {
+		var r = cat === 'calculation' ? calcSetById(key) : altById(key);
+		if (!r) { return false; }
+		if (path.join('.') === 'settings.hydraulics.demandMultiplier') {
+			if (cat !== 'calculation') { return false; }
+			r.demandMultiplier = v;
+			return true;
+		}
+		if (path[0] === 'times' && path.length === 2 && LPN_SCENARIO_TIME_KEYS.indexOf(path[1]) >= 0) {
+			return cat === 'calculation' && setScenarioTime(r, path[1], text);
+		}
+		r.settings = plainObject(r.settings) ? r.settings : {};
+		scnBookPutPath(r.settings, path, altCopy(v));
+		if (path[0] === 'times' && path.length === 2) { scnBookPutPath(r.settings, ['times', 'text', path[1]], text); }
+		return true;
+	}
+	// A scenario names an alternative by its key: smAssign()'s rule, without a name lookup. Values a
+	// scenario holds of its own in the category are first kept as a stored alternative.
+	function scnBookAssign(scnId, cat, key) {
+		var s = scenarioById(scnId), rec = null, res, kept;
+		if (!s) { return treeRefuse('missing'); }
+		if (key === LPN_BASE_CHOICE) { rec = { id: LPN_BASE_CHOICE }; }
+		else if (key !== '') {
+			if (smImplicitOwner(cat, key) === s) { return true; }
+			if (smImplicitOwner(cat, key)) { key = smMaterialize(cat, key); if (key && key.refused) { return key; } }
+			rec = smRecord(cat, key);
+			if (!rec) { return treeRefuse('missing'); }
+		}
+		if (rec === null && !storedChoiceOf(s, cat)) { return true; }
+		if (rec !== null && scenarioHoldsLocal(s, cat)) {
+			kept = promoteStored(s.id, cat, smUniqueName(cat, scenarioDisplayName(s), smImplicitKey(s, cat)));
+			if (kept.refused) { return kept; }
+		}
+		res = cat === 'calculation' ? assignCalcSet(scnId, rec ? rec.id : null) : assignAlternative(scnId, cat, rec ? rec.id : null);
+		return res;
+	}
+	/**
+	 * **APPLY A PLAN, AS ONE UNDO STEP.** New scenarios and alternatives first (named, under Base),
+	 * then names, parents, the alternative each scenario names, and the values. A scenario's own
+	 * alternative from a file before 2026-10-12 is stored first wherever it is written to, as any
+	 * edit in the program stores it. Answers {applied, failed: [text]}.
+	 */
+	function scnBookApply(plan) {
+		var made = {}, failed = [], applied = 0, base = baseScenario(), renamed = false, misfit = false;
+		function mapScn(k) { return made[k] || k; }
+		function mapAlt(cat, k) {
+			var i, s, n;
+			k = made[k] || k;
+			if (k === smBaseKey(cat) || smRecord(cat, k)) { return k; }
+			i = String(k).lastIndexOf(':');
+			s = i > 0 ? scenarioById(String(k).slice(0, i)) : null;
+			n = s ? storedChoiceOf(s, cat) : undefined;
+			return (n !== undefined && n !== LPN_BASE_CHOICE) ? n : k;
+		}
+		function stored(cat, k) {
+			k = mapAlt(cat, k);
+			if (smImplicitOwner(cat, k)) { k = smMaterialize(cat, k); }
+			return (k && !k.refused && k !== smBaseKey(cat)) ? k : null;
+		}
+		function ok(res, text) { if (!(res === true || (res && !res.refused && res !== false))) { failed.push(text); } }
+		saveUndoSnapshot();
+		undoTopHoldsSettingPaths([['project', 'scenarioOrdered'], ['project', 'compareSet']]);
+		plan.ops.newScn.forEach(function (n) {
+			var s = { id: newScenarioId(), name: n.name, overrides: {} };
+			scenarios.push(s);
+			made[n.key] = s.id;
+		});
+		plan.ops.newAlt.forEach(function (n) {
+			var r = createStored(n.cat === 'calculation' ? 'calc' : 'alt', n.cat, n.name, null, true);
+			if (r.refused) { failed.push(n.name); return; }
+			made[n.key] = r.id;
+		});
+		touchTree('scnBookApply');
+		plan.ops.renameScn.forEach(function (n) { var s = scenarioById(n.id); if (s) { s.name = n.name; renamed = true; } else { failed.push(n.name); } });
+		plan.ops.renameAlt.forEach(function (n) {
+			var k = stored(n.cat, n.key), r = k ? smRecord(n.cat, k) : null;
+			if (r) { r.name = n.name; } else { failed.push(n.name); }
+		});
+		touchTree('scnBookApply');
+		plan.ops.newScn.concat(plan.ops.parentScn).forEach(function (n) {
+			var id = n.id || made[n.key], p = mapScn(n.parent);
+			if (!id || (!n.id && p === base.id)) { return; }
+			ok(setScenarioParent(id, p === base.id ? null : p), scenarioDisplayName(scenarioById(id) || { name: id }));
+		});
+		plan.ops.newAlt.concat(plan.ops.parentAlt).forEach(function (n) {
+			var k, p;
+			if (made[n.key] && n.parent === smBaseKey(n.cat)) { return; }
+			k = stored(n.cat, n.key);
+			p = n.parent === smBaseKey(n.cat) ? null : stored(n.cat, n.parent);
+			if (!k || (n.parent !== smBaseKey(n.cat) && !p)) { failed.push(n.name || smName(n.cat, mapAlt(n.cat, n.key))); return; }
+			ok(reparentStored(n.cat === 'calculation' ? 'calc' : 'alt', k, p), smName(n.cat, k));
+		});
+		plan.ops.picks.forEach(function (n) {
+			var k = n.key === '' || n.key === LPN_BASE_CHOICE ? n.key : mapAlt(n.cat, n.key);
+			ok(scnBookAssign(mapScn(n.scn), n.cat, k), scenarioDisplayName(scenarioById(mapScn(n.scn)) || { name: n.scn }) + ': ' + altCategoryLabel(n.cat));
+		});
+		plan.ops.values.forEach(function (n) {
+			var k = stored(n.cat, n.key);
+			ok(k ? scnBookPut(k, n.ovKey, n.prop, n.v) : false, smName(n.cat, mapAlt(n.cat, n.key)) + ', ' + scnBookAssetText(n.ovKey) + ' ' + scnBookIdOf(n.ovKey));
+		});
+		plan.ops.settings.forEach(function (n) {
+			var k = stored(n.cat, n.key);
+			ok(k ? scnBookPutSetting(n.cat, k, n.path, n.v, n.text) : false, smName(n.cat, mapAlt(n.cat, n.key)) + ': ' + smMergeLeafText(n.path));
+		});
+		treeDropEmpty();
+		touchTree('scnBookApply');
+		if (scenarioBasicMode && basicModeMisfit()) { scenarioBasicMode = false; misfit = true; refreshScenariosTab(); }
+		applied = Math.max(0, plan.changes.length - failed.length);
+		return { applied: applied, failed: failed, renamed: renamed, misfit: misfit };
+	}
+	// Everything a scenario act redraws, once, after the whole workbook is in.
+	function scnBookAfter(res) {
+		var tab = paneTableById('scenarios');
+		applyScenarioChange();
+		if (res.renamed) { paneScnScenarioRenamed(); }
+		if (tab) { paneTableReset(tab); if (document.getElementById(tab.panel)) { renderPaneTable(tab); } }
+		dropScenarioCompareRun();
+		rebuildScenarioManager();
+	}
+	function scnBookRead(bytes) {
+		return EngCalcs.lpnUnzip(bytes).then(function (files) { return EngCalcs.lpnTableXlsxRead(files); });
+	}
+	function pickScnBookFile() {
+		var input = document.getElementById('lpn_scnbook_file');
+		if (input) { input.click(); }
+	}
+	function importScnBookFromFile(file) {
+		var reader = new FileReader(), pc = scnBookPc();
+		reader.onload = function (ev) {
+			scnBookRead(new Uint8Array(ev.target.result)).then(function (book) {
+				showScnBookReport(scnBookPlan(book), file.name);
+			}, function () {
+				tellNotice(scnBookSay('lpn_scnbook_refused_unreadable', '{file} could not be read as an .xlsx workbook, so nothing was changed.', { file: file.name }));
+			});
+		};
+		reader.onerror = function () { setNotice(pc.lpn_survey_read_error || 'That file could not be read from your disk.'); };
+		reader.readAsArrayBuffer(file);
+	}
+	/**
+	 * **THE REPORT, BEFORE ANYTHING IS APPLIED**: every difference, every row not used and why, and
+	 * what the project keeps that the workbook does not have. Apply makes the changes as one undo
+	 * step; Cancel changes nothing. With no differences there is only OK.
+	 */
+	function showScnBookReport(plan, fileName) {
+		var pc = scnBookPc(), n;
+		if (!plan.ok) {
+			tellNotice(scnBookSay(plan.why, 'This file is not a scenario workbook, so nothing was changed. A scenario workbook is made with File, Export, Scenario workbook.', { file: fileName }));
+			return;
+		}
+		n = plan.changes.length;
+		openDialog(function (body) {
+			var p = ffEl('p', 'lpn-dialog-msg', n ? scnBookSay('lpn_scnbook_report_changes', 'Differences between {file} and this project: {n}. Nothing is changed until Apply changes is chosen; Undo reverses the whole import.', { file: fileName, n: n })
+				: scnBookSay('lpn_scnbook_report_none', 'The workbook {file} has no differences from this project.', { file: fileName }), body);
+			p.setAttribute('data-scnbook', 'summary');
+			function table(cls, heads, rows) {
+				var t = ffEl('table', 'lpn-ff-table ' + cls, null, ffEl('div', 'lpn-ff-tablewrap', null, body)), tr = ffEl('tr', null, null, ffEl('thead', null, null, t)), tb;
+				heads.forEach(function (h) { ffEl('th', null, h, tr); });
+				tb = ffEl('tbody', null, null, t);
+				rows.forEach(function (r) { var row = ffEl('tr', null, null, tb); r.forEach(function (c) { ffCell(row, String(c === undefined || c === null ? '' : c)); }); });
+			}
+			if (n) {
+				ffEl('p', 'lpn-ff-summary', scnBookSay('lpn_scnbook_head_changes', 'Changes ({n})', { n: n }), body);
+				table('lpn-scnbook-changes', [pc.lpn_scnbook_col_sheet || 'Sheet', pc.lpn_scnbook_col_row || 'Row', pc.lpn_scnbook_col_change || 'Change',
+					pc.lpn_scnbook_col_project || 'In the project', pc.lpn_scnbook_col_workbook || 'In the workbook'],
+					plan.changes.map(function (c) { return [c.sheet, c.row, c.what, c.from, c.to]; }));
+			}
+			if (plan.unusable.length) {
+				ffEl('p', 'lpn-ff-summary', scnBookSay('lpn_scnbook_head_unusable', 'Not used ({n})', { n: plan.unusable.length }), body);
+				table('lpn-scnbook-unusable', [pc.lpn_scnbook_col_sheet || 'Sheet', pc.lpn_scnbook_col_row || 'Row', pc.lpn_scnbook_col_reason || 'Reason'],
+					plan.unusable.map(function (u) { return [u.sheet, u.row, u.why]; }));
+			}
+			if (plan.kept.length) {
+				ffEl('p', 'lpn-ff-summary', scnBookSay('lpn_scnbook_head_kept', 'Kept, not in the workbook ({n})', { n: plan.kept.length }), body);
+				var ul = ffEl('ul', 'lpn-scnbook-kept', null, body);
+				plan.kept.forEach(function (k) { ffEl('li', null, k, ul); });
+			}
+		}, n ? [
+			{ label: pc.lpn_scnbook_apply || 'Apply changes', fn: function () {
+				var res = scnBookApply(plan);
+				scnBookAfter(res);
+				setNotice(scnBookSay('lpn_scnbook_applied', 'Applied {n} changes from {file}. Undo reverses them.', { n: res.applied, file: fileName }) +
+					(res.failed.length ? ' ' + scnBookSay('lpn_scnbook_apply_failed', 'Not applied: {list}.', { list: res.failed.join('; ') }) : '') +
+					(res.misfit ? ' ' + basicMisfitText() : ''));
+			} },
+			{ label: pc.lpn_cancel || 'Cancel', isDefault: true, cancel: true, fn: function () { } }
+		] : [{ label: pc.lpn_dialog_ok || 'OK', isDefault: true, cancel: true, fn: function () { } }],
+		{ title: scnBookSay('lpn_scnbook_report_title', 'Import scenario workbook: {file}', { file: fileName }) });
+	}
+	EngCalcs.lpnScnBookSheets = function () { return scnBookSheets(); };
+	EngCalcs.lpnScnBookBytes = function () { return scnBookBytes(); };
+	EngCalcs.lpnScnBookRead = scnBookRead;
+	EngCalcs.lpnScnBookPlan = function (book) { return scnBookPlan(book); };
+	EngCalcs.lpnScnBookApply = function (plan) { var res = scnBookApply(plan); scnBookAfter(res); return res; };
 	// **THE THREE IMPORT ROWS, APART FROM THE MENU THAT SHOWS THEM** (Task 718), the same split
 	// mapMenuRows() takes from openMapMenu(): a harness can ask what the submenu offers without
 	// driving a popup. Each row is unchanged from the flat list it moved out of -- same icon, same
@@ -50853,6 +51865,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// button back in the Libraries box.**
 			{ icon: 'open', label: pc.lpn_library_import || 'Import libraries…',
 			  tip: pc.lpn_library_import_tip, fn: libImportPick },
+			// **THE SCENARIO WORKBOOK, SYNC IN** (Task 752): reads one back, reports every difference,
+			// and applies them on a yes. The twin of File > Export > Scenario workbook.
+			{ icon: 'open', label: pc.lpn_file_import_scnbook || 'Import scenario workbook…',
+			  tip: pc.lpn_file_import_scnbook_tip, fn: pickScnBookFile },
 			// **WORKSPACE (Tom, 2026-10-07)**: the browser-scoped layout and preferences, from a file.
 			// Under File > Import because it comes from a file, by the same vote that put surveyed
 			// points here; Settings holds the settings themselves and this is a file command.
@@ -50888,6 +51904,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ icon: 'save', label: pc.lpn_file_export_item_csv || 'CSV file…',
 			  tip: pc.lpn_file_export_csv_tip, fn: function () { openExportTableBox('csv'); } },
 			{ separator: true },
+			// **THE SCENARIO WORKBOOK, SYNC OUT** (Task 752): the scenario tree and every alternative's
+			// own values, one .xlsx, to edit and read back with File > Import.
+			{ icon: 'save', label: pc.lpn_file_export_item_scnbook || 'Scenario workbook…',
+			  tip: pc.lpn_file_export_scnbook_tip, fn: exportScnBookFile },
 			// Workspace (Tom, 2026-10-07): the twin of File > Import > Workspace.
 			{ icon: 'save', label: pc.lpn_file_export_item_workspace || 'Workspace…',
 			  tip: pc.lpn_file_export_workspace_tip, fn: exportWorkspaceFile }
@@ -54039,6 +55059,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				var f = gjInput.files[0];
 				gjInput.value = '';
 				if (f) { importGeoJsonShapesFromFile(f); }
+			});
+		}
+		var scnBookInput = document.getElementById('lpn_scnbook_file');
+		if (scnBookInput) {
+			scnBookInput.addEventListener('change', function () {
+				var f = scnBookInput.files[0];
+				scnBookInput.value = '';
+				if (f) { importScnBookFromFile(f); }
 			});
 		}
 		var dxfInput = document.getElementById('lpn_dxf_shapes_file');
