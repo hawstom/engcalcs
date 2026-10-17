@@ -174,7 +174,7 @@ async function main() {
 		d.nodes.push({ id: 'J1', type: 'junction', x: 500, y: 0, elev: 0, _demand: 30 });
 		d.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 0 });
 		d.links.push({ id: 'L1', type: 'pipe', from: 'R1', to: 'J1', verts: [], _diameter: 200, _roughness: 130, _length: 1000, _k: 0, _status: 'open' });
-		d.links.push({ id: 'V1', type: 'valve', valveType: 'PRV', from: 'J1', to: 'J2', verts: [], _diameter: 200, _setting: 40, _k: 0, _status: 'open' });
+		d.links.push({ id: 'V1', type: 'valve', valveType: 'PBV', from: 'J1', to: 'J2', verts: [], _diameter: 200, _setting: 40, _k: 0, _status: 'open' });
 		EC.lpnEpanetLoad = () => Promise.reject(new Error('Failed to fetch dynamically imported module'));
 		banner.textContent = '';
 		L3.warmEpanetEngine('background');
@@ -183,7 +183,7 @@ async function main() {
 		return banner.textContent;
 	}
 	let b = await needed(false);
-	ok('offline, the PRV network banner keeps today\'s sentence', b === PC.lpn_engine_needed_failed, JSON.stringify(b));
+	ok('offline, the PBV network banner keeps today\'s sentence', b === PC.lpn_engine_needed_failed, JSON.stringify(b));
 	b = await needed(true);
 	ok('online, it names the failed download instead', b === PC.lpn_engine_needed_failed_why.replace('{reason}', EC.lpnEngineReason('fetch')), JSON.stringify(b));
 	const offTail = PC.lpn_engine_needed_failed.slice(PC.lpn_engine_needed_failed.lastIndexOf('. ', PC.lpn_engine_needed_failed.length - 2) + 2);
