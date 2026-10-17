@@ -51,6 +51,18 @@ value deliberately set blank as `(blank)`. Each value column's key carries a uni
 (`diameter|in`); a column whose stamp differs from the project's unit is refused whole, so a workbook
 made in other units is never misread.
 
+5. **Project**: one row, the project's name, its number of assets, and a fingerprint of their IDs.
+   An import into a project whose name or asset IDs differ says so at the top of the report (EPANET
+   IDs such as 10 and 22 are in many networks, so a Net1 workbook would otherwise read into Net2 as
+   13 plain changes). It never refuses: the person decides.
+
+**Typed characters are not kept, because the program keeps none.** A number typed in the Tables
+pane or Properties is stored as the number (`+text`, `paneParseCellText()`, `numberFieldBlank()`):
+a typed 6.00 is 6 and 1e-3 is 0.001, in the program and so in the workbook. The workbook writes
+the stored number as JavaScript writes it, and reads a cell as the same number when the two agree
+to 15 significant digits. If overrides ever keep their typed text, the workbook should write and
+compare that text instead.
+
 ## The sync rules
 
 - **Nothing is applied before the report.** Import reads the workbook, compares it with the open
