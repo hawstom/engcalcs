@@ -50918,24 +50918,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// The kind word an asset is shown with, as the override list shows it; an asset the drawing no
 	// longer has keeps its group's own word, so its row can still be matched.
+	function scnBookKindWords() {
+		var pc = scnBookPc();
+		return { junction: pc.lpn_tool_add_junction || 'Junction', reservoir: pc.lpn_tool_add_reservoir || 'Reservoir', tank: pc.lpn_tool_add_tank || 'Tank',
+			pipe: pc.lpn_tool_add_pipe || 'Pipe', pump: pc.lpn_tool_add_pump || 'Pump', valve: pc.lpn_tool_add_valve || 'Valve', text: pc.lpn_tool_add_text || 'Text' };
+	}
 	function scnBookAssetText(key) {
-		var pc = scnBookPc(), g = ovKeyGroup(key), el = g === 'label' ? null : smMergeElement(key), words;
-		if (g === 'label') { return pc.lpn_tool_add_text || 'Text'; }
+		var g = ovKeyGroup(key), el = g === 'label' ? null : smMergeElement(key), words = scnBookKindWords();
+		if (g === 'label') { return words.text; }
 		if (!el) { return g; }
-		words = { junction: pc.lpn_tool_add_junction || 'Junction', reservoir: pc.lpn_tool_add_reservoir || 'Reservoir', tank: pc.lpn_tool_add_tank || 'Tank',
-			pipe: pc.lpn_tool_add_pipe || 'Pipe', pump: pc.lpn_tool_add_pump || 'Pump', valve: pc.lpn_tool_add_valve || 'Valve' };
 		return words[morphBaseOf(el, 'type')] || g;
 	}
+	// The group an Asset cell names: a kind word on this page or in English, or the group itself.
 	function scnBookGroupOfAsset(t) {
-		var pc = scnBookPc(), low = String(t || '').trim().toLowerCase(), out = null;
+		var low = String(t || '').trim().toLowerCase(), words = scnBookKindWords(), of = { junction: 'node', reservoir: 'node', tank: 'node', node: 'node',
+			pipe: 'link', pump: 'link', valve: 'link', link: 'link', text: 'label', label: 'label' }, k;
 		if (!low) { return null; }
-		[['node', ['junction', 'reservoir', 'tank', 'node'], ['lpn_tool_add_junction', 'lpn_tool_add_reservoir', 'lpn_tool_add_tank']],
-			['link', ['pipe', 'pump', 'valve', 'link'], ['lpn_tool_add_pipe', 'lpn_tool_add_pump', 'lpn_tool_add_valve']],
-			['label', ['text', 'label'], ['lpn_tool_add_text']]].forEach(function (g) {
-			if (out) { return; }
-			if (g[1].indexOf(low) >= 0 || g[2].some(function (k) { return pc[k] && String(pc[k]).toLowerCase() === low; })) { out = g[0]; }
-		});
-		return out === null ? undefined : out;
+		if (of[low]) { return of[low]; }
+		for (k in words) { if (Object.prototype.hasOwnProperty.call(words, k) && String(words[k]).toLowerCase() === low) { return of[k]; } }
+		return undefined;
 	}
 	function scnBookIdOf(key) { return String(key).slice(ovKeyFor(ovKeyGroup(key), '').length); }
 	function scnBookSortKeys(keys) {

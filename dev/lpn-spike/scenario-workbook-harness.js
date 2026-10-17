@@ -41,6 +41,7 @@ global.FileReader = function () {
 };
 const NET1 = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net1.inp'), 'utf8');
 const E = global.EngCalcs;
+const PC = global.EngCalcs.pageConfig;
 const INJECT =
 	"\t\tgetDoc: function () { return doc; }, getSettings: function () { return settings; }, getScenarios: function () { return scenarios; },\n" +
 	"\t\tseedDefaultInputs: seedDefaultInputs, setProp: setProp, effective: effective,\n" +
@@ -274,10 +275,12 @@ function build(L) {
 	const why = plan.unusable.map((u) => u.sheet + '@' + u.row + ': ' + u.why);
 	ok('W4.1 nothing to apply', plan.changes.length === 0, what(plan));
 	ok('W4.2 the blanked cell is kept, and said', plan.kept.length === 1 && /Demand, Peak: .*Junction 23/.test(plan.kept[0]), JSON.stringify(plan.kept));
-	ok('W4.3 "twelve" is not a number, with its row', why.some((w) => /Physical@3: Peak, Pipe 12: Diameter: not a number/.test(w)), why.join(' | '));
-	ok('W4.4 the asset the project lacks', why.some((w) => /Demand@\d+: The project has no single asset Junction J-NOPE/.test(w)), why.join(' | '));
-	ok('W4.5 the column in other units is refused as a column', why.some((w) => /furlongs/.test(w) && /so its values were not read/.test(w)), why.join(' | '));
-	ok('W4.6 the sheet that is not the workbook\'s', why.some((w) => /^Notes@: This sheet is not one/.test(w)), why.join(' | '));
+	const fill = (key, vars) => Object.keys(vars).reduce((t, k) => t.split('{' + k + '}').join(vars[k]), PC[key]);
+	ok('W4.3 "twelve" is not a number, with its row', why.indexOf('Physical@3: Peak, ' + PC.lpn_tool_add_pipe + ' 12: ' + PC.lpn_field_diameter + ': ' + PC.lpn_scnbook_why_number) >= 0, why.join(' | '));
+	ok('W4.4 the asset the project lacks', why.some((w) => /^Demand@\d+: /.test(w) && w.slice(w.indexOf(': ') + 2) === fill('lpn_scnbook_why_no_asset', { asset: 'Junction', id: 'J-NOPE' })), why.join(' | '));
+	ok('W4.5 the column in other units is refused as a column', why.indexOf('Physical@: ' + fill('lpn_scnbook_why_column_unit',
+		{ column: ph.rows[0][colOf(ph, 'roughness')], unit: 'furlongs', project: PC.lpn_scnbook_no_unit })) >= 0, why.join(' | '));
+	ok('W4.6 the sheet that is not the workbook\'s', why.indexOf('Notes@: ' + PC.lpn_scnbook_why_sheet) >= 0, why.join(' | '));
 	ok('W4.7 a file that is no workbook at all is refused whole', L.bookPlan([{ name: 'S', rows: [['a'], ['b']] }]).ok === false);
 
 	console.log('--- W5. the tree from a workbook ---');
