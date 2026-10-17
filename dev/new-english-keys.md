@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**97 still to read on master**, of 407 untranslated keys, of 3025 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**98 still to read on master**, of 408 untranslated keys, of 3026 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -79,7 +79,7 @@ is the one you meant. "The first one" is a complete answer.
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (407, 97 to read @@ NEEDS RULING)
+## lpn_  (408, 98 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -852,6 +852,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_pane_inactive_show`**
   > Include inactive topology
   _Ruled OK 2026-10-16._
+- **`lpn_pane_popout`**
+  > Open in a box
+  @@ NEEDS RULING
 - **`lpn_pane_scn_cur_only`**
   > Current scenario only
   _Ruled OK 2026-10-16._
@@ -1307,7 +1310,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**1 still to read**, of 4 new keys across 9 unmerged branch(es).
+**0 still to read**, of 3 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -1319,8 +1322,6 @@ build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
-
-### feat/guide-scenarios (`b1f4c33ff`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -1344,8 +1345,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### option/pane-boxes (`27296e9db`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_pane_popout`**
-  > Open in a box
-  @@ NEEDS RULING
+### option/pane-boxes (`dcc1e7a2f`) — adds no English strings

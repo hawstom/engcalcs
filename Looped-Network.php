@@ -870,6 +870,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<div id="lpn_pane_strip" class="lpn-pane-strip">
 			<div id="lpn_pane_tabs" class="lpn-pane-tabs" role="tablist"></div>
 		</div>
+		<button type="button" id="lpn_pane_popout" class="lpn-pane-x lpn-pane-popout" title="<?=htmlspecialchars($ec_lang['lpn_pane_popout'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_pane_popout'])?>"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" focusable="false"><rect x="1.5" y="4.5" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5 1.5h7.5V9" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></button>
 		<button type="button" id="lpn_pane_close" class="lpn-pane-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	</div>
 	<div id="lpn_pane_body" class="lpn-pane-body">
@@ -2560,6 +2561,7 @@ EngCalcs.pageConfig = {
 	lpn_pane_tab_pumps: <?=json_encode($ec_lang['lpn_pane_tab_pumps'])?>,
 	lpn_pane_tab_valves: <?=json_encode($ec_lang['lpn_pane_tab_valves'])?>,
 	lpn_pane_tab_tip: <?=json_encode($ec_lang['lpn_pane_tab_tip'])?>,
+	lpn_pane_popout: <?=json_encode($ec_lang['lpn_pane_popout'])?>,
 	lpn_pane_none: <?=json_encode($ec_lang['lpn_pane_none'])?>,
 	lpn_pane_text_attached: <?=json_encode($ec_lang['lpn_pane_text_attached'])?>,
 	lpn_pane_not_used: <?=json_encode($ec_lang['lpn_pane_not_used'])?>,

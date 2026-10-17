@@ -138,6 +138,7 @@ const EC_LPN_FURNITURE = [
     // The Scenario manager (Tom, 2026-10-09), which replaced the Alternatives preview box
     // (`lpn_altbox`, 2026-10-07, card E02: "Add the key, no first-dock limit").
     'lpn_smbox'       => 'position, size and dock of the Scenario manager box',
+    'lpn_paneboxes'   => 'position, size, dock and openness of each bottom-pane tab opened as a box (option branch, Task 799)',
     'lpn_snipbox'     => 'position and size of the Screenshot box, and its magnification',
     // NOT a box POSITION like its neighbours, and it is furniture for the same reason they are:
     // whether somebody wants a progress dialog in front of them while a run goes is a fact about

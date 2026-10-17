@@ -171,7 +171,10 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		// The Screenshot box (Tom, 2026-10-05): the Contour box's shell. It goes through the seam like
 		// its siblings, though startScreenshot() does not open it on a phone at all, where filling the
 		// window would cover the map the finger has to drag over.
-		['openSnipBox', 'the Screenshot box']];
+		['openSnipBox', 'the Screenshot box'],
+		// A bottom-pane tab opened as a box (option branch, Task 799): one wireBoxMemory() call for all
+		// of them, placed through the seam like the rest.
+		['paneBoxPop', 'a bottom-pane tab opened as a box']];
 	FILLS.forEach(function (p) {
 		ok(p[1] + ' opens through the seam', /placePanelForScreen\(/.test(body(p[0])));
 	});

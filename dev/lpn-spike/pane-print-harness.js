@@ -375,7 +375,7 @@ console.log('\n--- pressing Print ---');
 		const php = fs.readFileSync(path.join(ROOT, 'Looped-Network.php'), 'utf8');
 		report(/id="lpn_pane_strip"[\s\S]{0,200}id="lpn_pane_tabs"/.test(php),
 			'...the page nests the tablist inside that strip');
-		report(/id="lpn_pane_tabs"[\s\S]{0,120}<\/div>\s*<\/div>\s*<button[^>]*id="lpn_pane_close"/.test(php),
+		report(/id="lpn_pane_tabs"[\s\S]{0,120}<\/div>\s*<\/div>\s*(?:<button[^>]*id="lpn_pane_popout"[\s\S]{0,600}?<\/button>\s*)?<button[^>]*id="lpn_pane_close"/.test(php),
 			'...and leaves the X outside it, so it stays pinned to the top-right corner');
 		report(/\.lpn-pane-strip \{[^}]*flex-wrap: wrap/.test(css), '...the strip is the wrapping row');
 		report(/\.lpn-pane-tabs \{ display: contents; \}/.test(css),
