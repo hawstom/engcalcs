@@ -2066,6 +2066,12 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_guide_ff_marks_term']?></dt><dd><?=$ec_lang['lpn_guide_ff_marks_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_ff_example_term']?></dt><dd><?=$ec_lang['lpn_guide_ff_example_def']?></dd>
 </dl></template>
+<?php // The Criticality analysis chapter (Task 785). ?>
+<template id="lpn_guide_more_lpn_crit_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_cr_case_term']?></dt><dd><?=$ec_lang['lpn_guide_cr_case_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_cr_dead_term']?></dt><dd><?=$ec_lang['lpn_guide_cr_dead_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_cr_example_term']?></dt><dd><?=$ec_lang['lpn_guide_cr_example_def']?></dd>
+</dl></template>
 <template id="lpn_guide_more_lpn_scncmp_box"><dl>
 	<dt><?=$ec_lang['lpn_guide_cmp_cols_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_cols_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_cmp_run_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_run_def']?></dd>
