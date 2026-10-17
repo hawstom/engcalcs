@@ -109,13 +109,14 @@ provenance rules: `dev/agents/README.md`.
 | `dev/session-handoff.md` | **Read first.** RULINGS, TRAPS and dated STATE; delete a state line once checked |
 | `dev/ROADMAP.md` | OPEN tasks only. Format `Priority\|ID\|status Description` |
 | `dev/terms.md` | **The concept source translators work from**: plain-words names, Tom's definitions, uniqueness attention groups. Tom edits it |
+| `dev/plain-sentences.md` | Tom's per-string help for translators: one string at a time, in plain words. Tom edits it |
 | `dev/roadmap-closed-ids.md` | One line per closed ID, so a cited `Task N` resolves |
 | `dev/tom-review-queue.md` | Tom's browser-pass comments, quoted, until cleared |
 | `dev/real-world-reviews.md` | What outside testers did and said, one entry per session |
 | `dev/scripts/` | All CLI tools and checks; `glossary.json` is the engineering term glossary |
 | `dev/calc-spike/`, `dev/lpn-spike/` | Headless tests. `dev/calc-spike/README.md` is the recipe for a worked example |
 | `dev/translation_payloads/` | Per-language JSON payloads for translation sprints |
-| `dev/language-strings.md` | Full rules for writing `$ec_lang` / `$ec_lang_syn` values |
+| `dev/language-strings.md` | Full rules for writing `$ec_lang` values and `dev/plain-sentences.md` entries |
 | `dev/translation-process.md` | Sprint SOP and full mechanics |
 | `dev/testing-notes.md` | What actually catches defects here |
 | `dev/english-key-rulings.json` | Tom's approvals of English strings, keyed on the exact text so a ruling lapses when the wording changes. Never hand-edit `dev/new-english-keys.md` expecting it to survive |
@@ -257,13 +258,13 @@ before editing any string value.** `lang_syntax_validate.php` enforces: (A) neve
 (B) never a tag in a plain-text-bound string, including dialog text; (C) advisory name/derivation
 mismatch; (D) single-quoted values only.
 
-- **`$ec_lang_syn` is OFF-LIMITS to AI** without explicit written permission in that conversation.
-  Propose a diff; Tom approves; then write. No standing carve-outs. Entries are synonyms that pass
-  the substitution test.
+- **`dev/plain-sentences.md` is OFF-LIMITS to AI** without explicit written permission in that
+  conversation. Propose a diff; Tom approves; then write. No standing carve-outs. It holds Tom's
+  per-string help for translators, in plain words; it replaced `$ec_lang_syn`.
 - **Suggestions only, no prohibitions.** A translator gets what a word means and what to call it,
   never a "do not" line; a wrong translation means the definition needs fixing.
 - **Routing:** an English reader also stumbles → fix the English; English is fine but untranslatable
-  → `$ec_lang_syn`; the concept recurs → `dev/terms.md`, Tom's plain-words concept list, which
+  → `dev/plain-sentences.md`; the concept recurs → `dev/terms.md`, Tom's plain-words concept list, which
   `terms_to_glossary.php --write` carries into `glossary.json`. Never edit those glossary fields by hand.
 - **Never rename a key by hand** — `php dev/scripts/rename_lang_key.php old new --apply`.
 - **English style: standard professional civil-engineering technical English**, the register of

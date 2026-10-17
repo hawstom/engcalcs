@@ -67,38 +67,9 @@ function ecLoadKeyConcepts(?string $path = null): array
 }
 
 /**
- * Term names named by `gloss:` tags in one $ec_lang_syn value -- right of the pipe only, one tag
- * may list several terms comma-separated. The same parse as gloss_ref_check.php.
+ * Every concept id a key cites in key_concepts.json, de-duplicated, order kept.
  */
-function ecGlossPointerTerms(string $synValue): array
+function ecConceptsCitedByKey(string $key, array $keyConcepts): array
 {
-    $pipe = strpos($synValue, '|');
-    if ($pipe === false) { return []; }
-    if (!preg_match_all('/\bgloss:\s*([^;]+)/', substr($synValue, $pipe + 1), $m)) { return []; }
-    $names = [];
-    foreach ($m[1] as $raw) {
-        foreach (explode(',', $raw) as $one) {
-            $one = strtolower(trim($one));
-            if ($one !== '') { $names[] = $one; }
-        }
-    }
-    return $names;
-}
-
-/**
- * Every concept id a key cites: key_concepts.json first, then any `gloss:` pointer whose term
- * carries a concept. De-duplicated, order kept.
- *
- * @param array $termsByLowerName lower-cased term name => term entry
- */
-function ecConceptsCitedByKey(string $key, array $keyConcepts, array $synMap, array $termsByLowerName): array
-{
-    $ids = $keyConcepts[$key] ?? [];
-    if (isset($synMap[$key])) {
-        foreach (ecGlossPointerTerms((string)$synMap[$key]) as $name) {
-            $id = trim((string)($termsByLowerName[$name]['concept'] ?? ''));
-            if ($id !== '') { $ids[] = $id; }
-        }
-    }
-    return array_values(array_unique($ids));
+    return array_values(array_unique($keyConcepts[$key] ?? []));
 }

@@ -105,7 +105,10 @@ $jsonFiles = [
     __DIR__ . '/translation_exempt_keys.json',
     __DIR__ . '/translation_coverage.json',
     dirname(__DIR__) . '/english-key-rulings.json',
+    dirname(__DIR__) . '/plain-sentence-rulings.json',
+    __DIR__ . '/key_concepts.json',
 ];
+$plainFile = dirname(__DIR__) . '/plain-sentences.md';
 
 $edits = [];
 function noteEdit(array &$edits, $file, $n) { $edits[$file] = ($edits[$file] ?? 0) + $n; }
@@ -117,7 +120,7 @@ foreach ($keys as $key) {
     //    to the one key and this script cannot tell which.
     foreach ($langFiles as $file) {
         $content = (string) file_get_contents($file);
-        $out = preg_replace('/^\$ec_lang(?:_syn)?\[\'' . $qk . '\'\]\s*=.*\R/m', '', $content, -1, $n);
+        $out = preg_replace('/^\$ec_lang\[\'' . $qk . '\'\]\s*=.*\R/m', '', $content, -1, $n);
         if ($n) { noteEdit($edits, $file, $n); if ($apply) { file_put_contents($file, $out); } }
     }
     // 2. The JSON records that key English strings by name.
@@ -135,7 +138,13 @@ foreach ($keys as $key) {
             }
         }
     }
-    // 3. The pageConfig supply lines, only when asked.
+    // 3. Its entry in dev/plain-sentences.md: the help goes with the string it described.
+    if (is_file($plainFile)) {
+        $content = (string) file_get_contents($plainFile);
+        $out = preg_replace('/^### ' . $qk . '\R(?:(?!### ).*\R?)*/m', '', $content, -1, $n);
+        if ($n) { noteEdit($edits, $plainFile, $n); if ($apply) { file_put_contents($plainFile, $out); } }
+    }
+    // 4. The pageConfig supply lines, only when asked.
     if ($withSupply) {
         foreach ($supplyOf[$key] as $hit) {
             [$file, $n, $line] = $hit;

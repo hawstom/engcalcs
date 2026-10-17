@@ -427,7 +427,7 @@ run_check "lang markup matches English"  blocking php dev/scripts/lang_tag_parit
 # matters because a repeat already ships (lpn_push_base_only carries {base} twice, everywhere).
 run_check "language placeholders"        blocking php dev/scripts/lang_placeholder_check.php
 run_check "placeholder selftest"         blocking php dev/scripts/lang_placeholder_selftest.php
-run_check "gloss pointers resolve"       blocking php dev/scripts/gloss_ref_check.php
+run_check "glossary term names"          blocking php dev/scripts/gloss_ref_check.php
 # Task 737. Concept records are the translator's source; a duplicate id, an id that reads as
 # another concept's English, or a key citing a missing id ships a wrong or inconsistent term in 26
 # languages while payloads still generate and --check still says FRESH.
@@ -440,12 +440,7 @@ run_check "anchor languages"             blocking php dev/scripts/anchor_languag
 run_check "anchor language selftest"     blocking php dev/scripts/anchor_language_selftest.php
 run_check "js module wiring"             blocking php dev/scripts/js_module_wiring_check.php
 run_check "js module wiring selftest"    blocking php dev/scripts/js_module_wiring_selftest.php
-run_check "layout tags match widgets" blocking php dev/scripts/layout_tag_check.php
-# Task 322 row 15. The unguarded half of the same rule: layout_tag_check.php reads the RIGHT
-# side of the pipe, and the generator strips commentary by POSITION, so a tag written on the
-# left is shipped to 26 agents as though it were a synonym.
-run_check "syn tags right of the pipe"   blocking php dev/scripts/syn_tag_side_check.php
-run_check "syn tag side selftest"        blocking php dev/scripts/syn_tag_side_selftest.php
+run_check "plain sentences and layout"  blocking php dev/scripts/layout_tag_check.php
 # Task 322 row 26. A verdict leads with its glyph and never a marker word. WHICH strings are
 # verdicts is read out of the RENDERER -- writeCheckHTML()'s short-text argument and the labels
 # objects -- rather than guessed from key names, which is what the survey said made it risky.

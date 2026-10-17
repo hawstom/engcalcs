@@ -2596,6 +2596,7 @@ EngCalcs.pageConfig = {
 	lpn_library_pattern_values: <?=json_encode($ec_lang['lpn_library_pattern_values'])?>,
 	lpn_library_pattern_values_tip: <?=json_encode($ec_lang['lpn_library_pattern_values_tip'])?>,
 	lpn_library_pattern_span: <?=json_encode($ec_lang['lpn_library_pattern_span'])?>,
+	lpn_library_pattern_axis_step: <?=json_encode($ec_lang['lpn_library_pattern_axis_step'])?>,
 	lpn_library_pattern_none: <?=json_encode($ec_lang['lpn_library_pattern_none'])?>,
 	lpn_choice_default: <?=json_encode($ec_lang['lpn_choice_default'])?>,
 	lpn_settings_default_pattern: <?=json_encode($ec_lang['lpn_settings_default_pattern'])?>,

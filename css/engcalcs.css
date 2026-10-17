@@ -4858,6 +4858,16 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 /* A curve is read in two dimensions -- flow across, head up -- so it gets more height than a
    pattern, which is read only for its ups and downs along one axis. */
 .lpn-lib-chart { height: 76px; }
+/* The pattern graph with axes: the multiplier range down the left, clock time and period ordinal
+   under it. A two-column grid so the labels line up with the stretched SVG. */
+.lpn-lib-plot { display: grid; grid-template-columns: auto 1fr; column-gap: 4px; font-size: .8em; }
+.lpn-lib-yaxis { display: flex; flex-direction: column; justify-content: space-between; text-align: right; font-variant-numeric: tabular-nums; }
+.lpn-lib-ytitle { opacity: .7; }
+.lpn-lib-xaxes { grid-column: 2; }
+.lpn-lib-xrow { position: relative; height: 1.3em; font-variant-numeric: tabular-nums; }
+.lpn-lib-xtitle { position: absolute; right: 0; opacity: .7; }
+.lpn-lib-tick { position: absolute; transform: translateX(-50%); }
+.lpn-lib-tick-first { transform: none; }
 .lpn-lib-note { font-size: .9em; opacity: .8; margin: 2px 0; }
 .lpn-lib-verdict { font-size: .9em; }
 /* The section a library entry list sits under. Its heading is not sticky -- unlike Settings, only

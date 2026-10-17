@@ -44,8 +44,8 @@
  * is still on the old link. That check is the point: "no translator needed" and "nothing left to
  * do" are different claims, and only the first one is being made here.
  *
- * Scope: $ec_lang display strings only (not $ec_lang_syn — intent is
- * translator metadata, not a shipped translated string).
+ * Scope: $ec_lang display strings only (not dev/plain-sentences.md, which is translator help, not a
+ * shipped translated string).
  */
 
 const LANG_DIR = __DIR__ . '/../../lib';

@@ -16,13 +16,10 @@
  * anyway by a sprint that could not tell the difference. The count is echoed in
  * payload['meta']['out_of_scope_key_count'] so the suppression stays visible.
  *
- * Optional sibling map support in lib/lang.ec.en.php:
- *   $ec_lang_syn['some_key'] = 'Synonyms a translator can re-compress | layout: button; avoid: X';
- * Left of the first pipe: every phrase must pass the substitution test -- it could stand in the
- * slot as the label itself. Emitted to payload['key_syn'][key]. Right of the pipe: commentary
- * tags, emitted to payload['key_notes'][key] as the full instructions from the tag table in
- * dev/language-strings.md (gloss: pointers excepted; their terms arrive in key_concepts and
- * glossary).
+ * Per-string help comes from dev/plain-sentences.md, Tom's file (it replaced $ec_lang_syn,
+ * 2026-10-16). An entry's Plain line goes to payload['key_plain'][key]; its Layout, Symbol and
+ * Runtime lines go to payload['key_notes'][key] as the full instructions from the table in
+ * dev/language-strings.md, and its Note lines as notes.
  *
  * Per-key delivery, Appendix D step 1 of dev/translation-clarification-review.md: keys whose
  * English was reworded since the last sync (detect_english_drift.php CHANGED) are in
@@ -51,12 +48,12 @@ const SUGGESTION_BOX_HEADING = '## The suggestion box';
 // the same way and for the same reason as the suggestion box.
 const CONCEPT_SOURCE_HEADING = '## Concepts are the source';
 const EN_FILE = DEFAULT_LANG_DIR . '/lang.ec.en.php';
-// Appendix D step 1 of dev/translation-clarification-review.md. The `$ec_lang_syn` commentary tags
-// (`layout:`, `avoid:`, `symbol`, `runtime:`) are shorthand for a full instruction written once, in
-// the tag table of dev/language-strings.md. The payload carries the full instruction, read from that
+// Appendix D step 1 of dev/translation-clarification-review.md. The Layout, Symbol and Runtime lines
+// of dev/plain-sentences.md are shorthand for a full instruction written once, in the table of
+// dev/language-strings.md. The payload carries the full instruction, read from that
 // table, so the translator never has to know the shorthand and the two cannot drift apart.
 const TAG_TABLE_SOURCE = __DIR__ . '/../language-strings.md';
-const TAG_TABLE_HEADING = '### `$ec_lang_syn` format';
+const TAG_TABLE_HEADING = '### Layout, Symbol and Runtime lines';
 // The English-drift manifest detect_english_drift.php keeps. A key whose English hash no longer
 // matches it was reworded after its translations were written; those keys travel in
 // keys_to_translate with reason english_changed instead of on a separate English-only list.
@@ -70,6 +67,7 @@ require_once __DIR__ . '/exempt_keys.inc.php';
 require_once __DIR__ . '/prefix_terms.inc.php';
 require_once __DIR__ . '/coverage.inc.php';
 require_once __DIR__ . '/concepts.inc.php';
+require_once __DIR__ . '/plain_sentences.inc.php';
 
 main($argv);
 
@@ -123,7 +121,7 @@ function buildPayloads(array $opts, bool $quiet = false): array
     if (count($enKeys) === 0) {
         fail('No keys parsed from English language file.');
     }
-    $enIntent = loadEnglishIntentMap(EN_FILE);
+    $plainSentences = ecPlainSentences();
 
     $glossaryData = readJsonFile(GLOSSARY_PATH);
     if (!isset($glossaryData['terms']) || !is_array($glossaryData['terms'])) {
@@ -184,9 +182,9 @@ function buildPayloads(array $opts, bool $quiet = false): array
         [$deltaKeys, $keyContext, $exemptKeys, $outOfScopeKeys] =
             collectDeltaAndContext($enKeys, $current, $activePrefixes, $lang, $exemptMap, $coverage, $changedKeys);
         $keyContext = attachTipPairs($keyContext, $enKeys, $current);
-        $keySyn = collectKeySyn($deltaKeys, $enKeys, $enIntent);
-        $keyNotes = collectKeyNotes($deltaKeys, $enIntent, $tagTable);
-        $keyConceptMap = collectKeyConcepts($deltaKeys, $keyConcepts, $enIntent, $termIndex, $conceptIndex, $lang);
+        $keyPlain = collectKeyPlain($deltaKeys, $enKeys, $plainSentences);
+        $keyNotes = collectKeyNotes($deltaKeys, $plainSentences, $tagTable);
+        $keyConceptMap = collectKeyConcepts($deltaKeys, $keyConcepts, $conceptIndex, $lang);
         $exemptTotal += count($exemptKeys);
         $outOfScopeTotal += count($outOfScopeKeys);
         $changedCount = count(array_filter($keyContext, static function ($c) {
@@ -194,7 +192,7 @@ function buildPayloads(array $opts, bool $quiet = false): array
         }));
 
         $prefixesInDelta = detectPrefixes($deltaKeys);
-        $batchTerms = selectBatchTerms($deltaKeys, $glossaryData['terms'], $keyConcepts, $enIntent, $termIndex, $prefixMap);
+        $batchTerms = selectBatchTerms($deltaKeys, $glossaryData['terms'], $keyConcepts, $termIndex, $prefixMap);
         $glossaryText = buildPromptContext($batchTerms, $lang);
         $uniqueness = collectUniqueness($batchTerms, $glossaryData['terms'], $lang);
 
@@ -230,7 +228,7 @@ function buildPayloads(array $opts, bool $quiet = false): array
                 'control_name_notes' => 'Where an English string names a control, it names it in one of two shapes. A single control is written as its label followed by the widget word: "press the Calculate button", "the Recalculate automatically setting", "the Required fire flow box". A menu path is written as comma-separated labels: "File, Save as"; "Settings, Calculation, Hydraulics". In BOTH shapes the label is another key\'s value. Translate it with exactly the words you used for that key, so the sentence still names what is on the screen; translate the widget word and the surrounding prose normally.',
                 'glossary_notes' => 'glossary lists the technical terms that the strings in this batch use, each named in plain words, with your language\'s preferred translation where one exists. Use the preferred translation wherever the term appears, unless your language\'s genuine standard term is better; then use that and say so in your report.',
                 'context_notes' => 'Use key_context[key].neighbors to keep register consistent with nearby translated strings. key_context[key].tip is the help text shown for that label, and key_context[key].label is the label a tip explains: read the pair together, and give the same thing the same word in both. Where the partner already has a translation in your file, its value is shown.',
-                'syn_notes' => 'key_syn[key] gives other English wordings of that one string; any of them could stand in its place. Use whichever your language expresses most naturally and compactly; you are not bound to the literal English wording.',
+                'plain_notes' => 'key_plain[key] says in plain words what that one string means, other wordings joined by "or". Use whichever your language expresses most naturally and compactly; you are not bound to the literal English wording.',
                 'key_notes_notes' => 'key_notes[key] are notes about that one string: how much room it has, symbols to keep exactly, what it refers to. Follow them. They are instructions to you, never text to put in your file.',
                 'suggestion_box_notes' => 'Read suggestion_box and follow it. It is part of your instructions, not a footnote: a sprint does not close while a translator complaint is unanswered.',
                 'concept_notes' => 'Read concept_source and follow it. key_concepts lists, for a key that names a concept, its plain-words name, which is what you translate from; English is one rendering of it.',
@@ -249,7 +247,7 @@ function buildPayloads(array $opts, bool $quiet = false): array
             // Backward-compatibility for scripts that still expect payload["keys"].
             'keys' => $deltaKeys,
             'key_context' => $keyContext,
-            'key_syn' => $keySyn,
+            'key_plain' => $keyPlain,
             'key_notes' => $keyNotes,
             'key_concepts' => $keyConceptMap,
             'uniqueness_attention' => $uniqueness,
@@ -478,14 +476,14 @@ function loadFencedBlock(string $heading): string
 /**
  * ROADMAP Task 737. For each delta key that cites a concept, the concept record the translator
  * translates from: its plain-words name from dev/terms.md, Tom's definition where he wrote one,
- * and English as one rendering. A key citing no concept gets no entry: English stays the source. Citations come from key_concepts.json and from `gloss:` pointers.
+ * and English as one rendering. A key citing no concept gets no entry: English stays the source. Citations come from key_concepts.json.
  */
-function collectKeyConcepts(array $deltaKeys, array $keyConcepts, array $synMap, array $termIndex, array $conceptIndex, string $lang): array
+function collectKeyConcepts(array $deltaKeys, array $keyConcepts, array $conceptIndex, string $lang): array
 {
     $out = [];
     foreach ($deltaKeys as $key => $english) {
         $entries = [];
-        foreach (ecConceptsCitedByKey($key, $keyConcepts, $synMap, $termIndex) as $id) {
+        foreach (ecConceptsCitedByKey($key, $keyConcepts) as $id) {
             $term = $conceptIndex[$id] ?? null;
             if ($term === null || trim((string)($term['plain'] ?? '')) === '') {
                 continue;
@@ -511,48 +509,20 @@ function collectKeyConcepts(array $deltaKeys, array $keyConcepts, array $synMap,
     return $out;
 }
 
-function loadEnglishIntentMap(string $file): array
-{
-    $ec_lang = [];
-    $ec_lang_syn = [];
-    include $file;
-
-    if (!is_array($ec_lang_syn)) {
-        return [];
-    }
-
-    return $ec_lang_syn;
-}
-
-function collectKeySyn(array $deltaKeys, array $enKeys, array $intentMap): array
+/**
+ * The Plain line of each delta key's entry in dev/plain-sentences.md, where it says something the
+ * English does not.
+ */
+function collectKeyPlain(array $deltaKeys, array $enKeys, array $plainSentences): array
 {
     $result = [];
-
     foreach ($deltaKeys as $key => $english) {
-        if (!array_key_exists($key, $intentMap)) {
+        $plain = trim((string)($plainSentences[$key]['plain'] ?? ''));
+        if ($plain === '' || $plain === trim((string)($enKeys[$key] ?? $english))) {
             continue;
         }
-
-        // Intent strings follow the convention "<intent> | <commentary>" (see CLAUDE.md,
-        // Language Keys). Everything from the first pipe onward is non-translated commentary
-        // (layout/avoid/gloss tags); strip it so payloads carry only the translatable intent.
-        $intent = trim((string)$intentMap[$key]);
-        $pipePos = strpos($intent, '|');
-        if ($pipePos !== false) {
-            $intent = trim(substr($intent, 0, $pipePos));
-        }
-        if ($intent === '') {
-            continue;
-        }
-
-        $enValue = trim((string)($enKeys[$key] ?? $english));
-        if ($intent === $enValue) {
-            continue;
-        }
-
-        $result[$key] = $intent;
+        $result[$key] = $plain;
     }
-
     return $result;
 }
 
@@ -592,78 +562,33 @@ function loadTagTable(): array
 }
 
 /**
- * Split `$ec_lang_syn` commentary into [tag, value, raw] parts. A new tag begins only at a known
- * tag name, because tag values are prose and prose contains semicolons. The same rule as
- * layout_tag_check.php's splitTags(); see the comment there for the defect that taught it.
- * A part that does not begin with a known tag comes back with tag '' and is free commentary.
- */
-function splitSynCommentary(string $commentary, array $knownTags): array
-{
-    $names = implode('|', array_map(static function ($t) { return preg_quote($t, '/'); }, $knownTags));
-    $parts = preg_split('/;\s*(?=(?:' . $names . ')\s*[:;]|(?:' . $names . ')\s*$)/', $commentary);
-    $out = [];
-    foreach ($parts as $part) {
-        $part = trim($part);
-        if ($part === '') {
-            continue;
-        }
-        // `symbol; <prose>`: a flag followed by a sentence.
-        if (preg_match('/^(' . $names . ')\s*;\s*(.+)$/s', $part, $mm)) {
-            $out[] = [$mm[1], '', $mm[1]];
-            $part = trim($mm[2]);
-        }
-        if (preg_match('/^(' . $names . ')\s*(?::\s*(.*))?$/s', $part, $mm)) {
-            $out[] = [$mm[1], trim($mm[2] ?? ''), $part];
-        } else {
-            $out[] = ['', '', $part];
-        }
-    }
-    return $out;
-}
-
-/**
- * Appendix D step 1, item 1. The commentary right of the first pipe in a key's `$ec_lang_syn`,
- * rendered as the plain instructions a translator needs, one string per instruction:
+ * Appendix D step 1, item 1. The Layout, Symbol, Runtime and Note lines of a key's entry in
+ * dev/plain-sentences.md, rendered as the plain instructions a translator needs, one per line:
  *
- *   layout/runtime: <value>  -> "Layout (<value>): <the table's full instruction>"
- *   avoid: <sense>           -> not sent: suggestions only, no prohibitions (Tom, 2026-10-16)
- *   symbol                   -> "Symbol: <the table's instruction>"
- *   gloss: <term>            -> nothing here; the term already arrives through key_concepts and glossary
- *   free prose               -> "Note: <prose>"
- *
- * Emitted whether or not the synonyms left of the pipe equal the English, unlike key_syn: a key
- * with nothing to say on the left can still carry a warning on the right.
+ *   Layout: <value>    -> "Layout (<value>): <the table's full instruction>"
+ *   Runtime: <value>   -> "Runtime (<value>): <the table's full instruction>"
+ *   Symbol: yes        -> "Symbol: <the table's instruction>"
+ *   Note: <prose>      -> "Note: <prose>"
  */
-function collectKeyNotes(array $deltaKeys, array $synMap, array $tagTable): array
+function collectKeyNotes(array $deltaKeys, array $plainSentences, array $tagTable): array
 {
-    $known = array_keys($tagTable);
     $out = [];
     foreach ($deltaKeys as $key => $english) {
-        if (!isset($synMap[$key])) {
+        $e = $plainSentences[$key] ?? null;
+        if ($e === null) {
             continue;
         }
-        $syn = (string)$synMap[$key];
-        $pipe = strpos($syn, '|');
-        if ($pipe === false) {
-            continue;
-        }
-        // SUGGESTIONS ONLY, NO PROHIBITIONS (Tom, 2026-10-16): an `avoid:` tag stays in the file,
-        // unsent. "We are masking our poor definitions with often very wrong prohibitions."
         $notes = [];
-        foreach (splitSynCommentary(substr($syn, $pipe + 1), $known) as [$tag, $value, $raw]) {
-            if ($tag === '') {
-                $notes[] = 'Note: ' . $raw;
-                continue;
-            }
-            if ($tag === 'gloss') {
-                continue;
-            }
-            if ($tag === 'avoid') {
+        foreach (['layout' => $e['layout'], 'runtime' => $e['runtime'], 'symbol' => $e['symbol'] ? '' : null] as $tag => $value) {
+            if ($value === null || ($tag !== 'symbol' && $value === '')) {
                 continue;
             }
             $instruction = $tagTable[$tag][$value] ?? $tagTable[$tag]['*'] ?? '';
             $label = ucfirst($tag) . ($value !== '' ? ' (' . $value . ')' : '');
             $notes[] = $instruction !== '' ? $label . ': ' . $instruction : $label;
+        }
+        foreach ($e['notes'] as $note) {
+            $notes[] = 'Note: ' . $note;
         }
         if ($notes) {
             $out[$key] = $notes;
@@ -727,7 +652,7 @@ function attachTipPairs(array $keyContext, array $enKeys, array $current): array
  * Appendix D step 1, item 4. The glossary terms this batch's strings actually use, in glossary
  * order:
  *
- *   - every term a batch key cites, through key_concepts.json or a `gloss:` pointer;
+ *   - every term a batch key cites in key_concepts.json;
  *   - every term whose English rendering appears as a word or phrase in a batch string (a plural
  *     s/es allowed), EXCEPT that a sense-qualified term, one whose name carries a parenthetical
  *     such as "run (a simulation)" or "text (map annotation)", counts only in a string whose
@@ -738,7 +663,7 @@ function attachTipPairs(array $keyContext, array $enKeys, array $current): array
  * A term whose English appears in no batch string, and that no batch key cites, has nothing in
  * this batch to help with. Sending it anyway is what made an lpn payload carry all 72 lpn terms.
  */
-function selectBatchTerms(array $deltaKeys, array $terms, array $keyConcepts, array $synMap, array $termIndex, array $prefixMap): array
+function selectBatchTerms(array $deltaKeys, array $terms, array $keyConcepts, array $termIndex, array $prefixMap): array
 {
     if (count($deltaKeys) === 0) {
         return [];
@@ -749,11 +674,6 @@ function selectBatchTerms(array $deltaKeys, array $terms, array $keyConcepts, ar
     foreach ($deltaKeys as $key => $english) {
         foreach ($keyConcepts[$key] ?? [] as $id) {
             $cited['concept:' . $id] = true;
-        }
-        if (isset($synMap[$key])) {
-            foreach (ecGlossPointerTerms((string)$synMap[$key]) as $name) {
-                $cited['term:' . $name] = true;
-            }
         }
         $plain = ' ' . html_entity_decode(strip_tags((string)$english), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $textAll .= $plain;
@@ -771,7 +691,7 @@ function selectBatchTerms(array $deltaKeys, array $terms, array $keyConcepts, ar
         if (($termIndex[$name] ?? null) !== $term) {
             continue; // a duplicate name; gloss_ref_check.php refuses those, termIndexByName() keeps the last
         }
-        $take = isset($cited['term:' . $name]) || isset($cited['concept:' . ($term['concept'] ?? '')]);
+        $take = isset($cited['concept:' . ($term['concept'] ?? '')]);
         if (!$take) {
             $qualified = strpos($name, '(') !== false;
             $haystack = $qualified ? ($textWired[$name] ?? '') : $textAll;

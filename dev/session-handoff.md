@@ -96,45 +96,44 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-15 (twenty-first session, the evening, Arizona time)
+## STATE — 2026-10-16 (twenty-third session, the evening, Arizona time)
 
 ### Master: see the pushed SHA in the last report. Production: b7c99102 (10-09) when last read; ask, About box
 
-Landed on master 2026-10-15: feat/leader-keep (807, night); feat/stopped-series (808); his word calls on the 808 strings and the mode
-prompts ("labels, and Text"); fix/mtc-vertical-sides (z = 0 side rock reads N/A, `mtc_not_applicable`);
-feat/plural (35 count strings in the "cells (n)" form); sprint 1016 (15 new, 44 resynced, 26 languages;
-`dev/english-friction/1016.json`; halo had been rendered "hello" in am bn hi my, fixed; tr N/A "Uygulanmaz");
-perf/switch-cost + perf/cross-shed (Task 681: no second label pass on arrival, crossing shed counted once;
-identical output; n600 cold switch 3.2 s to 1.3 s). No key was unrendered, so none deleted.
-Earlier the same day: twentieth session's list (text-halo, search-zoom-accuracy, sprint 737b, ...).
+Landed on master 2026-10-16 (his typed word): feat/description-lines (806), chore/retire-mark-extrema,
+feat/pattern-axis ("Step", ticks fit the width), fix/merge-1016 (those two merges broke three harnesses;
+one was a real defect: Tab out of the multi-line Description dropped focus), roadmap closures 806, 807,
+643, 786; 802 and 804 to 100; 798 to 50. Another session (engcalcs-05) merged chore/plain-sentences
+($ec_lang_syn retired into dev/plain-sentences.md, with his marks). Deleted keys: none this session
+beyond retire-mark-extrema's two (`lpn_labels_mark_extrema`, `_tip`).
 
 ### Branches awaiting his word (pushed; all on the Branch previews page with test steps)
 
-Twenty-second session (10-16 afternoon) built his 10-16 items below; previews page rows updated.
-
-- **feat/bentley-interop**: he APPROVED all its new English. His changes: the Scenarios table flies out
-  AUTOMATICALLY with the manager (no button), as the spreadsheet version, and widens by dragging; All
-  unused omits categories with nothing unused; Clean map's tip loses the "shows only the drawing"
-  sentence and starts "Checked: The zoom...". He says per-scenario graphs are not new (they changed
-  with scenario two days earlier). The `$ec_lang_syn` Transform description still awaits his OK.
-  `lpn_cleanmap`, `lpn_ovrmarks`, and the flyout width `flyW` inside `lpn_smbox`: TELL HIM before it
-  merges. Still unruled: `lpn_settings_override_marks_tip`, `lpn_sm_all_row_tip`, `lpn_sm_unused_none`. After it lands
-  delete match-property, graph-bubble. **10-16 (9b9f74f3):** the manager's table is one box with it
-  (tucks/closes together), Settings' slim divider, pane Scenarios tab kept; new bubbles open at 200 px
-  (his "miniatures"); result cells in Tables AND Properties print the label decimals with trailing
-  zeros; Vertices column sized by heading only. Awaiting his pass (R-409).
-- **EPS defects he found on bentley-interop, worked on fix/zero-demand-solve**: (1) the "1-hr drain"
-  scenario reports it ended at 15:07:33; (2) tanks drain with no demand; (3) a pattern of mostly 0s
-  stops EPANET at 0:00 ("Surely it's smarter than this"); (4) on the 8108 preview his Fotobi shows no
-  EPS and no animation controls. R-402: he accepted keeping his numbers and the message ("OK"), and
-  approved its status messages. Don't call a fixture by its filename to him; name his project.
-- **feat/description-lines** (806): his call changed to "\P" with no spaces (was " \P "); the legacy
-  spaced reading is gone (9b55bfe7).
-- **chore/retire-mark-extrema** (3f3650f3): "Mark highest and lowest values" retired on his call;
-  deleted keys `lpn_labels_mark_extrema`, `lpn_labels_mark_extrema_tip`. Needs his merge word.
-- **feat/pattern-axis** (c6d33547): the Library pattern graph has Multipliers / Time / Period axes. New
-  English "Period" (`lpn_library_pattern_axis_period`) awaits his word; tick times are pattern time,
-  not run time (Pattern start not added) -- ask.
+- **feat/bentley-interop** (8116): his 10-16 pass items are built and merged in: feat/scenario-box (manager
+  and table ONE box, one title bar, one x; R-410), feat/manage-override (List overrides became Manage
+  overrides: Clear per row, Clear selected, Clear all, each time series graph its own row; R-413; English
+  awaits him), fix/elevation-override (elevation WAS already a Physical override on this branch, the
+  handoff note came from master's helper; the real defect was a scenario's automatic slope length using
+  Base's elevations, fixed; R-414). fix/zero-demand-solve is merged into it. An integration agent was
+  merging master into it and making its suite green (its head had 4 red harnesses before today). Check
+  its state with `git log` before anything else. Still to TELL HIM before it merges: `lpn_cleanmap`,
+  `lpn_ovrmarks` (localStorage), `flyW`/`dockW` in `lpn_smbox`. He asked whether to merge it and keep
+  building: CC's answer was yes (merge, then new branches from master; 749 gets its own branch when a
+  sample file exists). Unruled: `lpn_settings_override_marks_tip`, `lpn_sm_all_row_tip`,
+  `lpn_sm_unused_none`, the Transform plain sentence. After it lands delete match-property, graph-bubble,
+  scenario-box, manage-override, elevation-override.
+- **feat/theme-dark** (8110, Task 714): System/Light/Dark in Settings > Page, NEW localStorage key
+  `lpn_theme` (told him). Looped Network page only (other calculators' navbar is not tokenised). Perry's
+  five findings and his "colors legend doesn't respond to Dark" fixed (ced0c2db). English: Theme, its tip,
+  System, Light, Dark.
+- **feat/basemap-outdoors** (8107, Task 617): Mapbox Outdoors as the third press of the corner tile; his
+  word "Topo" (key `lpn_basemap_topo_show`, "Show topo map"; stored value stays `outdoors`). BLOCKED on
+  his word for privacy.php's "Satellite imagery" row: proposed "Satellite and topo map imagery" /
+  "Mapbox, for the satellite and topo map images"; `third_party_request_check.php` pins the old phrase.
+- **feat/geojson-import** (8108, Task 728): File > Import > Import GeoJSON network; Perry's fixes done
+  (b4c12097). ~60 new English keys await him. His calls: NAD83 (EPSG:4269) refused or read as WGS 84
+  "up to about 1 m off"; minor loss 0 on imported pipes (built); `lpn_file_import_shapes_tip` is now
+  untrue (says import networks from EPANET only). Shapefile half not built.
 
 ### Proposed to him 2026-10-15/16, awaiting his word
 
@@ -156,25 +155,31 @@ Twenty-second session (10-16 afternoon) built his 10-16 items below; previews pa
   (15:07:33, 14:01:42): EPANET closes L22 and the junctions it fed have no source. 15:07:33 was the
   simulation time, NOT the wall clock as CC told him. He asks why lowering a full tank's initial
   depth avoids the 0:00 stop when flow is zero either way. Candidate answer to "surely it's smarter":
-  pressure-driven demand. Also: his units went back to US (possible defect; asked him for steps).
+  pressure-driven demand. His units going back to US on Fotobi: he has no steps and will keep observing (R-415).
 - **A pipe-label artifact** in a new project (one pipe label, while stretching nodes): his screenshot
   was the wrong file; ask for it.
 
 ### Questions out to him
 
-- R-409 (3): how to manage the time series bubble overrides. CC proposed right-click a bubble:
-  "Remove from this scenario" / "Remove from all scenarios", plus bubbles as rows in List overrides.
-- Elevation is not overridable, so editing it in a child scenario silently changes Base (found by the
-  scenario UI helper). By design per `LPN_OVERRIDABLE`, but nothing on screen says so.
-
 - Task 800: keep J-NE-S-3's equal override?
 - Task 681: the node shed's re-fits are what is left (~250 ms on n600); cheaper means changing the layout.
+- Task 269 (EWB): the action is his (call Dane Whitmer); Task 728 import half is the geojson branch.
 
 ### Next job
 
-His browser pass on bentley-interop (R-409), retire-mark-extrema, pattern-axis, description-lines.
-Wish lists: New junction without a canvas click (Declan). Perry's scenario UI helper merged
-(`dev/lpn-spike/scenario-ui-helper.js`). Mary's Number of services decimals is moot: the CSV is gone.
+His browser pass on bentley-interop (once green), theme-dark, basemap-outdoors (after the privacy word),
+geojson-import. Wish lists: New junction without a canvas click (Declan). Survey of obsolete dev/ files
+was given to him 10-16 (11 safe to delete, none deleted yet; icon-preview/render is 13 MB).
+
+### Traps met 2026-10-16 (twenty-third session)
+
+- **Two small branches green alone broke three harnesses together** (description-lines + retire-mark-extrema:
+  halo-under-ink pinned the extrema code, Tab order, setting-scope inventory). The suite on the merge caught it.
+- **His uncommitted edit arrived mid-suite** in the main checkout, and another session merged into master
+  in the same checkout during a run. Commit his edits in a worktree copy; tell peer sessions before a run.
+- **A sub-branch builder's "fails on base too" is worth collecting**: three of them independently found
+  bentley-interop's own head red, which nobody had run since 9b9f74f3.
+- **The classifier refused killing leaked `php -S` servers** (parent 1, days old). Ask him to allow it.
 
 ### Traps met 2026-10-15 (twenty-first session)
 
@@ -386,7 +391,7 @@ Wish lists: New junction without a canvas click (Declan). Perry's scenario UI he
 - **The DMARC mailbox is readable from here**: `ssh jconstru`, `~/mail/constructionnotesmanager.com/dmarc/{new,cur}`;
   tar it down and parse the gz/zip XML locally. The reports are not in his Gmail.
 - **The harvester mis-filed one synonym ruling** (consent_body): it stored his edited synonym as the
-  English. Check `syn-rulings.json` by eye after any harvest with an edited synonym.
+  English. Check `plain-sentence-rulings.json` by eye after any harvest with an edited plain sentence.
 - **He wrote two different edits of one key** (lpn_ds_search_note) in two sections of the file; the
   questions-section edit was applied. Expect it when a key is both new and questioned.
 

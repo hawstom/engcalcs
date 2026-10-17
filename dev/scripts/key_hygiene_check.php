@@ -31,7 +31,6 @@ const HYGIENE_LANG_FILE = __DIR__ . '/../../lib/lang.ec.en.php';
 $strict = in_array('--strict', $argv, true);
 
 $ec_lang = [];
-$ec_lang_syn = [];
 include HYGIENE_LANG_FILE;
 $keys = array_keys($ec_lang);
 

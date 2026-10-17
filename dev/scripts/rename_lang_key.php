@@ -73,10 +73,14 @@ $targets[] = __DIR__ . '/translation_coverage.json';
 // He is the scarcest resource here; asking him to re-read a string he has already approved because a
 // suffix was tidied is the one cost a rename must not have.
 $targets[] = dirname(__DIR__) . '/english-key-rulings.json';
+// Tom's per-string help and its answers, and the concepts a key cites, are filed under its name too.
+$targets[] = dirname(__DIR__) . '/plain-sentences.md';
+$targets[] = dirname(__DIR__) . '/plain-sentence-rulings.json';
+$targets[] = __DIR__ . '/key_concepts.json';
 
 // Word-boundary match so renaming `lpn_file_new` cannot touch `lpn_file_newer`. Covers every shape
-// a key appears in across this codebase: $ec_lang['k'], $ec_lang_syn['k'], pc.k, "k": in JSON,
-// and bare k: in a pageConfig object literal.
+// a key appears in across this codebase: $ec_lang['k'], pc.k, "k": in JSON, "### k" in
+// dev/plain-sentences.md, and bare k: in a pageConfig object literal.
 $pattern = '/(?<![A-Za-z0-9_])' . preg_quote($old, '/') . '(?![A-Za-z0-9_])/';
 
 $edits = [];

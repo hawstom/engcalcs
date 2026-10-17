@@ -145,8 +145,8 @@ section verbatim. Sequence recap:
    HTML/symbol-preservation rules, any known wrong-sense traps carried over from prior audits of
    related terms in that language family, and the instruction to read the payload's `meta.*_notes`
    and follow them. **The per-key guidance is in the payload, attached to its key; do not restate it
-   in the brief:** `key_syn` (synonyms), `key_notes` (the `$ec_lang_syn` commentary as full
-   instructions), `key_concepts`, `key_context` (reason, current value, neighbours, and the label's
+   in the brief:** `key_plain` (the string in plain words), `key_notes` (its Layout, Symbol,
+   Runtime and Note lines from `dev/plain-sentences.md`, as full instructions), `key_concepts`, `key_context` (reason, current value, neighbours, and the label's
    tip or the tip's label), and `glossary` (only the terms this batch's strings use). **The
    suggestion-box block is in every payload as `suggestion_box` — tell the agent to read it.** It is
    an ingredient of the prompt, not a reminder to the orchestrator: an agent that was never given
@@ -264,20 +264,20 @@ read-only watchlist dump and grep-slice are free and can be done any time.
 
 ## Standing content rules (apply in all three scenarios)
 
-- **`$ec_lang_syn` is off-limits to AI** without explicit written permission each time — see
-  `CLAUDE.md`. Format: `<intent> | <commentary>`, tag vocabulary (`layout`, `avoid`, `symbol`,
-  `gloss`) defined once there. **No standing carve-outs** — Task 132's intent-trimming
+- **`dev/plain-sentences.md` is off-limits to AI** without explicit written permission each time —
+  see `CLAUDE.md`. Format in the file's own header; the Layout values are defined once in
+  `dev/language-strings.md`. **No standing carve-outs** — Task 132's intent-trimming
   pre-authorization was retired 2026-08-08. Working pattern: AI proposes a diff, human approves,
   then AI writes.
-- **Intent's payload is SYNONYMS, and it applies to plain labels too.** The left-of-pipe is
-  alternate wordings a translator can re-compress in their own language. Two former rules are
+- **A plain sentence is alternate wordings, and it applies to plain labels too.** Its Plain line is
+  wordings a translator can re-compress in their own language. Two former rules are
   retired (2026-08-08): "intent is reserved for jargon/transliteration risk", and "adding an intent
   to a plain label is itself a defect". They made every *plain* label ineligible for the one channel
   that would have helped — and the `lpn_` sprint's three worst labels ("Zoom to fit", "Map display
   and sizes", "Restore defaults") were all plain English.
 - **Routing — does an English reader also stumble?** Yes → fix the English (one edit, all 27
-  languages). No, but a translator can't recover the concept from the words → `$ec_lang_syn`
-  synonyms. Recurs across labels/calculators → `glossary.json`. Never duplicate the same fact across
+  languages). No, but a translator can't recover the concept from the words → `dev/plain-sentences.md`.
+  Recurs across labels/calculators → `dev/terms.md`. Never duplicate the same fact across
   two channels; a weight-flavored/standard term a culture actually uses is correct — `avoid` forbids
   only physical errors and lazy transliterations, never a genuine local standard, and **`avoid` is
   never a substitute for saying plainly what the label means**. See `CLAUDE.md` § "Routing rule".
@@ -355,7 +355,7 @@ English, and the English can be a translation of it."* The source is `dev/terms.
 edits: each concept named in plain words, his definition where he wrote one, and the uniqueness
 attention groups. `php dev/scripts/terms_to_glossary.php --write` carries it into `glossary.json`
 (`plain`, `definition`, `uniqueness_group`); `concept_check.php` fails until the two agree. A key
-cites a concept through `dev/scripts/key_concepts.json` or a `gloss:` pointer, and its payload then
+cites a concept through `dev/scripts/key_concepts.json`, and its payload then
 carries `key_concepts`. The fenced block below reaches every agent as `concept_source`, exactly as
 the suggestion box does, and editing it makes every payload stale. Design: `dev/term-concepts.md`.
 
@@ -389,7 +389,7 @@ standing tripwire.
 - **The payload carries the resync.** `generate_translation_payloads.php` reads the same manifest
   and puts every `CHANGED` key the language file already holds into `keys_to_translate`, with
   `key_context[key].reason = english_changed` and the stale `current_value`, so a reworded string
-  gets the same `key_syn`, `key_notes`, `key_concepts`, tip and neighbours as a new one. **There is
+  gets the same `key_plain`, `key_notes`, `key_concepts`, tip and neighbours as a new one. **There is
   no separate resync list and the brief does not need one** (an old `resync_*.json` in
   `dev/translation_payloads/` is a leftover, not an input). Scope is not consulted for these: a
   translated key stays maintained whatever tier its cell is in.
@@ -409,7 +409,7 @@ standing tripwire.
   `--check` gates on any CHANGED key, `--json` prints the CHANGED list, `--update` re-baselines
   `english_string_hashes.json`.
 - `dev/scripts/wave0_keyset.php` — assemble the Wave 0 pass set and pre-filter keys that already
-  carry a `$ec_lang_syn`; `--skipped` enumerates what it dropped, `--no-filter` restores the raw set,
+  have a plain sentence; `--skipped` enumerates what it dropped, `--no-filter` restores the raw set,
   `--measure=<sprint>` replays a friction log against the filter.
 - `dev/scripts/generate_translation_payloads.php` — build per-language JSON payloads, missing and
   reworded keys together;
@@ -461,7 +461,7 @@ question about paths.
    entry as `human_answer`. That blocks a sprint until he rules; the block is the point. Never ask him
    for a ruling in chat that the file can carry.
    **Assemble the pass set with `php dev/scripts/wave0_keyset.php --new-and-changed --prefix=<p>`**,
-   which drops keys already carrying a non-empty `$ec_lang_syn` — that channel has already answered
+   which drops keys that already have a plain sentence — that channel has already answered
    this exact question, and re-asking produces a re-flag. Measured against `239-wave0-calcs.json`:
    9 of 35 findings skipped, dismissal rate 37% → 23%. **It also skipped one confirmed rewrite**
    (`mtc_note_1`), so a skipped key is a cheaper second look, not a key ruled correct — `--skipped`

@@ -824,8 +824,8 @@ $ec_lang['lpn_field_text_bold']='Подебљан текст';
 // justification; you don't even have to mention the anchor point").
 //
 // **NO SYNONYM ENTRY, and the reason is a rule rather than an omission** (Tom, 2026-08-18: "no syn.
-// It's a technical term. We can only give a definition, which is not our job."). $ec_lang_syn holds
-// phrases that could STAND ON THE CONTROL in place of the label; a technical term has no such
+// It's a technical term. We can only give a definition, which is not our job."). A plain sentence
+// (dev/plain-sentences.md, then $ec_lang_syn) holds phrases that could STAND ON THE CONTROL in place of the label; a technical term has no such
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 // The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
 // attaching and detaching are map gestures, never a typed rename.
@@ -860,7 +860,7 @@ $ec_lang['lpn_field_emitter_tip']='Додатни истицај који зав
 $ec_lang['lpn_field_elev']='Кота';
 // Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
 // what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
-// protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
+// protocol, a visible tip is the preferred home for a definition, in place of a plain-sentence
 // entry carrying translatable payload nobody on the page can see.
 // A reservoir carries an elevation AND a head. Leaving the head blank means "the water surface is
 // at the reservoir's own elevation"; the placeholder string is what shows in that empty box.
@@ -1761,12 +1761,12 @@ $ec_lang['lpn_replace_scope']='Изаберите изнад једну врст
 // language that puts the unit somewhere else can.
 $ec_lang['lpn_profile_menu']='Профил';
 $ec_lang['lpn_graphs_menu']='Графикони';
-// **THE SYNONYMS ARE IN THE SYNONYM CHANNEL, WHICH IS WHERE THEY WERE ALWAYS MEANT TO BE.** They
+// **THE SYNONYMS ARE IN dev/plain-sentences.md, THE CHANNEL MEANT FOR THEM.** They
 // shipped as `lpn_profile_tip_syn` / `lpn_profile_title_syn` -- ordinary $ec_lang keys with no call
 // site, which nothing rendered and which a sprint would have translated into 26 languages for
 // nobody to read. Sprint 459's Wave 0 found them; Tom ruled the move on 2026-08-24 ("these _syns
 // are really needed. Are they simply keyed wrong? I guess 1. My mistake."), which is the written
-// permission $ec_lang_syn requires. Same text, correct array.
+// permission a plain sentence requires. Same text, correct channel.
 $ec_lang['lpn_profile_title']='Профил дуж путање';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.
@@ -2753,8 +2753,8 @@ $ec_lang['lpn_labels_heading_link']='Ознаке веза';
 // THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
 // row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line
 // below", which reads better and made both words unfindable. The Settings box searches tips, so a
-// word not on the page is a word the search cannot reach -- and $ec_lang_syn, the other place the
-// terms could have gone, is invisible to it. Plain English leads and the term is the gloss, which is
+// word not on the page is a word the search cannot reach -- and dev/plain-sentences.md, the other
+// place the terms could have gone, is invisible to it. Plain English leads and the term is the gloss, which is
 // the same shape as "Minor (local) loss".
 // "Apply to all" beside each ID prefix (ROADMAP Task 345): an ID prefix normally governs only the assets
 // you draw from now on, and this is the way to say "I meant the ones already here". {n} and

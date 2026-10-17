@@ -443,8 +443,6 @@ the block.
   R2000. Tom, 2026-10-07: his DXF Interface Manager spec, for import AND export, and a rudimentary
   interim workflow, verbatim in `dev/dxf-interface.md`. **DXF export merged 2026-10-08**; import is
   what remains.
-- 75|798| **Field values in Text, by {} keys disclosed in the User Manual.**
-  Tom, 2026-10-15: *"Allow field/reference text in Text using {}. Define/disclose the keys in the User Manual."*
 - 75|799| **Try Tables and Graphs as dockable boxes too, on an option branch.**
   Tom, 2026-10-15: *"Can we try a UI option branch for everything in the bottom pane to be available also as dockable boxes: (a) Tables and (b) Graphs?"* Seam with the bottom-pane tab strip.
 - 75|803| **See every unused alternative at a glance.** **BUILT 2026-10-15 on `feat/bentley-interop`.**
@@ -869,6 +867,9 @@ the block.
   **BUILT 2026-10-08 on `feat/hover-label`**, asked again by outside tester DDN ("whether to show these
   should be a setting"): Select mode, card on rest, setting in Map and page; Perry passed it. Open: field
   names in words, and other modes (calls page G07, G08).
+- 50|798| **Field values in Text, by {} keys disclosed in the User Manual.**
+  Tom, 2026-10-15: *"Allow field/reference text in Text using {}. Define/disclose the keys in the User Manual."*
+  Tom, 2026-10-16: *"It's to give the user the ability to put dynamic fields into Text objects using variables we expose to them either as internal keys (English-based) or as a form of the local label lang string. Not done."* He agreed it is priority 50.
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
   `9c47608f`, one day after the snapshot). The 2026-08-21 report gives HW 58% use-of-shopping, ordinary

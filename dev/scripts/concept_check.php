@@ -112,7 +112,6 @@ if (!is_array($glossary) || !isset($glossary['terms']) || !is_array($glossary['t
     exit(1);
 }
 $ec_lang = [];
-$ec_lang_syn = [];
 include __DIR__ . '/../../lib/lang.ec.en.php';
 
 $keyConcepts = ecLoadKeyConcepts();

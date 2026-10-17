@@ -29,7 +29,7 @@ function check(ok, label, detail) {
 const KEYS = ['flow_static', 'flow_mid', 'flow_max', 'average_day', 'max_day', 'peak_hour', 'fire_max_day']
 	.map((k) => 'lpn_scenario_preset_' + k);
 const strings = JSON.parse(execFileSync('php', ['-r',
-	'$ec_lang = array(); $ec_lang_syn = array(); include "' + ROOT + 'lib/lang.ec.en.php"; $o = array();' +
+	'$ec_lang = array(); include "' + ROOT + 'lib/lang.ec.en.php"; $o = array();' +
 	'foreach ($ec_lang as $k => $v) { if (strpos($k, "lpn_scenario_preset_") === 0) { $o[$k] = $v; } }' +
 	'echo json_encode($o);'], { encoding: 'utf8' }));
 

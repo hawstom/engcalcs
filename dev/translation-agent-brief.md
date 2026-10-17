@@ -9,7 +9,7 @@ Repo root: `~/webdev/hawsedc.com/engcalcs`
 - **Language file (edit):** `lib/lang.ec.<LANG>.php`
 
 Read the payload FIRST and in full. It is self-describing and carries everything below in
-machine form: `keys_to_translate`, `glossary`, `key_context`, `key_syn`, `key_notes`,
+machine form: `keys_to_translate`, `glossary`, `key_context`, `key_plain`, `key_notes`,
 `key_concepts`, and `meta.*_notes`, which say how to use each one.
 
 ## What to translate
@@ -68,8 +68,8 @@ English and need retranslating from the new wording.
    translate, drop, or duplicate one.
 5. **Keep variable symbols and unit tokens exactly as in English** — `Q`, `v`, `H`, `D`,
    `h_f`, `psi`, `m`, `ft`, `L/s`, `gpm`. This holds in right-to-left scripts too.
-6. **Never add, change, or remove a `$ec_lang_syn` entry.** That array is human-authored
-   English translator guidance. It is not yours to edit, in any file, for any reason.
+6. **Leave `dev/plain-sentences.md` as it is.** It is Tom's English guidance for translators, and
+   only he changes it. If an entry misled you, say so in your report.
 
 ## Terminology
 
@@ -80,8 +80,8 @@ English and need retranslating from the new wording.
 - **Use the term your language's engineers actually use.** Where they use the English loanword,
   that is correct. A word spelled out from English because the concept is hard has been the most
   common defect in past sprints, so read every new loanword back in your language.
-- `key_syn`, when present, gives alternate English wordings of that label. Any of them could
-  stand on the control. Pick whichever re-compresses most naturally in your language; you are
+- `key_plain`, when present, says in plain words what that string means, other wordings joined
+  by "or". Any of them could stand on the control. Pick whichever re-compresses most naturally in your language; you are
   not bound to the literal English wording.
 - `key_notes`, when present, are instructions about that one string (how much room it has, a
   sense it must not be read in, symbols to keep). Obey them; never put them in your file.
@@ -102,7 +102,7 @@ The consent banner has **three** buttons: `consent_decline` ("Refuse all"), `con
 - `consent_accept_all` = allow this **and any later ask**; never ask me again.
 - `consent_decline` = refuse this **and any later ask**; never ask me again.
 
-Their `key_syn` entries spell this out. Translate the temporal distinction, and make sure the
+Their `key_plain` entries spell this out. Translate the temporal distinction, and make sure the
 two labels are visibly different from each other in your language. Keep both short — they sit
 side by side on three buttons competing for width.
 

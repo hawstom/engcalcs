@@ -2,7 +2,7 @@
 
 Extracted from `CLAUDE.md` on 2026-08-16 so the file read every session stays short. `CLAUDE.md`
 keeps the four hard rules and the routing table; everything below is the detail behind them.
-Read this when you are writing or editing `$ec_lang` / `$ec_lang_syn` values.
+Read this when you are writing or editing `$ec_lang` values or `dev/plain-sentences.md` entries.
 
 Copyright 2009 Thomas Gail Haws. GNU GPL v3 or later.
 
@@ -79,8 +79,8 @@ pressure` for static pressure, `Pulled down` for drawdown, `settle` for converge
 runs, and `The usual value is {n}.` where the word is **default**. Tom: *"please quit making up
 things to avoid the obvious terms."* Technical English is the opposite instruction: the manuals use
 the conventional term, so this house style forbids those substitutions rather than licensing them.
-The per-string mechanisms still carry their own jobs: `$ec_lang_syn` for what a translator cannot
-recover, `glossary.json` for a concept that recurs, `dev/scripts/plain_english_swap_check.php` for
+The per-string mechanisms still carry their own jobs: `dev/plain-sentences.md` for what a translator
+cannot recover, `dev/terms.md` for a concept that recurs, `dev/scripts/plain_english_swap_check.php` for
 substitutions that shipped and were struck, and Tom reading `dev/new-english-keys.md`.
 
 **Identity strings (menu entry + `<title>`) match the authoritative published source's own
@@ -123,7 +123,7 @@ visitor-facing strings alike. What APA settles, in the order it will come up her
 **APA settles how a string is written down; the technical-English house style above settles its
 register.** Neither licenses replacing a conventional term: APA has no opinion about whether a string
 may say *drawdown*, and the technical register requires it. Nothing here overrides
-`plain_english_swap_check.php`, `$ec_lang_syn`, `glossary.json` or Tom's own reading of
+`plain_english_swap_check.php`, `dev/plain-sentences.md`, `dev/terms.md` or Tom's own reading of
 `dev/new-english-keys.md`.
 
 **The one deliberate departure is the em dash**, which APA uses freely (closed up, no spaces) and
@@ -299,55 +299,51 @@ coverage is English, French and German ONLY.** Cite it in a French entry; it ans
 languages that actually struggled. Full sourcing: `dev/agents/utility-planning-engineer/journal.md`,
 2026-09-08.
 
-### `$ec_lang_syn` — synonyms and alternate expressions
+### `dev/plain-sentences.md` — one string in plain words
 
-**It answers exactly one question, asked by a translator: "what other ways could this be said?" — and
-it answers in words, not commentary.** It is not a place to describe a label, explain a decision, or
-leave notes for a human.
+Tom's file, and it replaced `$ec_lang_syn` (2026-10-16). One entry per key: an English line, a
+**Plain** line, and optional Layout, Symbol, Runtime and Note lines (format in the file's own
+header). Written to his rules for `dev/terms.md`: synonyms joined by "or", no parentheses, a comma
+before "or" only in a list of three or more, suggestions only. **It answers one question, asked by a
+translator: "what does this one string mean, and how else could it be said?"**
 
-**THE SUBSTITUTION TEST, the one rule that separates a synonym from a description:** every phrase must
-be able to **stand in the slot**. You could put it on that button, that heading, that label, and it
-would still mean the right thing. If a phrase could not go on the control, it is a description.
+**THE SUBSTITUTION TEST** separates a synonym from a description: every phrase in the Plain line
+should be able to **stand in the slot**. You could put it on that button, that heading, that label,
+and it would still mean the right thing.
 
-```php
-// ✅ every item could be the label
-$ec_lang_syn['lpn_new_text']='Text, Label, Temporary Text, Placeholder, Unfinished text, or Default words';
-// ❌ none of this could ever be the label
-$ec_lang_syn['lpn_new_text']='The word that appears inside a new text label when it is first placed.';
+```
+✅ - Plain: Text, Label, Temporary Text, Placeholder, Unfinished text, or Default words
+❌ - Plain: The word that appears inside a new text label when it is first placed.
 ```
 
-Description is the failure mode this channel drifts into every single time. Apply the test to every
-phrase, including the ones inside parentheses.
+Description is the failure mode this channel drifts into every single time.
 
 **When it is needed: whenever the plain meaning is not what the English words literally say.** That
 is much broader than jargon — do **not** gate it on jargon or transliteration risk. The labels that
 hurt most in a recent sprint ("Zoom to fit", "Restore defaults") are all plain English.
 
-```php
-// A known idiom, but "fit" never names WHAT is fitted.
-$ec_lang_syn['lpn_tool_zoom_extent']='Zoom out (or in) until the whole drawing fits in the window; show everything at once (zoom to extents, fit to window, show all). | avoid: adjusting the zoom by an amount';
-// "Defaults" is standard English but its plain meaning is "the original values".
-$ec_lang_syn['calc_defaults']='Restore (revert, return) to the original (initial, as-shipped, factory) values (state).';
+```
+### calc_defaults
+- English: Restore defaults
+- Plain: Restore, revert, or return to the original, initial, as-shipped, or factory values or state.
 ```
 
 **Fragment or whole string?** One test:
 
 | What is unclear | Shape |
 |---|---|
-| A **word** — one term is ambiguous, jargon, or a polysemy trap | **Fragment**: a word bank of alternates for that word alone. The translator can parse the sentence; they are stuck on one slot. |
+| A **word** — one term is ambiguous, jargon, or a polysemy trap | **Fragment**: a word bank of alternates for that word alone. The translator can parse the sentence; they are stuck on one slot. If the word recurs, it is a concept for `dev/terms.md` instead. |
 | The **structure** — the words are individually plain but relate in more than one way | **Whole string, rephrased.** Alternates for one word cannot fix a parse. |
 
-**`$ec_lang_syn` is OFF-LIMITS to AI.** Never add, change or remove an entry without explicit written
-permission in that conversation. The pattern is: AI proposes entries as a diff in the conversation;
-the human approves; only then does AI write them. There are **no standing carve-outs.**
+**`dev/plain-sentences.md` is OFF-LIMITS to AI.** Never add, change or remove an entry without
+explicit written permission in that conversation. The pattern is: AI proposes entries as a diff in
+the conversation; the human approves; only then does AI write them. There are **no standing
+carve-outs.**
 
-**Stale synonyms reach Tom through `dev/new-english-keys.md` ("Synonym entries to approve"), never chat.**
-An entry is stale when its key is gone or its English changed after it was written;
-`dev/syn-baseline.json` records the English and text each was written against. His answer on the flag
-line is harvested into `dev/syn-rulings.json` (keyed on key + English + synonym text). CC proposes a
-replacement in `dev/syn-proposals.json` (`{"proposals": {key: {"on": English, "syn": text}}}`), applies
-what he approves by hand, then runs `php dev/scripts/syn_baseline.php --record <key>` (`--prune` after a
-removal). A script never edits `$ec_lang_syn`.
+**Stale entries reach Tom through `dev/new-english-keys.md` ("Plain sentences to check"), never
+chat.** An entry is stale when its key is gone or the key's English no longer matches the entry's
+English line. His answer on the flag line is harvested into `dev/plain-sentence-rulings.json` (keyed
+on key + English + Plain text); CC applies what he approves by hand, English line included.
 
 ### Routing rule: English, intent, or glossary?
 
@@ -356,47 +352,38 @@ One question decides it: **does an English reader also stumble?**
 | Test | Home | Why |
 |---|---|---|
 | An English reader must re-read, or can read it two ways | **Fix the English** | Defective for its own audience. One edit fixes all 27 languages. |
-| English is correct and idiomatic, but a translator cannot recover the concept from the words | **`$ec_lang_syn`** | The English reader is served; the translator is not. |
-| The concept recurs across labels or calculators | **`glossary.json`** | It is about consistency across call sites, not one label. |
+| English is correct and idiomatic, but a translator cannot recover the concept from the words | **`dev/plain-sentences.md`** | The English reader is served; the translator is not. |
+| The concept recurs across labels or calculators | **`dev/terms.md`** | It is about consistency across call sites, not one label. |
 
 They compose. "Map display and sizes" had two valid parses, so the English was fixed (→ "Map
-appearance"); "Zoom to fit" reads fine, so the English stayed and a synonym entry carries the rest.
+appearance"); "Zoom to fit" reads fine, so the English stayed and a plain-sentence entry carries the rest.
 
 **Division of labor — do not duplicate a FACT across the three channels** (that is how stale values
-drift), though a label may legitimately carry both a `gloss:` pointer and its own synonyms:
+drift), though a label may legitimately cite a concept and carry its own plain sentence:
 
-- **`glossary.json` — per concept.** One entry, referenced by every label that uses the term. Single
-  source of truth for plain meaning, English synonyms, each language's dominant standard translation,
-  `avoid` lists, and sourcing.
-  Each term's `concept` id and `definition` are the translator's primary source, English one
-  rendering of it; a key cites a concept in `dev/scripts/key_concepts.json` (`dev/term-concepts.md`).
-- **`$ec_lang_syn` — per label.** Alternate wordings of *this* label.
+- **`dev/terms.md` — per concept.** One entry, cited by every key that uses the term in
+  `dev/scripts/key_concepts.json`. Its plain-words name and Tom's definition are the translator's
+  primary source, English one rendering of it; `terms_to_glossary.php --write` carries it into
+  `glossary.json`, which also holds each language's preferred translation (`dev/term-concepts.md`).
+- **`dev/plain-sentences.md` — per string.** What *this* string means, and other wordings of it.
 - **Visible `.ec-help`/`.ec-tip` tips — user-facing definition.** Translated with the label, so a
   plain-language definition here helps the user *and* anchors the concept for translators. A tip
-  serves the reader; a synonym entry serves the translator. Both may exist and that is not
+  serves the reader; a plain sentence serves the translator. Both may exist and that is not
   duplication.
 
-### `gloss:` pointers vs repeated synonyms
+### A key that names a concept cites it
 
-**Prefer the pointer when nothing but the concept is left** — one entry to maintain instead of the
-same gloss copied into four labels, and `glossary.json` can carry an `avoid` list an inline
-parenthetical cannot.
-
-**The test, applied after trimming:** does the entry still carry a wording a translator cannot get
-from the glossary? If yes, keep both — the pointer *accompanies* the synonyms. If the entry was only
-`X (Y)` where Y is the concept gloss, the pointer alone is better.
-
-**A pointer buys efficiency with a DEPENDENCY: the term must exist.** The payload generator sends
-every glossary term a batch key cites (by `gloss:` or `key_concepts.json`), plus every term whose
-English appears in a batch string; a sense-qualified term ("run (a simulation)") is matched by its
-bare word only in strings whose prefix wires it in `prefixToTermNames()`. **`php
-dev/scripts/gloss_ref_check.php` must exit 0 before any sprint** — it verifies every `gloss:` names
-a real term.
+**Cite the concept rather than restating it.** A key whose string names a concept in `dev/terms.md`
+lists that concept's id in `dev/scripts/key_concepts.json`; the translator then receives the plain
+name and Tom's definition with the key. The payload generator also sends every term whose English
+appears in a batch string; a sense-qualified term ("run (a simulation)") is matched by its bare
+word only in strings whose prefix wires it in `prefixToTermNames()`. `concept_check.php` verifies
+every citation resolves.
 
 **Suggestions only, no prohibitions** (Tom, 2026-10-16: *"We are masking our poor definitions with
 often very wrong prohibitions."*). A translator is told what a word MEANS and what to call it, never
-what not to write. `avoid` tags and glossary `avoid` arrays stay in the files, unsent; write no new
-ones. Where a translator went wrong, fix the definition.
+what not to write. Glossary `avoid` arrays stay in the file, unsent; write no new ones. Where a
+translator went wrong, fix the definition.
 
 ### Polysemy / units-trap protocol
 
@@ -431,21 +418,12 @@ rather than reasoning from physics alone.**
 The `avoid` arrays are the single source of truth for the trap-term watchlist
 (`dev/scripts/list_trap_terms.php`). Never maintain a separate watchlist.
 
-### `$ec_lang_syn` format: `<synonyms> | <commentary>`
+### Layout, Symbol and Runtime lines
 
-Split on the first pipe. **Left:** the synonyms — the translatable payload, every phrase passing the
-substitution test. May freely contain parentheses; the payload sends it as `key_syn`. **Right:**
-instructions to the translator, never translated into the file. The payload sends them as
-`key_notes`, each tag rendered as its full instruction from the table below (read from this table
-by `generate_translation_payloads.php`, so edit the wording here); free prose goes as a "Note:"; a
-`gloss:` adds no note, because its term arrives in `key_concepts` and `glossary`. No pipe means the
-whole string is synonyms.
-
-**Never put commentary in bare parentheses on the left** — parentheses are reserved for synonyms and
-are ambiguous with real content (e.g. `(as in HEC-RAS)`).
-
-Commentary uses this tag vocabulary (`tag: value`, `; `-separated; some are bare flags).
-`layout_tag_check.php` reads its vocabulary from this table, so an undefined token fails the build.
+An entry's Layout, Symbol and Runtime lines in `dev/plain-sentences.md` are shorthand. The payload
+sends each as `key_notes`, rendered as its full instruction from this table (read from it by
+`generate_translation_payloads.php`, so edit the wording here); a Note line goes as written, and the
+Plain line goes as `key_plain`. `layout_tag_check.php` refuses a Layout value outside this table.
 
 | Tag | Value | Full instruction it stands for |
 |-----|-------|-------------------------------|
@@ -454,14 +432,12 @@ Commentary uses this tag vocabulary (`tag: value`, `; `-separated; some are bare
 | `layout` | `nav item` | Renders as a top-level item in a HORIZONTAL BAR, competing for width with every sibling; prefer the shortest synonym. **A row inside a pull-down is NOT a nav item** — a pop-up sizes to its own widest row and competes with nothing. |
 | `layout` | `button` | A button label competing for width with siblings; short and imperative. |
 | `layout` | `sub-heading` | A heading over a group of controls, not a command or an option; a noun phrase, never an imperative. |
-| `avoid` | *(wrong sense)* | Not sent to translators (suggestions only, no prohibitions, 2026-10-16). Write no new ones. |
 | `symbol` | *(flag)* | Contains a variable symbol; keep every letter and subscript exactly as in English in every language, including RTL. Subscripted names are symbols, not words. |
-| `gloss` | *(term)* | Defer to that `glossary.json` term; do not restate it inline. |
-| `runtime` | `units appended` | The page concatenates a unit label at render time; do not name a unit inside the text, and leave room for one. |
+| `runtime` | `units appended` | The page adds a unit label after this text at render time; leave room for it, and let the page supply the unit. |
 
-**A WRONG TAG IS WORSE THAN A MISSING ONE.** A tag is an instruction a translator obeys without being
+**A WRONG LAYOUT LINE IS WORSE THAN A MISSING ONE.** It is an instruction a translator obeys without being
 able to see whether it is still true, and it describes a WIDGET — so it goes stale silently whenever
-the widget changes. One stale `layout: nav item` described a `<select>` that had been replaced by a
+the widget changes. One stale `layout: nav item` (then a `$ec_lang_syn` tag) described a `<select>` that had been replaced by a
 menu button, and four translators in one sprint dutifully compressed the label, one proposing we
 shorten the English so every language would inherit the cut. All four reasoned correctly from a
 constraint that had been false for weeks. `layout_tag_check.php` now verifies the value is in the
@@ -479,7 +455,7 @@ Write counts so they read correctly at 1 without plural logic, e.g. "overrides (
 ### Renaming a key, and finding key debt
 
 - **Never rename a key by hand.** `php dev/scripts/rename_lang_key.php old new --apply` does all 27
-  language files, `$ec_lang_syn`, every page and JS call site, the drift manifest, the exempt list
+  language files, `dev/plain-sentences.md`, every page and JS call site, the drift manifest, the exempt list
   and the coverage declaration in one pass. Dry run by default; refuses if the new name exists, so a
   rename never quietly merges two keys. A hand rename is ~40 edits and every miss fails **silently** —
   a missed lang file leaves an orphan, a missed call site renders an empty string. That expense is
