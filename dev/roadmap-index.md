@@ -7,11 +7,10 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**97 open tasks.** Next (100): 16 · Soon (75): 20 · Someday (50): 27 · Maybe (25): 15 · Parked (5): 19
+**93 open tasks.** Next (100): 16 · Soon (75): 16 · Someday (50): 27 · Maybe (25): 15 · Parked (5): 19
 
 ## 100 — Next (16)
 
-- Task 643 — Slope distance for automatic lengths, and whether anyone offers a length factor.
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
 - Task 721 — The scenario and alternatives model: Bentley's tree, plus Presentation and Calculation.
 - Task 737 — One canonical word per concept, so every language names each one once.
@@ -26,9 +25,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 794 — Edit a Text in place on the map.
 - Task 800 — A tidy list and count of one scenario's own overrides.
 - Task 801 — Retire Apply Base values; add Merge upward for alternatives.
-- Task 807 — Leave a leader exactly where the user put it.
+- Task 802 — The Scenarios table flies out from the Scenario Manager's right side.
+- Task 804 — Time series balloons become a Presentation override.
 
-## 75 — Soon (20)
+## 75 — Soon (16)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
@@ -42,14 +42,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 752 — Google Sheets: sync the scenarios and their alternatives out and in.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
-- ! Task 786 — More native SI examples, since SI is chosen twice as often as US.
 - Task 798 — Field values in Text, by {} keys disclosed in the User Manual.
 - Task 799 — Try Tables and Graphs as dockable boxes too, on an option branch.
-- Task 802 — The Scenarios table flies out from the Scenario Manager's right side.
 - Task 803 — See every unused alternative at a glance.
-- Task 804 — Time series balloons become a Presentation override.
 - Task 805 — A clean map: hide the override ambers and the map's own controls.
-- Task 806 — Descriptions take several lines and paragraphs.
 
 ## 50 — Someday (27)
 
@@ -125,5 +121,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-88 of 97 titles are within 4–12 words. `!` marks the rest;
+85 of 93 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

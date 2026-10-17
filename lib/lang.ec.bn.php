@@ -2750,14 +2750,12 @@ $ec_lang['lpn_field_text_all_zoom_tip']='যত দূরেই জুম আউ
 $ec_lang['lpn_tool_labels']='লেবেল';
 $ec_lang['lpn_labels_heading_node']='নোড লেবেল';
 $ec_lang['lpn_labels_heading_link']='লিংক লেবেল';
-$ec_lang['lpn_labels_mark_extrema']='সর্বোচ্চ ও সর্বনিম্ন মান চিহ্নিত করুন';
 // THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
 // row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line
 // below", which reads better and made both words unfindable. The Settings box searches tips, so a
 // word not on the page is a word the search cannot reach -- and dev/plain-sentences.md, the other
 // place the terms could have gone, is invisible to it. Plain English leads and the term is the gloss, which is
 // the same shape as "Minor (local) loss".
-$ec_lang['lpn_labels_mark_extrema_tip']='মানচিত্রে প্রতিটি লেবেলযুক্ত বৈশিষ্ট্যের সর্বোচ্চ মান তার ওপরে একটি রেখা (ওভারলাইন) দিয়ে, এবং সর্বনিম্ন মান তার নিচে একটি রেখা (আন্ডারলাইন) দিয়ে চিহ্নিত করুন।';
 // "Apply to all" beside each ID prefix (ROADMAP Task 345): an ID prefix normally governs only the assets
 // you draw from now on, and this is the way to say "I meant the ones already here". {n} and
 // {skipped} are whole numbers; {prefix} is the text the user typed.

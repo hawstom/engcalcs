@@ -266,16 +266,17 @@ function ok(name, cond, extra) {
 
 // ---- 5. lpnDescText: what is refused, and what is carried ------------------------------------
 {
-	console.log('\n--- only the line break is refused ---');
+	console.log('\n--- lines and paragraphs are carried (Task 806) ---');
 	const d = EngCalcs.lpnDescText;
 	ok('a sentence is carried whole', d('Corner of Elm and Main') === 'Corner of Elm and Main');
 	ok('a `;` is carried', d('Elm; and Main') === 'Elm; and Main');
 	// A tab round-trips in a trailing comment too, so it is the user's text and is left alone.
 	ok('a tab is carried', d('Elm\tMain') === 'Elm\tMain');
-	// A newline CANNOT be written as a trailing comment, so it becomes one space -- the one thing
-	// this function refuses, and the reason it is called at the field, the cell, Find and the writer.
-	ok('a newline becomes one space', d('Elm\nMain') === 'Elm Main');
-	ok('a CRLF becomes one space', d('Elm\r\nMain') === 'Elm Main');
+	// A newline is kept (Task 806); the .inp writer carries the later lines on `;|` comments.
+	ok('a newline is kept', d('Elm\nMain') === 'Elm\nMain');
+	ok('a CRLF becomes one LF', d('Elm\r\nMain') === 'Elm\nMain');
+	ok('a blank line (a paragraph break) is kept', d('A\n\nB') === 'A\n\nB');
+	ok('each line loses trailing blanks, the text its leading and trailing blank lines', d('\n A  \nB \n\n') === 'A\nB');
 	ok('trimmed, because the reader trims', d('  Elm  ') === 'Elm');
 	ok('whitespace only is no description', d(' \n ') === '');
 	ok('absent is no description', d(undefined) === '' && d(null) === '');
@@ -325,7 +326,7 @@ function ok(name, cond, extra) {
 	function inputsIn() {
 		const out = [];
 		(function walk(e) {
-			(e.children || []).forEach(function (c) { if (c._tag === 'input') { out.push(c); } walk(c); });
+			(e.children || []).forEach(function (c) { if (c._tag === 'input' || c._tag === 'textarea') { out.push(c); } walk(c); });
 		}(byId.lpn_popup_fields));
 		return out;
 	}
@@ -337,8 +338,8 @@ function ok(name, cond, extra) {
 	// shows its own rule rather than losing half of itself after the field is left.
 	box.value = 'Elm\nMain';
 	((box._listeners && box._listeners.input) || []).forEach((f) => f({}));
-	ok('a pasted newline is refused in the box itself', box.value === 'Elm Main', box.value);
-	ok('and the document holds the same thing the box shows', n.desc === 'Elm Main', n.desc);
+	ok('a pasted newline stays in the box', box.value === 'Elm\nMain', box.value);
+	ok('and the document holds the same thing the box shows', n.desc === 'Elm\nMain', n.desc);
 	box.value = '';
 	((box._listeners && box._listeners.input) || []).forEach((f) => f({}));
 	ok('clearing the box removes the key rather than storing an empty string', !('desc' in n));
@@ -403,8 +404,8 @@ function ok(name, cond, extra) {
 	const dCol = jCols[jCols.map((c) => c.key).indexOf('desc')];
 	const tCol = jCols[jCols.map((c) => c.key).indexOf('tag')];
 	dCol.set(j, 'Elm\nMain');
-	ok('a pasted newline is collapsed at the cell too', j.desc === 'Elm Main', j.desc);
-	ok('the cell reads back what it stored', L.paneCellText(dCol, j) === 'Elm Main');
+	ok('a pasted newline is kept at the cell too', j.desc === 'Elm\nMain', j.desc);
+	ok('the cell reads back what it stored', L.paneCellText(dCol, j) === 'Elm\nMain');
 	dCol.set(j, '   ');
 	ok('a whitespace-only paste clears the key', !('desc' in j));
 	tCol.set(j, 'MAIN 1962 south');
@@ -462,7 +463,7 @@ function ok(name, cond, extra) {
 	spec.set(j, 'Corner of Elm and Main');
 	spec.set(pipe, 'Elm\nMain');
 	ok('a bulk write reaches a node', j.desc === 'Corner of Elm and Main');
-	ok('a bulk write collapses a newline as well', pipe.desc === 'Elm Main', pipe.desc);
+	ok('a bulk write keeps a newline as well', pipe.desc === 'Elm\nMain', pipe.desc);
 	ok('and reads back through its own getter', spec.get(j) === 'Corner of Elm and Main');
 }
 

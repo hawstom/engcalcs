@@ -229,3 +229,36 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
 
 ---
 
+
+
+## A Description is lines and paragraphs (Task 806, Tom 2026-10-15)
+
+*"I think that all Description fields should allow multiple lines and paragraphs like most software
+to allow internal documentation."* Every Description (an element's, a customer's, and a pattern's,
+curve's, control's, pipe type's and fitting list's in the Library) is a growing textarea: Enter types
+a newline, Ctrl+Enter commits and leaves, Tab moves on. Stored with `\n`; `lpnDescText()` is the one
+normalizer (CRLF to LF, trailing blanks off each line, blank lines at the ends off the text).
+
+**One line, "\P" for each line break, wherever a Description must sit on one line** (Tom,
+2026-10-16: *"Maybe " \P ", since it's both intuitive, and it's what Autodesk historically used in
+Dimensions."*, then *"Change it from " \P " to "\P"."*). EPANET holds one line (a trailing `;comment`; for a pattern or curve the one comment
+line above its rows) and has no continuation syntax. So the whole description goes in that one
+place with each line break written as backslash, capital P, no spaces (`lpnDescInline()`); a blank
+paragraph line is two markers (`a\P\Pb`). A line ending in a backslash keeps a space before the
+marker, so the run stays its own. EPANET keeps the whole text, markers and all, and gives it back
+on its own re-save (`description-lines-harness.js` 2b reads it with the vendored engine's
+`getComment`). Reading back (`lpnDescFromInline()`), `\P` is a line break and the spaces round it
+are the text's own, so an indent after it survives. A
+backslash-P the person typed is written `\\P` and read back as typed; a comment from elsewhere
+saying `C:\Pumps` reads as a line break. An imported comment nobody edited goes back out as the
+file spelled it, `C:\Pumps` and all (`lpnDescTokSet()`, the number-token rule). A comment with no `\P` reads exactly as before, so Net1/2/3
+round-trip character for character. Rejected: the later lines on extra `;|` comment lines (Tom: *"the
+.inp doesn't allow for extra lines"*; EPANET's own re-save dropped them). Files written that way
+still read, and go back out in one line.
+
+**Display.** The Tables cell shows and edits the whole text in the same "\P" form, and so do a
+copy, a fill and the multi-element Properties box; the cell's tip shows the lines as lines
+(`data-ec-tip-lines`). Find and replace's one-line value box reads "\P" as a line break too. A
+map label shows the first line and an ellipsis. CSV and XLSX/ODS keep real line breaks (a
+spreadsheet cell holds them), GeoJSON is JSON, and DXF writes the caret escape `^J`.
+`description-lines-harness.js`, `description-lines-browser-harness.js`.

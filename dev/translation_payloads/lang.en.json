@@ -1584,8 +1584,6 @@
         "lpn_tool_labels": "Labels",
         "lpn_labels_heading_node": "Node labels",
         "lpn_labels_heading_link": "Link labels",
-        "lpn_labels_mark_extrema": "Mark highest and lowest values",
-        "lpn_labels_mark_extrema_tip": "Mark the highest value of each labelled property on the map with a line above it (an overline), and the lowest with a line below it (an underline).",
         "lpn_settings_apply_to_all": "Apply to all",
         "lpn_settings_apply_to_all_tip": "Every asset of this kind that is already drawn gets an ID starting with this text. Each one keeps its number. An ID that does not end in a number is not changed.",
         "lpn_confirm_apply_prefix": "Rename assets ({n}) so their IDs start with {prefix}? Each one keeps its number.",
@@ -2641,7 +2639,7 @@
         "lpn_snip_tip_copy": "Copy (Ctrl+C)",
         "lpn_screenshot_scale_tip": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
     },
-    "count": 2639,
+    "count": 2637,
     "active_prefixes": [
         "about",
         "bpn",

@@ -116,7 +116,7 @@ ok('...text and leader hidden together',
 ok('...and its extrema mark goes with the text, being part of it', L.vis(stub.id).text === 'hidden');
 ok('the 200-unit main keeps its label', !L.hiddenShort(long.id));
 ok('...visibly', L.vis(long.id).text !== 'hidden', JSON.stringify(L.vis(long.id)));
-ok('...and DOES carry an extrema mark, so the line above is not vacuous', L.vis(long.id).marked > 0,
+ok('...and carries no extrema mark, the setting being retired', L.vis(long.id).marked === 0,
 	String(L.vis(long.id).marked));
 
 // ---- 2. It comes back when there is room, which is what "even if the map is closer" means -------

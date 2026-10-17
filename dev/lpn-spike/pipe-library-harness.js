@@ -307,9 +307,9 @@ head('6. THE POPUP: a property the type states renders DISABLED at its inherited
 	// So it is the first control that is not one of those two -- which is what "immediately after
 	// ID" meant when the band was the ID alone, and is asserted that way rather than as slot 0,
 	// because a fixed slot is a number somebody has to re-count every time the band changes.
-	const controls = walk(pf).filter((e) => e._tag === 'select' || e._tag === 'input');
+	const controls = walk(pf).filter((e) => e._tag === 'select' || e._tag === 'input' || e._tag === 'textarea');
 	const afterBand = controls.slice(2);
-	check(controls.length > 2 && controls[0]._tag === 'input' && controls[1]._tag === 'input' &&
+	check(controls.length > 2 && /^(input|textarea)$/.test(controls[0]._tag) && /^(input|textarea)$/.test(controls[1]._tag) &&
 		afterBand[0]._tag === 'select',
 		`the identity band's two text boxes come first and then the pipe type selector: ` +
 		controls.slice(0, 3).map((e) => e._tag).join(','));
