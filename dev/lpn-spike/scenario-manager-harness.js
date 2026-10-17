@@ -24,7 +24,8 @@
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
 'use strict';
-const { ROOT, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const stub = require('./lpn-dom-stub.js');
+const { ROOT, setUnitSet, loadLoopedNetwork } = stub;
 require(ROOT + 'js/lpn-inp.js');
 require(ROOT + 'js/lpn-patterns.js');
 require(ROOT + 'js/lpn-time.js');
@@ -618,10 +619,23 @@ const MUTATIONS = [
 	['the first override asks first', (src) => src.replace("		var scn = activeScenario(), key = ovKey(el), t = ownWriteTarget(scn, categoryOf(prop, elGroup(el)));\n", "		if (writeTargetFor(activeScenario(), categoryOf(prop, elGroup(el))).kind === 'scn') { askDialog({ kind: 'alert', text: 'x' }); }\n		var scn = activeScenario(), key = ovKey(el), t = ownWriteTarget(scn, categoryOf(prop, elGroup(el)));\n"), true],
 	['the manager row is enabled in Basic mode', (src) => src.replace("label: pc.lpn_sm_menu || 'Scenario manager…', disabled: scenarioBasicMode,", "label: pc.lpn_sm_menu || 'Scenario manager…', disabled: false,")]
 ];
+// **A RUN'S PAGES ARE LET GO BEFORE THE NEXT RUN LOADS ITS OWN**, as a browser drops a page's
+// listeners when the next page loads. Each load hangs listeners on the stub's one window and
+// document and on its shared elements, and nothing took them down, so every live mutation's
+// fourteen pages stayed reachable with their documents: about 300 MB a run, past Node's default
+// heap by the twelfth mutation (4.4 GB; about 0.7 GB now). Nothing a run asserts reads a listener an earlier run left.
+function releasePages() {
+	global.window._listeners = {};
+	global.document._listeners = {};
+	Object.keys(stub.byId).forEach((id) => { stub.byId[id]._listeners = {}; });
+	stub.clearResizeObservers();
+	if (process.env.SMH_HEAP && global.gc) { global.gc(); console.log('  heap ' + (process.memoryUsage().heapUsed / 1e6 | 0) + ' MB'); }
+}
 (async function main() {
 	let fails = await run(null, false) + await runTail(null, false);
 	console.log('\n--- 11. live mutations: each must turn this harness red ---');
 	for (const m of MUTATIONS) {
+		releasePages();
 		let red;
 		try { red = await (m[2] ? runTail : run)(m[1], true); } catch (e) {
 			if (/the mutation changed nothing/.test(String(e && e.message))) { fails++; console.log('  FAIL mutation no longer applies: ' + m[0]); continue; }

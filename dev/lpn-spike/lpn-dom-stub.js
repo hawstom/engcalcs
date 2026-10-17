@@ -957,7 +957,10 @@ global.EngCalcs = {
 // asserting `el.title` passed while the page displayed a stale sentence for the life of the page
 // (2026-09-10, the transport's player buttons). One physical relationship, taught here: what the
 // READER sees is the cache, and only dispose() gives the attribute back.
-const _tips = new Map();
+// A WeakMap, as bootstrap's own element data store lets go of an element nobody holds: a Map here
+// kept every element that ever had a tip, its listeners, and through them every page a harness had
+// ever loaded (scenario-manager-harness.js loads about 180 and ran out of heap at 4.4 GB).
+const _tips = new WeakMap();
 class _StubTooltip {
   constructor(el) {
     this.el = el;
