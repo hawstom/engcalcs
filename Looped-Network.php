@@ -1935,6 +1935,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <h2><?=$ec_lang['lpn_guide_using_heading']?></h2>
 <dl>
 	<dt><?=$ec_lang['lpn_guide_keys_term']?></dt><dd><?=$ec_lang['lpn_guide_keys_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_use_term']?></dt><dd><?=$ec_lang['lpn_guide_use_def']?></dd>
 </dl>
 </section>
 <section class="lpn-guide-section" data-guide-section="toolbar">
