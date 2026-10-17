@@ -502,7 +502,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Copy
   _Ruled OK 2026-10-16._
 - **`lpn_sm_copy_ask`**
-  > Copy the overrides ({n}) of {name} up into {target}? {name} keeps them as its own overrides. You can undo this.
+  > Copy the overrides ({n}) of {name} up into {target}? It keeps them as its own overrides. You can undo this.
   @@ NEEDS RULING
 - **`lpn_sm_copy_base_tip`**
   > Copy Base as a child alternative. The copy holds no overrides and inherits every value from Base.
@@ -668,7 +668,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**62 still to read**, of 130 new keys across 12 unmerged branch(es).
+**63 still to read**, of 131 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -679,11 +679,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### docs/features-update (`c73fab2a6`) — adds no English strings
+### docs/features-fix (`c11f58f6c`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/geojson-import (`2645d1014`) — 67 new, 2 to read @@ NEEDS RULING
+### feat/geojson-import (`43101d8d9`) — 68 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_file_import_gjnet`**
   > Import GeoJSON network…
@@ -724,6 +724,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_gjnet_note_crs`**
   > The file states the coordinate system {crs}, which is WGS 84 latitude and longitude, the system RFC 7946 requires. Positions were read as stated.
   _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_crs_nad83`**
+  > The file states NAD83 (EPSG:4269). Its positions were read as WGS 84, which places them within about 1 to 2 m of where NAD83 puts them.
+  @@ NEEDS RULING
 - **`lpn_gjnet_note_default_demand`**
   > These junctions state no base demand and have the default base demand, {value}.
   _Ruled OK 2026-10-16._
@@ -1094,4 +1097,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/scenarios-menu (`76f6961bf`) — adds no English strings
+### feat/scenarios-menu (`6d595240b`) — adds no English strings

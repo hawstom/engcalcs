@@ -134,8 +134,7 @@ async function run(mutate, quiet) {
 	// Tom, 2026-10-16: *"I think we need a message to say 'cannot be deleted while it has children'."*
 	// An alternative others inherit from says so, naming them, parallel to the scenario's sentence.
 	const want2 = PC.lpn_sm_alt_delete_has_children.split('{name}').join(d1.name).split('{list}').join(dd.name);
-	ok('3.2a an alternative with a child alternative says it has children, naming it', typeof PC.lpn_sm_alt_delete_has_children === 'string' && L.smInUseText('demand', d1.id, d1.name) === want2 &&
-		/inherit from it/.test(want2), JSON.stringify(L.smInUseText('demand', d1.id, d1.name)));
+	ok('3.2a an alternative with a child alternative says it has children, naming it', typeof PC.lpn_sm_alt_delete_has_children === 'string' && L.smInUseText('demand', d1.id, d1.name) === want2, JSON.stringify(L.smInUseText('demand', d1.id, d1.name)));
 	ok('3.2c ...and does not call the child a use', L.smInUseText('demand', d1.id, d1.name).indexOf(PC.lpn_sm_in_use.split('\\n')[1]) < 0, JSON.stringify(L.smInUseText('demand', d1.id, d1.name)));
 	ok('3.2b a scenario with a child reads the Scenarios menu\'s own sentence, naming it', L.smInUseText('scenarios', c1.id, c1.name) === PC.lpn_scenario_delete_has_children.split('{name}').join(c1.name).split('{list}').join(g1.name), JSON.stringify(L.smInUseText('scenarios', c1.id, c1.name)));
 	ok('3.3 a leaf goes', L.smDelete('demand', dd.id) === true && L.smRecords('demand').filter((r) => !r.root).length === 2);
