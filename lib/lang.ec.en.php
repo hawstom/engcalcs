@@ -2540,11 +2540,11 @@ $ec_lang['lpn_omitted_note']='Left out of this run because no path leads from th
 $ec_lang['lpn_engine_fetching']='Downloading the EPANET solver. It is downloaded once and then stored on this device, so it works offline afterward.';
 $ec_lang['lpn_engine_ready']='The EPANET solver is now stored on this device and works offline.';
 $ec_lang['lpn_engine_fetching_valve']='Downloading the EPANET solver, so this valve can be solved now and offline later.';
-$ec_lang['lpn_engine_ready_valve']='The EPANET solver is now stored on this device. Pressure and flow control valves (PRV, PSV, FCV) can now be solved offline.';
-$ec_lang['lpn_engine_unavailable']='Could not download the EPANET solver, which is required to solve pressure and flow control valves (PRV, PSV, FCV). After one connection to the internet, the solver is stored on this device.';
+$ec_lang['lpn_engine_ready_valve']='The EPANET solver is now stored on this device. Pressure breaker and general purpose valves (PBV, GPV) can now be solved offline.';
+$ec_lang['lpn_engine_unavailable']='Could not download the EPANET solver, which is required to solve pressure breaker and general purpose valves (PBV, GPV). After one connection to the internet, the solver is stored on this device.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
-$ec_lang['lpn_engine_unavailable_why']='Pressure and flow control valves (PRV, PSV, FCV) cannot be solved without the EPANET solver. {reason}';
+$ec_lang['lpn_engine_unavailable_why']='Pressure breaker and general purpose valves (PBV, GPV) cannot be solved without the EPANET solver. {reason}';
 $ec_lang['lpn_engine_needed_loading']='Loading EPANET solver while you build. Results will be available when completely loaded.';
 // **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
 // own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
@@ -2558,7 +2558,7 @@ $ec_lang['lpn_engine_wait_pct']='Solver {percent}% loaded.';
 $ec_lang['lpn_engine_wait_bytes']='Solver {kb} KB loaded so far. The total is not available, so the percentage of completion is unknown.';
 $ec_lang['lpn_engine_needed_failed']='The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
 $ec_lang['lpn_engine_needed_failed_why']='This network can only be solved by the EPANET solver. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='These are pressure or flow control valves, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:';
+$ec_lang['lpn_diag_valve_needs_epanet']='These are pressure breaker or general purpose valves, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:';
 $ec_lang['lpn_diag_not_converged']='No solution was found. Check for physically impossible values, such as a diameter of zero.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3410,14 +3410,14 @@ $ec_lang['lpn_settings_engine_native']='Use the built-in solver when possible';
 // EPANET whatever the box says, and the one-time download, which is the cost a visitor on a slow
 // connection actually pays.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_engine_native_tip']='Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations or active PRV, PSV, or FCV. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.';
+$ec_lang['lpn_settings_engine_native_tip']='Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations or pressure breaker and general purpose valves (PBV, GPV). The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.';
 $ec_lang['lpn_engine_loading']='Loading the EPANET solver…';
 $ec_lang['lpn_engine_failed']='The EPANET solver could not be loaded. Showing the built-in solver instead.';
 $ec_lang['lpn_engine_failed_why']='{reason} Showing the built-in solver instead.';
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='Solved with the EPANET solver, because of these pressure and flow control valves:';
+$ec_lang['lpn_engine_valve_route']='Solved with the EPANET solver, because of these pressure breaker and general purpose valves:';
 $ec_lang['lpn_unit_unknown']='This drawing states a unit this page does not support: {unit}. All values are kept and displayed exactly as imported, and nothing was changed. Nothing can be computed until the unit is supported, because its conversion factor is unknown.';
 $ec_lang['lpn_engine_manning_note']='Note: with Manning roughness, EPANET rounds the constant in the Manning equation, so head loss is about 0.6% lower than the exact form.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------

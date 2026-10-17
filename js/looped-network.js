@@ -60418,7 +60418,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// his own instruction, and the argument for it -- an enabled control that does nothing is a lie
 		// -- turned out to rest on a false premise. THREE THINGS ALREADY TELL THE TRUTH: this row's own
 		// tip names both cases permanently ("an extended period run always does, and so does a network
-		// holding an active PRV, PSV, or FCV"); `lpn_engine_valve_route` says it again at the moment of
+		// holding a PBV or GPV"); `lpn_engine_valve_route` says it again at the moment of
 		// the solve; and the banner says it while the engine loads. A fourth telling was a conditional
 		// duplicate of a permanent one.
 		//
@@ -73059,7 +73059,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'These nodes have no path to a reservoir or tank:') + ' ' + issue.ids.join(', '); }
 		// NAMES THE VALVES, which is the entire reason this page keeps its own diagnostics instead
 		// of surfacing EPANET's numeric error codes. A user staring at a drawing can act on "V3".
-		if (issue.code === 'valve-needs-epanet') { return (pc.lpn_diag_valve_needs_epanet || 'These are pressure or flow control valves, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'valve-needs-epanet') { return (pc.lpn_diag_valve_needs_epanet || 'These are pressure breaker or general purpose valves, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:') + ' ' + issue.ids.join(', '); }
 		if (issue.code === 'pda-pressures') { return pc.lpn_diag_pda_pressures || 'Required pressure must be greater than Minimum pressure. Change one of them in Settings.'; }
 		if (issue.code === 'pda-needs-epanet') { return pc.lpn_diag_pda_needs_epanet || 'The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.'; }
 		if (issue.code === 'valve-on-fixed-head') { return (pc.lpn_diag_valve_on_fixed_head || 'These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:') + ' ' + issue.ids.join(', '); }
@@ -75051,7 +75051,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if ((engine === 'epanet' || epanetOnly.length > 0 || pdaRoute) && EngCalcs.lpnSolveEpanet) {
 			if (epanetOnly.length > 0 && engine !== 'epanet') {
 				valveRouteNote = ((EngCalcs.pageConfig || {}).lpn_engine_valve_route ||
-					'Solved with the EPANET solver, because of these pressure and flow control valves:') +
+					'Solved with the EPANET solver, because of these pressure breaker and general purpose valves:') +
 					' ' + epanetOnly.join(', ');
 			} else if (pdaRoute && engine !== 'epanet') {
 				// Task 762: the second thing that routes a network to EPANET by its own contents.
@@ -75262,8 +75262,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var offline = warmFailedOffline();
 			if (!quiet) {
 				setNotice(offline
-					? (pc.lpn_engine_unavailable || 'Could not download the EPANET solver, which is required to solve pressure and flow control valves (PRV, PSV, FCV). After one connection to the internet, the solver is stored on this device.')
-					: (pc.lpn_engine_unavailable_why || 'Pressure and flow control valves (PRV, PSV, FCV) cannot be solved without the EPANET solver. {reason}').replace('{reason}', EngCalcs.lpnEngineReason('fetch')));
+					? (pc.lpn_engine_unavailable || 'Could not download the EPANET solver, which is required to solve pressure breaker and general purpose valves (PBV, GPV). After one connection to the internet, the solver is stored on this device.')
+					: (pc.lpn_engine_unavailable_why || 'Pressure breaker and general purpose valves (PBV, GPV) cannot be solved without the EPANET solver. {reason}').replace('{reason}', EngCalcs.lpnEngineReason('fetch')));
 			}
 			if (window.console && console.warn) { console.warn('EPANET solver download failed:', err); }
 			refreshEpanetBanner();

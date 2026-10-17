@@ -272,8 +272,17 @@ console.log('\n--- a PBV, which the built-in solver does not solve ---');
 	// thing the box is for, which is saying what they want for the network's OTHER states.
 	ok('...and it is NOT disabled, because three other things already say this', !!box && box.disabled === false,
 		box && box.disabled);
+	// Asked of the solver, not pinned in English: every valve type the built-in solver does NOT
+	// solve (EngCalcs.lpnValveIsNative) is named in the tip, and no type it does solve is.
+	const tipText = PC.lpn_settings_engine_native_tip || '';
+	const epanetTypes = global.EngCalcs.lpnValveTypes.filter((t) =>
+		!global.EngCalcs.lpnValveIsNative({ type: 'valve', valveType: t }));
 	ok('...and the tip is where that fact lives permanently',
-		/PRV, PSV, or FCV/.test(PC.lpn_settings_engine_native_tip || ''), 'tip names the valve case');
+		epanetTypes.length > 0 && epanetTypes.every((t) => new RegExp('\\b' + t + '\\b').test(tipText)),
+		'tip names ' + epanetTypes.join(', '));
+	ok('...and names no valve the built-in solver does solve',
+		global.EngCalcs.lpnValveTypes.filter((t) => epanetTypes.indexOf(t) < 0)
+			.every((t) => !new RegExp('\\b' + t + '\\b').test(tipText)), tipText);
 	ok('...and names the other case too',
 		/extended period simulation/.test(PC.lpn_settings_engine_native_tip || ''), 'tip names the EPS case');
 	// The note that explained the greying went with the greying. Asserted as an ABSENCE, because a
