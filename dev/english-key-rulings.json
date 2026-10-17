@@ -1,6 +1,11 @@
 {
     "_note": "See dev/scripts/new_english_keys.php. A ruling is remembered against the EXACT English it was made on; change the string and the ruling lapses.",
     "rulings": {
+        "about_body_html": {
+            "on": "<h3>Mission</h3><p>HawsEDC Engineering Calculators have been offered freely online since 2010. They exist to serve engineers and field workers around the world — especially those working in water-scarce, low-resource, or underserved regions. These tools are part of a broader humanitarian mission: to tell every human being in the most practical and effective way possible <a target=\"_blank\" href=\"https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html\">that they are loved and cherished forever, that they have nothing to fear, and that they are not going to ruin everything</a>.</p><p>The calculators are the vehicle. The destination is a world free of suffering.</p><h3>Free Libre Open Source License</h3><p>All code is released under the <a target=\"_blank\" href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU General Public License v3.0 or later</a> — free as in freedom. You may use, study, modify, and redistribute the code under the same terms.</p><p>The website that serves it is offered freely today and since 2010; if one day it cannot be, the software is still yours to run.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Source Code</h3><p>The full source code is publicly available on GitHub:</p><p><a target=\"_blank\" href=\"https://github.com/hawstom/engcalcs\">github.com/hawstom/engcalcs</a></p><p>You can browse the code, file issues, or fork the repository there.</p><h3>Contributing</h3><p>All help is welcome. <a href=\"contact.php\">Contact Tom Haws</a>.</p><ul><li><strong>Translations:</strong> Suggest better wording. Improve or add a language.</li><li><strong>Bug reports:</strong> Use the feedback form on any calculator page, or file an issue on GitHub.</li><li><strong>New calculators:</strong> Ideas for hydraulic engineering tools that serve field workers and irrigation practitioners are especially welcome.</li><li><strong>Hosting:</strong> If you can mirror these calculators for a region with limited connectivity, please contact me.</li></ul><h3>Offline Use</h3><p>Open any calculator once while you are online and all of them keep working when you are not: your browser stores the whole suite as you go. The mechanism is a <strong>Progressive Web App (PWA)</strong>. After that, all calculators work offline — no internet required.</p><p>On Android or iOS, use your browser’s \"Add to Home Screen\" option to install EngCalcs as an app on your device. On desktop, look for the install icon in your browser’s address bar.</p><p>You can also save any individual calculator using your browser’s \"Save as…\" menu for one-off offline use.</p><h3>Contact</h3><p>Tom Haws, hydraulic engineer and founder of these calculators.<br />Use the feedback form on any calculator page, or reach the source code at <a target=\"_blank\" href=\"https://github.com/hawstom/engcalcs\">GitHub</a>.</p>",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
+        },
         "bpn_demand_mult": {
             "on": "Demand multiplier",
             "ruled": "2026-08-29"
@@ -209,6 +214,11 @@
             "ruled": "2026-09-25",
             "answer": "Edited."
         },
+        "lpn_basemap_topo_show": {
+            "on": "Show topo map",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_calib_axis_obs": {
             "on": "Observed: {q}",
             "ruled": "2026-10-03",
@@ -403,6 +413,16 @@
             "on": "The file's values are read in this project's units: {unit}.",
             "ruled": "2026-10-03",
             "answer": "OK."
+        },
+        "lpn_change_type_born": {
+            "on": "These values are new, set as on a newly drawn asset:",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use proposed"
+        },
+        "lpn_change_type_key": {
+            "on": "Each line: ID: the property and value that would be lost",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October (round 2): Use proposed"
         },
         "lpn_choice_default": {
             "on": "Default",
@@ -1516,6 +1536,11 @@
             "ruled": "2026-10-03",
             "answer": "OK."
         },
+        "lpn_dxf_note_blocks": {
+            "on": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
+        },
         "lpn_elev_dem_none": {
             "on": "The DEM gave no height for this node.",
             "ruled": "2026-09-01"
@@ -1669,6 +1694,11 @@
         "lpn_energy_pump_price_tip": {
             "on": "What one kilowatt hour costs at this pump. Leave it empty and the pump pays the price set for the whole network under Settings, Energy.",
             "ruled": "2026-09-04"
+        },
+        "lpn_energy_stopped": {
+            "on": "The EPANET run stopped before the end of the period, so no pump energy results were computed.",
+            "ruled": "2026-10-15",
+            "answer": "Revised. Does that work? If not, correct and try again."
         },
         "lpn_energy_title": {
             "on": "Pump energy report",
@@ -2067,6 +2097,11 @@
             "ruled": "2026-09-17",
             "answer": "OK."
         },
+        "lpn_field_active": {
+            "on": "Is active?",
+            "ruled": "2026-10-06",
+            "answer": "His own wording: \"Part of network: Change to \\\"Is active?\\\" like Bentley.\""
+        },
         "lpn_field_base_demand": {
             "on": "Base demand",
             "ruled": "2026-08-29"
@@ -2258,6 +2293,11 @@
             "ruled": "2026-09-09",
             "answer": "Edited."
         },
+        "lpn_field_valve_type_tip": {
+            "on": "Valve type. A throttle valve (TCV) applies a fixed loss. PRV, PSV, and FCV maintain a pressure or a flow, and open fully, close, or partly close as hydraulic conditions change. A PBV removes a fixed pressure, and a GPV follows a head loss curve. The types control different hydraulic properties, so settings may be lost when the type is changed.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Valve type. A throttle valve (TCV) applies a fixed loss. PRV, PSV, and FCV maintain a pressure or a flow, and open fully, close, or partly close as hydraulic conditions change. A PBV removes a fixed pressure, and a GPV follows a head loss curve. The types control different hydraulic properties, so settings may be lost when the type is changed."
+        },
         "lpn_file_convert_as": {
             "on": "Convert as…",
             "ruled": "2026-09-25",
@@ -2277,6 +2317,16 @@
             "on": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
             "ruled": "2026-10-09",
             "answer": "Use proposed (Tom, calls page round 3)."
+        },
+        "lpn_file_import_gjnet": {
+            "on": "Import GeoJSON network…",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_file_import_gjnet_tip": {
+            "on": "Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
         },
         "lpn_file_import_menu": {
             "on": "Import…",
@@ -2685,6 +2735,321 @@
             "on": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.",
             "ruled": "2026-08-29"
         },
+        "lpn_gjnet_and_more": {
+            "on": "and {n} more",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_col_example": {
+            "on": "Example",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_col_field": {
+            "on": "Field",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_col_fills": {
+            "on": "Fills",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_col_unit": {
+            "on": "Unit",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_intro": {
+            "on": "{points} points and {lines} lines were found. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. Choose the property each field fills and the unit of each number.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_lines_heading": {
+            "on": "Line fields (pipes)",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_no_fields": {
+            "on": "These features have no attribute fields.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_crs": {
+            "on": "The file states the coordinate system {crs}, which is WGS 84 latitude and longitude, the system RFC 7946 requires. Positions were read as stated.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_default_demand": {
+            "on": "These junctions state no base demand and have the default base demand, {value}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_default_diameter": {
+            "on": "These pipes state no diameter and have the default diameter, {value}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_default_elev": {
+            "on": "These nodes state no elevation and have the default elevation, {value}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_default_elev_added": {
+            "on": "These junctions were added at line ends and have the default elevation, {value}, because no node in the file states an elevation.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_default_k": {
+            "on": "These pipes state no minor loss coefficient, so each has 0, as in an EPANET file that states none.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_default_roughness": {
+            "on": "These pipes state no roughness and have the default roughness, {value}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_default_tank": {
+            "on": "These tanks have the default water depths and tank diameter.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_demand_kept": {
+            "on": "A reservoir or tank has no demand, so the demand stated on these nodes was kept as the custom property {key}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_demand_rows": {
+            "on": "These junctions had more than one demand row. A GeoJSON file holds only the first, which was imported.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_elev_taken": {
+            "on": "These nodes state no elevation. Each was given the elevation of the node shown in parentheses: for a junction added at a line end, the node at the other end of its pipe, otherwise the nearest node that states one.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_end_moved": {
+            "on": "These pipes have an end within {tol} of a point or another line end, but not on it. The end was joined to it; the largest distance is {dist}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_end_off_node": {
+            "on": "The line of each of these links does not start or end at its node. The node position was used.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_end_on_pipe": {
+            "on": "These line ends lie on the pipe shown in parentheses, but not at its end, and are not connected to it.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_field_custom": {
+            "on": "These fields were imported as custom properties.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_field_skipped": {
+            "on": "These fields were not imported, as chosen.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_id_dup": {
+            "on": "These IDs are stated by more than one feature of the same kind. Each later feature was assigned the ID shown in parentheses.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_id_new": {
+            "on": "These features state no valid ID and were assigned the ID shown in parentheses.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_junction_added": {
+            "on": "These junctions were added where a line end is not within {tol} of a point. Each has the default base demand.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_length_auto": {
+            "on": "These pipes state no length. Each length is computed from the line (Auto).",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_not_held": {
+            "on": "A GeoJSON file does not hold controls, rules, time settings, text labels, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_parts": {
+            "on": "These multipart lines have parts that are not connected and were imported as one pipe for each part.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_parts_points": {
+            "on": "These multipoint features were imported as one node for each point.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_pattern_conflict": {
+            "on": "These patterns are stated with different multipliers on different features. The first was used.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_pipe_type": {
+            "on": "These pipes state the pipe type shown in parentheses, whose definition a GeoJSON file does not hold. The pipe type was not imported; the diameter and roughness stated in the file were.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_results": {
+            "on": "The results in the file were not imported. Calculate computes them again.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_skip_geometry": {
+            "on": "Not imported: the feature is not a point or a line.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_skip_id": {
+            "on": "Not imported: the name is not a valid ID, or another element of the same kind has it.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_skip_kind": {
+            "on": "Not imported: the feature states no node_type or link_type.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_skip_loop": {
+            "on": "Not imported: both ends of the line join the same node.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_skip_no_node": {
+            "on": "Not imported: the start or end node named is not in the file.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_skip_position": {
+            "on": "Not imported: a position is not a valid latitude and longitude.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_skip_short": {
+            "on": "Not imported: a line needs at least two positions.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_unmapped_demand": {
+            "on": "No field was chosen for the base demand, so every junction has the default base demand, {value}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_unmapped_diameter": {
+            "on": "No field was chosen for the diameter, so every pipe has the default diameter, {value}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_unmapped_elev": {
+            "on": "No field was chosen for the elevation, so every node has the default elevation, {value}, and automatic lengths include no elevation difference.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_unmapped_id_line": {
+            "on": "No field was chosen for the line ID, so every pipe was assigned an ID.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_unmapped_id_point": {
+            "on": "No field was chosen for the point ID, so every node imported from a point was assigned an ID.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_unmapped_k": {
+            "on": "No field was chosen for the minor loss coefficient, so every pipe has 0, as in an EPANET file that states none.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_unmapped_length": {
+            "on": "No field was chosen for the length, so every pipe length is computed from the line (Auto).",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_unmapped_roughness": {
+            "on": "No field was chosen for the roughness, so every pipe has the default roughness, {value}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_value_unread": {
+            "on": "These values are not numbers or are not recognized, and were not used.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_note_z": {
+            "on": "These points state a third coordinate, which was not imported.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_other": {
+            "on": "{n} features are neither points nor lines and will not be imported; the report lists them.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_points_heading": {
+            "on": "Point fields (junctions, reservoirs, and tanks)",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_refuse_crs": {
+            "on": "{file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_refuse_empty": {
+            "on": "{file} contains no points or lines.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_report_lead": {
+            "on": "Each change made during import, and each feature not imported, is listed below with the reason:",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_target_custom": {
+            "on": "Custom property",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_target_node_type": {
+            "on": "Node type",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_target_skip": {
+            "on": "Do not import",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_title": {
+            "on": "Import GeoJSON network: {file}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_tolerance": {
+            "on": "Join tolerance (m)",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_tolerance_tip": {
+            "on": "A line end within this distance of a point, or of another line end, is joined to it. A line end farther than this from every point gets a new junction.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_gjnet_working": {
+            "on": "Importing {file}…",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_goto_on_map": {
             "on": "Go to on map",
             "ruled": "2026-09-29",
@@ -2703,6 +3068,16 @@
             "on": "Graphs",
             "ruled": "2026-10-03",
             "answer": "OK."
+        },
+        "lpn_guide_boxes_autohide": {
+            "on": "When the pointer leaves, a box without focus hides after a short delay. A box with focus hides when you click outside it, press Esc, or Tab out of it with the pointer elsewhere.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October (round 2): his own text"
+        },
+        "lpn_guide_dimmed": {
+            "on": "A dimmed name is a button that is currently hidden on the toolbar.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
         },
         "lpn_help_hotkeys": {
             "on": "Tables and Hotkeys",
@@ -2768,6 +3143,11 @@
             "ruled": "2026-10-07",
             "answer": "Technical-English interview: Use proposed"
         },
+        "lpn_inp_drop_headloss": {
+            "on": "This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the results here will not match the results in EPANET.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
+        },
         "lpn_inp_drop_net_options": {
             "on": "This EPANET .net file states settings that this page has no control for, so their values are listed here rather than carried across. Everything else came over. If you need them, open the file in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
             "ruled": "2026-09-06",
@@ -2802,6 +3182,11 @@
         "lpn_inp_drop_tags": {
             "on": "This file gives tags to some of its junctions, pipes or other assets. There is no place on this page to see a tag or change one yet. The tags are kept, and they are written back if you save an EPANET file.",
             "ruled": "2026-09-02"
+        },
+        "lpn_inp_drop_units": {
+            "on": "The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every value before using the results.",
+            "ruled": "2026-10-07",
+            "answer": "Technical-English interview: Use proposed"
         },
         "lpn_inp_export_flat_coords": {
             "on": "An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its positions in the project file only.",
@@ -3069,6 +3454,11 @@
         "lpn_library_import_units_line": {
             "on": "{name}: this project shows {mine}, the file shows {theirs}.",
             "ruled": "2026-09-23",
+            "answer": "OK."
+        },
+        "lpn_library_pattern_axis_step": {
+            "on": "Step",
+            "ruled": "2026-10-16",
             "answer": "OK."
         },
         "lpn_library_pipetype_add": {
@@ -3446,10 +3836,50 @@
             "ruled": "2026-10-15",
             "answer": "Approved. (proposal: \"labels and Text\")"
         },
+        "lpn_mode_add_junction": {
+            "on": "Mode: Add Junction. Specify a location on the map to place a junction. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-15",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
         "lpn_mode_add_meter": {
             "on": "Customer: click where the customer is, then click the pipe or the node that serves it. Or use Esc to cancel.",
             "ruled": "2026-09-23",
             "answer": "Edited."
+        },
+        "lpn_mode_add_pipe": {
+            "on": "Mode: Add Pipe. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-15",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_add_pump": {
+            "on": "Mode: Add Pump. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-15",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_add_reservoir": {
+            "on": "Mode: Add Reservoir. Specify a location on the map to place a reservoir. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-15",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_add_tank": {
+            "on": "Mode: Add Tank. Specify a location on the map to place a tank. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-15",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_add_text": {
+            "on": "Mode: Add Text. Specify a location on the map to place a Text. Specify a location near a node to attach the Text to that node. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-15",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_add_valve": {
+            "on": "Mode: Add Valve. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.",
+            "ruled": "2026-10-15",
+            "answer": "Approved. (proposal: \"labels and Text\")"
+        },
+        "lpn_mode_select": {
+            "on": "Mode: Select. Select an asset, a label, or a Text to see or change it. Drag to move a node, a label, or a Text. Use the Vertices tool to add or remove the bends in a pipe.",
+            "ruled": "2026-10-15",
+            "answer": "Approved. (proposal: \"labels and Text\")"
         },
         "lpn_mode_zoom_window": {
             "on": "Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.",
@@ -3471,6 +3901,11 @@
             "ruled": "2026-09-23",
             "answer": "OK."
         },
+        "lpn_msglog_hidden": {
+            "on": "Hidden",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
+        },
         "lpn_msglog_name": {
             "on": "Messages",
             "ruled": "2026-09-23",
@@ -3485,6 +3920,11 @@
             "on": "Read the recent messages again. They are kept only while this page is open.",
             "ruled": "2026-09-23",
             "answer": "OK."
+        },
+        "lpn_msglog_unhide": {
+            "on": "Show",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
         },
         "lpn_multi_applied": {
             "on": "Set {prop} on {n}.",
@@ -3585,6 +4025,36 @@
         "lpn_offscreen_intact": {
             "on": "Your network is intact.",
             "ruled": "2026-09-25",
+            "answer": "OK."
+        },
+        "lpn_ovl_bubble_moved": {
+            "on": "{quantity}, moved or resized",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_bubble_off": {
+            "on": "Not on the map",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_clear_all": {
+            "on": "Clear all overrides",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_clear_all_ask": {
+            "on": "Clear all the overrides ({n}) of {name}? Each value returns to the inherited value. Undo reverses this.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_clear_selected": {
+            "on": "Clear selected overrides",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_pick_tip": {
+            "on": "Select this override for the Clear selected overrides button.",
+            "ruled": "2026-10-16",
             "answer": "OK."
         },
         "lpn_pane_colmenu_tip": {
@@ -3947,6 +4417,11 @@
             "ruled": "2026-09-09",
             "answer": "OK"
         },
+        "lpn_popup_none": {
+            "on": "Nothing is selected. Select an asset on the map to see its properties.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
+        },
         "lpn_profile_delete": {
             "on": "Delete path",
             "ruled": "2026-08-29"
@@ -4196,6 +4671,16 @@
             "on": "Elevations requested for nodes ({n}). Results appear when they are received.",
             "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
+        },
+        "lpn_replace_done": {
+            "on": "Assets changed: {n}. This can be undone in one step.",
+            "ruled": "2026-10-15",
+            "answer": "Approved."
+        },
+        "lpn_replace_preview": {
+            "on": "Change assets ({n})?",
+            "ruled": "2026-10-15",
+            "answer": "Approved."
         },
         "lpn_replace_q_bad": {
             "on": "This query cannot be read, so there is nothing to change. Fix it above first.",
@@ -4464,6 +4949,11 @@
             "ruled": "2026-10-01",
             "answer": "OK."
         },
+        "lpn_scenario_preset_mult_tip": {
+            "on": "Demand multiplier {mult} times average day, a placeholder value. Most systems fall between {lo} and {hi} (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.",
+            "ruled": "2026-10-07",
+            "answer": "Calls page 7 October: Use proposed"
+        },
         "lpn_scenario_preset_peak_hour": {
             "on": "6. Peak hour",
             "ruled": "2026-10-01",
@@ -4521,6 +5011,11 @@
             "on": "Scenario comparison",
             "ruled": "2026-09-04"
         },
+        "lpn_search_refused": {
+            "on": "Place-name search is off, and nothing was sent. The Go to a latitude and longitude command still works.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use proposed"
+        },
         "lpn_setbox_divider": {
             "on": "Width of the Settings section list",
             "ruled": "2026-09-06",
@@ -4543,6 +5038,11 @@
             "on": "Shows the bubble over the map that says what your next click will do while you are selecting an area.",
             "ruled": "2026-09-09",
             "answer": "OK"
+        },
+        "lpn_settings_auto_run_tip": {
+            "on": "Turn off if recalculation is too slow. While this is on, the Calculate button is hidden.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October (round 2): Use proposed"
         },
         "lpn_settings_basemap_style": {
             "on": "Basemap style",
@@ -4877,6 +5377,11 @@
             "ruled": "2026-09-06",
             "answer": "OK."
         },
+        "lpn_split_pipe_ask": {
+            "on": "Split pipe {id} at this node?",
+            "ruled": "2026-10-10",
+            "answer": "I agree with Bentley that \"split\" is better than \"break\"."
+        },
         "lpn_status_closed": {
             "on": "{type} {id} now closed",
             "ruled": "2026-10-03",
@@ -4886,6 +5391,11 @@
             "on": "Event",
             "ruled": "2026-09-26",
             "answer": "OK."
+        },
+        "lpn_status_converted": {
+            "on": "Values ({n}) were rewritten into {unit}.",
+            "ruled": "2026-10-15",
+            "answer": "Approved."
         },
         "lpn_status_dry": {
             "on": "{type} {id} is empty",
@@ -5385,6 +5895,11 @@
             "on": "Copy",
             "ruled": "2026-09-04"
         },
+        "lpn_time_run_stopped_kept": {
+            "on": "The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.",
+            "ruled": "2026-10-15",
+            "answer": "Approved."
+        },
         "lpn_time_runbox_hide": {
             "on": "Do not show this box again",
             "ruled": "2026-09-14",
@@ -5420,10 +5935,20 @@
             "ruled": "2026-10-05",
             "answer": "OK."
         },
+        "lpn_time_stat_stopped": {
+            "on": "{statistic} not shown: the run stopped before the end of the period.",
+            "ruled": "2026-10-15",
+            "answer": "Approved."
+        },
         "lpn_time_statistic": {
             "on": "Statistic",
             "ruled": "2026-10-05",
             "answer": "OK."
+        },
+        "lpn_time_stopped_no_quality": {
+            "on": "No water quality results were computed, because the quality analysis starts after the hydraulic run ends.",
+            "ruled": "2026-10-15",
+            "answer": "Approved."
         },
         "lpn_tool_add_chain": {
             "on": "Junction Pipe Chain",
@@ -5474,6 +5999,11 @@
             "on": "Shortcut: press {key} or {key2}.",
             "ruled": "2026-09-14",
             "answer": "OK"
+        },
+        "lpn_tool_zoom_extent_tip": {
+            "on": "Fit the whole network to the map window. For Zoom Window with no fit first, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also upper right map zoom controls.",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: Use as written"
         },
         "lpn_tool_zoom_window": {
             "on": "Zoom Window",
@@ -5565,6 +6095,11 @@
             "ruled": "2026-09-25",
             "answer": "OK."
         },
+        "lpn_workspace_confirm": {
+            "on": "Replace this browser's workspace layout with the one in the file?",
+            "ruled": "2026-10-08",
+            "answer": "Calls page 8 October: his own text, \"Replace this browser's workspace layout with the one in the file?\""
+        },
         "lpn_wrong_btn": {
             "on": "Something wrong here?",
             "ruled": "2026-09-04"
@@ -5620,176 +6155,6 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
-        },
-        "lpn_field_active": {
-            "on": "Is active?",
-            "ruled": "2026-10-06",
-            "answer": "His own wording: \"Part of network: Change to \\\"Is active?\\\" like Bentley.\""
-        },
-        "about_body_html": {
-            "on": "<h3>Mission</h3><p>HawsEDC Engineering Calculators have been offered freely online since 2010. They exist to serve engineers and field workers around the world — especially those working in water-scarce, low-resource, or underserved regions. These tools are part of a broader humanitarian mission: to tell every human being in the most practical and effective way possible <a target=\"_blank\" href=\"https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html\">that they are loved and cherished forever, that they have nothing to fear, and that they are not going to ruin everything</a>.</p><p>The calculators are the vehicle. The destination is a world free of suffering.</p><h3>Free Libre Open Source License</h3><p>All code is released under the <a target=\"_blank\" href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU General Public License v3.0 or later</a> — free as in freedom. You may use, study, modify, and redistribute the code under the same terms.</p><p>The website that serves it is offered freely today and since 2010; if one day it cannot be, the software is still yours to run.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Source Code</h3><p>The full source code is publicly available on GitHub:</p><p><a target=\"_blank\" href=\"https://github.com/hawstom/engcalcs\">github.com/hawstom/engcalcs</a></p><p>You can browse the code, file issues, or fork the repository there.</p><h3>Contributing</h3><p>All help is welcome. <a href=\"contact.php\">Contact Tom Haws</a>.</p><ul><li><strong>Translations:</strong> Suggest better wording. Improve or add a language.</li><li><strong>Bug reports:</strong> Use the feedback form on any calculator page, or file an issue on GitHub.</li><li><strong>New calculators:</strong> Ideas for hydraulic engineering tools that serve field workers and irrigation practitioners are especially welcome.</li><li><strong>Hosting:</strong> If you can mirror these calculators for a region with limited connectivity, please contact me.</li></ul><h3>Offline Use</h3><p>Open any calculator once while you are online and all of them keep working when you are not: your browser stores the whole suite as you go. The mechanism is a <strong>Progressive Web App (PWA)</strong>. After that, all calculators work offline — no internet required.</p><p>On Android or iOS, use your browser’s \"Add to Home Screen\" option to install EngCalcs as an app on your device. On desktop, look for the install icon in your browser’s address bar.</p><p>You can also save any individual calculator using your browser’s \"Save as…\" menu for one-off offline use.</p><h3>Contact</h3><p>Tom Haws, hydraulic engineer and founder of these calculators.<br />Use the feedback form on any calculator page, or reach the source code at <a target=\"_blank\" href=\"https://github.com/hawstom/engcalcs\">GitHub</a>.</p>",
-            "ruled": "2026-10-07",
-            "answer": "Technical-English interview: Use proposed"
-        },
-        "lpn_field_valve_type_tip": {
-            "on": "Valve type. A throttle valve (TCV) applies a fixed loss. PRV, PSV, and FCV maintain a pressure or a flow, and open fully, close, or partly close as hydraulic conditions change. A PBV removes a fixed pressure, and a GPV follows a head loss curve. The types control different hydraulic properties, so settings may be lost when the type is changed.",
-            "ruled": "2026-10-07",
-            "answer": "Technical-English interview: Valve type. A throttle valve (TCV) applies a fixed loss. PRV, PSV, and FCV maintain a pressure or a flow, and open fully, close, or partly close as hydraulic conditions change. A PBV removes a fixed pressure, and a GPV follows a head loss curve. The types control different hydraulic properties, so settings may be lost when the type is changed."
-        },
-        "lpn_inp_drop_headloss": {
-            "on": "This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the results here will not match the results in EPANET.",
-            "ruled": "2026-10-07",
-            "answer": "Technical-English interview: Use proposed"
-        },
-        "lpn_inp_drop_units": {
-            "on": "The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every value before using the results.",
-            "ruled": "2026-10-07",
-            "answer": "Technical-English interview: Use proposed"
-        },
-        "lpn_scenario_preset_mult_tip": {
-            "on": "Demand multiplier {mult} times average day, a placeholder value. Most systems fall between {lo} and {hi} (National Research Council, 2006). Set the value for the system being modeled in Settings, Calculation, Hydraulics, Demand multiplier.",
-            "ruled": "2026-10-07",
-            "answer": "Calls page 7 October: Use proposed"
-        },
-        "lpn_change_type_born": {
-            "on": "These values are new, set as on a newly drawn asset:",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October: Use proposed"
-        },
-        "lpn_search_refused": {
-            "on": "Place-name search is off, and nothing was sent. The Go to a latitude and longitude command still works.",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October: Use proposed"
-        },
-        "lpn_popup_none": {
-            "on": "Nothing is selected. Select an asset on the map to see its properties.",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October: Use as written"
-        },
-        "lpn_guide_dimmed": {
-            "on": "A dimmed name is a button that is currently hidden on the toolbar.",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October: Use as written"
-        },
-        "lpn_tool_zoom_extent_tip": {
-            "on": "Fit the whole network to the map window. For Zoom Window with no fit first, press W or click the small triangle in the corner of the Zoom to fit toolbar button. See also upper right map zoom controls.",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October: Use as written"
-        },
-        "lpn_msglog_hidden": {
-            "on": "Hidden",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October: Use as written"
-        },
-        "lpn_msglog_unhide": {
-            "on": "Show",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October: Use as written"
-        },
-        "lpn_workspace_confirm": {
-            "on": "Replace this browser's workspace layout with the one in the file?",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October: his own text, \"Replace this browser's workspace layout with the one in the file?\""
-        },
-        "lpn_guide_boxes_autohide": {
-            "on": "When the pointer leaves, a box without focus hides after a short delay. A box with focus hides when you click outside it, press Esc, or Tab out of it with the pointer elsewhere.",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October (round 2): his own text"
-        },
-        "lpn_change_type_key": {
-            "on": "Each line: ID: the property and value that would be lost",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October (round 2): Use proposed"
-        },
-        "lpn_settings_auto_run_tip": {
-            "on": "Turn off if recalculation is too slow. While this is on, the Calculate button is hidden.",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October (round 2): Use proposed"
-        },
-        "lpn_dxf_note_blocks": {
-            "on": "Layers are named {prefix}, the asset code, a hyphen, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Every attribute is visible; the attributes of one element are stacked in a column beside its symbol.",
-            "ruled": "2026-10-08",
-            "answer": "Calls page 8 October: Use as written"
-        },
-        "lpn_split_pipe_ask": {
-            "on": "Split pipe {id} at this node?",
-            "ruled": "2026-10-10",
-            "answer": "I agree with Bentley that \"split\" is better than \"break\"."
-        },
-        "lpn_mode_select": {
-            "on": "Mode: Select. Select an asset, a label, or a Text to see or change it. Drag to move a node, a label, or a Text. Use the Vertices tool to add or remove the bends in a pipe.",
-            "ruled": "2026-10-15",
-            "answer": "Approved. (proposal: \"labels and Text\")"
-        },
-        "lpn_mode_add_junction": {
-            "on": "Mode: Add Junction. Specify a location on the map to place a junction. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-15",
-            "answer": "Approved. (proposal: \"labels and Text\")"
-        },
-        "lpn_mode_add_reservoir": {
-            "on": "Mode: Add Reservoir. Specify a location on the map to place a reservoir. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-15",
-            "answer": "Approved. (proposal: \"labels and Text\")"
-        },
-        "lpn_mode_add_tank": {
-            "on": "Mode: Add Tank. Specify a location on the map to place a tank. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-15",
-            "answer": "Approved. (proposal: \"labels and Text\")"
-        },
-        "lpn_mode_add_pipe": {
-            "on": "Mode: Add Pipe. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-15",
-            "answer": "Approved. (proposal: \"labels and Text\")"
-        },
-        "lpn_mode_add_pump": {
-            "on": "Mode: Add Pump. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-15",
-            "answer": "Approved. (proposal: \"labels and Text\")"
-        },
-        "lpn_mode_add_valve": {
-            "on": "Mode: Add Valve. Select a start node and then an end node to connect them. Specify points in open space in between to bend the line, or press Escape to start over. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-15",
-            "answer": "Approved. (proposal: \"labels and Text\")"
-        },
-        "lpn_mode_add_text": {
-            "on": "Mode: Add Text. Specify a location on the map to place a Text. Specify a location near a node to attach the Text to that node. Switch to Select mode to change or move assets, labels, and Text.",
-            "ruled": "2026-10-15",
-            "answer": "Approved. (proposal: \"labels and Text\")"
-        },
-        "lpn_time_run_stopped_kept": {
-            "on": "The EPANET run stopped at {time}. Results run to {solved}, the last period it solved, and none are shown after it. Its run report says why.",
-            "ruled": "2026-10-15",
-            "answer": "Approved."
-        },
-        "lpn_time_stat_stopped": {
-            "on": "{statistic} not shown: the run stopped before the end of the period.",
-            "ruled": "2026-10-15",
-            "answer": "Approved."
-        },
-        "lpn_time_stopped_no_quality": {
-            "on": "No water quality results were computed, because the quality analysis starts after the hydraulic run ends.",
-            "ruled": "2026-10-15",
-            "answer": "Approved."
-        },
-        "lpn_energy_stopped": {
-            "on": "The EPANET run stopped before the end of the period, so no pump energy results were computed.",
-            "ruled": "2026-10-15",
-            "answer": "Revised. Does that work? If not, correct and try again."
-        },
-        "lpn_replace_preview": {
-            "on": "Change assets ({n})?",
-            "ruled": "2026-10-15",
-            "answer": "Approved."
-        },
-        "lpn_replace_done": {
-            "on": "Assets changed: {n}. This can be undone in one step.",
-            "ruled": "2026-10-15",
-            "answer": "Approved."
-        },
-        "lpn_status_converted": {
-            "on": "Values ({n}) were rewritten into {unit}.",
-            "ruled": "2026-10-15",
-            "answer": "Approved."
         }
     }
 }

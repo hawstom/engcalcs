@@ -70222,7 +70222,7 @@ var EngCalcs = EngCalcs || {};
 				dsProbeLine(host, s.failing);
 			} else {
 				verdict = s.belowAtOne
-					? (pc.lpn_ds_found_below || '⚠ At least one junction is below {pressure} with no demand scaling. The largest demand scale that keeps every junction at {pressure} or above is {m}.')
+					? (pc.lpn_ds_found_below || '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.')
 					: (pc.lpn_ds_found || '✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.');
 				ffEl('p', 'lpn-ff-summary', verdict.split('{pressure}').join(pressure).replace('{m}', dsMult(s.multiplier)), host);
 				dsProbeLine(host, s.holding);
