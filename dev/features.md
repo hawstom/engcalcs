@@ -34,7 +34,7 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - World map canvas or your own backdrop. <!-- 145, 276 -->
 - XY to Lat/Lon conversion import wizard. <!-- 476 -->
 - Conversion of a project copy to another coordinate system and other units, and new projects in a real EPSG projection. <!-- 696, 641 -->
-- Place name search and elevations from map DEM. <!-- 437, 497 -->
+- Place name search, and elevations filled in from a digital elevation model. <!-- 437, 497 -->
 
 ## Adding, editing, and displaying assets and results
 
@@ -49,7 +49,7 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - Multi-line annotation text with bold, rotation, and association to assets. <!-- 337, 342, 376 -->
 - Independent size settings for text, symbol, and pipes. <!-- 331, 362 -->
 - Graphs: HGL profiles with path editing, time series, contour on the map, frequency distribution, and a flow balance of production against consumption. <!-- 409, 433, 506, 510, 600, 640 -->
-- Time series graphs at the foot of Properties and as bubbles on the map, including tank depth; and the bubbles are an override for Presentation. <!-- 637, 784, 804, 795 -->
+- Time series graphs at the foot of Properties and as bubbles on the map, including tank depth. A bubble's display is set per scenario. <!-- 637, 784, 804, 795 -->
 
 ## Extended-period simulations
 
@@ -63,7 +63,7 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 
 ## Analyses
 
-- Fire flow failure and collateral (design) failure analysis. <!-- 530 -->
+- Fire flow analysis: which junctions miss their fire flow, and which pull the rest of the system below its limits. <!-- 530 -->
 - Criticality analysis, which removes each pipe, pump, and valve in turn and reports the effect. <!-- 751 -->
 - Demand scaling, which finds the largest demand scale the system can carry. <!-- 754 -->
 
@@ -83,10 +83,10 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 
 ## Premium features included for everybody
 
-- Scenarios and alternatives (see Scenarios and alternatives). <!-- see: Scenarios and alternatives -->
-- Fire flow, criticality, and demand scaling analyses (see Analyses). <!-- see: Analyses -->
-- Import and export formats (see Projects, files, and formats). <!-- see: Projects, files, and formats -->
-- Coordinate system and unit conversion (see Projects, files, and formats). <!-- see: Projects, files, and formats -->
+- Scenarios and alternatives (above). <!-- see: Scenarios and alternatives -->
+- Fire flow, criticality, and demand scaling analyses (above). <!-- see: Analyses -->
+- Import and export formats (above). <!-- see: Projects, files, and formats -->
+- Coordinate system and unit conversion (above). <!-- see: Projects, files, and formats -->
 
 ## The calculators
 
@@ -100,6 +100,6 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 
 ## Language, license, and privacy
 
-- Twenty-seven languages, and every word is evaluated for translation. <!-- 15, 22 -->
+- Twenty-seven languages, and every word is considered for translation. <!-- 15, 22 -->
 - Free software under the GNU GPL, source in the open. <!-- 244 -->
 - No account, and no visitor identifier or count of you unless you say yes. <!-- 286, 288 -->
