@@ -241,6 +241,11 @@ async function main() {
 		await smRow('Fig 6').locator('.lpn-sm-name').dblclick();
 		await a.settle(1200);
 		ok('Fig 6, a child of Fig 5, made current with a double-click', (await page.evaluate(() => document.getElementById('lpn_scenario_btn').textContent)).indexOf('Fig 6') >= 0);
+		// The Scenario manager stays open over the map, and since it and its Scenarios table became one
+		// box it can cover the Settings box: closed with its own ×, as a reader would, so the click
+		// below lands on the Settings box and not on the manager.
+		await page.click('#lpn_sm_close');
+		await a.settle(400);
 		await openBox();
 		const inherited = await rowOf(B);
 		ok('Fig 6 inherits Fig 5\'s ticked "' + B + '" label, unmarked (it holds nothing of its own)', inherited.checked && !inherited.held, JSON.stringify(inherited));
