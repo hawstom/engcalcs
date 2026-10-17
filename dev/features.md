@@ -8,60 +8,85 @@
 LibreWaterNet landing page, the Help menu, both, neither — is his call and is not yet made.
 Nothing on any served page reads this file.
 
-41 features, citing 95 of the 711 closed task IDs. The other 616 are
+56 features, citing 125 of the 711 closed task IDs. The other 586 are
 bug fixes, refactors, rejected proposals, and work nobody outside this repository would
-call a feature — and 134 of them are ledger entries carrying no text at all, whose
+call a feature — and 133 of them are ledger entries carrying no text at all, whose
 narrative is in git and which nothing here has judged either way. **This list is honest
 rather than complete:** a feature is on it because somebody wrote a sentence for it.
 
 ## Solver
 
-- Native solver available for steady state (single moment) simulation. <!-- 146 -->
-- EPANET 2.3.5 solver for extended period simulations. Solver comparison display. <!-- 451, 419 -->
+- Native solver for steady state (single moment) simulation. <!-- 146 -->
+- EPANET 2.3.5 solver for extended period simulations, with a solver comparison display. <!-- 451, 419 -->
 - Auto-recalculate option. <!-- 467 -->
 
-## Projects and Saving
+## Projects, files, and formats
 
-- Multiple open project tabs saved in browser or save to "lwn" file format with locking for office network collaboration. <!-- 146.08, 447, 352, 360 -->
+- Multiple open project tabs, saved in the browser or to an "lwn" file, with locking for office network collaboration. <!-- 146.08, 447, 352, 360 -->
 - Install for offline use. <!-- 2, 4, 37, 246 -->
 - Best on PC, tested on a phone. <!-- 486 -->
-
-## Import, Export, and Map or Backdrop
-
-- EPANET `.inp` files import and export with data fidelity and detailed accept/ignore report. <!-- 196, 483, 281 -->
-- Examples from EPANET and others, XY and Lat/Lon, loaded and solved in one click. <!-- 314, 257, 454 -->
-- World map canvas or your own backdrop with friendly positioning options. <!-- 145, 276 -->
+- Network import and export as EPANET `.inp`, plus network export to GeoJSON and DXF. <!-- 196, 483, 281 -->
+- Tables export to ODS, XLSX, and CSV; Shapes import from shapefile, GeoJSON, and DXF; surveyed points import as junctions; clipboard copy/paste. <!-- 592, 776 -->
+- Workspace file: save your box layout, panes, and display options, and import them on another screen or browser. <!-- 313 -->
+- Many example projects, each loaded and solved in one click. <!-- 314, 257, 454 -->
+- Libraries of patterns, curves, controls, rules, pipe types, and fittings, importable from another project file. <!-- 611, 792, 465, 590 -->
+- Screenshot tool with enhanced resolution and a markup pen. <!-- 793 -->
+- World map canvas or your own backdrop. <!-- 145, 276 -->
 - XY to Lat/Lon conversion import wizard. <!-- 476 -->
-- Place name search and elevations from map DEM w/ preview. <!-- 437, 497 -->
+- Conversion of a project copy to another coordinate system and other units, and new projects in a real EPSG projection. <!-- 696, 641 -->
+- Place name search and elevations from map DEM. <!-- 437, 497 -->
 
 ## Adding, editing, and displaying assets and results
 
 - Junction, reservoir, tank, pipe with vertex draw and edit mode, pump, valve, and annotation text. <!-- 146.02 -->
-- Customizable multi- node and link labels including prefixes, suffixes, separator, and drop/shed order with auto or manual placement on leaders or aligned with links. <!-- 345, 329, 333, 336, 397, 398, 399, 469, 146.01, 383 -->
-- Find, replace, goto elements including complex queries in your language. <!-- 353, 420, 389, 540 -->
-- Editable, pasteable, spreadsheet-like asset tables: junctions, reservoirs, tanks, pipes, pumps and valves. <!-- 434, 455 -->
-- Group edit assets three different ways: Find and replace, Select area, and spreadsheet edit Tables. <!-- 266 -->
-- Network coloring: three to seven ranges, eight ways of choosing where the breaks fall, and 41 color ramps. <!-- 384, 327 -->
-- Multi-line annotation text objects with bold, rotation w/ pipe match option, and association to assets. <!-- 337, 342, 376 -->
+- Junction and pipe chain draw, with pipe split offered contextually when a junction lands on a pipe. <!-- 719 -->
+- Draw reference Shapes (points, lines, and polygons), managed in a Shapes table. <!-- 779 -->
+- Copy and paste properties between assets. <!-- 185 -->
+- Customizable node and link labels: prefixes, suffixes, separator, drop order, and automatic or manual placement. <!-- 345, 329, 333, 336, 397, 398, 399, 469, 146.01, 383 -->
+- Find, replace, and go to elements, including complex queries in your language. <!-- 353, 420, 389, 540 -->
+- Mass-edit assets by Find and replace, Select area, or spreadsheet Tables. <!-- 266 -->
+- Network coloring: three to seven ranges, eight ways of placing the breaks, and 41 color ramps. <!-- 384, 327 -->
+- Multi-line annotation text with bold, rotation, and association to assets. <!-- 337, 342, 376 -->
 - Independent size settings for text, symbol, and pipes. <!-- 331, 362 -->
-- HGL profiles with modern path selection and editing. <!-- 409, 433, 506, 510 -->
+- Graphs: HGL profiles with path editing, time series, contour on the map, frequency distribution, and a flow balance of production against consumption. <!-- 409, 433, 506, 510, 600, 640 -->
+- Time series graphs at the foot of Properties and as bubbles on the map, including tank depth; and the bubbles are an override for Presentation. <!-- 637, 784, 804, 795 -->
 
 ## Extended period simulations
 
-- Extended-period simulation following patterns for demands, reservoir head, and pump speed. <!-- 248.01, 423, 410, 248.02 -->
+- Extended-period simulation with patterns for demands, reservoir head, and pump speed. <!-- 248.01, 423, 410, 248.02 -->
 - EPANET-style rule-based controls. <!-- 248.03 -->
-- Pump, efficiency, head loss, and tank volume curves, defined once in the Libraries box beside the patterns and rules and stated by reference, so a manufacturer's curve keeps every point it was published with and a tank fills on its real shape. <!-- 460, 586, 587 -->
+- Pump, efficiency, head loss, and tank volume curves, kept in the Libraries box. <!-- 460, 586, 587 -->
 - EPANET run report. <!-- 450 -->
-- Color limits constant through a simulation, so a color means the same thing at every step. <!-- 448 -->
+- Color ranges constant through a simulation. <!-- 448 -->
 - Water quality: age, share from a source, chemical decay. <!-- 566 -->
-- Pump energy cost: Run length, power use, and cost including peak demand charge. <!-- 566.01 -->
+- Pump energy report: operating share, efficiency, power, energy used, and cost including a peak demand charge. <!-- 566.01, 577 -->
+
+## Analyses
+
+- Fire flow failure and collateral (design) failure analysis. <!-- 530 -->
+- Criticality analysis, which removes each pipe, pump, and valve in turn and reports the effect. <!-- 751 -->
+- Demand scaling, which finds the largest demand scale the system can carry. <!-- 754 -->
+
+## Scenarios and alternatives
+
+- Scenarios with overrides marked on the map, Manage overrides, and a scenario comparison report. <!-- 201, 407, 412, 512 -->
+- Alternatives with an inheritance tree, overrides mergeable upward into the alternative above, Presentation and Calculation override categories, ready-made scenarios in every new project, a Basic mode, and many more management features. <!-- 750, 765, 755, 801, 802 -->
+
+## Ease of use
+
+- Searchable user manual. <!-- 763 -->
+- Every setting in one box, searchable by the words you would use. <!-- 457 -->
+- Dockable boxes that auto-hide to an edge tab. <!-- 441 -->
+- One Water menu holds everything about water modeling, assets included. <!-- 543 -->
+- Editable, pasteable, spreadsheet-like asset tables. <!-- 434, 455 -->
+- Snap to objects, which enhances the value of DXF and shapefile Shapes import. <!-- 782 -->
 
 ## Premium features included for everybody
 
-- Fire flow failure and collateral (design) failure analysis. <!-- 530 -->
-- Scenarios: override management and report, scenario comparison report. <!-- 201, 407, 412, 512 -->
-- Pipe types library: attached a library reference to keep a pipe in sync with the library. <!-- 465 -->
-- Fittings library: attach fittings references to pipes and library pipe types. <!-- 590 -->
+- Scenarios and alternatives (see Scenarios and alternatives). <!-- see: Scenarios and alternatives -->
+- Fire flow, criticality, and demand scaling analyses (see Analyses). <!-- see: Analyses -->
+- Import and export formats (see Projects, files, and formats). <!-- see: Projects, files, and formats -->
+- Coordinate system and unit conversion (see Projects, files, and formats). <!-- see: Projects, files, and formats -->
 
 ## The calculators
 
