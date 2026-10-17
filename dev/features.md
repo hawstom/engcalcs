@@ -8,7 +8,7 @@
 LibreWaterNet landing page, the Help menu, both, neither — is his call and is not yet made.
 Nothing on any served page reads this file.
 
-53 features, citing 122 of the 711 closed task IDs. The other 589 are
+55 features, citing 124 of the 711 closed task IDs. The other 587 are
 bug fixes, refactors, rejected proposals, and work nobody outside this repository would
 call a feature — and 133 of them are ledger entries carrying no text at all, whose
 narrative is in git and which nothing here has judged either way. **This list is honest
@@ -20,19 +20,15 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - EPANET 2.3.5 solver for extended period simulations, with a solver comparison display. <!-- 451, 419 -->
 - Auto-recalculate option. <!-- 467 -->
 
-## Projects and Saving
+## Projects, files, and formats
 
 - Multiple open project tabs, saved in the browser or to an "lwn" file, with locking for office network collaboration. <!-- 146.08, 447, 352, 360 -->
 - Install for offline use. <!-- 2, 4, 37, 246 -->
-- Searchable user manual. <!-- 763 -->
 - Best on PC, tested on a phone. <!-- 486 -->
-
-## Import, Export, and Map or Backdrop
-
 - Network import and export as EPANET `.inp`, plus network export to GeoJSON and DXF. <!-- 196, 483, 281 -->
 - Tables export to ODS, XLSX, and CSV; Shapes import from shapefile, GeoJSON, and DXF; surveyed points import as junctions; clipboard copy/paste. <!-- 592, 776 -->
 - Workspace file: save your box layout, panes, and display options, and import them on another screen or browser. <!-- 313 -->
-- Examples from EPANET and others, loaded and solved in one click. <!-- 314, 257, 454 -->
+- Many example projects, loaded and solved in one click. <!-- 314, 257, 454 -->
 - Libraries of patterns, curves, controls, rules, pipe types, and fittings, copyable from another project file. <!-- 611, 792, 465, 590 -->
 - Screenshot tool with enhanced resolution and a markup pen. <!-- 793 -->
 - World map canvas or your own backdrop. <!-- 145, 276 -->
@@ -45,11 +41,9 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - Junction, reservoir, tank, pipe with vertex draw and edit mode, pump, valve, and annotation text. <!-- 146.02 -->
 - Junction and pipe chain draw, with pipe split offered contextually when a junction lands on a pipe. <!-- 719 -->
 - Draw reference Shapes (points, lines, and polygons), managed in a Shapes table. <!-- 779 -->
-- Snap to objects, which enhances the value of DXF and shapefile Shapes import. <!-- 782 -->
 - Copy and paste properties between assets. <!-- 185 -->
 - Customizable node and link labels: prefixes, suffixes, separator, drop order, and automatic or manual placement. <!-- 345, 329, 333, 336, 397, 398, 399, 469, 146.01, 383 -->
 - Find, replace, and go to elements, including complex queries in your language. <!-- 353, 420, 389, 540 -->
-- Editable, pasteable, spreadsheet-like asset tables. <!-- 434, 455 -->
 - Mass-edit assets by Find and replace, Select area, or spreadsheet Tables. <!-- 266 -->
 - Network coloring: three to seven ranges, eight ways of placing the breaks, and 41 color ramps. <!-- 384, 327 -->
 - Multi-line annotation text with bold, rotation, and association to assets. <!-- 337, 342, 376 -->
@@ -78,12 +72,20 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - Scenarios with overrides marked on the map, Manage overrides, and a scenario comparison report. <!-- 201, 407, 412, 512 -->
 - Alternatives with an inheritance tree, overrides mergeable upward into the alternative above, Presentation and Calculation override categories, ready-made scenarios in every new project, a Basic mode, and many more management features. <!-- 750, 765, 755, 801, 802 -->
 
+## Ease of use
+
+- Searchable user manual. <!-- 763 -->
+- Dockable boxes that auto-hide to an edge tab. <!-- 441 -->
+- One Water menu holds everything about water modeling, assets included. <!-- 543 -->
+- Editable, pasteable, spreadsheet-like asset tables. <!-- 434, 455 -->
+- Snap to objects, which enhances the value of DXF and shapefile Shapes import. <!-- 782 -->
+
 ## Premium features included for everybody
 
 - Scenarios and alternatives (see Scenarios and alternatives). <!-- see: Scenarios and alternatives -->
 - Fire flow, criticality, and demand scaling analyses (see Analyses). <!-- see: Analyses -->
-- Import and export formats (see Import, Export, and Map or Backdrop). <!-- see: Import, Export, and Map or Backdrop -->
-- Coordinate system and unit conversion (see Import, Export, and Map or Backdrop). <!-- see: Import, Export, and Map or Backdrop -->
+- Import and export formats (see Projects, files, and formats). <!-- see: Projects, files, and formats -->
+- Coordinate system and unit conversion (see Projects, files, and formats). <!-- see: Projects, files, and formats -->
 
 ## The calculators
 

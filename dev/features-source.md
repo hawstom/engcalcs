@@ -68,19 +68,16 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 - 451, 419| EPANET 2.3.5 solver for extended period simulations, with a solver comparison display.
 - 467| Auto-recalculate option.
 
-## Projects and Saving
+## Projects, files, and formats
 
 - 146.08, 447, 352, 360| Multiple open project tabs, saved in the browser or to an "lwn" file, with locking for office network collaboration.
 - 2, 4, 37, 246| Install for offline use.
-- 763| Searchable user manual.
 - 486| Best on PC, tested on a phone.
-
-## Import, Export, and Map or Backdrop
 
 - 196, 483, 281| Network import and export as EPANET `.inp`, plus network export to GeoJSON and DXF.
 - 592, 776| Tables export to ODS, XLSX, and CSV; Shapes import from shapefile, GeoJSON, and DXF; surveyed points import as junctions; clipboard copy/paste.
 - 313| Workspace file: save your box layout, panes, and display options, and import them on another screen or browser.
-- 314, 257, 454| Examples from EPANET and others, loaded and solved in one click.
+- 314, 257, 454| Many example projects, loaded and solved in one click.
 - 611, 792, 465, 590| Libraries of patterns, curves, controls, rules, pipe types, and fittings, copyable from another project file.
 - 793| Screenshot tool with enhanced resolution and a markup pen.
 - 145, 276| World map canvas or your own backdrop.
@@ -93,11 +90,9 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 - 146.02| Junction, reservoir, tank, pipe with vertex draw and edit mode, pump, valve, and annotation text.
 - 719| Junction and pipe chain draw, with pipe split offered contextually when a junction lands on a pipe.
 - 779| Draw reference Shapes (points, lines, and polygons), managed in a Shapes table.
-- 782| Snap to objects, which enhances the value of DXF and shapefile Shapes import.
 - 185| Copy and paste properties between assets.
 - 345, 329, 333, 336, 397, 398, 399, 469, 146.01, 383| Customizable node and link labels: prefixes, suffixes, separator, drop order, and automatic or manual placement.
 - 353, 420, 389, 540| Find, replace, and go to elements, including complex queries in your language.
-- 434, 455| Editable, pasteable, spreadsheet-like asset tables.
 - 266| Mass-edit assets by Find and replace, Select area, or spreadsheet Tables.
 - 384, 327| Network coloring: three to seven ranges, eight ways of placing the breaks, and 41 color ramps.
 - 337, 342, 376| Multi-line annotation text with bold, rotation, and association to assets.
@@ -126,6 +121,14 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 - 201, 407, 412, 512| Scenarios with overrides marked on the map, Manage overrides, and a scenario comparison report.
 - 750, 765, 755, 801, 802| Alternatives with an inheritance tree, overrides mergeable upward into the alternative above, Presentation and Calculation override categories, ready-made scenarios in every new project, a Basic mode, and many more management features.
 
+## Ease of use
+
+- 763| Searchable user manual.
+- 441| Dockable boxes that auto-hide to an edge tab.
+- 543| One Water menu holds everything about water modeling, assets included.
+- 434, 455| Editable, pasteable, spreadsheet-like asset tables.
+- 782| Snap to objects, which enhances the value of DXF and shapefile Shapes import.
+
 ## Premium features included for everybody
 
 <!-- **"PREMIUM" IS DELIBERATE AND IS NOT A PRICE.** Tom, 2026-09-12, asked directly whether the
@@ -136,8 +139,8 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 
 - see Scenarios and alternatives| Scenarios and alternatives (see Scenarios and alternatives).
 - see Analyses| Fire flow, criticality, and demand scaling analyses (see Analyses).
-- see Import, Export, and Map or Backdrop| Import and export formats (see Import, Export, and Map or Backdrop).
-- see Import, Export, and Map or Backdrop| Coordinate system and unit conversion (see Import, Export, and Map or Backdrop).
+- see Projects, files, and formats| Import and export formats (see Projects, files, and formats).
+- see Projects, files, and formats| Coordinate system and unit conversion (see Projects, files, and formats).
 
 
 ## The calculators
