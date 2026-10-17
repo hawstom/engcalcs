@@ -75,11 +75,12 @@ async function main() {
 		};
 		const raw = await a.lang('lpn_scenario_preset_mult_tip');
 		const tpl = (m, lo, hi) => raw.replace('{mult}', m).replace('{lo}', lo).replace('{hi}', hi).trim();
-		const md = { tip: await tipOf(await a.lang('lpn_scenario_preset_max_day')) }, ph = { tip: await tipOf(await a.lang('lpn_scenario_preset_peak_hour')) }, fm = { tip: await tipOf(await a.lang('lpn_scenario_preset_fire_max_day')) };
+		const md = { tip: await tipOf(await a.lang('lpn_scenario_preset_max_day')) }, ph = { tip: await tipOf(await a.lang('lpn_scenario_preset_peak_hour')) };
 		ok('Max Day tip: 2.0 times, between 1.2 and 3.0', md.tip === tpl('2.0', '1.2', '3.0'), md.tip);
 		ok('Peak hour tip: 3.0 times, between 3.0 and 6.0', ph.tip === tpl('3.0', '3.0', '6.0'), ph.tip);
 		ok('no placeholder left unfilled', !/[{}]/.test((md || {}).tip + (ph || {}).tip));
-		ok('Fire plus max day keeps its own tip', fm.tip === (await a.lang('lpn_scenario_preset_fire_max_day_tip')).trim(), fm.tip);
+		// Tom, 2026-10-16: 7. Fire plus max day is no longer made; Fire flow analysis checks every hydrant.
+		ok('no Fire plus max day row in a new project', !(await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_menu_list button')).some((b) => /Fire plus max day/.test(b.textContent)))));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 	} finally {

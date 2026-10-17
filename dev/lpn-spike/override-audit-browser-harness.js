@@ -15,14 +15,14 @@
 //       files the default pattern under Demand, as Bentley does.) The 24 counted what the scenario
 //       inherits: EPS Pump off's Active topology (2) and Initial settings (2 + EPS's 2), the run time
 //       from EPS's calculation set (1);
-//   O2  the Scenario manager's Scenarios tree has "Manage overrides", greyed on Base, saying why;
+//   O2  the Scenario manager's Scenarios tree has "Override manager…", greyed on Base, saying why;
 //   O3  pressed on 1-hr it lists the 17, grouped by category and alternative, in category order:
 //       Physical (13), Demand (2), Text (1), Calculation (1), and the groups add up to the count;
 //   O4  each row: the asset, the field as the Tables pane heads it, this scenario's value and the
 //       value it replaces (a diameter's Base value; the multiplier's project value; a dash for no
 //       default pattern), an override equal to it marked "(same)"; nothing reads "1 overrides";
 //   O5  clicking an asset's ID closes the list and goes to it on the map, selected.
-//   O7  (Task 800 wording) the Scenarios menu has Manage overrides in Basic mode, opening the same dialog; greyed at 0 overrides.
+//   O7  (Task 800 wording) the Scenarios menu has Override manager… in Basic mode, opening the same dialog; greyed at 0 overrides.
 //   O6  a yes/no reads in words both ways (a pump switched off: No, replacing Yes); and deleting an
 //       alternative says the number of overrides the list showed for it (13, 2, 1).
 //
@@ -109,7 +109,7 @@ async function main() {
 		const LO = await L('lpn_sm_list_overrides');
 		await clickRow(base);
 		let lb = await listBtn();
-		ok('O2 the Scenarios tree has a "' + LO + '" button', !!lb && lb.text === LO && LO === 'Manage overrides', JSON.stringify(lb));
+		ok('O2 the Scenarios tree has a "' + LO + '" button', !!lb && lb.text === LO && LO === 'Override manager…', JSON.stringify(lb));
 		ok('O2 ...greyed on Base, saying why', lb.off === true && lb.title === await L('lpn_sm_list_overrides_none'), JSON.stringify(lb));
 		await clickRow(ONE_HR);
 		lb = await listBtn();

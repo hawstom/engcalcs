@@ -366,8 +366,6 @@ the block.
   what remains.
 - 75|799| **Try Tables and Graphs as dockable boxes too, on an option branch.**
   Tom, 2026-10-15: *"Can we try a UI option branch for everything in the bottom pane to be available also as dockable boxes: (a) Tables and (b) Graphs?"* Seam with the bottom-pane tab strip.
-- 75|803| **See every unused alternative at a glance.** **BUILT 2026-10-15 on `feat/bentley-interop`.**
-  Tom, 2026-10-15: *"Maybe an 'Unused alternatives' button ... unless the selector (instead of a button) includes 'All unused' (and 'All'?), where all the headings are listed with a scrollbar."* R-390.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted

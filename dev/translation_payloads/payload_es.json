@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "es",
-        "expected_key_count": 2805,
-        "delta_key_count": 192,
-        "english_changed_key_count": 6,
+        "expected_key_count": 2879,
+        "delta_key_count": 269,
+        "english_changed_key_count": 7,
         "exempt_key_count": 49,
         "exempt_keys": [
             "calc_units_us",
@@ -77,7 +77,7 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: caudal\n- little outlet, dripper, or nozzle that lets water out slowly\n    English: emitter\n    Your language: emisor\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: tramo\n- calculator, tool, or program that finds and tells mathematical answers\n    English: calculator\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: Demanda\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Presión\n- elevation, height, or level of a point\n    English: elevation (z)\n    Your language: Elevación\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: nudo\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: nodo\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: línea\n- water network project, file, or model\n    English: project (saved network)\n    Your language: proyecto\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: escenario\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: predeterminado\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: Depósito\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: Válvula\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: Valores exclusivos\n- time-step by time-step multipliers or factors for water use\n    English: demand pattern\n    Your language: (no preferred translation yet: use your language's standard term)\n- leave a value off the map when there is no room or space\n    English: drop (a label)\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the water in the tank is, its water level or depth\n    English: tank level\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: Cliente\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- does not apply here, no value, or not relevant\n    English: N\/A\n    Your language: N\/A\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: caudal\n- little outlet, dripper, or nozzle that lets water out slowly\n    English: emitter\n    Your language: emisor\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: tramo\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: pérdida localizada\n- calculator, tool, or program that finds and tells mathematical answers\n    English: calculator\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: Demanda\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Presión\n- elevation, height, or level of a point\n    English: elevation (z)\n    Your language: Elevación\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: nudo\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: embalse\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: nodo\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: línea\n- water network project, file, or model\n    English: project (saved network)\n    Your language: proyecto\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: escenario\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: predeterminado\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: Depósito\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: Válvula\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: Valores exclusivos\n- time-step by time-step multipliers or factors for water use\n    English: demand pattern\n    Your language: (no preferred translation yet: use your language's standard term)\n- leave a value off the map when there is no room or space\n    English: drop (a label)\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the water in the tank is, its water level or depth\n    English: tank level\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: Cliente\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: Figura\n- does not apply here, no value, or not relevant\n    English: N\/A\n    Your language: N\/A\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
         "mtc_n_pi": "n from design rock size (P&I, Phillips & Ingersoll method)",
         "mtc_not_applicable": "N\/A",
@@ -134,7 +134,7 @@
         "lpn_scenario_delete_ask": "Delete the scenario {name}? The drawing itself is not changed.",
         "lpn_scenario_delete_goes": "Its overrides ({n}) are deleted with it.",
         "lpn_scenario_delete_stays": "These alternatives it uses stay in the project: {list}.",
-        "lpn_scenario_delete_has_children": "The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or move them to another parent.",
+        "lpn_scenario_delete_has_children": "The scenario {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.",
         "lpn_scenario_basic_tip": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show.",
         "lpn_scenario_basic_misfit": "This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.",
         "lpn_scenario_basic_misfit_base": "The Base scenario uses an alternative other than Base.",
@@ -167,10 +167,17 @@
         "lpn_sm_merge_ask": "Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of overriding them. You can undo this.",
         "lpn_sm_merge_skipped": "{between} also overrides these values. It is skipped and not changed, so {name} will read them from {between}, not from {target}:",
         "lpn_sm_merge_line": "{asset}: {property}",
-        "lpn_sm_list_overrides": "Manage overrides",
+        "lpn_sm_copy_up": "Copy upward",
+        "lpn_sm_copy_up_tip": "Copy the overrides of the selected alternative into an alternative above it in the tree. The selected alternative keeps its overrides.",
+        "lpn_sm_copy_up_root": "A Base alternative has nothing above it to copy into.",
+        "lpn_sm_copy_none": "The alternative {name} has no overrides to copy.",
+        "lpn_sm_copy_pick": "Copy the overrides of {name} into which alternative? Its parent is listed first.",
+        "lpn_sm_copy_ask": "Copy the overrides ({n}) of {name} up into {target}? It keeps them as its own overrides. You can undo this.",
+        "lpn_sm_copy_skipped": "{between} also overrides these values. It is skipped and not changed, so it keeps its own values for them:",
+        "lpn_sm_list_overrides": "Override manager…",
         "lpn_sm_list_overrides_tip": "List the scenario's overrides by category, each with the inherited value it overrides, and clear any of them.",
         "lpn_sm_list_overrides_none": "This scenario has no overrides.",
-        "lpn_ovl_title": "Manage overrides: {name}",
+        "lpn_ovl_title": "Override manager: {name}",
         "lpn_ovl_note": "These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Clear an override to restore the inherited value; Undo reverses it. Select an ID to go to the asset on the map.",
         "lpn_ovl_clear_selected": "Clear selected overrides",
         "lpn_ovl_clear_all": "Clear all overrides",
@@ -187,6 +194,7 @@
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the right pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the right pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
         "lpn_sm_delete_alt_ask": "Delete the alternative {name}?",
         "lpn_sm_in_use": "{item}\\ncannot be deleted while it is used by\\n{list}",
+        "lpn_sm_alt_delete_has_children": "The alternative {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.",
         "lpn_sm_item_scenario": "Scenario {name}",
         "lpn_sm_item_alternative": "Alternative {name}",
         "lpn_sm_name_taken": "The name {name} is already used in this tree.",
@@ -270,7 +278,76 @@
         "lpn_library_pattern_axis_step": "Step",
         "lpn_library_pattern_default_deleted_also": "Scenarios that also used it as their default: {list}.",
         "lpn_library_pattern_default_deleted_in": "Pattern {id} was the default demand pattern in these scenarios: {list}.",
-        "lpn_ds_found_below": "⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}."
+        "lpn_ds_found_below": "⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.",
+        "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system.",
+        "lpn_file_import_gjnet": "Import GeoJSON network…",
+        "lpn_file_import_gjnet_tip": "Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.",
+        "lpn_gjnet_refuse_crs": "{file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.",
+        "lpn_gjnet_refuse_empty": "{file} contains no points or lines.",
+        "lpn_gjnet_target_node_type": "Node type",
+        "lpn_gjnet_target_custom": "Custom property",
+        "lpn_gjnet_target_skip": "Do not import",
+        "lpn_gjnet_points_heading": "Point fields (junctions, reservoirs, and tanks)",
+        "lpn_gjnet_lines_heading": "Line fields (pipes)",
+        "lpn_gjnet_no_fields": "These features have no attribute fields.",
+        "lpn_gjnet_col_field": "Field",
+        "lpn_gjnet_col_example": "Example",
+        "lpn_gjnet_col_fills": "Fills",
+        "lpn_gjnet_col_unit": "Unit",
+        "lpn_gjnet_beta": "Beta: feedback requested",
+        "lpn_gjnet_beta_tip": "This import has been tried on few files from GIS programs. To report a problem or suggest a change, press {button} on the page and describe the file.",
+        "lpn_gjnet_intro": "{points} points and {lines} lines were found. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. Choose the property each field fills and the unit of each number.",
+        "lpn_gjnet_other": "{n} features are neither points nor lines and will not be imported; the report lists them.",
+        "lpn_gjnet_tolerance": "Join tolerance (m)",
+        "lpn_gjnet_tolerance_tip": "A line end within this distance of a point, or of another line end, is joined to it. A line end farther than this from every point gets a new junction.",
+        "lpn_gjnet_working": "Importing {file}…",
+        "lpn_gjnet_title": "Import GeoJSON network: {file}",
+        "lpn_gjnet_report_lead": "Each change made during import, and each feature not imported, is listed below with the reason:",
+        "lpn_gjnet_and_more": "and {n} more",
+        "lpn_gjnet_note_crs": "The file states the coordinate system {crs}, which is WGS 84 latitude and longitude, the system RFC 7946 requires. Positions were read as stated.",
+        "lpn_gjnet_note_crs_nad83": "The file states NAD83 (EPSG:4269). Its positions were read as WGS 84, which places them within about 1 to 2 m of where NAD83 puts them.",
+        "lpn_gjnet_note_skip_geometry": "Not imported: the feature is not a point or a line.",
+        "lpn_gjnet_note_skip_kind": "Not imported: the feature states no node_type or link_type.",
+        "lpn_gjnet_note_skip_position": "Not imported: a position is not a valid latitude and longitude.",
+        "lpn_gjnet_note_skip_id": "Not imported: the name is not a valid ID, or another element of the same kind has it.",
+        "lpn_gjnet_note_skip_no_node": "Not imported: the start or end node named is not in the file.",
+        "lpn_gjnet_note_skip_loop": "Not imported: both ends of the line join the same node.",
+        "lpn_gjnet_note_id_new": "These features state no valid ID and were assigned the ID shown in parentheses.",
+        "lpn_gjnet_note_id_dup": "These IDs are stated by more than one feature of the same kind. Each later feature was assigned the ID shown in parentheses.",
+        "lpn_gjnet_note_unmapped_id_point": "No field was chosen for the point ID, so every node imported from a point was assigned an ID.",
+        "lpn_gjnet_note_unmapped_id_line": "No field was chosen for the line ID, so every pipe was assigned an ID.",
+        "lpn_gjnet_note_skip_short": "Not imported: a line needs at least two positions.",
+        "lpn_gjnet_note_elev_taken": "These nodes state no elevation. Each was given the elevation of the node shown in parentheses: for a junction added at a line end, the node at the other end of its pipe, otherwise the nearest node that states one.",
+        "lpn_gjnet_note_default_elev_added": "These junctions were added at line ends and have the default elevation, {value}, because no node in the file states an elevation.",
+        "lpn_gjnet_note_demand_kept": "A reservoir or tank has no demand, so the demand stated on these nodes was kept as the custom property {key}.",
+        "lpn_gjnet_note_parts": "These multipart lines have parts that are not connected and were imported as one pipe for each part.",
+        "lpn_gjnet_note_parts_points": "These multipoint features were imported as one node for each point.",
+        "lpn_gjnet_note_junction_added": "These junctions were added where a line end is not within {tol} of a point. Each has the default base demand.",
+        "lpn_gjnet_note_end_moved": "These pipes have an end within {tol} of a point or another line end, but not on it. The end was joined to it; the largest distance is {dist}.",
+        "lpn_gjnet_note_end_on_pipe": "These line ends lie on the pipe shown in parentheses, but not at its end, and are not connected to it.",
+        "lpn_gjnet_note_z": "These points state a third coordinate, which was not imported.",
+        "lpn_gjnet_note_default_elev": "These nodes state no elevation and have the default elevation, {value}.",
+        "lpn_gjnet_note_unmapped_elev": "No field was chosen for the elevation, so every node has the default elevation, {value}, and automatic lengths include no elevation difference.",
+        "lpn_gjnet_note_default_demand": "These junctions state no base demand and have the default base demand, {value}.",
+        "lpn_gjnet_note_unmapped_demand": "No field was chosen for the base demand, so every junction has the default base demand, {value}.",
+        "lpn_gjnet_note_default_diameter": "These pipes state no diameter and have the default diameter, {value}.",
+        "lpn_gjnet_note_unmapped_diameter": "No field was chosen for the diameter, so every pipe has the default diameter, {value}.",
+        "lpn_gjnet_note_default_roughness": "These pipes state no roughness and have the default roughness, {value}.",
+        "lpn_gjnet_note_unmapped_roughness": "No field was chosen for the roughness, so every pipe has the default roughness, {value}.",
+        "lpn_gjnet_note_default_k": "These pipes state no minor loss coefficient, so each has 0, as in an EPANET file that states none.",
+        "lpn_gjnet_note_unmapped_k": "No field was chosen for the minor loss coefficient, so every pipe has 0, as in an EPANET file that states none.",
+        "lpn_gjnet_note_default_tank": "These tanks have the default water depths and tank diameter.",
+        "lpn_gjnet_note_length_auto": "These pipes state no length. Each length is computed from the line (Auto).",
+        "lpn_gjnet_note_unmapped_length": "No field was chosen for the length, so every pipe length is computed from the line (Auto).",
+        "lpn_gjnet_note_value_unread": "These values are not numbers or are not recognized, and were not used.",
+        "lpn_gjnet_note_field_skipped": "These fields were not imported, as chosen.",
+        "lpn_gjnet_note_field_custom": "These fields were imported as custom properties.",
+        "lpn_gjnet_note_results": "The results in the file were not imported. Calculate computes them again.",
+        "lpn_gjnet_note_demand_rows": "These junctions had more than one demand row. A GeoJSON file holds only the first, which was imported.",
+        "lpn_gjnet_note_pipe_type": "These pipes state the pipe type shown in parentheses, whose definition a GeoJSON file does not hold. The pipe type was not imported; the diameter and roughness stated in the file were.",
+        "lpn_gjnet_note_pattern_conflict": "These patterns are stated with different multipliers on different features. The first was used.",
+        "lpn_gjnet_note_end_off_node": "The line of each of these links does not start or end at its node. The node position was used.",
+        "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, text labels, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
     },
     "keys": {
         "mtc_n_pi": "n from design rock size (P&I, Phillips & Ingersoll method)",
@@ -328,7 +405,7 @@
         "lpn_scenario_delete_ask": "Delete the scenario {name}? The drawing itself is not changed.",
         "lpn_scenario_delete_goes": "Its overrides ({n}) are deleted with it.",
         "lpn_scenario_delete_stays": "These alternatives it uses stay in the project: {list}.",
-        "lpn_scenario_delete_has_children": "The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or move them to another parent.",
+        "lpn_scenario_delete_has_children": "The scenario {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.",
         "lpn_scenario_basic_tip": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show.",
         "lpn_scenario_basic_misfit": "This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.",
         "lpn_scenario_basic_misfit_base": "The Base scenario uses an alternative other than Base.",
@@ -361,10 +438,17 @@
         "lpn_sm_merge_ask": "Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of overriding them. You can undo this.",
         "lpn_sm_merge_skipped": "{between} also overrides these values. It is skipped and not changed, so {name} will read them from {between}, not from {target}:",
         "lpn_sm_merge_line": "{asset}: {property}",
-        "lpn_sm_list_overrides": "Manage overrides",
+        "lpn_sm_copy_up": "Copy upward",
+        "lpn_sm_copy_up_tip": "Copy the overrides of the selected alternative into an alternative above it in the tree. The selected alternative keeps its overrides.",
+        "lpn_sm_copy_up_root": "A Base alternative has nothing above it to copy into.",
+        "lpn_sm_copy_none": "The alternative {name} has no overrides to copy.",
+        "lpn_sm_copy_pick": "Copy the overrides of {name} into which alternative? Its parent is listed first.",
+        "lpn_sm_copy_ask": "Copy the overrides ({n}) of {name} up into {target}? It keeps them as its own overrides. You can undo this.",
+        "lpn_sm_copy_skipped": "{between} also overrides these values. It is skipped and not changed, so it keeps its own values for them:",
+        "lpn_sm_list_overrides": "Override manager…",
         "lpn_sm_list_overrides_tip": "List the scenario's overrides by category, each with the inherited value it overrides, and clear any of them.",
         "lpn_sm_list_overrides_none": "This scenario has no overrides.",
-        "lpn_ovl_title": "Manage overrides: {name}",
+        "lpn_ovl_title": "Override manager: {name}",
         "lpn_ovl_note": "These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Clear an override to restore the inherited value; Undo reverses it. Select an ID to go to the asset on the map.",
         "lpn_ovl_clear_selected": "Clear selected overrides",
         "lpn_ovl_clear_all": "Clear all overrides",
@@ -381,6 +465,7 @@
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the right pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the right pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
         "lpn_sm_delete_alt_ask": "Delete the alternative {name}?",
         "lpn_sm_in_use": "{item}\\ncannot be deleted while it is used by\\n{list}",
+        "lpn_sm_alt_delete_has_children": "The alternative {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.",
         "lpn_sm_item_scenario": "Scenario {name}",
         "lpn_sm_item_alternative": "Alternative {name}",
         "lpn_sm_name_taken": "The name {name} is already used in this tree.",
@@ -464,7 +549,76 @@
         "lpn_library_pattern_axis_step": "Step",
         "lpn_library_pattern_default_deleted_also": "Scenarios that also used it as their default: {list}.",
         "lpn_library_pattern_default_deleted_in": "Pattern {id} was the default demand pattern in these scenarios: {list}.",
-        "lpn_ds_found_below": "⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}."
+        "lpn_ds_found_below": "⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.",
+        "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system.",
+        "lpn_file_import_gjnet": "Import GeoJSON network…",
+        "lpn_file_import_gjnet_tip": "Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.",
+        "lpn_gjnet_refuse_crs": "{file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.",
+        "lpn_gjnet_refuse_empty": "{file} contains no points or lines.",
+        "lpn_gjnet_target_node_type": "Node type",
+        "lpn_gjnet_target_custom": "Custom property",
+        "lpn_gjnet_target_skip": "Do not import",
+        "lpn_gjnet_points_heading": "Point fields (junctions, reservoirs, and tanks)",
+        "lpn_gjnet_lines_heading": "Line fields (pipes)",
+        "lpn_gjnet_no_fields": "These features have no attribute fields.",
+        "lpn_gjnet_col_field": "Field",
+        "lpn_gjnet_col_example": "Example",
+        "lpn_gjnet_col_fills": "Fills",
+        "lpn_gjnet_col_unit": "Unit",
+        "lpn_gjnet_beta": "Beta: feedback requested",
+        "lpn_gjnet_beta_tip": "This import has been tried on few files from GIS programs. To report a problem or suggest a change, press {button} on the page and describe the file.",
+        "lpn_gjnet_intro": "{points} points and {lines} lines were found. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. Choose the property each field fills and the unit of each number.",
+        "lpn_gjnet_other": "{n} features are neither points nor lines and will not be imported; the report lists them.",
+        "lpn_gjnet_tolerance": "Join tolerance (m)",
+        "lpn_gjnet_tolerance_tip": "A line end within this distance of a point, or of another line end, is joined to it. A line end farther than this from every point gets a new junction.",
+        "lpn_gjnet_working": "Importing {file}…",
+        "lpn_gjnet_title": "Import GeoJSON network: {file}",
+        "lpn_gjnet_report_lead": "Each change made during import, and each feature not imported, is listed below with the reason:",
+        "lpn_gjnet_and_more": "and {n} more",
+        "lpn_gjnet_note_crs": "The file states the coordinate system {crs}, which is WGS 84 latitude and longitude, the system RFC 7946 requires. Positions were read as stated.",
+        "lpn_gjnet_note_crs_nad83": "The file states NAD83 (EPSG:4269). Its positions were read as WGS 84, which places them within about 1 to 2 m of where NAD83 puts them.",
+        "lpn_gjnet_note_skip_geometry": "Not imported: the feature is not a point or a line.",
+        "lpn_gjnet_note_skip_kind": "Not imported: the feature states no node_type or link_type.",
+        "lpn_gjnet_note_skip_position": "Not imported: a position is not a valid latitude and longitude.",
+        "lpn_gjnet_note_skip_id": "Not imported: the name is not a valid ID, or another element of the same kind has it.",
+        "lpn_gjnet_note_skip_no_node": "Not imported: the start or end node named is not in the file.",
+        "lpn_gjnet_note_skip_loop": "Not imported: both ends of the line join the same node.",
+        "lpn_gjnet_note_id_new": "These features state no valid ID and were assigned the ID shown in parentheses.",
+        "lpn_gjnet_note_id_dup": "These IDs are stated by more than one feature of the same kind. Each later feature was assigned the ID shown in parentheses.",
+        "lpn_gjnet_note_unmapped_id_point": "No field was chosen for the point ID, so every node imported from a point was assigned an ID.",
+        "lpn_gjnet_note_unmapped_id_line": "No field was chosen for the line ID, so every pipe was assigned an ID.",
+        "lpn_gjnet_note_skip_short": "Not imported: a line needs at least two positions.",
+        "lpn_gjnet_note_elev_taken": "These nodes state no elevation. Each was given the elevation of the node shown in parentheses: for a junction added at a line end, the node at the other end of its pipe, otherwise the nearest node that states one.",
+        "lpn_gjnet_note_default_elev_added": "These junctions were added at line ends and have the default elevation, {value}, because no node in the file states an elevation.",
+        "lpn_gjnet_note_demand_kept": "A reservoir or tank has no demand, so the demand stated on these nodes was kept as the custom property {key}.",
+        "lpn_gjnet_note_parts": "These multipart lines have parts that are not connected and were imported as one pipe for each part.",
+        "lpn_gjnet_note_parts_points": "These multipoint features were imported as one node for each point.",
+        "lpn_gjnet_note_junction_added": "These junctions were added where a line end is not within {tol} of a point. Each has the default base demand.",
+        "lpn_gjnet_note_end_moved": "These pipes have an end within {tol} of a point or another line end, but not on it. The end was joined to it; the largest distance is {dist}.",
+        "lpn_gjnet_note_end_on_pipe": "These line ends lie on the pipe shown in parentheses, but not at its end, and are not connected to it.",
+        "lpn_gjnet_note_z": "These points state a third coordinate, which was not imported.",
+        "lpn_gjnet_note_default_elev": "These nodes state no elevation and have the default elevation, {value}.",
+        "lpn_gjnet_note_unmapped_elev": "No field was chosen for the elevation, so every node has the default elevation, {value}, and automatic lengths include no elevation difference.",
+        "lpn_gjnet_note_default_demand": "These junctions state no base demand and have the default base demand, {value}.",
+        "lpn_gjnet_note_unmapped_demand": "No field was chosen for the base demand, so every junction has the default base demand, {value}.",
+        "lpn_gjnet_note_default_diameter": "These pipes state no diameter and have the default diameter, {value}.",
+        "lpn_gjnet_note_unmapped_diameter": "No field was chosen for the diameter, so every pipe has the default diameter, {value}.",
+        "lpn_gjnet_note_default_roughness": "These pipes state no roughness and have the default roughness, {value}.",
+        "lpn_gjnet_note_unmapped_roughness": "No field was chosen for the roughness, so every pipe has the default roughness, {value}.",
+        "lpn_gjnet_note_default_k": "These pipes state no minor loss coefficient, so each has 0, as in an EPANET file that states none.",
+        "lpn_gjnet_note_unmapped_k": "No field was chosen for the minor loss coefficient, so every pipe has 0, as in an EPANET file that states none.",
+        "lpn_gjnet_note_default_tank": "These tanks have the default water depths and tank diameter.",
+        "lpn_gjnet_note_length_auto": "These pipes state no length. Each length is computed from the line (Auto).",
+        "lpn_gjnet_note_unmapped_length": "No field was chosen for the length, so every pipe length is computed from the line (Auto).",
+        "lpn_gjnet_note_value_unread": "These values are not numbers or are not recognized, and were not used.",
+        "lpn_gjnet_note_field_skipped": "These fields were not imported, as chosen.",
+        "lpn_gjnet_note_field_custom": "These fields were imported as custom properties.",
+        "lpn_gjnet_note_results": "The results in the file were not imported. Calculate computes them again.",
+        "lpn_gjnet_note_demand_rows": "These junctions had more than one demand row. A GeoJSON file holds only the first, which was imported.",
+        "lpn_gjnet_note_pipe_type": "These pipes state the pipe type shown in parentheses, whose definition a GeoJSON file does not hold. The pipe type was not imported; the diameter and roughness stated in the file were.",
+        "lpn_gjnet_note_pattern_conflict": "These patterns are stated with different multipliers on different features. The first was used.",
+        "lpn_gjnet_note_end_off_node": "The line of each of these links does not start or end at its node. The node position was used.",
+        "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, text labels, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported."
     },
     "key_context": {
         "mtc_n_pi": {
@@ -1936,6 +2090,126 @@
                 }
             }
         },
+        "lpn_sm_copy_up": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Marcado: un escenario consiste solo en los valores fijados en él. Sin marcar: este menú ofrece además la tabla de vista previa de Alternativas, que muestra cómo se agrupan esos valores por categoría, y permite que un escenario tenga un tiempo total de simulación y un paso de tiempo hidráulico propios. Se agradecen los comentarios sobre esta función.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valores propios del escenario:",
+                    "english": "Scenario overrides:"
+                }
+            },
+            "tip": {
+                "key": "lpn_sm_copy_up_tip",
+                "english": "Copy the overrides of the selected alternative into an alternative above it in the tree. The selected alternative keeps its overrides."
+            }
+        },
+        "lpn_sm_copy_up_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Marcado: un escenario consiste solo en los valores fijados en él. Sin marcar: este menú ofrece además la tabla de vista previa de Alternativas, que muestra cómo se agrupan esos valores por categoría, y permite que un escenario tenga un tiempo total de simulación y un paso de tiempo hidráulico propios. Se agradecen los comentarios sobre esta función.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valores propios del escenario:",
+                    "english": "Scenario overrides:"
+                }
+            },
+            "label": {
+                "key": "lpn_sm_copy_up",
+                "english": "Copy upward"
+            }
+        },
+        "lpn_sm_copy_up_root": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Marcado: un escenario consiste solo en los valores fijados en él. Sin marcar: este menú ofrece además la tabla de vista previa de Alternativas, que muestra cómo se agrupan esos valores por categoría, y permite que un escenario tenga un tiempo total de simulación y un paso de tiempo hidráulico propios. Se agradecen los comentarios sobre esta función.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valores propios del escenario:",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_copy_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Marcado: un escenario consiste solo en los valores fijados en él. Sin marcar: este menú ofrece además la tabla de vista previa de Alternativas, que muestra cómo se agrupan esos valores por categoría, y permite que un escenario tenga un tiempo total de simulación y un paso de tiempo hidráulico propios. Se agradecen los comentarios sobre esta función.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valores propios del escenario:",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_copy_pick": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Marcado: un escenario consiste solo en los valores fijados en él. Sin marcar: este menú ofrece además la tabla de vista previa de Alternativas, que muestra cómo se agrupan esos valores por categoría, y permite que un escenario tenga un tiempo total de simulación y un paso de tiempo hidráulico propios. Se agradecen los comentarios sobre esta función.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valores propios del escenario:",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_copy_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Marcado: un escenario consiste solo en los valores fijados en él. Sin marcar: este menú ofrece además la tabla de vista previa de Alternativas, que muestra cómo se agrupan esos valores por categoría, y permite que un escenario tenga un tiempo total de simulación y un paso de tiempo hidráulico propios. Se agradecen los comentarios sobre esta función.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valores propios del escenario:",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_copy_skipped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Marcado: un escenario consiste solo en los valores fijados en él. Sin marcar: este menú ofrece además la tabla de vista previa de Alternativas, que muestra cómo se agrupan esos valores por categoría, y permite que un escenario tenga un tiempo total de simulación y un paso de tiempo hidráulico propios. Se agradecen los comentarios sobre esta función.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valores propios del escenario:",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
         "lpn_sm_list_overrides": {
             "reason": "missing",
             "current_value": null,
@@ -1973,7 +2247,7 @@
             },
             "label": {
                 "key": "lpn_sm_list_overrides",
-                "english": "Manage overrides"
+                "english": "Override manager…"
             }
         },
         "lpn_sm_list_overrides_none": {
@@ -2265,6 +2539,22 @@
             }
         },
         "lpn_sm_in_use": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_basic_tip",
+                    "value": "Marcado: un escenario consiste solo en los valores fijados en él. Sin marcar: este menú ofrece además la tabla de vista previa de Alternativas, que muestra cómo se agrupan esos valores por categoría, y permite que un escenario tenga un tiempo total de simulación y un paso de tiempo hidráulico propios. Se agradecen los comentarios sobre esta función.",
+                    "english": "Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: both are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenarios and alternatives relationships that Basic mode cannot show."
+                },
+                "next_translated": {
+                    "key": "lpn_time_scn_overrides",
+                    "value": "Valores propios del escenario:",
+                    "english": "Scenario overrides:"
+                }
+            }
+        },
+        "lpn_sm_alt_delete_has_children": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -3654,6 +3944,1139 @@
                     "key": "lpn_ds_search_stopped",
                     "value": "La búsqueda se detuvo antes de encontrar un resultado.",
                     "english": "The search was stopped before it found an answer."
+                }
+            }
+        },
+        "lpn_file_import_shapes_tip": {
+            "reason": "english_changed",
+            "current_value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes",
+                    "value": "Importar figuras GeoJSON…",
+                    "english": "Import GeoJSON shapes…"
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_shapes",
+                "english": "Import GeoJSON shapes…",
+                "value": "Importar figuras GeoJSON…"
+            }
+        },
+        "lpn_file_import_gjnet": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_gjnet_tip",
+                "english": "Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units."
+            }
+        },
+        "lpn_file_import_gjnet_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_gjnet",
+                "english": "Import GeoJSON network…"
+            }
+        },
+        "lpn_gjnet_refuse_crs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_refuse_empty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_target_node_type": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_target_custom": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_target_skip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_points_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_lines_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_no_fields": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_col_field": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_col_example": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_col_fills": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_col_unit": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_beta": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            },
+            "tip": {
+                "key": "lpn_gjnet_beta_tip",
+                "english": "This import has been tried on few files from GIS programs. To report a problem or suggest a change, press {button} on the page and describe the file."
+            }
+        },
+        "lpn_gjnet_beta_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            },
+            "label": {
+                "key": "lpn_gjnet_beta",
+                "english": "Beta: feedback requested"
+            }
+        },
+        "lpn_gjnet_intro": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_other": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_tolerance": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            },
+            "tip": {
+                "key": "lpn_gjnet_tolerance_tip",
+                "english": "A line end within this distance of a point, or of another line end, is joined to it. A line end farther than this from every point gets a new junction."
+            }
+        },
+        "lpn_gjnet_tolerance_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            },
+            "label": {
+                "key": "lpn_gjnet_tolerance",
+                "english": "Join tolerance (m)"
+            }
+        },
+        "lpn_gjnet_working": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_report_lead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_and_more": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_crs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_crs_nad83": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_skip_geometry": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_skip_kind": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_skip_position": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_skip_id": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_skip_no_node": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_skip_loop": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_id_new": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_id_dup": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_unmapped_id_point": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_unmapped_id_line": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_skip_short": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_elev_taken": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_default_elev_added": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_demand_kept": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_parts": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_parts_points": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_junction_added": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_end_moved": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_end_on_pipe": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_z": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_default_elev": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_unmapped_elev": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_default_demand": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_unmapped_demand": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_default_diameter": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_unmapped_diameter": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_default_roughness": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_unmapped_roughness": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_default_k": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_unmapped_k": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_default_tank": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_length_auto": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_unmapped_length": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_value_unread": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_field_skipped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_field_custom": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_results": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_demand_rows": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_pipe_type": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_pattern_conflict": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_end_off_node": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_gjnet_note_not_held": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Leer los puntos, las líneas y los polígonos de un archivo GeoJSON en este proyecto como Figuras. Los elementos de red del archivo no se importan; importe la red desde un archivo de EPANET. El proyecto debe estar georreferenciado o indicar un sistema de coordenadas.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} Figuras importadas de {file}.",
+                    "english": "{n} Shapes imported from {file}."
                 }
             }
         }

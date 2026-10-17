@@ -3423,9 +3423,10 @@ var EngCalcs = EngCalcs || {};
 	// typed. They seed the document's multiplier the way createScenario() does: a test is read at
 	// whatever demand the system has that day.
 	//
-	// **FIRE PLUS MAX DAY IS THE MAX DAY MULTIPLIER AND NOTHING ELSE**: Fire flow analysis already
-	// draws each junction's fire flow on top of the demand of the scenario it is run in, so this is
-	// the scenario to run it in, which its tip says.
+	// **NO FIRE PLUS MAX DAY** (Tom, 2026-10-16: *"the 'right' thing to do is check every fire
+	// hydrant since we offer that premium feature"*): a demand multiplier for fire flow invites the
+	// worst-hydrant guess, and Fire flow analysis tests every junction on top of the demand of the
+	// scenario it is run in. A file that already holds the old `fire_max_day` scenario keeps it.
 	//
 	// **ONLY A NEW PROJECT.** newProject() and the first visit call this; an opened file, an imported
 	// .inp and Delete network keep defaultScenarios(), so no file ever written changes shape. A new
@@ -3437,8 +3438,7 @@ var EngCalcs = EngCalcs || {};
 		{ id: 'flow_max', key: 'lpn_scenario_preset_flow_max', en: '3. Flow test: Max' },
 		{ id: 'average_day', key: 'lpn_scenario_preset_average_day', en: '4. Average Day', dm: 1 },
 		{ id: 'max_day', key: 'lpn_scenario_preset_max_day', en: '5. Max Day', dm: 2, range: [1.2, 3.0] },
-		{ id: 'peak_hour', key: 'lpn_scenario_preset_peak_hour', en: '6. Peak hour', dm: 3, range: [3.0, 6.0] },
-		{ id: 'fire_max_day', key: 'lpn_scenario_preset_fire_max_day', en: '7. Fire plus max day', dm: 2 }
+		{ id: 'peak_hour', key: 'lpn_scenario_preset_peak_hour', en: '6. Peak hour', dm: 3, range: [3.0, 6.0] }
 	];
 	function presetScenarios() {
 		var pc = EngCalcs.pageConfig || {}, docDm = (settings.hydraulics || {}).demandMultiplier;
@@ -6244,14 +6244,29 @@ var EngCalcs = EngCalcs || {};
 		storedUsers(kind, key).children.forEach(function (cid) { who.push({ name: smName(tree, cid), scn: false }); });
 		return who;
 	}
-	// "Alternative {name} cannot be deleted while it is used by" and one line per user, each led by
-	// Scenario or Alternative (Tom, 2026-10-13). The key holds a literal \n, as the guide keys do.
+	// "Alternative {name} cannot be deleted while it is used by" and one line per scenario using it,
+	// each led by Scenario (Tom, 2026-10-13). The key holds a literal \n, as the guide keys do.
+	// **CHILDREN ARE SAID AS CHILDREN** (Tom, 2026-10-16: *"I think we need a message to say 'cannot
+	// be deleted while it has children'. The only message I am seeing is 'cannot be deleted while it
+	// is used'."*): an item others inherit from says so in the Scenarios menu's own sentence for a
+	// scenario, and in its parallel for an alternative; one both used and inherited from says both.
 	function smInUseText(tree, key, name) {
-		var pc = EngCalcs.pageConfig || {};
+		var pc = EngCalcs.pageConfig || {}, isScn = smKind(tree) === 'scn', items = smInUseItems(tree, key), users, kids, parts = [];
 		var label = function (scn, n) { return (scn ? (pc.lpn_sm_item_scenario || 'Scenario {name}') : (pc.lpn_sm_item_alternative || 'Alternative {name}')).replace('{name}', n); };
-		return (pc.lpn_sm_in_use || '{item}\\ncannot be deleted while it is used by\\n{list}').replace(/\\n/g, '\n')
-			.replace('{item}', label(smKind(tree) === 'scn', name))
-			.replace('{list}', smInUseItems(tree, key).map(function (x) { return label(x.scn, x.name); }).join('\n'));
+		// In the Scenarios tree everything in the way is a child scenario.
+		users = isScn ? [] : items.filter(function (x) { return x.scn; });
+		kids = isScn ? items : items.filter(function (x) { return !x.scn; });
+		if (users.length) {
+			parts.push((pc.lpn_sm_in_use || '{item}\\ncannot be deleted while it is used by\\n{list}').replace(/\\n/g, '\n')
+				.split('{item}').join(label(false, name))
+				.split('{list}').join(users.map(function (x) { return label(true, x.name); }).join('\n')));
+		}
+		if (kids.length) {
+			parts.push((isScn ? (pc.lpn_scenario_delete_has_children || 'The scenario {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.')
+				: (pc.lpn_sm_alt_delete_has_children || 'The alternative {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.'))
+				.split('{name}').join(name).split('{list}').join(kids.map(function (x) { return x.name; }).join(', ')));
+		}
+		return parts.join('\n\n');
 	}
 	// **REFUSED WHILE IN USE, NAMING WHO** (H04). Base items never go.
 	function smDelete(tree, key) {
@@ -6770,8 +6785,13 @@ var EngCalcs = EngCalcs || {};
 	 * scenario's own alternative from an older file is stored first (smMaterialize()), and with it
 	 * any ancestor's, so an implicit target is looked up again through the scenario that owned it.
 	 * No snapshot: the caller's smTry() makes it one undo step.
+	 *
+	 * **COPY UPWARD IS THE SAME ACT WITH `keep`** (Tom, 2026-10-16: *"a Copy upward might be a nice
+	 * option for the user. They can copy upward and then delete as they desire."*): the target takes
+	 * the values exactly as a merge gives them, and the source keeps its own, so nothing it reads
+	 * changes. A skipped level is still named and still not changed.
 	 */
-	function smMergeUpward(tree, key, targetKey) {
+	function smMergeUpward(tree, key, targetKey, keep) {
 		var kind = smKind(tree), owner, src, tgt, plan, values = {}, settingsTree = {}, merged, b;
 		if (kind === 'scn') { return treeRefuse('scenarios'); }
 		if (!smMergeTargets(tree, key).some(function (u) { return u.key === targetKey; })) { return treeRefuse('target'); }
@@ -6815,6 +6835,11 @@ var EngCalcs = EngCalcs || {};
 			merged = combineHolders([{ values: values, settings: settingsTree }, tgt]);
 			if (kind === 'alt') { if (Object.keys(merged.values).length) { tgt.values = merged.values; } else { delete tgt.values; } }
 			if (Object.keys(merged.settings).length) { tgt.settings = merged.settings; } else { delete tgt.settings; }
+		}
+		if (keep) {
+			if (plan.view !== undefined) { smMergeBaseView(plan.view); }
+			touchTree('smCopyUpward');
+			return { source: key, target: targetKey, merged: plan.n };
 		}
 		plan.items.forEach(function (it) {
 			var ov = plainObject(src.values) ? src.values[it.k] : null;
@@ -7674,9 +7699,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	function scenarioMenuRows() {
 		var pc = EngCalcs.pageConfig || {}, rows = [], scn = activeScenario();
-		// **THE ORDER IS TOM'S** (2026-10-11): *"Scenario manager..., -, Basic mode, New, Rename,
-		// Delete, -, Apply Base, list of scenarios."* Apply Base values and the rule before it are
-		// retired (Task 801; Tom, 2026-10-15: *"this command is too confusing and dangerous"*); Merge
+		// **THE ORDER IS TOM'S** (2026-10-16): *"Scenarios manager..., Overrides manager..., Advanced
+		// mode, line, New, ..., line, list of scenarios."* The mode row sits among the managers, never
+		// beside Base, so a pointer that goes for Base cannot land on Basic mode. (Apply Base values and
+		// the rule before it are retired (Task 801; Tom, 2026-10-15: *"this command is too confusing and dangerous"*); Merge
 		// upward in the Scenario manager takes its place. The Scenarios table and the Scenario manager
 		// are where scenarios are managed, so the list of scenarios comes last.
 		// **THE SCENARIO MANAGER ROW IS ALWAYS HERE, GREYED WHILE BASIC MODE IS ON** (Tom, 2026-10-13:
@@ -7687,12 +7713,20 @@ var EngCalcs = EngCalcs || {};
 			tip: scenarioBasicMode ? (pc.lpn_sm_basic_on || 'Scenario manager is disabled when Basic mode is on.') : undefined,
 			fn: function () { openScenarioManager(); }
 		});
-		rows.push({ separator: true });
+		// **LIST OVERRIDES HERE TOO, SO BASIC MODE REACHES IT** (Tom, 2026-10-15: "Yes."). The same
+		// action as the Scenario manager's button, on the active scenario; greyed on Base and at 0.
+		rows.push({
+			label: pc.lpn_sm_list_overrides || 'Override manager…',
+			disabled: scn.isBase || !overrideCount(scn),
+			tip: (scn.isBase || !overrideCount(scn)) ? (pc.lpn_sm_list_overrides_none || 'This scenario has no overrides.') : pc.lpn_sm_list_overrides_tip,
+			fn: function () { smActListOverrides(scn.id); }
+		});
 		rows.push({
 			label: (scenarioBasicMode ? '✓ ' : '  ') + (pc.lpn_scenario_basic || 'Basic mode'),
 			tip: pc.lpn_scenario_basic_tip,
 			fn: function () { setScenarioBasicMode(!scenarioBasicMode); }
 		});
+		rows.push({ separator: true });
 		rows.push({
 			icon: 'insert', label: pc.lpn_scenario_new || 'New scenario…',
 			fn: function () {
@@ -7742,7 +7776,7 @@ var EngCalcs = EngCalcs || {};
 				// **A SCENARIO OTHERS INHERIT FROM IS NOT DELETED** (stage 5): say which, before asking.
 				var kids = scenarios.filter(function (x) { return x.parent === scn.id; });
 				if (kids.length) {
-					tellNotice((pc.lpn_scenario_delete_has_children || 'The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or move them to another parent.')
+					tellNotice((pc.lpn_scenario_delete_has_children || 'The scenario {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.')
 						.replace('{name}', scenarioDisplayName(scn))
 						.replace('{list}', kids.map(scenarioDisplayName).join(', ')));
 					return;
@@ -7754,14 +7788,7 @@ var EngCalcs = EngCalcs || {};
 				});
 			}
 		});
-		// **LIST OVERRIDES HERE TOO, SO BASIC MODE REACHES IT** (Tom, 2026-10-15: "Yes."). The same
-		// action as the Scenario manager's button, on the active scenario; greyed on Base and at 0.
-		rows.push({
-			label: pc.lpn_sm_list_overrides || 'Manage overrides',
-			disabled: scn.isBase || !overrideCount(scn),
-			tip: (scn.isBase || !overrideCount(scn)) ? (pc.lpn_sm_list_overrides_none || 'This scenario has no overrides.') : pc.lpn_sm_list_overrides_tip,
-			fn: function () { smActListOverrides(scn.id); }
-		});
+		rows.push({ separator: true });
 		scenariosForDisplay().forEach(function (s) {
 			rows.push({
 				// scenarioId is what makes a row a scenario, so a reader of the rows (the harness)
@@ -42530,15 +42557,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// the .inp's FILE line in the system code page, so a name outside it (Café-Ñandú-水) can leave
 	// EPANET looking for a file that is not there. Accents come off (NFD, combining marks dropped),
 	// anything else becomes a dash, and a name with no letter or digit left is "backdrop". The .inp
-	// and the .zip keep the project's own name; only what the FILE line names has to survive ANSI.
+	// and the .zip keep the project's own name (and the scenario's, inpExportBaseName()); only what
+	// the FILE line names has to survive ANSI.
 	function asciiPictureBase(name) {
 		var s = String(name || '');
 		if (s.normalize) { s = s.normalize('NFD').replace(/[̀-ͯ]/g, ''); }
 		s = s.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/-{2,}/g, '-').replace(/^[-.]+|[-.]+$/g, '');
 		return /[A-Za-z0-9]/.test(s) ? s : 'backdrop';
 	}
+	// **AN EXPORT FROM A SCENARIO NAMES THE SCENARIO** (Tom, 2026-10-16: *"Scenario export to EPANET:
+	// Do we append the project name with the name of the scenario?"*): `<project>-<scenario>`, each
+	// part made safe on its own, so a long project name cannot cut the scenario off. Base, the
+	// drawing itself, keeps the project name alone. The .zip and the picture follow.
+	function inpExportBaseName() {
+		var base = safeFileName(projectDisplayName(project)), scn = activeScenario();
+		if (!scn || scn.isBase) { return base; }
+		return base + '-' + safeFileName(scenarioDisplayName(scn));
+	}
 	function exportInpFile() {
-		var pcX = EngCalcs.pageConfig || {}, base = safeFileName(projectDisplayName(project)),
+		var pcX = EngCalcs.pageConfig || {}, base = inpExportBaseName(),
 			picBase = asciiPictureBase(base);
 		saveToStorage();   // export what is on screen, including edits not yet saved
 		// Every name goes in by split/join, never String.replace(): a project named `a$&b {file}`
@@ -44696,6 +44733,449 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function pickInpFile() {
 		var input = document.getElementById('lpn_inp_file');
 		if (input) { input.click(); }
+	}
+
+	// ---- File > Import > GeoJSON network (ROADMAP Task 728, import half) -------------------------
+	//
+	// Tom, 2026-10-06: *"yes to shapefile + GeoJSON import behind one mapping step."* The reading
+	// is js/lpn-geojson.js (lpnGeoJsonNetScan / lpnGeoJsonNetBuild, pure); this half asks the one
+	// question, builds the document and reports, and it lands EXACTLY as an `.inp` does
+	// (landInpText()): a new browser project named after the file, the units strip moved to the
+	// file's units first, arriving saved, with a report of every difference. A file this page wrote
+	// is read by its own schema and asks nothing. Rules: dev/geojson.md.
+	function pickGeoJsonNetFile() {
+		var pick = document.createElement('input');
+		pick.type = 'file';
+		pick.accept = '.geojson,.json,application/geo+json,application/json';
+		pick.addEventListener('change', function () {
+			var f = pick.files && pick.files[0];
+			if (!f) { return; }
+			var reader = new FileReader();
+			reader.onload = function (ev) { landGeoJsonNetText(String(ev.target.result), f.name); };
+			reader.onerror = function () {
+				setWarning((EngCalcs.pageConfig || {}).lpn_survey_read_error || 'That file could not be read from your disk.');
+			};
+			reader.readAsText(f);
+		});
+		pick.click();
+	}
+	// The text of a file, to a new project. `choice` (optional) is the mapping step's answer,
+	// given straight by a harness; `done(result)` is called once with what happened.
+	function landGeoJsonNetText(text, fileName, done, choice) {
+		var pc = EngCalcs.pageConfig || {}, scan;
+		logLpnFirstAction('import');
+		scan = EngCalcs.lpnGeoJsonNetScan ? EngCalcs.lpnGeoJsonNetScan(text) : { ok: false, error: 'unreadable', detail: '' };
+		if (!scan.ok) {
+			var msg = scan.error === 'crs'
+				? (pc.lpn_gjnet_refuse_crs || '{file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.')
+					.replace('{crs}', scan.detail)
+				: scan.error === 'empty'
+					? (pc.lpn_gjnet_refuse_empty || '{file} contains no points or lines.')
+					: (pc.lpn_geojson_import_unreadable || '{file} is not a GeoJSON file: {detail}').replace('{detail}', scan.detail || '');
+			setWarning(msg.replace('{file}', fileName));
+			if (done) { done({ ok: false, error: scan.error, message: msg.replace('{file}', fileName) }); }
+			return;
+		}
+		if (scan.ours || choice) { finishGeoJsonNet(scan, fileName, choice || null, done); return; }
+		openGeoJsonNetMapping(scan, fileName, function (ch) { finishGeoJsonNet(scan, fileName, ch, done); });
+	}
+	// The unit selectors a mapping target can name, and the names each offers.
+	function geoJsonNetUnitsOffered() {
+		var out = {};
+		['lpn_u_elevhead', 'lpn_u_flow', 'lpn_u_diameter', 'lpn_u_length', 'lpn_u_roughness'].forEach(function (n) {
+			var s = unitEl(n), i;
+			out[n] = [];
+			if (!s || !s.options) { return; }
+			for (i = 0; i < s.options.length; i++) { out[n].push(s.options[i].value); }
+		});
+		return out;
+	}
+	var LPN_GJNET_TOLERANCE = 0.5;   // metres; the dialog states it and the user may change it
+	/**
+	 * **THE ONE MAPPING STEP.** A table per kind of feature: each attribute field found, an example
+	 * value, the property it fills (guessed by name, every unguessed field kept as a custom
+	 * property) and, for a number, the unit it is in. Below it the snap tolerance, stated. `go`
+	 * receives { mapping, units, tolerance } when the user presses Import.
+	 */
+	function openGeoJsonNetMapping(scan, fileName, go) {
+		var pc = EngCalcs.pageConfig || {}, now = readUnitSelections(), offered = geoJsonNetUnitsOffered(),
+			guess = EngCalcs.lpnGeoJsonNetGuess(scan, now, offered), rows = [], tolInput,
+			dw = (settings.method || 'hw') === 'dw';
+		var TLABEL = {
+			id: pc.lpn_field_id || 'ID', nodeType: pc.lpn_gjnet_target_node_type || 'Node type',
+			elev: pc.lpn_field_elev || 'Elevation', demand: pc.lpn_field_base_demand || 'Base demand',
+			desc: pc.lpn_field_desc || 'Description', diameter: pc.lpn_field_diameter || 'Diameter',
+			roughness: pc.lpn_field_roughness || 'Roughness', length: pc.lpn_field_length || 'Length',
+			k: pc.lpn_field_km_short || 'Minor loss, k', status: pc.lpn_labels_init_status || 'Initial status',
+			custom: pc.lpn_gjnet_target_custom || 'Custom property', skip: pc.lpn_gjnet_target_skip || 'Do not import'
+		};
+		function familyOf(kind, target) {
+			var t = EngCalcs.lpnGeoJsonNetTargets[kind].filter(function (x) { return x.id === target; })[0];
+			if (!t || !t.family) { return null; }
+			// Hazen-Williams C has no unit; only a Darcy-Weisbach roughness is a length.
+			if (t.family === 'lpn_u_roughness' && !dw) { return null; }
+			return t.family;
+		}
+		function table(kind, body) {
+			var fields = scan.fields[kind] || [], tb, tr, th, head, i;
+			if (!scan.counts[kind]) { return; }
+			head = document.createElement('p');
+			head.style.margin = '10px 0 4px';
+			head.style.fontWeight = 'bold';
+			head.textContent = kind === 'point' ? (pc.lpn_gjnet_points_heading || 'Point fields (junctions, reservoirs, and tanks)')
+				: (pc.lpn_gjnet_lines_heading || 'Line fields (pipes)');
+			body.appendChild(head);
+			if (!fields.length) {
+				var none = document.createElement('p');
+				none.style.margin = '0';
+				none.textContent = pc.lpn_gjnet_no_fields || 'These features have no attribute fields.';
+				body.appendChild(none);
+				return;
+			}
+			tb = document.createElement('table');
+			tb.className = 'lpn-gjnet-table';
+			tb.setAttribute('data-kind', kind);
+			tr = document.createElement('tr');
+			[pc.lpn_gjnet_col_field || 'Field', pc.lpn_gjnet_col_example || 'Example',
+				pc.lpn_gjnet_col_fills || 'Fills', pc.lpn_gjnet_col_unit || 'Unit'].forEach(function (t) {
+				th = document.createElement('th'); th.textContent = t; th.style.textAlign = 'left'; th.style.paddingRight = '8px'; tr.appendChild(th);
+			});
+			tb.appendChild(tr);
+			for (i = 0; i < fields.length; i++) { tb.appendChild(row(kind, fields[i])); }
+			body.appendChild(tb);
+		}
+		function row(kind, f) {
+			var tr = document.createElement('tr'), td, sel, usel, r = { kind: kind, field: f.name };
+			// Each cell names its column (data-label), which the narrow layout shows in place of the
+			// heading row (css/engcalcs.css, .lpn-gjnet-table).
+			td = document.createElement('td'); td.className = 'lpn-gjnet-field'; td.textContent = f.name; td.style.paddingRight = '8px'; tr.appendChild(td);
+			td = document.createElement('td'); td.textContent = String(f.sample).slice(0, 24); td.style.paddingRight = '8px';
+			td.setAttribute('data-label', pc.lpn_gjnet_col_example || 'Example'); tr.appendChild(td);
+			td = document.createElement('td'); td.setAttribute('data-label', pc.lpn_gjnet_col_fills || 'Fills');
+			sel = document.createElement('select');
+			sel.setAttribute('data-field', f.name);
+			sel.setAttribute('aria-label', f.name);
+			EngCalcs.lpnGeoJsonNetTargets[kind].forEach(function (t) {
+				// A number target is offered for a field holding any number; a value in it that is not
+				// one is named in the report and the default used. Guessed only for a field of numbers.
+				if (t.family && !f.numbers) { return; }
+				var o = document.createElement('option'); o.value = t.id; o.textContent = TLABEL[t.id]; sel.appendChild(o);
+			});
+			sel.value = guess[kind][f.name] || 'custom';
+			td.appendChild(sel); tr.appendChild(td);
+			td = document.createElement('td');
+			usel = document.createElement('select');
+			usel.setAttribute('data-gjnet-unit', f.name);
+			td.setAttribute('data-label', pc.lpn_gjnet_col_unit || 'Unit');
+			usel.setAttribute('aria-label', (pc.lpn_gjnet_col_unit || 'Unit') + ': ' + f.name);
+			td.appendChild(usel); tr.appendChild(td);
+			r.sel = sel; r.usel = usel;
+			function syncUnit() {
+				var fam = familyOf(kind, sel.value), src = fam ? unitEl(fam) : null, i, o, want;
+				usel.innerHTML = '';
+				usel.style.display = src ? '' : 'none';
+				if (!src) { return; }
+				want = guess.units[kind + ':' + f.name] || now[fam];
+				for (i = 0; i < src.options.length; i++) {
+					o = document.createElement('option');
+					o.value = src.options[i].value; o.textContent = src.options[i].textContent;
+					usel.appendChild(o);
+				}
+				usel.value = want;
+				if (usel.selectedIndex < 0) { usel.selectedIndex = 0; }
+			}
+			sel.addEventListener('change', function () {
+				// One field per property: the field that held it before becomes a custom property.
+				if (sel.value !== 'custom' && sel.value !== 'skip') {
+					rows.forEach(function (o) { if (o !== r && o.kind === kind && o.sel.value === sel.value) { o.sel.value = 'custom'; o.sync(); } });
+				}
+				syncUnit();
+			});
+			r.sync = syncUnit;
+			syncUnit();
+			rows.push(r);
+			return tr;
+		}
+		openDialog(function (body) {
+			// Beta marker (Tom, 2026-10-16): a quiet label whose tip says where to report a problem.
+			var beta = document.createElement('p');
+			beta.className = 'lpn-gjnet-beta';
+			beta.textContent = pc.lpn_gjnet_beta || 'Beta: feedback requested';
+			beta.title = (pc.lpn_gjnet_beta_tip || 'This import has been tried on few files from GIS programs. To report a problem or suggest a change, press {button} on the page and describe the file.')
+				.replace('{button}', pc.lpn_wrong_btn || 'Something wrong here?');
+			body.appendChild(beta);
+			var p = document.createElement('p');
+			p.style.margin = '0 0 6px';
+			p.textContent = (pc.lpn_gjnet_intro || '{points} points and {lines} lines were found. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. Choose the property each field fills and the unit of each number.')
+				.replace('{points}', scan.counts.point).replace('{lines}', scan.counts.line);
+			body.appendChild(p);
+			if (scan.counts.other) {
+				var o = document.createElement('p');
+				o.style.margin = '0 0 6px';
+				o.textContent = (pc.lpn_gjnet_other || '{n} features are neither points nor lines and will not be imported; the report lists them.').replace('{n}', scan.counts.other);
+				body.appendChild(o);
+			}
+			var wrap = document.createElement('div');
+			wrap.style.maxHeight = '50vh';
+			wrap.style.overflow = 'auto';
+			table('point', wrap);
+			table('line', wrap);
+			body.appendChild(wrap);
+			if (scan.counts.line) {
+				var tl = document.createElement('p'), lab = document.createElement('label');
+				tl.style.margin = '10px 0 0';
+				lab.textContent = (pc.lpn_gjnet_tolerance || 'Join tolerance (m)') + ' ';
+				lab.title = pc.lpn_gjnet_tolerance_tip || 'A line end within this distance of a point, or of another line end, is joined to it. A line end farther than this from every point gets a new junction.';
+				tolInput = document.createElement('input');
+				tolInput.type = 'text';
+				tolInput.inputMode = 'decimal';
+				tolInput.id = 'lpn_gjnet_tolerance';
+				tolInput.size = 6;
+				tolInput.value = String(LPN_GJNET_TOLERANCE);
+				lab.appendChild(tolInput);
+				tl.appendChild(lab);
+				body.appendChild(tl);
+			}
+		}, [
+			{ label: pc.lpn_library_import_go || 'Import', isDefault: true, keepOpen: true, fn: function () {
+				var tol = LPN_GJNET_TOLERANCE, ch = { mapping: { point: {}, line: {} }, units: {}, tolerance: tol };
+				if (tolInput) {
+					var t = String(tolInput.value).trim();
+					if (!/^(\d+(\.\d*)?|\.\d+)$/.test(t)) { tolInput.style.outline = '2px solid var(--ec-bad-ink)'; tolInput.focus(); return; }
+					ch.tolerance = Number(t);
+				}
+				rows.forEach(function (r) {
+					var fam = familyOf(r.kind, r.sel.value);
+					ch.mapping[r.kind][r.field] = r.sel.value;
+					if (fam && r.usel.value) { ch.units[fam] = r.usel.value; }
+				});
+				closeDialog();
+				go(ch);
+				afterDialogAnswer();
+			} },
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
+		], { title: (pc.lpn_gjnet_title || 'Import GeoJSON network: {file}').replace('{file}', fileName) });
+	}
+	// The new-asset values in the units the new project will have (R-342): a value typed in a unit
+	// the import changed falls back to the built-in default for the new unit. Read by swapping a
+	// copy in for seedDefaultInputs(), which fills from the selectors as they now stand.
+	function geoJsonNetDefaults(changedSelectors) {
+		var keep = settings.defaults, copy = JSON.parse(JSON.stringify(keep || {})), out;
+		changedSelectors.forEach(function (s) {
+			(LPN_DEFAULTS_UNIT_FIELD[s] || []).forEach(function (k) { copy[k] = null; });
+		});
+		settings.defaults = copy;
+		try { seedDefaultInputs(); out = settings.defaults; } finally { settings.defaults = keep; }
+		return out;
+	}
+	// **A LARGE LAYER TAKES SECONDS TO OPEN** (6,589 features, about 9 s, measured 2026-10-16), and
+	// almost none of it is the import: building the network takes under 0.1 s; the rest is opening
+	// a project of that size (label placement, drawing, the first solve), the same cost an `.inp`
+	// of that size pays. So the notice says what is happening, and the work starts after the
+	// browser has painted it (two frames), or the notice would appear only when it was over.
+	function finishGeoJsonNet(scan, fileName, choice, done) {
+		var pc = EngCalcs.pageConfig || {};
+		setNotice((pc.lpn_gjnet_working || 'Importing {file}…').replace('{file}', fileName));
+		function run() { finishGeoJsonNetNow(scan, fileName, choice, done); }
+		if (typeof requestAnimationFrame === 'function') { requestAnimationFrame(function () { setTimeout(run, 0); }); }
+		else { setTimeout(run, 0); }
+	}
+	function finishGeoJsonNetNow(scan, fileName, choice, done) {
+		var before = readUnitSelections(), net, units, changed, defaults, saved, id, name;
+		if (scan.ours) {
+			net = EngCalcs.lpnGeoJsonNetBuild(scan, { prefixes: settings.idPrefixes, method: settings.method || 'hw' });
+			units = Object.assign({}, before, net.units || {});
+		} else {
+			units = Object.assign({}, before, choice.units || {});
+		}
+		// The units strip moves FIRST, as for an `.inp`: the file's numbers are stored as they are,
+		// so the strip must be showing the units they are in.
+		applyUnitSelections(units);
+		changed = LPN_UNIT_SELECTS.filter(function (n) { return before[n] !== readUnitSelections()[n]; });
+		defaults = geoJsonNetDefaults(changed);
+		if (!scan.ours) {
+			net = EngCalcs.lpnGeoJsonNetBuild(scan, { mapping: choice.mapping, units: readUnitSelections(),
+				tolerance: choice.tolerance, prefixes: settings.idPrefixes, defaults: defaults, method: settings.method || 'hw' });
+		}
+		name = String(fileName).replace(/\.(geojson|json)$/i, '') || String(fileName);
+		saved = docFromGeoJsonNet(net, name, defaults);
+		id = importProject(saved);
+		if (!id) { if (done) { done({ ok: false, error: 'storage' }); } return; }
+		stampProjectSaved(id);
+		renderTabs();
+		showGeoJsonNetReport(net, fileName);
+		if (done) { done({ ok: true, id: id, net: net }); }
+	}
+	/**
+	 * The built network as a saved document, ready for importProject(): docFromInp()'s shape, in
+	 * the saved frame (a geographic project, x the longitude and y the latitude). The settings are
+	 * the open project's, as for an `.inp`, with what the file states written onto them: the
+	 * friction method, the custom property designs, and the new-asset values in the new units.
+	 */
+	function docFromGeoJsonNet(net, name, defaults) {
+		var nodeAt = {}, next = newNextId(), s = JSON.parse(JSON.stringify(settings));
+		net.nodes.forEach(function (n) { nodeAt[n.id] = n; });
+		// A pipe with no length in the file is Auto, measured as linkAutoLength() measures one: the
+		// geodesic length of the line, as slope distance between its end elevations. A number of
+		// ours, and the report says which pipes.
+		net.links.forEach(function (l) {
+			var a = nodeAt[l.from], b = nodeAt[l.to], h, za, zb, dz;
+			if (!l.lenAuto || typeof l._length === 'number' || !a || !b) { return; }
+			h = Geom.geodesicPolylineMeters([{ x: a.x, y: a.y }].concat(l.verts, [{ x: b.x, y: b.y }])) * unitFactor('lpn_u_length');
+			za = linkEndElev(a); zb = linkEndElev(b);
+			dz = (za === null || zb === null) ? 0 : toDisplay(toSI(zb - za, 'lpn_u_elevhead'), 'lpn_u_length');
+			l._length = (dz && isFinite(dz)) ? Math.sqrt(h * h + dz * dz) : h;   // base-write: import builds Base
+		});
+		s.method = net.method || s.method;
+		s.defaults = defaults || s.defaults;
+		// The file states no EPANET options, so the new project states none (docFromInp()'s sparse rule).
+		s.hydraulics = {}; s.qualityOptions = {}; s.fileOptions = {};
+		s.quality = { mode: 'none', traceNode: '' };
+		readQualitySections({}, s, net.nodes, net.links);
+		readEnergySection({}, s, net.links);
+		readSourceMixingSections({}, s, net.nodes);
+		readTagsSection({}, s, net.nodes, net.links);
+		// A design the open project already has keeps its label and rules and gains the kinds the
+		// file puts it on; a new key gets a plain design.
+		s.customProps = (s.customProps || []).slice();
+		(net.customProps || []).forEach(function (def) {
+			var have = s.customProps.filter(function (d) { return d.key === def.key; })[0], letters;
+			if (!have) { s.customProps.push(def); return; }
+			letters = String(have.applies || '').split(',').filter(function (x) { return x; });
+			def.applies.split(',').forEach(function (x) { if (x && letters.indexOf(x) < 0) { letters.push(x); } });
+			have.applies = letters.join(',');
+		});
+		function claim(id, key) {
+			var prefix = s.idPrefixes[key] || key, n;
+			if (String(id).slice(0, prefix.length) !== prefix) { return; }
+			n = parseInt(String(id).slice(prefix.length), 10);
+			if (isFinite(n) && String(n) === String(id).slice(prefix.length) && n >= next[key]) { next[key] = n + 1; }
+		}
+		net.nodes.forEach(function (n) { claim(n.id, LPN_ID_KEY[n.type] || 'J'); });
+		net.links.forEach(function (l) { claim(l.id, LPN_ID_KEY[l.type] || 'L'); });
+		(net.shapes || []).forEach(function (sh) { claim(sh.id, 'S'); });
+		return rebaseDocument({
+			v: LPN_STORAGE_VERSION,
+			project: { name: name, activeScenario: 'base', coords: LPN_COORDS_GEO },
+			origin: { x: 0, y: 0 },
+			scenarios: defaultScenarios(),
+			nodes: net.nodes, links: net.links, labels: [],
+			shapes: (net.shapes && net.shapes.length) ? net.shapes : undefined,
+			nextId: next,
+			labelSettings: JSON.parse(JSON.stringify(labelSettings)),
+			backdrop: null,
+			settings: s,
+			patterns: net.patterns || [], curves: net.curves || [],
+			defaultPattern: null, times: null, controls: [], rules: [], inpSections: {},
+			units: readUnitSelections()
+		});
+	}
+	// One sentence per kind of difference, whole sentences (CLAUDE.md's key-reuse rule).
+	function geoJsonNetNoteText(note, net) {
+		var pc = EngCalcs.pageConfig || {}, tol = String(net.tolerance === undefined ? LPN_GJNET_TOLERANCE : net.tolerance) + ' m';
+		function v(x) { return String(x === undefined || x === null ? '' : x); }
+		var T = {
+			'crs-named': ['lpn_gjnet_note_crs', 'The file states the coordinate system {crs}, which is WGS 84 latitude and longitude, the system RFC 7946 requires. Positions were read as stated.'],
+			'crs-nad83': ['lpn_gjnet_note_crs_nad83', 'The file states NAD83 (EPSG:4269). Its positions were read as WGS 84, which places them within about 1 to 2 m of where NAD83 puts them.'],
+			'skip-geometry': ['lpn_gjnet_note_skip_geometry', 'Not imported: the feature is not a point or a line.'],
+			'skip-kind': ['lpn_gjnet_note_skip_kind', 'Not imported: the feature states no node_type or link_type.'],
+			'skip-position': ['lpn_gjnet_note_skip_position', 'Not imported: a position is not a valid latitude and longitude.'],
+			'skip-id': ['lpn_gjnet_note_skip_id', 'Not imported: the name is not a valid ID, or another element of the same kind has it.'],
+			'skip-no-node': ['lpn_gjnet_note_skip_no_node', 'Not imported: the start or end node named is not in the file.'],
+			'skip-loop': ['lpn_gjnet_note_skip_loop', 'Not imported: both ends of the line join the same node.'],
+			'id-new': ['lpn_gjnet_note_id_new', 'These features state no valid ID and were assigned the ID shown in parentheses.'],
+			'id-dup': ['lpn_gjnet_note_id_dup', 'These IDs are stated by more than one feature of the same kind. Each later feature was assigned the ID shown in parentheses.'],
+			'unmapped-id-point': ['lpn_gjnet_note_unmapped_id_point', 'No field was chosen for the point ID, so every node imported from a point was assigned an ID.'],
+			'unmapped-id-line': ['lpn_gjnet_note_unmapped_id_line', 'No field was chosen for the line ID, so every pipe was assigned an ID.'],
+			'skip-short': ['lpn_gjnet_note_skip_short', 'Not imported: a line needs at least two positions.'],
+			'elev-taken': ['lpn_gjnet_note_elev_taken', 'These nodes state no elevation. Each was given the elevation of the node shown in parentheses: for a junction added at a line end, the node at the other end of its pipe, otherwise the nearest node that states one.'],
+			'default-elev-added': ['lpn_gjnet_note_default_elev_added', 'These junctions were added at line ends and have the default elevation, {value}, because no node in the file states an elevation.'],
+			'demand-kept': ['lpn_gjnet_note_demand_kept', 'A reservoir or tank has no demand, so the demand stated on these nodes was kept as the custom property {key}.'],
+			'parts': ['lpn_gjnet_note_parts', 'These multipart lines have parts that are not connected and were imported as one pipe for each part.'],
+			'parts-points': ['lpn_gjnet_note_parts_points', 'These multipoint features were imported as one node for each point.'],
+			'junction-added': ['lpn_gjnet_note_junction_added', 'These junctions were added where a line end is not within {tol} of a point. Each has the default base demand.'],
+			'end-moved': ['lpn_gjnet_note_end_moved', 'These pipes have an end within {tol} of a point or another line end, but not on it. The end was joined to it; the largest distance is {dist}.'],
+			'end-on-pipe': ['lpn_gjnet_note_end_on_pipe', 'These line ends lie on the pipe shown in parentheses, but not at its end, and are not connected to it.'],
+			'z-ignored': ['lpn_gjnet_note_z', 'These points state a third coordinate, which was not imported.'],
+			'default-elev': ['lpn_gjnet_note_default_elev', 'These nodes state no elevation and have the default elevation, {value}.'],
+			'unmapped-elev': ['lpn_gjnet_note_unmapped_elev', 'No field was chosen for the elevation, so every node has the default elevation, {value}, and automatic lengths include no elevation difference.'],
+			'default-demand': ['lpn_gjnet_note_default_demand', 'These junctions state no base demand and have the default base demand, {value}.'],
+			'unmapped-demand': ['lpn_gjnet_note_unmapped_demand', 'No field was chosen for the base demand, so every junction has the default base demand, {value}.'],
+			'default-diameter': ['lpn_gjnet_note_default_diameter', 'These pipes state no diameter and have the default diameter, {value}.'],
+			'unmapped-diameter': ['lpn_gjnet_note_unmapped_diameter', 'No field was chosen for the diameter, so every pipe has the default diameter, {value}.'],
+			'default-roughness': ['lpn_gjnet_note_default_roughness', 'These pipes state no roughness and have the default roughness, {value}.'],
+			'unmapped-roughness': ['lpn_gjnet_note_unmapped_roughness', 'No field was chosen for the roughness, so every pipe has the default roughness, {value}.'],
+			'default-k': ['lpn_gjnet_note_default_k', 'These pipes state no minor loss coefficient, so each has 0, as in an EPANET file that states none.'],
+			'unmapped-k': ['lpn_gjnet_note_unmapped_k', 'No field was chosen for the minor loss coefficient, so every pipe has 0, as in an EPANET file that states none.'],
+			'default-tank': ['lpn_gjnet_note_default_tank', 'These tanks have the default water depths and tank diameter.'],
+			'length-auto': ['lpn_gjnet_note_length_auto', 'These pipes state no length. Each length is computed from the line (Auto).'],
+			'unmapped-length': ['lpn_gjnet_note_unmapped_length', 'No field was chosen for the length, so every pipe length is computed from the line (Auto).'],
+			'value-unread': ['lpn_gjnet_note_value_unread', 'These values are not numbers or are not recognized, and were not used.'],
+			'field-skipped': ['lpn_gjnet_note_field_skipped', 'These fields were not imported, as chosen.'],
+			'field-custom': ['lpn_gjnet_note_field_custom', 'These fields were imported as custom properties.'],
+			'results-dropped': ['lpn_gjnet_note_results', 'The results in the file were not imported. Calculate computes them again.'],
+			'demand-rows': ['lpn_gjnet_note_demand_rows', 'These junctions had more than one demand row. A GeoJSON file holds only the first, which was imported.'],
+			'pipe-type': ['lpn_gjnet_note_pipe_type', 'These pipes state the pipe type shown in parentheses, whose definition a GeoJSON file does not hold. The pipe type was not imported; the diameter and roughness stated in the file were.'],
+			'pattern-conflict': ['lpn_gjnet_note_pattern_conflict', 'These patterns are stated with different multipliers on different features. The first was used.'],
+			'end-off-node': ['lpn_gjnet_note_end_off_node', 'The line of each of these links does not start or end at its node. The node position was used.'],
+			'not-in-geojson': ['lpn_gjnet_note_not_held', 'A GeoJSON file does not hold controls, rules, time settings, text labels, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.']
+		};
+		var t = T[note.code] || [null, note.code], val = note.detail, s;
+		if (typeof val === 'number' && note.code.indexOf('default-') !== 0 && note.code.indexOf('unmapped-') !== 0) { val = val.toFixed(2) + ' m'; }
+		s = String((t[0] && pc[t[0]]) || t[1]);
+		var unitOf = { elev: 'lpn_u_elevhead', demand: 'lpn_u_flow', diameter: 'lpn_u_diameter', roughness: (settings.method === 'dw' ? 'lpn_u_roughness' : '') };
+		var tgt = note.code.replace(/^(default|unmapped)-/, '').replace(/-added$/, '');
+		if (note.code !== tgt && unitOf[tgt]) { val = v(note.detail) + ' ' + unitLabel(unitOf[tgt]); }
+		return s.replace('{crs}', v(note.detail)).replace('{tol}', tol).replace('{dist}', v(val)).replace('{value}', v(val)).replace('{key}', v(note.detail));
+	}
+	function showGeoJsonNetReport(net, fileName) {
+		var pc = EngCalcs.pageConfig || {}, CAP = 50;
+		openDialog(function (body) {
+			var h = document.createElement('p');
+			h.style.margin = '0 0 8px';
+			h.style.fontWeight = 'bold';
+			h.textContent = (pc.lpn_inp_report_heading || 'Imported {file}').replace('{file}', fileName);
+			body.appendChild(h);
+			var c = net.counts, sum = document.createElement('p');
+			sum.style.margin = '0 0 8px';
+			sum.textContent = (pc.lpn_inp_report_counts || '{nodes} junctions, reservoirs and tanks, {links} pipes, pumps and valves, in {units}.')
+				.replace('{nodes}', c.junction + c.reservoir + c.tank).replace('{links}', c.pipe + c.pump + c.valve)
+				.replace('{units}', unitLabel('lpn_u_flow'));
+			body.appendChild(sum);
+			if (c.shape) {
+				var shp = document.createElement('p');
+				shp.style.margin = '0 0 8px';
+				shp.textContent = (c.shape === 1 ? (pc.lpn_geojson_import_done_one || 'One Shape imported from {file}.')
+					: (pc.lpn_geojson_import_done || '{n} Shapes imported from {file}.').replace('{n}', c.shape)).replace('{file}', fileName);
+				body.appendChild(shp);
+			}
+			if (!net.notes.length) {
+				var ok = document.createElement('p');
+				ok.style.margin = '0';
+				ok.textContent = pc.lpn_inp_report_clean || 'All data in the file was imported. Nothing was omitted.';
+				body.appendChild(ok);
+				return;
+			}
+			var lead = document.createElement('p');
+			lead.style.margin = '0 0 6px';
+			lead.textContent = pc.lpn_gjnet_report_lead || 'Each change made during import, and each feature not imported, is listed below with the reason:';
+			body.appendChild(lead);
+			var ul = document.createElement('ul');
+			ul.id = 'lpn_gjnet_report';
+			ul.style.margin = '0';
+			ul.style.paddingLeft = '20px';
+			ul.style.maxHeight = '50vh';
+			ul.style.overflow = 'auto';
+			net.notes.forEach(function (n) {
+				var li = document.createElement('li'), ids = n.ids.slice(0, CAP).join(', ');
+				li.setAttribute('data-code', n.code);
+				li.style.marginBottom = '4px';
+				if (n.ids.length > CAP) { ids += ' ' + (pc.lpn_gjnet_and_more || 'and {n} more').replace('{n}', n.ids.length - CAP); }
+				li.textContent = geoJsonNetNoteText(n, net) + (n.ids.length ? ' (' + ids + ')' : '');
+				ul.appendChild(li);
+			});
+			body.appendChild(ul);
+		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
 	}
 
 	// ---- File > Import surveyed points (ROADMAP Task 592) ---------------------------------------
@@ -49975,6 +50455,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			  tip: pc.lpn_file_import_survey_tip, fn: pickSurveyFile },
 			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
 			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
+			// A GeoJSON file as a network, through one mapping step (Task 728).
+			{ icon: 'open', label: pc.lpn_file_import_gjnet || 'Import GeoJSON network…',
+			  tip: pc.lpn_file_import_gjnet_tip, fn: pickGeoJsonNetFile },
 			// The points, lines and polygons of a GeoJSON file, as Shapes (Task 779).
 			{ icon: 'open', label: pc.lpn_file_import_shapes || 'Import GeoJSON shapes…',
 			  tip: pc.lpn_file_import_shapes_tip, fn: pickGeoJsonFile },
@@ -78039,7 +78522,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				fn: function () { smActCurrent(key); } });
 			// **A TIDY LIST OF ONE SCENARIO'S OWN OVERRIDES, TO AUDIT THE COUNT** (Task 800; Tom,
 			// 2026-10-15: *"I don't know how to see a tidy list of overrides to audit"*).
-			out.push({ id: 'overrides', label: pc.lpn_sm_list_overrides || 'Manage overrides', tip: pc.lpn_sm_list_overrides_tip,
+			out.push({ id: 'overrides', label: pc.lpn_sm_list_overrides || 'Override manager…', tip: pc.lpn_sm_list_overrides_tip,
 				off: !valid || !scenarioById(key) || !overrideCount(scenarioById(key)),
 				offTip: !valid ? noSel : (pc.lpn_sm_list_overrides_none || 'This scenario has no overrides.'),
 				fn: function () { smActListOverrides(key); } });
@@ -78062,6 +78545,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				tip: pc.lpn_sm_merge_up_tip,
 				offTip: !valid ? noSel : (pc.lpn_sm_merge_up_root || 'A Base alternative has nothing above it to merge into.'),
 				fn: function () { smActMergeUpward(key); } });
+			// **COPY UPWARD, BESIDE IT** (Tom, 2026-10-16): the same targets, the source keeping its own.
+			out.push({ id: 'copyup', label: pc.lpn_sm_copy_up || 'Copy upward', off: !valid || !smMergeTargets(tree, key).length,
+				tip: pc.lpn_sm_copy_up_tip,
+				offTip: !valid ? noSel : (pc.lpn_sm_copy_up_root || 'A Base alternative has nothing above it to copy into.'),
+				fn: function () { smActMergeUpward(key, true); } });
 		}
 		out.push({ separator: true });
 		out.push({ id: 'del', label: pc.lpn_tool_delete || 'Delete', face: '−', off: !valid || isBase,
@@ -78672,7 +79160,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			initTipsIn(body);
 			if (scroll) { body.scrollTop = scroll; }
 		}, [{ label: pc.lpn_dialog_ok || 'OK', isDefault: true, cancel: true, fn: function () { } }],
-		{ title: (pc.lpn_ovl_title || 'Manage overrides: {name}').replace('{name}', scenarioDisplayName(scn)) });
+		{ title: (pc.lpn_ovl_title || 'Override manager: {name}').replace('{name}', scenarioDisplayName(scn)) });
 	}
 	/**
 	 * **CLEAR THESE OWN OVERRIDES** (items of ownOverrideItems(scn)), each from the holder it is stored
@@ -78747,16 +79235,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		smAfter(true, false);
 	}
 	// **MERGE UPWARD** (Task 801): which ancestor, then what it does, skipped values named, then the
-	// act as one undo step. Nothing is written before the second answer.
-	function smActMergeUpward(key) {
-		var tree = smState.tree, pc = EngCalcs.pageConfig || {}, ups, name, first;
+	// act as one undo step. Nothing is written before the second answer. **COPY UPWARD** (`keep`) asks
+	// the same two questions in its own words, and the source keeps its overrides.
+	function smActMergeUpward(key, keep) {
+		var tree = smState.tree, pc = EngCalcs.pageConfig || {}, ups, name, first, none;
 		if (tree === 'scenarios' || key === null || key === undefined) { return; }
 		ups = smMergeTargets(tree, key);
 		if (!ups.length) { return; }
 		name = smName(tree, key);
+		none = keep ? (pc.lpn_sm_copy_none || 'The alternative {name} has no overrides to copy.')
+			: (pc.lpn_sm_merge_none || 'The alternative {name} has no overrides to merge.');
 		first = smMergePlan(tree, key, ups[0].key);
-		if (!first || !first.own) { tellNotice((pc.lpn_sm_merge_none || 'The alternative {name} has no overrides to merge.').replace('{name}', name)); return; }
-		askDialog({ kind: 'choice', text: (pc.lpn_sm_merge_pick || 'Merge the overrides of {name} into which alternative? Its parent is listed first.').replace('{name}', name),
+		if (!first || !first.own) { tellNotice(none.split('{name}').join(name)); return; }
+		askDialog({ kind: 'choice', text: (keep ? (pc.lpn_sm_copy_pick || 'Copy the overrides of {name} into which alternative? Its parent is listed first.')
+			: (pc.lpn_sm_merge_pick || 'Merge the overrides of {name} into which alternative? Its parent is listed first.')).split('{name}').join(name),
 			choices: ups.map(function (u, i) { return { label: u.name, value: u.key, isDefault: i === 0 }; })
 				.concat([{ label: pc.lpn_cancel || 'Cancel', value: null, cancel: true }]) }, function (tk) {
 			var plan, parts, tname;
@@ -78765,20 +79257,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!plan) { return; }
 			tname = smName(tree, tk);
 			if (!plan.n) {
-				tellNotice((pc.lpn_sm_merge_none || 'The alternative {name} has no overrides to merge.').replace('{name}', name));
+				tellNotice(none.split('{name}').join(name));
 				return;
 			}
-			parts = [(pc.lpn_sm_merge_ask || 'Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of overriding them. You can undo this.')
+			parts = [(keep ? (pc.lpn_sm_copy_ask || 'Copy the overrides ({n}) of {name} up into {target}? It keeps them as its own overrides. You can undo this.')
+				: (pc.lpn_sm_merge_ask || 'Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of overriding them. You can undo this.'))
 				.replace(/\{name\}/g, name).replace('{n}', String(plan.n)).replace('{target}', tname)];
 			plan.skipped.forEach(function (s) {
-				parts.push((pc.lpn_sm_merge_skipped || '{between} also overrides these values. It is skipped and not changed, so {name} will read them from {between}, not from {target}:')
+				parts.push((keep ? (pc.lpn_sm_copy_skipped || '{between} also overrides these values. It is skipped and not changed, so it keeps its own values for them:')
+					: (pc.lpn_sm_merge_skipped || '{between} also overrides these values. It is skipped and not changed, so {name} will read them from {between}, not from {target}:'))
 					.replace(/\{between\}/g, s.name).replace('{name}', name).replace('{target}', tname) + '\n' + s.lines.join('\n'));
 			});
 			parts = parts.concat(smMergeMorphText(plan.morphs));
 			askDialog({ kind: 'confirm', text: parts.join('\n\n') }, function (yes) {
 				var res;
 				if (!yes) { return; }
-				res = smTry(function () { return smMergeUpward(tree, key, tk); });
+				res = smTry(function () { return smMergeUpward(tree, key, tk, !!keep); });
 				if (!res || res.refused) { return; }
 				smState.sel = res.source;
 				smAfter(true, false);
