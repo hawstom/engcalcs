@@ -35,6 +35,16 @@ One line per feature, under a `##` area heading:
 - <ids>| <one sentence, present tense, written for a reader who has never seen the page>
 ```
 
+A **pointer** sends the reader to the section that holds a capability, and carries no task IDs
+(used under Premium features, whose capabilities live in their home sections):
+
+```
+- see <exact ## heading>| <sentence ending in a full stop>
+```
+
+The generator proves the named heading exists, writes the row as `<!-- see: <heading> -->`, and
+does not count a pointer as a feature.
+
 `<ids>` is one or more closed task IDs, comma-separated. Every one must exist in
 `dev/roadmap-closed-ids.md` at priority 0, and no ID may be cited by two features — the generator
 fails on either. A closed ID cited by nothing is fine and expected. Merge freely: the unit of this
@@ -54,45 +64,71 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 
 ## Solver
 
-- 146| Native solver available for steady state (single moment) simulation.
-- 451, 419| EPANET 2.3.5 solver for extended period simulations. Solver comparison display.
+- 146| Native solver for steady-state (single moment) simulation.
+- 451, 419| EPANET 2.3.5 solver for extended-period simulations, with a solver comparison display.
 - 467| Auto-recalculate option.
 
-## Projects and Saving
+## Projects, files, and formats
 
-- 146.08, 447, 352, 360| Multiple open project tabs saved in browser or save to "lwn" file format with locking for office network collaboration.
+- 146.08, 447, 352, 360| Multiple open project tabs, saved in the browser or to an ".epp" file, with locking for office network collaboration.
 - 2, 4, 37, 246| Install for offline use.
 - 486| Best on PC, tested on a phone.
 
-## Import, Export, and Map or Backdrop
-
-- 196, 483, 281| EPANET `.inp` files import and export with data fidelity and detailed accept/ignore report.
-- 314, 257, 454| Examples from EPANET and others, XY and Lat/Lon, loaded and solved in one click.
-- 145, 276| World map canvas or your own backdrop with friendly positioning options.
+- 196, 483, 281| Network import and export as EPANET `.inp`, plus network export to GeoJSON and DXF.
+- 592, 776| Tables export to ODS, XLSX, and CSV; Shapes import from shapefile, GeoJSON, and DXF; surveyed points import as junctions; clipboard copy/paste.
+- 313| Workspace file: save your box layout, panes, and display options, and import them on another screen or browser.
+- 314, 257, 454| Many example projects, each loaded and solved in one click.
+- 611, 792, 465, 590| Libraries of patterns, curves, controls, rules, pipe types, and fittings, importable from another project file.
+- 793| Screenshot tool with enhanced resolution and a markup pen.
+- 145, 276| World map canvas or your own backdrop.
 - 476| XY to Lat/Lon conversion import wizard.
-- 437, 497| Place name search and elevations from map DEM w/ preview.
+- 696, 641| Conversion of a project copy to another coordinate system and other units, and new projects in a real EPSG projection.
+- 437, 497| Place name search, and elevations filled in from a digital elevation model.
 
 ## Adding, editing, and displaying assets and results
 
 - 146.02| Junction, reservoir, tank, pipe with vertex draw and edit mode, pump, valve, and annotation text.
-- 345, 329, 333, 336, 397, 398, 399, 469, 146.01, 383| Customizable multi- node and link labels including prefixes, suffixes, separator, and drop/shed order with auto or manual placement on leaders or aligned with links.
-- 353, 420, 389, 540| Find, replace, goto elements including complex queries in your language.
-- 434, 455| Editable, pasteable, spreadsheet-like asset tables: junctions, reservoirs, tanks, pipes, pumps and valves.
-- 266| Group edit assets three different ways: Find and replace, Select area, and spreadsheet edit Tables.
-- 384, 327| Network coloring: three to seven ranges, eight ways of choosing where the breaks fall, and 41 color ramps.
-- 337, 342, 376| Multi-line annotation text objects with bold, rotation w/ pipe match option, and association to assets.
+- 719| Junction and pipe chain draw, with pipe split offered contextually when a junction lands on a pipe.
+- 779| Draw reference Shapes (points, lines, and polygons), managed in a Shapes table.
+- 185| Copy and paste properties between assets.
+- 345, 329, 333, 336, 397, 398, 399, 469, 146.01, 383| Customizable node and link labels: prefixes, suffixes, separator, drop order, and automatic or manual placement.
+- 353, 420, 389, 540| Find, replace, and go to elements, including complex queries in your language.
+- 266| Mass-edit assets by Find and replace, Select area, or spreadsheet Tables.
+- 384, 327| Network coloring: three to seven ranges, six ways of placing the breaks (or type your own), and 41 color ramps.
+- 337, 342, 376| Multi-line annotation text with bold, rotation, and association to assets.
 - 331, 362| Independent size settings for text, symbol, and pipes.
-- 409, 433, 506, 510| HGL profiles with modern path selection and editing.
+- 409, 433, 506, 510, 600, 640| Graphs: HGL profiles with path editing, time series, contour on the map, frequency distribution, and a flow balance of production against consumption.
+- 637, 784, 804, 795| Time series graphs at the foot of Properties and as bubbles on the map, including tank depth. A bubble's display is set per scenario.
 
-## Extended period simulations
+## Extended-period simulations
 
-- 248.01, 423, 410, 248.02| Extended-period simulation following patterns for demands, reservoir head, and pump speed.
+- 248.01, 423, 410, 248.02| Extended-period simulation with patterns for demands, reservoir head, and pump speed.
 - 248.03| EPANET-style rule-based controls.
-- 460, 586, 587| Pump, efficiency, head loss, and tank volume curves, defined once in the Libraries box beside the patterns and rules and stated by reference, so a manufacturer's curve keeps every point it was published with and a tank fills on its real shape.
+- 460, 586, 587| Pump, efficiency, head loss, and tank volume curves, kept in the Libraries box.
 - 450| EPANET run report.
-- 448| Color limits constant through a simulation, so a color means the same thing at every step.
+- 448| Color ranges constant through a simulation.
 - 566| Water quality: age, share from a source, chemical decay.
-- 566.01| Pump energy cost: Run length, power use, and cost including peak demand charge.
+- 566.01, 577| Pump energy report: operating share, efficiency, power, energy used, and cost including a peak demand charge.
+
+## Analyses
+
+- 530| Fire flow analysis: which junctions miss their fire flow, and which pull the rest of the system below its limits.
+- 751| Criticality analysis, which removes each pipe, pump, and valve in turn and reports the effect.
+- 754| Demand scaling, which finds the largest demand scale the system can carry.
+
+## Scenarios and alternatives
+
+- 201, 407, 412, 512| Scenarios with overrides marked on the map, Manage overrides, and a scenario comparison report.
+- 750, 765, 755, 801, 802| Alternatives with an inheritance tree, overrides mergeable upward into the alternative above, Presentation and Calculation override categories, ready-made scenarios in every new project, a Basic mode, and many more management features.
+
+## Ease of use
+
+- 763| Searchable user manual.
+- 457| Every setting in one box, searchable by the words you would use.
+- 441| Dockable boxes that auto-hide to an edge tab.
+- 543| One Water menu holds everything about water modeling, assets included.
+- 434, 455| Editable, pasteable, spreadsheet-like asset tables.
+- 782| Snap to objects, which enhances the value of DXF and shapefile Shapes import.
 
 ## Premium features included for everybody
 
@@ -102,11 +138,10 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
      and now we are giving them away for free."* The word names what this class of capability
      costs everywhere ELSE, which is the whole point of the section. Do not re-flag it. -->
 
-
-- 530| Fire flow failure and collateral (design) failure analysis.
-- 201, 407, 412, 512| Scenarios: override management and report, scenario comparison report.
-- 465| Pipe types library: attached a library reference to keep a pipe in sync with the library.
-- 590| Fittings library: attach fittings references to pipes and library pipe types.
+- see Scenarios and alternatives| Scenarios and alternatives (above).
+- see Analyses| Fire flow, criticality, and demand scaling analyses (above).
+- see Projects, files, and formats| Import and export formats (above).
+- see Projects, files, and formats| Coordinate system and unit conversion (above).
 
 
 ## The calculators
@@ -121,6 +156,6 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 
 ## Language, license, and privacy
 
-- 15, 22| Twenty-seven languages, and every word is evaluated for translation.
+- 15, 22| Twenty-seven languages, and every word is considered for translation.
 - 244| Free software under the GNU GPL, source in the open.
-- 286, 288| No account, no visitor identifier, and nothing counted about you unless you say yes.
+- 286, 288| No account, and no visitor identifier or count of you unless you say yes.
