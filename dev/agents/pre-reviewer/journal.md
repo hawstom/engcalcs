@@ -4486,3 +4486,10 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: RTL (ar): card text-align is hard-coded left; unit marks flip ('5280, "14, "mg/L 0.5, .Init). Not compared with the map label.
 - OBSERVED: no long tasks over 25 Net3 assets; ~500 ms rest delay is by design. Spanish/Arabic Settings row still carry the old wording (payloads not regenerated; expected).
 - NOT CHECKED: harness mutation (does it fail on the pre-change code); dark theme; touch.
+
+## 2026-10-16 feat/hover-props re-review @ eda6e7172 (Perry)
+- OBSERVED (real Chromium, Net1 with injected tag/desc/custom property/PRV/customer, plus Net3, Net2, Elm Street): findings 1-4 are fixed. Card now carries the Properties rows in Properties' order and names (ID, X/Y, Description, Tag, Pipe type, Diameter, Length, Valve type, Pressure setting, From/To, Closed, custom Route, Is active, results). Empty fields are left out (Required fire flow, Emitter coefficient, Source quality, Price of power, reservoir Elevation); values use label decimals where a label field matches (Elevation 710.00, Pressure 119.13) else the raw number (Length 5280 where Properties shows 5280.00; Pump head curve "1" where Properties says "No curve chosen 1").
+- OBSERVED: never off-screen at 1280x520 and 390x740/390x500 with 12-line Descriptions on node and pipe (Description cut to 8 lines with an ellipsis; two columns at 520 high). Card cost 3 ms per rest (10 ms first) on Net3, Net2, Elm, Net3-World; no long tasks. Hovering while Properties is open with an uncommitted typed value leaves value, focus and box untouched.
+- OBSERVED: ar: dir rtl, right-aligned, colon on the correct side; "Chlorine" and custom-property names stay Latin; no Arabic font here so glyphs are boxes (not checked visually).
+- OBSERVED leftovers: "Closed: —" for an open pipe, "Is active?: ✓", "No pipe type chosen", "No fittings list chosen", "No pattern", "Demand pattern: (default: 1)"; extra Description lines print as unlabelled rows.
+- NOT CHECKED: harness mutation, dark theme, touch, ✓ glyph in the card (boxes in this headless font).
