@@ -3893,3 +3893,17 @@ Nobody's convention is a precedent for the disabled-until-selected-first form.
 - CITED (from memory, not refetched): WCAG 2.2 SC 1.4.11 (3:1 non-text contrast) and SC 2.5.8 (24 CSS px target), W3C. The Excel red-triangle comment indicator is the corner-mark convention (Microsoft Excel); Civil 3D's Override and Child override columns are Tom's description, not verified by me.
 - SPECULATION: granularity differs by surface (category choice versus one property in an alternative); one glyph, two verbs, so the tip names the verb.
 - Recommendation: CSS-drawn filled dot, down triangle, hollow dot (forms only) in one fixed two-cell inline-start gutter, shown only when more than one scenario exists; click on dot clears (Undo is the guard), click on triangle confirms then clears descendants. Written report: ida-override-marker.md. If only one thing: the Properties popup first.
+
+## 2026-10-17 - Themes beyond Light and Dark; the gallery plan (feat/theme)
+
+Written up in full in `dev/themes-plan.md`. Entries, each tagged:
+
+- OBSERVED (css/engcalcs.css:12-137, 140-330): the token block is about 130 names, about 60 named by VALUE (`--ec-gray-eee`, `--ec-hue-1976d2`); the dark set hand-writes all of them twice. Nine themes written that way is the project's real cost, so the plan's move one is seeds (about 25) plus `color-mix` derivation, byte-exact for the light greys by arithmetic (linear sRGB mix from #fff to #333).
+- OBSERVED (prototype, 2026-10-17, harness Chromium, tokens injected on `<html>`): amber, platinum, blueprint and handheld seeds re-coloured the whole app page and the calculator form with no CSS edit. Not following: the calculator Bootstrap navbar (`lib/Menus.lib.php:97`), page links, and `--ec-debug-grid: blue`.
+- OBSERVED (same renders): value-ramp colouring on a dark paper loses its darkest class (viridis "< 0.4 m/s" nearly invisible), so the map decision has to include a ramp-versus-paper floor.
+- OBSERVED (computed with my own script from hex, relative luminance): today's light `--ec-warn-ink #c60` on `#fffbe6` is 3.69:1 and `steelblue` on white is 4.11:1, both under 4.5; light control borders are 1.61:1. Every proposed theme measures at or above 4.5 text and 3 non-text; High contrast is 7.57 minimum text (AAA 7:1) and 21:1 borders.
+- OBSERVED (computed styles, Manning-Pipe-Flow at 1400 wide): h1 40 px, h2 32 px, the form's top at y = 238 of 900; body text starts at x = 0; native selects have radius 0 beside radius-4 inputs; body font is bare `sans-serif`.
+- CITED (W3C WCAG 2.2, SC 1.4.3, 1.4.6, 1.4.11, 1.4.1; from memory, not refetched): the thresholds I measured against. Media Queries Level 5 `prefers-contrast` and `forced-colors`: named from memory, widely implemented, not refetched.
+- SPECULATION: Platinum greys and highlight are from memory of Mac OS 8/9, not Apple's archive; Bahnschrift and Charcoal availability per OS is memory; amber and green phosphor hexes are my choice (no canonical value); the handheld four-shade values are the widely reproduced ones, unverified here. The plan says so in place.
+- Decision recorded: themes are BUNDLES (no separate corner, icon, font switches), because a closed set can be measured and a cube cannot. Map: display themes paint paper and neutral ink, document themes do not, anything that leaves the page (print, export, thumbnails) always uses the literals. Storage: `lpn_theme` values widen, nothing new stored.
+- Taught Tom the terms in the plan: seed token versus derived token, document versus display theme, chrome surface, hierarchy.
