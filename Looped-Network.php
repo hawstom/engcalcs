@@ -2011,6 +2011,16 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_guide_scn_example_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_example_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_scn_notes_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_notes_def']?></dd>
 </dl></template>
+<?php // The Libraries chapter (Task 785), in the entry for the Libraries box. ?>
+<template id="lpn_guide_more_lpn_library_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_lib_kinds_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_kinds_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_lib_refs_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_refs_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_lib_scn_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_scn_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_lib_ctl_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_ctl_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_lib_import_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_import_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_lib_example_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_example_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_lib_notes_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_notes_def']?></dd>
+</dl></template>
 <template id="lpn_guide_more_lpn_scncmp_box"><dl>
 	<dt><?=$ec_lang['lpn_guide_cmp_cols_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_cols_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_cmp_run_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_run_def']?></dd>
