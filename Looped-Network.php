@@ -2091,6 +2091,19 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_guide_ct_box_term']?></dt><dd><?=$ec_lang['lpn_guide_ct_box_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_ct_example_term']?></dt><dd><?=$ec_lang['lpn_guide_ct_example_def']?></dd>
 </dl></template>
+<?php // The Run report, Status changes, and Full report chapters (Task 785). ?>
+<template id="lpn_guide_more_lpn_rptbox"><dl>
+	<dt><?=$ec_lang['lpn_guide_rr_what_term']?></dt><dd><?=$ec_lang['lpn_guide_rr_what_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_rr_example_term']?></dt><dd><?=$ec_lang['lpn_guide_rr_example_def']?></dd>
+</dl></template>
+<template id="lpn_guide_more_lpn_status_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_st_what_term']?></dt><dd><?=$ec_lang['lpn_guide_st_what_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_st_example_term']?></dt><dd><?=$ec_lang['lpn_guide_st_example_def']?></dd>
+</dl></template>
+<template id="lpn_guide_more_lpn_full_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_fr_what_term']?></dt><dd><?=$ec_lang['lpn_guide_fr_what_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_fr_example_term']?></dt><dd><?=$ec_lang['lpn_guide_fr_example_def']?></dd>
+</dl></template>
 <template id="lpn_guide_more_lpn_scncmp_box"><dl>
 	<dt><?=$ec_lang['lpn_guide_cmp_cols_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_cols_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_cmp_run_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_run_def']?></dd>

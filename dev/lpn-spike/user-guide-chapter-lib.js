@@ -85,9 +85,26 @@ const dialogPress = (page, label) => page.evaluate((l) => {
 	return true;
 }, label);
 
+
+// A page in another language shows the same entry: its terms (English, because the chapter is) and no errors.
+async function esEntryCheck(browser, name, boxId, TERMS) {
+	const { Session } = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'session.js'));
+	const b = await Session.open(browser, name + '-es', { locale: 'es', viewport: { width: 1400, height: 900 } });
+	await b.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
+	await b.goto('Looped-Network.php?lang=es');
+	await b.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+	await b.openExampleCard(await b.lang('lpn_ex_net1_title'));
+	await b.settle(1200);
+	await openGuide(b);
+	const es = await entry(b.page, boxId);
+	ok('the Spanish page shows the chapter\'s terms', !!es && TERMS.every((k, i) => es.dts[i] === enString(k)), es && JSON.stringify(es.dts));
+	ok('no page errors (Spanish)', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
+	await b.context.close().catch(() => {});
+}
+
 function finish(name) {
 	console.log(fails ? `\n${name}: ${fails} FAILURE(S) of ${checks}` : `\n${name}: ALL PASS (${checks})`);
 	return fails ? 1 : 0;
 }
 
-module.exports = { REPO, U, ok, enString, plain, checkQuotes, openGuide, entry, searchFinds, dialogPress, finish };
+module.exports = { REPO, U, ok, enString, plain, checkQuotes, openGuide, entry, searchFinds, dialogPress, esEntryCheck, finish };
