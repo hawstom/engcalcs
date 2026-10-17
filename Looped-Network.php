@@ -1978,6 +1978,9 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <dl>
 	<dt><?=$ec_lang['lpn_notes_6_term']?></dt><dd><?=$ec_lang['lpn_notes_6_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_7_term']?></dt><dd><?=$ec_lang['lpn_notes_7_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_tbl_tabs_term']?></dt><dd><?=$ec_lang['lpn_guide_tbl_tabs_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_tbl_cell_term']?></dt><dd><?=$ec_lang['lpn_guide_tbl_cell_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_tbl_fill_term']?></dt><dd><?=$ec_lang['lpn_guide_tbl_fill_def']?></dd>
 </dl>
 </section>
 <section class="lpn-guide-section" data-guide-section="boxes">
