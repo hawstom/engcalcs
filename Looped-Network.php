@@ -2000,6 +2000,22 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_guide_find_replace_term']?></dt><dd><?=$ec_lang['lpn_guide_find_replace_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_find_notes_term']?></dt><dd><?=$ec_lang['lpn_guide_find_notes_def']?></dd>
 </dl></template>
+<?php // The Scenarios chapter, after the Scenario manager's own help (lpn_sm_help) in its entry, and the
+      // rest of the Scenario comparison chapter (Task 785). Same mechanism as the Find chapter above. ?>
+<template id="lpn_guide_more_lpn_sm_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_scn_use_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_use_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_scn_open_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_open_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_scn_marks_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_marks_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_scn_make_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_make_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_scn_scope_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_scope_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_scn_example_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_example_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_scn_notes_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_notes_def']?></dd>
+</dl></template>
+<template id="lpn_guide_more_lpn_scncmp_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_cmp_cols_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_cols_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_cmp_run_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_run_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_cmp_notes_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_notes_def']?></dd>
+</dl></template>
 </div>
 </div>
 	</div>
