@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**93 open tasks.** Next (100): 16 · Soon (75): 16 · Someday (50): 27 · Maybe (25): 15 · Parked (5): 19
+**93 open tasks.** Next (100): 16 · Soon (75): 15 · Someday (50): 28 · Maybe (25): 15 · Parked (5): 19
 
 ## 100 — Next (16)
 
@@ -28,7 +28,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 802 — The Scenarios table flies out from the Scenario Manager's right side.
 - Task 804 — Time series balloons become a Presentation override.
 
-## 75 — Soon (16)
+## 75 — Soon (15)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
@@ -42,12 +42,11 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 752 — Google Sheets: sync the scenarios and their alternatives out and in.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
-- Task 798 — Field values in Text, by {} keys disclosed in the User Manual.
 - Task 799 — Try Tables and Graphs as dockable boxes too, on an option branch.
 - Task 803 — See every unused alternative at a glance.
 - Task 805 — A clean map: hide the override ambers and the map's own controls.
 
-## 50 — Someday (27)
+## 50 — Someday (28)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -76,6 +75,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 734 — Where space is open east or west, one label on one line.
 - Task 736 — [H] · Count installs and app launches, if the consent text allows it.
 - Task 773 — Hover shows an asset's full label, as if every field were ticked.
+- Task 798 — Field values in Text, by {} keys disclosed in the User Manual.
 
 ## 25 — Maybe (15)
 
