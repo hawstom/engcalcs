@@ -97,6 +97,7 @@ the block.
   | Total potential energy at a point | Head |
   | Total potential energy as a line | HGL |
   | Total energy as a line | EGL |
+  **Found by sprint 1017's QA (2026-10-17):** am (ሁኔታ) and my (အခြေအနေ) each use one word for both Scenario and Status, about 120 and 21 strings; three box titles begin alike. Needs a Status word in each.
   The concept layer exists (`dev/term-concepts.md`, `concept_check.php`; glossary terms carry a
   concept id and a definition, and payloads send the definition as the source). Head and HGL stay
   split (Tom, 2026-09-30).
@@ -183,7 +184,7 @@ the block.
   Tom, 2026-10-17: *"I had much more in mind for themes than Light and Dark ... fun and useful themes around such ideas as high contrast, Mac, retro eras and devices (maybe monochrome amber and monochrome green), rounded corners, icons, fonts, and colors. I envision a fun and useful theme selector as well as an eventual upgrade of our default aesthetics ... a visitor might say, 'It looks the same, but better, nicer, more pleasant.'"* Ida's plan: `dev/themes-plan.md` on `feat/theme`.
 - 100|812| **Port the label bench's proven findings to master, one branch each.**
   Tom, 2026-10-17: *"We need to figure out what and how to merge the current best findings from our label placement project to improve our performance and results."* The bench branches are 2,300 commits behind and never merge as they are; the plan is `dev/label-trials/port-plan.md` on `docs/label-port`.
-- 75|809| **Finish the translation-clarification follow-ups at the next sprint.** Fix cs `lpn_settings_text_halo` (*svatozář*, a saint's halo) and sw (*mwanga*, light), and their `_tip`, with the `halo` concept in `dev/terms.md`; needs Tom's approval to translate. Awaiting him: sprint cadence (once before each production pull). Open: `prefix_terms.inc.php` lists now only wire sense-qualified terms; glossary `context` and `translation_notes_xx` are not folded into `definition`/`translation_notes`; no check fails a term reaching no key.
+- 75|809| **Finish the translation-clarification follow-ups at the next sprint.** The halo words were fixed with sprint 1017 (cs obrys, sw ukingo). Awaiting him: sprint cadence (once before each production pull). Open: `prefix_terms.inc.php` lists now only wire sense-qualified terms; glossary `context` and `translation_notes_xx` are not folded into `definition`/`translation_notes`; no check fails a term reaching no key.
 - 75|810| **Bring the features list up to what the software does.** Tom, 2026-10-16: *"I prefer to let you edit based on my
   messages/prompts."* Missing from `dev/features-source.md`: scenarios and alternatives, with Presentation and Calculation overrides
   for saved view layouts; converting coordinate systems and units; import and export of everything itemized; time series graphs on

@@ -3644,7 +3644,7 @@ $ec_lang['lpn_settings_align_labels']='Zarovnat popisky potrubí s potrubím';
 $ec_lang['lpn_settings_readability_bias']='Otočit popisek vzhůru nohama, když je nakloněný o víc než tolik stupňů vlevo od svislice';
 $ec_lang['lpn_settings_readability_bias_tip']='Otočí popisek, aby zůstal čitelný vzhůru, když je nakloněný o víc než tolik stupňů vlevo od svislice.';
 $ec_lang['lpn_settings_mask_labels']='Plné pozadí za popisky';
-$ec_lang['lpn_settings_text_halo']='Šířka svatozáře textu (procenta velikosti textu)';
+$ec_lang['lpn_settings_text_halo']='Šířka obrysu textu (procenta velikosti textu)';
 $ec_lang['lpn_settings_text_halo_tip']='Šířka plného obrysu za textem na mapě v procentech velikosti textu. Platí, je-li zapnuto Plné pozadí za popisky.';
 // Task 408: dragging a label away from its node draws a leader line, and this pulls that line onto
 // a round angle when the drag comes close to one. The values are numbers and the degree sign, which

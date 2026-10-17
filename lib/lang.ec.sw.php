@@ -3644,7 +3644,7 @@ $ec_lang['lpn_settings_align_labels']='Lainisha lebo za bomba na mabomba';
 $ec_lang['lpn_settings_readability_bias']='Geuza lebo chini juu ikiwa imeinama zaidi ya nyuzi hizi kushoto ya wima';
 $ec_lang['lpn_settings_readability_bias_tip']='Geuza lebo ili ibaki sawa juu wakati imeinama zaidi ya nyuzi hizi kushoto ya wima.';
 $ec_lang['lpn_settings_mask_labels']='Mandharinyuma imara nyuma ya lebo';
-$ec_lang['lpn_settings_text_halo']='Upana wa mwanga wa maandishi (asilimia ya ukubwa wa maandishi)';
+$ec_lang['lpn_settings_text_halo']='Upana wa ukingo wa maandishi (asilimia ya ukubwa wa maandishi)';
 $ec_lang['lpn_settings_text_halo_tip']='Upana wa mstari imara wa nje nyuma ya maandishi ya ramani, kama asilimia ya ukubwa wa maandishi. Hutumika wakati Mandharinyuma imara nyuma ya lebo imewashwa.';
 // Task 408: dragging a label away from its node draws a leader line, and this pulls that line onto
 // a round angle when the drag comes close to one. The values are numbers and the degree sign, which
