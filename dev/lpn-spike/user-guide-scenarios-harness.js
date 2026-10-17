@@ -25,13 +25,13 @@ U.takeBrowserLock(NAME, 'EC_UGSCN_LOCKED');
 
 // Chapter key -> language keys whose English text the chapter writes out.
 const QUOTES = {
-	lpn_guide_scn_use_def: ['lpn_scenario_preset_flow_static', 'lpn_scenario_preset_flow_mid', 'lpn_scenario_preset_flow_max',
-		'lpn_scenario_preset_average_day', 'lpn_scenario_preset_max_day', 'lpn_scenario_preset_peak_hour', 'lpn_scenario_preset_fire_max_day'],
+	lpn_guide_scn_use_def: ['lpn_ff_title', 'lpn_scenario_preset_flow_static', 'lpn_scenario_preset_flow_mid', 'lpn_scenario_preset_flow_max',
+		'lpn_scenario_preset_average_day', 'lpn_scenario_preset_max_day', 'lpn_scenario_preset_peak_hour'],
 	lpn_guide_scn_open_def: ['lpn_menu_project', 'lpn_scenario_menu', 'lpn_scenario_label', 'lpn_scenario_overrides', 'lpn_scenario_base',
 		'lpn_sm_title', 'lpn_scenario_basic'],
 	lpn_guide_scn_marks_def: ['lpn_alt_cat_physical', 'lpn_pane_scn_show', 'lpn_settings_override_marks', 'lpn_clean_map', 'lpn_menu_map',
 		'lpn_tool_settings', 'lpn_settings_sec_map', 'lpn_settings_page', 'lpn_settings_sec_symbology', 'lpn_labels_heading_node', 'lpn_labels_heading_link'],
-	lpn_guide_scn_make_def: ['lpn_morph_menu', 'lpn_paste_props_menu', 'lpn_find_menu', 'lpn_sm_list_overrides', 'lpn_ovl_clear_selected',
+	lpn_guide_scn_make_def: ['lpn_morph_menu', 'lpn_paste_props_menu', 'lpn_find_menu', ['lpn_sm_list_overrides', 'Override manager'], 'lpn_ovl_clear_selected',
 		'lpn_pane_clear_override', 'lpn_ovl_clear_all'],
 	lpn_guide_scn_scope_def: ['lpn_alt_cat_physical', 'lpn_alt_cat_demand', 'lpn_alt_cat_topology', 'lpn_alt_cat_initial', 'lpn_alt_cat_constituent',
 		'lpn_alt_cat_fireflow', 'lpn_alt_cat_energy', 'lpn_alt_cat_userdata', 'lpn_alt_cat_text', 'lpn_alt_cat_presentation', 'lpn_alt_cat_calculation',
@@ -39,7 +39,7 @@ const QUOTES = {
 	lpn_guide_scn_example_def: ['lpn_menu_project', 'lpn_scenario_menu', 'lpn_scenario_new', 'lpn_dialog_ok', 'lpn_field_diameter', 'lpn_scenario_base',
 		'bpn_demand_mult', 'lpn_tool_settings', 'lpn_alt_cat_calculation', 'lpn_settings_hydraulics', 'lpn_reports_menu', 'lpn_scncmp_title',
 		'lpn_scenario_label', 'lpn_scenario_overrides', 'bpn_p_min', 'lpn_scncmp_col_maxvelocity'],
-	lpn_guide_scn_notes_def: ['lpn_sm_list_overrides', 'lpn_ovl_same', 'lpn_scenario_basic', 'lpn_sm_title'],
+	lpn_guide_scn_notes_def: [['lpn_sm_list_overrides', 'Override manager'], 'lpn_ovl_same', 'lpn_scenario_basic', 'lpn_sm_title'],
 	lpn_guide_text_scncmp_box: ['lpn_sm_title', 'lpn_menu_project', 'lpn_reports_menu', 'lpn_scncmp_title'],
 	lpn_guide_cmp_cols_def: ['lpn_scenario_label', 'lpn_scncmp_current', 'lpn_scenario_overrides', 'bpn_demand_mult', 'lpn_time_duration',
 		'lpn_time_hyd_step', 'bpn_p_min', 'lpn_scncmp_col_maxvelocity'],
@@ -304,14 +304,15 @@ async function main() {
 		await a.newProject('us');
 		await settle(1500);
 		rows = await listRows();
-		const presets = ['flow_static', 'flow_mid', 'flow_max', 'average_day', 'max_day', 'peak_hour', 'fire_max_day'];
+		// The six the chapter lists, by key; a seventh (Fire plus max day) may still be there until the Scenarios menu branch lands.
+		const presets = ['flow_static', 'flow_mid', 'flow_max', 'average_day', 'max_day', 'peak_hour'];
 		const names = [];
 		for (const p of presets) { names.push(await T('lpn_scenario_preset_' + p)); }
-		const tail = rows.slice(-7);
-		ok('the list ends with the seven names the chapter writes out, each with one override', JSON.stringify(tail.map((x) => x.text)) === JSON.stringify(names.map((nm) => nm + ' (1)')), JSON.stringify(tail.map((x) => x.text)));
+		const listed = rows.map((x) => x.text);
+		ok('the list holds the six names the chapter writes out, in order, each with one override', names.every((nm, i) => listed.indexOf(nm + ' (1)') >= 0 && (i === 0 || listed.indexOf(nm + ' (1)') > listed.indexOf(names[i - 1] + ' (1)'))), JSON.stringify(listed.slice(-7)));
 		const d5 = await U.storedProject(ctx);
 		const mult = presets.map((p, i) => { const s = d5.scenarios.filter((x) => x.name === names[i])[0]; return s && s.demandMultiplier; });
-		ok('...with multipliers 1, 1, 1, 1, 2, 3, 2, as the chapter states', JSON.stringify(mult) === '[1,1,1,1,2,3,2]', JSON.stringify(mult));
+		ok('...with multipliers 1, 1, 1, 1, 2, and 3, as the chapter states', JSON.stringify(mult) === '[1,1,1,1,2,3]', JSON.stringify(mult));
 		ok('no page errors (English)', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.context.close().catch(() => {});
 
