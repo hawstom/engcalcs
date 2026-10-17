@@ -67,7 +67,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED English: 'Copy with column headings'
   @@ NEEDS RULING
 - **`lpn_settings_hover_card_tip`**
-  > Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
+  > Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
   *The finding:* 'at any scale, fit or not' leaves 'fit' with no subject: fit what? The setting makes the hover card show the label even when the on-map label was dropped for lack of room (js/looped-network.js:51225). 'fit' also collides with 'zoom to fit'.
   1. whether or not the label fits on the map at the current zoom
   2. whether or not the map is zoomed to fit the network
@@ -869,7 +869,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**143 still to read**, of 146 new keys across 11 unmerged branch(es).
+**145 still to read**, of 148 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -882,7 +882,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/guide-scenarios (`c60410088`) — 142 new, 142 to read @@ NEEDS RULING
+### feat/guide-scenarios (`e59a8892d`) — 144 new, 144 to read @@ NEEDS RULING
 
 - **`lpn_guide_bx_dock_def`**
   > <p>The corner of a box's title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap, and the box tucks back into its tab as described above. A tucked box is still open. A menu row or toolbar button that opens it brings it out of its tab.</p><p>Dragging a docked box by its title band floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.</p>
@@ -1130,6 +1130,12 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_guide_mn_list_term`**
   > Reading the menu list
   @@ NEEDS RULING
+- **`lpn_guide_nt_example_def`**
+  > Open the Net1 example and choose Water, Libraries. Curve 1, Pump Curve for Pump 9, has one point, 1500 gpm at 250 ft. The head at zero flow is 333.3 ft and the highest flow is 3000 gpm. At 3500 gpm, which is past the end of the curve, the curve gives a head of −120.4 ft. The EPANET solver reports that same head, a loss of 120.4 ft across the pump, and warns that pumps cannot deliver enough flow or head.
+  @@ NEEDS RULING
+- **`lpn_guide_nt_example_term`**
+  > Example on Net1: a pump past its curve
+  @@ NEEDS RULING
 - **`lpn_guide_prop_edit_def`**
   > <p>A value takes effect when the field is committed, by leaving it or pressing Enter. It is read in the unit named in its label, with no conversion, and the map label, Tables, and the results follow. Calculated values are read-only rows with no box to type in. For a link they follow its inputs, and for a node they sit among them. They are the results of the last calculation, at the time shown, and with Recalculate automatically cleared they are those of the last Calculate.</p><p>A pipe that uses a pipe type shows the values the type states as disabled. Click Detach from pipe type to copy those values into the pipe and edit them there.</p>
   @@ NEEDS RULING
@@ -1311,7 +1317,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Searching, links, and what is remembered
   @@ NEEDS RULING
 
-### feat/hover-props (`9672e7859`) — adds no English strings
+### feat/hover-props (`9672e7859`) — already merged into merge/1017b; its strings are listed there
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -1335,7 +1341,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/native-valves (`c3d69dba6`) — adds no English strings
+### feat/native-valves (`c16fa7cab`) — already merged into merge/1017b; its strings are listed there
+
+### merge/1017b (`bea5b062a`) — adds no English strings
 
 ### option/pane-boxes (`2ac75bbbe`) — 1 new, 1 to read @@ NEEDS RULING
 
