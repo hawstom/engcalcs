@@ -190,11 +190,11 @@ async function main() {
 		ok('it says how many points and lines were found', !!d && d.text.indexOf((await L('lpn_gjnet_intro')).replace('{points}', '4').replace('{lines}', '5')) >= 0, d && d.text.slice(0, 200));
 		const betaText = await L('lpn_gjnet_beta');
 		const beta = await P.evaluate(() => { const e = document.querySelector('#lpn_dialog_body .lpn-gjnet-beta'); return e ? { text: e.textContent, title: e.title, shown: e.getBoundingClientRect().height > 0 } : null; });
-		ok('the dialog is marked "Beta: feedback requested", visible', !!beta && beta.text === 'Beta: feedback requested' && beta.text === betaText && beta.shown, JSON.stringify(beta));
+		ok('the dialog is marked "Beta: feedback requested", visible', !!beta && beta.text === betaText && betaText.length > 0 && beta.shown, JSON.stringify(beta));
 		ok('...and its tip names the Something wrong here? button', !!beta && beta.title.indexOf(await L('lpn_wrong_btn')) >= 0 && beta.title.indexOf('{') < 0, beta && beta.title);
 		{
 			const tip = await L('lpn_file_import_shapes_tip');
-			ok('the Import GeoJSON shapes tip names both doors, the EPANET file and the GeoJSON network', tip.indexOf('EPANET file') >= 0 && tip.indexOf('Import GeoJSON network') >= 0 &&
+			ok('the Import GeoJSON shapes tip names both doors, the EPANET file and the GeoJSON network', tip.indexOf('EPANET file') >= 0 && tip.indexOf((await L('lpn_file_import_gjnet')).replace('…', '')) >= 0 &&
 				await P.evaluate((t) => (EngCalcs.pageConfig || {}).lpn_file_import_shapes_tip === t, tip), tip);
 		}
 		const sel = (kind, field) => P.$eval('table[data-kind="' + kind + '"] select[data-field="' + field + '"]', (s) => s.value);
