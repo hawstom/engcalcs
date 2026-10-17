@@ -194,6 +194,15 @@ async function main() {
 			const loc = a.page.locator(sel);
 			if (!(await loc.count())) { ok(`${c.label} is still in the box`, false); inventory.push({ sub: c.sub, label: c.label, declared: c.declared, observed: 'not driven' }); continue; }
 			let observed = 'session', tried = [];
+			// The previous row's restore may still be saving (a solve it scheduled saves the project
+			// when it lands), so wait for the store to go quiet before taking this row's "before":
+			// otherwise that late save is charged to this row.
+			for (let q = 0, prev = JSON.stringify(await P(SNAPSHOT)); q < 12; q++) {
+				await a.settle(250);
+				const now = JSON.stringify(await P(SNAPSHOT));
+				if (now === prev) { break; }
+				prev = now;
+			}
 			const snap0 = await P(SNAPSHOT);
 			const was = await loc.evaluate((e) => ({ checked: e.checked, value: e.value }));
 			const isView = await loc.evaluate((e) => !!e.closest('#lpn_set_view_group'));

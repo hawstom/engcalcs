@@ -81,8 +81,8 @@ rows) are counted only when present. Regenerate with
 | `lpn_set_sub_linkColors` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_custLbl` | 8 | 8 | 0 | 0 |
 | `lpn_set_sub_nodeLink` | 1 | 1 | 0 | 0 |
-| `lpn_set_sub_mapDisplay` | 16 | 16 | 0 | 0 |
-| `lpn_set_sub_page` | 2 | 0 | 2 | 0 |
+| `lpn_set_sub_mapDisplay` | 19 | 19 | 0 | 0 |
+| `lpn_set_sub_page` | 3 | 0 | 3 | 0 |
 | `lpn_set_sub_idPrefixes` | 7 | 7 | 0 | 0 |
 | `lpn_set_sub_defaults` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_customProps` | 10 | 10 | 0 | 0 |
@@ -91,11 +91,12 @@ rows) are counted only when present. Regenerate with
 | `lpn_set_sub_hydraulics` | 17 | 16 | 1 | 0 |
 | `lpn_set_sub_energy` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_quality` | 2 | 2 | 0 | 0 |
-| **Total** | 129 | 126 | 3 | 0 |
+| **Total** | 133 | 129 | 4 | 0 |
 
 Controls whose home is not their heading's default, as observed:
 
 - `lpn_set_sub_page`: Show the selection help -- browser
 - `lpn_set_sub_page`: Show the full label on hover -- browser
+- `lpn_set_sub_page`: Show override markers on the map -- browser
 - `lpn_set_sub_hydraulics`: Show the run progress box -- browser
 <!-- INVENTORY:END -->
