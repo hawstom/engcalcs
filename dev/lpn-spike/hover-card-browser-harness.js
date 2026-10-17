@@ -1,26 +1,26 @@
-// THE HOVER CARD: AN ASSET'S LABEL PER SETTINGS, AT ANY SCALE, FIT OR NOT (ROADMAP Task 773), in a
-// real Chromium. Run with:
+// THE HOVER CARD: ALL OF AN ASSET'S PROPERTIES, FORMATTED AS SETTINGS SPECIFIES, AT ANY SCALE, FIT OR
+// NOT (ROADMAP Task 773; Tom, 2026-10-16), in a real Chromium. Run with:
 //   node dev/lpn-spike/hover-card-browser-harness.js
 //
 // WHAT IT PROVES.
-//   1. Net1 with a NON-DEFAULT tick set (node: ID, Elevation, Demand; pipe: ID, Length, Diameter):
-//      resting the pointer on junction 11 shows a card whose lines equal the map label's rows, and
-//      a field unticked in Settings (Head, Pressure; Roughness, Flow) is absent: not more, not less.
-//      The card is the suite's one styled tip (a .tooltip), not the browser's (no title).
-//   2. The pipe's card carries the same values as its map label, in the same order, and none of
-//      the unticked ones.
-//   3. A group with nothing ticked shows the ID alone on the card.
-//   4. THE LABELING THRESHOLD DOES NOT HIDE THE CARD: with the threshold so low that the map draws
-//      no labels at the fitted view, the card still shows the ticked fields.
-//   5. DELETE AND DRAWING: in Delete mode the card shows on a pipe, and a press still deletes it
+//   1. Net1 with a NON-DEFAULT tick set (node: ID, Elevation, Demand; pipe: ID, Length, Diameter) and
+//      a pressure of 3 decimals: resting the pointer on junction 11, pipe 111 and a customer shows a
+//      card with fields that are NOT ticked (Head, Pressure; Roughness, Flow; the customer's
+//      Description), the pressure printed with the label settings' three decimals, and the map
+//      label's own ticked rows still a subset of it, in order. The card is the suite's one styled tip.
+//   2. WHICH BOXES ARE TICKED MAKES NO DIFFERENCE: the same cards with the TICK set, with nothing
+//      ticked, and with everything ticked are line for line equal.
+//   3. THE LABELING THRESHOLD DOES NOT HIDE THE CARD: with the threshold so low that the map draws
+//      no labels at the fitted view, the card still shows every field.
+//   4. DELETE AND DRAWING: in Delete mode the card shows on a pipe, and a press still deletes it
 //      and takes the card down; in Pipe mode it shows on the node about to be joined, and the
 //      press still starts / completes the pipe.
-//   6. HOVER COSTS NOTHING IN THE LABEL LAYER (no getBBox, no node added or removed), the card
+//   5. HOVER COSTS NOTHING IN THE LABEL LAYER (no getBBox, no node added or removed), the card
 //      takes no pointer events, a press selects through it, and sliding waits for rest.
-//   7. THE SETTING: Settings > Map and page > Page > "Show the full label on hover" is the real
+//   6. THE SETTING: Settings > Map and page > Page > "Show the full label on hover" is the real
 //      control; unticked, no card and lpn_hovercard=off is the only thing stored.
-//   8. ?lang=es: the Spanish card differs from the English one.
-//   9. No page errors.
+//   7. ?lang=es: the Spanish card differs from the English one and carries every field.
+//   8. No page errors.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -52,6 +52,8 @@ if (process.env[LOCK_ENV] !== '1') {
 }
 
 let checks = 0, failures = 0;
+const world = {};
+function isSubsequence(sub, full) { let i = 0; (full || []).forEach((t) => { if (i < (sub || []).length && sub[i] === t) { i++; } }); return !!sub && i === sub.length; }
 function ok(label, cond, detail) {
 	checks++;
 	if (!cond) { failures++; }
@@ -59,6 +61,7 @@ function ok(label, cond, detail) {
 }
 
 const NODE_FIELDS = ['id', 'desc', 'tag', 'demand', 'elev', 'initQuality', 'demandActual', 'level', 'head', 'pressure', 'quality'];
+const CUST_FIELDS = ['id', 'demandActual', 'demand', 'desc', 'tag', 'count'];
 const LINK_FIELDS = ['id', 'desc', 'tag', 'length', 'diameter', 'roughness', 'km', 'initStatus', 'bulkCoeff', 'wallCoeff',
 	'flow', 'velocity', 'headloss', 'gradient', 'friction', 'rate', 'quality', 'status'];
 
@@ -76,6 +79,11 @@ function projectText(tick, maxW) {
 	d.labelSettings = d.labelSettings || {};
 	d.labelSettings.node = {}; NODE_FIELDS.forEach((k) => { d.labelSettings.node[k] = tick.node.indexOf(k) >= 0; });
 	d.labelSettings.link = {}; LINK_FIELDS.forEach((k) => { d.labelSettings.link[k] = tick.link.indexOf(k) >= 0; });
+	d.labelSettings.customer = {}; CUST_FIELDS.forEach((k) => { d.labelSettings.customer[k] = (tick.customer || []).indexOf(k) >= 0; });
+	d.labelSettings.decimals = d.labelSettings.decimals || {};
+	d.labelSettings.decimals.node = Object.assign({}, d.labelSettings.decimals.node, { pressure: 3 });
+	// One loose service with a stated description, tag and count, so the customer card has fields.
+	d.customers = [{ id: 'M1', demand: 12.5, count: 3, link: null, x: 25, y: 60, desc: 'Main Street school', tag: 'inst' }];
 	return JSON.stringify(d);
 }
 
@@ -98,10 +106,10 @@ async function openNet1(Session, browser, tick, lang, maxW) {
 	return a;
 }
 
-const TICK = { node: ['id', 'elev', 'demand'], link: ['id', 'length', 'diameter'] };
-const ID_ONLY = { node: ['id'], link: ['id'] };
-const NONE = { node: [], link: [] };
-const TICK_ES = { node: ['id'], link: ['id', 'status', 'length'] };
+const TICK = { node: ['id', 'elev', 'demand'], link: ['id', 'length', 'diameter'], customer: ['id'] };
+const ALL = { node: NODE_FIELDS, link: LINK_FIELDS, customer: CUST_FIELDS };
+const NONE = { node: [], link: [], customer: [] };
+const TICK_ES = { node: ['id'], link: ['id', 'status', 'length'], customer: ['id'] };
 
 function centreOf(page, selector) {
 	return page.evaluate((sel) => {
@@ -174,9 +182,11 @@ async function main() {
 			await rest(a, p);
 			const lines = await cardLines(a.page);
 			ok('resting on junction 11 shows a card', !!lines, JSON.stringify(lines));
-			ok('...whose lines equal the map label rows, row for row (the ticked fields, not more)', lines && JSON.stringify(lines) === JSON.stringify(mapRows),
+			ok('...whose lines hold every map label row, in the label\'s order', lines && isSubsequence(mapRows, lines),
 				'card ' + JSON.stringify(lines) + ' label ' + JSON.stringify(mapRows));
-			ok('...and so carries none of the unticked fields (Head, Pressure)', lines && lines.length === 3, JSON.stringify(lines));
+			ok('...and also the unticked fields: Head and Pressure', lines && lines.length > 5 && lines.some((t) => /^H=/.test(t)) && lines.some((t) => /^P=/.test(t)), JSON.stringify(lines));
+			ok('...Pressure printed with the label settings\' three decimals', lines && lines.some((t) => /^P=\d+\.\d{3}\b/.test(t)), JSON.stringify(lines));
+			world.node = lines;
 			const anchorTitle = await a.page.evaluate(() => { const e = document.querySelector('.lpn-hovercard-anchor'); return e ? (e.getAttribute('title') || '') + (e.getAttribute('data-bs-original-title') || '') : 'none'; });
 			ok('the card is the styled tip on an untitled anchor, so no native tooltip can show', anchorTitle === '', JSON.stringify(anchorTitle));
 			const cost = await a.page.evaluate(() => ({ bbox: window.__bboxCalls, mut: window.__mut }));
@@ -199,10 +209,12 @@ async function main() {
 				await rest(a, pp);
 				const pl = await cardLines(a.page);
 				const lblText = await a.page.evaluate(() => { const t = document.querySelector('text[data-linklbl="111"]'); return t ? t.textContent.replace(/\s+/g, '') : null; });
-				ok('resting on pipe 111 shows its card: the three ticked rows', !!pl && pl.length === 3, JSON.stringify(pl));
+				ok('resting on pipe 111 shows its card with more than the three ticked rows', !!pl && pl.length > 5, JSON.stringify(pl));
 				ok('...led by the ID the map label shows', pl && pl[0] === PFX.link + '111', JSON.stringify(pl && pl[0]));
-				ok('...and its rows are, in order, what the map label prints', pl && lblText === pl.join('').replace(/\s+/g, ''),
+				ok('...with the unticked Roughness and Flow among them', pl && pl.some((t) => /^C=/.test(t)) && pl.some((t) => /^Q=/.test(t)), JSON.stringify(pl));
+				ok('...and the ticked rows the map label prints, in its order', pl && lblText === pl.filter((t) => lblText.indexOf(t.replace(/\s+/g, '')) >= 0).join('').replace(/\s+/g, ''),
 					'card ' + JSON.stringify(pl) + ' label ' + JSON.stringify(lblText));
+				world.link = pl;
 				await away(a);
 			}
 
@@ -274,16 +286,38 @@ async function main() {
 			ok('no page errors', !a.errors.length, (a.errors[0] || '').slice(0, 200));
 		} finally { await a.close(); }
 
-		// ---- nothing ticked: the ID alone ----
-		console.log('=== nothing ticked ===');
-		const n0 = await openNet1(Session, browser, NONE);
-		try {
-			const p0 = await centreOf(n0.page, '#lpn_canvas circle[data-node="11"]');
-			await rest(n0, p0);
-			const l0 = await cardLines(n0.page);
-			ok('a junction with no field ticked still shows a card: its ID alone', JSON.stringify(l0) === JSON.stringify([PFX.node + '11']), JSON.stringify(l0));
-			ok('no page errors (none ticked)', !n0.errors.length, (n0.errors[0] || '').slice(0, 200));
-		} finally { await n0.close(); }
+		// ---- the tick set makes no difference ----
+		console.log('=== nothing ticked, and everything ticked ===');
+		for (const [name, tk] of [['nothing ticked', NONE], ['everything ticked', ALL]]) {
+			// Every label drawn would cover the neighbours (a label is a hit target), so the labeling
+			// threshold hides them; the card does not depend on them.
+			const n0 = await openNet1(Session, browser, tk, undefined, 1);
+			try {
+				const p0 = await centreOf(n0.page, '#lpn_canvas circle[data-node="11"]');
+				// With every label drawn, a label of a neighbour can lie over the circle's centre; try
+				// points across the circle until the card names junction 11.
+				let jl = null;
+				for (const [dx, dy] of [[0, 0], [4, 4], [-4, 4], [4, -4], [-4, -4], [0, 6], [6, 0], [0, -8], [-8, 0], [0, 10], [10, 0]]) {
+					await away(n0);
+					await rest(n0, { x: p0.x + dx, y: p0.y + dy });
+					jl = await cardLines(n0.page);
+					if (jl && jl[0] === world.node[0]) { break; }
+				}
+				ok(name + ': the junction card is line for line the same', JSON.stringify(jl) === JSON.stringify(world.node), JSON.stringify(jl));
+				await away(n0);
+				const p1 = await centreOf(n0.page, '#lpn_canvas [data-link="111"]');
+				await rest(n0, p1);
+				ok(name + ': ...and the pipe card', JSON.stringify(await cardLines(n0.page)) === JSON.stringify(world.link), JSON.stringify(await cardLines(n0.page)));
+				await away(n0);
+				const p2 = await centreOf(n0.page, '#lpn_canvas .lpn-meter[data-cust="M1"]');
+				await rest(n0, p2);
+				const cl = await cardLines(n0.page);
+				if (name === 'nothing ticked') { world.cust = cl; }
+				ok(name + ': ...and the customer card has every field', !!cl && cl.length >= 5 && cl.some((t) => /Main Street school/.test(t)) && cl.some((t) => /inst/.test(t)), JSON.stringify(cl));
+				if (name !== 'nothing ticked') { ok('...the same as with nothing ticked', JSON.stringify(cl) === JSON.stringify(world.cust)); }
+				ok('no page errors (' + name + ')', !n0.errors.length, (n0.errors[0] || '').slice(0, 200));
+			} finally { await n0.close(); }
+		}
 
 		// ---- the labeling threshold hides the map's labels, not the card ----
 		console.log('=== labels hidden by the labeling threshold ===');
@@ -294,12 +328,12 @@ async function main() {
 			const ph = await centreOf(hz.page, '#lpn_canvas circle[data-node="11"]');
 			await rest(hz, ph);
 			const lh = await cardLines(hz.page);
-			ok('...yet resting on junction 11 shows the ticked fields', JSON.stringify(lh) === JSON.stringify([PFX.node + '11', 'Qb=150.0', 'Z=710.00']), JSON.stringify(lh));
+			ok('...yet resting on junction 11 shows every field', JSON.stringify(lh) === JSON.stringify(world.node), JSON.stringify(lh));
 			await away(hz);
 			const pph = await centreOf(hz.page, '#lpn_canvas [data-link="111"]');
 			await rest(hz, pph);
 			const lph = await cardLines(hz.page);
-			ok('...and on pipe 111', JSON.stringify(lph) === JSON.stringify([PFX.link + '111', "5280'", '10"']), JSON.stringify(lph));
+			ok('...and on pipe 111', JSON.stringify(lph) === JSON.stringify(world.link), JSON.stringify(lph));
 			ok('no page errors (threshold)', !hz.errors.length, (hz.errors[0] || '').slice(0, 200));
 		} finally { await hz.close(); }
 
@@ -314,7 +348,7 @@ async function main() {
 			const pd = await centreOf(dm.page, '#lpn_canvas [data-link="111"]');
 			await rest(dm, pd);
 			const ld = await cardLines(dm.page);
-			ok('in Delete mode, resting on pipe 111 shows its card', JSON.stringify(ld) === JSON.stringify([PFX.link + '111', "5280'", '10"']), JSON.stringify(ld));
+			ok('in Delete mode, resting on pipe 111 shows its card', JSON.stringify(ld) === JSON.stringify(world.link), JSON.stringify(ld));
 			const pe = await dm.page.evaluate(() => { const t = document.querySelector('.tooltip.lpn-hovercard'); return t ? getComputedStyle(t).pointerEvents : null; });
 			ok('...and it takes no pointer events', pe === 'none', pe);
 			await dm.page.mouse.down(); await dm.page.mouse.up();
@@ -328,7 +362,7 @@ async function main() {
 			const pb = await centreOf(dm.page, '#lpn_canvas circle[data-node="13"]');
 			await rest(dm, pa);
 			const lp = await cardLines(dm.page);
-			ok('in Pipe mode, resting on the node about to start a pipe shows its card', JSON.stringify(lp) === JSON.stringify([PFX.node + '11', 'Qb=150.0', 'Z=710.00']), JSON.stringify(lp));
+			ok('in Pipe mode, resting on the node about to start a pipe shows its card', !!lp && JSON.stringify(lp.slice(0, 5)) === JSON.stringify(world.node.slice(0, 5)) && lp.length === world.node.length, JSON.stringify(lp));
 			await dm.page.mouse.down(); await dm.page.mouse.up();
 			await dm.page.waitForTimeout(300);
 			ok('...the press starts the pipe (the from-node is marked) and the card is gone',
@@ -358,7 +392,7 @@ async function main() {
 			const pp = await centreOf(es.page, '#lpn_canvas [data-link="111"]');
 			await rest(es, pp);
 			const esPipe = await cardLines(es.page);
-			ok('the Spanish page shows a pipe card', !!esPipe && esPipe.length >= 3, JSON.stringify(esPipe));
+			ok('the Spanish page shows a pipe card with every field', !!esPipe && esPipe.length >= 8, JSON.stringify(esPipe));
 			ok('...whose words are Spanish where the English card has English ones', esPipe && enPipe && JSON.stringify(esPipe) !== JSON.stringify(enPipe),
 				'en ' + JSON.stringify(enPipe) + ' es ' + JSON.stringify(esPipe));
 			ok('no page errors (es)', !es.errors.length, (es.errors[0] || '').slice(0, 200));

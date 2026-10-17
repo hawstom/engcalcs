@@ -14292,7 +14292,7 @@ var EngCalcs = EngCalcs || {};
 		// The two identity strings, printed as the words they are. An absent one prints NOTHING
 		// rather than an empty slot: a blank where a description would be is a separator with no
 		// value beside it, which reads as a defect on every unlabelled service in the drawing.
-		if (ls.customer.desc && c.desc) { lines.push(affix('customer', 'desc', { text: descLabelText(c.desc) })); }
+		if (ls.customer.desc && c.desc) { lines.push(affix('customer', 'desc', { text: descLabelText(c.desc, ls.fullDesc) })); }
 		if (ls.customer.tag && c.tag) { lines.push(affix('customer', 'tag', { text: String(c.tag) })); }
 		if (ls.customer.count) {
 			lines.push(affix('customer', 'count', { text: String((typeof c.count === 'number' && isFinite(c.count) && c.count > 0) ? c.count : 1) }));
@@ -21445,8 +21445,8 @@ var EngCalcs = EngCalcs || {};
 	 * never calls refreshLabelText() or any placement pass.
 	 *
 	 * **THE LINES COME FROM THE MAP LABEL'S OWN COMPOSERS** (nodeLabelFieldLines(),
-	 * linkLabelFieldLines(), customerLabelLines()), handed the live label settings (the fields
-	 * ticked there, and only those; the ID alone if none). Same units, same decimals, same order, same prefixes and suffixes; a field with
+	 * linkLabelFieldLines(), customerLabelLines()), handed the live label settings with EVERY
+	 * field ticked (allFieldsLabelSettings(), Tom 2026-10-16). Same units, same decimals, same order, same prefixes and suffixes; a field with
 	 * nothing to say (no solve yet, no quality analysis) is left out exactly as the label leaves it
 	 * out. Results show what the label would show, so the stale-snapshot rule holds without a line
 	 * of code of its own. One value to a line, not the link label's one-line concatenation: a card
@@ -21513,21 +21513,31 @@ var EngCalcs = EngCalcs || {};
 			if (hoverCard.sel && hoverCard.sel.kind === sel.kind && hoverCard.sel.id === sel.id) { hoverCardShow(sel); }
 		}, delay);
 	}
-	// **THE CARD READS THE LABEL SETTINGS AS THEY STAND, NOT A COPY WITH EVERYTHING TICKED** (Tom,
-	// 2026-10-08: *"It should show per Settings. Not more and not less."*). It hands the map label's
-	// own composers the live `labelSettings`, so the fields, show order, decimals, prefixes and
-	// suffixes are the label's by construction. What it does NOT inherit is anything about the
-	// LABEL'S PLACEMENT: the labeling threshold (dataLabelsHidden) and the shed cascade (fit) act on
-	// the drawn glyphs after these composers have run, and the card never calls them, so it shows at
-	// any scale, fit or not. A group with nothing ticked (or nothing to say yet) shows the ID alone:
-	// the card has to name what it is resting on, and an asset's ID is the one field it always has.
-	function idOnlyLabelSettings() {
-		var ls = scnLabels(), only = Object.assign({}, ls);
+	// **THE CARD SHOWS EVERY FIELD THE ASSET HAS, EACH FORMATTED AS SETTINGS SPECIFIES** (Tom,
+	// 2026-10-16, Task 773, reversing 2026-10-08's "per Settings, not more and not less": *"to see
+	// all of its properties formatted as specified in Settings, at any scale, whether or not the
+	// label fits on the map"*). It hands the map label's own composers a copy of the live label
+	// settings with every field ticked, so decimals, units, prefixes, suffixes and show order are the
+	// label's by construction, and which boxes are ticked makes no difference. A field with nothing
+	// to say (no solve yet, no quality analysis, a pipe with no such property) is left out exactly as
+	// the label leaves it out. Nothing about the label's PLACEMENT is inherited: the labeling
+	// threshold and the shed cascade act on drawn glyphs after the composers have run, and the card
+	// never calls them. `fullDesc` lets a Description show all its lines (the label shows the first).
+	var LPN_CARD_FIELDS = {
+		node: ['id', 'desc', 'tag', 'demandActual', 'demand', 'head', 'pressure', 'elev', 'level', 'quality', 'initQuality'],
+		link: ['id', 'desc', 'tag', 'initStatus', 'diameter', 'length', 'roughness', 'km', 'bulkCoeff', 'wallCoeff',
+			'flow', 'velocity', 'headloss', 'gradient', 'friction', 'status', 'quality', 'rate'],
+		customer: ['id', 'demandActual', 'demand', 'desc', 'tag', 'count']
+	};
+	function allFieldsLabelSettings() {
+		var ls = scnLabels(), all = Object.assign({}, ls);
 		['node', 'link', 'customer'].forEach(function (g) {
-			only[g] = {};
-			Object.keys(ls[g] || {}).forEach(function (k) { only[g][k] = (k === 'id'); });
+			all[g] = {};
+			Object.keys(ls[g] || {}).forEach(function (k) { all[g][k] = true; });
+			LPN_CARD_FIELDS[g].forEach(function (k) { all[g][k] = true; });
 		});
-		return only;
+		all.fullDesc = true;
+		return all;
 	}
 	function hoverCardLinesWith(sel, ls) {
 		var e;
@@ -21538,8 +21548,7 @@ var EngCalcs = EngCalcs || {};
 		return [];
 	}
 	function hoverCardLines(sel) {
-		var lines = hoverCardLinesWith(sel, scnLabels()).filter(function (l) { return l.text !== ''; });
-		return lines.length ? lines : hoverCardLinesWith(sel, idOnlyLabelSettings());
+		return hoverCardLinesWith(sel, allFieldsLabelSettings()).filter(function (l) { return l.text !== ''; });
 	}
 	// **THE CARD IN DELETE AND THE LINK-DRAWING MODES** (Tom, 2026-10-08): the same card, for the
 	// thing the next click would act on (what you are about to delete; the node you are about to
@@ -21578,7 +21587,10 @@ var EngCalcs = EngCalcs || {};
 		var host = document.createElement('div');
 		lines.forEach(function (t, i) {
 			if (i) { host.appendChild(document.createElement('br')); }
-			host.appendChild(document.createTextNode(t));
+			t.split('\n').forEach(function (part, j) {
+				if (j) { host.appendChild(document.createElement('br')); }
+				host.appendChild(document.createTextNode(part));
+			});
 		});
 		if (!hoverCard.anchor) {
 			hoverCard.anchor = document.createElement('div');
@@ -73791,8 +73803,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// in show order, possibly none: the empty placeholder is the caller's business.
 	// **A MAP LABEL HAS ROOM FOR ONE LINE OF A DESCRIPTION** (Task 806): the first, with an ellipsis
 	// when the text has more. The whole text is in Properties and the Tables pane's tip.
-	function descLabelText(d) {
+	// `full` (the hover card): every line, up to LPN_CARD_DESC_LINES.
+	var LPN_CARD_DESC_LINES = 8;
+	function descLabelText(d, full) {
 		var t = EngCalcs.lpnDescText(d), first = t.split('\n')[0];
+		if (full) {
+			var ln = t.split('\n');
+			return ln.length > LPN_CARD_DESC_LINES ? ln.slice(0, LPN_CARD_DESC_LINES).join('\n') + ' \u2026' : t;
+		}
 		return t.length > first.length ? first + ' \u2026' : first;
 	}
 	function nodeLabelFieldLines(n, ls, extrema) {
@@ -73804,7 +73822,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// **THE TWO IDENTITY WORDS** (Tom's table, R-327), printed as the words they are and only
 			// where one is stated -- a customer's own rule (customerLabelLines()): a blank slot where
 			// a description would be reads as a defect on every node that has none.
-			if (ls.node.desc && n.desc) { lines.push(affix('node', 'desc', { text: descLabelText(n.desc) })); }
+			if (ls.node.desc && n.desc) { lines.push(affix('node', 'desc', { text: descLabelText(n.desc, ls.fullDesc) })); }
 			if (ls.node.tag && n.tag) { lines.push(affix('node', 'tag', { text: String(n.tag) })); }
 			// **DEMAND FIRST, BASE DEMAND UNDER IT.** Two quantities and two rows -- see
 			// resolvedDemand(). rawLine() for both: neither number ever crossed into SI.
@@ -73855,7 +73873,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function linkLabelFieldLines(l, ls, extrema) {
 		var ld = ls.decimals.link, ex = extrema || {}, lines = [];
 			if (ls.link.id) { lines.push(affix('link', 'id', { text: l.id })); }
-			if (ls.link.desc && l.desc) { lines.push(affix('link', 'desc', { text: descLabelText(l.desc) })); }
+			if (ls.link.desc && l.desc) { lines.push(affix('link', 'desc', { text: descLabelText(l.desc, ls.fullDesc) })); }
 			if (ls.link.tag && l.tag) { lines.push(affix('link', 'tag', { text: String(l.tag) })); }
 			// **THE STATUS THE DOCUMENT STATES, BEFORE ANY RUN** (Tom's table, R-327: "Initial
 			// status"), beside the Status row below, which is the run's answer where there is one.
