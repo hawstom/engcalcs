@@ -236,13 +236,13 @@ console.log('\n--- and outside the mode, nothing bends a pipe by accident ---');
 	ok('...but it still works inside the Vertices mode', f.pipe.verts.length === 0,
 		JSON.stringify(f.pipe.verts));
 
-	// **AND THE THREE LABEL-HOME RESETS ARE UNTOUCHED.** Sending a dragged label back where it came
+	// **AND THE LABEL-HOME RESETS AND THE TEXT EDITOR ARE UNTOUCHED.** Sending a dragged label back where it came
 	// from is not an edit to the network, and it is the other thing this same handler does.
 	const src = require('fs').readFileSync(require('./lpn-dom-stub.js').ROOT + 'js/looped-network.js', 'utf8');
 	const gate = src.indexOf("else if (mode !== 'vertices') { void 0; }");
-	ok('the gate is below the three label-home resets, not above them',
+	ok('the gate is below the label-home resets and the Text editor, not above them',
 		gate > src.indexOf('resetNodeLabelHome(t.dataset.nodelbl)')
-		&& gate > src.indexOf('resetTextLabelHome(t.dataset.lbl)')
+		&& gate > src.indexOf('openTextEditor(t.dataset.lbl, false)')
 		&& gate < src.indexOf("removeVertex(t.dataset.link, +t.dataset.vidx); }\n\t\t\telse if (t.dataset.link"),
 		gate);
 	// The English must not still promise the gesture that is gone. This is the sentence a reader of

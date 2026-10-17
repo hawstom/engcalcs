@@ -708,6 +708,7 @@ $ec_lang['lpn_node_customers_tip']='د مشتریانو لیست چې دلته �
 $ec_lang['lpn_node_customers_sum']='{total} {unit} د مشتریانو ({n}) نه';
 $ec_lang['lpn_customer_detached']='⚠ دا مشتری هیڅ پایپ سره نښلول شوی نه دی، نو د هغه غوښتنه پایلو کې نشته. یې ړنګ کړئ، یا یو پایپ راکاږئ او مشتری پرې ولیږئ.';
 $ec_lang['lpn_customer_fixed_head']='⚠ د دې پایپ نږدې سر یو ثابت د اوبو سطح لري، نو دا غوښتنه پر سمولېشن اغیزه نه کوي.';
+
 $ec_lang['lpn_customer_detached_count']='مشتریان چې پایپ سره نه دي نښلول شوي ({n}). د دوی غوښتنه نه ده شمېرل شوې.';
 $ec_lang['lpn_meter_pick_pipe']='اوس هغه پایپ یا نقطه وټاکئ چې دا مشتری خدمتوي. مشتری هلته پاتې کیږي چیرته چې تاسو یې ایښی دی. د لغوه کولو لپاره Escape ووهئ.';
 $ec_lang['lpn_inp_export_flat_customers']='د EPANET فایل مشتریان نه لري. په دې پروژه کې د مشتریانو ({n}) غوښتنه د غوښتنې قطار په توګه په هغه جنکشن کې لیکل کیږي چې هر مشتری ورته ټاکل شوی، د مشتري په ټاګ نومول شوی. فایل پخپله مشتری نه ثبتوي: د هغه ځای، هغه پایپ چې خدمت ورکوي، د هغه پایپ په اوږدو کې چیرته چې خدمت نښلي، یا څو خدمتونه استازیتوب کوي. دا معلومات په پروژه کې پاتې کیږي؛ د ساتلو لپاره د پروژې فایل وساتئ.';
@@ -992,7 +993,6 @@ $ec_lang['lpn_guide_text_contour_box']='هغه کونتور پلاټ کنټرو�
 $ec_lang['lpn_guide_text_scncmp_box']='هره سناریو د انځور له کاپي څخه حلوي او د هرې لپاره د پرځای کولو شمېر، ټیټ ترین فشار، او لوړ ترین سرعت جدول کوي. پروژه نه بدلوي، او هغه سناریو چې پرانیستې ده هماغسې پاتې کیږي لکه څنګه چې وه.';
 $ec_lang['lpn_guide_text_rptbox']='د وروستي اوږد مهاله سمولېشن لپاره د EPANET انجن لخوا لیکل شوی متني راپور ښیي، د خبرداریو او د شبکې لنډیز په ګډون. هر اوږد مهاله سمولېشن یې بدلوي؛ په یو وخت کې حل یې نه بدلوي، او سمون پخوانی راپور پرېږدي.';
 $ec_lang['lpn_guide_text_status_box']='د وروستي اوږد مهاله سمولېشن په اوږدو کې هر بدلون د وخت په ترتیب لیست کوي: د پمپ، والو، یا پایپ خلاصیدل یا تړل کیدل، د ټانک ډکیدل یا تشیدل پیلول یا ډک یا تش کیدل، او هر وخت ګام چې په بشپړه توګه نه و یو ځای شوی. یوازې بدلونونه لیست کیږي، هر وخت ګام نه.';
-$ec_lang['lpn_guide_text_alt_box']='د هرې سناریو لپاره ښیي چې په هره کټګورۍ کې کوم بدیل کاروي، لکه فزیکي، غوښتنه، او د شتمنۍ فعالول، او د هغې د محاسبې اختیارونه: د غوښتنې ضرب، ټول چلون وخت، او هایدرولیک وخت ګام. بدیلونه یوازې د لوستلو دي. د سناریو د محاسبې اختیارونه دلته لیکل کیدی شي، او خالي ځای د مور ارزښت کاروي. د ساده حالت له پاکولو وروسته یې د سناریوګانو له مینو څخه پرانیزئ.';
 $ec_lang['lpn_guide_text_full_box']='هر نقطه او هر تړاو په هر راپور وخت ګام کې، د جدولونو په برخه کې ښودل شویو واحدونو سره لیست کوي. پرته د اوږد مهاله سمولېشن څخه، اوسنی حل په یوه شېبه کې ښیي. ډاونلوډ یا چاپ هر وخت ګام لري، او جدول یو په یو ښیي.';
 $ec_lang['lpn_guide_text_calib_box']='د ساحې د اندازه کولو فایل د همدې ځایونو او وختونو محاسبه شویو پایلو سره پرتله کوي، د هر پیرامیټر لپاره یو فایل. فایل یوازې د اوسنۍ ناستې لپاره ساتل کیږي او له پروژې سره نه ساتل کیږي.';
 $ec_lang['lpn_guide_text_notes_popup']='د دې پاڼې د چلند او هغه څه چې نه کوي یادښتونه لیست کوي، هر یو د یوې اصطلاح او د هغې تعریف په توګه. شبکه نه بدلوي.';
@@ -1020,7 +1020,6 @@ $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?<
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='په {menu} کې هم';
 $ec_lang['lpn_guide_how_popup']='کله چې شتمني یا متن وټاکئ، ځانتیاوې پرانیستل کیږي.';
-$ec_lang['lpn_guide_how_alt']='د بدیلونو مخکتنه د اوبو، سناریوګانو لاندې لیست شوې کله چې ساده حالت بند وي.';
 $ec_lang['lpn_guide_not_shown']='دا کنټرول اوس مهال پر سکرین نشته.';
 // The box's two context headings. "Tables" holds the two table-help entries that used to sit only
 // in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
@@ -1475,8 +1474,20 @@ $ec_lang['lpn_pane_sel_only_none']='هیڅ عنصر نه دی ټاکل شوی. �
 // Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
 // scenario, with a Scenario column after ID.
 $ec_lang['lpn_pane_scn_show']='سناریوګانې ښودل';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+
+
+
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+
+
+
+
 $ec_lang['lpn_pane_clear_override']='خپل ارزښت پاکول';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -1532,20 +1543,29 @@ $ec_lang['lpn_menu_project']='اوبه';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='د اوبو د شبکې ماډل جوړولو لپاره ځانګړی هرڅه (پرته له متحرکو انځورو د چلولو کنټرولونو)';
 $ec_lang['lpn_tables_menu']='جدولونه';
-// Water > Change type (Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// Water > Morph (Task 781; Tom, 2026-10-14: *"I like the term 'Morph' (Transform) for this feature"*;
+// first built as Change type, Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
 // to Change node type for any asset, where if it has information that can't be ported to the new
 // type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
 // asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
 // popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
 // dev/asset-type.md.
-$ec_lang['lpn_change_type_menu']='ډول بدلول';
-$ec_lang['lpn_change_type_tip']='ټاکل شوې نقطې په جنکشنونو، ذخیرو، یا ټانکونو بدل کړئ، یا ټاکل شوي تړاوونه په پایپونو، پمپونو، یا والوونو. هر یو خپل ID، خپل ځای، خپل اړیکې، او هر هغه ارزښت ساتي چې نوی ډول هم لري. که کوم شی له لاسه ورکول کیږي، لومړی ستاسو څخه پوښتل کیږي.';
-$ec_lang['lpn_change_type_ok']='بدلول';
+$ec_lang['lpn_morph_menu']='ډول بدلول';
+$ec_lang['lpn_morph_tip']='ټاکل شوې نقطې په جنکشنونو، ذخیرو، یا ټانکونو بدل کړئ، یا ټاکل شوي تړاوونه په پایپونو، پمپونو، یا والوونو. هر یو خپل ID، خپل ځای، خپل اړیکې، او هر هغه ارزښت ساتي چې نوی ډول هم لري. که کوم شی له لاسه ورکول کیږي، لومړی ستاسو څخه پوښتل کیږي.';
+$ec_lang['lpn_morph_ok']='بدلول';
+// {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
+// when a node type was chosen), separated by commas.
+
+// The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
+// scenario, beside the override marker.
+
+
 $ec_lang['lpn_change_type_lost']='دا ارزښتونه به له لاسه ورکړل شي:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
 $ec_lang['lpn_change_type_key']='هر قطار: ID: هغه ځانتیا او ارزښت چې له لاسه به ورکړل شي';
 $ec_lang['lpn_change_type_line']='{id}: {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}، په سناریو {scenario} کې';
+
 $ec_lang['lpn_change_type_more']='او {n} نور.';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.
@@ -1614,6 +1634,32 @@ $ec_lang['lpn_confirm_delete_network']='په دې پروژه کې هر نقطه�
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='لټون او ځای پرځای کول';
+// Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
+// placement are never pasted.
+
+
+
+
+
+
+
+
+
+
+// The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
+// opens the in-place editor; Reset position sends a dragged label or an attached Text home.
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_find_title']='لټون او ځای پرځای کول';
 $ec_lang['lpn_find_scope']='څه ولټول شي';
 $ec_lang['lpn_find_scope_all']='هرڅه';
@@ -2056,6 +2102,8 @@ $ec_lang['lpn_status_inp_exported_picture']='{zip} صادر شو، چې د EPANE
 $ec_lang['lpn_status_inp_exported_no_picture']='{file} صادر شو. شاليد انځور ونه ساتل شو، نو .inp هیڅ نه نوموي؛ په EPANET کې یې د View > Backdrop > Load له لارې اضافه کړئ.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+
+
 $ec_lang['lpn_inp_export_differences']='{n} شیان چې .inp فارمېټ یې نشي ساتلی.';
 $ec_lang['lpn_inp_export_difference_one']='یو شی چې د .inp بڼه یې نشي نیولی.';
 $ec_lang['lpn_inp_export_refused']='دا پروژه د EPANET فایل په توګه لیکل کیدی نشي: {detail}';
@@ -3045,6 +3093,7 @@ $ec_lang['lpn_scenario_overrides']='د دودیزو ارزښتونو شمېر';
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='نصواري حلقه دا معنی لري چې دا عنصر یو ارزښت لري چې یوازې د سناریو {name} پورې اړوند دی.';
+
 $ec_lang['lpn_scenario_overrides_tip']='هر یو له دې ارزښتونو نه پر نقشه د نصواري حلقې سره نښه شوی دی. {base} ته لاړ شئ ترڅو انځور پرته له دوی وګورئ.';
 $ec_lang['lpn_scenario_menu']='سناریوګانې';
 $ec_lang['lpn_scenario_tip']='هغه ارزښتونه چې انځور یې اوس ښیي او پاڼه یې اوس حلوي. د سناریوګانو بدلولو، یا د یوې اضافه کولو، نوم بدلولو، یا ړنګولو لپاره کلیک وکړئ.';
@@ -3053,10 +3102,11 @@ $ec_lang['lpn_scenario_new_name']='سناریو {n}';
 $ec_lang['lpn_scenario_prompt_name']='د دې سناریو لپاره نوم';
 $ec_lang['lpn_scenario_rename']='د سناریو نوم بدلول…';
 $ec_lang['lpn_scenario_delete']='سناریو ړنګول';
-$ec_lang['lpn_scenario_delete_confirm']='سناریو {name}، او د هغې ارزښتونه ({n}) ړنګ کړم؟ پخپله انځور نه بدلیږي.';
-$ec_lang['lpn_scenario_override']='یوازې په دې سناریو کې';
+
+
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='چک شوی یې معنی دا ده چې دا ارزښت یوازې دې سناریو پورې اړه لري، حتی که ورته شمېره وي لکه اساس کې. بکس پاک کړئ ترڅو بېرته د اساس ارزښت وکارول شي.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3067,31 +3117,142 @@ $ec_lang['lpn_scenario_deactivated']='{id} په {scenario} کې د شبکې نه
 $ec_lang['lpn_scenario_delete_in_base']='له انځور څخه یې لرې کولو لپاره، یې په {base} سناریو کې ړنګ کړئ.';
 $ec_lang['lpn_scenario_only_deleted']='{id} ړنګ شو. دا یوازې د {scenario} برخه وه.';
 $ec_lang['lpn_scenario_delete_blocked']='{id} نه دی ړنګ شوی، ځکه چې تړاو {link} پر هغې پای ته رسیږي، او دا تړاو د {scenario} بهر هم شتون لري. د دواړو ړنګولو لپاره، یې په {base} سناریو کې ړنګ کړئ.';
-$ec_lang['lpn_scenario_push_btn']='د اساس ارزښتونه ټولو سناریوګانو ته پلي کول';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='هره سناریو د هغو ملکیتونو لپاره چې اوس یې لیبلونه ښکاره دي، بېرته د اساس ارزښت ته ورځي. هغه ارزښتونه چې یوازې دې سناریوګانو پورې اړه لري، غورځول کیږي.';
 $ec_lang['lpn_scenario_basic']='ساده حالت';
 $ec_lang['lpn_scenario_basic_tip']='ټاکل شوی: سناریو یوازې له هغو ارزښتونو جوړه ده چې پکې ټاکل شوي. پاک شوی: دا مینو د بدیلونو مخکتنې جدول هم وړاندې کوي، چې ښیي دا ارزښتونه په کټګورۍ سره څنګه ډلبندي شوي، او اجازه ورکوي چې سناریو جلا ټول چلولو وخت او هیدرولیکي وخت ګام ولري. د دې ځانګړتیا په اړه نظر ښه راغلاست دی.';
-$ec_lang['lpn_alt_title']='د بدیلونو مخکتنه';
-$ec_lang['lpn_alt_calc_options']='د محاسبې اختیارونه';
-$ec_lang['lpn_alt_note']='اساسي هره کټګورۍ د اساسي بدیل کاروي. هره سناریو د هرې بدلې شوې کټګورۍ لپاره جلا بدیل لري، چې د اساسي بدیل ماشوم دی. شمېره د بدل شویو ارزښتونو شمېر دی. وروستي درې کالمونه د محاسبې اختیارونه دي: د سناریو لپاره ارزښت ولیکئ، یا یې خالي پرېږدئ ترڅو د والد ارزښت وکارول شي. د پروژې ارزښتونه په تنظیماتو، محاسبه، وخت کې دي.';
-$ec_lang['lpn_scenario_duration_tip']='د میراث لپاره یې خالي پرېږدئ. د 0:00 ټول چلولو وخت یو ثابت حالت چلول دی.';
-$ec_lang['lpn_scenario_hyd_step_tip']='د میراث لپاره یې خالي پرېږدئ.';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_time_scn_overrides']='د سناریو خپل ارزښتونه:';
+
+
+
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+
+
+
+
+
+
+
+
+
+
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+
+
+
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_alt_cat_physical']='فزیکي';
 $ec_lang['lpn_alt_cat_demand']='غوښتنه';
 $ec_lang['lpn_alt_cat_topology']='د شتمنیو فعالول';
+
 $ec_lang['lpn_alt_cat_initial']='لومړني تنظیمات';
 $ec_lang['lpn_alt_cat_constituent']='جز';
 $ec_lang['lpn_alt_cat_fireflow']='د اور بهاو';
 $ec_lang['lpn_alt_cat_energy']='د انرژۍ لګښت';
 $ec_lang['lpn_alt_cat_userdata']='ځانګړي ځانګړتیاوې';
 $ec_lang['lpn_alt_cat_text']='متن';
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='ټولې سناریوګانې دې ملکیتونو لپاره د اساس ارزښتونه وکاروي؟ هغه ارزښتونه چې یوازې دې سناریوګانو پورې اړه لري، غورځول کیږي. تاسو دا بېرته کولی شئ.';
-$ec_lang['lpn_scenario_push_scenarios']='اغیزمن شوي سناریوګانې:';
-$ec_lang['lpn_scenario_push_values']='غورځول شوي ارزښتونه:';
-$ec_lang['lpn_scenario_push_none']='هیڅ سناریو د دې ملکیتونو لپاره خپل ارزښت نلري، نو هیڅ به ونه بدلیږي. هیڅ شی نه غورځول کیږي.';
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. د بهاو ازموینه: ثابت';
@@ -3231,6 +3392,8 @@ $ec_lang['lpn_time_run_fell_back']='په سکرین کې شمېرې پر ځای 
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='دا کنترولونه یو داسې عنصر نوموي چې نور په دې پروژه کې نشته، نو دا پرېښودل شول: {ids}';
 $ec_lang['lpn_control_unreadable_note']='دا کنترولونه نشول لوستل کیدی، نو دا پرېښودل شول: {ids}';
+
+
 $ec_lang['lpn_rule_dangling_note']='دا قواعد یو داسې عنصر ته اشاره کوي چې نور پدې پروژه کې نشته، نو دوی پدې چلون کې پرېښودل شول: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='دا قواعد نه شول لوستل کیدلی، نو دوی پدې چلون کې پرېښودل شول: {ids}';
 $ec_lang['lpn_settings_text_size']='د متن اندازه (پیکسلونه)';
@@ -3783,9 +3946,7 @@ $ec_lang['lpn_energy_curve_note']='دا پمپونه یوه داسې اغیزن�
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='رتبه';
 $ec_lang['lpn_labels_col_drop']='پرېښودل';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -4010,6 +4171,8 @@ $ec_lang['lpn_library_pattern_default_mark']='(ډیفالټ)';
 $ec_lang['lpn_library_pattern_default_tip']='د غوښتنې ډیفالټ نمونه. په تنظیماتو، د غوښتنې ډیفالټ نمونه کې یې بدل کړئ.';
 $ec_lang['lpn_library_pattern_default_deleted_to']='نمونه {id} د غوښتنې ډیفالټ نمونه وه. هغه جنکشنونه چې نمونه نلري اوس نمونه {now} کاروي.';
 $ec_lang['lpn_library_pattern_default_deleted_none']='نمونه {id} د غوښتنې ډیفالټ نمونه وه. هغه جنکشنونه چې نمونه نلري اوس ثابته غوښتنه کاروي.';
+
+
 $ec_lang['lpn_library_control_add']='یو کنترول اضافه کړئ';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -4572,4 +4735,4 @@ $ec_lang['lpn_snip_tip_eraser']='پاکوونکی: د لرې کولو لپاره
 $ec_lang['lpn_snip_tip_undo']='بېرته کول (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='بیا کول (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='کاپي (Ctrl+C)';
-$ec_lang['lpn_screenshot_scale_tip']='د انځور اندازه د سکرین پر ساحې د ضرب په توګه. لوی یې روښانه دی او لوی فایل جوړوي.';
+$ec_lang['lpn_screenshot_scale_tip']='د انځور اندازه د سکرین پر ساحې د ضرب په توګه. لوی یې روښانه دی او لوی فایل جوړوي.';$ec_lang['lpn_guide_text_alt_box']='د هرې سناریو لپاره ښیي چې په هره کټګورۍ کې کوم بدیل کاروي، لکه فزیکي، غوښتنه، او د شتمنۍ فعالول، او د هغې د محاسبې اختیارونه: د غوښتنې ضرب، ټول چلون وخت، او هایدرولیک وخت ګام. بدیلونه یوازې د لوستلو دي. د سناریو د محاسبې اختیارونه دلته لیکل کیدی شي، او خالي ځای د مور ارزښت کاروي. د ساده حالت له پاکولو وروسته یې د سناریوګانو له مینو څخه پرانیزئ.';$ec_lang['lpn_guide_how_alt']='د بدیلونو مخکتنه د اوبو، سناریوګانو لاندې لیست شوې کله چې ساده حالت بند وي.';$ec_lang['lpn_alt_calc_options']='د محاسبې اختیارونه';$ec_lang['lpn_scenario_duration_tip']='د میراث لپاره یې خالي پرېږدئ. د 0:00 ټول چلولو وخت یو ثابت حالت چلول دی.';$ec_lang['lpn_scenario_hyd_step_tip']='د میراث لپاره یې خالي پرېږدئ.';

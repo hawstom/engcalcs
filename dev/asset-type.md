@@ -1,4 +1,4 @@
-# Change type (Water > Change type)
+# Morph (Water > Morph), formerly Change type
 
 Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables to Change node type for
 any asset, where if it has information that can't be ported to the new type, we alert and ask."*
@@ -47,8 +47,11 @@ Links follow under "Links" below.
     `libAnnotateControl()` draws the same line.
   - A rule clause that names the node by a kind it no longer is.
 - **One undo** reverses the whole change, the selection included.
-- **Base-owned.** The type is not in `LPN_OVERRIDABLE`, like a valve's type, so a change made
-  while a scenario is showing applies in every scenario.
+- **In Base, in place; in any other scenario, an override of the type** (Task 781, Tom 2026-10-14).
+  This file describes the Base change. In a scenario Morph writes the type as an Active topology
+  override and the new type's values as ordinary overrides; see `dev/scenario-alternatives.md`,
+  "Morph". The two earlier scenario versions (a type override, 2026-10-07; a new coincident asset,
+  2026-10-08) and the Base-only rule of 2026-10-10 are superseded.
 
 ## Why Water, at the foot
 
@@ -112,15 +115,18 @@ The valve subtype (TCV, PRV and so on) still changes in the valve's own Properti
 the setting and dropping scenario overrides of it **without asking**. Whether the same rule applies
 there is a separate decision.
 
-## Seam: feat/bentley-interop (unmerged)
+## Seam: feat/bentley-interop (met on that branch, 2026-10-07)
 
 That branch stores scenario **alternatives** in `doc.alternatives[].values`, keyed by `ovKey()`
-(`n:<id>`, `l:<id>`), and routes every walk of an override map through `eachOverrideMap()`. Its
-seam check enforces that rule. `nodeTypeChangeReport()`, `applyNodeTypeChange()`,
-`linkTypeChangeReport()` and `applyLinkTypeChange()` walk `scenarios[].overrides` directly. **At
-that merge, all four must walk through `eachOverrideMap()` and also list and strip a lost
-property's values held in stored alternatives,** or an alternative keeps a tank's water depth on a
-junction or a pipe's roughness on a valve. Harness sections 4, 9 and 12 are the tests to extend.
+(`n:<id>`, `l:<id>`), and routes every walk of an override map through `eachOverrideMap()`. The
+four functions (`nodeTypeChangeReport()`, `applyNodeTypeChange()`, `linkTypeChangeReport()`,
+`applyLinkTypeChange()`) and the water-surface carry now walk one element's overrides through
+`eachElementOverride()`, which is `eachOverrideMap()` over every scenario's map and every stored
+alternative's. A lost value held in a stored alternative is listed by the alternative's name
+("..., in alternative NAME", `lpn_change_type_line_alternative`) and stripped with the type; a
+carried water surface is carried in the alternative too. The new type's values come from the open
+scenario's New assets settings. Harness: section 4b of `change-type-harness.js`, plus the mutation
+"a stored alternative's overrides are not walked".
 
 ## Known gaps
 

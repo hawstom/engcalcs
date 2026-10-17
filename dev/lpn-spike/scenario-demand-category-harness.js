@@ -13,7 +13,7 @@
 //
 // The fix makes the whole list ONE overridable property, `demands`. This drives the REAL popup
 // controls inside a scenario and asks, of every one of them, the question that matters: did Base
-// move? Then clearing, the Base-side push, undo, save and load, a file written before R-369 that
+// move? Then clearing, undo, save and load, a file written before R-369 that
 // overrides only `demand`, the solver, the .inp writer, a pattern rename, and Base itself.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -42,13 +42,16 @@ global.confirm = global.window.confirm = function () { return true; };
 
 const L = loadLoopedNetwork(
 	"\t\timportInp: importInpFromFile, getDoc: function () { return doc; },\n" +
+	// A scenario's values as it resolves them: its own map, or the alternative an override stored
+	// (2026-10-12).
+	"\t\town: function (s) { return resolvedOverrides(s); },\n" +
 	"\t\tserialize: serializeProject, applySaved: applySaved, assembleModel: assembleModel,\n" +
 	"\t\teffective: effective, setProp: setProp, hasOverride: hasOverride, ovKey: ovKey,\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario,\n" +
 	"\t\tgetScenarios: function () { return scenarios; }, activeScenario: activeScenario,\n" +
 	"\t\tresolvedDemand: resolvedDemand, baseDemandTotal: baseDemandTotal,\n" +
 	"\t\trenderNodeFields: renderNodeFields, paneTables: paneTables, pushSpecs: pushSpecList,\n" +
-	"\t\tpushBaseToScenarios: pushBaseToScenarios, labelSettings: function () { return labelSettings; },\n" +
+	"\t\tclearOverride: clearOverride, labelSettings: function () { return labelSettings; },\n" +
 	"\t\tsaveUndoSnapshot: saveUndoSnapshot, undo: undo,\n" +
 	"\t\tlibRenamePattern: libRenamePattern, libPatterns: libPatterns,\n" +
 	"\t\texportOptions: inpExportOptions,\n" +
@@ -105,13 +108,21 @@ function table(id) {
 		sels: findAll([t], 'SELECT'),
 		dels: findAll([t], 'BUTTON').filter(b => b.textContent === '×'),
 		add: findAll(kids, 'BUTTON').filter(b => b.textContent.indexOf(PC.lpn_demand_add) >= 0)[0],
-		// The table's own marker is the first one AFTER it: the identity band above carries the
-		// coordinates' markers, and ticking one of those is a different override entirely.
-		marker: kids.slice(kids.indexOf(t)).filter(l => l.tagName === 'LABEL' && l.className === 'lpn-ov-marker')[0]
+		// The table's own marker (Task 790's gutter) sits right before the block that holds it: the
+		// identity band above carries the coordinates' markers, a different override entirely. Its
+		// note, while it is an override, is the first one after the table.
+		marker: (function () {
+			const blk = kids.filter((k) => k === t || findAll([k], 'TABLE').indexOf(t) >= 0)[0], i = kids.indexOf(blk);
+			const g = i > 0 && String(kids[i - 1].className) === 'lpn-ovm' ? kids[i - 1] : null;
+			if (!g) { return null; }
+			const dot = g.children.filter((c) => /lpn-ovm-(dot|hollow)/.test(c.className))[0];
+			const note = kids.slice(i).filter((k) => k.className === 'lpn-ov-note')[0];
+			return { dot: dot, on: !!dot && /lpn-ovm-dot/.test(dot.className), textContent: note ? findAll([note], 'SPAN').map((x) => x.textContent).join('') : '' };
+		}())
 	};
 }
 function type(input, v) { input.value = v; input._listeners.change[0](); }
-function ovOf(id) { return L.activeScenario().overrides[L.ovKey(J(id))] || {}; }
+function ovOf(id) { return L.own(L.activeScenario())[L.ovKey(J(id))] || {}; }
 
 L.createScenario('Growth');
 const SCN = L.getScenarios()[L.getScenarios().length - 1];
@@ -184,11 +195,11 @@ console.log('\n--- editing the list inside a scenario ---');
 // ---------------------------------------------------------------------------
 console.log('\n--- undo ---');
 {
-	const before = JSON.stringify(L.activeScenario().overrides);
+	const before = JSON.stringify(L.own(L.activeScenario()));
 	table('J3').add._listeners.click[0]();
 	ok('Add on J3 made an override', !!ovOf('J3').demands);
 	L.undo();
-	ok('ONE undo takes it back, exactly', JSON.stringify(L.activeScenario().overrides) === before);
+	ok('ONE undo takes it back, exactly', JSON.stringify(L.own(L.activeScenario())) === before);
 	ok('...and Base never moved', baseNodes() === BASE0);
 }
 
@@ -198,13 +209,10 @@ console.log('\n--- undo ---');
 console.log('\n--- the override marker ---');
 {
 	let t = table('J4');
-	ok('the table carries one ticked marker', !!t.marker &&
-		findAll([t.marker], 'INPUT')[0].checked === true);
+	ok('the table carries one filled dot (Task 790)', !!t.marker && t.marker.on);
 	ok('...naming Base\'s value', t.marker.textContent.indexOf('33') >= 0, t.marker.textContent);
-	const box = findAll([t.marker], 'INPUT')[0];
-	box.checked = false;
-	box._listeners.change[0]();
-	ok('unticking clears the list override', !ovOf('J4').demands && !ovOf('J4').demand,
+	t.marker.dot._listeners.click[0]();
+	ok('clicking the dot clears the list override', !ovOf('J4').demands && !ovOf('J4').demand,
 		JSON.stringify(ovOf('J4')));
 	ok('...and J4 is Base\'s one row again', L.effective(J('J4'), 'demands').length === 1 &&
 		near(L.resolvedDemand(J('J4')), J4_BASE));
@@ -212,13 +220,12 @@ console.log('\n--- the override marker ---');
 	L.switchScenario('base');
 	L.switchScenario(SCN.id);
 	t = table('J5');
-	const b5 = findAll([t.marker], 'INPUT')[0];
-	b5.checked = true;
-	b5._listeners.change[0]();
-	ok('ticking a breakdown junction records its whole list', (ovOf('J5').demands || []).length === 2,
+	ok('a junction the scenario inherits wears the hollow dot', !!t.marker && !t.marker.on);
+	t.marker.dot._listeners.click[0]();
+	ok('clicking it on a breakdown junction records its whole list', (ovOf('J5').demands || []).length === 2,
 		JSON.stringify(ovOf('J5')));
 	ok('...changing no number', near(L.baseDemandTotal(J('J5')), 40.75));
-	ok('...and the tick kept the file\'s own text for later export',
+	ok('...and the click kept the file\'s own text for later export',
 		ovOf('J5').demands[1].tok && ovOf('J5').demands[1].tok.base === '0.750', JSON.stringify(ovOf('J5').demands[1]));
 }
 
@@ -297,6 +304,8 @@ console.log('\n--- a scenario saved before R-369 ---');
 	const sc = file.scenarios.find(s => s.id === SCN.id);
 	sc.overrides = {};
 	sc.overrides[L.ovKey(J('J1'))] = { demand: 100 };
+	// A file from before R-369 has no stored alternatives either (an override stores one since 2026-10-12).
+	delete sc.alternatives; delete file.alternatives;
 	L.applySaved(file);
 	ok('it loads and means what it meant: row 0 at 100, the other rows Base\'s',
 		L.effective(J('J1'), 'demand') === 100 && near(L.resolvedDemand(J('J1')), 100 * 0.6 + 20 * 0.2 + 12.5 * 0.6),
@@ -311,15 +320,15 @@ console.log('\n--- a scenario saved before R-369 ---');
 }
 
 // ---------------------------------------------------------------------------
-// 9. The Base-side push clears a scenario's list.
+// 9. Clearing the scenario's list (the override dot's own door) puts J1 back on Base's. Until
+//    Task 801 this was Apply Base values, which is retired.
 // ---------------------------------------------------------------------------
-console.log('\n--- Apply Base values to all scenarios ---');
+console.log('\n--- clearing the scenario\'s list ---');
 {
-	L.labelSettings().node.demand = true;
-	L.switchScenario('base');
-	L.pushBaseToScenarios(J('J1'));
 	L.switchScenario(SCN.id);
-	ok('the push discards the scenario\'s list, and J1 follows Base again',
+	L.clearOverride(J('J1'), 'demands');
+	L.clearOverride(J('J1'), 'demand');
+	ok('a cleared list is gone, and J1 follows Base again',
 		!ovOf('J1').demands && near(L.resolvedDemand(J('J1')), J1_BASE), JSON.stringify(ovOf('J1')));
 	L.switchScenario('base');
 }
@@ -339,8 +348,8 @@ console.log('\n--- Base itself ---');
 	t = table('J1');
 	type(t.sels[0], 'Pat2');
 	ok('a pattern edit in Base writes Base\'s own field', J('J1').demandPattern === 'Pat2');
-	ok('...and makes no override anywhere', L.getScenarios().every(s => !s.overrides[L.ovKey(J('J1'))] ||
-		!s.overrides[L.ovKey(J('J1'))].demands));
+	ok('...and makes no override anywhere', L.getScenarios().every(s => !L.own(s)[L.ovKey(J('J1'))] ||
+		!L.own(s)[L.ovKey(J('J1'))].demands));
 }
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');

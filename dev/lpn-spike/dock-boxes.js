@@ -11,7 +11,7 @@ const OPENERS = {
 	lpn_status_box: ['project', 'lpn_reports_menu', 'lpn_reports_status'],
 	lpn_calib_box: ['project', 'lpn_reports_menu', 'lpn_reports_calib'],
 	lpn_full_box: ['project', 'lpn_reports_menu', 'lpn_reports_full'],
-	lpn_alt_box: ['project', 'lpn_scenario_menu', 'lpn_alt_title'],
+	lpn_sm_box: ['project', 'lpn_scenario_menu', 'lpn_sm_menu'],
 	lpn_settings_box: ['project', null, 'lpn_tool_settings'],
 	lpn_popup: 'node',
 	lpn_find_popup: ['edit', null, 'lpn_find_menu'],

@@ -157,7 +157,10 @@ async function main() {
 	ok('...[CONTROLS] names neither pump', !/P-N[EW]/.test(section('CONTROLS')), JSON.stringify(section('CONTROLS')));
 	ok('...[ENERGY] names neither pump', !/P-N[EW]/.test(section('ENERGY')), JSON.stringify(section('ENERGY')));
 	const w = (built.warnings || []).find((x) => x.code === 'control-inactive');
-	ok('...and says which controls it left out', !!w && w.ids.slice().sort().join(',') === 'P-NE,P-NW', JSON.stringify(w));
+	// Where the page drops them before the writer does (js/looped-network.js's
+	// dropInactiveControls(), one id per control), the ids repeat; the set is what matters.
+	const offIds = [].concat(...(built.warnings || []).filter((x) => x.code === 'control-inactive').map((x) => x.ids));
+	ok('...and says which controls it left out', !!w && Array.from(new Set(offIds)).sort().join(',') === 'P-NE,P-NW', JSON.stringify(w));
 	const eps = modelOf('EPS');
 	const epsInp = EngCalcs.lpnToInp(eps, { eps: true }).inp;
 	ok('EPS (R-NE off, so pump P-NE with it): no [ENERGY] row for P-NE, P-NW\'s controls kept',

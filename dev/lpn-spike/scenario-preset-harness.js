@@ -75,11 +75,21 @@ function checkPresets(where) {
 	const names = menuNames();
 	check(JSON.stringify(names.slice(1)) === JSON.stringify(TOM), where + ': the menu lists them in Tom\'s order',
 		JSON.stringify(names));
-	// The Basic mode row is a command, so it sits after the separator with the others.
+	// Tom's order (2026-10-11): "Scenario manager..., -, Basic mode, New, Rename, Delete, -, Apply Base,
+	// list of scenarios." Apply Base values and its rule are retired (Task 801, 2026-10-15). Manage overrides
+	// follows Delete (Tom, 2026-10-15: "Yes", reachable in Basic mode).
 	{
-		const all = L.scenarioMenuRows(), firstSep = all.findIndex((r) => r.separator);
-		check(all.slice(0, firstSep).every((r) => r.scenarioId !== undefined) && all.slice(firstSep).every((r) => r.scenarioId === undefined),
-			where + ': scenarios come before the first separator, the commands (Basic mode among them) after');
+		const P = global.EngCalcs.pageConfig || {};
+		const kind = (r) => r.separator ? '-' : r.scenarioId !== undefined ? 'S'
+			: r.label === P.lpn_sm_menu ? 'manager'
+			: r.label.slice(2) === P.lpn_scenario_basic ? 'basic'
+			: r.label === P.lpn_scenario_new ? 'new'
+			: r.label === P.lpn_scenario_copy ? 'copy'
+			: r.label === P.lpn_scenario_rename ? 'rename'
+			: r.label === P.lpn_scenario_delete ? 'delete'
+			: r.label === P.lpn_sm_list_overrides ? 'list' : '?' + r.label;
+		const got = L.scenarioMenuRows().map(kind).join(','), want = ['manager', '-', 'basic', 'new', 'copy', 'rename', 'delete', 'list'].concat(sc.map(() => 'S')).join(',');
+		check(got === want, where + ': the menu is in Tom\'s order, the scenarios last', got);
 	}
 	const tips = L.scenarioMenuRows().filter((r) => r.scenarioId !== undefined && r.tip);
 	check(tips.length === 7, where + ': each of the seven carries its tip', tips.length + ' tips');
@@ -102,7 +112,9 @@ check(!L.indexEntry(L.getLibrary().openId).dirty, 'first visit: the presets do n
 {
 	const byId2 = {};
 	L.getScenarios().forEach((s) => { byId2[s.id] = s; });
-	check(L.overrideCount(byId2.average_day) === 0, '4. Average Day (multiplier 1) counts as no change on a document stating none');
+	// By presence (Task 800): the preset states a multiplier of 1, the value a document stating none
+	// solves with, and that is one override, shown in its list as "(same)".
+	check(L.overrideCount(byId2.average_day) === 1, '4. Average Day (multiplier 1) counts its one override, equal to the project\'s');
 	check(L.overrideCount(byId2.max_day) === 1, '5. Max Day counts its multiplier as one change');
 	L.switchScenario('peak_hour');
 	check(L.docDM() === 3, 'switching to 6. Peak hour solves at 3 x demand', String(L.docDM()));

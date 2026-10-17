@@ -8,7 +8,9 @@
 //      out of bounds";
 //   2. "Tanks run dry", whose demand empties both tanks, says the run STOPPED at a time (the
 //      lpn_time_run_stopped sentence), not that it was rejected and "did not start";
-//   3. on the Spanish page the same scenario says the same thing in that page's own words.
+//   3. on the Spanish page the same scenario says the same thing in that page's own words;
+//   4. Tom's own file (fixtures/fotobi-scenarios.epp, scenarios built from alternatives): every
+//      one of its thirteen scenarios, no refusal.
 // Every button is pressed with a MouseEvent of detail 1, as a person's click is.
 //
 // DO NOT PREFIX THIS WITH `flock`: it takes /tmp/engcalcs-browser.lock itself.
@@ -22,6 +24,7 @@ const { execFileSync, spawnSync } = require('child_process');
 const REPO = path.resolve(__dirname, '..', '..');
 const NAME = 'epanet-topology-refusal-browser-harness';
 const FIXTURE = path.join(__dirname, 'fixtures', 'fotobi-topology.epp');
+const TOMS = path.join(__dirname, 'fixtures', 'fotobi-scenarios.epp');
 const LOCK_FILE = process.env.EC_BROWSER_LOCK || '/tmp/engcalcs-browser.lock';
 if (process.env.EC_ETR_LOCKED !== '1') {
 	let has = false;
@@ -39,11 +42,11 @@ function ok(name, cond, extra) {
 	console.log((cond ? '  ok   ' : '  FAIL ') + name + (extra === undefined ? '' : '   ' + extra));
 }
 
-async function openFixture(a) {
-	const page = a.page;
+async function openFixture(a, file) {
+	const page = a.page, base = path.basename(file || FIXTURE);
 	await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
-	await a.writeFile('fotobi-topology.epp', fs.readFileSync(FIXTURE, 'utf8'));
-	await a.queuePick('fotobi-topology.epp');
+	await a.writeFile(base, fs.readFileSync(file || FIXTURE, 'utf8'));
+	await a.queuePick(base);
 	await a.menuClick(await a.lang('lpn_file_open'));
 	await a.settle(2500);
 	const readOnly = await a.lang('lpn_lock_open_readonly');
@@ -114,6 +117,21 @@ async function main() {
 			ok('no uncaught page errors (' + lang + ')', errors.length === 0, errors.slice(0, 2).join(' | '));
 			await a.close();
 		}
+		console.log('\n--- Tom\'s file ---');
+		const t = await Session.open(browser, 'etr-toms');
+		const terr = [];
+		t.page.on('pageerror', (e) => terr.push(String(e && e.message)));
+		await t.page.setViewportSize({ width: 1600, height: 1000 });
+		await t.goto('Looped-Network.php?ec_nolog=1');
+		const refusedT = (await t.lang('lpn_engine_refused')).slice(0, 30);
+		await openFixture(t, TOMS);
+		for (const name of JSON.parse(fs.readFileSync(TOMS, 'utf8')).scenarios.map((s) => s.name)) {
+			const hit = await pickScenario(t, name);
+			const st = await t.status();
+			ok(name + ': no refusal on the status line', hit && st.indexOf(refusedT) < 0 && !/out of bounds/.test(st), st.slice(0, 120));
+		}
+		ok('no uncaught page errors (Tom\'s file)', terr.length === 0, terr.slice(0, 2).join(' | '));
+		await t.close();
 	} finally {
 		await browser.close();
 		env.stopServer();

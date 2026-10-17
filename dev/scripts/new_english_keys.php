@@ -239,7 +239,24 @@ function ecBranchNewKeys(string $root): array {
                 }
             }
         }
-        $out[$b] = array('sha' => isset($sha[0]) ? $sha[0] : '?', 'keys' => $keys);
+        $out[$b] = array('sha' => isset($sha[0]) ? $sha[0] : '?', 'keys' => $keys, 'in' => '');
+    }
+    // **A BRANCH ALREADY MERGED INTO ANOTHER LISTED BRANCH IS NAMED, NOT REPEATED** (2026-10-16).
+    // Five sub-branches merged into feat/bentley-interop each re-listed its strings, so Tom read
+    // the same 180 keys four times and wrote "this is in this file twice". Its strings are the
+    // containing branch's now, and that is where he reads them. Two tips at one commit: the
+    // first by name keeps the list.
+    foreach ($out as $b => $info) {
+        foreach ($out as $c => $other) {
+            if ($c === $b || $other['in'] !== '') { continue; }
+            $rc = 1;
+            $ignored = array();
+            exec('cd ' . escapeshellarg($root) . ' && git merge-base --is-ancestor ' . escapeshellarg($b) . ' ' . escapeshellarg($c) . ' 2>/dev/null', $ignored, $rc);
+            if ($rc !== 0) { continue; }
+            if ($info['sha'] === $other['sha'] && strcmp($b, $c) < 0) { continue; }
+            $out[$b]['in'] = $c;
+            break;
+        }
     }
     ksort($out);
     return $out;
@@ -253,6 +270,10 @@ function ecBranchSection(string $root, array $masterEnglish): string {
     $totalUnruled = 0;
     $totalNew = 0;
     foreach ($branches as $b => $info) {
+        if ($info['in'] !== '') {
+            $body .= "\n### " . $b . " (`" . $info['sha'] . "`) — already merged into " . $info['in'] . "; its strings are listed there\n";
+            continue;
+        }
         $added = array();
         foreach ($info['keys'] as $k => $v) {
             if (!array_key_exists($k, $masterEnglish)) { $added[$k] = $v; }

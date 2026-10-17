@@ -164,6 +164,14 @@ the count in shipped English may fall and may not rise.
 
 This governs new calculators from day one, not just retrofits.
 
+### RULED 2026-10-13: no pair of commas around an "or" clause
+
+Write "Do this or do that to make this", never "Do this, or do that, to make this". Tom, 2026-10-13,
+on the Scenario manager help (four instances there, all rewritten): *"Such a use of commas is
+neither a proper appositive nor a proper list, and it introduces more awkwardness than it
+resolves."* A true appositive ("including Base") or a true list keeps its commas; an alternative
+action does not get a comma pair around it.
+
 ### RULED 2026-10-04: mood, device verbs, checkboxes
 
 Mary's three recommendations; Tom: *"Adopt all three style guide recommendations. Very solid. I love them."*

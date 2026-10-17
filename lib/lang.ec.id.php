@@ -708,6 +708,7 @@ $ec_lang['lpn_node_customers_tip']='Daftar pelanggan yang ditambahkan di sini ka
 $ec_lang['lpn_node_customers_sum']='{total} {unit} dari Pelanggan ({n})';
 $ec_lang['lpn_customer_detached']='⚠ Pelanggan ini tidak terhubung ke pipa, sehingga kebutuhannya tidak termasuk dalam hasil. Hapus pelanggan ini, atau gambar sebuah pipa dan pindahkan pelanggan ke atasnya.';
 $ec_lang['lpn_customer_fixed_head']='⚠ Ujung terdekat pipa itu memiliki muka air tetap, sehingga kebutuhan ini tidak memengaruhi simulasi.';
+
 $ec_lang['lpn_customer_detached_count']='Pelanggan yang tidak terhubung ke pipa ({n}). Kebutuhan mereka tidak diperhitungkan.';
 $ec_lang['lpn_meter_pick_pipe']='Sekarang pilih pipa atau simpul yang melayani pelanggan ini. Pelanggan tetap berada di tempat Anda meletakkannya. Tekan Escape untuk membatalkan.';
 $ec_lang['lpn_inp_export_flat_customers']='Berkas EPANET tidak memiliki pelanggan. Kebutuhan pelanggan dalam proyek ini ({n}) ditulis sebagai baris kebutuhan pada simpul tempat setiap pelanggan ditetapkan, dengan nama berupa tag pelanggan. Berkas tidak mencatat pelanggannya sendiri: lokasinya, pipa yang melayaninya, letak sambungan layanan sepanjang pipa itu, atau berapa banyak sambungan yang diwakilinya. Informasi itu tetap berada di proyek; simpan berkas proyek untuk mempertahankannya.';
@@ -992,7 +993,6 @@ $ec_lang['lpn_guide_text_contour_box']='Mengatur plot kontur yang digambar pada 
 $ec_lang['lpn_guide_text_scncmp_box']='Menyelesaikan setiap skenario dari salinan gambar dan menabulasikan, untuk masing-masing, jumlah penimpaan, tekanan terendah, dan kecepatan tertinggi. Kotak ini tidak mengubah proyek, dan skenario yang sedang dibuka dibiarkan seperti semula.';
 $ec_lang['lpn_guide_text_rptbox']='Menampilkan laporan teks yang ditulis oleh mesin EPANET untuk simulasi periode waktu terakhir, termasuk peringatan dan ringkasan jaringannya. Setiap simulasi periode waktu menggantikannya; penyelesaian pada satu saat tidak menggantikannya, dan suntingan membiarkan laporan sebelumnya tetap ada.';
 $ec_lang['lpn_guide_text_status_box']='Mendaftar, berurutan menurut waktu, setiap perubahan selama simulasi periode waktu terakhir: pembukaan atau penutupan pompa, katup, atau pipa, tangki yang mulai terisi atau terkuras atau menjadi penuh atau kosong, dan setiap langkah waktu yang tidak sepenuhnya konvergen. Hanya perubahan yang didaftar, bukan setiap langkah waktu.';
-$ec_lang['lpn_guide_text_alt_box']='Menampilkan, untuk setiap skenario, alternatif mana yang digunakan pada setiap kategori, seperti Fisik, Kebutuhan, dan Pengaktifan elemen, serta opsi perhitungannya: pengali kebutuhan, total waktu berjalan, dan langkah waktu hidrolik. Alternatif hanya-baca. Opsi perhitungan skenario dapat diketik di sini, dan kolom kosong memakai nilai induknya. Buka dari menu Skenario setelah Mode dasar dimatikan.';
 $ec_lang['lpn_guide_text_full_box']='Mendaftar setiap simpul dan setiap penghubung pada setiap langkah waktu pelaporan, dalam satuan yang ditampilkan di panel Tabel. Tanpa simulasi periode waktu, kotak ini menampilkan solusi saat ini pada satu saat. Unduh atau cetak memuat setiap langkah waktu, dan tabel menampilkan satu per satu.';
 $ec_lang['lpn_guide_text_calib_box']='Membandingkan berkas pengukuran lapangan dengan hasil perhitungan pada lokasi dan waktu yang sama, satu berkas untuk setiap parameter. Berkas hanya disimpan selama sesi berjalan dan tidak disimpan bersama proyek.';
 $ec_lang['lpn_guide_text_notes_popup']='Mendaftar catatan tentang cara kerja halaman ini dan apa yang tidak dilakukannya, masing-masing berupa istilah diikuti definisinya. Kotak ini tidak mengubah jaringan.';
@@ -1020,7 +1020,6 @@ $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?<
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='Juga di {menu}';
 $ec_lang['lpn_guide_how_popup']='Properti terbuka ketika Anda memilih aset atau teks.';
-$ec_lang['lpn_guide_how_alt']='Pratinjau Alternatif tercantum di Air, Skenario ketika Mode dasar dimatikan.';
 $ec_lang['lpn_guide_not_shown']='Kontrol ini tidak ada di layar saat ini.';
 // The box's two context headings. "Tables" holds the two table-help entries that used to sit only
 // in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
@@ -1475,8 +1474,20 @@ $ec_lang['lpn_pane_sel_only_none']='Tidak ada elemen yang dipilih. Pilih elemen 
 // Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
 // scenario, with a Scenario column after ID.
 $ec_lang['lpn_pane_scn_show']='Tampilkan skenario';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+
+
+
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+
+
+
+
 $ec_lang['lpn_pane_clear_override']='Hapus nilai khusus';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -1532,20 +1543,29 @@ $ec_lang['lpn_menu_project']='Air';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='Semua yang khusus untuk pemodelan jaringan air (kecuali kontrol pemutaran animasi)';
 $ec_lang['lpn_tables_menu']='Tabel';
-// Water > Change type (Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// Water > Morph (Task 781; Tom, 2026-10-14: *"I like the term 'Morph' (Transform) for this feature"*;
+// first built as Change type, Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
 // to Change node type for any asset, where if it has information that can't be ported to the new
 // type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
 // asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
 // popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
 // dev/asset-type.md.
-$ec_lang['lpn_change_type_menu']='Ubah jenis';
-$ec_lang['lpn_change_type_tip']='Ubah simpul terpilih menjadi simpul, reservoir, atau tangki, atau penghubung terpilih menjadi pipa, pompa, atau katup. Masing-masing mempertahankan ID, posisi, sambungan, dan setiap nilai yang juga dimiliki jenis baru. Jika ada yang akan hilang, Anda ditanya terlebih dahulu.';
-$ec_lang['lpn_change_type_ok']='Ubah';
+$ec_lang['lpn_morph_menu']='Ubah jenis';
+$ec_lang['lpn_morph_tip']='Ubah simpul terpilih menjadi simpul, reservoir, atau tangki, atau penghubung terpilih menjadi pipa, pompa, atau katup. Masing-masing mempertahankan ID, posisi, sambungan, dan setiap nilai yang juga dimiliki jenis baru. Jika ada yang akan hilang, Anda ditanya terlebih dahulu.';
+$ec_lang['lpn_morph_ok']='Ubah';
+// {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
+// when a node type was chosen), separated by commas.
+
+// The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
+// scenario, beside the override marker.
+
+
 $ec_lang['lpn_change_type_lost']='Nilai berikut akan hilang:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
 $ec_lang['lpn_change_type_key']='Setiap baris: ID: properti dan nilai yang akan hilang';
 $ec_lang['lpn_change_type_line']='{id}: {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, pada skenario {scenario}';
+
 $ec_lang['lpn_change_type_more']='Dan {n} lagi.';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.
@@ -1614,6 +1634,32 @@ $ec_lang['lpn_confirm_delete_network']='Hapus semua simpul, pipa, dan label teks
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='Cari dan ganti';
+// Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
+// placement are never pasted.
+
+
+
+
+
+
+
+
+
+
+// The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
+// opens the in-place editor; Reset position sends a dragged label or an attached Text home.
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_find_title']='Cari dan ganti';
 $ec_lang['lpn_find_scope']='Apa yang dicari';
 $ec_lang['lpn_find_scope_all']='Semuanya';
@@ -2056,6 +2102,8 @@ $ec_lang['lpn_status_inp_exported_picture']='Mengekspor {zip}, berisi berkas EPA
 $ec_lang['lpn_status_inp_exported_no_picture']='Mengekspor {file}. Gambar latar tidak dapat disimpan, sehingga .inp tidak menyebut gambar apa pun; di EPANET, tambahkan dengan View > Backdrop > Load.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+
+
 $ec_lang['lpn_inp_export_differences']='{n} hal yang tidak dapat ditampung format .inp.';
 $ec_lang['lpn_inp_export_difference_one']='Satu hal yang tidak dapat ditampung format .inp.';
 $ec_lang['lpn_inp_export_refused']='Proyek ini tidak dapat ditulis sebagai berkas EPANET: {detail}';
@@ -3045,6 +3093,7 @@ $ec_lang['lpn_scenario_overrides']='Jml. nilai khusus';
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='Cincin ambar berarti aset ini memiliki nilai khusus pada skenario {name}.';
+
 $ec_lang['lpn_scenario_overrides_tip']='Setiap nilai khusus ditandai di peta dengan cincin ambar. Beralih ke {base} atau skenario induk lain untuk melihat gambar tanpa nilai tersebut.';
 $ec_lang['lpn_scenario_menu']='Skenario';
 $ec_lang['lpn_scenario_tip']='Kumpulan nilai yang sedang ditampilkan pada gambar dan sedang diselesaikan oleh halaman ini. Klik untuk berpindah skenario, atau untuk menambah, mengganti nama, atau menghapus skenario.';
@@ -3053,10 +3102,11 @@ $ec_lang['lpn_scenario_new_name']='Skenario {n}';
 $ec_lang['lpn_scenario_prompt_name']='Nama untuk skenario ini';
 $ec_lang['lpn_scenario_rename']='Ganti nama skenario…';
 $ec_lang['lpn_scenario_delete']='Hapus skenario';
-$ec_lang['lpn_scenario_delete_confirm']='Hapus skenario {name}, beserta nilai khususnya ({n})? Gambar itu sendiri tidak berubah.';
-$ec_lang['lpn_scenario_override']='Nilai khusus di skenario ini';
+
+
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='Dicentang berarti skenario ini menimpa induknya untuk nilai ini, meskipun angkanya sama. Hapus centang untuk memakai nilai induk.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3067,31 +3117,142 @@ $ec_lang['lpn_scenario_deactivated']='{id} dikecualikan dari jaringan pada {scen
 $ec_lang['lpn_scenario_delete_in_base']='Untuk menghapusnya dari gambar, hapus di skenario {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} dihapus. Elemen ini hanya bagian dari {scenario}.';
 $ec_lang['lpn_scenario_delete_blocked']='{id} tidak dihapus, karena penghubung {link} berakhir padanya, dan penghubung itu juga ada di luar {scenario}. Untuk menghapus keduanya, hapus di skenario {base}.';
-$ec_lang['lpn_scenario_push_btn']='Terapkan nilai Dasar ke semua skenario';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Setiap skenario kembali menggunakan nilai Dasar untuk properti yang labelnya sedang ditampilkan sekarang. Nilai yang dimasukkan untuk properti ini di skenario mana pun akan dibuang.';
 $ec_lang['lpn_scenario_basic']='Mode dasar';
 $ec_lang['lpn_scenario_basic_tip']='Dicentang: skenario hanya terdiri dari nilai yang diatur di dalamnya. Tidak dicentang: menu ini juga menawarkan tabel pratinjau Alternatif, yang menunjukkan bagaimana nilai-nilai itu dikelompokkan menurut kategori, dan memungkinkan skenario memiliki total waktu berjalan dan langkah waktu hidraulik tersendiri. Umpan balik tentang fitur ini diterima dengan senang hati.';
-$ec_lang['lpn_alt_title']='Pratinjau Alternatif';
-$ec_lang['lpn_alt_calc_options']='Opsi perhitungan';
-$ec_lang['lpn_alt_note']='Dasar menggunakan alternatif Dasar dari setiap kategori. Setiap skenario memiliki alternatif tersendiri, turunan dari alternatif Dasar, untuk kategori apa pun yang diubah. Angkanya adalah jumlah nilai yang diubah. Tiga kolom terakhir adalah opsi perhitungan: masukkan nilai untuk skenario, atau biarkan kosong untuk memakai nilai induk. Nilai proyek berada di Pengaturan, Perhitungan, Waktu.';
-$ec_lang['lpn_scenario_duration_tip']='Biarkan kosong untuk mewarisi dari induk. Total waktu berjalan 0:00 adalah proses keadaan tunak.';
-$ec_lang['lpn_scenario_hyd_step_tip']='Biarkan kosong untuk mewarisi dari induk.';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_time_scn_overrides']='Nilai khusus skenario:';
+
+
+
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+
+
+
+
+
+
+
+
+
+
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+
+
+
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_alt_cat_physical']='Fisik';
 $ec_lang['lpn_alt_cat_demand']='Kebutuhan';
 $ec_lang['lpn_alt_cat_topology']='Pengaktifan elemen';
+
 $ec_lang['lpn_alt_cat_initial']='Pengaturan awal';
 $ec_lang['lpn_alt_cat_constituent']='Konstituen';
 $ec_lang['lpn_alt_cat_fireflow']='Debit kebakaran';
 $ec_lang['lpn_alt_cat_energy']='Biaya energi';
 $ec_lang['lpn_alt_cat_userdata']='Properti khusus';
 $ec_lang['lpn_alt_cat_text']='Teks';
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Jadikan setiap skenario menggunakan nilai Dasar untuk properti ini? Nilai yang dimasukkan untuk properti ini di skenario mana pun akan dibuang. Anda dapat membatalkan tindakan ini.';
-$ec_lang['lpn_scenario_push_scenarios']='Skenario yang terpengaruh:';
-$ec_lang['lpn_scenario_push_values']='Nilai yang dibuang:';
-$ec_lang['lpn_scenario_push_none']='Tidak ada skenario yang menimpa Dasar untuk properti-properti ini, sehingga tidak ada yang berubah. Tidak ada yang dibuang.';
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. Uji aliran: Statis';
@@ -3231,6 +3392,8 @@ $ec_lang['lpn_time_run_fell_back']='Angka pada layar berasal dari penyelesai baw
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='Kendali-kendali ini menyebut elemen yang sudah tidak ada dalam proyek ini, sehingga tidak disertakan: {ids}';
 $ec_lang['lpn_control_unreadable_note']='Kendali-kendali ini tidak dapat dibaca, sehingga tidak disertakan: {ids}';
+
+
 $ec_lang['lpn_rule_dangling_note']='Aturan-aturan ini merujuk pada elemen yang tidak lagi ada dalam proyek ini, sehingga diabaikan dalam proses ini: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='Aturan-aturan ini tidak dapat dibaca, sehingga diabaikan dalam proses ini: {ids}';
 $ec_lang['lpn_settings_text_size']='Ukuran teks (piksel)';
@@ -3783,9 +3946,7 @@ $ec_lang['lpn_energy_curve_note']='Pompa-pompa ini memanggil kurva efisiensi yan
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Peringkat';
 $ec_lang['lpn_labels_col_drop']='Lepas';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -4010,6 +4171,8 @@ $ec_lang['lpn_library_pattern_default_mark']='(default)';
 $ec_lang['lpn_library_pattern_default_tip']='Pola kebutuhan default. Ubah di Pengaturan, Pola kebutuhan default.';
 $ec_lang['lpn_library_pattern_default_deleted_to']='Pola {id} adalah pola kebutuhan default. Simpul tanpa pola sekarang memakai pola {now}.';
 $ec_lang['lpn_library_pattern_default_deleted_none']='Pola {id} adalah pola kebutuhan default. Simpul tanpa pola sekarang memakai kebutuhan konstan.';
+
+
 $ec_lang['lpn_library_control_add']='Tambah kendali';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -4572,4 +4735,4 @@ $ec_lang['lpn_snip_tip_eraser']='Penghapus: klik goresan untuk menghapusnya (E)'
 $ec_lang['lpn_snip_tip_undo']='Urungkan (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Ulangi (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Salin (Ctrl+C)';
-$ec_lang['lpn_screenshot_scale_tip']='Ukuran gambar sebagai kelipatan area di layar. Kelipatan yang lebih besar lebih tajam dan menghasilkan berkas lebih besar.';
+$ec_lang['lpn_screenshot_scale_tip']='Ukuran gambar sebagai kelipatan area di layar. Kelipatan yang lebih besar lebih tajam dan menghasilkan berkas lebih besar.';$ec_lang['lpn_guide_text_alt_box']='Menampilkan, untuk setiap skenario, alternatif mana yang digunakan pada setiap kategori, seperti Fisik, Kebutuhan, dan Pengaktifan elemen, serta opsi perhitungannya: pengali kebutuhan, total waktu berjalan, dan langkah waktu hidrolik. Alternatif hanya-baca. Opsi perhitungan skenario dapat diketik di sini, dan kolom kosong memakai nilai induknya. Buka dari menu Skenario setelah Mode dasar dimatikan.';$ec_lang['lpn_guide_how_alt']='Pratinjau Alternatif tercantum di Air, Skenario ketika Mode dasar dimatikan.';$ec_lang['lpn_alt_calc_options']='Opsi perhitungan';$ec_lang['lpn_scenario_duration_tip']='Biarkan kosong untuk mewarisi dari induk. Total waktu berjalan 0:00 adalah proses keadaan tunak.';$ec_lang['lpn_scenario_hyd_step_tip']='Biarkan kosong untuk mewarisi dari induk.';

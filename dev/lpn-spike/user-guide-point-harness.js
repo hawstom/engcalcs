@@ -150,15 +150,16 @@ async function run(browser, Session, tag, url) {
 	ok('a card of another kind closes the first card\'s menu at once, and rings its own control', JSON.stringify(await menusOpen()) === '{"m":"none","s":"none"}' && p.n === 1 && p.id === 'select', JSON.stringify([await menusOpen(), p]));
 	await page.waitForTimeout(2800);
 
-	console.log('\n2b. Properties and Alternatives preview say how they open');
+	console.log('\n2b. Properties says how it opens; the Scenario manager points at its menu row');
 	await clickCard(page, "function () { return document.getElementById('lpn_guide_b_lpn_popup'); }");
 	await a.settle(150);
 	const note = await page.evaluate(() => Array.from(document.querySelectorAll('.lpn-guide-nopoint')).map(n => n.textContent));
 	ok('the Properties card shows the note with its pointer', note.length === 1 && note[0].indexOf(await a.lang('lpn_guide_how_popup')) >= 0 && note[0].indexOf(await a.lang('lpn_guide_not_shown')) === 0, JSON.stringify(note));
-	await clickCard(page, "function () { return document.getElementById('lpn_guide_b_lpn_alt_box'); }");
+	await clickCard(page, "function () { return document.getElementById('lpn_guide_b_lpn_sm_box'); }");
 	await a.settle(150);
-	const note2 = await page.evaluate(() => Array.from(document.querySelectorAll('.lpn-guide-nopoint')).map(n => n.textContent));
-	ok('the Alternatives preview card shows the note with its pointer, and the Properties note is gone', note2.length === 1 && note2[0].indexOf(await a.lang('lpn_guide_how_alt')) >= 0, JSON.stringify(note2));
+	// Its row in the Scenarios menu is always there (H03), so its card rings that row instead.
+	const p2 = await pointed(page);
+	ok('the Scenario manager card rings its row in the Scenarios menu, and the Properties note is gone', p2.n === 1 && p2.visible && p2.note === 0 && String(p2.id).indexOf(await a.lang('lpn_sm_menu')) === 0, JSON.stringify(p2));
 
 	console.log('\n3. Find and replace');
 	await page.keyboard.press('Escape');

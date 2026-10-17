@@ -342,6 +342,9 @@ run_check "setting scope"                blocking php dev/scripts/setting_scope_
 # with reasons), an undeclared var(--ec-...), and a rise in inline literals in js/*.js and the PHP pages.
 # dev/lpn-spike/chrome-tokens-harness.js holds the browser half, and runs with the other harnesses.
 run_check "chrome colour tokens"         blocking php dev/scripts/chrome_colour_check.php
+# Task 714 Phase 2. The dark set must stay readable: its two blocks identical, every text token on every
+# surface it sits on at 4.5:1, every UI border 3:1. dev/lpn-spike/theme-browser-harness.js holds the browser half.
+run_check "theme contrast"               blocking node dev/scripts/theme_contrast_check.js
 # Task 690, the spreadsheet-parity half. Every property in an element's property popup is also a
 # column in that element's table -- and, because multiGroups() derives its sections from
 # paneTables(), in the multi-properties box with it. Adding a popup field is a complete, working,

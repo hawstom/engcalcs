@@ -159,6 +159,7 @@ const EC_SCRIPTLESS_CHECKS = [
     // named two of the three languages actually checked.
     'shell syntax (all .sh)'     => 'shell',
     'label bench selftest'       => 'label-bench/selftest-harness.js',
+    'theme contrast'             => 'theme_contrast_check.js',
 ];
 
 if (defined('CHECK_TABLE_PARITY_LIB_ONLY')) {

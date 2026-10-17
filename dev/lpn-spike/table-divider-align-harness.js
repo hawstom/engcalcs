@@ -202,6 +202,12 @@ async function main() {
 				// box-shadow alignment fix this harness guards is intact; only the sample was picking
 				// up a second, unrelated control that was never a divider.
 				await page.addStyleTag({ content: '.lpn-pane-colmenu, .lpn-pane-sortarrow { visibility: hidden; }' });
+				// **AND THE POINTER IS TAKEN OFF THE TAB IT JUST CLICKED, AND ITS TIP HIDDEN.** The
+				// Junctions tab's name tip opens under the pointer after its delay, which lands over the
+				// heading's left columns; on a loaded machine the screenshot came after the delay and read
+				// that tip's pixels as the heading (0/8, every sample row a run of grey or no dividers).
+				await page.mouse.move(1, 1);
+				await page.addStyleTag({ content: '.tooltip { visibility: hidden !important; }' });
 
 				if (forceScrollbarGutter) {
 					await page.evaluate(() => {

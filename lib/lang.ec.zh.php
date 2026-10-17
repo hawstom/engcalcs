@@ -708,6 +708,7 @@ $ec_lang['lpn_node_customers_tip']='添加在此节点（因为这是最近的�
 $ec_lang['lpn_node_customers_sum']='{total} {unit}，来自用户（{n}）';
 $ec_lang['lpn_customer_detached']='⚠ 该用户未连接到任何管道，因此其需水量未计入结果。请删除它，或绘制一条管道并将该用户移到其上。';
 $ec_lang['lpn_customer_fixed_head']='⚠ 该管道靠近的一端是固定水位，因此该需水量不影响模拟结果。';
+
 $ec_lang['lpn_customer_detached_count']='未连接到管道的用户（{n}）。其需水量未被计入。';
 $ec_lang['lpn_meter_pick_pipe']='现在点击为该用户供水的管道或节点。该用户会保持在您放置的位置。按 Escape 取消。';
 $ec_lang['lpn_inp_export_flat_customers']='EPANET 文件不含用户。本项目中用户（{n}）的需水量会作为一行需水量数据，写入各用户所分配到的节点，并以该用户的标记命名。文件不记录用户本身：它的位置、为其供水的管道、供水接入沿该管道的位置，或它代表多少个接户。这些信息保留在项目中；请保存项目文件以保留它们。';
@@ -992,7 +993,6 @@ $ec_lang['lpn_guide_text_contour_box']='控制按“节点着色依据”所选�
 $ec_lang['lpn_guide_text_scncmp_box']='用图纸的副本求解每个方案，并为每个方案列表给出覆盖值个数、最低压力和最高流速。它不会更改项目，当前打开的方案保持原样。';
 $ec_lang['lpn_guide_text_rptbox']='显示 EPANET 引擎为上一次延时模拟写出的文本报告，包括其警告和管网摘要。每次延时模拟都会替换该报告；单一时刻的求解不会替换，编辑也会保留之前的报告。';
 $ec_lang['lpn_guide_text_status_box']='按时间顺序列出上一次延时模拟中的每次变化：水泵、阀门或管道的开启或关闭，水箱开始充水或放水或变满或变空，以及任何未完全收敛的时间步。只列出变化，不列出每个时间步。';
-$ec_lang['lpn_guide_text_alt_box']='显示每个方案在各类别（如物理、需水量和元件启用）中使用哪一个备选方案，以及其计算选项：需水量倍数、总运行时长和水力时间步长。备选方案为只读。方案的计算选项可在此输入，留空则使用其父方案的数值。清除“基本模式”后，从“情景”菜单打开。';
 $ec_lang['lpn_guide_text_full_box']='列出每个报告时间步的每个节点和每条连接线，单位与“表格”窗格中显示的相同。没有延时模拟时，显示单一时刻的当前解。下载或打印包含每个时间步，表格一次显示一个。';
 $ec_lang['lpn_guide_text_calib_box']='将现场测量值文件与相同位置和时间的计算结果进行比较，每个参数一个文件。该文件仅在当前会话中保留，不随项目保存。';
 $ec_lang['lpn_guide_text_notes_popup']='列出关于本页面行为方式及其不具备功能的说明，每条为一个术语及其定义。它不会更改管网。';
@@ -1020,7 +1020,6 @@ $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?<
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='{menu}中的其他项';
 $ec_lang['lpn_guide_how_popup']='选中元件或文字时，将打开“属性”。';
-$ec_lang['lpn_guide_how_alt']='清除“基本模式”后，“备选方案预览”列在“水务”、“情景”之下。';
 $ec_lang['lpn_guide_not_shown']='此控件当前不在屏幕上。';
 // The box's two context headings. "Tables" holds the two table-help entries that used to sit only
 // in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
@@ -1475,8 +1474,20 @@ $ec_lang['lpn_pane_sel_only_none']='未选中任何元件。请先在地图上�
 // Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
 // scenario, with a Scenario column after ID.
 $ec_lang['lpn_pane_scn_show']='显示方案';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+
+
+
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+
+
+
+
 $ec_lang['lpn_pane_clear_override']='清除覆盖值';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -1532,20 +1543,29 @@ $ec_lang['lpn_menu_project']='水务';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='所有专属于供水管网建模的内容（动画播放控制除外）';
 $ec_lang['lpn_tables_menu']='表格';
-// Water > Change type (Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// Water > Morph (Task 781; Tom, 2026-10-14: *"I like the term 'Morph' (Transform) for this feature"*;
+// first built as Change type, Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
 // to Change node type for any asset, where if it has information that can't be ported to the new
 // type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
 // asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
 // popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
 // dev/asset-type.md.
-$ec_lang['lpn_change_type_menu']='更改类型';
-$ec_lang['lpn_change_type_tip']='将所选节点更改为节点、水库或水箱，或将所选连接线更改为管道、水泵或阀门。每个元件都保留其 ID、位置、连接关系，以及新类型同样具有的所有数值。如果有内容会丢失，会先询问您。';
-$ec_lang['lpn_change_type_ok']='更改';
+$ec_lang['lpn_morph_menu']='更改类型';
+$ec_lang['lpn_morph_tip']='将所选节点更改为节点、水库或水箱，或将所选连接线更改为管道、水泵或阀门。每个元件都保留其 ID、位置、连接关系，以及新类型同样具有的所有数值。如果有内容会丢失，会先询问您。';
+$ec_lang['lpn_morph_ok']='更改';
+// {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
+// when a node type was chosen), separated by commas.
+
+// The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
+// scenario, beside the override marker.
+
+
 $ec_lang['lpn_change_type_lost']='这些数值将会丢失：';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
 $ec_lang['lpn_change_type_key']='每行：ID：将会丢失的属性及其数值';
 $ec_lang['lpn_change_type_line']='{id}：{property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}：{property} {value}，在方案 {scenario} 中';
+
 $ec_lang['lpn_change_type_more']='另有 {n} 项。';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.
@@ -1614,6 +1634,32 @@ $ec_lang['lpn_confirm_delete_network']='删除本项目中的所有节点、管�
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='查找与替换';
+// Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
+// placement are never pasted.
+
+
+
+
+
+
+
+
+
+
+// The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
+// opens the in-place editor; Reset position sends a dragged label or an attached Text home.
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_find_title']='查找与替换';
 $ec_lang['lpn_find_scope']='搜索范围';
 $ec_lang['lpn_find_scope_all']='全部';
@@ -2056,6 +2102,8 @@ $ec_lang['lpn_status_inp_exported_picture']='已导出 {zip}，其中包含 EPAN
 $ec_lang['lpn_status_inp_exported_no_picture']='已导出 {file}。背景图片无法保存，因此 .inp 未指定背景图片；请在 EPANET 中通过“视图”>“背景”>“加载”添加。';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+
+
 $ec_lang['lpn_inp_export_differences']='有 {n} 项内容是 .inp 格式无法保存的。';
 $ec_lang['lpn_inp_export_difference_one']='.inp 格式无法保存的一项内容。';
 $ec_lang['lpn_inp_export_refused']='此项目无法写入为 EPANET 文件：{detail}';
@@ -3045,6 +3093,7 @@ $ec_lang['lpn_scenario_overrides']='覆盖值个数';
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='琥珀色圆环表示此元件在方案 {name} 中有覆盖值。';
+
 $ec_lang['lpn_scenario_overrides_tip']='每个覆盖值在地图上以琥珀色圆环标出。切换到{base}或另一个父方案，即可查看没有这些覆盖值的图纸。';
 $ec_lang['lpn_scenario_menu']='情景';
 $ec_lang['lpn_scenario_tip']='图中当前显示、页面正在求解的这套数值。点击可切换方案，或新建、重命名、删除方案。';
@@ -3053,10 +3102,11 @@ $ec_lang['lpn_scenario_new_name']='方案 {n}';
 $ec_lang['lpn_scenario_prompt_name']='该方案的名称';
 $ec_lang['lpn_scenario_rename']='重命名方案…';
 $ec_lang['lpn_scenario_delete']='删除方案';
-$ec_lang['lpn_scenario_delete_confirm']='要删除方案 {name} 及其覆盖值（{n}）吗？图纸本身不会更改。';
-$ec_lang['lpn_scenario_override']='在本方案中覆盖';
+
+
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='勾选表示本方案对此数值覆盖其父方案，即使数字相同。取消勾选则使用其父方案的数值。';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3067,31 +3117,142 @@ $ec_lang['lpn_scenario_deactivated']='{id} 在 {scenario} 中被排除在管网�
 $ec_lang['lpn_scenario_delete_in_base']='要将其从图纸中移除，请在{base}方案中删除。';
 $ec_lang['lpn_scenario_only_deleted']='{id} 已删除。它仅属于 {scenario}。';
 $ec_lang['lpn_scenario_delete_blocked']='{id} 未删除，因为连接线 {link} 终止于它，而该连接线在 {scenario} 之外也存在。要同时删除两者，请在{base}方案中删除。';
-$ec_lang['lpn_scenario_push_btn']='将基础方案数值应用于所有方案';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。';
 $ec_lang['lpn_scenario_basic']='基本模式';
 $ec_lang['lpn_scenario_basic_tip']='勾选时，方案仅由在其中设置的数值构成。取消勾选时，此菜单还会提供“备选方案预览”表，显示这些数值如何按类别分组，并允许方案具有单独的总运行时长和水力时间步长。欢迎对此功能提出反馈。';
-$ec_lang['lpn_alt_title']='备选方案预览';
-$ec_lang['lpn_alt_calc_options']='计算选项';
-$ec_lang['lpn_alt_note']='基础方案对每个类别都使用基础备选方案。每个方案对任何有更改的类别都有一个单独的备选方案，它是基础备选方案的子项。数字是已更改数值的个数。最后三列是计算选项：为该方案输入一个值，或留空以使用父方案的值。项目的值位于“设置”、“计算”、“时间”中。';
-$ec_lang['lpn_scenario_duration_tip']='留空则继承自父方案。总运行时长为 0:00 即为稳态运行。';
-$ec_lang['lpn_scenario_hyd_step_tip']='留空则继承自父方案。';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_time_scn_overrides']='方案覆盖值：';
+
+
+
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+
+
+
+
+
+
+
+
+
+
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+
+
+
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_alt_cat_physical']='物理';
 $ec_lang['lpn_alt_cat_demand']='需水量';
 $ec_lang['lpn_alt_cat_topology']='元件启用';
+
 $ec_lang['lpn_alt_cat_initial']='初始设置';
 $ec_lang['lpn_alt_cat_constituent']='组分';
 $ec_lang['lpn_alt_cat_fireflow']='消防流量';
 $ec_lang['lpn_alt_cat_energy']='能耗费用';
 $ec_lang['lpn_alt_cat_userdata']='自定义属性';
 $ec_lang['lpn_alt_cat_text']='文字';
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。';
-$ec_lang['lpn_scenario_push_scenarios']='受影响的方案：';
-$ec_lang['lpn_scenario_push_values']='被舍弃的数值：';
-$ec_lang['lpn_scenario_push_none']='没有任何方案对这些属性覆盖基础方案，因此不会有任何变化。不会舍弃任何内容。';
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. 流量测试：静态';
@@ -3231,6 +3392,8 @@ $ec_lang['lpn_time_run_fell_back']='屏幕上显示的数值改由内置求解�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='以下控制规则所指的元件已不在此项目中，因此已被略过：{ids}';
 $ec_lang['lpn_control_unreadable_note']='以下控制规则无法读取，因此已被略过：{ids}';
+
+
 $ec_lang['lpn_rule_dangling_note']='以下规则引用了本项目中已不存在的元件，因此本次运行已忽略它们：{ids}';
 $ec_lang['lpn_rule_unreadable_note']='以下规则无法读取，因此本次运行已忽略它们：{ids}';
 $ec_lang['lpn_settings_text_size']='文字大小（像素）';
@@ -3783,9 +3946,7 @@ $ec_lang['lpn_energy_curve_note']='以下水泵引用了没有数据点的效率
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='排名';
 $ec_lang['lpn_labels_col_drop']='省略';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -4010,6 +4171,8 @@ $ec_lang['lpn_library_pattern_default_mark']='（默认）';
 $ec_lang['lpn_library_pattern_default_tip']='默认需水模式。可在“设置”、“默认需水模式”中更改。';
 $ec_lang['lpn_library_pattern_default_deleted_to']='模式 {id} 曾是默认需水模式。未指定模式的节点现在使用模式 {now}。';
 $ec_lang['lpn_library_pattern_default_deleted_none']='模式 {id} 曾是默认需水模式。未指定模式的节点现在使用恒定需水量。';
+
+
 $ec_lang['lpn_library_control_add']='添加控制规则';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -4572,4 +4735,4 @@ $ec_lang['lpn_snip_tip_eraser']='橡皮擦：点击笔画将其删除 (E)';
 $ec_lang['lpn_snip_tip_undo']='撤销 (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='重做 (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='复制 (Ctrl+C)';
-$ec_lang['lpn_screenshot_scale_tip']='图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。';
+$ec_lang['lpn_screenshot_scale_tip']='图片大小相对于屏幕上该区域大小的倍数。倍数越大越清晰，文件也越大。';$ec_lang['lpn_guide_text_alt_box']='显示每个方案在各类别（如物理、需水量和元件启用）中使用哪一个备选方案，以及其计算选项：需水量倍数、总运行时长和水力时间步长。备选方案为只读。方案的计算选项可在此输入，留空则使用其父方案的数值。清除“基本模式”后，从“情景”菜单打开。';$ec_lang['lpn_guide_how_alt']='清除“基本模式”后，“备选方案预览”列在“水务”、“情景”之下。';$ec_lang['lpn_alt_calc_options']='计算选项';$ec_lang['lpn_scenario_duration_tip']='留空则继承自父方案。总运行时长为 0:00 即为稳态运行。';$ec_lang['lpn_scenario_hyd_step_tip']='留空则继承自父方案。';

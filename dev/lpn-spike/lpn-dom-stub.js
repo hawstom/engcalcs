@@ -68,7 +68,9 @@ function mkEl(tag, svgNS) {
     // in the middle of a value sets both.
     selectionStart: null, selectionEnd: null,
     appendChild(c) { this.children.push(c); c.parentNode = this; return c; },
-    insertBefore(c) { this.children.unshift(c); c.parentNode = this; return c; },
+    // Before `ref` when it is a child here (the override marker's gutter goes at the start of the row
+    // just built, Task 790); otherwise first, as this stub always did.
+    insertBefore(c, ref) { const i = ref ? this.children.indexOf(ref) : -1; if (i >= 0) { this.children.splice(i, 0, c); } else { this.children.unshift(c); } c.parentNode = this; return c; },
     // **A REAL SWAP, IN PLACE.** The Libraries box redraws a curve's chart and rebuilds one curve
     // entry this way, so a stub that lacked it could not run either path at all -- and the paste
     // handler's whole visible result is the entry that comes back.
@@ -416,7 +418,7 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_pane', 'lpn_pane_grip', 'lpn_pane_head', 'lpn_pane_tabs', 'lpn_pane_close',
   'lpn_pane_body', 'lpn_pane_profile', 'lpn_pane_junctions', 'lpn_pane_reservoirs',
   'lpn_pane_tanks', 'lpn_pane_pipes', 'lpn_pane_pumps', 'lpn_pane_valves', 'lpn_pane_text',
-  'lpn_pane_customers', 'lpn_pane_shapes',
+  'lpn_pane_customers', 'lpn_pane_shapes', 'lpn_pane_settings', 'lpn_pane_scenarios',
   'lpn_profile_form', 'lpn_profile_chart', 'lpn_profile_note',
   // The time-series tab and its three boxes (ROADMAP Task 599), the profile's twin. Absent from
   // this list, rebuildTsForm() and renderTimeSeries() return at their first line and the chart
@@ -955,7 +957,10 @@ global.EngCalcs = {
 // asserting `el.title` passed while the page displayed a stale sentence for the life of the page
 // (2026-09-10, the transport's player buttons). One physical relationship, taught here: what the
 // READER sees is the cache, and only dispose() gives the attribute back.
-const _tips = new Map();
+// A WeakMap, as bootstrap's own element data store lets go of an element nobody holds: a Map here
+// kept every element that ever had a tip, its listeners, and through them every page a harness had
+// ever loaded (scenario-manager-harness.js loads about 180 and ran out of heap at 4.4 GB).
+const _tips = new WeakMap();
 class _StubTooltip {
   constructor(el) {
     this.el = el;

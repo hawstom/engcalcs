@@ -50,7 +50,7 @@ const L = loadLoopedNetwork(
 	"\t\tseedDefaultInputs: seedDefaultInputs, getDoc: function () { return doc; },\n" +
 	"\t\tsetDoc: function (d) { doc = d; }, setSettings: function (s) { settings = s; },\n" +
 	"\t\tgetSettings: function () { return settings; },\n" +
-	"\t\trunSolve: runSolve, lastResult: function () { return lastSolveResult; },\n" +
+	"\t\trunSolve: runSolve, scheduleSolve: scheduleSolve, lastResult: function () { return lastSolveResult; },\n" +
 	"\t\topenPopup: openPopup, openLinkPopup: openLinkPopup, closePopup: closePopup,\n" +
 	"\t\topenMultiProperties: openMultiProperties, refreshPopupIfOpen: refreshPopupIfOpen,\n" +
 	"\t\tsetSelectionList: setSelectionList, setProp: setProp, serialize: serializeProject,\n" +
@@ -276,8 +276,11 @@ async function until(pred, ms) {
 	head('8. RECALCULATE OFF: THE SNAPSHOT STAYS');
 	L.openPopup(J1, 100, 100);
 	const snap = lineSig();
+	// An edit goes through scheduleSolve(), the one door every edit takes; with Recalculate off it
+	// solves nothing (runSolve() is what Calculate does). The elevation is a real edit since every
+	// property became overridable (2026-10-12); before, this setProp() wrote a field nothing read.
 	L.setProp(L.getDoc().nodes.filter((n) => n.id === J1)[0], 'elev', 1);
-	L.runSolve();
+	L.scheduleSolve();
 	await wait(400);
 	L.refreshPopupIfOpen();
 	check(EngCalcs.lpnTimeRunFrames().length > 0 && shown(),

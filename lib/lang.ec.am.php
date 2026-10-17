@@ -708,6 +708,7 @@ $ec_lang['lpn_node_customers_tip']='ይህ በጣም ቅርብ ነጥባቸው �
 $ec_lang['lpn_node_customers_sum']='{total} {unit} ከደንበኞች ({n})';
 $ec_lang['lpn_customer_detached']='⚠ ይህ ደንበኛ ከቧንቧ ጋር አልተገናኘም፣ ስለዚህ ፍላጎቱ በመልሶቹ ውስጥ የለም። ይሰርዙት፣ ወይም ቧንቧ ስለው ደንበኛውን ወደ እሱ ያንቀሳቅሱት።';
 $ec_lang['lpn_customer_fixed_head']='⚠ የዚያ ቧንቧ ቅርብ ጫፍ የማይንቀሳቀስ የውሃ ወለል ይዟል፣ ስለዚህ ይህ ፍላጎት በማስመሰያው ላይ ተጽዕኖ አያሳድርም።';
+
 $ec_lang['lpn_customer_detached_count']='ከቧንቧ ጋር ያልተገናኙ ደንበኞች ({n})። ፍላጎታቸው አልተካተተም።';
 $ec_lang['lpn_meter_pick_pipe']='አሁን ይህን ደንበኛ የሚያገለግለውን ቧንቧ ወይም ነጥብ ይምረጡ። ደንበኛው እርስዎ ባስቀመጡበት ይቆያል። ለመሰረዝ Escape ይጫኑ።';
 $ec_lang['lpn_inp_export_flat_customers']='የEPANET ፋይል ደንበኞች የለውም። በዚህ ፕሮጀክት ውስጥ ያሉት ደንበኞች ({n}) ፍላጎት እያንዳንዱ ደንበኛ በተመደበበት መገናኛ ላይ እንደ ፍላጎት ረድፍ ይጻፋል፣ በደንበኛው ተለጣፊም ይሰየማል። ፋይሉ ደንበኛውን ራሱ አይመዘግብም፦ ቦታውን፣ የሚያገለግለውን ቧንቧ፣ አገልግሎቱ በዚያ ቧንቧ ላይ የት እንደሚገናኝ፣ ወይም ምን ያህል አገልግሎቶችን እንደሚወክል። ያ መረጃ በፕሮጀክቱ ውስጥ ይቆያል፤ ለማቆየት የፕሮጀክት ፋይሉን ያስቀምጡ።';
@@ -992,7 +993,6 @@ $ec_lang['lpn_guide_text_contour_box']='በካርታው ላይ በነጥብ ቀ�
 $ec_lang['lpn_guide_text_scncmp_box']='እያንዳንዱን ሁኔታ ከስዕሉ ቅጂ ይፈታል፣ ለእያንዳንዱም የራስ ዋጋዎችን ብዛት፣ ዝቅተኛውን ግፊት እና ከፍተኛውን ፍጥነት በሠንጠረዥ ያሳያል። ፕሮጀክቱን አይለውጥም፣ የተከፈተውም ሁኔታ እንደነበረ ይቀራል።';
 $ec_lang['lpn_guide_text_rptbox']='በመጨረሻው የተራዘመ ጊዜ ማስመሰያ የEPANET ፈታች የጻፈውን የጽሑፍ ሪፖርት ያሳያል፣ ማስጠንቀቂያዎቹንና የመረቡን ማጠቃለያ ጨምሮ። እያንዳንዱ የተራዘመ ጊዜ ማስመሰያ ይተካዋል፤ በአንድ ቅጽበት መፍታት አይተካውም፣ ማስተካከልም የቀደመውን ሪፖርት እንዳለ ይተዋል።';
 $ec_lang['lpn_guide_text_status_box']='በመጨረሻው የተራዘመ ጊዜ ማስመሰያ ወቅት እያንዳንዱን ለውጥ በጊዜ ቅደም ተከተል ይዘረዝራል፦ የፓምፕ፣ ቫልቭ ወይም ቧንቧ መከፈት ወይም መዘጋት፣ ታንክ መሙላት ወይም መራቆት ሲጀምር ወይም ሲሞላ ወይም ባዶ ሲሆን፣ እና ሙሉ በሙሉ ያልተሰባሰበ ማንኛውም የጊዜ ደረጃ። የሚዘረዘሩት ለውጦች ብቻ ናቸው፣ እያንዳንዱ የጊዜ ደረጃ አይደለም።';
-$ec_lang['lpn_guide_text_alt_box']='ለእያንዳንዱ ሁኔታ፣ በእያንዳንዱ ምድብ ማለትም አካላዊ፣ ፍላጎትና የአካል ማንቃት ውስጥ የትኛውን አማራጭ እንደሚጠቀም፣ እንዲሁም የስሌት አማራጮቹን ያሳያል፦ የፍላጎት ማባዣ፣ ጠቅላላ የመሮጫ ጊዜ እና የሃይድሮሊክ ጊዜ ደረጃ። አማራጮቹ ለንባብ ብቻ ናቸው። የሁኔታ የስሌት አማራጮች እዚህ ሊተየቡ ይችላሉ፣ ባዶ ሲሆን የወላጁን ዋጋ ይጠቀማል። መሰረታዊ ሁነታን ካጸዱ በኋላ ከሁኔታዎች ምናሌ ይክፈቱት።';
 $ec_lang['lpn_guide_text_full_box']='እያንዳንዱን ነጥብና እያንዳንዱን ግንኙነት በእያንዳንዱ የሪፖርት ጊዜ ደረጃ፣ በሠንጠረዦች ፓነል ላይ በሚታዩት አሃዶች ይዘረዝራል። የተራዘመ ጊዜ ማስመሰያ ከሌለ፣ አሁን ያለውን መፍትሄ በአንድ ቅጽበት ያሳያል። ማውረድ ወይም ማተም እያንዳንዱን የጊዜ ደረጃ ይይዛል፣ ሠንጠረዡ ግን አንድ በአንድ ያሳያል።';
 $ec_lang['lpn_guide_text_calib_box']='የመስክ መለኪያዎችን ፋይል በተመሳሳይ ቦታዎችና ጊዜያት ከተሰሉት ውጤቶች ጋር ያወዳድራል፣ ለእያንዳንዱ ግቤት አንድ ፋይል። ፋይሉ ለአሁኑ ክፍለ ጊዜ ብቻ ይያዛል፣ ከፕሮጀክቱ ጋር አይቀመጥም።';
 $ec_lang['lpn_guide_text_notes_popup']='ይህ ገጽ እንዴት እንደሚሠራና ምን እንደማያደርግ ማስታወሻዎችን ይዘረዝራል፣ እያንዳንዱ እንደ ቃልና ትርጉሙ። መረቡን አይለውጥም።';
@@ -1020,7 +1020,6 @@ $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?<
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='በ{menu} ውስጥ ደግሞ';
 $ec_lang['lpn_guide_how_popup']='አካል ወይም ጽሑፍ ሲመርጡ ንብረቶች ይከፈታል።';
-$ec_lang['lpn_guide_how_alt']='መሰረታዊ ሁነታ ሲጠፋ የአማራጮች ቅድመ ዕይታ በውሃ፣ ሁኔታዎች ስር ተዘርዝሯል።';
 $ec_lang['lpn_guide_not_shown']='ይህ መቆጣጠሪያ አሁን በስክሪኑ ላይ የለም።';
 // The box's two context headings. "Tables" holds the two table-help entries that used to sit only
 // in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
@@ -1475,8 +1474,20 @@ $ec_lang['lpn_pane_sel_only_none']='ምንም አካል አልተመረጠም።
 // Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
 // scenario, with a Scenario column after ID.
 $ec_lang['lpn_pane_scn_show']='ሁኔታዎችን አሳይ';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+
+
+
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+
+
+
+
 $ec_lang['lpn_pane_clear_override']='የራስ ዋጋን አጽዳ';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -1532,20 +1543,29 @@ $ec_lang['lpn_menu_project']='ውሃ';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='ለውሃ መረብ ሞዴሊንግ የተለዩ ሁሉም ነገሮች (ከአኒሜሽን ማጫወቻ መቆጣጠሪያዎች በስተቀር)';
 $ec_lang['lpn_tables_menu']='ሠንጠረዦች';
-// Water > Change type (Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// Water > Morph (Task 781; Tom, 2026-10-14: *"I like the term 'Morph' (Transform) for this feature"*;
+// first built as Change type, Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
 // to Change node type for any asset, where if it has information that can't be ported to the new
 // type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
 // asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
 // popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
 // dev/asset-type.md.
-$ec_lang['lpn_change_type_menu']='ዓይነት ቀይር';
-$ec_lang['lpn_change_type_tip']='የተመረጡትን ነጥቦች ወደ መገናኛዎች፣ ማጠራቀሚያዎች ወይም ታንኮች፣ ወይም የተመረጡትን ግንኙነቶች ወደ ቧንቧዎች፣ ፓምፖች ወይም ቫልቮች ይቀይራል። እያንዳንዱ መለያውን፣ ቦታውን፣ ግንኙነቶቹን እና አዲሱ ዓይነትም ያለውን እያንዳንዱን ዋጋ ይይዛል። ማንኛውም ነገር የሚጠፋ ከሆነ፣ መጀመሪያ ይጠየቃሉ።';
-$ec_lang['lpn_change_type_ok']='ቀይር';
+$ec_lang['lpn_morph_menu']='ዓይነት ቀይር';
+$ec_lang['lpn_morph_tip']='የተመረጡትን ነጥቦች ወደ መገናኛዎች፣ ማጠራቀሚያዎች ወይም ታንኮች፣ ወይም የተመረጡትን ግንኙነቶች ወደ ቧንቧዎች፣ ፓምፖች ወይም ቫልቮች ይቀይራል። እያንዳንዱ መለያውን፣ ቦታውን፣ ግንኙነቶቹን እና አዲሱ ዓይነትም ያለውን እያንዳንዱን ዋጋ ይይዛል። ማንኛውም ነገር የሚጠፋ ከሆነ፣ መጀመሪያ ይጠየቃሉ።';
+$ec_lang['lpn_morph_ok']='ቀይር';
+// {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
+// when a node type was chosen), separated by commas.
+
+// The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
+// scenario, beside the override marker.
+
+
 $ec_lang['lpn_change_type_lost']='እነዚህ ዋጋዎች ይጠፋሉ፦';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
 $ec_lang['lpn_change_type_key']='እያንዳንዱ መስመር፦ መለያ፦ የሚጠፋው ንብረትና ዋጋ';
 $ec_lang['lpn_change_type_line']='{id}፦ {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}፦ {property} {value}፣ በሁኔታ {scenario}';
+
 $ec_lang['lpn_change_type_more']='እና {n} ተጨማሪ።';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.
@@ -1614,6 +1634,32 @@ $ec_lang['lpn_confirm_delete_network']='በዚህ ፕሮጀክት ውስጥ ያ�
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='ፈልግና ተካ';
+// Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
+// placement are never pasted.
+
+
+
+
+
+
+
+
+
+
+// The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
+// opens the in-place editor; Reset position sends a dragged label or an attached Text home.
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_find_title']='ፈልግና ተካ';
 $ec_lang['lpn_find_scope']='ምን መፈለግ';
 $ec_lang['lpn_find_scope_all']='ሁሉም ነገር';
@@ -2056,6 +2102,8 @@ $ec_lang['lpn_status_inp_exported_picture']='{zip} ተልኳል፣ እሱም የ
 $ec_lang['lpn_status_inp_exported_no_picture']='{file} ተልኳል። የበስተጀርባ ምስሉ ሊቀመጥ አልቻለም፣ ስለዚህ .inp ምንም አይሰይምም፤ በEPANET ውስጥ በእይታ፣ Backdrop፣ Load ያክሉት።';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+
+
 $ec_lang['lpn_inp_export_differences']='የ.inp ቅርጸት ሊይዛቸው የማይችላቸው {n} ነገሮች።';
 $ec_lang['lpn_inp_export_difference_one']='የ.inp ቅርጸት ሊይዘው የማይችለው አንድ ነገር።';
 $ec_lang['lpn_inp_export_refused']='ይህ ፕሮጀክት እንደ EPANET ፋይል ሊጻፍ አይችልም፦ {detail}';
@@ -3045,6 +3093,7 @@ $ec_lang['lpn_scenario_overrides']='የራስ ዋጋዎች ብዛት';
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='ወርቃማው ቀለበት ይህ ንብረት በ{name} ሁኔታ ውስጥ የራስ ዋጋ እንዳለው ያመለክታል።';
+
 $ec_lang['lpn_scenario_overrides_tip']='እያንዳንዱ የራስ ዋጋ በካርታው ላይ በወርቃማ ቀለበት ምልክት ተደርጎበታል። ያለ እነሱ ስዕሉን ለማየት ወደ {base} ወይም ሌላ የወላጅ ሁኔታ ይቀይሩ።';
 $ec_lang['lpn_scenario_menu']='ሁኔታዎች';
 $ec_lang['lpn_scenario_tip']='ስዕሉ እያሳየ ገጹም አሁን እየፈታ ያለው የዋጋዎች ስብስብ። ሁኔታዎችን ለመቀያየር፣ ወይም አንዱን ለመጨመር፣ ስም ለመቀየር ወይም ለማጥፋት ይጫኑ።';
@@ -3053,10 +3102,11 @@ $ec_lang['lpn_scenario_new_name']='ሁኔታ {n}';
 $ec_lang['lpn_scenario_prompt_name']='ለዚህ ሁኔታ ስም';
 $ec_lang['lpn_scenario_rename']='የሁኔታ ስም ቀይር…';
 $ec_lang['lpn_scenario_delete']='ሁኔታ አጥፋ';
-$ec_lang['lpn_scenario_delete_confirm']='ሁኔታ {name} እና የራስ ዋጋዎቹ ({n}) ይሰረዙ? ስዕሉ ራሱ አይለወጥም።';
-$ec_lang['lpn_scenario_override']='በዚህ ሁኔታ ውስጥ የራስ ዋጋ';
+
+
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='ሲመረጥ፣ ቁጥሩ ተመሳሳይ ቢሆንም እንኳ ይህ ሁኔታ ለዚህ ዋጋ ወላጁን ይሽራል። የወላጁን ዋጋ ለመጠቀም ሳጥኑን ያጽዱ።';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3067,31 +3117,142 @@ $ec_lang['lpn_scenario_deactivated']='{id} በ{scenario} ውስጥ ከመረቡ 
 $ec_lang['lpn_scenario_delete_in_base']='ከስዕሉ ለማስወገድ በ{base} ሁኔታ ውስጥ ይሰርዙት።';
 $ec_lang['lpn_scenario_only_deleted']='{id} ተሰርዟል። የ{scenario} ክፍል ብቻ ነበር።';
 $ec_lang['lpn_scenario_delete_blocked']='ግንኙነት {link} በእሱ ላይ ስለሚያበቃ፣ እና ያ ግንኙነት ከ{scenario} ውጭም ስላለ፣ {id} አልተሰረዘም። ሁለቱንም ለመሰረዝ በ{base} ሁኔታ ውስጥ ይሰርዟቸው።';
-$ec_lang['lpn_scenario_push_btn']='የመሠረት ዋጋዎችን ለሁሉም ሁኔታዎች ተግብር';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='እያንዳንዱ ሁኔታ አሁን ለሚታዩት ምልክቶች ወደ መሠረት ዋጋ ይመለሳል። ለእነዚያ ሁኔታዎች ብቻ የሆኑ ዋጋዎች ይጣላሉ።';
 $ec_lang['lpn_scenario_basic']='መሰረታዊ ሁነታ';
 $ec_lang['lpn_scenario_basic_tip']='ሲመረጥ፣ ሁኔታ በውስጡ የተዘጋጁትን ዋጋዎች ብቻ ይይዛል። ሲጸዳ፣ ይህ ምናሌ ዋጋዎቹ በምድብ እንዴት እንደሚሰባሰቡ የሚያሳየውን የአማራጮች ቅድመ እይታ ሠንጠረዥም ያቀርባል፣ ሁኔታም የተለየ ጠቅላላ የመሮጫ ጊዜና የሃይድሮሊክ ጊዜ ደረጃ እንዲኖረው ያስችላል። በዚህ ባህሪ ላይ አስተያየት ተቀባይነት አለው።';
-$ec_lang['lpn_alt_title']='የአማራጮች ቅድመ እይታ';
-$ec_lang['lpn_alt_calc_options']='የስሌት አማራጮች';
-$ec_lang['lpn_alt_note']='መሠረት የእያንዳንዱን ምድብ መሠረት አማራጭ ይጠቀማል። እያንዳንዱ ሁኔታ ለሚቀየር ማንኛውም ምድብ የመሠረት አማራጩ ልጅ የሆነ የተለየ አማራጭ አለው። ቁጥሩ የተቀየሩት ዋጋዎች ብዛት ነው። የመጨረሻዎቹ ሦስት አምዶች የስሌት አማራጮች ናቸው፦ ለሁኔታው ዋጋ ያስገቡ፣ ወይም የወላጁን ዋጋ ለመጠቀም ባዶ ይተዉት። የፕሮጀክቱ ዋጋዎች በቅንብሮች፣ ስሌት፣ ጊዜ ውስጥ ናቸው።';
-$ec_lang['lpn_scenario_duration_tip']='ከወላጁ ለመውረስ ባዶ ይተዉት። የ0:00 ጠቅላላ የመሮጫ ጊዜ የተረጋጋ-ሁኔታ ስራ ነው።';
-$ec_lang['lpn_scenario_hyd_step_tip']='ከወላጁ ለመውረስ ባዶ ይተዉት።';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_time_scn_overrides']='የሁኔታ የራስ ዋጋዎች፦';
+
+
+
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+
+
+
+
+
+
+
+
+
+
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+
+
+
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_alt_cat_physical']='አካላዊ';
 $ec_lang['lpn_alt_cat_demand']='ፍላጎት';
 $ec_lang['lpn_alt_cat_topology']='የአካል ማንቃት';
+
 $ec_lang['lpn_alt_cat_initial']='የመጀመሪያ ቅንብሮች';
 $ec_lang['lpn_alt_cat_constituent']='ንጥረ ነገር';
 $ec_lang['lpn_alt_cat_fireflow']='የእሳት ፍሰት';
 $ec_lang['lpn_alt_cat_energy']='የኃይል ወጪ';
 $ec_lang['lpn_alt_cat_userdata']='ብጁ ንብረቶች';
 $ec_lang['lpn_alt_cat_text']='ጽሑፍ';
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='እያንዳንዱ ሁኔታ ለእነዚህ ንብረቶች የመሠረት ዋጋዎችን እንዲጠቀም ማድረግ? ለእነዚያ ሁኔታዎች ብቻ የሆኑ ዋጋዎች ይጣላሉ። ይህን መልሰው መቀልበስ ይችላሉ።';
-$ec_lang['lpn_scenario_push_scenarios']='የተነኩ ሁኔታዎች፦';
-$ec_lang['lpn_scenario_push_values']='የተጣሉ ዋጋዎች፦';
-$ec_lang['lpn_scenario_push_none']='ከእነዚህ ባህሪያት ለማናቸውም መሠረትን የሚሽር ሁኔታ የለም፣ ስለዚህ ምንም አይለወጥም። ምንም አይጣልም።';
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. የፍሰት ሙከራ፦ የማይንቀሳቀስ';
@@ -3231,6 +3392,8 @@ $ec_lang['lpn_time_run_fell_back']='በስክሪኑ ላይ ያሉት ቁጥሮ�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='እነዚህ መቆጣጠሪያዎች በዚህ ፕሮጀክት ውስጥ ከሌለ አካል ስም ጠቅሰዋል፣ ስለዚህ ቀርተዋል፦ {ids}';
 $ec_lang['lpn_control_unreadable_note']='እነዚህ መቆጣጠሪያዎች ሊነበቡ አልቻሉም፣ ስለዚህ ቀርተዋል፦ {ids}';
+
+
 $ec_lang['lpn_rule_dangling_note']='እነዚህ ህጎች በዚህ ፕሮጀክት ውስጥ ከሌለ አካል ጋር የተያያዙ ናቸው፣ ስለዚህ በዚህ ሩጫ ችላ ተብለዋል፦ {ids}';
 $ec_lang['lpn_rule_unreadable_note']='እነዚህ ህጎች ሊነበቡ አልቻሉም፣ ስለዚህ በዚህ ሩጫ ችላ ተብለዋል፦ {ids}';
 $ec_lang['lpn_settings_text_size']='የጽሑፍ መጠን (ፒክሰሎች)';
@@ -3783,9 +3946,7 @@ $ec_lang['lpn_energy_curve_note']='እነዚህ ፓምፖች ምንም ነጥብ
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='ደረጃ';
 $ec_lang['lpn_labels_col_drop']='ውድቀት';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -4010,6 +4171,8 @@ $ec_lang['lpn_library_pattern_default_mark']='(ነባሪ)';
 $ec_lang['lpn_library_pattern_default_tip']='ነባሪው የፍላጎት ስርዓት። በቅንብሮች፣ ነባሪ የፍላጎት ስርዓት ውስጥ ይቀይሩት።';
 $ec_lang['lpn_library_pattern_default_deleted_to']='ስርዓት {id} ነባሪው የፍላጎት ስርዓት ነበር። ስርዓት የሌላቸው መገናኛዎች አሁን ስርዓት {now}ን ይጠቀማሉ።';
 $ec_lang['lpn_library_pattern_default_deleted_none']='ስርዓት {id} ነባሪው የፍላጎት ስርዓት ነበር። ስርዓት የሌላቸው መገናኛዎች አሁን ቋሚ ፍላጎት ይጠቀማሉ።';
+
+
 $ec_lang['lpn_library_control_add']='መቆጣጠሪያ ጨምር';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -4572,4 +4735,4 @@ $ec_lang['lpn_snip_tip_eraser']='መሰረዣ፦ ለማስወገድ ጭረትን
 $ec_lang['lpn_snip_tip_undo']='ቀልብስ (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='ድገም (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='ቅዳ (Ctrl+C)';
-$ec_lang['lpn_screenshot_scale_tip']='የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።';
+$ec_lang['lpn_screenshot_scale_tip']='የሥዕሉ መጠን በስክሪኑ ላይ ካለው ቦታ እጥፍ። ትልቁ የበለጠ ጥርት ያለ ነው፣ ፋይሉንም ትልቅ ያደርገዋል።';$ec_lang['lpn_guide_text_alt_box']='ለእያንዳንዱ ሁኔታ፣ በእያንዳንዱ ምድብ ማለትም አካላዊ፣ ፍላጎትና የአካል ማንቃት ውስጥ የትኛውን አማራጭ እንደሚጠቀም፣ እንዲሁም የስሌት አማራጮቹን ያሳያል፦ የፍላጎት ማባዣ፣ ጠቅላላ የመሮጫ ጊዜ እና የሃይድሮሊክ ጊዜ ደረጃ። አማራጮቹ ለንባብ ብቻ ናቸው። የሁኔታ የስሌት አማራጮች እዚህ ሊተየቡ ይችላሉ፣ ባዶ ሲሆን የወላጁን ዋጋ ይጠቀማል። መሰረታዊ ሁነታን ካጸዱ በኋላ ከሁኔታዎች ምናሌ ይክፈቱት።';$ec_lang['lpn_guide_how_alt']='መሰረታዊ ሁነታ ሲጠፋ የአማራጮች ቅድመ ዕይታ በውሃ፣ ሁኔታዎች ስር ተዘርዝሯል።';$ec_lang['lpn_alt_calc_options']='የስሌት አማራጮች';$ec_lang['lpn_scenario_duration_tip']='ከወላጁ ለመውረስ ባዶ ይተዉት። የ0:00 ጠቅላላ የመሮጫ ጊዜ የተረጋጋ-ሁኔታ ስራ ነው።';$ec_lang['lpn_scenario_hyd_step_tip']='ከወላጁ ለመውረስ ባዶ ይተዉት።';

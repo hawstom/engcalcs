@@ -103,7 +103,7 @@ file_put_contents($victim, $original);
 [$code, $out] = $run(['--check']);
 $expect(0, $code, 'FIXTURE 5: restoring the file returns the verdict to fresh', $out);
 
-// 6. THE SHAPE a translator reads (Appendix D step 1, dev/translation-clarification-review.md).
+// 6. THE SHAPE a translator reads (syn notes, reworded keys, tip pairs, only the glossary terms a batch uses).
 //    Built for one language with --as-changed, so it holds whether or not today's delta is empty.
 //    Each assertion is a note that used to be lost on the way to the translator.
 foreach (glob($tmp . '/*.json') as $f) { unlink($f); }

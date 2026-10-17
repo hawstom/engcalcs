@@ -172,9 +172,97 @@ foreach ($lines as $i => $line) {
     foreach ($found as $f) { $bad[] = ['line' => $i + 1, 'expr' => trim($f), 'text' => trim($line)]; }
 }
 
+// ---- 2b'. The overridable properties Base stores BARE (LPN_BARE_PROP) ----------------------------
+//
+// Tom made every property overridable on 2026-10-12, and the ones that had been Base-owned are
+// stored under their own names (`elev`, `minLevel`, `speed`...), as the file states them -- so the
+// `x._prop =` rule above cannot see a write to any of them, and `n.elev = v` in an editor would
+// edit Base from inside a scenario. The names are PARSED from LPN_BARE_PROP; the two positions are
+// left to their own guard (writeNodeCoord() is their one door, counted by node-coord-entry-harness.js).
+if (!preg_match('/var LPN_BARE_PROP = \{(.*?)\};/s', $src, $bp)) {
+    fwrite(STDERR, "FAIL: could not find LPN_BARE_PROP in js/looped-network.js.\n");
+    fwrite(STDERR, "It names the overridable properties Base stores without an underscore, and this check\n");
+    fwrite(STDERR, "derives the fields it guards from it. Fix the parse; do not hardcode the names.\n");
+    exit(1);
+}
+preg_match_all('/(\w+)\s*:\s*true/', $bp[1], $bpm);
+$bare = array_values(array_diff(array_unique($bpm[1]), ['x', 'y']));
+if (count($bare) < 5) {
+    fwrite(STDERR, "FAIL: parsed only " . count($bare) . " bare propert(ies) from LPN_BARE_PROP; the parse has drifted.\n");
+    exit(1);
+}
+$balt = implode('|', array_map('preg_quote', $bare));
+$bpatterns = [
+    '/(?<![\w.])[A-Za-z_$][\w$]*\.(' . $balt . ')\s*=(?!=)/',
+    '/\bdelete\s+[A-Za-z_$][\w$.]*\.(' . $balt . ')\b/',
+];
+foreach ($lines as $i => $line) {
+    if (preg_match('/^\s*(\/\/|\*|\/\*)/', $line)) { continue; }
+    $found = [];
+    foreach ($bpatterns as $bpat) {
+        if (preg_match_all($bpat, $line, $bh)) { $found = array_merge($found, $bh[0]); }
+    }
+    if (!$found) { continue; }
+    if (strpos($line, '// base-write:') !== false) { $approved += count($found); continue; }
+    foreach ($found as $f) { $bad[] = ['line' => $i + 1, 'expr' => trim($f), 'text' => trim($line)]; }
+}
+
+// ---- 2c. Override maps are walked by a named few, and maintenance goes through eachOverrideMap() ---
+//
+// Since the scenario tree is stored (dev/scenario-alternatives.md, stage 4), an override lives in
+// two kinds of map: a scenario's own `overrides` and a stored alternative's `values`. A rename, a
+// purge or a unit conversion that walks `scenarios` alone strands every value a shared alternative
+// holds, and nothing on screen says so until that alternative is used. So a read or write of
+// `.overrides` / `.values` (not the `Object.values(` call) is refused outside the functions named
+// here; everything else goes through eachOverrideMap() or the resolved readers.
+$ovAllowed = [
+    // the walk, and the resolver that every hot reader goes through
+    'eachOverrideMap', 'resolvedOverrides', 'buildResolvedOverrides', 'localOverrideMap', 'layerValuesByCategory',
+    // the stored tree's own load-time cleaning, and its mutations (merge, promote, assign)
+    'sanitizeScenarioTree', 'mergeAlternativeInto', 'combineHolders', 'scenarioHoldsLocal', 'takeScenarioLocals', 'promoteStored',
+    // the one write seam, and the scenario's own count beside its name
+    'setOverride', 'clearOverride', 'overrideCount',
+    // that count's items and the value each replaces (Task 800): one scenario's own holders, read only
+    'ownOverrideItems', 'ownOverrideInherited', 'storedOwnItems',
+    // what Delete scenario says it removes: the values of the alternatives that go with it, read only
+    'scenarioDeletePlan', 'storedOverrideCount',
+    // the down triangle (Task 790): the holder each child scenario writes to, read, and on a yes cleared
+    'childOverrideHolders', 'clearChildOverrides',
+    // Manage overrides: one of a scenario's own items cleared from the very holder it was listed from
+    'ovlClearItems',
+    // a new Base of its own: a snapshot of Base, written once into the record it creates
+    'baseSnapshotOf', 'storeBaseSnapshot',
+    // Merge upward (Task 801): one alternative's own values read, written into an ancestor, removed from it
+    'smOwnContent', 'smMergePlan', 'smMergeUpward',
+    // where a write lands, the scenario's own alternative made first (Tom, 2026-10-12)
+    'ownWriteMap',
+    // the derived (Basic mode) alternatives, read off each scenario's own map
+    'alternativesOf', 'resolveThroughAlternatives', 'alternativeOverrides',
+    // opening a file: the old key migration, and the guarantee that every scenario has a map
+    'migrateOverrideKeys', 'applySaved'];
+$ovBad = [];
+$fn = '';
+foreach ($lines as $i => $line) {
+    if (preg_match('/^\tfunction (\w+)\(/', $line, $fm)) { $fn = $fm[1]; }
+    if (preg_match('/^\s*(\/\/|\*|\/\*)/', $line)) { continue; }
+    $code = preg_replace('/\s\/\/.*$/', '', $line);
+    if (!preg_match('/\.(overrides|values)\b(?!\s*\()/', $code)) { continue; }
+    if (in_array($fn, $ovAllowed, true)) { continue; }
+    $ovBad[] = ($i + 1) . ' (in ' . ($fn === '' ? 'top level' : $fn . '()') . '): ' . trim($line);
+}
+if ($ovBad) {
+    fwrite(STDERR, "FAIL: an override map is walked outside the named functions:\n");
+    foreach ($ovBad as $b) { fwrite(STDERR, "  js/looped-network.js:$b\n"); }
+    fwrite(STDERR, "\nA walk of `scenarios` alone misses every stored alternative's values. Walk every map\n");
+    fwrite(STDERR, "with eachOverrideMap(fn), or read one scenario's with resolvedOverrides(scn). If a new\n");
+    fwrite(STDERR, "function genuinely owns a map, add it to \$ovAllowed in this script with its reason.\n");
+    exit(1);
+}
+
 printf("Scenario write seam — %d group(s) (%s) and %d overridable propert(ies) parsed from LPN_OVERRIDABLE: %s\n",
     count($groups), implode(', ', $groups), count($props), implode(', ', $props));
 printf("  demand list stored as %s (LPN_DEMANDS_STORAGE)\n", implode(', ', $dfields));
+printf("  stored bare: %s (LPN_BARE_PROP)\n", implode(', ', $bare));
 printf("  %d approved base-write(s), %d unmarked direct write(s)\n\n", $approved, count($bad));
 
 if ($bad) {

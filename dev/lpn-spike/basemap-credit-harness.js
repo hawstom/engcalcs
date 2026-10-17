@@ -84,7 +84,7 @@ function invariant(where) {
 	// It must name the source whose tiles are actually being fetched, not merely SOME source: the
 	// two sets carry different wording because Mapbox's terms name its imagery supplier as well.
 	const expect = hosts.every(h => h === 'tile.openstreetmap.org') ? 'osm'
-		: (hosts.every(h => h === 'api.mapbox.com') ? 'satellite' : '(mixed)');
+		: (hosts.every(h => h === 'api.mapbox.com') ? (L.style() === 'outdoors' ? 'outdoors' : 'satellite') : '(mixed)');
 	ok(where + ': ...and it is the set for the tiles being fetched, ' + expect,
 		sets[0] === expect, 'showing ' + sets.join(',') + ' for ' + hosts[0]);
 }
@@ -103,7 +103,7 @@ console.log('\n--- the markup: hidden until the code shows it, and one set per s
 	ok('...and it is NOT d-print-none: the tiles print, so the credit prints',
 		div.indexOf('d-print-none') < 0);
 	const sets = [...div.matchAll(/data-basemap-credit="([a-z]+)"/g)].map(m => m[1]);
-	ok('...and carries one credit set per tile source', sets.join(',') === 'osm,satellite',
+	ok('...and carries one credit set per tile source', sets.join(',') === 'osm,satellite,outdoors',
 		sets.join(','));
 	ok('...naming OpenStreetMap for the street tiles', /openstreetmap\.org\/copyright/.test(div));
 	ok('...and Mapbox and its imagery supplier for the satellite ones',
@@ -195,9 +195,12 @@ async function main() {
 		'on=' + L.basemapOn() + ' style=' + L.style());
 	invariant('after one press on the teaser');
 	L.teaserPress();
-	ok('a second press returns the STREET map rather than nothing',
-		L.basemapOn() && L.style() === 'osm', 'on=' + L.basemapOn() + ' style=' + L.style());
+	ok('a second press shows the outdoors map (Task 617)',
+		L.basemapOn() && L.style() === 'outdoors', 'on=' + L.basemapOn() + ' style=' + L.style());
 	invariant('after a second press on the teaser');
+	L.teaserPress();
+	ok('a third press returns the STREET map rather than nothing',
+		L.basemapOn() && L.style() === 'osm', 'on=' + L.basemapOn() + ' style=' + L.style());
 	L.teaserPress(); L.teaserPress(); L.teaserPress();
 	ok('and no number of presses can leave the map bare', L.basemapOn(),
 		'on=' + L.basemapOn() + ' style=' + L.style());

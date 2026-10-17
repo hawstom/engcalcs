@@ -76,15 +76,17 @@ const SNAPSHOT = () => {
 // The project record also carries WHERE THE READER WAS LOOKING (`view`), which rides along on any save
 // and moves when a box opens; and the library index carries a timestamp. Neither is a setting, so a
 // project-side difference is read with both set aside.
-function plain(o) {
+// EXCEPT FOR THE MAP VIEW'S OWN ROWS (Map center, Map scale; Tom, 2026-10-06: the view is a setting
+// and Base has one, the live view): there the view is the very value being driven, so it is kept.
+function plain(o, keepView) {
 	const out = {};
 	Object.keys(o).forEach((k) => {
 		if (k === 'lpn_index') { return; }
-		try { const d = JSON.parse(o[k]); delete d.view; out[k] = d; } catch (e) { out[k] = o[k]; }
+		try { const d = JSON.parse(o[k]); if (!keepView) { delete d.view; } out[k] = d; } catch (e) { out[k] = o[k]; }
 	});
 	return out;
 }
-function differs(a, b) { return JSON.stringify(plain(a)) !== JSON.stringify(plain(b)); }
+function differs(a, b, keepView) { return JSON.stringify(plain(a, keepView)) !== JSON.stringify(plain(b, keepView)); }
 
 // The value controls of the Settings box, tagged in document order so a rebuild that replaces the
 // elements can still be found again by position. Buttons, the filter, files and the colour-band
@@ -185,15 +187,29 @@ async function main() {
 		// they are written by one handler into one place.
 		const controls = allControls.filter((c) => c.first && (!process.env.PROBE_ONLY || c.id.includes(process.env.PROBE_ONLY)));
 		const before = await P(SNAPSHOT);
-		for (const c of controls) {
+		for (let ci = 0; ci < controls.length; ci++) {
+			const c = controls[ci];
 			if (process.env.TRACE) { console.log('  .. ' + c.id); }
 			await P(TAG);
 			const sel = `[data-probe="${c.id.replace(/"/g, '\\"')}"]`;
 			const loc = a.page.locator(sel);
 			if (!(await loc.count())) { ok(`${c.label} is still in the box`, false); inventory.push({ sub: c.sub, label: c.label, declared: c.declared, observed: 'not driven' }); continue; }
 			let observed = 'session', tried = [];
+			// The previous row's restore may still be saving (a solve it scheduled saves the project
+			// when it lands), so wait for the store to go quiet before taking this row's "before":
+			// otherwise that late save is charged to this row. QUIET MEANS A WHOLE SECOND UNCHANGED, not
+			// one 250 ms gap: under a loaded suite a Net3 solve outlasts that gap, and its save then
+			// landed inside the NEXT row's window (Theme, Show the run progress box), which no project
+			// write of theirs had made -- a spy on setItem saw none after the row's "before".
+			for (let q = 0, still = 0, prev = JSON.stringify(await P(SNAPSHOT)); q < 32 && still < 4; q++) {
+				await a.settle(250);
+				const now = JSON.stringify(await P(SNAPSHOT));
+				still = now === prev ? still + 1 : 0;
+				prev = now;
+			}
 			const snap0 = await P(SNAPSHOT);
 			const was = await loc.evaluate((e) => ({ checked: e.checked, value: e.value }));
+			const isView = await loc.evaluate((e) => !!e.closest('#lpn_set_view_group'));
 			const attempts = [];
 			if (c.type === 'checkbox') { attempts.push({ kind: 'click' }); }
 			else if (c.type === 'radio') { attempts.push({ kind: 'click' }); }
@@ -231,7 +247,7 @@ async function main() {
 				for (let w = 0; w < 4 && !landed; w++) {
 					await a.settle(250);
 					const snap1 = await P(SNAPSHOT);
-					const dO = differs(snap0.other, snap1.other), dP = differs(snap0.proj, snap1.proj);
+					const dO = differs(snap0.other, snap1.other), dP = differs(snap0.proj, snap1.proj, isView);
 					// BOTH is the defect CLAUDE.md names: a setting belongs to the project or to the
 					// browser, never both. It is a class of its own here so that it can never pass.
 					if (dO && dP) { observed = 'both'; landed = true; }
@@ -255,6 +271,11 @@ async function main() {
 			{ const d1 = await a.dialog(); if (d1 && d1.buttons.length) { await press(d1.buttons.length - 1); await a.settle(200); } }
 			const open = await P(() => document.getElementById('lpn_settings_box').style.display !== 'none');
 			if (!open) { await a.toolbarClick(await a.lang('lpn_tool_settings')); await a.settle(300); }
+			// **A "BOTH" IS DRIVEN ONCE MORE BEFORE IT IS BELIEVED.** It is the one verdict a stray save
+			// from an earlier row can manufacture (a browser row's own write plus somebody else's
+			// project write in the same window), and a spy on setItem caught Theme's "both" with no
+			// project write of its own. A real "both" does it again; a stray one does not.
+			if (observed === 'both' && !c.retried) { c.retried = true; await a.settle(3000); ci--; continue; }
 			inventory.push({ sub: c.sub, label: c.label, declared: c.declared, observed });
 			if (observed !== c.declared) {
 				ok(`${c.sub} / ${c.label}: marker says ${c.declared}, the page stores it as ${observed}`, false, tried.join('; '));

@@ -223,6 +223,7 @@ console.log('\n--- one place hides a panel, tips and all ---');
 		[/marker\.style\.display = 'none';/, 'the column-drag insertion marker (2026-09-26, fourth '
 			+ 'pass), declared with its reason beside NOT_A_PANEL_SHOW above'],
 		[/zoomWinEl\.style\.display = 'none'; return;/, 'the Zoom Window drag box on the map (Task 682), the same kind of shape as the select-area marquee above'],
+		[/rec\.root\.style\.display = 'none'; rec\.rect = null;/, 'a time series graph bubble whose asset is gone or off the map (Task 784): map furniture placed beside its asset, closed by its own x, not a panel in the pane/box sense. JUDGEMENT CALL'],
 		[/box\.style\.display = 'none'; box\.textContent = '';/, 'the select-area instruction bubble, which holds no control'],
 		[/el\.style\.display = 'none'; \}\n\t\ttry \{ localStorage\.setItem\(MENU_CUE_KEY/,
 			'the one-time menu cue (Task 625): a line of text and a dismiss button, with no drag, '
@@ -337,7 +338,9 @@ const CONDITIONAL_DISPLAY = [
 	[/^showNotice$/, /^el$/, 'the one-line map notice (lpn_map_notice): text only, no control'],
 	[/^syncStatusBoxVisibility$/, /^el$/, 'the status line (lpn_status): text only, no control. JUDGEMENT CALL: it is a box, '
 		+ 'but it holds no control, cannot be dragged and cannot be closed by the visitor'],
+	[/^refreshScenariosTab$/, /^b$/, 'the Scenarios tab button in the Tables pane strip: shown with Basic mode off, hidden with it on'],
 	[/^paintEngineBanner$/, /^el$/, 'the engine-wait banner across the top of the map: text only'],
+	[/^tsbPlaceAll$/, /^rec\.root$/, 'a time series graph bubble (Task 784) shown or hidden by whether its asset is on the map; see the NOT_A_PANEL entry for the same bubble'],
 	[/^openDialog$/, /^title$/, 'the modal dialog\'s own title band (Task 710): shown when a question names one, inside #lpn_dialog, holding no control']
 ];
 // What section 2c owns instead, as function + element.

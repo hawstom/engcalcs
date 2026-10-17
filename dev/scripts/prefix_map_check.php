@@ -26,7 +26,7 @@
  * the KEYS instead: if a prefix exists in lib/lang.ec.en.php, somebody must have decided what
  * glossary terms it needs, even if the decision was "none".
  *
- * WHAT THE MAP DECIDES SINCE 2026-10-16 (Appendix D step 1, dev/translation-clarification-review.md).
+ * WHAT THE MAP DECIDES SINCE 2026-10-16.
  * The payload generator no longer sends a prefix's whole list or falls back to three defaults. It
  * sends a term when a batch key cites it, or when the term's English appears in a batch string. The
  * map now decides only one thing: where a SENSE-QUALIFIED term ("run (a simulation)", "text (map

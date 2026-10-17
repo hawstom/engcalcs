@@ -151,7 +151,7 @@ the suite makes any of them.</p>
 <table class="ec-legal-table">
 	<tr><th>Feature</th><th>What is sent</th><th>To</th></tr>
 	<tr><td>Street map behind your network</td><td>Which tiles you are looking at, and your IP address</td><td><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></td></tr>
-	<tr><td>Satellite imagery</td><td>Which tiles you are looking at, and your IP address</td><td><a href="https://www.mapbox.com/" target="_blank" rel="noopener">Mapbox</a>, for the satellite images</td></tr>
+	<tr><td>Satellite and topo map imagery</td><td>Which tiles you are looking at, and your IP address</td><td><a href="https://www.mapbox.com/" target="_blank" rel="noopener">Mapbox</a>, for the satellite and topo map images</td></tr>
 	<tr><td>Search for a place by name</td><td>The words you type, and your IP address</td><td>OpenStreetMap&rsquo;s <a href="https://operations.osmfoundation.org/policies/nominatim/" target="_blank" rel="noopener">Nominatim</a></td></tr>
 	<tr><td>Ground elevations</td><td>The latitude and longitude of your nodes, and your IP address</td><td>Mapbox</td></tr>
 </table>

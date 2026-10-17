@@ -708,6 +708,7 @@ $ec_lang['lpn_node_customers_tip']='Bu düğüme eklenmiş müşterilerin listes
 $ec_lang['lpn_node_customers_sum']='Müşterilerden ({n}) {total} {unit}';
 $ec_lang['lpn_customer_detached']='⚠ Bu müşteri bir boruya bağlı değil, bu yüzden talebi sonuçlarda yok. Silin, ya da bir boru çizip müşteriyi onun üzerine taşıyın.';
 $ec_lang['lpn_customer_fixed_head']='⚠ O borunun yakın ucu sabit bir su yüzeyi tutuyor, bu yüzden bu talep simülasyonu etkilemez.';
+
 $ec_lang['lpn_customer_detached_count']='Bir boruya bağlı olmayan müşteriler ({n}). Talepleri hesaba katılmıyor.';
 $ec_lang['lpn_meter_pick_pipe']='Şimdi bu müşteriyi besleyen boruyu veya düğümü seçin. Müşteri, koyduğunuz yerde kalır. İptal etmek için Esc tuşuna basın.';
 $ec_lang['lpn_inp_export_flat_customers']='Bir EPANET dosyasında müşteri yoktur. Bu projedeki müşterilerin ({n}) talebi, her birinin atandığı düğüm üzerinde bir talep satırı olarak yazılır ve müşterinin etiketiyle adlandırılır. Dosya müşterinin kendisini kaydetmez: konumunu, onu besleyen boruyu, servisin bu boru boyunca nerede bağlandığını veya kaç servisi temsil ettiğini. Bu bilgi projede kalır; korumak için proje dosyasını kaydedin.';
@@ -992,7 +993,6 @@ $ec_lang['lpn_guide_text_contour_box']='Haritada, Düğümleri şuna göre renkl
 $ec_lang['lpn_guide_text_scncmp_box']='Her senaryoyu çizimin bir kopyasından çözer ve her biri için geçersiz kılma sayısını, en düşük basıncı ve en yüksek hızı tablolaştırır. Projeyi değiştirmez ve açık olan senaryo olduğu gibi bırakılır.';
 $ec_lang['lpn_guide_text_rptbox']='Son uzun süreli simülasyon için EPANET motorunun yazdığı metin raporunu, uyarıları ve şebeke özetiyle birlikte gösterir. Her uzun süreli simülasyon onun yerine geçer; tek bir andaki çözüm geçmez ve bir düzenleme önceki raporu yerinde bırakır.';
 $ec_lang['lpn_guide_text_status_box']='Son uzun süreli simülasyon sırasındaki her değişikliği zaman sırasıyla listeler: bir pompanın, vananın veya borunun açılıp kapanması, bir deponun dolmaya veya boşalmaya başlaması ya da dolması veya boşalması ve tam yakınsamayan her zaman adımı. Yalnızca değişiklikler listelenir, her zaman adımı değil.';
-$ec_lang['lpn_guide_text_alt_box']='Her senaryo için, Fiziksel, Talep ve Varlık etkinleştirme gibi her kategoride hangi alternatifi kullandığını ve hesaplama seçeneklerini gösterir: talep çarpanı, toplam çalışma süresi ve hidrolik zaman adımı. Alternatifler salt okunurdur. Bir senaryonun hesaplama seçenekleri burada yazılabilir; boş bırakılırsa üst senaryonun değeri kullanılır. Temel modu kapattıktan sonra Senaryolar menüsünden açın.';
 $ec_lang['lpn_guide_text_full_box']='Her düğümü ve her hattı her raporlama zaman adımında, Tablolar panelinde gösterilen birimlerle listeler. Uzun süreli simülasyon yoksa tek bir andaki geçerli çözümü gösterir. İndirme veya yazdırma her zaman adımını içerir; tablo ise her seferinde birini gösterir.';
 $ec_lang['lpn_guide_text_calib_box']='Bir saha ölçümü dosyasını, aynı yerlerdeki ve zamanlardaki hesaplanan sonuçlarla karşılaştırır; her parametre için bir dosya kullanılır. Dosya yalnızca geçerli oturum için tutulur ve projeyle birlikte kaydedilmez.';
 $ec_lang['lpn_guide_text_notes_popup']='Bu sayfanın nasıl davrandığına ve neler yapmadığına dair notları, her biri bir terim ve onu izleyen tanım olarak listeler. Şebekeyi değiştirmez.';
@@ -1020,7 +1020,6 @@ $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?<
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='{menu} içinde ayrıca';
 $ec_lang['lpn_guide_how_popup']='Bir varlık veya metin seçtiğinizde Özellikler açılır.';
-$ec_lang['lpn_guide_how_alt']='Temel mod kapalıyken Alternatifler önizlemesi, Su, Senaryolar altında listelenir.';
 $ec_lang['lpn_guide_not_shown']='Bu denetim şu anda ekranda değil.';
 // The box's two context headings. "Tables" holds the two table-help entries that used to sit only
 // in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
@@ -1475,8 +1474,20 @@ $ec_lang['lpn_pane_sel_only_none']='Hiçbir öğe seçili değil. Önce haritada
 // Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
 // scenario, with a Scenario column after ID.
 $ec_lang['lpn_pane_scn_show']='Senaryoları göster';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+
+
+
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+
+
+
+
 $ec_lang['lpn_pane_clear_override']='Senaryo değerini temizle';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -1532,20 +1543,29 @@ $ec_lang['lpn_menu_project']='Su';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='Su şebekesi modellemesine özgü her şey (animasyon oynatma denetimleri hariç)';
 $ec_lang['lpn_tables_menu']='Tablolar';
-// Water > Change type (Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// Water > Morph (Task 781; Tom, 2026-10-14: *"I like the term 'Morph' (Transform) for this feature"*;
+// first built as Change type, Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
 // to Change node type for any asset, where if it has information that can't be ported to the new
 // type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
 // asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
 // popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
 // dev/asset-type.md.
-$ec_lang['lpn_change_type_menu']='Türü değiştir';
-$ec_lang['lpn_change_type_tip']='Seçili düğümleri düğüme, rezervuara veya depoya, ya da seçili hatları boruya, pompaya veya vanaya dönüştürün. Her biri kimliğini, yerini, bağlantılarını ve yeni türün de taşıdığı her değeri korur. Bir şey kaybolacaksa önce size sorulur.';
-$ec_lang['lpn_change_type_ok']='Değiştir';
+$ec_lang['lpn_morph_menu']='Türü değiştir';
+$ec_lang['lpn_morph_tip']='Seçili düğümleri düğüme, rezervuara veya depoya, ya da seçili hatları boruya, pompaya veya vanaya dönüştürün. Her biri kimliğini, yerini, bağlantılarını ve yeni türün de taşıdığı her değeri korur. Bir şey kaybolacaksa önce size sorulur.';
+$ec_lang['lpn_morph_ok']='Değiştir';
+// {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
+// when a node type was chosen), separated by commas.
+
+// The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
+// scenario, beside the override marker.
+
+
 $ec_lang['lpn_change_type_lost']='Bu değerler kaybolacak:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
 $ec_lang['lpn_change_type_key']='Her satır: ID: kaybolacak özellik ve değer';
 $ec_lang['lpn_change_type_line']='{id}: {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, {scenario} senaryosunda';
+
 $ec_lang['lpn_change_type_more']='Ve {n} tane daha.';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.
@@ -1614,6 +1634,32 @@ $ec_lang['lpn_confirm_delete_network']='Bu projedeki her düğüm, boru ve metin
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='Bul ve değiştir';
+// Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
+// placement are never pasted.
+
+
+
+
+
+
+
+
+
+
+// The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
+// opens the in-place editor; Reset position sends a dragged label or an attached Text home.
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_find_title']='Bul ve değiştir';
 $ec_lang['lpn_find_scope']='Nerede aransın';
 $ec_lang['lpn_find_scope_all']='Her şey';
@@ -2056,6 +2102,8 @@ $ec_lang['lpn_status_inp_exported_picture']='{zip} dışa aktarıldı; içinde E
 $ec_lang['lpn_status_inp_exported_no_picture']='{file} dışa aktarıldı. Arka plan görüntüsü kaydedilemedi, bu yüzden .inp hiçbirini adlandırmıyor; EPANET\'te Görünüm > Arka plan > Yükle ile ekleyin.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+
+
 $ec_lang['lpn_inp_export_differences']='.inp biçiminin tutamadığı {n} şey.';
 $ec_lang['lpn_inp_export_difference_one']='.inp biçiminin tutamadığı bir şey.';
 $ec_lang['lpn_inp_export_refused']='Bu proje bir EPANET dosyası olarak yazılamaz: {detail}';
@@ -3045,6 +3093,7 @@ $ec_lang['lpn_scenario_overrides']='Kendi değer sayısı';
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='Kehribar renkli halka, bu öğenin yalnızca {name} senaryosuna ait bir değer taşıdığı anlamına gelir.';
+
 $ec_lang['lpn_scenario_overrides_tip']='Bu değerlerin her biri haritada kehribar renkli bir halkayla işaretlenir. Bunlar olmadan çizimi görmek için {base}\'e geçin.';
 $ec_lang['lpn_scenario_menu']='Senaryolar';
 $ec_lang['lpn_scenario_tip']='Çizimin şu anda gösterdiği ve sayfanın şu anda çözdüğü değerler kümesi. Senaryo değiştirmek, ya da bir tanesini eklemek, yeniden adlandırmak veya silmek için tıklayın.';
@@ -3053,10 +3102,11 @@ $ec_lang['lpn_scenario_new_name']='Senaryo {n}';
 $ec_lang['lpn_scenario_prompt_name']='Bu senaryo için ad';
 $ec_lang['lpn_scenario_rename']='Senaryoyu yeniden adlandır…';
 $ec_lang['lpn_scenario_delete']='Senaryoyu sil';
-$ec_lang['lpn_scenario_delete_confirm']='{name} senaryosu ve geçersiz kılmaları ({n}) silinsin mi? Çizimin kendisi değişmez.';
-$ec_lang['lpn_scenario_override']='Yalnızca bu senaryoda';
+
+
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='İşaretlemek, sayı aynı olsa bile bu senaryonun bu değer için üst senaryosunu geçersiz kıldığı anlamına gelir. Üst senaryonun değerini kullanmak için kutunun işaretini kaldırın.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3067,31 +3117,142 @@ $ec_lang['lpn_scenario_deactivated']='{id}, {scenario} içinde şebeke dışınd
 $ec_lang['lpn_scenario_delete_in_base']='Çizimden kaldırmak için {base} senaryosunda silin.';
 $ec_lang['lpn_scenario_only_deleted']='{id} silindi. Yalnızca {scenario} senaryosunun parçasıydı.';
 $ec_lang['lpn_scenario_delete_blocked']='{id} silinmedi, çünkü {link} hattı onda bitiyor ve bu hat {scenario} dışında da var. İkisini birden silmek için {base} senaryosunda silin.';
-$ec_lang['lpn_scenario_push_btn']='Temel değerlerini tüm senaryolara uygula';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='Şu anda gösterilen etiketlere sahip özellikler için her senaryo Temel değerine döner. Herhangi bir senaryoda bu özellikler için girilmiş değerler atılır.';
 $ec_lang['lpn_scenario_basic']='Temel mod';
 $ec_lang['lpn_scenario_basic_tip']='İşaretliyse bir senaryo yalnızca içinde belirlenen değerlerden oluşur. İşaretsizse bu menü ayrıca bu değerlerin kategoriye göre nasıl gruplandığını gösteren Alternatifler önizleme tablosunu sunar ve bir senaryonun ayrı bir toplam çalışma süresine ve hidrolik zaman adımına sahip olmasına izin verir. Bu özellik hakkındaki geri bildirimler memnuniyetle karşılanır.';
-$ec_lang['lpn_alt_title']='Alternatifler önizlemesi';
-$ec_lang['lpn_alt_calc_options']='Hesaplama seçenekleri';
-$ec_lang['lpn_alt_note']='Temel, her kategorinin Temel alternatifini kullanır. Her senaryo, değiştirilen her kategori için Temel alternatifin çocuğu olan ayrı bir alternatife sahiptir. Sayı, değiştirilen değerlerin sayısıdır. Son üç sütun hesaplama seçenekleridir: senaryo için bir değer girin veya üst değeri kullanmak için boş bırakın. Proje değerleri Ayarlar, Hesaplama, Zaman bölümündedir.';
-$ec_lang['lpn_scenario_duration_tip']='Üst senaryodan devralmak için boş bırakın. 0:00 toplam çalışma süresi, daimi rejim çalıştırmasıdır.';
-$ec_lang['lpn_scenario_hyd_step_tip']='Üst senaryodan devralmak için boş bırakın.';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_time_scn_overrides']='Senaryo değerleri:';
+
+
+
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+
+
+
+
+
+
+
+
+
+
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+
+
+
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_alt_cat_physical']='Fiziksel';
 $ec_lang['lpn_alt_cat_demand']='Talep';
 $ec_lang['lpn_alt_cat_topology']='Varlık etkinleştirme';
+
 $ec_lang['lpn_alt_cat_initial']='Başlangıç ayarları';
 $ec_lang['lpn_alt_cat_constituent']='Madde';
 $ec_lang['lpn_alt_cat_fireflow']='Yangın debisi';
 $ec_lang['lpn_alt_cat_energy']='Enerji maliyeti';
 $ec_lang['lpn_alt_cat_userdata']='Özel özellikler';
 $ec_lang['lpn_alt_cat_text']='Metin';
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='Her senaryo bu özellikler için Temel değerlerini kullansın mı? Herhangi bir senaryoda bu özellikler için girilmiş değerler atılır. Bunu geri alabilirsiniz.';
-$ec_lang['lpn_scenario_push_scenarios']='Etkilenen senaryolar:';
-$ec_lang['lpn_scenario_push_values']='Atılan değerler:';
-$ec_lang['lpn_scenario_push_none']='Hiçbir senaryonun bu özelliklerden herhangi biri için kendi değeri yok, bu yüzden hiçbir şey değişmez. Hiçbir şey atılmaz.';
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. Debi testi: Statik';
@@ -3231,6 +3392,8 @@ $ec_lang['lpn_time_run_fell_back']='Ekrandaki sayılar bunun yerine yerleşik ç
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='Bu kontroller, artık bu projede olmayan bir öğeyi adlandırıyor, bu yüzden dışarıda bırakıldı: {ids}';
 $ec_lang['lpn_control_unreadable_note']='Bu kontroller okunamadı, bu yüzden dışarıda bırakıldı: {ids}';
+
+
 $ec_lang['lpn_rule_dangling_note']='Bu kurallar artık bu projede olmayan bir öğeye başvuruyor, bu yüzden bu çalıştırmada dikkate alınmadılar: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='Bu kurallar okunamadı, bu yüzden bu çalıştırmada dikkate alınmadılar: {ids}';
 $ec_lang['lpn_settings_text_size']='Metin boyutu (piksel)';
@@ -3783,9 +3946,7 @@ $ec_lang['lpn_energy_curve_note']='Bu pompalar, hiç noktası olmayan bir verim 
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0,000';
-$ec_lang['lpn_labels_col_rank']='Sıra';
 $ec_lang['lpn_labels_col_drop']='Bırakma';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -4010,6 +4171,8 @@ $ec_lang['lpn_library_pattern_default_mark']='(varsayılan)';
 $ec_lang['lpn_library_pattern_default_tip']='Varsayılan talep deseni. Ayarlar, Varsayılan talep deseni altından değiştirin.';
 $ec_lang['lpn_library_pattern_default_deleted_to']='{id} deseni varsayılan talep desenidi. Deseni olmayan düğümler artık {now} desenini kullanıyor.';
 $ec_lang['lpn_library_pattern_default_deleted_none']='{id} deseni varsayılan talep desenidi. Deseni olmayan düğümler artık sabit bir talep kullanıyor.';
+
+
 $ec_lang['lpn_library_control_add']='Bir kontrol ekle';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -4572,4 +4735,4 @@ $ec_lang['lpn_snip_tip_eraser']='Silgi: kaldırmak için bir çizgiye tıklayın
 $ec_lang['lpn_snip_tip_undo']='Geri al (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Yinele (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Kopyala (Ctrl+C)';
-$ec_lang['lpn_screenshot_scale_tip']='Görüntünün boyutu, ekrandaki alanın katı olarak. Daha büyük olanı daha keskindir ve daha büyük bir dosya oluşturur.';
+$ec_lang['lpn_screenshot_scale_tip']='Görüntünün boyutu, ekrandaki alanın katı olarak. Daha büyük olanı daha keskindir ve daha büyük bir dosya oluşturur.';$ec_lang['lpn_guide_text_alt_box']='Her senaryo için, Fiziksel, Talep ve Varlık etkinleştirme gibi her kategoride hangi alternatifi kullandığını ve hesaplama seçeneklerini gösterir: talep çarpanı, toplam çalışma süresi ve hidrolik zaman adımı. Alternatifler salt okunurdur. Bir senaryonun hesaplama seçenekleri burada yazılabilir; boş bırakılırsa üst senaryonun değeri kullanılır. Temel modu kapattıktan sonra Senaryolar menüsünden açın.';$ec_lang['lpn_guide_how_alt']='Temel mod kapalıyken Alternatifler önizlemesi, Su, Senaryolar altında listelenir.';$ec_lang['lpn_alt_calc_options']='Hesaplama seçenekleri';$ec_lang['lpn_scenario_duration_tip']='Üst senaryodan devralmak için boş bırakın. 0:00 toplam çalışma süresi, daimi rejim çalıştırmasıdır.';$ec_lang['lpn_scenario_hyd_step_tip']='Üst senaryodan devralmak için boş bırakın.';

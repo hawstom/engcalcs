@@ -708,6 +708,7 @@ $ec_lang['lpn_node_customers_tip']='ان گاہکوں کی فہرست جو یہ�
 $ec_lang['lpn_node_customers_sum']='گاہکوں ({n}) سے {total} {unit}';
 $ec_lang['lpn_customer_detached']='⚠ یہ گاہک کسی پائپ سے منسلک نہیں، اس لیے اس کی طلب جوابات میں شامل نہیں۔ اسے حذف کریں، یا پائپ کھینچ کر گاہک کو اس پر منتقل کریں۔';
 $ec_lang['lpn_customer_fixed_head']='⚠ اس پائپ کے قریبی سرے پر ایک مقررہ پانی کی سطح ہے، اس لیے یہ طلب سمولیشن پر اثر انداز نہیں ہوتی۔';
+
 $ec_lang['lpn_customer_detached_count']='پائپ سے منسلک نہ ہونے والے گاہک ({n})۔ ان کی طلب شمار نہیں کی جاتی۔';
 $ec_lang['lpn_meter_pick_pipe']='اب وہ پائپ یا نوڈ منتخب کریں جو اس گاہک کو سروس دیتا ہے۔ گاہک وہیں رہتا ہے جہاں آپ نے اسے رکھا۔ منسوخ کرنے کے لیے Esc دبائیں۔';
 $ec_lang['lpn_inp_export_flat_customers']='EPANET فائل میں گاہک نہیں ہوتے۔ اس پراجیکٹ کے گاہکوں ({n}) کی طلب اس جنکشن پر طلب کی قطار کے طور پر لکھی جاتی ہے جس سے ہر گاہک منسوب ہے، اور اس کا نام گاہک کے ٹیگ پر رکھا جاتا ہے۔ فائل خود گاہک کو درج نہیں کرتی: اس کا مقام، اسے سروس دینے والا پائپ، اس پائپ کے ساتھ سروس کہاں جڑتی ہے، یا وہ کتنی سروسز کی نمائندگی کرتا ہے۔ یہ معلومات پراجیکٹ میں رہتی ہے؛ اسے رکھنے کے لیے پراجیکٹ فائل محفوظ کریں۔';
@@ -992,7 +993,6 @@ $ec_lang['lpn_guide_text_contour_box']='نوڈز کو اس کے مطابق رن�
 $ec_lang['lpn_guide_text_scncmp_box']='ہر منظرنامے کو ڈرائنگ کی ایک کاپی سے حل کرتا ہے اور ہر ایک کے لیے اپنی قدروں کی تعداد، کم ترین دباؤ اور بلند ترین رفتار کا جدول بناتا ہے۔ یہ پراجیکٹ کو تبدیل نہیں کرتا، اور جو منظرنامہ کھلا ہو وہ جیسا تھا ویسا ہی رہتا ہے۔';
 $ec_lang['lpn_guide_text_rptbox']='آخری توسیعی مدت کے سمیولیشن کے لیے EPANET انجن کی لکھی ہوئی متنی رپورٹ دکھاتا ہے، بشمول اس کی انتباہات اور نیٹ ورک کا خلاصہ۔ ہر توسیعی مدت کا سمیولیشن اسے بدل دیتا ہے؛ ایک وقتی لمحے کا حل اسے نہیں بدلتا، اور ترمیم پچھلی رپورٹ کو برقرار رکھتی ہے۔';
 $ec_lang['lpn_guide_text_status_box']='آخری توسیعی مدت کے سمیولیشن کے دوران ہر تبدیلی کو وقت کی ترتیب میں درج کرتا ہے: پمپ، والو یا پائپ کا کھلنا یا بند ہونا، ٹینک کا بھرنا یا خالی ہونا شروع ہونا یا بھر جانا یا خالی ہو جانا، اور کوئی بھی وقتی مرحلہ جو مکمل طور پر ہم آہنگ نہیں ہوا۔ صرف تبدیلیاں درج ہوتی ہیں، ہر وقتی مرحلہ نہیں۔';
-$ec_lang['lpn_guide_text_alt_box']='ہر منظرنامے کے لیے دکھاتا ہے کہ وہ ہر زمرے میں، جیسے طبعی، طلب اور اثاثوں کی فعالیت، کون سا متبادل استعمال کرتا ہے، اور اس کے حساب کے اختیارات: طلب ضرب، کل چلنے کا وقت، اور ہائیڈرالک وقتی مرحلہ۔ متبادل صرف پڑھنے کے لیے ہیں۔ منظرنامے کے حساب کے اختیارات یہاں ٹائپ کیے جا سکتے ہیں، اور خالی قدر اس کے والدین کی قدر استعمال کرتی ہے۔ بنیادی موڈ ہٹانے کے بعد اسے منظرنامے مینو سے کھولیں۔';
 $ec_lang['lpn_guide_text_full_box']='ہر رپورٹنگ وقتی مرحلے پر ہر نوڈ اور ہر لنک کو، جدولوں کے پینل میں دکھائی گئی اکائیوں میں، درج کرتا ہے۔ توسیعی مدت کے سمیولیشن کے بغیر یہ ایک وقتی لمحے کا موجودہ حل دکھاتا ہے۔ ڈاؤن لوڈ یا پرنٹ میں ہر وقتی مرحلہ شامل ہوتا ہے، اور جدول ایک وقت میں ایک دکھاتا ہے۔';
 $ec_lang['lpn_guide_text_calib_box']='میدانی پیمائشوں کی فائل کا انہی مقامات اور اوقات پر حساب شدہ نتائج سے موازنہ کرتا ہے، ہر پیرامیٹر کے لیے ایک فائل۔ فائل صرف موجودہ سیشن کے لیے رکھی جاتی ہے اور پراجیکٹ کے ساتھ محفوظ نہیں ہوتی۔';
 $ec_lang['lpn_guide_text_notes_popup']='اس صفحے کے برتاؤ اور جو یہ نہیں کرتا اس کے نوٹس درج کرتا ہے، ہر ایک اصطلاح اور اس کی تعریف کے طور پر۔ یہ نیٹ ورک کو تبدیل نہیں کرتا۔';
@@ -1020,7 +1020,6 @@ $ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?<
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='{menu} میں بھی';
 $ec_lang['lpn_guide_how_popup']='کوئی اثاثہ یا متن منتخب کرنے پر خصوصیات کھل جاتی ہیں۔';
-$ec_lang['lpn_guide_how_alt']='بنیادی موڈ بند ہونے پر متبادل کا پیش منظر پانی، منظرنامے کے تحت درج ہے۔';
 $ec_lang['lpn_guide_not_shown']='یہ کنٹرول اس وقت اسکرین پر نہیں ہے۔';
 // The box's two context headings. "Tables" holds the two table-help entries that used to sit only
 // in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
@@ -1475,8 +1474,20 @@ $ec_lang['lpn_pane_sel_only_none']='کوئی عنصر منتخب نہیں ہے۔
 // Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
 // scenario, with a Scenario column after ID.
 $ec_lang['lpn_pane_scn_show']='منظرنامے دکھائیں';
+// Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
+// scenario holds a value of its own in this table, and keep only the open scenario's rows.
+
+
+
+// The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
+// or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
+
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+
+
+
+
 $ec_lang['lpn_pane_clear_override']='اپنی قدر ہٹائیں';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -1532,20 +1543,29 @@ $ec_lang['lpn_menu_project']='پانی';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='پانی کے نیٹ ورک کی ماڈلنگ سے متعلق ہر چیز (اینیمیشن چلانے کے کنٹرولز کے علاوہ)';
 $ec_lang['lpn_tables_menu']='جدولیں';
-// Water > Change type (Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// Water > Morph (Task 781; Tom, 2026-10-14: *"I like the term 'Morph' (Transform) for this feature"*;
+// first built as Change type, Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
 // to Change node type for any asset, where if it has information that can't be ported to the new
 // type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
 // asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
 // popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
 // dev/asset-type.md.
-$ec_lang['lpn_change_type_menu']='قسم تبدیل کریں';
-$ec_lang['lpn_change_type_tip']='منتخب نوڈز کو جنکشن، ریزروائر یا ٹینک میں، یا منتخب لنکس کو پائپ، پمپ یا والو میں تبدیل کریں۔ ہر ایک اپنی ID، جگہ، کنکشنز اور ہر وہ قدر برقرار رکھتا ہے جو نئی قسم میں بھی موجود ہو۔ اگر کچھ ضائع ہونے والا ہو تو پہلے آپ سے پوچھا جاتا ہے۔';
-$ec_lang['lpn_change_type_ok']='تبدیل کریں';
+$ec_lang['lpn_morph_menu']='قسم تبدیل کریں';
+$ec_lang['lpn_morph_tip']='منتخب نوڈز کو جنکشن، ریزروائر یا ٹینک میں، یا منتخب لنکس کو پائپ، پمپ یا والو میں تبدیل کریں۔ ہر ایک اپنی ID، جگہ، کنکشنز اور ہر وہ قدر برقرار رکھتا ہے جو نئی قسم میں بھی موجود ہو۔ اگر کچھ ضائع ہونے والا ہو تو پہلے آپ سے پوچھا جاتا ہے۔';
+$ec_lang['lpn_morph_ok']='تبدیل کریں';
+// {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
+// when a node type was chosen), separated by commas.
+
+// The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
+// scenario, beside the override marker.
+
+
 $ec_lang['lpn_change_type_lost']='یہ قدریں ضائع ہو جائیں گی:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
 $ec_lang['lpn_change_type_key']='ہر سطر: ID: وہ خاصیت اور قدر جو ضائع ہو جائے گی';
 $ec_lang['lpn_change_type_line']='{id}: {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}، منظرنامہ {scenario} میں';
+
 $ec_lang['lpn_change_type_more']='اور {n} مزید۔';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.
@@ -1614,6 +1634,32 @@ $ec_lang['lpn_confirm_delete_network']='اس پراجیکٹ میں موجود ہ
 // point: a conventional name is what makes a powerful command findable by somebody who has never
 // read a word about this page.
 $ec_lang['lpn_find_menu']='تلاش اور تبدیلی';
+// Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
+// placement are never pasted.
+
+
+
+
+
+
+
+
+
+
+// The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
+// opens the in-place editor; Reset position sends a dragged label or an attached Text home.
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_find_title']='تلاش اور تبدیلی';
 $ec_lang['lpn_find_scope']='کیا تلاش کرنا ہے';
 $ec_lang['lpn_find_scope_all']='سب کچھ';
@@ -2056,6 +2102,8 @@ $ec_lang['lpn_status_inp_exported_picture']='{zip} برآمد ہوئی، جس م
 $ec_lang['lpn_status_inp_exported_no_picture']='{file} برآمد ہوئی۔ پس منظر کی تصویر محفوظ نہیں ہو سکی، اس لیے .inp کسی کا نام نہیں لیتی؛ EPANET میں اسے View > Backdrop > Load سے شامل کریں۔';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
+
+
 $ec_lang['lpn_inp_export_differences']='{n} چیزیں جو .inp فارمیٹ نہیں رکھ سکتا۔';
 $ec_lang['lpn_inp_export_difference_one']='ایک چیز جو .inp فارمیٹ نہیں رکھ سکتا۔';
 $ec_lang['lpn_inp_export_refused']='یہ پراجیکٹ EPANET فائل کے طور پر نہیں لکھا جا سکتا: {detail}';
@@ -3045,6 +3093,7 @@ $ec_lang['lpn_scenario_overrides']='اپنی قدروں کی تعداد';
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='کہربائی رنگ کا حلقہ ظاہر کرتا ہے کہ اس عنصر کی منظرنامہ {name} میں اپنی قدر ہے۔';
+
 $ec_lang['lpn_scenario_overrides_tip']='ہر اپنی قدر نقشے پر کہربائی حلقے سے نشان زد ہے۔ ڈرائنگ کو ان کے بغیر دیکھنے کے لیے {base} یا کسی اور والدین منظرنامے پر جائیں۔';
 $ec_lang['lpn_scenario_menu']='منظرنامے';
 $ec_lang['lpn_scenario_tip']='قدروں کا وہ مجموعہ جو ڈرائنگ اس وقت دکھا رہی ہے اور صفحہ ابھی حل کر رہا ہے۔ منظرنامے بدلنے، یا کوئی نیا شامل کرنے، نام بدلنے، یا حذف کرنے کے لیے کلک کریں۔';
@@ -3053,10 +3102,11 @@ $ec_lang['lpn_scenario_new_name']='منظرنامہ {n}';
 $ec_lang['lpn_scenario_prompt_name']='اس منظرنامے کا نام';
 $ec_lang['lpn_scenario_rename']='منظرنامے کا نام بدلیں…';
 $ec_lang['lpn_scenario_delete']='منظرنامہ حذف کریں';
-$ec_lang['lpn_scenario_delete_confirm']='منظرنامہ {name} اور اس کی اپنی قدریں ({n}) حذف کریں؟ ڈرائنگ خود تبدیل نہیں ہوتی۔';
-$ec_lang['lpn_scenario_override']='اس منظرنامے میں اپنی قدر';
+
+
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='منتخب ہونے کا مطلب ہے کہ یہ منظرنامہ اس قدر کے لیے اپنے والدین کی قدر کو بدل دیتا ہے، چاہے عدد یکساں ہو۔ والدین کی قدر استعمال کرنے کے لیے خانے سے نشان ہٹائیں۔';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -3067,31 +3117,142 @@ $ec_lang['lpn_scenario_deactivated']='{id}، {scenario} میں نیٹ ورک س�
 $ec_lang['lpn_scenario_delete_in_base']='اسے ڈرائنگ سے ہٹانے کے لیے {base} منظرنامے میں حذف کریں۔';
 $ec_lang['lpn_scenario_only_deleted']='{id} حذف ہو گیا۔ یہ صرف {scenario} کا حصہ تھا۔';
 $ec_lang['lpn_scenario_delete_blocked']='{id} حذف نہیں ہوا، کیونکہ لنک {link} اس پر ختم ہوتا ہے، اور وہ لنک {scenario} سے باہر بھی موجود ہے۔ دونوں کو حذف کرنے کے لیے انہیں {base} منظرنامے میں حذف کریں۔';
-$ec_lang['lpn_scenario_push_btn']='بنیاد کی قدریں تمام منظرناموں پر لاگو کریں';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_tip']='ہر منظرنامہ ان خصوصیات کے لیے بنیاد کی قدر پر واپس چلا جاتا ہے جن کے لیبل ابھی دکھائے جا رہے ہیں۔ کسی بھی منظرنامے میں ان کے لیے درج کردہ قدریں ضائع کر دی جاتی ہیں۔';
 $ec_lang['lpn_scenario_basic']='بنیادی موڈ';
 $ec_lang['lpn_scenario_basic_tip']='منتخب: منظرنامہ صرف ان قدروں پر مشتمل ہوتا ہے جو اس میں مقرر کی گئی ہوں۔ نشان ہٹا ہوا: یہ مینو متبادلات کا پیش منظر جدول بھی پیش کرتا ہے، جو دکھاتا ہے کہ وہ قدریں زمرے کے لحاظ سے کیسے گروپ کی گئی ہیں، اور منظرنامے کو الگ کل رن ٹائم اور ہائیڈرالک ٹائم اسٹیپ رکھنے دیتا ہے۔ اس خصوصیت پر رائے کا خیرمقدم ہے۔';
-$ec_lang['lpn_alt_title']='متبادلات کا پیش منظر';
-$ec_lang['lpn_alt_calc_options']='حساب کے اختیارات';
-$ec_lang['lpn_alt_note']='بنیاد ہر زمرے کا بنیادی متبادل استعمال کرتی ہے۔ ہر منظرنامے کا، ہر اس زمرے کے لیے جو تبدیل کیا گیا ہو، ایک الگ متبادل ہوتا ہے، جو بنیادی متبادل کی ذیلی شاخ ہے۔ عدد تبدیل شدہ قدروں کی تعداد ہے۔ آخری تین کالم حساب کے اختیارات ہیں: منظرنامے کے لیے قدر درج کریں، یا والدین کی قدر استعمال کرنے کے لیے اسے خالی چھوڑ دیں۔ پراجیکٹ کی قدریں ترتیبات، حساب، وقت میں ہیں۔';
-$ec_lang['lpn_scenario_duration_tip']='والدین سے وراثت میں لینے کے لیے خالی چھوڑیں۔ 0:00 کا کل رن ٹائم مستحکم حالت کا رن ہے۔';
-$ec_lang['lpn_scenario_hyd_step_tip']='والدین سے وراثت میں لینے کے لیے خالی چھوڑیں۔';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_time_scn_overrides']='منظرنامے کی اپنی قدریں:';
+
+
+
+// The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
+// field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
+// 'Owner'.").
+
+
+
+
+
+
+
+
+
+
+// A label field's settings, named in the Setting column with the field itself in the Owner column
+// (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
+// value appears on the label at all; where it sits on the label (1 first); which value is given up
+// first when labels crowd (1 first).
+
+
+
+// The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $ec_lang['lpn_alt_cat_physical']='طبعی';
 $ec_lang['lpn_alt_cat_demand']='طلب';
 $ec_lang['lpn_alt_cat_topology']='اثاثوں کی فعالیت';
+
 $ec_lang['lpn_alt_cat_initial']='ابتدائی ترتیبات';
 $ec_lang['lpn_alt_cat_constituent']='جزو';
 $ec_lang['lpn_alt_cat_fireflow']='فائر فلو';
 $ec_lang['lpn_alt_cat_energy']='توانائی کی لاگت';
 $ec_lang['lpn_alt_cat_userdata']='حسب ضرورت خصوصیات';
 $ec_lang['lpn_alt_cat_text']='متن';
+
+
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_push_confirm']='ہر منظرنامے کو ان خصوصیات کے لیے بنیاد کی قدریں استعمال کرنے دیں؟ کسی بھی منظرنامے میں ان کے لیے درج کردہ قدریں ضائع کر دی جاتی ہیں۔ آپ اسے واپس کر سکتے ہیں۔';
-$ec_lang['lpn_scenario_push_scenarios']='متاثرہ منظرنامے:';
-$ec_lang['lpn_scenario_push_values']='ضائع کی گئی قدریں:';
-$ec_lang['lpn_scenario_push_none']='ان خصوصیات میں سے کسی کے لیے کوئی منظرنامہ بنیاد کو تبدیل نہیں کرتا، اس لیے کچھ نہیں بدلے گا۔ کچھ ضائع نہیں ہوتا۔';
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. فلو ٹیسٹ: جامد';
@@ -3231,6 +3392,8 @@ $ec_lang['lpn_time_run_fell_back']='اسکرین پر موجود اعداد اس
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='یہ کنٹرول ایک ایسے عنصر کا نام لیتے ہیں جو اب اس پراجیکٹ میں نہیں، اس لیے انہیں چھوڑ دیا گیا: {ids}';
 $ec_lang['lpn_control_unreadable_note']='یہ کنٹرول پڑھے نہیں جا سکے، اس لیے انہیں چھوڑ دیا گیا: {ids}';
+
+
 $ec_lang['lpn_rule_dangling_note']='یہ قواعد ایک ایسے عنصر کا حوالہ دیتے ہیں جو اب اس پراجیکٹ میں موجود نہیں، اس لیے انہیں اس رن میں نظر انداز کیا گیا: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='یہ قواعد پڑھے نہیں جا سکے، اس لیے انہیں اس رن میں نظر انداز کیا گیا: {ids}';
 $ec_lang['lpn_settings_text_size']='متن کا سائز (پکسلز)';
@@ -3783,9 +3946,7 @@ $ec_lang['lpn_energy_curve_note']='یہ پمپ ایک ایسے افادیت وک
 // "Drop" heads the priority column (Task 445): the number says the order values and labels are
 // given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
 // so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
-// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
-$ec_lang['lpn_labels_col_rank']='درجہ';
 $ec_lang['lpn_labels_col_drop']='حذف';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
@@ -4010,6 +4171,8 @@ $ec_lang['lpn_library_pattern_default_mark']='(پہلے سے مقررہ)';
 $ec_lang['lpn_library_pattern_default_tip']='پہلے سے مقررہ طلب پیٹرن۔ اسے ترتیبات، پہلے سے مقررہ طلب پیٹرن میں بدلیں۔';
 $ec_lang['lpn_library_pattern_default_deleted_to']='پیٹرن {id} پہلے سے مقررہ طلب پیٹرن تھا۔ جن جنکشنز کا کوئی پیٹرن نہیں وہ اب پیٹرن {now} استعمال کرتے ہیں۔';
 $ec_lang['lpn_library_pattern_default_deleted_none']='پیٹرن {id} پہلے سے مقررہ طلب پیٹرن تھا۔ جن جنکشنز کا کوئی پیٹرن نہیں وہ اب مستقل طلب استعمال کرتے ہیں۔';
+
+
 $ec_lang['lpn_library_control_add']='ایک کنٹرول شامل کریں';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -4572,4 +4735,4 @@ $ec_lang['lpn_snip_tip_eraser']='ایریزر: لکیر ہٹانے کے لیے �
 $ec_lang['lpn_snip_tip_undo']='کالعدم کریں (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='دوبارہ کریں (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='کاپی کریں (Ctrl+C)';
-$ec_lang['lpn_screenshot_scale_tip']='تصویر کا سائز اسکرین پر موجود علاقے کے ضرب کے طور پر۔ بڑا ضرب زیادہ صاف تصویر دیتا ہے اور فائل بڑی بناتا ہے۔';
+$ec_lang['lpn_screenshot_scale_tip']='تصویر کا سائز اسکرین پر موجود علاقے کے ضرب کے طور پر۔ بڑا ضرب زیادہ صاف تصویر دیتا ہے اور فائل بڑی بناتا ہے۔';$ec_lang['lpn_guide_text_alt_box']='ہر منظرنامے کے لیے دکھاتا ہے کہ وہ ہر زمرے میں، جیسے طبعی، طلب اور اثاثوں کی فعالیت، کون سا متبادل استعمال کرتا ہے، اور اس کے حساب کے اختیارات: طلب ضرب، کل چلنے کا وقت، اور ہائیڈرالک وقتی مرحلہ۔ متبادل صرف پڑھنے کے لیے ہیں۔ منظرنامے کے حساب کے اختیارات یہاں ٹائپ کیے جا سکتے ہیں، اور خالی قدر اس کے والدین کی قدر استعمال کرتی ہے۔ بنیادی موڈ ہٹانے کے بعد اسے منظرنامے مینو سے کھولیں۔';$ec_lang['lpn_guide_how_alt']='بنیادی موڈ بند ہونے پر متبادل کا پیش منظر پانی، منظرنامے کے تحت درج ہے۔';$ec_lang['lpn_alt_calc_options']='حساب کے اختیارات';$ec_lang['lpn_scenario_duration_tip']='والدین سے وراثت میں لینے کے لیے خالی چھوڑیں۔ 0:00 کا کل رن ٹائم مستحکم حالت کا رن ہے۔';$ec_lang['lpn_scenario_hyd_step_tip']='والدین سے وراثت میں لینے کے لیے خالی چھوڑیں۔';

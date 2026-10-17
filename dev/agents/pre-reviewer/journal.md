@@ -3862,6 +3862,15 @@ OBSERVED defects (minor): new scenario while shown appends its rows at the botto
 OBSERVED: stable sort changes ordinary tables vs master (tie rows keep previous order instead of ID) - intended.
 Lesson: pane toggle button toggles; sort lives on the arrow button; dialogs routed to native by seam (answerPromptWith).
 
+## 2026-10-05 Perry: pre-review of scenario model stages 4 and 5 (feat/bentley-interop @ 9b924f90)
+- OBSERVED: harness passes (466). My own adversarial cases: shared alt across branches, child of alt-naming scenario, promote with ancestors, calc sets with parents, delete refusals all CONFIRMED.
+- OBSERVED: mergeAlternativeInto() loses a nearer `demand` when the target holds a `demands` list (9 -> 100). Repro in scratchpad perry1.js.
+- OBSERVED: merging an alternative into one that is not its ancestor silently drops what the first inherited from ITS parent (123 -> Base's 18).
+- OBSERVED: with a stored tree, N setProp calls are quadratic (2000: 0.47 s, 8000: 8.3 s; derived: 9 ms) -- touchTree() empties the whole cache per write, and setProp reads between writes.
+- OBSERVED: mutating out touchTree for clearOverride, createStored, deleteStored, merge, promote, eachOverrideMap, createScenario, deleteScenario, demandMultiplier, georef, applySaved, restoreUndoSnapshot leaves the harness green; the real code does touch at each.
+- OBSERVED: no-tree examples re-save byte-identical to the pre-stage-4 code (md5, 13 files). Tree survives Save As, autosave, round trip; .inp from Base unchanged by a tree.
+- Not checked: how anything LOOKS (nothing in the UI); paste / find-and-replace headless through the real UI.
+
 ## feat/tip-door at 4df634f8 (OBSERVED, 2026-10-06; re-verify before citing)
 OBSERVED real Chrome (Net3 desktop, 900 touch, 390 phone): the delegated listener works for HTML titles: toolbar, menu rows, Water button (title parked while menu open, restored on close), pane close x, tabs, synthetic disabled button (Chrome fires pointerover on it), Tab-key focus tips; tap on a toolbar button / menu button / menu row just acts, no tip left. Harness 12/12 and 5/12 with the wireTipDelegation() call removed (so it is not decoration).
 OBSERVED MISSED: SVG <title> CHILDREN still give the browser's native tip: Time series tab on Net3 has 100, Profile 126 (also Frequency, Calibration, scenario override ring via setOverrideTitle). The harness skips svg on purpose. CLAUDE.md line "the browser's native tooltip never shows" is false for these.
@@ -3914,6 +3923,38 @@ OBSERVED DEFECT: touch (hover none): tapping the glyph in the Properties box ope
 OBSERVED: Basic-example-SI-units opens with roughness unit ft (pre-existing); under D-W its tip reads ft in an SI project.
 SPECULATION: how the glyph looks (zero-width inset over the input end) not judged.
 
+## 2026-10-06 Perry: Settings table (Task 721 stage 3b), feat/bentley-interop @ 365def3d
+OBSERVED (real Chromium, this tree; re-verify before citing):
+- Branch harness passes (settings-table-browser-harness.js); removing undoTopHoldsSettings() from the Base write makes 3 checks FAIL, so the undo claim is not decoration.
+- Typed-value refusals (bad number, 0 or negative multiplier, unknown choice, bad time) revert silently, no dialog, no undo step. Same as the ordinary tables. Choice rows have no picker: the exact word must be typed.
+- Undo: Ctrl+Z after [Base table edit B, then Settings-box edit X] undoes B AND reverts X (B's step carries the settings as they were before B). Element edits do not do this. Redo likewise.
+- Settings box vs table: with Peak open and a Peak override, picking another friction method in the box silently writes Base, the box snaps back to Peak's value. With no override, the box edit lands in Base and Peak follows with no mark.
+- A row exists only if the project STATES the setting: Net3 lat/lon has no Friction method row (status bar says Hazen-Williams); a new project has no Accuracy, Maximum trials, Contour interval rows although the Settings box shows them.
+- Value cells show stored ids (rdylgn, pretty, osm, muted, dem, value, top-right) and raw JSON (Map view, colour band boundaries, Quality parameter); Value aria-label is the raw path. Units not shown on Values (65000 for map width).
+- New scenario seeds its own demand multiplier: wears the override wash while "No. of overrides: 0"; then Base edit to 1.4 leaves Peak at 1 and the count becomes 1.
+- Perf Net3, 5 scenarios, Show scenarios 1422 rows: toggle 229 ms, one edit 60 ms sync.
+Not checked: how anything looks beyond screenshots read; phone width of a 12-tab strip.
+
+## 2026-10-06 Perry: Settings box seam re-review, feat/bentley-interop @ 60729ab4
+OBSERVED (real Chromium, this tree; re-verify before citing):
+- Branch harness settings-table-browser-harness.js passes. My seven repros: undo-only-what-an-edit-changed FIXED; box edit in Peak lands in Peak, Base untouched (also through the real in-page friction confirm: Cancel changes nothing, OK writes Peak); unstated settings are rows "X (default)" on Net3 lat/lon and a new project; new scenario seeds nothing (row unmarked, count 0, follows Base edit to 1.4); undo/redo across Base, Peak, Off box edits steps one edit at a time, redo-all restores identical stored JSON; reload leaves stored JSON identical; Net3 typing in a box number field with 2 scenarios + Settings tab open: no long task, 15-64 ms. Still raw ids: Node color "pressure", Pipe color "velocity" (read-only).
+- DEFECT: with a scenario open, typing more than one character in any LABEL text field of the Settings box (Bef., Aft., text between values; 66 of them on Net3) keeps only the last character ("abcdef" -> "f"; paste of one string is fine). Each keystroke's rebuild swaps the input for a copy with the caret at 0. Base is fine. Number fields and the ID-prefix/other change-driven text fields are fine.
+- DEFECT: Graphs > Contour menu row, run in Peak, writes Base (colour field pressure, contour fill smooth, lines on); Peak holds nothing. showContour() is outside the seam. The box's own controls then write Peak correctly.
+- ID prefix "Apply to all" in a scenario renames Base's assets after a confirm; "Apply these new-asset values" is refused with "only in Base". Inconsistent, structural either way.
+- Fuzz of all ~300 Settings controls in Peak (real edits): Base changed only through Units (by design: "Units are the same in every scenario"). Buttons, ramp popup, custom property add, time settings, energy, new-asset defaults, colour breaks all land in the scenario.
+Not checked: how the box looks; Show scenarios toggle time re-measure; toolbar/legend controls outside the two boxes.
+
+## 2026-10-06 Perry: Stage 3c (held mark in Settings box, hold the view), feat/bentley-interop @ 70cdf9a3
+OBSERVED (real Chromium, Net1 XY and Net3 lat/lon, this tree; re-verify before citing):
+- Branch harness passes; three mutations (untag symbol size, drop the undo redraw, drop remembering Base's view at Hold) each make it FAIL. routing, setting-scope, settings-table harnesses pass.
+- 1:N honest at centre in Web Mercator: Net3 lat/lon 1:61919 vs my own WGS84 parallel-radius figure 61918.7. Resize keeps centre and scale. Save/reopen keeps held view and overrides; an `s`-form view still read; master and the pre-stage branch both open the new file without error.
+- Base fuzz of 65 box controls: no marks in Base or in Peak. Rapid switching (32 switches) lands on the right view.
+- DEFECT: Clear override on friction method leaves default roughness (0.00492, a D-W number) and roughness label decimals held in the scenario under Hazen-Williams. Base text for that default reads "Base: 100 ft".
+- DEFECT: label text fields (Bef., Aft., Text between values) typed in a scenario do not mark until the box rebuilds; then the note says "Base: Not stated" while Base shows "Q=".
+- DEFECT: latitude outside +-90 accepted (clamped to 85.05, scale recomputed wrong); longitude outside +-180 refused. A typed centre that only pans leaves a blank map with no "network is intact" notice. Centre boxes have no visible lat/lon or X/Y label.
+- Minor: corners do not update on window resize until next pan/zoom; after undo of a view Clear override, or reopening, the note is a bare "Clear override" with no Base line, and undo does not move the camera; search "friction" shows the amber edge but hides the Base line and Clear override; label-row notes give a bare value ("Base: 0", "Base: No") without saying which part.
+- Typing a scale in Base marks the file changed; panning does not (by design per code comment).
+SPECULATION: "Base:" equal to the held view right after Hold may read as pointless to Tom.
 ## feat/table-export (Task 776) at 9dd3bc32 (OBSERVED, 2026-10-06; re-verify before citing)
 OBSERVED real Chromium, Net1 solved: CSV and ODS download once per click from Junctions, Pipes, Pumps, and from a Show-scenarios Junctions table; results columns carry the displayed numbers; sorted order and Selection-only filter honoured; headings clean (no soft hyphens), units present. ODS passes zipfile/unzip -t and XML parse; office:value always dot-decimal, also under ?lang=fr and de (cell text is never localized). Copy with headings and plain Copy read back from the real clipboard correctly. Menu fits at 390x900 and 390x640. Harness 3 mutations all caught. No LibreOffice/soffice on this box: a real office suite NOT run.
 OBSERVED limits: an empty table (Valves, 0 rows) has no cell to right-click, so it cannot be exported; yes/no columns export 1/0; a From/To value like 007 would be a float cell with office:value="007" (office suite behaviour unverified); fr/de menus show the three new rows in English until translated.
@@ -3943,6 +3984,13 @@ OBSERVED (real Chrome on a scratch copy with a test hook, this tree; re-verify b
 - MISSED (low): Recalculate off, pump -> pipe shows velocity 0.00 and head loss 204 ft / gradient 2043% invented from stale numbers.
 - Pipe with scenario type override -> valve: that scenario's diameter silently reverts to Base's.
 Method note: scratch copy served by php -S, injected EngCalcs.__t; playwright from ~/.npm/_npx; lock via flock.
+
+## 2026-10-07 Perry: re-check of feat/bentley-interop @ 6f191a40
+OBSERVED (real Chromium, Net1 and Net3 lat/lon; re-verify before citing):
+- My three defects FIXED: Clear override on Friction method clears method, default roughness and roughness label decimals together, one undo restores all three; the H-W note reads "Base: 100" (no unit). Typed Bef./Aft./Separator text keeps the whole string and marks live, notes quote Base's real text (Bef.: Q=). Latitude 122, -95, 90.5, "abc" refused (silent revert, no dialog); longitude 190 refused; centre moved off the network shows "Your network is intact." with Zoom to fit.
+- Tom's notes: 205 of 244 Settings-table rows matched their box section and sub-heading by label, 0 genuine mismatches (4 were same-name label collisions); an override typed in the box shows in the table within 400 ms with Show scenarios off, with the amber wash.
+- Change type seam: junction 12 with a Peak demand override of 333 to Tank lists "12: Base demand 333 gpm, in scenario Peak", override count 1 to 0, undo restores 1 and the 333.
+NOT CHECKED: how any of it looks beyond reading screenshots.
 
 ## feat/user-guide at 3efca049 (OBSERVED, 2026-10-07; re-verify before citing)
 
@@ -4117,6 +4165,11 @@ OBSERVED GDAL 3.12 (pyogrio in a venv, no sudo): exported Net3 world loads, EPSG
 OBSERVED DEFECTS: (1) projected export before the CRS table is loaded (basemap off) or for a CRS outside the 5,240 gets the "not valid latitudes" refusal naming an easting; the `crs` message is unreachable and not in lang. (2) Gusnet reads demand_pattern/head_pattern/speed_pattern as multiplier STRINGS and pump_curve/vol_curve as point lists; we write names. A pattern named 3 reads as a constant x3 in Gusnet, silently; pump_curve 1 errors. (3) Gusnet REQUIRES tank min_vol; we omit it. (4) D-W roughness in ft vs Gusnet 1e-3 ft; gradient in percent vs m/1000m. (5) result values carry float noise (56.999999999999744).
 OBSERVED harness gaps by mutation on a scratch copy: a scenario switching an element off, a scenario-moved node, and the document origin are all unasserted (mutants passed). Swap lon/lat, drop vertices, results-without-solve, tank diameter unit are caught. I verified scenario and origin by hand: correct.
 Lesson: the harness's projected case used a stub transform; run the real one.
+## feat/bentley-interop at e6b7f7d0, type overrides in a scenario (OBSERVED, 2026-10-07; re-verify before citing)
+OBSERVED headless probes on Net1 (both scenarios, built-in solver, Base byte-compared through serializeProject): rename, deactivate-in-B, undo across switch, Change type twice and back, Base type changed later, child scenario, compare swap, pane swap, delete scenario while showing it, autosave with a typed tank depth: all leave Base identical. Keyboard in real Chromium: Esc = Cancel (no change), Enter = Create overrides, Tab twice + Enter = Cancel.
+OBSERVED DEFECT: Properties "Valve type" edit on a B-only valve (pipe made valve in B) writes l._setting directly and deletes B's setting override; _setting has an overridable name so it is not written back, and lay-back restores Base's (absent) value: B's valve ends with setting undefined. Base unharmed. Probe scratch only; not a repo file.
+OBSERVED: first dock of Alternatives still lands at 45% (864 px at 1920) by design; grip then widens to ~1300 and stops at the map's 320 px.
+Not done: Properties by real clicks for the valve case, appearance of anything, Find and replace, criticality/fire-flow runs while in B.
 ## feat/table-export, freeze + File > Export to at 3c0c093e (OBSERVED, 2026-10-07; re-verify before citing)
 CITED: XlsxWriter worksheet.py _write_panes (same pane/3-selection shape as ours); openpyxl 3.1.5 own output (same minimal workbookView, sheetView/pane); ECMA XSD t-yuki/ooxml-xsd sml-sheet.xsd, sml-workbook.xsd (CT_Worksheet, CT_Workbook sequence); Tom's LibreOffice-saved gnu/sdnet.ods settings.xml.
 OBSERVED: generated XLSX children are in CT_Worksheet/CT_Workbook order; openpyxl reads freeze B2/A2 on every sheet; zip testzip clean; odfpy loads ODS; ODS freeze items match sdnet.ods names and value semantics. Builder's three harnesses pass; mutation (delete bookViews) makes exactly one check fail, restored. No Excel/LibreOffice here: the freeze has still never been seen working in a real program.
@@ -4339,12 +4392,46 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: graph-bubble harness 40/40; a bubble on Net3 node 10 inside a non-Base scenario draws one line and the now mark.
 - NOT CHECKED: Settings box marks by mouse (builder harness only), look of the dots, Scenarios table Base pick.
 
+## 2026-10-14 review of feat/bentley-interop @ 42bf32ad (Perry)
+- OBSERVED (real Chromium, probes /tmp/claude-1000/perry-bentley/probe*.js): Basic on -> Scenario manager row disabled with tip "Scenario manager is disabled when Basic mode is on."; clicking forced does nothing. Basic off (misfit project) -> row enabled; no stuck state found.
+- OBSERVED: delete scenario Basic on "Its overrides (1) are deleted with it."; alternative-in-use refusal has a real newline ("...used by\nScenario Fig 6").
+- OBSERVED: Settings headings Bef./Aft. align with inputs on marked and unmarked rows at 1600 and 390 px; yellow note gone (0 notes). At 390 the "Use units / 0.000 / Show / Drop" headings wrap mid-word (not compared to pre-branch).
+- OBSERVED: Base Properties, junction 10 with child override: one-cell gutter, down triangle, asks "(2 total)", clears; junction with none has no gutter. Builder's no-change claim for 1g holds.
+- OBSERVED: lpn_sm_help diff vs df2b02cf is only "grouped into"->"belong to" and comma removals; Example paragraph intact.
+- Lesson: headless Chromium shows tofu for the check glyph in the menu; do not call checkbox state from the glyph.
+
 ## 2026-10-14 three-branch pre-review: zoom-selection, button-base, si-example-more (Perry)
 - OBSERVED (real Chromium, Net3 geographic fixture with a vertex pipe, a loose customer, a Text, scenario "Alt"): Zoom to selection frames a customer, node, vertex pipe, Tables-pane selection and area-select result; row greyed with nothing selected; 390 px Map menu fits (84-355 of 390). Builder harness 30/30. Not checked: a lone Text lands with its anchor, not its box, at canvas centre.
 - OBSERVED: at 390 px the floating Properties box covers the middle of the map, so a zoomed-to single asset is hidden behind it (same for every selection; fit ignores that box).
 - OBSERVED (branch CSS vs merge-base CSS injected into same page): button-base changes are nearly invisible at 1400 and 390; tool corner radius 4 to 5 px, Tab focus ring is now blue and rounded instead of the browser's black rectangle; transport and menus unchanged. Dialog buttons not touched by selectors.
 - OBSERVED: Net1 SI opens with L/s, m, mm in Tables, footer and labels; pump curve 94.635 L/s at 76.2 m; rule thresholds 40.538/36.576 m, controls 33.528/42.672 m; tank rises 36.576 to 40.955 m then pump closes at step 10. Scale bar reads 5 m on a 21 m drawing whose pipes are 1609 m (same as master Net1 in feet).
 - SPECULATION: "two rule-based controls" undercounts: the file has 2 simple controls and 2 rules.
+
+## 2026-10-14 review of feat/morph (Task 781) @ ca3e1104 (Perry)
+- OBSERVED (real Chromium + headless stub, probes in the session scratchpad `perry/`): Tom's case on Net1 (22 renamed J1, scenario "Tank at J1", Water > Morph > Tank): tank drawn, four pipes kept, head 295.375 m -> 217.932 m (695 ft + 20 ft); built-in and EPANET agree to 6e-5 m; Base solves back to identical numbers. Autosave (localStorage), File > Save as and .inp export of Base right after viewing the scenario all hold 22 as a junction; scenario .inp holds it under [TANKS]. Tab switch and back keeps the morph. Rename J1 and delete (with the snapshot the menu takes) in the scenario, undo, delete scenario, reopen file: no leak found. Recalculate OFF: symbol changes, stale heads kept. Builder harnesses 2 of 2 green, mutations red.
+- OBSERVED MISS (low-medium): Base "Break pipe" on a pipe that a scenario morphed to a valve copies the type override to both halves; the scenario then has two valves in series (js/looped-network.js eachOverrideMap copy, excludes only k and fittingsId).
+- OBSERVED MISS (medium-low): customers on a junction morphed to a tank: demand dropped from model with no notice (a detached customer gets one). Pipe -> pump in a scenario: no "no head curve" line (Base box has it).
+- OBSERVED (process): `$ec_lang_syn['lpn_morph_menu']` written by AI on a parenthetical remark; value is a sentence, fails the substitution test.
+- Lesson: the scratchpad directory is shared with other sessions; two of my probe files were overwritten. Work in a private subfolder.
+
+## 2026-10-14 feat/text-inplace @ 71e59287 (Perry)
+- OBSERVED (real Chromium, probes in session scratchpad): builder harness 24/24 and vertex-mode harness pass. Editor overlays left/right/centre/top/bottom aligned, 45/-60 degree, 2x size, anchored (both sides) and 1000 px-wide Text within ~10 px of the words; its font is 12 px against 11 px map text (min 12), so it is about 9% larger than the words it covers.
+- OBSERVED: no leak. Digits, Delete, Backspace, +,-,f, Ctrl+Z/Y inside the box never reach the map (Ctrl+Z is the textarea's own undo); Esc closes only the box, an open Properties box stays. Wheel, drag-pan and toolbar Undo commit first. Nothing new in localStorage/cookies.
+- OBSERVED: Text tool: every commit click places another "Text" (3 clicks = 3 Texts); Esc closes the editor but the tool stays armed, second Esc leaves; the last placeholder is left on the map when leaving via the toolbar. Esc on a fresh Text keeps the placeholder.
+- OBSERVED: empty commit leaves an invisible Text (0x0 box, stored ""), not deletable by double-click; same as Properties on master but now easy to reach.
+- OBSERVED: window resize while editing leaves the box where it was while the words move. Touch emulation: double-tap (90 and 250 ms) opens the editor, single tap opens Properties, editor survives compat mouse events. NOT CHECKED: real soft keyboard, real double-tap zoom.
+- CITED: removed gesture came from 9e85a004 (2026-07-30, Task 146, generic "double-click a label to send it back"); no Tom quote asks for it specifically for Text.
+
+## 2026-10-14 (late) feat/bentley-interop @ 0fc37895 (Perry)
+- OBSERVED (real Chromium, own probes in session scratchpad p/p1..p11.js, Tom's Fotobi_US_WGS84.epp): all 13 scenarios solve with engine epanet, ok, none refused, no page error; 7 switches 120 ms apart settle on the last scenario with the same result as a slow switch. EPS Pump off and 1-hr drain w pump off say "did not converge... Do not use them" (211 iterations, rel. err 0.011/0.018 at Accuracy 1e-5); the builder's harness attributes this to Accuracy, not to the network.
+- OBSERVED: DEFECT. With Basic off and Base using an alternative (Fotobi: Base Physical = "1-hr drain w pump off", L10 diameter shows 2 against its own 1.25), Water > Scenarios > "Apply Base values to all scenarios" wipes overrides in EVERY alternative, including the one Base itself uses: confirm says "Values discarded: 53" (13 of them Base's own), L10 falls to 1.25 in Base and everywhere. Undo (Ctrl+Z) restores it. eachOverrideMap() walks all alternatives; pushBaseToScenarios() does not skip Base's.
+- OBSERVED: Base with Initial = EPS: Base shows 23 on tanks, element keeps _level 15.01; a typed 21 goes into alternative a12; reload keeps 21; .inp export of Base writes 23 (what is on screen), clearing the pick exports 15.01 again; no loss of the element's own value. Every other child of Base (No wells, Flow tests) now ALSO inherits 23 (dashed gray ring) -- by design, but it is a Base-wide change from one cell. Deleting alternative EPS while Base uses it is refused, listing "Scenario Base" first.
+- OBSERVED: Basic on, project whose Base names an alternative: Basic is turned off on arrival with the misfit notice, pref not written; ticking Basic on in the menu gives the misfit alert, stays off.
+- OBSERVED: Text emptied in a non-Base scenario (Fotobi No wells, X42): editor closes, Text vanishes there (class lpn-lbl-hidden), notice "X42 is excluded from the network in No wells. It remains in the drawing and in the other scenarios. To remove it from the drawing, delete it in the Base scenario." The words are NOT cleared: they are still stored, Text tab row shows "Is active?" unticked, tick it to bring it back; Ctrl+Z also restores. Scenario-only Text emptied: deleted outright ("X4 is deleted. It was part of Alt only."), undo restores. Base and other scenarios untouched.
+- OBSERVED: Fotobi already holds an invisible empty Text (X43, 0x0), not new, reachable only by the Text tab.
+- OBSERVED: harnesses pass bare: scenario-pass-1014 27/27, fotobi-scenarios, text-inplace 35/35, text-ctxmenu 34/34, long-press 14/14, text-scenario, engine-refusal.
+- OBSERVED: inherited ring on map: gray dashed ring, faint, partly hidden by the tank symbol at default zoom; amber is bold. The Properties marks and Settings marks for an INHERITED value NOT checked by me (could not select T-NW by map click: junction J2 sits on top of the tank symbol; Tables-row click opened an empty Properties).
+- Lesson: in Fotobi a map click at a tank's centre hits junction J2; drive tanks from tables.
 
 ## 2026-10-14 feat/slope-length (Task 643) pre-review (Perry)
 - OBSERVED (real Chromium): builder harness slope-length-browser-harness.js passes in full; unit-change, tank-ground, survey-codes, curve-library, mercator harnesses pass. Basic US L6 420.00 to 442.72 (5.41%), SI L6 0.50%, others under 0.03%; both open stamped v13.
@@ -4361,6 +4448,13 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: Library spreadsheet export Patterns sheet has no Description column (Curves, Pipe types, Fittings sheets do). Empty pattern with a description writes no description to .inp.
 - OBSERVED: builder's browser harness 3 sections x en/es pass; inp harness, library harness, inp-export 4497 checks, Net3 roundtrip pass; Net1/2/3 PATTERNS/CONTROLS tokens unchanged (Net2/3 CONTROLS byte-identical, comments kept). Rule edit/delete sequences by mouse keep the right lines. Not done: mutation check of the harnesses.
 
+## 2026-10-15 feat/override-audit @ 89d2d09d, Task 800 (Perry)
+- OBSERVED (real Chromium, Tom's Fotobi fixture): counts EPS 5, EPS Pump off 5, 1-hr 17, 8-hr 16, 12-hr 16, 16-hr 16 match my hand trace of the fixture JSON (parent alternatives a12/a14/a9/a11 never counted; empty a15 child of a14 counts 0; 17th is J-NE-S-3 demand 1 = Base 1 by presence). Menu, status strip and list header agree; shared alternative counts for both scenarios.
+- OBSERVED: DEFECT, list shows an Active topology override of "not active" as a dash (EPS Pump off: Pump P-NE, Is active?, Override "—", Inherited "✓").
+- OBSERVED: calc set multiplier equal to the project's is not counted (16-hr 15, Calculation group vanishes) while a demand equal to Base is counted; delete-alternative question (storedOverrideCount) counts the multiplier by presence, so it can disagree (code read only, not run).
+- OBSERVED: phone 375 wide dialog fits, table scrolls inside; ?lang=es new keys fall back to English (expected pre-payload). Compare read by code (same function) and scenario-compare harness passes; Compare dialog not driven.
+- OBSERVED: builder harness 31/31; scenario-* harnesses, seam check pass.
+
 ## 2026-10-15 feat/description-lines @ 4ebca4e0 (Task 806) (Perry)
 - CITED (fetched EPANET v2.2 input2.c, input3.c, inpfile.c): gettokens keeps text after the first ';' as Comment; for PATTERNS and CURVES every comment-only line OVERWRITES LineComment (last one wins; a blank line clears it); the writer emits one `;comment` per pattern/curve and a trailing `;comment` per node/link row.
 - OBSERVED (vendored epanet-js, crafted .inp in the exported layout): file opens without error; node comment = first line only, `;|` lines dropped on EPANET re-save; pattern comment reads as "|second line of it" and curve comment as "|rated 2019" (first line LOST, last line wins). Builder's "later lines above the rows" order is wrong for EPANET's reader.
@@ -4374,3 +4468,12 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: with Statistic set to Maximum on a partial run the setting is silently ignored (no statistic offered, nothing said).
 - OBSERVED: builder harness passes; emptying the kept frames makes it fail 8 checks; reverting clampTime's cut does NOT fail it (it never asserts the stored time).
 - SPECULATION (code read, fixture has no pumps): Pump energy box on a partial run with pumps would say "needs an extended period simulation, press Calculate" (run.energy absent). Partial frames carry no water age/quality, so those columns are blank, unexplained.
+
+## 2026-10-16 feat/theme-dark @ 6cde31e31 (Task 714 phases 2 and 3) (Perry)
+- OBSERVED (real Chromium, colorScheme dark, scripted walk + screenshots): every menu, Settings (all sections), Find and replace, Libraries, User manual, About, Screenshot box, Properties popup, Tables pane (select, edit), time series / profile / frequency / flow balance graphs, close-unsaved confirm, consent banner, phone width 390: all dark and readable. No page errors.
+- OBSERVED: DEFECT (front door). With no network open, the gallery heading ("Open a copy of an example", the two lines under it), and the Privacy/Terms/Cookie links at the foot are light text on the unthemed pale OSM map tiles: unreadable. Light OS shows them dark.
+- OBSERVED: DEFECT. Example-card thumbnails are dark ink on dark ground (img SVG ignores currentColor): near invisible. The css comment says they keep white paper; the rule uses var(--ec-bg).
+- OBSERVED: Bootstrap tooltips (menu-row and Bottom panel tips) are a WHITE box in dark (Bootstrap inverts), unlike the dark name tips; white on the white map they lose their edge. "Something wrong here?" under the map is ~1.9:1 grey on the white map.
+- OBSERVED: lpn_theme set by Light/Dark, absent for System; no project key mentions theme/dark; Start fresh removes it and reloads as System; reload keeps Dark; no white flash (CSS and script held 2.5-4 s, paint is dark); calculator page Hazen-Williams under dark OS stays light, no data-theme.
+- OBSERVED: focus ring on Play/step transport buttons is the browser default (dark on grey); time step/speed selects show no ring.
+- NOT CHECKED: import report (open of crafted .inp did not complete in my driver), scenario manager box, EPANET run-report dialog.
