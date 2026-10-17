@@ -2085,6 +2085,12 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_guide_en_set_term']?></dt><dd><?=$ec_lang['lpn_guide_en_set_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_en_example_term']?></dt><dd><?=$ec_lang['lpn_guide_en_example_def']?></dd>
 </dl></template>
+<?php // The Contour plot chapter (Task 785). ?>
+<template id="lpn_guide_more_lpn_contour_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_ct_what_term']?></dt><dd><?=$ec_lang['lpn_guide_ct_what_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_ct_box_term']?></dt><dd><?=$ec_lang['lpn_guide_ct_box_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_ct_example_term']?></dt><dd><?=$ec_lang['lpn_guide_ct_example_def']?></dd>
+</dl></template>
 <template id="lpn_guide_more_lpn_scncmp_box"><dl>
 	<dt><?=$ec_lang['lpn_guide_cmp_cols_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_cols_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_cmp_run_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_run_def']?></dd>
