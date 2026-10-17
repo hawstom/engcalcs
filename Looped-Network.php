@@ -2072,6 +2072,13 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_guide_cr_dead_term']?></dt><dd><?=$ec_lang['lpn_guide_cr_dead_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_cr_example_term']?></dt><dd><?=$ec_lang['lpn_guide_cr_example_def']?></dd>
 </dl></template>
+<?php // The Demand scaling chapter (Task 785). ?>
+<template id="lpn_guide_more_lpn_ds_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_ds_run_term']?></dt><dd><?=$ec_lang['lpn_guide_ds_run_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_ds_find_term']?></dt><dd><?=$ec_lang['lpn_guide_ds_find_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_ds_scope_term']?></dt><dd><?=$ec_lang['lpn_guide_ds_scope_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_ds_example_term']?></dt><dd><?=$ec_lang['lpn_guide_ds_example_def']?></dd>
+</dl></template>
 <template id="lpn_guide_more_lpn_scncmp_box"><dl>
 	<dt><?=$ec_lang['lpn_guide_cmp_cols_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_cols_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_cmp_run_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_run_def']?></dd>
