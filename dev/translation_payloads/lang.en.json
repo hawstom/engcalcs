@@ -2256,6 +2256,7 @@
         "lpn_library_pattern_values": "Multipliers",
         "lpn_library_pattern_values_tip": "The multipliers, separated by spaces or commas. Paste a column from a spreadsheet if you have one. The list repeats for as long as the run lasts, so it does not have to cover the whole run.",
         "lpn_library_pattern_span": "Multipliers: {n}, {step} apart, covering {span}",
+        "lpn_library_pattern_axis_step": "Step",
         "lpn_library_pattern_none": "No pattern",
         "lpn_choice_default": "Default",
         "lpn_settings_default_pattern": "Default demand pattern",
@@ -2639,7 +2640,7 @@
         "lpn_snip_tip_copy": "Copy (Ctrl+C)",
         "lpn_screenshot_scale_tip": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
     },
-    "count": 2637,
+    "count": 2638,
     "active_prefixes": [
         "about",
         "bpn",

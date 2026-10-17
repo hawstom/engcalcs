@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "es",
-        "expected_key_count": 2637,
-        "delta_key_count": 1,
+        "expected_key_count": 2638,
+        "delta_key_count": 2,
         "english_changed_key_count": 0,
         "exempt_key_count": 49,
         "exempt_keys": [
@@ -59,6 +59,7 @@
         "out_of_scope_key_count": 0,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
         "active_prefixes": [
+            "lpn",
             "mtc"
         ],
         "requested_prefix": null,
@@ -78,10 +79,12 @@
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
     "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- does not apply here, no value, or not relevant\n    English: N\/A\n    Your language: N\/A",
     "keys_to_translate": {
-        "mtc_not_applicable": "N\/A"
+        "mtc_not_applicable": "N\/A",
+        "lpn_library_pattern_axis_step": "Step"
     },
     "keys": {
-        "mtc_not_applicable": "N\/A"
+        "mtc_not_applicable": "N\/A",
+        "lpn_library_pattern_axis_step": "Step"
     },
     "key_context": {
         "mtc_not_applicable": {
@@ -97,6 +100,22 @@
                     "key": "mtc_pi_out_of_range",
                     "value": "Fuera de rango",
                     "english": "Outside range"
+                }
+            }
+        },
+        "lpn_library_pattern_axis_step": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_pattern_span",
+                    "value": "Multiplicadores: {n}, separados por {step}, que cubren {span}",
+                    "english": "Multipliers: {n}, {step} apart, covering {span}"
+                },
+                "next_translated": {
+                    "key": "lpn_library_pattern_none",
+                    "value": "Sin patrón",
+                    "english": "No pattern"
                 }
             }
         }
