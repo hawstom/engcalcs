@@ -2325,11 +2325,16 @@ $ec_lang['lpn_workspace_refused_unreadable']='This file could not be read as a w
 // FALSE are what a spreadsheet writes for a yes/no cell, in every language. The reasons that begin in
 // lowercase follow a colon after the value they are about.
 $ec_lang['lpn_file_export_item_scnbook']='Scenario workbook…';
-$ec_lang['lpn_file_export_scnbook_tip']='Download the scenarios and their alternatives as one .xlsx workbook: a Scenarios sheet naming the parent of each scenario and the alternative it uses in each category, an Alternatives sheet, a sheet for each category of asset values holding the overrides of each alternative by asset ID, and a Settings sheet. Values are as stored, in the project units, with the unit in each heading. Base values are the network itself and are not included. Edit it in a spreadsheet program, then read it back with File, Import, Import scenario workbook.';
+$ec_lang['lpn_file_export_scnbook_tip']='Download the scenarios, their alternatives, and the overrides of each alternative as one .xlsx workbook, in the project units. Edit it in a spreadsheet program. Read it back with File, Import, Import scenario workbook.';
 $ec_lang['lpn_file_import_scnbook']='Import scenario workbook…';
 $ec_lang['lpn_file_import_scnbook_tip']='Read back a scenario workbook made with File, Export, Scenario workbook, after it is edited in a spreadsheet program. Every difference from this project is listed before anything is changed, with each row that cannot be used and the reason. Apply changes makes them all as one step, which Undo reverses. Nothing the workbook leaves out is deleted.';
 $ec_lang['lpn_scnbook_blank']='(blank)';
 $ec_lang['lpn_scnbook_no_unit']='no unit';
+$ec_lang['lpn_scnbook_sheet_project']='Project';
+$ec_lang['lpn_scnbook_col_project_name']='Project';
+$ec_lang['lpn_scnbook_col_assets']='Assets';
+$ec_lang['lpn_scnbook_col_fingerprint']='Asset ID check';
+$ec_lang['lpn_scnbook_other_project']='This workbook was made from the project {book} ({n} assets), and the open project is {project} ({m} assets). Check that the workbook belongs to this project before applying its changes.';
 $ec_lang['lpn_scnbook_refused_not_workbook']='This file is not a scenario workbook, so nothing was changed. A scenario workbook is made with File, Export, Scenario workbook.';
 $ec_lang['lpn_scnbook_col_demands']='Demand categories';
 $ec_lang['lpn_scnbook_sheet_alternatives']='Alternatives';
@@ -2363,7 +2368,7 @@ $ec_lang['lpn_scnbook_alternative_parent']='Parent of alternative {name} ({categ
 $ec_lang['lpn_scnbook_why_no_alternative']='There is no single alternative named {name} in {category}, so it was not used.';
 $ec_lang['lpn_scnbook_pick']='{scenario}: {category}';
 $ec_lang['lpn_scnbook_why_column_property']='The column {column} is not a property of {category}, so its values were not read.';
-$ec_lang['lpn_scnbook_why_column_unit']='The column {column} is in {unit}, and this project uses {project}, so its values were not read.';
+$ec_lang['lpn_scnbook_why_column_unit']='The column {column} was not used: its unit is {unit}, and the unit of {property} in this project is {project}.';
 $ec_lang['lpn_scnbook_why_base_values']='The values of Base are the drawing itself; edit them on the map or in the Tables pane. This row was not used.';
 $ec_lang['lpn_scnbook_why_no_id']='This row has no asset ID, so it was not used.';
 $ec_lang['lpn_scnbook_why_no_asset']='The project has no single asset {asset} {id}, so this row was not used.';

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**170 still to read on master**, of 480 untranslated keys, of 3098 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**175 still to read on master**, of 485 untranslated keys, of 3103 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -79,7 +79,7 @@ is the one you meant. "The first one" is a complete answer.
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (480, 170 to read @@ NEEDS RULING)
+## lpn_  (485, 175 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -139,7 +139,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Scenario workbook…
   @@ NEEDS RULING
 - **`lpn_file_export_scnbook_tip`**
-  > Download the scenarios and their alternatives as one .xlsx workbook: a Scenarios sheet naming the parent of each scenario and the alternative it uses in each category, an Alternatives sheet, a sheet for each category of asset values holding the overrides of each alternative by asset ID, and a Settings sheet. Values are as stored, in the project units, with the unit in each heading. Base values are the network itself and are not included. Edit it in a spreadsheet program, then read it back with File, Import, Import scenario workbook.
+  > Download the scenarios, their alternatives, and the overrides of each alternative as one .xlsx workbook, in the project units. Edit it in a spreadsheet program. Read it back with File, Import, Import scenario workbook.
   @@ NEEDS RULING
 - **`lpn_file_import_gjnet`**
   > Import GeoJSON network…
@@ -960,17 +960,26 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_scnbook_col_alternative`**
   > Alternative
   @@ NEEDS RULING
+- **`lpn_scnbook_col_assets`**
+  > Assets
+  @@ NEEDS RULING
 - **`lpn_scnbook_col_change`**
   > Change
   @@ NEEDS RULING
 - **`lpn_scnbook_col_demands`**
   > Demand categories
   @@ NEEDS RULING
+- **`lpn_scnbook_col_fingerprint`**
+  > Asset ID check
+  @@ NEEDS RULING
 - **`lpn_scnbook_col_path`**
   > Path
   @@ NEEDS RULING
 - **`lpn_scnbook_col_project`**
   > In the project
+  @@ NEEDS RULING
+- **`lpn_scnbook_col_project_name`**
+  > Project
   @@ NEEDS RULING
 - **`lpn_scnbook_col_reason`**
   > Reason
@@ -1017,6 +1026,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_scnbook_no_unit`**
   > no unit
   @@ NEEDS RULING
+- **`lpn_scnbook_other_project`**
+  > This workbook was made from the project {book} ({n} assets), and the open project is {project} ({m} assets). Check that the workbook belongs to this project before applying its changes.
+  @@ NEEDS RULING
 - **`lpn_scnbook_pick`**
   > {scenario}: {category}
   @@ NEEDS RULING
@@ -1047,6 +1059,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_scnbook_sheet_alternatives`**
   > Alternatives
   @@ NEEDS RULING
+- **`lpn_scnbook_sheet_project`**
+  > Project
+  @@ NEEDS RULING
 - **`lpn_scnbook_value`**
   > {alternative}, {asset} {id}: {property}
   @@ NEEDS RULING
@@ -1069,7 +1084,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > The column {column} is not a property of {category}, so its values were not read.
   @@ NEEDS RULING
 - **`lpn_scnbook_why_column_unit`**
-  > The column {column} is in {unit}, and this project uses {project}, so its values were not read.
+  > The column {column} was not used: its unit is {unit}, and the unit of {property} in this project is {project}.
   @@ NEEDS RULING
 - **`lpn_scnbook_why_gone`**
   > the drawing has no such asset, so the value was not changed.
@@ -1526,7 +1541,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**4 still to read**, of 7 new keys across 12 unmerged branch(es).
+**4 still to read**, of 7 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -1537,13 +1552,15 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/sprint-1017 (`a2f8af97f`) — adds no English strings
+### chore/handoff-1017s (`7c9fb5582`) — adds no English strings
+
+### chore/sprint-1017 (`757b7ee53`) — adds no English strings
 
 ### docs/label-port (`7ec7a65cf`) — already merged into feat/label-beside; its strings are listed there
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/label-beside (`f35eb0041`) — adds no English strings
+### feat/label-beside (`b145b4b1f`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -1567,9 +1584,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/sheet-sync (`7e5cafa3e`) — adds no English strings
+### feat/sheet-sync (`cac76e0cc`) — adds no English strings
 
-### feat/theme (`a40cca01a`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/theme (`380a4549b`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_theme_amber`**
   > Amber

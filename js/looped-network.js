@@ -50970,7 +50970,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function scnBookDescribeNow(prop, group) {
 		var pc = scnBookPc(), parts = smItemParts(ovKeyFor(group || 'node', '\u0000'), prop, prop === 'demands' ? 'demand' : prop),
 			c = parts.col, unit = c ? paneHeadingUnitText(c) : '', label, stamp;
-		label = prop === 'demands' ? (pc.lpn_scnbook_col_demands || 'Demand categories') : (parts.label === null ? prop : parts.label);
+		label = prop === 'demands' ? (pc.lpn_scnbook_col_demands || 'Demand categories') : prop === 'valveType' ? (pc.lpn_field_valve_type || 'Valve type') :
+			(parts.label === null ? prop : parts.label);
 		stamp = (c && typeof c.unit === 'function' && unitKey(c.unit())) || unit || '';
 		return { prop: prop, group: group, col: c, label: label, unit: unit, stamp: stamp,
 			head: label + (unit ? ' (' + unit + ')' : ''), key: prop + (stamp ? '|' + stamp : ''),
@@ -51020,6 +51021,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (s.isBase || s.root === true) { return ''; }
 		return scenarioDisplayName(parentScenarioOf(s));
 	}
+	// A unit stamp as a person reads it: the symbol the page's unit lists show for that unit (L/s, not
+	// lps), else the stamp itself.
+	function scnBookUnitText(stamp) {
+		var sels = document.querySelectorAll ? document.querySelectorAll('select option') : [], i;
+		for (i = 0; i < sels.length; i++) {
+			if (sels[i].value === stamp && sels[i].parentNode && /^lpn_u_/.test(sels[i].parentNode.id || '')) { return String(sels[i].textContent || stamp).trim(); }
+		}
+		return stamp;
+	}
 	function scnBookPathText(path) {
 		return path.some(function (m) { return String(m).indexOf('.') >= 0; }) ? JSON.stringify(path) : path.join('.');
 	}
@@ -51055,6 +51065,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (cat === 'scenarios') { return pc.lpn_pane_tab_scenarios || 'Scenarios'; }
 		if (cat === 'alternatives') { return pc.lpn_scnbook_sheet_alternatives || 'Alternatives'; }
 		if (cat === 'settings') { return pc.lpn_tool_settings || 'Settings'; }
+		if (cat === 'project') { return pc.lpn_scnbook_sheet_project || 'Project'; }
 		return altCategoryLabel(cat);
 	}
 	/**
@@ -51117,7 +51128,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			heads: [pc.lpn_settings_table_category || 'Category', pc.lpn_scnbook_col_alternative || 'Alternative', pc.lpn_settings_table_setting || 'Setting',
 				pc.lpn_scnbook_col_path || 'Path', pc.lpn_find_value || 'Value'],
 			keys: ['settings:category', 'alternative', 'setting', 'path', 'value'], rows: rows });
+		var idn = scnBookIdentity();
+		sheets.push({ name: scnBookSheetName('project'),
+			heads: [pc.lpn_scnbook_col_project_name || 'Project', pc.lpn_scnbook_col_assets || 'Assets', pc.lpn_scnbook_col_fingerprint || 'Asset ID check'],
+			keys: ['project:name', 'assets', 'fingerprint'], rows: [[idn.name, String(idn.assets), idn.fingerprint]] });
 		return sheets;
+	}
+	// **WHICH PROJECT A WORKBOOK CAME FROM** (Perry's review, 2026-10-17: a Net1 workbook read into Net2
+	// reported 13 changes, because EPANET IDs like 10 and 22 are in both). Cheap and stable: the project's
+	// name, how many assets it has, and a fingerprint of their IDs (FNV-1a over the sorted node and link
+	// IDs). A difference is said at the top of the report; the person decides.
+	function scnBookIdentity() {
+		var ids = [], h = 0x811c9dc5, s, i;
+		(doc.nodes || []).forEach(function (n) { ids.push(ovKeyFor('node', n.id)); });
+		(doc.links || []).forEach(function (l) { ids.push(ovKeyFor('link', l.id)); });
+		ids.sort();
+		s = ids.join('\n');
+		for (i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+		return { name: projectDisplayName(project), assets: ids.length, fingerprint: ('0000000' + h.toString(16)).slice(-8) };
 	}
 	function scnBookFileName() { return safeFileName(projectDisplayName(project)) + '-scenarios.xlsx'; }
 	function scnBookBytes() { return EngCalcs.lpnTableXlsxBook(scnBookSheets()); }
@@ -51201,7 +51229,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// ---- which sheet is which, by the first key of row 2 ----
 		(book || []).forEach(function (sh) {
 			var k = String(((sh.rows || [])[1] || [])[0] || '').trim(), kind = k.indexOf(':') > 0 ? k.slice(0, k.indexOf(':')) : '';
-			if (kind !== 'scenarios' && kind !== 'alternatives' && kind !== 'settings' && SCNBOOK_ELEMENT_CATS.indexOf(kind) < 0) {
+			if (kind !== 'scenarios' && kind !== 'alternatives' && kind !== 'settings' && kind !== 'project' && SCNBOOK_ELEMENT_CATS.indexOf(kind) < 0) {
 				if ((sh.rows || []).some(function (r, i) { return i > 0 && !blankRow(r); }) || (sh.rows || []).length) {
 					bad(sh.name, '', scnBookSay('lpn_scnbook_why_sheet', 'This sheet is not one a scenario workbook has, so it was not read.'));
 				}
@@ -51212,6 +51240,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		if (!found.scenarios && !found.alternatives && !SCNBOOK_ELEMENT_CATS.some(function (c) { return found[c]; }) && !found.settings) {
 			return { ok: false, why: 'lpn_scnbook_refused_not_workbook' };
+		}
+		// ---- the project it came from ----
+		if (found.project) {
+			(function () {
+				var m = keyMap(found.project), r = found.project.rows[2] || [], idn = scnBookIdentity(),
+					name = cell(r, m, 'name').trim(), n = cell(r, m, 'assets').trim(), fp = cell(r, m, 'fingerprint').trim();
+				if (name !== idn.name || fp !== idn.fingerprint) {
+					out.warning = scnBookSay('lpn_scnbook_other_project', 'This workbook was made from the project {book} ({n} assets), and the open project is {project} ({m} assets). Check that the workbook belongs to this project before applying its changes.',
+						{ book: name, n: n, project: idn.name, m: idn.assets });
+				}
+			}());
 		}
 		// ---- the names every reference is resolved against: the workbook's, else the project's ----
 		scnTable = scenarios.map(function (s) {
@@ -51463,8 +51502,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					if (!groups.length && !scnBookHas(customPropDefByKeyOrNull(prop), 'key')) {
 						d.bad = scnBookSay('lpn_scnbook_why_column_property', 'The column {column} is not a property of {category}, so its values were not read.', { column: String((sh.rows[0] || [])[i] || prop), category: altCategoryLabel(cat) });
 					} else if (stamp !== d.stamp) {
-						d.bad = scnBookSay('lpn_scnbook_why_column_unit', 'The column {column} is in {unit}, and this project uses {project}, so its values were not read.',
-							{ column: String((sh.rows[0] || [])[i] || prop), unit: stamp || (pc.lpn_scnbook_no_unit || 'no unit'), project: d.stamp || (pc.lpn_scnbook_no_unit || 'no unit') });
+						d.bad = scnBookSay('lpn_scnbook_why_column_unit', 'The column {column} was not used: its unit is {unit}, and the unit of {property} in this project is {project}.',
+							{ column: String((sh.rows[0] || [])[i] || prop), property: d.label, unit: stamp ? scnBookUnitText(stamp) : (pc.lpn_scnbook_no_unit || 'no unit'),
+								project: d.stamp ? scnBookUnitText(d.stamp) : (pc.lpn_scnbook_no_unit || 'no unit') });
 					}
 					if (d.bad && filled) { bad(sh.name, '', d.bad); }
 					cols.push(d);
@@ -51810,25 +51850,31 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		n = plan.changes.length;
 		openDialog(function (body) {
+			if (plan.warning) { ffEl('p', 'lpn-dialog-msg lpn-scnbook-warning', '\u26A0 ' + plan.warning, body).setAttribute('data-scnbook', 'warning'); }
 			var p = ffEl('p', 'lpn-dialog-msg', n ? scnBookSay('lpn_scnbook_report_changes', 'Differences between {file} and this project: {n}. Nothing is changed until Apply changes is chosen; Undo reverses the whole import.', { file: fileName, n: n })
 				: scnBookSay('lpn_scnbook_report_none', 'The workbook {file} has no differences from this project.', { file: fileName }), body);
 			p.setAttribute('data-scnbook', 'summary');
-			function table(cls, heads, rows) {
+			// `words`: how many leading columns break only between words (the sheet, the row and what
+			// changed), so a sheet name never breaks inside itself; the values may break anywhere.
+			function table(cls, heads, rows, words) {
 				var t = ffEl('table', 'lpn-ff-table ' + cls, null, ffEl('div', 'lpn-ff-tablewrap', null, body)), tr = ffEl('tr', null, null, ffEl('thead', null, null, t)), tb;
-				heads.forEach(function (h) { ffEl('th', null, h, tr); });
+				heads.forEach(function (h, i) { ffEl('th', i < words ? 'lpn-scnbook-words' : null, h, tr); });
 				tb = ffEl('tbody', null, null, t);
-				rows.forEach(function (r) { var row = ffEl('tr', null, null, tb); r.forEach(function (c) { ffCell(row, String(c === undefined || c === null ? '' : c)); }); });
+				rows.forEach(function (r) {
+					var row = ffEl('tr', null, null, tb);
+					r.forEach(function (c, i) { ffCell(row, String(c === undefined || c === null ? '' : c), i < words ? 'lpn-scnbook-words' : null); });
+				});
 			}
 			if (n) {
 				ffEl('p', 'lpn-ff-summary', scnBookSay('lpn_scnbook_head_changes', 'Changes ({n})', { n: n }), body);
 				table('lpn-scnbook-changes', [pc.lpn_scnbook_col_sheet || 'Sheet', pc.lpn_scnbook_col_row || 'Row', pc.lpn_scnbook_col_change || 'Change',
 					pc.lpn_scnbook_col_project || 'In the project', pc.lpn_scnbook_col_workbook || 'In the workbook'],
-					plan.changes.map(function (c) { return [c.sheet, c.row, c.what, c.from, c.to]; }));
+					plan.changes.map(function (c) { return [c.sheet, c.row, c.what, c.from, c.to]; }), 3);
 			}
 			if (plan.unusable.length) {
 				ffEl('p', 'lpn-ff-summary', scnBookSay('lpn_scnbook_head_unusable', 'Not used ({n})', { n: plan.unusable.length }), body);
 				table('lpn-scnbook-unusable', [pc.lpn_scnbook_col_sheet || 'Sheet', pc.lpn_scnbook_col_row || 'Row', pc.lpn_scnbook_col_reason || 'Reason'],
-					plan.unusable.map(function (u) { return [u.sheet, u.row, u.why]; }));
+					plan.unusable.map(function (u) { return [u.sheet, u.row, u.why]; }), 2);
 			}
 			if (plan.kept.length) {
 				ffEl('p', 'lpn-ff-summary', scnBookSay('lpn_scnbook_head_kept', 'Kept, not in the workbook ({n})', { n: plan.kept.length }), body);

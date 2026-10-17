@@ -19,7 +19,10 @@
 //       and an edit stores that alternative as the program does;
 //   W7  a choice (a pipe's status) is read by its stored word; a word that is no choice is refused;
 //   W8  a workbook made on a page in another language (its headings, sheet names, category and asset
-//       words, Base's name) reads back as no change.
+//       words, Base's name) reads back as no change;
+//   W9  a workbook from another project (Net1's into Net2) is warned of at the top, never refused;
+//   W10 typed characters: the program keeps a typed number as a number, and so does the workbook;
+//   W11 no two columns of a sheet share a heading (Type and Valve type).
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -183,8 +186,8 @@ function build(L) {
 	build(L);
 	const sheets = L.bookSheets();
 	const names = sheets.map((s) => s.keys[0].split(':')[0]);
-	ok('W1.1 Scenarios, Alternatives, nine element categories, Settings, in that order',
-		names.join() === ['scenarios', 'alternatives', 'physical', 'demand', 'topology', 'initial', 'constituent', 'fireflow', 'energy', 'userdata', 'text', 'settings'].join(), names.join());
+	ok('W1.1 Scenarios, Alternatives, nine element categories, Settings, Project, in that order',
+		names.join() === ['scenarios', 'alternatives', 'physical', 'demand', 'topology', 'initial', 'constituent', 'fireflow', 'energy', 'userdata', 'text', 'settings', 'project'].join(), names.join());
 	const scn = sheets[0];
 	ok('W1.2 the Scenarios sheet: Fire is a child of Peak, names its own Physical, Initial settings, Fire flow and Calculation, and inherits Peak\'s Demand',
 		JSON.stringify(scn.rows.map((r) => r.slice(0, 3))) === JSON.stringify([['base', 'Base', ''], [L.getScenarios()[1].id, 'Peak', 'Base'], [L.getScenarios()[2].id, 'Fire', 'Peak']]) &&
@@ -283,7 +286,7 @@ function build(L) {
 	ok('W4.3 "twelve" is not a number, with its row', why.indexOf('Physical@3: Peak, ' + PC.lpn_tool_add_pipe + ' 12: ' + PC.lpn_field_diameter + ': ' + PC.lpn_scnbook_why_number) >= 0, why.join(' | '));
 	ok('W4.4 the asset the project lacks', why.some((w) => /^Demand@\d+: /.test(w) && w.slice(w.indexOf(': ') + 2) === fill('lpn_scnbook_why_no_asset', { asset: 'Junction', id: 'J-NOPE' })), why.join(' | '));
 	ok('W4.5 the column in other units is refused as a column', why.indexOf('Physical@: ' + fill('lpn_scnbook_why_column_unit',
-		{ column: ph.rows[0][colOf(ph, 'roughness')], unit: 'furlongs', project: PC.lpn_scnbook_no_unit })) >= 0, why.join(' | '));
+		{ column: ph.rows[0][colOf(ph, 'roughness')], property: ph.rows[0][colOf(ph, 'roughness')], unit: 'furlongs', project: PC.lpn_scnbook_no_unit })) >= 0, why.join(' | '));
 	ok('W4.6 the sheet that is not the workbook\'s', why.indexOf('Notes@: ' + PC.lpn_scnbook_why_sheet) >= 0, why.join(' | '));
 	ok('W4.7 a file that is no workbook at all is refused whole', L.bookPlan([{ name: 'S', rows: [['a'], ['b']] }]).ok === false);
 
@@ -374,6 +377,44 @@ function build(L) {
 	plan = L.bookPlan(book8);
 	ok('W8.3 a new scenario under Base, choosing Base, in that language\'s word for Base', plan.unusable.length === 0 && plan.ops.newScn.length === 1 && plan.ops.newScn[0].parent === 'base' &&
 		plan.ops.picks.length === 1 && plan.ops.picks[0].key === 'base', JSON.stringify(plan.unusable) + what(plan));
+
+	console.log('--- W9. a workbook from another project says so ---');
+	plan = L.bookPlan(book0);
+	ok('W9.1 its own project: no warning', !plan.warning, plan.warning);
+	const N2 = page();
+	N2.importInp({ name: 'Net2.inp', _text: fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net2.inp'), 'utf8') });
+	plan = N2.bookPlan(book0);
+	ok('W9.2 Net1\'s workbook read into Net2 warns, naming both and their asset counts', !!plan.warning &&
+		plan.warning === PC.lpn_scnbook_other_project.split('{book}').join('Net1').split('{n}').join('24').split('{project}').join('Net2').split('{m}').join(String(N2.getDoc().nodes.length + N2.getDoc().links.length)), plan.warning);
+	ok('W9.3 ...and still reports its rows: the person decides', plan.ok && plan.changes.length > 0, String(plan.changes.length));
+	const renamed = clone(book0);
+	sheetOf(renamed, 'project').rows[2][2] = '00000000';
+	ok('W9.4 the same name with other asset IDs warns too', !!L.bookPlan(renamed).warning);
+
+	console.log('--- W10. typed characters ---');
+	// The program stores a typed number as a number (the Tables pane and Properties read +text), so
+	// "6.00" typed is 6, and the workbook writes 6. dev/scenario-workbook.md says so.
+	const T = page();
+	T.importProject(JSON.parse(file0));
+	T.switchScenario(sid(T, 'Peak'));
+	T.setProp(T.linkById('12'), 'diameter', +'6.00');
+	T.setProp(T.nodeById('23'), 'demand', +'1e-3');
+	T.switchScenario(T.baseScenario().id);
+	const bookT = await T.bookRead(T.bookBytes());
+	const tph = sheetOf(bookT, 'physical'), tdm = sheetOf(bookT, 'demand');
+	ok('W10.1 a typed 6.00 is stored as 6 and written as 6', tph.rows[rowOf(tph, 'Peak', '12')][colOf(tph, 'diameter')] === '6');
+	ok('W10.2 a typed 1e-3 is written as 0.001', tdm.rows[rowOf(tdm, 'Peak', '23')][colOf(tdm, 'demand')] === '0.001');
+	setCell(bookT, 'physical', 'Peak', '12', 'diameter', '6.00');
+	setCell(bookT, 'demand', 'Peak', '23', 'demand', '1e-3');
+	plan = T.bookPlan(bookT);
+	ok('W10.3 ...and the workbook typing them back is no change, as retyping them in the program is none', plan.changes.length === 0 && plan.unusable.length === 0, what(plan));
+
+	console.log('--- W11. headings ---');
+	const topo = sheetOf(book0, 'topology');
+	const typeHeads = topo.rows[0].filter((h, i) => ['type', 'valveType'].indexOf(String(topo.rows[1][i]).split('|')[0].replace(/^topology:/, '')) >= 0);
+	ok('W11.1 Active topology names its two type columns apart, as the Tables pane does', typeHeads.length === 2 && typeHeads[0] === PC.lpn_field_type && typeHeads[1] === PC.lpn_field_valve_type, JSON.stringify(typeHeads));
+	const heads = book0.map((sh) => sh.rows[0]).reduce((a, r) => a.concat(r), []);
+	ok('W11.2 no sheet has two columns with one heading', book0.every((sh) => new Set(sh.rows[0]).size === sh.rows[0].length), JSON.stringify(heads.length));
 
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nALL PASS');
 	process.exit(fails ? 1 : 0);
