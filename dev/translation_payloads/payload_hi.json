@@ -2,8 +2,8 @@
     "meta": {
         "language": "hi",
         "expected_key_count": 2879,
-        "delta_key_count": 268,
-        "english_changed_key_count": 7,
+        "delta_key_count": 276,
+        "english_changed_key_count": 15,
         "exempt_key_count": 38,
         "exempt_keys": [
             "u_imgd",
@@ -66,7 +66,7 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: प्रवाह\n- little outlet, dripper, or nozzle that lets water out slowly\n    English: emitter\n    Your language: उत्सर्जक\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: खंड\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: स्थानीय हानि\n- calculator, tool, or program that finds and tells mathematical answers\n    English: calculator\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: माँग\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: दाब\n- elevation, height, or level of a point\n    English: elevation (z)\n    Your language: स्तर\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: जंक्शन\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: जलाशय\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: नोड\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: लिंक\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: डिफ़ॉल्ट\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: टैंक\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: वाल्व\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: अपने मान\n- time-step by time-step multipliers or factors for water use\n    English: demand pattern\n    Your language: (no preferred translation yet: use your language's standard term)\n- leave a value off the map when there is no room or space\n    English: drop (a label)\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the water in the tank is, its water level or depth\n    English: tank level\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: ग्राहक\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: आकृति\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: प्रवाह\n- little outlet, dripper, or nozzle that lets water out slowly\n    English: emitter\n    Your language: उत्सर्जक\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: खंड\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: स्थानीय हानि\n- calculator, tool, or program that finds and tells mathematical answers\n    English: calculator\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: माँग\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: दाब\n- elevation, height, or level of a point\n    English: elevation (z)\n    Your language: स्तर\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: जंक्शन\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: जलाशय\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: नोड\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: लिंक\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: डिफ़ॉल्ट\n- solver or the part that works out the answer\n    English: solver\n    Your language: सॉल्वर\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: टैंक\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: वाल्व\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: अपने मान\n- time-step by time-step multipliers or factors for water use\n    English: demand pattern\n    Your language: (no preferred translation yet: use your language's standard term)\n- leave a value off the map when there is no room or space\n    English: drop (a label)\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the water in the tank is, its water level or depth\n    English: tank level\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: ग्राहक\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: आकृति\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
         "mtc_n_pi": "n from design rock size (P&I, Phillips & Ingersoll method)",
         "mtc_iteration_tip": "Choose a roughness option (B\/B, Blodgett–Bathurst, recommended) and a rock size option (Isbash recommended) to auto-iterate toward a uniform rock size for your target flow. See Notes below for the full method, or enter your own roughness value (follow link for guidance) and ignore rock size to skip iteration.",
@@ -109,6 +109,12 @@
         "lpn_paste_skip_valve": "Not pasted: {n} (the valve types differ).",
         "lpn_inp_export_flat_customers_inactive": "{n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.",
         "lpn_inp_export_flat_inactive_controls": "These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}",
+        "lpn_engine_ready_valve": "The EPANET solver is now stored on this device. Pressure breaker and general purpose valves (PBV, GPV) can now be solved offline.",
+        "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve pressure breaker and general purpose valves (PBV, GPV). After one connection to the internet, the solver is stored on this device.",
+        "lpn_engine_unavailable_why": "Pressure breaker and general purpose valves (PBV, GPV) cannot be solved without the EPANET solver. {reason}",
+        "lpn_diag_valve_needs_epanet": "These are pressure breaker or general purpose valves, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:",
+        "lpn_settings_hover_card": "Show all properties on hover",
+        "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
         "lpn_settings_override_marks": "Show override markers on the map",
         "lpn_settings_override_marks_tip": "Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.",
         "lpn_clean_map": "Clean map",
@@ -258,6 +264,8 @@
         "lpn_alt_cat_topology_tip": "Asset activation",
         "lpn_alt_cat_presentation": "Presentation",
         "lpn_alt_cat_calculation": "Calculation",
+        "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations or pressure breaker and general purpose valves (PBV, GPV). The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+        "lpn_engine_valve_route": "Solved with the EPANET solver, because of these pressure breaker and general purpose valves:",
         "lpn_time_run_cut_off": "EPANET had closed {link} and then could not solve for {nodes}.",
         "lpn_time_run_cut_off_full": "Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.",
         "lpn_time_run_cut_off_empty": "Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.",
@@ -379,6 +387,12 @@
         "lpn_paste_skip_valve": "Not pasted: {n} (the valve types differ).",
         "lpn_inp_export_flat_customers_inactive": "{n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.",
         "lpn_inp_export_flat_inactive_controls": "These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}",
+        "lpn_engine_ready_valve": "The EPANET solver is now stored on this device. Pressure breaker and general purpose valves (PBV, GPV) can now be solved offline.",
+        "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve pressure breaker and general purpose valves (PBV, GPV). After one connection to the internet, the solver is stored on this device.",
+        "lpn_engine_unavailable_why": "Pressure breaker and general purpose valves (PBV, GPV) cannot be solved without the EPANET solver. {reason}",
+        "lpn_diag_valve_needs_epanet": "These are pressure breaker or general purpose valves, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:",
+        "lpn_settings_hover_card": "Show all properties on hover",
+        "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
         "lpn_settings_override_marks": "Show override markers on the map",
         "lpn_settings_override_marks_tip": "Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.",
         "lpn_clean_map": "Clean map",
@@ -528,6 +542,8 @@
         "lpn_alt_cat_topology_tip": "Asset activation",
         "lpn_alt_cat_presentation": "Presentation",
         "lpn_alt_cat_calculation": "Calculation",
+        "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations or pressure breaker and general purpose valves (PBV, GPV). The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+        "lpn_engine_valve_route": "Solved with the EPANET solver, because of these pressure breaker and general purpose valves:",
         "lpn_time_run_cut_off": "EPANET had closed {link} and then could not solve for {nodes}.",
         "lpn_time_run_cut_off_full": "Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.",
         "lpn_time_run_cut_off_empty": "Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.",
@@ -1272,6 +1288,112 @@
                 }
             }
         },
+        "lpn_engine_ready_valve": {
+            "reason": "english_changed",
+            "current_value": "EPANET सॉल्वर अब इस डिवाइस पर है। दाब और प्रवाह नियंत्रण वाल्व (PRV, PSV, FCV) अब ऑफ़लाइन भी हल किए जा सकते हैं।",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_fetching_valve",
+                    "value": "EPANET सॉल्वर लाया जा रहा है, ताकि इस वाल्व को अभी और आगे ऑफ़लाइन भी हल किया जा सके।",
+                    "english": "Downloading the EPANET solver, so this valve can be solved now and offline later."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "EPANET सॉल्वर डाउनलोड नहीं हो सका, जो दाब और प्रवाह नियंत्रण वाल्व (PRV, PSV, FCV) को हल करने के लिए आवश्यक है। इंटरनेट से एक बार जुड़ने के बाद सॉल्वर इस डिवाइस पर रखा जाता है।",
+                    "english": "Could not download the EPANET solver, which is required to solve pressure breaker and general purpose valves (PBV, GPV). After one connection to the internet, the solver is stored on this device."
+                }
+            }
+        },
+        "lpn_engine_unavailable": {
+            "reason": "english_changed",
+            "current_value": "EPANET सॉल्वर डाउनलोड नहीं हो सका, जो दाब और प्रवाह नियंत्रण वाल्व (PRV, PSV, FCV) को हल करने के लिए आवश्यक है। इंटरनेट से एक बार जुड़ने के बाद सॉल्वर इस डिवाइस पर रखा जाता है।",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_ready_valve",
+                    "value": "EPANET सॉल्वर अब इस डिवाइस पर है। दाब और प्रवाह नियंत्रण वाल्व (PRV, PSV, FCV) अब ऑफ़लाइन भी हल किए जा सकते हैं।",
+                    "english": "The EPANET solver is now stored on this device. Pressure breaker and general purpose valves (PBV, GPV) can now be solved offline."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_unavailable_why",
+                    "value": "दाब और प्रवाह नियंत्रण वाल्व (PRV, PSV, FCV) EPANET सॉल्वर के बिना हल नहीं किए जा सकते। {reason}",
+                    "english": "Pressure breaker and general purpose valves (PBV, GPV) cannot be solved without the EPANET solver. {reason}"
+                }
+            }
+        },
+        "lpn_engine_unavailable_why": {
+            "reason": "english_changed",
+            "current_value": "दाब और प्रवाह नियंत्रण वाल्व (PRV, PSV, FCV) EPANET सॉल्वर के बिना हल नहीं किए जा सकते। {reason}",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "EPANET सॉल्वर डाउनलोड नहीं हो सका, जो दाब और प्रवाह नियंत्रण वाल्व (PRV, PSV, FCV) को हल करने के लिए आवश्यक है। इंटरनेट से एक बार जुड़ने के बाद सॉल्वर इस डिवाइस पर रखा जाता है।",
+                    "english": "Could not download the EPANET solver, which is required to solve pressure breaker and general purpose valves (PBV, GPV). After one connection to the internet, the solver is stored on this device."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "आपके बनाते समय EPANET सॉल्वर लोड हो रहा है। पूरी तरह लोड होने पर परिणाम उपलब्ध होंगे।",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                }
+            }
+        },
+        "lpn_diag_valve_needs_epanet": {
+            "reason": "english_changed",
+            "current_value": "ये दाब या प्रवाह नियंत्रण वाल्व हैं, और इनकी गणना केवल EPANET सॉल्वर कर सकता है। EPANET सॉल्वर लोड नहीं हो सका, इसलिए ये परिणाम उपलब्ध नहीं हैं:",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_needed_failed_why",
+                    "value": "इस नेटवर्क को केवल EPANET सॉल्वर हल कर सकता है। {reason}",
+                    "english": "This network can only be solved by the EPANET solver. {reason}"
+                },
+                "next_translated": {
+                    "key": "lpn_diag_valve_on_fixed_head",
+                    "value": "ये वाल्व सीधे किसी जलाशय या टैंक से जुड़े हैं, जो उस नोड पर हाइड्रॉलिक ग्रेड को स्थिर कर देता है, इसलिए वाल्व के नियंत्रित करने के लिए कुछ नहीं बचता। वाल्व और जलाशय या टैंक के बीच एक छोटा पाइप लगाएँ:",
+                    "english": "These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:"
+                }
+            }
+        },
+        "lpn_settings_hover_card": {
+            "reason": "english_changed",
+            "current_value": "होवर करने पर पूरा लेबल दिखाएँ",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_area_hint_tip",
+                    "value": "क्षेत्र चुनते समय मानचित्र पर वह संकेत दिखाएँ जो अगला चरण बताता है।",
+                    "english": "Show the prompt over the map that gives the next step while you are selecting an area."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_hover_card_tip",
+                    "value": "किसी नोड, लिंक या ग्राहक पर पॉइंटर रखें, तो सेटिंग्स में निर्दिष्ट उसका लेबल किसी भी स्केल पर दिखता है, चाहे लेबल मानचित्र पर समाता हो या नहीं। यह इस ब्राउज़र की सेटिंग है, प्रोजेक्ट की नहीं।",
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                }
+            },
+            "tip": {
+                "key": "lpn_settings_hover_card_tip",
+                "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
+                "value": "किसी नोड, लिंक या ग्राहक पर पॉइंटर रखें, तो सेटिंग्स में निर्दिष्ट उसका लेबल किसी भी स्केल पर दिखता है, चाहे लेबल मानचित्र पर समाता हो या नहीं। यह इस ब्राउज़र की सेटिंग है, प्रोजेक्ट की नहीं।"
+            }
+        },
+        "lpn_settings_hover_card_tip": {
+            "reason": "english_changed",
+            "current_value": "किसी नोड, लिंक या ग्राहक पर पॉइंटर रखें, तो सेटिंग्स में निर्दिष्ट उसका लेबल किसी भी स्केल पर दिखता है, चाहे लेबल मानचित्र पर समाता हो या नहीं। यह इस ब्राउज़र की सेटिंग है, प्रोजेक्ट की नहीं।",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_hover_card",
+                    "value": "होवर करने पर पूरा लेबल दिखाएँ",
+                    "english": "Show all properties on hover"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "ID उपसर्ग",
+                    "english": "ID prefixes"
+                }
+            },
+            "label": {
+                "key": "lpn_settings_hover_card",
+                "english": "Show all properties on hover",
+                "value": "होवर करने पर पूरा लेबल दिखाएँ"
+            }
+        },
         "lpn_settings_override_marks": {
             "reason": "missing",
             "current_value": null,
@@ -1279,7 +1401,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_hover_card_tip",
                     "value": "किसी नोड, लिंक या ग्राहक पर पॉइंटर रखें, तो सेटिंग्स में निर्दिष्ट उसका लेबल किसी भी स्केल पर दिखता है, चाहे लेबल मानचित्र पर समाता हो या नहीं। यह इस ब्राउज़र की सेटिंग है, प्रोजेक्ट की नहीं।",
-                    "english": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -1299,7 +1421,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_hover_card_tip",
                     "value": "किसी नोड, लिंक या ग्राहक पर पॉइंटर रखें, तो सेटिंग्स में निर्दिष्ट उसका लेबल किसी भी स्केल पर दिखता है, चाहे लेबल मानचित्र पर समाता हो या नहीं। यह इस ब्राउज़र की सेटिंग है, प्रोजेक्ट की नहीं।",
-                    "english": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -1319,7 +1441,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_hover_card_tip",
                     "value": "किसी नोड, लिंक या ग्राहक पर पॉइंटर रखें, तो सेटिंग्स में निर्दिष्ट उसका लेबल किसी भी स्केल पर दिखता है, चाहे लेबल मानचित्र पर समाता हो या नहीं। यह इस ब्राउज़र की सेटिंग है, प्रोजेक्ट की नहीं।",
-                    "english": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -1339,7 +1461,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_hover_card_tip",
                     "value": "किसी नोड, लिंक या ग्राहक पर पॉइंटर रखें, तो सेटिंग्स में निर्दिष्ट उसका लेबल किसी भी स्केल पर दिखता है, चाहे लेबल मानचित्र पर समाता हो या नहीं। यह इस ब्राउज़र की सेटिंग है, प्रोजेक्ट की नहीं।",
-                    "english": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -1359,7 +1481,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_hover_card_tip",
                     "value": "किसी नोड, लिंक या ग्राहक पर पॉइंटर रखें, तो सेटिंग्स में निर्दिष्ट उसका लेबल किसी भी स्केल पर दिखता है, चाहे लेबल मानचित्र पर समाता हो या नहीं। यह इस ब्राउज़र की सेटिंग है, प्रोजेक्ट की नहीं।",
-                    "english": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -1379,7 +1501,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_hover_card_tip",
                     "value": "किसी नोड, लिंक या ग्राहक पर पॉइंटर रखें, तो सेटिंग्स में निर्दिष्ट उसका लेबल किसी भी स्केल पर दिखता है, चाहे लेबल मानचित्र पर समाता हो या नहीं। यह इस ब्राउज़र की सेटिंग है, प्रोजेक्ट की नहीं।",
-                    "english": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -1399,7 +1521,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_hover_card_tip",
                     "value": "किसी नोड, लिंक या ग्राहक पर पॉइंटर रखें, तो सेटिंग्स में निर्दिष्ट उसका लेबल किसी भी स्केल पर दिखता है, चाहे लेबल मानचित्र पर समाता हो या नहीं। यह इस ब्राउज़र की सेटिंग है, प्रोजेक्ट की नहीं।",
-                    "english": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -1415,7 +1537,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_hover_card_tip",
                     "value": "किसी नोड, लिंक या ग्राहक पर पॉइंटर रखें, तो सेटिंग्स में निर्दिष्ट उसका लेबल किसी भी स्केल पर दिखता है, चाहे लेबल मानचित्र पर समाता हो या नहीं। यह इस ब्राउज़र की सेटिंग है, प्रोजेक्ट की नहीं।",
-                    "english": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -1431,7 +1553,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_hover_card_tip",
                     "value": "किसी नोड, लिंक या ग्राहक पर पॉइंटर रखें, तो सेटिंग्स में निर्दिष्ट उसका लेबल किसी भी स्केल पर दिखता है, चाहे लेबल मानचित्र पर समाता हो या नहीं। यह इस ब्राउज़र की सेटिंग है, प्रोजेक्ट की नहीं।",
-                    "english": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -3771,6 +3893,43 @@
                     "key": "lpn_scenario_preset_flow_static",
                     "value": "1. प्रवाह परीक्षण: स्थिर",
                     "english": "1. Flow test: Static"
+                }
+            }
+        },
+        "lpn_settings_engine_native_tip": {
+            "reason": "english_changed",
+            "current_value": "जहाँ संभव हो वहाँ बिल्ट-इन सॉल्वर उपयोग करने के लिए इसे चालू करें। अन्यथा, US EPA का EPANET सॉल्वर हमेशा उपयोग किया जाता है। बिल्ट-इन सॉल्वर विस्तारित अवधि सिमुलेशन या सक्रिय PRV, PSV, या FCV के लिए उपयोग नहीं किया जाता। EPANET सॉल्वर पहली बार उपयोग होने पर लगभग 650 KB डाउनलोड होता है और फिर इस डिवाइस पर रखा जाता है। जहाँ किसी पाइप में स्थानीय (लघु) हानि होती है, वहाँ दोनों सॉल्वर अंतिम अंकों में असहमत होते हैं: EPANET गुरुत्वाकर्षण के लिए उपयोग किए जाने वाले मान को पूर्णांकित करता है, इसलिए इसकी स्थानीय हानियाँ सटीक रूप से बहुत थोड़ी कम आती हैं।",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_engine_native",
+                    "value": "जहाँ संभव हो बिल्ट-इन सॉल्वर उपयोग करें",
+                    "english": "Use the built-in solver when possible"
+                },
+                "next_translated": {
+                    "key": "lpn_engine_loading",
+                    "value": "EPANET सॉल्वर लोड हो रहा है…",
+                    "english": "Loading the EPANET solver…"
+                }
+            },
+            "label": {
+                "key": "lpn_settings_engine_native",
+                "english": "Use the built-in solver when possible",
+                "value": "जहाँ संभव हो बिल्ट-इन सॉल्वर उपयोग करें"
+            }
+        },
+        "lpn_engine_valve_route": {
+            "reason": "english_changed",
+            "current_value": "EPANET सॉल्वर से हल किया गया, क्योंकि ये दाब और प्रवाह नियंत्रण वाल्व हैं:",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_failed_why",
+                    "value": "{reason} इसके बजाय बिल्ट-इन सॉल्वर दिखाया जा रहा है।",
+                    "english": "{reason} Showing the built-in solver instead."
+                },
+                "next_translated": {
+                    "key": "lpn_unit_unknown",
+                    "value": "इस ड्राइंग में ऐसी इकाई बताई गई है जिसे यह पृष्ठ समर्थित नहीं करता: {unit}। सभी मान जैसे आयात हुए वैसे ही रखे और दिखाए गए हैं, और कुछ नहीं बदला गया। इकाई समर्थित होने तक कुछ भी परिकलित नहीं किया जा सकता, क्योंकि उसका रूपांतरण गुणक अज्ञात है।",
+                    "english": "This drawing states a unit this page does not support: {unit}. All values are kept and displayed exactly as imported, and nothing was changed. Nothing can be computed until the unit is supported, because its conversion factor is unknown."
                 }
             }
         },

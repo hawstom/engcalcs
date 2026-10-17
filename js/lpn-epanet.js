@@ -7,11 +7,10 @@
 // interop we would otherwise hand-write.
 //
 // VALVES ARE THE FIRST FEATURE THIS PAGE HAS THAT THE ENGINE TOGGLE DOES NOT MERELY ACCELERATE.
-// A throttle valve (TCV) is a minor loss and solves in either engine. A PRV, PSV or FCV switches
-// its own state during the solve, and that is numerics we deliberately did not write a second
-// copy of -- so a network containing one is SOLVED HERE whatever the user's engine preference
-// says, and js/lpn-solver.js refuses it by name if this module cannot be reached. See the note
-// on EngCalcs.lpnValveIsNative there for the reasoning and the measurement behind it.
+// A throttle valve (TCV) is a minor loss and solves in either engine, and since Task 733 so do a
+// PRV, a PSV and an FCV: js/lpn-solver.js switches their state by EPANET's own rules. A PBV or a
+// GPV is still SOLVED HERE whatever the user's engine preference says, and js/lpn-solver.js
+// refuses it by name if this module cannot be reached. See EngCalcs.lpnValveIsNative there.
 //
 // THIS MODULE IS THE DEFAULT SOLVER (Task 605, Tom 2026-09-06: *"'Always use the EPANET solver'
 // is the page default."*). It used to be the opt-in, and the reason was never speed -- EPANET is
@@ -78,6 +77,7 @@
 		// Link properties a VALVE needs and a pipe does not. EN_DIAMETER is shared with a pipe
 		// but reached separately here, because setPipeData() is not valid on a valve index.
 		EN_DIAMETER = 0,
+		EN_MINORLOSS = 3,
 		EN_INITSETTING = 5,
 		// **WHAT A PUMP IS COSTING AT THIS INSTANT** (ROADMAP Task 566; dev/pump-energy.md).
 		// EN_ENERGY is the pump's power in KILOWATTS at the moment the hydraulic clock is standing
@@ -1310,8 +1310,8 @@
 			// gaining or losing its curve is a topology change even though nothing moved.
 			// VALVE TYPE IS IN THE SIGNATURE, and it has to be. The setting of a PRV is a
 			// pressure and the setting of an FCV is a flow, so retyping a valve changes what the
-			// number beside it MEANS -- and, because lpnValveIsNative() sends the active types to
-			// a different engine entirely, it can change which engine is answering. Pushing a new
+			// number beside it MEANS -- and, because lpnValveIsNative() sends a PBV or GPV to a
+			// different engine entirely, it can change which engine is answering. Pushing a new
 			// type through a setter is not possible anyway: EPANET fixes a link's type when the
 			// file is read.
 			parts.push('l' + l.id + '\u0001' + l.type + '\u0001' + l.from + '\u0001' + l.to +
@@ -1538,6 +1538,14 @@
 				//
 				// Diameter is still pushed: it is a geometric property, not a control.
 				p.setLinkValue(idx, EN_DIAMETER, l.diameter * 1000);
+				// **AND ITS MINOR LOSS, AFTER THE DIAMETER** (Task 733): a PRV/PSV/FCV/PBV applies it
+				// whenever it is not holding its setting, and without this line a warm session kept
+				// the loss of the first network it read -- found by native-valve-harness.js as
+				// exactly one k V^2/2g on an open PRV. After, because EN_DIAMETER rescales the stored
+				// loss by the diameter ratio and EN_MINORLOSS converts with the current diameter. A
+				// TCV is written 0, as [VALVES] writes it: EPANET ignores the column for one.
+				p.setLinkValue(idx, EN_MINORLOSS,
+					String(l.valveType || 'TCV').toUpperCase() === 'TCV' ? 0 : (l.k || 0));
 				if (String(l.valveType || 'TCV').toUpperCase() === 'GPV') { continue; }
 				p.setLinkValue(idx, EN_INITSTATUS, l.status === 'closed' ? 0 : 1);
 				if (l.status !== 'closed') {

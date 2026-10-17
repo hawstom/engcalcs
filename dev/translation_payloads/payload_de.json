@@ -2,8 +2,8 @@
     "meta": {
         "language": "de",
         "expected_key_count": 2879,
-        "delta_key_count": 268,
-        "english_changed_key_count": 7,
+        "delta_key_count": 276,
+        "english_changed_key_count": 15,
         "exempt_key_count": 55,
         "exempt_keys": [
             "calc_units_us",
@@ -83,7 +83,7 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: Durchfluss\n- little outlet, dripper, or nozzle that lets water out slowly\n    English: emitter\n    Your language: Tropfer\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: Strecke\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: Einzelverlust\n- calculator, tool, or program that finds and tells mathematical answers\n    English: calculator\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: Entnahme\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Druck\n- elevation, height, or level of a point\n    English: elevation (z)\n    Your language: Höhe\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: Entnahmeknoten\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: Reservoir\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: Knoten\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: Verbindung\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: Standard\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: Tank\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: Ventil\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: Individuelle Werte\n- time-step by time-step multipliers or factors for water use\n    English: demand pattern\n    Your language: (no preferred translation yet: use your language's standard term)\n- leave a value off the map when there is no room or space\n    English: drop (a label)\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the water in the tank is, its water level or depth\n    English: tank level\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: Kunde\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: Figur\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: Durchfluss\n- little outlet, dripper, or nozzle that lets water out slowly\n    English: emitter\n    Your language: Tropfer\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: Strecke\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: Einzelverlust\n- calculator, tool, or program that finds and tells mathematical answers\n    English: calculator\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: Entnahme\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Druck\n- elevation, height, or level of a point\n    English: elevation (z)\n    Your language: Höhe\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: Entnahmeknoten\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: Reservoir\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: Knoten\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: Verbindung\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: Standard\n- solver or the part that works out the answer\n    English: solver\n    Your language: Löser\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: Tank\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: Ventil\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: Individuelle Werte\n- time-step by time-step multipliers or factors for water use\n    English: demand pattern\n    Your language: (no preferred translation yet: use your language's standard term)\n- leave a value off the map when there is no room or space\n    English: drop (a label)\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the water in the tank is, its water level or depth\n    English: tank level\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: Kunde\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: Figur\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
         "mtc_n_pi": "n from design rock size (P&I, Phillips & Ingersoll method)",
         "mtc_iteration_tip": "Choose a roughness option (B\/B, Blodgett–Bathurst, recommended) and a rock size option (Isbash recommended) to auto-iterate toward a uniform rock size for your target flow. See Notes below for the full method, or enter your own roughness value (follow link for guidance) and ignore rock size to skip iteration.",
@@ -126,6 +126,12 @@
         "lpn_paste_skip_valve": "Not pasted: {n} (the valve types differ).",
         "lpn_inp_export_flat_customers_inactive": "{n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.",
         "lpn_inp_export_flat_inactive_controls": "These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}",
+        "lpn_engine_ready_valve": "The EPANET solver is now stored on this device. Pressure breaker and general purpose valves (PBV, GPV) can now be solved offline.",
+        "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve pressure breaker and general purpose valves (PBV, GPV). After one connection to the internet, the solver is stored on this device.",
+        "lpn_engine_unavailable_why": "Pressure breaker and general purpose valves (PBV, GPV) cannot be solved without the EPANET solver. {reason}",
+        "lpn_diag_valve_needs_epanet": "These are pressure breaker or general purpose valves, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:",
+        "lpn_settings_hover_card": "Show all properties on hover",
+        "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
         "lpn_settings_override_marks": "Show override markers on the map",
         "lpn_settings_override_marks_tip": "Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.",
         "lpn_clean_map": "Clean map",
@@ -275,6 +281,8 @@
         "lpn_alt_cat_topology_tip": "Asset activation",
         "lpn_alt_cat_presentation": "Presentation",
         "lpn_alt_cat_calculation": "Calculation",
+        "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations or pressure breaker and general purpose valves (PBV, GPV). The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+        "lpn_engine_valve_route": "Solved with the EPANET solver, because of these pressure breaker and general purpose valves:",
         "lpn_time_run_cut_off": "EPANET had closed {link} and then could not solve for {nodes}.",
         "lpn_time_run_cut_off_full": "Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.",
         "lpn_time_run_cut_off_empty": "Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.",
@@ -396,6 +404,12 @@
         "lpn_paste_skip_valve": "Not pasted: {n} (the valve types differ).",
         "lpn_inp_export_flat_customers_inactive": "{n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.",
         "lpn_inp_export_flat_inactive_controls": "These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}",
+        "lpn_engine_ready_valve": "The EPANET solver is now stored on this device. Pressure breaker and general purpose valves (PBV, GPV) can now be solved offline.",
+        "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve pressure breaker and general purpose valves (PBV, GPV). After one connection to the internet, the solver is stored on this device.",
+        "lpn_engine_unavailable_why": "Pressure breaker and general purpose valves (PBV, GPV) cannot be solved without the EPANET solver. {reason}",
+        "lpn_diag_valve_needs_epanet": "These are pressure breaker or general purpose valves, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:",
+        "lpn_settings_hover_card": "Show all properties on hover",
+        "lpn_settings_hover_card_tip": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
         "lpn_settings_override_marks": "Show override markers on the map",
         "lpn_settings_override_marks_tip": "Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.",
         "lpn_clean_map": "Clean map",
@@ -545,6 +559,8 @@
         "lpn_alt_cat_topology_tip": "Asset activation",
         "lpn_alt_cat_presentation": "Presentation",
         "lpn_alt_cat_calculation": "Calculation",
+        "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations or pressure breaker and general purpose valves (PBV, GPV). The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+        "lpn_engine_valve_route": "Solved with the EPANET solver, because of these pressure breaker and general purpose valves:",
         "lpn_time_run_cut_off": "EPANET had closed {link} and then could not solve for {nodes}.",
         "lpn_time_run_cut_off_full": "Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.",
         "lpn_time_run_cut_off_empty": "Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.",
@@ -1289,6 +1305,112 @@
                 }
             }
         },
+        "lpn_engine_ready_valve": {
+            "reason": "english_changed",
+            "current_value": "Der EPANET-Löser ist jetzt auf diesem Gerät gespeichert. Druck- und Durchflussregelventile (PRV, PSV, FCV) können nun offline berechnet werden.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_fetching_valve",
+                    "value": "Der EPANET-Löser wird heruntergeladen, damit dieses Ventil jetzt und später offline berechnet werden kann.",
+                    "english": "Downloading the EPANET solver, so this valve can be solved now and offline later."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "Der EPANET-Löser, der zur Berechnung von Druck- und Durchflussregelventilen (PRV, PSV, FCV) erforderlich ist, konnte nicht heruntergeladen werden. Nach einer einmaligen Internetverbindung ist der Löser auf diesem Gerät gespeichert.",
+                    "english": "Could not download the EPANET solver, which is required to solve pressure breaker and general purpose valves (PBV, GPV). After one connection to the internet, the solver is stored on this device."
+                }
+            }
+        },
+        "lpn_engine_unavailable": {
+            "reason": "english_changed",
+            "current_value": "Der EPANET-Löser, der zur Berechnung von Druck- und Durchflussregelventilen (PRV, PSV, FCV) erforderlich ist, konnte nicht heruntergeladen werden. Nach einer einmaligen Internetverbindung ist der Löser auf diesem Gerät gespeichert.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_ready_valve",
+                    "value": "Der EPANET-Löser ist jetzt auf diesem Gerät gespeichert. Druck- und Durchflussregelventile (PRV, PSV, FCV) können nun offline berechnet werden.",
+                    "english": "The EPANET solver is now stored on this device. Pressure breaker and general purpose valves (PBV, GPV) can now be solved offline."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_unavailable_why",
+                    "value": "Druck- und Durchflussregelventile (PRV, PSV, FCV) können ohne den EPANET-Löser nicht berechnet werden. {reason}",
+                    "english": "Pressure breaker and general purpose valves (PBV, GPV) cannot be solved without the EPANET solver. {reason}"
+                }
+            }
+        },
+        "lpn_engine_unavailable_why": {
+            "reason": "english_changed",
+            "current_value": "Druck- und Durchflussregelventile (PRV, PSV, FCV) können ohne den EPANET-Löser nicht berechnet werden. {reason}",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "Der EPANET-Löser, der zur Berechnung von Druck- und Durchflussregelventilen (PRV, PSV, FCV) erforderlich ist, konnte nicht heruntergeladen werden. Nach einer einmaligen Internetverbindung ist der Löser auf diesem Gerät gespeichert.",
+                    "english": "Could not download the EPANET solver, which is required to solve pressure breaker and general purpose valves (PBV, GPV). After one connection to the internet, the solver is stored on this device."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "EPANET-Löser wird geladen, während Sie bauen. Ergebnisse stehen zur Verfügung, sobald das Laden abgeschlossen ist.",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                }
+            }
+        },
+        "lpn_diag_valve_needs_epanet": {
+            "reason": "english_changed",
+            "current_value": "Diese Druck- oder Durchflussregelventile (PRV, PSV, FCV) kann nur der EPANET-Löser berechnen. Der EPANET-Löser konnte nicht geladen werden, daher fehlen diese Ergebnisse:",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_needed_failed_why",
+                    "value": "Dieses Netz kann nur vom EPANET-Löser berechnet werden. {reason}",
+                    "english": "This network can only be solved by the EPANET solver. {reason}"
+                },
+                "next_translated": {
+                    "key": "lpn_diag_valve_on_fixed_head",
+                    "value": "Diese Ventile sind direkt an ein Reservoir oder einen Tank angeschlossen, wodurch die Druckhöhe an diesem Knoten festliegt; das Ventil hat daher nichts zu regeln. Setzen Sie ein kurzes Rohr zwischen das Ventil und das Reservoir oder den Tank:",
+                    "english": "These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:"
+                }
+            }
+        },
+        "lpn_settings_hover_card": {
+            "reason": "english_changed",
+            "current_value": "Vollständige Beschriftung beim Überfahren anzeigen",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_area_hint_tip",
+                    "value": "Die Eingabeaufforderung über der Karte anzeigen, die den nächsten Schritt angibt, während ein Bereich ausgewählt wird.",
+                    "english": "Show the prompt over the map that gives the next step while you are selecting an area."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_hover_card_tip",
+                    "value": "Den Zeiger auf einem Knoten, einer Verbindung oder einem Kunden ruhen lassen, um seine Beschriftung gemäß den Einstellungen in jedem Maßstab zu sehen, unabhängig davon, ob die Beschriftung auf die Karte passt. Dies ist eine Einstellung für diesen Browser, nicht für das Projekt.",
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                }
+            },
+            "tip": {
+                "key": "lpn_settings_hover_card_tip",
+                "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
+                "value": "Den Zeiger auf einem Knoten, einer Verbindung oder einem Kunden ruhen lassen, um seine Beschriftung gemäß den Einstellungen in jedem Maßstab zu sehen, unabhängig davon, ob die Beschriftung auf die Karte passt. Dies ist eine Einstellung für diesen Browser, nicht für das Projekt."
+            }
+        },
+        "lpn_settings_hover_card_tip": {
+            "reason": "english_changed",
+            "current_value": "Den Zeiger auf einem Knoten, einer Verbindung oder einem Kunden ruhen lassen, um seine Beschriftung gemäß den Einstellungen in jedem Maßstab zu sehen, unabhängig davon, ob die Beschriftung auf die Karte passt. Dies ist eine Einstellung für diesen Browser, nicht für das Projekt.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_hover_card",
+                    "value": "Vollständige Beschriftung beim Überfahren anzeigen",
+                    "english": "Show all properties on hover"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "ID-Präfixe",
+                    "english": "ID prefixes"
+                }
+            },
+            "label": {
+                "key": "lpn_settings_hover_card",
+                "english": "Show all properties on hover",
+                "value": "Vollständige Beschriftung beim Überfahren anzeigen"
+            }
+        },
         "lpn_settings_override_marks": {
             "reason": "missing",
             "current_value": null,
@@ -1296,7 +1418,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_hover_card_tip",
                     "value": "Den Zeiger auf einem Knoten, einer Verbindung oder einem Kunden ruhen lassen, um seine Beschriftung gemäß den Einstellungen in jedem Maßstab zu sehen, unabhängig davon, ob die Beschriftung auf die Karte passt. Dies ist eine Einstellung für diesen Browser, nicht für das Projekt.",
-                    "english": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -1316,7 +1438,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_hover_card_tip",
                     "value": "Den Zeiger auf einem Knoten, einer Verbindung oder einem Kunden ruhen lassen, um seine Beschriftung gemäß den Einstellungen in jedem Maßstab zu sehen, unabhängig davon, ob die Beschriftung auf die Karte passt. Dies ist eine Einstellung für diesen Browser, nicht für das Projekt.",
-                    "english": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -1336,7 +1458,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_hover_card_tip",
                     "value": "Den Zeiger auf einem Knoten, einer Verbindung oder einem Kunden ruhen lassen, um seine Beschriftung gemäß den Einstellungen in jedem Maßstab zu sehen, unabhängig davon, ob die Beschriftung auf die Karte passt. Dies ist eine Einstellung für diesen Browser, nicht für das Projekt.",
-                    "english": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -1356,7 +1478,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_hover_card_tip",
                     "value": "Den Zeiger auf einem Knoten, einer Verbindung oder einem Kunden ruhen lassen, um seine Beschriftung gemäß den Einstellungen in jedem Maßstab zu sehen, unabhängig davon, ob die Beschriftung auf die Karte passt. Dies ist eine Einstellung für diesen Browser, nicht für das Projekt.",
-                    "english": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -1376,7 +1498,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_hover_card_tip",
                     "value": "Den Zeiger auf einem Knoten, einer Verbindung oder einem Kunden ruhen lassen, um seine Beschriftung gemäß den Einstellungen in jedem Maßstab zu sehen, unabhängig davon, ob die Beschriftung auf die Karte passt. Dies ist eine Einstellung für diesen Browser, nicht für das Projekt.",
-                    "english": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -1396,7 +1518,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_hover_card_tip",
                     "value": "Den Zeiger auf einem Knoten, einer Verbindung oder einem Kunden ruhen lassen, um seine Beschriftung gemäß den Einstellungen in jedem Maßstab zu sehen, unabhängig davon, ob die Beschriftung auf die Karte passt. Dies ist eine Einstellung für diesen Browser, nicht für das Projekt.",
-                    "english": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -1416,7 +1538,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_hover_card_tip",
                     "value": "Den Zeiger auf einem Knoten, einer Verbindung oder einem Kunden ruhen lassen, um seine Beschriftung gemäß den Einstellungen in jedem Maßstab zu sehen, unabhängig davon, ob die Beschriftung auf die Karte passt. Dies ist eine Einstellung für diesen Browser, nicht für das Projekt.",
-                    "english": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -1432,7 +1554,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_hover_card_tip",
                     "value": "Den Zeiger auf einem Knoten, einer Verbindung oder einem Kunden ruhen lassen, um seine Beschriftung gemäß den Einstellungen in jedem Maßstab zu sehen, unabhängig davon, ob die Beschriftung auf die Karte passt. Dies ist eine Einstellung für diesen Browser, nicht für das Projekt.",
-                    "english": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -1448,7 +1570,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_hover_card_tip",
                     "value": "Den Zeiger auf einem Knoten, einer Verbindung oder einem Kunden ruhen lassen, um seine Beschriftung gemäß den Einstellungen in jedem Maßstab zu sehen, unabhängig davon, ob die Beschriftung auf die Karte passt. Dies ist eine Einstellung für diesen Browser, nicht für das Projekt.",
-                    "english": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
+                    "english": "Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project."
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -3788,6 +3910,43 @@
                     "key": "lpn_scenario_preset_flow_static",
                     "value": "1. Durchflusstest: Statisch",
                     "english": "1. Flow test: Static"
+                }
+            }
+        },
+        "lpn_settings_engine_native_tip": {
+            "reason": "english_changed",
+            "current_value": "Auswählen, um wo möglich den eingebauten Löser zu verwenden. Andernfalls wird immer der EPANET-Löser der US-Umweltbehörde EPA verwendet. Der eingebaute Löser wird nicht für Simulationen mit erweitertem Zeitraum oder für aktive PRV, PSV oder FCV verwendet. Bei der ersten Verwendung des EPANET-Lösers werden etwa 650 KB heruntergeladen und danach auf diesem Gerät gespeichert. Bei einem Rohr mit Einzelverlust (örtlichem Verlust) unterscheiden sich die beiden Löser in den letzten Stellen: EPANET verwendet einen gerundeten Wert der Erdbeschleunigung, sodass seine Einzelverluste geringfügig niedriger sind als bei der exakten Form.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_engine_native",
+                    "value": "Wo möglich den eingebauten Löser verwenden",
+                    "english": "Use the built-in solver when possible"
+                },
+                "next_translated": {
+                    "key": "lpn_engine_loading",
+                    "value": "Der EPANET-Löser wird geladen…",
+                    "english": "Loading the EPANET solver…"
+                }
+            },
+            "label": {
+                "key": "lpn_settings_engine_native",
+                "english": "Use the built-in solver when possible",
+                "value": "Wo möglich den eingebauten Löser verwenden"
+            }
+        },
+        "lpn_engine_valve_route": {
+            "reason": "english_changed",
+            "current_value": "Mit dem EPANET-Löser berechnet, wegen dieser Druck- und Durchflussregelventile:",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_failed_why",
+                    "value": "{reason} Es werden stattdessen die Ergebnisse des eingebauten Lösers angezeigt.",
+                    "english": "{reason} Showing the built-in solver instead."
+                },
+                "next_translated": {
+                    "key": "lpn_unit_unknown",
+                    "value": "Diese Zeichnung gibt eine Einheit an, die diese Seite nicht unterstützt: {unit}. Alle Werte werden genau so beibehalten und angezeigt, wie sie importiert wurden, und nichts wurde geändert. Solange die Einheit nicht unterstützt wird, kann nichts berechnet werden, weil ihr Umrechnungsfaktor unbekannt ist.",
+                    "english": "This drawing states a unit this page does not support: {unit}. All values are kept and displayed exactly as imported, and nothing was changed. Nothing can be computed until the unit is supported, because its conversion factor is unknown."
                 }
             }
         },

@@ -4484,3 +4484,19 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: lpn_theme set by Light/Dark, absent for System; no project key mentions theme/dark; Start fresh removes it and reloads as System; reload keeps Dark; no white flash (CSS and script held 2.5-4 s, paint is dark); calculator page Hazen-Williams under dark OS stays light, no data-theme.
 - OBSERVED: focus ring on Play/step transport buttons is the browser default (dark on grey); time step/speed selects show no ring.
 - NOT CHECKED: import report (open of crafted .inp did not complete in my driver), scenario manager box, EPANET run-report dialog.
+
+## 2026-10-16 feat/hover-props @ 9cb2d1f8f (Task 773, hover card shows all properties) (Perry)
+- OBSERVED (real Chromium; Net1, Net1-SI, Elm Street, Net3-World, with injected tag/desc/custom property/valve/customer): builder harness 59/59 passes. Card equals the map label's composers with every box ticked, so it is the LABEL's field list, not the Properties box's.
+- OBSERVED: DEFECT (against "all of its properties"). Never on the card though in Properties: custom properties (Route RT0 on J2), X/Y or lat/lon, From/To, Closed, Is active, valve TYPE and SETTING (PRV 45 psi not shown), pump curve/speed/price/efficiency, pipe type, fittings list, emitter coefficient, required fire flow, tank min/max level, diameter, mixing, volume, head pattern, customer demand pattern and custom properties.
+- OBSERVED: DEFECT. 8-line Description wraps at ~270px, card 533px tall; at viewport 520px tall it runs off the bottom (and top); at 390x740 phone width with 8 lines it sat 245px above the top of the screen. 3-line description fits both.
+- OBSERVED: values with no Settings prefix print bare ("1609.3", "350", "Open" twice, "0.5 mg/L"); card cannot say which is length or diameter.
+- OBSERVED: RTL (ar): card text-align is hard-coded left; unit marks flip ('5280, "14, "mg/L 0.5, .Init). Not compared with the map label.
+- OBSERVED: no long tasks over 25 Net3 assets; ~500 ms rest delay is by design. Spanish/Arabic Settings row still carry the old wording (payloads not regenerated; expected).
+- NOT CHECKED: harness mutation (does it fail on the pre-change code); dark theme; touch.
+
+## 2026-10-16 feat/hover-props re-review @ eda6e7172 (Perry)
+- OBSERVED (real Chromium, Net1 with injected tag/desc/custom property/PRV/customer, plus Net3, Net2, Elm Street): findings 1-4 are fixed. Card now carries the Properties rows in Properties' order and names (ID, X/Y, Description, Tag, Pipe type, Diameter, Length, Valve type, Pressure setting, From/To, Closed, custom Route, Is active, results). Empty fields are left out (Required fire flow, Emitter coefficient, Source quality, Price of power, reservoir Elevation); values use label decimals where a label field matches (Elevation 710.00, Pressure 119.13) else the raw number (Length 5280 where Properties shows 5280.00; Pump head curve "1" where Properties says "No curve chosen 1").
+- OBSERVED: never off-screen at 1280x520 and 390x740/390x500 with 12-line Descriptions on node and pipe (Description cut to 8 lines with an ellipsis; two columns at 520 high). Card cost 3 ms per rest (10 ms first) on Net3, Net2, Elm, Net3-World; no long tasks. Hovering while Properties is open with an uncommitted typed value leaves value, focus and box untouched.
+- OBSERVED: ar: dir rtl, right-aligned, colon on the correct side; "Chlorine" and custom-property names stay Latin; no Arabic font here so glyphs are boxes (not checked visually).
+- OBSERVED leftovers: "Closed: —" for an open pipe, "Is active?: ✓", "No pipe type chosen", "No fittings list chosen", "No pattern", "Demand pattern: (default: 1)"; extra Description lines print as unlabelled rows.
+- NOT CHECKED: harness mutation, dark theme, touch, ✓ glyph in the card (boxes in this headless font).

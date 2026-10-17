@@ -328,7 +328,7 @@ the block.
   **PROMOTED TO 75 by Tom, 2026-10-14.**
   Tom, 2026-09-25, on WaterCAD's background layers: *"This seems like a GIS REST server offering."*
   A fifth third-party service is a new paragraph in `privacy.php` (CLAUDE.md).
-- 75|733| **Grow the native solver, in phases, to everything EPANET's solves.** Tom, 2026-09-26
+- 75|733| **Grow the native solver, in phases, to everything EPANET's solves.** **PHASE 1 MERGED 2026-10-17** (`feat/native-valves`): PRV, PSV, FCV solve natively, matching EPANET 2.3.5 within 0.8 mm head (`native-valve-harness.js`); PBV and GPV still route to EPANET. Next: PBV/GPV, then EPS. Tom, 2026-09-26
   **PROMOTED TO 75 by Tom, 2026-10-14.**
   (R-325): *"it would be fun and maybe wise ... to gradually, in phases, build out our native solver
   to do everything that the EPANET solver does. This way the math is less of a black box for us."*
