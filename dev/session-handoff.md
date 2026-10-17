@@ -114,15 +114,17 @@ on the asset itself; native-valves: Task 733 phase 1, PRV/PSV/FCV solve natively
 EPANET, PBV/GPV still route to EPANET; CLAUDE.md rule updated), feat/guide-scenarios (Task 785: every
 Guide chapter rewritten to the code, 146 new English strings, "Example on Net1", no "you").
 Deleted keys: `lpn_scenario_push_*` (6), `lpn_scenario_preset_fire_max_day`, `_tip`, `lpn_sm_copy_base_tip`.
-Storage told to him: `lpn_theme`, `lpn_cleanmap`, `lpn_ovrmarks`, `lpn_smbox` widths; NOT yet told:
-`lpn_paneboxes` (option branch only).
+Storage told to him: `lpn_theme`, `lpn_cleanmap`, `lpn_ovrmarks`, `lpn_smbox` widths, `lpn_paneboxes`.
+
+10-17 day: option/pane-boxes merged on his word (Task 799). Fixes: the app page no longer loads the
+parent `/hawsedc.css` (it painted dark mode's chrome light on hawsedc.com; worktree previews never load
+it); the corner basemap button in a scenario now writes the scenario (a press for Base's style was
+dropped). Features list gained customers (247) and custom properties (636); both landing sites now
+build features.html from it, use American spelling, and match apart from EPANET++'s deliberate lines.
 
 ### Branches awaiting him
 
-- **option/pane-boxes** (8115, Task 799): Tables and Graphs as dockable boxes; right-click a pane tab >
-  "Open in a box". New key `lpn_paneboxes`. Perry's three findings were being fixed at handoff (Profile
-  path choosing in a box, a new box covering the tab strip, Ctrl+Shift+PageUp/Down). He tries it before
-  any merge.
+- None besides the label-placer bench branches listed at the top.
 
 ### Questions out to him
 
@@ -133,7 +135,7 @@ Storage told to him: `lpn_theme`, `lpn_cleanmap`, `lpn_ovrmarks`, `lpn_smbox` wi
 
 ### Next job
 
-His deploy; his pass on option/pane-boxes; then a translation sprint on his word (Task 809 rides it).
+His deploy; then a translation sprint on his word (Task 809 rides it).
 Guide leftovers: `lpn_guide_text_notes_popup` renders nowhere (delete candidate); `lpn_guide_boxes_autohide`
 and `lpn_hotkeys_menu_def` say "you" but are his ruled text.
 

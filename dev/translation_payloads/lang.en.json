@@ -1150,6 +1150,7 @@
         "lpn_pane_tab_pumps": "Pumps",
         "lpn_pane_tab_valves": "Valves",
         "lpn_pane_tab_tip": "Edit assets as a spreadsheet-like table. Result columns cannot be edited. See Help, Notes for keyboard shortcuts.",
+        "lpn_pane_popout": "Open in a box",
         "lpn_pane_none": "This network has none of these yet.",
         "lpn_pane_text_attached": "Attached",
         "lpn_pane_not_used": "Not used",
@@ -3027,7 +3028,7 @@
         "lpn_snip_tip_copy": "Copy (Ctrl+C)",
         "lpn_screenshot_scale_tip": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
     },
-    "count": 3025,
+    "count": 3026,
     "active_prefixes": [
         "about",
         "bpn",
