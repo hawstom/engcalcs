@@ -1002,7 +1002,7 @@ $ec_lang['lpn_guide_text_status_box']='Lists, in time order, each change during 
 $ec_lang['lpn_guide_text_full_box']='Lists every node and every link at every reporting time step, in the units shown on the Tables pane. Without an extended period simulation, it shows the current solution at a single instant. Download or print carries every time step, and the table shows one at a time.';
 $ec_lang['lpn_guide_text_calib_box']='Compares a file of field measurements with the calculated results at the same locations and times, one file for each parameter. The file is held for the current session only and is not saved with the project.';
 $ec_lang['lpn_guide_text_notes_popup']='Lists notes on how this page behaves and what it does not do, each as a term followed by its definition. It does not change the network.';
-$ec_lang['lpn_guide_text_hotkeys_popup']='Lists every toolbar button and menu row, the keyboard shortcuts, and an entry for each box. Choosing a row shows where that control is; it never runs it. To search, press Ctrl+K from anywhere or / while the user manual has focus.';
+$ec_lang['lpn_guide_text_hotkeys_popup']='The user manual. Its sections are Using the user manual, Toolbar, Menus, Map, Screenshot, Tables, Boxes, About this calculator, and Notes on this page. Toolbar and Menus list every toolbar button and menu row with its keyboard shortcut, Boxes has an entry for each box, and the other sections state what the page does. Choosing a row shows where that control is; it never runs it. Press Ctrl+K to search, except while a question is open, or / while the user manual has focus.';
 // The Find and replace chapter beyond its opening paragraphs, in the Guide's Boxes section
 // (Tom, 2026-10-07). Each _def is HTML: keep the tags. A query inside <code> runs as written in
 // English on a page in any language; translate it with the words the Find box shows in your
@@ -2685,6 +2685,9 @@ $ec_lang['lpn_notes_engine_def']='The EPANET solver on this page is OWA-EPANET 2
 // The Notes example (Task 785). Held by dev/lpn-spike/user-guide-notes-harness.js.
 $ec_lang['lpn_guide_nt_example_term']='Example on Net1: a pump past its curve';
 $ec_lang['lpn_guide_nt_example_def']='Open the Net1 example and choose Water, Libraries. Curve 1, Pump Curve for Pump 9, has one point, 1500 gpm at 250 ft. The head at zero flow is 333.3 ft and the highest flow is 3000 gpm. At 3500 gpm, which is past the end of the curve, the curve gives a head of −120.4 ft. The EPANET solver reports that same head, a loss of 120.4 ft across the pump, and warns that pumps cannot deliver enough flow or head.';
+// The user manual's own entry (Task 785). Held by dev/lpn-spike/user-guide-own-harness.js.
+$ec_lang['lpn_guide_own_example_term']='Example on Net1';
+$ec_lang['lpn_guide_own_example_def']='<p>Open the Net1 example, press Ctrl+K, and type critical. Menus shows the row Criticality analysis… under Water, Analyze. Boxes shows the entries that mention it, among them Find and replace, Fire flow analysis, and Criticality analysis, and this entry. Choosing the row shows where Criticality analysis… is in the Analyze menu, and does not run it.</p>';
 $ec_lang['lpn_id_invalid']='Enter an ID with no spaces and no quotation marks.';
 $ec_lang['lpn_id_taken']='That ID is already in use.';
 $ec_lang['lpn_diag_no_fixed_head']='Add a reservoir or a tank. The network needs at least one known water level before it can be solved.';
