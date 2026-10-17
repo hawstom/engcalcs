@@ -67,7 +67,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED English: 'Copy with column headings'
   @@ NEEDS RULING
 - **`lpn_settings_hover_card_tip`**
-  > Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
+  > Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
   *The finding:* 'at any scale, fit or not' leaves 'fit' with no subject: fit what? The setting makes the hover card show the label even when the on-map label was dropped for lack of room (js/looped-network.js:51225). 'fit' also collides with 'zoom to fit'.
   1. whether or not the label fits on the map at the current zoom
   2. whether or not the map is zoomed to fit the network
@@ -641,7 +641,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**62 still to read**, of 130 new keys across 21 unmerged branch(es).
+**62 still to read**, of 130 new keys across 22 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -652,7 +652,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### docs/features-update (`dff6096d8`) — adds no English strings
+### docs/features-update (`6ecfd181a`) — adds no English strings
 
 ### feat/basemap-outdoors (`5b8059020`) — already merged into docs/features-update; its strings are listed there
 
@@ -864,7 +864,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Importing {file}…
   _Ruled OK 2026-10-16._
 
-### feat/guide-scenarios (`8cd2429d3`) — 60 new, 60 to read @@ NEEDS RULING
+### feat/guide-scenarios (`2d8eea7d3`) — 60 new, 60 to read @@ NEEDS RULING
 
 - **`lpn_guide_cmp_cols_def`**
   > <table class="lpn-notes-table"><tbody><tr><td>Scenario</td><td>The name of the scenario. The open scenario is marked (currently open).</td></tr><tr><td>No. of overrides</td><td>The overrides of the scenario itself, counted as in the Scenarios list. A calculation option such as the demand multiplier counts as one, and an override equal to the inherited value counts.</td></tr><tr><td>Demand multiplier, Total run time, Hydraulic time step</td><td>The values the scenario was solved under, its own or those of the project. A steady scenario shows a dash for the time step.</td></tr><tr><td>Lowest pressure</td><td>The lowest pressure at a junction, with its ID and the time it occurs. Reservoirs and tanks are left out because each has a fixed head.</td></tr><tr><td>Highest velocity</td><td>The highest velocity in a pipe or valve, with its ID and the time it occurs. Pumps are left out.</td></tr></tbody></table>
@@ -1047,7 +1047,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Searching, links, and what is remembered
   @@ NEEDS RULING
 
-### feat/hover-props (`bd7ebccca`) — adds no English strings
+### feat/hover-props (`667111d61`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -1077,12 +1077,14 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/scenario-box (`d4d566a71`) — already merged into docs/features-update; its strings are listed there
 
+### feat/scenarios-menu (`09cddaf19`) — already merged into merge/1016e; its strings are listed there
+
 ### feat/theme-dark (`ced0c2db9`) — already merged into docs/features-update; its strings are listed there
 
 ### fix/elevation-override (`515322bc3`) — already merged into docs/features-update; its strings are listed there
 
-### fix/units-revert (`1653542a4`) — adds no English strings
+### fix/units-revert (`7c252bbcd`) — already merged into merge/1016e; its strings are listed there
 
 ### fix/zero-demand-solve (`fbfbc28b6`) — already merged into docs/features-update; its strings are listed there
 
-### merge/1016e (`fe4fd5f32`) — already merged into docs/features-update; its strings are listed there
+### merge/1016e (`14ad39485`) — adds no English strings
