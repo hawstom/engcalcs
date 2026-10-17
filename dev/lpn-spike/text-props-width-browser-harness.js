@@ -73,9 +73,9 @@ async function main() {
 		await a.settle(700);
 		const DESC = await a.lang('lpn_field_desc'), SIZE = await a.lang('lpn_field_text_size');
 		const m = () => P.evaluate(([d, z]) => {
-			const f = document.getElementById('lpn_popup_fields'), ta = f.querySelector('textarea');
+			const f = document.getElementById('lpn_popup_fields'), ta = f.querySelector('textarea:not(.lpn-desc-ta)');
 			const cs = getComputedStyle(f), inner = f.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-			const byLabel = (t) => Array.from(f.querySelectorAll('label')).filter((l) => l.textContent.trim().indexOf(t) === 0).map((l) => l.querySelector('input'))[0];
+			const byLabel = (t) => Array.from(f.querySelectorAll('label')).filter((l) => l.textContent.trim().indexOf(t) === 0).map((l) => l.querySelector('input, textarea'))[0];
 			const di = byLabel(d), si = byLabel(z);
 			return { open: !!ta && document.getElementById('lpn_popup').style.display !== 'none', inner: Math.round(inner),
 				ta: ta ? Math.round(ta.getBoundingClientRect().width) : null, resize: ta ? getComputedStyle(ta).resize : null,
@@ -126,9 +126,9 @@ async function main() {
 		await Q.touchscreen.tap(tc.x, tc.y);
 		await ph.settle(900);
 		const pm = () => Q.evaluate(([d, z]) => {
-			const f = document.getElementById('lpn_popup_fields'), ta = f.querySelector('textarea');
+			const f = document.getElementById('lpn_popup_fields'), ta = f.querySelector('textarea:not(.lpn-desc-ta)');
 			const cs = getComputedStyle(f), inner = f.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-			const byLabel = (t) => Array.from(f.querySelectorAll('label')).filter((l) => l.textContent.trim().indexOf(t) === 0).map((l) => l.querySelector('input'))[0];
+			const byLabel = (t) => Array.from(f.querySelectorAll('label')).filter((l) => l.textContent.trim().indexOf(t) === 0).map((l) => l.querySelector('input, textarea'))[0];
 			const si = byLabel(z);
 			return { open: !!ta && document.getElementById('lpn_popup').style.display !== 'none', inner: Math.round(inner),
 				box: Math.round(document.getElementById('lpn_popup').getBoundingClientRect().width),
