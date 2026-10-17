@@ -50891,6 +50891,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if ((group === 'node' ? ['junction', 'reservoir', 'tank'] : ['pipe', 'pump', 'valve']).indexOf(s) < 0) { return { ok: false, why: 'lpn_scnbook_why_choice' }; }
 			return { ok: true, v: s };
 		}
+		// A link's initial status is open or closed (EPANET's [STATUS]); the Tables pane shows it as a
+		// Closed box, so TRUE and FALSE are read as that box.
+		if (d && d.prop === 'status' && group === 'link') {
+			yn = scnBookYesNo(s);
+			v = yn === true ? 'closed' : yn === false ? 'open' : s.toLowerCase();
+			if (v !== 'open' && v !== 'closed') { return { ok: false, why: 'lpn_scnbook_why_choice' }; }
+			return { ok: true, v: v };
+		}
 		if (d && d.prop === 'valveType') {
 			if (SCNBOOK_VALVE_TYPES.indexOf(s.toUpperCase()) < 0) { return { ok: false, why: 'lpn_scnbook_why_choice' }; }
 			return { ok: true, v: s.toUpperCase() };
@@ -50909,9 +50917,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return { ok: true, v: +s };
 		}
 		if (d && d.col && d.col.choices && el && !d.col.lenient) {
-			ch = d.col.choices(el) || [];
-			if (!ch.some(function (o) { return o[0] === s; })) { return { ok: false, why: 'lpn_scnbook_why_choice' }; }
-			return { ok: true, v: s };
+			// A choice by its stored word, or by the word the page shows for it (Closed for closed).
+			ch = (d.col.choices(el) || []).filter(function (o) { return o[0] === s; }).concat((d.col.choices(el) || []).filter(function (o) {
+				return String(o[1]).trim().toLowerCase() === s.toLowerCase();
+			}));
+			if (!ch.length) { return { ok: false, why: 'lpn_scnbook_why_choice' }; }
+			return { ok: true, v: ch[0][0] };
 		}
 		if (typeof like === 'string' || (d && d.col && (d.col.str || d.col.choices))) { return { ok: true, v: raw }; }
 		return { ok: true, v: (s !== '' && isFinite(+s)) ? +s : raw };

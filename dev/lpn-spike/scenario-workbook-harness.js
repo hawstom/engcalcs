@@ -16,7 +16,8 @@
 //       not the workbook's are each listed with the reason; nothing of them is applied;
 //   W5  the tree from a workbook: a new scenario, a rename, a new alternative and a pick, applied;
 //   W6  a file from before 2026-10-12 (a scenario's own values in its own map): round trip clean,
-//       and an edit stores that alternative as the program does.
+//       and an edit stores that alternative as the program does;
+//   W7  a choice (a pipe's status) is read by its stored word; a word that is no choice is refused.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -333,6 +334,20 @@ function build(L) {
 		!!stored && stored.values['n:23'].demand === 260 && stored.values['n:22'].demand === 400 && !Object.keys(O.scenarioById(peak.id).overrides || {}).length, JSON.stringify(stored));
 	O.undo();
 	ok('W6.5 Undo gives the old file back', JSON.stringify(O.serializeProject()) === oldFile);
+
+	console.log('--- W7. a choice, by its word or the page\'s ---');
+	const book7 = clone(book0);
+	setCell(book7, 'initial', 'Fire', '10', 'status', 'open');
+	plan = L.bookPlan(book7);
+	ok('W7.1 closed to open: one change, to the stored word', plan.changes.length === 1 && plan.ops.vals.length === 1 && plan.ops.vals[0].v === 'open', what(plan) + JSON.stringify(plan.unusable));
+	setCell(book7, 'initial', 'Fire', '10', 'status', 'Shut');
+	plan = L.bookPlan(book7);
+	setCell(book7, 'initial', 'Fire', '10', 'status', 'FALSE');
+	plan = L.bookPlan(book7);
+	ok('W7.1b ...and FALSE in the Closed column is open too', plan.changes.length === 1 && plan.ops.vals[0].v === 'open', what(plan));
+	setCell(book7, 'initial', 'Fire', '10', 'status', 'Shut');
+	plan = L.bookPlan(book7);
+	ok('W7.2 a word that is no choice is refused, and said', plan.changes.length === 0 && plan.unusable.length === 1 && plan.unusable[0].why.endsWith(PC.lpn_scnbook_why_choice), JSON.stringify(plan.unusable) + what(plan));
 
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nALL PASS');
 	process.exit(fails ? 1 : 0);
