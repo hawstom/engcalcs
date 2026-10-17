@@ -39,6 +39,11 @@
             "ruled": "2026-10-05",
             "answer": "OK."
         },
+        "lpn_alt_cat_calculation": {
+            "on": "Calculation",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_alt_cat_constituent": {
             "on": "Constituent",
             "ruled": "2026-10-01",
@@ -69,6 +74,11 @@
             "ruled": "2026-10-01",
             "answer": "OK."
         },
+        "lpn_alt_cat_presentation": {
+            "on": "Presentation",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_alt_cat_text": {
             "on": "Text",
             "ruled": "2026-10-01",
@@ -78,6 +88,11 @@
             "on": "Asset activation",
             "ruled": "2026-10-01",
             "answer": "Edited."
+        },
+        "lpn_alt_cat_topology_tip": {
+            "on": "Asset activation",
+            "ruled": "2026-10-16",
+            "answer": "OK."
         },
         "lpn_alt_cat_userdata": {
             "on": "Custom properties",
@@ -424,15 +439,20 @@
             "ruled": "2026-10-08",
             "answer": "Calls page 8 October (round 2): Use proposed"
         },
+        "lpn_change_type_line_alternative": {
+            "on": "{id}: {property} {value}, in alternative {alternative}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_choice_default": {
             "on": "Default",
             "ruled": "2026-10-05",
             "answer": "OK."
         },
         "lpn_clean_map": {
-            "on": "Hide map readouts",
-            "ruled": "2026-09-25",
-            "answer": "This is obsolete. It doesn't go anywhere. Delete key."
+            "on": "Clean map",
+            "ruled": "2026-10-16",
+            "answer": "OK."
         },
         "lpn_clean_map_off": {
             "on": "Show map readouts",
@@ -440,9 +460,9 @@
             "answer": "This is obsolete. It doesn't go anywhere. Delete key."
         },
         "lpn_clean_map_tip": {
-            "on": "Take the status strip and the coordinate readout off the map, so a screenshot shows only the drawing. Your drawing is not touched, and this choice is not stored; reloading the page brings the readouts back.",
-            "ruled": "2026-09-25",
-            "answer": "This is obsolete. It doesn't go anywhere. Delete key.\n- **`lpn_confirm_labels_restore`**\n> Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.\n_Ruled OK 2026-09-23._"
+            "on": "Checked: the zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
         },
         "lpn_confirm_labels_restore": {
             "on": "Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.",
@@ -584,6 +604,11 @@
             "ruled": "2026-10-03",
             "answer": "OK."
         },
+        "lpn_control_inactive_note": {
+            "on": "These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_convas_cancelled": {
             "on": "Nothing was converted. The copy is closed, and the original project is unchanged.",
             "ruled": "2026-09-25",
@@ -722,6 +747,26 @@
         "lpn_copy_original": {
             "on": "Original; keep same lock",
             "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_copy_props_done": {
+            "on": "Copied properties of {id}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_copy_props_done_ov": {
+            "on": "Copied the overrides of {id} in this scenario.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_copy_props_menu": {
+            "on": "Copy properties",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_copy_props_no_overrides": {
+            "on": "No overrides to copy.",
+            "ruled": "2026-10-16",
             "answer": "OK."
         },
         "lpn_copy_title": {
@@ -1204,6 +1249,21 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
+        "lpn_ctx_edit_text": {
+            "on": "Edit text",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ctx_reset_position": {
+            "on": "Reset position",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ctx_reset_position_off_tip": {
+            "on": "Only a label or an attached Text that has been dragged from its own position can be reset.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_curve_kind_effic": {
             "on": "Pump efficiency",
             "ruled": "2026-09-05"
@@ -1269,6 +1329,11 @@
         "lpn_customer_heading": {
             "on": "Customer {id}",
             "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_customer_node_inactive": {
+            "on": "This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.",
+            "ruled": "2026-10-16",
             "answer": "OK."
         },
         "lpn_demand_add": {
@@ -2293,6 +2358,16 @@
             "ruled": "2026-09-09",
             "answer": "Edited."
         },
+        "lpn_field_type": {
+            "on": "Type",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_field_type_tip": {
+            "on": "The type of this asset in this scenario, set by Morph. Clear the override to use the parent scenario's type.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_field_valve_type_tip": {
             "on": "Valve type. A throttle valve (TCV) applies a fixed loss. PRV, PSV, and FCV maintain a pressure or a flow, and open fully, close, or partly close as hydraulic conditions change. A PBV removes a fixed pressure, and a GPV follows a head loss curve. The types control different hydraulic properties, so settings may be lost when the type is changed.",
             "ruled": "2026-10-07",
@@ -3198,6 +3273,11 @@
             "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
+        "lpn_inp_export_flat_customers_inactive": {
+            "on": "{n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_inp_export_flat_fittings": {
             "on": "An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of pipes here ({n}) is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.",
             "ruled": "2026-10-15",
@@ -3207,6 +3287,11 @@
             "on": "Saved {file}",
             "ruled": "2026-09-09",
             "answer": "OK"
+        },
+        "lpn_inp_export_flat_inactive_controls": {
+            "on": "These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
         },
         "lpn_inp_export_flat_lead": {
             "on": "The exported EPANET file is numerically equivalent to this project. But it has no place for the following things:",
@@ -3458,6 +3543,16 @@
         },
         "lpn_library_pattern_axis_step": {
             "on": "Step",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_library_pattern_default_deleted_also": {
+            "on": "Scenarios that also used it as their default: {list}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_library_pattern_default_deleted_in": {
+            "on": "Pattern {id} was the default demand pattern in these scenarios: {list}.",
             "ruled": "2026-10-16",
             "answer": "OK."
         },
@@ -3886,6 +3981,26 @@
             "ruled": "2026-09-25",
             "answer": "OK."
         },
+        "lpn_morph_menu": {
+            "on": "Morph",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_morph_ok": {
+            "on": "Morph",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_morph_other_kind": {
+            "on": "A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_morph_tip": {
+            "on": "Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its location, its connections, and every value the new type also has. In Base the asset itself is changed, and you are asked first if any value would be lost. In any other scenario the new type is an override in that scenario only, and the values only the new type has start from Settings > New assets.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_msglog_ago": {
             "on": "{x} ago",
             "ruled": "2026-09-23",
@@ -4052,8 +4167,68 @@
             "ruled": "2026-10-16",
             "answer": "OK."
         },
+        "lpn_ovl_col_inherited": {
+            "on": "Inherited value",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_col_inherited_tip": {
+            "on": "The value this scenario reads without the override: the value of the parent of the alternative, or the Base value.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_col_override": {
+            "on": "Override",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_group": {
+            "on": "{category}: {alternative}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_note": {
+            "on": "These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Clear an override to restore the inherited value; Undo reverses it. Select an ID to go to the asset on the map.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_ovl_pick_tip": {
             "on": "Select this override for the Clear selected overrides button.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_same": {
+            "on": "(same)",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_same_tip": {
+            "on": "Equal to the inherited value. It is still an override, and it is counted.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovl_title": {
+            "on": "Manage overrides: {name}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovm_child_ask": {
+            "on": "Clear child overrides ({n} total)?",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovm_child_tip": {
+            "on": "Child scenarios override this value ({n} total). Click to clear their overrides.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovm_dot_clear": {
+            "on": "Click to clear it.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_ovm_dot_set": {
+            "on": "Inherited. Click to make it an override in this scenario, holding the value shown.",
             "ruled": "2026-10-16",
             "answer": "OK."
         },
@@ -4135,6 +4310,11 @@
         "lpn_pane_hide_cols": {
             "on": "Hide these columns",
             "ruled": "2026-09-25",
+            "answer": "OK."
+        },
+        "lpn_pane_inactive_show": {
+            "on": "Include inactive topology",
+            "ruled": "2026-10-16",
             "answer": "OK."
         },
         "lpn_pane_manage_cols": {
@@ -4332,6 +4512,21 @@
             "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
+        "lpn_pane_scn_cur_only": {
+            "on": "Current scenario only",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_pane_scn_filter_note": {
+            "on": "{filters}. Showing {n} of {all}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_pane_scn_ov_only": {
+            "on": "Overrides only",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_pane_sel_only": {
             "on": "Selection only",
             "ruled": "2026-10-05",
@@ -4367,6 +4562,11 @@
             "ruled": "2026-09-17",
             "answer": "OK."
         },
+        "lpn_pane_tab_scenarios": {
+            "on": "Scenarios",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_pane_text_attached": {
             "on": "Attached",
             "ruled": "2026-09-09",
@@ -4380,6 +4580,51 @@
         "lpn_pane_width_tip": {
             "on": "Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.",
             "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_paste_alt_created": {
+            "on": "Created {category} alternative {name} for this scenario.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_paste_done_many": {
+            "on": "Pasted properties of {id} to {m} assets. Values changed: {n}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_paste_done_one": {
+            "on": "Pasted properties of {id} to {to}. Values changed: {n}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_paste_props_menu": {
+            "on": "Paste properties to selection",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_paste_props_off_kind": {
+            "on": "No selected asset can take the copied properties.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_paste_props_off_none": {
+            "on": "Nothing is copied. Right-click or long press an asset and choose Copy properties.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_paste_props_off_select": {
+            "on": "Select the assets to paste to, then choose Paste properties to selection.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_paste_skip_breakdown": {
+            "on": "Not pasted: {n} (demand is a list of categories).",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_paste_skip_valve": {
+            "on": "Not pasted: {n} (the valve types differ).",
+            "ruled": "2026-10-16",
             "answer": "OK."
         },
         "lpn_pda_deficit_note": {
@@ -4844,6 +5089,11 @@
             "ruled": "2026-09-06",
             "answer": "OK."
         },
+        "lpn_rule_inactive_note": {
+            "on": "These rules refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_rule_unreadable_note": {
             "on": "These rules could not be read, so they were ignored in this run: {ids}",
             "ruled": "2026-09-05"
@@ -4868,10 +5118,55 @@
             "ruled": "2026-10-01",
             "answer": "OK."
         },
+        "lpn_scenario_basic_misfit": {
+            "on": "This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_scenario_basic_misfit_base": {
+            "on": "The Base scenario uses an alternative other than Base.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_scenario_basic_tip": {
             "on": "Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.",
             "ruled": "2026-10-01",
             "answer": "Edited."
+        },
+        "lpn_scenario_copy": {
+            "on": "Copy scenario",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_scenario_copy_off": {
+            "on": "Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_scenario_copy_tip": {
+            "on": "Copies the open scenario and its overrides, and opens the copy.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_scenario_delete_ask": {
+            "on": "Delete the scenario {name}? The drawing itself is not changed.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_scenario_delete_goes": {
+            "on": "Its overrides ({n}) are deleted with it.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_scenario_delete_has_children": {
+            "on": "The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or move them another parent.",
+            "ruled": "2026-10-16",
+            "answer": "Edited"
+        },
+        "lpn_scenario_delete_stays": {
+            "on": "These alternatives it uses stay in the project: {list}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
         },
         "lpn_scenario_duration_tip": {
             "on": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
@@ -4882,6 +5177,11 @@
             "on": "Leave blank to inherit from parent.",
             "ruled": "2026-10-05",
             "answer": "Edited"
+        },
+        "lpn_scenario_mark_inh_tip": {
+            "on": "The dashed gray ring means the scenario {name} inherits an override for this asset from its parent scenario or alternative.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
         },
         "lpn_scenario_mark_tip": {
             "on": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
@@ -4988,6 +5288,11 @@
         "lpn_scncmp_menu_tip": {
             "on": "Solve every scenario in this project and read them side by side: the lowest pressure and the highest velocity in each.",
             "ruled": "2026-09-04"
+        },
+        "lpn_scncmp_none_checked": {
+            "on": "No scenario is checked for comparison. Check scenarios in the Scenario manager.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
         },
         "lpn_scncmp_note": {
             "on": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.",
@@ -5137,6 +5442,16 @@
             "on": "An additional test the solver must pass before it stops: the largest head any one pipe is still out by. Zero means do not apply this test. Only the EPANET solver reads this box.",
             "ruled": "2026-09-02"
         },
+        "lpn_settings_held_base": {
+            "on": "{base}: {value}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_held_in": {
+            "on": "Override in {scenario}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_settings_hover_card_tip": {
             "on": "Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.",
             "ruled": "2026-10-09",
@@ -5189,6 +5504,16 @@
             "on": "Not stated",
             "ruled": "2026-09-01"
         },
+        "lpn_settings_override_marks": {
+            "on": "Show override markers on the map",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_override_marks_tip": {
+            "on": "Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_settings_pressure_exponent": {
             "on": "Pressure exponent",
             "ruled": "2026-10-05",
@@ -5227,6 +5552,196 @@
         "lpn_settings_req_pressure_tip": {
             "on": "Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.",
             "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_settings_restore_base_only": {
+            "on": "Switch to Base to restore the defaults.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_basemap": {
+            "on": "Basemap",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_basemap_last": {
+            "on": "Basemap to return to",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_basemap_osm": {
+            "on": "Street map",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_basemap_satellite": {
+            "on": "Satellite images",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_bubbles": {
+            "on": "Time series graphs on the map",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_check_freq": {
+            "on": "Status check frequency",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_contour_buffer": {
+            "on": "Contour buffer",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_contour_fill": {
+            "on": "Contour fill",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_contour_interval": {
+            "on": "Contour interval",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_contour_labels": {
+            "on": "Contour labels",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_contour_opacity": {
+            "on": "Contour fill opacity",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_contour_terrain": {
+            "on": "Contour ground between nodes from Mapbox DEM",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_customer_max_width": {
+            "on": "Show customer labels when zoomed to this map width or less",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_default": {
+            "on": "{value} (default)",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_elev_source_old": {
+            "on": "Elevation source (older projects)",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_emitter_exponent_old": {
+            "on": "Emitter exponent (older projects)",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_id_prefix": {
+            "on": "ID prefix",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_label_after": {
+            "on": "Text after",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_label_before": {
+            "on": "Text before",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_label_drop": {
+            "on": "Drop order",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_label_on": {
+            "on": "Is active",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_label_show": {
+            "on": "Show order",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_labels_customer": {
+            "on": "Customer labels",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_labels_field": {
+            "on": "{labels}: {field}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_labels_part": {
+            "on": "{labels}: {field}, {part}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_max_check": {
+            "on": "Maximum status checks",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_new_asset": {
+            "on": "New assets: {setting}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_of": {
+            "on": "{setting}, {member}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_pda_src": {
+            "on": "Pressure driven options stated in the file",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_quality_option": {
+            "on": "Quality option as the file states it",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_quality_step": {
+            "on": "Quality time step",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_status_report": {
+            "on": "Status report",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_symbol_cap_multiple": {
+            "on": "Largest symbol, as a multiple of a typical pipe length",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_symbol_cap_percentile": {
+            "on": "Typical pipe length, as a percentile of all pipe lengths",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_tolerance": {
+            "on": "Accuracy (older projects)",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_view": {
+            "on": "Map view (center and scale)",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_row_view_value": {
+            "on": "Center {x}, {y}; scale {s}",
+            "ruled": "2026-10-16",
             "answer": "OK."
         },
         "lpn_settings_runbox": {
@@ -5290,6 +5805,41 @@
             "ruled": "2026-09-23",
             "answer": "OK."
         },
+        "lpn_settings_table_category": {
+            "on": "Category",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_table_major": {
+            "on": "Major heading",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_table_minor": {
+            "on": "Minor heading",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_table_no": {
+            "on": "No",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_table_owner": {
+            "on": "Owner",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_table_setting": {
+            "on": "Setting",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_table_yes": {
+            "on": "Yes",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_settings_trials": {
             "on": "Maximum trials",
             "ruled": "2026-08-29"
@@ -5322,6 +5872,46 @@
             "on": "How many further trials to allow after the maximum above is used up, before the last trial is reported. Only the EPANET solver reads this box.",
             "ruled": "2026-09-02"
         },
+        "lpn_settings_units_one_project": {
+            "on": "Units are the same in every scenario.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_view_bottom_right": {
+            "on": "Bottom right corner",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_view_center": {
+            "on": "Map center",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_view_save": {
+            "on": "Save this view in this scenario",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_view_save_tip": {
+            "on": "Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_view_scale": {
+            "on": "Map scale",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_view_scale_tip": {
+            "on": "The scale at the center of the map, as 1:N. Type 1:2000, or just 2000, to zoom to that scale.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_settings_view_top_left": {
+            "on": "Top left corner",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_settings_viscosity": {
             "on": "Relative viscosity",
             "ruled": "2026-08-29"
@@ -5329,6 +5919,231 @@
         "lpn_settings_viscosity_tip": {
             "on": "The viscosity of the fluid compared with water at 20 degrees Celsius. It only changes the answer under the Darcy-Weisbach method.",
             "ruled": "2026-08-29"
+        },
+        "lpn_sm_add_base": {
+            "on": "Add base",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_add_base_alt_tip": {
+            "on": "Add another Base alternative. It starts as a copy of Base's values in this category, and later edits to Base do not change it.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_add_base_tip": {
+            "on": "Add another Base scenario. It starts as a copy of Base, with its own alternatives, and later edits to Base do not change it.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_add_child": {
+            "on": "Add child",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_all_row_tip": {
+            "on": "Double-click to open it in its category tree.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_base_kept": {
+            "on": "The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_base_named": {
+            "on": "The Base of a tree is not renamed.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_basic_on": {
+            "on": "Scenario manager is disabled when Basic mode is on.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_col_parent": {
+            "on": "Parent",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_compare_tip": {
+            "on": "Include in Scenario comparison",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_copy": {
+            "on": "Copy",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_current_already": {
+            "on": "This scenario is already the current scenario.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_cycle": {
+            "on": "{name} cannot be moved under one of its own children.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_delete": {
+            "on": "Delete the selected item. A used item is not deleted.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_delete_alt_ask": {
+            "on": "Delete the alternative {name}?",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_help": {
+            "on": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the right pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the right pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+            "ruled": "2026-10-16",
+            "answer": "Edited."
+        },
+        "lpn_sm_in_use": {
+            "on": "{item}\\ncannot be deleted while it is used by\\n{list}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_inherited": {
+            "on": "inherited",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_item_alternative": {
+            "on": "Alternative {name}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_item_scenario": {
+            "on": "Scenario {name}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_list_overrides": {
+            "on": "Manage overrides",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_list_overrides_none": {
+            "on": "This scenario has no overrides.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_list_overrides_tip": {
+            "on": "List the scenario's overrides by category, each with the inherited value it overrides, and clear any of them.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_make_current": {
+            "on": "Make current",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_menu": {
+            "on": "Scenario manager…",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_merge_ask": {
+            "on": "Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of overriding them. You can undo this.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_merge_line": {
+            "on": "{asset}: {property}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_merge_none": {
+            "on": "The alternative {name} has no overrides to merge.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_merge_pick": {
+            "on": "Merge the overrides of {name} into which alternative? Its parent is listed first.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_merge_skipped": {
+            "on": "{between} also overrides these values. It is skipped and not changed, so {name} will read them from {between}, not from {target}:",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_merge_up": {
+            "on": "Merge upward",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_merge_up_root": {
+            "on": "A Base alternative has nothing above it to merge into.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_merge_up_tip": {
+            "on": "Move the overrides of the selected alternative into an alternative above it in the tree. The selected alternative then inherits those values.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_name_taken": {
+            "on": "The name {name} is already used in this tree.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_none_selected": {
+            "on": "Select an item in the tree first.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_rename": {
+            "on": "Rename",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_rename_alts_ask": {
+            "on": "Rename equally named alternatives?",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_shared_note": {
+            "on": "Shared with: {list}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_title": {
+            "on": "Scenario manager",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_tree_all": {
+            "on": "All",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_tree_unused": {
+            "on": "All unused",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_unused_none": {
+            "on": "None",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_used_by": {
+            "on": "Used by scenarios: {n}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_used_by_none": {
+            "on": "Not used by any scenario",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_sm_used_by_tip": {
+            "on": "Used by: {list}",
+            "ruled": "2026-10-16",
+            "answer": "OK."
         },
         "lpn_source_pattern": {
             "on": "Source pattern",
@@ -5887,6 +6702,21 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
+        "lpn_time_run_cut_off": {
+            "on": "EPANET had closed {link} and then could not solve for {nodes}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_time_run_cut_off_empty": {
+            "on": "Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_time_run_cut_off_full": {
+            "on": "Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
         "lpn_time_run_report_copied": {
             "on": "Copied",
             "ruled": "2026-09-04"
@@ -6078,6 +6908,36 @@
         "lpn_ts_title": {
             "on": "Values versus time",
             "ruled": "2026-09-17",
+            "answer": "OK."
+        },
+        "lpn_tsb_close": {
+            "on": "Close graph",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_tsb_max": {
+            "on": "Close a graph before opening another. Up to {n} stay open.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_tsb_menu": {
+            "on": "Time series graph",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_tsb_off_tip": {
+            "on": "Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_tsb_quantity": {
+            "on": "Quantity to graph",
+            "ruled": "2026-10-16",
+            "answer": "OK."
+        },
+        "lpn_tsb_resize": {
+            "on": "Drag to resize",
+            "ruled": "2026-10-16",
             "answer": "OK."
         },
         "lpn_units_mapcoords": {
