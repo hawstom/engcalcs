@@ -1940,6 +1940,11 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 </section>
 <section class="lpn-guide-section" data-guide-section="toolbar">
 <h2><?=$ec_lang['lpn_help_icons']?></h2>
+<dl>
+	<dt><?=$ec_lang['lpn_guide_tb_row_term']?></dt><dd><?=$ec_lang['lpn_guide_tb_row_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_tb_dim_term']?></dt><dd><?=$ec_lang['lpn_guide_tb_dim_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_tb_two_term']?></dt><dd><?=$ec_lang['lpn_guide_tb_two_def']?></dd>
+</dl>
 <p id="lpn_guide_dimnote" class="lpn-guide-prose" hidden><?=$ec_lang['lpn_guide_dimmed']?></p>
 <div id="lpn_guide_toolbar" class="lpn-guide-list"></div>
 </section>
