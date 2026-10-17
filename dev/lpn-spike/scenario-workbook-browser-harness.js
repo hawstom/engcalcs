@@ -71,8 +71,17 @@ async function open(browser, rel) {
 	return a;
 }
 // A row of a File fly-out, pressed as a mouse presses it.
+async function closeMenus(a) {
+	for (let i = 0; i < 4; i++) {
+		const shown = await a.page.evaluate(() => ['lpn_menu_popup', 'lpn_menu_popup2'].some((id) => { const p = document.getElementById(id); return !!p && getComputedStyle(p).display !== 'none' && p.style.display !== 'none'; }));
+		if (!shown) { return; }
+		await a.page.keyboard.press('Escape');
+		await a.settle(150);
+	}
+}
 async function subRows(a, parentKey) {
 	const parent = norm(await a.lang(parentKey));
+	await closeMenus(a);
 	await a.page.click('#lpn_menu_file');
 	await a.page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
 	await a.page.evaluate((l) => {
@@ -151,10 +160,10 @@ async function main() {
 		console.log('\n--- 1. File > Export > Scenario workbook ---');
 		const a = await open(browser, 'Looped-Network.php');
 		const ex = await subRows(a, 'lpn_file_export_menu');
-		await a.page.keyboard.press('Escape');
+		await closeMenus(a);
 		ok('1.1 the Export fly-out has the row, after CSV file', ex.indexOf(norm(await a.lang('lpn_file_export_item_scnbook'))) === ex.indexOf(norm(await a.lang('lpn_file_export_item_csv'))) + 1, ex.join(' | '));
 		const im = await subRows(a, 'lpn_file_import_menu');
-		await a.page.keyboard.press('Escape');
+		await closeMenus(a);
 		ok('1.2 the Import fly-out has its twin', im.indexOf(norm(await a.lang('lpn_file_import_scnbook'))) >= 0, im.join(' | '));
 		const out0 = await exportBook(a, 'out0');
 		ok('1.3 one .xlsx, named for the project', /-scenarios\.xlsx$/.test(out0.name), out0.name);
@@ -163,7 +172,7 @@ async function main() {
 
 		console.log('\n--- 2. the same file back: no differences ---');
 		let rep = await importBook(a, out0.file);
-		ok('2.1 the report says there are no differences', rep.summary.indexOf(out0.name) >= 0 && rep.changes.length === 0 && rep.unusable.length === 0 && rep.kept.length === 0, JSON.stringify(rep));
+		ok('2.1 the report says there are no differences', rep.summary.indexOf(path.basename(out0.file)) >= 0 && rep.changes.length === 0 && rep.unusable.length === 0 && rep.kept.length === 0, JSON.stringify(rep));
 		ok('2.2 ...with OK only', JSON.stringify(rep.buttons) === JSON.stringify([await a.lang('lpn_dialog_ok')]), JSON.stringify(rep.buttons));
 		await pressButton(a, await a.lang('lpn_dialog_ok'));
 		ok('2.3 OK closes it', !(await dialogShown(a)));
@@ -183,7 +192,7 @@ async function main() {
 		dm.rows.push(drow);
 		const f3 = writeBook(book, path.join(TMP, 'peak.xlsx'));
 		rep = await importBook(a, f3);
-		ok('3.1 the report lists the five: the scenario, two alternatives, two picks and two values (seven rows)', rep.changes.length === 7 && rep.unusable.length === 0 && rep.kept.length === 0,
+		ok('3.1 the report lists seven rows: the scenario, two alternatives, its two picks and two values', rep.changes.length === 7 && rep.unusable.length === 0 && rep.kept.length === 0,
 			JSON.stringify(rep.changes) + JSON.stringify(rep.unusable));
 		ok('3.2 ...with Apply changes and Cancel', JSON.stringify(rep.buttons) === JSON.stringify([await a.lang('lpn_scnbook_apply'), await a.lang('lpn_cancel')]), JSON.stringify(rep.buttons));
 		await pressButton(a, await a.lang('lpn_cancel'));
@@ -217,13 +226,15 @@ async function main() {
 		const es = await open(browser, 'Looped-Network.php?lang=es');
 		ok('5.0 the page is Spanish', await es.page.evaluate(() => document.documentElement.lang) === 'es');
 		const exEs = await subRows(es, 'lpn_file_export_menu');
-		await es.page.keyboard.press('Escape');
+		await closeMenus(es);
 		const imEs = await subRows(es, 'lpn_file_import_menu');
-		await es.page.keyboard.press('Escape');
+		await closeMenus(es);
 		ok('5.1 its Export menu has the row', exEs.indexOf(norm(await es.lang('lpn_file_export_item_scnbook'))) >= 0, exEs.join(' | '));
 		ok('5.2 its Import menu has the row', imEs.indexOf(norm(await es.lang('lpn_file_import_scnbook'))) >= 0, imEs.join(' | '));
 		const outEs = await exportBook(es, 'es');
-		ok('5.3 the Spanish workbook has Spanish headings over the same keys', sheetOf(outEs.book, 'scenarios').rows[1].join() === sheetOf(out0.book, 'scenarios').rows[1].join());
+		const kph = sheetOf(outEs.book, 'scenarios').rows[1].indexOf('physical');
+		ok('5.3 the Spanish workbook has the page\'s headings over the same keys', sheetOf(outEs.book, 'scenarios').rows[1].join() === sheetOf(out0.book, 'scenarios').rows[1].join() &&
+			sheetOf(outEs.book, 'scenarios').rows[0][kph] === await es.lang('lpn_alt_cat_physical'), sheetOf(outEs.book, 'scenarios').rows[0].join(' | '));
 		rep = await importBook(es, outEs.file);
 		ok('5.4 ...and read back is no difference', rep.changes.length === 0 && rep.unusable.length === 0 && rep.kept.length === 0, JSON.stringify(rep));
 		await pressButton(es, await es.lang('lpn_dialog_ok'));
