@@ -53,6 +53,7 @@ if (process.env[LOCK_ENV] !== '1') {
 
 let checks = 0, failures = 0;
 const world = {};
+let PC = {};   // the page's own strings, so no English wording is pinned here
 function isSubsequence(sub, full) { let i = 0; (full || []).forEach((t) => { if (i < (sub || []).length && sub[i] === t) { i++; } }); return !!sub && i === sub.length; }
 function ok(label, cond, detail) {
 	checks++;
@@ -205,6 +206,7 @@ async function main() {
 		console.log('=== subject: node ID, Elevation, Demand; pipe ID, Length, Diameter ===');
 		const a = await openNet1(Session, browser, TICK);
 		try {
+			PC = await a.page.evaluate(() => EngCalcs.pageConfig);
 			const mapRows = await labelRows(a.page, '11');
 			ok('on the map, junction 11 shows exactly its three ticked rows', mapRows && mapRows.length === 3, JSON.stringify(mapRows));
 			const p = await centreOf(a.page, '#lpn_canvas circle[data-node="11"]');
@@ -270,7 +272,7 @@ async function main() {
 				ok('resting on pipe 111 shows its card', !!pl && pl.length > 10, JSON.stringify(pl));
 				ok('...led by the ID the map label shows', pl && pl[0] === 'ID: ' + PFX.link + '111', JSON.stringify(pl && pl[0]));
 				ok('...Length and Diameter are told apart by name, formatted as the label is', has(pl, /^Length: 5280'$/) && has(pl, /^Diameter: 10"$/), JSON.stringify(pl));
-				ok('...exactly the Labels list for a pipe', sameSet(names(pl), ['ID', 'Length', 'Diameter', 'Roughness, C', 'Minor loss, k', 'Initial status', 'Bulk reaction coefficient', 'Wall reaction coefficient', 'Flow', 'Velocity', 'Head loss', 'Head loss gradient', 'Friction factor', 'Reaction rate', 'Average Chlorine concentration', 'Status']), JSON.stringify(names(pl)));
+				ok('...exactly the Labels list for a pipe', sameSet(names(pl), ['ID', 'Length', 'Diameter', 'Roughness, C', PC.lpn_field_km_short, 'Initial status', PC.lpn_reaction_bulk, PC.lpn_reaction_wall, 'Flow', 'Velocity', 'Head loss', PC.lpn_result_gradient, 'Friction factor', 'Reaction rate', 'Average Chlorine concentration', 'Status']), JSON.stringify(names(pl)));
 				ok('...Status says Open', has(pl, /^Status: Open$/), JSON.stringify(pl));
 				world.link = pl;
 				await away(a);
@@ -371,7 +373,7 @@ async function main() {
 				await rest(n0, p2);
 				const cl = await cardLines(n0.page);
 				if (name === 'nothing ticked') { world.cust = cl; }
-				ok(name + ': ...and the customer card has every field', !!cl && sameSet(names(cl), ['ID', 'Description', 'Tag', 'Base demand', 'Number of services', 'Demand']) && has(cl, /^Description: Main Street school$/) && has(cl, /^Number of services: 3$/), JSON.stringify(cl));
+				ok(name + ': ...and the customer card has every field', !!cl && sameSet(names(cl), ['ID', 'Description', 'Tag', 'Base demand', PC.lpn_field_meter_count, 'Demand']) && has(cl, /^Description: Main Street school$/) && has(cl, /^Number of services: 3$/), JSON.stringify(cl));
 				if (name !== 'nothing ticked') { ok('...the same as with nothing ticked', JSON.stringify(cl) === JSON.stringify(world.cust)); }
 				ok('no page errors (' + name + ')', !n0.errors.length, (n0.errors[0] || '').slice(0, 200));
 			} finally { await n0.close(); }
