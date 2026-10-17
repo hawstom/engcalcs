@@ -140,7 +140,7 @@ async function main() {
 	const checkMapText = (label, rows, mustSee) => {
 		const bad = rows.filter((x) => x.ratio < 4.5);
 		ok(label + ': every text over the map reads at 4.5:1 or better (' + rows.length + ' read)', bad.length === 0, bad.map((x) => x.sel + ' "' + x.txt + '" ' + x.ratio.toFixed(2)).join('; '));
-		mustSee.forEach((re) => ok(label + ': the scan saw ' + re, rows.some((x) => re.test(x.txt)), 'not on screen'));
+		mustSee.forEach((re) => ok(label + ': the scan saw ' + re, rows.some((x) => re.test(x.txt)), 'absent'));
 	};
 
 	// ONE TIP, IN BOTH THEMES: a name tip (hover) and an explanation (click on a ?) are both Bootstrap tooltips; both
