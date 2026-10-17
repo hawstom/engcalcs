@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**17 still to read on master**, of 193 untranslated keys, of 2811 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**17 still to read on master**, of 261 untranslated keys, of 2879 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -79,7 +79,7 @@ is the one you meant. "The first one" is a complete answer.
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (193, 17 to read @@ NEEDS RULING)
+## lpn_  (261, 17 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -134,6 +134,210 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-16._
 - **`lpn_field_type_tip`**
   > The type of this asset in this scenario, set by Morph. Clear the override to use the parent scenario's type.
+  _Ruled OK 2026-10-16._
+- **`lpn_file_import_gjnet`**
+  > Import GeoJSON network…
+  _Ruled OK 2026-10-16._
+- **`lpn_file_import_gjnet_tip`**
+  > Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_and_more`**
+  > and {n} more
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_beta`**
+  > Beta: feedback requested
+  @@ NEEDS RULING
+- **`lpn_gjnet_beta_tip`**
+  > This import has been tried on few files from GIS programs. To report a problem or suggest a change, press {button} on the page and describe the file.
+  @@ NEEDS RULING
+- **`lpn_gjnet_col_example`**
+  > Example
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_col_field`**
+  > Field
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_col_fills`**
+  > Fills
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_col_unit`**
+  > Unit
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_intro`**
+  > {points} points and {lines} lines were found. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. Choose the property each field fills and the unit of each number.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_lines_heading`**
+  > Line fields (pipes)
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_no_fields`**
+  > These features have no attribute fields.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_crs`**
+  > The file states the coordinate system {crs}, which is WGS 84 latitude and longitude, the system RFC 7946 requires. Positions were read as stated.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_crs_nad83`**
+  > The file states NAD83 (EPSG:4269). Its positions were read as WGS 84, which places them within about 1 to 2 m of where NAD83 puts them.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_default_demand`**
+  > These junctions state no base demand and have the default base demand, {value}.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_default_diameter`**
+  > These pipes state no diameter and have the default diameter, {value}.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_default_elev`**
+  > These nodes state no elevation and have the default elevation, {value}.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_default_elev_added`**
+  > These junctions were added at line ends and have the default elevation, {value}, because no node in the file states an elevation.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_default_k`**
+  > These pipes state no minor loss coefficient, so each has 0, as in an EPANET file that states none.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_default_roughness`**
+  > These pipes state no roughness and have the default roughness, {value}.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_default_tank`**
+  > These tanks have the default water depths and tank diameter.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_demand_kept`**
+  > A reservoir or tank has no demand, so the demand stated on these nodes was kept as the custom property {key}.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_demand_rows`**
+  > These junctions had more than one demand row. A GeoJSON file holds only the first, which was imported.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_elev_taken`**
+  > These nodes state no elevation. Each was given the elevation of the node shown in parentheses: for a junction added at a line end, the node at the other end of its pipe, otherwise the nearest node that states one.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_end_moved`**
+  > These pipes have an end within {tol} of a point or another line end, but not on it. The end was joined to it; the largest distance is {dist}.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_end_off_node`**
+  > The line of each of these links does not start or end at its node. The node position was used.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_end_on_pipe`**
+  > These line ends lie on the pipe shown in parentheses, but not at its end, and are not connected to it.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_field_custom`**
+  > These fields were imported as custom properties.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_field_skipped`**
+  > These fields were not imported, as chosen.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_id_dup`**
+  > These IDs are stated by more than one feature of the same kind. Each later feature was assigned the ID shown in parentheses.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_id_new`**
+  > These features state no valid ID and were assigned the ID shown in parentheses.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_junction_added`**
+  > These junctions were added where a line end is not within {tol} of a point. Each has the default base demand.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_length_auto`**
+  > These pipes state no length. Each length is computed from the line (Auto).
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_not_held`**
+  > A GeoJSON file does not hold controls, rules, time settings, text labels, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_parts`**
+  > These multipart lines have parts that are not connected and were imported as one pipe for each part.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_parts_points`**
+  > These multipoint features were imported as one node for each point.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_pattern_conflict`**
+  > These patterns are stated with different multipliers on different features. The first was used.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_pipe_type`**
+  > These pipes state the pipe type shown in parentheses, whose definition a GeoJSON file does not hold. The pipe type was not imported; the diameter and roughness stated in the file were.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_results`**
+  > The results in the file were not imported. Calculate computes them again.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_skip_geometry`**
+  > Not imported: the feature is not a point or a line.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_skip_id`**
+  > Not imported: the name is not a valid ID, or another element of the same kind has it.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_skip_kind`**
+  > Not imported: the feature states no node_type or link_type.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_skip_loop`**
+  > Not imported: both ends of the line join the same node.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_skip_no_node`**
+  > Not imported: the start or end node named is not in the file.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_skip_position`**
+  > Not imported: a position is not a valid latitude and longitude.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_skip_short`**
+  > Not imported: a line needs at least two positions.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_unmapped_demand`**
+  > No field was chosen for the base demand, so every junction has the default base demand, {value}.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_unmapped_diameter`**
+  > No field was chosen for the diameter, so every pipe has the default diameter, {value}.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_unmapped_elev`**
+  > No field was chosen for the elevation, so every node has the default elevation, {value}, and automatic lengths include no elevation difference.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_unmapped_id_line`**
+  > No field was chosen for the line ID, so every pipe was assigned an ID.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_unmapped_id_point`**
+  > No field was chosen for the point ID, so every node imported from a point was assigned an ID.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_unmapped_k`**
+  > No field was chosen for the minor loss coefficient, so every pipe has 0, as in an EPANET file that states none.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_unmapped_length`**
+  > No field was chosen for the length, so every pipe length is computed from the line (Auto).
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_unmapped_roughness`**
+  > No field was chosen for the roughness, so every pipe has the default roughness, {value}.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_value_unread`**
+  > These values are not numbers or are not recognized, and were not used.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_z`**
+  > These points state a third coordinate, which was not imported.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_other`**
+  > {n} features are neither points nor lines and will not be imported; the report lists them.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_points_heading`**
+  > Point fields (junctions, reservoirs, and tanks)
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_refuse_crs`**
+  > {file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_refuse_empty`**
+  > {file} contains no points or lines.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_report_lead`**
+  > Each change made during import, and each feature not imported, is listed below with the reason:
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_target_custom`**
+  > Custom property
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_target_node_type`**
+  > Node type
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_target_skip`**
+  > Do not import
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_title`**
+  > Import GeoJSON network: {file}
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_tolerance`**
+  > Join tolerance (m)
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_tolerance_tip`**
+  > A line end within this distance of a point, or of another line end, is joined to it. A line end farther than this from every point gets a new junction.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_working`**
+  > Importing {file}…
   _Ruled OK 2026-10-16._
 - **`lpn_inp_export_flat_customers_inactive`**
   > {n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.
@@ -275,7 +479,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-16._
 - **`lpn_scenario_delete_has_children`**
   > The scenario {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: His call: "I would rather say 'has children' if that is precise." (it is)_
 - **`lpn_scenario_delete_stays`**
   > These alternatives it uses stay in the project: {list}.
   _Ruled 2026-10-13: Approved as written._
@@ -482,7 +686,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled 2026-10-16: I approve all three._
 - **`lpn_sm_alt_delete_has_children`**
   > The alternative {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: His call: "I would rather say 'has children' if that is precise." (it is)_
 - **`lpn_sm_base_kept`**
   > The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.
   _Ruled OK 2026-10-16._
@@ -551,7 +755,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-16._
 - **`lpn_sm_list_overrides`**
   > Override manager…
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Asked "Scenario manager…" / "Override manager…": "Yes. Proceed."_
 - **`lpn_sm_list_overrides_none`**
   > This scenario has no overrides.
   _Ruled 2026-10-15: Revised. But should be obvious when count = 0._
@@ -665,7 +869,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**63 still to read**, of 131 new keys across 11 unmerged branch(es).
+**60 still to read**, of 63 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -678,212 +882,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/geojson-import (`43101d8d9`) — 68 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_file_import_gjnet`**
-  > Import GeoJSON network…
-  _Ruled OK 2026-10-16._
-- **`lpn_file_import_gjnet_tip`**
-  > Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_and_more`**
-  > and {n} more
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_beta`**
-  > Beta: feedback requested
-  @@ NEEDS RULING
-- **`lpn_gjnet_beta_tip`**
-  > This import has been tried on few files from GIS programs. To report a problem or suggest a change, press {button} on the page and describe the file.
-  @@ NEEDS RULING
-- **`lpn_gjnet_col_example`**
-  > Example
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_col_field`**
-  > Field
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_col_fills`**
-  > Fills
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_col_unit`**
-  > Unit
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_intro`**
-  > {points} points and {lines} lines were found. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. Choose the property each field fills and the unit of each number.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_lines_heading`**
-  > Line fields (pipes)
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_no_fields`**
-  > These features have no attribute fields.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_crs`**
-  > The file states the coordinate system {crs}, which is WGS 84 latitude and longitude, the system RFC 7946 requires. Positions were read as stated.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_crs_nad83`**
-  > The file states NAD83 (EPSG:4269). Its positions were read as WGS 84, which places them within about 1 to 2 m of where NAD83 puts them.
-  @@ NEEDS RULING
-- **`lpn_gjnet_note_default_demand`**
-  > These junctions state no base demand and have the default base demand, {value}.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_default_diameter`**
-  > These pipes state no diameter and have the default diameter, {value}.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_default_elev`**
-  > These nodes state no elevation and have the default elevation, {value}.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_default_elev_added`**
-  > These junctions were added at line ends and have the default elevation, {value}, because no node in the file states an elevation.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_default_k`**
-  > These pipes state no minor loss coefficient, so each has 0, as in an EPANET file that states none.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_default_roughness`**
-  > These pipes state no roughness and have the default roughness, {value}.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_default_tank`**
-  > These tanks have the default water depths and tank diameter.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_demand_kept`**
-  > A reservoir or tank has no demand, so the demand stated on these nodes was kept as the custom property {key}.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_demand_rows`**
-  > These junctions had more than one demand row. A GeoJSON file holds only the first, which was imported.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_elev_taken`**
-  > These nodes state no elevation. Each was given the elevation of the node shown in parentheses: for a junction added at a line end, the node at the other end of its pipe, otherwise the nearest node that states one.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_end_moved`**
-  > These pipes have an end within {tol} of a point or another line end, but not on it. The end was joined to it; the largest distance is {dist}.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_end_off_node`**
-  > The line of each of these links does not start or end at its node. The node position was used.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_end_on_pipe`**
-  > These line ends lie on the pipe shown in parentheses, but not at its end, and are not connected to it.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_field_custom`**
-  > These fields were imported as custom properties.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_field_skipped`**
-  > These fields were not imported, as chosen.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_id_dup`**
-  > These IDs are stated by more than one feature of the same kind. Each later feature was assigned the ID shown in parentheses.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_id_new`**
-  > These features state no valid ID and were assigned the ID shown in parentheses.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_junction_added`**
-  > These junctions were added where a line end is not within {tol} of a point. Each has the default base demand.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_length_auto`**
-  > These pipes state no length. Each length is computed from the line (Auto).
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_not_held`**
-  > A GeoJSON file does not hold controls, rules, time settings, text labels, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_parts`**
-  > These multipart lines have parts that are not connected and were imported as one pipe for each part.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_parts_points`**
-  > These multipoint features were imported as one node for each point.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_pattern_conflict`**
-  > These patterns are stated with different multipliers on different features. The first was used.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_pipe_type`**
-  > These pipes state the pipe type shown in parentheses, whose definition a GeoJSON file does not hold. The pipe type was not imported; the diameter and roughness stated in the file were.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_results`**
-  > The results in the file were not imported. Calculate computes them again.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_skip_geometry`**
-  > Not imported: the feature is not a point or a line.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_skip_id`**
-  > Not imported: the name is not a valid ID, or another element of the same kind has it.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_skip_kind`**
-  > Not imported: the feature states no node_type or link_type.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_skip_loop`**
-  > Not imported: both ends of the line join the same node.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_skip_no_node`**
-  > Not imported: the start or end node named is not in the file.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_skip_position`**
-  > Not imported: a position is not a valid latitude and longitude.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_skip_short`**
-  > Not imported: a line needs at least two positions.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_unmapped_demand`**
-  > No field was chosen for the base demand, so every junction has the default base demand, {value}.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_unmapped_diameter`**
-  > No field was chosen for the diameter, so every pipe has the default diameter, {value}.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_unmapped_elev`**
-  > No field was chosen for the elevation, so every node has the default elevation, {value}, and automatic lengths include no elevation difference.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_unmapped_id_line`**
-  > No field was chosen for the line ID, so every pipe was assigned an ID.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_unmapped_id_point`**
-  > No field was chosen for the point ID, so every node imported from a point was assigned an ID.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_unmapped_k`**
-  > No field was chosen for the minor loss coefficient, so every pipe has 0, as in an EPANET file that states none.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_unmapped_length`**
-  > No field was chosen for the length, so every pipe length is computed from the line (Auto).
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_unmapped_roughness`**
-  > No field was chosen for the roughness, so every pipe has the default roughness, {value}.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_value_unread`**
-  > These values are not numbers or are not recognized, and were not used.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_z`**
-  > These points state a third coordinate, which was not imported.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_other`**
-  > {n} features are neither points nor lines and will not be imported; the report lists them.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_points_heading`**
-  > Point fields (junctions, reservoirs, and tanks)
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_refuse_crs`**
-  > {file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_refuse_empty`**
-  > {file} contains no points or lines.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_report_lead`**
-  > Each change made during import, and each feature not imported, is listed below with the reason:
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_target_custom`**
-  > Custom property
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_target_node_type`**
-  > Node type
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_target_skip`**
-  > Do not import
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_title`**
-  > Import GeoJSON network: {file}
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_tolerance`**
-  > Join tolerance (m)
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_tolerance_tip`**
-  > A line end within this distance of a point, or of another line end, is joined to it. A line end farther than this from every point gets a new junction.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_working`**
-  > Importing {file}…
-  _Ruled OK 2026-10-16._
+### feat/geojson-import (`43101d8d9`) — already merged into merge/1017; its strings are listed there
 
 ### feat/guide-scenarios (`8bd566f9f`) — 60 new, 60 to read @@ NEEDS RULING
 
@@ -1092,4 +1091,6 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/scenarios-menu (`fb1e6baf6`) — adds no English strings
+### feat/scenarios-menu (`0f73aec80`) — already merged into merge/1017; its strings are listed there
+
+### merge/1017 (`a36480951`) — adds no English strings
