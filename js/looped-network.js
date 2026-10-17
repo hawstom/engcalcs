@@ -59755,7 +59755,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		g.addEventListener('focusout', function (e) {
 			var to = e.relatedTarget;
-			if (to && !g.contains(to)) { themeGalleryClose(false, false); }
+			// Focus going to the Theme button is its click arriving; the click closes the gallery itself.
+			if (to && !g.contains(to) && !btn.contains(to)) { themeGalleryClose(false, false); }
 		});
 		// Escape in the capture phase, because the gallery is the innermost thing on screen; it is consumed only
 		// while the gallery is open. A press outside the gallery (not on its own button, which toggles) reverts.

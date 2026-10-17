@@ -16,7 +16,8 @@
 //      theme back, closes the gallery and returns focus to the button; nothing was stored.
 //   5. Enter keeps the focused card; a click keeps the card clicked. Either closes the gallery, stores the
 //      choice in `lpn_theme` (and nothing else), and repaints the button.
-//   6. A press outside the gallery while previewing puts the kept theme back.
+//   6. A press outside the gallery while previewing puts the kept theme back; so does a second click on
+//      the Theme button, which closes the gallery rather than opening it again.
 //   7. The kept theme survives a reload. `?theme=system` is the rescue: it clears the choice. A value the
 //      page does not know is read as System.
 //   8. On a Spanish page the gallery works the same and its names are the page's own strings; on a right-to-
@@ -217,6 +218,13 @@ async function main() {
 			await a.settle(300);
 			st = await state(a);
 			ok('6. a press outside the gallery puts the kept Platinum back and closes it', st.theme === 'platinum' && st.stored === 'platinum' && !st.open, JSON.stringify(st));
+			await openGallery(a);
+			await a.page.hover(card('amber'));
+			await a.settle(150);
+			await a.page.click('#lpn_set_theme');
+			await a.settle(300);
+			st = await state(a);
+			ok('6. a second click on the Theme button closes the gallery and puts the kept Platinum back', st.theme === 'platinum' && !st.open && st.btn.expanded === 'false', JSON.stringify(st));
 
 			// 7. a reload keeps it; the rescue clears it; an unknown value is System
 			await a.reload();
