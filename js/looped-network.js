@@ -79641,7 +79641,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				tellNotice(none.split('{name}').join(name));
 				return;
 			}
-			parts = [(keep ? (pc.lpn_sm_copy_ask || 'Copy the overrides ({n}) of {name} up into {target}? It keeps them as its own overrides. You can undo this.')
+			parts = [(keep ? (pc.lpn_sm_copy_ask || 'Copy the overrides ({n}) of {name} up into {target}? {name} keeps them as its own overrides. You can undo this.')
 				: (pc.lpn_sm_merge_ask || 'Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of overriding them. You can undo this.'))
 				.replace(/\{name\}/g, name).replace('{n}', String(plan.n)).replace('{target}', tname)];
 			plan.skipped.forEach(function (s) {
