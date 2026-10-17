@@ -3423,9 +3423,10 @@ var EngCalcs = EngCalcs || {};
 	// typed. They seed the document's multiplier the way createScenario() does: a test is read at
 	// whatever demand the system has that day.
 	//
-	// **FIRE PLUS MAX DAY IS THE MAX DAY MULTIPLIER AND NOTHING ELSE**: Fire flow analysis already
-	// draws each junction's fire flow on top of the demand of the scenario it is run in, so this is
-	// the scenario to run it in, which its tip says.
+	// **NO FIRE PLUS MAX DAY** (Tom, 2026-10-16: *"the 'right' thing to do is check every fire
+	// hydrant since we offer that premium feature"*): a demand multiplier for fire flow invites the
+	// worst-hydrant guess, and Fire flow analysis tests every junction on top of the demand of the
+	// scenario it is run in. A file that already holds the old `fire_max_day` scenario keeps it.
 	//
 	// **ONLY A NEW PROJECT.** newProject() and the first visit call this; an opened file, an imported
 	// .inp and Delete network keep defaultScenarios(), so no file ever written changes shape. A new
@@ -3437,8 +3438,7 @@ var EngCalcs = EngCalcs || {};
 		{ id: 'flow_max', key: 'lpn_scenario_preset_flow_max', en: '3. Flow test: Max' },
 		{ id: 'average_day', key: 'lpn_scenario_preset_average_day', en: '4. Average Day', dm: 1 },
 		{ id: 'max_day', key: 'lpn_scenario_preset_max_day', en: '5. Max Day', dm: 2, range: [1.2, 3.0] },
-		{ id: 'peak_hour', key: 'lpn_scenario_preset_peak_hour', en: '6. Peak hour', dm: 3, range: [3.0, 6.0] },
-		{ id: 'fire_max_day', key: 'lpn_scenario_preset_fire_max_day', en: '7. Fire plus max day', dm: 2 }
+		{ id: 'peak_hour', key: 'lpn_scenario_preset_peak_hour', en: '6. Peak hour', dm: 3, range: [3.0, 6.0] }
 	];
 	function presetScenarios() {
 		var pc = EngCalcs.pageConfig || {}, docDm = (settings.hydraulics || {}).demandMultiplier;

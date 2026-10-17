@@ -5,11 +5,15 @@
 // easy to do a few like '1. Flow test: Static, 2. Flow test: Mid, 3. Flow test: Max, 4. Average
 // Day, 5. Max Day, 6. Peak hour, 7. Fire plus max day'"*.
 //
-// Checked: the first-visit project and a wizard-made project both hold Base plus the seven, in his
-// order in the scenario menu, with the multipliers LPN_PRESET_SCENARIOS states and a tip on each;
-// a new project made from a customized one gets the seven again, not that project's list; an
-// opened project file and an imported .inp get Base alone; and a Base-only file round-trips
-// byte-identical.
+// Tom, 2026-10-16, removing 7. Fire plus max day: *"the 'right' thing to do is check every fire
+// hydrant since we offer that premium feature"*.
+//
+// Checked: the first-visit project and a wizard-made project both hold Base plus the six, in his
+// order in the scenario menu, with the multipliers LPN_PRESET_SCENARIOS states and a tip on each,
+// and no Fire plus max day; a new project made from a customized one gets the six again, not that
+// project's list; an opened project file and an imported .inp get Base alone; a Base-only file
+// round-trips byte-identical; and a file that already holds the old fire_max_day scenario opens
+// and saves with it unchanged.
 
 'use strict';
 
@@ -26,7 +30,7 @@ function check(ok, label, detail) {
 }
 
 // The page's own English strings for the new keys, so the tips are the real ones.
-const KEYS = ['flow_static', 'flow_mid', 'flow_max', 'average_day', 'max_day', 'peak_hour', 'fire_max_day']
+const KEYS = ['flow_static', 'flow_mid', 'flow_max', 'average_day', 'max_day', 'peak_hour']
 	.map((k) => 'lpn_scenario_preset_' + k);
 const strings = JSON.parse(execFileSync('php', ['-r',
 	'$ec_lang = array(); include "' + ROOT + 'lib/lang.ec.en.php"; $o = array();' +
@@ -63,7 +67,7 @@ const L = loadLoopedNetwork(
 
 // Tom's order is the key order; the words themselves come from the language file.
 const TOM = KEYS.map((k) => strings[k]);
-const WANT_DM = { average_day: 1, max_day: 2, peak_hour: 3, fire_max_day: 2 };
+const WANT_DM = { average_day: 1, max_day: 2, peak_hour: 3 };
 
 function menuNames() {
 	return L.scenarioMenuRows().filter((r) => r.scenarioId !== undefined)
@@ -71,7 +75,8 @@ function menuNames() {
 }
 function checkPresets(where) {
 	const sc = L.getScenarios();
-	check(sc.length === 8 && sc[0].isBase, where + ': Base plus seven scenarios', sc.length + ' scenarios');
+	check(sc.length === 7 && sc[0].isBase, where + ': Base plus six scenarios', sc.length + ' scenarios');
+	check(!sc.some((s) => s.id === 'fire_max_day'), where + ': no Fire plus max day', sc.map((s) => s.id).join(','));
 	const names = menuNames();
 	check(JSON.stringify(names.slice(1)) === JSON.stringify(TOM), where + ': the menu lists them in Tom\'s order',
 		JSON.stringify(names));
@@ -91,7 +96,7 @@ function checkPresets(where) {
 		check(got === want, where + ': the menu is in Tom\'s order, the scenarios last', got);
 	}
 	const tips = L.scenarioMenuRows().filter((r) => r.scenarioId !== undefined && r.tip);
-	check(tips.length === 7, where + ': each of the seven carries its tip', tips.length + ' tips');
+	check(tips.length === 6, where + ': each of the six carries its tip', tips.length + ' tips');
 	sc.forEach(function (s) {
 		if (s.isBase) { return; }
 		if (WANT_DM[s.id] !== undefined) {
@@ -127,11 +132,11 @@ console.log('\n--- they are ordinary scenarios: renamed, deleted, and a user one
 	L.deleteScenario('flow_mid');
 	const mine = L.createScenario('My scenario');
 	check(mine.id === 's1', 'a scenario the user adds next is still s1', mine.id);
-	check(L.getScenarios().length === 8 && !L.getScenarios().some((s) => s.id === 'flow_mid'),
+	check(L.getScenarios().length === 7 && !L.getScenarios().some((s) => s.id === 'flow_mid'),
 		'deleting one removes it', L.getScenarios().map((s) => s.id).join(','));
 }
 
-console.log('\n--- a NEW project made from that customized one gets the seven again ---');
+console.log('\n--- a NEW project made from that customized one gets the six again ---');
 {
 	const units = {};
 	['lpn_u_length', 'lpn_u_diameter', 'lpn_u_elevhead', 'lpn_u_pressure', 'lpn_u_flow',
@@ -153,6 +158,16 @@ console.log('\n--- a project file that is opened gets Base alone, and round-trip
 		'its scenarios are written back exactly as the file had them');
 	L.importProject(L.prepareDocument(JSON.parse(once)));
 	check(JSON.stringify(L.serializeProject()) === once, 'save, reopen, save: byte-identical');
+}
+
+console.log('\n--- a file that already holds the old Fire plus max day keeps it ---');
+{
+	const d = JSON.parse(fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8'));
+	d.scenarios.push({ id: 'fire_max_day', name: '7. Fire plus max day', overrides: {}, demandMultiplier: 2 });
+	L.importProject(L.prepareDocument(JSON.parse(JSON.stringify(d))));
+	const f = L.getScenarios().filter((s) => s.id === 'fire_max_day')[0];
+	check(!!f && f.name === '7. Fire plus max day' && f.demandMultiplier === 2, 'it opens with its name and multiplier', JSON.stringify(f));
+	check(JSON.stringify(JSON.parse(JSON.stringify(L.serializeProject())).scenarios) === JSON.stringify(d.scenarios), 'and is written back exactly as the file had it');
 }
 
 console.log('\n--- an imported .inp gets Base alone ---');
