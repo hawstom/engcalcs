@@ -25767,7 +25767,7 @@ var EngCalcs = EngCalcs || {};
 	function setPaneTab(id) {
 		var was = activePaneTab(), now = paneTabById(id);
 		if (!now) { return; }
-		if (id === 'scenarios' && smFlyOn) { smFlySet(false); }
+		if (id === 'scenarios' && smTableIn()) { smTableSet(false); }
 		if (paneState.open && was && was !== now && was.hide) { was.hide(); }
 		paneState.tab = now.id;
 		applyPaneLayout();
@@ -25784,7 +25784,7 @@ var EngCalcs = EngCalcs || {};
 	// Only the toolbar button toggles, because a toggle is what a pressed/unpressed button IS.
 	function openPane(id) {
 		var t = paneTabById(id), was;
-		if (id === 'scenarios' && smFlyOn) { smFlySet(false); }
+		if (id === 'scenarios' && smTableIn()) { smTableSet(false); }
 		was = activePaneTab();
 		if (t && t !== was) {
 			if (paneState.open && was.hide) { was.hide(); }
@@ -62350,18 +62350,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return !!g.lpnDragging || g.matches(':hover');
 	}
 	function dockPointerOver(d) {
-		try { return d.box.matches(':hover') || (!!d.tab && d.tab.matches(':hover')) || dockGripHeld(d) || dockOwnMenuHovered(d) || dockFlyHovered(d); } catch (e) { return false; }
-	}
-	// **THE SCENARIOS TABLE FLOWN OUT BESIDE THE MANAGER IS PART OF THE MANAGER'S BOX** (Tom,
-	// 2026-10-16): pointing at it, typing in it or pressing in it is pointing at, typing in or
-	// pressing in the manager, so the manager does not tuck from under it.
-	function dockFlyHovered(d) {
-		var f = d.box.id === 'lpn_sm_box' ? smFlyEl() : null;
-		return !!f && smFlyOn && f.style.display !== 'none' && f.matches(':hover');
-	}
-	function dockFlyHas(d, node) {
-		var f = d.box.id === 'lpn_sm_box' ? smFlyEl() : null;
-		return !!f && !!node && f.contains(node);
+		try { return d.box.matches(':hover') || (!!d.tab && d.tab.matches(':hover')) || dockGripHeld(d) || dockOwnMenuHovered(d); } catch (e) { return false; }
 	}
 	// **A RIGHT-CLICK MENU A BOX OPENED IS PART OF THAT BOX** (Tom, 2026-10-12: *"In Scenario Manager,
 	// any right-click action hides the box. (F2 does not.)"*). The menu is drawn on the page's body,
@@ -62398,13 +62387,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		clearTimeout(dockTimer);
 		dockTimer = setTimeout(function () {
 			if (dockFlyout !== d || dockPointerOver(d)) { return; }
-			if (document.activeElement && (d.box.contains(document.activeElement) || dockFlyHas(d, document.activeElement))) { return; }
+			if (document.activeElement && d.box.contains(document.activeElement)) { return; }
 			dockTuck(d);
 		}, LPN_DOCK_TUCK_MS);
 	}
 	function dockOutsidePress(e) {
 		var d = dockFlyout, t = e.target;
-		if (!d || !t || d.box.contains(t) || dockFlyHas(d, t) || (d.tab && d.tab.contains(t)) || (t.classList && t.classList.contains('lpn-dock-grip'))) { return; }
+		if (!d || !t || d.box.contains(t) || (d.tab && d.tab.contains(t)) || (t.classList && t.classList.contains('lpn-dock-grip'))) { return; }
 		if (dockOwnMenu(d, t)) { return; }
 		// A press inside a tip that box raised is still the box's.
 		if (t.closest && t.closest('.tooltip, .popover')) { return; }
@@ -77663,14 +77652,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	loadScenarioBasicPref();
 	// The Scenarios tab of the Tables pane is shown only with Basic mode off. A pane left on it when
-	// Basic mode begins, or when its table flies out beside the manager (smFlySet()), gives way to
-	// the first table.
+	// Basic mode begins, or when its table moves into the manager's box (smTableSync()), gives way
+	// to the first table.
 	function refreshScenariosTab() {
 		var b = document.getElementById('lpn_pane_tab_scenarios'), gone = scenarioBasicMode;
 		if (b) { b.style.display = gone ? 'none' : ''; }
-		// While the table is out beside the manager the tab stays, but the panel is not in the pane,
+		// While the table is in the manager's box the tab stays, but the panel is not in the pane,
 		// so a pane left on it gives way to the first table; choosing the tab sends the table home.
-		if ((gone || smFlyOn) && paneState && paneState.tab === 'scenarios') { setPaneTab(paneTabs[0].id); }
+		if ((gone || smTableIn()) && paneState && paneState.tab === 'scenarios') { setPaneTab(paneTabs[0].id); }
 	}
 	function altCategoryLabel(cat) {
 		var pc = EngCalcs.pageConfig || {};
@@ -77859,7 +77848,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		sel.addEventListener('change', function () { smState.tree = sel.value; smState.sel = null; smState.editing = null; smState.allSel = null; rebuildScenarioManager(); });
 		tools.appendChild(sel);
 		host.appendChild(tools);
-		if (smIsAllView(smState.tree)) { smAllList(host, scroll, hadFocus); smFlyRefresh(); return; }
+		if (smIsAllView(smState.tree)) { smAllList(host, scroll, hadFocus); smTableRefresh(); return; }
 		tools = document.createElement('div');
 		tools.className = 'lpn-sm-tools';
 		// The buttons act on the selected item, the right-click menu on the item clicked; both are
@@ -77894,7 +77883,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		initTipsIn(host);
 		if (smState.editing !== null) { smFocusEditor(); }
 		else if (hadFocus && tree.focus) { tree.focus(); }
-		smFlyRefresh();
+		smTableRefresh();
 	}
 	function smUsedByText(tree, key) {
 		var pc = EngCalcs.pageConfig || {}, users = smUsedBy(tree, key);
@@ -78478,6 +78467,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	var smboxLayout = Object.assign(newBoxLayout(), { userSized: false, flyW: null });
 	function saveSmboxLayout() {
 		if (boxSaveHeld()) { return; }
+		smTableNormalizeLayout();
 		smboxLayout.open = !!(smboxLayout.dock && smBoxIsOpen());
 		try { localStorage.setItem(LPN_SMBOX_KEY, JSON.stringify(smboxLayout)); } catch (e) {}
 	}
@@ -78489,14 +78479,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (scenarioBasicMode) { return; }
 		if (!box) { return; }
 		box.style.display = 'flex';
+		// The table goes in before the box is placed, so a first open centres the whole box.
+		smTableOn = true;
 		rebuildScenarioManager();
-		placePanelForScreen(box, function () { placeBoxRemembered(box, smboxLayout); });
+		placePanelForScreen(box, function () { placeBoxRemembered(box, smTablePlaceLayout()); });
 		initTipsIn(box);
-		smFlyAuto();
 		if (smboxLayout.dock && !smboxLayout.open) { saveSmboxLayout(); }
 	}
 	function closeScenarioManager() {
-		smFlyClose();
+		smTableSet(false);
 		if (smBoxIsOpen()) { hidePanel(smBoxEl()); }
 		if (smboxLayout.open) { saveSmboxLayout(); }
 	}
@@ -78505,6 +78496,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!box) { return; }
 		if (x) { x.addEventListener('click', closeScenarioManager); }
 		wireBoxMemory(box, LPN_SMBOX_KEY, smboxLayout, saveSmboxLayout, smBoxIsOpen);
+		wireSmTable(box);
 		// The Alternatives preview box this replaced kept `lpn_altbox`; nothing reads it now.
 		try { localStorage.removeItem('lpn_altbox'); } catch (e) { /* storage refused */ }
 		refreshScenariosTab();
@@ -78654,221 +78646,237 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function smAllFocus() { var t = document.getElementById('lpn_sm_tree'); if (t && t.focus) { t.focus(); } }
 
-	// ---- THE SCENARIOS TABLE, FLOWN OUT BESIDE THE MANAGER (Task 802) ---------------------------
+	// ---- THE SCENARIOS TABLE, A PANE OF THE MANAGER'S OWN BOX (Task 802) ------------------------
 	//
 	// Tom, 2026-10-15 (R-389): *"Could we stick that table onto the right side of the Scenario Manager
 	// to accomplish (a) that both are available in the same gesture and (b) that it flies out over the
 	// map instead of displacing the map?"* Then, 2026-10-16, on the first build: *"Yes. But (1) I want
 	// it automatic, no button, (2) I want the spreadsheet version, (3) I want it expandable (it's too
-	// narrow)."*
+	// narrow)."* And on the second: *"I think we need only one x and one title bar; this is a
+	// consolidated box now; I fear that you are still thinking of it as two."*
 	//
-	// **AUTOMATIC.** It opens with the manager and closes with it; its × puts it away until the manager
-	// is opened again. Beside the box, at the box's height, over the map: a fixed layer of the page,
-	// never a column, so the map keeps its size. It follows the box when it moves or is resized. Where
-	// there is no room beside the box (a box against both edges) it lies over the box's own lower part.
-	// **NOT ON A PHONE**, where it would cover the tree the manager is opened for; there the Tables
-	// pane's Scenarios tab still holds the table.
+	// **ONE BOX.** The table is a pane inside #lpn_sm_box, beside the manager's tree, laid out as the
+	// Settings box lays out its index and its content (.lpn-setbox-panes, with Settings' own slim
+	// divider between). So there is one title band, one X, one row of dock buttons, one border and
+	// shadow, and one docked tab; the box floats, docks, auto-hides and closes as one thing because it
+	// IS one thing. A floating box is still a fixed layer over the map, so the map keeps its size.
+	//
+	// **AUTOMATIC.** The table is in the box whenever the box is open, except on a phone, where it
+	// would cover the tree the manager is opened for; there the Tables pane's Scenarios tab holds it.
 	//
 	// **THE SPREADSHEET IS THE TABLES PANE'S OWN SCENARIOS TABLE, MOVED, NOT DRAWN TWICE.** While the
-	// table is out, the pane's panel element itself lives in the flyout and renderPaneTable() keeps
-	// drawing into it, with its selection, fill, paste and column widths. The pane's Scenarios tab
-	// stays on show meanwhile (Tom, 2026-10-16, continuity); choosing it sends the table home.
+	// table is in the box, the pane's panel element itself lives in #lpn_sm_table and renderPaneTable()
+	// keeps drawing into it, with its selection, fill, paste and column widths. The pane's Scenarios
+	// tab stays on show meanwhile (Tom, 2026-10-16, continuity); choosing it sends the table home, and
+	// the manager then has the whole box until it is next opened.
 	//
-	// **ONE BOX WITH THE MANAGER** (Tom, 2026-10-16): the table closes, tucks and flies out with the
-	// manager, and pointing at or typing in the table is pointing at or typing in the manager
-	// (dockFlyHovered(), dockFlyHas()). The seam between them is Settings' own slim divider
-	// (.lpn-setbox-divider); dragging it away from the box widens the table.
-	//
-	// **EXPANDABLE.** The edge away from the box drags it wider or narrower, up to the room beside the
-	// box. The width a drag leaves is kept with the manager's own layout (`flyW` in `lpn_smbox`).
-	var smFlyOn = false, smFlyWatch = null, smFlyHome = null;
-	function smFlyEl() { return document.getElementById('lpn_sm_fly'); }
-	// Shown at the manager's own stacking level (smFlyPlace()), never raised past it: it is part of
-	// that box, not a panel of its own.
-	function smFlyShow(fly) { fly.style.display = 'flex'; }
-	function smFlyIsOpen() { var f = smFlyEl(); return !!f && f.style.display !== 'none' && f.style.display !== ''; }
-	function smFlyRem() { return parseFloat(getComputedStyle(document.documentElement).fontSize) || 16; }
-	function smFlySet(on) {
-		smFlyOn = !!on && smBoxIsOpen();
-		if (smFlyOn) { smFlyBuild(); smFlyWatchBox(); smFlyPlace(); }
-		else {
-			var f = smFlyEl();
-			if (f) { hidePanel(f); }
-			smFlyPanelHome();
+	// **EXPANDABLE.** The manager's column keeps its width and the table takes the rest; the box is as
+	// wide as the two. The divider follows the pointer: dragged toward the manager it widens the table,
+	// the box growing on the manager's side while its far edge stays put (a box against the window's
+	// edge, or docked on the manager's side, grows at the far edge instead). The table's width is kept
+	// with the manager's own layout (`flyW` in `lpn_smbox`, the field this branch already stores); a
+	// drag of the box's corner gives the table the difference too. `w` in that record stays the
+	// manager's width alone, so a box opened without its table (a phone) opens at the manager's size.
+	var smTableOn = false, smTableHome = null, smMgrKeep = 0, smExpectW = 0, smWasDocked = false;
+	function smTableHost() { return document.getElementById('lpn_sm_table'); }
+	function smTableIn() { var b = smBoxEl(); return !!b && b.classList.contains('lpn-sm-has-table'); }
+	function smTableRem() { return parseFloat(getComputedStyle(document.documentElement).fontSize) || 16; }
+	// 2 + 6 + 2: the panes' 10 px gap either side of the 6 px divider, less its -8 px margins.
+	var SM_TABLE_SEAM = 10;
+	function smTableIsRtl() { return (document.documentElement.getAttribute('dir') || '').toLowerCase() === 'rtl'; }
+	function smTableMinW() { return 12 * smTableRem(); }
+	// The width the box has without its table: the reader's, if a drag of its corner chose one, else
+	// the stylesheet's (#lpn_sm_box's 22rem, held up by .lpn-setbox's min-width of 25rem).
+	function smMgrBoxW() {
+		var vw = window.innerWidth || document.documentElement.clientWidth || 0;
+		if (smboxLayout.userSized && smboxLayout.w > 0) { return Math.round(smboxLayout.w); }
+		return Math.round(Math.min(25 * smTableRem(), 0.94 * vw));
+	}
+	function smBoxChrome(box) {
+		var cs = getComputedStyle(box);
+		return (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0) +
+			(parseFloat(cs.borderLeftWidth) || 0) + (parseFloat(cs.borderRightWidth) || 0);
+	}
+	// The table's width as stored, else 40rem: Scenario, Parent and three categories open, the rest a
+	// scroll away.
+	function smTableW() { return Math.max(smTableMinW(), smboxLayout.flyW || 40 * smTableRem()); }
+	// The whole box, manager and table, as wide as the window allows.
+	function smTableTotalW() {
+		var vw = window.innerWidth || document.documentElement.clientWidth || 0;
+		return Math.round(Math.min(vw - 2 * POPUP_EDGE, smMgrKeep + SM_TABLE_SEAM + smTableW()));
+	}
+	// What the opener hands placeBoxRemembered(): the record, at the whole box's width while the table
+	// is in, so a first open centres the box the reader will see.
+	function smTablePlaceLayout() {
+		if (!smTableIn()) { return smboxLayout; }
+		return { left: smboxLayout.left, top: smboxLayout.top, w: smTableTotalW(),
+			h: smboxLayout.userSized ? smboxLayout.h : null, open: smboxLayout.open, userSized: true };
+	}
+	function smTableSet(on) {
+		smTableOn = !!on;
+		smTableSync();
+	}
+	// Called at the end of every rebuild of the manager, which every scenario act already reaches.
+	function smTableRefresh() { if (smTableOn) { smTableSync(); } }
+	// The one place the table goes into the box or comes out of it.
+	function smTableSync() {
+		var box = smBoxEl(), host = smTableHost(), tab = paneTableById('scenarios'),
+			panel = tab && document.getElementById(tab.panel), want, newly = false;
+		if (!box || !host) { return; }
+		want = smTableOn && smBoxIsOpen() && !smallScreen() && !!panel;
+		if (want) {
+			if (panel.parentNode !== host) {
+				smTableHome = { parent: panel.parentNode, next: panel.nextSibling };
+				hideTipsIn(panel);
+				host.appendChild(panel);
+			}
+			if (!box.classList.contains('lpn-sm-has-table')) {
+				smMgrKeep = smMgrBoxW();
+				box.classList.add('lpn-sm-has-table');
+				newly = true;
+			}
+			box.style.setProperty('--lpn-sm-mgr-w', Math.max(0, Math.round(smMgrKeep - smBoxChrome(box))) + 'px');
+			renderPaneTable(tab);
+			initTipsIn(host);
+			smTableFit(newly);
+		} else if (box.classList.contains('lpn-sm-has-table') || smTableHome) {
+			box.classList.remove('lpn-sm-has-table');
+			smTablePanelHome();
+			// The manager alone, at its own width again (a docked box keeps its column).
+			if (!smallScreen()) { box.style.width = smboxLayout.userSized && smboxLayout.w > 0 ? Math.round(smboxLayout.w) + 'px' : ''; }
+			smExpectW = 0;
+			smWasDocked = false;
 		}
 		refreshScenariosTab();
 	}
-	// Opened with the manager, except on a phone.
-	function smFlyAuto() { if (!smallScreen()) { smFlySet(true); } }
-	function smFlyClose() { if (smFlyOn || smFlyIsOpen()) { smFlySet(false); } }
-	// Called at the end of every rebuild of the manager, which every scenario act already reaches.
-	function smFlyRefresh() { if (smFlyOn && smBoxIsOpen()) { smFlyBuild(); smFlyPlace(); } }
 	// The pane's Scenarios panel goes back where it came from.
-	function smFlyPanelHome() {
+	function smTablePanelHome() {
 		var tab = paneTableById('scenarios'), panel = tab && document.getElementById(tab.panel);
-		if (!smFlyHome || !panel) { smFlyHome = null; return; }
+		if (!smTableHome || !panel) { smTableHome = null; return; }
 		hideTipsIn(panel);
-		if (smFlyHome.next && smFlyHome.next.parentNode === smFlyHome.parent) { smFlyHome.parent.insertBefore(panel, smFlyHome.next); }
-		else { smFlyHome.parent.appendChild(panel); }
-		smFlyHome = null;
+		if (smTableHome.next && smTableHome.next.parentNode === smTableHome.parent) { smTableHome.parent.insertBefore(panel, smTableHome.next); }
+		else { smTableHome.parent.appendChild(panel); }
+		smTableHome = null;
 		applyPaneLayout();
 	}
-	function smFlyBuild() {
-		var pc = EngCalcs.pageConfig || {}, f = smFlyEl(), x, grip, tab = paneTableById('scenarios'),
-			panel = tab && document.getElementById(tab.panel);
-		if (!f) {
-			f = document.createElement('div');
-			f.id = 'lpn_sm_fly';
-			f.className = 'lpn-sm-fly d-print-none';
-			f.setAttribute('role', 'region');
-			x = document.createElement('button');
-			x.type = 'button';
-			x.className = 'lpn-popover-x lpn-sm-fly-x';
-			x.id = 'lpn_sm_fly_close';
-			x.title = pc.lpn_close || 'Close';
-			x.setAttribute('aria-label', x.title);
-			x.textContent = '×';
-			x.addEventListener('click', function () { smFlySet(false); });
-			f.appendChild(x);
-			// The slim divider Settings draws between its index and its main pane
-			// (.lpn-setbox-divider), here between the manager and its table.
-			grip = document.createElement('div');
-			grip.id = 'lpn_sm_fly_divider';
-			grip.className = 'lpn-setbox-divider lpn-sm-fly-grip';
-			grip.setAttribute('role', 'separator');
-			grip.setAttribute('aria-orientation', 'vertical');
-			grip.setAttribute('tabindex', '0');
-			grip.addEventListener('pointerdown', smFlyStartResize);
-			grip.addEventListener('keydown', smFlyDividerKey);
-			f.appendChild(grip);
-			// One box with the manager: the pointer on the table is the pointer on the manager.
-			f.addEventListener('pointerenter', function () { if (dockFlyout && dockFlyout.box === smBoxEl()) { clearTimeout(dockTimer); } });
-			f.addEventListener('pointerleave', function () { if (dockFlyout && dockFlyout.box === smBoxEl() && !(smBoxEl().matches(':hover'))) { dockTuckLater(dockFlyout); } });
-			f.addEventListener('focusout', function () {
-				setTimeout(function () { if (dockFlyout && dockFlyout.box === smBoxEl()) { dockTuckLater(dockFlyout); } }, 0);
-			});
-			document.body.appendChild(f);
-		}
-		f.setAttribute('aria-label', pc.lpn_pane_tab_scenarios || 'Scenarios');
-		grip = document.getElementById('lpn_sm_fly_divider');
-		if (grip) { grip.setAttribute('aria-label', pc.lpn_pane_tab_scenarios || 'Scenarios'); }
-		if (panel && panel.parentNode !== f) {
-			smFlyHome = { parent: panel.parentNode, next: panel.nextSibling };
-			hideTipsIn(panel);
-			f.appendChild(panel);
-		}
-		smFlyShow(f);
-		if (tab && panel) { renderPaneTable(tab); }
-		initTipsIn(f);
-	}
-	// The room the table may take beside the box, on the side it is on.
-	function smFlyRoom() {
-		var f = smFlyEl(), box = smBoxEl(), r, vw, side;
-		if (!f || !box) { return 0; }
-		r = box.getBoundingClientRect();
-		vw = window.innerWidth || document.documentElement.clientWidth || 0;
-		side = f.getAttribute('data-side');
-		return side === 'left' ? r.left - POPUP_EDGE : vw - r.right - POPUP_EDGE;
-	}
-	function smFlyDividerKey(e) {
-		var f = smFlyEl(), side = f && f.getAttribute('data-side'), w, toward;
-		if (!f || side === 'over') { return; }
-		w = f.getBoundingClientRect().width;
-		if (e.key === 'Home') { smboxLayout.flyW = null; smFlyPlace(); saveSmboxLayout(); }
-		else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-			toward = (e.key === 'ArrowRight' ? 1 : -1) * (side === 'left' ? -1 : 1);
-			smboxLayout.flyW = Math.round(Math.max(18 * smFlyRem(), Math.min(smFlyRoom(), w + 12 * toward)));
-			f.style.width = smboxLayout.flyW + 'px';
-			saveSmboxLayout();
-		} else { return; }
-		if (e.preventDefault) { e.preventDefault(); }
-	}
-	function smFlyStartResize(ev) {
-		var f = smFlyEl(), x0 = ev.clientX, w0, side, move, up, min = 18 * smFlyRem();
-		if (!f || f.getAttribute('data-side') === 'over' || (ev.button !== undefined && ev.button !== 0)) { return; }
-		if (ev.preventDefault) { ev.preventDefault(); }
-		w0 = f.getBoundingClientRect().width;
-		side = f.getAttribute('data-side');
-		move = function (e) {
-			var dx = (e.clientX - x0) * (side === 'left' ? -1 : 1);
-			smboxLayout.flyW = Math.round(Math.max(min, Math.min(smFlyRoom(), w0 + dx)));
-			f.style.width = smboxLayout.flyW + 'px';
-		};
-		up = function () {
-			document.removeEventListener('pointermove', move);
-			document.removeEventListener('pointerup', up);
-			document.removeEventListener('pointercancel', up);
-			saveSmboxLayout();
-		};
-		document.addEventListener('pointermove', move);
-		document.addEventListener('pointerup', up);
-		document.addEventListener('pointercancel', up);
-	}
-	// Beside the box at its inline end (the right, or the left on a right-to-left page), else at the
-	// other side, else over the box below its two rows of controls. The box's own stacking level, so a
-	// box raised above it is raised above the table too.
-	function smFlyPlace() {
-		var f = smFlyEl(), box = smBoxEl(), r, vw, vh, edge = POPUP_EDGE, rtl, endRoom, startRoom, want, tools, top, z, room, w;
-		if (!f || !box || !smFlyOn) { return; }
-		if (!smBoxIsOpen() || box.classList.contains('lpn-dock-collapsed')) { hidePanel(f); return; }
-		smFlyShow(f);
-		// A docked column has its own width grip on this same seam, in front; the divider steps inside it.
-		f.setAttribute('data-docked', box.classList.contains('lpn-docked') ? '1' : '0');
-		r = box.getBoundingClientRect();
-		vw = window.innerWidth || document.documentElement.clientWidth || 0;
-		vh = window.innerHeight || document.documentElement.clientHeight || 0;
-		rtl = (document.documentElement.getAttribute('dir') || '').toLowerCase() === 'rtl';
-		endRoom = rtl ? r.left - edge : vw - r.right - edge;
-		startRoom = rtl ? vw - r.right - edge : r.left - edge;
-		// 18rem: a name column and two categories, the least that is a table.
-		want = 18 * smFlyRem();
-		z = getComputedStyle(box).zIndex;
-		f.style.zIndex = z && z !== 'auto' ? z : '1050';
-		f.style.left = f.style.right = f.style.top = f.style.bottom = f.style.width = f.style.height = f.style.maxWidth = '';
-		f.classList.remove('lpn-sm-fly-over');
-		if (endRoom >= want || startRoom >= want) {
-			var atEnd = endRoom >= want || endRoom >= startRoom, onRight = atEnd !== rtl;
-			room = Math.floor(atEnd ? endRoom : startRoom);
-			f.style.top = Math.max(edge, r.top) + 'px';
-			f.style.height = Math.max(120, Math.min(r.height, vh - edge - Math.max(edge, r.top))) + 'px';
-			// A dragged width, else 40rem: Scenario, Parent and three categories open, the rest a scroll away.
-			w = smboxLayout.flyW || 40 * smFlyRem();
-			f.style.width = Math.round(Math.max(Math.min(want, room), Math.min(w, room))) + 'px';
-			f.style.maxWidth = room + 'px';
-			if (onRight) { f.style.left = Math.round(r.right - 1) + 'px'; }
-			else { f.style.right = Math.round(vw - r.left - 1) + 'px'; }
-			f.setAttribute('data-side', onRight ? 'right' : 'left');
+	// The box at the width of its two panes. Floating, it widens toward its inline end, kept inside
+	// the window. Docked, its column is the dock's (`dockW`, the same record), widened once, when the
+	// table first finds it too narrow to be a table; the dock's own grip sizes it after that.
+	function smTableFit(newly) {
+		var box = smBoxEl(), vw = window.innerWidth || document.documentElement.clientWidth || 0,
+			r, w, left, docked;
+		if (!box || !smTableIn()) { return; }
+		docked = boxIsDocked(box);
+		if (docked) {
+			if ((newly || !smWasDocked) && !(smboxLayout.dockW >= smMgrKeep + SM_TABLE_SEAM + 18 * smTableRem())) {
+				smboxLayout.dockW = Math.round(smMgrKeep + SM_TABLE_SEAM + smTableW());
+				layoutDocks();
+			}
+			smWasDocked = true;
 			return;
 		}
-		// No room beside the box: over its lower part, below the selector and the commands.
-		tools = box.querySelectorAll('.lpn-sm-tools');
-		top = tools.length ? tools[tools.length - 1].getBoundingClientRect().bottom + 4 : r.top + 80;
-		f.classList.add('lpn-sm-fly-over');
-		f.style.left = Math.max(edge, r.left) + 'px';
-		f.style.width = Math.max(0, Math.min(r.right, vw - edge) - Math.max(edge, r.left)) + 'px';
-		f.style.maxWidth = f.style.width;
-		f.style.top = top + 'px';
-		f.style.height = Math.max(120, Math.min(r.bottom, vh - edge) - top) + 'px';
-		f.setAttribute('data-side', 'over');
+		smWasDocked = false;
+		r = box.getBoundingClientRect();
+		w = smTableTotalW();
+		smExpectW = w;
+		if (Math.abs(r.width - w) <= 0.5) { return; }
+		box.style.width = w + 'px';
+		left = smTableIsRtl() ? r.right - w : r.left;
+		box.style.left = Math.round(Math.max(POPUP_EDGE, Math.min(left, vw - POPUP_EDGE - w))) + 'px';
 	}
-	// The table follows the box: a drag or a dock writes the box's style or class, a resize its size,
-	// and the window its own size. Closing the box (any door, including Basic mode) closes it.
-	function smFlyWatchBox() {
-		var box = smBoxEl();
-		if (smFlyWatch || !box) { return; }
-		smFlyWatch = { mo: null, ro: null };
-		if (window.MutationObserver) {
-			smFlyWatch.mo = new MutationObserver(function () {
-				if (!smBoxIsOpen()) { smFlyClose(); return; }
-				if (smFlyOn) { smFlyPlace(); }
+	// Run by saveSmboxLayout() before it writes. The box-memory observers record the whole box's
+	// width as `w`; while the table is in, the manager's part goes back into `w`, and a width the
+	// reader dragged the corner to (one that is not the width smTableFit() set) goes to the table.
+	function smTableNormalizeLayout() {
+		var box = smBoxEl(), host = smTableHost();
+		if (!box || !smTableIn() || boxIsDocked(box) || smallScreen()) { return; }
+		if (smboxLayout.userSized && smboxLayout.w > 0 && smExpectW && Math.abs(smboxLayout.w - smExpectW) > 1 && host) {
+			smboxLayout.flyW = Math.round(host.getBoundingClientRect().width);
+			smExpectW = smboxLayout.w;
+		}
+		if (smboxLayout.userSized) { smboxLayout.w = smMgrKeep; }
+	}
+	// The divider moved by `dx` pixels on screen from where a drag began (`from`).
+	function smTableDividerMove(from, dx) {
+		var box = smBoxEl(), vw = window.innerWidth || document.documentElement.clientWidth || 0,
+			rtl = smTableIsRtl(), toward = dx * (rtl ? -1 : 1), fly, total, rest, left;
+		if (!box) { return; }
+		rest = from.box.width - from.fly;
+		fly = Math.max(smTableMinW(), from.fly - toward);
+		if (boxIsDocked(box)) {
+			smboxLayout.dockW = Math.round(rest + fly);
+			layoutDocks();
+			smboxLayout.flyW = Math.round(smTableHost().getBoundingClientRect().width);
+			return;
+		}
+		total = Math.min(vw - 2 * POPUP_EDGE, rest + fly);
+		fly = total - rest;
+		// The far edge stays put, so the divider stays under the pointer; against the window's edge
+		// the box grows at the far edge instead.
+		left = rtl ? from.box.left : from.box.right - total;
+		left = Math.max(POPUP_EDGE, Math.min(left, vw - POPUP_EDGE - total));
+		box.style.width = Math.round(total) + 'px';
+		box.style.left = Math.round(left) + 'px';
+		smExpectW = Math.round(total);
+		smboxLayout.flyW = Math.round(fly);
+		smboxLayout.left = Math.round(left);
+	}
+	function smTableDragFrom() {
+		var box = smBoxEl(), host = smTableHost(), r = box.getBoundingClientRect();
+		return { box: { left: r.left, right: r.right, width: r.width }, fly: host.getBoundingClientRect().width };
+	}
+	function wireSmTable(box) {
+		var d = document.getElementById('lpn_sm_divider'), start = null;
+		if (d && !d._lpnDividerWired) {
+			d._lpnDividerWired = true;
+			// Settings' own divider (wireSetboxDivider()): a press focuses it, so the arrows and Home
+			// work from where the hand already is, and the pointer is captured for a fast drag.
+			d.addEventListener('pointerdown', function (e) {
+				if (!smTableIn() || (e.button !== undefined && e.button !== 0)) { return; }
+				start = { x: e.clientX, from: smTableDragFrom() };
+				if (d.focus) { d.focus(); }
+				if (d.setPointerCapture && e.pointerId !== undefined) { try { d.setPointerCapture(e.pointerId); } catch (err) {} }
+				if (e.preventDefault) { e.preventDefault(); }
+				// Not the box's own drag: a press on the divider is not a press on the title band.
+				if (e.stopPropagation) { e.stopPropagation(); }
 			});
-			smFlyWatch.mo.observe(box, { attributes: true, attributeFilter: ['style', 'class'] });
+			d.addEventListener('pointermove', function (e) {
+				if (!start) { return; }
+				smTableDividerMove(start.from, e.clientX - start.x);
+			});
+			['pointerup', 'pointercancel'].forEach(function (evt) {
+				d.addEventListener(evt, function (e) {
+					if (!start) { return; }
+					start = null;
+					if (d.releasePointerCapture && e && e.pointerId !== undefined) { try { d.releasePointerCapture(e.pointerId); } catch (err) {} }
+					saveSmboxLayout();
+				});
+			});
+			d.addEventListener('keydown', function (e) {
+				if (!smTableIn()) { return; }
+				if (e.key === 'Home') {
+					smboxLayout.flyW = null;
+					if (boxIsDocked(box)) { smboxLayout.dockW = Math.round(smMgrKeep + SM_TABLE_SEAM + smTableW()); layoutDocks(); }
+					else { smTableFit(false); }
+				} else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+					smTableDividerMove(smTableDragFrom(), e.key === 'ArrowRight' ? 12 : -12);
+				} else { return; }
+				saveSmboxLayout();
+				if (e.preventDefault) { e.preventDefault(); }
+			});
 		}
-		if (window.ResizeObserver) {
-			smFlyWatch.ro = new ResizeObserver(function () { if (smFlyOn) { smFlyPlace(); } });
-			smFlyWatch.ro.observe(box);
+		// Closed by any door (the X, Escape, Basic mode), the table goes home with the box. Docked or
+		// floated, the box is fitted to its two panes again.
+		if (window.MutationObserver) {
+			new MutationObserver(function () {
+				if (!smBoxIsOpen()) { if (smTableIn()) { smTableSet(false); } return; }
+				if (smTableIn() && boxIsDocked(box) !== smWasDocked) { smTableFit(false); }
+			}).observe(box, { attributes: true, attributeFilter: ['style', 'class'] });
 		}
-		window.addEventListener('resize', function () { if (smFlyOn) { smFlyPlace(); } });
+		// A window narrowed to a phone sends the table home, and widened again brings it back.
+		window.addEventListener('resize', function () {
+			if (smTableOn && smBoxIsOpen()) { smTableSync(); }
+		});
 	}
 	// ---- the Scenarios table: one row per scenario, one column per category -------------------
 	function scenarioTableRows() {

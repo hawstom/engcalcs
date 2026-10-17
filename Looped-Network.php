@@ -1481,7 +1481,19 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<div id="lpn_smbox_title" class="lpn-setbox-title"><?=ecTipLabel($ec_lang['lpn_sm_title'], $ec_lang['lpn_sm_help'])?></div>
 	<button type="button" id="lpn_sm_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
-		<div id="lpn_sm_body" class="lpn-sm-body"></div>
+		<?php // ONE BOX, TWO PANES, LAID OUT AS SETTINGS LAYS OUT ITS INDEX AND ITS CONTENT (Tom,
+		      // 2026-10-16: "this is a consolidated box now"): the manager's tree, Settings' own slim
+		      // divider, and the Tables pane's Scenarios table moved in beside it (smTableSync()). One
+		      // title band, one X, one row of dock buttons, one border. The divider and the table pane
+		      // show only while the table is in (.lpn-sm-has-table on the box). ?>
+		<div id="lpn_sm_panes" class="lpn-setbox-panes lpn-sm-panes">
+			<div id="lpn_sm_body" class="lpn-sm-body"></div>
+			<div id="lpn_sm_divider" class="lpn-setbox-divider lpn-sm-divider" role="separator"
+				aria-orientation="vertical" tabindex="0"
+				aria-label="<?=htmlspecialchars($ec_lang['lpn_pane_tab_scenarios'])?>"></div>
+			<div id="lpn_sm_table" class="lpn-sm-table" role="region"
+				aria-label="<?=htmlspecialchars($ec_lang['lpn_pane_tab_scenarios'])?>"></div>
+		</div>
 	</div>
 </div>
 <?php // THE FULL REPORT (ROADMAP Task 715). EPANET's Report > Full: every node and every link at
