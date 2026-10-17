@@ -306,6 +306,12 @@ const FOREIGN = fs.readFileSync(ROOT + 'dev/lpn-spike/fixtures/geojson-utility-l
 	const ll = JSON.stringify({ type: 'FeatureCollection', crs: { type: 'name', properties: { name: 'EPSG:4326' } },
 		features: [{ type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [-111.9, 33.4] } }] });
 	ok('EPSG:4326 is longitude and latitude and is read', E.lpnGeoJsonNetScan(ll).ok === true);
+	['EPSG:4269', 'urn:ogc:def:crs:EPSG::4269', 'urn:ogc:def:crs:EPSG:6.6:4269', 'http://www.opengis.net/def/crs/EPSG/0/4269'].forEach(function (nm) {
+		const nad = JSON.stringify({ type: 'FeatureCollection', crs: { type: 'name', properties: { name: nm } },
+			features: [{ type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [-111.9, 33.4] } }] });
+		const sc = E.lpnGeoJsonNetScan(nad);
+		ok('NAD83 as ' + nm + ' is read as WGS 84 and named, not refused', sc.ok === true && sc.nad83Named === nm && !sc.crsNamed, JSON.stringify(sc.error || sc.nad83Named));
+	});
 	ok('a file with no points or lines is refused as empty', E.lpnGeoJsonNetScan('{"type":"FeatureCollection","features":[]}').error === 'empty');
 	ok('text that is not JSON is refused as unreadable', E.lpnGeoJsonNetScan('not json').error === 'unreadable');
 }

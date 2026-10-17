@@ -4280,6 +4280,7 @@ EngCalcs.pageConfig = {
 	lpn_gjnet_report_lead: <?=json_encode($ec_lang['lpn_gjnet_report_lead'])?>,
 	lpn_gjnet_and_more: <?=json_encode($ec_lang['lpn_gjnet_and_more'])?>,
 	lpn_gjnet_note_crs: <?=json_encode($ec_lang['lpn_gjnet_note_crs'])?>,
+	lpn_gjnet_note_crs_nad83: <?=json_encode($ec_lang['lpn_gjnet_note_crs_nad83'])?>,
 	lpn_gjnet_note_skip_geometry: <?=json_encode($ec_lang['lpn_gjnet_note_skip_geometry'])?>,
 	lpn_gjnet_note_skip_kind: <?=json_encode($ec_lang['lpn_gjnet_note_skip_kind'])?>,
 	lpn_gjnet_note_skip_position: <?=json_encode($ec_lang['lpn_gjnet_note_skip_position'])?>,

@@ -273,6 +273,24 @@ async function main() {
 			!!d && d.text === (await L('lpn_gjnet_refuse_crs')).replace('{crs}', 'urn:ogc:def:crs:EPSG::2223').replace('{file}', 'stateplane.geojson'), d && d.text);
 		if (d) { await a.dialogClick(d.buttons[0]); }
 		ok('...and nothing is imported', (await h.stored()).count === n0);
+		// NAD83 (EPSG:4269) is read as WGS 84 with no transform, and the report says so.
+		const nadFile = JSON.stringify({ type: 'FeatureCollection', crs: { type: 'name', properties: { name: 'urn:ogc:def:crs:EPSG::4269' } },
+			features: [
+				{ type: 'Feature', properties: { ID: 'N1', ELEV: '300' }, geometry: { type: 'Point', coordinates: [-111.9123456, 33.4123456] } },
+				{ type: 'Feature', properties: { ID: 'N2', ELEV: '301' }, geometry: { type: 'Point', coordinates: [-111.9113456, 33.4133456] } },
+				{ type: 'Feature', properties: { PID: 'P1' }, geometry: { type: 'LineString', coordinates: [[-111.9123456, 33.4123456], [-111.9113456, 33.4133456]] } }] });
+		await h.importVia({ name: 'nad83.geojson', mimeType: 'application/geo+json', buffer: Buffer.from(nadFile) });
+		d = await a.waitDialog(4000);
+		ok('a NAD83 file is not refused: the mapping step opens', !!d && d.text.indexOf((await L('lpn_gjnet_refuse_crs')).slice(0, 12)) < 0 && await P.evaluate(() => !!document.querySelector('#lpn_dialog_body table[data-kind]')), d && d.text.slice(0, 120));
+		await a.dialogClick(await L('lpn_library_import_go'));
+		d = await a.waitDialog(8000);
+		const nadItems = await P.$$eval('#lpn_gjnet_report li', (ls) => ls.map((li) => ({ code: li.getAttribute('data-code'), text: li.textContent })));
+		const nadNote = nadItems.find((i) => i.code === 'crs-nad83');
+		ok('the report carries the NAD83 note', !!nadNote && nadNote.text === (await L('lpn_gjnet_note_crs_nad83')), JSON.stringify(nadItems.map((i) => i.code)));
+		if (d) { await a.dialogClick(await L('lpn_dialog_ok')); }
+		const nadDoc = (await h.stored()).doc;
+		const nx = (id) => nadDoc.nodes.find((n) => n.id === id);
+		ok('the positions are the file\'s, unchanged', !!nx('N1') && !!nx('N2') && nx('N1').x === -111.9123456 && nx('N1').y === 33.4123456 && nx('N2').x === -111.9113456 && nx('N2').y === 33.4133456, JSON.stringify([nx('N1') && [nx('N1').x, nx('N1').y]]));
 		ok('the menu row has its tip', await P.evaluate(() => !!(window.EngCalcs.pageConfig || {}).lpn_file_import_gjnet_tip));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();

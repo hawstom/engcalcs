@@ -542,7 +542,7 @@
 	//     lines. A line end that lands on no point within the stated tolerance gets a junction of
 	//     its own; a LineString's interior positions become the pipe's bends.
 	//   - RFC 7946 section 4: positions are WGS 84 longitude and latitude. A legacy `crs` member
-	//     naming CRS84 or EPSG:4326 is that frame and is read, and said; one naming any other frame
+	//     naming CRS84 or EPSG:4326 is that frame and is read, and said; one naming NAD83 (EPSG:4269) is read the same way, with a note that the frames differ by 1 to 2 m; one naming any other frame
 	//     is refused with its name, because a guess would place the network somewhere false.
 	//   - **NOTHING IS DROPPED OR CHANGED WITHOUT BEING NAMED.** Every feature not imported, every
 	//     ID changed, every junction added, every line end moved and every default used is a note
@@ -554,6 +554,9 @@
 	var GJ_TYPES = { Point: 'point', MultiPoint: 'point', LineString: 'line', MultiLineString: 'line' };
 	// The legacy names (GeoJSON 2008 section 3) for the one frame RFC 7946 allows.
 	var GJ_WGS84 = /^(urn:ogc:def:crs:OGC:1\.3:CRS84|urn:ogc:def:crs:OGC::CRS84|OGC:CRS84|CRS:?84|urn:ogc:def:crs:EPSG:[0-9.]*:4326|EPSG:+4326|https?:\/\/www\.opengis\.net\/def\/crs\/(OGC\/1\.3\/CRS84|EPSG\/0\/4326))$/i;
+	// NAD83 (Tom, 2026-10-16): read as WGS 84 with no transform, so the stored numbers equal the
+	// file's, and said. The two frames differ by about 1 to 2 m in the continental US.
+	var GJ_NAD83 = /^(urn:ogc:def:crs:EPSG:[0-9.]*:4269|EPSG:+4269|https?:\/\/www\.opengis\.net\/def\/crs\/EPSG\/0\/4269)$/i;
 	// What the writer above puts on every feature. A file of ours whose features carry any other
 	// key carries it as a custom property and says so.
 	var GJ_OURS_NODE = ['name', 'node_type', 'description', 'elevation', 'base_demand', 'demand_pattern',
@@ -632,7 +635,7 @@
 	 *     seen: `numeric` when every value stated is a number, `numbers` how many are.
 	 */
 	EngCalcs.lpnGeoJsonNetScan = function (text) {
-		var rd = readJson(text), root, feats, crsNamed = '', bad = '', counts = { point: 0, line: 0, other: 0 },
+		var rd = readJson(text), root, feats, crsNamed = '', nad83Named = '', bad = '', counts = { point: 0, line: 0, other: 0 },
 			fields = { point: [], line: [] }, seen = { point: {}, line: {} }, i;
 		if (!rd.ok) { return { ok: false, error: 'unreadable', detail: rd.detail }; }
 		root = rd.value;
@@ -644,6 +647,7 @@
 			if (!obj || typeof obj !== 'object' || obj.crs === undefined || obj.crs === null) { return; }
 			name = gjCrsName(obj.crs);
 			if (GJ_WGS84.test(name.trim())) { crsNamed = crsNamed || name; }
+			else if (GJ_NAD83.test(name.trim())) { nad83Named = nad83Named || name; }
 			else if (!bad) { bad = name; }
 		}
 		crsCheck(root);
@@ -668,7 +672,7 @@
 		fields.point.concat(fields.line).forEach(function (r) { if (!r.count) { r.numeric = false; } });
 		if (!counts.point && !counts.line) { return { ok: false, error: 'empty', detail: '' }; }
 		return {
-			ok: true, root: root, feats: feats, crsNamed: crsNamed, counts: counts, fields: fields,
+			ok: true, root: root, feats: feats, crsNamed: crsNamed, nad83Named: nad83Named, counts: counts, fields: fields,
 			ours: !!(root.lwn && gjPlain(root.lwn.format) === 'LibreWaterNet GeoJSON')
 		};
 	};
@@ -815,6 +819,7 @@
 			nodeById = {}, linkIds = {}, patterns = [], patById = {}, curves = [], curveById = {}, custom = {},
 			counts = { junction: 0, reservoir: 0, tank: 0, pipe: 0, pump: 0, valve: 0, shape: 0 }, hadResults = false;
 		if (scan.crsNamed) { notes.add('crs-named', null, scan.crsNamed); }
+		if (scan.nad83Named) { notes.add('crs-nad83', null, scan.nad83Named); }
 		function num(pr, key, dst, dkey) {
 			var n = gjNumber(pr[key]);
 			if (!n) { return; }
@@ -986,6 +991,7 @@
 			fieldOf = { point: {}, line: {} }, zCount = [], minted = { J: 0, L: 0 }, lat0 = 0, nLat = 0,
 			noElev = [], demandKept = [];
 		if (scan.crsNamed) { notes.add('crs-named', null, scan.crsNamed); }
+		if (scan.nad83Named) { notes.add('crs-nad83', null, scan.nad83Named); }
 		['point', 'line'].forEach(function (kind) {
 			Object.keys(map[kind] || {}).forEach(function (field) {
 				var t = map[kind][field];

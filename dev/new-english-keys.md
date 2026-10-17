@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**8 still to read on master**, of 252 untranslated keys, of 2872 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**9 still to read on master**, of 253 untranslated keys, of 2873 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -79,7 +79,7 @@ is the one you meant. "The first one" is a complete answer.
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (252, 8 to read @@ NEEDS RULING)
+## lpn_  (253, 9 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -174,6 +174,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_gjnet_note_crs`**
   > The file states the coordinate system {crs}, which is WGS 84 latitude and longitude, the system RFC 7946 requires. Positions were read as stated.
   _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_crs_nad83`**
+  > The file states NAD83 (EPSG:4269). Its positions were read as WGS 84, which places them within about 1 to 2 m of where NAD83 puts them.
+  @@ NEEDS RULING
 - **`lpn_gjnet_note_default_demand`**
   > These junctions state no base demand and have the default base demand, {value}.
   _Ruled OK 2026-10-16._
@@ -857,7 +860,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/geojson-import (`2645d1014`) — adds no English strings
+### feat/geojson-import (`218ba29f9`) — adds no English strings
 
 ### feat/guide-scenarios (`b8f4a13d8`) — 60 new, 60 to read @@ NEEDS RULING
 

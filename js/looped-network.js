@@ -45039,6 +45039,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		function v(x) { return String(x === undefined || x === null ? '' : x); }
 		var T = {
 			'crs-named': ['lpn_gjnet_note_crs', 'The file states the coordinate system {crs}, which is WGS 84 latitude and longitude, the system RFC 7946 requires. Positions were read as stated.'],
+			'crs-nad83': ['lpn_gjnet_note_crs_nad83', 'The file states NAD83 (EPSG:4269). Its positions were read as WGS 84, which places them within about 1 to 2 m of where NAD83 puts them.'],
 			'skip-geometry': ['lpn_gjnet_note_skip_geometry', 'Not imported: the feature is not a point or a line.'],
 			'skip-kind': ['lpn_gjnet_note_skip_kind', 'Not imported: the feature states no node_type or link_type.'],
 			'skip-position': ['lpn_gjnet_note_skip_position', 'Not imported: a position is not a valid latitude and longitude.'],
