@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**154 still to read on master**, of 177 untranslated keys, of 2799 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read on master**, of 0 untranslated keys, of 2637 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -154,13 +154,6 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-- **`lpn_morph_menu`**
-  > Morph
-  *Why stale:* no record of the English it was written against
-  *Current synonym:* Transform | Change the type of an asset (a node into a junction, reservoir or tank; a link into a pipe, pump or valve) while it keeps its ID, location and connections.
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
 - **`lpn_pane_scn_alt_tip`**
   > {category} alt.: {alternative}
   *Why stale:* no record of the English it was written against
@@ -172,6 +165,14 @@ never edits a synonym.
   > Run
   *Why stale:* no record of the English it was written against
   *Current synonym:* Run, simulation, computation, or calculation report
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`lpn_scenario_push_values`**
+  > Values discarded:
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Values thrown away:
+  *Current synonym:* Values thrown away, Values discarded, Values lost, Values wiped, Values replaced, Values displaced, Values cleared, Custom values cleared | a count follows this label, not a list of values
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
@@ -198,7 +199,24 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (177, 154 to read @@ NEEDS RULING)
+None on master. Every English key here is present in at least one other language.
+
+---
+
+# Strings waiting on a branch
+
+**187 still to read**, of 190 new keys across 12 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### feat/bentley-interop (`b34e598bf`) — 174 new, 174 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -214,10 +232,10 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_clean_map`**
   > Clean map
-  _Ruled 2026-10-15: Approved._
+  @@ NEEDS RULING
 - **`lpn_clean_map_tip`**
   > Checked: the zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.
-  _Ruled 2026-10-16: Asked whether to lowercase "The" after "Checked:" like the other tips: "Yes. Make your proposed correction. Thank you for checking."_
+  @@ NEEDS RULING
 - **`lpn_control_inactive_note`**
   > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
   @@ NEEDS RULING
@@ -232,7 +250,7 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_copy_props_no_overrides`**
   > No overrides to copy.
-  _Ruled 2026-10-13: Approved as written._
+  @@ NEEDS RULING
 - **`lpn_ctx_edit_text`**
   > Edit text
   @@ NEEDS RULING
@@ -263,23 +281,17 @@ never edits a synonym.
 - **`lpn_library_pattern_default_deleted_in`**
   > Pattern {id} was the default demand pattern in these scenarios: {list}.
   @@ NEEDS RULING
+- **`lpn_morph_menu`**
+  > Morph
+  @@ NEEDS RULING
+- **`lpn_morph_ok`**
+  > Morph
+  @@ NEEDS RULING
 - **`lpn_morph_other_kind`**
   > A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}
   @@ NEEDS RULING
-- **`lpn_ovl_bubble_moved`**
-  > {quantity}, moved or resized
-  @@ NEEDS RULING
-- **`lpn_ovl_bubble_off`**
-  > Not on the map
-  @@ NEEDS RULING
-- **`lpn_ovl_clear_all`**
-  > Clear all overrides
-  @@ NEEDS RULING
-- **`lpn_ovl_clear_all_ask`**
-  > Clear all the overrides ({n}) of {name}? Each value returns to the inherited value. Undo reverses this.
-  @@ NEEDS RULING
-- **`lpn_ovl_clear_selected`**
-  > Clear selected overrides
+- **`lpn_morph_tip`**
+  > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its location, its connections, and every value the new type also has. In Base the asset itself is changed, and you are asked first if any value would be lost. In any other scenario the new type is an override in that scenario only, and the values only the new type has start from Settings > New assets.
   @@ NEEDS RULING
 - **`lpn_ovl_col_inherited`**
   > Inherited value
@@ -294,10 +306,7 @@ never edits a synonym.
   > {category}: {alternative}
   @@ NEEDS RULING
 - **`lpn_ovl_note`**
-  > These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Clear an override to restore the inherited value; Undo reverses it. Select an ID to go to the asset on the map.
-  @@ NEEDS RULING
-- **`lpn_ovl_pick_tip`**
-  > Select this override for the Clear selected overrides button.
+  > These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Click an ID to go to the asset on the map.
   @@ NEEDS RULING
 - **`lpn_ovl_same`**
   > (same)
@@ -306,20 +315,20 @@ never edits a synonym.
   > Equal to the inherited value. It is still an override, and it is counted.
   @@ NEEDS RULING
 - **`lpn_ovl_title`**
-  > Manage overrides: {name}
+  > Overrides: {name}
   @@ NEEDS RULING
 - **`lpn_ovm_child_ask`**
   > Clear child overrides ({n} total)?
   @@ NEEDS RULING
 - **`lpn_ovm_child_tip`**
   > Child scenarios override this value ({n} total). Click to clear their overrides.
-  _Ruled 2026-10-13: Approved as written._
+  @@ NEEDS RULING
 - **`lpn_ovm_dot_clear`**
   > Click to clear it.
-  _Ruled 2026-10-13: Approved as written._
+  @@ NEEDS RULING
 - **`lpn_ovm_dot_set`**
   > Inherited. Click to make it an override in this scenario, holding the value shown.
-  _Ruled 2026-10-13: Approved as written._
+  @@ NEEDS RULING
 - **`lpn_pane_inactive_show`**
   > Include inactive topology
   @@ NEEDS RULING
@@ -367,19 +376,19 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_scenario_basic_misfit`**
   > This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.
-  _Ruled OK 2026-10-13._
+  @@ NEEDS RULING
 - **`lpn_scenario_basic_misfit_base`**
   > The Base scenario uses an alternative other than Base.
   @@ NEEDS RULING
 - **`lpn_scenario_copy`**
   > Copy scenario
-  _Ruled OK 2026-10-13._
+  @@ NEEDS RULING
 - **`lpn_scenario_copy_off`**
   > Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.
-  _Ruled OK 2026-10-13._
+  @@ NEEDS RULING
 - **`lpn_scenario_copy_tip`**
   > Copies the open scenario and its overrides, and opens the copy.
-  _Ruled OK 2026-10-13._
+  @@ NEEDS RULING
 - **`lpn_scenario_delete_ask`**
   > Delete the scenario {name}? The drawing itself is not changed.
   @@ NEEDS RULING
@@ -391,7 +400,7 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_scenario_delete_stays`**
   > These alternatives it uses stay in the project: {list}.
-  _Ruled 2026-10-13: Approved as written._
+  @@ NEEDS RULING
 - **`lpn_scenario_mark_inh_tip`**
   > The dashed gray ring means the scenario {name} inherits an override for this asset from its parent scenario or alternative.
   @@ NEEDS RULING
@@ -406,10 +415,10 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_settings_override_marks`**
   > Show override markers on the map
-  _Ruled 2026-10-15: Approved._
+  @@ NEEDS RULING
 - **`lpn_settings_override_marks_tip`**
   > Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.
-  _Ruled 2026-10-16: I approve all three._
+  @@ NEEDS RULING
 - **`lpn_settings_restore_base_only`**
   > Switch to Base to restore the defaults.
   @@ NEEDS RULING
@@ -427,7 +436,7 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_settings_row_bubbles`**
   > Time series graphs on the map
-  _Ruled 2026-10-15: Approved._
+  @@ NEEDS RULING
 - **`lpn_settings_row_check_freq`**
   > Status check frequency
   @@ NEEDS RULING
@@ -583,7 +592,7 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_sm_all_row_tip`**
   > Double-click to open it in its category tree.
-  _Ruled 2026-10-16: I approve all three._
+  @@ NEEDS RULING
 - **`lpn_sm_base_kept`**
   > The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.
   @@ NEEDS RULING
@@ -630,13 +639,13 @@ never edits a synonym.
   > Scenario {name}
   @@ NEEDS RULING
 - **`lpn_sm_list_overrides`**
-  > Manage overrides
+  > List overrides
   @@ NEEDS RULING
 - **`lpn_sm_list_overrides_none`**
   > This scenario has no overrides.
-  _Ruled 2026-10-15: Revised. But should be obvious when count = 0._
+  @@ NEEDS RULING
 - **`lpn_sm_list_overrides_tip`**
-  > List the scenario's overrides by category, each with the inherited value it overrides, and clear any of them.
+  > List the scenario's overrides by category, each with the inherited value it overrides.
   @@ NEEDS RULING
 - **`lpn_sm_make_current`**
   > Make current
@@ -679,7 +688,7 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_sm_rename_alts_ask`**
   > Rename equally named alternatives?
-  _Ruled OK 2026-10-13._
+  @@ NEEDS RULING
 - **`lpn_sm_shared_note`**
   > Shared with: {list}
   @@ NEEDS RULING
@@ -688,13 +697,13 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_sm_tree_all`**
   > All
-  _Ruled 2026-10-15: Approved._
+  @@ NEEDS RULING
 - **`lpn_sm_tree_unused`**
   > All unused
-  _Ruled 2026-10-15: Approved._
+  @@ NEEDS RULING
 - **`lpn_sm_unused_none`**
   > None
-  _Ruled 2026-10-16: I approve all three._
+  @@ NEEDS RULING
 - **`lpn_sm_used_by`**
   > Used by scenarios: {n}
   @@ NEEDS RULING
@@ -706,13 +715,13 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_time_run_cut_off`**
   > EPANET had closed {link} and then could not solve for {nodes}.
-  _Ruled 2026-10-15: R-402 status messages: Approved._
+  @@ NEEDS RULING
 - **`lpn_time_run_cut_off_empty`**
   > Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.
-  _Ruled 2026-10-15: R-402 status messages: Approved._
+  @@ NEEDS RULING
 - **`lpn_time_run_cut_off_full`**
   > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
-  _Ruled 2026-10-15: R-402 status messages: Approved._
+  @@ NEEDS RULING
 - **`lpn_tsb_close`**
   > Close graph
   @@ NEEDS RULING
@@ -732,30 +741,7 @@ never edits a synonym.
   > Drag to resize
   @@ NEEDS RULING
 
----
-
-# Strings waiting on a branch
-
-**2 still to read**, of 5 new keys across 16 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### chore/plain-sentences (`8301b0524`) — adds no English strings
-
-### feat/basemap-outdoors (`2a45b1cc2`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_basemap_outdoors_show`**
-  > Show outdoors map
-  @@ NEEDS RULING
-
-### feat/bentley-interop (`9b9f74f33`) — adds no English strings
+### feat/description-lines (`9b55bfe79`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -781,18 +767,49 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/manage-override (`c07f5b4d6`) — adds no English strings
+### feat/match-property (`05bda7651`) — 10 new, 10 to read @@ NEEDS RULING
 
-### feat/match-property (`05bda7651`) — adds no English strings
-
-### feat/pattern-axis (`6f37c6eed`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_library_pattern_axis_step`**
-  > Step
+- **`lpn_copy_props_done`**
+  > Copied properties of {id}.
+  @@ NEEDS RULING
+- **`lpn_copy_props_menu`**
+  > Copy properties
+  @@ NEEDS RULING
+- **`lpn_paste_done_many`**
+  > Pasted properties of {id} to {m} assets. Values changed: {n}.
+  @@ NEEDS RULING
+- **`lpn_paste_done_one`**
+  > Pasted properties of {id} to {to}. Values changed: {n}.
+  @@ NEEDS RULING
+- **`lpn_paste_props_menu`**
+  > Paste properties to selection
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_kind`**
+  > No selected asset can take the copied properties.
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_none`**
+  > Nothing is copied. Right-click an asset and choose Copy properties.
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_select`**
+  > Select the assets to paste to, then choose Paste properties to selection.
+  @@ NEEDS RULING
+- **`lpn_paste_skip_breakdown`**
+  > Not pasted: {n} (demand is a list of categories).
+  @@ NEEDS RULING
+- **`lpn_paste_skip_valve`**
+  > Not pasted: {n} (the valve types differ).
   @@ NEEDS RULING
 
-### feat/scenario-box (`d49f40568`) — adds no English strings
+### fix/zero-demand-solve (`fbfbc28b6`) — 3 new, 3 to read @@ NEEDS RULING
 
-### fix/elevation-override (`9b9f74f33`) — adds no English strings
+- **`lpn_time_run_cut_off`**
+  > EPANET had closed {link} and then could not solve for {nodes}.
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off_empty`**
+  > Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off_full`**
+  > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
+  @@ NEEDS RULING
 
-### fix/zero-demand-solve (`fbfbc28b6`) — adds no English strings
+### tool/scenario-harness-helper (`1e9fbe55b`) — adds no English strings

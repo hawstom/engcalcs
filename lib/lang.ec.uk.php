@@ -2798,14 +2798,12 @@ $ec_lang['lpn_field_text_all_zoom_tip']='Залишати цей текст на
 $ec_lang['lpn_tool_labels']='Підписи';
 $ec_lang['lpn_labels_heading_node']='Підписи вузлів';
 $ec_lang['lpn_labels_heading_link']='Підписи з\'єднань';
-$ec_lang['lpn_labels_mark_extrema']='Позначати найвищі й найнижчі значення';
 // THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
 // row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line
 // below", which reads better and made both words unfindable. The Settings box searches tips, so a
 // word not on the page is a word the search cannot reach -- and $ec_lang_syn, the other place the
 // terms could have gone, is invisible to it. Plain English leads and the term is the gloss, which is
 // the same shape as "Minor (local) loss".
-$ec_lang['lpn_labels_mark_extrema_tip']='Позначати найвище значення кожної підписаної властивості на карті лінією над ним (надрядкова), а найнижче — лінією під ним (підрядкова).';
 // "Apply to all" beside each ID prefix (ROADMAP Task 345): an ID prefix normally governs only the assets
 // you draw from now on, and this is the way to say "I meant the ones already here". {n} and
 // {skipped} are whole numbers; {prefix} is the text the user typed.

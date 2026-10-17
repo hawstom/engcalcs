@@ -8,8 +8,8 @@ lines rather than appending corrections.
 
 ## Before merging anything
 
-- **Feature branches alive, each awaiting Tom's browser pass** (`feature_freeze` is OFF): see STATE
-  below. A feature merges into master on his typed word; there is no all-clear file. Plus `feat/label-placer` (the seam; round-5 bench), `feat/label-gang-search` (bench only), and
+- **Feature branches alive, each awaiting Tom's browser pass**: see STATE below. A feature merges
+  into master on his typed word; there is no all-clear file, freeze or merge hook. Plus `feat/label-placer` (the seam; round-5 bench), `feat/label-gang-search` (bench only), and
   builders `feat/label-placer-a`..`-d`, which never merge alone.
 - **A branch that adds a key fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
@@ -110,8 +110,7 @@ Earlier the same day: twentieth session's list (text-halo, search-zoom-accuracy,
 
 ### Branches awaiting his word (pushed; all on the Branch previews page with test steps)
 
-His browser pass of 2026-10-15 night came back; four agents were sent that night, one per item below.
-If a branch's `git log` shows no commit after 10-15 22:00, that agent's work was lost: re-brief it.
+Twenty-second session (10-16 afternoon) built his 10-16 items below; previews page rows updated.
 
 - **feat/bentley-interop**: he APPROVED all its new English. His changes: the Scenarios table flies out
   AUTOMATICALLY with the manager (no button), as the spreadsheet version, and widens by dragging; All
@@ -120,37 +119,68 @@ If a branch's `git log` shows no commit after 10-15 22:00, that agent's work was
   with scenario two days earlier). The `$ec_lang_syn` Transform description still awaits his OK.
   `lpn_cleanmap`, `lpn_ovrmarks`, and the flyout width `flyW` inside `lpn_smbox`: TELL HIM before it
   merges. Still unruled: `lpn_settings_override_marks_tip`, `lpn_sm_all_row_tip`, `lpn_sm_unused_none`. After it lands
-  delete match-property, graph-bubble.
+  delete match-property, graph-bubble. **10-16 (9b9f74f3):** the manager's table is one box with it
+  (tucks/closes together), Settings' slim divider, pane Scenarios tab kept; new bubbles open at 200 px
+  (his "miniatures"); result cells in Tables AND Properties print the label decimals with trailing
+  zeros; Vertices column sized by heading only. Awaiting his pass (R-409).
 - **EPS defects he found on bentley-interop, worked on fix/zero-demand-solve**: (1) the "1-hr drain"
   scenario reports it ended at 15:07:33; (2) tanks drain with no demand; (3) a pattern of mostly 0s
   stops EPANET at 0:00 ("Surely it's smarter than this"); (4) on the 8108 preview his Fotobi shows no
   EPS and no animation controls. R-402: he accepted keeping his numbers and the message ("OK"), and
   approved its status messages. Don't call a fixture by its filename to him; name his project.
-- **feat/description-lines** (806): his call changed to "\P" with no spaces (was " \P ").
+- **feat/description-lines** (806): his call changed to "\P" with no spaces (was " \P "); the legacy
+  spaced reading is gone (9b55bfe7).
+- **chore/retire-mark-extrema** (3f3650f3): "Mark highest and lowest values" retired on his call;
+  deleted keys `lpn_labels_mark_extrema`, `lpn_labels_mark_extrema_tip`. Needs his merge word.
+- **feat/pattern-axis** (c6d33547): the Library pattern graph has Multipliers / Time / Period axes. New
+  English "Period" (`lpn_library_pattern_axis_period`) awaits his word; tick times are pattern time,
+  not run time (Pattern start not added) -- ask.
 
-### Proposed to him 2026-10-15 night, awaiting his yes
+### Proposed to him 2026-10-15/16, awaiting his word
 
 - Independent review of how a clarification reaches a translator (halo read as "hello"; "translating
   too often?"): `dev/translation-clarification-review.md`. Its halo glossary wording, its sprint cadence
-  (once before each production pull) and its tooling fix (send the notes already written) await him.
+  (once before each production pull) await him. Its tooling fix landed 10-16: the packet now sends
+  the syn notes, reworded keys (no resync list), tip pairs, and only the glossary terms a batch uses.
+  He forbids translating without his approval.
+
+### His answers of 2026-10-16 (early), being built or awaiting design
+
+- **Language, done 10-16**: `dev/terms.md` (his plain-words names, two uniqueness groups) is the
+  concept source; packets lead with it. A blind Spanish test from plain names alone: his picks and CC's
+  clear calls are in es (cota, profundidad del flujo, densidad relativa, LP/LE). Left for the next
+  Spanish sprint, with his word: cota and carga hidráulica file-wide. His open questions: should the
+  glossary carry abbreviations (HGL, EGL); is "N/A" the right English (he means "no meaningful
+  answer"); is "Headwater below crown" good English.
+- **EPS (bentley-interop, his Fotobi)**: a run stops with Error 110 when tank T-NE runs EMPTY
+  (15:07:33, 14:01:42): EPANET closes L22 and the junctions it fed have no source. 15:07:33 was the
+  simulation time, NOT the wall clock as CC told him. He asks why lowering a full tank's initial
+  depth avoids the 0:00 stop when flow is zero either way. Candidate answer to "surely it's smarter":
+  pressure-driven demand. Also: his units went back to US (possible defect; asked him for steps).
+- **A pipe-label artifact** in a new project (one pipe label, while stretching nodes): his screenshot
+  was the wrong file; ask for it.
 
 ### Questions out to him
 
+- R-409 (3): how to manage the time series bubble overrides. CC proposed right-click a bubble:
+  "Remove from this scenario" / "Remove from all scenarios", plus bubbles as rows in List overrides.
+- Elevation is not overridable, so editing it in a child scenario silently changes Base (found by the
+  scenario UI helper). By design per `LPN_OVERRIDABLE`, but nothing on screen says so.
+
 - Task 800: keep J-NE-S-3's equal override?
 - Task 681: the node shed's re-fits are what is left (~250 ms on n600); cheaper means changing the layout.
-- Task 802: retire the bottom-pane Scenarios tab now the flyout opens with the manager?
 
 ### Next job
 
-Merge the agents' work into their branches, update the previews page, and ask for his browser pass.
-Wish lists: New junction without a canvas click (Declan), Number of services decimals (Mary), a
-harness helper that starts a scenario from the UI (Perry).
+His browser pass on bentley-interop (R-409), retire-mark-extrema, pattern-axis, description-lines.
+Wish lists: New junction without a canvas click (Declan). Perry's scenario UI helper merged
+(`dev/lpn-spike/scenario-ui-helper.js`). Mary's Number of services decimals is moot: the CSV is gone.
 
 ### Traps met 2026-10-15 (twenty-first session)
 
 - **"Ledger" was CC's word; he did not know it.** Relay in his words.
-- **He retired the all-clear file and its hook (10-15 night)**: they duplicated the classifier and
-  choked merges. Do not rebuild one.
+- **He retired the all-clear file, both freezes, the deploy-blocker list and the pre-merge hook**
+  (10-15/16): they duplicated the classifier and choked merges. Do not rebuild them.
 
 - **A pipe hides a refusal.** `new_english_keys.php --write | tail` exits 0 when the generator REFUSED,
   and the next `git add` committed a conflicted file. Never pipe a guard into tail inside an && chain.

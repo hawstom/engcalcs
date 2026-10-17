@@ -503,7 +503,7 @@ const FIVE = [
 	const descBox = (function find(el) {
 		let hit = null;
 		(el.children || []).forEach((ch) => {
-			if (!hit && ch._tag === 'input' && ch.type === 'text' && ch.value === 'the duty curve') { hit = ch; }
+			if (!hit && (ch._tag === 'input' || ch._tag === 'textarea') && ch.value === 'the duty curve') { hit = ch; }
 			if (!hit) { hit = find(ch); }
 		});
 		return hit;
@@ -570,7 +570,7 @@ const FIVE = [
 	const rowsOf = (el) => (el.children || []).filter((ch) => /lpn-lib-curve-row/.test(String(ch['class'] || '')));
 	const textIn = (el, out) => {
 		(el.children || []).forEach((ch) => {
-			if (ch._tag === 'input' || ch._tag === 'select' || ch._tag === 'output') { out.push(ch); }
+			if (ch._tag === 'input' || ch._tag === 'textarea' || ch._tag === 'select' || ch._tag === 'output') { out.push(ch); }
 			textIn(ch, out);
 		});
 		return out;
@@ -578,7 +578,7 @@ const FIVE = [
 	const twoRows = rowsOf(entryEl);
 	check(twoRows.length === 2, `the header is two rows: ${twoRows.length}`);
 	const line1 = textIn(twoRows[0], []).map((e) => e._tag);
-	check(line1[0] === 'input' && line1[1] === 'input' && line1.indexOf('select') < 0,
+	check(line1[0] === 'input' && line1[1] === 'textarea' && line1.indexOf('select') < 0,
 		`line 1 is the id and the description, and no type selector: ${line1.join(',')}`);
 	check(textIn(twoRows[0], [])[0].value === 'C1'
 			&& textIn(twoRows[0], [])[1].value === 'the duty curve',

@@ -138,18 +138,6 @@ the block.
   Tom, 2026-10-12 (interview q03): expose override vs inherited with a single-character marker, carried
   through Properties and Settings, after Civil 3D's Override / Child override columns. Ida: a dot gutter;
   Mary: Bentley's and Civil 3D's per-row checkbox. Tom's call between them first. Journals 2026-10-12.
-- 100|643| **Slope distance for automatic lengths, and whether anyone offers a length factor.**
-  Tom, 2026-09-13: *"this is straining at a gnat while we are swallowing the camel of slope distance,
-  pipe dips, pipe depth"*. **Decided 2026-10-14: *"Let's go ahead and use slope distance for our
-  calculations in case it's significant which occasionally will be true."*** An automatic length
-  combines the drawn horizontal length with the end nodes' elevation difference; a typed length is
-  untouched. Slope distance merged 2026-10-15 (`feat/slope-length`). Still open: a length adjustment factor or increment.
-  Tom: *"ask Mary to research whether anybody offers 'Length adjustment factor' for auto lengths. I
-  don't want to break a tacit complicit oversight on this or be ridiculously pedantic."* **Mary,
-  2026-10-14: no tool she searched offers one** (WaterGEMS has a typed per-pipe length and a 3D length
-  from node elevations; its "Length Adjustment" is a surge device). She advises against a project
-  factor: a reviewer cannot audit it. Our typed length is already the per-pipe override. Nothing
-  about length accuracy is claimed in public until this closes (Task 641).
 - 100|681| **Economize the label layout: it is half the cost of a project switch.**
   **PROMOTED TO 100 by Tom, 2026-10-14.** (c)/(d) and (b) shipped. **2026-10-15 merged (`perf/switch-cost`, `perf/cross-shed`):**
   a cold switch no longer lays the labels out twice, and the crossing shed counts pairs once (identical output,
@@ -227,8 +215,12 @@ the block.
   Tom, 2026-10-15, on Fotobi's "1-hr drain w pump off" (24 overrides vs its siblings' 23): *"I don't know how to see a tidy list of overrides to audit ... that count seems inflated ... I should see the count of only the present overrides, not the inherited overrides. I count 13 diameter overrides, 1 text override, and 2 calculation overrides."* Also his screenshot note: tanks show the amber circle while their overrides are only in the parent. Review R-386.
 - 100|801| **Retire Apply Base values; add Merge upward for alternatives.**
   Tom, 2026-10-15: *"I don't think we need this command any more now that we have the circles and the down arrows. And this command is too confusing and dangerous."* And: *"I am not sure that it is meaningful to put a non-base alternative with the Base scenario ... It seems to create a certain circularity that we should avoid. What do you and Mary find?"* **Mary, 2026-10-15:** Bentley documents no circularity and no push-down command; WaterGEMS merges a preferred alternative UP into Base; skeletonization requires Base on parent alternatives only. **Tom, 2026-10-15: *"Allow and retire. I agree. And I like the 'Merge into parent' command. Good find on Mary's part."*** So: Base may keep a non-Base alternative (a WaterGEMS file may arrive that way, Task 749; nothing is circular); retire Apply Base values; add Merge into parent (an alternative's own values move up into its parent, Bentley's merge to base). Then: *"Maybe 'Merge upward' and it lets you choose how many steps upward to target the merge (in case you want to skip parent)?"* Settled with him (*"Yes. Perfect."*): pick the target ancestor by name; if a skipped alternative holds its own value for anything merged, name those assets and fields before merging and leave them untouched. R-387.
-- 100|807| **Leave a leader exactly where the user put it.**
-  Tom, 2026-10-15: *"Let's try leaving exactly in place the leader locations set by the user. I think that our stretching them is frustrating to them. If they want to give us control, they will reset the leader."* R-398.
+- 100|802| **The Scenarios table flies out from the Scenario Manager's right side.** **BUILT 2026-10-15 on `feat/bentley-interop`.**
+  **PROMOTED TO 100 by Tom, 2026-10-16.** Closes when `feat/bentley-interop` merges.
+  Tom, 2026-10-15: *"Could we stick that table onto the right side of the Scenario Manager to accomplish (a) that both are available in the same gesture and (b) that it flies out over the map instead of displacing the map?"* R-389.
+- 100|804| **Time series balloons become a Presentation override.** **BUILT 2026-10-15 on `feat/bentley-interop`.**
+  **PROMOTED TO 100 by Tom, 2026-10-16.** Closes when `feat/bentley-interop` merges.
+  Tom, 2026-10-15: *"The Time series balloons/bubbles should be a Presentation override."* R-391.
 - 75|539| **Gang the neighbour labels so their leaders stop crossing.**
   **DEMOTED TO 75 by Tom, 2026-10-11.**
   **PORTING THE BENCH TO MASTER, 2026-10-07** (Tom agreed D09: rules 1-3 as three defect branches;
@@ -452,28 +444,14 @@ the block.
   R2000. Tom, 2026-10-07: his DXF Interface Manager spec, for import AND export, and a rudimentary
   interim workflow, verbatim in `dev/dxf-interface.md`. **DXF export merged 2026-10-08**; import is
   what remains.
-- 75|786| **More native SI examples, since SI is chosen twice as often as US.**
-  Tom, 2026-10-11: *"SI presets are requested over twice as much as US presets. So I want to have more good SI
-  examples, even if I have to convert the Net2 and Net3 examples."* Mary is surveying redistributable SI networks
-  and the KYPipe examples (her journal, 2026-10-11).
-  Tom, 2026-10-11: *"convert Net2 and Net3 to SI and put them first in this order: Net3 SI, Net3 US, Net2 SI, Net2
-  US."* Built on `feat/si-example`. Expand the gallery first, promote to the front later. KYPipe networks (CC BY-NC):
-  ask the authors before shipping any.
-  Net1, Net2 (Branford) and Net3 (Novato) US and SI pairs merged (with Tom's 10-13 rounding rule); only Elm Street Center keeps a backdrop.
 - 75|798| **Field values in Text, by {} keys disclosed in the User Manual.**
   Tom, 2026-10-15: *"Allow field/reference text in Text using {}. Define/disclose the keys in the User Manual."*
 - 75|799| **Try Tables and Graphs as dockable boxes too, on an option branch.**
   Tom, 2026-10-15: *"Can we try a UI option branch for everything in the bottom pane to be available also as dockable boxes: (a) Tables and (b) Graphs?"* Seam with the bottom-pane tab strip.
-- 75|802| **The Scenarios table flies out from the Scenario Manager's right side.** **BUILT 2026-10-15 on `feat/bentley-interop`.**
-  Tom, 2026-10-15: *"Could we stick that table onto the right side of the Scenario Manager to accomplish (a) that both are available in the same gesture and (b) that it flies out over the map instead of displacing the map?"* R-389.
 - 75|803| **See every unused alternative at a glance.** **BUILT 2026-10-15 on `feat/bentley-interop`.**
   Tom, 2026-10-15: *"Maybe an 'Unused alternatives' button ... unless the selector (instead of a button) includes 'All unused' (and 'All'?), where all the headings are listed with a scrollbar."* R-390.
-- 75|804| **Time series balloons become a Presentation override.** **BUILT 2026-10-15 on `feat/bentley-interop`.**
-  Tom, 2026-10-15: *"The Time series balloons/bubbles should be a Presentation override."* R-391.
 - 75|805| **A clean map: hide the override ambers and the map's own controls.** **BUILT 2026-10-15 on `feat/bentley-interop`.**
   Tom, 2026-10-15: *"It would be good to be able to hide the amber override indicators from the map. Maybe a Map, Clean map button is a good idea after all with zoom buttons, error messenger, ambers, and satellite button hiding."* R-396.
-- 75|806| **Descriptions take several lines and paragraphs.** **BUILT 2026-10-15 on `feat/description-lines`; 2026-10-15 a line break is " \P " wherever it sits on one line (.inp, Tables cell, copy), on Tom's call.**
-  Tom, 2026-10-15: *"I think that all Description fields should allow multiple lines and paragraphs like most software to allow internal documentation."* R-395.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted

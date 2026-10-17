@@ -394,14 +394,17 @@ parenthetical cannot.
 from the glossary? If yes, keep both — the pointer *accompanies* the synonyms. If the entry was only
 `X (Y)` where Y is the concept gloss, the pointer alone is better.
 
-**A pointer buys efficiency with a DEPENDENCY.** A glossary term reaches an agent only if the key's
-prefix is wired in `prefixToTermNames()`. **`php dev/scripts/gloss_ref_check.php` must exit 0 before
-any sprint** — it verifies every `gloss:` names a real term AND that the term is wired to that key's
-prefix.
+**A pointer buys efficiency with a DEPENDENCY: the term must exist.** The payload generator sends
+every glossary term a batch key cites (by `gloss:` or `key_concepts.json`), plus every term whose
+English appears in a batch string; a sense-qualified term ("run (a simulation)") is matched by its
+bare word only in strings whose prefix wires it in `prefixToTermNames()`. **`php
+dev/scripts/gloss_ref_check.php` must exit 0 before any sprint** — it verifies every `gloss:` names
+a real term.
 
-**Positive guidance beats negative guidance.** An `avoid` list tells a translator which ditch to
-miss, not where the road is. Reach for `avoid` only for a genuine polysemy trap (financial "default",
-anatomical "head"), never as a substitute for saying plainly what the label means.
+**Suggestions only, no prohibitions** (Tom, 2026-10-16: *"We are masking our poor definitions with
+often very wrong prohibitions."*). A translator is told what a word MEANS and what to call it, never
+what not to write. `avoid` tags and glossary `avoid` arrays stay in the files, unsent; write no new
+ones. Where a translator went wrong, fix the definition.
 
 ### Polysemy / units-trap protocol
 
@@ -414,26 +417,23 @@ recurs language after language, sprint after sprint. Give a trap term **all thre
    reform the `$ec_lang` value; that fixes all 26 languages at the source. Identity strings are
    exempt. Example: "station" (a bus-stop mistranslation trap) is best fixed by allowing the plain
    alias "Distance", not by guarding the jargon.
-2. **A root glossary entry with a structured `avoid` array.** Put the concept — including the *root*
+2. **A root glossary entry whose definition says plainly what the word means.** Put the concept — including the *root*
    word, not only its compounds — in `glossary.json`. Keep **compounds** as the authoritative
    translatable units (a compound's idiomatic translation is not the concatenation of its atoms:
    "velocity head" → fr "hauteur de vitesse"); the root atom is an **anchor** carrying the shared
    guard, never an ingredient to compose from.
-   **`avoid` may only forbid physical/structural errors and lazy transliterations — never a term
-   that is a language's genuine standard.** We defer to each language's dominant term; **we are not
+   We defer to each language's dominant term; **we are not
    the judges of terminology, the culture is.** This is why the English source keeps "Specific
    gravity" rather than "relative density". For a units trap, forbid *attaching units to the value*,
    not the *word* — a weight-flavoured term that is the local standard (tr "özgül ağırlık") is
    correct.
 3. **A visible definitional tip on any input label** (specific gravity → "Density relative to
-   water"), plus a **commentary-only** guard (`| avoid: anatomical "head"`) so no translatable
-   payload is duplicated. This is the one sanctioned case where a plain label gets an `avoid`.
+   water").
 
 **"Head" is NOT a units trap the way specific gravity is.** The suite reads head loss in psi/kPa/bar
 as well as metres and defaults to psi under the US preset (`partial_head` in `lib/Units.lib.php`).
 Only *total* head — EGL/HGL — is water-column-only, because an EGL is an elevation. German
-*Druckverlust*, French *perte de charge* and Urdu *دباؤ نقصان* are all correct and an `avoid` must
-never forbid them. **A glossary claim about units is a claim about `Units.lib.php` — check it there
+*Druckverlust*, French *perte de charge* and Urdu *دباؤ نقصان* are all correct. **A glossary claim about units is a claim about `Units.lib.php` — check it there
 rather than reasoning from physics alone.**
 
 The `avoid` arrays are the single source of truth for the trap-term watchlist
@@ -442,8 +442,12 @@ The `avoid` arrays are the single source of truth for the trap-term watchlist
 ### `$ec_lang_syn` format: `<synonyms> | <commentary>`
 
 Split on the first pipe. **Left:** the synonyms — the translatable payload, every phrase passing the
-substitution test. May freely contain parentheses. **Right:** production/layout notes, not
-translated; the payload generator strips it. No pipe means the whole string is synonyms.
+substitution test. May freely contain parentheses; the payload sends it as `key_syn`. **Right:**
+instructions to the translator, never translated into the file. The payload sends them as
+`key_notes`, each tag rendered as its full instruction from the table below (read from this table
+by `generate_translation_payloads.php`, so edit the wording here); free prose goes as a "Note:"; a
+`gloss:` adds no note, because its term arrives in `key_concepts` and `glossary`. No pipe means the
+whole string is synonyms.
 
 **Never put commentary in bare parentheses on the left** — parentheses are reserved for synonyms and
 are ambiguous with real content (e.g. `(as in HEC-RAS)`).
@@ -458,7 +462,7 @@ Commentary uses this tag vocabulary (`tag: value`, `; `-separated; some are bare
 | `layout` | `nav item` | Renders as a top-level item in a HORIZONTAL BAR, competing for width with every sibling; prefer the shortest synonym. **A row inside a pull-down is NOT a nav item** — a pop-up sizes to its own widest row and competes with nothing. |
 | `layout` | `button` | A button label competing for width with siblings; short and imperative. |
 | `layout` | `sub-heading` | A heading over a group of controls, not a command or an option; a noun phrase, never an imperative. |
-| `avoid` | *(wrong sense)* | Must not be read or translated in the named sense. |
+| `avoid` | *(wrong sense)* | Not sent to translators (suggestions only, no prohibitions, 2026-10-16). Write no new ones. |
 | `symbol` | *(flag)* | Contains a variable symbol; keep every letter and subscript exactly as in English in every language, including RTL. Subscripted names are symbols, not words. |
 | `gloss` | *(term)* | Defer to that `glossary.json` term; do not restate it inline. |
 | `runtime` | `units appended` | The page concatenates a unit label at render time; do not name a unit inside the text, and leave room for one. |

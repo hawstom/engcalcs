@@ -85,17 +85,14 @@ adding ceremony there buys little and costs every future session.
 
 Written after the incidents, all of it live today:
 
-- **`dev/hooks/pre-merge-commit`** refuses a merge a freeze or an open deploy blocker forbids. The
-  per-branch all-clear file it once read was retired on Tom's word, 2026-10-15: his typed word,
-  which Claude Code's permission check requires, is the all-clear.
+- The pre-merge hook, all-clear file, freezes and deploy-blocker list were retired on Tom's word,
+  2026-10-15/16: his typed word, which Claude Code's permission check requires, is the all-clear.
 - **`dev/hooks/pre-push`** refuses a push of master unless `check_all.sh` has passed **on that exact
   commit**, stamped in `.git/check-all-passed`. It is why a merge result gets re-verified rather
   than the branch it came from.
 - **`hook_install_check.php`** — the hooks are a COPY in `.git/`, not `core.hooksPath`, because
   hooksPath resolves into the working tree and a checkout without `dev/hooks/` silently deletes
   every guard. It failed open and silently once; this check is the price of the fix.
-- **`branch_policy_selftest.php`** — nine cases against a throwaway repository, because a hook that
-  only speaks when it refuses is indistinguishable from a broken one.
 - **`branch_hygiene_check.php`** (advisory) — every branch with its age, distance from master and
   whether it is merged.
 - **`deploy_identity_selftest.php`** — the About box's build line names the deploy, not a file, so

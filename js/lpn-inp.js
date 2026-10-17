@@ -387,6 +387,11 @@
 		var carried = {};   // section name -> the file's own lines, for every section not read below
 		// The `;PUMP:`-style line last seen inside [CURVES], waiting for the row it describes.
 		var pendingCurveType = null;
+		// The last row read in one of the six sections that carry a description, which a `;|` line
+		// after it continues; and which sections those are.
+		var pendingCurveCont = { more: [], raw: [] };
+		var lastDescRow = null,
+			DESC_ROW_SECTIONS = { JUNCTIONS: 1, RESERVOIRS: 1, TANKS: 1, PIPES: 1, PUMPS: 1, VALVES: 1 };
 		// The file's own comment and blank lines since the last row of [PATTERNS] or [CONTROLS],
 		// waiting for the row they sit above (`toks.preLines`), and what is left over at the end of
 		// each section (`sectionFoot`). See the reading below and lpnInpSplitPre().
@@ -409,6 +414,23 @@
 			// token, so no section that does NOT mean anything by its comments can mistake one for
 			// data.
 			if (semi >= 0) { cmt = line.slice(semi + 1).trim(); line = line.slice(0, semi); }
+			// **A `;|` LINE CONTINUES THE DESCRIPTION ABOVE IT**, in a file written by an early build of
+			// Task 806, before line breaks went on the one comment as "\P" (EngCalcs.lpnDescText).
+			// Still read, never written. On the row of one of the six element sections, or on the
+			// `;TYPE:` line of a curve. Anywhere else it is an ordinary comment and is treated as one.
+			if (semi >= 0 && !line.trim() && lines[i].charAt(semi + 1) === '|') {
+				if (lastDescRow && DESC_ROW_SECTIONS[section]) {
+					(lastDescRow.more = lastDescRow.more || []).push(lines[i].slice(semi + 2).replace(/\s+$/, ''));
+					continue;
+				}
+				// A curve's `;|` lines sit ABOVE its `;TYPE:` line (that build's layout).
+				if (section === 'CURVES') {
+					pendingCurveCont.more.push(lines[i].slice(semi + 2).replace(/\s+$/, ''));
+					pendingCurveCont.raw.push(lines[i].replace(/\s+$/, ''));
+					continue;
+				}
+			}
+			lastDescRow = null;
 			// **[CURVES] STATES A CURVE'S TYPE IN A COMMENT, AND EPANET'S OWN WRITER ALWAYS EMITS
 			// ONE** (Task 586): `;PUMP: Pump Curve for Pump 10` sits above the rows it describes,
 			// and Net1/Net2/Net3 all carry them. It is the file's own statement of what a curve IS,
@@ -421,8 +443,10 @@
 					pendingCurveType = {
 						raw: lines[i].replace(/\s+$/, ''),
 						type: ctm[1].toUpperCase(),
-						note: ctm[2].trim()
+						note: ctm[2].trim(),
+						more: pendingCurveCont.more, rawMore: pendingCurveCont.raw
 					};
+					pendingCurveCont = { more: [], raw: [] };
 				}
 			}
 			// **A DESCRIPTION IN [PATTERNS], [CONTROLS] AND [RULES] IS A WHOLE-LINE COMMENT ABOVE
@@ -492,6 +516,7 @@
 			if (section === 'CURVES') {
 				toks.raw = lines[i].replace(/\s+$/, '');
 				if (pendingCurveType) { toks.typeLine = pendingCurveType; pendingCurveType = null; }
+				pendingCurveCont = { more: [], raw: [] };
 			}
 			if (section === 'PATTERNS' || section === 'CONTROLS') {
 				if (pendingRaw.some(function (l) { return l.trim(); })) { toks.preLines = pendingRaw; }
@@ -499,6 +524,7 @@
 			}
 			if (!rawSections[section]) { rawSections[section] = []; }
 			rawSections[section].push(toks);
+			if (DESC_ROW_SECTIONS[section]) { lastDescRow = toks; }
 			seen[section] = (seen[section] || 0) + 1;
 		}
 		flushFoot();
@@ -759,15 +785,18 @@
 			var runStart = (i === 0 || rows[i - 1][0] !== r[0]);
 			if (r.preLines) {
 				var psp = EngCalcs.lpnInpSplitPre(r.preLines, true),
-					pnote = psp.desc.length ? EngCalcs.lpnDescText(psp.desc[0].replace(/^\s*;/, '')) : '';
+					pnote = psp.desc.length ? EngCalcs.lpnInpDescFromLinesAbove(psp.desc) : '';
 				if (!pnote) { psp.head = psp.head.concat(psp.desc); }
-				if (runStart && !pat.note && pnote) { pat.note = pnote; pnote = ''; }
+				if (runStart && !pat.note && pnote) {
+					pat.note = pnote; pnote = '';
+					if (psp.desc.length === 1) { EngCalcs.lpnDescTokSet(pat, 'note', psp.desc[0].replace(/^\s*;/, ''), pat.note); }
+				}
 				if (runStart && pat.multipliers.length === 0 && EngCalcs.lpnInpHasComment(psp.head)) {
 					pat.head = psp.head;
 				} else {
 					lostComments.PATTERNS = lostComments.PATTERNS.concat(psp.head);
 				}
-				if (pnote) { lostComments.PATTERNS.push(psp.desc[0]); }
+				if (pnote) { lostComments.PATTERNS = lostComments.PATTERNS.concat(psp.desc); }
 			}
 			// A trailing comment on a pattern row means nothing to EPANET (input2.c replaces it
 			// with the line comment in [PATTERNS]) and has nowhere to go in six-per-line rows.
@@ -830,8 +859,11 @@
 		// EPANET's own writer emits a bare trailing `;` on every row of Net1/2/3, so an EMPTY
 		// comment must read as no description at all -- which is what lpnDescText's trim gives.
 		function readDesc(el, r) {
-			var d = EngCalcs.lpnDescText(r.cmt);
-			if (d) { el.desc = d; }
+			var d = EngCalcs.lpnDescJoin(r.cmt, r.more);
+			if (d) {
+				el.desc = d;
+				if (!(r.more && r.more.length)) { EngCalcs.lpnDescTokSet(el, 'desc', r.cmt, d); }
+			}
 			return el;
 		}
 		// **A CONTROL'S DESCRIPTION** is the whole-line comments above it, back to the control
@@ -846,19 +878,22 @@
 		// control is a heading over what follows: it is kept as `head`, verbatim and blank lines
 		// included, and written back above the control -- never read as its description.
 		function readControlNote(ctl, r) {
-			var sp = EngCalcs.lpnInpSplitPre(r.preLines, false), texts = [], note,
-				trail = EngCalcs.lpnDescText(r.cmt);
-			sp.desc.forEach(function (l) { var t = EngCalcs.lpnDescText(l.replace(/^\s*;/, '')); if (t) { texts.push(t); } });
-			note = texts.join(' ');
+			var sp = EngCalcs.lpnInpSplitPre(r.preLines, false), note,
+				trail = EngCalcs.lpnDescText(EngCalcs.lpnDescFromInline(r.cmt));
+			note = EngCalcs.lpnInpDescFromLines(sp.desc);
 			if (!note) { sp.head = sp.head.concat(sp.desc); sp.desc = []; }
 			if (EngCalcs.lpnInpHasComment(sp.head)) { ctl.head = sp.head; }
 			if (note) {
 				ctl.note = note;
-				if (sp.desc.length !== 1 || sp.desc[0] !== ';' + note) { ctl.noteSrc = sp.desc; }
-				if (trail) { ctl.tail = trail; }
+				// Kept verbatim unless it is the `;|` layout of an early Task 806 build, which goes back
+				// out as one line (lpnDescText()).
+				if ((sp.desc.length !== 1 || sp.desc[0] !== ';' + note)
+						&& !sp.desc.some(function (l) { return /^\s*;\|/.test(l); })) { ctl.noteSrc = sp.desc; }
+				if (trail) { ctl.tail = trail; EngCalcs.lpnDescTokSet(ctl, 'tail', r.cmt, trail); }
 			} else if (trail) {
 				ctl.note = trail;
 				ctl.noteAt = 'end';
+				EngCalcs.lpnDescTokSet(ctl, 'note', r.cmt, trail);
 			}
 		}
 		// A control that is not kept takes its comments with it, and the report says so.
@@ -1136,7 +1171,8 @@
 			if (!c || !typeLine || c.stated) { return; }
 			c.kind = INP_CURVE_TYPE[typeLine.type] || 'generic';
 			c.stated = true;
-			if (typeLine.note) { c.note = typeLine.note; }
+			var cnote = EngCalcs.lpnDescJoin(typeLine.note, typeLine.more);
+			if (cnote) { c.note = cnote; }
 		}
 		function curveKind(name, kind) {
 			if (!name || !curveById[name]) { return; }
@@ -1155,7 +1191,13 @@
 			// edited writes its own line back with the rest of its own characters.
 			if (r.typeLine) {
 				curveTyped(r[0], r.typeLine);
-				if (!crec.src.length) { crec.src.push(r.typeLine.raw); }
+				// A type line an early Task 806 build continued on `;|` lines goes back as the one line
+				// it now is, its line breaks as "\P" (lpnDescText()).
+				if (!crec.src.length) {
+					crec.src.push(r.typeLine.rawMore.length
+						? ';' + r.typeLine.type + ': ' + EngCalcs.lpnDescInline(EngCalcs.lpnDescJoin(r.typeLine.note, r.typeLine.more))
+						: r.typeLine.raw);
+				}
 			}
 			if (r.raw) { crec.src.push(r.raw); }
 			if (r.length < 3) { continue; }
@@ -2260,16 +2302,133 @@
 		while (k > 0 && L[k - 1].trim()) { k--; }
 		var out = { head: L.slice(0, k), desc: L.slice(k) };
 		if (onlyLast && out.desc.length > 1) {
-			out.head = out.head.concat(out.desc.slice(0, -1));
-			out.desc = out.desc.slice(-1);
+			// The last description is the last comment line AND the `;|` lines directly above it, which
+			// continue it (a pattern's first line is the LAST comment line over its rows).
+			var g = out.desc.length - 1;
+			while (g > 0 && /^\s*;\|/.test(out.desc[g - 1])) { g--; }
+			out.head = out.head.concat(out.desc.slice(0, g));
+			out.desc = out.desc.slice(g);
 		}
 		return out;
 	};
 	EngCalcs.lpnInpHasComment = function (lines) {
 		return (lines || []).some(function (l) { return /^\s*;/.test(String(l)); });
 	};
+	/**
+	 * **A DESCRIPTION IS LINES AND PARAGRAPHS** (Task 806; Tom, 2026-10-15: *"all Description fields
+	 * should allow multiple lines and paragraphs like most software to allow internal
+	 * documentation"*). Stored with `\n`, whatever the platform pasted in: CRLF and CR become LF, each
+	 * line loses its trailing blanks (a file cannot keep them -- the reader trims), and the whole
+	 * text loses its leading and trailing blank lines. A blank line in the middle is a paragraph break
+	 * and is kept as typed. It used to collapse every line break to a space.
+	 *
+	 * **ONE LINE, WITH "\P" FOR EACH LINE BREAK, WHEREVER A DESCRIPTION MUST SIT ON ONE LINE**
+	 * (Tom, 2026-10-16: *"Maybe " \P ", since it's both intuitive, and it's what Autodesk
+	 * historically used in Dimensions."*, then *"Change it from " \P " to "\P"."*). EPANET holds
+	 * one line per description: a trailing `;comment` on the row, or for a pattern or curve the one
+	 * comment line above its first row (input2.c `LineComment`), with no continuation syntax. So the
+	 * whole description goes in that one place, each line break written as backslash, capital P,
+	 * with no spaces; and the Tables pane's cell shows and edits it the same way. EPANET keeps the
+	 * whole text, `\P` and all, on its own re-save. A blank paragraph line is two markers in a row
+	 * (`a\P\Pb`).
+	 *
+	 * Reading one back, `\P` is a line break and the spaces round it are the text's own (an indent
+	 * after it survives; lpnDescText() trims a line's trailing spaces). A backslash-P the person
+	 * TYPED is written with one more backslash (`\\P`) and read back as typed, so the text is never
+	 * changed by a round trip; a file from elsewhere whose comment says `C:\Pumps` is read as a line
+	 * break, which is the price of the convention, and is written back as the file spelled it
+	 * (lpnDescTokSet()). A comment with no `\P` in it is read exactly as it always was.
+	 *
+	 * Files this branch wrote before that call carried the later lines on `;|` comment lines; the
+	 * reader still takes those (lpnInpParse), and nothing writes them.
+	 */
 	EngCalcs.lpnDescText = function (v) {
-		return ((v === undefined || v === null) ? '' : String(v)).replace(/[\r\n]+/g, ' ').trim();
+		return ((v === undefined || v === null) ? '' : String(v))
+			.replace(/\r\n|\r/g, '\n').split('\n').map(function (l) { return l.replace(/\s+$/, ''); })
+			.join('\n').trim();
+	};
+	/** The description's first line, for a place that has room for one line (a map label). */
+	EngCalcs.lpnDescFirstLine = function (v) {
+		return EngCalcs.lpnDescText(v).split('\n')[0];
+	};
+	/** The description on one line, lines joined by a space: for a pull-down's option text. */
+	EngCalcs.lpnDescOneLine = function (v) {
+		return EngCalcs.lpnDescText(v).replace(/\n+/g, ' ');
+	};
+	/**
+	 * The description on one line to be read back and edited: each line break as "\P", no spaces
+	 * (Tom, 2026-10-16: *"Change it from " \P " to "\P"."*). One case needs a space before the
+	 * marker: a line ending in a backslash (so the run stays the line's own; the reader keeps the
+	 * space and lpnDescText() trims it as the line's trailing space).
+	 */
+	EngCalcs.lpnDescInline = function (v) {
+		var L = EngCalcs.lpnDescText(v).split('\n').map(function (l) {
+			return l.replace(/(\\+)P/g, '\\$1P');
+		}), out = L[0], k;
+		for (k = 1; k < L.length; k++) {
+			if (/\\$/.test(L[k - 1])) { out += ' \\P'; }
+			else { out += '\\P'; }
+			out += L[k];
+		}
+		return out;
+	};
+	/**
+	 * lpnDescInline() read back: "\P" is a line break, "\\P" a typed "\P". Spaces round the
+	 * marker are the text's own.
+	 */
+	EngCalcs.lpnDescFromInline = function (s) {
+		var t = (s === undefined || s === null) ? '' : String(s);
+		if (t.indexOf('\\P') < 0) { return t; }
+		return t.replace(/(\\+)P/g, function (m, bs) { return bs.length === 1 ? '\n' : bs.slice(1) + 'P'; });
+	};
+	/**
+	 * **A DESCRIPTION READ FROM A FILE GOES BACK OUT AS THE FILE SPELLED IT** while it still says the
+	 * same text: CLAUDE.md's "only the user touches a file's numbers", applied to its words. A file
+	 * that writes a bare `C:\Pumps`, is not re-spelled by an
+	 * export nobody asked for. Kept in `rec.tok[key]` only when it differs from what the writer would
+	 * say, and checked again at write time, so an edit retires it by itself (lpnNumText()'s rule).
+	 */
+	EngCalcs.lpnDescTokSet = function (rec, key, raw, text) {
+		var r = (typeof raw === 'string') ? raw.replace(/\s+$/, '') : null;
+		if (r !== null && r !== EngCalcs.lpnDescInline(text)
+				&& EngCalcs.lpnDescText(EngCalcs.lpnDescFromInline(r)) === EngCalcs.lpnDescText(text)) {
+			(rec.tok || (rec.tok = {}))[key] = r;
+		} else if (rec.tok) {
+			delete rec.tok[key];
+			if (!Object.keys(rec.tok).length) { delete rec.tok; }
+		}
+	};
+	/** The one-line text a description is written as: the file's own spelling while it still holds. */
+	EngCalcs.lpnDescInlineOf = function (rec, key, text) {
+		var t = rec && rec.tok ? rec.tok[key] : undefined;
+		if (typeof t === 'string' && EngCalcs.lpnDescText(text)
+				&& EngCalcs.lpnDescText(EngCalcs.lpnDescFromInline(t)) === EngCalcs.lpnDescText(text)) { return t; }
+		return EngCalcs.lpnDescInline(text);
+	};
+	/** A first line plus the `;|` continuation texts the reader gathered, back into one description. */
+	EngCalcs.lpnDescJoin = function (first, more) {
+		return EngCalcs.lpnDescText([EngCalcs.lpnDescFromInline(first || '')].concat(more || []).join('\n'));
+	};
+	/** The same for a pattern, whose first line is the LAST comment line and whose `;|` lines precede it. */
+	EngCalcs.lpnInpDescFromLinesAbove = function (lines) {
+		var L = (lines || []).map(function (l) { return String(l).replace(/^\s*;/, ''); }), first;
+		if (!L.length) { return ''; }
+		first = L.pop().trim();
+		return EngCalcs.lpnDescJoin(first, L.map(function (s) { return (s.charAt(0) === '|' ? s.slice(1) : s).replace(/\s+$/, ''); }));
+	};
+	/**
+	 * The description a run of whole-line comments says: a plain `;` line is a line of its own
+	 * (joined to the one before by a space, as several comment lines always were read), and a `;|`
+	 * line continues the one before on a new line.
+	 */
+	EngCalcs.lpnInpDescFromLines = function (lines) {
+		var res = '';
+		(lines || []).forEach(function (l, k) {
+			var s = String(l).replace(/^\s*;/, '');
+			if (k > 0 && s.charAt(0) === '|') { res += '\n' + s.slice(1).replace(/\s+$/, ''); }
+			else { s = EngCalcs.lpnDescFromInline(s.trim()); if (s) { res += (res ? ' ' : '') + s; } }
+		});
+		return EngCalcs.lpnDescText(res);
 	};
 	/** One word, because EPANET's reader stops at whitespace. Empty means the element has no tag. */
 	EngCalcs.lpnTagText = function (v) {
@@ -2469,7 +2628,10 @@
 		// type, and it is the only place a curve NOTHING REFERENCES can carry one -- which the
 		// Library's "Add a curve" button makes routinely. A `generic` curve states nothing, because
 		// there is nothing to state.
-		if (word) { out.push(';' + word + ':' + (curve.note ? ' ' + curve.note : '')); }
+		if (word) {
+			var cn = EngCalcs.lpnDescInline(curve.note);
+			out.push(';' + word + ':' + (cn ? ' ' + cn : ''));
+		}
 		pts.forEach(function (p, i) {
 			out.push(reactRow([curve.id,
 				cx.same ? EngCalcs.lpnNumText(curve, i + 'x', p[0]) : String(p[0] * cx.mul),
@@ -2711,7 +2873,7 @@
 		 * tokens with comments stripped.
 		 */
 		function descOf(el) {
-			var d = EngCalcs.lpnDescText(el && el.desc);
+			var d = EngCalcs.lpnDescInlineOf(el, 'desc', el && el.desc);
 			return d ? '\t;' + d : '';
 		}
 
@@ -3149,7 +3311,8 @@
 			// loop over the factors -- so this does too. A pattern with no rows cannot be stated in
 			// an .inp at all, so a blank line follows it: both EPANET's reader (a blank line
 			// empties `LineComment`, input2.c) and this one then keep it off the next pattern.
-			if (note) { patternRows.push(';' + note); }
+			// One line, its line breaks as "\P" (see lpnDescText).
+			if (note) { patternRows.push(';' + EngCalcs.lpnDescInlineOf(pat, 'note', note)); }
 			if (note && !mults.length) { patternRows.push(''); }
 			// SIX PER LINE, which is EPANET's own layout and the one Net3 is written in. The id
 			// repeats on each line and the values concatenate; that is the format, not a nicety.
@@ -3186,18 +3349,16 @@
 			// A heading the file stated above it, blank line and all (readControlNote()).
 			if (Array.isArray(ctl.head)) { ctl.head.forEach(function (l) { controlRows.push(String(l)); }); }
 			if (note && ctl.noteAt === 'end') {
-				line += ' ;' + note;
+				line += ' ;' + EngCalcs.lpnDescInlineOf(ctl, 'note', note);
 			} else if (note) {
 				src = Array.isArray(ctl.noteSrc) ? ctl.noteSrc : null;
-				if (src && src.map(function (s) {
-					return EngCalcs.lpnDescText(String(s).replace(/^\s*;/, ''));
-				}).filter(Boolean).join(' ') === note) {
+				if (src && EngCalcs.lpnInpDescFromLines(src) === note) {
 					src.forEach(function (s) { controlRows.push(String(s)); });
 				} else {
-					controlRows.push(';' + note);
+					controlRows.push(';' + EngCalcs.lpnDescInline(note));
 				}
 			}
-			if (ctl.tail && ctl.noteAt !== 'end') { line += ' ;' + EngCalcs.lpnDescText(ctl.tail); }
+			if (ctl.tail && ctl.noteAt !== 'end') { line += ' ;' + EngCalcs.lpnDescInlineOf(ctl, 'tail', ctl.tail); }
 			controlRows.push(line);
 			if (Array.isArray(ctl.foot)) { ctl.foot.forEach(function (l) { controlRows.push(String(l)); }); }
 		});

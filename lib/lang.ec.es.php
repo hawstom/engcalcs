@@ -10,8 +10,8 @@ $ec_lang['u_ft']='pies';
 $ec_lang['u_fth2o']='pies ca';
 $ec_lang['u_ftps']='pies/seg.';
 $ec_lang['u_gpm']='gal/min';
-$ec_lang['u_gradePercent']='% vert./horiz.';
-$ec_lang['u_grade']='vert./horiz.';
+$ec_lang['u_gradePercent']='% v/h';
+$ec_lang['u_grade']='v/h';
 $ec_lang['u_in2']='pulg.^2';
 $ec_lang['u_inh2o']='pulg. ca';
 $ec_lang['u_in']='pulg.';
@@ -120,8 +120,8 @@ $ec_lang['calc_copy_link']='Copiar enlace';
 $ec_lang['ec_related_calcs']='Calculadoras relacionadas:';
 $ec_lang['calc_copy_link_done']='¡Copiado!';
 // Darcy-Weisbach. See mphl_ for missing text.
-$ec_lang['dw_main_menu']='Pérdida de carga en tubería según Darcy-Weisbach';
-$ec_lang['dw_main_title']='Calculadora gratis en línea de pérdida de carga en tubería según Darcy-Weisbach';
+$ec_lang['dw_main_menu']='Pérdida de carga en tuberías de Darcy-Weisbach';
+$ec_lang['dw_main_title']='Calculadora gratuita en línea de pérdida de carga en tuberías de Darcy-Weisbach';
 $ec_lang['dw_main_desc']='Pérdida de carga en tubería a partir del diámetro, la rugosidad y el caudal, según Darcy-Weisbach';
 $ec_lang['dw_roughness']='e';
 $ec_lang['dw_roughness_tip']='Altura de rugosidad absoluta, e, de la pared de la tubería. Valores típicos: acero (nuevo) 0,046 mm, acero (usado) 0,15 mm, HDPE 0,003 mm, PVC/uPVC 0,0015 mm, concreto 0,3–3 mm.';
@@ -139,11 +139,11 @@ $ec_lang['dw_friction_factor']='Factor de fricción, f';
 $ec_lang['hw_main_menu']='Pérdida de carga en tubería según Hazen-Williams';
 $ec_lang['hw_main_title']='Calculadora gratis en línea de pérdida de carga en tubería según Hazen-Williams';
 $ec_lang['hw_main_desc']='Pérdida de carga en tubería a partir del diámetro, el coeficiente C de Hazen-Williams y el caudal';
-$ec_lang['hw_hgl_1']='HGL aguas abajo';
-$ec_lang['hw_hgl_2']='HGL aguas arriba';
-$ec_lang['hw_elev_up']='Elevación aguas arriba';
+$ec_lang['hw_hgl_1']='LP aguas abajo';
+$ec_lang['hw_hgl_2']='LP aguas arriba';
+$ec_lang['hw_elev_up']='Cota aguas arriba';
 $ec_lang['hw_pressure_up']='Presión aguas arriba';
-$ec_lang['hw_elev_down']='Elevación aguas abajo';
+$ec_lang['hw_elev_down']='Cota aguas abajo';
 $ec_lang['hw_pressure_down']='Presión aguas abajo';
 $ec_lang['hw_pressure_check']='Verificación de presión';
 $ec_lang['hw_pressure_ok_short']='Presión positiva';
@@ -152,8 +152,8 @@ $ec_lang['hw_pressure_neg']='La presión aguas abajo es menor que cero. El HGL q
 $ec_lang['hw_roughness']='Coeficiente de Hazen-Williams, C';
 $ec_lang['hw_note_1']='<dl><dt>Esta calculadora no representa el perfil de la tubería entre los dos extremos.</dt><dd>Usa solo las elevaciones aguas arriba y aguas abajo que usted ingresa. Si el terreno se eleva por encima de cualquiera de los dos extremos en algún punto intermedio, la presión en ese punto alto es menor que cualquier presión indicada aquí. Vuelva a ejecutar la calculadora para el tramo desde el extremo aguas arriba hasta el punto alto para verificarlo.</dd><dd>Donde el HGL queda por debajo de la tubería, el agua está bajo presión negativa. El aire sale de la solución, una tubería de paredes delgadas puede colapsar, y puede ingresar agua subterránea contaminada a través de las juntas. Mantenga la línea bajo presión positiva en todo su recorrido, y considere una válvula de aire en cada punto alto.</dd><dt>La presión aguas arriba es una condición de frontera que usted proporciona.</dt><dd>Léala en un manómetro, en el nivel de agua de un tanque (la altura de agua sobre la tubería), o en la curva de un bombeo. Un bombeo entrega menos presión a medida que aumenta el caudal, así que use el punto de la curva que corresponda al caudal ingresado arriba.</dd><dt>Sume usted mismo los coeficientes de pérdida localizada.</dt><dd>Sume los valores de K de cada válvula, codo, tee, medidor y entrada en la línea, e ingrese ese total. Siga el enlace de ese campo para ver valores típicos. En una línea de conducción larga estas pérdidas son pequeñas frente a la fricción, pero en tuberías cortas dentro de una estación pueden ser la mayor parte de la pérdida.</dd></dl>';
 // Manning Irregular
-$ec_lang['mi_menu']='Canal de sección irregular según Manning';
-$ec_lang['mi_main_title']='Calculadora gratis en línea de Manning para canal de sección irregular';
+$ec_lang['mi_menu']='Canal irregular de Manning';
+$ec_lang['mi_main_title']='Calculadora gratuita en línea de canal irregular de Manning';
 $ec_lang['mi_main_desc']='Calculadora de flujo uniforme según Manning para canal de sección irregular';
 $ec_lang['mi_waterSurfaceElevation']='Altura de la lámina libre';
 $ec_lang['mi_q_617']='<span class="ec-help" title="El caudal compuesto, Q, usando una n compuesta para cada región según Chow 6-17, velocidades iguales">Q <span class="ec-tip">?</span></span>';
@@ -192,7 +192,7 @@ $ec_lang['mpf_depth_ratio']='Relación de calados, y/d<sub>0</sub>';
 $ec_lang['mpf_flow']='Caudal, Q';
 $ec_lang['mpf_flow_tip']='El caudal y la profundidad se calculan para una tubería de longitud infinita. Para lograr que este caudal entre en la tubería puede necesitarse una mayor profundidad de agua de entrada. Vea las Notas más abajo para más detalles y un video tutorial.';
 $ec_lang['mpf_velocity']='Velocidad, v';
-$ec_lang['mpf_velocity_head']='<span class="ec-help" title="Energía cinética expresada como una altura de columna de agua, v²/2g">Carga de velocidad, h<sub>v</sub> <span class="ec-tip">?</span></span>';
+$ec_lang['mpf_velocity_head']='<span class="ec-help" title="Energía cinética expresada como altura de columna de agua, v²/2g">Carga de velocidad, h<sub>v</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['mpf_flow_area']='Área de flujo, A';
 $ec_lang['mpf_pipe_area']='Área de la tubería, A<sub>0</sub>';
 $ec_lang['mpf_area_ratio']='Relación de áreas, A/A<sub>0</sub>';
@@ -200,7 +200,7 @@ $ec_lang['mpf_wetted_perimeter']='Perímetro mojado, P<sub>w</sub>';
 $ec_lang['mpf_hydraulic_radius']='Radio hidráulico, R<sub>h</sub>';
 $ec_lang['mpf_top_width']='Ancho de lámina libre, T';
 $ec_lang['mpf_froude_number']='Número de Froude, Fr';
-$ec_lang['mpf_shear_stress']='Tensión tangencial promedio, τ';
+$ec_lang['mpf_shear_stress']='Esfuerzo cortante medio, τ';
 $ec_lang['mpf_full_flow']='Caudal lleno, Q<sub>0</sub>';
 $ec_lang['mpf_full_flow_ratio']='Relación de caudales, Q/Q<sub>0</sub>';
 $ec_lang['mpf_note_1']='<dl><dt>Este es el caudal (y la profundidad) dentro de una tubería <em>de longitud infinita</em>.</dt><dd>Lograr que el caudal entre en la tubería puede requerir una profundidad de agua de entrada (cabezal) bastante mayor. Agregue por lo menos 1,5 veces la carga de velocidad para estimar la profundidad de agua de entrada, o <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">vea mi tutorial de 2 minutos</a> sobre los cálculos estándar de cabezal de entrada en alcantarillas usando <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, el programa gratuito de alcantarillas de la Administración Federal de Carreteras de los Estados Unidos.</dd>';
@@ -220,10 +220,10 @@ $ec_lang['mphl_total_junction_k_short']='Coeficiente de pérdida, k<sub>m</sub>'
 $ec_lang['mphl_total_junction_k_tip']='Coeficiente de pérdida localizada (menor), km. Estas pérdidas ocurren en uniones de tubería, entradas, salidas, codos y válvulas — el término "menor" es convencional pero engañoso; en un tramo corto pueden igualar o superar las pérdidas por fricción. Valores típicos de k: entrada de borde vivo 0.5, cada codo de 45° 0.2–0.3, válvula de compuerta (totalmente abierta) 0.1, válvula mariposa 0.2, salida (a un depósito o a la atmósfera) 1.0. Sume todos los accesorios para obtener el km total. El valor predeterminado 2.0 supone una entrada, una salida y dos codos de 45°.';
 $ec_lang['mphl_friction_slope']='Pendiente de fricción';
 $ec_lang['mphl_friction_loss']='Pérdida por fricción, h<sub>f</sub>';
-$ec_lang['mphl_junction_loss']='Pérdida localizada (menor), h<sub>m</sub>';
+$ec_lang['mphl_junction_loss']='Pérdida menor (local), h<sub>m</sub>';
 $ec_lang['mphl_total_loss']='Pérdida total, h<sub>L</sub>';
-$ec_lang['mphl_egl_1']='EGL aguas abajo';
-$ec_lang['mphl_egl_2']='EGL aguas arriba';
+$ec_lang['mphl_egl_1']='LE aguas abajo';
+$ec_lang['mphl_egl_2']='LE aguas arriba';
 $ec_lang['mphl_hgl_egl_tip']='Este resultado puede no ser válido donde la tubería se eleva por encima de la línea piezométrica.';
 $ec_lang['mphl_note_1']='<dl><dt>Esta calculadora no representa el perfil de la tubería entre los dos extremos.</dt><dd>Si el HGL desciende por debajo de la parte superior de la tubería en algún punto, este cálculo puede no ser válido.</dd><dt>Para una entrada abierta (alcantarilla), es necesario verificar las condiciones de control de entrada.</dt><dd>1. El HGL aguas arriba debe estar por encima de la cota de flujo a profundidad normal aguas arriba (¡y por encima de la tubería!).</dd><dd>2. El cabezal de una alcantarilla se representa mejor con el EGL aguas arriba que con el HGL aguas arriba.</dd><dd>3. Véase <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mi tutorial de 2 minutos</a> para cálculos estándar sencillos de cabezal en alcantarillas usando <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, el programa gratuito de alcantarillas de la Administración Federal de Carreteras de los Estados Unidos.</dd><dd>4. Esta página resuelve solo el caso de control de salida: una tubería que fluye llena, donde las condiciones aguas abajo determinan el cabezal. El diseño de alcantarillas consiste en decidir si predomina el control de entrada o el control de salida, así que use HY-8 siempre que cualquiera de los dos pueda predominar.</dd></dl>';
 // Manning Trapezoid. See mpf_ for missing text.
@@ -234,9 +234,9 @@ $ec_lang['mtc_bottom_width']='Anchura de la base, b';
 $ec_lang['mtc_side_slope_1']='Pendiente de lado 1, z<sub>1</sub> (horiz./vert.)';
 $ec_lang['mtc_side_slope_2']='Pendiente de lado 2, z<sub>2</sub> (horiz./vert.)';
 $ec_lang['mtc_channel_slope']='Pendiente del canal, S';
-$ec_lang['mtc_flow_depth']='Calado de la lámina de agua, y';
+$ec_lang['mtc_flow_depth']='Profundidad del flujo, y';
 $ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">Ángulo de la curva, β</a><span class="ec-help" title="Para el tamaño de roca. Siga el enlace para ver el diagrama."><span class="ec-tip">?</span></span>';
-$ec_lang['mtc_sgrock']='<span class="ec-help" title="Densidad relativa al agua. Valor típico ≈ 2,65 para roca triturada">Gravedad específica de la roca, sg <span class="ec-tip">?</span></span>';
+$ec_lang['mtc_sgrock']='<span class="ec-help" title="Densidad relativa al agua. Valor típico ≈ 2,65 para roca triturada.">Densidad relativa de la roca, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='Tamaño de roca de diseño, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n para el tamaño de roca de diseño según Strickler';
 $ec_lang['mtc_n_blodgett']='n para el tamaño de roca de diseño según Blodgett';
@@ -315,11 +315,11 @@ $ec_lang['or_notes_4_def']='Cuando TWE está sobre la solera de la apertura, est
 // Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Micro-Hidroeléctrica';
 $ec_lang['mhp_main_title']='Calculadora Gratuita de Potencia Micro-Hidroeléctrica';
-$ec_lang['mhp_main_desc']='Calculadora de Potencia de Micro-Hidroeléctrica de Pasada';
+$ec_lang['mhp_main_desc']='Calculadora de potencia de microcentral hidroeléctrica de pasada';
 $ec_lang['mhp_gross_head']='Carga bruta, H<sub>gross</sub>';
 $ec_lang['mhp_diameter']='<span class="ec-help" title="Diámetro de la tubería de presión (tubería de suministro)">Diámetro de la tubería de presión, D <span class="ec-tip">?</span></span>';
 $ec_lang['mhp_length']='Longitud, L';
-$ec_lang['mhp_efficiency']='Rendimiento de la instalación, η (0–1)';
+$ec_lang['mhp_efficiency']='Eficiencia de la central, η (0–1)';
 $ec_lang['mhp_vel_check']='Verificación de velocidad';
 $ec_lang['mhp_hl_check']='Verificación de pérdida de carga';
 $ec_lang['mhp_hnet']='Carga neta, H<sub>net</sub>';
@@ -463,7 +463,7 @@ $ec_lang['rc_main_desc']='Dimensionamiento de Escollera para Bajante — Robinso
 $ec_lang['rc_S0']='Pendiente del fondo del canal, S<sub>0</sub>';
 $ec_lang['rc_qt']='<span class="ec-help" title="Caudal por unidad de ancho en la entrada del canal. Para un canal de ancho de plantilla B con caudal total Q, usar q_t = Q / B.">Caudal unitario total, q<sub>t</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_np']='Porosidad de la escollera, n<sub>p</sub>';
-$ec_lang['rc_sg']='<span class="ec-help" title="Densidad relativa al agua. Típico para granito o basalto triturado ≈ 2,65. Rango válido según Robinson: 2,54 a 2,82.">Gravedad específica de la roca, sg <span class="ec-tip">?</span></span>';
+$ec_lang['rc_sg']='<span class="ec-help" title="Densidad relativa al agua. Valor típico para granito triturado o basalto ≈ 2,65. Rango válido de Robinson: 2,54 a 2,82.">Densidad relativa de la roca, sg <span class="ec-tip">?</span></span>';
 $ec_lang['rc_SD']='<span class="ec-help" title="Desviación estándar de gradación. Roca uniforme ≈ 1,25. Rango válido Robinson: 1,15 a 1,47.">Gradación SD = D<sub>84.1</sub>/D<sub>50</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_yn']='<span class="ec-help" title="El remanso (Hp > yn) es conveniente porque reduce la erosión aguas arriba. (USDA)">Tirante normal en el canal de entrada, y<sub>n</sub> <span class="ec-tip">?</span></span>';
 $ec_lang['rc_D50']='<span class="ec-help" title="Ec. 1 (S0 < 0,10) o Ec. 2 (0,10-0,40). Válido: D50 15-278 mm, S0 0,02-0,40. Fuera del rango: extrapolado.">Tamaño mediano de roca requerido, D<sub>50</sub> <span class="ec-tip">?</span></span>';
@@ -2798,14 +2798,12 @@ $ec_lang['lpn_field_text_all_zoom_tip']='Mantiene este texto en el dibujo sin im
 $ec_lang['lpn_tool_labels']='Etiquetas';
 $ec_lang['lpn_labels_heading_node']='Etiquetas de nodo';
 $ec_lang['lpn_labels_heading_link']='Etiquetas de línea';
-$ec_lang['lpn_labels_mark_extrema']='Marcar los valores más alto y más bajo';
 // THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
 // row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line
 // below", which reads better and made both words unfindable. The Settings box searches tips, so a
 // word not on the page is a word the search cannot reach -- and $ec_lang_syn, the other place the
 // terms could have gone, is invisible to it. Plain English leads and the term is the gloss, which is
 // the same shape as "Minor (local) loss".
-$ec_lang['lpn_labels_mark_extrema_tip']='Marca el valor más alto de cada propiedad etiquetada en el mapa con una línea encima (una raya superior), y el más bajo con una línea debajo (una raya inferior).';
 // "Apply to all" beside each ID prefix (ROADMAP Task 345): an ID prefix normally governs only the assets
 // you draw from now on, and this is the way to say "I meant the ones already here". {n} and
 // {skipped} are whole numbers; {prefix} is the text the user typed.

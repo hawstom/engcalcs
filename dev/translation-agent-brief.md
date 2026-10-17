@@ -9,8 +9,8 @@ Repo root: `~/webdev/hawsedc.com/engcalcs`
 - **Language file (edit):** `lib/lang.ec.<LANG>.php`
 
 Read the payload FIRST and in full. It is self-describing and carries everything below in
-machine form: `keys_to_translate`, `prompt_context_by_prefix`, `glossary_terms_by_prefix`,
-`key_context`, `key_syn`.
+machine form: `keys_to_translate`, `glossary`, `key_context`, `key_syn`, `key_notes`,
+`key_concepts`, and `meta.*_notes`, which say how to use each one.
 
 ## What to translate
 
@@ -19,7 +19,9 @@ the language file. Do not translate keys listed in `meta.exempt_keys` — those 
 identical to English on purpose.
 
 Most of these keys are **absent** from your language file, not blank. Append them as new lines
-at the end of the file (the file has no closing `?>`). Order does not matter — the orchestrator
+at the end of the file (the file has no closing `?>`). **Check `key_context[key].reason` first:**
+`blank`, `equal_to_english` and `english_changed` keys are already in your file and are
+**replaced in place**, never appended (`meta.reason_notes`). Order does not matter — the orchestrator
 runs `lang_key_order_normalizer.php` afterward.
 
 ## What this batch is
@@ -71,24 +73,19 @@ English and need retranslating from the new wording.
 
 ## Terminology
 
-- `prompt_context_by_prefix` gives the **preferred translation** for this language's key
-  technical terms. Use them. They are the result of prior sprints and native review.
-- `glossary_terms_by_prefix` carries the full concept entries, including `avoid` lists.
-  **An `avoid` entry forbids a physical/structural error or a lazy transliteration — it never
-  forbids a term that is genuinely your language's dominant standard.** We defer to your
-  language's own professional convention; we are not the judges of your terminology.
-- **Do not phonetically transliterate an English technical word** when a real term exists in
-  your language. If your language's engineers genuinely use the English loanword, that is
-  fine and correct — but reaching for a transliteration because the concept is hard is the
-  single most common defect in past sprints.
-- `key_syn`, when present, is translator guidance for that specific label:
-  - **Left of the first `|`** = alternate English wordings of the same label. Any of them
-    could stand on the control. Pick whichever re-compresses most naturally in your language;
-    you are not bound to the literal English wording.
-  - **Right of the first `|`** = production commentary. **Never translate it.** Tags:
-    `layout: column heading` / `unit token` / `nav item` → keep it as short as your language
-    allows; `symbol` → keep every letter and subscript exactly; `avoid: X` → this label must
-    NOT be read in sense X; `gloss: T` → see glossary term T.
+- `glossary` lists the technical terms this batch's strings use, with the **preferred
+  translation** for this language and what each MEANS. Use the preferred translations, unless
+  your language's own professional standard term is better: then use that and say so in your
+  report. We defer to your language's convention; we are not the judges of your terminology.
+- **Use the term your language's engineers actually use.** Where they use the English loanword,
+  that is correct. A word spelled out from English because the concept is hard has been the most
+  common defect in past sprints, so read every new loanword back in your language.
+- `key_syn`, when present, gives alternate English wordings of that label. Any of them could
+  stand on the control. Pick whichever re-compresses most naturally in your language; you are
+  not bound to the literal English wording.
+- `key_notes`, when present, are instructions about that one string (how much room it has, a
+  sense it must not be read in, symbols to keep). Obey them; never put them in your file.
+- `key_context.tip` / `key_context.label` pair a label with its help text. Read them together.
 - `key_context.neighbors` shows the already-translated strings on either side. Use them to
   match the register and vocabulary of the existing file — your work must read as the same
   translator's voice, not a bolt-on.

@@ -33,11 +33,9 @@ to leave something uncommitted.
   same fix is merged to master separately. A clean release can always be cut from a pre-merge SHA
   and fixes cherry-picked on — never tell him otherwise.
 - **Merge FROM master often. Merge a capability branch INTO master only on Tom's typed word in
-  the conversation.** Green is not done. Claude Code's permission check enforces it; there is no
-  all-clear file. `dev/hooks/pre-merge-commit` refuses only what `dev/branch-policy.json` switches
-  on — `feature_freeze.active` refuses any branch named feat/... (only Tom lifts it), `freeze.active` is
-  the emergency stop refusing everything but a `hotfix:` — and an open `dev/deploy-blockers.json`
-  entry. A defect or tooling track merges on green alone.
+  the conversation.** Green is not done. Claude Code's permission check enforces it; no file or
+  hook does. There are no freezes; to hold a release still, cut a release branch. A defect or
+  tooling track merges on green alone.
 - **A batch of merges costs one `check_all` run, about 19 minutes (three browser lanes, 2026-10-15); tell Tom the wait before
   starting it.** Merge the whole batch, then fold in the payload regeneration, roadmap closures and
   handoff edits, all before the run: every later master commit is another full run. On the merge
@@ -110,6 +108,7 @@ provenance rules: `dev/agents/README.md`.
 |------|---------|
 | `dev/session-handoff.md` | **Read first.** RULINGS, TRAPS and dated STATE; delete a state line once checked |
 | `dev/ROADMAP.md` | OPEN tasks only. Format `Priority\|ID\|status Description` |
+| `dev/terms.md` | **The concept source translators work from**: plain-words names, Tom's definitions, uniqueness attention groups. Tom edits it |
 | `dev/roadmap-closed-ids.md` | One line per closed ID, so a cited `Task N` resolves |
 | `dev/tom-review-queue.md` | Tom's browser-pass comments, quoted, until cleared |
 | `dev/real-world-reviews.md` | What outside testers did and said, one entry per session |
@@ -208,6 +207,10 @@ it. **A core calculator, in scope in all 26 languages. Never call it "preview".*
   project in metres**, its lengths measured on the ground (`isWebMercProject()`). EPSG:4326 is the
   suggested row. Mission scope is a 300 km system span; `geodesicMeters()` is flat per leg
   (206 ppm at scope). `dev/geographic-projects.md`.
+- **A Description is lines and paragraphs**, stored with `\n` (Tom, 2026-10-15). Wherever it must sit on
+  one line (the `.inp`'s one comment, a Tables cell, a copy) each line break is `\P`, no spaces
+  (Tom, 2026-10-16; `lpnDescInline()`/`lpnDescFromInline()`); an unedited imported one goes back out
+  as the file spelled it. `dev/lpn-rulings.md`.
 - **Reads and writes EPANET `.inp`** (`js/lpn-inp.js`). Import reports every difference, never
   rejects, never drops silently. Export is character-exact on Net1/2/3.
 - **Design for a pointer; make a phone survivable.** Never call it a PC application in public — it
@@ -257,8 +260,11 @@ mismatch; (D) single-quoted values only.
 - **`$ec_lang_syn` is OFF-LIMITS to AI** without explicit written permission in that conversation.
   Propose a diff; Tom approves; then write. No standing carve-outs. Entries are synonyms that pass
   the substitution test.
+- **Suggestions only, no prohibitions.** A translator gets what a word means and what to call it,
+  never a "do not" line; a wrong translation means the definition needs fixing.
 - **Routing:** an English reader also stumbles → fix the English; English is fine but untranslatable
-  → `$ec_lang_syn`; the concept recurs → `glossary.json`.
+  → `$ec_lang_syn`; the concept recurs → `dev/terms.md`, Tom's plain-words concept list, which
+  `terms_to_glossary.php --write` carries into `glossary.json`. Never edit those glossary fields by hand.
 - **Never rename a key by hand** — `php dev/scripts/rename_lang_key.php old new --apply`.
 - **English style: standard professional civil-engineering technical English**, the register of
   FHWA HEC circulars, USACE HEC manuals, the EPA EPANET 2.2 manual, and AWWA M-series manuals. No
