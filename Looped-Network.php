@@ -2021,6 +2021,15 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_guide_lib_example_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_example_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_lib_notes_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_notes_def']?></dd>
 </dl></template>
+<?php // The Properties chapter (Task 785), in the entry for the Properties box. ?>
+<template id="lpn_guide_more_lpn_popup"><dl>
+	<dt><?=$ec_lang['lpn_guide_prop_open_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_open_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_prop_edit_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_edit_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_prop_id_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_id_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_prop_scn_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_scn_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_prop_multi_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_multi_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_prop_example_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_example_def']?></dd>
+</dl></template>
 <template id="lpn_guide_more_lpn_scncmp_box"><dl>
 	<dt><?=$ec_lang['lpn_guide_cmp_cols_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_cols_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_cmp_run_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_run_def']?></dd>
