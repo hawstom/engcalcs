@@ -59647,6 +59647,164 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * abbreviation you will read tomorrow is written while you are still looking at the long form
 	 * that produced it.
 	 */
+	// ---- THE THEME GALLERY (Task 811; dev/themes-plan.md) ----
+	// Settings > Map and page > Page > Theme is a button showing the chosen theme as a small picture of the
+	// page and its name. It opens a gallery of the same pictures, one per theme. Each picture is real
+	// markup painted by its own theme's tokens (`.ec-theme-card[data-theme]` shares the token rules with
+	// <html>, css/engcalcs.css), so a card can never drift from what the page becomes, and a theme added to
+	// the stylesheet and to window.ecTheme.list appears here with no further work.
+	//
+	// **TRY, THEN KEEP.** Pointing at a card, or reaching it with the arrow keys, repaints the whole page in
+	// that theme (window.ecTheme.preview(), which stores nothing). A click, Enter or Space keeps it
+	// (window.ecTheme.set(), the one writer of `lpn_theme`). Escape, a click outside the gallery, Tab out of
+	// it, or the pointer leaving it puts the kept theme back. On a touch screen there is no pointing, so a
+	// tap keeps the theme it lands on, and another tap changes it again.
+	function themeLabel(pc, t) {
+		var names = { system: pc.lpn_theme_system || 'System', light: pc.lpn_theme_light || 'Light', dark: pc.lpn_theme_dark || 'Dark',
+			hc: pc.lpn_theme_hc || 'High contrast', amber: pc.lpn_theme_amber || 'Amber', green: pc.lpn_theme_green || 'Green',
+			platinum: pc.lpn_theme_platinum || 'Platinum' };
+		return names[t] || t;
+	}
+	// A small picture of the page: the menu bar's outlined items, the toolbar, the tab strip, a box of
+	// text, a notice, and a patch of the map (whose paper and ink no theme changes).
+	function themeMiniature(t) {
+		var c = document.createElement('span');
+		c.className = 'ec-theme-card';
+		c.setAttribute('aria-hidden', 'true');
+		c.setAttribute('data-theme', window.ecTheme.resolve(t));
+		c.setAttribute('data-theme-choice', t);
+		c.innerHTML = '<span class="ec-tc-menu"><i></i><i></i><i></i></span>' +
+			'<span class="ec-tc-tool"><i></i><i></i><i></i><i></i><i></i></span>' +
+			'<span class="ec-tc-tabs"><i></i><i class="ec-tc-cur"></i></span>' +
+			'<span class="ec-tc-panel"><i></i><i></i><i class="ec-tc-link"></i></span>' +
+			'<span class="ec-tc-map"><svg viewBox="0 0 70 34" preserveAspectRatio="none"><path d="M6 26 L26 12 L48 20 L64 7"/>' +
+			'<circle cx="26" cy="12" r="2.6"/><circle cx="48" cy="20" r="2.6"/></svg><span class="ec-tc-note"></span></span>';
+		return c;
+	}
+	function themeGalleryClose(keep, refocus) {
+		var g = document.getElementById('lpn_theme_gallery');
+		if (!g) { return; }
+		if (!keep) { window.ecTheme.preview(null); }
+		if (g._lpnOff) { g._lpnOff(); }
+		if (g.parentNode) { g.parentNode.removeChild(g); }
+		var btn = document.getElementById('lpn_set_theme');
+		if (btn) {
+			btn.setAttribute('aria-expanded', 'false');
+			themeButtonPaint(btn);
+			if (refocus) { btn.focus(); }
+		}
+	}
+	function themeButtonPaint(btn) {
+		var pc = EngCalcs.pageConfig || {}, t = window.ecTheme.get(), name = document.createElement('span');
+		btn.textContent = '';
+		btn.appendChild(themeMiniature(t));
+		name.className = 'lpn-theme-btn-name';
+		name.textContent = themeLabel(pc, t);
+		btn.appendChild(name);
+		btn.setAttribute('data-theme-choice', t);
+	}
+	function themeGalleryOpen(btn) {
+		var pc = EngCalcs.pageConfig || {}, kept = window.ecTheme.get(), cards = [];
+		themeGalleryClose(false, false);
+		var g = document.createElement('div');
+		g.id = 'lpn_theme_gallery';
+		g.className = 'lpn-theme-gallery d-print-none';
+		g.setAttribute('role', 'group');
+		g.setAttribute('aria-label', pc.lpn_settings_theme || 'Theme');
+		function previewing(card) {
+			cards.forEach(function (c) { c.classList.toggle('lpn-theme-previewing', c === card); });
+		}
+		window.ecTheme.list.forEach(function (t, i) {
+			var b = document.createElement('button'), name = document.createElement('span');
+			b.type = 'button';
+			b.className = 'lpn-theme-choice';
+			b.setAttribute('data-theme-name', t);
+			b.setAttribute('aria-pressed', t === kept ? 'true' : 'false');
+			b.tabIndex = t === kept ? 0 : -1;
+			b.style.setProperty('--lpn-theme-i', String(i));
+			b.appendChild(themeMiniature(t));
+			name.className = 'lpn-theme-choice-name';
+			name.textContent = themeLabel(pc, t);
+			b.appendChild(name);
+			b.addEventListener('mouseenter', function () { window.ecTheme.preview(t); previewing(b); });
+			b.addEventListener('focus', function () {
+				cards.forEach(function (c) { c.tabIndex = c === b ? 0 : -1; });
+				window.ecTheme.preview(t); previewing(b);
+			});
+			b.addEventListener('click', function () { window.ecTheme.set(t); themeGalleryClose(true, true); });
+			cards.push(b);
+			g.appendChild(b);
+		});
+		g.addEventListener('mouseleave', function () { window.ecTheme.preview(null); previewing(null); });
+		// The arrow keys walk the grid (left and right swap on a right-to-left page), Home and End go to the
+		// ends. Consumed here so the map's own keys never see them.
+		g.addEventListener('keydown', function (e) {
+			var i = cards.indexOf(document.activeElement), cols = 1, rtl = (getComputedStyle(g).direction === 'rtl'), to = -1;
+			if (i < 0) { return; }
+			while (cols < cards.length && cards[cols].offsetTop === cards[0].offsetTop) { cols++; }
+			if (e.key === 'ArrowRight') { to = i + (rtl ? -1 : 1); }
+			else if (e.key === 'ArrowLeft') { to = i + (rtl ? 1 : -1); }
+			else if (e.key === 'ArrowDown') { to = i + cols; }
+			else if (e.key === 'ArrowUp') { to = i - cols; }
+			else if (e.key === 'Home') { to = 0; }
+			else if (e.key === 'End') { to = cards.length - 1; }
+			else { return; }
+			e.preventDefault();
+			e.stopPropagation();
+			cards[Math.max(0, Math.min(cards.length - 1, to))].focus();
+		});
+		g.addEventListener('focusout', function (e) {
+			var to = e.relatedTarget;
+			if (to && !g.contains(to)) { themeGalleryClose(false, false); }
+		});
+		// Escape in the capture phase, because the gallery is the innermost thing on screen; it is consumed only
+		// while the gallery is open. A press outside the gallery (not on its own button, which toggles) reverts.
+		function onKey(e) {
+			if (e.key !== 'Escape' && e.key !== 'Esc') { return; }
+			e.preventDefault();
+			e.stopPropagation();
+			themeGalleryClose(false, true);
+		}
+		function onDown(e) {
+			if (g.contains(e.target) || (btn.contains && btn.contains(e.target))) { return; }
+			themeGalleryClose(false, false);
+		}
+		function onResize() { themeGalleryClose(false, false); }
+		document.addEventListener('keydown', onKey, true);
+		document.addEventListener('pointerdown', onDown, true);
+		window.addEventListener('resize', onResize);
+		g._lpnOff = function () {
+			document.removeEventListener('keydown', onKey, true);
+			document.removeEventListener('pointerdown', onDown, true);
+			window.removeEventListener('resize', onResize);
+		};
+		document.body.appendChild(g);
+		// Under the button, or above it when the window has no room below; kept inside the window.
+		var r = btn.getBoundingClientRect(), w = g.offsetWidth, h = g.offsetHeight, vw = window.innerWidth, vh = window.innerHeight;
+		var left = rtlPage() ? r.right - w : r.left, top = r.bottom + 4;
+		if (top + h > vh - 4 && r.top - h - 4 >= 4) { top = r.top - h - 4; }
+		g.style.left = Math.max(4, Math.min(vw - w - 4, left)) + 'px';
+		g.style.top = Math.max(4, Math.min(vh - h - 4, top)) + 'px';
+		btn.setAttribute('aria-expanded', 'true');
+		var start = cards.filter(function (c) { return c.getAttribute('aria-pressed') === 'true'; })[0] || cards[0];
+		start.focus({ preventScroll: true });
+	}
+	function rtlPage() { return (document.documentElement.getAttribute('dir') || '').toLowerCase() === 'rtl'; }
+	function themeControl() {
+		var btn = document.createElement('button');
+		btn.type = 'button';
+		btn.id = 'lpn_set_theme';
+		btn.className = 'lpn-theme-btn';
+		btn.setAttribute('aria-haspopup', 'true');
+		btn.setAttribute('aria-expanded', 'false');
+		themeButtonPaint(btn);
+		btn.addEventListener('click', function (e) {
+			// The row is a <label>, and a click on its words arrives here too.
+			e.preventDefault();
+			if (document.getElementById('lpn_theme_gallery')) { themeGalleryClose(false, false); } else { themeGalleryOpen(btn); }
+		});
+		return btn;
+	}
 	// **THE SUB-HEADINGS ARE IN THE MARKUP NOW AND THIS FILLS THEM** (Task 441, restructured). The
 	// rows below did not move between categories by being re-parented at run time -- each one is
 	// appended to the host that stands under its own sub-heading in Looped-Network.php, so where a
@@ -60553,23 +60711,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		row(pageBody, pc.lpn_settings_override_marks || 'Show override markers on the map', ovrMarksInput,
 			pc.lpn_settings_override_marks_tip);
 
-		// The theme (Task 714, Phase 3; dev/theming-plan.md): System, Light or Dark. The same section and
-		// the same reason as the two rows above: it is a fact about the screen and the eyes at it, so it
-		// lives in this browser (`lpn_theme`, written by window.ecTheme in the page head) and never in
-		// serializeProject(). It repaints with no reload, because the head script owns the attribute.
-		var themeSelect = document.createElement('select');
-		themeSelect.id = 'lpn_set_theme';
-		[['system', pc.lpn_theme_system || 'System'], ['light', pc.lpn_theme_light || 'Light'],
-			['dark', pc.lpn_theme_dark || 'Dark']].forEach(function (o) {
-			var opt = document.createElement('option');
-			opt.value = o[0]; opt.textContent = o[1];
-			if (typeof window.ecTheme !== 'undefined' && window.ecTheme.get() === o[0]) { opt.selected = true; }
-			themeSelect.appendChild(opt);
-		});
-		themeSelect.addEventListener('change', function () {
-			if (typeof window.ecTheme !== 'undefined') { window.ecTheme.set(themeSelect.value); }
-		});
-		row(pageBody, pc.lpn_settings_theme || 'Theme', themeSelect, pc.lpn_settings_theme_tip);
+		// The theme (Task 714; the gallery, Task 811; dev/themes-plan.md). The same section and the same
+		// reason as the rows above: it is a fact about the screen and the eyes at it, so it lives in this
+		// browser (`lpn_theme`, written by window.ecTheme in the page head) and never in serializeProject().
+		// The control is a button showing the chosen theme as a small picture; it opens the gallery, where
+		// pointing at a card (or reaching it with the arrow keys) repaints the whole page in that theme, a
+		// click or Enter keeps it, and Escape, a click elsewhere or the pointer leaving puts the kept one back.
+		if (typeof window.ecTheme !== 'undefined') {
+			row(pageBody, pc.lpn_settings_theme || 'Theme', themeControl(), pc.lpn_settings_theme_tip);
+		}
 		var tail = document.createElement('div');
 		tail.style.marginTop = '6px';
 		pageBody.appendChild(tail);

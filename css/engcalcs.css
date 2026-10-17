@@ -516,6 +516,23 @@
 	--ec-bevel-in: inset 1px 1px 0 #888, inset -1px -1px 0 #fff;
 }
 /* ec-colour-tokens:end */
+/* BOOTSTRAP FOLLOWS THE NEWER THEMES (Task 811). Bootstrap paints the page's own text, its links and its
+   field edges from its own variables, light or dark by data-bs-theme; in Light and Dark that is what the page
+   has always shown, so they are left alone. A theme with a palette of its own hands Bootstrap its tokens, or
+   the Settings box would be written in Bootstrap's grey and the links in Bootstrap's blue. `:where()` keeps
+   the link rule as weak as Bootstrap's own `a` rule, so every rule of this file that colours a link still wins. */
+:root:is([data-theme="hc"], [data-theme="hc-dark"], [data-theme="amber"], [data-theme="green"], [data-theme="platinum"]) {
+	--bs-body-color: var(--ec-ink);
+	--bs-body-bg: var(--ec-bg);
+	--bs-emphasis-color: var(--ec-ink-black);
+	--bs-secondary-color: var(--ec-ink-muted);
+	--bs-border-color: var(--ec-border-strong);
+	--bs-secondary-bg: var(--ec-gray-eee);
+	--bs-tertiary-bg: var(--ec-gray-f7f7f7);
+}
+:where(:root[data-theme="hc"], :root[data-theme="hc-dark"], :root[data-theme="amber"], :root[data-theme="green"], :root[data-theme="platinum"]) a { color: var(--ec-accent); }
+/* "Saved in this browser" is faded by opacity, which lands under 4.5:1 on a phosphor or a pure-ink palette. */
+:root:is([data-theme="hc"], [data-theme="hc-dark"], [data-theme="amber"], [data-theme="green"], [data-theme="platinum"]) .lpn-saved { opacity: 1; color: var(--ec-ink-muted); }
 
 /* ---------------------------------------------------------------------------------------------
    SELF-SUFFICIENCY BLOCK -- rules this suite needs that used to live only in the PARENT SITE.
@@ -6288,3 +6305,72 @@ textarea.lpn-desc-ta {
 	.lpn-gjnet-table td[data-label]::before { content: attr(data-label) ": "; }
 	.lpn-gjnet-table select { max-width: 100%; }
 }
+
+/* ---- THE THEME GALLERY (Task 811; dev/themes-plan.md) ----
+   Settings > Page > Theme is a button showing the chosen theme as a small picture of the page; it opens a
+   gallery of the same pictures, one per theme. A picture (.ec-theme-card) carries data-theme, so the token
+   rules at the top of this file paint it in its own theme while the page around it stays in the page's.
+   Its little map keeps the map's paper and ink, because the map does not follow a theme. */
+.ec-theme-card {
+	display: block; position: relative; box-sizing: border-box; overflow: hidden;
+	width: 132px; height: 80px;
+	background: var(--ec-bg); color: var(--ec-ink);
+	border: 1px solid var(--ec-border-strong); border-radius: 4px;
+	line-height: 0; text-align: start;
+}
+.ec-theme-card i { display: block; font-style: normal; box-sizing: border-box; }
+.ec-tc-menu, .ec-tc-tool, .ec-tc-tabs { display: flex; gap: 4px; background: var(--ec-chrome-bg); padding: 0 5px; }
+.ec-tc-menu { height: 14px; align-items: center; padding-top: 2px; gap: 3px; }
+.ec-tc-menu i { width: 22px; height: 9px; background: var(--ec-bg); border: 1px solid var(--ec-accent); border-radius: min(var(--ec-btn-radius), 3px); box-shadow: var(--ec-bevel); }
+.ec-tc-tool { height: 13px; align-items: center; gap: 6px; border-bottom: 1px solid var(--ec-gray-d6d6d6); }
+.ec-tc-tool i { width: 7px; height: 7px; border: 1.5px solid var(--ec-ink-black); border-radius: 1px; }
+.ec-tc-tabs { height: 11px; align-items: flex-end; gap: 2px; border-bottom: 1px solid var(--ec-gray-999); }
+.ec-tc-tabs i { width: 22px; height: 7px; margin-bottom: -1px; background: var(--ec-gray-ececec); border: 1px solid var(--ec-gray-999); border-bottom: 0; border-radius: 2px 2px 0 0; }
+.ec-tc-tabs i.ec-tc-cur { background: var(--ec-bg); }
+.ec-tc-panel, .ec-tc-map, .ec-tc-note { display: block; }
+.ec-tc-panel { position: absolute; left: 4px; top: 43px; bottom: 4px; width: 36px; padding: 4px; background: var(--ec-bg); border: 1px solid var(--ec-border-strong); }
+.ec-tc-panel i { height: 3px; margin-bottom: 4px; background: var(--ec-ink); border-radius: 1px; }
+.ec-tc-panel i + i { width: 70%; background: var(--ec-ink-muted); }
+.ec-tc-panel i.ec-tc-link { width: 85%; background: var(--ec-accent); }
+.ec-tc-map { position: absolute; left: 44px; right: 4px; top: 43px; bottom: 4px; background: var(--ec-map-paper); border: 1px solid var(--ec-border-strong); }
+.ec-tc-map svg { display: block; width: 100%; height: 100%; fill: var(--ec-map-paper); stroke: var(--ec-map-ink); stroke-width: 1.4px; }
+.ec-tc-note { position: absolute; right: 3px; top: 3px; width: 26px; height: 7px; background: var(--ec-warn-bg); border: 1px solid var(--ec-warn-border); }
+/* The Settings row's button: a smaller picture and the name. */
+.lpn-theme-btn {
+	display: inline-flex; align-items: center; gap: 8px; max-width: 100%;
+	padding: 3px 10px 3px 3px; font: inherit; cursor: pointer;
+	background: var(--ec-bg); color: var(--ec-ink);
+	border: 1px solid var(--ec-control-border); border-radius: var(--ec-btn-radius);
+}
+.lpn-theme-btn:hover { border-color: var(--ec-accent-hover); background: var(--ec-accent-hover-bg); }
+.lpn-theme-btn[aria-expanded="true"] { border-color: var(--ec-accent-open); background: var(--ec-accent-open-bg); }
+.lpn-theme-btn:focus-visible { outline: 2px solid var(--ec-accent); outline-offset: 2px; }
+.lpn-theme-btn .ec-theme-card { width: 60px; height: 36px; flex: none; }
+.lpn-theme-btn .ec-tc-tool, .lpn-theme-btn .ec-tc-tabs, .lpn-theme-btn .ec-tc-panel, .lpn-theme-btn .ec-tc-note { display: none; }
+.lpn-theme-btn .ec-tc-menu { height: 10px; padding: 1px 3px 0; }
+.lpn-theme-btn .ec-tc-menu i { width: 12px; height: 6px; }
+.lpn-theme-btn .ec-tc-map { left: 3px; right: 3px; top: 13px; bottom: 3px; }
+.lpn-theme-btn-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* The gallery: fixed over the page, above the boxes (1200-1799) and the menu pop-up (1850), under the modal. */
+.lpn-theme-gallery {
+	position: fixed; z-index: 1855; box-sizing: border-box;
+	display: grid; grid-template-columns: repeat(auto-fill, 146px); gap: 6px;
+	width: min(626px, calc(100vw - 8px)); max-height: calc(100vh - 8px); overflow: auto;
+	padding: 8px; justify-content: center;
+	background: var(--ec-bg); color: var(--ec-ink);
+	border: 1px solid var(--ec-border-strong); border-radius: 6px;
+	box-shadow: 0 4px 14px var(--ec-a-0-0-0-25);
+}
+.lpn-theme-choice {
+	display: flex; flex-direction: column; align-items: center; gap: 4px;
+	padding: 6px 6px 4px; margin: 0; font: inherit; font-size: .9em; color: inherit; cursor: pointer;
+	background: none; border: 2px solid transparent; border-radius: 6px;
+	animation: lpn-theme-in .2s ease-out both; animation-delay: calc(var(--lpn-theme-i, 0) * 35ms);
+}
+.lpn-theme-choice:hover, .lpn-theme-choice.lpn-theme-previewing { background: var(--ec-accent-hover-bg); border-color: var(--ec-accent-hover); }
+.lpn-theme-choice[aria-pressed="true"] { border-color: var(--ec-accent); }
+.lpn-theme-choice[aria-pressed="true"] .lpn-theme-choice-name { font-weight: bold; }
+.lpn-theme-choice:focus-visible { outline: 2px solid var(--ec-accent); outline-offset: 1px; }
+.lpn-theme-choice-name { max-width: 132px; line-height: 1.25; text-align: center; overflow-wrap: anywhere; }
+@keyframes lpn-theme-in { from { opacity: 0; transform: translateY(4px) scale(.97); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .lpn-theme-choice { animation: none; } }

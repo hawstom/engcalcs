@@ -159,7 +159,12 @@ function evaluate(set) {
 	};
 }
 
-module.exports = { THEMES, pairs, contrast, colour };
+// The browser harness asks for one theme's tokens by name, evaluated here, to prove this file and Chromium agree.
+function themeTokens(theme, css) {
+	const rules = readBlock(css || fs.readFileSync(path.join(__dirname, '..', '..', 'css', 'engcalcs.css'), 'utf8'));
+	return evaluate(tokensFor(rules, theme));
+}
+module.exports = { THEMES, pairs, contrast, colour, themeTokens };
 
 if (require.main === module) {
 	const css = fs.readFileSync(path.join(__dirname, '..', '..', 'css', 'engcalcs.css'), 'utf8');

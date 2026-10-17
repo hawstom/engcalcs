@@ -3174,10 +3174,18 @@ $ec_lang['lpn_settings_override_marks_tip']='Show the amber ring on an asset wit
 $ec_lang['lpn_clean_map']='Clean map';
 $ec_lang['lpn_clean_map_tip']='Checked: the zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_settings_theme']='Theme';
-$ec_lang['lpn_settings_theme_tip']='Choose light or dark colors for the page. System follows the setting of your device. The map drawing looks the same in every theme. This is a setting for this browser, not for the project.';
+$ec_lang['lpn_settings_theme_tip']='Choose the colors of the page. Point at a theme to see it on the page, and click it to keep it. System follows the settings of your device. The map drawing looks the same in every theme. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_theme_system']='System';
 $ec_lang['lpn_theme_light']='Light';
 $ec_lang['lpn_theme_dark']='Dark';
+// More themes (Task 811, dev/themes-plan.md). A name, shown under a small picture of the page in that
+// theme. High contrast is black on white, or white on black when the device is set to dark. Amber and
+// Green are the one-color screens of early computer terminals. Platinum is the gray desktop of the late
+// 1990s.
+$ec_lang['lpn_theme_hc']='High contrast';
+$ec_lang['lpn_theme_amber']='Amber';
+$ec_lang['lpn_theme_green']='Green';
+$ec_lang['lpn_theme_platinum']='Platinum';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a
