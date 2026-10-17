@@ -21,7 +21,7 @@
  * Runtime lines go to payload['key_notes'][key] as the full instructions from the table in
  * dev/language-strings.md, and its Note lines as notes.
  *
- * Per-key delivery, Appendix D step 1 of dev/translation-clarification-review.md: keys whose
+ * Per-key delivery: keys whose
  * English was reworded since the last sync (detect_english_drift.php CHANGED) are in
  * keys_to_translate with reason english_changed; a label and its _tip travel together in
  * key_context; and payload['glossary'] holds only the terms this batch's strings use, once.
@@ -48,7 +48,7 @@ const SUGGESTION_BOX_HEADING = '## The suggestion box';
 // the same way and for the same reason as the suggestion box.
 const CONCEPT_SOURCE_HEADING = '## Concepts are the source';
 const EN_FILE = DEFAULT_LANG_DIR . '/lang.ec.en.php';
-// Appendix D step 1 of dev/translation-clarification-review.md. The Layout, Symbol and Runtime lines
+// The Layout, Symbol and Runtime lines
 // of dev/plain-sentences.md are shorthand for a full instruction written once, in the table of
 // dev/language-strings.md. The payload carries the full instruction, read from that
 // table, so the translator never has to know the shorthand and the two cannot drift apart.
