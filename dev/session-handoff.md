@@ -137,9 +137,9 @@ beyond retire-mark-extrema's two (`lpn_labels_mark_extrema`, `_tip`).
 
 ### Proposed to him 2026-10-15/16, awaiting his word
 
-- Independent review of how a clarification reaches a translator (halo read as "hello"; "translating
-  too often?"): `dev/translation-clarification-review.md`. Its halo glossary wording, its sprint cadence
-  (once before each production pull) await him. Its tooling fix landed 10-16: the packet now sends
+- How a clarification reaches a translator (halo read as "hello"; "translating too often?"): the
+  review file is deleted; open items are Task 809. The sprint cadence (once before each production
+  pull) awaits him. Its tooling fix landed 10-16: the packet now sends
   the syn notes, reworded keys (no resync list), tip pairs, and only the glossary terms a batch uses.
   He forbids translating without his approval.
 
