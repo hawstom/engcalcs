@@ -3178,7 +3178,7 @@ $ec_lang['lpn_settings_theme_tip']='Choose the colors of the page. Point at a th
 $ec_lang['lpn_theme_system']='System';
 $ec_lang['lpn_theme_light']='Light';
 $ec_lang['lpn_theme_dark']='Dark';
-// More themes (Task 811, dev/themes-plan.md). A name, shown under a small picture of the page in that
+// More themes (dev/themes-plan.md). A name, shown under a small picture of the page in that
 // theme. High contrast is black on white, or white on black when the device is set to dark. Amber and
 // Green are the one-color screens of early computer terminals. Platinum is the gray desktop of the late
 // 1990s.

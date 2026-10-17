@@ -59647,7 +59647,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * abbreviation you will read tomorrow is written while you are still looking at the long form
 	 * that produced it.
 	 */
-	// ---- THE THEME GALLERY (Task 811; dev/themes-plan.md) ----
+	// ---- THE THEME GALLERY (dev/themes-plan.md) ----
 	// Settings > Map and page > Page > Theme is a button showing the chosen theme as a small picture of the
 	// page and its name. It opens a gallery of the same pictures, one per theme. Each picture is real
 	// markup painted by its own theme's tokens (`.ec-theme-card[data-theme]` shares the token rules with
@@ -60711,7 +60711,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		row(pageBody, pc.lpn_settings_override_marks || 'Show override markers on the map', ovrMarksInput,
 			pc.lpn_settings_override_marks_tip);
 
-		// The theme (Task 714; the gallery, Task 811; dev/themes-plan.md). The same section and the same
+		// The theme (Task 714; the gallery, dev/themes-plan.md). The same section and the same
 		// reason as the rows above: it is a fact about the screen and the eyes at it, so it lives in this
 		// browser (`lpn_theme`, written by window.ecTheme in the page head) and never in serializeProject().
 		// The control is a button showing the chosen theme as a small picture; it opens the gallery, where

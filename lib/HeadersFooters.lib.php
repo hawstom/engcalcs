@@ -69,7 +69,7 @@ if (isset($html_desc) && trim((string)$html_desc) !== '') :
 	<?=$html_head?>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 <?php
-// THE THEME, SET BEFORE FIRST PAINT (Task 714; the gallery, Task 811; dev/themes-plan.md). The visitor's
+// THE THEME, SET BEFORE FIRST PAINT (Task 714; the gallery, dev/themes-plan.md). The visitor's
 // choice is System (the default), Light, Dark, High contrast, Amber, Green or Platinum, kept in this browser
 // alone: localStorage `lpn_theme` holds `light`, `dark`, `hc`, `amber`, `green` or `platinum`, and is absent
 // for System. Anything else stored there is read as System, so a theme retired later strands nobody.
