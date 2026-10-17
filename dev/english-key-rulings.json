@@ -451,8 +451,8 @@
         },
         "lpn_clean_map": {
             "on": "Clean map",
-            "ruled": "2026-10-16",
-            "answer": "OK."
+            "ruled": "2026-10-15",
+            "answer": "Approved."
         },
         "lpn_clean_map_off": {
             "on": "Show map readouts",
@@ -462,7 +462,7 @@
         "lpn_clean_map_tip": {
             "on": "Checked: the zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.",
             "ruled": "2026-10-16",
-            "answer": "OK."
+            "answer": "Asked whether to lowercase \"The\" after \"Checked:\" like the other tips: \"Yes. Make your proposed correction. Thank you for checking.\""
         },
         "lpn_confirm_labels_restore": {
             "on": "Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.",
@@ -766,8 +766,8 @@
         },
         "lpn_copy_props_no_overrides": {
             "on": "No overrides to copy.",
-            "ruled": "2026-10-16",
-            "answer": "OK."
+            "ruled": "2026-10-13",
+            "answer": "Approved as written."
         },
         "lpn_copy_title": {
             "on": "Mark file as new copy?",
@@ -4219,18 +4219,18 @@
         },
         "lpn_ovm_child_tip": {
             "on": "Child scenarios override this value ({n} total). Click to clear their overrides.",
-            "ruled": "2026-10-16",
-            "answer": "OK."
+            "ruled": "2026-10-13",
+            "answer": "Approved as written."
         },
         "lpn_ovm_dot_clear": {
             "on": "Click to clear it.",
-            "ruled": "2026-10-16",
-            "answer": "OK."
+            "ruled": "2026-10-13",
+            "answer": "Approved as written."
         },
         "lpn_ovm_dot_set": {
             "on": "Inherited. Click to make it an override in this scenario, holding the value shown.",
-            "ruled": "2026-10-16",
-            "answer": "OK."
+            "ruled": "2026-10-13",
+            "answer": "Approved as written."
         },
         "lpn_pane_colmenu_tip": {
             "on": "Hide or manage columns",
@@ -5120,7 +5120,7 @@
         },
         "lpn_scenario_basic_misfit": {
             "on": "This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-13",
             "answer": "OK."
         },
         "lpn_scenario_basic_misfit_base": {
@@ -5135,17 +5135,17 @@
         },
         "lpn_scenario_copy": {
             "on": "Copy scenario",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-13",
             "answer": "OK."
         },
         "lpn_scenario_copy_off": {
             "on": "Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-13",
             "answer": "OK."
         },
         "lpn_scenario_copy_tip": {
             "on": "Copies the open scenario and its overrides, and opens the copy.",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-13",
             "answer": "OK."
         },
         "lpn_scenario_delete_ask": {
@@ -5165,8 +5165,8 @@
         },
         "lpn_scenario_delete_stays": {
             "on": "These alternatives it uses stay in the project: {list}.",
-            "ruled": "2026-10-16",
-            "answer": "OK."
+            "ruled": "2026-10-13",
+            "answer": "Approved as written."
         },
         "lpn_scenario_duration_tip": {
             "on": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
@@ -5506,13 +5506,13 @@
         },
         "lpn_settings_override_marks": {
             "on": "Show override markers on the map",
-            "ruled": "2026-10-16",
-            "answer": "OK."
+            "ruled": "2026-10-15",
+            "answer": "Approved."
         },
         "lpn_settings_override_marks_tip": {
             "on": "Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.",
             "ruled": "2026-10-16",
-            "answer": "OK."
+            "answer": "I approve all three."
         },
         "lpn_settings_pressure_exponent": {
             "on": "Pressure exponent",
@@ -5581,8 +5581,8 @@
         },
         "lpn_settings_row_bubbles": {
             "on": "Time series graphs on the map",
-            "ruled": "2026-10-16",
-            "answer": "OK."
+            "ruled": "2026-10-15",
+            "answer": "Approved."
         },
         "lpn_settings_row_check_freq": {
             "on": "Status check frequency",
@@ -5943,7 +5943,7 @@
         "lpn_sm_all_row_tip": {
             "on": "Double-click to open it in its category tree.",
             "ruled": "2026-10-16",
-            "answer": "OK."
+            "answer": "I approve all three."
         },
         "lpn_sm_base_kept": {
             "on": "The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.",
@@ -6027,8 +6027,8 @@
         },
         "lpn_sm_list_overrides_none": {
             "on": "This scenario has no overrides.",
-            "ruled": "2026-10-16",
-            "answer": "OK."
+            "ruled": "2026-10-15",
+            "answer": "Revised. But should be obvious when count = 0."
         },
         "lpn_sm_list_overrides_tip": {
             "on": "List the scenario's overrides by category, each with the inherited value it overrides, and clear any of them.",
@@ -6102,7 +6102,7 @@
         },
         "lpn_sm_rename_alts_ask": {
             "on": "Rename equally named alternatives?",
-            "ruled": "2026-10-16",
+            "ruled": "2026-10-13",
             "answer": "OK."
         },
         "lpn_sm_shared_note": {
@@ -6117,18 +6117,18 @@
         },
         "lpn_sm_tree_all": {
             "on": "All",
-            "ruled": "2026-10-16",
-            "answer": "OK."
+            "ruled": "2026-10-15",
+            "answer": "Approved."
         },
         "lpn_sm_tree_unused": {
             "on": "All unused",
-            "ruled": "2026-10-16",
-            "answer": "OK."
+            "ruled": "2026-10-15",
+            "answer": "Approved."
         },
         "lpn_sm_unused_none": {
             "on": "None",
             "ruled": "2026-10-16",
-            "answer": "OK."
+            "answer": "I approve all three."
         },
         "lpn_sm_used_by": {
             "on": "Used by scenarios: {n}",
@@ -6704,18 +6704,18 @@
         },
         "lpn_time_run_cut_off": {
             "on": "EPANET had closed {link} and then could not solve for {nodes}.",
-            "ruled": "2026-10-16",
-            "answer": "OK."
+            "ruled": "2026-10-15",
+            "answer": "R-402 status messages: Approved."
         },
         "lpn_time_run_cut_off_empty": {
             "on": "Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.",
-            "ruled": "2026-10-16",
-            "answer": "OK."
+            "ruled": "2026-10-15",
+            "answer": "R-402 status messages: Approved."
         },
         "lpn_time_run_cut_off_full": {
             "on": "Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.",
-            "ruled": "2026-10-16",
-            "answer": "OK."
+            "ruled": "2026-10-15",
+            "answer": "R-402 status messages: Approved."
         },
         "lpn_time_run_report_copied": {
             "on": "Copied",
