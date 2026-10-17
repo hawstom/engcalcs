@@ -151,13 +151,13 @@ async function main() {
 
 		console.log('\n6. Letters, digits, and zoom keys');
 		await bpress('KeyW');
-		ok('W enters Zoom Window', (await bmode()) === 'zoom-window', await bmode());
+		ok('the W key starts the Zoom Window tool', (await bmode()) === 'zoom-window', await bmode());
 		await bpress('Escape');
 		await bpress('KeyA');
-		ok('A selects an area', (await bmode()) === 'select-area', await bmode());
+		ok('the A key starts the area tool', (await bmode()) === 'select-area', await bmode());
 		await bpress('Escape');
 		await bpress('KeyF');
-		ok('F draws a Shape', (await bmode()) === 'add-shape', await bmode());
+		ok('the F key starts the Shape tool', (await bmode()) === 'add-shape', await bmode());
 		await bpress('Escape');
 		await b.menuClick(await U.lang(ctx2, 'lpn_find_menu'), 'edit');
 		await bsettle(700);
