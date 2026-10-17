@@ -1088,7 +1088,7 @@ $ec_lang['lpn_guide_set_reset_def']='<p>Obnovit výchozí hodnoty se nejprve zep
 // The Toolbar chapter (Task 785), terms in the Toolbar section above its rows. Held by
 // dev/lpn-spike/user-guide-toolbar-harness.js.
 $ec_lang['lpn_guide_tb_row_term']='Čtení řádku';
-$ec_lang['lpn_guide_tb_row_def']='<p>Každý řádek je jedno tlačítko panelu nástrojů, v pořadí pruhu, s oddělovačem mezi skupinami. Řádek ukazuje ikonu tlačítka, jeho název a tip, poté jeho klávesy. Dělá-li totéž řádek nabídky, řádek za slovy Také v ukazuje i cestu nabídkou. Kliknutí na řádek ukáže na tlačítko na panelu nástrojů. Tlačítko nikdy nespustí. Není-li tlačítko na obrazovce, řádek otevře řádek nabídky, který dělá totéž.</p>';
+$ec_lang['lpn_guide_tb_row_def']='<p>Každý řádek je jedno tlačítko panelu nástrojů, v pořadí pruhu, s oddělovačem mezi skupinami. Řádek ukazuje ikonu tlačítka, jeho název a tip, poté jeho klávesy. Dělá-li totéž řádek nabídky, řádek za slovy Také v nabídce ukazuje i cestu nabídkou. Kliknutí na řádek ukáže na tlačítko na panelu nástrojů. Tlačítko nikdy nespustí. Není-li tlačítko na obrazovce, řádek otevře řádek nabídky, který dělá totéž.</p>';
 $ec_lang['lpn_guide_tb_dim_term']='Zašedlé názvy';
 $ec_lang['lpn_guide_tb_dim_def']='<p>Zašedlý název patří tlačítku, které teď není na obrazovce. Tlačítko, které na obrazovce je, není zašedlé, ať už může v daném okamžiku jednat, nebo ne. Vypočítat je zašedlé, dokud je zaškrtnuto Přepočítávat automaticky, protože se tlačítko objeví jen tehdy, je-li toto nastavení odškrtnuto.</p><p>Na telefonu v nízkém režimu zůstává na panelu nástrojů jen pět ovládacích prvků výpočtu. Každý další název je zašedlý a kliknutí na něj otevře řádek nabídky, který dělá totéž. Tlačítko Spodní panel nemá řádek nabídky, takže jeho řádek může jen uvést, že ovládací prvek není na obrazovce.</p>';
 $ec_lang['lpn_guide_tb_two_term']='Tlačítka s trojúhelníkem v rohu';
@@ -2655,7 +2655,7 @@ $ec_lang['lpn_notes_3_def']='Každý projekt je karta a každá karta se během 
 // H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Křivka čerpadla';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_notes_5_def']='Čerpadlo se řídí vztahem H = H₀ − aQ^b, kde H je tlaková výška, kterou čerpadlo přidává, a Q je průtok, který jím prochází. Body křivky se zadávají ve Voda, Knihovny jako křivka Tlaková výška čerpadla a čerpadlo tuto křivku uvádí ve Vlastnostech. Tři body – tlaková výška při nulovém průtoku, normální pracovní bod a bod nejvyššího průtoku – proloží H₀, a a b přímo a nejvěrněji sledují publikovanou křivku. Dva body proloží parabolu (b = 2) s vrcholem při nulovém průtoku. Jeden bod používá pravidlo EPANET: tlaková výška při nulovém průtoku je 1,33334násobek zadané tlakové výšky a nejvyšší průtok je 2násobek zadaného průtoku, což opět dává b = 2. Čerpadlo bez zadané křivky nepřidává žádnou tlakovou výšku. Křivka není oříznuta v místě, kde tlaková výška dosáhne nuly, takže průtok vyšší, než jaký křivka dokáže dodat, dá zápornou tlakovou výšku. Řešením je větší čerpadlo nebo menší odběr, ne jiné proložení křivky. Křivka může obsahovat i více než tři body. Řešič EPANET dostane všechny a mezi nimi interpoluje, zatímco řádek Rovnice a vestavěný řešič používají nejnižší, prostřední a nejvyšší bod.';
+$ec_lang['lpn_notes_5_def']='Čerpadlo se řídí vztahem H = H₀ − aQ^b, kde H je tlaková výška, kterou čerpadlo přidává, a Q je průtok, který jím prochází. Body křivky se zadávají ve Voda, Knihovny jako křivka Tlaková výška čerpadla a čerpadlo tuto křivku uvádí ve Vlastnostech. Tři body – tlaková výška při nulovém průtoku, normální pracovní bod a bod nejvyššího průtoku – proloží H₀, a i b přímo a nejvěrněji sledují publikovanou křivku. Dva body proloží parabolu (b = 2) s vrcholem při nulovém průtoku. Jeden bod používá pravidlo EPANET: tlaková výška při nulovém průtoku je 1,33334násobek zadané tlakové výšky a nejvyšší průtok je 2násobek zadaného průtoku, což opět dává b = 2. Čerpadlo bez zadané křivky nepřidává žádnou tlakovou výšku. Křivka není oříznuta v místě, kde tlaková výška dosáhne nuly, takže průtok vyšší, než jaký křivka dokáže dodat, dá zápornou tlakovou výšku. Řešením je větší čerpadlo nebo menší odběr, ne jiné proložení křivky. Křivka může obsahovat i více než tři body. Řešič EPANET dostane všechny a mezi nimi interpoluje, zatímco řádek Rovnice a vestavěný řešič používají nejnižší, prostřední a nejvyšší bod.';
 // WAS "Planned additions", NAMING THREE THINGS THAT NOW SHIP (scenarios, result tables, .inp
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
@@ -4572,7 +4572,7 @@ $ec_lang['lpn_ff_skipped']='{n} vybraných prvků nejsou uzly, takže nebyly tes
 $ec_lang['lpn_ff_required']='Požadovaný požární průtok';
 $ec_lang['lpn_ff_required_tip']='Průtok požadovaný u hydrantu příslušným požárním předpisem nebo hasičským orgánem. Každý uzel se testuje proti této hodnotě, pokud pro něj není zadán požadovaný požární průtok.';
 $ec_lang['lpn_ff_required_own']='Uzly s individuálním požadovaným požárním průtokem se místo toho testují proti této hodnotě. Počet takových uzlů: {n}.';
-$ec_lang['lpn_ff_required_node_tip']='Požární průtok požadovaný v tomto uzlu pro využití území, které obsluhuje, podle příslušného požárního předpisu nebo hasičského orgánu. Ponecháte-li pole prázdné, uzel se otestuje proti hodnotě v okně Analýza požárního průtoku.';
+$ec_lang['lpn_ff_required_node_tip']='Požární průtok požadovaný v tomto uzlu pro využití území, které obsluhuje, podle příslušného požárního předpisu nebo hasičského orgánu. Ponecháte-li pole prázdné, uzel se otestuje proti hodnotě v okně Požární průtok: analýza.';
 $ec_lang['lpn_ff_residual']='Zbytkový tlak k udržení';
 $ec_lang['lpn_ff_residual_tip']='Tlak, který musí uzel stále držet při odběru požárního průtoku. AWWA M31 a NFPA 291 používají 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Návrhová kontrola (vliv na síť)';
@@ -4719,7 +4719,7 @@ $ec_lang['lpn_crit_scope_tip']='Všechna potrubí, čerpadla a ventily, nebo jen
 $ec_lang['lpn_crit_scope_all']='Všechny spoje';
 $ec_lang['lpn_crit_scope_selected']='Vybrané spoje';
 $ec_lang['lpn_crit_minpressure']='Nejnižší povolený tlak';
-$ec_lang['lpn_crit_minpressure_tip']='Je to stejné číslo jako Nejnižší povolený tlak jinde v Analýze požárního průtoku. Změna zde ho změní i tam.';
+$ec_lang['lpn_crit_minpressure_tip']='Je to stejné číslo jako Nejnižší povolený tlak jinde v okně Požární průtok: analýza. Změna zde ho změní i tam.';
 $ec_lang['lpn_crit_col_asset']='Prvek';
 $ec_lang['lpn_crit_col_unserved']='Nedodaný odběr';
 $ec_lang['lpn_crit_col_cutoff']='Odříznuté uzly';
@@ -4755,7 +4755,7 @@ $ec_lang['lpn_ds_scope']='Uzly ke škálování';
 $ec_lang['lpn_ds_scope_all']='Všechny uzly';
 $ec_lang['lpn_ds_scope_selected']='Vybrané uzly';
 $ec_lang['lpn_ds_minpressure']='Nejnižší povolený tlak';
-$ec_lang['lpn_ds_minpressure_tip']='Je to totéž číslo jako Nejnižší povolený tlak jinde v Analýze požárního průtoku. Změna zde změní i tam.';
+$ec_lang['lpn_ds_minpressure_tip']='Je to totéž číslo jako Nejnižší povolený tlak jinde v okně Požární průtok: analýza. Změna zde změní i tam.';
 $ec_lang['lpn_ds_head_scale']='Škálovat odběry';
 $ec_lang['lpn_ds_multiplier']='Měřítko odběru';
 $ec_lang['lpn_ds_multiplier_tip']='Činitel, kterým se každý odběr násobí; 1,5 je zvýšení o 50 %. Uplatňuje se navíc k násobiteli odběru aktivního scénáře, který je již v odběrech zahrnut, a v projektu se nikdy neukládá.';
@@ -5045,4 +5045,4 @@ $ec_lang['lpn_snip_tip_eraser']='Guma: kliknutím na tah jej odstraníte (E)';
 $ec_lang['lpn_snip_tip_undo']='Zpět (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Znovu (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Kopírovat (Ctrl+C)';
-$ec_lang['lpn_screenshot_scale_tip']='Velikost obrázku jako násobek oblasti na obrazovce. Větší obrázek je ostřejší a vytvoří větší soubor.';$ec_lang['lpn_guide_text_alt_box']='Zobrazuje pro každý scénář, kterou alternativu používá v každé kategorii, například Fyzikální, Odběr a Aktivace prvků, a jeho možnosti výpočtu: násobitel odběru, celkovou dobu běhu a hydraulický časový krok. Alternativy jsou jen ke čtení. Možnosti výpočtu scénáře lze zadat zde a prázdné pole použije hodnotu nadřazeného scénáře. Okno se otevře z nabídky Scénáře po zrušení výběru Základního režimu.';$ec_lang['lpn_guide_how_alt']='Náhled alternativ je uveden v části Voda, Scénáře, je-li Základní režim vypnutý.';$ec_lang['lpn_alt_calc_options']='Možnosti výpočtu';$ec_lang['lpn_scenario_duration_tip']='Ponechte prázdné, aby se převzala hodnota nadřazeného scénáře. Celková doba běhu 0:00 je ustálený výpočet.';$ec_lang['lpn_scenario_hyd_step_tip']='Ponechte prázdné, aby se převzala hodnota nadřazeného scénáře.';
+$ec_lang['lpn_screenshot_scale_tip']='Velikost obrázku jako násobek oblasti na obrazovce. Větší obrázek je ostřejší a vytvoří větší soubor.';
