@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**172 still to read on master**, of 482 untranslated keys, of 3100 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**170 still to read on master**, of 480 untranslated keys, of 3098 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -79,7 +79,7 @@ is the one you meant. "The first one" is a complete answer.
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (482, 172 to read @@ NEEDS RULING)
+## lpn_  (480, 170 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -1050,14 +1050,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_scnbook_value`**
   > {alternative}, {asset} {id}: {property}
   @@ NEEDS RULING
-- **`lpn_scnbook_why_asset_kind`**
-  > There is no kind of asset called {asset}, so this row was not used.
-  @@ NEEDS RULING
 - **`lpn_scnbook_why_asset_twice`**
   > A second row for {asset} {id} in this alternative. Only the first was read.
-  @@ NEEDS RULING
-- **`lpn_scnbook_why_base_name`**
-  > The name of Base is not changed by a workbook.
   @@ NEEDS RULING
 - **`lpn_scnbook_why_base_settings`**
   > The settings of Base are the project's own; change them in the Settings box. This row was not used.
@@ -1532,7 +1526,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**0 still to read**, of 3 new keys across 12 unmerged branch(es).
+**4 still to read**, of 7 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -1573,6 +1567,19 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/sheet-sync (`8a0862fac`) — adds no English strings
+### feat/sheet-sync (`7e5cafa3e`) — adds no English strings
 
-### feat/theme (`d420437f2`) — adds no English strings
+### feat/theme (`a40cca01a`) — 4 new, 4 to read @@ NEEDS RULING
+
+- **`lpn_theme_amber`**
+  > Amber
+  @@ NEEDS RULING
+- **`lpn_theme_green`**
+  > Green
+  @@ NEEDS RULING
+- **`lpn_theme_hc`**
+  > High contrast
+  @@ NEEDS RULING
+- **`lpn_theme_platinum`**
+  > Platinum
+  @@ NEEDS RULING

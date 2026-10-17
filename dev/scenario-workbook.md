@@ -69,6 +69,9 @@ made in other units is never misread.
 - **References are names**, as a person writes them, resolved by ID first, then by the name the
   workbook gives, then by the name the project has, so renaming Peak in its own row does not strand
   the rows that still say Peak. Names are unique within a tree, as the Scenario manager keeps them.
+- **A workbook made on a page in another language reads back.** Its keys decide; a category word or
+  an asset kind word this page does not know leaves the ID or the setting's path to decide, and the
+  name its Scenarios sheet gives Base is read as Base wherever the workbook names it.
 - **New rows make new things**: a scenario row or an alternative row with no ID (or an ID this
   project does not have) is a new scenario or alternative; a value row for it fills it.
 - **A scenario's own alternative from a file before 2026-10-12** (its values in its own map) is

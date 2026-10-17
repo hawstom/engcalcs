@@ -51238,8 +51238,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					if (s) {
 						seen[id] = true;
 						e = entryIn(scnTable, s.id);
+						// **BASE'S NAME IS THE PAGE'S OWN WORD**, in whatever language the workbook was made: not
+						// read as a rename, but taken as one more name of Base (and of each category's Base
+						// item, which is the same word), so the rows that name Base in that language resolve.
 						if (s.isBase) {
-							if (name !== '' && name !== scenarioDisplayName(s) && name !== 'Base') { bad(sh.name, row, scnBookSay('lpn_scnbook_why_base_name', 'The name of Base is not changed by a workbook.')); }
+							if (name !== '') {
+								if (e.names.indexOf(name) < 0) { e.names.push(name); }
+								LPN_ALT_CATEGORIES.forEach(function (c) { if (altTables[c][0].names.indexOf(name) < 0) { altTables[c][0].names.push(name); } });
+							}
 						} else if (name === '') {
 							bad(sh.name, row, scnBookSay('lpn_scnbook_why_no_name', 'This row has no name, so its name was not changed.'));
 						} else if (name !== scenarioDisplayName(s)) {
@@ -51268,7 +51274,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					if (tree) {
 						if (seen[id]) { bad(sh.name, row, scnBookSay('lpn_scnbook_why_id_twice', 'A second row with the ID {id}. Only the first was read.', { id: id })); return; }
 						seen[id] = true;
-						if (catText.trim() !== '' && cat !== tree) {
+						// A category word in another language says nothing this page can check; the ID decides.
+						if (cat && cat !== tree) {
 							bad(sh.name, row, scnBookSay('lpn_scnbook_why_category', 'The alternative {id} is in the category {category}, so this row was not used.', { id: id, category: altCategoryLabel(tree) }));
 							return;
 						}
@@ -51475,8 +51482,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					if (e && e.dead) { return; }
 					if (cat === 'calculation') { return; }
 					holderVals = e && e.isNew ? {} : (ownCache[cat + '\u0000' + hk] = ownCache[cat + '\u0000' + hk] || scnBookOwnValues(cat, hk));
+					// A kind word this page does not know (another language's) leaves the ID to decide alone.
 					group = scnBookGroupOfAsset(assetText);
-					if (group === undefined) { bad(sh.name, row, scnBookSay('lpn_scnbook_why_asset_kind', 'There is no kind of asset called {asset}, so this row was not used.', { asset: assetText.trim() })); return; }
 					cand = group ? [group] : (cat === 'text' ? ['label'] : ['node', 'link']);
 					if (id === '') { bad(sh.name, row, scnBookSay('lpn_scnbook_why_no_id', 'This row has no asset ID, so it was not used.')); return; }
 					hits = cand.filter(function (g) { return !!smMergeElement(ovKeyFor(g, id)); });
@@ -51534,6 +51541,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					var row = ri + 3, catText = cell(r, m, 'category'), cat = scnBookCatOf(catText), altText = cell(r, m, 'alternative'), hk, e, path, t = cell(r, m, 'value'),
 						leaves, leaf, pt, sec, like, p, what, cur, kind;
 					if (blankRow(r)) { return; }
+					// A category word in another language: the setting's own category says it.
+					if (cat === undefined && scnBookPathParse(cell(r, m, 'path'))) { cat = categoryOfSetting(scnBookPathParse(cell(r, m, 'path'))) || undefined; }
 					if (!cat) {
 						bad(sh.name, row, catText.trim() === '' ? scnBookSay('lpn_scnbook_why_no_category', 'A new alternative needs a category, so this row was not used.')
 							: scnBookSay('lpn_scnbook_why_unknown_category', 'There is no category {category}, so this row was not used.', { category: catText.trim() }));

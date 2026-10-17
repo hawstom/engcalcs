@@ -17,7 +17,9 @@
 //   W5  the tree from a workbook: a new scenario, a rename, a new alternative and a pick, applied;
 //   W6  a file from before 2026-10-12 (a scenario's own values in its own map): round trip clean,
 //       and an edit stores that alternative as the program does;
-//   W7  a choice (a pipe's status) is read by its stored word; a word that is no choice is refused.
+//   W7  a choice (a pipe's status) is read by its stored word; a word that is no choice is refused;
+//   W8  a workbook made on a page in another language (its headings, sheet names, category and asset
+//       words, Base's name) reads back as no change.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -152,6 +154,7 @@ function resaved(book) {
 	return new Uint8Array(Buffer.concat(parts.concat([cd, end])));
 }
 const clone = (b) => JSON.parse(JSON.stringify(b));
+const SCN_ELEMENT_KINDS = ['physical', 'demand', 'topology', 'initial', 'constituent', 'fireflow', 'energy', 'userdata', 'text'];
 const what = (p) => p.changes.map((c) => c.what + ' = ' + c.to).join(' | ');
 
 // Net1, a child scenario Peak and its child Fire, with overrides in four categories and a
@@ -348,6 +351,29 @@ function build(L) {
 	setCell(book7, 'initial', 'Fire', '10', 'status', 'Shut');
 	plan = L.bookPlan(book7);
 	ok('W7.2 a word that is no choice is refused, and said', plan.changes.length === 0 && plan.unusable.length === 1 && plan.unusable[0].why.endsWith(PC.lpn_scnbook_why_choice), JSON.stringify(plan.unusable) + what(plan));
+
+	console.log('--- W8. a workbook made on a page in another language ---');
+	// Its headings, category words, asset words and Base's name are that page's; the keys are not.
+	const book8 = clone(book0);
+	book8.forEach((sh) => { sh.name = 'Hoja ' + sh.name; sh.rows[0] = sh.rows[0].map((h) => 'X ' + h); });
+	sheetOf(book8, 'scenarios').rows[2][1] = 'Escenario base';
+	sheetOf(book8, 'scenarios').rows.slice(2).forEach((r) => { if (r[2] === 'Base') { r[2] = 'Escenario base'; } });
+	sheetOf(book8, 'alternatives').rows.slice(2).forEach((r) => { if (r[3] === 'Base') { r[3] = 'Escenario base'; } });
+	sheetOf(book8, 'alternatives').rows.slice(2).forEach((r) => { r[0] = 'Categoría ' + r[0]; });
+	sheetOf(book8, 'settings').rows.slice(2).forEach((r) => { r[0] = 'Categoría ' + r[0]; });
+	SCN_ELEMENT_KINDS.forEach((k) => { const sh = sheetOf(book8, k); if (sh) { sh.rows.slice(2).forEach((r) => { r[1] = r[1] === 'Pipe' ? 'Tubería' : r[1] === 'Junction' ? 'Nudo' : r[1]; }); } });
+	plan = L.bookPlan(book8);
+	ok('W8.1 read back on this page: no change, nothing unused, nothing kept', plan.ok && plan.changes.length === 0 && plan.unusable.length === 0 && plan.kept.length === 0,
+		JSON.stringify([plan.changes, plan.unusable, plan.kept]));
+	setCell(book8, 'physical', 'Peak', '12', 'diameter', '14');
+	plan = L.bookPlan(book8);
+	ok('W8.2 ...and an edit in it is the one change', plan.changes.length === 1 && plan.ops.vals[0].v === 14 && plan.unusable.length === 0, what(plan));
+	const s8 = sheetOf(book8, 'scenarios'), k8 = s8.rows[1].map((k, i) => (i === 0 ? 'id' : String(k))), r8 = k8.map(() => '');
+	r8[1] = 'Noche'; r8[2] = 'Escenario base'; r8[k8.indexOf('demand')] = 'Escenario base';
+	s8.rows.push(r8);
+	plan = L.bookPlan(book8);
+	ok('W8.3 a new scenario under Base, choosing Base, in that language\'s word for Base', plan.unusable.length === 0 && plan.ops.newScn.length === 1 && plan.ops.newScn[0].parent === 'base' &&
+		plan.ops.picks.length === 1 && plan.ops.picks[0].key === 'base', JSON.stringify(plan.unusable) + what(plan));
 
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nALL PASS');
 	process.exit(fails ? 1 : 0);
