@@ -29,7 +29,7 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - Tables export to ODS, XLSX, and CSV; Shapes import from shapefile, GeoJSON, and DXF; surveyed points import as junctions; clipboard copy/paste. <!-- 592, 776 -->
 - Workspace file: save your box layout, panes, and display options, and import them on another screen or browser. <!-- 313 -->
 - Many example projects, each loaded and solved in one click. <!-- 314, 257, 454 -->
-- Libraries of patterns, curves, controls, rules, pipe types, and fittings, copyable from another project file. <!-- 611, 792, 465, 590 -->
+- Libraries of patterns, curves, controls, rules, pipe types, and fittings, importable from another project file. <!-- 611, 792, 465, 590 -->
 - Screenshot tool with enhanced resolution and a markup pen. <!-- 793 -->
 - World map canvas or your own backdrop. <!-- 145, 276 -->
 - XY to Lat/Lon conversion import wizard. <!-- 476 -->

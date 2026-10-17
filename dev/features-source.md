@@ -78,7 +78,7 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 - 592, 776| Tables export to ODS, XLSX, and CSV; Shapes import from shapefile, GeoJSON, and DXF; surveyed points import as junctions; clipboard copy/paste.
 - 313| Workspace file: save your box layout, panes, and display options, and import them on another screen or browser.
 - 314, 257, 454| Many example projects, each loaded and solved in one click.
-- 611, 792, 465, 590| Libraries of patterns, curves, controls, rules, pipe types, and fittings, copyable from another project file.
+- 611, 792, 465, 590| Libraries of patterns, curves, controls, rules, pipe types, and fittings, importable from another project file.
 - 793| Screenshot tool with enhanced resolution and a markup pen.
 - 145, 276| World map canvas or your own backdrop.
 - 476| XY to Lat/Lon conversion import wizard.
