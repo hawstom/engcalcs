@@ -3423,9 +3423,10 @@ var EngCalcs = EngCalcs || {};
 	// typed. They seed the document's multiplier the way createScenario() does: a test is read at
 	// whatever demand the system has that day.
 	//
-	// **FIRE PLUS MAX DAY IS THE MAX DAY MULTIPLIER AND NOTHING ELSE**: Fire flow analysis already
-	// draws each junction's fire flow on top of the demand of the scenario it is run in, so this is
-	// the scenario to run it in, which its tip says.
+	// **NO FIRE PLUS MAX DAY** (Tom, 2026-10-16: *"the 'right' thing to do is check every fire
+	// hydrant since we offer that premium feature"*): a demand multiplier for fire flow invites the
+	// worst-hydrant guess, and Fire flow analysis tests every junction on top of the demand of the
+	// scenario it is run in. A file that already holds the old `fire_max_day` scenario keeps it.
 	//
 	// **ONLY A NEW PROJECT.** newProject() and the first visit call this; an opened file, an imported
 	// .inp and Delete network keep defaultScenarios(), so no file ever written changes shape. A new
@@ -3437,8 +3438,7 @@ var EngCalcs = EngCalcs || {};
 		{ id: 'flow_max', key: 'lpn_scenario_preset_flow_max', en: '3. Flow test: Max' },
 		{ id: 'average_day', key: 'lpn_scenario_preset_average_day', en: '4. Average Day', dm: 1 },
 		{ id: 'max_day', key: 'lpn_scenario_preset_max_day', en: '5. Max Day', dm: 2, range: [1.2, 3.0] },
-		{ id: 'peak_hour', key: 'lpn_scenario_preset_peak_hour', en: '6. Peak hour', dm: 3, range: [3.0, 6.0] },
-		{ id: 'fire_max_day', key: 'lpn_scenario_preset_fire_max_day', en: '7. Fire plus max day', dm: 2 }
+		{ id: 'peak_hour', key: 'lpn_scenario_preset_peak_hour', en: '6. Peak hour', dm: 3, range: [3.0, 6.0] }
 	];
 	function presetScenarios() {
 		var pc = EngCalcs.pageConfig || {}, docDm = (settings.hydraulics || {}).demandMultiplier;
@@ -6244,14 +6244,29 @@ var EngCalcs = EngCalcs || {};
 		storedUsers(kind, key).children.forEach(function (cid) { who.push({ name: smName(tree, cid), scn: false }); });
 		return who;
 	}
-	// "Alternative {name} cannot be deleted while it is used by" and one line per user, each led by
-	// Scenario or Alternative (Tom, 2026-10-13). The key holds a literal \n, as the guide keys do.
+	// "Alternative {name} cannot be deleted while it is used by" and one line per scenario using it,
+	// each led by Scenario (Tom, 2026-10-13). The key holds a literal \n, as the guide keys do.
+	// **CHILDREN ARE SAID AS CHILDREN** (Tom, 2026-10-16: *"I think we need a message to say 'cannot
+	// be deleted while it has children'. The only message I am seeing is 'cannot be deleted while it
+	// is used'."*): an item others inherit from says so in the Scenarios menu's own sentence for a
+	// scenario, and in its parallel for an alternative; one both used and inherited from says both.
 	function smInUseText(tree, key, name) {
-		var pc = EngCalcs.pageConfig || {};
+		var pc = EngCalcs.pageConfig || {}, isScn = smKind(tree) === 'scn', items = smInUseItems(tree, key), users, kids, parts = [];
 		var label = function (scn, n) { return (scn ? (pc.lpn_sm_item_scenario || 'Scenario {name}') : (pc.lpn_sm_item_alternative || 'Alternative {name}')).replace('{name}', n); };
-		return (pc.lpn_sm_in_use || '{item}\\ncannot be deleted while it is used by\\n{list}').replace(/\\n/g, '\n')
-			.replace('{item}', label(smKind(tree) === 'scn', name))
-			.replace('{list}', smInUseItems(tree, key).map(function (x) { return label(x.scn, x.name); }).join('\n'));
+		// In the Scenarios tree everything in the way is a child scenario.
+		users = isScn ? [] : items.filter(function (x) { return x.scn; });
+		kids = isScn ? items : items.filter(function (x) { return !x.scn; });
+		if (users.length) {
+			parts.push((pc.lpn_sm_in_use || '{item}\\ncannot be deleted while it is used by\\n{list}').replace(/\\n/g, '\n')
+				.split('{item}').join(label(false, name))
+				.split('{list}').join(users.map(function (x) { return label(true, x.name); }).join('\n')));
+		}
+		if (kids.length) {
+			parts.push((isScn ? (pc.lpn_scenario_delete_has_children || 'The scenario {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.')
+				: (pc.lpn_sm_alt_delete_has_children || 'The alternative {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.'))
+				.split('{name}').join(name).split('{list}').join(kids.map(function (x) { return x.name; }).join(', ')));
+		}
+		return parts.join('\n\n');
 	}
 	// **REFUSED WHILE IN USE, NAMING WHO** (H04). Base items never go.
 	function smDelete(tree, key) {
@@ -6770,8 +6785,13 @@ var EngCalcs = EngCalcs || {};
 	 * scenario's own alternative from an older file is stored first (smMaterialize()), and with it
 	 * any ancestor's, so an implicit target is looked up again through the scenario that owned it.
 	 * No snapshot: the caller's smTry() makes it one undo step.
+	 *
+	 * **COPY UPWARD IS THE SAME ACT WITH `keep`** (Tom, 2026-10-16: *"a Copy upward might be a nice
+	 * option for the user. They can copy upward and then delete as they desire."*): the target takes
+	 * the values exactly as a merge gives them, and the source keeps its own, so nothing it reads
+	 * changes. A skipped level is still named and still not changed.
 	 */
-	function smMergeUpward(tree, key, targetKey) {
+	function smMergeUpward(tree, key, targetKey, keep) {
 		var kind = smKind(tree), owner, src, tgt, plan, values = {}, settingsTree = {}, merged, b;
 		if (kind === 'scn') { return treeRefuse('scenarios'); }
 		if (!smMergeTargets(tree, key).some(function (u) { return u.key === targetKey; })) { return treeRefuse('target'); }
@@ -6815,6 +6835,11 @@ var EngCalcs = EngCalcs || {};
 			merged = combineHolders([{ values: values, settings: settingsTree }, tgt]);
 			if (kind === 'alt') { if (Object.keys(merged.values).length) { tgt.values = merged.values; } else { delete tgt.values; } }
 			if (Object.keys(merged.settings).length) { tgt.settings = merged.settings; } else { delete tgt.settings; }
+		}
+		if (keep) {
+			if (plan.view !== undefined) { smMergeBaseView(plan.view); }
+			touchTree('smCopyUpward');
+			return { source: key, target: targetKey, merged: plan.n };
 		}
 		plan.items.forEach(function (it) {
 			var ov = plainObject(src.values) ? src.values[it.k] : null;
@@ -7674,9 +7699,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	function scenarioMenuRows() {
 		var pc = EngCalcs.pageConfig || {}, rows = [], scn = activeScenario();
-		// **THE ORDER IS TOM'S** (2026-10-11): *"Scenario manager..., -, Basic mode, New, Rename,
-		// Delete, -, Apply Base, list of scenarios."* Apply Base values and the rule before it are
-		// retired (Task 801; Tom, 2026-10-15: *"this command is too confusing and dangerous"*); Merge
+		// **THE ORDER IS TOM'S** (2026-10-16): *"Scenarios manager..., Overrides manager..., Advanced
+		// mode, line, New, ..., line, list of scenarios."* The mode row sits among the managers, never
+		// beside Base, so a pointer that goes for Base cannot land on Basic mode. (Apply Base values and
+		// the rule before it are retired (Task 801; Tom, 2026-10-15: *"this command is too confusing and dangerous"*); Merge
 		// upward in the Scenario manager takes its place. The Scenarios table and the Scenario manager
 		// are where scenarios are managed, so the list of scenarios comes last.
 		// **THE SCENARIO MANAGER ROW IS ALWAYS HERE, GREYED WHILE BASIC MODE IS ON** (Tom, 2026-10-13:
@@ -7687,12 +7713,20 @@ var EngCalcs = EngCalcs || {};
 			tip: scenarioBasicMode ? (pc.lpn_sm_basic_on || 'Scenario manager is disabled when Basic mode is on.') : undefined,
 			fn: function () { openScenarioManager(); }
 		});
-		rows.push({ separator: true });
+		// **LIST OVERRIDES HERE TOO, SO BASIC MODE REACHES IT** (Tom, 2026-10-15: "Yes."). The same
+		// action as the Scenario manager's button, on the active scenario; greyed on Base and at 0.
+		rows.push({
+			label: pc.lpn_sm_list_overrides || 'Override manager…',
+			disabled: scn.isBase || !overrideCount(scn),
+			tip: (scn.isBase || !overrideCount(scn)) ? (pc.lpn_sm_list_overrides_none || 'This scenario has no overrides.') : pc.lpn_sm_list_overrides_tip,
+			fn: function () { smActListOverrides(scn.id); }
+		});
 		rows.push({
 			label: (scenarioBasicMode ? '✓ ' : '  ') + (pc.lpn_scenario_basic || 'Basic mode'),
 			tip: pc.lpn_scenario_basic_tip,
 			fn: function () { setScenarioBasicMode(!scenarioBasicMode); }
 		});
+		rows.push({ separator: true });
 		rows.push({
 			icon: 'insert', label: pc.lpn_scenario_new || 'New scenario…',
 			fn: function () {
@@ -7742,7 +7776,7 @@ var EngCalcs = EngCalcs || {};
 				// **A SCENARIO OTHERS INHERIT FROM IS NOT DELETED** (stage 5): say which, before asking.
 				var kids = scenarios.filter(function (x) { return x.parent === scn.id; });
 				if (kids.length) {
-					tellNotice((pc.lpn_scenario_delete_has_children || 'The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or move them to another parent.')
+					tellNotice((pc.lpn_scenario_delete_has_children || 'The scenario {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.')
 						.replace('{name}', scenarioDisplayName(scn))
 						.replace('{list}', kids.map(scenarioDisplayName).join(', ')));
 					return;
@@ -7754,14 +7788,7 @@ var EngCalcs = EngCalcs || {};
 				});
 			}
 		});
-		// **LIST OVERRIDES HERE TOO, SO BASIC MODE REACHES IT** (Tom, 2026-10-15: "Yes."). The same
-		// action as the Scenario manager's button, on the active scenario; greyed on Base and at 0.
-		rows.push({
-			label: pc.lpn_sm_list_overrides || 'Manage overrides',
-			disabled: scn.isBase || !overrideCount(scn),
-			tip: (scn.isBase || !overrideCount(scn)) ? (pc.lpn_sm_list_overrides_none || 'This scenario has no overrides.') : pc.lpn_sm_list_overrides_tip,
-			fn: function () { smActListOverrides(scn.id); }
-		});
+		rows.push({ separator: true });
 		scenariosForDisplay().forEach(function (s) {
 			rows.push({
 				// scenarioId is what makes a row a scenario, so a reader of the rows (the harness)
@@ -42530,15 +42557,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// the .inp's FILE line in the system code page, so a name outside it (Café-Ñandú-水) can leave
 	// EPANET looking for a file that is not there. Accents come off (NFD, combining marks dropped),
 	// anything else becomes a dash, and a name with no letter or digit left is "backdrop". The .inp
-	// and the .zip keep the project's own name; only what the FILE line names has to survive ANSI.
+	// and the .zip keep the project's own name (and the scenario's, inpExportBaseName()); only what
+	// the FILE line names has to survive ANSI.
 	function asciiPictureBase(name) {
 		var s = String(name || '');
 		if (s.normalize) { s = s.normalize('NFD').replace(/[̀-ͯ]/g, ''); }
 		s = s.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/-{2,}/g, '-').replace(/^[-.]+|[-.]+$/g, '');
 		return /[A-Za-z0-9]/.test(s) ? s : 'backdrop';
 	}
+	// **AN EXPORT FROM A SCENARIO NAMES THE SCENARIO** (Tom, 2026-10-16: *"Scenario export to EPANET:
+	// Do we append the project name with the name of the scenario?"*): `<project>-<scenario>`, each
+	// part made safe on its own, so a long project name cannot cut the scenario off. Base, the
+	// drawing itself, keeps the project name alone. The .zip and the picture follow.
+	function inpExportBaseName() {
+		var base = safeFileName(projectDisplayName(project)), scn = activeScenario();
+		if (!scn || scn.isBase) { return base; }
+		return base + '-' + safeFileName(scenarioDisplayName(scn));
+	}
 	function exportInpFile() {
-		var pcX = EngCalcs.pageConfig || {}, base = safeFileName(projectDisplayName(project)),
+		var pcX = EngCalcs.pageConfig || {}, base = inpExportBaseName(),
 			picBase = asciiPictureBase(base);
 		saveToStorage();   // export what is on screen, including edits not yet saved
 		// Every name goes in by split/join, never String.replace(): a project named `a$&b {file}`
@@ -78485,7 +78522,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				fn: function () { smActCurrent(key); } });
 			// **A TIDY LIST OF ONE SCENARIO'S OWN OVERRIDES, TO AUDIT THE COUNT** (Task 800; Tom,
 			// 2026-10-15: *"I don't know how to see a tidy list of overrides to audit"*).
-			out.push({ id: 'overrides', label: pc.lpn_sm_list_overrides || 'Manage overrides', tip: pc.lpn_sm_list_overrides_tip,
+			out.push({ id: 'overrides', label: pc.lpn_sm_list_overrides || 'Override manager…', tip: pc.lpn_sm_list_overrides_tip,
 				off: !valid || !scenarioById(key) || !overrideCount(scenarioById(key)),
 				offTip: !valid ? noSel : (pc.lpn_sm_list_overrides_none || 'This scenario has no overrides.'),
 				fn: function () { smActListOverrides(key); } });
@@ -78508,6 +78545,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				tip: pc.lpn_sm_merge_up_tip,
 				offTip: !valid ? noSel : (pc.lpn_sm_merge_up_root || 'A Base alternative has nothing above it to merge into.'),
 				fn: function () { smActMergeUpward(key); } });
+			// **COPY UPWARD, BESIDE IT** (Tom, 2026-10-16): the same targets, the source keeping its own.
+			out.push({ id: 'copyup', label: pc.lpn_sm_copy_up || 'Copy upward', off: !valid || !smMergeTargets(tree, key).length,
+				tip: pc.lpn_sm_copy_up_tip,
+				offTip: !valid ? noSel : (pc.lpn_sm_copy_up_root || 'A Base alternative has nothing above it to copy into.'),
+				fn: function () { smActMergeUpward(key, true); } });
 		}
 		out.push({ separator: true });
 		out.push({ id: 'del', label: pc.lpn_tool_delete || 'Delete', face: '−', off: !valid || isBase,
@@ -79118,7 +79160,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			initTipsIn(body);
 			if (scroll) { body.scrollTop = scroll; }
 		}, [{ label: pc.lpn_dialog_ok || 'OK', isDefault: true, cancel: true, fn: function () { } }],
-		{ title: (pc.lpn_ovl_title || 'Manage overrides: {name}').replace('{name}', scenarioDisplayName(scn)) });
+		{ title: (pc.lpn_ovl_title || 'Override manager: {name}').replace('{name}', scenarioDisplayName(scn)) });
 	}
 	/**
 	 * **CLEAR THESE OWN OVERRIDES** (items of ownOverrideItems(scn)), each from the holder it is stored
@@ -79193,16 +79235,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		smAfter(true, false);
 	}
 	// **MERGE UPWARD** (Task 801): which ancestor, then what it does, skipped values named, then the
-	// act as one undo step. Nothing is written before the second answer.
-	function smActMergeUpward(key) {
-		var tree = smState.tree, pc = EngCalcs.pageConfig || {}, ups, name, first;
+	// act as one undo step. Nothing is written before the second answer. **COPY UPWARD** (`keep`) asks
+	// the same two questions in its own words, and the source keeps its overrides.
+	function smActMergeUpward(key, keep) {
+		var tree = smState.tree, pc = EngCalcs.pageConfig || {}, ups, name, first, none;
 		if (tree === 'scenarios' || key === null || key === undefined) { return; }
 		ups = smMergeTargets(tree, key);
 		if (!ups.length) { return; }
 		name = smName(tree, key);
+		none = keep ? (pc.lpn_sm_copy_none || 'The alternative {name} has no overrides to copy.')
+			: (pc.lpn_sm_merge_none || 'The alternative {name} has no overrides to merge.');
 		first = smMergePlan(tree, key, ups[0].key);
-		if (!first || !first.own) { tellNotice((pc.lpn_sm_merge_none || 'The alternative {name} has no overrides to merge.').replace('{name}', name)); return; }
-		askDialog({ kind: 'choice', text: (pc.lpn_sm_merge_pick || 'Merge the overrides of {name} into which alternative? Its parent is listed first.').replace('{name}', name),
+		if (!first || !first.own) { tellNotice(none.split('{name}').join(name)); return; }
+		askDialog({ kind: 'choice', text: (keep ? (pc.lpn_sm_copy_pick || 'Copy the overrides of {name} into which alternative? Its parent is listed first.')
+			: (pc.lpn_sm_merge_pick || 'Merge the overrides of {name} into which alternative? Its parent is listed first.')).split('{name}').join(name),
 			choices: ups.map(function (u, i) { return { label: u.name, value: u.key, isDefault: i === 0 }; })
 				.concat([{ label: pc.lpn_cancel || 'Cancel', value: null, cancel: true }]) }, function (tk) {
 			var plan, parts, tname;
@@ -79211,20 +79257,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!plan) { return; }
 			tname = smName(tree, tk);
 			if (!plan.n) {
-				tellNotice((pc.lpn_sm_merge_none || 'The alternative {name} has no overrides to merge.').replace('{name}', name));
+				tellNotice(none.split('{name}').join(name));
 				return;
 			}
-			parts = [(pc.lpn_sm_merge_ask || 'Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of overriding them. You can undo this.')
+			parts = [(keep ? (pc.lpn_sm_copy_ask || 'Copy the overrides ({n}) of {name} up into {target}? It keeps them as its own overrides. You can undo this.')
+				: (pc.lpn_sm_merge_ask || 'Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of overriding them. You can undo this.'))
 				.replace(/\{name\}/g, name).replace('{n}', String(plan.n)).replace('{target}', tname)];
 			plan.skipped.forEach(function (s) {
-				parts.push((pc.lpn_sm_merge_skipped || '{between} also overrides these values. It is skipped and not changed, so {name} will read them from {between}, not from {target}:')
+				parts.push((keep ? (pc.lpn_sm_copy_skipped || '{between} also overrides these values. It is skipped and not changed, so it keeps its own values for them:')
+					: (pc.lpn_sm_merge_skipped || '{between} also overrides these values. It is skipped and not changed, so {name} will read them from {between}, not from {target}:'))
 					.replace(/\{between\}/g, s.name).replace('{name}', name).replace('{target}', tname) + '\n' + s.lines.join('\n'));
 			});
 			parts = parts.concat(smMergeMorphText(plan.morphs));
 			askDialog({ kind: 'confirm', text: parts.join('\n\n') }, function (yes) {
 				var res;
 				if (!yes) { return; }
-				res = smTry(function () { return smMergeUpward(tree, key, tk); });
+				res = smTry(function () { return smMergeUpward(tree, key, tk, !!keep); });
 				if (!res || res.refused) { return; }
 				smState.sel = res.source;
 				smAfter(true, false);

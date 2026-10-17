@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**9 still to read on master**, of 253 untranslated keys, of 2873 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**17 still to read on master**, of 193 untranslated keys, of 2811 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -79,7 +79,7 @@ is the one you meant. "The first one" is a complete answer.
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (253, 9 to read @@ NEEDS RULING)
+## lpn_  (193, 17 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -134,210 +134,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-16._
 - **`lpn_field_type_tip`**
   > The type of this asset in this scenario, set by Morph. Clear the override to use the parent scenario's type.
-  _Ruled OK 2026-10-16._
-- **`lpn_file_import_gjnet`**
-  > Import GeoJSON network…
-  _Ruled OK 2026-10-16._
-- **`lpn_file_import_gjnet_tip`**
-  > Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_and_more`**
-  > and {n} more
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_beta`**
-  > Beta: feedback requested
-  @@ NEEDS RULING
-- **`lpn_gjnet_beta_tip`**
-  > This import has been tried on few files from GIS programs. To report a problem or suggest a change, press {button} on the page and describe the file.
-  @@ NEEDS RULING
-- **`lpn_gjnet_col_example`**
-  > Example
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_col_field`**
-  > Field
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_col_fills`**
-  > Fills
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_col_unit`**
-  > Unit
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_intro`**
-  > {points} points and {lines} lines were found. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. Choose the property each field fills and the unit of each number.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_lines_heading`**
-  > Line fields (pipes)
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_no_fields`**
-  > These features have no attribute fields.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_crs`**
-  > The file states the coordinate system {crs}, which is WGS 84 latitude and longitude, the system RFC 7946 requires. Positions were read as stated.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_crs_nad83`**
-  > The file states NAD83 (EPSG:4269). Its positions were read as WGS 84, which places them within about 1 to 2 m of where NAD83 puts them.
-  @@ NEEDS RULING
-- **`lpn_gjnet_note_default_demand`**
-  > These junctions state no base demand and have the default base demand, {value}.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_default_diameter`**
-  > These pipes state no diameter and have the default diameter, {value}.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_default_elev`**
-  > These nodes state no elevation and have the default elevation, {value}.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_default_elev_added`**
-  > These junctions were added at line ends and have the default elevation, {value}, because no node in the file states an elevation.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_default_k`**
-  > These pipes state no minor loss coefficient, so each has 0, as in an EPANET file that states none.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_default_roughness`**
-  > These pipes state no roughness and have the default roughness, {value}.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_default_tank`**
-  > These tanks have the default water depths and tank diameter.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_demand_kept`**
-  > A reservoir or tank has no demand, so the demand stated on these nodes was kept as the custom property {key}.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_demand_rows`**
-  > These junctions had more than one demand row. A GeoJSON file holds only the first, which was imported.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_elev_taken`**
-  > These nodes state no elevation. Each was given the elevation of the node shown in parentheses: for a junction added at a line end, the node at the other end of its pipe, otherwise the nearest node that states one.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_end_moved`**
-  > These pipes have an end within {tol} of a point or another line end, but not on it. The end was joined to it; the largest distance is {dist}.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_end_off_node`**
-  > The line of each of these links does not start or end at its node. The node position was used.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_end_on_pipe`**
-  > These line ends lie on the pipe shown in parentheses, but not at its end, and are not connected to it.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_field_custom`**
-  > These fields were imported as custom properties.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_field_skipped`**
-  > These fields were not imported, as chosen.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_id_dup`**
-  > These IDs are stated by more than one feature of the same kind. Each later feature was assigned the ID shown in parentheses.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_id_new`**
-  > These features state no valid ID and were assigned the ID shown in parentheses.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_junction_added`**
-  > These junctions were added where a line end is not within {tol} of a point. Each has the default base demand.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_length_auto`**
-  > These pipes state no length. Each length is computed from the line (Auto).
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_not_held`**
-  > A GeoJSON file does not hold controls, rules, time settings, text labels, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_parts`**
-  > These multipart lines have parts that are not connected and were imported as one pipe for each part.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_parts_points`**
-  > These multipoint features were imported as one node for each point.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_pattern_conflict`**
-  > These patterns are stated with different multipliers on different features. The first was used.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_pipe_type`**
-  > These pipes state the pipe type shown in parentheses, whose definition a GeoJSON file does not hold. The pipe type was not imported; the diameter and roughness stated in the file were.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_results`**
-  > The results in the file were not imported. Calculate computes them again.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_skip_geometry`**
-  > Not imported: the feature is not a point or a line.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_skip_id`**
-  > Not imported: the name is not a valid ID, or another element of the same kind has it.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_skip_kind`**
-  > Not imported: the feature states no node_type or link_type.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_skip_loop`**
-  > Not imported: both ends of the line join the same node.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_skip_no_node`**
-  > Not imported: the start or end node named is not in the file.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_skip_position`**
-  > Not imported: a position is not a valid latitude and longitude.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_skip_short`**
-  > Not imported: a line needs at least two positions.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_unmapped_demand`**
-  > No field was chosen for the base demand, so every junction has the default base demand, {value}.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_unmapped_diameter`**
-  > No field was chosen for the diameter, so every pipe has the default diameter, {value}.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_unmapped_elev`**
-  > No field was chosen for the elevation, so every node has the default elevation, {value}, and automatic lengths include no elevation difference.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_unmapped_id_line`**
-  > No field was chosen for the line ID, so every pipe was assigned an ID.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_unmapped_id_point`**
-  > No field was chosen for the point ID, so every node imported from a point was assigned an ID.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_unmapped_k`**
-  > No field was chosen for the minor loss coefficient, so every pipe has 0, as in an EPANET file that states none.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_unmapped_length`**
-  > No field was chosen for the length, so every pipe length is computed from the line (Auto).
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_unmapped_roughness`**
-  > No field was chosen for the roughness, so every pipe has the default roughness, {value}.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_value_unread`**
-  > These values are not numbers or are not recognized, and were not used.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_note_z`**
-  > These points state a third coordinate, which was not imported.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_other`**
-  > {n} features are neither points nor lines and will not be imported; the report lists them.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_points_heading`**
-  > Point fields (junctions, reservoirs, and tanks)
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_refuse_crs`**
-  > {file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_refuse_empty`**
-  > {file} contains no points or lines.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_report_lead`**
-  > Each change made during import, and each feature not imported, is listed below with the reason:
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_target_custom`**
-  > Custom property
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_target_node_type`**
-  > Node type
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_target_skip`**
-  > Do not import
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_title`**
-  > Import GeoJSON network: {file}
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_tolerance`**
-  > Join tolerance (m)
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_tolerance_tip`**
-  > A line end within this distance of a point, or of another line end, is joined to it. A line end farther than this from every point gets a new junction.
-  _Ruled OK 2026-10-16._
-- **`lpn_gjnet_working`**
-  > Importing {file}…
   _Ruled OK 2026-10-16._
 - **`lpn_inp_export_flat_customers_inactive`**
   > {n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.
@@ -397,8 +193,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Equal to the inherited value. It is still an override, and it is counted.
   _Ruled OK 2026-10-16._
 - **`lpn_ovl_title`**
-  > Manage overrides: {name}
-  _Ruled OK 2026-10-16._
+  > Override manager: {name}
+  @@ NEEDS RULING
 - **`lpn_ovm_child_ask`**
   > Clear child overrides ({n} total)?
   _Ruled OK 2026-10-16._
@@ -478,8 +274,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Its overrides ({n}) are deleted with it.
   _Ruled OK 2026-10-16._
 - **`lpn_scenario_delete_has_children`**
-  > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or move them to another parent.
-  _Ruled 2026-10-16: His own edit of 2026-10-16 ("move them another parent"); CC added "to"._
+  > The scenario {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.
+  @@ NEEDS RULING
 - **`lpn_scenario_delete_stays`**
   > These alternatives it uses stay in the project: {list}.
   _Ruled 2026-10-13: Approved as written._
@@ -684,6 +480,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_sm_all_row_tip`**
   > Double-click to open it in its category tree.
   _Ruled 2026-10-16: I approve all three._
+- **`lpn_sm_alt_delete_has_children`**
+  > The alternative {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.
+  @@ NEEDS RULING
 - **`lpn_sm_base_kept`**
   > The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.
   _Ruled OK 2026-10-16._
@@ -702,6 +501,27 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_sm_copy`**
   > Copy
   _Ruled OK 2026-10-16._
+- **`lpn_sm_copy_ask`**
+  > Copy the overrides ({n}) of {name} up into {target}? It keeps them as its own overrides. You can undo this.
+  @@ NEEDS RULING
+- **`lpn_sm_copy_none`**
+  > The alternative {name} has no overrides to copy.
+  @@ NEEDS RULING
+- **`lpn_sm_copy_pick`**
+  > Copy the overrides of {name} into which alternative? Its parent is listed first.
+  @@ NEEDS RULING
+- **`lpn_sm_copy_skipped`**
+  > {between} also overrides these values. It is skipped and not changed, so it keeps its own values for them:
+  @@ NEEDS RULING
+- **`lpn_sm_copy_up`**
+  > Copy upward
+  @@ NEEDS RULING
+- **`lpn_sm_copy_up_root`**
+  > A Base alternative has nothing above it to copy into.
+  @@ NEEDS RULING
+- **`lpn_sm_copy_up_tip`**
+  > Copy the overrides of the selected alternative into an alternative above it in the tree. The selected alternative keeps its overrides.
+  @@ NEEDS RULING
 - **`lpn_sm_current_already`**
   > This scenario is already the current scenario.
   _Ruled OK 2026-10-16._
@@ -730,8 +550,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Scenario {name}
   _Ruled OK 2026-10-16._
 - **`lpn_sm_list_overrides`**
-  > Manage overrides
-  _Ruled OK 2026-10-16._
+  > Override manager…
+  @@ NEEDS RULING
 - **`lpn_sm_list_overrides_none`**
   > This scenario has no overrides.
   _Ruled 2026-10-15: Revised. But should be obvious when count = 0._
@@ -845,7 +665,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**69 still to read**, of 72 new keys across 12 unmerged branch(es).
+**63 still to read**, of 131 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -856,22 +676,225 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### docs/features-fix (`c11f58f6c`) — adds no English strings
-
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/geojson-import (`218ba29f9`) — adds no English strings
+### feat/geojson-import (`43101d8d9`) — 68 new, 3 to read @@ NEEDS RULING
 
-### feat/guide-scenarios (`b8f4a13d8`) — 60 new, 60 to read @@ NEEDS RULING
+- **`lpn_file_import_gjnet`**
+  > Import GeoJSON network…
+  _Ruled OK 2026-10-16._
+- **`lpn_file_import_gjnet_tip`**
+  > Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_and_more`**
+  > and {n} more
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_beta`**
+  > Beta: feedback requested
+  @@ NEEDS RULING
+- **`lpn_gjnet_beta_tip`**
+  > This import has been tried on few files from GIS programs. To report a problem or suggest a change, press {button} on the page and describe the file.
+  @@ NEEDS RULING
+- **`lpn_gjnet_col_example`**
+  > Example
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_col_field`**
+  > Field
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_col_fills`**
+  > Fills
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_col_unit`**
+  > Unit
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_intro`**
+  > {points} points and {lines} lines were found. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. Choose the property each field fills and the unit of each number.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_lines_heading`**
+  > Line fields (pipes)
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_no_fields`**
+  > These features have no attribute fields.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_crs`**
+  > The file states the coordinate system {crs}, which is WGS 84 latitude and longitude, the system RFC 7946 requires. Positions were read as stated.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_crs_nad83`**
+  > The file states NAD83 (EPSG:4269). Its positions were read as WGS 84, which places them within about 1 to 2 m of where NAD83 puts them.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_default_demand`**
+  > These junctions state no base demand and have the default base demand, {value}.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_default_diameter`**
+  > These pipes state no diameter and have the default diameter, {value}.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_default_elev`**
+  > These nodes state no elevation and have the default elevation, {value}.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_default_elev_added`**
+  > These junctions were added at line ends and have the default elevation, {value}, because no node in the file states an elevation.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_default_k`**
+  > These pipes state no minor loss coefficient, so each has 0, as in an EPANET file that states none.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_default_roughness`**
+  > These pipes state no roughness and have the default roughness, {value}.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_default_tank`**
+  > These tanks have the default water depths and tank diameter.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_demand_kept`**
+  > A reservoir or tank has no demand, so the demand stated on these nodes was kept as the custom property {key}.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_demand_rows`**
+  > These junctions had more than one demand row. A GeoJSON file holds only the first, which was imported.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_elev_taken`**
+  > These nodes state no elevation. Each was given the elevation of the node shown in parentheses: for a junction added at a line end, the node at the other end of its pipe, otherwise the nearest node that states one.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_end_moved`**
+  > These pipes have an end within {tol} of a point or another line end, but not on it. The end was joined to it; the largest distance is {dist}.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_end_off_node`**
+  > The line of each of these links does not start or end at its node. The node position was used.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_end_on_pipe`**
+  > These line ends lie on the pipe shown in parentheses, but not at its end, and are not connected to it.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_field_custom`**
+  > These fields were imported as custom properties.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_field_skipped`**
+  > These fields were not imported, as chosen.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_id_dup`**
+  > These IDs are stated by more than one feature of the same kind. Each later feature was assigned the ID shown in parentheses.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_id_new`**
+  > These features state no valid ID and were assigned the ID shown in parentheses.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_junction_added`**
+  > These junctions were added where a line end is not within {tol} of a point. Each has the default base demand.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_length_auto`**
+  > These pipes state no length. Each length is computed from the line (Auto).
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_not_held`**
+  > A GeoJSON file does not hold controls, rules, time settings, text labels, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_parts`**
+  > These multipart lines have parts that are not connected and were imported as one pipe for each part.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_parts_points`**
+  > These multipoint features were imported as one node for each point.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_pattern_conflict`**
+  > These patterns are stated with different multipliers on different features. The first was used.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_pipe_type`**
+  > These pipes state the pipe type shown in parentheses, whose definition a GeoJSON file does not hold. The pipe type was not imported; the diameter and roughness stated in the file were.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_results`**
+  > The results in the file were not imported. Calculate computes them again.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_skip_geometry`**
+  > Not imported: the feature is not a point or a line.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_skip_id`**
+  > Not imported: the name is not a valid ID, or another element of the same kind has it.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_skip_kind`**
+  > Not imported: the feature states no node_type or link_type.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_skip_loop`**
+  > Not imported: both ends of the line join the same node.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_skip_no_node`**
+  > Not imported: the start or end node named is not in the file.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_skip_position`**
+  > Not imported: a position is not a valid latitude and longitude.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_skip_short`**
+  > Not imported: a line needs at least two positions.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_unmapped_demand`**
+  > No field was chosen for the base demand, so every junction has the default base demand, {value}.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_unmapped_diameter`**
+  > No field was chosen for the diameter, so every pipe has the default diameter, {value}.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_unmapped_elev`**
+  > No field was chosen for the elevation, so every node has the default elevation, {value}, and automatic lengths include no elevation difference.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_unmapped_id_line`**
+  > No field was chosen for the line ID, so every pipe was assigned an ID.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_unmapped_id_point`**
+  > No field was chosen for the point ID, so every node imported from a point was assigned an ID.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_unmapped_k`**
+  > No field was chosen for the minor loss coefficient, so every pipe has 0, as in an EPANET file that states none.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_unmapped_length`**
+  > No field was chosen for the length, so every pipe length is computed from the line (Auto).
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_unmapped_roughness`**
+  > No field was chosen for the roughness, so every pipe has the default roughness, {value}.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_value_unread`**
+  > These values are not numbers or are not recognized, and were not used.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_note_z`**
+  > These points state a third coordinate, which was not imported.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_other`**
+  > {n} features are neither points nor lines and will not be imported; the report lists them.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_points_heading`**
+  > Point fields (junctions, reservoirs, and tanks)
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_refuse_crs`**
+  > {file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_refuse_empty`**
+  > {file} contains no points or lines.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_report_lead`**
+  > Each change made during import, and each feature not imported, is listed below with the reason:
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_target_custom`**
+  > Custom property
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_target_node_type`**
+  > Node type
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_target_skip`**
+  > Do not import
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_title`**
+  > Import GeoJSON network: {file}
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_tolerance`**
+  > Join tolerance (m)
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_tolerance_tip`**
+  > A line end within this distance of a point, or of another line end, is joined to it. A line end farther than this from every point gets a new junction.
+  _Ruled OK 2026-10-16._
+- **`lpn_gjnet_working`**
+  > Importing {file}…
+  _Ruled OK 2026-10-16._
+
+### feat/guide-scenarios (`8bd566f9f`) — 60 new, 60 to read @@ NEEDS RULING
 
 - **`lpn_guide_cmp_cols_def`**
-  > <table class="lpn-notes-table"><tbody><tr><td>Scenario</td><td>The name of the scenario. The open scenario is marked (currently open).</td></tr><tr><td>No. of overrides</td><td>The overrides of the scenario itself, counted as in the Scenarios list. A calculation option such as the demand multiplier counts as one, and an override equal to the inherited value counts.</td></tr><tr><td>Demand multiplier, Total run time, Hydraulic time step</td><td>The values the scenario was solved under, its own or those of the project. A steady scenario shows a dash for the time step.</td></tr><tr><td>Lowest pressure</td><td>The lowest pressure at a junction, with its ID and the time it occurs. Reservoirs and tanks are left out because each has a fixed head.</td></tr><tr><td>Highest velocity</td><td>The highest velocity in a pipe or valve, with its ID and the time it occurs. Pumps are left out.</td></tr></tbody></table>
+  > <table class="lpn-notes-table"><tbody><tr><td>Scenario</td><td>The name of the scenario. The open scenario is marked (currently open).</td></tr><tr><td>No. of overrides</td><td>The overrides of the scenario itself, counted as in the Scenarios list. A calculation option such as the demand multiplier counts as one, and an override equal to the inherited value counts.</td></tr><tr><td>Demand multiplier, Total run time, Hydraulic time step</td><td>The values the scenario was solved under, its own or those of the project. A steady-state scenario shows a dash for the time step.</td></tr><tr><td>Lowest pressure</td><td>The lowest pressure at a junction, with its ID and the time it occurs. Reservoirs and tanks are left out because each has a fixed head.</td></tr><tr><td>Highest velocity</td><td>The highest velocity in a pipe or valve, with its ID and the time it occurs. Pumps are left out.</td></tr></tbody></table>
   @@ NEEDS RULING
 - **`lpn_guide_cmp_cols_term`**
   > What the table holds
   @@ NEEDS RULING
 - **`lpn_guide_cmp_notes_def`**
-  > <ul><li>A scenario that cannot be solved shows the reason in place of its two results, for example that a junction has no path to a source after a pipe is made inactive. The other scenarios are still solved. A scenario that did not converge shows its last results and a message.</li><li>The block above the table, The same in every scenario, states the friction method, units, accuracy, and maximum trials. A setting that differs between scenarios is left out of the block.</li><li>There is no pass or fail threshold. Read the numbers against the design criteria of the system being modeled.</li><li>The worked example in the Scenario manager entry compares three scenarios on Net1.</li></ul>
+  > <ul><li>A scenario that cannot be solved shows the reason in place of its two results, for example that a junction has no path to a source after a pipe is made inactive. The other scenarios are still solved. A scenario that did not converge shows its last results and a message.</li><li>The block above the table, The same in every scenario, states the friction method, units, accuracy, and maximum trials. A setting that differs between scenarios is left out of the block.</li><li>There is no pass or fail threshold. Read the numbers against the design criteria of the system being modeled.</li><li>The example given in the Scenario manager entry compares three scenarios on Net1.</li></ul>
   @@ NEEDS RULING
 - **`lpn_guide_cmp_notes_term`**
   > Points to note
@@ -880,10 +903,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > <p>A scenario with a Total run time greater than 0 is run over the whole period through the EPANET engine. Its lowest pressure and highest velocity are the extremes over every time step, each shown with its time. A scenario with a Total run time of 0 is solved at one instant. The total run time is one of the options a scenario can override, so one table can hold both kinds.</p>
   @@ NEEDS RULING
 - **`lpn_guide_cmp_run_term`**
-  > Steady and extended-period scenarios
+  > Steady-state and extended-period scenarios
   @@ NEEDS RULING
 - **`lpn_guide_lib_ctl_def`**
-  > <p>A control is one statement. A rule is several lines that begin with RULE. Keywords are typed in English whatever the language of the page, and numbers are in the units of the project. Add a control starts from a statement built from the network, which is then edited into the one intended.</p><p>Controls and rules change a result only in an extended-period simulation, that is, when Total run time is greater than 0. A single-instant solution is not changed by either. Rules are applied by the EPANET engine only. Both are saved with the project and written to an EPANET file.</p>
+  > <p>A control is one statement. A rule is several lines that begin with RULE. Keywords are typed in English whatever the language of the page, and numbers are in the units of the project. Add a control starts from a statement built from the network, which is then edited into the one intended.</p><p>Controls and rules change a result only in an extended-period simulation, that is, when Total run time is greater than 0. A steady-state solution is not changed by either. Rules are applied by the EPANET engine only. Both are saved with the project and written to an EPANET file.</p>
   @@ NEEDS RULING
 - **`lpn_guide_lib_ctl_term`**
   > Controls and rules in a run
@@ -892,7 +915,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > <p>Open the Net1 example and choose Water, Libraries. Patterns holds pattern 1, Demand Pattern, with 12 multipliers 2:00 apart, covering 24:00, marked (default). Curves holds curve 1, Pump Curve for Pump 9, a Pump head curve with one point, 1500 gpm at 250 ft. Controls holds two statements: the first opens Link 9 when Node 2 falls below 110, and the second closes it when Node 2 rises above 140. Rules holds two rules that test the clock time and the level of Tank 2.</p><p>Choose Water, Calculate, and then Water, Reports, Status changes. Pump L9 is now closed at 10:00, now open at 15:00, and now closed at 21:00, and Tank N2 is now emptying at 22:00. In Controls, change 140 to 135 in the second control and choose Water, Calculate again. The last closing moves to 20:00, and Tank N2 is now emptying at 21:00.</p>
   @@ NEEDS RULING
 - **`lpn_guide_lib_example_term`**
-  > Worked example on Net1
+  > Example on Net1
   @@ NEEDS RULING
 - **`lpn_guide_lib_import_def`**
   > <p>File, Import…, Import libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.</p>
@@ -934,7 +957,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > <p>Open the Net1 example and click Pipe 10. Properties lists its inputs, from Description to Is active?, and then its results at the time shown: Flow 1866.2 gpm, Velocity 2.4 ft/sec, and Head loss 19.12 ft H2O.</p><p>Click Pipe 113 and Shift-click Pipe 31. The title reads 2 selected, the one section is Pipes (2), and Diameter shows Various, because Pipe 31 is 6 in. and Pipe 113 is 8 in. Enter 10 for Diameter. The notice reads Set Diameter (in) on 2., both pipes are 10 in., and one Undo returns them to 6 and 8 in.</p>
   @@ NEEDS RULING
 - **`lpn_guide_prop_example_term`**
-  > Worked example on Net1
+  > Example on Net1
   @@ NEEDS RULING
 - **`lpn_guide_prop_id_def`**
   > <p>The ID is edited in the title bar. It cannot contain a space or a quotation mark, and a node's ID cannot be that of another node, nor a link's that of another link. A node and a link can have the same ID. A refused ID leaves the old one in place and shows a message. Renaming an asset carries its scenario overrides with it.</p>
@@ -964,7 +987,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > <p>Open the Net1 example. Choose Water, Scenarios, New scenario…, type Larger main, and click OK. Select Pipe 10 on the map and enter 24 for Diameter in Properties; Base has 18 in., shown beneath the field as Base scenario: 18. Choose Base in the Scenarios list, choose New scenario… again, type Max day, and enter 1.8 for Demand multiplier in Settings, Calculation, Hydraulics. Then choose Water, Reports, Scenario comparison.</p><table class="lpn-notes-table"><tbody><tr><td>Scenario</td><td>No. of overrides</td><td>Demand multiplier</td><td>Lowest pressure</td><td>Highest velocity</td></tr><tr><td>Base</td><td>0</td><td>1</td><td>108 psi at N32, 14:00</td><td>2.76 ft/sec at L11, 16:00</td></tr><tr><td>Larger main</td><td>1</td><td>1</td><td>109 psi at N32, 14:00</td><td>2.87 ft/sec at L11, 16:00</td></tr><tr><td>Max day</td><td>1</td><td>1.8</td><td>15.77 psi at N32, 9:00</td><td>3.49 ft/sec at L10, 8:00</td></tr></tbody></table><p>The total run time is 24:00 in all three, so each lowest pressure and highest velocity is the extreme over the day, at the time shown. The larger main raises the lowest pressure by about 1 psi. A multiplier of 1.8 lowers it to 15.77 psi at 9:00, and the highest velocity moves to Pipe 10. Each scenario holds one override, and Base keeps its values.</p>
   @@ NEEDS RULING
 - **`lpn_guide_scn_example_term`**
-  > Worked example on Net1
+  > Example on Net1
   @@ NEEDS RULING
 - **`lpn_guide_scn_make_def`**
   > <p>With a scenario other than Base open, an edit to a value that scenarios can override is stored as an override in the open scenario, by whichever door it is made: typing in Properties, editing a cell in Tables, Replace in Find and replace, dragging a node or entering its coordinates, Morph (the new type is the override), or Paste properties to selection. A setting typed in the Settings box is stored as an override when scenarios can override that setting. Base is not changed. In Base, the same edits change the network itself and reach every scenario that has not overridden the value.</p><p>Delete acts differently. In a scenario, Delete does not remove an asset that exists in Base. It makes the asset inactive in the open scenario, and with it the pipes of a node, and says so. The asset is still in the drawing and in the other scenarios. An asset drawn while a scenario is open is inactive in Base and active in that scenario, and Delete in that scenario removes it. Deleting an asset in Base also deletes its overrides in every scenario, after a question that counts them. Customers and Shapes belong to no scenario and are deleted outright.</p><p>The Override manager row of the Scenarios list opens a list of every override of the open scenario by category, each beside the inherited value it replaces. A time series graph on the map that the scenario opened, moved, or changed is a row of its own. Check rows and click Clear selected overrides, click Clear override in one row, or click Clear all overrides. Each value then returns to the inherited value, and Undo reverses it. Select an ID in the list to go to the asset on the map. The dot in Properties and the Clear override row in the cell menu of Tables clear one override at a time.</p>
@@ -997,13 +1020,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > What a scenario can and cannot override
   @@ NEEDS RULING
 - **`lpn_guide_scn_use_def`**
-  > <p>Scenarios save many designs, views, or situations in the same project, such as average day, maximum day, peak hour, a report presentation figure, a main out of service, or a proposed replacement. The network is drawn once, in the Base scenario. Every other scenario holds only its overrides, the values that differ from the scenario it inherits from, and reads everything else from that scenario. An edit to Base therefore reaches every scenario that has not overridden that value.</p><p>A new project starts with six ready-made scenarios: 1. Flow test: Static, 2. Flow test: Mid, 3. Flow test: Max, 4. Average Day, 5. Max Day, and 6. Peak hour. They are ordinary scenarios that can be renamed, edited, and deleted. Each starts with one override, its demand multiplier: 1 for the flow tests and Average Day, 2 for Max Day, and 3 for Peak hour. The multipliers are placeholders to be replaced with values for the system being modeled. A project opened from a file, including each example, or imported from an EPANET file has Base alone.</p><p>Fire flow is checked with the Fire flow analysis, which tests every junction, or the junctions you select.</p>
+  > <p>Scenarios save many designs, views, or situations in the same project, such as average day, maximum day, peak hour, a report presentation figure, a main out of service, or a proposed replacement. The network is drawn once, in the Base scenario. Every other scenario holds only its overrides, the values that differ from the scenario it inherits from, and reads everything else from that scenario. An edit to Base therefore reaches every scenario that has not overridden that value.</p><p>A new project starts with six ready-made scenarios: 1. Flow test: Static, 2. Flow test: Mid, 3. Flow test: Max, 4. Average Day, 5. Max Day, and 6. Peak hour. They are ordinary scenarios that can be renamed, edited, and deleted. Each starts with one override, its demand multiplier: 1 for the flow tests and Average Day, 2 for Max Day, and 3 for Peak hour. The multipliers are placeholders to be replaced with values for the system being modeled. A project opened from a file, including each example, or imported from an EPANET file has Base alone.</p><p>Fire flow is checked with the Fire flow analysis, which tests every junction or the selected junctions. Max Day is the scenario normally open when it is run.</p>
   @@ NEEDS RULING
 - **`lpn_guide_scn_use_term`**
   > What a scenario is for
   @@ NEEDS RULING
 - **`lpn_guide_set_assets_def`**
-  > <p>ID prefixes and Values set what assets drawn from now on are called and start with. They do not change assets already drawn. Apply to all, beside an ID prefix, gives every existing asset of that kind an ID that starts with the prefix; each keeps its number, and an ID that does not end in a number is not changed. Apply these new-asset values to every existing asset replaces those properties on every existing asset, after a question, but only for the properties whose labels are showing on the map. Undo reverses it.</p>
+  > <p>ID prefixes and Values are for assets drawn from now on. They do not change assets already drawn. Apply to all, beside an ID prefix, gives every existing asset of that kind an ID that starts with the prefix; each keeps its number, and an ID that does not end in a number is not changed. Apply these new-asset values to every existing asset replaces those properties on every existing asset, after a question, but only for the properties whose labels are showing on the map. Undo reverses it.</p>
   @@ NEEDS RULING
 - **`lpn_guide_set_assets_term`**
   > New assets, and applying values to existing ones
@@ -1045,7 +1068,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Searching, links, and what is remembered
   @@ NEEDS RULING
 
-### feat/hover-props (`10f35a1ed`) — adds no English strings
+### feat/hover-props (`c0c1ac019`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -1069,32 +1092,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/scenarios-menu (`6d595240b`) — 9 new, 9 to read @@ NEEDS RULING
-
-- **`lpn_sm_alt_delete_has_children`**
-  > The alternative {name} cannot be deleted while other alternatives inherit from it: {list}. Delete those first, or move them to another parent.
-  @@ NEEDS RULING
-- **`lpn_sm_copy_ask`**
-  > Copy the overrides ({n}) of {name} up into {target}? {name} keeps them as its own overrides. You can undo this.
-  @@ NEEDS RULING
-- **`lpn_sm_copy_base_tip`**
-  > Copy Base as a child alternative. The copy holds no overrides and inherits every value from Base.
-  @@ NEEDS RULING
-- **`lpn_sm_copy_none`**
-  > The alternative {name} has no overrides to copy.
-  @@ NEEDS RULING
-- **`lpn_sm_copy_pick`**
-  > Copy the overrides of {name} into which alternative? Its parent is listed first.
-  @@ NEEDS RULING
-- **`lpn_sm_copy_skipped`**
-  > {between} also overrides these values. It is skipped and not changed, so it keeps its own values for them:
-  @@ NEEDS RULING
-- **`lpn_sm_copy_up`**
-  > Copy upward
-  @@ NEEDS RULING
-- **`lpn_sm_copy_up_root`**
-  > A Base alternative has nothing above it to copy into.
-  @@ NEEDS RULING
-- **`lpn_sm_copy_up_tip`**
-  > Copy the overrides of the selected alternative into an alternative above it in the tree. The selected alternative keeps its overrides.
-  @@ NEEDS RULING
+### feat/scenarios-menu (`fb1e6baf6`) — adds no English strings

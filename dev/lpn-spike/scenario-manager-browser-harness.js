@@ -119,14 +119,13 @@ async function main() {
 			const r = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).filter((b) => b.textContent.trim().indexOf(lab) >= 0)[0];
 			return !!r && r.disabled === true;
 		}, SMMENU));
-		// Tom, 2026-10-11: "Scenario manager..., -, Basic mode, New, Rename, Delete, -, Apply Base, list of scenarios."
-		// Apply Base values and the rule before it are retired (Task 801, 2026-10-15). Manage overrides follows
-		// Delete (Tom, 2026-10-15: "Yes", reachable in Basic mode).
+		// Tom, 2026-10-16: "Scenarios manager..., Overrides manager..., Advanced mode, line, New, ..., line, list
+		// of scenarios." (Apply Base values is retired, Task 801.)
 		const menuSeq = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_menu_list > *')).filter((e) => e.offsetParent !== null || e.tagName === 'HR')
 			.map((e) => e.tagName === 'HR' ? '-' : e.textContent.trim()));
-		const wantSeq = [SMMENU, '-', '✓ ' + await L('lpn_scenario_basic'), await L('lpn_scenario_new'), await L('lpn_scenario_copy'), await L('lpn_scenario_rename'), await L('lpn_scenario_delete'),
-			await L('lpn_sm_list_overrides'), '✓ ' + await L('lpn_scenario_base')];
-		ok('1.1a the menu is in Tom\'s order: Scenario manager, Basic mode and the commands, then the scenarios (no Apply Base values)',
+		const wantSeq = [SMMENU, await L('lpn_sm_list_overrides'), '✓ ' + await L('lpn_scenario_basic'), '-', await L('lpn_scenario_new'), await L('lpn_scenario_copy'), await L('lpn_scenario_rename'), await L('lpn_scenario_delete'),
+			'-', '✓ ' + await L('lpn_scenario_base')];
+		ok('1.1a the menu is in Tom\'s order: the managers, Basic mode, the commands, then the scenarios (no Apply Base values)',
 			JSON.stringify(menuSeq.map((t) => t.replace(/\s+/g, ' '))) === JSON.stringify(wantSeq.map((t) => t.replace(/\s+/g, ' '))), JSON.stringify(menuSeq));
 		await page.keyboard.press('Escape');
 		await page.evaluate(() => { document.body.click(); });
@@ -322,7 +321,7 @@ async function main() {
 		await settle(500);
 		ok('4.3 an alternative was added under Base', JSON.stringify(await names()) === JSON.stringify(['Base', '-Dry year', 'Base2']), JSON.stringify(await names()));
 		ok('4.4 ...used by no scenario yet', (await rows())[1].meta === await L('lpn_sm_used_by_none'), (await rows())[1].meta);
-		ok('4.5 an alternatives tree toolbar is Add child, Add base, Rename, Copy, Merge upward, minus (no Make current)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), await L('lpn_sm_merge_up'), '\u2212']), JSON.stringify(await toolbar()));
+		ok('4.5 an alternatives tree toolbar is Add child, Add base, Rename, Copy, Merge upward, Copy upward, minus (no Make current)', JSON.stringify(await toolbar()) === JSON.stringify([await L('lpn_sm_add_child'), await L('lpn_sm_add_base'), await L('lpn_sm_rename'), await L('lpn_sm_copy'), await L('lpn_sm_merge_up'), await L('lpn_sm_copy_up'), '\u2212']), JSON.stringify(await toolbar()));
 		await clickRow('Dry year');
 		await click('#lpn_sm_copy');
 		await settle(400);
