@@ -2988,7 +2988,7 @@ $ec_lang['lpn_hide_titles']='Hide these titles';
 // bubble and reads 'Show this'; this one has to name what it is talking about.
 $ec_lang['lpn_settings_area_hint']='Show the selection help';
 $ec_lang['lpn_settings_area_hint_tip']='Show the prompt over the map that gives the next step while you are selecting an area.';
-$ec_lang['lpn_settings_hover_card']='Show the full label on hover';
+$ec_lang['lpn_settings_hover_card']='Show all properties on hover';
 $ec_lang['lpn_settings_hover_card_tip']='Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.';
 // Task 805 (Tom, 2026-10-15, R-396: "It would be good to be able to hide the amber override
 // indicators from the map. Maybe a Map, Clean map button is a good idea after all"). The rings'

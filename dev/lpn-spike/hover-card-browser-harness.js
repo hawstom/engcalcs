@@ -17,7 +17,7 @@
 //      press still starts / completes the pipe.
 //   5. HOVER COSTS NOTHING IN THE LABEL LAYER (no getBBox, no node added or removed), the card
 //      takes no pointer events, a press selects through it, and sliding waits for rest.
-//   6. THE SETTING: Settings > Map and page > Page > "Show the full label on hover" is the real
+//   6. THE SETTING: Settings > Map and page > Page > "Show all properties on hover" is the real
 //      control; unticked, no card and lpn_hovercard=off is the only thing stored.
 //   7. ?lang=es: the Spanish card differs from the English one and carries every field.
 //   8. No page errors.

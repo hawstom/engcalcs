@@ -59597,7 +59597,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			hoverCardInput.type = 'checkbox';
 			hoverCardInput.checked = hoverCardOn();
 			hoverCardInput.addEventListener('change', function () { setHoverCardOn(hoverCardInput.checked); });
-			row(pageBody, pc.lpn_settings_hover_card || 'Show the full label on hover', hoverCardInput,
+			row(pageBody, pc.lpn_settings_hover_card || 'Show all properties on hover', hoverCardInput,
 				pc.lpn_settings_hover_card_tip);
 		}
 		// The override rings' own switch (Task 805): the same section and the same reason as the two

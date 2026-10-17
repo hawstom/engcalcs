@@ -641,7 +641,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**36 still to read**, of 104 new keys across 20 unmerged branch(es).
+**62 still to read**, of 130 new keys across 21 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -652,9 +652,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/basemap-outdoors (`5b8059020`) — already merged into feat/guide-scenarios; its strings are listed there
+### docs/features-update (`dff6096d8`) — adds no English strings
 
-### feat/bentley-interop (`1ef30b7b5`) — already merged into feat/guide-scenarios; its strings are listed there
+### feat/basemap-outdoors (`5b8059020`) — already merged into docs/features-update; its strings are listed there
+
+### feat/bentley-interop (`1ef30b7b5`) — already merged into docs/features-update; its strings are listed there
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -862,7 +864,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Importing {file}…
   _Ruled OK 2026-10-16._
 
-### feat/guide-scenarios (`e2e0505d3`) — 34 new, 34 to read @@ NEEDS RULING
+### feat/guide-scenarios (`8cd2429d3`) — 60 new, 60 to read @@ NEEDS RULING
 
 - **`lpn_guide_cmp_cols_def`**
   > <table class="lpn-notes-table"><tbody><tr><td>Scenario</td><td>The name of the scenario. The open scenario is marked (currently open).</td></tr><tr><td>No. of overrides</td><td>The overrides of the scenario itself, counted as in the Scenarios list. A calculation option such as the demand multiplier counts as one, and an override equal to the inherited value counts.</td></tr><tr><td>Demand multiplier, Total run time, Hydraulic time step</td><td>The values the scenario was solved under, its own or those of the project. A steady scenario shows a dash for the time step.</td></tr><tr><td>Lowest pressure</td><td>The lowest pressure at a junction, with its ID and the time it occurs. Reservoirs and tanks are left out because each has a fixed head.</td></tr><tr><td>Highest velocity</td><td>The highest velocity in a pipe or valve, with its ID and the time it occurs. Pumps are left out.</td></tr></tbody></table>
@@ -889,7 +891,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Controls and rules in a run
   @@ NEEDS RULING
 - **`lpn_guide_lib_example_def`**
-  > <p>Open the Net1 example and choose Water, Libraries. Patterns holds pattern 1, Demand Pattern, with 12 multipliers 2:00 apart, covering 24:00, marked (default). Curves holds curve 1, Pump Curve for Pump 9, a Pump head curve with one point, 1500 gpm at 250 ft. Controls holds <code>LINK 9 OPEN IF NODE 2 BELOW 110</code> and <code>LINK 9 CLOSED IF NODE 2 ABOVE 140</code>, and Rules holds two rules that test the clock time and the level of Tank 2.</p><p>Choose Water, Calculate, and then Water, Reports, Status changes. Pump L9 is now closed at 10:00, now open at 15:00, and now closed at 21:00, and Tank N2 is now emptying at 22:00. In Controls, change 140 to 135 in the second control and choose Water, Calculate again. The last closing moves to 20:00, and Tank N2 is now emptying at 21:00.</p>
+  > <p>Open the Net1 example and choose Water, Libraries. Patterns holds pattern 1, Demand Pattern, with 12 multipliers 2:00 apart, covering 24:00, marked (default). Curves holds curve 1, Pump Curve for Pump 9, a Pump head curve with one point, 1500 gpm at 250 ft. Controls holds two statements: the first opens Link 9 when Node 2 falls below 110, and the second closes it when Node 2 rises above 140. Rules holds two rules that test the clock time and the level of Tank 2.</p><p>Choose Water, Calculate, and then Water, Reports, Status changes. Pump L9 is now closed at 10:00, now open at 15:00, and now closed at 21:00, and Tank N2 is now emptying at 22:00. In Controls, change 140 to 135 in the second control and choose Water, Calculate again. The last closing moves to 20:00, and Tank N2 is now emptying at 21:00.</p>
   @@ NEEDS RULING
 - **`lpn_guide_lib_example_term`**
   > Worked example on Net1
@@ -901,7 +903,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Importing libraries from another project
   @@ NEEDS RULING
 - **`lpn_guide_lib_kinds_def`**
-  > <table class="lpn-notes-table"><tbody><tr><td>Patterns</td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. A column pasted from a spreadsheet fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.</td></tr><tr><td>Curves</td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve is fitted through its points and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. The other kinds join their points with straight lines. A pump or valve states its curve in Properties, where the Curves link opens this section.</td></tr><tr><td>Pipe types</td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.</td></tr><tr><td>Fittings</td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.</td></tr><tr><td>Controls</td><td>One statement each, in EPANET syntax, such as <code>LINK 9 OPEN IF NODE 2 BELOW 110</code>. Under each, the box states whether it was understood.</td></tr><tr><td>Rules</td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.</td></tr></tbody></table>
+  > <table class="lpn-notes-table"><tbody><tr><td>Patterns</td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.</td></tr><tr><td>Curves</td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve is fitted through its points and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. The other kinds join their points with straight lines. A pump or valve states its curve in Properties, where the Curves link opens this section.</td></tr><tr><td>Pipe types</td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.</td></tr><tr><td>Fittings</td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.</td></tr><tr><td>Controls</td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value</code>. Under each, the box states whether it was understood.</td></tr><tr><td>Rules</td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.</td></tr></tbody></table>
   @@ NEEDS RULING
 - **`lpn_guide_lib_kinds_term`**
   > What each section holds
@@ -924,14 +926,50 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_guide_lib_scn_term`**
   > Libraries and scenarios
   @@ NEEDS RULING
+- **`lpn_guide_prop_edit_def`**
+  > <p>A value takes effect when the field is committed, by leaving it or pressing Enter. It is read in the unit named in its label, with no conversion, and the map label, Tables, and the results follow. Calculated values are read-only rows with no box to type in. For a link they follow its inputs, and for a node they sit among them. They are the results of the last calculation, at the time shown, and with Recalculate automatically cleared they are those of the last Calculate.</p><p>A pipe that uses a pipe type shows the values the type states as disabled. Click Detach from pipe type to copy those values into the pipe and edit them there.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_prop_edit_term`**
+  > Editing a value
+  @@ NEEDS RULING
+- **`lpn_guide_prop_example_def`**
+  > <p>Open the Net1 example and click Pipe 10. Properties lists its inputs, from Description to Is active?, and then its results at the time shown: Flow 1866.2 gpm, Velocity 2.4 ft/sec, and Head loss 19.12 ft H2O.</p><p>Click Pipe 113 and Shift-click Pipe 31. The title reads 2 selected, the one section is Pipes (2), and Diameter shows Various, because Pipe 31 is 6 in. and Pipe 113 is 8 in. Enter 10 for Diameter. The notice reads Set Diameter (in) on 2., both pipes are 10 in., and one Undo returns them to 6 and 8 in.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_prop_example_term`**
+  > Worked example on Net1
+  @@ NEEDS RULING
+- **`lpn_guide_prop_id_def`**
+  > <p>The ID is edited in the title bar. It cannot contain a space or a quotation mark, and a node's ID cannot be that of another node, nor a link's that of another link. A node and a link can have the same ID. A refused ID leaves the old one in place and shows a message. Renaming an asset carries its scenario overrides with it.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_prop_id_term`**
+  > The ID
+  @@ NEEDS RULING
+- **`lpn_guide_prop_multi_def`**
+  > <p>The title reads, for example, 2 selected. The box has one section for each type of asset in the selection, headed by the name of the type and the number of assets of it, as in Pipes (2), and each section can be collapsed. A section lists the properties that Tables has as columns and that can be set on every asset in it. Results and values that a pipe type states are not listed. A row shows the value the assets share, or Various where they differ.</p><p>Typing a value into a row sets it on every asset of that type in the selection. A row that is not touched writes nothing. A notice states the count, as in Set Diameter (in) on 2., and one Undo reverses the whole row. In a scenario other than Base the values are stored as overrides.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_prop_multi_term`**
+  > Several assets selected
+  @@ NEEDS RULING
+- **`lpn_guide_prop_open_def`**
+  > <p>In Select mode, click a node, link, Text, or Customer to open Properties beside it, or where the box was last moved. Shift-click another asset to add it to the selection. With more than one asset selected, the box lists what can be set on all of them at once (see Several assets selected, below). A Shape has no Properties box, because its points are edited on the map.</p><p>The right-click menu of a node or link has Copy properties, Paste properties to selection, and Time series graph. On a touch screen, press and hold the asset for the same menu. Time series graph needs the results of an extended-period simulation.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_prop_open_term`**
+  > Opening Properties
+  @@ NEEDS RULING
+- **`lpn_guide_prop_scn_def`**
+  > <p>In a scenario other than Base, an edit to a value that scenarios can override is stored as an override of the open scenario, and the row is marked at its left. The Scenario manager entry describes the marks and lists what is the same in every scenario: the ID, Description, and Tag are. A Customer has no scenario values. Switching scenarios leaves Properties open on the same asset, showing the values of the scenario that is now open.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_prop_scn_term`**
+  > In a scenario
+  @@ NEEDS RULING
 - **`lpn_guide_scn_example_def`**
-  > <p>Open the Net1 example. Choose Water, Scenarios, New scenario…, type Larger main, and click OK. Select Pipe 10 on the map and enter 24 for Diameter in Properties; Base has 18 in., shown beneath the field as Base scenario: 18. Choose Base in the Scenarios list, choose New scenario… again, type Max day, and enter 1.8 for Demand multiplier in Settings, Calculation, Hydraulics. Then choose Water, Reports, Scenario comparison.</p><table class="lpn-notes-table"><tbody><tr><td>Scenario</td><td>No. of overrides</td><td>Demand multiplier</td><td>Lowest pressure</td><td>Highest velocity</td></tr><tr><td>Base</td><td>0</td><td>1</td><td>108 psi at N32, 14:00</td><td>2.76 ft/sec at L11, 16:00</td></tr><tr><td>Larger main</td><td>1</td><td>1</td><td>109 psi at N32, 14:00</td><td>2.87 ft/sec at L11, 16:00</td></tr><tr><td>Max day</td><td>1</td><td>1.8</td><td>15.77 psi at N32, 9:00</td><td>3.49 ft/sec at L10, 8:00</td></tr></tbody></table><p>The total run time is 24:00 in all three, so each lowest pressure and highest velocity is the extreme over the day, at the time shown. The larger main raises the lowest pressure by about 1 psi. A multiplier of 1.8 lowers it to 15.77 psi at 9:00, and the highest velocity moves to Pipe 10. Each scenario holds one override, and Base is unchanged.</p>
+  > <p>Open the Net1 example. Choose Water, Scenarios, New scenario…, type Larger main, and click OK. Select Pipe 10 on the map and enter 24 for Diameter in Properties; Base has 18 in., shown beneath the field as Base scenario: 18. Choose Base in the Scenarios list, choose New scenario… again, type Max day, and enter 1.8 for Demand multiplier in Settings, Calculation, Hydraulics. Then choose Water, Reports, Scenario comparison.</p><table class="lpn-notes-table"><tbody><tr><td>Scenario</td><td>No. of overrides</td><td>Demand multiplier</td><td>Lowest pressure</td><td>Highest velocity</td></tr><tr><td>Base</td><td>0</td><td>1</td><td>108 psi at N32, 14:00</td><td>2.76 ft/sec at L11, 16:00</td></tr><tr><td>Larger main</td><td>1</td><td>1</td><td>109 psi at N32, 14:00</td><td>2.87 ft/sec at L11, 16:00</td></tr><tr><td>Max day</td><td>1</td><td>1.8</td><td>15.77 psi at N32, 9:00</td><td>3.49 ft/sec at L10, 8:00</td></tr></tbody></table><p>The total run time is 24:00 in all three, so each lowest pressure and highest velocity is the extreme over the day, at the time shown. The larger main raises the lowest pressure by about 1 psi. A multiplier of 1.8 lowers it to 15.77 psi at 9:00, and the highest velocity moves to Pipe 10. Each scenario holds one override, and Base keeps its values.</p>
   @@ NEEDS RULING
 - **`lpn_guide_scn_example_term`**
   > Worked example on Net1
   @@ NEEDS RULING
 - **`lpn_guide_scn_make_def`**
-  > <p>With a scenario other than Base open, an edit to a value that scenarios can override is stored as an override in the open scenario, by whichever door it is made: typing in Properties, editing a cell in Tables, Replace in Find and replace, dragging a node or entering its coordinates, Morph (the new type is the override), or Paste properties to selection. A setting typed in the Settings box is stored as an override when scenarios can override that setting. Base is not changed. In Base, the same edits change the network itself and reach every scenario that has not overridden the value.</p><p>Delete acts differently. In a scenario, Delete does not remove an asset that exists in Base. It makes the asset inactive in the open scenario, and with it the pipes of a node, and says so. The asset is still in the drawing and in the other scenarios. An asset drawn while a scenario is open is inactive in Base and active in that scenario, and Delete in that scenario removes it. Deleting an asset in Base also deletes its overrides in every scenario, after a question that counts them. Customers and Shapes belong to no scenario and are deleted outright.</p><p>The Manage overrides row of the Scenarios list opens a list of every override of the open scenario by category, each beside the inherited value it replaces. A time series graph on the map that the scenario opened, moved, or changed is a row of its own. Check rows and click Clear selected overrides, click Clear override on one row, or click Clear all overrides. Each value then returns to the inherited value, and Undo reverses it. Select an ID in the list to go to the asset on the map. The dot in Properties and the Clear override row in the cell menu of Tables clear one override at a time.</p>
+  > <p>With a scenario other than Base open, an edit to a value that scenarios can override is stored as an override in the open scenario, by whichever door it is made: typing in Properties, editing a cell in Tables, Replace in Find and replace, dragging a node or entering its coordinates, Morph (the new type is the override), or Paste properties to selection. A setting typed in the Settings box is stored as an override when scenarios can override that setting. Base is not changed. In Base, the same edits change the network itself and reach every scenario that has not overridden the value.</p><p>Delete acts differently. In a scenario, Delete does not remove an asset that exists in Base. It makes the asset inactive in the open scenario, and with it the pipes of a node, and says so. The asset is still in the drawing and in the other scenarios. An asset drawn while a scenario is open is inactive in Base and active in that scenario, and Delete in that scenario removes it. Deleting an asset in Base also deletes its overrides in every scenario, after a question that counts them. Customers and Shapes belong to no scenario and are deleted outright.</p><p>The Manage overrides row of the Scenarios list opens a list of every override of the open scenario by category, each beside the inherited value it replaces. A time series graph on the map that the scenario opened, moved, or changed is a row of its own. Check rows and click Clear selected overrides, click Clear override in one row, or click Clear all overrides. Each value then returns to the inherited value, and Undo reverses it. Select an ID in the list to go to the asset on the map. The dot in Properties and the Clear override row in the cell menu of Tables clear one override at a time.</p>
   @@ NEEDS RULING
 - **`lpn_guide_scn_make_term`**
   > Making and clearing overrides
@@ -966,8 +1004,50 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_guide_scn_use_term`**
   > What a scenario is for
   @@ NEEDS RULING
+- **`lpn_guide_set_assets_def`**
+  > <p>ID prefixes and Values set what assets drawn from now on are called and start with. They do not change assets already drawn. Apply to all, beside an ID prefix, gives every existing asset of that kind an ID that starts with the prefix; each keeps its number, and an ID that does not end in a number is not changed. Apply these new-asset values to every existing asset replaces those properties on every existing asset, after a question, but only for the properties whose labels are showing on the map. Undo reverses it.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_set_assets_term`**
+  > New assets, and applying values to existing ones
+  @@ NEEDS RULING
+- **`lpn_guide_set_reset_def`**
+  > <p>Restore defaults asks first, and then returns ID prefixes, new-asset values, solver settings, map appearance, legend position, and visible labels of the open project to their original values. The network is not changed, other projects are not affected, and one Undo puts the settings back.</p><p>Start fresh asks first, and then deletes every project, every background image, all settings, and the unit choices saved in this browser, and reloads the page as a new visitor would see it. It cannot be undone.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_set_reset_term`**
+  > Restore defaults and Start fresh
+  @@ NEEDS RULING
+- **`lpn_guide_set_scn_def`**
+  > <p>In a scenario other than Base, a value typed for a setting that scenarios can override is stored as an override, and the row is marked with a solid dot. A triangle marks a setting that scenarios below the open one override. The Scenario manager entry lists which settings can be overridden. Units are the same in every scenario. Restore defaults is dimmed outside Base, and Apply these new-asset values to every existing asset is refused there, because it changes the drawing itself.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_set_scn_term`**
+  > Settings in a scenario
+  @@ NEEDS RULING
+- **`lpn_guide_set_search_def`**
+  > <p>Type one or more words in Search settings to list only the settings that mention all of them, in the name or in the tip. A word that matches a heading shows every setting under that heading. For example, opacity lists Symbol opacity (0 to 1) and Background image opacity (0 to 1); opacity symbol lists the first alone; and sprinklers lists Emitter exponent, whose tip mentions sprinklers and whose name does not. The search changes no setting.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_set_search_term`**
+  > Searching
+  @@ NEEDS RULING
+- **`lpn_guide_set_units_def`**
+  > <p>Each quantity has its own unit in Units. When values in the project are entered in that unit, changing it asks a question first. Non-destructive keeps every number as typed and reads it in the new unit. Destructive rewrites the numbers by conversion, so the network stays physically the same, and the original numbers are lost unless Undo is used; one Undo restores the numbers and the unit. Cancel leaves everything as it was.</p><p>Example on Net1: choose mm for Diameter in Units. Destructive rewrites 13 values, and Pipe 10 reads 457.2 mm. Non-destructive leaves the 13 values alone, and Pipe 10 reads 18 mm.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_set_units_term`**
+  > Changing a unit
+  @@ NEEDS RULING
+- **`lpn_guide_set_where_def`**
+  > <p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map and page (Appearance and Page), Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.</p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_set_where_term`**
+  > Sections, and where settings are saved
+  @@ NEEDS RULING
+- **`lpn_guide_use_def`**
+  > <p>Search ignores capitals and accents and lists the rows and entries that contain the text typed. Choosing a row shows where that control is. It never runs the control. On a phone, where the toolbar is folded away, a toolbar row opens the menu row that does the same thing.</p><p>The address of the page follows the entry being read, as in <code>Looped-Network.php#guide</code>, so it can be copied as a link to that entry. Closing the user manual clears it. The user manual remembers in this browser whether it was open, its position and size, and whether its contents list is hidden. On a phone the contents list starts hidden.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_use_term`**
+  > Searching, links, and what is remembered
+  @@ NEEDS RULING
 
-### feat/hover-props (`5692be50c`) — adds no English strings
+### feat/hover-props (`bd7ebccca`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -991,18 +1071,18 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/manage-override (`5a5f90f52`) — already merged into feat/guide-scenarios; its strings are listed there
+### feat/manage-override (`5a5f90f52`) — already merged into docs/features-update; its strings are listed there
 
-### feat/match-property (`05bda7651`) — already merged into feat/guide-scenarios; its strings are listed there
+### feat/match-property (`05bda7651`) — already merged into docs/features-update; its strings are listed there
 
-### feat/scenario-box (`d4d566a71`) — already merged into feat/guide-scenarios; its strings are listed there
+### feat/scenario-box (`d4d566a71`) — already merged into docs/features-update; its strings are listed there
 
-### feat/theme-dark (`ced0c2db9`) — already merged into feat/guide-scenarios; its strings are listed there
+### feat/theme-dark (`ced0c2db9`) — already merged into docs/features-update; its strings are listed there
 
-### fix/elevation-override (`515322bc3`) — already merged into feat/guide-scenarios; its strings are listed there
+### fix/elevation-override (`515322bc3`) — already merged into docs/features-update; its strings are listed there
 
 ### fix/units-revert (`1653542a4`) — adds no English strings
 
-### fix/zero-demand-solve (`fbfbc28b6`) — already merged into feat/guide-scenarios; its strings are listed there
+### fix/zero-demand-solve (`fbfbc28b6`) — already merged into docs/features-update; its strings are listed there
 
-### merge/1016e (`e756bcc29`) — already merged into feat/hover-props; its strings are listed there
+### merge/1016e (`fe4fd5f32`) — already merged into docs/features-update; its strings are listed there
