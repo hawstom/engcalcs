@@ -96,50 +96,46 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-16 (twenty-fourth session, late evening, Arizona time)
+## STATE — 2026-10-17 (twenty-fourth session, overnight, Arizona time)
 
-### Master f1b1dd1f7 (pushed 10-16, suite green). Production: b7c99102 (10-09) when last read; ask, About box
+### Master: see the last pushed SHA in the morning report. Production: b7c99102 (10-09) when last read
 
-Landed on master 10-16 night, on his typed word ("Merge merge/1016e into master"): feat/bentley-interop
-(scenarios and alternatives, Morph, Match/Copy properties, graph bubbles, Manage overrides, Clean map,
-override markers, long press, edit Text in place, Merge upward), feat/theme-dark, feat/basemap-outdoors
-(Topo; privacy.php row "Satellite and topo map imagery"), fix/units-revert (Import EPANET file and a
-refused New project restamped the open project's units: his R-415 Fotobi "units back to US"; Convert as
-now converts Settings > New assets values; Settings > Units SI/US buttons ask first), fix/library-notes,
-his 251 harvested marks, his four plain-sentences changes, obsolete dev files deleted, Tasks 617 714
-781 782 784 789 790 794 801 802 804 805 closed, 809 and 810 opened. Deleted keys: the six
-`lpn_scenario_push_*` (Apply Base values retired, on bentley-interop). Storage told to him: `lpn_theme`,
-`lpn_cleanmap`, `lpn_ovrmarks`, `flyW`/`dockW` in `lpn_smbox`.
+**Tom intends to deploy master on 10-17 WITHOUT a translation sprint**, bentley-interop included. About
+400 English strings then show in English on the other 26 language pages (new Guide chapters, scenario
+manager, theme, topo, six engine strings that on non-English pages still say PRV/PSV/FCV need EPANET).
 
-### Branches awaiting him (pushed; on the Branch previews page, http://localhost:8080/)
+Landed 10-16/17 on his typed words: merge/1016e (bentley-interop, theme-dark, basemap-outdoors,
+units-revert, library-notes), docs features list (librewaternet.org pushed f4acec9; he pulls
+`cd ~/addon_html/librewaternet.org && git pull`), merge/1017 (geojson-import with NAD83 read as WGS 84
+and a note; scenarios-menu: menu order, "Override manager…", Copy upward, "has children" delete messages,
+Fire plus max day preset removed, Project-Scenario.inp export names), merge/1017b (hover-props: the
+card lists the Settings > Labels fields for the asset, formatted by Labels, no Description, opens only
+on the asset itself; native-valves: Task 733 phase 1, PRV/PSV/FCV solve natively within 0.8 mm of
+EPANET, PBV/GPV still route to EPANET; CLAUDE.md rule updated), feat/guide-scenarios (Task 785: every
+Guide chapter rewritten to the code, 146 new English strings, "Example on Net1", no "you").
+Deleted keys: `lpn_scenario_push_*` (6), `lpn_scenario_preset_fire_max_day`, `_tip`, `lpn_sm_copy_base_tip`.
+Storage told to him: `lpn_theme`, `lpn_cleanmap`, `lpn_ovrmarks`, `lpn_smbox` widths; NOT yet told:
+`lpn_paneboxes` (option branch only).
 
-- **feat/hover-props** (8111, Task 773): the hover card lists the Properties box's rows, named, formatted by
-  the label settings; never off-screen; RTL. Row "Show all properties on hover" and the tip are his words.
-  Perry's first pass found it showed only label fields (fixed); a second Perry pass was running at handoff.
-- **feat/guide-scenarios** (8113, Task 785): six User Manual chapters rewritten to the code, 60 new English
-  strings, plus his "count of overrides" in `lpn_scncmp_menu_tip`. Not yet merged with master f1b1dd1f7.
-- **feat/scenarios-menu** (8114): Scenarios menu reordered to his sketch (managers, Basic mode, line,
-  commands, line, scenario list). Names unchanged; CC proposed "Override manager..." for Manage overrides,
-  awaiting him. He likes "Basic mode" if the order cures the Basic/Base misclick.
-- **docs/features-update** (8112 serves `~/webdev/lwn-features-preview`, a librewaternet.org worktree on
-  branch `features-update`, Task 810): the public feature list restructured to his 15 notes (pointer rows
-  `- see <heading>|`, Analyses and Scenarios sections, Premium as pointers). PUBLIC CLAIMS: needs his OK
-  line by line. Open: pipe split has no closed ID of its own (folded into the chain line).
-- **feat/geojson-import** (8108, Task 728): Beta marker "Beta: feedback requested", Shapes tip names both
-  doors. Awaits his merge word and his NAD83 call (CC recommends: read as WGS 84 with a report note).
+### Branches awaiting him
+
+- **option/pane-boxes** (8115, Task 799): Tables and Graphs as dockable boxes; right-click a pane tab >
+  "Open in a box". New key `lpn_paneboxes`. Perry's three findings were being fixed at handoff (Profile
+  path choosing in a box, a new box covering the tab strip, Ctrl+Shift+PageUp/Down). He tries it before
+  any merge.
 
 ### Questions out to him
 
-- Bubbles after Merge upward (Fotobi EPS -> Base): CC says by design (the child inherits after a merge);
-  does he want a "copy upward" too?
-- Task 800: keep J-NE-S-3's equal override? Task 681: the node shed's re-fits.
-- Port 8202 (epanet-plus-plus.org) never reaches jasmine from his browser though 81xx does; it is also
-  served on 8109. He says he is always on ssh; the cause is on his forward list, not asked further.
+- His `lpn_sm_help` lacks Copy upward and the has-children delete reason: CC proposed two sentences.
+- Hover card: Flow has no unit on the card because the label settings give none ("Use units" tick).
+- Bubbles after Merge upward: by design; he wants Copy upward (built). Task 800, 681 as before.
+- Port 8202 never reaches jasmine from his browser; epanet-plus-plus.org is also on 8109.
 
 ### Next job
 
-His passes on the five branches above. Then Task 785's remaining chapters, Task 809 at the next sprint
-(needs his approval), and Declan's New junction without a canvas click (design question open).
+His deploy; his pass on option/pane-boxes; then a translation sprint on his word (Task 809 rides it).
+Guide leftovers: `lpn_guide_text_notes_popup` renders nowhere (delete candidate); `lpn_guide_boxes_autohide`
+and `lpn_hotkeys_menu_def` say "you" but are his ruled text.
 
 ### Traps met 2026-10-16 (twenty-fourth session)
 
