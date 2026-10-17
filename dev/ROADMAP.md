@@ -167,8 +167,8 @@ the block.
   `.inp`, waits on finding one. Presentation never travels through a Bentley file (Bentley keeps
   display in the `.wtg`); the project file is its only home.
 - 100|785| **Rewrite the Guide's chapters to the Find and replace model.**
-  **PROMOTED TO 100, 2026-10-14.** Rewritten on `feat/guide-scenarios` (2026-10-16), each with a `user-guide-*-harness.js`: Scenario manager (the Scenarios chapter), Scenario comparison, Libraries, Properties, Settings, Using the user manual.
-  Still audited only (`dev/user-guide-audit.md`, its order): Toolbar, Menus, Map, Screenshot, Tables, Boxes, Fire flow, Critical assets, Demand scaling, Pump energy, Contour, Run report, Status changes, Full report, Calibration, Notes, Guide.
+  **PROMOTED TO 100, 2026-10-14.** Rewritten on `feat/guide-scenarios` (2026-10-16 and 17), each with a `user-guide-*-harness.js`: every chapter of the audit except Screenshot (Scenario manager, Scenario comparison, Libraries, Properties, Settings, Using the user manual, Toolbar, Menus, Map, Tables, Boxes, Fire flow, Critical assets, Demand scaling, Pump energy, Contour, Run report, Status changes, Full report, Calibration, Notes, the user manual's own entry).
+  Still audited only (`dev/user-guide-audit.md`): Screenshot. Awaits Tom's browser pass and the merge.
   Split from Task 763 on its close, 2026-10-11.
 - 100|800| **A tidy list and count of one scenario's own overrides.** **BUILT on `feat/bentley-interop`** (override-audit merged in 2026-10-15, with Tom's wording and a List overrides row on the Scenarios menu, greyed at 0).
   Tom, 2026-10-15, on Fotobi's "1-hr drain w pump off" (24 overrides vs its siblings' 23): *"I don't know how to see a tidy list of overrides to audit ... that count seems inflated ... I should see the count of only the present overrides, not the inherited overrides. I count 13 diameter overrides, 1 text override, and 2 calculation overrides."* Also his screenshot note: tanks show the amber circle while their overrides are only in the parent. Review R-386.

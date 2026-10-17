@@ -10,6 +10,19 @@ the code contradicts, and (c) one engineering example of why the feature matters
 
 Function names are in `js/looped-network.js` unless another file is named.
 
+## Chapters rewritten on `feat/guide-scenarios` (2026-10-16 and 2026-10-17)
+
+Each has a `dev/lpn-spike/user-guide-<chapter>-harness.js` that reads every quoted interface name from
+the language file, measures the numbers on Net1, and checks a page in Spanish. Rewritten: Scenario
+manager, Scenario comparison, Libraries, Properties, Settings, Using the user manual, Toolbar, Menus,
+Map, Tables, Boxes, Fire flow, Critical assets, Demand scaling, Pump energy, Contour, Run report, Status
+changes, Full report, Calibration, Notes, and the user manual's own entry. Still audited only:
+Screenshot. Contradictions the rewrite corrected on 2026-10-17: the Notes pump curve note told the reader
+to enter points on the pump, which the Libraries now own; the solver note did not say the built-in
+solver exists; the color note did not say a scenario shows Base's boundaries; the user manual's entry
+said Ctrl+K works from anywhere (not while a question is open) and listed three contents where it has
+nine sections.
+
 ## The rewrite pattern (Find and replace)
 
 What makes a chapter a step better, as applied to Find and replace:
