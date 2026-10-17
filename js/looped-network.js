@@ -42568,15 +42568,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// the .inp's FILE line in the system code page, so a name outside it (Café-Ñandú-水) can leave
 	// EPANET looking for a file that is not there. Accents come off (NFD, combining marks dropped),
 	// anything else becomes a dash, and a name with no letter or digit left is "backdrop". The .inp
-	// and the .zip keep the project's own name; only what the FILE line names has to survive ANSI.
+	// and the .zip keep the project's own name (and the scenario's, inpExportBaseName()); only what
+	// the FILE line names has to survive ANSI.
 	function asciiPictureBase(name) {
 		var s = String(name || '');
 		if (s.normalize) { s = s.normalize('NFD').replace(/[̀-ͯ]/g, ''); }
 		s = s.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/-{2,}/g, '-').replace(/^[-.]+|[-.]+$/g, '');
 		return /[A-Za-z0-9]/.test(s) ? s : 'backdrop';
 	}
+	// **AN EXPORT FROM A SCENARIO NAMES THE SCENARIO** (Tom, 2026-10-16: *"Scenario export to EPANET:
+	// Do we append the project name with the name of the scenario?"*): `<project>-<scenario>`, each
+	// part made safe on its own, so a long project name cannot cut the scenario off. Base, the
+	// drawing itself, keeps the project name alone. The .zip and the picture follow.
+	function inpExportBaseName() {
+		var base = safeFileName(projectDisplayName(project)), scn = activeScenario();
+		if (!scn || scn.isBase) { return base; }
+		return base + '-' + safeFileName(scenarioDisplayName(scn));
+	}
 	function exportInpFile() {
-		var pcX = EngCalcs.pageConfig || {}, base = safeFileName(projectDisplayName(project)),
+		var pcX = EngCalcs.pageConfig || {}, base = inpExportBaseName(),
 			picBase = asciiPictureBase(base);
 		saveToStorage();   // export what is on screen, including edits not yet saved
 		// Every name goes in by split/join, never String.replace(): a project named `a$&b {file}`
