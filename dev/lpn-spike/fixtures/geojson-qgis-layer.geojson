@@ -1,0 +1,9 @@
+{"type":"FeatureCollection","name":"qgis","crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:OGC:1.3:CRS84"}},"features":[
+{"type":"Feature","id":1,"properties":{"fid":1,"NAME":"J-A","ELEV_M":"250.75","BASEDEM":"3.20","KIND":"reservoir"},"geometry":{"type":"Point","coordinates":[-112,33.5,812.4]}},
+{"type":"Feature","id":2,"properties":{"fid":2,"NAME":"J-B","ELEV_M":null,"BASEDEM":"0.00"},"geometry":{"type":"Point","coordinates":[-111.99,33.5]}},
+{"type":"Feature","id":3,"properties":{"fid":3,"NAME":"J-B","ELEV_M":"248.5","BASEDEM":"1,5"},"geometry":{"type":"Point","coordinates":[-111.98,33.5]}},
+{"type":"Feature","id":4,"properties":{"fid":4,"NAME":"J-D","ELEV_M":"  251 ","BASEDEM":"2e-1"},"geometry":{"type":"Point","coordinates":[-111.99,33.49]}},
+{"type":"Feature","properties":{"fid":10,"PIPE":"P1","DIA_IN":"8.00","DIA_MM":null,"LEN_M":"912.30","CVAL":"120"},"geometry":{"type":"LineString","coordinates":[[-112,33.5],[-111.995,33.5005],[-111.99,33.5]]}},
+{"type":"Feature","properties":{"fid":11,"PIPE":"P2","DIA_IN":"6","LEN_M":"","CVAL":"110"},"geometry":{"type":"MultiLineString","coordinates":[[[-111.99,33.5],[-111.985,33.5]],[[-111.985,33.5],[-111.98,33.5]]]}},
+{"type":"Feature","properties":{"fid":12,"PIPE":"P3","DIA_IN":"8","CVAL":"120"},"geometry":{"type":"LineString","coordinates":[[-111.99,33.5],[-111.99,33.49]]}},
+{"type":"Feature","properties":{"fid":13,"PIPE":"P4","DIA_IN":"4","CVAL":"120"},"geometry":{"type":"LineString","coordinates":[[-111.98,33.5],[-111.99,33.495]]}}]}

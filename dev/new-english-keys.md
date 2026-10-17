@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**59 still to read on master**, of 59 untranslated keys, of 2696 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**65 still to read on master**, of 65 untranslated keys, of 2702 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -199,7 +199,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
-## lpn_  (59, 59 to read @@ NEEDS RULING)
+## lpn_  (65, 65 to read @@ NEEDS RULING)
 
 - **`lpn_file_import_gjnet`**
   > Import GeoJSON network…
@@ -243,8 +243,11 @@ never edits a synonym.
 - **`lpn_gjnet_note_default_elev`**
   > These nodes state no elevation and have the default elevation, {value}.
   @@ NEEDS RULING
+- **`lpn_gjnet_note_default_elev_added`**
+  > These junctions were added at line ends and have the default elevation, {value}, because no node in the file states an elevation.
+  @@ NEEDS RULING
 - **`lpn_gjnet_note_default_k`**
-  > These pipes state no minor loss coefficient and have the default, {value}.
+  > These pipes state no minor loss coefficient, so each has 0, as in an EPANET file that states none.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_default_roughness`**
   > These pipes state no roughness and have the default roughness, {value}.
@@ -252,8 +255,14 @@ never edits a synonym.
 - **`lpn_gjnet_note_default_tank`**
   > These tanks have the default water depths and tank diameter.
   @@ NEEDS RULING
+- **`lpn_gjnet_note_demand_kept`**
+  > A reservoir or tank has no demand, so the demand stated on these nodes was kept as the custom property {key}.
+  @@ NEEDS RULING
 - **`lpn_gjnet_note_demand_rows`**
   > These junctions had more than one demand row. A GeoJSON file holds only the first, which was imported.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_elev_taken`**
+  > These nodes state no elevation. Each was given the elevation of the node shown in parentheses: for a junction added at a line end, the node at the other end of its pipe, otherwise the nearest node that states one.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_end_moved`**
   > These pipes have an end within {tol} of a point or another line end, but not on it. The end was joined to it; the largest distance is {dist}.
@@ -277,7 +286,7 @@ never edits a synonym.
   > These features state no valid ID and were assigned the ID shown in parentheses.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_junction_added`**
-  > These junctions were added where a line end is not within {tol} of a point. Each has the default elevation and base demand.
+  > These junctions were added where a line end is not within {tol} of a point. Each has the default base demand.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_length_auto`**
   > These pipes state no length. Each length is computed from the line (Auto).
@@ -318,6 +327,9 @@ never edits a synonym.
 - **`lpn_gjnet_note_skip_position`**
   > Not imported: a position is not a valid latitude and longitude.
   @@ NEEDS RULING
+- **`lpn_gjnet_note_skip_short`**
+  > Not imported: a line needs at least two positions.
+  @@ NEEDS RULING
 - **`lpn_gjnet_note_unmapped_demand`**
   > No field was chosen for the base demand, so every junction has the default base demand, {value}.
   @@ NEEDS RULING
@@ -325,13 +337,16 @@ never edits a synonym.
   > No field was chosen for the diameter, so every pipe has the default diameter, {value}.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_unmapped_elev`**
-  > No field was chosen for the elevation, so every node has the default elevation, {value}.
+  > No field was chosen for the elevation, so every node has the default elevation, {value}, and automatic lengths include no elevation difference.
   @@ NEEDS RULING
-- **`lpn_gjnet_note_unmapped_id`**
-  > No field was chosen for the ID, so every element was assigned an ID.
+- **`lpn_gjnet_note_unmapped_id_line`**
+  > No field was chosen for the line ID, so every pipe was assigned an ID.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_unmapped_id_point`**
+  > No field was chosen for the point ID, so every node imported from a point was assigned an ID.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_unmapped_k`**
-  > No field was chosen for the minor loss coefficient, so every pipe has the default, {value}.
+  > No field was chosen for the minor loss coefficient, so every pipe has 0, as in an EPANET file that states none.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_unmapped_length`**
   > No field was chosen for the length, so every pipe length is computed from the line (Auto).
@@ -378,12 +393,15 @@ never edits a synonym.
 - **`lpn_gjnet_tolerance_tip`**
   > A line end within this distance of a point, or of another line end, is joined to it. A line end farther than this from every point gets a new junction.
   @@ NEEDS RULING
+- **`lpn_gjnet_working`**
+  > Importing {file}…
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**722 still to read**, of 725 new keys across 20 unmerged branch(es).
+**728 still to read**, of 731 new keys across 18 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -394,8 +412,6 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-1016c (`cc73b6242`) — adds no English strings
-
 ### chore/plain-sentences (`307c6a742`) — adds no English strings
 
 ### feat/basemap-outdoors (`2a45b1cc2`) — 1 new, 1 to read @@ NEEDS RULING
@@ -404,7 +420,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show outdoors map
   @@ NEEDS RULING
 
-### feat/bentley-interop (`9b9f74f33`) — 174 new, 174 to read @@ NEEDS RULING
+### feat/bentley-interop (`5b59c746e`) — 180 new, 180 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -481,6 +497,21 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_morph_tip`**
   > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its location, its connections, and every value the new type also has. In Base the asset itself is changed, and you are asked first if any value would be lost. In any other scenario the new type is an override in that scenario only, and the values only the new type has start from Settings > New assets.
   @@ NEEDS RULING
+- **`lpn_ovl_bubble_moved`**
+  > {quantity}, moved or resized
+  @@ NEEDS RULING
+- **`lpn_ovl_bubble_off`**
+  > Not on the map
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_all`**
+  > Clear all overrides
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_all_ask`**
+  > Clear all the overrides ({n}) of {name}? Each value returns to the inherited value. Undo reverses this.
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_selected`**
+  > Clear selected overrides
+  @@ NEEDS RULING
 - **`lpn_ovl_col_inherited`**
   > Inherited value
   @@ NEEDS RULING
@@ -494,7 +525,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > {category}: {alternative}
   @@ NEEDS RULING
 - **`lpn_ovl_note`**
-  > These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Click an ID to go to the asset on the map.
+  > These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Clear an override to restore the inherited value; Undo reverses it. Select an ID to go to the asset on the map.
+  @@ NEEDS RULING
+- **`lpn_ovl_pick_tip`**
+  > Select this override for the Clear selected overrides button.
   @@ NEEDS RULING
 - **`lpn_ovl_same`**
   > (same)
@@ -503,7 +537,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Equal to the inherited value. It is still an override, and it is counted.
   @@ NEEDS RULING
 - **`lpn_ovl_title`**
-  > Overrides: {name}
+  > Manage overrides: {name}
   @@ NEEDS RULING
 - **`lpn_ovm_child_ask`**
   > Clear child overrides ({n} total)?
@@ -827,13 +861,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Scenario {name}
   @@ NEEDS RULING
 - **`lpn_sm_list_overrides`**
-  > List overrides
+  > Manage overrides
   @@ NEEDS RULING
 - **`lpn_sm_list_overrides_none`**
   > This scenario has no overrides.
   @@ NEEDS RULING
 - **`lpn_sm_list_overrides_tip`**
-  > List the scenario's overrides by category, each with the inherited value it overrides.
+  > List the scenario's overrides by category, each with the inherited value it overrides, and clear any of them.
   @@ NEEDS RULING
 - **`lpn_sm_make_current`**
   > Make current
@@ -931,7 +965,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/geojson-import (`526455d7c`) — adds no English strings
+### feat/geojson-import (`381185bb0`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -2604,8 +2638,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_tsb_resize`**
   > Drag to resize
   @@ NEEDS RULING
-
-### fix/merge-1016 (`0f6e3e23f`) — adds no English strings
 
 ### fix/zero-demand-solve (`fbfbc28b6`) — 3 new, 3 to read @@ NEEDS RULING
 

@@ -40168,9 +40168,12 @@ var EngCalcs = EngCalcs || {};
 		}
 		function row(kind, f) {
 			var tr = document.createElement('tr'), td, sel, usel, r = { kind: kind, field: f.name };
-			td = document.createElement('td'); td.textContent = f.name; td.style.paddingRight = '8px'; tr.appendChild(td);
-			td = document.createElement('td'); td.textContent = String(f.sample).slice(0, 24); td.style.paddingRight = '8px'; tr.appendChild(td);
-			td = document.createElement('td');
+			// Each cell names its column (data-label), which the narrow layout shows in place of the
+			// heading row (css/engcalcs.css, .lpn-gjnet-table).
+			td = document.createElement('td'); td.className = 'lpn-gjnet-field'; td.textContent = f.name; td.style.paddingRight = '8px'; tr.appendChild(td);
+			td = document.createElement('td'); td.textContent = String(f.sample).slice(0, 24); td.style.paddingRight = '8px';
+			td.setAttribute('data-label', pc.lpn_gjnet_col_example || 'Example'); tr.appendChild(td);
+			td = document.createElement('td'); td.setAttribute('data-label', pc.lpn_gjnet_col_fills || 'Fills');
 			sel = document.createElement('select');
 			sel.setAttribute('data-field', f.name);
 			sel.setAttribute('aria-label', f.name);
@@ -40185,6 +40188,7 @@ var EngCalcs = EngCalcs || {};
 			td = document.createElement('td');
 			usel = document.createElement('select');
 			usel.setAttribute('data-gjnet-unit', f.name);
+			td.setAttribute('data-label', pc.lpn_gjnet_col_unit || 'Unit');
 			usel.setAttribute('aria-label', (pc.lpn_gjnet_col_unit || 'Unit') + ': ' + f.name);
 			td.appendChild(usel); tr.appendChild(td);
 			r.sel = sel; r.usel = usel;
@@ -40279,7 +40283,19 @@ var EngCalcs = EngCalcs || {};
 		try { seedDefaultInputs(); out = settings.defaults; } finally { settings.defaults = keep; }
 		return out;
 	}
+	// **A LARGE LAYER TAKES SECONDS TO OPEN** (6,589 features, about 9 s, measured 2026-10-16), and
+	// almost none of it is the import: building the network takes under 0.1 s; the rest is opening
+	// a project of that size (label placement, drawing, the first solve), the same cost an `.inp`
+	// of that size pays. So the notice says what is happening, and the work starts after the
+	// browser has painted it (two frames), or the notice would appear only when it was over.
 	function finishGeoJsonNet(scan, fileName, choice, done) {
+		var pc = EngCalcs.pageConfig || {};
+		setNotice((pc.lpn_gjnet_working || 'Importing {file}…').replace('{file}', fileName));
+		function run() { finishGeoJsonNetNow(scan, fileName, choice, done); }
+		if (typeof requestAnimationFrame === 'function') { requestAnimationFrame(function () { setTimeout(run, 0); }); }
+		else { setTimeout(run, 0); }
+	}
+	function finishGeoJsonNetNow(scan, fileName, choice, done) {
 		var before = readUnitSelections(), net, units, changed, defaults, saved, id, name;
 		if (scan.ours) {
 			net = EngCalcs.lpnGeoJsonNetBuild(scan, { prefixes: settings.idPrefixes, method: settings.method || 'hw' });
@@ -40383,23 +40399,28 @@ var EngCalcs = EngCalcs || {};
 			'skip-loop': ['lpn_gjnet_note_skip_loop', 'Not imported: both ends of the line join the same node.'],
 			'id-new': ['lpn_gjnet_note_id_new', 'These features state no valid ID and were assigned the ID shown in parentheses.'],
 			'id-dup': ['lpn_gjnet_note_id_dup', 'These IDs are stated by more than one feature of the same kind. Each later feature was assigned the ID shown in parentheses.'],
-			'unmapped-id': ['lpn_gjnet_note_unmapped_id', 'No field was chosen for the ID, so every element was assigned an ID.'],
+			'unmapped-id-point': ['lpn_gjnet_note_unmapped_id_point', 'No field was chosen for the point ID, so every node imported from a point was assigned an ID.'],
+			'unmapped-id-line': ['lpn_gjnet_note_unmapped_id_line', 'No field was chosen for the line ID, so every pipe was assigned an ID.'],
+			'skip-short': ['lpn_gjnet_note_skip_short', 'Not imported: a line needs at least two positions.'],
+			'elev-taken': ['lpn_gjnet_note_elev_taken', 'These nodes state no elevation. Each was given the elevation of the node shown in parentheses: for a junction added at a line end, the node at the other end of its pipe, otherwise the nearest node that states one.'],
+			'default-elev-added': ['lpn_gjnet_note_default_elev_added', 'These junctions were added at line ends and have the default elevation, {value}, because no node in the file states an elevation.'],
+			'demand-kept': ['lpn_gjnet_note_demand_kept', 'A reservoir or tank has no demand, so the demand stated on these nodes was kept as the custom property {key}.'],
 			'parts': ['lpn_gjnet_note_parts', 'These multipart lines have parts that are not connected and were imported as one pipe for each part.'],
 			'parts-points': ['lpn_gjnet_note_parts_points', 'These multipoint features were imported as one node for each point.'],
-			'junction-added': ['lpn_gjnet_note_junction_added', 'These junctions were added where a line end is not within {tol} of a point. Each has the default elevation and base demand.'],
+			'junction-added': ['lpn_gjnet_note_junction_added', 'These junctions were added where a line end is not within {tol} of a point. Each has the default base demand.'],
 			'end-moved': ['lpn_gjnet_note_end_moved', 'These pipes have an end within {tol} of a point or another line end, but not on it. The end was joined to it; the largest distance is {dist}.'],
 			'end-on-pipe': ['lpn_gjnet_note_end_on_pipe', 'These line ends lie on the pipe shown in parentheses, but not at its end, and are not connected to it.'],
 			'z-ignored': ['lpn_gjnet_note_z', 'These points state a third coordinate, which was not imported.'],
 			'default-elev': ['lpn_gjnet_note_default_elev', 'These nodes state no elevation and have the default elevation, {value}.'],
-			'unmapped-elev': ['lpn_gjnet_note_unmapped_elev', 'No field was chosen for the elevation, so every node has the default elevation, {value}.'],
+			'unmapped-elev': ['lpn_gjnet_note_unmapped_elev', 'No field was chosen for the elevation, so every node has the default elevation, {value}, and automatic lengths include no elevation difference.'],
 			'default-demand': ['lpn_gjnet_note_default_demand', 'These junctions state no base demand and have the default base demand, {value}.'],
 			'unmapped-demand': ['lpn_gjnet_note_unmapped_demand', 'No field was chosen for the base demand, so every junction has the default base demand, {value}.'],
 			'default-diameter': ['lpn_gjnet_note_default_diameter', 'These pipes state no diameter and have the default diameter, {value}.'],
 			'unmapped-diameter': ['lpn_gjnet_note_unmapped_diameter', 'No field was chosen for the diameter, so every pipe has the default diameter, {value}.'],
 			'default-roughness': ['lpn_gjnet_note_default_roughness', 'These pipes state no roughness and have the default roughness, {value}.'],
 			'unmapped-roughness': ['lpn_gjnet_note_unmapped_roughness', 'No field was chosen for the roughness, so every pipe has the default roughness, {value}.'],
-			'default-k': ['lpn_gjnet_note_default_k', 'These pipes state no minor loss coefficient and have the default, {value}.'],
-			'unmapped-k': ['lpn_gjnet_note_unmapped_k', 'No field was chosen for the minor loss coefficient, so every pipe has the default, {value}.'],
+			'default-k': ['lpn_gjnet_note_default_k', 'These pipes state no minor loss coefficient, so each has 0, as in an EPANET file that states none.'],
+			'unmapped-k': ['lpn_gjnet_note_unmapped_k', 'No field was chosen for the minor loss coefficient, so every pipe has 0, as in an EPANET file that states none.'],
 			'default-tank': ['lpn_gjnet_note_default_tank', 'These tanks have the default water depths and tank diameter.'],
 			'length-auto': ['lpn_gjnet_note_length_auto', 'These pipes state no length. Each length is computed from the line (Auto).'],
 			'unmapped-length': ['lpn_gjnet_note_unmapped_length', 'No field was chosen for the length, so every pipe length is computed from the line (Auto).'],
@@ -40417,9 +40438,9 @@ var EngCalcs = EngCalcs || {};
 		if (typeof val === 'number' && note.code.indexOf('default-') !== 0 && note.code.indexOf('unmapped-') !== 0) { val = val.toFixed(2) + ' m'; }
 		s = String((t[0] && pc[t[0]]) || t[1]);
 		var unitOf = { elev: 'lpn_u_elevhead', demand: 'lpn_u_flow', diameter: 'lpn_u_diameter', roughness: (settings.method === 'dw' ? 'lpn_u_roughness' : '') };
-		var tgt = note.code.replace(/^(default|unmapped)-/, '');
+		var tgt = note.code.replace(/^(default|unmapped)-/, '').replace(/-added$/, '');
 		if (note.code !== tgt && unitOf[tgt]) { val = v(note.detail) + ' ' + unitLabel(unitOf[tgt]); }
-		return s.replace('{crs}', v(note.detail)).replace('{tol}', tol).replace('{dist}', v(val)).replace('{value}', v(val));
+		return s.replace('{crs}', v(note.detail)).replace('{tol}', tol).replace('{dist}', v(val)).replace('{value}', v(val)).replace('{key}', v(note.detail));
 	}
 	function showGeoJsonNetReport(net, fileName) {
 		var pc = EngCalcs.pageConfig || {}, CAP = 50;

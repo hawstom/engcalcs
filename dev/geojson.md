@@ -132,11 +132,28 @@ built-in one). Harnesses: `dev/lpn-spike/geojson-import-harness.js` (node) and
   dialog) of a point joins it, else of another line end, else a junction is added there. Interior
   positions are bends. A multipart line whose parts meet end to start is one pipe; otherwise one
   pipe per part. A line end lying along another pipe's middle is named, not joined (no split).
-- **Every change is named**: features not imported (not a point or line, bad position, both ends on
-  one node), IDs assigned (blank, invalid, duplicate within a kind), junctions added, ends moved
-  (largest distance), a value that is not a number, a default used (per element, or one line when
-  no field was chosen), fields left out or kept as custom properties, a third coordinate ignored.
-  A pipe with no length is Auto (slope distance along the line).
+- **Every change is named**: features not imported (not a point or line, a line of one position,
+  bad position, both ends on one node), IDs assigned (blank, invalid, duplicate within a kind; with
+  no ID field, one line per kind), junctions added, ends moved (largest distance), a value that is
+  not a number, a default used (per element, or one line when no field was chosen), fields left
+  out or kept as custom properties (each named once), a third coordinate ignored. A pipe with no
+  length is Auto (slope distance along the line).
+- **An elevation the file does not state is taken, never invented** (pre-review 2026-10-16: a 0 under
+  a 250 m reservoir solved at 250 m of pressure). A junction added at a line end takes the
+  elevation of the node at the other end of its pipe, if that one states it; any other node with
+  none takes the nearest node that states one; each is named with its source. With no elevation
+  field chosen every node has the default, so every node is level and every Auto length is the
+  horizontal one, which the report says.
+- **A demand on a reservoir or tank** (a node type field) is kept as the custom property
+  `custom_<field>`, as typed, and named; a reservoir or tank has no demand.
+- **Minor loss is 0 where no field fills it**, as EPANET reads a silent file, and the report says so.
+  The New assets default (a drawing preference) is not used.
+- **A large layer** (6,589 features) takes about 6 to 9 s, almost all of it opening a project of
+  that size (label placement, drawing, the first solve); the build itself is under 0.1 s. The
+  notice says "Importing {file}…" while it works.
+- **Narrow screens**: under 600 px the mapping table becomes one card per field, each cell named.
+- A file starting with a byte order mark is read. **NAD83 (EPSG:4269) is refused** like any other
+  frame that is not CRS84 or EPSG:4326; whether to read it as WGS 84 is Tom's call.
 - **Coordinates.** RFC 7946: WGS 84 longitude and latitude; stored as typed, characters in `tok`.
   A legacy `crs` naming CRS84 or EPSG:4326 is read and named; any other is refused with its name
   and the instruction to export in EPSG:4326. Never guessed, never converted.

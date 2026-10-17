@@ -683,20 +683,20 @@
 	// columns (OBJECTID, Shape_Length, which is in the file's own map units) are never guessed.
 	var GJ_GUESS = {
 		point: [
-			['id', /^(name|id|nodeid|nodename|assetid|facilityid|gisid|junctionid|label)$/],
-			['nodeType', /^(nodetype|epanettype|elementtype)$/],
-			['elev', /^(elevation|elev|z|groundelevation|groundelev|grndelev|gndelev|elevft|elevm|elevationft|elevationm)$/],
-			['demand', /^(basedemand|demand|avgdemand|averagedemand|demandgpm|demandlps)$/],
-			['desc', /^(description|desc|comment|comments|notes|note)$/]
+			['id', /^(name|id|nodeid|nodename|node|assetid|asset|facilityid|facid|gisid|junctionid|junction|hydrantid|label|tag)$/],
+			['nodeType', /^(nodetype|epanettype|elementtype|kind)$/],
+			['elev', /^(elevation|elev|el|z|ground|groundelevation|groundelev|grndelev|gndelev|grelev|surfelev|elevft|elevm|elevationft|elevationm|elft|elm)$/],
+			['demand', /^(basedemand|basedem|demand|dem|avgdemand|averagedemand|avgdem|demandgpm|demandlps|demgpm|demlps|bdemand)$/],
+			['desc', /^(description|desc|comment|comments|notes|note|remarks)$/]
 		],
 		line: [
-			['id', /^(name|id|pipeid|pipename|linkid|assetid|facilityid|gisid|label)$/],
-			['diameter', /^(diameter|diam|dia|size|pipesize|nomdiam|nomdia|nominaldiameter|diameterin|diameterinch|diammm|diameterinmm|diain|diamin)$/],
-			['roughness', /^(roughness|rough|cfactor|hwc|hazenc|hazenwilliamsc|c)$/],
-			['length', /^(length|len|pipelength|lengthft|lengthm)$/],
+			['id', /^(name|id|pid|pipe|pipeid|pipeno|pipenum|pipename|linkid|link|mainid|assetid|asset|facilityid|facid|gisid|label|tag)$/],
+			['diameter', /^(diameter|diam|dia|size|pipesize|pipediam|pipedia|nomdiam|nomdia|nomsize|nominaldiameter|diameterin|diameterinch|diametermm|diammm|diamin|diain|diamm|sizein|sizemm)$/],
+			['roughness', /^(roughness|rough|cfactor|cval|cvalue|hwc|hwcoef|hwcfactor|hazen|hazenc|hazenwilliamsc|c)$/],
+			['length', /^(length|len|pipelength|pipelen|lengthft|lengthm|lenft|lenm)$/],
 			['k', /^(minorloss|minorlosscoefficient|mloss|k|km)$/],
 			['status', /^(status|initialstatus)$/],
-			['desc', /^(description|desc|comment|comments|notes|note)$/]
+			['desc', /^(description|desc|comment|comments|notes|note|remarks)$/]
 		]
 	};
 	// A unit stated at the end of a field name (`diam_in`, `elev_ft`, `demand_lps`), for each family.
@@ -725,9 +725,10 @@
 					rule = GJ_GUESS[kind][i];
 					if (!taken[rule[0]] && rule[1].test(key)) { g = rule[0]; break; }
 				}
-				// A numeric target wants numbers; a column of text is kept rather than misread.
+				// A numeric target wants numbers: guessed where at least half the values stated are
+				// numbers (a stray "1,5" is then named in the report); a column of text is kept.
 				var tg = EngCalcs.lpnGeoJsonNetTargets[kind].filter(function (t) { return t.id === g; })[0];
-				if (tg && tg.family && !f.numeric) { g = 'custom'; tg = null; }
+				if (tg && tg.family && !(f.numbers && f.numbers * 2 >= f.count)) { g = 'custom'; tg = null; }
 				if (g !== 'custom') { taken[g] = true; }
 				out[kind][f.name] = g;
 				if (tg && tg.family) {
@@ -773,13 +774,17 @@
 	};
 
 	function gjNotes() {
-		var list = [], at = {};
+		var list = [], at = {}, seen = {};
 		return {
 			list: list,
 			add: function (code, id, detail) {
 				var n = at[code];
-				if (!n) { n = at[code] = { code: code, ids: [], detail: detail === undefined ? '' : detail }; list.push(n); }
-				if (id !== undefined && id !== null) { n.ids.push(String(id)); }
+				if (!n) { n = at[code] = { code: code, ids: [], detail: detail === undefined ? '' : detail }; list.push(n); seen[code] = {}; }
+				// Each name once: a field or a pattern is named by every feature that carries it.
+				if (id !== undefined && id !== null && !Object.prototype.hasOwnProperty.call(seen[code], String(id))) {
+					seen[code][String(id)] = 1;
+					n.ids.push(String(id));
+				}
 				return n;
 			}
 		};
@@ -890,7 +895,8 @@
 		links = links.map(function (q) {
 			var pr = q.pr, g = q.f.geometry, cs, from = text(pr, 'start_node_name'), to = text(pr, 'end_node_name'),
 				a = nodeById[from], b = nodeById[to], lk, verts = [], i, p, first, last;
-			if (!g || g.type !== 'LineString' || !Array.isArray(g.coordinates) || g.coordinates.length < 2) { notes.add('skip-geometry', q.label); return null; }
+			if (!g || g.type !== 'LineString' || !Array.isArray(g.coordinates)) { notes.add('skip-geometry', q.label); return null; }
+			if (g.coordinates.length < 2) { notes.add('skip-short', q.label); return null; }
 			if (!a || !b) { notes.add('skip-no-node', q.label); return null; }
 			if (!gjIdOk(q.label) || linkIds[q.label]) { notes.add('skip-id', q.label); return null; }
 			cs = g.coordinates;
@@ -970,7 +976,8 @@
 			tol = (typeof opts.tolerance === 'number' && opts.tolerance >= 0) ? opts.tolerance : 0.5,
 			pre = opts.prefixes || {}, nodes = [], links = [], custom = {}, used = {}, nodeIds = {}, linkIds = {},
 			counts = { junction: 0, reservoir: 0, tank: 0, pipe: 0, pump: 0, valve: 0, shape: 0 },
-			fieldOf = { point: {}, line: {} }, zCount = [], minted = { J: 0, L: 0 }, lat0 = 0, nLat = 0;
+			fieldOf = { point: {}, line: {} }, zCount = [], minted = { J: 0, L: 0 }, lat0 = 0, nLat = 0,
+			noElev = [], demandKept = [];
 		if (scan.crsNamed) { notes.add('crs-named', null, scan.crsNamed); }
 		['point', 'line'].forEach(function (kind) {
 			Object.keys(map[kind] || {}).forEach(function (field) {
@@ -1056,12 +1063,21 @@
 				id = idFor('point', ps.length > 1 ? {} : q.pr, q.label + (ps.length > 1 ? '/' + (k + 1) : ''), 'J', nodeIds);
 				nd = { id: id, type: type, x: p.lon, y: p.lat, tok: { x: p.tok.x, y: p.tok.y } };
 				if (typeof p.z === 'number') { zCount.push(id); }
-				numInto('point', 'elev', q.pr, nd, 'elev', id);
-				fill(nd, 'elev', d.nodeElev === undefined ? 0 : d.nodeElev, 'default-elev', id);
+				// A node with no elevation is settled after the pipes are built (below), from its neighbours.
+				if (!numInto('point', 'elev', q.pr, nd, 'elev', id)) { noElev.push(nd); }
 				if (type === 'junction') {
 					numInto('point', 'demand', q.pr, nd, '_demand', id);
 					fill(nd, '_demand', d.demand === undefined ? 0 : d.demand, 'default-demand', id);
-				} else if (type === 'tank') {
+				} else if (fieldOf.point.demand && !gjBlank(q.pr[fieldOf.point.demand])) {
+					// A reservoir or tank has no demand; the value is kept, as typed, and named.
+					var dk = gjCustomKey(fieldOf.point.demand);
+					nd['_' + dk] = gjText(q.pr[fieldOf.point.demand]);
+					custom[dk] = custom[dk] || { letters: {}, label: fieldOf.point.demand };
+					custom[dk].letters[GJ_TYPE_LETTER[type]] = 1;
+					demandKept.push(id);
+					notes.add('demand-kept', null, dk);
+				}
+				if (type === 'tank') {
 					nd._level = d.tankLevel; nd.minLevel = d.tankMinLevel; nd.maxLevel = d.tankMaxLevel; nd.tankDiameter = d.tankDiameter;
 					notes.add('default-tank', id);
 				}
@@ -1109,8 +1125,9 @@
 				return hit.node;
 			}
 			nd = { id: mint('J'), type: 'junction', x: p.lon, y: p.lat, tok: { x: p.tok.x, y: p.tok.y }, auto: true,
-				elev: d.nodeElev === undefined ? 0 : d.nodeElev, _demand: d.demand === undefined ? 0 : d.demand };
+				_demand: d.demand === undefined ? 0 : d.demand };
 			nodeIds[nd.id] = 1;
+			noElev.push(nd);
 			nodes.push(nd); addToGrid(nd); added.push(nd.id); counts.junction++;
 			return nd;
 		}
@@ -1122,7 +1139,7 @@
 				if (!Array.isArray(raw[i])) { notes.add('skip-position', q.label); return; }
 				pts = [];
 				for (k = 0; k < raw[i].length; k++) { p = gjPos(raw[i][k]); if (!p) { notes.add('skip-position', q.label); return; } pts.push(p); }
-				if (pts.length < 2) { notes.add('skip-geometry', q.label); return; }
+				if (pts.length < 2) { notes.add('skip-short', q.label); return; }
 				// A part that starts exactly where the last one ended continues it (one pipe).
 				part = parts[parts.length - 1];
 				if (part && part[part.length - 1].lon === pts[0].lon && part[part.length - 1].lat === pts[0].lat) {
@@ -1145,7 +1162,9 @@
 				fill(lk, '_roughness', d.roughness, 'default-roughness', id);
 				if (!numInto('line', 'length', q.pr, lk, '_length', id)) { lk.lenAuto = true; notes.add('length-auto', id); }
 				numInto('line', 'k', q.pr, lk, '_k', id);
-				fill(lk, '_k', d.k === undefined ? 0 : d.k, 'default-k', id);
+				// 0 where the file is silent, as EPANET reads a silent [PIPES] row; never the New
+				// assets default, which is a drawing preference, not a statement about this pipe.
+				fill(lk, '_k', 0, 'default-k', id);
 				if (fieldOf.line.status && !gjBlank(q.pr[fieldOf.line.status])) {
 					var sv = String(gjText(q.pr[fieldOf.line.status])).trim().toLowerCase();
 					if (/^(closed|close|c|0|false|no)$/.test(sv)) { lk._status = 'closed'; }
@@ -1188,12 +1207,61 @@
 				}
 			});
 		}
+		// ---- an elevation the file does not state is taken from a node that states one ----
+		// An added line-end junction takes the elevation of a pipe neighbour that states one (the
+		// other end of its pipe); any other node, and a junction with no such neighbour, takes the
+		// nearest node that states one. Named, with the node it came from. With no elevation field
+		// chosen, or none stated, every node keeps the default.
+		var hasElev = {}, statedList = [];
+		nodes.forEach(function (n) { if (typeof n.elev === 'number') { hasElev[n.id] = n; statedList.push(n); } });
+		if (noElev.length && statedList.length) {
+			var adj = {}, EC = 200, eg = {}, eMinI = Infinity, eMaxI = -Infinity, eMinJ = Infinity, eMaxJ = -Infinity;
+			links.forEach(function (l) { (adj[l.from] = adj[l.from] || []).push(l.to); (adj[l.to] = adj[l.to] || []).push(l.from); });
+			statedList.forEach(function (n) {
+				var i = Math.floor(n.x * MX / EC), j = Math.floor(n.y * MY / EC), k = gkey(i, j);
+				(eg[k] = eg[k] || []).push(n);
+				eMinI = Math.min(eMinI, i); eMaxI = Math.max(eMaxI, i); eMinJ = Math.min(eMinJ, j); eMaxJ = Math.max(eMaxJ, j);
+			});
+			var nearestStated = function (n) {
+				var ci = Math.floor(n.x * MX / EC), cj = Math.floor(n.y * MY / EC), best = null, bd = Infinity, r, i, j, list, k, dd,
+					maxR = Math.max(Math.abs(ci - eMinI), Math.abs(ci - eMaxI), Math.abs(cj - eMinJ), Math.abs(cj - eMaxJ)) + 1;
+				for (r = 0; r <= maxR; r++) {
+					for (i = ci - r; i <= ci + r; i++) {
+						for (j = cj - r; j <= cj + r; j++) {
+							if (Math.max(Math.abs(i - ci), Math.abs(j - cj)) !== r) { continue; }
+							list = eg[gkey(i, j)];
+							if (!list) { continue; }
+							for (k = 0; k < list.length; k++) {
+								dd = Math.pow(list[k].x * MX - n.x * MX, 2) + Math.pow(list[k].y * MY - n.y * MY, 2);
+								if (dd < bd) { bd = dd; best = list[k]; }
+							}
+						}
+					}
+					// Every node in a ring beyond r is at least r cells away.
+					if (best && Math.sqrt(bd) <= r * EC) { break; }
+				}
+				return best;
+			};
+			var taken = notes.add('elev-taken');
+			noElev.forEach(function (n) {
+				var src = null;
+				if (n.auto) { (adj[n.id] || []).some(function (o) { if (hasElev[o]) { src = hasElev[o]; return true; } return false; }); }
+				src = src || nearestStated(n);
+				n.elev = src.elev;
+				if (src.tok && src.tok.elev) { (n.tok = n.tok || {}).elev = src.tok.elev; }
+				taken.ids.push(n.id + ' (' + src.id + ')');
+			});
+		} else {
+			noElev.forEach(function (n) { fill(n, 'elev', d.nodeElev === undefined ? 0 : d.nodeElev, n.auto ? 'default-elev-added' : 'default-elev', n.id); });
+		}
+		if (demandKept.length) { notes.list.forEach(function (x) { if (x.code === 'demand-kept') { x.ids = demandKept; } }); }
 		nodes.forEach(function (n) { delete n.auto; });
 		if (added.length) { notes.add('junction-added').ids = added; }
 		if (moved.length) { notes.add('end-moved', null, maxMove).ids = moved; }
 		if (onPipe.length) { notes.add('end-on-pipe').ids = onPipe; }
 		if (zCount.length) { notes.add('z-ignored').ids = zCount; }
-		if ((pointFeats.length && !fieldOf.point.id) || (lineFeats.length && !fieldOf.line.id)) { notes.add('unmapped-id'); }
+		if (pointFeats.length && !fieldOf.point.id) { notes.add('unmapped-id-point'); }
+		if (lineFeats.length && !fieldOf.line.id) { notes.add('unmapped-id-line'); }
 		if (!fieldOf.line.length) { notes.list.forEach(function (x) { if (x.code === 'length-auto') { x.code = 'unmapped-length'; x.ids = []; } }); }
 		['elev', 'demand', 'diameter', 'roughness', 'k'].forEach(function (t) {
 			var kind = (t === 'elev' || t === 'demand') ? 'point' : 'line';
@@ -1202,11 +1270,16 @@
 				var n = null;
 				notes.list.forEach(function (x) { if (x.code === 'default-' + t) { n = x; } });
 				if (n) { n.code = 'unmapped-' + t; n.ids = []; }
+				if (t === 'elev') {
+					// The added junctions have the same default, so one line says it for every node.
+					notes.list.forEach(function (x) { if (x.code === 'default-elev-added') { if (n) { x.code = '_drop'; } else { x.code = 'unmapped-elev'; x.ids = []; n = x; } } });
+				}
 			}
 		});
 		if (fieldOf.point.custom || fieldOf.line.custom) {
 			(fieldOf.point.custom || []).concat(fieldOf.line.custom || []).forEach(function (f) { notes.add('field-custom', f); });
 		}
+		for (var di = notes.list.length - 1; di >= 0; di--) { if (notes.list[di].code === '_drop') { notes.list.splice(di, 1); } }
 		return {
 			ok: true, ours: false, nodes: nodes, links: links, shapes: [], patterns: [], curves: [],
 			customProps: gjCustomDefs(custom), units: opts.units || null, method: opts.method || 'hw',
@@ -1222,7 +1295,8 @@
 	 */
 	function readJson(text) {
 		try {
-			return { ok: true, value: JSON.parse(String(text), function (key, value, ctx) {
+			// A byte order mark is not JSON text (RFC 8259 section 8.1 lets a reader ignore it).
+			return { ok: true, value: JSON.parse(String(text).replace(/^\uFEFF/, ''), function (key, value, ctx) {
 				if (typeof value === 'number') {
 					return new Num(value, (ctx && typeof ctx.source === 'string') ? ctx.source : String(value));
 				}

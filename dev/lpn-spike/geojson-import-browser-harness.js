@@ -60,6 +60,23 @@ const FIXTURE = fs.readFileSync(path.join(REPO, 'dev', 'lpn-spike', 'fixtures', 
 // project by the page's own solve, and the EPANET options a GeoJSON file does not hold (the report
 // says so) move its last digit. Every input is compared, byte for byte.
 const RESULT = /"(head|pressure|demand|flowrate|headloss|unit_headloss|velocity)":("[^"]*"|[-+0-9.eE]+),?/g;
+const QGIS = fs.readFileSync(path.join(REPO, 'dev', 'lpn-spike', 'fixtures', 'geojson-qgis-layer.geojson'));
+// The pre-reviewer's large layer, made here rather than stored (1 MB): a 55 by 55 grid of points
+// 0.001 degree apart, every row joined west to east and the first eleven columns north to south.
+function bigGrid() {
+	const f = [];
+	for (let i = 0; i < 55; i++) {
+		for (let j = 0; j < 55; j++) {
+			f.push({ type: 'Feature', properties: { ID: 'N' + i + '_' + j, EL: String(300 + i), D: '0.5' },
+				geometry: { type: 'Point', coordinates: [+(-112 + 0.001 * j).toFixed(3), +(33 + 0.001 * i).toFixed(3)] } });
+		}
+	}
+	let k = 0;
+	const at = (i, j) => [+(-112 + 0.001 * j).toFixed(3), +(33 + 0.001 * i).toFixed(3)];
+	for (let i = 0; i < 55; i++) { for (let j = 0; j < 54; j++) { f.push({ type: 'Feature', properties: { PID: 'P' + (k++), DIA: '200', C: '120' }, geometry: { type: 'LineString', coordinates: [at(i, j), at(i, j + 1)] } }); } }
+	for (let j = 0; j < 11; j++) { for (let i = 0; i < 54; i++) { f.push({ type: 'Feature', properties: { PID: 'P' + (k++), DIA: '200', C: '120' }, geometry: { type: 'LineString', coordinates: [at(i, j), at(i + 1, j)] } }); } }
+	return JSON.stringify({ type: 'FeatureCollection', features: f });
+}
 const featuresOf = (t) => t.slice(t.indexOf('\n"features":')).replace(RESULT, '').replace(/,}/g, '}');
 
 function helpers(a) {
@@ -180,7 +197,7 @@ async function main() {
 			await P.$eval('#lpn_gjnet_tolerance', (i) => i.parentNode.title) === await L('lpn_gjnet_tolerance_tip'));
 		// The user's choices: DIAM_MM fills the diameter, in mm; LEN is left out.
 		await P.selectOption('table[data-kind="line"] select[data-field="DIAM_MM"]', 'diameter');
-		ok('a field chosen as the diameter shows the diameter units, on the project unit', await unit('line', 'DIAM_MM') === 'in');
+		ok('DIAM_MM is guessed the diameter, its unit mm from its name', await sel('line', 'DIAM_MM') === 'diameter' && await unit('line', 'DIAM_MM') === 'mm');
 		await P.selectOption('table[data-kind="line"] select[data-gjnet-unit="DIAM_MM"]', 'mm');
 		await P.selectOption('table[data-kind="line"] select[data-field="LEN"]', 'skip');
 		// One field per property: choosing PIPE_ID's property for MATERIAL hands PIPE_ID back to custom.
@@ -188,8 +205,17 @@ async function main() {
 		ok('one field per property: a second field taking the ID makes the first a custom property', await sel('line', 'PIPE_ID') === 'custom');
 		await P.selectOption('table[data-kind="line"] select[data-field="PIPE_ID"]', 'id');
 		ok('...and taking it back makes the second one a custom property again', await sel('line', 'MATERIAL') === 'custom');
+		// Every notice the page puts up from here on, so the one shown during the work can be read.
+		await P.evaluate(() => {
+			window.__gjNotices = [];
+			const n = document.getElementById('lpn_map_notice');
+			new MutationObserver(() => { if (n.style.display !== 'none' && n.textContent) { window.__gjNotices.push(n.textContent); } })
+				.observe(n, { childList: true, characterData: true, subtree: true, attributes: true });
+		});
 		await a.dialogClick(await L('lpn_library_import_go'));
 		d = await a.waitDialog(4000);
+		const said = await P.evaluate(() => window.__gjNotices);
+		ok('while it works, the notice says it is importing the file', said.indexOf((await L('lpn_gjnet_working')).replace('{file}', 'water_assets.geojson')) >= 0, JSON.stringify(said));
 		const items = await P.$$eval('#lpn_gjnet_report li', (ls) => ls.map((li) => ({ code: li.getAttribute('data-code'), text: li.textContent })));
 		const item = (c) => items.find((i) => i.code === c);
 		ok('the report opens after Import', !!d && items.length > 5, JSON.stringify(items.map((i) => i.code)));
@@ -213,11 +239,13 @@ async function main() {
 		ok('HY-1: elevation 1203.50 as typed, OWNER as a custom property', N['HY-1'].elev === 1203.5 && N['HY-1'].tok.elev === '1203.50' && N['HY-1']._custom_OWNER === 'City');
 		ok('M-1 joins HY-1 to HY-2, 150.0 mm as typed, with one bend', Lk['M-1'] && Lk['M-1'].from === 'HY-1' && Lk['M-1'].to === 'HY-2' && Lk['M-1']._diameter === 150 &&
 			Lk['M-1'].tok._diameter === '150.0' && Lk['M-1'].verts.length === 1, JSON.stringify(Lk['M-1']));
-		// M-2 runs 0.01 degree of latitude (3640 ft) from HY-2 (1201.25 ft) down to a junction added at
-		// the default elevation 0: the slope distance, as every Auto length is measured.
-		const h2 = 0.01 * 110574 / 0.3048, want2 = Math.sqrt(h2 * h2 + 1201.25 * 1201.25);
-		ok('a pipe with no length is Auto, the slope distance along its line (M-2 about ' + Math.round(want2) + ' ft)',
-			Lk['M-2'].lenAuto === true && Math.abs(Lk['M-2']._length - want2) < 15, String(Lk['M-2']._length));
+		// M-2 runs 0.01 degree of latitude (about 3640 ft) from HY-2 (1201.25 ft) to a junction added at
+		// its far end, which takes HY-2's elevation: level, so the Auto length is the horizontal one.
+		const h2 = 0.01 * 110574 / 0.3048;
+		ok('the junction added at M-2\'s end has HY-2\'s elevation, 1201.25', N[Lk['M-2'].to].elev === 1201.25, JSON.stringify(N[Lk['M-2'].to]));
+		ok('a pipe with no length is Auto, here level, so the horizontal length (M-2 about ' + Math.round(h2) + ' ft)',
+			Lk['M-2'].lenAuto === true && Math.abs(Lk['M-2']._length - h2) < 15, String(Lk['M-2']._length));
+		ok('every imported pipe has minor loss 0', doc.links.every((l) => l._k === 0));
 		ok('the OWNER design is in the project settings', (doc.settings.customProps || []).some((p) => p.key === 'custom_OWNER' && p.label === 'OWNER'));
 		const tabs = await a.tabs();
 		ok('the new project is the current tab', tabs.some((t) => t.current && t.label.indexOf('water_assets') >= 0), JSON.stringify(tabs.map((t) => t.label)));
@@ -239,6 +267,77 @@ async function main() {
 		ok('the menu row has its tip', await P.evaluate(() => !!(window.EngCalcs.pageConfig || {}).lpn_file_import_gjnet_tip));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
+
+		console.log('\n--- 5. no elevation field: every node level, every Auto length horizontal ---');
+		{
+			const b = await open(browser), hb = helpers(b), Pb = hb.P;
+			await b.newProject('us'); await b.dismissGallery().catch(() => {}); await hb.settle(400);
+			await hb.importVia({ name: 'qgis.geojson', mimeType: 'application/geo+json', buffer: QGIS });
+			await b.waitDialog(4000);
+			await Pb.selectOption('table[data-kind="point"] select[data-field="ELEV_M"]', 'skip');
+			await b.dialogClick(await b.lang('lpn_library_import_go'));
+			const rd = await b.waitDialog(8000);
+			const unm = (await b.lang('lpn_gjnet_note_unmapped_elev'));
+			ok('the report says every node has the default elevation and Auto lengths include no elevation difference',
+				!!rd && rd.text.indexOf(unm.split('{value}')[0]) >= 0 && rd.text.indexOf(unm.split('{value}')[1]) >= 0, rd && rd.text.slice(0, 300));
+			await b.dialogClick(await b.lang('lpn_dialog_ok'));
+			const dq = (await hb.stored()).doc, nq = {};
+			dq.nodes.forEach((n) => { nq[n.id] = n; });
+			const p3 = dq.links.find((l) => l.id === 'P3');
+			// P3 runs 0.01 degree of latitude due south at 33.5 degrees: horizontal, one hundredth of a
+			// meridian degree there (111132.954 - 559.822 cos 2phi + 1.175 cos 4phi m), in the project
+			// length unit (LEN_M made it metres).
+			const ph = 33.495 * Math.PI / 180, mdeg = 111132.954 - 559.822 * Math.cos(2 * ph) + 1.175 * Math.cos(4 * ph);
+			const want3 = 0.01 * mdeg / (dq.units.lpn_u_length === 'ft' ? 0.3048 : 1);
+			ok('all nodes share one elevation, and P3\'s Auto length is the horizontal ' + want3.toFixed(1) + ' ' + dq.units.lpn_u_length,
+				new Set(dq.nodes.map((n) => n.elev)).size === 1 && p3.lenAuto === true && Math.abs(p3._length - want3) < want3 * 0.002, String(p3._length));
+			ok('the reservoir J-A keeps the demand 3.20 as a custom property', nq['J-A'].type === 'reservoir' && nq['J-A']._custom_BASEDEM === '3.20');
+			ok('no uncaught page errors', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
+			await b.close();
+		}
+
+		console.log('\n--- 6. a phone, 390 px: every column of the mapping table on screen ---');
+		{
+			const c = await Session.open(browser, NAME, { viewport: { width: 390, height: 780 } });
+			await c.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com|nominatim/, (route) => route.abort());
+			await c.goto('Looped-Network.php');
+			await c.answerTrainingPanel().catch(() => {});
+			await c.page.evaluate(() => { const e = document.getElementById('ec-consent'); if (e) { e.remove(); } delete window.lpnDialogAnswerer; });
+			await c.settle(1000);
+			await c.newProject('us'); await c.dismissGallery().catch(() => {});
+			await helpers(c).importVia({ name: 'qgis.geojson', mimeType: 'application/geo+json', buffer: QGIS });
+			await c.waitDialog(4000);
+			const boxes = await c.page.$$eval('table.lpn-gjnet-table select', (ss) => ss.filter((x) => x.style.display !== 'none')
+				.map((x) => { const r = x.getBoundingClientRect(); return { f: x.getAttribute('data-field') || 'unit:' + x.getAttribute('data-gjnet-unit'), l: r.left, r: r.right, w: r.width }; }));
+			const off = boxes.filter((b2) => b2.l < 0 || b2.r > 390 || b2.w < 20);
+			ok('every Fills and Unit select is within the 390 px screen (' + boxes.length + ')', boxes.length > 10 && !off.length, JSON.stringify(off.slice(0, 4)));
+			ok('...the DIA_IN unit among them', boxes.some((b2) => b2.f === 'unit:DIA_IN'));
+			await c.close();
+		}
+
+		console.log('\n--- 7. a 6,589-feature layer: the working notice, and the time it takes ---');
+		{
+			const e = await open(browser), he = helpers(e), Pe = he.P;
+			await e.newProject('si'); await e.dismissGallery().catch(() => {}); await he.settle(400);
+			await he.importVia({ name: 'grid.geojson', mimeType: 'application/geo+json', buffer: Buffer.from(bigGrid()) });
+			await e.waitDialog(10000);
+			await Pe.evaluate(() => {
+				window.__gjNotices = [];
+				const n = document.getElementById('lpn_map_notice');
+				new MutationObserver(() => { if (n.style.display !== 'none' && n.textContent) { window.__gjNotices.push(n.textContent); } })
+					.observe(n, { childList: true, characterData: true, subtree: true, attributes: true });
+			});
+			const t0 = Date.now();
+			await e.dialogClick(await e.lang('lpn_library_import_go'));
+			const rep2 = await e.waitDialog(120000);
+			const ms = Date.now() - t0;
+			console.log('        (6,589 features: ' + ms + ' ms from Import to the report)');
+			const said2 = await Pe.evaluate(() => window.__gjNotices);
+			ok('the working notice is up while it works', said2[0] === (await e.lang('lpn_gjnet_working')).replace('{file}', 'grid.geojson'), JSON.stringify(said2.slice(0, 2)));
+			ok('3,025 nodes and 3,564 pipes arrive', !!rep2 && rep2.text.indexOf('3025') >= 0 && rep2.text.indexOf('3564') >= 0, rep2 && rep2.text.slice(0, 160));
+			ok('no uncaught page errors', e.errors.length === 0, e.errors.slice(0, 2).join(' | '));
+			await e.close();
+		}
 	} finally {
 		await browser.close();
 		env.stopServer();

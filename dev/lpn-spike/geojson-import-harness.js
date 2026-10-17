@@ -176,8 +176,8 @@ const FOREIGN = fs.readFileSync(ROOT + 'dev/lpn-spike/fixtures/geojson-utility-l
 	ok('guessed by name: FACILITYID the ID, ELEV_FT the elevation, DEMAND the demand, OWNER kept',
 		g.point.FACILITYID === 'id' && g.point.ELEV_FT === 'elev' && g.point.DEMAND === 'demand' && g.point.OWNER === 'custom', JSON.stringify(g.point));
 	ok('ELEV_FT is guessed in feet from its name; DEMAND takes the project unit', g.units['point:ELEV_FT'] === 'fth2o' && g.units['point:DEMAND'] === 'lps', JSON.stringify(g.units));
-	ok('PIPE_ID the ID, C the roughness; DIAM_MM is not all numbers, so it is not guessed a diameter',
-		g.line.PIPE_ID === 'id' && g.line.C === 'roughness' && g.line.DIAM_MM === 'custom' && g.line.MATERIAL === 'custom', JSON.stringify(g.line));
+	ok('PIPE_ID the ID, C the roughness; DIAM_MM (four numbers and "6 inch") is guessed the diameter, in mm from its name',
+		g.line.PIPE_ID === 'id' && g.line.C === 'roughness' && g.line.DIAM_MM === 'diameter' && g.units['line:DIAM_MM'] === 'mm' && g.line.MATERIAL === 'custom', JSON.stringify(g.line));
 	// The user's choices: DIAM_MM is the diameter in mm, LEN is not imported.
 	g.line.DIAM_MM = 'diameter'; g.line.LEN = 'skip';
 	const units = { lpn_u_elevhead: 'fth2o', lpn_u_flow: 'lps', lpn_u_diameter: 'mm', lpn_u_length: 'm' };
@@ -204,6 +204,9 @@ const FOREIGN = fs.readFileSync(ROOT + 'dev/lpn-spike/fixtures/geojson-utility-l
 	ok('LEN was not imported, as chosen, and the report says so', note('field-skipped') && note('field-skipped').ids.join() === 'LEN' && !('_length' in L['M-1'] && L['M-1'].lenAuto === false));
 	ok('no length field: every pipe is Auto, in one line of the report', L['M-1'].lenAuto === true && note('unmapped-length') && !note('length-auto'));
 	ok('M-2 ends where no point is: one junction is added there', L['M-2'].from === 'HY-2' && N[L['M-2'].to] && note('junction-added').ids.indexOf(L['M-2'].to) >= 0);
+	ok('...and it takes the elevation of HY-2, the other end of its pipe, with its characters, and the report names the source',
+		N[L['M-2'].to].elev === 1201.25 && N[L['M-2'].to].tok.elev === '1201.25' && note('elev-taken').ids.indexOf(L['M-2'].to + ' (HY-2)') >= 0, JSON.stringify(note('elev-taken')));
+	ok('no pipe has the New assets minor loss: no field fills it, so 0, in one line', net.links.every((l) => l._k === 0) && note('unmapped-k') && note('unmapped-k').ids.length === 0);
 	ok('M-3, a multipart line whose parts meet, is one pipe from that junction, with the meeting point a bend',
 		L['M-3'] && L['M-3'].from === L['M-2'].to && L['M-3'].verts.length === 1 && L['M-3'].verts[0].x === -111.885, JSON.stringify(L['M-3']));
 	ok('M-3 states no roughness: the default 100, named', L['M-3']._roughness === 100 && note('default-roughness').ids.indexOf('M-3') >= 0);
@@ -229,9 +232,66 @@ const FOREIGN = fs.readFileSync(ROOT + 'dev/lpn-spike/fixtures/geojson-utility-l
 	const net = E.lpnGeoJsonNetBuild(scan, { mapping: none, defaults: { nodeElev: 0, demand: 0, diameter: 200, roughness: 100, k: 0 } });
 	const codes = net.notes.map((n) => n.code);
 	ok('with no field mapped: one line each for the ID, elevation, demand, diameter, roughness, k and length',
-		['unmapped-id', 'unmapped-elev', 'unmapped-demand', 'unmapped-diameter', 'unmapped-roughness', 'unmapped-k', 'unmapped-length'].every((c) => codes.indexOf(c) >= 0) &&
+		['unmapped-id-point', 'unmapped-id-line', 'unmapped-elev', 'unmapped-demand', 'unmapped-diameter', 'unmapped-roughness', 'unmapped-k', 'unmapped-length'].every((c) => codes.indexOf(c) >= 0) &&
 		!codes.some((c) => /^default-(elev|demand|diameter|roughness|k)$/.test(c)), codes.join());
 	ok('...and the IDs made here are J and L numbers', net.nodes.every((n) => /^J\d+$/.test(n.id)) && net.links.every((l) => /^L\d+$/.test(l.id)));
+}
+
+// A QGIS export (the pre-reviewer's layer): text numbers, nulls, a duplicate name, a reservoir with
+// a demand, a 3D point, a multipart line, a line end on the middle of a pipe.
+{
+	console.log('\n2b. A QGIS layer');
+	const scan = E.lpnGeoJsonNetScan(fs.readFileSync(ROOT + 'dev/lpn-spike/fixtures/geojson-qgis-layer.geojson', 'utf8'));
+	const offered = { lpn_u_elevhead: ['fth2o', 'mh2o'], lpn_u_flow: ['gpm', 'lps'], lpn_u_diameter: ['in', 'mm'], lpn_u_length: ['ft', 'm'], lpn_u_roughness: ['ft', 'mm'] };
+	const g = E.lpnGeoJsonNetGuess(scan, { lpn_u_elevhead: 'fth2o', lpn_u_flow: 'gpm', lpn_u_diameter: 'mm', lpn_u_length: 'ft' }, offered);
+	ok('guessed: NAME the ID, ELEV_M the elevation in m, BASEDEM the base demand (one "1,5" among numbers), KIND the node type',
+		g.point.NAME === 'id' && g.point.ELEV_M === 'elev' && g.units['point:ELEV_M'] === 'mh2o' && g.point.BASEDEM === 'demand' && g.point.KIND === 'nodeType', JSON.stringify(g.point));
+	ok('guessed: PIPE the ID, DIA_IN the diameter in in, LEN_M the length in m, CVAL the roughness',
+		g.line.PIPE === 'id' && g.line.DIA_IN === 'diameter' && g.units['line:DIA_IN'] === 'in' && g.line.LEN_M === 'length' && g.units['line:LEN_M'] === 'm' && g.line.CVAL === 'roughness', JSON.stringify(g.line) + JSON.stringify(g.units));
+	ok('the Example is the first value stated, never a null', scan.fields.point.find((f) => f.name === 'ELEV_M').sample === '250.75' && scan.fields.line.find((f) => f.name === 'DIA_MM').sample === '');
+	const net = E.lpnGeoJsonNetBuild(scan, { mapping: g, units: {}, tolerance: 0.5, defaults: { nodeElev: 0, demand: 0, diameter: 200, roughness: 100, k: 2 } });
+	const N = {}, L = {};
+	net.nodes.forEach((n) => { N[n.id] = n; });
+	net.links.forEach((l) => { L[l.id] = l; });
+	const note = (c) => net.notes.find((n) => n.code === c);
+	ok('J-A is a reservoir; its demand 3.20 is kept as the custom property custom_BASEDEM, as typed, and named',
+		N['J-A'].type === 'reservoir' && N['J-A']._custom_BASEDEM === '3.20' && note('demand-kept') && note('demand-kept').ids.join() === 'J-A' && note('demand-kept').detail === 'custom_BASEDEM' &&
+		net.customProps.some((d) => d.key === 'custom_BASEDEM' && d.applies === 'R'), JSON.stringify(note('demand-kept')));
+	ok('J-B states a null elevation: it takes the nearest stated one, named with its source', N['J-B'].elev === 248.5 && note('elev-taken').ids.indexOf('J-B (J1)') >= 0, JSON.stringify(note('elev-taken')));
+	const added = note('junction-added').ids[0];
+	ok('the junction added at P4\'s far end takes the elevation of the node at its other end (J1)', N[added].elev === 248.5 && note('elev-taken').ids.indexOf(added + ' (J1)') >= 0);
+	ok('LEN_M 912.30 is P1\'s length, as typed; a blank LEN_M is Auto', L.P1._length === 912.3 && L.P1.tok._length === '912.30' && L.P1.lenAuto === false && L.P2.lenAuto === true);
+	ok('the 3D point is named', note('z-ignored') && note('z-ignored').ids.join() === 'J-A');
+	ok('every pipe has minor loss 0, as EPANET reads a silent file, not the New assets 2', net.links.every((l) => l._k === 0) && note('unmapped-k'));
+	ok('fid is named once among the custom properties although points and lines both carry it', note('field-custom').ids.filter((x) => x === 'fid').length === 1, note('field-custom').ids.join());
+	ok('every pipe has an ID field, and so do the points: no unmapped-ID line', !note('unmapped-id-point') && !note('unmapped-id-line'));
+}
+// The edge cases: a byte order mark, null geometry, a GeometryCollection, a multipoint, positions
+// that are not positions, a one-position line, a zero-length line, a multipart line apart.
+{
+	const scan = E.lpnGeoJsonNetScan(fs.readFileSync(ROOT + 'dev/lpn-spike/fixtures/geojson-edge-cases.geojson', 'utf8'));
+	ok('a file starting with a byte order mark is read', scan.ok === true, JSON.stringify(scan).slice(0, 100));
+	const g = E.lpnGeoJsonNetGuess(scan, {}, {});
+	const net = E.lpnGeoJsonNetBuild(scan, { mapping: g, tolerance: 0.5, defaults: { nodeElev: 0, demand: 0, diameter: 200, roughness: 100, k: 2 } });
+	const note = (c) => net.notes.find((n) => n.code === c) || { ids: [] };
+	ok('a one-position line: "a line needs at least two positions"', note('skip-short').ids.join() === 'L2');
+	ok('no geometry, a GeometryCollection and an empty MultiPolygon: not a point or a line', note('skip-geometry').ids.join() === 'C,D,P', note('skip-geometry').ids.join());
+	ok('an empty, an out-of-range and a quoted position are named', note('skip-position').ids.join() === 'F,G,H');
+	ok('the zero-length line joins one node to itself and is named', note('skip-loop').ids.join() === 'L3');
+	ok('only lines lack a field mapped for the ID... none here: both kinds map ID', !note('unmapped-id-point').code && !note('unmapped-id-line').code);
+	const lines = E.lpnGeoJsonNetBuild(scan, { mapping: { point: g.point, line: {}, units: {} }, defaults: { nodeElev: 0 } });
+	ok('with no line field chosen as the ID, the report says the pipes, not every element',
+		lines.notes.some((n) => n.code === 'unmapped-id-line') && !lines.notes.some((n) => n.code === 'unmapped-id-point'));
+}
+// No elevation field: every node has the default, said once, and nothing is taken from a neighbour.
+{
+	const scan = E.lpnGeoJsonNetScan(fs.readFileSync(ROOT + 'dev/lpn-spike/fixtures/geojson-qgis-layer.geojson', 'utf8'));
+	const g = E.lpnGeoJsonNetGuess(scan, {}, {});
+	g.point.ELEV_M = 'skip';
+	const net = E.lpnGeoJsonNetBuild(scan, { mapping: g, defaults: { nodeElev: 7, demand: 0 } });
+	const codes = net.notes.map((n) => n.code);
+	ok('no elevation field: every node, added ones too, has the default 7, in one line; none taken',
+		net.nodes.every((n) => n.elev === 7) && codes.indexOf('unmapped-elev') >= 0 && codes.indexOf('elev-taken') < 0 && codes.indexOf('default-elev-added') < 0, codes.join());
 }
 
 // ---- 3. a frame that is not longitude and latitude is refused, never guessed ----------------------
