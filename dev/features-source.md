@@ -70,6 +70,10 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 - 314, 257, 454| Examples from EPANET and others, XY and Lat/Lon, loaded and solved in one click.
 - 145, 276| World map canvas or your own backdrop with friendly positioning options.
 - 476| XY to Lat/Lon conversion import wizard.
+- 696, 641| Convert a copy of a project to another coordinate system and other units, with a wizard that zooms, scales, and rotates your network onto the map; new projects can start in a real EPSG projection.
+- 779, 592| Import points, lines, and polygons from GeoJSON, shapefile, and DXF files as Shapes, and import a list of surveyed points as junctions.
+- 611, 792| Libraries of patterns, curves, controls, rules, pipe types, and fittings, each with a description, and whole libraries copied in from another project file.
+- 776, 793| Export tables to ODS, XLSX, or CSV by table and scenario with the libraries they refer to, copy any table with its headings, and take a screenshot of the map and copy it into a report. Network export to GeoJSON and DXF, and a workspace file that carries your box layout to another screen.
 - 437, 497| Place name search and elevations from map DEM w/ preview.
 
 ## Adding, editing, and displaying assets and results
@@ -83,6 +87,8 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 - 337, 342, 376| Multi-line annotation text objects with bold, rotation w/ pipe match option, and association to assets.
 - 331, 362| Independent size settings for text, symbol, and pipes.
 - 409, 433, 506, 510| HGL profiles with modern path selection and editing.
+- 600, 640| Graphs: time series, profile, contour on the map, frequency distribution, and a flow balance of production against consumption.
+- 637, 784, 804, 795| Time series graphs at the foot of Properties and as bubbles on the map from an asset's right-click menu, including tank depth; the bubbles are a Presentation override.
 
 ## Extended period simulations
 
@@ -92,7 +98,7 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 - 450| EPANET run report.
 - 448| Color limits constant through a simulation, so a color means the same thing at every step.
 - 566| Water quality: age, share from a source, chemical decay.
-- 566.01| Pump energy cost: Run length, power use, and cost including peak demand charge.
+- 566.01, 577| Pump energy report: for each pump, the share of the run it operates, efficiency, average and peak power, energy used, and cost including a peak demand charge.
 
 ## Premium features included for everybody
 
@@ -104,7 +110,9 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 
 
 - 530| Fire flow failure and collateral (design) failure analysis.
+- 751, 754| Criticality, which removes each pipe, pump, and valve in turn and reports the effect, and demand scaling, which finds the largest demand scale the system can carry, both run on a copy of the network.
 - 201, 407, 412, 512| Scenarios: override management and report, scenario comparison report.
+- 750, 765, 755, 801, 802| Alternatives that build on one another, each holding overrides in categories such as Presentation (how the map looks) and Calculation (run time and time step), with ready-made scenarios in every new project and overrides merged upward into the alternative above.
 - 465| Pipe types library: attached a library reference to keep a pipe in sync with the library.
 - 590| Fittings library: attach fittings references to pipes and library pipe types.
 
