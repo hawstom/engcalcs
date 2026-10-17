@@ -1240,11 +1240,7 @@ Code: `smMergeTargets()`, `smOwnContent()`, `smMergePlan()`, `smMergeUpward()` (
 - **Children are said as children.** Delete on an item others inherit from says so
   (`lpn_scenario_delete_has_children` for a scenario, `lpn_sm_alt_delete_has_children` for an
   alternative), naming them; one both used by scenarios and inherited from says both, the use first.
-- **Copy on a Base alternative makes its child** (Tom: *"I should be able to copy a Base as a child.
-  Right?"*). Copy copies an item's overrides; Base holds none (its values are the drawing's), so the
-  copy, `Copy_of_Base`, holds none and inherits every value. Rejected: a child holding every Base value
-  as an override, which would count thousands of overrides equal to their inherited values. A Base of
-  its own (Add base) is a record and is still copied beside itself.
+- **Copy on a Base stays greyed** (Tom, of a child-copy built and removed the same day: *"Not well-planned. Trash the effort. ... I guess that Copy upward is the answer."*).
 - **Copy upward** sits after Merge upward: the same picker, the same skipped-level warning in its own
   words, the same write into the target (`smMergeUpward(..., keep)`), and the source keeps its own
   overrides. One undo step.

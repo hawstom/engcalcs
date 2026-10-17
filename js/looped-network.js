@@ -6263,7 +6263,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (kids.length) {
 			parts.push((isScn ? (pc.lpn_scenario_delete_has_children || 'The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or move them to another parent.')
-				: (pc.lpn_sm_alt_delete_has_children || 'The alternative {name} cannot be deleted while other alternatives inherit from it: {list}. Delete those first, or move them to another parent.'))
+				: (pc.lpn_sm_alt_delete_has_children || 'The alternative {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.'))
 				.split('{name}').join(name).split('{list}').join(kids.map(function (x) { return x.name; }).join(', ')));
 		}
 		return parts.join('\n\n');
@@ -6513,19 +6513,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	// **COPY AN ALTERNATIVE (or a calculation set)**: its own values, as a sibling beside it under the
 	// same parent, named like a scenario copy. Nothing uses the copy until a scenario chooses it.
-	// **A BASE IS COPIED AS ITS CHILD** (Tom, 2026-10-16: *"I should be able to copy a Base as a
-	// child. Right?"*): the tree's Base item has no parent to hold a sibling (a second Base is Add
-	// base). Copy copies an item's overrides, and Base holds none (its values are the drawing's, not
-	// overrides), so the copy is a child holding none, reading every value of Base by inheritance,
-	// named like any copy. A Base of its own (Add base) is a record and is copied beside itself.
 	function smCopyStored(tree, key) {
 		var kind = smKind(tree), src, c, list;
-		if (kind !== 'scn' && smIsBaseKey(tree, key)) {
-			c = createStored(kind, kind === 'calc' ? null : tree, smUniqueName(tree, 'Copy_of_' + smName(tree, key)), null, true);
-			if (!c || c.refused) { return c || treeRefuse('failed'); }
-			touchTree('smCopyStored');
-			return c;
-		}
 		if (kind !== 'scn') { key = smMaterialize(tree, key); }
 		if (key && key.refused) { return key; }
 		src = smRecord(tree, key);
@@ -78098,10 +78087,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			offTip: !valid ? noSel : (pc.lpn_sm_base_named || 'The Base of a tree is not renamed.'),
 			fn: function () { smStartRename(key); } });
 		// **ONE "Copy", ACTING ON WHAT IS SELECTED** (Tom, 2026-10-12): a scenario asks Separate edits
-		// or Share edits; an alternative is copied beside itself, and a Base as its child (smCopyStored()).
+		// or Share edits; an alternative is copied beside itself.
 		out.push({ id: 'copy', label: pc.lpn_sm_copy || 'Copy',
-			tip: isBase && tree !== 'scenarios' ? (pc.lpn_sm_copy_base_tip || 'Copy Base as a child alternative. The copy holds no overrides and inherits every value from Base.') : undefined,
-			off: !valid || tree === 'scenarios',
+			off: !valid || isBase || tree === 'scenarios',
 			offTip: tree === 'scenarios' ? (pc.lpn_scenario_copy_off || 'Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.') : (!valid ? noSel : null),
 			fn: function () { smActCopy(key); } });
 		// **MERGE UPWARD, ON AN ALTERNATIVE THAT HAS A PARENT** (Task 801): not in the Scenarios tree,
@@ -78794,11 +78782,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function smActCopy(key) {
 		var res;
 		if (smState.tree === 'scenarios') { return; }
-		if (key === null || key === undefined) { return; }
+		if (key === null || key === undefined || smIsBaseKey(smState.tree, key)) { return; }
 		res = smTry(function () { return smCopyStored(smState.tree, key); });
 		if (!res || res.refused) { return; }
-		// A Base's copy is its child: open the Base so the copy is seen.
-		if (smIsBaseKey(smState.tree, key)) { smSetCollapsed(smState.tree, key, false); smReveal(smState.tree, key); }
 		smState.sel = res.id;
 		smAfter(true, false);
 	}

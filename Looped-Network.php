@@ -3882,7 +3882,6 @@ EngCalcs.pageConfig = {
 	lpn_sm_none_selected: <?=json_encode($ec_lang['lpn_sm_none_selected'])?>,
 	lpn_sm_base_named: <?=json_encode($ec_lang['lpn_sm_base_named'])?>,
 	lpn_sm_copy: <?=json_encode($ec_lang['lpn_sm_copy'])?>,
-	lpn_sm_copy_base_tip: <?=json_encode($ec_lang['lpn_sm_copy_base_tip'])?>,
 	lpn_sm_merge_up: <?=json_encode($ec_lang['lpn_sm_merge_up'])?>,
 	lpn_sm_merge_up_tip: <?=json_encode($ec_lang['lpn_sm_merge_up_tip'])?>,
 	lpn_sm_merge_up_root: <?=json_encode($ec_lang['lpn_sm_merge_up_root'])?>,

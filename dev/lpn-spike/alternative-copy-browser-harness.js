@@ -1,13 +1,10 @@
-// COPY A BASE AS A CHILD, AND COPY UPWARD, CLICKED IN A REAL CHROMIUM (Tom, 2026-10-16). Run with:
+// COPY UPWARD, CLICKED IN A REAL CHROMIUM (Tom, 2026-10-16). Run with:
 //   node dev/lpn-spike/alternative-copy-browser-harness.js   (takes the browser lock itself)
 //
 // On the crafted Net1 of alternative-merge-upward-browser-harness.js (Physical: Base > A > B > C, B
 // holding pipe 10's diameter, C pipe 10's and junction 22's elevation; scenario "Uses C" naming C):
-//   C1  Copy is live on the Physical tree's Base, its tip saying what it does (Tom: "I should be able
-//       to copy a Base as a child. Right?"); pressed, it adds Copy_of_Base, a child of Base holding no
-//       overrides, shown open under Base and selected; one Ctrl+Z takes it away.
-//   C2  Copy on A still copies beside A (a sibling under A's parent, Base).
-//   U1  "Copy upward" is a button and a right-click row beside Merge upward, greyed on Base, saying why
+//   U1  "Copy upward" is a button and a right-click row beside Merge upward, greyed on Base, saying why,
+//       and Copy is greyed on Base
 //       (Tom: "a Copy upward might be a nice option for the user. They can copy upward and then delete
 //       as they desire.");
 //   U2  pressed on C it asks which ancestor, B, A, Base, Cancel, as Merge upward does;
@@ -103,9 +100,6 @@ async function main() {
 			return t.length ? t.join(' ; ') : null;
 		});
 
-		const copyBtn = () => page.evaluate(() => { const b = document.getElementById('lpn_sm_copy'); return b ? { text: b.textContent, off: b.getAttribute('aria-disabled') === 'true', title: b.title } : null; });
-		const selName = () => page.evaluate(() => { const r = document.querySelector('#lpn_sm_tree .lpn-sm-row[aria-selected="true"] .lpn-sm-name'); return r ? r.textContent : null; });
-		const rowVisible = (name) => rowOf(name).isVisible().catch(() => false);
 		const unblur = () => page.evaluate(() => document.activeElement && document.activeElement.blur && document.activeElement.blur());
 		await page.click('#lpn_scenario_btn');
 		await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
@@ -117,37 +111,6 @@ async function main() {
 		await page.selectOption('#lpn_sm_tree_select', 'physical');
 		await settle(600);
 
-		console.log('--- C1. Copy on Base ---');
-		await flush();
-		const sv0 = await saved();
-		await clickRow(await L('lpn_scenario_base'));
-		let cb = await copyBtn();
-		ok('C1 Copy is live on Base', !!cb && cb.text === (await L('lpn_sm_copy')) && cb.off === false, JSON.stringify(cb));
-		ok('C1 ...its tip says it copies Base as a child', !!cb && cb.title === (await L('lpn_sm_copy_base_tip')), JSON.stringify(cb));
-		await click('#lpn_sm_copy');
-		await flush();
-		let sv = await saved();
-		const made = (sv.alternatives || []).filter((x) => x.category === 'physical' && x.name === 'Copy_of_Base');
-		ok('C1 a new Physical alternative Copy_of_Base, a child of Base (parent null, not a Base of its own)', made.length === 1 && made[0].parent === null && made[0].root !== true, JSON.stringify(made));
-		ok('C1 ...holding no overrides', made.length === 1 && !made[0].values && !made[0].settings, JSON.stringify(made));
-		ok('C1 ...shown in the tree and selected', (await rowVisible('Copy_of_Base')) && (await selName()) === 'Copy_of_Base', JSON.stringify(await selName()));
-		ok('C1 ...and nothing else changed', JSON.stringify((sv.alternatives || []).filter((x) => x.name !== 'Copy_of_Base')) === JSON.stringify(sv0.alternatives), '');
-		await unblur();
-		await page.keyboard.press('Control+z');
-		await flush();
-		ok('C1 one Ctrl+Z takes it away', JSON.stringify((await saved()).alternatives) === JSON.stringify(sv0.alternatives), JSON.stringify((await saved()).alternatives));
-
-		console.log('--- C2. Copy on A ---');
-		await clickRow('A');
-		await click('#lpn_sm_copy');
-		await flush();
-		sv = await saved();
-		const ca = (sv.alternatives || []).filter((x) => x.name === 'Copy_of_A');
-		ok('C2 Copy on A copies beside it, under Base', ca.length === 1 && ca[0].parent === null && ca[0].category === 'physical', JSON.stringify(ca));
-		await unblur();
-		await page.keyboard.press('Control+z');
-		await flush();
-
 		console.log('--- U1. the command ---');
 		const CU = await L('lpn_sm_copy_up');
 		const cuBtn = () => page.evaluate(() => { const b = document.getElementById('lpn_sm_copyup'); return b ? { text: b.textContent, off: b.getAttribute('aria-disabled') === 'true', title: b.title } : null; });
@@ -155,6 +118,8 @@ async function main() {
 		let ub = await cuBtn();
 		ok('U1 the alternatives tree has a "' + CU + '" button, reading exactly "Copy upward"', !!ub && ub.text === CU && CU === 'Copy upward', JSON.stringify(ub));
 		ok('U1 ...greyed on Base, saying why', !!ub && ub.off === true && ub.title === await L('lpn_sm_copy_up_root'), JSON.stringify(ub));
+		// Copy stays greyed on Base (Tom, 2026-10-16, of a copy-as-child built and removed: "I guess that Copy upward is the answer").
+		ok('U1 ...and Copy is greyed on Base', await page.evaluate(() => { const b = document.getElementById('lpn_sm_copy'); return !!b && b.getAttribute('aria-disabled') === 'true'; }));
 		await clickRow('C');
 		ub = await cuBtn();
 		ok('U1 ...live on C, its tip saying C keeps its overrides', !!ub && ub.off === false && ub.title === await L('lpn_sm_copy_up_tip'), JSON.stringify(ub));
@@ -188,7 +153,7 @@ async function main() {
 		ok('U3 ...and, before copying, B and the value it holds', !!q && q.indexOf(skip + '\n' + (await L('lpn_tool_add_pipe')) + ' 10: ' + (await L('lpn_field_diameter'))) > 0, JSON.stringify(q));
 		await press(await L('lpn_dialog_ok'));
 		await flush();
-		sv = await saved();
+		let sv = await saved();
 		ok('U3 A holds C\'s values', (vals(sv, 'a1') || {})['l:10'] && vals(sv, 'a1')['l:10'].diameter === 20 && vals(sv, 'a1')['n:22'].elev === 900, JSON.stringify(vals(sv, 'a1')));
 		ok('U3 ...B is untouched', JSON.stringify(vals(sv, 'a2')) === JSON.stringify({ 'l:10': { diameter: 16 } }), JSON.stringify(vals(sv, 'a2')));
 		ok('U3 ...C keeps its own overrides', JSON.stringify(vals(sv, 'a3')) === JSON.stringify(vals(su0, 'a3')), JSON.stringify(vals(sv, 'a3')));
