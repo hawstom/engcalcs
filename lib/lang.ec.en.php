@@ -2997,6 +2997,11 @@ $ec_lang['lpn_settings_override_marks']='Show override markers on the map';
 $ec_lang['lpn_settings_override_marks_tip']='Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_clean_map']='Clean map';
 $ec_lang['lpn_clean_map_tip']='Checked: the zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.';
+$ec_lang['lpn_settings_theme']='Theme';
+$ec_lang['lpn_settings_theme_tip']='Choose light or dark colors for the page. System follows the setting of your device. The map drawing looks the same in every theme. This is a setting for this browser, not for the project.';
+$ec_lang['lpn_theme_system']='System';
+$ec_lang['lpn_theme_light']='Light';
+$ec_lang['lpn_theme_dark']='Dark';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a

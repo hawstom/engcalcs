@@ -122,6 +122,249 @@
 	--ec-a-255-255-255-85: rgba(255, 255, 255, .85);
 	--ec-a-255-255-255-9: rgba(255, 255, 255, .9);
 	--ec-a-255-255-255-94: rgba(255, 255, 255, .94);
+	/* The one tip: Bootstrap's tooltip, name tips and explanations alike (Task 714). Black with white
+	   text in light, which is what Bootstrap drew; the edge is a ring that costs no size. */
+	--ec-tip-bg: #000;
+	--ec-tip-ink: #fff;
+	--ec-tip-edge: #000;
+	/* The (?) and warning glyphs that open a tip */
+	--ec-help-ink: steelblue;
+}
+/* THE DARK SET (Task 714, Phase 2). It overrides the tokens above and nothing else, so a colour is changed
+   in one place per theme. Two selectors carry the SAME block, because CSS cannot share one: the explicit
+   choice (<html data-theme="dark">) and the operating system's preference when the choice is System
+   (<html data-theme="system">, the default). Both attributes are written by the head script of the
+   looped-network page alone (lib/HeadersFooters.lib.php, window.ecTheme); a page that carries no
+   data-theme stays light under any system, on purpose: the calculator pages keep markup (a light
+   Bootstrap navbar) and the parent site's own stylesheet that are not tokens, so they are not themed
+   yet. An explicit Light is simply the light set. theme_contrast_check.js holds the two blocks identical
+   and every text and surface pair to WCAG AA. The map drawing (paper and ink, chrome_colour_allow.json)
+   is not a token and does not change. */
+:root[data-theme="dark"] {
+	color-scheme: dark;
+	/* Surfaces and text */
+	--ec-bg: #1e1f22;
+	--ec-ink: #d5d8dc;
+	--ec-ink-strong: #e6e8eb;
+	--ec-ink-muted: #b7bbc1;
+	--ec-ink-subtle: #a9aeb5;
+	--ec-ink-black: #fff;
+	/* Rules and borders */
+	--ec-border: #3a3d44;
+	--ec-border-strong: #6b7078;
+	/* Accent: links, outlined buttons, menu bar */
+	--ec-accent: #8ab4f8;
+	--ec-point: #ff6fa3;
+	--ec-accent-hover: #aecbfa;
+	--ec-accent-open: #aecbfa;
+	--ec-accent-hover-bg: #27354d;
+	--ec-accent-open-bg: #31456b;
+	/* Brand blue */
+	--ec-brand: #62b0ea;
+	--ec-brand-hover: #8cc4f2;
+	/* Notice and status */
+	--ec-warn-bg: #3a3318;
+	--ec-warn-border: #b8960f;
+	--ec-warn-ink: #f0a04b;
+	--ec-ok-ink: #6fcf7f;
+	--ec-bad-ink: #ff7b72;
+	--ec-error-ink: #ff8a80;
+	--ec-error-bg: #3d1f1e;
+	--ec-error-bg-soft: #3a2222;
+	--ec-neutral-ink: #a3a8ae;
+	/* Interaction */
+	--ec-hover-bg: #29384f;
+	--ec-hover-border: #6a93c4;
+	--ec-pressed-bg: #35507a;
+	--ec-pressed-border: #7aaadf;
+	--ec-select: #8ab4f8;
+	--ec-select-bg: #26364f;
+	--ec-select-bg-strong: #2f4468;
+	/* Calculator forms and the debug grid */
+	--ec-form-bg: #22262e;
+	--ec-form-border: #7a7ad6;
+	--ec-debug-grid: #5b7cff;
+	/* Neutral greys */
+	--ec-gray-444: #c8cbd0;
+	--ec-gray-767676: #9ba0a7;
+	--ec-gray-777: #a8adb4;
+	--ec-gray-888: #959ba2;
+	--ec-gray-999: #868c93;
+	--ec-gray-aaa: #70757d;
+	--ec-gray-bbb: #6a6f77;
+	--ec-gray-d6d6d6: #444850;
+	--ec-gray-dcdcdc: #41454c;
+	--ec-gray-e0e0e0: #3f434a;
+	--ec-gray-e6e6e6: #383b42;
+	--ec-gray-e8e8e8: #363940;
+	--ec-gray-eaeaea: #34373d;
+	--ec-gray-ececec: #32353b;
+	--ec-gray-eee: #30333a;
+	--ec-gray-f0f0f0: #2c2f34;
+	--ec-gray-f2f2f2: #2a2c31;
+	--ec-gray-f6f6f6: #26282c;
+	--ec-gray-f7f7f7: #25272b;
+	--ec-gray-fafafa: #232528;
+	/* Other hues */
+	--ec-hue-037: #7cb4ef;
+	--ec-hue-05a: #7ab0f0;
+	--ec-hue-0b0080: #b9b4ff;
+	--ec-hue-10304f: #10304f;
+	--ec-hue-12211f: #dfe6e4;
+	--ec-hue-1565c0: #4f9bf0;
+	--ec-hue-17406b: #8ab4e8;
+	--ec-hue-1976d2: #64a8f5;
+	--ec-hue-2a6ebb: #5b93d6;
+	--ec-hue-3c4043: #b0b4ba;
+	--ec-hue-5a6570: #aab2bb;
+	--ec-hue-5f6368: #aeb3b8;
+	--ec-hue-667: #a4a4c4;
+	--ec-hue-8ab: #5d7d94;
+	--ec-hue-b00020: #ff8a9b;
+	--ec-hue-c0392b: #ff7a6a;
+	--ec-hue-d99: #a05a5a;
+	--ec-hue-eae7e0: #2f2d29;
+	--ec-hue-eef1f4: #262b32;
+	--ec-hue-eef3fd: #26324a;
+	--ec-hue-eef4ff: #26324a;
+	--ec-hue-f4d4d4: #4a2b2b;
+	--ec-hue-fdd: #4a2828;
+	--ec-hue-fff3cd: #3b371c;
+	--ec-hue-fff4e5: #44331c;
+	/* Translucent colours */
+	--ec-a-0-0-0-12: rgba(0, 0, 0, .3);
+	--ec-a-0-0-0-18: rgba(0, 0, 0, .4);
+	--ec-a-0-0-0-2: rgba(0, 0, 0, .4);
+	--ec-a-0-0-0-25: rgba(0, 0, 0, .5);
+	--ec-a-0-0-0-3: rgba(0, 0, 0, .5);
+	--ec-a-0-0-0-35: rgba(0, 0, 0, .6);
+	--ec-a-0-0-0-4: rgba(0, 0, 0, .6);
+	--ec-a-6-69-173-12: rgba(138, 180, 248, .16);
+	--ec-a-6-69-173-35: rgba(138, 180, 248, .45);
+	--ec-a-60-64-67-14: rgba(200, 205, 215, .14);
+	--ec-a-60-64-67-5: rgba(200, 205, 215, .5);
+	--ec-map-overlay-bg: rgba(30, 31, 34, .8);
+	--ec-a-255-255-255-85: rgba(30, 31, 34, .95);
+	--ec-a-255-255-255-9: rgba(30, 31, 34, .9);
+	--ec-a-255-255-255-94: rgba(30, 31, 34, .94);
+	--ec-tip-bg: #2b2d33;
+	--ec-tip-ink: #e6e8eb;
+	--ec-tip-edge: #8a9099;
+	--ec-help-ink: #7fb2e0;
+}
+@media (prefers-color-scheme: dark) {
+	:root[data-theme="system"] {
+		color-scheme: dark;
+		/* Surfaces and text */
+		--ec-bg: #1e1f22;
+		--ec-ink: #d5d8dc;
+		--ec-ink-strong: #e6e8eb;
+		--ec-ink-muted: #b7bbc1;
+		--ec-ink-subtle: #a9aeb5;
+		--ec-ink-black: #fff;
+		/* Rules and borders */
+		--ec-border: #3a3d44;
+		--ec-border-strong: #6b7078;
+		/* Accent: links, outlined buttons, menu bar */
+		--ec-accent: #8ab4f8;
+		--ec-point: #ff6fa3;
+		--ec-accent-hover: #aecbfa;
+		--ec-accent-open: #aecbfa;
+		--ec-accent-hover-bg: #27354d;
+		--ec-accent-open-bg: #31456b;
+		/* Brand blue */
+		--ec-brand: #62b0ea;
+		--ec-brand-hover: #8cc4f2;
+		/* Notice and status */
+		--ec-warn-bg: #3a3318;
+		--ec-warn-border: #b8960f;
+		--ec-warn-ink: #f0a04b;
+		--ec-ok-ink: #6fcf7f;
+		--ec-bad-ink: #ff7b72;
+		--ec-error-ink: #ff8a80;
+		--ec-error-bg: #3d1f1e;
+		--ec-error-bg-soft: #3a2222;
+		--ec-neutral-ink: #a3a8ae;
+		/* Interaction */
+		--ec-hover-bg: #29384f;
+		--ec-hover-border: #6a93c4;
+		--ec-pressed-bg: #35507a;
+		--ec-pressed-border: #7aaadf;
+		--ec-select: #8ab4f8;
+		--ec-select-bg: #26364f;
+		--ec-select-bg-strong: #2f4468;
+		/* Calculator forms and the debug grid */
+		--ec-form-bg: #22262e;
+		--ec-form-border: #7a7ad6;
+		--ec-debug-grid: #5b7cff;
+		/* Neutral greys */
+		--ec-gray-444: #c8cbd0;
+		--ec-gray-767676: #9ba0a7;
+		--ec-gray-777: #a8adb4;
+		--ec-gray-888: #959ba2;
+		--ec-gray-999: #868c93;
+		--ec-gray-aaa: #70757d;
+		--ec-gray-bbb: #6a6f77;
+		--ec-gray-d6d6d6: #444850;
+		--ec-gray-dcdcdc: #41454c;
+		--ec-gray-e0e0e0: #3f434a;
+		--ec-gray-e6e6e6: #383b42;
+		--ec-gray-e8e8e8: #363940;
+		--ec-gray-eaeaea: #34373d;
+		--ec-gray-ececec: #32353b;
+		--ec-gray-eee: #30333a;
+		--ec-gray-f0f0f0: #2c2f34;
+		--ec-gray-f2f2f2: #2a2c31;
+		--ec-gray-f6f6f6: #26282c;
+		--ec-gray-f7f7f7: #25272b;
+		--ec-gray-fafafa: #232528;
+		/* Other hues */
+		--ec-hue-037: #7cb4ef;
+		--ec-hue-05a: #7ab0f0;
+		--ec-hue-0b0080: #b9b4ff;
+		--ec-hue-10304f: #10304f;
+		--ec-hue-12211f: #dfe6e4;
+		--ec-hue-1565c0: #4f9bf0;
+		--ec-hue-17406b: #8ab4e8;
+		--ec-hue-1976d2: #64a8f5;
+		--ec-hue-2a6ebb: #5b93d6;
+		--ec-hue-3c4043: #b0b4ba;
+		--ec-hue-5a6570: #aab2bb;
+		--ec-hue-5f6368: #aeb3b8;
+		--ec-hue-667: #a4a4c4;
+		--ec-hue-8ab: #5d7d94;
+		--ec-hue-b00020: #ff8a9b;
+		--ec-hue-c0392b: #ff7a6a;
+		--ec-hue-d99: #a05a5a;
+		--ec-hue-eae7e0: #2f2d29;
+		--ec-hue-eef1f4: #262b32;
+		--ec-hue-eef3fd: #26324a;
+		--ec-hue-eef4ff: #26324a;
+		--ec-hue-f4d4d4: #4a2b2b;
+		--ec-hue-fdd: #4a2828;
+		--ec-hue-fff3cd: #3b371c;
+		--ec-hue-fff4e5: #44331c;
+		/* Translucent colours */
+		--ec-a-0-0-0-12: rgba(0, 0, 0, .3);
+		--ec-a-0-0-0-18: rgba(0, 0, 0, .4);
+		--ec-a-0-0-0-2: rgba(0, 0, 0, .4);
+		--ec-a-0-0-0-25: rgba(0, 0, 0, .5);
+		--ec-a-0-0-0-3: rgba(0, 0, 0, .5);
+		--ec-a-0-0-0-35: rgba(0, 0, 0, .6);
+		--ec-a-0-0-0-4: rgba(0, 0, 0, .6);
+		--ec-a-6-69-173-12: rgba(138, 180, 248, .16);
+		--ec-a-6-69-173-35: rgba(138, 180, 248, .45);
+		--ec-a-60-64-67-14: rgba(200, 205, 215, .14);
+		--ec-a-60-64-67-5: rgba(200, 205, 215, .5);
+		--ec-map-overlay-bg: rgba(30, 31, 34, .8);
+		--ec-a-255-255-255-85: rgba(30, 31, 34, .95);
+		--ec-a-255-255-255-9: rgba(30, 31, 34, .9);
+		--ec-a-255-255-255-94: rgba(30, 31, 34, .94);
+		--ec-tip-bg: #2b2d33;
+		--ec-tip-ink: #e6e8eb;
+		--ec-tip-edge: #8a9099;
+		--ec-help-ink: #7fb2e0;
+	}
 }
 /* ec-colour-tokens:end */
 
@@ -340,13 +583,15 @@ input.ec-spin[type=number] {
    that have to agree. Ticks are box-shadow rather than pseudo-elements so the element stays a
    plain text node for anything measuring the strip's height. */
 .lpn-scalebar {
-	background: rgba(255, 255, 255, .8);
+	/* A panel of chrome over the map: themed (Tom, 2026-10-16: the legend "doesn't respond to Dark"). */
+	background: var(--ec-map-overlay-bg);
+	color: var(--ec-ink);
 	padding: 2px 6px 1px;
 	text-align: center;
 	line-height: 1.3;
-	border-bottom: 2px solid #333;
-	border-left: 1px solid #333;
-	border-right: 1px solid #333;
+	border-bottom: 2px solid var(--ec-ink);
+	border-left: 1px solid var(--ec-ink);
+	border-right: 1px solid var(--ec-ink);
 	box-sizing: border-box;
 	white-space: nowrap;
 	overflow: hidden;
@@ -417,7 +662,7 @@ button > .ec-icon, a > .ec-icon, label > .ec-icon { margin-inline-end: 0.4em; }
 /* Hover-tip icons (⚠, ?) that carry a longer explanation in the title attribute */
 .ec-tip {
 	cursor: help;
-	color: steelblue;
+	color: var(--ec-help-ink);
 	font-size: 0.9em;
 }
 
@@ -455,7 +700,12 @@ button > .ec-icon, a > .ec-icon, label > .ec-icon { margin-inline-end: 0.4em; }
    tall mode never gets a tip wider than its screen. */
 .tooltip {
 	--bs-tooltip-max-width: min(17rem, calc(100vw - 2rem));
+	/* ONE TIP IN BOTH THEMES: Bootstrap inverts its tooltip under data-bs-theme=dark, which made a white box
+	   beside our dark chrome. The colours are tokens, and a 1px ring (no size) gives a tip its edge on white paper. */
+	--bs-tooltip-bg: var(--ec-tip-bg);
+	--bs-tooltip-color: var(--ec-tip-ink);
 }
+.tooltip .tooltip-inner { box-shadow: 0 0 0 1px var(--ec-tip-edge); }
 
 /* **AN EXPLANATION IS OPENED ON PURPOSE, SO IT MAY BE READ, NOT GLIMPSED** (ROADMAP Task 759, Tom
    2026-10-03: "Click the ?, closed by a click elsewhere or Esc"). The tip behind a "?" opens only
@@ -1629,6 +1879,11 @@ html[lang="zh"] .ec-welcome {
 .lpn-menubar-item:focus-visible, #lpn_toolbar button:not(.lpn-transport-btn):focus-visible {
 	outline: 2px solid var(--ec-accent); outline-offset: 2px;
 }
+/* The transport's buttons and its two drop-downs get the same ring (they were left out of the rule above, so
+   they showed the browser's default, dark on grey). Raised so a joined neighbour never covers the ring. */
+#lpn_toolbar_run .lpn-transport-btn:focus-visible, #lpn_toolbar select:focus-visible {
+	outline: 2px solid var(--ec-accent); outline-offset: 2px; position: relative; z-index: 1;
+}
 #lpn_toolbar button:not(.lpn-transport-btn) {
 	background: none; color: inherit; padding: 3px 5px; line-height: 1;
 }
@@ -2262,6 +2517,10 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-examples-h { margin: 0 0 .15em; font-size: 1.35em; font-weight: 600; }
 .lpn-examples-sub { margin: 0 0 .5em; opacity: .75; font-size: .95em; }
 .lpn-examples-msg { margin: 3em auto; max-width: 30em; opacity: .7; }
+/* THE GALLERY'S OWN WORDS LIE DIRECTLY ON THE MAP'S TILES, which no theme changes, so they keep the map's
+   ink in every theme (the cards are a themed panel and carry their own colours). Allow-listed as map ink. */
+.lpn-examples-welcome, .lpn-examples-h, .lpn-examples-sub, .lpn-examples-msg, .lpn-examples-legal { color: #212529; }
+.lpn-examples-legal a { color: #0645ad; }
 /* ONE ROW WHEN THERE IS ROOM, wrapping down when there is not (Tom, 2026-08-14: "There is no
    guarantee that the examples will all fit... Wrapping degrades gracefully. So it might be better
    to put them all in one row initially").
@@ -2310,14 +2569,14 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	margin-bottom: .15em;
 	padding: 2px;
 	box-sizing: border-box;
-	background: var(--ec-bg);
+	background: #fff; /* paper, in both themes */
 	border: 1px solid var(--ec-a-128-128-128-4);
 	border-radius: 3px;
-	color: var(--ec-hue-17406b);
+	color: #17406b; /* the drawing's ink, for currentColor inside the SVG */
 }
 .lpn-example-title { font-weight: 600; font-size: .92em; }
 .lpn-example-desc { font-size: .8em; opacity: .8; line-height: 1.3; }
-.lpn-example-meta { font-size: .75em; opacity: .6; }
+.lpn-example-meta { font-size: .75em; opacity: .7; }
 /* Above the grid, not below it -- see renderExamplesGallery(). */
 .lpn-examples-blank {
 	display: inline-block;
@@ -2327,15 +2586,11 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	padding: .3em;
 	font: inherit;
 	font-size: .9em;
-	color: var(--ec-hue-17406b);
+	color: #17406b; /* on the map's tiles: map ink in every theme */
 	text-decoration: underline;
 	cursor: pointer;
 }
-@media (prefers-color-scheme: dark) {
-	.lpn-example-card { background: rgba(38, 38, 38, .94); color: #eee; }
-	.lpn-examples-blank { color: #8ab4e8; }
-	/* The thumbnail keeps its white paper and its dark ink -- deliberately NOT themed. */
-}
+/* The example thumbnail keeps its white paper and its dark ink in every theme: the drawing is not themed. */
 /* Printing a network should print the network, never the shop window. */
 @media print { #lpn_empty_hint { display: none !important; } }
 /* The gallery's legal row -- this page has no footer, so Privacy/Terms/Cookie settings sit here and
@@ -2377,7 +2632,9 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	z-index: 3;
 	font-size: 0.9em;
 	line-height: 1.4;
-	background: rgba(255, 255, 255, .85);
+	/* A themed panel of chrome over the map; its swatches below are data colours and never change. */
+	background: var(--ec-a-255-255-255-85);
+	color: var(--ec-ink);
 	padding: 4px 8px;
 	pointer-events: none;
 }
@@ -4186,6 +4443,11 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 /* Once tapped it is no longer a control, and it must not keep looking like one: the label is the
    thank-you, so a hover border on it would invite a second press that posts nothing. */
 .lpn-wrong-btn[disabled] { color: var(--ec-ink-muted); cursor: default; border-color: transparent; opacity: 1; }
+/* The standing cell in the bottom strip sits on the map's own paper, not on chrome: map ink in every theme. */
+#lpn_wrong_btn { color: #555; }
+#lpn_wrong_btn .ec-tip { color: #2a5d8a; }
+#lpn_wrong_btn:hover, #lpn_wrong_btn:focus { color: #222; border-color: #bbb; }
+#lpn_wrong_btn[disabled] { color: #555; border-color: transparent; }
 /* ---- The box "Something wrong here?" opens (ROADMAP Task 768), drawn in #lpn_dialog ----
    The picks are toggles (aria-pressed), wrapping onto as many rows as the width needs, so a phone in
    tall mode gets a column of them and a desk gets two rows. A pressed pick wears the toolbar's own
