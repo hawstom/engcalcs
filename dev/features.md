@@ -34,7 +34,7 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - XY to Lat/Lon conversion import wizard. <!-- 476 -->
 - Convert a copy of a project to another coordinate system and other units, with a wizard that zooms, scales, and rotates your network onto the map; new projects can start in a real EPSG projection. <!-- 696, 641 -->
 - Import points, lines, and polygons from GeoJSON, shapefile, and DXF files as Shapes, and import a list of surveyed points as junctions. <!-- 779, 592 -->
-- Libraries of patterns, curves, controls, rules, pipe types, and fittings, each with a description, and whole libraries copied in from another project file. <!-- 611, 792 -->
+- Libraries of patterns, curves, controls, rules, pipe types, and fittings, and whole libraries copied in from another project file. <!-- 611, 792 -->
 - Export tables to ODS, XLSX, or CSV by table and scenario with the libraries they refer to, copy any table with its headings, and take a screenshot of the map and copy it into a report. Network export to GeoJSON and DXF, and a workspace file that carries your box layout to another screen. <!-- 776, 793 -->
 - Place name search and elevations from map DEM w/ preview. <!-- 437, 497 -->
 
