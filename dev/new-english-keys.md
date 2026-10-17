@@ -75,129 +75,9 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED English: 'Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.'
   @@ NEEDS RULING
 
-## Synonym entries to approve  (15, 14 to read @@ NEEDS RULING)
+## Plain sentences to check  (0, none are stale)
 
-**These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
-English string that has since changed, or against a key that no longer exists. Say which: keep it
-as is, change it (a proposal may follow), or remove it. **Your answer on the flag line is the
-written permission** the rule requires; CC then applies it by hand and re-records it. A script
-never edits a synonym.
-
-- **`consent_body`**
-  > May we save a random code in this browser so that we can count how many browsers use each part of this site? The code is made up on the spot, says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first.
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.
-  *Current synonym:* May we save (store, keep, put) a random code (a string of letters and digits chosen by chance) in this browser so that we can count (tally) how many browsers use each part of this site? The code is made up on the spot (created at that moment), says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first.
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`consent_current_granted`**
-  > You allowed this. This browser keeps a random code so that we can count it.
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* You allowed this. We limit logging for this browser profile.
-  *Current synonym:* You allowed this. A random browser code is tracked to minimize duplicate use counts.
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`consent_region_label`**
-  > Your choice about the counting code.
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* Your choice about limiting logging.
-  *Current synonym:* Your choice about the random browser code tracking.
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`ip_is_lateral`**
-  > <span class="ec-help" title="Checked: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* <span class="ec-help" title="Checked: this reach is a segment of the test lateral, from which individual emitters withdraw water. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
-  *Current synonym:* | gloss: lateral, mainline; avoid: "test" read as typical/sample
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`lpn_cp_restrict`**
-  > Restrict these characters
-  *Why stale:* no record of the English it was written against
-  *Current synonym:* Forbid these characters; the opposite of Allow only these characters
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`lpn_cp_restrict_tip`**
-  > Restrict these characters:
-  *Why stale:* no record of the English it was written against
-  *Current synonym:* Forbid these characters; the opposite of Allow only these characters
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`lpn_fb_intro`**
-  > Canned messages (optional). Nothing is sent until you press Send.
-  *Why stale:* no record of the English it was written against
-  *Current synonym:* Ready-made messages; preset choices the visitor can pick instead of typing
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`lpn_ff_selected`**
-  > Selected junctions
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* Selected
-  *Current synonym:* Selected junctions | a pull-down option under Junctions to test; agrees with junctions, plural
-  *Proposed synonym:* Only the selected junctions, The junctions selected on the map | a pull-down option under Junctions to test; agrees with junctions, plural
-  *Why this proposal:* Each could stand in the pull-down row; the old text only repeated the English.
-  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
-  @@ NEEDS RULING
-
-- **`lpn_labels_priority_node_tip`**
-  > The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first. When only one value is left and two labels still overlap, one of them is hidden: the one with the lower demand, with pressure nearer the middle of the range, or with elevation or head more like its neighboring nodes.
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first. When only one value is left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.
-  *Current synonym:* more like neighboring nodes = numerically closer to the neighbors' values | avoid: similar in kind
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  _Ruled 2026-10-05: Is this _syn needed?_
-
-- **`lpn_pane_scn_alt_tip`**
-  > {category} alt.: {alternative}
-  *Why stale:* no record of the English it was written against
-  *Current synonym:* alt. abbreviates alternative (the scenario alternative that holds this override); abbreviate it the way your language abbreviates that word
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`lpn_reports_epanet`**
-  > Run
-  *Why stale:* no record of the English it was written against
-  *Current synonym:* Run, simulation, computation, or calculation report
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`lpn_scenario_push_values`**
-  > Values discarded:
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* Values thrown away:
-  *Current synonym:* Values thrown away, Values discarded, Values lost, Values wiped, Values replaced, Values displaced, Values cleared, Custom values cleared | a count follows this label, not a list of values
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`lpn_snip_tip_mode`**
-  > Snip shape
-  *Why stale:* no record of the English it was written against
-  *Current synonym:* Shape to specify for screenshot
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`rc_Hp`**
-  > <span class="ec-help" title="Ponding (Hp > yn) is desirable because it reduces upstream erosion. (USDA)">Inlet weir head, H<sub>p</sub> <span class="ec-tip">?</span></span>
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* <span class="ec-help" title="Ponding (Hp > yn) is good — reduces upstream erosion. (USDA)">Inlet weir head, H<sub>p</sub> <span class="ec-tip">?</span></span>
-  *Current synonym:* | gloss: weir head
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
-
-- **`rc_yn`**
-  > <span class="ec-help" title="Ponding (Hp > yn) is desirable because it reduces upstream erosion. (USDA)">Normal depth in inlet channel, y<sub>n</sub> <span class="ec-tip">?</span></span>
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* <span class="ec-help" title="Ponding (Hp > yn) is good — reduces upstream erosion. (USDA)">Normal depth in inlet channel, y<sub>n</sub> <span class="ec-tip">?</span></span>
-  *Current synonym:* Enter the normal depth in the channel that delivers flow to this chute. | Upstream, not downstream: ponding reduces erosion UPSTREAM of the chute inlet (above/before it, toward the source). Do not flip the direction.
-  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
-  @@ NEEDS RULING
+Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
 None on master. Every English key here is present in at least one other language.
 
@@ -205,7 +85,7 @@ None on master. Every English key here is present in at least one other language
 
 # Strings waiting on a branch
 
-**187 still to read**, of 190 new keys across 12 unmerged branch(es).
+**793 still to read**, of 796 new keys across 18 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -216,7 +96,1362 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`b34e598bf`) — 174 new, 174 to read @@ NEEDS RULING
+### chore/plain-sentences (`a13bf9df3`) — adds no English strings
+
+### feat/basemap-outdoors (`2a45b1cc2`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_basemap_outdoors_show`**
+  > Show outdoors map
+  @@ NEEDS RULING
+
+### feat/bentley-interop (`34791a202`) — 180 new, 180 to read @@ NEEDS RULING
+
+- **`lpn_alt_cat_calculation`**
+  > Calculation
+  @@ NEEDS RULING
+- **`lpn_alt_cat_presentation`**
+  > Presentation
+  @@ NEEDS RULING
+- **`lpn_alt_cat_topology_tip`**
+  > Asset activation
+  @@ NEEDS RULING
+- **`lpn_change_type_line_alternative`**
+  > {id}: {property} {value}, in alternative {alternative}
+  @@ NEEDS RULING
+- **`lpn_clean_map`**
+  > Clean map
+  @@ NEEDS RULING
+- **`lpn_clean_map_tip`**
+  > Checked: the zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.
+  @@ NEEDS RULING
+- **`lpn_control_inactive_note`**
+  > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
+  @@ NEEDS RULING
+- **`lpn_copy_props_done`**
+  > Copied properties of {id}.
+  @@ NEEDS RULING
+- **`lpn_copy_props_done_ov`**
+  > Copied the overrides of {id} in this scenario.
+  @@ NEEDS RULING
+- **`lpn_copy_props_menu`**
+  > Copy properties
+  @@ NEEDS RULING
+- **`lpn_copy_props_no_overrides`**
+  > No overrides to copy.
+  @@ NEEDS RULING
+- **`lpn_ctx_edit_text`**
+  > Edit text
+  @@ NEEDS RULING
+- **`lpn_ctx_reset_position`**
+  > Reset position
+  @@ NEEDS RULING
+- **`lpn_ctx_reset_position_off_tip`**
+  > Only a label or an attached Text that has been dragged from its own position can be reset.
+  @@ NEEDS RULING
+- **`lpn_customer_node_inactive`**
+  > This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.
+  @@ NEEDS RULING
+- **`lpn_field_type`**
+  > Type
+  @@ NEEDS RULING
+- **`lpn_field_type_tip`**
+  > The type of this asset in this scenario, set by Morph. Clear the override to use the parent scenario's type.
+  @@ NEEDS RULING
+- **`lpn_inp_export_flat_customers_inactive`**
+  > {n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.
+  @@ NEEDS RULING
+- **`lpn_inp_export_flat_inactive_controls`**
+  > These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}
+  @@ NEEDS RULING
+- **`lpn_library_pattern_default_deleted_also`**
+  > Scenarios that also used it as their default: {list}.
+  @@ NEEDS RULING
+- **`lpn_library_pattern_default_deleted_in`**
+  > Pattern {id} was the default demand pattern in these scenarios: {list}.
+  @@ NEEDS RULING
+- **`lpn_morph_menu`**
+  > Morph
+  @@ NEEDS RULING
+- **`lpn_morph_ok`**
+  > Morph
+  @@ NEEDS RULING
+- **`lpn_morph_other_kind`**
+  > A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}
+  @@ NEEDS RULING
+- **`lpn_morph_tip`**
+  > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its location, its connections, and every value the new type also has. In Base the asset itself is changed, and you are asked first if any value would be lost. In any other scenario the new type is an override in that scenario only, and the values only the new type has start from Settings > New assets.
+  @@ NEEDS RULING
+- **`lpn_ovl_bubble_moved`**
+  > {quantity}, moved or resized
+  @@ NEEDS RULING
+- **`lpn_ovl_bubble_off`**
+  > Not on the map
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_all`**
+  > Clear all overrides
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_all_ask`**
+  > Clear all the overrides ({n}) of {name}? Each value returns to the inherited value. Undo reverses this.
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_selected`**
+  > Clear selected overrides
+  @@ NEEDS RULING
+- **`lpn_ovl_col_inherited`**
+  > Inherited value
+  @@ NEEDS RULING
+- **`lpn_ovl_col_inherited_tip`**
+  > The value this scenario reads without the override: the value of the parent of the alternative, or the Base value.
+  @@ NEEDS RULING
+- **`lpn_ovl_col_override`**
+  > Override
+  @@ NEEDS RULING
+- **`lpn_ovl_group`**
+  > {category}: {alternative}
+  @@ NEEDS RULING
+- **`lpn_ovl_note`**
+  > These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Clear an override to restore the inherited value; Undo reverses it. Select an ID to go to the asset on the map.
+  @@ NEEDS RULING
+- **`lpn_ovl_pick_tip`**
+  > Select this override for the Clear selected overrides button.
+  @@ NEEDS RULING
+- **`lpn_ovl_same`**
+  > (same)
+  @@ NEEDS RULING
+- **`lpn_ovl_same_tip`**
+  > Equal to the inherited value. It is still an override, and it is counted.
+  @@ NEEDS RULING
+- **`lpn_ovl_title`**
+  > Manage overrides: {name}
+  @@ NEEDS RULING
+- **`lpn_ovm_child_ask`**
+  > Clear child overrides ({n} total)?
+  @@ NEEDS RULING
+- **`lpn_ovm_child_tip`**
+  > Child scenarios override this value ({n} total). Click to clear their overrides.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_clear`**
+  > Click to clear it.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_set`**
+  > Inherited. Click to make it an override in this scenario, holding the value shown.
+  @@ NEEDS RULING
+- **`lpn_pane_inactive_show`**
+  > Include inactive topology
+  @@ NEEDS RULING
+- **`lpn_pane_scn_cur_only`**
+  > Current scenario only
+  @@ NEEDS RULING
+- **`lpn_pane_scn_filter_note`**
+  > {filters}. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_scn_ov_only`**
+  > Overrides only
+  @@ NEEDS RULING
+- **`lpn_pane_tab_scenarios`**
+  > Scenarios
+  @@ NEEDS RULING
+- **`lpn_paste_alt_created`**
+  > Created {category} alternative {name} for this scenario.
+  @@ NEEDS RULING
+- **`lpn_paste_done_many`**
+  > Pasted properties of {id} to {m} assets. Values changed: {n}.
+  @@ NEEDS RULING
+- **`lpn_paste_done_one`**
+  > Pasted properties of {id} to {to}. Values changed: {n}.
+  @@ NEEDS RULING
+- **`lpn_paste_props_menu`**
+  > Paste properties to selection
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_kind`**
+  > No selected asset can take the copied properties.
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_none`**
+  > Nothing is copied. Right-click or long press an asset and choose Copy properties.
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_select`**
+  > Select the assets to paste to, then choose Paste properties to selection.
+  @@ NEEDS RULING
+- **`lpn_paste_skip_breakdown`**
+  > Not pasted: {n} (demand is a list of categories).
+  @@ NEEDS RULING
+- **`lpn_paste_skip_valve`**
+  > Not pasted: {n} (the valve types differ).
+  @@ NEEDS RULING
+- **`lpn_rule_inactive_note`**
+  > These rules refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
+  @@ NEEDS RULING
+- **`lpn_scenario_basic_misfit`**
+  > This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.
+  @@ NEEDS RULING
+- **`lpn_scenario_basic_misfit_base`**
+  > The Base scenario uses an alternative other than Base.
+  @@ NEEDS RULING
+- **`lpn_scenario_copy`**
+  > Copy scenario
+  @@ NEEDS RULING
+- **`lpn_scenario_copy_off`**
+  > Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.
+  @@ NEEDS RULING
+- **`lpn_scenario_copy_tip`**
+  > Copies the open scenario and its overrides, and opens the copy.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_ask`**
+  > Delete the scenario {name}? The drawing itself is not changed.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_goes`**
+  > Its overrides ({n}) are deleted with it.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_has_children`**
+  > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_stays`**
+  > These alternatives it uses stay in the project: {list}.
+  @@ NEEDS RULING
+- **`lpn_scenario_mark_inh_tip`**
+  > The dashed gray ring means the scenario {name} inherits an override for this asset from its parent scenario or alternative.
+  @@ NEEDS RULING
+- **`lpn_scncmp_none_checked`**
+  > No scenario is checked for comparison. Check scenarios in the Scenario manager.
+  @@ NEEDS RULING
+- **`lpn_settings_held_base`**
+  > {base}: {value}
+  @@ NEEDS RULING
+- **`lpn_settings_held_in`**
+  > Override in {scenario}.
+  @@ NEEDS RULING
+- **`lpn_settings_override_marks`**
+  > Show override markers on the map
+  @@ NEEDS RULING
+- **`lpn_settings_override_marks_tip`**
+  > Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.
+  @@ NEEDS RULING
+- **`lpn_settings_restore_base_only`**
+  > Switch to Base to restore the defaults.
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap`**
+  > Basemap
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap_last`**
+  > Basemap to return to
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap_osm`**
+  > Street map
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap_satellite`**
+  > Satellite images
+  @@ NEEDS RULING
+- **`lpn_settings_row_bubbles`**
+  > Time series graphs on the map
+  @@ NEEDS RULING
+- **`lpn_settings_row_check_freq`**
+  > Status check frequency
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_buffer`**
+  > Contour buffer
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_fill`**
+  > Contour fill
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_interval`**
+  > Contour interval
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_labels`**
+  > Contour labels
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_opacity`**
+  > Contour fill opacity
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_terrain`**
+  > Contour ground between nodes from Mapbox DEM
+  @@ NEEDS RULING
+- **`lpn_settings_row_customer_max_width`**
+  > Show customer labels when zoomed to this map width or less
+  @@ NEEDS RULING
+- **`lpn_settings_row_default`**
+  > {value} (default)
+  @@ NEEDS RULING
+- **`lpn_settings_row_elev_source_old`**
+  > Elevation source (older projects)
+  @@ NEEDS RULING
+- **`lpn_settings_row_emitter_exponent_old`**
+  > Emitter exponent (older projects)
+  @@ NEEDS RULING
+- **`lpn_settings_row_id_prefix`**
+  > ID prefix
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_after`**
+  > Text after
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_before`**
+  > Text before
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_drop`**
+  > Drop order
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_on`**
+  > Is active
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_show`**
+  > Show order
+  @@ NEEDS RULING
+- **`lpn_settings_row_labels_customer`**
+  > Customer labels
+  @@ NEEDS RULING
+- **`lpn_settings_row_labels_field`**
+  > {labels}: {field}
+  @@ NEEDS RULING
+- **`lpn_settings_row_labels_part`**
+  > {labels}: {field}, {part}
+  @@ NEEDS RULING
+- **`lpn_settings_row_max_check`**
+  > Maximum status checks
+  @@ NEEDS RULING
+- **`lpn_settings_row_new_asset`**
+  > New assets: {setting}
+  @@ NEEDS RULING
+- **`lpn_settings_row_of`**
+  > {setting}, {member}
+  @@ NEEDS RULING
+- **`lpn_settings_row_pda_src`**
+  > Pressure driven options stated in the file
+  @@ NEEDS RULING
+- **`lpn_settings_row_quality_option`**
+  > Quality option as the file states it
+  @@ NEEDS RULING
+- **`lpn_settings_row_quality_step`**
+  > Quality time step
+  @@ NEEDS RULING
+- **`lpn_settings_row_status_report`**
+  > Status report
+  @@ NEEDS RULING
+- **`lpn_settings_row_symbol_cap_multiple`**
+  > Largest symbol, as a multiple of a typical pipe length
+  @@ NEEDS RULING
+- **`lpn_settings_row_symbol_cap_percentile`**
+  > Typical pipe length, as a percentile of all pipe lengths
+  @@ NEEDS RULING
+- **`lpn_settings_row_tolerance`**
+  > Accuracy (older projects)
+  @@ NEEDS RULING
+- **`lpn_settings_row_view`**
+  > Map view (center and scale)
+  @@ NEEDS RULING
+- **`lpn_settings_row_view_value`**
+  > Center {x}, {y}; scale {s}
+  @@ NEEDS RULING
+- **`lpn_settings_table_category`**
+  > Category
+  @@ NEEDS RULING
+- **`lpn_settings_table_major`**
+  > Major heading
+  @@ NEEDS RULING
+- **`lpn_settings_table_minor`**
+  > Minor heading
+  @@ NEEDS RULING
+- **`lpn_settings_table_no`**
+  > No
+  @@ NEEDS RULING
+- **`lpn_settings_table_owner`**
+  > Owner
+  @@ NEEDS RULING
+- **`lpn_settings_table_setting`**
+  > Setting
+  @@ NEEDS RULING
+- **`lpn_settings_table_yes`**
+  > Yes
+  @@ NEEDS RULING
+- **`lpn_settings_units_one_project`**
+  > Units are the same in every scenario.
+  @@ NEEDS RULING
+- **`lpn_settings_view_bottom_right`**
+  > Bottom right corner
+  @@ NEEDS RULING
+- **`lpn_settings_view_center`**
+  > Map center
+  @@ NEEDS RULING
+- **`lpn_settings_view_save`**
+  > Save this view in this scenario
+  @@ NEEDS RULING
+- **`lpn_settings_view_save_tip`**
+  > Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.
+  @@ NEEDS RULING
+- **`lpn_settings_view_scale`**
+  > Map scale
+  @@ NEEDS RULING
+- **`lpn_settings_view_scale_tip`**
+  > The scale at the center of the map, as 1:N. Type 1:2000, or just 2000, to zoom to that scale.
+  @@ NEEDS RULING
+- **`lpn_settings_view_top_left`**
+  > Top left corner
+  @@ NEEDS RULING
+- **`lpn_sm_add_base`**
+  > Add base
+  @@ NEEDS RULING
+- **`lpn_sm_add_base_alt_tip`**
+  > Add another Base alternative. It starts as a copy of Base's values in this category, and later edits to Base do not change it.
+  @@ NEEDS RULING
+- **`lpn_sm_add_base_tip`**
+  > Add another Base scenario. It starts as a copy of Base, with its own alternatives, and later edits to Base do not change it.
+  @@ NEEDS RULING
+- **`lpn_sm_add_child`**
+  > Add child
+  @@ NEEDS RULING
+- **`lpn_sm_all_row_tip`**
+  > Double-click to open it in its category tree.
+  @@ NEEDS RULING
+- **`lpn_sm_base_kept`**
+  > The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.
+  @@ NEEDS RULING
+- **`lpn_sm_base_named`**
+  > The Base of a tree is not renamed.
+  @@ NEEDS RULING
+- **`lpn_sm_basic_on`**
+  > Scenario manager is disabled when Basic mode is on.
+  @@ NEEDS RULING
+- **`lpn_sm_col_parent`**
+  > Parent
+  @@ NEEDS RULING
+- **`lpn_sm_compare_tip`**
+  > Include in Scenario comparison
+  @@ NEEDS RULING
+- **`lpn_sm_copy`**
+  > Copy
+  @@ NEEDS RULING
+- **`lpn_sm_current_already`**
+  > This scenario is already the current scenario.
+  @@ NEEDS RULING
+- **`lpn_sm_cycle`**
+  > {name} cannot be moved under one of its own children.
+  @@ NEEDS RULING
+- **`lpn_sm_delete`**
+  > Delete the selected item. A used item is not deleted.
+  @@ NEEDS RULING
+- **`lpn_sm_delete_alt_ask`**
+  > Delete the alternative {name}?
+  @@ NEEDS RULING
+- **`lpn_sm_help`**
+  > How scenarios and alternatives work:\n\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\n\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\n\nProperties and settings belong to alternatives categories that appear as columns of the Scenarios table and as management options in Scenario manager.\n\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\n\nExample: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\n\nHow to manage scenarios:\n\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\n\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\n\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\n\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\n\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\n\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
+  @@ NEEDS RULING
+- **`lpn_sm_in_use`**
+  > {item}\ncannot be deleted while it is used by\n{list}
+  @@ NEEDS RULING
+- **`lpn_sm_inherited`**
+  > inherited
+  @@ NEEDS RULING
+- **`lpn_sm_item_alternative`**
+  > Alternative {name}
+  @@ NEEDS RULING
+- **`lpn_sm_item_scenario`**
+  > Scenario {name}
+  @@ NEEDS RULING
+- **`lpn_sm_list_overrides`**
+  > Manage overrides
+  @@ NEEDS RULING
+- **`lpn_sm_list_overrides_none`**
+  > This scenario has no overrides.
+  @@ NEEDS RULING
+- **`lpn_sm_list_overrides_tip`**
+  > List the scenario's overrides by category, each with the inherited value it overrides, and clear any of them.
+  @@ NEEDS RULING
+- **`lpn_sm_make_current`**
+  > Make current
+  @@ NEEDS RULING
+- **`lpn_sm_menu`**
+  > Scenario manager…
+  @@ NEEDS RULING
+- **`lpn_sm_merge_ask`**
+  > Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of overriding them. You can undo this.
+  @@ NEEDS RULING
+- **`lpn_sm_merge_line`**
+  > {asset}: {property}
+  @@ NEEDS RULING
+- **`lpn_sm_merge_none`**
+  > The alternative {name} has no overrides to merge.
+  @@ NEEDS RULING
+- **`lpn_sm_merge_pick`**
+  > Merge the overrides of {name} into which alternative? Its parent is listed first.
+  @@ NEEDS RULING
+- **`lpn_sm_merge_skipped`**
+  > {between} also overrides these values. It is skipped and not changed, so {name} will read them from {between}, not from {target}:
+  @@ NEEDS RULING
+- **`lpn_sm_merge_up`**
+  > Merge upward
+  @@ NEEDS RULING
+- **`lpn_sm_merge_up_root`**
+  > A Base alternative has nothing above it to merge into.
+  @@ NEEDS RULING
+- **`lpn_sm_merge_up_tip`**
+  > Move the overrides of the selected alternative into an alternative above it in the tree. The selected alternative then inherits those values.
+  @@ NEEDS RULING
+- **`lpn_sm_name_taken`**
+  > The name {name} is already used in this tree.
+  @@ NEEDS RULING
+- **`lpn_sm_none_selected`**
+  > Select an item in the tree first.
+  @@ NEEDS RULING
+- **`lpn_sm_rename`**
+  > Rename
+  @@ NEEDS RULING
+- **`lpn_sm_rename_alts_ask`**
+  > Rename equally named alternatives?
+  @@ NEEDS RULING
+- **`lpn_sm_shared_note`**
+  > Shared with: {list}
+  @@ NEEDS RULING
+- **`lpn_sm_title`**
+  > Scenario manager
+  @@ NEEDS RULING
+- **`lpn_sm_tree_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_sm_tree_unused`**
+  > All unused
+  @@ NEEDS RULING
+- **`lpn_sm_unused_none`**
+  > None
+  @@ NEEDS RULING
+- **`lpn_sm_used_by`**
+  > Used by scenarios: {n}
+  @@ NEEDS RULING
+- **`lpn_sm_used_by_none`**
+  > Not used by any scenario
+  @@ NEEDS RULING
+- **`lpn_sm_used_by_tip`**
+  > Used by: {list}
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off`**
+  > EPANET had closed {link} and then could not solve for {nodes}.
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off_empty`**
+  > Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off_full`**
+  > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
+  @@ NEEDS RULING
+- **`lpn_tsb_close`**
+  > Close graph
+  @@ NEEDS RULING
+- **`lpn_tsb_max`**
+  > Close a graph before opening another. Up to {n} stay open.
+  @@ NEEDS RULING
+- **`lpn_tsb_menu`**
+  > Time series graph
+  @@ NEEDS RULING
+- **`lpn_tsb_off_tip`**
+  > Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.
+  @@ NEEDS RULING
+- **`lpn_tsb_quantity`**
+  > Quantity to graph
+  @@ NEEDS RULING
+- **`lpn_tsb_resize`**
+  > Drag to resize
+  @@ NEEDS RULING
+
+### feat/desktop (`baba0f04d`) — adds no English strings
+
+### feat/geojson-import (`b4c12097f`) — 65 new, 65 to read @@ NEEDS RULING
+
+- **`lpn_file_import_gjnet`**
+  > Import GeoJSON network…
+  @@ NEEDS RULING
+- **`lpn_file_import_gjnet_tip`**
+  > Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.
+  @@ NEEDS RULING
+- **`lpn_gjnet_and_more`**
+  > and {n} more
+  @@ NEEDS RULING
+- **`lpn_gjnet_col_example`**
+  > Example
+  @@ NEEDS RULING
+- **`lpn_gjnet_col_field`**
+  > Field
+  @@ NEEDS RULING
+- **`lpn_gjnet_col_fills`**
+  > Fills
+  @@ NEEDS RULING
+- **`lpn_gjnet_col_unit`**
+  > Unit
+  @@ NEEDS RULING
+- **`lpn_gjnet_intro`**
+  > {points} points and {lines} lines were found. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. Choose the property each field fills and the unit of each number.
+  @@ NEEDS RULING
+- **`lpn_gjnet_lines_heading`**
+  > Line fields (pipes)
+  @@ NEEDS RULING
+- **`lpn_gjnet_no_fields`**
+  > These features have no attribute fields.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_crs`**
+  > The file states the coordinate system {crs}, which is WGS 84 latitude and longitude, the system RFC 7946 requires. Positions were read as stated.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_default_demand`**
+  > These junctions state no base demand and have the default base demand, {value}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_default_diameter`**
+  > These pipes state no diameter and have the default diameter, {value}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_default_elev`**
+  > These nodes state no elevation and have the default elevation, {value}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_default_elev_added`**
+  > These junctions were added at line ends and have the default elevation, {value}, because no node in the file states an elevation.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_default_k`**
+  > These pipes state no minor loss coefficient, so each has 0, as in an EPANET file that states none.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_default_roughness`**
+  > These pipes state no roughness and have the default roughness, {value}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_default_tank`**
+  > These tanks have the default water depths and tank diameter.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_demand_kept`**
+  > A reservoir or tank has no demand, so the demand stated on these nodes was kept as the custom property {key}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_demand_rows`**
+  > These junctions had more than one demand row. A GeoJSON file holds only the first, which was imported.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_elev_taken`**
+  > These nodes state no elevation. Each was given the elevation of the node shown in parentheses: for a junction added at a line end, the node at the other end of its pipe, otherwise the nearest node that states one.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_end_moved`**
+  > These pipes have an end within {tol} of a point or another line end, but not on it. The end was joined to it; the largest distance is {dist}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_end_off_node`**
+  > The line of each of these links does not start or end at its node. The node position was used.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_end_on_pipe`**
+  > These line ends lie on the pipe shown in parentheses, but not at its end, and are not connected to it.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_field_custom`**
+  > These fields were imported as custom properties.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_field_skipped`**
+  > These fields were not imported, as chosen.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_id_dup`**
+  > These IDs are stated by more than one feature of the same kind. Each later feature was assigned the ID shown in parentheses.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_id_new`**
+  > These features state no valid ID and were assigned the ID shown in parentheses.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_junction_added`**
+  > These junctions were added where a line end is not within {tol} of a point. Each has the default base demand.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_length_auto`**
+  > These pipes state no length. Each length is computed from the line (Auto).
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_not_held`**
+  > A GeoJSON file does not hold controls, rules, time settings, text labels, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_parts`**
+  > These multipart lines have parts that are not connected and were imported as one pipe for each part.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_parts_points`**
+  > These multipoint features were imported as one node for each point.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_pattern_conflict`**
+  > These patterns are stated with different multipliers on different features. The first was used.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_pipe_type`**
+  > These pipes state the pipe type shown in parentheses, whose definition a GeoJSON file does not hold. The pipe type was not imported; the diameter and roughness stated in the file were.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_results`**
+  > The results in the file were not imported. Calculate computes them again.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_skip_geometry`**
+  > Not imported: the feature is not a point or a line.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_skip_id`**
+  > Not imported: the name is not a valid ID, or another element of the same kind has it.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_skip_kind`**
+  > Not imported: the feature states no node_type or link_type.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_skip_loop`**
+  > Not imported: both ends of the line join the same node.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_skip_no_node`**
+  > Not imported: the start or end node named is not in the file.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_skip_position`**
+  > Not imported: a position is not a valid latitude and longitude.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_skip_short`**
+  > Not imported: a line needs at least two positions.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_unmapped_demand`**
+  > No field was chosen for the base demand, so every junction has the default base demand, {value}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_unmapped_diameter`**
+  > No field was chosen for the diameter, so every pipe has the default diameter, {value}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_unmapped_elev`**
+  > No field was chosen for the elevation, so every node has the default elevation, {value}, and automatic lengths include no elevation difference.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_unmapped_id_line`**
+  > No field was chosen for the line ID, so every pipe was assigned an ID.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_unmapped_id_point`**
+  > No field was chosen for the point ID, so every node imported from a point was assigned an ID.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_unmapped_k`**
+  > No field was chosen for the minor loss coefficient, so every pipe has 0, as in an EPANET file that states none.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_unmapped_length`**
+  > No field was chosen for the length, so every pipe length is computed from the line (Auto).
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_unmapped_roughness`**
+  > No field was chosen for the roughness, so every pipe has the default roughness, {value}.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_value_unread`**
+  > These values are not numbers or are not recognized, and were not used.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_z`**
+  > These points state a third coordinate, which was not imported.
+  @@ NEEDS RULING
+- **`lpn_gjnet_other`**
+  > {n} features are neither points nor lines and will not be imported; the report lists them.
+  @@ NEEDS RULING
+- **`lpn_gjnet_points_heading`**
+  > Point fields (junctions, reservoirs, and tanks)
+  @@ NEEDS RULING
+- **`lpn_gjnet_refuse_crs`**
+  > {file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.
+  @@ NEEDS RULING
+- **`lpn_gjnet_refuse_empty`**
+  > {file} contains no points or lines.
+  @@ NEEDS RULING
+- **`lpn_gjnet_report_lead`**
+  > Each change made during import, and each feature not imported, is listed below with the reason:
+  @@ NEEDS RULING
+- **`lpn_gjnet_target_custom`**
+  > Custom property
+  @@ NEEDS RULING
+- **`lpn_gjnet_target_node_type`**
+  > Node type
+  @@ NEEDS RULING
+- **`lpn_gjnet_target_skip`**
+  > Do not import
+  @@ NEEDS RULING
+- **`lpn_gjnet_title`**
+  > Import GeoJSON network: {file}
+  @@ NEEDS RULING
+- **`lpn_gjnet_tolerance`**
+  > Join tolerance (m)
+  @@ NEEDS RULING
+- **`lpn_gjnet_tolerance_tip`**
+  > A line end within this distance of a point, or of another line end, is joined to it. A line end farther than this from every point gets a new junction.
+  @@ NEEDS RULING
+- **`lpn_gjnet_working`**
+  > Importing {file}…
+  @@ NEEDS RULING
+
+### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
+
+- **`lpn_confirm_labels_restore`**
+  > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  _Ruled OK 2026-09-23._
+- **`lpn_labels_restore`**
+  > Restore label defaults
+  _Ruled OK 2026-09-23._
+- **`lpn_labels_restore_tip`**
+  > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  _Ruled OK 2026-09-23._
+
+### feat/label-placer (`eaa25d025`) — adds no English strings
+
+### feat/label-placer-a (`2883c0334`) — adds no English strings
+
+### feat/label-placer-b (`18cac7083`) — adds no English strings
+
+### feat/label-placer-c (`4dc27ea10`) — adds no English strings
+
+### feat/label-placer-d (`2e5e81c40`) — adds no English strings
+
+### feat/manage-override (`5a5f90f52`) — 180 new, 180 to read @@ NEEDS RULING
+
+- **`lpn_alt_cat_calculation`**
+  > Calculation
+  @@ NEEDS RULING
+- **`lpn_alt_cat_presentation`**
+  > Presentation
+  @@ NEEDS RULING
+- **`lpn_alt_cat_topology_tip`**
+  > Asset activation
+  @@ NEEDS RULING
+- **`lpn_change_type_line_alternative`**
+  > {id}: {property} {value}, in alternative {alternative}
+  @@ NEEDS RULING
+- **`lpn_clean_map`**
+  > Clean map
+  @@ NEEDS RULING
+- **`lpn_clean_map_tip`**
+  > Checked: the zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.
+  @@ NEEDS RULING
+- **`lpn_control_inactive_note`**
+  > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
+  @@ NEEDS RULING
+- **`lpn_copy_props_done`**
+  > Copied properties of {id}.
+  @@ NEEDS RULING
+- **`lpn_copy_props_done_ov`**
+  > Copied the overrides of {id} in this scenario.
+  @@ NEEDS RULING
+- **`lpn_copy_props_menu`**
+  > Copy properties
+  @@ NEEDS RULING
+- **`lpn_copy_props_no_overrides`**
+  > No overrides to copy.
+  @@ NEEDS RULING
+- **`lpn_ctx_edit_text`**
+  > Edit text
+  @@ NEEDS RULING
+- **`lpn_ctx_reset_position`**
+  > Reset position
+  @@ NEEDS RULING
+- **`lpn_ctx_reset_position_off_tip`**
+  > Only a label or an attached Text that has been dragged from its own position can be reset.
+  @@ NEEDS RULING
+- **`lpn_customer_node_inactive`**
+  > This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.
+  @@ NEEDS RULING
+- **`lpn_field_type`**
+  > Type
+  @@ NEEDS RULING
+- **`lpn_field_type_tip`**
+  > The type of this asset in this scenario, set by Morph. Clear the override to use the parent scenario's type.
+  @@ NEEDS RULING
+- **`lpn_inp_export_flat_customers_inactive`**
+  > {n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.
+  @@ NEEDS RULING
+- **`lpn_inp_export_flat_inactive_controls`**
+  > These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}
+  @@ NEEDS RULING
+- **`lpn_library_pattern_default_deleted_also`**
+  > Scenarios that also used it as their default: {list}.
+  @@ NEEDS RULING
+- **`lpn_library_pattern_default_deleted_in`**
+  > Pattern {id} was the default demand pattern in these scenarios: {list}.
+  @@ NEEDS RULING
+- **`lpn_morph_menu`**
+  > Morph
+  @@ NEEDS RULING
+- **`lpn_morph_ok`**
+  > Morph
+  @@ NEEDS RULING
+- **`lpn_morph_other_kind`**
+  > A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}
+  @@ NEEDS RULING
+- **`lpn_morph_tip`**
+  > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its location, its connections, and every value the new type also has. In Base the asset itself is changed, and you are asked first if any value would be lost. In any other scenario the new type is an override in that scenario only, and the values only the new type has start from Settings > New assets.
+  @@ NEEDS RULING
+- **`lpn_ovl_bubble_moved`**
+  > {quantity}, moved or resized
+  @@ NEEDS RULING
+- **`lpn_ovl_bubble_off`**
+  > Not on the map
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_all`**
+  > Clear all overrides
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_all_ask`**
+  > Clear all the overrides ({n}) of {name}? Each value returns to the inherited value. Undo reverses this.
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_selected`**
+  > Clear selected overrides
+  @@ NEEDS RULING
+- **`lpn_ovl_col_inherited`**
+  > Inherited value
+  @@ NEEDS RULING
+- **`lpn_ovl_col_inherited_tip`**
+  > The value this scenario reads without the override: the value of the parent of the alternative, or the Base value.
+  @@ NEEDS RULING
+- **`lpn_ovl_col_override`**
+  > Override
+  @@ NEEDS RULING
+- **`lpn_ovl_group`**
+  > {category}: {alternative}
+  @@ NEEDS RULING
+- **`lpn_ovl_note`**
+  > These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Clear an override to restore the inherited value; Undo reverses it. Select an ID to go to the asset on the map.
+  @@ NEEDS RULING
+- **`lpn_ovl_pick_tip`**
+  > Select this override for the Clear selected overrides button.
+  @@ NEEDS RULING
+- **`lpn_ovl_same`**
+  > (same)
+  @@ NEEDS RULING
+- **`lpn_ovl_same_tip`**
+  > Equal to the inherited value. It is still an override, and it is counted.
+  @@ NEEDS RULING
+- **`lpn_ovl_title`**
+  > Manage overrides: {name}
+  @@ NEEDS RULING
+- **`lpn_ovm_child_ask`**
+  > Clear child overrides ({n} total)?
+  @@ NEEDS RULING
+- **`lpn_ovm_child_tip`**
+  > Child scenarios override this value ({n} total). Click to clear their overrides.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_clear`**
+  > Click to clear it.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_set`**
+  > Inherited. Click to make it an override in this scenario, holding the value shown.
+  @@ NEEDS RULING
+- **`lpn_pane_inactive_show`**
+  > Include inactive topology
+  @@ NEEDS RULING
+- **`lpn_pane_scn_cur_only`**
+  > Current scenario only
+  @@ NEEDS RULING
+- **`lpn_pane_scn_filter_note`**
+  > {filters}. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_scn_ov_only`**
+  > Overrides only
+  @@ NEEDS RULING
+- **`lpn_pane_tab_scenarios`**
+  > Scenarios
+  @@ NEEDS RULING
+- **`lpn_paste_alt_created`**
+  > Created {category} alternative {name} for this scenario.
+  @@ NEEDS RULING
+- **`lpn_paste_done_many`**
+  > Pasted properties of {id} to {m} assets. Values changed: {n}.
+  @@ NEEDS RULING
+- **`lpn_paste_done_one`**
+  > Pasted properties of {id} to {to}. Values changed: {n}.
+  @@ NEEDS RULING
+- **`lpn_paste_props_menu`**
+  > Paste properties to selection
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_kind`**
+  > No selected asset can take the copied properties.
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_none`**
+  > Nothing is copied. Right-click or long press an asset and choose Copy properties.
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_select`**
+  > Select the assets to paste to, then choose Paste properties to selection.
+  @@ NEEDS RULING
+- **`lpn_paste_skip_breakdown`**
+  > Not pasted: {n} (demand is a list of categories).
+  @@ NEEDS RULING
+- **`lpn_paste_skip_valve`**
+  > Not pasted: {n} (the valve types differ).
+  @@ NEEDS RULING
+- **`lpn_rule_inactive_note`**
+  > These rules refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
+  @@ NEEDS RULING
+- **`lpn_scenario_basic_misfit`**
+  > This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.
+  @@ NEEDS RULING
+- **`lpn_scenario_basic_misfit_base`**
+  > The Base scenario uses an alternative other than Base.
+  @@ NEEDS RULING
+- **`lpn_scenario_copy`**
+  > Copy scenario
+  @@ NEEDS RULING
+- **`lpn_scenario_copy_off`**
+  > Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.
+  @@ NEEDS RULING
+- **`lpn_scenario_copy_tip`**
+  > Copies the open scenario and its overrides, and opens the copy.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_ask`**
+  > Delete the scenario {name}? The drawing itself is not changed.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_goes`**
+  > Its overrides ({n}) are deleted with it.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_has_children`**
+  > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_stays`**
+  > These alternatives it uses stay in the project: {list}.
+  @@ NEEDS RULING
+- **`lpn_scenario_mark_inh_tip`**
+  > The dashed gray ring means the scenario {name} inherits an override for this asset from its parent scenario or alternative.
+  @@ NEEDS RULING
+- **`lpn_scncmp_none_checked`**
+  > No scenario is checked for comparison. Check scenarios in the Scenario manager.
+  @@ NEEDS RULING
+- **`lpn_settings_held_base`**
+  > {base}: {value}
+  @@ NEEDS RULING
+- **`lpn_settings_held_in`**
+  > Override in {scenario}.
+  @@ NEEDS RULING
+- **`lpn_settings_override_marks`**
+  > Show override markers on the map
+  @@ NEEDS RULING
+- **`lpn_settings_override_marks_tip`**
+  > Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.
+  @@ NEEDS RULING
+- **`lpn_settings_restore_base_only`**
+  > Switch to Base to restore the defaults.
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap`**
+  > Basemap
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap_last`**
+  > Basemap to return to
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap_osm`**
+  > Street map
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap_satellite`**
+  > Satellite images
+  @@ NEEDS RULING
+- **`lpn_settings_row_bubbles`**
+  > Time series graphs on the map
+  @@ NEEDS RULING
+- **`lpn_settings_row_check_freq`**
+  > Status check frequency
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_buffer`**
+  > Contour buffer
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_fill`**
+  > Contour fill
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_interval`**
+  > Contour interval
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_labels`**
+  > Contour labels
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_opacity`**
+  > Contour fill opacity
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_terrain`**
+  > Contour ground between nodes from Mapbox DEM
+  @@ NEEDS RULING
+- **`lpn_settings_row_customer_max_width`**
+  > Show customer labels when zoomed to this map width or less
+  @@ NEEDS RULING
+- **`lpn_settings_row_default`**
+  > {value} (default)
+  @@ NEEDS RULING
+- **`lpn_settings_row_elev_source_old`**
+  > Elevation source (older projects)
+  @@ NEEDS RULING
+- **`lpn_settings_row_emitter_exponent_old`**
+  > Emitter exponent (older projects)
+  @@ NEEDS RULING
+- **`lpn_settings_row_id_prefix`**
+  > ID prefix
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_after`**
+  > Text after
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_before`**
+  > Text before
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_drop`**
+  > Drop order
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_on`**
+  > Is active
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_show`**
+  > Show order
+  @@ NEEDS RULING
+- **`lpn_settings_row_labels_customer`**
+  > Customer labels
+  @@ NEEDS RULING
+- **`lpn_settings_row_labels_field`**
+  > {labels}: {field}
+  @@ NEEDS RULING
+- **`lpn_settings_row_labels_part`**
+  > {labels}: {field}, {part}
+  @@ NEEDS RULING
+- **`lpn_settings_row_max_check`**
+  > Maximum status checks
+  @@ NEEDS RULING
+- **`lpn_settings_row_new_asset`**
+  > New assets: {setting}
+  @@ NEEDS RULING
+- **`lpn_settings_row_of`**
+  > {setting}, {member}
+  @@ NEEDS RULING
+- **`lpn_settings_row_pda_src`**
+  > Pressure driven options stated in the file
+  @@ NEEDS RULING
+- **`lpn_settings_row_quality_option`**
+  > Quality option as the file states it
+  @@ NEEDS RULING
+- **`lpn_settings_row_quality_step`**
+  > Quality time step
+  @@ NEEDS RULING
+- **`lpn_settings_row_status_report`**
+  > Status report
+  @@ NEEDS RULING
+- **`lpn_settings_row_symbol_cap_multiple`**
+  > Largest symbol, as a multiple of a typical pipe length
+  @@ NEEDS RULING
+- **`lpn_settings_row_symbol_cap_percentile`**
+  > Typical pipe length, as a percentile of all pipe lengths
+  @@ NEEDS RULING
+- **`lpn_settings_row_tolerance`**
+  > Accuracy (older projects)
+  @@ NEEDS RULING
+- **`lpn_settings_row_view`**
+  > Map view (center and scale)
+  @@ NEEDS RULING
+- **`lpn_settings_row_view_value`**
+  > Center {x}, {y}; scale {s}
+  @@ NEEDS RULING
+- **`lpn_settings_table_category`**
+  > Category
+  @@ NEEDS RULING
+- **`lpn_settings_table_major`**
+  > Major heading
+  @@ NEEDS RULING
+- **`lpn_settings_table_minor`**
+  > Minor heading
+  @@ NEEDS RULING
+- **`lpn_settings_table_no`**
+  > No
+  @@ NEEDS RULING
+- **`lpn_settings_table_owner`**
+  > Owner
+  @@ NEEDS RULING
+- **`lpn_settings_table_setting`**
+  > Setting
+  @@ NEEDS RULING
+- **`lpn_settings_table_yes`**
+  > Yes
+  @@ NEEDS RULING
+- **`lpn_settings_units_one_project`**
+  > Units are the same in every scenario.
+  @@ NEEDS RULING
+- **`lpn_settings_view_bottom_right`**
+  > Bottom right corner
+  @@ NEEDS RULING
+- **`lpn_settings_view_center`**
+  > Map center
+  @@ NEEDS RULING
+- **`lpn_settings_view_save`**
+  > Save this view in this scenario
+  @@ NEEDS RULING
+- **`lpn_settings_view_save_tip`**
+  > Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.
+  @@ NEEDS RULING
+- **`lpn_settings_view_scale`**
+  > Map scale
+  @@ NEEDS RULING
+- **`lpn_settings_view_scale_tip`**
+  > The scale at the center of the map, as 1:N. Type 1:2000, or just 2000, to zoom to that scale.
+  @@ NEEDS RULING
+- **`lpn_settings_view_top_left`**
+  > Top left corner
+  @@ NEEDS RULING
+- **`lpn_sm_add_base`**
+  > Add base
+  @@ NEEDS RULING
+- **`lpn_sm_add_base_alt_tip`**
+  > Add another Base alternative. It starts as a copy of Base's values in this category, and later edits to Base do not change it.
+  @@ NEEDS RULING
+- **`lpn_sm_add_base_tip`**
+  > Add another Base scenario. It starts as a copy of Base, with its own alternatives, and later edits to Base do not change it.
+  @@ NEEDS RULING
+- **`lpn_sm_add_child`**
+  > Add child
+  @@ NEEDS RULING
+- **`lpn_sm_all_row_tip`**
+  > Double-click to open it in its category tree.
+  @@ NEEDS RULING
+- **`lpn_sm_base_kept`**
+  > The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.
+  @@ NEEDS RULING
+- **`lpn_sm_base_named`**
+  > The Base of a tree is not renamed.
+  @@ NEEDS RULING
+- **`lpn_sm_basic_on`**
+  > Scenario manager is disabled when Basic mode is on.
+  @@ NEEDS RULING
+- **`lpn_sm_col_parent`**
+  > Parent
+  @@ NEEDS RULING
+- **`lpn_sm_compare_tip`**
+  > Include in Scenario comparison
+  @@ NEEDS RULING
+- **`lpn_sm_copy`**
+  > Copy
+  @@ NEEDS RULING
+- **`lpn_sm_current_already`**
+  > This scenario is already the current scenario.
+  @@ NEEDS RULING
+- **`lpn_sm_cycle`**
+  > {name} cannot be moved under one of its own children.
+  @@ NEEDS RULING
+- **`lpn_sm_delete`**
+  > Delete the selected item. A used item is not deleted.
+  @@ NEEDS RULING
+- **`lpn_sm_delete_alt_ask`**
+  > Delete the alternative {name}?
+  @@ NEEDS RULING
+- **`lpn_sm_help`**
+  > How scenarios and alternatives work:\n\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\n\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\n\nProperties and settings belong to alternatives categories that appear as columns of the Scenarios table and as management options in Scenario manager.\n\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\n\nExample: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\n\nHow to manage scenarios:\n\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\n\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\n\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\n\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\n\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\n\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
+  @@ NEEDS RULING
+- **`lpn_sm_in_use`**
+  > {item}\ncannot be deleted while it is used by\n{list}
+  @@ NEEDS RULING
+- **`lpn_sm_inherited`**
+  > inherited
+  @@ NEEDS RULING
+- **`lpn_sm_item_alternative`**
+  > Alternative {name}
+  @@ NEEDS RULING
+- **`lpn_sm_item_scenario`**
+  > Scenario {name}
+  @@ NEEDS RULING
+- **`lpn_sm_list_overrides`**
+  > Manage overrides
+  @@ NEEDS RULING
+- **`lpn_sm_list_overrides_none`**
+  > This scenario has no overrides.
+  @@ NEEDS RULING
+- **`lpn_sm_list_overrides_tip`**
+  > List the scenario's overrides by category, each with the inherited value it overrides, and clear any of them.
+  @@ NEEDS RULING
+- **`lpn_sm_make_current`**
+  > Make current
+  @@ NEEDS RULING
+- **`lpn_sm_menu`**
+  > Scenario manager…
+  @@ NEEDS RULING
+- **`lpn_sm_merge_ask`**
+  > Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of overriding them. You can undo this.
+  @@ NEEDS RULING
+- **`lpn_sm_merge_line`**
+  > {asset}: {property}
+  @@ NEEDS RULING
+- **`lpn_sm_merge_none`**
+  > The alternative {name} has no overrides to merge.
+  @@ NEEDS RULING
+- **`lpn_sm_merge_pick`**
+  > Merge the overrides of {name} into which alternative? Its parent is listed first.
+  @@ NEEDS RULING
+- **`lpn_sm_merge_skipped`**
+  > {between} also overrides these values. It is skipped and not changed, so {name} will read them from {between}, not from {target}:
+  @@ NEEDS RULING
+- **`lpn_sm_merge_up`**
+  > Merge upward
+  @@ NEEDS RULING
+- **`lpn_sm_merge_up_root`**
+  > A Base alternative has nothing above it to merge into.
+  @@ NEEDS RULING
+- **`lpn_sm_merge_up_tip`**
+  > Move the overrides of the selected alternative into an alternative above it in the tree. The selected alternative then inherits those values.
+  @@ NEEDS RULING
+- **`lpn_sm_name_taken`**
+  > The name {name} is already used in this tree.
+  @@ NEEDS RULING
+- **`lpn_sm_none_selected`**
+  > Select an item in the tree first.
+  @@ NEEDS RULING
+- **`lpn_sm_rename`**
+  > Rename
+  @@ NEEDS RULING
+- **`lpn_sm_rename_alts_ask`**
+  > Rename equally named alternatives?
+  @@ NEEDS RULING
+- **`lpn_sm_shared_note`**
+  > Shared with: {list}
+  @@ NEEDS RULING
+- **`lpn_sm_title`**
+  > Scenario manager
+  @@ NEEDS RULING
+- **`lpn_sm_tree_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_sm_tree_unused`**
+  > All unused
+  @@ NEEDS RULING
+- **`lpn_sm_unused_none`**
+  > None
+  @@ NEEDS RULING
+- **`lpn_sm_used_by`**
+  > Used by scenarios: {n}
+  @@ NEEDS RULING
+- **`lpn_sm_used_by_none`**
+  > Not used by any scenario
+  @@ NEEDS RULING
+- **`lpn_sm_used_by_tip`**
+  > Used by: {list}
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off`**
+  > EPANET had closed {link} and then could not solve for {nodes}.
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off_empty`**
+  > Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off_full`**
+  > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
+  @@ NEEDS RULING
+- **`lpn_tsb_close`**
+  > Close graph
+  @@ NEEDS RULING
+- **`lpn_tsb_max`**
+  > Close a graph before opening another. Up to {n} stay open.
+  @@ NEEDS RULING
+- **`lpn_tsb_menu`**
+  > Time series graph
+  @@ NEEDS RULING
+- **`lpn_tsb_off_tip`**
+  > Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.
+  @@ NEEDS RULING
+- **`lpn_tsb_quantity`**
+  > Quantity to graph
+  @@ NEEDS RULING
+- **`lpn_tsb_resize`**
+  > Drag to resize
+  @@ NEEDS RULING
+
+### feat/match-property (`05bda7651`) — 10 new, 10 to read @@ NEEDS RULING
+
+- **`lpn_copy_props_done`**
+  > Copied properties of {id}.
+  @@ NEEDS RULING
+- **`lpn_copy_props_menu`**
+  > Copy properties
+  @@ NEEDS RULING
+- **`lpn_paste_done_many`**
+  > Pasted properties of {id} to {m} assets. Values changed: {n}.
+  @@ NEEDS RULING
+- **`lpn_paste_done_one`**
+  > Pasted properties of {id} to {to}. Values changed: {n}.
+  @@ NEEDS RULING
+- **`lpn_paste_props_menu`**
+  > Paste properties to selection
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_kind`**
+  > No selected asset can take the copied properties.
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_none`**
+  > Nothing is copied. Right-click an asset and choose Copy properties.
+  @@ NEEDS RULING
+- **`lpn_paste_props_off_select`**
+  > Select the assets to paste to, then choose Paste properties to selection.
+  @@ NEEDS RULING
+- **`lpn_paste_skip_breakdown`**
+  > Not pasted: {n} (demand is a list of categories).
+  @@ NEEDS RULING
+- **`lpn_paste_skip_valve`**
+  > Not pasted: {n} (the valve types differ).
+  @@ NEEDS RULING
+
+### feat/pattern-axis (`6f37c6eed`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_library_pattern_axis_step`**
+  > Step
+  @@ NEEDS RULING
+
+### feat/scenario-box (`d4d566a71`) — 174 new, 174 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -741,39 +1976,154 @@ build for that would be a gate nobody keeps. Refresh it with
   > Drag to resize
   @@ NEEDS RULING
 
-### feat/description-lines (`9b55bfe79`) — adds no English strings
+### feat/theme-dark (`6cde31e31`) — 5 new, 5 to read @@ NEEDS RULING
 
-### feat/desktop (`baba0f04d`) — adds no English strings
+- **`lpn_settings_theme`**
+  > Theme
+  @@ NEEDS RULING
+- **`lpn_settings_theme_tip`**
+  > Choose light or dark colors for the page. System follows the setting of your device. The map drawing looks the same in every theme. This is a setting for this browser, not for the project.
+  @@ NEEDS RULING
+- **`lpn_theme_dark`**
+  > Dark
+  @@ NEEDS RULING
+- **`lpn_theme_light`**
+  > Light
+  @@ NEEDS RULING
+- **`lpn_theme_system`**
+  > System
+  @@ NEEDS RULING
 
-### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
+### fix/elevation-override (`515322bc3`) — 174 new, 174 to read @@ NEEDS RULING
 
-- **`lpn_confirm_labels_restore`**
-  > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
-  _Ruled OK 2026-09-23._
-- **`lpn_labels_restore`**
-  > Restore label defaults
-  _Ruled OK 2026-09-23._
-- **`lpn_labels_restore_tip`**
-  > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
-  _Ruled OK 2026-09-23._
-
-### feat/label-placer (`eaa25d025`) — adds no English strings
-
-### feat/label-placer-a (`2883c0334`) — adds no English strings
-
-### feat/label-placer-b (`18cac7083`) — adds no English strings
-
-### feat/label-placer-c (`4dc27ea10`) — adds no English strings
-
-### feat/label-placer-d (`2e5e81c40`) — adds no English strings
-
-### feat/match-property (`05bda7651`) — 10 new, 10 to read @@ NEEDS RULING
-
+- **`lpn_alt_cat_calculation`**
+  > Calculation
+  @@ NEEDS RULING
+- **`lpn_alt_cat_presentation`**
+  > Presentation
+  @@ NEEDS RULING
+- **`lpn_alt_cat_topology_tip`**
+  > Asset activation
+  @@ NEEDS RULING
+- **`lpn_change_type_line_alternative`**
+  > {id}: {property} {value}, in alternative {alternative}
+  @@ NEEDS RULING
+- **`lpn_clean_map`**
+  > Clean map
+  @@ NEEDS RULING
+- **`lpn_clean_map_tip`**
+  > Checked: the zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.
+  @@ NEEDS RULING
+- **`lpn_control_inactive_note`**
+  > These controls refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
+  @@ NEEDS RULING
 - **`lpn_copy_props_done`**
   > Copied properties of {id}.
   @@ NEEDS RULING
+- **`lpn_copy_props_done_ov`**
+  > Copied the overrides of {id} in this scenario.
+  @@ NEEDS RULING
 - **`lpn_copy_props_menu`**
   > Copy properties
+  @@ NEEDS RULING
+- **`lpn_copy_props_no_overrides`**
+  > No overrides to copy.
+  @@ NEEDS RULING
+- **`lpn_ctx_edit_text`**
+  > Edit text
+  @@ NEEDS RULING
+- **`lpn_ctx_reset_position`**
+  > Reset position
+  @@ NEEDS RULING
+- **`lpn_ctx_reset_position_off_tip`**
+  > Only a label or an attached Text that has been dragged from its own position can be reset.
+  @@ NEEDS RULING
+- **`lpn_customer_node_inactive`**
+  > This customer is assigned to a junction that is inactive in this scenario, so its demand is not part of the solve.
+  @@ NEEDS RULING
+- **`lpn_field_type`**
+  > Type
+  @@ NEEDS RULING
+- **`lpn_field_type_tip`**
+  > The type of this asset in this scenario, set by Morph. Clear the override to use the parent scenario's type.
+  @@ NEEDS RULING
+- **`lpn_inp_export_flat_customers_inactive`**
+  > {n} of these customers are assigned to a junction that is inactive in this scenario, so their demand is not in the file.
+  @@ NEEDS RULING
+- **`lpn_inp_export_flat_inactive_controls`**
+  > These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}
+  @@ NEEDS RULING
+- **`lpn_library_pattern_default_deleted_also`**
+  > Scenarios that also used it as their default: {list}.
+  @@ NEEDS RULING
+- **`lpn_library_pattern_default_deleted_in`**
+  > Pattern {id} was the default demand pattern in these scenarios: {list}.
+  @@ NEEDS RULING
+- **`lpn_morph_menu`**
+  > Morph
+  @@ NEEDS RULING
+- **`lpn_morph_ok`**
+  > Morph
+  @@ NEEDS RULING
+- **`lpn_morph_other_kind`**
+  > A node can be morphed only into another type of node, and a link only into another type of link. Not morphed: {ids}
+  @@ NEEDS RULING
+- **`lpn_morph_tip`**
+  > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its location, its connections, and every value the new type also has. In Base the asset itself is changed, and you are asked first if any value would be lost. In any other scenario the new type is an override in that scenario only, and the values only the new type has start from Settings > New assets.
+  @@ NEEDS RULING
+- **`lpn_ovl_col_inherited`**
+  > Inherited value
+  @@ NEEDS RULING
+- **`lpn_ovl_col_inherited_tip`**
+  > The value this scenario reads without the override: the value of the parent of the alternative, or the Base value.
+  @@ NEEDS RULING
+- **`lpn_ovl_col_override`**
+  > Override
+  @@ NEEDS RULING
+- **`lpn_ovl_group`**
+  > {category}: {alternative}
+  @@ NEEDS RULING
+- **`lpn_ovl_note`**
+  > These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Click an ID to go to the asset on the map.
+  @@ NEEDS RULING
+- **`lpn_ovl_same`**
+  > (same)
+  @@ NEEDS RULING
+- **`lpn_ovl_same_tip`**
+  > Equal to the inherited value. It is still an override, and it is counted.
+  @@ NEEDS RULING
+- **`lpn_ovl_title`**
+  > Overrides: {name}
+  @@ NEEDS RULING
+- **`lpn_ovm_child_ask`**
+  > Clear child overrides ({n} total)?
+  @@ NEEDS RULING
+- **`lpn_ovm_child_tip`**
+  > Child scenarios override this value ({n} total). Click to clear their overrides.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_clear`**
+  > Click to clear it.
+  @@ NEEDS RULING
+- **`lpn_ovm_dot_set`**
+  > Inherited. Click to make it an override in this scenario, holding the value shown.
+  @@ NEEDS RULING
+- **`lpn_pane_inactive_show`**
+  > Include inactive topology
+  @@ NEEDS RULING
+- **`lpn_pane_scn_cur_only`**
+  > Current scenario only
+  @@ NEEDS RULING
+- **`lpn_pane_scn_filter_note`**
+  > {filters}. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_scn_ov_only`**
+  > Overrides only
+  @@ NEEDS RULING
+- **`lpn_pane_tab_scenarios`**
+  > Scenarios
+  @@ NEEDS RULING
+- **`lpn_paste_alt_created`**
+  > Created {category} alternative {name} for this scenario.
   @@ NEEDS RULING
 - **`lpn_paste_done_many`**
   > Pasted properties of {id} to {m} assets. Values changed: {n}.
@@ -788,7 +2138,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > No selected asset can take the copied properties.
   @@ NEEDS RULING
 - **`lpn_paste_props_off_none`**
-  > Nothing is copied. Right-click an asset and choose Copy properties.
+  > Nothing is copied. Right-click or long press an asset and choose Copy properties.
   @@ NEEDS RULING
 - **`lpn_paste_props_off_select`**
   > Select the assets to paste to, then choose Paste properties to selection.
@@ -798,6 +2148,375 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_paste_skip_valve`**
   > Not pasted: {n} (the valve types differ).
+  @@ NEEDS RULING
+- **`lpn_rule_inactive_note`**
+  > These rules refer to an asset that is inactive in this scenario, so they are ignored in its run: {ids}
+  @@ NEEDS RULING
+- **`lpn_scenario_basic_misfit`**
+  > This project has scenarios and alternatives relationships that are not compatible with Scenarios Basic mode, so Basic mode is disabled.
+  @@ NEEDS RULING
+- **`lpn_scenario_basic_misfit_base`**
+  > The Base scenario uses an alternative other than Base.
+  @@ NEEDS RULING
+- **`lpn_scenario_copy`**
+  > Copy scenario
+  @@ NEEDS RULING
+- **`lpn_scenario_copy_off`**
+  > Copy scenario works in Basic mode. With Basic mode off, add a scenario and choose its alternatives in the Scenarios table.
+  @@ NEEDS RULING
+- **`lpn_scenario_copy_tip`**
+  > Copies the open scenario and its overrides, and opens the copy.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_ask`**
+  > Delete the scenario {name}? The drawing itself is not changed.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_goes`**
+  > Its overrides ({n}) are deleted with it.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_has_children`**
+  > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_stays`**
+  > These alternatives it uses stay in the project: {list}.
+  @@ NEEDS RULING
+- **`lpn_scenario_mark_inh_tip`**
+  > The dashed gray ring means the scenario {name} inherits an override for this asset from its parent scenario or alternative.
+  @@ NEEDS RULING
+- **`lpn_scncmp_none_checked`**
+  > No scenario is checked for comparison. Check scenarios in the Scenario manager.
+  @@ NEEDS RULING
+- **`lpn_settings_held_base`**
+  > {base}: {value}
+  @@ NEEDS RULING
+- **`lpn_settings_held_in`**
+  > Override in {scenario}.
+  @@ NEEDS RULING
+- **`lpn_settings_override_marks`**
+  > Show override markers on the map
+  @@ NEEDS RULING
+- **`lpn_settings_override_marks_tip`**
+  > Show the amber ring on an asset with an override in the open scenario, and the dashed gray ring on an asset that inherits one. The Tables pane marks overrides either way. Map, Clean map hides the rings while it is checked. This is a setting for this browser, not for the project.
+  @@ NEEDS RULING
+- **`lpn_settings_restore_base_only`**
+  > Switch to Base to restore the defaults.
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap`**
+  > Basemap
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap_last`**
+  > Basemap to return to
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap_osm`**
+  > Street map
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap_satellite`**
+  > Satellite images
+  @@ NEEDS RULING
+- **`lpn_settings_row_bubbles`**
+  > Time series graphs on the map
+  @@ NEEDS RULING
+- **`lpn_settings_row_check_freq`**
+  > Status check frequency
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_buffer`**
+  > Contour buffer
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_fill`**
+  > Contour fill
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_interval`**
+  > Contour interval
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_labels`**
+  > Contour labels
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_opacity`**
+  > Contour fill opacity
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_terrain`**
+  > Contour ground between nodes from Mapbox DEM
+  @@ NEEDS RULING
+- **`lpn_settings_row_customer_max_width`**
+  > Show customer labels when zoomed to this map width or less
+  @@ NEEDS RULING
+- **`lpn_settings_row_default`**
+  > {value} (default)
+  @@ NEEDS RULING
+- **`lpn_settings_row_elev_source_old`**
+  > Elevation source (older projects)
+  @@ NEEDS RULING
+- **`lpn_settings_row_emitter_exponent_old`**
+  > Emitter exponent (older projects)
+  @@ NEEDS RULING
+- **`lpn_settings_row_id_prefix`**
+  > ID prefix
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_after`**
+  > Text after
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_before`**
+  > Text before
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_drop`**
+  > Drop order
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_on`**
+  > Is active
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_show`**
+  > Show order
+  @@ NEEDS RULING
+- **`lpn_settings_row_labels_customer`**
+  > Customer labels
+  @@ NEEDS RULING
+- **`lpn_settings_row_labels_field`**
+  > {labels}: {field}
+  @@ NEEDS RULING
+- **`lpn_settings_row_labels_part`**
+  > {labels}: {field}, {part}
+  @@ NEEDS RULING
+- **`lpn_settings_row_max_check`**
+  > Maximum status checks
+  @@ NEEDS RULING
+- **`lpn_settings_row_new_asset`**
+  > New assets: {setting}
+  @@ NEEDS RULING
+- **`lpn_settings_row_of`**
+  > {setting}, {member}
+  @@ NEEDS RULING
+- **`lpn_settings_row_pda_src`**
+  > Pressure driven options stated in the file
+  @@ NEEDS RULING
+- **`lpn_settings_row_quality_option`**
+  > Quality option as the file states it
+  @@ NEEDS RULING
+- **`lpn_settings_row_quality_step`**
+  > Quality time step
+  @@ NEEDS RULING
+- **`lpn_settings_row_status_report`**
+  > Status report
+  @@ NEEDS RULING
+- **`lpn_settings_row_symbol_cap_multiple`**
+  > Largest symbol, as a multiple of a typical pipe length
+  @@ NEEDS RULING
+- **`lpn_settings_row_symbol_cap_percentile`**
+  > Typical pipe length, as a percentile of all pipe lengths
+  @@ NEEDS RULING
+- **`lpn_settings_row_tolerance`**
+  > Accuracy (older projects)
+  @@ NEEDS RULING
+- **`lpn_settings_row_view`**
+  > Map view (center and scale)
+  @@ NEEDS RULING
+- **`lpn_settings_row_view_value`**
+  > Center {x}, {y}; scale {s}
+  @@ NEEDS RULING
+- **`lpn_settings_table_category`**
+  > Category
+  @@ NEEDS RULING
+- **`lpn_settings_table_major`**
+  > Major heading
+  @@ NEEDS RULING
+- **`lpn_settings_table_minor`**
+  > Minor heading
+  @@ NEEDS RULING
+- **`lpn_settings_table_no`**
+  > No
+  @@ NEEDS RULING
+- **`lpn_settings_table_owner`**
+  > Owner
+  @@ NEEDS RULING
+- **`lpn_settings_table_setting`**
+  > Setting
+  @@ NEEDS RULING
+- **`lpn_settings_table_yes`**
+  > Yes
+  @@ NEEDS RULING
+- **`lpn_settings_units_one_project`**
+  > Units are the same in every scenario.
+  @@ NEEDS RULING
+- **`lpn_settings_view_bottom_right`**
+  > Bottom right corner
+  @@ NEEDS RULING
+- **`lpn_settings_view_center`**
+  > Map center
+  @@ NEEDS RULING
+- **`lpn_settings_view_save`**
+  > Save this view in this scenario
+  @@ NEEDS RULING
+- **`lpn_settings_view_save_tip`**
+  > Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.
+  @@ NEEDS RULING
+- **`lpn_settings_view_scale`**
+  > Map scale
+  @@ NEEDS RULING
+- **`lpn_settings_view_scale_tip`**
+  > The scale at the center of the map, as 1:N. Type 1:2000, or just 2000, to zoom to that scale.
+  @@ NEEDS RULING
+- **`lpn_settings_view_top_left`**
+  > Top left corner
+  @@ NEEDS RULING
+- **`lpn_sm_add_base`**
+  > Add base
+  @@ NEEDS RULING
+- **`lpn_sm_add_base_alt_tip`**
+  > Add another Base alternative. It starts as a copy of Base's values in this category, and later edits to Base do not change it.
+  @@ NEEDS RULING
+- **`lpn_sm_add_base_tip`**
+  > Add another Base scenario. It starts as a copy of Base, with its own alternatives, and later edits to Base do not change it.
+  @@ NEEDS RULING
+- **`lpn_sm_add_child`**
+  > Add child
+  @@ NEEDS RULING
+- **`lpn_sm_all_row_tip`**
+  > Double-click to open it in its category tree.
+  @@ NEEDS RULING
+- **`lpn_sm_base_kept`**
+  > The Base of a tree is not deleted. Another Base added with Add base is deleted when nothing uses it.
+  @@ NEEDS RULING
+- **`lpn_sm_base_named`**
+  > The Base of a tree is not renamed.
+  @@ NEEDS RULING
+- **`lpn_sm_basic_on`**
+  > Scenario manager is disabled when Basic mode is on.
+  @@ NEEDS RULING
+- **`lpn_sm_col_parent`**
+  > Parent
+  @@ NEEDS RULING
+- **`lpn_sm_compare_tip`**
+  > Include in Scenario comparison
+  @@ NEEDS RULING
+- **`lpn_sm_copy`**
+  > Copy
+  @@ NEEDS RULING
+- **`lpn_sm_current_already`**
+  > This scenario is already the current scenario.
+  @@ NEEDS RULING
+- **`lpn_sm_cycle`**
+  > {name} cannot be moved under one of its own children.
+  @@ NEEDS RULING
+- **`lpn_sm_delete`**
+  > Delete the selected item. A used item is not deleted.
+  @@ NEEDS RULING
+- **`lpn_sm_delete_alt_ask`**
+  > Delete the alternative {name}?
+  @@ NEEDS RULING
+- **`lpn_sm_help`**
+  > How scenarios and alternatives work:\n\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\n\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\n\nProperties and settings belong to alternatives categories that appear as columns of the Scenarios table and as management options in Scenario manager.\n\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\n\nExample: You create a "Figure: Node and link IDs" scenario and edit a Text to say "Node and Link IDs." When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called "Figure: Node and link IDs" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\n\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\n\nHow to manage scenarios:\n\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\n\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\n\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\n\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\n\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\n\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the Scenarios table. An override made in a shared alternative changes every scenario that uses it.
+  @@ NEEDS RULING
+- **`lpn_sm_in_use`**
+  > {item}\ncannot be deleted while it is used by\n{list}
+  @@ NEEDS RULING
+- **`lpn_sm_inherited`**
+  > inherited
+  @@ NEEDS RULING
+- **`lpn_sm_item_alternative`**
+  > Alternative {name}
+  @@ NEEDS RULING
+- **`lpn_sm_item_scenario`**
+  > Scenario {name}
+  @@ NEEDS RULING
+- **`lpn_sm_list_overrides`**
+  > List overrides
+  @@ NEEDS RULING
+- **`lpn_sm_list_overrides_none`**
+  > This scenario has no overrides.
+  @@ NEEDS RULING
+- **`lpn_sm_list_overrides_tip`**
+  > List the scenario's overrides by category, each with the inherited value it overrides.
+  @@ NEEDS RULING
+- **`lpn_sm_make_current`**
+  > Make current
+  @@ NEEDS RULING
+- **`lpn_sm_menu`**
+  > Scenario manager…
+  @@ NEEDS RULING
+- **`lpn_sm_merge_ask`**
+  > Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of overriding them. You can undo this.
+  @@ NEEDS RULING
+- **`lpn_sm_merge_line`**
+  > {asset}: {property}
+  @@ NEEDS RULING
+- **`lpn_sm_merge_none`**
+  > The alternative {name} has no overrides to merge.
+  @@ NEEDS RULING
+- **`lpn_sm_merge_pick`**
+  > Merge the overrides of {name} into which alternative? Its parent is listed first.
+  @@ NEEDS RULING
+- **`lpn_sm_merge_skipped`**
+  > {between} also overrides these values. It is skipped and not changed, so {name} will read them from {between}, not from {target}:
+  @@ NEEDS RULING
+- **`lpn_sm_merge_up`**
+  > Merge upward
+  @@ NEEDS RULING
+- **`lpn_sm_merge_up_root`**
+  > A Base alternative has nothing above it to merge into.
+  @@ NEEDS RULING
+- **`lpn_sm_merge_up_tip`**
+  > Move the overrides of the selected alternative into an alternative above it in the tree. The selected alternative then inherits those values.
+  @@ NEEDS RULING
+- **`lpn_sm_name_taken`**
+  > The name {name} is already used in this tree.
+  @@ NEEDS RULING
+- **`lpn_sm_none_selected`**
+  > Select an item in the tree first.
+  @@ NEEDS RULING
+- **`lpn_sm_rename`**
+  > Rename
+  @@ NEEDS RULING
+- **`lpn_sm_rename_alts_ask`**
+  > Rename equally named alternatives?
+  @@ NEEDS RULING
+- **`lpn_sm_shared_note`**
+  > Shared with: {list}
+  @@ NEEDS RULING
+- **`lpn_sm_title`**
+  > Scenario manager
+  @@ NEEDS RULING
+- **`lpn_sm_tree_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_sm_tree_unused`**
+  > All unused
+  @@ NEEDS RULING
+- **`lpn_sm_unused_none`**
+  > None
+  @@ NEEDS RULING
+- **`lpn_sm_used_by`**
+  > Used by scenarios: {n}
+  @@ NEEDS RULING
+- **`lpn_sm_used_by_none`**
+  > Not used by any scenario
+  @@ NEEDS RULING
+- **`lpn_sm_used_by_tip`**
+  > Used by: {list}
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off`**
+  > EPANET had closed {link} and then could not solve for {nodes}.
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off_empty`**
+  > Tank {tank} was empty, so EPANET had closed {link} to keep it from draining further, and then could not solve for {nodes}.
+  @@ NEEDS RULING
+- **`lpn_time_run_cut_off_full`**
+  > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
+  @@ NEEDS RULING
+- **`lpn_tsb_close`**
+  > Close graph
+  @@ NEEDS RULING
+- **`lpn_tsb_max`**
+  > Close a graph before opening another. Up to {n} stay open.
+  @@ NEEDS RULING
+- **`lpn_tsb_menu`**
+  > Time series graph
+  @@ NEEDS RULING
+- **`lpn_tsb_off_tip`**
+  > Needs extended period results. Set a Total run time in Settings, Calculation, Time, and calculate.
+  @@ NEEDS RULING
+- **`lpn_tsb_quantity`**
+  > Quantity to graph
+  @@ NEEDS RULING
+- **`lpn_tsb_resize`**
+  > Drag to resize
   @@ NEEDS RULING
 
 ### fix/zero-demand-solve (`fbfbc28b6`) — 3 new, 3 to read @@ NEEDS RULING
@@ -811,5 +2530,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_time_run_cut_off_full`**
   > Tank {tank} was full, so EPANET had closed {link} to keep water out of it, and then could not solve for {nodes}. This can happen when a full tank has no water leaving it, as when every demand is zero. A demand slightly above zero, or a tank level slightly below its maximum, avoids it.
   @@ NEEDS RULING
-
-### tool/scenario-harness-helper (`1e9fbe55b`) — adds no English strings
