@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**6 still to read on master**, of 185 untranslated keys, of 2805 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**8 still to read on master**, of 185 untranslated keys, of 2805 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -79,7 +79,7 @@ is the one you meant. "The first one" is a complete answer.
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (185, 6 to read @@ NEEDS RULING)
+## lpn_  (185, 8 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -193,8 +193,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Equal to the inherited value. It is still an override, and it is counted.
   _Ruled OK 2026-10-16._
 - **`lpn_ovl_title`**
-  > Manage overrides: {name}
-  _Ruled OK 2026-10-16._
+  > Override manager: {name}
+  @@ NEEDS RULING
 - **`lpn_ovm_child_ask`**
   > Clear child overrides ({n} total)?
   _Ruled OK 2026-10-16._
@@ -526,8 +526,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Scenario {name}
   _Ruled OK 2026-10-16._
 - **`lpn_sm_list_overrides`**
-  > Manage overrides
-  _Ruled OK 2026-10-16._
+  > Override manager…
+  @@ NEEDS RULING
 - **`lpn_sm_list_overrides_none`**
   > This scenario has no overrides.
   _Ruled 2026-10-15: Revised. But should be obvious when count = 0._
@@ -641,7 +641,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**62 still to read**, of 130 new keys across 22 unmerged branch(es).
+**62 still to read**, of 130 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -652,11 +652,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### docs/features-update (`6ecfd181a`) — adds no English strings
-
-### feat/basemap-outdoors (`5b8059020`) — already merged into docs/features-update; its strings are listed there
-
-### feat/bentley-interop (`1ef30b7b5`) — already merged into docs/features-update; its strings are listed there
+### docs/features-update (`572b8b5a0`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -864,7 +860,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Importing {file}…
   _Ruled OK 2026-10-16._
 
-### feat/guide-scenarios (`2d8eea7d3`) — 60 new, 60 to read @@ NEEDS RULING
+### feat/guide-scenarios (`395606e96`) — 60 new, 60 to read @@ NEEDS RULING
 
 - **`lpn_guide_cmp_cols_def`**
   > <table class="lpn-notes-table"><tbody><tr><td>Scenario</td><td>The name of the scenario. The open scenario is marked (currently open).</td></tr><tr><td>No. of overrides</td><td>The overrides of the scenario itself, counted as in the Scenarios list. A calculation option such as the demand multiplier counts as one, and an override equal to the inherited value counts.</td></tr><tr><td>Demand multiplier, Total run time, Hydraulic time step</td><td>The values the scenario was solved under, its own or those of the project. A steady scenario shows a dash for the time step.</td></tr><tr><td>Lowest pressure</td><td>The lowest pressure at a junction, with its ID and the time it occurs. Reservoirs and tanks are left out because each has a fixed head.</td></tr><tr><td>Highest velocity</td><td>The highest velocity in a pipe or valve, with its ID and the time it occurs. Pumps are left out.</td></tr></tbody></table>
@@ -1047,7 +1043,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Searching, links, and what is remembered
   @@ NEEDS RULING
 
-### feat/hover-props (`667111d61`) — adds no English strings
+### feat/hover-props (`10f35a1ed`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -1071,20 +1067,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/manage-override (`5a5f90f52`) — already merged into docs/features-update; its strings are listed there
-
-### feat/match-property (`05bda7651`) — already merged into docs/features-update; its strings are listed there
-
-### feat/scenario-box (`d4d566a71`) — already merged into docs/features-update; its strings are listed there
-
-### feat/scenarios-menu (`09cddaf19`) — already merged into merge/1016e; its strings are listed there
-
-### feat/theme-dark (`ced0c2db9`) — already merged into docs/features-update; its strings are listed there
-
-### fix/elevation-override (`515322bc3`) — already merged into docs/features-update; its strings are listed there
-
-### fix/units-revert (`7c252bbcd`) — already merged into merge/1016e; its strings are listed there
-
-### fix/zero-demand-solve (`fbfbc28b6`) — already merged into docs/features-update; its strings are listed there
-
-### merge/1016e (`14ad39485`) — adds no English strings
+### feat/scenarios-menu (`fc1367cf4`) — adds no English strings

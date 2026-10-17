@@ -7691,7 +7691,7 @@ var EngCalcs = EngCalcs || {};
 		// **LIST OVERRIDES HERE TOO, SO BASIC MODE REACHES IT** (Tom, 2026-10-15: "Yes."). The same
 		// action as the Scenario manager's button, on the active scenario; greyed on Base and at 0.
 		rows.push({
-			label: pc.lpn_sm_list_overrides || 'Manage overrides',
+			label: pc.lpn_sm_list_overrides || 'Override manager…',
 			disabled: scn.isBase || !overrideCount(scn),
 			tip: (scn.isBase || !overrideCount(scn)) ? (pc.lpn_sm_list_overrides_none || 'This scenario has no overrides.') : pc.lpn_sm_list_overrides_tip,
 			fn: function () { smActListOverrides(scn.id); }
@@ -78041,7 +78041,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				fn: function () { smActCurrent(key); } });
 			// **A TIDY LIST OF ONE SCENARIO'S OWN OVERRIDES, TO AUDIT THE COUNT** (Task 800; Tom,
 			// 2026-10-15: *"I don't know how to see a tidy list of overrides to audit"*).
-			out.push({ id: 'overrides', label: pc.lpn_sm_list_overrides || 'Manage overrides', tip: pc.lpn_sm_list_overrides_tip,
+			out.push({ id: 'overrides', label: pc.lpn_sm_list_overrides || 'Override manager…', tip: pc.lpn_sm_list_overrides_tip,
 				off: !valid || !scenarioById(key) || !overrideCount(scenarioById(key)),
 				offTip: !valid ? noSel : (pc.lpn_sm_list_overrides_none || 'This scenario has no overrides.'),
 				fn: function () { smActListOverrides(key); } });
@@ -78674,7 +78674,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			initTipsIn(body);
 			if (scroll) { body.scrollTop = scroll; }
 		}, [{ label: pc.lpn_dialog_ok || 'OK', isDefault: true, cancel: true, fn: function () { } }],
-		{ title: (pc.lpn_ovl_title || 'Manage overrides: {name}').replace('{name}', scenarioDisplayName(scn)) });
+		{ title: (pc.lpn_ovl_title || 'Override manager: {name}').replace('{name}', scenarioDisplayName(scn)) });
 	}
 	/**
 	 * **CLEAR THESE OWN OVERRIDES** (items of ownOverrideItems(scn)), each from the holder it is stored

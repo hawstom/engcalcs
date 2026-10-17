@@ -8,7 +8,8 @@
 //   M1  Base opens a time series graph of 31. A child (made with New scenario) overrides pipe 10's
 //       diameter, Text X1's words, the demand multiplier, and opens graphs of 22 and 12. A sibling
 //       opens its own graph of 22.
-//   M2  The Scenarios menu row and the dialog title read Manage overrides; the child counts 5, one
+//   M2  The Scenarios menu row reads Override manager… and the dialog title Override manager: (Tom,
+//       2026-10-16, "Yes. Proceed." to the rename from Manage overrides); the child counts 5, one
 //       row each, the two graphs as Presentation rows (Junction 22, Junction 12, Time series graph,
 //       replacing "Not on the map"); the graph of 31 it inherits is no row.
 //   M3  Clear override on the 22 row: one row fewer, the list stays open, the child's map loses its
@@ -186,9 +187,9 @@ async function main() {
 
 		console.log('--- M2. the list ---');
 		const rows0 = await menuRows();
-		ok('M2 the Scenarios menu row reads "Manage overrides"', MO === 'Manage overrides' && rows0.some((r) => r.text === MO), JSON.stringify(rows0.map((r) => r.text)));
+		ok('M2 the Scenarios menu row reads "Override manager…"', MO === 'Override manager…' && rows0.some((r) => r.text === MO), JSON.stringify(rows0.map((r) => r.text)));
 		let d = await openManage(CHILD);
-		ok('M2 the dialog is titled "Manage overrides: ' + CHILD + '"', !!d && d.title === (await L('lpn_ovl_title')).replace('{name}', CHILD) && /^Manage overrides: /.test(d.title), d && d.title);
+		ok('M2 the dialog is titled "Override manager: ' + CHILD + '"', !!d && d.title === (await L('lpn_ovl_title')).replace('{name}', CHILD) && /^Override manager: /.test(d.title), d && d.title);
 		ok('M2 it counts 5, one row each, a box and Clear override on every row', !!d && d.msg === (await L('lpn_scenario_overrides')) + ': 5' && nrows(d) === 5 && d.boxes === 5 && d.clears === 5, JSON.stringify(d && d.msg) + ' ' + JSON.stringify(rowsOf(d)));
 		ok('M2 Clear selected overrides is off until a row is selected', !!d && d.selOff === true);
 		const junction = await L('lpn_tool_add_junction'), TSG = await L('lpn_tsb_menu'), OFF = await L('lpn_ovl_bubble_off');
