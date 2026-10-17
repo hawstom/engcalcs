@@ -845,7 +845,8 @@ console.log('\n--- 9. scenario parents and the held view ---');
 		const before = L.getScenarios().length;
 		row.fn();
 		said = (L.lastNotice() || {}).text || '';
-		ok('...and the menu\'s Delete row says so instead of asking', L.getScenarios().length === before && said.indexOf(fire.name) >= 0 && said.indexOf('inherit') >= 0);
+		ok('...and the menu\'s Delete row says so instead of asking', L.getScenarios().length === before && said.indexOf(fire.name) >= 0 &&
+			said.indexOf(String(global.EngCalcs.pageConfig.lpn_scenario_delete_has_children || '').split('{name}')[1].split('{list}')[0]) >= 0);
 	}
 	ok('...and a reparent to Base keeps its own values', L.setScenarioParent(fire.id, null) === true && fire.parent === undefined &&
 		(L.switchScenario(fire.id), L.effective(j, 'demand') === 900) && L.heldCalcOption(fire, 'demandMultiplier') === undefined);
