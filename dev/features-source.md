@@ -64,13 +64,13 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 
 ## Solver
 
-- 146| Native solver for steady state (single moment) simulation.
-- 451, 419| EPANET 2.3.5 solver for extended period simulations, with a solver comparison display.
+- 146| Native solver for steady-state (single moment) simulation.
+- 451, 419| EPANET 2.3.5 solver for extended-period simulations, with a solver comparison display.
 - 467| Auto-recalculate option.
 
 ## Projects, files, and formats
 
-- 146.08, 447, 352, 360| Multiple open project tabs, saved in the browser or to an "lwn" file, with locking for office network collaboration.
+- 146.08, 447, 352, 360| Multiple open project tabs, saved in the browser or to an ".epp" file, with locking for office network collaboration.
 - 2, 4, 37, 246| Install for offline use.
 - 486| Best on PC, tested on a phone.
 
@@ -83,7 +83,7 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 - 145, 276| World map canvas or your own backdrop.
 - 476| XY to Lat/Lon conversion import wizard.
 - 696, 641| Conversion of a project copy to another coordinate system and other units, and new projects in a real EPSG projection.
-- 437, 497| Place name search and elevations from map DEM.
+- 437, 497| Place name search, and elevations filled in from a digital elevation model.
 
 ## Adding, editing, and displaying assets and results
 
@@ -94,13 +94,13 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 - 345, 329, 333, 336, 397, 398, 399, 469, 146.01, 383| Customizable node and link labels: prefixes, suffixes, separator, drop order, and automatic or manual placement.
 - 353, 420, 389, 540| Find, replace, and go to elements, including complex queries in your language.
 - 266| Mass-edit assets by Find and replace, Select area, or spreadsheet Tables.
-- 384, 327| Network coloring: three to seven ranges, eight ways of placing the breaks, and 41 color ramps.
+- 384, 327| Network coloring: three to seven ranges, six ways of placing the breaks (or type your own), and 41 color ramps.
 - 337, 342, 376| Multi-line annotation text with bold, rotation, and association to assets.
 - 331, 362| Independent size settings for text, symbol, and pipes.
 - 409, 433, 506, 510, 600, 640| Graphs: HGL profiles with path editing, time series, contour on the map, frequency distribution, and a flow balance of production against consumption.
-- 637, 784, 804, 795| Time series graphs at the foot of Properties and as bubbles on the map, including tank depth; and the bubbles are an override for Presentation.
+- 637, 784, 804, 795| Time series graphs at the foot of Properties and as bubbles on the map, including tank depth. A bubble's display is set per scenario.
 
-## Extended period simulations
+## Extended-period simulations
 
 - 248.01, 423, 410, 248.02| Extended-period simulation with patterns for demands, reservoir head, and pump speed.
 - 248.03| EPANET-style rule-based controls.
@@ -112,7 +112,7 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 
 ## Analyses
 
-- 530| Fire flow failure and collateral (design) failure analysis.
+- 530| Fire flow analysis: which junctions miss their fire flow, and which pull the rest of the system below its limits.
 - 751| Criticality analysis, which removes each pipe, pump, and valve in turn and reports the effect.
 - 754| Demand scaling, which finds the largest demand scale the system can carry.
 
@@ -138,10 +138,10 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
      and now we are giving them away for free."* The word names what this class of capability
      costs everywhere ELSE, which is the whole point of the section. Do not re-flag it. -->
 
-- see Scenarios and alternatives| Scenarios and alternatives (see Scenarios and alternatives).
-- see Analyses| Fire flow, criticality, and demand scaling analyses (see Analyses).
-- see Projects, files, and formats| Import and export formats (see Projects, files, and formats).
-- see Projects, files, and formats| Coordinate system and unit conversion (see Projects, files, and formats).
+- see Scenarios and alternatives| Scenarios and alternatives (above).
+- see Analyses| Fire flow, criticality, and demand scaling analyses (above).
+- see Projects, files, and formats| Import and export formats (above).
+- see Projects, files, and formats| Coordinate system and unit conversion (above).
 
 
 ## The calculators
@@ -156,6 +156,6 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 
 ## Language, license, and privacy
 
-- 15, 22| Twenty-seven languages, and every word is evaluated for translation.
+- 15, 22| Twenty-seven languages, and every word is considered for translation.
 - 244| Free software under the GNU GPL, source in the open.
-- 286, 288| No account, no visitor identifier, and nothing counted about you unless you say yes.
+- 286, 288| No account, and no visitor identifier or count of you unless you say yes.
