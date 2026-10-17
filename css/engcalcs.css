@@ -6059,7 +6059,13 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
    pointer. It must never take a click. */
 .lpn-hovercard-anchor { position: fixed; width: 1px; height: 1px; pointer-events: none; }
 .tooltip.lpn-hovercard { pointer-events: none; }
-.tooltip.lpn-hovercard .tooltip-inner { text-align: left; }
+.tooltip.lpn-hovercard { max-width: calc(100vw - 8px); }
+.tooltip.lpn-hovercard .tooltip-inner { text-align: start; max-width: min(24rem, calc(100vw - 8px)); max-height: calc(100vh - 8px); overflow: hidden; }
+.tooltip.lpn-hovercard-wide .tooltip-inner { max-width: min(46rem, calc(100vw - 8px)); }
+.tooltip.lpn-hovercard .tooltip-arrow { display: none; }
+.lpn-hovercard-row { white-space: pre-line; }
+.lpn-hovercard-cols { column-count: 2; column-gap: 1rem; }
+.lpn-hovercard-cols .lpn-hovercard-row { break-inside: avoid; }
 
 /* ---- Time series graph bubbles (Task 784) -------------------------------------------------------
    The layer is a fixed window over the part of the canvas that is on screen, clipped to it, and does

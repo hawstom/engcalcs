@@ -86,10 +86,6 @@ const EC_HARNESS_WORDING_EXCEPT = [
             . 'message. It reads like lpn_basemap_tip because both describe the same picture.',
     ],
     'dev/lpn-spike/engine-prefetch-harness.js' => [
-        'PRV, PSV, or FCV' =>
-            '(a) asserted against PC.lpn_settings_engine_native_tip, not against the screen: the '
-            . 'engine checkbox was left un-disabled BECAUSE that tip names both cases permanently, '
-            . 'so the tip losing them is the defect this line is for.',
         'extended period simulation' =>
             '(a) the other case the same tip must keep naming.',
     ],

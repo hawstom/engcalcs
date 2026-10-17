@@ -114,16 +114,18 @@ ok('the status bar warns that the engines differ on Manning',
 // ------------------------------------------------------------------------------------------
 // 2. AN ACTIVE VALVE ROUTES ITSELF, AND DOES NOT REWRITE THE USER'S CHOICE
 // ------------------------------------------------------------------------------------------
-console.log('\n--- a PRV takes the network to EPANET on its own ---');
+// **A PBV, SINCE THE BUILT-IN SOLVER LEARNT PRV/PSV/FCV** (Task 733): a pressure breaker is the
+// valve that still only EPANET solves, so it is the one that has to route the network on its own.
+console.log('\n--- a PBV takes the network to EPANET on its own ---');
 L.settings().method = 'hw';
 L.settings().engine = 'native';
 {
 	const doc = line();
 	doc.links[0]._roughness = 130;
-	// A PRV may not sit on a fixed head (EPANET input error 219, and lpnDiagnose says so), so the
+	// An active valve may not sit on a fixed head (lpnDiagnose's valve-on-fixed-head), so the
 	// valve goes between two junctions with a pipe either side.
 	doc.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 0 });
-	doc.links.push({ id: 'V1', type: 'valve', valveType: 'PRV', from: 'J1', to: 'J2', verts: [],
+	doc.links.push({ id: 'V1', type: 'valve', valveType: 'PBV', from: 'J1', to: 'J2', verts: [],
 		_diameter: 200, _setting: 40, _k: 0, _status: 'open' });
 
 	const was = epanetSolves();
@@ -137,9 +139,35 @@ L.settings().engine = 'native';
 	ok('the stored engine setting was NOT rewritten', L.settings().engine === 'native', L.settings().engine);
 	ok('the status bar names the valve that caused the switch',
 		status().indexOf('V1') >= 0, JSON.stringify(status()));
-	// The PRV is doing something, or nothing above is about a PRV at all.
-	ok('the PRV actually holds its downstream head at the setting',
-		Math.abs(r.heads.J2 - 40) < 0.01, r.heads.J2);
+	// The PBV is doing something, or nothing above is about a PBV at all.
+	ok('the PBV actually takes its setting out of the head',
+		Math.abs(r.heads.J1 - r.heads.J2 - 40) < 0.01, r.heads.J1 - r.heads.J2);
+}
+
+// ------------------------------------------------------------------------------------------
+// 2b. A PRV NO LONGER LEAVES THE BUILT-IN SOLVER (Task 733, phase 1)
+// ------------------------------------------------------------------------------------------
+console.log('\n--- a PRV stays on the built-in solver ---');
+{
+	const doc = line();
+	doc.links[0]._roughness = 130;
+	doc.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 0 });
+	doc.links.push({ id: 'V2', type: 'valve', valveType: 'PRV', from: 'J1', to: 'J2', verts: [],
+		_diameter: 200, _setting: 40, _k: 0, _status: 'open' });
+	const was = epanetSolves();
+	L.runSolve();
+	const r = L.lastResult();
+	ok('the PRV network is not handed to EPANET', epanetSolves() === was, epanetSolves() - was + ' calls');
+	ok('...it is the built-in solver\'s answer', !!r && r.engine !== 'epanet', r && r.engine);
+	ok('...and the PRV holds its downstream head at the setting',
+		!!r && Math.abs(r.heads.J2 - 40) < 0.01, r && r.heads.J2);
+	ok('...and says the valve is active', !!r && r.valveStatus && r.valveStatus.V2 === 'active',
+		r && JSON.stringify(r.valveStatus));
+	doc.links.pop();
+	doc.nodes.pop();
+	doc.links.push({ id: 'V1', type: 'valve', valveType: 'PBV', from: 'J1', to: 'J2', verts: [],
+		_diameter: 200, _setting: 40, _k: 0, _status: 'open' });
+	doc.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 0 });
 }
 
 // ------------------------------------------------------------------------------------------

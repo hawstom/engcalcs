@@ -10,6 +10,19 @@ the code contradicts, and (c) one engineering example of why the feature matters
 
 Function names are in `js/looped-network.js` unless another file is named.
 
+## Chapters rewritten on `feat/guide-scenarios` (2026-10-16 and 2026-10-17)
+
+Each has a `dev/lpn-spike/user-guide-<chapter>-harness.js` that reads every quoted interface name from
+the language file, measures the numbers on Net1, and checks a page in Spanish. Rewritten: Scenario
+manager, Scenario comparison, Libraries, Properties, Settings, Using the user manual, Toolbar, Menus,
+Map, Tables, Boxes, Fire flow, Critical assets, Demand scaling, Pump energy, Contour, Run report, Status
+changes, Full report, Calibration, Notes, and the user manual's own entry. Still audited only:
+Screenshot. Contradictions the rewrite corrected on 2026-10-17: the Notes pump curve note told the reader
+to enter points on the pump, which the Libraries now own; the solver note did not say the built-in
+solver exists; the color note did not say a scenario shows Base's boundaries; the user manual's entry
+said Ctrl+K works from anywhere (not while a question is open) and listed three contents where it has
+nine sections.
+
 ## The rewrite pattern (Find and replace)
 
 What makes a chapter a step better, as applied to Find and replace:
@@ -119,6 +132,8 @@ Ctrl+D: every old cast-iron pipe gets C = 80 in that scenario only.
 
 ## Using the guide
 
+**REWRITTEN 2026-10-16** (`dev/lpn-spike/user-guide-using-harness.js`): the keys table says what ? does (a toolbar button or menu row under the pointer or with focus, else the search field), when it and Ctrl+K do nothing, and the new term covers search, the address that follows the entry, and what is remembered.
+
 (a) Omits:
 - Ctrl+K (Cmd+K on a Mac) replaces the browser's Ctrl+K everywhere, including text fields; it now
   puts up to 80 characters of selected text into the search field (this branch).
@@ -162,6 +177,8 @@ junction through a low-pressure zone; the map keeps at least 320 px.
 
 ## Properties
 
+**REWRITTEN 2026-10-16** (`feat/guide-scenarios`, `dev/lpn-spike/user-guide-properties-harness.js`). Corrections to this section: values Base owned then (Elevation, a reservoir's head pattern) are overridable now; the box has no time-series graph at its foot (graphs are bubbles on the map, from the right-click menu); results sit among a node's inputs and follow a link's; the multi-selection box lists ID, From, and To like the Tables columns it is built from.
+
 (a) Omits:
 - In a scenario, an edit to a value the scenario can override creates an override without a
   message; values it cannot override (Elevation, a reservoir head pattern) change Base and every
@@ -184,6 +201,8 @@ flow shortfall and set Diameter to 8 once; Base stays unchanged for comparison.
 
 ## Settings
 
+**REWRITTEN 2026-10-16** (`dev/lpn-spike/user-guide-settings-harness.js`). "There is no other place to find settings" is gone from the box text: Tables has a Settings tab that lists them. Restore defaults leaves a hydraulic option unset rather than typed; Undo does not reverse it.
+
 (a) Omits:
 - Demand multiplier is per scenario; inside a scenario the row reads and writes that scenario's value,
   and a blank inherits.
@@ -205,6 +224,8 @@ flow shortfall and set Diameter to 8 once; Base stays unchanged for comparison.
 (1.0, 1.8, 2.7): one number per scenario instead of one edit per junction.
 
 ## Library
+
+**REWRITTEN 2026-10-16** (`dev/lpn-spike/user-guide-library-harness.js`). The box is titled Libraries. A pattern, curve, pipe type, or fittings list is the same in every scenario; the default demand pattern is a setting and a scenario can have its own. Controls act in an extended-period simulation only, rules in EPANET runs only.
 
 (a) Omits:
 - The Library is project-wide, not per scenario: editing a curve or pattern in a scenario changes it
@@ -284,6 +305,8 @@ still hold 40 psi: the build-out headroom before a main must be upsized.
 
 ## Scenario comparison
 
+**REWRITTEN 2026-10-16** (`dev/lpn-spike/user-guide-scenarios-harness.js`): the entry now says which scenarios are solved (those checked in the Scenario manager), the columns, steady and extended-period scenarios, and failed rows, with a Net1 example held cell for cell.
+
 (a) Omits:
 - It runs when the box opens, and again after every settled edit while open: one solve per scenario
   each time.
@@ -302,6 +325,8 @@ value. An override equal to Base's value is still counted.
 pressure (38 psi at J-112 at 07:00) and the highest velocity: the standard master-plan checks.
 
 ## Alternatives
+
+**SUPERSEDED 2026-10-16.** There is no Alternatives box any more: the Scenario manager (tree and Scenarios table in one box) replaced it, and its entry now holds the Scenarios chapter after Tom's own help text. Of the facts below, the nine categories are eleven now (Presentation and Calculation are the two added).
 
 (a) Omits:
 - Alternatives are derived from each scenario's overrides, not stored; a cell's count is the number

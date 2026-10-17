@@ -147,7 +147,8 @@ async function pass(browser, Session, tag, extra) {
 		ok('...and the Guide was read whole', all.length > 150, String(all.length));
 		const entry = (id) => page.evaluate((id) => {
 			const en = document.getElementById('lpn_guide_b_' + id);
-			return en ? Array.from(en.querySelectorAll('p')).map(p => p.textContent.trim()).join('\n\n') : null;
+			// Only the entry's own paragraphs: a chapter's definition list below them has paragraphs of its own.
+			return en ? Array.from(en.querySelectorAll(':scope > p')).map(p => p.textContent.trim()).join('\n\n') : null;
 		}, id);
 		const props = await entry('lpn_popup');
 		ok('5. Properties shows the 2026-10-07 wording', props === enString('lpn_guide_text_popup'), props);
