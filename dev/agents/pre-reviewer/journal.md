@@ -4477,3 +4477,12 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: lpn_theme set by Light/Dark, absent for System; no project key mentions theme/dark; Start fresh removes it and reloads as System; reload keeps Dark; no white flash (CSS and script held 2.5-4 s, paint is dark); calculator page Hazen-Williams under dark OS stays light, no data-theme.
 - OBSERVED: focus ring on Play/step transport buttons is the browser default (dark on grey); time step/speed selects show no ring.
 - NOT CHECKED: import report (open of crafted .inp did not complete in my driver), scenario manager box, EPANET run-report dialog.
+
+## 2026-10-16 feat/hover-props @ 9cb2d1f8f (Task 773, hover card shows all properties) (Perry)
+- OBSERVED (real Chromium; Net1, Net1-SI, Elm Street, Net3-World, with injected tag/desc/custom property/valve/customer): builder harness 59/59 passes. Card equals the map label's composers with every box ticked, so it is the LABEL's field list, not the Properties box's.
+- OBSERVED: DEFECT (against "all of its properties"). Never on the card though in Properties: custom properties (Route RT0 on J2), X/Y or lat/lon, From/To, Closed, Is active, valve TYPE and SETTING (PRV 45 psi not shown), pump curve/speed/price/efficiency, pipe type, fittings list, emitter coefficient, required fire flow, tank min/max level, diameter, mixing, volume, head pattern, customer demand pattern and custom properties.
+- OBSERVED: DEFECT. 8-line Description wraps at ~270px, card 533px tall; at viewport 520px tall it runs off the bottom (and top); at 390x740 phone width with 8 lines it sat 245px above the top of the screen. 3-line description fits both.
+- OBSERVED: values with no Settings prefix print bare ("1609.3", "350", "Open" twice, "0.5 mg/L"); card cannot say which is length or diameter.
+- OBSERVED: RTL (ar): card text-align is hard-coded left; unit marks flip ('5280, "14, "mg/L 0.5, .Init). Not compared with the map label.
+- OBSERVED: no long tasks over 25 Net3 assets; ~500 ms rest delay is by design. Spanish/Arabic Settings row still carry the old wording (payloads not regenerated; expected).
+- NOT CHECKED: harness mutation (does it fail on the pre-change code); dark theme; touch.
