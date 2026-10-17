@@ -70,7 +70,7 @@ async function layOut(stub, sc, mutate, scenario) {
 	let lastShip = null;
 	for (const scenario of [false, true]) {
 		for (const sc of V.SCENES) {
-			const tag = sc.name + (scenario ? ' in a scenario' : '');
+			const tag = sc.name + (scenario ? ', scenario' : '');
 			const ship = await layOut(stub, sc, undefined, scenario);
 			const ref = await layOut(stub, sc, noMemo, scenario);
 			sc.mults.forEach((m, i) => {

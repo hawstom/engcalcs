@@ -514,7 +514,7 @@ var EngCalcs = EngCalcs || {};
 		return !!scnSetting('alignPipeLabels') && l.lx === undefined && l.ly === undefined;
 	}
 	// Whether the label is DRAWN along its pipe this pass: the setting asks for it, and the pass did
-	// not have to set it level beside the pipe instead (placeLevelPipeLabels(), Task 812).
+	// not have to set it level beside the pipe instead (placeLevelPipeLabels()).
 	function linkLabelDrawnAligned(l) {
 		var le = linkEls[l.id];
 		return linkLabelAligned(l) && !(le && le.levelBeside);
@@ -1525,7 +1525,7 @@ var EngCalcs = EngCalcs || {};
 		// still in conflict, no clear station on its pipe (placeStationedLabels()), standing on
 		// ground a node label has just taken (yieldStationedLabels()),
 		// or the losing half of a crossing nothing could repair (shedCrossingLabels(), Task 539).
-		// A label the pass set LEVEL BESIDE its pipe (Task 812) is drawn whatever hid it along the pipe.
+		// A label the pass set LEVEL BESIDE its pipe (placeLevelPipeLabels()) is drawn whatever hid it along the pipe.
 		var hideAll = le.levelBeside ? !!le.hiddenCrossed
 			: (le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenBlocked || !!le.hiddenYielded || !!le.hiddenCrossed);
 		setLabelAssemblyHidden(le, hideAll);
@@ -2849,12 +2849,12 @@ var EngCalcs = EngCalcs || {};
 	// back.
 	var lastCrossingShed = null;
 	// **A PIPE LABEL THAT CANNOT LIE ALONG ITS PIPE IS TRIED LEVEL BESIDE IT BEFORE IT HIDES**
-	// (Task 812, dev/label-trials/port-plan.md Step 3). Along the pipe, a label hides when it has
+	// (dev/label-trials/port-plan.md Step 3). Along the pipe, a label hides when it has
 	// shed to its last value and is still crowded, when no station on its pipe is clear, or when a
 	// node label has taken its ground (and when it is too long for its segment, which stays a hide,
-	// below). Measured on master (dev/label-trials/preprocessing/hide-reasons.js), those exits hid
-	// 102 of Net3's 119 pipe labels at 2x and 237 of the 600-junction network's 343, and not one of
-	// them had tried a spot off its pipe. Here each tries one, level, as a free label with a
+	// below). Measured on master (dev/label-trials/preprocessing/hide-reasons.js), those three exits
+	// hid 37 of Net3's 119 pipe labels at 2x and 202 of the 600-junction network's 343, and not one
+	// of them had tried a spot off its pipe. Here each tries one, level, as a free label with a
 	// leader: R14, *"Values outrank alignment"*, and R1, nearness to home given up before the label.
 	//
 	// **WHAT IT IS GIVEN IS ALREADY ITS SMALLEST FORM.** The crowding shed stops at one value, so a
@@ -3092,7 +3092,7 @@ var EngCalcs = EngCalcs || {};
 		// **THE YIELDER HAS TO ACTUALLY LEAVE, and until 2026-08-23 it never did.** See
 		// yieldStationedLabels() -- this is the one call site, and it must run after BOTH placements.
 		perfDebugAccum('  cl:yield', function () { yieldStationedLabels(nodePlaced, obs); });
-		// **AND A PIPE LABEL THAT COULD NOT LIE ALONG ITS PIPE IS TRIED LEVEL BESIDE IT** (Task 812).
+		// **AND A PIPE LABEL THAT COULD NOT LIE ALONG ITS PIPE IS TRIED LEVEL BESIDE IT** (placeLevelPipeLabels()).
 		// Last, on the ground every other label has left, so nothing already placed moves.
 		perfDebugAccum('  cl:level', function () {
 			placeLevelPipeLabels(obs, nodeObs, nodeLabels, nodePlaced, labels, placed, holders, fs);
@@ -7281,7 +7281,7 @@ var EngCalcs = EngCalcs || {};
 		if (!Object.prototype.hasOwnProperty.call(m.v, k)) { m.v[k] = settingFor(m.scn, ['labelSettings'].concat(path || [])); }
 		return m.v[k];
 	}
-	// **EACH SETTING READ ONCE PER LABEL PASS** (Task 812, port-plan Step 1). Inside one
+	// **EACH SETTING READ ONCE PER LABEL PASS** (dev/label-trials/port-plan.md Step 1). Inside one
 	// refreshLabelText() the answers of scnSetting(), scnLabels() and coordOverridesOf() cannot
 	// change, yet the pass asked the scenario layer for them thousands of times. The memo lives
 	// only inside that one call, and it drops itself if anything moves the tree (a setting or

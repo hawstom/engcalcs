@@ -1204,7 +1204,7 @@ EngCalcs.lpnCollide = (function () {
 		// 23.9 per 100 shown, leaders through a node 697 -> 407, the page pass about 8% slower.
 		// `opts.clean === false` is the old single sweep, kept for the harness that measures it.
 		var clean = opts.clean !== false, waiting = [], seat = {};
-		// **STRICT: A SIDE IS TAKEN ONLY IF IT BREAKS NOTHING** (Task 812, the level pipe label). The
+		// **STRICT: A SIDE IS TAKEN ONLY IF IT BREAKS NOTHING** (the level pipe label, dev/label-trials/port-plan.md Step 3). The
 		// labels handed in strictly are ones that would otherwise hide, so there is no fallback that
 		// costs a neighbour: a side held by a yielding label is blocked, the label may not lie on its
 		// own pipe (`ownLink`, R7: beside it, not on it), and a leader long enough to be drawn
