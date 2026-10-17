@@ -64,13 +64,13 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 
 ## Solver
 
-- 146| Native solver for steady state (single moment) simulation.
-- 451, 419| EPANET 2.3.5 solver for extended period simulations, with a solver comparison display.
+- 146| Native solver for steady-state (single moment) simulation.
+- 451, 419| EPANET 2.3.5 solver for extended-period simulations, with a solver comparison display.
 - 467| Auto-recalculate option.
 
 ## Projects, files, and formats
 
-- 146.08, 447, 352, 360| Multiple open project tabs, saved in the browser or to an "lwn" file, with locking for office network collaboration.
+- 146.08, 447, 352, 360| Multiple open project tabs, saved in the browser or to an ".epp" file, with locking for office network collaboration.
 - 2, 4, 37, 246| Install for offline use.
 - 486| Best on PC, tested on a phone.
 
@@ -94,13 +94,13 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 - 345, 329, 333, 336, 397, 398, 399, 469, 146.01, 383| Customizable node and link labels: prefixes, suffixes, separator, drop order, and automatic or manual placement.
 - 353, 420, 389, 540| Find, replace, and go to elements, including complex queries in your language.
 - 266| Mass-edit assets by Find and replace, Select area, or spreadsheet Tables.
-- 384, 327| Network coloring: three to seven ranges, eight ways of placing the breaks, and 41 color ramps.
+- 384, 327| Network coloring: three to seven ranges, six ways of placing the breaks (or type your own), and 41 color ramps.
 - 337, 342, 376| Multi-line annotation text with bold, rotation, and association to assets.
 - 331, 362| Independent size settings for text, symbol, and pipes.
 - 409, 433, 506, 510, 600, 640| Graphs: HGL profiles with path editing, time series, contour on the map, frequency distribution, and a flow balance of production against consumption.
 - 637, 784, 804, 795| Time series graphs at the foot of Properties and as bubbles on the map, including tank depth; and the bubbles are an override for Presentation.
 
-## Extended period simulations
+## Extended-period simulations
 
 - 248.01, 423, 410, 248.02| Extended-period simulation with patterns for demands, reservoir head, and pump speed.
 - 248.03| EPANET-style rule-based controls.
@@ -158,4 +158,4 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 
 - 15, 22| Twenty-seven languages, and every word is evaluated for translation.
 - 244| Free software under the GNU GPL, source in the open.
-- 286, 288| No account, no visitor identifier, and nothing counted about you unless you say yes.
+- 286, 288| No account, and no visitor identifier or count of you unless you say yes.

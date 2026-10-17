@@ -16,13 +16,13 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 
 ## Solver
 
-- Native solver for steady state (single moment) simulation. <!-- 146 -->
-- EPANET 2.3.5 solver for extended period simulations, with a solver comparison display. <!-- 451, 419 -->
+- Native solver for steady-state (single moment) simulation. <!-- 146 -->
+- EPANET 2.3.5 solver for extended-period simulations, with a solver comparison display. <!-- 451, 419 -->
 - Auto-recalculate option. <!-- 467 -->
 
 ## Projects, files, and formats
 
-- Multiple open project tabs, saved in the browser or to an "lwn" file, with locking for office network collaboration. <!-- 146.08, 447, 352, 360 -->
+- Multiple open project tabs, saved in the browser or to an ".epp" file, with locking for office network collaboration. <!-- 146.08, 447, 352, 360 -->
 - Install for offline use. <!-- 2, 4, 37, 246 -->
 - Best on PC, tested on a phone. <!-- 486 -->
 - Network import and export as EPANET `.inp`, plus network export to GeoJSON and DXF. <!-- 196, 483, 281 -->
@@ -45,13 +45,13 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 - Customizable node and link labels: prefixes, suffixes, separator, drop order, and automatic or manual placement. <!-- 345, 329, 333, 336, 397, 398, 399, 469, 146.01, 383 -->
 - Find, replace, and go to elements, including complex queries in your language. <!-- 353, 420, 389, 540 -->
 - Mass-edit assets by Find and replace, Select area, or spreadsheet Tables. <!-- 266 -->
-- Network coloring: three to seven ranges, eight ways of placing the breaks, and 41 color ramps. <!-- 384, 327 -->
+- Network coloring: three to seven ranges, six ways of placing the breaks (or type your own), and 41 color ramps. <!-- 384, 327 -->
 - Multi-line annotation text with bold, rotation, and association to assets. <!-- 337, 342, 376 -->
 - Independent size settings for text, symbol, and pipes. <!-- 331, 362 -->
 - Graphs: HGL profiles with path editing, time series, contour on the map, frequency distribution, and a flow balance of production against consumption. <!-- 409, 433, 506, 510, 600, 640 -->
 - Time series graphs at the foot of Properties and as bubbles on the map, including tank depth; and the bubbles are an override for Presentation. <!-- 637, 784, 804, 795 -->
 
-## Extended period simulations
+## Extended-period simulations
 
 - Extended-period simulation with patterns for demands, reservoir head, and pump speed. <!-- 248.01, 423, 410, 248.02 -->
 - EPANET-style rule-based controls. <!-- 248.03 -->
@@ -102,4 +102,4 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 
 - Twenty-seven languages, and every word is evaluated for translation. <!-- 15, 22 -->
 - Free software under the GNU GPL, source in the open. <!-- 244 -->
-- No account, no visitor identifier, and nothing counted about you unless you say yes. <!-- 286, 288 -->
+- No account, and no visitor identifier or count of you unless you say yes. <!-- 286, 288 -->
