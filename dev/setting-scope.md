@@ -45,7 +45,7 @@ Derived from `EC_LPN_FURNITURE` in `dev/scripts/lpn_furniture_check.php`; the ch
 | `lpn_panecols` | Column width, order and hidden columns of the Tables (drag a divider or heading, Manage columns) |
 | `lpn_runbox` | Settings > Calculation > Hydraulics > Show the run progress box |
 | `lpn_scnbasic` | Scenarios > Basic mode |
-| `lpn_hovercard` | Settings > Map and page > Page > Show the full label on hover |
+| `lpn_hovercard` | Settings > Map and page > Page > Show all properties on hover |
 | `lpn_ovrmarks` | Settings > Map and page > Page > Show override markers on the map |
 | `lpn_cleanmap` | Map > Clean map |
 | `lpn_theme` | Settings > Map and page > Page > Theme (System, Light, Dark) |
