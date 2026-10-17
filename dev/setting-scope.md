@@ -99,7 +99,7 @@ rows) are counted only when present. Regenerate with
 Controls whose home is not their heading's default, as observed:
 
 - `lpn_set_sub_page`: Show the selection help -- browser
-- `lpn_set_sub_page`: Show the full label on hover -- browser
+- `lpn_set_sub_page`: Show all properties on hover -- browser
 - `lpn_set_sub_page`: Show override markers on the map -- browser
 - `lpn_set_sub_page`: Theme -- browser
 - `lpn_set_sub_hydraulics`: Show the run progress box -- browser
