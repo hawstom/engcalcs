@@ -64,7 +64,8 @@ async function main() {
 
 		console.log('\n3. The built-in solver');
 		const tip = plain(enString('lpn_settings_engine_native_tip')), note = plain(enString('lpn_notes_1_def'));
-		ok('the setting\'s tip and the note both name extended period simulation and the pressure and flow control valves, and both give the rest to the EPANET solver', [tip, note].every((t) => /extended period/.test(t) && /PRV, PSV/.test(t) && /FCV/.test(t) && /EPANET solver/.test(t)));
+		// Since Task 733 phase 1 (2026-10-17) the built-in solver solves PRV, PSV and FCV; only PBV and GPV still need EPANET.
+		ok('the setting\'s tip and the note both name extended period simulation and the valves only EPANET solves, and both give the rest to the EPANET solver', [tip, note].every((t) => /extended period/.test(t) && /PBV/.test(t) && /GPV/.test(t) && !/PRV, PSV/.test(t) && /EPANET solver/.test(t)));
 
 		console.log('\n4. The engine note');
 		const engine = plain(enString('lpn_notes_engine_def'));
