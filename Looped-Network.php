@@ -2104,6 +2104,12 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_guide_fr_what_term']?></dt><dd><?=$ec_lang['lpn_guide_fr_what_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_fr_example_term']?></dt><dd><?=$ec_lang['lpn_guide_fr_example_def']?></dd>
 </dl></template>
+<?php // The Calibration chapter (Task 785). ?>
+<template id="lpn_guide_more_lpn_calib_box"><dl>
+	<dt><?=$ec_lang['lpn_guide_cal_what_term']?></dt><dd><?=$ec_lang['lpn_guide_cal_what_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_cal_file_term']?></dt><dd><?=$ec_lang['lpn_guide_cal_file_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_cal_example_term']?></dt><dd><?=$ec_lang['lpn_guide_cal_example_def']?></dd>
+</dl></template>
 <template id="lpn_guide_more_lpn_scncmp_box"><dl>
 	<dt><?=$ec_lang['lpn_guide_cmp_cols_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_cols_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_cmp_run_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_run_def']?></dd>
