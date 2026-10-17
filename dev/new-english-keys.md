@@ -1126,7 +1126,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > This row names no setting this page knows, so it was not used.
   @@ NEEDS RULING
 - **`lpn_scnbook_why_root_parent`**
-  > A Base takes no parent, so the parent in this row was not used.
+  > The parent of a Base is not set by a workbook, so the parent in this row was not used.
   @@ NEEDS RULING
 - **`lpn_scnbook_why_setting_category`**
   > this setting is not in the category {category}, so it was not used.
@@ -1543,13 +1543,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/sprint-1017 (`e6ac0b78e`) — adds no English strings
+### chore/sprint-1017 (`a2f8af97f`) — adds no English strings
 
 ### docs/label-port (`7ec7a65cf`) — already merged into feat/label-beside; its strings are listed there
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/label-beside (`6170ce774`) — adds no English strings
+### feat/label-beside (`f35eb0041`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -1573,6 +1573,6 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/sheet-sync (`4404697a7`) — adds no English strings
+### feat/sheet-sync (`8a0862fac`) — adds no English strings
 
-### feat/theme (`a59716ca4`) — adds no English strings
+### feat/theme (`d420437f2`) — adds no English strings

@@ -51302,7 +51302,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				return;
 			}
 			if (x.s.isBase || x.s.root === true) {
-				if (ptext.trim() !== '') { bad(x.sh.name, x.row, scnBookSay('lpn_scnbook_why_root_parent', 'A Base takes no parent, so the parent in this row was not used.')); }
+				if (ptext.trim() !== '') { bad(x.sh.name, x.row, scnBookSay('lpn_scnbook_why_root_parent', 'The parent of a Base is not set by a workbook, so the parent in this row was not used.')); }
 				return;
 			}
 			if (p === undefined || p === null) {
@@ -51365,7 +51365,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			cur = smParentKey(x.cat, x.key);
 			if (cur === null) {
-				if (ptext.trim() !== '') { bad(x.sh.name, x.row, scnBookSay('lpn_scnbook_why_root_parent', 'A Base takes no parent, so the parent in this row was not used.')); }
+				if (ptext.trim() !== '') { bad(x.sh.name, x.row, scnBookSay('lpn_scnbook_why_root_parent', 'The parent of a Base is not set by a workbook, so the parent in this row was not used.')); }
 				return;
 			}
 			if (p === undefined || p === null) {
