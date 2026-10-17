@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**98 still to read on master**, of 408 untranslated keys, of 3026 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**98 still to read on master**, of 408 untranslated keys, of 3025 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,59 +21,9 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (5 to read @@ NEEDS RULING)
+## Questions from the translators  (0, all answered)
 
-**These are SHIPPED strings, already translated into 26 languages.** A wave-0
-reading or a translator found each one readable two ways, and no sprint launches while one is
-unanswered. You are not being asked to approve wording here; you are being asked which reading
-is the one you meant. "The first one" is a complete answer.
-
-### from sprint 1003-ds
-
-- **`lpn_ds_found_below`**
-  > ⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.
-  *The finding:* Tom: 'I think I need explanation, and this need clarification.' It appears after Find when the demands as entered (a demand scale of 1) leave at least one junction below the limit; {m} is the largest scale, always under 1, at which every judged junction keeps the limit (0.62 means demands cut to 62 percent). 'it' in 'keeps it' is vague, 'demands as they are' never says scale 1, and {m} reads as headroom when it is a cut.
-  1. the system can take up to {m} times today's demand (wrong)
-  2. demands must be cut to {m} times what is entered for every junction to keep the pressure (right)
-  **What this asks for:** which of the readings above you meant.
-  *The proposal:* PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B paralle...
-  _Ruled 2026-10-16: B_
-
-### from sprint 1008c-wave0
-
-- **`lpn_export_table_current`**
-  > Current
-  *The finding:* 'Current' is a radio option under both Tables and Scenarios (js/looped-network.js:29716-29720). In a hydraulics tool a translator can read it as electric or water current, or as 'present time', rather than 'the one now selected'. 'All' pairs with it.
-  1. the table or scenario now selected
-  2. current, as flow of water or electricity
-  3. up to date, not out of date
-  **What this asks for:** which of the readings above you meant.
-  *The proposal:* PROPOSED syn: 'Current' (this radio, under Tables and Scenarios) means the one now selected, as opposed to All; it is never a flow or electric current. Alternative English: 'Selected only' / 'All'.
-  _Ruled 2026-10-16: syn is deprecated, so I am confused._
-- **`lpn_file_export_workspace_tip`**
-  > Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.
-  *The finding:* 'the reading preferences of this page' is unexplained jargon: a translator cannot tell whether it means language, text size, or display toggles such as the run box, the area hint and the hover card. Same phrase in lpn_file_import_workspace_tip.
-  1. language or font settings for reading text
-  2. display toggles the visitor set, such as whether help bubbles and the hover card are shown
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English (both keys): replace 'the reading preferences of this page' with 'the display options of this page, such as which help bubbles and the hover card are shown'.
-  _Ruled 2026-10-16: OK._
-- **`lpn_pane_copy_heads`**
-  > Copy with column headings
-  *The finding:* 'headings' does not say which: the column headings the table shows, or row and column headings. Right-click menu item in a Tables pane (js/looped-network.js:28892); paneCopyTsv adds one row, the column headings with unit.
-  1. copy the selected cells with their column headings as a first row
-  2. copy the selected cells with both row and column headings
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English: 'Copy with column headings'
-  _Ruled 2026-10-17: OK._
-- **`lpn_settings_hover_card_tip`**
-  > Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.
-  *The finding:* 'at any scale, fit or not' leaves 'fit' with no subject: fit what? The setting makes the hover card show the label even when the on-map label was dropped for lack of room (js/looped-network.js:51225). 'fit' also collides with 'zoom to fit'.
-  1. whether or not the label fits on the map at the current zoom
-  2. whether or not the map is zoomed to fit the network
-  **What this asks for:** a WORDING ruling -- is the English above right, or say what it should say.
-  *The proposal:* PROPOSED English: 'Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.'
-  _Ruled 2026-10-16: I've had second thoughts about this feature. I would, after all, like to have it say and act like this: 'Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.'_
+Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
 ## Plain sentences to check  (0, none are stale)
 
@@ -340,7 +290,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Importing {file}…
   _Ruled OK 2026-10-16._
 - **`lpn_guide_bx_dock_def`**
-  > <p>The corner of a box's title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap, and the box tucks back into its tab as described above. A tucked box is still open. A menu row or toolbar button that opens it brings it out of its tab.</p><p>Dragging a docked box by its title band floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.</p>
+  > <p>The corner of a box's title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap, and the box tucks back into its tab as described above. A tucked box is still open. A menu row or toolbar button that opens it brings it out of its tab.</p><p>Dragging a docked box by its title bar floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.</p>
   @@ NEEDS RULING
 - **`lpn_guide_bx_dock_term`**
   > Docking and tabs
@@ -394,7 +344,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Steady-state and extended-period scenarios
   _Ruled 2026-10-17: His own edit of 2026-10-17, applied by CC (steady state hyphenated as a modifier)._
 - **`lpn_guide_cr_case_def`**
-  > <p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as Lowest pressure allowed elsewhere in the Fire flow analysis.</p>
+  > <p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest pressure allowed elsewhere box of the Fire flow analysis.</p>
   @@ NEEDS RULING
 - **`lpn_guide_cr_case_term`**
   > What each case does
@@ -418,7 +368,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > The box
   @@ NEEDS RULING
 - **`lpn_guide_ct_example_def`**
-  > <p>Open the Net1 example and choose Water, Graphs, Contour. The nodes are colored by pressure, and the line under the color key states 9 nodes, 11 pipes, a reach of 2.5 times the median pipe length beside them, and lines every 5 psi. The pump, Link 9, is not one of the 11 pipes. Clear Show contours, and the nodes stay colored by pressure.</p>
+  > <p>Open the Net1 example and choose Water, Graphs, Contour. The nodes are colored by pressure, and the line under the color key states 9 nodes, 11 pipes, a reach of 2.5 times the median pipe length beside them, and lines every 5 psi. The pump, Link 9, is not one of the 11 pipes. When Show contours is cleared, the nodes stay colored by pressure.</p>
   @@ NEEDS RULING
 - **`lpn_guide_ct_example_term`**
   > Example on Net1
@@ -436,7 +386,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Example on Net1
   @@ NEEDS RULING
 - **`lpn_guide_ds_find_def`**
-  > <p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as Lowest pressure allowed elsewhere in the Fire flow analysis.</p>
+  > <p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest pressure allowed elsewhere box of the Fire flow analysis.</p>
   @@ NEEDS RULING
 - **`lpn_guide_ds_find_term`**
   > Find
@@ -466,7 +416,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Reading the report
   @@ NEEDS RULING
 - **`lpn_guide_en_set_def`**
-  > <p>Settings, Energy holds the Pump efficiency (percent), used for every pump that has no efficiency curve, the Price of power for one kilowatt hour, a Price pattern that multiplies the price at each pattern step, the Peak demand charge per kW, and a Currency text that is printed beside the costs and is only a label. A pump can have its own price, price pattern, and efficiency curve in Properties. The prices, the pattern, the peak demand charge, the Pump efficiency (percent), and a pump's own values are in the Energy cost category, so a scenario can override them. When no price is stated, or the price is zero, every cost is zero and the report says so. The application suggests no price.</p>
+  > <p>Settings, Energy holds the Pump efficiency (percent), used for every pump that has no efficiency curve, the Price of power for one kilowatt hour, a Price pattern that multiplies the price at each pattern step, the Peak demand charge per kW, and a Currency text that is printed beside the costs and does not convert the costs. A pump can have its own price, price pattern, and efficiency curve in Properties. The prices, the pattern, the peak demand charge, the Pump efficiency (percent), and a pump's own values are in the Energy cost category, so a scenario can override them. When no price is stated, or the price is zero, every cost is zero and the report says so. The application suggests no price.</p>
   @@ NEEDS RULING
 - **`lpn_guide_en_set_term`**
   > What sets the numbers
@@ -562,7 +512,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Esc
   @@ NEEDS RULING
 - **`lpn_guide_map_letters_def`**
-  > <p>W starts Zoom Window, A starts selecting an area (pressing A again cycles the window, lasso, and polygon), and F draws a Shape. The plus or equals key zooms in, and the minus key zooms out, by one wheel step. These keys and the digits 0 to 9 are not taken when another key makes them a shortcut, such as Ctrl+C, are not taken while typing in a field, and leave the letters of an open menu to its rows. A digit typed on a selected Tables cell overwrites the cell instead of choosing a tool.</p>
+  > <p>W starts Zoom Window, A starts selecting an area (pressing A again cycles the window, lasso, and polygon), and F draws a Shape. The plus or equals key zooms in, and the minus key zooms out, by one wheel step. These keys and the digits 0 to 9 do nothing on the map when another key makes them a shortcut, such as Ctrl+C, do nothing while typing in a field, and leave the letters of an open menu to its rows. A digit typed on a selected Tables cell overwrites the cell instead of choosing a tool.</p>
   @@ NEEDS RULING
 - **`lpn_guide_map_letters_term`**
   > Letters, digits, and zoom keys
@@ -580,7 +530,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Menus from the keyboard
   @@ NEEDS RULING
 - **`lpn_guide_mn_list_def`**
-  > <p>The list is drawn from the menus themselves: File, Edit, Map, Water, and Help, each under its own heading, with the rows of a fly-out indented under the row that opens it and a rule between groups. It leaves out rows that are hidden now, headings inside a menu, and rows named from the project or the browser, such as scenario names. It goes one fly-out deep, and it has no entry for the Language menu. A row that is disabled now is still listed, with no sign of it. Clicking a row opens the menu and fly-out with that row pointed at. It never runs the row.</p>
+  > <p>The list is drawn from the menus themselves: File, Edit, Map, Water, and Help, each under its own heading, with the rows of a fly-out indented under the row that opens it and a rule between groups. It leaves out rows that are hidden now, headings inside a menu, and rows named from the project or the browser, such as scenario names. It goes one fly-out deep, and it has no entry for the Language menu. A row that is disabled now is still listed, with no mark to show that it is disabled. Clicking a row opens the menu and fly-out with that row pointed at. It never runs the row.</p>
   @@ NEEDS RULING
 - **`lpn_guide_mn_list_term`**
   > Reading the menu list
@@ -652,7 +602,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Example on Net1
   _Ruled 2026-10-17: His own edit of 2026-10-17, applied by CC (steady state hyphenated as a modifier)._
 - **`lpn_guide_scn_make_def`**
-  > <p>With a scenario other than Base open, an edit to a value that scenarios can override is stored as an override in the open scenario, by whichever door it is made: typing in Properties, editing a cell in Tables, Replace in Find and replace, dragging a node or entering its coordinates, Morph (the new type is the override), or Paste properties to selection. A setting typed in the Settings box is stored as an override when scenarios can override that setting. Base is not changed. In Base, the same edits change the network itself and reach every scenario that has not overridden the value.</p><p>Delete acts differently. In a scenario, Delete does not remove an asset that exists in Base. It makes the asset inactive in the open scenario, and with it the pipes of a node, and says so. The asset is still in the drawing and in the other scenarios. An asset drawn while a scenario is open is inactive in Base and active in that scenario, and Delete in that scenario removes it. Deleting an asset in Base also deletes its overrides in every scenario, after a question that counts them. Customers and Shapes belong to no scenario and are deleted outright.</p><p>The Override manager row of the Scenarios list opens a list of every override of the open scenario by category, each beside the inherited value it replaces. A time series graph on the map that the scenario opened, moved, or changed is a row of its own. Check rows and click Clear selected overrides, click Clear override in one row, or click Clear all overrides. Each value then returns to the inherited value, and Undo reverses it. Select an ID in the list to go to the asset on the map. The dot in Properties and the Clear override row in the cell menu of Tables clear one override at a time.</p>
+  > <p>With a scenario other than Base open, an edit to a value that scenarios can override is stored as an override in the open scenario, however it is made: typing in Properties, editing a cell in Tables, Replace in Find and replace, dragging a node or entering its coordinates, Morph (the new type is the override), or Paste properties to selection. A setting typed in the Settings box is stored as an override when scenarios can override that setting. Base is not changed. In Base, the same edits change the network itself and reach every scenario that has not overridden the value.</p><p>Delete acts differently. In a scenario, Delete does not remove an asset that exists in Base. It makes the asset inactive in the open scenario, and for a node also its pipes, and a message states this. The asset is still in the drawing and in the other scenarios. An asset drawn while a scenario is open is inactive in Base and active in that scenario, and Delete in that scenario removes it. Deleting an asset in Base also deletes its overrides in every scenario, after a question that counts them. Customers and Shapes belong to no scenario and are deleted outright.</p><p>The Override manager row of the Scenarios list opens a list of every override of the open scenario by category, each beside the inherited value it replaces. A time series graph on the map that the scenario opened, moved, or changed is a row of its own. Check rows and click Clear selected overrides, click Clear override in one row, or click Clear all overrides. Each value then returns to the inherited value, and Undo reverses it. Select an ID in the list to go to the asset on the map. The dot in Properties and the Clear override row in the cell menu of Tables clear one override at a time.</p>
   @@ NEEDS RULING
 - **`lpn_guide_scn_make_term`**
   > Making and clearing overrides
@@ -742,7 +692,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Dimmed names
   @@ NEEDS RULING
 - **`lpn_guide_tb_row_def`**
-  > <p>Each row is one toolbar button, in the order of the strip, with a rule between groups. A row shows the button's icon, name, and tip, then its keys, and, where a menu row does the same thing, Also in followed by the menu path. Clicking a row points at the button on the toolbar. It never runs the button. When the button is not on screen, the row opens the menu row that does the same thing.</p>
+  > <p>Each row is one toolbar button, in the order of the strip, with a rule between groups. A row shows the button's icon, name, and tip, then its keys. Where a menu row does the same thing, the row also shows the menu path after the words Also in. Clicking a row points at the button on the toolbar. It never runs the button. When the button is not on screen, the row opens the menu row that does the same thing.</p>
   @@ NEEDS RULING
 - **`lpn_guide_tb_row_term`**
   > Reading a row
@@ -766,7 +716,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Filling, filters, and scenarios
   @@ NEEDS RULING
 - **`lpn_guide_tbl_tabs_def`**
-  > <p>Choose Water, Tables, or click Bottom panel, to open the pane. Its tabs, left to right, are Junctions, Reservoirs, Tanks, Pipes, Pumps, Valves, Text, Customers, Shapes, Settings, Scenarios, Time series, Profile, Frequency, and Flow balance. The Scenarios tab is shown when Basic mode is cleared. Column width, order, and visibility are kept in this browser, not in the project.</p>
+  > <p>To open the pane, click the Bottom panel button or choose Water, Tables. Its tabs, left to right, are Junctions, Reservoirs, Tanks, Pipes, Pumps, Valves, Text, Customers, Shapes, Settings, Scenarios, Time series, Profile, Frequency, and Flow balance. The Scenarios tab is shown when Basic mode is cleared. Column width, order, and visibility are kept in this browser, not in the project.</p>
   @@ NEEDS RULING
 - **`lpn_guide_tbl_tabs_term`**
   > The tabs
@@ -1147,7 +1097,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Copy
   _Ruled OK 2026-10-16._
 - **`lpn_sm_copy_ask`**
-  > Copy the overrides ({n}) of {name} up into {target}? It keeps them as its own overrides. You can undo this.
+  > Copy the overrides ({n}) of {name} up into {target}? {name} keeps them as its own overrides. You can undo this.
   @@ NEEDS RULING
 - **`lpn_sm_copy_none`**
   > The alternative {name} has no overrides to copy.
@@ -1321,6 +1271,8 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### chore/sprint-1017 (`979a3cff0`) — adds no English strings
+
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
@@ -1344,5 +1296,3 @@ build for that would be a gate nobody keeps. Refresh it with
 ### feat/label-placer-c (`4dc27ea10`) — adds no English strings
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
-
-### option/pane-boxes (`dcc1e7a2f`) — adds no English strings
