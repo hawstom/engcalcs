@@ -107,7 +107,7 @@ async function main() {
 		await press(a);
 		let t = await tiles(a);
 		ok('one press: satellite tiles', t.length > 0 && t.every((h) => /mapbox\.satellite/.test(h)), t[0]);
-		ok('the corner tile now offers Outdoors', (await teaser(a)).label === pc.lpn_basemap_outdoors_show, (await teaser(a)).label);
+		ok('the corner tile now offers Outdoors', (await teaser(a)).label === pc.lpn_basemap_topo_show, (await teaser(a)).label);
 		a.mapbox.length = 0; a.statuses.length = 0;
 		await press(a);
 		t = await tiles(a);

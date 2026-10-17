@@ -14674,7 +14674,7 @@ var EngCalcs = EngCalcs || {};
 		// The name says what the PRESS will do, not what is showing -- the button cycles the
 		// basemaps, so it never offers "Hide".
 		var name = src === 'outdoors' ? (pc.lpn_basemap_show || 'Show street map')
-			: src === 'satellite' ? (pc.lpn_basemap_outdoors_show || 'Show outdoors map')
+			: src === 'satellite' ? (pc.lpn_basemap_topo_show || 'Show topo map')
 			: (pc.lpn_basemap_satellite_show || 'Show satellite images');
 		b.setAttribute('aria-label', name);
 		b.setAttribute('aria-pressed', on ? 'true' : 'false');

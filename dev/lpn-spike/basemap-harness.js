@@ -428,7 +428,7 @@ console.log('\n--- the corner teaser appears where the menu row does, and nowher
 	L.refreshTeaser();
 	ok('...and the tile then offers the OUTDOORS map (Task 617), not "hide"',
 		btn.getAttribute('aria-pressed') === 'true' &&
-		btn.getAttribute('aria-label') === PC.lpn_basemap_outdoors_show, btn.getAttribute('aria-label'));
+		btn.getAttribute('aria-label') === PC.lpn_basemap_topo_show, btn.getAttribute('aria-label'));
 	ok('...and shows the next source, which is what the picture is for',
 		String(btn.getAttribute('class')).indexOf('lpn-basemap-teaser-outdoors') >= 0);
 	click();
