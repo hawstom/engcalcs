@@ -1202,7 +1202,7 @@ one asset, with the same words), `pushBaseToScenarios()`, `pushHereButton()`, an
 (2026-10-15) and the two stale `$ec_lang_syn` entries are deleted.
 
 **Built:** "Merge upward", a command of every alternatives tree in the Scenario manager (button and
-right-click row, after Copy; not in the Scenarios tree; greyed on a Base). It asks which ancestor, by
+right-click row, after Copy; not in the Scenarios tree; greyed on a Base). Copy upward follows it (2026-10-16). It asks which ancestor, by
 name, parent first, up to the tree's Base item, then asks again saying how many overrides move. The
 selected alternative's OWN values (never what it inherits) are written into the target, the nearer
 winning by the rule they resolve by (`combineHolders()`, the demand pair included), and removed from it;
@@ -1232,6 +1232,22 @@ scenario act (`applyScenarioChange()`).
 Code: `smMergeTargets()`, `smOwnContent()`, `smMergePlan()`, `smMergeUpward()` (model) and
 `smActMergeUpward()` (the two questions). Harnesses: `alternative-merge-upward-harness.js` (headless) and
 `alternative-merge-upward-browser-harness.js` (Chromium).
+
+### Tom's calls of 2026-10-16 (Scenarios menu branch)
+
+- **Override manager…** is the name of Manage overrides (menu row, button, dialog title "Override
+  manager: {name}"); keys unchanged.
+- **Children are said as children.** Delete on an item others inherit from says so
+  (`lpn_scenario_delete_has_children` for a scenario, `lpn_sm_alt_delete_has_children` for an
+  alternative), naming them; one both used by scenarios and inherited from says both, the use first.
+- **Copy on a Base stays greyed** (Tom, of a child-copy built and removed the same day: *"Not well-planned. Trash the effort. ... I guess that Copy upward is the answer."*).
+- **Copy upward** sits after Merge upward: the same picker, the same skipped-level warning in its own
+  words, the same write into the target (`smMergeUpward(..., keep)`), and the source keeps its own
+  overrides. One undo step.
+- **No ready-made "7. Fire plus max day"** in a new project (*"the 'right' thing to do is check every
+  fire hydrant since we offer that premium feature"*). A file holding it keeps it; its row has no tip.
+- **An EPANET export from a scenario other than Base** is named `<project>-<scenario>.inp` (and .zip,
+  .bmp, .bpw), each part made safe on its own (`inpExportBaseName()`).
 
 ### The count is a scenario's own, and List overrides audits it (Task 800, 2026-10-15)
 

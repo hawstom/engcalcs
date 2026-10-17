@@ -214,7 +214,7 @@ async function main() {
 		await a.settle(400);
 
 		// ---- D4 ----
-		console.log('\n--- D4. Delete an alternative in use: three parts, a line each ---');
+		console.log('\n--- D4. Delete an alternative in use and inherited from: both said ---');
 		await page.selectOption('#lpn_sm_tree_select', 'initial');
 		await a.settle(500);
 		await smRow('EPS');
@@ -222,10 +222,13 @@ async function main() {
 		await page.keyboard.press('Delete');
 		await flush();
 		const said = ((a.dialogs.filter((x) => x.type === 'alert')[0]) || {}).message || '';
-		const lines = said.split('\n'), phrase = (await L('lpn_sm_in_use')).split('\\n')[1];
-		ok('D4 line 1 is "Alternative EPS" alone, line 2 the phrase alone, then each user', lines[0] === (await L('lpn_sm_item_alternative')).replace('{name}', 'EPS') &&
-			lines[1] === phrase && lines.slice(2).indexOf((await L('lpn_sm_item_scenario')).replace('{name}', 'EPS')) >= 0 &&
-			lines.slice(2).indexOf((await L('lpn_sm_item_alternative')).replace('{name}', 'EPS Pump off')) >= 0, JSON.stringify(said));
+		// Used by scenario EPS AND inherited from by EPS Pump off: both said (Tom, 2026-10-16, "cannot
+		// be deleted while it has children"). The in-use part keeps its lines; the children follow.
+		const paras = said.split('\n\n'), lines = (paras[0] || '').split('\n'), phrase = (await L('lpn_sm_in_use')).split('\\n')[1];
+		ok('D4 line 1 is "Alternative EPS" alone, line 2 the phrase alone, then the scenario using it', lines[0] === (await L('lpn_sm_item_alternative')).replace('{name}', 'EPS') &&
+			lines[1] === phrase && lines.slice(2).join('|') === (await L('lpn_sm_item_scenario')).replace('{name}', 'EPS'), JSON.stringify(said));
+		ok('D4 ...then, a paragraph of its own, that EPS Pump off inherits from it', paras.length === 2 &&
+			paras[1] === (await L('lpn_sm_alt_delete_has_children')).split('{name}').join('EPS').split('{list}').join('EPS Pump off'), JSON.stringify(said));
 		ok('D4 ...and it is not deleted', (await saved()).alternatives.some((x) => x.id === 'a12'));
 
 		// ---- P3 ----
