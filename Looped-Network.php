@@ -1961,6 +1961,10 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <h2><?=$ec_lang['lpn_hotkeys_map_heading']?></h2>
 <dl>
 	<dt class="lpn-guide-dup"><?=$ec_lang['lpn_hotkeys_map_term']?></dt><dd><?=str_replace('</tbody></table>', '<tr><td>W</td><td>' . $ec_lang['lpn_hotkeys_zoomwin_def'] . '</td></tr></tbody></table>', preg_replace('~</tr>~', '</tr><tr><td>1</td><td>' . $ec_lang['lpn_tool_add_chain'] . '</td></tr><tr><td>A</td><td>' . rtrim($ec_lang['lpn_tool_area_tip'], '.') . '</td></tr>', $ec_lang['lpn_hotkeys_map_def'], 1))?></dd>
+	<dt><?=$ec_lang['lpn_guide_map_undo_term']?></dt><dd><?=$ec_lang['lpn_guide_map_undo_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_map_del_term']?></dt><dd><?=$ec_lang['lpn_guide_map_del_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_map_esc_term']?></dt><dd><?=$ec_lang['lpn_guide_map_esc_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_map_letters_term']?></dt><dd><?=$ec_lang['lpn_guide_map_letters_def']?></dd>
 </dl>
 </section>
 <section class="lpn-guide-section" data-guide-section="snip">
