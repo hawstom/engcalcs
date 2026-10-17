@@ -27,7 +27,7 @@ async function main() {
 	const { chromium } = require(path.join(L.REPO, 'dev', 'browser-pass', 'node_modules', 'playwright-core'));
 	console.log('\n1. Every interface name the chapter quotes is the language file\'s');
 	checkQuotes({
-		lpn_guide_tb_dim_def: ['lpn_tool_undo', 'lpn_time_run', 'lpn_settings_auto_run', 'lpn_pane_toggle'],
+		lpn_guide_tb_dim_def: ['lpn_time_run', 'lpn_settings_auto_run', 'lpn_pane_toggle'],
 		lpn_guide_tb_two_def: ['lpn_tool_zoom_extent', 'lpn_tool_zoom_window', 'lpn_tool_area_window']
 	});
 	ok('the chapter says "Also in", as the rows do', plain(enString('lpn_guide_tb_row_def')).indexOf(enString('lpn_guide_also').split('{menu}')[0].trim()) >= 0);

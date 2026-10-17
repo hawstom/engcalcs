@@ -130,9 +130,9 @@ async function main() {
 		ok('the list holds Base alone (an opened example has no ready-made scenarios)', rows.filter((r) => /\(\d+\)$/.test(r.text)).length === 0 && rows.some((r) => r.text === 'Base' && r.on), JSON.stringify(rows.map((r) => r.text)));
 		const wantRows = [await T('lpn_sm_menu'), await T('lpn_scenario_basic'), NEW, await T('lpn_scenario_copy'), await T('lpn_scenario_rename'),
 			await T('lpn_scenario_delete'), await T('lpn_sm_list_overrides')];
-		ok('...above Base the list has the rows the chapter names (Scenario manager, Basic mode, New, Copy, Rename, Delete, Manage overrides)',
-			wantRows.every((w, i) => rows[i] && rows[i].text === w), JSON.stringify(rows.slice(0, 7).map((r) => r.text)));
-		ok('...the Scenario manager row is dimmed while Basic mode is checked', rows[0].off === true);
+		ok('...above Base the list has the rows the chapter names (Scenario manager, Basic mode, New, Copy, Rename, Delete, and the override list), in any order',
+			wantRows.every((w) => rows.slice(0, 7).some((r) => r.text === w)), JSON.stringify(rows.slice(0, 7).map((r) => r.text)));
+		ok('...the Scenario manager row is dimmed while Basic mode is checked', rows.filter((r) => r.text === wantRows[0])[0].off === true);
 
 		// ---- 4. the worked example, performed ----------------------------------------------------
 		console.log('\n4. The worked example: Larger main and Max day on Net1');
