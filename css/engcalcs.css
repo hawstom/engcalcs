@@ -5147,6 +5147,16 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
 .lpn-sm-has-table .lpn-sm-panes > .lpn-sm-table { display: flex; flex-direction: column; flex: 1 1 0; min-width: 12rem; min-height: 0; }
 /* The Tables pane's own Scenarios panel, moved in: in the flow here, not stacked as in the pane. */
 #lpn_sm_table .lpn-pane-panel.lpn-pane-scroll { display: block; position: relative; inset: auto; z-index: auto; content-visibility: visible; flex: 1 1 auto; min-height: 0; height: auto; overflow: auto; padding: 0; }
+/* ---- A BOTTOM-PANE TAB OPENED AS A BOX (option branch, Task 799) -------------------------------
+   The tab's own panel is carried into the box, so it is in the flow here as in the Scenario
+   manager above, not stacked as in the pane. The host is the box body's one child and gives the
+   panel a height to fill. */
+.lpn-panebox-host { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; position: relative; }
+.lpn-panebox-host > .lpn-pane-panel { flex: 1 1 auto; min-height: 0; height: auto; }
+.lpn-panebox-host > .lpn-pane-panel.lpn-pane-scroll { display: block; position: relative; inset: auto; z-index: auto; content-visibility: visible; overflow: auto; padding: 0; }
+.lpn-panebox-host > .lpn-profile-panel { display: flex; }
+.lpn-pane-popout { display: inline-flex; align-items: center; justify-content: center; }
+@media (max-width: 40rem) { .lpn-pane-popout { display: none; } }
 /* ---- THE RUN'S OWN DIALOG (ROADMAP Task 530) --------------------------------------------------
 
    Progress, Stop, nothing else (Tom, 2026-08-30). It borrows .lpn-popover for the viewport caps and

@@ -25835,7 +25835,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		paneTabs.forEach(function (t) {
 			var panel = document.getElementById(t.panel), on = t.id === paneState.tab, tab;
-			if (panel) { panel.classList.toggle('on', on); }
+			if (panel) { panel.classList.toggle('on', on || paneBoxed(t.id)); }
 			tab = document.getElementById('lpn_pane_tab_' + t.id);
 			if (tab) { tab.setAttribute('aria-selected', on ? 'true' : 'false'); }
 			// A tab's menu caret wears the tab's own selected state, so the two read as ONE tab
@@ -25858,6 +25858,7 @@ var EngCalcs = EngCalcs || {};
 	function setPaneTab(id) {
 		var was = activePaneTab(), now = paneTabById(id);
 		if (!now) { return; }
+		if (paneBoxShow(id)) { return; }
 		if (id === 'scenarios' && smTableIn()) { smTableSet(false); }
 		if (paneState.open && was && was !== now && was.hide) { was.hide(); }
 		paneState.tab = now.id;
@@ -25875,6 +25876,7 @@ var EngCalcs = EngCalcs || {};
 	// Only the toolbar button toggles, because a toggle is what a pressed/unpressed button IS.
 	function openPane(id) {
 		var t = paneTabById(id), was;
+		if (paneBoxShow(id)) { return; }
 		if (id === 'scenarios' && smTableIn()) { smTableSet(false); }
 		was = activePaneTab();
 		if (t && t !== was) {
@@ -25896,11 +25898,240 @@ var EngCalcs = EngCalcs || {};
 	function togglePane() {
 		if (paneState.open) { closePane(); } else { openPane(paneState.tab); }
 	}
+	// ---- THE BOTTOM PANE'S TABS, ALSO AS DOCKABLE BOXES (option branch, ROADMAP Task 799) ---------
+	//
+	// Tom, 2026-10-15: *"Can we try a UI option branch for everything in the bottom pane to be
+	// available also as dockable boxes: (a) Tables and (b) Graphs?"*
+	//
+	// **A MOVE, NOT A COPY.** A tab opened as a box LEAVES the strip: its panel element is carried
+	// into the box and carried home when the box is closed, so a table keeps every handler it was
+	// wired with (editing, paste, selection, sorting, column widths) and a graph keeps every kind and
+	// control, with no second copy to fall out of step. One Table or Graph is therefore never shown
+	// twice. The strip keeps the tabs that are still in it, and the pane's default is unchanged.
+	// The Scenarios table already has its own box (the Scenario manager) and is not offered here.
+	//
+	// **ONE BOX PER TAB**, so a table can sit beside a graph, or two tables beside each other, in the
+	// same dock columns every other box uses. Each box is built the first time its tab is opened as
+	// one and registered with the dock system (registerDockBox()), so floating, docking left or right,
+	// sharing a column and auto-hide are the page's own. **CLOSING THE BOX SENDS THE TAB BACK TO THE
+	// STRIP.**
+	//
+	// **FURNITURE, one browser key, `lpn_paneboxes`:** {tab id: {open, left, top, w, h, userSized,
+	// dock, autohide, dockW, dockOrd}}, the fields every other box record holds, one entry per tab
+	// that was ever floated, docked or opened. Never in the project file. Not offered on a phone,
+	// where every box fills the window and there is no column to dock into.
+	var LPN_PANEBOXES_KEY = 'lpn_paneboxes';
+	var paneBoxes = {};
+	function paneBoxed(id) { var e = paneBoxes[id]; return !!(e && e.on); }
+	function paneBoxIds() { return Object.keys(paneBoxes).filter(paneBoxed); }
+	/** Is this tab's content on screen somewhere, in the pane as the visible tab or in its box? */
+	function paneTabOnShow(id) { return paneBoxed(id) || (paneIsOpen() && paneState.tab === id); }
+	function paneBoxCanPop(id) {
+		return !!paneTabById(id) && id !== 'scenarios' && !paneBoxed(id) && !smallScreen() &&
+			paneTabs.some(function (t) { return t.id !== id && !paneBoxed(t.id) && !paneTabIsHidden(t); });
+	}
+	function paneBoxesRead() {
+		var raw = null, v = null;
+		try { raw = localStorage.getItem(LPN_PANEBOXES_KEY); } catch (e) { return {}; }
+		if (!raw) { return {}; }
+		try { v = JSON.parse(raw); } catch (e) { return {}; }
+		return (v && typeof v === 'object') ? v : {};
+	}
+	function paneBoxesSave() {
+		var v = {}, n = 0;
+		if (boxSaveHeld()) { return; }
+		Object.keys(paneBoxes).forEach(function (id) {
+			var r = paneBoxes[id].rec, o = {};
+			['left', 'top', 'w', 'h'].forEach(function (k) { if (typeof r[k] === 'number') { o[k] = r[k]; } });
+			if (r.userSized) { o.userSized = true; }
+			if (r.open) { o.open = true; }
+			if (r.dock) { o.dock = r.dock; }
+			if (r.autohide) { o.autohide = true; }
+			if (r.dockW) { o.dockW = r.dockW; }
+			if (r.dockOrd !== undefined) { o.dockOrd = r.dockOrd; }
+			if (Object.keys(o).length) { v[id] = o; n++; }
+		});
+		try {
+			if (n) { localStorage.setItem(LPN_PANEBOXES_KEY, JSON.stringify(v)); }
+			else { localStorage.removeItem(LPN_PANEBOXES_KEY); }
+		} catch (e) {}
+	}
+	/** The stored fields for one tab, laid onto its live record. */
+	function paneBoxApplyStored(rec, s) {
+		if (!s || typeof s !== 'object') { return; }
+		['left', 'top', 'w', 'h'].forEach(function (k) { if (typeof s[k] === 'number' && isFinite(s[k])) { rec[k] = s[k]; } });
+		rec.userSized = s.userSized === true;
+		rec.open = s.open === true;
+		readDockFields(s, rec);
+	}
+	/** The box for one tab, built and registered with the dock system on first use. */
+	function paneBoxEntry(id) {
+		var e = paneBoxes[id], tab = paneTabById(id), pc = EngCalcs.pageConfig || {}, box, title, x, body, rpt;
+		if (e) { return e; }
+		if (!tab) { return null; }
+		box = document.createElement('div');
+		box.id = 'lpn_panebox_' + id;
+		box.className = 'd-print-none lpn-popover lpn-setbox lpn-ffbox lpn-panebox';
+		box.style.cssText = 'display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);' +
+			'padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)';
+		box.setAttribute('role', 'dialog');
+		title = document.createElement('div');
+		title.className = 'lpn-setbox-title';
+		title.id = box.id + '_title';
+		title.textContent = pc[tab.label] || tab.id;
+		box.setAttribute('aria-labelledby', title.id);
+		x = document.createElement('button');
+		x.type = 'button';
+		x.className = 'lpn-popover-x';
+		x.title = pc.lpn_close || 'Close';
+		x.setAttribute('aria-label', x.title);
+		x.textContent = '×';
+		body = document.createElement('div');
+		body.className = 'lpn-popover-body lpn-setbox-body';
+		e = { box: box, host: document.createElement('div'), rec: newBoxLayout(), on: false, home: null };
+		e.rec.userSized = false;
+		e.host.className = 'lpn-panebox-host';
+		body.appendChild(e.host);
+		box.appendChild(title);
+		box.appendChild(x);
+		box.appendChild(body);
+		rpt = rptBoxEl();
+		if (rpt && rpt.parentNode) { rpt.parentNode.insertBefore(box, rpt.nextSibling); }
+		else { document.body.appendChild(box); }
+		paneBoxes[id] = e;
+		x.addEventListener('click', function () { paneBoxReturn(id); });
+		wireBoxMemory(box, LPN_PANEBOXES_KEY, e.rec, paneBoxesSave, function () { return paneBoxed(id); });
+		registerDockBox(box.id, e.rec, paneBoxesSave, LPN_PANEBOXES_KEY, null);
+		e.d = box.__lpnDock;
+		// These boxes are made at run time and have no Guide entry of their own; the pane's does the work.
+		e.d.noGuide = true;
+		e.d.guideBtn = null;
+		renderDockCorner(e.d);
+		paneBoxApplyStored(e.rec, paneBoxesRead()[id]);
+		return e;
+	}
+	/** A tab's strip button (and its arrow, when it has one) is hidden while the tab is a box. */
+	function paneBoxStrip(id, away) {
+		var b = document.getElementById('lpn_pane_tab_' + id), p = b && b.parentNode;
+		if (!b) { return; }
+		b.style.display = away ? 'none' : '';
+		if (p && p.classList && p.classList.contains('lpn-pane-tab-pair')) { p.style.display = away ? 'none' : ''; }
+	}
+	/** Open one pane tab as a box. `restoring`: the page came back with it open. */
+	function paneBoxPop(id, restoring) {
+		var tab = paneTabById(id), panel = tab && document.getElementById(tab.panel), e, wasShown, i, next = null, before;
+		if (!panel || !paneBoxCanPop(id)) { return false; }
+		e = paneBoxEntry(id);
+		if (!e) { return false; }
+		closeMenu();
+		hideOpenTips();
+		wasShown = paneIsOpen() && paneState.tab === id;
+		if (paneState.tab === id) {
+			i = paneTabIndex(id);
+			before = paneTabs.slice(0, i).reverse();
+			paneTabs.slice(i + 1).concat(before).some(function (t) {
+				if (t.id !== id && !paneBoxed(t.id) && !paneTabIsHidden(t)) { next = t; return true; }
+				return false;
+			});
+			if (next) { paneState.tab = next.id; }
+		}
+		e.home = { parent: panel.parentNode, next: panel.nextSibling };
+		hideTipsIn(panel);
+		e.host.appendChild(panel);
+		e.on = true;
+		paneBoxStrip(id, true);
+		e.box.style.display = 'flex';
+		applyPaneLayout();
+		if (wasShown && next && activePaneTab().show) { activePaneTab().show(); }
+		// A tab that was on show in the pane has already had its first press (the profile's second
+		// press chooses a path), so it is hidden first and shown as new.
+		if (wasShown && tab.hide) { tab.hide(); }
+		if (tab.show) { tab.show(); }
+		placePanelForScreen(e.box, function () { placeBoxRemembered(e.box, e.rec); });
+		initTipsIn(e.box);
+		rememberBoxOpen(e.rec, paneBoxesSave, true);
+		if (!restoring) { savePaneState(); }
+		return true;
+	}
+	/** The box is closed: the tab goes back to the strip. */
+	function paneBoxReturn(id) {
+		var e = paneBoxes[id], tab = paneTabById(id), panel = tab && document.getElementById(tab.panel), h;
+		if (!e || !e.on) { return; }
+		e.on = false;
+		hidePanel(e.box);
+		h = e.home;
+		e.home = null;
+		if (panel && h && h.parent) {
+			hideTipsIn(panel);
+			if (h.next && h.next.parentNode === h.parent) { h.parent.insertBefore(panel, h.next); }
+			else { h.parent.appendChild(panel); }
+		}
+		paneBoxStrip(id, false);
+		rememberBoxOpen(e.rec, paneBoxesSave, false);
+		if (tab && tab.hide) { tab.hide(); }
+		applyPaneLayout();
+	}
+	/** A door that names a boxed tab (a menu row, a hotkey) shows its box rather than the pane. */
+	function paneBoxShow(id) {
+		var e = paneBoxes[id];
+		if (!e || !e.on) { return false; }
+		closeMenu();
+		if (boxIsTucked(e.box)) { dockFlyOut(e.d, false); }
+		if (e.box.__lpnRaise) { e.box.__lpnRaise(); }
+		return true;
+	}
+	/** Tabs whose content is in a box, as paneTabs rows. */
+	function paneBoxedTabs() { return paneBoxIds().map(paneTabById).filter(Boolean); }
+	/** Every boxed tab redraws with the pane's own refresh (a solve, an edit, a transport step). */
+	function paneBoxesRefresh() {
+		paneBoxedTabs().forEach(function (t) { if (t.refresh) { t.refresh(); } });
+	}
+	/** A document arrived: boxed tables are drawn from it and boxed graphs are shown afresh. */
+	function paneBoxesDocumentArrived() {
+		paneBoxedTabs().forEach(function (t) {
+			var spec = paneTableById(t.id);
+			if (spec) { renderPaneTable(spec); }
+			else if (t.id === 'profile') { if (t.refresh) { t.refresh(); } }
+			else if (t.show) { t.show(); }
+		});
+	}
+	/** The boxed table the keyboard or pointer is in, if any: Print and Selection only act on it. */
+	function paneBoxedTableWithFocus() {
+		var a = document.activeElement, ids = paneBoxIds(), i, tab;
+		if (!a || !a.closest) { return null; }
+		for (i = 0; i < ids.length; i++) {
+			tab = paneTabById(ids[i]);
+			if (tab && paneTableById(ids[i]) && a.closest('#' + tab.panel)) { return paneTableById(ids[i]); }
+		}
+		return null;
+	}
+	/** Tabs open as boxes at the last save come back with the page, in the stored order. */
+	function restorePaneBoxes() {
+		var stored = paneBoxesRead();
+		if (smallScreen()) { return; }
+		Object.keys(stored).forEach(function (id) {
+			var e;
+			if (!paneTabById(id) || id === 'scenarios') { return; }
+			e = paneBoxEntry(id);
+			if (!e) { return; }
+			paneBoxApplyStored(e.rec, stored[id]);
+		});
+		Object.keys(stored).filter(function (id) { return paneBoxes[id] && paneBoxes[id].rec.open; })
+			.sort(function (a, b) { return (paneBoxes[a].rec.dockOrd || 0) - (paneBoxes[b].rec.dockOrd || 0); })
+			.forEach(function (id) { paneBoxPop(id, true); });
+	}
+	function paneBoxFromMenu(tabId) { if (!paneBoxPop(tabId)) { paneBoxShow(tabId); } }
+	/** The right-click on a tab: one row, and the button in the pane's head does the same for the tab on show. */
+	function openPaneTabMenu(anchor, tabId) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!paneBoxCanPop(tabId)) { return; }
+		openMenu(anchor, [{ label: pc.lpn_pane_popout || 'Open in a box', fn: function () { paneBoxPop(tabId); } }]);
+	}
 	function wirePane() {
 		var pane = paneEl(), strip = document.getElementById('lpn_pane_tabs'),
 			grip = document.getElementById('lpn_pane_grip'),
 			x = document.getElementById('lpn_pane_close'), pc = EngCalcs.pageConfig || {},
-			dragFrom = null;
+			pop = document.getElementById('lpn_pane_popout'), dragFrom = null;
 		if (!pane) { return; }
 		if (strip) {
 			paneTabs.forEach(function (t) {
@@ -25914,6 +26145,12 @@ var EngCalcs = EngCalcs || {};
 				// .ec-help so a tap reveals it (EngCalcs.initTips()).
 				if (t.tip && pc[t.tip]) { b.title = pc[t.tip]; b.className += ' ec-help'; }
 				b.addEventListener('click', function () { setPaneTab(t.id); });
+				// The right-click on a tab: Open in a box (option branch, Task 799).
+				b.addEventListener('contextmenu', function (e) {
+					if (!paneBoxCanPop(t.id)) { return; }
+					e.preventDefault();
+					openPaneTabMenu(b, t.id);
+				});
 				if (!t.menu) { strip.appendChild(b); return; }
 				// **A TAB AND ITS ARROW WRAP AS ONE** (Task 600 pre-review): as two separate items in
 				// the wrapping strip, a long-language row could break between them and leave the ▾
@@ -25951,6 +26188,12 @@ var EngCalcs = EngCalcs || {};
 		}
 		refreshScenariosTab();
 		if (x) { x.addEventListener('click', closePane); }
+		// The button beside the X: the tab on show, as a box (option branch, Task 799).
+		if (pop) {
+			pop.title = pc.lpn_pane_popout || 'Open in a box';
+			pop.setAttribute('aria-label', pop.title);
+			pop.addEventListener('click', function () { paneBoxFromMenu(paneState.tab); });
+		}
 		// **SELECTION ONLY AND PRINT TABLE ARE NOT BUTTONS HERE** (Tom, 2026-10-04, port 8109: "I
 		// lean toward releasing with a cleaner UI"). Both live on the Tables pane's right-click
 		// menu (Menu key or Shift+F10 on a cell opens it); Selection only is also Ctrl+Shift+L.
@@ -33004,7 +33247,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// way is a future case this already answers, without a second door for "unavailable."
 	function paneTabIsHidden(tab) {
 		var btn = document.getElementById('lpn_pane_tab_' + tab.id);
-		return !!(btn && btn.style && btn.style.display === 'none') || (tab.id === 'scenarios' && scenarioBasicMode);
+		return !!(btn && btn.style && btn.style.display === 'none') || (tab.id === 'scenarios' && scenarioBasicMode) || paneBoxed(tab.id);
 	}
 	function paneTabIndex(id) {
 		var i;
@@ -34418,7 +34661,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// this is hidden on Profile for the same reason; both read the same answer, so a tab that is
 	// not a table can neither show the button nor be reached through it.
 	function activePaneTableSpec() {
-		return paneTableById(paneState.tab);
+		return paneBoxedTableWithFocus() || paneTableById(paneState.tab);
 	}
 
 	// **THE TABLE AS A FILE** (Tom, 2026-10-06). Cells read through paneCellDisplayText(), the same reader
@@ -34711,7 +34954,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// about the document -- nothing here is saved, and nothing here needs an undo snapshot, because
 	// a path is a list of stops the reader chose and not a thing in the drawing.
 	var profileState = { from: '', to: '', waypoints: [], draw: null, activeId: '', editing: false, editDrag: null };
-	function profileIsOpen() { return paneIsOpen() && paneState.tab === 'profile'; }
+	function profileIsOpen() { return paneTabOnShow('profile'); }
 
 	// ---- THE ROUTE, ON THE MAP (ROADMAP Task 433) -----------------------------------------------
 	//
@@ -34872,6 +35115,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tsbArrived();
 		basicModeFitOnArrival();
 		paneTables().forEach(paneTableReset);
+		paneBoxesDocumentArrived();
 		if (paneIsOpen() && activePaneTableSpec()) { renderPaneTable(activePaneTableSpec()); }
 		// The Time series tab draws from the run, not the table specs, and a switch that re-solves
 		// nothing never reached it: it went on showing the project just left (2026-09-29).
@@ -34891,7 +35135,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	var paneRenderHeld = 0;
 	function refreshPaneIfOpen() {
 		var t = activePaneTab();
-		if (paneRenderHeld || !paneIsOpen() || !t || !t.refresh) { return; }
+		if (paneRenderHeld) { return; }
+		paneBoxesRefresh();
+		if (!paneIsOpen() || !t || !t.refresh) { return; }
 		t.refresh();
 	}
 	// A panel that opens on two empty pull-downs asks the user to do work before it can show them
@@ -40076,6 +40322,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY,
 			LPN_PANE_KEY, LPN_RPANE_KEY, LPN_SETBOX_KEY, LPN_FINDBOX_KEY, LPN_LIBBOX_KEY,
 			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY, LPN_CONTOURBOX_KEY, LPN_MSGHIDDEN_KEY,
+			LPN_PANEBOXES_KEY,
 			// 'lpn_notesbox' and 'lpn_hotkeysbox' join the list here rather than a day later, for the
 			// same reason every entry above states its own miss: window furniture left out of this
 			// list makes "exactly as a brand-new visitor would see it" false for that one key. ('lpn_notesbox'
@@ -50333,7 +50580,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The closers are each box's own, because several undo something more than a display
 	// (the contour plot on the map, a screenshot in progress, a running analysis).
 	function workspaceBoxClosers() {
-		return {
+		var c = {
 			lpn_settings_box: closeSettingsBox, lpn_library_box: closeLibraryBox, lpn_find_popup: closeFindPopup,
 			lpn_ff_box: closeFireFlowBox, lpn_crit_box: closeCriticalityBox, lpn_ds_box: closeDemandScaleBox,
 			lpn_energy_box: closeEnergyBox, lpn_contour_box: closeContourBox, lpn_snip_box: closeSnipBox,
@@ -50341,6 +50588,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lpn_sm_box: closeScenarioManager, lpn_full_box: closeFullReportBox, lpn_calib_box: closeCalibBox,
 			'lpn_hotkeys_popup': closeHotkeysBox
 		};
+		Object.keys(paneBoxes).forEach(function (id) { c['lpn_panebox_' + id] = function () { paneBoxReturn(id); }; });
+		return c;
 	}
 	// A record as it is before any storage has been read.
 	function workspaceResetRecord(rec) {
@@ -51362,7 +51611,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// their corner `?` already carries), never written here. Prose for a box goes where its tip
 	// stands now, so a box with no description yet still has an entry for its "?" to open.
 	function guideBoxList() {
-		return dockBoxes.map(function (d) {
+		return dockBoxes.filter(function (d) { return !d.noGuide; }).map(function (d) {
 			var t = d.box.querySelector('.lpn-setbox-title');
 			// dockTitleOf() names the box without a "?" its title carries (the Scenario manager's).
 			return { d: d, id: d.box.id, title: t ? dockTitleOf(d) : '' };
@@ -61948,6 +62197,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// only while Basic mode is off, the one state in which it is shown at all.
 		if (smboxLayout.open && smboxLayout.dock && !scenarioBasicMode) { openScenarioManager(); }
 		if (hotkeysboxLayout.open) { openHotkeysBox(); }
+		restorePaneBoxes();
 		if (findUserOpen) { toggleFindPopup(null, true); }
 	}
 	// ---- THE DIVIDER BETWEEN THE TWO PANES (ROADMAP Task 576) ------------------------------------
@@ -80516,7 +80766,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The time-series chart draws the measured points of whichever file matches what it is showing,
 	// so a newly loaded file has to reach an open chart too.
 	function refreshCalibOverlay() {
-		if (paneIsOpen() && paneState.tab === 'timeseries') { renderTimeSeries(); }
+		if (paneTabOnShow('timeseries')) { renderTimeSeries(); }
 	}
 	/**
 	 * **MEASURED POINTS FOR THE TIME-SERIES CHART**: the loaded file whose parameter is the quantity
