@@ -85,7 +85,7 @@ None on master. Every English key here is present in at least one other language
 
 # Strings waiting on a branch
 
-**781 still to read**, of 784 new keys across 20 unmerged branch(es).
+**793 still to read**, of 796 new keys across 18 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -96,9 +96,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-1016c (`cc73b6242`) — adds no English strings
-
-### chore/plain-sentences (`8301b0524`) — adds no English strings
+### chore/plain-sentences (`307c6a742`) — adds no English strings
 
 ### feat/basemap-outdoors (`2a45b1cc2`) — 1 new, 1 to read @@ NEEDS RULING
 
@@ -106,7 +104,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show outdoors map
   @@ NEEDS RULING
 
-### feat/bentley-interop (`9b9f74f33`) — 174 new, 174 to read @@ NEEDS RULING
+### feat/bentley-interop (`34791a202`) — 180 new, 180 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -183,6 +181,21 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_morph_tip`**
   > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its location, its connections, and every value the new type also has. In Base the asset itself is changed, and you are asked first if any value would be lost. In any other scenario the new type is an override in that scenario only, and the values only the new type has start from Settings > New assets.
   @@ NEEDS RULING
+- **`lpn_ovl_bubble_moved`**
+  > {quantity}, moved or resized
+  @@ NEEDS RULING
+- **`lpn_ovl_bubble_off`**
+  > Not on the map
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_all`**
+  > Clear all overrides
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_all_ask`**
+  > Clear all the overrides ({n}) of {name}? Each value returns to the inherited value. Undo reverses this.
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_selected`**
+  > Clear selected overrides
+  @@ NEEDS RULING
 - **`lpn_ovl_col_inherited`**
   > Inherited value
   @@ NEEDS RULING
@@ -196,7 +209,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > {category}: {alternative}
   @@ NEEDS RULING
 - **`lpn_ovl_note`**
-  > These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Click an ID to go to the asset on the map.
+  > These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Clear an override to restore the inherited value; Undo reverses it. Select an ID to go to the asset on the map.
+  @@ NEEDS RULING
+- **`lpn_ovl_pick_tip`**
+  > Select this override for the Clear selected overrides button.
   @@ NEEDS RULING
 - **`lpn_ovl_same`**
   > (same)
@@ -205,7 +221,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Equal to the inherited value. It is still an override, and it is counted.
   @@ NEEDS RULING
 - **`lpn_ovl_title`**
-  > Overrides: {name}
+  > Manage overrides: {name}
   @@ NEEDS RULING
 - **`lpn_ovm_child_ask`**
   > Clear child overrides ({n} total)?
@@ -529,13 +545,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Scenario {name}
   @@ NEEDS RULING
 - **`lpn_sm_list_overrides`**
-  > List overrides
+  > Manage overrides
   @@ NEEDS RULING
 - **`lpn_sm_list_overrides_none`**
   > This scenario has no overrides.
   @@ NEEDS RULING
 - **`lpn_sm_list_overrides_tip`**
-  > List the scenario's overrides by category, each with the inherited value it overrides.
+  > List the scenario's overrides by category, each with the inherited value it overrides, and clear any of them.
   @@ NEEDS RULING
 - **`lpn_sm_make_current`**
   > Make current
@@ -633,12 +649,12 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/geojson-import (`abe2b9929`) — 59 new, 59 to read @@ NEEDS RULING
+### feat/geojson-import (`b4c12097f`) — 65 new, 65 to read @@ NEEDS RULING
 
-- **`lpn_file_import_geojson_net`**
+- **`lpn_file_import_gjnet`**
   > Import GeoJSON network…
   @@ NEEDS RULING
-- **`lpn_file_import_geojson_net_tip`**
+- **`lpn_file_import_gjnet_tip`**
   > Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.
   @@ NEEDS RULING
 - **`lpn_gjnet_and_more`**
@@ -666,7 +682,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > These features have no attribute fields.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_crs`**
-  > The file states the coordinate system {crs}, which is WGS 84 longitude and latitude, the system RFC 7946 requires. Positions were read as stated.
+  > The file states the coordinate system {crs}, which is WGS 84 latitude and longitude, the system RFC 7946 requires. Positions were read as stated.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_default_demand`**
   > These junctions state no base demand and have the default base demand, {value}.
@@ -677,8 +693,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_gjnet_note_default_elev`**
   > These nodes state no elevation and have the default elevation, {value}.
   @@ NEEDS RULING
+- **`lpn_gjnet_note_default_elev_added`**
+  > These junctions were added at line ends and have the default elevation, {value}, because no node in the file states an elevation.
+  @@ NEEDS RULING
 - **`lpn_gjnet_note_default_k`**
-  > These pipes state no minor loss coefficient and have the default, {value}.
+  > These pipes state no minor loss coefficient, so each has 0, as in an EPANET file that states none.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_default_roughness`**
   > These pipes state no roughness and have the default roughness, {value}.
@@ -686,8 +705,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_gjnet_note_default_tank`**
   > These tanks have the default water depths and tank diameter.
   @@ NEEDS RULING
+- **`lpn_gjnet_note_demand_kept`**
+  > A reservoir or tank has no demand, so the demand stated on these nodes was kept as the custom property {key}.
+  @@ NEEDS RULING
 - **`lpn_gjnet_note_demand_rows`**
   > These junctions had more than one demand row. A GeoJSON file holds only the first, which was imported.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_elev_taken`**
+  > These nodes state no elevation. Each was given the elevation of the node shown in parentheses: for a junction added at a line end, the node at the other end of its pipe, otherwise the nearest node that states one.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_end_moved`**
   > These pipes have an end within {tol} of a point or another line end, but not on it. The end was joined to it; the largest distance is {dist}.
@@ -711,7 +736,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > These features state no valid ID and were assigned the ID shown in parentheses.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_junction_added`**
-  > These junctions were added where a line end is not within {tol} of a point. Each has the default elevation and base demand.
+  > These junctions were added where a line end is not within {tol} of a point. Each has the default base demand.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_length_auto`**
   > These pipes state no length. Each length is computed from the line (Auto).
@@ -750,7 +775,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not imported: the start or end node named is not in the file.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_skip_position`**
-  > Not imported: a position is not a valid longitude and latitude.
+  > Not imported: a position is not a valid latitude and longitude.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_skip_short`**
+  > Not imported: a line needs at least two positions.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_unmapped_demand`**
   > No field was chosen for the base demand, so every junction has the default base demand, {value}.
@@ -759,13 +787,16 @@ build for that would be a gate nobody keeps. Refresh it with
   > No field was chosen for the diameter, so every pipe has the default diameter, {value}.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_unmapped_elev`**
-  > No field was chosen for the elevation, so every node has the default elevation, {value}.
+  > No field was chosen for the elevation, so every node has the default elevation, {value}, and automatic lengths include no elevation difference.
   @@ NEEDS RULING
-- **`lpn_gjnet_note_unmapped_id`**
-  > No field was chosen for the ID, so every element was assigned an ID.
+- **`lpn_gjnet_note_unmapped_id_line`**
+  > No field was chosen for the line ID, so every pipe was assigned an ID.
+  @@ NEEDS RULING
+- **`lpn_gjnet_note_unmapped_id_point`**
+  > No field was chosen for the point ID, so every node imported from a point was assigned an ID.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_unmapped_k`**
-  > No field was chosen for the minor loss coefficient, so every pipe has the default, {value}.
+  > No field was chosen for the minor loss coefficient, so every pipe has 0, as in an EPANET file that states none.
   @@ NEEDS RULING
 - **`lpn_gjnet_note_unmapped_length`**
   > No field was chosen for the length, so every pipe length is computed from the line (Auto).
@@ -786,7 +817,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Point fields (junctions, reservoirs, and tanks)
   @@ NEEDS RULING
 - **`lpn_gjnet_refuse_crs`**
-  > {file} states the coordinate system {crs}. GeoJSON positions are WGS 84 longitude and latitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.
+  > {file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.
   @@ NEEDS RULING
 - **`lpn_gjnet_refuse_empty`**
   > {file} contains no points or lines.
@@ -812,6 +843,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_gjnet_tolerance_tip`**
   > A line end within this distance of a point, or of another line end, is joined to it. A line end farther than this from every point gets a new junction.
   @@ NEEDS RULING
+- **`lpn_gjnet_working`**
+  > Importing {file}…
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -835,7 +869,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/manage-override (`23577b620`) — 180 new, 180 to read @@ NEEDS RULING
+### feat/manage-override (`5a5f90f52`) — 180 new, 180 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -1417,7 +1451,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Step
   @@ NEEDS RULING
 
-### feat/scenario-box (`d49f40568`) — 174 new, 174 to read @@ NEEDS RULING
+### feat/scenario-box (`d4d566a71`) — 174 new, 174 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -1960,7 +1994,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > System
   @@ NEEDS RULING
 
-### fix/elevation-override (`9b9f74f33`) — 174 new, 174 to read @@ NEEDS RULING
+### fix/elevation-override (`515322bc3`) — 174 new, 174 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -2484,8 +2518,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_tsb_resize`**
   > Drag to resize
   @@ NEEDS RULING
-
-### fix/merge-1016 (`f717ff560`) — adds no English strings
 
 ### fix/zero-demand-solve (`fbfbc28b6`) — 3 new, 3 to read @@ NEEDS RULING
 

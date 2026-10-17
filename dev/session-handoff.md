@@ -144,12 +144,10 @@ Twenty-second session (10-16 afternoon) built his 10-16 items below; previews pa
   the syn notes, reworded keys (no resync list), tip pairs, and only the glossary terms a batch uses.
   He forbids translating without his approval.
 
-- **Plain sentences (branch chore/plain-sentences, 10-16)**: `$ec_lang_syn` retired into
-  `dev/plain-sentences.md` (his word: "Do all of the _syn proposed work"). Awaiting his review of
-  the draft before merge: https://claude.ai/artifact/DYJ6DgunNcYGrEqqtJW3n9 (collection "review").
-  Apply his marks to the file, then merge. Lost with syn-proposals.json: an unapproved lpn_ff_selected
-  proposal; his open question on lpn_labels_priority_node_tip "Is this _syn needed?" is answered in
-  the draft (kept as a Plain line).
+- **Trapezoidal channel, "B/B" (his comment 10-16, needs his call)**: the roughness radio button reads
+  "B/B" (hard-coded in Manning-Trap.php, untranslated), while `mtc_iteration_tip` and `mtc_note_1` say
+  "Blodgett–Bathurst". Prose should name the option as shown: spell the button out, or have the prose
+  say B/B. Ask him which.
 
 ### His answers of 2026-10-16 (early), being built or awaiting design
 

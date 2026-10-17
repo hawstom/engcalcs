@@ -1,11 +1,11 @@
 # Plain sentences
 
-Help for translators with one string at a time, where the English of that one string is hard to carry into another language. A concept that recurs across many strings belongs in `dev/terms.md` instead. Tom edits this file directly; `generate_translation_payloads.php` reads it into every translator packet.
+Help for translators with one string at a time, where the English of that one string is hard to carry into another language. The English stays primary; an entry here is a second wording of the same string, so that a translator is not left with the English as the only source. A concept that recurs across many strings belongs in `dev/terms.md` instead. Tom edits this file directly; `generate_translation_payloads.php` reads it into every translator packet.
 
 ## How an entry is written
 
 - The heading is the string's key. The English line is the English the entry was written against. When the string changes, the entry is listed for you in `dev/new-english-keys.md` under "Plain sentences to check".
-- **Plain** says what the whole string means, in plain words, its tip included. Pair a technical word with the everyday one, as in velocity or speed. Synonyms stand side by side, joined by "or", with no parentheses. A comma before "or" only in a list of three or more.
+- **Plain** says what the whole string means, in plain words, its tip included. Synonyms stand side by side, joined by "or", with no parentheses. A comma before "or" only in a list of three or more.
 - **Layout** says where the string sits on the page: column heading, unit token, nav item, button, or sub-heading. The full instruction a translator receives for each is in the table in `dev/language-strings.md`.
 - **Symbol: yes** marks a string holding a variable symbol, kept exactly as in English.
 - **Runtime: units appended** marks a string the page adds a unit to.
@@ -48,7 +48,7 @@ Help for translators with one string at a time, where the English of that one st
 ### consent_current_granted
 
 - English: You allowed this. This browser keeps a random code so that we can count it.
-- Plain: You allowed this. This browser keeps or stores a random code so that we can count this browser once, however many times it visits.
+- Plain: You allowed this. This browser keeps or stores a random code to stop us from counting this browser again, however many times it visits.
 
 ### consent_current_denied
 
@@ -58,7 +58,7 @@ Help for translators with one string at a time, where the English of that one st
 ### consent_region_label
 
 - English: Your choice about the counting code.
-- Plain: Your choice about the counting code, the random code that lets us count this browser.
+- Plain: Your choice about the counting code, the random code that stops us from counting this browser again.
 
 ### calc_set_units_tip
 
@@ -78,7 +78,7 @@ Help for translators with one string at a time, where the English of that one st
 ### dw_friction_factor_method
 
 - English: Friction factor method
-- Plain: The method used to compute the friction factor from the pipe roughness.
+- Plain: The method used to compute the losses from friction in pipes.
 
 ### mi_q_617
 
@@ -107,7 +107,7 @@ Help for translators with one string at a time, where the English of that one st
 ### mi_tau
 
 - English: Bottom shear τ
-- Plain: The average shear stress of the flow on the channel bottom, τ.
+- Plain: The average tangential or shear stress of the flow on the channel bottom, τ.
 - Layout: column heading
 - Symbol: yes
 
@@ -181,7 +181,7 @@ Help for translators with one string at a time, where the English of that one st
 ### mpf_shear_stress
 
 - English: Average shear stress, τ
-- Plain: The average shear stress of the flow on the pipe wall, τ.
+- Plain: The average tangential or shear stress of the flow on the pipe wall, τ.
 - Symbol: yes
 
 ### mtc_n_strickler
@@ -194,11 +194,6 @@ Help for translators with one string at a time, where the English of that one st
 
 - English: Blodgett vs. Bathurst
 - Plain: Blodgett versus Bathurst: which of the two roughness methods, Blodgett’s or Bathurst’s, applies at this relative submergence.
-
-### mtc_note_1
-
-- English: <dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness option (Blodgett–Bathurst recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The roughness value from the method you chose is copied into the roughness input. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.</dd><dt>Basic calculator (no iteration)</dt><dd>Enter your desired roughness value. Ignore the design rock size input area.</dd></dl>
-- Note: Blodgett–Bathurst is the two names in full, as in the Blodgett vs. Bathurst label.
 
 ### ws_main_menu
 
@@ -259,12 +254,12 @@ Help for translators with one string at a time, where the English of that one st
 ### cs_water_value
 
 - English: Water value
-- Plain: The money value, price, or worth of water per unit volume. Any local currency works, used the same way as for the lining cost.
+- Plain: The money value, price, or worth of water per unit volume. Any local currency works if used the same way as for the lining cost.
 
 ### cs_lining_cost
 
 - English: Lining cost
-- Plain: The cost or price of canal lining per unit area. Any local currency works, used the same way as for the water value.
+- Plain: The cost or price of canal lining per unit area. Any local currency works if used the same way as for the water value.
 
 ### rc_yn
 
@@ -422,7 +417,7 @@ Help for translators with one string at a time, where the English of that one st
 ### lpn_new_text
 
 - English: Text
-- Plain: Text: the words a new text item on the map shows until you type your own.
+- Plain: Text, Label, Temporary Text, Placeholder, Unfinished text, or Default words
 
 ### lpn_examples_open
 
@@ -448,7 +443,7 @@ Help for translators with one string at a time, where the English of that one st
 ### lpn_geomap
 
 - English: georeferenced
-- Plain: georeferenced: placed on the world map by real coordinates.
+- Plain: georeferenced: placed on the world map.
 
 ### lpn_xymap
 
@@ -521,11 +516,6 @@ Help for translators with one string at a time, where the English of that one st
 
 - English: Flow control (FCV)
 - Plain: Flow control valve, FCV: a valve that limits the flow to a set value.
-
-### lpn_field_tag
-
-- English: Tag
-- Plain: Tag: a short word of the user’s own, with no spaces, often a pressure zone or a work order. It is EPANET’s own [TAGS] value.
 
 ### lpn_field_meter_count
 
