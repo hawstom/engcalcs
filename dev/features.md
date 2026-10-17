@@ -8,9 +8,9 @@
 LibreWaterNet landing page, the Help menu, both, neither — is his call and is not yet made.
 Nothing on any served page reads this file.
 
-51 features, citing 121 of the 711 closed task IDs. The other 590 are
+53 features, citing 122 of the 711 closed task IDs. The other 589 are
 bug fixes, refactors, rejected proposals, and work nobody outside this repository would
-call a feature — and 134 of them are ledger entries carrying no text at all, whose
+call a feature — and 133 of them are ledger entries carrying no text at all, whose
 narrative is in git and which nothing here has judged either way. **This list is honest
 rather than complete:** a feature is on it because somebody wrote a sentence for it.
 
@@ -24,12 +24,14 @@ rather than complete:** a feature is on it because somebody wrote a sentence for
 
 - Multiple open project tabs, saved in the browser or to an "lwn" file, with locking for office network collaboration. <!-- 146.08, 447, 352, 360 -->
 - Install for offline use. <!-- 2, 4, 37, 246 -->
-- Searchable user manual. <!-- 745 -->
+- Searchable user manual. <!-- 763 -->
 - Best on PC, tested on a phone. <!-- 486 -->
 
 ## Import, Export, and Map or Backdrop
 
-- Import and export formats: EPANET, ODS, XLSX, CSV, DXF, shapefile, GeoJSON, survey points, libraries, and clipboard copy/paste. <!-- 196, 483, 281, 592, 776 -->
+- Network import and export as EPANET `.inp`, plus network export to GeoJSON and DXF. <!-- 196, 483, 281 -->
+- Tables export to ODS, XLSX, and CSV; Shapes import from shapefile, GeoJSON, and DXF; surveyed points import as junctions; clipboard copy/paste. <!-- 592, 776 -->
+- Workspace file: save your box layout, panes, and display options, and import them on another screen or browser. <!-- 313 -->
 - Examples from EPANET and others, loaded and solved in one click. <!-- 314, 257, 454 -->
 - Libraries of patterns, curves, controls, rules, pipe types, and fittings, copyable from another project file. <!-- 611, 792, 465, 590 -->
 - Screenshot tool with enhanced resolution and a markup pen. <!-- 793 -->

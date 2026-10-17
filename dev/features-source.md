@@ -72,12 +72,14 @@ the line whose ID set is exactly `486` into its own honest-edges note, so that l
 
 - 146.08, 447, 352, 360| Multiple open project tabs, saved in the browser or to an "lwn" file, with locking for office network collaboration.
 - 2, 4, 37, 246| Install for offline use.
-- 745| Searchable user manual.
+- 763| Searchable user manual.
 - 486| Best on PC, tested on a phone.
 
 ## Import, Export, and Map or Backdrop
 
-- 196, 483, 281, 592, 776| Import and export formats: EPANET, ODS, XLSX, CSV, DXF, shapefile, GeoJSON, survey points, libraries, and clipboard copy/paste.
+- 196, 483, 281| Network import and export as EPANET `.inp`, plus network export to GeoJSON and DXF.
+- 592, 776| Tables export to ODS, XLSX, and CSV; Shapes import from shapefile, GeoJSON, and DXF; surveyed points import as junctions; clipboard copy/paste.
+- 313| Workspace file: save your box layout, panes, and display options, and import them on another screen or browser.
 - 314, 257, 454| Examples from EPANET and others, loaded and solved in one click.
 - 611, 792, 465, 590| Libraries of patterns, curves, controls, rules, pipe types, and fittings, copyable from another project file.
 - 793| Screenshot tool with enhanced resolution and a markup pen.
