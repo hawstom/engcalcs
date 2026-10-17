@@ -51035,6 +51035,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		return out;
 	}
+	// One holder's own element values, read only (smOwnContent()).
+	function scnBookOwnValues(cat, key) { return smOwnContent(cat, key).values; }
 	function scnBookHolders(cat) { return smRows(cat).filter(function (r) { return !r.isBase; }); }
 	function scnBookSheetName(cat) {
 		var pc = scnBookPc();
@@ -51073,7 +51075,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		SCNBOOK_ELEMENT_CATS.forEach(function (cat) {
 			var data = [], extra = [], cols;
 			scnBookHolders(cat).forEach(function (h) {
-				var vals = smOwnContent(cat, h.key).values;
+				var vals = scnBookOwnValues(cat, h.key);
 				scnBookSortKeys(Object.keys(vals)).forEach(function (k) {
 					if (!plainObject(vals[k]) || !Object.keys(vals[k]).length) { return; }
 					data.push({ name: h.name, key: k, ov: vals[k] });
@@ -51169,7 +51171,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function scnBookPlanNow(book) {
 		var pc = scnBookPc(), ownCache = {}, out = { ok: true, changes: [], unusable: [], kept: [],
-			ops: { newScn: [], newAlt: [], renameScn: [], renameAlt: [], parentScn: [], parentAlt: [], picks: [], values: [], settings: [] } },
+			ops: { newScn: [], newAlt: [], renameScn: [], renameAlt: [], parentScn: [], parentAlt: [], picks: [], vals: [], settings: [] } },
 			found = {}, base = baseScenario(), scnTable, altTables = {}, scnRows = [], altRows = [], inheritWord = pc.lpn_sm_inherited || 'inherited';
 		function bad(sheet, row, why) { out.unusable.push({ sheet: sheet, row: row, why: why }); }
 		function change(sheet, row, what, from, to) { out.changes.push({ sheet: sheet, row: row, what: what, from: from, to: to }); }
@@ -51460,7 +51462,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					e = entryIn(altTables[cat], hk);
 					if (e && e.dead) { return; }
 					if (cat === 'calculation') { return; }
-					holderVals = e && e.isNew ? {} : (ownCache[cat + '\u0000' + hk] = ownCache[cat + '\u0000' + hk] || smOwnContent(cat, hk).values);
+					holderVals = e && e.isNew ? {} : (ownCache[cat + '\u0000' + hk] = ownCache[cat + '\u0000' + hk] || scnBookOwnValues(cat, hk));
 					group = scnBookGroupOfAsset(assetText);
 					if (group === undefined) { bad(sh.name, row, scnBookSay('lpn_scnbook_why_asset_kind', 'There is no kind of asset called {asset}, so this row was not used.', { asset: assetText.trim() })); return; }
 					cand = group ? [group] : (cat === 'text' ? ['label'] : ['node', 'link']);
@@ -51492,14 +51494,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 							bad(sh.name, row, what + ': ' + scnBookSay('lpn_scnbook_why_not_property', 'this asset has no such property in this category, so the value was not used.'));
 							return;
 						}
-						out.ops.values.push({ cat: cat, key: hk, ovKey: k, prop: d.prop, v: p.v });
+						out.ops.vals.push({ cat: cat, key: hk, ovKey: k, prop: d.prop, v: p.v });
 						change(sh.name, row, has ? what : scnBookSay('lpn_scnbook_new_value', 'New override: {what}', { what: what }), has ? scnBookText(cur[d.prop]) : '', t);
 					});
 				});
 			}
 			// What the project holds and the workbook does not state: kept, and said.
 			scnBookHolders(cat).forEach(function (h) {
-				var vals = smOwnContent(cat, h.key).values, left = [];
+				var vals = scnBookOwnValues(cat, h.key), left = [];
 				scnBookSortKeys(Object.keys(vals)).forEach(function (k) {
 					Object.keys(plainObject(vals[k]) ? vals[k] : {}).forEach(function (p) {
 						if (!(stated[h.key] && stated[h.key][k + '\u0000' + p])) { left.push(scnBookAssetText(k) + ' ' + scnBookIdOf(k) + ': ' + scnBookDescribe(p, ovKeyGroup(k)).label); }
@@ -51732,7 +51734,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var k = n.key === '' || n.key === LPN_BASE_CHOICE ? n.key : mapAlt(n.cat, n.key);
 			ok(scnBookAssign(mapScn(n.scn), n.cat, k), scenarioDisplayName(scenarioById(mapScn(n.scn)) || { name: n.scn }) + ': ' + altCategoryLabel(n.cat));
 		});
-		plan.ops.values.forEach(function (n) {
+		plan.ops.vals.forEach(function (n) {
 			var k = stored(n.cat, n.key);
 			ok(k ? scnBookPut(k, n.ovKey, n.prop, n.v) : false, smName(n.cat, mapAlt(n.cat, n.key)) + ', ' + scnBookAssetText(n.ovKey) + ' ' + scnBookIdOf(n.ovKey));
 		});
