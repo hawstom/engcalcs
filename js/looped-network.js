@@ -45704,12 +45704,29 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			applyOneUnit(name, to);
 			if (unitKey(name) !== to) { return; }   // not an option this select offers
 			convertUnitValues(name, fNew / fOld);
+			convertDefaultInputs(name, fNew / fOld);
 			changed[name] = true;
 		});
 		convasRound(changed, a.rounding || {});
 		rememberUnitSelections();
 		afterUnitChange(fromUnits);
 		return changed;
+	}
+	// **THE SETTINGS > NEW ASSETS NUMBERS GO WITH THE NETWORK'S** (Tom, 2026-10-16: "Convert as
+	// doesn't convert the Settings starting values: Fix it."). Each is a number typed in the unit
+	// `name` names, so a copy converted to millimetres drew its next pipe 4 mm across. The same
+	// factor as the network, held to six significant figures as the other Settings numbers are.
+	// Not part of convertUnitValues(): that function is also the COUNT that decides whether a unit
+	// change needs its question, and every project, an empty one too, has these numbers.
+	function convertDefaultInputs(name, k) {
+		var d = settings.defaults, keys = (LPN_DEFAULTS_UNIT_FIELD[name] || []).slice();
+		if (!d) { return; }
+		if (name === 'lpn_u_elevhead') { keys.push('tankMinLevel'); }
+		// Roughness is a length only under Darcy-Weisbach, as convertUnitValues() says of the pipes.
+		if (name === 'lpn_u_roughness' && frictionMethod() === 'dw') { keys.push('roughness'); }
+		keys.forEach(function (key) {
+			if (typeof d[key] === 'number' && isFinite(d[key])) { d[key] = +(d[key] * k).toPrecision(6); }
+		});
 	}
 	// Nearest `step`, then written with no more decimals than the step has, so 0.1 gives 12.3 and
 	// not 12.299999999999999.
