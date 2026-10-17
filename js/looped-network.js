@@ -26135,6 +26135,15 @@ var EngCalcs = EngCalcs || {};
 			});
 			if (next) { paneState.tab = next.id; }
 		}
+		// **A NEW BOX OPENS DOCKED AT THE RIGHT, 30rem WIDE** (not over the strip it came from, and
+		// not the 52rem a floating box has, which two boxes would double into most of a 1600 px map).
+		// A box the visitor has placed before keeps what they chose.
+		if (!restoring && !e.rec.dock && !(e.rec.left > 0 || e.rec.top > 0) && !smallScreen()) {
+			e.rec.dock = 'right';
+			e.rec.dockOrd = dockNextOrd('right', e.d);
+			if (!e.rec.dockW) { e.rec.dockW = Math.round(30 * smTableRem()); }
+			renderDockCorner(e.d);
+		}
 		e.home = { parent: panel.parentNode, next: panel.nextSibling };
 		hideTipsIn(panel);
 		e.host.appendChild(panel);
@@ -26142,7 +26151,11 @@ var EngCalcs = EngCalcs || {};
 		paneBoxStrip(id, true);
 		e.box.style.display = 'flex';
 		applyPaneLayout();
-		if (wasShown && next && activePaneTab().show) { activePaneTab().show(); }
+		// **ON A SHORT WINDOW THE PANE GIVES ITS HEIGHT BACK** when the tab the reader was using
+		// leaves it (under 800 px of height): a box was asked for so the map could be bigger.
+		// The toolbar button reopens it on the tabs that remain.
+		if (wasShown && !restoring && viewportHeight() < 800) { closePane(); }
+		else if (wasShown && next && activePaneTab().show) { activePaneTab().show(); }
 		// A tab that was on show in the pane has already had its first press (the profile's second
 		// press chooses a path), so it is hidden first and shown as new.
 		if (wasShown && tab.hide) { tab.hide(); }
@@ -26178,6 +26191,8 @@ var EngCalcs = EngCalcs || {};
 		closeMenu();
 		if (boxIsTucked(e.box)) { dockFlyOut(e.d, false); }
 		if (e.box.__lpnRaise) { e.box.__lpnRaise(); }
+		// The profile's second press chooses a path, in a box as in the pane (Task 506).
+		if (id === 'profile' && paneTabById(id).show) { paneTabById(id).show(); }
 		return true;
 	}
 	/** Tabs whose content is in a box, as paneTabs rows. */
@@ -33406,6 +33421,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * focus, exactly as clicking that tab by hand would leave it.
 	 */
 	function paneStepTab(fromId, dir) {
+		// A boxed tab is not in the strip: the keys do nothing there, rather than move the pane's tab.
+		if (paneBoxed(fromId)) { return true; }
 		var idx = paneTabIndex(fromId), newIdx, newTab, fromSpec = paneTableById(fromId),
 			rows, cols, box, colKey = null, rowIdx = 0,
 			newSpec, newRows, newCols, newColIdx, newRowIdx;

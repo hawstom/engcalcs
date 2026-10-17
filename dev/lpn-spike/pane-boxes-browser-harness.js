@@ -103,6 +103,8 @@ async function main() {
 		let st = await boxState('pipes');
 		ok('the box is shown with the panel inside it', st && st.shown && st.panelIn, JSON.stringify(st));
 		ok('the table has room (not a sliver)', st && st.panelH > 150 && st.panelW > 300, st && (st.panelW + 'x' + st.panelH));
+		ok('a new box opens docked at the right, 480 px wide, not over the strip it came from', st && st.docked &&
+			Math.abs(await page.evaluate(() => document.getElementById('lpn_panebox_pipes').getBoundingClientRect().width) - 480) <= 2);
 		ok('Pipes left the strip', !(await stripHas('pipes')));
 		ok('the pane moved to another tab and still works', await page.evaluate(() => document.getElementById('lpn_pane').style.display !== 'none' &&
 			!!document.querySelector('#lpn_pane .lpn-pane-panel.on') && !document.getElementById('lpn_pane_pipes').closest('#lpn_pane')));
@@ -138,8 +140,7 @@ async function main() {
 		ok('a heading sorts the rows', !!sorter && JSON.stringify(idsAfter) !== JSON.stringify(idsBefore), JSON.stringify([idsBefore, idsAfter]));
 
 		console.log('\n--- docked, and found there after a reload ---');
-		await page.click('#lpn_panebox_pipes .lpn-corner-btn[data-dock="right"]');
-		await a.settle(600);
+		await a.settle(300);
 		st = await boxState('pipes');
 		ok('docked at the right', st && st.docked && st.shown, JSON.stringify(st));
 		const dockedW = await page.evaluate(() => Math.round(document.getElementById('lpn_panebox_pipes').getBoundingClientRect().width));
@@ -179,6 +180,28 @@ async function main() {
 			await page.evaluate(() => !!document.querySelector('#lpn_panebox_timeseries #lpn_ts_chart svg')), JSON.stringify(st));
 		ok('both boxes are back', (await boxState('pipes')) && (await boxState('pipes')).shown);
 
+		console.log('\n--- Ctrl+Shift+PageDown in a boxed table stays in the box ---');
+		const paneTabBefore = await page.evaluate(() => (document.querySelector('#lpn_pane_tabs [aria-selected=true]') || {}).id);
+		await (await page.$$('#lpn_pane_pipes td.lpn-pane-col-roughness'))[1].click();
+		await page.keyboard.press('Control+Shift+PageDown');
+		await a.settle(400);
+		ok('the pane\'s tab did not move', (await page.evaluate(() => (document.querySelector('#lpn_pane_tabs [aria-selected=true]') || {}).id)) === paneTabBefore);
+		ok('and the focus is still inside the box', await page.evaluate(() => !!document.activeElement.closest('#lpn_panebox_pipes')));
+
+		console.log('\n--- a boxed Profile: the second press chooses a path ---');
+		await page.click('#lpn_pane_tab_profile');
+		await a.settle(800);
+		await page.click('#lpn_pane_popout');
+		await a.settle(1000);
+		ok('the Profile box is out', (await boxState('profile')) && (await boxState('profile')).shown);
+		await a.menuClickSub(await L('lpn_graphs_menu'), await L('lpn_profile_menu'), 'project');
+		await a.settle(800);
+		const say = await page.evaluate(() => (document.getElementById('lpn_profile_say') || {}).textContent || '');
+		ok('the Profile row starts the chooser: "Select the node where the path starts."', say.indexOf(await L('lpn_profile_draw_start')) >= 0, say);
+		await page.keyboard.press('Escape');
+		await page.click('#lpn_panebox_profile .lpn-popover-x');
+		await a.settle(400);
+
 		console.log('\n--- closing a box sends the tab home ---');
 		await page.click('#lpn_panebox_pipes .lpn-popover-x');
 		await a.settle(600);
@@ -193,6 +216,19 @@ async function main() {
 		const left = await page.evaluate(() => localStorage.getItem('lpn_paneboxes'));
 		await reload(a);
 		ok('after another reload neither is a box', (await page.evaluate(() => document.querySelector('.lpn-panebox-host > .lpn-pane-panel'))) === null && (await stripHas('pipes')), String(left));
+
+		console.log('\n--- on a short window the pane gives its height back ---');
+		await page.setViewportSize({ width: 1400, height: 700 });
+		await a.settle(600);
+		await page.click('#lpn_pane_tab_pipes');
+		await a.settle(400);
+		await page.click('#lpn_pane_popout');
+		await a.settle(800);
+		ok('popping the tab in use closes the pane (window under 800 px tall)', await page.evaluate(() => document.getElementById('lpn_pane').style.display === 'none'));
+		await page.click('#lpn_panebox_pipes .lpn-popover-x');
+		await page.setViewportSize({ width: 1600, height: 1000 });
+		await a.toolbarClick(await L('lpn_pane_toggle'));
+		await a.settle(500);
 
 		console.log('\n--- a phone does not get it ---');
 		await page.setViewportSize({ width: 390, height: 800 });
