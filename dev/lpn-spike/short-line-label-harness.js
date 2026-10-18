@@ -1,4 +1,4 @@
-// A pipe too short to carry its own label does not carry one. Run with:
+// A pipe too short to carry its own label does not carry one along it. Run with:
 //   node dev/lpn-spike/short-line-label-harness.js
 //
 // Tom, 2026-08-14: "If a line is too short, its label must disappear even if the map is closer than
@@ -38,6 +38,8 @@ const L = loadLoopedNetwork(
 	"\t\t\t\t\treturn t.getAttribute('text-decoration'); }).length }; },\n" +
 	"\t\tnudgeOf: function (id) { return linkEls[id].nudge; },\n" +
 	"\t\thiddenShort: function (id) { return !!linkEls[id].hiddenShort; },\n" +
+	"\t\tlevel: function (id) { return !!linkEls[id].levelBeside; },\n" +
+	"\t\ttransform: function (id) { return linkEls[id].text.getAttribute('transform') || ''; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -104,16 +106,19 @@ function layoutAt(tw) {
 	L.relayoutLabels();
 }
 
-console.log('=== a pipe shorter than its own label carries none ===');
+console.log('=== a pipe shorter than its own label carries none along it ===');
 
 layoutAt(TW);
 ok('the short stub is suppressed', L.hiddenShort(stub.id));
-ok('...text and leader hidden together',
-	L.vis(stub.id).text === 'hidden' && L.vis(stub.id).leader === 'hidden',
+// **NOT ALONG IT: LEVEL BESIDE IT, OR NOT AT ALL** (Tom, 2026-10-17: short pipes should also try
+// the level spot). Nothing else is near this stub, so placeLevelPipeLabels() finds it a level side;
+// pipe-label-level-browser-harness.js holds the hide where no side is clean.
+ok('...and its label is set level beside it instead, there being room',
+	L.level(stub.id) && L.vis(stub.id).text !== 'hidden' && !/rotate\((?!0[ )])/.test(L.transform(stub.id)),
+	JSON.stringify({ level: L.level(stub.id), vis: L.vis(stub.id), transform: L.transform(stub.id) }));
+// The mark rides INSIDE the text, so the text and its mark are one thing whichever way it is drawn.
+ok('...text and leader shown or hidden together', L.vis(stub.id).text === L.vis(stub.id).leader,
 	JSON.stringify(L.vis(stub.id)));
-// The mark rides INSIDE the text now, so hiding the text hides it by construction -- there is no
-// separate element left to forget, which is what the old ticks === 0 assertion was guarding.
-ok('...and its extrema mark goes with the text, being part of it', L.vis(stub.id).text === 'hidden');
 ok('the 200-unit main keeps its label', !L.hiddenShort(long.id));
 ok('...visibly', L.vis(long.id).text !== 'hidden', JSON.stringify(L.vis(long.id)));
 ok('...and carries no extrema mark, the setting being retired', L.vis(long.id).marked === 0,

@@ -2850,16 +2850,16 @@ var EngCalcs = EngCalcs || {};
 	var lastCrossingShed = null;
 	// **A PIPE LABEL THAT CANNOT LIE ALONG ITS PIPE IS TRIED LEVEL BESIDE IT BEFORE IT HIDES**
 	// (dev/label-trials/port-plan.md Step 3). Along the pipe, a label hides when it has
-	// shed to its last value and is still crowded, when no station on its pipe is clear, or when a
-	// node label has taken its ground (and when it is too long for its segment, which stays a hide,
-	// below). Measured on master (dev/label-trials/preprocessing/hide-reasons.js), those three exits
-	// hid 37 of Net3's 119 pipe labels at 2x and 202 of the 600-junction network's 343, and not one
-	// of them had tried a spot off its pipe. Here each tries one, level, as a free label with a
+	// shed to its last value and is still crowded, when no station on its pipe is clear, when a
+	// node label has taken its ground, or when it is too long for its segment. Measured on master
+	// (dev/label-trials/preprocessing/hide-reasons.js), those four exits hid 102 of Net3's 119 pipe
+	// labels at 2x and 231 of the 600-junction network's 343, and not one of them had tried a spot
+	// off its pipe. Here each tries one, level, as a free label with a
 	// leader: R14, *"Values outrank alignment"*, and R1, nearness to home given up before the label.
 	//
 	// **WHAT IT IS GIVEN IS ALREADY ITS SMALLEST FORM.** The crowding shed stops at one value, so a
-	// label still crowded arrives here as that last value; a blocked or yielded one keeps the
-	// content it had.
+	// label still crowded, or too long for its segment, arrives here as that last value; a blocked
+	// or yielded one keeps the content it had.
 	//
 	// **LAST, AND STRICT, SO NOTHING ALREADY ON THE MAP MOVES.** It runs after every other label is
 	// placed, against all of them, their leaders included, and takes a side only if the side breaks
@@ -2876,11 +2876,12 @@ var EngCalcs = EngCalcs || {};
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id];
 			if (!le || le.empty || le.hiddenCrossed || !linkLabelAligned(l) || linkLabelStations(l).length !== 1) { return; }
-			// **A LABEL TOO SHORT FOR ITS SEGMENT STILL HIDES** (Tom, 2026-08-14: *"If a line is too
-			// short, its label must disappear even if the map is closer than the 'all-disappear'
-			// limit."*; short-line-label-harness.js). R1 (2026-10-06) would let it try; that is his
-			// call to make, so it is not made here.
-			if (linkLabelTooShort(l, le) || !(le.hiddenCrowded || le.hiddenBlocked || le.hiddenYielded)) { return; }
+			// **A LABEL TOO SHORT FOR ITS SEGMENT TRIES THE LEVEL SPOT TOO** (Tom, 2026-10-17: short
+			// pipes should also try the level spot). Along the pipe it still hides, as his 2026-08-14
+			// call has it (*"If a line is too short, its label must disappear"*): that is about lying
+			// along a line with no room, and a level label does not lie along it. It arrives in the
+			// form the shed left it, its last value, and hides as before if no side is clean.
+			if (!(linkLabelTooShort(l, le) || le.hiddenCrowded || le.hiddenBlocked || le.hiddenYielded)) { return; }
 			var mid = linkLabelMid(l), dir = linkDirectionAt(l, mid),
 				deg = Math.atan2(dir.by - dir.ay, dir.bx - dir.ax) * 180 / Math.PI,
 				arcs = Collide.openArcs([deg, deg + 180]),
