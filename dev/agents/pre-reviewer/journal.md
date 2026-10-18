@@ -4507,3 +4507,10 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: ar: dir rtl, right-aligned, colon on the correct side; "Chlorine" and custom-property names stay Latin; no Arabic font here so glyphs are boxes (not checked visually).
 - OBSERVED leftovers: "Closed: —" for an open pipe, "Is active?: ✓", "No pipe type chosen", "No fittings list chosen", "No pattern", "Demand pattern: (default: 1)"; extra Description lines print as unlabelled rows.
 - NOT CHECKED: harness mutation, dark theme, touch, ✓ glyph in the card (boxes in this headless font).
+
+## 2026-10-17 feat/theme @ c57fc21e3 (Task 811, theme gallery) (Perry)
+- OBSERVED (real Chromium, Net1): the branch's own harnesses pass (gallery 54, contrast 2976, light-tokens 339, theme 68). Light vs master computed-style diff: only the planned changes (grey band, darker status/? colour, field edges, the new Theme button). Gallery works by mouse, keyboard (harness) and touch at 390 px (tap keeps and closes, nothing overflows).
+- OBSERVED: calculator pages (Manning-Pipe-Flow, Hazen-Williams) ignore lpn_theme entirely (white); consistent with plan "Branch 3", but the stored choice does not reach them.
+- OBSERVED: DEFECT. @media print: no literal paper. Under Amber/Green/Dark the body text colour stays theme ink in print (amber 255,176,0 on white) and the map legend prints as a dark box; Tables print area inherits the same ink. Plan promised print literal.
+- OBSERVED: es page shows English theme names and "Theme" (keys untranslated, expected until sprint).
+- NOT CHECKED: Recalculate-off stale look under themes (CSS is opacity .5, theme-neutral), harness mutation, RTL gallery visually, Guide box in Green/Platinum.
