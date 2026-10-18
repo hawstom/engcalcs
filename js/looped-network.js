@@ -6952,7 +6952,7 @@ var EngCalcs = EngCalcs || {};
 		'project.scenarioOrdered': null, 'project.compareSet': null,
 		// -- document objects: an element's reference varies, the object does not (CLAUDE.md)
 		patterns: null, curves: null, pipeTypes: null, fittingSets: null, profiles: null,
-		controls: null, rules: null, inpSections: null,
+		controls: null, rules: null, inpSections: null, msx: null,
 		// -- coordinate-bearing, and megabytes
 		backdrop: null,
 		// **A SCENARIO MAY HOLD ITS OWN VIEW** (Tom, 2026-10-06: *"A scenario may have map overrides,
@@ -40642,6 +40642,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// The carried EPANET sections, saved with the drawing for the same reason the rule text is:
 			// a project saved and reopened still holds everything its `.inp` stated.
 			inpSections: doc.inpSections || {},
+			// **THE ATTACHED EPANET-MSX FILE** (Task 717, phase 1): the user's own text, kept and never
+			// run. Written only when there is one, so a file without one is byte for byte what it was.
+			msx: doc.msx || undefined,
 			// Where the reader was looking. Not a reason to SAVE -- panning marks nothing dirty --
 			// but it rides along whenever something else does, so a file reopens where it was left.
 			view: currentView(),
@@ -41840,6 +41843,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		doc.controls = saved.controls || [];
 		doc.rules = saved.rules || [];
 		doc.inpSections = saved.inpSections || {};
+		doc.msx = saved.msx || null;
 		// A scenario tree from a later reader (shared alternatives, calculation sets) rides through
 		// verbatim; a scenario's own tree keys already do, on the scenario object.
 		LPN_TREE_KEYS.forEach(function (k) { if (saved[k] !== undefined) { doc[k] = saved[k]; } else { delete doc[k]; } });
@@ -45110,6 +45114,144 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function pickInpFile() {
 		var input = document.getElementById('lpn_inp_file');
 		if (input) { input.click(); }
+	}
+
+	// ---- EPANET-MSX, PHASE 1: CARRY THE FILE, SAY SO (ROADMAP Task 717) ---------------------------
+	//
+	// An EPANET-MSX study is two files, the `.inp` and a `.msx` that names its nodes and links. The
+	// `.msx` is attached to the OPEN project, stored as the user's own characters in `doc.msx`
+	// ({name, text, enc}) so it rides in serializeProject() and the project file, and written back
+	// byte for byte by File > Export > EPANET-MSX file. It is never parsed into the model and never
+	// run: the scan below only counts species and finds IDs this network lacks, to say so.
+	// `enc` is 'utf-8' or, for a file that is not valid UTF-8, 'latin1' (one byte per character),
+	// so the bytes written back are the bytes that came in.
+	function msxBytesToText(buf) {
+		var u8 = new Uint8Array(buf), i, s;
+		try { return { text: new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(u8), enc: 'utf-8' }; }
+		catch (e) {
+			s = '';
+			for (i = 0; i < u8.length; i++) { s += String.fromCharCode(u8[i]); }
+			return { text: s, enc: 'latin1' };
+		}
+	}
+	function msxTextToBytes(m) {
+		var i, u8;
+		if (m.enc === 'latin1') {
+			u8 = new Uint8Array(m.text.length);
+			for (i = 0; i < m.text.length; i++) { u8[i] = m.text.charCodeAt(i) & 255; }
+			return u8;
+		}
+		return new TextEncoder().encode(m.text);
+	}
+	// Species names and the IDs the file mentions that this network does not have.
+	function msxScan(text) {
+		var sec = '', species = [], missing = [], seen = {}, hasSpecies = false;
+		String(text).replace(/^(\uFEFF|\u00EF\u00BB\u00BF)/, '').split(/\r\n|\r|\n/).forEach(function (raw) {
+			var line = raw.split(';')[0].trim(), t, m = /^\[\s*([A-Za-z]+)\s*\]/.exec(line), id = null, kind = null;
+			if (m) { sec = m[1].toUpperCase(); if (sec === 'SPECIES') { hasSpecies = true; } return; }
+			if (!line) { return; }
+			t = line.split(/\s+/);
+			if (sec === 'SPECIES' && t.length > 1) { species.push(t[1]); }
+			else if (sec === 'QUALITY' && t.length > 1 && /^(NODE|LINK)$/i.test(t[0])) { id = t[1]; kind = t[0].toUpperCase(); }
+			else if (sec === 'SOURCES' && t.length > 1) { id = t[1]; kind = 'NODE'; }
+			else if (sec === 'PARAMETERS' && t.length > 1 && /^(PIPE|TANK)$/i.test(t[0])) { id = t[1]; kind = /^PIPE/i.test(t[0]) ? 'LINK' : 'NODE'; }
+			if (id !== null && !seen[kind + id]) {
+				seen[kind + id] = true;
+				if (!(kind === 'NODE' ? nodeById(id) : linkById(id))) { missing.push(id); }
+			}
+		});
+		return { hasSpecies: hasSpecies, species: species, missing: missing };
+	}
+	function openMsxRow() {
+		if (doc.msx) { showMsxAttached(); } else { pickMsxFile(); }
+	}
+	function pickMsxFile() {
+		var pick = document.createElement('input');
+		pick.type = 'file';
+		pick.id = 'lpn_msx_file';
+		pick.accept = '.msx,text/plain';
+		pick.addEventListener('change', function () {
+			var f = pick.files && pick.files[0], reader;
+			if (!f) { return; }
+			reader = new FileReader();
+			reader.onload = function (ev) { attachMsx(ev.target.result, f.name); };
+			reader.onerror = function () {
+				setWarning((EngCalcs.pageConfig || {}).lpn_survey_read_error || 'That file could not be read from your disk.');
+			};
+			reader.readAsArrayBuffer(f);
+		});
+		pick.click();
+	}
+	function attachMsx(buf, fileName) {
+		var pc = EngCalcs.pageConfig || {}, r = msxBytesToText(buf), scan = msxScan(r.text), ids;
+		if (!scan.hasSpecies) {
+			setWarning((pc.lpn_msx_not_msx || '{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.').split('{file}').join(fileName));
+			return;
+		}
+		saveUndoSnapshot();
+		doc.msx = { name: fileName, text: r.text, enc: r.enc };
+		libCommit();
+		openDialog(function (body) {
+			var h = document.createElement('p'), p;
+			h.style.margin = '0 0 8px';
+			h.style.fontWeight = 'bold';
+			h.textContent = (pc.lpn_msx_report_heading || 'Attached {file}').split('{file}').join(fileName);
+			body.appendChild(h);
+			p = document.createElement('p');
+			p.style.margin = '0 0 6px';
+			p.textContent = pc.lpn_msx_report_kept || 'This EPANET-MSX file is kept with the project and written back unchanged on export. This page does not run it.';
+			body.appendChild(p);
+			p = document.createElement('p');
+			p.style.margin = '0 0 6px';
+			p.textContent = (pc.lpn_msx_report_species || 'Species in the file: {list}.').split('{list}').join(scan.species.join(', '));
+			body.appendChild(p);
+			if (scan.missing.length) {
+				ids = scan.missing.slice(0, 12).join(', ') + (scan.missing.length > 12 ? ', …' : '');
+				p = document.createElement('p');
+				p.style.margin = '0';
+				p.textContent = (pc.lpn_msx_report_missing || 'IDs in the file that this network does not have: {ids}.').split('{ids}').join(ids);
+				body.appendChild(p);
+			}
+		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
+	}
+	function showMsxAttached() {
+		var pc = EngCalcs.pageConfig || {}, m = doc.msx;
+		if (!m) { return; }
+		openDialog(function (body) {
+			var h = document.createElement('p'), ta = document.createElement('textarea');
+			h.style.margin = '0 0 8px';
+			h.style.fontWeight = 'bold';
+			h.textContent = (pc.lpn_msx_attached_heading || 'Attached EPANET-MSX file: {file}').split('{file}').join(m.name);
+			body.appendChild(h);
+			ta.id = 'lpn_msx_text';
+			ta.readOnly = true;
+			ta.rows = 14;
+			ta.cols = 70;
+			ta.style.width = '100%';
+			ta.style.fontFamily = 'monospace';
+			ta.value = m.text;
+			body.appendChild(ta);
+			ta = document.createElement('p');
+			ta.style.margin = '6px 0 0';
+			ta.textContent = pc.lpn_msx_report_kept || 'This EPANET-MSX file is kept with the project and written back unchanged on export. This page does not run it.';
+			body.appendChild(ta);
+		}, [
+			{ label: pc.lpn_msx_replace || 'Replace…', fn: function () { setTimeout(pickMsxFile, 0); } },
+			{ label: pc.lpn_msx_remove || 'Remove', fn: function () {
+				saveUndoSnapshot();
+				doc.msx = null;
+				libCommit();
+				setNotice((pc.lpn_msx_removed || 'Removed {file} from this project.').split('{file}').join(m.name));
+			} },
+			{ label: pc.lpn_close || 'Close', isDefault: true, fn: function () { } }
+		]);
+	}
+	function exportMsxFile() {
+		var pcX = EngCalcs.pageConfig || {}, m = doc.msx, name;
+		if (!m) { return; }
+		name = inpExportBaseName() + '.msx';
+		downloadBlob(new Blob([msxTextToBytes(m)], { type: 'text/plain' }), name);
+		setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').split('{file}').join(name));
 	}
 
 	// ---- File > Import > GeoJSON network (ROADMAP Task 728, import half) -------------------------
@@ -50834,6 +50976,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			  tip: pc.lpn_file_import_survey_tip, fn: pickSurveyFile },
 			{ icon: 'open', label: pc.lpn_file_import_inp || 'EPANET file…',
 			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
+			// **EPANET-MSX (Task 717, phase 1)**: attaches the second file of a multi-species study to
+			// the open project; kept and written back, never run. With one attached, the row shows it.
+			{ icon: 'open', label: pc.lpn_file_import_msx || 'EPANET-MSX file…',
+			  tip: pc.lpn_file_import_msx_tip, fn: openMsxRow },
 			// A GeoJSON file as a network, through one mapping step (Task 728).
 			{ icon: 'open', label: pc.lpn_file_import_gjnet || 'GeoJSON network…',
 			  tip: pc.lpn_file_import_gjnet_tip, fn: pickGeoJsonNetFile },
@@ -50869,6 +51015,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return [
 			{ icon: 'save', label: pc.lpn_file_export_item_inp || 'EPANET file…',
 			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
+			// The attached EPANET-MSX file, as its own row so one click is one download. Only offered
+			// when the project holds one.
+			{ icon: 'save', label: pc.lpn_file_export_item_msx || 'EPANET-MSX file…', hidden: !doc.msx,
+			  tip: pc.lpn_file_export_msx_tip, fn: exportMsxFile },
 			// GeoJSON (Task 728): same verb, same kind of file.
 			{ icon: 'save', label: pc.lpn_file_export_item_geojson || 'GeoJSON file…',
 			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile },
