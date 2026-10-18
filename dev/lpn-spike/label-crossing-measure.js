@@ -122,7 +122,12 @@ async function measure(file, mode, opts) {
 	// third placement set, and must not stand in for the node labels' answer.
 	Collide.placeLabelsFirstFit = function (labels, obs, opts) {
 		const out = realFF.call(this, labels, obs, opts);
-		if (opts && opts.strict) { lastLevel = out; } else { lastFirstFit = out; }
+		// A strict call over node labels is the one-line insertion (Task 734), after the repair: the
+		// labels that took a line are drawn there, so they replace the repair's entries.
+		if (opts && opts.strict && labels.length && labels[0].id.charAt(0) === 'n') {
+			const took = {}; out.forEach(function (r) { if (!r.dropped) { took[r.id] = r; } });
+			if (lastFirstFit) { lastFirstFit = lastFirstFit.map(function (r) { return took[r.id] || r; }); }
+		} else if (opts && opts.strict) { lastLevel = out; } else { lastFirstFit = out; }
 		return out;
 	};
 	const realRing = Collide.placeLabels;
