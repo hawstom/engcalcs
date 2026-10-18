@@ -3131,6 +3131,7 @@ EngCalcs.pageConfig = {
 	lpn_diag_dangling_link: <?=json_encode($ec_lang['lpn_diag_dangling_link'])?>,
 	lpn_diag_unreachable: <?=json_encode($ec_lang['lpn_diag_unreachable'])?>,
 	lpn_omitted_note: <?=json_encode($ec_lang['lpn_omitted_note'])?>,
+	lpn_roughness_method_note: <?=json_encode($ec_lang['lpn_roughness_method_note'])?>,
 	lpn_engine_fetching: <?=json_encode($ec_lang['lpn_engine_fetching'])?>,
 	lpn_engine_ready: <?=json_encode($ec_lang['lpn_engine_ready'])?>,
 	lpn_engine_fetching_valve: <?=json_encode($ec_lang['lpn_engine_fetching_valve'])?>,
