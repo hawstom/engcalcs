@@ -116,7 +116,7 @@ the block.
   concept id and a definition, and payloads send the definition as the source). Head and HGL stay
   split (Tom, 2026-09-30).
 - 100|741| **The infinite map: generated networks for the label bench.**
-  **ROUND 5 DONE 2026-09-30** on `feat/label-placer`: generator, L-Town and C-Town, pre-registered protocol, `dev/label-trials/round-5-2026-09-29.md`; five rule proposals await his ruling.
+  **ROUND 5 DONE 2026-09-30** on `feat/label-placer`: generator, L-Town and C-Town, pre-registered protocol, `dev/label-trials/round-5-2026-09-29.md`; the five rule proposals were answered by Tom; his answers are in `dev/label-placement-rules.md`.
   Tom, 2026-09-28, on threats to validity: *"It's all Net3. Where's the infinite map?"* A generator of
   networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
   utility-scale networks. Notes: dev/paper-notes-label-placement.md.
