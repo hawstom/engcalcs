@@ -114,14 +114,48 @@
 	--ec-icon-stroke: 2;
 	--ec-icon-cap: round;
 	--ec-icon-join: round;
+	/* What fills an icon's closed shapes: nothing in Light (line drawings); a theme may fill them, a tint
+	   of the icon's own colour (Arcade's two-tone icons), with no icon redrawn. */
+	--ec-icon-fill: none;
 	/* The text in the Settings box's label columns (Before, Use units, After, Decimals, Show, Drop), whose
 	   widths are fixed: a fixed-width face sets it smaller so a word fits its column as it does in Light. */
 	--ec-field-text-scale: 1;
 	/* The keyboard focus ring's width. */
 	--ec-focus-w: 2px;
-	/* The map's own paper and ink, for the gallery cards' little map. The map itself does not follow a theme. */
+	/* THE MAP (Task 811, round 3). On screen the drawing follows the theme: its paper, the network's ink, the
+	   lettering and its halo, the leaders, the selection, hover and found marks, and the face its words are set
+	   in. Each value here is what Light has always drawn. A colour the VISITOR chose (colour by value, a
+	   Text label's own weight) is written on the element itself and wins over all of these. Print and the
+	   screenshot draw Light whatever the theme (see printing and snipCloneSvg() in js/looped-network.js). */
 	--ec-map-paper: #fff;
+	/* Neutral ink: leaders, service lines, meters, the drag flash. */
 	--ec-map-ink: #000;
+	/* The network's own ink: pipes, node outlines, symbols, flow arrows, vertices (--lpn-map-ink). */
+	--ec-map-asset: #1a6faf;
+	/* Data and Text lettering, and the halo that keeps it legible over a pipe. */
+	--ec-map-label: #333;
+	--ec-map-halo: #fff;
+	--ec-map-font: sans-serif;
+	--ec-map-weight: normal;
+	/* Marks: selected, hovered, found, a drawn Shape, the marquee. */
+	--ec-map-select: #1976d2;
+	--ec-map-hover: #78909e;
+	--ec-map-located: #e65100;
+	--ec-map-shape: #6a3d9a;
+	--ec-map-marquee: #0645ad;
+	/* Contours: the line, and its lettering. */
+	--ec-map-contour: #262626;
+	--ec-map-contour-ink: #1c1c1c;
+	/* The map's frame, and the words that sit straight on its paper (the examples gallery, "Something wrong
+	   here?"). */
+	--ec-map-frame: #ccc;
+	--ec-map-text: #212529;
+	--ec-map-text-muted: #555;
+	--ec-map-text-strong: #222;
+	--ec-map-link: #0645ad;
+	--ec-map-help: #2a5d8a;
+	--ec-map-edge: #bbb;
+	--ec-map-deep: #17406b;
 	/* The basemap button's two pictures of a map (data, not chrome) */
 	--ec-hue-10304f: #10304f;
 	--ec-hue-eae7e0: #eae7e0;
@@ -381,6 +415,27 @@
 	--ec-tip-ink: #e6e8eb;
 	--ec-tip-edge: #8a9099;
 	--ec-help-ink: #7fb2e0;
+	/* The map (round 3). */
+	--ec-map-paper: #1e1f22;
+	--ec-map-ink: #d5d8dc;
+	--ec-map-asset: #6aaee8;
+	--ec-map-label: #d5d8dc;
+	--ec-map-halo: #1e1f22;
+	--ec-map-select: #8ab4f8;
+	--ec-map-hover: #9aa7b0;
+	--ec-map-located: #ff9e57;
+	--ec-map-shape: #c79bf2;
+	--ec-map-marquee: #8ab4f8;
+	--ec-map-contour: #c8ccd2;
+	--ec-map-contour-ink: #e6e8eb;
+	--ec-map-frame: #3a3d44;
+	--ec-map-text: #d5d8dc;
+	--ec-map-text-muted: #b7bbc1;
+	--ec-map-text-strong: #e6e8eb;
+	--ec-map-link: #8ab4f8;
+	--ec-map-help: #7fb2e0;
+	--ec-map-edge: #6b7078;
+	--ec-map-deep: #8ab4e8;
 }
 /* HIGH CONTRAST (Task 811): pure ink on pure paper, black rules, every text pair at 7:1 (WCAG AAA). One
    choice, two palettes: this one, and the next when the device is set to dark. System chooses it when the
@@ -427,6 +482,27 @@
 	--ec-box-border: 2px solid var(--ec-ink);
 	--ec-box-shadow: none;
 	--ec-tabs-rule: 2px solid var(--ec-ink);
+	/* The map (round 3). */
+	--ec-map-paper: #fff;
+	--ec-map-ink: #000;
+	--ec-map-asset: #00449e;
+	--ec-map-label: #000;
+	--ec-map-halo: #fff;
+	--ec-map-select: #0000b3;
+	--ec-map-hover: #595959;
+	--ec-map-located: #a33a00;
+	--ec-map-shape: #4b0082;
+	--ec-map-marquee: #0000b3;
+	--ec-map-contour: #000;
+	--ec-map-contour-ink: #000;
+	--ec-map-frame: #000;
+	--ec-map-text: #000;
+	--ec-map-text-muted: #333;
+	--ec-map-text-strong: #000;
+	--ec-map-link: #0000b3;
+	--ec-map-help: #00399e;
+	--ec-map-edge: #000;
+	--ec-map-deep: #00399e;
 }
 :root[data-theme="hc-dark"], .ec-theme-card[data-theme="hc-dark"] {
 	color-scheme: dark;
@@ -471,6 +547,27 @@
 	--ec-box-border: 2px solid var(--ec-ink);
 	--ec-box-shadow: none;
 	--ec-tabs-rule: 2px solid var(--ec-ink);
+	/* The map (round 3). */
+	--ec-map-paper: #000;
+	--ec-map-ink: #fff;
+	--ec-map-asset: #7fd4ff;
+	--ec-map-label: #fff;
+	--ec-map-halo: #000;
+	--ec-map-select: #ffff00;
+	--ec-map-hover: #a6a6a6;
+	--ec-map-located: #ffb366;
+	--ec-map-shape: #e0b3ff;
+	--ec-map-marquee: #7fd4ff;
+	--ec-map-contour: #fff;
+	--ec-map-contour-ink: #fff;
+	--ec-map-frame: #fff;
+	--ec-map-text: #fff;
+	--ec-map-text-muted: #e0e0e0;
+	--ec-map-text-strong: #fff;
+	--ec-map-link: #7fd4ff;
+	--ec-map-help: #7fd4ff;
+	--ec-map-edge: #fff;
+	--ec-map-deep: #7fd4ff;
 }
 /* AMBER (Task 811): a monochrome amber terminal. One hue in steps of brightness; status reads by the verdict
    glyph (a check or a warning sign) and the override marker's shape, never by colour alone (WCAG 1.4.1). */
@@ -525,6 +622,28 @@
 	--ec-a-0-0-0-12: rgba(0, 0, 0, .5);
 	--ec-a-0-0-0-2: rgba(0, 0, 0, .6);
 	--ec-a-0-0-0-25: rgba(0, 0, 0, .6);
+	/* The map (round 3). */
+	--ec-map-paper: #140c00;
+	--ec-map-ink: #ffb000;
+	--ec-map-asset: #ffb000;
+	--ec-map-label: #ffd37a;
+	--ec-map-halo: #140c00;
+	--ec-map-select: #fff;
+	--ec-map-hover: #c98a00;
+	--ec-map-located: #fff;
+	--ec-map-shape: #ffe3a8;
+	--ec-map-marquee: #ffd37a;
+	--ec-map-contour: #9a6600;
+	--ec-map-contour-ink: #ffd37a;
+	--ec-map-frame: #9a6600;
+	--ec-map-text: #ffb000;
+	--ec-map-text-muted: #d99a00;
+	--ec-map-text-strong: #ffd37a;
+	--ec-map-link: #ffd37a;
+	--ec-map-help: #ffb000;
+	--ec-map-edge: #9a6600;
+	--ec-map-deep: #ffd37a;
+	--ec-map-font: var(--ec-font-ui);
 }
 /* GREEN (Task 811): the same terminal in green phosphor. It differs from Amber by hue alone. */
 :root[data-theme="green"], .ec-theme-card[data-theme="green"] {
@@ -577,6 +696,28 @@
 	--ec-a-0-0-0-12: rgba(0, 0, 0, .5);
 	--ec-a-0-0-0-2: rgba(0, 0, 0, .6);
 	--ec-a-0-0-0-25: rgba(0, 0, 0, .6);
+	/* The map (round 3). */
+	--ec-map-paper: #031003;
+	--ec-map-ink: #33ff66;
+	--ec-map-asset: #33ff66;
+	--ec-map-label: #a6ffbd;
+	--ec-map-halo: #031003;
+	--ec-map-select: #fff;
+	--ec-map-hover: #1f9a3e;
+	--ec-map-located: #fff;
+	--ec-map-shape: #d2ffdf;
+	--ec-map-marquee: #a6ffbd;
+	--ec-map-contour: #1f9a3e;
+	--ec-map-contour-ink: #a6ffbd;
+	--ec-map-frame: #1f9a3e;
+	--ec-map-text: #33ff66;
+	--ec-map-text-muted: #2bd957;
+	--ec-map-text-strong: #a6ffbd;
+	--ec-map-link: #a6ffbd;
+	--ec-map-help: #33ff66;
+	--ec-map-edge: #1f9a3e;
+	--ec-map-deep: #a6ffbd;
+	--ec-map-font: var(--ec-font-ui);
 }
 /* PLATINUM (Task 811): an evocation of the late-1990s desktop: window-grey chrome, white content, black
    ink, navy links, pale yellow tips, square corners and a one-pixel raised edge on the buttons. */
@@ -626,6 +767,8 @@
 	--ec-icon-stroke: 1.75;
 	--ec-icon-cap: square;
 	--ec-icon-join: miter;
+	/* The map (round 3). */
+	--ec-map-font: var(--ec-font-ui);
 }
 /* ROUNDED (Task 811, round 2): Light's colours in a softer, newer shape. The face the computer itself uses
    for its own windows, pill-shaped buttons, every corner about twice Light's, boxes with large rounded corners,
@@ -671,6 +814,8 @@
 	--ec-box-shadow: 0 2px 6px rgba(0, 0, 0, .08), 0 12px 32px rgba(0, 0, 0, .16);
 	--ec-tabs-rule: 1px solid var(--ec-border-strong);
 	--ec-icon-stroke: 1.75;
+	/* The map (round 3). */
+	--ec-map-font: var(--ec-font-ui);
 }
 /* NEWSPAPER (Task 811, round 2): an evocation of a broadsheet of record. Newsprint paper and black ink,
    the serif a newspaper set its columns in, small capitals on the menu bar, capital headlines on the box
@@ -721,6 +866,28 @@
 	--ec-icon-stroke: 1.5;
 	--ec-icon-cap: butt;
 	--ec-icon-join: miter;
+	/* The map (round 3). */
+	--ec-map-paper: #f6f2e7;
+	--ec-map-ink: #1c1c1c;
+	--ec-map-asset: #1c1c1c;
+	--ec-map-label: #1c1c1c;
+	--ec-map-halo: #f6f2e7;
+	--ec-map-select: #7a1010;
+	--ec-map-hover: #6b6b6b;
+	--ec-map-located: #a33a00;
+	--ec-map-shape: #4a3a6a;
+	--ec-map-marquee: #7a1010;
+	--ec-map-contour: #3a3a3a;
+	--ec-map-contour-ink: #1c1c1c;
+	--ec-map-frame: #4a4a4a;
+	--ec-map-text: #1c1c1c;
+	--ec-map-text-muted: #4a4a4a;
+	--ec-map-text-strong: #000;
+	--ec-map-link: #7a1010;
+	--ec-map-help: #7a1010;
+	--ec-map-edge: #6b6b6b;
+	--ec-map-deep: #1c1c1c;
+	--ec-map-font: var(--ec-font-ui);
 }
 /* ARCADE (Task 811, round 2): an evocation of a 1980s maze game. Black screen, maze-blue walls drawn as
    double lines with round corners round every box and under the tab strip, a row of dots along the chrome,
@@ -778,6 +945,30 @@
 	--ec-chrome-image: radial-gradient(circle at 50% calc(100% - 2px), #ffb897 0 1.5px, transparent 2px);
 	--ec-chrome-image-size: 18px 100%;
 	--ec-icon-stroke: 2.5;
+	--ec-icon-fill: color-mix(in srgb, currentColor 30%, transparent);
+	/* The map (round 3). */
+	--ec-map-paper: #000;
+	--ec-map-ink: #ececf4;
+	--ec-map-asset: #4848ff;
+	--ec-map-label: #ececf4;
+	--ec-map-halo: #000;
+	--ec-map-select: #ffe600;
+	--ec-map-hover: #ffb8ff;
+	--ec-map-located: #ff5c5c;
+	--ec-map-shape: #ffb8ff;
+	--ec-map-marquee: #ffe600;
+	--ec-map-contour: #4848ff;
+	--ec-map-contour-ink: #ececf4;
+	--ec-map-frame: #4848ff;
+	--ec-map-text: #ececf4;
+	--ec-map-text-muted: #c0c0d0;
+	--ec-map-text-strong: #fff;
+	--ec-map-link: #ffe600;
+	--ec-map-help: #00ffff;
+	--ec-map-edge: #4848ff;
+	--ec-map-deep: #ffe600;
+	--ec-map-font: var(--ec-font-ui);
+	--ec-map-weight: bold;
 }
 /* SPACE (Task 811, round 2): an evocation of a film set among the stars. A night sky with stars behind the
    chrome, pale ink, gold for links and titles, a geometric face in widely spaced capitals on the menu bar
@@ -833,6 +1024,28 @@
 	--ec-chrome-image: radial-gradient(1px 1px at 23px 9px, #fff 50%, transparent 100%), radial-gradient(1px 1px at 71px 27px, #cfd8ff 50%, transparent 100%), radial-gradient(1.5px 1.5px at 131px 15px, #fff 50%, transparent 100%), radial-gradient(1px 1px at 187px 33px, #ffe9b0 50%, transparent 100%), radial-gradient(1px 1px at 229px 5px, #fff 50%, transparent 100%), radial-gradient(1px 1px at 283px 21px, #cfd8ff 50%, transparent 100%);
 	--ec-chrome-image-size: 300px 40px;
 	--ec-icon-stroke: 1.5;
+	/* The map (round 3). */
+	--ec-map-paper: #05060b;
+	--ec-map-ink: #d9dce6;
+	--ec-map-asset: #4fc3ff;
+	--ec-map-label: #d9dce6;
+	--ec-map-halo: #05060b;
+	--ec-map-select: #ffe81f;
+	--ec-map-hover: #8a92ad;
+	--ec-map-located: #ff6b5e;
+	--ec-map-shape: #ff6ad5;
+	--ec-map-marquee: #ffe81f;
+	--ec-map-contour: #5c627a;
+	--ec-map-contour-ink: #d9dce6;
+	--ec-map-frame: #5c627a;
+	--ec-map-text: #d9dce6;
+	--ec-map-text-muted: #b0b5c5;
+	--ec-map-text-strong: #fff;
+	--ec-map-link: #ffe81f;
+	--ec-map-help: #4fc3ff;
+	--ec-map-edge: #6b7290;
+	--ec-map-deep: #ffe81f;
+	--ec-map-font: var(--ec-font-ui);
 }
 }
 /* ec-colour-tokens:end */
@@ -861,7 +1074,7 @@
    a label is the same width, placed in the same spot, and exported the same, whatever the theme; and it
    never glows. */
 body { font-size: var(--ec-font-size); text-shadow: var(--ec-text-glow); }
-#lpn_canvas { font-family: sans-serif; font-size: 1rem; text-shadow: none; }
+#lpn_canvas { font-family: var(--ec-map-font); font-size: 1rem; text-shadow: none; }
 /* The label columns in Settings are fixed widths (js/looped-network.js, LPN_LABEL_*_W); their text follows
    --ec-field-text-scale (1 in Light) so a wider face does not cut "Init." or break "units" in two. */
 :is(#lpn_labels_node_fields, #lpn_labels_link_fields, #lpn_labels_customer_fields) > div > :nth-child(n+2) { font-size: calc(1em * var(--ec-field-text-scale)); }
@@ -1181,6 +1394,7 @@ input.ec-spin[type=number] {
 	/* The line weight and its ends, from the theme (Light: 2, round, round, as the <svg> states them).
 	   A path that states its own width or cap keeps it. */
 	stroke-width: var(--ec-icon-stroke); stroke-linecap: var(--ec-icon-cap); stroke-linejoin: var(--ec-icon-join);
+	fill: var(--ec-icon-fill);
 }
 /* A control whose label is "<icon> Word" gets its gap from here rather than from a space character
    baked into every call site -- a literal space is unremovable and wrong in a narrow toolbar.
@@ -1328,7 +1542,7 @@ html[lang="zh"] .ec-welcome {
    dev/browser-pass/specs/cursorflicker.js, and that spec still holds that bare map says the map's
    own cursor everywhere it shows through. What is superseded is the GLYPH twice over: `grab`,
    because this is not a web map, and then `pointer`, because he looked at it. */
-#lpn_canvas { touch-action: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; cursor: default; --lpn-sym: 1; --lpn-symf: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-backdrop-img-opacity: 1; --lpn-basemap-style: none; --lpn-map-bg: #fff; }
+#lpn_canvas { touch-action: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; cursor: default; --lpn-sym: 1; --lpn-symf: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-backdrop-img-opacity: 1; --lpn-basemap-style: none; --lpn-map-bg: var(--ec-map-paper); }
 /* **AND NOTHING CHANGES WHILE THE MAP IS MOVING**, which is why there is no `#lpn_canvas.lpn-panning`
    rule here any more. It was `cursor: grabbing`, the closing half of the open hand, and it goes with
    the hand. `setPanning()` still writes the class on the one frame a pan really translates the map,
@@ -1442,7 +1656,7 @@ html[lang="zh"] .ec-welcome {
    wateriness. Colour-by-value still overrides all of it through currentColor, so the budget is
    spent the moment the model has something to say. One token, so a future change is one edit. */
 :root {
-	--lpn-map-ink: #1a6faf;
+	--lpn-map-ink: var(--ec-map-asset);
 	/* **THE PIPES TAKE THE SAME INK AS THE NODE OUTLINES** (Tom, 2026-09-02: *"Pipes same as node
 	   outlines."*, settling the "let's try main/dark" of a minute earlier). ONE ink for the whole
 	   drawing, so the network reads as a single object rather than as symbols sitting on a
@@ -1876,9 +2090,9 @@ html[lang="zh"] .ec-welcome {
    Both rules sit AFTER their .lpn-override twin (selection is the thing you are acting on now) and
    BEFORE .lpn-node-pending (mid-pipe-draw is about what your next click does, which is more
    urgent still). */
-.lpn-link-halo.lpn-selected { stroke: #1976d2; stroke-width: calc(2.857 * var(--lpn-lw, 0)); }
-.lpn-node.lpn-selected { stroke: #1976d2; stroke-width: calc(0.5 * var(--lpn-symf, 0)); }
-.lpn-lbl.lpn-selected { fill: #1976d2; }
+.lpn-link-halo.lpn-selected { stroke: var(--ec-map-select); stroke-width: calc(2.857 * var(--lpn-lw, 0)); }
+.lpn-node.lpn-selected { stroke: var(--ec-map-select); stroke-width: calc(0.5 * var(--lpn-symf, 0)); }
+.lpn-lbl.lpn-selected { fill: var(--ec-map-select); }
 /* HOVER PREVIEW, Select mode only (Ida's wishlist item 1): additive to the Task 618 cursor, which
    stays `default` over an object and over nothing on purpose -- nothing else on screen said what a
    click would hit. js/looped-network.js toggles this on the exact element selectionMarkEl() would
@@ -1887,7 +2101,7 @@ html[lang="zh"] .ec-welcome {
    Weaker than `.lpn-selected` on purpose (thinner stroke, a greyer blue) and `:not(.lpn-selected)`
    guarantees the selected look always wins when both classes land on the same element, regardless
    of rule order. */
-:root { --lpn-hover-color: #78909e; }
+:root { --lpn-hover-color: var(--ec-map-hover); }
 .lpn-link-halo.lpn-hover:not(.lpn-selected) { stroke: var(--lpn-hover-color); stroke-width: calc(1.8 * var(--lpn-lw, 0)); }
 .lpn-node.lpn-hover:not(.lpn-selected) { stroke: var(--lpn-hover-color); stroke-width: calc(0.32 * var(--lpn-symf, 0)); }
 .lpn-lbl.lpn-hover:not(.lpn-selected) { fill: var(--lpn-hover-color); }
@@ -1895,7 +2109,7 @@ html[lang="zh"] .ec-welcome {
    standing, since a go-to no longer replaces the set (findGoTo() in js/looped-network.js). Orange,
    at the selection's weight, and it pulses three times so it is found; `:not(.lpn-selected)` so a
    selected element keeps the selected look. */
-:root { --lpn-located-color: #e65100; }
+:root { --lpn-located-color: var(--ec-map-located); }
 @keyframes lpn-located-pulse { 0%, 100% { stroke-opacity: 1; } 50% { stroke-opacity: 0.25; } }
 .lpn-link-halo.lpn-located:not(.lpn-selected) { stroke: var(--lpn-located-color); stroke-width: calc(2.857 * var(--lpn-lw, 0)); animation: lpn-located-pulse 0.6s ease-in-out 3; }
 .lpn-node.lpn-located:not(.lpn-selected) { stroke: var(--lpn-located-color); stroke-width: calc(0.5 * var(--lpn-symf, 0)); animation: lpn-located-pulse 0.6s ease-in-out 3; }
@@ -1961,25 +2175,25 @@ html[lang="zh"] .ec-welcome {
    pointer event; the page finds a Shape by distance (shapeHitOver() in js/looped-network.js). The
    grips show only on a selected Shape. */
 .lpn-shapes, .lpn-shape, .lpn-shape * { pointer-events: none; }
-.lpn-shape-line { fill: none; stroke: #6a3d9a; stroke-width: 1.5px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
-.lpn-shape-line.lpn-shape-closed { fill: #6a3d9a; fill-opacity: .06; }
-.lpn-shape-x { fill: none; stroke: #6a3d9a; stroke-width: 2px; vector-effect: non-scaling-stroke; transform: scale(calc(5 * var(--lpn-hair, 0))); }
+.lpn-shape-line { fill: none; stroke: var(--ec-map-shape); stroke-width: 1.5px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.lpn-shape-line.lpn-shape-closed { fill: var(--ec-map-shape); fill-opacity: .06; }
+.lpn-shape-x { fill: none; stroke: var(--ec-map-shape); stroke-width: 2px; vector-effect: non-scaling-stroke; transform: scale(calc(5 * var(--lpn-hair, 0))); }
 .lpn-shape-handle { display: none; }
-.lpn-shape-handle rect { fill: #fff; stroke: #6a3d9a; stroke-width: 1.5px; vector-effect: non-scaling-stroke; transform: scale(calc(4 * var(--lpn-hair, 0))); }
+.lpn-shape-handle rect { fill: var(--ec-map-paper); stroke: var(--ec-map-shape); stroke-width: 1.5px; vector-effect: non-scaling-stroke; transform: scale(calc(4 * var(--lpn-hair, 0))); }
 .lpn-shape.lpn-selected .lpn-shape-handle { display: inline; }
-.lpn-shape.lpn-selected .lpn-shape-line, .lpn-shape.lpn-selected .lpn-shape-x { stroke: #1976d2; stroke-width: 2.5px; }
+.lpn-shape.lpn-selected .lpn-shape-line, .lpn-shape.lpn-selected .lpn-shape-x { stroke: var(--ec-map-select); stroke-width: 2.5px; }
 .lpn-shape.lpn-hover:not(.lpn-selected) .lpn-shape-line, .lpn-shape.lpn-hover:not(.lpn-selected) .lpn-shape-x { stroke-width: 2.5px; }
 .lpn-shape-draftg { pointer-events: none; }
-.lpn-shape-draft { fill: none; stroke: #6a3d9a; stroke-width: 1.5px; stroke-dasharray: 5 3; vector-effect: non-scaling-stroke; }
-.lpn-shape-draft-pt { fill: #fff; stroke: #6a3d9a; stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.lpn-shape-draft { fill: none; stroke: var(--ec-map-shape); stroke-width: 1.5px; stroke-dasharray: 5 3; vector-effect: non-scaling-stroke; }
+.lpn-shape-draft-pt { fill: var(--ec-map-paper); stroke: var(--ec-map-shape); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
 /* The select-area marquee (Task 266). Blue rather than the rubber band's red, because the rubber
    band says "a pipe will be drawn here" and this says "these are the ones I mean" -- two shapes
    that both follow the pointer and must never be mistaken for each other. A faint wash inside it,
    so a lasso reads as an enclosure rather than as a scribble; pointer-events off, or the shape
    being drawn would swallow the hit tests of everything under it. */
 .lpn-marquee {
-	stroke: #0645ad; stroke-width: calc(0.35 * var(--lpn-symf, 0)); stroke-dasharray: 1.2 1;
-	fill: #0645ad; fill-opacity: .08; pointer-events: none;
+	stroke: var(--ec-map-marquee); stroke-width: calc(0.35 * var(--lpn-symf, 0)); stroke-dasharray: 1.2 1;
+	fill: var(--ec-map-marquee); fill-opacity: .08; pointer-events: none;
 }
 /* **THE DISCLOSURE TRIANGLE** (Task 266). It says "this control holds more than it shows", which
    is the only thing that makes press-again-to-cycle discoverable. A pseudo-element, so there is
@@ -2047,9 +2261,9 @@ html[lang="zh"] .ec-welcome {
    8 -- and a heavy halo closes those up. `stroke-linejoin: round` keeps a sharp corner from
    throwing a spike. */
 .lpn-lbl {
-	fill: #333; pointer-events: none; user-select: none;
+	fill: var(--ec-map-label); pointer-events: none; user-select: none; font-weight: var(--ec-map-weight);
 	paint-order: stroke fill;
-	stroke: #fff; stroke-width: calc(var(--lpn-halo, 0.4) * 1em); stroke-linejoin: round;
+	stroke: var(--ec-map-halo); stroke-width: calc(var(--lpn-halo, 0.4) * 1em); stroke-linejoin: round;
 }
 /* The in-place Text editor (looped-network.js openTextEditor()): laid over the hidden map words at
    their size, angle and alignment, so it must add no box metrics of its own. The outline marks it as
@@ -2071,7 +2285,7 @@ html[lang="zh"] .ec-welcome {
    size and 0.14px if you turned symbols down -- which is why Tom reported "no leaders" while
    looking at them (2026-08-15). A leader that cannot be seen is worse than none: the label it
    belongs to then reads as floating free of the network. */
-.lpn-leader { stroke: #000; stroke-width: var(--lpn-hair, 0); pointer-events: none; }
+.lpn-leader { stroke: var(--ec-map-ink); stroke-width: var(--lpn-hair, 0); pointer-events: none; }
 /* ---- CUSTOMERS: the meter and its service connector (ROADMAP Task 247) ----------------------
    THE STROKE WIDTH IS SET PER ELEMENT, NOT HERE, and that is the one thing about these two that
    is unlike every other symbol on this map. A meter is drawn to its real size (about 2 m across)
@@ -2082,7 +2296,7 @@ html[lang="zh"] .ec-welcome {
 
    THE CONNECTOR IS NOT PICKABLE, exactly like a label's leader above it: a press on a service
    line means the meter, which is what a reader intends by pressing one. */
-.lpn-service { stroke: #000; pointer-events: none; fill: none; }
+.lpn-service { stroke: var(--ec-map-ink); pointer-events: none; fill: none; }
 .lpn-service-off { display: none; }
 /* A SOLID DOT (Tom, 2026-09-17: "The map symbol is to be a solid dot."). It is drawn three to
    seven pixels across at the zooms this map is read at, where an outlined box is a grey smudge
@@ -2094,11 +2308,11 @@ html[lang="zh"] .ec-welcome {
    have said `pointer` since that task; this is the same sentence about the same kind of thing, and
    there is no third convention. The service connector needs none: it is `pointer-events: none`
    above, so the cursor over it is whatever is behind it. */
-.lpn-meter { fill: #000; stroke: #000; cursor: pointer; }
+.lpn-meter { fill: var(--ec-map-ink); stroke: var(--ec-map-ink); cursor: pointer; }
 /* A METER ATTACHED TO NOTHING LOOKS LIKE IT. Its demand is in no junction's total and therefore
    in no answer on the screen, so it is drawn hollow and dashed rather than merely drawn without a
    connector: an absent line is a thing you have to notice, an empty ring is a thing you can see. */
-.lpn-meter-loose { fill: #fff; stroke-dasharray: 1.5 1.2; }
+.lpn-meter-loose { fill: var(--ec-map-paper); stroke-dasharray: 1.5 1.2; }
 /* The preview dot of a half-placed meter, which is view state and not an element yet. The same
    red the rubber band it hangs off is, so the two read as one gesture in progress. */
 .lpn-meter-pending { fill: none; stroke: #d32f2f; stroke-dasharray: 1.5 1.2; pointer-events: none; }
@@ -2121,7 +2335,7 @@ html[lang="zh"] .ec-welcome {
    Two classes, so it outranks the loose white above it while a customer is selected, and that
    comes back the moment it is not. A customer connected to nothing keeps its dashes meanwhile,
    which is the half of that signal a reader is looking at anyway. */
-.lpn-meter.lpn-selected { fill: #1976d2; stroke: #1976d2; }
+.lpn-meter.lpn-selected { fill: var(--ec-map-select); stroke: var(--ec-map-select); }
 /* Hover preview on a customer's own dot, the same weaker/greyer mark as the node/link/label rules
    above and for the same reason -- see the comment beside .lpn-node.lpn-hover. */
 .lpn-meter.lpn-hover:not(.lpn-selected) { fill: var(--lpn-hover-color); stroke: var(--lpn-hover-color); }
@@ -2144,7 +2358,7 @@ html[lang="zh"] .ec-welcome {
    one thing this grip does not do. Every other draggable thing on this page (a node, a vertex
    handle, a label) says `pointer` while it is draggable, so this is not a new rule; it is the grip
    rejoining the one that was already there. */
-.lpn-custhandle { fill: #fff; stroke: #1976d2; cursor: pointer; }
+.lpn-custhandle { fill: var(--ec-map-paper); stroke: var(--ec-map-select); cursor: pointer; }
 /* A METER CARRIES NO LABEL ON THE MAP (Tom, 2026-09-17: "I don't think we want labels on
    customers. I didn't ask for them."). An account number used to be drawn beside every symbol as
    generated annotation; it is gone, and so is the rule that was here for it. The account number
@@ -2178,11 +2392,11 @@ html[lang="zh"] .ec-welcome {
 .lpn-just-dragged { animation: lpn-just-dragged 45s ease-out; }
 @keyframes lpn-just-dragged {
 	0%   { fill: #d40000; }
-	4%   { fill: #000; }
+	4%   { fill: var(--ec-map-ink); }
 	8%   { fill: #d40000; }
-	12%  { fill: #000; }
+	12%  { fill: var(--ec-map-ink); }
 	16%  { fill: #d40000; animation-timing-function: linear; }
-	100% { fill: #000; }
+	100% { fill: var(--ec-map-ink); }
 }
 /* **THE SAME MARK, ON A NODE THAT MOVED** (Tom, 2026-09-01: *"we have no way of knowing when a
    junction moves. Some sort of a fading highlight like the labels have when they are moved would
@@ -3066,8 +3280,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-examples-msg { margin: 3em auto; max-width: 30em; opacity: .7; }
 /* THE GALLERY'S OWN WORDS LIE DIRECTLY ON THE MAP'S TILES, which no theme changes, so they keep the map's
    ink in every theme (the cards are a themed panel and carry their own colours). Allow-listed as map ink. */
-.lpn-examples-welcome, .lpn-examples-h, .lpn-examples-sub, .lpn-examples-msg, .lpn-examples-legal { color: #212529; }
-.lpn-examples-legal a { color: #0645ad; }
+.lpn-examples-welcome, .lpn-examples-h, .lpn-examples-sub, .lpn-examples-msg, .lpn-examples-legal { color: var(--ec-map-text); }
+.lpn-examples-legal a { color: var(--ec-map-link); }
 /* ONE ROW WHEN THERE IS ROOM, wrapping down when there is not (Tom, 2026-08-14: "There is no
    guarantee that the examples will all fit... Wrapping degrades gracefully. So it might be better
    to put them all in one row initially").
@@ -3133,7 +3347,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	padding: .3em;
 	font: inherit;
 	font-size: .9em;
-	color: #17406b; /* on the map's tiles: map ink in every theme */
+	color: var(--ec-map-deep); /* on the map's paper, in the map's own ink */
 	text-decoration: underline;
 	cursor: pointer;
 }
@@ -3192,7 +3406,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	flex: 0 0 auto;
 	width: 1.4em;
 	height: 0.85em;
-	border: 1px solid rgba(0, 0, 0, .45);
+	border: 1px solid color-mix(in srgb, var(--ec-map-ink) 45%, transparent);
 }
 /* The contour plot's support line under the node block (Task 600): what the colour between the
    nodes stands on. Narrow and small, because it is a sentence in a corner overlay. */
@@ -3210,20 +3424,20 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    retaining wall of a grading plan. A label's stroke width and font size are attributes in drawing
    units, set per zoom, so no rule here may name them. */
 .lpn-contour-line {
-	fill: none; stroke: #262626; stroke-opacity: .5; stroke-width: 1px;
+	fill: none; stroke: var(--ec-map-contour); stroke-opacity: .5; stroke-width: 1px;
 	vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round;
 }
 .lpn-contour-line.lpn-contour-index { stroke-opacity: .8; stroke-width: 1.6px; }
 .lpn-contour-label {
-	fill: #1c1c1c; stroke: #fff; stroke-opacity: .9; paint-order: stroke; stroke-linejoin: round;
+	fill: var(--ec-map-contour-ink); stroke: var(--ec-map-halo); stroke-opacity: .9; paint-order: stroke; stroke-linejoin: round;
 	font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-weight: 600;
 }
 .lpn-contour-break-casing {
-	fill: none; stroke: #fff; stroke-opacity: .9; stroke-width: 7px; stroke-linecap: round;
+	fill: none; stroke: var(--ec-map-halo); stroke-opacity: .9; stroke-width: 7px; stroke-linecap: round;
 	vector-effect: non-scaling-stroke;
 }
 .lpn-contour-break {
-	fill: none; stroke: #1c1c1c; stroke-width: 3.5px; stroke-linecap: round;
+	fill: none; stroke: var(--ec-map-contour-ink); stroke-width: 3.5px; stroke-linecap: round;
 	vector-effect: non-scaling-stroke;
 }
 /* The contour box: the Find box's shell, a little wider for a name column and a number with its
@@ -4994,10 +5208,10 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    thank-you, so a hover border on it would invite a second press that posts nothing. */
 .lpn-wrong-btn[disabled] { color: var(--ec-ink-muted); cursor: default; border-color: transparent; opacity: 1; }
 /* The standing cell in the bottom strip sits on the map's own paper, not on chrome: map ink in every theme. */
-#lpn_wrong_btn { color: #555; }
-#lpn_wrong_btn .ec-tip { color: #2a5d8a; }
-#lpn_wrong_btn:hover, #lpn_wrong_btn:focus { color: #222; border-color: #bbb; }
-#lpn_wrong_btn[disabled] { color: #555; border-color: transparent; }
+#lpn_wrong_btn { color: var(--ec-map-text-muted); }
+#lpn_wrong_btn .ec-tip { color: var(--ec-map-help); }
+#lpn_wrong_btn:hover, #lpn_wrong_btn:focus { color: var(--ec-map-text-strong); border-color: var(--ec-map-edge); }
+#lpn_wrong_btn[disabled] { color: var(--ec-map-text-muted); border-color: transparent; }
 /* ---- The box "Something wrong here?" opens (ROADMAP Task 768), drawn in #lpn_dialog ----
    The picks are toggles (aria-pressed), wrapping onto as many rows as the width needs, so a phone in
    tall mode gets a column of them and a desk gets two rows. A pressed pick wears the toolbar's own
@@ -6683,7 +6897,7 @@ textarea.lpn-desc-ta {
    Settings > Page > Theme is a button showing the chosen theme as a small picture of the page; it opens a
    gallery of the same pictures, one per theme. A picture (.ec-theme-card) carries data-theme, so the token
    rules at the top of this file paint it in its own theme while the page around it stays in the page's.
-   Its little map keeps the map's paper and ink, because the map does not follow a theme. */
+   Its little map is painted in the theme's map paper and network ink, as the real map is on screen. */
 .ec-theme-card {
 	display: block; position: relative; box-sizing: border-box; overflow: hidden;
 	width: 132px; height: 80px;
@@ -6712,7 +6926,7 @@ textarea.lpn-desc-ta {
 .ec-tc-panel i + i { width: 70%; background: var(--ec-ink-muted); }
 .ec-tc-panel i.ec-tc-link { width: 85%; background: var(--ec-accent); }
 .ec-tc-map { position: absolute; left: 44px; right: 4px; top: 43px; bottom: 4px; background: var(--ec-map-paper); border: 1px solid var(--ec-border-strong); }
-.ec-tc-map svg { display: block; width: 100%; height: 100%; fill: var(--ec-map-paper); stroke: var(--ec-map-ink); stroke-width: 1.4px; }
+.ec-tc-map svg { display: block; width: 100%; height: 100%; fill: var(--ec-map-paper); stroke: var(--ec-map-asset); stroke-width: 1.4px; }
 .ec-tc-note { position: absolute; right: 3px; top: 3px; width: 26px; height: 7px; background: var(--ec-warn-bg); border: 1px solid var(--ec-warn-border); }
 /* The Settings row's button: a smaller picture and the name. */
 .lpn-theme-btn {

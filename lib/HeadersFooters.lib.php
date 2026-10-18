@@ -82,7 +82,8 @@ if (isset($html_desc) && trim((string)$html_desc) !== '') :
 // not tokens), and a page with no data-theme stays light under any system. The script is inline and ahead
 // of the stylesheets on purpose: a dark-mode visitor must never see a white flash while a file loads.
 // window.ecTheme.set() is the one writer; preview() repaints without storing anything (the gallery in
-// Settings), and preview(null) returns to the stored choice. `?theme=system` in the address is the rescue
+// Settings), and preview(null) returns to the stored choice. Every repaint fires `ec-theme` on window, which
+// the map listens to (its lettering may change face, js/looped-network.js mapFollowTheme()). `?theme=system` in the address is the rescue
 // for a visitor who chose a theme they cannot read: it clears the choice (any other listed name sets it).
 // With storage blocked the choice still holds until the page is closed. No consent is needed: a
 // preference the visitor set (dev/cookie-storage-inventory.md).
@@ -94,7 +95,7 @@ if ($type === 'EngCalcsApp') :
 	function ok(t){return T.indexOf(t)>=0;}
 	function g(){if(m){return m;}try{var t=localStorage.getItem('lpn_theme');return ok(t)?t:'system';}catch(e){return 'system';}}
 	function r(t){var k=!!(qd&&qd.matches);t=ok(t)?t:'system';if(t==='system'){t=qc&&qc.matches?'hc':(k?'dark':'light');}return t==='hc'&&k?'hc-dark':t;}
-	function a(){var t=r(p||g());d.setAttribute('data-theme',t);d.setAttribute('data-bs-theme',K[t]?'dark':'light');}
+	function a(){var t=r(p||g());d.setAttribute('data-theme',t);d.setAttribute('data-bs-theme',K[t]?'dark':'light');try{w.dispatchEvent(new Event('ec-theme'));}catch(e){}}
 	function s(t){m=ok(t)?t:'system';try{if(m!=='system'){localStorage.setItem('lpn_theme',m);}else{localStorage.removeItem('lpn_theme');}}catch(e){}p=null;a();}
 	try{var u=/[?&]theme=([a-z]+)/.exec(location.search);if(u&&ok(u[1])){s(u[1]);}}catch(e){}
 	a();[qd,qc].forEach(function(q){if(q&&q.addEventListener){q.addEventListener('change',a);}});

@@ -54,7 +54,16 @@ const BORDERS = [['ec-border-strong', 'ec-bg'], ['ec-form-border', 'ec-form-bg']
 	['ec-hue-2a6ebb', 'ec-bg'], ['ec-ink-subtle', 'ec-bg'], ['ec-point', 'ec-bg'], ['ec-tip-edge', 'ec-bg'],
 	['ec-control-border', 'ec-bg'], ['ec-accent', 'ec-chrome-bg'], ['ec-gray-999', 'ec-chrome-bg'],
 	// The override marker is a shape (Task 790), on the page and on a held row
-	['ec-held-ink', 'ec-bg'], ['ec-held-ink', 'ec-held-bg']];
+	['ec-held-ink', 'ec-bg'], ['ec-held-ink', 'ec-held-bg'],
+	// THE MAP (round 3): the network, its marks and its frame against the map's own paper
+	['ec-map-asset', 'ec-map-paper'], ['ec-map-ink', 'ec-map-paper'], ['ec-map-select', 'ec-map-paper'],
+	['ec-map-hover', 'ec-map-paper'], ['ec-map-located', 'ec-map-paper'], ['ec-map-shape', 'ec-map-paper'],
+	['ec-map-marquee', 'ec-map-paper'], ['ec-map-contour', 'ec-map-paper']];
+// Text on the map: lettering on its own halo and on the bare paper, and the words that sit on the paper.
+const MAP_TEXT = [['ec-map-label', ['ec-map-halo', 'ec-map-paper']], ['ec-map-contour-ink', ['ec-map-halo', 'ec-map-paper']],
+	['ec-map-select', ['ec-map-halo']], ['ec-map-text', ['ec-map-paper']], ['ec-map-text-muted', ['ec-map-paper']],
+	['ec-map-text-strong', ['ec-map-paper']], ['ec-map-link', ['ec-map-paper']], ['ec-map-help', ['ec-map-paper']],
+	['ec-map-deep', ['ec-map-paper']]];
 
 // Every pair as [fg, bg, need, why] for one theme, for this check and the browser harness alike.
 function pairs(theme) {
@@ -64,6 +73,7 @@ function pairs(theme) {
 	ON_FILL.forEach(([t, ss]) => ss.forEach((s) => out.push([t, s, text, 'text on a filled control'])));
 	DISABLED.forEach(([t, ss]) => ss.forEach((s) => out.push([t, s, 3, 'disabled text'])));
 	BORDERS.forEach(([b, s]) => out.push([b, s, 3, 'UI border']));
+	MAP_TEXT.forEach(([t, ss]) => ss.forEach((x) => out.push([t, x, text, 'map lettering'])));
 	return out;
 }
 

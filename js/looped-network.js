@@ -698,8 +698,13 @@ var EngCalcs = EngCalcs || {};
 	 * Bounded, and cleared whole rather than evicted one by one: a drawing whose labels are all
 	 * distinct gets one lookup per measurement and nothing worse.
 	 */
-	var textMeasureCache = Object.create(null), textMeasureKeys = 0;
+	var textMeasureCache = Object.create(null), textMeasureKeys = 0, textMeasureHits = 0;
 	var TEXT_MEASURE_MAX = 20000;
+	// **THE MAP'S FACE IS PART OF THE KEY** (Task 811, round 3): a theme may set the map's lettering in
+	// another face or weight (--ec-map-font, --ec-map-weight, css/engcalcs.css), and the same string is
+	// then a different width. Keyed rather than cleared, so going back to a theme already seen reuses
+	// every width it measured.
+	var mapFaceKey = '';
 	// `fontWorld` is the size the string is drawn at. Zero or missing means the answer cannot be
 	// attributed to a size, so the real measurement is taken and nothing is banked.
 	function measuredTextWidth(el, str, fontWorld, measure) {
@@ -709,10 +714,10 @@ var EngCalcs = EngCalcs || {};
 		// size differing in the last bits -- which is a different key, and a measured 87% of the
 		// hits lost for a size difference of one part in ten million. Six significant figures is
 		// four orders of magnitude finer than the quantisation the measurement itself carries.
-		var k = ((el && el.getAttribute && el.getAttribute('class')) || '')
+		var k = mapFaceKey + '\u0000' + ((el && el.getAttribute && el.getAttribute('class')) || '')
 			+ '\u0000' + fontWorld.toPrecision(6) + '\u0000' + str,
 			hit = textMeasureCache[k], w;
-		if (hit !== undefined) { return hit; }
+		if (hit !== undefined) { textMeasureHits++; return hit; }
 		w = measure();
 		if (isFinite(w) && w >= 0) {
 			if (textMeasureKeys >= TEXT_MEASURE_MAX) {
@@ -52832,7 +52837,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// A deep copy of the map's SVG with every computed style written onto its element, hidden
 	// elements dropped, and every raster inlined. `out.droppedBasemap` reports a tile left out.
 	function snipCloneSvg(out) {
+		// **COPIED AS LIGHT, WHATEVER THE THEME** (Task 811 round 3): a screenshot leaves the page, and what
+		// leaves the page is the drawing everyone else sees. withLightMap() lends the page Light and Light's
+		// label layout for the length of this synchronous copy.
+		return withLightMap(function () { return snipCloneSvgNow(out); });
+	}
+	function snipCloneSvgNow(out) {
 		var clone = svg.cloneNode(true), pending = [];
+		out.paper = window.getComputedStyle(svg).backgroundColor || 'white';
 		function walk(o, c) {
 			var cs = window.getComputedStyle(o);
 			if (cs.display === 'none') { c.parentNode.removeChild(c); return; }
@@ -52923,16 +52935,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				var c = document.createElement('canvas'), ctx;
 				c.width = W; c.height = H;
 				ctx = c.getContext('2d');
-				ctx.fillStyle = window.getComputedStyle(svg).backgroundColor || 'white';
+				ctx.fillStyle = out.paper;
 				ctx.fillRect(0, 0, W, H);
 				ctx.drawImage(im, 0, 0, W, H);
 				ctx.save();
 				ctx.scale(W / r.w, H / r.h);
 				ctx.translate(-r.x, -r.y);
 				ctx.beginPath(); ctx.rect(r.x, r.y, r.w, r.h); ctx.clip();
-				snipLegends().forEach(function (lg) {
-					var lr = lg.getBoundingClientRect();
-					if (lr.right > r.x && lr.left < r.x + r.w && lr.bottom > r.y && lr.top < r.y + r.h) { snipPaintHtml(ctx, lg); }
+				// The legends are painted from their computed styles, so they too are read in Light.
+				withLightMap(function () {
+					snipLegends().forEach(function (lg) {
+						var lr = lg.getBoundingClientRect();
+						if (lr.right > r.x && lr.left < r.x + r.w && lr.bottom > r.y && lr.top < r.y + r.h) { snipPaintHtml(ctx, lg); }
+					});
 				});
 				ctx.restore();
 				if (poly) {
@@ -52954,6 +52969,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}, function (err) { URL.revokeObjectURL(url); throw err; });
 		});
 	}
+	// For the harnesses (Task 811 round 3): the whole visible map rendered exactly as the screenshot
+	// renders it, as a data: URL, so a theme can be proved not to reach the picture.
+	EngCalcs.lpnRenderMapPng = function () {
+		return renderScreenshot(snipMapRect(), null).then(function (o) {
+			return new Promise(function (resolve) { var f = new FileReader(); f.onload = function () { resolve(f.result); }; f.readAsDataURL(o.blob); });
+		});
+	};
 	function snipDownload(blob) {
 		var a = document.createElement('a'), url = URL.createObjectURL(blob);
 		a.href = url;
@@ -54140,6 +54162,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 		} catch (err) { /* localStorage/history can throw (private mode) -- non-fatal, just skip the wipe */ }
 		svg = document.getElementById('lpn_canvas');
+		mapFaceKey = readMapFaceKey();   // the face the first layout is measured in (Task 811 round 3)
 		world = el('g', {}, svg);
 		// BELOW the user's own backdrop image: a registered plan sheet is the thing the person put
 		// there on purpose, and a street map is context behind it.
@@ -59318,7 +59341,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// A meter moved by hand re-draws its own geometry, which is per notch too and so cannot
 			// carry the taint; its position is read here instead.
 			JSON.stringify(doc.customers || []),
-			georef ? 1 : 0, georefActive() ? 1 : 0].join('|') +
+			georef ? 1 : 0, georefActive() ? 1 : 0, mapFaceKey].join('|') +
 			// The open scenario's own settings, where it holds any (stage 3): nothing at all in a
 			// project that has none, so this key is the one it always was.
 			(own ? '|' + JSON.stringify(own) : '');
@@ -74888,6 +74911,84 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	if (typeof window !== 'undefined' && window.addEventListener) {
 		window.addEventListener('beforeprint', function () { flushLabelRefresh(); });
 	}
+	/**
+	 * ---- THE MAP FOLLOWS THE THEME (Task 811, round 3; dev/themes-plan.md) ----
+	 *
+	 * Colours need nothing here: the drawing reads its paper, ink, lettering and marks from --ec-map-*
+	 * tokens, so a theme repaints it with no JavaScript at all. **The FACE is the one thing that moves
+	 * geometry**: a label set in a wider face is a wider label, so where a theme changes the map's face or
+	 * weight the widths are measured again and the labels placed again, ONCE (requestLabelRefresh()
+	 * coalesces a run of changes, so sweeping the pointer across the gallery is one pass at the end).
+	 * A theme with Light's face (Dark, High contrast) moves nothing and runs no pass.
+	 *
+	 * **WHAT LEAVES THE PAGE IS LIGHT.** Paper prints Light by the stylesheet (the theme blocks are
+	 * screen-only), and the screenshot copies the map as Light (snipCloneSvg()). Both must also be
+	 * LAID OUT in Light's face, or Light's lettering would stand where the theme's wider words were
+	 * placed: withLightMap() lends the page Light for the length of one synchronous task, lays the labels
+	 * out in its face, runs the export, and puts the theme and its layout back before anything paints.
+	 */
+	function readMapFaceKey() {
+		if (!svg || typeof getComputedStyle !== 'function') { return ''; }
+		var cs = getComputedStyle(svg);
+		return (cs.getPropertyValue('--ec-map-font') || '').trim() + '|' + (cs.getPropertyValue('--ec-map-weight') || '').trim();
+	}
+	var mapFaceSync = false, mapRelabels = 0, labelPassTotal = 0;
+	function mapFollowTheme() {
+		var k = readMapFaceKey();
+		if (!svg || k === mapFaceKey) { return; }
+		var first = !mapFaceKey;
+		mapFaceKey = k;
+		if (first) { return; }   // the page's first reading: the build that follows lays everything out
+		mapRelabels++;
+		labelCacheTaint();
+		refreshTextLabelSizes();
+		if (mapFaceSync) { refreshLabelText(); } else { requestLabelRefresh(); }
+	}
+	if (typeof window !== 'undefined' && window.addEventListener) {
+		window.addEventListener('ec-theme', mapFollowTheme);
+	}
+	// Run `fn` with the page in Light and the labels laid out in Light's face, and put everything back
+	// before returning. Whatever `fn` returns is returned.
+	function withLightMap(fn) {
+		var T = window.ecTheme, prev, out;
+		if (!T || T.resolve(T.previewing() || T.get()) === 'light') { return fn(); }
+		prev = T.previewing();
+		mapFaceSync = true;
+		try {
+			flushLabelRefresh();
+			T.preview('light');
+			mapFollowTheme();
+			out = fn();
+		} finally {
+			T.preview(prev);
+			mapFollowTheme();
+			mapFaceSync = false;
+		}
+		return out;
+	}
+	// Printing: Light's layout for the paper, the theme's back afterwards.
+	var printLight = null;
+	if (typeof window !== 'undefined' && window.addEventListener) {
+		window.addEventListener('beforeprint', function () {
+			var T = window.ecTheme;
+			if (!T || T.resolve(T.previewing() || T.get()) === 'light') { return; }
+			printLight = { prev: T.previewing() };
+			mapFaceSync = true;
+			try { T.preview('light'); mapFollowTheme(); } finally { mapFaceSync = false; }
+		});
+		window.addEventListener('afterprint', function () {
+			if (!printLight) { return; }
+			var T = window.ecTheme, prev = printLight.prev;
+			printLight = null;
+			mapFaceSync = true;
+			try { T.preview(prev); mapFollowTheme(); } finally { mapFaceSync = false; }
+		});
+	}
+	// For the harnesses: how many times the map was laid out again for a theme, how many content passes
+	// ran, and the measurement bank's size and hits.
+	EngCalcs.lpnMapThemeStats = function () {
+		return { face: mapFaceKey, relabels: mapRelabels, passes: labelPassTotal, measureKeys: textMeasureKeys, measureHits: textMeasureHits };
+	};
 	function refreshLabelText() {
 		// **OFF MEANS OFF: NO CONTENT PASS FOR LETTERING NOBODY IS DRAWING** (Tom, 2026-09-17).
 		// This is the expensive half -- it composes every node's and link's text, writes the glyphs,
@@ -74901,6 +75002,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// part of this pass a suppressor has no business cancelling.
 		// A synchronous pass answers every request made before it (see requestLabelRefresh()).
 		labelRefreshPending = false;
+		labelPassTotal++;
 		labelCacheTaint();
 		hoverCardHide();
 		if (dataLabelsHidden) { labelWorkSkipped = true; refreshLabelPassTail(); return; }

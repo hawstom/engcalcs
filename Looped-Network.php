@@ -284,7 +284,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      //
 		      // The measurement is unaffected either way: flowBelowMap() is `body.bottom -
 		      // svg.bottom`, and the canvas's own height appears in both terms, so it cancels. ?>
-		<svg id="lpn_canvas" dir="ltr" width="100%" height="10000" style="border:1px solid #ccc;background:#fff"></svg>
+		<svg id="lpn_canvas" dir="ltr" width="100%" height="10000" style="border:1px solid var(--ec-map-frame);background:var(--lpn-map-bg)"></svg>
 		<?php // Persistent mode signal, INSIDE the canvas (Tom, 2026-07-30, second look: "I envisioned
 		      // the mode status in the canvas area since it's active like coordinates" -- moved from a
 		      // <p> above the map to this overlay, matching #lpn_coords' own treatment below: an
