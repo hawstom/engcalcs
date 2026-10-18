@@ -298,7 +298,8 @@
    System becomes light, dark or high contrast by the operating system's preferences, and High contrast
    becomes its light or dark palette by the colour scheme, so no block is written twice. Only the looped-
    network page carries the attribute; a calculator page has none and stays light, on purpose (a light
-   Bootstrap navbar and the parent site's stylesheet are not tokens). The map drawing is not a token. */
+   Bootstrap navbar and the parent site's stylesheet are not tokens). Each block ends with its map: the paper,
+   ink and lettering the drawing takes on screen (the --ec-map-* tokens; print stays Light). */
 /* DARK (Task 714): today's hand-chosen values, every one stated. */
 :root[data-theme="dark"], .ec-theme-card[data-theme="dark"] {
 	--ec-chrome-bg: #22262e;
@@ -3351,7 +3352,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	text-decoration: underline;
 	cursor: pointer;
 }
-/* The example thumbnail keeps its white paper and its dark ink in every theme: the drawing is not themed. */
+/* The example thumbnail keeps its white paper and its dark ink in every theme: a thumbnail is a picture of a drawing. */
 /* Printing a network should print the network, never the shop window. */
 @media print { #lpn_empty_hint { display: none !important; } }
 /* The gallery's legal row -- this page has no footer, so Privacy/Terms/Cookie settings sit here and

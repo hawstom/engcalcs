@@ -533,8 +533,53 @@ the four new palettes (`theme_contrast_check.js`, `theme-contrast-browser-harnes
 only, as round 1's were. Storage: no new key; `lpn_theme` may now also hold `rounded`, `newspaper`, `arcade`
 or `space`.
 
-**Still open, for Tom**: the map stays white in every theme (the display-theme map decision above was not
-built); the calculator pages are still not themed.
+**Still open, for Tom**: the calculator pages are still not themed. (The map now follows the theme: round 3.)
+
+## Round 3 as built (build agent, 2026-10-18): the map follows the theme
+
+Tom's pass of round 2: *"I really love it. It's neither too little nor too much. Can the map elements (asset
+labels and text etc.) also comply?"* This replaces the map decision above (display themes paint the map,
+document themes do not): **every theme paints the map on screen**, through `--ec-map-*` tokens in each theme
+block, and Light's values are the literals the map always drew (a 1300 px screenshot of Net1 with Settings
+open is still byte-identical to the one taken before round 2).
+
+- **What follows the theme**: the paper (`--lpn-map-bg`), the network ink (`--lpn-map-ink`: pipes, node
+  outlines, tank, reservoir, pump and valve symbols, flow arrows, vertices), the lettering and its halo, the
+  leaders, service lines and meters, the selection, hover and found marks, a Shape's default ink, the
+  marquee, contours, and the words that sit on the paper (the examples gallery's welcome, "Something wrong
+  here?"). Dark, Amber, Green, Arcade, Space and High contrast's dark palette have a dark map; Newspaper
+  has newsprint; Light, Rounded, Platinum and High contrast keep white.
+- **What does not**: every colour that MEANS something (colour by value, fire-flow verdicts, the override
+  amber, the pending red, the georeferencing and profile tools), and anything the visitor wrote on an element
+  (a coloured asset, a Text's own bold). An example thumbnail keeps its own white paper.
+- **The face**: data and Text labels take the theme's face (`--ec-map-font`, Arcade also bold). A face
+  change is a width change, so `mapFollowTheme()` (js/looped-network.js) re-measures and lays the labels out
+  ONCE (requested, so a sweep across the gallery is one pass); a theme with Light's face (Dark, High
+  contrast) runs no pass. The text-measurement bank's key carries the face, so going back to a theme
+  answers every width from the bank; the per-notch layout bank's inputs carry it too, so no notch laid out in
+  one face is reused in another (that bank is emptied by any content pass, as before, rather than kept per
+  theme).
+- **What leaves the page is Light**: print (the theme blocks are screen-only, and on `beforeprint` the
+  labels are laid out in Light's face, then back on `afterprint`); the screenshot and its clipboard copy
+  (`snipCloneSvg()` and the legend painting run inside `withLightMap()`, which lends the page Light for one
+  synchronous task); the EPANET file (a Text's [LABELS] corner is placed from its measured width, so the
+  export is measured in Light). DXF and GeoJSON never read the drawing.
+- **Icons**: `--ec-icon-fill` fills an icon's closed shapes with a tint of its own colour (Arcade's two-tone
+  icons), with no icon redrawn.
+- **Perry's round-2 finding**: in Amber and Green the Settings label columns cut "Init." and broke
+  "units"; their text now follows `--ec-field-text-scale` (0.72 in the terminals), and the harness holds
+  every theme to cutting nothing Light does not.
+
+Held by `theme-design-browser-harness.js` (369 checks): map paint per theme against its tokens and Light's
+literals, label contrast on halo and paper, the visitor's colour winning, one pass per face change and none
+for the same face, the bank reused on return, print laid out and painted as Light and restored afterwards,
+the screenshot, EPANET and DXF files byte-identical to Light's in every theme, nothing cut in Settings or the
+Scenario manager, and the Scenario manager's contrast. `theme-browser-harness.js` and
+`theme-contrast-browser-harness.js` now read the map's own paper instead of assuming white.
+
+**Known, not built**: colour by value keeps its ramp on a dark paper, so a ramp's darkest class (viridis
+purple) is faint on Amber, Arcade or Space; the fix (a casing in the paper's opposite tone, or lifting that
+stop) changes how a visitor's colouring looks and is Tom's call. The basemap tiles are not filtered.
 
 ## Proposed ROADMAP row (Tom promotes; I do not edit the roadmap)
 
