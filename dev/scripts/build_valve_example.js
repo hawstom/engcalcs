@@ -44,6 +44,7 @@ L.getProject().name = 'Valves';
 // (as Net1 does) and frame the drawing by hand: it spans x 0..620, y 70..330 in feet.
 const f = JSON.parse(L.projectFileText());
 f.view = { cx: 310, cy: 200, s: 1.3 };
+f.settings.textSize = 12; f.settings.symbolSize = 12; f.settings.linkWidth = 4;   // every example opens at 12, 12, 4
 f.labelSettings = {
 	node: { id: true, elev: true, demand: true, head: false, pressure: true },
 	link: { id: true, diameter: false, length: false, roughness: false, km: false, flow: true, velocity: true, headloss: false, gradient: false },

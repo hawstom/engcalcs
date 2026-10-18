@@ -63,7 +63,7 @@ const FT = 3.28084;
 		L.runSolve(); await settleEpanet();
 		R[eng] = L.lastResult();
 		ok(eng + ' converges', !!R[eng] && R[eng].converged === true, JSON.stringify(R[eng] && R[eng].issues));
-		ok(eng + ' was solved by ' + (eng === 'epanet' ? 'EPANET' : 'the built-in solver'),
+		ok(eng + ' was solved by ' + (eng === 'epanet' ? 'EPANET' : 'the native engine'),
 			eng === 'epanet' ? R[eng].engine === 'epanet' : !R[eng].engine, R[eng].engine);
 	}
 	const model = L.assembleModel();
