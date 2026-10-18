@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hi",
-        "expected_key_count": 3026,
-        "delta_key_count": 23,
+        "expected_key_count": 3032,
+        "delta_key_count": 29,
         "english_changed_key_count": 22,
         "exempt_key_count": 45,
         "exempt_keys": [
@@ -101,7 +101,13 @@
         "lpn_file_import_gjnet": "GeoJSON network…",
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
         "lpn_file_import_dxf": "DXF shapes…",
-        "lpn_file_import_shp": "Shapefile shapes…"
+        "lpn_file_import_shp": "Shapefile shapes…",
+        "lpn_export_holds_scenario": "It holds the scenario {scenario} only.",
+        "lpn_export_holds_base": "It holds the Base scenario only.",
+        "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
+        "lpn_survey_added_scenario": "The nodes were added to {scenario}. In Base they are inactive.",
+        "lpn_pane_pasted_scenario": "These values are overrides in the scenario {scenario}.",
+        "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file."
     },
     "keys": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
@@ -126,7 +132,13 @@
         "lpn_file_import_gjnet": "GeoJSON network…",
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
         "lpn_file_import_dxf": "DXF shapes…",
-        "lpn_file_import_shp": "Shapefile shapes…"
+        "lpn_file_import_shp": "Shapefile shapes…",
+        "lpn_export_holds_scenario": "It holds the scenario {scenario} only.",
+        "lpn_export_holds_base": "It holds the Base scenario only.",
+        "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
+        "lpn_survey_added_scenario": "The nodes were added to {scenario}. In Base they are inactive.",
+        "lpn_pane_pasted_scenario": "These values are overrides in the scenario {scenario}.",
+        "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file."
     },
     "key_context": {
         "consent_body": {
@@ -555,6 +567,78 @@
                 "key": "lpn_file_import_shp_tip",
                 "english": "Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this.",
                 "value": "ESRI shapefile के बिंदु, रेखाएँ और बहुभुज इस प्रोजेक्ट में आकृतियों के रूप में पढ़ें, एट्रिब्यूट स्तंभों को गुणों के रूप में रखते हुए। या तो .zip चुनें, या .shp को उसकी .shx, .dbf और .prj के साथ चुनें (कई चुनने के लिए Ctrl या Shift दबाए रखें)। प्रोजेक्ट से भिन्न निर्देशांक प्रणाली वाले निर्देशांक बदले जाते हैं, और सूचना यह बताती है।"
+            }
+        },
+        "lpn_export_holds_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "चित्र का आकार, स्क्रीन पर दिख रहे क्षेत्र के गुणज के रूप में। बड़ा गुणज अधिक स्पष्ट होता है और फ़ाइल बड़ी बनाता है।",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_export_holds_base": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "चित्र का आकार, स्क्रीन पर दिख रहे क्षेत्र के गुणज के रूप में। बड़ा गुणज अधिक स्पष्ट होता है और फ़ाइल बड़ी बनाता है।",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_geojson_results_other": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "चित्र का आकार, स्क्रीन पर दिख रहे क्षेत्र के गुणज के रूप में। बड़ा गुणज अधिक स्पष्ट होता है और फ़ाइल बड़ी बनाता है।",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_added_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "चित्र का आकार, स्क्रीन पर दिख रहे क्षेत्र के गुणज के रूप में। बड़ा गुणज अधिक स्पष्ट होता है और फ़ाइल बड़ी बनाता है।",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_pane_pasted_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "चित्र का आकार, स्क्रीन पर दिख रहे क्षेत्र के गुणज के रूप में। बड़ा गुणज अधिक स्पष्ट होता है और फ़ाइल बड़ी बनाता है।",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_export_leaves_alternatives": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "चित्र का आकार, स्क्रीन पर दिख रहे क्षेत्र के गुणज के रूप में। बड़ा गुणज अधिक स्पष्ट होता है और फ़ाइल बड़ी बनाता है।",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
             }
         }
     },
