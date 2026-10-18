@@ -6,11 +6,10 @@
 //
 // Tree (demands in gpm, US units):
 //   Base                                   average day, Net1's own demands
-//   |- Peak hour                           demand multiplier 2.25 (one override)
-//   |  `- Peak hour with main break        Active topology alternative "Main break, pipe 112 closed" (shared)
-//   `- Max day                             demand multiplier 1.5 (one override)
-//      `- Max day plus fire flow           local demand at hydrant junction 23: 1150, which x1.5 = 225 + 1500
-//         `- Max day plus fire flow with main break   the same shared main-break alternative
+//   |- Max day                             demand multiplier 1.5 (one override)
+//   |  `- Max day with main break          Active topology alternative "Main break, pipe 112 closed" (shared)
+//   `- Peak hour                           demand multiplier 2.25 (one override)
+//      `- Peak hour with main break        the same shared alternative
 'use strict';
 const path = require('path');
 const fs = require('fs');
@@ -40,39 +39,28 @@ L.applySaved(saved); L.buildDom(); L.applyMethodUI();
 const doc = L.getDoc();
 const node = (id) => doc.nodes.filter((n) => n.id === id)[0];
 const link = (id) => doc.links.filter((l) => l.id === id)[0];
-const JUNCTIONS = ['11', '12', '13', '21', '22', '23', '31', '32'];
-const baseDemand = {};
-JUNCTIONS.forEach((id) => { baseDemand[id] = L.effective(node(id), 'demand'); });
-const num = (x) => Math.round(x * 1000) / 1000;
-function setDemands(factor) { JUNCTIONS.forEach((id) => L.setProp(node(id), 'demand', num(baseDemand[id] * factor))); }
 
 L.getProject().name = 'Net1 with scenarios';
 const base = L.getScenarios()[0];
 // Stored alternatives are created first, then named by a scenario; edits made in that scenario
 // land in the stored record (writeTargetFor), which is what lets a second scenario share it.
 // Max day and Peak hour are ONE override each: the scenario's demand multiplier (Settings, Demand
-// multiplier), which the page stores in the scenario's Calculation alternative. The multiplier also
-// scales a junction's own demand, so the fire flow is entered divided by it.
+// multiplier), which the page stores in the scenario's Calculation alternative. No junction demand
+// is overridden anywhere. Fire flow is not a scenario here: Water, Analyze, Fire flow analysis adds
+// it, unmultiplied, on top of the open scenario's demands.
 const breakAlt = L.createAlternative('topology', 'Main break, pipe 112 closed', null);
 const setMult = (scn, v) => { L.switchScenario(scn.id); L.calcWriteTargetOf(scn).demandMultiplier = v; };
 
-const peak = L.createScenario('Peak hour', base.id);
-setMult(peak, 2.25);
-
-const peakBreak = L.createScenario('Peak hour with main break', peak.id);
-L.assignAlternative(peakBreak.id, 'topology', breakAlt.id);
-L.switchScenario(peakBreak.id); L.setProp(link('112'), 'active', false);
-
 const md = L.createScenario('Max day', base.id);
 setMult(md, 1.5);
+const mdBreak = L.createScenario('Max day with main break', md.id);
+L.assignAlternative(mdBreak.id, 'topology', breakAlt.id);
+L.switchScenario(mdBreak.id); L.setProp(link('112'), 'active', false);
 
-// Under Max day the multiplier is 1.5 and applies to this entry too, so 1,150 gpm becomes 1,725:
-// Net1's own 150 gpm at junction 23 times 1.5 (225) plus 1,500 gpm of fire flow.
-const fire = L.createScenario('Max day plus fire flow', md.id);
-L.switchScenario(fire.id); L.setProp(node('23'), 'demand', num(baseDemand['23'] + 1500 / 1.5));
-
-const fireBreak = L.createScenario('Max day plus fire flow with main break', fire.id);
-L.assignAlternative(fireBreak.id, 'topology', breakAlt.id);
+const peak = L.createScenario('Peak hour', base.id);
+setMult(peak, 2.25);
+const peakBreak = L.createScenario('Peak hour with main break', peak.id);
+L.assignAlternative(peakBreak.id, 'topology', breakAlt.id);
 
 L.switchScenario(base.id);
 // The stub has no real canvas, so the view it writes is the stub's; Net1's own framing is right.

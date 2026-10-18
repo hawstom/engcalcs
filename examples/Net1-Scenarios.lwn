@@ -15,13 +15,13 @@
 		},
 		{
 			"id": "s1",
-			"name": "Peak hour",
+			"name": "Max day",
 			"overrides": {},
 			"calc": "c1"
 		},
 		{
 			"id": "s2",
-			"name": "Peak hour with main break",
+			"name": "Max day with main break",
 			"overrides": {},
 			"parent": "s1",
 			"alternatives": {
@@ -30,24 +30,15 @@
 		},
 		{
 			"id": "s3",
-			"name": "Max day",
+			"name": "Peak hour",
 			"overrides": {},
 			"calc": "c2"
 		},
 		{
 			"id": "s4",
-			"name": "Max day plus fire flow",
+			"name": "Peak hour with main break",
 			"overrides": {},
 			"parent": "s3",
-			"alternatives": {
-				"demand": "a2"
-			}
-		},
-		{
-			"id": "s5",
-			"name": "Max day plus fire flow with main break",
-			"overrides": {},
-			"parent": "s4",
 			"alternatives": {
 				"topology": "a1"
 			}
@@ -758,31 +749,20 @@
 					"active": false
 				}
 			}
-		},
-		{
-			"id": "a2",
-			"category": "demand",
-			"name": "Max day plus fire flow",
-			"parent": null,
-			"values": {
-				"n:23": {
-					"demand": 1150
-				}
-			}
 		}
 	],
 	"calcSets": [
 		{
 			"id": "c1",
-			"name": "Peak hour",
-			"parent": null,
-			"demandMultiplier": 2.25
-		},
-		{
-			"id": "c2",
 			"name": "Max day",
 			"parent": null,
 			"demandMultiplier": 1.5
+		},
+		{
+			"id": "c2",
+			"name": "Peak hour",
+			"parent": null,
+			"demandMultiplier": 2.25
 		}
 	]
 }

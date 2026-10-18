@@ -2,12 +2,11 @@
 //   node dev/lpn-spike/scenario-example-browser-harness.js
 //
 // Real Chromium, the real page. The gallery card "EPANET Net1 with scenarios" is clicked; the
-// Scenario manager must show the tree (Base; Peak hour > Peak hour with main break; Max day > Max day
-// plus fire flow > Max day plus fire flow with main break); each scenario is made current in the
-// manager and solved by the page, and the differences a person would look for are read off the
-// page's own solve: the fire pulls the hydrant junction down, the grandchild still carries the
-// parent's fire demand, and the main break lowers pressure again. Both engines are held headless
-// by scenario-example-harness.js; this one runs the file's own engine (EPANET).
+// Scenario manager must show the tree (Base; Max day > Max day with main break; Peak hour > Peak
+// hour with main break); each scenario is made current in the manager and solved by the page, and
+// the differences a person would look for are read off the page's own solve: more demand gives lower
+// pressure and the main break lowers it again. Both engines and the Fire flow analysis are held
+// headless by scenario-example-harness.js; this one runs the file's own engine (EPANET).
 //
 // DO NOT PREFIX THIS WITH `flock`: it takes /tmp/engcalcs-browser.lock itself.
 //
@@ -71,7 +70,7 @@ async function main() {
 		const BASE = await a.lang('lpn_scenario_base');
 		const names = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_sm_tree .lpn-sm-row')).map((r) => '-'.repeat(+r.getAttribute('aria-level') - 1) + r.querySelector('.lpn-sm-name').textContent));
 		// Children are listed in name order.
-		const want = [BASE, '-Max day', '--Max day plus fire flow', '---Max day plus fire flow with main break', '-Peak hour', '--Peak hour with main break'];
+		const want = [BASE, '-Max day', '--Max day with main break', '-Peak hour', '--Peak hour with main break'];
 		ok('2. the Scenario manager shows the tree', JSON.stringify(await names()) === JSON.stringify(want), JSON.stringify(await names()));
 
 		const makeCurrent = async (name) => {
@@ -88,7 +87,7 @@ async function main() {
 			return page.evaluate((j) => { const r = EngCalcs.lpnSolveProbe(); return r && r.pressures ? { p: r.pressures[j], converged: r.converged, engine: r.engine } : null; }, id);
 		};
 		const P = {};
-		for (const n of ['Max day', 'Max day plus fire flow', 'Max day plus fire flow with main break', 'Peak hour', 'Peak hour with main break']) {
+		for (const n of ['Max day', 'Max day with main break', 'Peak hour', 'Peak hour with main break']) {
 			await page.evaluate(() => { window.__prevSolve = EngCalcs.lpnSolveProbe(); });
 			await makeCurrent(n);
 			const cur = await page.evaluate(() => document.getElementById('lpn_scenario_btn').textContent);
@@ -97,10 +96,9 @@ async function main() {
 			P[n] = await page.evaluate(() => { const r = EngCalcs.lpnSolveProbe(); return r && r.pressures ? { j23: r.pressures['23'], j22: r.pressures['22'], converged: r.converged } : null; });
 			ok('3. ...and it solved', !!P[n] && P[n].converged === true, JSON.stringify(P[n]));
 		}
-		const d = (x, y) => (P[x].j23 - P[y].j23);
-		ok('4. the fire flow pulls junction 23 down from Max day', d('Max day', 'Max day plus fire flow') > 5 * 0.70307, String(d('Max day', 'Max day plus fire flow')));
-		ok('5. the grandchild is lower again with the main break closed (it still carries the inherited fire demand)', P['Max day plus fire flow with main break'].j23 < P['Max day plus fire flow'].j23);
-		ok('6. the main break also lowers junction 22 at the peak hour', P['Peak hour with main break'].j22 < P['Peak hour'].j22);
+		ok('4. more demand, lower pressure: Max day below Base-like levels and Peak hour below Max day at junction 23', P['Peak hour'].j23 < P['Max day'].j23);
+		ok('5. the main break lowers junction 23 in Max day', P['Max day with main break'].j23 < P['Max day'].j23);
+		ok('6. the main break lowers junction 22 at the peak hour', P['Peak hour with main break'].j22 < P['Peak hour'].j22);
 		ok('7. no page errors', errors.length === 0, errors.join(' | '));
 	} finally {
 		await browser.close();
