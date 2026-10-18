@@ -18,7 +18,7 @@
 
 const path = require('path');
 const L = require('./user-guide-chapter-lib.js');
-const { U, ok, enString, plain, checkQuotes, openGuide, finish } = L;
+const { U, ok, enString, esString, plain, checkQuotes, openGuide, finish } = L;
 const NAME = 'user-guide-menus-harness';
 U.takeBrowserLock(NAME, 'EC_UGMN_LOCKED');
 
@@ -107,7 +107,7 @@ async function main() {
 		await b.settle(1200);
 		await openGuide(b);
 		const es = await b.page.evaluate(() => Array.from(document.querySelectorAll('[data-guide-section="menus"] > dl > dt')).map((d) => d.textContent.trim()));
-		ok('the Spanish page shows the same terms, the two new ones in English', es.length === 3 && es[1] === enString('lpn_guide_mn_kbd_term') && es[2] === enString('lpn_guide_mn_list_term'), JSON.stringify(es));
+		ok('the Spanish page shows the same terms, the two new ones as the Spanish file has them', es.length === 3 && es[1] === esString('lpn_guide_mn_kbd_term') && es[2] === esString('lpn_guide_mn_list_term'), JSON.stringify(es));
 		ok('no page errors (Spanish)', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
 		await b.context.close().catch(() => {});
 	} catch (e) {

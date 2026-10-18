@@ -6252,7 +6252,7 @@ var EngCalcs = EngCalcs || {};
 	// scenario, and in its parallel for an alternative; one both used and inherited from says both.
 	function smInUseText(tree, key, name) {
 		var pc = EngCalcs.pageConfig || {}, isScn = smKind(tree) === 'scn', items = smInUseItems(tree, key), users, kids, parts = [];
-		var label = function (scn, n) { return (scn ? (pc.lpn_sm_item_scenario || 'Scenario {name}') : (pc.lpn_sm_item_alternative || 'Alternative {name}')).replace('{name}', n); };
+		var label = function (scn, n) { return (scn ? (pc.lpn_sm_item_scenario || 'Scenario {name}') : (pc.lpn_sm_item_alternative || 'Alternative {name}')).replace(/\{name\}/g, n); };
 		// In the Scenarios tree everything in the way is a child scenario.
 		users = isScn ? [] : items.filter(function (x) { return x.scn; });
 		kids = isScn ? items : items.filter(function (x) { return !x.scn; });
@@ -7588,7 +7588,7 @@ var EngCalcs = EngCalcs || {};
 	// The one question both doors ask (the Scenarios menu's Delete and the Scenario manager's).
 	function scenarioDeleteQuestion(sc) {
 		var pc = EngCalcs.pageConfig || {}, plan = scenarioDeletePlan(sc), parts;
-		parts = [(pc.lpn_scenario_delete_ask || 'Delete the scenario {name}? The drawing itself is not changed.').replace('{name}', scenarioDisplayName(sc))];
+		parts = [(pc.lpn_scenario_delete_ask || 'Delete the scenario {name}? The drawing itself is not changed.').replace(/\{name\}/g, scenarioDisplayName(sc))];
 		if (plan.n) { parts.push(overridesGoText(plan.n)); }
 		if (plan.kept.length) { parts.push((pc.lpn_scenario_delete_stays || 'These alternatives it uses stay in the project: {list}.').replace('{list}', plan.kept.join(', '))); }
 		return parts.join(' ');
@@ -7737,7 +7737,7 @@ var EngCalcs = EngCalcs || {};
 					v = v.trim();
 					if (!v) { return; }
 					// The manager's rule (Sue, 2026-10-12): one name, one scenario, Base included.
-					if (smNameTaken('scenarios', v)) { setNotice((pc.lpn_sm_name_taken || 'The name {name} is already used in this tree.').replace('{name}', v)); return; }
+					if (smNameTaken('scenarios', v)) { setNotice((pc.lpn_sm_name_taken || 'The name {name} is already used in this tree.').replace(/\{name\}/g, v)); return; }
 					saveUndoSnapshot();
 					createScenario(v);
 				});
@@ -7755,7 +7755,7 @@ var EngCalcs = EngCalcs || {};
 			fn: function () {
 				askDialog({ kind: 'prompt', text: pc.lpn_scenario_prompt_name || 'Name for this scenario', value: scn.name || '' }, function (v) {
 					if (v === null || !v.trim()) { return; }
-					if (smNameTaken('scenarios', v.trim(), scn.id)) { setNotice((pc.lpn_sm_name_taken || 'The name {name} is already used in this tree.').replace('{name}', v.trim())); return; }
+					if (smNameTaken('scenarios', v.trim(), scn.id)) { setNotice((pc.lpn_sm_name_taken || 'The name {name} is already used in this tree.').replace(/\{name\}/g, v.trim())); return; }
 					var kin = scenarioNamesakes(scn, scenarioDisplayName(scn));
 					saveUndoSnapshot();
 					scn.name = v.trim();
@@ -7777,7 +7777,7 @@ var EngCalcs = EngCalcs || {};
 				var kids = scenarios.filter(function (x) { return x.parent === scn.id; });
 				if (kids.length) {
 					tellNotice((pc.lpn_scenario_delete_has_children || 'The scenario {name} cannot be deleted because it has children: {list}. Delete those first, or move them to another parent.')
-						.replace('{name}', scenarioDisplayName(scn))
+						.replace(/\{name\}/g, scenarioDisplayName(scn))
 						.replace('{list}', kids.map(scenarioDisplayName).join(', ')));
 					return;
 				}
@@ -35713,7 +35713,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function profileMissingText(p, missing) {
 		var pc = EngCalcs.pageConfig || {};
 		return (pc.lpn_profile_missing || 'The saved path {name} uses nodes that are not in this project: {ids}')
-			.replace('{name}', p.name || '').replace('{ids}', missing.join(', '));
+			.replace(/\{name\}/g, p.name || '').replace('{ids}', missing.join(', '));
 	}
 	// **APPLYING ONE DRAWS WHAT IT CAN AND SAYS WHAT IT CANNOT.** The unknown ids are left out of
 	// the DISPLAYED stops -- a stop with no node routes nowhere, and the panel would answer a
@@ -35773,7 +35773,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {}, p = activeSavedProfile(), msg;
 		if (!p) { return; }
 		msg = (pc.lpn_profile_delete_confirm || 'Delete the saved path {name}? The drawing itself is not changed.')
-			.replace('{name}', p.name || '');
+			.replace(/\{name\}/g, p.name || '');
 		askDialog({ kind: 'confirm', text: msg }, function (yes) {
 			if (!yes) { return; }
 			saveUndoSnapshot();
@@ -39939,7 +39939,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				updateEmptyHint();
 				renderTabs();
 				setNotice((pc.lpn_status_example_opened || 'Opened {name} as a copy. Save it with File, Save as.')
-					.replace('{name}', projectDisplayName(project)));
+					.replace(/\{name\}/g, projectDisplayName(project)));
 			})
 			.catch(function () {
 				// **A FAILED OPEN RE-ENABLES THINGS.** The in-flight guard lifts so the next
@@ -44098,7 +44098,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Says where the user landed, the same way discardProject() does: a project appearing on
 		// screen that was not there a moment ago wants narration.
 		setNotice((pc.lpn_status_imported || 'Opened {name} from a file, and added it to this browser as a new project.')
-			.replace('{name}', projectDisplayName(project)));
+			.replace(/\{name\}/g, projectDisplayName(project)));
 		return id;
 	}
 	// Text off a disk to a prepared document, or null with the reason already reported. Shared by
@@ -46691,7 +46691,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (from.kind === 'epsg' && from.crs === LPN_CRS_WEBMERC && doc.nodes.length && isWebMercProject()) {
 			srcUnitM = metresPerWorldUnit(doc.nodes[0].x, doc.nodes[0].y);
 		}
-		name = (pc.lpn_copy_of || 'Copy of {name}').replace('{name}', projectDisplayName(project));
+		name = (pc.lpn_copy_of || 'Copy of {name}').replace(/\{name\}/g, projectDisplayName(project));
 		// **A COPY IS A DIFFERENT DOCUMENT AND MUST NOT CARRY THE ORIGINAL'S IDENTITY.** The docId is
 		// what the lock broker and every live file handle key on.
 		delete saved.project.docId;
@@ -46753,7 +46753,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// through restoreViewOrFit() like any document without one (view-memory-harness.js).
 		if (!step) {
 			setNotice(String(pc.lpn_convas_done || 'The converted copy is {name}. The original project is unchanged.')
-				.replace('{name}', name));
+				.replace(/\{name\}/g, name));
 			return;
 		}
 		convas = { origId: origId, copyId: id, to: to, lenKey: lenTo, name: name, step: step, srcUnitM: srcUnitM,
@@ -47465,7 +47465,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// only knows it holds a project that is not the one in front of us. Needs no server.
 		if (target.stale) {
 			var warnStale = (pc.lpn_saveas_overwrites_newer || 'That file has changed since you last saw it, so somebody else has almost certainly saved to it. Saving here replaces their version with yours. Continue?')
-				.replace('{name}', target.name || (pc.lpn_lock_somebody || 'Somebody else'));
+				.replace(/\{name\}/g, target.name || (pc.lpn_lock_somebody || 'Somebody else'));
 			if (!(await askDialogP({ kind: 'confirm', text: warnStale }))) { return; }
 		}
 		if (target.foreign) {
@@ -47473,7 +47473,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// whole project about to be destroyed, so name it and let the user decide. This branch
 			// works with the broker down, which is the entire point.
 			var warn = (pc.lpn_saveas_overwrites_project || 'That file already holds a different project, {name}. Saving here replaces it completely. Continue?')
-				.replace('{name}', target.name || (pc.lpn_lock_somebody || 'Somebody else'));
+				.replace(/\{name\}/g, target.name || (pc.lpn_lock_somebody || 'Somebody else'));
 			if (!(await askDialogP({ kind: 'confirm', text: warn }))) { return; }
 		}
 		// Writing somewhere new makes this a DIFFERENT document, so it needs its own lock key: a copy
@@ -47709,7 +47709,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// before this shipped -- rather than the rule.
 		var named = (info && info.lockedBy) ? String(info.lockedBy) : '';
 		lines.push((named
-			? (pc.lpn_lock_open_heading || '{name} has this file open.').replace('{name}', named)
+			? (pc.lpn_lock_open_heading || '{name} has this file open.').replace(/\{name\}/g, named)
 			: (pc.lpn_lock_open_inuse || 'This file appears to be in use.'))
 			+ ' ' + (pc.lpn_lock_open_care || 'To avoid data loss, choose carefully from the options below.'));
 		var heldFor = now - (((info && info.acquiredAt) || 0) * 1000);
@@ -47920,7 +47920,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		syncReadOnlyToOpenProject();
 		renderTabs();
 		setNotice((pc.lpn_copy_kept_link || 'Opened {name} as the original, moved to a new place. Save now writes to this file.')
-			.replace('{name}', projectDisplayName(indexEntry(tabId) || project)));
+			.replace(/\{name\}/g, projectDisplayName(indexEntry(tabId) || project)));
 	}
 	// "A copy; make new lock". The copy gets a NEW docId BEFORE it lands, so the lock it takes is its
 	// own and the original's lock is never touched -- not released, not stolen, not even acquired.
@@ -47971,7 +47971,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		setNotice(((entry && entry.dirty)
 			? (pc.lpn_status_already_open_dirty || 'That file is already open here as {name}, with changes you have not saved to it. This switched to it rather than opening a second copy. Use File, Revert if you want the version on disk instead.')
 			: (pc.lpn_status_already_open || 'That file is already open here as {name}, so this switched to it rather than opening a second copy.')
-		).replace('{name}', projectDisplayName(entry || project)));
+		).replace(/\{name\}/g, projectDisplayName(entry || project)));
 		syncReadOnlyToOpenProject();
 		renderTabs();
 		// A tab opened read-only STAYS read-only (Tom, 2026-08-04) -- re-opening its file is not the
@@ -48273,7 +48273,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (readOnly) {
 			bannerRO = {
 				message: (pc.lpn_lock_readonly_banner || 'Read-only: {name} has this file open. Anything here can be changed, but not saved. Use File, Save as to save to a different file.')
-					.replace('{name}', lockedByName.get(id) || (pc.lpn_lock_somebody || 'Somebody else'))
+					.replace(/\{name\}/g, lockedByName.get(id) || (pc.lpn_lock_somebody || 'Somebody else'))
 			};
 		} else {
 			bannerRO = null;
@@ -48394,7 +48394,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (lockRequestSeen.get(id) === r.requestedAt) { return; }
 		lockRequestSeen.set(id, r.requestedAt);
 		var msg = (pc.lpn_lock_requested || '{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over.')
-			.replace('{name}', r.requestedBy || (pc.lpn_lock_somebody || 'Somebody else'));
+			.replace(/\{name\}/g, r.requestedBy || (pc.lpn_lock_somebody || 'Somebody else'));
 		if (id === library.openId) {
 			bannerWarn = { kind: 'request', message: msg, action: null, dismissable: true };
 			renderBanner();
@@ -50830,19 +50830,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// file."*). It lived under Settings > New assets, on the argument that it makes new
 			// assets and takes the new-asset values; that argument is still true and is not where a
 			// person looks. A command named after a FILE belongs with the other file commands.
-			{ icon: 'position', label: pc.lpn_file_import_survey || 'Import surveyed points…',
+			{ icon: 'position', label: pc.lpn_file_import_survey || 'Surveyed points…',
 			  tip: pc.lpn_file_import_survey_tip, fn: pickSurveyFile },
-			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
+			{ icon: 'open', label: pc.lpn_file_import_inp || 'EPANET file…',
 			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
 			// A GeoJSON file as a network, through one mapping step (Task 728).
-			{ icon: 'open', label: pc.lpn_file_import_gjnet || 'Import GeoJSON network…',
+			{ icon: 'open', label: pc.lpn_file_import_gjnet || 'GeoJSON network…',
 			  tip: pc.lpn_file_import_gjnet_tip, fn: pickGeoJsonNetFile },
 			// The points, lines and polygons of a GeoJSON file, as Shapes (Task 779).
-			{ icon: 'open', label: pc.lpn_file_import_shapes || 'Import GeoJSON shapes…',
+			{ icon: 'open', label: pc.lpn_file_import_shapes || 'GeoJSON shapes…',
 			  tip: pc.lpn_file_import_shapes_tip, fn: pickGeoJsonFile },
-			{ icon: 'open', label: pc.lpn_file_import_dxf || 'Import DXF shapes…',
+			{ icon: 'open', label: pc.lpn_file_import_dxf || 'DXF shapes…',
 			  tip: pc.lpn_file_import_dxf_tip, fn: pickDxfShapesFile },
-			{ icon: 'open', label: pc.lpn_file_import_shp || 'Import shapefile shapes…',
+			{ icon: 'open', label: pc.lpn_file_import_shp || 'Shapefile shapes…',
 			  tip: pc.lpn_file_import_shp_tip, fn: pickShapefile },
 			// **THE LIBRARY IMPORT WIZARD'S OWN DOOR, AND ITS ONLY ONE** (Task 611). Tom,
 			// 2026-09-17: *"Move the button to the File menu. I thought you already did that."* Then
@@ -50851,7 +50851,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// asking for the wizard *"available from every applicable library"*; his later word wins,
 			// and the earlier one should have been questioned rather than built. **Do not put a
 			// button back in the Libraries box.**
-			{ icon: 'open', label: pc.lpn_library_import || 'Import libraries…',
+			{ icon: 'open', label: pc.lpn_library_import || 'Libraries…',
 			  tip: pc.lpn_library_import_tip, fn: libImportPick },
 			// **WORKSPACE (Tom, 2026-10-07)**: the browser-scoped layout and preferences, from a file.
 			// Under File > Import because it comes from a file, by the same vote that put surveyed
@@ -53590,7 +53590,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			p.style.margin = '0';
 			p.textContent = (isBrowser
 				? (pc.lpn_close_browser_confirm || '{name} is stored only in this browser. If you close it without saving it to a file, it is permanently lost.')
-				: (pc.lpn_close_save_confirm || 'Save your changes to {name} before closing it?')).replace('{name}', name);
+				: (pc.lpn_close_save_confirm || 'Save your changes to {name} before closing it?')).replace(/\{name\}/g, name);
 			body.appendChild(p);
 		}, [
 			{
@@ -56118,13 +56118,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		(doc.alternatives || []).forEach(function (r) {
 			if (!before['a\u0000' + r.id]) {
 				out.push((pc.lpn_paste_alt_created || 'Created {category} alternative {name} for this scenario.')
-					.replace('{category}', smTreeLabel(r.category)).replace('{name}', String(r.name || '')));
+					.replace('{category}', smTreeLabel(r.category)).replace(/\{name\}/g, String(r.name || '')));
 			}
 		});
 		(doc.calcSets || []).forEach(function (r) {
 			if (!before['c\u0000' + r.id]) {
 				out.push((pc.lpn_paste_alt_created || 'Created {category} alternative {name} for this scenario.')
-					.replace('{category}', smTreeLabel('calculation')).replace('{name}', String(r.name || '')));
+					.replace('{category}', smTreeLabel('calculation')).replace(/\{name\}/g, String(r.name || '')));
 			}
 		});
 		return out;
@@ -61385,9 +61385,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!/^(SELECT|INPUT|TEXTAREA)$/.test(el.tagName || '')) { return; }
 			held.push({ el: el, key: setboxControlKey(el, box), focus: el === focused });
 		});
-		if (!held.length) { out = rebuild(); setboxKeepPlace(); return out; }
+		// **A REBUILD NEVER SCROLLS THE BOX** (Tom, 2026-10-17, docked at the right, in Spanish:
+		// clearing the Demand multiplier by its dot threw the content 561 px). Half way through a
+		// rebuild the content is shorter than the scroll position, and anything that reads layout
+		// then (a tip being hidden, for one) clamps scrollTop to the short content; the full content
+		// comes back and the clamp stays. The position the reader had is put back before the
+		// control in the hand is put back under the pointer (setboxKeepPlace()).
+		var sc = setboxScroller(), st = sc ? sc.scrollTop : 0, unclamp = function () {
+			if (sc && sc.scrollTop !== st && sc.scrollHeight - sc.clientHeight >= st) { sc.scrollTop = st; }
+		};
+		if (!held.length) { out = rebuild(); unclamp(); setboxKeepPlace(); return out; }
 		setboxKeeping = true;
-		try { out = rebuild(); } finally { setboxKeeping = false; setboxKeepPlace(); }
+		try { out = rebuild(); } finally { setboxKeeping = false; unclamp(); setboxKeepPlace(); }
 		held.forEach(function (h) {
 			var el = h.el, twin;
 			if (!box.contains(el)) {
@@ -61551,6 +61560,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!el || !el.getBoundingClientRect || !el.offsetParent) { return; }
 		delta = el.getBoundingClientRect().top - pl.top;
 		if (Math.abs(delta) >= 1) { sc.scrollTop += delta; }
+	}
+	// **A CLEAR BY THE GUTTER'S DOT HOLDS ITS ROW STILL TOO** (Tom, 2026-10-17: *"Clearing a demand
+	// override in Settings scrolls the main pane away from the input of interest because of the
+	// removal of a line."*). The gutter is `data-lpn-noseam`, so its click never reached the pin in
+	// setboxEditBegin(), and nothing held the row still through the rebuild that follows the clear.
+	// The row's control (the row itself where it has none) is pinned, then put back after the
+	// rebuild and on the next frame. dev/lpn-spike/setbox-clear-place-browser-harness.js.
+	function setboxPinRow(row) {
+		if (row && row.querySelector) { setboxPin(row.querySelector('input, select, textarea') || row); }
+	}
+	function setboxKeepPlaceSoon() {
+		setboxKeepPlace();
+		if (typeof requestAnimationFrame === 'function') { requestAnimationFrame(setboxKeepPlace); }
 	}
 	function setboxEditBegin(e) {
 		if (setboxEdit) { return; }
@@ -61762,7 +61784,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		g.setAttribute('data-lpn-noseam', '1');
 		if (held.length) {
 			g.appendChild(ovmCell('lpn-ovm-dot', (pc.lpn_settings_held_in || 'Override in {scenario}.').split('{scenario}').join(scenarioDisplayName(scn)) +
-				' ' + (pc.lpn_ovm_dot_clear || 'Click to clear it.'), function () { clearHeldSetboxRows(held, scn); }));
+				' ' + (pc.lpn_ovm_dot_clear || 'Click to clear it.'), function () { setboxPinRow(el); clearHeldSetboxRows(held, scn); setboxKeepPlaceSoon(); }));
 		} else { g.appendChild(ovmCell('lpn-ovm-none')); }
 		mine = rows.filter(function (r) { return paths.some(function (p) { return setboxPathUnder(r.path, p); }); });
 		kids = childSettingHolders(mine);
@@ -61770,10 +61792,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			g.appendChild(ovmCell('lpn-ovm-tri', (pc.lpn_ovm_child_tip || 'Child scenarios override this value ({n} total). Click to clear their overrides.').replace('{n}', String(kids.length)), function () {
 				var now = childSettingHolders(mine);
 				askClearChildOverrides(now.length, function () {
+					setboxPinRow(el);
 					now.forEach(function (k) { settingRowClear(k.row, k.scn); });
 					settingTableAfterEdit();
 					refreshScenarioStatus();
 					refreshPaneIfOpen();
+					setboxKeepPlaceSoon();
 				});
 			}));
 		} else if (!held.length) { return; }
@@ -64359,7 +64383,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					var li = document.createElement('li');
 					li.textContent = (pc.lpn_library_import_units_line
 						|| '{name}: this project shows {mine}, the file shows {theirs}.')
-						.replace('{name}', d.name).replace('{mine}', d.mine)
+						.replace(/\{name\}/g, d.name).replace('{mine}', d.mine)
 						.replace('{theirs}', d.theirs);
 					ul.appendChild(li);
 				});
@@ -64374,7 +64398,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				input.checked = true;
 				input.addEventListener('change', syncUnits);
 				span.textContent = (pc.lpn_library_import_count || '{name} ({count})')
-					.replace('{name}', String(pc[LIB_IMPORTABLE[o.kind].label] || o.kind))
+					.replace(/\{name\}/g, String(pc[LIB_IMPORTABLE[o.kind].label] || o.kind))
 					.replace('{count}', String(o.count));
 				row.appendChild(input);
 				row.appendChild(document.createTextNode(' '));
@@ -70673,7 +70697,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (name && !curve) {
 			pumpEfficNote(fields, (pc.lpn_pump_effic_unstated
 				|| 'This pump refers to an efficiency curve called {name}, which nothing in this project defines, so it runs at the efficiency set for the whole network, {percent}.')
-				.replace('{name}', name).replace('{percent}', globalText));
+				.replace(/\{name\}/g, name).replace('{percent}', globalText));
 		} else if (!name) {
 			pumpEfficNote(fields, (pc.lpn_pump_effic_global
 				|| 'This pump has no efficiency curve chosen, so it runs at the efficiency set for the whole network, {percent}.')
@@ -75379,7 +75403,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			|| 'The dashed gray ring means the scenario {name} inherits an override for this asset from its parent scenario or alternative.')
 			: (pc.lpn_scenario_mark_tip
 			|| 'The amber ring means this asset has an override in the scenario {name}.'))
-			.replace('{name}', scenarioDisplayName(activeScenario()));
+			.replace(/\{name\}/g, scenarioDisplayName(activeScenario()));
 	}
 	/**
 	 * **ONE ELEMENT'S MARKS, WHICH IS ALL AN EDIT CAN EVER CHANGE** (ROADMAP Task 706). Both
@@ -79369,7 +79393,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var kin = tree === 'scenarios' ? scenarioNamesakes(scenarioById(key), smName(tree, key)) : [];
 		res = smTry(function () { return smRename(tree, key, v); });
 		if (res !== true) {
-			if (res.refused === 'duplicate') { setNotice((pc.lpn_sm_name_taken || 'The name {name} is already used in this tree.').replace('{name}', v)); }
+			if (res.refused === 'duplicate') { setNotice((pc.lpn_sm_name_taken || 'The name {name} is already used in this tree.').replace(/\{name\}/g, v)); }
 			rebuildScenarioManager();
 			return;
 		}
@@ -79441,7 +79465,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (tree !== 'scenarios' && !smInUseBy(tree, key).length) {
 			var rec = smRecord(tree, key), n = rec && !rec.implicit ? storedOverrideCount(smKind(tree), rec) : 0;
 			if (n) {
-				askDialog({ kind: 'confirm', text: (pc.lpn_sm_delete_alt_ask || 'Delete the alternative {name}?').replace('{name}', name) + ' ' + overridesGoText(n) }, function (yes) {
+				askDialog({ kind: 'confirm', text: (pc.lpn_sm_delete_alt_ask || 'Delete the alternative {name}?').replace(/\{name\}/g, name) + ' ' + overridesGoText(n) }, function (yes) {
 					if (yes) { smActDeleteNow(tree, key, name, wasCurrent, from); }
 				});
 				return;
@@ -79466,7 +79490,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var tree = smState.tree, pc = EngCalcs.pageConfig || {}, res;
 		res = smTry(function () { return smMove(tree, from, targetKey, zone); });
 		if (res !== true) {
-			if (res.refused === 'parent') { setNotice((pc.lpn_sm_cycle || '{name} cannot be moved under one of its own children.').replace('{name}', smName(tree, from))); }
+			if (res.refused === 'parent') { setNotice((pc.lpn_sm_cycle || '{name} cannot be moved under one of its own children.').replace(/\{name\}/g, smName(tree, from))); }
 			rebuildScenarioManager();
 			return;
 		}
@@ -79626,7 +79650,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				all.addEventListener('click', function () {
 					closeDialog();
 					askDialog({ kind: 'confirm', text: (pc.lpn_ovl_clear_all_ask || 'Clear all the overrides ({n}) of {name}? Each value returns to the inherited value. Undo reverses this.')
-						.replace('{n}', String(n)).replace('{name}', scenarioDisplayName(scn)) }, function (yes) {
+						.replace('{n}', String(n)).replace(/\{name\}/g, scenarioDisplayName(scn)) }, function (yes) {
 						if (yes) { ovlClearItems(scn, ownOverrideItems(scn)); }
 						smActListOverrides(key);
 					});
@@ -79692,7 +79716,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			initTipsIn(body);
 			if (scroll) { body.scrollTop = scroll; }
 		}, [{ label: pc.lpn_dialog_ok || 'OK', isDefault: true, cancel: true, fn: function () { } }],
-		{ title: (pc.lpn_ovl_title || 'Override manager: {name}').replace('{name}', scenarioDisplayName(scn)) });
+		{ title: (pc.lpn_ovl_title || 'Override manager: {name}').replace(/\{name\}/g, scenarioDisplayName(scn)) });
 	}
 	/**
 	 * **CLEAR THESE OWN OVERRIDES** (items of ownOverrideItems(scn)), each from the holder it is stored
@@ -79792,13 +79816,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				tellNotice(none.split('{name}').join(name));
 				return;
 			}
-			parts = [(keep ? (pc.lpn_sm_copy_ask || 'Copy the overrides ({n}) of {name} up into {target}? It keeps them as its own overrides. You can undo this.')
+			parts = [(keep ? (pc.lpn_sm_copy_ask || 'Copy the overrides ({n}) of {name} up into {target}? {name} keeps them as its own overrides. You can undo this.')
 				: (pc.lpn_sm_merge_ask || 'Move the overrides ({n}) of {name} up into {target}? Afterward, it inherits them instead of overriding them. You can undo this.'))
 				.replace(/\{name\}/g, name).replace('{n}', String(plan.n)).replace('{target}', tname)];
 			plan.skipped.forEach(function (s) {
 				parts.push((keep ? (pc.lpn_sm_copy_skipped || '{between} also overrides these values. It is skipped and not changed, so it keeps its own values for them:')
 					: (pc.lpn_sm_merge_skipped || '{between} also overrides these values. It is skipped and not changed, so {name} will read them from {between}, not from {target}:'))
-					.replace(/\{between\}/g, s.name).replace('{name}', name).replace('{target}', tname) + '\n' + s.lines.join('\n'));
+					.replace(/\{between\}/g, s.name).replace(/\{name\}/g, name).replace('{target}', tname) + '\n' + s.lines.join('\n'));
 			});
 			parts = parts.concat(smMergeMorphText(plan.morphs));
 			askDialog({ kind: 'confirm', text: parts.join('\n\n') }, function (yes) {
@@ -80510,7 +80534,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		wrap.appendChild(h);
 		if (!rows.length) {
 			h = document.createElement('p');
-			h.textContent = pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.';
+			h.textContent = pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.';
 			wrap.appendChild(h);
 			return wrap;
 		}
@@ -80598,7 +80622,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		host.innerHTML = '';
 		rows = fullReportRows();
 		if (!rows.length) {
-			ffEl('p', 'lpn-ff-note', pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.', host);
+			ffEl('p', 'lpn-ff-note', pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.', host);
 			return;
 		}
 		frames = reportFrames();

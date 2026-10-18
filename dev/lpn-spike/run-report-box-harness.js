@@ -71,7 +71,7 @@ console.log('=== 1. it draws the LAST run\'s report, not the run box\'s copy ===
 	// the only thing that ever noticed.
 	global.EngCalcs.lpnTimeRunReport = function () { return ''; };
 	withReport(REPORT);
-	ok('the box opens', L.openRunReportBox() === true);
+	ok('the Run report box is shown', L.openRunReportBox() === true);
 	ok('...and it is open by the same test restoreOpenBoxes() uses', L.rptBoxIsOpen() === true,
 		box.style.display);
 	ok('...carrying EPANET\'s own text, unedited', pre.textContent === REPORT,

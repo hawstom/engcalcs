@@ -1121,7 +1121,7 @@ EngCalcs.setIconLabel = function (el, iconName, name, tip) {
 	if (ic) { el.appendChild(ic); }
 	if (name) { el.setAttribute('aria-label', name); }
 	var pattern = (this.pageConfig || {}).lpn_tip_join || '{name} \u2014 {tip}';
-	el.title = tip ? pattern.replace('{name}', name || '').replace('{tip}', tip) : (name || '');
+	el.title = tip ? pattern.replace(/\{name\}/g, name || '').replace('{tip}', tip) : (name || '');
 	if (el.className.indexOf('ec-help') < 0) {
 		el.className = (el.className ? el.className + ' ' : '') + 'ec-help';
 	}

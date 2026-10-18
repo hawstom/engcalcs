@@ -11,8 +11,8 @@
                 "copy the selected cells with their column headings as a first row",
                 "copy the selected cells with both row and column headings"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "PROPOSED English: 'Copy with column headings'",
+            "disposition": "english",
+            "resolution": "The English is 'Copy with column headings' (checked 2026-10-17).",
             "human_answer": "OK.",
             "human_answered": "2026-10-17"
         },
@@ -26,8 +26,8 @@
                 "current, as flow of water or electricity",
                 "up to date, not out of date"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "PROPOSED syn: 'Current' (this radio, under Tables and Scenarios) means the one now selected, as opposed to All; it is never a flow or electric current. Alternative English: 'Selected only' / 'All'.",
+            "disposition": "dismissed",
+            "resolution": "The proposal used the retired syn channel. Checked the 26 shipped renderings 2026-10-17: each reads 'the present one' (Actual, Atual, Actuel, Aktuell, Geçerli, Corrente as in anno corrente, Текущая, 当前), none an electric or water current, so nothing to change. Was: PROPOSED syn: 'Current' (this radio, under Tables and Scenarios) means the one now selected, as opposed to All; it is never a flow or electric current. Alternative English: 'Selected only' / 'All'.",
             "human_answer": "syn is deprecated, so I am confused.",
             "human_answered": "2026-10-16"
         },
@@ -40,8 +40,8 @@
                 "whether or not the label fits on the map at the current zoom",
                 "whether or not the map is zoomed to fit the network"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "PROPOSED English: 'Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.'",
+            "disposition": "english",
+            "resolution": "The English is the text in human_answer (checked 2026-10-17). Was: PROPOSED English: 'Rest the pointer on a node, link or customer to see its label as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.'",
             "human_answer": "I've had second thoughts about this feature. I would, after all, like to have it say and act like this: 'Rest the pointer on a node, link or customer to see all of its properties formatted as specified in Settings, at any scale, whether or not the label fits on the map. This is a setting for this browser, not for the project.'",
             "human_answered": "2026-10-16"
         },
@@ -54,8 +54,8 @@
                 "language or font settings for reading text",
                 "display toggles the visitor set, such as whether help bubbles and the hover card are shown"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "PROPOSED English (both keys): replace 'the reading preferences of this page' with 'the display options of this page, such as which help bubbles and the hover card are shown'.",
+            "disposition": "english",
+            "resolution": "Applied to both workspace tips (checked 2026-10-17). Was: PROPOSED English (both keys): replace 'the reading preferences of this page' with 'the display options of this page, such as which help bubbles and the hover card are shown'.",
             "human_answer": "OK.",
             "human_answered": "2026-10-16"
         },

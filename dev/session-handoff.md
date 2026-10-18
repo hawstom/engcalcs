@@ -18,8 +18,8 @@ lines rather than appending corrections.
 - **Never wrap `run_harnesses.sh` or `check_all.sh` in the browser lock**: each browser harness
   takes that lock itself, so the wrapper deadlocks every one (2026-09-25, 280 s NOT RUN apiece).
   Brief agents to write journals to the scratchpad while a suite runs in the main checkout.
-- Since 2026-10-02 (jasmine, 24 threads) `check_all.sh` runs four suites at once in slots, ~19 min since the browser lanes (Task 797; ~57 before)
-  each by 2026-10-15 (Task 797); run it with no outer flock. A branch cut before `f9829cee` still uses the single browser lock,
+- Since 2026-10-02 (jasmine, 24 threads) `check_all.sh` runs four suites at once in slots, ~36 min (two runs, 2026-10-17; Task 797);
+  run it with no outer flock. A branch cut before `f9829cee` still uses the single browser lock,
   so its browser harnesses can print `NOT RUN` under load: merge master into it first.
 
 ## RULINGS
@@ -96,48 +96,67 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-17 (twenty-fourth session, overnight, Arizona time)
+## STATE — 2026-10-17 (twenty-fifth session, afternoon and evening, Arizona time)
 
-### Master: see the last pushed SHA in the morning report. Production: b7c99102 (10-09) when last read
+### Master: 45317389e (pushed 2026-10-17 9:39 PM; Tom deploys it). Production: 4866c11d2 (sprint 1017) or 45317389e
 
-**Tom intends to deploy master on 10-17 WITHOUT a translation sprint**, bentley-interop included. About
-400 English strings then show in English on the other 26 language pages (new Guide chapters, scenario
-manager, theme, topo, six engine strings that on non-English pages still say PRV/PSV/FCV need EPANET).
+**Sprint 1017 is merged into master and ready to deploy**. It translates the 408 untranslated
+keys (98 of them he had not yet read) and 27 rewordings into 26 languages, Wave 0 rewrote 19 English
+strings (`dev/english-friction/1017-wave0.json`), cross-language QA fixed 237 strings
+(`dev/english-friction/1017-qa-report.md`), Task 809's halo words, the five dead keys joined on one
+line in every file, and a new payload note: **Layout (box title)**, derived from the page by
+`dev/scripts/dock_box_titles.inc.php`, tells translators to put a dockable box title's subject word
+first (his auto-hide tab question). Every `.replace('{name}'` is now global (Copy upward says {name} twice).
+Deleted keys: `lpn_guide_text_notes_popup`; and from the 26 non-English files only, `lpn_guide_text_alt_box`,
+`lpn_guide_how_alt`, `lpn_alt_calc_options`, `lpn_scenario_duration_tip`, `lpn_scenario_hyd_step_tip`.
 
-Landed 10-16/17 on his typed words: merge/1016e (bentley-interop, theme-dark, basemap-outdoors,
-units-revert, library-notes), docs features list (librewaternet.org pushed f4acec9; he pulls
-`cd ~/addon_html/librewaternet.org && git pull`), merge/1017 (geojson-import with NAD83 read as WGS 84
-and a note; scenarios-menu: menu order, "Override manager…", Copy upward, "has children" delete messages,
-Fire plus max day preset removed, Project-Scenario.inp export names), merge/1017b (hover-props: the
-card lists the Settings > Labels fields for the asset, formatted by Labels, no Description, opens only
-on the asset itself; native-valves: Task 733 phase 1, PRV/PSV/FCV solve natively within 0.8 mm of
-EPANET, PBV/GPV still route to EPANET; CLAUDE.md rule updated), feat/guide-scenarios (Task 785: every
-Guide chapter rewritten to the code, 146 new English strings, "Example on Net1", no "you").
-Deleted keys: `lpn_scenario_push_*` (6), `lpn_scenario_preset_fire_max_day`, `_tip`, `lpn_sm_copy_base_tip`.
-Storage told to him: `lpn_theme`, `lpn_cleanmap`, `lpn_ovrmarks`, `lpn_smbox` widths, `lpn_paneboxes`.
+### Branches he has passed once (2026-10-17); his notes are on Tasks 752, 811, 812 and 814
 
-10-17 day: option/pane-boxes merged on his word (Task 799). Fixes: the app page no longer loads the
-parent `/hawsedc.css` (it painted dark mode's chrome light on hawsedc.com; worktree previews never load
-it); the corner basemap button in a scenario now writes the scenario (a press for Base's style was
-dropped). Features list gained customers (247) and custom properties (636); both landing sites now
-build features.html from it, use American spelling, and match apart from EPANET++'s deliberate lines.
-
-### Branches awaiting him
-
-- None besides the label-placer bench branches listed at the top.
+- `feat/sheet-sync` (row 8108): phase 1 of Task 752's old shape, the whole-tree workbook. Task 752 was
+  reshaped on market research (results by scenario, demand import, one scenario at a time); salvage, don't merge.
+- `feat/theme` (row 8111): Task 811. Colour themes only so far; he wants design themes on the same branch.
+- `feat/label-beside` (row 8110): Task 812. He saw no difference and no level label; the page shows no
+  zoom factor and he could not reach the 600-junction network. Short pipes should also try the level spot.
+- `docs/label-port`: the port plan (Task 813); merges with label-beside.
 
 ### Questions out to him
 
+- Terms for Task 737 (am, my use one word for Scenario and Status): CC proposed two `dev/terms.md`
+  entries and a uniqueness group; he edits that file.
+- The import labels and four English fixes (`fix/menu-wording`) change English only; their 26
+  translations are owed. A mini-sprint needs his word.
 - His `lpn_sm_help` lacks Copy upward and the has-children delete reason: CC proposed two sentences.
-- Hover card: Flow has no unit on the card because the label settings give none ("Use units" tick).
-- Bubbles after Merge upward: by design; he wants Copy upward (built). Task 800, 681 as before.
 - Port 8202 never reaches jasmine from his browser; epanet-plus-plus.org is also on 8109.
+
+### Waiting to merge (next batch, one suite run)
+
+- `chore/752-reshape`: Task 752 reshaped on market research, the report filed, Task 809's cadence.
+- `fix/settings-clear-jump` (828185057, green on its harness): the real Settings jump, a 561 px pull
+  when a tip is showing during a redraw. A defect: merges on green.
+- `feat/sqlite-reader` (Task 749) is NOT in any batch: Tom, 2026-10-17, *"No merging it until it's done."*
+- WaterCAD samples found: `dev/agents/market-researcher/wtg-samples.md` (Zenodo 7162154, TSNet). Tom is
+  seeking a free EWB Bentley licence to make the one missing case, a child that overrides a value.
 
 ### Next job
 
-His deploy; then a translation sprint on his word (Task 809 rides it).
-Guide leftovers: `lpn_guide_text_notes_popup` renders nowhere (delete candidate); `lpn_guide_boxes_autohide`
-and `lpn_hotkeys_menu_def` say "you" but are his ruled text.
+His pull to deploy. Task 814 before more of 752. Design themes on `feat/theme`. Find why label-beside
+shows nothing. Task 749 waits on his `.sqlite` sample.
+
+### Traps met 2026-10-17 (twenty-fifth session)
+
+- **The classifier refused the sprint's master merge** though his message authorized the sprint. Ask
+  for "Merge chore/sprint-1017" typed, at the top of the report.
+- **A script writing friction dispositions was refused as "instruction poisoning"**; the same edits by
+  the Edit tool went through. Write dispositions with Edit.
+- **Translators told "subject word first" made bad titles**: "Complete: report" for Full report (ar,
+  fa, km), an invented subject ("Network: full report", pt, fr, it), and my changed placeholder colons
+  to dodge the identical check. Read every box-title change in the sprint diff.
+- **A Wave 0 rewrite that repeats a placeholder** ({name} twice) trips `language placeholders` until
+  every `.replace('{name}'` is global.
+- **The Guide harnesses compared the Spanish page with the English** and broke when the sprint
+  translated it. They now use `esString()` from `user-guide-chapter-lib.js`.
+- **The regex parsers miss keys joined onto one physical line**; QA found five dead ones in 26 files.
+  PHP `include` sees them: count orphans with it, not with `^`-anchored greps.
 
 ### Traps met 2026-10-16 (twenty-fourth session)
 

@@ -739,3 +739,4 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|805| CLOSED 2026-10-16 (merged on Tom's word, `feat/bentley-interop` batch): Map, Clean map hides the map's controls and the override rings (browser keys `lpn_cleanmap`, `lpn_ovrmarks`).
 - 0|803| CLOSED 2026-10-17 (merged 10-16 with `feat/bentley-interop`): the Scenario manager's list offers All and All unused, so every unused alternative shows at a glance.
 - 0|799| CLOSED 2026-10-17 (merged on Tom's word, `option/pane-boxes`): right-click a bottom-pane tab, Open in a box; Tables and Graphs dock as boxes (browser key `lpn_paneboxes`).
+- 0|785| CLOSED 2026-10-17 (merged on Tom's word, `feat/guide-scenarios`): every Guide chapter rewritten to the code, each with a `user-guide-*-harness.js`; Screenshot audited only.

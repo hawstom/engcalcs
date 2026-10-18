@@ -129,7 +129,7 @@ const ready = () => new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 		const origId = lib.openId, before = bytes(origId), name0 = L.getProject().name;
 
 		L.openConvertAsBox();
-		ok('the box opens', byId.lpn_convas_panel.style.display === 'block');
+		ok('the Convert box is shown', byId.lpn_convas_panel.style.display === 'block');
 		ok('...on this project\'s own case: not georeferenced', byId.lpn_convas_kind_none.checked === true);
 		const a0 = L.convasAnswers();
 		ok('...and on this project\'s own units', a0.units.lpn_u_length === 'ft' && a0.units.lpn_u_flow === 'gpm',
