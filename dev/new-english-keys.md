@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**2 still to read on master**, of 9 untranslated keys, of 3034 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**18 still to read on master**, of 25 untranslated keys, of 3050 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (9, 2 to read @@ NEEDS RULING)
+## lpn_  (25, 18 to read @@ NEEDS RULING)
 
 - **`lpn_ex_net1_scn_desc`**
   > Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.
@@ -49,12 +49,60 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_geojson_results_other`**
   > No results are included, because the results on screen belong to the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
+- **`lpn_guide_cmp_byasset_def`**
+  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_cmp_byasset_term`**
+  > Results by asset
+  @@ NEEDS RULING
 - **`lpn_pane_pasted_scenario`**
   > These values are overrides in the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
 - **`lpn_roughness_method_note`**
   > ⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.
   _Ruled 2026-10-18: I agree._
+- **`lpn_scncmp_progress`**
+  > Solving scenario {done} of {total}…
+  @@ NEEDS RULING
+- **`lpn_scncmp_stopped`**
+  > Stopped after {done} of {total} scenarios. The results below are the ones already finished.
+  @@ NEEDS RULING
+- **`lpn_scnres_at_time`**
+  > ({time})
+  @@ NEEDS RULING
+- **`lpn_scnres_col`**
+  > {quantity} ({unit}), {scenario}
+  @@ NEEDS RULING
+- **`lpn_scnres_copy_tip`**
+  > Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.
+  @@ NEEDS RULING
+- **`lpn_scnres_empty`**
+  > This project has none of these assets.
+  @@ NEEDS RULING
+- **`lpn_scnres_failed`**
+  > {scenario} could not be solved, so its columns are blank. {why}
+  @@ NEEDS RULING
+- **`lpn_scnres_none`**
+  > Check at least one result to show.
+  @@ NEEDS RULING
+- **`lpn_scnres_not_converged`**
+  > (not converged)
+  @@ NEEDS RULING
+- **`lpn_scnres_not_converged_note`**
+  > A column marked {mark} shows the last results the solver reached before it stopped without converging.
+  @@ NEEDS RULING
+- **`lpn_scnres_stale`**
+  > Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.
+  @@ NEEDS RULING
+- **`lpn_scnres_steady`**
+  > (steady state)
+  @@ NEEDS RULING
+- **`lpn_scnres_time_note`**
+  > A scenario with a total run time is read at the time step on screen, {time}, or at its last time step if its run ends sooner. Each heading shows the time read.
+  @@ NEEDS RULING
+- **`lpn_scnres_title`**
+  > Results by asset
+  @@ NEEDS RULING
 - **`lpn_survey_added_scenario`**
   > The nodes were added to {scenario}. In Base they are inactive.
   _Ruled 2026-10-18: I approved all._
@@ -63,7 +111,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**91 still to read**, of 95 new keys across 9 unmerged branch(es).
+**75 still to read**, of 79 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -73,6 +121,8 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### chore/batch-1018b (`daca5dac7`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -146,58 +196,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
   @@ NEEDS RULING
 
-### feat/scenario-example (`a6afa080a`) — adds no English strings
+### feat/scenario-example (`a6afa080a`) — already merged into chore/batch-1018b; its strings are listed there
 
-### feat/scenario-results (`4db53980e`) — 16 new, 16 to read @@ NEEDS RULING
-
-- **`lpn_guide_cmp_byasset_def`**
-  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box.</p>
-  @@ NEEDS RULING
-- **`lpn_guide_cmp_byasset_term`**
-  > Results by asset
-  @@ NEEDS RULING
-- **`lpn_scncmp_progress`**
-  > Solving scenario {done} of {total}…
-  @@ NEEDS RULING
-- **`lpn_scncmp_stopped`**
-  > Stopped after {done} of {total} scenarios. The results below are the ones already finished.
-  @@ NEEDS RULING
-- **`lpn_scnres_at_time`**
-  > ({time})
-  @@ NEEDS RULING
-- **`lpn_scnres_col`**
-  > {quantity} ({unit}), {scenario}
-  @@ NEEDS RULING
-- **`lpn_scnres_copy_tip`**
-  > Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.
-  @@ NEEDS RULING
-- **`lpn_scnres_empty`**
-  > This project has none of these assets.
-  @@ NEEDS RULING
-- **`lpn_scnres_failed`**
-  > {scenario} could not be solved, so its columns are blank. {why}
-  @@ NEEDS RULING
-- **`lpn_scnres_none`**
-  > Check at least one result to show.
-  @@ NEEDS RULING
-- **`lpn_scnres_not_converged`**
-  > (not converged)
-  @@ NEEDS RULING
-- **`lpn_scnres_not_converged_note`**
-  > A column marked {mark} shows the last results the solver reached before it stopped without converging.
-  @@ NEEDS RULING
-- **`lpn_scnres_stale`**
-  > Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.
-  @@ NEEDS RULING
-- **`lpn_scnres_steady`**
-  > (steady state)
-  @@ NEEDS RULING
-- **`lpn_scnres_time_note`**
-  > A scenario with a total run time is read at the time step on screen, {time}, or at its last time step if its run ends sooner. Each heading shows the time read.
-  @@ NEEDS RULING
-- **`lpn_scnres_title`**
-  > Results by asset
-  @@ NEEDS RULING
+### feat/scenario-results (`4db53980e`) — adds no English strings
 
 ### feat/sqlite-reader (`9470877a6`) — 49 new, 49 to read @@ NEEDS RULING
 

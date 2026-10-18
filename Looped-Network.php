@@ -2119,6 +2119,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <template id="lpn_guide_more_lpn_scncmp_box"><dl>
 	<dt><?=$ec_lang['lpn_guide_cmp_cols_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_cols_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_cmp_run_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_run_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_cmp_byasset_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_byasset_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_cmp_notes_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_notes_def']?></dd>
 </dl></template>
 </div>
@@ -3263,6 +3264,20 @@ EngCalcs.pageConfig = {
 	lpn_scncmp_period_note: <?=json_encode($ec_lang['lpn_scncmp_period_note'])?>,
 	lpn_scncmp_current: <?=json_encode($ec_lang['lpn_scncmp_current'])?>,
 	lpn_scncmp_note: <?=json_encode($ec_lang['lpn_scncmp_note'])?>,
+	lpn_scncmp_progress: <?=json_encode($ec_lang['lpn_scncmp_progress'])?>,
+	lpn_scncmp_stopped: <?=json_encode($ec_lang['lpn_scncmp_stopped'])?>,
+	lpn_scnres_title: <?=json_encode($ec_lang['lpn_scnres_title'])?>,
+	lpn_scnres_col: <?=json_encode($ec_lang['lpn_scnres_col'])?>,
+	lpn_scnres_none: <?=json_encode($ec_lang['lpn_scnres_none'])?>,
+	lpn_scnres_empty: <?=json_encode($ec_lang['lpn_scnres_empty'])?>,
+	lpn_scnres_copy_tip: <?=json_encode($ec_lang['lpn_scnres_copy_tip'])?>,
+	lpn_scnres_time_note: <?=json_encode($ec_lang['lpn_scnres_time_note'])?>,
+	lpn_scnres_at_time: <?=json_encode($ec_lang['lpn_scnres_at_time'])?>,
+	lpn_scnres_steady: <?=json_encode($ec_lang['lpn_scnres_steady'])?>,
+	lpn_scnres_not_converged: <?=json_encode($ec_lang['lpn_scnres_not_converged'])?>,
+	lpn_scnres_not_converged_note: <?=json_encode($ec_lang['lpn_scnres_not_converged_note'])?>,
+	lpn_scnres_failed: <?=json_encode($ec_lang['lpn_scnres_failed'])?>,
+	lpn_scnres_stale: <?=json_encode($ec_lang['lpn_scnres_stale'])?>,
 	lpn_reports_menu: <?=json_encode($ec_lang['lpn_reports_menu'])?>,
 	lpn_reports_epanet: <?=json_encode($ec_lang['lpn_reports_epanet'])?>,
 	lpn_reports_status: <?=json_encode($ec_lang['lpn_reports_status'])?>,
