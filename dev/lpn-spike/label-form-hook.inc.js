@@ -43,8 +43,11 @@
 		read: function (tolPx, ambPx) {
 			var s = state.s, W = svg.clientWidth, H = svg.clientHeight, tol = tolPx / s, amb = ambPx / s,
 				v = { labels: 0, values: 0, nodes: 0, nodeInline: 0, nodeStacked: 0, pipes: 0, along: 0, level: 0, levelLeader: 0,
-					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N3: [], N3node: 0, astray: [], sig: [] },
+					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N1mine: [], N3: [], N3node: 0, astray: [], sig: [] },
 				items = [], circles = [], texts = [];
+			// Seven figures: a content pass re-measures, and the last bits of a width move.
+			function q(x) { var n = parseFloat(x); return isFinite(n) ? n.toPrecision(7) : String(x); }
+			function geo(e, names) { return names.map(function (a) { return q(e.getAttribute(a)); }).join(','); }
 			function inView(p) { var x = p.x * s + state.tx, y = p.y * s + state.ty; return x >= 0 && x <= W && y >= 0 && y <= H; }
 			function vis(t) { return !!t && !!t.textContent && t.checkVisibility({ visibilityProperty: true, opacityProperty: true }); }
 			function leaderOf(h) {
@@ -115,12 +118,12 @@
 			doc.nodes.forEach(function (n) {
 				var ne = nodeEls[n.id], k = (ne && ne.lines) ? ne.lines.length : 0, g;
 				if (!ne || ne.empty || !ne.text || !inView(nodeAt(n))) { return; }
-				v.sig.push('n' + n.id + ' ' + ne.text.getAttribute('x') + ',' + ne.text.getAttribute('y') + ' ' + vis(ne.text) + ' ' + ne.text.textContent +
-					' ' + (ne.leader ? [ne.leader.style.display, ne.leader.getAttribute('x2'), ne.leader.getAttribute('y2')].join(',') : ''));
-				if (!vis(ne.text)) { return; }
+				if (!vis(ne.text)) { v.sig.push('n' + n.id + ' hidden'); return; }
+				v.sig.push('n' + n.id + ' ' + geo(ne.text, ['x', 'y']) + ' ' + ne.text.textContent + ' ' +
+					(leaderOf(ne) ? geo(ne.leader, ['x1', 'y1', 'x2', 'y2']) : ''));
 				v.nodes++; v.values += k;
 				if (k > 1) { if (ne.inline) { v.nodeInline++; } else { v.nodeStacked++; } }
-				items.push({ key: 'N' + n.id, rows: rowsOf(ne.text) });
+				items.push({ key: 'N' + n.id, rows: rowsOf(ne.text), mine: !!ne.inline });
 				g = leaderOf(ne);
 				if (g) {
 					circles.forEach(function (c) {
@@ -133,14 +136,13 @@
 				var le = linkEls[l.id], f, g, rows;
 				if (!le || le.empty || !le.text || !inView(linkLabelMid(l))) { return; }
 				f = le.levelBeside && le.levelForm;
-				v.sig.push('l' + l.id + ' ' + le.text.getAttribute('x') + ',' + le.text.getAttribute('y') + ' ' + (le.text.getAttribute('transform') || '') + ' ' +
-					vis(le.text) + ' ' + le.text.textContent + ' ' + (le.leader ? [le.leader.style.display, le.leader.getAttribute('x1'), le.leader.getAttribute('y1'),
-					le.leader.getAttribute('x2'), le.leader.getAttribute('y2')].join(',') : ''));
-				if (!vis(le.text)) { return; }
+				if (!vis(le.text)) { v.sig.push('l' + l.id + ' hidden'); return; }
+				v.sig.push('l' + l.id + ' ' + geo(le.text, ['x', 'y']) + ' ' + (le.text.getAttribute('transform') || '').replace(/[-0-9.e]+/g, q) + ' ' +
+					le.text.textContent + ' ' + (leaderOf(le) ? geo(le.leader, ['x1', 'y1', 'x2', 'y2']) : ''));
 				v.pipes++; v.values += f ? f.lines.length : (le.lines || []).length;
 				rows = rowsOf(le.text);
 				(le.repeats || []).forEach(function (r) { if (vis(r.text)) { rows = rows.concat(rowsOf(r.text)); } });
-				items.push({ key: 'L' + l.id, rows: rows });
+				items.push({ key: 'L' + l.id, rows: rows, mine: !!le.levelBeside });
 				if (!le.levelBeside) { v.along++; return; }
 				v.level++;
 				if (f && f.stacked) { v.levelStacked++; } else { v.levelInline++; }
@@ -169,15 +171,19 @@
 					for (j = i + 1; j < items.length; j++) {
 						items[j].rows.forEach(function (c) {
 							var d = depth(b, c);
-							if (d > tol) { v.N1.push(it.key + ' on ' + items[j].key + ' ' + (d * s).toFixed(1) + ' px'); }
+							if (d > tol) { v.N1.push(it.key + ' on ' + items[j].key + ' ' + (d * s).toFixed(1) + ' px'); if (it.mine || items[j].mine) { v.N1mine.push(v.N1[v.N1.length - 1]); } }
 						});
 					}
-					circles.forEach(function (c) { if (ptBox(c.x, c.y, b) < c.r - tol) { v.N1.push(it.key + ' on node ' + c.id); } });
-					texts.forEach(function (t) { var d = depth(b, t.b); if (d > tol) { v.N1.push(it.key + ' on Text ' + t.id + ' ' + (d * s).toFixed(1) + ' px'); } });
+					circles.forEach(function (c) { if (ptBox(c.x, c.y, b) < c.r - tol) { v.N1.push(it.key + ' on node ' + c.id); if (it.mine) { v.N1mine.push(v.N1[v.N1.length - 1]); } } });
+					texts.forEach(function (t) { var d = depth(b, t.b); if (d > tol) { v.N1.push(it.key + ' on Text ' + t.id + ' ' + (d * s).toFixed(1) + ' px'); if (it.mine) { v.N1mine.push(v.N1[v.N1.length - 1]); } } });
 				});
 			});
 			v.labels = v.nodes + v.pipes;
 			v.sig = v.sig.join('\n');
 			return v;
 		}
+	};
+	window.__lpnForm.perf = function () {
+		perfDebugSums = {}; var t0 = performance.now(); refreshLabelText(); var o = perfDebugSums || {}; o.total = performance.now() - t0; perfDebugSums = null;
+		var r = {}; Object.keys(o).forEach(function (k) { r[k.trim()] = Math.round(o[k]); }); return r;
 	};

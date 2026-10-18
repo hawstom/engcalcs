@@ -1227,12 +1227,19 @@ EngCalcs.lpnCollide = (function () {
 		// `near` (a margin): a side too close to draw a leader must leave the label's own pipe the
 		// nearest one (ownPipeNearest()).
 		var nearMargin = opts.near >= 0 ? opts.near : -1;
+		// `quietMax`: out to this distance a side whose own pipe is plainly the nearest may go without
+		// a leader (`lbl._quiet`), the reader's eye doing the leader's work; any other side beyond
+		// `leaderMin` says whose it is with a leader.
+		var quietMax = opts.quietMax > leaderMin ? opts.quietMax : leaderMin;
 		function strictOk(lbl, c, b) {
-			var g, i, o, far = Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y) > leaderMin;
+			var g, i, o, dist = Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y), far = dist > leaderMin,
+				near = function () { return nearMargin < 0 || lbl.ownLink === undefined || ownPipeNearest(b, local, lbl.ownLink, nearMargin); };
+			lbl._quiet = false;
 			if (lbl.ownLink !== undefined && boxesOnOwnLink(b, local, lbl.ownLink)) { return false; }
 			// A side near enough to draw no leader must say whose label it is by being nearest its own
 			// pipe; one far enough out to carry a leader says it with the leader.
-			if (!far) { return nearMargin < 0 || lbl.ownLink === undefined || ownPipeNearest(b, local, lbl.ownLink, nearMargin); }
+			if (!far) { return near(); }
+			if (dist <= quietMax && near()) { lbl._quiet = true; return true; }
 			g = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id);
 			// Every symbol counts, the one round the anchor included: a pipe's anchor is no node's
 			// own, so a leader starting inside an end node's symbol runs through it.
@@ -1254,7 +1261,7 @@ EngCalcs.lpnCollide = (function () {
 			// occupies rather than a rectangle around it.
 			b.forEach(function (cb) { index.addBox(obs.boxes.push(cb) - 1); });
 			var lead = null;
-			if (strict && Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y) > leaderMin) {
+			if (strict && !lbl._quiet && Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y) > leaderMin) {
 				lead = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id);
 				index.addSegment(obs.segments.push(lead) - 1);
 			}
@@ -1307,7 +1314,13 @@ EngCalcs.lpnCollide = (function () {
 			index.near(a0.x, a0.y, lbl._reach, local);
 			for (i = from || 0; i < sides.length; i++) {
 				c = sides[i];
+				// A side offered for clean ground only (`cleanOnly`, a level label's other stations)
+				// is not asked again here.
+				if (c.cleanOnly) { continue; }
 				lbl.anchor = c.anchor || a0;
+				// `leaderClean`: a label whose leader may never pass through another node's symbol, even
+				// here (a one-line node label, Task 734: its ring reaches further east and west).
+				if (lbl.leaderClean && leaderThroughSymbol(lbl, c, local)) { continue; }
 				if (lbl.anchor !== at) { at = lbl.anchor; index.near(at.x, at.y, lbl._reach, local); }
 				// The STAIRCASE, not the block (Task 406): asking about the block would call a side
 				// occupied because of ground the short rows never cover.
@@ -1360,7 +1373,9 @@ EngCalcs.lpnCollide = (function () {
 				g.sides = sidesOf(lbl).filter(function (c) { return (c.anchor ? c.anchor.x + ',' + c.anchor.y : '') === key; });
 			}
 			g._reach = reachOf(g);
-			r = placeClean(g);
+			// Growing, it asks the last sweep only: the label already stands, and the clean sweep
+			// before it doubled the growth's time for a handful of spots (600-junction network).
+			r = from ? null : placeClean(g);
 			if (!r) { r = placeAny(g, 0); }
 			if (!r || r.dropped) { return null; }
 			// The side is reported against the label's own list.
@@ -1377,19 +1392,26 @@ EngCalcs.lpnCollide = (function () {
 					if (nr) { nr.form = k; seat[lbl.id] = nr; return; }
 				}
 			});
+			// **ONE VALUE MORE AT A TIME, AND IT STOPS AT THE FIRST COUNT NOTHING FITS.** A form with
+			// one value more covers the ground of the form below it in the same shape, so where every
+			// form of n values fails, every form of more fails too; climbing finds the same most-values
+			// form as trying the biggest first, and a label with no room asks two forms, not all.
 			order.forEach(function (lbl) {
-				var r = seat[lbl.id], k, nr, now;
+				var r = seat[lbl.id], k, nr, now, want, grew;
 				if (!r || r.dropped || !lbl.forms) { return; }
 				now = r.form === undefined ? (lbl.values || 0) : (lbl.forms[r.form].values || 0);
-				for (k = 0; k < lbl.forms.length; k++) {
-					if (!((lbl.forms[k].values || 0) > now)) { continue; }
-					nr = tryForm(lbl, lbl.forms[k], r);
-					if (nr) {
-						bury(r);
-						nr.form = k;
-						seat[lbl.id] = nr;
-						return;
+				for (;;) {
+					want = Infinity;
+					lbl.forms.forEach(function (f) { if ((f.values || 0) > now && f.values < want) { want = f.values; } });
+					if (want === Infinity) { return; }
+					grew = false;
+					for (k = 0; k < lbl.forms.length; k++) {
+						if ((lbl.forms[k].values || 0) !== want) { continue; }
+						nr = tryForm(lbl, lbl.forms[k], r);
+						if (nr) { bury(r); nr.form = k; seat[lbl.id] = r = nr; grew = true; break; }
 					}
+					if (!grew) { return; }
+					now = want;
 				}
 			});
 		}
@@ -1399,7 +1421,7 @@ EngCalcs.lpnCollide = (function () {
 		// for the same reason: a pass that scribbles on its arguments cannot be run twice on one
 		// drawing to check that it agrees with itself, which is the cheapest strong assertion there
 		// is -- and it is asserted.
-		labels.forEach(function (l) { delete l._reach; });
+		labels.forEach(function (l) { delete l._reach; delete l._quiet; });
 		return out;
 	}
 	// **CLEAR MEANS CLEAR OF THE HARD OBSTACLES, AND THE RANKS SAY WHICH THOSE ARE.** A first-fit has
