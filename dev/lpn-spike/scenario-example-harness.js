@@ -75,7 +75,7 @@ async function solved() { L.runSolve(); await settleEpanet(); return L.lastResul
 	ok('...named by exactly two scenarios, one under each branch',
 		brk && (used[brk.id] || []).length === 2 && used[brk.id].indexOf('Peak hour with main break') >= 0 && used[brk.id].indexOf('Max day plus fire flow with main break') >= 0, JSON.stringify(used[brk && brk.id]));
 	ok('...and it closes pipe 112 only', brk && JSON.stringify(brk.values) === JSON.stringify({ 'l:112': { active: false } }), JSON.stringify(brk && brk.values));
-	const peakAlt = alts.filter((a) => a.name === 'Peak hour demand')[0], mdAlt = alts.filter((a) => a.name === 'Maximum day demand')[0];
+	const peakAlt = alts.filter((a) => a.name === 'Peak hour demand')[0], mdAlt = alts.filter((a) => a.id === byName['Max day'].alternatives.demand)[0];
 	ok('Peak hour demand and Maximum day demand are Demand alternatives, one scenario each',
 		peakAlt && mdAlt && peakAlt.category === 'demand' && mdAlt.category === 'demand' && used[peakAlt.id].length === 1 && used[mdAlt.id].length === 1);
 	const fireAlt = alts.filter((a) => a.parent === (mdAlt && mdAlt.id))[0];
@@ -107,7 +107,7 @@ async function solved() { L.runSolve(); await settleEpanet(); return L.lastResul
 			const r = await solved();
 			const label = eng + ' / ' + s.name;
 			ok(label + ' converges', !!r && r.converged === true, JSON.stringify(r && r.issues));
-			ok(label + ' was solved by ' + (eng === 'epanet' ? 'EPANET' : 'the built-in solver'), !!r && (eng === 'epanet' ? r.engine === 'epanet' : !r.engine), r && r.engine);
+			ok(label + ' was solved by ' + (eng === 'epanet' ? 'EPANET' : 'native'), !!r && (eng === 'epanet' ? r.engine === 'epanet' : !r.engine), r && r.engine);
 			P[eng][s.name] = r && r.pressures;
 		}
 	}
