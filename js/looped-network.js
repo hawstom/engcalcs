@@ -80374,7 +80374,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		wrap.appendChild(h);
 		if (!rows.length) {
 			h = document.createElement('p');
-			h.textContent = pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.';
+			h.textContent = pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.';
 			wrap.appendChild(h);
 			return wrap;
 		}
@@ -80462,7 +80462,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		host.innerHTML = '';
 		rows = fullReportRows();
 		if (!rows.length) {
-			ffEl('p', 'lpn-ff-note', pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.', host);
+			ffEl('p', 'lpn-ff-note', pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.', host);
 			return;
 		}
 		frames = reportFrames();
