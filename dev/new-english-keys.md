@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**1 still to read on master**, of 7 untranslated keys, of 3032 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**4 still to read on master**, of 10 untranslated keys, of 3031 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,8 +29,14 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (7, 1 to read @@ NEEDS RULING)
+## lpn_  (10, 4 to read @@ NEEDS RULING)
 
+- **`lpn_diag_gpv_curve_order`**
+  > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
+  @@ NEEDS RULING
+- **`lpn_diag_valve_conflict`**
+  > These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:
+  @@ NEEDS RULING
 - **`lpn_export_holds_base`**
   > It holds the Base scenario only.
   _Ruled 2026-10-18: I approved all._
@@ -43,6 +49,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_geojson_results_other`**
   > No results are included, because the results on screen belong to the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
+- **`lpn_gpv_one_point_note`**
+  > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
+  @@ NEEDS RULING
 - **`lpn_pane_pasted_scenario`**
   > These values are overrides in the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
@@ -57,7 +66,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**125 still to read**, of 157 new keys across 17 unmerged branch(es).
+**122 still to read**, of 154 new keys across 18 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -67,6 +76,8 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### chore/batch-1018 (`3792f486c`) — adds no English strings
 
 ### docs/label-port (`7ec7a65cf`) — already merged into feat/label-beside; its strings are listed there
 
@@ -140,20 +151,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Species in the file: {list}.
   @@ NEEDS RULING
 
-### feat/native-pbv-gpv (`db4e8ff15`) — 4 new, 4 to read @@ NEEDS RULING
-
-- **`lpn_valve_why_conflict`**
-  > connected to another control valve in a way EPANET does not allow
-  @@ NEEDS RULING
-- **`lpn_valve_why_gpv_no_curve`**
-  > no head loss curve
-  @@ NEEDS RULING
-- **`lpn_valve_why_gpv_one_point`**
-  > head loss curve has only one point
-  @@ NEEDS RULING
-- **`lpn_valve_why_gpv_order`**
-  > head loss curve flows do not increase
-  @@ NEEDS RULING
+### feat/native-pbv-gpv (`a666754bf`) — adds no English strings
 
 ### feat/scenario-example (`90ff7216c`) — 2 new, 2 to read @@ NEEDS RULING
 
@@ -548,7 +546,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   @@ NEEDS RULING
 
-### feat/theme (`f91c79069`) — 9 new, 5 to read @@ NEEDS RULING
+### feat/theme (`4a9213d75`) — 10 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_theme_amber`**
   > Amber
@@ -571,6 +569,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_theme_platinum`**
   > Platinum
   _Ruled OK 2026-10-17._
+- **`lpn_theme_prairie`**
+  > Prairie
+  @@ NEEDS RULING
 - **`lpn_theme_rounded`**
   > Rounded
   @@ NEEDS RULING
