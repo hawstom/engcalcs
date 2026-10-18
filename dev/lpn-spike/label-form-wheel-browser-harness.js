@@ -159,8 +159,17 @@ async function layOut(Session, browser, sc, mode, opts) {
 			v.notch = k;
 			views.push(v);
 		}
+		// The named labels, as Tom meets them: at the last notch, laid out by the wheel's own pass.
+		const named = await a.page.evaluate((ids) => window.__lpnForm.named(ids), sc.named);
+		if (opts && opts.shots && mode.shipped) {
+			fs.mkdirSync(opts.shots, { recursive: true });
+			await a.page.screenshot({ path: path.join(opts.shots, sc.key + '-' + (sc.outToPipe ? out + '-out' : at + '-in') + '.png') });
+			for (const nm of (opts.clips && opts.clips[sc.key]) || []) {
+				const r = await a.page.evaluate((id) => window.__lpnForm.clipOf(id), nm);
+				if (r) { await a.page.screenshot({ path: path.join(opts.shots, sc.key + '-' + nm.replace(/[^A-Za-z0-9]+/g, '') + '.png'), clip: r }); }
+			}
+		}
 		// The same view twice: a content pass where we stand, then out two notches and back in two.
-		const last = views[views.length - 1];
 		const again = await a.page.evaluate(([tol, amb]) => { window.__lpnForm.content(); return window.__lpnForm.read(tol, amb); }, [TOL_PX, AMBIG_PX]);
 		await wheel(a.page, -2); await a.settle(1200);
 		await wheel(a.page, 2); await a.settle(1500);
@@ -172,15 +181,6 @@ async function layOut(Session, browser, sc, mode, opts) {
 		const back2 = await a.page.evaluate(([tol, amb]) => window.__lpnForm.read(tol, amb), [TOL_PX, AMBIG_PX]);
 		// The content pass's own time at the last view, median of three, and the named labels.
 		const ms = await a.page.evaluate(() => window.__lpnForm.timeContent(3));
-		const named = await a.page.evaluate((ids) => window.__lpnForm.named(ids), sc.named);
-		if (opts && opts.shots && mode.shipped) {
-			fs.mkdirSync(opts.shots, { recursive: true });
-			await a.page.screenshot({ path: path.join(opts.shots, sc.key + '-' + (sc.outToPipe ? out + '-out' : at + '-in') + '.png') });
-			for (const nm of (opts.clips && opts.clips[sc.key]) || []) {
-				const r = await a.page.evaluate((id) => window.__lpnForm.clipOf(id), nm);
-				if (r) { await a.page.screenshot({ path: path.join(opts.shots, sc.key + '-' + nm.replace(/[^A-Za-z0-9]+/g, '') + '.png'), clip: r }); }
-			}
-		}
 		return { views, again, back, back2, ms, named, out, cut, hooked, errors: a.errors.slice() };
 	} finally {
 		await a.close();
@@ -231,6 +231,7 @@ async function main() {
 				console.log(`        ${sc.outToPipe ? on.out + ' out' : v.notch + ' in'}: shipped   ${row(v)}`);
 				console.log(`        ${' '.repeat(String(sc.outToPipe ? on.out + ' out' : v.notch + ' in').length)}  reference ${row(w)}`);
 				extra.forEach((e) => console.log(`          ${e.ref.padEnd(9)} ${row(e.r.views[i])}`));
+				console.log(`          e.g. one-line node labels ${v.ex.nodeInline.slice(0, 6).join(' ')}; leadered stacks ${v.ex.levelStacked.slice(0, 6).join(' ')}; leadered one-line ${v.ex.levelInline.slice(0, 6).join(' ')}`);
 				const tag = sc.name + ', ' + (sc.outToPipe ? on.out + ' notches out' : v.notch + ' notches in');
 				// N1 that the reference draws too is not this work's: hand-placed labels on Net1 (Tom's
 				// screenshot: N10 and N11) and master's own node labels; it is printed in the row.

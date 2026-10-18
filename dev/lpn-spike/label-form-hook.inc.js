@@ -43,7 +43,7 @@
 		read: function (tolPx, ambPx) {
 			var s = state.s, W = svg.clientWidth, H = svg.clientHeight, tol = tolPx / s, amb = ambPx / s,
 				v = { labels: 0, values: 0, nodes: 0, nodeInline: 0, nodeStacked: 0, pipes: 0, along: 0, level: 0, levelLeader: 0,
-					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N1mine: [], N3: [], N3node: 0, astray: [], sig: [] },
+					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N1mine: [], ex: { nodeInline: [], levelStacked: [], levelInline: [] }, N3: [], N3node: 0, astray: [], sig: [] },
 				items = [], circles = [], texts = [];
 			// To a quarter of a screen pixel: a label measured at another zoom differs from one measured
 			// at this one in the hundredths of a pixel (the font's hinting), which no reader can see.
@@ -123,7 +123,7 @@
 				v.sig.push('n' + n.id + ' ' + geo(ne.text, ['x', 'y']) + ' ' + ne.text.textContent + ' ' +
 					(leaderOf(ne) ? geo(ne.leader, ['x1', 'y1', 'x2', 'y2']) : ''));
 				v.nodes++; v.values += k;
-				if (k > 1) { if (ne.inline) { v.nodeInline++; } else { v.nodeStacked++; } }
+				if (k > 1) { if (ne.inline) { v.nodeInline++; v.ex.nodeInline.push(n.id); } else { v.nodeStacked++; } }
 				items.push({ key: 'N' + n.id, rows: rowsOf(ne.text), mine: !!ne.inline });
 				g = leaderOf(ne);
 				if (g) {
@@ -148,7 +148,7 @@
 				items.push({ key: 'L' + l.id, rows: rows, mine: !!le.levelBeside });
 				if (!le.levelBeside) { v.along++; return; }
 				v.level++;
-				if (f && f.stacked) { v.levelStacked++; } else { v.levelInline++; }
+				if (f && f.stacked) { v.levelStacked++; v.ex.levelStacked.push(l.id); } else { v.levelInline++; if (leaderOf(le)) { v.ex.levelInline.push(l.id); } }
 				if (f && f.lines.length > (le.lines || []).length) { v.levelGrown++; }
 				g = leaderOf(le);
 				if (g) {

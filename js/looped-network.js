@@ -3027,7 +3027,8 @@ var EngCalcs = EngCalcs || {};
 	// 2026-10-18: *"pipe labels that go out on a leader inline or stacked"*, and on which when both
 	// fit, *"Whichever shows more"*). Each candidate content is drawn once into a hidden scratch
 	// <text> of the same class and size, every write first and every read after, so a batch costs one
-	// layout; widths are kept in PIXELS by the text, so a wheel notch reads them back for nothing.
+	// layout; widths are kept by the text and the size it is drawn at, so a notch revisited reads them
+	// back for nothing.
 	// The label's own element is not touched: its banked widths are the along-the-pipe content's,
 	// and every pass before this one reasons from them.
 	var levelFormCache = Object.create(null), levelFormKeys = 0;
@@ -3036,7 +3037,10 @@ var EngCalcs = EngCalcs || {};
 			lines.map(function (ln) { return ln.text; }).join('\u0001');
 	}
 	function measureLevelForms(reqs, fsNow) {
-		var s = state.s || 1, px = (effectiveFontSize() * s).toFixed(4), todo = [];
+		// Keyed on the size in WORLD units, as measuredTextWidth() keys its own: the browser lays
+		// text out at the size it is drawn, so a width measured at one zoom is not exactly another
+		// zoom's, and a cache shared across zooms would make a layout depend on the zooms before it.
+		var s = state.s || 1, px = (parseFloat(fsNow) || effectiveFontSize()).toPrecision(6), todo = [];
 		reqs.forEach(function (q) {
 			q.key = px + '\u0002' + levelFormKey(q.lines, q.stacked);
 			var hit = levelFormCache[q.key];
