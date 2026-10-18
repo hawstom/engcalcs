@@ -1346,7 +1346,11 @@ EngCalcs.lpnCollide = (function () {
 					// kept as the fallback, taken if no clearer side follows.
 					if (verdict !== 'clear') { continue; }
 					if (strictOk(lbl, c, b, true)) { return commit(lbl, sides, c, b); }
-					if (!fallback && strictOk(lbl, c, b)) { fallback = c; fallbackBox = b; fallbackAt = lbl.anchor; }
+					// Not across another pipe, though: lying on it, a label reads as that pipe's whatever
+					// its leader says (pre-review, 2026-10-18, Net1's "Q=1866.2" on pipe 111).
+					if (!fallback && !(lbl.ownLink !== undefined && boxesOnLink(b, local, lbl.id)) && strictOk(lbl, c, b)) {
+						fallback = c; fallbackBox = b; fallbackAt = lbl.anchor;
+					}
 					continue;
 				}
 				if (verdict === 'clear') { return commit(lbl, sides, c, b); }
