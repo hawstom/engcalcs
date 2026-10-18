@@ -182,6 +182,28 @@ additive if a real case for one ever appears.
 
 ---
 
+### 2.3 Space at the edges, and the curve of difficulty (Tom, 2026-10-18)
+
+From his browser pass of `feat/label-form`, quoted:
+
+- *"Many networks at many zoom levels are finite. For them, take advantage of the infinite space at
+  their edges to stack one-line leaders tidily."* An opportunistic standard, not yet scheduled: a
+  zoomed-out finite network can stack its edge labels in tidy columns of one-line labels on leaders.
+- *"Some networks or some zoom levels are either infinite or much bigger than a reasonable leader
+  reach. For them, we drop things when we must."*
+- *"There very often is a curve of difficulty for label placement where very close zooms are
+  trivial to solve, very far zooms are easy to solve with tidy columns of one-line labels, and
+  mid-level zooms are crowded and difficult."*
+- *"I hope that we are successfully (a) ignoring off-screen parts of the network and (b)
+  pre-processing the network geometry and saving placement solutions across sessions if feasible,
+  and obviously across zooms."* Not yet checked against the code.
+- Leaders: *"I would like to see leaders used sooner/shorter. ... except for a leader with less
+  than a text height of length, we want to show all labels connected with a leader."*
+- *"I think it would be okay for pipes to run through one-line node labels."*
+- *"Rearranging themselves is low cost as a design value. I think we can approve the increase"*
+  (the slower pass per zoom notch). *"What we need to be aiming for is 'Use attractive available
+  space opportunistically' and 'Be efficient'."*
+
 ## 3. The method
 
 Placement has **two outcomes, placed and dropped.** Free link labels and dragged labels are scored
