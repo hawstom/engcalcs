@@ -91,7 +91,9 @@ function helpers(a) {
 		const t0 = Date.now();
 		while (!downloads.length && Date.now() - t0 < 15000) { await P.waitForTimeout(200); }
 		await P.waitForTimeout(600);
-		P.off('download', onDl);
+		// A file that leaves scenarios behind is answered with a dialog (Task 814); dismiss it.
+	if (await P.evaluate(() => { const d = document.getElementById('lpn_dialog'); return !!d && d.style.display !== 'none'; })) { await P.keyboard.press('Escape'); await P.waitForTimeout(300); }
+	P.off('download', onDl);
 		if (!downloads.length) { return null; }
 		const p = await downloads[0].path();
 		return p ? fs.readFileSync(p, 'utf8') : null;
