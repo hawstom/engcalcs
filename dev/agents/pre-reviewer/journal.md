@@ -4514,3 +4514,7 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: DEFECT. @media print: no literal paper. Under Amber/Green/Dark the body text colour stays theme ink in print (amber 255,176,0 on white) and the map legend prints as a dark box; Tables print area inherits the same ink. Plan promised print literal.
 - OBSERVED: es page shows English theme names and "Theme" (keys untranslated, expected until sprint).
 - NOT CHECKED: Recalculate-off stale look under themes (CSS is opacity .5, theme-neutral), harness mutation, RTL gallery visually, Guide box in Green/Platinum.
+
+## 2026-10-18 feat/theme round 2 (02b3b2be5)
+OBSERVED (jasmine Chromium, Liberation fonts only): 10 themes at 1300/800(ar)/390 px, zero sideways scroll; map label positions (81 text boxes, relative to map) identical in every theme; only third-party host seen is tile.openstreetmap.org (pre-existing); no @font-face/@import/url(http) added. Amber/Green: Settings > Node labels header "Use units" splits to "Use / uni / ts" and the "Initial quality" prefix box reads "Ini" (15 px mono widens columns). Newspaper in Arabic shows blank text (jasmine has no Arabic glyphs; Light shows tofu), unverifiable here. Map is white inside Amber/Green/Arcade/Space (known). Rounded = Light + pills + softer boxes. Icons only change stroke weight/caps, none redrawn. Platinum name = Apple UI term (low risk, name only).
+CAVEAT: my harness scrolled the page 35px after toolbar click (artifact, not a defect). Did not byte-compare Light to master.
