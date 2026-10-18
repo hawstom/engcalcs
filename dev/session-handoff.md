@@ -104,15 +104,13 @@ Task 815, plain privacy.php, consent_body "so we don't count you again" in Engli
 af91792e5 (full/empty tank closes its link natively; Change type reservoir -> tank 0/0/1; routing
 harness flake; fire-flow multiplier guard; label rules sync; port plan on master), e202f28f2 (label
 settings memo, identical drawing). consent_body's 26 translations owed (EC_CONSENT_VERSION stays 2).
-Merged on his word: feat/scenario-example, feat/scenario-results (Task 752 step 1). Open from
+Merged on his word: feat/scenario-example, feat/scenario-results (Task 752 step 1), feat/native-pbv-gpv
+(EPANET 2.3.5 error 220 note still owed to Luke Butler). Open from
 scenario-results: flow shown as magnitude only; fire flow across scenarios still a gap.
 Closed: Tasks 815, 800, 721. Task 737 marked WAIT: sprint.
 
 ### Ready for his typed merge word (all reviewed by Perry, green but for payload freshness)
 
-- `feat/native-pbv-gpv` (8107): every valve native; no valve routes to EPANET. A valves example is
-  being built on it (agent running). EPANET 2.3.5 checks error 220 only against non-adjacent valve
-  rows (input3.c valvedata/valvecheck): tell Luke Butler.
 - `feat/msx` (8112, /chlorine-decay.msx to attach to Net1): Task 717 phase 1. Then his calls on the
   import-report sentence and landing-page MSX lines (dev/msx-scope.md).
 - `feat/theme` (8111): 13 themes; the map follows the theme; he loves Desktop and Prairie. His calls
