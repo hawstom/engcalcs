@@ -11,6 +11,8 @@ The bench lives on `feat/label-placer` (2,346 commits behind master; read with `
 feat/label-placer:<path>`). It will never merge as it is. Everything below is a new small branch from
 master.
 
+
+**The bench branches are archived (2026-10-18)** as tags `archive/feat/label-placer`, `archive/feat/label-placer-a`..`-d` and `archive/feat/label-gang-search`; every `git show feat/label-placer:<path>` below reads as `git show archive/feat/label-placer:<path>`.
 ---
 
 ## 1. What the bench has proven, and against what
