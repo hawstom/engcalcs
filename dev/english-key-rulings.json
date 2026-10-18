@@ -7361,6 +7361,11 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
+        },
+        "lpn_roughness_method_note": {
+            "on": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
+            "ruled": "2026-10-18",
+            "answer": "I agree."
         }
     }
 }

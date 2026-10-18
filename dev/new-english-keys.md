@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 3026 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read on master**, of 1 untranslated keys, of 3026 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,11 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-None on master. Every English key here is present in at least one other language.
+## lpn_  (1, all ruled)
+
+- **`lpn_roughness_method_note`**
+  > ⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.
+  _Ruled 2026-10-18: I agree._
 
 ---
 
@@ -46,15 +50,15 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/roadmap-1017n (`4efe1eeef`) — adds no English strings
+### chore/roadmap-1017n (`574e7b9b3`) — adds no English strings
 
-### docs/import-export-scenario (`e19c09d2e`) — adds no English strings
+### docs/import-export-scenario (`e19c09d2e`) — already merged into chore/roadmap-1017n; its strings are listed there
 
 ### docs/label-port (`7ec7a65cf`) — already merged into feat/label-beside; its strings are listed there
 
-### docs/msx (`6ff053272`) — adds no English strings
+### docs/msx (`6ff053272`) — already merged into chore/roadmap-1017n; its strings are listed there
 
-### feat/command-usage (`453a0ac8e`) — adds no English strings
+### feat/command-usage (`23e45f368`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -82,7 +86,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/msx (`c92dc9db9`) — 13 new, 13 to read @@ NEEDS RULING
+### feat/msx (`dd08408f6`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_file_export_item_msx`**
   > EPANET-MSX file…
@@ -126,7 +130,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/native-pbv-gpv (`11212c9ed`) — adds no English strings
 
-### feat/scenario-example (`6b852aaf7`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/scenario-example (`4ff2623c4`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_ex_net1_scn_desc`**
   > Gallons per minute, with feet and inches. EPANET's Net1 with five scenarios under Base, the average day. Peak hour is 2.25 times the Base demands and Max day is 1.5 times. Max day plus fire flow adds 1,500 gpm at junction 23. A main break closes pipe 112 in two scenarios that share one alternative.
@@ -369,7 +373,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > not TRUE or FALSE, so it was not used.
   @@ NEEDS RULING
 
-### feat/sqlite-reader (`b6e38fb5a`) — 49 new, 49 to read @@ NEEDS RULING
+### feat/sqlite-reader (`9470877a6`) — 49 new, 49 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
   > WaterCAD or WaterGEMS model…
@@ -519,7 +523,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   @@ NEEDS RULING
 
-### feat/theme (`88d5a1530`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/theme (`02b3b2be5`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_theme_amber`**
   > Amber
@@ -546,9 +550,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Space
   @@ NEEDS RULING
 
-### fix/friction-method-roughness (`1b69039f3`) — adds no English strings
+### fix/friction-method-roughness (`d6116624f`) — adds no English strings
 
-### fix/scenario-receipt (`bed5443e0`) — 5 new, 5 to read @@ NEEDS RULING
+### fix/scenario-receipt (`2d33b9921`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_export_holds_base`**
   > It holds the Base scenario only.
