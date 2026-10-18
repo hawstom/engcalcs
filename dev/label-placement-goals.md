@@ -300,11 +300,11 @@ terminal rung.
 
 **A node label's two forms (Tasks 734 and 812, `tryInlineNodeLabels()`).** A node label is a stack,
 or its fields on one line, in the same order with the page's separator, east or west of its node.
-Where nothing is lost the stack stays. Where a node label found no side, or a placed one makes a
-pipe label yield, those labels and the ones in their way try one line before anything sheds; the
-layout that shows more labels, then more values, is kept, and a tie keeps the stacks. A label too short for its segment
-never lies along it (Tom, 2026-08-14), but it tries the level rung like the rest (Tom, 2026-10-17:
-short pipes should also try the level spot; `short-line-label-harness.js`).
+The stacked layout is decided first, shed, repaired and crossing-hidden as always; then a node label
+it dropped or shed values from tries its full content on one line, set into the ground that layout
+leaves, only where the line is clear of every label, symbol, Text, pipe and pipe label, on the map
+and off its legends, no wider than a quarter of the map. Nothing else moves, so no node label is
+hidden, shortened or loses its ID for it.
 
 **THE CASCADE HAS TWO ENTRANCES AND NEEDS THE SAME EXIT FOR BOTH.** A label enters it because it is
 too long for its segment, or because it conflicts with a neighbour — and for a long time only the
