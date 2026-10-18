@@ -78311,6 +78311,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		scenarioCompareAgain = false;
 		if (doc.nodes.length === 0) {
 			scenarioCompareRun = [];
+			scenarioCompareProgress = { done: 0, total: 0, stopped: false };
 			rebuildScenarioCompareReport();
 			return Promise.resolve(scenarioCompareRun);
 		}
@@ -78508,6 +78509,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// No run and not busy is only reachable with the box shut -- opening it starts one -- so
 		// there is nothing to say and no invitation to print.
 		if (!scenarioCompareRun) { return; }
+		if (!scenarioCompareRun.length && scenarioCompareProgress.stopped) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_scncmp_stopped ||
+				'Stopped after {done} of {total} scenarios. The results below are the ones already finished.')
+				.replace('{done}', '0').replace('{total}', String(scenarioCompareProgress.total)), host);
+			return;
+		}
 		if (!scenarioCompareRun.length) {
 			ffEl('p', 'lpn-ff-note', pc.lpn_scncmp_empty ||
 				'Nothing has been drawn yet, so there is nothing to solve.', host);
@@ -78670,7 +78677,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function scenarioResultsText(t, csv) {
 		var rows = t.rows.map(function (r) {
-			return [labelPrefixFor(t.kind.group, 'id') + r[0]].concat(r.slice(1).map(scnResFull));
+			return [r[0]].concat(r.slice(1).map(scnResFull));
 		});
 		return csv ? EngCalcs.lpnTableCsv(t.heads, rows) : EngCalcs.lpnTableTsv(t.heads, rows);
 	}
@@ -78764,7 +78771,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		body.parentNode.id = 'lpn_scnres_table';
 		sorted.forEach(function (x) {
 			var tr = ffEl('tr', null, null, body);
-			ffCell(tr, labelPrefixFor(t.kind.group, 'id') + x.r[0]);
+			// The ID as the Tables pane and its exports write it, with no label prefix, so a paste
+			// lines up against a sheet exported from there.
+			ffCell(tr, x.r[0]);
 			t.cols.forEach(function (c, k) { ffCell(tr, scnResShown(x.r[k + 1], t.kind.group, c.q), 'lpn-ff-num'); });
 		});
 		if (t.anyPeriod) {
