@@ -4011,7 +4011,12 @@ var EngCalcs = EngCalcs || {};
 	 * which changes what every coordinate in the document MEANS -- so georefWrite() maps the
 	 * overrides through the same transform, and georefCancel() puts them back.
 	 */
-	function coordOverridesOf(n) { return (n && resolvedOverrides(activeScenario())[ovKey(n)]) || null; }
+	function coordOverridesOf(n) {
+		var m = labelPassMemo;
+		if (!n) { return null; }
+		if (m) { return (m.ov || (m.ov = resolvedOverrides(activeScenario())))[ovKey(n)] || null; }
+		return resolvedOverrides(activeScenario())[ovKey(n)] || null;
+	}
 	function nodeDrawX(n) {
 		var ov = coordOverridesOf(n);
 		return (ov && typeof ov.x === 'number') ? inwardX(ov.x) : (n ? n.x : undefined);
@@ -7148,8 +7153,22 @@ var EngCalcs = EngCalcs || {};
 	// member of `project`, for the open scenario. A reader that runs per element per frame asks for
 	// a LEAF (a number, a flag), which is never copied; one that wants a whole map asks once per pass
 	// and hands the answer down.
-	function scnSetting(member) { return settingFor(activeScenario(), ['settings', member]); }
-	function scnLabels(path) { return settingFor(activeScenario(), ['labelSettings'].concat(path || [])); }
+	//
+	// **ONE LABEL PASS READS EACH SETTING ONCE.** Inside refreshLabelText() the two shorthands below
+	// answer from `labelPassMemo`, a map made at the pass's start and dropped at its end (in a
+	// finally), so a setting written between two passes is read fresh by the second. Thousands of
+	// asks per pass, none of which can have a different answer inside it.
+	var labelPassMemo = null;
+	function scnSetting(member) {
+		var m = labelPassMemo, k = 'settings.' + member;
+		if (!m) { return settingFor(activeScenario(), ['settings', member]); }
+		return Object.prototype.hasOwnProperty.call(m, k) ? m[k] : (m[k] = settingFor(activeScenario(), ['settings', member]));
+	}
+	function scnLabels(path) {
+		var m = labelPassMemo, k = 'labels.' + (path || []).join('.');
+		if (!m) { return settingFor(activeScenario(), ['labelSettings'].concat(path || [])); }
+		return Object.prototype.hasOwnProperty.call(m, k) ? m[k] : (m[k] = settingFor(activeScenario(), ['labelSettings'].concat(path || [])));
+	}
 	function scnProject(member) { return settingFor(activeScenario(), ['project', member]); }
 	function scnDefaultPattern() { return settingFor(activeScenario(), ['defaultPattern']) || null; }
 	// Deletes one path from a scenario's block and prunes every container it emptied, down to the
@@ -38739,6 +38758,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return changeTypeLine(String(pc.lpn_change_type_line_alternative || '{id}: {property} {value}, in alternative {alternative}')
 			.replace('{alternative}', function () { return String(owner.name || owner.id); }), id, label, valueText);
 	}
+	// **A RESERVOIR CHANGED TO A TANK IS BORN EMPTY ON ITS OWN GROUND** (Tom, 2026-10-18): base
+	// elevation = Elevation (bottomElev left blank, which means exactly that), lowest depth 0,
+	// highest depth 1, starting depth 0, in the Elevation/Head unit the depths are typed in.
+	var RESERVOIR_TO_TANK = { _level: 0, minLevel: 0, maxLevel: 1 };
 	function waterSurfaceCarry(n, to) {
 		var from = n.type, key = ovKey(n), out = { base: null, ovs: [], prop: null, newProp: null }, e;
 		if (from === 'tank' && to === 'reservoir') {
@@ -38749,20 +38772,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			eachElementOverride(key, function (ov, owner, map) {
 				if (typeof ov.level === 'number') { out.ovs.push({ s: owner, map: map, value: e + ov.level }); }
 			}, true);
-		} else if (from === 'reservoir' && to === 'tank') {
-			e = typeof n.elev === 'number' ? n.elev
-				: (!elevSourceIsDem() && typeof (scnSetting('defaults') || {}).nodeElev === 'number' ? scnSetting('defaults').nodeElev : undefined);
-			if (e === undefined) { return out; }
-			out.prop = 'head'; out.newProp = 'level';
-			if (typeof n._head === 'number') {
-				if (n._head >= e) { out.base = { value: n._head - e }; }
-			} else {
-				out.base = { value: 0, silent: true };
-			}
-			eachElementOverride(key, function (ov, owner, map) {
-				if (typeof ov.head === 'number' && ov.head >= e) { out.ovs.push({ s: owner, map: map, value: ov.head - e }); }
-			}, true);
 		}
+		// RESERVOIR -> TANK CARRIES NOTHING (Tom, 2026-10-18: *"For minimal change, how about Base
+		// elevation = Elevation, min depth = 0, max depth = 1, and starting depth = 0?"*): the tank
+		// is born empty on the reservoir's ground (RESERVOIR_TO_TANK), and the head is listed as lost.
 		return out;
 	}
 	function nodeTypeChangeReport(n, to) {
@@ -38868,6 +38881,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (n.elev === undefined && to !== 'reservoir') {
 			if (elevSourceIsDem()) { queueTerrainForNewNode(n.id); }
 			else { n.elev = (scnSetting('defaults') || {}).nodeElev; }   // base-write: a type change is Base's, and so is the ground it gives a node that had none
+		}
+		if (from === 'reservoir' && to === 'tank') {
+			// Tom's four values, see RESERVOIR_TO_TANK. A blank base stands on the ground, which is Elevation.
+			delete n.bottomElev;   // base-write: a type change is Base's, and a blank base is the ground
+			for (k in RESERVOIR_TO_TANK) { if (Object.prototype.hasOwnProperty.call(RESERVOIR_TO_TANK, k)) { n[k] = RESERVOIR_TO_TANK[k]; } }   // base-write: a type change is Base's
+			if (n.tok) { delete n.tok.bottomElev; delete n.tok.level; delete n.tok.minLevel; delete n.tok.maxLevel; }   // base-write: tokens of values the type change replaced
 		}
 		// The water surface, carried (waterSurfaceCarry()). Written after the strip, which has
 		// already taken the old property and any override map it left empty.
@@ -39528,11 +39547,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			h = effective(el, 'bottomElev');
 			return { prop: 'level', newProp: 'head', value: (typeof h === 'number' && isFinite(h) ? h : e) + (effective(el, 'level') || 0) };
 		}
-		if (from === 'reservoir' && to === 'tank') {
-			h = effective(el, 'head');
-			if (h === undefined || h === null || h === '') { return { prop: 'head', newProp: 'level', value: 0 }; }
-			return h >= e ? { prop: 'head', newProp: 'level', value: h - e } : null;
-		}
+		// Reservoir -> tank carries nothing: morphOne() writes RESERVOIR_TO_TANK.
 		return null;
 	}
 	/**
@@ -39574,6 +39589,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!isLink && to !== 'reservoir' && rawBase.baseElev === undefined && !Object.prototype.hasOwnProperty.call(held, 'elev') &&
 				(scnSetting('defaults') || {}).nodeElev !== undefined) {
 			setOverride(el, 'elev', (scnSetting('defaults') || {}).nodeElev);
+		}
+		if (!isLink && from.type === 'reservoir' && to === 'tank') {
+			setOverride(el, 'level', RESERVOIR_TO_TANK._level);
+			setOverride(el, 'minLevel', RESERVOIR_TO_TANK.minLevel);
+			setOverride(el, 'maxLevel', RESERVOIR_TO_TANK.maxLevel);
 		}
 		if (carry) {
 			setOverride(el, carry.newProp, carry.value);
@@ -74886,7 +74906,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		perfDebugCount('labelPasses');
 		beginMapBoxHold();
 		beginLinkGeomHold();
-		try { refreshLabelTextPass(); } finally { endMapBoxHold(); endLinkGeomHold(); }
+		labelPassMemo = {};
+		try { refreshLabelTextPass(); } finally { labelPassMemo = null; endMapBoxHold(); endLinkGeomHold(); }
 		// Stamped LAST, so a writer inside the pass's own tail moves the generation past it.
 		contentPassAt = { gen: labelCacheGen, s: state.s };
 	}

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**4 still to read on master**, of 10 untranslated keys, of 3031 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**3 still to read on master**, of 10 untranslated keys, of 3031 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (10, 4 to read @@ NEEDS RULING)
+## lpn_  (10, 3 to read @@ NEEDS RULING)
 
 - **`lpn_diag_gpv_curve_order`**
   > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
@@ -45,7 +45,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled 2026-10-18: I approved all._
 - **`lpn_export_leaves_alternatives`**
   > The alternatives stored in this project are not in the file.
-  @@ NEEDS RULING
+  _Ruled 2026-10-18: GeoJSON alternatives string is approved._
 - **`lpn_geojson_results_other`**
   > No results are included, because the results on screen belong to the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
@@ -66,7 +66,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**122 still to read**, of 154 new keys across 18 unmerged branch(es).
+**140 still to read**, of 172 new keys across 17 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -77,15 +77,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/batch-1018 (`3792f486c`) — adds no English strings
-
-### docs/label-port (`7ec7a65cf`) — already merged into feat/label-beside; its strings are listed there
+### chore/batch-1018 (`1706228a6`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
 ### feat/label-beside (`8676cd1be`) — already merged into feat/label-form; its strings are listed there
 
-### feat/label-form (`62e158e10`) — adds no English strings
+### feat/label-form (`cbdf05df6`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -109,7 +107,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/msx (`b1a11204c`) — 13 new, 13 to read @@ NEEDS RULING
+### feat/msx (`8b083e9d7`) — 15 new, 15 to read @@ NEEDS RULING
 
 - **`lpn_file_export_item_msx`**
   > EPANET-MSX file…
@@ -142,24 +140,81 @@ build for that would be a gate nobody keeps. Refresh it with
   > Attached {file}
   @@ NEEDS RULING
 - **`lpn_msx_report_kept`**
-  > This EPANET-MSX file is kept with the project and written back unchanged on export. This page does not run it.
+  > This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. This page does not run it.
   @@ NEEDS RULING
 - **`lpn_msx_report_missing`**
   > IDs in the file that this network does not have: {ids}.
   @@ NEEDS RULING
+- **`lpn_msx_report_no_species`**
+  > No species are listed in the file.
+  @@ NEEDS RULING
 - **`lpn_msx_report_species`**
   > Species in the file: {list}.
   @@ NEEDS RULING
+- **`lpn_msx_too_big`**
+  > {file} is too large to keep in browser storage, so it was not attached.
+  @@ NEEDS RULING
 
-### feat/native-pbv-gpv (`a666754bf`) — adds no English strings
+### feat/native-pbv-gpv (`d3d14e45c`) — adds no English strings
 
-### feat/scenario-example (`90ff7216c`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/scenario-example (`a6afa080a`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_ex_net1_scn_desc`**
-  > Gallons per minute, with feet and inches. EPANET's Net1 with five scenarios under Base, the average day. Peak hour sets the demand multiplier to 2.25 and Max day sets it to 1.5. The fire scenario adds 1,500 gpm at junction 23. The multiplier also scales that junction's own demand, so it holds 1,150 gpm, which is 1,725 gpm at 1.5. A main break closes pipe 112 in two scenarios that share one alternative.
+  > Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.
   @@ NEEDS RULING
 - **`lpn_ex_net1_scn_title`**
   > EPANET Net1 with scenarios, gpm (US)
+  @@ NEEDS RULING
+
+### feat/scenario-results (`4db53980e`) — 16 new, 16 to read @@ NEEDS RULING
+
+- **`lpn_guide_cmp_byasset_def`**
+  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_cmp_byasset_term`**
+  > Results by asset
+  @@ NEEDS RULING
+- **`lpn_scncmp_progress`**
+  > Solving scenario {done} of {total}…
+  @@ NEEDS RULING
+- **`lpn_scncmp_stopped`**
+  > Stopped after {done} of {total} scenarios. The results below are the ones already finished.
+  @@ NEEDS RULING
+- **`lpn_scnres_at_time`**
+  > ({time})
+  @@ NEEDS RULING
+- **`lpn_scnres_col`**
+  > {quantity} ({unit}), {scenario}
+  @@ NEEDS RULING
+- **`lpn_scnres_copy_tip`**
+  > Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.
+  @@ NEEDS RULING
+- **`lpn_scnres_empty`**
+  > This project has none of these assets.
+  @@ NEEDS RULING
+- **`lpn_scnres_failed`**
+  > {scenario} could not be solved, so its columns are blank. {why}
+  @@ NEEDS RULING
+- **`lpn_scnres_none`**
+  > Check at least one result to show.
+  @@ NEEDS RULING
+- **`lpn_scnres_not_converged`**
+  > (not converged)
+  @@ NEEDS RULING
+- **`lpn_scnres_not_converged_note`**
+  > A column marked {mark} shows the last results the solver reached before it stopped without converging.
+  @@ NEEDS RULING
+- **`lpn_scnres_stale`**
+  > Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.
+  @@ NEEDS RULING
+- **`lpn_scnres_steady`**
+  > (steady state)
+  @@ NEEDS RULING
+- **`lpn_scnres_time_note`**
+  > A scenario with a total run time is read at the time step on screen, {time}, or at its last time step if its run ends sooner. Each heading shows the time read.
+  @@ NEEDS RULING
+- **`lpn_scnres_title`**
+  > Results by asset
   @@ NEEDS RULING
 
 ### feat/sheet-sync (`1c77e44cd`) — 77 new, 52 to read @@ NEEDS RULING
@@ -546,7 +601,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   @@ NEEDS RULING
 
-### feat/theme (`4a9213d75`) — 10 new, 6 to read @@ NEEDS RULING
+### feat/theme (`876ebef92`) — 10 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_theme_amber`**
   > Amber
@@ -578,5 +633,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_theme_space`**
   > Space
   @@ NEEDS RULING
-
-### fix/native-psv (`977e854cd`) — adds no English strings
