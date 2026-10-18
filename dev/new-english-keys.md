@@ -32,7 +32,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 ## lpn_  (9, 3 to read @@ NEEDS RULING)
 
 - **`lpn_ex_net1_scn_desc`**
-  > Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day. Max day sets the demand multiplier to 1.5 and Peak hour sets it to 2.25. A main break closes pipe 112 in a child of each, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, set Junctions to test to Selected junctions, enter a Required fire flow of 1,500 gpm, and click Run.
+  > Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.
   @@ NEEDS RULING
 - **`lpn_ex_net1_scn_title`**
   > EPANET Net1 with scenarios, gpm (US)
@@ -63,7 +63,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**125 still to read**, of 157 new keys across 22 unmerged branch(es).
+**125 still to read**, of 157 new keys across 17 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -74,17 +74,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/batch-1018 (`3792f486c`) — adds no English strings
-
 ### docs/label-port (`7ec7a65cf`) — already merged into feat/label-beside; its strings are listed there
-
-### docs/label-rules-sync (`5cf0f6d3c`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
 ### feat/label-beside (`8676cd1be`) — already merged into feat/label-form; its strings are listed there
 
-### feat/label-form (`df994e9ea`) — adds no English strings
+### feat/label-form (`209b8a0b8`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -108,7 +104,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/msx (`ec39c8962`) — 15 new, 15 to read @@ NEEDS RULING
+### feat/msx (`478a7460d`) — 15 new, 15 to read @@ NEEDS RULING
 
 - **`lpn_file_export_item_msx`**
   > EPANET-MSX file…
@@ -168,7 +164,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
   @@ NEEDS RULING
 
-### feat/scenario-example (`3ab32a0f6`) — adds no English strings
+### feat/scenario-example (`7fabab896`) — adds no English strings
 
 ### feat/sheet-sync (`1c77e44cd`) — 77 new, 52 to read @@ NEEDS RULING
 
@@ -587,10 +583,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Space
   @@ NEEDS RULING
 
-### fix/fireflow-multiplier (`5b585faa6`) — adds no English strings
-
-### fix/native-psv (`ac2be6e4c`) — adds no English strings
-
-### fix/routing-harness-flake (`28385de57`) — adds no English strings
-
-### perf/label-settings-memo (`60538c437`) — adds no English strings
+### perf/label-settings-memo (`e8cd592ea`) — adds no English strings

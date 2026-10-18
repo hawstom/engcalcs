@@ -83,7 +83,7 @@
             "titleKey": "lpn_ex_net1_scn_title",
             "descKey": "lpn_ex_net1_scn_desc",
             "title": "EPANET Net1 with scenarios, gpm (US)",
-            "description": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day. Max day sets the demand multiplier to 1.5 and Peak hour sets it to 2.25. A main break closes pipe 112 in a child of each, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, set Junctions to test to Selected junctions, enter a Required fire flow of 1,500 gpm, and click Run.",
+            "description": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.",
             "system": "us",
             "coords": "xy",
             "work": "maintenance",
