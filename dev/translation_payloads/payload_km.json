@@ -2,8 +2,8 @@
     "meta": {
         "language": "km",
         "expected_key_count": 3025,
-        "delta_key_count": 0,
-        "english_changed_key_count": 0,
+        "delta_key_count": 15,
+        "english_changed_key_count": 15,
         "exempt_key_count": 32,
         "exempt_keys": [
             "u_imgd",
@@ -41,7 +41,9 @@
         ],
         "out_of_scope_key_count": 7,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
-        "active_prefixes": [],
+        "active_prefixes": [
+            "lpn"
+        ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "reason_notes": "key_context[key].reason says what to do with each key. missing: the key is not in your file; append it as a new line. blank, equal_to_english, english_changed: the key IS already in your file, holding key_context[key].current_value; REPLACE that value in place and never append a second line for the same key. english_changed means the English was reworded after your file's translation was written: translate the new English, and keep words from the old translation only where they still say what the new English says.",
@@ -57,12 +59,371 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "No glossary term is used by the strings in this batch.",
-    "keys_to_translate": [],
-    "keys": [],
-    "key_context": [],
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: លំហូរ\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: សម្ពាធ\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: ថ្នាំង\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: តំណ\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: រូបគូរ\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "keys_to_translate": {
+        "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_file_import_inp": "EPANET file…",
+        "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
+        "lpn_library_import": "Libraries…",
+        "lpn_crit_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ds_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_file_import_survey": "Surveyed points…",
+        "lpn_file_import_shapes": "GeoJSON shapes…",
+        "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
+        "lpn_file_import_gjnet": "GeoJSON network…",
+        "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
+        "lpn_file_import_dxf": "DXF shapes…",
+        "lpn_file_import_shp": "Shapefile shapes…"
+    },
+    "keys": {
+        "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_file_import_inp": "EPANET file…",
+        "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
+        "lpn_library_import": "Libraries…",
+        "lpn_crit_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ds_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_file_import_survey": "Surveyed points…",
+        "lpn_file_import_shapes": "GeoJSON shapes…",
+        "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
+        "lpn_file_import_gjnet": "GeoJSON network…",
+        "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
+        "lpn_file_import_dxf": "DXF shapes…",
+        "lpn_file_import_shp": "Shapefile shapes…"
+    },
+    "key_context": {
+        "lpn_guide_lib_import_def": {
+            "reason": "english_changed",
+            "current_value": "<p>ឯកសារ, នាំចូល…, នាំចូលបណ្ណាល័យ… បើកឯកសារគម្រោងផ្សេង ហើយចម្លងបណ្ណាល័យទាំងមូលពីវាចូលក្នុងគម្រោងនេះ។ ធាតុដែលឈ្មោះរបស់វាត្រូវបានប្រើរួចហើយនៅទីនេះ ត្រូវបានរំលង និងរាយបញ្ជី ដូច្នេះគ្មានអ្វីដែលមានស្រាប់នៅទីនេះត្រូវបានផ្លាស់ប្ដូរទេ។ ការព្រមាននឹងបង្ហាញពេលឯកសារ និងគម្រោងចែងបរិមាណក្នុងខ្នាតខុសគ្នា ហើយធាតុត្រូវបាននាំចូលដូចដែលបានសរសេរ។ ប្រភេទបំពង់ដែលសំដៅទៅបញ្ជីគ្រឿងបំពង់ដែលគម្រោងនេះមិនមាន ត្រូវបានរាយបញ្ជី សូមនាំចូលបណ្ណាល័យគ្រឿងបំពង់ពីឯកសារតែមួយ ដើម្បីដោះស្រាយវា។<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_lib_import_term",
+                    "value": "ការនាំចូលបណ្ណាល័យពីគម្រោងផ្សេង",
+                    "english": "Importing libraries from another project"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_lib_example_term",
+                    "value": "ឧទាហរណ៍លើ Net1",
+                    "english": "Example on Net1"
+                }
+            }
+        },
+        "lpn_file_import_inp": {
+            "reason": "english_changed",
+            "current_value": "នាំចូលឯកសារ EPANET…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_menu",
+                    "value": "នាំចូល…",
+                    "english": "Import…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "អានបណ្ដាញចេញពីឯកសារ EPANET ទាំងឯកសារអត្ថបទ .inp ឬឯកសារ .net ដែល EPANET រក្សាទុក រួចរក្សាទុកវានៅក្នុងកម្មវិធីរុករកនេះជាគម្រោងថ្មី។",
+                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort)."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_inp_tip",
+                "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort).",
+                "value": "អានបណ្ដាញចេញពីឯកសារ EPANET ទាំងឯកសារអត្ថបទ .inp ឬឯកសារ .net ដែល EPANET រក្សាទុក រួចរក្សាទុកវានៅក្នុងកម្មវិធីរុករកនេះជាគម្រោងថ្មី។"
+            }
+        },
+        "lpn_file_export_workspace_tip": {
+            "reason": "english_changed",
+            "current_value": "ទាញយកឯកសារតូចមួយដែលផ្ទុកកន្លែងដែលប្រអប់របស់អ្នកនៅ ទំហំរបស់ពួកវា ប្រអប់ណាបើក ឬភ្ជាប់ និងទំហំផ្ទាំង និងជួរឈររបស់អ្នក បូកជម្រើសបង្ហាញនៃទំព័រនេះ ដូចជាពពុះជំនួយ និងកាតពេលដាក់ទ្រនិចណាដែលបង្ហាញ។ គម្រោង ការកំណត់គម្រោង និងខូគីរបស់អ្នក (ភាសា ការយល់ព្រម ឯកតា) មិននៅក្នុងវាទេ។ ផ្ទុកវាលើអេក្រង់ ឬកម្មវិធីរុករកផ្សេងដោយ ឯកសារ នាំចូល កន្លែងធ្វើការ។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_item_workspace",
+                    "value": "កន្លែងធ្វើការ…",
+                    "english": "Workspace…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_workspace",
+                    "value": "កន្លែងធ្វើការ…",
+                    "english": "Workspace…"
+                }
+            }
+        },
+        "lpn_file_import_workspace_tip": {
+            "reason": "english_changed",
+            "current_value": "អនុវត្តឯកសារកន្លែងធ្វើការដែលបានរក្សាទុកដោយ ឯកសារ នាំចេញ កន្លែងធ្វើការ៖ ទីតាំង និងទំហំប្រអប់ ការភ្ជាប់ ទំហំផ្ទាំង និងជម្រើសបង្ហាញនៃទំព័រនេះ ដូចជាពពុះជំនួយ និងកាតពេលដាក់ទ្រនិចណាដែលបង្ហាញ។ គម្រោង និងខូគីរបស់អ្នកមិនត្រូវបានប៉ះពាល់ទេ។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace",
+                    "value": "កន្លែងធ្វើការ…",
+                    "english": "Workspace…"
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "កន្លែងធ្វើការត្រូវបានរក្សាទុកទៅ {file}៖ ការកំណត់ {n}។",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_workspace",
+                "english": "Workspace…",
+                "value": "កន្លែងធ្វើការ…"
+            }
+        },
+        "lpn_full_needs_run": {
+            "reason": "english_changed",
+            "current_value": "របាយការណ៍ពេញលេញរាយថ្នាំង និងតំណគ្រប់មួយ នៅជំហានពេលវេលារាយការណ៍គ្រប់ជំហាន។ ចុច ដំណើរការ រួចបើក ទឹក, របាយការណ៍, របាយការណ៍ពេញលេញ។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_title",
+                    "value": "របាយការណ៍ពេញលេញ",
+                    "english": "Full report"
+                },
+                "next_translated": {
+                    "key": "lpn_full_note",
+                    "value": "ជួរដេកមួយក្នុងមួយថ្នាំង ឬតំណ ក្នុងមួយជំហានពេលវេលារាយការណ៍ ក្នុងឯកតាដែលបានបង្ហាញនៅលើផ្ទាំងតារាង។ ក្រឡាទទេជាជួរឈរដែលបរិមាណនោះគ្មាន។ ការទាញយក ឬបោះពុម្ពនាំយកគ្រប់ជំហានពេលវេលា; តារាងខាងក្រោមបង្ហាញតែមួយក្នុងមួយពេល។",
+                    "english": "One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time."
+                }
+            }
+        },
+        "lpn_library_import": {
+            "reason": "english_changed",
+            "current_value": "នាំចូលបណ្ណាល័យ…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "បញ្ជីគ្រឿងបំពង់នេះកំពុងប្រើដោយបំពង់ ({count})៖ {ids}។ សូមផ្ដាច់វាចេញពីពួកវាមុននឹងលុប។",
+                    "english": "This fittings list is used by pipes ({count}): {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_library_import_tip",
+                    "value": "ជ្រើសរើសឯកសារគម្រោងមួយផ្សេងទៀត ហើយចម្លងបណ្ណាល័យទាំងមូលពីវាចូលទៅគម្រោងនេះ។ អ្វីៗដែលឈ្មោះរបស់វាត្រូវបានប្រើរួចហើយនៅទីនេះ ត្រូវបានរំលង ហើយបានរាយ ដូច្នេះគ្មានអ្វីដែលអ្នកមានរួចហើយត្រូវបានផ្លាស់ប្ដូរទេ។",
+                    "english": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed."
+                }
+            },
+            "tip": {
+                "key": "lpn_library_import_tip",
+                "english": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
+                "value": "ជ្រើសរើសឯកសារគម្រោងមួយផ្សេងទៀត ហើយចម្លងបណ្ណាល័យទាំងមូលពីវាចូលទៅគម្រោងនេះ។ អ្វីៗដែលឈ្មោះរបស់វាត្រូវបានប្រើរួចហើយនៅទីនេះ ត្រូវបានរំលង ហើយបានរាយ ដូច្នេះគ្មានអ្វីដែលអ្នកមានរួចហើយត្រូវបានផ្លាស់ប្ដូរទេ។"
+            }
+        },
+        "lpn_crit_minpressure_tip": {
+            "reason": "english_changed",
+            "current_value": "នេះជាលេខដូចគ្នានឹងសម្ពាធទាបបំផុតដែលអនុញ្ញាតនៅកន្លែងផ្សេងក្នុងលំហូរពន្លត់អគ្គីភ័យ៖ ការវិភាគ។ ការប្ដូរវានៅទីនេះប្ដូរវានៅទីនោះដែរ។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_minpressure",
+                    "value": "សម្ពាធទាបបំផុតដែលអនុញ្ញាត",
+                    "english": "Lowest pressure allowed"
+                },
+                "next_translated": {
+                    "key": "lpn_crit_col_asset",
+                    "value": "ធាតុ",
+                    "english": "Asset"
+                }
+            },
+            "label": {
+                "key": "lpn_crit_minpressure",
+                "english": "Lowest pressure allowed",
+                "value": "សម្ពាធទាបបំផុតដែលអនុញ្ញាត"
+            }
+        },
+        "lpn_ds_minpressure_tip": {
+            "reason": "english_changed",
+            "current_value": "នេះជាលេខដូចគ្នានឹង សម្ពាធទាបបំផុតដែលអនុញ្ញាត នៅកន្លែងផ្សេងក្នុងលំហូរពន្លត់អគ្គីភ័យ៖ ការវិភាគ។ ការផ្លាស់ប្ដូរវានៅទីនេះផ្លាស់ប្ដូរវានៅទីនោះ។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ds_minpressure",
+                    "value": "សម្ពាធទាបបំផុតដែលអនុញ្ញាត",
+                    "english": "Lowest pressure allowed"
+                },
+                "next_translated": {
+                    "key": "lpn_ds_head_scale",
+                    "value": "ធ្វើមាត្រដ្ឋានតម្រូវការ",
+                    "english": "Scale the demands"
+                }
+            },
+            "label": {
+                "key": "lpn_ds_minpressure",
+                "english": "Lowest pressure allowed",
+                "value": "សម្ពាធទាបបំផុតដែលអនុញ្ញាត"
+            }
+        },
+        "lpn_file_import_survey": {
+            "reason": "english_changed",
+            "current_value": "នាំចូលចំណុចស្ទង់…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_analyze_time_moved",
+                    "value": "⚠ នេះត្រូវបានគណនានៅ {time} ហើយនាឡិកាឥឡូវនៅ {now}។ សូមដំណើរការវាម្ដងទៀតសម្រាប់ជំហានពេលវេលាដែលនៅលើអេក្រង់។",
+                    "english": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "អានបញ្ជីចំណុចស្ទង់ពីឯកសារអត្ថបទ ហើយបង្កើតថ្នាំងមួយនៅចំណុចនីមួយៗ ដោយយកការកំណត់ធាតុថ្មីសម្រាប់អ្វីៗដែលឯកសារមិនបានចែង។ គ្មានបំពង់ត្រូវបានគូរទេ លុះត្រាតែអ្នកធីក អានការពិពណ៌នាជាលេខកូដវាល ហើយគ្មានជួរដេកណាត្រូវបានលុបដោយមិនបានដាក់ឈ្មោះទេ។ វាអានប្រព័ន្ធកូអរដោនេដែលគម្រោងនេះប្រើរួចហើយ ទោះបានតម្រៀបភូមិសាស្ត្រ ឬអត់ក៏ដោយ។",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_survey_tip",
+                "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
+                "value": "អានបញ្ជីចំណុចស្ទង់ពីឯកសារអត្ថបទ ហើយបង្កើតថ្នាំងមួយនៅចំណុចនីមួយៗ ដោយយកការកំណត់ធាតុថ្មីសម្រាប់អ្វីៗដែលឯកសារមិនបានចែង។ គ្មានបំពង់ត្រូវបានគូរទេ លុះត្រាតែអ្នកធីក អានការពិពណ៌នាជាលេខកូដវាល ហើយគ្មានជួរដេកណាត្រូវបានលុបដោយមិនបានដាក់ឈ្មោះទេ។ វាអានប្រព័ន្ធកូអរដោនេដែលគម្រោងនេះប្រើរួចហើយ ទោះបានតម្រៀបភូមិសាស្ត្រ ឬអត់ក៏ដោយ។"
+            }
+        },
+        "lpn_file_import_shapes": {
+            "reason": "english_changed",
+            "current_value": "នាំចូលរូបគូរ GeoJSON…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "អានបញ្ជីចំណុចស្ទង់ពីឯកសារអត្ថបទ ហើយបង្កើតថ្នាំងមួយនៅចំណុចនីមួយៗ ដោយយកការកំណត់ធាតុថ្មីសម្រាប់អ្វីៗដែលឯកសារមិនបានចែង។ គ្មានបំពង់ត្រូវបានគូរទេ លុះត្រាតែអ្នកធីក អានការពិពណ៌នាជាលេខកូដវាល ហើយគ្មានជួរដេកណាត្រូវបានលុបដោយមិនបានដាក់ឈ្មោះទេ។ វាអានប្រព័ន្ធកូអរដោនេដែលគម្រោងនេះប្រើរួចហើយ ទោះបានតម្រៀបភូមិសាស្ត្រ ឬអត់ក៏ដោយ។",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "អានចំណុច បន្ទាត់ និងពហុកោណនៃឯកសារ GeoJSON ចូលក្នុងគម្រោងនេះជារូបគូរ។ ធាតុបណ្ដាញក្នុងឯកសារមិនត្រូវបាននាំចូលទេ សូមនាំចូលបណ្ដាញពីឯកសារ EPANET ឬដោយ នាំចូលបណ្ដាញ GeoJSON។ គម្រោងត្រូវតែមានទីតាំងលើផែនដី ឬចែងប្រព័ន្ធកូអរដោនេ។",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_shapes_tip",
+                "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
+                "value": "អានចំណុច បន្ទាត់ និងពហុកោណនៃឯកសារ GeoJSON ចូលក្នុងគម្រោងនេះជារូបគូរ។ ធាតុបណ្ដាញក្នុងឯកសារមិនត្រូវបាននាំចូលទេ សូមនាំចូលបណ្ដាញពីឯកសារ EPANET ឬដោយ នាំចូលបណ្ដាញ GeoJSON។ គម្រោងត្រូវតែមានទីតាំងលើផែនដី ឬចែងប្រព័ន្ធកូអរដោនេ។"
+            }
+        },
+        "lpn_file_import_shapes_tip": {
+            "reason": "english_changed",
+            "current_value": "អានចំណុច បន្ទាត់ និងពហុកោណនៃឯកសារ GeoJSON ចូលក្នុងគម្រោងនេះជារូបគូរ។ ធាតុបណ្ដាញក្នុងឯកសារមិនត្រូវបាននាំចូលទេ សូមនាំចូលបណ្ដាញពីឯកសារ EPANET ឬដោយ នាំចូលបណ្ដាញ GeoJSON។ គម្រោងត្រូវតែមានទីតាំងលើផែនដី ឬចែងប្រព័ន្ធកូអរដោនេ។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes",
+                    "value": "នាំចូលរូបគូរ GeoJSON…",
+                    "english": "GeoJSON shapes…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_gjnet",
+                    "value": "នាំចូលបណ្ដាញ GeoJSON…",
+                    "english": "GeoJSON network…"
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_shapes",
+                "english": "GeoJSON shapes…",
+                "value": "នាំចូលរូបគូរ GeoJSON…"
+            }
+        },
+        "lpn_file_import_gjnet": {
+            "reason": "english_changed",
+            "current_value": "នាំចូលបណ្ដាញ GeoJSON…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "អានចំណុច បន្ទាត់ និងពហុកោណនៃឯកសារ GeoJSON ចូលក្នុងគម្រោងនេះជារូបគូរ។ ធាតុបណ្ដាញក្នុងឯកសារមិនត្រូវបាននាំចូលទេ សូមនាំចូលបណ្ដាញពីឯកសារ EPANET ឬដោយ នាំចូលបណ្ដាញ GeoJSON។ គម្រោងត្រូវតែមានទីតាំងលើផែនដី ឬចែងប្រព័ន្ធកូអរដោនេ។",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_gjnet_tip",
+                    "value": "បើកឯកសារ GeoJSON ជាគម្រោងថ្មី។ ចំណុចត្រូវបាននាំចូលជាថ្នាំង អាងស្តុក ឬធុងទឹក ហើយបន្ទាត់ជាបំពង់។ ឯកសារដែលបាននាំចេញពីទំព័រនេះត្រូវបានអានដូចដែលបានសរសេរ សម្រាប់ឯកសារផ្សេងទៀត មួយជំហានភ្ជាប់វាលរបស់វាទៅលក្ខណៈសម្បត្តិ និងខ្នាត។",
+                    "english": "Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_gjnet_tip",
+                "english": "Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.",
+                "value": "បើកឯកសារ GeoJSON ជាគម្រោងថ្មី។ ចំណុចត្រូវបាននាំចូលជាថ្នាំង អាងស្តុក ឬធុងទឹក ហើយបន្ទាត់ជាបំពង់។ ឯកសារដែលបាននាំចេញពីទំព័រនេះត្រូវបានអានដូចដែលបានសរសេរ សម្រាប់ឯកសារផ្សេងទៀត មួយជំហានភ្ជាប់វាលរបស់វាទៅលក្ខណៈសម្បត្តិ និងខ្នាត។"
+            }
+        },
+        "lpn_gjnet_note_not_held": {
+            "reason": "english_changed",
+            "current_value": "ឯកសារ GeoJSON មិនមានច្បាប់ត្រួតពិនិត្យ ក្បួន ការកំណត់ពេលវេលា ស្លាកអត្ថបទ ជម្រើស EPANET ឬបណ្ណាល័យប្រភេទបំពង់ គ្រឿងបំពង់ និងខ្សែកោងប្រសិទ្ធភាពទេ ដូច្នេះគ្មានអ្វីក្នុងចំណោមទាំងនេះត្រូវបាននាំចូលទេ។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_end_off_node",
+                    "value": "បន្ទាត់នៃតំណនីមួយៗទាំងនេះមិនចាប់ផ្ដើម ឬបញ្ចប់នៅថ្នាំងរបស់វាទេ។ ទីតាំងថ្នាំងត្រូវបានប្រើ។",
+                    "english": "The line of each of these links does not start or end at its node. The node position was used."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "រូបគូរ {n} ត្រូវបាននាំចូលពី {file}។",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_file_import_dxf": {
+            "reason": "english_changed",
+            "current_value": "នាំចូលរូបគូរ DXF…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geojson_import_unreadable",
+                    "value": "{file} មិនមែនជាឯកសារ GeoJSON ទេ៖ {detail}",
+                    "english": "{file} is not a GeoJSON file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_dxf_tip",
+                    "value": "អានចំណុច បន្ទាត់ និងខ្សែពហុបន្ទាត់នៃឯកសារ ASCII DXF ចូលគម្រោងនេះជារូបគូរ ដោយរក្សាឈ្មោះស្រទាប់នីមួយៗជាលក្ខណៈសម្បត្តិ។ អង្គភាពផ្សេងទៀតត្រូវបានរាប់ និងរាយ មិនត្រូវបាននាំចូលទេ។ កូអរដោនេត្រូវបានអានជា X និង Y នៃគម្រោងនេះ ដោយគ្មានការបម្លែង។",
+                    "english": "Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_dxf_tip",
+                "english": "Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion.",
+                "value": "អានចំណុច បន្ទាត់ និងខ្សែពហុបន្ទាត់នៃឯកសារ ASCII DXF ចូលគម្រោងនេះជារូបគូរ ដោយរក្សាឈ្មោះស្រទាប់នីមួយៗជាលក្ខណៈសម្បត្តិ។ អង្គភាពផ្សេងទៀតត្រូវបានរាប់ និងរាយ មិនត្រូវបាននាំចូលទេ។ កូអរដោនេត្រូវបានអានជា X និង Y នៃគម្រោងនេះ ដោយគ្មានការបម្លែង។"
+            }
+        },
+        "lpn_file_import_shp": {
+            "reason": "english_changed",
+            "current_value": "នាំចូលរូបគូរ shapefile…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_dxf_tip",
+                    "value": "អានចំណុច បន្ទាត់ និងខ្សែពហុបន្ទាត់នៃឯកសារ ASCII DXF ចូលគម្រោងនេះជារូបគូរ ដោយរក្សាឈ្មោះស្រទាប់នីមួយៗជាលក្ខណៈសម្បត្តិ។ អង្គភាពផ្សេងទៀតត្រូវបានរាប់ និងរាយ មិនត្រូវបាននាំចូលទេ។ កូអរដោនេត្រូវបានអានជា X និង Y នៃគម្រោងនេះ ដោយគ្មានការបម្លែង។",
+                    "english": "Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_shp_tip",
+                    "value": "អានចំណុច បន្ទាត់ និងពហុកោណនៃ ESRI shapefile ចូលគម្រោងនេះជារូបគូរ ដោយរក្សាជួរឈរគុណលក្ខណៈជាលក្ខណៈសម្បត្តិ។ ជ្រើសរើស .zip ឬ .shp រួមជាមួយ .shx, .dbf និង .prj របស់វា (សង្កត់ Ctrl ឬ Shift ដើម្បីជ្រើសរើសច្រើន)។ កូអរដោនេក្នុងប្រព័ន្ធកូអរដោនេផ្សេងពីគម្រោងត្រូវបានបម្លែង ហើយសេចក្តីជូនដំណឹងចែងអំពីរឿងនេះ។",
+                    "english": "Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_shp_tip",
+                "english": "Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this.",
+                "value": "អានចំណុច បន្ទាត់ និងពហុកោណនៃ ESRI shapefile ចូលគម្រោងនេះជារូបគូរ ដោយរក្សាជួរឈរគុណលក្ខណៈជាលក្ខណៈសម្បត្តិ។ ជ្រើសរើស .zip ឬ .shp រួមជាមួយ .shx, .dbf និង .prj របស់វា (សង្កត់ Ctrl ឬ Shift ដើម្បីជ្រើសរើសច្រើន)។ កូអរដោនេក្នុងប្រព័ន្ធកូអរដោនេផ្សេងពីគម្រោងត្រូវបានបម្លែង ហើយសេចក្តីជូនដំណឹងចែងអំពីរឿងនេះ។"
+            }
+        }
+    },
     "key_plain": [],
     "key_notes": [],
     "key_concepts": [],
-    "uniqueness_attention": []
+    "uniqueness_attention": [
+        {
+            "instruction": "Find unique names for each.",
+            "members": [
+                {
+                    "plain_name": "short word, name, or tag stuck on a pipe or point",
+                    "english_rendering": "Tag",
+                    "preferred_translation": "ស្លាកសម្គាល់"
+                },
+                {
+                    "plain_name": "words, values, or names the program writes beside a pipe or point",
+                    "english_rendering": "Label",
+                    "preferred_translation": ""
+                },
+                {
+                    "plain_name": "words, notes, or captions you type onto the map",
+                    "english_rendering": "Text",
+                    "preferred_translation": ""
+                },
+                {
+                    "plain_name": "note, remark, or description for people about one item",
+                    "english_rendering": "Description",
+                    "preferred_translation": ""
+                },
+                {
+                    "plain_name": "short code that names one item, like J-1 or P-12",
+                    "english_rendering": "ID",
+                    "preferred_translation": ""
+                }
+            ]
+        }
+    ]
 }

@@ -2,8 +2,8 @@
     "meta": {
         "language": "my",
         "expected_key_count": 3025,
-        "delta_key_count": 0,
-        "english_changed_key_count": 0,
+        "delta_key_count": 15,
+        "english_changed_key_count": 15,
         "exempt_key_count": 46,
         "exempt_keys": [
             "u_imgd",
@@ -55,7 +55,9 @@
         ],
         "out_of_scope_key_count": 7,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
-        "active_prefixes": [],
+        "active_prefixes": [
+            "lpn"
+        ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "reason_notes": "key_context[key].reason says what to do with each key. missing: the key is not in your file; append it as a new line. blank, equal_to_english, english_changed: the key IS already in your file, holding key_context[key].current_value; REPLACE that value in place and never append a second line for the same key. english_changed means the English was reworded after your file's translation was written: translate the new English, and keep words from the old translation only where they still say what the new English says.",
@@ -71,12 +73,371 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "No glossary term is used by the strings in this batch.",
-    "keys_to_translate": [],
-    "keys": [],
-    "key_context": [],
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: ရေစီးနှုန်း\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: ဖိအား\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: ရေးဆွဲပုံ\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "keys_to_translate": {
+        "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_file_import_inp": "EPANET file…",
+        "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
+        "lpn_library_import": "Libraries…",
+        "lpn_crit_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ds_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_file_import_survey": "Surveyed points…",
+        "lpn_file_import_shapes": "GeoJSON shapes…",
+        "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
+        "lpn_file_import_gjnet": "GeoJSON network…",
+        "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
+        "lpn_file_import_dxf": "DXF shapes…",
+        "lpn_file_import_shp": "Shapefile shapes…"
+    },
+    "keys": {
+        "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_file_import_inp": "EPANET file…",
+        "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
+        "lpn_library_import": "Libraries…",
+        "lpn_crit_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ds_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_file_import_survey": "Surveyed points…",
+        "lpn_file_import_shapes": "GeoJSON shapes…",
+        "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
+        "lpn_file_import_gjnet": "GeoJSON network…",
+        "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
+        "lpn_file_import_dxf": "DXF shapes…",
+        "lpn_file_import_shp": "Shapefile shapes…"
+    },
+    "key_context": {
+        "lpn_guide_lib_import_def": {
+            "reason": "english_changed",
+            "current_value": "<p>ဖိုင်၊ တင်သွင်းရန်…၊ စာရင်းများ တင်သွင်းရန်… က အခြားပရောဂျက်ဖိုင်တစ်ခုကို ဖွင့်ပြီး စာရင်းတစ်ခုလုံးကို ၎င်းမှ ဤပရောဂျက်သို့ ကူးထည့်သည်။ ဤနေရာတွင် အမည်သုံးပြီးသားအရာကို ကျော်၍ စာရင်းပြသဖြင့် ဤနေရာတွင် ရှိပြီးသားအရာ မပြောင်းပါ။ ဖိုင်နှင့် ပရောဂျက်က ပမာဏတစ်ခုကို မတူသောယူနစ်ဖြင့် ဖော်ပြထားလျှင် သတိပေးချက်တစ်ခု ပေါ်ပြီး အရာများကို ရေးထားသည့်အတိုင်း တင်သွင်းသည်။ ဤပရောဂျက်တွင် မရှိသော ချိတ်ဆက်ပစ္စည်းစာရင်းကို ရည်ညွှန်းသော ပိုက်အမျိုးအစားများကို စာရင်းပြသည်၊ ဖြေရှင်းရန် ထိုဖိုင်တစ်ခုတည်းမှ ချိတ်ဆက်ပစ္စည်း စာရင်းကို တင်သွင်းပါ။<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_lib_import_term",
+                    "value": "အခြားပရောဂျက်မှ စာရင်းများ တင်သွင်းခြင်း",
+                    "english": "Importing libraries from another project"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_lib_example_term",
+                    "value": "Net1 ပေါ်ရှိ ဥပမာ",
+                    "english": "Example on Net1"
+                }
+            }
+        },
+        "lpn_file_import_inp": {
+            "reason": "english_changed",
+            "current_value": "EPANET ဖိုင် တင်သွင်းရန်…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_menu",
+                    "value": "တင်သွင်းရန်…",
+                    "english": "Import…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "EPANET ဖိုင်တစ်ခု - .inp စာသားဖိုင် (သို့) EPANET သိမ်းဆည်းသော .net ဖိုင် တစ်ခုခုမှ ကွန်ရက်တစ်ခုကို ဖတ်ယူပြီး၊ ဤဘရောက်ဇာထဲတွင် ပရောဂျက်အသစ်တစ်ခုအဖြစ် သိမ်းဆည်းသည်။",
+                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort)."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_inp_tip",
+                "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort).",
+                "value": "EPANET ဖိုင်တစ်ခု - .inp စာသားဖိုင် (သို့) EPANET သိမ်းဆည်းသော .net ဖိုင် တစ်ခုခုမှ ကွန်ရက်တစ်ခုကို ဖတ်ယူပြီး၊ ဤဘရောက်ဇာထဲတွင် ပရောဂျက်အသစ်တစ်ခုအဖြစ် သိမ်းဆည်းသည်။"
+            }
+        },
+        "lpn_file_export_workspace_tip": {
+            "reason": "english_changed",
+            "current_value": "သင့်ဘောက်စ်များ တည်ရှိရာ၊ ၎င်းတို့၏ အရွယ်အစား၊ မည်သည်တို့ ပွင့်နေသည် သို့မဟုတ် ကပ်ထားသည်၊ သင့်ပင်န်နှင့် ကော်လံ အရွယ်အစားများ၊ ထို့အပြင် မည်သည့် အကူအညီပူဖောင်းများနှင့် hover ကတ်ကို ပြသည်ဟူသော ဤစာမျက်နှာ၏ ပြသမှု ရွေးစရာများပါသော ဖိုင်အသေးတစ်ခုကို ဒေါင်းလုဒ်လုပ်ပါ။ သင့်ပရောဂျက်များ၊ ပရောဂျက်ဆက်တင်များနှင့် ကွတ်ကီးများ (ဘာသာစကား၊ ခွင့်ပြုချက်၊ ယူနစ်များ) မပါဝင်ပါ။ အခြားစခရင် သို့မဟုတ် ဘရောက်ဇာတွင် ဖိုင်၊ တင်သွင်းရန်၊ လုပ်ငန်းခွင် ဖြင့် တင်ပါ။",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_item_workspace",
+                    "value": "လုပ်ငန်းခွင်…",
+                    "english": "Workspace…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_workspace",
+                    "value": "လုပ်ငန်းခွင်…",
+                    "english": "Workspace…"
+                }
+            }
+        },
+        "lpn_file_import_workspace_tip": {
+            "reason": "english_changed",
+            "current_value": "ဖိုင်၊ ထုတ်ယူရန်၊ လုပ်ငန်းခွင် ဖြင့် သိမ်းထားသော လုပ်ငန်းခွင်ဖိုင်ကို အသုံးပြုပါ - ဘောက်စ်တည်နေရာနှင့် အရွယ်အစားများ၊ ကပ်ထားမှု၊ ပင်န်အရွယ်အစားများနှင့် မည်သည့် အကူအညီပူဖောင်းများနှင့် hover ကတ်ကို ပြသည်ဟူသော ဤစာမျက်နှာ၏ ပြသမှု ရွေးစရာများ။ သင့်ပရောဂျက်များနှင့် ကွတ်ကီးများကို မထိပါ။",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace",
+                    "value": "လုပ်ငန်းခွင်…",
+                    "english": "Workspace…"
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "လုပ်ငန်းခွင်ကို {file} သို့ သိမ်းပြီးပါပြီ - ဆက်တင် {n} ခု။",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_workspace",
+                "english": "Workspace…",
+                "value": "လုပ်ငန်းခွင်…"
+            }
+        },
+        "lpn_full_needs_run": {
+            "reason": "english_changed",
+            "current_value": "အပြည့်အစုံ အစီရင်ခံစာသည် အစီရင်ခံ အချိန်အဆင့်တိုင်းရှိ ဆက်စပ်နေရာတိုင်းနှင့် လိုင်းတိုင်းကို စာရင်းပြုစုသည်။ တွက်ချက်ရန် ကို နှိပ်ပါ၊ ထို့နောက် ရေ၊ အစီရင်ခံစာများ၊ အပြည့်အစုံ အစီရင်ခံစာ ကို ဖွင့်ပါ။",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_title",
+                    "value": "အပြည့်အစုံ အစီရင်ခံစာ",
+                    "english": "Full report"
+                },
+                "next_translated": {
+                    "key": "lpn_full_note",
+                    "value": "ဆက်စပ်နေရာ (သို့) လိုင်းတစ်ခုစီ၊ အစီရင်ခံ အချိန်အဆင့်တစ်ခုစီအတွက် အတန်းတစ်ခု၊ ဇယားများ panel ပေါ်တွင် ပြထားသော ယူနစ်များဖြင့်။ ဗလာဆဲလ်သည် ထိုပမာဏ မရှိသော ကော်လံဖြစ်သည်။ ဒေါင်းလုတ်ချခြင်း (သို့) ပရင့်ထုတ်ခြင်းသည် အချိန်အဆင့်တိုင်းကို သယ်ဆောင်သည်; အောက်ပါ ဇယားသည် တစ်ကြိမ်လျှင် တစ်ခုကိုသာ ပြသသည်။",
+                    "english": "One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time."
+                }
+            }
+        },
+        "lpn_library_import": {
+            "reason": "english_changed",
+            "current_value": "စာရင်းများ တင်သွင်းရန်…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "ဤချိတ်ဆက်ပစ္စည်း စာရင်းကို အသုံးပြုသော ပိုက်များ ({count}) - {ids}။ ဖျက်ခြင်းမပြုမီ ၎င်းတို့မှ ဖြုတ်ချပါ။",
+                    "english": "This fittings list is used by pipes ({count}): {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_library_import_tip",
+                    "value": "အခြားပရောဂျက်ဖိုင်တစ်ခုကို ရွေးချယ်ပြီး ၎င်းမှ စာရင်းများတစ်ခုလုံးကို ဤပရောဂျက်ထဲသို့ ကူးယူပါ။ ဤနေရာတွင် အမည်တူ ရှိပြီးသားအရာများကို ကျော်သွားပြီး စာရင်းပြုစုသည်၊ သို့ဖြစ်၍ သင့်တွင် ရှိပြီးသား မည်သည့်အရာမျှ ပြောင်းလဲမည် မဟုတ်ပါ။",
+                    "english": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed."
+                }
+            },
+            "tip": {
+                "key": "lpn_library_import_tip",
+                "english": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
+                "value": "အခြားပရောဂျက်ဖိုင်တစ်ခုကို ရွေးချယ်ပြီး ၎င်းမှ စာရင်းများတစ်ခုလုံးကို ဤပရောဂျက်ထဲသို့ ကူးယူပါ။ ဤနေရာတွင် အမည်တူ ရှိပြီးသားအရာများကို ကျော်သွားပြီး စာရင်းပြုစုသည်၊ သို့ဖြစ်၍ သင့်တွင် ရှိပြီးသား မည်သည့်အရာမျှ ပြောင်းလဲမည် မဟုတ်ပါ။"
+            }
+        },
+        "lpn_crit_minpressure_tip": {
+            "reason": "english_changed",
+            "current_value": "ဤသည်မှာ မီးငြိမ်းသတ်ရေးစီးနှုန်း ခွဲခြမ်းစိတ်ဖြာမှုရှိ အခြားနေရာတွင် ခွင့်ပြုထားသော အနိမ့်ဆုံးဖိအား နှင့် တူညီသော ကိန်းဂဏန်းဖြစ်သည်။ ဤနေရာတွင် ပြောင်းလျှင် ထိုနေရာတွင်လည်း ပြောင်းသည်။",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_minpressure",
+                    "value": "ခွင့်ပြုထားသော အနိမ့်ဆုံးဖိအား",
+                    "english": "Lowest pressure allowed"
+                },
+                "next_translated": {
+                    "key": "lpn_crit_col_asset",
+                    "value": "အစိတ်အပိုင်း",
+                    "english": "Asset"
+                }
+            },
+            "label": {
+                "key": "lpn_crit_minpressure",
+                "english": "Lowest pressure allowed",
+                "value": "ခွင့်ပြုထားသော အနိမ့်ဆုံးဖိအား"
+            }
+        },
+        "lpn_ds_minpressure_tip": {
+            "reason": "english_changed",
+            "current_value": "ဤသည်မှာ မီးငြိမ်းသတ်ရေးစီးနှုန်း ခွဲခြမ်းစိတ်ဖြာမှုတွင် ရှိသော ခွင့်ပြုထားသော အနိမ့်ဆုံးဖိအားနှင့် တူညီသော ဂဏန်းဖြစ်သည်။ ဤနေရာတွင် ပြောင်းလျှင် ထိုနေရာတွင်ပါ ပြောင်းသည်။",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ds_minpressure",
+                    "value": "ခွင့်ပြုထားသော အနိမ့်ဆုံးဖိအား",
+                    "english": "Lowest pressure allowed"
+                },
+                "next_translated": {
+                    "key": "lpn_ds_head_scale",
+                    "value": "လိုအင်များကို စကေးချဲ့ရန်",
+                    "english": "Scale the demands"
+                }
+            },
+            "label": {
+                "key": "lpn_ds_minpressure",
+                "english": "Lowest pressure allowed",
+                "value": "ခွင့်ပြုထားသော အနိမ့်ဆုံးဖိအား"
+            }
+        },
+        "lpn_file_import_survey": {
+            "reason": "english_changed",
+            "current_value": "စစ်တမ်းကောက်ယူထားသော အမှတ်များ တင်သွင်းရန်…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_analyze_time_moved",
+                    "value": "⚠ ဤသည်ကို {time} တွင် တွက်ချက်ခဲ့ပြီး ယခု နာရီသည် {now} တွင် ရှိသည်။ မျက်နှာပြင်ပေါ်ရှိ အချိန်အဆင့်အတွက် ထပ်မံ လည်ပတ်ပါ။",
+                    "english": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "စာသားဖိုင်မှ စစ်တမ်းကောက်ယူထားသော အမှတ်စာရင်းကို ဖတ်ပြီး အမှတ်တစ်ခုစီတွင် ဆက်စပ်နေရာတစ်ခု ပြုလုပ်ပါ၊ ဖိုင်က မဖော်ပြသည့်အရာအားလုံးအတွက် အစိတ်အပိုင်းအသစ် ဆက်တင်များကို သုံးသည်။ ဖော်ပြချက်ကို ကွင်းဆင်းကုဒ်များအဖြစ် ဖတ်ရန် ကို မရွေးလျှင် ပိုက်လိုင်း မရေးဆွဲပါ၊ အတန်းတစ်ခုမျှ အမည်မဖော်ဘဲ မကျန်ရစ်ပါ။ ဤပရောဂျက် သုံးပြီးသား သြဒီနိတ်စနစ်ကို ဖတ်သည်၊ ကမ္ဘာမြေပေါ်နေရာ သတ်မှတ်ထားသည်ဖြစ်စေ မဖြစ်စေ။",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_survey_tip",
+                "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
+                "value": "စာသားဖိုင်မှ စစ်တမ်းကောက်ယူထားသော အမှတ်စာရင်းကို ဖတ်ပြီး အမှတ်တစ်ခုစီတွင် ဆက်စပ်နေရာတစ်ခု ပြုလုပ်ပါ၊ ဖိုင်က မဖော်ပြသည့်အရာအားလုံးအတွက် အစိတ်အပိုင်းအသစ် ဆက်တင်များကို သုံးသည်။ ဖော်ပြချက်ကို ကွင်းဆင်းကုဒ်များအဖြစ် ဖတ်ရန် ကို မရွေးလျှင် ပိုက်လိုင်း မရေးဆွဲပါ၊ အတန်းတစ်ခုမျှ အမည်မဖော်ဘဲ မကျန်ရစ်ပါ။ ဤပရောဂျက် သုံးပြီးသား သြဒီနိတ်စနစ်ကို ဖတ်သည်၊ ကမ္ဘာမြေပေါ်နေရာ သတ်မှတ်ထားသည်ဖြစ်စေ မဖြစ်စေ။"
+            }
+        },
+        "lpn_file_import_shapes": {
+            "reason": "english_changed",
+            "current_value": "GeoJSON ရေးဆွဲပုံများ တင်သွင်းရန်…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "စာသားဖိုင်မှ စစ်တမ်းကောက်ယူထားသော အမှတ်စာရင်းကို ဖတ်ပြီး အမှတ်တစ်ခုစီတွင် ဆက်စပ်နေရာတစ်ခု ပြုလုပ်ပါ၊ ဖိုင်က မဖော်ပြသည့်အရာအားလုံးအတွက် အစိတ်အပိုင်းအသစ် ဆက်တင်များကို သုံးသည်။ ဖော်ပြချက်ကို ကွင်းဆင်းကုဒ်များအဖြစ် ဖတ်ရန် ကို မရွေးလျှင် ပိုက်လိုင်း မရေးဆွဲပါ၊ အတန်းတစ်ခုမျှ အမည်မဖော်ဘဲ မကျန်ရစ်ပါ။ ဤပရောဂျက် သုံးပြီးသား သြဒီနိတ်စနစ်ကို ဖတ်သည်၊ ကမ္ဘာမြေပေါ်နေရာ သတ်မှတ်ထားသည်ဖြစ်စေ မဖြစ်စေ။",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "GeoJSON ဖိုင်တစ်ခုရှိ အမှတ်များ၊ လိုင်းများနှင့် ပိုလီဂွန်များကို ဤပရောဂျက်ထဲသို့ ရေးဆွဲပုံများအဖြစ် ဖတ်ယူသည်။ ဖိုင်ထဲရှိ ကွန်ရက်အစိတ်အပိုင်းများကို မတင်သွင်းပါ၊ ကွန်ရက်ကို EPANET ဖိုင်မှ သို့မဟုတ် GeoJSON ကွန်ရက် တင်သွင်းရန် ဖြင့် တင်သွင်းပါ။ ပရောဂျက်သည် မြေပေါ်နေရာ တွဲထားရမည် သို့မဟုတ် သြဒီနိတ်စနစ် သတ်မှတ်ထားရမည်။",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_shapes_tip",
+                "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
+                "value": "GeoJSON ဖိုင်တစ်ခုရှိ အမှတ်များ၊ လိုင်းများနှင့် ပိုလီဂွန်များကို ဤပရောဂျက်ထဲသို့ ရေးဆွဲပုံများအဖြစ် ဖတ်ယူသည်။ ဖိုင်ထဲရှိ ကွန်ရက်အစိတ်အပိုင်းများကို မတင်သွင်းပါ၊ ကွန်ရက်ကို EPANET ဖိုင်မှ သို့မဟုတ် GeoJSON ကွန်ရက် တင်သွင်းရန် ဖြင့် တင်သွင်းပါ။ ပရောဂျက်သည် မြေပေါ်နေရာ တွဲထားရမည် သို့မဟုတ် သြဒီနိတ်စနစ် သတ်မှတ်ထားရမည်။"
+            }
+        },
+        "lpn_file_import_shapes_tip": {
+            "reason": "english_changed",
+            "current_value": "GeoJSON ဖိုင်တစ်ခုရှိ အမှတ်များ၊ လိုင်းများနှင့် ပိုလီဂွန်များကို ဤပရောဂျက်ထဲသို့ ရေးဆွဲပုံများအဖြစ် ဖတ်ယူသည်။ ဖိုင်ထဲရှိ ကွန်ရက်အစိတ်အပိုင်းများကို မတင်သွင်းပါ၊ ကွန်ရက်ကို EPANET ဖိုင်မှ သို့မဟုတ် GeoJSON ကွန်ရက် တင်သွင်းရန် ဖြင့် တင်သွင်းပါ။ ပရောဂျက်သည် မြေပေါ်နေရာ တွဲထားရမည် သို့မဟုတ် သြဒီနိတ်စနစ် သတ်မှတ်ထားရမည်။",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes",
+                    "value": "GeoJSON ရေးဆွဲပုံများ တင်သွင်းရန်…",
+                    "english": "GeoJSON shapes…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_gjnet",
+                    "value": "GeoJSON ကွန်ရက် တင်သွင်းရန်…",
+                    "english": "GeoJSON network…"
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_shapes",
+                "english": "GeoJSON shapes…",
+                "value": "GeoJSON ရေးဆွဲပုံများ တင်သွင်းရန်…"
+            }
+        },
+        "lpn_file_import_gjnet": {
+            "reason": "english_changed",
+            "current_value": "GeoJSON ကွန်ရက် တင်သွင်းရန်…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "GeoJSON ဖိုင်တစ်ခုရှိ အမှတ်များ၊ လိုင်းများနှင့် ပိုလီဂွန်များကို ဤပရောဂျက်ထဲသို့ ရေးဆွဲပုံများအဖြစ် ဖတ်ယူသည်။ ဖိုင်ထဲရှိ ကွန်ရက်အစိတ်အပိုင်းများကို မတင်သွင်းပါ၊ ကွန်ရက်ကို EPANET ဖိုင်မှ သို့မဟုတ် GeoJSON ကွန်ရက် တင်သွင်းရန် ဖြင့် တင်သွင်းပါ။ ပရောဂျက်သည် မြေပေါ်နေရာ တွဲထားရမည် သို့မဟုတ် သြဒီနိတ်စနစ် သတ်မှတ်ထားရမည်။",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_gjnet_tip",
+                    "value": "GeoJSON ဖိုင်တစ်ခုကို ပရောဂျက်အသစ်အဖြစ် ဖွင့်ပါ။ အမှတ်များကို ဆက်စပ်နေရာများ၊ ရေကန်များ သို့မဟုတ် ရေတိုက်များအဖြစ်လည်းကောင်း၊ လိုင်းများကို ပိုက်များအဖြစ်လည်းကောင်း တင်သွင်းသည်။ ဤစာမျက်နှာမှ ထုတ်ယူထားသော ဖိုင်ကို ရေးထားသည့်အတိုင်း ဖတ်သည်၊ အခြားဖိုင်တိုင်းအတွက် အဆင့်တစ်ခုက ၎င်း၏ ကွက်များကို ဂုဏ်သတ္တိများနှင့် ယူနစ်များသို့ ချိတ်ဆက်ပေးသည်။",
+                    "english": "Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_gjnet_tip",
+                "english": "Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.",
+                "value": "GeoJSON ဖိုင်တစ်ခုကို ပရောဂျက်အသစ်အဖြစ် ဖွင့်ပါ။ အမှတ်များကို ဆက်စပ်နေရာများ၊ ရေကန်များ သို့မဟုတ် ရေတိုက်များအဖြစ်လည်းကောင်း၊ လိုင်းများကို ပိုက်များအဖြစ်လည်းကောင်း တင်သွင်းသည်။ ဤစာမျက်နှာမှ ထုတ်ယူထားသော ဖိုင်ကို ရေးထားသည့်အတိုင်း ဖတ်သည်၊ အခြားဖိုင်တိုင်းအတွက် အဆင့်တစ်ခုက ၎င်း၏ ကွက်များကို ဂုဏ်သတ္တိများနှင့် ယူနစ်များသို့ ချိတ်ဆက်ပေးသည်။"
+            }
+        },
+        "lpn_gjnet_note_not_held": {
+            "reason": "english_changed",
+            "current_value": "GeoJSON ဖိုင်သည် ထိန်းချုပ်မှုများ၊ စည်းမျဉ်းများ၊ အချိန်ဆက်တင်များ၊ စာသား အညွှန်းများ၊ EPANET ရွေးချယ်စရာများ သို့မဟုတ် ပိုက်အမျိုးအစား၊ ချိတ်ဆက်ပစ္စည်းနှင့် ထိရောက်မှုကွေးမျဉ်း စာရင်းများကို မသိမ်းထားသဖြင့် ဤအရာများတစ်ခုမျှ မတင်သွင်းခဲ့ပါ။",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_end_off_node",
+                    "value": "ဤဆက်သွယ်မှုတစ်ခုစီ၏ လိုင်းသည် ၎င်း၏နေရာတွင် မစသလို မဆုံးပါ။ နေရာ၏ တည်နေရာကို သုံးခဲ့သည်။",
+                    "english": "The line of each of these links does not start or end at its node. The node position was used."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{file} မှ ရေးဆွဲပုံ {n} ခု တင်သွင်းခဲ့သည်။",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_file_import_dxf": {
+            "reason": "english_changed",
+            "current_value": "DXF ရေးဆွဲပုံများ တင်သွင်းရန်…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geojson_import_unreadable",
+                    "value": "{file} သည် GeoJSON ဖိုင် မဟုတ်ပါ - {detail}",
+                    "english": "{file} is not a GeoJSON file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_dxf_tip",
+                    "value": "ASCII DXF ဖိုင်တစ်ခုရှိ အမှတ်များ၊ လိုင်းများနှင့် polyline များကို ဤပရောဂျက်ထဲသို့ ရေးဆွဲပုံများအဖြစ် ဖတ်ယူပြီး အလွှာအမည်တစ်ခုစီကို ဂုဏ်သတ္တိတစ်ခုအဖြစ် ထားသည်။ အခြားအရာများကို ရေတွက်၍ စာရင်းပြုလုပ်သည်၊ မတင်သွင်းပါ။ သြဒီနိတ်များကို ပြောင်းလဲခြင်းမရှိဘဲ ဤပရောဂျက်၏ X နှင့် Y အဖြစ် ဖတ်သည်။",
+                    "english": "Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_dxf_tip",
+                "english": "Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion.",
+                "value": "ASCII DXF ဖိုင်တစ်ခုရှိ အမှတ်များ၊ လိုင်းများနှင့် polyline များကို ဤပရောဂျက်ထဲသို့ ရေးဆွဲပုံများအဖြစ် ဖတ်ယူပြီး အလွှာအမည်တစ်ခုစီကို ဂုဏ်သတ္တိတစ်ခုအဖြစ် ထားသည်။ အခြားအရာများကို ရေတွက်၍ စာရင်းပြုလုပ်သည်၊ မတင်သွင်းပါ။ သြဒီနိတ်များကို ပြောင်းလဲခြင်းမရှိဘဲ ဤပရောဂျက်၏ X နှင့် Y အဖြစ် ဖတ်သည်။"
+            }
+        },
+        "lpn_file_import_shp": {
+            "reason": "english_changed",
+            "current_value": "shapefile ရေးဆွဲပုံများ တင်သွင်းရန်…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_dxf_tip",
+                    "value": "ASCII DXF ဖိုင်တစ်ခုရှိ အမှတ်များ၊ လိုင်းများနှင့် polyline များကို ဤပရောဂျက်ထဲသို့ ရေးဆွဲပုံများအဖြစ် ဖတ်ယူပြီး အလွှာအမည်တစ်ခုစီကို ဂုဏ်သတ္တိတစ်ခုအဖြစ် ထားသည်။ အခြားအရာများကို ရေတွက်၍ စာရင်းပြုလုပ်သည်၊ မတင်သွင်းပါ။ သြဒီနိတ်များကို ပြောင်းလဲခြင်းမရှိဘဲ ဤပရောဂျက်၏ X နှင့် Y အဖြစ် ဖတ်သည်။",
+                    "english": "Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_shp_tip",
+                    "value": "ESRI shapefile တစ်ခုရှိ အမှတ်များ၊ လိုင်းများနှင့် ပိုလီဂွန်များကို ဤပရောဂျက်ထဲသို့ ရေးဆွဲပုံများအဖြစ် ဖတ်ယူပြီး အရည်အချင်းကော်လံများကို ဂုဏ်သတ္တိများအဖြစ် ထားသည်။ .zip (သို့) .shp နှင့်အတူ ၎င်း၏ .shx၊ .dbf နှင့် .prj ကို ရွေးချယ်ပါ (အများအပြားရွေးရန် Ctrl (သို့) Shift ကို ဖိထားပါ)။ ပရောဂျက်နှင့် မတူသော သြဒီနိတ်စနစ်ရှိ သြဒီနိတ်များကို ပြောင်းလဲပေးပြီး အကြောင်းကြားချက်တွင် ဖော်ပြသည်။",
+                    "english": "Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_shp_tip",
+                "english": "Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this.",
+                "value": "ESRI shapefile တစ်ခုရှိ အမှတ်များ၊ လိုင်းများနှင့် ပိုလီဂွန်များကို ဤပရောဂျက်ထဲသို့ ရေးဆွဲပုံများအဖြစ် ဖတ်ယူပြီး အရည်အချင်းကော်လံများကို ဂုဏ်သတ္တိများအဖြစ် ထားသည်။ .zip (သို့) .shp နှင့်အတူ ၎င်း၏ .shx၊ .dbf နှင့် .prj ကို ရွေးချယ်ပါ (အများအပြားရွေးရန် Ctrl (သို့) Shift ကို ဖိထားပါ)။ ပရောဂျက်နှင့် မတူသော သြဒီနိတ်စနစ်ရှိ သြဒီနိတ်များကို ပြောင်းလဲပေးပြီး အကြောင်းကြားချက်တွင် ဖော်ပြသည်။"
+            }
+        }
+    },
     "key_plain": [],
     "key_notes": [],
     "key_concepts": [],
-    "uniqueness_attention": []
+    "uniqueness_attention": [
+        {
+            "instruction": "Find unique names for each.",
+            "members": [
+                {
+                    "plain_name": "short word, name, or tag stuck on a pipe or point",
+                    "english_rendering": "Tag",
+                    "preferred_translation": "တဂ်"
+                },
+                {
+                    "plain_name": "words, values, or names the program writes beside a pipe or point",
+                    "english_rendering": "Label",
+                    "preferred_translation": ""
+                },
+                {
+                    "plain_name": "words, notes, or captions you type onto the map",
+                    "english_rendering": "Text",
+                    "preferred_translation": ""
+                },
+                {
+                    "plain_name": "note, remark, or description for people about one item",
+                    "english_rendering": "Description",
+                    "preferred_translation": ""
+                },
+                {
+                    "plain_name": "short code that names one item, like J-1 or P-12",
+                    "english_rendering": "ID",
+                    "preferred_translation": ""
+                }
+            ]
+        }
+    ]
 }
