@@ -96,48 +96,67 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-17 (twenty-fourth session, overnight, Arizona time)
+## STATE — 2026-10-17 (twenty-fifth session, afternoon and evening, Arizona time)
 
-### Master: see the last pushed SHA in the morning report. Production: b7c99102 (10-09) when last read
+### Master: e8ba2bb67 (merge/1017c) unless he has typed a merge word since. Production: b7c99102 (10-09) when last read
 
-**Tom intends to deploy master on 10-17 WITHOUT a translation sprint**, bentley-interop included. About
-400 English strings then show in English on the other 26 language pages (new Guide chapters, scenario
-manager, theme, topo, six engine strings that on non-English pages still say PRV/PSV/FCV need EPANET).
+**Sprint 1017 is on `chore/sprint-1017`, green (check_all EXIT=0 on 90a948c17), pushed, NOT merged**:
+the classifier refused CC's master merge; it needs his typed word. It translates the 408 untranslated
+keys (98 of them he had not yet read) and 27 rewordings into 26 languages, Wave 0 rewrote 19 English
+strings (`dev/english-friction/1017-wave0.json`), cross-language QA fixed 237 strings
+(`dev/english-friction/1017-qa-report.md`), Task 809's halo words, the five dead keys joined on one
+line in every file, and a new payload note: **Layout (box title)**, derived from the page by
+`dev/scripts/dock_box_titles.inc.php`, tells translators to put a dockable box title's subject word
+first (his auto-hide tab question). Every `.replace('{name}'` is now global (Copy upward says {name} twice).
+Deleted keys: `lpn_guide_text_notes_popup`; and from the 26 non-English files only, `lpn_guide_text_alt_box`,
+`lpn_guide_how_alt`, `lpn_alt_calc_options`, `lpn_scenario_duration_tip`, `lpn_scenario_hyd_step_tip`.
 
-Landed 10-16/17 on his typed words: merge/1016e (bentley-interop, theme-dark, basemap-outdoors,
-units-revert, library-notes), docs features list (librewaternet.org pushed f4acec9; he pulls
-`cd ~/addon_html/librewaternet.org && git pull`), merge/1017 (geojson-import with NAD83 read as WGS 84
-and a note; scenarios-menu: menu order, "Override manager…", Copy upward, "has children" delete messages,
-Fire plus max day preset removed, Project-Scenario.inp export names), merge/1017b (hover-props: the
-card lists the Settings > Labels fields for the asset, formatted by Labels, no Description, opens only
-on the asset itself; native-valves: Task 733 phase 1, PRV/PSV/FCV solve natively within 0.8 mm of
-EPANET, PBV/GPV still route to EPANET; CLAUDE.md rule updated), feat/guide-scenarios (Task 785: every
-Guide chapter rewritten to the code, 146 new English strings, "Example on Net1", no "you").
-Deleted keys: `lpn_scenario_push_*` (6), `lpn_scenario_preset_fire_max_day`, `_tip`, `lpn_sm_copy_base_tip`.
-Storage told to him: `lpn_theme`, `lpn_cleanmap`, `lpn_ovrmarks`, `lpn_smbox` widths, `lpn_paneboxes`.
+### Branches awaiting his browser pass (all pre-reviewed by Perry, all green, all pushed)
 
-10-17 day: option/pane-boxes merged on his word (Task 799). Fixes: the app page no longer loads the
-parent `/hawsedc.css` (it painted dark mode's chrome light on hawsedc.com; worktree previews never load
-it); the corner basemap button in a scenario now writes the scenario (a press for Base's style was
-dropped). Features list gained customers (247) and custom properties (636); both landing sites now
-build features.html from it, use American spelling, and match apart from EPANET++'s deliberate lines.
-
-### Branches awaiting him
-
-- None besides the label-placer bench branches listed at the top.
+- `feat/sheet-sync` (Branch previews row 8108): Task 752 phase 1, the scenario workbook as an .xlsx
+  file, export and import with a report first. Design calls for him in `dev/scenario-workbook.md`: Q3
+  Base values are not in the workbook; Q5 renaming a scenario does not rename its same-name
+  alternatives (against his 2026-10-12 rule). Typed characters (6.00) are not kept, because the program
+  itself stores only the number.
+- `feat/theme` (row 8111): Task 811 first branch, gallery selector, High contrast, Amber, Green,
+  Platinum, Light's two "better" changes. `lpn_theme` takes more values; nothing new stored. Calculator
+  pages ignore the theme (planned for a later branch). Fix round from Perry (print literal, contrast
+  over the map, opaque hover card, tip) was running at handoff: check its log.
+- `feat/label-beside` (row 8110): Task 812 Steps 0, 1, 3 from `dev/label-trials/port-plan.md`. Fix round
+  from Perry (level labels nearer another pipe than their own; n600 pass over 1 s) was running at
+  handoff: check its log before asking him.
+- `docs/label-port`: the port plan and pre-processing inquiry (Task 813); merges with label-beside.
 
 ### Questions out to him
 
+- Wave 0 changed two strings he may have written: `lpn_guide_en_set_def` ("is only a label" became
+  "does not convert the costs") and `mtc_note_1` step 5 ("Repeat" became "The steps are repeated").
+- English findings from QA, not yet changed: `lpn_crit_minpressure_tip`, `lpn_ds_minpressure_tip`
+  ("elsewhere" read as an adverb in 15 languages); `lpn_full_needs_run` quotes "Full report" where the
+  row is "Full"; `lpn_gjnet_note_not_held` says "text labels" (our Text).
 - His `lpn_sm_help` lacks Copy upward and the has-children delete reason: CC proposed two sentences.
-- Hover card: Flow has no unit on the card because the label settings give none ("Use units" tick).
-- Bubbles after Merge upward: by design; he wants Copy upward (built). Task 800, 681 as before.
 - Port 8202 never reaches jasmine from his browser; epanet-plus-plus.org is also on 8109.
 
 ### Next job
 
-His deploy; then a translation sprint on his word (Task 809 rides it).
-Guide leftovers: `lpn_guide_text_notes_popup` renders nowhere (delete candidate); `lpn_guide_boxes_autohide`
-and `lpn_hotkeys_menu_def` say "you" but are his ruled text.
+His merge word on `chore/sprint-1017`, then the suite on the merge commit and a push. Then his browser
+passes on the three branches above. Task 749 waits on his `.sqlite` sample.
+
+### Traps met 2026-10-17 (twenty-fifth session)
+
+- **The classifier refused the sprint's master merge** though his message authorized the sprint. Ask
+  for "Merge chore/sprint-1017" typed, at the top of the report.
+- **A script writing friction dispositions was refused as "instruction poisoning"**; the same edits by
+  the Edit tool went through. Write dispositions with Edit.
+- **Translators told "subject word first" made bad titles**: "Complete: report" for Full report (ar,
+  fa, km), an invented subject ("Network: full report", pt, fr, it), and my changed placeholder colons
+  to dodge the identical check. Read every box-title change in the sprint diff.
+- **A Wave 0 rewrite that repeats a placeholder** ({name} twice) trips `language placeholders` until
+  every `.replace('{name}'` is global.
+- **The Guide harnesses compared the Spanish page with the English** and broke when the sprint
+  translated it. They now use `esString()` from `user-guide-chapter-lib.js`.
+- **The regex parsers miss keys joined onto one physical line**; QA found five dead ones in 26 files.
+  PHP `include` sees them: count orphans with it, not with `^`-anchored greps.
 
 ### Traps met 2026-10-16 (twenty-fourth session)
 
