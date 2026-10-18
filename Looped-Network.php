@@ -4609,6 +4609,10 @@ EngCalcs.pageConfig = {
       // the Mercator frame with no transform at all. Putting 190 KB on every page load to serve
       // the minority is the shape of decision that put the EPANET engine on the critical path. ?>
 <script src="/engcalcs/js/lpn-crs.js?v=<?=filemtime(__DIR__.'/js/lpn-crs.js')?>"></script>
+<?php // The read-only SQLite reader (Task 749), in the same shape: a few kilobytes here, and
+      // js/vendor/sql-wasm.js plus its 658 KB wasm only once a database is opened. No menu
+      // reaches it yet (dev/sqlite-reader.md); EngCalcs.lpnSqliteOpen() from the console does. ?>
+<script src="/engcalcs/js/lpn-sqlite.js?v=<?=filemtime(__DIR__.'/js/lpn-sqlite.js')?>"></script>
 <?php // The colour catalogue and the swatch GEOMETRY (js/lpn-ramps.js). Pure arithmetic, no DOM:
       // the strip in the Coloring controls asks it how wide each box is rather than counting on
       // flex, which is how the first swatch came to eat the whole strip. ?>

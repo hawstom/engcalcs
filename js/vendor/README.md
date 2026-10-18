@@ -69,3 +69,13 @@ epanetjs.com is FSL-1.1-MIT — not FLOSS today, MIT after two years. This is th
 `slim/index.js`, redo the one specifier edit above, and run
 `node dev/lpn-spike/validate_epanet.js` — it must stay 8/8. Do **not** take `dist/engines/`:
 the default build already embeds the engine, which is what keeps this to two files.
+
+## sql.js 1.14.2 (MIT)
+
+`sql-wasm.js` and `sql-wasm.wasm` are sql.js 1.14.2, SQLite compiled to WebAssembly, MIT licensed,
+© the sql.js authors; SQLite itself is public domain. Full licence text: `sql.js.LICENSE`. MIT is
+GPL-3-compatible. Copied unmodified from the npm tarball's `dist/`; `package-lock.json` pins it by
+sha512. Loaded only by `js/lpn-sqlite.js`, only when a database is opened, and never precached
+(ROADMAP Task 749, `dev/sqlite-reader.md`). Upgrading: `npm install --save-dev --save-exact
+sql.js@<v>`, copy the two files and `LICENSE`, update the digests in `dev/vendor-manifest.json` and
+`VERSION` in `js/lpn-sqlite.js`, and run `node dev/lpn-spike/sqlite-reader-harness.js`.

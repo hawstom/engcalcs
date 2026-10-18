@@ -96,6 +96,9 @@ const EC_HARNESS_LAZY_MODULES = [
                   . 'of definitions on first use, so booting it in the shared stub would make '
                   . 'every harness pay for a library almost none of them touch; the projection '
                   . 'harnesses load it themselves.',
+    'lpn-sqlite.js' => 'the read-only SQLite reader (Task 749). It fetches js/vendor/sql-wasm.js and '
+                     . 'its 658 KB wasm on first use and nothing calls it during boot; '
+                     . 'dev/lpn-spike/sqlite-reader-harness.js loads it.',
 ];
 
 /**
