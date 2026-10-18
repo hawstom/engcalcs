@@ -120,11 +120,11 @@ Deleted keys: `lpn_guide_text_notes_popup`; and from the 26 non-English files on
   itself stores only the number.
 - `feat/theme` (row 8111): Task 811 first branch, gallery selector, High contrast, Amber, Green,
   Platinum, Light's two "better" changes. `lpn_theme` takes more values; nothing new stored. Calculator
-  pages ignore the theme (planned for a later branch). Fix round from Perry (print literal, contrast
-  over the map, opaque hover card, tip) was running at handoff: check its log.
-- `feat/label-beside` (row 8110): Task 812 Steps 0, 1, 3 from `dev/label-trials/port-plan.md`. Fix round
-  from Perry (level labels nearer another pipe than their own; n600 pass over 1 s) was running at
-  handoff: check its log before asking him.
+  pages ignore the theme (planned for a later branch). Perry's fix round is in (594ce706a, green): every
+  theme prints in Light colours, the hover card is opaque (Light's was 90%), the tip is reworded.
+- `feat/label-beside` (row 8110): Task 812 Steps 0, 1, 3 from `dev/label-trials/port-plan.md`. Perry's fix
+  round is in (3f21650fc, green): a level label must be nearest its own pipe or draw a leader; labels
+  shown 44.1% to 53.7% of those asked; n600 at 1x 914 ms.
 - `docs/label-port`: the port plan and pre-processing inquiry (Task 813); merges with label-beside.
 
 ### Questions out to him
