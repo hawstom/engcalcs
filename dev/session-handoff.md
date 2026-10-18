@@ -104,13 +104,12 @@ Task 815, plain privacy.php, consent_body "so we don't count you again" in Engli
 af91792e5 (full/empty tank closes its link natively; Change type reservoir -> tank 0/0/1; routing
 harness flake; fire-flow multiplier guard; label rules sync; port plan on master), e202f28f2 (label
 settings memo, identical drawing). consent_body's 26 translations owed (EC_CONSENT_VERSION stays 2).
+Merged on his word: feat/scenario-example, feat/scenario-results (Task 752 step 1). Open from
+scenario-results: flow shown as magnitude only; fire flow across scenarios still a gap.
 Closed: Tasks 815, 800, 721. Task 737 marked WAIT: sprint.
 
 ### Ready for his typed merge word (all reviewed by Perry, green but for payload freshness)
 
-- `feat/scenario-results` (8113), Task 752 step 1: he said "It looks good. Copy and save work." Ask
-  for "Merge feat/scenario-results" typed. Open for him: flow shown as magnitude only (reversals
-  invisible); fire-flow comparison across scenarios still a gap (Perry).
 - `feat/native-pbv-gpv` (8107): every valve native; no valve routes to EPANET. A valves example is
   being built on it (agent running). EPANET 2.3.5 checks error 220 only against non-adjacent valve
   rows (input3.c valvedata/valvecheck): tell Luke Butler.
@@ -118,7 +117,6 @@ Closed: Tasks 815, 800, 721. Task 737 marked WAIT: sprint.
   import-report sentence and landing-page MSX lines (dev/msx-scope.md).
 - `feat/theme` (8111): 13 themes; the map follows the theme; he loves Desktop and Prairie. His calls
   pending: Dark's dark map reverses Task 714; whether a "Designer" theme (Ida, or a paid human) is wanted.
-- `feat/scenario-example` (8106): fire flow tested by the analysis in Max day, never multiplied (harness).
 - `feat/label-form` (8114) + `feat/label-beside` (8110): he likes label-form; round 2 running (Perry
   found the one-line node trial hid node labels and IDs; fix: per-label no loss). His call after: the
   pass is ~1.6 s per notch on n600 (master 0.8 s); keep the one-line node trial on large views?
