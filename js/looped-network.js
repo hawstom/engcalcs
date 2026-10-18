@@ -44901,7 +44901,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				wtgNote.style.margin = '0 0 8px';
 				wtgNote.style.fontWeight = 'bold';
 				wtgNote.textContent = String(pc.lpn_wtg_report_intro || 'This was a WaterCAD or WaterGEMS model. Bentley publishes no description of the file, so it is read by a layout learned from example files. It was imported as a new project, from its scenario {base} and {n} more scenarios. Compare the results with WaterGEMS before relying on them.')
-					.replace('{base}', lastWtg.base).replace('{n}', lastWtg.n);
+					.split('{base}').join(lastWtg.base).split('{n}').join(String(lastWtg.n));
 				body.appendChild(wtgNote);
 			}
 			var sum = document.createElement('p');
@@ -45283,10 +45283,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// What an `.inp` cannot say, laid onto the saved document before it is opened.
 	function wtgLayOnto(saved, r) {
 		var off = {};
-		(r.inactiveIds.nodes || []).forEach(function (i) { off['n:' + i] = true; });
-		(r.inactiveIds.links || []).forEach(function (i) { off['l:' + i] = true; });
-		saved.nodes.forEach(function (n) { if (off['n:' + n.id]) { n._active = false; } });   // base-write: an imported document is born in Base
-		saved.links.forEach(function (l) { if (off['l:' + l.id]) { l._active = false; } });   // base-write: an imported document is born in Base
+		(r.inactiveIds.nodes || []).forEach(function (i) { off[ovKeyFor('node', i)] = true; });
+		(r.inactiveIds.links || []).forEach(function (i) { off[ovKeyFor('link', i)] = true; });
+		saved.nodes.forEach(function (n) { if (off[ovKeyFor('node', n.id)]) { n._active = false; } });   // base-write: an imported document is born in Base
+		saved.links.forEach(function (l) { if (off[ovKeyFor('link', l.id)]) { l._active = false; } });   // base-write: an imported document is born in Base
 		var sid = {}, n = 0;
 		r.scenarios.forEach(function (s) { sid[s.fileId] = 's' + (++n); });
 		r.scenarios.forEach(function (s) {

@@ -239,7 +239,9 @@ $ovAllowed = [
     // the derived (Basic mode) alternatives, read off each scenario's own map
     'alternativesOf', 'resolveThroughAlternatives', 'alternativeOverrides',
     // opening a file: the old key migration, and the guarantee that every scenario has a map
-    'migrateOverrideKeys', 'applySaved'];
+    'migrateOverrideKeys', 'applySaved',
+    // a WaterGEMS import (Task 749): the scenarios and alternatives of a document not yet opened, written once
+    'wtgLayOnto'];
 $ovBad = [];
 $fn = '';
 foreach ($lines as $i => $line) {
