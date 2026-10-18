@@ -13,6 +13,7 @@ and a function cannot carry a description, cannot be authored by anyone who is n
 |------|------:|------:|-------|-------|
 | `Net1.lwn` | 11 | 13 | gpm | EPANET's Net1: 9 junctions, 1 reservoir, 1 tank, 1 pump. Public domain, ships with EPANET. |
 | `Net1-SI.lwn` | 11 | 13 | L/s | `Net1.lwn` converted to SI (below), rules included. |
+| `Valves.lwn` | 14 | 13 | gpm | One of each valve type (PBV, PRV, PSV, FCV, TCV, GPV), each controlling at the solved state. Built by `dev/scripts/build_valve_example.js` from `dev/scripts/valve_example.inp`; held by `valve-example-harness.js`. |
 | `Net2-Branford-CT.lwn` | 36 | 40 | gpm | EPANET's Net2 placed at Branford, Connecticut on EPSG:2234 (Tom's own saved project, 2026-10-12). No backdrop. |
 | `Net3-Novato-CA-World.lwn` | 97 | 119 | gpm | EPANET's Net3 placed at Novato, California as a lat/lon project, world map behind it. No backdrop. |
 | `Elm-Street-Center.lwn` | 18 | 19 | gpm | Tom's own design snapshot, anonymised, with a CAD site plan as its backdrop. The one example with a backdrop (Tom, 2026-10-12). |
