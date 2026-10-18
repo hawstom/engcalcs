@@ -859,7 +859,6 @@ body { font-size: var(--ec-font-size); text-shadow: var(--ec-text-glow); }
 #lpn_canvas { font-family: sans-serif; font-size: 1rem; text-shadow: none; }
 .ec-theme-card svg { text-shadow: none; }
 .lpn-popover, .lpn-panebox, .lpn-regmode-bar, .lpn-snip-edit-panel, .lpn-snip-menu { border-radius: var(--ec-box-radius); }
-.lpn-setbox-title { border-radius: var(--ec-box-radius) var(--ec-box-radius) 0 0; }
 /* PRINT IS LIGHT (Task 811). The theme blocks are screen-only, so the tokens print as Light; Bootstrap's own
    dark switch (data-bs-theme="dark", written for Dark, Amber, Green and High contrast's dark palette) is
    undone here with Bootstrap's light values, so the page's text prints dark on white. */
@@ -4294,6 +4293,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	border-bottom: 1px solid var(--ec-border-strong); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
 	font-family: var(--ec-font-title); font-weight: var(--ec-title-weight); color: var(--ec-title-ink); text-transform: var(--ec-title-case); letter-spacing: var(--ec-title-tracking);
 	background-image: var(--ec-titlebar-image); text-shadow: var(--ec-title-halo);
+	border-radius: var(--ec-box-radius) var(--ec-box-radius) 0 0;
 }
 
 /* **A "?" IN THE TITLE BAND TAKES THE POINTER** (Tom, 2026-10-11, on the Scenario manager's: *"The
