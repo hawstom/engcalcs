@@ -2,8 +2,8 @@
     "meta": {
         "language": "fr",
         "expected_key_count": 3025,
-        "delta_key_count": 15,
-        "english_changed_key_count": 15,
+        "delta_key_count": 20,
+        "english_changed_key_count": 20,
         "exempt_key_count": 71,
         "exempt_keys": [
             "u_depthFrac",
@@ -93,21 +93,30 @@
         "plain_notes": "key_plain[key] says in plain words what that one string means, other wordings joined by \"or\". Use whichever your language expresses most naturally and compactly; you are not bound to the literal English wording.",
         "key_notes_notes": "key_notes[key] are notes about that one string: how much room it has, symbols to keep exactly, what it refers to. Follow them. They are instructions to you, never text to put in your file.",
         "suggestion_box_notes": "Read suggestion_box and follow it. It is part of your instructions, not a footnote: a sprint does not close while a translator complaint is unanswered.",
+        "translator_notes": [
+            "Tree, parent, child and inherit are the words of a family tree. Use the everyday family words of your language."
+        ],
+        "translator_notes_notes": "Read translator_notes and follow them. Each is true of every string you translate.",
         "concept_notes": "Read concept_source and follow it. key_concepts lists, for a key that names a concept, its plain-words name, which is what you translate from; English is one rendering of it.",
         "uniqueness_notes": "uniqueness_attention lists the few groups of concepts that sit side by side on one screen. Find unique names for each, and use each name the same way everywhere."
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: débit\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Pression\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: nœud\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: liaison\n- water network project, file, or model\n    English: project (saved network)\n    Your language: projet\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: débit d'incendie\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: Figure\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: débit\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: vitesse\n- flow used, taken, or consumed\n    English: demand\n    Your language: Demande\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Pression\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: dessiner\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: jonction\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: réservoir\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: nœud\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: liaison\n- water network project, file, or model\n    English: project (saved network)\n    Your language: projet\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: scénario\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: par défaut\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: Bâche\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: Valeurs personnalisées\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: débit d'incendie\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: Figure\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
+        "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_file_import_inp": "EPANET file…",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
         "lpn_library_import": "Libraries…",
-        "lpn_crit_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
-        "lpn_ds_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ff_minpressure": "Lowest system pressure allowed",
+        "lpn_crit_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ds_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_file_import_survey": "Surveyed points…",
         "lpn_file_import_shapes": "GeoJSON shapes…",
         "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
@@ -118,13 +127,18 @@
     },
     "keys": {
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
+        "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_file_import_inp": "EPANET file…",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
         "lpn_library_import": "Libraries…",
-        "lpn_crit_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
-        "lpn_ds_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ff_minpressure": "Lowest system pressure allowed",
+        "lpn_crit_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ds_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_file_import_survey": "Surveyed points…",
         "lpn_file_import_shapes": "GeoJSON shapes…",
         "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
@@ -147,6 +161,54 @@
                     "key": "lpn_guide_lib_example_term",
                     "value": "Exemple sur Net1",
                     "english": "Example on Net1"
+                }
+            }
+        },
+        "lpn_guide_ff_asks_def": {
+            "reason": "english_changed",
+            "current_value": "<p>Chaque jonction testée subit deux tests, sur une copie du réseau au pas de temps affiché et dans le scénario ouvert. Le premier demande quel débit la jonction peut fournir tout en maintenant la pression résiduelle. Un débit est prélevé à la jonction, et des résolutions répétées le cernent, jusqu'à un plafond égal à 10000 gpm. Une jonction qui maintient encore la pression résiduelle au plafond est signalée comme fournissant plus que le plafond. Le second test, la vérification de conception, prélève le débit requis à la jonction et demande si une autre jonction de son périmètre tombe sous la Pression minimale admise ailleurs, ou si une conduite de son périmètre dépasse la Vitesse maximale admise. La vérification de conception n'est pas faite lorsque son périmètre est Aucune vérification.<\/p><p>Une jonction qui a sa propre propriété Débit d'incendie requis est testée avec cette valeur, et toute autre jonction avec la valeur de la boîte.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_ff_asks_term",
+                    "value": "Ce qui est demandé à chaque jonction",
+                    "english": "What is asked of each junction"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_ff_result_term",
+                    "value": "Lire les résultats",
+                    "english": "Reading the results"
+                }
+            }
+        },
+        "lpn_guide_cr_case_def": {
+            "reason": "english_changed",
+            "current_value": "<p>Pour chaque liaison du périmètre, la liaison est rendue inactive sur une copie du réseau, et la copie est résolue au pas de temps affiché dans le scénario ouvert. Un calcul est une résolution pour chaque liaison et une de plus sans rien de coupé. Une jonction qui n'a plus de chemin ouvert vers un réservoir ou une bâche est isolée : elle est retirée avant la résolution, et sa demande est comptée dans Demande non desservie. Parmi les jonctions encore raccordées, Jonctions sous le minimum liste celles dont la pression tombe sous la Pression minimale admise. Une jonction qui est déjà sous ce seuil sans rien de coupé n'est comptée contre aucune liaison, et le résumé indique combien il y en a. La Pression minimale admise est le même paramètre que la boîte Pression minimale admise ailleurs de l'analyse du débit d'incendie.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_cr_case_term",
+                    "value": "Ce que fait chaque cas",
+                    "english": "What each case does"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_cr_dead_term",
+                    "value": "Bouts de réseau, et la liste",
+                    "english": "Dead ends, and the list"
+                }
+            }
+        },
+        "lpn_guide_ds_find_def": {
+            "reason": "english_changed",
+            "current_value": "<p>Rechercher explore les facteurs d'échelle de la demande de 0 à 20, au 0,01 le plus proche, pour trouver le plus grand pour lequel chaque jonction choisie garde au moins la Pression minimale admise. Il indique le facteur et la pression la plus basse à ce facteur, ainsi que la même chose pour le pas suivant, où la pression tombe pour la première fois sous la limite. Si les demandes telles que saisies laissent déjà une jonction sous la limite, la réponse est marquée d'un signe d'avertissement. Si chaque jonction respecte la limite à 20, la réponse le dit. Arrêter met fin à une recherche sans réponse. La Pression minimale admise est le même paramètre que la boîte Pression minimale admise ailleurs de l'analyse du débit d'incendie.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_ds_find_term",
+                    "value": "Rechercher",
+                    "english": "Find"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_ds_scope_term",
+                    "value": "Jonctions, et pas de temps",
+                    "english": "Junctions, and the time step"
                 }
             }
         },
@@ -208,6 +270,22 @@
                 "value": "Espace de travail…"
             }
         },
+        "lpn_sm_help": {
+            "reason": "english_changed",
+            "current_value": "Comment fonctionnent les scénarios et les alternatives :\\n\\nEn Mode de base, les alternatives sont masquées et automatiques, et tous les nouveaux scénarios sont des enfants du scénario Base.\\n\\nAvec le Mode de base désactivé, une arborescence d'héritage complexe est disponible, et les alternatives peuvent être partagées entre scénarios. Mais le comportement par défaut des modifications lorsqu'une nouvelle association d'alternative est nécessaire (en l'absence de gestion proactive par l'utilisateur) est de créer une alternative nommée comme le scénario actuel, ce qui donne à chaque scénario son propre ensemble d'alternatives.\\n\\nLes propriétés et les paramètres appartiennent à des catégories d'alternatives qui apparaissent comme colonnes du tableau des scénarios et des alternatives et comme options de gestion dans le Gestionnaire de scénarios.\\n\\nLes valeurs personnalisées sont créées dans les scénarios, mais elles appartiennent en réalité aux alternatives associées au scénario ; un scénario est donc comme une fenêtre sur ses alternatives. Les associations d'alternatives à des scénarios se gèrent dans le volet de droite du Gestionnaire de scénarios ou dans le tableau Scénarios du volet inférieur. Créer un nouveau scénario ne crée aucune alternative ; le nouveau scénario utilise les alternatives de son parent jusqu'à ce que des valeurs personnalisées soient créées qui exigent de nouvelles alternatives. Lorsque des valeurs personnalisées sont créées dans un scénario, elles sont enregistrées dans leur alternative respective pour le scénario ; si le scénario n'a pas une telle alternative, une nouvelle alternative est créée avec le nom du scénario.\\n\\nExemple : vous créez un scénario « Figure : ID des nœuds et des liaisons » et vous modifiez un Texte pour qu'il dise « ID des nœuds et des liaisons ». Quand vous créez le scénario, aucune alternative n'est créée. Mais au moment où vous enregistrez le Texte, une alternative de Texte appelée « Figure : ID des nœuds et des liaisons » est créée avec la valeur personnalisée du Texte. En Mode de base, vous voyez cela simplement comme une valeur personnalisée dans le scénario lui-même.\\n\\nCopier les propriétés ne copie que les valeurs personnalisées. Dans tout scénario autre que Base, elle ne copie que les valeurs personnalisées que l'élément a dans ce scénario.\\n\\nComment gérer les scénarios :\\n\\n- Choisissez Scénarios ou une catégorie d'alternatives dans la liste du haut pour afficher son arborescence.\\n\\n- Créez un enfant de l'élément sélectionné avec Ajouter un enfant. Ajouter une base ajoute une autre Base, qui commence comme une copie de Base telle qu'elle est maintenant ; les modifications ultérieures de Base ne la changent pas. Un nouvel enfant porte le nom de son parent ; tapez un nom pour le renommer. Copier copie l'alternative sélectionnée. Fusionner vers le haut déplace les valeurs personnalisées de l'alternative sélectionnée dans une alternative située au-dessus, choisie par son nom, et l'alternative sélectionnée en hérite alors ; il nomme d'abord toute valeur qu'une alternative qu'il saute personnalise aussi, et qui n'est pas modifiée. Pour copier un scénario, utilisez Copier le scénario dans le menu Scénarios, en Mode de base ; il copie les valeurs personnalisées du scénario, avec les alternatives qui les contiennent. Ajouter une base et Copier le scénario créent chacun des alternatives : Ajouter une base crée une alternative Base pour la nouvelle Base dans chaque catégorie qui contient des valeurs, et Copier le scénario crée une nouvelle alternative, nommée comme la copie, pour chaque alternative qui contient les valeurs personnalisées du scénario.\\n\\n- Faites glisser un élément sur un autre pour en faire un enfant de cet élément. Un scénario déplacé sous un nouveau parent hérite de lui tout ce qu'il n'a pas personnalisé ; ce qu'il a personnalisé ne change pas. Faites glisser un élément entre deux éléments pour les réordonner.\\n\\n- Cliquez sur un élément pour le sélectionner. Appuyez sur F2 ou choisissez Renommer pour renommer l'élément sélectionné. Renommer un scénario demande s'il faut renommer les alternatives qui portent son nom ; en Mode de base, elles sont renommées avec lui, sans demander. Double-cliquez sur un scénario ou appuyez sur Entrée pour le rendre actuel. Cliquez sur la flèche à côté d'un élément ou appuyez sur Gauche ou Droite pour le réduire ou le développer. Faites un clic droit sur un élément pour les mêmes commandes que les boutons.\\n\\n- Appuyez sur Suppr ou cliquez sur le bouton moins pour supprimer l'élément sélectionné. Un élément utilisé n'est pas supprimé, et le message nomme ce qui l'utilise. Supprimer un scénario avec le Mode de base désactivé conserve les alternatives qu'il utilise. Supprimer un scénario avec le Mode de base activé supprime aussi chacune de ses alternatives qu'aucun autre scénario n'utilise.\\n\\n- Pour qu'un scénario utilise une autre alternative, y compris Base, choisissez-la dans la ligne du scénario dans le volet de droite du Gestionnaire de scénarios ou dans le tableau Scénarios. Une valeur personnalisée faite dans une alternative partagée change tous les scénarios qui l'utilisent.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ovl_same_tip",
+                    "value": "Égale à la valeur héritée. C'est quand même une valeur personnalisée, et elle est comptée.",
+                    "english": "Equal to the inherited value. It is still an override, and it is counted."
+                },
+                "next_translated": {
+                    "key": "lpn_sm_delete_alt_ask",
+                    "value": "Supprimer l'alternative {name} ?",
+                    "english": "Delete the alternative {name}?"
+                }
+            }
+        },
         "lpn_full_needs_run": {
             "reason": "english_changed",
             "current_value": "Le rapport complet liste chaque nœud et chaque liaison à chaque pas de temps de rapport. Appuyez sur Calculer, puis ouvrez Eau, Rapports, Rapport complet.",
@@ -243,6 +321,27 @@
                 "key": "lpn_library_import_tip",
                 "english": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
                 "value": "Choisissez un autre fichier de projet et copiez des bibliothèques entières depuis celui-ci vers ce projet. Tout ce dont le nom est déjà utilisé ici est ignoré et listé, afin que rien de ce que vous avez déjà ne soit modifié."
+            }
+        },
+        "lpn_ff_minpressure": {
+            "reason": "english_changed",
+            "current_value": "Pression minimale admise ailleurs",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_design_no_selection",
+                    "value": "La portée de la vérification de conception est réglée sur Sélectionnées, mais aucun élément n'est sélectionné. Sélectionnez des éléments sur la carte ou choisissez Toutes.",
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_minpressure_tip",
+                    "value": "Une jonction qui descend sous cette valeur pendant qu'une autre prélève son débit d'incendie est signalée comme un problème de conception.",
+                    "english": "A junction that falls below this while another one is drawing its fire flow is reported as a design issue."
+                }
+            },
+            "tip": {
+                "key": "lpn_ff_minpressure_tip",
+                "english": "A junction that falls below this while another one is drawing its fire flow is reported as a design issue.",
+                "value": "Une jonction qui descend sous cette valeur pendant qu'une autre prélève son débit d'incendie est signalée comme un problème de conception."
             }
         },
         "lpn_crit_minpressure_tip": {
@@ -432,8 +531,50 @@
     },
     "key_plain": [],
     "key_notes": [],
-    "key_concepts": [],
+    "key_concepts": {
+        "lpn_sm_help": [
+            {
+                "concept": "family-tree",
+                "plain_name": "A family tree",
+                "english_rendering": "tree",
+                "preferred_translation": ""
+            },
+            {
+                "concept": "family-tree-parent",
+                "plain_name": "A family tree parent",
+                "english_rendering": "parent",
+                "preferred_translation": ""
+            },
+            {
+                "concept": "family-tree-child",
+                "plain_name": "A family tree child",
+                "english_rendering": "child",
+                "preferred_translation": ""
+            },
+            {
+                "concept": "family-tree-inherit",
+                "plain_name": "A family tree inherit-",
+                "english_rendering": "inherit",
+                "preferred_translation": ""
+            }
+        ]
+    },
     "uniqueness_attention": [
+        {
+            "instruction": "Find unique names for each.",
+            "members": [
+                {
+                    "plain_name": "what-if version, case, scenario, or arrangement of circumstances",
+                    "english_rendering": "scenario",
+                    "preferred_translation": "scénario"
+                },
+                {
+                    "plain_name": "state of a link at a moment, open, closed, or active",
+                    "english_rendering": "status",
+                    "preferred_translation": ""
+                }
+            ]
+        },
         {
             "instruction": "Find unique names for each.",
             "members": [

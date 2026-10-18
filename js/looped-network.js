@@ -76269,7 +76269,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			boxes.design, '');
 
 		boxes.minPressure = ffInput(ask.minPressure);
-		ffRow(host, pc.lpn_ff_minpressure || 'Lowest pressure allowed elsewhere',
+		ffRow(host, pc.lpn_ff_minpressure || 'Lowest system pressure allowed',
 			pc.lpn_ff_minpressure_tip, boxes.minPressure, unitLabel('lpn_u_pressure'));
 
 		boxes.maxVelocity = ffInput(ask.maxVelocity);

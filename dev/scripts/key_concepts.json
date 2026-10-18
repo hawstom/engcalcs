@@ -289,6 +289,125 @@
         ],
         "lpn_scenario_base": [
             "scenario"
+        ],
+        "lpn_guide_scn_use_def": [
+            "family-tree-inherit"
+        ],
+        "lpn_guide_scn_open_def": [
+            "family-tree"
+        ],
+        "lpn_guide_scn_marks_def": [
+            "family-tree-parent",
+            "family-tree-inherit"
+        ],
+        "lpn_guide_scn_make_def": [
+            "family-tree-inherit"
+        ],
+        "lpn_guide_scn_notes_def": [
+            "family-tree-inherit"
+        ],
+        "lpn_guide_cmp_cols_def": [
+            "family-tree-inherit"
+        ],
+        "lpn_ovm_child_ask": [
+            "family-tree-child"
+        ],
+        "lpn_ovm_child_tip": [
+            "family-tree-child"
+        ],
+        "lpn_ovm_dot_set": [
+            "family-tree-inherit"
+        ],
+        "lpn_field_type_tip": [
+            "family-tree-parent"
+        ],
+        "lpn_settings_override_marks_tip": [
+            "family-tree-inherit"
+        ],
+        "lpn_scenario_mark_inh_tip": [
+            "family-tree-parent",
+            "family-tree-inherit"
+        ],
+        "lpn_scenario_overrides_tip": [
+            "family-tree-parent"
+        ],
+        "lpn_scenario_delete_has_children": [
+            "family-tree-parent",
+            "family-tree-child"
+        ],
+        "lpn_scenario_basic_tip": [
+            "family-tree-child"
+        ],
+        "lpn_sm_col_parent": [
+            "family-tree-parent"
+        ],
+        "lpn_sm_add_child": [
+            "family-tree-child"
+        ],
+        "lpn_sm_base_kept": [
+            "family-tree"
+        ],
+        "lpn_sm_none_selected": [
+            "family-tree"
+        ],
+        "lpn_sm_base_named": [
+            "family-tree"
+        ],
+        "lpn_sm_merge_up_tip": [
+            "family-tree",
+            "family-tree-inherit"
+        ],
+        "lpn_sm_merge_pick": [
+            "family-tree-parent"
+        ],
+        "lpn_sm_merge_ask": [
+            "family-tree-inherit"
+        ],
+        "lpn_sm_copy_up_tip": [
+            "family-tree"
+        ],
+        "lpn_sm_copy_pick": [
+            "family-tree-parent"
+        ],
+        "lpn_sm_list_overrides_tip": [
+            "family-tree-inherit"
+        ],
+        "lpn_ovl_note": [
+            "family-tree-inherit"
+        ],
+        "lpn_ovl_clear_all_ask": [
+            "family-tree-inherit"
+        ],
+        "lpn_ovl_col_inherited": [
+            "family-tree-inherit"
+        ],
+        "lpn_ovl_col_inherited_tip": [
+            "family-tree-parent"
+        ],
+        "lpn_ovl_same_tip": [
+            "family-tree-inherit"
+        ],
+        "lpn_sm_help": [
+            "family-tree",
+            "family-tree-parent",
+            "family-tree-child",
+            "family-tree-inherit"
+        ],
+        "lpn_sm_alt_delete_has_children": [
+            "family-tree-parent",
+            "family-tree-child"
+        ],
+        "lpn_sm_name_taken": [
+            "family-tree"
+        ],
+        "lpn_sm_cycle": [
+            "family-tree-child"
+        ],
+        "lpn_sm_all_row_tip": [
+            "family-tree"
+        ],
+        "lpn_sm_inherited": [
+            "family-tree-inherit"
         ]
     }
 }
