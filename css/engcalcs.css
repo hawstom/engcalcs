@@ -114,6 +114,9 @@
 	--ec-icon-stroke: 2;
 	--ec-icon-cap: round;
 	--ec-icon-join: round;
+	/* The text in the Settings box's label columns (Before, Use units, After, Decimals, Show, Drop), whose
+	   widths are fixed: a fixed-width face sets it smaller so a word fits its column as it does in Light. */
+	--ec-field-text-scale: 1;
 	/* The keyboard focus ring's width. */
 	--ec-focus-w: 2px;
 	/* The map's own paper and ink, for the gallery cards' little map. The map itself does not follow a theme. */
@@ -514,6 +517,7 @@
 	--ec-icon-stroke: 2.25;
 	--ec-icon-cap: square;
 	--ec-icon-join: miter;
+	--ec-field-text-scale: .72;
 	/* The dim steps stay readable: quiet text is the muted ink, disabled text the middle grey */
 	--ec-neutral-ink: var(--ec-ink-muted);
 	--ec-gray-777: var(--ec-ink-muted);
@@ -566,6 +570,7 @@
 	--ec-icon-stroke: 2.25;
 	--ec-icon-cap: square;
 	--ec-icon-join: miter;
+	--ec-field-text-scale: .72;
 	--ec-neutral-ink: var(--ec-ink-muted);
 	--ec-gray-777: var(--ec-ink-muted);
 	--ec-gray-bbb: var(--ec-gray-999);
@@ -857,6 +862,9 @@
    never glows. */
 body { font-size: var(--ec-font-size); text-shadow: var(--ec-text-glow); }
 #lpn_canvas { font-family: sans-serif; font-size: 1rem; text-shadow: none; }
+/* The label columns in Settings are fixed widths (js/looped-network.js, LPN_LABEL_*_W); their text follows
+   --ec-field-text-scale (1 in Light) so a wider face does not cut "Init." or break "units" in two. */
+:is(#lpn_labels_node_fields, #lpn_labels_link_fields, #lpn_labels_customer_fields) > div > :nth-child(n+2) { font-size: calc(1em * var(--ec-field-text-scale)); }
 .ec-theme-card svg { text-shadow: none; }
 .lpn-popover, .lpn-panebox, .lpn-regmode-bar, .lpn-snip-edit-panel, .lpn-snip-menu { border-radius: var(--ec-box-radius); }
 /* PRINT IS LIGHT (Task 811). The theme blocks are screen-only, so the tokens print as Light; Bootstrap's own
