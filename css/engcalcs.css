@@ -125,11 +125,12 @@
 	--ec-page-image: none;
 	--ec-page-image-size: auto;
 	--ec-page-image-pos: 0 0;
-	/* PRAIRIE'S MATERIALS (Ida's direction, 2026-10-18; Tom: menus are a water tower's tank band, the toolbar is
-	   clouds, the project tabs are barns). Galvanized steel for the menu bar and the transport, a cloud for a
-	   tool under the pointer and a pressed one, barn wood for an inactive tab. Nothing in other themes. */
+	/* PRAIRIE'S MATERIALS (Ida's direction and Tom's calls, 2026-10-18: each menu is a small water-tower tank,
+	   the toolbar is clouds, the project tabs are barns, the lower chrome is a fence). Galvanized steel for the
+	   menu tanks and the transport, a cloud for a tool under the pointer and a pressed one, barn wood for an
+	   inactive tab, weathered fence boards for the bottom pane's tabs and the docked boxes' tabs. Nothing in
+	   other themes. */
 	--ec-steel: none;
-	--ec-steel-ribs: none;
 	--ec-steel-edge: transparent;
 	--ec-steel-ink: currentColor;
 	--ec-cloud: transparent;
@@ -139,6 +140,12 @@
 	--ec-cloud-pressed-edge: transparent;
 	--ec-barn: transparent;
 	--ec-barn-edge: transparent;
+	--ec-steel-bright: none;
+	--ec-tank-dome: none;
+	--ec-fence: none;
+	--ec-fence-grain: none;
+	--ec-fence-edge: transparent;
+	--ec-fence-hover: none;
 	/* The box title band's picture: where it sits and how big (Prairie's water tower), and the room the
 	   title leaves for it. */
 	--ec-titlebar-pos: 0 0;
@@ -1199,15 +1206,13 @@
 	--ec-box-border: 2px solid var(--ec-border-strong);
 	--ec-box-shadow: 3px 3px 0 rgba(43, 36, 24, .22);
 	--ec-tabs-rule: 4px double #7a5c3a;
-	--ec-chrome-image: radial-gradient(ellipse 90px 11px at 16% 22px, rgba(255, 255, 255, .7), transparent 70%), radial-gradient(ellipse 140px 13px at 58% 14px, rgba(255, 255, 255, .55), transparent 70%), radial-gradient(ellipse 80px 9px at 86% 40px, rgba(255, 255, 255, .5), transparent 70%), linear-gradient(to bottom, #7fb0dc 0, #b7d6ec 45px, #e4eef2 80px, #efe6cc 108px);
-	--ec-chrome-image-size: 100% 108px;
-	--ec-chrome-image-pos: 0 31px;
+	--ec-chrome-image: radial-gradient(ellipse 90px 12px at 16% 46px, rgba(255, 255, 255, .7), transparent 70%), radial-gradient(ellipse 140px 14px at 58% 40px, rgba(255, 255, 255, .55), transparent 70%), radial-gradient(ellipse 80px 10px at 86% 64px, rgba(255, 255, 255, .5), transparent 70%), linear-gradient(to bottom, #7fb0dc 0, #a6cbe7 40px, #b7d6ec 76px, #e4eef2 112px, #efe6cc 140px);
+	--ec-chrome-image-size: 100% 140px;
 	--ec-chrome-image-repeat: no-repeat;
 	--ec-chrome-image-attach: fixed;
 	--ec-chrome-gap: none;
-	--ec-page-image: radial-gradient(ellipse 90px 11px at 16% 22px, rgba(255, 255, 255, .7), transparent 70%), radial-gradient(ellipse 140px 13px at 58% 14px, rgba(255, 255, 255, .55), transparent 70%), radial-gradient(ellipse 80px 9px at 86% 40px, rgba(255, 255, 255, .5), transparent 70%), linear-gradient(to bottom, #7fb0dc 0, #b7d6ec 45px, #e4eef2 80px, #efe6cc 108px);
-	--ec-page-image-size: 100% 108px;
-	--ec-page-image-pos: 0 31px;
+	--ec-page-image: radial-gradient(ellipse 90px 12px at 16% 46px, rgba(255, 255, 255, .7), transparent 70%), radial-gradient(ellipse 140px 14px at 58% 40px, rgba(255, 255, 255, .55), transparent 70%), radial-gradient(ellipse 80px 10px at 86% 64px, rgba(255, 255, 255, .5), transparent 70%), linear-gradient(to bottom, #7fb0dc 0, #a6cbe7 40px, #b7d6ec 76px, #e4eef2 112px, #efe6cc 140px);
+	--ec-page-image-size: 100% 140px;
 	--ec-titlebar-image: url("/engcalcs/icons/favicon.svg");
 	--ec-titlebar-pos: 10px 8px;
 	--ec-titlebar-pos-rtl: right 10px top 8px;
@@ -1217,7 +1222,6 @@
 	--ec-icon-stroke: 2;
 	--ec-icon-cap: square;
 	--ec-steel: linear-gradient(#eef1f2 0, #cdd4d8 45%, #bcc5cb 70%, #e3e7ea 100%);
-	--ec-steel-ribs: repeating-linear-gradient(90deg, rgba(0, 0, 0, .05) 0 1px, transparent 1px 7px);
 	--ec-steel-edge: #6f7b84;
 	--ec-steel-ink: #1f2a33;
 	--ec-cloud: #fff;
@@ -1227,6 +1231,12 @@
 	--ec-cloud-pressed-edge: #6f879c;
 	--ec-barn: #e6d8b8;
 	--ec-barn-edge: #7a6a50;
+	--ec-steel-bright: linear-gradient(#f7f9fa 0, #dde3e6 45%, #cfd6db 70%, #eef1f3 100%);
+	--ec-tank-dome: inset 0 2px 0 rgba(255, 255, 255, .75), inset 0 -2px 3px rgba(60, 70, 80, .18);
+	--ec-fence: linear-gradient(#bcae96 0, #b3a48c 50%, #a99a82 100%);
+	--ec-fence-grain: repeating-linear-gradient(90deg, rgba(60, 40, 20, .07) 0 1px, transparent 1px 9px), repeating-linear-gradient(0deg, rgba(60, 40, 20, .05) 0 1px, transparent 1px 4px);
+	--ec-fence-edge: #6e5d45;
+	--ec-fence-hover: linear-gradient(#cbbfa9 0, #c4b69f 100%);
 	/* The map (round 3): wheat paper, dark ink, a steel network and barn-red selection. */
 	--ec-map-paper: #f5ecd2;
 	--ec-map-ink: #2b2418;
@@ -1271,14 +1281,26 @@
 /* "Saved in this browser" is faded by opacity, which lands under 4.5:1 on a phosphor or a pure-ink palette. */
 :root[data-theme]:not([data-theme="light"]):not([data-theme="dark"]) .lpn-saved { opacity: 1; color: var(--ec-ink-muted); }
 }
-/* PRAIRIE'S SHAPES (Ida's direction, 2026-10-18). The menu bar is a galvanized tank band above the sky, its
-   words painted on in dark ink with no outline; the toolbar's tools are clouds; the tabs are barns. Red is kept
-   for the open menu, the current tab and paper: never on the sky or on the steel at rest. */
+/* PRAIRIE'S SHAPES (Ida's direction and Tom's calls, 2026-10-18). Each menu is a small galvanized tank on the
+   sky, its name painted on in dark ink like a town's on a water tower; the toolbar's tools are clouds; the
+   project tabs are barns; the bottom pane's tabs and the docked boxes' tabs are fence boards, the current one a
+   freshly painted board. Red is kept for an open menu's lettering, the current barn and paper. (Brick was
+   considered for the lower chrome and not used: barn red already belongs to the project tabs, and a second
+   red would compete with it.) */
 @media screen {
-:root[data-theme="prairie"] #lpn_menubar { background: var(--ec-steel-ribs), var(--ec-steel); border-bottom: 1px solid var(--ec-steel-edge); }
-:root[data-theme="prairie"] .lpn-menubar-item { background: transparent; border-color: transparent; color: var(--ec-steel-ink); box-shadow: none; }
-:root[data-theme="prairie"] .lpn-menubar-item:hover { background: var(--ec-bg); border-color: var(--ec-accent); color: var(--ec-accent); }
-:root[data-theme="prairie"] .lpn-menubar-item[aria-expanded="true"] { background: var(--ec-accent); border-color: var(--ec-accent); color: var(--ec-bg); }
+:root[data-theme="prairie"] .lpn-menubar-item {
+	background: var(--ec-steel); border: 1px solid var(--ec-steel-edge); border-radius: 12px / 50%; color: var(--ec-steel-ink); box-shadow: var(--ec-tank-dome);
+}
+:root[data-theme="prairie"] .lpn-menubar-item:hover { background: var(--ec-steel-bright); border-color: var(--ec-steel-edge); color: var(--ec-steel-ink); box-shadow: var(--ec-tank-dome), var(--ec-cloud-shadow); }
+:root[data-theme="prairie"] .lpn-menubar-item[aria-expanded="true"] { background: var(--ec-steel-bright); border-color: var(--ec-steel-edge); color: var(--ec-accent-hover); box-shadow: var(--ec-tank-dome); }
+:root[data-theme="prairie"] .lpn-pane-tab, :root[data-theme="prairie"] .lpn-pane-tab-menu {
+	background: var(--ec-fence-grain), var(--ec-fence); color: var(--ec-ink); border: 1px solid var(--ec-fence-edge); border-top-width: 2px; border-bottom: 0; border-radius: 0;
+}
+:root[data-theme="prairie"] .lpn-pane-tab:hover, :root[data-theme="prairie"] .lpn-pane-tab-menu:hover { background: var(--ec-fence-grain), var(--ec-fence-hover); }
+:root[data-theme="prairie"] .lpn-pane-tab[aria-selected="true"], :root[data-theme="prairie"] .lpn-pane-tab-menu-current { background: var(--ec-bg); border-color: var(--ec-fence-edge); }
+:root[data-theme="prairie"] .lpn-dock-strip { background: var(--ec-fence-grain), var(--ec-fence); border-color: var(--ec-fence-edge); border-width: 2px 1px; }
+:root[data-theme="prairie"] .lpn-dock-tab { background: var(--ec-bg); color: var(--ec-ink); border-color: var(--ec-fence-edge); border-radius: 0; }
+:root[data-theme="prairie"] .lpn-dock-tab:hover, :root[data-theme="prairie"] .lpn-dock-tab:focus-visible, :root[data-theme="prairie"] .lpn-dock-tab[aria-expanded="true"] { background: var(--ec-fence-grain), var(--ec-fence-hover); }
 :root[data-theme="prairie"] #lpn_toolbar button:not(.lpn-transport-btn):hover:not(:disabled) { background: var(--ec-cloud); border-color: transparent; box-shadow: var(--ec-cloud-shadow); border-radius: 999px; }
 :root[data-theme="prairie"] #lpn_toolbar button:not(.lpn-transport-btn)[aria-pressed="true"] { background: var(--ec-cloud-pressed); border-color: var(--ec-cloud-pressed-edge); box-shadow: var(--ec-cloud-pressed-shadow); color: var(--ec-accent); border-radius: 999px; }
 :root[data-theme="prairie"] #lpn_toolbar_run .lpn-transport-btn { background: var(--ec-steel); border: 1px solid var(--ec-steel-edge); color: var(--ec-steel-ink); }
@@ -1291,8 +1313,7 @@
 :root[data-theme="prairie"] .lpn-tab-current .lpn-tab-x { color: var(--ec-bg); border-left-color: color-mix(in srgb, var(--ec-bg) 50%, transparent); }
 :root[data-theme="prairie"] .lpn-tab-current > button:hover { background: color-mix(in srgb, var(--ec-ink-black) 18%, transparent); }
 :root[data-theme="prairie"] .lpn-msglog-btn.lpn-msglog-active { background: var(--ec-bg); border-color: var(--ec-accent); color: var(--ec-accent); }
-.ec-theme-card[data-theme="prairie"] .ec-tc-menu { background: var(--ec-steel-ribs), var(--ec-steel); }
-.ec-theme-card[data-theme="prairie"] .ec-tc-menu i { background: transparent; border-color: var(--ec-steel-ink); }
+.ec-theme-card[data-theme="prairie"] .ec-tc-menu i { background: var(--ec-steel); border-color: var(--ec-steel-edge); border-radius: 4px / 50%; }
 .ec-theme-card[data-theme="prairie"] .ec-tc-tabs i { background: var(--ec-barn); }
 .ec-theme-card[data-theme="prairie"] .ec-tc-tabs i.ec-tc-cur { background: var(--ec-accent); }
 }

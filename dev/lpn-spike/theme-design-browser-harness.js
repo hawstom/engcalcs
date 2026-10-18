@@ -30,7 +30,8 @@
 //      middle (a web address excepted) and no text box clips its value where Light does not.
 //  13. WORDS AND ICONS ON THE CHROME, MEASURED IN PIXELS: a picture behind the chrome (Prairie's sky, Space's
 //      stars, the terminals' scan lines) is not a colour a style can report, so a screenshot is sampled round
-//      every word and icon in the menu bar, toolbar and tab strip, and the lightest and darkest pixel under it
+//      every word and icon in the menu bar, toolbar, tab strip and the bottom pane's tab strip (opened for the
+//      purpose; Prairie's fence boards), and the lightest and darkest pixel under it
 //      are each held to 4.5:1 for a word and 3:1 for an icon.
 //  14. THE THREE CONSENT BUTTONS LOOK ALIKE in every theme (CLAUDE.md: never restyle one consent button to stand
 //      out): the same computed fill, edge and ink on all three, and their words readable on that fill.
@@ -95,7 +96,7 @@ const DESIGN = {
 		boxFrame: '4px double', titleCase: 'uppercase', tabsRule: '4px double', iconStroke: 2.5, picture: 'some', titleInk: 'accent' },
 	space: { face: 'Futura', size: '15px', menuCase: 'uppercase', btnRadius: '2px', boxRadius: '3px', titleCase: 'uppercase',
 		iconStroke: 1.5, picture: 'some', titleInk: 'accent' },
-	prairie: { face: 'Rockwell', size: '15px', menuCase: 'uppercase', menuWeight: '700', btnRadius: '3px', boxRadius: '4px', boxFrame: '2px solid',
+	prairie: { face: 'Rockwell', size: '15px', menuCase: 'uppercase', menuWeight: '700', btnRadius: '12px 50%', boxRadius: '4px', boxFrame: '2px solid',
 		titleCase: 'uppercase', tabsRule: '4px double', iconCap: 'square', picture: 'some', titleInk: 'accent', titlePicture: 'some' }
 };
 const KEYS = ['face', 'size', 'menuCase', 'menuCaps', 'menuWeight', 'btnRadius', 'boxRadius', 'boxFrame', 'shadow', 'titleCase', 'tabsRule', 'iconStroke', 'iconCap', 'picture', 'glow'];
@@ -204,6 +205,9 @@ async function main() {
 		try {
 			await openPage(s);
 			themes = (await s.page.evaluate(() => window.ecTheme.list)).filter((t) => t !== 'system');
+			await s.toolbarClick(await s.lang('lpn_pane_toggle'));
+			await s.settle(600);
+			ok('the bottom pane is open, so its tabs are measured too', await s.page.evaluate(() => !!document.querySelector('.lpn-pane-strip .lpn-pane-tab')));
 			ok('the gallery offers every designed theme, and every theme offered is designed', JSON.stringify(themes.slice().sort()) === JSON.stringify(Object.keys(DESIGN).sort()), JSON.stringify(themes));
 			// 9: a face change lays the labels out once; the bank is keyed on the face
 			const stats = () => s.page.evaluate(() => EngCalcs.lpnMapThemeStats());
@@ -269,8 +273,10 @@ async function main() {
 						let worstText = 99, worstIcon = 99, wt = '', wi = '';
 						const opaque = (el) => {
 							let n = el;
-							for (; n && !n.matches('#lpn_menubar, #lpn_toolbar, #lpn_tabs'); n = n.parentElement) {
-								const b = parse(getComputedStyle(n).backgroundColor); if (b[3] >= 1) { return b; }
+							for (; n && !n.matches('#lpn_menubar, #lpn_toolbar, #lpn_tabs, .lpn-pane-strip'); n = n.parentElement) {
+								const c = getComputedStyle(n);
+								if (c.backgroundImage !== 'none') { return null; }   // a picture (fence boards, a tank): pixels
+								const b = parse(c.backgroundColor); if (b[3] >= 1) { return b; }
 							}
 							// The row itself: a plain colour is read as a colour; only a picture is sampled in pixels.
 							return n && getComputedStyle(n).backgroundImage === 'none' ? parse(getComputedStyle(n).backgroundColor) : null;
@@ -289,7 +295,7 @@ async function main() {
 								if (need === 'icon' && q < worstIcon) { worstIcon = q; wi = (el.closest('button') || el).getAttribute('title') || (el.closest('button') || el).className; }
 							});
 						};
-						document.querySelectorAll('#lpn_menubar *, #lpn_toolbar *, #lpn_tabs *').forEach((el) => {
+						document.querySelectorAll('#lpn_menubar *, #lpn_toolbar *, #lpn_tabs *, .lpn-pane-strip *').forEach((el) => {
 							if (el.closest('svg') && !el.matches('svg.ec-icon')) { return; }
 							if (el.matches('svg.ec-icon')) { if (!el.closest(':disabled')) { sample(el, 'icon'); } return; }
 							if (/^(SELECT|OPTION|INPUT)$/.test(el.tagName) || el.closest(':disabled')) { return; }

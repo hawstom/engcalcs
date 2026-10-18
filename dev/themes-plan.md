@@ -613,6 +613,18 @@ is wheat with a red edge. The consent buttons are steel, all three alike (CLAUDE
 every theme. Measured in Chromium: menu words on the steel 6.5:1 at worst, toolbar icons on the sky 6.0:1 at
 worst. Rockwell is absent on jasmine, so tab label widths on Windows want Tom's eye.
 
+**Prairie, Tom's calls on Ida's direction** (*"I disagree that the entire menu bar is a galvanized band ... the menu
+buttons, which I suggested to be individual tanks ... I love the toolbar clouds. I love the project tab barns. The
+lower elements ... look like Newspaper. Maybe they could use a brickish treatment or a fence treatment."*). The
+sky runs from the top of the window again, behind the menu bar; each menu is its own small galvanized tank
+(steel gradient, rounded shell ends, a highlight along its top, a thin steel edge, its name painted in dark
+bold spaced capitals; hover brightens the steel and lifts it with a soft shadow; open keeps the tank and paints
+its name in the deeper barn red, #7d1f15, 5.8:1 at the darkest steel). The bottom pane's tabs and the docked
+boxes' tabs are fence boards (weathered grey-brown with a faint grain, a heavier top rail), the current one a
+freshly painted board. **Brick was considered for the lower chrome and not used**: barn red already belongs to
+the project tabs, and a second red would compete with it; Tom can ask for brick instead. Measured in Chromium
+with the pane open: the worst word on Prairie's chrome is 6.3:1, the worst icon 6.0:1.
+
 **Known, not built**: colour by value keeps its ramp on a dark paper, so a ramp's darkest class (viridis
 purple) is faint on Amber, Arcade or Space; the fix (a casing in the paper's opposite tone, or lifting that
 stop) changes how a visitor's colouring looks and is Tom's call. The basemap tiles are not filtered.
