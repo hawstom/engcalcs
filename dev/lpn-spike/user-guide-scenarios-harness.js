@@ -30,7 +30,7 @@ const QUOTES = {
 	lpn_guide_scn_open_def: ['lpn_menu_project', 'lpn_scenario_menu', 'lpn_scenario_label', 'lpn_scenario_overrides', 'lpn_scenario_base',
 		'lpn_sm_title', 'lpn_scenario_basic'],
 	lpn_guide_scn_marks_def: ['lpn_alt_cat_physical', 'lpn_pane_scn_show', 'lpn_settings_override_marks', 'lpn_clean_map', 'lpn_menu_map',
-		'lpn_tool_settings', 'lpn_settings_sec_map', 'lpn_settings_page', 'lpn_settings_sec_symbology', 'lpn_labels_heading_node', 'lpn_labels_heading_link'],
+		'lpn_tool_settings', 'lpn_settings_sec_map', 'lpn_settings_map_options', 'lpn_settings_sec_symbology', 'lpn_labels_heading_node', 'lpn_labels_heading_link'],
 	lpn_guide_scn_make_def: ['lpn_morph_menu', 'lpn_paste_props_menu', 'lpn_find_menu', ['lpn_sm_list_overrides', 'Override manager'], 'lpn_ovl_clear_selected',
 		'lpn_pane_clear_override', 'lpn_ovl_clear_all'],
 	lpn_guide_scn_scope_def: ['lpn_alt_cat_physical', 'lpn_alt_cat_demand', 'lpn_alt_cat_topology', 'lpn_alt_cat_initial', 'lpn_alt_cat_constituent',
@@ -210,8 +210,8 @@ async function main() {
 			}
 			return out.join(' < ');
 		}, await T('lpn_settings_override_marks'));
-		ok('Show override markers on the map sits under ' + (await T('lpn_settings_sec_map')) + ' and ' + (await T('lpn_settings_page')),
-			!!heads && heads.indexOf(await T('lpn_settings_page')) === 0 && heads.indexOf(await T('lpn_settings_sec_map')) > 0, heads);
+		ok('Show override markers on the map sits under ' + (await T('lpn_settings_sec_map')) + ' and ' + (await T('lpn_settings_map_options')),
+			!!heads && heads.indexOf(await T('lpn_settings_map_options')) === 0 && heads.indexOf(await T('lpn_settings_sec_map')) > 0, heads);
 		const hasHead = (t) => P.evaluate((x) => Array.from(document.querySelectorAll('#lpn_settings_box .lpn-set-head, #lpn_settings_box .lpn-set-sub'))
 			.some((h) => h.textContent.trim().indexOf(x) === 0), t);
 		ok('the Settings box has the headings the chapters name: Symbology with Node labels and Link labels, Calculation with Hydraulics',

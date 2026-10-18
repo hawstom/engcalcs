@@ -1196,23 +1196,25 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 				<section id="lpn_set_sec_map" class="lpn-set-sec" data-set-sec="map">
 					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_map']?></h3>
 					<div class="lpn-set-secbody">
-						<?php // Map appearance holds what is true of the WHOLE SHEET: the sizes, the two
-						      // legend positions, the thematic mode. Its heading sits immediately before
-						      // Text size, which is Tom's own placement.
-						      //
-						      // The colour-scheme acknowledgements are rendered into the shared host by
-						      // buildColoringSection(), VERBATIM out of EngCalcs.lpnRamps.CREDITS -- one
-						      // licence fixes its own wording, so it is never retyped here where it could
-						      // drift. Untranslated on purpose, exactly like the OpenStreetMap credit on
-						      // the map. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_mapDisplay" data-saved="project"><?=$ec_lang['lpn_settings_map_display']?><?=lpnSavedMark('project')?></div>
+						<?php // Tom, 2026-10-18: two indexed sub-headings, Drawing (the numbers and the two
+						      // legend corners) and Options (the switches, the theme, the resets), each
+						      // cut by small headings the index leaves out (.lpn-set-group). The minor
+						      // groups are built in JS except Positions, which three builders share:
+						      // the labels legend, the colour legend (buildColoringSection) and the
+						      // along-the-line switch, in that order. Options mixes project and
+						      // browser rows, so its browser rows carry their own marker. The colour-scheme
+						      // acknowledgements live in the Credits section, verbatim. ?>
+						<div class="lpn-set-sub" id="lpn_set_sub_mapDisplay" data-saved="project"><?=$ec_lang['lpn_settings_map_drawing']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_set_map_fields" class="lpn-set-part"></div>
-							<div id="lpn_set_colors_shared" class="lpn-set-part"></div>
+							<div class="lpn-set-part">
+								<div class="lpn-set-group"><?=$ec_lang['lpn_settings_grp_positions']?></div>
+								<div id="lpn_set_pos_fields" class="lpn-set-part"></div>
+								<div id="lpn_set_colors_shared" class="lpn-set-part"></div>
+								<div id="lpn_set_pos_fields2" class="lpn-set-part"></div>
+							</div>
 						</div>
-						<?php // Tom: "Change Calculator to Page and make it a heading." The one group in the
-						      // box that is NOT carried in the project file, which its note says out loud. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_page" data-saved="browser"><?=$ec_lang['lpn_settings_page']?><?=lpnSavedMark('browser')?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_page" data-saved="project"><?=$ec_lang['lpn_settings_map_options']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_page_fields" class="lpn-set-part"></div></div>
 					</div>
 				</section>
@@ -2129,6 +2131,13 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 
 <script>
 EngCalcs.pageConfig = {
+	lpn_settings_grp_size: <?=json_encode($ec_lang['lpn_settings_grp_size'])?>,
+	lpn_settings_grp_angle: <?=json_encode($ec_lang['lpn_settings_grp_angle'])?>,
+	lpn_settings_grp_zoom: <?=json_encode($ec_lang['lpn_settings_grp_zoom'])?>,
+	lpn_settings_grp_fade: <?=json_encode($ec_lang['lpn_settings_grp_fade'])?>,
+	lpn_settings_grp_show: <?=json_encode($ec_lang['lpn_settings_grp_show'])?>,
+	lpn_settings_grp_thematic: <?=json_encode($ec_lang['lpn_settings_grp_thematic'])?>,
+	lpn_settings_grp_resets: <?=json_encode($ec_lang['lpn_settings_grp_resets'])?>,
 	lpn_tool_select: <?=json_encode($ec_lang['lpn_tool_select'])?>,
 	lpn_tool_add_junction: <?=json_encode($ec_lang['lpn_tool_add_junction'])?>,
 	lpn_tool_add_reservoir: <?=json_encode($ec_lang['lpn_tool_add_reservoir'])?>,

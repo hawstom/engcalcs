@@ -85,8 +85,8 @@ rows) are counted only when present. Regenerate with
 | `lpn_set_sub_linkColors` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_custLbl` | 8 | 8 | 0 | 0 |
 | `lpn_set_sub_nodeLink` | 1 | 1 | 0 | 0 |
-| `lpn_set_sub_mapDisplay` | 19 | 19 | 0 | 0 |
-| `lpn_set_sub_page` | 4 | 0 | 4 | 0 |
+| `lpn_set_sub_mapDisplay` | 16 | 16 | 0 | 0 |
+| `lpn_set_sub_page` | 7 | 3 | 4 | 0 |
 | `lpn_set_sub_idPrefixes` | 7 | 7 | 0 | 0 |
 | `lpn_set_sub_defaults` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_customProps` | 10 | 10 | 0 | 0 |
