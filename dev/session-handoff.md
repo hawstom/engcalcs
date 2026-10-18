@@ -114,7 +114,7 @@ Deleted keys: `lpn_guide_text_notes_popup`; and from the 26 non-English files on
 ### Branches awaiting his browser pass (all pre-reviewed by Perry, all green, all pushed)
 
 - `feat/sheet-sync` (Branch previews row 8108): Task 752 phase 1, the scenario workbook as an .xlsx
-  file, export and import with a report first. Design calls for him in `dev/scenario-workbook.md`: Q3
+  file, export and import with a report first. Design calls for him in `feat/sheet-sync:dev/scenario-workbook.md`: Q3
   Base values are not in the workbook; Q5 renaming a scenario does not rename its same-name
   alternatives (against his 2026-10-12 rule). Typed characters (6.00) are not kept, because the program
   itself stores only the number.
@@ -122,7 +122,7 @@ Deleted keys: `lpn_guide_text_notes_popup`; and from the 26 non-English files on
   Platinum, Light's two "better" changes. `lpn_theme` takes more values; nothing new stored. Calculator
   pages ignore the theme (planned for a later branch). Perry's fix round is in (594ce706a, green): every
   theme prints in Light colours, the hover card is opaque (Light's was 90%), the tip is reworded.
-- `feat/label-beside` (row 8110): Task 812 Steps 0, 1, 3 from `dev/label-trials/port-plan.md`. Perry's fix
+- `feat/label-beside` (row 8110): Task 812 Steps 0, 1, 3 from `docs/label-port:dev/label-trials/port-plan.md`. Perry's fix
   round is in (3f21650fc, green): a level label must be nearest its own pipe or draw a leader; labels
   shown 44.1% to 53.7% of those asked; n600 at 1x 914 ms.
 - `docs/label-port`: the port plan and pre-processing inquiry (Task 813); merges with label-beside.
