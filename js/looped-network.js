@@ -45188,9 +45188,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			setWarning((pc.lpn_msx_not_msx || '{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.').split('{file}').join(fileName));
 			return;
 		}
+		var prevMsx = doc.msx || null;
 		saveUndoSnapshot();
 		doc.msx = { name: fileName, text: r.text, enc: r.enc };
 		libCommit();
+		// **A FILE THE BROWSER CANNOT KEEP IS NOT "KEPT"**: the autosave just refused it, so it
+		// would be gone on reload. Put the previous state back, save that, and say so where it is seen.
+		if (storageError) {
+			doc.msx = prevMsx;
+			saveToStorage();
+			setWarning((pc.lpn_msx_too_big || '{file} is too large to keep in browser storage, so it was not attached.').split('{file}').join(fileName));
+			return;
+		}
 		openDialog(function (body) {
 			var h = document.createElement('p'), p;
 			h.style.margin = '0 0 8px';
@@ -45199,11 +45208,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			body.appendChild(h);
 			p = document.createElement('p');
 			p.style.margin = '0 0 6px';
-			p.textContent = pc.lpn_msx_report_kept || 'This EPANET-MSX file is kept with the project and written back unchanged on export. This page does not run it.';
+			p.textContent = pc.lpn_msx_report_kept || 'This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. This page does not run it.';
 			body.appendChild(p);
 			p = document.createElement('p');
 			p.style.margin = '0 0 6px';
-			p.textContent = (pc.lpn_msx_report_species || 'Species in the file: {list}.').split('{list}').join(scan.species.join(', '));
+			p.textContent = scan.species.length ? (pc.lpn_msx_report_species || 'Species in the file: {list}.').split('{list}').join(scan.species.join(', '))
+				: (pc.lpn_msx_report_no_species || 'No species are listed in the file.');
 			body.appendChild(p);
 			if (scan.missing.length) {
 				ids = scan.missing.slice(0, 12).join(', ') + (scan.missing.length > 12 ? ', …' : '');
@@ -45233,7 +45243,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			body.appendChild(ta);
 			ta = document.createElement('p');
 			ta.style.margin = '6px 0 0';
-			ta.textContent = pc.lpn_msx_report_kept || 'This EPANET-MSX file is kept with the project and written back unchanged on export. This page does not run it.';
+			ta.textContent = pc.lpn_msx_report_kept || 'This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. This page does not run it.';
 			body.appendChild(ta);
 		}, [
 			{ label: pc.lpn_msx_replace || 'Replace…', fn: function () { setTimeout(pickMsxFile, 0); } },

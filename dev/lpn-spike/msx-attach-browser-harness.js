@@ -128,7 +128,7 @@ async function main() {
 		console.log('\n--- File > Import > EPANET-MSX file ---');
 		await attach(a, L, 'cl.msx', MSX1, false);
 		const rep = await dialogText(a);
-		ok('the report says the file is kept and not run', rep.indexOf(L.kept) >= 0, rep);
+		ok('the report says the file is kept and not run', rep.indexOf(L.kept) >= 0 && /when the EPANET-MSX file is exported/.test(rep), rep);
 		ok('...names the species CL2', /Species in the file: CL2\./.test(rep), rep);
 		ok('...names the ID the network lacks (NOWHERE) and not J1', rep.indexOf('NOWHERE') >= 0 && !/this network does not have:[^.]*J1/.test(rep), rep);
 		await closeDialogs(a);
@@ -175,6 +175,19 @@ async function main() {
 		}
 		const e3 = await exportMsx(b, L);
 		ok('reopened project exports the same bytes', e3.length === 1 && Buffer.compare(e3[0].bytes, MSX1) === 0, e3.map((f) => f.name + ':' + f.bytes.length).join(', '));
+
+		console.log('\n--- a file the browser cannot keep (6 MB) is refused, and the old one stays ---');
+		const BIG = Buffer.concat([Buffer.from('[SPECIES]\nBULK CL2 MG\n[TERMS]\n'), Buffer.alloc(6 * 1024 * 1024, 'x')]);
+		await b.menuClickSub(L.imp, L.impMsx, 'file');
+		await b.settle(400);
+		await attach(b, L, 'big.msx', BIG, true);
+		const bigSaid = await dialogText(b);
+		ok('the visitor is told it is too large to keep and was not attached', /too large to keep in browser storage/.test(bigSaid), bigSaid.slice(0, 160));
+		await closeDialogs(b);
+		const e4 = await exportMsx(b, L);
+		ok('the previous .msx is still attached and exports unchanged', e4.length === 1 && Buffer.compare(e4[0].bytes, MSX1) === 0);
+		const stored = await b.page.evaluate(() => Object.keys(localStorage).some((k) => (localStorage.getItem(k) || '').indexOf('xxxxxxxxxxxxxxxx') >= 0));
+		ok('nothing of the big file reached browser storage', !stored);
 
 		console.log('\n--- Remove ---');
 		await b.menuClickSub(L.imp, L.impMsx, 'file');

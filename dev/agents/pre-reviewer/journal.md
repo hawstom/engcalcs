@@ -4507,3 +4507,5 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: ar: dir rtl, right-aligned, colon on the correct side; "Chlorine" and custom-property names stay Latin; no Arabic font here so glyphs are boxes (not checked visually).
 - OBSERVED leftovers: "Closed: —" for an open pipe, "Is active?: ✓", "No pipe type chosen", "No fittings list chosen", "No pattern", "Demand pattern: (default: 1)"; extra Description lines print as unlabelled rows.
 - NOT CHECKED: harness mutation, dark theme, touch, ✓ glyph in the card (boxes in this headless font).
+
+2026-10-18 feat/msx b1a11204c. OBSERVED: harness 14/14; Net1+msx base/scenario export names match; IDs (j-1, Node.Two, 7, Res_A) survive .inp export; undo/redo of attach ok; 6MB attach not persisted past reload (saved silently-ish). 390px dialog fits. Merge with master conflicts only in dev/new-english-keys.md.
