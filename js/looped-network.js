@@ -75801,7 +75801,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		epanetWarmLoaded = 0;
 		epanetWarmTotal = 0;
 		epanetWarmPct = -1;
-		if (!quiet) { setNotice(pc.lpn_engine_fetching || 'Getting the EPANET solver.'); }
+		if (!quiet) { setNotice(pc.lpn_engine_fetching || 'Downloading the EPANET solver. It is downloaded once and then stored on this device, so it works offline afterward.'); }
 		refreshEpanetBanner();
 		EngCalcs.lpnEpanetLoad(null, onEpanetProgress).then(function () {
 			epanetWarmState = 'ready';
