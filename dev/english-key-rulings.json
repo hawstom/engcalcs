@@ -7522,6 +7522,31 @@
             "on": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
             "ruled": "2026-10-18",
             "answer": "Yes! That's the right question."
+        },
+        "lpn_export_holds_scenario": {
+            "on": "It holds the scenario {scenario} only.",
+            "ruled": "2026-10-18",
+            "answer": "I approved all."
+        },
+        "lpn_export_holds_base": {
+            "on": "It holds the Base scenario only.",
+            "ruled": "2026-10-18",
+            "answer": "I approved all."
+        },
+        "lpn_geojson_results_other": {
+            "on": "No results are included, because the results on screen belong to the scenario {scenario}.",
+            "ruled": "2026-10-18",
+            "answer": "I approved all."
+        },
+        "lpn_survey_added_scenario": {
+            "on": "The nodes were added to {scenario}. In Base they are inactive.",
+            "ruled": "2026-10-18",
+            "answer": "I approved all."
+        },
+        "lpn_pane_pasted_scenario": {
+            "on": "These values are overrides in the scenario {scenario}.",
+            "ruled": "2026-10-18",
+            "answer": "I approved all."
         }
     }
 }

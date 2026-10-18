@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 1 untranslated keys, of 3026 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**1 still to read on master**, of 6 untranslated keys, of 3031 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,17 +29,32 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (1, all ruled)
+## lpn_  (6, 1 to read @@ NEEDS RULING)
 
-- **`lpn_roughness_method_note`**
-  > ⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.
-  _Ruled 2026-10-18: I agree._
+- **`lpn_export_holds_base`**
+  > It holds the Base scenario only.
+  _Ruled 2026-10-18: I approved all._
+- **`lpn_export_holds_scenario`**
+  > It holds the scenario {scenario} only.
+  _Ruled 2026-10-18: I approved all._
+- **`lpn_export_leaves_alternatives`**
+  > The alternatives stored in this project are not in the file.
+  @@ NEEDS RULING
+- **`lpn_geojson_results_other`**
+  > No results are included, because the results on screen belong to the scenario {scenario}.
+  _Ruled 2026-10-18: I approved all._
+- **`lpn_pane_pasted_scenario`**
+  > These values are overrides in the scenario {scenario}.
+  _Ruled 2026-10-18: I approved all._
+- **`lpn_survey_added_scenario`**
+  > The nodes were added to {scenario}. In Base they are inactive.
+  _Ruled 2026-10-18: I approved all._
 
 ---
 
 # Strings waiting on a branch
 
-**131 still to read**, of 163 new keys across 19 unmerged branch(es).
+**154 still to read**, of 157 new keys across 19 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -56,7 +71,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-beside (`8676cd1be`) — already merged into feat/label-form; its strings are listed there
 
-### feat/label-form (`189535122`) — adds no English strings
+### feat/label-form (`62e158e10`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -146,86 +161,86 @@ build for that would be a gate nobody keeps. Refresh it with
   > EPANET Net1 with scenarios, gpm (US)
   @@ NEEDS RULING
 
-### feat/sheet-sync (`1c77e44cd`) — 77 new, 52 to read @@ NEEDS RULING
+### feat/sheet-sync (`1c77e44cd`) — 77 new, 77 to read @@ NEEDS RULING
 
 - **`lpn_file_export_item_scnbook`**
   > Scenario workbook…
-  _Ruled 2026-10-17: Deprecated, I think._
+  @@ NEEDS RULING
 - **`lpn_file_export_scnbook_tip`**
   > Download the scenarios, their alternatives, and the overrides of each alternative as one .xlsx workbook, in the project units. Edit it in a spreadsheet program. Read it back with File, Import, Import scenario workbook.
-  _Ruled 2026-10-17: Deprecated, I think._
+  @@ NEEDS RULING
 - **`lpn_file_import_scnbook`**
   > Import scenario workbook…
-  _Ruled 2026-10-17: Deprecated, I think._
+  @@ NEEDS RULING
 - **`lpn_file_import_scnbook_tip`**
   > Read back a scenario workbook made with File, Export, Scenario workbook, after it is edited in a spreadsheet program. Every difference from this project is listed before anything is changed, with each row that cannot be used and the reason. Apply changes makes them all as one step, which Undo reverses. Nothing the workbook leaves out is deleted.
-  _Ruled 2026-10-17: Deprecated, I think._
+  @@ NEEDS RULING
 - **`lpn_scnbook_alternative_name`**
   > Alternative name ({category})
-  _Ruled OK 2026-10-17._
+  @@ NEEDS RULING
 - **`lpn_scnbook_alternative_parent`**
   > Parent of alternative {name} ({category})
-  _Ruled OK 2026-10-17._
+  @@ NEEDS RULING
 - **`lpn_scnbook_applied`**
   > Applied {n} changes from {file}. Undo reverses them.
-  _Ruled OK 2026-10-17._
+  @@ NEEDS RULING
 - **`lpn_scnbook_apply`**
   > Apply changes
-  _Ruled OK 2026-10-17._
+  @@ NEEDS RULING
 - **`lpn_scnbook_apply_failed`**
   > Not applied: {list}.
-  _Ruled OK 2026-10-17._
+  @@ NEEDS RULING
 - **`lpn_scnbook_blank`**
   > (blank)
-  _Ruled OK 2026-10-17._
+  @@ NEEDS RULING
 - **`lpn_scnbook_col_alternative`**
   > Alternative
-  _Ruled 2026-10-17: Deprecated, I think. And don't these exist elsewhere? We should DRY._
+  @@ NEEDS RULING
 - **`lpn_scnbook_col_assets`**
   > Assets
-  _Ruled 2026-10-17: Deprecated, I think. And don't these exist elsewhere? We should DRY._
+  @@ NEEDS RULING
 - **`lpn_scnbook_col_change`**
   > Change
-  _Ruled 2026-10-17: Deprecated, I think. And don't these exist elsewhere? We should DRY._
+  @@ NEEDS RULING
 - **`lpn_scnbook_col_demands`**
   > Demand categories
-  _Ruled 2026-10-17: Deprecated, I think. And don't these exist elsewhere? We should DRY._
+  @@ NEEDS RULING
 - **`lpn_scnbook_col_fingerprint`**
   > Asset ID check
-  _Ruled 2026-10-17: Deprecated, I think._
+  @@ NEEDS RULING
 - **`lpn_scnbook_col_path`**
   > Path
-  _Ruled 2026-10-17: Deprecated, I think. And don't these exist elsewhere? We should DRY._
+  @@ NEEDS RULING
 - **`lpn_scnbook_col_project`**
   > In the project
-  _Ruled 2026-10-17: Deprecated, I think._
+  @@ NEEDS RULING
 - **`lpn_scnbook_col_project_name`**
   > Project
-  _Ruled 2026-10-17: Deprecated, I think. And don't these exist elsewhere? We should DRY._
+  @@ NEEDS RULING
 - **`lpn_scnbook_col_reason`**
   > Reason
-  _Ruled 2026-10-17: Deprecated, I think. And don't these exist elsewhere? We should DRY._
+  @@ NEEDS RULING
 - **`lpn_scnbook_col_row`**
   > Row
-  _Ruled 2026-10-17: Deprecated, I think._
+  @@ NEEDS RULING
 - **`lpn_scnbook_col_sheet`**
   > Sheet
-  _Ruled 2026-10-17: Deprecated, I think._
+  @@ NEEDS RULING
 - **`lpn_scnbook_col_workbook`**
   > In the workbook
   @@ NEEDS RULING
 - **`lpn_scnbook_head_changes`**
   > Changes ({n})
-  _Ruled 2026-10-17: Deprecated, I think._
+  @@ NEEDS RULING
 - **`lpn_scnbook_head_kept`**
   > Kept, not in the workbook ({n})
-  _Ruled 2026-10-17: Deprecated, I think._
+  @@ NEEDS RULING
 - **`lpn_scnbook_head_unusable`**
   > Not used ({n})
-  _Ruled 2026-10-17: Deprecated, I think. And don't these exist elsewhere? We should DRY._
+  @@ NEEDS RULING
 - **`lpn_scnbook_kept_alternative`**
   > Alternative {name} ({category}) is not in the workbook, and is kept.
-  _Ruled 2026-10-17: Deprecated, I think._
+  @@ NEEDS RULING
 - **`lpn_scnbook_kept_scenario`**
   > Scenario {name} is not in the workbook, and is kept.
   @@ NEEDS RULING
@@ -530,11 +545,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   @@ NEEDS RULING
 
-### feat/theme (`f91c79069`) — 9 new, 5 to read @@ NEEDS RULING
+### feat/theme (`f91c79069`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_theme_amber`**
   > Amber
-  _Ruled OK 2026-10-17._
+  @@ NEEDS RULING
 - **`lpn_theme_arcade`**
   > Arcade
   @@ NEEDS RULING
@@ -543,16 +558,16 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_theme_green`**
   > Green
-  _Ruled OK 2026-10-17._
+  @@ NEEDS RULING
 - **`lpn_theme_hc`**
   > High contrast
-  _Ruled OK 2026-10-17._
+  @@ NEEDS RULING
 - **`lpn_theme_newspaper`**
   > Newspaper
   @@ NEEDS RULING
 - **`lpn_theme_platinum`**
   > Platinum
-  _Ruled OK 2026-10-17._
+  @@ NEEDS RULING
 - **`lpn_theme_rounded`**
   > Rounded
   @@ NEEDS RULING
@@ -564,23 +579,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### fix/native-psv (`977e854cd`) — adds no English strings
 
-### fix/scenario-receipt (`8ed43cb78`) — 6 new, 6 to read @@ NEEDS RULING
-
-- **`lpn_export_holds_base`**
-  > It holds the Base scenario only.
-  @@ NEEDS RULING
-- **`lpn_export_holds_scenario`**
-  > It holds the scenario {scenario} only.
-  @@ NEEDS RULING
-- **`lpn_export_leaves_alternatives`**
-  > The alternatives stored in this project are not in the file.
-  @@ NEEDS RULING
-- **`lpn_geojson_results_other`**
-  > No results are included, because the results on screen belong to the scenario {scenario}.
-  @@ NEEDS RULING
-- **`lpn_pane_pasted_scenario`**
-  > These values are overrides in the scenario {scenario}.
-  @@ NEEDS RULING
-- **`lpn_survey_added_scenario`**
-  > The nodes were added to {scenario}. In Base they are inactive.
-  @@ NEEDS RULING
+### fix/scenario-receipt (`8ed43cb78`) — adds no English strings
