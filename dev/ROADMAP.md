@@ -160,7 +160,7 @@ the block.
     `labelPass` inside `buildDom` and a label-measurement count.
 - 100|749| **Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.**
   Tom, 2026-10-17: *"I am working on getting us at least one .sqllite example in case you can't find or make one."*
-  **PROMOTED TO 100 by Tom, 2026-10-14. Blocked on a sample file**: a small WaterCAD model with one child scenario, saved as `.sqlite` and as `.inp`.
+  **PROMOTED TO 100 by Tom, 2026-10-14. Samples found 2026-10-17** (`dev/agents/market-researcher/wtg-samples.md`): Zenodo 7162154 (CC BY 4.0) has WaterGEMS `.wtg.sqlite` files, one with a child scenario that overrides nothing, and an `.inp` of the same model; TSNet (MIT) has two Base-only ones. **Still missing:** a child scenario that overrides a value, with its `.inp`; Tom may make one with a free EWB Bentley licence. Reader foundation on `feat/sqlite-reader`.
   Tom, 2026-10-06: *"As far as bentley-interop goes, the goal is to engage with the .sqlite file and
   connect to Google Sheets for Sync in and Sync out"* (the Sheets half is Task 752). The model it
   needs is Task 721. Phase 1 (`dev/bentley-interop.md`): the schema is unpublished, no public sample

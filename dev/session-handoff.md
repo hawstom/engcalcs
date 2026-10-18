@@ -135,9 +135,8 @@ Deleted keys: `lpn_guide_text_notes_popup`; and from the 26 non-English files on
   when a tip is showing during a redraw. A defect: merges on green.
 - `feat/sqlite-reader` (Task 749, agent may still be running in an agent worktree (`git worktree list`); check
   `git log master..feat/sqlite-reader` and its worktree `git status`): sql.js vendored, lazy, no UI.
-- WaterCAD sample hunt: report at
-  `/tmp/claude-1000/-home-haws-webdev-hawsedc-com-engcalcs/ed416eba-df76-4fb3-affc-2f4a618ced1e/scratchpad/wtg-sample-hunt.md`
-  if the agent finished; file it under `dev/agents/market-researcher/`. Tom is seeking a free EWB Bentley licence.
+- WaterCAD samples found: `dev/agents/market-researcher/wtg-samples.md` (Zenodo 7162154, TSNet). Tom is
+  seeking a free EWB Bentley licence to make the one missing case, a child that overrides a value.
 
 ### Next job
 
