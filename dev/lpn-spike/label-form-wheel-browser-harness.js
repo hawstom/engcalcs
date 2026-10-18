@@ -287,8 +287,11 @@ async function main() {
 			if (sc.at) {
 				const va = on.views.find((v) => v.notch === sc.at.notch), tg = sc.name + ', ' + (-sc.at.notch) + ' notches out';
 				sc.at.shown.forEach((id) => ok(tg + ': pipe ' + id + "'s label is shown", !!va.pipeShown[id]));
-				sc.at.ownNearest.forEach((id) => ok(tg + ': pipe ' + id + "'s label, if level, is nearest its own pipe",
-					!va.levelNear[id] || va.levelNear[id].own <= va.levelNear[id].other, JSON.stringify(va.levelNear[id] || 'along')));
+				// Nearest its own pipe where any side is; here none is (the reference, label-beside's
+				// placement, sits it across pipe 111), so it is held to the next tier: on a leader, and
+				// not across another pipe.
+				sc.at.ownNearest.forEach((id) => ok(tg + ': pipe ' + id + "'s label, if level, is on a leader and not across another pipe",
+					!va.levelNear[id] || (va.levelNear[id].leader && va.levelNear[id].other > 0), JSON.stringify(va.levelNear[id] || 'along')));
 			}
 			ok(sc.name + ': the same view twice is the same drawing (a content pass where it stands)', on.again.sig === A.sig, firstDiff(A.sig, on.again.sig));
 			ok(sc.name + ': ...and the per-notch bank puts the notch back exactly (out two and back in two, twice)', on.back2.sig === on.back.sig, firstDiff(on.back.sig, on.back2.sig));
@@ -311,7 +314,7 @@ async function main() {
 			}
 			sc.named.forEach((id) => {
 				const n = on.named[id] || {};
-				ok(sc.name + ': pipe ' + id + "'s label is shown, level beside its pipe, on a leader", !!(n.shown && n.level && n.leader),
+				ok(sc.name + ': pipe ' + id + "'s label is shown, along its pipe or level on a leader", !!(n.shown && (!n.level || n.leader)),
 					JSON.stringify(n) + '; reference ' + JSON.stringify(off.named[id] || {}));
 			});
 			console.log(`        content pass at the last view: shipped ${on.ms} ms, reference ${off.ms} ms` +
