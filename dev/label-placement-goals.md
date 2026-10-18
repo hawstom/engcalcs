@@ -290,8 +290,19 @@ shed trailing values (per §2.2's link order) → set it level beside its pipe �
 on, that shed to its last value and is still crowded, found no clear station, yielded its ground
 to a node label, or is too long for its segment, is tried level beside its pipe as a free label with a leader, after every other
 label is placed and only where it breaks no never-rule, and only where a reader can tell its pipe:
-a side close enough to need no leader must leave its own pipe the nearest pipe to its rows; a side
-further out carries a leader. The hide stays the terminal rung. A label too short for its segment
+it carries a leader from its pipe whenever it is more than 0.6 of a font size off it, and a side
+nearer than that must leave its own pipe the nearest pipe to its rows. Its leader starts at the
+pipe's middle, or, when every side there is taken, at the nearest clear station (0.5, 0.35, 0.65,
+0.2, 0.8 of the pipe). Once every level label has its smallest form, each may take another form:
+more of its values, one line or a stack, whichever shows more (Tom, 2026-10-18: *"Whichever shows
+more"*), at the station it stands on, without costing any other label its place. The hide stays the
+terminal rung.
+
+**A node label's two forms (Tasks 734 and 812, `tryInlineNodeLabels()`).** A node label is a stack,
+or its fields on one line, in the same order with the page's separator, east or west of its node.
+Where nothing is lost the stack stays. Where a node label found no side, or a placed one makes a
+pipe label yield, those labels and the ones in their way try one line before anything sheds; the
+layout that shows more labels, then more values, is kept, and a tie keeps the stacks. A label too short for its segment
 never lies along it (Tom, 2026-08-14), but it tries the level rung like the rest (Tom, 2026-10-17:
 short pipes should also try the level spot; `short-line-label-harness.js`).
 

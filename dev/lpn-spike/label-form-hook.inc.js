@@ -1,0 +1,183 @@
+	// label-form-wheel-browser-harness.js's handles, injected into js/looped-network.js on its way to
+	// the browser. Reads the drawing, in world units, from the glyphs.
+	window.__lpnForm = {
+		fields: function (nodeF, linkF) {
+			Object.keys(labelSettings.node).concat(nodeF).forEach(function (k) { labelSettings.node[k] = nodeF.indexOf(k) >= 0; });
+			Object.keys(labelSettings.link).concat(linkF).forEach(function (k) { labelSettings.link[k] = linkF.indexOf(k) >= 0; });
+			settings.alignPipeLabels = true;
+			saveToStorage(); requestLabelRefresh();
+		},
+		solved: function () { return !!lastSolveResult; },
+		fit: function () { zoomExtent(); },
+		content: function () { refreshLabelText(); },
+		timeContent: function (n) {
+			var t = [], i, t0;
+			for (i = 0; i < n; i++) { t0 = performance.now(); refreshLabelText(); t.push(performance.now() - t0); }
+			t.sort(function (a, b) { return a - b; });
+			return Math.round(t[t.length >> 1]);
+		},
+		pipePx: function (id) {
+			var l = linkById(id), p = linkPointList(l), d = 0, i;
+			for (i = 1; i < p.length; i++) { d += Math.hypot(p[i].x - p[i - 1].x, p[i].y - p[i - 1].y); }
+			return d * state.s;
+		},
+		named: function (ids) {
+			var out = {};
+			ids.forEach(function (id) {
+				var le = linkEls[id], f = le && le.levelBeside && le.levelForm;
+				if (!le) { out[id] = null; return; }
+				out[id] = { shown: !!le.text.textContent && le.text.checkVisibility({ visibilityProperty: true }),
+					level: !!le.levelBeside, leader: !!(le.leader && le.leader.style.display !== 'none' && le.leader.style.visibility !== 'hidden'),
+					stacked: !!(f && f.stacked), values: f ? f.lines.length : (le.lines || []).length, text: le.text.textContent };
+			});
+			return out;
+		},
+		clipOf: function (key) {
+			var h = key.charAt(0) === 'n' ? nodeEls[key.slice(2)] : linkEls[key.slice(2)], r, c = svg.getBoundingClientRect(), x0, y0, x1, y1;
+			if (!h || !h.text) { return null; }
+			r = h.text.getBoundingClientRect();
+			x0 = Math.max(c.left, r.left - 90); y0 = Math.max(c.top, r.top - 70);
+			x1 = Math.min(c.right, r.right + 90); y1 = Math.min(c.bottom, r.bottom + 70);
+			return { x: x0, y: y0, width: x1 - x0, height: y1 - y0 };
+		},
+		read: function (tolPx, ambPx) {
+			var s = state.s, W = svg.clientWidth, H = svg.clientHeight, tol = tolPx / s, amb = ambPx / s,
+				v = { labels: 0, values: 0, nodes: 0, nodeInline: 0, nodeStacked: 0, pipes: 0, along: 0, level: 0, levelLeader: 0,
+					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N3: [], N3node: 0, astray: [], sig: [] },
+				items = [], circles = [], texts = [];
+			function inView(p) { var x = p.x * s + state.tx, y = p.y * s + state.ty; return x >= 0 && x <= W && y >= 0 && y <= H; }
+			function vis(t) { return !!t && !!t.textContent && t.checkVisibility({ visibilityProperty: true, opacityProperty: true }); }
+			function leaderOf(h) {
+				var e = h.leader;
+				if (!e || e.style.display === 'none' || e.style.visibility === 'hidden' || e.getAttribute('x1') == null) { return null; }
+				return { ax: +e.getAttribute('x1'), ay: +e.getAttribute('y1'), bx: +e.getAttribute('x2'), by: +e.getAttribute('y2') };
+			}
+			// The rows of a <text> as drawn: each row's tspans' own boxes, turned by the text's rotation.
+			function rowsOf(t) {
+				var m = /rotate\(([-0-9.e]+)[ ,]+([-0-9.e]+)[ ,]+([-0-9.e]+)\)/.exec(t.getAttribute('transform') || ''),
+					a = m ? +m[1] : 0, ox = m ? +m[2] : 0, oy = m ? +m[3] : 0, rows = [], cur = null, i, c, b, rad = a * Math.PI / 180;
+				for (i = 0; i < t.childNodes.length; i++) {
+					c = t.childNodes[i];
+					if (c.nodeType !== 1) { continue; }
+					try { b = c.getBBox(); } catch (e) { continue; }
+					if (!(b.width > 0)) { continue; }
+					if (c.getAttribute('x') != null || !cur) { cur = { x0: b.x, y0: b.y, x1: b.x + b.width, y1: b.y + b.height }; rows.push(cur); }
+					else { cur.x0 = Math.min(cur.x0, b.x); cur.y0 = Math.min(cur.y0, b.y); cur.x1 = Math.max(cur.x1, b.x + b.width); cur.y1 = Math.max(cur.y1, b.y + b.height); }
+				}
+				return rows.map(function (r) {
+					var cx = (r.x0 + r.x1) / 2, cy = (r.y0 + r.y1) / 2, dx = cx - ox, dy = cy - oy;
+					if (a) { cx = ox + dx * Math.cos(rad) - dy * Math.sin(rad); cy = oy + dx * Math.sin(rad) + dy * Math.cos(rad); }
+					return { cx: cx, cy: cy, w: r.x1 - r.x0, h: r.y1 - r.y0, a: rad };
+				});
+			}
+			function axes(b) { return [[Math.cos(b.a), Math.sin(b.a)], [-Math.sin(b.a), Math.cos(b.a)]]; }
+			function proj(b, ax) {
+				var c = b.cx * ax[0] + b.cy * ax[1], e = Math.abs(b.w / 2 * (Math.cos(b.a) * ax[0] + Math.sin(b.a) * ax[1])) +
+					Math.abs(b.h / 2 * (-Math.sin(b.a) * ax[0] + Math.cos(b.a) * ax[1]));
+				return [c - e, c + e];
+			}
+			function depth(p, q) {
+				var d = Infinity;
+				axes(p).concat(axes(q)).forEach(function (ax) {
+					var u = proj(p, ax), w = proj(q, ax);
+					d = Math.min(d, Math.min(u[1], w[1]) - Math.max(u[0], w[0]));
+				});
+				return d;
+			}
+			// A point's distance into a box, in the box's frame: >0 outside.
+			function ptBox(px, py, b) {
+				var dx = px - b.cx, dy = py - b.cy, x = dx * Math.cos(-b.a) - dy * Math.sin(-b.a), y = dx * Math.sin(-b.a) + dy * Math.cos(-b.a);
+				return Math.hypot(Math.max(Math.abs(x) - b.w / 2, 0), Math.max(Math.abs(y) - b.h / 2, 0));
+			}
+			function ptSeg(px, py, g) {
+				var vx = g.bx - g.ax, vy = g.by - g.ay, L = vx * vx + vy * vy, u = L ? ((px - g.ax) * vx + (py - g.ay) * vy) / L : 0;
+				u = Math.max(0, Math.min(1, u));
+				return Math.hypot(g.ax + vx * u - px, g.ay + vy * u - py);
+			}
+			function segBox(g, b) {
+				// distance from a segment to an unrotated box (level labels are level)
+				var x0 = b.cx - b.w / 2, x1 = b.cx + b.w / 2, y0 = b.cy - b.h / 2, y1 = b.cy + b.h / 2, i, d = Infinity, n = 24, x, y;
+				for (i = 0; i <= n; i++) {
+					x = g.ax + (g.bx - g.ax) * i / n; y = g.ay + (g.by - g.ay) * i / n;
+					d = Math.min(d, Math.hypot(Math.max(x0 - x, 0, x - x1), Math.max(y0 - y, 0, y - y1)));
+				}
+				[[x0, y0], [x0, y1], [x1, y0], [x1, y1]].forEach(function (p) { d = Math.min(d, ptSeg(p[0], p[1], g)); });
+				return d;
+			}
+			doc.nodes.forEach(function (n) {
+				var ne = nodeEls[n.id];
+				if (ne && ne.circle) { circles.push({ id: n.id, x: +ne.circle.getAttribute('cx'), y: +ne.circle.getAttribute('cy'), r: +ne.circle.getAttribute('r') }); }
+			});
+			doc.labels.forEach(function (lb) {
+				var te = labelEls[lb.id];
+				if (te && te.text && vis(te.text)) { rowsOf(te.text).forEach(function (b) { texts.push({ id: lb.id, b: b }); }); }
+			});
+			doc.nodes.forEach(function (n) {
+				var ne = nodeEls[n.id], k = (ne && ne.lines) ? ne.lines.length : 0, g;
+				if (!ne || ne.empty || !ne.text || !inView(nodeAt(n))) { return; }
+				v.sig.push('n' + n.id + ' ' + ne.text.getAttribute('x') + ',' + ne.text.getAttribute('y') + ' ' + vis(ne.text) + ' ' + ne.text.textContent +
+					' ' + (ne.leader ? [ne.leader.style.display, ne.leader.getAttribute('x2'), ne.leader.getAttribute('y2')].join(',') : ''));
+				if (!vis(ne.text)) { return; }
+				v.nodes++; v.values += k;
+				if (k > 1) { if (ne.inline) { v.nodeInline++; } else { v.nodeStacked++; } }
+				items.push({ key: 'N' + n.id, rows: rowsOf(ne.text) });
+				g = leaderOf(ne);
+				if (g) {
+					circles.forEach(function (c) {
+						if (c.id === n.id || ptSeg(c.x, c.y, g) >= c.r - tol) { return; }
+						if (ne.inline) { v.N3.push('N' + n.id + ' leader through ' + c.id); } else { v.N3node++; }
+					});
+				}
+			});
+			doc.links.forEach(function (l) {
+				var le = linkEls[l.id], f, g, rows;
+				if (!le || le.empty || !le.text || !inView(linkLabelMid(l))) { return; }
+				f = le.levelBeside && le.levelForm;
+				v.sig.push('l' + l.id + ' ' + le.text.getAttribute('x') + ',' + le.text.getAttribute('y') + ' ' + (le.text.getAttribute('transform') || '') + ' ' +
+					vis(le.text) + ' ' + le.text.textContent + ' ' + (le.leader ? [le.leader.style.display, le.leader.getAttribute('x1'), le.leader.getAttribute('y1'),
+					le.leader.getAttribute('x2'), le.leader.getAttribute('y2')].join(',') : ''));
+				if (!vis(le.text)) { return; }
+				v.pipes++; v.values += f ? f.lines.length : (le.lines || []).length;
+				rows = rowsOf(le.text);
+				(le.repeats || []).forEach(function (r) { if (vis(r.text)) { rows = rows.concat(rowsOf(r.text)); } });
+				items.push({ key: 'L' + l.id, rows: rows });
+				if (!le.levelBeside) { v.along++; return; }
+				v.level++;
+				if (f && f.stacked) { v.levelStacked++; } else { v.levelInline++; }
+				if (f && f.lines.length > (le.lines || []).length) { v.levelGrown++; }
+				g = leaderOf(le);
+				if (g) {
+					v.levelLeader++;
+					circles.forEach(function (c) { if (ptSeg(c.x, c.y, g) < c.r - tol) { v.N3.push('L' + l.id + ' leader through ' + c.id); } });
+					return;
+				}
+				// No leader: its own pipe must be the nearest, by `amb`.
+				var own = Infinity, other = Infinity, who = '';
+				doc.links.forEach(function (m) {
+					var p = linkPointList(m), d = Infinity, i;
+					for (i = 1; i < p.length; i++) {
+						rows.forEach(function (b) { d = Math.min(d, segBox({ ax: p[i - 1].x, ay: p[i - 1].y, bx: p[i].x, by: p[i].y }, b)); });
+					}
+					if (m.id === l.id) { own = d; } else if (d < other) { other = d; who = m.id; }
+				});
+				if (other <= own + amb) { v.astray.push(l.id + '(' + (own * s).toFixed(1) + ' px vs ' + who + ' ' + (other * s).toFixed(1) + ')'); }
+			});
+			// N1: rows of two labels, a row on a node symbol, a row on a Text item.
+			items.forEach(function (it, i) {
+				it.rows.forEach(function (b) {
+					var j;
+					for (j = i + 1; j < items.length; j++) {
+						items[j].rows.forEach(function (c) {
+							var d = depth(b, c);
+							if (d > tol) { v.N1.push(it.key + ' on ' + items[j].key + ' ' + (d * s).toFixed(1) + ' px'); }
+						});
+					}
+					circles.forEach(function (c) { if (ptBox(c.x, c.y, b) < c.r - tol) { v.N1.push(it.key + ' on node ' + c.id); } });
+					texts.forEach(function (t) { var d = depth(b, t.b); if (d > tol) { v.N1.push(it.key + ' on Text ' + t.id + ' ' + (d * s).toFixed(1) + ' px'); } });
+				});
+			});
+			v.labels = v.nodes + v.pipes;
+			v.sig = v.sig.join('\n');
+			return v;
+		}
+	};
