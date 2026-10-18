@@ -4,8 +4,8 @@
 //
 // pipe-label-level-browser-harness.js checks the level rung's never-rules at set scales, reached by
 // applyView() and a direct refreshLabelText(). Tom's pass (2026-10-17) saw no level label at all, so
-// this one follows his hands instead: a 1920 x 1000 window, the gallery card "EPANET Net3, gpm (US)"
-// opened from the front door, node fields ID, P, Qb, Z and link fields ID, Q, V along the pipe, then
+// this one follows his hands instead: a 1920 x 1000 window, the gallery card for Net3 in gpm
+// (lpn_ex_net3_title) opened from the front door, node fields ID, P, Qb, Z and link fields ID, Q, V along the pipe, then
 // real wheel notches over the middle of the map (each one is wheelZoom()'s 1.1), so the labels are
 // laid out by the zoom path's own settle and the per-notch bank, not by a harness call. The same
 // is done to the 600-junction generated network (plain-downtown-n600-seed71.lwn), Zoom to fit
@@ -91,7 +91,7 @@ const HOOK = '\twindow.__lpnWheel = {\n' +
 const NODE_FIELDS = ['id', 'pressure', 'demand', 'elev'], LINK_FIELDS = ['id', 'flow', 'velocity'];
 const NOTCHES = 6, LEVEL_MIN = 15, SHORT_MIN = 5;
 const SCENES = [
-	{ name: 'Net3 (gallery, gpm)', card: 'EPANET Net3, gpm (US)' },
+	{ name: 'Net3 (gallery, gpm)', cardKey: 'lpn_ex_net3_title' },
 	{ name: '600-junction downtown', file: 'dev/lpn-spike/fixtures/plain-downtown-n600-seed71.lwn', fit: true }
 ];
 
@@ -115,8 +115,8 @@ async function layOut(Session, browser, sc, levelOn) {
 		await a.goto('Looped-Network.php?ec_nolog=1');
 		await a.answerTrainingPanel().catch(() => {});
 		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
-		if (sc.card) {
-			await a.openExampleCard(sc.card);
+		if (sc.cardKey) {
+			await a.openExampleCard(await a.lang(sc.cardKey));
 		} else {
 			await a.page.evaluate((txt) => { localStorage.clear(); localStorage.setItem('lpn_project_wheel', txt); },
 				fs.readFileSync(path.join(REPO, sc.file), 'utf8'));
