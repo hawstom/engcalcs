@@ -5190,6 +5190,10 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
 /* Column width is king (CLAUDE.md): the table is read in a box a reader may have made narrow, so
    the id column wraps rather than pushing the numbers off the edge. */
 .lpn-ff-tablewrap { overflow-x: auto; }
+/* Task 752: the Results by asset table in Scenario comparison. */
+.lpn-scnres { margin-top: .8em; }
+.lpn-scnres-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .3em 1em; margin: .3em 0; }
+.lpn-ff-table td.lpn-ff-num { text-align: right; font-variant-numeric: tabular-nums; }
 .lpn-ff-table { width: 100%; border-collapse: collapse; font-size: .9em; }
 /* The calculation options shown beside the alternatives (the Alternatives preview's Demand
    multiplier, Total run time and Hydraulic time step, Task 755): a divider before the first, every

@@ -72588,6 +72588,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return effective(l, 'length') / unitFactor('lpn_u_length');
 	}
 	var lastSolveResult = null;
+	// An edit since the results on screen were solved, with Recalculate off (afterManualEdit()).
+	var editedSinceSolve = false;
 	// AN INACTIVE ELEMENT IS NOT IN THE NETWORK (Task 184). `active` is an ordinary overridable
 	// boolean, so this is the whole of how a scenario varies topology: the proposed loop is in the
 	// document, drawn greyed, and simply absent from the model handed to the solver.
@@ -78226,6 +78228,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	var scenarioCompareBusy = false;
 	// A run asked for while another was in flight. See runScenarioCompare().
 	var scenarioCompareAgain = false;
+	// **A LONG RUN SHOWS HOW FAR IT HAS GOT AND CAN BE STOPPED** (Task 752): six scenarios of a
+	// 600-junction network, each run for a day, is a wait worth a count and a Stop button. Stop
+	// keeps the scenarios already solved, the rule the fire-flow sweep's Stop follows.
+	var scenarioCompareStop = false;
+	var scenarioCompareProgress = { done: 0, total: 0, stopped: false };
 	function scnCmpBoxEl() { return document.getElementById('lpn_scncmp_box'); }
 	function scnCmpBoxIsOpen() {
 		var box = scnCmpBoxEl();
@@ -78306,16 +78313,37 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		scenarioCompareAgain = false;
 		if (doc.nodes.length === 0) {
 			scenarioCompareRun = [];
+			scenarioCompareProgress = { done: 0, total: 0, stopped: false };
 			rebuildScenarioCompareReport();
 			return Promise.resolve(scenarioCompareRun);
 		}
 		before = JSON.stringify(doc);
 		scenarioCompareBusy = true;
+		scenarioCompareStop = false;
 		scenarioCompareRun = null;
+		var pairs = scenarioCompareModels();
+		scenarioCompareProgress = { done: 0, total: pairs.length, stopped: false };
+		// The time step on screen, read once at the start: every period scenario's per-asset
+		// column is that scenario's frame at this time (scnResFrame()).
+		scenarioCompareShownT = EngCalcs.lpnTimeNow ? (EngCalcs.lpnTimeNow() || 0) : 0;
 		rebuildScenarioCompareReport();
 		chain = Promise.resolve();
-		scenarioCompareModels().forEach(function (pair) {
+		pairs.forEach(function (pair) {
+			// **A BREATH BETWEEN SCENARIOS**, so the count repaints and a Stop click is heard: the
+			// built-in solver answers synchronously, and a chain of synchronous solves would hold
+			// the page until the last one finished.
 			chain = chain.then(function () {
+				return new Promise(function (res) { setTimeout(res, 0); });
+			}).then(function () {
+				if (scenarioCompareStop) { return null; }
+				return scnCmpSolveOne(pair);
+			}).then(function () {
+				if (scenarioCompareStop) { return; }
+				scenarioCompareProgress.done++;
+				scnCmpShowProgress();
+			});
+		});
+		function scnCmpSolveOne(pair) {
 				var issues = EngCalcs.lpnDiagnose(pair.model), engine;
 				// A scenario can be undrawable on its own -- deactivating a link can leave a node
 				// with no path to a source -- and that is an ANSWER about that scenario rather than
@@ -78343,7 +78371,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						rows.push({
 							scn: pair.scn, opts: pair.opts, ok: true, period: true, converged: converged,
 							minPressure: ext.minPressure, minAt: ext.minAt, minT: ext.minT,
-							maxVelocity: ext.maxVelocity, maxAt: ext.maxAt, maxT: ext.maxT
+							maxVelocity: ext.maxVelocity, maxAt: ext.maxAt, maxT: ext.maxT,
+							run: run
 						});
 					}, function () {
 						rows.push({ scn: pair.scn, opts: pair.opts, ok: false, why: pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.' });
@@ -78369,16 +78398,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						// for that scenario, and printing nothing tells the reader less.
 						converged: result.converged !== false,
 						minPressure: ext.minPressure, minAt: ext.minAt,
-						maxVelocity: ext.maxVelocity, maxAt: ext.maxAt
+						maxVelocity: ext.maxVelocity, maxAt: ext.maxAt,
+						result: result
 					});
 				}, function () {
 					rows.push({ scn: pair.scn, opts: pair.opts, ok: false, why: pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.' });
 				});
-			});
-		});
+			}
 		return chain.then(function () {
 			scenarioCompareBusy = false;
 			scenarioCompareRun = rows;
+			if (scenarioCompareStop) {
+				// A stopped run is the answer asked for: a re-run queued behind it would undo the Stop.
+				scenarioCompareProgress.stopped = true;
+				scenarioCompareStop = false;
+				scenarioCompareAgain = false;
+			}
 			// Set by the run, never by a user action. A false here is a defect in whatever wrote to
 			// `doc` during a solve, not in this box -- the same assertion the fire-flow sweep makes.
 			// Recorded BEFORE any re-run, or a run superseded mid-flight would take its own verdict
@@ -78390,6 +78425,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 	}
 	var scenarioCompareDocGuard = true;
+	var scenarioCompareShownT = 0;
+	// The count, updated in place so the Stop button under it is never rebuilt under the pointer.
+	function scnCmpShowProgress() {
+		var pc = EngCalcs.pageConfig || {}, el = document.getElementById('lpn_scncmp_progress');
+		if (!el) { return; }
+		el.textContent = (pc.lpn_scncmp_progress || 'Solving scenario {done} of {total}…')
+			.replace('{done}', String(Math.min(scenarioCompareProgress.done + 1, scenarioCompareProgress.total)))
+			.replace('{total}', String(scenarioCompareProgress.total));
+	}
 	// One cell: the number and the element it was found at, in the reader's own units.
 	// `t` is the time step a run found it at, and only a run passes one.
 	function scnCmpAt(si, unitId, id, group, t) {
@@ -78455,11 +78499,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		host.innerHTML = '';
 		if (scenarioCompareBusy) {
 			ffEl('p', 'lpn-ff-note', pc.lpn_scncmp_running || 'Solving every scenario…', host);
+			ffEl('p', 'lpn-ff-summary', '', host).id = 'lpn_scncmp_progress';
+			scnCmpShowProgress();
+			var stopRow = ffEl('div', 'lpn-ff-buttons', null, host),
+				stop = ffEl('button', 'lpn-ff-stopbtn', pc.lpn_ff_stop || 'Stop', stopRow);
+			stop.type = 'button';
+			stop.id = 'lpn_scncmp_stop';
+			stop.addEventListener('click', function () { scenarioCompareStop = true; stop.disabled = true; });
 			return;
 		}
 		// No run and not busy is only reachable with the box shut -- opening it starts one -- so
 		// there is nothing to say and no invitation to print.
 		if (!scenarioCompareRun) { return; }
+		if (!scenarioCompareRun.length && scenarioCompareProgress.stopped) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_scncmp_stopped ||
+				'Stopped after {done} of {total} scenarios. The results below are the ones already finished.')
+				.replace('{done}', '0').replace('{total}', String(scenarioCompareProgress.total)), host);
+			return;
+		}
 		if (!scenarioCompareRun.length) {
 			ffEl('p', 'lpn-ff-note', pc.lpn_scncmp_empty ||
 				'Nothing has been drawn yet, so there is nothing to solve.', host);
@@ -78504,9 +78561,272 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ffEl('p', 'lpn-ff-note', pc.lpn_scncmp_period_note ||
 				'Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole network, at the time shown.', host);
 		}
+		if (scenarioCompareProgress.stopped) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_scncmp_stopped ||
+				'Stopped after {done} of {total} scenarios. The results below are the ones already finished.')
+				.replace('{done}', String(scenarioCompareProgress.done))
+				.replace('{total}', String(scenarioCompareProgress.total)), host);
+		}
 		ffEl('p', 'lpn-ff-note', pc.lpn_scncmp_note ||
 			'Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.', host);
+		buildScenarioResultsSection(host);
 	}
+	// ---- RESULTS BY ASSET, ONE COLUMN PER SCENARIO (Task 752, step 1) ---------------------------
+	//
+	// **THE SAME RUN, READ A SECOND WAY, AND NOT A SECOND FEATURE.** The comparison above already
+	// solves every checked scenario from a copy; this keeps each answer and prints it per asset: one
+	// row an asset, one column a result in a scenario. A comparison across scenarios is what Bentley
+	// and InfoWater users have on record asking to put in a spreadsheet
+	// (dev/agents/market-researcher/spreadsheet-sync.md), so Copy and Download CSV sit under it.
+	//
+	// **EVERY NUMBER COMES THROUGH THE TABLES PANE'S OWN READERS** (colorNodeValue()/colorLinkValue())
+	// with the scenario swapped in (paneInScenario()) and that scenario's answer standing in for the
+	// one on screen (tsAsOfFrame()), both restored in a `finally`. So a cell here can never disagree
+	// with what the Tables pane shows when that scenario is open and solved, and nothing on screen is
+	// touched. A scenario with a total run time is read at the time step on screen.
+	//
+	// **THE CHOICES LAST FOR THE PAGE LOAD AND ARE STORED NOWHERE**, like the fire flow table's sort.
+	var SCNRES_KINDS = [
+		{ id: 'junctions', group: 'node', type: 'junction', label: 'lpn_pane_tab_junctions', fb: 'Junctions',
+			qs: [['pressure', 'lpn_result_pressure', 'Pressure'], ['head', 'lpn_result_head', 'Head'],
+				['demandActual', 'bpn_demand', 'Demand']] },
+		{ id: 'reservoirs', group: 'node', type: 'reservoir', label: 'lpn_pane_tab_reservoirs', fb: 'Reservoirs',
+			qs: [['head', 'lpn_result_head', 'Head'], ['pressure', 'lpn_result_pressure', 'Pressure']] },
+		{ id: 'tanks', group: 'node', type: 'tank', label: 'lpn_pane_tab_tanks', fb: 'Tanks',
+			qs: [['head', 'lpn_result_head', 'Head'], ['pressure', 'lpn_result_pressure', 'Pressure'],
+				['depth', 'lpn_result_depth', 'Depth']] },
+		{ id: 'pipes', group: 'link', type: 'pipe', label: 'lpn_pane_tab_pipes', fb: 'Pipes',
+			qs: [['flow', 'lpn_result_flow', 'Flow'], ['velocity', 'lpn_result_velocity', 'Velocity'],
+				['headloss', 'lpn_result_headloss', 'Head loss']] },
+		{ id: 'pumps', group: 'link', type: 'pump', label: 'lpn_pane_tab_pumps', fb: 'Pumps',
+			qs: [['flow', 'lpn_result_flow', 'Flow'], ['headloss', 'lpn_result_pump_head', 'Head']] },
+		{ id: 'valves', group: 'link', type: 'valve', label: 'lpn_pane_tab_valves', fb: 'Valves',
+			qs: [['flow', 'lpn_result_flow', 'Flow'], ['velocity', 'lpn_result_velocity', 'Velocity'],
+				['headloss', 'lpn_result_headloss', 'Head loss']] }
+	];
+	var SCNRES_UNIT = { pressure: 'pressure', head: 'elevhead', depth: 'elevhead', headloss: 'elevhead',
+		flow: 'flow', demandActual: 'flow', velocity: 'velocity' };
+	var scnResState = { kind: 'junctions', picked: { junctions: ['pressure'] }, sort: { col: null, dir: 1 } };
+	function scnResKind() {
+		return SCNRES_KINDS.filter(function (k) { return k.id === scnResState.kind; })[0] || SCNRES_KINDS[0];
+	}
+	function scnResPicked(kind) {
+		var p = scnResState.picked[kind.id];
+		if (!p) { p = scnResState.picked[kind.id] = [kind.qs[0][0]]; }
+		// In the kind's own order, whatever order they were checked in.
+		return kind.qs.filter(function (q) { return p.indexOf(q[0]) >= 0; });
+	}
+	// The answer a row's column reads: a steady solve, or a run's frame at the time step on screen.
+	function scnResFrame(r) {
+		if (!r || !r.ok) { return null; }
+		if (r.period) { return EngCalcs.lpnTimeFrameResult ? EngCalcs.lpnTimeFrameResult(r.run, scenarioCompareShownT) : null; }
+		return r.result || null;
+	}
+	// { heads, rows, display } for the asset kind and results chosen. `rows` hold display-unit numbers
+	// (undefined where a scenario has none); `display` the same rounded to the label decimals.
+	function scenarioResultsTable() {
+		// **EVERY SCENARIO THE RUN REACHED HAS ITS COLUMNS, SOLVED OR NOT** (Perry's review): one that
+		// could not be solved keeps blank columns and is named in a note under the table, rather than
+		// vanishing from a table a reader will paste and trust. In the run's order, which is the
+		// scenario tree's (scenariosForDisplay(), the Scenario manager's order).
+		var pc = EngCalcs.pageConfig || {}, kind = scnResKind(), qs = scnResPicked(kind),
+			reached = scenarioCompareRun || [],
+			solved = reached.filter(function (r) { return r.ok; }),
+			anyPeriod = solved.some(function (r) { return r.period; }),
+			els = (kind.group === 'node' ? doc.nodes : doc.links).filter(function (e) { return e.type === kind.type; }),
+			heads = [pc.lpn_field_id || 'ID'], cols = [], vals = {}, frames = {}, names = {}, wasSnap = tankSnap;
+		// The scenario's part of a heading: its name, then what a reader of a pasted sheet must know
+		// about the numbers under it -- the time actually read (a run shorter than the time on screen
+		// shows its last step), steady state where the table mixes the two, and no convergence.
+		reached.forEach(function (r) {
+			var frame = scnResFrame(r), name = scenarioDisplayName(r.scn);
+			frames[r.scn.id] = frame;
+			if (r.ok && r.period && frame && typeof frame.t === 'number') {
+				name += ' ' + (pc.lpn_scnres_at_time || '({time})')
+					.replace('{time}', EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(frame.t) : String(frame.t));
+			} else if (r.ok && anyPeriod) {
+				name += ' ' + (pc.lpn_scnres_steady || '(steady state)');
+			}
+			if (r.ok && r.converged === false) { name += ' ' + (pc.lpn_scnres_not_converged || '(not converged)'); }
+			names[r.scn.id] = name;
+		});
+		qs.forEach(function (q) {
+			reached.forEach(function (r) {
+				cols.push({ q: q[0], scn: r.scn.id });
+				heads.push((pc.lpn_scnres_col || '{quantity} ({unit}), {scenario}')
+					.replace('{quantity}', pc[q[1]] || q[2])
+					.replace('{unit}', unitLabel(resultUnit(SCNRES_UNIT[q[0]]) || 'lpn_u_velocity'))
+					.replace('{scenario}', names[r.scn.id]));
+			});
+		});
+		solved.forEach(function (r) {
+			var frame = frames[r.scn.id], got = vals[r.scn.id] = {};
+			if (!frame) { return; }
+			try {
+				// The live tank shape of the scenario swapped in, not the snapshot of the one on screen.
+				tankSnap = null;
+				paneInScenario(r.scn, function () {
+					tsAsOfFrame(frame, function () {
+						els.forEach(function (e) {
+							var one = got[e.id] = {};
+							qs.forEach(function (q) {
+								one[q[0]] = kind.group === 'node' ? colorNodeValue(e, q[0]) : colorLinkValue(e, q[0]);
+							});
+						});
+					});
+				});
+			} finally { tankSnap = wasSnap; }
+		});
+		var rows = els.map(function (e) {
+			return [e.id].concat(cols.map(function (c) {
+				var v = ((vals[c.scn] || {})[e.id] || {})[c.q];
+				return (typeof v === 'number' && isFinite(v)) ? v : undefined;
+			}));
+		});
+		return { kind: kind, heads: heads, cols: cols, rows: rows, anyPeriod: anyPeriod,
+			failed: reached.filter(function (r) { return !r.ok; }),
+			notConverged: solved.some(function (r) { return r.converged === false; }),
+			openSolved: solved.some(function (r) { return r.scn.id === project.activeScenario; }) };
+	}
+	// The label decimals the Tables pane prints a result with (paneResultDecimals()).
+	function scnResShown(v, group, q) {
+		var d = (labelSettings.decimals[group] || {})[q];
+		if (typeof v !== 'number' || !isFinite(v)) { return ''; }
+		return (typeof d === 'number' && d >= 0 && d <= 10) ? v.toFixed(d) : ffNum(v);
+	}
+	// **A SPREADSHEET GETS THE FULL NUMBER, NOT THE ROUNDED ONE.** A difference between two scenarios
+	// is the reason to paste this, and a pressure rounded to one decimal hides a 0.04 psi one. Ten
+	// significant figures, in the units on screen (the heading names them), a point for the decimal
+	// and no thousands separator: what every spreadsheet reads as a number.
+	function scnResFull(v) {
+		return (typeof v === 'number' && isFinite(v)) ? String(+v.toPrecision(10)) : '';
+	}
+	function scenarioResultsText(t, csv) {
+		var rows = t.rows.map(function (r) {
+			return [r[0]].concat(r.slice(1).map(scnResFull));
+		});
+		return csv ? EngCalcs.lpnTableCsv(t.heads, rows) : EngCalcs.lpnTableTsv(t.heads, rows);
+	}
+	function scenarioResultsFileName(t) {
+		var pc = EngCalcs.pageConfig || {};
+		return paneProjectPrefix() + paneNoSpace(paneSanitizeFileName(pc.lpn_scnres_title || 'Results by asset')) + '-' +
+			paneNoSpace(paneSanitizeFileName(pc[t.kind.label] || t.kind.fb)) + '.csv';
+	}
+	function downloadScenarioResultsCsv() {
+		var pc = EngCalcs.pageConfig || {}, t = scenarioResultsTable(), name = scenarioResultsFileName(t);
+		downloadTextFile(name, scenarioResultsText(t, true), PANE_EXPORT_MIME.csv);
+		setNotice((pc.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', name));
+	}
+	function buildScenarioResultsSection(host) {
+		var pc = EngCalcs.pageConfig || {}, kind = scnResKind(), t, sec, ctl, sel, body, btns, copy, csv, sorted;
+		if (!scenarioCompareRun || !scenarioCompareRun.some(function (r) { return r.ok; })) { return; }
+		sec = ffEl('div', 'lpn-scnres', null, host);
+		sec.id = 'lpn_scnres';
+		ffEl('p', 'lpn-ff-summary', pc.lpn_scnres_title || 'Results by asset', sec);
+		ctl = ffEl('div', 'lpn-scnres-controls', null, sec);
+		var lab = ffEl('label', null, null, ctl);
+		ffEl('span', null, (pc.lpn_survey_codes_col_type || 'Asset type') + ' ', lab);
+		sel = ffEl('select', null, null, lab);
+		sel.id = 'lpn_scnres_kind';
+		SCNRES_KINDS.forEach(function (k) {
+			var o = ffEl('option', null, pc[k.label] || k.fb, sel);
+			o.value = k.id;
+			if (k.id === kind.id) { o.selected = true; }
+		});
+		sel.addEventListener('change', function () {
+			scnResState.kind = sel.value;
+			scnResState.sort = { col: null, dir: 1 };
+			rebuildScenarioCompareReport();
+			var again = document.getElementById('lpn_scnres_kind');
+			if (again && again.focus) { again.focus(); }
+		});
+		kind.qs.forEach(function (q) {
+			var cl = ffEl('label', 'lpn-scnres-q', null, ctl), cb = ffEl('input', null, null, cl);
+			cb.type = 'checkbox';
+			cb.value = q[0];
+			cb.checked = scnResPicked(kind).some(function (p) { return p[0] === q[0]; });
+			ffEl('span', null, ' ' + (pc[q[1]] || q[2]), cl);
+			cb.addEventListener('change', function () {
+				var cur = scnResState.picked[kind.id].filter(function (x) { return x !== q[0]; });
+				if (cb.checked) { cur.push(q[0]); }
+				scnResState.picked[kind.id] = cur;
+				scnResState.sort = { col: null, dir: 1 };
+				rebuildScenarioCompareReport();
+				var again = document.querySelector('#lpn_scnres input[value="' + q[0] + '"]');
+				if (again && again.focus) { again.focus(); }
+			});
+		});
+		t = scenarioResultsTable();
+		if (t.cols.length === 0) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_scnres_none || 'Check at least one result to show.', sec);
+			return;
+		}
+		if (!t.rows.length) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_scnres_empty || 'This project has none of these assets.', sec);
+			return;
+		}
+		btns = ffEl('div', 'lpn-ff-buttons', null, sec);
+		copy = ffEl('button', 'lpn-rptbox-copy', pc.lpn_time_run_report_copy || 'Copy', btns);
+		copy.type = 'button';
+		copy.id = 'lpn_scnres_copy';
+		copy.title = pc.lpn_scnres_copy_tip ||
+			'Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.';
+		copy.addEventListener('click', function () {
+			if (EngCalcs.lpnCopyText) { EngCalcs.lpnCopyText(scenarioResultsText(scenarioResultsTable(), false), copy); }
+		});
+		csv = ffEl('button', 'lpn-rptbox-copy', pc.lpn_full_download_csv || 'Download CSV', btns);
+		csv.type = 'button';
+		csv.id = 'lpn_scnres_csv';
+		csv.addEventListener('click', downloadScenarioResultsCsv);
+		// Sorted on the numbers, never on their text, with a blank last both ways (ffSortResults()).
+		sorted = t.rows.map(function (r, i) { return { r: r, i: i }; });
+		if (scnResState.sort.col !== null) {
+			var c = scnResState.sort.col, dir = scnResState.sort.dir;
+			sorted.sort(function (a, b) {
+				var ka = a.r[c], kb = b.r[c], ab = ffBlank(ka), bb = ffBlank(kb), d;
+				if (ab || bb) { return ab === bb ? a.i - b.i : (ab ? 1 : -1); }
+				d = (typeof ka === 'number' && typeof kb === 'number') ? ka - kb
+					: String(ka).localeCompare(String(kb), undefined, { numeric: true });
+				return d ? dir * d : a.i - b.i;
+			});
+		}
+		body = ffTable(sec, t.heads, { state: scnResState.sort, by: function (col) {
+			scnResState.sort = { col: col, dir: scnResState.sort.col === col ? -scnResState.sort.dir : 1 };
+			rebuildScenarioCompareReport();
+		} });
+		body.parentNode.id = 'lpn_scnres_table';
+		sorted.forEach(function (x) {
+			var tr = ffEl('tr', null, null, body);
+			// The ID as the Tables pane and its exports write it, with no label prefix, so a paste
+			// lines up against a sheet exported from there.
+			ffCell(tr, x.r[0]);
+			t.cols.forEach(function (c, k) { ffCell(tr, scnResShown(x.r[k + 1], t.kind.group, c.q), 'lpn-ff-num'); });
+		});
+		t.failed.forEach(function (r) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_scnres_failed || '{scenario} could not be solved, so its columns are blank. {why}')
+				.replace('{scenario}', scenarioDisplayName(r.scn)).replace('{why}', r.why || ''), sec);
+		});
+		if (t.notConverged) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_scnres_not_converged_note ||
+				'A column marked {mark} shows the last results the solver reached before it stopped without converging.')
+				.replace('{mark}', pc.lpn_scnres_not_converged || '(not converged)'), sec);
+		}
+		if (t.anyPeriod) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_scnres_time_note ||
+				'A scenario with a total run time is read at the time step on screen, {time}, or at its last time step if its run ends sooner. Each heading shows the time read.')
+				.replace('{time}', EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(scenarioCompareShownT) : String(scenarioCompareShownT)), sec);
+		}
+		// **RECALCULATE OFF: THE OPEN SCENARIO'S COLUMN IS NOT THE SNAPSHOT ON SCREEN** (Perry's
+		// review). The comparison solves the current inputs; the map and the Tables pane keep the
+		// last solve until Calculate, so after an edit the two can differ, and the box says so.
+		if (t.openSolved && scnSetting('autoRun') === false && (editedSinceSolve || !lastSolveResult ||
+			(lastSolveResult._scn && lastSolveResult._scn !== project.activeScenario))) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_scnres_stale ||
+				'Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.')
+				.replace('{scenario}', scenarioDisplayName(activeScenario())), sec);
+		}
+	}
+
 	// **ASKING FOR THE REPORT IS THE REQUEST; THERE IS NOTHING FURTHER TO PRESS** (Tom, 2026-09-04:
 	// *"I don't think that the Compare button is needed. If you request any of the three reports
 	// (Pump, Scenario, EPANET), you should get them with no further confirmation or interaction."*).
@@ -81169,6 +81489,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var notConverged = result.converged === false;
 		captureTankSnapshot();
 		lastSolveResult = result;
+		editedSinceSolve = false;
 		if (result && typeof result === 'object') { result._scn = project.activeScenario; }
 		refreshMapStatus();
 		// The only case where the two engines knowingly disagree, so say so rather than let a
@@ -81570,6 +81891,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * debounced write. There is no repaint at all on this path now.
 	 */
 	function afterManualEdit() {
+		// Recalculate off: the results on screen no longer answer the inputs (Results by asset says so).
+		editedSinceSolve = true;
 		// **ONE DEBOUNCED SAVE DOOR FOR THE WHOLE PAGE** (Task 706). This used to keep a timer of
 		// its own at the same 300 ms; scheduleSave() is that timer, shared now with every ordinary
 		// edit, so a burst that crosses the Recalculate switch still costs exactly one write.

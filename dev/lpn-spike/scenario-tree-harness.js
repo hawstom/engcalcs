@@ -394,6 +394,8 @@ console.log('\n--- 2. explicit but derivable == derived ---');
 		return J([L.assembleModel(), ex && ex.inp, L.effectiveTimes(), document.getElementById('lpn_canvas').children.length]);
 	}
 	files.forEach((f) => {
+		// The scenario example ships a stored tree on purpose (scenario-example-harness.js holds it).
+		if (f === 'Net1-Scenarios.lwn') { return; }
 		open(f);
 		// A DERIVED project is one a file from before 2026-10-12 holds: the scenario's own values in
 		// its own maps. Written there directly, since a write through setProp() now stores the
@@ -430,7 +432,7 @@ console.log('\n--- 3. files ---');
 		L.applySaved(L.acceptImportedText(once));
 		L.buildDom();
 		ok(f.replace(ROOT, '') + ': no tree key appears, and a re-save is byte-identical',
-			L.projectFileText() === once && !/"(alternatives|calcSets)":/.test(once.replace(/"scenarios":[\s\S]*?\]\s*,\s*"nodes"/, '')));
+			L.projectFileText() === once && (/Net1-Scenarios\.lwn$/.test(f) || !/"(alternatives|calcSets)":/.test(once.replace(/"scenarios":[\s\S]*?\]\s*,\s*"nodes"/, ''))));
 	});
 	// A file whose tree cannot be resolved is cleaned, never trusted.
 	open('Net1.lwn');
