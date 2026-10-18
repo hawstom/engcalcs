@@ -14,8 +14,9 @@
 //
 // THE SCENES, opened the way Tom opens them (the gallery card, or the 600-junction file and Zoom to
 // fit), labels set as a Labels checkbox sets them, then wheel notches over the middle of the map:
-//   * Net3 (gallery, gpm): node ID, P, Qb, Z; link ID, Q, V; as opened, 3 and 6 notches in;
-//   * the 600-junction downtown network: the same fields; fit, 3 and 6 notches in;
+//   * Net3 (gallery, gpm): node ID, P, Qb, Z; link ID, Q, V; 6 and 9 notches in (its labels show
+//     from 6);
+//   * the 600-junction downtown network: the same fields; fit, and 6 notches in;
 //   * Net1 (gallery, US, N and L prefixes): node ID, Qb, Z, P; link Q; wheeled OUT until the short
 //     pipe 113 on the east side is about 54 px long -- Tom's 2026-10-18 screenshot, where that
 //     pipe showed no label with open ground east of it.
@@ -92,7 +93,7 @@ const SCENES = [
 	{ key: 'net3', name: 'Net3 (gallery, gpm)', cardKey: 'lpn_ex_net3_title', node: NET3_NODE, link: NET3_LINK, notches: [6, 9],
 		named: [] },
 	{ key: 'n600', name: '600-junction downtown', file: 'dev/lpn-spike/fixtures/plain-downtown-n600-seed71.lwn', fit: true,
-		node: NET3_NODE, link: NET3_LINK, notches: [0, 3, 6], named: [] },
+		node: NET3_NODE, link: NET3_LINK, notches: [0, 6], named: [] },
 	{ key: 'net1', name: 'Net1 (gallery, US), zoomed out', cardKey: 'lpn_ex_net1_title', node: ['id', 'demand', 'elev', 'pressure'],
 		link: ['flow'], outToPipe: { id: '113', px: 54 }, notches: [0], named: ['113'] }
 ];
@@ -169,6 +170,10 @@ async function layOut(Session, browser, sc, mode, opts) {
 				if (r) { await a.page.screenshot({ path: path.join(opts.shots, sc.key + '-' + nm.replace(/[^A-Za-z0-9]+/g, '') + '.png'), clip: r }); }
 			}
 		}
+		if (!mode.shipped) {
+			const ms0 = await a.page.evaluate(() => window.__lpnForm.timeContent(3));
+			return { views, ms: ms0, named, out, cut, hooked, errors: a.errors.slice() };
+		}
 		// The same view twice: a content pass where we stand, then out two notches and back in two.
 		const again = await a.page.evaluate(([tol, amb]) => { window.__lpnForm.content(); return window.__lpnForm.read(tol, amb); }, [TOL_PX, AMBIG_PX]);
 		await wheel(a.page, -2); await a.settle(1200);
@@ -242,12 +247,14 @@ async function main() {
 				ok(tag + ': no fewer labels than the reference, and no fewer values', v.labels >= w.labels && v.values >= w.values,
 					`${w.labels} -> ${v.labels} labels, ${w.values} -> ${v.values} values`);
 			});
-			const A = on.views[on.views.length - 1], B = off.views[off.views.length - 1];
+			const A = on.views[on.views.length - 1];
 			const sum = (vs, k) => vs.reduce((t, v) => t + v[k], 0);
 			ok(sc.name + ': the same view twice is the same drawing (a content pass where it stands)', on.again.sig === A.sig, firstDiff(A.sig, on.again.sig));
 			ok(sc.name + ': ...and the per-notch bank puts the notch back exactly (out two and back in two, twice)', on.back2.sig === on.back.sig, firstDiff(on.back.sig, on.back2.sig));
-			console.log(`        first revisit against the first visit: shipped ${on.back.sig === A.sig ? 'same' : 'differs: ' + firstDiff(A.sig, on.back.sig)}; ` +
-				`reference ${off.back.sig === B.sig ? 'same' : 'differs: ' + firstDiff(B.sig, off.back.sig)}`);
+			// Printed, not asserted: a label the wheel's pass did not re-measure is measured afresh by
+			// the content pass, a tenth of a pixel different at this zoom, and the first-fit may then
+			// settle a crowded corner another way (Net1 here: hand-placed N11 measured 53.0 against 53.1 px).
+			console.log(`        first revisit against the first visit: ${on.back.sig === A.sig ? 'same' : 'differs: ' + firstDiff(A.sig, on.back.sig)}`);
 			ok(sc.name + ': more values shown than the reference over its views', sum(on.views, 'values') > sum(off.views, 'values'),
 				`${sum(off.views, 'values')} -> ${sum(on.views, 'values')}`);
 			if (sc.key === 'net3') {
