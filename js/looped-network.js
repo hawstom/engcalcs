@@ -72588,6 +72588,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return effective(l, 'length') / unitFactor('lpn_u_length');
 	}
 	var lastSolveResult = null;
+	// An edit since the results on screen were solved, with Recalculate off (afterManualEdit()).
+	var editedSinceSolve = false;
 	// AN INACTIVE ELEMENT IS NOT IN THE NETWORK (Task 184). `active` is an ordinary overridable
 	// boolean, so this is the whole of how a scenario varies topology: the proposed loop is in the
 	// document, drawn greyed, and simply absent from the model handed to the solver.
@@ -78623,21 +78625,42 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// { heads, rows, display } for the asset kind and results chosen. `rows` hold display-unit numbers
 	// (undefined where a scenario has none); `display` the same rounded to the label decimals.
 	function scenarioResultsTable() {
+		// **EVERY SCENARIO THE RUN REACHED HAS ITS COLUMNS, SOLVED OR NOT** (Perry's review): one that
+		// could not be solved keeps blank columns and is named in a note under the table, rather than
+		// vanishing from a table a reader will paste and trust. In the run's order, which is the
+		// scenario tree's (scenariosForDisplay(), the Scenario manager's order).
 		var pc = EngCalcs.pageConfig || {}, kind = scnResKind(), qs = scnResPicked(kind),
-			solved = (scenarioCompareRun || []).filter(function (r) { return r.ok; }),
+			reached = scenarioCompareRun || [],
+			solved = reached.filter(function (r) { return r.ok; }),
+			anyPeriod = solved.some(function (r) { return r.period; }),
 			els = (kind.group === 'node' ? doc.nodes : doc.links).filter(function (e) { return e.type === kind.type; }),
-			heads = [pc.lpn_field_id || 'ID'], cols = [], vals = {}, wasSnap = tankSnap;
+			heads = [pc.lpn_field_id || 'ID'], cols = [], vals = {}, frames = {}, names = {}, wasSnap = tankSnap;
+		// The scenario's part of a heading: its name, then what a reader of a pasted sheet must know
+		// about the numbers under it -- the time actually read (a run shorter than the time on screen
+		// shows its last step), steady state where the table mixes the two, and no convergence.
+		reached.forEach(function (r) {
+			var frame = scnResFrame(r), name = scenarioDisplayName(r.scn);
+			frames[r.scn.id] = frame;
+			if (r.ok && r.period && frame && typeof frame.t === 'number') {
+				name += ' ' + (pc.lpn_scnres_at_time || '({time})')
+					.replace('{time}', EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(frame.t) : String(frame.t));
+			} else if (r.ok && anyPeriod) {
+				name += ' ' + (pc.lpn_scnres_steady || '(steady state)');
+			}
+			if (r.ok && r.converged === false) { name += ' ' + (pc.lpn_scnres_not_converged || '(not converged)'); }
+			names[r.scn.id] = name;
+		});
 		qs.forEach(function (q) {
-			solved.forEach(function (r) {
+			reached.forEach(function (r) {
 				cols.push({ q: q[0], scn: r.scn.id });
 				heads.push((pc.lpn_scnres_col || '{quantity} ({unit}), {scenario}')
 					.replace('{quantity}', pc[q[1]] || q[2])
 					.replace('{unit}', unitLabel(resultUnit(SCNRES_UNIT[q[0]]) || 'lpn_u_velocity'))
-					.replace('{scenario}', scenarioDisplayName(r.scn)));
+					.replace('{scenario}', names[r.scn.id]));
 			});
 		});
 		solved.forEach(function (r) {
-			var frame = scnResFrame(r), got = vals[r.scn.id] = {};
+			var frame = frames[r.scn.id], got = vals[r.scn.id] = {};
 			if (!frame) { return; }
 			try {
 				// The live tank shape of the scenario swapped in, not the snapshot of the one on screen.
@@ -78660,7 +78683,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				return (typeof v === 'number' && isFinite(v)) ? v : undefined;
 			}));
 		});
-		return { kind: kind, heads: heads, cols: cols, rows: rows, anyPeriod: solved.some(function (r) { return r.period; }) };
+		return { kind: kind, heads: heads, cols: cols, rows: rows, anyPeriod: anyPeriod,
+			failed: reached.filter(function (r) { return !r.ok; }),
+			notConverged: solved.some(function (r) { return r.converged === false; }),
+			openSolved: solved.some(function (r) { return r.scn.id === project.activeScenario; }) };
 	}
 	// The label decimals the Tables pane prints a result with (paneResultDecimals()).
 	function scnResShown(v, group, q) {
@@ -78776,10 +78802,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ffCell(tr, x.r[0]);
 			t.cols.forEach(function (c, k) { ffCell(tr, scnResShown(x.r[k + 1], t.kind.group, c.q), 'lpn-ff-num'); });
 		});
+		t.failed.forEach(function (r) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_scnres_failed || '{scenario} could not be solved, so its columns are blank. {why}')
+				.replace('{scenario}', scenarioDisplayName(r.scn)).replace('{why}', r.why || ''), sec);
+		});
+		if (t.notConverged) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_scnres_not_converged_note ||
+				'A column marked {mark} shows the last results the solver reached before it stopped without converging.')
+				.replace('{mark}', pc.lpn_scnres_not_converged || '(not converged)'), sec);
+		}
 		if (t.anyPeriod) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_scnres_time_note ||
-				'A scenario with a total run time shows its results at {time}, the time step on screen.')
+				'A scenario with a total run time is read at the time step on screen, {time}, or at its last time step if its run ends sooner. Each heading shows the time read.')
 				.replace('{time}', EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(scenarioCompareShownT) : String(scenarioCompareShownT)), sec);
+		}
+		// **RECALCULATE OFF: THE OPEN SCENARIO'S COLUMN IS NOT THE SNAPSHOT ON SCREEN** (Perry's
+		// review). The comparison solves the current inputs; the map and the Tables pane keep the
+		// last solve until Calculate, so after an edit the two can differ, and the box says so.
+		if (t.openSolved && scnSetting('autoRun') === false && (editedSinceSolve || !lastSolveResult ||
+			(lastSolveResult._scn && lastSolveResult._scn !== project.activeScenario))) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_scnres_stale ||
+				'Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.')
+				.replace('{scenario}', scenarioDisplayName(activeScenario())), sec);
 		}
 	}
 
@@ -81445,6 +81489,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var notConverged = result.converged === false;
 		captureTankSnapshot();
 		lastSolveResult = result;
+		editedSinceSolve = false;
 		if (result && typeof result === 'object') { result._scn = project.activeScenario; }
 		refreshMapStatus();
 		// The only case where the two engines knowingly disagree, so say so rather than let a
@@ -81846,6 +81891,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * debounced write. There is no repaint at all on this path now.
 	 */
 	function afterManualEdit() {
+		// Recalculate off: the results on screen no longer answer the inputs (Results by asset says so).
+		editedSinceSolve = true;
 		// **ONE DEBOUNCED SAVE DOOR FOR THE WHOLE PAGE** (Task 706). This used to keep a timer of
 		// its own at the same 300 ms; scheduleSave() is that timer, shared now with every ordinary
 		// edit, so a burst that crosses the Recalculate switch still costs exactly one write.

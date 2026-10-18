@@ -10,6 +10,14 @@
 //   S4  Stop, pressed while the scenarios are solving, keeps what was finished and says so.
 //   S5  A 24-hour run: a scenario's column is that scenario's frame at the time step on screen.
 //   S6  ?lang=es: the asset names come out in Spanish and the table and Copy still work.
+//   S7  A scenario that cannot be solved keeps blank columns and is named in a note; one that did
+//       not converge is marked in the heading, on screen and in the copy; columns follow a stored
+//       scenario order, not the alphabet.
+//   S8  Recalculate off, open scenario switched: the box says its column is solved from the
+//       current inputs and may differ from the results on screen.
+// The Demand column is the one that moves with the scenario swap alone (the solve result does not
+// carry it), so S1 asserts it against the demands in the file times each scenario's multiplier:
+// with the swap removed, every column reads the open scenario's multiplier and S1 fails.
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
 'use strict';
@@ -57,6 +65,9 @@ function project(steady) {
 	if (steady) {
 		d.times.duration = 0; d.times.text.duration = '0:00';
 		d.settings.engine = 'native';
+	} else {
+		// A run that ends at 2:00, read with 6:00 on screen: it shows its last step and says so.
+		d.scenarios.push({ id: 'sshort', name: 'Short', overrides: {}, times: { duration: 7200, text: { duration: '2:00' } } });
 	}
 	return d;
 }
@@ -144,7 +155,12 @@ async function main() {
 		};
 		const activeName = () => a.page.evaluate(() => (document.getElementById('lpn_scenario_btn') || {}).textContent.trim());
 		// The column of the table that holds quantity label q (by its heading text) in scenario s.
-		const colOf = (t, qLabel, s) => t.heads.findIndex((h) => h.indexOf(qLabel + ' (') === 0 && h.endsWith(', ' + s));
+		// A heading's scenario part may carry a time or a mark after the name: "Max day (6:00)".
+		const colOf = (t, qLabel, s) => t.heads.findIndex((h) => {
+			if (h.indexOf(qLabel + ' (') !== 0) { return false; }
+			const tail = h.slice(h.indexOf('), ') + 3);
+			return tail === s || tail.indexOf(s + ' (') === 0;
+		});
 
 		// ================================ STEADY STATE ================================
 		let page = await open(project(true));
@@ -162,9 +178,21 @@ async function main() {
 		ok('the default table is junction pressure in three scenarios', t && t.heads.length === 4 && t.rows.length === 9, t && t.heads.join(' | '));
 		ok('the headings name the unit and the scenario', t && t.heads[1] === P + ' (psi), Base' && t.heads[2] === P + ' (psi), Big main' && t.heads[3] === P + ' (psi), Max day', t && t.heads.join(' | '));
 		const views = {};
-		await chooseKind('junctions', ['pressure', 'head']);
+		await chooseKind('junctions', ['pressure', 'head', 'demandActual']);
 		views.junctions = await resTable();
-		ok('two results checked give six scenario columns', views.junctions.heads.length === 7, views.junctions.heads.join(' | '));
+		ok('three results checked give nine scenario columns', views.junctions.heads.length === 10, views.junctions.heads.join(' | '));
+		// Independent of the page: Net1's base demands times pattern 1 at 0:00 (1.0) times the multiplier.
+		const D = await L('bpn_demand'), net1 = project(true), mult = { 'Base': 1, 'Max day': 1.8, 'Big main': 1 };
+		for (const s of ['Base', 'Max day', 'Big main']) {
+			const dc = colOf(views.junctions, D, s);
+			const bad = views.junctions.rows.filter((r) => {
+				const n = net1.nodes.find((x) => x.id === r[0]), want = n._demand * mult[s];
+				return !(Math.abs(+r[dc] - want) <= 0.006 * Math.max(1, want));
+			});
+			ok(s + ': every junction demand is the file\'s base demand times ' + mult[s], dc > 0 && bad.length === 0,
+				bad.slice(0, 3).map((r) => r[0] + '=' + r[dc]).join(' '));
+		}
+		ok('no Recalculate-off note while Recalculate is on', (await page.evaluate(() => document.getElementById('lpn_scnres').textContent)).indexOf(await L('lpn_scnres_stale').then((x) => x.slice(0, 20))) < 0);
 		await chooseKind('tanks', ['head']);
 		views.tanks = await resTable();
 		await chooseKind('reservoirs', ['head']);
@@ -289,7 +317,9 @@ async function main() {
 		await chooseKind('junctions', ['pressure']);
 		const run = await resTable();
 		const note = await page.evaluate(() => (document.getElementById('lpn_scnres') || {}).textContent || '');
-		ok('the table says which time step it shows', note.indexOf('at 6:00, the time step on screen') >= 0, note.slice(-120));
+		ok('the table says which time step it shows', note.indexOf((await L('lpn_scnres_time_note')).replace('{time}', '6:00')) >= 0, note.slice(-160));
+		ok('each run column names the time it was read at', run.heads[1] === P + ' (psi), Base (6:00)', run.heads.join(' | '));
+		ok('a run shorter than the time on screen names its last step', run.heads.indexOf(P + ' (psi), Short (2:00)') > 0, run.heads.join(' | '));
 		await chooseKind('tanks', ['head']);
 		const runTank = await resTable();
 		await closeCompare();
@@ -332,6 +362,49 @@ async function main() {
 		await a.settle(300);
 		ok('Copy works on the Spanish page', esCopies.length === 1 && esCopies[0].split('\n').length === 10, esCopies.length);
 		ok('no uncaught page errors (es)', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+
+		// ================================ FAILED, NOT CONVERGED, ORDER ================================
+		console.log('\n--- S7: a scenario that fails, one that does not converge, stored order ---');
+		const d7 = project(true);
+		d7.scenarios = d7.scenarios.filter((x) => x.isBase);
+		d7.scenarios.push({ id: 'strial', name: 'One trial', overrides: {}, settings: { settings: { hydraulics: { trials: 1, accuracy: 1e-9 } } } });
+		d7.scenarios.push({ id: 'sdead', name: 'Dead', overrides: { 'n:9': { active: false }, 'n:2': { active: false } } });
+		d7.project.activeScenario = 'base';
+		d7.project.scenarioOrdered = true;   // One trial before Dead, which the alphabet would reverse
+		page = await open(d7);
+		await openCompare();
+		const t7 = await resTable();
+		const NC = await L('lpn_scnres_not_converged');
+		ok('columns follow the stored scenario order', t7 && t7.heads[1].indexOf(', Base') > 0 && t7.heads[2].indexOf(', One trial') > 0 && t7.heads[3].indexOf(', Dead') > 0, t7 && t7.heads.join(' | '));
+		ok('the scenario that cannot be solved keeps its column, blank', t7 && t7.heads[3] === P + ' (psi), Dead' && t7.rows.every((r) => r[3] === ''), t7 && t7.heads[3]);
+		const n7 = await page.evaluate(() => document.getElementById('lpn_scnres').textContent);
+		const failedLead = (await L('lpn_scnres_failed')).replace('{scenario}', 'Dead').split('{why}')[0];
+		ok('...and a note names it and says why', n7.indexOf(failedLead) >= 0 && n7.indexOf(failedLead) + failedLead.length < n7.length, n7.slice(n7.indexOf('Dead'), n7.indexOf('Dead') + 160));
+		ok('the scenario that did not converge is marked in its heading', t7 && t7.heads[2] === P + ' (psi), One trial ' + NC, t7 && t7.heads[2]);
+		ok('...with a note saying what the mark means', n7.indexOf((await L('lpn_scnres_not_converged_note')).replace('{mark}', NC)) >= 0);
+		const c7 = [];
+		await page.exposeFunction('__scnresCopied7', (x) => { c7.push(x); });
+		await page.evaluate(() => {
+			const orig = window.EngCalcs.lpnCopyText;
+			window.EngCalcs.lpnCopyText = function (text, btn) { window.__scnresCopied7(text); return orig(text, btn); };
+		});
+		await page.click('#lpn_scnres_copy');
+		await a.settle(300);
+		const h7 = (c7[0] || '').split('\n')[0].split('\t');
+		ok('the copied heading carries the mark too', h7[2] === P + ' (psi), One trial ' + NC && h7[3] === P + ' (psi), Dead', h7.join(' | '));
+		ok('no uncaught page errors (S7)', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+
+		// ================================ RECALCULATE OFF ================================
+		console.log('\n--- S8: Recalculate off, the open scenario switched ---');
+		const d8 = project(true);
+		d8.project.activeScenario = 'base';
+		d8.settings.autoRun = false;
+		page = await open(d8);
+		await switchTo('Max day');   // the screen keeps Base's solve: a snapshot
+		await openCompare();
+		const n8 = await page.evaluate(() => document.getElementById('lpn_scnres').textContent);
+		ok('the box says the open scenario\'s column is solved from the current inputs', n8.indexOf((await L('lpn_scnres_stale')).replace('{scenario}', 'Max day')) >= 0, n8.slice(-220));
+		ok('no uncaught page errors (S8)', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	} finally {
 		if (a) { await a.close().catch(() => {}); }
 		await browser.close();

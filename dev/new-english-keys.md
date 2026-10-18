@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**10 still to read on master**, of 17 untranslated keys, of 3042 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**16 still to read on master**, of 23 untranslated keys, of 3048 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (17, 10 to read @@ NEEDS RULING)
+## lpn_  (23, 16 to read @@ NEEDS RULING)
 
 - **`lpn_export_holds_base`**
   > It holds the Base scenario only.
@@ -44,7 +44,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > No results are included, because the results on screen belong to the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
 - **`lpn_guide_cmp_byasset_def`**
-  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box.</p>
+  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box.</p>
   @@ NEEDS RULING
 - **`lpn_guide_cmp_byasset_term`**
   > Results by asset
@@ -61,6 +61,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_scncmp_stopped`**
   > Stopped after {done} of {total} scenarios. The results below are the ones already finished.
   @@ NEEDS RULING
+- **`lpn_scnres_at_time`**
+  > ({time})
+  @@ NEEDS RULING
 - **`lpn_scnres_col`**
   > {quantity} ({unit}), {scenario}
   @@ NEEDS RULING
@@ -70,11 +73,26 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_scnres_empty`**
   > This project has none of these assets.
   @@ NEEDS RULING
+- **`lpn_scnres_failed`**
+  > {scenario} could not be solved, so its columns are blank. {why}
+  @@ NEEDS RULING
 - **`lpn_scnres_none`**
   > Check at least one result to show.
   @@ NEEDS RULING
+- **`lpn_scnres_not_converged`**
+  > (not converged)
+  @@ NEEDS RULING
+- **`lpn_scnres_not_converged_note`**
+  > A column marked {mark} shows the last results the solver reached before it stopped without converging.
+  @@ NEEDS RULING
+- **`lpn_scnres_stale`**
+  > Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.
+  @@ NEEDS RULING
+- **`lpn_scnres_steady`**
+  > (steady state)
+  @@ NEEDS RULING
 - **`lpn_scnres_time_note`**
-  > A scenario with a total run time shows its results at {time}, the time step on screen.
+  > A scenario with a total run time is read at the time step on screen, {time}, or at its last time step if its run ends sooner. Each heading shows the time read.
   @@ NEEDS RULING
 - **`lpn_scnres_title`**
   > Results by asset
@@ -195,7 +213,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > EPANET Net1 with scenarios, gpm (US)
   @@ NEEDS RULING
 
-### feat/scenario-results (`e1a400880`) — adds no English strings
+### feat/scenario-results (`0dc35e0de`) — adds no English strings
 
 ### feat/sheet-sync (`1c77e44cd`) — 77 new, 52 to read @@ NEEDS RULING
 
