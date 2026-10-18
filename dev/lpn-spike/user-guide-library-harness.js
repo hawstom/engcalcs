@@ -271,7 +271,7 @@ async function main() {
 		await settle(300);
 
 		// ---- 6. where the chapter sends the reader ------------------------------------------------
-		console.log('\n6. File, Import…, Import libraries…');
+		console.log('\n6. File, Import…, Libraries…');
 		await a.openMenu('file');
 		await a._clickRow('#lpn_menu_list', await T('lpn_file_import_menu'));
 		await P.waitForSelector('#lpn_menu_popup2', { state: 'visible' });
