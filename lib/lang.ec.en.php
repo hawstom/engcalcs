@@ -1055,7 +1055,7 @@ $ec_lang['lpn_guide_lib_scn_def']='<p>The Libraries are the same in every scenar
 $ec_lang['lpn_guide_lib_ctl_term']='Controls and rules in a run';
 $ec_lang['lpn_guide_lib_ctl_def']='<p>A control is one statement. A rule is several lines that begin with RULE. Keywords are typed in English whatever the language of the page, and numbers are in the units of the project. Add a control starts from a statement built from the network, which is then edited into the one intended.</p><p>Controls and rules change a result only in an extended-period simulation, that is, when Total run time is greater than 0. A steady-state solution is not changed by either. Rules are applied by the EPANET engine only. Both are saved with the project and written to an EPANET file.</p>';
 $ec_lang['lpn_guide_lib_import_term']='Importing libraries from another project';
-$ec_lang['lpn_guide_lib_import_def']='<p>File, Import…, Import libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.</p>';
+$ec_lang['lpn_guide_lib_import_def']='<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.</p>';
 $ec_lang['lpn_guide_lib_example_term']='Example on Net1';
 $ec_lang['lpn_guide_lib_example_def']='<p>Open the Net1 example and choose Water, Libraries. Patterns holds pattern 1, Demand Pattern, with 12 multipliers 2:00 apart, covering 24:00, marked (default). Curves holds curve 1, Pump Curve for Pump 9, a Pump head curve with one point, 1500 gpm at 250 ft. Controls holds two statements: the first opens Link 9 when Node 2 falls below 110, and the second closes it when Node 2 rises above 140. Rules holds two rules that test the clock time and the level of Tank 2.</p><p>Choose Water, Calculate, and then Water, Reports, Status changes. Pump L9 is now closed at 10:00, now open at 15:00, and now closed at 21:00, and Tank N2 is now emptying at 22:00. In Controls, change 140 to 135 in the second control and choose Water, Calculate again. The last closing moves to 20:00, and Tank N2 is now emptying at 21:00.</p>';
 $ec_lang['lpn_guide_lib_notes_term']='Points to note';
@@ -2256,7 +2256,7 @@ $ec_lang['lpn_dialog_ok']='OK';
 // fly-out off one row, the same submenu idiom Help > Toolbar already uses. Each row keeps its
 // own existing key and tip; only this one row is new.
 $ec_lang['lpn_file_import_menu']='Import…';
-$ec_lang['lpn_file_import_inp']='Import EPANET file…';
+$ec_lang['lpn_file_import_inp']='EPANET file…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort).';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
@@ -2310,9 +2310,9 @@ $ec_lang['lpn_dxf_note_categories']='Junctions with more than one demand categor
 $ec_lang['lpn_file_export_geojson_tip']='Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.';
 // Workspace export and import (Tom, 2026-10-07). {file}, {n}, {r}, {u} and {version} are filled in by the page.
 $ec_lang['lpn_file_export_item_workspace']='Workspace…';
-$ec_lang['lpn_file_export_workspace_tip']='Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.';
+$ec_lang['lpn_file_export_workspace_tip']='Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.';
 $ec_lang['lpn_file_import_workspace']='Workspace…';
-$ec_lang['lpn_file_import_workspace_tip']='Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.';
+$ec_lang['lpn_file_import_workspace_tip']='Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.';
 $ec_lang['lpn_workspace_exported']='Workspace saved to {file}: {n} settings.';
 $ec_lang['lpn_workspace_imported']='Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.';
 $ec_lang['lpn_workspace_ignored']='Entries ignored because they were not recognized: {u}.';
@@ -4112,7 +4112,7 @@ $ec_lang['lpn_status_note']='Read from the same extended period run as the Table
 $ec_lang['lpn_reports_full']='Full';
 $ec_lang['lpn_reports_full_tip']='Table of all nodes and links at every reporting time step of the last run';
 $ec_lang['lpn_full_title']='Full report';
-$ec_lang['lpn_full_needs_run']='The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.';
+$ec_lang['lpn_full_needs_run']='The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.';
 $ec_lang['lpn_full_note']='One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.';
 $ec_lang['lpn_full_step_label']='Time step';
 $ec_lang['lpn_full_download_csv']='Download CSV';
@@ -4320,7 +4320,7 @@ $ec_lang['lpn_library_fittings_in_use']='This fittings list is used by pipes ({c
 // Import libraries row under File, and nothing in the Libraries box (Tom, 2026-09-18: 'Remove
 // buttons except at the File menu.'). The label and its tip name no particular library, because
 // the FILE decides what is on offer rather than whatever section anybody was looking at.
-$ec_lang['lpn_library_import']='Import libraries…';
+$ec_lang['lpn_library_import']='Libraries…';
 $ec_lang['lpn_library_import_tip']='Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.';
 // The chooser, which is step 2 of the wizard: what the chosen file turned out to hold. The count
 // beside each name is the only thing on that screen that says what the file actually has in it.
@@ -4722,7 +4722,7 @@ $ec_lang['lpn_crit_scope_tip']='All pipes, pumps, and valves, or only those sele
 $ec_lang['lpn_crit_scope_all']='All links';
 $ec_lang['lpn_crit_scope_selected']='Selected links';
 $ec_lang['lpn_crit_minpressure']='Lowest pressure allowed';
-$ec_lang['lpn_crit_minpressure_tip']='This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.';
+$ec_lang['lpn_crit_minpressure_tip']='This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.';
 $ec_lang['lpn_crit_col_asset']='Asset';
 $ec_lang['lpn_crit_col_unserved']='Demand not served';
 $ec_lang['lpn_crit_col_cutoff']='Junctions cut off';
@@ -4758,7 +4758,7 @@ $ec_lang['lpn_ds_scope']='Junctions to scale';
 $ec_lang['lpn_ds_scope_all']='All junctions';
 $ec_lang['lpn_ds_scope_selected']='Selected junctions';
 $ec_lang['lpn_ds_minpressure']='Lowest pressure allowed';
-$ec_lang['lpn_ds_minpressure_tip']='This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.';
+$ec_lang['lpn_ds_minpressure_tip']='This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.';
 $ec_lang['lpn_ds_head_scale']='Scale the demands';
 $ec_lang['lpn_ds_multiplier']='Demand scale';
 $ec_lang['lpn_ds_multiplier_tip']='The factor by which each demand is multiplied; 1.5 is a 50% increase. It applies in addition to the demand multiplier of the active scenario, which is already in the demands, and it is never saved in the project.';
@@ -4806,13 +4806,13 @@ $ec_lang['lpn_analyze_time_moved']='⚠ This was computed at {time}, and the clo
 // probably a longitude in the wrong column, and this page says so and changes nothing, because it
 // cannot tell a mistake from a place; a file of eastings and northings is refused by name, because
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
-$ec_lang['lpn_file_import_survey']='Import surveyed points…';
+$ec_lang['lpn_file_import_survey']='Surveyed points…';
 $ec_lang['lpn_file_import_survey_tip']='Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.';
 // GeoJSON import of Shapes (Task 779). Only points, lines and polygons come in, as Shapes; the
 // network is imported from an EPANET file. Every feature not imported is named in the report.
-$ec_lang['lpn_file_import_shapes']='Import GeoJSON shapes…';
-$ec_lang['lpn_file_import_shapes_tip']='Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network from an EPANET file or with Import GeoJSON network. The project must be georeferenced or state a coordinate system.';
-$ec_lang['lpn_file_import_gjnet']='Import GeoJSON network…';
+$ec_lang['lpn_file_import_shapes']='GeoJSON shapes…';
+$ec_lang['lpn_file_import_shapes_tip']='Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.';
+$ec_lang['lpn_file_import_gjnet']='GeoJSON network…';
 $ec_lang['lpn_file_import_gjnet_tip']='Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.';
 $ec_lang['lpn_gjnet_refuse_crs']='{file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.';
 $ec_lang['lpn_gjnet_refuse_empty']='{file} contains no points or lines.';
@@ -4879,7 +4879,7 @@ $ec_lang['lpn_gjnet_note_demand_rows']='These junctions had more than one demand
 $ec_lang['lpn_gjnet_note_pipe_type']='These pipes state the pipe type shown in parentheses, whose definition a GeoJSON file does not hold. The pipe type was not imported; the diameter and roughness stated in the file were.';
 $ec_lang['lpn_gjnet_note_pattern_conflict']='These patterns are stated with different multipliers on different features. The first was used.';
 $ec_lang['lpn_gjnet_note_end_off_node']='The line of each of these links does not start or end at its node. The node position was used.';
-$ec_lang['lpn_gjnet_note_not_held']='A GeoJSON file does not hold controls, rules, time settings, text labels, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.';
+$ec_lang['lpn_gjnet_note_not_held']='A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.';
 $ec_lang['lpn_geojson_import_done']='{n} Shapes imported from {file}.';
 $ec_lang['lpn_geojson_import_done_one']='One Shape imported from {file}.';
 $ec_lang['lpn_geojson_import_renamed']='{n} feature names cannot be used as Shape IDs. Each Shape was given another ID and keeps its feature name: {list}.';
@@ -4895,9 +4895,9 @@ $ec_lang['lpn_geojson_import_parts']='{n} multipart features imported as one Sha
 $ec_lang['lpn_geojson_import_parts_one']='One multipart feature imported as one Shape for each part.';
 $ec_lang['lpn_geojson_import_local']='GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.';
 $ec_lang['lpn_geojson_import_unreadable']='{file} is not a GeoJSON file: {detail}';
-$ec_lang['lpn_file_import_dxf']='Import DXF shapes…';
+$ec_lang['lpn_file_import_dxf']='DXF shapes…';
 $ec_lang['lpn_file_import_dxf_tip']='Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion.';
-$ec_lang['lpn_file_import_shp']='Import shapefile shapes…';
+$ec_lang['lpn_file_import_shp']='Shapefile shapes…';
 $ec_lang['lpn_file_import_shp_tip']='Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this.';
 $ec_lang['lpn_dxf_import_skipped']='{n} entities not imported: {list}.';
 $ec_lang['lpn_dxf_import_skipped_one']='One entity not imported: {list}.';

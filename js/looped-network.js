@@ -50830,19 +50830,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// file."*). It lived under Settings > New assets, on the argument that it makes new
 			// assets and takes the new-asset values; that argument is still true and is not where a
 			// person looks. A command named after a FILE belongs with the other file commands.
-			{ icon: 'position', label: pc.lpn_file_import_survey || 'Import surveyed points…',
+			{ icon: 'position', label: pc.lpn_file_import_survey || 'Surveyed points…',
 			  tip: pc.lpn_file_import_survey_tip, fn: pickSurveyFile },
-			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
+			{ icon: 'open', label: pc.lpn_file_import_inp || 'EPANET file…',
 			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
 			// A GeoJSON file as a network, through one mapping step (Task 728).
-			{ icon: 'open', label: pc.lpn_file_import_gjnet || 'Import GeoJSON network…',
+			{ icon: 'open', label: pc.lpn_file_import_gjnet || 'GeoJSON network…',
 			  tip: pc.lpn_file_import_gjnet_tip, fn: pickGeoJsonNetFile },
 			// The points, lines and polygons of a GeoJSON file, as Shapes (Task 779).
-			{ icon: 'open', label: pc.lpn_file_import_shapes || 'Import GeoJSON shapes…',
+			{ icon: 'open', label: pc.lpn_file_import_shapes || 'GeoJSON shapes…',
 			  tip: pc.lpn_file_import_shapes_tip, fn: pickGeoJsonFile },
-			{ icon: 'open', label: pc.lpn_file_import_dxf || 'Import DXF shapes…',
+			{ icon: 'open', label: pc.lpn_file_import_dxf || 'DXF shapes…',
 			  tip: pc.lpn_file_import_dxf_tip, fn: pickDxfShapesFile },
-			{ icon: 'open', label: pc.lpn_file_import_shp || 'Import shapefile shapes…',
+			{ icon: 'open', label: pc.lpn_file_import_shp || 'Shapefile shapes…',
 			  tip: pc.lpn_file_import_shp_tip, fn: pickShapefile },
 			// **THE LIBRARY IMPORT WIZARD'S OWN DOOR, AND ITS ONLY ONE** (Task 611). Tom,
 			// 2026-09-17: *"Move the button to the File menu. I thought you already did that."* Then
@@ -50851,7 +50851,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// asking for the wizard *"available from every applicable library"*; his later word wins,
 			// and the earlier one should have been questioned rather than built. **Do not put a
 			// button back in the Libraries box.**
-			{ icon: 'open', label: pc.lpn_library_import || 'Import libraries…',
+			{ icon: 'open', label: pc.lpn_library_import || 'Libraries…',
 			  tip: pc.lpn_library_import_tip, fn: libImportPick },
 			// **WORKSPACE (Tom, 2026-10-07)**: the browser-scoped layout and preferences, from a file.
 			// Under File > Import because it comes from a file, by the same vote that put surveyed
