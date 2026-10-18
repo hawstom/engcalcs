@@ -180,6 +180,25 @@ async function main() {
 		const nb = await notice();
 		ok('R5 in Base the paste notice has no scenario sentence', /Pasted cells/.test(nb) && nb.indexOf((await L('lpn_pane_pasted_scenario')).split('{scenario}')[0].trim()) < 0, nb);
 
+		console.log('--- R6. Base only, with and without stored alternatives ---');
+		const reopen = async (proj) => {
+			await page.evaluate((txt) => { localStorage.setItem('lpn_project_hover', txt); }, JSON.stringify(proj));
+			await a.reload();
+			await a.answerTrainingPanel().catch(() => {});
+			await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
+			await a.settle(2500);
+		};
+		const d6 = JSON.parse(JSON.stringify(d));
+		d6.scenarios = [d6.scenarios[0]];
+		d6.project.activeScenario = 'base';
+		await reopen(d6);
+		const e0 = await doExport('lpn_file_export_item_inp');
+		ok('R6 Base alone, no alternatives: no dialog, no sentence', !e0.dialog && !/It holds/.test(e0.notice), e0.notice);
+		d6.alternatives = [{ id: 'a1', category: 'physical', name: 'A', parent: null }, { id: 'a2', category: 'physical', name: 'B', parent: 'a1', values: {} }];
+		await reopen(d6);
+		const e1 = await doExport('lpn_file_export_item_geojson');
+		const leaves = (await L('lpn_export_leaves_alternatives')).trim();
+		ok('R6 Base alone with stored alternatives: a dialog that names what is left behind', e1.dialog && e1.dialog.indexOf(leaves) >= 0 && e1.notice.indexOf(leaves) >= 0, e1.dialog);
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {
 		await browser.close();

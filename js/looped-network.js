@@ -42958,11 +42958,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * formats carry a single set of values; with more than Base in the project the other scenarios
 	 * stay behind, and the notice says so. Empty when the project is Base alone (nothing is left).
 	 */
+	function exportLeavesSomething() {
+		return scenarios.length > 1 || (doc.alternatives || []).length > 0 || (doc.calcSets || []).length > 0;
+	}
 	function exportScenarioSentence() {
-		var pcX = EngCalcs.pageConfig || {}, scn = activeScenario();
-		if (scenarios.length < 2) { return ''; }
-		if (!scn || scn.isBase) { return ' ' + (pcX.lpn_export_holds_base || 'It holds the Base scenario only.'); }
-		return ' ' + (pcX.lpn_export_holds_scenario || 'It holds the scenario {scenario} only.').split('{scenario}').join(scenarioDisplayName(scn));
+		var pcX = EngCalcs.pageConfig || {}, scn = activeScenario(), out;
+		if (!exportLeavesSomething()) { return ''; }
+		out = (!scn || scn.isBase) ? (pcX.lpn_export_holds_base || 'It holds the Base scenario only.')
+			: (pcX.lpn_export_holds_scenario || 'It holds the scenario {scenario} only.').split('{scenario}').join(scenarioDisplayName(scn));
+		if ((doc.alternatives || []).length || (doc.calcSets || []).length) {
+			out += ' ' + (pcX.lpn_export_leaves_alternatives || 'The alternatives stored in this project are not in the file.');
+		}
+		return ' ' + out;
 	}
 	/**
 	 * **A FILE THAT LEAVES SCENARIOS BEHIND IS ANSWERED WITH A DIALOG** (Tom, 2026-10-18: *"Dialog, I
@@ -42973,7 +42980,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	var exportDialogShown = false;
 	function exportScenarioDialog(text, already) {
 		var pcX = EngCalcs.pageConfig || {};
-		if (scenarios.length < 2 || already) { return; }
+		if (!exportLeavesSomething() || already) { return; }
 		openDialog(function (body) {
 			var p = document.createElement('p');
 			p.style.margin = '0';

@@ -2372,6 +2372,7 @@ EngCalcs.pageConfig = {
 	lpn_geojson_refused_empty: <?=json_encode($ec_lang['lpn_geojson_refused_empty'])?>,
 	lpn_geojson_results_in: <?=json_encode($ec_lang['lpn_geojson_results_in'])?>,
 	lpn_geojson_results_out: <?=json_encode($ec_lang['lpn_geojson_results_out'])?>,
+	lpn_export_leaves_alternatives: <?=json_encode($ec_lang['lpn_export_leaves_alternatives'])?>,
 	lpn_export_holds_scenario: <?=json_encode($ec_lang['lpn_export_holds_scenario'])?>,
 	lpn_export_holds_base: <?=json_encode($ec_lang['lpn_export_holds_base'])?>,
 	lpn_geojson_results_other: <?=json_encode($ec_lang['lpn_geojson_results_other'])?>,
