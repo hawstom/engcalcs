@@ -110,7 +110,8 @@
         "concept_layer_note": "Task 737 (2026-09-29). Every term carries a language-neutral primary record: a unique \"concept\" id (coined, Sally-style, for interface elements such as label-sym-sally = Label, label-user-tessa = Text, label-word-gus = Tag, label-long-dora = Description; a plain id for quantities) and a \"definition\" that says what the thing IS and how it differs from its neighbours. English is one rendering among 27, in translations.en; where translations.en is absent the English rendering is the term name. A translator treats a non-empty definition as the source and the English as one rendering of it; where the definition is empty, English remains the source, exactly as before. Keys cite concepts in dev/scripts/key_concepts.json and through gloss: pointers. Guarded by dev/scripts/concept_check.php. Design: dev/term-concepts.md. Renamed the four coined ids 2026-09-30 (Tom's ruling): sally/tessa/gus/dora became label-sym-sally/label-user-tessa/label-word-gus/label-long-dora.",
         "uniqueness_groups": {
             "1": "label, text, description, tag, ID",
-            "2": "hydraulic grade line, head loss gradient, colour ramp"
+            "2": "hydraulic grade line, head loss gradient, colour ramp",
+            "3": "scenario, status"
         }
     },
     "terms": {
@@ -3436,7 +3437,7 @@
         "82": {
             "term": "scenario",
             "concept": "scenario",
-            "definition": "",
+            "definition": "Project state as a collection of contributing overrides.",
             "symbol": "",
             "context": "A named set of property overrides on top of a project's canonical Base network -- e.g. a fire-flow case with higher demands and different valve states. The geometry is shared; only properties vary. Base is itself a scenario with no overrides. See ROADMAP Task 184 for the full delta model.",
             "avoid": [
@@ -3477,7 +3478,8 @@
             },
             "source": "merged 2026-08-25 with a string-keyed duplicate",
             "plain": "what-if version, case, scenario, or arrangement of circumstances",
-            "old_definition": "A named set of property values that replace the Base values on top of one shared drawing, such as a fire flow case with higher demands and different valve states. The geometry is the same in every scenario and only properties vary. Base is itself a scenario with no overrides."
+            "old_definition": "A named set of property values that replace the Base values on top of one shared drawing, such as a fire flow case with higher demands and different valve states. The geometry is the same in every scenario and only properties vary. Base is itself a scenario with no overrides.",
+            "uniqueness_group": 3
         },
         "83": {
             "term": "channel lining",
@@ -5254,6 +5256,20 @@
             },
             "source": "dev/terms.md",
             "uniqueness_group": 1
+        },
+        "status (link status)": {
+            "term": "status (link status)",
+            "concept": "status-link",
+            "plain": "state of a link at a moment, open, closed, or active",
+            "definition": "",
+            "symbol": "",
+            "context": "",
+            "translation_notes": "",
+            "translations": {
+                "en": "status"
+            },
+            "source": "dev/terms.md",
+            "uniqueness_group": 3
         }
     }
 }
