@@ -4032,6 +4032,8 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 /* The two scope markers, "Project settings" and "Calculator settings". Quieter than a sub-heading
    because they label a SCOPE rather than name a place you can jump to. */
 .lpn-set-group { margin-top: 10px; font-weight: 600; opacity: .8; text-transform: none; }
+/* A small heading under Drawing or Options, left out of the index: a step below .lpn-set-sub. */
+.lpn-set-minor { margin-top: 6px; font-size: .85rem; font-style: italic; }
 /* **ONE SMALL-TEXT TREATMENT FOR THE WHOLE BOX**, and it is .lpn-units-name's: .85em at .8 opacity.
    The notes under a sub-heading, the ramp acknowledgements, the name beside a unit select and --
    since Tom's 2026-08-19 audit -- the name of every setting row are one size and one opacity. A

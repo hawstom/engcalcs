@@ -1208,7 +1208,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						<div class="lpn-set-subbody">
 							<div id="lpn_set_map_fields" class="lpn-set-part"></div>
 							<div class="lpn-set-part">
-								<div class="lpn-set-group"><?=$ec_lang['lpn_settings_grp_positions']?></div>
+								<div class="lpn-set-group lpn-set-minor"><?=$ec_lang['lpn_settings_grp_positions']?></div>
 								<div id="lpn_set_pos_fields" class="lpn-set-part"></div>
 								<div id="lpn_set_colors_shared" class="lpn-set-part"></div>
 								<div id="lpn_set_pos_fields2" class="lpn-set-part"></div>

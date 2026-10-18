@@ -60385,7 +60385,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		function minorGroup(target, text) {
 			var part = document.createElement('div'), head = document.createElement('div');
 			part.className = 'lpn-set-part';
-			head.className = 'lpn-set-group';
+			head.className = 'lpn-set-group lpn-set-minor';
 			head.textContent = text;
 			part.appendChild(head);
 			target.appendChild(part);
