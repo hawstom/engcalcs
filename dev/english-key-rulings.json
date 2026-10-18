@@ -7547,6 +7547,11 @@
             "on": "These values are overrides in the scenario {scenario}.",
             "ruled": "2026-10-18",
             "answer": "I approved all."
+        },
+        "lpn_export_leaves_alternatives": {
+            "on": "The alternatives stored in this project are not in the file.",
+            "ruled": "2026-10-18",
+            "answer": "GeoJSON alternatives string is approved."
         }
     }
 }

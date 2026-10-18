@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**1 still to read on master**, of 7 untranslated keys, of 3032 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read on master**, of 7 untranslated keys, of 3032 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (7, 1 to read @@ NEEDS RULING)
+## lpn_  (7, all ruled)
 
 - **`lpn_export_holds_base`**
   > It holds the Base scenario only.
@@ -39,7 +39,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled 2026-10-18: I approved all._
 - **`lpn_export_leaves_alternatives`**
   > The alternatives stored in this project are not in the file.
-  @@ NEEDS RULING
+  _Ruled 2026-10-18: GeoJSON alternatives string is approved._
 - **`lpn_geojson_results_other`**
   > No results are included, because the results on screen belong to the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
