@@ -77,7 +77,7 @@ async function main() {
 		await a.menuClickSub(await T('lpn_analyze_menu'), await T('lpn_ff_menu'), 'project');
 		await settle(900);
 		const ffMin = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_ff_controls input')).map((i) => i.value));
-		ok('Lowest pressure allowed elsewhere in the Fire flow analysis took the same 116', ffMin.indexOf('116') >= 0, JSON.stringify(ffMin));
+		ok('Lowest system pressure allowed in the Fire flow analysis took the same 116', ffMin.indexOf('116') >= 0, JSON.stringify(ffMin));
 		await P.evaluate(() => document.getElementById('lpn_ff_close').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
 		await settle(300);
 

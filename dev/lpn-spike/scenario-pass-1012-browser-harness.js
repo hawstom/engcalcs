@@ -98,6 +98,8 @@ async function exportInp(a) {
 	await a.menuClickSub(await a.lang('lpn_file_export_menu'), await a.lang('lpn_file_export_item_inp'), 'file');
 	for (let i = 0; i < 60 && got.length < 1; i++) { await a.page.waitForTimeout(100); }
 	await a.page.waitForTimeout(800);
+	// A file that leaves scenarios behind is answered with a dialog (Task 814); dismiss it.
+	if (await a.page.evaluate(() => { const d = document.getElementById('lpn_dialog'); return !!d && d.style.display !== 'none'; })) { await a.page.keyboard.press('Escape'); await a.page.waitForTimeout(300); }
 	a.page.off('download', onDl);
 	if (!got.length) { return null; }
 	return inpText(fs.readFileSync(await got[0].path()));
