@@ -9,8 +9,7 @@ lines rather than appending corrections.
 ## Before merging anything
 
 - **Feature branches alive, each awaiting Tom's browser pass**: see STATE below. A feature merges
-  into master on his typed word; there is no all-clear file, freeze or merge hook. Plus `feat/label-placer` (the seam; round-5 bench), `feat/label-gang-search` (bench only), and
-  builders `feat/label-placer-a`..`-d`, which never merge alone.
+  into master on his typed word; there is no all-clear file, freeze or merge hook. The label bench branches are archived as tags (see STATE).
 - **A branch that adds a key fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
 - **Merge master into a branch before merging it to master**, then run the suite on the merge:
@@ -96,51 +95,46 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-18 (twenty-sixth session, overnight, Arizona time)
+## STATE — 2026-10-18 (twenty-sixth session, overnight and morning, Arizona time)
 
-### Master: batch 2 of 2026-10-18 (the last merge on master). Production: 4866c11d2 or 45317389e when last read
+### Master: e202f28f2 pushed and green (batches 1-3). This branch's merge (roadmap closures, handoff) still needs its suite. Production: what he last pulled
 
-Pushed 2026-10-18: **555a8899a** (batch 1: PBV unit fix, GPV warm-close fix, scenario receipts, roughness
-note, Task 815, plainer privacy.php, consent_body "so we don't count you again" in English, his word
-calls) and batch 2 (full/empty tank closes its link in the built-in solver plus his Change-type
-defaults 0/0/1, routing-harness flake fix, fire-flow multiplier guard, label rules sync with the port
-plan now on master, his alternatives-string approval). **His pull deploys them.** consent_body's 26
-translations are owed (next sprint; EC_CONSENT_VERSION stays 2, same ask).
+Batches pushed 2026-10-18: 555a8899a (PBV unit, GPV warm close, scenario receipts, roughness note,
+Task 815, plain privacy.php, consent_body "so we don't count you again" in English, his word calls),
+af91792e5 (full/empty tank closes its link natively; Change type reservoir -> tank 0/0/1; routing
+harness flake; fire-flow multiplier guard; label rules sync; port plan on master), e202f28f2 (label
+settings memo, identical drawing). consent_body's 26 translations owed (EC_CONSENT_VERSION stays 2).
+Closed: Tasks 815, 800, 721. Task 737 marked WAIT: sprint.
 
-### Feature branches waiting for his browser pass and typed merge word
+### Ready for his typed merge word (all reviewed by Perry, green but for payload freshness)
 
-- `feat/theme` (8111): round 3 in progress: map follows the theme (print and files stay Light), Desktop
-  (modern Mac look, no Apple names), Prairie (sky below the menus, menu buttons as galvanized tanks,
-  cloud toolbar, barn project tabs, fence lower chrome; Ida's direction in her journal). Perry reviewed round 2.
-- `feat/native-pbv-gpv` (8107): Task 733 phase 2 done through round 3: every valve type native, no valve
-  routes to EPANET, bad curves and forbidden valve pairs are data faults in both engines. Perry
-  confirmed the maths. Found: EPANET 2.3.5 checks error 220 only against non-adjacent valve rows
-  (input3.c valvedata/valvecheck); worth telling Luke Butler.
-- `feat/msx` (8112, sample at /chlorine-decay.msx): Task 717 phase 1; Perry: ready; round 2 fixes running.
-  When it merges, the import-report sentence and landing-page MSX lines (dev/msx-scope.md) are his call.
-- `feat/label-beside` (8110): his pass "no regressions"; held to judge with `feat/label-form`.
-- `feat/label-form` (building): inline/stacked node labels and leadered pipe labels, "whichever shows
-  more"; his /tmp/pipe-leader-missing.png case is a named harness case.
-- `feat/scenario-example` (8106): round 3: no hand-divided fire flow; the Description tells the reader
-  to run Fire flow analysis in Max day (his rule: a fire flow is never multiplied, only base demand).
-- `feat/sqlite-reader`: Task 749, never merges until done (his word). WaterGEMS import works on public
-  samples (kept in the scratchpad, never committed); a child that overrides a value is unproven.
-- `perf/label-settings-memo`: port plan step 1, building. Speed only; may merge on green.
+- `feat/scenario-results` (8113), Task 752 step 1: he said "It looks good. Copy and save work." Ask
+  for "Merge feat/scenario-results" typed. Open for him: flow shown as magnitude only (reversals
+  invisible); fire-flow comparison across scenarios still a gap (Perry).
+- `feat/native-pbv-gpv` (8107): every valve native; no valve routes to EPANET. A valves example is
+  being built on it (agent running). EPANET 2.3.5 checks error 220 only against non-adjacent valve
+  rows (input3.c valvedata/valvecheck): tell Luke Butler.
+- `feat/msx` (8112, /chlorine-decay.msx to attach to Net1): Task 717 phase 1. Then his calls on the
+  import-report sentence and landing-page MSX lines (dev/msx-scope.md).
+- `feat/theme` (8111): 13 themes; the map follows the theme; he loves Desktop and Prairie. His calls
+  pending: Dark's dark map reverses Task 714; whether a "Designer" theme (Ida, or a paid human) is wanted.
+- `feat/scenario-example` (8106): fire flow tested by the analysis in Max day, never multiplied (harness).
+- `feat/label-form` (8114) + `feat/label-beside` (8110): he likes label-form; round 2 running (Perry
+  found the one-line node trial hid node labels and IDs; fix: per-label no loss). His call after: the
+  pass is ~1.6 s per notch on n600 (master 0.8 s); keep the one-line node trial on large views?
+- `feat/sqlite-reader`: Task 749, never merges until done (his word).
 
-### Calls he made this session (all recorded in rulings, roadmap or docs)
+### Retired 2026-10-18
 
-Task 814 calls 1-5 (dialog unless the result is visible; a network import may land in the open
-project); "Lowest system pressure allowed"; "the second pane"; family-tree terms "A family tree
-child" etc. plus a "For every translator" section in dev/terms.md that reaches every payload; MSX named
-in "What it does not do"; privacy.php: "is never used" is a fact, "will never" a promise; no fixed
-retention limit on counts; a curveless GPV solves as an open valve; Change type reservoir -> tank
-gives base = elevation, depths 0/0/1, start 0; a fire flow is never multiplied.
+`feat/sheet-sync` and the label bench (`feat/label-placer`, `-a`..`-d`, `feat/label-gang-search`):
+archived as tags `archive/<branch>` (read with `git show archive/feat/label-placer:<path>`),
+branches, worktrees and preview rows removed. Bench data stays in /home/haws/label-trials-work.
 
 ### Next job
 
-His pull. His browser passes on the branches above. Port plan steps 2-5 after label-form. Task 816
-(Guide chapter pages). Task 814's network-into-open-project import (his call 2). Task 752's reshaped
-phase (results by scenario, demand import).
+Merge on his word; port plan steps 2 and 5 after label-form; Task 816; Task 814's network-into-open-
+project import (his call 2); Task 752 steps 2-3 (demand import, ODS/CSV in); a fire-flow-across-
+scenarios table; Task 733 phase 3 (EPS) slow and careful.
 
 ### Traps met 2026-10-18 (twenty-sixth session)
 
