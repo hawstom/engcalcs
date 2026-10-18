@@ -3008,7 +3008,7 @@ var EngCalcs = EngCalcs || {};
 	// *"Fully shedded links need to hide if they are still in conflict"*): a label with no such
 	// side stays hidden exactly as before. Only a lone label is tried; a chain keeps its stations.
 	// Longest pipe first, as the slide orders them, so the order is a function of the drawing.
-	var LPN_LEVEL_REACH_TEXT_HEIGHTS = 3, LPN_LEVEL_PAD_FRAC = 0.1, LPN_LEVEL_NEAR_FRAC = 0.35;
+	var LPN_LEVEL_REACH_TEXT_HEIGHTS = 3, LPN_LEVEL_PAD_FRAC = 0.1, LPN_LEVEL_NEAR_FRAC = 0.5;
 	// **A LEVEL LABEL CARRIES ITS LEADER UNLESS IT TOUCHES ITS PIPE** (pre-review of
 	// feat/label-beside, 2026-10-18: level labels 25-45 px from their pipe had no leader, because a
 	// data label draws one only past leaderThreshold(), and several sat as near another pipe as their
@@ -3342,14 +3342,27 @@ var EngCalcs = EngCalcs || {};
 		// flicker every pass here is written to avoid. Measured, so the price is on the record: on
 		// Net3-World with every label field on the whole repair is 19-58 ms a pass, against 25-90 ms
 		// for ONE of the four to six placeLabelsFirstFit() calls the same pass already makes.
-		var repaired = perfDebugAccum('  cl:repair', function () { return Collide.repairCrossingGangs(nodeLabels, nodePlaced, nodeObs, {
+		// **A ONE-LINE NODE LABEL STAYS WHERE ITS FIRST-FIT PUT IT** (Task 734): the repair's trial
+		// slots do not keep a leader off other nodes' symbols, which a one-line label's longer reach
+		// east and west needs (`leaderClean`), so it takes part only as a fixed neighbour.
+		var fixedIds = {}, movable = nodeLabels.filter(function (sp) { if (sp.leaderClean) { fixedIds[sp.id] = true; } return !sp.leaderClean; }),
+			fixed = nodePlaced.filter(function (r) { return fixedIds[r.id]; }).map(function (r) {
+				var sp = nodeLabels.filter(function (q) { return q.id === r.id; })[0];
+				return r.dropped || !sp ? r : Object.assign({}, r, { leader: Collide.segment(sp.anchor.x, sp.anchor.y, r.x, r.y, 'leader', r.id) });
+			});
+		var repaired = perfDebugAccum('  cl:repair', function () { return Collide.repairCrossingGangs(movable,
+			nodePlaced.filter(function (r) { return !fixedIds[r.id]; }), nodeObs, {
 			pad: pad, leaderMin: leaderThreshold(),
 			// The closing count is a second sweep of the whole drawing for a number no decision
 			// reads, so it is taken only when the bench is open to print it.
 			report: debugOn('labels'),
-			foreign: crossingForeigners(obs).concat(ringForeigners(placed))
+			foreign: crossingForeigners(obs).concat(ringForeigners(placed), ringForeigners(fixed))
 		}); });
-		nodePlaced = repaired.results;
+		if (fixed.length) {
+			var byRid = {};
+			repaired.results.forEach(function (r) { byRid[r.id] = r; });
+			nodePlaced = nodePlaced.map(function (r) { return byRid[r.id] || r; });
+		} else { nodePlaced = repaired.results; }
 		lastGangRepair = repaired.stats;
 		// **AND WHATEVER SURVIVED THAT, ONE OF THE TWO LABELS GOES** (Task 539 phase three). The
 		// repair moves what it can show an improvement for; this closes the remainder, which is the

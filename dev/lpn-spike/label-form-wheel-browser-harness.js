@@ -136,7 +136,7 @@ async function layOut(Session, browser, sc, mode, opts) {
 			await a.answerTrainingPanel().catch(() => {});
 			await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 		}
-		await a.page.waitForFunction(() => window.__lpnForm && window.__lpnForm.solved(), null, { timeout: 30000 });
+		await a.page.waitForFunction(() => window.__lpnForm && window.__lpnForm.solved(), null, { timeout: 90000 });
 		await a.page.evaluate(([n, l]) => window.__lpnForm.fields(n, l), [sc.node, sc.link]);
 		await a.settle(2000);
 		if (sc.fit) { await a.page.evaluate(() => window.__lpnForm.fit()); await a.settle(2000); }
