@@ -464,15 +464,17 @@ EngCalcs.lpnValveIsNative = function (link) {
 // the end of its array there. None of those has an EPANET answer to match, so such a GPV keeps
 // routing to EPANET and gets whatever EPANET does with it today (js/lpn-epanet.js writes an
 // empty one as an open throttle and says so).
-EngCalcs.lpnGpvCurveOk = function (link) {
+EngCalcs.lpnGpvCurveProblem = function (link) {
 	var pts = link.curvePoints || [], i;
-	if (pts.length < 2) { return false; }
+	if (pts.length === 0) { return 'gpv-no-curve'; }
+	if (pts.length < 2) { return 'gpv-one-point'; }
 	for (i = 0; i < pts.length; i++) {
-		if (!pts[i] || !isFinite(pts[i][0]) || !isFinite(pts[i][1])) { return false; }
-		if (i > 0 && !(pts[i][0] > pts[i - 1][0])) { return false; }
+		if (!pts[i] || !isFinite(pts[i][0]) || !isFinite(pts[i][1])) { return 'gpv-order'; }
+		if (i > 0 && !(pts[i][0] > pts[i - 1][0])) { return 'gpv-order'; }
 	}
-	return true;
+	return null;
 };
+EngCalcs.lpnGpvCurveOk = function (link) { return EngCalcs.lpnGpvCurveProblem(link) === null; };
 
 // **EPANET REFUSES SOME VALVE PAIRS, AND THE BUILT-IN SOLVER MUST NOT QUIETLY ANSWER THEM.** Input
 // error 220, OWA-EPANET 2.3.5 project.c valvecheck(): two PRVs sharing a downstream node or in
@@ -521,13 +523,28 @@ EngCalcs.lpnDemandModelIsPda = function (model) {
 // Ids of every valve in the model that only the EPANET engine can solve. Exported because the UI
 // needs the same answer BEFORE it picks an engine, and two copies of this rule would drift.
 EngCalcs.lpnEpanetOnlyValves = function (model) {
-	var out = [], conflicts = EngCalcs.lpnValveConflicts(model), i;
+	var reasons = EngCalcs.lpnEpanetOnlyValveReasons(model), out = [], i;
 	for (i = 0; i < model.links.length; i++) {
-		if (!EngCalcs.lpnValveIsNative(model.links[i]) || conflicts[model.links[i].id] ||
-				(model.links[i].type === 'valve' && String(model.links[i].valveType).toUpperCase() === 'GPV' &&
-				!EngCalcs.lpnGpvCurveOk(model.links[i]))) {
-			out.push(model.links[i].id);
+		if (reasons[model.links[i].id]) { out.push(model.links[i].id); }
+	}
+	return out;
+};
+
+// WHY each of those valves is EPANET's alone, so the page can say so per valve rather than
+// leaving the reader to guess (Task 733 phase 2). { id: reason }, a reason being 'conflict' (a
+// pair EPANET refuses, lpnValveConflicts), 'gpv-no-curve', 'gpv-one-point' or 'gpv-order' (see
+// lpnGpvCurveProblem), or 'type' (a valve type the built-in solver does not know -- none today).
+EngCalcs.lpnEpanetOnlyValveReasons = function (model) {
+	var out = {}, conflicts = EngCalcs.lpnValveConflicts(model), i, l, why;
+	for (i = 0; i < model.links.length; i++) {
+		l = model.links[i];
+		why = null;
+		if (!EngCalcs.lpnValveIsNative(l)) { why = 'type'; }
+		else if (conflicts[l.id]) { why = 'conflict'; }
+		else if (l.type === 'valve' && String(l.valveType).toUpperCase() === 'GPV') {
+			why = EngCalcs.lpnGpvCurveProblem(l);
 		}
+		if (why) { out[l.id] = why; }
 	}
 	return out;
 };
@@ -627,7 +644,8 @@ EngCalcs.lpnDiagnose = function (model, options) {
 	if (opts.engine === 'native') {
 		epanetOnlyValves = EngCalcs.lpnEpanetOnlyValves(model);
 		if (epanetOnlyValves.length > 0) {
-			issues.push({ code: 'valve-needs-epanet', ids: epanetOnlyValves });
+			issues.push({ code: 'valve-needs-epanet', ids: epanetOnlyValves,
+				reasons: EngCalcs.lpnEpanetOnlyValveReasons(model) });
 		}
 	}
 

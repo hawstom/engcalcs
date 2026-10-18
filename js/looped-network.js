@@ -73459,6 +73459,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (vt === 'FCV') { return 'flow'; }
 		return 'none';                                            // TCV loss coefficient, GPV curve
 	}
+	// THE VALVES ONLY EPANET ANSWERS, EACH WITH ITS REASON (Task 733 phase 2): "V1 (no head loss
+	// curve)". Since every valve type is the built-in solver's, a bare list left the reader asking
+	// what was wrong with V1. The reasons are EngCalcs.lpnEpanetOnlyValveReasons()'s; a valve with
+	// no reason stated is listed by name alone.
+	function epanetOnlyValveList(ids, reasons) {
+		var pc = EngCalcs.pageConfig || {},
+			text = {
+				'conflict': pc.lpn_valve_why_conflict || 'connected to another control valve in a way EPANET does not allow',
+				'gpv-no-curve': pc.lpn_valve_why_gpv_no_curve || 'no head loss curve',
+				'gpv-one-point': pc.lpn_valve_why_gpv_one_point || 'head loss curve has only one point',
+				'gpv-order': pc.lpn_valve_why_gpv_order || 'head loss curve flows do not increase'
+			};
+		return ids.map(function (id) {
+			var why = reasons && text[reasons[id]];
+			return why ? id + ' (' + why + ')' : id;
+		}).join(', ');
+	}
 	function diagIssueText(issue) {
 		var pc = EngCalcs.pageConfig || {};
 		if (issue.code === 'no-fixed-head') { return pc.lpn_diag_no_fixed_head || 'Add a reservoir or a tank. The network needs at least one known water level before it can be solved.'; }
@@ -73466,7 +73483,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'These nodes have no path to a reservoir or tank:') + ' ' + issue.ids.join(', '); }
 		// NAMES THE VALVES, which is the entire reason this page keeps its own diagnostics instead
 		// of surfacing EPANET's numeric error codes. A user staring at a drawing can act on "V3".
-		if (issue.code === 'valve-needs-epanet') { return (pc.lpn_diag_valve_needs_epanet || 'Only the EPANET solver can compute these valves. The EPANET solver could not be loaded, so these results are missing:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'valve-needs-epanet') { return (pc.lpn_diag_valve_needs_epanet || 'The built-in solver does not solve these valves, and the EPANET solver could not be loaded, so these results are missing:') + ' ' + epanetOnlyValveList(issue.ids, issue.reasons); }
 		if (issue.code === 'pda-pressures') { return pc.lpn_diag_pda_pressures || 'Required pressure must be greater than Minimum pressure. Change one of them in Settings.'; }
 		if (issue.code === 'pda-needs-epanet') { return pc.lpn_diag_pda_needs_epanet || 'The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.'; }
 		if (issue.code === 'valve-on-fixed-head') { return (pc.lpn_diag_valve_on_fixed_head || 'These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:') + ' ' + issue.ids.join(', '); }
@@ -75461,8 +75478,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if ((engine === 'epanet' || epanetOnly.length > 0 || pdaRoute) && EngCalcs.lpnSolveEpanet) {
 			if (epanetOnly.length > 0 && engine !== 'epanet') {
 				valveRouteNote = ((EngCalcs.pageConfig || {}).lpn_engine_valve_route ||
-					'Solved with the EPANET solver, because of these valves:') +
-					' ' + epanetOnly.join(', ');
+					'Solved with the EPANET solver, because the built-in solver does not solve these valves:') +
+					' ' + epanetOnlyValveList(epanetOnly, EngCalcs.lpnEpanetOnlyValveReasons(model));
 			} else if (pdaRoute && engine !== 'epanet') {
 				// Task 762: the second thing that routes a network to EPANET by its own contents.
 				valveRouteNote = (EngCalcs.pageConfig || {}).lpn_engine_pda_route ||

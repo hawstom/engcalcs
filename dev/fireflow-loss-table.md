@@ -24,7 +24,7 @@ What this repo already does with one, all shipped under Task 248:
 | Import | `js/lpn-inp.js` | A `[VALVES]` GPV row arrives as a real valve holding `curveId`, a reference into `doc.curves` (Task 586). A GPV naming a curve the file does not contain still arrives as a valve, keeping the name, and is reported (`gpv-curve-missing`) |
 | Export | `js/lpn-inp.js` | Names the curve in the setting column; `[CURVES]` is composed from the library, so a curve nobody edited goes back out as the file's own lines. A GPV whose curve has no points goes out as an open TCV and is reported (`gpv-no-curve-as-open`) |
 | Engine | `js/lpn-epanet.js` | Same two rules for the in-memory `.inp`. **A GPV's points are part of `signatureOf()`**, because EPANET refuses to be controlled through the API for one at all — error 207, *"attempt to control CV/GPV link"* — so `pushValues()` skips it and a changed curve forces a full rebuild rather than silently answering with the previous curve |
-| Our own solver | `js/lpn-solver.js` | **Cannot solve one.** `EngCalcs.lpnValveIsNative` returns false for everything but a TCV, so a GPV is an EPANET-only element and a network holding one routes to EPANET automatically |
+| Our own solver | `js/lpn-solver.js` | **Solves one since Task 733 phase 2**, by EPANET's own `gpvcoeff()`: the curve segment bracketing the flow, linearized each iteration (`native-pbv-gpv-harness.js` holds it to EPANET). Only a GPV whose curve EPANET could not read either (no points, one point, flows not increasing) still routes to EPANET (`EngCalcs.lpnEpanetOnlyValveReasons`) |
 
 So the format is not the obstacle. The obstacle is the last row.
 
@@ -55,11 +55,11 @@ There is nothing here to optimise.
 
 And the table is not free either. Two costs it would add:
 
-- **It would make the search EPANET-only.** A GPV is not native, so a hydrant carrying its loss as a
-  curve could not be searched by the built-in solver at all — a capability the assembly has today.
-  Teaching our own solver a piecewise-linear link means writing the interpolation *and its
-  derivative*, because the global gradient algorithm needs dh/dq per link. That is real numerics
-  bought to save 0.03 ms.
+- **It would trade an exact law for a piecewise-linear one.** The built-in solver has solved a GPV
+  since Task 733 phase 2, so the search would no longer be EPANET-only — that cost, argued here
+  before, is gone. What remains is that a curve is linear between its points, so its slope (the
+  dh/dq the global gradient algorithm needs) jumps at every point, where a `k` and a diameter give
+  the smooth K V²/2g. That is accuracy and convergence given up to save 0.03 ms.
 - **The table would have to be regenerated whenever anything about the assembly changed** — and the
   lateral length has no default and must be asked, per hydrant, precisely because five agency
   standards span 25–100 ft. A stored table is a cached derived value with a staleness problem; a
@@ -102,4 +102,4 @@ flow-versus-loss curve for a specific hydrant model. That is data we do not have
 the AWWA C502 number in the code is a QA *ceiling*, not a measurement — and if it existed it would
 belong in the library type as points, replacing the barrel piece of the `k` for that model and
 saying so. Even then it would be converted to a `k` at the lateral's velocity for the solve, not
-handed to EPANET as a GPV, for the two reasons in §2.
+handed to the solver as a GPV, for the two reasons in §2.

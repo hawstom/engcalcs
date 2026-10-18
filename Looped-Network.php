@@ -4238,6 +4238,10 @@ EngCalcs.pageConfig = {
 	lpn_engine_failed: <?=json_encode($ec_lang['lpn_engine_failed'])?>,
 	lpn_engine_failed_why: <?=json_encode($ec_lang['lpn_engine_failed_why'])?>,
 	lpn_engine_valve_route: <?=json_encode($ec_lang['lpn_engine_valve_route'])?>,
+	lpn_valve_why_conflict: <?=json_encode($ec_lang['lpn_valve_why_conflict'])?>,
+	lpn_valve_why_gpv_no_curve: <?=json_encode($ec_lang['lpn_valve_why_gpv_no_curve'])?>,
+	lpn_valve_why_gpv_one_point: <?=json_encode($ec_lang['lpn_valve_why_gpv_one_point'])?>,
+	lpn_valve_why_gpv_order: <?=json_encode($ec_lang['lpn_valve_why_gpv_order'])?>,
 	lpn_engine_manning_note: <?=json_encode($ec_lang['lpn_engine_manning_note'])?>,
 <?php   // EPANET said no (Task 471), and the controls it would have said no over (Task 466). ?>
 	lpn_engine_refused: <?=json_encode($ec_lang['lpn_engine_refused'])?>,

@@ -22,6 +22,7 @@
 
 const { setUnitSet, loadLoopedNetwork, settleEpanet, epanetSolves, warmEpanet } = require('./lpn-dom-stub.js');
 
+const PC = global.EngCalcs.pageConfig;
 const L = loadLoopedNetwork(
 	"\t\trunSolve: runSolve, assembleModel: assembleModel, buildDom: buildDom,\n" +
 	"\t\tgetDoc: function () { return doc; }, settings: function () { return settings; },\n" +
@@ -145,6 +146,11 @@ L.settings().engine = 'native';
 	ok('the stored engine setting was NOT rewritten', L.settings().engine === 'native', L.settings().engine);
 	ok('the status bar names the valve that caused the switch',
 		status().indexOf('V1') >= 0, JSON.stringify(status()));
+	// ...and WHY, since every valve type is the built-in solver's now (Tom, 2026-10-18, on the
+	// curveless GPV: solve it through EPANET and say why).
+	ok('...and says why: that valve has no head loss curve',
+		status().indexOf(PC.lpn_engine_valve_route + ' V1 (' + PC.lpn_valve_why_gpv_no_curve + ')') >= 0,
+		JSON.stringify(status()));
 	// The open throttle EPANET was handed: no loss across it, or nothing above is about it at all.
 	ok('the curveless GPV is the open connection EPANET is handed',
 		!!r && Math.abs(r.heads.J1 - r.heads.J2) < 0.01, r && r.heads.J1 - r.heads.J2);
@@ -188,6 +194,18 @@ nativeValve({ valveType: 'PBV', _setting: 10, _diameter: 8 }, (r) => {
 	ok('...and a 10 psi PBV under the US preset takes out 10 psi, not 10 m',
 		!!r && Math.abs(psi - 10) < 0.01, psi);
 });
+// **AND A GPV's CURVE IS IN THE STRIP's gpm AND ft** under the US preset: 100 -> 5, 300 -> 15,
+// 500 -> 40. Read by hand: 200 gpm is 10 ft, 400 gpm is 27.5 ft, and 50 gpm extrapolates the first
+// segment back to 2.5 ft (pre-reviewer's probe, 2026-10-18). J1 carries the line's own 30 gpm, so
+// the valve's flow is J2's demand alone.
+L.getDoc().curves = (L.getDoc().curves || []).concat([{ id: 'GUS', kind: 'headloss',
+	points: [[100, 5], [300, 15], [500, 40]] }]);
+for (const [gpm, ft] of [[200, 10], [400, 27.5], [50, 2.5]]) {
+	nativeValve({ valveType: 'GPV', _setting: 0, _curveId: 'GUS', _diameter: 8 }, (r) => {
+		const drop = !!r && (r.heads.J1 - r.heads.J2) / 0.3048;
+		ok('...and a US GPV curve read at ' + gpm + ' gpm loses ' + ft + ' ft', !!r && Math.abs(drop - ft) < 0.01, drop);
+	}, gpm);
+}
 setUnitSet('si');
 // A GPV naming a library head-loss curve, in the strip's L/s and metres: 20 L/s through it sits
 // halfway along the 10-30 L/s segment, so it loses 4 m.
@@ -217,6 +235,9 @@ console.log('\n--- and with EPANET unreachable, the refusal names the valve ---'
 		ok('nothing was handed to an engine that is not there', epanetSolves() === was);
 		ok('no numbers were produced', L.lastResult() === null, JSON.stringify(L.lastResult()));
 		ok('the refusal names the valve', status().indexOf('V1') >= 0, JSON.stringify(status()));
+		ok('...with its reason, in the sentence that is true of a curveless GPV',
+			status().indexOf(PC.lpn_diag_valve_needs_epanet + ' V1 (' + PC.lpn_valve_why_gpv_no_curve + ')') >= 0,
+			JSON.stringify(status()));
 		ok('...and says it is the EPANET engine that is missing',
 			/EPANET/.test(status()), JSON.stringify(status()));
 	} finally { EngCalcs.lpnSolveEpanet = keep; }

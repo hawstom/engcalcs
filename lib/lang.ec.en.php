@@ -2732,7 +2732,7 @@ $ec_lang['lpn_engine_wait_pct']='Solver {percent}% loaded.';
 $ec_lang['lpn_engine_wait_bytes']='Solver {kb} KB loaded so far. The total is not available, so the percentage of completion is unknown.';
 $ec_lang['lpn_engine_needed_failed']='The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
 $ec_lang['lpn_engine_needed_failed_why']='This network can only be solved by the EPANET solver. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='Only the EPANET solver can compute these valves. The EPANET solver could not be loaded, so these results are missing:';
+$ec_lang['lpn_diag_valve_needs_epanet']='The built-in solver does not solve these valves, and the EPANET solver could not be loaded, so these results are missing:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:';
 $ec_lang['lpn_diag_not_converged']='No solution was found. Check for physically impossible values, such as a diameter of zero.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3591,7 +3591,11 @@ $ec_lang['lpn_engine_failed_why']='{reason} Showing the built-in solver instead.
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='Solved with the EPANET solver, because of these valves:';
+$ec_lang['lpn_engine_valve_route']='Solved with the EPANET solver, because the built-in solver does not solve these valves:';
+$ec_lang['lpn_valve_why_conflict']='connected to another control valve in a way EPANET does not allow';
+$ec_lang['lpn_valve_why_gpv_no_curve']='no head loss curve';
+$ec_lang['lpn_valve_why_gpv_one_point']='head loss curve has only one point';
+$ec_lang['lpn_valve_why_gpv_order']='head loss curve flows do not increase';
 $ec_lang['lpn_unit_unknown']='This drawing states a unit this page does not support: {unit}. All values are kept and displayed exactly as imported, and nothing was changed. Nothing can be computed until the unit is supported, because its conversion factor is unknown.';
 $ec_lang['lpn_engine_manning_note']='Note: with Manning roughness, EPANET rounds the constant in the Manning equation, so head loss is about 0.6% lower than the exact form.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------

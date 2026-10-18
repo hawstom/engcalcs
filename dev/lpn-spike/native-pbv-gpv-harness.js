@@ -175,6 +175,75 @@ const CASES = [
 	}
 ];
 
+// ---- round 2: the pre-reviewer's cases (2026-10-18) -----------------------------------------------
+// THE OPEN/ACTIVE LINE OF A PBV, swept across it. With k = 50 on the 0.2 m valve at 30 L/s the
+// fully-open minor loss is 2.32 m, so settings below that leave the valve OPEN (pbvcoeff()'s
+// `Km Q^2 > setting`) and settings above it ACTIVE. The state is asserted, so a threshold moved --
+// "open only when the minor loss is at least twice the setting", tried as a mutation -- fails here
+// on 1.6 to 2.3 m by 22 to 720 mm as well as on the state. The open cases are held to K_HEAD_TOL,
+// not HEAD_TOL: EPANET's minor loss uses g rounded to 32.2 ft/s2, and at k = 50 that alone is
+// 2.2 mm (it is the same number at every open setting, which is how it can be told from a law).
+const K_HEAD_TOL = 3e-3;
+const SWEEP = [1.6, 1.9, 2.1, 2.3, 2.5, 3.0, 4.0].map((st) => ({
+	name: `PBV k=50, setting ${st} m (${st < 2.32 ? 'open' : 'active'} side of 2.32 m)`,
+	model: line('PBV', st, { k: 50 }), want: { V: st < 2.32 ? 'open' : 'active' }, headTol: K_HEAD_TOL
+}));
+const two = (links) => ({ method: 'hw', nodes: [res('R', 100), jn('J1', 0), jn('J2', 0, 30)],
+	links: [pipe('P1', 'R', 'J1', 500, 0.25)].concat(links) });
+const chain3 = (links, extra) => ({ method: 'hw',
+	nodes: [res('R', 100), jn('J1', 0), jn('J2', 0), jn('J3', 0)].concat(extra || [jn('J4', 0, 30)]),
+	links: [pipe('P1', 'R', 'J1', 500, 0.25)].concat(links) });
+const ROUND2 = SWEEP.concat([
+	{
+		// THE 1e-6 cfs FLOOR ON A GPV's FLOW (gpvcoeff(): q = MAX(q, TINY)). It matters only below
+		// 2.8e-8 m3/s, so the case is a trickle (2e-5 L/s) through a curve steep enough at the origin
+		// (50 m over the first 0.001 L/s) that the floor sets the head loss: EPANET loses r x TINY =
+		// 1.42 m here, and with the floor removed the built-in solver loses 1.0 m -- 416 mm out.
+		name: 'GPV carrying a trickle below EPANET\'s flow floor',
+		model: line('GPV', 0, gpv(curve([[0, 0], [0.001, 50], [1, 60]])), null, 0.00002), want: { V: 'open' }
+	},
+	{ name: 'GPV landing on a decreasing segment', model: line('GPV', 0, gpv(curve([[10, 2], [25, 6], [40, 3], [60, 30]])), null, 32),
+		want: { V: 'open' } },
+	{ name: 'GPV whose whole curve decreases', model: line('GPV', 0, gpv(curve([[10, 8], [25, 6], [40, 3], [60, 1]]))),
+		want: { V: 'open' } },
+	{ name: 'GPV with negative head losses', model: line('GPV', 0, gpv(curve([[10, -2], [25, -1], [40, 3]]))),
+		want: { V: 'open' } },
+	{ name: 'GPV curve through the origin', model: line('GPV', 0, gpv(curve([[0, 0], [25, 6], [40, 14]]))), want: { V: 'open' } },
+	{ name: 'GPV with a two-point curve', model: line('GPV', 0, gpv(curve([[10, 2], [50, 12]]))), want: { V: 'open' } },
+	{ name: 'GPV far beyond its last point', model: line('GPV', 0, gpv(curve([[1, 0.1], [2, 0.2]]))), want: { V: 'open' } },
+	{ name: 'GPV ignores its minor-loss column', model: line('GPV', 0, gpv(curve([[10, 2], [25, 6], [40, 14]]), { k: 20 })),
+		want: { V: 'open' } },
+	{ name: 'PBV setting larger than the head available (200 m)', model: line('PBV', 200), want: { V: 'active' }, drop: { V: 200 } },
+	{ name: 'PBV setting larger than the head available (60 m)', model: line('PBV', 60), want: { V: 'active' }, drop: { V: 60 } },
+	{ name: 'PBV of 200 m with the water running backwards', model: line('PBV', 200, null, backfeed),
+		want: { V: 'active' }, drop: { V: 200 }, reverse: 'V' },
+	{ name: 'PBV of 30 m with the water running backwards', model: line('PBV', 30, null, backfeed),
+		want: { V: 'active' }, drop: { V: 30 }, reverse: 'V' },
+	{ name: 'two PBVs in series', model: { method: 'hw', nodes: [res('R', 100), jn('J1', 0), jn('J2', 0), jn('J3', 0, 30)],
+		links: [pipe('P1', 'R', 'J1', 500, 0.25), valve('V1', 'J1', 'J2', 'PBV', 10), valve('V2', 'J2', 'J3', 'PBV', 15)] },
+		want: { V1: 'active', V2: 'active' }, drop: { V1: 10, V2: 15 } },
+	{ name: 'PBV straight into a PRV', model: { method: 'hw', nodes: [res('R', 100), jn('J1', 0), jn('J2', 0), jn('J3', 0, 30)],
+		links: [pipe('P1', 'R', 'J1', 500, 0.25), valve('V1', 'J1', 'J2', 'PBV', 10), valve('V2', 'J2', 'J3', 'PRV', 20)] },
+		want: { V1: 'active', V2: 'active' }, drop: { V1: 10 } },
+	{ name: 'PRV straight into a PBV', model: { method: 'hw', nodes: [res('R', 100), jn('J1', 0), jn('J2', 0), jn('J3', 0, 30)],
+		links: [pipe('P1', 'R', 'J1', 500, 0.25), valve('V1', 'J1', 'J2', 'PRV', 40), valve('V2', 'J2', 'J3', 'PBV', 10)] },
+		want: { V1: 'active', V2: 'active' }, drop: { V2: 10 } },
+	{ name: 'PBV, a pipe, then a PRV', model: chain3([valve('V1', 'J1', 'J2', 'PBV', 10), pipe('P2', 'J2', 'J3', 100, 0.25),
+		valve('V2', 'J3', 'J4', 'PRV', 20)]), want: { V1: 'active', V2: 'active' }, drop: { V1: 10 } },
+	{ name: 'an open PRV, a pipe, then a PBV', model: chain3([valve('V2', 'J1', 'J2', 'PRV', 200), pipe('P2', 'J2', 'J3', 100, 0.25),
+		valve('V1', 'J3', 'J4', 'PBV', 10)]), want: { V1: 'active', V2: 'open' }, drop: { V1: 10 } },
+	{ name: 'PBV in parallel with a pipe', model: two([valve('V1', 'J1', 'J2', 'PBV', 10), pipe('P2', 'J1', 'J2', 300, 0.2)]),
+		want: { V1: 'active' }, drop: { V1: 10 } },
+	{ name: 'GPV in parallel with a pipe', model: two([valve('V1', 'J1', 'J2', 'GPV', 0, 0.2, gpv(curve([[10, 2], [25, 6], [40, 14]]))),
+		pipe('P2', 'J1', 'J2', 300, 0.2)]), want: { V1: 'open' } },
+	{ name: 'two GPVs in parallel', model: two([valve('V1', 'J1', 'J2', 'GPV', 0, 0.2, gpv(curve([[10, 2], [25, 6], [40, 14]]))),
+		valve('V2', 'J1', 'J2', 'GPV', 0, 0.2, gpv(curve([[10, 5], [25, 9], [40, 20]])))]), want: { V1: 'open', V2: 'open' } }
+]);
+// NOT HERE, ON PURPOSE: two PBVs in parallel with DIFFERENT settings (no solution -- both
+// engines run off to 1e12 L/s) and a GPV at exactly zero flow on a curve whose first segment does
+// not pass through the origin (the loss's sign is SGN(Q) of round-off, so EPANET's own answer is a
+// coin toss, 1.33 m either way). Neither has an EPANET answer to hold the built-in solver to.
+
 // ---- EPA's networks, with valves put in --------------------------------------------------------
 function toSolverModel(parsed) {
 	const S = parsed.scale;
@@ -283,7 +352,7 @@ async function compare(c) {
 		shape += ` Q ${c.reverse}=${(native.flows[c.reverse] / LPS).toFixed(3)} L/s`;
 		if (!(native.flows[c.reverse] < -LPS)) { shapeOk = false; }
 	}
-	const pass1 = d.dH <= (c.dw ? DW_HEAD_TOL : HEAD_TOL) && d.dQ <= qTol && stateOk && shapeOk &&
+	const pass1 = d.dH <= (c.headTol || (c.dw ? DW_HEAD_TOL : HEAD_TOL)) && d.dQ <= qTol && stateOk && shapeOk &&
 		native.converged && epa.converged;
 	ok(c.name, pass1,
 		`dH=${d.dH.toExponential(2)} m @${d.atH}  dQ=${d.dQ.toExponential(2)} m3/s @${d.atQ}  ` +
@@ -292,7 +361,7 @@ async function compare(c) {
 		`  it=${native.iterations}/${epa.iterations}`);
 	const kind = /GPV/.test(c.name) && !/PBV/.test(c.name) ? 'GPV' : /PBV/.test(c.name) && !/GPV/.test(c.name) ? 'PBV' : 'both';
 	const w = worst[kind] || (worst[kind] = { dH: 0, h: '', dQ: 0, q: '' });
-	if (!c.dw && d.dH > w.dH) { w.dH = d.dH; w.h = c.name; }
+	if (!c.dw && !c.headTol && d.dH > w.dH) { w.dH = d.dH; w.h = c.name; }
 	if (d.dQ > w.dQ) { w.dQ = d.dQ; w.q = c.name; }
 	return d;
 }
@@ -300,6 +369,9 @@ async function compare(c) {
 async function run() {
 	console.log('-- 1. constructed networks');
 	for (const c of CASES) { await compare(c); }
+
+	console.log('-- 1b. the open/active sweep and the pre-reviewer\'s cases');
+	for (const c of ROUND2) { await compare(c); }
 
 	console.log('-- 2. EPA Net1 and Net3, with PBVs and GPVs put in');
 	const net1 = loadNet('Net1.inp');
@@ -380,7 +452,7 @@ async function run() {
 	}
 
 	console.log('\nWorst differences from EPANET 2.3.5 (Hazen-Williams cases; Darcy-Weisbach held to ' +
-		DW_HEAD_TOL * 1000 + ' mm):');
+		DW_HEAD_TOL * 1000 + ' mm, the k = 50 sweep to ' + K_HEAD_TOL * 1000 + ' mm):');
 	Object.keys(worst).forEach((k) => {
 		const w = worst[k];
 		console.log(`  ${k}: head ${(w.dH * 1000).toFixed(3)} mm (${w.h}); flow ${(w.dQ / LPS).toExponential(2)} L/s (${w.q})`);
