@@ -73279,7 +73279,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						return [toSI(pt[0], 'lpn_u_flow'), toSI(pt[1], 'lpn_u_elevhead')];
 					});
 				}
-				if (out.valveType === 'PRV' || out.valveType === 'PSV') {
+				// A PBV's DROP is a pressure too, in a PRV's unit (valveSettingSpec() says
+				// lpn_u_pressure). Left unconverted, a 10 psi PBV reached the EPANET engine as 10 m of
+				// head, which is 14.2 psi. dev/lpn-spike/pbv-setting-unit-harness.js.
+				if (out.valveType === 'PRV' || out.valveType === 'PSV' || out.valveType === 'PBV') {
 					out.setting = toSI(effective(l, 'setting') || 0, 'lpn_u_pressure');
 				} else if (out.valveType === 'FCV') {
 					out.setting = toSI(effective(l, 'setting') || 0, 'lpn_u_flow');
