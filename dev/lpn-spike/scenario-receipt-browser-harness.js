@@ -112,7 +112,7 @@ async function main() {
 		const jb = gb.text ? JSON.parse(gb.text) : null;
 		ok('R2 Base GeoJSON has results', jb && /"has_results":\s*true/.test(gb.text), gb.notice);
 		ok('R2 Base file name is the project alone', gb.name === 'Elm-Street.geojson', gb.name);
-		ok('R1 Base notice names the Base scenario', /It holds the Base scenario only\./.test(gb.notice), gb.notice);
+		ok('R1 Base notice names the Base scenario', gb.notice.indexOf((await L('lpn_export_holds_base')).trim()) >= 0, gb.notice);
 
 		console.log('--- R1/R2 (Peak hour) ---');
 		ok('Peak hour is opened', await toScenario('Peak hour'));
@@ -120,7 +120,7 @@ async function main() {
 		ok('R1 GeoJSON file name carries the scenario', gp.name === 'Elm-Street-Peak-hour.geojson', gp.name);
 		ok('R1 GeoJSON notice names the scenario', /It holds the scenario Peak hour only\./.test(gp.notice), gp.notice);
 		ok('R2 stale results are not attached to Peak hour', gp.text && !/"has_results":\s*true/.test(gp.text) && !/"head":/.test(gp.text.replace(/"has_results"/g, '')), gp.text && String(/"has_results":\s*true/.test(gp.text)));
-		ok('R2 the notice names Base as the results\' scenario', new RegExp('belong to the scenario ' + base).test(gp.notice), gp.notice);
+		ok('R2 the notice names Base as the results\' scenario', gp.notice.indexOf((await L('lpn_geojson_results_other')).replace('{scenario}', base).trim()) >= 0, gp.notice);
 		const ip = await doExport('lpn_file_export_item_inp');
 		ok('R1 EPANET file name carries the scenario', ip.name === 'Elm-Street-Peak-hour.inp', ip.name);
 		ok('R1 EPANET notice names the scenario', /It holds the scenario Peak hour only\./.test(ip.notice), ip.notice);
@@ -173,7 +173,7 @@ async function main() {
 		await paste('8.5');
 		await a.settle(400);
 		const nb = await notice();
-		ok('R5 in Base the paste notice has no scenario sentence', /Pasted cells/.test(nb) && !/overrides in the scenario/.test(nb), nb);
+		ok('R5 in Base the paste notice has no scenario sentence', /Pasted cells/.test(nb) && nb.indexOf((await L('lpn_pane_pasted_scenario')).split('{scenario}')[0].trim()) < 0, nb);
 
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {
