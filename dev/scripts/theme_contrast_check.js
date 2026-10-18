@@ -22,7 +22,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Every theme the head script can write on <html data-theme>, and its text ratio.
-const THEMES = { light: 4.5, dark: 4.5, hc: 7, 'hc-dark': 7, rounded: 4.5, platinum: 4.5, newspaper: 4.5, amber: 4.5, green: 4.5, arcade: 4.5, space: 4.5 };
+const THEMES = { light: 4.5, dark: 4.5, hc: 7, 'hc-dark': 7, rounded: 4.5, platinum: 4.5, desktop: 4.5, newspaper: 4.5, amber: 4.5, green: 4.5, arcade: 4.5, space: 4.5 };
 // Light shipped before this check; its weak pairs are reported, not failed.
 const INFO_ONLY = { light: true };
 
@@ -30,7 +30,7 @@ const INFO_ONLY = { light: true };
 const TEXT = ['ink', 'ink-strong', 'ink-muted', 'ink-subtle', 'accent', 'accent-hover', 'brand', 'warn-ink', 'ok-ink',
 	'bad-ink', 'error-ink', 'neutral-ink', 'gray-444', 'gray-777', 'hue-17406b', 'hue-5a6570', 'hue-5f6368', 'hue-667',
 	'hue-b00020', 'hue-0b0080', 'hue-12211f', 'help-ink'].map((t) => 'ec-' + t);
-const SURFACE = ['bg', 'chrome-bg', 'form-bg', 'gray-fafafa', 'gray-f7f7f7', 'gray-f6f6f6', 'gray-f2f2f2', 'gray-f0f0f0', 'hover-bg',
+const SURFACE = ['bg', 'chrome-bg', 'box-bg', 'form-bg', 'gray-fafafa', 'gray-f7f7f7', 'gray-f6f6f6', 'gray-f2f2f2', 'gray-f0f0f0', 'hover-bg',
 	'select-bg', 'warn-bg', 'error-bg', 'error-bg-soft', 'hue-eef1f4', 'hue-eef3fd', 'hue-eef4ff',
 	'accent-hover-bg', 'hue-fdd', 'hue-fff3cd', 'hue-fff4e5'].map((t) => 'ec-' + t);
 // Text that sits only on the quiet surfaces (a hovered close button, a selected row) is checked on those.

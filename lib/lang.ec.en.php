@@ -3182,12 +3182,14 @@ $ec_lang['lpn_theme_dark']='Dark';
 // Green are the one-color screens of early computer terminals. Platinum is the gray desktop of the late
 // 1990s. Rounded is the Light colors with soft, rounded shapes. Newspaper is black type on newsprint, set
 // like a printed newspaper. Arcade is a black screen with blue maze walls, like a 1980s arcade game. Space
-// is a night sky with stars and gold lettering, like a science-fiction film.
+// is a night sky with stars and gold lettering, like a science-fiction film. Desktop is the light, frosted look
+// of a present-day computer's own windows.
 $ec_lang['lpn_theme_hc']='High contrast';
 $ec_lang['lpn_theme_amber']='Amber';
 $ec_lang['lpn_theme_green']='Green';
 $ec_lang['lpn_theme_platinum']='Platinum';
 $ec_lang['lpn_theme_rounded']='Rounded';
+$ec_lang['lpn_theme_desktop']='Desktop';
 $ec_lang['lpn_theme_newspaper']='Newspaper';
 $ec_lang['lpn_theme_arcade']='Arcade';
 $ec_lang['lpn_theme_space']='Space';

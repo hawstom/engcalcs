@@ -58,9 +58,9 @@ function ok(label, cond, detail) {
 const SHOTS = process.env.EC_THEME_SHOTS || '';
 if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: true }); }
 
-const ORDER = ['system', 'light', 'dark', 'hc', 'rounded', 'platinum', 'newspaper', 'amber', 'green', 'arcade', 'space'];
+const ORDER = ['system', 'light', 'dark', 'hc', 'rounded', 'platinum', 'desktop', 'newspaper', 'amber', 'green', 'arcade', 'space'];
 const KEYS = { system: 'lpn_theme_system', light: 'lpn_theme_light', dark: 'lpn_theme_dark', hc: 'lpn_theme_hc',
-	amber: 'lpn_theme_amber', green: 'lpn_theme_green', platinum: 'lpn_theme_platinum', rounded: 'lpn_theme_rounded',
+	amber: 'lpn_theme_amber', green: 'lpn_theme_green', platinum: 'lpn_theme_platinum', rounded: 'lpn_theme_rounded', desktop: 'lpn_theme_desktop',
 	newspaper: 'lpn_theme_newspaper', arcade: 'lpn_theme_arcade', space: 'lpn_theme_space' };
 
 async function main() {

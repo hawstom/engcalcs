@@ -577,6 +577,16 @@ the screenshot, EPANET and DXF files byte-identical to Light's in every theme, n
 Scenario manager, and the Scenario manager's contrast. `theme-browser-harness.js` and
 `theme-contrast-browser-harness.js` now read the map's own paper instead of assuming white.
 
+**Desktop** (Tom, 2026-10-18: *"we are missing one very important theme: Mac OS"*; Platinum is the 1990s
+desktop, this is today's). Named Desktop in the gallery, after Platinum; no maker's name, logo or window
+buttons. The computer's own interface face (-apple-system, BlinkMacSystemFont, then Segoe UI, Roboto,
+Helvetica), a frosted light-grey menu bar and toolbar and frosted boxes (`--ec-chrome-blur`, `--ec-box-blur`,
+`--ec-box-bg` at 86% white), 7 px button and 12 px box corners, light layered shadows, hairline frames and tab
+rule, one calm blue (#005bbd) for links, selection and focus, a 3 px focus ring, and a white map with that
+blue for its selection. Where the browser cannot blur, an `@supports not (backdrop-filter...)` rule makes the
+boxes and chrome solid, so the drawing never shows through the words; the harness holds a frosted box's text
+at 4.5:1 even with black or the network's ink behind it.
+
 **Known, not built**: colour by value keeps its ramp on a dark paper, so a ramp's darkest class (viridis
 purple) is faint on Amber, Arcade or Space; the fix (a casing in the paper's opposite tone, or lifting that
 stop) changes how a visitor's colouring looks and is Tom's call. The basemap tiles are not filtered.

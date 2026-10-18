@@ -218,7 +218,7 @@ async function main() {
 			await a.settle(200);
 			lightRef = await a.page.evaluate(resolveTokens, allTokens);
 			lightLegend = await a.page.evaluate(() => { const l = document.getElementById('lpn_labels_legend'); return l ? getComputedStyle(l).backgroundColor : null; });
-			for (const t of ['light', 'dark', 'hc', 'rounded', 'platinum', 'newspaper', 'amber', 'green', 'arcade', 'space']) { await measure(a, t, t); }
+			for (const t of ['light', 'dark', 'hc', 'rounded', 'platinum', 'desktop', 'newspaper', 'amber', 'green', 'arcade', 'space']) { await measure(a, t, t); }
 			ok('no page errors (light device)', !a.errors.length, (a.errors[0] || '').slice(0, 200));
 		} finally { await a.close(); }
 		const b = await Session.open(browser, 'dark-os', { colorScheme: 'dark' });

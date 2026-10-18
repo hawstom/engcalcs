@@ -250,7 +250,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // mirrors #lpn_settings_box's static-PHP-plus-JS-clamped-position pattern (position:fixed,
 	      // positioned/clamped by showBackdropTargetPanel() in looped-network.js), not the spike's
 	      // fixed center-screen placement. ?>
-	<div id="lpn_backdrop_target_panel" class="d-print-none" style="display:none;position:fixed;z-index:30;background:var(--ec-bg);border:var(--ec-box-border);padding:8px;box-shadow:var(--ec-box-shadow)">
+	<div id="lpn_backdrop_target_panel" class="d-print-none" style="display:none;position:fixed;z-index:30;background:var(--ec-box-bg);border:var(--ec-box-border);padding:8px;box-shadow:var(--ec-box-shadow)">
 		<label for="lpn_backdrop_target_mode"><?=$ec_lang['lpn_backdrop_target_label']?></label>
 		<select id="lpn_backdrop_target_mode">
 			<option value="node"><?=$ec_lang['lpn_backdrop_target_node']?></option>
@@ -987,7 +987,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // somewhere other than where it visually appeared, so the tap fell through to the canvas
       // underneath and was read as a background pan). fixed is always viewport-relative, matching
       // clientX/clientY directly with no scroll math needed. ?>
-<div id="lpn_popup" class="d-print-none lpn-popover lpn-propbox" style="display:none;position:fixed;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)">
+<div id="lpn_popup" class="d-print-none lpn-popover lpn-propbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)">
 	<?php // **THE DRAG BAND IS NAMED AND DELINEATED** (Tom, 2026-09-08: *"There is no visual title bar
 	      // depiction. For a non-hog box like this I would expect a title bar with a title in it;
 	      // maybe the right title is 'Properties'. Or empty for now. But a nice line delineating the
@@ -1018,7 +1018,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // modeless for a reason -- you find something, look at the map, and search again without the
       // panel ever taking the map away. Everything inside is built in JS (wireFindPopup()), because
       // the property and condition lists depend on which kind of element you chose. ?>
-<div id="lpn_find_popup" class="d-print-none lpn-popover lpn-findbox" style="display:none;position:fixed;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)">
+<div id="lpn_find_popup" class="d-print-none lpn-popover lpn-findbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)">
 	<?php // The padded band at the top is the DRAG SURFACE, exactly as on #lpn_popup: `e.target` is
 	      // the panel itself there and a child everywhere else, so a drag can never start on a
 	      // control. That is why the padding is 40px on top and 8px elsewhere. ?>
@@ -1064,7 +1064,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // AutoCAD palette." Nothing here assumes a floating box: the whole thing is one element with
       // one placement function, so a future dock changes where it is put and nothing about what is
       // in it. ?>
-<div id="lpn_settings_box" class="d-print-none lpn-popover lpn-setbox" style="display:none;position:fixed;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_setbox_title">
+<div id="lpn_settings_box" class="d-print-none lpn-popover lpn-setbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_setbox_title">
 	<?php // The padded band at the top is the DRAG SURFACE, exactly as on #lpn_popup and #lpn_find_popup:
 	      // `e.target` is the box itself there and a child everywhere else, so a drag can never start
 	      // on a control. That is why the padding is 40px on top and 8px elsewhere. ?>
@@ -1337,7 +1337,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // and scrolls to them; these three are disjoint editors rather than sections of one document,
       // so a click SHOWS one and hides the others. Built in JS (buildLibraryBox), because what is
       // in each depends entirely on the document. ?>
-<div id="lpn_library_box" class="d-print-none lpn-popover lpn-setbox lpn-libbox" style="display:none;position:fixed;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_libbox_title">
+<div id="lpn_library_box" class="d-print-none lpn-popover lpn-setbox lpn-libbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_libbox_title">
 	<div id="lpn_libbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_library_menu']?></div>
 	<button type="button" id="lpn_libbox_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1359,7 +1359,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // scrolling body -- so there is one set of box mechanics on this page rather than a third.
       // The controls and both reports are built in JS (buildFireFlowBox), because what is in them
       // depends entirely on the document and on what the last run found. ?>
-<div id="lpn_ff_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_ffbox_title">
+<div id="lpn_ff_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_ffbox_title">
 	<div id="lpn_ffbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ff_title']?></div>
 	<button type="button" id="lpn_ff_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1376,7 +1376,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // loses. Fire flow's sibling, on the same box shell; the controls and the report are built in
       // JS (buildCriticalityControls, rebuildCriticalityReport). Its progress uses fire flow's run
       // dialog below, retitled for the run. ?>
-<div id="lpn_crit_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_critbox_title">
+<div id="lpn_crit_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_critbox_title">
 	<div id="lpn_critbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_crit_title']?></div>
 	<button type="button" id="lpn_crit_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1388,7 +1388,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // a copy, and the largest multiplier the system holds above a pressure limit. The third
       // sibling on fire flow's box shell; built in JS (buildDemandScaleControls,
       // rebuildDemandScaleReport). ?>
-<div id="lpn_ds_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_dsbox_title">
+<div id="lpn_ds_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_dsbox_title">
 	<div id="lpn_dsbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ds_title']?></div>
 	<button type="button" id="lpn_ds_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1401,7 +1401,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // shell -- the drag band, the resize grip, the scrolling body -- so this page has one set of
       // box mechanics and not a fourth. The report itself is built in JS (rebuildEnergyReport),
       // because it exists only for as long as the run that produced it. ?>
-<div id="lpn_energy_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_energybox_title">
+<div id="lpn_energy_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_energybox_title">
 	<div id="lpn_energybox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_energy_title']?></div>
 	<button type="button" id="lpn_energy_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1413,7 +1413,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // Find box's shell: the drag band holds the title, the body is rows of a name and a control,
       // built in JS by buildContourBox() because every row reads the project's settings. Remembered
       // per browser as `lpn_contourbox`, like every other standing box. ?>
-<div id="lpn_contour_box" class="d-print-none lpn-popover lpn-findbox lpn-contourbox" style="display:none;position:fixed;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_contour_title">
+<div id="lpn_contour_box" class="d-print-none lpn-popover lpn-findbox lpn-contourbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_contour_title">
 	<div id="lpn_contour_title" class="lpn-setbox-title"><?=$ec_lang['lpn_contour_plot']?></div>
 	<button type="button" id="lpn_contour_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div id="lpn_contour_body" class="lpn-popover-body"></div>
@@ -1423,7 +1423,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // snip."*). Opens with Map > Screenshot, on the Contour box's shell. Its magnification is a
       // preference of this browser, not modelling data, so it rides in `lpn_snipbox` beside where
       // the box sits, and never in the project. ?>
-<div id="lpn_snip_box" class="d-print-none lpn-popover lpn-findbox lpn-snipbox" style="display:none;position:fixed;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_snip_title">
+<div id="lpn_snip_box" class="d-print-none lpn-popover lpn-findbox lpn-snipbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_snip_title">
 	<div id="lpn_snip_title" class="lpn-setbox-title"><?=$ec_lang['lpn_screenshot_menu']?></div>
 	<button type="button" id="lpn_snip_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div id="lpn_snip_body" class="lpn-popover-body"></div>
@@ -1433,7 +1433,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // each was found. It borrows the fire flow box's shell for the reason the pump energy report
       // does -- one set of box mechanics on this page, not a fifth -- and its table is built in JS
       // (rebuildScenarioCompareReport), because it exists only for as long as the run behind it. ?>
-<div id="lpn_scncmp_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_scncmp_title">
+<div id="lpn_scncmp_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_scncmp_title">
 	<div id="lpn_scncmp_title" class="lpn-setbox-title"><?=$ec_lang['lpn_scncmp_title']?></div>
 	<button type="button" id="lpn_scncmp_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1450,7 +1450,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // text is EPANET's own and untranslated (lpn_time_run_report_tip says so), and an EPANET
       // .rpt is column-aligned monospace: wrapping it destroys the only structure it has. The
       // popover body scrolls vertically already; this adds the other axis, inside the box. ?>
-<div id="lpn_rptbox" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_rptbox_title">
+<div id="lpn_rptbox" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_rptbox_title">
 	<div id="lpn_rptbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_time_run_report']?></div>
 	<?php // Copy sits in the sticky .lpn-box-tools row, not the title band (the dock icons' and the
 	      // X's): the report can be thousands of lines, and a Copy that scrolls away with the text
@@ -1466,7 +1466,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // tanks filling, emptying, filling up or running dry, and a step that did not converge. It
       // borrows the same box shell as the reports above it; the list is built in JS
       // (rebuildStatusReport) because it exists only for as long as the run behind it. ?>
-<div id="lpn_status_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_statusbox_title">
+<div id="lpn_status_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_statusbox_title">
 	<div id="lpn_statusbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_status_title']?></div>
 	<button type="button" id="lpn_status_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1478,7 +1478,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // name, rename, add, delete and move children and branches, and nothing else. Its position is
       // window furniture (localStorage `lpn_smbox`), never in the project file. The tree itself is
       // built in JS (rebuildScenarioManager). ?>
-<div id="lpn_sm_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_smbox_title">
+<div id="lpn_sm_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_smbox_title">
 	<div id="lpn_smbox_title" class="lpn-setbox-title"><?=ecTipLabel($ec_lang['lpn_sm_title'], $ec_lang['lpn_sm_help'])?></div>
 	<button type="button" id="lpn_sm_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1504,7 +1504,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // band (that band is the dock icons' and the X's), and the row stays put as the table
       // scrolls, because this table can run to thousands of rows and a button that scrolls away
       // with it is a button nobody finds. ?>
-<div id="lpn_full_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_fullbox_title">
+<div id="lpn_full_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_fullbox_title">
 	<div id="lpn_fullbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_full_title']?></div>
 	<button type="button" id="lpn_full_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1520,7 +1520,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // file input lives inside the box because loading a file is the box's own first step; the
       // file is held in memory only, and so is where the box sits -- it writes nothing to the
       // visitor's device. Built in JS (rebuildCalibReport). ?>
-<div id="lpn_calib_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_calibbox_title">
+<div id="lpn_calib_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_calibbox_title">
 	<div id="lpn_calibbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_calib_title']?></div>
 	<button type="button" id="lpn_calib_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<input type="file" id="lpn_calib_file" accept=".dat,.txt,.cal,text/plain" style="display:none">
@@ -1528,7 +1528,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<div id="lpn_calib_report" class="lpn-ff-report"></div>
 	</div>
 </div>
-<div id="lpn_ff_run_box" class="d-print-none lpn-popover lpn-ffrunbox" style="display:none;position:fixed;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_ffrun_title">
+<div id="lpn_ff_run_box" class="d-print-none lpn-popover lpn-ffrunbox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_ffrun_title">
 	<div id="lpn_ffrun_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ff_run_title']?></div>
 	<div class="lpn-popover-body">
 		<div id="lpn_ff_run_body"></div>
@@ -1539,7 +1539,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // js/looped-network.js builds those, so three popovers would have been three copies of the
       // same positioning and dismissal code. Replaces the Projects panel of Task 146.08 -- the tab
       // strip now answers "which network am I looking at", permanently and without a click. ?>
-<div id="lpn_menu_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:1850;background:var(--ec-bg);border:var(--ec-box-border);padding:4px;box-shadow:var(--ec-box-shadow)">
+<div id="lpn_menu_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:1850;background:var(--ec-box-bg);border:var(--ec-box-border);padding:4px;box-shadow:var(--ec-box-shadow)">
 	<div id="lpn_menu_list"></div>
 </div>
 <?php // The SUBMENU layer (Task 264 rework, Tom 2026-08-10: "the universal convention is for that to
@@ -1548,7 +1548,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // PARENT STAYS ON SCREEN -- replacing the list in one popup is what made New read as a menu
       // that had been navigated away from. z-index one above its parent so it paints over it where
       // the clamp has to overlap them on a narrow window. ?>
-<div id="lpn_menu_popup2" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:1851;background:var(--ec-bg);border:var(--ec-box-border);padding:4px;box-shadow:var(--ec-box-shadow)">
+<div id="lpn_menu_popup2" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:1851;background:var(--ec-box-bg);border:var(--ec-box-border);padding:4px;box-shadow:var(--ec-box-shadow)">
 	<div id="lpn_menu_list2"></div>
 </div>
 <?php // ONE dialog, reused for every question that has to be answered before anything else happens:
@@ -1604,7 +1604,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // reason every other panel on this page is: the strings are language keys and PHP is where
       // those live. What JS builds here is only the eight unit selects, and those are CLONED from
       // the page's own strip so nothing about a unit family or an option value is retyped. ?>
-<div id="lpn_new_panel" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:22;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_new_title">
+<div id="lpn_new_panel" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:22;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_new_title">
 	<div id="lpn_new_title" class="lpn-setbox-title"><?=$ec_lang['lpn_new_title']?></div>
 	<button type="button" id="lpn_new_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body">
@@ -1690,7 +1690,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // three cases are his (R-155): EPSG, unnamed (local) georeference, not georeferenced. The
       // EPSG chooser is the New project box's own, and the units are cloned from the strip exactly
       // as that box clones them. Filled by js/looped-network.js (openConvertAsBox). ?>
-<div id="lpn_convas_panel" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:22;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_convas_title">
+<div id="lpn_convas_panel" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:22;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_convas_title">
 	<div id="lpn_convas_title" class="lpn-setbox-title"><?=$ec_lang['lpn_convas_title']?></div>
 	<button type="button" id="lpn_convas_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body">
@@ -1789,7 +1789,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       //
       // STATIC MARKUP filled by js/looped-network.js, like every other panel here, because the
       // strings are language keys and PHP is where those live. ?>
-<div id="lpn_crsbox" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:23;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_crsbox_title">
+<div id="lpn_crsbox" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:23;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:40rem" role="dialog" aria-labelledby="lpn_crsbox_title">
 	<?php // Plain text, no tip (Tom, 2026-09-25: the old tip here read as non-functional, and a
 	      // box title carries none elsewhere in this file -- see lpn_convas_title beside it). The
 	      // permanence-warning tip this title used to carry had no other reader and is retired
@@ -1843,7 +1843,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       //
       // **THE VERSION IS DERIVED, NOT DECLARED** -- see ecDeployIdentity(). A website has no
       // release to number, and what a bug report actually needs is which code answered. ?>
-<div id="lpn_about_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:30rem">
+<div id="lpn_about_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 12px 12px;box-shadow:var(--ec-box-shadow);max-width:30rem">
 	<button type="button" id="lpn_about_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 <?php // ONE TITLE BAR ON EVERY NON-HOGGING BOX (2026-09-09). The class carries the band and the
       // divider; the 40px top padding above is the room it sits in. ?>
@@ -1914,7 +1914,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // **SAME SHELL AS NOTES** (.lpn-setbox / .lpn-notesbox), wired by wireHotkeysBox(): draggable,
       // resizable, remembered per browser as `lpn_hotkeysbox` (the key it always had; nothing new is
       // stored), dismissed only by its own X or an Escape pressed while focus is inside it. ?>
-<div id="lpn_hotkeys_popup" class="d-print-none lpn-popover lpn-setbox lpn-notesbox lpn-guidebox" style="display:none;position:fixed;background:var(--ec-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_hotkeys_title">
+<div id="lpn_hotkeys_popup" class="d-print-none lpn-popover lpn-setbox lpn-notesbox lpn-guidebox" style="display:none;position:fixed;background:var(--ec-box-bg);border:var(--ec-box-border);padding:40px 8px 8px;box-shadow:var(--ec-box-shadow)" role="dialog" aria-labelledby="lpn_hotkeys_title">
 	<div id="lpn_hotkeys_title" class="lpn-setbox-title"><?=$ec_lang['lpn_help_manual']?></div>
 	<button type="button" id="lpn_hotkeys_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body lpn-guide-body">
@@ -4237,6 +4237,7 @@ EngCalcs.pageConfig = {
 	lpn_theme_green: <?=json_encode($ec_lang['lpn_theme_green'])?>,
 	lpn_theme_platinum: <?=json_encode($ec_lang['lpn_theme_platinum'])?>,
 	lpn_theme_rounded: <?=json_encode($ec_lang['lpn_theme_rounded'])?>,
+	lpn_theme_desktop: <?=json_encode($ec_lang['lpn_theme_desktop'])?>,
 	lpn_theme_newspaper: <?=json_encode($ec_lang['lpn_theme_newspaper'])?>,
 	lpn_theme_arcade: <?=json_encode($ec_lang['lpn_theme_arcade'])?>,
 	lpn_theme_space: <?=json_encode($ec_lang['lpn_theme_space'])?>,

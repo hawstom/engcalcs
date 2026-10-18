@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**8 still to read on master**, of 8 untranslated keys, of 3033 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**9 still to read on master**, of 9 untranslated keys, of 3034 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,13 +29,16 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (8, 8 to read @@ NEEDS RULING)
+## lpn_  (9, 9 to read @@ NEEDS RULING)
 
 - **`lpn_theme_amber`**
   > Amber
   @@ NEEDS RULING
 - **`lpn_theme_arcade`**
   > Arcade
+  @@ NEEDS RULING
+- **`lpn_theme_desktop`**
+  > Desktop
   @@ NEEDS RULING
 - **`lpn_theme_green`**
   > Green
@@ -60,7 +63,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**151 still to read**, of 154 new keys across 25 unmerged branch(es).
+**152 still to read**, of 155 new keys across 25 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -109,7 +112,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/msx (`dd08408f6`) — 13 new, 13 to read @@ NEEDS RULING
+### feat/msx (`b1a11204c`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_file_export_item_msx`**
   > EPANET-MSX file…
@@ -559,7 +562,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   @@ NEEDS RULING
 
-### feat/theme (`8fa936920`) — adds no English strings
+### feat/theme (`732b21a44`) — adds no English strings
 
 ### fix/friction-method-roughness (`2ce53ac34`) — 1 new, 1 to read @@ NEEDS RULING
 
@@ -573,13 +576,16 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### fix/pbv-setting-unit (`2310b877a`) — adds no English strings
 
-### fix/scenario-receipt (`50386ccfa`) — 5 new, 5 to read @@ NEEDS RULING
+### fix/scenario-receipt (`8ed43cb78`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_export_holds_base`**
   > It holds the Base scenario only.
   @@ NEEDS RULING
 - **`lpn_export_holds_scenario`**
   > It holds the scenario {scenario} only.
+  @@ NEEDS RULING
+- **`lpn_export_leaves_alternatives`**
+  > The alternatives stored in this project are not in the file.
   @@ NEEDS RULING
 - **`lpn_geojson_results_other`**
   > No results are included, because the results on screen belong to the scenario {scenario}.

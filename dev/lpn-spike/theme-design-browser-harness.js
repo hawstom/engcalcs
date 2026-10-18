@@ -80,6 +80,7 @@ const DESIGN = {
 	hc: { boxFrame: '2px solid', shadow: 'none', tabsRule: '2px solid', iconStroke: 2.5 },
 	rounded: { face: '-apple-system', menuWeight: '500', btnRadius: '999px', boxRadius: '14px', iconStroke: 1.75 },
 	platinum: { face: 'Charcoal', size: '14px', menuWeight: '700', btnRadius: '2px', iconStroke: 1.75, iconCap: 'square', titlePicture: 'some' },
+	desktop: { face: '-apple-system', size: '15px', menuWeight: '500', btnRadius: '7px', boxRadius: '12px', iconStroke: 1.6, frosted: true },
 	newspaper: { face: 'Times New Roman', menuCaps: 'small-caps', btnRadius: '0px', boxFrame: '3px double', shadow: 'none',
 		titleCase: 'uppercase', tabsRule: '3px double', iconStroke: 1.5, iconCap: 'butt' },
 	amber: { face: 'ui-monospace', size: '15px', btnRadius: '0px', titleCase: 'uppercase', iconStroke: 2.25, iconCap: 'square', picture: 'some', glow: 'some' },
@@ -119,7 +120,16 @@ function readDesign() {
 		titleCase: tc.textTransform, titleInk: tc.color === accent ? 'accent' : 'ink', titlePicture: tc.backgroundImage === 'none' ? 'none' : 'some',
 		tabsRule: tb.borderBottomWidth + ' ' + tb.borderBottomStyle, iconStroke: parseFloat(ic.strokeWidth), iconCap: ic.strokeLinecap,
 		picture: cs(document.getElementById('lpn_menubar')).backgroundImage === 'none' ? 'none' : 'some', glow: cs(body).textShadow === 'none' ? 'none' : 'some',
-		contrast: { box: ratio(sample), title: ratio(title), menu: ratio(menu) }
+		contrast: { box: ratio(sample), title: ratio(title), menu: ratio(menu) },
+		// A frosted box (Desktop): its blur, the chrome's, and its words against the box laid over the worst
+		// thing that could be behind it (black) and over the network's own ink.
+		frost: bc.backdropFilter, chromeFrost: cs(document.getElementById('lpn_menubar')).backdropFilter,
+		frostWorst: (function () {
+			const bg = parse(bc.backgroundColor), ink = lum(parse(cs(sample).color));
+			const over = (f, b) => [0, 1, 2].map((i) => f[i] * f[3] + b[i] * (1 - f[3])).concat([1]);
+			const asset = parse(getComputedStyle(document.querySelector('#lpn_canvas .lpn-link')).stroke);
+			return Math.min.apply(null, [[0, 0, 0, 1], asset].map((under) => { const l = lum(over(bg, under)); return (Math.max(l, ink) + 0.05) / (Math.min(l, ink) + 0.05); }));
+		})()
 	};
 }
 
@@ -221,6 +231,12 @@ async function main() {
 				if (t !== 'light' && t !== 'dark' && lightGot) {
 					const differ = KEYS.filter((k) => got[k] !== lightGot[k]);
 					ok(t + ': differs from Light in at least three design properties beyond colour (' + differ.join(', ') + ')', differ.length >= 3);
+				}
+				if (t === 'desktop') {
+					ok('desktop: the boxes and the menu bar are frosted (a blur of what is behind them)', /blur/.test(got.frost) && /blur/.test(got.chromeFrost), got.frost + ' / ' + got.chromeFrost);
+					ok('desktop: a frosted box\'s words read at 4.5:1 even over black or the network\'s ink behind it (' + got.frostWorst.toFixed(2) + ')', got.frostWorst >= 4.5);
+				} else {
+					ok(t + ': nothing is frosted', got.frost === 'none' && got.chromeFrost === 'none', got.frost);
 				}
 				// 3: readable
 				const need = /^hc/.test(attr) ? 7 : 4.5;

@@ -102,6 +102,12 @@
 	/* A box's frame and its shadow: Settings, Properties, Find, every dialog and floating panel. */
 	--ec-box-border: 1px solid var(--ec-ink);
 	--ec-box-shadow: 2px 2px 6px var(--ec-a-0-0-0-3);
+	/* A box's surface, and a frosted blur of whatever is behind it (Desktop); the page's own surface and no
+	   blur in Light. The chrome may be frosted too. Where the browser cannot blur, the theme falls back to a
+	   solid surface (the @supports rule after the theme blocks). */
+	--ec-box-bg: var(--ec-bg);
+	--ec-box-blur: none;
+	--ec-chrome-blur: none;
 	/* The rule under the tab strip, and a picture behind the menu bar, toolbar and tab strip (scan lines,
 	   stars). The title band of a box may carry a picture too (Platinum's ridges). */
 	--ec-tabs-rule: 1px solid var(--ec-gray-999);
@@ -818,6 +824,64 @@
 	/* The map (round 3). */
 	--ec-map-font: var(--ec-font-ui);
 }
+/* DESKTOP (Task 811, round 3): an evocation of today's desktop operating system with a light window. The
+   computer's own interface face, a frosted light-grey menu bar and toolbar and frosted boxes (a blur of what
+   is behind them), large soft corners, light layered shadows, hairline separators, and one calm blue for
+   links, selection and focus. A light map with the same blue for its selection. No maker's name, logo or
+   window buttons appear. */
+:root[data-theme="desktop"], .ec-theme-card[data-theme="desktop"] {
+	--ec-bg: #fff;
+	--ec-chrome-bg: rgba(236, 236, 238, .82);
+	--ec-ink: #1d1d1f;
+	--ec-ink-black: #000;
+	--ec-border-strong: #8e8e93;
+	--ec-control-border: #8e8e93;
+	--ec-accent: #005bbd;
+	--ec-point: #c2185b;
+	--ec-accent-hover: #0057b0;
+	--ec-accent-open: #004a96;
+	--ec-brand: #005bbd;
+	--ec-brand-hover: #0057b0;
+	--ec-warn-bg: #fff8e6;
+	--ec-warn-border: #b07d00;
+	--ec-warn-ink: #8a4b00;
+	--ec-held: #e8a33d;
+	--ec-held-ink: #8a5a00;
+	--ec-ok-ink: #1a6b2e;
+	--ec-bad-ink: #c0221c;
+	--ec-error-ink: #a81e18;
+	--ec-error-bg: #fdecea;
+	--ec-select: #0057b5;
+	--ec-tip-bg: #2c2c2e;
+	--ec-tip-ink: #fff;
+	--ec-tip-edge: #2c2c2e;
+	--ec-help-ink: #004a9c;
+	--ec-gray-999: #6e6e73;
+	--ec-gray-bbb: #8e8e93;
+	--ec-neutral-ink: var(--ec-ink-muted);
+	--ec-gray-777: var(--ec-ink-muted);
+	--ec-hover-border: var(--ec-accent);
+	--ec-pressed-border: var(--ec-accent-open);
+	--ec-font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	--ec-font-size: .9375rem;
+	--ec-menu-weight: 500;
+	--ec-title-weight: 600;
+	--ec-btn-radius: 7px;
+	--ec-radius-scale: 2;
+	--ec-box-radius: 12px;
+	--ec-box-border: 1px solid rgba(0, 0, 0, .14);
+	--ec-box-shadow: 0 0 0 .5px rgba(0, 0, 0, .1), 0 2px 6px rgba(0, 0, 0, .08), 0 10px 30px rgba(0, 0, 0, .16);
+	--ec-box-bg: rgba(255, 255, 255, .86);
+	--ec-box-blur: saturate(180%) blur(20px);
+	--ec-chrome-blur: saturate(180%) blur(20px);
+	--ec-tabs-rule: 1px solid var(--ec-border);
+	--ec-focus-w: 3px;
+	--ec-icon-stroke: 1.6;
+	/* The map (round 3). */
+	--ec-map-select: #0062cc;
+	--ec-map-marquee: #0062cc;
+	--ec-map-font: var(--ec-font-ui);
+}
 /* NEWSPAPER (Task 811, round 2): an evocation of a broadsheet of record. Newsprint paper and black ink,
    the serif a newspaper set its columns in, small capitals on the menu bar, capital headlines on the box
    titles, double rules where a page would have them (under the tab strip, round every box), no
@@ -1069,6 +1133,11 @@
 /* "Saved in this browser" is faded by opacity, which lands under 4.5:1 on a phosphor or a pure-ink palette. */
 :root[data-theme]:not([data-theme="light"]):not([data-theme="dark"]) .lpn-saved { opacity: 1; color: var(--ec-ink-muted); }
 }
+/* NO BLUR, NO SEE-THROUGH (Task 811, round 3): where the browser cannot blur, a frosted surface would be a
+   plain translucent one with the drawing showing through the words, so Desktop's boxes and chrome go solid. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+	:root[data-theme="desktop"], .ec-theme-card[data-theme="desktop"] { --ec-box-bg: var(--ec-bg); --ec-chrome-bg: var(--ec-gray-eee); }
+}
 /* THE DESIGN TOKENS AT WORK (Task 811, round 2). The page's text size and glow, and the corners of every box.
    In Light each of these is what the page always drew (1rem, no glow, square boxes). THE MAP IS THE DRAWING,
    NOT CHROME: its lettering keeps the face and size it inherited from the page before themes had either, so
@@ -1080,7 +1149,9 @@ body { font-size: var(--ec-font-size); text-shadow: var(--ec-text-glow); }
    --ec-field-text-scale (1 in Light) so a wider face does not cut "Init." or break "units" in two. */
 :is(#lpn_labels_node_fields, #lpn_labels_link_fields, #lpn_labels_customer_fields) > div > :nth-child(n+2) { font-size: calc(1em * var(--ec-field-text-scale)); }
 .ec-theme-card svg { text-shadow: none; }
-.lpn-popover, .lpn-panebox, .lpn-regmode-bar, .lpn-snip-edit-panel, .lpn-snip-menu { border-radius: var(--ec-box-radius); }
+.lpn-popover, .lpn-panebox, .lpn-regmode-bar, .lpn-snip-edit-panel, .lpn-snip-menu {
+	border-radius: var(--ec-box-radius); -webkit-backdrop-filter: var(--ec-box-blur); backdrop-filter: var(--ec-box-blur);
+}
 /* PRINT IS LIGHT (Task 811). The theme blocks are screen-only, so the tokens print as Light; Bootstrap's own
    dark switch (data-bs-theme="dark", written for Dark, Amber, Green and High contrast's dark palette) is
    undone here with Bootstrap's light values, so the page's text prints dark on white. */
@@ -2458,7 +2529,7 @@ html[lang="zh"] .ec-welcome {
 	position: fixed; left: 50%; transform: translateX(-50%); bottom: 1em;
 	z-index: 3000; display: flex; align-items: center; gap: 0.75em;
 	padding: 8px 12px;
-	background: var(--ec-bg); color: var(--ec-ink); border: var(--ec-box-border);
+	background: var(--ec-box-bg); color: var(--ec-ink); border: var(--ec-box-border);
 	box-shadow: var(--ec-box-shadow);
 	/* max-content, as #lpn_dialog: placed at left: 50%, the bar otherwise shrank to the half of the
 	   window to its right, and on a phone stood as a 195 px column over the map. */
@@ -2717,7 +2788,7 @@ html[dir="rtl"] .lpn-transport-btn[data-icon="step-fwd"] svg, html[dir="rtl"] .l
    hairline. A quiet surface of their own lets the chrome recede and the drawing come first. The 4 px gaps
    between the three rows are margins; a shadow with no blur paints each one the same colour without
    moving a pixel of layout. The menu items keep their white fill and blue outline (Task 616). */
-#lpn_menubar, #lpn_toolbar, #lpn_tabs { background: var(--ec-chrome-bg); background-image: var(--ec-chrome-image); background-size: var(--ec-chrome-image-size); }
+#lpn_menubar, #lpn_toolbar, #lpn_tabs { background: var(--ec-chrome-bg); background-image: var(--ec-chrome-image); background-size: var(--ec-chrome-image-size); -webkit-backdrop-filter: var(--ec-chrome-blur); backdrop-filter: var(--ec-chrome-blur); }
 #lpn_menubar, #lpn_toolbar { box-shadow: 0 4px 0 var(--ec-chrome-bg); }
 /* The floor for every box makePanelDraggable() wires. raisePanel() writes a higher number inline as
    boxes are opened and touched; this is only where the stack starts, and it is what puts an untouched
@@ -2930,7 +3001,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-snip-lasso { position: absolute; left: 0; top: 0; pointer-events: none; }
 .lpn-snip-lasso polygon { fill: var(--ec-select-bg); fill-opacity: 0.5; stroke: var(--ec-accent); stroke-width: 1; stroke-dasharray: 4 3; }
 .lpn-snip-edit { position: fixed; inset: 0; z-index: 1860; background: var(--ec-a-0-0-0-4); display: flex; align-items: center; justify-content: center; padding: 8px; }
-.lpn-snip-edit-panel { position: relative; background: var(--ec-bg); color: var(--ec-ink); border: var(--ec-box-border); box-shadow: var(--ec-box-shadow); padding: 8px; max-width: 100%; max-height: 100%; display: flex; flex-direction: column; gap: 8px; }
+.lpn-snip-edit-panel { position: relative; background: var(--ec-box-bg); color: var(--ec-ink); border: var(--ec-box-border); box-shadow: var(--ec-box-shadow); padding: 8px; max-width: 100%; max-height: 100%; display: flex; flex-direction: column; gap: 8px; }
 .lpn-snip-edit-bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding-inline-end: 28px; }
 .lpn-snip-edit-bar .lpn-popover-x { position: absolute; top: 4px; inset-inline-end: 6px; }
 .lpn-snip-edit-bar .lpn-btn-on { background: var(--ec-select-bg); border-color: var(--ec-accent); }
@@ -2943,7 +3014,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-snip-split { display: inline-flex; }
 .lpn-snip-split .lpn-snip-ic:first-child { border-start-end-radius: 0; border-end-end-radius: 0; }
 .lpn-snip-split .lpn-snip-chev { min-width: 20px; padding: 0 2px; border-inline-start: 0; border-start-start-radius: 0; border-end-start-radius: 0; }
-.lpn-snip-menu { display: none; position: fixed; z-index: 1850; flex-direction: column; gap: 2px; padding: 2px; background: var(--ec-bg); border: var(--ec-box-border); box-shadow: var(--ec-box-shadow); }
+.lpn-snip-menu { display: none; position: fixed; z-index: 1850; flex-direction: column; gap: 2px; padding: 2px; background: var(--ec-box-bg); border: var(--ec-box-border); box-shadow: var(--ec-box-shadow); }
 .lpn-snip-menu.lpn-snip-menu-open { display: flex; }
 .lpn-snip-seg { display: inline-flex; }
 .lpn-snip-seg .lpn-snip-ic:first-child { border-start-end-radius: 0; border-end-end-radius: 0; }
@@ -5920,7 +5991,7 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
 .lpn-panebox-host .lpn-pane-panel { flex: 1 1 auto; min-height: 0; height: auto; }
 .lpn-panebox-host .lpn-pane-panel.lpn-pane-scroll { display: block; position: relative; inset: auto; z-index: auto; content-visibility: visible; overflow: auto; padding: 0; }
 .lpn-panebox-host .lpn-profile-panel { display: flex; }
-.lpn-panebox { display: none; position: fixed; background: var(--ec-bg); border: var(--ec-box-border); padding: 40px 8px 8px; box-shadow: var(--ec-box-shadow); }
+.lpn-panebox { display: none; position: fixed; background: var(--ec-box-bg); border: var(--ec-box-border); padding: 40px 8px 8px; box-shadow: var(--ec-box-shadow); }
 .lpn-pane-tab-boxed { display: none !important; }
 .lpn-pane-popout { display: inline-flex; align-items: center; justify-content: center; }
 @media (max-width: 40rem) { .lpn-pane-popout { display: none; } }
