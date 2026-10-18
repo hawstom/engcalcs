@@ -318,7 +318,7 @@ async function main() {
 		}));
 		const esJ = await L('lpn_pane_tab_junctions');
 		ok('the page is Spanish: Junctions is not the English word', esJ !== 'Junctions' && es.opts[0] === esJ, es.opts.join(' | '));
-		ok('a new string falls back to English until it is translated', es.title === 'Results by asset', es.title);
+		ok('the section title is the Spanish page\'s own string (English until translated)', es.title === await L('lpn_scnres_title'), es.title);
 		const esT = await resTable();
 		ok('the Spanish table has nine junction rows and three scenarios', esT && esT.rows.length === 9 && esT.heads.length === 4, esT && esT.heads.join(' | '));
 		ok('Spanish numbers use a point, as a spreadsheet reads them', esT && esT.rows.every((r) => /^-?\d+(\.\d+)?$/.test(r[1])), esT && esT.rows[0].join(' | '));
