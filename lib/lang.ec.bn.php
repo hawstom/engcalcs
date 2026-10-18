@@ -2694,7 +2694,6 @@ $ec_lang['lpn_diag_unreachable']='এই নোডগুলো থেকে ক�
 // ids stand in the status bar until the network changes. Said in EPANET's own terms (junction,
 // reservoir, tank) and never as an error, because the run happened.
 $ec_lang['lpn_omitted_note']='এই রান থেকে বাদ দেওয়া হয়েছে, কারণ এগুলো থেকে কোনো জলাধার বা ট্যাংকে যাওয়ার পথ নেই: {ids}';
-$ec_lang['lpn_roughness_method_note']='⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.';
 // BOTH OF THESE NAME THE VALVES. The page ends each one with a list of IDs, which is the reason
 // this calculator writes its own messages instead of showing EPANET\'s numbered errors: a person
 // looking at a drawing can act on \'V3\' and can do nothing at all with \'error 110\'.
