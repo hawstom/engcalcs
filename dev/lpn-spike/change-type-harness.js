@@ -54,6 +54,8 @@ global.FileReader = function () {
 const NET1 = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net1.inp'), 'utf8');
 const NET3 = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net3.inp'), 'utf8');
 const PC = global.EngCalcs.pageConfig;
+// Section 11's reservoir-turned-tank Net1, solved by EPANET too once the synchronous run is done.
+let net1RefillModel = null;
 
 const INJECT =
 	"\t\tgetDoc: function () { return doc; }, getSettings: function () { return settings; },\n" +
@@ -158,12 +160,11 @@ function run(mutate, quiet) {
 		const n = L.nodeById(J);
 		ok('2.1 no box (a reservoir with a blank head has nothing to lose)', q.length === 0, JSON.stringify(q));
 		ok('2.2 it is a tank', n.type === 'tank');
-		// A blank head follows the ground, so the surface is AT the elevation: depth 0 keeps it.
-		ok('2.3 water depth 0 keeps the surface; lowest, highest and diameter are the New assets defaults',
-			L.effective(n, 'level') === 0 && n.minLevel === D.tankMinLevel &&
-			n.maxLevel === D.tankMaxLevel && n.tankDiameter === D.tankDiameter,
-			[L.effective(n, 'level'), n.minLevel, n.maxLevel, n.tankDiameter].join(',') + ' vs 0,' +
-			[D.tankMinLevel, D.tankMaxLevel, D.tankDiameter].join(','));
+		// Tom, 2026-10-18: base = Elevation, depths 0 / 0 / 1; the diameter is the New assets default.
+		ok('2.3 depth 0, lowest 0, highest 1, base on the ground; diameter is the New assets default',
+			L.effective(n, 'level') === 0 && n.minLevel === 0 && n.maxLevel === 1 && n.bottomElev === undefined &&
+			n.tankDiameter === D.tankDiameter,
+			[L.effective(n, 'level'), n.minLevel, n.maxLevel, n.bottomElev, n.tankDiameter].join(',') + ' vs 0,0,1,,' + D.tankDiameter);
 		ok('2.4 elevation is kept, not re-defaulted', n.elev === 812);
 		ok('2.5 the export writes it under [TANKS]', sectionOf(L.exportInp().inp, J) === 'TANKS');
 	}
@@ -372,7 +373,7 @@ function run(mutate, quiet) {
 		S.engine = engineWas;
 	}
 
-	say('\n--- 11. Net1: tank 2 -> reservoir -> tank, and every junction pressure is unchanged ---');
+	say('\n--- 11. Net1: tank 2 -> reservoir (pressures unchanged) -> tank (born empty) ---');
 	{
 		L.importInp({ name: 'Net1.inp', _text: NET1 });
 		const solve = () => solver.lpnSolve(L.assembleModel(), { tol: 1e-9 });
@@ -395,21 +396,25 @@ function run(mutate, quiet) {
 		let after = solve(), worst = 0;
 		juncs.forEach(id => { worst = Math.max(worst, Math.abs(after.pressures[id] - before.pressures[id])); });
 		ok('11.3 every junction pressure unchanged (within 1e-6)', worst < 1e-6, 'worst ' + worst);
+		// BACK TO A TANK, IT IS BORN EMPTY ON ITS OWN GROUND (Tom, 2026-10-18: *"For minimal change,
+		// how about Base elevation = Elevation, min depth = 0, max depth = 1, and starting depth =
+		// 0?"*). Nothing is carried: the reservoir's head, Base's and the scenario's, is lost.
 		q = change('2', 'tank', true);
-		ok('11.4 back to a tank: elevation 850, water depth 120', L.nodeById('2').elev === 850 &&
-			L.effective(L.nodeById('2'), 'level') === 120, String(L.effective(L.nodeById('2'), 'level')));
-		ok('11.4b ...and the scenario\'s depth is 100 again', ovOf().level === 100 && !('head' in ovOf()), JSON.stringify(ovOf()));
-		ok('11.5 the box says the depth', (q[0] || '').indexOf('2: ' + PC.lpn_field_tank_level + ' 120') >= 0, q[0]);
-		// The way back has no highest depth to restore (it was lost), so it is set to the depth itself,
-		// and the tank comes back FULL. A full tank takes no water in (EPANET hydstatus.c
-		// tankstatus(), in both engines), so Net1's pump stops filling it and the pressures move:
-		// that is the full tank, not the surface. With Net1's own 150 back, the surface alone decides.
-		ok('11.6a the tank comes back full, at its depth', L.effective(L.nodeById('2'), 'maxLevel') === 120,
-			String(L.effective(L.nodeById('2'), 'maxLevel')));
-		L.setProp(L.nodeById('2'), 'maxLevel', 150);
-		after = solve(); worst = 0;
-		juncs.forEach(id => { worst = Math.max(worst, Math.abs(after.pressures[id] - before.pressures[id])); });
-		ok('11.6 and every junction pressure is still unchanged', worst < 1e-6, 'worst ' + worst);
+		const t2b = L.nodeById('2');
+		ok('11.4 back to a tank: base = elevation 850, depths 0 / 0 / 1', t2b.type === 'tank' && t2b.elev === 850 &&
+			t2b.bottomElev === undefined && L.effective(t2b, 'level') === 0 && L.effective(t2b, 'minLevel') === 0 &&
+			L.effective(t2b, 'maxLevel') === 1,
+			[t2b.elev, t2b.bottomElev, L.effective(t2b, 'level'), L.effective(t2b, 'minLevel'), L.effective(t2b, 'maxLevel')].join(','));
+		ok('11.4b ...and the scenario holds no depth and no head', !('level' in ovOf()) && !('head' in ovOf()), JSON.stringify(ovOf()));
+		ok('11.5 the box lists the head as lost, Base and scenario', (q[0] || '').indexOf('2: ' + PC.lpn_field_head + ' 970') >= 0 &&
+			(q[0] || '').indexOf('Low tank') >= 0, q[0]);
+		// An EMPTY tank at 850 ft, well below the network: it takes water in and gives none out
+		// (EPANET hydstatus.c tankstatus() closes outflow only). Net1's pipe 110 runs 2 -> 12, so
+		// filling is a negative flow. Held to EPANET's own answer after the run (net1RefillModel).
+		after = solve();
+		ok('11.6 the empty tank fills: pipe 110 carries water into it', after.ok && after.converged && after.flows['110'] < -1e-3,
+			after.flows && String(after.flows['110']));
+		if (!quiet) { net1RefillModel = L.assembleModel(); }
 	}
 
 
@@ -737,8 +742,8 @@ const MUTATIONS = [
 		"n[k] = birth[k];   // base-write: the new type's own", "void birth[k];   // base-write: the new type's own")],
 	['the tank\'s water surface is not carried', src => src.replace(
 		"if (typeof n._level === 'number') { out.base = { value: e + n._level }; }", "")],
-	['the reservoir\'s head is not carried into a tank', src => src.replace(
-		"if (n._head >= e) { out.base = { value: n._head - e }; }", "")],
+	['a reservoir changed to a tank gets the New assets defaults instead', src => src.replace(
+		"var RESERVOIR_TO_TANK = { _level: 0, minLevel: 0, maxLevel: 1 };", "var RESERVOIR_TO_TANK = {};")],
 	['a converted node shows freshly derived results', src => src.replace(
 		"\t\tvar held = heldTypeChange(n, 'pressure');\n\t\tif (held !== undefined) { return held; }\n", "")],
 	['a stored alternative\'s overrides are not walked', src => src.replace(
@@ -789,6 +794,23 @@ MUTATIONS.forEach(function (m) {
 	if (!red) { mutFails++; }
 });
 
-const total = fails + mutFails;
-console.log('\n' + (total ? total + ' FAILED' : 'all passed'));
-process.exit(total ? 1 : 0);
+// The same Net1, solved by the EPANET engine: the empty tank is the same in both.
+(async function () {
+	let epaFails = 0;
+	require(ROOT + 'js/lpn-epanet.js');
+	const m = net1RefillModel, nat = m && solver.lpnSolve(m);
+	const epa = m && await global.EngCalcs.lpnSolveEpanet(m, { moduleUrl: 'file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js') });
+	let dH = Infinity, dQ = Infinity;
+	if (nat && nat.ok && epa && epa.ok) {
+		dH = 0; dQ = 0;
+		m.nodes.forEach(nd => { dH = Math.max(dH, Math.abs(nat.heads[nd.id] - epa.heads[nd.id])); });
+		m.links.forEach(l => { dQ = Math.max(dQ, Math.abs(nat.flows[l.id] - epa.flows[l.id])); });
+	}
+	const good = dH < 2e-3 && dQ < 1e-4 && epa.flows['110'] < -1e-3;
+	console.log((good ? 'PASS  ' : 'FAIL  ') + '11.7 EPANET gives the same answer for the empty tank   dH=' + dH + ' m dQ=' + dQ +
+		' m3/s, 110 ' + (epa && epa.flows ? epa.flows['110'] : '?'));
+	if (!good) { epaFails++; }
+	const total = fails + mutFails + epaFails;
+	console.log('\n' + (total ? total + ' FAILED' : 'all passed'));
+	process.exit(total ? 1 : 0);
+}()).catch(function (e) { console.error(e); process.exit(1); });
