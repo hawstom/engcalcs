@@ -18,6 +18,7 @@ Find unique names for each. A group is added only where two meanings sit side by
 
 1. label, text, description, tag, ID
 2. hydraulic grade line, head loss gradient, colour ramp
+3. scenario, status
 
 ## Entries
 
@@ -430,6 +431,8 @@ Find unique names for each. A group is added only where two meanings sit side by
 
 - English: scenario
 - id: `scenario`
+- Definition: Project state as a collection of contributing overrides.
+- Uniqueness attention: group 3
 
 ### Covering, layer, or surface on the channel's bottom and sides
 
@@ -613,6 +616,12 @@ Find unique names for each. A group is added only where two meanings sit side by
 
 - English: tank level
 - id: `tank-level`
+
+### State of a link at a moment, open, closed, or active
+
+- English: status (link status)
+- id: `status-link`
+- Uniqueness attention: group 3
 
 ### Open, letting water through, passing, or flowing
 
