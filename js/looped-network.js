@@ -33006,17 +33006,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// eleven read-only cells is a paste the user believes landed. A paste that made rows says
 		// how many, because a clerk who typed 400 rows needs to know 400 landed, not how many
 		// cells changed.
+		var pasteScn = activeScenario(), pasteTail = (pasteScn && !pasteScn.isBase && (wrote || created.length))
+			? ' ' + String(pc.lpn_pane_pasted_scenario || 'These values are overrides in the scenario {scenario}.').split('{scenario}').join(scenarioDisplayName(pasteScn)) : '';
 		if (created.length) {
 			setNotice(String(refused + dropped
 				? (pc.lpn_pane_pasted_rows_skipped || 'Pasted rows ({n}). Rows added to the network ({created}). Cells not changed ({skipped}).')
 				: (pc.lpn_pane_pasted_rows || 'Pasted rows ({n}). Rows added to the network ({created}).'))
 				.replace('{n}', String(nRows))
 				.replace('{created}', String(created.length))
-				.replace('{skipped}', String(refused + dropped)));
+				.replace('{skipped}', String(refused + dropped)) + pasteTail);
 		} else {
 			setNotice(String(pc.lpn_pane_pasted || 'Pasted cells ({n}). Cells not changed ({skipped}).')
 				.replace('{n}', String(wrote))
-				.replace('{skipped}', String(refused + dropped)));
+				.replace('{skipped}', String(refused + dropped)) + pasteTail);
 		}
 		return { wrote: wrote, refused: refused, dropped: dropped, created: created.length };
 	}
@@ -42951,6 +42953,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!scn || scn.isBase) { return base; }
 		return base + '-' + safeFileName(scenarioDisplayName(scn));
 	}
+	/**
+	 * **AN EXPORT NAMES THE ONE SCENARIO IT HOLDS** (Task 814, defect 1). The .inp, GeoJSON and DXF
+	 * formats carry a single set of values; with more than Base in the project the other scenarios
+	 * stay behind, and the notice says so. Empty when the project is Base alone (nothing is left).
+	 */
+	function exportScenarioSentence() {
+		var pcX = EngCalcs.pageConfig || {}, scn = activeScenario();
+		if (scenarios.length < 2) { return ''; }
+		if (!scn || scn.isBase) { return ' ' + (pcX.lpn_export_holds_base || 'It holds the Base scenario only.'); }
+		return ' ' + (pcX.lpn_export_holds_scenario || 'It holds the scenario {scenario} only.').split('{scenario}').join(scenarioDisplayName(scn));
+	}
 	function exportInpFile() {
 		var pcX = EngCalcs.pageConfig || {}, base = inpExportBaseName(),
 			picBase = asciiPictureBase(base);
@@ -42974,6 +42987,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				tail = nDiff === 1 ? ' ' + (pcX.lpn_inp_export_difference_one || 'One thing the .inp format cannot hold.')
 					: nDiff ? ' ' + (pcX.lpn_inp_export_differences || '{n} things the .inp format cannot hold.').split('{n}').join(String(nDiff))
 					: '';
+			tail += exportScenarioSentence();
 			// EXPORTING IS NOT SAVING. No stampProjectSaved() here, deliberately: an `.inp` cannot hold
 			// this document (scenarios, text sizes, a backdrop image), so a project that has only been
 			// exported still has unsaved changes and must keep saying so.
@@ -43018,9 +43032,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * a stale snapshot (Recalculate off) is still what the screen shows, and the file says only
 	 * "the results on the screen".
 	 */
+	/**
+	 * **RESULTS ARE ATTACHED ONLY TO THE SCENARIO THEY WERE SOLVED FOR** (Task 814, defect 2). With
+	 * Recalculate off the screen keeps the last solve while the open scenario changes, so the file
+	 * would pair one scenario's values with another's results. The solve is tagged with its scenario
+	 * (`_scn`); when that is not the open one, the results are left out and the notice names the
+	 * scenario they belong to. Returns that scenario's name, or '' when the results match.
+	 */
+	function geoJsonStaleScenario() {
+		if (!lastSolveResult || !lastSolveResult._scn || lastSolveResult._scn === activeScenario().id) { return ''; }
+		for (var i = 0; i < scenarios.length; i++) {
+			if (scenarios[i].id === lastSolveResult._scn) { return scenarioDisplayName(scenarios[i]) || lastSolveResult._scn; }
+		}
+		return lastSolveResult._scn;
+	}
 	function geoJsonResults() {
 		var out = { nodes: {}, links: {}, time: (lastSolveResult && typeof lastSolveResult.t === 'number') ? lastSolveResult.t : undefined };
-		if (!lastSolveResult) { return null; }
+		if (!lastSolveResult || geoJsonStaleScenario()) { return null; }
 		doc.nodes.forEach(function (n) {
 			out.nodes[n.id] = { head: colorNodeValue(n, 'head'), pressure: colorNodeValue(n, 'pressure'),
 				demand: colorNodeValue(n, 'demandActual') };
@@ -43073,14 +43101,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var blob = new Blob([out.text], { type: 'application/geo+json' }),
 				url = URL.createObjectURL(blob), a = document.createElement('a');
 			a.href = url;
-			a.download = safeFileName(projectDisplayName(project)) + '.geojson';
+			a.download = inpExportBaseName() + '.geojson';
 			document.body.appendChild(a);
 			a.click();
 			document.body.removeChild(a);
 			setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
 			// EXPORTING IS NOT SAVING, for the reason exportInpFile() gives: no stampProjectSaved().
-			setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) + ' ' +
+			var staleScn = geoJsonStaleScenario();
+			setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) + exportScenarioSentence() + ' ' +
 				(out.hasResults ? (pcX.lpn_geojson_results_in || 'The results on screen are included.')
+					: staleScn ? (pcX.lpn_geojson_results_other || 'No results are included, because the results on screen belong to the scenario {scenario}.').split('{scenario}').join(staleScn)
 					: (pcX.lpn_geojson_results_out || 'No results are included, because the network is not solved.')));
 		});
 	}
@@ -43940,7 +43970,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var blob = new Blob([EngCalcs.lpnDxfBytes(out.text)], { type: 'application/dxf' }),
 			url = URL.createObjectURL(blob), a = document.createElement('a');
 		a.href = url;
-		a.download = safeFileName(projectDisplayName(project)) + '.dxf';
+		a.download = inpExportBaseName() + '.dxf';
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
@@ -43950,8 +43980,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// project's degrees would otherwise look for them (Tom, 2026-10-06).
 		setNotice(frame.kind === 'geo'
 			? (pcX.lpn_dxf_exported_geo || 'Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.')
-				.replace('{file}', a.download).replace('{crs}', dxfCrsName(frame.code))
-			: (pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download));
+				.replace('{file}', a.download).replace('{crs}', dxfCrsName(frame.code)) + exportScenarioSentence()
+			: (pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) + exportScenarioSentence());
 	}
 	/**
 	 * **THE EXPORT ALERT** (ROADMAP Task 465 slice 5; Tom, 2026-09-06, on a library pipe being
@@ -46025,7 +46055,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// looking at the box they asked for; what they do not know is how many points came out of it.
 	function showSurveyReport(parsed, outcome) {
 		var pc = EngCalcs.pageConfig || {},
-			lines = EngCalcs.lpnSurveyReportLines(parsed, outcome, surveyAxes());
+			lines = EngCalcs.lpnSurveyReportLines(parsed, outcome, surveyAxes()),
+			svScn = activeScenario();
+		// Task 814, defect 3: in a scenario other than Base the nodes are born inactive in Base.
+		if (svScn && !svScn.isBase && outcome && outcome.created) {
+			lines = [{ text: (pc.lpn_survey_added_scenario || 'The nodes were added to {scenario}. In Base they are inactive.')
+				.split('{scenario}').join(scenarioDisplayName(svScn)), raw: null }].concat(lines);
+		}
 		openDialog(function (body) {
 			// **THE SENTENCE, THEN THE READER'S OWN LINE UNDERNEATH IT** (Tom, 2026-09-17: *"it
 			// should print the entire line with a much shorter message"*). The line is drawn in a
@@ -80994,6 +81030,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var notConverged = result.converged === false;
 		captureTankSnapshot();
 		lastSolveResult = result;
+		if (result && typeof result === 'object') { result._scn = project.activeScenario; }
 		refreshMapStatus();
 		// The only case where the two engines knowingly disagree, so say so rather than let a
 		// user discover a 0.6% shift by switching the checkbox. See js/lpn-epanet.js.
