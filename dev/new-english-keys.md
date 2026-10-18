@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**4 still to read on master**, of 4 untranslated keys, of 3029 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**8 still to read on master**, of 8 untranslated keys, of 3033 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,10 +29,13 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (4, 4 to read @@ NEEDS RULING)
+## lpn_  (8, 8 to read @@ NEEDS RULING)
 
 - **`lpn_theme_amber`**
   > Amber
+  @@ NEEDS RULING
+- **`lpn_theme_arcade`**
+  > Arcade
   @@ NEEDS RULING
 - **`lpn_theme_green`**
   > Green
@@ -40,15 +43,24 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_theme_hc`**
   > High contrast
   @@ NEEDS RULING
+- **`lpn_theme_newspaper`**
+  > Newspaper
+  @@ NEEDS RULING
 - **`lpn_theme_platinum`**
   > Platinum
+  @@ NEEDS RULING
+- **`lpn_theme_rounded`**
+  > Rounded
+  @@ NEEDS RULING
+- **`lpn_theme_space`**
+  > Space
   @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**77 still to read**, of 80 new keys across 12 unmerged branch(es).
+**98 still to read**, of 101 new keys across 21 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -59,11 +71,19 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### chore/roadmap-1017n (`4efe1eeef`) — adds no English strings
+
+### docs/import-export-scenario (`e19c09d2e`) — adds no English strings
+
 ### docs/label-port (`7ec7a65cf`) — already merged into feat/label-beside; its strings are listed there
+
+### docs/msx (`6ff053272`) — adds no English strings
+
+### feat/command-usage (`453a0ac8e`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/label-beside (`5857fd6eb`) — adds no English strings
+### feat/label-beside (`79a4a98e0`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -86,6 +106,59 @@ build for that would be a gate nobody keeps. Refresh it with
 ### feat/label-placer-c (`4dc27ea10`) — adds no English strings
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
+
+### feat/msx (`c92dc9db9`) — 13 new, 13 to read @@ NEEDS RULING
+
+- **`lpn_file_export_item_msx`**
+  > EPANET-MSX file…
+  @@ NEEDS RULING
+- **`lpn_file_export_msx_tip`**
+  > Download the attached EPANET-MSX file exactly as it was imported.
+  @@ NEEDS RULING
+- **`lpn_file_import_msx`**
+  > EPANET-MSX file…
+  @@ NEEDS RULING
+- **`lpn_file_import_msx_tip`**
+  > Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project and written back unchanged. It is not run.
+  @@ NEEDS RULING
+- **`lpn_msx_attached_heading`**
+  > Attached EPANET-MSX file: {file}
+  @@ NEEDS RULING
+- **`lpn_msx_not_msx`**
+  > {file} does not look like an EPANET-MSX file: it has no [SPECIES] section.
+  @@ NEEDS RULING
+- **`lpn_msx_remove`**
+  > Remove
+  @@ NEEDS RULING
+- **`lpn_msx_removed`**
+  > Removed {file} from this project.
+  @@ NEEDS RULING
+- **`lpn_msx_replace`**
+  > Replace…
+  @@ NEEDS RULING
+- **`lpn_msx_report_heading`**
+  > Attached {file}
+  @@ NEEDS RULING
+- **`lpn_msx_report_kept`**
+  > This EPANET-MSX file is kept with the project and written back unchanged on export. This page does not run it.
+  @@ NEEDS RULING
+- **`lpn_msx_report_missing`**
+  > IDs in the file that this network does not have: {ids}.
+  @@ NEEDS RULING
+- **`lpn_msx_report_species`**
+  > Species in the file: {list}.
+  @@ NEEDS RULING
+
+### feat/native-pbv-gpv (`11212c9ed`) — adds no English strings
+
+### feat/scenario-example (`6b852aaf7`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_ex_net1_scn_desc`**
+  > Gallons per minute, with feet and inches. EPANET's Net1 with five scenarios under Base, the average day. Peak hour is 2.25 times the Base demands and Max day is 1.5 times. Max day plus fire flow adds 1,500 gpm at junction 23. A main break closes pipe 112 in two scenarios that share one alternative.
+  @@ NEEDS RULING
+- **`lpn_ex_net1_scn_title`**
+  > EPANET Net1 with scenarios, gpm (US)
+  @@ NEEDS RULING
 
 ### feat/sheet-sync (`1c77e44cd`) — 77 new, 77 to read @@ NEEDS RULING
 
@@ -321,6 +394,30 @@ build for that would be a gate nobody keeps. Refresh it with
   > not TRUE or FALSE, so it was not used.
   @@ NEEDS RULING
 
-### feat/sqlite-reader (`736713b16`) — adds no English strings
+### feat/sqlite-reader (`16bd4ba05`) — adds no English strings
 
-### feat/theme (`594ce706a`) — adds no English strings
+### feat/theme (`c529169f8`) — adds no English strings
+
+### fix/friction-method-roughness (`1b69039f3`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_roughness_method_note`**
+  > ⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.
+  @@ NEEDS RULING
+
+### fix/scenario-receipt (`bed5443e0`) — 5 new, 5 to read @@ NEEDS RULING
+
+- **`lpn_export_holds_base`**
+  > It holds the Base scenario only.
+  @@ NEEDS RULING
+- **`lpn_export_holds_scenario`**
+  > It holds the scenario {scenario} only.
+  @@ NEEDS RULING
+- **`lpn_geojson_results_other`**
+  > No results are included, because the results on screen belong to the scenario {scenario}.
+  @@ NEEDS RULING
+- **`lpn_pane_pasted_scenario`**
+  > These values are overrides in the scenario {scenario}.
+  @@ NEEDS RULING
+- **`lpn_survey_added_scenario`**
+  > The nodes were added to {scenario}. In Base they are inactive.
+  @@ NEEDS RULING

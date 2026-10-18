@@ -499,7 +499,7 @@ byte with the one taken before the change):
   font is fetched, so no fifth third-party request and no `privacy.php` change; a face the visitor lacks falls
   through its list (on Windows: Times New Roman, Consolas, Verdana, Trebuchet MS, Segoe UI, Bahnschrift).
 - **The menu bar's words and the box titles**: weight, capitals, letter spacing, small capitals, title colour.
-- **Corners**: every literal `border-radius` of the chrome (52 sites) became one of six tiers, each its Light
+- **Corners**: every literal `border-radius` of the chrome (43 sites) became one of six tiers, each its Light
   size times `--ec-radius-scale` (0 squares the page, 2 doubles it); boxes take `--ec-box-radius` (0 in Light).
 - **Frames**: `--ec-box-border` and `--ec-box-shadow` on all 27 floating boxes (their inline styles now name
   the tokens), `--ec-tabs-rule` under the tab strip, `--ec-focus-w` on every focus ring.
