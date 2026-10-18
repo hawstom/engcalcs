@@ -1,8 +1,15 @@
 # The SQLite reader: the foundation for Bentley `.wtg.sqlite`
 
-ROADMAP Task 749, branch `feat/sqlite-reader`, 2026-10-17. Built before any Bentley sample exists,
-so it reads any SQLite database and knows nothing about Bentley. The research behind it is
-`dev/bentley-interop.md`.
+ROADMAP Task 749, branch `feat/sqlite-reader`, 2026-10-17. It reads any SQLite database and knows
+nothing about Bentley. The research behind it is `dev/bentley-interop.md`; the public samples and
+what their schema shows are `chore/752-reshape:dev/agents/market-researcher/wtg-samples.md`.
+
+**Checked once against real files, 2026-10-17** (a one-off script, not committed; the samples stay
+out of the repo while their licence question is open): Zenodo 7162154's "withdrwal capacity curve"
+model (7.1 MB) opened in 71 ms and listed 383 tables (384 less SQLite's own `sqlite_sequence`);
+`HMIScenario` read as Base (58), "Scenario - 1" with parent 58, and "Scenario - 2", plus the
+soft-deleted row 1; `IdahoPipe_Physical_Data` read 151 rows. TSNet's `tnet3.wtg.sqlite` listed
+379. Neither file changed.
 
 ## What was vendored
 
@@ -51,17 +58,22 @@ nothing of sql.js and that opening a database fetches both files from the page's
 **No visitor-facing UI and no language keys.** The only way in is the browser console on the
 Looped Network page: read a file into an ArrayBuffer and call `EngCalcs.lpnSqliteOpen(buf)`.
 
-## Left for the sample
+## Left for the resolver
 
-- **The schema mapping**: which tables hold elements, scenarios and alternatives, and how
-  Bentley's element types map onto ours.
+The schema is now visible in public samples (see the samples note above); what is not yet built:
+
+- **The schema mapping**: Bentley's element classes onto ours, and filtering the soft-deleted
+  (`IsDeleted`) rows every table carries.
 - **The resolver**: scenario, then the alternative for each facet, then the parent chain until a
   value is found (`dev/bentley-interop.md`, the patent).
-- **Storage units per field**, and whether coordinates are columns or geometry blobs.
+- **Storage units per field** (one sample suggests feet throughout; another disagrees), and
+  decoding the WKB point geometry.
+- **A child scenario that overrides a value**: no public sample has one, so how an override is
+  stored is still unconfirmed.
 - **Big files.** sql.js holds the whole file in memory; Bentley reports a 6 GB file for 7,000
   pipes. If real files are that size, a paged reader (wa-sqlite) replaces sql.js.
 - **A zipped `.wtg.sqlite`** (Bentley suggests zipping) is refused as not SQLite today.
 - **A WAL-mode file** opens, but rows still in its separate `-wal` file are not seen. Bentley
-  may never leave one; the sample will say.
+  may never leave one.
 - The import's scenario-awareness questions (Task 814), the menu entry, its wording and keys, and
   writing the file back (no-go, `dev/bentley-interop.md`).
