@@ -84,9 +84,10 @@ async function main() {
 			const n = await notice();
 			let text = null;
 			if (dl) { text = fs.readFileSync(await dl.path(), 'utf8'); }
-			await page.keyboard.press('Escape');
-			await a.settle(300);
-			return { name: dl ? dl.suggestedFilename() : null, notice: n, text };
+			// Tom, 2026-10-18: a file that leaves scenarios behind is answered with a dialog to dismiss.
+			const dlg = await a.dialog();
+			if (dlg) { await a.dialogClick((await L('lpn_dialog_ok')).trim()); }
+			return { name: dl ? dl.suggestedFilename() : null, notice: n, text, dialog: dlg ? dlg.text : null };
 		};
 		const toScenario = async (name) => {
 			await page.click('#lpn_scenario_btn');
@@ -121,11 +122,15 @@ async function main() {
 		ok('R1 GeoJSON notice names the scenario', /It holds the scenario Peak hour only\./.test(gp.notice), gp.notice);
 		ok('R2 stale results are not attached to Peak hour', gp.text && !/"has_results":\s*true/.test(gp.text) && !/"head":/.test(gp.text.replace(/"has_results"/g, '')), gp.text && String(/"has_results":\s*true/.test(gp.text)));
 		ok('R2 the notice names Base as the results\' scenario', gp.notice.indexOf((await L('lpn_geojson_results_other')).replace('{scenario}', base).trim()) >= 0, gp.notice);
+		ok('R1 the GeoJSON notice is a dialog too', gp.dialog && gp.dialog.indexOf('It holds the scenario Peak hour only') >= 0 || (gp.dialog || '').indexOf(gp.notice) === 0, gp.dialog);
+		ok('R1 Base export is a dialog while Peak hour exists', gb.dialog && gb.dialog.indexOf(gb.notice) === 0, gb.dialog);
 		const ip = await doExport('lpn_file_export_item_inp');
 		ok('R1 EPANET file name carries the scenario', ip.name === 'Elm-Street-Peak-hour.inp', ip.name);
+		ok('R1 the EPANET notice is a dialog', ip.dialog && ip.dialog.indexOf(ip.notice) === 0, ip.dialog);
 		ok('R1 EPANET notice names the scenario', /It holds the scenario Peak hour only\./.test(ip.notice), ip.notice);
 		const dp = await doExport('lpn_file_export_item_dxf');
 		ok('R1 DXF file name carries the scenario', dp.name === 'Elm-Street-Peak-hour.dxf', dp.name);
+		ok('R1 the DXF notice is a dialog', dp.dialog && dp.dialog.indexOf(dp.notice) === 0, dp.dialog);
 		ok('R1 DXF notice names the scenario', /It holds the scenario Peak hour only\./.test(dp.notice), dp.notice);
 
 		console.log('--- R3. survey points in Peak hour ---');
