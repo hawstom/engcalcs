@@ -303,8 +303,35 @@ ur_table($presets, 'asked', 'Preset clicks by raw Accept-Language tag',
 ur_charts($signal, $range, 'Behaviour signals per day',
     'log/engcalcs-signal.log, field 1 (timestamp)');
 ur_table($signal, 'event', 'Signals by kind',
-    'log/engcalcs-signal.log, field 5: outbound, touch, units, repeat, lpn or share');
+    'log/engcalcs-signal.log, field 5: outbound, touch, units, repeat, lpn or share. Command rows '
+  . '(cmd:) are counted under Map commands used, not here.');
 ur_table($signal, 'detail', 'Signal detail', 'log/engcalcs-signal.log, field 6', 60);
+?>
+
+<h2>Map commands used</h2>
+<p class="src">log/engcalcs-signal.log, rows whose field 5 is lpn and whose field 6 begins cmd:. One
+row per command per page load, taken when a menu command or a toolbar button is chosen. Only which
+command, never what it was given or which property or value was chosen in it. Commands nobody used
+in this window are listed with zeros, from lib/lpn-commands.json; that file and this log name the
+Looped Network page, which is also the EPANET++ page (both log the same page name, so they cannot
+be told apart here).</p>
+<?php
+$cmdGroups = ecUsageCommandRows($report['commands'], ecUsageCommandCatalog());
+$cmdTot = $report['commands']['bucketTotals'];
+if (!$cmdTot['visitor'] && !$cmdTot['visit']) {
+    echo '<p class="none">No command rows in this window.</p>';
+}
+foreach ($cmdGroups as $g) {
+    echo '<h3>' . ur_h($g['label']) . '</h3>';
+    echo '<table><thead><tr><th>command (and its id)</th><th>browsers (said yes)</th><th>uses (said yes)</th>'
+       . '<th>page loads (everyone else)</th></tr></thead><tbody>';
+    foreach ($g['rows'] as $r) {
+        echo '<tr><td>' . ($r['parent'] !== '' ? ur_h($r['parent']) . ' &rsaquo; ' : '') . ur_h($r['label'])
+           . ($r['listed'] ? '' : ' <em>(not in the command list)</em>') . ' <code>' . ur_h($r['id'])
+           . '</code></td><td>' . $r['browsers'] . '</td><td>' . $r['uses'] . '</td><td>' . $r['loads'] . '</td></tr>';
+    }
+    echo '</tbody></table>';
+}
 ?>
 
 <h2>Contact funnel</h2>

@@ -382,6 +382,81 @@ ec_ur_expect('the rendered page also carries a noindex robots meta tag',
 ec_ur_expect('it is not usage-report/index.php reborn: that directory and its .htaccess are gone',
     !is_dir($root . '/usage-report'));
 
+// ---- 8. map command usage (Task 815) ----------------------------------------------------------
+// A said-yes browser pressing two commands, another browser pressing one of them, two page loads on
+// a third, and one id the command list does not know (the project tab's menu is logged but not
+// listed). The unused commands must still show, as zeros; the cmd: rows must stay out of the
+// general signal detail table; and the buckets must never meet.
+$dir2 = sys_get_temp_dir() . '/ec-usage-cmd-' . getmypid();
+@mkdir($dir2, 0777, true);
+$C1 = '1111111111111111'; $C2 = '2222222222222222';
+$sigRows = array(
+    "2026-10-10T00:00:00Z{$T}Looped-Network{$T}en{$T}en-us{$T}lpn{$T}cmd:file/file_new{$T}{$C1}{$T}visitor",
+    "2026-10-10T00:00:01Z{$T}Looped-Network{$T}en{$T}en-us{$T}lpn{$T}cmd:tb/add-pump{$T}{$C1}{$T}visitor",
+    "2026-10-11T00:00:00Z{$T}Looped-Network{$T}fr{$T}fr{$T}lpn{$T}cmd:tb/add-pump{$T}{$C2}{$T}visitor",
+    "2026-10-11T00:00:01Z{$T}Looped-Network{$T}en{$T}en-us{$T}lpn{$T}cmd:tb/add-pump{$T}visit",
+    "2026-10-11T00:00:02Z{$T}Looped-Network{$T}en{$T}en-us{$T}lpn{$T}cmd:tb/add-pump{$T}visit",
+    "2026-10-11T00:00:03Z{$T}Looped-Network{$T}en{$T}en-us{$T}lpn{$T}cmd:tab/tab_duplicate{$T}visit",
+    "2026-10-11T00:00:04Z{$T}Looped-Network{$T}en{$T}en-us{$T}lpn{$T}first:example{$T}visit",
+);
+file_put_contents("$dir2/engcalcs-signal.log", implode("\n", $sigRows) . "\n");
+$rep2 = ecUsageReportBuild(array($dir2), '', '');
+$catalog = ecUsageCommandCatalog();
+$cmdRows = ecUsageCommandRows($rep2['commands'], $catalog);
+$byId = array();
+foreach ($cmdRows as $g) { foreach ($g['rows'] as $r) { $byId[$r['id']] = $r; } }
+ec_ur_expect('the command list file is readable and holds the menus and the toolbar',
+    isset($cmdRows['file']) && isset($cmdRows['tb']) && isset($byId['file/file_new']) && isset($byId['tb/add-pump']),
+    implode(',', array_keys($cmdRows)));
+ec_ur_expect('a command pressed by one browser: 1 browser, 1 use, 0 page loads',
+    $byId['file/file_new']['browsers'] === 1 && $byId['file/file_new']['uses'] === 1 && $byId['file/file_new']['loads'] === 0,
+    json_encode($byId['file/file_new']));
+ec_ur_expect('a command pressed by two browsers and on two page loads keeps the buckets apart',
+    $byId['tb/add-pump']['browsers'] === 2 && $byId['tb/add-pump']['uses'] === 2 && $byId['tb/add-pump']['loads'] === 2,
+    json_encode($byId['tb/add-pump']));
+ec_ur_expect('a command nobody pressed is listed with zeros',
+    isset($byId['edit/edit_delete_network']) && $byId['edit/edit_delete_network']['uses'] === 0
+    && $byId['edit/edit_delete_network']['loads'] === 0 && $byId['edit/edit_delete_network']['browsers'] === 0);
+ec_ur_expect('an id the list does not know is shown, marked as not in the list, under its own menu',
+    isset($byId['tab/tab_duplicate']) && $byId['tab/tab_duplicate']['listed'] === false
+    && $byId['tab/tab_duplicate']['loads'] === 1 && isset($cmdRows['tab']));
+ec_ur_expect('the cmd: rows stay out of the general signal series; the other lpn row stays in it',
+    $rep2['series']['signal']['bucketTotals'] === array('visitor' => 0, 'visit' => 1),
+    json_encode($rep2['series']['signal']['bucketTotals']));
+$boot2 = "$dir2/render.php";
+file_put_contents($boot2,
+    "<?php\n\$_GET['days'] = 0;\n"
+  . "define('EC_USAGE_REPORT_DIRS', " . var_export(serialize(array($dir2)), true) . ");\n"
+  . "require " . var_export($root . '/spock.php', true) . ";\n");
+$html2 = (string) shell_exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($boot2) . ' 2>&1');
+ec_ur_expect('the page has a Map commands used section with no PHP warning',
+    strpos($html2, '<h2>Map commands used</h2>') !== false && stripos($html2, 'Warning:') === false
+    && stripos($html2, 'Notice:') === false && stripos($html2, 'Fatal error') === false);
+$d2 = new DOMDocument();
+@$d2->loadHTML($html2);
+$x2 = new DOMXPath($d2);
+$cell = function ($id) use ($x2) {
+    foreach ($x2->query('//tr[td/code]') as $tr) {
+        $code = $tr->getElementsByTagName('code')->item(0);
+        if ($code && $code->textContent === $id) {
+            $o = array();
+            foreach ($tr->childNodes as $c) { if ($c->nodeName === 'td') { $o[] = trim($c->textContent); } }
+            return $o;
+        }
+    }
+    return null;
+};
+$pump = $cell('tb/add-pump');
+ec_ur_expect('the rendered row for the toolbar pump button reads 2 browsers, 2 uses, 2 page loads',
+    $pump && $pump[1] === '2' && $pump[2] === '2' && $pump[3] === '2' && strpos($pump[0], 'Pump') !== false,
+    json_encode($pump));
+$zero = $cell('map/clean_map');
+ec_ur_expect('an unused command renders as a row of zeros with its English label',
+    $zero && $zero[1] === '0' && $zero[2] === '0' && $zero[3] === '0' && strpos($zero[0], 'Clean map') !== false,
+    json_encode($zero));
+foreach (glob("$dir2/{,.}*", GLOB_BRACE) ?: array() as $f) { if (is_file($f)) { @unlink($f); } }
+@rmdir($dir2);
+
 // ---- cleanup -----------------------------------------------------------------------------------
 foreach (glob("$dir/{,.}*", GLOB_BRACE) ?: array() as $f) { if (is_file($f)) { @unlink($f); } }
 @rmdir($dir);

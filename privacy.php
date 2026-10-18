@@ -24,7 +24,7 @@ echoHeader("EngCalcs", $html_title, "", false);
 ?>
 <div class="ec-legal">
 
-<p><em>Last updated: 8 October 2026. This notice covers hawsedc.com, including the EngCalcs
+<p><em>Last updated: 17 October 2026. This notice covers hawsedc.com, including the EngCalcs
 engineering calculators at hawsedc.com/engcalcs.</em></p>
 
 <h2>The short version</h2>
@@ -57,8 +57,8 @@ USA.</p>
 			was used with a finger or with a mouse, and sometimes one short fact about what happened
 			on the page: which reference link you followed, that you changed some input, which units
 			you chose, that this browser had used this calculator before, that you copied the page
-			link, that you saved or renamed a pipe-network project, or which drawing tool and which
-			error message you met on the pipe-network map. <strong>Never anything you type.</strong>
+			link, that you saved or renamed a pipe-network project, or which menu command, toolbar
+			button, drawing tool and error message you used or met on the pipe-network map. <strong>Never anything you type.</strong>
 			No IP address, no account, and no description of your browser or device beyond that
 			one finger-or-mouse fact. If you said yes, the random code described below</td>
 		<td>To decide which calculators to improve and which languages to translate into</td>
