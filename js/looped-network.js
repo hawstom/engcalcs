@@ -61234,9 +61234,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!/^(SELECT|INPUT|TEXTAREA)$/.test(el.tagName || '')) { return; }
 			held.push({ el: el, key: setboxControlKey(el, box), focus: el === focused });
 		});
-		if (!held.length) { out = rebuild(); setboxKeepPlace(); return out; }
+		// **A REBUILD NEVER SCROLLS THE BOX** (Tom, 2026-10-17, docked at the right, in Spanish:
+		// clearing the Demand multiplier by its dot threw the content 561 px). Half way through a
+		// rebuild the content is shorter than the scroll position, and anything that reads layout
+		// then (a tip being hidden, for one) clamps scrollTop to the short content; the full content
+		// comes back and the clamp stays. The position the reader had is put back before the
+		// control in the hand is put back under the pointer (setboxKeepPlace()).
+		var sc = setboxScroller(), st = sc ? sc.scrollTop : 0, unclamp = function () {
+			if (sc && sc.scrollTop !== st && sc.scrollHeight - sc.clientHeight >= st) { sc.scrollTop = st; }
+		};
+		if (!held.length) { out = rebuild(); unclamp(); setboxKeepPlace(); return out; }
 		setboxKeeping = true;
-		try { out = rebuild(); } finally { setboxKeeping = false; setboxKeepPlace(); }
+		try { out = rebuild(); } finally { setboxKeeping = false; unclamp(); setboxKeepPlace(); }
 		held.forEach(function (h) {
 			var el = h.el, twin;
 			if (!box.contains(el)) {
