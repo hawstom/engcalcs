@@ -400,6 +400,13 @@ function run(mutate, quiet) {
 			L.effective(L.nodeById('2'), 'level') === 120, String(L.effective(L.nodeById('2'), 'level')));
 		ok('11.4b ...and the scenario\'s depth is 100 again', ovOf().level === 100 && !('head' in ovOf()), JSON.stringify(ovOf()));
 		ok('11.5 the box says the depth', (q[0] || '').indexOf('2: ' + PC.lpn_field_tank_level + ' 120') >= 0, q[0]);
+		// The way back has no highest depth to restore (it was lost), so it is set to the depth itself,
+		// and the tank comes back FULL. A full tank takes no water in (EPANET hydstatus.c
+		// tankstatus(), in both engines), so Net1's pump stops filling it and the pressures move:
+		// that is the full tank, not the surface. With Net1's own 150 back, the surface alone decides.
+		ok('11.6a the tank comes back full, at its depth', L.effective(L.nodeById('2'), 'maxLevel') === 120,
+			String(L.effective(L.nodeById('2'), 'maxLevel')));
+		L.setProp(L.nodeById('2'), 'maxLevel', 150);
 		after = solve(); worst = 0;
 		juncs.forEach(id => { worst = Math.max(worst, Math.abs(after.pressures[id] - before.pressures[id])); });
 		ok('11.6 and every junction pressure is still unchanged', worst < 1e-6, 'worst ' + worst);
