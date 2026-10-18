@@ -112,8 +112,8 @@ Deleted keys: `lpn_guide_text_notes_popup`; and from the 26 non-English files on
 
 ### Branches he has passed once (2026-10-17); his notes are on Tasks 752, 811, 812 and 814
 
-- `feat/sheet-sync` (row 8108): Task 752 phase 1. **Held for Task 814** (classify every import and
-  export by scenario awareness). Then ODS not XLSX, the whole project, the demand multiplier with demand.
+- `feat/sheet-sync` (row 8108): phase 1 of Task 752's old shape, the whole-tree workbook. Task 752 was
+  reshaped on market research (results by scenario, demand import, one scenario at a time); salvage, don't merge.
 - `feat/theme` (row 8111): Task 811. Colour themes only so far; he wants design themes on the same branch.
 - `feat/label-beside` (row 8110): Task 812. He saw no difference and no level label; the page shows no
   zoom factor and he could not reach the 600-junction network. Short pipes should also try the level spot.

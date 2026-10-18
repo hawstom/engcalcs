@@ -16,7 +16,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 737 — One canonical word per concept, so every language names each one once.
 - Task 741 — The infinite map: generated networks for the label bench.
 - Task 749 — Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.
-- Task 752 — Google Sheets: sync the scenarios and their alternatives out and in.
+- ! Task 752 — Spreadsheet data in and out, one scenario at a time, as a file.
 - Task 800 — A tidy list and count of one scenario's own overrides.
 - Task 811 — Themes beyond Light and Dark: a selector, and a better default.
 - Task 812 — Port the label bench's proven findings to master, one branch each.
@@ -112,5 +112,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-77 of 84 titles are within 4–12 words. `!` marks the rest;
+76 of 84 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
