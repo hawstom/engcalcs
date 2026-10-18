@@ -257,6 +257,7 @@ async function main() {
 				const w = off.views[i];
 				console.log(`        ${v.notch < 0 ? -v.notch + ' out' : v.notch + ' in'}: shipped   ${row(v)}`);
 				console.log(`        ${' '.repeat(String(v.notch < 0 ? -v.notch + ' out' : v.notch + ' in').length)}  reference ${row(w)}`);
+				console.log(`          no one-line node form, same view: node labels ${v.stacked.nodes} -> ${v.nodes}, node values ${Object.keys(v.stacked.node).reduce((t, k) => t + v.stacked.node[k].n, 0)} -> ${Object.keys(v.node).reduce((t, k) => t + v.node[k].n, 0)}; all labels ${v.stacked.labels} -> ${v.labels}, values ${v.stacked.values} -> ${v.values}`);
 				extra.forEach((e) => console.log(`          ${e.ref.padEnd(9)} ${row(e.r.views[i])}`));
 				console.log(`          e.g. one-line node labels ${v.ex.nodeInline.slice(0, 6).join(' ')}; leadered stacks ${v.ex.levelStacked.slice(0, 6).join(' ')}; leadered one-line ${v.ex.levelInline.slice(0, 6).join(' ')}`);
 				const tag = sc.name + ', ' + (v.notch < 0 ? -v.notch + ' notches out' : v.notch + ' notches in');
