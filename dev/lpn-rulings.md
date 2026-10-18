@@ -91,14 +91,16 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   `native-pbv-gpv-harness.js`. The one rejected alternative, kept so it is not re-proposed: routing
   every active valve to EPANET because "it implements their state switching and we do not" (Tom,
   2026-09-26: *"This way the math is less of a black box for us."*), and speed was never the reason: after Task
-  322's envelope Cholesky native runs 3.93 ms against EPANET's 3.31 ms at 201 nodes. **What still
-  routes to EPANET** is a valve pair EPANET refuses (its input error 220, `lpnValveConflicts`) and a
-  GPV whose curve EPANET could not read either (`lpnGpvCurveOk`), because neither has an EPANET
-  answer to match. Such a network is routed automatically and the status bar says so, **without
-  rewriting the user's stored `engine` setting** (the setting is a preference; the routing is a
-  fact about this network). The native solver refuses it by name if the engine is unreachable.
-  `EngCalcs.lpnEpanetOnlyValves` is the one place that line is drawn; `EngCalcs.lpnLinkK` is the
-  one place a TCV's loss is read from its SETTING rather than its `k`.
+  322's envelope Cholesky native runs 3.93 ms against EPANET's 3.31 ms at 201 nodes. **No valve
+  routes to EPANET** (Tom, 2026-10-18, of per-valve routing messages: *"If this branch is to build
+  this solver, I don't understand why we would add these strings."*). What EPANET cannot take is a
+  DATA fault, said the same in either engine by `EngCalcs.lpnDiagnose`: a valve pair its input rule
+  220 forbids (`lpnValveConflicts`; EPANET itself enforces it only when another valve row sits
+  between the two, so we apply the rule as stated, to every pair) and a GPV curve whose flows do not
+  increase (EPANET's error 230) are refused by name. A one-point GPV curve, which EPANET reads past
+  its array, is solved as the line through the origin and that point and said; a curveless GPV is
+  the open connection EPANET is handed, with no message. `EngCalcs.lpnLinkK` is the one place a
+  TCV's loss is read from its SETTING rather than its `k`.
 - **A CURVE IS A DOCUMENT OBJECT AND AN ELEMENT HOLDS ONLY A REFERENCE** (Task 586, Tom
   2026-09-05: *"move all pump curve data to the Library under curves and leave only curve
   references in the pump properties"*). `doc.curves` holds `{id, kind, points, src, tok}`; a pump,

@@ -135,9 +135,8 @@ function text(words) { const t = mkEl('text'); t.textContent = words; return t; 
 	ok('lpnEpanetLoad exists and needs no url in Node',
 		typeof EngCalcs.lpnEpanetLoad === 'function', typeof EngCalcs.lpnEpanetLoad);
 	ok('the one place the native/EPANET line is drawn is present',
-		typeof EngCalcs.lpnValveIsNative === 'function' &&
-		EngCalcs.lpnEpanetOnlyValves({ links: [{ id: 'V', type: 'valve', valveType: 'GPV', curvePoints: [] }] })
-			.join() === 'V');
+		typeof EngCalcs.lpnDemandModelIsPda === 'function' &&
+		EngCalcs.lpnDemandModelIsPda({ hydraulics: { demandModel: 'PDA' } }) === true);
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');

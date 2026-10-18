@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='Изостављено из овог прорач�
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='Преузимање EPANET решавача. Преузима се једном и потом чува на овом уређају, тако да након тога ради и без интернета.';
 $ec_lang['lpn_engine_ready']='EPANET решавач је сада на овом уређају и ради без интернета.';
-$ec_lang['lpn_engine_fetching_valve']='Преузимање EPANET решавача, како би овај вентил могао да се реши сада и без интернета касније.';
-$ec_lang['lpn_engine_ready_valve']='EPANET решавач је сада на овом уређају. Вентили за обарање притиска и вентили опште намене (PBV, GPV) сада могу да се решавају и без интернета.';
 $ec_lang['lpn_engine_unavailable']='EPANET решавач није могао да се преузме, а потребан је за решавање вентила за обарање притиска и вентила опште намене (PBV, GPV). После једног повезивања на интернет, решавач се чува на овом уређају.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='Решавач учитан {percent}%.';
 $ec_lang['lpn_engine_wait_bytes']='Решавач учитан {kb} KB до сада. Укупна величина није доступна, па проценат завршетка није познат.';
 $ec_lang['lpn_engine_needed_failed']='EPANET решавач још није учитан, не може да се учита, а ова мрежа може да се реши само помоћу њега. Биће учитан када будете повезани на интернет.';
 $ec_lang['lpn_engine_needed_failed_why']='Ова мрежа се може решити само EPANET решавачем. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='Ово су вентили за обарање притиска или вентили опште намене, а само их EPANET решавач може израчунати. EPANET решавач није могао да се учита, па следећи резултати недостају:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='Ови вентили су директно повезани на резервоар или тенк, који већ одређује ниво воде тамо, па вентилу не остаје ништа да регулише. Поставите кратку цев између вентила и резервоара или тенка:';
 $ec_lang['lpn_diag_not_converged']='Решење није пронађено. Проверите да ли постоје вредности које су у стварности немогуће, попут пречника нула.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} Уместо тога се прик�
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='Решено помоћу EPANET решавача, због ових вентила за обарање притиска и вентила опште намене:';
 $ec_lang['lpn_unit_unknown']='Овај цртеж наводи јединицу коју ова страница не нуди: {unit}. Све је сачувано и приказано тачно онако како је унето, и ништа није промењено. Одговори не могу да се дају док ова страница не препозна ту јединицу, јер не постоји начин да се утврди колика је.';
 $ec_lang['lpn_engine_manning_note']='Напомена: са Манинговом храпавошћу, EPANET заокружује константу у Манинговој једначини, па губитак напора испадне за око 0,6% нижи него у тачном облику.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------

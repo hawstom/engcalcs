@@ -136,12 +136,11 @@ async function main() {
 		steepRes.ok ? (steepRes.heads.J1 - steepRes.heads.J2).toFixed(4) + ' m against 12'
 			: JSON.stringify(steepRes.issues));
 
-	// ---- 3. the routing rule ----------------------------------------------------------------------
+	// ---- 3. the built-in solver ----------------------------------------------------------------------
 	console.log('\n--- which engine answers ---');
-	ok('both types are native since Task 733 phase 2, so neither routes a network to EPANET',
-		EngCalcs.lpnValveIsNative({ type: 'valve', valveType: 'PBV' }) &&
-		EngCalcs.lpnValveIsNative({ type: 'valve', valveType: 'GPV' }) &&
-		EngCalcs.lpnEpanetOnlyValves(network({ valveType: 'PBV', setting: 7 })).length === 0);
+	ok('both types are the built-in solver\'s since Task 733 phase 2, so a PBV network solves natively',
+		EngCalcs.lpnValveIsFixedLaw({ type: 'valve', valveType: 'PBV' }) &&
+		EngCalcs.lpnValveIsFixedLaw({ type: 'valve', valveType: 'GPV' }));
 	// And the built-in solver's answer is the hand answer too: exactly the setting across a PBV.
 	const nat = EngCalcs.lpnSolve(network({ valveType: 'PBV', setting: 7 }));
 	ok('the native solver removes exactly the PBV\'s 7 m',

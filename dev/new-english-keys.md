@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**4 still to read on master**, of 4 untranslated keys, of 3029 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**3 still to read on master**, of 3 untranslated keys, of 3024 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,26 +29,23 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (4, 4 to read @@ NEEDS RULING)
+## lpn_  (3, 3 to read @@ NEEDS RULING)
 
-- **`lpn_valve_why_conflict`**
-  > connected to another control valve in a way EPANET does not allow
+- **`lpn_diag_gpv_curve_order`**
+  > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
   @@ NEEDS RULING
-- **`lpn_valve_why_gpv_no_curve`**
-  > no head loss curve
+- **`lpn_diag_valve_conflict`**
+  > These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:
   @@ NEEDS RULING
-- **`lpn_valve_why_gpv_one_point`**
-  > head loss curve has only one point
-  @@ NEEDS RULING
-- **`lpn_valve_why_gpv_order`**
-  > head loss curve flows do not increase
+- **`lpn_gpv_one_point_note`**
+  > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
   @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**155 still to read**, of 158 new keys across 25 unmerged branch(es).
+**158 still to read**, of 161 new keys across 18 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -59,21 +56,37 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/roadmap-1017n (`639e1c5ab`) — adds no English strings
+### chore/batch-1018 (`3792f486c`) — 7 new, 7 to read @@ NEEDS RULING
 
-### docs/import-export-scenario (`e19c09d2e`) — already merged into chore/roadmap-1017n; its strings are listed there
+- **`lpn_export_holds_base`**
+  > It holds the Base scenario only.
+  @@ NEEDS RULING
+- **`lpn_export_holds_scenario`**
+  > It holds the scenario {scenario} only.
+  @@ NEEDS RULING
+- **`lpn_export_leaves_alternatives`**
+  > The alternatives stored in this project are not in the file.
+  @@ NEEDS RULING
+- **`lpn_geojson_results_other`**
+  > No results are included, because the results on screen belong to the scenario {scenario}.
+  @@ NEEDS RULING
+- **`lpn_pane_pasted_scenario`**
+  > These values are overrides in the scenario {scenario}.
+  @@ NEEDS RULING
+- **`lpn_roughness_method_note`**
+  > ⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.
+  @@ NEEDS RULING
+- **`lpn_survey_added_scenario`**
+  > The nodes were added to {scenario}. In Base they are inactive.
+  @@ NEEDS RULING
 
 ### docs/label-port (`7ec7a65cf`) — already merged into feat/label-beside; its strings are listed there
 
-### docs/msx (`6ff053272`) — already merged into chore/roadmap-1017n; its strings are listed there
-
-### docs/privacy-plain (`8c5738a0f`) — adds no English strings
-
-### feat/command-usage (`2746d27e6`) — adds no English strings
-
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/label-beside (`8676cd1be`) — adds no English strings
+### feat/label-beside (`8676cd1be`) — already merged into feat/label-form; its strings are listed there
+
+### feat/label-form (`62e158e10`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -97,7 +110,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/msx (`dd08408f6`) — 13 new, 13 to read @@ NEEDS RULING
+### feat/msx (`b1a11204c`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_file_export_item_msx`**
   > EPANET-MSX file…
@@ -139,7 +152,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Species in the file: {list}.
   @@ NEEDS RULING
 
-### feat/native-pbv-gpv (`11212c9ed`) — adds no English strings
+### feat/native-pbv-gpv (`db4e8ff15`) — adds no English strings
 
 ### feat/scenario-example (`90ff7216c`) — 2 new, 2 to read @@ NEEDS RULING
 
@@ -534,13 +547,16 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   @@ NEEDS RULING
 
-### feat/theme (`9645addfa`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/theme (`4a9213d75`) — 10 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_theme_amber`**
   > Amber
   @@ NEEDS RULING
 - **`lpn_theme_arcade`**
   > Arcade
+  @@ NEEDS RULING
+- **`lpn_theme_desktop`**
+  > Desktop
   @@ NEEDS RULING
 - **`lpn_theme_green`**
   > Green
@@ -554,6 +570,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_theme_platinum`**
   > Platinum
   @@ NEEDS RULING
+- **`lpn_theme_prairie`**
+  > Prairie
+  @@ NEEDS RULING
 - **`lpn_theme_rounded`**
   > Rounded
   @@ NEEDS RULING
@@ -561,32 +580,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Space
   @@ NEEDS RULING
 
-### fix/friction-method-roughness (`2ce53ac34`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_roughness_method_note`**
-  > ⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.
-  @@ NEEDS RULING
-
-### fix/gpv-closed-warm (`9d62a8fbd`) — adds no English strings
-
 ### fix/native-psv (`977e854cd`) — adds no English strings
-
-### fix/pbv-setting-unit (`2310b877a`) — adds no English strings
-
-### fix/scenario-receipt (`50386ccfa`) — 5 new, 5 to read @@ NEEDS RULING
-
-- **`lpn_export_holds_base`**
-  > It holds the Base scenario only.
-  @@ NEEDS RULING
-- **`lpn_export_holds_scenario`**
-  > It holds the scenario {scenario} only.
-  @@ NEEDS RULING
-- **`lpn_geojson_results_other`**
-  > No results are included, because the results on screen belong to the scenario {scenario}.
-  @@ NEEDS RULING
-- **`lpn_pane_pasted_scenario`**
-  > These values are overrides in the scenario {scenario}.
-  @@ NEEDS RULING
-- **`lpn_survey_added_scenario`**
-  > The nodes were added to {scenario}. In Base they are inactive.
-  @@ NEEDS RULING

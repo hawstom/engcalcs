@@ -113,47 +113,61 @@ ok('the status bar warns that the engines differ on Manning',
 	/manning/i.test(status()), JSON.stringify(status()));
 
 // ------------------------------------------------------------------------------------------
-// 2. A VALVE ONLY EPANET CAN ANSWER ROUTES ITSELF, AND DOES NOT REWRITE THE USER'S CHOICE
+// 2. A NETWORK ONLY EPANET CAN ANSWER ROUTES ITSELF, AND DOES NOT REWRITE THE USER'S CHOICE
 // ------------------------------------------------------------------------------------------
-// **A GPV WITH NO CURVE, SINCE THE BUILT-IN SOLVER LEARNT EVERY VALVE TYPE** (Task 733, phase 2).
-// Every type is native now; what still routes is a valve pair EPANET refuses and a GPV whose curve
-// EPANET could not read either (EngCalcs.lpnGpvCurveOk). The curveless GPV is the one of those
-// EPANET still SOLVES -- js/lpn-epanet.js writes it as an open throttle and says so -- so it is the
-// valve that has to route the network on its own.
-function curvelessGpv(doc) {
-	doc.links.push({ id: 'V1', type: 'valve', valveType: 'GPV', from: 'J1', to: 'J2', verts: [],
-		_diameter: 200, _setting: 0, _k: 0, _status: 'open' });
+// **A PRESSURE-DRIVEN DEMAND MODEL, SINCE NO VALVE ROUTES ANY MORE** (Task 733; Tom, 2026-10-18).
+// Every valve type is the built-in solver's; what still sends a single-instant solve to EPANET by
+// its own contents is PDA (Task 762), so it is the network that has to route on its own here.
+const PDA = { demandModel: 'PDA', minPressure: 0, reqPressure: 20, pressureExponent: 0.5 };
+function pdaLine() {
+	const doc = line();
+	doc.links[0]._roughness = 130;
+	L.settings().hydraulics = Object.assign({}, PDA);
+	return doc;
 }
-console.log('\n--- a curveless GPV takes the network to EPANET on its own ---');
+console.log('\n--- a pressure-driven network takes itself to EPANET ---');
 L.settings().method = 'hw';
 L.settings().engine = 'native';
 {
-	const doc = line();
-	doc.links[0]._roughness = 130;
-	// A valve may not sit on a fixed head (lpnDiagnose's valve-on-fixed-head), so the valve goes
-	// between two junctions with a pipe either side.
-	doc.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 0 });
-	curvelessGpv(doc);
-
+	pdaLine();
 	const was = epanetSolves();
 	const r = await solved();
-	ok('the valve alone sent it to EPANET, with the setting still on the built-in solver',
+	ok('the demand model alone sent it to EPANET, with the setting still on the built-in solver',
 		epanetSolves() === was + 1, epanetSolves() - was + ' calls');
 	ok('...and the answer really is EPANET\'s', !!r && r.engine === 'epanet', r && r.engine);
 	ok('...and it converged rather than being quietly dropped', !!r && r.converged === true);
 	// THE HALF THAT IS ABOUT HONESTY: the setting is a preference, the routing is a fact about this
 	// network, so the setting must survive untouched and the reader must be told.
 	ok('the stored engine setting was NOT rewritten', L.settings().engine === 'native', L.settings().engine);
-	ok('the status bar names the valve that caused the switch',
-		status().indexOf('V1') >= 0, JSON.stringify(status()));
-	// ...and WHY, since every valve type is the built-in solver's now (Tom, 2026-10-18, on the
-	// curveless GPV: solve it through EPANET and say why).
-	ok('...and says why: that valve has no head loss curve',
-		status().indexOf(PC.lpn_engine_valve_route + ' V1 (' + PC.lpn_valve_why_gpv_no_curve + ')') >= 0,
-		JSON.stringify(status()));
-	// The open throttle EPANET was handed: no loss across it, or nothing above is about it at all.
-	ok('the curveless GPV is the open connection EPANET is handed',
-		!!r && Math.abs(r.heads.J1 - r.heads.J2) < 0.01, r && r.heads.J1 - r.heads.J2);
+	ok('the status bar says why it switched', status().indexOf(PC.lpn_engine_pda_route) >= 0, JSON.stringify(status()));
+	L.settings().hydraulics = {};
+}
+
+// ------------------------------------------------------------------------------------------
+// 2a. A CURVELESS GPV IS AN OPEN CONNECTION IN THE BUILT-IN SOLVER, AND SAYS NOTHING
+// ------------------------------------------------------------------------------------------
+// Tom, 2026-10-18: the built-in solver handles it exactly as EPANET does -- js/lpn-epanet.js writes
+// it as a TCV at zero loss -- with no routing and no message. A freshly chosen GPV has no curve.
+console.log('\n--- a curveless GPV stays on the built-in solver ---');
+{
+	const doc = line();
+	doc.links[0]._roughness = 130;
+	doc.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 10 });
+	doc.links.push({ id: 'V1', type: 'valve', valveType: 'GPV', from: 'J1', to: 'J2', verts: [],
+		_diameter: 200, _setting: 0, _k: 5, _status: 'open' });
+	const was = epanetSolves();
+	L.runSolve();
+	const r = L.lastResult();
+	ok('the curveless GPV network is not handed to EPANET', epanetSolves() === was, epanetSolves() - was + ' calls');
+	ok('...it is the built-in solver\'s answer, converged', !!r && r.engine !== 'epanet' && r.converged === true, r && r.engine);
+	ok('...an open connection: no loss across it, its k ignored as EPANET\'s TCV ignores it',
+		!!r && Math.abs(r.heads.J1 - r.heads.J2) < 1e-3, r && r.heads.J1 - r.heads.J2);
+	ok('...and the status bar says nothing about the valve', status().indexOf('V1') < 0, JSON.stringify(status()));
+	const epa = await (async () => { L.settings().engine = 'epanet'; const x = await solved(); L.settings().engine = 'native'; return x; })();
+	ok('...and EPANET gives the same heads', !!epa && Math.abs(epa.heads.J2 - r.heads.J2) < 2e-3,
+		epa && (epa.heads.J2 - r.heads.J2));
+	doc.links.pop();
+	doc.nodes.pop();
 }
 
 // ------------------------------------------------------------------------------------------
@@ -221,12 +235,9 @@ nativeValve({ valveType: 'GPV', _setting: 0, _curveId: 'GL1' }, (r) => {
 // ------------------------------------------------------------------------------------------
 // The other half of the same rule, and the state the stub used to be in permanently. Removing
 // lpnSolveEpanet is exactly what an offline first visit looks like to runSolve().
-console.log('\n--- and with EPANET unreachable, the refusal names the valve ---');
+console.log('\n--- and with EPANET unreachable, the refusal says what needs it ---');
 {
-	const doc = line();
-	doc.links[0]._roughness = 130;
-	doc.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 0 });
-	curvelessGpv(doc);
+	pdaLine();
 	const keep = EngCalcs.lpnSolveEpanet;
 	delete EngCalcs.lpnSolveEpanet;
 	try {
@@ -234,19 +245,59 @@ console.log('\n--- and with EPANET unreachable, the refusal names the valve ---'
 		L.runSolve();
 		ok('nothing was handed to an engine that is not there', epanetSolves() === was);
 		ok('no numbers were produced', L.lastResult() === null, JSON.stringify(L.lastResult()));
-		ok('the refusal names the valve', status().indexOf('V1') >= 0, JSON.stringify(status()));
-		ok('...with its reason, in the sentence that is true of a curveless GPV',
-			status().indexOf(PC.lpn_diag_valve_needs_epanet + ' V1 (' + PC.lpn_valve_why_gpv_no_curve + ')') >= 0,
+		ok('the refusal is the pressure-driven one', status().indexOf(PC.lpn_diag_pda_needs_epanet) >= 0,
 			JSON.stringify(status()));
-		ok('...and says it is the EPANET engine that is missing',
-			/EPANET/.test(status()), JSON.stringify(status()));
 	} finally { EngCalcs.lpnSolveEpanet = keep; }
 
 	// Put it back and the same network solves again -- so the refusal is about the engine being
 	// absent, not about the network being bad.
 	const r = await solved();
 	ok('the engine returning revives the same network', !!r && r.engine === 'epanet', r && r.engine);
+	L.settings().hydraulics = {};
 }
+
+// ------------------------------------------------------------------------------------------
+// 4. THE VALVE DATA FAULTS ARE THE SAME IN BOTH ENGINES (Task 733; Tom, 2026-10-18)
+// ------------------------------------------------------------------------------------------
+console.log('\n--- valve data faults, either engine ---');
+for (const engine of ['native', 'epanet']) {
+	L.settings().engine = engine;
+	{
+		// Two PRVs in series: EPANET's error 220 (project.c valvecheck()).
+		const doc = line();
+		doc.links[0]._roughness = 130;
+		doc.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 0 });
+		doc.nodes.push({ id: 'J3', type: 'junction', x: 1300, y: 0, elev: 0, _demand: 5 });
+		doc.links.push({ id: 'V1', type: 'valve', valveType: 'PRV', from: 'J1', to: 'J2', verts: [], _diameter: 200, _setting: 60, _k: 0, _status: 'open' });
+		doc.links.push({ id: 'V2', type: 'valve', valveType: 'PRV', from: 'J2', to: 'J3', verts: [], _diameter: 200, _setting: 30, _k: 0, _status: 'open' });
+		const r = await solved();
+		ok(engine + ': two PRVs in series are refused, by name', r === null &&
+			status().indexOf(PC.lpn_diag_valve_conflict + ' V1, V2') >= 0, JSON.stringify(status()));
+		doc.links.pop(); doc.links.pop(); doc.nodes.pop(); doc.nodes.pop();
+	}
+	{
+		// A GPV curve whose flows do not increase: validate.c validatecurves(), error 230.
+		L.getDoc().curves = (L.getDoc().curves || []).filter((c) => c.id !== 'GBAD' && c.id !== 'GONE').concat([
+			{ id: 'GBAD', kind: 'headloss', points: [[20, 5], [20, 8]] },
+			{ id: 'GONE', kind: 'headloss', points: [[20, 5]] }]);
+		const doc = line();
+		doc.links[0]._roughness = 130;
+		doc.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 10 });
+		doc.links.push({ id: 'V1', type: 'valve', valveType: 'GPV', from: 'J1', to: 'J2', verts: [], _diameter: 200, _setting: 0, _curveId: 'GBAD', _k: 0, _status: 'open' });
+		let r = await solved();
+		ok(engine + ': a GPV curve whose flows do not increase is refused, by name', r === null &&
+			status().indexOf(PC.lpn_diag_gpv_curve_order + ' V1') >= 0, JSON.stringify(status()));
+		// One point (20 L/s -> 5 m): solved as the line through the origin and it, and said.
+		doc.links[doc.links.length - 1]._curveId = 'GONE';
+		r = await solved();
+		ok(engine + ': a one-point GPV curve solves as the line through the origin: 10 L/s loses 2.5 m',
+			!!r && Math.abs(r.heads.J1 - r.heads.J2 - 2.5) < 2e-3, r && (r.heads.J1 - r.heads.J2));
+		ok(engine + ': ...and says so, naming the valve',
+			status().indexOf(PC.lpn_gpv_one_point_note.replace('{ids}', 'V1')) >= 0, JSON.stringify(status()));
+		doc.links.pop(); doc.nodes.pop();
+	}
+}
+L.settings().engine = 'native';
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
 process.exit(fails ? 1 : 0);

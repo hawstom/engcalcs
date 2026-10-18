@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='Viliachwa nje ya uendeshaji huu kwa sababu hakuna 
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='Inapakua kitatuzi cha EPANET. Kinapakuliwa mara moja kisha kuhifadhiwa kwenye kifaa hiki, hivyo kinafanya kazi bila mtandao baadaye.';
 $ec_lang['lpn_engine_ready']='Kitatuzi cha EPANET sasa kimehifadhiwa kwenye kifaa hiki na kinafanya kazi bila mtandao.';
-$ec_lang['lpn_engine_fetching_valve']='Inapakua kitatuzi cha EPANET, ili vali hii iweze kutatuliwa sasa na bila mtandao baadaye.';
-$ec_lang['lpn_engine_ready_valve']='Kitatuzi cha EPANET sasa kimehifadhiwa kwenye kifaa hiki. Vali za kuvunja shinikizo na vali za matumizi ya jumla (PBV, GPV) sasa zinaweza kutatuliwa bila mtandao.';
 $ec_lang['lpn_engine_unavailable']='Kitatuzi cha EPANET, kinachohitajika kutatua vali za kuvunja shinikizo na vali za matumizi ya jumla (PBV, GPV), hakikuweza kupakuliwa. Baada ya muunganisho mmoja wa intaneti, kitatuzi huhifadhiwa kwenye kifaa hiki.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='Kitatuzi kimepakiwa {percent}%.';
 $ec_lang['lpn_engine_wait_bytes']='Kitatuzi kimepakia KB {kb} hadi sasa. Jumla haipatikani, hivyo asilimia ya ukamilifu haijulikani.';
 $ec_lang['lpn_engine_needed_failed']='Kitatuzi cha EPANET hakijapakiwa bado, hakiwezi kupakiwa, na mtandao huu unaweza kutatuliwa nacho pekee. Kitapakiwa utakapounganishwa na mtandao wa intaneti.';
 $ec_lang['lpn_engine_needed_failed_why']='Mtandao huu unaweza kutatuliwa tu na kitatuzi cha EPANET. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='Hizi ni vali za kuvunja shinikizo au vali za matumizi ya jumla, na ni kitatuzi cha EPANET pekee kinachoweza kuzikokotoa. Kitatuzi cha EPANET hakikuweza kupakiwa, hivyo matokeo haya hayapo:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='Vali hizi zimeunganishwa moja kwa moja kwenye hifadhi ya maji au tanki, ambayo huweka kiwango cha haidroliki kwenye kifundo hicho, kwa hiyo vali haina cha kudhibiti. Weka bomba fupi kati ya vali na hifadhi ya maji au tanki:';
 $ec_lang['lpn_diag_not_converged']='Hakuna suluhisho lililopatikana. Kagua thamani zisizowezekana kimwili, kama kipenyo cha sifuri.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} Inaonyesha kitatuzi kilichojengwa nd
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='Imetatuliwa kwa kitatuzi cha EPANET, kwa sababu ya vali hizi za kuvunja shinikizo na vali za matumizi ya jumla:';
 $ec_lang['lpn_unit_unknown']='Mchoro huu unataja kitengo ambacho ukurasa huu hauwezi kutumia: {unit}. Thamani zote zimehifadhiwa na kuonyeshwa kama zilivyoingizwa, na hakuna kilichobadilishwa. Hakuna kinachoweza kukokotolewa hadi kitengo kiungwe mkono, kwa sababu kigezo chake cha ubadilishaji hakijulikani.';
 $ec_lang['lpn_engine_manning_note']='Kumbuka: kwa usuguo wa Manning, EPANET hurundisha kigezo katika mlingano wa Manning, hivyo upotevu wa kimo ni chini kwa takriban asilimia 0.6 kuliko fomu kamili.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------

@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='اس رن سے خارج کیے گئے کیونکہ
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='EPANET حل کار ڈاؤن لوڈ کیا جا رہا ہے۔ یہ ایک بار ڈاؤن لوڈ ہوتا ہے اور پھر اس آلے پر محفوظ رہتا ہے، اس لیے بعد میں یہ آف لائن کام کرتا ہے۔';
 $ec_lang['lpn_engine_ready']='EPANET حل کار اب اس آلے پر موجود ہے، اور آف لائن کام کرتا ہے۔';
-$ec_lang['lpn_engine_fetching_valve']='EPANET حل کار ڈاؤن لوڈ کیا جا رہا ہے، تاکہ یہ والو ابھی اور بعد میں آف لائن حل کیا جا سکے۔';
-$ec_lang['lpn_engine_ready_valve']='EPANET سولور اب اس آلے پر محفوظ ہے۔ پریشر بریکر اور عمومی مقصد کے والوز (PBV، GPV) اب آف لائن حل کیے جا سکتے ہیں۔';
 $ec_lang['lpn_engine_unavailable']='EPANET سولور ڈاؤن لوڈ نہیں ہو سکا، جو پریشر بریکر اور عمومی مقصد کے والوز (PBV، GPV) کو حل کرنے کے لیے ضروری ہے۔ انٹرنیٹ سے ایک بار جڑنے کے بعد سولور اس آلے پر محفوظ ہو جاتا ہے۔';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='حل کار {percent}% لوڈ ہوا۔';
 $ec_lang['lpn_engine_wait_bytes']='حل کار ابھی تک {kb} KB لوڈ ہوا۔ کل مقدار دستیاب نہیں، اس لیے تکمیل کا فیصد معلوم نہیں۔';
 $ec_lang['lpn_engine_needed_failed']='EPANET حل کار ابھی تک لوڈ نہیں ہوا، لوڈ نہیں ہو سکتا، اور یہ نیٹ ورک صرف اسی سے حل ہو سکتا ہے۔ جب آپ انٹرنیٹ سے جڑیں گے تو یہ لوڈ ہو جائے گا۔';
 $ec_lang['lpn_engine_needed_failed_why']='یہ نیٹ ورک صرف EPANET حل کار سے حل ہو سکتا ہے۔ {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='یہ پریشر بریکر یا عمومی مقصد کے والوز ہیں، اور انہیں صرف EPANET سولور حساب کر سکتا ہے۔ EPANET سولور لوڈ نہیں ہو سکا، اس لیے یہ نتائج غائب ہیں:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='یہ والوز براہ راست کسی ریزروائر یا ٹینک سے جڑے ہیں، جو اس نوڈ پر ہائیڈرالک گریڈ مقرر کر دیتا ہے، اس لیے والو کے کنٹرول کرنے کے لیے کچھ نہیں بچتا۔ والو اور ریزروائر یا ٹینک کے درمیان ایک چھوٹا پائپ ڈالیں:';
 $ec_lang['lpn_diag_not_converged']='کوئی حل نہیں ملا۔ طبعی طور پر ناممکن قدروں کی جانچ کریں، جیسے صفر قطر۔';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} اس کی جگہ بلٹ اِن حل 
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='EPANET سولور سے حل کیا گیا، کیونکہ یہ پریشر بریکر اور عمومی مقصد کے والوز ہیں:';
 $ec_lang['lpn_unit_unknown']='یہ ڈرائنگ ایسی اکائی بیان کرتی ہے جسے یہ صفحہ سپورٹ نہیں کرتا: {unit}۔ تمام قدریں بالکل جیسی درآمد ہوئیں ویسی ہی رکھی اور دکھائی گئی ہیں، اور کچھ تبدیل نہیں کیا گیا۔ جب تک اکائی سپورٹ نہ ہو کچھ حساب نہیں کیا جا سکتا، کیونکہ اس کا تبدیلی کا عامل معلوم نہیں۔';
 $ec_lang['lpn_engine_manning_note']='نوٹ: مانیننگ کھردرا پن کے ساتھ، EPANET مانیننگ مساوات میں مستقل کو گول کرتا ہے، اس لیے دباؤ نقصان درست شکل سے تقریباً 0.6% کم آتا ہے۔';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------

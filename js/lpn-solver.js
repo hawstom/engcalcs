@@ -430,10 +430,10 @@ EngCalcs.lpnPressureDatum = function (node) {
 //           exactly as hydcoeffs.c pbvcoeff() and gpvcoeff() decide it. Cited at each line below,
 //           and held to EPANET's answer by dev/lpn-spike/native-pbv-gpv-harness.js.
 //
-// WHAT STILL ROUTES TO EPANET is a valve pair EPANET refuses (lpnValveConflicts) and a GPV whose
-// curve EPANET could not read either (lpnGpvCurveOk). If EPANET is unreachable this file refuses
-// those with a diagnostic that NAMES THE VALVES ("valve V3 needs the EPANET engine" beats "error
-// 110").
+// NO VALVE ROUTES TO EPANET ANY MORE (Tom, 2026-10-18). What is left are DATA faults, and they are
+// lpnDiagnose()'s, the same in either engine: a valve pair EPANET's rule forbids
+// (lpnValveConflicts) and a GPV curve whose flows do not increase (lpnGpvCurveProblem) are refused
+// by name; a one-point GPV curve is solved, as a straight line through the origin, and said.
 EngCalcs.lpnValveTypes = ['PRV', 'PSV', 'FCV', 'TCV', 'PBV', 'GPV'];
 
 // The valves whose state this file decides inside the iteration.
@@ -448,41 +448,58 @@ EngCalcs.lpnValveIsFixedLaw = function (link) {
 	return t === 'PBV' || t === 'GPV';
 };
 
-// The one place the native/EPANET-only line is drawn, by TYPE. A link that is not a valve is
-// native; so are a TCV and, since Task 733, a PRV, a PSV and an FCV (phase 1) and a PBV and a GPV
-// (phase 2). Every one of EngCalcs.lpnValveTypes is native now; the line is kept, and kept here,
-// because the next type EPANET grows (its PCV, say) starts on the far side of it.
-EngCalcs.lpnValveIsNative = function (link) {
-	return link.type !== 'valve' || (link.valveType || 'TCV').toUpperCase() === 'TCV' ||
-		EngCalcs.lpnValveIsControl(link) || EngCalcs.lpnValveIsFixedLaw(link);
-};
-
-// **A GPV IS NATIVE ONLY WITH A CURVE EPANET COULD READ.** OWA-EPANET 2.3.5 validate.c
-// validatecurves() refuses a curve with no points (error 231) or with x values that do not
-// strictly increase (error 230), and hydcoeffs.c curvecoeff() reads the
-// segment [k-1, k] around the flow, which a ONE-point curve does not have -- EPANET reads past
-// the end of its array there. None of those has an EPANET answer to match, so such a GPV keeps
-// routing to EPANET and gets whatever EPANET does with it today (js/lpn-epanet.js writes an
-// empty one as an open throttle and says so).
+// **A GPV's CURVE, READ AS EPANET 2.3.5 READS IT** (Task 733 phase 2; Tom, 2026-10-18, on what a
+// curve EPANET cannot use should do). One of four answers, each EPANET's own:
+//   'gpv-no-curve'  no points. js/lpn-epanet.js writes such a GPV as a TCV at zero loss, an open
+//                   connection, because EPANET rejects a GPV naming a missing curve; the built-in
+//                   solver does exactly what that TCV does (hydcoeffs.c tcvcoeff(), Km = 0, so
+//                   valvecoeff()'s P = 1/CSMALL). Not a fault: a freshly chosen GPV has no curve.
+//   'gpv-one-point' ONE point. hydcoeffs.c curvecoeff() reads the segment [k-1, k], which a
+//                   one-point curve does not have, so EPANET reads past the end of its array; in
+//                   the vendored build that slot holds (0, 0), and the loss comes out as the
+//                   straight line through the origin and the one point (measured: 20 L/s -> 5 m
+//                   gives 7.5 m at 30 L/s, 2.5 m at 10). That is also the one defensible reading of a
+//                   single point, so the built-in solver adopts it ON PURPOSE rather than by
+//                   accident, and the page says it did (a warning, not a refusal).
+//   'gpv-order'     flows that do not strictly increase, or one point at zero or negative flow,
+//                   which has no line through the origin. validate.c validatecurves() refuses the
+//                   first (error 230, and openhyd() then fails with 110); EPANET returns NaN heads
+//                   for the second. Refused by name, in both engines.
+//   null            a usable curve.
 EngCalcs.lpnGpvCurveProblem = function (link) {
 	var pts = link.curvePoints || [], i;
 	if (pts.length === 0) { return 'gpv-no-curve'; }
-	if (pts.length < 2) { return 'gpv-one-point'; }
 	for (i = 0; i < pts.length; i++) {
 		if (!pts[i] || !isFinite(pts[i][0]) || !isFinite(pts[i][1])) { return 'gpv-order'; }
 		if (i > 0 && !(pts[i][0] > pts[i - 1][0])) { return 'gpv-order'; }
 	}
+	if (pts.length === 1) { return pts[0][0] > 0 ? 'gpv-one-point' : 'gpv-order'; }
 	return null;
 };
-EngCalcs.lpnGpvCurveOk = function (link) { return EngCalcs.lpnGpvCurveProblem(link) === null; };
 
-// **EPANET REFUSES SOME VALVE PAIRS, AND THE BUILT-IN SOLVER MUST NOT QUIETLY ANSWER THEM.** Input
+// Ids of the GPVs in `model` whose curve problem is `code`.
+EngCalcs.lpnGpvsWith = function (model, code) {
+	var out = [], i, l;
+	for (i = 0; i < model.links.length; i++) {
+		l = model.links[i];
+		if (l.type === 'valve' && String(l.valveType).toUpperCase() === 'GPV' &&
+				EngCalcs.lpnGpvCurveProblem(l) === code) { out.push(l.id); }
+	}
+	return out;
+};
+
+// **VALVE PAIRS EPANET'S RULE FORBIDS ARE A DATA FAULT, REFUSED BY NAME IN BOTH ENGINES.** Input
 // error 220, OWA-EPANET 2.3.5 project.c valvecheck(): two PRVs sharing a downstream node or in
 // series, two PSVs sharing an upstream node or in series, a PSV on a PRV's downstream node, and a
 // PRV or PSV on the wrong side of an FCV. Each such pair hands one node two boundary conditions.
-// The pair keeps routing to EPANET, which refuses it exactly as it always has, so a network that
-// was refused before this file learnt valves is refused after it. Status does not matter here:
-// EPANET checks the pair as it reads the file, before any status is applied.
+// Status does not matter: EPANET checks the pair as it reads the file.
+//
+// **EPANET ITSELF ENFORCES THIS ONLY SOMETIMES.** input3.c valvedata() calls
+// valvecheck(pr, net->Nlinks, ...) BEFORE it increments Nlinks, and valvecheck() skips
+// `valve->Link == index` -- so the valve read immediately before is never compared. Measured on the
+// vendored engine: two PRVs in series solve when they are adjacent in [VALVES] and are refused
+// (error 200) with any other valve row between them. An answer that depends on row order is not
+// one to copy, so the rule is applied as EPANET states it, to every pair, in both engines.
 EngCalcs.lpnValveConflicts = function (model) {
 	var vs = [], out = {}, i, j, a, b;
 	for (i = 0; i < model.links.length; i++) {
@@ -512,41 +529,12 @@ EngCalcs.lpnValveConflicts = function (model) {
 	return out;
 };
 
-// **PRESSURE-DRIVEN ANALYSIS IS EPANET'S ALONE** (Task 762), the second thing, after an active
-// PRV/PSV/FCV, that draws the line between the engines. The built-in solver fixes every demand
+// **PRESSURE-DRIVEN ANALYSIS IS EPANET'S ALONE** (Task 762), and since Task 733 the only thing in a
+// model's hydraulics, as opposed to its clock, that draws the line between the engines. The built-in solver fixes every demand
 // and never claims to solve PDA; a model asking for it routes to EPANET and is refused here.
 EngCalcs.lpnDemandModelIsPda = function (model) {
 	var h = model && model.hydraulics;
 	return !!(h && String(h.demandModel || '').toUpperCase() === 'PDA');
-};
-
-// Ids of every valve in the model that only the EPANET engine can solve. Exported because the UI
-// needs the same answer BEFORE it picks an engine, and two copies of this rule would drift.
-EngCalcs.lpnEpanetOnlyValves = function (model) {
-	var reasons = EngCalcs.lpnEpanetOnlyValveReasons(model), out = [], i;
-	for (i = 0; i < model.links.length; i++) {
-		if (reasons[model.links[i].id]) { out.push(model.links[i].id); }
-	}
-	return out;
-};
-
-// WHY each of those valves is EPANET's alone, so the page can say so per valve rather than
-// leaving the reader to guess (Task 733 phase 2). { id: reason }, a reason being 'conflict' (a
-// pair EPANET refuses, lpnValveConflicts), 'gpv-no-curve', 'gpv-one-point' or 'gpv-order' (see
-// lpnGpvCurveProblem), or 'type' (a valve type the built-in solver does not know -- none today).
-EngCalcs.lpnEpanetOnlyValveReasons = function (model) {
-	var out = {}, conflicts = EngCalcs.lpnValveConflicts(model), i, l, why;
-	for (i = 0; i < model.links.length; i++) {
-		l = model.links[i];
-		why = null;
-		if (!EngCalcs.lpnValveIsNative(l)) { why = 'type'; }
-		else if (conflicts[l.id]) { why = 'conflict'; }
-		else if (l.type === 'valve' && String(l.valveType).toUpperCase() === 'GPV') {
-			why = EngCalcs.lpnGpvCurveProblem(l);
-		}
-		if (why) { out[l.id] = why; }
-	}
-	return out;
 };
 
 // **IS THERE ENOUGH HERE FOR AN ANSWER TO MEAN ANYTHING?** (Task 608.)
@@ -590,8 +578,8 @@ EngCalcs.lpnLinkK = function (link) {
 // 'unreachable': a pipe drawn near a junction but not snapped to it.
 //
 // `options.engine` NAMES THE ENGINE THE CALLER IS ABOUT TO USE, and it is opt-in on purpose.
-// Everything below is engine-independent except one check -- an active valve
-// is a perfectly valid network that this file alone cannot solve -- so that check fires only when
+// Everything below is engine-independent except one check -- a pressure-driven demand model is a
+// perfectly valid network that this file alone cannot solve -- so that check fires only when
 // the caller has said 'native'. A caller that names no engine is asking "is this network sound?",
 // which is what the UI asks before it has chosen, and gets the engine-independent answer. The
 // alternative, defaulting to 'native', would make EngCalcs.lpnSolveEpanet refuse a network it is
@@ -607,7 +595,6 @@ EngCalcs.lpnDiagnose = function (model, options) {
 		queue = [],
 		unreachable = [],
 		badlyPlacedValves = [],
-		epanetOnlyValves,
 		i,
 		id,
 		link,
@@ -640,14 +627,16 @@ EngCalcs.lpnDiagnose = function (model, options) {
 		issues.push({ code: 'valve-on-fixed-head', ids: badlyPlacedValves });
 	}
 
-	// The one engine-dependent check -- see the note on `options` above.
-	if (opts.engine === 'native') {
-		epanetOnlyValves = EngCalcs.lpnEpanetOnlyValves(model);
-		if (epanetOnlyValves.length > 0) {
-			issues.push({ code: 'valve-needs-epanet', ids: epanetOnlyValves,
-				reasons: EngCalcs.lpnEpanetOnlyValveReasons(model) });
-		}
+	// THE TWO VALVE DATA FAULTS (Task 733; Tom, 2026-10-18), refused by name whichever engine is
+	// chosen, because EPANET refuses both too: a pair its valvecheck() rule forbids, and a GPV curve
+	// it cannot read (see lpnGpvCurveProblem; a one-point curve is solved and said, not refused).
+	var conflictMap = EngCalcs.lpnValveConflicts(model), conflictIds = [];
+	for (i = 0; i < model.links.length; i++) {
+		if (conflictMap[model.links[i].id]) { conflictIds.push(model.links[i].id); }
 	}
+	if (conflictIds.length > 0) { issues.push({ code: 'valve-conflict', ids: conflictIds }); }
+	var badCurves = EngCalcs.lpnGpvsWith(model, 'gpv-order');
+	if (badCurves.length > 0) { issues.push({ code: 'gpv-curve-order', ids: badCurves }); }
 
 	if (EngCalcs.lpnDemandModelIsPda(model)) {
 		var hy = model.hydraulics, mn = typeof hy.minPressure === 'number' ? hy.minPressure : 0;
@@ -800,7 +789,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		k;
 
 	// 'native' names THIS file, so lpnDiagnose adds the one check that is about this engine's
-	// limits rather than about the network: an active valve it cannot switch. See its comment.
+	// limits rather than about the network: a pressure-driven demand model. See its comment.
 	issues = EngCalcs.lpnDiagnose(model, { engine: 'native' });
 	if (issues.length > 0) {
 		return { ok: false, issues: issues, converged: false, iterations: 0 };
@@ -982,8 +971,12 @@ EngCalcs.lpnSolve = function (model, options) {
 		if (links[k].status === 'closed' || !EngCalcs.lpnValveIsFixedLaw(links[k])) { continue; }
 		if (String(links[k].valveType).toUpperCase() === 'GPV') {
 			fStat[k] = 'open';
-			gpvX[k] = links[k].curvePoints.map(function (pt) { return pt[0]; });
-			gpvY[k] = links[k].curvePoints.map(function (pt) { return pt[1]; });
+			// No points: the open TCV js/lpn-epanet.js hands EPANET (see lpnGpvCurveProblem), so
+			// gpvCoeff() below sees an empty curve. One point: the line through the origin and it.
+			var gpts = (links[k].curvePoints || []).slice();
+			if (gpts.length === 1) { gpts.unshift([0, 0]); }
+			gpvX[k] = gpts.map(function (pt) { return pt[0]; });
+			gpvY[k] = gpts.map(function (pt) { return pt[1]; });
 		} else {
 			fStat[k] = 'active';
 		}
@@ -1018,6 +1011,9 @@ EngCalcs.lpnSolve = function (model, options) {
 	// zero flow is +1, and so is this one's.
 	function gpvCoeff(k2) {
 		var xs = gpvX[k2], ys = gpvY[k2], npts = xs.length, q2 = Math.abs(Q[k2]), k1, kk = 0, r, h0;
+		// A curveless GPV is EPANET's open TCV at zero loss: hydcoeffs.c tcvcoeff() sets Km = 0 and
+		// valvecoeff() then gives the low-resistance line P = 1/CSMALL, Y = Q.
+		if (npts === 0) { G[k2] = 1 / V_CSMALL; y[k2] = Q[k2]; return; }
 		if (q2 < V_TINY_Q) { q2 = V_TINY_Q; }
 		while (kk < npts && xs[kk] < q2) { kk++; }
 		if (kk === 0) { kk++; } else if (kk === npts) { kk--; }
@@ -1511,8 +1507,13 @@ EngCalcs.lpnSolve = function (model, options) {
 
 	// The report reads one state per valve; a PBV's or GPV's is the law it was last solved under.
 	for (k = 0; k < links.length; k++) { if (fStat[k] !== undefined) { vStat[k] = fStat[k]; } }
-	return EngCalcs.lpnReport(model, junctions, junctionIndex, byId, H, Q, method,
+	var report = EngCalcs.lpnReport(model, junctions, junctionIndex, byId, H, Q, method,
 		visc, iter, converged, maxFlowChange, vStat);
+	// A one-point GPV curve was read as a line through the origin (lpnGpvCurveProblem); say so, under
+	// the same code js/lpn-epanet.js gives it, so the page says it whichever engine answered.
+	var onePoint = EngCalcs.lpnGpvsWith(model, 'gpv-one-point');
+	if (onePoint.length > 0) { report.warnings = [{ code: 'gpv-one-point', ids: onePoint }]; }
+	return report;
 };
 
 // Turns the raw H/Q vectors into per-id results, and recomputes each link's head

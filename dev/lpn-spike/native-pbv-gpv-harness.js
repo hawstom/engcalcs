@@ -398,21 +398,34 @@ async function run() {
 		await compare({ name: n.name, model: chain(n.m, n.v), want: n.want, drop: n.drop });
 	}
 
-	console.log('-- 3. the line the page routes on');
-	ok('every valve type is native now', EngCalcs.lpnValveTypes.every((t) =>
-		EngCalcs.lpnValveIsNative({ type: 'valve', valveType: t })));
-	ok('a PBV network goes to neither engine but the chosen one',
-		EngCalcs.lpnEpanetOnlyValves(line('PBV', 10)).length === 0);
-	ok('a GPV with a usable curve likewise', EngCalcs.lpnEpanetOnlyValves(line('GPV', 0, gpv(GPV4))).length === 0);
-	// A curve EPANET could not read either has no answer to match, so it keeps going to EPANET.
-	ok('a GPV with no curve still goes to EPANET',
-		EngCalcs.lpnEpanetOnlyValves(line('GPV', 0, gpv([]))).join() === 'V');
-	ok('a GPV with a one-point curve still goes to EPANET',
-		EngCalcs.lpnEpanetOnlyValves(line('GPV', 0, gpv(curve([[20, 5]])))).join() === 'V');
-	ok('a GPV whose flows do not increase still goes to EPANET',
-		EngCalcs.lpnEpanetOnlyValves(line('GPV', 0, gpv(curve([[20, 5], [20, 8]])))).join() === 'V');
-	ok('...and the built-in solver refuses it by name rather than guessing',
-		(EngCalcs.lpnSolve(line('GPV', 0, gpv([]))).issues || []).some((i) => i.code === 'valve-needs-epanet'));
+	console.log('-- 3. curves EPANET cannot use as they stand (Task 733; Tom, 2026-10-18)');
+	// No curve: the open TCV js/lpn-epanet.js writes, solved the same by both engines, no fault.
+	await compare({ name: 'GPV with no curve (an open connection, k ignored)', model: line('GPV', 0, gpv([], { k: 6 })),
+		want: { V: 'open' }, drop: { V: 0 } });
+	// One point: the line through the origin and it (lpnGpvCurveProblem), both engines -- the EPANET
+	// path writes that line out rather than leave EPANET to read past its array. 20 L/s -> 5 m at
+	// 30 L/s is 7.5 m, the number the vendored engine gave for the bare one-point file too.
+	await compare({ name: 'GPV with a one-point curve (line through the origin)', model: line('GPV', 0, gpv(curve([[20, 5]]))),
+		want: { V: 'open' }, drop: { V: 7.5 } });
+	await compare({ name: 'GPV with a one-point curve, backwards', model: line('GPV', 0, gpv(curve([[20, 5]])), backfeed),
+		want: { V: 'open' }, reverse: 'V' });
+	{
+		const one = EngCalcs.lpnSolve(line('GPV', 0, gpv(curve([[20, 5]]))));
+		ok('...and the built-in solver says it read one point as a line',
+			(one.warnings || []).some((w) => w.code === 'gpv-one-point' && w.ids.join() === 'V'), JSON.stringify(one.warnings));
+		const epa = await EngCalcs.lpnSolveEpanet(line('GPV', 0, gpv(curve([[20, 5]]))), { moduleUrl: MODULE_URL });
+		ok('...and so does the EPANET path', (epa.warnings || []).some((w) => w.code === 'gpv-one-point'),
+			JSON.stringify(epa.warnings));
+	}
+	// Flows that do not increase, and one point at zero flow: refused by name, in both engines.
+	for (const [nm, pts] of [['flows that do not increase', [[20, 5], [20, 8]]], ['one point at zero flow', [[0, 5]]]]) {
+		const m = line('GPV', 0, gpv(curve(pts)));
+		const nat = EngCalcs.lpnSolve(m);
+		const epa = await EngCalcs.lpnSolveEpanet(m, { moduleUrl: MODULE_URL });
+		const named = (r) => !r.ok && (r.issues || []).some((i) => i.code === 'gpv-curve-order' && i.ids.join() === 'V');
+		ok('a GPV curve with ' + nm + ' is refused by name in both engines', named(nat) && named(epa),
+			JSON.stringify([nat.issues, epa.issues]));
+	}
 	ok('a PBV on a reservoir is still refused by name',
 		EngCalcs.lpnDiagnose({ nodes: [res('R', 50), jn('J', 0, 1)],
 			links: [valve('V', 'R', 'J', 'PBV', 20, 0.2)] }).some((i) => i.code === 'valve-on-fixed-head'));

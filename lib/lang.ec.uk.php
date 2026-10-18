@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='Пропущено в цьому розрахун�
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='Отримання розв\'язувача EPANET. Його завантажують один раз і зберігають на цьому пристрої, тож надалі він працює офлайн.';
 $ec_lang['lpn_engine_ready']='Розв\'язувач EPANET тепер на цьому пристрої й працює офлайн.';
-$ec_lang['lpn_engine_fetching_valve']='Отримання розв\'язувача EPANET, щоб цей клапан можна було розрахувати зараз і офлайн надалі.';
-$ec_lang['lpn_engine_ready_valve']='Розв’язувач EPANET тепер зберігається на цьому пристрої. Клапани-гасники тиску й клапани загального призначення (PBV, GPV) тепер можна розраховувати офлайн.';
 $ec_lang['lpn_engine_unavailable']='Не вдалося завантажити розв’язувач EPANET, який потрібен для розрахунку клапанів-гасників тиску й клапанів загального призначення (PBV, GPV). Після одного підключення до інтернету розв’язувач зберігається на цьому пристрої.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='Розв’язувач завантажено 
 $ec_lang['lpn_engine_wait_bytes']='Наразі завантажено {kb} КБ розв’язувача. Загальний розмір недоступний, тож відсоток завершення невідомий.';
 $ec_lang['lpn_engine_needed_failed']='Розв\'язувач EPANET ще не завантажено, його не вдається завантажити, а цю мережу може розв\'язати лише він. Він завантажиться, коли ви підключитеся до інтернету.';
 $ec_lang['lpn_engine_needed_failed_why']='Цю мережу можна розрахувати лише розв’язувачем EPANET. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='Це клапани-гасники тиску або клапани загального призначення, і обчислити їх може лише розв’язувач EPANET. Розв’язувач EPANET не вдалося завантажити, тому цих результатів немає:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='Ці клапани з’єднано безпосередньо з резервуаром або ємністю, які фіксують напір у цьому вузлі, тож клапану нічого регулювати. Вставте коротку трубу між клапаном і резервуаром або ємністю:';
 $ec_lang['lpn_diag_not_converged']='Розв\'язок не знайдено. Перевірте значення, неможливі в реальному житті, наприклад нульовий діаметр.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} Натомість показано 
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='Розраховано розв’язувачем EPANET через ці клапани-гасники тиску й клапани загального призначення:';
 $ec_lang['lpn_unit_unknown']='Це креслення вказує одиницю, яку ця сторінка не підтримує: {unit}. Усі значення збережено й показано точно так, як імпортовано, і нічого не змінено. Нічого не можна обчислити, доки одиницю не буде підтримано, бо її коефіцієнт перетворення невідомий.';
 $ec_lang['lpn_engine_manning_note']='Примітка: з коефіцієнтом шорсткості Маннінга EPANET округлює сталу в рівнянні Маннінга, тож втрати напору виходять приблизно на 0,6% нижчими, ніж за точною формулою.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------

@@ -38162,7 +38162,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			l.lenAuto = false;
 			// TCV IS THE DEFAULT TYPE, deliberately: the plainest valve. Every type is solved by both
 			// engines since Task 733 phase 2, so no type the user picks changes which engine the page
-			// is using. See EngCalcs.lpnValveIsNative.
+			// is using.
 			l.valveType = 'TCV';
 			l._setting = defaultValveSetting('TCV');   // base-write: construction: a valve is born with its type default in Base
 		}
@@ -60797,7 +60797,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// his own instruction, and the argument for it -- an enabled control that does nothing is a lie
 		// -- turned out to rest on a false premise. THREE THINGS ALREADY TELL THE TRUTH: this row's own
 		// tip names the case permanently ("an extended period run always does"; until Task 733 it named
-		// a PBV or GPV too); `lpn_engine_valve_route` says it again at the moment of
+		// a PBV or GPV too); `lpn_engine_pda_route` says it again at the moment of
 		// the solve; and the banner says it while the engine loads. A fourth telling was a conditional
 		// duplicate of a permanent one.
 		//
@@ -70824,11 +70824,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				return;
 			}
 			l.valveType = v;
-			// The moment an active type is chosen is the moment the 664 KB engine becomes necessary,
-			// and the moment the user is most likely to still be online. See warmEpanetEngine().
-			if (EngCalcs.lpnValveIsNative && !EngCalcs.lpnValveIsNative({ type: 'valve', valveType: v })) {
-				warmEpanetEngine('valve');
-			}
+			// (No engine to fetch here any more: every valve type is the built-in solver's too since
+			// Task 733, so choosing one never makes the EPANET engine necessary.)
 			// RE-SEEDED, NOT CARRIED ACROSS. The old number was a pressure, a flow or a loss
 			// coefficient, and none of the three means anything as one of the other two -- 60 psi
 			// read as a loss coefficient of 60 is a valve nobody built. The tip on the setting
@@ -70850,8 +70847,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// head-loss curve BELONGS TO THE VALVE and is named after it, which is Task 248.04's ruling
 		// for curves generally, so the pump's own three-point table serves it reading (flow, head
 		// LOSS) instead of (flow, head).
-		// Both solve in either engine since Task 733 phase 2 -- EngCalcs.lpnValveIsNative is the one
-		// place that line is drawn.
+		// Both solve in either engine since Task 733 phase 2.
 		if (vt === 'GPV') {
 			renderGpvCurve(fields, l, linkId);
 		} else if (vt === 'PBV') {
@@ -73459,23 +73455,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (vt === 'FCV') { return 'flow'; }
 		return 'none';                                            // TCV loss coefficient, GPV curve
 	}
-	// THE VALVES ONLY EPANET ANSWERS, EACH WITH ITS REASON (Task 733 phase 2): "V1 (no head loss
-	// curve)". Since every valve type is the built-in solver's, a bare list left the reader asking
-	// what was wrong with V1. The reasons are EngCalcs.lpnEpanetOnlyValveReasons()'s; a valve with
-	// no reason stated is listed by name alone.
-	function epanetOnlyValveList(ids, reasons) {
-		var pc = EngCalcs.pageConfig || {},
-			text = {
-				'conflict': pc.lpn_valve_why_conflict || 'connected to another control valve in a way EPANET does not allow',
-				'gpv-no-curve': pc.lpn_valve_why_gpv_no_curve || 'no head loss curve',
-				'gpv-one-point': pc.lpn_valve_why_gpv_one_point || 'head loss curve has only one point',
-				'gpv-order': pc.lpn_valve_why_gpv_order || 'head loss curve flows do not increase'
-			};
-		return ids.map(function (id) {
-			var why = reasons && text[reasons[id]];
-			return why ? id + ' (' + why + ')' : id;
-		}).join(', ');
-	}
 	function diagIssueText(issue) {
 		var pc = EngCalcs.pageConfig || {};
 		if (issue.code === 'no-fixed-head') { return pc.lpn_diag_no_fixed_head || 'Add a reservoir or a tank. The network needs at least one known water level before it can be solved.'; }
@@ -73483,7 +73462,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'These nodes have no path to a reservoir or tank:') + ' ' + issue.ids.join(', '); }
 		// NAMES THE VALVES, which is the entire reason this page keeps its own diagnostics instead
 		// of surfacing EPANET's numeric error codes. A user staring at a drawing can act on "V3".
-		if (issue.code === 'valve-needs-epanet') { return (pc.lpn_diag_valve_needs_epanet || 'The built-in solver does not solve these valves, and the EPANET solver could not be loaded, so these results are missing:') + ' ' + epanetOnlyValveList(issue.ids, issue.reasons); }
+		// The two valve data faults (Task 733; Tom, 2026-10-18): EPANET refuses both, so both engines do.
+		if (issue.code === 'valve-conflict') { return (pc.lpn_diag_valve_conflict || 'These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'gpv-curve-order') { return (pc.lpn_diag_gpv_curve_order || 'The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:') + ' ' + issue.ids.join(', '); }
 		if (issue.code === 'pda-pressures') { return pc.lpn_diag_pda_pressures || 'Required pressure must be greater than Minimum pressure. Change one of them in Settings.'; }
 		if (issue.code === 'pda-needs-epanet') { return pc.lpn_diag_pda_needs_epanet || 'The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.'; }
 		if (issue.code === 'valve-on-fixed-head') { return (pc.lpn_diag_valve_on_fixed_head || 'These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:') + ' ' + issue.ids.join(', '); }
@@ -75454,16 +75435,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			refreshLabelText();
 			return;
 		}
-		// AN ACTIVE VALVE ROUTES THE SOLVE TO EPANET, whatever the engine PREFERENCE says, and the
-		// status bar says so out loud (Task 248 phase 2).
+		// A PRESSURE-DRIVEN DEMAND MODEL ROUTES THE SOLVE TO EPANET, whatever the engine PREFERENCE
+		// says, and the status bar says so out loud (Task 762). No valve does any more (Task 733:
+		// every type is the built-in solver's too, Tom 2026-10-18).
 		//
-		// The setting is a preference; the routing is a fact about THIS network. Every valve type is
-		// the built-in solver's too since Task 733 (PRV, PSV and FCV in phase 1, PBV and GPV in
-		// phase 2); what still routes is a valve pair EPANET refuses and a GPV whose curve it cannot
-		// read (EngCalcs.lpnEpanetOnlyValves). The routing is automatic, because refusing to solve a network we
-		// can solve would be absurd, and VISIBLE, because a user who ticked "built-in solver" and
-		// silently got a different engine has been lied to. settings.engine is NOT rewritten: delete
-		// the valve and the page goes back to the engine the user chose.
+		// The setting is a preference; the routing is a fact about THIS network. The routing is
+		// automatic, because refusing to solve a network we can solve would be absurd, and VISIBLE,
+		// because a user who ticked "built-in solver" and silently got a different engine has been
+		// lied to. settings.engine is NOT rewritten: change the demand model back and the page goes
+		// back to the engine the user chose.
 
 		// A DOCUMENT WITH A DURATION IS A RUN, not a solve (Task 248), and js/lpn-time.js owns it
 		// from here: it drives EPANET's own time loop, keeps the frames, and calls applySolveResult()
@@ -75471,18 +75451,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// network this page has had until now.
 		if (EngCalcs.lpnTimeRun && EngCalcs.lpnTimeRun(model)) { return; }
 
-		var epanetOnly = EngCalcs.lpnEpanetOnlyValves ? EngCalcs.lpnEpanetOnlyValves(model) : [],
-			pdaRoute = !!(EngCalcs.lpnDemandModelIsPda && EngCalcs.lpnDemandModelIsPda(model));
-		valveRouteNote = '';
+		var pdaRoute = !!(EngCalcs.lpnDemandModelIsPda && EngCalcs.lpnDemandModelIsPda(model));
+		engineRouteNote = '';
 		var engine = scnSetting('engine');
-		if ((engine === 'epanet' || epanetOnly.length > 0 || pdaRoute) && EngCalcs.lpnSolveEpanet) {
-			if (epanetOnly.length > 0 && engine !== 'epanet') {
-				valveRouteNote = ((EngCalcs.pageConfig || {}).lpn_engine_valve_route ||
-					'Solved with the EPANET solver, because the built-in solver does not solve these valves:') +
-					' ' + epanetOnlyValveList(epanetOnly, EngCalcs.lpnEpanetOnlyValveReasons(model));
-			} else if (pdaRoute && engine !== 'epanet') {
-				// Task 762: the second thing that routes a network to EPANET by its own contents.
-				valveRouteNote = (EngCalcs.pageConfig || {}).lpn_engine_pda_route ||
+		if ((engine === 'epanet' || pdaRoute) && EngCalcs.lpnSolveEpanet) {
+			if (pdaRoute && engine !== 'epanet') {
+				// Task 762: the one thing that routes a network to EPANET by its own contents.
+				engineRouteNote = (EngCalcs.pageConfig || {}).lpn_engine_pda_route ||
 					'Solved with the EPANET solver, because the demand model is pressure driven.';
 			}
 			runSolveEpanet(model);
@@ -75492,7 +75467,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// Set by runSolve() when a network was routed to EPANET by its own contents rather than by the
 	// user's choice; read by applySolveResult(), which owns the status bar after a successful solve.
-	var valveRouteNote = '';
+	var engineRouteNote = '';
 	// **THE STANDING NOTE FOR NODES LEFT OUT OF THE RUN** because no path reaches a reservoir or a
 	// tank (Tom, 2026-10-09). Set by runSolve() from the model's `omitted` list, said in the status
 	// bar with the other run notes by applySolveResult() and by the extended-period run's own
@@ -75664,23 +75639,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function warmEpanetEngine(why) {
 		var pc = EngCalcs.pageConfig || {},
-			quiet = (why === 'background'),
-			suffix = (why === 'valve') ? '_valve' : '';
+			quiet = (why === 'background');
 		if (!EngCalcs.lpnEpanetLoad) { return; }
 		// 'unavailable' is retried on purpose -- the engine load no longer caches a failure
 		// (js/lpn-epanet.js), so a user who was offline a moment ago gets another attempt the next
-		// time they touch a valve, which is the moment they care. The BACKGROUND leg does not retry:
+		// time they ask for the engine, which is the moment they care. The BACKGROUND leg does not retry:
 		// see maybeWarmEpanetInBackground(), which refuses to start from any state but 'cold'.
 		if (epanetWarmState === 'warming' || epanetWarmState === 'ready') { return; }
 		epanetWarmState = 'warming';
 		epanetWarmLoaded = 0;
 		epanetWarmTotal = 0;
 		epanetWarmPct = -1;
-		if (!quiet) { setNotice(pc['lpn_engine_fetching' + suffix] || 'Getting the EPANET solver.'); }
+		if (!quiet) { setNotice(pc.lpn_engine_fetching || 'Getting the EPANET solver.'); }
 		refreshEpanetBanner();
 		EngCalcs.lpnEpanetLoad(null, onEpanetProgress).then(function () {
 			epanetWarmState = 'ready';
-			if (!quiet) { setNotice(pc['lpn_engine_ready' + suffix] || 'The EPANET solver is now stored on this device and works offline.'); }
+			if (!quiet) { setNotice(pc.lpn_engine_ready || 'The EPANET solver is now stored on this device and works offline.'); }
 			refreshEpanetBanner();
 		}, function (err) {
 			epanetWarmState = 'unavailable';
@@ -75696,27 +75670,26 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			refreshEpanetBanner();
 		});
 	}
-	// Warm if the document ALREADY holds a valve only EPANET can solve -- opening a saved project or
-	// importing an .inp, where the user never picked a type at all. assembleModel() is the one place
-	// that knows the current scenario's real link list, so ask it rather than re-deriving.
+	// Warm if the document ALREADY asks for something only EPANET solves -- a pressure-driven demand
+	// model, on opening a saved project or importing an .inp. assembleModel() is the one place that
+	// knows the current scenario's real settings, so ask it rather than re-deriving.
 	function warmEpanetIfNeeded() {
-		if (!EngCalcs.lpnEpanetOnlyValves) { return; }
+		if (!EngCalcs.lpnDemandModelIsPda) { return; }
 		try {
 			var model = assembleModel();
 			// The arriving document decides the checkbox and the banner too, and it decides them
 			// before any solve has run: opening a file with a PRV in it is exactly the moment the
 			// built-in solver stops being available for it.
 			syncEpanetNeed(model);
-			if (EngCalcs.lpnEpanetOnlyValves(model).length > 0 || EngCalcs.lpnDemandModelIsPda(model)) { warmEpanetEngine('valve'); }
+			if (EngCalcs.lpnDemandModelIsPda(model)) { warmEpanetEngine('needed'); }
 		} catch (e) { /* a half-built document is not a reason to shout */ }
 	}
 
 	// ---- WHEN ONLY EPANET WILL DO (Task 608, part 2) ---------------------------------------------
 	//
 	// TWO THINGS PUT A NETWORK BEYOND THE BUILT-IN SOLVER, and both lines are drawn elsewhere: a
-	// valve EngCalcs.lpnEpanetOnlyValves names (since Task 733, only a pair EPANET refuses or a GPV
-	// whose curve it cannot read) and a
-	// document that states a duration (EngCalcs.lpnTimeIsExtended). This is the one place the page
+	// pressure-driven demand model (EngCalcs.lpnDemandModelIsPda) and a document that states a
+	// duration (EngCalcs.lpnTimeIsExtended); no valve, since Task 733. This is the one place the page
 	// asks the two together, so the checkbox and the banner cannot come to different answers.
 	function modelNeedsEpanet(model) {
 		// The model's own clock when it carries one (Task 755): the scenario comparison assembles
@@ -75724,8 +75697,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (model && model.time && model.time.times && EngCalcs.lpnTimeIsExtended) {
 			if (EngCalcs.lpnTimeIsExtended(model.time.times)) { return true; }
 		} else if (effectiveTimesExtended()) { return true; }
-		if (EngCalcs.lpnDemandModelIsPda && EngCalcs.lpnDemandModelIsPda(model)) { return true; }
-		return !!(EngCalcs.lpnEpanetOnlyValves && EngCalcs.lpnEpanetOnlyValves(model).length > 0);
+		return !!(EngCalcs.lpnDemandModelIsPda && EngCalcs.lpnDemandModelIsPda(model));
 	}
 	// The same question when no model is to hand -- the settings panel being rebuilt, for instance.
 	// A half-built document is not an answer of "yes", so it answers no rather than throwing.
@@ -76041,17 +76013,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		};
 	}
 	// **THE ENGINE IS THE CALLER'S CHOICE AND THE COST IS THE USER'S** (js/lpn-fireflow.js takes
-	// `solve` injected for exactly this reason). The rule is runSolve()'s own: a network holding a
-	// valve EngCalcs.lpnEpanetOnlyValves names goes to EPANET whatever the preference says. Since
-	// Task 733 that is only a pair EPANET refuses or a GPV whose curve it cannot read; every type,
-	// PBV and GPV included, is the built-in solver's too.
+	// `solve` injected for exactly this reason). The rule is runSolve()'s own: a pressure-driven
+	// demand model goes to EPANET whatever the preference says. No valve does (Task 733).
 	//
 	// **NOT FIRE FLOW'S ANY MORE**, though it was written there and still lives beside it: the
 	// scenario comparison run asks the same question of the same model, and two functions choosing
 	// an engine is two answers to "which engine solves this network" waiting to disagree.
 	function engineFor(model) {
-		var only = EngCalcs.lpnEpanetOnlyValves ? EngCalcs.lpnEpanetOnlyValves(model) : [],
-			useEpanet = (scnSetting('engine') === 'epanet' || only.length > 0
+		var useEpanet = (scnSetting('engine') === 'epanet'
 				|| (EngCalcs.lpnDemandModelIsPda && EngCalcs.lpnDemandModelIsPda(model))) && !!EngCalcs.lpnSolveEpanet;
 		return {
 			epanet: useEpanet,
@@ -81113,7 +81082,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pdaNote = pdaShort > 0
 			? (pc.lpn_pda_deficit_note || 'Junctions receiving less than their demand: {n}.').replace('{n}', String(pdaShort))
 			: '';
-		setStatus([result.stoppedNote || '', notConvergedNote, valveRouteNote, pdaNote, omittedNote,
+		setStatus([result.stoppedNote || '', notConvergedNote, engineRouteNote, pdaNote, omittedNote,
+			// A one-point GPV curve, read as a line through the origin (EngCalcs.lpnGpvCurveProblem),
+			// said whichever engine answered: both give it the code.
+			droppedNote('gpv-one-point', 'lpn_gpv_one_point_note',
+				'\u26a0 These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}'),
 			droppedNote('control-dangling', 'lpn_control_dangling_note',
 				'These controls name an element that is no longer in this project, so they were left out: {ids}'),
 			droppedNote('control-unreadable', 'lpn_control_unreadable_note',
