@@ -72,7 +72,8 @@ if (isset($html_desc) && trim((string)$html_desc) !== '') :
 // THE THEME, SET BEFORE FIRST PAINT (Task 714; the gallery, dev/themes-plan.md). The visitor's
 // choice is System (the default), Light, Dark, High contrast, Rounded, Platinum, Newspaper, Amber, Green,
 // Arcade or Space, kept in this browser alone: localStorage `lpn_theme` holds `light`, `dark`, `hc`, `rounded`,
-// `platinum`, `newspaper`, `amber`, `green`, `arcade` or `space`, and is absent for System. Anything else stored there is read as System, so a theme retired later strands nobody.
+// `platinum`, `newspaper`, `amber`, `green`, `arcade` or `space`, and is absent for System. Anything else
+// stored there is read as System, so a theme retired later strands nobody.
 // <html data-theme> carries the RESOLVED theme, the one css/engcalcs.css paints: System becomes light,
 // dark (prefers-color-scheme) or high contrast (prefers-contrast: more), and High contrast becomes `hc` or
 // `hc-dark` by the colour scheme; both follow a change of the device setting while the page is open.

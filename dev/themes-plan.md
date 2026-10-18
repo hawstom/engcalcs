@@ -468,12 +468,11 @@ Departures, each with its reason:
    `.form-control` (`#dee2e6`, 1.3:1): the transport's two drop-downs and the navbar's fields. They take the
    new `--ec-control-border` (`#8f8f8f`, 3.2:1); `--ec-border-strong` is a panel rule and stays `#ccc`.
 7. **Amber and Green do not invert errors.** Error ink also sits on the page's ordinary surfaces, where an
-   inverted ink would be 1:1; errors are the bright step on a dim amber (green) wash instead. No mono font,
-   no icon stroke, and the map stays white in every theme: those are branch 2's tokens and decision. The
-   existing `--ec-btn-radius` squares their buttons (0) and Platinum's (2 px).
+   inverted ink would be 1:1; errors are the bright step on a dim amber (green) wash instead. The map stays
+   white in every theme. (Their mono face, glow, scan lines and square icon ends came in round 2, below.)
 8. **Platinum's bevel shipped** (`--ec-bevel`, `--ec-bevel-in`), on the menu-bar items and toolbar buttons.
 9. **High contrast**: every text pair at 7:1 needed a handful of overrides (the dim greys become the muted
-   ink, ok and bad inks deepened). Its 3 px focus ring and heavier icon stroke wait for branch 2's tokens.
+   ink, ok and bad inks deepened). Its 3 px focus ring and heavier icon stroke came in round 2.
    `forced-colors` is untested.
 10. **Bootstrap is handed the tokens in the four new themes** (body text, link colour, its borders), or the
     Settings box would be written in Bootstrap's grey and the links in its blue. Light and Dark keep
@@ -487,6 +486,55 @@ Departures, each with its reason:
     Properties box read through it).
 14. **Strings**: four names (`lpn_theme_hc`, `_amber`, `_green`, `_platinum`) and a reworded
     `lpn_settings_theme_tip` (it said "light or dark colors"; now it names shapes and type too, and no pointing).
+
+## Round 2 as built (build agent, 2026-10-17): design themes
+
+Tom's pass of round 1: *"Nice start. These appear to be pure color themes."* So a theme now carries the
+non-colour half of its look as tokens in the same first rule (`css/engcalcs.css`), each Light's old literal
+by default, so Light is pixel-identical (a 1300 px screenshot of Net1 with Settings open compares byte for
+byte with the one taken before the change):
+
+- **Type**: `--ec-font-ui` (the page's face), `--ec-font-title` (box titles), `--ec-font-mono` (the four
+  hand-written mono stacks now share it), `--ec-font-size` (the body's size). **System faces only**: no web
+  font is fetched, so no fifth third-party request and no `privacy.php` change; a face the visitor lacks falls
+  through its list (on Windows: Times New Roman, Consolas, Verdana, Trebuchet MS, Segoe UI, Bahnschrift).
+- **The menu bar's words and the box titles**: weight, capitals, letter spacing, small capitals, title colour.
+- **Corners**: every literal `border-radius` of the chrome (52 sites) became one of six tiers, each its Light
+  size times `--ec-radius-scale` (0 squares the page, 2 doubles it); boxes take `--ec-box-radius` (0 in Light).
+- **Frames**: `--ec-box-border` and `--ec-box-shadow` on all 27 floating boxes (their inline styles now name
+  the tokens), `--ec-tabs-rule` under the tab strip, `--ec-focus-w` on every focus ring.
+- **Pictures**: `--ec-chrome-image` behind the menu bar, toolbar and tab strip (scan lines, stars, a row of
+  dots), `--ec-titlebar-image` and `--ec-title-halo` on box titles (Platinum's ridged title bar, with a ring of
+  window grey round each letter so the ridges stop short of the word), `--ec-text-glow` (phosphor).
+- **Icons**: `--ec-icon-stroke`, `--ec-icon-cap`, `--ec-icon-join` on `.ec-icon` (Light: 2, round, round, as
+  the `<svg>` states them; a path that states its own keeps it). No icon is redrawn.
+
+**The map is pinned**: `#lpn_canvas` keeps `sans-serif` at 1rem and never glows, because label width drives
+label placement and export. The design harness proves a label measures the same in every theme.
+
+Themes, in gallery order (System, Light, Dark, High contrast first, as before):
+
+| Theme | What it changes beyond colour |
+|---|---|
+| High contrast | Heavier icon lines (2.5), a 3 px focus ring, 2 px box frames and tab rule, no shadow. Same face and sizes (a contrast theme must not change word widths). |
+| **Rounded** (new) | Light's colours, the computer's own UI face, pill-shaped menu and tool buttons, corners twice Light's, 14 px box corners with a hairline frame and a soft deep shadow, lighter icon lines. The candidate for "the same, but better". |
+| Platinum | The classic desktop's faces where present (Charcoal, Chicago, Geneva, then Verdana) at 14 px, bold menu titles, half-size corners, a hard drop shadow, a ridged title bar on every box, square-ended icon lines. |
+| **Newspaper** (new) | Newsprint and black ink, Times New Roman, small capitals on the menu bar, capital box titles, double rules round every box and under the tab strip, no corner and no shadow, oxblood links, fine engraved icon lines. Evokes a broadsheet of record; names none. |
+| Amber, Green | A fixed-width face at 15 px, square corners, a faint phosphor glow, scan lines across the chrome, capital box titles, square icon ends, a glow round every box. |
+| **Arcade** (new) | Evokes a 1980s maze game: black screen, maze-blue double walls with round corners round every box and under the tab strip, a row of dots along the chrome, yellow links and titles, the four chasers' colours for status, a heavy rounded face in capitals on the menu bar. No game's name, logo or characters. |
+| **Space** (new) | Evokes a science-fiction film: a starfield behind the chrome, pale ink, gold links and titles, a geometric face in widely spaced capitals, fine corners, a thin gold frame and deep shadow round every box, blue selection. No film's name, logo or lettering. |
+
+Held by `theme-design-browser-harness.js` (every theme: each design property read from the real element
+equals its block; Light is the old page; each theme but Dark differs from Light in at least three design
+properties; box text, title and menu word at 4.5:1, 7:1 in High contrast; map lettering unchanged; print is
+Light's design; at 390 px no sideways scroll and the menu bar one row), and the round-1 checks extended to
+the four new palettes (`theme_contrast_check.js`, `theme-contrast-browser-harness.js`,
+`theme-gallery-browser-harness.js`). Strings: `lpn_theme_rounded`, `_newspaper`, `_arcade`, `_space`, English
+only, as round 1's were. Storage: no new key; `lpn_theme` may now also hold `rounded`, `newspaper`, `arcade`
+or `space`.
+
+**Still open, for Tom**: the map stays white in every theme (the display-theme map decision above was not
+built); the calculator pages are still not themed.
 
 ## Proposed ROADMAP row (Tom promotes; I do not edit the roadmap)
 
