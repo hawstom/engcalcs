@@ -7806,7 +7806,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		return rows;
 	}
-	function openScenarioMenu(anchor) { openMenu(anchor, scenarioMenuRows()); }
+	function openScenarioMenu(anchor) { openMenu(anchor, scenarioMenuRows(), 0, 'scenario'); }
 	// THE SELECTOR AND THE READOUT ARE ONE CONTROL, in the map's bottom status strip beside the
 	// units -- where this page already answers continuous questions about the state of the map.
 	function wireScenarioButton() {
@@ -35799,6 +35799,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		list.forEach(function (p) {
 			var missing = profileMissingStops(p);
 			rows.push({
+				variable: true,   // a saved path's name: content, never a command (Task 815)
 				// A tick on the one you are looking at, the same marker the scenario menu uses; the
 				// ⚠ is CLAUDE.md's caution glyph and its whole explanation is in the tip.
 				label: (p.id === profileState.activeId ? '✓ ' : '  ') + (missing.length ? '⚠ ' : '') + (p.name || ''),
@@ -35818,7 +35819,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// arrow"). Last in the menu, below a separator, and never a control on the panel.
 		rows.push({ separator: true });
 		rows.push({ label: pc.lpn_profile_open || 'Open EPANET profile file…', fn: pickProfileFile });
-		openMenu(anchor, rows, 0);
+		openMenu(anchor, rows, 0, 'profile');
 	}
 	// **AN EPANET .PRO FILE BECOMES THE STOPS OF A PROFILE** (Task 604). A profile here is a list of
 	// stops with the shortest route between consecutive ones (pathThrough), so the listed nodes ARE
@@ -49053,11 +49054,71 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tipParked[i] = null;
 		if (p.el && !p.el.title) { p.el.title = p.title; }
 	}
-	function openMenu(anchor, rows, level) {
+	// ---- COMMAND USAGE (Task 815) -----------------------------------------------------------------
+	// Which menu commands and toolbar buttons get used, as ONE `lpn` signal per command per page load
+	// (EngCalcs.logSignal dedupes in memory; nothing is stored on the device). The hook is the two
+	// click sites in openMenu() and ONE delegated listener on the toolbar, not a line per command.
+	//
+	// THE ID IS THE COMMAND'S, NEVER THE VISITOR'S: `cmd:<menu>/<lang key>` or
+	// `cmd:<menu>/<submenu key>/<lang key>`, the key being the `lpn_` string the row's label came
+	// from, found by looking the displayed label up in pageConfig (so it is the same in all 27
+	// languages). A row whose label is not a pageConfig string is CONTENT, not a command (a recent
+	// file, a scenario, a project tab, a language name) and logs nothing. What the command was then
+	// given or told to do is not visible here at all: `fn` runs after the id is taken.
+	var menuGroup = '';
+	var cmdKeyByLabel = null;
+	// Where several keys carry the same words (Import > EPANET file... and Export > EPANET file...
+	// are two keys with one English text), the key sharing most name tokens with the PARENT's key
+	// wins, so an import row is named import_ and an export row export_. Ties go to the first key.
+	function cmdKeyFor(label, hint) {
+		var pc, k, v, list, best = '', bestScore = -1, want, i, sc;
+		if (!cmdKeyByLabel) {
+			cmdKeyByLabel = {};
+			pc = EngCalcs.pageConfig || {};
+			for (k in pc) {
+				v = pc[k];
+				if (typeof v === 'string' && k.indexOf('lpn_') === 0 && v) {
+					if (!cmdKeyByLabel.hasOwnProperty(v)) { cmdKeyByLabel[v] = []; }
+					cmdKeyByLabel[v].push(k.slice(4));
+				}
+			}
+		}
+		v = String(label || '').replace(/^[\u2713\u26A0*\s]+/, '');
+		if (!cmdKeyByLabel.hasOwnProperty(v)) { return ''; }
+		list = cmdKeyByLabel[v];
+		want = String(hint || '').split('_');
+		for (i = 0; i < list.length; i++) {
+			sc = list[i].split('_').filter(function (t) { return t !== 'menu' && t !== 'item' && want.indexOf(t) >= 0; }).length;
+			if (sc > bestScore) { bestScore = sc; best = list[i]; }
+		}
+		return best;
+	}
+	function commandId(group, parentRow, row) {
+		var p = '', k;
+		if (!group || !row || row.variable) { return ''; }
+		if (parentRow) { p = cmdKeyFor(parentRow.label, group); if (!p) { return ''; } }
+		k = cmdKeyFor(row.label, p || group);
+		if (!k) { return ''; }
+		return group + '/' + (p ? p + '/' : '') + k;
+	}
+	function logCommandUse(id) {
+		if (id && EngCalcs.logSignal) { EngCalcs.logSignal('lpn', 'cmd:' + id); }
+	}
+	function toolbarCommandId(btn) {
+		var i;
+		for (i = 0; i < toolbarIconIndex.length; i++) {
+			if (toolbarIconIndex[i].el === btn) { return 'tb/' + (btn.dataset.tool || toolbarIconIndex[i].icon); }
+		}
+		return '';
+	}
+	var menuCapture = null;   // set by lpnCommandCatalog() to read a menu's rows without opening it
+	function openMenu(anchor, rows, level, group) {
+		if (menuCapture) { menuCapture.push(rows); return; }
 		menuRestoreSeq++;
 		var els = menuEls(level), popup = els.popup, list = els.list;
 		if (!popup || !list) { return; }
 		if (!level) {
+			menuGroup = group || (anchor && /^lpn_menu_/.test(anchor.id || '') ? anchor.id.slice(9) : '');
 			if (openMenuAnchor === anchor && popup.style.display === 'block') { closeMenu(); return; }
 			// **THE OPEN ITEM LOOKS PRESSED** (feat/menu-button preview, R-202/R-203): aria-expanded
 			// was already the accessible signal a menu button owes a screen reader; it is now also
@@ -49073,6 +49134,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			closeViewPopovers();
 		}
 		parkAnchorTip(anchor, level);
+		var rowGroup = menuGroup, rowParent = level && anchor ? anchor.__lpnRow || null : null;
 		list.innerHTML = '';
 		list.setAttribute('role', 'menu');
 		var mnemonics = menuMnemonics(rows);
@@ -49185,7 +49247,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// plain row at every level, so entering "Blank project" closed the menu that
 				// "Blank project" was in.
 				if (canHover()) { b.addEventListener('mouseenter', cancelSubClose); }
-				b.addEventListener('click', function (e) { closeMenu(); r.fn(e); dismissTipsAfterCommand(); });
+				b.addEventListener('click', function (e) { logCommandUse(commandId(rowGroup, rowParent, r)); closeMenu(); r.fn(e); dismissTipsAfterCommand(); });
 			} else {
 				// Moving onto a plain row in the PARENT dismisses the fly-out, as every desktop menu
 				// does -- otherwise it hangs beside a row it no longer belongs to. On a DELAY, because
@@ -49194,7 +49256,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// Same gate: on touch this fired from the synthesised mouse sequence and armed a
 				// 350 ms close of the fly-out the user had just opened.
 				if (canHover()) { b.addEventListener('mouseenter', scheduleSubClose); }
-				b.addEventListener('click', function (e) { closeMenu(); r.fn(e); dismissTipsAfterCommand(); });
+				b.addEventListener('click', function (e) { logCommandUse(commandId(rowGroup, rowParent, r)); closeMenu(); r.fn(e); dismissTipsAfterCommand(); });
 			}
 			list.appendChild(b);
 		});
@@ -53549,7 +53611,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ label: pc.lpn_tab_move_right || 'Move right', disabled: idx < 0 || idx >= library.projects.length - 1, fn: function () { moveTab(id, 1); } },
 			{ separator: true },
 			{ icon: 'close', label: pc.lpn_close || 'Close', fn: function () { closeTab(id); } }
-		]);
+		], 0, 'tab');
 	}
 	function openTabListMenu(anchor) {
 		openMenu(anchor, library.projects.map(function (p) {
@@ -54552,7 +54614,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (toolbar && !toolbarTipsWired) {
 			toolbarTipsWired = true;
 			toolbar.addEventListener('click', function (e) {
-				if (e.target && e.target.closest && e.target.closest('button')) {
+				var tb = e.target && e.target.closest ? e.target.closest('button') : null;
+				if (tb) {
+					logCommandUse(toolbarCommandId(tb));
 					dismissTipsAfterCommand();
 				}
 			});
@@ -81467,6 +81531,47 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			leader: (L && L.style.display !== 'none') ? { x1: +L.getAttribute('x1'), y1: +L.getAttribute('y1'),
 				x2: +L.getAttribute('x2'), y2: +L.getAttribute('y2') } : null,
 			hidden: !!(h.text && h.text.style.visibility === 'hidden'), side: h.side, lside: x.lside, w: labelBoxWidth(h) };
+	};
+	// Every command this page offers, with the id the usage log would carry for it (Task 815), for
+	// dev/lpn-spike/command-usage-browser-harness.js, which writes lib/lpn-commands.json from it and
+	// fails when the file has gone stale. Menu-bar menus, the scenario menu and the toolbar; the
+	// project tab's menu is built per tab and is logged but not listed.
+	EngCalcs.lpnCommandCatalog = function () {
+		var out = [], pc = EngCalcs.pageConfig || {};
+		function walk(group, groupLabel, rows, parentRow) {
+			(rows || []).forEach(function (r) {
+				var id, sub;
+				if (!r || r.separator || r.heading || r.variable || !r.label) { return; }
+				if (r.submenu) {
+					try { sub = r.submenu() || []; } catch (err) { sub = []; }
+					if (!parentRow) { walk(group, groupLabel, sub, r); }
+					return;
+				}
+				id = commandId(group, parentRow, r);
+				if (id) {
+					out.push({ id: id, group: group, groupLabel: groupLabel, parent: parentRow ? parentRow.label : '',
+						label: String(r.label).replace(/^[\u2713\u26A0*\s]+/, '') });
+				}
+			});
+		}
+		[['file', fileMenuRows], ['edit', function () { return editMenuRows(null); }], ['map', mapMenuRows],
+			['project', waterMenuRows], ['help', helpMenuRows]].forEach(function (m) {
+			var rows;
+			try { rows = m[1](); } catch (err) { rows = []; }
+			walk(m[0], guideMenuLabel('lpn_menu_' + m[0]), rows, null);
+		});
+		walk('scenario', pc.lpn_scenario_menu || 'Scenarios', scenarioMenuRows(), null);
+		try {
+			menuCapture = [];
+			if (library && library.openId) { openProjectMenu(library.openId, document.body); }
+			walk('tab', 'Project tab', menuCapture[0] || [], null);
+		} catch (err3) { /* the tab menu is listed when it can be built */ }
+		menuCapture = null;
+		toolbarIconIndex.forEach(function (b) {
+			var id = toolbarCommandId(b.el);
+			if (id) { out.push({ id: id, group: 'tb', groupLabel: 'Toolbar', parent: '', label: String(b.name || '') }); }
+		});
+		return out;
 	};
 	// The Full report's Type column harness opens the box through this, not through the menu.
 	EngCalcs.lpnOpenFullReportBox = function () { return openFullReportBox(); };
