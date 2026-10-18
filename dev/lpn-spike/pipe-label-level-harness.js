@@ -52,7 +52,9 @@ function ok(label, cond, detail) {
 	const realFF = Collide.placeLabelsFirstFit, realRepair = Collide.repairCrossingGangs, realRing = Collide.placeLabels;
 	Collide.placeLabelsFirstFit = function (labels, obs, opts) {
 		const out = realFF.call(this, labels, obs, opts);
-		if (opts && opts.strict) { cap.level = out; }
+		// A strict call over node labels is the one-line insertion (Task 734), after the repair: its
+		// placements replace the repair's for the labels that took a line.
+		if (opts && opts.strict) { if (labels.length && labels[0].id.charAt(0) === 'n') { cap.inline = out; } else { cap.level = out; } }
 		return out;
 	};
 	Collide.repairCrossingGangs = function (labels, placed, obs, opts) {
@@ -72,6 +74,10 @@ function ok(label, cond, detail) {
 		const doc = L.getDoc(), nodeEls = L.nodeEls(), linkEls = L.linkEls(), s = L.state().s, eps = EPS_PX / s;
 		const holderOf = (id) => id.charAt(0) === 'n' ? nodeEls[id.slice(2)] : linkEls[id.slice(2)];
 		const drawn = [];
+		if (cap.inline && cap.node) {
+			const took = {}; cap.inline.forEach((r) => { if (!r.dropped) { took[r.id] = r; } });
+			cap.node = cap.node.map((r) => took[r.id] || r);
+		}
 		[cap.node, cap.ring, cap.level].forEach((set) => (set || []).forEach((r) => {
 			if (r.dropped) { return; }
 			const h = holderOf(r.id);

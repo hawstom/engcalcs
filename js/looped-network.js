@@ -2717,9 +2717,14 @@ var EngCalcs = EngCalcs || {};
 	// (`inlineFrom`), so a drag frame lays out the same stacks and sets the same lines.
 	// COST: one strict first-fit over the labels tried, against the drawing; no node re-fit.
 	var LPN_INLINE_MAX_VIEW_FRAC = 0.25;
-	function insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list) {
+	function insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list, ring) {
 		var ground = { boxes: obs.boxes.slice().concat(viewFrameBoxes()), segments: obs.segments.slice() }, byId = {}, min = leaderThreshold(), specs = [], out;
 		nodeLabels.forEach(function (sp) { byId[sp.id] = sp; });
+		// The ring pass's labels (free pipe labels, dragged ones) with the leaders the renderer draws.
+		ringForeigners(ring || []).forEach(function (f) {
+			f.boxes.forEach(function (b) { ground.boxes.push(b); });
+			if (f.leader) { ground.segments.push(f.leader); }
+		});
 		placed.forEach(function (r) {
 			var sp = byId[r.id];
 			if (r.dropped || !sp) { return; }
@@ -2768,7 +2773,17 @@ var EngCalcs = EngCalcs || {};
 	}
 	// A drag frame's half: the labels that hold a line are set in it again, exactly as the content
 	// pass set them (it placed the same stacks first).
-	function reinsertInlineNodeLabels(nodeLabels, placed, obs, pad, fs) {
+	function runInlineTrial(nodeLabels, placed, obs, pad, fsNow, ring) {
+		var byId = {}, nodeOf = {};
+		nodeLabels.forEach(function (l) { byId[l.id] = l; });
+		doc.nodes.forEach(function (n) { nodeOf[nodeLabelKey(n.id)] = n; });
+		inlineRing = ring;
+		placed = perfDebugAccum('  ns:inline', function () { return tryInlineNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf); });
+		inlineRing = null;
+		return placed;
+	}
+	var inlineRing = null;
+	function reinsertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, ring) {
 		var list = [];
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id];
@@ -2777,7 +2792,7 @@ var EngCalcs = EngCalcs || {};
 			}
 		});
 		if (!list.length) { return placed; }
-		return insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list).placed;
+		return insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list, ring).placed;
 	}
 	function tryInlineNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf) {
 		var fs = parseFloat(fsNow) || effectiveFontSize(), cand = [], s0 = state.s || 1,
@@ -2799,7 +2814,7 @@ var EngCalcs = EngCalcs || {};
 			list.push({ id: c.id, c: c, spec: inlineNodeSpec(c.n, fs, m.wPx / s0) });
 		});
 		if (!list.length) { lastInlineTrial = null; return placed; }
-		res = insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list);
+		res = insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list, inlineRing);
 		lastInlineTrial = { tried: list.length, took: res.took.length };
 		res.took.forEach(function (id) {
 			var it = list.filter(function (x) { return x.id === id; })[0], ne = it.c.ne,
@@ -2864,7 +2879,6 @@ var EngCalcs = EngCalcs || {};
 			rungs++;
 		}
 		lastNodeShedRungs = rungs;
-		placed = perfDebugAccum('  ns:inline', function () { return tryInlineNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf); });
 		return placed;
 	}
 	// The rungs the last pass ran, for a harness to read. Not a decision input -- nothing reads it.
@@ -3367,8 +3381,6 @@ var EngCalcs = EngCalcs || {};
 		// places whatever content the last content pass decided, and re-decides on the way out.
 		if (shedNodes) {
 			nodePlaced = perfDebugAccum('  cl:nodeShed', function () { return shedNodeLabelsForCrowding(nodeLabels, nodePlaced, nodeObs, pad, fsNow); });
-		} else {
-			nodePlaced = reinsertInlineNodeLabels(nodeLabels, nodePlaced, nodeObs, pad, fs);
 		}
 		// Every number the ring pass is steered by goes through ONE place, so ?debug=labels can
 		// override them live without a second code path deciding anything (see labelTuning()). It
@@ -3429,6 +3441,10 @@ var EngCalcs = EngCalcs || {};
 		// only rung left once moving has run out. It must run HERE, after both placements and before
 		// the holders are written, because a hide is a DROP and the drop seam is the loop below.
 		lastCrossingShed = perfDebugAccum('  cl:crossShed', function () { return shedCrossingLabels(nodeLabels, nodePlaced, labels, placed, obs); });
+		// **AND LAST OF THE NODE STEPS, A LABEL THAT LOST SOMETHING TRIES ONE LINE** (Task 734): after
+		// the repair and the crossing hides, so not one of them sees it, and it can move nobody.
+		nodePlaced = shedNodes ? runInlineTrial(nodeLabels, nodePlaced, nodeObs, pad, fsNow, placed)
+			: reinsertInlineNodeLabels(nodeLabels, nodePlaced, nodeObs, pad, fs, placed);
 		placed.concat(nodePlaced).forEach(function (r) {
 			var h = holders[r.id];
 			if (!h) { return; }
