@@ -239,9 +239,10 @@ $ec_lang['mtc_bend_angle']='<a target="_blank" href="riprap-bend-angle.png">Ungh
 $ec_lang['mtc_sgrock']='<span class="ec-help" title="Densitate relativă la apă. Valoare tipică ≈ 2,65 pentru rocă concasată">Densitatea relativă a rocii, sg <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_in']='Dimensiunea de proiectare a rocii, D<sub>50</sub>';
 $ec_lang['mtc_n_strickler']='n din dimensiunea de proiectare a rocii (metoda Strickler)';
+// Edited by TGH 2026-09-07
 $ec_lang['mtc_n_blodgett']='n din dimensiunea de proiectare a rocii (metoda Blodgett)';
 $ec_lang['mtc_n_bathurst']='n din dimensiunea de proiectare a rocii (metoda Bathurst)';
-$ec_lang['mtc_n_pi']='n din dimensiunea de proiectare a rocii (metoda Phillips & Ingersoll)';
+$ec_lang['mtc_n_pi']='n din dimensiunea de proiectare a rocii (P&I, metoda Phillips & Ingersoll)';
 $ec_lang['mtc_blodgett_v_bathurst']='Blodgett față de Bathurst';
 $ec_lang['mtc_pi_range_check']='Verificare interval P&I';
 $ec_lang['mtc_pi_ok']='d50 în intervalul P&I';
@@ -258,8 +259,8 @@ $ec_lang['mtc_d50_searcy']='Dimensiunea necesară a rocii unghiulare, D<sub>50</
 $ec_lang['mtc_vel_ok']='Viteză rezonabilă pentru ipotezele de curgere uniformă.';
 $ec_lang['mtc_vel_low']='Viteză mică — risc de sedimentare.';
 $ec_lang['mtc_vel_high']='Viteza este ridicată și poate să nu fie realistă; verificați eroziunea îmbrăcăminții canalului, adâncimea suplimentară în curbe și pierderea de energie la lărgiri sau obstacole.';
-$ec_lang['mtc_iteration_tip']='Alegeți o opțiune de rugozitate (Blodgett–Bathurst recomandat) și o opțiune de dimensiune a rocii (Isbash recomandat) pentru a itera automat către o dimensiune uniformă a rocii pentru debitul dorit. Vedeți Notele de mai jos pentru metoda completă, sau introduceți propria valoare de rugozitate (urmați linkul pentru îndrumări) și ignorați dimensiunea rocii pentru a evita iterația.';
-$ec_lang['mtc_note_1']='<dl><dt>Iterație automată de dimensionare a rocii și rugozității</dt><dd>Alegeți o opțiune de rugozitate (Blodgett–Bathurst recomandat) și o opțiune de dimensiune de proiectare a rocii (Isbash recomandat). Ajustați adâncimea și factorul de siguranță al dimensiunii rocii pentru a atinge debitul dorit cu o dimensiune uniformă a rocii. De fiecare dată când modificați o valoare de intrare, calculatorul repetă acești pași: 1. Rugozitatea este calculată din dimensiunea de proiectare a rocii. 2. Valoarea rugozității din metoda aleasă de dvs. este copiată în rugozitatea de intrare. 3. Debitul canalului și dimensiunea necesară a rocii sunt calculate. 4. Dimensiunea de proiectare a rocii este ajustată. 5. Repetați până când eroarea din dimensiunea de proiectare a rocii este foarte mică.</dd><dt>Calculator de bază (fără iterație)</dt><dd>Introduceți valoarea dorită de rugozitate. Ignorați zona de intrare a dimensiunii de proiectare a rocii.</dd></dl>';
+$ec_lang['mtc_iteration_tip']='Alegeți o opțiune de rugozitate (B/B pentru Blodgett–Bathurst este recomandată) și o opțiune de dimensiune a rocii (Isbash recomandată) pentru a itera automat către o dimensiune uniformă a rocii pentru debitul dorit. Vedeți Notele de mai jos pentru metoda completă. Pentru a omite iterația, introduceți propria valoare de rugozitate (urmați linkul pentru îndrumări) și ignorați dimensiunea rocii.';
+$ec_lang['mtc_note_1']='<dl><dt>Iterație automată de dimensionare a rocii și rugozității</dt><dd>Alegeți o opțiune de rugozitate (B/B pentru Blodgett–Bathurst este recomandată) și o opțiune de dimensiune de proiectare a rocii (Isbash recomandată). Ajustați adâncimea și factorul de siguranță al dimensiunii rocii pentru a atinge debitul dorit cu o dimensiune uniformă a rocii. De fiecare dată când modificați o valoare de intrare, calculatorul repetă acești pași: 1. Rugozitatea este calculată din dimensiunea de proiectare a rocii. 2. Valoarea rugozității din metoda aleasă de dvs. este copiată în rugozitatea de intrare. 3. Debitul canalului și dimensiunea necesară a rocii sunt calculate. 4. Dimensiunea de proiectare a rocii este ajustată. 5. Pașii se repetă până când eroarea din dimensiunea de proiectare a rocii devine foarte mică.</dd><dt>Calculator de bază (fără iterație)</dt><dd>Introduceți valoarea dorită de rugozitate. Ignorați zona de intrare a dimensiunii de proiectare a rocii.</dd></dl>';
 $ec_lang['mtc_note_2_term']='Verificare viteză';
 $ec_lang['mtc_note_2_def']='Viteza mare indică faptul că a existat o cădere de nivel mare, care a generat o energie specifică atât de ridicată. Acea energie se poate pierde rapid la lărgiri, curbe sau obstacole. Verificați dacă acest lucru este rezonabil pentru amplasament.';
 $ec_lang['mtc_solver_no_solution']='Nu s-a găsit nicio soluție pentru Q dat cu aceste date de intrare ale canalului.';
@@ -601,9 +602,11 @@ $ec_lang['bpn_demand_mult']='Multiplicator de debit';
 // Edited by TGH 2026-09-07
 $ec_lang['bpn_demand_mult_tip']='Scalează simultan debitul tuturor tronsoanelor, pentru un calcul de oră de vârf sau de creștere viitoare. Utilizați 1 pentru debitele introduse ca atare.';
 $ec_lang['bpn_elev_down']='Cotă av.';
+// Edited by TGH 2026-09-07
 $ec_lang['bpn_q_line']='Debit tronson';
 $ec_lang['bpn_q_line_tip']='Debitul total transportat de acest tronson: cerința sa proprie plus fiecare cerință aval pe care o alimentează.';
 $ec_lang['bpn_p_down']='Pres. av.';
+// Edited by TGH 2026-09-07
 // Edited by TGH 2026-09-07
 $ec_lang['bpn_p_down_tip']='Sarcina de presiune manometrică la nodul aval al acestui tronson. O valoare negativă (semnalată) înseamnă presiune subatmosferică; verificați proiectul.';
 $ec_lang['bpn_sketch_heading']='Schema rețelei';
@@ -708,7 +711,7 @@ $ec_lang['lpn_node_customers_tip']='Lista abonaților adăugați aici pentru că
 $ec_lang['lpn_node_customers_sum']='{total} {unit} de la abonați ({n})';
 $ec_lang['lpn_customer_detached']='⚠ Acest abonat nu este conectat la nicio conductă, deci cerința sa nu este inclusă în rezultate. Ștergeți-l, sau desenați o conductă și mutați abonatul pe ea.';
 $ec_lang['lpn_customer_fixed_head']='⚠ Capătul apropiat al acelei conducte are o suprafață de apă fixă, deci această cerință nu afectează simularea.';
-
+$ec_lang['lpn_customer_node_inactive']='Acest abonat este atribuit unei joncțiuni inactive în acest scenariu, deci cerința lui nu face parte din rezolvare.';
 $ec_lang['lpn_customer_detached_count']='Abonați neconectați la o conductă ({n}). Cerința lor nu este luată în calcul.';
 $ec_lang['lpn_meter_pick_pipe']='Acum selectați conducta sau nodul care deservește acest abonat. Abonatul rămâne unde l-ați pus. Apăsați Escape pentru a anula.';
 $ec_lang['lpn_inp_export_flat_customers']='Un fișier EPANET nu are abonați. Cerința abonaților din acest proiect ({n}) este scrisă ca un rând de cerință pe joncțiunea la care este atribuit fiecare abonat, denumit cu marcajul abonatului. Fișierul nu înregistrează abonatul însuși: locația lui, conducta care îl deservește, locul de-a lungul acelei conducte unde se conectează branșamentul sau câte branșamente reprezintă. Aceste informații rămân în proiect; salvați fișierul de proiect pentru a le păstra.';
@@ -984,19 +987,18 @@ $ec_lang['lpn_guide_box_named']='Caseta {box}';
 $ec_lang['lpn_guide_dimmed']='Un nume atenuat este un buton ascuns în prezent pe bara de instrumente.';
 // One entry in the Guide's Boxes section for each box, shown by the "?" in its title bar. Fire flow,
 // Critical assets, and Demand scaling carry theirs in lpn_ff_intro and the keys that follow it.
-$ec_lang['lpn_guide_text_popup']='Arată proprietățile elementului sau textului selectat, sau ale mai multor elemente selectate, lângă selecție sau acolo unde a fost mutată caseta ultima dată. O valoare modificată schimbă imediat rețeaua, iar eticheta elementului de pe hartă și panoul Tabele o urmează. Rezultatele ultimului calcul sunt listate sub câmpurile de intrare și nu pot fi modificate.';
+$ec_lang['lpn_guide_text_popup']='Arată proprietățile elementului, ale Textului sau ale Abonatului selectat, sau ale mai multor elemente selectate. Caseta se deschide lângă selecție sau acolo unde a fost mutată ultima dată. O valoare modificată schimbă imediat rețeaua, iar eticheta elementului de pe hartă și panoul Tabele sunt actualizate. Rezultatele calculate sunt afișate ca rânduri numai pentru citire și nu pot fi modificate.';
 $ec_lang['lpn_guide_text_find_popup']='Găsește elementele care îndeplinesc o condiție, de exemplu toate conductele mai mici de 8 in. sau toate joncțiunile sub 40 psi, și poate modifica o proprietate la toate într-o singură operație. Folosiți-o pentru a verifica un model înainte de rezolvare (o cotă lipsă, un diametru introdus în unitatea greșită), pentru a lista locurile cu probleme după rezolvare (presiune scăzută, viteză mare) și pentru a face o corecție la mai multe elemente.\n\nListele Ce se caută, Proprietate, Condiție și Valoare construiesc o condiție și o scriu ca linie de text în caseta Interogare. Linia poate fi editată și direct, iar listele o urmează. O interogare pe care listele nu o pot exprima, de exemplu două condiții unite prin SAU, ascunde listele până când se apasă butonul Folosește comenzile în schimb. Pentru a căuta, apăsați Enter în caseta Interogare sau apăsați butonul Găsire.';
-$ec_lang['lpn_guide_text_settings_box']='Toate setările și cele două butoane de resetare se află în caseta Setări. Nu există alt loc în care se găsesc setările. Caseta poate fi căutată: tastați unul sau mai multe cuvinte în Căutare în setări pentru a lista doar setările care le menționează pe toate. Setările sunt salvate cu proiectul, cu excepția opțiunii Arată caseta de progres a rulării și a celor de la Pagină, care sunt păstrate în acest browser. Poziția și dimensiunea acestei casete sunt, de asemenea, păstrate numai în acest browser.';
-$ec_lang['lpn_guide_text_library_box']='Conține modelele, curbele, tipurile de conductă, fitingurile, comenzile de control și regulile proiectului. Un element face trimitere la un model, o curbă, un tip de conductă sau un fiting prin ID-ul său, iar acel articol se editează aici. Comenzile de control și regulile se aplică întregii rețele. Regulile sunt aplicate numai de motorul EPANET. Toate sunt salvate cu proiectul.';
+$ec_lang['lpn_guide_text_settings_box']='Conține setările proiectului deschis și ale acestui browser, aranjate pe secțiuni. Alegeți Apă, Setări pentru a o deschide. Două butoane, Restabilește valorile implicite și Începeți din nou, le resetează. Caseta poate fi căutată: tastați unul sau mai multe cuvinte în Căutare în setări pentru a lista doar setările care le menționează pe toate. Poziția și dimensiunea acestei casete sunt păstrate numai în acest browser.';
+$ec_lang['lpn_guide_text_library_box']='Conține modelele, curbele, tipurile de conductă, listele de fitinguri, comenzile și regulile proiectului, câte o secțiune pentru fiecare. Alegeți Apă, Biblioteci pentru a o deschide. Un element face trimitere la un model, o curbă, un tip de conductă sau o listă de fitinguri prin ID-ul acelui articol, iar articolul se creează, se editează și se șterge aici. Toate sunt salvate cu proiectul, iar Anulare inversează o modificare făcută aici. Poziția și dimensiunea casetei sunt păstrate numai în acest browser.';
 $ec_lang['lpn_guide_text_energy_box']='Raportează consumul de energie, puterea de vârf și costul fiecărei pompe pe parcursul ultimei simulări pe perioadă extinsă, folosind eficiența fiecărei pompe și prețul energiei stabilit la Setări, Energie. Are nevoie de o Durată totală a rulării în Setări și de o rețea rezolvată. Nu modifică rețeaua.';
 $ec_lang['lpn_guide_text_contour_box']='Controlează diagrama de contururi desenată pe hartă pornind de la valoarea nodului aleasă în Colorează nodurile după: schema de culori, umplerea și opacitatea ei, intervalul liniilor de contur și etichetele, precum și cât de departe ajunge culoarea de la fiecare conductă. Dezactivarea ascunde diagrama și lasă culorile nodurilor. Modifică numai afișarea, nu rețeaua.';
-$ec_lang['lpn_guide_text_scncmp_box']='Rezolvă fiecare scenariu dintr-o copie a desenului și tabelează, pentru fiecare, numărul de valori specifice, cea mai mică presiune și cea mai mare viteză. Nu modifică proiectul, iar scenariul deschis rămâne așa cum era.';
+$ec_lang['lpn_guide_text_scncmp_box']='Rezolvă fiecare scenariu bifat în Managerul de scenarii, pe toate dacă nu au fost debifate, dintr-o copie a desenului, și tabelează pentru fiecare numărul de valori specifice, multiplicatorul cerinței, durata totală de rulare, pasul de timp hidraulic, cea mai mică presiune și cea mai mare viteză. Alegeți Apă, Rapoarte, Comparație scenarii pentru a o deschide. Comparația pornește la deschidere și pornește din nou după fiecare modificare cât timp rămâne deschisă.\n\nNu modifică proiectul, iar scenariul deschis rămâne așa cum era.';
 $ec_lang['lpn_guide_text_rptbox']='Arată raportul text scris de motorul EPANET pentru ultima simulare pe perioadă extinsă, inclusiv avertismentele și sumarul rețelei. Fiecare simulare pe perioadă extinsă îl înlocuiește; o rezolvare la un singur moment nu îl înlocuiește, iar o editare lasă raportul anterior pe loc.';
 $ec_lang['lpn_guide_text_status_box']='Listează, în ordine cronologică, fiecare schimbare din timpul ultimei simulări pe perioadă extinsă: deschiderea sau închiderea unei pompe, vane sau conducte, un bazin care începe să se umple sau să se golească ori care devine plin sau gol și orice pas de timp care nu a convergut complet. Sunt listate numai schimbările, nu fiecare pas de timp.';
 $ec_lang['lpn_guide_text_full_box']='Listează fiecare nod și fiecare legătură la fiecare pas de timp de raportare, în unitățile arătate în panoul Tabele. Fără simulare pe perioadă extinsă, arată soluția curentă la un singur moment. Descărcarea sau tipărirea cuprinde fiecare pas de timp, iar tabelul arată câte unul pe rând.';
 $ec_lang['lpn_guide_text_calib_box']='Compară un fișier de măsurători din teren cu rezultatele calculate în aceleași locuri și momente, câte un fișier pentru fiecare parametru. Fișierul este păstrat numai pe durata sesiunii curente și nu este salvat cu proiectul.';
-$ec_lang['lpn_guide_text_notes_popup']='Listează note despre comportamentul acestei pagini și despre ce nu face, fiecare ca un termen urmat de definiția lui. Nu modifică rețeaua.';
-$ec_lang['lpn_guide_text_hotkeys_popup']='Listează fiecare buton al barei de instrumente și fiecare rând de meniu, comenzile rapide de la tastatură și câte o intrare pentru fiecare casetă. Alegerea unui rând arată unde se află acel control; nu îl execută. Pentru a căuta, apăsați Ctrl+K de oriunde sau / cât timp manualul de utilizare are focalizarea.';
+$ec_lang['lpn_guide_text_hotkeys_popup']='Manualul de utilizare. Secțiunile sale sunt Folosirea manualului de utilizare, Bara de instrumente, Meniuri, Hartă, Captură de ecran, Tabele, Casete, Despre acest calculator și Note despre această pagină. Bara de instrumente și Meniuri listează fiecare buton al barei de instrumente și fiecare rând de meniu cu comanda lui rapidă de la tastatură, Casete are câte o intrare pentru fiecare casetă, iar celelalte secțiuni descriu ce face pagina. Alegerea unui rând arată unde se află acel control; nu îl execută. Apăsați Ctrl+K pentru a căuta, sau apăsați / cât timp manualul de utilizare are focalizarea. Ctrl+K nu caută cât timp o întrebare este deschisă.';
 // The Find and replace chapter beyond its opening paragraphs, in the Guide's Boxes section
 // (Tom, 2026-10-07). Each _def is HTML: keep the tags. A query inside <code> runs as written in
 // English on a page in any language; translate it with the words the Find box shows in your
@@ -1004,7 +1006,7 @@ $ec_lang['lpn_guide_text_hotkeys_popup']='Listează fiecare buton al barei de in
 // and Net3 by dev/lpn-spike/user-guide-find-harness.js: never change them in translation.
 $ec_lang['lpn_guide_find_query_term']='Limbajul interogărilor';
 $ec_lang['lpn_guide_find_query_def']='<table class="lpn-notes-table"><tbody><tr><td><code>Domeniu.Proprietate condiție valoare</code></td><td>O condiție. Domeniul, ales în lista Ce se caută, este Toate, Joncțiune, Rezervor, Bazin, Conductă, Pompă, Vană, Text, Abonat sau Sursă. Proprietatea este orice intrare din lista Proprietate pentru acel domeniu.</td></tr><tr><td>Condiții</td><td>egal cu, mai mare decât, mai mic decât, conține, cele mai mari n, cele mai mici n și gol. Conține se aplică numai textului. La cele mai mari n și cele mai mici n, n este un număr, ca în cele mai mari 5. Cu litera n însăși, ca în <code>Pipe.Velocity n highest</code>, sau cu caseta Valoare goală, sunt listate 10 elemente. Condiția gol găsește elementele care nu au nicio valoare pentru proprietate. Conectivitatea are patru condiții și nu primește valoare.</td></tr><tr><td>Valori</td><td>Un număr se introduce fără unitate, în unitatea arătată în Proprietăți și în panoul Tabele: 40, nu 40 psi. Textul, inclusiv un ID, se încadrează între ghilimele simple sau duble: <code>\'60\'</code>.</td></tr><tr><td>ȘI, SAU și parantezele</td><td>ȘI se evaluează înaintea lui SAU, iar parantezele grupează condițiile. Negarea (NOT) nu este disponibilă.</td></tr><tr><td>Ortografie</td><td>Cuvintele nu țin cont de majuscule. Cuvintele englezești sunt acceptate în orice limbă, deci o interogare copiată din acest manual de utilizare rulează pe o pagină în orice limbă.</td></tr></tbody></table>';
-$ec_lang['lpn_guide_find_examples_term']='Exemple lucrate pe Net3';
+$ec_lang['lpn_guide_find_examples_term']='Exemple pe Net3';
 $ec_lang['lpn_guide_find_examples_def']='<p>Deschideți exemplul Net3 pentru a le urmări. Presiunea este în psi, iar viteza în ft/s.</p><table class="lpn-notes-table"><tbody><tr><td><code>Everything.ID equal to \'60\'</code></td><td>Joncțiunea 60 și conducta 60. O joncțiune și o conductă pot avea același ID, deci o căutare după ID la Toate poate returna mai multe elemente.</td></tr><tr><td><code>Junction.Pressure below 40</code></td><td>Joncțiunile 10, 40, 50, 20 și 153, începând cu cea mai mică presiune. Joncțiunea 10 are -0,6 psi, o presiune negativă care necesită verificare.</td></tr><tr><td><code>Pipe.Velocity 5 highest</code></td><td>Conductele 60, 329, 125, 123 și 149, începând cu cea mai mare viteză. Conducta 60 transportă 9,3 ft/s.</td></tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5</code></td><td>Joncțiunile 10, 20, 40 și 50 și conductele 60, 125 și 329: presiuni scăzute și viteze mari într-o singură listă.</td></tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100</code></td><td>Joncțiunile 10, 20, 40 și 50, presiunile scăzute de pe terenul înalt. Ambele condiții trebuie să indice același tip de element: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3</code> nu găsește nimic, deoarece niciun element nu este și joncțiune, și conductă.</td></tr><tr><td><code>Pipe.Closed equal to \'closed\'</code></td><td>Conducta 330, singura conductă închisă în fișierul Net3.</td></tr><tr><td><code>Junction.Connectivity no open path to a source</code></td><td>Nimic, așa cum este distribuit fișierul. Cu conducta 247 închisă (vezi Înlocuire și Anulare), joncțiunile 215, 217, 219 și 225: joncțiunile pe care o avarie a conductei 247 le-ar lăsa fără alimentare. Repetarea pentru fiecare conductă este o analiză de criticitate.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_find_results_term']='Rezultate, selecția și Tabele';
 $ec_lang['lpn_guide_find_results_def']='<p>Elementele care corespund sunt listate sub butonul Găsire. Mai mare decât și cele mai mari n listează întâi valoarea cea mai mare, mai mic decât și cele mai mici n întâi valoarea cea mai mică, iar celelalte condiții listează după valoarea găsită, apoi după ID. O interogare cu AND sau OR listează nodurile, apoi legăturile, fiecare după ID. O singură potrivire este afișată imediat pe hartă. Selectați un rând pentru a centra harta pe acel element. Dacă nu este selectat nimic, elementul este și selectat; dacă ceva este selectat, elementul este evidențiat, iar selecția nu se schimbă. Shift+clic sau Ctrl+clic pe un rând îl adaugă la selecție sau îl elimină. Butonul Găsire nu selectează singur toate potrivirile.</p><p>Butonul Filtrează în tabelul curent aplică aceeași interogare panoului Tabele. Fiecare tabel la care se aplică interogarea arată numai rândurile care corespund, cu interogarea și numărul de rânduri deasupra. Pentru a selecta pe hartă toate potrivirile, selectați acele rânduri și alegeți Selectează pe hartă din meniul clic dreapta. Un filtru de tabel nu este salvat cu proiectul și se încheie când pagina este reîncărcată. Un rând editat astfel încât să nu mai corespundă rămâne în tabel, atenuat și marcat cu un semn de avertizare, până când butonul Filtrează în tabelul curent este apăsat din nou.</p>';
@@ -1012,10 +1014,178 @@ $ec_lang['lpn_guide_find_replace_term']='Înlocuire și Anulare';
 $ec_lang['lpn_guide_find_replace_def']='<p>Partea Modifică ce a fost găsit din casetă scrie o proprietate la fiecare element găsit de interogare. Alegeți proprietatea în lista Proprietatea de modificat, introduceți noua valoare în caseta Valoare nouă în unitatea afișată și apăsați butonul Înlocuiește. Caseta indică apoi câte elemente s-ar modifica, fără a le număra pe cele care au deja noua valoare. Apăsați butonul Modifică-le pentru a aplica schimbarea sau Anulare. O singură Anulare inversează întreaga înlocuire.</p><p>Exemplu pe Net1: <code>Pipe.Diameter below 10</code> găsește conductele 31, 122, 113 și 121. Alegeți Diametru, introduceți 10 și apăsați Înlocuiește; caseta arată „Modificați 4 elemente?”. Apăsați Modifică-le pentru a seta toate cele patru conducte la 10 in. O singură Anulare le readuce la 6 și 8 in.</p><p>Exemplu pe Net3: <code>Pipe.ID equal to \'247\'</code> găsește conducta 247. Alegeți Închisă, alegeți din nou Închisă în lista Valoare nouă și apăsați Înlocuiește, apoi Modifică-le, pentru a închide conducta pentru exemplul de conectivitate de mai sus. Anularea o deschide din nou.</p><p>Înlocuirea necesită un singur tip de element, deci la Toate alegeți mai întâi un tip de element în lista Ce se caută. Într-un scenariu altul decât Base, o înlocuire este stocată în acel scenariu, ca aceeași editare din Proprietăți. Acolo unde sunt disponibile cotele Mapbox, Cota poate fi înlocuită din Mapbox DEM în loc de o valoare tastată.</p>';
 $ec_lang['lpn_guide_find_notes_term']='Observații';
 $ec_lang['lpn_guide_find_notes_def']='<ul><li>Valorile sunt comparate la precizie completă și listate cu patru zecimale. Egal cu se potrivește rar cu un rezultat calculat; folosiți mai mare decât și mai mic decât.</li><li>Presiunea, sarcina, debitul, viteza și celelalte rezultate sunt cele ale ultimului calcul. Cu setarea Recalculează automat debifată, ele descriu rețeaua așa cum era la ultimul Calculează.</li><li>Mai mare decât și mai mic decât pe text folosesc ordinea din dicționar, cu numerele în ordine numerică: pe Net1, <code>Junction.ID above \'20\'</code> găsește joncțiunile 21, 22, 23, 31 și 32.</li><li>La Toate sunt oferite numai ID, Descriere, Marcaj și Conectivitate. Alegeți un tip de element în lista Ce se caută pentru a vedea lista completă a proprietăților lui.</li><li>Un element Text nu are ID. Căutați-l după cuvintele lui, ca în <code>Text.Text contains \'pump\'</code>.</li><li>Cele patru condiții Conectivitate pentru un nod sunt fără legături la nod, fără legături deschise la nod, fără traseu de legături către o sursă și fără traseu deschis către o sursă. O sursă este un rezervor sau un bazin.</li></ul>';
+// The Scenarios chapter, in the entry for the Scenario manager box (Task 785). Written from the code of
+// feat/bentley-interop and held by dev/lpn-spike/user-guide-scenarios-harness.js. The box's own help
+// (lpn_sm_help, Tom's wording of 2026-10-16) comes first in the entry; nothing here restates or
+// contradicts it. Terms follow the Find and replace chapter's pattern.
+$ec_lang['lpn_guide_scn_use_term']='La ce servește un scenariu';
+$ec_lang['lpn_guide_scn_use_def']='<p>Scenariile salvează mai multe variante de proiectare, vizualizări sau situații în același proiect, de exemplu ziua medie, ziua maximă, ora de vârf, o figură de prezentare dintr-un raport, o conductă principală scoasă din funcțiune sau o înlocuire propusă. Rețeaua este desenată o singură dată, în scenariul Bază. Fiecare alt scenariu conține doar valorile sale specifice, adică valorile care diferă de scenariul din care moștenește, și citește tot restul din acel scenariu. O modificare în Bază ajunge deci la fiecare scenariu care nu a înlocuit acea valoare.</p><p>Un proiect nou pornește cu șase scenarii gata făcute: 1. Test de debit: Static, 2. Test de debit: Mediu, 3. Test de debit: Max, 4. Zi medie, 5. Zi maximă și 6. Oră de vârf. Sunt scenarii obișnuite care pot fi redenumite, modificate și șterse. Fiecare pornește cu o valoare specifică, multiplicatorul cerinței: 1 pentru testele de debit și Zi medie, 2 pentru Zi maximă și 3 pentru Oră de vârf. Multiplicatorii sunt valori provizorii, de înlocuit cu valori pentru sistemul modelat. Un proiect deschis dintr-un fișier, inclusiv fiecare exemplu, sau importat dintr-un fișier EPANET are doar Bază.</p><p>Debitul de incendiu se verifică cu Debit de incendiu: analiză, care testează toate joncțiunile sau joncțiunile selectate. Zi maximă este scenariul deschis în mod normal când se rulează.</p>';
+$ec_lang['lpn_guide_scn_open_term']='Scenariul deschis';
+$ec_lang['lpn_guide_scn_open_def']='<p>Butonul Scenariu din banda de stare de sub hartă numește scenariul deschis și îi numără valorile specifice, ca în Scenariu: Bază | Nr. de valori specifice: 0. Faceți clic pe el sau alegeți Apă, Scenarii pentru a comuta între scenarii sau pentru a adăuga, copia, redenumi ori șterge unul. Fiecare scenariu din listă își arată numărul de valori specifice între paranteze, iar o bifă este la cel deschis. Rândul Manager de scenarii deschide arborele de scenarii și alternative. Este estompat cât timp Mod de bază este bifat.</p><p>Desenul, etichetele, Proprietățile, Tabelele și rezultatele aparțin toate scenariului deschis, iar pagina rezolvă numai scenariul deschis. Comparația scenariilor, descrisă în propria intrare, le rezolvă pe celelalte din copii. Scenariul deschis este salvat cu proiectul.</p>';
+$ec_lang['lpn_guide_scn_marks_term']='Unde se văd valorile specifice';
+$ec_lang['lpn_guide_scn_marks_def']='<p>Pe hartă, un element care are o valoare specifică în scenariul deschis este încercuit cu auriu, iar un element care moștenește o valoare specifică de la un scenariu părinte sau de la o alternativă este încercuit cu o linie întreruptă gri. Pentru cerință, diametru, rugozitate, coeficientul pierderii locale (minore) și lungime, un inel apare doar cât timp Setări, Vizualizare, Etichete noduri sau Etichete legături arată acea valoare pe hartă; o valoare specifică a oricărei alte proprietăți are mereu inelul ei. În Tabele, o celulă care conține o valoare stabilită de scenariul deschis este aurie, iar sfatul ei numește alternativa care o deține, ca în Fizic, alt.: Conductă mai mare. Afișează scenariile, din meniul celulei unui tabel, listează fiecare element o dată pentru fiecare scenariu.</p><p>Fiecare rând din Proprietăți pe care un scenariu îl poate înlocui are o marcă în stânga. Un punct plin înseamnă că scenariul deschis înlocuiește valoarea; faceți clic pe el pentru a șterge valoarea specifică. Un punct gol înseamnă că valoarea este moștenită; faceți clic pe el pentru a face din valoarea afișată o valoare specifică. Un triunghi înseamnă că scenariile de sub acesta înlocuiesc valoarea; faceți clic pe el pentru a le șterge valorile specifice, după o confirmare. Sub un rând înlocuit se află valoarea moștenită pe care o înlocuiește, ca în Scenariul de bază: 18. Caseta Setări are doar punctul plin și triunghiul, deoarece tastarea unei valori acolo este ceea ce creează o valoare specifică.</p><p>Pentru a ascunde inelele, debifați Arată marcajele valorilor specifice pe hartă la Setări, Hartă și pagină, Pagină, sau alegeți Hartă, Hartă curată. Ambele sunt păstrate în acest browser, nu în proiect. Tabele marchează valorile specifice în ambele cazuri.</p>';
+$ec_lang['lpn_guide_scn_make_term']='Crearea și ștergerea valorilor specifice';
+$ec_lang['lpn_guide_scn_make_def']='<p>Cu un alt scenariu decât Bază deschis, o modificare a unei valori pe care scenariile o pot înlocui este stocată ca valoare specifică în scenariul deschis, indiferent cum este făcută: tastare în Proprietăți, editarea unei celule în Tabele, Înlocuire în Găsire și înlocuire, tragerea unui nod sau introducerea coordonatelor lui, Schimbare tip (noul tip este valoarea specifică) sau Lipește proprietățile în selecție. O setare tastată în caseta Setări este stocată ca valoare specifică atunci când scenariile pot înlocui acea setare. Bază nu este modificat. În Bază, aceleași modificări schimbă rețeaua însăși și ajung la fiecare scenariu care nu a înlocuit valoarea.</p><p>Ștergerea acționează diferit. Într-un scenariu, Ștergere nu elimină un element care există în Bază. Face elementul inactiv în scenariul deschis, iar pentru un nod și conductele lui, și un mesaj spune acest lucru. Elementul rămâne în desen și în celelalte scenarii. Un element desenat cât timp un scenariu este deschis este inactiv în Bază și activ în acel scenariu, iar Ștergere în acel scenariu îl elimină. Ștergerea unui element în Bază șterge și valorile lui specifice din fiecare scenariu, după o întrebare care le numără. Abonații și Figurile nu aparțin niciunui scenariu și sunt șterse definitiv.</p><p>Rândul Manager de valori specifice din lista Scenarii deschide o listă cu fiecare valoare specifică a scenariului deschis, pe categorii, fiecare lângă valoarea moștenită pe care o înlocuiește. Un grafic de serii de timp de pe hartă pe care scenariul l-a deschis, mutat sau modificat este un rând separat. Bifați rânduri și faceți clic pe Șterge valorile specifice selectate, faceți clic pe Șterge valoarea specifică într-un rând sau faceți clic pe Șterge toate valorile specifice. Fiecare valoare revine apoi la valoarea moștenită, iar Anulare o inversează. Selectați un ID din listă pentru a merge la elementul de pe hartă. Punctul din Proprietăți și rândul Șterge valoarea specifică din meniul celulei din Tabele șterg câte o valoare specifică.</p>';
+$ec_lang['lpn_guide_scn_scope_term']='Ce poate și ce nu poate înlocui un scenariu';
+$ec_lang['lpn_guide_scn_scope_def']='<table class="lpn-notes-table"><tbody><tr><td>Proprietăți</td><td>Orice proprietate a unui nod sau a unei legături, cu excepția celor listate mai jos, inclusiv poziția, dacă este activ și tipul (Schimbare tip). Un Text poate înlocui cuvintele, poziția, dimensiunea, alinierea, aldinul, unghiul și dacă este afișat. O proprietate personalizată poate fi înlocuită întotdeauna. Proprietățile sunt păstrate în categoriile Fizic, Cerință, Topologie activă, Setări inițiale, Constituent chimic, Debit de incendiu, Cost energie, Proprietăți personalizate, Text, Prezentare și Calcul.</td></tr><tr><td>Setări</td><td>Setările salvate cu proiectul, cu excepția celor listate mai jos: opțiunile de calcul (de exemplu multiplicatorul cerinței, durata totală de rulare, pasul de timp hidraulic și metoda de frecare), modelul implicit al cerinței, valorile date elementelor noi și setările de prezentare (dimensiuni, culori, etichete, curbe de nivel, vizualizarea hărții și graficele de serii de timp de pe hartă).</td></tr><tr><td>La fel în fiecare scenariu</td><td>ID-ul, Descrierea și Marcajul unui element; nodurile de capăt și cotiturile unei legături; Abonații și Figurile; unitățile și sistemul de coordonate; și conținutul Bibliotecilor (modele, curbe, tipuri de conductă, liste de fitinguri, comenzi și reguli). O modificare a oricăruia dintre acestea schimbă fiecare scenariu. Un scenariu poate îndrepta un element către o altă curbă, un alt tip de conductă, o altă listă de fitinguri sau un alt model, dar nu poate schimba ce conțin acestea.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_scn_example_term']='Exemplu pe Net1';
+$ec_lang['lpn_guide_scn_example_def']='<p>Deschideți exemplul Net1. Alegeți Apă, Scenarii, Scenariu nou…, tastați Conductă mai mare și faceți clic pe OK. Selectați Conducta 10 pe hartă și introduceți 24 pentru Diametru în Proprietăți; Bază are 18 in, afișat sub câmp ca Scenariul de bază: 18. Alegeți Bază în lista Scenarii, alegeți din nou Scenariu nou…, tastați Zi maximă și introduceți 1,8 pentru Multiplicator de cerință în Setări, Calcul, Hidraulică. Apoi alegeți Apă, Rapoarte, Comparație scenarii.</p><table class="lpn-notes-table"><tbody><tr><td>Scenariu</td><td>Nr. de valori specifice</td><td>Multiplicator de cerință</td><td>Cea mai mică presiune</td><td>Cea mai mare viteză</td></tr><tr><td>Bază</td><td>0</td><td>1</td><td>108 psi la N32, 14:00</td><td>2,76 ft/s la L11, 16:00</td></tr><tr><td>Conductă mai mare</td><td>1</td><td>1</td><td>109 psi la N32, 14:00</td><td>2,87 ft/s la L11, 16:00</td></tr><tr><td>Zi maximă</td><td>1</td><td>1,8</td><td>15,77 psi la N32, 9:00</td><td>3,49 ft/s la L10, 8:00</td></tr></tbody></table><p>Durata totală de rulare este 24:00 în toate trei, deci fiecare cea mai mică presiune și cea mai mare viteză este extrema peste zi, la ora afișată. Conducta principală mai mare ridică cea mai mică presiune cu aproximativ 1 psi. Un multiplicator de 1,8 o coboară la 15,77 psi la 9:00, iar cea mai mare viteză trece la Conducta 10. Fiecare scenariu conține o valoare specifică, iar Bază își păstrează valorile.</p>';
+$ec_lang['lpn_guide_scn_notes_term']='Puncte de reținut';
+$ec_lang['lpn_guide_scn_notes_def']='<ul><li>O valoare specifică egală cu valoarea moștenită este tot o valoare specifică. Este numărată, iar Manager de valori specifice o marchează (aceeași).</li><li>Mod de bază este o setare pentru acest browser, nu pentru proiect. Este dezactivat pentru un proiect ale cărui scenarii și alternative nu le poate arăta. Alternativele și Managerul de scenarii sunt descrise în ajutorul din partea de sus a acestei intrări.</li><li>Anulare păstrează 20 de pași. Fiecare pas restabilește scenariile și scenariul deschis odată cu desenul, deci adăugarea, redenumirea și ștergerea unui scenariu pot fi anulate.</li><li>Exportul unui fișier EPANET scrie numai scenariul deschis, cu valorile și pozițiile nodurilor pe care le citește acel scenariu. Scenariile în sine sunt înregistrate numai în fișierul proiectului.</li></ul>';
+// The Scenario comparison chapter beyond its opening paragraphs (lpn_guide_text_scncmp_box), copied into
+// the box's entry by renderGuideBoxes() from <template id="lpn_guide_more_lpn_scncmp_box">. Task 785.
+$ec_lang['lpn_guide_cmp_cols_term']='Ce conține tabelul';
+$ec_lang['lpn_guide_cmp_cols_def']='<table class="lpn-notes-table"><tbody><tr><td>Scenariu</td><td>Numele scenariului. Scenariul deschis este marcat (deschis acum).</td></tr><tr><td>Nr. de valori specifice</td><td>Valorile specifice ale scenariului însuși, numărate ca în lista Scenarii. O opțiune de calcul, cum este multiplicatorul cerinței, se numără ca una, și se numără și o valoare specifică egală cu cea moștenită.</td></tr><tr><td>Multiplicator de cerință, Durata totală de rulare, Pas de timp hidraulic</td><td>Valorile cu care a fost rezolvat scenariul, ale lui proprii sau ale proiectului. Un scenariu în regim permanent arată o liniuță pentru pasul de timp.</td></tr><tr><td>Cea mai mică presiune</td><td>Cea mai mică presiune dintr-o joncțiune, cu ID-ul ei și momentul în care apare. Rezervoarele și bazinele sunt omise, deoarece fiecare are o sarcină fixă.</td></tr><tr><td>Cea mai mare viteză</td><td>Cea mai mare viteză dintr-o conductă sau o vană, cu ID-ul ei și momentul în care apare. Pompele sunt omise.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_cmp_run_term']='Scenarii în regim permanent și pe perioadă extinsă';
+$ec_lang['lpn_guide_cmp_run_def']='<p>Un scenariu cu o Durată totală de rulare mai mare decât 0 este rulat pe toată perioada prin motorul EPANET. Cea mai mică presiune și cea mai mare viteză ale sale sunt extremele peste fiecare pas de timp, fiecare afișată cu momentul ei. Un scenariu cu o Durată totală de rulare 0 este rezolvat la un singur moment. Durata totală de rulare este una dintre opțiunile pe care un scenariu le poate înlocui, deci un singur tabel poate conține ambele feluri.</p>';
+$ec_lang['lpn_guide_cmp_notes_term']='Puncte de reținut';
+$ec_lang['lpn_guide_cmp_notes_def']='<ul><li>Un scenariu care nu poate fi rezolvat arată motivul în locul celor două rezultate ale sale, de exemplu că o joncțiune nu are drum către o sursă după ce o conductă a fost făcută inactivă. Celelalte scenarii sunt rezolvate în continuare. Un scenariu care nu a convers arată ultimele sale rezultate și un mesaj.</li><li>Blocul de deasupra tabelului, La fel în fiecare scenariu, indică metoda de frecare, unitățile, acuratețea și numărul maxim de încercări. O setare care diferă între scenarii este omisă din bloc.</li><li>Nu există prag de reușită sau eșec. Citiți numerele în raport cu criteriile de proiectare ale sistemului modelat.</li><li>Exemplul din intrarea Manager de scenarii compară trei scenarii pe Net1.</li></ul>';
+// The Libraries chapter, in the entry for the Libraries box (Task 785), copied in by renderGuideBoxes() from
+// <template id="lpn_guide_more_lpn_library_box">. Written from the code and held by
+// dev/lpn-spike/user-guide-library-harness.js.
+$ec_lang['lpn_guide_lib_kinds_term']='Ce conține fiecare secțiune';
+$ec_lang['lpn_guide_lib_kinds_def']='<table class="lpn-notes-table"><tbody><tr><td>Modele</td><td>O listă de multiplicatori care se repetă cât timp durează o rulare, câte un multiplicator pentru fiecare pas de timp al modelului. Un model nou are 24 de multiplicatori de 1. Lipirea unei coloane de foaie de calcul umple caseta Multiplicatori. Modelul implicit al cerinței este marcat (implicit) și se alege în Setări, Calcul, Hidraulică.</td></tr><tr><td>Curbe</td><td>Patru feluri, alese ca Tip de curbă: Sarcină pompă, Eficiență pompă, Volum bazin și Pierdere de sarcină vană. Punctele se introduc într-un grilaj care acceptă o coloană lipită dintr-o foaie de calcul sau rânduri copiate dintr-un fișier EPANET. O curbă de sarcină a pompei este ajustată prin punctele ei, iar linia Ecuație arată ajustarea; un punct este citit ca punct de proiectare, cu o sarcină la debit zero de 1,33334 ori sarcina lui și un debit maxim de 2 ori debitul lui, așa cum îl citește EPANET. Celelalte feluri unesc punctele cu linii drepte. O pompă sau o vană își indică curba în Proprietăți, unde linkul Curbe deschide această secțiune.</td></tr><tr><td>Tipuri de conductă</td><td>O definiție de diametru, rugozitate și coeficienți de reacție la care fac trimitere mai multe conducte. O proprietate poate fi lăsată necompletată în definiție și apoi introdusă pentru fiecare conductă. În Proprietăți, valorile pe care le indică un tip de conductă sunt dezactivate, iar Detașează de tipul de conductă le copiază în conductă și oprește conducta să mai folosească tipul.</td></tr><tr><td>Fitinguri</td><td>Liste de fitinguri cu o cantitate pentru fiecare, adunate într-un singur coeficient de pierdere locală (minoră), k, pentru o conductă sau un tip de conductă. Fitingurile oferite sunt cele treisprezece din Tabelul 3.3 din manualul de utilizare EPANET 2.2 și Alt fiting. Alegerea unuia copiază coeficientul lui în rând, unde poate fi schimbat.</td></tr><tr><td>Comenzi</td><td>Câte o instrucțiune, în sintaxa EPANET, ca în <code>LINK id OPEN IF NODE id BELOW value</code>. Sub fiecare, caseta indică dacă a fost înțeleasă.</td></tr><tr><td>Reguli</td><td>Mai multe rânduri fiecare, în sintaxa EPANET: RULE, IF, AND, OR, THEN, ELSE și PRIORITY. Sub fiecare, caseta indică dacă a fost citită.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_lib_refs_term']='Redenumirea, ștergerea și ce face trimitere la un articol';
+$ec_lang['lpn_guide_lib_refs_def']='<p>Un ID se schimbă în secțiunea lui. Un ID necompletat sau un ID deja folosit în aceeași secțiune nu este acceptat. Redenumirea unui articol mută fiecare trimitere la el, în Bază și în fiecare scenariu. Pentru un model, trimiterile sunt modelul cerinței unei joncțiuni și modelul fiecărei categorii de cerință a ei, modelul cerinței unui Abonat, modelul de sarcină al unui rezervor, modelul de turație al unei pompe și modelul implicit al cerinței.</p><p>Un model care este folosit poate fi șters, iar fiecare trimitere la el este eliminată. Dacă era modelul implicit al cerinței, o notificare spune ce folosesc acum joncțiunile fără model. O curbă, un tip de conductă sau o listă de fitinguri care este folosită nu se șterge. Mesajul numește elementele care o folosesc, iar fiecăruia trebuie să i se dea întâi altă curbă sau trebuie detașat de tip ori de listă.</p>';
+$ec_lang['lpn_guide_lib_scn_term']='Bibliotecile și scenariile';
+$ec_lang['lpn_guide_lib_scn_def']='<p>Bibliotecile sunt aceleași în fiecare scenariu. Un scenariu poate îndrepta un element către o altă curbă, un alt tip de conductă, o altă listă de fitinguri sau un alt model, ceea ce este o valoare specifică a acelui element, dar conținutul unui articol nu este înlocuit. O modificare a unui model, a unei curbe, a unui tip de conductă, a unei liste de fitinguri, a unei comenzi sau a unei reguli o schimbă pentru fiecare scenariu, indiferent ce scenariu este deschis. Modelul implicit al cerinței este o setare, nu un articol, iar un scenariu își poate avea propriul model.</p><p>O comandă sau o regulă care numește un element inactiv în scenariul deschis este ignorată în rularea acelui scenariu, iar caseta Biblioteci o listează. Una care numește un element pe care proiectul nu îl are este de asemenea ignorată, cu un avertisment.</p>';
+$ec_lang['lpn_guide_lib_ctl_term']='Comenzile și regulile într-o rulare';
+$ec_lang['lpn_guide_lib_ctl_def']='<p>O comandă este o singură instrucțiune. O regulă este formată din mai multe rânduri care încep cu RULE. Cuvintele-cheie se tastează în engleză indiferent de limba paginii, iar numerele sunt în unitățile proiectului. Adaugă o comandă pornește de la o instrucțiune construită din rețea, care este apoi modificată în cea dorită.</p><p>Comenzile și regulile schimbă un rezultat numai într-o simulare pe perioadă extinsă, adică atunci când Durata totală de rulare este mai mare decât 0. O soluție în regim permanent nu este schimbată de niciuna. Regulile sunt aplicate numai de motorul EPANET. Ambele sunt salvate cu proiectul și scrise într-un fișier EPANET.</p>';
+$ec_lang['lpn_guide_lib_import_term']='Importul de biblioteci dintr-un alt proiect';
+$ec_lang['lpn_guide_lib_import_def']='<p>Fișier, Importare…, Importă biblioteci… deschide un alt fișier de proiect și copiază din el biblioteci întregi în acest proiect. Un articol al cărui nume este deja folosit aici este omis și listat, deci nimic din ce există deja nu este schimbat. Un avertisment este afișat când fișierul și proiectul indică o mărime în unități diferite, iar articolele sunt importate așa cum sunt scrise. Tipurile de conductă care fac trimitere la o listă de fitinguri pe care acest proiect nu o are sunt listate; importați biblioteca de fitinguri din același fișier pentru a le rezolva.</p>';
+$ec_lang['lpn_guide_lib_example_term']='Exemplu pe Net1';
+$ec_lang['lpn_guide_lib_example_def']='<p>Deschideți exemplul Net1 și alegeți Apă, Biblioteci. Modele conține modelul 1, Demand Pattern, cu 12 multiplicatori la intervale de 2:00, acoperind 24:00, marcat (implicit). Curbe conține curba 1, Pump Curve for Pump 9, o curbă de sarcină a pompei cu un punct, 1500 gpm la 250 ft. Comenzi conține două instrucțiuni: prima deschide Legătura 9 când Nodul 2 scade sub 110, iar a doua o închide când Nodul 2 urcă peste 140. Reguli conține două reguli care testează ora ceasului și nivelul Bazinului 2.</p><p>Alegeți Apă, Calculează, apoi Apă, Rapoarte, Modificări de stare. Pompa L9 este acum închisă la 10:00, acum deschisă la 15:00 și acum închisă la 21:00, iar Bazinul N2 se golește acum la 22:00. În Comenzi, schimbați 140 în 135 în a doua comandă și alegeți din nou Apă, Calculează. Ultima închidere se mută la 20:00, iar Bazinul N2 se golește acum la 21:00.</p>';
+$ec_lang['lpn_guide_lib_notes_term']='Puncte de reținut';
+$ec_lang['lpn_guide_lib_notes_def']='<ul><li>Un model se repetă cât timp durează o rulare, deci nu trebuie să acopere toată rularea.</li><li>Un fișier EPANET nu are loc pentru un tip de conductă sau o listă de fitinguri. Fișierul poartă numerele pe care le citește fiecare conductă, iar exportul spune ce conducte au fost aplatizate.</li><li>Poziția și dimensiunea casetei Biblioteci sunt păstrate în acest browser. Articolele sunt salvate cu proiectul.</li></ul>';
+// The Properties chapter, in the entry for the Properties box (Task 785), copied in by renderGuideBoxes() from
+// <template id="lpn_guide_more_lpn_popup">. Held by dev/lpn-spike/user-guide-properties-harness.js.
+$ec_lang['lpn_guide_prop_open_term']='Deschiderea Proprietăților';
+$ec_lang['lpn_guide_prop_open_def']='<p>În modul Selectare, faceți clic pe un nod, o legătură, un Text sau un Abonat pentru a deschide Proprietățile lângă el sau acolo unde a fost mutată caseta ultima dată. Shift+clic pe alt element îl adaugă la selecție. Cu mai multe elemente selectate, caseta listează ce se poate stabili pe toate deodată (vedeți Mai multe elemente selectate, mai jos). O Figură nu are casetă Proprietăți, deoarece punctele ei se editează pe hartă.</p><p>Meniul clic dreapta al unui nod sau al unei legături are Copiază proprietățile, Lipește proprietățile în selecție și Grafic de serii de timp. Pe un ecran tactil, apăsați lung elementul pentru același meniu. Graficul de serii de timp are nevoie de rezultatele unei simulări pe perioadă extinsă.</p>';
+$ec_lang['lpn_guide_prop_edit_term']='Editarea unei valori';
+$ec_lang['lpn_guide_prop_edit_def']='<p>O valoare intră în vigoare când câmpul este confirmat, prin părăsirea lui sau apăsarea tastei Enter. Este citită în unitatea indicată în eticheta ei, fără conversie, iar eticheta de pe hartă, Tabelele și rezultatele o urmează. Valorile calculate sunt rânduri numai pentru citire, fără casetă de tastare. Pentru o legătură ele urmează valorile ei de intrare, iar pentru un nod se află printre ele. Sunt rezultatele ultimului calcul, la momentul afișat, iar cu Recalculează automat debifat sunt cele ale ultimului Calculează.</p><p>O conductă care folosește un tip de conductă arată ca dezactivate valorile pe care le indică tipul. Faceți clic pe Detașează de tipul de conductă pentru a copia acele valori în conductă și a le edita acolo.</p>';
+$ec_lang['lpn_guide_prop_id_term']='ID-ul';
+$ec_lang['lpn_guide_prop_id_def']='<p>ID-ul se editează în bara de titlu. Nu poate conține spațiu sau ghilimele, iar ID-ul unui nod nu poate fi al altui nod, nici ID-ul unei legături al altei legături. Un nod și o legătură pot avea același ID. Un ID refuzat lasă la locul lui ID-ul vechi și afișează un mesaj. Redenumirea unui element duce cu ea valorile lui specifice din scenarii.</p>';
+$ec_lang['lpn_guide_prop_scn_term']='Într-un scenariu';
+$ec_lang['lpn_guide_prop_scn_def']='<p>Într-un alt scenariu decât Bază, o modificare a unei valori pe care scenariile o pot înlocui este stocată ca valoare specifică a scenariului deschis, iar rândul este marcat în stânga. Intrarea Manager de scenarii descrie mărcile și listează ce este la fel în fiecare scenariu: ID-ul, Descrierea și Marcajul sunt. Un Abonat nu are valori de scenariu. Comutarea între scenarii lasă Proprietățile deschise pe același element, arătând valorile scenariului care este acum deschis.</p>';
+$ec_lang['lpn_guide_prop_multi_term']='Mai multe elemente selectate';
+$ec_lang['lpn_guide_prop_multi_def']='<p>Titlul spune, de exemplu, 2 selectate. Caseta are câte o secțiune pentru fiecare tip de element din selecție, cu titlul format din numele tipului și numărul de elemente de acest tip, ca în Conducte (2), iar fiecare secțiune poate fi restrânsă. O secțiune listează proprietățile pe care Tabelele le au drept coloane și care se pot stabili pe fiecare element din ea. Rezultatele și valorile pe care le indică un tip de conductă nu sunt listate. Un rând arată valoarea comună elementelor sau Diverse acolo unde diferă.</p><p>Tastarea unei valori într-un rând o stabilește pe fiecare element de acel tip din selecție. Un rând care nu a fost atins nu scrie nimic. O notificare indică numărul, ca în S-a setat Diametru (in) pe 2., iar o singură Anulare inversează tot rândul. Într-un alt scenariu decât Bază valorile sunt stocate ca valori specifice.</p>';
+$ec_lang['lpn_guide_prop_example_term']='Exemplu pe Net1';
+$ec_lang['lpn_guide_prop_example_def']='<p>Deschideți exemplul Net1 și faceți clic pe Conducta 10. Proprietăți listează valorile ei de intrare, de la Descriere până la Activ?, apoi rezultatele ei la momentul afișat: Debit 1866,2 gpm, Viteză 2,4 ft/s și Pierdere de sarcină 19,12 ft H2O.</p><p>Faceți clic pe Conducta 113 și Shift+clic pe Conducta 31. Titlul spune 2 selectate, singura secțiune este Conducte (2), iar Diametru arată Diverse, deoarece Conducta 31 are 6 in, iar Conducta 113 are 8 in. Introduceți 10 pentru Diametru. Notificarea spune S-a setat Diametru (in) pe 2., ambele conducte au 10 in, iar o singură Anulare le readuce la 6 și 8 in.</p>';
+// The Settings chapter, in the entry for the Settings box (Task 785), copied in by renderGuideBoxes() from
+// <template id="lpn_guide_more_lpn_settings_box">. Held by dev/lpn-spike/user-guide-settings-harness.js.
+$ec_lang['lpn_guide_set_where_term']='Secțiunile și locul unde sunt salvate setările';
+$ec_lang['lpn_guide_set_where_def']='<p>Lista din stânga casetei sare la o secțiune sau la un subtitlu. Secțiunile sunt Vizualizare (Etichete noduri, Culori noduri, Etichete legături, Culori legături, Abonat și Toate), Hartă și pagină (Aspect și Pagină), Elemente (Prefixe ID, Valori la creare și Proprietăți personalizate), Calcul (Unități, Timp, Hidraulică, Energie și Calitate) și Credite. Fiecare subtitlu indică dacă setările lui sunt Salvate cu proiectul sau Salvate în acest browser. Totul este salvat cu proiectul, cu excepția setărilor de la Pagină și a unui rând din Hidraulică, Arată caseta de progres a rulării, care indică el însuși Salvat în acest browser.</p><p>Fila Setări din Tabele listează aceleași setări ca rânduri, cu Categoria și Valoarea lor, deci o setare poate fi găsită și verificată și acolo.</p>';
+$ec_lang['lpn_guide_set_search_term']='Căutarea';
+$ec_lang['lpn_guide_set_search_def']='<p>Tastați unul sau mai multe cuvinte în Căutare în setări pentru a lista doar setările care le menționează pe toate, în nume sau în sfat. Un cuvânt care se potrivește cu un titlu arată fiecare setare de sub acel titlu. De exemplu, opacity listează Opacitate simbol (0 până la 1) și Opacitate imagine de fundal (0 până la 1); opacity symbol o listează numai pe prima; iar sprinklers listează Exponent emițător, al cărui sfat menționează sprinklers, iar numele nu. Căutarea nu schimbă nicio setare.</p>';
+$ec_lang['lpn_guide_set_scn_term']='Setările într-un scenariu';
+$ec_lang['lpn_guide_set_scn_def']='<p>Într-un alt scenariu decât Bază, o valoare tastată pentru o setare pe care scenariile o pot înlocui este stocată ca valoare specifică, iar rândul este marcat cu un punct plin. Un triunghi marchează o setare pe care o înlocuiesc scenariile de sub cel deschis. Intrarea Manager de scenarii listează ce setări pot fi înlocuite. Unitățile sunt aceleași în fiecare scenariu. Restabilește valorile implicite este estompat în afara scenariului Bază, iar Aplică aceste valori pentru elemente noi la fiecare element existent este refuzat acolo, deoarece schimbă desenul însuși.</p>';
+$ec_lang['lpn_guide_set_units_term']='Schimbarea unei unități';
+$ec_lang['lpn_guide_set_units_def']='<p>Fiecare mărime are propria unitate în Unități. Când valorile din proiect sunt introduse în acea unitate, schimbarea ei pune mai întâi o întrebare. Nedistructiv păstrează fiecare număr așa cum a fost tastat și îl citește în noua unitate. Distructiv rescrie numerele prin conversie, astfel încât rețeaua rămâne fizic aceeași, iar numerele originale se pierd dacă nu se folosește Anulare; o singură Anulare restabilește numerele și unitatea. Anulează lasă totul așa cum era.</p><p>Exemplu pe Net1: alegeți mm pentru Diametru în Unități. Distructiv rescrie 13 valori, iar Conducta 10 se citește 457,2 mm. Nedistructiv lasă cele 13 valori neatinse, iar Conducta 10 se citește 18 mm.</p>';
+$ec_lang['lpn_guide_set_assets_term']='Elemente noi și aplicarea valorilor la cele existente';
+$ec_lang['lpn_guide_set_assets_def']='<p>Prefixele ID și Valori la creare sunt pentru elementele desenate de acum înainte. Nu schimbă elementele deja desenate. Aplică la toate, lângă un prefix ID, dă fiecărui element existent de acel fel un ID care începe cu prefixul; fiecare își păstrează numărul, iar un ID care nu se termină cu un număr nu este schimbat. Aplică aceste valori pentru elemente noi la fiecare element existent înlocuiește acele proprietăți pe fiecare element existent, după o întrebare, dar numai pentru proprietățile ale căror etichete sunt afișate pe hartă. Anulare o inversează.</p>';
+$ec_lang['lpn_guide_set_reset_term']='Restabilește valorile implicite și Începeți din nou';
+$ec_lang['lpn_guide_set_reset_def']='<p>Restabilește valorile implicite întreabă mai întâi, apoi readuce la valorile lor originale prefixele ID, valorile la creare ale elementelor noi, setările rezolvitorului, aspectul hărții, poziția legendei și etichetele vizibile ale proiectului deschis. Rețeaua nu este schimbată, alte proiecte nu sunt afectate, iar o singură Anulare readuce setările.</p><p>Începeți din nou întreabă mai întâi, apoi șterge fiecare proiect, fiecare imagine de fundal, toate setările și alegerile de unități salvate în acest browser și reîncarcă pagina așa cum ar vedea-o un vizitator nou. Nu poate fi anulat.</p>';
+// The Toolbar chapter (Task 785), terms in the Toolbar section above its rows. Held by
+// dev/lpn-spike/user-guide-toolbar-harness.js.
+$ec_lang['lpn_guide_tb_row_term']='Citirea unui rând';
+$ec_lang['lpn_guide_tb_row_def']='<p>Fiecare rând este un buton al barei de instrumente, în ordinea benzii, cu o linie între grupuri. Un rând arată pictograma, numele și sfatul butonului, apoi tastele lui. Acolo unde un rând de meniu face același lucru, rândul arată și calea meniului după cuvintele De asemenea în. Un clic pe un rând indică butonul de pe bara de instrumente. Nu rulează niciodată butonul. Când butonul nu este pe ecran, rândul deschide rândul de meniu care face același lucru.</p>';
+$ec_lang['lpn_guide_tb_dim_term']='Nume estompate';
+$ec_lang['lpn_guide_tb_dim_def']='<p>Un nume estompat aparține unui buton care nu este acum pe ecran. Un buton care este pe ecran nu este estompat, indiferent dacă poate acționa sau nu în acel moment. Calculează este estompat cât timp Recalculează automat este bifat, deoarece butonul apare doar când acea setare este debifată.</p><p>Pe un telefon în modul vertical, doar cele cinci comenzi de rulare rămân pe bara de instrumente. Fiecare alt nume este estompat, iar un clic pe unul deschide rândul de meniu care face același lucru. Butonul Panou inferior nu are rând de meniu, deci rândul lui poate spune doar că controlul nu este pe ecran.</p>';
+$ec_lang['lpn_guide_tb_two_term']='Butoane cu un triunghi în colț';
+$ec_lang['lpn_guide_tb_two_def']='<p>Încadrează tot și Selectați o fereastră au un mic triunghi în colțul din dreapta jos. Apăsarea butonului a doua oară, fără nimic apăsat între timp, îl schimbă: Încadrează tot devine Zoom fereastră, iar Selectați o fereastră trece ciclic prin formele de fereastră, lasou și poligon. Un clic pe colțul butonului Încadrează tot intră imediat în Zoom fereastră, fără a încadra vizualizarea.</p>';
+// The Menus chapter (Task 785), two terms after the ruled keys table. Held by dev/lpn-spike/user-guide-menus-harness.js.
+$ec_lang['lpn_guide_mn_list_term']='Citirea listei de meniuri';
+$ec_lang['lpn_guide_mn_list_def']='<p>Lista este desenată din meniurile însele: Fișier, Editare, Hartă, Apă și Ajutor, fiecare sub propriul titlu, cu rândurile unui submeniu indentate sub rândul care îl deschide și cu o linie între grupuri. Omite rândurile ascunse acum, titlurile din interiorul unui meniu și rândurile numite după proiect sau browser, cum sunt numele scenariilor. Merge la un submeniu adâncime și nu are intrare pentru meniul Limbă. Un rând dezactivat acum este totuși listat, fără nicio marcă care să arate că este dezactivat. Un clic pe un rând deschide meniul și submeniul cu acel rând indicat. Nu rulează niciodată rândul.</p>';
+$ec_lang['lpn_guide_mn_kbd_term']='Meniurile de la tastatură';
+$ec_lang['lpn_guide_mn_kbd_def']='<p>Literele de după Alt+Shift sunt taste la poziții fixe, F pentru Fișier, E pentru Editare, M pentru Hartă, W pentru Apă, H pentru Ajutor și L pentru Limbă, pe orice aranjament de tastatură și în orice limbă. După F10, litera unui meniu singură îl deschide, iar Esc pe bara de meniuri readuce focalizarea unde era.</p><p>Rândurile pe care le poate folosi doar un indicator nu au literă, iar tastele săgeată le sar. Printre ele sunt Vârfuri, cele trei selecții de zonă, instrumentele de Inserare, Zoom fereastră și Captură de ecran.</p>';
+// The Map chapter (Task 785): terms after the ruled keys table. Held by dev/lpn-spike/user-guide-map-harness.js.
+$ec_lang['lpn_guide_map_undo_term']='Anulare și Refacere';
+$ec_lang['lpn_guide_map_undo_def']='<p>Ctrl+Z anulează ultima modificare, iar Ctrl+Y sau Ctrl+Shift+Z o reface. Într-o celulă din Tabele, tastele aparțin proiectului cât timp celula este doar selectată și textului celulei după ce a început tastarea. Pagina păstrează ultimii 20 de pași, numai în memorie, iar comutarea între proiecte îi șterge. Un pas restabilește scenariile, scenariul deschis și unitățile odată cu desenul.</p>';
+$ec_lang['lpn_guide_map_del_term']='Ștergere';
+$ec_lang['lpn_guide_map_del_def']='<p>Delete sau Backspace șterge selecția, cu excepția timpului în care se tastează într-un câmp, unde tasta aparține câmpului. Cu nimic selectat, Delete spune acest lucru, iar Backspace nu face nimic. O singură Anulare inversează ștergerea mai multor elemente. Într-un alt scenariu decât Bază, Delete nu elimină un element care există în Bază; intrarea Manager de scenarii descrie ce face.</p>';
+$ec_lang['lpn_guide_map_esc_term']='Esc';
+$ec_lang['lpn_guide_map_esc_def']='<p>Un Esc care închide un meniu, o listă derulantă sau o casetă nu face altceva. Casetele Proprietăți, Setări și Biblioteci se închid doar când focalizarea este în casetă și indicatorul este deasupra ei. Fără niciuna dintre acestea deschisă, Esc readuce instrumentul activ la Selectare, iar în Selectare șterge selecția. O conductă desenată pe jumătate cere un Esc pentru a fi abandonată și un al doilea pentru a reveni la Selectare. Într-un câmp, Esc aparține câmpului.</p>';
+$ec_lang['lpn_guide_map_letters_term']='Litere, cifre și taste de zoom';
+$ec_lang['lpn_guide_map_letters_def']='<p>W pornește Zoom fereastră, A pornește selectarea unei zone (o nouă apăsare a lui A trece ciclic prin fereastră, lasou și poligon), iar F desenează o Figură. Tasta plus sau egal mărește, iar tasta minus micșorează, cu un pas al rotiței. Aceste taste și cifrele de la 0 la 9 nu fac nimic pe hartă când o altă tastă le face o comandă rapidă, cum este Ctrl+C, nu fac nimic cât timp se tastează într-un câmp și lasă literele unui meniu deschis rândurilor lui. O cifră tastată pe o celulă selectată din Tabele suprascrie celula în loc să aleagă un instrument.</p>';
+// The Tables chapter (Task 785): terms after the two ruled key tables. Held by dev/lpn-spike/user-guide-tables-harness.js.
+$ec_lang['lpn_guide_tbl_tabs_term']='Filele';
+$ec_lang['lpn_guide_tbl_tabs_def']='<p>Pentru a deschide panoul, faceți clic pe butonul Panou inferior sau alegeți Apă, Tabele. Filele lui, de la stânga la dreapta, sunt Joncțiuni, Rezervoare, Bazine, Conducte, Pompe, Vane, Text, Abonați, Figuri, Setări, Scenarii, Serii de timp, Profil, Frecvență și Bilanț de debit. Fila Scenarii este afișată când Mod de bază este debifat. Lățimea, ordinea și vizibilitatea coloanelor sunt păstrate în acest browser, nu în proiect.</p>';
+$ec_lang['lpn_guide_tbl_cell_term']='Selectarea, introducerea și editarea unei celule';
+$ec_lang['lpn_guide_tbl_cell_def']='<p>O celulă se află într-una din trei stări. Cât timp este doar selectată, tastele săgeată se mută de la o celulă la alta, iar Ctrl+Z este Anularea proiectului. Tastarea unui caracter peste o celulă selectată începe o introducere: textul tastat înlocuiește valoarea, iar o tastă săgeată o confirmă și trece la celula următoare. F2 sau dublu clic deschide celula pentru editare: cursorul de text este în valoare, iar tastele săgeată mută cursorul. Într-o introducere și într-o editare, Ctrl+Z anulează tastarea. Esc anulează introducerea sau editarea și lasă celula selectată.</p>';
+$ec_lang['lpn_guide_tbl_fill_term']='Umplerea, filtrele și scenariile';
+$ec_lang['lpn_guide_tbl_fill_def']='<p>Ctrl+D umple în jos o zonă selectată pornind de la rândul ei de sus, iar Ctrl+Enter o umple cu valoarea celulei active. Ambele lasă neatinse coloana ID și celulele numai pentru citire, iar o notificare spune câte celule au fost umplute și câte nu au fost schimbate. Ctrl+Shift+L arată doar elementele selectate pe hartă. Cu un filtru activ, Ctrl+A și Ctrl+D acționează doar asupra rândurilor afișate, iar un rând editat astfel încât să nu se mai potrivească rămâne până când filtrul este aplicat din nou.</p><p>Într-un alt scenariu decât Bază, o editare de celulă, Ctrl+D, Ctrl+Enter și o lipire sunt stocate ca valori specifice ale scenariului deschis.</p>';
+// The Boxes chapter (Task 785): terms after Tom's two paragraphs. Held by dev/lpn-spike/user-guide-boxes-harness.js.
+$ec_lang['lpn_guide_bx_dock_term']='Ancorarea și filele';
+$ec_lang['lpn_guide_bx_dock_def']='<p>Colțul barei de titlu a unei casete are Ancorare în stânga hărții, Ancorare în dreapta hărții și Flotant și, după ce caseta este ancorată, Ascundere automată. O casetă ancorată este o coloană lângă hartă. Cu Ascundere automată, este o filă pe o bandă îngustă la marginea hărții. Fila deschide caseta la trecerea cursorului, după 150 ms cu un mouse sau un stilou, sau la un clic ori o atingere, iar caseta se retrage înapoi în filă așa cum s-a descris mai sus. O casetă retrasă este totuși deschisă. Un rând de meniu sau un buton al barei de instrumente care o deschide o scoate din filă.</p><p>Tragerea unei casete ancorate de bara ei de titlu o face flotantă și oprește ascunderea automată. Casetele ancorate pe o parte au aceeași lățime, iar harta păstrează cel puțin 320 px. Filele se reordonează trăgându-le sau apăsând Alt+Sus ori Alt+Jos pe o filă focalizată.</p>';
+$ec_lang['lpn_guide_bx_keep_term']='Ce își amintește o casetă';
+$ec_lang['lpn_guide_bx_keep_def']='<p>Fiecare casetă păstrează în acest browser locul unde plutește, dimensiunea, dacă este deschisă, partea de ancorare, dacă se ascunde automat, lățimea ancorată și locul filei ei. Proprietăți, Criticitate: analiză, Cerință: scalare și Calibrare păstrează doar partea de ancorare, ascunderea automată, locul filei și dacă sunt deschise; locul unde plutesc durează cât o încărcare a paginii. Un browser fără aranjament salvat pornește cu unele casete ancorate ca file, și nimic nu este stocat până când o casetă este schimbată.</p>';
+$ec_lang['lpn_guide_bx_phone_term']='Pe un telefon';
+$ec_lang['lpn_guide_bx_phone_def']='<p>La 640 px sau mai îngust, nicio casetă nu se ancorează și fiecare casetă umple fereastra. Butoanele de ancorare nu sunt oferite. Un aranjament ancorat este păstrat și revine pe o fereastră mai lată.</p>';
+// The Fire flow analysis chapter (Task 785), in the entry for its box. Held by dev/lpn-spike/user-guide-fireflow-harness.js.
+$ec_lang['lpn_guide_ff_asks_term']='Ce se cere de la fiecare joncțiune';
+$ec_lang['lpn_guide_ff_asks_def']='<p>Fiecare joncțiune testată primește două teste, pe o copie a rețelei la pasul de timp de pe ecran și în scenariul deschis. Primul întreabă cât debit poate livra joncțiunea cât timp menține presiunea reziduală. Un debit este preluat la joncțiune, iar rezolvările repetate îl restrâng, până la un plafon egal cu 10000 gpm. O joncțiune care menține totuși presiunea reziduală la plafon este raportată ca livrând mai mult decât plafonul. Al doilea test, verificarea de proiectare, preia debitul necesar la joncțiune și întreabă dacă vreo altă joncțiune din domeniul ei scade sub Cea mai mică presiune permisă în altă parte sau dacă vreo conductă din domeniul ei depășește Cea mai mare viteză permisă. Verificarea de proiectare nu se face când domeniul ei este Niciuna.</p><p>O joncțiune cu propria proprietate Debit de incendiu necesar este testată față de acea valoare, iar fiecare altă joncțiune față de valoarea din casetă.</p>';
+$ec_lang['lpn_guide_ff_result_term']='Citirea rezultatelor';
+$ec_lang['lpn_guide_ff_result_def']='<p>Rezumatul numără joncțiunile care au trecut toate verificările, joncțiunile care au picat la debitul de incendiu și joncțiunile care au afectat restul sistemului. Tabelul listează, pentru fiecare joncțiune testată, Presiunea statică înainte de preluarea oricărui debit de incendiu, Debitul necesar, Presiunea la debit necesar, Debitul disponibil, Reziduala menținută, Cel mai grav efect și Limita de proiectare ale verificării de proiectare, numărul de Rulări, adică numărul de rezolvări ale întregii rețele, și Modurile de eșec. O celulă fără număr arată o liniuță, niciodată un zero. O joncțiune care nu a putut fi rezolvată arată motivul ei în locul numerelor. Tabelul tipărește cel mult 200 de joncțiuni și spune câte nu a tipărit.</p>';
+$ec_lang['lpn_guide_ff_marks_term']='Inelele, Oprește și o singură analiză la un moment dat';
+$ec_lang['lpn_guide_ff_marks_def']='<p>După o rulare, cercul fiecărei joncțiuni testate este conturat pe hartă după rezultatul ei, iar conturele diferă prin modelul liniei întrerupte, nu doar prin culoare. Alegeți Joncțiunile selectate pentru a testa doar joncțiunile selectate pe hartă; orice altceva selectat este numărat și nu este testat. Oprește încheie o rulare și păstrează joncțiunile deja terminate. Doar una dintre analizele debit de incendiu, criticitate și scalarea cerinței rulează la un moment dat.</p>';
+$ec_lang['lpn_guide_ff_example_term']='Exemplu pe Net1';
+$ec_lang['lpn_guide_ff_example_def']='<p>Deschideți exemplul Net1, alegeți Apă, Analiză, Analiza debitului de incendiu… și faceți clic pe Rulează cu caseta așa cum se deschide. Pasul de timp este 0:00, iar rularea rezolvă întreaga rețea de 135 de ori. Opt din cele nouă joncțiuni trec toate verificările. Joncțiunea N32 pică la debitul de incendiu: presiunea ei statică este 111 psi, rămân doar 1,19 psi la cei 1000 gpm necesari, iar debitul ei disponibil este 892 gpm. Joncțiunea N31 poate livra 1339 gpm, iar Joncțiunea N12 mai mult de 10000 gpm.</p>';
+// The Criticality analysis chapter (Task 785). Held by dev/lpn-spike/user-guide-criticality-harness.js.
+$ec_lang['lpn_guide_cr_case_term']='Ce face fiecare caz';
+$ec_lang['lpn_guide_cr_case_def']='<p>Pentru fiecare legătură din domeniu, legătura este făcută inactivă pe o copie a rețelei, iar copia este rezolvată la pasul de timp de pe ecran în scenariul deschis. O rulare înseamnă o rezolvare pentru fiecare legătură și încă una fără nimic defect. O joncțiune rămasă fără drum deschis către un rezervor sau un bazin este izolată: este eliminată înainte de rezolvare, iar cerința ei este numărată ca Cerință neservită. Dintre joncțiunile încă conectate, Joncțiuni sub minim listează pe cele a căror presiune scade sub Cea mai mică presiune permisă. O joncțiune care este deja sub ea cu nimic defect nu este numărată față de nicio legătură, iar rezumatul spune câte sunt. Cea mai mică presiune permisă este aceeași setare ca și caseta Cea mai mică presiune permisă în altă parte din Debit de incendiu: analiză.</p>';
+$ec_lang['lpn_guide_cr_dead_term']='Capetele moarte și lista';
+$ec_lang['lpn_guide_cr_dead_def']='<p>O legătură de capăt mort este una a cărei eliminare izolează joncțiuni care pot fi atinse doar prin ea. Tot ce se află dincolo de ea este pierderea ei, deci cu Omite capetele moarte bifat legătura nu este rezolvată, iar rezumatul spune câte au fost omise. Lista arată, pentru fiecare legătură, Cerința neservită, Joncțiunile izolate și Joncțiunile sub minim, fiecare cu numărul și primele cinci ID-uri, iar un clic pe un ID merge la el pe hartă. Legăturile care costă ceva sistemul sunt listate primele până când se face clic pe un titlu de coloană pentru sortare, iar rezumatul le numără față de numărul de legături testate. Alegeți Legăturile selectate pentru a defecta doar legăturile selectate pe hartă.</p>';
+$ec_lang['lpn_guide_cr_example_term']='Exemplu pe Net1';
+$ec_lang['lpn_guide_cr_example_def']='<p>Deschideți exemplul Net1, alegeți Apă, Analiză, Analiza criticității…, introduceți 116 pentru Cea mai mică presiune permisă și faceți clic pe Rulează. Pasul de timp este 0:00, iar rularea rezolvă întreaga rețea de 14 ori. Patru din cele 13 legături coboară o joncțiune sub 116 psi când sunt scoase: L9 (N10, N11 și N21), L10 (N11 și N21), L111 (N21 și N22) și L112 (N21 și N22). Două joncțiuni sunt deja sub 116 psi cu nimic defect și nu sunt numărate. Deoarece Net1 este inelară, pierderea unei singure legături nu lasă niciodată o joncțiune fără alimentare.</p>';
+// The Demand scaling chapter (Task 785). Held by dev/lpn-spike/user-guide-demandscale-harness.js.
+$ec_lang['lpn_guide_ds_run_term']='Rulează';
+$ec_lang['lpn_guide_ds_run_def']='<p>Rulează înmulțește cerințele de la joncțiunile alese cu Factorul de scalare a cerinței, pe o copie a rețelei la pasul de timp de pe ecran și în scenariul deschis. Face două rezolvări, una cu cerințele așa cum sunt și una scalată. Rezultatul listează Cele mai mici presiuni și Cele mai mari viteze, fiecare cu valoarea Scalat lângă valoarea Nescalat, care este valoarea pe care o arată harta. Fiecare listă are zece rânduri, iar caseta spune câte legături nu arată. Factorul de scalare a cerinței se aplică în plus față de multiplicatorul cerinței al scenariului deschis și nu este niciodată salvat în proiect.</p>';
+$ec_lang['lpn_guide_ds_find_term']='Găsire';
+$ec_lang['lpn_guide_ds_find_def']='<p>Găsire caută factori de scalare a cerinței de la 0 la 20, până la cel mai apropiat 0,01, pentru cel mai mare la care fiecare joncțiune aleasă păstrează cel puțin Cea mai mică presiune permisă. Raportează factorul și cea mai mică presiune la el, și același lucru pentru pasul următor în sus, unde presiunea scade prima dată sub limită. Dacă cerințele așa cum sunt introduse lasă deja o joncțiune sub limită, răspunsul este marcat cu un semn de avertizare. Dacă fiecare joncțiune păstrează limita la 20, răspunsul spune acest lucru. Oprește încheie o căutare fără răspuns. Cea mai mică presiune permisă este aceeași setare ca și caseta Cea mai mică presiune permisă în altă parte din Debit de incendiu: analiză.</p>';
+$ec_lang['lpn_guide_ds_scope_term']='Joncțiunile și pasul de timp';
+$ec_lang['lpn_guide_ds_scope_def']='<p>Cu Joncțiunile selectate, doar joncțiunile selectate pe hartă sunt scalate și verificate. Celelalte joncțiuni sunt lăsate așa cum sunt, iar cele care scad sub limită sunt listate fără a limita răspunsul. Doar pasul de timp de pe ecran este scalat, iar nivelurile și stările sunt luate din el. Pentru a testa vârful, mutați ceasul la cerința de vârf înainte de rulare.</p>';
+$ec_lang['lpn_guide_ds_example_term']='Exemplu pe Net1';
+$ec_lang['lpn_guide_ds_example_def']='<p>Deschideți exemplul Net1 și alegeți Apă, Analiză, Scalarea cerinței…. La pasul de timp 0:00, faceți clic pe Găsire cu caseta așa cum se deschide. Fiecare joncțiune păstrează cel puțin 20 psi până la un factor de scalare a cerinței de 5,76, unde cea mai mică presiune este 20,11 psi la joncțiunea N32. La 5,77 este 19,8 psi, iar căutarea a durat 13 rezolvări. Introduceți 3 pentru Factor de scalare a cerinței și faceți clic pe Rulează: Joncțiunea N32 scade de la 111 psi, nescalat, la 85,99 psi, iar Legătura L112 crește de la 0,535 ft/s la 3,13 ft/s.</p>';
+// The Pump energy chapter (Task 785). Held by dev/lpn-spike/user-guide-energy-harness.js.
+$ec_lang['lpn_guide_en_read_term']='Citirea raportului';
+$ec_lang['lpn_guide_en_read_def']='<p>Alegeți Apă, Rapoarte, Energie pompe. Raportul integrează puterea fiecărei pompe pe ultima simulare pe perioadă extinsă, deci are nevoie de o Durată totală de rulare mai mare decât 0 și de un calcul. Pentru fiecare pompă listează % din rulare, Efic., kW med., kW de vârf, kWh și Cost. kW med. este media cât timp pompa a funcționat, nu pe perioadele de repaus. Sub tabel se află Energie consumată, Costul energiei, Consum de putere de vârf, Costul de vârf de sarcină și Cost total. O rețea fără pompe nu are nimic de raportat.</p>';
+$ec_lang['lpn_guide_en_set_term']='Ce stabilește numerele';
+$ec_lang['lpn_guide_en_set_def']='<p>Setări, Energie conține Eficiența pompei (procent), folosită pentru fiecare pompă fără curbă de eficiență, Prețul energiei pentru un kilowatt-oră, un Model de preț care înmulțește prețul la fiecare pas al modelului, Tariful de vârf de sarcină pe kW și un text Monedă care este tipărit lângă costuri și nu convertește costurile. O pompă își poate avea propriul preț, propriul model de preț și propria curbă de eficiență în Proprietăți. Prețurile, modelul, tariful de vârf de sarcină, Eficiența pompei (procent) și valorile proprii ale unei pompe sunt în categoria Cost energie, deci un scenariu le poate înlocui. Când nu este indicat niciun preț sau prețul este zero, fiecare cost este zero, iar raportul spune acest lucru. Aplicația nu sugerează niciun preț.</p>';
+$ec_lang['lpn_guide_en_example_term']='Exemplu pe Net1';
+$ec_lang['lpn_guide_en_example_def']='<p>Deschideți exemplul Net1, care are o durată totală de rulare de 24:00, și calculați. Alegeți Apă, Rapoarte, Energie pompe. Pompa L9 funcționează 65,71% din rulare la o eficiență de 75% și consumă în medie 96,22 kW, 96,71 kW la vârf și 1518 kWh. Nu este indicat niciun preț, deci costul este 0, iar raportul spune acest lucru. Introduceți 0,12 pentru Prețul energiei în Setări, Energie, și calculați din nou: costul lui L9 este 182, Cost total.</p>';
+// The Contour plot chapter (Task 785). Held by dev/lpn-spike/user-guide-contour-harness.js.
+$ec_lang['lpn_guide_ct_what_term']='Ce este graficul';
+$ec_lang['lpn_guide_ct_what_def']='<p>Alegeți Apă, Grafice, Contur. Rândul pornește graficul în scenariul deschis, ca o umplere netedă cu curbe de nivel etichetate, folosind presiunea dacă nodurile nu sunt încă colorate, și deschide caseta. Graficul răspândește culorile nodurilor de-a lungul conductelor și, lângă ele, până la un multiplu stabilit al lungimii mediane a conductelor, estompându-se pe partea exterioară. Nu colorează peste pompe, vane sau legături închise. Linia de sub cheia culorilor spune câte noduri și conducte folosește graficul, raza de lângă conducte și intervalul curbelor. Cu prea puține noduri, spune acest lucru.</p>';
+$ec_lang['lpn_guide_ct_box_term']='Caseta';
+$ec_lang['lpn_guide_ct_box_def']='<p>Afișează curbele de nivel, când este debifat, ascunde umplerea și curbele și păstrează culorile nodurilor. Caseta conține și Colorează nodurile după și Schemă de culori, care sunt aceleași două setări ca în Setări, Vizualizare, Culori noduri, Umplere (Fără, Neted sau Benzi, care vopsește fiecare clasă uniform), Opacitatea umplerii, Curbele de nivel cu Intervalul și Etichetele lor și Zona tampon în multipli ai lungimii mediane a conductelor. Într-un proiect așezat pe Pământ, caseta poate lua și terenul dintre noduri din Mapbox DEM, după ce vizitatorul este de acord să trimită numerele de dale ale zonei rețelei. Aceste setări sunt salvate cu proiectul și pot fi înlocuite de un scenariu. Graficul schimbă doar afișarea, nu rețeaua.</p>';
+$ec_lang['lpn_guide_ct_example_term']='Exemplu pe Net1';
+$ec_lang['lpn_guide_ct_example_def']='<p>Deschideți exemplul Net1 și alegeți Apă, Grafice, Contur. Nodurile sunt colorate după presiune, iar linia de sub cheia culorilor spune 9 noduri, 11 conducte, o rază de 2,5 ori lungimea mediană a conductelor lângă ele și curbe la fiecare 5 psi. Pompa, Legătura 9, nu este una dintre cele 11 conducte. Când Afișează curbele de nivel este debifat, nodurile rămân colorate după presiune.</p>';
+// The Run report, Status changes, and Full report chapters (Task 785). Held by dev/lpn-spike/user-guide-reports-harness.js.
+$ec_lang['lpn_guide_rr_what_term']='Ce conține raportul';
+$ec_lang['lpn_guide_rr_what_def']='<p>Alegeți Apă, Rapoarte, Rulare. Raportul este textul pe care motorul EPANET l-a scris pentru ultima simulare pe perioadă extinsă, în pagini. Începe cu bannerul și numele rețelei, apoi numără joncțiunile, rezervoarele, bazinele, conductele, pompele și vanele, apoi indică opțiunile de analiză și apoi listează starea hidraulică a rulării cu avertismentele ei. Butonul Copiază copiază textul.</p>';
+$ec_lang['lpn_guide_rr_example_term']='Exemplu pe Net1';
+$ec_lang['lpn_guide_rr_example_def']='<p>Deschideți exemplul Net1, care a fost deja calculat, și alegeți Apă, Rapoarte, Rulare. Rezumatul numără 9 joncțiuni, 1 rezervor, 1 bazin, 12 conducte, 1 pompă și 0 vane. Formula pierderii de sarcină este Hazen-Williams, pasul de timp hidraulic este 1,00 hrs, iar durata totală este 24,00 hrs.</p>';
+$ec_lang['lpn_guide_st_what_term']='Ce este listat';
+$ec_lang['lpn_guide_st_what_def']='<p>Alegeți Apă, Rapoarte, Modificări de stare. Fiecare rând dă momentul unei schimbări și schimbarea: o pompă, o vană sau o conductă acum deschisă sau acum închisă, sau un bazin care se umple, se golește, este plin sau este gol. Este listat și un pas de timp care nu a convers complet. Lista este în ordinea timpului și conține doar schimbări, nu fiecare pas. Este citită din aceeași rulare pe perioadă extinsă ca panoul Tabele și Raportul complet.</p>';
+$ec_lang['lpn_guide_st_example_term']='Exemplu pe Net1';
+$ec_lang['lpn_guide_st_example_def']='<p>Deschideți exemplul Net1 și alegeți Apă, Rapoarte, Modificări de stare. Bazinul N2 se umple acum la 1:00, se golește la 11:00, se umple la 16:00 și se golește la 22:00. Pompa L9 este acum închisă la 10:00, acum deschisă la 15:00 și acum închisă la 21:00.</p>';
+$ec_lang['lpn_guide_fr_what_term']='Ce conține tabelul';
+$ec_lang['lpn_guide_fr_what_def']='<p>Alegeți Apă, Rapoarte, Complet. Tabelul are un rând pentru fiecare nod și legătură la fiecare pas de timp de raportare, în unitățile panoului Tabele. Coloanele lui sunt Tip, ID, Cerință, Sarcină, Presiune, Concentrație de clor, Debit, Viteză, Pierdere de sarcină, Sarcina pompei și Stare, iar o celulă este goală acolo unde elementul nu are acea mărime. Lista Pas de timp alege pasul afișat, iar Descarcă CSV și Tipărește raportul cuprind fiecare pas. Fără o simulare pe perioadă extinsă, tabelul arată soluția curentă la un singur moment.</p>';
+$ec_lang['lpn_guide_fr_example_term']='Exemplu pe Net1';
+$ec_lang['lpn_guide_fr_example_def']='<p>Deschideți exemplul Net1 și alegeți Apă, Rapoarte, Complet. Cele 24 de elemente sunt listate la 25 de pași de raportare, de la 0:00 la 24:00, adică 600 de rânduri. La 0:00, Joncțiunea 11 are o cerință de 150 gpm, o sarcină de 985,23 ft H2O și o presiune de 119,26 psi.</p>';
+// The Calibration chapter (Task 785). Held by dev/lpn-spike/user-guide-calibration-harness.js.
+$ec_lang['lpn_guide_cal_what_term']='Ce compară raportul';
+$ec_lang['lpn_guide_cal_what_def']='<p>Alegeți Apă, Rapoarte, Calibrare. Lista Parametru alege ce măsoară fișierul: Cerință, Sarcină, Presiune, Concentrație de clor, Debit sau Viteză. Câte un fișier este păstrat pentru fiecare parametru, iar butonul Încarcă fișier de calibrare… deschide un selector de fișiere. Raportul are trei pagini. Statistici dă, pentru fiecare locație, numărul de observații, media observată, media calculată, eroarea medie și eroarea RMS, apoi un rând Rețea pentru toate locațiile împreună și corelația dintre medii. Grafic de corelație pune fiecare măsurătoare la valoarea ei observată pe orizontală și la valoarea ei calculată pe verticală, cu o linie diagonală unde cele două coincid. Comparații de medii desenează mediile observată și calculată ca o pereche de bare pentru fiecare locație.</p><p>Valoarea calculată este citită din rularea pe perioadă extinsă, iar o măsurătoare între doi pași de raportare este comparată cu valoarea interpolată între ei. O măsurătoare în afara momentelor raportate de rulare este omisă și numărată. Cu o soluție la un singur moment, fiecare măsurătoare este comparată cu acel singur rezultat, indiferent ce moment indică fișierul. Raportul se completează după ce rețeaua este calculată.</p>';
+$ec_lang['lpn_guide_cal_file_term']='Fișierul de calibrare';
+$ec_lang['lpn_guide_cal_file_def']='<p>Un fișier text cu un ID de locație, un moment și o valoare măsurată pe fiecare rând. Momentul este măsurat de la începutul simulării, în ore zecimale sau ore:minute. Un punct și virgulă începe un comentariu. Un rând cu doar un moment și o valoare aparține locației de deasupra. Valorile sunt citite în unitățile proiectului, iar raportul spune care este unitatea. O locație care nu este în rețea este listată, iar măsurătorile ei sunt numărate ca omise, un rând care nu poate fi citit este listat după numărul rândului, iar restul fișierului este folosit. Un fișier este păstrat în memorie pentru proiectul deschis și doar pentru această încărcare a paginii. Nu este salvat cu proiectul și nici pe acest dispozitiv. Când graficul Serii de timp arată aceeași mărime, valorile măsurate sunt desenate pe el ca inele.</p>';
+$ec_lang['lpn_guide_cal_example_term']='Exemplu pe Net1';
+$ec_lang['lpn_guide_cal_example_def']='<p>Deschideți exemplul Net1, calculați-l și alegeți Apă, Rapoarte, Calibrare. Cu Presiune aleasă, încărcați un fișier care dă Joncțiunea 11 ca 118,5 psi la 0:00 și 121,0 psi la 12:00, Joncțiunea 31 ca 110,2 psi la 6:00 și 108,7 psi la 18:00 și Joncțiunea 99 ca 50 psi la 0:00, urmate de un rând care nu este date. Raportul spune că fișierul are 5 măsurători în 3 locații, numește Joncțiunea 99 ca nefiind în rețea, cu 1 măsurătoare omisă, și listează rândul ilizibil. Statistici arată Joncțiunea 11 cu 2 observații, o medie observată de 119,75 psi, o medie calculată de 116,53 psi, o eroare medie de 3,98 și o eroare RMS de 5,12. Joncțiunea 31 are 109,45, 118,71, 9,26 și 9,79. Rândul Rețea are 4 observații, o eroare medie de 6,62 și o eroare RMS de 7,81.</p>';
 // Where the Guide lists its own keys, so that a search for one finds it.
 $ec_lang['lpn_guide_using_heading']='Folosirea manualului de utilizare';
 $ec_lang['lpn_guide_keys_term']='Comenzi rapide ale manualului de utilizare';
-$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>Deschide manualul de utilizare la controlul aflat sub cursor sau care are focalizarea.</td></tr><tr><td>F1</td><td>Deschide manualul de utilizare la intrarea pentru caseta care are focalizarea.</td></tr><tr><td>Ctrl+K</td><td>Deschide manualul de utilizare cu textul selectat în câmpul de căutare.</td></tr><tr><td>/</td><td>Selectează câmpul de căutare cât timp manualul de utilizare are focalizarea.</td></tr><tr><td>Esc</td><td>Închide manualul de utilizare și revine la locul unde ați fost.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_keys_def']='<table class="lpn-notes-table"><tbody><tr><td>?</td><td>Deschide manualul de utilizare la butonul barei de instrumente sau la rândul de meniu aflat sub cursor sau care are focalizarea. În alt loc, îl deschide cu câmpul de căutare selectat. Tasta nu îl deschide cât timp se tastează într-un câmp sau cât timp o întrebare este deschisă.</td></tr><tr><td>F1</td><td>Deschide manualul de utilizare la intrarea pentru caseta care are focalizarea.</td></tr><tr><td>Ctrl+K</td><td>Deschide manualul de utilizare cu câmpul de căutare selectat și cu orice text selectat, până la 80 de caractere, în el. Înlocuiește Ctrl+K al browserului, cu excepția cazului în care o întrebare este deschisă, când manualul de utilizare nu se deschide.</td></tr><tr><td>/</td><td>Selectează câmpul de căutare cât timp manualul de utilizare are focalizarea.</td></tr><tr><td>Esc</td><td>Cât timp manualul de utilizare are focalizarea, îl închide și readuce focalizarea unde era.</td></tr></tbody></table>';
+$ec_lang['lpn_guide_use_term']='Căutarea, linkurile și ce este reținut';
+$ec_lang['lpn_guide_use_def']='<p>Căutarea ignoră majusculele și diacriticele și listează rândurile și intrările care conțin textul tastat. Alegerea unui rând arată unde se află acel control. Nu rulează niciodată controlul. Pe un telefon, unde bara de instrumente este strânsă, un rând al barei de instrumente deschide rândul de meniu care face același lucru.</p><p>Adresa paginii urmează intrarea citită, ca în <code>Looped-Network.php#guide</code>, deci poate fi copiată ca link către acea intrare. Închiderea manualului de utilizare o șterge. Manualul de utilizare își amintește în acest browser dacă a fost deschis, poziția și dimensiunea lui și dacă lista lui de conținut este ascunsă. Pe un telefon lista de conținut pornește ascunsă.</p>';
 // Under a toolbar button in the User guide, naming the menu row that does the same thing.
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='De asemenea în {menu}';
@@ -1260,6 +1430,7 @@ $ec_lang['lpn_menu_map']='Hartă';
 // were deleted with the rows -- nothing else read them.
 $ec_lang['lpn_basemap_show']='Afișează harta stradală';
 $ec_lang['lpn_basemap_satellite_show']='Afișează imagini din satelit';
+$ec_lang['lpn_basemap_topo_show']='Arată harta topografică';
 // **THE PAIR OF NOUNS IS 'local' and 'georeferenced', LOWER CASE** (Tom's own edit of this block,
 // 2026-09-16, dev/tom-coordinate-vocabulary-2026-09-16.md: *"The terms we need to use are
 // 'Georeferenced' vs. 'Local or Arbitrary'"*). They replaced 'lat/lon' and 'xy'. Nothing renders
@@ -1437,6 +1608,7 @@ $ec_lang['lpn_pane_tab_pipes']='Conducte';
 $ec_lang['lpn_pane_tab_pumps']='Pompe';
 $ec_lang['lpn_pane_tab_valves']='Vane';
 $ec_lang['lpn_pane_tab_tip']='Editați elementele ca într-un tabel de tip foaie de calcul. Coloanele de rezultate nu pot fi editate. Vedeți Ajutor, Note pentru comenzile rapide de la tastatură.';
+$ec_lang['lpn_pane_popout']='Deschide într-o casetă';
 $ec_lang['lpn_pane_none']='Această rețea nu are încă niciunul dintre acestea.';
 // **A PERSISTENT NOTE, NOT A HOVER TIP** (Tom, 2026-09-08, asking for wording "to the effect that
 // 'This table is intended to be ready for asset entry and creation by pasting from a spreadsheet'").
@@ -1476,18 +1648,18 @@ $ec_lang['lpn_pane_sel_only_none']='Nu este selectat niciun element. Selectați 
 $ec_lang['lpn_pane_scn_show']='Afișează scenariile';
 // Two switches on the cell menu while Show scenarios is on (Tom, 2026-10-07): keep only the rows whose
 // scenario holds a value of its own in this table, and keep only the open scenario's rows.
-
-
-
+$ec_lang['lpn_pane_scn_ov_only']='Numai valori specifice';
+$ec_lang['lpn_pane_scn_cur_only']='Numai scenariul curent';
+$ec_lang['lpn_pane_inactive_show']='Include topologia inactivă';
 // The line above a table while either switch is on, beside the filter's own Show all. {filters} is one
 // or both of the two switch names, joined by a comma; {n} the rows showing, {all} the rows without them.
-
+$ec_lang['lpn_pane_scn_filter_note']='{filters}. Se afișează {n} din {all}.';
 // The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
 // scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
-
-
-
-
+$ec_lang['lpn_ovm_child_ask']='Ștergeți valorile specifice ale scenariilor copil ({n} în total)?';
+$ec_lang['lpn_ovm_child_tip']='Scenariile copil înlocuiesc această valoare ({n} în total). Faceți clic pentru a le șterge valorile specifice.';
+$ec_lang['lpn_ovm_dot_clear']='Faceți clic pentru a o șterge.';
+$ec_lang['lpn_ovm_dot_set']='Moștenită. Faceți clic pentru a o face valoare specifică în acest scenariu, păstrând valoarea afișată.';
 $ec_lang['lpn_pane_clear_override']='Șterge valoarea specifică';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -1515,7 +1687,8 @@ $ec_lang['lpn_export_table_scn_note']='Rezultatele sunt exportate numai pentru s
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
-// lpn_clean_map_tip were deleted with the row; nothing else read them.
+// lpn_clean_map_tip were deleted with the row; nothing else read them. lpn_clean_map and
+// lpn_clean_map_tip are back since Task 805 for a DIFFERENT command (it hides controls, not readouts).
 // THE PROJECT MENU (ROADMAP Task 467). Tom, 2026-08-20: "Maybe we can have a Project menu with
 // Settings, Library, and Report under it?" Its rows borrow the names they already have --
 // lpn_tool_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
@@ -1555,17 +1728,17 @@ $ec_lang['lpn_morph_tip']='Schimbați nodurile selectate în joncțiuni, rezervo
 $ec_lang['lpn_morph_ok']='Schimbă';
 // {ids} lists the selected assets of the other kind (nodes when a link type was chosen, and links
 // when a node type was chosen), separated by commas.
-
+$ec_lang['lpn_morph_other_kind']='Tipul unui nod poate fi schimbat doar în alt tip de nod, iar cel al unei legături doar în alt tip de legătură. Tip neschimbat: {ids}';
 // The Properties row shown where a scenario morphs the asset (Task 781): the type it is in this
 // scenario, beside the override marker.
-
-
+$ec_lang['lpn_field_type']='Tip';
+$ec_lang['lpn_field_type_tip']='Tipul acestui element în acest scenariu, stabilit prin Schimbare tip. Ștergeți valoarea specifică pentru a folosi tipul scenariului părinte.';
 $ec_lang['lpn_change_type_lost']='Aceste valori se vor pierde:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
 $ec_lang['lpn_change_type_key']='Fiecare linie: ID: proprietatea și valoarea care s-ar pierde';
 $ec_lang['lpn_change_type_line']='{id}: {property} {value}';
 $ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, în scenariul {scenario}';
-
+$ec_lang['lpn_change_type_line_alternative']='{id}: {property} {value}, în alternativa {alternative}';
 $ec_lang['lpn_change_type_more']='Și încă {n}.';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.
@@ -1636,30 +1809,30 @@ $ec_lang['lpn_confirm_delete_network']='Ștergeți fiecare nod, conductă și et
 $ec_lang['lpn_find_menu']='Găsire și înlocuire';
 // Copy and Paste properties (Task 782; Tom, 2026-10-12: a clipboard, no confirmation). Identity and
 // placement are never pasted.
-
-
-
-
-
-
-
-
-
-
+$ec_lang['lpn_copy_props_menu']='Copiază proprietățile';
+$ec_lang['lpn_copy_props_done']='Proprietățile lui {id} au fost copiate.';
+$ec_lang['lpn_copy_props_no_overrides']='Nicio valoare specifică de copiat.';
+$ec_lang['lpn_copy_props_done_ov']='Valorile specifice ale lui {id} în acest scenariu au fost copiate.';
+$ec_lang['lpn_paste_alt_created']='A fost creată pentru acest scenariu alternativa {name} din categoria {category}.';
+$ec_lang['lpn_paste_props_menu']='Lipește proprietățile în selecție';
+$ec_lang['lpn_paste_props_off_none']='Nu a fost copiat nimic. Faceți clic dreapta sau apăsați lung pe un element și alegeți Copiază proprietățile.';
+$ec_lang['lpn_paste_props_off_select']='Selectați elementele în care lipiți, apoi alegeți Lipește proprietățile în selecție.';
+$ec_lang['lpn_paste_props_off_kind']='Niciun element selectat nu poate primi proprietățile copiate.';
+$ec_lang['lpn_tsb_menu']='Grafic de serii de timp';
 // The map's right-click (and long press) menu on a Text and on a dragged label (2026-10-14). Edit text
 // opens the in-place editor; Reset position sends a dragged label or an attached Text home.
-
-
-
-
-
-
-
-
-
-
-
-
+$ec_lang['lpn_ctx_edit_text']='Editare text';
+$ec_lang['lpn_ctx_reset_position']='Resetare poziție';
+$ec_lang['lpn_ctx_reset_position_off_tip']='Doar o etichetă sau un Text atașat care a fost tras din poziția sa proprie poate fi resetat.';
+$ec_lang['lpn_tsb_off_tip']='Are nevoie de rezultate pe perioadă extinsă. Stabiliți o Durată totală de rulare în Setări, Calcul, Timp și calculați.';
+$ec_lang['lpn_tsb_close']='Închide graficul';
+$ec_lang['lpn_tsb_resize']='Trageți pentru a redimensiona';
+$ec_lang['lpn_tsb_quantity']='Mărimea de reprezentat grafic';
+$ec_lang['lpn_tsb_max']='Închideți un grafic înainte de a deschide altul. Cel mult {n} rămân deschise.';
+$ec_lang['lpn_paste_done_one']='Proprietățile lui {id} au fost lipite în {to}. Valori schimbate: {n}.';
+$ec_lang['lpn_paste_done_many']='Proprietățile lui {id} au fost lipite în {m} elemente. Valori schimbate: {n}.';
+$ec_lang['lpn_paste_skip_breakdown']='Nelipite: {n} (cerința este o listă de categorii).';
+$ec_lang['lpn_paste_skip_valve']='Nelipite: {n} (tipurile de vană diferă).';
 $ec_lang['lpn_find_title']='Găsire și înlocuire';
 $ec_lang['lpn_find_scope']='Ce se caută';
 $ec_lang['lpn_find_scope_all']='Toate';
@@ -1917,7 +2090,7 @@ $ec_lang['lpn_freq_axis_percent']='Procent mai mic decât';
 // plot sends: tile numbers for the network's area, not each node's latitude and longitude.
 $ec_lang['lpn_contour_menu']='Contur';
 $ec_lang['lpn_contour_tip']='Afișează pe hartă un grafic de contur: culorile nodurilor se întind de-a lungul și lângă conducte, cu curbe de nivel etichetate. Deschide o casetă pentru reglaj sau dezactivare.';
-$ec_lang['lpn_contour_plot']='Grafic de contur';
+$ec_lang['lpn_contour_plot']='Contur: grafic';
 $ec_lang['lpn_contour_show']='Afișează curbele de nivel';
 $ec_lang['lpn_contour_show_tip']='Debifați pentru a ascunde umplerea și liniile curbelor de nivel; bifați pentru a le readuce așa cum erau. Culorile nodurilor rămân.';
 $ec_lang['lpn_contour_fill']='Umplere';
@@ -2102,8 +2275,8 @@ $ec_lang['lpn_status_inp_exported_picture']='S-a exportat {zip}, care conține f
 $ec_lang['lpn_status_inp_exported_no_picture']='S-a exportat {file}. Imaginea de fundal nu a putut fi salvată, deci fișierul .inp nu indică niciuna; în EPANET, adăugați-o cu Vizualizare, Fundal, Încărcare.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
-
-
+$ec_lang['lpn_inp_export_flat_customers_inactive']='{n} dintre acești abonați sunt atribuiți unei joncțiuni inactive în acest scenariu, deci cerința lor nu este în fișier.';
+$ec_lang['lpn_inp_export_flat_inactive_controls']='Aceste comenzi și reguli fac trimitere la un element inactiv în acest scenariu, deci nu sunt în fișier: {ids}';
 $ec_lang['lpn_inp_export_differences']='{n} lucruri pe care formatul .inp nu le poate păstra.';
 $ec_lang['lpn_inp_export_difference_one']='Un lucru pe care formatul .inp nu îl poate păstra.';
 $ec_lang['lpn_inp_export_refused']='Acest proiect nu poate fi scris ca fișier EPANET: {detail}';
@@ -2458,7 +2631,7 @@ $ec_lang['lpn_notes_1_term']='Cum se rezolvă';
 // lpn_time_no_engine and lpn_engine_unavailable.** A note everybody reads should not carry a
 // failure explanation that the failure itself delivers. Task 605's rule is untouched -- every
 // sentence a reader meets only when something has gone wrong SURVIVES, and those two are it.
-$ec_lang['lpn_notes_1_def']='Rezolvitorul EPANET rezolvă această rețea. Stabiliți o durată totală de rulare, iar fiecare pas de raportare este calculat pe rând: bazinele se umplu și se golesc, cerințele urmează modelele lor, iar bara de instrumente redă rularea.';
+$ec_lang['lpn_notes_1_def']='Implicit, rețeaua este rezolvată de rezolvitorul EPANET. Când este stabilită o durată totală de rulare, fiecare pas de timp de raportare este calculat pe rând: bazinele se umplu și se golesc, cerințele urmează modelele lor, iar bara de instrumente redă rularea. Cu Folosește rezolvitorul integrat când este posibil bifat, o soluție la un singur moment poate fi rezolvată în schimb de rezolvitorul integrat, dar o simulare pe perioadă extinsă sau o rețea cu o vană cu cădere fixă de presiune ori de uz general (PBV, GPV) este întotdeauna rezolvată de rezolvitorul EPANET.';
 $ec_lang['lpn_notes_2_term']='Ce nu face';
 // **"Water quality chemistry is not modeled" WAS FLATLY FALSE** (Tom, 2026-09-10: *"Wrong
 // facts."*). A reacting chemical, bulk and wall reaction coefficients and a limiting
@@ -2472,7 +2645,7 @@ $ec_lang['lpn_notes_2_term']='Ce nu face';
 // or claims to. Do not lengthen the list without him.
 $ec_lang['lpn_notes_2_def']='Supratensiunile și lovitura de berbec nu sunt modelate: toate rezultatele sunt valabile pentru curgere permanentă sau lent variabilă, nu pentru unda de presiune tranzitorie produsă de închiderea rapidă a unei vane.';
 $ec_lang['lpn_notes_3_term']='Salvarea proiectelor';
-$ec_lang['lpn_notes_3_def']='Fiecare proiect este o filă, iar fiecare filă este salvată în acest browser pe măsură ce lucrați. Ștergerea datelor browserului le șterge pe toate, deci păstrați-vă munca într-un fișier: Fișier, Salvare ca. Un asterisc pe o filă înseamnă că aceasta conține modificări care nu se află într-un fișier. Nimic nu este scris vreodată într-un fișier decât dacă solicitați. În unele browsere un proiect se conectează la fișierul în care îl salvați, iar Fișier, Salvare scrie de atunci încolo în același fișier; în altele nicio conexiune nu este posibilă, deci Salvare este dezactivată și este disponibilă doar Salvare ca. Atunci când un fișier proiect este păstrat pe o unitate partajată, această pagină vă spune dacă un coleg îl are deja deschis, astfel încât două persoane să nu scrie una peste alta.';
+$ec_lang['lpn_notes_3_def']='Fiecare proiect este o filă, iar fiecare filă este salvată în acest browser pe măsură ce lucrați. Ștergerea datelor browserului le șterge pe toate, deci munca trebuie păstrată într-un fișier: Fișier, Salvare ca. Un asterisc pe o filă înseamnă că aceasta conține modificări care nu se află într-un fișier, iar închiderea acelei file întreabă mai întâi. Nimic nu este scris vreodată într-un fișier decât dacă se alege Salvare sau Salvare ca. În unele browsere un proiect se conectează la fișierul în care este salvat, iar Fișier, Salvare scrie de atunci încolo în același fișier; în altele nicio conexiune nu este posibilă, deci Salvare este dezactivată și este disponibilă doar Salvare ca. Acest site ține evidența cine are deschis un fișier de proiect, astfel încât două persoane să nu scrie una peste alta. Deschiderea unui fișier pe care un coleg îl are deja deschis oferă Cere, Deschide numai pentru citire și Rupe blocarea. Dacă serverul nu poate fi contactat, un avertisment spune că un alt utilizator poate edita același fișier în același timp.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
 // It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
 // to stay readable on a phone, while the Notes section is already this page's documentation home,
@@ -2482,7 +2655,7 @@ $ec_lang['lpn_notes_3_def']='Fiecare proiect este o filă, iar fiecare filă est
 // H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Curba pompei';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_notes_5_def']='O pompă respectă H = H₀ − aQ^b, unde H este sarcina adăugată de pompă, iar Q este debitul care trece prin ea. Introduceți unul, două sau trei puncte de pe curba producătorului. Trei puncte, sarcina la debit zero, punctul normal de funcționare și punctul de debit maxim, determină direct H₀, a și b, și urmăresc cel mai fidel o curbă publicată. Două puncte ajustează o parabolă (b = 2) cu vârful la debit zero. Un singur punct folosește o regulă uzuală: sarcina la debit zero este 1,33 × sarcina introdusă, iar debitul maxim este 2 × debitul introdus, ceea ce dă tot b = 2. O pompă fără niciun punct introdus nu adaugă nicio sarcină. Curba nu este întreruptă acolo unde sarcina ajunge la zero, deci a cere unei pompe mai mult debit decât poate oferi curba sa dă o sarcină negativă. Soluția este o pompă mai mare sau o cerință mai mică, nu o altă ajustare a curbei. O curbă poate avea mai mult de trei puncte, iar fiecare punct introdus este citit.';
+$ec_lang['lpn_notes_5_def']='O pompă respectă H = H₀ − aQ^b, unde H este sarcina adăugată de pompă, iar Q este debitul care trece prin ea. Punctele curbei se introduc în Apă, Biblioteci, ca o curbă de Sarcină pompă, iar pompa indică acea curbă în Proprietăți. Trei puncte, sarcina la debit zero, punctul normal de funcționare și punctul de debit maxim, determină direct H₀, a și b, și urmăresc cel mai fidel o curbă publicată. Două puncte ajustează o parabolă (b = 2) cu vârful la debit zero. Un singur punct folosește regula EPANET: sarcina la debit zero este 1,33334 ori sarcina introdusă, iar debitul maxim este de 2 ori debitul introdus, ceea ce dă tot b = 2. O pompă fără curbă indicată nu adaugă nicio sarcină. Curba nu este întreruptă acolo unde sarcina ajunge la zero, deci un debit mai mare decât poate oferi curba dă o sarcină negativă. Soluția este o pompă mai mare sau o cerință mai mică, nu o altă ajustare a curbei. O curbă poate avea mai mult de trei puncte. Rezolvitorul EPANET le primește pe toate și interpolează între ele, în timp ce linia Ecuație și rezolvitorul integrat folosesc punctul cel mai de jos, cel din mijloc și cel mai de sus.';
 // WAS "Planned additions", NAMING THREE THINGS THAT NOW SHIP (scenarios, result tables, .inp
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
@@ -2503,9 +2676,15 @@ $ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Taste
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
 // settings.colorFrozenBreaks in js/looped-network.js.
 $ec_lang['lpn_notes_color_term']='Limitele benzilor de culoare rămân aceleași';
-$ec_lang['lpn_notes_color_def']='Limitele benzilor de culoare sunt stabilite atunci când alegeți o metodă de clasificare a datelor. Ele nu sunt stabilite din nou la fiecare pas de timp, pentru că asta ar face ca fiecare culoare să însemne altceva la fiecare pas, ceea ce nu ajută la vizualizarea sistemului dvs. EPANET funcționează la fel. Pentru limite noi, alegeți din nou o metodă sau introduceți propriile limite.';
+$ec_lang['lpn_notes_color_def']='Limitele benzilor de culoare sunt stabilite atunci când este aleasă o metodă de clasificare a datelor. Ele nu sunt stabilite din nou la fiecare pas de timp, pentru că asta ar face ca fiecare culoare să însemne altceva la fiecare pas, ceea ce nu ajută la vizualizarea unui sistem. Un scenariu arată limitele lui Bază. EPANET funcționează la fel. Pentru limite noi, alegeți din nou o metodă sau introduceți limite.';
 $ec_lang['lpn_notes_engine_term']='Ce versiune de EPANET rulează această pagină';
 $ec_lang['lpn_notes_engine_def']='Rezolvitorul EPANET de pe această pagină este OWA-EPANET 2.3.5, lansat pe 20 februarie 2025. EPANET este dezvoltat de Open Water Analytics, o comunitate care colaborează cu Agenția pentru Protecția Mediului a Statelor Unite (EPA), care a lansat versiunea 2.2.0 în decembrie 2019. Raportul de rulare îl numește 2.3.05, deoarece motorul scrie ultimul număr pe două cifre. Ajunge pe această pagină prin epanet-js 0.9.0, de Luke Butler, sub licența MIT, și rulează în browserul dvs.: rețeaua dvs. nu este trimisă niciodată nicăieri pentru a fi rezolvată.';
+// The Notes example (Task 785). Held by dev/lpn-spike/user-guide-notes-harness.js.
+$ec_lang['lpn_guide_nt_example_term']='Exemplu pe Net1: o pompă dincolo de curba ei';
+$ec_lang['lpn_guide_nt_example_def']='Deschideți exemplul Net1 și alegeți Apă, Biblioteci. Curba 1, Pump Curve for Pump 9, are un punct, 1500 gpm la 250 ft. Sarcina la debit zero este 333,3 ft, iar debitul maxim este 3000 gpm. La 3500 gpm, care este dincolo de capătul curbei, curba dă o sarcină de −120,4 ft. Rezolvitorul EPANET raportează aceeași sarcină, o pierdere de 120,4 ft pe pompă, și avertizează că pompele nu pot livra suficient debit sau suficientă sarcină.';
+// The user manual's own entry (Task 785). Held by dev/lpn-spike/user-guide-own-harness.js.
+$ec_lang['lpn_guide_own_example_term']='Exemplu pe Net1';
+$ec_lang['lpn_guide_own_example_def']='<p>Deschideți exemplul Net1, apăsați Ctrl+K și tastați critic. Meniuri arată rândul Analiza criticității… la Apă, Analiză. Casete arată intrările care îl menționează, printre ele Găsire și înlocuire, Debit de incendiu: analiză și Criticitate: analiză, precum și această intrare. Alegerea rândului arată unde se află Analiza criticității… în meniul Analiză și nu o rulează.</p>';
 $ec_lang['lpn_id_invalid']='Introduceți un ID fără spații și fără ghilimele.';
 $ec_lang['lpn_id_taken']='Acel ID este deja folosit.';
 $ec_lang['lpn_diag_no_fixed_head']='Adăugați un rezervor sau un bazin. Rețeaua are nevoie de cel puțin un nivel de apă cunoscut înainte de a putea fi rezolvată.';
@@ -2532,11 +2711,11 @@ $ec_lang['lpn_omitted_note']='Omise din această rulare deoarece niciun traseu n
 $ec_lang['lpn_engine_fetching']='Se descarcă rezolvitorul EPANET. Este descărcat o singură dată și apoi stocat pe acest dispozitiv, deci funcționează ulterior offline.';
 $ec_lang['lpn_engine_ready']='Rezolvitorul EPANET se află acum pe acest dispozitiv și funcționează offline.';
 $ec_lang['lpn_engine_fetching_valve']='Se descarcă rezolvitorul EPANET, astfel încât această vană poate fi rezolvată acum și offline mai târziu.';
-$ec_lang['lpn_engine_ready_valve']='Rezolvitorul EPANET se află acum pe acest dispozitiv. Vanele de control al presiunii și al debitului (PRV, PSV, FCV) pot fi acum rezolvate offline.';
-$ec_lang['lpn_engine_unavailable']='Rezolvitorul EPANET, necesar pentru rezolvarea vanelor de control al presiunii și al debitului (PRV, PSV, FCV), nu a putut fi descărcat. După o conectare la internet, rezolvitorul este stocat pe acest dispozitiv.';
+$ec_lang['lpn_engine_ready_valve']='Rezolvitorul EPANET se află acum pe acest dispozitiv. Vanele cu cădere fixă de presiune și vanele de uz general (PBV, GPV) pot fi acum rezolvate offline.';
+$ec_lang['lpn_engine_unavailable']='Rezolvitorul EPANET, necesar pentru rezolvarea vanelor cu cădere fixă de presiune și a vanelor de uz general (PBV, GPV), nu a putut fi descărcat. După o conectare la internet, rezolvitorul este stocat pe acest dispozitiv.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
-$ec_lang['lpn_engine_unavailable_why']='Vanele de control al presiunii și al debitului (PRV, PSV, FCV) nu pot fi rezolvate fără rezolvitorul EPANET. {reason}';
+$ec_lang['lpn_engine_unavailable_why']='Vanele cu cădere fixă de presiune și vanele de uz general (PBV, GPV) nu pot fi rezolvate fără rezolvitorul EPANET. {reason}';
 $ec_lang['lpn_engine_needed_loading']='Se încarcă rezolvitorul EPANET în timp ce construiți. Rezultatele vor fi disponibile după încărcarea completă.';
 // **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
 // own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
@@ -2550,7 +2729,7 @@ $ec_lang['lpn_engine_wait_pct']='Rezolvitor încărcat {percent}%.';
 $ec_lang['lpn_engine_wait_bytes']='Rezolvitor: {kb} KB încărcați până acum. Totalul nu este disponibil, deci procentul de finalizare este necunoscut.';
 $ec_lang['lpn_engine_needed_failed']='Rezolvitorul EPANET nu a fost încă încărcat, nu poate fi încărcat, iar această rețea poate fi rezolvată doar de el. Va fi încărcat atunci când sunteți conectat la internet.';
 $ec_lang['lpn_engine_needed_failed_why']='Această rețea poate fi rezolvată doar de rezolvitorul EPANET. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='Acestea sunt vane de control al presiunii sau al debitului, iar numai rezolvitorul EPANET le poate calcula. Rezolvitorul EPANET nu a putut fi încărcat, deci aceste rezultate lipsesc:';
+$ec_lang['lpn_diag_valve_needs_epanet']='Acestea sunt vane cu cădere fixă de presiune sau vane de uz general, iar numai rezolvitorul EPANET le poate calcula. Rezolvitorul EPANET nu a putut fi încărcat, deci aceste rezultate lipsesc:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='Aceste vane sunt conectate direct la un rezervor sau la un bazin, care fixează linia piezometrică în acel nod, deci vana nu are nimic de controlat. Introduceți o conductă scurtă între vană și rezervor sau bazin:';
 $ec_lang['lpn_diag_not_converged']='Nu s-a găsit nicio soluție. Verificați dacă există valori imposibile în realitate, cum ar fi un diametru zero.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -2675,6 +2854,16 @@ $ec_lang['lpn_field_desc']='Descriere';
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
 // word for this and a hydraulic engineer already knows it.
 $ec_lang['lpn_field_tag']='Marcaj';
+// Tom, 2026-09-06, in dev/new-english-keys.md, answering Wave 0's finding that a bare 'Tag'
+// reads as markup or as a price tag in most languages: Add _syn 'Tag or user defined field
+// possibly for grouping assets possibly in pressure zones'. His sentence is the commentary,
+// verbatim and right of the pipe; the substitutable half is left of it, because the generator
+// strips commentary by POSITION and a whole sentence on the left ships to 26 agents as a
+// synonym list.
+// Edited by TGH 2026-09-07
+// ROADMAP Task 247. Tom's own words, given verbatim on 2026-09-19 when he shortened the label from
+// "Services at this customer" to "Number of services": the short label loses the "at this customer"
+// that told a translator WHOSE services are being counted, and this is where that goes back.
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_tag_tip']='Un marcaj poate avea orice semnificație doriți, cum ar fi o zonă de presiune sau un ordin de lucru. Niciun calcul de aici sau din EPANET nu îl citește. Un marcaj este un singur cuvânt: EPANET se oprește din citire la primul spațiu, deci un spațiu este refuzat pe măsură ce îl tastați. Este păstrat la import și la export în fișierul EPANET.';
 $ec_lang['lpn_pump_effic_curve']='Curbă de eficiență a pompei';
@@ -2798,12 +2987,6 @@ $ec_lang['lpn_field_text_all_zoom_tip']='Păstrează acest text pe desen oricât
 $ec_lang['lpn_tool_labels']='Etichete';
 $ec_lang['lpn_labels_heading_node']='Etichete noduri';
 $ec_lang['lpn_labels_heading_link']='Etichete legături';
-// THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
-// row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line
-// below", which reads better and made both words unfindable. The Settings box searches tips, so a
-// word not on the page is a word the search cannot reach -- and dev/plain-sentences.md, the other
-// place the terms could have gone, is invisible to it. Plain English leads and the term is the gloss, which is
-// the same shape as "Minor (local) loss".
 // "Apply to all" beside each ID prefix (ROADMAP Task 345): an ID prefix normally governs only the assets
 // you draw from now on, and this is the way to say "I meant the ones already here". {n} and
 // {skipped} are whole numbers; {prefix} is the text the user typed.
@@ -2976,8 +3159,21 @@ $ec_lang['lpn_hide_titles']='Ascunde aceste titluri';
 // bubble and reads 'Show this'; this one has to name what it is talking about.
 $ec_lang['lpn_settings_area_hint']='Afișează ajutorul de selecție';
 $ec_lang['lpn_settings_area_hint_tip']='Afișează indicația de pe hartă care dă pasul următor în timp ce selectați o zonă.';
-$ec_lang['lpn_settings_hover_card']='Arată eticheta completă la trecerea cursorului';
-$ec_lang['lpn_settings_hover_card_tip']='Țineți cursorul pe un nod, o legătură sau un abonat pentru a-i vedea eticheta așa cum este specificată în Setări, la orice scară, indiferent dacă eticheta încape pe hartă. Aceasta este o setare pentru acest browser, nu pentru proiect.';
+$ec_lang['lpn_settings_hover_card']='Arată toate proprietățile la trecerea cursorului';
+$ec_lang['lpn_settings_hover_card_tip']='Țineți cursorul pe un nod, o legătură sau un abonat pentru a-i vedea toate proprietățile formatate așa cum este specificat în Setări, la orice scară, indiferent dacă eticheta încape pe hartă. Aceasta este o setare pentru acest browser, nu pentru proiect.';
+// Task 805 (Tom, 2026-10-15, R-396: "It would be good to be able to hide the amber override
+// indicators from the map. Maybe a Map, Clean map button is a good idea after all"). The rings'
+// own switch, in Settings, Map and page, Page; and the Map menu row that hides them with the
+// controls over the drawing. Both are browser settings.
+$ec_lang['lpn_settings_override_marks']='Arată marcajele valorilor specifice pe hartă';
+$ec_lang['lpn_settings_override_marks_tip']='Arată inelul auriu pe un element cu o valoare specifică în scenariul deschis și inelul gri întrerupt pe un element care moștenește una. Panoul Tabele marchează valorile specifice în ambele cazuri. Hartă, Hartă curată ascunde inelele cât timp este bifat. Aceasta este o setare pentru acest browser, nu pentru proiect.';
+$ec_lang['lpn_clean_map']='Hartă curată';
+$ec_lang['lpn_clean_map_tip']='Bifat: butoanele de zoom, butonul de hartă stradală și satelit, butonul Mesaje și notificările, ajutorul de selecție, butonul de feedback și inelele valorilor specifice sunt ascunse. Debifat: sunt afișate. Erorile sunt afișate în continuare pe hartă, iar fiecare notificare este păstrată în continuare în Mesaje. Aceasta este o setare pentru acest browser, nu pentru proiect.';
+$ec_lang['lpn_settings_theme']='Temă';
+$ec_lang['lpn_settings_theme_tip']='Alegeți culori luminoase sau întunecate pentru pagină. Sistem urmează setarea dispozitivului dvs. Desenul hărții arată la fel în orice temă. Aceasta este o setare pentru acest browser, nu pentru proiect.';
+$ec_lang['lpn_theme_system']='Sistem';
+$ec_lang['lpn_theme_light']='Luminoasă';
+$ec_lang['lpn_theme_dark']='Întunecată';
 $ec_lang['lpn_settings_id_prefixes']='Prefixe ID';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a
@@ -3079,6 +3275,10 @@ $ec_lang['lpn_cp_key_taken']='O altă proprietate personalizată folosește deja
 // question it answers is how much of this scenario is its own rather than inherited.
 $ec_lang['lpn_scenario_label']='Scenariu';
 $ec_lang['lpn_scenario_base']='Bază';
+// "Base" is four letters carrying six English senses, standing alone as a proper name in a dropdown.
+// KEPT, because Tom is right that it is solid where it sits (2026-08-14) and it is what WaterGEMS and
+// InfoWater scenario managers call it -- so the fix belongs here, not in the English. Word list is
+// his; "Original" was struck at his instruction.
 // "Overrides" (Tom, 2026-10-04: *"I believe that the technical term may be 'Enter the scenario's
 // override'"*; Mary found it is Bentley WaterGEMS's word, "Overriding Inheritance"). It replaced
 // "custom values" (2026-08-14). The rejected alternative stays rejected for a TRANSLATION reason:
@@ -3093,7 +3293,7 @@ $ec_lang['lpn_scenario_overrides']='Nr. de valori specifice';
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='Inelul auriu înseamnă că acest element are o valoare specifică în scenariul {name}.';
-
+$ec_lang['lpn_scenario_mark_inh_tip']='Inelul gri întrerupt înseamnă că scenariul {name} moștenește pentru acest element o valoare specifică de la scenariul său părinte sau de la o alternativă.';
 $ec_lang['lpn_scenario_overrides_tip']='Fiecare valoare specifică este marcată pe hartă cu un inel auriu. Comutați la {base} sau la alt scenariu părinte pentru a vedea desenul fără ele.';
 $ec_lang['lpn_scenario_menu']='Scenarii';
 $ec_lang['lpn_scenario_tip']='Setul de valori pe care desenul le arată și pe care pagina le rezolvă acum. Faceți clic pentru a schimba scenariile, sau pentru a adăuga, redenumi sau șterge unul.';
@@ -3102,10 +3302,10 @@ $ec_lang['lpn_scenario_new_name']='Scenariul {n}';
 $ec_lang['lpn_scenario_prompt_name']='Nume pentru acest scenariu';
 $ec_lang['lpn_scenario_rename']='Redenumire scenariu…';
 $ec_lang['lpn_scenario_delete']='Ștergere scenariu';
-
-
-
-
+$ec_lang['lpn_scenario_delete_ask']='Ștergeți scenariul {name}? Desenul propriu-zis nu este modificat.';
+$ec_lang['lpn_scenario_delete_goes']='Valorile lui specifice ({n}) sunt șterse odată cu el.';
+$ec_lang['lpn_scenario_delete_stays']='Aceste alternative pe care le folosește rămân în proiect: {list}.';
+$ec_lang['lpn_scenario_delete_has_children']='Scenariul {name} nu poate fi șters deoarece are copii: {list}. Ștergeți-i mai întâi sau mutați-i la alt părinte.';
 // Edited by TGH 2026-09-07
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
@@ -3119,139 +3319,159 @@ $ec_lang['lpn_scenario_only_deleted']='{id} este șters. Făcea parte numai din 
 $ec_lang['lpn_scenario_delete_blocked']='{id} nu este șters, deoarece legătura {link} se termină la el, iar acea legătură există și în afara scenariului {scenario}. Pentru a le șterge pe amândouă, ștergeți-le în scenariul {base}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_basic']='Mod de bază';
-$ec_lang['lpn_scenario_basic_tip']='Bifat: un scenariu constă doar din valorile stabilite în el. Debifat: acest meniu oferă și tabelul de previzualizare a Alternativelor, care arată cum sunt grupate acele valori pe categorii, și permite unui scenariu să aibă o durată totală de rulare și un pas de timp hidraulic separate. Opiniile despre această funcție sunt binevenite.';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+$ec_lang['lpn_scenario_basic_tip']='Bifat: alternativele sunt ascunse și automate, fiecare scenariu își arată valorile specifice ca fiind ale lui, iar toate scenariile noi sunt copii ale scenariului Bază; Managerul de scenarii și tabelul Scenarii nu sunt afișate. Debifat: Managerul de scenarii și tabelul Scenarii sunt afișate, iar alternativele pot fi partajate între scenarii. Manager de scenarii este dezactivat când Mod de bază este activ. Mod de bază este dezactivat când un proiect are relații între scenarii și alternative pe care Mod de bază nu le poate arăta.';
+$ec_lang['lpn_scenario_basic_misfit']='Acest proiect are relații între scenarii și alternative care nu sunt compatibile cu Mod de bază al scenariilor, deci Mod de bază este dezactivat.';
+$ec_lang['lpn_scenario_basic_misfit_base']='Scenariul Bază folosește o altă alternativă decât Bază.';
+$ec_lang['lpn_scenario_copy']='Copiază scenariul';
+$ec_lang['lpn_scenario_copy_tip']='Copiază scenariul deschis și valorile lui specifice și deschide copia.';
+$ec_lang['lpn_scenario_copy_off']='Copiază scenariul funcționează în Mod de bază. Cu Mod de bază dezactivat, adăugați un scenariu și alegeți alternativele lui în tabelul Scenarii.';
+$ec_lang['lpn_sm_title']='Manager de scenarii';
+$ec_lang['lpn_sm_menu']='Manager de scenarii…';
+$ec_lang['lpn_sm_basic_on']='Manager de scenarii este dezactivat când Mod de bază este activ.';
+$ec_lang['lpn_pane_tab_scenarios']='Scenarii';
+$ec_lang['lpn_sm_col_parent']='Părinte';
+$ec_lang['lpn_sm_add_child']='Adaugă copil';
+$ec_lang['lpn_sm_add_base']='Adaugă bază';
+$ec_lang['lpn_sm_add_base_tip']='Adaugă un alt scenariu Bază. Pornește ca o copie a lui Bază, cu propriile alternative, iar modificările ulterioare ale lui Bază nu îl schimbă.';
+$ec_lang['lpn_sm_add_base_alt_tip']='Adaugă o altă alternativă Bază. Pornește ca o copie a valorilor lui Bază din această categorie, iar modificările ulterioare ale lui Bază nu o schimbă.';
+$ec_lang['lpn_sm_delete']='Șterge elementul selectat. Un element folosit nu este șters.';
+$ec_lang['lpn_sm_base_kept']='Baza unui arbore nu este ștearsă. O altă Bază adăugată cu Adaugă bază este ștearsă când nimic nu o folosește.';
+$ec_lang['lpn_sm_rename']='Redenumire';
+$ec_lang['lpn_sm_rename_alts_ask']='Redenumiți alternativele cu același nume?';
+$ec_lang['lpn_sm_make_current']='Fă curent';
 // Tips on greyed Scenario manager commands, saying why they are greyed (Perry, 2026-10-11).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+$ec_lang['lpn_sm_current_already']='Acest scenariu este deja scenariul curent.';
+$ec_lang['lpn_sm_none_selected']='Selectați mai întâi un element din arbore.';
+$ec_lang['lpn_sm_base_named']='Baza unui arbore nu este redenumită.';
+$ec_lang['lpn_sm_copy']='Copiază';
+$ec_lang['lpn_sm_merge_up']='Îmbină în sus';
+$ec_lang['lpn_sm_merge_up_tip']='Mută valorile specifice ale alternativei selectate într-o alternativă de deasupra ei în arbore. Alternativa selectată moștenește apoi acele valori.';
+$ec_lang['lpn_sm_merge_up_root']='O alternativă Bază nu are nimic deasupra în care să se îmbine.';
+$ec_lang['lpn_sm_merge_none']='Alternativa {name} nu are valori specifice de îmbinat.';
+$ec_lang['lpn_sm_merge_pick']='În ce alternativă se îmbină valorile specifice ale lui {name}? Părintele ei este listat primul.';
+$ec_lang['lpn_sm_merge_ask']='Mutați în sus valorile specifice ({n}) ale lui {name} în {target}? După aceea le moștenește în loc să le înlocuiască. Puteți anula acest lucru.';
+$ec_lang['lpn_sm_merge_skipped']='{between} înlocuiește și aceste valori. Este omisă și nu este schimbată, deci {name} le va citi din {between}, nu din {target}:';
+$ec_lang['lpn_sm_merge_line']='{asset}: {property}';
+$ec_lang['lpn_sm_copy_up']='Copiază în sus';
+$ec_lang['lpn_sm_copy_up_tip']='Copiază valorile specifice ale alternativei selectate într-o alternativă de deasupra ei în arbore. Alternativa selectată își păstrează valorile specifice.';
+$ec_lang['lpn_sm_copy_up_root']='O alternativă Bază nu are nimic deasupra în care să copieze.';
+$ec_lang['lpn_sm_copy_none']='Alternativa {name} nu are valori specifice de copiat.';
+$ec_lang['lpn_sm_copy_pick']='În ce alternativă se copiază valorile specifice ale lui {name}? Părintele ei este listat primul.';
+$ec_lang['lpn_sm_copy_ask']='Copiați în sus valorile specifice ({n}) ale lui {name} în {target}? {name} le păstrează ca valori specifice proprii. Puteți anula acest lucru.';
+$ec_lang['lpn_sm_copy_skipped']='{between} înlocuiește și aceste valori. Este omisă și nu este schimbată, deci își păstrează propriile valori pentru ele:';
+$ec_lang['lpn_sm_list_overrides']='Manager de valori specifice…';
+$ec_lang['lpn_sm_list_overrides_tip']='Listează valorile specifice ale scenariului pe categorii, fiecare cu valoarea moștenită pe care o înlocuiește, și permite ștergerea oricăreia dintre ele.';
+$ec_lang['lpn_sm_list_overrides_none']='Acest scenariu nu are valori specifice.';
+$ec_lang['lpn_ovl_title']='Manager de valori specifice: {name}';
+$ec_lang['lpn_ovl_note']='Acestea sunt valorile pe care acest scenariu le stabilește el însuși în alternativele pe care le folosește, fiecare cu valoarea pe care o înlocuiește. Valorile pe care le moștenește nu sunt nici listate, nici numărate. Ștergeți o valoare specifică pentru a restabili valoarea moștenită; Anulare o inversează. Selectați un ID pentru a merge la elementul de pe hartă.';
+$ec_lang['lpn_ovl_clear_selected']='Șterge valorile specifice selectate';
+$ec_lang['lpn_ovl_clear_all']='Șterge toate valorile specifice';
+$ec_lang['lpn_ovl_clear_all_ask']='Ștergeți toate valorile specifice ({n}) ale lui {name}? Fiecare valoare revine la valoarea moștenită. Anulare o inversează.';
+$ec_lang['lpn_ovl_pick_tip']='Selectați această valoare specifică pentru butonul Șterge valorile specifice selectate.';
+$ec_lang['lpn_ovl_bubble_off']='Nu este pe hartă';
+$ec_lang['lpn_ovl_bubble_moved']='{quantity}, mutat sau redimensionat';
+$ec_lang['lpn_ovl_group']='{category}: {alternative}';
+$ec_lang['lpn_ovl_col_override']='Valoare specifică';
+$ec_lang['lpn_ovl_col_inherited']='Valoare moștenită';
+$ec_lang['lpn_ovl_col_inherited_tip']='Valoarea pe care acest scenariu o citește fără valoarea specifică: valoarea părintelui alternativei sau valoarea din Bază.';
+$ec_lang['lpn_ovl_same']='(aceeași)';
+$ec_lang['lpn_ovl_same_tip']='Egală cu valoarea moștenită. Este totuși o valoare specifică și este numărată.';
+$ec_lang['lpn_sm_help']='Cum funcționează scenariile și alternativele:\n\nÎn Mod de bază, alternativele sunt ascunse și automate, iar toate scenariile noi sunt copii ale scenariului Bază.\n\nCu Mod de bază dezactivat, este disponibil un arbore complex de moștenire, iar alternativele pot fi partajate între scenarii. Dar comportamentul implicit al modificărilor, când este nevoie de o nouă asociere de alternativă (în lipsa unei gestionări proactive din partea utilizatorului), este să creeze o alternativă cu numele scenariului curent, ceea ce dă fiecărui scenariu setul său unic de alternative.\n\nProprietățile și setările aparțin unor categorii de alternative care apar ca coloane ale tabelului de scenarii și alternative și ca opțiuni de gestionare în Managerul de scenarii.\n\nValorile specifice sunt create în scenarii, dar de fapt aparțin alternativelor respective asociate scenariului; deci un scenariu este ca o fereastră către alternativele sale. Asocierile alternativelor cu scenariile se gestionează în panoul din dreapta al Managerului de scenarii sau în tabelul Scenarii din panoul inferior. Crearea unui scenariu nou nu creează nicio alternativă; scenariul nou folosește alternativele părintelui său până când sunt create valori specifice care au nevoie de alternative noi. Când sunt create valori specifice într-un scenariu, ele sunt stocate în alternativa respectivă pentru scenariu; dacă scenariul nu are o astfel de alternativă, este creată o alternativă nouă cu numele scenariului.\n\nExemplu: creați un scenariu "Figură: ID-urile nodurilor și legăturilor" și editați un Text astfel încât să spună "ID-urile nodurilor și legăturilor." Când creați scenariul, nu este creată nicio alternativă. Dar în momentul în care salvați Textul, este creată o alternativă de Text numită "Figură: ID-urile nodurilor și legăturilor" cu valoarea specifică pentru valoarea Textului. În Mod de bază, vedeți asta pur și simplu ca o valoare specifică în scenariul însuși.\n\nCopiază proprietățile copiază numai valorile specifice. În orice scenariu în afară de Bază, copiază numai valorile specifice pe care elementul le are în acel scenariu.\n\nCum se gestionează scenariile:\n\n- Alegeți Scenarii sau o categorie de alternative din lista de sus pentru a-i afișa arborele.\n\n- Creați un copil al elementului selectat cu Adaugă copil. Adaugă bază adaugă o altă Bază, care pornește ca o copie a lui Bază așa cum este acum; modificările ulterioare ale lui Bază nu o schimbă. Un copil nou primește numele părintelui său; tastați un nume pentru a-l redenumi. Copiază copiază alternativa selectată. Îmbină în sus mută valorile specifice ale alternativei selectate într-o alternativă de deasupra ei, aleasă după nume, iar alternativa selectată le moștenește apoi; mai întâi numește orice valoare pe care o înlocuiește și o alternativă pe care o omite, valoare care nu este schimbată. Pentru a copia un scenariu, folosiți Copiază scenariul în meniul Scenarii, în Mod de bază; copiază valorile specifice ale scenariului, cu alternativele care le conțin. Adaugă bază și Copiază scenariul creează fiecare alternative: Adaugă bază creează o alternativă Bază pentru noua Bază în fiecare categorie care conține valori, iar Copiază scenariul creează o alternativă nouă, cu numele copiei, pentru fiecare alternativă care conține valorile specifice ale scenariului.\n\n- Trageți un element peste altul pentru a-l face copil al acelui element. Un scenariu mutat la un părinte nou moștenește de la el tot ce nu a înlocuit; ce a înlocuit nu se schimbă. Trageți un element între două elemente pentru a le reordona.\n\n- Faceți clic pe un element pentru a-l selecta. Apăsați F2 sau alegeți Redenumire pentru a redenumi elementul selectat. Redenumirea unui scenariu întreabă dacă să fie redenumite alternativele care îi poartă numele; în Mod de bază ele sunt redenumite odată cu el, fără întrebare. Faceți dublu clic pe un scenariu sau apăsați Enter pentru a-l face curent. Faceți clic pe săgeata de lângă un element sau apăsați Stânga ori Dreapta pentru a-l restrânge sau extinde. Faceți clic dreapta pe un element pentru aceleași comenzi ca butoanele.\n\n- Apăsați Delete sau faceți clic pe butonul minus pentru a șterge elementul selectat. Un element în uz nu este șters, iar mesajul numește ce îl folosește. Ștergerea unui scenariu cu Mod de bază dezactivat păstrează alternativele pe care le folosește. Ștergerea unui scenariu cu Mod de bază activ șterge și fiecare dintre alternativele lui pe care nu le folosește niciun alt scenariu.\n\n- Pentru a face un scenariu să folosească altă alternativă, inclusiv Bază, alegeți-o în rândul scenariului din panoul din dreapta al Managerului de scenarii sau din tabelul Scenarii. O valoare specifică făcută într-o alternativă partajată schimbă fiecare scenariu care o folosește.';
+$ec_lang['lpn_sm_delete_alt_ask']='Ștergeți alternativa {name}?';
+$ec_lang['lpn_sm_in_use']='{item}\nnu se poate șterge cât timp este în uz la\n{list}';
+$ec_lang['lpn_sm_alt_delete_has_children']='Alternativa {name} nu poate fi ștearsă deoarece are copii: {list}. Ștergeți-i mai întâi sau mutați-i la alt părinte.';
+$ec_lang['lpn_sm_item_scenario']='Scenariul {name}';
+$ec_lang['lpn_sm_item_alternative']='Alternativa {name}';
+$ec_lang['lpn_sm_name_taken']='Numele {name} este deja folosit în acest arbore.';
+$ec_lang['lpn_sm_cycle']='{name} nu poate fi mutat sub unul dintre propriii săi copii.';
+$ec_lang['lpn_sm_used_by']='Folosit de scenarii: {n}';
+$ec_lang['lpn_sm_used_by_tip']='Folosit de: {list}';
+$ec_lang['lpn_sm_used_by_none']='Nefolosit de niciun scenariu';
+$ec_lang['lpn_sm_tree_all']='Toate';
+$ec_lang['lpn_sm_tree_unused']='Toate cele nefolosite';
+$ec_lang['lpn_sm_unused_none']='Niciuna';
+$ec_lang['lpn_sm_all_row_tip']='Faceți dublu clic pentru a-l deschide în arborele categoriei lui.';
+$ec_lang['lpn_sm_compare_tip']='Include în Comparație scenarii';
+$ec_lang['lpn_sm_inherited']='moștenit';
+$ec_lang['lpn_sm_shared_note']='Partajat cu: {list}';
+$ec_lang['lpn_scncmp_none_checked']='Niciun scenariu nu este bifat pentru comparație. Bifați scenarii în Managerul de scenarii.';
 $ec_lang['lpn_time_scn_overrides']='Valori specifice scenariului:';
-
-
-
+$ec_lang['lpn_settings_table_major']='Titlu principal';
+$ec_lang['lpn_settings_table_minor']='Subtitlu';
+$ec_lang['lpn_settings_table_category']='Categorie';
 // The Settings table's third heading level, between Minor heading and Setting: the label field, coloured
 // field, asset or custom property a group of settings belongs to (Tom, 2026-10-07: "We could call it
 // 'Owner'.").
-
-
-
-
-
-
-
-
-
-
+$ec_lang['lpn_settings_table_owner']='Aparține';
+$ec_lang['lpn_settings_table_setting']='Setare';
+$ec_lang['lpn_settings_table_yes']='Da';
+$ec_lang['lpn_settings_table_no']='Nu';
+$ec_lang['lpn_settings_row_of']='{setting}, {member}';
+$ec_lang['lpn_settings_row_labels_field']='{labels}: {field}';
+$ec_lang['lpn_settings_row_labels_part']='{labels}: {field}, {part}';
+$ec_lang['lpn_settings_row_labels_customer']='Etichete abonați';
+$ec_lang['lpn_settings_row_label_before']='Text înainte';
+$ec_lang['lpn_settings_row_label_after']='Text după';
 // A label field's settings, named in the Setting column with the field itself in the Owner column
 // (Tom, 2026-10-07: "Symbology.Node labels.ID.Is Active", "Show order", "Drop order"). Whether the
 // value appears on the label at all; where it sits on the label (1 first); which value is given up
 // first when labels crowd (1 first).
-
-
-
+$ec_lang['lpn_settings_row_label_on']='Activ';
+$ec_lang['lpn_settings_row_label_show']='Ordinea afișării';
+$ec_lang['lpn_settings_row_label_drop']='Ordinea omiterii';
 // The Setting column of an ID prefix row; the asset it applies to is in the Owner column.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+$ec_lang['lpn_settings_row_id_prefix']='Prefix ID';
+$ec_lang['lpn_settings_row_symbol_cap_multiple']='Cel mai mare simbol, ca multiplu al unei lungimi tipice de conductă';
+$ec_lang['lpn_settings_row_symbol_cap_percentile']='Lungimea tipică de conductă, ca percentilă a tuturor lungimilor de conductă';
+$ec_lang['lpn_settings_row_contour_labels']='Etichete curbe de nivel';
+$ec_lang['lpn_settings_row_check_freq']='Frecvența verificării stării';
+$ec_lang['lpn_settings_row_max_check']='Număr maxim de verificări ale stării';
+$ec_lang['lpn_settings_row_status_report']='Raport de stare';
+$ec_lang['lpn_settings_row_pda_src']='Opțiuni de cerință dependentă de presiune indicate în fișier';
+$ec_lang['lpn_settings_row_quality_option']='Opțiunea de calitate așa cum o indică fișierul';
+$ec_lang['lpn_settings_row_tolerance']='Acuratețe (proiecte mai vechi)';
+$ec_lang['lpn_settings_row_emitter_exponent_old']='Exponent emițător (proiecte mai vechi)';
+$ec_lang['lpn_settings_row_elev_source_old']='Sursa cotei (proiecte mai vechi)';
+$ec_lang['lpn_settings_row_basemap']='Harta de bază';
+$ec_lang['lpn_settings_row_basemap_last']='Harta de bază la care se revine';
+$ec_lang['lpn_settings_row_customer_max_width']='Arată etichetele abonaților când harta este mărită la această lățime sau mai puțin';
+$ec_lang['lpn_settings_row_quality_step']='Pas de timp al calității';
+$ec_lang['lpn_settings_row_view']='Vizualizarea hărții (centru și scară)';
+$ec_lang['lpn_settings_row_bubbles']='Grafice de serii de timp pe hartă';
+$ec_lang['lpn_settings_row_contour_fill']='Umplerea curbelor de nivel';
+$ec_lang['lpn_settings_row_contour_opacity']='Opacitatea umplerii curbelor de nivel';
+$ec_lang['lpn_settings_row_contour_interval']='Intervalul curbelor de nivel';
+$ec_lang['lpn_settings_row_contour_buffer']='Zona tampon a curbelor de nivel';
+$ec_lang['lpn_settings_row_contour_terrain']='Terenul dintre noduri pentru curbele de nivel din Mapbox DEM';
+$ec_lang['lpn_settings_row_new_asset']='Elemente noi: {setting}';
+$ec_lang['lpn_settings_row_default']='{value} (implicit)';
+$ec_lang['lpn_settings_row_view_value']='Centru {x}, {y}; scară {s}';
+$ec_lang['lpn_settings_held_in']='Valoare specifică în {scenario}.';
+$ec_lang['lpn_settings_held_base']='{base}: {value}';
+$ec_lang['lpn_settings_view_center']='Centrul hărții';
+$ec_lang['lpn_settings_view_scale']='Scara hărții';
+$ec_lang['lpn_settings_view_scale_tip']='Scara în centrul hărții, ca 1:N. Tastați 1:2000, sau doar 2000, pentru a mări la acea scară.';
+$ec_lang['lpn_settings_view_top_left']='Colțul din stânga sus';
+$ec_lang['lpn_settings_view_bottom_right']='Colțul din dreapta jos';
+$ec_lang['lpn_settings_view_save']='Salvează această vizualizare în acest scenariu';
+$ec_lang['lpn_settings_view_save_tip']='Stochează acest centru și această scară ale hărții în scenariul deschis, astfel încât deschiderea acelui scenariu mută harta aici. Mutarea ulterioară a hărții nu schimbă nimic până când apăsați din nou acest buton. Ștergeți valoarea specifică pentru a urma din nou vizualizarea din {base}.';
+$ec_lang['lpn_settings_row_basemap_osm']='Hartă stradală';
+$ec_lang['lpn_settings_row_basemap_satellite']='Imagini din satelit';
+$ec_lang['lpn_settings_row_basemap_topo']='Hartă topografică';
+$ec_lang['lpn_settings_units_one_project']='Unitățile sunt aceleași în fiecare scenariu.';
+$ec_lang['lpn_settings_restore_base_only']='Comutați la Bază pentru a restabili valorile implicite.';
 $ec_lang['lpn_alt_cat_physical']='Fizic';
 $ec_lang['lpn_alt_cat_demand']='Cerință';
-$ec_lang['lpn_alt_cat_topology']='Activarea elementelor';
-
+$ec_lang['lpn_alt_cat_topology']='Topologie activă';
+$ec_lang['lpn_alt_cat_topology_tip']='Activarea elementelor';
 $ec_lang['lpn_alt_cat_initial']='Setări inițiale';
 $ec_lang['lpn_alt_cat_constituent']='Constituent chimic';
 $ec_lang['lpn_alt_cat_fireflow']='Debit de incendiu';
 $ec_lang['lpn_alt_cat_energy']='Cost energie';
 $ec_lang['lpn_alt_cat_userdata']='Proprietăți personalizate';
 $ec_lang['lpn_alt_cat_text']='Text';
-
-
+$ec_lang['lpn_alt_cat_presentation']='Prezentare';
+$ec_lang['lpn_alt_cat_calculation']='Calcul';
 // Edited by TGH 2026-09-07
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
@@ -3312,6 +3532,14 @@ $ec_lang['lpn_settings_default_is']='Valoarea implicită este {n}.';
 $ec_lang['lpn_settings_accuracy_tip']='Limita de convergență pe care rezolvitorul trebuie s-o atingă înainte de a se opri, măsurată ca variația totală a debitului de la o încercare la următoarea, împărțită la debitul total din legături. Un număr mai mic este mai exact și durează mai mult.';
 $ec_lang['lpn_settings_specific_gravity']='Densitate relativă';
 $ec_lang['lpn_settings_viscosity']='Vâscozitate relativă';
+// **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
+// this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
+// collided with the word the same sprint used for lpn_result_concentration, on the same screen.
+// Tom approved a synonym on 2026-09-06. **HIS FIRST WORDING WAS 'Relative rate of diffusion' and it
+// is NOT what shipped**: that is diffusivity, and this key is viscosity. He was given a friction
+// entry that quoted a translator's mistaken description of the key without anyone checking it
+// against this file -- so the note below says what the number IS and what it is NOT, because two
+// separate readers have now reached for a transport coefficient on a fluid property.
 $ec_lang['lpn_settings_viscosity_tip']='Vâscozitatea fluidului comparată cu a apei la 20 de grade Celsius. Schimbă răspunsul doar la metoda Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Încercări maxime';
 $ec_lang['lpn_settings_trials_tip']='Numărul maxim de încercări înainte ca rezolvitorul să se oprească pe o rețea care nu converge.';
@@ -3353,14 +3581,14 @@ $ec_lang['lpn_settings_engine_native']='Folosește rezolvitorul integrat când e
 // EPANET whatever the box says, and the one-time download, which is the cost a visitor on a slow
 // connection actually pays.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_engine_native_tip']='Activați pentru a folosi rezolvitorul integrat acolo unde este posibil. În caz contrar, este folosit întotdeauna rezolvitorul EPANET de la US EPA. Rezolvitorul integrat nu este folosit pentru simulări pe perioadă extinsă sau pentru vane PRV, PSV ori FCV active. Prima dată când este folosit rezolvitorul EPANET, se descarcă aproximativ 650 KB, care rămân apoi pe acest dispozitiv. Acolo unde o conductă are o pierdere locală (minoră), cele două rezolvitoare diferă în ultimele cifre: EPANET folosește o valoare rotunjită a accelerației gravitaționale, deci pierderile sale locale sunt foarte puțin mai mici decât forma exactă.';
+$ec_lang['lpn_settings_engine_native_tip']='Activați pentru a folosi rezolvitorul integrat acolo unde este posibil. În caz contrar, este folosit întotdeauna rezolvitorul EPANET de la US EPA. Rezolvitorul integrat nu este folosit pentru simulări pe perioadă extinsă sau pentru vane cu cădere fixă de presiune ori de uz general (PBV, GPV). Prima dată când este folosit rezolvitorul EPANET, se descarcă aproximativ 650 KB, care rămân apoi pe acest dispozitiv. Acolo unde o conductă are o pierdere locală (minoră), cele două rezolvitoare diferă în ultimele cifre: EPANET folosește o valoare rotunjită a accelerației gravitaționale, deci pierderile sale locale sunt foarte puțin mai mici decât forma exactă.';
 $ec_lang['lpn_engine_loading']='Se încarcă rezolvitorul EPANET…';
 $ec_lang['lpn_engine_failed']='Rezolvitorul EPANET nu a putut fi încărcat. Se afișează în schimb rezolvitorul integrat.';
 $ec_lang['lpn_engine_failed_why']='{reason} Se afișează în schimb rezolvitorul integrat.';
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='Rezolvat cu rezolvitorul EPANET, din cauza acestor vane de control al presiunii și al debitului:';
+$ec_lang['lpn_engine_valve_route']='Rezolvat cu rezolvitorul EPANET, din cauza acestor vane cu cădere fixă de presiune și de uz general:';
 $ec_lang['lpn_unit_unknown']='Acest desen indică o unitate pe care această pagină nu o acceptă: {unit}. Toate valorile sunt păstrate și afișate exact așa cum au fost importate, iar nimic nu a fost modificat. Nu se poate calcula nimic până când unitatea este acceptată, deoarece factorul ei de conversie este necunoscut.';
 $ec_lang['lpn_engine_manning_note']='Notă: cu rugozitate Manning, EPANET rotunjește constanta din ecuația Manning, astfel încât pierderea de sarcină este cu aproximativ 0,6% mai mică decât forma exactă.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
@@ -3380,6 +3608,12 @@ $ec_lang['lpn_time_stat_stopped']='{statistic} nu este afișată: rularea s-a op
 $ec_lang['lpn_time_stopped_no_quality']='Nu au fost calculate rezultate privind calitatea apei, deoarece analiza calității începe după încheierea rulării hidraulice.';
 $ec_lang['lpn_energy_stopped']='Rularea EPANET s-a oprit înainte de sfârșitul perioadei, deci nu au fost calculate rezultate privind energia pompelor.';
 $ec_lang['lpn_time_run_stopped_kept']='Rularea EPANET s-a oprit la {time}. Rezultatele ajung până la {solved}, ultima perioadă rezolvată, iar după aceasta nu se afișează niciunul. Raportul ei de rulare spune de ce.';
+// Why a stopped run stopped, read from EPANET's own run report (R-402). {link} is the link EPANET
+// had just closed, {tank} the tank at one end of it, {nodes} the ids of the nodes EPANET then could
+// not solve for, comma-separated. Follows lpn_time_run_stopped or lpn_time_run_stopped_kept.
+$ec_lang['lpn_time_run_cut_off']='EPANET închisese {link}, apoi nu a mai putut rezolva pentru {nodes}.';
+$ec_lang['lpn_time_run_cut_off_full']='Bazinul {tank} era plin, deci EPANET închisese {link} pentru a nu lăsa apa să intre în el, apoi nu a mai putut rezolva pentru {nodes}. Acest lucru se poate întâmpla când un bazin plin nu are nicio ieșire de apă, ca atunci când fiecare cerință este zero. O cerință puțin peste zero sau un nivel al bazinului puțin sub maxim îl evită.';
+$ec_lang['lpn_time_run_cut_off_empty']='Bazinul {tank} era gol, deci EPANET închisese {link} pentru a nu-l lăsa să se golească mai mult, apoi nu a mai putut rezolva pentru {nodes}.';
 // The run's own version of that last sentence: a period run has a moment and a tank level to name,
 // and a one-moment solve does not, which is where the shared label stops.
 $ec_lang['lpn_time_run_fell_back']='În schimb, numerele de pe ecran provin din rezolvitorul integrat. Acesta calculează câte un moment odată, deci aceasta este rețeaua doar la {time}, cu fiecare bazin încă la nivelul său inițial.';
@@ -3390,8 +3624,8 @@ $ec_lang['lpn_time_run_fell_back']='În schimb, numerele de pe ecran provin din 
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_control_dangling_note']='Aceste comenzi numesc un element care nu mai este în acest proiect, deci au fost omise: {ids}';
 $ec_lang['lpn_control_unreadable_note']='Aceste comenzi nu au putut fi citite, deci au fost omise: {ids}';
-
-
+$ec_lang['lpn_control_inactive_note']='Aceste comenzi fac trimitere la un element inactiv în acest scenariu, deci sunt ignorate în rularea lui: {ids}';
+$ec_lang['lpn_rule_inactive_note']='Aceste reguli fac trimitere la un element inactiv în acest scenariu, deci sunt ignorate în rularea lui: {ids}';
 $ec_lang['lpn_rule_dangling_note']='Aceste reguli indică un element care nu mai este în acest proiect, deci au fost ignorate la această rulare: {ids}';
 $ec_lang['lpn_rule_unreadable_note']='Aceste reguli nu au putut fi citite, deci au fost ignorate la această rulare: {ids}';
 $ec_lang['lpn_settings_text_size']='Dimensiune text (pixeli)';
@@ -3585,7 +3819,7 @@ $ec_lang['lpn_time_runbox_hide']='Nu mai afișa această casetă';
 $ec_lang['lpn_settings_runbox']='Afișează caseta de progres a rulării';
 $ec_lang['lpn_settings_runbox_tip']='O casetă care raportează cât de departe a ajuns o rulare și ce a găsit. Cu ea dezactivată, o rulare terminată spune același lucru în linia de stare, timp de câteva secunde. Aceasta este o setare pentru acest browser, nu pentru proiect.';
 $ec_lang['lpn_time_run_failed']='Rularea nu s-a încheiat, deci nu există rezultate pentru momentele ulterioare.';
-$ec_lang['lpn_time_run_report']='Raport de rulare';
+$ec_lang['lpn_time_run_report']='Rulare: raport';
 $ec_lang['lpn_time_run_report_copy']='Copiază';
 $ec_lang['lpn_time_run_report_copied']='Copiat';
 $ec_lang['lpn_time_run_report_tip']='Raportul scris de EPANET pentru ultima rulare, textual: dacă a convergit și orice avertismente. Textul este produs de rezolvitorul EPANET, nu de această pagină.';
@@ -3796,7 +4030,7 @@ $ec_lang['lpn_reports_menu']='Rapoarte';
 // Row label only (the box title is lpn_time_run_report). Tom, 2026-10-07: no row carries '(EPANET)';
 // the tips say where a report comes from. Run is EPANET's verbatim report.
 $ec_lang['lpn_reports_epanet']='Rulare';
-$ec_lang['lpn_energy_title']='Raport de energie a pompelor';
+$ec_lang['lpn_energy_title']='Pompe: raport de energie';
 $ec_lang['lpn_energy_menu']='Energie pompe';
 $ec_lang['lpn_energy_efficiency']='Eficiența pompei (procent)';
 $ec_lang['lpn_energy_efficiency_tip']='Eficiența globală (de la rețeaua electrică la apă) folosită pentru orice pompă care nu are propria curbă de eficiență. EPANET folosește 75 la sută atunci când nu se precizează nimic.';
@@ -3825,7 +4059,7 @@ $ec_lang['lpn_energy_no_pumps']='Această rețea nu are pompe, deci nu există n
 // re-keying are lpn_scenario_label and lpn_scenario_overrides, which already name the same two
 // things in the scenario menu.
 $ec_lang['lpn_scncmp_title']='Comparație scenarii';
-$ec_lang['lpn_scncmp_menu_tip']='Tabel de scenarii cu numărul de diferențe, cea mai mică presiune și cea mai mare viteză';
+$ec_lang['lpn_scncmp_menu_tip']='Tabel de scenarii cu numărul de valori specifice, cea mai mică presiune și cea mai mare viteză';
 $ec_lang['lpn_scncmp_running']='Se rezolvă fiecare scenariu…';
 $ec_lang['lpn_scncmp_empty']='Nu a fost desenat încă nimic, deci nu este nimic de rezolvat.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Viteză maximă';
@@ -3892,7 +4126,7 @@ $ec_lang['lpn_full_row_count']='Rânduri ({n}).';
 // lpn_calib_missing: keep in step with feat/profile-file's lpn_profile_file_missing (Task 604), the same sentence.
 $ec_lang['lpn_reports_calib']='Calibrare';
 $ec_lang['lpn_reports_calib_tip']='Comparați datele de teren măsurate dintr-un fișier de calibrare cu ultima rulare: statistici, un grafic de corelație și comparații de medii.';
-$ec_lang['lpn_calib_title']='Raport de calibrare';
+$ec_lang['lpn_calib_title']='Calibrare: raport';
 $ec_lang['lpn_calib_param']='Parametru';
 $ec_lang['lpn_calib_param_tip']='Mărimea pe care o măsoară fișierul de calibrare. Se păstrează câte un fișier pentru fiecare parametru.';
 $ec_lang['lpn_calib_load']='Încarcă fișier de calibrare…';
@@ -3981,6 +4215,13 @@ $ec_lang['lpn_library_menu']='Biblioteci';
 // that is the word every water-network user and every tutorial already has -- see the note in
 // dev/scripts/glossary.json about deferring to a discipline's standard term.
 $ec_lang['lpn_library_patterns']='Modele';
+// **THE SYNONYMS ARE TOM'S OWN, GIVEN 2026-08-24**, which is the written permission this array
+// requires. "Pattern" is the discipline's standard term and stays the label; the payload exists so
+// a translator who cannot recover the concept from that one word has the shape of it.
+//
+// "Run" was on his list and he struck it the same day, on the collision: this page's Run is the
+// button that plays an extended-period simulation back, so a translator reaching for their word for
+// a program run would have named the wrong thing. Tom: *"Yes. It's not the best term."*
 $ec_lang['lpn_library_patterns_tip']='Un model este o listă de multiplicatori care se repetă. Fiecare se aplică pentru un pas de timp al modelului, deci 24 de numere cu un pas de o oră alcătuiesc o zi care se repetă. O cerință de 10 cu un multiplicator de 1,5 este 15 în acel moment.';
 $ec_lang['lpn_library_curves']='Curbe';
 $ec_lang['lpn_library_curves_tip']='Sarcina sau eficiența pompei în funcție de debit, pierderea vanei în funcție de debit, sau volumul bazinului în funcție de adâncime';
@@ -4130,6 +4371,7 @@ $ec_lang['lpn_fitting_return_bend']='Cot de întoarcere închis';
 $ec_lang['lpn_fitting_tee_run']='Teu standard, curgere prin traseul drept';
 $ec_lang['lpn_fitting_tee_branch']='Teu standard, curgere prin ramificație';
 $ec_lang['lpn_fitting_entrance']='Intrare cu muchie ascuțită';
+// Tom, 2026-09-30, ruling sprint 2026-09-30-golf item 1: _syn = "All junctions" / "Selected junctions".
 $ec_lang['lpn_fitting_exit']='Ieșire';
 // THE ONE ROW THAT IS NOT THE MANUAL\'S: a fitting the table does not carry, whose coefficient the
 // user states. Without it the picker would quietly refuse every fitting nobody could source.
@@ -4155,6 +4397,8 @@ $ec_lang['lpn_library_pattern_values_tip']='Multiplicatorii, separați prin spa�
 // {n} values, {step} apart, covering {span}. Placeholders rather than three joined fragments
 // (Task 193): the order of the three differs by language and a sandwich cannot express that.
 $ec_lang['lpn_library_pattern_span']='Multiplicatori: {n}, la {step} distanță, acoperind {span}';
+// Under the pattern graph, beside the clock-time row: the ordinal of each time period (1, 2, 3).
+$ec_lang['lpn_library_pattern_axis_step']='Pas';
 $ec_lang['lpn_library_pattern_none']='Niciun model';
 // The blank first option of a selector whose blank follows a project-wide default (a junction's or
 // customer's demand pattern, a pump's price pattern and efficiency curve). Tom, 2026-10-04.
@@ -4169,8 +4413,8 @@ $ec_lang['lpn_library_pattern_default_mark']='(implicit)';
 $ec_lang['lpn_library_pattern_default_tip']='Modelul de cerință implicit. Schimbați-l la Setări, Model de cerință implicit.';
 $ec_lang['lpn_library_pattern_default_deleted_to']='Modelul {id} era modelul de cerință implicit. Joncțiunile fără model folosesc acum modelul {now}.';
 $ec_lang['lpn_library_pattern_default_deleted_none']='Modelul {id} era modelul de cerință implicit. Joncțiunile fără model folosesc acum o cerință constantă.';
-
-
+$ec_lang['lpn_library_pattern_default_deleted_also']='Scenarii care l-au folosit și ele ca model implicit: {list}.';
+$ec_lang['lpn_library_pattern_default_deleted_in']='Modelul {id} era modelul implicit al cerinței în aceste scenarii: {list}.';
 $ec_lang['lpn_library_control_add']='Adaugă o comandă';
 // THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
@@ -4317,7 +4561,7 @@ $ec_lang['lpn_analyze_menu']='Analiză';
 $ec_lang['lpn_analyze_menu_tip']='Analize care rulează rețeaua pe o copie: debitul de incendiu la fiecare joncțiune, pierderea fiecărei conducte, pompe și vane, și cerințele mărite sau reduse proporțional.';
 $ec_lang['lpn_ff_menu']='Analiza debitului de incendiu…';
 $ec_lang['lpn_ff_menu_tip']='Testați fiecare joncțiune selectată pentru debitul de incendiu și verificați efectul asupra restului sistemului';
-$ec_lang['lpn_ff_title']='Analiza debitului de incendiu';
+$ec_lang['lpn_ff_title']='Debit de incendiu: analiză';
 $ec_lang['lpn_ff_intro']='Fiecare joncțiune, pe rând, preia un debit de incendiu peste cerința ei existentă. Rularea folosește o copie a rețelei la pasul de timp de pe ecran, deci nimic din proiect nu se schimbă.\n\nDebitul de incendiu se testează în mod normal la cerința zilei maxime, deci setați mai întâi rețeaua în această condiție.\n\nFiecare joncțiune testată necesită aproximativ 16 rezolvări ale întregii rețele, deci un sistem mare durează minute: alegeți joncțiunile înainte de rulare și opriți oricând pentru a păstra rezultatele parțiale.';
 $ec_lang['lpn_ff_scope']='Joncțiuni de testat';
 $ec_lang['lpn_ff_all']='Toate joncțiunile';
@@ -4328,7 +4572,7 @@ $ec_lang['lpn_ff_skipped']='{n} elemente selectate nu sunt joncțiuni, deci nu a
 $ec_lang['lpn_ff_required']='Debit de incendiu necesar';
 $ec_lang['lpn_ff_required_tip']='Debitul necesar la un hidrant conform codului de incendiu aplicabil sau autorității pentru incendii. Fiecare joncțiune este testată față de această valoare, cu excepția cazului în care pentru ea este introdus un debit de incendiu necesar.';
 $ec_lang['lpn_ff_required_own']='Joncțiunile cu un debit de incendiu necesar individual sunt testate față de acea valoare. Numărul lor: {n}.';
-$ec_lang['lpn_ff_required_node_tip']='Debitul de incendiu necesar la această joncțiune pentru destinația terenului pe care o deservește, conform codului de incendiu aplicabil sau autorității pentru incendii. Lăsați gol pentru a testa joncțiunea față de valoarea din caseta Analiza debitului de incendiu.';
+$ec_lang['lpn_ff_required_node_tip']='Debitul de incendiu necesar la această joncțiune pentru destinația terenului pe care o deservește, conform codului de incendiu aplicabil sau autorității pentru incendii. Lăsați gol pentru a testa joncțiunea față de valoarea din caseta Debit de incendiu: analiză.';
 $ec_lang['lpn_ff_residual']='Presiune reziduală de menținut';
 $ec_lang['lpn_ff_residual_tip']='Presiunea pe care joncțiunea trebuie să o mențină în continuare în timp ce livrează debitul de incendiu. AWWA M31 și NFPA 291 folosesc 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Verificare de proiectare (efect asupra sistemului)';
@@ -4468,14 +4712,14 @@ $ec_lang['lpn_ff_err_unknown']='Niciun rezultat. Cod de eroare: {code}';
 // {n}, {done} and {total} are whole numbers; {pressure} is a pressure with its unit.
 $ec_lang['lpn_crit_menu']='Analiza criticității…';
 $ec_lang['lpn_crit_menu_tip']='Scoateți pe rând din rețea fiecare conductă, pompă și vană și raportați efectul asupra sistemului.';
-$ec_lang['lpn_crit_title']='Analiza criticității';
+$ec_lang['lpn_crit_title']='Criticitate: analiză';
 $ec_lang['lpn_crit_intro']='Fiecare element este scos pe rând din rețea, iar rețeaua este rezolvată la pasul de timp de pe ecran, în scenariul activ. Nimic din proiect nu este modificat; întreaga rulare se face pe o copie.';
 $ec_lang['lpn_crit_scope']='Legături de întrerupt';
 $ec_lang['lpn_crit_scope_tip']='Toate conductele, pompele și vanele, sau doar cele selectate pe hartă. Alegeți setul înainte de a rula.';
 $ec_lang['lpn_crit_scope_all']='Toate legăturile';
 $ec_lang['lpn_crit_scope_selected']='Legăturile selectate';
 $ec_lang['lpn_crit_minpressure']='Cea mai mică presiune permisă';
-$ec_lang['lpn_crit_minpressure_tip']='Este același număr ca Cea mai mică presiune permisă în altă parte din Analiza debitului de incendiu. Dacă îl schimbați aici, se schimbă și acolo.';
+$ec_lang['lpn_crit_minpressure_tip']='Este același număr ca Cea mai mică presiune permisă în altă parte din Debit de incendiu: analiză. Dacă îl schimbați aici, se schimbă și acolo.';
 $ec_lang['lpn_crit_col_asset']='Element';
 $ec_lang['lpn_crit_col_unserved']='Cerință neservită';
 $ec_lang['lpn_crit_col_cutoff']='Joncțiuni izolate';
@@ -4505,13 +4749,13 @@ $ec_lang['lpn_crit_skipped_dead']='Legături de capăt mort omise: {n}. Fiecare 
 // junction on the map; {reason} is a whole sentence saying why the solver gave no answer.
 $ec_lang['lpn_ds_menu']='Scalarea cerinței…';
 $ec_lang['lpn_ds_menu_tip']='Înmulțiți cerințele pe o copie a rețelei și vedeți presiunile și vitezele, sau găsiți cel mai mare factor de scalare a cerinței pe care sistemul îl poate susține.';
-$ec_lang['lpn_ds_title']='Scalarea cerinței';
+$ec_lang['lpn_ds_title']='Cerință: scalare';
 $ec_lang['lpn_ds_intro']='Apăsați butonul Rulează pentru a înmulți cerințele la joncțiunile alese cu factorul de scalare a cerinței și a vedea presiunile și vitezele.\n\nApăsați butonul Găsește pentru a găsi cel mai mare factor de scalare a cerinței, cu aproximație de {step}, la care toate aceste joncțiuni păstrează cel puțin cea mai mică presiune permisă; căutarea se face de la 0 la {max}.\n\nAmbele lucrează pe o copie a rețelei, rezolvată la pasul de timp de pe ecran, în scenariul activ, deci nimic din proiect nu se schimbă. Doar acel pas de timp este scalat, iar nivelurile și stările sunt preluate din el; pentru a testa vârful, mutați ceasul la cerința de vârf înainte de a rula.';
 $ec_lang['lpn_ds_scope']='Joncțiuni de scalat';
 $ec_lang['lpn_ds_scope_all']='Toate joncțiunile';
 $ec_lang['lpn_ds_scope_selected']='Joncțiunile selectate';
 $ec_lang['lpn_ds_minpressure']='Cea mai mică presiune permisă';
-$ec_lang['lpn_ds_minpressure_tip']='Este același număr ca Cea mai mică presiune permisă din altă parte a Analizei debitului de incendiu. Dacă îl schimbați aici, se schimbă și acolo.';
+$ec_lang['lpn_ds_minpressure_tip']='Este același număr ca Cea mai mică presiune permisă din altă parte a casetei Debit de incendiu: analiză. Dacă îl schimbați aici, se schimbă și acolo.';
 $ec_lang['lpn_ds_head_scale']='Scalarea cerințelor';
 $ec_lang['lpn_ds_multiplier']='Factor de scalare a cerinței';
 $ec_lang['lpn_ds_multiplier_tip']='Factorul cu care este înmulțită fiecare cerință; 1,5 înseamnă o creștere de 50%. Se aplică suplimentar față de multiplicatorul de cerință al scenariului activ, care este deja în cerințe, și nu este niciodată salvat în proiect.';
@@ -4522,7 +4766,7 @@ $ec_lang['lpn_ds_outside_below']='La un factor de scalare a cerinței de {m}, jo
 $ec_lang['lpn_ds_holds_max']='✓ Fiecare joncțiune păstrează {pressure} până la un factor de scalare a cerinței de {max}, limita superioară a căutării.';
 $ec_lang['lpn_ds_below_zero']='⚠ Cel puțin o joncțiune este sub {pressure} chiar și cu cerințele scalate la zero.';
 $ec_lang['lpn_ds_found']='✓ Fiecare joncțiune verificată păstrează cel puțin {pressure} până la un factor de scalare a cerinței de {m}.';
-$ec_lang['lpn_ds_found_below']='⚠ Cel puțin o joncțiune este sub {pressure} fără nicio scalare a cerinței. Cel mai mare factor de scalare a cerinței care păstrează fiecare joncțiune la {pressure} sau peste este {m}.';
+$ec_lang['lpn_ds_found_below']='⚠ Cerințele așa cum au fost introduse (un factor de scalare a cerinței de 1) lasă cel puțin o joncțiune sub {pressure}. Cel mai mare factor de scalare a cerinței care păstrează fiecare joncțiune la {pressure} sau peste este {m}.';
 $ec_lang['lpn_ds_search_stopped']='Căutarea a fost oprită înainte de a găsi un răspuns.';
 $ec_lang['lpn_ds_lowest_at']='La un factor de scalare a cerinței de {m}, cea mai mică presiune este {pressure}, la joncțiunea {id}.';
 $ec_lang['lpn_ds_nosolve_at']='La un factor de scalare a cerinței de {m}, rețeaua nu a dat niciun răspuns. {reason}';
@@ -4564,7 +4808,75 @@ $ec_lang['lpn_file_import_survey_tip']='Citește o listă de puncte topografice 
 // GeoJSON import of Shapes (Task 779). Only points, lines and polygons come in, as Shapes; the
 // network is imported from an EPANET file. Every feature not imported is named in the report.
 $ec_lang['lpn_file_import_shapes']='Importă figuri GeoJSON…';
-$ec_lang['lpn_file_import_shapes_tip']='Citește punctele, liniile și poligoanele dintr-un fișier GeoJSON în acest proiect, ca Figuri. Elementele de rețea din fișier nu sunt importate; importați rețeaua dintr-un fișier EPANET. Proiectul trebuie să fie georeferențiat sau să indice un sistem de coordonate.';
+$ec_lang['lpn_file_import_shapes_tip']='Citește punctele, liniile și poligoanele dintr-un fișier GeoJSON în acest proiect, ca Figuri. Elementele de rețea din fișier nu sunt importate; importați rețeaua dintr-un fișier EPANET sau cu Importă rețea GeoJSON. Proiectul trebuie să fie georeferențiat sau să indice un sistem de coordonate.';
+$ec_lang['lpn_file_import_gjnet']='Importă rețea GeoJSON…';
+$ec_lang['lpn_file_import_gjnet_tip']='Deschide un fișier GeoJSON ca proiect nou. Punctele sunt importate ca joncțiuni, rezervoare sau bazine, iar liniile ca conducte. Un fișier exportat din această pagină este citit așa cum a fost scris; pentru orice alt fișier, un pas asociază câmpurile lui cu proprietăți și unități.';
+$ec_lang['lpn_gjnet_refuse_crs']='{file} indică sistemul de coordonate {crs}. Pozițiile GeoJSON sunt latitudine și longitudine WGS 84 (RFC 7946), iar această pagină nu convertește un fișier GeoJSON dintr-un alt sistem. Exportați stratul din GIS în EPSG:4326 (WGS 84), apoi importați acel fișier.';
+$ec_lang['lpn_gjnet_refuse_empty']='{file} nu conține puncte sau linii.';
+$ec_lang['lpn_gjnet_target_node_type']='Tip de nod';
+$ec_lang['lpn_gjnet_target_custom']='Proprietate personalizată';
+$ec_lang['lpn_gjnet_target_skip']='Nu importa';
+$ec_lang['lpn_gjnet_points_heading']='Câmpuri de punct (joncțiuni, rezervoare și bazine)';
+$ec_lang['lpn_gjnet_lines_heading']='Câmpuri de linie (conducte)';
+$ec_lang['lpn_gjnet_no_fields']='Aceste obiecte nu au câmpuri de atribute.';
+$ec_lang['lpn_gjnet_col_field']='Câmp';
+$ec_lang['lpn_gjnet_col_example']='Exemplu';
+$ec_lang['lpn_gjnet_col_fills']='Completează';
+$ec_lang['lpn_gjnet_col_unit']='Unitate';
+$ec_lang['lpn_gjnet_beta']='Beta: se solicită feedback';
+$ec_lang['lpn_gjnet_beta_tip']='Acest import a fost încercat pe puține fișiere din programe GIS. Pentru a raporta o problemă sau a sugera o schimbare, apăsați {button} pe pagină și descrieți fișierul.';
+$ec_lang['lpn_gjnet_intro']='Au fost găsite {points} puncte și {lines} linii. Punctele sunt importate ca joncțiuni, rezervoare sau bazine, iar liniile ca conducte. Alegeți proprietatea pe care o completează fiecare câmp și unitatea fiecărui număr.';
+$ec_lang['lpn_gjnet_other']='{n} obiecte nu sunt nici puncte, nici linii și nu vor fi importate; raportul le listează.';
+$ec_lang['lpn_gjnet_tolerance']='Toleranță de îmbinare (m)';
+$ec_lang['lpn_gjnet_tolerance_tip']='Un capăt de linie aflat la această distanță de un punct sau de un alt capăt de linie este îmbinat cu acesta. Un capăt de linie mai departe de atât de orice punct primește o joncțiune nouă.';
+$ec_lang['lpn_gjnet_working']='Se importă {file}…';
+$ec_lang['lpn_gjnet_title']='Importă rețea GeoJSON: {file}';
+$ec_lang['lpn_gjnet_report_lead']='Fiecare schimbare făcută la import și fiecare obiect neimportat sunt listate mai jos, cu motivul:';
+$ec_lang['lpn_gjnet_and_more']='și încă {n}';
+$ec_lang['lpn_gjnet_note_crs']='Fișierul indică sistemul de coordonate {crs}, adică latitudine și longitudine WGS 84, sistemul cerut de RFC 7946. Pozițiile au fost citite așa cum sunt indicate.';
+$ec_lang['lpn_gjnet_note_crs_nad83']='Fișierul indică NAD83 (EPSG:4269). Pozițiile lui au fost citite ca WGS 84, ceea ce le plasează la aproximativ 1 până la 2 m de locul în care le pune NAD83.';
+$ec_lang['lpn_gjnet_note_skip_geometry']='Neimportat: obiectul nu este un punct sau o linie.';
+$ec_lang['lpn_gjnet_note_skip_kind']='Neimportat: obiectul nu indică node_type sau link_type.';
+$ec_lang['lpn_gjnet_note_skip_position']='Neimportat: o poziție nu este o latitudine și o longitudine valide.';
+$ec_lang['lpn_gjnet_note_skip_id']='Neimportat: numele nu este un ID valid sau îl are alt element de același fel.';
+$ec_lang['lpn_gjnet_note_skip_no_node']='Neimportat: nodul de început sau de sfârșit numit nu este în fișier.';
+$ec_lang['lpn_gjnet_note_skip_loop']='Neimportat: ambele capete ale liniei se îmbină cu același nod.';
+$ec_lang['lpn_gjnet_note_id_new']='Aceste obiecte nu indică un ID valid și au primit ID-ul afișat între paranteze.';
+$ec_lang['lpn_gjnet_note_id_dup']='Aceste ID-uri sunt indicate de mai mult de un obiect de același fel. Fiecare obiect următor a primit ID-ul afișat între paranteze.';
+$ec_lang['lpn_gjnet_note_unmapped_id_point']='Nu a fost ales niciun câmp pentru ID-ul punctului, deci fiecărui nod importat dintr-un punct i s-a atribuit un ID.';
+$ec_lang['lpn_gjnet_note_unmapped_id_line']='Nu a fost ales niciun câmp pentru ID-ul liniei, deci fiecărei conducte i s-a atribuit un ID.';
+$ec_lang['lpn_gjnet_note_skip_short']='Neimportat: o linie are nevoie de cel puțin două poziții.';
+$ec_lang['lpn_gjnet_note_elev_taken']='Aceste noduri nu indică o cotă. Fiecare a primit cota nodului afișat între paranteze: pentru o joncțiune adăugată la capătul unei linii, nodul de la celălalt capăt al conductei ei, altfel cel mai apropiat nod care indică una.';
+$ec_lang['lpn_gjnet_note_default_elev_added']='Aceste joncțiuni au fost adăugate la capete de linii și au cota implicită, {value}, deoarece niciun nod din fișier nu indică o cotă.';
+$ec_lang['lpn_gjnet_note_demand_kept']='Un rezervor sau un bazin nu are cerință, deci cerința indicată pe aceste noduri a fost păstrată ca proprietate personalizată {key}.';
+$ec_lang['lpn_gjnet_note_parts']='Aceste linii cu mai multe părți au părți care nu sunt conectate și au fost importate ca o conductă pentru fiecare parte.';
+$ec_lang['lpn_gjnet_note_parts_points']='Aceste obiecte cu mai multe puncte au fost importate ca un nod pentru fiecare punct.';
+$ec_lang['lpn_gjnet_note_junction_added']='Aceste joncțiuni au fost adăugate acolo unde un capăt de linie nu este la mai puțin de {tol} de un punct. Fiecare are cerința de bază implicită.';
+$ec_lang['lpn_gjnet_note_end_moved']='Aceste conducte au un capăt la mai puțin de {tol} de un punct sau de alt capăt de linie, dar nu pe el. Capătul a fost îmbinat cu acesta; cea mai mare distanță este {dist}.';
+$ec_lang['lpn_gjnet_note_end_on_pipe']='Aceste capete de linii se află pe conducta afișată între paranteze, dar nu la capătul ei, și nu sunt conectate la ea.';
+$ec_lang['lpn_gjnet_note_z']='Aceste puncte indică o a treia coordonată, care nu a fost importată.';
+$ec_lang['lpn_gjnet_note_default_elev']='Aceste noduri nu indică o cotă și au cota implicită, {value}.';
+$ec_lang['lpn_gjnet_note_unmapped_elev']='Nu a fost ales niciun câmp pentru cotă, deci fiecare nod are cota implicită, {value}, iar lungimile automate nu includ nicio diferență de cotă.';
+$ec_lang['lpn_gjnet_note_default_demand']='Aceste joncțiuni nu indică o cerință de bază și au cerința de bază implicită, {value}.';
+$ec_lang['lpn_gjnet_note_unmapped_demand']='Nu a fost ales niciun câmp pentru cerința de bază, deci fiecare joncțiune are cerința de bază implicită, {value}.';
+$ec_lang['lpn_gjnet_note_default_diameter']='Aceste conducte nu indică un diametru și au diametrul implicit, {value}.';
+$ec_lang['lpn_gjnet_note_unmapped_diameter']='Nu a fost ales niciun câmp pentru diametru, deci fiecare conductă are diametrul implicit, {value}.';
+$ec_lang['lpn_gjnet_note_default_roughness']='Aceste conducte nu indică o rugozitate și au rugozitatea implicită, {value}.';
+$ec_lang['lpn_gjnet_note_unmapped_roughness']='Nu a fost ales niciun câmp pentru rugozitate, deci fiecare conductă are rugozitatea implicită, {value}.';
+$ec_lang['lpn_gjnet_note_default_k']='Aceste conducte nu indică un coeficient de pierdere locală, deci fiecare are 0, ca într-un fișier EPANET care nu indică niciunul.';
+$ec_lang['lpn_gjnet_note_unmapped_k']='Nu a fost ales niciun câmp pentru coeficientul de pierdere locală, deci fiecare conductă are 0, ca într-un fișier EPANET care nu indică niciunul.';
+$ec_lang['lpn_gjnet_note_default_tank']='Aceste bazine au adâncimile de apă și diametrul bazinului implicite.';
+$ec_lang['lpn_gjnet_note_length_auto']='Aceste conducte nu indică o lungime. Fiecare lungime este calculată din linie (Automat).';
+$ec_lang['lpn_gjnet_note_unmapped_length']='Nu a fost ales niciun câmp pentru lungime, deci fiecare lungime de conductă este calculată din linie (Automat).';
+$ec_lang['lpn_gjnet_note_value_unread']='Aceste valori nu sunt numere sau nu sunt recunoscute și nu au fost folosite.';
+$ec_lang['lpn_gjnet_note_field_skipped']='Aceste câmpuri nu au fost importate, așa cum s-a ales.';
+$ec_lang['lpn_gjnet_note_field_custom']='Aceste câmpuri au fost importate ca proprietăți personalizate.';
+$ec_lang['lpn_gjnet_note_results']='Rezultatele din fișier nu au fost importate. Calculează le calculează din nou.';
+$ec_lang['lpn_gjnet_note_demand_rows']='Aceste joncțiuni au avut mai mult de un rând de cerință. Un fișier GeoJSON o păstrează doar pe prima, care a fost importată.';
+$ec_lang['lpn_gjnet_note_pipe_type']='Aceste conducte indică tipul de conductă afișat între paranteze, a cărui definiție un fișier GeoJSON nu o conține. Tipul de conductă nu a fost importat; diametrul și rugozitatea indicate în fișier au fost.';
+$ec_lang['lpn_gjnet_note_pattern_conflict']='Aceste modele sunt indicate cu multiplicatori diferiți pe obiecte diferite. A fost folosit primul.';
+$ec_lang['lpn_gjnet_note_end_off_node']='Linia fiecăreia dintre aceste legături nu începe și nu se termină la nodul ei. A fost folosită poziția nodului.';
+$ec_lang['lpn_gjnet_note_not_held']='Un fișier GeoJSON nu conține comenzi, reguli, setări de timp, etichete de text, opțiuni EPANET sau bibliotecile de tipuri de conductă, fitinguri și curbe de eficiență, deci nimic din acestea nu a fost importat.';
 $ec_lang['lpn_geojson_import_done']='{n} Figuri importate din {file}.';
 $ec_lang['lpn_geojson_import_done_one']='O Figură importată din {file}.';
 $ec_lang['lpn_geojson_import_renamed']='{n} nume de entități nu pot fi folosite ca ID-uri de Figură. Fiecărei Figuri i s-a atribuit alt ID și își păstrează numele entității: {list}.';
@@ -4733,4 +5045,4 @@ $ec_lang['lpn_snip_tip_eraser']='Radieră: faceți clic pe un trasaj pentru a-l 
 $ec_lang['lpn_snip_tip_undo']='Anulare (Ctrl+Z)';
 $ec_lang['lpn_snip_tip_redo']='Refacere (Ctrl+Y)';
 $ec_lang['lpn_snip_tip_copy']='Copiază (Ctrl+C)';
-$ec_lang['lpn_screenshot_scale_tip']='Dimensiunea imaginii ca multiplu al zonei de pe ecran. O valoare mai mare dă o imagine mai clară și un fișier mai mare.';$ec_lang['lpn_guide_text_alt_box']='Arată, pentru fiecare scenariu, ce alternativă folosește în fiecare categorie, de exemplu Fizic, Cerere și Activarea elementelor, precum și opțiunile lui de calcul: multiplicatorul cererii, durata totală a rulării și pasul de timp hidraulic. Alternativele sunt numai pentru citire. Opțiunile de calcul ale unui scenariu pot fi tastate aici, iar un câmp necompletat folosește valoarea scenariului părinte. Deschideți-o din meniul Scenarii după ce debifați Mod de bază.';$ec_lang['lpn_guide_how_alt']='Previzualizarea alternativelor este listată la Apă, Scenarii când Mod de bază este dezactivat.';$ec_lang['lpn_alt_calc_options']='Opțiuni de calcul';$ec_lang['lpn_scenario_duration_tip']='Lăsați gol pentru a moșteni de la părinte. O durată totală de rulare de 0:00 este o rulare în regim permanent.';$ec_lang['lpn_scenario_hyd_step_tip']='Lăsați gol pentru a moșteni de la părinte.';
+$ec_lang['lpn_screenshot_scale_tip']='Dimensiunea imaginii ca multiplu al zonei de pe ecran. O valoare mai mare dă o imagine mai clară și un fișier mai mare.';

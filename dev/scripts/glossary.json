@@ -4265,7 +4265,7 @@
                 "translating the three-letter code PBV, which is EPANET's own element name and is the same in every language, exactly as PRV, PSV, FCV, TCV and GPV are."
             ],
             "context": "EPANET's pressure breaker valve: it forces a fixed pressure drop between its two ends, in the direction of flow, whatever the flow is. Its siblings in the same selector are PRV, PSV, FCV, TCV and GPV.",
-            "translation_notes": "[2026-08-19, sprint 438 wave 0] English kept: it is EPANET's published element name and identity terms are not renamed. Where the language's water field has no settled phrase, a descriptive rendering (\"valve that drops the pressure by a fixed amount\") beats reaching for the electrical word.",
+            "translation_notes": "[2026-08-19, sprint 438 wave 0] English kept: it is EPANET's published element name and identity terms are not renamed. Where the language's water field has no settled phrase, a descriptive rendering (\"valve that drops the pressure by a fixed amount\") beats reaching for the electrical word. | [2026-10-17, sprint 1017] Shipped valve-type labels (lpn_valve_type_pbv): am ግፊት ሰባሪ (PBV); ar كاسر الضغط (PBV); bg Прекъсвач на налягането (PBV); bn চাপ ভাঙার ভালভ (PBV); cs Ventil rušící tlak (PBV); de Druckabbau (PBV); es Rompepresión (PBV); fa شکنندهٔ فشار (PBV); fr Brise-pression (PBV); he שובר לחץ (PBV); hi दाब-विच्छेदक (PBV); hr Za rasterećenje tlaka (PBV); id Pemecah tekanan (PBV); it Rompitratta di pressione (PBV); km ការកាត់បន្ថយសម្ពាធថេរ (PBV); my ဖိအားချိုးဗားလ် (PBV); ps د فشار ماتوونکی (PBV); pt Quebra-pressão (PBV); ro Cădere fixă de presiune (PBV); ru Гаситель давления (PBV); sr Вентил за обарање притиска (PBV); sw Kuvunja shinikizo (PBV); tr Basınç kırıcı (PBV); uk Гасіння тиску (PBV); ur پریشر بریکر (PBV); zh 减压定值（PBV）. Five engine strings that once said PRV, PSV, FCV where the English says PBV, GPV were rewritten in every language. Prose and label still differ in zh (label 减压定值（PBV）, prose 压力断路阀), km, my and it (label Rompitratta di pressione, prose frangipressione): align the label at the next term sweep.",
             "translations": {
                 "en": "pressure breaker valve"
             },
@@ -5194,7 +5194,7 @@
             "symbol": "",
             "avoid": [],
             "context": "",
-            "translation_notes": "Tom's wording, 2026-10-16.",
+            "translation_notes": "Tom's wording, 2026-10-16. | [2026-10-17, Task 809] cs svatozář (a saint's halo) replaced by obrys (outline), matching its own tip's plného obrysu; sw mwanga (light) replaced by ukingo (edge, border), matching its tip's mstari imara wa nje.",
             "translations": {
                 "en": "halo"
             },

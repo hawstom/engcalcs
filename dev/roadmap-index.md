@@ -7,17 +7,19 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**81 open tasks.** Next (100): 7 · Soon (75): 12 · Someday (50): 28 · Maybe (25): 15 · Parked (5): 19
+**83 open tasks.** Next (100): 9 · Soon (75): 12 · Someday (50): 28 · Maybe (25): 15 · Parked (5): 19
 
-## 100 — Next (7)
+## 100 — Next (9)
 
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
 - Task 721 — The scenario and alternatives model: Bentley's tree, plus Presentation and Calculation.
 - Task 737 — One canonical word per concept, so every language names each one once.
 - Task 741 — The infinite map: generated networks for the label bench.
 - Task 749 — Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.
-- Task 785 — Rewrite the Guide's chapters to the Find and replace model.
+- Task 752 — Google Sheets: sync the scenarios and their alternatives out and in.
 - Task 800 — A tidy list and count of one scenario's own overrides.
+- Task 811 — Themes beyond Light and Dark: a selector, and a better default.
+- Task 812 — Port the label bench's proven findings to master, one branch each.
 
 ## 75 — Soon (12)
 
@@ -28,11 +30,11 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 676 — Watch the sites, and send a derived weekly report.
 - Task 720 — Background layers from a GIS server.
 - Task 733 — Grow the native solver, in phases, to everything EPANET's solves.
-- Task 752 — Google Sheets: sync the scenarios and their alternatives out and in.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
 - Task 809 — Finish the translation-clarification follow-ups at the next sprint.
 - Task 810 — Bring the features list up to what the software does.
+- Task 813 — Pre-processing the network for label placement: methods, benefits, results.
 
 ## 50 — Someday (28)
 
@@ -109,5 +111,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-74 of 81 titles are within 4–12 words. `!` marks the rest;
+76 of 83 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

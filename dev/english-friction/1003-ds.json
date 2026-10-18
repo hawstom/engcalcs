@@ -11,8 +11,8 @@
                 "the system can take up to {m} times today's demand (wrong)",
                 "demands must be cut to {m} times what is entered for every junction to keep the pressure (right)"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B parallels lpn_ds_found.",
+            "disposition": "english",
+            "resolution": "B is the English now (checked 2026-10-17). Was: PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B parallels lpn_ds_found.",
             "human_answer": "B",
             "human_answered": "2026-10-16"
         }

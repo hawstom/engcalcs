@@ -33,6 +33,13 @@ function enString(key) {
 	if (!m) { throw new Error('no English for ' + key); }
 	return m[1].replace(/\\'/g, "'").replace(/\\\\/g, '\\');
 }
+// The Spanish value, as the ?lang=es page sends it, or the English while a key is untranslated. A check
+// on the Spanish page compares against this, never against the English, which held only until a sprint.
+const ES = fs.readFileSync(path.join(REPO, 'lib', 'lang.ec.es.php'), 'utf8');
+function esString(key) {
+	const m = ES.match(new RegExp("\\$ec_lang\\['" + key + "'\\]='((?:[^'\\\\]|\\\\.)*)';"));
+	return m ? m[1].replace(/\\'/g, "'").replace(/\\\\/g, '\\') : enString(key);
+}
 // Markup out, entities out, white space single: what a reader of the entry sees.
 const plain = (html) => String(html).replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 
@@ -97,7 +104,7 @@ async function esEntryCheck(browser, name, boxId, TERMS) {
 	await b.settle(1200);
 	await openGuide(b);
 	const es = await entry(b.page, boxId);
-	ok('the Spanish page shows the chapter\'s terms', !!es && TERMS.every((k, i) => es.dts[i] === enString(k)), es && JSON.stringify(es.dts));
+	ok('the Spanish page shows the chapter\'s terms', !!es && TERMS.every((k, i) => es.dts[i] === esString(k)), es && JSON.stringify(es.dts));
 	ok('no page errors (Spanish)', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
 	await b.context.close().catch(() => {});
 }
@@ -107,4 +114,4 @@ function finish(name) {
 	return fails ? 1 : 0;
 }
 
-module.exports = { REPO, U, ok, enString, plain, checkQuotes, openGuide, entry, searchFinds, dialogPress, esEntryCheck, finish };
+module.exports = { REPO, U, ok, enString, esString, plain, checkQuotes, openGuide, entry, searchFinds, dialogPress, esEntryCheck, finish };

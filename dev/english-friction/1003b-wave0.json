@@ -87,8 +87,8 @@
                 "the bottom panel lists every junction with its results",
                 "the bottom panel lists only the junctions along the profile route"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "PROPOSED: 'A project can be placed on real ground with a street map behind it. EPANET .inp files can be read and written. The bottom pane plots a profile along a path and tabulates the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.'",
+            "disposition": "english",
+            "resolution": "The section is gone: lpn_notes_4 was deleted in c85803931 (Trim Notes box, move scope notes to About). Was: PROPOSED: 'A project can be placed on real ground with a street map behind it. EPANET .inp files can be read and written. The bottom pane plots a profile along a path and tabulates the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.'",
             "human_answer": "For the record, I find this \"Notes\" box, and this section in particular, to be embarrassing. What's it's purpose? Maybe I need to edit lang.ec.en.php. Is there a compelling reason why we can't remove this section or the entire box? If it matters, every section should be an important advisory, not fluff like this.",
             "human_answered": "2026-10-05"
         },

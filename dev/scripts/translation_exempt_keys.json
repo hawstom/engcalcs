@@ -967,6 +967,101 @@
                 "fr"
             ],
             "reason": "Description -- the French word is Description (sprint 737, 2026-10-14, replacing Libellé, which collided with the map Label)."
+        },
+        "lpn_sm_merge_line": {
+            "category": "placeholder",
+            "languages": "*",
+            "reason": "Placeholders and punctuation only ('{asset}: {property}'): no word to translate, so every language is identical to the English. Sprint 1017, filed by most translators."
+        },
+        "lpn_ovl_group": {
+            "category": "placeholder",
+            "languages": "*",
+            "reason": "Placeholders and punctuation only ('{category}: {alternative}'): no word to translate, so every language is identical to the English. Sprint 1017, filed by most translators."
+        },
+        "lpn_settings_row_of": {
+            "category": "placeholder",
+            "languages": "*",
+            "reason": "Placeholders and punctuation only ('{setting}, {member}'): no word to translate, so every language is identical to the English. Sprint 1017, filed by most translators."
+        },
+        "lpn_settings_row_labels_field": {
+            "category": "placeholder",
+            "languages": "*",
+            "reason": "Placeholders and punctuation only ('{labels}: {field}'): no word to translate, so every language is identical to the English. Sprint 1017, filed by most translators."
+        },
+        "lpn_settings_row_labels_part": {
+            "category": "placeholder",
+            "languages": "*",
+            "reason": "Placeholders and punctuation only ('{labels}: {field}, {part}'): no word to translate, so every language is identical to the English. Sprint 1017, filed by most translators."
+        },
+        "lpn_settings_held_base": {
+            "category": "placeholder",
+            "languages": "*",
+            "reason": "Placeholders and punctuation only ('{base}: {value}'): no word to translate, so every language is identical to the English. Sprint 1017, filed by most translators."
+        },
+        "lpn_field_type": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "Type -- the standard French word (sprint 1017, fr translator)."
+        },
+        "lpn_sm_col_parent": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "Parent -- the French word for a tree parent (sprint 1017)."
+        },
+        "lpn_sm_item_alternative": {
+            "category": "cognate",
+            "languages": [
+                "de",
+                "fr"
+            ],
+            "reason": "'Alternative {name}' -- Alternative is the ordinary word in German and French (sprint 1017)."
+        },
+        "lpn_sm_item_scenario": {
+            "category": "cognate",
+            "languages": [
+                "it"
+            ],
+            "reason": "'Scenario {name}' -- correct Italian word order and spelling (sprint 1017)."
+        },
+        "lpn_theme_system": {
+            "category": "cognate",
+            "languages": [
+                "de"
+            ],
+            "reason": "System -- the German word, as in Systemeinstellung (sprint 1017)."
+        },
+        "lpn_settings_row_default": {
+            "category": "loanword",
+            "languages": [
+                "id"
+            ],
+            "reason": "The visible word is 'default', the Indonesian loanword used throughout the id file (sprint 1017)."
+        },
+        "lpn_guide_map_esc_term": {
+            "category": "code-convention",
+            "languages": "*",
+            "reason": "Esc -- the name printed on the key; most languages keep it (sprint 1017; fr chose Échap, which is also right)."
+        },
+        "mtc_not_applicable": {
+            "category": "abbreviation",
+            "languages": [
+                "es",
+                "pt",
+                "ro"
+            ],
+            "reason": "N/A -- the standard short form of not applicable in these languages, for a narrow results cell (sprint 1017)."
+        },
+        "lpn_settings_table_no": {
+            "category": "cognate",
+            "languages": [
+                "es",
+                "it"
+            ],
+            "reason": "No -- the word for no in Spanish and Italian (sprint 1017)."
         }
     }
 }

@@ -1,0 +1,1158 @@
+{
+    "sprint": "1017",
+    "description": "Translator friction from sprint 1017 (435 to 436 keys in 26 languages, plus a review of the 17 dockable box titles against the new Layout (box title) note). Most entries are placeholder-only strings meeting the identical-to-English check; they are exempted.",
+    "entries": [
+        {
+            "key": "lpn_sm_merge_line",
+            "source": "translator",
+            "lang": "ar",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_ovl_group",
+            "source": "translator",
+            "lang": "ar",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_field",
+            "source": "translator",
+            "lang": "ar",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_base",
+            "source": "translator",
+            "lang": "ar",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_library_controls",
+            "source": "translator",
+            "lang": "ar",
+            "complaint": "The Arabic file gives Controls and Rules the identical word (القواعد), so sentences that name the two library sections cannot tell them apart.",
+            "readings": [
+                "use الضوابط for Controls, as the new guide text does",
+                "keep القواعد for both"
+            ],
+            "disposition": "glossary",
+            "resolution": "ar gave Controls and Rules one word; lpn_library_controls is now الضوابط (bg likewise Управление). Recorded in the sprint glossary notes."
+        },
+        {
+            "key": "lpn_pane_tab_pipes",
+            "source": "translator",
+            "lang": "ar",
+            "complaint": "The glossary has no preferred Arabic word for link. The file mixes رابط/الروابط and وصلة/الوصلات, and رابط also means a hyperlink.",
+            "readings": [
+                "وصلة (link as a pipe, pump or valve)",
+                "رابط (existing in lpn_crit_* and lpn_ff_* strings)"
+            ],
+            "disposition": "glossary",
+            "resolution": "ar link: وصلة in free prose for a pipe, pump or valve; رابط also means hyperlink. Recorded for the ar glossary."
+        },
+        {
+            "key": "lpn_sm_merge_line",
+            "source": "translator",
+            "lang": "bn",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_ovl_group",
+            "source": "translator",
+            "lang": "bn",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_of",
+            "source": "translator",
+            "lang": "bn",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_field",
+            "source": "translator",
+            "lang": "bn",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_part",
+            "source": "translator",
+            "lang": "bn",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_base",
+            "source": "translator",
+            "lang": "bn",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_sm_merge_line",
+            "source": "translator",
+            "lang": "cs",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_ovl_group",
+            "source": "translator",
+            "lang": "cs",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_of",
+            "source": "translator",
+            "lang": "cs",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_field",
+            "source": "translator",
+            "lang": "cs",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_part",
+            "source": "translator",
+            "lang": "cs",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_base",
+            "source": "translator",
+            "lang": "cs",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "mtc_not_applicable",
+            "source": "translator",
+            "lang": "es",
+            "complaint": "The correct Spanish abbreviation is the English one (N/A), so the string is identical to English.",
+            "readings": [
+                "N/A kept as the standard abbreviation",
+                "N/D or 'No aplica', rejected"
+            ],
+            "disposition": "dismissed",
+            "resolution": "N/A is the standard short form; exempted for es, pt, ro."
+        },
+        {
+            "key": "lpn_alt_cat_topology",
+            "source": "translator",
+            "lang": "es",
+            "complaint": "'Active topology' (category name) and its tip 'Asset activation' describe the same thing in different words, so the two do not read as a pair.",
+            "readings": [
+                "Translated both literally (Topología activa / Activación de elementos)",
+                "Unify the wording in English"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Deliberate: 'Active topology' is Bentley's category name, and its tip, Tom's 'Asset activation', says what the category holds. A label and its tip may use different words."
+        },
+        {
+            "key": "lpn_settings_table_owner",
+            "source": "translator",
+            "lang": "fa",
+            "complaint": "'Owner' is a column heading in the Settings table, and it is not stated whether it means the project or the browser (where the setting is saved) or a person.",
+            "readings": [
+                "where the setting lives (project or browser)",
+                "a person who owns the setting"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Tom ruled the English. It is the Settings table column saying whether the project or this browser keeps the setting (js/looped-network.js:30630); the readings chosen (pertence a, aparține, where the setting lives) are right."
+        },
+        {
+            "key": "lpn_sm_merge_line",
+            "source": "translator",
+            "lang": "fa",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "exempt as identical-by-design",
+                "a translatable string"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_ovl_group",
+            "source": "translator",
+            "lang": "fa",
+            "complaint": "Placeholders and a colon only; identical to the English in Persian.",
+            "readings": [
+                "exempt as identical-by-design",
+                "a translatable string"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_field",
+            "source": "translator",
+            "lang": "fa",
+            "complaint": "Placeholders and a colon only; identical to the English in Persian.",
+            "readings": [
+                "exempt as identical-by-design",
+                "a translatable string"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_base",
+            "source": "translator",
+            "lang": "fa",
+            "complaint": "Placeholders and a colon only; identical to the English in Persian.",
+            "readings": [
+                "exempt as identical-by-design",
+                "a translatable string"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_guide_set_search_def",
+            "source": "translator",
+            "lang": "fa",
+            "complaint": "The example 'sprinklers lists Emitter exponent, whose tip mentions sprinklers and whose name does not' does not survive translation: the fa name for Emitter exponent contains the word for sprinkler. I substituted 'leaks', which is in the tip and not the name.",
+            "readings": [
+                "example word adapted to the translated name",
+                "example word kept as sprinklers (false in fa)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Correct adaptation: the example word must be in the tip and not in the name in each language, and fa chose such a word."
+        },
+        {
+            "key": "lpn_field_type",
+            "source": "translator",
+            "lang": "fr",
+            "complaint": "The French word for Type is Type, so it is byte-identical to English; no alternative French word is better.",
+            "readings": [
+                "Type (the standard French word)",
+                "Genre or Catégorie (rejected, worse)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Correct cognate; exempted for fr in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_sm_col_parent",
+            "source": "translator",
+            "lang": "fr",
+            "complaint": "The French word for Parent is Parent, so it is byte-identical to English and is the right word for a scenario tree.",
+            "readings": [
+                "Parent (tree parent)",
+                "Mère (rejected, wrong)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Correct cognate; exempted for fr."
+        },
+        {
+            "key": "lpn_sm_item_alternative",
+            "source": "translator",
+            "lang": "fr",
+            "complaint": "'Alternative {name}' is also correct French, so it is byte-identical to English.",
+            "readings": [
+                "Alternative (a named set of overrides)",
+                "Variante (rejected)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Correct cognate; exempted for de and fr."
+        },
+        {
+            "key": "lpn_settings_row_of",
+            "source": "translator",
+            "lang": "fr",
+            "complaint": "The string is only placeholders and a comma, so it cannot differ from English.",
+            "readings": [
+                "identity string kept as is",
+                "invent wording (rejected)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_guide_bx_keep_def",
+            "source": "translator",
+            "lang": "hi",
+            "complaint": "The English says the boxes Properties, Critical assets, Demand scaling, and Calibration keep only dock state, but no box is titled Critical assets; the box is titled Criticality analysis.",
+            "readings": [
+                "Critical assets means the Criticality analysis box",
+                "a separate box"
+            ],
+            "disposition": "english",
+            "resolution": "Fixed 2026-10-17: 'Critical assets' is now 'Criticality analysis', the box's title. Translators had already named the box by its title."
+        },
+        {
+            "key": "lpn_sm_merge_line",
+            "source": "translator",
+            "lang": "hi",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_ovl_group",
+            "source": "translator",
+            "lang": "hi",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_of",
+            "source": "translator",
+            "lang": "hi",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_field",
+            "source": "translator",
+            "lang": "hi",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_part",
+            "source": "translator",
+            "lang": "hi",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_base",
+            "source": "translator",
+            "lang": "hi",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_sm_merge_line",
+            "source": "translator",
+            "lang": "hr",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_ovl_group",
+            "source": "translator",
+            "lang": "hr",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_of",
+            "source": "translator",
+            "lang": "hr",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_field",
+            "source": "translator",
+            "lang": "hr",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_part",
+            "source": "translator",
+            "lang": "hr",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_base",
+            "source": "translator",
+            "lang": "hr",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_gjnet_note_not_held",
+            "source": "translator",
+            "lang": "hr",
+            "complaint": "The English says 'text labels' for what the app calls Text (EPANET's Label), which collides with our Label (EPANET's Notation).",
+            "readings": [
+                "Tekst (our Text)",
+                "oznake (our Label)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Tom ruled the English. 'text labels' means our Text (EPANET's Label); hr chose Tekst, which is right. Raised with Tom as a possible English edit, since Label is a reserved word."
+        },
+        {
+            "key": "lpn_time_run",
+            "source": "translator",
+            "lang": "hr",
+            "complaint": "The English is 'Calculate' but the hr value is 'Pokreni' (the same word as Run on the analysis buttons), so references to the Calculate button cannot match the screen.",
+            "readings": [
+                "wrote Izračunaj in my strings",
+                "matched the stale Pokreni"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Not an English problem: the hr value was stale ('Pokreni', Run); corrected to 'Izračunaj' 2026-10-17."
+        },
+        {
+            "key": "lpn_sm_item_scenario",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "'Scenario {name}' is the correct Italian word order and spelling, so it is byte-identical to the English.",
+            "readings": [
+                "kept 'Scenario {name}' (correct Italian)",
+                "rejected inventing a distinct word"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Correct Italian; exempted for it."
+        },
+        {
+            "key": "lpn_sm_merge_line",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "Placeholders only; identical to the English by necessity.",
+            "readings": [
+                "kept as is",
+                "rejected altering the punctuation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_ovl_group",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "Placeholders only; identical to the English by necessity.",
+            "readings": [
+                "kept as is",
+                "rejected altering the punctuation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_of",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "Placeholders only; identical to the English by necessity.",
+            "readings": [
+                "kept as is",
+                "rejected altering the punctuation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_field",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "Placeholders only; identical to the English by necessity.",
+            "readings": [
+                "kept as is",
+                "rejected altering the punctuation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_part",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "Placeholders only; identical to the English by necessity.",
+            "readings": [
+                "kept as is",
+                "rejected altering the punctuation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_base",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "Placeholders only; identical to the English by necessity.",
+            "readings": [
+                "kept as is",
+                "rejected altering the punctuation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_sm_title",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "The box-title note says to put the subject word first, but the same box is opened by the menu row lpn_sm_menu ('Gestione scenari…'), and guide prose refers to the box by that menu wording, so a colon title ('Scenari: gestione') differs from the name the prose uses.",
+            "readings": [
+                "used 'Scenari: gestione' for the box title and 'Gestione scenari' for the menu row and prose",
+                "rejected using 'Gestione scenari' for the title too"
+            ],
+            "disposition": "dismissed",
+            "resolution": "it chose a subject-first title and kept the menu row's natural phrase; the Guide names menu rows by their row text, so both are right."
+        },
+        {
+            "key": "lpn_scenario_basic_tip",
+            "source": "translator",
+            "lang": "it",
+            "complaint": "'Basic mode is on/off' and 'checked/cleared' are mixed in the English; Italian selezionata/deselezionata collides with 'selected' used for assets on the map.",
+            "readings": [
+                "used selezionata/deselezionata for the checkbox, as the file already does",
+                "rejected spuntata/non spuntata"
+            ],
+            "disposition": "dismissed",
+            "resolution": "it kept the file's existing checkbox words; the checkbox-vs-selection collision is a glossary matter for it, recorded for the next term sweep."
+        },
+        {
+            "key": "lpn_sm_merge_line",
+            "source": "translator",
+            "lang": "ps",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_ovl_group",
+            "source": "translator",
+            "lang": "ps",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_field",
+            "source": "translator",
+            "lang": "ps",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_base",
+            "source": "translator",
+            "lang": "ps",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_guide_text_settings_box",
+            "source": "translator",
+            "lang": "ps",
+            "complaint": "The old Pashto said settings sit in the Settings box and nowhere else; the new English dropped that claim, and I rewrote to the new English only.",
+            "readings": [
+                "translated the new English only",
+                "kept the old sentences"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Right: the new English dropped that claim, and the translation follows the new English."
+        },
+        {
+            "key": "lpn_settings_table_owner",
+            "source": "translator",
+            "lang": "pt",
+            "complaint": "Owner has no stated object: it could mean who owns the setting (project or this browser) or which part of the page owns it.",
+            "readings": [
+                "Pertence a (what the setting belongs to, project or browser)",
+                "Proprietário (a person who owns it)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Tom ruled the English. It is the Settings table column saying whether the project or this browser keeps the setting (js/looped-network.js:30630); the readings chosen (pertence a, aparține, where the setting lives) are right."
+        },
+        {
+            "key": "lpn_sm_merge_line",
+            "source": "translator",
+            "lang": "pt",
+            "complaint": "Placeholders only; byte-identical to English and trips identical-to-english.",
+            "readings": [
+                "Keep as {asset}: {property}",
+                "Invent different wording"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_ovl_group",
+            "source": "translator",
+            "lang": "pt",
+            "complaint": "Placeholders only; byte-identical to English and trips identical-to-english.",
+            "readings": [
+                "Keep as {category}: {alternative}",
+                "Invent different wording"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_of",
+            "source": "translator",
+            "lang": "pt",
+            "complaint": "Placeholders only; byte-identical to English and trips identical-to-english.",
+            "readings": [
+                "Keep as {setting}, {member}",
+                "Invent different wording"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_field",
+            "source": "translator",
+            "lang": "pt",
+            "complaint": "Placeholders only; byte-identical to English and trips identical-to-english.",
+            "readings": [
+                "Keep as {labels}: {field}",
+                "Invent different wording"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_part",
+            "source": "translator",
+            "lang": "pt",
+            "complaint": "Placeholders only; byte-identical to English and trips identical-to-english.",
+            "readings": [
+                "Keep as {labels}: {field}, {part}",
+                "Invent different wording"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_base",
+            "source": "translator",
+            "lang": "pt",
+            "complaint": "Placeholders only; byte-identical to English and trips identical-to-english.",
+            "readings": [
+                "Keep as {base}: {value}",
+                "Invent different wording"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_guide_bx_keep_def",
+            "source": "translator",
+            "lang": "pt",
+            "complaint": "The English calls a box 'Critical assets', but that box's title key is 'Criticality analysis', so the name looks stale.",
+            "readings": [
+                "Treated it as the Criticality analysis box",
+                "A separate Critical assets box"
+            ],
+            "disposition": "english",
+            "resolution": "Fixed 2026-10-17: 'Critical assets' is now 'Criticality analysis', the box's title. Translators had already named the box by its title."
+        },
+        {
+            "key": "lpn_settings_row_label_drop",
+            "source": "translator",
+            "lang": "pt",
+            "complaint": "'Drop order' is easy to read as dropping data, but it appears to be the order in which labels are left off the map when there is no room.",
+            "readings": [
+                "Ordem de omissão (order labels are left off the map)",
+                "Ordem de exclusão (deleting)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Tom ruled the English. It is the order in which label fields are left off the map when there is no room; the reading chosen (omission) is right."
+        },
+        {
+            "key": "lpn_sm_merge_line",
+            "source": "translator",
+            "lang": "ro",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_ovl_group",
+            "source": "translator",
+            "lang": "ro",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_of",
+            "source": "translator",
+            "lang": "ro",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_field",
+            "source": "translator",
+            "lang": "ro",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_part",
+            "source": "translator",
+            "lang": "ro",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_base",
+            "source": "translator",
+            "lang": "ro",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "mtc_not_applicable",
+            "source": "translator",
+            "lang": "ro",
+            "complaint": "I kept 'N/A' as the glossary prefers, but Romanian also has 'Nu se aplică' and 'ND'; the glossary choice is unconfirmed for Romanian.",
+            "readings": [
+                "N/A, kept for narrow results columns",
+                "Nu se aplică"
+            ],
+            "disposition": "dismissed",
+            "resolution": "N/A is the standard short form; exempted for es, pt, ro."
+        },
+        {
+            "key": "lpn_settings_table_owner",
+            "source": "translator",
+            "lang": "ro",
+            "complaint": "'Owner' as a settings-table column is unclear: the party the setting belongs to (project or this browser) or a person who owns it.",
+            "readings": [
+                "Aparține (what the setting belongs to)",
+                "Proprietar (a person)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Tom ruled the English. It is the Settings table column saying whether the project or this browser keeps the setting (js/looped-network.js:30630); the readings chosen (pertence a, aparține, where the setting lives) are right."
+        },
+        {
+            "key": "lpn_sm_merge_line",
+            "source": "translator",
+            "lang": "ru",
+            "complaint": "Pure-placeholder templates (also lpn_ovl_group, lpn_settings_row_of, lpn_settings_row_labels_field, lpn_settings_row_labels_part, lpn_settings_held_base) contain no translatable word, so identical to English is correct.",
+            "readings": [
+                "kept identical",
+                "invented different punctuation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_of",
+            "source": "translator",
+            "lang": "sr",
+            "complaint": "Placeholder-only string ({setting}, {member}); Serbian is byte-identical to the English; same for lpn_settings_row_labels_field, lpn_settings_row_labels_part, lpn_settings_held_base, lpn_sm_merge_line and lpn_ovl_group.",
+            "readings": [
+                "identical is correct",
+                "invent different punctuation, rejected"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_sm_merge_line",
+            "source": "translator",
+            "lang": "sw",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_ovl_group",
+            "source": "translator",
+            "lang": "sw",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_of",
+            "source": "translator",
+            "lang": "sw",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_field",
+            "source": "translator",
+            "lang": "sw",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_part",
+            "source": "translator",
+            "lang": "sw",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_base",
+            "source": "translator",
+            "lang": "sw",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_guide_scn_use_def",
+            "source": "translator",
+            "lang": "sw",
+            "complaint": "The six ready-made scenario names (Flow test: Static, Mid, Max, Average Day, Max Day, Peak hour) are listed in prose, but the strings that actually name them in a new project are not given, so the translations may not match what the page shows.",
+            "readings": [
+                "translated the names in plain Swahili",
+                "left them in English to match the names the page may create"
+            ],
+            "disposition": "dismissed",
+            "resolution": "The preset names are translated keys (lpn_scenario_preset_*); the cross-language check makes the prose match them."
+        },
+        {
+            "key": "lpn_sm_merge_line",
+            "source": "translator",
+            "lang": "tr",
+            "complaint": "Placeholders and a colon only; must equal the English and trips identical-to-english.",
+            "readings": [
+                "keep identical",
+                "invent different punctuation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_ovl_group",
+            "source": "translator",
+            "lang": "tr",
+            "complaint": "Placeholders and a colon only; must equal the English.",
+            "readings": [
+                "keep identical",
+                "invent different punctuation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_of",
+            "source": "translator",
+            "lang": "tr",
+            "complaint": "Placeholders and a comma only; must equal the English.",
+            "readings": [
+                "keep identical",
+                "invent different punctuation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_field",
+            "source": "translator",
+            "lang": "tr",
+            "complaint": "Placeholders and a colon only; must equal the English.",
+            "readings": [
+                "keep identical",
+                "invent different punctuation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_part",
+            "source": "translator",
+            "lang": "tr",
+            "complaint": "Placeholders, a colon and a comma only; must equal the English.",
+            "readings": [
+                "keep identical",
+                "invent different punctuation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_base",
+            "source": "translator",
+            "lang": "tr",
+            "complaint": "Placeholders and a colon only; must equal the English.",
+            "readings": [
+                "keep identical",
+                "invent different punctuation"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_alt_cat_topology",
+            "source": "translator",
+            "lang": "tr",
+            "complaint": "The English changed from 'Asset activation' to 'Active topology', but the tip lpn_alt_cat_topology_tip still says 'Asset activation', so the label and its tip name the concept differently.",
+            "readings": [
+                "translate each key literally (Etkin topoloji and Varlık etkinleştirme)",
+                "make the tip match the label"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Deliberate: 'Active topology' is Bentley's category name, and its tip, Tom's 'Asset activation', says what the category holds. A label and its tip may use different words."
+        },
+        {
+            "key": "lpn_sm_merge_line",
+            "source": "translator",
+            "lang": "ur",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_ovl_group",
+            "source": "translator",
+            "lang": "ur",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_row_labels_field",
+            "source": "translator",
+            "lang": "ur",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        },
+        {
+            "key": "lpn_settings_held_base",
+            "source": "translator",
+            "lang": "ur",
+            "complaint": "Placeholders and punctuation only; identical to the English is correct.",
+            "readings": [
+                "keep as is",
+                "invent a different separator"
+            ],
+            "disposition": "dismissed",
+            "resolution": "Placeholders and punctuation only: identical is correct. Exempted for every language in translation_exempt_keys.json."
+        }
+    ]
+}

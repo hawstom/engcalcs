@@ -97,6 +97,7 @@ the block.
   | Total potential energy at a point | Head |
   | Total potential energy as a line | HGL |
   | Total energy as a line | EGL |
+  **Found by sprint 1017's QA (2026-10-17):** am (ሁኔታ) and my (အခြေအနေ) each use one word for both Scenario and Status, about 120 and 21 strings; three box titles begin alike. Needs a Status word in each.
   The concept layer exists (`dev/term-concepts.md`, `concept_check.php`; glossary terms carry a
   concept id and a definition, and payloads send the definition as the source). Head and HGL stay
   split (Tom, 2026-09-30).
@@ -158,6 +159,7 @@ the block.
   - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
     `labelPass` inside `buildDom` and a label-measurement count.
 - 100|749| **Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.**
+  Tom, 2026-10-17: *"I am working on getting us at least one .sqllite example in case you can't find or make one."*
   **PROMOTED TO 100 by Tom, 2026-10-14. Blocked on a sample file**: a small WaterCAD model with one child scenario, saved as `.sqlite` and as `.inp`.
   Tom, 2026-10-06: *"As far as bentley-interop goes, the goal is to engage with the .sqlite file and
   connect to Google Sheets for Sync in and Sync out"* (the Sheets half is Task 752). The model it
@@ -166,13 +168,23 @@ the block.
   might help), so the deciding test, a small model with a child scenario saved as `.sqlite` and as
   `.inp`, waits on finding one. Presentation never travels through a Bentley file (Bentley keeps
   display in the `.wtg`); the project file is its only home.
-- 100|785| **Rewrite the Guide's chapters to the Find and replace model.**
-  **PROMOTED TO 100, 2026-10-14.** Rewritten on `feat/guide-scenarios` (2026-10-16 and 17), each with a `user-guide-*-harness.js`: every chapter of the audit except Screenshot (Scenario manager, Scenario comparison, Libraries, Properties, Settings, Using the user manual, Toolbar, Menus, Map, Tables, Boxes, Fire flow, Critical assets, Demand scaling, Pump energy, Contour, Run report, Status changes, Full report, Calibration, Notes, the user manual's own entry).
-  Still audited only (`dev/user-guide-audit.md`): Screenshot. Awaits Tom's browser pass and the merge.
-  Split from Task 763 on its close, 2026-10-11.
-- 100|800| **A tidy list and count of one scenario's own overrides.** **BUILT on `feat/bentley-interop`** (override-audit merged in 2026-10-15, with Tom's wording and a List overrides row on the Scenarios menu, greyed at 0).
+- 100|800| **A tidy list and count of one scenario's own overrides.** **SHIPPED 2026-10-16 with `feat/bentley-interop`** (override-audit merged in 2026-10-15, with Tom's wording and a List overrides row on the Scenarios menu, greyed at 0).
   Tom, 2026-10-15, on Fotobi's "1-hr drain w pump off" (24 overrides vs its siblings' 23): *"I don't know how to see a tidy list of overrides to audit ... that count seems inflated ... I should see the count of only the present overrides, not the inherited overrides. I count 13 diameter overrides, 1 text override, and 2 calculation overrides."* Also his screenshot note: tanks show the amber circle while their overrides are only in the parent. Review R-386.
-- 75|809| **Finish the translation-clarification follow-ups at the next sprint.** Fix cs `lpn_settings_text_halo` (*svatozář*, a saint's halo) and sw (*mwanga*, light), and their `_tip`, with the `halo` concept in `dev/terms.md`; needs Tom's approval to translate. Awaiting him: sprint cadence (once before each production pull). Open: `prefix_terms.inc.php` lists now only wire sense-qualified terms; glossary `context` and `translation_notes_xx` are not folded into `definition`/`translation_notes`; no check fails a term reaching no key.
+- 100|752| **Google Sheets: sync the scenarios and their alternatives out and in.**
+  **PROMOTED TO 100, 2026-10-17** (Tom: *"The next big tasks are Google sheets sync and .sqllite import/export."*). Phase 1, the workbook as a file (export, then import with a report before applying), is on `feat/sheet-sync`.
+  **Direction, Tom 2026-10-07, on Bentley's Connection** (a saved, re-runnable set of directions from
+  a source to a model, run for Sync In and Sync Out, not a live link): *"Nice. That's where we should head."*
+  Tom, 2026-09-30, on a master-spreadsheet layout (a Scenarios tab naming each scenario's
+  alternatives, then one tab per data kind keyed by element ID): *"Spreadsheet structure: I love
+  this."* and *"Sync in/out: Could we do this with GSheets?"*; 2026-10-06, it is half of the interop
+  goal. The tabs read the tree Task 721 builds. Export/import as a file first (no account, no
+  upload); a Sheets sync is a fifth third-party service, so a `privacy.php` paragraph and his call.
+  Mary, Sue and Declan advised against Sheets as the live store (2026-09-30); a sync is not that.
+- 100|811| **Themes beyond Light and Dark: a selector, and a better default.**
+  Tom, 2026-10-17: *"I had much more in mind for themes than Light and Dark ... fun and useful themes around such ideas as high contrast, Mac, retro eras and devices (maybe monochrome amber and monochrome green), rounded corners, icons, fonts, and colors. I envision a fun and useful theme selector as well as an eventual upgrade of our default aesthetics ... a visitor might say, 'It looks the same, but better, nicer, more pleasant.'"* Ida's plan: `dev/themes-plan.md` on `feat/theme`.
+- 100|812| **Port the label bench's proven findings to master, one branch each.**
+  Tom, 2026-10-17: *"We need to figure out what and how to merge the current best findings from our label placement project to improve our performance and results."* The bench branches are 2,300 commits behind and never merge as they are; the plan is `dev/label-trials/port-plan.md` on `docs/label-port`.
+- 75|809| **Finish the translation-clarification follow-ups at the next sprint.** The halo words were fixed with sprint 1017 (cs obrys, sw ukingo). Awaiting him: sprint cadence (once before each production pull). Open: `prefix_terms.inc.php` lists now only wire sense-qualified terms; glossary `context` and `translation_notes_xx` are not folded into `definition`/`translation_notes`; no check fails a term reaching no key.
 - 75|810| **Bring the features list up to what the software does.** Tom, 2026-10-16: *"I prefer to let you edit based on my
   messages/prompts."* Missing from `dev/features-source.md`: scenarios and alternatives, with Presentation and Calculation overrides
   for saved view layouts; converting coordinate systems and units; import and export of everything itemized; time series graphs on
@@ -334,15 +346,6 @@ the block.
   to do everything that the EPANET solver does. This way the math is less of a black box for us."*
   Phases to scope: PRV/PSV/FCV, then a time dimension (EPS), then quality. Supersedes the CLAUDE.md
   line that the built-in solver is not getting a time dimension only when a phase ships.
-- 75|752| **Google Sheets: sync the scenarios and their alternatives out and in.**
-  **Direction, Tom 2026-10-07, on Bentley's Connection** (a saved, re-runnable set of directions from
-  a source to a model, run for Sync In and Sync Out, not a live link): *"Nice. That's where we should head."*
-  Tom, 2026-09-30, on a master-spreadsheet layout (a Scenarios tab naming each scenario's
-  alternatives, then one tab per data kind keyed by element ID): *"Spreadsheet structure: I love
-  this."* and *"Sync in/out: Could we do this with GSheets?"*; 2026-10-06, it is half of the interop
-  goal. The tabs read the tree Task 721 builds. Export/import as a file first (no account, no
-  upload); a Sheets sync is a fifth third-party service, so a `privacy.php` paragraph and his call.
-  Mary, Sue and Declan advised against Sheets as the live store (2026-09-30); a sync is not that.
 - 75|756| **Cross-platform: the suite as a desktop application, beyond the web folder.**
   Tom, 2026-09-30: *"Put a cross platform project on our roadmap priority 75. Plan where/how to move
   the project to transcend the web-centric hawsedc.com/engcalcs folder. Windows or Linux? Plan what
@@ -364,6 +367,8 @@ the block.
   R2000. Tom, 2026-10-07: his DXF Interface Manager spec, for import AND export, and a rudimentary
   interim workflow, verbatim in `dev/dxf-interface.md`. **DXF export merged 2026-10-08**; import is
   what remains.
+- 75|813| **Pre-processing the network for label placement: methods, benefits, results.**
+  Tom, 2026-10-17: *"continue our project toward inquiry about the hows/methods and whys/benefits/results of pre-processing the network for label placement efficiency."* Design and first experiment: `dev/label-trials/preprocessing-inquiry.md` on `docs/label-port`.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted

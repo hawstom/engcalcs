@@ -8,7 +8,7 @@
 LibreWaterNet landing page, the Help menu, both, neither — is his call and is not yet made.
 Nothing on any served page reads this file.
 
-58 features, citing 127 of the 713 closed task IDs. The other 586 are
+58 features, citing 127 of the 714 closed task IDs. The other 587 are
 bug fixes, refactors, rejected proposals, and work nobody outside this repository would
 call a feature — and 133 of them are ledger entries carrying no text at all, whose
 narrative is in git and which nothing here has judged either way. **This list is honest
