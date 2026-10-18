@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 3032,
-        "delta_key_count": 29,
-        "english_changed_key_count": 22,
+        "expected_key_count": 3033,
+        "delta_key_count": 38,
+        "english_changed_key_count": 26,
         "exempt_key_count": 32,
         "exempt_keys": [
             "u_imgd",
@@ -64,19 +64,25 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: លំហូរ\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: ល្បឿន\n- flow used, taken, or consumed\n    English: demand\n    Your language: តម្រូវការ\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: សម្ពាធ\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: ថ្នាំង\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: អាងស្តុក\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: ថ្នាំង\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: តំណ\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: លំនាំដើម\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: ធុងទឹក\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: វ៉ាល់\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: តម្លៃផ្ទាល់ខ្លួន\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: រូបគូរ\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: លំហូរ\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: ល្បឿន\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: ក្បាលទឹក\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: ការបាត់បង់ថ្ពល់\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: ការបាត់បង់មូលដ្ឋាន\n- flow used, taken, or consumed\n    English: demand\n    Your language: តម្រូវការ\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: សម្ពាធ\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: ថ្នាំង\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: អាងស្តុក\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: ថ្នាំង\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: តំណ\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: លំនាំដើម\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- solver or the part that works out the answer\n    English: solver\n    Your language: ឧបករណ៍ដោះស្រាយ\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: ធុងទឹក\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: វ៉ាល់\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: តម្លៃផ្ទាល់ខ្លួន\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: រូបគូរ\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
         "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_ex_valves_title": "Valve types, gpm (US)",
+        "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_file_import_inp": "EPANET file…",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
         "lpn_notes_2_def": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
         "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
+        "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.",
+        "lpn_engine_unavailable_why": "This network cannot be solved without the EPANET solver. {reason}",
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
         "lpn_library_import": "Libraries…",
         "lpn_ff_minpressure": "Lowest system pressure allowed",
@@ -89,6 +95,9 @@
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
         "lpn_file_import_dxf": "DXF shapes…",
         "lpn_file_import_shp": "Shapefile shapes…",
+        "lpn_diag_valve_conflict": "These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:",
+        "lpn_diag_gpv_curve_order": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:",
+        "lpn_gpv_one_point_note": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}",
         "lpn_export_holds_scenario": "It holds the scenario {scenario} only.",
         "lpn_export_holds_base": "It holds the Base scenario only.",
         "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
@@ -102,12 +111,18 @@
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
         "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_ex_valves_title": "Valve types, gpm (US)",
+        "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_file_import_inp": "EPANET file…",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
         "lpn_notes_2_def": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
         "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
+        "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.",
+        "lpn_engine_unavailable_why": "This network cannot be solved without the EPANET solver. {reason}",
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
         "lpn_library_import": "Libraries…",
         "lpn_ff_minpressure": "Lowest system pressure allowed",
@@ -120,6 +135,9 @@
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
         "lpn_file_import_dxf": "DXF shapes…",
         "lpn_file_import_shp": "Shapefile shapes…",
+        "lpn_diag_valve_conflict": "These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:",
+        "lpn_diag_gpv_curve_order": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:",
+        "lpn_gpv_one_point_note": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}",
         "lpn_export_holds_scenario": "It holds the scenario {scenario} only.",
         "lpn_export_holds_base": "It holds the Base scenario only.",
         "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
@@ -208,6 +226,38 @@
                 }
             }
         },
+        "lpn_ex_valves_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net1_si_desc",
+                    "value": "លីត្រក្នុងមួយវិនាទី ជាមួយម៉ែត្រ និងមីលីម៉ែត្រ។ ឧទាហរណ៍ EPANET ប្រឌិតមួយបម្លែងពីហ្គាឡុងក្នុងមួយនាទី ហ្វីត និងអ៊ីញ ដែលមានក្លរីន អាងស្តុក 1 ធុងទឹក 1 ម៉ាស៊ីនបូម 1 និងការគ្រប់គ្រងផ្អែកលើច្បាប់ពីរ។",
+                    "english": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_net2_si_title",
+                    "value": "EPANET Net2, L\/s (ប្រព័ន្ធម៉ែត្រិក)",
+                    "english": "EPANET Net2, L\/s (SI)"
+                }
+            }
+        },
+        "lpn_ex_valves_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net1_si_desc",
+                    "value": "លីត្រក្នុងមួយវិនាទី ជាមួយម៉ែត្រ និងមីលីម៉ែត្រ។ ឧទាហរណ៍ EPANET ប្រឌិតមួយបម្លែងពីហ្គាឡុងក្នុងមួយនាទី ហ្វីត និងអ៊ីញ ដែលមានក្លរីន អាងស្តុក 1 ធុងទឹក 1 ម៉ាស៊ីនបូម 1 និងការគ្រប់គ្រងផ្អែកលើច្បាប់ពីរ។",
+                    "english": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_net2_si_title",
+                    "value": "EPANET Net2, L\/s (ប្រព័ន្ធម៉ែត្រិក)",
+                    "english": "EPANET Net2, L\/s (SI)"
+                }
+            }
+        },
         "lpn_file_import_inp": {
             "reason": "english_changed",
             "current_value": "នាំចូលឯកសារ EPANET…",
@@ -266,6 +316,22 @@
                 "value": "កន្លែងធ្វើការ…"
             }
         },
+        "lpn_notes_1_def": {
+            "reason": "english_changed",
+            "current_value": "តាមលំនាំដើម បណ្ដាញត្រូវបានដោះស្រាយដោយឧបករណ៍ដោះស្រាយ EPANET។ ពេលរយៈពេលដំណើរការសរុបត្រូវបានកំណត់ ជំហានពេលវេលារាយការណ៍នីមួយៗត្រូវបានគណនាតាមលំដាប់៖ ធុងទឹកបំពេញ និងបញ្ចេញ តម្រូវការធ្វើតាមលំនាំរបស់វា ហើយរបារឧបករណ៍ចាក់ឡើងវិញនូវការដំណើរការ។ ពេល ប្រើឧបករណ៍ដោះស្រាយខាងក្នុងនៅទីណាដែលអាចធ្វើបាន ត្រូវបានធីក ដំណោះស្រាយនៅពេលតែមួយអាចត្រូវបានដោះស្រាយដោយឧបករណ៍ដោះស្រាយខាងក្នុងជំនួសវិញ ប៉ុន្តែការក្លែងធ្វើលើរយៈពេលមួយ ឬបណ្ដាញដែលមានវ៉ាល់បំបែកសម្ពាធ ឬវ៉ាល់គោលបំណងទូទៅ (PBV, GPV) តែងតែត្រូវបានដោះស្រាយដោយឧបករណ៍ដោះស្រាយ EPANET។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_1_term",
+                    "value": "របៀបដែលវាត្រូវបានដោះស្រាយ",
+                    "english": "How it is solved"
+                },
+                "next_translated": {
+                    "key": "lpn_notes_2_term",
+                    "value": "អ្វីដែលវាមិនធ្វើ",
+                    "english": "What it does not do"
+                }
+            }
+        },
         "lpn_notes_2_def": {
             "reason": "english_changed",
             "current_value": "ការឡើងសម្ពាធភ្លាមៗ (surge) និងការប៉ះទឹក (water hammer) មិនត្រូវបានធ្វើគំរូទេ៖ លទ្ធផលទាំងអស់គឺសម្រាប់លំហូរស្ថិរភាព ឬប្រែប្រួលយឺតៗ មិនមែនសម្រាប់រលកសម្ពាធបណ្ដោះអាសន្នដែលបណ្ដាលមកពីការបិទវ៉ាល់ភ្លាមៗនោះទេ។",
@@ -298,6 +364,38 @@
                 }
             }
         },
+        "lpn_engine_unavailable": {
+            "reason": "english_changed",
+            "current_value": "មិនអាចទាញយកឧបករណ៍ដោះស្រាយ EPANET បានទេ ដែលត្រូវការដើម្បីដោះស្រាយវ៉ាល់បំបែកសម្ពាធ និងវ៉ាល់គោលបំណងទូទៅ (PBV, GPV)។ បន្ទាប់ពីតភ្ជាប់អ៊ីនធឺណិតម្ដង ឧបករណ៍ដោះស្រាយត្រូវបានរក្សាទុកនៅលើឧបករណ៍នេះ។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_ready",
+                    "value": "ឧបករណ៍ដោះស្រាយ EPANET ស្ថិតនៅក្នុងឧបករណ៍នេះឥឡូវនេះ ហើយដំណើរការដោយគ្មានអ៊ីនធឺណិត។",
+                    "english": "The EPANET solver is now stored on this device and works offline."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_unavailable_why",
+                    "value": "វ៉ាល់បំបែកសម្ពាធ និងវ៉ាល់គោលបំណងទូទៅ (PBV, GPV) មិនអាចដោះស្រាយបានដោយគ្មានឧបករណ៍ដោះស្រាយ EPANET ទេ។ {reason}",
+                    "english": "This network cannot be solved without the EPANET solver. {reason}"
+                }
+            }
+        },
+        "lpn_engine_unavailable_why": {
+            "reason": "english_changed",
+            "current_value": "វ៉ាល់បំបែកសម្ពាធ និងវ៉ាល់គោលបំណងទូទៅ (PBV, GPV) មិនអាចដោះស្រាយបានដោយគ្មានឧបករណ៍ដោះស្រាយ EPANET ទេ។ {reason}",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "មិនអាចទាញយកឧបករណ៍ដោះស្រាយ EPANET បានទេ ដែលត្រូវការដើម្បីដោះស្រាយវ៉ាល់បំបែកសម្ពាធ និងវ៉ាល់គោលបំណងទូទៅ (PBV, GPV)។ បន្ទាប់ពីតភ្ជាប់អ៊ីនធឺណិតម្ដង ឧបករណ៍ដោះស្រាយត្រូវបានរក្សាទុកនៅលើឧបករណ៍នេះ។",
+                    "english": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "កំពុងផ្ទុកឧបករណ៍ដោះស្រាយ EPANET ខណៈអ្នកកំពុងកសាង។ លទ្ធផលនឹងអាចប្រើបានពេលផ្ទុករួចទាំងស្រុង។",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                }
+            }
+        },
         "lpn_sm_help": {
             "reason": "english_changed",
             "current_value": "របៀបដែលសេណារីយ៉ូ និងជម្រើសជំនួសដំណើរការ៖\\n\\nក្នុងរបៀបមូលដ្ឋាន ជម្រើសជំនួសត្រូវបានលាក់ និងស្វ័យប្រវត្តិ ហើយសេណារីយ៉ូថ្មីទាំងអស់ជាកូនរបស់សេណារីយ៉ូ មូលដ្ឋាន។\\n\\nពេលបិទរបៀបមូលដ្ឋាន ដើមឈើទទួលមរតកស្មុគស្មាញអាចប្រើបាន ហើយជម្រើសជំនួសអាចត្រូវបានចែករំលែករវាងសេណារីយ៉ូ។ ប៉ុន្តែអាកប្បកិរិយាលំនាំដើមនៃការកែសម្រួលពេលត្រូវការទំនាក់ទំនងជម្រើសជំនួសថ្មី (ក្នុងករណីគ្មានការគ្រប់គ្រងសកម្មពីអ្នកប្រើ) គឺបង្កើតជម្រើសជំនួសមួយដែលមានឈ្មោះដូចសេណារីយ៉ូបច្ចុប្បន្ន ដែលផ្ដល់ឲ្យសេណារីយ៉ូនីមួយៗនូវសំណុំជម្រើសជំនួសតែមួយគត់របស់វា។\\n\\nលក្ខណៈសម្បត្តិ និងការកំណត់ជារបស់ប្រភេទជម្រើសជំនួស ដែលបង្ហាញជាជួរឈរនៃតារាងសេណារីយ៉ូ និងជម្រើសជំនួស ហើយជាជម្រើសគ្រប់គ្រងក្នុង កម្មវិធីគ្រប់គ្រងសេណារីយ៉ូ។\\n\\nតម្លៃផ្ទាល់ខ្លួនត្រូវបានបង្កើតក្នុងសេណារីយ៉ូ ប៉ុន្តែពួកវាពិតជារបស់ជម្រើសជំនួសរៀងៗខ្លួនដែលទាក់ទងនឹងសេណារីយ៉ូ ដូច្នេះសេណារីយ៉ូប្រៀបដូចជាបង្អួចទៅកាន់ជម្រើសជំនួសរបស់វា។ ទំនាក់ទំនងរវាងជម្រើសជំនួសនិងសេណារីយ៉ូត្រូវបានគ្រប់គ្រងក្នុងផ្ទាំងស្ដាំនៃ កម្មវិធីគ្រប់គ្រងសេណារីយ៉ូ ឬក្នុងតារាងសេណារីយ៉ូនៅផ្ទាំងខាងក្រោម។ ការបង្កើតសេណារីយ៉ូថ្មីមិនបង្កើតជម្រើសជំនួសទេ សេណារីយ៉ូថ្មីប្រើជម្រើសជំនួសរបស់មេរបស់វា រហូតដល់តម្លៃផ្ទាល់ខ្លួនដែលត្រូវការជម្រើសជំនួសថ្មីត្រូវបានបង្កើត។ ពេលតម្លៃផ្ទាល់ខ្លួនត្រូវបានបង្កើតក្នុងសេណារីយ៉ូ ពួកវាត្រូវបានរក្សាទុកក្នុងជម្រើសជំនួសរៀងៗខ្លួនសម្រាប់សេណារីយ៉ូ ប្រសិនបើសេណារីយ៉ូគ្មានជម្រើសជំនួសបែបនោះទេ ជម្រើសជំនួសថ្មីត្រូវបានបង្កើតដោយប្រើឈ្មោះរបស់សេណារីយ៉ូ។\\n\\nឧទាហរណ៍៖ អ្នកបង្កើតសេណារីយ៉ូ \"Figure: Node and link IDs\" ហើយកែសម្រួលអត្ថបទមួយឲ្យនិយាយថា \"Node and Link IDs\"។ ពេលអ្នកបង្កើតសេណារីយ៉ូ គ្មានជម្រើសជំនួសណាត្រូវបានបង្កើតទេ។ ប៉ុន្តែនៅពេលអ្នករក្សាទុកអត្ថបទ ជម្រើសជំនួសអត្ថបទមួយឈ្មោះ \"Figure: Node and link IDs\" ត្រូវបានបង្កើតជាមួយតម្លៃផ្ទាល់ខ្លួនសម្រាប់តម្លៃអត្ថបទ។ ក្នុងរបៀបមូលដ្ឋាន អ្នកឃើញវាជាតម្លៃផ្ទាល់ខ្លួនធម្មតាក្នុងសេណារីយ៉ូខ្លួនឯង។\\n\\nចម្លងលក្ខណៈសម្បត្តិ ចម្លងតែតម្លៃផ្ទាល់ខ្លួនប៉ុណ្ណោះ។ ក្នុងសេណារីយ៉ូណាក៏ដោយក្រៅពី មូលដ្ឋាន វាចម្លងតែតម្លៃផ្ទាល់ខ្លួនដែលធាតុមានក្នុងសេណារីយ៉ូនោះ។\\n\\nរបៀបគ្រប់គ្រងសេណារីយ៉ូ៖\\n\\n- ជ្រើសរើស សេណារីយ៉ូ ឬប្រភេទជម្រើសជំនួសក្នុងបញ្ជីនៅខាងលើ ដើម្បីបង្ហាញដើមឈើរបស់វា។\\n\\n- បង្កើតកូនរបស់ធាតុដែលបានជ្រើសរើសដោយ បន្ថែមកូន។ បន្ថែមមូលដ្ឋាន បន្ថែម មូលដ្ឋាន មួយទៀត ដែលចាប់ផ្ដើមជាច្បាប់ចម្លងនៃ មូលដ្ឋាន ដូចដែលវាជាឥឡូវ ការកែសម្រួលនៅពេលក្រោយចំពោះ មូលដ្ឋាន មិនផ្លាស់ប្ដូរវាទេ។ កូនថ្មីត្រូវបានដាក់ឈ្មោះតាមមេរបស់វា វាយឈ្មោះដើម្បីប្ដូរឈ្មោះ។ ចម្លង ចម្លងជម្រើសជំនួសដែលបានជ្រើសរើស។ បញ្ចូលឡើងលើ ផ្លាស់ទីតម្លៃផ្ទាល់ខ្លួនរបស់ជម្រើសជំនួសដែលបានជ្រើសរើសទៅក្នុងជម្រើសជំនួសមួយខាងលើវា ដែលជ្រើសរើសតាមឈ្មោះ ហើយបន្ទាប់មកជម្រើសជំនួសដែលបានជ្រើសរើសទទួលមរតកពួកវា វាដាក់ឈ្មោះមុនសិននូវតម្លៃណាមួយដែលជម្រើសជំនួសដែលវារំលងក៏មានតម្លៃផ្ទាល់ខ្លួនដែរ ដែលមិនត្រូវបានផ្លាស់ប្ដូរ។ ដើម្បីចម្លងសេណារីយ៉ូ សូមប្រើ ចម្លងសេណារីយ៉ូ ក្នុងម៉ឺនុយសេណារីយ៉ូ ក្នុងរបៀបមូលដ្ឋាន វាចម្លងតម្លៃផ្ទាល់ខ្លួនរបស់សេណារីយ៉ូ ជាមួយជម្រើសជំនួសដែលរក្សាពួកវា។ បន្ថែមមូលដ្ឋាន និង ចម្លងសេណារីយ៉ូ នីមួយៗបង្កើតជម្រើសជំនួស៖ បន្ថែមមូលដ្ឋាន បង្កើតជម្រើសជំនួស មូលដ្ឋាន សម្រាប់មូលដ្ឋានថ្មីក្នុងគ្រប់ប្រភេទដែលមានតម្លៃ ហើយ ចម្លងសេណារីយ៉ូ បង្កើតជម្រើសជំនួសថ្មីដែលមានឈ្មោះដូចច្បាប់ចម្លង សម្រាប់ជម្រើសជំនួសនីមួយៗដែលរក្សាតម្លៃផ្ទាល់ខ្លួនរបស់សេណារីយ៉ូ។\\n\\n- អូសធាតុមួយទៅលើធាតុមួយទៀតដើម្បីធ្វើឲ្យវាជាកូនរបស់ធាតុនោះ។ សេណារីយ៉ូដែលត្រូវបានផ្លាស់ទីទៅមេថ្មីទទួលមរតកពីមេនោះនូវអ្វីៗទាំងអស់ដែលវាមិនទាន់មានតម្លៃផ្ទាល់ខ្លួន អ្វីដែលវាមានតម្លៃផ្ទាល់ខ្លួនរួចហើយមិនផ្លាស់ប្ដូរទេ។ អូសធាតុមួយរវាងធាតុពីរដើម្បីតម្រៀបឡើងវិញ។\\n\\n- ចុចធាតុមួយដើម្បីជ្រើសរើសវា។ ចុច F2 ឬជ្រើសរើស ប្ដូរឈ្មោះ ដើម្បីប្ដូរឈ្មោះធាតុដែលបានជ្រើសរើស។ ការប្ដូរឈ្មោះសេណារីយ៉ូសួរថាតើត្រូវប្ដូរឈ្មោះជម្រើសជំនួសដែលមានឈ្មោះរបស់វាដែរឬទេ ក្នុងរបៀបមូលដ្ឋាន ពួកវាត្រូវបានប្ដូរឈ្មោះជាមួយវា ដោយមិនសួរ។ ចុចទ្វេដងលើសេណារីយ៉ូ ឬចុច Enter ដើម្បីធ្វើឲ្យវាជាបច្ចុប្បន្ន។ ចុចព្រួញនៅជាប់ធាតុមួយ ឬចុច Left ឬ Right ដើម្បីបត់ ឬពង្រីកវា។ ចុចខាងស្ដាំលើធាតុមួយសម្រាប់ពាក្យបញ្ជាដូចគ្នានឹងប៊ូតុង។\\n\\n- ចុច Delete ឬចុចប៊ូតុងដកដើម្បីលុបធាតុដែលបានជ្រើសរើស។ ធាតុដែលកំពុងប្រើមិនត្រូវបានលុបទេ ហើយសារដាក់ឈ្មោះអ្វីដែលប្រើវា។ ការលុបសេណារីយ៉ូពេលបិទរបៀបមូលដ្ឋានរក្សាជម្រើសជំនួសដែលវាប្រើ។ ការលុបសេណារីយ៉ូពេលបើករបៀបមូលដ្ឋានក៏លុបជម្រើសជំនួសនីមួយៗរបស់វាដែលគ្មានសេណារីយ៉ូផ្សេងប្រើដែរ។\\n\\n- ដើម្បីធ្វើឲ្យសេណារីយ៉ូប្រើជម្រើសជំនួសមួយទៀត រួមទាំង មូលដ្ឋាន សូមជ្រើសរើសវាក្នុងជួរដេករបស់សេណារីយ៉ូនៅផ្ទាំងស្ដាំនៃ កម្មវិធីគ្រប់គ្រងសេណារីយ៉ូ ឬតារាងសេណារីយ៉ូ។ តម្លៃផ្ទាល់ខ្លួនដែលធ្វើក្នុងជម្រើសជំនួសដែលចែករំលែកផ្លាស់ប្ដូរគ្រប់សេណារីយ៉ូដែលប្រើវា។",
@@ -312,6 +410,27 @@
                     "value": "លុបជម្រើសជំនួស {name} ឬទេ?",
                     "english": "Delete the alternative {name}?"
                 }
+            }
+        },
+        "lpn_settings_engine_native_tip": {
+            "reason": "english_changed",
+            "current_value": "បើកវាដើម្បីប្រើឧបករណ៍ដោះស្រាយខាងក្នុងនៅទីណាដែលអាចធ្វើបាន។ បើមិនដូច្នោះទេ ឧបករណ៍ដោះស្រាយ EPANET ពី US EPA តែងតែត្រូវបានប្រើ។ ឧបករណ៍ដោះស្រាយខាងក្នុងមិនត្រូវបានប្រើសម្រាប់ការក្លែងធ្វើលើរយៈពេលមួយ ឬវ៉ាល់បំបែកសម្ពាធ និងវ៉ាល់គោលបំណងទូទៅ (PBV, GPV) ទេ។ លើកដំបូងដែលឧបករណ៍ដោះស្រាយ EPANET ត្រូវបានប្រើ ប្រហែល 650 KB ត្រូវបានទាញយក ហើយបន្ទាប់មកត្រូវបានរក្សាទុកលើឧបករណ៍នេះ។ ពេលបំពង់មានការបាត់បង់មូលដ្ឋាន ឧបករណ៍ដោះស្រាយទាំងពីរខុសគ្នាត្រង់ខ្ទង់ចុងក្រោយ៖ EPANET ប្រើតម្លៃកាត់ខ្ទង់នៃសំទុះទំនាញ ដូច្នេះការបាត់បង់មូលដ្ឋានរបស់វាទាបជាងបន្តិចបន្តួចពីទម្រង់ពិតប្រាកដ។",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_engine_native",
+                    "value": "ប្រើឧបករណ៍ដោះស្រាយខាងក្នុងនៅទីណាដែលអាចធ្វើបាន",
+                    "english": "Use the built-in solver when possible"
+                },
+                "next_translated": {
+                    "key": "lpn_engine_loading",
+                    "value": "កំពុងផ្ទុកឧបករណ៍ដោះស្រាយ EPANET…",
+                    "english": "Loading the EPANET solver…"
+                }
+            },
+            "label": {
+                "key": "lpn_settings_engine_native",
+                "english": "Use the built-in solver when possible",
+                "value": "ប្រើឧបករណ៍ដោះស្រាយខាងក្នុងនៅទីណាដែលអាចធ្វើបាន"
             }
         },
         "lpn_full_needs_run": {
@@ -554,6 +673,54 @@
                 "key": "lpn_file_import_shp_tip",
                 "english": "Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this.",
                 "value": "អានចំណុច បន្ទាត់ និងពហុកោណនៃ ESRI shapefile ចូលគម្រោងនេះជារូបគូរ ដោយរក្សាជួរឈរគុណលក្ខណៈជាលក្ខណៈសម្បត្តិ។ ជ្រើសរើស .zip ឬ .shp រួមជាមួយ .shx, .dbf និង .prj របស់វា (សង្កត់ Ctrl ឬ Shift ដើម្បីជ្រើសរើសច្រើន)។ កូអរដោនេក្នុងប្រព័ន្ធកូអរដោនេផ្សេងពីគម្រោងត្រូវបានបម្លែង ហើយសេចក្តីជូនដំណឹងចែងអំពីរឿងនេះ។"
+            }
+        },
+        "lpn_diag_valve_conflict": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_pda_route",
+                    "value": "បានដោះស្រាយដោយឧបករណ៍ដោះស្រាយ EPANET ព្រោះគំរូតម្រូវការផ្អែកលើសម្ពាធ។",
+                    "english": "Solved with the EPANET solver, because the demand model is pressure driven."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_needs_epanet",
+                    "value": "គំរូតម្រូវការផ្អែកលើសម្ពាធ ហើយមានតែឧបករណ៍ដោះស្រាយ EPANET ប៉ុណ្ណោះដែលអាចគណនាវាបាន។ មិនអាចផ្ទុកឧបករណ៍ដោះស្រាយ EPANET បានទេ ដូច្នេះលទ្ធផលទាំងនេះបាត់។",
+                    "english": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing."
+                }
+            }
+        },
+        "lpn_diag_gpv_curve_order": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_pda_route",
+                    "value": "បានដោះស្រាយដោយឧបករណ៍ដោះស្រាយ EPANET ព្រោះគំរូតម្រូវការផ្អែកលើសម្ពាធ។",
+                    "english": "Solved with the EPANET solver, because the demand model is pressure driven."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_needs_epanet",
+                    "value": "គំរូតម្រូវការផ្អែកលើសម្ពាធ ហើយមានតែឧបករណ៍ដោះស្រាយ EPANET ប៉ុណ្ណោះដែលអាចគណនាវាបាន។ មិនអាចផ្ទុកឧបករណ៍ដោះស្រាយ EPANET បានទេ ដូច្នេះលទ្ធផលទាំងនេះបាត់។",
+                    "english": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing."
+                }
+            }
+        },
+        "lpn_gpv_one_point_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_pda_route",
+                    "value": "បានដោះស្រាយដោយឧបករណ៍ដោះស្រាយ EPANET ព្រោះគំរូតម្រូវការផ្អែកលើសម្ពាធ។",
+                    "english": "Solved with the EPANET solver, because the demand model is pressure driven."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_needs_epanet",
+                    "value": "គំរូតម្រូវការផ្អែកលើសម្ពាធ ហើយមានតែឧបករណ៍ដោះស្រាយ EPANET ប៉ុណ្ណោះដែលអាចគណនាវាបាន។ មិនអាចផ្ទុកឧបករណ៍ដោះស្រាយ EPANET បានទេ ដូច្នេះលទ្ធផលទាំងនេះបាត់។",
+                    "english": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing."
+                }
             }
         },
         "lpn_export_holds_scenario": {
