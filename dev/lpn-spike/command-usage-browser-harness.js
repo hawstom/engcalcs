@@ -227,31 +227,33 @@ async function main() {
 
 		// ---- C6: the real endpoint, both buckets of gating -----------------------------------------
 		console.log('\n---- C6. the real endpoint ----');
-		const readNew = () => {
+		// Other harnesses run in this checkout at the same time and write the same log, so each leg names a
+		// command no other harness presses and reads only its rows.
+		const readNew = (id) => {
 			if (!fs.existsSync(signalLog)) { return []; }
 			const start = logSizeBefore > 0 ? logSizeBefore : 0;
-			return fs.readFileSync(signalLog, 'utf8').slice(start).split('\n').filter((l) => /\tlpn\tcmd:/.test(l));
+			return fs.readFileSync(signalLog, 'utf8').slice(start).split('\n').filter((l) => l.indexOf('\tlpn\tcmd:' + id + '\t') >= 0);
 		};
 		const c = await Session.open(browser, 'C', { serviceWorkers: 'block' });
 		await c.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 		await c.goto('Looped-Network.php?ec_nolog=1');   // a tester browser: this is the gating that says no
 		await c.settle(2000);
-		await c.page.click('#lpn_toolbar button[data-tool="add-pump"]');
+		await c.page.click('#lpn_toolbar button[data-tool="add-text"]');
 		await c.settle(1200);
-		ok('a tester browser (ec_nolog) leaves no cmd: row in the log', readNew().length === 0, readNew().join(' | '));
+		ok('a tester browser (ec_nolog) leaves no cmd: row in the log', readNew('tb/add-text').length === 0, readNew('tb/add-text').join(' | '));
 		await c.context.close();
 
 		const d = await Session.open(browser, 'D', { serviceWorkers: 'block' });
 		await d.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 		await d.page.goto(env.pageUrl('Looped-Network.php'), { waitUntil: 'load' });   // an ordinary visitor
 		await d.settle(2500);
-		await d.page.click('#lpn_toolbar button[data-tool="add-pump"]');
+		await d.page.click('#lpn_toolbar button[data-tool="add-shape"]');
 		await d.settle(1500);
-		const rows = readNew();
+		const rows = readNew('tb/add-shape');
 		ok('an ordinary visitor who has not agreed leaves exactly one cmd: row', rows.length === 1, rows.join(' | '));
 		const f = (rows[0] || '').split('\t');
 		ok('...that row names the command, nothing else, and is in the page-load bucket (visit)',
-			f[5] === 'cmd:tb/add-pump' && f[f.length - 1] === 'visit', JSON.stringify(f));
+			f[5] === 'cmd:tb/add-shape' && f[f.length - 1] === 'visit', JSON.stringify(f));
 		await d.context.close();
 		await a.context.close();
 	} catch (e) {
