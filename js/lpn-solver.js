@@ -423,10 +423,17 @@ EngCalcs.lpnPressureDatum = function (node) {
 //           js/vendor/ -- and cited at each one below: the matrix coefficients from hydcoeffs.c,
 //           the state changes from hydstatus.c, and when they are checked from hydsolver.c.
 //           dev/lpn-spike/native-valve-harness.js holds both engines to the same answer.
-//   PBV / GPV -- still EPANET's alone. A PBV forces a loss whichever way the water runs and a GPV
-//           follows a head-loss curve; neither is phase 1, so they still route the solve to
-//           EPANET, and if EPANET is unreachable this file refuses with a diagnostic that NAMES
-//           THE VALVES ("valve V3 needs the EPANET engine" beats "error 110").
+//   PBV / GPV -- FIXED-LAW VALVES, native since Task 733 phase 2. A PBV forces its setting as
+//           the head drop across it and a GPV follows a head-loss curve. Neither changes state
+//           during the solve -- EPANET's hydstatus.c never looks at either -- so each is one more
+//           head-loss law in the link loop, decided afresh from the current flow every iteration
+//           exactly as hydcoeffs.c pbvcoeff() and gpvcoeff() decide it. Cited at each line below,
+//           and held to EPANET's answer by dev/lpn-spike/native-pbv-gpv-harness.js.
+//
+// WHAT STILL ROUTES TO EPANET is a valve pair EPANET refuses (lpnValveConflicts) and a GPV whose
+// curve EPANET could not read either (lpnGpvCurveOk). If EPANET is unreachable this file refuses
+// those with a diagnostic that NAMES THE VALVES ("valve V3 needs the EPANET engine" beats "error
+// 110").
 EngCalcs.lpnValveTypes = ['PRV', 'PSV', 'FCV', 'TCV', 'PBV', 'GPV'];
 
 // The valves whose state this file decides inside the iteration.
@@ -435,11 +442,36 @@ EngCalcs.lpnValveIsControl = function (link) {
 	return t === 'PRV' || t === 'PSV' || t === 'FCV';
 };
 
+// The valves whose head loss follows a fixed law this file evaluates each iteration (phase 2).
+EngCalcs.lpnValveIsFixedLaw = function (link) {
+	var t = link && link.type === 'valve' ? String(link.valveType || 'TCV').toUpperCase() : '';
+	return t === 'PBV' || t === 'GPV';
+};
+
 // The one place the native/EPANET-only line is drawn, by TYPE. A link that is not a valve is
-// native; so are a TCV and, since Task 733, a PRV, a PSV and an FCV.
+// native; so are a TCV and, since Task 733, a PRV, a PSV and an FCV (phase 1) and a PBV and a GPV
+// (phase 2). Every one of EngCalcs.lpnValveTypes is native now; the line is kept, and kept here,
+// because the next type EPANET grows (its PCV, say) starts on the far side of it.
 EngCalcs.lpnValveIsNative = function (link) {
 	return link.type !== 'valve' || (link.valveType || 'TCV').toUpperCase() === 'TCV' ||
-		EngCalcs.lpnValveIsControl(link);
+		EngCalcs.lpnValveIsControl(link) || EngCalcs.lpnValveIsFixedLaw(link);
+};
+
+// **A GPV IS NATIVE ONLY WITH A CURVE EPANET COULD READ.** OWA-EPANET 2.3.5 validate.c
+// validatecurves() refuses a curve with no points (error 231) or with x values that do not
+// strictly increase (error 230), and hydcoeffs.c curvecoeff() reads the
+// segment [k-1, k] around the flow, which a ONE-point curve does not have -- EPANET reads past
+// the end of its array there. None of those has an EPANET answer to match, so such a GPV keeps
+// routing to EPANET and gets whatever EPANET does with it today (js/lpn-epanet.js writes an
+// empty one as an open throttle and says so).
+EngCalcs.lpnGpvCurveOk = function (link) {
+	var pts = link.curvePoints || [], i;
+	if (pts.length < 2) { return false; }
+	for (i = 0; i < pts.length; i++) {
+		if (!pts[i] || !isFinite(pts[i][0]) || !isFinite(pts[i][1])) { return false; }
+		if (i > 0 && !(pts[i][0] > pts[i - 1][0])) { return false; }
+	}
+	return true;
 };
 
 // **EPANET REFUSES SOME VALVE PAIRS, AND THE BUILT-IN SOLVER MUST NOT QUIETLY ANSWER THEM.** Input
@@ -491,7 +523,9 @@ EngCalcs.lpnDemandModelIsPda = function (model) {
 EngCalcs.lpnEpanetOnlyValves = function (model) {
 	var out = [], conflicts = EngCalcs.lpnValveConflicts(model), i;
 	for (i = 0; i < model.links.length; i++) {
-		if (!EngCalcs.lpnValveIsNative(model.links[i]) || conflicts[model.links[i].id]) {
+		if (!EngCalcs.lpnValveIsNative(model.links[i]) || conflicts[model.links[i].id] ||
+				(model.links[i].type === 'valve' && String(model.links[i].valveType).toUpperCase() === 'GPV' &&
+				!EngCalcs.lpnGpvCurveOk(model.links[i]))) {
 			out.push(model.links[i].id);
 		}
 	}
@@ -911,6 +945,72 @@ EngCalcs.lpnSolve = function (model, options) {
 	}
 	if (vc.length) { X = new Float64Array(nn); }
 
+	// ---- PBV AND GPV (Task 733, phase 2) ------------------------------------------------------
+	//
+	// NEITHER HAS A STATE TO SWITCH. EPANET's hydstatus.c never examines a PBV or a GPV, and its
+	// hydcoeffs.c headlosscoeffs() assembles both in the ordinary link loop, beside the pipes --
+	// not in valvecoeffs(), which is for the three whose flow comes from the node balance. So they
+	// are assembled here in link order too, and they count in X like any pipe. What a PBV does
+	// differ on, iteration by iteration, is WHICH LAW applies, and pbvcoeff() decides that from the
+	// flow at the start of the iteration; fStat records the answer, for the report.
+	//
+	// The user's Closed is the main loop's, as for every link: G = 0 and skipped. EPANET puts
+	// 1/CBIG there instead (valvecoeff(), "Valve is closed"); phase 1 measured the two agreeing on
+	// a closed PRV and FCV to the last reported digit, and the same harness case holds it here.
+	var fStat = [], gpvX = [], gpvY = [],
+		V_TINY_Q = 1e-6 * VCFS,            // types.h TINY, as gpvcoeff() floors the flow (cfs)
+		V_TINY_R = 1e-6 * VFT / VCFS;      // ...and as it floors the curve's slope (ft per cfs)
+	for (k = 0; k < links.length; k++) {
+		if (links[k].status === 'closed' || !EngCalcs.lpnValveIsFixedLaw(links[k])) { continue; }
+		if (String(links[k].valveType).toUpperCase() === 'GPV') {
+			fStat[k] = 'open';
+			gpvX[k] = links[k].curvePoints.map(function (pt) { return pt[0]; });
+			gpvY[k] = links[k].curvePoints.map(function (pt) { return pt[1]; });
+		} else {
+			fStat[k] = 'active';
+		}
+		// The same first guess as every EPANET valve: 1 ft/s (hydraul.c initlinkflow()).
+		Q[k] = Math.PI * links[k].diameter * links[k].diameter / 4 * VFT;
+	}
+
+	// hydcoeffs.c pbvcoeff(). A setting of zero is EPANET's "fixed OPEN or CLOSED" branch and an
+	// ordinary open valve. Otherwise, while the valve's own fully-open minor loss Km Q^2 would
+	// take out MORE than the setting it is just an open valve; below that it forces the head drop
+	// from its start node to its end node to equal the setting: P = CBIG, Y = setting x CBIG, so
+	// the flow update Q - Y + P (H1 - H2) pins H1 - H2 to the setting. That drop is UNSIGNED --
+	// EPANET's Y carries no SGN(flow) -- so with the water running backwards the valve still
+	// holds its start node above its end node by the setting, and the harness holds us to that.
+	function pbvCoeff(k2) {
+		var setting = links[k2].setting || 0, q2 = Q[k2];
+		if (setting === 0 || linkM[k2] * q2 * q2 > setting) {
+			valveOpenCoeff(k2);
+			fStat[k2] = 'open';
+			return;
+		}
+		G[k2] = V_CBIG;
+		y[k2] = setting * V_CBIG;
+		fStat[k2] = 'active';
+	}
+
+	// hydcoeffs.c gpvcoeff() with curvecoeff(): the straight segment of the head-loss curve that
+	// brackets |Q| -- the first segment below the curve, the last above it -- linearized at |Q|,
+	// with EPANET's two TINY floors. P = 1/r and Y = (h0/r + |Q|) sgn(Q), where h0 + r|Q| is the
+	// segment's head loss: the curve read the same both ways, the loss signed with the flow. An
+	// open GPV's minor-loss column plays no part (gpvcoeff never reads Km); EPANET's SGN() of a
+	// zero flow is +1, and so is this one's.
+	function gpvCoeff(k2) {
+		var xs = gpvX[k2], ys = gpvY[k2], npts = xs.length, q2 = Math.abs(Q[k2]), k1, kk = 0, r, h0;
+		if (q2 < V_TINY_Q) { q2 = V_TINY_Q; }
+		while (kk < npts && xs[kk] < q2) { kk++; }
+		if (kk === 0) { kk++; } else if (kk === npts) { kk--; }
+		k1 = kk - 1;
+		r = (ys[kk] - ys[k1]) / (xs[kk] - xs[k1]);
+		h0 = ys[k1] - r * xs[k1];
+		if (!(r >= V_TINY_R)) { r = V_TINY_R; }
+		G[k2] = 1 / r;
+		y[k2] = (h0 / r + q2) * (Q[k2] < 0 ? -1 : 1);
+	}
+
 	// One off-diagonal write, with the self-loop case the main assembly also handles.
 	function addOff(a, b, val) {
 		if (a === b) { M[envDiag[a]] -= 2 * val; return; }
@@ -1140,6 +1240,9 @@ EngCalcs.lpnSolve = function (model, options) {
 					G[k] = 1 / p;
 					y[k] = h / p;
 				}
+			} else if (fStat[k] !== undefined) {
+				// A PBV or a GPV: no friction (it has no length) and its own law, from above.
+				if (String(link.valveType).toUpperCase() === 'PBV') { pbvCoeff(k); } else { gpvCoeff(k); }
 			} else {
 				if (!resFixed) {
 					link.f = EngCalcs.lpnDwFriction(Math.max(aq, qMin), link.diameter, link.roughness, visc);
@@ -1388,6 +1491,8 @@ EngCalcs.lpnSolve = function (model, options) {
 		}
 	}
 
+	// The report reads one state per valve; a PBV's or GPV's is the law it was last solved under.
+	for (k = 0; k < links.length; k++) { if (fStat[k] !== undefined) { vStat[k] = fStat[k]; } }
 	return EngCalcs.lpnReport(model, junctions, junctionIndex, byId, H, Q, method,
 		visc, iter, converged, maxFlowChange, vStat);
 };
@@ -1441,12 +1546,13 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 
 	for (k = 0; k < model.links.length; k++) {
 		link = model.links[k];
-		// **A CONTROL VALVE REPORTS AS EPANET REPORTS IT** (epanet.c EN_getlinkvalue): closed by the
+		// **A CONTROL VALVE REPORTS AS EPANET REPORTS IT** (epanet.c EN_getlinkvalue), and so does a
+		// PBV and a GPV, whose loss is likewise no minor-loss formula's: closed by the
 		// solve, its flow, velocity and head loss are zero; otherwise its head loss is the head
 		// difference across it, which for an active valve is the pressure it is taking out -- the
 		// minor-loss formula would report only the fully-open part of that.
 		vs = vStat ? vStat[k] : undefined;
-		if (EngCalcs.lpnValveIsControl(link)) {
+		if (EngCalcs.lpnValveIsControl(link) || EngCalcs.lpnValveIsFixedLaw(link)) {
 			valveStatus[link.id] = vs === undefined ? 'closed' : vs;
 		}
 		if (vs !== undefined) {
@@ -1505,7 +1611,8 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 		headlosses: headlosses,
 		velocities: velocities,
 		// Each PRV, PSV and FCV's state at the answer: 'active', 'open', 'closed', 'xpressure' or
-		// 'xfcv' (see lpnSolve). A valve the user closed is 'closed'.
+		// 'xfcv' (see lpnSolve). A PBV's is 'active' (holding its drop) or 'open' (its minor loss
+		// already exceeds it), a GPV's 'open'. A valve the user closed is 'closed'.
 		valveStatus: valveStatus
 	};
 };
