@@ -1279,6 +1279,8 @@ $ec_lang['lpn_ex_net1_si_title']='EPANET Net1 plus rule-based controls, L/s (SI)
 $ec_lang['lpn_ex_net1_si_desc']='Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.';
 $ec_lang['lpn_ex_net1_scn_title']='EPANET Net1 with scenarios, gpm (US)';
 $ec_lang['lpn_ex_net1_scn_desc']='Gallons per minute, with feet and inches. EPANET\'s Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.';
+$ec_lang['lpn_ex_valves_title']='Valve types, gpm (US)';
+$ec_lang['lpn_ex_valves_desc']='Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.';
 $ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (SI)';
 $ec_lang['lpn_ex_net2_si_desc']='Liters per second, with meters and millimeters. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (US)';
@@ -2639,7 +2641,7 @@ $ec_lang['lpn_notes_1_term']='How it is solved';
 // lpn_time_no_engine and lpn_engine_unavailable.** A note everybody reads should not carry a
 // failure explanation that the failure itself delivers. Task 605's rule is untouched -- every
 // sentence a reader meets only when something has gone wrong SURVIVES, and those two are it.
-$ec_lang['lpn_notes_1_def']='By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation or a network with a pressure breaker or general purpose valve (PBV, GPV) is always solved by the EPANET solver.';
+$ec_lang['lpn_notes_1_def']='By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.';
 $ec_lang['lpn_notes_2_term']='What it does not do';
 // **"Water quality chemistry is not modeled" WAS FLATLY FALSE** (Tom, 2026-09-10: *"Wrong
 // facts."*). A reacting chemical, bulk and wall reaction coefficients and a limiting
@@ -2720,12 +2722,10 @@ $ec_lang['lpn_roughness_method_note']='⚠ Pipes with a roughness outside the no
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='Downloading the EPANET solver. It is downloaded once and then stored on this device, so it works offline afterward.';
 $ec_lang['lpn_engine_ready']='The EPANET solver is now stored on this device and works offline.';
-$ec_lang['lpn_engine_fetching_valve']='Downloading the EPANET solver, so this valve can be solved now and offline later.';
-$ec_lang['lpn_engine_ready_valve']='The EPANET solver is now stored on this device. Pressure breaker and general purpose valves (PBV, GPV) can now be solved offline.';
-$ec_lang['lpn_engine_unavailable']='Could not download the EPANET solver, which is required to solve pressure breaker and general purpose valves (PBV, GPV). After one connection to the internet, the solver is stored on this device.';
+$ec_lang['lpn_engine_unavailable']='Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
-$ec_lang['lpn_engine_unavailable_why']='Pressure breaker and general purpose valves (PBV, GPV) cannot be solved without the EPANET solver. {reason}';
+$ec_lang['lpn_engine_unavailable_why']='This network cannot be solved without the EPANET solver. {reason}';
 $ec_lang['lpn_engine_needed_loading']='Loading EPANET solver while you build. Results will be available when completely loaded.';
 // **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
 // own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
@@ -2739,7 +2739,6 @@ $ec_lang['lpn_engine_wait_pct']='Solver {percent}% loaded.';
 $ec_lang['lpn_engine_wait_bytes']='Solver {kb} KB loaded so far. The total is not available, so the percentage of completion is unknown.';
 $ec_lang['lpn_engine_needed_failed']='The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
 $ec_lang['lpn_engine_needed_failed_why']='This network can only be solved by the EPANET solver. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='These are pressure breaker or general purpose valves, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:';
 $ec_lang['lpn_diag_not_converged']='No solution was found. Check for physically impossible values, such as a diameter of zero.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3591,14 +3590,13 @@ $ec_lang['lpn_settings_engine_native']='Use the built-in solver when possible';
 // EPANET whatever the box says, and the one-time download, which is the cost a visitor on a slow
 // connection actually pays.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_engine_native_tip']='Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations or pressure breaker and general purpose valves (PBV, GPV). The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.';
+$ec_lang['lpn_settings_engine_native_tip']='Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.';
 $ec_lang['lpn_engine_loading']='Loading the EPANET solver…';
 $ec_lang['lpn_engine_failed']='The EPANET solver could not be loaded. Showing the built-in solver instead.';
 $ec_lang['lpn_engine_failed_why']='{reason} Showing the built-in solver instead.';
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='Solved with the EPANET solver, because of these pressure breaker and general purpose valves:';
 $ec_lang['lpn_unit_unknown']='This drawing states a unit this page does not support: {unit}. All values are kept and displayed exactly as imported, and nothing was changed. Nothing can be computed until the unit is supported, because its conversion factor is unknown.';
 $ec_lang['lpn_engine_manning_note']='Note: with Manning roughness, EPANET rounds the constant in the Manning equation, so head loss is about 0.6% lower than the exact form.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
@@ -5045,6 +5043,9 @@ $ec_lang['lpn_settings_req_pressure_tip']='Enter the pressure at or above which 
 $ec_lang['lpn_settings_pressure_exponent']='Pressure exponent';
 $ec_lang['lpn_settings_pressure_exponent_tip']='Enter the exponent of the curve that rises from no flow at the minimum pressure to the full demand at the required pressure.';
 $ec_lang['lpn_engine_pda_route']='Solved with the EPANET solver, because the demand model is pressure driven.';
+$ec_lang['lpn_diag_valve_conflict']='These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:';
+$ec_lang['lpn_diag_gpv_curve_order']='The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:';
+$ec_lang['lpn_gpv_one_point_note']='⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}';
 $ec_lang['lpn_diag_pda_needs_epanet']='The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.';
 $ec_lang['lpn_result_delivered_demand']='Delivered demand';
 $ec_lang['lpn_result_delivered_demand_tip']='The flow this junction actually receives under the pressure driven demand model. It is less than the demand when the pressure is below the required pressure.';

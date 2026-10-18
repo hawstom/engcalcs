@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='未纳入本次运行，因为没有路径从这�
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='正在获取 EPANET 求解器。它只需下载一次，此后会保存在本设备上，因此之后可以离线使用。';
 $ec_lang['lpn_engine_ready']='EPANET 求解器现已保存在本设备上，可以离线使用。';
-$ec_lang['lpn_engine_fetching_valve']='正在获取 EPANET 求解器，以便现在求解此阀门，并在以后离线使用。';
-$ec_lang['lpn_engine_ready_valve']='EPANET 求解器现已保存在本设备上。压力断路阀和通用阀（PBV、GPV）此后可以离线求解。';
 $ec_lang['lpn_engine_unavailable']='无法下载 EPANET 求解器，而求解压力断路阀和通用阀（PBV、GPV）必须使用它。联网一次后，求解器即保存在本设备上。';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='求解器已加载 {percent}%。';
 $ec_lang['lpn_engine_wait_bytes']='求解器目前已加载 {kb} KB。总大小未知，因此无法得知完成百分比。';
 $ec_lang['lpn_engine_needed_failed']='EPANET 求解器尚未加载，目前也无法加载，而此管网只能由它求解。连接互联网后即可加载。';
 $ec_lang['lpn_engine_needed_failed_why']='此管网只能由 EPANET 求解器求解。{reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='以下为压力断路阀或通用阀，只有 EPANET 求解器才能计算。由于无法加载 EPANET 求解器，缺少这些结果：';
 $ec_lang['lpn_diag_valve_on_fixed_head']='以下阀门直接连接在水库或水箱上，而水库或水箱固定了该节点处的测压管水头线，因此阀门无可控制之处。请在阀门与水库或水箱之间加入一段短管：';
 $ec_lang['lpn_diag_not_converged']='未找到解。请检查是否存在现实中不可能出现的数值，例如管径为零。';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} 改为显示内置求解器的结果
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='因以下压力断路阀和通用阀，本次使用 EPANET 求解器求解：';
 $ec_lang['lpn_unit_unknown']='此图纸中标明的单位 {unit} 本页面不支持。所有数值均按导入时的原样保留和显示，未作任何更改。在本页面支持该单位之前无法进行任何计算，因为其换算系数未知。';
 $ec_lang['lpn_engine_manning_note']='注意：使用曼宁糙率时，EPANET 对曼宁方程中的常数取整，因此水头损失比精确形式约低 0.6%。';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------

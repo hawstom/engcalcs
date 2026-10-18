@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='Esclusi da questa esecuzione perché nessun percor
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='Download del risolutore EPANET. Viene scaricato una sola volta e poi conservato su questo dispositivo, così in seguito funziona anche offline.';
 $ec_lang['lpn_engine_ready']='Il risolutore EPANET è ora conservato su questo dispositivo e funziona offline.';
-$ec_lang['lpn_engine_fetching_valve']='Download del risolutore EPANET, così questa valvola può essere risolta ora e offline in seguito.';
-$ec_lang['lpn_engine_ready_valve']='Il risolutore EPANET è ora conservato su questo dispositivo. Le valvole frangipressione e di uso generale (PBV, GPV) possono ora essere risolte offline.';
 $ec_lang['lpn_engine_unavailable']='Non è stato possibile scaricare il risolutore EPANET, necessario per risolvere le valvole frangipressione e di uso generale (PBV, GPV). Dopo una connessione a internet, il risolutore è conservato su questo dispositivo.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='Risolutore caricato al {percent}%.';
 $ec_lang['lpn_engine_wait_bytes']='Risolutore: {kb} KB caricati finora. Il totale non è disponibile, quindi la percentuale di completamento è sconosciuta.';
 $ec_lang['lpn_engine_needed_failed']='Il risolutore EPANET non è stato ancora caricato, non può essere caricato, e questa rete può essere risolta solo da esso. Verrà caricato quando sei connesso a internet.';
 $ec_lang['lpn_engine_needed_failed_why']='Questa rete può essere risolta solo dal risolutore EPANET. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='Queste sono valvole frangipressione o di uso generale, e solo il risolutore EPANET è in grado di calcolarle. Non è stato possibile caricare il risolutore EPANET, quindi questi risultati mancano:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='Queste valvole sono collegate direttamente a un serbatoio o a una vasca, che fissa in quel nodo la linea piezometrica, quindi la valvola non ha nulla da controllare. Inserisci un breve tratto di tubazione tra la valvola e il serbatoio o la vasca:';
 $ec_lang['lpn_diag_not_converged']='Non è stata trovata alcuna soluzione. Controlla se ci sono valori impossibili nella realtà, come un diametro pari a zero.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} Viene mostrato il risolutore integra
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='Risolto con il risolutore EPANET, a causa di queste valvole frangipressione e di uso generale:';
 $ec_lang['lpn_unit_unknown']='Questo disegno indica un\'unità che questa pagina non supporta: {unit}. Tutti i valori sono conservati e mostrati esattamente come importati, e nulla è stato modificato. Non è possibile calcolare nulla finché l\'unità non è supportata, perché il suo fattore di conversione è sconosciuto.';
 $ec_lang['lpn_engine_manning_note']='Nota: con la scabrezza di Manning, EPANET arrotonda la costante nell\'equazione di Manning, quindi la perdita di carico risulta di circa lo 0,6% più bassa rispetto alla forma esatta.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------

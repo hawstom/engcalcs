@@ -4516,3 +4516,10 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: n600, 6 scenarios steady 0.3 s; 24h x6 2.1 s; Stop keeps finished.
 - Fire flow: not offered. Gap remains.
 - I used pkill -f on my own wait loop (violates brief); disclosed.
+## 2026-10-18 feat/native-pbv-gpv @ 11212c9ed (Task 733 phase 2, PBV and GPV native) (Perry)
+- CITED: OWA-EPANET v2.3.5 hydcoeffs.c pbvcoeff/gpvcoeff/curvecoeff, epanet.c EN_HEADLOSS (abs for non-pump). Fetched to perry-pbv/src.
+- OBSERVED: native equations match source line for line; ~45 probes (probe1..9.js) all within 1-6 mm of EPANET except degenerate cases below.
+- OBSERVED: US page-level GPV (gpm/ft) and PBV (psi) match hand answers and EPANET to <0.01 mm.
+- OBSERVED: harness mutation: sign, TINY slope floor, PBV Y sign caught; PBV open threshold (>) and q TINY floor NOT caught.
+- OBSERVED (pre-existing, master too): EPANET path ignores a GPV's Closed toggle once the session is warm.
+- OBSERVED: zero-flow GPV, first segment negative intercept: J3 differs 1.33 m (EPANET's own tie is noise-decided).

@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='Omise din această rulare deoarece niciun traseu n
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='Se descarcă rezolvitorul EPANET. Este descărcat o singură dată și apoi stocat pe acest dispozitiv, deci funcționează ulterior offline.';
 $ec_lang['lpn_engine_ready']='Rezolvitorul EPANET se află acum pe acest dispozitiv și funcționează offline.';
-$ec_lang['lpn_engine_fetching_valve']='Se descarcă rezolvitorul EPANET, astfel încât această vană poate fi rezolvată acum și offline mai târziu.';
-$ec_lang['lpn_engine_ready_valve']='Rezolvitorul EPANET se află acum pe acest dispozitiv. Vanele cu cădere fixă de presiune și vanele de uz general (PBV, GPV) pot fi acum rezolvate offline.';
 $ec_lang['lpn_engine_unavailable']='Rezolvitorul EPANET, necesar pentru rezolvarea vanelor cu cădere fixă de presiune și a vanelor de uz general (PBV, GPV), nu a putut fi descărcat. După o conectare la internet, rezolvitorul este stocat pe acest dispozitiv.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='Rezolvitor încărcat {percent}%.';
 $ec_lang['lpn_engine_wait_bytes']='Rezolvitor: {kb} KB încărcați până acum. Totalul nu este disponibil, deci procentul de finalizare este necunoscut.';
 $ec_lang['lpn_engine_needed_failed']='Rezolvitorul EPANET nu a fost încă încărcat, nu poate fi încărcat, iar această rețea poate fi rezolvată doar de el. Va fi încărcat atunci când sunteți conectat la internet.';
 $ec_lang['lpn_engine_needed_failed_why']='Această rețea poate fi rezolvată doar de rezolvitorul EPANET. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='Acestea sunt vane cu cădere fixă de presiune sau vane de uz general, iar numai rezolvitorul EPANET le poate calcula. Rezolvitorul EPANET nu a putut fi încărcat, deci aceste rezultate lipsesc:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='Aceste vane sunt conectate direct la un rezervor sau la un bazin, care fixează linia piezometrică în acel nod, deci vana nu are nimic de controlat. Introduceți o conductă scurtă între vană și rezervor sau bazin:';
 $ec_lang['lpn_diag_not_converged']='Nu s-a găsit nicio soluție. Verificați dacă există valori imposibile în realitate, cum ar fi un diametru zero.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} Se afișează în schimb rezolvitoru
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='Rezolvat cu rezolvitorul EPANET, din cauza acestor vane cu cădere fixă de presiune și de uz general:';
 $ec_lang['lpn_unit_unknown']='Acest desen indică o unitate pe care această pagină nu o acceptă: {unit}. Toate valorile sunt păstrate și afișate exact așa cum au fost importate, iar nimic nu a fost modificat. Nu se poate calcula nimic până când unitatea este acceptată, deoarece factorul ei de conversie este necunoscut.';
 $ec_lang['lpn_engine_manning_note']='Notă: cu rugozitate Manning, EPANET rotunjește constanta din ecuația Manning, astfel încât pierderea de sarcină este cu aproximativ 0,6% mai mică decât forma exactă.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------

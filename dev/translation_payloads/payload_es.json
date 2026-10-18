@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "es",
-        "expected_key_count": 3050,
-        "delta_key_count": 48,
-        "english_changed_key_count": 23,
+        "expected_key_count": 3051,
+        "delta_key_count": 57,
+        "english_changed_key_count": 27,
         "exempt_key_count": 58,
         "exempt_keys": [
             "calc_units_us",
@@ -90,7 +90,7 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: caudal\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: velocidad\n- flow used, taken, or consumed\n    English: demand\n    Your language: Demanda\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Presión\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: dibujar\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: nudo\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: embalse\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: nodo\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: línea\n- water network project, file, or model\n    English: project (saved network)\n    Your language: proyecto\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: escenario\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: predeterminado\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- solver or the part that works out the answer\n    English: solver\n    Your language: solucionador\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: Depósito\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: Válvula\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: Valores exclusivos\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: caudal contra incendios\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: rastreo de fuente\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: Figura\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: caudal\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: velocidad\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: carga\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: pérdida de carga\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: pérdida localizada\n- flow used, taken, or consumed\n    English: demand\n    Your language: Demanda\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Presión\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: dibujar\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: nudo\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: embalse\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: nodo\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: línea\n- water network project, file, or model\n    English: project (saved network)\n    Your language: proyecto\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: escenario\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: predeterminado\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- solver or the part that works out the answer\n    English: solver\n    Your language: solucionador\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: Depósito\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: Válvula\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: Valores exclusivos\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: caudal contra incendios\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: rastreo de fuente\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: Figura\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
         "lpn_guide_cmp_byasset_term": "Results by asset",
@@ -101,12 +101,18 @@
         "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_ex_net1_scn_title": "EPANET Net1 with scenarios, gpm (US)",
         "lpn_ex_net1_scn_desc": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.",
+        "lpn_ex_valves_title": "Valve types, gpm (US)",
+        "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_file_import_inp": "EPANET file…",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
         "lpn_notes_2_def": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
         "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
+        "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.",
+        "lpn_engine_unavailable_why": "This network cannot be solved without the EPANET solver. {reason}",
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
         "lpn_scncmp_menu_tip": "Table of scenarios with count of overrides, lowest pressure, and highest velocity, and a table of results by asset that copies to a spreadsheet",
         "lpn_scncmp_progress": "Solving scenario {done} of {total}…",
         "lpn_scncmp_stopped": "Stopped after {done} of {total} scenarios. The results below are the ones already finished.",
@@ -134,6 +140,9 @@
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
         "lpn_file_import_dxf": "DXF shapes…",
         "lpn_file_import_shp": "Shapefile shapes…",
+        "lpn_diag_valve_conflict": "These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:",
+        "lpn_diag_gpv_curve_order": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:",
+        "lpn_gpv_one_point_note": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}",
         "lpn_export_holds_scenario": "It holds the scenario {scenario} only.",
         "lpn_export_holds_base": "It holds the Base scenario only.",
         "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
@@ -151,12 +160,18 @@
         "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_ex_net1_scn_title": "EPANET Net1 with scenarios, gpm (US)",
         "lpn_ex_net1_scn_desc": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.",
+        "lpn_ex_valves_title": "Valve types, gpm (US)",
+        "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_file_import_inp": "EPANET file…",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
         "lpn_notes_2_def": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
         "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
+        "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.",
+        "lpn_engine_unavailable_why": "This network cannot be solved without the EPANET solver. {reason}",
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
         "lpn_scncmp_menu_tip": "Table of scenarios with count of overrides, lowest pressure, and highest velocity, and a table of results by asset that copies to a spreadsheet",
         "lpn_scncmp_progress": "Solving scenario {done} of {total}…",
         "lpn_scncmp_stopped": "Stopped after {done} of {total} scenarios. The results below are the ones already finished.",
@@ -184,6 +199,9 @@
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
         "lpn_file_import_dxf": "DXF shapes…",
         "lpn_file_import_shp": "Shapefile shapes…",
+        "lpn_diag_valve_conflict": "These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:",
+        "lpn_diag_gpv_curve_order": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:",
+        "lpn_gpv_one_point_note": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}",
         "lpn_export_holds_scenario": "It holds the scenario {scenario} only.",
         "lpn_export_holds_base": "It holds the Base scenario only.",
         "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
@@ -336,6 +354,38 @@
                 }
             }
         },
+        "lpn_ex_valves_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net1_si_desc",
+                    "value": "Litros por segundo, con metros y milímetros. Un ejemplo ficticio de EPANET convertido de galones por minuto, pies y pulgadas, con cloro, 1 embalse, 1 depósito, 1 bomba y dos controles basados en reglas.",
+                    "english": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_net2_si_desc",
+                    "value": "Litros por segundo, con metros y milímetros. Un ejemplo de EPANET en Branford, Connecticut, convertido de galones por minuto, pies y pulgadas: 35 nudos y 1 depósito, sin embalse, sin bomba y sin válvulas, de unos 2 km por 4 km. El fluoruro, una sustancia no reactiva, entra por una fuente.",
+                    "english": "Liters per second, with meters and millimeters. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source."
+                }
+            }
+        },
+        "lpn_ex_valves_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net1_si_desc",
+                    "value": "Litros por segundo, con metros y milímetros. Un ejemplo ficticio de EPANET convertido de galones por minuto, pies y pulgadas, con cloro, 1 embalse, 1 depósito, 1 bomba y dos controles basados en reglas.",
+                    "english": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_net2_si_desc",
+                    "value": "Litros por segundo, con metros y milímetros. Un ejemplo de EPANET en Branford, Connecticut, convertido de galones por minuto, pies y pulgadas: 35 nudos y 1 depósito, sin embalse, sin bomba y sin válvulas, de unos 2 km por 4 km. El fluoruro, una sustancia no reactiva, entra por una fuente.",
+                    "english": "Liters per second, with meters and millimeters. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source."
+                }
+            }
+        },
         "lpn_file_import_inp": {
             "reason": "english_changed",
             "current_value": "Importar archivo de EPANET…",
@@ -394,6 +444,22 @@
                 "value": "Espacio de trabajo…"
             }
         },
+        "lpn_notes_1_def": {
+            "reason": "english_changed",
+            "current_value": "De forma predeterminada, el solucionador de EPANET resuelve la red. Cuando se fija un tiempo total de simulación, cada paso de tiempo de informe se calcula en secuencia: los depósitos se llenan y se vacían, las demandas siguen sus patrones y la barra de herramientas reproduce la simulación. Con Usar el solucionador incorporado cuando sea posible marcado, el solucionador incorporado puede resolver una solución de un solo instante, pero una simulación de período extendido o una red con una válvula rompedora de presión o una válvula de propósito general (PBV, GPV) la resuelve siempre el solucionador de EPANET.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_1_term",
+                    "value": "Cómo se resuelve",
+                    "english": "How it is solved"
+                },
+                "next_translated": {
+                    "key": "lpn_notes_2_term",
+                    "value": "Lo que no hace",
+                    "english": "What it does not do"
+                }
+            }
+        },
         "lpn_notes_2_def": {
             "reason": "english_changed",
             "current_value": "No se modelan las sobrepresiones transitorias ni el golpe de ariete: todos los resultados corresponden a flujo permanente o de variación lenta, no a la onda de presión transitoria causada por un cierre rápido de una válvula.",
@@ -426,6 +492,38 @@
                 }
             }
         },
+        "lpn_engine_unavailable": {
+            "reason": "english_changed",
+            "current_value": "No se pudo descargar el solucionador de EPANET, necesario para resolver las válvulas rompedoras de presión y de propósito general (PBV, GPV). Después de una conexión a internet, el solucionador queda guardado en este dispositivo.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_ready",
+                    "value": "El solucionador de EPANET ya está en este dispositivo, y funciona sin conexión.",
+                    "english": "The EPANET solver is now stored on this device and works offline."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_unavailable_why",
+                    "value": "Las válvulas rompedoras de presión y de propósito general (PBV, GPV) no se pueden resolver sin el solucionador de EPANET. {reason}",
+                    "english": "This network cannot be solved without the EPANET solver. {reason}"
+                }
+            }
+        },
+        "lpn_engine_unavailable_why": {
+            "reason": "english_changed",
+            "current_value": "Las válvulas rompedoras de presión y de propósito general (PBV, GPV) no se pueden resolver sin el solucionador de EPANET. {reason}",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "No se pudo descargar el solucionador de EPANET, necesario para resolver las válvulas rompedoras de presión y de propósito general (PBV, GPV). Después de una conexión a internet, el solucionador queda guardado en este dispositivo.",
+                    "english": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "Cargando el solucionador de EPANET mientras usted construye. Los resultados estarán disponibles cuando termine de cargarse.",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                }
+            }
+        },
         "lpn_sm_help": {
             "reason": "english_changed",
             "current_value": "Cómo funcionan los escenarios y las alternativas:\\n\\nEn el Modo básico, las alternativas están ocultas y son automáticas, y todos los escenarios nuevos son secundarios del escenario Base.\\n\\nCon el Modo básico desmarcado, hay disponible un árbol de herencia complejo, y las alternativas se pueden compartir entre escenarios. Pero el comportamiento predeterminado de las ediciones cuando se necesita una asociación de alternativa nueva (en ausencia de una administración proactiva por parte del usuario) es crear una alternativa con el mismo nombre que el escenario actual, lo que da a cada escenario su propio conjunto de alternativas.\\n\\nLas propiedades y los ajustes pertenecen a categorías de alternativas que aparecen como columnas de la tabla de escenarios y alternativas y como opciones de administración en el Administrador de escenarios.\\n\\nLos valores específicos se crean en los escenarios, pero en realidad pertenecen a las alternativas respectivas asociadas con el escenario; por eso un escenario es como una ventana hacia sus alternativas. Las asociaciones de alternativas con escenarios se administran en el panel derecho del Administrador de escenarios o en la tabla Escenarios del panel inferior. Crear un escenario nuevo no crea alternativas; el escenario nuevo usa las alternativas de su escenario superior hasta que se crean valores específicos que necesiten alternativas nuevas. Cuando se crean valores específicos en un escenario, se guardan en su alternativa respectiva para el escenario; si el escenario no tiene esa alternativa, se crea una nueva con el nombre del escenario.\\n\\nEjemplo: usted crea un escenario \"Figura: ID de nodos y líneas\" y edita un texto para que diga \"ID de nodos y líneas.\" Al crear el escenario no se crea ninguna alternativa. Pero en el momento en que guarda el texto, se crea una alternativa de Texto llamada \"Figura: ID de nodos y líneas\" con el valor específico del valor del texto. En el Modo básico, esto se ve simplemente como un valor específico en el propio escenario.\\n\\nCopiar propiedades copia solo los valores específicos. En cualquier escenario distinto de Base, copia solo los valores específicos que el elemento tiene en ese escenario.\\n\\nCómo administrar los escenarios:\\n\\n- Elija Escenarios o una categoría de alternativas en la lista de arriba para mostrar su árbol.\\n\\n- Cree un elemento secundario del elemento seleccionado con Agregar secundario. Agregar base agrega otra Base, que comienza como una copia de Base tal como está ahora; las ediciones posteriores de Base no la cambian. Un elemento secundario nuevo lleva el nombre de su elemento superior; escriba un nombre para renombrarlo. Copiar copia la alternativa seleccionada. Combinar hacia arriba mueve los valores específicos de la alternativa seleccionada a una alternativa superior, elegida por nombre, y la alternativa seleccionada pasa a heredarlos; antes nombra cualquier valor que también reemplace una alternativa que se omite, el cual no se cambia. Para copiar un escenario, use Copiar escenario en el menú Escenarios, en el Modo básico; copia los valores específicos del escenario, con las alternativas que los contienen. Agregar base y Copiar escenario crean cada uno alternativas: Agregar base crea una alternativa Base para la nueva Base en cada categoría que contiene valores, y Copiar escenario crea una alternativa nueva, con el nombre de la copia, por cada alternativa que contiene los valores específicos del escenario.\\n\\n- Arrastre un elemento sobre otro para hacerlo secundario de ese elemento. Un escenario movido a un nuevo elemento superior hereda de él todo lo que no ha reemplazado; lo que ha reemplazado no cambia. Arrastre un elemento entre otros dos para reordenarlos.\\n\\n- Haga clic en un elemento para seleccionarlo. Presione F2 o elija Renombrar para renombrar el elemento seleccionado. Al renombrar un escenario se pregunta si se deben renombrar las alternativas que llevan su nombre; en el Modo básico se renombran con él, sin preguntar. Haga doble clic en un escenario o presione Intro para establecerlo como actual. Haga clic en la flecha junto a un elemento o presione Izquierda o Derecha para contraerlo o expandirlo. Haga clic con el botón derecho en un elemento para ver los mismos comandos que los botones.\\n\\n- Presione Supr o haga clic en el botón menos para eliminar el elemento seleccionado. Un elemento en uso no se elimina, y el mensaje nombra lo que lo usa. Eliminar un escenario con el Modo básico desmarcado conserva las alternativas que usa. Eliminar un escenario con el Modo básico marcado también elimina cada una de sus alternativas que ningún otro escenario usa.\\n\\n- Para hacer que un escenario use otra alternativa, incluida Base, elíjala en la fila del escenario en el panel derecho del Administrador de escenarios o en la tabla Escenarios. Un valor específico creado en una alternativa compartida cambia todos los escenarios que la usan.",
@@ -440,6 +538,27 @@
                     "value": "¿Eliminar la alternativa {name}?",
                     "english": "Delete the alternative {name}?"
                 }
+            }
+        },
+        "lpn_settings_engine_native_tip": {
+            "reason": "english_changed",
+            "current_value": "Active esta opción para usar el solucionador incorporado donde sea posible. De lo contrario, siempre se usa el solucionador de EPANET de la EPA de EE. UU. El solucionador incorporado no se usa en simulaciones de período extendido ni con válvulas rompedoras de presión o de propósito general (PBV, GPV). La primera vez que se usa el solucionador de EPANET, se descargan cerca de 650 KB, que luego se guardan en este dispositivo. Donde una tubería tiene una pérdida localizada, los dos solucionadores difieren en los últimos dígitos: EPANET usa un valor redondeado de la aceleración de la gravedad, así que sus pérdidas localizadas resultan levemente menores que la forma exacta.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_engine_native",
+                    "value": "Usar el solucionador incorporado cuando sea posible",
+                    "english": "Use the built-in solver when possible"
+                },
+                "next_translated": {
+                    "key": "lpn_engine_loading",
+                    "value": "Cargando el solucionador de EPANET…",
+                    "english": "Loading the EPANET solver…"
+                }
+            },
+            "label": {
+                "key": "lpn_settings_engine_native",
+                "english": "Use the built-in solver when possible",
+                "value": "Usar el solucionador incorporado cuando sea posible"
             }
         },
         "lpn_scncmp_menu_tip": {
@@ -922,6 +1041,54 @@
                 "key": "lpn_file_import_shp_tip",
                 "english": "Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this.",
                 "value": "Leer los puntos, las líneas y los polígonos de un shapefile de ESRI en este proyecto como Figuras, conservando las columnas de atributos como propiedades. Seleccione el .zip, o bien el .shp junto con sus archivos .shx, .dbf y .prj (mantenga presionada la tecla Ctrl o Mayús para seleccionar varios). Las coordenadas de un sistema de coordenadas distinto del del proyecto se convierten, y el aviso lo indica."
+            }
+        },
+        "lpn_diag_valve_conflict": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_pda_route",
+                    "value": "Resuelto con el solucionador de EPANET, porque el modelo de demanda es impulsado por la presión.",
+                    "english": "Solved with the EPANET solver, because the demand model is pressure driven."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_needs_epanet",
+                    "value": "El modelo de demanda es impulsado por la presión, y solo el solucionador de EPANET puede calcularlo. No se pudo cargar el solucionador de EPANET, así que faltan estos resultados.",
+                    "english": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing."
+                }
+            }
+        },
+        "lpn_diag_gpv_curve_order": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_pda_route",
+                    "value": "Resuelto con el solucionador de EPANET, porque el modelo de demanda es impulsado por la presión.",
+                    "english": "Solved with the EPANET solver, because the demand model is pressure driven."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_needs_epanet",
+                    "value": "El modelo de demanda es impulsado por la presión, y solo el solucionador de EPANET puede calcularlo. No se pudo cargar el solucionador de EPANET, así que faltan estos resultados.",
+                    "english": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing."
+                }
+            }
+        },
+        "lpn_gpv_one_point_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_pda_route",
+                    "value": "Resuelto con el solucionador de EPANET, porque el modelo de demanda es impulsado por la presión.",
+                    "english": "Solved with the EPANET solver, because the demand model is pressure driven."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_needs_epanet",
+                    "value": "El modelo de demanda es impulsado por la presión, y solo el solucionador de EPANET puede calcularlo. No se pudo cargar el solucionador de EPANET, así que faltan estos resultados.",
+                    "english": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing."
+                }
             }
         },
         "lpn_export_holds_scenario": {

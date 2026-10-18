@@ -1,0 +1,76 @@
+[TITLE]
+Valves: one of each EPANET valve type, each one controlling at the solved state.
+
+[JUNCTIONS]
+;ID   Elev  Demand
+ J1   560   0                ;Top of the steep line, upstream of the pressure breaker
+ J2   556   0                ;Below the pressure breaker
+ J3   520   100              ;Distribution hub. The PSV holds its pressure
+ J4   480   0                ;Inlet of the low zone, held by the PRV
+ J5   470   250              ;Low zone customers
+ J6   430   0                ;Downstream of the PSV
+ J7   500   0                ;Downstream of the FCV
+ J8   510   0                ;Downstream of the throttled valve
+ J9   505   120              ;Customers behind the throttled valve
+ J10  500   0                ;Downstream of the strainer valve
+ J11  495   300              ;Customers behind the strainer
+
+[RESERVOIRS]
+;ID   Head
+  R1   810                    ;Hilltop source reservoir
+ R2   575                    ;Customer pond, filled through the flow control valve
+
+[TANKS]
+;ID   Elev  InitLvl  MinLvl  MaxLvl  Diam  MinVol
+ T1   440   20       0       40      60    0      ;Low-zone storage tank
+
+[PIPES]
+;ID   Node1  Node2  Length  Diam  Rough  MinorLoss  Status
+ P1   R1     J1     3000    16    130    0          Open   ;Steep gravity main from the reservoir
+ P2   J2     J3     2500    12    130    0          Open   ;Main to the hub
+ P3   J4     J5     1200    8     130    0          Open   ;Low zone main
+ P4   J6     T1     800     10    130    0          Open   ;Fill line to the tank
+ P5   J7     R2     600     8     130    0          Open   ;Line to the customer pond
+ P6   J8     J9     800     6     130    0          Open   ;Branch behind the throttled valve
+ P7   J10    J11    1000    6     130    0          Open   ;Branch behind the strainer
+
+[VALVES]
+;ID    Node1  Node2  Diam  Type  Setting  MinorLoss
+ PBV1  J1     J2     12    PBV   60       0          ;Pressure breaker: takes 60 psi off the steep line so the hub is not overpressured
+ PRV1  J3     J4     8     PRV   45       0          ;Pressure reducing valve: holds the low zone at 45 psi
+ PSV1  J3     J6     10    PSV   55       0          ;Pressure sustaining valve: throttles the tank fill so the hub stays at 55 psi
+ FCV1  J3     J7     8     FCV   300      0          ;Flow control valve: limits the customer pond to 300 gpm
+ TCV1  J3     J8     4     TCV   150      0          ;Throttle control valve: a part-closed isolation valve, loss coefficient 150
+ GPV1  J3     J10    6     GPV   STRAINER 0         ;General purpose valve: a basket strainer, head loss from the Library curve
+
+[CURVES]
+;HEADLOSS: Basket strainer, 6 in
+ STRAINER  0    0
+ STRAINER  100  1.2
+ STRAINER  200  4.5
+ STRAINER  300  10
+ STRAINER  400  17.5
+ STRAINER  500  28
+
+[OPTIONS]
+ UNITS               GPM
+ HEADLOSS            H-W
+
+[COORDINATES]
+;Node  X     Y
+ R1    0     200
+ J1    120   200
+ J2    240   200
+ J3    380   200
+ J4    480   330
+ J5    620   330
+ J6    480   250
+ T1    620   250
+ J7    480   200
+ R2    620   200
+ J8    480   150
+ J9    620   150
+ J10   480   70
+ J11   620   70
+
+[END]
