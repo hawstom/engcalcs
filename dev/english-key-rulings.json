@@ -1090,9 +1090,9 @@
             "answer": "OK."
         },
         "lpn_crit_minpressure_tip": {
-            "on": "This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.",
-            "ruled": "2026-10-01",
-            "answer": "OK."
+            "on": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
+            "ruled": "2026-10-17",
+            "answer": "Tom, 2026-10-17, choosing the rename to Lowest system pressure allowed: \"I choose (b).\""
         },
         "lpn_crit_no_links": {
             "on": "This project has no links yet, so there is nothing to break.",
@@ -1497,9 +1497,9 @@
             "answer": "OK."
         },
         "lpn_ds_minpressure_tip": {
-            "on": "This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.",
-            "ruled": "2026-10-03",
-            "answer": "OK."
+            "on": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
+            "ruled": "2026-10-17",
+            "answer": "Tom, 2026-10-17, choosing the rename to Lowest system pressure allowed: \"I choose (b).\""
         },
         "lpn_ds_multiplier": {
             "on": "Demand scale",
@@ -2003,8 +2003,9 @@
             "answer": "Calls page 8 October: Use proposed"
         },
         "lpn_ff_minpressure": {
-            "on": "Lowest pressure allowed elsewhere",
-            "ruled": "2026-09-01"
+            "on": "Lowest system pressure allowed",
+            "ruled": "2026-10-17",
+            "answer": "Tom, 2026-10-17, choosing the rename to Lowest system pressure allowed: \"I choose (b).\""
         },
         "lpn_ff_minpressure_tip": {
             "on": "A junction that falls below this while another one is drawing its fire flow is reported as a design issue.",
@@ -2383,10 +2384,20 @@
             "ruled": "2026-09-28",
             "answer": "OK."
         },
+        "lpn_file_export_item_scnbook": {
+            "on": "Scenario workbook…",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think."
+        },
         "lpn_file_export_menu": {
             "on": "Export…",
             "ruled": "2026-10-09",
             "answer": "Change File, 'Export to...' to 'Export...'."
+        },
+        "lpn_file_export_scnbook_tip": {
+            "on": "Download the scenarios, their alternatives, and the overrides of each alternative as one .xlsx workbook, in the project units. Edit it in a spreadsheet program. Read it back with File, Import, Import scenario workbook.",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think."
         },
         "lpn_file_export_workspace_tip": {
             "on": "Download a small file holding where your boxes sit, their sizes, which are open or docked, and your pane and column sizes, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
@@ -2407,6 +2418,16 @@
             "on": "Import…",
             "ruled": "2026-10-01",
             "answer": "OK."
+        },
+        "lpn_file_import_scnbook": {
+            "on": "Import scenario workbook…",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think."
+        },
+        "lpn_file_import_scnbook_tip": {
+            "on": "Read back a scenario workbook made with File, Export, Scenario workbook, after it is edited in a spreadsheet program. Every difference from this project is listed before anything is changed, with each row that cannot be used and the reason. Apply changes makes them all as one step, which Undo reverses. Nothing the workbook leaves out is deleted.",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think."
         },
         "lpn_file_import_survey": {
             "on": "Import surveyed points…",
@@ -5564,6 +5585,111 @@
             "ruled": "2026-10-01",
             "answer": "OK."
         },
+        "lpn_scnbook_alternative_name": {
+            "on": "Alternative name ({category})",
+            "ruled": "2026-10-17",
+            "answer": "OK."
+        },
+        "lpn_scnbook_alternative_parent": {
+            "on": "Parent of alternative {name} ({category})",
+            "ruled": "2026-10-17",
+            "answer": "OK."
+        },
+        "lpn_scnbook_applied": {
+            "on": "Applied {n} changes from {file}. Undo reverses them.",
+            "ruled": "2026-10-17",
+            "answer": "OK."
+        },
+        "lpn_scnbook_apply": {
+            "on": "Apply changes",
+            "ruled": "2026-10-17",
+            "answer": "OK."
+        },
+        "lpn_scnbook_apply_failed": {
+            "on": "Not applied: {list}.",
+            "ruled": "2026-10-17",
+            "answer": "OK."
+        },
+        "lpn_scnbook_blank": {
+            "on": "(blank)",
+            "ruled": "2026-10-17",
+            "answer": "OK."
+        },
+        "lpn_scnbook_col_alternative": {
+            "on": "Alternative",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think. And don't these exist elsewhere? We should DRY."
+        },
+        "lpn_scnbook_col_assets": {
+            "on": "Assets",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think. And don't these exist elsewhere? We should DRY."
+        },
+        "lpn_scnbook_col_change": {
+            "on": "Change",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think. And don't these exist elsewhere? We should DRY."
+        },
+        "lpn_scnbook_col_demands": {
+            "on": "Demand categories",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think. And don't these exist elsewhere? We should DRY."
+        },
+        "lpn_scnbook_col_fingerprint": {
+            "on": "Asset ID check",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think."
+        },
+        "lpn_scnbook_col_path": {
+            "on": "Path",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think. And don't these exist elsewhere? We should DRY."
+        },
+        "lpn_scnbook_col_project": {
+            "on": "In the project",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think."
+        },
+        "lpn_scnbook_col_project_name": {
+            "on": "Project",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think. And don't these exist elsewhere? We should DRY."
+        },
+        "lpn_scnbook_col_reason": {
+            "on": "Reason",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think. And don't these exist elsewhere? We should DRY."
+        },
+        "lpn_scnbook_col_row": {
+            "on": "Row",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think."
+        },
+        "lpn_scnbook_col_sheet": {
+            "on": "Sheet",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think."
+        },
+        "lpn_scnbook_head_changes": {
+            "on": "Changes ({n})",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think."
+        },
+        "lpn_scnbook_head_kept": {
+            "on": "Kept, not in the workbook ({n})",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think."
+        },
+        "lpn_scnbook_head_unusable": {
+            "on": "Not used ({n})",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think. And don't these exist elsewhere? We should DRY."
+        },
+        "lpn_scnbook_kept_alternative": {
+            "on": "Alternative {name} ({category}) is not in the workbook, and is kept.",
+            "ruled": "2026-10-17",
+            "answer": "Deprecated, I think."
+        },
         "lpn_scncmp_at": {
             "on": "{value} at {id}",
             "ruled": "2026-09-04"
@@ -6327,9 +6453,9 @@
             "answer": "OK."
         },
         "lpn_sm_help": {
-            "on": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the right pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the right pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
-            "ruled": "2026-10-16",
-            "answer": "His own edit of 2026-10-16."
+            "on": "How scenarios and alternatives work:\\\\n\\\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\\\n\\\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\\\n\\\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\\\n\\\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\\\n\\\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\\\n\\\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\\\n\\\\nHow to manage scenarios:\\\\n\\\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\\\n\\\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\\\n\\\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\\\n\\\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\\\n\\\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\\\n\\\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+            "ruled": "2026-10-17",
+            "answer": "His own text; Tom, 2026-10-17: \"How about 'the second pane'?\""
         },
         "lpn_sm_in_use": {
             "on": "{item}\\ncannot be deleted while it is used by\\n{list}",
@@ -7018,13 +7144,33 @@
             "on": "These are the nodes that will be filled in: {ids}",
             "ruled": "2026-08-29"
         },
+        "lpn_theme_amber": {
+            "on": "Amber",
+            "ruled": "2026-10-17",
+            "answer": "OK."
+        },
         "lpn_theme_dark": {
             "on": "Dark",
             "ruled": "2026-10-17",
             "answer": "OK."
         },
+        "lpn_theme_green": {
+            "on": "Green",
+            "ruled": "2026-10-17",
+            "answer": "OK."
+        },
+        "lpn_theme_hc": {
+            "on": "High contrast",
+            "ruled": "2026-10-17",
+            "answer": "OK."
+        },
         "lpn_theme_light": {
             "on": "Light",
+            "ruled": "2026-10-17",
+            "answer": "OK."
+        },
+        "lpn_theme_platinum": {
+            "on": "Platinum",
             "ruled": "2026-10-17",
             "answer": "OK."
         },
@@ -7366,6 +7512,16 @@
             "on": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
             "ruled": "2026-10-18",
             "answer": "I agree."
+        },
+        "lpn_notes_2_def": {
+            "on": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
+            "ruled": "2026-10-18",
+            "answer": "Tom, 2026-10-18, to the MSX sentence proposed for this list: \"I agree.\""
+        },
+        "consent_body": {
+            "on": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
+            "ruled": "2026-10-18",
+            "answer": "Yes! That's the right question."
         }
     }
 }

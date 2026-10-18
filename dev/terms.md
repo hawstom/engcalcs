@@ -20,6 +20,12 @@ Find unique names for each. A group is added only where two meanings sit side by
 2. hydraulic grade line, head loss gradient, colour ramp
 3. scenario, status
 
+## For every translator
+
+Each paragraph here goes to every translator in every sprint.
+
+Tree, parent, child and inherit are the words of a family tree. Use the everyday family words of your language.
+
 ## Entries
 
 ### Flow quantity or amount of water passing per time
@@ -433,6 +439,26 @@ Find unique names for each. A group is added only where two meanings sit side by
 - id: `scenario`
 - Definition: Project state as a collection of contributing overrides.
 - Uniqueness attention: group 3
+
+### A family tree
+
+- English: tree (family tree)
+- id: `family-tree`
+
+### A family tree parent
+
+- English: parent (family tree)
+- id: `family-tree-parent`
+
+### A family tree child
+
+- English: child (family tree)
+- id: `family-tree-child`
+
+### A family tree inherit-
+
+- English: inherit (family tree)
+- id: `family-tree-inherit`
 
 ### Covering, layer, or surface on the channel's bottom and sides
 
