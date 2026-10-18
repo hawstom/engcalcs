@@ -4011,7 +4011,12 @@ var EngCalcs = EngCalcs || {};
 	 * which changes what every coordinate in the document MEANS -- so georefWrite() maps the
 	 * overrides through the same transform, and georefCancel() puts them back.
 	 */
-	function coordOverridesOf(n) { return (n && resolvedOverrides(activeScenario())[ovKey(n)]) || null; }
+	function coordOverridesOf(n) {
+		var m = labelPassMemo;
+		if (!n) { return null; }
+		if (m) { return (m.ov || (m.ov = resolvedOverrides(activeScenario())))[ovKey(n)] || null; }
+		return resolvedOverrides(activeScenario())[ovKey(n)] || null;
+	}
 	function nodeDrawX(n) {
 		var ov = coordOverridesOf(n);
 		return (ov && typeof ov.x === 'number') ? inwardX(ov.x) : (n ? n.x : undefined);
@@ -7148,8 +7153,22 @@ var EngCalcs = EngCalcs || {};
 	// member of `project`, for the open scenario. A reader that runs per element per frame asks for
 	// a LEAF (a number, a flag), which is never copied; one that wants a whole map asks once per pass
 	// and hands the answer down.
-	function scnSetting(member) { return settingFor(activeScenario(), ['settings', member]); }
-	function scnLabels(path) { return settingFor(activeScenario(), ['labelSettings'].concat(path || [])); }
+	//
+	// **ONE LABEL PASS READS EACH SETTING ONCE.** Inside refreshLabelText() the two shorthands below
+	// answer from `labelPassMemo`, a map made at the pass's start and dropped at its end (in a
+	// finally), so a setting written between two passes is read fresh by the second. Thousands of
+	// asks per pass, none of which can have a different answer inside it.
+	var labelPassMemo = null;
+	function scnSetting(member) {
+		var m = labelPassMemo, k = 'settings.' + member;
+		if (!m) { return settingFor(activeScenario(), ['settings', member]); }
+		return Object.prototype.hasOwnProperty.call(m, k) ? m[k] : (m[k] = settingFor(activeScenario(), ['settings', member]));
+	}
+	function scnLabels(path) {
+		var m = labelPassMemo, k = 'labels.' + (path || []).join('.');
+		if (!m) { return settingFor(activeScenario(), ['labelSettings'].concat(path || [])); }
+		return Object.prototype.hasOwnProperty.call(m, k) ? m[k] : (m[k] = settingFor(activeScenario(), ['labelSettings'].concat(path || [])));
+	}
 	function scnProject(member) { return settingFor(activeScenario(), ['project', member]); }
 	function scnDefaultPattern() { return settingFor(activeScenario(), ['defaultPattern']) || null; }
 	// Deletes one path from a scenario's block and prunes every container it emptied, down to the
@@ -74888,7 +74907,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		perfDebugCount('labelPasses');
 		beginMapBoxHold();
 		beginLinkGeomHold();
-		try { refreshLabelTextPass(); } finally { endMapBoxHold(); endLinkGeomHold(); }
+		labelPassMemo = {};
+		try { refreshLabelTextPass(); } finally { labelPassMemo = null; endMapBoxHold(); endLinkGeomHold(); }
 		// Stamped LAST, so a writer inside the pass's own tail moves the generation past it.
 		contentPassAt = { gen: labelCacheGen, s: state.s };
 	}
