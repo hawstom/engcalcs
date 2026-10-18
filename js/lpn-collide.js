@@ -813,12 +813,15 @@ EngCalcs.lpnCollide = (function () {
 			// obstacles are then scored against all seventeen candidates -- measured at 79ms against
 			// 43ms for the honest circle on a 220-label drawing. A broad-phase index that hands its
 			// output straight to the narrow phase is not an optimisation, it is a bigger problem.
+			// A query wider than one cell (a strict label's bigger form, growOne()) walks as many rings
+			// of cells as it needs; within one cell it is the 3x3 block, as it always was.
 			near: function (x, y, r, out) {
-				var i0 = Math.floor(x / cell) - 1, j0 = Math.floor(y / cell) - 1, i, j, c, k, idx, o;
+				var span = r > cell ? Math.ceil(r / cell) : 1,
+					i0 = Math.floor(x / cell) - span, j0 = Math.floor(y / cell) - span, i, j, c, k, idx, o;
 				stamp++;
 				out.boxes.length = 0; out.segments.length = 0;
-				for (i = i0; i <= i0 + 2; i++) {
-					for (j = j0; j <= j0 + 2; j++) {
+				for (i = i0; i <= i0 + 2 * span; i++) {
+					for (j = j0; j <= j0 + 2 * span; j++) {
 						c = cells.get(key(i, j));
 						if (!c) { continue; }
 						for (k = 0; k < c.boxes.length; k++) {
@@ -1182,10 +1185,9 @@ EngCalcs.lpnCollide = (function () {
 		labels.forEach(function (l) {
 			l._reach = reachOf(l);
 			maxReach = Math.max(maxReach, l._reach);
-			// A strict label's other forms (`forms`, below) are reached for from the same anchor.
-			(l.forms || []).forEach(function (f) {
-				maxReach = Math.max(maxReach, reachOf(Object.assign({}, l, f)));
-			});
+			// A strict label's other forms (`forms`, below) are NOT counted into the cell: growOne()
+			// asks for its wider ground by walking more cells, and a cell sized for the biggest form of
+			// any label made every other query on the drawing slower.
 		});
 		index = grid(maxReach, obs);
 		obs.boxes.forEach(function (b, i) { index.addBox(i); });
@@ -1367,26 +1369,69 @@ EngCalcs.lpnCollide = (function () {
 		// A label that moves to a bigger form gives back the ground of the smaller one, by moving
 		// its committed rows and leader out of the world, so a later label sees the ground free.
 		// The result says which form won (`form`, an index into `forms`; absent for the label's own).
+		var GROW_SLACK = 1;
 		function bury(r) {
 			(r.boxes || []).forEach(function (b) { b.cx = b.cy = 1e300; b.w = b.h = 0; });
 			if (r.leader) { r.leader.ax = r.leader.bx = r.leader.ay = r.leader.by = 1e300; }
 		}
-		function tryForm(lbl, f, from) {
+		function tryForm(lbl, f) {
 			var g = Object.assign({}, lbl, f), r;
-			// A label growing stays at the station it was seated from: its sides there only.
-			if (from) {
-				var key = from.anchor ? from.anchor.x + ',' + from.anchor.y : '';
-				g.sides = sidesOf(lbl).filter(function (c) { return (c.anchor ? c.anchor.x + ',' + c.anchor.y : '') === key; });
-			}
 			g._reach = reachOf(g);
-			// Growing, it asks the last sweep only: the label already stands, and the clean sweep
-			// before it doubled the growth's time for a handful of spots (600-junction network).
-			r = from ? null : placeClean(g);
+			r = placeClean(g);
 			if (!r) { r = placeAny(g, 0); }
-			if (!r || r.dropped) { return null; }
-			// The side is reported against the label's own list.
-			if (g.sides !== lbl.sides && r.side >= 0) { r.side = sidesOf(lbl).indexOf(g.sides[r.side]); }
-			return r;
+			return r && !r.dropped ? r : null;
+		}
+		// **GROWING, A LABEL STAYS WHERE IT STANDS, OR AS NEAR**: the side it holds first, then the
+		// sides of its station no further out than that one (GROW_SLACK of its height more), on the
+		// last sweep's terms. The ground round it is asked for ONCE, wide enough for its biggest form,
+		// and every form is tried against that; measured on the 600-junction network, asking again
+		// per form was most of the growth's time.
+		function growOne(lbl, r) {
+			var all = sidesOf(lbl), at = all[r.side], a = r.anchor || lbl.anchor, a0 = lbl.anchor,
+				key = r.anchor ? r.anchor.x + ',' + r.anchor.y : '', d0, sides, now, want, k, i, f, g, b, c, nr, grew, reach = 0;
+			if (!at) { return r; }
+			d0 = Math.hypot(at.x - a.x, at.y - a.y);
+			sides = [at].concat(all.filter(function (q) {
+				return q !== at && (q.anchor ? q.anchor.x + ',' + q.anchor.y : '') === key &&
+					Math.hypot(q.x - a.x, q.y - a.y) <= d0 + GROW_SLACK * lbl.h;
+			}));
+			// Within the index's own cell (maxReach), which every form's reach was counted into.
+			var diag = Math.hypot(lbl.w, lbl.h);
+			sides.forEach(function (q) { reach = Math.max(reach, Math.hypot(q.x - a.x, q.y - a.y)); });
+			lbl.forms.forEach(function (q) { diag = Math.max(diag, Math.hypot(q.w, q.h)); });
+			reach += diag + pad;
+			now = r.form === undefined ? (lbl.values || 0) : (lbl.forms[r.form].values || 0);
+			index.near(a.x, a.y, reach, local);
+			try {
+				for (;;) {
+					want = Infinity;
+					lbl.forms.forEach(function (q) { if ((q.values || 0) > now && q.values < want) { want = q.values; } });
+					if (want === Infinity) { return r; }
+					grew = false;
+					for (k = 0; k < lbl.forms.length && !grew; k++) {
+						f = lbl.forms[k];
+						if ((f.values || 0) !== want) { continue; }
+						g = Object.assign({}, lbl, f);
+						g.anchor = a;
+						for (i = 0; i < sides.length; i++) {
+							c = sides[i];
+							b = labelLineBoxes(g, c);
+							if (boxesClearOf(b, local, lastPad, lbl.id) !== 'clear' || !strictOk(g, c, b)) { continue; }
+							nr = commit(g, all, c, b);
+							if (c.anchor) { nr.anchor = { x: c.anchor.x, y: c.anchor.y }; }
+							bury(r);
+							nr.form = k;
+							seat[lbl.id] = r = nr;
+							grew = true;
+							// What it just took is ground the next form must keep off, bar its own.
+							index.near(a.x, a.y, reach, local);
+							break;
+						}
+					}
+					if (!grew) { return r; }
+					now = want;
+				}
+			} finally { lbl.anchor = a0; }
 		}
 		if (strict) {
 			order.forEach(function (lbl) {
@@ -1403,22 +1448,9 @@ EngCalcs.lpnCollide = (function () {
 			// form of n values fails, every form of more fails too; climbing finds the same most-values
 			// form as trying the biggest first, and a label with no room asks two forms, not all.
 			order.forEach(function (lbl) {
-				var r = seat[lbl.id], k, nr, now, want, grew;
+				var r = seat[lbl.id];
 				if (!r || r.dropped || !lbl.forms) { return; }
-				now = r.form === undefined ? (lbl.values || 0) : (lbl.forms[r.form].values || 0);
-				for (;;) {
-					want = Infinity;
-					lbl.forms.forEach(function (f) { if ((f.values || 0) > now && f.values < want) { want = f.values; } });
-					if (want === Infinity) { return; }
-					grew = false;
-					for (k = 0; k < lbl.forms.length; k++) {
-						if ((lbl.forms[k].values || 0) !== want) { continue; }
-						nr = tryForm(lbl, lbl.forms[k], r);
-						if (nr) { bury(r); nr.form = k; seat[lbl.id] = r = nr; grew = true; break; }
-					}
-					if (!grew) { return; }
-					now = want;
-				}
+				growOne(lbl, r);
 			});
 		}
 		// The result keeps the drop order, so a reader of `out` sees the same sequence either way.

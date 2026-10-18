@@ -3041,10 +3041,11 @@ var EngCalcs = EngCalcs || {};
 		// text out at the size it is drawn, so a width measured at one zoom is not exactly another
 		// zoom's, and a cache shared across zooms would make a layout depend on the zooms before it.
 		var s = state.s || 1, px = (parseFloat(fsNow) || effectiveFontSize()).toPrecision(6), todo = [];
+		var seen = {}, dup = [];
 		reqs.forEach(function (q) {
 			q.key = px + '\u0002' + levelFormKey(q.lines, q.stacked);
 			var hit = levelFormCache[q.key];
-			if (hit) { q.m = hit; } else { todo.push(q); }
+			if (hit) { q.m = hit; } else if (seen[q.key]) { dup.push(q); } else { seen[q.key] = q; todo.push(q); }
 		});
 		if (todo.length && labelsLayer) {
 			todo.forEach(function (q) {
@@ -3067,14 +3068,15 @@ var EngCalcs = EngCalcs || {};
 				levelFormCache[q.key] = q.m; levelFormKeys++;
 			});
 		}
+		dup.forEach(function (q) { q.m = seen[q.key].m; });
 		return reqs;
 	}
 	// The forms a level label may take besides the one it arrived in: every content from its full
 	// label down to the one the shed left it, each on one line and, with two values or more, as a
 	// stack. Most values first; between two forms showing the same values, the smaller footprint
 	// first, since it leaves more ground for the labels after it.
-	function levelLabelForms(l, le, fs, fsNow) {
-		var all = le.allLines || le.lines, base = le.lines || [], order, g, gBase, reqs = [], sets = [], out = [], s = state.s || 1;
+	function levelFormRequests(le) {
+		var all = le.allLines || le.lines, base = le.lines || [], order, g, gBase, reqs = [], sets = [];
 		if (!all || !all.length || le.empty) { return []; }
 		order = shedOrder(all);
 		gBase = all.length - base.length;
@@ -3088,7 +3090,11 @@ var EngCalcs = EngCalcs || {};
 			if (ls.length > 1) { reqs.push({ lines: ls, stacked: true }); }
 		});
 		if (base.length > 1) { reqs.push({ lines: base, stacked: true }); }
-		measureLevelForms(reqs, fsNow).forEach(function (q) {
+		return reqs;
+	}
+	function levelFormsFrom(reqs) {
+		var out = [], s = state.s || 1;
+		reqs.forEach(function (q) {
 			if (!q.m || !(q.m.wPx > 0)) { return; }
 			var n = q.stacked ? q.lines.length : 1, w = q.m.wPx / s, h = dataLabelBoxHeight(n),
 				rows = q.stacked && q.m.rowWPx && q.m.rowWPx.length > 1 ? q.m.rowWPx.map(function (v) { return v / s; }) : null,
@@ -3153,9 +3159,15 @@ var EngCalcs = EngCalcs || {};
 				lines: labelRowWidths(le), values: (le.lines || []).length, l: l });
 		});
 		// Every candidate's other forms, measured in one batch.
+		// **ONE BATCH FOR EVERY LABEL'S FORMS**: every hidden element written, then every one read,
+		// so a wheel notch at a size not yet measured costs one layout, not one per label.
 		perfDebugAccum('  lv:forms', function () {
+			var all = [];
+			specs.forEach(function (sp) { sp.reqs = levelFormRequests(linkEls[sp.l.id]); all = all.concat(sp.reqs); });
+			measureLevelForms(all, fsNow);
 			specs.forEach(function (sp) {
-				var f = levelLabelForms(sp.l, linkEls[sp.l.id], fs, fsNow);
+				var f = levelFormsFrom(sp.reqs);
+				delete sp.reqs;
 				if (f.length) { sp.forms = f; }
 			});
 		});
