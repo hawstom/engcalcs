@@ -430,6 +430,7 @@ function ecUsageReportBuild(array $dirs, $from, $to)
     $series = array();
     foreach ($fieldsByKind as $kind => $fields) { $series[$kind] = ecUsageNewSeries($fields); }
     $presets         = ecUsageNewSeries(array('detail', 'asked'));
+    $commands        = ecUsageNewSeries(array('detail'));   // Task 815: lpn cmd: rows, kept out of 'signal'
     $contactViews    = ecUsageNewSeries(array());
     $reachClassified = 0;
     $sources         = array();
@@ -446,6 +447,13 @@ function ecUsageReportBuild(array $dirs, $from, $to)
                 if ($row === null) { continue; }
                 $any++;
                 if (!isset($series[$kind])) { continue; }
+                // A command-use row (Task 815) has its own section and its own series: left in
+                // 'signal' it would bury first:, diag: and wrong: under a hundred command ids.
+                if ($kind === 'signal' && $row['event'] === 'lpn' && strpos($row['detail'], 'cmd:') === 0) {
+                    $row['detail'] = substr($row['detail'], 4);
+                    ecUsageFeedSeries($commands, $row, $from, $to);
+                    continue;
+                }
                 ecUsageFeedSeries($series[$kind], $row, $from, $to);
 
                 if ($kind === 'reach' && $row['classified'] && ecUsageRowInWindow($row, $from, $to)) {
@@ -467,6 +475,7 @@ function ecUsageReportBuild(array $dirs, $from, $to)
     return array(
         'series'          => $series,
         'presets'         => $presets,
+        'commands'        => $commands,
         'contactViews'    => $contactViews,
         'reachClassified' => $reachClassified,
         'sources'         => $sources,
@@ -520,4 +529,81 @@ function ecUsageBarsSvg(array $series, $unitLabel, $fill)
           . htmlspecialchars($days[$n - 1]) . '</text>';
     $svg .= '</svg>';
     return $svg;
+}
+
+/**
+ * The page's own command list (lib/lpn-commands.json, written by
+ * dev/lpn-spike/command-usage-browser-harness.js from the menus the page really builds), as groups
+ * in menu order: array(array('id', 'label', 'commands' => array(array('id', 'label', 'parent')))).
+ * An unreadable file is an empty list, and the report then shows only what was used.
+ */
+function ecUsageCommandCatalog($path = null)
+{
+    $path = $path === null ? __DIR__ . '/lpn-commands.json' : $path;
+    $j = is_file($path) ? json_decode((string) @file_get_contents($path), true) : null;
+    return (is_array($j) && isset($j['groups']) && is_array($j['groups'])) ? $j['groups'] : array();
+}
+
+/**
+ * Joins a command-use series (ids as logged, without the cmd: prefix) to the command list, so a
+ * command nobody used shows as a zero. Returns array(groupId => array('label', 'rows')), each row
+ * array('id', 'label', 'parent', 'browsers', 'uses', 'loads', 'listed'). Groups keep menu order,
+ * then any group only the log knows (the project tab's menu); an id the log has and the list does
+ * not is appended to its group with listed=false. The two buckets stay in separate columns.
+ */
+function ecUsageCommandRows(array $series, array $catalog)
+{
+    $c = $series['countBy']['detail'];
+    $out = array();
+    $seen = array();
+    $row = function ($id, $label, $parent, $listed) use ($c, $series) {
+        return array('id' => $id, 'label' => $label, 'parent' => $parent,
+            'browsers' => ecUsageSeriesBrowsers($series, 'detail', $id),
+            'uses' => isset($c['visitor'][$id]) ? $c['visitor'][$id] : 0,
+            'loads' => isset($c['visit'][$id]) ? $c['visit'][$id] : 0,
+            'listed' => $listed);
+    };
+    foreach ($catalog as $g) {
+        $gid = (string) $g['id'];
+        $out[$gid] = array('label' => (string) $g['label'], 'rows' => array());
+        foreach ((array) $g['commands'] as $cmd) {
+            $seen[$cmd['id']] = true;
+            $out[$gid]['rows'][] = $row($cmd['id'], (string) $cmd['label'], (string) $cmd['parent'], true);
+        }
+    }
+    $keys = array_keys($c['visitor'] + $c['visit']);
+    sort($keys);
+    foreach ($keys as $id) {
+        if (isset($seen[$id])) { continue; }
+        $gid = strpos($id, '/') === false ? '(other)' : substr($id, 0, strpos($id, '/'));
+        if (!isset($out[$gid])) { $out[$gid] = array('label' => $gid, 'rows' => array()); }
+        $out[$gid]['rows'][] = $row($id, $id, '', false);
+    }
+    return $out;
+}
+
+/**
+ * The commands used in the window, flat and most used first, as plain-words rows: path
+ * ("Water, Analyze, Fire flow analysis..."), id, browsers, uses and page loads. Ordered by browsers
+ * (said yes), then page loads, then uses, then path; the two buckets are columns, never added.
+ * $groups is ecUsageCommandRows()'s result.
+ */
+function ecUsageCommandUsed(array $groups)
+{
+    $out = array();
+    foreach ($groups as $g) {
+        foreach ($g['rows'] as $r) {
+            if (!$r['uses'] && !$r['loads']) { continue; }
+            $out[] = array(
+                'path' => $g['label'] . ', ' . ($r['parent'] !== '' ? $r['parent'] . ', ' : '') . $r['label'],
+                'id' => $r['id'], 'browsers' => $r['browsers'], 'uses' => $r['uses'], 'loads' => $r['loads']);
+        }
+    }
+    usort($out, function ($a, $b) {
+        if ($a['browsers'] !== $b['browsers']) { return $b['browsers'] - $a['browsers']; }
+        if ($a['loads'] !== $b['loads']) { return $b['loads'] - $a['loads']; }
+        if ($a['uses'] !== $b['uses']) { return $b['uses'] - $a['uses']; }
+        return strcmp($a['path'], $b['path']);
+    });
+    return $out;
 }

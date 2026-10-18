@@ -468,6 +468,9 @@ define('TITLE_LOG', EC_LOG_DIR . '/engcalcs-title.log');
 //             -- no typed text, no address, and nothing out of the drawing. It is a complaint and
 //             not a measurement: three of these on one code in one language is a defect report, and
 //             one is a person who could not tell us any other way.
+//             And 'cmd:<menu>/<command>' (Task 815): a menu command or toolbar button was chosen,
+//             once per command per page load, the id taken from the command and never from what
+//             it was given. spock.php's Map commands used section reads these.
 //   share     The share control under the Printable Title was used (Task 228). detail = 'copy'
 //             (the clipboard took it) or 'manual' (no clipboard here, so the link was shown for
 //             the visitor to copy). ONE HONEST MEASURE and no more: it says the control was used,
