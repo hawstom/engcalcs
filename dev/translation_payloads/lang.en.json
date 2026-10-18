@@ -1652,6 +1652,7 @@
         "lpn_diag_dangling_link": "A pipe or pump connects to a node that no longer exists:",
         "lpn_diag_unreachable": "These nodes have no path to a reservoir or tank:",
         "lpn_omitted_note": "Left out of this run because no path leads from them to a reservoir or tank: {ids}",
+        "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
         "lpn_engine_fetching": "Downloading the EPANET solver. It is downloaded once and then stored on this device, so it works offline afterward.",
         "lpn_engine_ready": "The EPANET solver is now stored on this device and works offline.",
         "lpn_engine_fetching_valve": "Downloading the EPANET solver, so this valve can be solved now and offline later.",
@@ -3027,7 +3028,7 @@
         "lpn_snip_tip_copy": "Copy (Ctrl+C)",
         "lpn_screenshot_scale_tip": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
     },
-    "count": 3025,
+    "count": 3026,
     "active_prefixes": [
         "about",
         "bpn",
