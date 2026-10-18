@@ -372,6 +372,8 @@ the block.
   what remains.
 - 75|813| **Pre-processing the network for label placement: methods, benefits, results.**
   Tom, 2026-10-17: *"continue our project toward inquiry about the hows/methods and whys/benefits/results of pre-processing the network for label placement efficiency."* Design and first experiment: `dev/label-trials/preprocessing-inquiry.md` on `docs/label-port`.
+- 75|816| **Give each User Guide chapter its own address in each language.**
+  Tom, 2026-10-17: *"Is the user manual crawlable and indexable by Google? And if so, how soon would we expect to be able to ask Google or Gemini or even Claude, Perplexity, Deepseek, Grok, or ChatGPT how scenarios work in EPANET++?"* Crawlable today, but the whole guide sits inside the app page, one address per language, so a search about one topic has no page to land on. A chapter page per language fixes that; each new page owes the parent site's `sitemap.xml` a regenerate (Tom, 2026-10-17: *"Yes, add it at 75."*).
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
