@@ -4523,3 +4523,12 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: notch cost (long tasks) n600 ~1.0 s vs ~0.85 s master (headless); Net3 ~140 vs ~140.
 - OBSERVED: leaderless level labels as close to another pipe as their own (Net3 6 notches pipe 115, "Q=422.6"; n600 6 notches pipes 831, 8911, 4668, 4316, a stack "Q=1.3" over "Q=40.1"). n600 6 notches: label-box overlaps 7 -> 16 vs master (L9875 over N666, 29x14 px); n600 fit: 4 level-label boxes over a node dot.
 - Decays: re-verify before citing.
+
+## 2026-10-18, feat/label-form (head c2cbd03b2)
+
+- OBSERVED: Chromium 1920x1000, 1400x900, 390x844. Pass time (sum of long tasks per wheel notch, 3 reps): Net3 master 101 / beside 110 / form 168 / form without the one-line node trial 159 ms; n600 818 / 958 / 1617 / 1422 ms. Skipping the growth: time about -4%, values -37%.
+- OBSERVED: node labels worse than master and beside on Net3 at 9 notches (84 -> 79 labels, 177 -> 167 values, 12 lose their ID, e.g. N105 is just "P=51.27"); entirely the one-line node trial (skip it and node counts equal master exactly).
+- OBSERVED: a one-line node label struck through by a pipe ("N127, Qb=17.7, Z=56.00, P=44.52"); "L173 / Q=7963.3 / V=3.6" touches the rotated "Q=463.3"; at 390 px one-line node labels run off the right edge and under the legend.
+- OBSERVED: Net1 pipe 113 labelled at all 15 zooms (master 8/15, beside 11/15); pipe 11 Q=1234.2 hidden at notch 4 where beside showed it, and pipe 10's "Q=1866.2" sits under pipe 11 though its leader goes to pipe 10.
+- OBSERVED: 0 leader/leader crossings, 0 new leader-through-node; deterministic over 3 runs.
+- Decays: re-verify before citing.
