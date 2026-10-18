@@ -144,7 +144,7 @@ section verbatim. Sequence recap:
    Sprints" Model policy, 2026-07-12). Each agent gets: payload path, target lang file path,
    HTML/symbol-preservation rules, any known wrong-sense traps carried over from prior audits of
    related terms in that language family, and the instruction to read the payload's `meta.*_notes`
-   and follow them. **The per-key guidance is in the payload, attached to its key; do not restate it
+   and follow them (`meta.translator_notes` is `dev/terms.md`'s "For every translator" section, Tom's word on a whole family of words). **The per-key guidance is in the payload, attached to its key; do not restate it
    in the brief:** `key_plain` (the string in plain words), `key_notes` (its Layout, Symbol,
    Runtime and Note lines from `dev/plain-sentences.md`, as full instructions), `key_concepts`, `key_context` (reason, current value, neighbours, and the label's
    tip or the tip's label), and `glossary` (only the terms this batch's strings use). **The

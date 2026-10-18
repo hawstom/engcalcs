@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**3 still to read on master**, of 3 untranslated keys, of 3024 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**1 still to read on master**, of 7 untranslated keys, of 3032 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,23 +29,35 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (3, 3 to read @@ NEEDS RULING)
+## lpn_  (7, 1 to read @@ NEEDS RULING)
 
-- **`lpn_diag_gpv_curve_order`**
-  > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
+- **`lpn_export_holds_base`**
+  > It holds the Base scenario only.
+  _Ruled 2026-10-18: I approved all._
+- **`lpn_export_holds_scenario`**
+  > It holds the scenario {scenario} only.
+  _Ruled 2026-10-18: I approved all._
+- **`lpn_export_leaves_alternatives`**
+  > The alternatives stored in this project are not in the file.
   @@ NEEDS RULING
-- **`lpn_diag_valve_conflict`**
-  > These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:
-  @@ NEEDS RULING
-- **`lpn_gpv_one_point_note`**
-  > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
-  @@ NEEDS RULING
+- **`lpn_geojson_results_other`**
+  > No results are included, because the results on screen belong to the scenario {scenario}.
+  _Ruled 2026-10-18: I approved all._
+- **`lpn_pane_pasted_scenario`**
+  > These values are overrides in the scenario {scenario}.
+  _Ruled 2026-10-18: I approved all._
+- **`lpn_roughness_method_note`**
+  > ⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.
+  _Ruled 2026-10-18: I agree._
+- **`lpn_survey_added_scenario`**
+  > The nodes were added to {scenario}. In Base they are inactive.
+  _Ruled 2026-10-18: I approved all._
 
 ---
 
 # Strings waiting on a branch
 
-**158 still to read**, of 161 new keys across 18 unmerged branch(es).
+**125 still to read**, of 157 new keys across 17 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -55,30 +67,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### chore/batch-1018 (`3792f486c`) — 7 new, 7 to read @@ NEEDS RULING
-
-- **`lpn_export_holds_base`**
-  > It holds the Base scenario only.
-  @@ NEEDS RULING
-- **`lpn_export_holds_scenario`**
-  > It holds the scenario {scenario} only.
-  @@ NEEDS RULING
-- **`lpn_export_leaves_alternatives`**
-  > The alternatives stored in this project are not in the file.
-  @@ NEEDS RULING
-- **`lpn_geojson_results_other`**
-  > No results are included, because the results on screen belong to the scenario {scenario}.
-  @@ NEEDS RULING
-- **`lpn_pane_pasted_scenario`**
-  > These values are overrides in the scenario {scenario}.
-  @@ NEEDS RULING
-- **`lpn_roughness_method_note`**
-  > ⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.
-  @@ NEEDS RULING
-- **`lpn_survey_added_scenario`**
-  > The nodes were added to {scenario}. In Base they are inactive.
-  @@ NEEDS RULING
 
 ### docs/label-port (`7ec7a65cf`) — already merged into feat/label-beside; its strings are listed there
 
@@ -152,7 +140,20 @@ build for that would be a gate nobody keeps. Refresh it with
   > Species in the file: {list}.
   @@ NEEDS RULING
 
-### feat/native-pbv-gpv (`db4e8ff15`) — adds no English strings
+### feat/native-pbv-gpv (`db4e8ff15`) — 4 new, 4 to read @@ NEEDS RULING
+
+- **`lpn_valve_why_conflict`**
+  > connected to another control valve in a way EPANET does not allow
+  @@ NEEDS RULING
+- **`lpn_valve_why_gpv_no_curve`**
+  > no head loss curve
+  @@ NEEDS RULING
+- **`lpn_valve_why_gpv_one_point`**
+  > head loss curve has only one point
+  @@ NEEDS RULING
+- **`lpn_valve_why_gpv_order`**
+  > head loss curve flows do not increase
+  @@ NEEDS RULING
 
 ### feat/scenario-example (`90ff7216c`) — 2 new, 2 to read @@ NEEDS RULING
 
@@ -163,86 +164,86 @@ build for that would be a gate nobody keeps. Refresh it with
   > EPANET Net1 with scenarios, gpm (US)
   @@ NEEDS RULING
 
-### feat/sheet-sync (`1c77e44cd`) — 77 new, 77 to read @@ NEEDS RULING
+### feat/sheet-sync (`1c77e44cd`) — 77 new, 52 to read @@ NEEDS RULING
 
 - **`lpn_file_export_item_scnbook`**
   > Scenario workbook…
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think._
 - **`lpn_file_export_scnbook_tip`**
   > Download the scenarios, their alternatives, and the overrides of each alternative as one .xlsx workbook, in the project units. Edit it in a spreadsheet program. Read it back with File, Import, Import scenario workbook.
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think._
 - **`lpn_file_import_scnbook`**
   > Import scenario workbook…
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think._
 - **`lpn_file_import_scnbook_tip`**
   > Read back a scenario workbook made with File, Export, Scenario workbook, after it is edited in a spreadsheet program. Every difference from this project is listed before anything is changed, with each row that cannot be used and the reason. Apply changes makes them all as one step, which Undo reverses. Nothing the workbook leaves out is deleted.
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think._
 - **`lpn_scnbook_alternative_name`**
   > Alternative name ({category})
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-17._
 - **`lpn_scnbook_alternative_parent`**
   > Parent of alternative {name} ({category})
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-17._
 - **`lpn_scnbook_applied`**
   > Applied {n} changes from {file}. Undo reverses them.
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-17._
 - **`lpn_scnbook_apply`**
   > Apply changes
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-17._
 - **`lpn_scnbook_apply_failed`**
   > Not applied: {list}.
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-17._
 - **`lpn_scnbook_blank`**
   > (blank)
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-17._
 - **`lpn_scnbook_col_alternative`**
   > Alternative
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think. And don't these exist elsewhere? We should DRY._
 - **`lpn_scnbook_col_assets`**
   > Assets
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think. And don't these exist elsewhere? We should DRY._
 - **`lpn_scnbook_col_change`**
   > Change
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think. And don't these exist elsewhere? We should DRY._
 - **`lpn_scnbook_col_demands`**
   > Demand categories
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think. And don't these exist elsewhere? We should DRY._
 - **`lpn_scnbook_col_fingerprint`**
   > Asset ID check
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think._
 - **`lpn_scnbook_col_path`**
   > Path
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think. And don't these exist elsewhere? We should DRY._
 - **`lpn_scnbook_col_project`**
   > In the project
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think._
 - **`lpn_scnbook_col_project_name`**
   > Project
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think. And don't these exist elsewhere? We should DRY._
 - **`lpn_scnbook_col_reason`**
   > Reason
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think. And don't these exist elsewhere? We should DRY._
 - **`lpn_scnbook_col_row`**
   > Row
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think._
 - **`lpn_scnbook_col_sheet`**
   > Sheet
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think._
 - **`lpn_scnbook_col_workbook`**
   > In the workbook
   @@ NEEDS RULING
 - **`lpn_scnbook_head_changes`**
   > Changes ({n})
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think._
 - **`lpn_scnbook_head_kept`**
   > Kept, not in the workbook ({n})
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think._
 - **`lpn_scnbook_head_unusable`**
   > Not used ({n})
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think. And don't these exist elsewhere? We should DRY._
 - **`lpn_scnbook_kept_alternative`**
   > Alternative {name} ({category}) is not in the workbook, and is kept.
-  @@ NEEDS RULING
+  _Ruled 2026-10-17: Deprecated, I think._
 - **`lpn_scnbook_kept_scenario`**
   > Scenario {name} is not in the workbook, and is kept.
   @@ NEEDS RULING
@@ -547,11 +548,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   @@ NEEDS RULING
 
-### feat/theme (`4a9213d75`) — 10 new, 10 to read @@ NEEDS RULING
+### feat/theme (`f91c79069`) — 9 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_theme_amber`**
   > Amber
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-17._
 - **`lpn_theme_arcade`**
   > Arcade
   @@ NEEDS RULING
@@ -560,19 +561,16 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_theme_green`**
   > Green
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-17._
 - **`lpn_theme_hc`**
   > High contrast
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-17._
 - **`lpn_theme_newspaper`**
   > Newspaper
   @@ NEEDS RULING
 - **`lpn_theme_platinum`**
   > Platinum
-  @@ NEEDS RULING
-- **`lpn_theme_prairie`**
-  > Prairie
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-17._
 - **`lpn_theme_rounded`**
   > Rounded
   @@ NEEDS RULING
