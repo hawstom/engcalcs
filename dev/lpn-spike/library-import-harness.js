@@ -735,17 +735,19 @@ head('12. the wizard has a row in the File menu, beside the rows that open a pro
 		'and the submenu row is the one door that remains');
 	// Task 718's three import rows in the order it built (surveyed points, EPANET file, libraries),
 	// then Workspace (2026-10-07), with GeoJSON, DXF and shapefile Shapes (Task 779) after the EPANET
-	// file, and the GeoJSON network (Task 728) directly under the EPANET file, the other network.
-	check(subRows.length === 8 &&
+	// file, and the GeoJSON network (Task 728) directly under the EPANET file, the other network, then
+	// the WaterCAD or WaterGEMS model (Task 749), the third network.
+	check(subRows.length === 9 &&
 		subRows[0].indexOf(String(pc.lpn_file_import_survey)) >= 0 &&
 		subRows[1].indexOf(String(pc.lpn_file_import_inp)) >= 0 &&
 		subRows[2].indexOf(String(pc.lpn_file_import_gjnet)) >= 0 &&
-		subRows[3].indexOf(String(pc.lpn_file_import_shapes)) >= 0 &&
-		subRows[4].indexOf(String(pc.lpn_file_import_dxf)) >= 0 &&
-		subRows[5].indexOf(String(pc.lpn_file_import_shp)) >= 0 &&
-		subRows[6].indexOf(String(pc.lpn_library_import)) >= 0 &&
-		subRows[7].indexOf(String(pc.lpn_file_import_workspace)) >= 0,
-		`the import rows stand in order: surveyed points, EPANET file, GeoJSON network, GeoJSON shapes, DXF shapes, shapefile shapes, libraries, workspace: ${JSON.stringify(subRows)}`);
+		subRows[3].indexOf(String(pc.lpn_file_import_wtg)) >= 0 &&
+		subRows[4].indexOf(String(pc.lpn_file_import_shapes)) >= 0 &&
+		subRows[5].indexOf(String(pc.lpn_file_import_dxf)) >= 0 &&
+		subRows[6].indexOf(String(pc.lpn_file_import_shp)) >= 0 &&
+		subRows[7].indexOf(String(pc.lpn_library_import)) >= 0 &&
+		subRows[8].indexOf(String(pc.lpn_file_import_workspace)) >= 0,
+		`the import rows stand in order: surveyed points, EPANET file, GeoJSON network, WaterGEMS model, GeoJSON shapes, DXF shapes, shapefile shapes, libraries, workspace: ${JSON.stringify(subRows)}`);
 }());
 
 console.log('\n' + (failures ? failures + ' FAILURE(S)' : 'All library-import checks passed.'));
