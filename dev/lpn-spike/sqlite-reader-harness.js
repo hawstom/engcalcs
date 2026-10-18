@@ -157,7 +157,7 @@ async function main() {
 	head('5. A file that is not SQLite is refused, clearly');
 	const inp = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net1.inp'), 'latin1');
 	const cases = [
-		['an EPANET .inp', new TextEncoder().encode(inp)],
+		['Net1.inp, a text file', new TextEncoder().encode(inp)],
 		['a zip (a zipped .wtg.sqlite)', new Uint8Array([0x50, 0x4b, 0x03, 0x04].concat(new Array(200).fill(0)))],
 		['an empty file', new Uint8Array(0)],
 		['the header alone, too short to be a database', bytes.slice(0, 50)],
