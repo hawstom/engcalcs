@@ -35,8 +35,8 @@ engineering calculators at hawsedc.com/engcalcs.</em></p>
 
 <p><strong>We cannot tell who anyone is, and we hold nothing worth sharing.</strong> We count how
 the pages are used, so that we know which calculators to improve and which languages to translate
-into. If you allow it, your browser keeps a random code so that we do not count the same browser
-twice. That code is used for nothing but counting. It is never sold, never shared, never joined to
+into. If you allow it, your browser keeps a random code so we don&rsquo;t count you
+again. That code is used for nothing but counting. It is never sold, never shared, never joined to
 anything else, and never used to follow anyone. The rest of this page lists exactly what is counted
 and what else reaches us, and it gives the legal details the law requires.</p>
 
@@ -126,8 +126,8 @@ three answers. <em>Refuse all</em>: we store only that answer, so that we do not
 something different. <em>Allow all</em>: it covers that too, and we do not ask again.</p>
 
 <p>With a yes, the browser also makes up a random code of 16 characters and keeps it in a cookie
-named <code>ec_code</code>. <strong>The code exists so that we do not count the same browser
-twice.</strong> It is made from nothing about you, your device, or your visit, and it records
+named <code>ec_code</code>. <strong>The code exists so we don&rsquo;t count you
+again.</strong> It is made from nothing about you, your device, or your visit, and it records
 nothing you enter. Every count the browser sends after that carries the code. That lets us count
 how many different browsers use each calculator, and not only how many times it was used. The code
 lasts 400 days from the most recent visit, the longest a browser keeps any cookie. <em>Refuse
@@ -153,7 +153,7 @@ number.</p>
 	<tr><td><code>ec_terrain</code></td><td>Your yes to elevation lookup. Only a yes is stored</td><td>1 year</td><td>No</td></tr>
 	<tr><td><code>ec_blang</code></td><td>One digit: we have already counted which language this browser asks for</td><td>1 year</td><td><strong>Yes</strong></td></tr>
 	<tr><td><code>ec_seen</code></td><td>One digit per page: which counts we have already made. No identifier</td><td>Until the browser is closed</td><td><strong>Yes</strong></td></tr>
-	<tr><td><code>ec_code</code></td><td>A random code, so that we do not count the same browser twice</td><td>400 days from the most recent visit</td><td><strong>Yes</strong></td></tr>
+	<tr><td><code>ec_code</code></td><td>A random code, so we don&rsquo;t count you again</td><td>400 days from the most recent visit</td><td><strong>Yes</strong></td></tr>
 	<tr><td>Saved networks (browser storage)</td><td>The pipe networks you draw</td><td>Until you delete them</td><td>No</td></tr>
 	<tr><td>Lock token and page layout (browser storage)</td><td>A random code that tells the lock server which locks are yours, and how you left the panels</td><td>Until you delete them</td><td>No</td></tr>
 	<tr><td>Offline copy of the suite (browser cache)</td><td>This site&rsquo;s own pages, scripts, styles, and icons, kept so the calculators open without a connection. It holds no identifier and nothing you entered, and it is sent nowhere. On the Looped Pipe Network page it also keeps our own EPANET engine, fetched quietly in advance so that solver starts at once. To remove it, clear this site&rsquo;s data in your browser; the next visit rebuilds it</td><td>Until you clear it. Files are replaced when we publish a new version</td><td>No</td></tr>
@@ -203,7 +203,7 @@ messages you send us, on the transfer being necessary to do what you asked (Arti
 
 <table class="ec-legal-table">
 	<tr><th>What</th><th>How long</th></tr>
-	<tr><td>Usage counts</td><td>At most 26 months, and often less</td></tr>
+	<tr><td>Usage counts</td><td>No fixed limit. We delete old counts from time to time, once they no longer help decide anything</td></tr>
 	<tr><td>Messages you send us</td><td>As long as the conversation may matter, and deleted on request</td></tr>
 	<tr><td>Project lock records</td><td>30 days after the last activity</td></tr>
 	<tr><td>The web server&rsquo;s access log</td><td><strong>No promise: it may stay on the server indefinitely</strong></td></tr>

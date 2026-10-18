@@ -48,8 +48,8 @@ if (isset($opts['help'])) {
     exit(0);
 }
 $apply  = isset($opts['apply']);
-// 26 months is what privacy.php promises. Passing --months smaller is always safe; passing a
-// larger one would make the page's own claim untrue, so it is refused.
+// 26 months is the default. privacy.php states no fixed limit (Tom, 2026-10-18: nothing schedules
+// this script, so a number there was a promise kept only by hand). Larger --months stays refused.
 $months = isset($opts['months']) ? (int)$opts['months'] : 26;
 if ($months < 1 || $months > 26) {
     fwrite(STDERR, "--months must be between 1 and 26; privacy.php promises at most 26.\n");
@@ -68,9 +68,8 @@ $logs[] = TESTER_LOG;
 
 // AND EVERY ARCHIVE. Until 2026-08-23 this script read the six live paths and nothing else, so a
 // log rotated into spock/<date>/ by dev/scripts/archive_logs.php -- or hand-moved there, which is
-// how the first ones arrive -- was data the retention backstop never touched. privacy.php promises
-// usage counts are kept "at most 26 months"; an untouched archive turns that promise into a lie
-// the moment the first one is 27 months old, and nothing would have said so. Moving a file does
+// how the first ones arrive -- was data the retention backstop never touched. an untouched archive would
+// escape every trim, however long a window is chosen, and nothing would have said so. Moving a file does
 // not change what the page told the visitor about it.
 //
 // Globbed rather than listed, so a hand-moved archive is covered the day it appears with no edit
