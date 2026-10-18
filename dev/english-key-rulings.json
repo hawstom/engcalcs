@@ -7507,6 +7507,11 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
+        },
+        "lpn_notes_2_def": {
+            "on": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
+            "ruled": "2026-10-18",
+            "answer": "Tom, 2026-10-18, to the MSX sentence proposed for this list: \"I agree.\""
         }
     }
 }

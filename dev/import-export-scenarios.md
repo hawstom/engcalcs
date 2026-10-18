@@ -278,6 +278,8 @@ does not. Fixes 1, 3 and 4 are sentences and cost no storage or consent change.
 
 ## Part 6. Decisions only Tom can make
 
+**TOM'S CALLS, 2026-10-18:** 1. *"I approve."* (no confirmation when the project is only Base). 2. *"Yes."* An `.inp` or GeoJSON network MAY land in the open project, matching IDs and updating values, against the recommendation below. 3. *"I agree."* (the open scenario is the default). 4. *"Dialog, I say. It's a major event that deserves a major answer, I think, unless there are visible results like the opening of a new tab."* 5. *"I agree."* (no "sync" until a live link exists).
+
 1. **Ask only when something would be lost?** The standard skips the confirmation when the project is
    only Base with no alternatives. *Recommend yes:* a visitor with one scenario has nothing to
    confirm, and a dialog on every export teaches them to click through it.

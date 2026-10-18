@@ -2646,7 +2646,8 @@ $ec_lang['lpn_notes_2_term']='What it does not do';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure.';
+// MSX added on Tom's word, 2026-10-18 (Task 717): "I agree."
+$ec_lang['lpn_notes_2_def']='Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.';
 $ec_lang['lpn_notes_3_term']='Saving projects';
 $ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in this browser as the work proceeds. Clearing the browser\'s data deletes them all, so the work belongs in a file: File, Save as. An asterisk on a tab means it holds changes that are not in a file, and closing that tab asks first. Nothing is ever written to a file unless Save or Save as is chosen. In some browsers a project connects to the file it is saved to, and File, Save writes back to that same file from then on; in others no connection is possible, so Save is disabled and only Save as is available. This site keeps track of who has a project file open, so that two people do not write over each other. Opening a file that a colleague already has open offers Ask, Open read-only, and Break lock. If the server cannot be reached, a warning states that another user can edit the same file at the same time.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").

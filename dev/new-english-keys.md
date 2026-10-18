@@ -46,13 +46,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/roadmap-1017n (`4efe1eeef`) — adds no English strings
+### chore/roadmap-1017n (`fb4642e31`) — adds no English strings
 
-### docs/import-export-scenario (`e19c09d2e`) — adds no English strings
+### docs/import-export-scenario (`e19c09d2e`) — already merged into chore/roadmap-1017n; its strings are listed there
 
 ### docs/label-port (`7ec7a65cf`) — already merged into feat/label-beside; its strings are listed there
 
-### docs/msx (`6ff053272`) — adds no English strings
+### docs/msx (`6ff053272`) — already merged into chore/roadmap-1017n; its strings are listed there
 
 ### feat/command-usage (`23e45f368`) — adds no English strings
 
@@ -369,7 +369,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > not TRUE or FALSE, so it was not used.
   @@ NEEDS RULING
 
-### feat/sqlite-reader (`ce5b689a9`) — 49 new, 49 to read @@ NEEDS RULING
+### feat/sqlite-reader (`9470877a6`) — 49 new, 49 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
   > WaterCAD or WaterGEMS model…
@@ -519,7 +519,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   @@ NEEDS RULING
 
-### feat/theme (`88d5a1530`) — 8 new, 4 to read @@ NEEDS RULING
+### feat/theme (`02b3b2be5`) — 8 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_theme_amber`**
   > Amber
