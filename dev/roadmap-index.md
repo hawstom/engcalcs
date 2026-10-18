@@ -7,12 +7,14 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**84 open tasks.** Next (100): 10 · Soon (75): 12 · Someday (50): 28 · Maybe (25): 15 · Parked (5): 19
+**85 open tasks.** Next (100): 13 · Soon (75): 10 · Someday (50): 27 · Maybe (25): 16 · Parked (5): 19
 
-## 100 — Next (10)
+## 100 — Next (13)
 
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
+- Task 717 — EPANET-MSX, multi-species water quality.
 - Task 721 — The scenario and alternatives model: Bentley's tree, plus Presentation and Calculation.
+- Task 733 — Grow the native solver, in phases, to everything EPANET's solves.
 - Task 737 — One canonical word per concept, so every language names each one once.
 - Task 741 — The infinite map: generated networks for the label bench.
 - Task 749 — Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.
@@ -21,23 +23,22 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 811 — Themes beyond Light and Dark: a selector, and a better default.
 - Task 812 — Port the label bench's proven findings to master, one branch each.
 - Task 814 — Classify every import and export by its scenario awareness.
+- Task 815 — Usage report: which map commands and toolbar buttons get used.
 
-## 75 — Soon (12)
+## 75 — Soon (10)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
 - Task 623 — File loss judged only by people whose files are throwaway.
-- Task 639 — Layers: the first heading under Map and page.
 - Task 676 — Watch the sites, and send a derived weekly report.
 - Task 720 — Background layers from a GIS server.
-- Task 733 — Grow the native solver, in phases, to everything EPANET's solves.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
 - Task 809 — Finish the translation-clarification follow-ups at the next sprint.
 - Task 810 — Bring the features list up to what the software does.
 - Task 813 — Pre-processing the network for label placement: methods, benefits, results.
 
-## 50 — Someday (28)
+## 50 — Someday (27)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -59,7 +60,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 702 — A view window cannot describe a span across the far side of the world.
 - Task 707 — Five minutes of a real browser on the Task 706 repair.
 - Task 712 — Tank water depth as a map label field.
-- Task 717 — EPANET-MSX, multi-species water quality.
 - Task 722 — Change and revision tracking.
 - Task 725 — One wide fire-flow table instead of two reports.
 - Task 728 — Import a GIS shapefile or geodatabase as a network.
@@ -68,7 +68,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 773 — Hover shows an asset's full label, as if every field were ticked.
 - Task 798 — Field values in Text, by {} keys disclosed in the User Manual.
 
-## 25 — Maybe (15)
+## 25 — Maybe (16)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 225.13 — `dev/lpn-file-lock-test-punchlist.md` §13 needs the rewrite §0–§8 got
@@ -80,6 +80,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 613 — [H] · "Note" instead of "Text" for the free-text map object.
 - ! Task 619 — [H] · The map cursor reverts to an arrow on Chrome at fractional display scaling.
 - Task 621 — [H] · A command search: KDH went looking for one.
+- Task 639 — Layers: the first heading under Map and page.
 - Task 672 — The placement wizard degrades and then crashes after a few pans.
 - Task 723 — WaterCAD's element list, against ours.
 - Task 729 — Type a node's location in State Plane or UTM.
@@ -112,5 +113,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-76 of 84 titles are within 4–12 words. `!` marks the rest;
+77 of 85 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

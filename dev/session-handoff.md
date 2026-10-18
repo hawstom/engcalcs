@@ -133,8 +133,7 @@ Deleted keys: `lpn_guide_text_notes_popup`; and from the 26 non-English files on
 - `chore/752-reshape`: Task 752 reshaped on market research, the report filed, Task 809's cadence.
 - `fix/settings-clear-jump` (828185057, green on its harness): the real Settings jump, a 561 px pull
   when a tip is showing during a redraw. A defect: merges on green.
-- `feat/sqlite-reader` (Task 749, agent may still be running in an agent worktree (`git worktree list`); check
-  `git log master..feat/sqlite-reader` and its worktree `git status`): sql.js vendored, lazy, no UI.
+- `feat/sqlite-reader` (Task 749) is NOT in any batch: Tom, 2026-10-17, *"No merging it until it's done."*
 - WaterCAD samples found: `dev/agents/market-researcher/wtg-samples.md` (Zenodo 7162154, TSNet). Tom is
   seeking a free EWB Bentley licence to make the one missing case, a child that overrides a value.
 
