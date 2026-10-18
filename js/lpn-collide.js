@@ -1172,10 +1172,10 @@ EngCalcs.lpnCollide = (function () {
 		function reachOf(l) {
 			var far = 0, i, s = l.sides && l.sides.length ? l.sides : [l.home];
 			for (i = 0; i < s.length; i++) {
-				far = Math.max(far, Math.hypot(s[i].x - l.anchor.x, s[i].y - l.anchor.y));
-				// A side may hang off its own point (`anchor`, a strict pipe label's other station),
-				// so the leader from there is within reach too.
-				if (s[i].anchor) { far = Math.max(far, Math.hypot(s[i].anchor.x - l.anchor.x, s[i].anchor.y - l.anchor.y)); }
+				// A side may hang off its own point (`anchor`, a strict pipe label's other station);
+				// the ground round that point is asked for when the sweep reaches it.
+				var a = s[i].anchor || l.anchor;
+				far = Math.max(far, Math.hypot(s[i].x - a.x, s[i].y - a.y));
 			}
 			return far + Math.hypot(l.w, l.h) + pad;
 		}
@@ -1281,10 +1281,12 @@ EngCalcs.lpnCollide = (function () {
 		}
 		function placeClean0(lbl, a0) {
 			var sides = sidesOf(lbl), i, c, b, verdict, first = -1;
-			index.near(lbl.anchor.x, lbl.anchor.y, lbl._reach, local);
+			var at = a0;
+			index.near(a0.x, a0.y, lbl._reach, local);
 			for (i = 0; i < sides.length; i++) {
 				c = sides[i];
 				lbl.anchor = c.anchor || a0;
+				if (lbl.anchor !== at) { at = lbl.anchor; index.near(at.x, at.y, lbl._reach, local); }
 				b = labelLineBoxes(lbl, c);
 				verdict = boxesClearOf(b, local, pad, lbl.id);
 				if (verdict === 'blocked') { continue; }
@@ -1301,10 +1303,12 @@ EngCalcs.lpnCollide = (function () {
 		// under it or not, else the first side held only by labels this one outranks, else a drop.
 		function placeAny0(lbl, from, a0) {
 			var sides = sidesOf(lbl), i, c, b, verdict, fallback = null, fallbackBox = null;
-			index.near(lbl.anchor.x, lbl.anchor.y, lbl._reach, local);
+			var at = a0;
+			index.near(a0.x, a0.y, lbl._reach, local);
 			for (i = from || 0; i < sides.length; i++) {
 				c = sides[i];
 				lbl.anchor = c.anchor || a0;
+				if (lbl.anchor !== at) { at = lbl.anchor; index.near(at.x, at.y, lbl._reach, local); }
 				// The STAIRCASE, not the block (Task 406): asking about the block would call a side
 				// occupied because of ground the short rows never cover.
 				b = labelLineBoxes(lbl, c);
@@ -1348,12 +1352,20 @@ EngCalcs.lpnCollide = (function () {
 			(r.boxes || []).forEach(function (b) { b.cx = b.cy = 1e300; b.w = b.h = 0; });
 			if (r.leader) { r.leader.ax = r.leader.bx = r.leader.ay = r.leader.by = 1e300; }
 		}
-		function tryForm(lbl, f) {
+		function tryForm(lbl, f, from) {
 			var g = Object.assign({}, lbl, f), r;
+			// A label growing stays at the station it was seated from: its sides there only.
+			if (from) {
+				var key = from.anchor ? from.anchor.x + ',' + from.anchor.y : '';
+				g.sides = sidesOf(lbl).filter(function (c) { return (c.anchor ? c.anchor.x + ',' + c.anchor.y : '') === key; });
+			}
 			g._reach = reachOf(g);
 			r = placeClean(g);
 			if (!r) { r = placeAny(g, 0); }
-			return r && !r.dropped ? r : null;
+			if (!r || r.dropped) { return null; }
+			// The side is reported against the label's own list.
+			if (g.sides !== lbl.sides && r.side >= 0) { r.side = sidesOf(lbl).indexOf(g.sides[r.side]); }
+			return r;
 		}
 		if (strict) {
 			order.forEach(function (lbl) {
@@ -1371,8 +1383,13 @@ EngCalcs.lpnCollide = (function () {
 				now = r.form === undefined ? (lbl.values || 0) : (lbl.forms[r.form].values || 0);
 				for (k = 0; k < lbl.forms.length; k++) {
 					if (!((lbl.forms[k].values || 0) > now)) { continue; }
-					nr = tryForm(lbl, lbl.forms[k]);
-					if (nr) { bury(r); nr.form = k; seat[lbl.id] = nr; return; }
+					nr = tryForm(lbl, lbl.forms[k], r);
+					if (nr) {
+						bury(r);
+						nr.form = k;
+						seat[lbl.id] = nr;
+						return;
+					}
 				}
 			});
 		}

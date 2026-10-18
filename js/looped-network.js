@@ -1315,7 +1315,9 @@ var EngCalcs = EngCalcs || {};
 		labelCacheTaint();
 		// A node label stacks (composeRows()) unless the pass chose its ONE-LINE form (Task 734,
 		// tryInlineNodeLabels()): the same fields, in the same order, with the page's separator.
-		ne.inline = !!inline && lines.length > 1;
+		// The flag is the label's FORM, kept even when a shed leaves it one line, so the sides it is
+		// placed on (nodeFirstFitSpec()) stay those of the form it was tried in.
+		ne.inline = !!inline;
 		var rows = composeRows(lines, !ne.inline);
 		setMultilineText(ne.text, nodeLabelBase(n).x, rows);
 		ne.lineCount = rows.length;
