@@ -18,9 +18,7 @@
 			"id": "s1",
 			"name": "Peak hour",
 			"overrides": {},
-			"alternatives": {
-				"demand": "a1"
-			}
+			"calc": "c1"
 		},
 		{
 			"id": "s2",
@@ -28,16 +26,14 @@
 			"overrides": {},
 			"parent": "s1",
 			"alternatives": {
-				"topology": "a3"
+				"topology": "a1"
 			}
 		},
 		{
 			"id": "s3",
 			"name": "Max day",
 			"overrides": {},
-			"alternatives": {
-				"demand": "a2"
-			}
+			"calc": "c2"
 		},
 		{
 			"id": "s4",
@@ -45,7 +41,7 @@
 			"overrides": {},
 			"parent": "s3",
 			"alternatives": {
-				"demand": "a4"
+				"demand": "a2"
 			}
 		},
 		{
@@ -54,7 +50,7 @@
 			"overrides": {},
 			"parent": "s4",
 			"alternatives": {
-				"topology": "a3"
+				"topology": "a1"
 			}
 		}
 	],
@@ -755,70 +751,6 @@
 	"alternatives": [
 		{
 			"id": "a1",
-			"category": "demand",
-			"name": "Peak hour demand",
-			"parent": null,
-			"values": {
-				"n:11": {
-					"demand": 337.5
-				},
-				"n:12": {
-					"demand": 337.5
-				},
-				"n:13": {
-					"demand": 225
-				},
-				"n:21": {
-					"demand": 337.5
-				},
-				"n:22": {
-					"demand": 450
-				},
-				"n:23": {
-					"demand": 337.5
-				},
-				"n:31": {
-					"demand": 225
-				},
-				"n:32": {
-					"demand": 225
-				}
-			}
-		},
-		{
-			"id": "a2",
-			"category": "demand",
-			"name": "Maximum day demand",
-			"parent": null,
-			"values": {
-				"n:11": {
-					"demand": 225
-				},
-				"n:12": {
-					"demand": 225
-				},
-				"n:13": {
-					"demand": 150
-				},
-				"n:21": {
-					"demand": 225
-				},
-				"n:22": {
-					"demand": 300
-				},
-				"n:23": {
-					"demand": 225
-				},
-				"n:31": {
-					"demand": 150
-				},
-				"n:32": {
-					"demand": 150
-				}
-			}
-		},
-		{
-			"id": "a3",
 			"category": "topology",
 			"name": "Main break, pipe 112 closed",
 			"parent": null,
@@ -829,15 +761,29 @@
 			}
 		},
 		{
-			"id": "a4",
+			"id": "a2",
 			"category": "demand",
 			"name": "Max day plus fire flow",
-			"parent": "a2",
+			"parent": null,
 			"values": {
 				"n:23": {
-					"demand": 1725
+					"demand": 1150
 				}
 			}
+		}
+	],
+	"calcSets": [
+		{
+			"id": "c1",
+			"name": "Peak hour",
+			"parent": null,
+			"demandMultiplier": 2.25
+		},
+		{
+			"id": "c2",
+			"name": "Max day",
+			"parent": null,
+			"demandMultiplier": 1.5
 		}
 	]
 }

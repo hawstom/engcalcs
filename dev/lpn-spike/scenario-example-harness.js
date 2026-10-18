@@ -6,12 +6,13 @@
 // page's own scenario code. What is asserted, headless, through the real open path:
 //   1. the tree: Base; Peak hour > Peak hour with main break; Max day > Max day plus fire flow >
 //      Max day plus fire flow with main break (depth 3, so a grandchild inherits twice);
-//   2. one stored alternative is named by TWO scenarios (the main break), and the two Demand
-//      alternatives are named by one scenario each;
+//   2. one stored alternative is named by TWO scenarios (the main break); Peak hour and Max day are
+//      ONE override each, the demand multiplier (no junction is rewritten); the fire flow is the one
+//      Demand alternative, holding junction 23 alone;
 //   3. every scenario solves and converges in BOTH engines, and the two engines agree to 0.5 psi
 //      on every junction (EPANET and the built-in solver use the same Hazen-Williams constants here);
-//   4. the engineering: demands scale 2.25 and 1.5 times Base, the fire flow is 1,500 gpm on top of
-//      Max day at junction 23, the fire pulls junction 23 below Max day, the grandchild keeps the
+//   4. the engineering: multipliers are 2.25 and 1.5, the fire flow is 1,500 gpm on top of
+//      Max day at junction 23 (entered as 1,150, because the multiplier scales it too), the fire pulls junction 23 below Max day, the grandchild keeps the
 //      fire demand it inherited, and the main break lowers junction 22's pressure below Max day plus
 //      fire flow's own.
 //   5. opening and re-saving the file is byte-stable in its scenario blocks (nothing is lost).
@@ -29,7 +30,7 @@ if (!global.EngCalcs.lpnGeorefToLonLat) { require(ROOT + 'js/lpn-georef.js'); }
 const L = loadLoopedNetwork(EXAMPLE_EXPORTS +
 	"\t\tgetDoc: function () { return doc; }, getScenarios: function () { return scenarios; },\n" +
 	"\t\tsettings: function () { return settings; }, seedDefaultInputs: seedDefaultInputs,\n" +
-	"\t\tswitchScenario: switchScenario, effective: effective, runSolve: runSolve,\n" +
+	"\t\tswitchScenario: switchScenario, scenarioDemandMultiplier: scenarioDemandMultiplier, effective: effective, runSolve: runSolve,\n" +
 	"\t\tlastResult: function () { return lastSolveResult; }, serializeProject: serializeProject,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas'); world = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world); linksLayer = el('g', {}, world);\n" +
@@ -75,26 +76,30 @@ async function solved() { L.runSolve(); await settleEpanet(); return L.lastResul
 	ok('...named by exactly two scenarios, one under each branch',
 		brk && (used[brk.id] || []).length === 2 && used[brk.id].indexOf('Peak hour with main break') >= 0 && used[brk.id].indexOf('Max day plus fire flow with main break') >= 0, JSON.stringify(used[brk && brk.id]));
 	ok('...and it closes pipe 112 only', brk && JSON.stringify(brk.values) === JSON.stringify({ 'l:112': { active: false } }), JSON.stringify(brk && brk.values));
-	const peakAlt = alts.filter((a) => a.name === 'Peak hour demand')[0], mdAlt = alts.filter((a) => a.id === byName['Max day'].alternatives.demand)[0];
-	ok('Peak hour demand and Maximum day demand are Demand alternatives, one scenario each',
-		peakAlt && mdAlt && peakAlt.category === 'demand' && mdAlt.category === 'demand' && used[peakAlt.id].length === 1 && used[mdAlt.id].length === 1);
-	const fireAlt = alts.filter((a) => a.parent === (mdAlt && mdAlt.id))[0];
-	ok('the fire flow is a child of Maximum day demand holding one value, junction 23', fireAlt && JSON.stringify(Object.keys(fireAlt.values)) === '["n:23"]', JSON.stringify(fireAlt));
+	const calcs = doc.calcSets || [];
+	ok('no Demand alternative rewrites junctions for Peak hour or Max day: the only Demand alternative holds junction 23 alone',
+		alts.filter((a) => a.category === 'demand').length === 1 && JSON.stringify(Object.keys(alts.filter((a) => a.category === 'demand')[0].values)) === '["n:23"]');
+	ok('Peak hour and Max day each hold one Calculation override, the demand multiplier, and nothing else',
+		calcs.length === 2 && ['Peak hour', 'Max day'].every((n) => { const c = calcs.filter((x) => x.id === byName[n].calc)[0]; return c && Object.keys(c).filter((k) => ['settings', 'times'].indexOf(k) >= 0).length === 0 && typeof c.demandMultiplier === 'number'; }));
+	ok('...and neither scenario holds a junction demand override of its own',
+		['Peak hour', 'Max day'].every((n) => Object.keys(byName[n].overrides || {}).length === 0 && !byName[n].alternatives));
 
 	console.log('--- 3. the numbers a person reads');
 	const node = (id) => doc.nodes.filter((n) => n.id === id)[0];
 	const link = (id) => doc.links.filter((l) => l.id === id)[0];
-	const demand = (scn, id) => { L.switchScenario(scn.id); return L.effective(node(id), 'demand'); };
 	const base = scns.filter((s) => s.isBase)[0];
+	// The demand the solver is given: the junction's value times the scenario's multiplier.
+	const demand = (scn, id) => { L.switchScenario(scn.id); const m = L.scenarioDemandMultiplier(); return L.effective(node(id), 'demand') * (m === undefined ? 1 : m); };
 	const J = ['11', '12', '13', '21', '22', '23', '31', '32'];
-	ok('Peak hour is 2.25 times Base at every junction', J.every((j) => demand(byName['Peak hour'], j) === 2.25 * demand(base, j)));
-	ok('Max day is 1.5 times Base at every junction', J.every((j) => demand(byName['Max day'], j) === 1.5 * demand(base, j)));
-	ok('Max day plus fire flow is Max day plus 1,500 gpm at junction 23, and Max day elsewhere',
+	ok('Peak hour multiplier is 2.25, and every junction demand is 2.25 times Base', byName['Peak hour'] && (L.switchScenario(byName['Peak hour'].id), L.scenarioDemandMultiplier() === 2.25) && J.every((j) => demand(byName['Peak hour'], j) === 2.25 * demand(base, j)));
+	ok('Max day multiplier is 1.5, and every junction demand is 1.5 times Base', (L.switchScenario(byName['Max day'].id), L.scenarioDemandMultiplier() === 1.5) && J.every((j) => demand(byName['Max day'], j) === 1.5 * demand(base, j)));
+	ok('Max day plus fire flow inherits the 1.5 multiplier (the child holds none)', (L.switchScenario(byName['Max day plus fire flow'].id), L.scenarioDemandMultiplier() === 1.5) && !byName['Max day plus fire flow'].calc);
+	ok('...the multiplier also scales junction 23\'s own entry, so 1,150 gpm gives Max day plus exactly 1,500 gpm of fire flow',
 		demand(byName['Max day plus fire flow'], '23') === demand(byName['Max day'], '23') + 1500 &&
 		J.filter((j) => j !== '23').every((j) => demand(byName['Max day plus fire flow'], j) === demand(byName['Max day'], j)));
-	ok('the grandchild inherits the fire demand', demand(byName['Max day plus fire flow with main break'], '23') === 1725);
+	ok('the grandchild inherits the multiplier and the fire demand (1,725 gpm at junction 23)', demand(byName['Max day plus fire flow with main break'], '23') === 1725);
 	L.switchScenario(byName['Max day plus fire flow with main break'].id);
-	ok('...and pipe 112 is out of service there, in service in Base', L.effective(link('112'), 'active') === false);
+	ok('...and pipe 112 is out of service there', L.effective(link('112'), 'active') === false);
 	L.switchScenario(base.id);
 	ok('...and in service in Base', L.effective(link('112'), 'active') !== false);
 

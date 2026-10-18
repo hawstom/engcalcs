@@ -83,7 +83,7 @@
             "titleKey": "lpn_ex_net1_scn_title",
             "descKey": "lpn_ex_net1_scn_desc",
             "title": "EPANET Net1 with scenarios, gpm (US)",
-            "description": "Gallons per minute, with feet and inches. EPANET's Net1 with five scenarios under Base, the average day. Peak hour is 2.25 times the Base demands and Max day is 1.5 times. The fire scenario adds 1,500 gpm to Max day at junction 23. A main break closes pipe 112 in two scenarios that share one alternative.",
+            "description": "Gallons per minute, with feet and inches. EPANET's Net1 with five scenarios under Base, the average day. Peak hour sets the demand multiplier to 2.25 and Max day sets it to 1.5. The fire scenario adds 1,500 gpm at junction 23. The multiplier also scales that junction's own demand, so it holds 1,150 gpm, which is 1,725 gpm at 1.5. A main break closes pipe 112 in two scenarios that share one alternative.",
             "system": "us",
             "coords": "xy",
             "work": "maintenance",

@@ -32,7 +32,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 ## lpn_  (2, 2 to read @@ NEEDS RULING)
 
 - **`lpn_ex_net1_scn_desc`**
-  > Gallons per minute, with feet and inches. EPANET's Net1 with five scenarios under Base, the average day. Peak hour is 2.25 times the Base demands and Max day is 1.5 times. The fire scenario adds 1,500 gpm to Max day at junction 23. A main break closes pipe 112 in two scenarios that share one alternative.
+  > Gallons per minute, with feet and inches. EPANET's Net1 with five scenarios under Base, the average day. Peak hour sets the demand multiplier to 2.25 and Max day sets it to 1.5. The fire scenario adds 1,500 gpm at junction 23. The multiplier also scales that junction's own demand, so it holds 1,150 gpm, which is 1,725 gpm at 1.5. A main break closes pipe 112 in two scenarios that share one alternative.
   @@ NEEDS RULING
 - **`lpn_ex_net1_scn_title`**
   > EPANET Net1 with scenarios, gpm (US)
@@ -42,7 +42,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**153 still to read**, of 156 new keys across 22 unmerged branch(es).
+**153 still to read**, of 156 new keys across 24 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -135,7 +135,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/native-pbv-gpv (`11212c9ed`) — adds no English strings
 
-### feat/scenario-example (`4ff2623c4`) — adds no English strings
+### feat/scenario-example (`053a4645d`) — adds no English strings
 
 ### feat/sheet-sync (`1c77e44cd`) — 77 new, 77 to read @@ NEEDS RULING
 
@@ -521,7 +521,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   @@ NEEDS RULING
 
-### feat/theme (`02b3b2be5`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/theme (`62431ac93`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_theme_amber`**
   > Amber
@@ -553,6 +553,10 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_roughness_method_note`**
   > ⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.
   @@ NEEDS RULING
+
+### fix/gpv-closed-warm (`9d62a8fbd`) — adds no English strings
+
+### fix/pbv-setting-unit (`2310b877a`) — adds no English strings
 
 ### fix/scenario-receipt (`50386ccfa`) — 5 new, 5 to read @@ NEEDS RULING
 
