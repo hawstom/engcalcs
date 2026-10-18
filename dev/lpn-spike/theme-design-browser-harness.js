@@ -32,6 +32,8 @@
 //      stars, the terminals' scan lines) is not a colour a style can report, so a screenshot is sampled round
 //      every word and icon in the menu bar, toolbar and tab strip, and the lightest and darkest pixel under it
 //      are each held to 4.5:1 for a word and 3:1 for an icon.
+//  14. THE THREE CONSENT BUTTONS LOOK ALIKE in every theme (CLAUDE.md: never restyle one consent button to stand
+//      out): the same computed fill, edge and ink on all three, and their words readable on that fill.
 //  12. THE SCENARIO MANAGER reads in every theme: its text on its surface at 4.5:1 (7:1 in High contrast), its
 //      title in the theme's own face, and nothing in it cut.
 //   6. A PHONE SURVIVES EVERY THEME: at 390 by 844 the page has no sideways scroll, and the menu bar and the
@@ -394,6 +396,20 @@ async function main() {
 			}
 			ok('no page errors (desktop)', !s.errors.length, (s.errors[0] || '').slice(0, 200));
 		} finally { await s.close(); }
+
+		// 14: the consent banner, before anything is answered
+		const cb = await Session.open(browser, 'consent', { colorScheme: 'light' });
+		try {
+			await cb.goto('Looped-Network.php');
+			for (const t of themes) {
+				await cb.page.evaluate((x) => window.ecTheme.set(x), t);
+				await cb.settle(150);
+				const b = await cb.page.evaluate(() => Array.from(document.querySelectorAll('.ec-consent-btn')).map((e) => {
+					const c = getComputedStyle(e); return [c.backgroundColor, c.borderTopColor, c.borderTopWidth, c.borderTopStyle, c.color, c.fontWeight, c.borderTopLeftRadius].join('|');
+				}));
+				ok('14. ' + t + ': the three consent buttons look alike', b.length === 3 && b[0] === b[1] && b[1] === b[2], JSON.stringify(b));
+			}
+		} finally { await cb.close(); }
 
 		// 12: the Scenario manager, in every theme
 		const sm = await Session.open(browser, 'scenario-manager', { colorScheme: 'light' });

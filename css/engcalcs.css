@@ -124,6 +124,21 @@
 	/* A picture behind the whole page, the margin round the map included (Prairie's sky). */
 	--ec-page-image: none;
 	--ec-page-image-size: auto;
+	--ec-page-image-pos: 0 0;
+	/* PRAIRIE'S MATERIALS (Ida's direction, 2026-10-18; Tom: menus are a water tower's tank band, the toolbar is
+	   clouds, the project tabs are barns). Galvanized steel for the menu bar and the transport, a cloud for a
+	   tool under the pointer and a pressed one, barn wood for an inactive tab. Nothing in other themes. */
+	--ec-steel: none;
+	--ec-steel-ribs: none;
+	--ec-steel-edge: transparent;
+	--ec-steel-ink: currentColor;
+	--ec-cloud: transparent;
+	--ec-cloud-shadow: none;
+	--ec-cloud-pressed: transparent;
+	--ec-cloud-pressed-shadow: none;
+	--ec-cloud-pressed-edge: transparent;
+	--ec-barn: transparent;
+	--ec-barn-edge: transparent;
 	/* The box title band's picture: where it sits and how big (Prairie's water tower), and the room the
 	   title leaves for it. */
 	--ec-titlebar-pos: 0 0;
@@ -1149,8 +1164,8 @@
 	--ec-point: #6a3d9a;
 	--ec-accent-hover: #7d1f15;
 	--ec-accent-open: #5c160f;
-	--ec-brand: #9e2a1e;
-	--ec-brand-hover: #7d1f15;
+	--ec-brand: #34546e;
+	--ec-brand-hover: #26405a;
 	--ec-warn-bg: #f8e7b5;
 	--ec-warn-border: #8a6a10;
 	--ec-warn-ink: #6b3d00;
@@ -1174,7 +1189,7 @@
 	--ec-font-size: .9375rem;
 	--ec-menu-weight: bold;
 	--ec-menu-case: uppercase;
-	--ec-menu-tracking: .06em;
+	--ec-menu-tracking: .12em;
 	--ec-title-case: uppercase;
 	--ec-title-tracking: .14em;
 	--ec-title-ink: var(--ec-accent);
@@ -1184,13 +1199,15 @@
 	--ec-box-border: 2px solid var(--ec-border-strong);
 	--ec-box-shadow: 3px 3px 0 rgba(43, 36, 24, .22);
 	--ec-tabs-rule: 4px double #7a5c3a;
-	--ec-chrome-image: radial-gradient(ellipse 90px 13px at 16% 34px, rgba(255, 255, 255, .7), transparent 70%), radial-gradient(ellipse 140px 16px at 58% 26px, rgba(255, 255, 255, .55), transparent 70%), radial-gradient(ellipse 80px 11px at 86% 52px, rgba(255, 255, 255, .5), transparent 70%), linear-gradient(to bottom, #3a78b6 0, #6fa6d6 34px, #b7d6ec 78px, #e4eef2 112px, #efe6cc 138px);
-	--ec-chrome-image-size: 100% 140px;
+	--ec-chrome-image: radial-gradient(ellipse 90px 11px at 16% 22px, rgba(255, 255, 255, .7), transparent 70%), radial-gradient(ellipse 140px 13px at 58% 14px, rgba(255, 255, 255, .55), transparent 70%), radial-gradient(ellipse 80px 9px at 86% 40px, rgba(255, 255, 255, .5), transparent 70%), linear-gradient(to bottom, #7fb0dc 0, #b7d6ec 45px, #e4eef2 80px, #efe6cc 108px);
+	--ec-chrome-image-size: 100% 108px;
+	--ec-chrome-image-pos: 0 31px;
 	--ec-chrome-image-repeat: no-repeat;
 	--ec-chrome-image-attach: fixed;
 	--ec-chrome-gap: none;
-	--ec-page-image: radial-gradient(ellipse 90px 13px at 16% 34px, rgba(255, 255, 255, .7), transparent 70%), radial-gradient(ellipse 140px 16px at 58% 26px, rgba(255, 255, 255, .55), transparent 70%), radial-gradient(ellipse 80px 11px at 86% 52px, rgba(255, 255, 255, .5), transparent 70%), linear-gradient(to bottom, #3a78b6 0, #6fa6d6 34px, #b7d6ec 78px, #e4eef2 112px, #efe6cc 138px);
-	--ec-page-image-size: 100% 140px;
+	--ec-page-image: radial-gradient(ellipse 90px 11px at 16% 22px, rgba(255, 255, 255, .7), transparent 70%), radial-gradient(ellipse 140px 13px at 58% 14px, rgba(255, 255, 255, .55), transparent 70%), radial-gradient(ellipse 80px 9px at 86% 40px, rgba(255, 255, 255, .5), transparent 70%), linear-gradient(to bottom, #7fb0dc 0, #b7d6ec 45px, #e4eef2 80px, #efe6cc 108px);
+	--ec-page-image-size: 100% 108px;
+	--ec-page-image-pos: 0 31px;
 	--ec-titlebar-image: url("/engcalcs/icons/favicon.svg");
 	--ec-titlebar-pos: 10px 8px;
 	--ec-titlebar-pos-rtl: right 10px top 8px;
@@ -1199,6 +1216,17 @@
 	--ec-title-pad-start: 40px;
 	--ec-icon-stroke: 2;
 	--ec-icon-cap: square;
+	--ec-steel: linear-gradient(#eef1f2 0, #cdd4d8 45%, #bcc5cb 70%, #e3e7ea 100%);
+	--ec-steel-ribs: repeating-linear-gradient(90deg, rgba(0, 0, 0, .05) 0 1px, transparent 1px 7px);
+	--ec-steel-edge: #6f7b84;
+	--ec-steel-ink: #1f2a33;
+	--ec-cloud: #fff;
+	--ec-cloud-shadow: 0 2px 6px rgba(30, 60, 100, .35);
+	--ec-cloud-pressed: #dfe8ee;
+	--ec-cloud-pressed-shadow: inset 0 -5px 8px rgba(70, 100, 140, .4), 0 1px 3px rgba(30, 60, 100, .3);
+	--ec-cloud-pressed-edge: #6f879c;
+	--ec-barn: #e6d8b8;
+	--ec-barn-edge: #7a6a50;
 	/* The map (round 3): wheat paper, dark ink, a steel network and barn-red selection. */
 	--ec-map-paper: #f5ecd2;
 	--ec-map-ink: #2b2418;
@@ -1242,6 +1270,31 @@
 :where(:root[data-theme]:not([data-theme="light"]):not([data-theme="dark"])) a { color: var(--ec-accent); }
 /* "Saved in this browser" is faded by opacity, which lands under 4.5:1 on a phosphor or a pure-ink palette. */
 :root[data-theme]:not([data-theme="light"]):not([data-theme="dark"]) .lpn-saved { opacity: 1; color: var(--ec-ink-muted); }
+}
+/* PRAIRIE'S SHAPES (Ida's direction, 2026-10-18). The menu bar is a galvanized tank band above the sky, its
+   words painted on in dark ink with no outline; the toolbar's tools are clouds; the tabs are barns. Red is kept
+   for the open menu, the current tab and paper: never on the sky or on the steel at rest. */
+@media screen {
+:root[data-theme="prairie"] #lpn_menubar { background: var(--ec-steel-ribs), var(--ec-steel); border-bottom: 1px solid var(--ec-steel-edge); }
+:root[data-theme="prairie"] .lpn-menubar-item { background: transparent; border-color: transparent; color: var(--ec-steel-ink); box-shadow: none; }
+:root[data-theme="prairie"] .lpn-menubar-item:hover { background: var(--ec-bg); border-color: var(--ec-accent); color: var(--ec-accent); }
+:root[data-theme="prairie"] .lpn-menubar-item[aria-expanded="true"] { background: var(--ec-accent); border-color: var(--ec-accent); color: var(--ec-bg); }
+:root[data-theme="prairie"] #lpn_toolbar button:not(.lpn-transport-btn):hover:not(:disabled) { background: var(--ec-cloud); border-color: transparent; box-shadow: var(--ec-cloud-shadow); border-radius: 999px; }
+:root[data-theme="prairie"] #lpn_toolbar button:not(.lpn-transport-btn)[aria-pressed="true"] { background: var(--ec-cloud-pressed); border-color: var(--ec-cloud-pressed-edge); box-shadow: var(--ec-cloud-pressed-shadow); color: var(--ec-accent); border-radius: 999px; }
+:root[data-theme="prairie"] #lpn_toolbar_run .lpn-transport-btn { background: var(--ec-steel); border: 1px solid var(--ec-steel-edge); color: var(--ec-steel-ink); }
+:root[data-theme="prairie"] .lpn-tab {
+	clip-path: polygon(0 100%, 0 40%, 12% 15%, 26% 0, 74% 0, 88% 15%, 100% 40%, 100% 100%);
+	background: var(--ec-barn); border: 0; border-radius: 0; box-shadow: inset 1px 0 var(--ec-barn-edge), inset -1px 0 var(--ec-barn-edge);
+}
+:root[data-theme="prairie"] .lpn-tab > button { padding-top: 13px; }
+:root[data-theme="prairie"] .lpn-tab-current { background: var(--ec-accent); color: var(--ec-bg); box-shadow: inset 2px 0 var(--ec-bg), inset -2px 0 var(--ec-bg), inset 0 -2px var(--ec-bg); }
+:root[data-theme="prairie"] .lpn-tab-current .lpn-tab-x { color: var(--ec-bg); border-left-color: color-mix(in srgb, var(--ec-bg) 50%, transparent); }
+:root[data-theme="prairie"] .lpn-tab-current > button:hover { background: color-mix(in srgb, var(--ec-ink-black) 18%, transparent); }
+:root[data-theme="prairie"] .lpn-msglog-btn.lpn-msglog-active { background: var(--ec-bg); border-color: var(--ec-accent); color: var(--ec-accent); }
+.ec-theme-card[data-theme="prairie"] .ec-tc-menu { background: var(--ec-steel-ribs), var(--ec-steel); }
+.ec-theme-card[data-theme="prairie"] .ec-tc-menu i { background: transparent; border-color: var(--ec-steel-ink); }
+.ec-theme-card[data-theme="prairie"] .ec-tc-tabs i { background: var(--ec-barn); }
+.ec-theme-card[data-theme="prairie"] .ec-tc-tabs i.ec-tc-cur { background: var(--ec-accent); }
 }
 /* NO BLUR, NO SEE-THROUGH (Task 811, round 3): where the browser cannot blur, a frosted surface would be a
    plain translucent one with the drawing showing through the words, so Desktop's boxes and chrome go solid. */
@@ -2900,7 +2953,7 @@ html[dir="rtl"] .lpn-transport-btn[data-icon="step-fwd"] svg, html[dir="rtl"] .l
    moving a pixel of layout. The menu items keep their white fill and blue outline (Task 616). */
 #lpn_menubar, #lpn_toolbar, #lpn_tabs { background: var(--ec-chrome-bg); background-image: var(--ec-chrome-image); background-size: var(--ec-chrome-image-size); -webkit-backdrop-filter: var(--ec-chrome-blur); backdrop-filter: var(--ec-chrome-blur);
 	background-position: var(--ec-chrome-image-pos); background-repeat: var(--ec-chrome-image-repeat); background-attachment: var(--ec-chrome-image-attach); }
-#formInput { background-image: var(--ec-page-image); background-size: var(--ec-page-image-size); background-repeat: no-repeat; background-attachment: fixed; }
+#formInput { background-image: var(--ec-page-image); background-size: var(--ec-page-image-size); background-position: var(--ec-page-image-pos); background-repeat: no-repeat; background-attachment: fixed; }
 #lpn_menubar, #lpn_toolbar { box-shadow: var(--ec-chrome-gap); }
 /* The floor for every box makePanelDraggable() wires. raisePanel() writes a higher number inline as
    boxes are opened and touched; this is only where the stack starts, and it is what puts an untouched

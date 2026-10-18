@@ -601,6 +601,18 @@ sits on a fill of its own; `theme-design-browser-harness.js` samples a screensho
 the chrome (4.5:1 for a word, 3:1 for an icon, in every theme; Light's 3.79:1 close mark on a grey tab is
 reported, not failed, as Light shipped before the check).
 
+**Prairie, Ida's direction** (Tom: *"it needs a designer's eye ... the menus don't fit ... the toolbar active press
+looks out of place. Maybe it needs to be more like a cloud ... a tank theme of galvanized steel"*). The menu
+bar is a galvanized tank band (`--ec-steel`, faint ribs, a dark steel edge) ABOVE the sky, its words painted on
+in dark ink with no outline (hover: paper with a red edge; open: red). The sky starts below the band and runs
+behind the toolbar and tabs to the wheat horizon at the fence rail. The toolbar's tools are clouds: white on
+hover, a pressed cloud (pale, shaded underneath, red icon) when on. The transport is steel. The tabs are barns
+(a clip-path roof): the current one red with white trim, the others barn wood. Red appears only on the open
+menu, the current tab, paper (links, box titles) and the map's selection; the message chip at the map's corner
+is wheat with a red edge. The consent buttons are steel, all three alike (CLAUDE.md), held by the harness in
+every theme. Measured in Chromium: menu words on the steel 6.5:1 at worst, toolbar icons on the sky 6.0:1 at
+worst. Rockwell is absent on jasmine, so tab label widths on Windows want Tom's eye.
+
 **Known, not built**: colour by value keeps its ramp on a dark paper, so a ramp's darkest class (viridis
 purple) is faint on Amber, Arcade or Space; the fix (a casing in the paper's opposite tone, or lifting that
 stop) changes how a visitor's colouring looks and is Tom's call. The basemap tiles are not filtered.
