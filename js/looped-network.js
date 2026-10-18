@@ -2869,7 +2869,7 @@ var EngCalcs = EngCalcs || {};
 	// *"Fully shedded links need to hide if they are still in conflict"*): a label with no such
 	// side stays hidden exactly as before. Only a lone label is tried; a chain keeps its stations.
 	// Longest pipe first, as the slide orders them, so the order is a function of the drawing.
-	var LPN_LEVEL_REACH_TEXT_HEIGHTS = 3, LPN_LEVEL_PAD_FRAC = 0.1;
+	var LPN_LEVEL_REACH_TEXT_HEIGHTS = 3, LPN_LEVEL_PAD_FRAC = 0.1, LPN_LEVEL_NEAR_FRAC = 0.2;
 	function placeLevelPipeLabels(obs, nodeObs, nodeLabels, nodePlaced, ringLabels, ringPlaced, holders, fs) {
 		var specs = [], min = leaderThreshold(), d = defaultLabelOffset(), home0 = Math.hypot(d.x, d.y),
 			reach = Math.max(home0 * 3, fs * LPN_LEVEL_REACH_TEXT_HEIGHTS), byKey = {};
@@ -2930,7 +2930,13 @@ var EngCalcs = EngCalcs || {};
 		// clean sweep asks a tenth of a font size of air. Measured against the full 0.35 pad on both
 		// sweeps (Net3 2x, the 600-junction network at 2x): 40 and 232 pipe labels shown against 35
 		// and 214.
-		var out = Collide.placeLabelsFirstFit(specs, ground, { pad: fs * LPN_LEVEL_PAD_FRAC, lastPad: 0, strict: true, leaderMin: min });
+		// **AND IT MUST STILL SAY WHICH PIPE IT IS FOR** (pre-review, 2026-10-17: 115 of the 600-junction
+		// network's level labels at 2x sat nearer another pipe than their own, with no leader). A side
+		// near enough to draw no leader is taken only where its own pipe is the nearest pipe to its
+		// rows, by a fifth of a font size (`near`); a side further out carries a leader to its pipe,
+		// which says it instead. A label with no such side stays hidden.
+		var out = Collide.placeLabelsFirstFit(specs, ground, { pad: fs * LPN_LEVEL_PAD_FRAC, lastPad: 0, strict: true,
+			leaderMin: min, near: fs * LPN_LEVEL_NEAR_FRAC });
 		out.forEach(function (r) {
 			var sp = byKey[r.id], le = sp && linkEls[sp.l.id];
 			if (!le || r.dropped) { return; }

@@ -1214,10 +1214,15 @@ EngCalcs.lpnCollide = (function () {
 		// the slide along a pipe makes the same bargain (touching a neighbour beats hiding).
 		var strict = !!opts.strict, leaderMin = opts.leaderMin > 0 ? opts.leaderMin : 0,
 			lastPad = opts.lastPad >= 0 ? opts.lastPad : pad;
+		// `near` (a margin): a side too close to draw a leader must leave the label's own pipe the
+		// nearest one (ownPipeNearest()).
+		var nearMargin = opts.near >= 0 ? opts.near : -1;
 		function strictOk(lbl, c, b) {
-			var g, i, o;
+			var g, i, o, far = Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y) > leaderMin;
 			if (lbl.ownLink !== undefined && boxesOnOwnLink(b, local, lbl.ownLink)) { return false; }
-			if (Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y) <= leaderMin) { return true; }
+			// A side near enough to draw no leader must say whose label it is by being nearest its own
+			// pipe; one far enough out to carry a leader says it with the leader.
+			if (!far) { return nearMargin < 0 || lbl.ownLink === undefined || ownPipeNearest(b, local, lbl.ownLink, nearMargin); }
 			g = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id);
 			// Every symbol counts, the one round the anchor included: a pipe's anchor is no node's
 			// own, so a leader starting inside an end node's symbol runs through it.
@@ -1382,6 +1387,41 @@ EngCalcs.lpnCollide = (function () {
 		return false;
 	}
 
+	// The distance from a segment to a box, 0 where they meet: the segment is turned into the box's
+	// own frame, then it is the nearer of its ends to the rectangle and the rectangle's corners to it.
+	function segmentBoxDistance(g, b) {
+		var r = -(b.a || 0) * Math.PI / 180, c = Math.cos(r), s = Math.sin(r), hw = b.w / 2, hh = b.h / 2;
+		function loc(x, y) { var dx = x - b.cx, dy = y - b.cy; return { x: dx * c - dy * s, y: dx * s + dy * c }; }
+		var p = loc(g.ax, g.ay), q = loc(g.bx, g.by), best = Infinity, i, k;
+		if (segmentInBoxFraction(g, b) > 0) { return 0; }
+		function ptRect(t) { var dx = Math.max(Math.abs(t.x) - hw, 0), dy = Math.max(Math.abs(t.y) - hh, 0); return Math.hypot(dx, dy); }
+		function ptSeg(t) {
+			var vx = q.x - p.x, vy = q.y - p.y, L2 = vx * vx + vy * vy, u = L2 ? ((t.x - p.x) * vx + (t.y - p.y) * vy) / L2 : 0;
+			u = u < 0 ? 0 : (u > 1 ? 1 : u);
+			return Math.hypot(p.x + vx * u - t.x, p.y + vy * u - t.y);
+		}
+		best = Math.min(ptRect(p), ptRect(q));
+		for (i = -1; i <= 1; i += 2) { for (k = -1; k <= 1; k += 2) { best = Math.min(best, ptSeg({ x: i * hw, y: k * hh })); } }
+		return best;
+	}
+	// IS ITS OWN PIPE THE NEAREST ONE? The level rung's reading test: a level label with no leader
+	// says which pipe it belongs to only by being nearer that pipe than any other, by `margin` at
+	// least. Measured to the rows; asked of the pipes in reach (`local`).
+	function ownPipeNearest(boxes, obs, ownLink, margin) {
+		var own = Infinity, i, j, o, d;
+		for (j = 0; j < obs.segments.length; j++) {
+			o = obs.segments[j];
+			if (o.kind !== 'link' || o.owner !== ownLink) { continue; }
+			for (i = 0; i < boxes.length; i++) { d = segmentBoxDistance(o, boxes[i]); if (d < own) { own = d; } }
+		}
+		if (own === Infinity) { return false; }
+		for (j = 0; j < obs.segments.length; j++) {
+			o = obs.segments[j];
+			if (o.kind !== 'link' || o.owner === ownLink) { continue; }
+			for (i = 0; i < boxes.length; i++) { if (segmentBoxDistance(o, boxes[i]) < own + margin) { return false; } }
+		}
+		return true;
+	}
 	// Does any row lie on the label's OWN pipe? The strict first-fit's R7 test: a level pipe label
 	// sits beside its pipe, not across it. `ownLink` is the owner its pipe's segments carry.
 	function boxesOnOwnLink(boxes, obs, ownLink) {
@@ -2111,6 +2151,8 @@ EngCalcs.lpnCollide = (function () {
 		placeLabelsFirstFit: placeLabelsFirstFit,
 		boxClearOf: boxClearOf,
 		boxesClearOf: boxesClearOf,
+		segmentBoxDistance: segmentBoxDistance,
+		ownPipeNearest: ownPipeNearest,
 		labelLineBoxes: labelLineBoxes,
 		RING_ANGLES: RING_ANGLES,
 		box: box,

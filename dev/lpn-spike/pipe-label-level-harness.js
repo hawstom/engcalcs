@@ -17,7 +17,8 @@
 // labels already draw a few leaders through other nodes' symbols on these views, 1 to 4 a view,
 // which this branch does not touch and the table prints); no view shows fewer labels or fewer
 // values than before; every label drawn before is drawn identically after (the level pass runs last
-// and only on labels that were hidden); and the level pass shows labels on every network. R14 holds
+// and only on labels that were hidden); every level label drawn without a leader is nearer its own
+// pipe than any other pipe, measured to its rows; and the level pass shows labels on every network. R14 holds
 // by construction: only a label that could not lie along its pipe is ever set level.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -51,7 +52,7 @@ function ok(label, cond, detail) {
 	const realFF = Collide.placeLabelsFirstFit, realRepair = Collide.repairCrossingGangs, realRing = Collide.placeLabels;
 	Collide.placeLabelsFirstFit = function (labels, obs, opts) {
 		const out = realFF.call(this, labels, obs, opts);
-		if (opts && opts.strict) { cap.level = out; cap.levelSpecs = labels; }
+		if (opts && opts.strict) { cap.level = out; }
 		return out;
 	};
 	Collide.repairCrossingGangs = function (labels, placed, obs, opts) {
@@ -128,6 +129,22 @@ function ok(label, cond, detail) {
 				if (Math.hypot(ax + vx * t - q.x, ay + vy * t - q.y) < q.r - eps) { br.N3.push(o.id + ' leader through node ' + q.id); }
 			});
 		});
+		// WHICH PIPE IS IT FOR? A level label with no drawn leader must be nearer its own pipe than
+		// any other, measured to its rows (pre-review, 2026-10-17).
+		br.astray = [];
+		const pipes = ((cap.obs && cap.obs.segments) || []).filter((g) => g.kind === 'link');
+		(cap.level || []).forEach((r) => {
+			const h = linkEls[r.id.slice(2)];
+			if (r.dropped || !V.shown(h) || !h.levelBeside) { return; }
+			if (h.leader && h.leader.style.display !== 'none') { return; }
+			const bs = (r.boxes && r.boxes.length) ? r.boxes : [r.box];
+			let own = Infinity, other = Infinity;
+			pipes.forEach((g) => bs.forEach((b) => {
+				const d = Collide.segmentBoxDistance(g, b);
+				if (g.owner === r.id) { own = Math.min(own, d); } else { other = Math.min(other, d); }
+			}));
+			if (other < own) { br.astray.push(r.id); }
+		});
 		return br;
 	}
 
@@ -165,6 +182,8 @@ function ok(label, cond, detail) {
 			const was = new Set(b.br.N1.concat(b.br.N3, b.br.N5)), added = a.br.N1.concat(a.br.N3, a.br.N5).filter((x) => !was.has(x));
 			ok(tag + ': no never-rule break added (N1, N3, N5)', added.length === 0,
 				`after N1 ${a.br.N1.length} N3 ${a.br.N3.length} N5 ${a.br.N5.length}, ${added.length} new` + (added.length ? '; e.g. ' + added.slice(0, 3).join('; ') : ''));
+			ok(tag + ': every level label without a leader is nearer its own pipe than any other', a.br.astray.length === 0,
+				a.br.astray.length + ' of ' + a.c.level + (a.br.astray.length ? ': ' + a.br.astray.slice(0, 4).join(' ') : ''));
 			ok(tag + ': no fewer labels or values than before', shownA >= shownB && rowsA >= rowsB, shownB + ' -> ' + shownA + ' labels, ' + rowsB + ' -> ' + rowsA + ' values');
 			const moved = Object.keys(b.sig).filter((k) => a.sig[k] !== b.sig[k]);
 			ok(tag + ': every label drawn before is drawn identically after', moved.length === 0,

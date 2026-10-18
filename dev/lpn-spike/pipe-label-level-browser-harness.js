@@ -8,7 +8,8 @@
 // near Novato and the bench's 600-junction downtown network. Labels and values shown in view are
 // counted both ways and must not fall; every level label's drawn text box (getBBox, turned by its
 // own transform) must not overlap another label's text or a node symbol by more than 1.5 screen px
-// (N1), nor its leader pass within a node symbol (N3). Pass time is printed, median of three, and
+// (N1), nor its leader pass within a node symbol (N3), and a level label drawn without a leader must
+// lie nearer its own pipe than any other (its drawn rows, every pipe in the drawing). Pass time is printed, median of three, and
 // so is the same overlap reading over the labels that are not level, which is the layout before.
 // LEVEL_PROBE=l:ID,n:ID prints the model's boxes and the drawn text for those labels at each view.
 //
@@ -90,7 +91,10 @@ const HOOK = '\twindow.__lpnLevel = {\n' +
 	'\t\t\tvar asked = { n: 0, l: 0 };\n' +
 	'\t\t\tdoc.nodes.forEach(function (n) { var e = nodeEls[n.id], p = nodeAt(n); if (e && !e.empty && p.x * state.s + state.tx >= 0 && p.x * state.s + state.tx <= W && p.y * state.s + state.ty >= 0 && p.y * state.s + state.ty <= H) { asked.n++; } });\n' +
 	'\t\t\tdoc.links.forEach(function (l) { var e = linkEls[l.id], p = linkLabelMid(l); if (e && !e.empty && p.x * state.s + state.tx >= 0 && p.x * state.s + state.tx <= W && p.y * state.s + state.ty >= 0 && p.y * state.s + state.ty <= H) { asked.l++; } });\n' +
-	'\t\t\treturn { s: state.s, labels: out, sym: sym, asked: asked };\n' +
+	// Which pipe is it for: a level label with no leader whose drawn rows lie nearer another pipe.
+	'\t\t\tvar C = EngCalcs.lpnCollide, segs = []; doc.links.forEach(function (l) { var p = linkPointList(l), i; for (i = 1; i < p.length; i++) { segs.push({ id: l.id, ax: p[i - 1].x, ay: p[i - 1].y, bx: p[i].x, by: p[i].y }); } });\n' +
+	'\t\t\tvar astray = out.filter(function (d) { if (d.kind !== "l" || !d.level || d.leader) { return false; } var own = Infinity, other = Infinity; segs.forEach(function (g) { d.boxes.forEach(function (b) { var x = C.segmentBoxDistance(g, b); if (g.id === d.id) { own = Math.min(own, x); } else { other = Math.min(other, x); } }); }); return other < own; }).map(function (d) { return d.id; });\n' +
+	'\t\t\treturn { s: state.s, labels: out, sym: sym, asked: asked, astray: astray };\n' +
 	'\t\t}\n' +
 	'\t};\n';
 
@@ -224,6 +228,8 @@ async function main() {
 				const bo = baseOverlaps(Collide, on.views[i]);
 				console.log(`        (labels not level overlapping each other in real fonts: ${bo.n}, worst ${bo.worst.toFixed(1)} px)`);
 				ok(sc.name + ' ' + m + 'x: no fewer labels or values than before', A.pipes + A.nodes >= B.pipes + B.nodes && A.rows >= B.rows);
+				ok(sc.name + ' ' + m + 'x: every level label without a leader is nearer its own pipe, in real fonts', !on.views[i].astray.length,
+					on.views[i].astray.length + ' of ' + A.level + (on.views[i].astray.length ? ': ' + on.views[i].astray.slice(0, 4).join(' ') : ''));
 				ok(sc.name + ' ' + m + 'x: no level label breaks N1 or N3 in real fonts', br.length === 0, br.length + (br.length ? ': ' + br.slice(0, 3).join('; ') : ''));
 			});
 			ok(sc.name + ': the level pass shows labels', level > 0, String(level));
