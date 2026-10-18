@@ -2327,7 +2327,7 @@ var EngCalcs = EngCalcs || {};
 		// an unbounded panel takes most of the window. Hence a max-width plus
 		// `overflow-wrap:anywhere` on the readout, which breaks the long token instead.
 		box.setAttribute('style', 'position:fixed;left:8px;bottom:8px;z-index:35;background:var(--ec-bg);'
-			+ 'border:1px solid var(--ec-ink);padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3);'
+			+ 'border:var(--ec-box-border);padding:8px;font:12px/1.4 monospace;box-shadow:var(--ec-box-shadow);'
 			+ 'max-height:70vh;max-width:min(26em,45vw);overflow:auto');
 		function row(label, get, set, step, hint) {
 			var l = document.createElement('label'), i = document.createElement('input');
@@ -16856,7 +16856,7 @@ var EngCalcs = EngCalcs || {};
 		// top-right. The width is capped for the reason the label bench states -- a fixed box with
 		// no width sizes to its widest child, and a tile key has no wrap opportunity.
 		box.setAttribute('style', 'position:fixed;right:8px;bottom:8px;z-index:35;background:var(--ec-bg);'
-			+ 'border:1px solid var(--ec-ink);padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3);'
+			+ 'border:var(--ec-box-border);padding:8px;font:12px/1.4 monospace;box-shadow:var(--ec-box-shadow);'
 			+ 'max-height:70vh;max-width:min(30em,45vw);overflow:auto;white-space:pre-wrap;'
 			+ 'overflow-wrap:anywhere');
 		var h = document.createElement('div');
@@ -59662,11 +59662,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function themeLabel(pc, t) {
 		var names = { system: pc.lpn_theme_system || 'System', light: pc.lpn_theme_light || 'Light', dark: pc.lpn_theme_dark || 'Dark',
 			hc: pc.lpn_theme_hc || 'High contrast', amber: pc.lpn_theme_amber || 'Amber', green: pc.lpn_theme_green || 'Green',
-			platinum: pc.lpn_theme_platinum || 'Platinum' };
+			platinum: pc.lpn_theme_platinum || 'Platinum', rounded: pc.lpn_theme_rounded || 'Rounded',
+			newspaper: pc.lpn_theme_newspaper || 'Newspaper', arcade: pc.lpn_theme_arcade || 'Arcade', space: pc.lpn_theme_space || 'Space' };
 		return names[t] || t;
 	}
-	// A small picture of the page: the menu bar's outlined items, the toolbar, the tab strip, a box of
-	// text, a notice, and a patch of the map (whose paper and ink no theme changes).
+	// A small picture of the page: the menu bar's outlined items, the toolbar, the tab strip, a box with a
+	// sample of the theme's lettering ("Aa", hidden from a screen reader with the rest of the card: it is a
+	// picture of a face, not a word), a notice, and a patch of the map (whose paper and ink no theme changes).
 	function themeMiniature(t) {
 		var c = document.createElement('span');
 		c.className = 'ec-theme-card';
@@ -59676,7 +59678,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		c.innerHTML = '<span class="ec-tc-menu"><i></i><i></i><i></i></span>' +
 			'<span class="ec-tc-tool"><i></i><i></i><i></i><i></i><i></i></span>' +
 			'<span class="ec-tc-tabs"><i></i><i class="ec-tc-cur"></i></span>' +
-			'<span class="ec-tc-panel"><i></i><i></i><i class="ec-tc-link"></i></span>' +
+			'<span class="ec-tc-panel"><b class="ec-tc-type">Aa</b><i></i><i class="ec-tc-link"></i></span>' +
 			'<span class="ec-tc-map"><svg viewBox="0 0 70 34" preserveAspectRatio="none"><path d="M6 26 L26 12 L48 20 L64 7"/>' +
 			'<circle cx="26" cy="12" r="2.6"/><circle cx="48" cy="20" r="2.6"/></svg><span class="ec-tc-note"></span></span>';
 		return c;

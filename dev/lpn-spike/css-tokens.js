@@ -33,7 +33,14 @@ function expandTokens(css) {
 		if (!/var\(|color-mix\(/.test(v)) { tokens[name] = v; return; }
 		try { tokens[name] = spell(get(name)); } catch (e) { tokens[name] = v; }
 	});
-	return css.replace(/var\(\s*--(ec-[\w-]+)\s*\)/g, (m, name) => (name in tokens ? tokens[name] : m));
+	// A token that is not a colour (a radius tier, a frame, a shadow list) may itself name tokens, so the
+	// substitution runs until nothing more changes (Task 811 round 2: --ec-radius-s is calc(3px * scale)).
+	let out = css, prev = '';
+	for (let i = 0; i < 6 && out !== prev; i++) {
+		prev = out;
+		out = out.replace(/var\(\s*--(ec-[\w-]+)\s*\)/g, (m, name) => (name in tokens ? tokens[name] : m));
+	}
+	return out;
 }
 
 function readCss(file) { return expandTokens(fs.readFileSync(file, 'utf8')); }

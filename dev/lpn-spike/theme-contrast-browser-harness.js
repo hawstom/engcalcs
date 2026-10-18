@@ -135,7 +135,7 @@ async function main() {
 	const tokenNames = Array.from(new Set([].concat(...Object.keys(check.THEMES).map((t) => check.pairs(t).map((p) => [p[0], p[1]]))).reduce((a, p) => a.concat(p), [])));
 	const summary = [];
 	const allTokens = Object.keys(check.themeDecls('light', fs.readFileSync(path.join(REPO, 'css', 'engcalcs.css'), 'utf8'))).map((n) => n)
-		.filter((n) => !/radius|border-w|bevel/.test(n));
+		.filter((n) => { try { check.themeTokens('light')(n); return true; } catch (e) { return false; } });   // colours only: not a radius, a face or a shadow list
 	let lightRef = null, lightLegend = null;
 
 	async function measure(s, choice, theme) {
@@ -217,7 +217,7 @@ async function main() {
 			await a.settle(200);
 			lightRef = await a.page.evaluate(resolveTokens, allTokens);
 			lightLegend = await a.page.evaluate(() => { const l = document.getElementById('lpn_labels_legend'); return l ? getComputedStyle(l).backgroundColor : null; });
-			for (const t of ['light', 'dark', 'hc', 'amber', 'green', 'platinum']) { await measure(a, t, t); }
+			for (const t of ['light', 'dark', 'hc', 'rounded', 'platinum', 'newspaper', 'amber', 'green', 'arcade', 'space']) { await measure(a, t, t); }
 			ok('no page errors (light device)', !a.errors.length, (a.errors[0] || '').slice(0, 200));
 		} finally { await a.close(); }
 		const b = await Session.open(browser, 'dark-os', { colorScheme: 'dark' });

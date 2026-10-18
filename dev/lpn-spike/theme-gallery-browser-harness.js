@@ -58,9 +58,10 @@ function ok(label, cond, detail) {
 const SHOTS = process.env.EC_THEME_SHOTS || '';
 if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: true }); }
 
-const ORDER = ['system', 'light', 'dark', 'hc', 'amber', 'green', 'platinum'];
+const ORDER = ['system', 'light', 'dark', 'hc', 'rounded', 'platinum', 'newspaper', 'amber', 'green', 'arcade', 'space'];
 const KEYS = { system: 'lpn_theme_system', light: 'lpn_theme_light', dark: 'lpn_theme_dark', hc: 'lpn_theme_hc',
-	amber: 'lpn_theme_amber', green: 'lpn_theme_green', platinum: 'lpn_theme_platinum' };
+	amber: 'lpn_theme_amber', green: 'lpn_theme_green', platinum: 'lpn_theme_platinum', rounded: 'lpn_theme_rounded',
+	newspaper: 'lpn_theme_newspaper', arcade: 'lpn_theme_arcade', space: 'lpn_theme_space' };
 
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
@@ -123,7 +124,7 @@ async function main() {
 				t: b.getAttribute('data-theme-name'), name: b.querySelector('.lpn-theme-choice-name').textContent, pressed: b.getAttribute('aria-pressed'),
 				mini: b.querySelector('.ec-theme-card').getAttribute('data-theme'), paper: getComputedStyle(b.querySelector('.ec-theme-card')).backgroundColor
 			})));
-			ok('1. seven cards in order: ' + ORDER.join(', '), JSON.stringify(cards.map((c) => c.t)) === JSON.stringify(ORDER), JSON.stringify(cards.map((c) => c.t)));
+			ok('1. ' + ORDER.length + ' cards in order: ' + ORDER.join(', '), JSON.stringify(cards.map((c) => c.t)) === JSON.stringify(ORDER), JSON.stringify(cards.map((c) => c.t)));
 			const names = []; for (const t of ORDER) { names.push(await a.lang(KEYS[t])); }
 			ok('1. each card is named from the language file', JSON.stringify(cards.map((c) => c.name)) === JSON.stringify(names), JSON.stringify(cards.map((c) => c.name)));
 			ok('1. System is the pressed card', cards.filter((c) => c.pressed === 'true').map((c) => c.t).join() === 'system');
@@ -132,7 +133,7 @@ async function main() {
 			ok('2. each card is painted in its own theme: Amber, Green, Dark and High contrast keep their own paper on a light page',
 				paper.amber === 'rgb(20, 12, 0)' && paper.green === 'rgb(3, 16, 3)' && paper.dark === 'rgb(30, 31, 34)' && paper.hc === 'rgb(255, 255, 255)' && paper.light === 'rgb(255, 255, 255)', JSON.stringify(paper));
 			ok('2. System\'s card shows what System is here (light), High contrast its light palette',
-				cards[0].mini === 'light' && cards[3].mini === 'hc', JSON.stringify(cards.map((c) => c.mini)));
+				cards[0].mini === 'light' && cards[ORDER.indexOf('hc')].mini === 'hc', JSON.stringify(cards.map((c) => c.mini)));
 			await shot(a, 'gallery-1-open.png');
 
 			// 3. pointing previews
@@ -169,7 +170,7 @@ async function main() {
 			const below = ORDER[Math.min(ORDER.length - 1, 2 + cols)];
 			ok('4. ArrowDown moves one row down (' + cols + ' to a row): ' + below, st.focus === below && st.theme === (below === 'hc' ? 'hc' : below), JSON.stringify(st));
 			await a.page.keyboard.press('End'); await a.settle(150);
-			ok('4. End: Platinum', (await state(a)).focus === 'platinum');
+			ok('4. End: Space', (await state(a)).focus === 'space');
 			await a.page.keyboard.press('Home'); await a.settle(150);
 			ok('4. Home: System', (await state(a)).focus === 'system');
 			await a.page.keyboard.press('ArrowRight'); await a.page.keyboard.press('ArrowRight'); await a.page.keyboard.press('ArrowRight'); await a.settle(150);
@@ -186,9 +187,9 @@ async function main() {
 			await a.page.keyboard.press('Enter'); await a.settle(400);
 			st = await state(a);
 			ok('5. Enter on the button opens the gallery again, focus on the kept card', st.open && st.focus === 'system', JSON.stringify(st));
-			for (let i = 0; i < 4; i++) { await a.page.keyboard.press('ArrowRight'); }
+			for (let i = 0; i < ORDER.indexOf('amber'); i++) { await a.page.keyboard.press('ArrowRight'); }
 			await a.settle(150);
-			ok('5. four to the right: Amber, previewed', (await state(a)).theme === 'amber');
+			ok('5. ' + ORDER.indexOf('amber') + ' to the right: Amber, previewed', (await state(a)).theme === 'amber');
 			await a.page.keyboard.press('Enter'); await a.settle(300);
 			st = await state(a);
 			ok('5. Enter keeps Amber: stored, painted, gallery closed', st.stored === 'amber' && st.theme === 'amber' && !st.open, JSON.stringify(st));
@@ -283,7 +284,7 @@ async function main() {
 			await openSettingsRow(d);
 			await openGallery(d);
 			const minis = await d.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_theme_gallery .ec-theme-card')).map((c) => c.getAttribute('data-theme')));
-			ok('9. System\'s card is Dark and High contrast\'s card is its dark palette', minis[0] === 'dark' && minis[3] === 'hc-dark', JSON.stringify(minis));
+			ok('9. System\'s card is Dark and High contrast\'s card is its dark palette', minis[0] === 'dark' && minis[ORDER.indexOf('hc')] === 'hc-dark', JSON.stringify(minis));
 			await d.page.click(card('hc'));
 			await d.settle(300);
 			st = await state(d);

@@ -3180,11 +3180,17 @@ $ec_lang['lpn_theme_dark']='Dark';
 // More themes (dev/themes-plan.md). A name, shown under a small picture of the page in that
 // theme. High contrast is black on white, or white on black when the device is set to dark. Amber and
 // Green are the one-color screens of early computer terminals. Platinum is the gray desktop of the late
-// 1990s.
+// 1990s. Rounded is the Light colors with soft, rounded shapes. Newspaper is black type on newsprint, set
+// like a printed newspaper. Arcade is a black screen with blue maze walls, like a 1980s arcade game. Space
+// is a night sky with stars and gold lettering, like a science-fiction film.
 $ec_lang['lpn_theme_hc']='High contrast';
 $ec_lang['lpn_theme_amber']='Amber';
 $ec_lang['lpn_theme_green']='Green';
 $ec_lang['lpn_theme_platinum']='Platinum';
+$ec_lang['lpn_theme_rounded']='Rounded';
+$ec_lang['lpn_theme_newspaper']='Newspaper';
+$ec_lang['lpn_theme_arcade']='Arcade';
+$ec_lang['lpn_theme_space']='Space';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a
