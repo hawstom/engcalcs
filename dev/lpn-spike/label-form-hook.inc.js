@@ -46,8 +46,8 @@
 					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N1mine: [], N3: [], N3node: 0, astray: [], sig: [] },
 				items = [], circles = [], texts = [];
 			// Seven figures: a content pass re-measures, and the last bits of a width move.
-			function q(x) { var n = parseFloat(x); return isFinite(n) ? n.toPrecision(7) : String(x); }
-			function geo(e, names) { return names.map(function (a) { return q(e.getAttribute(a)); }).join(','); }
+			function q(x) { var n = parseFloat(x); return isFinite(n) ? (n * s).toFixed(2) : String(x); }
+			function geo(e, names) { return names.map(function (a) { return q(e.getAttribute(a)); }).join(',') + ' ' + (e.getAttribute('text-anchor') || ''); }
 			function inView(p) { var x = p.x * s + state.tx, y = p.y * s + state.ty; return x >= 0 && x <= W && y >= 0 && y <= H; }
 			function vis(t) { return !!t && !!t.textContent && t.checkVisibility({ visibilityProperty: true, opacityProperty: true }); }
 			function leaderOf(h) {
@@ -127,7 +127,9 @@
 				g = leaderOf(ne);
 				if (g) {
 					circles.forEach(function (c) {
-						if (c.id === n.id || ptSeg(c.x, c.y, g) >= c.r - tol) { return; }
+						// A symbol over the leader's own start is the placement's own exemption (two nodes
+						// drawn on one another, leaderThroughSymbol()): not a crossing.
+						if (c.id === n.id || ptSeg(c.x, c.y, g) >= c.r - tol || Math.hypot(c.x - g.ax, c.y - g.ay) < c.r) { return; }
 						if (ne.inline) { v.N3.push('N' + n.id + ' leader through ' + c.id); } else { v.N3node++; }
 					});
 				}
@@ -151,6 +153,7 @@
 				if (g) {
 					v.levelLeader++;
 					circles.forEach(function (c) { if (ptSeg(c.x, c.y, g) < c.r - tol) { v.N3.push('L' + l.id + ' leader through ' + c.id); } });
+					// a pipe label's leader starts on its pipe, never inside an end node's symbol
 					return;
 				}
 				// No leader: its own pipe must be the nearest, by `amb`.
@@ -187,3 +190,5 @@
 		perfDebugSums = {}; var t0 = performance.now(); refreshLabelText(); var o = perfDebugSums || {}; o.total = performance.now() - t0; perfDebugSums = null;
 		var r = {}; Object.keys(o).forEach(function (k) { r[k.trim()] = Math.round(o[k]); }); return r;
 	};
+	// eslint-disable-next-line no-eval
+	window.__lpnForm.ev = function (src) { return eval(src); };

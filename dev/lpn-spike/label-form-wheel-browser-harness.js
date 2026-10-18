@@ -240,6 +240,8 @@ async function main() {
 			const sum = (vs, k) => vs.reduce((t, v) => t + v[k], 0);
 			ok(sc.name + ': the same view twice is the same drawing (a content pass where it stands)', on.again.sig === A.sig, firstDiff(A.sig, on.again.sig));
 			ok(sc.name + ': ...and out two notches and back in two', on.back.sig === A.sig, firstDiff(A.sig, on.back.sig));
+			console.log(`        reference, same view twice: content pass ${off.again.sig === B.sig ? 'same' : 'DIFFERS: ' + firstDiff(B.sig, off.again.sig)}; ` +
+				`out two and back ${off.back.sig === B.sig ? 'same' : 'DIFFERS: ' + firstDiff(B.sig, off.back.sig)}`);
 			ok(sc.name + ': more values shown than the reference over its views', sum(on.views, 'values') > sum(off.views, 'values'),
 				`${sum(off.views, 'values')} -> ${sum(on.views, 'values')}`);
 			if (sc.key === 'net3') {
@@ -260,7 +262,6 @@ async function main() {
 			});
 			console.log(`        content pass at the last view: shipped ${on.ms} ms, reference ${off.ms} ms` +
 				extra.map((e) => `, ${e.ref} ${e.r.ms} ms`).join(''));
-			void B;
 		}
 	} finally {
 		await browser.close();

@@ -1540,6 +1540,12 @@ var EngCalcs = EngCalcs || {};
 			end = { x: anchor.x + le.levelAt.ex, y: anchor.y + le.levelAt.ey };
 		}
 		var org = dataLabelOrigin(isPrimary ? le : part, anchor, end, (lone && l.lx !== undefined) ? l : null, isPrimary && labelInHand(le));
+		// **A LEVEL STACK HUNG LEFT IS FLUSH AGAINST ITS LEADER** (Task 812): its rows end at the
+		// leader's end, as the placement modelled them, rather than starting at the box's left edge.
+		if (lone && le.levelBeside && le.levelForm && le.levelForm.stacked && le.side === 'left') {
+			part.text.setAttribute('text-anchor', 'end');
+			org = { x: end.x, y: org.y };
+		}
 		repositionMultilineText(part.text, org.x, org.y);
 		if (isPrimary) { updateDataLeader(le, anchor, end); }
 	}
@@ -1558,8 +1564,9 @@ var EngCalcs = EngCalcs || {};
 		// still in conflict, no clear station on its pipe (placeStationedLabels()), standing on
 		// ground a node label has just taken (yieldStationedLabels()),
 		// or the losing half of a crossing nothing could repair (shedCrossingLabels(), Task 539).
-		// A label the pass set LEVEL BESIDE its pipe (placeLevelPipeLabels()) is drawn whatever hid it along the pipe.
-		var hideAll = le.levelBeside ? !!le.hiddenCrossed
+		// A label the pass set LEVEL BESIDE its pipe (placeLevelPipeLabels()) is drawn whatever hid it
+		// along the pipe, a crossing lost there included: level, it was placed clear of every leader.
+		var hideAll = le.levelBeside ? false
 			: (le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenBlocked || !!le.hiddenYielded || !!le.hiddenCrossed);
 		setLabelAssemblyHidden(le, hideAll);
 		syncLevelGlyphs(l, le);
@@ -3082,9 +3089,9 @@ var EngCalcs = EngCalcs || {};
 			var n = q.stacked ? q.lines.length : 1, w = q.m.wPx / s, h = dataLabelBoxHeight(n),
 				rows = q.stacked && q.m.rowWPx && q.m.rowWPx.length > 1 ? q.m.rowWPx.map(function (v) { return v / s; }) : null,
 				area = rows ? rows.reduce(function (a, v) { return a + v; }, 0) * (h / n) : w * h;
-			// The whole block is reserved, not the staircase: a stack hung left of its point is drawn
-			// with its rows flush LEFT (dataLabelOrigin()), which the staircase model does not draw.
-			out.push({ w: w, h: h, lines: null, values: q.lines.length, area: area,
+			// The staircase, as drawn: a stack hung left of its point is drawn with its rows flush
+			// against the point (layoutLinkLabelAt()), as Collide.labelLineBoxes() models it.
+			out.push({ w: w, h: h, lines: rows, values: q.lines.length, area: area,
 				form: { lines: q.lines, stacked: q.stacked, key: levelFormKey(q.lines, q.stacked), wPx: q.m.wPx } });
 		});
 		out.sort(function (a, b) { return (b.values - a.values) || (a.area - b.area) || ((a.form.stacked ? 1 : 0) - (b.form.stacked ? 1 : 0)); });
@@ -3096,13 +3103,15 @@ var EngCalcs = EngCalcs || {};
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id];
 			if (le) { le.levelForm = null; le.levelAt = null; }
-			if (!le || le.empty || le.hiddenCrossed || !linkLabelAligned(l) || linkLabelStations(l).length !== 1) { return; }
+			if (!le || le.empty || !linkLabelAligned(l) || linkLabelStations(l).length !== 1) { return; }
 			// **A LABEL TOO SHORT FOR ITS SEGMENT TRIES THE LEVEL SPOT TOO** (Tom, 2026-10-17: short
 			// pipes should also try the level spot). Along the pipe it still hides, as his 2026-08-14
 			// call has it (*"If a line is too short, its label must disappear"*): that is about lying
 			// along a line with no room, and a level label does not lie along it. It arrives in the
 			// form the shed left it, its last value, and hides as before if no side is clean.
-			if (!(linkLabelTooShort(l, le) || le.hiddenCrowded || le.hiddenBlocked || le.hiddenYielded)) { return; }
+			// And one that lost a crossing along its pipe (shedCrossingLabels()): level, it is placed
+			// off every leader, so it crosses nothing (Tom's Net1 at 14 notches out, 2026-10-18).
+			if (!(linkLabelTooShort(l, le) || le.hiddenCrowded || le.hiddenBlocked || le.hiddenYielded || le.hiddenCrossed)) { return; }
 			var mid = linkLabelMid(l), pts = linkPointList(l), sides = [];
 			// The sides round one point of the pipe: its corners, then rings out to `reach` on either
 			// side of the pipe, nearest first. `at` marks a point other than the label's own.
