@@ -55749,6 +55749,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// stored as n.lx/n.ly, world units from the node center, same convention as a Text
 				// label's lb.x/lb.y offset from its anchor.
 				var nn = nodeById(t.dataset.nodelbl), posN = nodeLabelPos(nn), w4 = screenToWorld(e.clientX, e.clientY);
+				// **A LABEL PICKED UP IS A STACK** (Task 734): its one-line form is the placement's
+				// answer to a crowded view, and a label the user places is the user's, as a dragged
+				// pipe label stacks (composeRows()). Restacked before the grab point is measured.
+				if (nodeEls[t.dataset.nodelbl] && nodeEls[t.dataset.nodelbl].inline) {
+					writeNodeLabelGlyphs(nodeEls[t.dataset.nodelbl], nn, nodeEls[t.dataset.nodelbl].lines, effectiveFontSize() + 'px', false);
+					measureLabelWidths(nodeEls[t.dataset.nodelbl]);
+					layoutNodeLabel(t.dataset.nodelbl);
+				}
 				var neN = nodeEls[t.dataset.nodelbl],
 					gxN = neN ? w4.x - (neN.side === 'left' ? posN.x - labelBoxWidth(neN) : posN.x) : null;
 				drag = { type: 'nodelbl', id: t.dataset.nodelbl, offX: posN.x - w4.x, offY: posN.y - w4.y, gx: gxN };
@@ -81910,7 +81918,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			anchor: kind === 'node' ? nodeAt(x) : linkLabelMid(x),
 			leader: (L && L.style.display !== 'none') ? { x1: +L.getAttribute('x1'), y1: +L.getAttribute('y1'),
 				x2: +L.getAttribute('x2'), y2: +L.getAttribute('y2') } : null,
-			hidden: !!(h.text && h.text.style.visibility === 'hidden'), side: h.side, lside: x.lside, w: labelBoxWidth(h) };
+			hidden: !!(h.text && h.text.style.visibility === 'hidden'), side: h.side, lside: x.lside, w: labelBoxWidth(h),
+			inline: !!h.inline };
 	};
 	// The Full report's Type column harness opens the box through this, not through the menu.
 	EngCalcs.lpnOpenFullReportBox = function () { return openFullReportBox(); };

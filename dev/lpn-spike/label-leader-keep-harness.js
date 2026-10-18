@@ -325,9 +325,14 @@ async function sectionSide(a, c, mid) {
 	const labs = (await visibleLabels(page, 'data-nodelbl')).filter((l) =>
 		l.x > c.x + 250 && l.x + l.w < c.x + c.w - 250 && l.y > c.y + 200 && l.y + l.h < c.y + c.h - 200);
 	let S = null, sp = null;
+	// Nearest the middle first: the section zooms in ten notches about the middle and must still
+	// find the label on screen.
+	labs.sort((u, v) => Math.hypot(u.x + u.w / 2 - mid.x, u.y + u.h / 2 - mid.y) - Math.hypot(v.x + v.w / 2 - mid.x, v.y + v.h / 2 - mid.y));
 	for (const l of labs) {
 		const p = await probe(page, 'node', l.id);
-		if (p && p.lx === undefined && p.side === 'right' && p.end.x > p.anchor.x) { S = l; sp = p; break; }
+		// A stacked one: a one-line label (Task 734) restacks when it is picked up, which changes the
+		// width this section's distances are measured in.
+		if (p && p.lx === undefined && !p.inline && p.side === 'right' && p.end.x > p.anchor.x) { S = l; sp = p; break; }
 	}
 	ok('an automatic label hanging right of its leader end, to move', !!S);
 	if (!S) { return; }
