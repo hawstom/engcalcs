@@ -59821,13 +59821,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			mapBody = byId('lpn_set_map_fields'), unitsBody = byId('lpn_set_units_fields'),
 			compBody = byId('lpn_set_hydraulics_fields'), qualBody = byId('lpn_set_quality_fields'),
 			energyBody = byId('lpn_set_energy_fields'),
-			pageBody = byId('lpn_set_page_fields');
-		if (!idBody || !defBody || !customBody || !mapBody || !unitsBody || !compBody || !qualBody || !energyBody || !pageBody) { return; }
+			pageBody = byId('lpn_set_page_fields'),
+			posBody = byId('lpn_set_pos_fields'), posBody2 = byId('lpn_set_pos_fields2'),
+			mapBody2 = byId('lpn_set_map_fields2');
+		if (!idBody || !defBody || !customBody || !mapBody || !unitsBody || !compBody || !qualBody || !energyBody || !pageBody || !posBody || !posBody2 || !mapBody2) { return; }
 		// **EVERY HOST THIS FUNCTION FILLS MUST ALSO BE CLEARED BY IT**, and a host left out of this
 		// line does not fail: it ACCUMULATES, so the box grows another copy of its rows on every
 		// rebuild, and rebuilding is what a settings change does. Measured on the water-quality host
 		// the day it was added -- seven Track rows after four switches.
-		[idBody, defBody, customBody, mapBody, unitsBody, compBody, qualBody, energyBody, pageBody].forEach(clearFields);
+		[idBody, defBody, customBody, mapBody, unitsBody, compBody, qualBody, energyBody, pageBody, posBody, posBody2, mapBody2].forEach(clearFields);
 		// **A ROW IS A FLEX LINE, NOT A LABEL FOLLOWED BY A <br>.** Tom, 2026-08-18: "It can be
 		// longer and narrower ... A few things can wrap. Inputs can be shorter." A label that simply
 		// precedes its control cannot wrap without the control wrapping with it and cannot line its
@@ -60379,6 +60381,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// "Display" rather than Tom's first "Map sizes": the section also holds symbol and backdrop
 		// opacity, which are not sizes, and stranding those two in a group of their own would be
 		// more clicking than it saves.
+		// The small headings under Map (Tom, 2026-10-18), which the index leaves out. Fade's two rows
+		// stand under Thematic, and Positions is a group of its own in Looped-Network.php.
+		// Each is a part, so the search filter still walks it row by row and hides the heading.
+		function minorGroup(target, text) {
+			var part = document.createElement('div'), head = document.createElement('div');
+			part.className = 'lpn-set-part';
+			head.className = 'lpn-set-group lpn-set-minor';
+			head.textContent = text;
+			part.appendChild(head);
+			target.appendChild(part);
+			return part;
+		}
+		var sizeBody = minorGroup(mapBody, pc.lpn_settings_grp_size || 'Size'),
+			angleBody = minorGroup(mapBody, pc.lpn_settings_grp_angle || 'Angle'),
+			zoomBody = minorGroup(mapBody, pc.lpn_settings_grp_zoom || 'Zoom'),
+			showBody = minorGroup(mapBody2, pc.lpn_settings_grp_show || 'Show'),
+			thematicBody = minorGroup(mapBody2, pc.lpn_settings_grp_thematic || 'Thematic'),
+			fadeBody = thematicBody;
 		var sizeInput = document.createElement('input');
 		sizeInput.type = 'number'; sizeInput.className = 'ec-spin';
 		sizeInput.step = '1'; sizeInput.min = '1'; sizeInput.value = settings.textSize;
@@ -60386,7 +60406,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (+sizeInput.value > 0) { settings.textSize = +sizeInput.value; refreshFontSizes(); saveToStorage(); }
 			else { sizeInput.value = settings.textSize; }
 		});
-		setboxTag(row(mapBody, pc.lpn_settings_text_size || 'Text size (pixels)', sizeInput), [['settings', 'textSize']]);
+		setboxTag(row(sizeBody, pc.lpn_settings_text_size || 'Text size (pixels)', sizeInput), [['settings', 'textSize']]);
 		// THREE INDEPENDENT PIXEL SIZES, and no units selector anywhere (Task 331). The "Text size
 		// units" map/screen dropdown is gone with map-unit sizing itself, and the old "Symbol size
 		// (relative to text)" multiplier is gone with the coupling that forced it -- a symbol size
@@ -60399,7 +60419,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (+symInput.value > 0) { settings.symbolSize = +symInput.value; refreshSymbolSizes(); relayoutLabels(); saveToStorage(); }
 			else { symInput.value = settings.symbolSize; }
 		});
-		setboxTag(row(mapBody, pc.lpn_settings_symbol_size || 'Symbol size (pixels)', symInput), [['settings', 'symbolSize']]);
+		setboxTag(row(sizeBody, pc.lpn_settings_symbol_size || 'Symbol size (pixels)', symInput), [['settings', 'symbolSize']]);
 		var lwInput = document.createElement('input');
 		lwInput.type = 'number'; lwInput.className = 'ec-spin';
 		lwInput.step = '1'; lwInput.min = '1'; lwInput.value = settings.linkWidth;
@@ -60413,7 +60433,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (+lwInput.value >= 1) { settings.linkWidth = +lwInput.value; refreshSymbolSizes(); saveToStorage(); }
 			else { lwInput.value = settings.linkWidth; }
 		});
-		setboxTag(row(mapBody, pc.lpn_settings_link_width || 'Link line width (pixels)', lwInput), [['settings', 'linkWidth']]);
+		setboxTag(row(sizeBody, pc.lpn_settings_link_width || 'Link line width (pixels)', lwInput), [['settings', 'linkWidth']]);
 		// **FLOW-DIRECTION ARROWS** (Tom, 2026-09-01). Built exactly like maskLabels and
 		// alignPipeLabels two rows below -- a bare checkbox through row(), reading `settings`,
 		// writing `settings`, then one apply function and saveToStorage(). It sits with the link
@@ -60424,7 +60444,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			settings.showArrows = arrowInput.checked;
 			applyShowArrows(); saveToStorage();
 		});
-		setboxTag(row(mapBody, pc.lpn_settings_show_arrows || 'Flow direction arrows', arrowInput,
+		setboxTag(row(showBody, pc.lpn_settings_show_arrows || 'Flow direction arrows', arrowInput,
 			pc.lpn_settings_show_arrows_tip), [['settings', 'showArrows']]);
 		// Task 329, and it ships OFF: aligned-vs-horizontal is a visual judgement, and turning it on
 		// by default would be making that judgement for the user rather than offering it to them.
@@ -60434,7 +60454,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			settings.alignPipeLabels = alignInput.checked;
 			relayoutLabels(); saveToStorage();
 		});
-		setboxTag(row(mapBody, pc.lpn_settings_align_labels || 'Draw link labels along the link line', alignInput), [['settings', 'alignPipeLabels']]);
+		setboxTag(row(posBody2, pc.lpn_settings_align_labels || 'Draw link labels along the link line', alignInput), [['settings', 'alignPipeLabels']]);
 		// Task 351, and it belongs directly under the checkbox it only means anything for. A number
 		// rather than a checkbox because the right value depends on the drawing: a subdivision of
 		// north-south mains wants the doorway well clear of vertical, and a diagonal transmission
@@ -60450,7 +60470,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			biasInput.value = settings.labelFlipLeftOfVertical;
 			relayoutLabels(); saveToStorage();
 		});
-		setboxTag(row(mapBody, pc.lpn_settings_readability_bias || 'Label flip angle adjustment (degrees)', biasInput,
+		setboxTag(row(angleBody, pc.lpn_settings_readability_bias || 'Label flip angle adjustment (degrees)', biasInput,
 			pc.lpn_settings_readability_bias_tip), [['settings', 'labelFlipLeftOfVertical']]);
 		// Task 330, and it ships ON because that is what the page has always drawn -- a label over a
 		// backdrop image is unreadable without it, and an upgrade must not restyle anyone's drawing.
@@ -60460,7 +60480,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			settings.maskLabels = maskInput.checked;
 			applyMaskLabels(); saveToStorage();
 		});
-		setboxTag(row(mapBody, pc.lpn_settings_mask_labels || 'Solid background behind labels', maskInput), [['settings', 'maskLabels']]);
+		setboxTag(row(showBody, pc.lpn_settings_mask_labels || 'Solid background behind labels', maskInput), [['settings', 'maskLabels']]);
 		var haloInput = document.createElement('input');
 		haloInput.type = 'number'; haloInput.className = 'ec-spin';
 		haloInput.step = '5'; haloInput.min = '0'; haloInput.max = '100'; haloInput.value = textHaloPct();
@@ -60469,7 +60489,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (haloInput.value !== '' && isFinite(v) && v >= 0 && v <= 100) { settings.textHalo = v; applyTextHalo(); saveToStorage(); }
 			else { haloInput.value = textHaloPct(); }
 		});
-		setboxTag(row(mapBody, pc.lpn_settings_text_halo || 'Text halo width (percent of text size)', haloInput,
+		setboxTag(row(sizeBody, pc.lpn_settings_text_halo || 'Text halo width (percent of text size)', haloInput,
 			pc.lpn_settings_text_halo_tip), [['settings', 'textHalo']]);
 		// **ONE CONTROL, NOT A CHECKBOX AND A PICKER** (ROADMAP Task 408). Tom asked for "a toggle
 		// or picker for the increment"; Off is one of the increments, exactly as it is one of the
@@ -60494,7 +60514,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			settings.leaderSnapDeg = +snapSelect.value;
 			saveToStorage();
 		});
-		setboxTag(row(mapBody, pc.lpn_settings_leader_snap || 'Snap leader lines to set angles', snapSelect,
+		setboxTag(row(angleBody, pc.lpn_settings_leader_snap || 'Snap leader lines to set angles', snapSelect,
 			null), [['settings', 'leaderSnapDeg']]);
 		// ---- THE LABELING THRESHOLD (Tasks 669 and 705, restored 2026-09-22) ----
 		// It sat at this point until 2026-08-19 and is back on Tom's asking, in his words for the
@@ -60525,7 +60545,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			get: function () { return settings.labelMaxWidth; },
 			set: function (v) { settings.labelMaxWidth = v; labelThresholdChanged(); saveToStorage(); }
 		});
-		setboxTag(row(mapBody, pc.lpn_settings_label_max_width || 'Show labels when zoomed to this map width or less',
+		setboxTag(row(zoomBody, pc.lpn_settings_label_max_width || 'Show labels when zoomed to this map width or less',
 			lmw.wrap, pc.lpn_settings_label_max_width_tip), [['settings', 'labelMaxWidth']]);
 		// ---- THE MAXIMUM-SYMBOL-SIZE RULE (Task 705, his own wording, 2026-09-22) ----
 		// "Prevent nodes from scaling larger than [0.5] times the length of the [20] percentile
@@ -60577,7 +60597,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				capWrap.appendChild(capNote);
 			}
 		}
-		setboxTag(row(mapBody, capLabel || '\u00a0', capWrap, pc.lpn_settings_symbol_cap_tip), [['settings', 'symbolCapMultiple'], ['settings', 'symbolCapPercentile']]);
+		setboxTag(row(zoomBody, capLabel || '\u00a0', capWrap, pc.lpn_settings_symbol_cap_tip), [['settings', 'symbolCapMultiple'], ['settings', 'symbolCapPercentile']]);
 		var opacityInput = document.createElement('input');
 		opacityInput.type = 'number'; opacityInput.step = '0.05'; opacityInput.min = '0.05'; opacityInput.max = '1';
 		opacityInput.value = settings.symbolOpacity;
@@ -60586,7 +60606,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (v > 0 && v <= 1) { settings.symbolOpacity = v; refreshSymbolSizes(); saveToStorage(); }
 			else { opacityInput.value = settings.symbolOpacity; }
 		});
-		setboxTag(row(mapBody, pc.lpn_settings_symbol_opacity || 'Symbol opacity (0 to 1)', opacityInput), [['settings', 'symbolOpacity']]);
+		setboxTag(row(fadeBody, pc.lpn_settings_symbol_opacity || 'Symbol opacity (0 to 1)', opacityInput), [['settings', 'symbolOpacity']]);
 		var backdropOpacityInput = document.createElement('input');
 		backdropOpacityInput.type = 'number'; backdropOpacityInput.step = '0.05';
 		backdropOpacityInput.min = '0.05'; backdropOpacityInput.max = '1';
@@ -60596,7 +60616,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (v > 0 && v <= 1) { settings.backdropOpacity = v; refreshSymbolSizes(); saveToStorage(); }
 			else { backdropOpacityInput.value = settings.backdropOpacity; }
 		});
-		setboxTag(row(mapBody, pc.lpn_settings_backdrop_opacity || 'Background image opacity (0 to 1)', backdropOpacityInput), [['settings', 'backdropOpacity']]);
+		setboxTag(row(fadeBody, pc.lpn_settings_backdrop_opacity || 'Background image opacity (0 to 1)', backdropOpacityInput), [['settings', 'backdropOpacity']]);
 		// Task 617: tone the street or satellite tiles down. Same save path as the opacity row above.
 		var basemapStyleSelect = document.createElement('select');
 		basemapStyleSelect.id = 'lpn_set_basemap_style';
@@ -60611,7 +60631,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		basemapStyleSelect.addEventListener('change', function () {
 			settings.basemapStyle = basemapStyleSelect.value; delete settings.basemapFilter; refreshBackdropOpacity(); saveToStorage();
 		});
-		setboxTag(row(mapBody, pc.lpn_settings_basemap_style || 'Basemap style', basemapStyleSelect), [['settings', 'basemapStyle']]);
+		setboxTag(row(thematicBody, pc.lpn_settings_basemap_style || 'Basemap style', basemapStyleSelect), [['settings', 'basemapStyle']]);
 		var legendSelect = document.createElement('select');
 		legendPositionOptions(pc).forEach(function (o) {
 			var opt = document.createElement('option');
@@ -60630,17 +60650,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// weakest case there is for promoting a row out of its section. The earlier "fiddled with
 		// often" justification for keeping it loose did not survive contact with the section it
 		// obviously belongs to.
-		setboxTag(row(mapBody, pc.lpn_settings_legend_position || 'Labels legend position', legendSelect), [['settings', 'legendPosition']]);
-		settingsViewRows(mapBody, row);
-		// The time series graphs on the map (Task 804): read-only here, a Presentation value whose
-		// override is marked and cleared like any other. Opened from an asset's right-click menu.
-		(function () {
-			var v = document.createElement('span');
-			v.id = 'lpn_set_bubbles_value';
-			v.className = 'lpn-set-note';
-			v.textContent = tsbSummaryText(tsbList());
-			setboxTag(row(mapBody, pc.lpn_settings_row_bubbles || 'Time series graphs on the map', v), [['bubbles']]);
-		}());
+		setboxTag(row(posBody, pc.lpn_settings_legend_position || 'Labels legend position', legendSelect), [['settings', 'legendPosition']]);
+		settingsViewRows(zoomBody, row);
 		// There is no "Saving to a file" section (Task 211): nothing is written to a file on a timer.
 		// Its 60-180 s range protected a coupling rather than the user -- one number doing three jobs
 		// (write interval, lock heartbeat, takeover threshold).
@@ -60703,6 +60714,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		ovrMarksInput.addEventListener('change', function () { setOverrideMarksPref(ovrMarksInput.checked); });
 		row(pageBody, pc.lpn_settings_override_marks || 'Show override markers on the map', ovrMarksInput,
 			pc.lpn_settings_override_marks_tip);
+		// The time series graphs on the map (Task 804): read-only here, a Presentation value whose
+		// override is marked and cleared like any other. Opened from an asset's right-click menu.
+		(function () {
+			var v = document.createElement('span');
+			v.id = 'lpn_set_bubbles_value';
+			v.className = 'lpn-set-note';
+			v.textContent = tsbSummaryText(tsbList());
+			setboxTag(row(showBody, pc.lpn_settings_row_bubbles || 'Time series graphs on the map', v), [['bubbles']]);
+		}());
 
 		// The theme (Task 714, Phase 3; dev/theming-plan.md): System, Light or Dark. The same section and
 		// the same reason as the two rows above: it is a fact about the screen and the eyes at it, so it
@@ -61168,7 +61188,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		helpTip(wipeBtn, pc.lpn_reset_all_tip);
 		wipeBtn.addEventListener('click', wipeEverything);
 		tail.appendChild(wipeBtn);
-		[idBody, defBody, mapBody, unitsBody, compBody, energyBody, pageBody].forEach(tipsIn);
+		[idBody, defBody, mapBody, unitsBody, compBody, energyBody, pageBody, posBody, posBody2, mapBody2].forEach(tipsIn);
 	}
 	// ================================================================================================
 	// THE SETTINGS BOX (ROADMAP Task 441, absorbing 284)
@@ -61213,7 +61233,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		time: 'lpn_set_sub_time',
 		// The Page sub-heading inside the Map section -- what the Hide these titles link opens at,
 		// so the switch it just threw is the first thing on screen.
-		page: 'lpn_set_sub_page'
+		page: 'lpn_set_sec_page'
 	};
 	// ---- WHERE THE BOX IS AND HOW BIG IT IS, REMEMBERED (Tom, 2026-08-19) -------------------
 	//
@@ -62063,6 +62083,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			[].forEach.call(sec.querySelectorAll('.lpn-set-sub'), function (sub) {
 				n++;
 				if (!sub.id) { sub.id = 'lpn_set_sub_auto' + n; }
+				// A silent sub-heading (Map, Page) is never shown, so it has no row in the index.
+				if (sub.classList.contains('lpn-set-sub-silent')) { return; }
 				link(sub, setboxHeadingText(sub), 'lpn-setbox-link-sub').setAttribute('data-sub', sub.id);
 			});
 		});

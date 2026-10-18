@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**23 still to read on master**, of 30 untranslated keys, of 3051 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**29 still to read on master**, of 36 untranslated keys, of 3055 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (30, 23 to read @@ NEEDS RULING)
+## lpn_  (36, 29 to read @@ NEEDS RULING)
 
 - **`lpn_diag_gpv_curve_order`**
   > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
@@ -118,6 +118,24 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_scnres_title`**
   > Results by asset
   @@ NEEDS RULING
+- **`lpn_settings_grp_angle`**
+  > Angle
+  @@ NEEDS RULING
+- **`lpn_settings_grp_positions`**
+  > Positions
+  @@ NEEDS RULING
+- **`lpn_settings_grp_show`**
+  > Show
+  @@ NEEDS RULING
+- **`lpn_settings_grp_size`**
+  > Size
+  @@ NEEDS RULING
+- **`lpn_settings_grp_thematic`**
+  > Thematic
+  @@ NEEDS RULING
+- **`lpn_settings_grp_zoom`**
+  > Zoom
+  @@ NEEDS RULING
 - **`lpn_survey_added_scenario`**
   > The nodes were added to {scenario}. In Base they are inactive.
   _Ruled 2026-10-18: I approved all._
@@ -126,7 +144,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**80 still to read**, of 84 new keys across 8 unmerged branch(es).
+**70 still to read**, of 74 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -137,11 +155,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### chore/batch-1018d (`b716a3956`) — adds no English strings
+
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
 ### feat/label-beside (`8676cd1be`) — already merged into feat/label-form; its strings are listed there
 
-### feat/label-form (`cbdf05df6`) — adds no English strings
+### feat/label-form (`d05fdb069`) — adds no English strings
 
 ### feat/msx (`8b083e9d7`) — 15 new, 15 to read @@ NEEDS RULING
 
@@ -190,8 +210,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_msx_too_big`**
   > {file} is too large to keep in browser storage, so it was not attached.
   @@ NEEDS RULING
-
-### feat/native-pbv-gpv (`9655a14fe`) — adds no English strings
 
 ### feat/sqlite-reader (`9470877a6`) — 49 new, 49 to read @@ NEEDS RULING
 
@@ -376,35 +394,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Space
   @@ NEEDS RULING
 
-### fix/settings-map-layout (`bc00393d2`) — 10 new, 10 to read @@ NEEDS RULING
-
-- **`lpn_settings_grp_angle`**
-  > Angle
-  @@ NEEDS RULING
-- **`lpn_settings_grp_fade`**
-  > Fade
-  @@ NEEDS RULING
-- **`lpn_settings_grp_positions`**
-  > Positions
-  @@ NEEDS RULING
-- **`lpn_settings_grp_resets`**
-  > Resets
-  @@ NEEDS RULING
-- **`lpn_settings_grp_show`**
-  > Show
-  @@ NEEDS RULING
-- **`lpn_settings_grp_size`**
-  > Size
-  @@ NEEDS RULING
-- **`lpn_settings_grp_thematic`**
-  > Thematic
-  @@ NEEDS RULING
-- **`lpn_settings_grp_zoom`**
-  > Zoom
-  @@ NEEDS RULING
-- **`lpn_settings_map_drawing`**
-  > Drawing
-  @@ NEEDS RULING
-- **`lpn_settings_map_options`**
-  > Options
-  @@ NEEDS RULING
+### fix/settings-map-layout (`b416d8393`) — already merged into chore/batch-1018d; its strings are listed there

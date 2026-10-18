@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-10-15",
-    "count": 3041,
+    "count": 3039,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -8227,7 +8227,6 @@
         "lpn_settings_legend_top_left": "04b38cf935ddb566539a9d8e1cdb43936bd668bb",
         "lpn_settings_legend_top_right": "c1cc898f9464ac2b95be31217a4bf923f156129e",
         "lpn_settings_link_width": "623cbffca875732a18c38f46d3e5d058ae858208",
-        "lpn_settings_map_display": "41def7a0febe741da87c5b79ce78ce27b83f3ae7",
         "lpn_settings_mask_labels": "801615742e22b285a1838d6184c72544ec28a96b",
         "lpn_settings_min_pressure": "92cef383c83182176bddd94c5b4e089724949843",
         "lpn_settings_min_pressure_tip": "a07f5384bdaf4149a3e6fcef4c6635e7e74a2738",
@@ -8295,7 +8294,6 @@
         "lpn_settings_search_tip": "b7353c978027e9a41a9545a936f2153f9945bb31",
         "lpn_settings_sec_assets": "20e338624cee29d0effead85b0dd0e70de783b4c",
         "lpn_settings_sec_calculation": "dc6751bd6532a841494c31d2cb271a6c23434bcc",
-        "lpn_settings_sec_map": "de1c309b44683a001edb720820f80e41779d3f21",
         "lpn_settings_sec_symbology": "5c55024681cce0bc8a2a396ae2263be43e8fb284",
         "lpn_settings_show_arrows": "506ea0310015efdaaa98a97baa00628f80c7560c",
         "lpn_settings_show_arrows_tip": "5bdb7e91752124951ec32c368e1a768a075182df",
@@ -17777,10 +17775,6 @@
             "words": 4,
             "ends_sentence": false
         },
-        "lpn_settings_map_display": {
-            "words": 1,
-            "ends_sentence": false
-        },
         "lpn_settings_mask_labels": {
             "words": 4,
             "ends_sentence": false
@@ -18047,10 +18041,6 @@
         },
         "lpn_settings_sec_calculation": {
             "words": 1,
-            "ends_sentence": false
-        },
-        "lpn_settings_sec_map": {
-            "words": 3,
             "ends_sentence": false
         },
         "lpn_settings_sec_symbology": {

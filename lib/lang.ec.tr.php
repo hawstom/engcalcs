@@ -3686,7 +3686,6 @@ $ec_lang['lpn_basemap_style_normal']='Normal';
 $ec_lang['lpn_basemap_style_muted']='Soluk';
 $ec_lang['lpn_basemap_style_faded']='Silik';
 $ec_lang['lpn_basemap_style_grayscale']='Gri tonlamalı';
-$ec_lang['lpn_settings_map_display']='Görünüm';
 // PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
 // to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
 // LPN_MAP_MIN in js/looped-network.js). Nothing renders these two keys now, so key_hygiene_check
@@ -3853,7 +3852,6 @@ $ec_lang['lpn_time_settings_open']='Zaman ayarları';
 // "Hydraulics" is EPANET's own name for the friction-method/accuracy/engine group, which also
 // leaves room for its siblings (Quality, Reactions) as they arrive.
 $ec_lang['lpn_settings_sec_symbology']='Görselleştirme';
-$ec_lang['lpn_settings_sec_map']='Harita ve sayfa';
 $ec_lang['lpn_settings_sec_assets']='Öğeler';
 $ec_lang['lpn_settings_sec_calculation']='Hesaplama';
 // ROADMAP Task 247. A customer label's CONTENT is the node rows above it (Tom: "Customer labels

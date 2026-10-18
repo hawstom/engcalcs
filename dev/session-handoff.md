@@ -105,7 +105,12 @@ af91792e5 (full/empty tank closes its link natively; Change type reservoir -> ta
 harness flake; fire-flow multiplier guard; label rules sync; port plan on master), e202f28f2 (label
 settings memo, identical drawing). consent_body's 26 translations owed (EC_CONSENT_VERSION stays 2).
 Merged on his word: feat/scenario-example, feat/scenario-results (Task 752 step 1), feat/native-pbv-gpv
-(EPANET 2.3.5 error 220 note still owed to Luke Butler). Open from
+(EPANET 2.3.5 error 220 note still owed to Luke Butler), fix/settings-map-layout (Map and Page
+sections; deleted keys lpn_settings_sec_map, lpn_settings_map_display).
+His calls 2026-10-18: feat/theme Dark map "Good", Platinum beside Desktop "Good", brief Ida on a
+Designer theme when there is budget, try water towers for Prairie's map menu buttons. feat/label-form:
+he likes it, slower pass approved, notes in dev/label-placement-goals.md §2.3 on the branch; no merge
+word yet. Budget is tight (NPS review urgencies): slow down. Open from
 scenario-results: flow shown as magnitude only; fire flow across scenarios still a gap.
 Closed: Tasks 815, 800, 721. Task 737 marked WAIT: sprint.
 
