@@ -2708,19 +2708,19 @@ var EngCalcs = EngCalcs || {};
 			cand.push({ id: id, n: n, ne: ne, spec: byId[id] });
 		}
 		function score(pl) {
-			var labels = 0, values = 0, taken = stationedYieldSet(pl, obs);
+			var labels = 0, nVal = 0, taken = stationedYieldSet(pl, obs);
 			pl.forEach(function (r) {
 				var ne = holder(r.id);
 				if (r.dropped || !ne) { return; }
-				labels++; values += (ne.lines || []).length;
+				labels++; nVal += (ne.lines || []).length;
 			});
 			Object.keys(taken).forEach(function (id) {
 				var le = linkEls[id];
-				labels--; values -= (le && le.lines ? le.lines.length : 0);
+				labels--; nVal -= (le && le.lines ? le.lines.length : 0);
 			});
-			return { labels: labels, values: values };
+			return { labels: labels, nVal: nVal };
 		}
-		function better(a, b) { return a.labels > b.labels || (a.labels === b.labels && a.values > b.values); }
+		function better(a, b) { return a.labels > b.labels || (a.labels === b.labels && a.nVal > b.nVal); }
 		function setForm(list, inline) {
 			if (!list.length) { return; }
 			list.forEach(function (c) { writeNodeLabelGlyphs(c.ne, c.n, c.ne.lines, fsNow, inline); });
@@ -3101,10 +3101,10 @@ var EngCalcs = EngCalcs || {};
 				area = rows ? rows.reduce(function (a, v) { return a + v; }, 0) * (h / n) : w * h;
 			// The staircase, as drawn: a stack hung left of its point is drawn with its rows flush
 			// against the point (layoutLinkLabelAt()), as Collide.labelLineBoxes() models it.
-			out.push({ w: w, h: h, lines: rows, values: q.lines.length, area: area,
+			out.push({ w: w, h: h, lines: rows, nVal: q.lines.length, area: area,
 				form: { lines: q.lines, stacked: q.stacked, key: levelFormKey(q.lines, q.stacked), wPx: q.m.wPx } });
 		});
-		out.sort(function (a, b) { return (b.values - a.values) || (a.area - b.area) || ((a.form.stacked ? 1 : 0) - (b.form.stacked ? 1 : 0)); });
+		out.sort(function (a, b) { return (b.nVal - a.nVal) || (a.area - b.area) || ((a.form.stacked ? 1 : 0) - (b.form.stacked ? 1 : 0)); });
 		return out;
 	}
 	function placeLevelPipeLabels(obs, nodeObs, nodeLabels, nodePlaced, ringLabels, ringPlaced, holders, fs) {
@@ -3156,7 +3156,7 @@ var EngCalcs = EngCalcs || {};
 			specs.push({ id: linkLabelKey(l.id), ownLink: linkLabelKey(l.id), anchor: mid, home: linkLabelBase(l),
 				dragged: false, sides: sides, len: Geom.polylineLength(linkPointList(l)),
 				w: labelBoxWidth(le), h: dataLabelBoxHeight(le.lineCount), yOff: -fs * 0.85,
-				lines: labelRowWidths(le), values: (le.lines || []).length, l: l });
+				lines: labelRowWidths(le), nVal: (le.lines || []).length, l: l });
 		});
 		// Every candidate's other forms, measured in one batch.
 		// **ONE BATCH FOR EVERY LABEL'S FORMS**: every hidden element written, then every one read,

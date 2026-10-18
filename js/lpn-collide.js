@@ -1359,7 +1359,7 @@ EngCalcs.lpnCollide = (function () {
 		waiting.forEach(function (lbl) { seat[lbl.id] = placeAny(lbl, startAt[lbl.id]); });
 		// **A STRICT LABEL'S OTHER FORMS: WHICHEVER SHOWS MORE** (Tom, 2026-10-18, asked which form a
 		// label should take when more than one fits: *"Whichever shows more"*). `lbl.forms` is a list
-		// of other shapes of the same label, { w, h, lines, values }, the caller's order being the
+		// of other shapes of the same label, { w, h, lines, nVal (how many values it shows) }, the caller's order being the
 		// order of preference among equals. Each is a fact about this label alone, so they come
 		// AFTER every label has its smallest form, and no label's growth costs another its place:
 		//   1. a label that found no side in its own form tries the others with the same number of
@@ -1400,17 +1400,17 @@ EngCalcs.lpnCollide = (function () {
 			sides.forEach(function (q) { reach = Math.max(reach, Math.hypot(q.x - a.x, q.y - a.y)); });
 			lbl.forms.forEach(function (q) { diag = Math.max(diag, Math.hypot(q.w, q.h)); });
 			reach += diag + pad;
-			now = r.form === undefined ? (lbl.values || 0) : (lbl.forms[r.form].values || 0);
+			now = r.form === undefined ? (lbl.nVal || 0) : (lbl.forms[r.form].nVal || 0);
 			index.near(a.x, a.y, reach, local);
 			try {
 				for (;;) {
 					want = Infinity;
-					lbl.forms.forEach(function (q) { if ((q.values || 0) > now && q.values < want) { want = q.values; } });
+					lbl.forms.forEach(function (q) { if ((q.nVal || 0) > now && q.nVal < want) { want = q.nVal; } });
 					if (want === Infinity) { return r; }
 					grew = false;
 					for (k = 0; k < lbl.forms.length && !grew; k++) {
 						f = lbl.forms[k];
-						if ((f.values || 0) !== want) { continue; }
+						if ((f.nVal || 0) !== want) { continue; }
 						g = Object.assign({}, lbl, f);
 						g.anchor = a;
 						for (i = 0; i < sides.length; i++) {
@@ -1435,10 +1435,10 @@ EngCalcs.lpnCollide = (function () {
 		}
 		if (strict) {
 			order.forEach(function (lbl) {
-				var r = seat[lbl.id], k, nr, own = lbl.values || 0;
+				var r = seat[lbl.id], k, nr, own = lbl.nVal || 0;
 				if (!r || !r.dropped || !lbl.forms) { return; }
 				for (k = 0; k < lbl.forms.length; k++) {
-					if ((lbl.forms[k].values || 0) !== own) { continue; }
+					if ((lbl.forms[k].nVal || 0) !== own) { continue; }
 					nr = tryForm(lbl, lbl.forms[k]);
 					if (nr) { nr.form = k; seat[lbl.id] = nr; return; }
 				}
