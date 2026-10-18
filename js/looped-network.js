@@ -907,7 +907,7 @@ var EngCalcs = EngCalcs || {};
 		return { id: nodeLabelKey(n.id), anchor: nodeAt(n), home: nodeLabelBase(n),
 			dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
 			w: labelBoxWidth(ne), h: dataLabelBoxHeight(ne.lineCount), yOff: -fs * 0.85,
-			lines: labelRowWidths(ne), leaderClean: !!ne.inline };
+			lines: labelRowWidths(ne), leaderClean: !!ne.inline, offLinks: !!ne.inline };
 	}
 	// **WHERE A ONE-LINE NODE LABEL MAY GO: EAST OR WEST OF ITS NODE** (Task 734, Tom 2026-09-26:
 	// *"where there is infinite space east or west, we might want to recognize that infinity and
@@ -2677,42 +2677,47 @@ var EngCalcs = EngCalcs || {};
 		if (gone >= order.length - 1) { return null; }
 		return { lbl: lbl, n: n, ne: ne, all: all, order: order, gone: gone };
 	}
-	// **BEFORE ANY VALUE GOES, THE LABELS IN THE WAY TRY ONE LINE** (Task 734 and Task 812; Tom,
+	// **AFTER THE SHED, A NODE LABEL THAT LOST SOMETHING TRIES ONE LINE** (Tasks 734 and 812; Tom,
 	// 2026-10-18, on which form a node label takes when both fit: *"Whichever shows more"*).
 	//
-	// A node label has two forms, the stack and one line east or west of its node (inlineNodeSides()).
-	// Where nothing is lost the two show the same, and the stack stays: a picture that changes for
-	// nothing is a cost (R11). What the form can change is what the OTHER labels get, so it is tried
-	// exactly where something is lost: a node label that found no side, the placed node labels on
-	// the ground it needed (nodeShedBlockers(), the pair the shed would make give up values), and
-	// every placed node label standing on a pipe label that will yield to it (stationedYieldSet()).
-	// Those go to one line together and the node first-fit runs again. **WHICHEVER OF THE TWO
-	// LAYOUTS SHOWS MORE IS KEPT**, counted as labels shown (node labels seated, less the pipe labels
-	// they make yield) and then values shown; the first layout wins a tie, so nothing changes unless
-	// something more is shown. It runs before the shed, at full content, so a label keeps its
-	// values on one line where a stack would have had to give one up.
+	// A node label has two forms, the stack and one line east or west of its node (inlineNodeSides()),
+	// its fields in the same order with the page's separator. Where nothing is lost the stack stays:
+	// a picture that changes for nothing is a cost (R11). So the one line is tried only where the
+	// stacked layout, shed and all, lost something: a node label it dropped, one it shed values
+	// from, the node labels in the way of a dropped one (nodeShedBlockers()), and every node label
+	// standing on a pipe label that will yield to it (stationedYieldSet()). Each tries its FULL
+	// content on one line, and the node first-fit runs again.
 	//
-	// Pure, like the rest of the pass: the candidates, the forms and the count are all facts about
-	// the drawing, and a drag frame rebuilds each label's spec in the form it now has.
-	// COST: one more node first-fit, and only on a view where some node label found no side or some
-	// pipe label yields; none elsewhere. (A second fit, sending back to its stack any label the first
-	// had unseated, was measured on the 600-junction network and not worth its time.)
+	// **NO NODE LABEL PAYS FOR IT** (pre-review, 2026-10-18: a trial judged on the drawing's total
+	// hid 9 of Net3's node labels and took the ID off 12 to show more pipe values). The one-line
+	// layout is kept only if every node label the stacked layout seated is still seated; a label
+	// tried keeps its full content, ID included, and every other label keeps the content the shed
+	// gave it, so no node label shows a value fewer. A label tried and unseated goes back to its
+	// stack and the fit runs once more; if that still unseats one, the stacked layout stands. Of
+	// two layouts that both keep every node label, the one showing more (labels, less the pipe
+	// labels made to yield, then values) is kept, and a tie keeps the stacks.
+	//
+	// Pure, like the rest of the pass: the candidates, the forms and the count are facts about the
+	// drawing, and a drag frame rebuilds each label's spec in the form it now has.
+	// COST: one node first-fit (two when a label must go back), only on a view where the stacked
+	// layout lost something.
+	var LPN_INLINE_MAX_VIEW_FRAC = 0.25;
 	function tryInlineNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf) {
 		var fs = parseFloat(fsNow) || effectiveFontSize(), dropped = [], cand = [], seen = {}, stat = [], i, idx, local,
-			reach = 0, index, live = { boxes: [], segments: [] };
+			reach = 0, index, live = { boxes: [], segments: [] }, seatedA = {};
 		function holder(id) { var n = nodeOf[id]; return n ? nodeEls[n.id] : null; }
 		function enlist(id) {
 			var n = nodeOf[id], ne = n && nodeEls[n.id];
-			if (seen[id] || !ne || ne.empty || !ne.lines || ne.lines.length < 2 || !byId[id]) { return; }
+			if (seen[id] || !ne || ne.empty || !ne.allLines || ne.allLines.length < 2 || !byId[id]) { return; }
 			seen[id] = true;
 			cand.push({ id: id, n: n, ne: ne, spec: byId[id] });
 		}
-		function score(pl) {
+		function score(pl, full) {
 			var labels = 0, nVal = 0, taken = stationedYieldSet(pl, obs);
 			pl.forEach(function (r) {
 				var ne = holder(r.id);
 				if (r.dropped || !ne) { return; }
-				labels++; nVal += (ne.lines || []).length;
+				labels++; nVal += full[r.id] ? ne.allLines.length : (ne.lines || []).length;
 			});
 			Object.keys(taken).forEach(function (id) {
 				var le = linkEls[id];
@@ -2721,17 +2726,10 @@ var EngCalcs = EngCalcs || {};
 			return { labels: labels, nVal: nVal };
 		}
 		function better(a, b) { return a.labels > b.labels || (a.labels === b.labels && a.nVal > b.nVal); }
-		function setForm(list, inline) {
-			if (!list.length) { return; }
-			list.forEach(function (c) { writeNodeLabelGlyphs(c.ne, c.n, c.ne.lines, fsNow, inline); });
-			list.forEach(function (c) { measureLabelWidths(c.ne); });
-			list.forEach(function (c) {
-				var f = nodeFirstFitSpec(c.n, c.ne, fs);
-				c.spec.w = f.w; c.spec.h = f.h; c.spec.lines = f.lines; c.spec.sides = f.sides; c.spec.leaderClean = f.leaderClean;
-			});
-		}
+		function keepsEvery(pl) { return pl.every(function (r) { return !(r.dropped && seatedA[r.id]); }); }
 		placed.forEach(function (r) {
-			if (r.dropped && byId[r.id]) { dropped.push(byId[r.id]); return; }
+			if (r.dropped) { if (byId[r.id]) { dropped.push(byId[r.id]); } return; }
+			seatedA[r.id] = true;
 			(r.boxes || (r.box ? [r.box] : [])).forEach(function (b) { live.boxes.push(b); });
 		});
 		obs.boxes.forEach(function (b) { if (b.linkOwner !== undefined) { stat.push(b); } });
@@ -2745,6 +2743,10 @@ var EngCalcs = EngCalcs || {};
 				nodeShedBlockers(lbl, index, local, pad).forEach(enlist);
 			});
 		}
+		placed.forEach(function (r) {
+			var ne = holder(r.id);
+			if (!r.dropped && ne && ne.allLines && ne.lines && ne.lines.length < ne.allLines.length) { enlist(r.id); }
+		});
 		if (stat.length) {
 			idx = Collide.boxIndex(stat);
 			placed.forEach(function (r) {
@@ -2755,27 +2757,55 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (!cand.length) { lastInlineTrial = null; return placed; }
 		// **PRICED BEFORE IT IS DRAWN.** Each label's one-line width comes from measureLevelForms(), the
-		// same measurement in a hidden element, banked by content, so a wheel notch asks the browser
-		// nothing; only a layout that is kept is written into the labels themselves.
-		var base = score(placed), was = cand.map(function (c) {
+		// same measurement in a hidden element, banked by content and size, so a revisited notch asks
+		// the browser nothing; only a layout that is kept is written into the labels themselves.
+		// **AND NO WIDER THAN A QUARTER OF THE MAP** (pre-review, 2026-10-18: on a 390 px phone a
+		// 150 px line ran off the map's edge and under its legend).
+		var was = cand.map(function (c) {
 			return { w: c.spec.w, h: c.spec.h, lines: c.spec.lines, sides: c.spec.sides };
-		}), reqs = measureLevelForms(cand.map(function (c) { return { lines: c.ne.lines, stacked: false }; }), fsNow),
-			d = defaultLabelOffset(), s0 = state.s || 1;
-		cand.forEach(function (c, k) {
-			var m = reqs[k].m, a = nodeAt(c.n);
-			if (!m || !(m.wPx > 0)) { return; }
-			c.spec.w = m.wPx / s0; c.spec.h = dataLabelBoxHeight(1); c.spec.lines = null;
-			c.spec.sides = inlineNodeSides(a, d, fs, Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS));
-			c.spec.leaderClean = true;
-			c.tried = true;
-		});
-		var p1 = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad }), s1 = score(p1);
-		lastInlineTrial = { tried: cand.length, base: base, all: s1 };
-		if (better(s1, base)) {
-			setForm(cand.filter(function (c) { return c.tried; }), true);
-			return p1;
+		}), reqs = measureLevelForms(cand.map(function (c) { return { lines: c.ne.allLines, stacked: false }; }), fsNow),
+			d = defaultLabelOffset(), s0 = state.s || 1, maxPx = ((svg && svg.clientWidth) || 1920) * LPN_INLINE_MAX_VIEW_FRAC,
+			full = {}, tried = [];
+		function restore(c) {
+			var k = cand.indexOf(c);
+			c.spec.w = was[k].w; c.spec.h = was[k].h; c.spec.lines = was[k].lines; c.spec.sides = was[k].sides;
+			c.spec.leaderClean = false; c.spec.offLinks = false;
+			delete full[c.id];
 		}
-		cand.forEach(function (c, k) { c.spec.w = was[k].w; c.spec.h = was[k].h; c.spec.lines = was[k].lines; c.spec.sides = was[k].sides; c.spec.leaderClean = false; });
+		cand.forEach(function (c, k) {
+			var m = reqs[k].m;
+			if (!m || !(m.wPx > 0) || m.wPx > maxPx) { return; }
+			c.spec.w = m.wPx / s0; c.spec.h = dataLabelBoxHeight(1); c.spec.lines = null;
+			c.spec.sides = inlineNodeSides(nodeAt(c.n), d, fs, Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS));
+			c.spec.leaderClean = true; c.spec.offLinks = true;
+			full[c.id] = true;
+			tried.push(c);
+		});
+		if (!tried.length) { lastInlineTrial = null; return placed; }
+		var base = score(placed, {}), pick = null, p1, p2, lost;
+		p1 = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
+		lost = tried.filter(function (c) { return seatedA[c.id] && p1.some(function (r) { return r.id === c.id && r.dropped; }); });
+		if (!lost.length && keepsEvery(p1)) { pick = p1; }
+		else if (lost.length) {
+			lost.forEach(restore);
+			tried = tried.filter(function (c) { return lost.indexOf(c) < 0; });
+			if (tried.length) {
+				p2 = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
+				if (keepsEvery(p2)) { pick = p2; }
+			}
+		}
+		lastInlineTrial = { tried: cand.length, base: base, kept: pick ? score(pick, full) : null };
+		if (pick && better(score(pick, full), base)) {
+			tried.forEach(function (c) { writeNodeLabelGlyphs(c.ne, c.n, c.ne.allLines, fsNow, true); });
+			tried.forEach(function (c) { measureLabelWidths(c.ne); });
+			tried.forEach(function (c) {
+				var f = nodeFirstFitSpec(c.n, c.ne, fs);
+				c.spec.w = f.w; c.spec.h = f.h; c.spec.lines = f.lines; c.spec.sides = f.sides;
+				c.spec.leaderClean = f.leaderClean; c.spec.offLinks = f.offLinks;
+			});
+			return pick;
+		}
+		tried.forEach(restore);
 		return placed;
 	}
 	// What the last one-line trial did, for a harness to read. Not a decision input.
@@ -2784,7 +2814,6 @@ var EngCalcs = EngCalcs || {};
 		var byId = {}, nodeOf = {}, rungs = 0;
 		nodeLabels.forEach(function (l) { byId[l.id] = l; });
 		doc.nodes.forEach(function (n) { nodeOf[nodeLabelKey(n.id)] = n; });
-		placed = perfDebugAccum('  ns:inline', function () { return tryInlineNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf); });
 		var maxRungs = nodeShedMaxRungs();
 		while (rungs < maxRungs) {
 			var liveObs = { boxes: [], segments: [] }, dropped = [], recs = [], seen = {},
@@ -2832,6 +2861,7 @@ var EngCalcs = EngCalcs || {};
 			rungs++;
 		}
 		lastNodeShedRungs = rungs;
+		placed = perfDebugAccum('  ns:inline', function () { return tryInlineNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf); });
 		return placed;
 	}
 	// The rungs the last pass ran, for a harness to read. Not a decision input -- nothing reads it.

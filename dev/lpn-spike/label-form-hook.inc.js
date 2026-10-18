@@ -43,7 +43,7 @@
 		read: function (tolPx, ambPx) {
 			var s = state.s, W = svg.clientWidth, H = svg.clientHeight, tol = tolPx / s, amb = ambPx / s,
 				v = { labels: 0, values: 0, nodes: 0, nodeInline: 0, nodeStacked: 0, pipes: 0, along: 0, level: 0, levelLeader: 0,
-					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N1mine: [], ex: { nodeInline: [], levelStacked: [], levelInline: [] }, N3: [], N3node: 0, astray: [], sig: [] },
+					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N1mine: [], N1mine0: [], struck: [], offView: [], node: {}, levelNear: {}, leaderNearOther: 0, pipeShown: {}, ex: { nodeInline: [], levelStacked: [], levelInline: [] }, N3: [], N3node: 0, astray: [], sig: [] },
 				items = [], circles = [], texts = [];
 			// To a quarter of a screen pixel: a label measured at another zoom differs from one measured
 			// at this one in the hundredths of a pixel (the font's hinting), which no reader can see.
@@ -108,6 +108,17 @@
 				[[x0, y0], [x0, y1], [x1, y0], [x1, y1]].forEach(function (p) { d = Math.min(d, ptSeg(p[0], p[1], g)); });
 				return d;
 			}
+			// Does a segment enter an unrotated box (Liang-Barsky)?
+			function segHits(g, b) {
+				var x0 = b.cx - b.w / 2, x1 = b.cx + b.w / 2, y0 = b.cy - b.h / 2, y1 = b.cy + b.h / 2,
+					dx = g.bx - g.ax, dy = g.by - g.ay, t0 = 0, t1 = 1, p = [-dx, dx, -dy, dy], qq = [g.ax - x0, x1 - g.ax, g.ay - y0, y1 - g.ay], i, r;
+				for (i = 0; i < 4; i++) {
+					if (p[i] === 0) { if (qq[i] < 0) { return false; } continue; }
+					r = qq[i] / p[i];
+					if (p[i] < 0) { if (r > t1) { return false; } if (r > t0) { t0 = r; } } else { if (r < t0) { return false; } if (r < t1) { t1 = r; } }
+				}
+				return t0 <= t1;
+			}
 			doc.nodes.forEach(function (n) {
 				var ne = nodeEls[n.id];
 				if (ne && ne.circle) { circles.push({ id: n.id, x: +ne.circle.getAttribute('cx'), y: +ne.circle.getAttribute('cy'), r: +ne.circle.getAttribute('r') }); }
@@ -119,12 +130,31 @@
 			doc.nodes.forEach(function (n) {
 				var ne = nodeEls[n.id], k = (ne && ne.lines) ? ne.lines.length : 0, g;
 				if (!ne || ne.empty || !ne.text || !inView(nodeAt(n))) { return; }
-				if (!vis(ne.text)) { v.sig.push('n' + n.id + ' hidden'); return; }
+				if (!vis(ne.text)) { v.sig.push('n' + n.id + ' hidden'); v.node[n.id] = { n: 0, id: false }; return; }
+				v.node[n.id] = { n: k, id: (ne.lines || []).some(function (ln) { return ln.field === 'id'; }) };
 				v.sig.push('n' + n.id + ' ' + geo(ne.text, ['x', 'y']) + ' ' + ne.text.textContent + ' ' +
 					(leaderOf(ne) ? geo(ne.leader, ['x1', 'y1', 'x2', 'y2']) : ''));
 				v.nodes++; v.values += k;
 				if (k > 1) { if (ne.inline) { v.nodeInline++; v.ex.nodeInline.push(n.id); } else { v.nodeStacked++; } }
-				items.push({ key: 'N' + n.id, rows: rowsOf(ne.text), mine: !!ne.inline });
+				var nrows = rowsOf(ne.text);
+				items.push({ key: 'N' + n.id, rows: nrows, mine: !!ne.inline });
+				if (ne.inline) {
+					// A pipe through a one-line label strikes it through; and the label lies on the map,
+					// clear of the map's furniture (its legends, the strips and the chip).
+					doc.links.forEach(function (m) {
+						var p = linkPointList(m), i2;
+						for (i2 = 1; i2 < p.length; i2++) {
+							if (nrows.some(function (b) { return segHits({ ax: p[i2 - 1].x, ay: p[i2 - 1].y, bx: p[i2].x, by: p[i2].y }, b); })) {
+								v.struck.push('N' + n.id + ' crossed by ' + m.id); return;
+							}
+						}
+					});
+					var br = ne.text.getBoundingClientRect(), cr = svg.getBoundingClientRect(), fr = mapFurnitureRects(cr);
+					if (br.left < cr.left - 1 || br.right > cr.right + 1 || br.top < cr.top - 1 || br.bottom > cr.bottom + 1) { v.offView.push('N' + n.id + ' off the map'); }
+					fr.forEach(function (f) {
+						if (br.right - cr.left > f.l && br.left - cr.left < f.r && br.bottom - cr.top > f.t && br.top - cr.top < f.b) { v.offView.push('N' + n.id + ' under map furniture'); }
+					});
+				}
 				g = leaderOf(ne);
 				if (g) {
 					circles.forEach(function (c) {
@@ -140,6 +170,7 @@
 				if (!le || le.empty || !le.text || !inView(linkLabelMid(l))) { return; }
 				f = le.levelBeside && le.levelForm;
 				if (!vis(le.text)) { v.sig.push('l' + l.id + ' hidden'); return; }
+				v.pipeShown[l.id] = true;
 				v.sig.push('l' + l.id + ' ' + geo(le.text, ['x', 'y']) + ' ' + (le.text.getAttribute('transform') || '').replace(/[-0-9.e]+/g, q) + ' ' +
 					le.text.textContent + ' ' + (leaderOf(le) ? geo(le.leader, ['x1', 'y1', 'x2', 'y2']) : ''));
 				v.pipes++; v.values += f ? f.lines.length : (le.lines || []).length;
@@ -151,13 +182,6 @@
 				if (f && f.stacked) { v.levelStacked++; v.ex.levelStacked.push(l.id); } else { v.levelInline++; if (leaderOf(le)) { v.ex.levelInline.push(l.id); } }
 				if (f && f.lines.length > (le.lines || []).length) { v.levelGrown++; }
 				g = leaderOf(le);
-				if (g) {
-					v.levelLeader++;
-					circles.forEach(function (c) { if (ptSeg(c.x, c.y, g) < c.r - tol) { v.N3.push('L' + l.id + ' leader through ' + c.id); } });
-					// a pipe label's leader starts on its pipe, never inside an end node's symbol
-					return;
-				}
-				// No leader: its own pipe must be the nearest, by `amb`.
 				var own = Infinity, other = Infinity, who = '';
 				doc.links.forEach(function (m) {
 					var p = linkPointList(m), d = Infinity, i;
@@ -166,6 +190,17 @@
 					}
 					if (m.id === l.id) { own = d; } else if (d < other) { other = d; who = m.id; }
 				});
+				// Whose pipe is nearest its rows, leader or not (a label nearer another pipe than its own
+				// reads as that pipe's even with a leader): counted, and named labels are asserted.
+				v.levelNear[l.id] = { own: +(own * s).toFixed(1), other: +(other * s).toFixed(1), who: who, leader: !!g };
+				if (g) {
+					v.levelLeader++;
+					if (other < own) { v.leaderNearOther++; }
+					circles.forEach(function (c) { if (ptSeg(c.x, c.y, g) < c.r - tol) { v.N3.push('L' + l.id + ' leader through ' + c.id); } });
+					// a pipe label's leader starts on its pipe, never inside an end node's symbol
+					return;
+				}
+				// No leader: its own pipe must be the nearest, by `amb`.
 				if (other <= own + amb) { v.astray.push(l.id + '(' + (own * s).toFixed(1) + ' px vs ' + who + ' ' + (other * s).toFixed(1) + ')'); }
 			});
 			// N1: rows of two labels, a row on a node symbol, a row on a Text item.
@@ -176,6 +211,8 @@
 						items[j].rows.forEach(function (c) {
 							var d = depth(b, c);
 							if (d > tol) { v.N1.push(it.key + ' on ' + items[j].key + ' ' + (d * s).toFixed(1) + ' px'); if (it.mine || items[j].mine) { v.N1mine.push(v.N1[v.N1.length - 1]); } }
+							// Ours against any label, held to a quarter pixel: glyph boxes that touch.
+							if ((it.mine || items[j].mine) && d > 0.25 / s) { v.N1mine0.push(it.key + ' on ' + items[j].key + ' ' + (d * s).toFixed(2) + ' px'); }
 						});
 					}
 					circles.forEach(function (c) { if (ptBox(c.x, c.y, b) < c.r - tol) { v.N1.push(it.key + ' on node ' + c.id); if (it.mine) { v.N1mine.push(v.N1[v.N1.length - 1]); } } });

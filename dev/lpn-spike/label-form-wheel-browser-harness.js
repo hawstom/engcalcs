@@ -95,8 +95,16 @@ const SCENES = [
 	{ key: 'n600', name: '600-junction downtown', file: 'dev/lpn-spike/fixtures/plain-downtown-n600-seed71.lwn', fit: true,
 		node: NET3_NODE, link: NET3_LINK, notches: [0, 6], named: [] },
 	{ key: 'net1', name: 'Net1 (gallery, US), zoomed out', cardKey: 'lpn_ex_net1_title', node: ['id', 'demand', 'elev', 'pressure'],
-		link: ['flow'], outToPipe: { id: '113', px: 54 }, notches: [0], named: ['113'] }
-];
+		link: ['flow'], outToPipe: { id: '113', px: 54 }, notches: [0, 10], named: ['113'], shotAt: 0,
+		// Ten notches back in (four out from the card's view, Perry's notch 4): pipe 11's label is
+		// shown, and pipe 10's does not sit nearer pipe 11 than its own.
+		at10: { shown: ['11'], ownNearest: ['10'] } },
+	{ key: 'phone', name: 'Net3 (gallery, gpm) on a 390 px phone', cardKey: 'lpn_ex_net3_title', node: NET3_NODE, link: NET3_LINK,
+		notches: [3, 6], named: [], viewport: { width: 390, height: 844 } }
+].filter((sc) => (process.env.LABEL_FORM_SCENES || 'net3,net1,phone').split(',').indexOf(sc.key) >= 0);
+// The trial's call, made switchable in the page so the same view can be laid out stacked-only for
+// the per-label node comparison without a second session.
+const TRIAL = "placed = perfDebugAccum('  ns:inline', function () { return tryInlineNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf); });";
 const TOL_PX = 1.5, AMBIG_PX = 3;
 
 async function wheel(page, n) {
@@ -109,7 +117,7 @@ function refSource(ref, file) {
 }
 
 async function layOut(Session, browser, sc, mode, opts) {
-	const a = await Session.open(browser, NAME, { serviceWorkers: 'block', viewport: { width: 1920, height: 1000 } });
+	const a = await Session.open(browser, NAME, { serviceWorkers: 'block', viewport: sc.viewport || { width: 1920, height: 1000 } });
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 	let cut = 0, hooked = 0;
 	await a.page.route(/\/js\/(looped-network|lpn-collide)\.js/, async (route) => {
@@ -120,6 +128,7 @@ async function layOut(Session, browser, sc, mode, opts) {
 			if (mode.cut) {
 				CUTS.forEach(([from, to]) => { if (body.split(from).length === 2) { body = body.replace(from, to); cut++; } });
 			}
+			if (!mode.cut && body.split(TRIAL).length === 2) { body = body.replace(TRIAL, 'if (!window.__lpnNoInline) { ' + TRIAL + ' }'); }
 			if (body.indexOf(MARKER) >= 0) { body = body.replace(MARKER, HOOK + MARKER); hooked++; }
 		}
 		await route.fulfill({ response: resp, body: body });
@@ -151,24 +160,32 @@ async function layOut(Session, browser, sc, mode, opts) {
 			await wheel(a.page, -out);
 			await a.settle(1500);
 		}
-		const views = [];
-		let at = 0;
+		const views = [], shotAt = sc.shotAt !== undefined ? sc.shotAt : sc.notches[sc.notches.length - 1];
+		let at = 0, named = {};
 		for (const k of sc.notches) {
 			await wheel(a.page, k - at); at = k;
 			await a.settle(1500);
 			const v = await a.page.evaluate(([tol, amb]) => window.__lpnForm.read(tol, amb), [TOL_PX, AMBIG_PX]);
 			v.notch = k;
-			views.push(v);
-		}
-		// The named labels, as Tom meets them: at the last notch, laid out by the wheel's own pass.
-		const named = await a.page.evaluate((ids) => window.__lpnForm.named(ids), sc.named);
-		if (opts && opts.shots && mode.shipped) {
-			fs.mkdirSync(opts.shots, { recursive: true });
-			await a.page.screenshot({ path: path.join(opts.shots, sc.key + '-' + (sc.outToPipe ? out + '-out' : at + '-in') + '.png') });
-			for (const nm of (opts.clips && opts.clips[sc.key]) || []) {
-				const r = await a.page.evaluate((id) => window.__lpnForm.clipOf(id), nm);
-				if (r) { await a.page.screenshot({ path: path.join(opts.shots, sc.key + '-' + nm.replace(/[^A-Za-z0-9]+/g, '') + '.png'), clip: r }); }
+			if (k === shotAt) {
+				// The named labels and Tom's screenshots, as he meets them: laid out by the wheel's own pass.
+				named = await a.page.evaluate((ids) => window.__lpnForm.named(ids), sc.named);
+				if (opts && opts.shots && mode.shipped) {
+					fs.mkdirSync(opts.shots, { recursive: true });
+					await a.page.screenshot({ path: path.join(opts.shots, sc.key + '-' + (sc.outToPipe ? (out - k) + '-out' : k + '-in') + '.png') });
+					for (const nm of (opts.clips && opts.clips[sc.key]) || []) {
+						const r = await a.page.evaluate((id) => window.__lpnForm.clipOf(id), nm);
+						if (r) { await a.page.screenshot({ path: path.join(opts.shots, sc.key + '-' + nm.replace(/[^A-Za-z0-9]+/g, '') + '.png'), clip: r }); }
+					}
+				}
 			}
+			// The same view with no one-line node form (a content pass with the trial switched off),
+			// then the trial back on and the view laid out again as it was.
+			if (mode.shipped) {
+				v.stacked = await a.page.evaluate(([tol, amb]) => { window.__lpnNoInline = true; window.__lpnForm.content();
+					const r = window.__lpnForm.read(tol, amb); window.__lpnNoInline = false; window.__lpnForm.content(); return r; }, [TOL_PX, AMBIG_PX]);
+			}
+			views.push(v);
 		}
 		if (!mode.shipped) {
 			const ms0 = await a.page.evaluate(() => window.__lpnForm.timeContent(3));
@@ -200,7 +217,7 @@ function firstDiff(a, b) {
 function row(v) {
 	return `labels ${v.labels} (nodes ${v.nodes}: ${v.nodeInline} one line, ${v.nodeStacked} stacked; pipes ${v.pipes}: ${v.along} along, ` +
 		`${v.level} level on a leader ${v.levelLeader}, ${v.levelInline} one line, ${v.levelStacked} stacked), values ${v.values}; ` +
-		`N1 ${v.N1.length} (${v.N1mine.length} ours) N3 ${v.N3.length} (node-label leaders through a symbol ${v.N3node}) astray ${v.astray.length}`;
+		`N1 ${v.N1.length} (${v.N1mine.length} ours) N3 ${v.N3.length} (node-label leaders through a symbol ${v.N3node}) astray ${v.astray.length}, leadered nearer another pipe ${v.leaderNearOther}`;
 }
 
 async function main() {
@@ -233,22 +250,41 @@ async function main() {
 			for (const ref of refs) { extra.push({ ref, r: await layOut(Session, browser, sc, { ref }) }); }
 			on.views.forEach((v, i) => {
 				const w = off.views[i];
-				console.log(`        ${sc.outToPipe ? on.out + ' out' : v.notch + ' in'}: shipped   ${row(v)}`);
-				console.log(`        ${' '.repeat(String(sc.outToPipe ? on.out + ' out' : v.notch + ' in').length)}  reference ${row(w)}`);
+				console.log(`        ${sc.outToPipe ? (on.out - v.notch) + ' out' : v.notch + ' in'}: shipped   ${row(v)}`);
+				console.log(`        ${' '.repeat(String(sc.outToPipe ? (on.out - v.notch) + ' out' : v.notch + ' in').length)}  reference ${row(w)}`);
 				extra.forEach((e) => console.log(`          ${e.ref.padEnd(9)} ${row(e.r.views[i])}`));
 				console.log(`          e.g. one-line node labels ${v.ex.nodeInline.slice(0, 6).join(' ')}; leadered stacks ${v.ex.levelStacked.slice(0, 6).join(' ')}; leadered one-line ${v.ex.levelInline.slice(0, 6).join(' ')}`);
-				const tag = sc.name + ', ' + (sc.outToPipe ? on.out + ' notches out' : v.notch + ' notches in');
+				const tag = sc.name + ', ' + (sc.outToPipe ? (on.out - v.notch) + ' notches out' : v.notch + ' notches in');
 				// N1 that the reference draws too is not this work's: hand-placed labels on Net1 (Tom's
 				// screenshot: N10 and N11) and master's own node labels; it is printed in the row.
 				ok(tag + ': N1 = 0 for level pipe labels and one-line node labels, and no more N1 than the reference', v.N1mine.length === 0 && v.N1.length <= w.N1.length,
 					v.N1mine.slice(0, 3).join('; ') + (v.N1.length > w.N1.length ? ' all: ' + v.N1.slice(0, 3).join('; ') : ''));
 				ok(tag + ': N3 = 0 for the leaders of level pipe labels and one-line node labels', v.N3.length === 0, v.N3.slice(0, 3).join('; '));
+				// **NO NODE LABEL PAYS FOR A ONE-LINE FORM** (pre-review, 2026-10-18): against the same view
+				// laid out with stacks only, every node label shown there is shown, with no fewer values,
+				// and with its ID if it had it.
+				const lossN = [];
+				Object.keys(v.stacked.node).forEach((id) => {
+					const x = v.stacked.node[id], y = v.node[id] || { n: 0, id: false };
+					if (y.n < x.n || (x.id && !y.id)) { lossN.push('N' + id + ' ' + x.n + (x.id ? '+ID' : '') + ' -> ' + y.n + (y.id ? '+ID' : '')); }
+				});
+				ok(tag + ': no node label hidden, shortened or without its ID against the stacked layout of the same view', lossN.length === 0,
+					lossN.length + (lossN.length ? ': ' + lossN.slice(0, 5).join('; ') : ''));
+				ok(tag + ': no pipe runs through a one-line node label', v.struck.length === 0, v.struck.slice(0, 4).join('; '));
+				ok(tag + ': no level label or one-line node label overlaps another label, by the rotated glyph boxes', v.N1mine0.length === 0, v.N1mine0.slice(0, 3).join('; '));
+				ok(tag + ': every one-line node label lies within the map and off its legends', v.offView.length === 0, v.offView.slice(0, 4).join('; '));
 				ok(tag + ': every level label with no leader is nearest its own pipe', v.astray.length === 0, v.astray.slice(0, 4).join(' '));
 				ok(tag + ': no fewer labels than the reference, and no fewer values', v.labels >= w.labels && v.values >= w.values,
 					`${w.labels} -> ${v.labels} labels, ${w.values} -> ${v.values} values`);
 			});
 			const A = on.views[on.views.length - 1];
 			const sum = (vs, k) => vs.reduce((t, v) => t + v[k], 0);
+			if (sc.at10) {
+				const v10 = on.views.find((v) => v.notch === 10);
+				sc.at10.shown.forEach((id) => ok(sc.name + ', 4 notches out: pipe ' + id + "'s label is shown", !!v10.pipeShown[id]));
+				sc.at10.ownNearest.forEach((id) => ok(sc.name + ', 4 notches out: pipe ' + id + "'s label, if level, is nearest its own pipe",
+					!v10.levelNear[id] || v10.levelNear[id].own <= v10.levelNear[id].other, JSON.stringify(v10.levelNear[id] || 'along')));
+			}
 			ok(sc.name + ': the same view twice is the same drawing (a content pass where it stands)', on.again.sig === A.sig, firstDiff(A.sig, on.again.sig));
 			ok(sc.name + ': ...and the per-notch bank puts the notch back exactly (out two and back in two, twice)', on.back2.sig === on.back.sig, firstDiff(on.back.sig, on.back2.sig));
 			// Printed, not asserted: a label the wheel's pass did not re-measure is measured afresh by

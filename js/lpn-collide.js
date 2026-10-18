@@ -1233,7 +1233,11 @@ EngCalcs.lpnCollide = (function () {
 		// without one (`lbl._quiet`) where its own pipe is plainly the nearest; every other side beyond
 		// `leaderMin` says whose it is with a leader.
 		var quietMax = opts.quietMax > leaderMin ? opts.quietMax : leaderMin;
-		function strictOk(lbl, c, b) {
+		// `clear`: the clean sweep and growth ask more of a side with a leader too: that its own pipe
+		// be the nearest to its rows (pre-review, 2026-10-18: Net1's "Q=1866.2" sat under the next
+		// pipe with its leader running back to its own). Only the last sweep, for a label with no
+		// such side, lets the leader alone say whose it is.
+		function strictOk(lbl, c, b, clear) {
 			var dist = Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y), far = dist > leaderMin,
 				near = function () { return nearMargin < 0 || lbl.ownLink === undefined || ownPipeNearest(b, local, lbl.ownLink, nearMargin); };
 			lbl._quiet = false;
@@ -1243,7 +1247,7 @@ EngCalcs.lpnCollide = (function () {
 			if (!far) { return near(); }
 			// The leader first; only where no clean leader can be drawn (one starting inside an end
 			// node's symbol, on a pipe shorter than its own symbols) does a quiet side stand in.
-			if (leaderClear(lbl, c)) { return true; }
+			if (leaderClear(lbl, c)) { return !clear || lbl.ownLink === undefined || ownPipeNearest(b, local, lbl.ownLink, 0); }
 			if (dist <= quietMax && near()) { lbl._quiet = true; return true; }
 			return false;
 		}
@@ -1307,7 +1311,7 @@ EngCalcs.lpnCollide = (function () {
 				if (verdict === 'blocked') { continue; }
 				if (first < 0) { first = i; }
 				if (verdict === 'clear' && !boxesOnLink(b, local, lbl.id) && !leaderThroughSymbol(lbl, c, local) &&
-						(!strict || strictOk(lbl, c, b))) {
+						(!strict || strictOk(lbl, c, b, true))) {
 					return commit(lbl, sides, c, b);
 				}
 			}
@@ -1317,7 +1321,7 @@ EngCalcs.lpnCollide = (function () {
 		// The last sweep, and the whole of the pass when `clean` is off: the first clear side, a pipe
 		// under it or not, else the first side held only by labels this one outranks, else a drop.
 		function placeAny0(lbl, from, a0) {
-			var sides = sidesOf(lbl), i, c, b, verdict, fallback = null, fallbackBox = null;
+			var sides = sidesOf(lbl), i, c, b, verdict, fallback = null, fallbackBox = null, fallbackAt = a0;
 			var at = a0;
 			index.near(a0.x, a0.y, lbl._reach, local);
 			for (i = from || 0; i < sides.length; i++) {
@@ -1326,16 +1330,23 @@ EngCalcs.lpnCollide = (function () {
 				// is not asked again here.
 				if (c.cleanOnly) { continue; }
 				lbl.anchor = c.anchor || a0;
+				if (lbl.anchor !== at) { at = lbl.anchor; index.near(at.x, at.y, lbl._reach, local); }
 				// `leaderClean`: a label whose leader may never pass through another node's symbol, even
 				// here (a one-line node label, Task 734: its ring reaches further east and west).
 				if (lbl.leaderClean && leaderThroughSymbol(lbl, c, local)) { continue; }
-				if (lbl.anchor !== at) { at = lbl.anchor; index.near(at.x, at.y, lbl._reach, local); }
+				// `offLinks`: a label no pipe may run through, even here (a one-line node label: a
+				// pipe through a line of text strikes it through, pre-review 2026-10-18).
+				if (lbl.offLinks && boxesOnLink(labelLineBoxes(lbl, c), local, lbl.id)) { continue; }
 				// The STAIRCASE, not the block (Task 406): asking about the block would call a side
 				// occupied because of ground the short rows never cover.
 				b = labelLineBoxes(lbl, c);
 				verdict = lbl.dragged ? 'clear' : boxesClearOf(b, local, strict ? lastPad : pad, lbl.id);
 				if (strict) {
-					if (verdict === 'clear' && strictOk(lbl, c, b)) { return commit(lbl, sides, c, b); }
+					// A side whose own pipe is the nearest wins; one that only its leader explains is
+					// kept as the fallback, taken if no clearer side follows.
+					if (verdict !== 'clear') { continue; }
+					if (strictOk(lbl, c, b, true)) { return commit(lbl, sides, c, b); }
+					if (!fallback && strictOk(lbl, c, b)) { fallback = c; fallbackBox = b; fallbackAt = lbl.anchor; }
 					continue;
 				}
 				if (verdict === 'clear') { return commit(lbl, sides, c, b); }
@@ -1345,7 +1356,15 @@ EngCalcs.lpnCollide = (function () {
 				// such a side existed is the ranking working backwards.
 				if (verdict === 'yielding' && !fallback) { fallback = c; fallbackBox = b; }
 			}
-			if (fallback) { return commit(lbl, sides, fallback, fallbackBox); }
+			if (fallback) {
+				if (strict) {
+					// Asked again where it stands, so the leader-or-quiet answer is this side's.
+					lbl.anchor = fallbackAt;
+					if (lbl.anchor !== at) { at = lbl.anchor; index.near(at.x, at.y, lbl._reach, local); }
+					strictOk(lbl, fallback, fallbackBox);
+				}
+				return commit(lbl, sides, fallback, fallbackBox);
+			}
 			// **DROPPED: NOTHING IS COMMITTED.** A label nobody can see is not an obstacle, so it
 			// must not go into the index -- otherwise it keeps ground clear for a label that is not
 			// drawn, and the drawing ends up emptier than the conflict warranted.
@@ -1416,7 +1435,7 @@ EngCalcs.lpnCollide = (function () {
 						for (i = 0; i < sides.length; i++) {
 							c = sides[i];
 							b = labelLineBoxes(g, c);
-							if (boxesClearOf(b, local, lastPad, lbl.id) !== 'clear' || !strictOk(g, c, b)) { continue; }
+							if (boxesClearOf(b, local, lastPad, lbl.id) !== 'clear' || !strictOk(g, c, b, true)) { continue; }
 							nr = commit(g, all, c, b);
 							if (c.anchor) { nr.anchor = { x: c.anchor.x, y: c.anchor.y }; }
 							bury(r);
