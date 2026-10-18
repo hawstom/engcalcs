@@ -55917,6 +55917,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				}
 				var neN = nodeEls[t.dataset.nodelbl],
 					gxN = neN ? w4.x - (neN.side === 'left' ? posN.x - labelBoxWidth(neN) : posN.x) : null;
+				// A label restacked under the cursor is narrower than the line that was grabbed: the grab
+				// point is held within the stack, so the stack comes to the cursor rather than the cursor
+				// being left beside it.
+				if (neN && gxN !== null) { gxN = Math.max(0, Math.min(labelBoxWidth(neN), gxN)); }
 				drag = { type: 'nodelbl', id: t.dataset.nodelbl, offX: posN.x - w4.x, offY: posN.y - w4.y, gx: gxN };
 				Object.assign(drag, common);
 			} else if (t.dataset.linklbl !== undefined) {

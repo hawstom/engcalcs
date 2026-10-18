@@ -120,11 +120,11 @@ async function main() {
 	// The 1440 x 900 fit of each example before R-403, which a desktop must keep. Elm Street's was
 	// 1.265734716274574 until Task 807 (leader-keep) kept its 14 dragged labels on their own side,
 	// nearer their nodes; less lettering to frame, so the fit closes in. Checked by screenshot.
-	// Net3's were 8110.764038908496 (both) until Task 734/812 (feat/label-form): pipe labels set
-	// level on leaders and one-line node labels at the network's edge are lettering to frame too,
-	// so the fit opens out a little, by a different amount in gpm and in L/s.
+	// Net3 in gpm was 8110.764038908496, as the L/s one still is, until Task 734/812
+	// (feat/label-form): its one-line node labels at the network's edge are lettering to frame too,
+	// and there the fit closes in a little.
 	const DESK = {
-		lpn_ex_net3_si_title: 7956.960690187861, lpn_ex_net3_title: 7993.425139873818,
+		lpn_ex_net3_si_title: 8110.764038908496, lpn_ex_net3_title: 8181.520385005933,
 		lpn_ex_net2_si_title: 0.1722048547892766, lpn_ex_net2_title: 0.052488039708116024,
 		lpn_ex_elm_street_title: 1.4334291332773326, lpn_ex_net1_si_title: 26.1141072219296,
 		lpn_ex_net1_title: 7.959579890262752, lpn_ex_basic_si_title: 0.8257611638584945,
