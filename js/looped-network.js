@@ -38739,6 +38739,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return changeTypeLine(String(pc.lpn_change_type_line_alternative || '{id}: {property} {value}, in alternative {alternative}')
 			.replace('{alternative}', function () { return String(owner.name || owner.id); }), id, label, valueText);
 	}
+	// **A RESERVOIR CHANGED TO A TANK IS BORN EMPTY ON ITS OWN GROUND** (Tom, 2026-10-18): base
+	// elevation = Elevation (bottomElev left blank, which means exactly that), lowest depth 0,
+	// highest depth 1, starting depth 0, in the Elevation/Head unit the depths are typed in.
+	var RESERVOIR_TO_TANK = { _level: 0, minLevel: 0, maxLevel: 1 };
 	function waterSurfaceCarry(n, to) {
 		var from = n.type, key = ovKey(n), out = { base: null, ovs: [], prop: null, newProp: null }, e;
 		if (from === 'tank' && to === 'reservoir') {
@@ -38749,20 +38753,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			eachElementOverride(key, function (ov, owner, map) {
 				if (typeof ov.level === 'number') { out.ovs.push({ s: owner, map: map, value: e + ov.level }); }
 			}, true);
-		} else if (from === 'reservoir' && to === 'tank') {
-			e = typeof n.elev === 'number' ? n.elev
-				: (!elevSourceIsDem() && typeof (scnSetting('defaults') || {}).nodeElev === 'number' ? scnSetting('defaults').nodeElev : undefined);
-			if (e === undefined) { return out; }
-			out.prop = 'head'; out.newProp = 'level';
-			if (typeof n._head === 'number') {
-				if (n._head >= e) { out.base = { value: n._head - e }; }
-			} else {
-				out.base = { value: 0, silent: true };
-			}
-			eachElementOverride(key, function (ov, owner, map) {
-				if (typeof ov.head === 'number' && ov.head >= e) { out.ovs.push({ s: owner, map: map, value: ov.head - e }); }
-			}, true);
 		}
+		// RESERVOIR -> TANK CARRIES NOTHING (Tom, 2026-10-18: *"For minimal change, how about Base
+		// elevation = Elevation, min depth = 0, max depth = 1, and starting depth = 0?"*): the tank
+		// is born empty on the reservoir's ground (RESERVOIR_TO_TANK), and the head is listed as lost.
 		return out;
 	}
 	function nodeTypeChangeReport(n, to) {
@@ -38868,6 +38862,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (n.elev === undefined && to !== 'reservoir') {
 			if (elevSourceIsDem()) { queueTerrainForNewNode(n.id); }
 			else { n.elev = (scnSetting('defaults') || {}).nodeElev; }   // base-write: a type change is Base's, and so is the ground it gives a node that had none
+		}
+		if (from === 'reservoir' && to === 'tank') {
+			// Tom's four values, see RESERVOIR_TO_TANK. A blank base stands on the ground, which is Elevation.
+			delete n.bottomElev;   // base-write: a type change is Base's, and a blank base is the ground
+			for (k in RESERVOIR_TO_TANK) { if (Object.prototype.hasOwnProperty.call(RESERVOIR_TO_TANK, k)) { n[k] = RESERVOIR_TO_TANK[k]; } }   // base-write: a type change is Base's
+			if (n.tok) { delete n.tok.bottomElev; delete n.tok.level; delete n.tok.minLevel; delete n.tok.maxLevel; }   // base-write: tokens of values the type change replaced
 		}
 		// The water surface, carried (waterSurfaceCarry()). Written after the strip, which has
 		// already taken the old property and any override map it left empty.
@@ -39528,11 +39528,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			h = effective(el, 'bottomElev');
 			return { prop: 'level', newProp: 'head', value: (typeof h === 'number' && isFinite(h) ? h : e) + (effective(el, 'level') || 0) };
 		}
-		if (from === 'reservoir' && to === 'tank') {
-			h = effective(el, 'head');
-			if (h === undefined || h === null || h === '') { return { prop: 'head', newProp: 'level', value: 0 }; }
-			return h >= e ? { prop: 'head', newProp: 'level', value: h - e } : null;
-		}
+		// Reservoir -> tank carries nothing: morphOne() writes RESERVOIR_TO_TANK.
 		return null;
 	}
 	/**
@@ -39574,6 +39570,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!isLink && to !== 'reservoir' && rawBase.baseElev === undefined && !Object.prototype.hasOwnProperty.call(held, 'elev') &&
 				(scnSetting('defaults') || {}).nodeElev !== undefined) {
 			setOverride(el, 'elev', (scnSetting('defaults') || {}).nodeElev);
+		}
+		if (!isLink && from.type === 'reservoir' && to === 'tank') {
+			setOverride(el, 'level', RESERVOIR_TO_TANK._level);
+			setOverride(el, 'minLevel', RESERVOIR_TO_TANK.minLevel);
+			setOverride(el, 'maxLevel', RESERVOIR_TO_TANK.maxLevel);
 		}
 		if (carry) {
 			setOverride(el, carry.newProp, carry.value);
