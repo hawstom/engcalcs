@@ -45,6 +45,8 @@ a REAL is the stored double, an integer past 2^53 stays a BigInt, a blob is a `U
 
 Tests: `dev/lpn-spike/sqlite-reader-harness.js` (Node, 44 checks). Python's `sqlite3` builds the
 model-shaped database at test time, so writer and reader are different SQLite builds.
+`dev/lpn-spike/sqlite-reader-browser-harness.js` (Chromium) holds that a page load fetches
+nothing of sql.js and that opening a database fetches both files from the page's own site, once.
 
 **No visitor-facing UI and no language keys.** The only way in is the browser console on the
 Looped Network page: read a file into an ArrayBuffer and call `EngCalcs.lpnSqliteOpen(buf)`.
