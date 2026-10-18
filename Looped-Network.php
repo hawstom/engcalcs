@@ -1196,8 +1196,8 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 				<section id="lpn_set_sec_map" class="lpn-set-sec" data-set-sec="map">
 					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_map']?></h3>
 					<div class="lpn-set-secbody">
-						<?php // Tom, 2026-10-18: two indexed sub-headings, Drawing (the numbers and the two
-						      // legend corners) and Options (the switches, the theme, the resets), each
+						<?php // Tom, 2026-10-18: two indexed sub-headings, Sizes (the numbers) and Options
+						      // (the legend corners, the switches, the theme, the resets), each
 						      // cut by small headings the index leaves out (.lpn-set-group). The minor
 						      // groups are built in JS except Positions, which three builders share:
 						      // the labels legend, the colour legend (buildColoringSection) and the
@@ -1207,15 +1207,17 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						<div class="lpn-set-sub" id="lpn_set_sub_mapDisplay" data-saved="project"><?=$ec_lang['lpn_settings_map_drawing']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_set_map_fields" class="lpn-set-part"></div>
+						</div>
+						<div class="lpn-set-sub" id="lpn_set_sub_page" data-saved="project"><?=$ec_lang['lpn_settings_map_options']?><?=lpnSavedMark('project')?></div>
+						<div class="lpn-set-subbody">
 							<div class="lpn-set-part">
 								<div class="lpn-set-group lpn-set-minor"><?=$ec_lang['lpn_settings_grp_positions']?></div>
 								<div id="lpn_set_pos_fields" class="lpn-set-part"></div>
 								<div id="lpn_set_colors_shared" class="lpn-set-part"></div>
 								<div id="lpn_set_pos_fields2" class="lpn-set-part"></div>
 							</div>
+							<div id="lpn_set_page_fields" class="lpn-set-part"></div>
 						</div>
-						<div class="lpn-set-sub" id="lpn_set_sub_page" data-saved="project"><?=$ec_lang['lpn_settings_map_options']?><?=lpnSavedMark('project')?></div>
-						<div class="lpn-set-subbody"><div id="lpn_set_page_fields" class="lpn-set-part"></div></div>
 					</div>
 				</section>
 				<?php // ---- Section: NEW ELEMENTS ----

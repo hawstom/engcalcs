@@ -1080,7 +1080,7 @@ $ec_lang['lpn_guide_prop_example_def']='<p>Open the Net1 example and click Pipe 
 // The Settings chapter, in the entry for the Settings box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_settings_box">. Held by dev/lpn-spike/user-guide-settings-harness.js.
 $ec_lang['lpn_guide_set_where_term']='Sections, and where settings are saved';
-$ec_lang['lpn_guide_set_where_def']='<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map and page (Drawing and Options), Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the rows that state Saved in this browser themselves: four under Options, and Show the run progress box in Hydraulics.</p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.</p>';
+$ec_lang['lpn_guide_set_where_def']='<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map and page (Sizes and Options), Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the rows that state Saved in this browser themselves: four under Options, and Show the run progress box in Hydraulics.</p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.</p>';
 $ec_lang['lpn_guide_set_search_term']='Searching';
 $ec_lang['lpn_guide_set_search_def']='<p>Type one or more words in Search settings to list only the settings that mention all of them, in the name or in the tip. A word that matches a heading shows every setting under that heading. For example, opacity lists Symbol opacity (0 to 1) and Background image opacity (0 to 1); opacity symbol lists the first alone; and sprinklers lists Emitter exponent, whose tip mentions sprinklers and whose name does not. The search changes no setting.</p>';
 $ec_lang['lpn_guide_set_scn_term']='Settings in a scenario';
@@ -3703,7 +3703,7 @@ $ec_lang['lpn_basemap_style_grayscale']='Grayscale';
 $ec_lang['lpn_settings_map_display']='Appearance';
 // The two sub-headings of Map and page, and the small headings under them that the index leaves
 // out (Tom, 2026-10-18).
-$ec_lang['lpn_settings_map_drawing']='Drawing';
+$ec_lang['lpn_settings_map_drawing']='Sizes';
 $ec_lang['lpn_settings_map_options']='Options';
 $ec_lang['lpn_settings_grp_size']='Size';
 $ec_lang['lpn_settings_grp_angle']='Angle';
