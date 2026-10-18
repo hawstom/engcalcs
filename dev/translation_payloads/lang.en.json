@@ -64,7 +64,7 @@
         "template_feedback": "Can you suggest better wording or anything else? Do you want to help or to learn to create tools like these? Please contact me.",
         "template_printable_title": "Printable Title",
         "template_printable_subtitle": "Printable Subtitle",
-        "consent_body": "May we save a random code in this browser so that we can count how many browsers use each part of this site? The code is made up on the spot, says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first.",
+        "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
         "lpn_time_run_tip": "Solve this network at every hydraulic time step.",
         "consent_accept": "Allow this",
         "consent_accept_all": "Allow all",

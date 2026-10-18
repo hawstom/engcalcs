@@ -25,9 +25,18 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## Plain sentences to check  (0, none are stale)
+## Plain sentences to check  (1, 1 to read @@ NEEDS RULING)
 
-Every entry in `dev/plain-sentences.md` matches the English it was written against.
+**These are your translator notes in `dev/plain-sentences.md`, not visitor wording.** Each was written
+against English that has since changed, or against a key that no longer exists. Say which: keep it
+as is, change it (give the new text), or remove it. CC applies your answer to the file.
+
+- **`consent_body`**
+  > May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.
+  *Why stale:* the English changed after this entry was written
+  *Written against:* May we save a random code in this browser so that we can count how many browsers use each part of this site? The code is made up on the spot, says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first.
+  *Current plain sentence:* May we save, store, keep, or put a random code, a string of letters and digits chosen by chance, in this browser so that we can count or tally how many browsers use each part of this site? The code is made up on the spot, created at that moment, says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first.
+  @@ NEEDS RULING
 
 None on master. Every English key here is present in at least one other language.
 
@@ -35,7 +44,7 @@ None on master. Every English key here is present in at least one other language
 
 # Strings waiting on a branch
 
-**126 still to read**, of 158 new keys across 21 unmerged branch(es).
+**126 still to read**, of 158 new keys across 22 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -46,7 +55,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/roadmap-1017n (`fb4642e31`) — adds no English strings
+### chore/roadmap-1017n (`574e7b9b3`) — adds no English strings
 
 ### docs/import-export-scenario (`e19c09d2e`) — already merged into chore/roadmap-1017n; its strings are listed there
 
@@ -54,7 +63,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### docs/msx (`6ff053272`) — already merged into chore/roadmap-1017n; its strings are listed there
 
-### feat/command-usage (`23e45f368`) — adds no English strings
+### docs/privacy-plain (`fc3e5ddbc`) — adds no English strings
+
+### feat/command-usage (`8ff233b91`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -546,13 +557,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Space
   @@ NEEDS RULING
 
-### fix/friction-method-roughness (`d6116624f`) — 1 new, 1 to read @@ NEEDS RULING
+### fix/friction-method-roughness (`2ce53ac34`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_roughness_method_note`**
   > ⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.
   @@ NEEDS RULING
 
-### fix/scenario-receipt (`5da096541`) — 5 new, 5 to read @@ NEEDS RULING
+### fix/scenario-receipt (`50386ccfa`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_export_holds_base`**
   > It holds the Base scenario only.

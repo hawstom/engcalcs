@@ -85,7 +85,8 @@ $ec_lang['template_printable_subtitle']='Printable Subtitle';
 // EC_CONSENT_VERSION WENT FROM 1 TO 2 WITH IT, because what is stored changed. Everybody who chose
 // "Allow this" is asked again; "Allow all" and "Refuse all" are not. The other 26 languages keep
 // their old sentence until the next translation sprint, under the same version.
-$ec_lang['consent_body']='May we save a random code in this browser so that we can count how many browsers use each part of this site? The code is made up on the spot, says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else\'s first.';
+// Tom, 2026-10-18: "a random code so we don't count you again"; to this wording: "Yes! That's the right question." Same ask, so EC_CONSENT_VERSION stays.
+$ec_lang['consent_body']='May we save a random code in this browser, so we don\'t count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_time_run_tip']='Solve this network at every hydraulic time step.';
 $ec_lang['consent_accept']='Allow this';
