@@ -4515,3 +4515,11 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: no level label overlaps a label or node symbol, no leader crosses a leader, label or node. But many level labels with no leader are closer to ANOTHER pipe than their own (n600 2x: 100 of 137; Net3 2x: 9 of 14) and about 40% touch another pipe. Leaders appear only past a distance threshold, so a level label 25-45 px from its pipe has no leader. The harness checks N1/N3/N5 only, so it cannot see this.
 - OBSERVED: n600 1x pass 905 -> 1128 ms (R10 bound is 1 s).
 - Harnesses stay: they never measured "which pipe is this label for"; a metric of that kind is what a reviewer must add.
+
+## 2026-10-18, feat/label-beside round 2 (head 8676cd1be)
+
+- OBSERVED: Chromium 1920x1000 and 1400x900 via /usr/bin/google-chrome. Net3 at 6 notches: pipe labels 13 -> 38 (25 level), node labels 82 -> 82, none lost, none reworded. n600 fit: 13 -> 69 (56 level); 6 notches in: 52 -> 176 (124 level). 1400px: same Net3, n600 63 (52 level) at fit.
+- OBSERVED: 112 not reproducible: 5 reruns each Net3 and n600 byte-identical level sets.
+- OBSERVED: notch cost (long tasks) n600 ~1.0 s vs ~0.85 s master (headless); Net3 ~140 vs ~140.
+- OBSERVED: leaderless level labels as close to another pipe as their own (Net3 6 notches pipe 115, "Q=422.6"; n600 6 notches pipes 831, 8911, 4668, 4316, a stack "Q=1.3" over "Q=40.1"). n600 6 notches: label-box overlaps 7 -> 16 vs master (L9875 over N666, 29x14 px); n600 fit: 4 level-label boxes over a node dot.
+- Decays: re-verify before citing.
