@@ -1169,13 +1169,23 @@ EngCalcs.lpnCollide = (function () {
 		// offset -- and `dev/lpn-spike/label-priority-harness.js`'s soundness assertion is what
 		// found it. So: furthest candidate endpoint, plus the label's full diagonal beyond it, plus
 		// the pad. Erring wide costs a few tests; erring narrow drops the assertion's whole point.
-		labels.forEach(function (l) {
+		function reachOf(l) {
 			var far = 0, i, s = l.sides && l.sides.length ? l.sides : [l.home];
 			for (i = 0; i < s.length; i++) {
 				far = Math.max(far, Math.hypot(s[i].x - l.anchor.x, s[i].y - l.anchor.y));
+				// A side may hang off its own point (`anchor`, a strict pipe label's other station),
+				// so the leader from there is within reach too.
+				if (s[i].anchor) { far = Math.max(far, Math.hypot(s[i].anchor.x - l.anchor.x, s[i].anchor.y - l.anchor.y)); }
 			}
-			l._reach = far + Math.hypot(l.w, l.h) + pad;
+			return far + Math.hypot(l.w, l.h) + pad;
+		}
+		labels.forEach(function (l) {
+			l._reach = reachOf(l);
 			maxReach = Math.max(maxReach, l._reach);
+			// A strict label's other forms (`forms`, below) are reached for from the same anchor.
+			(l.forms || []).forEach(function (f) {
+				maxReach = Math.max(maxReach, reachOf(Object.assign({}, l, f)));
+			});
 		});
 		index = grid(maxReach, obs);
 		obs.boxes.forEach(function (b, i) { index.addBox(i); });
@@ -1233,6 +1243,7 @@ EngCalcs.lpnCollide = (function () {
 			}
 			for (i = 0; i < local.segments.length; i++) {
 				o = local.segments[i];
+				if (o.owner !== undefined && o.owner === lbl.id) { continue; }
 				if (o.kind === 'leader' && segmentsCross(g, o)) { return false; }
 			}
 			return true;
@@ -1248,7 +1259,7 @@ EngCalcs.lpnCollide = (function () {
 				index.addSegment(obs.segments.push(lead) - 1);
 			}
 			return { id: lbl.id, x: c.x, y: c.y, dx: c.x - lbl.home.x, dy: c.y - lbl.home.y,
-				dropped: false, side: sides.indexOf(c),
+				dropped: false, side: sides.indexOf(c), anchor: c.anchor ? { x: c.anchor.x, y: c.anchor.y } : undefined,
 				// `box` stays the ONE box a reader draws and counts (?debug=boxes, the bench's
 				// overlap count); `boxes` is what the pass actually reserved.
 				box: labelBoxAtEnd(lbl, c), boxes: b, leader: lead };
@@ -1257,11 +1268,23 @@ EngCalcs.lpnCollide = (function () {
 		// outright, because ground only fills up between the sweeps: every side before that one is
 		// still blocked when the last sweep comes back for this label, so it starts there.
 		var startAt = {};
+		// **A SIDE MAY CARRY ITS OWN POINT** (`c.anchor`): a strict pipe label tried from another
+		// station of its pipe when its own point is boxed in, its leader drawn from there. The
+		// label's anchor is lent to the side for the tests and given back after.
 		function placeClean(lbl) {
+			var a0 = lbl.anchor;
+			try { return placeClean0(lbl, a0); } finally { lbl.anchor = a0; }
+		}
+		function placeAny(lbl, from) {
+			var a0 = lbl.anchor;
+			try { return placeAny0(lbl, from, a0); } finally { lbl.anchor = a0; }
+		}
+		function placeClean0(lbl, a0) {
 			var sides = sidesOf(lbl), i, c, b, verdict, first = -1;
 			index.near(lbl.anchor.x, lbl.anchor.y, lbl._reach, local);
 			for (i = 0; i < sides.length; i++) {
 				c = sides[i];
+				lbl.anchor = c.anchor || a0;
 				b = labelLineBoxes(lbl, c);
 				verdict = boxesClearOf(b, local, pad, lbl.id);
 				if (verdict === 'blocked') { continue; }
@@ -1276,11 +1299,12 @@ EngCalcs.lpnCollide = (function () {
 		}
 		// The last sweep, and the whole of the pass when `clean` is off: the first clear side, a pipe
 		// under it or not, else the first side held only by labels this one outranks, else a drop.
-		function placeAny(lbl, from) {
+		function placeAny0(lbl, from, a0) {
 			var sides = sidesOf(lbl), i, c, b, verdict, fallback = null, fallbackBox = null;
 			index.near(lbl.anchor.x, lbl.anchor.y, lbl._reach, local);
 			for (i = from || 0; i < sides.length; i++) {
 				c = sides[i];
+				lbl.anchor = c.anchor || a0;
 				// The STAIRCASE, not the block (Task 406): asking about the block would call a side
 				// occupied because of ground the short rows never cover.
 				b = labelLineBoxes(lbl, c);
@@ -1308,6 +1332,50 @@ EngCalcs.lpnCollide = (function () {
 			if (r) { seat[lbl.id] = r; } else { waiting.push(lbl); }
 		});
 		waiting.forEach(function (lbl) { seat[lbl.id] = placeAny(lbl, startAt[lbl.id]); });
+		// **A STRICT LABEL'S OTHER FORMS: WHICHEVER SHOWS MORE** (Tom, 2026-10-18, asked which form a
+		// label should take when more than one fits: *"Whichever shows more"*). `lbl.forms` is a list
+		// of other shapes of the same label, { w, h, lines, values }, the caller's order being the
+		// order of preference among equals. Each is a fact about this label alone, so they come
+		// AFTER every label has its smallest form, and no label's growth costs another its place:
+		//   1. a label that found no side in its own form tries the others with the same number of
+		//      values (a stack where one line would not fit, or the reverse);
+		//   2. then, in drop order, every seated label tries the forms that show MORE values, most
+		//      first, on all its sides, against everything seated, and takes the first that fits.
+		// A label that moves to a bigger form gives back the ground of the smaller one, by moving
+		// its committed rows and leader out of the world, so a later label sees the ground free.
+		// The result says which form won (`form`, an index into `forms`; absent for the label's own).
+		function bury(r) {
+			(r.boxes || []).forEach(function (b) { b.cx = b.cy = 1e300; b.w = b.h = 0; });
+			if (r.leader) { r.leader.ax = r.leader.bx = r.leader.ay = r.leader.by = 1e300; }
+		}
+		function tryForm(lbl, f) {
+			var g = Object.assign({}, lbl, f), r;
+			g._reach = reachOf(g);
+			r = placeClean(g);
+			if (!r) { r = placeAny(g, 0); }
+			return r && !r.dropped ? r : null;
+		}
+		if (strict) {
+			order.forEach(function (lbl) {
+				var r = seat[lbl.id], k, nr, own = lbl.values || 0;
+				if (!r || !r.dropped || !lbl.forms) { return; }
+				for (k = 0; k < lbl.forms.length; k++) {
+					if ((lbl.forms[k].values || 0) !== own) { continue; }
+					nr = tryForm(lbl, lbl.forms[k]);
+					if (nr) { nr.form = k; seat[lbl.id] = nr; return; }
+				}
+			});
+			order.forEach(function (lbl) {
+				var r = seat[lbl.id], k, nr, now;
+				if (!r || r.dropped || !lbl.forms) { return; }
+				now = r.form === undefined ? (lbl.values || 0) : (lbl.forms[r.form].values || 0);
+				for (k = 0; k < lbl.forms.length; k++) {
+					if (!((lbl.forms[k].values || 0) > now)) { continue; }
+					nr = tryForm(lbl, lbl.forms[k]);
+					if (nr) { bury(r); nr.form = k; seat[lbl.id] = nr; return; }
+				}
+			});
+		}
 		// The result keeps the drop order, so a reader of `out` sees the same sequence either way.
 		order.forEach(function (lbl) { out.push(seat[lbl.id]); });
 		// **THE INPUTS COME BACK EXACTLY AS THEY WENT IN.** placeLabels() makes the same promise, and

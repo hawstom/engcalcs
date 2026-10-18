@@ -341,7 +341,7 @@ var EngCalcs = EngCalcs || {};
 		if (!holder.leader) { return; }
 		if (holder.empty) { holder.leader.style.display = 'none'; return; }
 		var d = Math.hypot(end.x - anchor.x, end.y - anchor.y);
-		if (d <= leaderThreshold()) { holder.leader.style.display = 'none'; return; }
+		if (d <= (holder.levelBeside ? levelLeaderMin() : leaderThreshold())) { holder.leader.style.display = 'none'; return; }
 		// A -> B, both world points, nothing derived: an endpoint computed from the label box would
 		// move when the box's pixel width did, and the angle with it (Task 328).
 		holder.leader.style.display = '';
@@ -419,7 +419,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	// `owner` is the node or pipe of a MOVED label (or `true`), else falsy for an automatic one.
 	function dataLabelOrigin(holder, anchor, end, owner, inHand) {
-		var w = labelBoxWidth(holder);
+		// `drawW`: a level pipe label drawn in another form than its banked one (syncLevelGlyphs()).
+		var w = holder.drawW !== undefined ? holder.drawW : labelBoxWidth(holder);
 		holder.side = owner ? movedLabelSide(holder, owner, anchor, end, inHand)
 			: (end.x >= anchor.x ? 'right' : 'left');
 		if (owner && owner !== true && owner.lside !== holder.side) { owner.lside = holder.side; }
@@ -659,6 +660,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		le.segRow = segRow;
 		setMultilineText(le.text, linkLabelBase(l).x, rows);
+		le.levelGlyphs = null;
 		le.text.style.fontSize = fsNow;
 		(le.repeats || []).forEach(function (r) { r.text.style.fontSize = fsNow; });
 		le.rows = rows;
@@ -900,12 +902,33 @@ var EngCalcs = EngCalcs || {};
 	function nodeFirstFitSpec(n, ne, fs) {
 		var d = defaultLabelOffset(), ctx = nodeContextFor(n.id),
 			reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS),
-			sides = Collide.cardinalSides(nodeAt(n), d,
+			sides = ne.inline ? inlineNodeSides(nodeAt(n), d, fs, reach) : Collide.cardinalSides(nodeAt(n), d,
 				(ctx && ctx.arcs) || Collide.openArcs([]), { raster: true, outer: reach });
 		return { id: nodeLabelKey(n.id), anchor: nodeAt(n), home: nodeLabelBase(n),
 			dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
 			w: labelBoxWidth(ne), h: dataLabelBoxHeight(ne.lineCount), yOff: -fs * 0.85,
 			lines: labelRowWidths(ne) };
+	}
+	// **WHERE A ONE-LINE NODE LABEL MAY GO: EAST OR WEST OF ITS NODE** (Task 734, Tom 2026-09-26:
+	// *"where there is infinite space east or west, we might want to recognize that infinity and
+	// leverage it by using single-line concatenation of properties"*; 2026-10-18: *"Node labels that
+	// go inline instead of stacked"*). Level with the node first, east then west; then the four
+	// corners a stack would use; then rings out to `reach` within 35 degrees of level, nearest first.
+	// Nothing here is a fact about the zoom except through the symbol and text sizes, as for a stack.
+	var LPN_INLINE_NODE_ARC = 35;
+	function inlineNodeSides(a, d, fs, reach) {
+		var dx = Math.abs(d.x), dy = Math.abs(d.y), h1 = dataLabelBoxHeight(1),
+			cy = a.y + fs * 0.85 - h1 / 2, home = Math.hypot(dx, dy), out = [], ring;
+		out.push({ x: a.x + dx, y: cy, corner: -1, deg: 0 }, { x: a.x - dx, y: cy, corner: -1, deg: 180 });
+		[[1, -1], [-1, -1], [1, 1], [-1, 1]].forEach(function (c) {
+			out.push({ x: a.x + c[0] * dx, y: a.y + c[1] * dy, corner: -1, deg: null });
+		});
+		ring = Collide.polarCandidates(a, { start: -LPN_INLINE_NODE_ARC, end: LPN_INLINE_NODE_ARC }, home, reach, { rings: 3, tol: 0 }).concat(
+			Collide.polarCandidates(a, { start: 180 - LPN_INLINE_NODE_ARC, end: 180 + LPN_INLINE_NODE_ARC }, home, reach, { rings: 3, tol: 0 }));
+		ring.forEach(function (q, i) { q._r = Math.hypot(q.x - a.x, q.y - a.y); q._i = i; });
+		ring.sort(function (p, q) { return (p._r - q._r) || (p._i - q._i); });
+		ring.forEach(function (q) { delete q._r; delete q._i; out.push(q); });
+		return out;
 	}
 	// The drop order, as ONE rule both the prediction and the real pass read. The lexicographic drop
 	// key becomes an ORDINAL here, so js/lpn-collide.js sees one number and never has to know what a
@@ -1288,9 +1311,12 @@ var EngCalcs = EngCalcs || {};
 	// drawn at the OLD scale and multiplies by the NEW one -- the banked pixel width is then wrong by
 	// exactly the zoom ratio, making obstacle boxes enormous when you zoom out.
 	// It is a WRITE, which is why it belongs in the write half and not beside the measurement.
-	function writeNodeLabelGlyphs(ne, n, lines, fsNow) {
+	function writeNodeLabelGlyphs(ne, n, lines, fsNow, inline) {
 		labelCacheTaint();
-		var rows = composeRows(lines, true);   // a node label always stacks -- see composeRows()
+		// A node label stacks (composeRows()) unless the pass chose its ONE-LINE form (Task 734,
+		// tryInlineNodeLabels()): the same fields, in the same order, with the page's separator.
+		ne.inline = !!inline && lines.length > 1;
+		var rows = composeRows(lines, !ne.inline);
 		setMultilineText(ne.text, nodeLabelBase(n).x, rows);
 		ne.lineCount = rows.length;
 		ne.lines = lines;   // the FIELD lines, one per value, whatever shape they were drawn in
@@ -1505,8 +1531,13 @@ var EngCalcs = EngCalcs || {};
 			lone = isPrimary && single,
 			mid = lone ? linkLabelMid(l) : linkLabelMid(l, along),
 			anchor = { x: mid.x, y: mid.y },
-			end = lone ? linkLabelPos(l) : { x: mid.x + d.x, y: mid.y + d.y },
-			org = dataLabelOrigin(isPrimary ? le : part, anchor, end, (lone && l.lx !== undefined) ? l : null, isPrimary && labelInHand(le));
+			end = lone ? linkLabelPos(l) : { x: mid.x + d.x, y: mid.y + d.y };
+		// A level label hangs off the station placeLevelPipeLabels() placed it from.
+		if (lone && le.levelBeside && le.levelAt) {
+			anchor = le.levelAt.along === null ? mid : Geom.pointAlongPolyline(linkPointList(l), le.levelAt.along);
+			end = { x: anchor.x + le.levelAt.ex, y: anchor.y + le.levelAt.ey };
+		}
+		var org = dataLabelOrigin(isPrimary ? le : part, anchor, end, (lone && l.lx !== undefined) ? l : null, isPrimary && labelInHand(le));
 		repositionMultilineText(part.text, org.x, org.y);
 		if (isPrimary) { updateDataLeader(le, anchor, end); }
 	}
@@ -1529,6 +1560,8 @@ var EngCalcs = EngCalcs || {};
 		var hideAll = le.levelBeside ? !!le.hiddenCrossed
 			: (le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenBlocked || !!le.hiddenYielded || !!le.hiddenCrossed);
 		setLabelAssemblyHidden(le, hideAll);
+		syncLevelGlyphs(l, le);
+		if (le.levelBeside && le.levelForm) { le.drawW = le.levelForm.wPx / (state.s || 1); } else { delete le.drawW; }
 		var single = linkLabelStations(l).length === 1,
 			stations = perfDebugAccum('  lkL:stations', function () {
 				return single ? [le.alignedAlong] : drawnLinkLabelStations(l);
@@ -2579,7 +2612,7 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id];
 			if (!ne || ne.empty || !ne.allLines || !ne.lines) { return; }
-			if (ne.lines.length >= ne.allLines.length) { return; }
+			if (ne.lines.length >= ne.allLines.length && !ne.inline) { return; }
 			work.push({ n: n, ne: ne });
 		});
 		if (!work.length) { return; }
@@ -2635,10 +2668,111 @@ var EngCalcs = EngCalcs || {};
 		if (gone >= order.length - 1) { return null; }
 		return { lbl: lbl, n: n, ne: ne, all: all, order: order, gone: gone };
 	}
+	// **BEFORE ANY VALUE GOES, THE LABELS IN THE WAY TRY ONE LINE** (Task 734 and Task 812; Tom,
+	// 2026-10-18, on which form a node label takes when both fit: *"Whichever shows more"*).
+	//
+	// A node label has two forms, the stack and one line east or west of its node (inlineNodeSides()).
+	// Where nothing is lost the two show the same, and the stack stays: a picture that changes for
+	// nothing is a cost (R11). What the form can change is what the OTHER labels get, so it is tried
+	// exactly where something is lost: a node label that found no side, the placed node labels on
+	// the ground it needed (nodeShedBlockers(), the pair the shed would make give up values), and
+	// every placed node label standing on a pipe label that will yield to it (stationedYieldSet()).
+	// Those go to one line together and the node first-fit runs again; any of them that was seated
+	// before and is not now goes back to its stack, and it runs once more. **WHICHEVER OF THE
+	// LAYOUTS SHOWS MORE IS KEPT**, counted as labels shown (node labels seated, less the pipe labels
+	// they make yield) and then values shown; the first layout wins a tie, so nothing changes unless
+	// something more is shown. It runs before the shed, at full content, so a label keeps its
+	// values on one line where a stack would have had to give one up.
+	//
+	// Pure, like the rest of the pass: the candidates, the forms and the count are all facts about
+	// the drawing, and a drag frame rebuilds each label's spec in the form it now has.
+	// COST: two more node first-fits and one write and measure of the labels tried, and only on a
+	// view where some node label found no side or some pipe label yields; none elsewhere.
+	function tryInlineNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf) {
+		var fs = parseFloat(fsNow) || effectiveFontSize(), dropped = [], cand = [], seen = {}, stat = [], i, idx, local,
+			reach = 0, index, live = { boxes: [], segments: [] };
+		function holder(id) { var n = nodeOf[id]; return n ? nodeEls[n.id] : null; }
+		function enlist(id) {
+			var n = nodeOf[id], ne = n && nodeEls[n.id];
+			if (seen[id] || !ne || ne.empty || !ne.lines || ne.lines.length < 2 || !byId[id]) { return; }
+			seen[id] = true;
+			cand.push({ id: id, n: n, ne: ne, spec: byId[id] });
+		}
+		function score(pl) {
+			var labels = 0, values = 0, taken = stationedYieldSet(pl, obs);
+			pl.forEach(function (r) {
+				var ne = holder(r.id);
+				if (r.dropped || !ne) { return; }
+				labels++; values += (ne.lines || []).length;
+			});
+			Object.keys(taken).forEach(function (id) {
+				var le = linkEls[id];
+				labels--; values -= (le && le.lines ? le.lines.length : 0);
+			});
+			return { labels: labels, values: values };
+		}
+		function better(a, b) { return a.labels > b.labels || (a.labels === b.labels && a.values > b.values); }
+		function setForm(list, inline) {
+			if (!list.length) { return; }
+			list.forEach(function (c) { writeNodeLabelGlyphs(c.ne, c.n, c.ne.lines, fsNow, inline); });
+			list.forEach(function (c) { measureLabelWidths(c.ne); });
+			list.forEach(function (c) {
+				var f = nodeFirstFitSpec(c.n, c.ne, fs);
+				c.spec.w = f.w; c.spec.h = f.h; c.spec.lines = f.lines; c.spec.sides = f.sides;
+			});
+		}
+		placed.forEach(function (r) {
+			if (r.dropped && byId[r.id]) { dropped.push(byId[r.id]); return; }
+			(r.boxes || (r.box ? [r.box] : [])).forEach(function (b) { live.boxes.push(b); });
+		});
+		obs.boxes.forEach(function (b) { if (b.linkOwner !== undefined) { stat.push(b); } });
+		if (dropped.length) {
+			dropped.forEach(function (lbl) { reach = Math.max(reach, nodeLabelReach(lbl, pad)); });
+			index = Collide.grid(reach, live);
+			live.boxes.forEach(function (b, k) { index.addBox(k); });
+			local = { boxes: [], segments: [] };
+			dropped.forEach(function (lbl) {
+				enlist(lbl.id);
+				nodeShedBlockers(lbl, index, local, pad).forEach(enlist);
+			});
+		}
+		if (stat.length) {
+			idx = Collide.boxIndex(stat);
+			placed.forEach(function (r) {
+				if (r.dropped || seen[r.id]) { return; }
+				var bs = r.boxes || (r.box ? [r.box] : []);
+				for (i = 0; i < bs.length; i++) { if (idx.anyOverlap(bs[i])) { enlist(r.id); return; } }
+			});
+		}
+		if (!cand.length) { lastInlineTrial = null; return placed; }
+		var base = score(placed), wasSeated = {};
+		placed.forEach(function (r) { if (!r.dropped) { wasSeated[r.id] = true; } });
+		setForm(cand, true);
+		var p1 = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad }), s1 = score(p1), lost = [], gone = {};
+		p1.forEach(function (r) { if (r.dropped && wasSeated[r.id]) { gone[r.id] = true; } });
+		cand.forEach(function (c) { if (gone[c.id]) { lost.push(c); } });
+		var p2 = null, s2 = null;
+		if (lost.length) {
+			setForm(lost, false);
+			p2 = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
+			s2 = score(p2);
+		}
+		lastInlineTrial = { tried: cand.length, base: base, all: s1, kept: s2 };
+		if (p2 && better(s2, base) && !better(s1, s2)) { return p2; }
+		if (better(s1, base)) {
+			if (p2) { setForm(lost, true); }
+			return p1;
+		}
+		setForm(cand.filter(function (c) { return c.ne.inline; }), false);
+		return placed;
+	}
+	// What the last one-line trial did, for a harness to read. Not a decision input.
+	var lastInlineTrial = null;
 	function shedNodeLabelsForCrowding(nodeLabels, placed, obs, pad, fsNow) {
 		var byId = {}, nodeOf = {}, rungs = 0;
 		nodeLabels.forEach(function (l) { byId[l.id] = l; });
 		doc.nodes.forEach(function (n) { nodeOf[nodeLabelKey(n.id)] = n; });
+		placed = perfDebugAccum('  ns:inline', function () { return tryInlineNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf); });
 		var maxRungs = nodeShedMaxRungs();
 		while (rungs < maxRungs) {
 			var liveObs = { boxes: [], segments: [] }, dropped = [], recs = [], seen = {},
@@ -2673,7 +2807,7 @@ var EngCalcs = EngCalcs || {};
 			perfDebugAccum('  ns:glyphs', function () {
 				recs.forEach(function (rec) {
 					writeNodeLabelGlyphs(rec.ne, rec.n,
-						keptLines(rec.all, shedKeepSet(rec.all, rec.order, rec.gone + 1)), fsNow);
+						keptLines(rec.all, shedKeepSet(rec.all, rec.order, rec.gone + 1)), fsNow, rec.ne.inline);
 				});
 				recs.forEach(function (rec) { measureLabelWidths(rec.ne); });
 				recs.forEach(function (rec) {
@@ -2870,11 +3004,93 @@ var EngCalcs = EngCalcs || {};
 	// side stays hidden exactly as before. Only a lone label is tried; a chain keeps its stations.
 	// Longest pipe first, as the slide orders them, so the order is a function of the drawing.
 	var LPN_LEVEL_REACH_TEXT_HEIGHTS = 3, LPN_LEVEL_PAD_FRAC = 0.1, LPN_LEVEL_NEAR_FRAC = 0.2;
+	// **A LEVEL LABEL CARRIES ITS LEADER UNLESS IT TOUCHES ITS PIPE** (pre-review of
+	// feat/label-beside, 2026-10-18: level labels 25-45 px from their pipe had no leader, because a
+	// data label draws one only past leaderThreshold(), and several sat as near another pipe as their
+	// own). A level label is off its pipe by definition, so the leader is what says whose it is: it
+	// is drawn whenever the label's point is more than this many font sizes from the pipe's.
+	var LPN_LEVEL_LEADER_FRAC = 0.6, LPN_LEVEL_STATIONS = [0.5, 0.35, 0.65, 0.2, 0.8];
+	function levelLeaderMin() { return effectiveFontSize() * LPN_LEVEL_LEADER_FRAC; }
+	// **THE OTHER FORMS OF A LEVEL LABEL, MEASURED WITHOUT TOUCHING THE LABEL** (Task 812, Tom
+	// 2026-10-18: *"pipe labels that go out on a leader inline or stacked"*, and on which when both
+	// fit, *"Whichever shows more"*). Each candidate content is drawn once into a hidden scratch
+	// <text> of the same class and size, every write first and every read after, so a batch costs one
+	// layout; widths are kept in PIXELS by the text, so a wheel notch reads them back for nothing.
+	// The label's own element is not touched: its banked widths are the along-the-pipe content's,
+	// and every pass before this one reasons from them.
+	var levelFormCache = Object.create(null), levelFormKeys = 0;
+	function levelFormKey(lines, stacked) {
+		return (stacked ? 'S' : 'I') + '\u0001' + labelSeparator() + '\u0001' +
+			lines.map(function (ln) { return ln.text; }).join('\u0001');
+	}
+	function measureLevelForms(reqs, fsNow) {
+		var s = state.s || 1, px = (effectiveFontSize() * s).toFixed(4), todo = [];
+		reqs.forEach(function (q) {
+			q.key = px + '\u0002' + levelFormKey(q.lines, q.stacked);
+			var hit = levelFormCache[q.key];
+			if (hit) { q.m = hit; } else { todo.push(q); }
+		});
+		if (todo.length && labelsLayer) {
+			todo.forEach(function (q) {
+				q.t = el('text', { x: 0, y: 0, 'class': 'lpn-lbl' }, labelsLayer);
+				q.t.style.visibility = 'hidden';
+				q.t.style.fontSize = fsNow;
+				setMultilineText(q.t, 0, composeRows(q.lines, q.stacked));
+			});
+			todo.forEach(function (q) {
+				var h = { text: q.t }, w = 0;
+				try { w = q.t.getBBox().width; } catch (err) { w = 0; }
+				noteRowWidths(h);
+				q.m = { wPx: w * s, rowWPx: h.rowWPx ? h.rowWPx.slice() : null };
+			});
+			todo.forEach(function (q) {
+				if (q.t.parentNode) { q.t.parentNode.removeChild(q.t); }
+				delete q.t;
+				if (!(q.m.wPx > 0)) { return; }
+				if (levelFormKeys >= TEXT_MEASURE_MAX) { levelFormCache = Object.create(null); levelFormKeys = 0; }
+				levelFormCache[q.key] = q.m; levelFormKeys++;
+			});
+		}
+		return reqs;
+	}
+	// The forms a level label may take besides the one it arrived in: every content from its full
+	// label down to the one the shed left it, each on one line and, with two values or more, as a
+	// stack. Most values first; between two forms showing the same values, the smaller footprint
+	// first, since it leaves more ground for the labels after it.
+	function levelLabelForms(l, le, fs, fsNow) {
+		var all = le.allLines || le.lines, base = le.lines || [], order, g, gBase, reqs = [], sets = [], out = [], s = state.s || 1;
+		if (!all || !all.length || le.empty) { return []; }
+		order = shedOrder(all);
+		gBase = all.length - base.length;
+		for (g = 0; g <= gBase; g++) { sets.push(keptLines(all, shedKeepSet(all, order, g))); }
+		// The shed walks the same order, so its last rung is the content the label arrived in. If it
+		// is not (a label edited in place mid-pass), only the full label is offered beside it.
+		if (!sameLines(sets[sets.length - 1], base)) { sets = all.length > base.length ? [all] : []; }
+		else { sets.pop(); }
+		sets.forEach(function (ls) {
+			reqs.push({ lines: ls, stacked: false });
+			if (ls.length > 1) { reqs.push({ lines: ls, stacked: true }); }
+		});
+		if (base.length > 1) { reqs.push({ lines: base, stacked: true }); }
+		measureLevelForms(reqs, fsNow).forEach(function (q) {
+			if (!q.m || !(q.m.wPx > 0)) { return; }
+			var n = q.stacked ? q.lines.length : 1, w = q.m.wPx / s, h = dataLabelBoxHeight(n),
+				rows = q.stacked && q.m.rowWPx && q.m.rowWPx.length > 1 ? q.m.rowWPx.map(function (v) { return v / s; }) : null,
+				area = rows ? rows.reduce(function (a, v) { return a + v; }, 0) * (h / n) : w * h;
+			// The whole block is reserved, not the staircase: a stack hung left of its point is drawn
+			// with its rows flush LEFT (dataLabelOrigin()), which the staircase model does not draw.
+			out.push({ w: w, h: h, lines: null, values: q.lines.length, area: area,
+				form: { lines: q.lines, stacked: q.stacked, key: levelFormKey(q.lines, q.stacked), wPx: q.m.wPx } });
+		});
+		out.sort(function (a, b) { return (b.values - a.values) || (a.area - b.area) || ((a.form.stacked ? 1 : 0) - (b.form.stacked ? 1 : 0)); });
+		return out;
+	}
 	function placeLevelPipeLabels(obs, nodeObs, nodeLabels, nodePlaced, ringLabels, ringPlaced, holders, fs) {
 		var specs = [], min = leaderThreshold(), d = defaultLabelOffset(), home0 = Math.hypot(d.x, d.y),
-			reach = Math.max(home0 * 3, fs * LPN_LEVEL_REACH_TEXT_HEIGHTS), byKey = {};
+			reach = Math.max(home0 * 3, fs * LPN_LEVEL_REACH_TEXT_HEIGHTS), byKey = {}, fsNow = fs + 'px';
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id];
+			if (le) { le.levelForm = null; le.levelAt = null; }
 			if (!le || le.empty || le.hiddenCrossed || !linkLabelAligned(l) || linkLabelStations(l).length !== 1) { return; }
 			// **A LABEL TOO SHORT FOR ITS SEGMENT TRIES THE LEVEL SPOT TOO** (Tom, 2026-10-17: short
 			// pipes should also try the level spot). Along the pipe it still hides, as his 2026-08-14
@@ -2882,19 +3098,40 @@ var EngCalcs = EngCalcs || {};
 			// along a line with no room, and a level label does not lie along it. It arrives in the
 			// form the shed left it, its last value, and hides as before if no side is clean.
 			if (!(linkLabelTooShort(l, le) || le.hiddenCrowded || le.hiddenBlocked || le.hiddenYielded)) { return; }
-			var mid = linkLabelMid(l), dir = linkDirectionAt(l, mid),
-				deg = Math.atan2(dir.by - dir.ay, dir.bx - dir.ax) * 180 / Math.PI,
-				arcs = Collide.openArcs([deg, deg + 180]),
-				sides = Collide.cardinalSides(mid, d, arcs, {}),
-				ring = Collide.polarCandidates(mid, arcs[0], home0, reach, { rings: 4 }).concat(
-					Collide.polarCandidates(mid, arcs[1], home0, reach, { rings: 4 }));
-			ring.forEach(function (p, i) { p._r = Math.hypot(p.x - mid.x, p.y - mid.y); p._i = i; });
-			ring.sort(function (a, b) { return (a._r - b._r) || (a._i - b._i); });
-			ring.forEach(function (p) { delete p._r; delete p._i; sides.push(p); });
+			var mid = linkLabelMid(l), pts = linkPointList(l), sides = [];
+			// The sides round one point of the pipe: its corners, then rings out to `reach` on either
+			// side of the pipe, nearest first. `at` marks a point other than the label's own.
+			function sidesAt(p, along, rings) {
+				var dir = linkDirectionAt(l, p),
+					deg = Math.atan2(dir.by - dir.ay, dir.bx - dir.ax) * 180 / Math.PI,
+					arcs = Collide.openArcs([deg, deg + 180]),
+					out = Collide.cardinalSides(p, d, arcs, {}),
+					ring = Collide.polarCandidates(p, arcs[0], home0, reach, { rings: rings }).concat(
+						Collide.polarCandidates(p, arcs[1], home0, reach, { rings: rings }));
+				ring.forEach(function (q, i) { q._r = Math.hypot(q.x - p.x, q.y - p.y); q._i = i; });
+				ring.sort(function (a, b) { return (a._r - b._r) || (a._i - b._i); });
+				ring.forEach(function (q) { delete q._r; delete q._i; out.push(q); });
+				if (along !== null) { out.forEach(function (q) { q.anchor = p; q.along = along; }); }
+				return out;
+			}
+			sides = sidesAt(mid, null, 4);
+			// **AND THEN FROM THE NEAREST CLEAR STATION** (Task 812). The label's own point is dodged
+			// off the flow arrow at mid-pipe, which on a short pipe puts it by an end node, where
+			// every leader starts inside that node's symbol (Tom's Net1, 2026-10-18: the short
+			// pipe east of the top-right junction hid with open ground beside it). Its other
+			// stations come after every side of its own point, nearest the middle first.
+			LPN_LEVEL_STATIONS.forEach(function (a) {
+				Array.prototype.push.apply(sides, sidesAt(Geom.pointAlongPolyline(pts, a), a, 3));
+			});
 			specs.push({ id: linkLabelKey(l.id), ownLink: linkLabelKey(l.id), anchor: mid, home: linkLabelBase(l),
 				dragged: false, sides: sides, len: Geom.polylineLength(linkPointList(l)),
 				w: labelBoxWidth(le), h: dataLabelBoxHeight(le.lineCount), yOff: -fs * 0.85,
-				lines: labelRowWidths(le), l: l });
+				lines: labelRowWidths(le), values: (le.lines || []).length, l: l });
+		});
+		// Every candidate's other forms, measured in one batch.
+		specs.forEach(function (sp) {
+			var f = levelLabelForms(sp.l, linkEls[sp.l.id], fs, fsNow);
+			if (f.length) { sp.forms = f; }
 		});
 		if (!specs.length) { return; }
 		specs.sort(function (a, b) { return (b.len - a.len) || (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0)); });
@@ -2937,11 +3174,15 @@ var EngCalcs = EngCalcs || {};
 		// rows, by a fifth of a font size (`near`); a side further out carries a leader to its pipe,
 		// which says it instead. A label with no such side stays hidden.
 		var out = Collide.placeLabelsFirstFit(specs, ground, { pad: fs * LPN_LEVEL_PAD_FRAC, lastPad: 0, strict: true,
-			leaderMin: min, near: fs * LPN_LEVEL_NEAR_FRAC });
+			leaderMin: levelLeaderMin(), near: fs * LPN_LEVEL_NEAR_FRAC });
 		out.forEach(function (r) {
 			var sp = byKey[r.id], le = sp && linkEls[sp.l.id];
 			if (!le || r.dropped) { return; }
 			le.levelBeside = true;
+			le.levelForm = (r.form !== undefined && sp.forms && sp.forms[r.form]) ? sp.forms[r.form].form : null;
+			// Where its leader starts and its text hangs, from the station it was placed from.
+			var side = r.side >= 0 ? sp.sides[r.side] : null, a = r.anchor || sp.anchor;
+			le.levelAt = { along: side && side.along !== undefined ? side.along : null, ex: r.x - a.x, ey: r.y - a.y };
 			le.nudge = { x: r.dx, y: r.dy };
 			le.nudgeManual = false;
 			le.placedSide = r.side;
@@ -2950,7 +3191,18 @@ var EngCalcs = EngCalcs || {};
 			(r.boxes || [r.box]).forEach(function (b) { b.kind = 'levellabel'; b.levelOwner = sp.l.id; obs.boxes.push(b); });
 			if (r.leader) { obs.segments.push(r.leader); }
 		});
-		specs.forEach(function (sp) { delete sp.l; });
+		specs.forEach(function (sp) { delete sp.l; delete sp.forms; });
+	}
+	// **WHAT A LEVEL LABEL'S ELEMENT SHOWS** (Task 812). A level label in another form than the one
+	// it arrived in has that form written into its own <text>; anything else shows the content the
+	// pass along the pipe decided (`le.rows`). Written only on a change, so a pass that decides the
+	// same thing writes nothing. `le.levelGlyphs` names what is in the element, null for `le.rows`.
+	function syncLevelGlyphs(l, le) {
+		var want = (le.levelBeside && le.levelForm) ? le.levelForm.key : null;
+		if ((le.levelGlyphs || null) === want) { return; }
+		if (want) { setMultilineText(le.text, 0, composeRows(le.levelForm.lines, le.levelForm.stacked)); }
+		else if (le.rows) { setMultilineText(le.text, 0, le.rows); }
+		le.levelGlyphs = want;
 	}
 	function runLabelCollisionAvoidance(shedNodes) {
 		var fs = effectiveFontSize(), fsNow = fs + 'px', labels = [], nodeLabels = [], stationed = [],
@@ -41082,7 +41334,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// The glyphs have to be WRITTEN -- these are new elements -- but they are written
 				// from the content the shed already decided, so no cascade runs and nothing is
 				// measured.
-				if (c.lines && !c.empty) { writeNodeLabelGlyphs(ne, n, c.lines.slice(), fsNow); }
+				if (c.lines && !c.empty) { writeNodeLabelGlyphs(ne, n, c.lines.slice(), fsNow, c.inline); }
 				ne.allLines = c.allLines || (c.lines ? c.lines.slice() : ne.allLines);
 				ne.empty = c.empty; ne.lineCount = c.lineCount;
 				restoreBucketHolder(ne, c);
@@ -59549,7 +59801,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			hiddenShort: !!h.hiddenShort, hiddenCrowded: !!h.hiddenCrowded, hiddenYielded: !!h.hiddenYielded,
 			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
 			alignedAlong: h.alignedAlong, stationSides: h.stationSides ? h.stationSides.slice() : h.stationSides,
-			levelBeside: !!h.levelBeside, tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
+			levelBeside: !!h.levelBeside, levelForm: h.levelForm || null, levelAt: h.levelAt || null, inline: !!h.inline, tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
 			rowW: h.rowW ? h.rowW.slice() : null, rowWPx: h.rowWPx ? h.rowWPx.slice() : null,
 			segW: h.segW ? h.segW.slice() : null };
 	}
@@ -59602,7 +59854,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h.hiddenShort = c.hiddenShort; h.hiddenCrowded = c.hiddenCrowded; h.hiddenYielded = c.hiddenYielded;
 		h.hiddenBlocked = c.hiddenBlocked;
 		h.hiddenCrossed = c.hiddenCrossed; h.hiddenDropped = c.hiddenDropped;
-		h.alignedAlong = c.alignedAlong; h.levelBeside = c.levelBeside;
+		h.alignedAlong = c.alignedAlong; h.levelBeside = c.levelBeside; h.levelForm = c.levelForm || null; h.levelAt = c.levelAt || null;
 		h.stationSides = c.stationSides ? c.stationSides.slice() : c.stationSides;
 		h.tw = c.tw; h.twPx = c.twPx; h.width = c.width; h.widthPx = c.widthPx;
 		h.rowW = c.rowW ? c.rowW.slice() : null; h.rowWPx = c.rowWPx ? c.rowWPx.slice() : null;
@@ -59619,7 +59871,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			doc.nodes.forEach(function (n) {
 				var ne = nodeEls[n.id], c = e.nodes[n.id];
 				if (!ne || !c) { return; }
-				if (c.lines && !sameLines(ne.lines, c.lines)) { writeNodeLabelGlyphs(ne, n, c.lines.slice(), fsNow); }
+				if (c.lines && (!sameLines(ne.lines, c.lines) || !!ne.inline !== !!c.inline)) { writeNodeLabelGlyphs(ne, n, c.lines.slice(), fsNow, c.inline); }
 				ne.lineCount = c.lineCount;
 				restoreBucketHolder(ne, c);
 			});

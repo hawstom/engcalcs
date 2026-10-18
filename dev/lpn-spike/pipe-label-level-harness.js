@@ -176,7 +176,7 @@ function ok(label, cond, detail) {
 				totals[k].shown += v.c.pipesShown + v.c.nodesShown; totals[k].asked += v.c.pipes + v.c.nodes;
 				totals[k].rows += v.c.pipeRows + v.c.nodeRows; totals[k].rowsAsked += v.c.pipeRowsAsked + v.c.nodeRowsAsked;
 			});
-			const line = `pipes ${b.c.pipesShown} -> ${a.c.pipesShown} of ${a.c.pipes} (${a.c.level} level), nodes ${b.c.nodesShown} -> ${a.c.nodesShown} of ${a.c.nodes}, ` +
+			const line = `pipes ${b.c.pipesShown} -> ${a.c.pipesShown} of ${a.c.pipes} (${a.c.level} level: ${a.c.levelInline} one line, ${a.c.levelStacked} stacked, ${a.c.levelGrown} grown), nodes ${b.c.nodesShown} -> ${a.c.nodesShown} of ${a.c.nodes} (${a.c.nodeInline} one line), ` +
 				`values ${rowsB} -> ${rowsA} of ${a.c.pipeRowsAsked + a.c.nodeRowsAsked}; breaks before N1 ${b.br.N1.length} N3 ${b.br.N3.length} N5 ${b.br.N5.length}`;
 			if (TABLE) { console.log('        ' + tag + ': ' + line); }
 			const was = new Set(b.br.N1.concat(b.br.N3, b.br.N5)), added = a.br.N1.concat(a.br.N3, a.br.N5).filter((x) => !was.has(x));

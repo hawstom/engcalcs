@@ -103,21 +103,31 @@ function countShown(L) {
 	const doc = L.getDoc(), st = L.state(), nodeEls = L.nodeEls(), linkEls = L.linkEls();
 	const inView = (p) => { const x = p.x * st.s + st.tx, y = p.y * st.s + st.ty; return x >= 0 && x <= W && y >= 0 && y <= H; };
 	const byId = {}; doc.nodes.forEach((n) => { byId[n.id] = n; });
-	const c = { pipes: 0, pipesShown: 0, pipeRows: 0, pipeRowsAsked: 0, nodes: 0, nodesShown: 0, nodeRows: 0, nodeRowsAsked: 0, level: 0, along: 0 };
+	const c = { pipes: 0, pipesShown: 0, pipeRows: 0, pipeRowsAsked: 0, nodes: 0, nodesShown: 0, nodeRows: 0, nodeRowsAsked: 0, level: 0, along: 0,
+		levelStacked: 0, levelInline: 0, levelGrown: 0, nodeInline: 0, nodeStacked: 0 };
 	doc.links.forEach((l) => {
 		const le = linkEls[l.id]; if (!le || le.empty) { return; }
 		const a = L.nodeAt(byId[l.from]), b = L.nodeAt(byId[l.to]);
 		if (!a || !b || !(inView(a) || inView(b))) { return; }
 		c.pipes++; c.pipeRowsAsked += (le.allLines || le.lines || []).length;
 		if (shown(le)) {
-			c.pipesShown++; c.pipeRows += (le.lines || []).length;
-			if (le.levelBeside) { c.level++; } else { c.along++; }
+			// A level label drawn in another form shows that form's values (Task 812).
+			const f = le.levelBeside && le.levelForm;
+			c.pipesShown++; c.pipeRows += f ? f.lines.length : (le.lines || []).length;
+			if (le.levelBeside) {
+				c.level++;
+				if (f && f.stacked) { c.levelStacked++; } else { c.levelInline++; }
+				if (f && f.lines.length > (le.lines || []).length) { c.levelGrown++; }
+			} else { c.along++; }
 		}
 	});
 	doc.nodes.forEach((n) => {
 		const ne = nodeEls[n.id]; if (!ne || ne.empty || !inView(L.nodeAt(n))) { return; }
 		c.nodes++; c.nodeRowsAsked += (ne.allLines || ne.lines || []).length;
-		if (shown(ne)) { c.nodesShown++; c.nodeRows += (ne.lines || []).length; }
+		if (shown(ne)) {
+			c.nodesShown++; c.nodeRows += (ne.lines || []).length;
+			if ((ne.lines || []).length > 1) { if (ne.inline) { c.nodeInline++; } else { c.nodeStacked++; } }
+		}
 	});
 	return c;
 }
