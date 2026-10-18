@@ -26791,7 +26791,7 @@ var EngCalcs = EngCalcs || {};
 		return pc.lpn_color_break_number ||
 			'A boundary must be a number. The map is unchanged.';
 	}
-	function buildColoringSection() { var out = withSetboxView(buildColoringSectionNow); markHeldSetboxRows(); markSavedShort(); return out; }
+	function buildColoringSection() { var out = withSetboxView(buildColoringSectionNow); markHeldSetboxRows(); return out; }
 	function buildColoringSectionNow() {
 		var pc = EngCalcs.pageConfig || {},
 			R = ramps(),
@@ -59720,28 +59720,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		m.textContent = pc['lpn_saved_' + cls] || '';
 		return m;
 	}
-	// **(p) OR (b) AFTER EVERY ROW UNDER MAP AND PAGE** (Tom, 2026-10-18), read off the row's own
-	// class or its (silent) sub-heading's; the legend above Map says what the letters mean. Run after
-	// each builder that writes a row there, and idempotent.
-	function markSavedShort() {
-		var pc = EngCalcs.pageConfig || {};
-		['lpn_set_sec_map', 'lpn_set_sec_page'].forEach(function (id) {
-			var sec = document.getElementById(id);
-			if (!sec) { return; }
-			[].forEach.call(sec.querySelectorAll('.lpn-set-row'), function (row) {
-				var lab = row.firstElementChild, body = row.closest('.lpn-set-subbody'),
-					sub = body && body.previousElementSibling,
-					cls = row.getAttribute('data-saved') || (sub && sub.getAttribute('data-saved')), m;
-				if (!lab || !cls || lab.querySelector('.lpn-saved-short')) { return; }
-				m = document.createElement('span');
-				m.className = 'lpn-saved lpn-saved-short';
-				m.setAttribute('data-saved-class', cls);
-				m.textContent = ' ' + (pc['lpn_saved_short_' + cls] || '');
-				m.title = pc['lpn_saved_' + cls] || '';
-				lab.appendChild(m);
-			});
-		});
-	}
 	function validatePrefix(p) { return !!p && !/[\s'"]/.test(p); }
 	// Fills SIX of the Settings box's hosts (Task 441, restructured): ID prefixes and starting values
 	// under New elements, map appearance and the page under Map and page, units and hydraulics under
@@ -61211,7 +61189,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		wipeBtn.addEventListener('click', wipeEverything);
 		tail.appendChild(wipeBtn);
 		[idBody, defBody, mapBody, unitsBody, compBody, energyBody, pageBody, posBody, posBody2, mapBody2].forEach(tipsIn);
-		markSavedShort();
 	}
 	// ================================================================================================
 	// THE SETTINGS BOX (ROADMAP Task 441, absorbing 284)

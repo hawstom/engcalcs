@@ -158,7 +158,7 @@ async function main() {
 		// ---- 4. searching --------------------------------------------------------------------------
 		console.log('\n4. Searching');
 		await openSettings();
-		const visible = () => P.evaluate(() => Array.from(document.querySelectorAll('#lpn_settings_box [data-lpn-setting]')).filter((e) => e.getClientRects().length).map((e) => e.textContent.replace(/\s+/g, ' ').replace(/\s*\((p|b)\)\s*$/, '').replace(/\s*\?\s*$/, '').trim()));
+		const visible = () => P.evaluate(() => Array.from(document.querySelectorAll('#lpn_settings_box [data-lpn-setting]')).filter((e) => e.getClientRects().length).map((e) => e.textContent.replace(/\s+/g, ' ').replace(/\s*\?\s*$/, '').trim()));
 		const search = async (q) => { await P.fill('#lpn_setbox_filter', q); await settle(500); return visible(); };
 		const sym = await T('lpn_settings_symbol_opacity'), bd = await T('lpn_settings_backdrop_opacity'), em = await T('lpn_settings_emitter_exponent');
 		let v = await search('opacity');
