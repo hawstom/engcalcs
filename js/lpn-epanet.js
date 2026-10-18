@@ -1340,6 +1340,9 @@
 				// Measured before the fix: a curve steepened at every point still reported the old 6 m.
 				'\u0001' + (l.type === 'valve' && String(l.valveType || '').toUpperCase() === 'GPV'
 					? (l.curvePoints || []).map(function (q) { return q[0] + ',' + q[1]; }).join(';')
+						// **AND ITS STATUS**: error 207 refuses EN_INITSTATUS on a GPV too, so a Closed
+						// GPV could never reach a warm session (54 L/s through a closed valve).
+						+ (l.status === 'closed' ? ':shut' : '')
 					: '') +
 				// **A PUMP'S STATUS IS IN THE SIGNATURE, AND IT HAS TO BE** (2026-09-25). A session
 				// opened with a pump shut and then handed EN_INITSTATUS = open by pushValues() still

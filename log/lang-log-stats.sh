@@ -939,6 +939,30 @@ echo "--- Diagnostics met ---"
 awk -F'\t' '$5=="lpn" && $6 ~ /^diag:/ {print $6}' "$TMP/signal" | sort | uniq -c | sort -rn
 
 echo ""
+echo "=== Looped-Network: map commands used (Task 815) ==="
+echo "    One row per command per page load, taken when a menu command or a toolbar button is"
+echo "    chosen: id is <menu>/<command>, or <menu>/<submenu>/<command>, or tb/<button>. Which"
+echo "    command only, never what it was given. Browsers and uses are the said-yes bucket"
+echo "    (distinct codes, then rows); page loads is everybody else. They are never added."
+echo "    Commands nobody used are listed with zeros, from lib/lpn-commands.json."
+echo ""
+CMD_CAT="$(dirname "$0")/../lib/lpn-commands.json"
+{
+    awk -F'\t' "$AWK_CODE"'$5=="lpn" && $6 ~ /^cmd:/ { print substr($6,5)"\tp\t" ec_code() }' "$TMP/p-signal"
+    awk -F'\t' '$5=="lpn" && $6 ~ /^cmd:/ { print substr($6,5)"\tl\t" }' "$TMP/l-signal"
+    if [ -f "$CMD_CAT" ]; then
+        grep -o '"id": *"[^"]*"' "$CMD_CAT" | sed 's/^"id": *"//; s/"$//' | grep / | awk '{print $0"\tz\t"}'
+    fi
+} | awk -F'\t' '
+    $2=="p" { u[$1]++; if ($3 != "" && !(($1 SUBSEP $3) in b)) { b[$1,$3]=1; nb[$1]++ } }
+    $2=="l" { l[$1]++ }
+    { seen[$1]=1 }
+    END { for (k in seen) printf "%d\t%d\t%d\t%s\n", (k in u?u[k]:0), (k in nb?nb[k]:0), (k in l?l[k]:0), k }' \
+| sort -t"$(printf '\t')" -k1,1nr -k3,3nr -k4,4 | awk -F'\t' '
+    !hdr { printf "    %-52s %9s %10s %12s\n", "command id", "browsers", "uses", "page loads"; hdr=1 }
+    { printf "    %-52s %9d %10d %12d\n", $4, $2, $1, $3 }'
+
+echo ""
 echo "=== Looped-Network: the one-tap grievance link (Task 207) ==="
 echo "    'wrong:none' is the standing cell in the map's bottom strip; 'wrong:<code>' is the same"
 echo "    control inside the solver's amber diagnostic box, and the code names the message that"

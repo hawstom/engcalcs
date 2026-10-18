@@ -4434,13 +4434,9 @@ var EngCalcs = EngCalcs || {};
 	 * overrides through the same transform, and georefCancel() puts them back.
 	 */
 	function coordOverridesOf(n) {
-		var m;
+		var m = labelPassMemo;
 		if (!n) { return null; }
-		m = labelPassMemo();
-		if (m) {
-			if (!m.ov) { m.ov = resolvedOverrides(m.scn); }
-			return m.ov[ovKey(n)] || null;
-		}
+		if (m) { return (m.ov || (m.ov = resolvedOverrides(activeScenario())))[ovKey(n)] || null; }
 		return resolvedOverrides(activeScenario())[ovKey(n)] || null;
 	}
 	function nodeDrawX(n) {
@@ -7579,42 +7575,21 @@ var EngCalcs = EngCalcs || {};
 	// member of `project`, for the open scenario. A reader that runs per element per frame asks for
 	// a LEAF (a number, a flag), which is never copied; one that wants a whole map asks once per pass
 	// and hands the answer down.
+	//
+	// **ONE LABEL PASS READS EACH SETTING ONCE.** Inside refreshLabelText() the two shorthands below
+	// answer from `labelPassMemo`, a map made at the pass's start and dropped at its end (in a
+	// finally), so a setting written between two passes is read fresh by the second. Thousands of
+	// asks per pass, none of which can have a different answer inside it.
+	var labelPassMemo = null;
 	function scnSetting(member) {
-		var m = labelPassMemo(), k;
+		var m = labelPassMemo, k = 'settings.' + member;
 		if (!m) { return settingFor(activeScenario(), ['settings', member]); }
-		k = 's\u0001' + member;
-		if (!Object.prototype.hasOwnProperty.call(m.v, k)) { m.v[k] = settingFor(m.scn, ['settings', member]); }
-		return m.v[k];
+		return Object.prototype.hasOwnProperty.call(m, k) ? m[k] : (m[k] = settingFor(activeScenario(), ['settings', member]));
 	}
 	function scnLabels(path) {
-		var m = labelPassMemo(), k;
+		var m = labelPassMemo, k = 'labels.' + (path || []).join('.');
 		if (!m) { return settingFor(activeScenario(), ['labelSettings'].concat(path || [])); }
-		k = 'l\u0001' + (path || []).join('\u0001');
-		if (!Object.prototype.hasOwnProperty.call(m.v, k)) { m.v[k] = settingFor(m.scn, ['labelSettings'].concat(path || [])); }
-		return m.v[k];
-	}
-	// **EACH SETTING READ ONCE PER LABEL PASS** (dev/label-trials/port-plan.md Step 1). Inside one
-	// refreshLabelText() the answers of scnSetting(), scnLabels() and coordOverridesOf() cannot
-	// change, yet the pass asked the scenario layer for them thousands of times. The memo lives
-	// only inside that one call, and it drops itself if anything moves the tree (a setting or
-	// alternative write bumps treeEpoch), the document, the scenario list or the open scenario, so
-	// a write part-way through a pass is read fresh. Same answers, so the same layout:
-	// dev/lpn-spike/label-pass-memo-harness.js compares every placed label before and after.
-	var passMemo = null, passMemoDepth = 0;
-	function labelPassMemo() {
-		var m = passMemo, scn;
-		if (!m) { return null; }
-		scn = activeScenario();
-		if (m.epoch !== treeEpoch || m.doc !== doc || m.scenarios !== scenarios || m.scn !== scn) {
-			m = passMemo = { epoch: treeEpoch, doc: doc, scenarios: scenarios, scn: scn, v: {}, ov: null };
-		}
-		return m;
-	}
-	function beginLabelPassMemo() {
-		if (!passMemoDepth++) { passMemo = { epoch: NaN, v: {}, ov: null }; }
-	}
-	function endLabelPassMemo() {
-		if (!--passMemoDepth) { passMemo = null; }
+		return Object.prototype.hasOwnProperty.call(m, k) ? m[k] : (m[k] = settingFor(activeScenario(), ['labelSettings'].concat(path || [])));
 	}
 	function scnProject(member) { return settingFor(activeScenario(), ['project', member]); }
 	function scnDefaultPattern() { return settingFor(activeScenario(), ['defaultPattern']) || null; }
@@ -8272,7 +8247,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		return rows;
 	}
-	function openScenarioMenu(anchor) { openMenu(anchor, scenarioMenuRows()); }
+	function openScenarioMenu(anchor) { openMenu(anchor, scenarioMenuRows(), 0, 'scenario'); }
 	// THE SELECTOR AND THE READOUT ARE ONE CONTROL, in the map's bottom status strip beside the
 	// units -- where this page already answers continuous questions about the state of the map.
 	function wireScenarioButton() {
@@ -33472,17 +33447,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// eleven read-only cells is a paste the user believes landed. A paste that made rows says
 		// how many, because a clerk who typed 400 rows needs to know 400 landed, not how many
 		// cells changed.
+		var pasteScn = activeScenario(), pasteTail = (pasteScn && !pasteScn.isBase && (wrote || created.length))
+			? ' ' + String(pc.lpn_pane_pasted_scenario || 'These values are overrides in the scenario {scenario}.').split('{scenario}').join(scenarioDisplayName(pasteScn)) : '';
 		if (created.length) {
 			setNotice(String(refused + dropped
 				? (pc.lpn_pane_pasted_rows_skipped || 'Pasted rows ({n}). Rows added to the network ({created}). Cells not changed ({skipped}).')
 				: (pc.lpn_pane_pasted_rows || 'Pasted rows ({n}). Rows added to the network ({created}).'))
 				.replace('{n}', String(nRows))
 				.replace('{created}', String(created.length))
-				.replace('{skipped}', String(refused + dropped)));
+				.replace('{skipped}', String(refused + dropped)) + pasteTail);
 		} else {
 			setNotice(String(pc.lpn_pane_pasted || 'Pasted cells ({n}). Cells not changed ({skipped}).')
 				.replace('{n}', String(wrote))
-				.replace('{skipped}', String(refused + dropped)));
+				.replace('{skipped}', String(refused + dropped)) + pasteTail);
 		}
 		return { wrote: wrote, refused: refused, dropped: dropped, created: created.length };
 	}
@@ -36265,6 +36242,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		list.forEach(function (p) {
 			var missing = profileMissingStops(p);
 			rows.push({
+				variable: true,   // a saved path's name: content, never a command (Task 815)
 				// A tick on the one you are looking at, the same marker the scenario menu uses; the
 				// ⚠ is CLAUDE.md's caution glyph and its whole explanation is in the tip.
 				label: (p.id === profileState.activeId ? '✓ ' : '  ') + (missing.length ? '⚠ ' : '') + (p.name || ''),
@@ -36284,7 +36262,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// arrow"). Last in the menu, below a separator, and never a control on the panel.
 		rows.push({ separator: true });
 		rows.push({ label: pc.lpn_profile_open || 'Open EPANET profile file…', fn: pickProfileFile });
-		openMenu(anchor, rows, 0);
+		openMenu(anchor, rows, 0, 'profile');
 	}
 	// **AN EPANET .PRO FILE BECOMES THE STOPS OF A PROFILE** (Task 604). A profile here is a list of
 	// stops with the shortest route between consecutive ones (pathThrough), so the listed nodes ARE
@@ -39202,6 +39180,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return changeTypeLine(String(pc.lpn_change_type_line_alternative || '{id}: {property} {value}, in alternative {alternative}')
 			.replace('{alternative}', function () { return String(owner.name || owner.id); }), id, label, valueText);
 	}
+	// **A RESERVOIR CHANGED TO A TANK IS BORN EMPTY ON ITS OWN GROUND** (Tom, 2026-10-18): base
+	// elevation = Elevation (bottomElev left blank, which means exactly that), lowest depth 0,
+	// highest depth 1, starting depth 0, in the Elevation/Head unit the depths are typed in.
+	var RESERVOIR_TO_TANK = { _level: 0, minLevel: 0, maxLevel: 1 };
 	function waterSurfaceCarry(n, to) {
 		var from = n.type, key = ovKey(n), out = { base: null, ovs: [], prop: null, newProp: null }, e;
 		if (from === 'tank' && to === 'reservoir') {
@@ -39212,20 +39194,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			eachElementOverride(key, function (ov, owner, map) {
 				if (typeof ov.level === 'number') { out.ovs.push({ s: owner, map: map, value: e + ov.level }); }
 			}, true);
-		} else if (from === 'reservoir' && to === 'tank') {
-			e = typeof n.elev === 'number' ? n.elev
-				: (!elevSourceIsDem() && typeof (scnSetting('defaults') || {}).nodeElev === 'number' ? scnSetting('defaults').nodeElev : undefined);
-			if (e === undefined) { return out; }
-			out.prop = 'head'; out.newProp = 'level';
-			if (typeof n._head === 'number') {
-				if (n._head >= e) { out.base = { value: n._head - e }; }
-			} else {
-				out.base = { value: 0, silent: true };
-			}
-			eachElementOverride(key, function (ov, owner, map) {
-				if (typeof ov.head === 'number' && ov.head >= e) { out.ovs.push({ s: owner, map: map, value: ov.head - e }); }
-			}, true);
 		}
+		// RESERVOIR -> TANK CARRIES NOTHING (Tom, 2026-10-18: *"For minimal change, how about Base
+		// elevation = Elevation, min depth = 0, max depth = 1, and starting depth = 0?"*): the tank
+		// is born empty on the reservoir's ground (RESERVOIR_TO_TANK), and the head is listed as lost.
 		return out;
 	}
 	function nodeTypeChangeReport(n, to) {
@@ -39331,6 +39303,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (n.elev === undefined && to !== 'reservoir') {
 			if (elevSourceIsDem()) { queueTerrainForNewNode(n.id); }
 			else { n.elev = (scnSetting('defaults') || {}).nodeElev; }   // base-write: a type change is Base's, and so is the ground it gives a node that had none
+		}
+		if (from === 'reservoir' && to === 'tank') {
+			// Tom's four values, see RESERVOIR_TO_TANK. A blank base stands on the ground, which is Elevation.
+			delete n.bottomElev;   // base-write: a type change is Base's, and a blank base is the ground
+			for (k in RESERVOIR_TO_TANK) { if (Object.prototype.hasOwnProperty.call(RESERVOIR_TO_TANK, k)) { n[k] = RESERVOIR_TO_TANK[k]; } }   // base-write: a type change is Base's
+			if (n.tok) { delete n.tok.bottomElev; delete n.tok.level; delete n.tok.minLevel; delete n.tok.maxLevel; }   // base-write: tokens of values the type change replaced
 		}
 		// The water surface, carried (waterSurfaceCarry()). Written after the strip, which has
 		// already taken the old property and any override map it left empty.
@@ -39991,11 +39969,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			h = effective(el, 'bottomElev');
 			return { prop: 'level', newProp: 'head', value: (typeof h === 'number' && isFinite(h) ? h : e) + (effective(el, 'level') || 0) };
 		}
-		if (from === 'reservoir' && to === 'tank') {
-			h = effective(el, 'head');
-			if (h === undefined || h === null || h === '') { return { prop: 'head', newProp: 'level', value: 0 }; }
-			return h >= e ? { prop: 'head', newProp: 'level', value: h - e } : null;
-		}
+		// Reservoir -> tank carries nothing: morphOne() writes RESERVOIR_TO_TANK.
 		return null;
 	}
 	/**
@@ -40037,6 +40011,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!isLink && to !== 'reservoir' && rawBase.baseElev === undefined && !Object.prototype.hasOwnProperty.call(held, 'elev') &&
 				(scnSetting('defaults') || {}).nodeElev !== undefined) {
 			setOverride(el, 'elev', (scnSetting('defaults') || {}).nodeElev);
+		}
+		if (!isLink && from.type === 'reservoir' && to === 'tank') {
+			setOverride(el, 'level', RESERVOIR_TO_TANK._level);
+			setOverride(el, 'minLevel', RESERVOIR_TO_TANK.minLevel);
+			setOverride(el, 'maxLevel', RESERVOIR_TO_TANK.maxLevel);
 		}
 		if (carry) {
 			setOverride(el, carry.newProp, carry.value);
@@ -43417,6 +43396,41 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!scn || scn.isBase) { return base; }
 		return base + '-' + safeFileName(scenarioDisplayName(scn));
 	}
+	/**
+	 * **AN EXPORT NAMES THE ONE SCENARIO IT HOLDS** (Task 814, defect 1). The .inp, GeoJSON and DXF
+	 * formats carry a single set of values; with more than Base in the project the other scenarios
+	 * stay behind, and the notice says so. Empty when the project is Base alone (nothing is left).
+	 */
+	function exportLeavesSomething() {
+		return scenarios.length > 1 || (doc.alternatives || []).length > 0 || (doc.calcSets || []).length > 0;
+	}
+	function exportScenarioSentence() {
+		var pcX = EngCalcs.pageConfig || {}, scn = activeScenario(), out;
+		if (!exportLeavesSomething()) { return ''; }
+		out = (!scn || scn.isBase) ? (pcX.lpn_export_holds_base || 'It holds the Base scenario only.')
+			: (pcX.lpn_export_holds_scenario || 'It holds the scenario {scenario} only.').split('{scenario}').join(scenarioDisplayName(scn));
+		if ((doc.alternatives || []).length || (doc.calcSets || []).length) {
+			out += ' ' + (pcX.lpn_export_leaves_alternatives || 'The alternatives stored in this project are not in the file.');
+		}
+		return ' ' + out;
+	}
+	/**
+	 * **A FILE THAT LEAVES SCENARIOS BEHIND IS ANSWERED WITH A DIALOG** (Tom, 2026-10-18: *"Dialog, I
+	 * say. It's a major event that deserves a major answer."*). Only when the project has more than
+	 * Base; with Base alone nothing is left and the status line is enough. `already` is true when
+	 * another dialog (the .inp's flattening report) is open and has taken the sentence into itself.
+	 */
+	var exportDialogShown = false;
+	function exportScenarioDialog(text, already) {
+		var pcX = EngCalcs.pageConfig || {};
+		if (!exportLeavesSomething() || already) { return; }
+		openDialog(function (body) {
+			var p = document.createElement('p');
+			p.style.margin = '0';
+			p.textContent = text;
+			body.appendChild(p);
+		}, [{ label: pcX.lpn_dialog_ok || 'OK', fn: function () { } }]);
+	}
 	function exportInpFile() {
 		var pcX = EngCalcs.pageConfig || {}, base = inpExportBaseName(),
 			picBase = asciiPictureBase(base);
@@ -43440,6 +43454,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				tail = nDiff === 1 ? ' ' + (pcX.lpn_inp_export_difference_one || 'One thing the .inp format cannot hold.')
 					: nDiff ? ' ' + (pcX.lpn_inp_export_differences || '{n} things the .inp format cannot hold.').split('{n}').join(String(nDiff))
 					: '';
+			tail += exportScenarioSentence();
 			// EXPORTING IS NOT SAVING. No stampProjectSaved() here, deliberately: an `.inp` cannot hold
 			// this document (scenarios, text sizes, a backdrop image), so a project that has only been
 			// exported still has unsaved changes and must keep saying so.
@@ -43448,7 +43463,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				setNotice((pic === false
 					? (pcX.lpn_status_inp_exported_no_picture || 'Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.')
 					: (pcX.lpn_status_inp_exported || 'Exported {file}.')).split('{file}').join(inpName) + tail);
+				exportDialogShown = false;
 				showInpExportFlattening(out.differences, inpName);
+				exportScenarioDialog(lastNoticeText, exportDialogShown);
 				return;
 			}
 			var built;
@@ -43465,7 +43482,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					.split('{picture}').join('\u0003').split('{world}').join('\u0004')
 					.split('\u0001').join(zipName).split('\u0002').join(inpName)
 					.split('\u0003').join(picName).split('\u0004').join(worldName) + tail);
+				exportDialogShown = false;
 				showInpExportFlattening(out.differences, inpName);
+				exportScenarioDialog(lastNoticeText, exportDialogShown);
 			}, function () {
 				// No archive, so no picture: the bare .inp, written again without a FILE line, and said.
 				finish(false);
@@ -43484,9 +43503,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * a stale snapshot (Recalculate off) is still what the screen shows, and the file says only
 	 * "the results on the screen".
 	 */
+	/**
+	 * **RESULTS ARE ATTACHED ONLY TO THE SCENARIO THEY WERE SOLVED FOR** (Task 814, defect 2). With
+	 * Recalculate off the screen keeps the last solve while the open scenario changes, so the file
+	 * would pair one scenario's values with another's results. The solve is tagged with its scenario
+	 * (`_scn`); when that is not the open one, the results are left out and the notice names the
+	 * scenario they belong to. Returns that scenario's name, or '' when the results match.
+	 */
+	function geoJsonStaleScenario() {
+		if (!lastSolveResult || !lastSolveResult._scn || lastSolveResult._scn === activeScenario().id) { return ''; }
+		for (var i = 0; i < scenarios.length; i++) {
+			if (scenarios[i].id === lastSolveResult._scn) { return scenarioDisplayName(scenarios[i]) || lastSolveResult._scn; }
+		}
+		return lastSolveResult._scn;
+	}
 	function geoJsonResults() {
 		var out = { nodes: {}, links: {}, time: (lastSolveResult && typeof lastSolveResult.t === 'number') ? lastSolveResult.t : undefined };
-		if (!lastSolveResult) { return null; }
+		if (!lastSolveResult || geoJsonStaleScenario()) { return null; }
 		doc.nodes.forEach(function (n) {
 			out.nodes[n.id] = { head: colorNodeValue(n, 'head'), pressure: colorNodeValue(n, 'pressure'),
 				demand: colorNodeValue(n, 'demandActual') };
@@ -43539,15 +43572,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var blob = new Blob([out.text], { type: 'application/geo+json' }),
 				url = URL.createObjectURL(blob), a = document.createElement('a');
 			a.href = url;
-			a.download = safeFileName(projectDisplayName(project)) + '.geojson';
+			a.download = inpExportBaseName() + '.geojson';
 			document.body.appendChild(a);
 			a.click();
 			document.body.removeChild(a);
 			setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
 			// EXPORTING IS NOT SAVING, for the reason exportInpFile() gives: no stampProjectSaved().
-			setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) + ' ' +
+			var staleScn = geoJsonStaleScenario();
+			setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) + exportScenarioSentence() + ' ' +
 				(out.hasResults ? (pcX.lpn_geojson_results_in || 'The results on screen are included.')
+					: staleScn ? (pcX.lpn_geojson_results_other || 'No results are included, because the results on screen belong to the scenario {scenario}.').split('{scenario}').join(staleScn)
 					: (pcX.lpn_geojson_results_out || 'No results are included, because the network is not solved.')));
+			exportScenarioDialog(lastNoticeText, false);
 		});
 	}
 	// ---- IMPORT GeoJSON SHAPES (Task 779) ----------------------------------------------------------
@@ -44406,7 +44442,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var blob = new Blob([EngCalcs.lpnDxfBytes(out.text)], { type: 'application/dxf' }),
 			url = URL.createObjectURL(blob), a = document.createElement('a');
 		a.href = url;
-		a.download = safeFileName(projectDisplayName(project)) + '.dxf';
+		a.download = inpExportBaseName() + '.dxf';
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
@@ -44416,8 +44452,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// project's degrees would otherwise look for them (Tom, 2026-10-06).
 		setNotice(frame.kind === 'geo'
 			? (pcX.lpn_dxf_exported_geo || 'Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.')
-				.replace('{file}', a.download).replace('{crs}', dxfCrsName(frame.code))
-			: (pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download));
+				.replace('{file}', a.download).replace('{crs}', dxfCrsName(frame.code)) + exportScenarioSentence()
+			: (pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) + exportScenarioSentence());
+		exportScenarioDialog(lastNoticeText, false);
 	}
 	/**
 	 * **THE EXPORT ALERT** (ROADMAP Task 465 slice 5; Tom, 2026-09-06, on a library pipe being
@@ -44479,12 +44516,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			said.push((pc.lpn_inp_export_flat_fittings || 'An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of pipes here ({n}) is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.')
 				.replace('{n}', String(fittings.ids.length)));
 		}
+		exportDialogShown = true;
 		openDialog(function (body) {
 			var h = document.createElement('p'), lead = document.createElement('p'),
 				ul = document.createElement('ul');
 			h.style.margin = '0 0 8px';
 			h.style.fontWeight = 'bold';
-			h.textContent = (pc.lpn_inp_export_flat_heading || 'Saved {file}').replace('{file}', fileName);
+			h.textContent = (pc.lpn_inp_export_flat_heading || 'Saved {file}').replace('{file}', fileName) + exportScenarioSentence();
 			body.appendChild(h);
 			lead.style.margin = '0 0 6px';
 			lead.textContent = pc.lpn_inp_export_flat_lead || 'The exported EPANET file is numerically equivalent to this project. But it has no place for the following things:';
@@ -46491,7 +46529,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// looking at the box they asked for; what they do not know is how many points came out of it.
 	function showSurveyReport(parsed, outcome) {
 		var pc = EngCalcs.pageConfig || {},
-			lines = EngCalcs.lpnSurveyReportLines(parsed, outcome, surveyAxes());
+			lines = EngCalcs.lpnSurveyReportLines(parsed, outcome, surveyAxes()),
+			svScn = activeScenario();
+		// Task 814, defect 3: in a scenario other than Base the nodes are born inactive in Base.
+		if (svScn && !svScn.isBase && outcome && outcome.created) {
+			lines = [{ text: (pc.lpn_survey_added_scenario || 'The nodes were added to {scenario}. In Base they are inactive.')
+				.split('{scenario}').join(scenarioDisplayName(svScn)), raw: null }].concat(lines);
+		}
 		openDialog(function (body) {
 			// **THE SENTENCE, THEN THE READER'S OWN LINE UNDERNEATH IT** (Tom, 2026-09-17: *"it
 			// should print the entire line with a much shorter message"*). The line is drawn in a
@@ -49519,11 +49563,71 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		tipParked[i] = null;
 		if (p.el && !p.el.title) { p.el.title = p.title; }
 	}
-	function openMenu(anchor, rows, level) {
+	// ---- COMMAND USAGE (Task 815) -----------------------------------------------------------------
+	// Which menu commands and toolbar buttons get used, as ONE `lpn` signal per command per page load
+	// (EngCalcs.logSignal dedupes in memory; nothing is stored on the device). The hook is the two
+	// click sites in openMenu() and ONE delegated listener on the toolbar, not a line per command.
+	//
+	// THE ID IS THE COMMAND'S, NEVER THE VISITOR'S: `cmd:<menu>/<lang key>` or
+	// `cmd:<menu>/<submenu key>/<lang key>`, the key being the `lpn_` string the row's label came
+	// from, found by looking the displayed label up in pageConfig (so it is the same in all 27
+	// languages). A row whose label is not a pageConfig string is CONTENT, not a command (a recent
+	// file, a scenario, a project tab, a language name) and logs nothing. What the command was then
+	// given or told to do is not visible here at all: `fn` runs after the id is taken.
+	var menuGroup = '';
+	var cmdKeyByLabel = null;
+	// Where several keys carry the same words (Import > EPANET file... and Export > EPANET file...
+	// are two keys with one English text), the key sharing most name tokens with the PARENT's key
+	// wins, so an import row is named import_ and an export row export_. Ties go to the first key.
+	function cmdKeyFor(label, hint) {
+		var pc, k, v, list, best = '', bestScore = -1, want, i, sc;
+		if (!cmdKeyByLabel) {
+			cmdKeyByLabel = {};
+			pc = EngCalcs.pageConfig || {};
+			for (k in pc) {
+				v = pc[k];
+				if (typeof v === 'string' && k.indexOf('lpn_') === 0 && v) {
+					if (!cmdKeyByLabel.hasOwnProperty(v)) { cmdKeyByLabel[v] = []; }
+					cmdKeyByLabel[v].push(k.slice(4));
+				}
+			}
+		}
+		v = String(label || '').replace(/^[\u2713\u26A0*\s]+/, '');
+		if (!cmdKeyByLabel.hasOwnProperty(v)) { return ''; }
+		list = cmdKeyByLabel[v];
+		want = String(hint || '').split('_');
+		for (i = 0; i < list.length; i++) {
+			sc = list[i].split('_').filter(function (t) { return t !== 'menu' && t !== 'item' && want.indexOf(t) >= 0; }).length;
+			if (sc > bestScore) { bestScore = sc; best = list[i]; }
+		}
+		return best;
+	}
+	function commandId(group, parentRow, row) {
+		var p = '', k;
+		if (!group || !row || row.variable) { return ''; }
+		if (parentRow) { p = cmdKeyFor(parentRow.label, group); if (!p) { return ''; } }
+		k = cmdKeyFor(row.label, p || group);
+		if (!k) { return ''; }
+		return group + '/' + (p ? p + '/' : '') + k;
+	}
+	function logCommandUse(id) {
+		if (id && EngCalcs.logSignal) { EngCalcs.logSignal('lpn', 'cmd:' + id); }
+	}
+	function toolbarCommandId(btn) {
+		var i;
+		for (i = 0; i < toolbarIconIndex.length; i++) {
+			if (toolbarIconIndex[i].el === btn) { return 'tb/' + (btn.dataset.tool || toolbarIconIndex[i].icon); }
+		}
+		return '';
+	}
+	var menuCapture = null;   // set by lpnCommandCatalog() to read a menu's rows without opening it
+	function openMenu(anchor, rows, level, group) {
+		if (menuCapture) { menuCapture.push(rows); return; }
 		menuRestoreSeq++;
 		var els = menuEls(level), popup = els.popup, list = els.list;
 		if (!popup || !list) { return; }
 		if (!level) {
+			menuGroup = group || (anchor && /^lpn_menu_/.test(anchor.id || '') ? anchor.id.slice(9) : '');
 			if (openMenuAnchor === anchor && popup.style.display === 'block') { closeMenu(); return; }
 			// **THE OPEN ITEM LOOKS PRESSED** (feat/menu-button preview, R-202/R-203): aria-expanded
 			// was already the accessible signal a menu button owes a screen reader; it is now also
@@ -49539,6 +49643,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			closeViewPopovers();
 		}
 		parkAnchorTip(anchor, level);
+		var rowGroup = menuGroup, rowParent = level && anchor ? anchor.__lpnRow || null : null;
 		list.innerHTML = '';
 		list.setAttribute('role', 'menu');
 		var mnemonics = menuMnemonics(rows);
@@ -49651,7 +49756,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// plain row at every level, so entering "Blank project" closed the menu that
 				// "Blank project" was in.
 				if (canHover()) { b.addEventListener('mouseenter', cancelSubClose); }
-				b.addEventListener('click', function (e) { closeMenu(); r.fn(e); dismissTipsAfterCommand(); });
+				b.addEventListener('click', function (e) { logCommandUse(commandId(rowGroup, rowParent, r)); closeMenu(); r.fn(e); dismissTipsAfterCommand(); });
 			} else {
 				// Moving onto a plain row in the PARENT dismisses the fly-out, as every desktop menu
 				// does -- otherwise it hangs beside a row it no longer belongs to. On a DELAY, because
@@ -49660,7 +49765,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// Same gate: on touch this fired from the synthesised mouse sequence and armed a
 				// 350 ms close of the fly-out the user had just opened.
 				if (canHover()) { b.addEventListener('mouseenter', scheduleSubClose); }
-				b.addEventListener('click', function (e) { closeMenu(); r.fn(e); dismissTipsAfterCommand(); });
+				b.addEventListener('click', function (e) { logCommandUse(commandId(rowGroup, rowParent, r)); closeMenu(); r.fn(e); dismissTipsAfterCommand(); });
 			}
 			list.appendChild(b);
 		});
@@ -54015,7 +54120,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ label: pc.lpn_tab_move_right || 'Move right', disabled: idx < 0 || idx >= library.projects.length - 1, fn: function () { moveTab(id, 1); } },
 			{ separator: true },
 			{ icon: 'close', label: pc.lpn_close || 'Close', fn: function () { closeTab(id); } }
-		]);
+		], 0, 'tab');
 	}
 	function openTabListMenu(anchor) {
 		openMenu(anchor, library.projects.map(function (p) {
@@ -55018,7 +55123,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (toolbar && !toolbarTipsWired) {
 			toolbarTipsWired = true;
 			toolbar.addEventListener('click', function (e) {
-				if (e.target && e.target.closest && e.target.closest('button')) {
+				var tb = e.target && e.target.closest ? e.target.closest('button') : null;
+				if (tb) {
+					logCommandUse(toolbarCommandId(tb));
 					dismissTipsAfterCommand();
 				}
 			});
@@ -73753,7 +73860,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						return [toSI(pt[0], 'lpn_u_flow'), toSI(pt[1], 'lpn_u_elevhead')];
 					});
 				}
-				if (out.valveType === 'PRV' || out.valveType === 'PSV') {
+				// A PBV's DROP is a pressure too, in a PRV's unit (valveSettingSpec() says
+				// lpn_u_pressure). Left unconverted, a 10 psi PBV reached the EPANET engine as 10 m of
+				// head, which is 14.2 psi. dev/lpn-spike/pbv-setting-unit-harness.js.
+				if (out.valveType === 'PRV' || out.valveType === 'PSV' || out.valveType === 'PBV') {
 					out.setting = toSI(effective(l, 'setting') || 0, 'lpn_u_pressure');
 				} else if (out.valveType === 'FCV') {
 					out.setting = toSI(effective(l, 'setting') || 0, 'lpn_u_flow');
@@ -75228,8 +75338,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		perfDebugCount('labelPasses');
 		beginMapBoxHold();
 		beginLinkGeomHold();
-		beginLabelPassMemo();
-		try { refreshLabelTextPass(); } finally { endLabelPassMemo(); endMapBoxHold(); endLinkGeomHold(); }
+		labelPassMemo = {};
+		try { refreshLabelTextPass(); } finally { labelPassMemo = null; endMapBoxHold(); endLinkGeomHold(); }
 		// Stamped LAST, so a writer inside the pass's own tail moves the generation past it.
 		contentPassAt = { gen: labelCacheGen, s: state.s };
 	}
@@ -75901,6 +76011,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		maybeWarmEpanetInBackground(model);
 		syncEpanetNeed(model);
 		omittedNote = omittedNoteText(model);
+		roughnessNote = roughnessNoteText(model);
 		var issues = EngCalcs.lpnDiagnose(model);
 		if (issues.length > 0) {
 			lastSolveResult = null;
@@ -75960,10 +76071,29 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			'Left out of this run because no path leads from them to a reservoir or tank: {ids}')
 			.replace('{ids}', ids.join(', '));
 	}
-	// A status line with the standing note beneath it, unless it is already there.
+	// **THE STANDING NOTE FOR ROUGHNESS ENTERED FOR ANOTHER FRICTION METHOD** (Sue's wish list,
+	// 2026-10-05, item 5). A scenario may switch the friction method (Calculation alternative) while
+	// its pipes keep the roughness numbers meant for the other one, and so does an imported file.
+	// Judged by the one plausibility table above (LPN_VALUE_RULES), on the model the solver is
+	// handed, so it follows the open scenario and not the Base. It states a count and changes
+	// nothing: no conversion is offered (Task 721, roughness is the user's to edit). Not a modal.
+	var roughnessNote = '';
+	function roughnessNoteText(model) {
+		var n = 0;
+		((model && model.links) || []).forEach(function (l) {
+			if (l.type === 'pipe' && l.roughness !== '' && l.roughness !== null && valueWarningRule('roughness', +l.roughness, model.method)) { n++; }
+		});
+		if (n === 0) { return ''; }
+		return ((EngCalcs.pageConfig || {}).lpn_roughness_method_note ||
+			'\u26a0 Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.')
+			.replace('{method}', frictionMethodLabel()).replace('{n}', String(n));
+	}
+	// A status line with the standing notes beneath it, unless already there.
 	function withOmittedNote(text) {
-		if (!text || !omittedNote || text.indexOf(omittedNote) >= 0) { return text; }
-		return text + ' ' + omittedNote;
+		if (!text) { return text; }
+		if (omittedNote && text.indexOf(omittedNote) < 0) { text += ' ' + omittedNote; }
+		if (roughnessNote && text.indexOf(roughnessNote) < 0) { text += ' ' + roughnessNote; }
+		return text;
 	}
 
 	// ---- Warming the EPANET engine ----
@@ -76744,7 +76874,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			boxes.design, '');
 
 		boxes.minPressure = ffInput(ask.minPressure);
-		ffRow(host, pc.lpn_ff_minpressure || 'Lowest pressure allowed elsewhere',
+		ffRow(host, pc.lpn_ff_minpressure || 'Lowest system pressure allowed',
 			pc.lpn_ff_minpressure_tip, boxes.minPressure, unitLabel('lpn_u_pressure'));
 
 		boxes.maxVelocity = ffInput(ask.maxVelocity);
@@ -81469,6 +81599,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var notConverged = result.converged === false;
 		captureTankSnapshot();
 		lastSolveResult = result;
+		if (result && typeof result === 'object') { result._scn = project.activeScenario; }
 		refreshMapStatus();
 		// The only case where the two engines knowingly disagree, so say so rather than let a
 		// user discover a 0.6% shift by switching the checkbox. See js/lpn-epanet.js.
@@ -81565,7 +81696,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pdaNote = pdaShort > 0
 			? (pc.lpn_pda_deficit_note || 'Junctions receiving less than their demand: {n}.').replace('{n}', String(pdaShort))
 			: '';
-		setStatus([result.stoppedNote || '', notConvergedNote, valveRouteNote, pdaNote, omittedNote,
+		setStatus([result.stoppedNote || '', notConvergedNote, valveRouteNote, pdaNote, omittedNote, roughnessNote,
 			droppedNote('control-dangling', 'lpn_control_dangling_note',
 				'These controls name an element that is no longer in this project, so they were left out: {ids}'),
 			droppedNote('control-unreadable', 'lpn_control_unreadable_note',
@@ -81920,6 +82051,47 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				x2: +L.getAttribute('x2'), y2: +L.getAttribute('y2') } : null,
 			hidden: !!(h.text && h.text.style.visibility === 'hidden'), side: h.side, lside: x.lside, w: labelBoxWidth(h),
 			inline: !!h.inline };
+	};
+	// Every command this page offers, with the id the usage log would carry for it (Task 815), for
+	// dev/lpn-spike/command-usage-browser-harness.js, which writes lib/lpn-commands.json from it and
+	// fails when the file has gone stale. Menu-bar menus, the scenario menu and the toolbar; the
+	// project tab's menu is built per tab and is logged but not listed.
+	EngCalcs.lpnCommandCatalog = function () {
+		var out = [], pc = EngCalcs.pageConfig || {};
+		function walk(group, groupLabel, rows, parentRow) {
+			(rows || []).forEach(function (r) {
+				var id, sub;
+				if (!r || r.separator || r.heading || r.variable || !r.label) { return; }
+				if (r.submenu) {
+					try { sub = r.submenu() || []; } catch (err) { sub = []; }
+					if (!parentRow) { walk(group, groupLabel, sub, r); }
+					return;
+				}
+				id = commandId(group, parentRow, r);
+				if (id) {
+					out.push({ id: id, group: group, groupLabel: groupLabel, parent: parentRow ? parentRow.label : '',
+						label: String(r.label).replace(/^[\u2713\u26A0*\s]+/, '') });
+				}
+			});
+		}
+		[['file', fileMenuRows], ['edit', function () { return editMenuRows(null); }], ['map', mapMenuRows],
+			['project', waterMenuRows], ['help', helpMenuRows]].forEach(function (m) {
+			var rows;
+			try { rows = m[1](); } catch (err) { rows = []; }
+			walk(m[0], guideMenuLabel('lpn_menu_' + m[0]), rows, null);
+		});
+		walk('scenario', pc.lpn_scenario_menu || 'Scenarios', scenarioMenuRows(), null);
+		try {
+			menuCapture = [];
+			if (library && library.openId) { openProjectMenu(library.openId, document.body); }
+			walk('tab', 'Project tab', menuCapture[0] || [], null);
+		} catch (err3) { /* the tab menu is listed when it can be built */ }
+		menuCapture = null;
+		toolbarIconIndex.forEach(function (b) {
+			var id = toolbarCommandId(b.el);
+			if (id) { out.push({ id: id, group: 'tb', groupLabel: 'Toolbar', parent: '', label: String(b.name || '') }); }
+		});
+		return out;
 	};
 	// The Full report's Type column harness opens the box through this, not through the menu.
 	EngCalcs.lpnOpenFullReportBox = function () { return openFullReportBox(); };

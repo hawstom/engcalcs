@@ -92,9 +92,8 @@ window is not recoverable from the archive once the report has moved on.
 
 ## Retention
 
-`dev/scripts/trim_logs.php` walks `spock/*/` as well as `log/`. It has to: `privacy.php` promises
-usage counts are kept at most 26 months, and an archive that retention never touches turns that
-promise into a lie the moment the first archive is 27 months old. Every deletion it makes inside an
+`dev/scripts/trim_logs.php` walks `spock/*/` as well as `log/`. It has to: an archive that retention never touches would
+keep its rows however long a window is chosen. (`privacy.php` states no fixed limit since 2026-10-18.) Every deletion it makes inside an
 archive is appended to that archive's manifest, so `--verify` reads the shortened window as
 retention rather than as a loss.
 

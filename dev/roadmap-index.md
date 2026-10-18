@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**85 open tasks.** Next (100): 13 · Soon (75): 10 · Someday (50): 27 · Maybe (25): 16 · Parked (5): 19
+**85 open tasks.** Next (100): 12 · Soon (75): 11 · Someday (50): 27 · Maybe (25): 16 · Parked (5): 19
 
-## 100 — Next (13)
+## 100 — Next (12)
 
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
 - Task 717 — EPANET-MSX, multi-species water quality.
@@ -23,9 +23,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 811 — Themes beyond Light and Dark: a selector, and a better default.
 - Task 812 — Port the label bench's proven findings to master, one branch each.
 - Task 814 — Classify every import and export by its scenario awareness.
-- Task 815 — Usage report: which map commands and toolbar buttons get used.
 
-## 75 — Soon (10)
+## 75 — Soon (11)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
@@ -37,6 +36,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 809 — Finish the translation-clarification follow-ups at the next sprint.
 - Task 810 — Bring the features list up to what the software does.
 - Task 813 — Pre-processing the network for label placement: methods, benefits, results.
+- Task 816 — Give each User Guide chapter its own address in each language.
 
 ## 50 — Someday (27)
 

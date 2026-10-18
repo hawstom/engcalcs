@@ -5270,6 +5270,58 @@
             },
             "source": "dev/terms.md",
             "uniqueness_group": 3
+        },
+        "tree": {
+            "term": "tree",
+            "concept": "family-tree",
+            "plain": "A family tree",
+            "definition": "",
+            "symbol": "",
+            "context": "",
+            "translation_notes": "",
+            "translations": {
+                "en": "tree"
+            },
+            "source": "dev/terms.md"
+        },
+        "parent": {
+            "term": "parent",
+            "concept": "family-tree-parent",
+            "plain": "A family tree parent",
+            "definition": "",
+            "symbol": "",
+            "context": "",
+            "translation_notes": "",
+            "translations": {
+                "en": "parent"
+            },
+            "source": "dev/terms.md"
+        },
+        "child": {
+            "term": "child",
+            "concept": "family-tree-child",
+            "plain": "A family tree child",
+            "definition": "",
+            "symbol": "",
+            "context": "",
+            "translation_notes": "",
+            "translations": {
+                "en": "child"
+            },
+            "source": "dev/terms.md"
+        },
+        "inherit": {
+            "term": "inherit",
+            "concept": "family-tree-inherit",
+            "plain": "A family tree inherit-",
+            "definition": "",
+            "symbol": "",
+            "context": "",
+            "translation_notes": "",
+            "translations": {
+                "en": "inherit"
+            },
+            "source": "dev/terms.md"
         }
     }
 }

@@ -179,11 +179,6 @@ that fits along today is drawn exactly as today.
 - **Harness:** `pipe-label-level-harness.js`: pipe labels shown per view on Net3, Novato and n600 at
   the five zooms; zero N1 and N3 (`label-node-symbol-harness.js`'s count); R14 at close zoom (a level
   label with room to lie along, under 5%, the judges' limit); labels already along unchanged.
-- **Built on `feat/label-beside`, 2026-10-17, for the crowded, blocked and yielded exits only.** The
-  short-segment exit still hides: Tom, 2026-08-14, *"If a line is too short, its label must
-  disappear even if the map is closer than the 'all-disappear' limit"*, held by
-  `short-line-label-harness.js`. Letting it try too adds about 10 pipe labels per view on Net3 and
-  13 on n600 at 2x; his call.
 - **Risk:** high visibility. Pipe labels appear level, some with leaders, on views that today show
   bare pipes. It adds a rung before §3.5's hide in `dev/label-placement-goals.md`; the hide stays the
   terminal exit, so Tom's 2026-08-17 *"Fully shedded links need to hide if they are still in

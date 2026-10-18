@@ -96,51 +96,66 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-17 (twenty-fifth session, afternoon and evening, Arizona time)
+## STATE — 2026-10-18 (twenty-sixth session, overnight, Arizona time)
 
-### Master: 45317389e (pushed 2026-10-17 9:39 PM; Tom deploys it). Production: 4866c11d2 (sprint 1017) or 45317389e
+### Master: batch 2 of 2026-10-18 (the last merge on master). Production: 4866c11d2 or 45317389e when last read
 
-**Sprint 1017 is merged into master and ready to deploy**. It translates the 408 untranslated
-keys (98 of them he had not yet read) and 27 rewordings into 26 languages, Wave 0 rewrote 19 English
-strings (`dev/english-friction/1017-wave0.json`), cross-language QA fixed 237 strings
-(`dev/english-friction/1017-qa-report.md`), Task 809's halo words, the five dead keys joined on one
-line in every file, and a new payload note: **Layout (box title)**, derived from the page by
-`dev/scripts/dock_box_titles.inc.php`, tells translators to put a dockable box title's subject word
-first (his auto-hide tab question). Every `.replace('{name}'` is now global (Copy upward says {name} twice).
-Deleted keys: `lpn_guide_text_notes_popup`; and from the 26 non-English files only, `lpn_guide_text_alt_box`,
-`lpn_guide_how_alt`, `lpn_alt_calc_options`, `lpn_scenario_duration_tip`, `lpn_scenario_hyd_step_tip`.
+Pushed 2026-10-18: **555a8899a** (batch 1: PBV unit fix, GPV warm-close fix, scenario receipts, roughness
+note, Task 815, plainer privacy.php, consent_body "so we don't count you again" in English, his word
+calls) and batch 2 (full/empty tank closes its link in the built-in solver plus his Change-type
+defaults 0/0/1, routing-harness flake fix, fire-flow multiplier guard, label rules sync with the port
+plan now on master, his alternatives-string approval). **His pull deploys them.** consent_body's 26
+translations are owed (next sprint; EC_CONSENT_VERSION stays 2, same ask).
 
-### Branches he has passed once (2026-10-17); his notes are on Tasks 752, 811, 812 and 814
+### Feature branches waiting for his browser pass and typed merge word
 
-- `feat/sheet-sync` (row 8108): phase 1 of Task 752's old shape, the whole-tree workbook. Task 752 was
-  reshaped on market research (results by scenario, demand import, one scenario at a time); salvage, don't merge.
-- `feat/theme` (row 8111): Task 811. Colour themes only so far; he wants design themes on the same branch.
-- `feat/label-beside` (row 8110): Task 812. He saw no difference and no level label; the page shows no
-  zoom factor and he could not reach the 600-junction network. Short pipes should also try the level spot.
-- `docs/label-port`: the port plan (Task 813); merges with label-beside.
+- `feat/theme` (8111): round 3 in progress: map follows the theme (print and files stay Light), Desktop
+  (modern Mac look, no Apple names), Prairie (sky below the menus, menu buttons as galvanized tanks,
+  cloud toolbar, barn project tabs, fence lower chrome; Ida's direction in her journal). Perry reviewed round 2.
+- `feat/native-pbv-gpv` (8107): Task 733 phase 2 done through round 3: every valve type native, no valve
+  routes to EPANET, bad curves and forbidden valve pairs are data faults in both engines. Perry
+  confirmed the maths. Found: EPANET 2.3.5 checks error 220 only against non-adjacent valve rows
+  (input3.c valvedata/valvecheck); worth telling Luke Butler.
+- `feat/msx` (8112, sample at /chlorine-decay.msx): Task 717 phase 1; Perry: ready; round 2 fixes running.
+  When it merges, the import-report sentence and landing-page MSX lines (dev/msx-scope.md) are his call.
+- `feat/label-beside` (8110): his pass "no regressions"; held to judge with `feat/label-form`.
+- `feat/label-form` (building): inline/stacked node labels and leadered pipe labels, "whichever shows
+  more"; his /tmp/pipe-leader-missing.png case is a named harness case.
+- `feat/scenario-example` (8106): round 3: no hand-divided fire flow; the Description tells the reader
+  to run Fire flow analysis in Max day (his rule: a fire flow is never multiplied, only base demand).
+- `feat/sqlite-reader`: Task 749, never merges until done (his word). WaterGEMS import works on public
+  samples (kept in the scratchpad, never committed); a child that overrides a value is unproven.
+- `perf/label-settings-memo`: port plan step 1, building. Speed only; may merge on green.
 
-### Questions out to him
+### Calls he made this session (all recorded in rulings, roadmap or docs)
 
-- Terms for Task 737 (am, my use one word for Scenario and Status): CC proposed two `dev/terms.md`
-  entries and a uniqueness group; he edits that file.
-- The import labels and four English fixes (`fix/menu-wording`) change English only; their 26
-  translations are owed. A mini-sprint needs his word.
-- His `lpn_sm_help` lacks Copy upward and the has-children delete reason: CC proposed two sentences.
-- Port 8202 never reaches jasmine from his browser; epanet-plus-plus.org is also on 8109.
-
-### Waiting to merge (next batch, one suite run)
-
-- `chore/752-reshape`: Task 752 reshaped on market research, the report filed, Task 809's cadence.
-- `fix/settings-clear-jump` (828185057, green on its harness): the real Settings jump, a 561 px pull
-  when a tip is showing during a redraw. A defect: merges on green.
-- `feat/sqlite-reader` (Task 749) is NOT in any batch: Tom, 2026-10-17, *"No merging it until it's done."*
-- WaterCAD samples found: `dev/agents/market-researcher/wtg-samples.md` (Zenodo 7162154, TSNet). Tom is
-  seeking a free EWB Bentley licence to make the one missing case, a child that overrides a value.
+Task 814 calls 1-5 (dialog unless the result is visible; a network import may land in the open
+project); "Lowest system pressure allowed"; "the second pane"; family-tree terms "A family tree
+child" etc. plus a "For every translator" section in dev/terms.md that reaches every payload; MSX named
+in "What it does not do"; privacy.php: "is never used" is a fact, "will never" a promise; no fixed
+retention limit on counts; a curveless GPV solves as an open valve; Change type reservoir -> tank
+gives base = elevation, depths 0/0/1, start 0; a fire flow is never multiplied.
 
 ### Next job
 
-His pull to deploy. Task 814 before more of 752. Design themes on `feat/theme`. Find why label-beside
-shows nothing. Task 749 waits on his `.sqlite` sample.
+His pull. His browser passes on the branches above. Port plan steps 2-5 after label-form. Task 816
+(Guide chapter pages). Task 814's network-into-open-project import (his call 2). Task 752's reshaped
+phase (results by scenario, demand import).
+
+### Traps met 2026-10-18 (twenty-sixth session)
+
+- **My briefs told agents to add new keys to all 27 files**; the rule is English only (the others fall
+  back). It failed `lang syntax rules A-D` (identical-to-english). Brief: new keys in lib/lang.ec.en.php only.
+- **A merge run without GIT_AUTHOR_NAME took Tom as author.** Export the author env in the SAME command as
+  every merge; redo the batch from origin/master if it slips (unpushed, so cheap).
+- **His edit of new-english-keys.md arrived mid-suite in the main checkout**: moved by patch to a chore
+  worktree, then `git checkout --` in main before the suite ended, so the stamp still landed.
+- **Ida proposed restyling one consent button to stand out**; CLAUDE.md forbids it. Read seat advice against
+  the house rules before forwarding it.
+- **scenario-settings-routing-harness failed in five branch suites**: stray page debounces between cases
+  (fixed in the harness, fix/routing-harness-flake). Other multi-case harnesses may share the exposure.
+- **The previous session's open questions were invisible to him after /clear.** Read the last session's
+  final messages for unanswered questions before reporting.
 
 ### Traps met 2026-10-17 (twenty-fifth session)
 

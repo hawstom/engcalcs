@@ -1,7 +1,7 @@
 // The label views the port plan measures (dev/label-trials/port-plan.md), on the DOM stub: Net3 and
 // Net3 on the world map near Novato at their fit view and closer, and the bench's 600-junction
 // downtown network at its five zooms. Node fields ID, P, Qb, Z; link fields ID, Q, V; solved through
-// EPANET. Shared by label-pass-memo-harness.js and pipe-label-level-harness.js, so the two count
+// EPANET. Shared by pipe-label-level-harness.js and its kin, so they count
 // the same views.
 //
 // Copyright 2009 Thomas Gail Haws
