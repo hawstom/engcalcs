@@ -66,6 +66,13 @@ the block.
 
 ## 100 — Next.
 
+- 100|717| **EPANET-MSX, multi-species water quality.**
+  **PROMOTED TO 100 by Tom, 2026-10-17**: *"it's an undisclosed EPANET parity issue."* First find each public parity claim that MSX makes untrue and qualify it (his call, as public claims); then build.
+  Tom, 2026-09-25: *"Multi-species MSX: Add it priority 50. I don't understand it, but we can learn.
+  Thank you, Mary!"* From Mary's `dev/agents/market-researcher/epanet-gap-audit.md`.
+  Tom, 2026-09-26 (R-320): *"This is an extension, not base EPANET. We can provide this, but it's
+  not a blocker for EPANET++."* His UI sketch: Settings, Quality holds a short list of parameters
+  with toggles plus an open-ended list of reactive species, no scarier than Custom Properties.
 - 100|721| **The scenario and alternatives model: Bentley's tree, plus Presentation and Calculation.**
   Tom, 2026-09-25: *"I like the layered scenario alternatives paradigm."* The destination is
   Bentley's model (a scenario tree; each scenario picks one alternative per category; alternatives
@@ -78,6 +85,13 @@ the block.
   Stages, answers and code: `dev/scenario-alternatives.md` on `feat/bentley-interop`. Basic mode
   hides it until the Advanced UX is designed. Task 765 (Presentation) is folded in here. Stage 6 (the
   Scenario manager and the Scenarios table, Tom's calls of 2026-10-09) is built on the branch.
+- 100|733| **Grow the native solver, in phases, to everything EPANET's solves.** **PHASE 1 MERGED 2026-10-17** (`feat/native-valves`): PRV, PSV, FCV solve natively, matching EPANET 2.3.5 within 0.8 mm head (`native-valve-harness.js`); PBV and GPV still route to EPANET. Next: PBV/GPV, then EPS. Tom, 2026-09-26
+  **PROMOTED TO 100 by Tom, 2026-10-17, as a long-term task: slow and careful.** Each phase is its own branch, matched against EPANET 2.3.5 on every shipped example before it merges.
+  **PROMOTED TO 75 by Tom, 2026-10-14.**
+  (R-325): *"it would be fun and maybe wise ... to gradually, in phases, build out our native solver
+  to do everything that the EPANET solver does. This way the math is less of a black box for us."*
+  Phases to scope: PRV/PSV/FCV, then a time dimension (EPS), then quality. Supersedes the CLAUDE.md
+  line that the built-in solver is not getting a time dimension only when a phase ships.
 - 100|737| **One canonical word per concept, so every language names each one once.**
   Tom, 2026-10-14: mnemonic, definitional keys over coined names (*"we don't need more confusion"*).
   **WHAT IS LEFT: every language gives each concept below its own word, used everywhere, and no two
@@ -159,8 +173,9 @@ the block.
   - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
     `labelPass` inside `buildDom` and a label-measurement count.
 - 100|749| **Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.**
+  Tom, 2026-10-17: *"Proceed with the .sqllite branch. No merging it until it's done. This is another long project."* It lives on `feat/sqlite-reader` until then.
   Tom, 2026-10-17: *"I am working on getting us at least one .sqllite example in case you can't find or make one."*
-  **PROMOTED TO 100 by Tom, 2026-10-14. Blocked on a sample file**: a small WaterCAD model with one child scenario, saved as `.sqlite` and as `.inp`.
+  **PROMOTED TO 100 by Tom, 2026-10-14. Samples found 2026-10-17** (`dev/agents/market-researcher/wtg-samples.md`): Zenodo 7162154 (CC BY 4.0) has WaterGEMS `.wtg.sqlite` files, one with a child scenario that overrides nothing, and an `.inp` of the same model; TSNet (MIT) has two Base-only ones. **Still missing:** a child scenario that overrides a value, with its `.inp`; Tom may make one with a free EWB Bentley licence. Reader foundation on `feat/sqlite-reader`.
   Tom, 2026-10-06: *"As far as bentley-interop goes, the goal is to engage with the .sqlite file and
   connect to Google Sheets for Sync in and Sync out"* (the Sheets half is Task 752). The model it
   needs is Task 721. Phase 1 (`dev/bentley-interop.md`): the schema is unpublished, no public sample
@@ -172,24 +187,25 @@ the block.
   Tom, 2026-10-15, on Fotobi's "1-hr drain w pump off" (24 overrides vs its siblings' 23): *"I don't know how to see a tidy list of overrides to audit ... that count seems inflated ... I should see the count of only the present overrides, not the inherited overrides. I count 13 diameter overrides, 1 text override, and 2 calculation overrides."* Also his screenshot note: tanks show the amber circle while their overrides are only in the parent. Review R-386.
 - 100|814| **Classify every import and export by its scenario awareness.**
   Comes before Task 752 goes on. Tom, 2026-10-17: *"We must get perfect clarity about our standard handling of scen/alt in imp/exp, then we must apply it to every imp/exp command."* His three classes: current scenario, current project, separate project. For each command: how aware the format is of scenarios and alternatives, and how well it fits this project; an import from a less aware format asks where it goes (current or new scenario/alternative, current or new project); an export to one asks to confirm exporting part of the project; an equally aware one discloses that it is an export, not a save or a sync. Maybe one standard questionnaire or wizard.
-- 100|752| **Google Sheets: sync the scenarios and their alternatives out and in.**
-  **PROMOTED TO 100, 2026-10-17** (Tom: *"The next big tasks are Google sheets sync and .sqllite import/export."*). Phase 1, the workbook as a file (export, then import with a report before applying), is on `feat/sheet-sync`.
-  **Direction, Tom 2026-10-07, on Bentley's Connection** (a saved, re-runnable set of directions from
-  a source to a model, run for Sync In and Sync Out, not a live link): *"Nice. That's where we should head."*
-  Tom, 2026-09-30, on a master-spreadsheet layout (a Scenarios tab naming each scenario's
-  alternatives, then one tab per data kind keyed by element ID): *"Spreadsheet structure: I love
-  this."* and *"Sync in/out: Could we do this with GSheets?"*; 2026-10-06, it is half of the interop
-  goal. The tabs read the tree Task 721 builds. Export/import as a file first (no account, no
-  upload); a Sheets sync is a fifth third-party service, so a `privacy.php` paragraph and his call.
-  Mary, Sue and Declan advised against Sheets as the live store (2026-09-30); a sync is not that.
-  **Tom's browser pass of phase 1 (2026-10-17):** waits on Task 814. Use ODS, not XLSX. Carry the whole project (all of Net1, everything the project file holds), not only the scenarios. The demand multiplier went into the settings tab, though it belongs with demand. Base values out of the workbook: fine for a beginning. A renamed scenario not renaming its alternatives: the namesake rename is a Basic mode rule, so the workbook may apply names as written. He asks why we are doing this and whether it rests on market research (it rests on his 2026-09-30 and 10-07 words, none).
+- 100|752| **Spreadsheet data in and out, one scenario at a time, as a file.**
+  **RESHAPED 2026-10-17 on market research** (Tom: *"Reshape Task 752 that way."*; evidence in
+  `dev/agents/market-researcher/spreadsheet-sync.md`). Modellers move element data one way (demands
+  from meter or billing sheets, curves, patterns) and reports out; nobody found round-trips a scenario
+  tree, and nobody asks for a live Google Sheets link. So, in order: (1) a results-by-scenario table
+  that copies to a spreadsheet (a gap Bentley and InfoWater both have on record); (2) a demand import
+  from a meter or billing table that says "this replaces N demands" before applying; (3) ODS, with CSV
+  the simplest door, into the current scenario, asking where it goes per Task 814. **Rejected for now:**
+  the whole-project workbook round trip and a live Sheets link (his 2026-09-30 and 10-07 wants, Bentley's
+  Connection the model), until a real user asks. `feat/sheet-sync` holds phase 1 of the old shape.
 - 100|811| **Themes beyond Light and Dark: a selector, and a better default.**
   Tom, 2026-10-17: *"I had much more in mind for themes than Light and Dark ... fun and useful themes around such ideas as high contrast, Mac, retro eras and devices (maybe monochrome amber and monochrome green), rounded corners, icons, fonts, and colors. I envision a fun and useful theme selector as well as an eventual upgrade of our default aesthetics ... a visitor might say, 'It looks the same, but better, nicer, more pleasant.'"* Ida's plan: `dev/themes-plan.md` on `feat/theme`.
   Tom's pass of the first branch (2026-10-17): *"Nice start. These appear to be pure color themes."* The branch is also to carry design themes: fonts, rounding, widths, sizes and icons, and whole looks such as Mac and other legendary ones (whimsical too: Pac-Man, the London Times, Star Wars).
 - 100|812| **Port the label bench's proven findings to master, one branch each.**
   Tom, 2026-10-17: *"We need to figure out what and how to merge the current best findings from our label placement project to improve our performance and results."* The bench branches are 2,300 commits behind and never merge as they are; the plan is `dev/label-trials/port-plan.md` on `docs/label-port`.
   Tom's pass of `feat/label-beside` (2026-10-17): no difference from master seen on Net3 or Novato; not one level label seen; the page reports no zoom factor, so "at 2x" cannot be followed; he could not reach the 600-junction network. Short pipes should also try the level spot.
-- 75|809| **Finish the translation-clarification follow-ups at the next sprint.** The halo words were fixed with sprint 1017 (cs obrys, sw ukingo). Awaiting him: sprint cadence (once before each production pull). Open: `prefix_terms.inc.php` lists now only wire sense-qualified terms; glossary `context` and `translation_notes_xx` are not folded into `definition`/`translation_notes`; no check fails a term reaching no key.
+- 100|815| **Usage report: which map commands and toolbar buttons get used.**
+  Tom, 2026-10-17: *"I am having difficulty gleaning from the report any insights about what parts of lpn/epp are being used ... start with menu commands and toolbar buttons ... we can be happy to know whether people are using Scenario manager and Fire flow analysis without knowing which properties they are overriding or what their fire flow input is."* One deduped row per command per page load, never its inputs; `spock.php` lists them by menu. The `privacy.php` usage-counts sentence changes with it.
+- 75|809| **Finish the translation-clarification follow-ups at the next sprint.** The halo words were fixed with sprint 1017 (cs obrys, sw ukingo). Cadence, Tom 2026-10-17: no more than about once a week; sprint 1017 took 3 h 20 min and 10% of his weekly budget. Open: `prefix_terms.inc.php` lists now only wire sense-qualified terms; glossary `context` and `translation_notes_xx` are not folded into `definition`/`translation_notes`; no check fails a term reaching no key.
 - 75|810| **Bring the features list up to what the software does.** Tom, 2026-10-16: *"I prefer to let you edit based on my
   messages/prompts."* Missing from `dev/features-source.md`: scenarios and alternatives, with Presentation and Calculation overrides
   for saved view layouts; converting coordinate systems and units; import and export of everything itemized; time series graphs on
@@ -290,18 +306,6 @@ the block.
     storage state was captured before the tab was closed. `dev/scripts/lpn-forensics.js` is the
     read-only console paste that answers the scenario list in one go -- run it on the next
     specimen BEFORE closing the tab.
-- 75|639| **Layers: the first heading under Map and page.**
-  **RESCOPED 2026-10-11** (Tom, to CC's proposal: *"OK. I am fuzzy on it at the moment, but clarities will arise
-  once I play with it."*): Map appearance already holds opacity, sizes and colours, so this is on/off and order per
-  layer, worth building once Shapes (779), contours and customers are layers. After 779 merges.
-  Tom, 2026-09-12. A Layers sub-heading under `Settings > Map and page`, ABOVE Appearance, with a
-  row per layer and the columns On/off, Opacity, Size (default), Color (default), Z.
-  - **Phase 1 layers: Text, Symbol, Link, Flow arrow, Background.** Roadmap layers: Contour
-    (Task 640) and Customer (Task 247).
-  - **Z is RELATIVE**, ranged 0 (default) to roughly 2-10 times the number of layers -- so adding a
-    layer never renumbers the others, which is the whole reason it is not an index.
-  - A layer setting is MODELLING data by CLAUDE.md's project-versus-browser rule and rides in
-    `serializeProject()`; it is not window furniture.
 - 75|676| **Watch the sites, and send a derived weekly report.**
   **DEMOTED TO 75 by Tom, 2026-10-11.**
   Tom, 2026-09-15: *"mistakes like the site outages and merging difficult development branches to
@@ -345,12 +349,6 @@ the block.
   **PROMOTED TO 75 by Tom, 2026-10-14.**
   Tom, 2026-09-25, on WaterCAD's background layers: *"This seems like a GIS REST server offering."*
   A fifth third-party service is a new paragraph in `privacy.php` (CLAUDE.md).
-- 75|733| **Grow the native solver, in phases, to everything EPANET's solves.** **PHASE 1 MERGED 2026-10-17** (`feat/native-valves`): PRV, PSV, FCV solve natively, matching EPANET 2.3.5 within 0.8 mm head (`native-valve-harness.js`); PBV and GPV still route to EPANET. Next: PBV/GPV, then EPS. Tom, 2026-09-26
-  **PROMOTED TO 75 by Tom, 2026-10-14.**
-  (R-325): *"it would be fun and maybe wise ... to gradually, in phases, build out our native solver
-  to do everything that the EPANET solver does. This way the math is less of a black box for us."*
-  Phases to scope: PRV/PSV/FCV, then a time dimension (EPS), then quality. Supersedes the CLAUDE.md
-  line that the built-in solver is not getting a time dimension only when a phase ships.
 - 75|756| **Cross-platform: the suite as a desktop application, beyond the web folder.**
   Tom, 2026-09-30: *"Put a cross platform project on our roadmap priority 75. Plan where/how to move
   the project to transcend the web-centric hawsedc.com/engcalcs folder. Windows or Linux? Plan what
@@ -758,12 +756,6 @@ the block.
   Convert as has a Label suffix box for depth that is disabled because `level` is not in
   `nodeFieldDefs()`. Measured 2026-09-23 at eight sites, including the dense label priority table
   and both label passes, so it is a label feature, not a wizard fix.
-- 50|717| **EPANET-MSX, multi-species water quality.**
-  Tom, 2026-09-25: *"Multi-species MSX: Add it priority 50. I don't understand it, but we can learn.
-  Thank you, Mary!"* From Mary's `dev/agents/market-researcher/epanet-gap-audit.md`.
-  Tom, 2026-09-26 (R-320): *"This is an extension, not base EPANET. We can provide this, but it's
-  not a blocker for EPANET++."* His UI sketch: Settings, Quality holds a short list of parameters
-  with toggles plus an open-ended list of reactive species, no scarier than Custom Properties.
 - 50|722| **Change and revision tracking.**
   Tom, 2026-09-25, from WaterCAD: *"I like change/revision tracking very cool."*
 - 50|725| **One wide fire-flow table instead of two reports.**
@@ -940,6 +932,19 @@ the block.
     first-time reader who needed the search, so a discoverable affordance and an undiscoverable one
     are both half an answer.
   - Filed as a maybe-someday on his own framing. Decide the location question before any code.
+- 25|639| **Layers: the first heading under Map and page.**
+  **DEMOTED TO 25 by Tom, 2026-10-17.**
+  **RESCOPED 2026-10-11** (Tom, to CC's proposal: *"OK. I am fuzzy on it at the moment, but clarities will arise
+  once I play with it."*): Map appearance already holds opacity, sizes and colours, so this is on/off and order per
+  layer, worth building once Shapes (779), contours and customers are layers. After 779 merges.
+  Tom, 2026-09-12. A Layers sub-heading under `Settings > Map and page`, ABOVE Appearance, with a
+  row per layer and the columns On/off, Opacity, Size (default), Color (default), Z.
+  - **Phase 1 layers: Text, Symbol, Link, Flow arrow, Background.** Roadmap layers: Contour
+    (Task 640) and Customer (Task 247).
+  - **Z is RELATIVE**, ranged 0 (default) to roughly 2-10 times the number of layers -- so adding a
+    layer never renumbers the others, which is the whole reason it is not an index.
+  - A layer setting is MODELLING data by CLAUDE.md's project-versus-browser rule and rides in
+    `serializeProject()`; it is not window furniture.
 - 25|672| **The placement wizard degrades and then crashes after a few pans.**
   **DROPPED TO 25 BY TOM, 2026-09-15: *"This is not manifesting. If it does, I will report."*** Kept
   rather than closed because the instrument built for it is the valuable part and should not be

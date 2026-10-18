@@ -98,7 +98,7 @@ lines rather than appending corrections.
 
 ## STATE — 2026-10-17 (twenty-fifth session, afternoon and evening, Arizona time)
 
-### Master: 4866c11d2 (sprint 1017 merged, green, pushed 2026-10-17 8:02 PM). Production: b7c99102 (10-09) when last read
+### Master: 45317389e (pushed 2026-10-17 9:39 PM; Tom deploys it). Production: 4866c11d2 (sprint 1017) or 45317389e
 
 **Sprint 1017 is merged into master and ready to deploy**. It translates the 408 untranslated
 keys (98 of them he had not yet read) and 27 rewordings into 26 languages, Wave 0 rewrote 19 English
@@ -112,8 +112,8 @@ Deleted keys: `lpn_guide_text_notes_popup`; and from the 26 non-English files on
 
 ### Branches he has passed once (2026-10-17); his notes are on Tasks 752, 811, 812 and 814
 
-- `feat/sheet-sync` (row 8108): Task 752 phase 1. **Held for Task 814** (classify every import and
-  export by scenario awareness). Then ODS not XLSX, the whole project, the demand multiplier with demand.
+- `feat/sheet-sync` (row 8108): phase 1 of Task 752's old shape, the whole-tree workbook. Task 752 was
+  reshaped on market research (results by scenario, demand import, one scenario at a time); salvage, don't merge.
 - `feat/theme` (row 8111): Task 811. Colour themes only so far; he wants design themes on the same branch.
 - `feat/label-beside` (row 8110): Task 812. He saw no difference and no level label; the page shows no
   zoom factor and he could not reach the 600-junction network. Short pipes should also try the level spot.
@@ -127,6 +127,15 @@ Deleted keys: `lpn_guide_text_notes_popup`; and from the 26 non-English files on
   translations are owed. A mini-sprint needs his word.
 - His `lpn_sm_help` lacks Copy upward and the has-children delete reason: CC proposed two sentences.
 - Port 8202 never reaches jasmine from his browser; epanet-plus-plus.org is also on 8109.
+
+### Waiting to merge (next batch, one suite run)
+
+- `chore/752-reshape`: Task 752 reshaped on market research, the report filed, Task 809's cadence.
+- `fix/settings-clear-jump` (828185057, green on its harness): the real Settings jump, a 561 px pull
+  when a tip is showing during a redraw. A defect: merges on green.
+- `feat/sqlite-reader` (Task 749) is NOT in any batch: Tom, 2026-10-17, *"No merging it until it's done."*
+- WaterCAD samples found: `dev/agents/market-researcher/wtg-samples.md` (Zenodo 7162154, TSNet). Tom is
+  seeking a free EWB Bentley licence to make the one missing case, a child that overrides a value.
 
 ### Next job
 
