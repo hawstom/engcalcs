@@ -7,19 +7,17 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**85 open tasks.** Next (100): 12 · Soon (75): 11 · Someday (50): 27 · Maybe (25): 16 · Parked (5): 19
+**83 open tasks.** Next (100): 10 · Soon (75): 11 · Someday (50): 27 · Maybe (25): 16 · Parked (5): 19
 
-## 100 — Next (12)
+## 100 — Next (10)
 
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
 - Task 717 — EPANET-MSX, multi-species water quality.
-- Task 721 — The scenario and alternatives model: Bentley's tree, plus Presentation and Calculation.
 - Task 733 — Grow the native solver, in phases, to everything EPANET's solves.
-- Task 737 — One canonical word per concept, so every language names each one once.
+- Task 737 — WAIT: sprint · One canonical word per concept, so every language names each one once.
 - Task 741 — The infinite map: generated networks for the label bench.
 - Task 749 — Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.
 - ! Task 752 — Spreadsheet data in and out, one scenario at a time, as a file.
-- Task 800 — A tidy list and count of one scenario's own overrides.
 - Task 811 — Themes beyond Light and Dark: a selector, and a better default.
 - Task 812 — Port the label bench's proven findings to master, one branch each.
 - Task 814 — Classify every import and export by its scenario awareness.
@@ -113,5 +111,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-77 of 85 titles are within 4–12 words. `!` marks the rest;
+75 of 83 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

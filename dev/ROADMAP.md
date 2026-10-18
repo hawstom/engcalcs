@@ -73,18 +73,6 @@ the block.
   Tom, 2026-09-26 (R-320): *"This is an extension, not base EPANET. We can provide this, but it's
   not a blocker for EPANET++."* His UI sketch: Settings, Quality holds a short list of parameters
   with toggles plus an open-ended list of reactive species, no scarier than Custom Properties.
-- 100|721| **The scenario and alternatives model: Bentley's tree, plus Presentation and Calculation.**
-  Tom, 2026-09-25: *"I like the layered scenario alternatives paradigm."* The destination is
-  Bentley's model (a scenario tree; each scenario picks one alternative per category; alternatives
-  inherit from parents), extended with a Presentation category (view, map appearance, symbology),
-  which Bentley does not have, and Calculation options. Tom, 2026-10-06: the two categories should
-  free users from Save As for what-iffing, under one rule: no equation-driven change to stored
-  dimensions (units, coordinate frame) without a Save As; friction method varies, roughness is the
-  user's to edit. **First item: the full alternatives and inheritance model under the hood** (stages
-  4 and 5), after advice from every angle (*"Order matters... we are likely to make mistakes"*).
-  Stages, answers and code: `dev/scenario-alternatives.md` on `feat/bentley-interop`. Basic mode
-  hides it until the Advanced UX is designed. Task 765 (Presentation) is folded in here. Stage 6 (the
-  Scenario manager and the Scenarios table, Tom's calls of 2026-10-09) is built on the branch.
 - 100|733| **Grow the native solver, in phases, to everything EPANET's solves.** **PHASE 1 MERGED 2026-10-17** (`feat/native-valves`): PRV, PSV, FCV solve natively, matching EPANET 2.3.5 within 0.8 mm head (`native-valve-harness.js`); PBV and GPV still route to EPANET. Next: PBV/GPV, then EPS. Tom, 2026-09-26
   **PROMOTED TO 100 by Tom, 2026-10-17, as a long-term task: slow and careful.** Each phase is its own branch, matched against EPANET 2.3.5 on every shipped example before it merges.
   **PROMOTED TO 75 by Tom, 2026-10-14.**
@@ -92,7 +80,8 @@ the block.
   to do everything that the EPANET solver does. This way the math is less of a black box for us."*
   Phases to scope: PRV/PSV/FCV, then a time dimension (EPS), then quality. Supersedes the CLAUDE.md
   line that the built-in solver is not getting a time dimension only when a phase ships.
-- 100|737| **One canonical word per concept, so every language names each one once.**
+- 100|737| WAIT: sprint — **One canonical word per concept, so every language names each one once.**
+  **Not done, 2026-10-18** (Tom asked "Done?"): the am and my Status words (terms entries written 2026-10-17) and the "labels, and Text" mode prompts reach those languages only through the next sprint.
   Tom, 2026-10-14: mnemonic, definitional keys over coined names (*"we don't need more confusion"*).
   **WHAT IS LEFT: every language gives each concept below its own word, used everywhere, and no two
   concepts share a word.** Known collisions: Tag and Label are one word in es (Etiqueta), it
@@ -183,8 +172,6 @@ the block.
   might help), so the deciding test, a small model with a child scenario saved as `.sqlite` and as
   `.inp`, waits on finding one. Presentation never travels through a Bentley file (Bentley keeps
   display in the `.wtg`); the project file is its only home.
-- 100|800| **A tidy list and count of one scenario's own overrides.** **SHIPPED 2026-10-16 with `feat/bentley-interop`** (override-audit merged in 2026-10-15, with Tom's wording and a List overrides row on the Scenarios menu, greyed at 0).
-  Tom, 2026-10-15, on Fotobi's "1-hr drain w pump off" (24 overrides vs its siblings' 23): *"I don't know how to see a tidy list of overrides to audit ... that count seems inflated ... I should see the count of only the present overrides, not the inherited overrides. I count 13 diameter overrides, 1 text override, and 2 calculation overrides."* Also his screenshot note: tanks show the amber circle while their overrides are only in the parent. Review R-386.
 - 100|814| **Classify every import and export by its scenario awareness.**
   Comes before Task 752 goes on. Tom, 2026-10-17: *"We must get perfect clarity about our standard handling of scen/alt in imp/exp, then we must apply it to every imp/exp command."* His three classes: current scenario, current project, separate project. For each command: how aware the format is of scenarios and alternatives, and how well it fits this project; an import from a less aware format asks where it goes (current or new scenario/alternative, current or new project); an export to one asks to confirm exporting part of the project; an equally aware one discloses that it is an export, not a save or a sync. Maybe one standard questionnaire or wizard.
   Inventory and standard: `dev/import-export-scenarios.md`. **Tom's calls, 2026-10-18:** no confirmation when the project is only Base; an `.inp` or GeoJSON network may land in the open project (IDs matched, values updated); the open scenario is the default; the receipt is a dialog (*"a major event that deserves a major answer ... unless there are visible results like the opening of a new tab"*); no "sync" until a live link exists.
