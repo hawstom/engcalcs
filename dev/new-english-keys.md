@@ -82,82 +82,82 @@ build for that would be a gate nobody keeps. Refresh it with
 
 - **`lpn_file_export_item_scnbook`**
   > Scenario workbook…
-  @@ NEEDS RULING
+  Deprecated, I think.
 - **`lpn_file_export_scnbook_tip`**
   > Download the scenarios, their alternatives, and the overrides of each alternative as one .xlsx workbook, in the project units. Edit it in a spreadsheet program. Read it back with File, Import, Import scenario workbook.
-  @@ NEEDS RULING
+  Deprecated, I think.
 - **`lpn_file_import_scnbook`**
   > Import scenario workbook…
-  @@ NEEDS RULING
+  Deprecated, I think.
 - **`lpn_file_import_scnbook_tip`**
   > Read back a scenario workbook made with File, Export, Scenario workbook, after it is edited in a spreadsheet program. Every difference from this project is listed before anything is changed, with each row that cannot be used and the reason. Apply changes makes them all as one step, which Undo reverses. Nothing the workbook leaves out is deleted.
-  @@ NEEDS RULING
+  Deprecated, I think.
 - **`lpn_scnbook_alternative_name`**
   > Alternative name ({category})
-  @@ NEEDS RULING
+  OK.
 - **`lpn_scnbook_alternative_parent`**
   > Parent of alternative {name} ({category})
-  @@ NEEDS RULING
+  OK.
 - **`lpn_scnbook_applied`**
   > Applied {n} changes from {file}. Undo reverses them.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_scnbook_apply`**
   > Apply changes
-  @@ NEEDS RULING
+  OK.
 - **`lpn_scnbook_apply_failed`**
   > Not applied: {list}.
-  @@ NEEDS RULING
+  OK.
 - **`lpn_scnbook_blank`**
   > (blank)
-  @@ NEEDS RULING
+  OK.
 - **`lpn_scnbook_col_alternative`**
   > Alternative
-  @@ NEEDS RULING
+  Deprecated, I think. And don't these exist elsewhere? We should DRY.
 - **`lpn_scnbook_col_assets`**
   > Assets
-  @@ NEEDS RULING
+  Deprecated, I think. And don't these exist elsewhere? We should DRY.
 - **`lpn_scnbook_col_change`**
   > Change
-  @@ NEEDS RULING
+  Deprecated, I think. And don't these exist elsewhere? We should DRY.
 - **`lpn_scnbook_col_demands`**
   > Demand categories
-  @@ NEEDS RULING
+  Deprecated, I think. And don't these exist elsewhere? We should DRY.
 - **`lpn_scnbook_col_fingerprint`**
   > Asset ID check
-  @@ NEEDS RULING
+  Deprecated, I think.
 - **`lpn_scnbook_col_path`**
   > Path
-  @@ NEEDS RULING
+  Deprecated, I think. And don't these exist elsewhere? We should DRY.
 - **`lpn_scnbook_col_project`**
   > In the project
-  @@ NEEDS RULING
+  Deprecated, I think.
 - **`lpn_scnbook_col_project_name`**
   > Project
-  @@ NEEDS RULING
+  Deprecated, I think. And don't these exist elsewhere? We should DRY.
 - **`lpn_scnbook_col_reason`**
   > Reason
-  @@ NEEDS RULING
+  Deprecated, I think. And don't these exist elsewhere? We should DRY.
 - **`lpn_scnbook_col_row`**
   > Row
-  @@ NEEDS RULING
+  Deprecated, I think.
 - **`lpn_scnbook_col_sheet`**
   > Sheet
-  @@ NEEDS RULING
+  Deprecated, I think.
 - **`lpn_scnbook_col_workbook`**
   > In the workbook
   @@ NEEDS RULING
 - **`lpn_scnbook_head_changes`**
   > Changes ({n})
-  @@ NEEDS RULING
+  Deprecated, I think.
 - **`lpn_scnbook_head_kept`**
   > Kept, not in the workbook ({n})
-  @@ NEEDS RULING
+  Deprecated, I think.
 - **`lpn_scnbook_head_unusable`**
   > Not used ({n})
-  @@ NEEDS RULING
+  Deprecated, I think. And don't these exist elsewhere? We should DRY.
 - **`lpn_scnbook_kept_alternative`**
   > Alternative {name} ({category}) is not in the workbook, and is kept.
-  @@ NEEDS RULING
+  Deprecated, I think.
 - **`lpn_scnbook_kept_scenario`**
   > Scenario {name} is not in the workbook, and is kept.
   @@ NEEDS RULING
@@ -316,13 +316,13 @@ build for that would be a gate nobody keeps. Refresh it with
 
 - **`lpn_theme_amber`**
   > Amber
-  @@ NEEDS RULING
+  OK.
 - **`lpn_theme_green`**
   > Green
-  @@ NEEDS RULING
+  OK.
 - **`lpn_theme_hc`**
   > High contrast
-  @@ NEEDS RULING
+  OK.
 - **`lpn_theme_platinum`**
   > Platinum
-  @@ NEEDS RULING
+  OK.
