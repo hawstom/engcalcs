@@ -68,6 +68,7 @@ require_once __DIR__ . '/prefix_terms.inc.php';
 require_once __DIR__ . '/coverage.inc.php';
 require_once __DIR__ . '/concepts.inc.php';
 require_once __DIR__ . '/plain_sentences.inc.php';
+require_once __DIR__ . '/dock_box_titles.inc.php';
 
 main($argv);
 
@@ -572,9 +573,22 @@ function loadTagTable(): array
  */
 function collectKeyNotes(array $deltaKeys, array $plainSentences, array $tagTable): array
 {
+    static $boxTitles = null;
+    if ($boxTitles === null) {
+        try {
+            $boxTitles = dockBoxTitleKeys();
+        } catch (RuntimeException $ex) {
+            fail($ex->getMessage());
+        }
+    }
     $out = [];
     foreach ($deltaKeys as $key => $english) {
         $e = $plainSentences[$key] ?? null;
+        // A dockable box's title gets Layout (box title), derived from the page (dock_box_titles.inc.php).
+        if (isset($boxTitles[$key]) && ($e === null || $e['layout'] === '' || $e['layout'] === null)) {
+            $e = ($e ?? ['runtime' => '', 'symbol' => false, 'notes' => []]);
+            $e['layout'] = 'box title';
+        }
         if ($e === null) {
             continue;
         }

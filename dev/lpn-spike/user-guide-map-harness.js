@@ -17,7 +17,7 @@
 
 const path = require('path');
 const L = require('./user-guide-chapter-lib.js');
-const { U, ok, enString, plain, checkQuotes, openGuide, dialogPress, finish } = L;
+const { U, ok, enString, esString, plain, checkQuotes, openGuide, dialogPress, finish } = L;
 const NAME = 'user-guide-map-harness';
 U.takeBrowserLock(NAME, 'EC_UGMAP_LOCKED');
 
@@ -191,7 +191,7 @@ async function main() {
 		await c.settle(1200);
 		await openGuide(c);
 		const es = await c.page.evaluate(() => Array.from(document.querySelectorAll('[data-guide-section="map"] > dl > dt')).map((d) => d.textContent.trim()));
-		ok('the Spanish page shows the four new terms', es.length === 5 && TERMS.slice(1).every((k, i) => es[i + 1] === enString(k)), JSON.stringify(es));
+		ok('the Spanish page shows the four new terms', es.length === 5 && TERMS.slice(1).every((k, i) => es[i + 1] === esString(k)), JSON.stringify(es));
 		ok('no page errors (Spanish)', c.errors.length === 0, c.errors.slice(0, 2).join(' | '));
 		await c.context.close().catch(() => {});
 	} catch (e) {

@@ -84,7 +84,7 @@ async function main() {
 			await a.settle(500);
 			await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 			const opened = await openKind(a, page, sel);
-			ok('the box opens', opened);
+			ok('the Properties box is shown', opened);
 			if (!opened) { await a.close(); continue; }
 			const o = await info(page);
 			const at = await page.evaluate(WRAP, o.w);

@@ -1,0 +1,246 @@
+{
+    "sprint": "1017-wave0",
+    "description": "Wave 0 adversarial English pass over the 121 keys wave0_keyset.php --new-and-changed leaves for review (438 in scope, 317 already ruled by Tom on their exact English and excluded). Each string was read at its call site in Looped-Network.php, js/looped-network.js, or Manning-Trap.php and asked for every reading a careful non-native translator could take. 20 entries filed, 19 open with a PROPOSED English rewrite (nothing written to lib/lang.ec.en.php) and 1 dismissed because the call site settles the doubt. The other keys read one way only.",
+    "entries": [
+        {
+            "key": "mtc_iteration_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"(B/B, Blodgett–Bathurst, recommended)\" reads as a list of three items, beside \"(Isbash recommended)\" with no comma; and \"See Notes below for the full method, or enter your own roughness value\" offers entering a roughness as an alternative to reading the Notes. (Manning-Trap.php:19 and :28, the tip on the roughness and rock size labels beside the B/B, P&I, Isbash radio buttons)",
+            "readings": [
+                "B/B is the Blodgett–Bathurst button, and it is the recommended roughness option; to skip iteration, enter a roughness",
+                "three separate options B/B, Blodgett–Bathurst, and recommended; read the Notes OR enter a roughness"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: 'Choose a roughness option (B/B for Blodgett–Bathurst is recommended) and a rock size option (Isbash recommended) to auto-iterate toward a uniform rock size for your target flow. See Notes below for the full method. To skip iteration, enter your own roughness value (follow link for guidance) and ignore rock size.' The parenthesis says B/B is the abbreviation and that it is recommended; the skip-iteration step becomes its own sentence with its purpose first."
+        },
+        {
+            "key": "mtc_note_1",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Steps 1 to 4 describe what the calculator does, but step 5 \"Repeat until error...\" is an imperative, which a translator renders as an instruction to the user. The same \"(B/B, Blodgett–Bathurst, recommended)\" list-of-three parenthesis as mtc_iteration_tip. (Manning-Trap.php:62, the Notes under the trapezoidal channel calculator)",
+            "readings": [
+                "the calculator repeats steps 1 to 4 until the error is very small",
+                "the user is told to repeat the steps by hand"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: '<dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness option (B/B for Blodgett–Bathurst is recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The roughness value from the method you chose is copied into the roughness input. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. The steps are repeated until the error in the design rock size is very small.</dd><dt>Basic calculator (no iteration)</dt><dd>Enter your desired roughness value. Ignore the design rock size input area.</dd></dl>' Step 5 is passive like steps 1 to 4, matching \"the calculator repeats these steps\"; the parenthesis matches mtc_iteration_tip."
+        },
+        {
+            "key": "lpn_guide_text_popup",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Four \"or\"s in one sentence, with a comma pair around \"or of several selected assets\" (the 2026-10-13 rule); \"or where the box was last moved\" can attach to the list of things whose properties are shown. \"follow\" (the Tables pane follows) is the \"follows you\" AI-ism and reads as \"come next\". (Looped-Network.php:2818, the Properties box entry in the user manual)",
+            "readings": [
+                "the box shows the properties and is placed beside the selection or at its last moved position; the label and pane are updated",
+                "it shows the properties of a place where the box was moved; the label and pane come after"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: 'Shows the properties of the selected asset, Text, or Customer, or of several selected assets. The box opens beside the selection or where it was last moved. An edited value changes the network at once, and the asset's map label and the Tables pane are updated. Calculated results are shown as read-only rows and cannot be edited.' Placement becomes its own sentence, so each \"or\" joins one pair."
+        },
+        {
+            "key": "lpn_guide_text_library_box",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"An asset refers to a pattern, curve, pipe type, or fittings list by its ID\": in languages whose possessive follows the subject (sein, son, su, свой), \"its\" becomes the asset's own ID. (Looped-Network.php:2821, the Libraries box entry)",
+            "readings": [
+                "the asset refers to the item by the item's ID",
+                "the asset refers to the item by the asset's own ID"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: 'Holds the project's patterns, curves, pipe types, fittings lists, controls, and rules, one section each. Choose Water, Libraries to open it. An asset refers to a pattern, curve, pipe type, or fittings list by the ID of that item, and the item is created, edited, and deleted here. All are saved with the project, and Undo reverses an edit made here. The position and size of the box are kept in this browser only.' Names the owner of the ID."
+        },
+        {
+            "key": "lpn_guide_text_hotkeys_popup",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Press Ctrl+K to search, except while a question is open, or / while the user manual has focus.\" The \"or /\" can continue the except clause (except while a question is open or while / ...), and / is easily lost as a word between commas. (Looped-Network.php:2829, the user manual's own entry)",
+            "readings": [
+                "press Ctrl+K, or press / while the manual has focus, to search; Ctrl+K does not search while a question is open",
+                "Ctrl+K searches except while a question is open or while the manual has focus"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: 'The user manual. Its sections are Using the user manual, Toolbar, Menus, Map, Screenshot, Tables, Boxes, About this calculator, and Notes on this page. Toolbar and Menus list every toolbar button and menu row with its keyboard shortcut, Boxes has an entry for each box, and the other sections state what the page does. Choosing a row shows where that control is; it never runs it. Press Ctrl+K to search, or press / while the user manual has focus. Ctrl+K does not search while a question is open.' One alternative per clause; the exception gets its own sentence, as in lpn_guide_keys_def."
+        },
+        {
+            "key": "lpn_guide_scn_make_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"by whichever door it is made\" is a metaphor a translator will render as a physical door. \"It makes the asset inactive in the open scenario, and with it the pipes of a node, and says so\": which node, and \"says so\" has software speaking. (Looped-Network.php:2031, Scenario manager entry, How overrides are made)",
+            "readings": [
+                "however the edit is made; a deleted node's pipes also become inactive, and a message states it",
+                "through whichever door (literal); the pipes of some node; Delete talks"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: '<p>With a scenario other than Base open, an edit to a value that scenarios can override is stored as an override in the open scenario, however it is made: typing in Properties, editing a cell in Tables, Replace in Find and replace, dragging a node or entering its coordinates, Morph (the new type is the override), or Paste properties to selection. A setting typed in the Settings box is stored as an override when scenarios can override that setting. Base is not changed. In Base, the same edits change the network itself and reach every scenario that has not overridden the value.</p><p>Delete acts differently. In a scenario, Delete does not remove an asset that exists in Base. It makes the asset inactive in the open scenario, and for a node also its pipes, and a message states this. The asset is still in the drawing and in the other scenarios. An asset drawn while a scenario is open is inactive in Base and active in that scenario, and Delete in that scenario removes it. Deleting an asset in Base also deletes its overrides in every scenario, after a question that counts them. Customers and Shapes belong to no scenario and are deleted outright.</p><p>The Override manager row of the Scenarios list opens a list of every override of the open scenario by category, each beside the inherited value it replaces. A time series graph on the map that the scenario opened, moved, or changed is a row of its own. Check rows and click Clear selected overrides, click Clear override in one row, or click Clear all overrides. Each value then returns to the inherited value, and Undo reverses it. Select an ID in the list to go to the asset on the map. The dot in Properties and the Clear override row in the cell menu of Tables clear one override at a time.</p>' Literal wording for the metaphor; the pipes are tied to the deleted node."
+        },
+        {
+            "key": "lpn_guide_tb_row_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"then its keys, and, where a menu row does the same thing, Also in followed by the menu path\": \"Also in\" is a label quoted with no marker, inside a comma pair, and reads as prose (\"also in, followed by the menu path\"). (Looped-Network.php:1945; \"Also in\" is the text of lpn_guide_also, Also in {menu}, shown in each row (js/looped-network.js:51580))",
+            "readings": [
+                "the row shows the words Also in and the menu path",
+                "the button is also in some place followed by the menu path"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: '<p>Each row is one toolbar button, in the order of the strip, with a rule between groups. A row shows the button's icon, name, and tip, then its keys. Where a menu row does the same thing, the row also shows the menu path after the words Also in. Clicking a row points at the button on the toolbar. It never runs the button. When the button is not on screen, the row opens the menu row that does the same thing.</p>' \"the words Also in\" marks the label for the translator, who renders it as lpn_guide_also."
+        },
+        {
+            "key": "lpn_guide_mn_list_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"A row that is disabled now is still listed, with no sign of it\": \"it\" can be the row or the fact that it is disabled. (Looped-Network.php:1957, Menus section)",
+            "readings": [
+                "the row is listed with no mark that it is disabled",
+                "the row is listed but cannot be seen"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: '<p>The list is drawn from the menus themselves: File, Edit, Map, Water, and Help, each under its own heading, with the rows of a fly-out indented under the row that opens it and a rule between groups. It leaves out rows that are hidden now, headings inside a menu, and rows named from the project or the browser, such as scenario names. It goes one fly-out deep, and it has no entry for the Language menu. A row that is disabled now is still listed, with no mark to show that it is disabled. Clicking a row opens the menu and fly-out with that row pointed at. It never runs the row.</p>' Names what is not shown."
+        },
+        {
+            "key": "lpn_guide_map_letters_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"These keys and the digits 0 to 9 are not taken when...\" does not say taken by what; \"taken\" reads as \"occupied\" or \"unavailable\". (Looped-Network.php:1968, Map section, Letters, digits, and zoom keys)",
+            "readings": [
+                "the page does not act on these keys in those cases",
+                "these keys are not available or are not assigned"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: '<p>W starts Zoom Window, A starts selecting an area (pressing A again cycles the window, lasso, and polygon), and F draws a Shape. The plus or equals key zooms in, and the minus key zooms out, by one wheel step. These keys and the digits 0 to 9 do nothing on the map when another key makes them a shortcut, such as Ctrl+C, do nothing while typing in a field, and leave the letters of an open menu to its rows. A digit typed on a selected Tables cell overwrites the cell instead of choosing a tool.</p>' States the behavior."
+        },
+        {
+            "key": "lpn_guide_tbl_tabs_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Choose Water, Tables, or click Bottom panel, to open the pane.\" is the comma pair around an \"or\" clause (2026-10-13), and its first comma sits inside a menu path, so \"Tables\" can read as a third menu item or a separate thing to choose. (Looped-Network.php:1982, Tables section, The tabs)",
+            "readings": [
+                "use the menu path Water, Tables or the Bottom panel button to open the pane",
+                "choose Water, then choose Tables or click Bottom panel"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: '<p>To open the pane, click the Bottom panel button or choose Water, Tables. Its tabs, left to right, are Junctions, Reservoirs, Tanks, Pipes, Pumps, Valves, Text, Customers, Shapes, Settings, Scenarios, Time series, Profile, Frequency, and Flow balance. The Scenarios tab is shown when Basic mode is cleared. Column width, order, and visibility are kept in this browser, not in the project.</p>' No comma pair; the button takes its widget word; the menu path ends the sentence so its comma cannot be read as a list."
+        },
+        {
+            "key": "lpn_guide_bx_dock_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "The first sentence says \"title bar\", the second paragraph \"title band\" (the only \"title band\" in the English file; \"title bar\" is used 7 times). A translator gives two parts of a box two names. (Looped-Network.php:1992, Boxes section, Docking and tabs)",
+            "readings": [
+                "the same title bar",
+                "a separate band below the title"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: '<p>The corner of a box's title bar has Dock at the left of the map, Dock at the right of the map, and Float, and, once the box is docked, Auto-hide. A docked box is a column beside the map. With Auto-hide, it is a tab on a slim strip at the edge of the map. The tab opens the box on hover, after 150 ms with a mouse or pen, or on a click or tap, and the box tucks back into its tab as described above. A tucked box is still open. A menu row or toolbar button that opens it brings it out of its tab.</p><p>Dragging a docked box by its title bar floats it and turns auto-hide off. Boxes docked on one side share one width, and the map keeps at least 320 px. Tabs are reordered by dragging them or by pressing Alt+Up or Alt+Down on a focused tab.</p>' One name for one part."
+        },
+        {
+            "key": "lpn_guide_cr_case_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Lowest pressure allowed is the same setting as Lowest pressure allowed elsewhere in the Fire flow analysis\": \"elsewhere\" reads as an adverb (\"the same setting, found elsewhere in Fire flow analysis\"), not as the last word of the label. (Looped-Network.php:2073; the fire flow setting is lpn_ff_minpressure, Lowest pressure allowed elsewhere (js/looped-network.js:76248))",
+            "readings": [
+                "the same as the Fire flow box labeled Lowest pressure allowed elsewhere",
+                "the same as Lowest pressure allowed, which is found elsewhere, in Fire flow analysis"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: '<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest pressure allowed elsewhere box of the Fire flow analysis.</p>' Label, then the widget word, per the naming rule in dev/language-strings.md."
+        },
+        {
+            "key": "lpn_guide_ds_find_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Same sentence and same defect as lpn_guide_cr_case_def: \"elsewhere\" is read as an adverb. (Looped-Network.php:2080; lpn_ff_minpressure, Lowest pressure allowed elsewhere)",
+            "readings": [
+                "the same as the Fire flow box labeled Lowest pressure allowed elsewhere",
+                "the same as Lowest pressure allowed, found elsewhere in Fire flow analysis"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: '<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest pressure allowed elsewhere box of the Fire flow analysis.</p>' Parallel with lpn_guide_cr_case_def."
+        },
+        {
+            "key": "lpn_guide_en_set_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"a Currency text that is printed beside the costs and is only a label\": on this page Label is a defined term (EPANET Notation, a map label), so a translator uses that term; the meaning intended is that the text converts nothing. The phrase echoes the currency field tip Tom edited 2026-09-08, so this may be his wording. (Looped-Network.php:2087, Pump energy, What sets the numbers)",
+            "readings": [
+                "the text is printed and has no effect on the numbers",
+                "the currency is shown as a map Label"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: '<p>Settings, Energy holds the Pump efficiency (percent), used for every pump that has no efficiency curve, the Price of power for one kilowatt hour, a Price pattern that multiplies the price at each pattern step, the Peak demand charge per kW, and a Currency text that is printed beside the costs and does not convert the costs. A pump can have its own price, price pattern, and efficiency curve in Properties. The prices, the pattern, the peak demand charge, the Pump efficiency (percent), and a pump's own values are in the Energy cost category, so a scenario can override them. When no price is stated, or the price is zero, every cost is zero and the report says so. The application suggests no price.</p>' Says what \"only a label\" means without the reserved word; if Tom keeps his phrase, a plain-sentence entry can carry the meaning instead."
+        },
+        {
+            "key": "lpn_guide_ct_example_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Clear Show contours, and the nodes stay colored by pressure.\" is the struck \"Do X and Y happens\" construction (2026-09-23); a translator reads two facts joined by \"and\". (Looped-Network.php:2094, Contour, Example on Net1)",
+            "readings": [
+                "if Show contours is cleared, the nodes stay colored",
+                "clear the checkbox; separately, the nodes stay colored"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: '<p>Open the Net1 example and choose Water, Graphs, Contour. The nodes are colored by pressure, and the line under the color key states 9 nodes, 11 pipes, a reach of 2.5 times the median pipe length beside them, and lines every 5 psi. The pump, Link 9, is not one of the 11 pipes. When Show contours is cleared, the nodes stay colored by pressure.</p>' The explicit conditional, as the ruling suggests for a consequence."
+        },
+        {
+            "key": "lpn_notes_1_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"but an extended period simulation, and a network with a pressure breaker or general purpose valve (PBV, GPV), is always solved\": the comma pair with a singular \"is\" makes the second item read as an appositive describing the extended period simulation. (Looped-Network.php:2001, Notes on this page, the solver note)",
+            "readings": [
+                "two cases, each always solved by EPANET",
+                "an extended period simulation, which is a network with a PBV or GPV"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: 'By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation or a network with a pressure breaker or general purpose valve (PBV, GPV) is always solved by the EPANET solver.' No comma pair; \"or\" keeps the singular verb correct."
+        },
+        {
+            "key": "lpn_notes_5_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"fit H₀, a and b directly\": with no serial comma, the symbol a reads as the article (\"fit H₀, a [something] and b\"). (Looped-Network.php:2009, Notes on this page, the pump curve note)",
+            "readings": [
+                "the three coefficients H₀, a, and b",
+                "H₀ and a b"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: 'A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. The points of the curve are entered in Water, Libraries, as a Pump head curve, and the pump states that curve in Properties. Three points, the head at zero flow, the normal working point, and the point of highest flow, fit H₀, a, and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses EPANET’s rule: the head at zero flow is 1.33334 times the head entered, and the highest flow is 2 times the flow entered, which again gives b = 2. A pump with no curve stated adds no head. The curve is not truncated where the head reaches zero, so a flow greater than the curve can deliver produces a negative head. The remedy is a larger pump or a smaller demand, not a different curve fit. A curve can hold more than three points. The EPANET solver is given all of them and interpolates between them, while the Equation line and the built-in solver use the lowest, middle, and highest points.' The serial comma (APA) isolates the symbol a."
+        },
+        {
+            "key": "lpn_scenario_basic_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Cleared: both are shown\" sits after a sentence naming alternatives, overrides, the Scenario manager, and the Scenarios table; \"both\" may be alternatives and overrides. \"scenarios and alternatives relationships\" can parse as (scenarios) and (alternatives relationships). (Looped-Network.php:3982, js/looped-network.js:7726, the Basic mode checkbox tip)",
+            "readings": [
+                "the Scenario manager and the Scenarios table are shown; relationships among scenarios and alternatives",
+                "alternatives and overrides are shown; scenarios, and relationships of alternatives"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: 'Checked: alternatives are hidden and automatic, each scenario shows its overrides as its own, and all new scenarios are children of the Base scenario; the Scenario manager and the Scenarios table are not shown. Cleared: the Scenario manager and the Scenarios table are shown, and alternatives can be shared among scenarios. Scenario manager is disabled when Basic mode is on. Basic mode is disabled when a project has scenario and alternative relationships that Basic mode cannot show.' Names what is shown and makes the compound modifier singular."
+        },
+        {
+            "key": "lpn_sm_copy_ask",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Copy the overrides ({n}) of {name} up into {target}? It keeps them as its own overrides.\" After a copy both alternatives hold the overrides, so \"It\" can be {target}, the nearer noun. (js/looped-network.js:79644, the Copy upward confirmation)",
+            "readings": [
+                "{name} keeps its overrides",
+                "{target} keeps the copied values as its own overrides"
+            ],
+            "disposition": "english",
+            "resolution": "Applied 2026-10-17: 'Copy the overrides ({n}) of {name} up into {target}? {name} keeps them as its own overrides. You can undo this.' Names the alternative, as the tip lpn_sm_copy_up_tip does (\"The selected alternative keeps its overrides\")."
+        },
+        {
+            "key": "lpn_alt_cat_topology",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Active topology\" can read as \"the topology now in use\" rather than \"which assets are active\". (js/looped-network.js:78817, an alternative category in the Scenario manager)",
+            "readings": [
+                "the category that holds which assets are active",
+                "the topology currently in use"
+            ],
+            "disposition": "dismissed",
+            "resolution": "one reading: the category tip lpn_alt_cat_topology_tip, Asset activation (ruled), settles it, and Active Topology is the Bentley category name."
+        }
+    ]
+}

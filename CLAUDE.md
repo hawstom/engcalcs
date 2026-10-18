@@ -36,7 +36,7 @@ to leave something uncommitted.
   the conversation.** Green is not done. Claude Code's permission check enforces it; no file or
   hook does. There are no freezes; to hold a release still, cut a release branch. A defect or
   tooling track merges on green alone.
-- **A batch of merges costs one `check_all` run, about 19 minutes (three browser lanes, 2026-10-15); tell Tom the wait before
+- **A batch of merges costs one `check_all` run, about 36 minutes (measured twice, 2026-10-17); tell Tom the wait before
   starting it.** Merge the whole batch, then fold in the payload regeneration, roadmap closures and
   handoff edits, all before the run: every later master commit is another full run. On the merge
   result run `sh dev/scripts/check_all.sh --fast` and `sh dev/scripts/run_harnesses.sh --node-only`

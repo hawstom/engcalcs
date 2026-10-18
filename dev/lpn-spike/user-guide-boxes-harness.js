@@ -16,7 +16,7 @@
 
 const path = require('path');
 const L = require('./user-guide-chapter-lib.js');
-const { U, ok, enString, plain, checkQuotes, openGuide, finish } = L;
+const { U, ok, enString, esString, plain, checkQuotes, openGuide, finish } = L;
 const NAME = 'user-guide-boxes-harness';
 U.takeBrowserLock(NAME, 'EC_UGBX_LOCKED');
 
@@ -140,7 +140,7 @@ async function main() {
 		await b.settle(1200);
 		await openGuide(b);
 		const es = await b.page.evaluate(() => Array.from(document.querySelectorAll('[data-guide-section="boxes"] > dl > dt')).map((d) => d.textContent.trim()));
-		ok('the Spanish page shows the three terms', JSON.stringify(es) === JSON.stringify(TERMS.map(enString)), JSON.stringify(es));
+		ok('the Spanish page shows the three terms', JSON.stringify(es) === JSON.stringify(TERMS.map(esString)), JSON.stringify(es));
 		ok('no page errors (Spanish)', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
 		await b.context.close().catch(() => {});
 	} catch (e) {
