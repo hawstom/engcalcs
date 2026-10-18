@@ -15,6 +15,13 @@
 //      none moves on screen.
 //   3. Properties, a junction's demand: its dot clears it and removes the line under it, and the
 //      demand field stays put (it did before the fix too; held here as a guard).
+//   4. Tom's own case, in Spanish with the box docked at the right: as a first visit docks it
+//      (auto-hidden, EC_DEFAULT_DOCKS), pinned, and auto-hidden. The dot is HOVERED until its tip
+//      shows, then clicked. Before the fix this threw the content 561 px: something read layout
+//      half way through the rebuild (only with a tip showing), when the content was shorter than
+//      the scroll position, and the browser clamped scrollTop there.
+//   5. Then Ctrl+Z, with the pointer resting on the row's "?" until its tip shows: the undo
+//      rebuilds the box with no control pinned, so only keepSetboxControl()'s unclamp holds it.
 //
 // DO NOT PREFIX THIS WITH `flock`: it takes /tmp/engcalcs-browser.lock itself.
 //
@@ -195,6 +202,90 @@ async function main() {
 		const pb = await pw();
 		ok('...its dot clicked: cleared, the line gone, and the demand field did not move on screen', !!pb && !pb.dot && pb.notes === 0 && Math.abs(pb.y - pa.y) < 2, JSON.stringify(pb));
 		ok('no page error', errors.length === 0, JSON.stringify(errors.slice(0, 3)));
+
+		// ---- 4. TOM'S CASE: Spanish, the box docked at the right, labels under their fields ----
+		for (const mode of ['defaults', 'docked', 'autohide']) {
+			console.log('--- 4. ' + mode + ' at the right, in Spanish: the demand multiplier ---');
+			const b = await Session.open(browser, 'B' + mode, { viewport: { width: 1400, height: 900 } });
+			const P = b.page, errsB = [];
+			// A visitor's first visit docks the right-hand boxes, auto-hidden (applyDefaultDocks()); a
+			// webdriver session does not unless asked, so 'defaults' asks.
+			if (mode === 'defaults') { await P.addInitScript(() => { window.EC_DEFAULT_DOCKS = true; }); }
+			P.on('pageerror', (e) => errsB.push(String(e && e.message)));
+			await b.goto('Looped-Network.php?lang=es');
+			await b.openExampleCard(await b.lang('lpn_ex_net1_title'));
+			await b.settle(1500);
+			await P.evaluate(() => {
+				let e = document.querySelector('.ec-consent-actions');
+				while (e && getComputedStyle(e).position !== 'fixed') { e = e.parentElement; }
+				if (e) { e.style.display = 'none'; }
+			});
+			b.answerPromptWith('Escenario 1');
+			const newRow = await b.lang('lpn_scenario_new');
+			await require('./manager-door.js').ensure(P, newRow);
+			await P.click('#lpn_scenario_btn');
+			await P.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+			for (const r of await P.$$('#lpn_menu_list button.lpn-menu-row')) {
+				if ((await r.textContent()).trim().replace(/^✓\s*/, '') === newRow.trim()) { await r.click(); break; }
+			}
+			await b.settle(1500);
+			await b.toolbarClick(await b.lang('lpn_tool_settings'));
+			await P.waitForSelector('#lpn_settings_box', { state: 'visible' });
+			await b.settle(600);
+			if (mode !== 'defaults') { await P.click('#lpn_settings_box .lpn-corner-btn[data-dock="right"]'); await b.settle(800); }
+			if (mode === 'autohide') { await P.click('#lpn_settings_box .lpn-corner-btn[data-dock="autohide"]'); await b.settle(600);
+				// Out again from its tab, as a flyout over the map.
+				await P.evaluate(() => { const t = Array.from(document.querySelectorAll('[id^="lpn_dock_strip_"] *')).filter((x) => x.__lpnDockFor === 'lpn_settings_box' || /Config/.test(x.textContent || '') && x.children.length === 0)[0]; if (t) { t.click(); } });
+				await b.settle(800);
+			}
+			const sel = JSON.stringify([['settings', 'hydraulics', 'demandMultiplier']]);
+			const W = (s) => P.evaluate((s) => {
+				const r = Array.from(document.querySelectorAll('#lpn_setbox_content [data-lpn-setting]')).filter((x) => x.offsetParent && x.getAttribute('data-lpn-setting') === s)[0];
+				const sc = document.getElementById('lpn_setbox_content'), box = document.getElementById('lpn_settings_box');
+				if (!r) { return { none: true, shown: !!box && box.getBoundingClientRect().width }; }
+				const c = r.querySelector('input'), dot = r.querySelector('.lpn-ovm-dot'), d = dot ? dot.getBoundingClientRect() : null;
+				return { y: c.getBoundingClientRect().top, held: r.classList.contains('lpn-set-held'), value: c.value,
+					docked: box.classList.contains('lpn-docked'), boxW: Math.round(box.getBoundingClientRect().width),
+					st: Math.round(sc.scrollTop), sh: sc.scrollHeight, ch: sc.clientHeight,
+					dot: d && d.width ? { x: d.left + d.width / 2, y: d.top + d.height / 2 } : null };
+			}, s);
+			const center = () => P.evaluate((s) => {
+				const r = Array.from(document.querySelectorAll('#lpn_setbox_content [data-lpn-setting]')).filter((x) => x.offsetParent && x.getAttribute('data-lpn-setting') === s)[0];
+				const c = r.querySelector('input'), sc = document.getElementById('lpn_setbox_content');
+				sc.scrollTop += (c.getBoundingClientRect().top - sc.getBoundingClientRect().top) - sc.clientHeight / 2;
+			}, sel);
+			await center();
+			await b.settle(200);
+			const inp = await P.evaluateHandle((s) => Array.from(document.querySelectorAll('#lpn_setbox_content [data-lpn-setting]')).filter((x) => x.offsetParent && x.getAttribute('data-lpn-setting') === s)[0].querySelector('input'), sel);
+			await inp.asElement().click();
+			await P.keyboard.press('Control+a');
+			await P.keyboard.type('2');
+			await P.keyboard.press('Tab');
+			await b.settle(1200);
+			await center();
+			await b.settle(300);
+			const w0 = await W(sel);
+			ok(mode + ': docked at the right, Multiplicador de demanda held with its dot', !!w0 && w0.docked && w0.held && !!w0.dot, JSON.stringify(w0));
+			// Hovered first, long enough for its tip to show, as Tom's screenshot has it.
+			if (w0 && w0.dot) { await P.mouse.move(w0.dot.x, w0.dot.y); await b.settle(1500); await P.mouse.click(w0.dot.x, w0.dot.y); }
+			await b.settle(1200);
+			const w1 = await W(sel);
+			ok(mode + ': its dot clicked, the override is cleared and the field stays where it was on screen', !!w1 && !w1.held && !!w0 && Math.abs(w1.y - w0.y) < 2, JSON.stringify(w1));
+			const q = await P.evaluate((s) => {
+				const r = Array.from(document.querySelectorAll('#lpn_setbox_content [data-lpn-setting]')).filter((x) => x.offsetParent && x.getAttribute('data-lpn-setting') === s)[0];
+				const t = r && r.querySelector('.ec-tip'), g = t ? t.getBoundingClientRect() : null;
+				return g && g.width ? { x: g.left + g.width / 2, y: g.top + g.height / 2 } : null;
+			}, sel);
+			if (q) { await P.mouse.move(q.x, q.y); await b.settle(1500); }
+			await P.keyboard.press('Control+z');
+			await b.settle(1200);
+			const w2 = await W(sel);
+			// The held row is 2 px taller than a plain one, so the field may sit 2 px lower inside it; the
+			// box's scroll position must not change at all.
+			ok(mode + ': Ctrl+Z with the "?" tip showing puts the override back, the box does not scroll', !!q && !!w2 && w2.held && !!w0 && w2.st === w0.st && Math.abs(w2.y - w0.y) < 3, JSON.stringify(w2));
+			ok(mode + ': no page error', errsB.length === 0, JSON.stringify(errsB.slice(0, 3)));
+			await b.context.close().catch(() => {});
+		}
 	} finally {
 		await browser.close();
 		env.stopServer();
