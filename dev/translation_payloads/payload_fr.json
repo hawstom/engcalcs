@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 3026,
-        "delta_key_count": 23,
+        "expected_key_count": 3032,
+        "delta_key_count": 29,
         "english_changed_key_count": 22,
         "exempt_key_count": 71,
         "exempt_keys": [
@@ -127,7 +127,13 @@
         "lpn_file_import_gjnet": "GeoJSON network…",
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
         "lpn_file_import_dxf": "DXF shapes…",
-        "lpn_file_import_shp": "Shapefile shapes…"
+        "lpn_file_import_shp": "Shapefile shapes…",
+        "lpn_export_holds_scenario": "It holds the scenario {scenario} only.",
+        "lpn_export_holds_base": "It holds the Base scenario only.",
+        "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
+        "lpn_survey_added_scenario": "The nodes were added to {scenario}. In Base they are inactive.",
+        "lpn_pane_pasted_scenario": "These values are overrides in the scenario {scenario}.",
+        "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file."
     },
     "keys": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
@@ -152,7 +158,13 @@
         "lpn_file_import_gjnet": "GeoJSON network…",
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
         "lpn_file_import_dxf": "DXF shapes…",
-        "lpn_file_import_shp": "Shapefile shapes…"
+        "lpn_file_import_shp": "Shapefile shapes…",
+        "lpn_export_holds_scenario": "It holds the scenario {scenario} only.",
+        "lpn_export_holds_base": "It holds the Base scenario only.",
+        "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
+        "lpn_survey_added_scenario": "The nodes were added to {scenario}. In Base they are inactive.",
+        "lpn_pane_pasted_scenario": "These values are overrides in the scenario {scenario}.",
+        "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file."
     },
     "key_context": {
         "consent_body": {
@@ -581,6 +593,78 @@
                 "key": "lpn_file_import_shp_tip",
                 "english": "Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this.",
                 "value": "Lire les points, lignes et polygones d'un shapefile ESRI dans ce projet, sous forme de figures, en conservant les colonnes d'attributs comme propriétés. Sélectionnez soit le .zip, soit le .shp avec ses .shx, .dbf et .prj (maintenez Ctrl ou Maj pour en sélectionner plusieurs). Les coordonnées d'un système de coordonnées différent de celui du projet sont converties, et l'avis l'indique."
+            }
+        },
+        "lpn_export_holds_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "La taille de l'image en multiple de la zone affichée à l'écran. Une valeur plus grande donne une image plus nette et un fichier plus volumineux.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_export_holds_base": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "La taille de l'image en multiple de la zone affichée à l'écran. Une valeur plus grande donne une image plus nette et un fichier plus volumineux.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_geojson_results_other": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "La taille de l'image en multiple de la zone affichée à l'écran. Une valeur plus grande donne une image plus nette et un fichier plus volumineux.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_added_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "La taille de l'image en multiple de la zone affichée à l'écran. Une valeur plus grande donne une image plus nette et un fichier plus volumineux.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_pane_pasted_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "La taille de l'image en multiple de la zone affichée à l'écran. Une valeur plus grande donne une image plus nette et un fichier plus volumineux.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_export_leaves_alternatives": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "La taille de l'image en multiple de la zone affichée à l'écran. Une valeur plus grande donne une image plus nette et un fichier plus volumineux.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
             }
         }
     },

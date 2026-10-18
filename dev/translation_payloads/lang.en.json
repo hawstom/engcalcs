@@ -3026,9 +3026,15 @@
         "lpn_snip_tip_undo": "Undo (Ctrl+Z)",
         "lpn_snip_tip_redo": "Redo (Ctrl+Y)",
         "lpn_snip_tip_copy": "Copy (Ctrl+C)",
-        "lpn_screenshot_scale_tip": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+        "lpn_screenshot_scale_tip": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file.",
+        "lpn_export_holds_scenario": "It holds the scenario {scenario} only.",
+        "lpn_export_holds_base": "It holds the Base scenario only.",
+        "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
+        "lpn_survey_added_scenario": "The nodes were added to {scenario}. In Base they are inactive.",
+        "lpn_pane_pasted_scenario": "These values are overrides in the scenario {scenario}.",
+        "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file."
     },
-    "count": 3026,
+    "count": 3032,
     "active_prefixes": [
         "about",
         "bpn",
