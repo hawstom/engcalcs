@@ -992,6 +992,42 @@ EngCalcs.lpnSolve = function (model, options) {
 		}
 	}
 
+	// **A FULL TANK TAKES NO WATER IN AND AN EMPTY ONE GIVES NONE OUT** (hydstatus.c tankstatus(),
+	// through linkstatus()): a link carrying flow into a tank at its highest level, or out of one at
+	// its lowest, is closed for the trial (TEMPCLOSED), re-opened at the next check and closed again
+	// if the flow still points that way. EPANET does it at t = 0 too, so without it a pump feeding a
+	// full tank pushed water in that EPANET keeps out. Only a tank with a diameter (diameter 0 is a
+	// reservoir to EPANET, input3.c) and levels EPANET accepts (min <= level <= max). The bridge
+	// writes no Overflow column, so no tank here can overflow.
+	var tk = [], tFull = {}, tEmpty = {}, tClosed = new Uint8Array(links.length);
+	for (i = 0; i < nodes.length; i++) {
+		var tn = nodes[i];
+		if (tn.type !== 'tank' || !(tn.diameter > 0) || typeof tn.level !== 'number' ||
+			typeof tn.minLevel !== 'number' || typeof tn.maxLevel !== 'number' ||
+			tn.minLevel > tn.level || tn.level > tn.maxLevel) { continue; }
+		if (tn.level >= tn.maxLevel) { tFull[tn.id] = true; }
+		if (tn.level <= tn.minLevel) { tEmpty[tn.id] = true; }
+	}
+	for (k = 0; k < links.length; k++) {
+		if (links[k].status === 'closed' || vStat[k] !== undefined) { continue; }
+		if (tFull[links[k].from] || tEmpty[links[k].from] || tFull[links[k].to] || tEmpty[links[k].to]) { tk.push(k); }
+	}
+	// q is the flow OUT of the tank, as tankstatus() is handed it.
+	function tankShuts(id, q) {
+		if (tFull[id] && q < 0) { return true; }
+		return !!tEmpty[id] && q > 0;
+	}
+	function tankLinkStatus() {
+		var change = false, t, k2, was;
+		for (t = 0; t < tk.length; t++) {
+			k2 = tk[t];
+			was = tClosed[k2];
+			tClosed[k2] = tankShuts(links[k2].from, Q[k2]) || tankShuts(links[k2].to, -Q[k2]) ? 1 : 0;
+			if (tClosed[k2] !== was) { change = true; }
+		}
+		return change;
+	}
+
 	function headAt(id, Hv) {
 		var ix = junctionIndex[id];
 		return ix === undefined ? byId[id].head : Hv[ix];
@@ -1110,7 +1146,11 @@ EngCalcs.lpnSolve = function (model, options) {
 			q = Q[k];
 			aq = Math.abs(q);
 
-			if (link.type === 'pump') {
+			if (tClosed[k]) {
+				// hydcoeffs.c: a closed link's coefficients are P = 1/CBIG, Y = its flow.
+				G[k] = V_CBIG_INV;
+				y[k] = q;
+			} else if (link.type === 'pump') {
 				// Head GAIN: H_to - H_from = H0 - a Q^b, so h = -(H0 - a Q^b).
 				var qp = Math.max(aq, qMin);
 				if (!(link.h0 > 0) && !(link.a > 0)) {
@@ -1369,8 +1409,9 @@ EngCalcs.lpnSolve = function (model, options) {
 			// CONVERGED, BUT ONLY IF NO VALVE WANTS TO CHANGE: the pressure valves were checked
 			// above, and the FCVs are checked now (hydsolver.c: "Quit if no status changes occur").
 			// A change restarts the count toward the next periodic check and the stall watch.
-			if (X !== null) {
-				var flowChange = flowValveStatus(H);
+			if (X !== null || tk.length) {
+				var flowChange = X !== null ? flowValveStatus(H) : false;
+				if (tankLinkStatus()) { flowChange = true; }
 				if (valveChange || flowChange) {
 					nextCheck = iter + checkFreq;
 					bestChange = Infinity;
@@ -1381,12 +1422,17 @@ EngCalcs.lpnSolve = function (model, options) {
 			converged = true;
 			break;
 		}
-		// The periodic check on FCVs, every CheckFreq trials up to MaxCheck (hydsolver.c).
-		if (X !== null && iter <= maxCheck && iter === nextCheck) {
-			flowValveStatus(H);
+		// The periodic check on FCVs and links to tanks, every CheckFreq trials up to MaxCheck
+		// (hydsolver.c).
+		if ((X !== null || tk.length) && iter <= maxCheck && iter === nextCheck) {
+			if (X !== null) { flowValveStatus(H); }
+			tankLinkStatus();
 			nextCheck += checkFreq;
 		}
 	}
+	// A link a tank closed reports as EPANET reports any closed link (epanet.c EN_getlinkvalue):
+	// no flow, velocity or head loss. lpnReport reads that off a 'closed' state.
+	for (k = 0; k < tk.length; k++) { if (tClosed[tk[k]]) { vStat[tk[k]] = 'closed'; } }
 
 	return EngCalcs.lpnReport(model, junctions, junctionIndex, byId, H, Q, method,
 		visc, iter, converged, maxFlowChange, vStat);
