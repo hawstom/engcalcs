@@ -4316,7 +4316,6 @@ EngCalcs.pageConfig = {
 	lpn_basemap_style_muted: <?=json_encode($ec_lang['lpn_basemap_style_muted'])?>,
 	lpn_basemap_style_faded: <?=json_encode($ec_lang['lpn_basemap_style_faded'])?>,
 	lpn_basemap_style_grayscale: <?=json_encode($ec_lang['lpn_basemap_style_grayscale'])?>,
-	lpn_settings_map_display: <?=json_encode($ec_lang['lpn_settings_map_display'])?>,
 	lpn_settings_legend_position: <?=json_encode($ec_lang['lpn_settings_legend_position'])?>,
 	lpn_settings_legend_off: <?=json_encode($ec_lang['lpn_settings_legend_off'])?>,
 	lpn_settings_snap_off: <?=json_encode($ec_lang['lpn_settings_snap_off'])?>,

@@ -3698,7 +3698,6 @@ $ec_lang['lpn_basemap_style_normal']='Normal';
 $ec_lang['lpn_basemap_style_muted']='Muted';
 $ec_lang['lpn_basemap_style_faded']='Faded';
 $ec_lang['lpn_basemap_style_grayscale']='Grayscale';
-$ec_lang['lpn_settings_map_display']='Appearance';
 // The two sub-headings of Map and page, and the small headings under them that the index leaves
 // out (Tom, 2026-10-18).
 $ec_lang['lpn_settings_grp_size']='Size';
@@ -3873,7 +3872,6 @@ $ec_lang['lpn_time_settings_open']='Time settings';
 // "Hydraulics" is EPANET's own name for the friction-method/accuracy/engine group, which also
 // leaves room for its siblings (Quality, Reactions) as they arrive.
 $ec_lang['lpn_settings_sec_symbology']='Symbology';
-$ec_lang['lpn_settings_sec_map']='Map and page';
 $ec_lang['lpn_settings_sec_assets']='Assets';
 $ec_lang['lpn_settings_sec_calculation']='Calculation';
 // ROADMAP Task 247. A customer label's CONTENT is the node rows above it (Tom: "Customer labels

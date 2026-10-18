@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 3051,
-        "delta_key_count": 57,
-        "english_changed_key_count": 27,
+        "expected_key_count": 3055,
+        "delta_key_count": 66,
+        "english_changed_key_count": 30,
         "exempt_key_count": 49,
         "exempt_keys": [
             "calc_units_us",
@@ -81,12 +81,14 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: průtok\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: rychlost\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: tlaková výška\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: ztráta tlakové výšky\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: místní ztráta\n- flow used, taken, or consumed\n    English: demand\n    Your language: Odběr\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Tlak\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: (no preferred translation yet: use your language's standard term)\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: zdroj\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: výchozí\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- solver or the part that works out the answer\n    English: solver\n    Your language: řešič\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: Nádrž\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: Ventil\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: Specifické hodnoty\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: sledování původu\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: Útvar\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: průtok\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: rychlost\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: tlaková výška\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: ztráta tlakové výšky\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: místní ztráta\n- flow used, taken, or consumed\n    English: demand\n    Your language: Odběr\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Tlak\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: (no preferred translation yet: use your language's standard term)\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: zdroj\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: výchozí\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- solver or the part that works out the answer\n    English: solver\n    Your language: řešič\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: Nádrž\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: Ventil\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: Specifické hodnoty\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: sledování původu\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: Odběratel\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: Útvar\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
+        "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
         "lpn_guide_cmp_byasset_term": "Results by asset",
         "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box.<\/p>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
         "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
@@ -102,8 +104,15 @@
         "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
         "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.",
         "lpn_engine_unavailable_why": "This network cannot be solved without the EPANET solver. {reason}",
+        "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Clear it to hide the text with the other labels once the view is wider than the labeling threshold set under Map.",
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
         "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+        "lpn_settings_grp_size": "Size",
+        "lpn_settings_grp_angle": "Angle",
+        "lpn_settings_grp_zoom": "Zoom",
+        "lpn_settings_grp_positions": "Positions",
+        "lpn_settings_grp_show": "Show",
+        "lpn_settings_grp_thematic": "Thematic",
         "lpn_scncmp_menu_tip": "Table of scenarios with count of overrides, lowest pressure, and highest velocity, and a table of results by asset that copies to a spreadsheet",
         "lpn_scncmp_progress": "Solving scenario {done} of {total}…",
         "lpn_scncmp_stopped": "Stopped after {done} of {total} scenarios. The results below are the ones already finished.",
@@ -143,9 +152,11 @@
     },
     "keys": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
+        "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
         "lpn_guide_cmp_byasset_term": "Results by asset",
         "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box.<\/p>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
         "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
@@ -161,8 +172,15 @@
         "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
         "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.",
         "lpn_engine_unavailable_why": "This network cannot be solved without the EPANET solver. {reason}",
+        "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Clear it to hide the text with the other labels once the view is wider than the labeling threshold set under Map.",
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
         "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+        "lpn_settings_grp_size": "Size",
+        "lpn_settings_grp_angle": "Angle",
+        "lpn_settings_grp_zoom": "Zoom",
+        "lpn_settings_grp_positions": "Positions",
+        "lpn_settings_grp_show": "Show",
+        "lpn_settings_grp_thematic": "Thematic",
         "lpn_scncmp_menu_tip": "Table of scenarios with count of overrides, lowest pressure, and highest velocity, and a table of results by asset that copies to a spreadsheet",
         "lpn_scncmp_progress": "Solving scenario {done} of {total}…",
         "lpn_scncmp_stopped": "Stopped after {done} of {total} scenarios. The results below are the ones already finished.",
@@ -217,6 +235,22 @@
                 }
             }
         },
+        "lpn_guide_scn_marks_def": {
+            "reason": "english_changed",
+            "current_value": "<p>Na mapě je prvek, který má v otevřeném scénáři specifickou hodnotu, obkroužen žlutooranžově a prvek, který dědí specifickou hodnotu z nadřazeného scénáře nebo alternativy, je obkroužen čárkovanou šedou čarou. U odběru, průměru, drsnosti, součinitele místní ztráty a délky se kroužek zobrazí jen tehdy, když Nastavení, Vizualizace, Popisky uzlů nebo Popisky spojů zobrazují tuto hodnotu na mapě; specifická hodnota jakékoli jiné vlastnosti má kroužek vždy. V Tabulkách je buňka s hodnotou nastavenou otevřeným scénářem žlutooranžová a její tip uvádí alternativu, která ji drží, například Fyzikální alt.: Větší řad. Zobrazit scénáře v nabídce buňky tabulky uvede každý prvek jednou pro každý scénář.<\/p><p>Každý řádek Vlastností, který může scénář přepsat, má vlevo značku. Plná tečka znamená, že hodnotu přepisuje otevřený scénář; kliknutím na ni specifickou hodnotu zrušíte. Prázdná tečka znamená, že hodnota je zděděná; kliknutím na ni se zobrazená hodnota stane specifickou hodnotou. Trojúhelník znamená, že hodnotu přepisují scénáře pod tímto; kliknutím na něj jejich specifické hodnoty po potvrzení zrušíte. Pod přepsaným řádkem je zděděná hodnota, kterou nahrazuje, například Základní scénář: 18. Okno Nastavení má jen plnou tečku a trojúhelník, protože specifickou hodnotu tvoří už samotné zadání hodnoty.<\/p><p>Kroužky skryjete odškrtnutím Zobrazit značky specifických hodnot na mapě v Nastavení, Mapa a stránka, Stránka, nebo volbou Mapa, Vyčistit mapu. Obojí se uchovává v tomto prohlížeči, ne v projektu. Tabulky označují specifické hodnoty v obou případech.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_scn_marks_term",
+                    "value": "Kde se specifické hodnoty zobrazují",
+                    "english": "Where overrides show"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_scn_make_term",
+                    "value": "Vytváření a rušení specifických hodnot",
+                    "english": "Making and clearing overrides"
+                }
+            }
+        },
         "lpn_guide_cmp_byasset_term": {
             "reason": "missing",
             "current_value": null,
@@ -262,6 +296,22 @@
                     "key": "lpn_guide_lib_example_term",
                     "value": "Příklad na Net1",
                     "english": "Example on Net1"
+                }
+            }
+        },
+        "lpn_guide_set_where_def": {
+            "reason": "english_changed",
+            "current_value": "<p>Seznam vlevo v okně přeskočí na část nebo podnadpis. Části jsou Vizualizace (Popisky uzlů, Barvy uzlů, Popisky spojů, Barvy spojů, Odběratel a Uzel a spoj), Mapa a stránka (Vzhled a Stránka), Prvky (Předpony ID, Hodnoty nových prvků a Vlastní vlastnosti), Výpočet (Jednotky, Čas, Hydraulika, Energie a Kvalita vody) a Poděkování. Každý podnadpis uvádí, zda jsou jeho nastavení Uloženo s projektem, nebo Uloženo v tomto prohlížeči. Vše se ukládá s projektem kromě nastavení v části Stránka a jednoho řádku v Hydraulice, Zobrazit okno průběhu výpočtu, který sám uvádí Uloženo v tomto prohlížeči.<\/p><p>Karta Nastavení v Tabulkách uvádí tatáž nastavení jako řádky s jejich Kategorií a Hodnotou, takže je lze najít a zkontrolovat i tam.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_set_where_term",
+                    "value": "Části a kam se nastavení ukládají",
+                    "english": "Sections, and where settings are saved"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_set_search_term",
+                    "value": "Hledání",
+                    "english": "Searching"
                 }
             }
         },
@@ -515,6 +565,27 @@
                 }
             }
         },
+        "lpn_field_text_all_zoom_tip": {
+            "reason": "english_changed",
+            "current_value": "Ponechá tento text na výkresu bez ohledu na to, jak moc oddálíte. Zrušením zaškrtnutí se text skryje spolu s ostatními popisky, jakmile je pohled širší než práh zobrazování popisků nastavený v Mapa a stránka.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_all_zoom",
+                    "value": "Zobrazovat při všech úrovních přiblížení",
+                    "english": "Show at all zoom levels"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_labels",
+                    "value": "Popisky",
+                    "english": "Labels"
+                }
+            },
+            "label": {
+                "key": "lpn_field_text_all_zoom",
+                "english": "Show at all zoom levels",
+                "value": "Zobrazovat při všech úrovních přiblížení"
+            }
+        },
         "lpn_sm_help": {
             "reason": "english_changed",
             "current_value": "Jak fungují scénáře a alternativy:\\n\\nV Základním režimu jsou alternativy skryté a automatické a všechny nové scénáře jsou podřízené Základnímu scénáři.\\n\\nPři vypnutém Základním režimu je k dispozici složitý strom dědičnosti a alternativy lze sdílet mezi scénáři. Výchozí chování úprav, když je potřeba nová vazba na alternativu (bez aktivní správy ze strany uživatele), je však vytvořit alternativu pojmenovanou podle aktuálního scénáře, čímž každý scénář získá vlastní sadu alternativ.\\n\\nVlastnosti a nastavení patří do kategorií alternativ, které se zobrazují jako sloupce tabulky scénářů a alternativ a jako možnosti správy ve Správci scénářů.\\n\\nSpecifické hodnoty se vytvářejí ve scénářích, ale ve skutečnosti patří příslušným alternativám přiřazeným ke scénáři; scénář je tedy jako okno do svých alternativ. Přiřazení alternativ ke scénářům se spravuje v pravém panelu Správce scénářů nebo v tabulce Scénáře ve spodním panelu. Vytvoření nového scénáře nevytváří žádné alternativy; nový scénář používá alternativy svého nadřazeného, dokud nevzniknou specifické hodnoty, které potřebují nové alternativy. Když se ve scénáři vytvoří specifické hodnoty, ukládají se do příslušné alternativy pro tento scénář; nemá-li scénář takovou alternativu, vytvoří se nová alternativa pojmenovaná podle scénáře.\\n\\nPříklad: Vytvoříte scénář „Obrázek: ID uzlů a spojů“ a upravíte Text tak, aby uváděl „ID uzlů a spojů“. Při vytvoření scénáře se nevytvoří žádné alternativy. V okamžiku uložení Textu se však vytvoří alternativa Textu nazvaná „Obrázek: ID uzlů a spojů“ se specifickou hodnotou Textu. V Základním režimu to vidíte jednoduše jako specifickou hodnotu ve scénáři samotném.\\n\\nKopírovat vlastnosti kopíruje pouze specifické hodnoty. V jakémkoli jiném scénáři než Základní kopíruje jen specifické hodnoty, které má prvek v tomto scénáři.\\n\\nJak scénáře spravovat:\\n\\n- Zvolte Scénáře nebo kategorii alternativ v seznamu nahoře a zobrazí se jeho strom.\\n\\n- Potomka vybrané položky vytvoříte příkazem Přidat potomka. Přidat základ přidá další Základ, který začíná jako kopie Základu tak, jak je nyní; pozdější úpravy Základu jej nemění. Nový potomek je pojmenován podle svého nadřazeného; zadáním názvu jej přejmenujete. Kopírovat zkopíruje vybranou alternativu. Sloučit nahoru přesune specifické hodnoty vybrané alternativy do alternativy nad ní, zvolené podle názvu, a vybraná alternativa je pak dědí; nejprve uvede každou hodnotu, kterou přepisuje i alternativa, jež se přeskakuje, a ta se nemění. Chcete-li zkopírovat scénář, použijte v Základním režimu Kopírovat scénář v nabídce Scénáře; zkopíruje specifické hodnoty scénáře spolu s alternativami, které je drží. Přidat základ i Kopírovat scénář vytvářejí alternativy: Přidat základ vytvoří Základní alternativu pro nový Základ v každé kategorii, která drží hodnoty, a Kopírovat scénář vytvoří novou alternativu, pojmenovanou jako kopie, pro každou alternativu, která drží specifické hodnoty scénáře.\\n\\n- Přetažením položky na jinou z ní uděláte potomka této položky. Scénář přesunutý pod nového nadřazeného z něj dědí vše, co nepřepsal; to, co přepsal, se nemění. Přetažením položky mezi dvě položky je přeřadíte.\\n\\n- Kliknutím na položku ji vyberete. Stisknutím F2 nebo volbou Přejmenovat přejmenujete vybranou položku. Přejmenování scénáře se zeptá, zda přejmenovat i alternativy, které nesou jeho název; v Základním režimu se přejmenují spolu s ním, bez dotazu. Dvojitým kliknutím na scénář nebo stisknutím Enter jej učiníte aktuálním. Kliknutím na šipku vedle položky nebo stisknutím Doleva či Doprava ji sbalíte nebo rozbalíte. Kliknutím pravým tlačítkem na položku získáte stejné příkazy jako u tlačítek.\\n\\n- Stisknutím Delete nebo kliknutím na tlačítko mínus vybranou položku smažete. Používaná položka se nesmaže a zpráva uvádí, co ji používá. Smazání scénáře při vypnutém Základním režimu ponechá alternativy, které používá. Smazání scénáře při zapnutém Základním režimu smaže také každou jeho alternativu, kterou nepoužívá žádný jiný scénář.\\n\\n- Aby scénář používal jinou alternativu, včetně Základní, zvolte ji v řádku scénáře v pravém panelu Správce scénářů nebo v tabulce Scénáře. Specifická hodnota vytvořená ve sdílené alternativě změní každý scénář, který ji používá.",
@@ -550,6 +621,102 @@
                 "key": "lpn_settings_engine_native",
                 "english": "Use the built-in solver when possible",
                 "value": "Používat vestavěný řešič, kde je to možné"
+            }
+        },
+        "lpn_settings_grp_size": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "Odstíny šedi",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Umístění legendy popisků",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_angle": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "Odstíny šedi",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Umístění legendy popisků",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_zoom": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "Odstíny šedi",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Umístění legendy popisků",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_positions": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "Odstíny šedi",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Umístění legendy popisků",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "Odstíny šedi",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Umístění legendy popisků",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_thematic": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "Odstíny šedi",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Umístění legendy popisků",
+                    "english": "Labels legend position"
+                }
             }
         },
         "lpn_scncmp_menu_tip": {
@@ -1160,6 +1327,20 @@
     },
     "key_notes": [],
     "key_concepts": {
+        "lpn_guide_scn_marks_def": [
+            {
+                "concept": "family-tree-parent",
+                "plain_name": "A family tree parent",
+                "english_rendering": "parent",
+                "preferred_translation": ""
+            },
+            {
+                "concept": "family-tree-inherit",
+                "plain_name": "A family tree inherit-",
+                "english_rendering": "inherit",
+                "preferred_translation": ""
+            }
+        ],
         "lpn_sm_help": [
             {
                 "concept": "family-tree",

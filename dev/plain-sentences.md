@@ -572,11 +572,6 @@ Help for translators with one string at a time, where the English of that one st
 - English: Relative viscosity
 - Plain: Relative viscosity: how thick the fluid is compared with water at 20 °C. It changes the friction factor under Darcy-Weisbach and nothing else.
 
-### lpn_settings_map_display
-
-- English: Appearance
-- Plain: Appearance: how the map looks: sizes, opacity, and positions.
-
 ### lpn_settings_legend_position
 
 - English: Labels legend position
