@@ -110,35 +110,28 @@ first (his auto-hide tab question). Every `.replace('{name}'` is now global (Cop
 Deleted keys: `lpn_guide_text_notes_popup`; and from the 26 non-English files only, `lpn_guide_text_alt_box`,
 `lpn_guide_how_alt`, `lpn_alt_calc_options`, `lpn_scenario_duration_tip`, `lpn_scenario_hyd_step_tip`.
 
-### Branches awaiting his browser pass (all pre-reviewed by Perry, all green, all pushed)
+### Branches he has passed once (2026-10-17); his notes are on Tasks 752, 811, 812 and 814
 
-- `feat/sheet-sync` (Branch previews row 8108): Task 752 phase 1, the scenario workbook as an .xlsx
-  file, export and import with a report first. Design calls for him in `feat/sheet-sync:dev/scenario-workbook.md`: Q3
-  Base values are not in the workbook; Q5 renaming a scenario does not rename its same-name
-  alternatives (against his 2026-10-12 rule). Typed characters (6.00) are not kept, because the program
-  itself stores only the number.
-- `feat/theme` (row 8111): Task 811 first branch, gallery selector, High contrast, Amber, Green,
-  Platinum, Light's two "better" changes. `lpn_theme` takes more values; nothing new stored. Calculator
-  pages ignore the theme (planned for a later branch). Perry's fix round is in (594ce706a, green): every
-  theme prints in Light colours, the hover card is opaque (Light's was 90%), the tip is reworded.
-- `feat/label-beside` (row 8110): Task 812 Steps 0, 1, 3 from `docs/label-port:dev/label-trials/port-plan.md`. Perry's fix
-  round is in (3f21650fc, green): a level label must be nearest its own pipe or draw a leader; labels
-  shown 44.1% to 53.7% of those asked; n600 at 1x 914 ms.
-- `docs/label-port`: the port plan and pre-processing inquiry (Task 813); merges with label-beside.
+- `feat/sheet-sync` (row 8108): Task 752 phase 1. **Held for Task 814** (classify every import and
+  export by scenario awareness). Then ODS not XLSX, the whole project, the demand multiplier with demand.
+- `feat/theme` (row 8111): Task 811. Colour themes only so far; he wants design themes on the same branch.
+- `feat/label-beside` (row 8110): Task 812. He saw no difference and no level label; the page shows no
+  zoom factor and he could not reach the 600-junction network. Short pipes should also try the level spot.
+- `docs/label-port`: the port plan (Task 813); merges with label-beside.
 
 ### Questions out to him
 
-- Wave 0 changed two strings he may have written: `lpn_guide_en_set_def` ("is only a label" became
-  "does not convert the costs") and `mtc_note_1` step 5 ("Repeat" became "The steps are repeated").
-- English findings from QA, not yet changed: `lpn_crit_minpressure_tip`, `lpn_ds_minpressure_tip`
-  ("elsewhere" read as an adverb in 15 languages); `lpn_full_needs_run` quotes "Full report" where the
-  row is "Full"; `lpn_gjnet_note_not_held` says "text labels" (our Text).
+- Terms for Task 737 (am, my use one word for Scenario and Status): CC proposed two `dev/terms.md`
+  entries and a uniqueness group; he edits that file.
+- The import labels and four English fixes (`fix/menu-wording`) change English only; their 26
+  translations are owed. A mini-sprint needs his word.
 - His `lpn_sm_help` lacks Copy upward and the has-children delete reason: CC proposed two sentences.
 - Port 8202 never reaches jasmine from his browser; epanet-plus-plus.org is also on 8109.
 
 ### Next job
 
-His pull of 4866c11d2 to deploy the sprint. His browser passes on the three branches above. Task 749 waits on his `.sqlite` sample.
+His pull to deploy. Task 814 before more of 752. Design themes on `feat/theme`. Find why label-beside
+shows nothing. Task 749 waits on his `.sqlite` sample.
 
 ### Traps met 2026-10-17 (twenty-fifth session)
 
