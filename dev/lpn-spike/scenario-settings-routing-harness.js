@@ -30,6 +30,17 @@ const { execFileSync } = require('child_process');
 
 const BLIND = process.env.LPN_SEAM_BLIND === '1';
 
+// The page debounces its own work on real clocks (the auto-recalculate at 300 ms, the contour
+// relabel at 150 ms, the basemap at 120 ms). This harness drives every step itself, so a stray
+// debounce firing during a later case's settle() changed that case's labels and contour lines
+// with the machine's speed (measured 2026-10-18: Q labels and contour-line digits, only under
+// load). Delayed timers never fire here; zero-delay ones (the frame and settle chains) do.
+const realSetTimeout = global.setTimeout;
+global.setTimeout = function (fn, ms) {
+	return ms >= 20 ? 0 : realSetTimeout.apply(this, arguments);
+};
+if (global.window) { global.window.setTimeout = global.setTimeout; }
+
 global.confirm = global.window.confirm = function () { return true; };
 global.alert = global.window.alert = function () {};
 global.prompt = global.window.prompt = function () { return 'Scenario'; };
