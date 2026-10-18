@@ -16,7 +16,8 @@
 //      map's own labels are left out: neither is chrome a theme paints.
 //   4. The theme took: <html data-theme> is that theme and the page's surface is that theme's form colour.
 //   5. TEXT ON THE MAP'S PAPER (anything over the drawing with no surface of its own: "Something wrong
-//      here?", its "?", a label legend's words) reads at 4.5:1 against that paper in EVERY theme, Light too.
+//      here?", its "?", a label legend's words) reads at 4.5:1 against that paper, the theme's own map paper
+//      since round 3, in EVERY theme, Light too.
 //   6. PRINT IS LIGHT: with print emulated, every --ec-* token resolves to its Light value whatever theme was
 //      chosen, the page's own text is Bootstrap's light ink, and the label legend prints on white.
 //   7. The hover card (Settings, Show all properties on hover) is opaque: nothing reads through it.
@@ -108,7 +109,7 @@ function scanText() {
 			opacity *= +ns.opacity;
 			if (NATIVE.test(n.tagName) && n.tagName !== 'BUTTON') { native = true; }
 			if (n.tagName === 'BUTTON' && !n.className) { native = true; }
-			if (onMap && n.contains(cv)) { base = [255, 255, 255, 1]; paper = true; break; }
+			if (onMap && n.contains(cv)) { base = parse(getComputedStyle(cv).backgroundColor); paper = true; break; }
 			const bg = parse(ns.backgroundColor);
 			if (bg[3] > 0) { if (bg[3] >= 1) { base = bg; break; } layers.push(bg); }
 			n = n.parentElement;

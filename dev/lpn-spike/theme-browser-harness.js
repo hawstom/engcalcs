@@ -12,8 +12,10 @@
 //   2. Dark pins dark under a light OS; Light pins light under a dark OS. Both repaint with no reload.
 //   3. The choice survives a reload, and the first paint already has it (the attribute is set by the
 //      head script, so the document element carries it before any stylesheet-dependent render).
-//   4. THE DRAWING DOES NOT CHANGE: the canvas paper and a pipe's and a node's ink compute to the same
-//      colours in every theme, and the canvas pixels of Net1 are byte-identical light and dark.
+//   4. THE DRAWING FOLLOWS THE THEME ON SCREEN (Task 811 round 3, which reverses Task 714's white map): white
+//      paper and the #1a6faf network in Light, Dark's own dark paper and lighter network ink in Dark, and
+//      System under a dark device draws exactly what Dark draws (theme-design-browser-harness.js proves the
+//      print and the exported files stay Light).
 //   5. The chrome DOES change: the page, the Settings box and the menu popup compute different colours.
 //   6. Browser furniture only: `lpn_theme` is the one key, System removes it, and the stored project
 //      holds no theme (nothing in it says "theme" or "dark"), saved while Dark was chosen.
@@ -124,7 +126,7 @@ async function main() {
 		return png;
 	};
 
-	// Text that sits on the map, not on a themed panel, is read against the map's own paper (white). For every
+	// Text that sits on the map, not on a themed panel, is read against the map's own paper. For every
 	// visible text element whose centre is over the canvas, walk up to the element that holds the canvas and
 	// composite the backgrounds met on the way; an element on no background of its own is on the paper. A
 	// themed panel (an overlay with its own background) is judged against that panel.
@@ -144,7 +146,7 @@ async function main() {
 			const cs = getComputedStyle(el); if (cs.visibility === 'hidden' || cs.display === 'none') { return; }
 			const layers = []; let n = el, solid = false;
 			while (n && n !== document.documentElement && !n.contains(cv)) { const bg = parse(getComputedStyle(n).backgroundColor); if (bg[3] > 0) { layers.push(bg); } if (bg[3] >= 1) { solid = true; break; } n = n.parentElement; }
-			let base = [255, 255, 255, 1]; if (solid) { base = layers.pop(); }
+			let base = parse(getComputedStyle(cv).backgroundColor); if (solid) { base = layers.pop(); }
 			layers.reverse(); let b = base; layers.forEach((l) => { b = over(l, b); });
 			let fg = parse(cs.color); fg = over([fg[0], fg[1], fg[2], fg[3] * (+cs.opacity || 1)], b);
 			const a = lum(fg), bb = lum(b);
@@ -265,13 +267,13 @@ async function main() {
 			const darkColours = await colours(a.page);
 			const darkPx = await canvasPixels(a.page);
 
-			// 4. the drawing is the same
-			ok('4. canvas paper is white in both themes', lightColours.canvasPaper === LIGHT_BG && darkColours.canvasPaper === LIGHT_BG, lightColours.canvasPaper + ' / ' + darkColours.canvasPaper);
+			// 4. the drawing follows the theme
+			ok('4. canvas paper is white in Light and Dark\'s own dark in Dark', lightColours.canvasPaper === LIGHT_BG && darkColours.canvasPaper === DARK_BG, lightColours.canvasPaper + ' / ' + darkColours.canvasPaper);
 			ok('4. the scale bar is themed chrome: light text on a dark panel in dark, dark on light in light', darkColours.scaleInk === 'rgb(213, 216, 220)' && darkColours.scaleBg === 'rgba(30, 31, 34, 0.8)' && lightColours.scaleBg === 'rgba(255, 255, 255, 0.8)' && lightColours.scaleInk !== darkColours.scaleInk, JSON.stringify([lightColours.scaleInk, lightColours.scaleBg, darkColours.scaleInk, darkColours.scaleBg]));
-			ok('4. a pipe\'s ink is identical in both themes', lightColours.pipeInk === darkColours.pipeInk && lightColours.pipeInk !== null, lightColours.pipeInk + ' / ' + darkColours.pipeInk);
-			ok('4. a node\'s ink and fill are identical in both themes', lightColours.nodeInk === darkColours.nodeInk && lightColours.nodeFill === darkColours.nodeFill, [lightColours.nodeInk, darkColours.nodeInk, lightColours.nodeFill, darkColours.nodeFill].join(' '));
-			ok('4. the canvas pixels (paper and ink) are byte-identical light and dark', Buffer.compare(lightPx, darkPx) === 0 && Buffer.compare(sysPx, darkPx) === 0,
-				'light ' + lightPx.length + ' bytes, dark ' + darkPx.length + ' bytes');
+			ok('4. a pipe\'s ink is the theme\'s map ink: #1a6faf in Light, lighter in Dark', lightColours.pipeInk === 'rgb(26, 111, 175)' && darkColours.pipeInk === 'rgb(106, 174, 232)', lightColours.pipeInk + ' / ' + darkColours.pipeInk);
+			ok('4. a node\'s ink follows it', lightColours.nodeInk === 'rgb(26, 111, 175)' && darkColours.nodeInk === 'rgb(106, 174, 232)', [lightColours.nodeInk, darkColours.nodeInk, lightColours.nodeFill, darkColours.nodeFill].join(' '));
+			ok('4. the canvas pixels differ between Light and Dark, and System under a dark device is Dark to the byte', Buffer.compare(lightPx, darkPx) !== 0 && Buffer.compare(sysPx, darkPx) === 0,
+				'light ' + lightPx.length + ' bytes, dark ' + darkPx.length + ' bytes, system ' + sysPx.length);
 			// 5. the chrome changes
 			ok('5. the chrome differs between the themes (page, tab rule, menu ink)', lightColours.body !== darkColours.body || lightColours.tabsBorder !== darkColours.tabsBorder, '');
 			ok('5. the tab rule and menu ink differ', lightColours.tabsBorder !== darkColours.tabsBorder && lightColours.menuInk !== darkColours.menuInk, JSON.stringify([lightColours.tabsBorder, darkColours.tabsBorder, lightColours.menuInk, darkColours.menuInk]));

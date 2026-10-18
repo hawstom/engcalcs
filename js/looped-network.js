@@ -42969,7 +42969,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var opts = inpExportOptions(), out, inpName = base + '.inp',
 				picName = picBase + '.bmp', worldName = picBase + '.bpw', zipName = base + '.zip';
 			if (pic) { opts.backdropFile = picName; }
-			out = EngCalcs.lpnExportInp(inpExportDocument(), opts);
+			// A Text's [LABELS] corner is placed from its measured width, so it is measured in Light's
+			// face whatever the theme (Task 811 round 3): the file is the same file in every theme.
+			out = withLightMap(function () { return EngCalcs.lpnExportInp(inpExportDocument(), opts); });
 			if (!out || !out.ok) {
 				setNotice((pcX.lpn_inp_export_refused || 'This project cannot be written as an EPANET file: {detail}')
 					.split('{detail}').join((out && out.detail) || '?'));
@@ -52971,8 +52973,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// For the harnesses (Task 811 round 3): the whole visible map rendered exactly as the screenshot
 	// renders it, as a data: URL, so a theme can be proved not to reach the picture.
-	EngCalcs.lpnRenderMapPng = function () {
-		return renderScreenshot(snipMapRect(), null).then(function (o) {
+	// `at` is an optional rectangle in the map's own pixels ({x, y, w, h} from its top-left corner), so the same
+	// piece of the drawing can be asked for under chrome of different heights.
+	EngCalcs.lpnRenderMapPng = function (at) {
+		var sr = svg.getBoundingClientRect(), r = at ? { x: sr.left + svg.clientLeft + at.x, y: sr.top + svg.clientTop + at.y, w: at.w, h: at.h } : snipMapRect();
+		return renderScreenshot(r, null).then(function (o) {
 			return new Promise(function (resolve) { var f = new FileReader(); f.onload = function () { resolve(f.result); }; f.readAsDataURL(o.blob); });
 		});
 	};
