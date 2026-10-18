@@ -61401,6 +61401,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		delta = el.getBoundingClientRect().top - pl.top;
 		if (Math.abs(delta) >= 1) { sc.scrollTop += delta; }
 	}
+	// **A CLEAR BY THE GUTTER'S DOT HOLDS ITS ROW STILL TOO** (Tom, 2026-10-17: *"Clearing a demand
+	// override in Settings scrolls the main pane away from the input of interest because of the
+	// removal of a line."*). The gutter is `data-lpn-noseam`, so its click never reached the pin in
+	// setboxEditBegin(), and nothing held the row still through the rebuild that follows the clear.
+	// The row's control (the row itself where it has none) is pinned, then put back after the
+	// rebuild and on the next frame. dev/lpn-spike/setbox-clear-place-browser-harness.js.
+	function setboxPinRow(row) {
+		if (row && row.querySelector) { setboxPin(row.querySelector('input, select, textarea') || row); }
+	}
+	function setboxKeepPlaceSoon() {
+		setboxKeepPlace();
+		if (typeof requestAnimationFrame === 'function') { requestAnimationFrame(setboxKeepPlace); }
+	}
 	function setboxEditBegin(e) {
 		if (setboxEdit) { return; }
 		if (e && e.target && (e.type === 'click' || e.type === 'change')) { setboxPin(e.target); }
@@ -61611,7 +61624,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		g.setAttribute('data-lpn-noseam', '1');
 		if (held.length) {
 			g.appendChild(ovmCell('lpn-ovm-dot', (pc.lpn_settings_held_in || 'Override in {scenario}.').split('{scenario}').join(scenarioDisplayName(scn)) +
-				' ' + (pc.lpn_ovm_dot_clear || 'Click to clear it.'), function () { clearHeldSetboxRows(held, scn); }));
+				' ' + (pc.lpn_ovm_dot_clear || 'Click to clear it.'), function () { setboxPinRow(el); clearHeldSetboxRows(held, scn); setboxKeepPlaceSoon(); }));
 		} else { g.appendChild(ovmCell('lpn-ovm-none')); }
 		mine = rows.filter(function (r) { return paths.some(function (p) { return setboxPathUnder(r.path, p); }); });
 		kids = childSettingHolders(mine);
@@ -61619,10 +61632,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			g.appendChild(ovmCell('lpn-ovm-tri', (pc.lpn_ovm_child_tip || 'Child scenarios override this value ({n} total). Click to clear their overrides.').replace('{n}', String(kids.length)), function () {
 				var now = childSettingHolders(mine);
 				askClearChildOverrides(now.length, function () {
+					setboxPinRow(el);
 					now.forEach(function (k) { settingRowClear(k.row, k.scn); });
 					settingTableAfterEdit();
 					refreshScenarioStatus();
 					refreshPaneIfOpen();
+					setboxKeepPlaceSoon();
 				});
 			}));
 		} else if (!held.length) { return; }
