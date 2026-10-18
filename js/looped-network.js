@@ -73279,7 +73279,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						return [toSI(pt[0], 'lpn_u_flow'), toSI(pt[1], 'lpn_u_elevhead')];
 					});
 				}
-				if (out.valveType === 'PRV' || out.valveType === 'PSV') {
+				// A PBV's DROP is a pressure too, in a PRV's unit (valveSettingSpec() says
+				// lpn_u_pressure). Left unconverted, a 10 psi PBV reached the EPANET engine as 10 m of
+				// head, which is 14.2 psi. dev/lpn-spike/pbv-setting-unit-harness.js.
+				if (out.valveType === 'PRV' || out.valveType === 'PSV' || out.valveType === 'PBV') {
 					out.setting = toSI(effective(l, 'setting') || 0, 'lpn_u_pressure');
 				} else if (out.valveType === 'FCV') {
 					out.setting = toSI(effective(l, 'setting') || 0, 'lpn_u_flow');
@@ -75426,6 +75429,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		maybeWarmEpanetInBackground(model);
 		syncEpanetNeed(model);
 		omittedNote = omittedNoteText(model);
+		roughnessNote = roughnessNoteText(model);
 		var issues = EngCalcs.lpnDiagnose(model);
 		if (issues.length > 0) {
 			lastSolveResult = null;
@@ -75485,10 +75489,29 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			'Left out of this run because no path leads from them to a reservoir or tank: {ids}')
 			.replace('{ids}', ids.join(', '));
 	}
-	// A status line with the standing note beneath it, unless it is already there.
+	// **THE STANDING NOTE FOR ROUGHNESS ENTERED FOR ANOTHER FRICTION METHOD** (Sue's wish list,
+	// 2026-10-05, item 5). A scenario may switch the friction method (Calculation alternative) while
+	// its pipes keep the roughness numbers meant for the other one, and so does an imported file.
+	// Judged by the one plausibility table above (LPN_VALUE_RULES), on the model the solver is
+	// handed, so it follows the open scenario and not the Base. It states a count and changes
+	// nothing: no conversion is offered (Task 721, roughness is the user's to edit). Not a modal.
+	var roughnessNote = '';
+	function roughnessNoteText(model) {
+		var n = 0;
+		((model && model.links) || []).forEach(function (l) {
+			if (l.type === 'pipe' && l.roughness !== '' && l.roughness !== null && valueWarningRule('roughness', +l.roughness, model.method)) { n++; }
+		});
+		if (n === 0) { return ''; }
+		return ((EngCalcs.pageConfig || {}).lpn_roughness_method_note ||
+			'\u26a0 Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.')
+			.replace('{method}', frictionMethodLabel()).replace('{n}', String(n));
+	}
+	// A status line with the standing notes beneath it, unless already there.
 	function withOmittedNote(text) {
-		if (!text || !omittedNote || text.indexOf(omittedNote) >= 0) { return text; }
-		return text + ' ' + omittedNote;
+		if (!text) { return text; }
+		if (omittedNote && text.indexOf(omittedNote) < 0) { text += ' ' + omittedNote; }
+		if (roughnessNote && text.indexOf(roughnessNote) < 0) { text += ' ' + roughnessNote; }
+		return text;
 	}
 
 	// ---- Warming the EPANET engine ----
@@ -81090,7 +81113,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pdaNote = pdaShort > 0
 			? (pc.lpn_pda_deficit_note || 'Junctions receiving less than their demand: {n}.').replace('{n}', String(pdaShort))
 			: '';
-		setStatus([result.stoppedNote || '', notConvergedNote, valveRouteNote, pdaNote, omittedNote,
+		setStatus([result.stoppedNote || '', notConvergedNote, valveRouteNote, pdaNote, omittedNote, roughnessNote,
 			droppedNote('control-dangling', 'lpn_control_dangling_note',
 				'These controls name an element that is no longer in this project, so they were left out: {ids}'),
 			droppedNote('control-unreadable', 'lpn_control_unreadable_note',
