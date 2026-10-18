@@ -50830,19 +50830,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// file."*). It lived under Settings > New assets, on the argument that it makes new
 			// assets and takes the new-asset values; that argument is still true and is not where a
 			// person looks. A command named after a FILE belongs with the other file commands.
-			{ icon: 'position', label: pc.lpn_file_import_survey || 'Import surveyed points…',
+			{ icon: 'position', label: pc.lpn_file_import_survey || 'Surveyed points…',
 			  tip: pc.lpn_file_import_survey_tip, fn: pickSurveyFile },
-			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
+			{ icon: 'open', label: pc.lpn_file_import_inp || 'EPANET file…',
 			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
 			// A GeoJSON file as a network, through one mapping step (Task 728).
-			{ icon: 'open', label: pc.lpn_file_import_gjnet || 'Import GeoJSON network…',
+			{ icon: 'open', label: pc.lpn_file_import_gjnet || 'GeoJSON network…',
 			  tip: pc.lpn_file_import_gjnet_tip, fn: pickGeoJsonNetFile },
 			// The points, lines and polygons of a GeoJSON file, as Shapes (Task 779).
-			{ icon: 'open', label: pc.lpn_file_import_shapes || 'Import GeoJSON shapes…',
+			{ icon: 'open', label: pc.lpn_file_import_shapes || 'GeoJSON shapes…',
 			  tip: pc.lpn_file_import_shapes_tip, fn: pickGeoJsonFile },
-			{ icon: 'open', label: pc.lpn_file_import_dxf || 'Import DXF shapes…',
+			{ icon: 'open', label: pc.lpn_file_import_dxf || 'DXF shapes…',
 			  tip: pc.lpn_file_import_dxf_tip, fn: pickDxfShapesFile },
-			{ icon: 'open', label: pc.lpn_file_import_shp || 'Import shapefile shapes…',
+			{ icon: 'open', label: pc.lpn_file_import_shp || 'Shapefile shapes…',
 			  tip: pc.lpn_file_import_shp_tip, fn: pickShapefile },
 			// **THE LIBRARY IMPORT WIZARD'S OWN DOOR, AND ITS ONLY ONE** (Task 611). Tom,
 			// 2026-09-17: *"Move the button to the File menu. I thought you already did that."* Then
@@ -50851,7 +50851,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// asking for the wizard *"available from every applicable library"*; his later word wins,
 			// and the earlier one should have been questioned rather than built. **Do not put a
 			// button back in the Libraries box.**
-			{ icon: 'open', label: pc.lpn_library_import || 'Import libraries…',
+			{ icon: 'open', label: pc.lpn_library_import || 'Libraries…',
 			  tip: pc.lpn_library_import_tip, fn: libImportPick },
 			// **WORKSPACE (Tom, 2026-10-07)**: the browser-scoped layout and preferences, from a file.
 			// Under File > Import because it comes from a file, by the same vote that put surveyed
@@ -61401,6 +61401,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		delta = el.getBoundingClientRect().top - pl.top;
 		if (Math.abs(delta) >= 1) { sc.scrollTop += delta; }
 	}
+	// **A CLEAR BY THE GUTTER'S DOT HOLDS ITS ROW STILL TOO** (Tom, 2026-10-17: *"Clearing a demand
+	// override in Settings scrolls the main pane away from the input of interest because of the
+	// removal of a line."*). The gutter is `data-lpn-noseam`, so its click never reached the pin in
+	// setboxEditBegin(), and nothing held the row still through the rebuild that follows the clear.
+	// The row's control (the row itself where it has none) is pinned, then put back after the
+	// rebuild and on the next frame. dev/lpn-spike/setbox-clear-place-browser-harness.js.
+	function setboxPinRow(row) {
+		if (row && row.querySelector) { setboxPin(row.querySelector('input, select, textarea') || row); }
+	}
+	function setboxKeepPlaceSoon() {
+		setboxKeepPlace();
+		if (typeof requestAnimationFrame === 'function') { requestAnimationFrame(setboxKeepPlace); }
+	}
 	function setboxEditBegin(e) {
 		if (setboxEdit) { return; }
 		if (e && e.target && (e.type === 'click' || e.type === 'change')) { setboxPin(e.target); }
@@ -61611,7 +61624,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		g.setAttribute('data-lpn-noseam', '1');
 		if (held.length) {
 			g.appendChild(ovmCell('lpn-ovm-dot', (pc.lpn_settings_held_in || 'Override in {scenario}.').split('{scenario}').join(scenarioDisplayName(scn)) +
-				' ' + (pc.lpn_ovm_dot_clear || 'Click to clear it.'), function () { clearHeldSetboxRows(held, scn); }));
+				' ' + (pc.lpn_ovm_dot_clear || 'Click to clear it.'), function () { setboxPinRow(el); clearHeldSetboxRows(held, scn); setboxKeepPlaceSoon(); }));
 		} else { g.appendChild(ovmCell('lpn-ovm-none')); }
 		mine = rows.filter(function (r) { return paths.some(function (p) { return setboxPathUnder(r.path, p); }); });
 		kids = childSettingHolders(mine);
@@ -61619,10 +61632,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			g.appendChild(ovmCell('lpn-ovm-tri', (pc.lpn_ovm_child_tip || 'Child scenarios override this value ({n} total). Click to clear their overrides.').replace('{n}', String(kids.length)), function () {
 				var now = childSettingHolders(mine);
 				askClearChildOverrides(now.length, function () {
+					setboxPinRow(el);
 					now.forEach(function (k) { settingRowClear(k.row, k.scn); });
 					settingTableAfterEdit();
 					refreshScenarioStatus();
 					refreshPaneIfOpen();
+					setboxKeepPlaceSoon();
 				});
 			}));
 		} else if (!held.length) { return; }
@@ -80359,7 +80374,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		wrap.appendChild(h);
 		if (!rows.length) {
 			h = document.createElement('p');
-			h.textContent = pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.';
+			h.textContent = pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.';
 			wrap.appendChild(h);
 			return wrap;
 		}
@@ -80447,7 +80462,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		host.innerHTML = '';
 		rows = fullReportRows();
 		if (!rows.length) {
-			ffEl('p', 'lpn-ff-note', pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full report.', host);
+			ffEl('p', 'lpn-ff-note', pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.', host);
 			return;
 		}
 		frames = reportFrames();

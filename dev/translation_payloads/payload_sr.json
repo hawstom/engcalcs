@@ -2,8 +2,8 @@
     "meta": {
         "language": "sr",
         "expected_key_count": 3025,
-        "delta_key_count": 0,
-        "english_changed_key_count": 0,
+        "delta_key_count": 15,
+        "english_changed_key_count": 15,
         "exempt_key_count": 43,
         "exempt_keys": [
             "calc_units_us",
@@ -52,7 +52,9 @@
         ],
         "out_of_scope_key_count": 5,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
-        "active_prefixes": [],
+        "active_prefixes": [
+            "lpn"
+        ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "reason_notes": "key_context[key].reason says what to do with each key. missing: the key is not in your file; append it as a new line. blank, equal_to_english, english_changed: the key IS already in your file, holding key_context[key].current_value; REPLACE that value in place and never append a second line for the same key. english_changed means the English was reworded after your file's translation was written: translate the new English, and keep words from the old translation only where they still say what the new English says.",
@@ -68,12 +70,371 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "No glossary term is used by the strings in this batch.",
-    "keys_to_translate": [],
-    "keys": [],
-    "key_context": [],
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: проток\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Притисак\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: Фигура\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "keys_to_translate": {
+        "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_file_import_inp": "EPANET file…",
+        "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
+        "lpn_library_import": "Libraries…",
+        "lpn_crit_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ds_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_file_import_survey": "Surveyed points…",
+        "lpn_file_import_shapes": "GeoJSON shapes…",
+        "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
+        "lpn_file_import_gjnet": "GeoJSON network…",
+        "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
+        "lpn_file_import_dxf": "DXF shapes…",
+        "lpn_file_import_shp": "Shapefile shapes…"
+    },
+    "keys": {
+        "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_file_import_inp": "EPANET file…",
+        "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
+        "lpn_library_import": "Libraries…",
+        "lpn_crit_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ds_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_file_import_survey": "Surveyed points…",
+        "lpn_file_import_shapes": "GeoJSON shapes…",
+        "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
+        "lpn_file_import_gjnet": "GeoJSON network…",
+        "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
+        "lpn_file_import_dxf": "DXF shapes…",
+        "lpn_file_import_shp": "Shapefile shapes…"
+    },
+    "key_context": {
+        "lpn_guide_lib_import_def": {
+            "reason": "english_changed",
+            "current_value": "<p>Датотека, Увези…, Увези библиотеке… отвара другу пројектну датотеку и копира читаве библиотеке из ње у овај пројекат. Ставка чије је име већ употребљено овде прескаче се и наводи, па се ништа што већ постоји не мења. Приказује се упозорење када датотека и пројекат изражавају величину у различитим јединицама, а ставке се увозе како су записане. Типови цеви који упућују на листу фитинга коју овај пројекат нема су наведени; увезите библиотеку фитинга из исте датотеке да то решите.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_lib_import_term",
+                    "value": "Увоз библиотека из другог пројекта",
+                    "english": "Importing libraries from another project"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_lib_example_term",
+                    "value": "Пример на Net1",
+                    "english": "Example on Net1"
+                }
+            }
+        },
+        "lpn_file_import_inp": {
+            "reason": "english_changed",
+            "current_value": "Увези EPANET датотеку…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_menu",
+                    "value": "Увези…",
+                    "english": "Import…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "Учитава мрежу из EPANET датотеке, било текстуалне .inp датотеке или .net датотеке коју EPANET чува, и чува је у овом прегледачу као нови пројекат.",
+                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort)."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_inp_tip",
+                "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort).",
+                "value": "Учитава мрежу из EPANET датотеке, било текстуалне .inp датотеке или .net датотеке коју EPANET чува, и чува је у овом прегледачу као нови пројекат."
+            }
+        },
+        "lpn_file_export_workspace_tip": {
+            "reason": "english_changed",
+            "current_value": "Преузмите малу датотеку која садржи где се налазе ваши оквири, њихове величине, који су отворени или прикачени, и величине ваших панела и колона, плус опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти, подешавања пројекта и колачићи (језик, сагласност, јединице) нису у њој. Учитајте је на другом екрану или прегледачу преко Датотека, Увези, Радни простор.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_item_workspace",
+                    "value": "Радни простор…",
+                    "english": "Workspace…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_workspace",
+                    "value": "Радни простор…",
+                    "english": "Workspace…"
+                }
+            }
+        },
+        "lpn_file_import_workspace_tip": {
+            "reason": "english_changed",
+            "current_value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace",
+                    "value": "Радни простор…",
+                    "english": "Workspace…"
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_workspace",
+                "english": "Workspace…",
+                "value": "Радни простор…"
+            }
+        },
+        "lpn_full_needs_run": {
+            "reason": "english_changed",
+            "current_value": "Пун извештај наводи сваки чвор и сваку везу у сваком извештајном временском кораку. Притисните Израчунај, а затим отворите Вода, Извештаји, Пун извештај.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_title",
+                    "value": "Пун извештај",
+                    "english": "Full report"
+                },
+                "next_translated": {
+                    "key": "lpn_full_note",
+                    "value": "Један ред по чвору или вези по извештајном временском кораку, у јединицама приказаним у панелу Табеле. Празна ћелија је колона коју та величина нема. Преузимање или штампа носи сваки временски корак; табела испод приказује један по један.",
+                    "english": "One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time."
+                }
+            }
+        },
+        "lpn_library_import": {
+            "reason": "english_changed",
+            "current_value": "Увези библиотеке…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "Овај списак фитинга користе цеви ({count}): {ids}. Одвојите га од њих пре него што га обришете.",
+                    "english": "This fittings list is used by pipes ({count}): {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_library_import_tip",
+                    "value": "Изаберите другу пројектну датотеку и копирајте целе библиотеке из ње у овај пројекат. Све чије је име овде већ заузето се прескаче и наводи, па се ништа што већ имате не мења.",
+                    "english": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed."
+                }
+            },
+            "tip": {
+                "key": "lpn_library_import_tip",
+                "english": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
+                "value": "Изаберите другу пројектну датотеку и копирајте целе библиотеке из ње у овај пројекат. Све чије је име овде већ заузето се прескаче и наводи, па се ништа што већ имате не мења."
+            }
+        },
+        "lpn_crit_minpressure_tip": {
+            "reason": "english_changed",
+            "current_value": "Ово је исти број као Најнижи дозвољени притисак на другим местима у оквиру Противпожарни проток: анализа. Измена овде мења га и тамо.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_minpressure",
+                    "value": "Најнижи дозвољени притисак",
+                    "english": "Lowest pressure allowed"
+                },
+                "next_translated": {
+                    "key": "lpn_crit_col_asset",
+                    "value": "Елемент",
+                    "english": "Asset"
+                }
+            },
+            "label": {
+                "key": "lpn_crit_minpressure",
+                "english": "Lowest pressure allowed",
+                "value": "Најнижи дозвољени притисак"
+            }
+        },
+        "lpn_ds_minpressure_tip": {
+            "reason": "english_changed",
+            "current_value": "Ово је исти број као Најнижи дозвољени притисак на другом месту у оквиру Противпожарни проток: анализа. Промена овде мења и тамо.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ds_minpressure",
+                    "value": "Најнижи дозвољени притисак",
+                    "english": "Lowest pressure allowed"
+                },
+                "next_translated": {
+                    "key": "lpn_ds_head_scale",
+                    "value": "Скалирај потрошњу",
+                    "english": "Scale the demands"
+                }
+            },
+            "label": {
+                "key": "lpn_ds_minpressure",
+                "english": "Lowest pressure allowed",
+                "value": "Најнижи дозвољени притисак"
+            }
+        },
+        "lpn_file_import_survey": {
+            "reason": "english_changed",
+            "current_value": "Увези снимљене тачке…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_analyze_time_moved",
+                    "value": "⚠ Ово је израчунато у {time}, а сат је сада на {now}. Покрените поново за временски корак на екрану.",
+                    "english": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Прочитајте списак снимљених тачака из текстуалне датотеке и направите по један чвор на свакој тачки, преузимајући подешавања за нове елементе за све што датотека не наводи. Ниједна цев се не црта осим ако означите Читај опис као теренске шифре, а ниједан ред никада није одбачен без именовања. Чита координатни систем који овај пројекат већ користи, геореференциран или не.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_survey_tip",
+                "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
+                "value": "Прочитајте списак снимљених тачака из текстуалне датотеке и направите по један чвор на свакој тачки, преузимајући подешавања за нове елементе за све што датотека не наводи. Ниједна цев се не црта осим ако означите Читај опис као теренске шифре, а ниједан ред никада није одбачен без именовања. Чита координатни систем који овај пројекат већ користи, геореференциран или не."
+            }
+        },
+        "lpn_file_import_shapes": {
+            "reason": "english_changed",
+            "current_value": "Увези GeoJSON фигуре…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "Прочитајте списак снимљених тачака из текстуалне датотеке и направите по један чвор на свакој тачки, преузимајући подешавања за нове елементе за све што датотека не наводи. Ниједна цев се не црта осим ако означите Читај опис као теренске шифре, а ниједан ред никада није одбачен без именовања. Чита координатни систем који овај пројекат већ користи, геореференциран или не.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Прочитајте тачке, линије и полигоне из GeoJSON датотеке у овај пројекат као Фигуре. Елементи мреже у датотеци се не увозе; увезите мрежу из EPANET датотеке или командом Увези GeoJSON мрежу. Пројекат мора бити геореференциран или имати наведен координатни систем.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_shapes_tip",
+                "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
+                "value": "Прочитајте тачке, линије и полигоне из GeoJSON датотеке у овај пројекат као Фигуре. Елементи мреже у датотеци се не увозе; увезите мрежу из EPANET датотеке или командом Увези GeoJSON мрежу. Пројекат мора бити геореференциран или имати наведен координатни систем."
+            }
+        },
+        "lpn_file_import_shapes_tip": {
+            "reason": "english_changed",
+            "current_value": "Прочитајте тачке, линије и полигоне из GeoJSON датотеке у овај пројекат као Фигуре. Елементи мреже у датотеци се не увозе; увезите мрежу из EPANET датотеке или командом Увези GeoJSON мрежу. Пројекат мора бити геореференциран или имати наведен координатни систем.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes",
+                    "value": "Увези GeoJSON фигуре…",
+                    "english": "GeoJSON shapes…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_gjnet",
+                    "value": "Увези GeoJSON мрежу…",
+                    "english": "GeoJSON network…"
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_shapes",
+                "english": "GeoJSON shapes…",
+                "value": "Увези GeoJSON фигуре…"
+            }
+        },
+        "lpn_file_import_gjnet": {
+            "reason": "english_changed",
+            "current_value": "Увези GeoJSON мрежу…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "Прочитајте тачке, линије и полигоне из GeoJSON датотеке у овај пројекат као Фигуре. Елементи мреже у датотеци се не увозе; увезите мрежу из EPANET датотеке или командом Увези GeoJSON мрежу. Пројекат мора бити геореференциран или имати наведен координатни систем.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_gjnet_tip",
+                    "value": "Отворите GeoJSON датотеку као нови пројекат. Тачке се увозе као чворови, резервоари или тенкови, а линије као цеви. Датотека извезена са ове странице чита се како је записана; за сваку другу датотеку, један корак придружује њена поља својствима и јединицама.",
+                    "english": "Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_gjnet_tip",
+                "english": "Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.",
+                "value": "Отворите GeoJSON датотеку као нови пројекат. Тачке се увозе као чворови, резервоари или тенкови, а линије као цеви. Датотека извезена са ове странице чита се како је записана; за сваку другу датотеку, један корак придружује њена поља својствима и јединицама."
+            }
+        },
+        "lpn_gjnet_note_not_held": {
+            "reason": "english_changed",
+            "current_value": "GeoJSON датотека не садржи контроле, правила, подешавања времена, текстове на мапи, EPANET опције, нити библиотеке типова цеви, фитинга и кривих ефикасности, па ништа од тога није увезено.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_end_off_node",
+                    "value": "Линија сваке од ових веза не почиње нити се завршава на њеном чвору. Коришћен је положај чвора.",
+                    "english": "The line of each of these links does not start or end at its node. The node position was used."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "Из {file} је увезено Фигура: {n}.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_file_import_dxf": {
+            "reason": "english_changed",
+            "current_value": "Увези DXF фигуре…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geojson_import_unreadable",
+                    "value": "{file} није GeoJSON датотека: {detail}",
+                    "english": "{file} is not a GeoJSON file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_dxf_tip",
+                    "value": "Прочитајте тачке, линије и полилиније из ASCII DXF датотеке у овај пројекат као Фигуре, са именом сваког слоја задржаним као својство. Остали ентитети се броје и наводе, али се не увозе. Координате се читају као X и Y овог пројекта, без претварања.",
+                    "english": "Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_dxf_tip",
+                "english": "Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion.",
+                "value": "Прочитајте тачке, линије и полилиније из ASCII DXF датотеке у овај пројекат као Фигуре, са именом сваког слоја задржаним као својство. Остали ентитети се броје и наводе, али се не увозе. Координате се читају као X и Y овог пројекта, без претварања."
+            }
+        },
+        "lpn_file_import_shp": {
+            "reason": "english_changed",
+            "current_value": "Увези shapefile фигуре…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_dxf_tip",
+                    "value": "Прочитајте тачке, линије и полилиније из ASCII DXF датотеке у овај пројекат као Фигуре, са именом сваког слоја задржаним као својство. Остали ентитети се броје и наводе, али се не увозе. Координате се читају као X и Y овог пројекта, без претварања.",
+                    "english": "Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_shp_tip",
+                    "value": "Прочитајте тачке, линије и полигоне из ESRI shapefile-а у овај пројекат као Фигуре, са колонама атрибута задржаним као својства. Изаберите или .zip, или .shp заједно са његовим .shx, .dbf и .prj (држите Ctrl или Shift да изаберете више датотека). Координате у координатном систему различитом од система пројекта се претварају, а обавештење то наводи.",
+                    "english": "Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_shp_tip",
+                "english": "Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this.",
+                "value": "Прочитајте тачке, линије и полигоне из ESRI shapefile-а у овај пројекат као Фигуре, са колонама атрибута задржаним као својства. Изаберите или .zip, или .shp заједно са његовим .shx, .dbf и .prj (држите Ctrl или Shift да изаберете више датотека). Координате у координатном систему различитом од система пројекта се претварају, а обавештење то наводи."
+            }
+        }
+    },
     "key_plain": [],
     "key_notes": [],
     "key_concepts": [],
-    "uniqueness_attention": []
+    "uniqueness_attention": [
+        {
+            "instruction": "Find unique names for each.",
+            "members": [
+                {
+                    "plain_name": "short word, name, or tag stuck on a pipe or point",
+                    "english_rendering": "Tag",
+                    "preferred_translation": "Таг"
+                },
+                {
+                    "plain_name": "words, values, or names the program writes beside a pipe or point",
+                    "english_rendering": "Label",
+                    "preferred_translation": ""
+                },
+                {
+                    "plain_name": "words, notes, or captions you type onto the map",
+                    "english_rendering": "Text",
+                    "preferred_translation": ""
+                },
+                {
+                    "plain_name": "note, remark, or description for people about one item",
+                    "english_rendering": "Description",
+                    "preferred_translation": ""
+                },
+                {
+                    "plain_name": "short code that names one item, like J-1 or P-12",
+                    "english_rendering": "ID",
+                    "preferred_translation": ""
+                }
+            ]
+        }
+    ]
 }

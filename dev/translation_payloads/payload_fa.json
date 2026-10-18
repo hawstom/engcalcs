@@ -2,8 +2,8 @@
     "meta": {
         "language": "fa",
         "expected_key_count": 3025,
-        "delta_key_count": 0,
-        "english_changed_key_count": 0,
+        "delta_key_count": 15,
+        "english_changed_key_count": 15,
         "exempt_key_count": 32,
         "exempt_keys": [
             "u_imgd",
@@ -41,7 +41,9 @@
         ],
         "out_of_scope_key_count": 7,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
-        "active_prefixes": [],
+        "active_prefixes": [
+            "lpn"
+        ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
         "reason_notes": "key_context[key].reason says what to do with each key. missing: the key is not in your file; append it as a new line. blank, equal_to_english, english_changed: the key IS already in your file, holding key_context[key].current_value; REPLACE that value in place and never append a second line for the same key. english_changed means the English was reworded after your file's translation was written: translate the new English, and keep words from the old translation only where they still say what the new English says.",
@@ -57,12 +59,371 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "No glossary term is used by the strings in this batch.",
-    "keys_to_translate": [],
-    "keys": [],
-    "key_context": [],
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: دبی\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: فشار\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: شکل\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "keys_to_translate": {
+        "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_file_import_inp": "EPANET file…",
+        "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
+        "lpn_library_import": "Libraries…",
+        "lpn_crit_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ds_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_file_import_survey": "Surveyed points…",
+        "lpn_file_import_shapes": "GeoJSON shapes…",
+        "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
+        "lpn_file_import_gjnet": "GeoJSON network…",
+        "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
+        "lpn_file_import_dxf": "DXF shapes…",
+        "lpn_file_import_shp": "Shapefile shapes…"
+    },
+    "keys": {
+        "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_file_import_inp": "EPANET file…",
+        "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
+        "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
+        "lpn_library_import": "Libraries…",
+        "lpn_crit_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ds_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_file_import_survey": "Surveyed points…",
+        "lpn_file_import_shapes": "GeoJSON shapes…",
+        "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
+        "lpn_file_import_gjnet": "GeoJSON network…",
+        "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
+        "lpn_file_import_dxf": "DXF shapes…",
+        "lpn_file_import_shp": "Shapefile shapes…"
+    },
+    "key_context": {
+        "lpn_guide_lib_import_def": {
+            "reason": "english_changed",
+            "current_value": "<p>فایل، وارد کردن…، وارد کردن کتابخانه‌ها… فایل پروژهٔ دیگری را باز می‌کند و کتابخانه‌های کامل را از آن در این پروژه کپی می‌کند. موردی که نامش در اینجا پیش‌تر استفاده شده رد و فهرست می‌شود، پس چیزی که پیش‌تر در اینجا بود تغییر نمی‌کند. وقتی فایل و پروژه یک کمیت را در واحدهای متفاوت بیان کنند هشداری نشان داده می‌شود، و موردها همان‌طور که نوشته شده‌اند وارد می‌شوند. انواع لوله‌ای که به فهرست اتصالاتی ارجاع می‌دهند که این پروژه ندارد فهرست می‌شوند؛ برای رفع آن‌ها کتابخانهٔ اتصالات را از همان فایل وارد کنید.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_lib_import_term",
+                    "value": "وارد کردن کتابخانه‌ها از پروژهٔ دیگر",
+                    "english": "Importing libraries from another project"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_lib_example_term",
+                    "value": "مثال روی Net1",
+                    "english": "Example on Net1"
+                }
+            }
+        },
+        "lpn_file_import_inp": {
+            "reason": "english_changed",
+            "current_value": "وارد کردن فایل EPANET…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_menu",
+                    "value": "وارد کردن…",
+                    "english": "Import…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "یک شبکه را از یک فایل EPANET بخوانید، چه فایل متنی .inp و چه فایل .net که EPANET ذخیره می‌کند، و آن را در این مرورگر به‌صورت پروژهٔ تازه ذخیره کنید.",
+                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort)."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_inp_tip",
+                "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort).",
+                "value": "یک شبکه را از یک فایل EPANET بخوانید، چه فایل متنی .inp و چه فایل .net که EPANET ذخیره می‌کند، و آن را در این مرورگر به‌صورت پروژهٔ تازه ذخیره کنید."
+            }
+        },
+        "lpn_file_export_workspace_tip": {
+            "reason": "english_changed",
+            "current_value": "فایل کوچکی را بارگیری می‌کند که جای جعبه‌هایتان، اندازهٔ آن‌ها، اینکه کدام باز یا جاسازی شده‌اند، و اندازهٔ پنل‌ها و ستون‌هایتان را در خود دارد، به‌علاوهٔ گزینه‌های نمایش این صفحه، مانند اینکه کدام حباب‌های راهنما و کارت شناور نشان داده شوند. پروژه‌ها، تنظیمات پروژه و کوکی‌های شما (زبان، رضایت، واحدها) در آن نیستند. آن را روی صفحه یا مرورگر دیگر با فایل، وارد کردن، فضای کار بارگذاری کنید.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_item_workspace",
+                    "value": "فضای کار…",
+                    "english": "Workspace…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_workspace",
+                    "value": "فضای کار…",
+                    "english": "Workspace…"
+                }
+            }
+        },
+        "lpn_file_import_workspace_tip": {
+            "reason": "english_changed",
+            "current_value": "فایل فضای کاری را که با فایل، برون‌بری، فضای کار ذخیره شده اعمال می‌کند: جای جعبه‌ها و اندازه‌هایشان، جاسازی، اندازهٔ پنل‌ها و گزینه‌های نمایش این صفحه، مانند اینکه کدام حباب‌های راهنما و کارت شناور نشان داده شوند. پروژه‌ها و کوکی‌های شما دست‌نخورده می‌مانند.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace",
+                    "value": "فضای کار…",
+                    "english": "Workspace…"
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "فضای کار در {file} ذخیره شد: {n} تنظیم.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_workspace",
+                "english": "Workspace…",
+                "value": "فضای کار…"
+            }
+        },
+        "lpn_full_needs_run": {
+            "reason": "english_changed",
+            "current_value": "گزارش کامل هر گره و هر لوله را در هر گام زمانی گزارش‌دهی فهرست می‌کند. محاسبه را بزنید، سپس آب، گزارش‌ها، گزارش کامل را باز کنید.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_title",
+                    "value": "گزارش کامل",
+                    "english": "Full report"
+                },
+                "next_translated": {
+                    "key": "lpn_full_note",
+                    "value": "یک ردیف برای هر گره یا لوله در هر گام زمانی گزارش‌دهی، در واحدهای نشان‌داده‌شده در برگهٔ جدول‌ها. یک سلول خالی یعنی آن ستون آن کمیت را ندارد. دانلود یا چاپ هر گام زمانی را دربر می‌گیرد؛ جدول زیر یکی را در هر زمان نشان می‌دهد.",
+                    "english": "One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time."
+                }
+            }
+        },
+        "lpn_library_import": {
+            "reason": "english_changed",
+            "current_value": "وارد کردن کتابخانه‌ها…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_fittings_in_use",
+                    "value": "این فهرست اتصالات را لوله‌ها ({count}) استفاده می‌کنند: {ids}. پیش از حذف آن، آن‌ها را از آن جدا کنید.",
+                    "english": "This fittings list is used by pipes ({count}): {ids}. Detach it from them before deleting it."
+                },
+                "next_translated": {
+                    "key": "lpn_library_import_tip",
+                    "value": "فایل پروژهٔ دیگری را انتخاب کنید و کتابخانه‌های کامل را از آن به این پروژه کپی کنید. هرچه نامش از پیش اینجا گرفته شده باشد نادیده گرفته و فهرست می‌شود، پس چیزی که از پیش دارید تغییر نمی‌کند.",
+                    "english": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed."
+                }
+            },
+            "tip": {
+                "key": "lpn_library_import_tip",
+                "english": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
+                "value": "فایل پروژهٔ دیگری را انتخاب کنید و کتابخانه‌های کامل را از آن به این پروژه کپی کنید. هرچه نامش از پیش اینجا گرفته شده باشد نادیده گرفته و فهرست می‌شود، پس چیزی که از پیش دارید تغییر نمی‌کند."
+            }
+        },
+        "lpn_crit_minpressure_tip": {
+            "reason": "english_changed",
+            "current_value": "این همان عددِ کمترین فشار مجاز در جریان آتش‌نشانی: تحلیل است. تغییر آن اینجا آنجا را هم تغییر می‌دهد.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_minpressure",
+                    "value": "کمترین فشار مجاز",
+                    "english": "Lowest pressure allowed"
+                },
+                "next_translated": {
+                    "key": "lpn_crit_col_asset",
+                    "value": "المان",
+                    "english": "Asset"
+                }
+            },
+            "label": {
+                "key": "lpn_crit_minpressure",
+                "english": "Lowest pressure allowed",
+                "value": "کمترین فشار مجاز"
+            }
+        },
+        "lpn_ds_minpressure_tip": {
+            "reason": "english_changed",
+            "current_value": "این همان عدد «کمترین فشار مجاز» در جاهای دیگر جریان آتش‌نشانی: تحلیل است. تغییر آن در اینجا آن را در آنجا نیز تغییر می‌دهد.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ds_minpressure",
+                    "value": "کمترین فشار مجاز",
+                    "english": "Lowest pressure allowed"
+                },
+                "next_translated": {
+                    "key": "lpn_ds_head_scale",
+                    "value": "مقیاس‌دهی مصرف‌ها",
+                    "english": "Scale the demands"
+                }
+            },
+            "label": {
+                "key": "lpn_ds_minpressure",
+                "english": "Lowest pressure allowed",
+                "value": "کمترین فشار مجاز"
+            }
+        },
+        "lpn_file_import_survey": {
+            "reason": "english_changed",
+            "current_value": "وارد کردن نقاط نقشه‌برداری‌شده…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_analyze_time_moved",
+                    "value": "⚠ این در {time} محاسبه شد، و ساعت اکنون در {now} است. برای گام زمانی روی صفحه دوباره اجرا کنید.",
+                    "english": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "فهرستی از نقاط نقشه‌برداری‌شده را از یک فایل متنی می‌خواند و در هر نقطه یک گره می‌سازد، و برای هر چه فایل بیان نکرده از تنظیمات المان تازه استفاده می‌کند. مگر آنکه «خواندن توضیح به‌صورت کدهای میدانی» را علامت بزنید، لوله‌ای ترسیم نمی‌شود، و هیچ ردیفی بدون نام بردن کنار گذاشته نمی‌شود. دستگاه مختصاتی را می‌خواند که این پروژه از پیش به کار می‌برد، چه جای‌گذاری جغرافیایی شده باشد چه نه.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_survey_tip",
+                "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
+                "value": "فهرستی از نقاط نقشه‌برداری‌شده را از یک فایل متنی می‌خواند و در هر نقطه یک گره می‌سازد، و برای هر چه فایل بیان نکرده از تنظیمات المان تازه استفاده می‌کند. مگر آنکه «خواندن توضیح به‌صورت کدهای میدانی» را علامت بزنید، لوله‌ای ترسیم نمی‌شود، و هیچ ردیفی بدون نام بردن کنار گذاشته نمی‌شود. دستگاه مختصاتی را می‌خواند که این پروژه از پیش به کار می‌برد، چه جای‌گذاری جغرافیایی شده باشد چه نه."
+            }
+        },
+        "lpn_file_import_shapes": {
+            "reason": "english_changed",
+            "current_value": "وارد کردن شکل‌های GeoJSON…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_survey_tip",
+                    "value": "فهرستی از نقاط نقشه‌برداری‌شده را از یک فایل متنی می‌خواند و در هر نقطه یک گره می‌سازد، و برای هر چه فایل بیان نکرده از تنظیمات المان تازه استفاده می‌کند. مگر آنکه «خواندن توضیح به‌صورت کدهای میدانی» را علامت بزنید، لوله‌ای ترسیم نمی‌شود، و هیچ ردیفی بدون نام بردن کنار گذاشته نمی‌شود. دستگاه مختصاتی را می‌خواند که این پروژه از پیش به کار می‌برد، چه جای‌گذاری جغرافیایی شده باشد چه نه.",
+                    "english": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "نقطه‌ها، خط‌ها و چندضلعی‌های یک فایل GeoJSON را به‌صورت شکل در این پروژه می‌خواند. المان‌های شبکه در فایل وارد نمی‌شوند؛ شبکه را از یک فایل EPANET یا با وارد کردن شبکهٔ GeoJSON وارد کنید. پروژه باید جای‌گذاری جغرافیایی شده باشد یا دستگاه مختصات مشخص کرده باشد.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_shapes_tip",
+                "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
+                "value": "نقطه‌ها، خط‌ها و چندضلعی‌های یک فایل GeoJSON را به‌صورت شکل در این پروژه می‌خواند. المان‌های شبکه در فایل وارد نمی‌شوند؛ شبکه را از یک فایل EPANET یا با وارد کردن شبکهٔ GeoJSON وارد کنید. پروژه باید جای‌گذاری جغرافیایی شده باشد یا دستگاه مختصات مشخص کرده باشد."
+            }
+        },
+        "lpn_file_import_shapes_tip": {
+            "reason": "english_changed",
+            "current_value": "نقطه‌ها، خط‌ها و چندضلعی‌های یک فایل GeoJSON را به‌صورت شکل در این پروژه می‌خواند. المان‌های شبکه در فایل وارد نمی‌شوند؛ شبکه را از یک فایل EPANET یا با وارد کردن شبکهٔ GeoJSON وارد کنید. پروژه باید جای‌گذاری جغرافیایی شده باشد یا دستگاه مختصات مشخص کرده باشد.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes",
+                    "value": "وارد کردن شکل‌های GeoJSON…",
+                    "english": "GeoJSON shapes…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_gjnet",
+                    "value": "وارد کردن شبکهٔ GeoJSON…",
+                    "english": "GeoJSON network…"
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_shapes",
+                "english": "GeoJSON shapes…",
+                "value": "وارد کردن شکل‌های GeoJSON…"
+            }
+        },
+        "lpn_file_import_gjnet": {
+            "reason": "english_changed",
+            "current_value": "وارد کردن شبکهٔ GeoJSON…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_shapes_tip",
+                    "value": "نقطه‌ها، خط‌ها و چندضلعی‌های یک فایل GeoJSON را به‌صورت شکل در این پروژه می‌خواند. المان‌های شبکه در فایل وارد نمی‌شوند؛ شبکه را از یک فایل EPANET یا با وارد کردن شبکهٔ GeoJSON وارد کنید. پروژه باید جای‌گذاری جغرافیایی شده باشد یا دستگاه مختصات مشخص کرده باشد.",
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_gjnet_tip",
+                    "value": "یک فایل GeoJSON را به‌صورت پروژهٔ جدید باز می‌کند. نقطه‌ها به‌صورت گره، مخزن یا تانک، و خط‌ها به‌صورت لوله وارد می‌شوند. فایلی که از این صفحه برون‌بری شده همان‌طور که نوشته شده خوانده می‌شود؛ برای هر فایل دیگر، یک گام میدان‌های آن را به ویژگی‌ها و واحدها نگاشت می‌کند.",
+                    "english": "Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_gjnet_tip",
+                "english": "Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.",
+                "value": "یک فایل GeoJSON را به‌صورت پروژهٔ جدید باز می‌کند. نقطه‌ها به‌صورت گره، مخزن یا تانک، و خط‌ها به‌صورت لوله وارد می‌شوند. فایلی که از این صفحه برون‌بری شده همان‌طور که نوشته شده خوانده می‌شود؛ برای هر فایل دیگر، یک گام میدان‌های آن را به ویژگی‌ها و واحدها نگاشت می‌کند."
+            }
+        },
+        "lpn_gjnet_note_not_held": {
+            "reason": "english_changed",
+            "current_value": "فایل GeoJSON کنترل‌ها، قاعده‌ها، تنظیمات زمان، متن‌های نقشه، گزینه‌های EPANET، یا کتابخانه‌های نوع لوله، اتصالات و منحنی بازده را نگه نمی‌دارد، پس هیچ‌کدام وارد نشدند.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_gjnet_note_end_off_node",
+                    "value": "خط هر یک از این اتصال‌ها در گرهٔ خود آغاز یا پایان نمی‌یابد. موقعیت گره به کار رفت.",
+                    "english": "The line of each of these links does not start or end at its node. The node position was used."
+                },
+                "next_translated": {
+                    "key": "lpn_geojson_import_done",
+                    "value": "{n} شکل از {file} وارد شد.",
+                    "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_file_import_dxf": {
+            "reason": "english_changed",
+            "current_value": "وارد کردن شکل‌های DXF…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geojson_import_unreadable",
+                    "value": "{file} فایل GeoJSON نیست: {detail}",
+                    "english": "{file} is not a GeoJSON file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_dxf_tip",
+                    "value": "نقطه‌ها، خط‌ها و چندخط‌های یک فایل DXF متنی (ASCII) را به‌صورت شکل در این پروژه می‌خواند و نام هر لایه را به‌عنوان ویژگی نگه می‌دارد. موجودیت‌های دیگر شمرده و فهرست می‌شوند، اما وارد نمی‌شوند. مختصات به‌عنوان X و Y این پروژه خوانده می‌شود، بدون تبدیل.",
+                    "english": "Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_dxf_tip",
+                "english": "Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion.",
+                "value": "نقطه‌ها، خط‌ها و چندخط‌های یک فایل DXF متنی (ASCII) را به‌صورت شکل در این پروژه می‌خواند و نام هر لایه را به‌عنوان ویژگی نگه می‌دارد. موجودیت‌های دیگر شمرده و فهرست می‌شوند، اما وارد نمی‌شوند. مختصات به‌عنوان X و Y این پروژه خوانده می‌شود، بدون تبدیل."
+            }
+        },
+        "lpn_file_import_shp": {
+            "reason": "english_changed",
+            "current_value": "وارد کردن شکل‌های شیپ‌فایل…",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_dxf_tip",
+                    "value": "نقطه‌ها، خط‌ها و چندخط‌های یک فایل DXF متنی (ASCII) را به‌صورت شکل در این پروژه می‌خواند و نام هر لایه را به‌عنوان ویژگی نگه می‌دارد. موجودیت‌های دیگر شمرده و فهرست می‌شوند، اما وارد نمی‌شوند. مختصات به‌عنوان X و Y این پروژه خوانده می‌شود، بدون تبدیل.",
+                    "english": "Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_shp_tip",
+                    "value": "نقطه‌ها، خط‌ها و چندضلعی‌های یک شیپ‌فایل ESRI را به‌صورت شکل در این پروژه می‌خواند و ستون‌های ویژگی را به‌عنوان ویژگی نگه می‌دارد. یا فایل .zip را انتخاب کنید یا فایل .shp را همراه با .shx، .dbf و .prj آن (برای انتخاب چند فایل، Ctrl یا Shift را نگه دارید). مختصات در دستگاه مختصاتی غیر از دستگاه پروژه تبدیل می‌شود، و اعلان این را بیان می‌کند.",
+                    "english": "Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_shp_tip",
+                "english": "Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this.",
+                "value": "نقطه‌ها، خط‌ها و چندضلعی‌های یک شیپ‌فایل ESRI را به‌صورت شکل در این پروژه می‌خواند و ستون‌های ویژگی را به‌عنوان ویژگی نگه می‌دارد. یا فایل .zip را انتخاب کنید یا فایل .shp را همراه با .shx، .dbf و .prj آن (برای انتخاب چند فایل، Ctrl یا Shift را نگه دارید). مختصات در دستگاه مختصاتی غیر از دستگاه پروژه تبدیل می‌شود، و اعلان این را بیان می‌کند."
+            }
+        }
+    },
     "key_plain": [],
     "key_notes": [],
     "key_concepts": [],
-    "uniqueness_attention": []
+    "uniqueness_attention": [
+        {
+            "instruction": "Find unique names for each.",
+            "members": [
+                {
+                    "plain_name": "short word, name, or tag stuck on a pipe or point",
+                    "english_rendering": "Tag",
+                    "preferred_translation": "تگ"
+                },
+                {
+                    "plain_name": "words, values, or names the program writes beside a pipe or point",
+                    "english_rendering": "Label",
+                    "preferred_translation": ""
+                },
+                {
+                    "plain_name": "words, notes, or captions you type onto the map",
+                    "english_rendering": "Text",
+                    "preferred_translation": ""
+                },
+                {
+                    "plain_name": "note, remark, or description for people about one item",
+                    "english_rendering": "Description",
+                    "preferred_translation": ""
+                },
+                {
+                    "plain_name": "short code that names one item, like J-1 or P-12",
+                    "english_rendering": "ID",
+                    "preferred_translation": ""
+                }
+            ]
+        }
+    ]
 }
