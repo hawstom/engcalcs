@@ -44756,6 +44756,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// EPANET features share one message instead of each buying its own translated string.
 	function inpDropText(code) {
 		var pc = EngCalcs.pageConfig || {};
+		if (LPN_WTG_NOTE[code]) { return wtgNoteText(code); }
 		switch (code) {
 			case 'headloss-formula': return pc.lpn_inp_drop_headloss || 'This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the results here will not match the results in EPANET.';
 			// 'tanks' and 'links-on-tanks' are gone (Task 248): tanks are imported now, so neither
@@ -44893,6 +44894,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					|| 'This was an EPANET .net file, the native EPANET project format. The format has no published specification; this page reads it using a format inferred from example files, so use it only when no .inp file is available. The .inp file is the documented format that other programs read: in EPANET use File, Export, Network to write one, and import that file instead whenever possible.';
 				body.appendChild(netNote);
 			}
+			// **A WATERGEMS MODEL SAYS WHAT IT IS, AND WHERE IT WENT** (Task 749, Task 814): read by a
+			// layout learned from examples, landed as a new project, with how many scenarios.
+			if (lastWtg) {
+				var wtgNote = document.createElement('p');
+				wtgNote.style.margin = '0 0 8px';
+				wtgNote.style.fontWeight = 'bold';
+				wtgNote.textContent = String(pc.lpn_wtg_report_intro || 'This was a WaterCAD or WaterGEMS model. Bentley publishes no description of the file, so it is read by a layout learned from example files. It was imported as a new project, from its scenario {base} and {n} more scenarios. Compare the results with WaterGEMS before relying on them.')
+					.replace('{base}', lastWtg.base).replace('{n}', lastWtg.n);
+				body.appendChild(wtgNote);
+			}
 			var sum = document.createElement('p');
 			sum.style.margin = '0 0 8px';
 			sum.textContent = (pc.lpn_inp_report_counts || '{nodes} junctions, reservoirs and tanks, {links} pipes, pumps and valves, in {units}.')
@@ -44907,7 +44918,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// at all -- lands as a plain XY drawing (docFromInp() above), which is what "unreferenced"
 			// means here. This report is the one place BOTH doors show it: it renders for a plain
 			// Import EPANET file… and for the copy File, Convert as… lands before its own box opens.
-			if (parsed.nodes.length && parsed.mapUnits !== 'degrees') {
+			if (parsed.nodes.length && parsed.mapUnits !== 'degrees' && !lastWtg) {
 				var crsNote = document.createElement('p');
 				crsNote.style.margin = '0 0 8px';
 				crsNote.textContent = pc.lpn_inp_report_no_crs || 'EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…';
@@ -44967,7 +44978,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			lead = document.createElement('p');
 			lead.style.margin = '0 0 6px';
-			lead.textContent = pc.lpn_inp_report_lead || 'This page does not use every EPANET feature, but no data in the file is discarded. The list below shows data in the file that is retained but not used, and any changes made during import:';
+			lead.textContent = lastWtg
+				? (pc.lpn_wtg_report_lead || 'The list below shows what was changed on the way in, and what in the file was not imported:')
+				: (pc.lpn_inp_report_lead || 'This page does not use every EPANET feature, but no data in the file is discarded. The list below shows data in the file that is retained but not used, and any changes made during import:');
 			body.appendChild(lead);
 			ul = document.createElement('ul');
 			ul.style.margin = '0';
@@ -45110,6 +45123,187 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function pickInpFile() {
 		var input = document.getElementById('lpn_inp_file');
 		if (input) { input.click(); }
+	}
+
+	// ---- File > Import > WaterCAD or WaterGEMS model (ROADMAP Task 749) --------------------------
+	//
+	// Tom, 2026-10-17: *"Proceed with the .sqllite branch."* The database is read by js/lpn-sqlite.js
+	// (read-only, sql.js fetched from this site only now) and turned into `.inp` text by js/lpn-wtg.js,
+	// so it lands by the route an EPANET file takes: units strip first, document, arrival saved, one
+	// report. What an `.inp` cannot carry is laid onto the document here: inactive elements, the
+	// scenarios beyond Base with their overrides, and the alternatives no scenario uses.
+	//
+	// **A NEW PROJECT, AND IT SAYS SO** (Task 814): a WaterGEMS model is as scenario-aware as this
+	// page, and an import from it should one day ask where it goes. For now it is always a new
+	// project, and the report's first sentence says that. Record: dev/sqlite-reader.md.
+	var lastWtg = null;   // { base, n } while the report of a WaterGEMS import is being drawn
+	var LPN_WTG_NOTE = {
+		'wtg-units-assumed': ['lpn_wtg_note_units_assumed', 'No .wtg file was chosen with the database, so the units the model is displayed in are not known. The project uses the units that go with the flow unit shown in parentheses. To keep the model\'s own units, import it again and choose both files.'],
+		'wtg-units-differ': ['lpn_wtg_note_units_differ', 'WaterGEMS displays these quantities in other units. Here they are in the project\'s units.'],
+		'wtg-converted': ['lpn_wtg_note_converted', 'The database stores every number in US customary units (feet, cubic feet per second, psi). Each number was converted once to the project\'s units and rounded to the shortest decimal within 5 parts in 100 million, which gives back the number as it was entered.'],
+		'wtg-directed-split': ['lpn_wtg_note_directed_split', 'In WaterGEMS a pump or valve is a node between two pipes. Each of these was imported as a pump or valve link between two new junctions at its elevation, named after it with -U (upstream) and -D (downstream).'],
+		'wtg-tank-inlet': ['lpn_wtg_note_tank_inlet', 'These tanks fill through a separate inlet at the top in WaterGEMS. An EPANET tank has no such inlet, so the inlet pipe joins the tank at its base.'],
+		'wtg-tables-unread': ['lpn_wtg_note_tables_unread', 'Not imported: the data in these tables of the database, which this page does not read (for example transient, fire flow, and energy cost data).'],
+		'wtg-element-unread': ['lpn_wtg_note_element_unread', 'Not imported: these elements, of a kind this page does not model. The kind is shown in parentheses.'],
+		'wtg-id-changed': ['lpn_wtg_note_id_changed', 'These names are not valid EPANET IDs or repeat another name, so each was given the ID shown in parentheses.'],
+		'wtg-inactive': ['lpn_wtg_note_inactive', 'These elements are inactive in the model and were imported inactive.'],
+		'wtg-controls-unread': ['lpn_wtg_note_controls_unread', 'Not imported: these controls, which this page does not yet read from a WaterGEMS model. Each is shown as WaterGEMS states it.'],
+		'wtg-scenario-root': ['lpn_wtg_note_scenario_root', 'These scenarios have no parent in the model. Here every scenario descends from Base, so each was made a child of Base.'],
+		'wtg-scenario-alternative': ['lpn_wtg_note_scenario_alternative', 'These scenarios use a Physical alternative other than the one Base uses. The values in which it differs from Base were imported as the scenario\'s own overrides; the alternative itself was not imported.'],
+		'wtg-scenario-category': ['lpn_wtg_note_scenario_category', 'Not imported: the alternatives these scenarios use in categories other than Physical. There the scenario has the Base values.'],
+		'wtg-alternative-unused': ['lpn_wtg_note_alternative_unused', 'No scenario uses these Physical alternatives. Each was imported as an alternative of its own, holding the values it states, so that a scenario can use it.'],
+		'wtg-active-scenario': ['lpn_wtg_note_active_scenario', 'The model was open on the scenario shown in parentheses. This project opens on Base.'],
+		'wtg-pump-extended': ['lpn_wtg_note_pump_extended', 'These pump curves are extended beyond their points in WaterGEMS. Only the points were imported.'],
+		'wtg-pump-nodef': ['lpn_wtg_note_pump_curve', 'These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. Give each a curve before calculating.'],
+		'wtg-pump-deftype': ['lpn_wtg_note_pump_curve', 'These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. Give each a curve before calculating.'],
+		'wtg-pump-nocurve': ['lpn_wtg_note_pump_curve', 'These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. Give each a curve before calculating.'],
+		'wtg-pump-efficiency': ['lpn_wtg_note_pump_efficiency', 'Not imported: the efficiency of these pump definitions, which is neither a constant nor a list of points.'],
+		'wtg-pump-vsp': ['lpn_wtg_note_pump_vsp', 'These pumps are variable-speed pumps in the model. They were imported as fixed-speed pumps.'],
+		'wtg-tcv-coefficient': ['lpn_wtg_note_tcv_coefficient', 'These throttle control valves state a discharge coefficient rather than a minor loss coefficient. The minor loss coefficient stored with each was used.'],
+		'wtg-gpv-nocurve': ['lpn_wtg_note_gpv_curve', 'These general purpose valves have no head loss curve in the file.'],
+		'wtg-valve-status': ['lpn_wtg_note_valve_status', 'The initial status of these valves was read from a code not yet confirmed in an example file.'],
+		'wtg-valve-closed': ['lpn_wtg_note_valve_status', 'The initial status of these valves was read from a code not yet confirmed in an example file.'],
+		'wtg-tank-area': ['lpn_wtg_note_tank_shape', 'These tanks are not circular. Each was given the diameter of a circle of the same area, or, where the shape is not known, the diameter stored with it.'],
+		'wtg-tank-section': ['lpn_wtg_note_tank_shape', 'These tanks are not circular. Each was given the diameter of a circle of the same area, or, where the shape is not known, the diameter stored with it.'],
+		'wtg-tank-demand': ['lpn_wtg_note_tank_demand', 'Not imported: the demands at these tanks. An EPANET tank has no demand.'],
+		'wtg-emitter-unread': ['lpn_wtg_note_emitter_unread', 'Not imported: the emitter coefficients of these junctions, because the unit they are stored in is not yet confirmed.'],
+		'wtg-customer-demand': ['lpn_wtg_note_customer_demand', 'Not imported: the customer demands and unit demands at these junctions. Their base demands were imported.'],
+		'wtg-setting-pattern': ['lpn_wtg_note_setting_pattern', 'Not imported: the setting patterns of these valves.'],
+		'wtg-pattern-continuous': ['lpn_wtg_note_pattern_continuous', 'These patterns are continuous in the model. Here each multiplier holds until the next time step.'],
+		'wtg-pattern-calendar': ['lpn_wtg_note_pattern_calendar', 'Not imported: the day of the week and month multipliers of these patterns.'],
+		'wtg-pattern-irregular': ['lpn_wtg_note_pattern_irregular', 'These patterns have times that are not whole multiples of the pattern time step. Each was read at that time step.'],
+		'wtg-pattern-end': ['lpn_wtg_note_pattern_other', 'These patterns differ from EPANET patterns in their start time, their last multiplier, or their name (EPANET applies a pattern named 1 to every demand with no pattern). Check them.'],
+		'wtg-pattern-start': ['lpn_wtg_note_pattern_other', 'These patterns differ from EPANET patterns in their start time, their last multiplier, or their name (EPANET applies a pattern named 1 to every demand with no pattern). Check them.'],
+		'wtg-pattern-default': ['lpn_wtg_note_pattern_other', 'These patterns differ from EPANET patterns in their start time, their last multiplier, or their name (EPANET applies a pattern named 1 to every demand with no pattern). Check them.'],
+		'wtg-demand-adjustments': ['lpn_wtg_note_options', 'Not imported: these calculation options (demand adjustments, pressure-dependent demand, or a friction method code this page does not know). Where the model states no EPANET options, the defaults were used.'],
+		'wtg-pdd': ['lpn_wtg_note_options', 'Not imported: these calculation options (demand adjustments, pressure-dependent demand, or a friction method code this page does not know). Where the model states no EPANET options, the defaults were used.'],
+		'wtg-no-options': ['lpn_wtg_note_options', 'Not imported: these calculation options (demand adjustments, pressure-dependent demand, or a friction method code this page does not know). Where the model states no EPANET options, the defaults were used.'],
+		'wtg-friction-unknown': ['lpn_wtg_note_options', 'Not imported: these calculation options (demand adjustments, pressure-dependent demand, or a friction method code this page does not know). Where the model states no EPANET options, the defaults were used.'],
+		'wtg-srs': ['lpn_wtg_note_srs', 'The model states the spatial reference shown. Its coordinates were imported as plain x and y.'],
+		'wtg-link-unjoined': ['lpn_wtg_note_link_unjoined', 'Not imported: these pipes, pumps, or valves, whose ends are not two different imported nodes, or which do not sit between exactly two pipes.'],
+		'wtg-link-loop': ['lpn_wtg_note_link_unjoined', 'Not imported: these pipes, pumps, or valves, whose ends are not two different imported nodes, or which do not sit between exactly two pipes.'],
+		'wtg-directed-unlinked': ['lpn_wtg_note_link_unjoined', 'Not imported: these pipes, pumps, or valves, whose ends are not two different imported nodes, or which do not sit between exactly two pipes.'],
+		'wtg-no-geometry': ['lpn_wtg_note_no_geometry', 'These nodes have no location in the file and were placed at 0, 0.'],
+		'wtg-unconverted': ['lpn_wtg_note_unconverted', 'These values are stored in a unit this page does not know and were set to 0. Check them before calculating.'],
+		'wtg-unit-unknown': ['lpn_wtg_note_unit_unknown', 'Not converted: these fields, whose stored unit (shown in parentheses) this page does not know.'],
+		'wtg-unit-assumed': ['lpn_wtg_note_unit_assumed', 'The file does not state the stored unit of these fields, so the unit every example file states was assumed.'],
+		'wtg-cv-closed': ['lpn_wtg_note_cv_closed', 'These pipes have a check valve and start closed. They were imported closed.']
+	};
+	function wtgNoteText(code) {
+		var pc = EngCalcs.pageConfig || {}, t = LPN_WTG_NOTE[code];
+		return t ? String(pc[t[0]] || t[1]) : null;
+	}
+	function pickWtgFiles() {
+		var pick = document.createElement('input');
+		pick.type = 'file';
+		pick.multiple = true;
+		// `.sqlite` is the database; `.wtg` (the display settings) may be chosen with it for the units.
+		pick.accept = '.sqlite,.wtg,.db';
+		pick.addEventListener('change', function () {
+			if (pick.files && pick.files.length) { landWtgFiles(Array.prototype.slice.call(pick.files)); }
+		});
+		pick.click();
+	}
+	function readFileBytes(f, ok, bad) {
+		var reader = new FileReader();
+		reader.onload = function (ev) { ok(ev.target.result); };
+		reader.onerror = bad;
+		reader.readAsArrayBuffer(f);
+	}
+	// The chosen files to a new project. `done(result)` (optional, for a harness) is called once.
+	function landWtgFiles(files, done) {
+		var pc = EngCalcs.pageConfig || {};
+		function finish(r) { if (done) { done(r); } }
+		var db = null, wtg = null;
+		files.forEach(function (f) {
+			var n = String(f.name || '');
+			if (/\.sqlite$|\.db$/i.test(n)) { db = db || f; } else if (/\.wtg$/i.test(n)) { wtg = wtg || f; }
+		});
+		if (!db && files.length === 1 && !wtg) { db = files[0]; }
+		if (!db) { setWarning(pc.lpn_wtg_need_sqlite || 'Choose the model\'s .wtg.sqlite file. The .wtg file holds only how the model is displayed; it can be chosen with it.'); finish({ ok: false, code: 'need-sqlite' }); return; }
+		logLpnFirstAction('import');
+		var fileName = String(db.name);
+		function say(key, english) { setWarning(String(pc[key] || english).replace('{file}', fileName)); }
+		function readDb(display) {
+			readFileBytes(db, function (buf) {
+				if (!EngCalcs.lpnSqliteIsSqlite || !EngCalcs.lpnSqliteIsSqlite(buf)) {
+					say('lpn_wtg_not_sqlite', '{file} is not a SQLite database, so it is not a WaterCAD or WaterGEMS model file. A zipped model must be unzipped first.');
+					finish({ ok: false, code: 'not-sqlite' });
+					return;
+				}
+				setNotice(String(pc.lpn_wtg_working || 'Reading {file}…').replace('{file}', fileName));
+				EngCalcs.lpnSqliteOpen(buf).then(function (handle) {
+					var r;
+					try { r = EngCalcs.lpnWtgRead(handle, { display: display, fileName: fileName }); } finally { handle.close(); }
+					if (!r.ok) {
+						say('lpn_wtg_not_wtg', '{file} is a SQLite database, but not a WaterCAD or WaterGEMS model.');
+						finish(r);
+						return;
+					}
+					var id = landWtgResult(r, fileName);
+					finish({ ok: !!id, id: id, read: r });
+				}, function (e) {
+					if (e && e.code === 'engine') { say('lpn_wtg_engine', 'The SQLite reader could not be loaded, so {file} could not be opened. Check the connection and try again.'); }
+					else { say('lpn_wtg_unreadable', '{file} could not be read as a SQLite database. It may be damaged.'); }
+					finish({ ok: false, code: e && e.code });
+				});
+			}, function () {
+				setWarning(pc.lpn_survey_read_error || 'That file could not be read from your disk.');
+				finish({ ok: false, code: 'read' });
+			});
+		}
+		if (!wtg) { readDb(null); return; }
+		readFileBytes(wtg, function (buf) {
+			readDb(EngCalcs.lpnWtgDisplayUnits(new TextDecoder('utf-8').decode(new Uint8Array(buf))));
+		}, function () { readDb(null); });
+	}
+	// The reader's result as a project. Returns the new project's id, or null when refused.
+	function landWtgResult(r, fileName) {
+		var pc = EngCalcs.pageConfig || {};
+		var parsed = EngCalcs.lpnInpParse ? EngCalcs.lpnInpParse(r.inp) : { ok: false };
+		if (!parsed.ok) { setWarning(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.'); return null; }
+		var name = String(fileName).replace(/(\.wtg)?\.sqlite$|\.db$/i, '') || String(fileName),
+			before = readUnitSelections();
+		lastNetUnnamed = [];
+		lastWasNet = false;
+		rememberOutgoingProject();
+		applyUnitSelections(inpUnitSelections(parsed));
+		var saved = docFromInp(parsed, name);
+		wtgLayOnto(saved, r);
+		var id = importProject(saved, true);
+		if (!id) { applyUnitSelections(before); refreshMapStatus(); return null; }
+		stampProjectSaved(id);
+		renderTabs();
+		// The reader's notes first: they are about the model; the parser's are about the text it made.
+		parsed.dropped = r.notes.concat(parsed.dropped);
+		lastWtg = { base: r.baseScenario || 'Base', n: r.scenarios.length };
+		try { showInpReport(parsed, fileName); } finally { lastWtg = null; }
+		return id;
+	}
+	// What an `.inp` cannot say, laid onto the saved document before it is opened.
+	function wtgLayOnto(saved, r) {
+		var off = {};
+		(r.inactiveIds.nodes || []).forEach(function (i) { off['n:' + i] = true; });
+		(r.inactiveIds.links || []).forEach(function (i) { off['l:' + i] = true; });
+		saved.nodes.forEach(function (n) { if (off['n:' + n.id]) { n._active = false; } });   // base-write: an imported document is born in Base
+		saved.links.forEach(function (l) { if (off['l:' + l.id]) { l._active = false; } });   // base-write: an imported document is born in Base
+		var sid = {}, n = 0;
+		r.scenarios.forEach(function (s) { sid[s.fileId] = 's' + (++n); });
+		r.scenarios.forEach(function (s) {
+			var rec = { id: sid[s.fileId], name: s.name, overrides: JSON.parse(JSON.stringify(s.overrides || {})) };
+			if (s.parentFileId && sid[s.parentFileId]) { rec.parent = sid[s.parentFileId]; }
+			saved.scenarios.push(rec);
+		});
+		if (r.alternatives.length) {
+			var aid = {}, k = 0;
+			r.alternatives.forEach(function (a) { aid[a.fileId] = 'a' + (++k); });
+			saved.alternatives = r.alternatives.map(function (a) {
+				var rec = { id: aid[a.fileId], category: a.category, name: a.name, parent: (a.parentFileId && aid[a.parentFileId]) || null };
+				if (a.root) { rec.root = true; }
+				if (Object.keys(a.values || {}).length) { rec.values = JSON.parse(JSON.stringify(a.values)); }
+				return rec;
+			});
+		}
 	}
 
 	// ---- File > Import > GeoJSON network (ROADMAP Task 728, import half) -------------------------
@@ -50837,6 +51031,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// A GeoJSON file as a network, through one mapping step (Task 728).
 			{ icon: 'open', label: pc.lpn_file_import_gjnet || 'GeoJSON network…',
 			  tip: pc.lpn_file_import_gjnet_tip, fn: pickGeoJsonNetFile },
+			// A WaterCAD or WaterGEMS model database, read-only (Task 749).
+			{ icon: 'open', label: pc.lpn_file_import_wtg || 'WaterCAD or WaterGEMS model…',
+			  tip: pc.lpn_file_import_wtg_tip, fn: pickWtgFiles },
 			// The points, lines and polygons of a GeoJSON file, as Shapes (Task 779).
 			{ icon: 'open', label: pc.lpn_file_import_shapes || 'GeoJSON shapes…',
 			  tip: pc.lpn_file_import_shapes_tip, fn: pickGeoJsonFile },
