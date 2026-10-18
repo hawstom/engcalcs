@@ -16,7 +16,7 @@
 // that band and a network solved on 'native' must land at exactly 1. Delete the routing and both
 // come back at 1.000, which fails here.
 //
-// Sections 2 and 3 are the two halves of the valve rule CLAUDE.md states: an active valve routes
+// Sections 2 and 3 are the two halves of the valve rule: a valve only EPANET can answer routes
 // to EPANET on its own without rewriting the user's setting, and the native solver refuses such a
 // network BY NAME when the engine is unreachable.
 
@@ -112,21 +112,27 @@ ok('the status bar warns that the engines differ on Manning',
 	/manning/i.test(status()), JSON.stringify(status()));
 
 // ------------------------------------------------------------------------------------------
-// 2. AN ACTIVE VALVE ROUTES ITSELF, AND DOES NOT REWRITE THE USER'S CHOICE
+// 2. A VALVE ONLY EPANET CAN ANSWER ROUTES ITSELF, AND DOES NOT REWRITE THE USER'S CHOICE
 // ------------------------------------------------------------------------------------------
-// **A PBV, SINCE THE BUILT-IN SOLVER LEARNT PRV/PSV/FCV** (Task 733): a pressure breaker is the
-// valve that still only EPANET solves, so it is the one that has to route the network on its own.
-console.log('\n--- a PBV takes the network to EPANET on its own ---');
+// **A GPV WITH NO CURVE, SINCE THE BUILT-IN SOLVER LEARNT EVERY VALVE TYPE** (Task 733, phase 2).
+// Every type is native now; what still routes is a valve pair EPANET refuses and a GPV whose curve
+// EPANET could not read either (EngCalcs.lpnGpvCurveOk). The curveless GPV is the one of those
+// EPANET still SOLVES -- js/lpn-epanet.js writes it as an open throttle and says so -- so it is the
+// valve that has to route the network on its own.
+function curvelessGpv(doc) {
+	doc.links.push({ id: 'V1', type: 'valve', valveType: 'GPV', from: 'J1', to: 'J2', verts: [],
+		_diameter: 200, _setting: 0, _k: 0, _status: 'open' });
+}
+console.log('\n--- a curveless GPV takes the network to EPANET on its own ---');
 L.settings().method = 'hw';
 L.settings().engine = 'native';
 {
 	const doc = line();
 	doc.links[0]._roughness = 130;
-	// An active valve may not sit on a fixed head (lpnDiagnose's valve-on-fixed-head), so the
-	// valve goes between two junctions with a pipe either side.
+	// A valve may not sit on a fixed head (lpnDiagnose's valve-on-fixed-head), so the valve goes
+	// between two junctions with a pipe either side.
 	doc.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 0 });
-	doc.links.push({ id: 'V1', type: 'valve', valveType: 'PBV', from: 'J1', to: 'J2', verts: [],
-		_diameter: 200, _setting: 40, _k: 0, _status: 'open' });
+	curvelessGpv(doc);
 
 	const was = epanetSolves();
 	const r = await solved();
@@ -139,36 +145,58 @@ L.settings().engine = 'native';
 	ok('the stored engine setting was NOT rewritten', L.settings().engine === 'native', L.settings().engine);
 	ok('the status bar names the valve that caused the switch',
 		status().indexOf('V1') >= 0, JSON.stringify(status()));
-	// The PBV is doing something, or nothing above is about a PBV at all.
-	ok('the PBV actually takes its setting out of the head',
-		Math.abs(r.heads.J1 - r.heads.J2 - 40) < 0.01, r.heads.J1 - r.heads.J2);
+	// The open throttle EPANET was handed: no loss across it, or nothing above is about it at all.
+	ok('the curveless GPV is the open connection EPANET is handed',
+		!!r && Math.abs(r.heads.J1 - r.heads.J2) < 0.01, r && r.heads.J1 - r.heads.J2);
 }
 
 // ------------------------------------------------------------------------------------------
-// 2b. A PRV NO LONGER LEAVES THE BUILT-IN SOLVER (Task 733, phase 1)
+// 2b. A PRV, A PBV AND A GPV WITH A CURVE NO LONGER LEAVE THE BUILT-IN SOLVER (Task 733)
 // ------------------------------------------------------------------------------------------
-console.log('\n--- a PRV stays on the built-in solver ---');
-{
+console.log('\n--- a PRV, a PBV and a GPV stay on the built-in solver ---');
+function nativeValve(v, check, demandJ2) {
 	const doc = line();
 	doc.links[0]._roughness = 130;
-	doc.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 0 });
-	doc.links.push({ id: 'V2', type: 'valve', valveType: 'PRV', from: 'J1', to: 'J2', verts: [],
-		_diameter: 200, _setting: 40, _k: 0, _status: 'open' });
+	doc.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: demandJ2 || 0 });
+	doc.links.push(Object.assign({ id: 'V2', type: 'valve', from: 'J1', to: 'J2', verts: [],
+		_diameter: 200, _k: 0, _status: 'open' }, v));
 	const was = epanetSolves();
 	L.runSolve();
 	const r = L.lastResult();
-	ok('the PRV network is not handed to EPANET', epanetSolves() === was, epanetSolves() - was + ' calls');
+	ok('the ' + v.valveType + ' network is not handed to EPANET', epanetSolves() === was, epanetSolves() - was + ' calls');
 	ok('...it is the built-in solver\'s answer', !!r && r.engine !== 'epanet', r && r.engine);
+	check(r);
+	doc.links.pop();
+	doc.nodes.pop();
+}
+nativeValve({ valveType: 'PRV', _setting: 40 }, (r) => {
 	ok('...and the PRV holds its downstream head at the setting',
 		!!r && Math.abs(r.heads.J2 - 40) < 0.01, r && r.heads.J2);
 	ok('...and says the valve is active', !!r && r.valveStatus && r.valveStatus.V2 === 'active',
 		r && JSON.stringify(r.valveStatus));
-	doc.links.pop();
-	doc.nodes.pop();
-	doc.links.push({ id: 'V1', type: 'valve', valveType: 'PBV', from: 'J1', to: 'J2', verts: [],
-		_diameter: 200, _setting: 40, _k: 0, _status: 'open' });
-	doc.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 0 });
-}
+});
+nativeValve({ valveType: 'PBV', _setting: 40 }, (r) => {
+	ok('...and the PBV takes exactly its setting out of the head',
+		!!r && Math.abs(r.heads.J1 - r.heads.J2 - 40) < 0.01, r && r.heads.J1 - r.heads.J2);
+});
+// **A PBV's DROP IS A PRESSURE, IN THE PRESSURE UNIT** -- under the US preset 10 psi, not 10 m.
+// assembleModel() passed a PBV's setting through unconverted until Task 733 phase 2, so a 10 psi
+// PBV took out 14.2 psi in both engines.
+setUnitSet('us');
+nativeValve({ valveType: 'PBV', _setting: 10, _diameter: 8 }, (r) => {
+	const psi = !!r && (r.heads.J1 - r.heads.J2) / 0.3048 * 0.4333;
+	ok('...and a 10 psi PBV under the US preset takes out 10 psi, not 10 m',
+		!!r && Math.abs(psi - 10) < 0.01, psi);
+});
+setUnitSet('si');
+// A GPV naming a library head-loss curve, in the strip's L/s and metres: 20 L/s through it sits
+// halfway along the 10-30 L/s segment, so it loses 4 m.
+L.getDoc().curves = (L.getDoc().curves || []).concat([{ id: 'GL1', kind: 'headloss',
+	points: [[10, 2], [30, 6], [50, 14]] }]);
+nativeValve({ valveType: 'GPV', _setting: 0, _curveId: 'GL1' }, (r) => {
+	ok('...and the GPV loses what its curve says at 20 L/s, 4 m',
+		!!r && Math.abs(r.heads.J1 - r.heads.J2 - 4) < 0.01, r && r.heads.J1 - r.heads.J2);
+}, 20);
 
 // ------------------------------------------------------------------------------------------
 // 3. WITH NO ENGINE, THE BUILT-IN SOLVER REFUSES BY NAME
@@ -177,6 +205,10 @@ console.log('\n--- a PRV stays on the built-in solver ---');
 // lpnSolveEpanet is exactly what an offline first visit looks like to runSolve().
 console.log('\n--- and with EPANET unreachable, the refusal names the valve ---');
 {
+	const doc = line();
+	doc.links[0]._roughness = 130;
+	doc.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 0 });
+	curvelessGpv(doc);
 	const keep = EngCalcs.lpnSolveEpanet;
 	delete EngCalcs.lpnSolveEpanet;
 	try {

@@ -133,13 +133,14 @@ function line(L) {
 		_diameter: 200, _roughness: 130, _length: 1000, _k: 0, _status: 'open' });
 	return d;
 }
-// The same line with a PBV on the far end -- a valve only EPANET solves (since Task 733 a PRV is
-// the built-in solver's too). It may not sit on a fixed head, hence the second junction.
-function withPbv(L) {
+// The same line with a curveless GPV on the far end -- since Task 733 phase 2 every valve type is
+// the built-in solver's, and a GPV with no curve (EngCalcs.lpnGpvCurveOk) is the one valve only
+// EPANET answers. It may not sit on a fixed head, hence the second junction.
+function withEpanetOnlyValve(L) {
 	const d = line(L);
 	d.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 0 });
-	d.links.push({ id: 'V1', type: 'valve', valveType: 'PBV', from: 'J1', to: 'J2', verts: [],
-		_diameter: 200, _setting: 40, _k: 0, _status: 'open' });
+	d.links.push({ id: 'V1', type: 'valve', valveType: 'GPV', from: 'J1', to: 'J2', verts: [],
+		_diameter: 200, _setting: 0, _k: 0, _status: 'open' });
 	return d;
 }
 function fresh() {
@@ -246,14 +247,14 @@ console.log('\n--- the drawing becomes a network ---');
 // ------------------------------------------------------------------------------------------
 // 3. A NETWORK ONLY EPANET CAN SOLVE: THE CHECKBOX AND THE BANNER
 // ------------------------------------------------------------------------------------------
-console.log('\n--- a PBV, which the built-in solver does not solve ---');
+console.log('\n--- a curveless GPV, which the built-in solver does not solve ---');
 {
 	fakeLoader();
 	const L = fresh();
 	// 'native' ON PURPOSE. It is the value that makes the next assertion mean something: if the
 	// page wrote settings.engine to force the routing, this is where it would show.
 	L.settings().engine = 'native';
-	withPbv(L);
+	withEpanetOnlyValve(L);
 	L.runSolve();
 
 	ok('the fetch started for it', loads === 1, loads + ' fetches');
@@ -277,9 +278,10 @@ console.log('\n--- a PBV, which the built-in solver does not solve ---');
 	const tipText = PC.lpn_settings_engine_native_tip || '';
 	const epanetTypes = global.EngCalcs.lpnValveTypes.filter((t) =>
 		!global.EngCalcs.lpnValveIsNative({ type: 'valve', valveType: t }));
-	ok('...and the tip is where that fact lives permanently',
-		epanetTypes.length > 0 && epanetTypes.every((t) => new RegExp('\\b' + t + '\\b').test(tipText)),
-		'tip names ' + epanetTypes.join(', '));
+	// Since Task 733 phase 2 that is no type at all, so the tip names none.
+	ok('...and the tip names every valve type the built-in solver does not solve',
+		epanetTypes.every((t) => new RegExp('\\b' + t + '\\b').test(tipText)),
+		'types EPANET alone solves: ' + (epanetTypes.join(', ') || 'none'));
 	ok('...and names no valve the built-in solver does solve',
 		global.EngCalcs.lpnValveTypes.filter((t) => epanetTypes.indexOf(t) < 0)
 			.every((t) => !new RegExp('\\b' + t + '\\b').test(tipText)), tipText);
@@ -305,7 +307,7 @@ console.log('\n--- a PBV, which the built-in solver does not solve ---');
 	// AND THE NETWORK GOING BACK TO ORDINARY CHANGES NOTHING ABOUT THE BOX, which is the point of
 	// not disabling it: there is no state to come back from.
 	const d = L.getDoc();
-	d.links.pop(); d.nodes.pop();          // the PBV and the junction beyond it
+	d.links.pop(); d.nodes.pop();          // the GPV and the junction beyond it
 	L.runSolve();
 	L.rebuildSettingsFields();
 	ok('deleting the valve leaves the checkbox exactly as it was',
@@ -323,7 +325,7 @@ console.log('\n--- and when it cannot be fetched at all ---');
 	fakeLoader();
 	const L = fresh();
 	L.settings().engine = 'native';
-	withPbv(L);
+	withEpanetOnlyValve(L);
 	L.runSolve();
 	ok('the wait is on screen while it tries', banner() === PC.lpn_engine_needed_loading, JSON.stringify(banner()));
 	gate.rej(new Error('offline'));

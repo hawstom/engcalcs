@@ -309,8 +309,9 @@ async function run() {
 	console.log('-- the line the page routes on');
 	ok('PRV, PSV, FCV and TCV are native', ['PRV', 'PSV', 'FCV', 'TCV'].every((t) =>
 		EngCalcs.lpnValveIsNative({ type: 'valve', valveType: t })));
-	ok('PBV and GPV still need EPANET', ['PBV', 'GPV'].every((t) =>
-		!EngCalcs.lpnValveIsNative({ type: 'valve', valveType: t })));
+	// PBV and GPV are phase 2's, and dev/lpn-spike/native-pbv-gpv-harness.js holds them.
+	ok('PBV and GPV are native too, since phase 2', ['PBV', 'GPV'].every((t) =>
+		EngCalcs.lpnValveIsNative({ type: 'valve', valveType: t })));
 	// EPANET's input error 220 (project.c valvecheck): two PRVs in series. EPANET refuses it, so the
 	// built-in solver must not quietly answer it: those valves still route to EPANET.
 	const series = line('PRV', 60);

@@ -84,18 +84,21 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   **"No extended-period simulation yet" is FALSE.** It stood in this file and on the LibreWaterNet
   landing draft until 2026-08-21, three days after the run shipped, and Tom caught it, not a check.
   Do not restore it.
-- **Valves are the one place the two engines deliberately differ.** A throttle valve (TCV) is a minor
-  loss on a zero-length link and solves in either engine. PRV/PSV/FCV switch their own state inside
-  the iteration and solve through **EPANET only** — a second implementation was not written.
-  *(Corrected 2026-08-30: this used to say EPANET is "measured ~9x faster than our own solver".
-  It is not, any more. Task 322's solver work replaced a dense Cholesky with an envelope one and
-  a re-run puts native at 3.93 ms against EPANET's 3.31 ms at 201 nodes — ratio 0.8x, ours
-  marginally faster. **Speed is no longer a reason to prefer either engine**; the reason valves
-  route to EPANET is that it implements their state switching and we do not.)* A network holding one is routed to EPANET automatically and
-  the status bar says so, **without rewriting the user's stored `engine` setting** (the setting is a
-  preference; the routing is a fact about this network). The native solver refuses such a network by
-  name if the engine is unreachable. `EngCalcs.lpnValveIsNative` is the one place that line is drawn;
-  `EngCalcs.lpnLinkK` is the one place a TCV's loss is read from its SETTING rather than its `k`.
+- **Every valve type solves in either engine** (Task 733). A throttle valve (TCV) is a minor loss on
+  a zero-length link. PRV, PSV and FCV switch state inside the iteration (phase 1) and a PBV and a
+  GPV follow their fixed laws (phase 2), each transcribed function by function from OWA-EPANET
+  2.3.5, the engine the page vendors, and held to it by `dev/lpn-spike/native-valve-harness.js` and
+  `native-pbv-gpv-harness.js`. The one rejected alternative, kept so it is not re-proposed: routing
+  every active valve to EPANET because "it implements their state switching and we do not" (Tom,
+  2026-09-26: *"This way the math is less of a black box for us."*), and speed was never the reason: after Task
+  322's envelope Cholesky native runs 3.93 ms against EPANET's 3.31 ms at 201 nodes. **What still
+  routes to EPANET** is a valve pair EPANET refuses (its input error 220, `lpnValveConflicts`) and a
+  GPV whose curve EPANET could not read either (`lpnGpvCurveOk`), because neither has an EPANET
+  answer to match. Such a network is routed automatically and the status bar says so, **without
+  rewriting the user's stored `engine` setting** (the setting is a preference; the routing is a
+  fact about this network). The native solver refuses it by name if the engine is unreachable.
+  `EngCalcs.lpnEpanetOnlyValves` is the one place that line is drawn; `EngCalcs.lpnLinkK` is the
+  one place a TCV's loss is read from its SETTING rather than its `k`.
 - **A CURVE IS A DOCUMENT OBJECT AND AN ELEMENT HOLDS ONLY A REFERENCE** (Task 586, Tom
   2026-09-05: *"move all pump curve data to the Library under curves and leave only curve
   references in the pump properties"*). `doc.curves` holds `{id, kind, points, src, tok}`; a pump,

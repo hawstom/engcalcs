@@ -200,11 +200,13 @@ function line(L) {
 		_diameter: 200, _roughness: 130, _length: 1000, _k: 0, _status: 'open' });
 	return d;
 }
-function withPbv(L) {
+// A network only EPANET answers. Since Task 733 phase 2 every valve type is native, so the one
+// left is a GPV with no curve (EngCalcs.lpnGpvCurveOk), which EPANET solves as an open throttle.
+function withEpanetOnlyValve(L) {
 	const d = line(L);
 	d.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 0 });
-	d.links.push({ id: 'V1', type: 'valve', valveType: 'PBV', from: 'J1', to: 'J2', verts: [],
-		_diameter: 200, _setting: 40, _k: 0, _status: 'open' });
+	d.links.push({ id: 'V1', type: 'valve', valveType: 'GPV', from: 'J1', to: 'J2', verts: [],
+		_diameter: 200, _setting: 0, _k: 0, _status: 'open' });
 	return d;
 }
 // **ONE INSTANCE PER SCENARIO.** epanetWarmState leaves 'cold' once and never returns, which is
@@ -289,7 +291,7 @@ console.log('\n--- a network only EPANET can solve keeps its own stronger senten
 	fakeLoader();
 	const L = fresh();
 	L.settings().engine = 'native';
-	withPbv(L);
+	withEpanetOnlyValve(L);
 	L.runSolve();
 	ok('the banner is the needs-the-engine sentence', banner() === PC.lpn_engine_needed_loading,
 		JSON.stringify(banner()));
@@ -408,7 +410,7 @@ console.log('\n--- no bar where there is no download to report ---');
 	fakeLoader();
 	const L = fresh();
 	L.settings().engine = 'native';
-	withPbv(L);
+	withEpanetOnlyValve(L);
 	L.runSolve();
 	ok('the needs-the-engine wait has a bar', barShown(), barEl.style.display);
 	gate.rej(new Error('offline'));

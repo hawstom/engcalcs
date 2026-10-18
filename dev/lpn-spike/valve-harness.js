@@ -339,10 +339,10 @@ console.log('\n--- model -> .inp -> model ---');
 		pb && pb.settingUnit === 'press', pb && pb.settingUnit);
 	ok('...and its fully-open minor loss', pb && pb.k === 1.5, pb && pb.k);
 
-	// Neither is native: both switch their own state inside the iteration, so both route to EPANET.
-	ok('both are EPANET-only, like every other active type',
-		!EngCalcs.lpnValveIsNative({ type: 'valve', valveType: 'PBV' }) &&
-		!EngCalcs.lpnValveIsNative({ type: 'valve', valveType: 'GPV' }));
+	// Both solve in either engine since Task 733 phase 2 (native-pbv-gpv-harness.js holds them).
+	ok('both are native, like every other type since Task 733',
+		EngCalcs.lpnValveIsNative({ type: 'valve', valveType: 'PBV' }) &&
+		EngCalcs.lpnValveIsNative({ type: 'valve', valveType: 'GPV' }));
 }
 
 // ---------------------------------------------------------------------------
@@ -373,7 +373,7 @@ console.log('\n--- the native solver ---');
 		EngCalcs.lpnLinkK({ type: 'pipe', k: 3 }) === 3 &&
 		EngCalcs.lpnLinkK({ type: 'valve', valveType: 'PRV', setting: 40, k: 3 }) === 3);
 
-	// AN ACTIVE VALVE IS REFUSED BY NAME. This is the message a user meets when the EPANET module
+	// A VALVE ONLY EPANET CAN ANSWER IS REFUSED BY NAME. This is the message a user meets when the EPANET module
 	// cannot be loaded (offline, blocked), and the whole reason this page writes its own
 	// diagnostics instead of surfacing EPANET's numbered errors.
 	const prvModel = {
@@ -385,13 +385,14 @@ console.log('\n--- the native solver ---');
 		],
 		links: [
 			{ id: 'L1', type: 'pipe', from: 'R', to: 'J1', length: 200, diameter: 0.25, roughness: 130, k: 0, status: 'open' },
-			{ id: 'V7', type: 'valve', valveType: 'PBV', from: 'J1', to: 'J2', length: 0, diameter: 0.25, roughness: 150, setting: 40, k: 0, status: 'open' }
+			{ id: 'V7', type: 'valve', valveType: 'GPV', from: 'J1', to: 'J2', length: 0, diameter: 0.25, roughness: 150, setting: 0, k: 0, status: 'open', curvePoints: [] }
 		]
 	};
-	// A PBV, since Task 733 taught the built-in solver PRV, PSV and FCV (native-valve-harness.js
-	// holds those to EPANET); a pressure breaker is still EPANET's alone.
-	ok('a PBV is not native', !EngCalcs.lpnValveIsNative(prvModel.links[1]));
-	ok('a PRV, a PSV and an FCV are', ['PRV', 'PSV', 'FCV'].every((t) =>
+	// A GPV WITH NO CURVE, since Task 733 taught the built-in solver every type (native-valve-harness.js
+	// and native-pbv-gpv-harness.js hold them to EPANET): a curve EPANET could not read either has no
+	// answer to match, so it is still EPANET's alone (EngCalcs.lpnGpvCurveOk).
+	ok('a GPV is native by type', EngCalcs.lpnValveIsNative(prvModel.links[1]));
+	ok('a PRV, a PSV, an FCV and a PBV are', ['PRV', 'PSV', 'FCV', 'PBV'].every((t) =>
 		EngCalcs.lpnValveIsNative({ type: 'valve', valveType: t })));
 	ok('a TCV is', EngCalcs.lpnValveIsNative({ type: 'valve', valveType: 'TCV' }));
 	ok('a pipe is', EngCalcs.lpnValveIsNative({ type: 'pipe' }));
@@ -406,7 +407,7 @@ console.log('\n--- the native solver ---');
 		!solved.ok && solved.issues.some((i) => i.code === 'valve-needs-epanet'));
 
 	// AND THE EPANET PATH MUST NOT INHERIT THE REFUSAL. A caller that names no engine is asking
-	// "is this network sound?", which a PBV network is.
+	// "is this network sound?", which this network is.
 	ok('a caller that names no engine gets no such issue',
 		EngCalcs.lpnDiagnose(prvModel).every((i) => i.code !== 'valve-needs-epanet'),
 		JSON.stringify(EngCalcs.lpnDiagnose(prvModel)));

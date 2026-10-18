@@ -1,9 +1,9 @@
 // PBV AND GPV, THROUGH THE REAL EPANET ENGINE -- ROADMAP Task 248. Run with:
 //   node dev/lpn-spike/pbv-gpv-harness.js
 //
-// WHY THIS IS AN ENGINE HARNESS AND NOT A UNIT TEST. Both types are EPANET-only: they switch their
-// own state inside the iteration, so our native solver never sees one and there is no second answer
-// to compare against. Everything that can go wrong is therefore in the `.inp` WRITER, and it goes
+// WHY THIS IS AN ENGINE HARNESS. Since Task 733 phase 2 the built-in solver solves both types too,
+// and dev/lpn-spike/native-pbv-gpv-harness.js holds the two engines to each other. But two engines
+// reading the SAME model cannot catch the `.inp` WRITER getting a unit wrong, and it goes
 // wrong silently -- js/lpn-epanet.js's own opening note says it exactly: a 0.15 m diameter written
 // as "0.15" is read as 0.15 mm, "and the network still solves perfectly, just for a different
 // network."
@@ -138,16 +138,15 @@ async function main() {
 
 	// ---- 3. the routing rule ----------------------------------------------------------------------
 	console.log('\n--- which engine answers ---');
-	ok('neither type is native, so a network holding one is routed to EPANET',
-		!EngCalcs.lpnValveIsNative({ type: 'valve', valveType: 'PBV' }) &&
-		!EngCalcs.lpnValveIsNative({ type: 'valve', valveType: 'GPV' }));
-	ok('...and both are named when the engine is unreachable',
-		EngCalcs.lpnEpanetOnlyValves(network({ valveType: 'PBV', setting: 7 })).join() === 'V1');
-	// The native solver must REFUSE rather than solve one wrong.
-	const refused = EngCalcs.lpnSolve(network({ valveType: 'PBV', setting: 7 }));
-	ok('the native solver refuses a PBV by name rather than solving it as an open pipe',
-		!refused.ok && JSON.stringify(refused.issues || []).indexOf('V1') >= 0,
-		JSON.stringify(refused.issues || []));
+	ok('both types are native since Task 733 phase 2, so neither routes a network to EPANET',
+		EngCalcs.lpnValveIsNative({ type: 'valve', valveType: 'PBV' }) &&
+		EngCalcs.lpnValveIsNative({ type: 'valve', valveType: 'GPV' }) &&
+		EngCalcs.lpnEpanetOnlyValves(network({ valveType: 'PBV', setting: 7 })).length === 0);
+	// And the built-in solver's answer is the hand answer too: exactly the setting across a PBV.
+	const nat = EngCalcs.lpnSolve(network({ valveType: 'PBV', setting: 7 }));
+	ok('the native solver removes exactly the PBV\'s 7 m',
+		nat.ok && Math.abs((nat.heads.J1 - nat.heads.J2) - 7) < 1e-4,
+		nat.ok ? (nat.heads.J1 - nat.heads.J2).toFixed(6) + ' m' : JSON.stringify(nat.issues || []));
 
 	console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');
 	process.exit(fails === 0 ? 0 : 1);

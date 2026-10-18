@@ -7,10 +7,12 @@
 // interop we would otherwise hand-write.
 //
 // VALVES ARE THE FIRST FEATURE THIS PAGE HAS THAT THE ENGINE TOGGLE DOES NOT MERELY ACCELERATE.
-// A throttle valve (TCV) is a minor loss and solves in either engine, and since Task 733 so do a
-// PRV, a PSV and an FCV: js/lpn-solver.js switches their state by EPANET's own rules. A PBV or a
-// GPV is still SOLVED HERE whatever the user's engine preference says, and js/lpn-solver.js
-// refuses it by name if this module cannot be reached. See EngCalcs.lpnValveIsNative there.
+// A throttle valve (TCV) is a minor loss and solves in either engine, and since Task 733 so does
+// every other type: js/lpn-solver.js switches a PRV, PSV and FCV by EPANET's own rules (phase 1)
+// and applies a PBV's and a GPV's laws as EPANET does (phase 2). What is still SOLVED HERE whatever
+// the user's engine preference says is a valve pair EPANET refuses and a GPV whose curve it cannot
+// read, and js/lpn-solver.js refuses those by name if this module cannot be reached. See
+// EngCalcs.lpnEpanetOnlyValves there.
 //
 // THIS MODULE IS THE DEFAULT SOLVER (Task 605, Tom 2026-09-06: *"'Always use the EPANET solver'
 // is the page default."*). It used to be the opt-in, and the reason was never speed -- EPANET is
@@ -1310,8 +1312,8 @@
 			// gaining or losing its curve is a topology change even though nothing moved.
 			// VALVE TYPE IS IN THE SIGNATURE, and it has to be. The setting of a PRV is a
 			// pressure and the setting of an FCV is a flow, so retyping a valve changes what the
-			// number beside it MEANS -- and, because lpnValveIsNative() sends a PBV or GPV to a
-			// different engine entirely, it can change which engine is answering. Pushing a new
+			// number beside it MEANS -- and, because lpnEpanetOnlyValves() sends a refused pair to
+			// a different engine entirely, it can change which engine is answering. Pushing a new
 			// type through a setter is not possible anyway: EPANET fixes a link's type when the
 			// file is read.
 			parts.push('l' + l.id + '\u0001' + l.type + '\u0001' + l.from + '\u0001' + l.to +
