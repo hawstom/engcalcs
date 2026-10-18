@@ -4241,6 +4241,7 @@ EngCalcs.pageConfig = {
 	lpn_theme_newspaper: <?=json_encode($ec_lang['lpn_theme_newspaper'])?>,
 	lpn_theme_arcade: <?=json_encode($ec_lang['lpn_theme_arcade'])?>,
 	lpn_theme_space: <?=json_encode($ec_lang['lpn_theme_space'])?>,
+	lpn_theme_prairie: <?=json_encode($ec_lang['lpn_theme_prairie'])?>,
 	lpn_settings_engine_native: <?=json_encode($ec_lang['lpn_settings_engine_native'])?>,
 	lpn_settings_engine_native_tip: <?=json_encode($ec_lang['lpn_settings_engine_native_tip'])?>,
 	lpn_engine_loading: <?=json_encode($ec_lang['lpn_engine_loading'])?>,

@@ -28,6 +28,10 @@
 //      files, are byte-identical to Light's.
 //  11. NOTHING IN SETTINGS IS CUT (Perry, round 2): in every theme, no word in the Settings box breaks in the
 //      middle (a web address excepted) and no text box clips its value where Light does not.
+//  13. WORDS AND ICONS ON THE CHROME, MEASURED IN PIXELS: a picture behind the chrome (Prairie's sky, Space's
+//      stars, the terminals' scan lines) is not a colour a style can report, so a screenshot is sampled round
+//      every word and icon in the menu bar, toolbar and tab strip, and the lightest and darkest pixel under it
+//      are each held to 4.5:1 for a word and 3:1 for an icon.
 //  12. THE SCENARIO MANAGER reads in every theme: its text on its surface at 4.5:1 (7:1 in High contrast), its
 //      title in the theme's own face, and nothing in it cut.
 //   6. A PHONE SURVIVES EVERY THEME: at 390 by 844 the page has no sideways scroll, and the menu bar and the
@@ -88,7 +92,9 @@ const DESIGN = {
 	arcade: { face: 'Arial Rounded MT Bold', size: '15px', menuCase: 'uppercase', menuWeight: '700', btnRadius: '10px', boxRadius: '12px',
 		boxFrame: '4px double', titleCase: 'uppercase', tabsRule: '4px double', iconStroke: 2.5, picture: 'some', titleInk: 'accent' },
 	space: { face: 'Futura', size: '15px', menuCase: 'uppercase', btnRadius: '2px', boxRadius: '3px', titleCase: 'uppercase',
-		iconStroke: 1.5, picture: 'some', titleInk: 'accent' }
+		iconStroke: 1.5, picture: 'some', titleInk: 'accent' },
+	prairie: { face: 'Rockwell', size: '15px', menuCase: 'uppercase', menuWeight: '700', btnRadius: '3px', boxRadius: '4px', boxFrame: '2px solid',
+		titleCase: 'uppercase', tabsRule: '4px double', iconCap: 'square', picture: 'some', titleInk: 'accent', titlePicture: 'some' }
 };
 const KEYS = ['face', 'size', 'menuCase', 'menuCaps', 'menuWeight', 'btnRadius', 'boxRadius', 'boxFrame', 'shadow', 'titleCase', 'tabsRule', 'iconStroke', 'iconCap', 'picture', 'glow'];
 
@@ -241,6 +247,59 @@ async function main() {
 				// 3: readable
 				const need = /^hc/.test(attr) ? 7 : 4.5;
 				Object.keys(got.contrast).forEach((k) => ok(t + ': ' + k + ' text reads at ' + got.contrast[k].toFixed(2) + ':1 >= ' + need, got.contrast[k] >= need));
+				// 13: the chrome, in pixels
+				{
+					const shotB64 = (await s.page.screenshot()).toString('base64');
+					const res = await s.page.evaluate(async (b64) => {
+						const img = await new Promise((r) => { const i = new Image(); i.onload = () => r(i); i.src = 'data:image/png;base64,' + b64; });
+						const cv = document.createElement('canvas'); cv.width = img.width; cv.height = img.height;
+						const cx = cv.getContext('2d'); cx.drawImage(img, 0, 0);
+						const px = (x, y) => Array.from(cx.getImageData(Math.round(x), Math.round(y), 1, 1).data);
+						const lum = (q) => { const f = q.slice(0, 3).map((x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }); return 0.2126 * f[0] + 0.7152 * f[1] + 0.0722 * f[2]; };
+						const parse = (x) => {
+							let m = /rgba?\(([^)]+)\)/.exec(x);
+							if (m) { const p = m[1].split(/[\s,/]+/).filter(Boolean).map(parseFloat); return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1]; }
+							m = /color\(srgb ([^)]*)\)/.exec(x);
+							if (m) { const p = m[1].split(/[\s/]+/).filter(Boolean).map(parseFloat); return [p[0] * 255, p[1] * 255, p[2] * 255, p.length > 3 ? p[3] : 1]; }
+							return [0, 0, 0, 0];
+						};
+						const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+						let worstText = 99, worstIcon = 99, wt = '', wi = '';
+						const opaque = (el) => {
+							let n = el;
+							for (; n && !n.matches('#lpn_menubar, #lpn_toolbar, #lpn_tabs'); n = n.parentElement) {
+								const b = parse(getComputedStyle(n).backgroundColor); if (b[3] >= 1) { return b; }
+							}
+							// The row itself: a plain colour is read as a colour; only a picture is sampled in pixels.
+							return n && getComputedStyle(n).backgroundImage === 'none' ? parse(getComputedStyle(n).backgroundColor) : null;
+						};
+						const sample = (el, need) => {
+							const r = el.getBoundingClientRect();
+							if (r.width < 4 || r.height < 4 || r.bottom > innerHeight || getComputedStyle(el).visibility !== 'visible') { return; }
+							const ink = parse(getComputedStyle(el).color), fill = opaque(el);
+							// A word on a fill of its own is measured against that fill; one with nothing opaque behind it up
+							// to the chrome row stands on the row's picture, sampled just outside the word on all four sides.
+							const pts = fill ? [fill] : [[r.left - 2, r.top + r.height / 2], [r.right + 1, r.top + r.height / 2], [r.left + r.width / 2, r.top - 2], [r.left + r.width / 2, r.bottom + 1]]
+								.filter(([x, y]) => x >= 0 && y >= 0 && x < innerWidth && y < innerHeight).map(([x, y]) => px(x, y));
+							pts.forEach((bg) => {
+								const q = ratio(ink, bg);
+								if (need === 'text' && q < worstText) { worstText = q; wt = el.tagName + '.' + (el.className.baseVal === undefined ? el.className : el.className.baseVal) + ' "' + (el.textContent || '').trim().slice(0, 16) + '"'; }
+								if (need === 'icon' && q < worstIcon) { worstIcon = q; wi = (el.closest('button') || el).getAttribute('title') || (el.closest('button') || el).className; }
+							});
+						};
+						document.querySelectorAll('#lpn_menubar *, #lpn_toolbar *, #lpn_tabs *').forEach((el) => {
+							if (el.closest('svg') && !el.matches('svg.ec-icon')) { return; }
+							if (el.matches('svg.ec-icon')) { if (!el.closest(':disabled')) { sample(el, 'icon'); } return; }
+							if (/^(SELECT|OPTION|INPUT)$/.test(el.tagName) || el.closest(':disabled')) { return; }
+							if (Array.from(el.childNodes).some((n) => n.nodeType === 3 && n.textContent.trim())) { sample(el, 'text'); }
+						});
+						return { worstText, worstIcon, wt, wi };
+					}, shotB64);
+					// Light shipped before this check (its muted close mark on a grey tab is 3.79:1): reported, not failed.
+					if (t === 'light') { console.log('  info light: worst word on the chrome ' + res.worstText.toFixed(2) + ' (' + res.wt + ')'); }
+					else { ok(t + ': every word on the chrome reads at 4.5:1 against what is behind it (worst ' + res.worstText.toFixed(2) + ', ' + res.wt + ')', res.worstText >= 4.5); }
+					ok(t + ': every icon on the chrome stands out at 3:1 (worst ' + res.worstIcon.toFixed(2) + ', ' + res.wi + ')', res.worstIcon >= 3);
+				}
 				// 4: the map
 				await s.settle(500);
 				const mp = await s.page.evaluate(readMap);

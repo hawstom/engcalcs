@@ -113,6 +113,24 @@
 	--ec-tabs-rule: 1px solid var(--ec-gray-999);
 	--ec-chrome-image: none;
 	--ec-chrome-image-size: auto;
+	--ec-chrome-image-pos: 0 0;
+	--ec-chrome-image-repeat: repeat;
+	/* `fixed` lays the chrome's picture against the window, so one sky runs unbroken across the menu bar,
+	   the toolbar, the tab strip and the gaps between them (Prairie). */
+	--ec-chrome-image-attach: scroll;
+	/* What paints the 4 px gaps between the three chrome rows: the chrome's own colour, or nothing where the
+	   page's picture behind them is the same picture (Prairie). */
+	--ec-chrome-gap: 0 4px 0 var(--ec-chrome-bg);
+	/* A picture behind the whole page, the margin round the map included (Prairie's sky). */
+	--ec-page-image: none;
+	--ec-page-image-size: auto;
+	/* The box title band's picture: where it sits and how big (Prairie's water tower), and the room the
+	   title leaves for it. */
+	--ec-titlebar-pos: 0 0;
+	--ec-titlebar-pos-rtl: 0 0;
+	--ec-titlebar-size: auto;
+	--ec-titlebar-repeat: repeat;
+	--ec-title-pad-start: 12px;
 	--ec-titlebar-image: none;
 	/* A ring of the band's colour round each letter of a box title, so a picture behind it stops short of the word. */
 	--ec-title-halo: var(--ec-text-glow);
@@ -1110,6 +1128,98 @@
 	--ec-map-help: #4fc3ff;
 	--ec-map-edge: #6b7290;
 	--ec-map-deep: #ffe81f;
+	--ec-map-font: var(--ec-font-ui);
+}
+/* PRAIRIE (Task 811, round 3; Tom, 2026-10-18: "an old west or an Americana theme ... that riffs on our water
+   tower icon brand", then "Maybe a sky background somehow somewhere"). Great Plains: a big sky, deep blue at the
+   top to a pale haze at the horizon, a few soft clouds, laid against the window so it runs unbroken behind the
+   menu bar, the toolbar and the tab strip and down to a fence rail (a double rule in weathered wood) under them.
+   Wheat-paper surfaces, a barn-red accent, galvanized steel for selection, a slab face where the computer has
+   one (Rockwell ships with Windows and Office), capital letter-spaced lettering like paint on a tank, and the
+   suite's own water tower (icons/favicon.svg, not redrawn) beside every box title. A wheat-paper map. No seal,
+   logo or clip art. Every word on the sky sits on a fill of its own (the menu items, the tabs). */
+:root[data-theme="prairie"], .ec-theme-card[data-theme="prairie"] {
+	--ec-bg: #fbf6e9;
+	--ec-chrome-bg: #dcebf3;
+	--ec-ink: #2b2418;
+	--ec-ink-black: #000;
+	--ec-border-strong: #7a6a50;
+	--ec-control-border: #7a6a50;
+	--ec-accent: #9e2a1e;
+	--ec-point: #6a3d9a;
+	--ec-accent-hover: #7d1f15;
+	--ec-accent-open: #5c160f;
+	--ec-brand: #9e2a1e;
+	--ec-brand-hover: #7d1f15;
+	--ec-warn-bg: #f8e7b5;
+	--ec-warn-border: #8a6a10;
+	--ec-warn-ink: #6b3d00;
+	--ec-held: #c98512;
+	--ec-held-ink: #6b4400;
+	--ec-ok-ink: #2f6a2a;
+	--ec-bad-ink: #a8210f;
+	--ec-error-ink: #8f1a0a;
+	--ec-error-bg: #f6d8cc;
+	--ec-select: #3e5a73;
+	--ec-tip-bg: #2b2418;
+	--ec-tip-ink: #fbf6e9;
+	--ec-tip-edge: #000;
+	--ec-help-ink: #2e4558;
+	--ec-hover-border: var(--ec-accent);
+	--ec-gray-999: #6b6255;
+	--ec-gray-bbb: #7a6a50;
+	--ec-neutral-ink: var(--ec-ink-muted);
+	--ec-gray-777: var(--ec-ink-muted);
+	--ec-font-ui: Rockwell, "Rockwell Nova", "Roboto Slab", "Zilla Slab", Georgia, serif;
+	--ec-font-size: .9375rem;
+	--ec-menu-weight: bold;
+	--ec-menu-case: uppercase;
+	--ec-menu-tracking: .06em;
+	--ec-title-case: uppercase;
+	--ec-title-tracking: .14em;
+	--ec-title-ink: var(--ec-accent);
+	--ec-btn-radius: 3px;
+	--ec-radius-scale: .75;
+	--ec-box-radius: 4px;
+	--ec-box-border: 2px solid var(--ec-border-strong);
+	--ec-box-shadow: 3px 3px 0 rgba(43, 36, 24, .22);
+	--ec-tabs-rule: 4px double #7a5c3a;
+	--ec-chrome-image: radial-gradient(ellipse 90px 13px at 16% 34px, rgba(255, 255, 255, .7), transparent 70%), radial-gradient(ellipse 140px 16px at 58% 26px, rgba(255, 255, 255, .55), transparent 70%), radial-gradient(ellipse 80px 11px at 86% 52px, rgba(255, 255, 255, .5), transparent 70%), linear-gradient(to bottom, #3a78b6 0, #6fa6d6 34px, #b7d6ec 78px, #e4eef2 112px, #efe6cc 138px);
+	--ec-chrome-image-size: 100% 140px;
+	--ec-chrome-image-repeat: no-repeat;
+	--ec-chrome-image-attach: fixed;
+	--ec-chrome-gap: none;
+	--ec-page-image: radial-gradient(ellipse 90px 13px at 16% 34px, rgba(255, 255, 255, .7), transparent 70%), radial-gradient(ellipse 140px 16px at 58% 26px, rgba(255, 255, 255, .55), transparent 70%), radial-gradient(ellipse 80px 11px at 86% 52px, rgba(255, 255, 255, .5), transparent 70%), linear-gradient(to bottom, #3a78b6 0, #6fa6d6 34px, #b7d6ec 78px, #e4eef2 112px, #efe6cc 138px);
+	--ec-page-image-size: 100% 140px;
+	--ec-titlebar-image: url("/engcalcs/icons/favicon.svg");
+	--ec-titlebar-pos: 10px 8px;
+	--ec-titlebar-pos-rtl: right 10px top 8px;
+	--ec-titlebar-size: 22px 22px;
+	--ec-titlebar-repeat: no-repeat;
+	--ec-title-pad-start: 40px;
+	--ec-icon-stroke: 2;
+	--ec-icon-cap: square;
+	/* The map (round 3): wheat paper, dark ink, a steel network and barn-red selection. */
+	--ec-map-paper: #f5ecd2;
+	--ec-map-ink: #2b2418;
+	--ec-map-asset: #34546e;
+	--ec-map-label: #2b2418;
+	--ec-map-halo: #f5ecd2;
+	--ec-map-select: #9e2a1e;
+	--ec-map-hover: #7a6a50;
+	--ec-map-located: #b34700;
+	--ec-map-shape: #5a3d7a;
+	--ec-map-marquee: #9e2a1e;
+	--ec-map-contour: #4a3f2c;
+	--ec-map-contour-ink: #2b2418;
+	--ec-map-frame: #7a6a50;
+	--ec-map-text: #2b2418;
+	--ec-map-text-muted: #5a4f3c;
+	--ec-map-text-strong: #000;
+	--ec-map-link: #9e2a1e;
+	--ec-map-help: #34546e;
+	--ec-map-edge: #7a6a50;
+	--ec-map-deep: #34546e;
 	--ec-map-font: var(--ec-font-ui);
 }
 }
@@ -2788,8 +2898,10 @@ html[dir="rtl"] .lpn-transport-btn[data-icon="step-fwd"] svg, html[dir="rtl"] .l
    hairline. A quiet surface of their own lets the chrome recede and the drawing come first. The 4 px gaps
    between the three rows are margins; a shadow with no blur paints each one the same colour without
    moving a pixel of layout. The menu items keep their white fill and blue outline (Task 616). */
-#lpn_menubar, #lpn_toolbar, #lpn_tabs { background: var(--ec-chrome-bg); background-image: var(--ec-chrome-image); background-size: var(--ec-chrome-image-size); -webkit-backdrop-filter: var(--ec-chrome-blur); backdrop-filter: var(--ec-chrome-blur); }
-#lpn_menubar, #lpn_toolbar { box-shadow: 0 4px 0 var(--ec-chrome-bg); }
+#lpn_menubar, #lpn_toolbar, #lpn_tabs { background: var(--ec-chrome-bg); background-image: var(--ec-chrome-image); background-size: var(--ec-chrome-image-size); -webkit-backdrop-filter: var(--ec-chrome-blur); backdrop-filter: var(--ec-chrome-blur);
+	background-position: var(--ec-chrome-image-pos); background-repeat: var(--ec-chrome-image-repeat); background-attachment: var(--ec-chrome-image-attach); }
+#formInput { background-image: var(--ec-page-image); background-size: var(--ec-page-image-size); background-repeat: no-repeat; background-attachment: fixed; }
+#lpn_menubar, #lpn_toolbar { box-shadow: var(--ec-chrome-gap); }
 /* The floor for every box makePanelDraggable() wires. raisePanel() writes a higher number inline as
    boxes are opened and touched; this is only where the stack starts, and it is what puts an untouched
    box above the chrome. */
@@ -4587,6 +4699,8 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	border-bottom: 1px solid var(--ec-border-strong); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
 	font-family: var(--ec-font-title); font-weight: var(--ec-title-weight); color: var(--ec-title-ink); text-transform: var(--ec-title-case); letter-spacing: var(--ec-title-tracking);
 	background-image: var(--ec-titlebar-image); text-shadow: var(--ec-title-halo);
+	background-position: var(--ec-titlebar-pos); background-size: var(--ec-titlebar-size); background-repeat: var(--ec-titlebar-repeat);
+	padding-inline-start: var(--ec-title-pad-start);
 	border-radius: var(--ec-box-radius) var(--ec-box-radius) 0 0;
 }
 
@@ -4612,6 +4726,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	display: flex; align-items: center; pointer-events: none;
 }
 .lpn-box-corner > * { pointer-events: auto; }
+html[dir="rtl"] .lpn-setbox-title { background-position: var(--ec-titlebar-pos-rtl); }
 .lpn-has-corner > .lpn-setbox-title { padding-right: calc(40px + var(--lpn-corner-w, 0px)); }
 .lpn-corner-btn {
 	width: 28px; height: 39px; padding: 0; border: 0; background: transparent;
@@ -6979,6 +7094,8 @@ textarea.lpn-desc-ta {
 }
 .ec-theme-card i { display: block; font-style: normal; box-sizing: border-box; }
 .ec-tc-menu, .ec-tc-tool, .ec-tc-tabs { display: flex; gap: 4px; background: var(--ec-chrome-bg); background-image: var(--ec-chrome-image); padding: 0 5px; }
+/* A sky laid against the window (Prairie) is drawn whole in each row of the little picture instead. */
+.ec-tc-menu, .ec-tc-tool, .ec-tc-tabs { background-size: 100% 100%; }
 .ec-tc-menu { height: 14px; align-items: center; padding-top: 2px; gap: 3px; }
 .ec-tc-menu i { width: 22px; height: 9px; background: var(--ec-bg); border: 1px solid var(--ec-accent); border-radius: min(var(--ec-btn-radius), 3px); box-shadow: var(--ec-bevel); }
 .ec-tc-tool { height: 13px; align-items: center; gap: 6px; border-bottom: 1px solid var(--ec-gray-d6d6d6); }

@@ -587,6 +587,20 @@ blue for its selection. Where the browser cannot blur, an `@supports not (backdr
 boxes and chrome solid, so the drawing never shows through the words; the harness holds a frosted box's text
 at 4.5:1 even with black or the network's ink behind it.
 
+**Prairie** (Tom, 2026-10-18: *"an old west or an Americana theme (Kansas? or Nebraska?) that riffs on our water
+tower icon brand"*, then *"Prairie is great. That's where you can't put a tank on a hill."* and *"Maybe a sky
+background somehow somewhere."*). Last in the gallery. A big sky (a CSS gradient from deep blue to a pale haze,
+three soft CSS clouds) laid against the window (`--ec-chrome-image-attach: fixed`, `--ec-page-image` on the
+page's form, `--ec-chrome-gap: none`), so one sky runs behind the menu bar, the toolbar, the tab strip and the
+gaps between them, down to a fence rail (a double rule in weathered wood) under the tabs; parchment surfaces,
+barn-red links and box titles, galvanized steel for selection, Rockwell where the computer has it (then Roboto
+Slab, Zilla Slab, Georgia), capital letter-spaced menu words and titles, and the suite's own water tower
+(icons/favicon.svg, same origin, not redrawn) beside every box title (`--ec-titlebar-pos/-size/-repeat`,
+`--ec-title-pad-start`). A wheat-paper map with a steel network and barn-red selection. Every word on the sky
+sits on a fill of its own; `theme-design-browser-harness.js` samples a screenshot round every word and icon on
+the chrome (4.5:1 for a word, 3:1 for an icon, in every theme; Light's 3.79:1 close mark on a grey tab is
+reported, not failed, as Light shipped before the check).
+
 **Known, not built**: colour by value keeps its ramp on a dark paper, so a ramp's darkest class (viridis
 purple) is faint on Amber, Arcade or Space; the fix (a casing in the paper's opposite tone, or lifting that
 stop) changes how a visitor's colouring looks and is Tom's call. The basemap tiles are not filtered.

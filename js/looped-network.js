@@ -59691,7 +59691,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var names = { system: pc.lpn_theme_system || 'System', light: pc.lpn_theme_light || 'Light', dark: pc.lpn_theme_dark || 'Dark',
 			hc: pc.lpn_theme_hc || 'High contrast', amber: pc.lpn_theme_amber || 'Amber', green: pc.lpn_theme_green || 'Green',
 			platinum: pc.lpn_theme_platinum || 'Platinum', rounded: pc.lpn_theme_rounded || 'Rounded',
-			desktop: pc.lpn_theme_desktop || 'Desktop', newspaper: pc.lpn_theme_newspaper || 'Newspaper', arcade: pc.lpn_theme_arcade || 'Arcade', space: pc.lpn_theme_space || 'Space' };
+			desktop: pc.lpn_theme_desktop || 'Desktop', newspaper: pc.lpn_theme_newspaper || 'Newspaper', arcade: pc.lpn_theme_arcade || 'Arcade', space: pc.lpn_theme_space || 'Space', prairie: pc.lpn_theme_prairie || 'Prairie' };
 		return names[t] || t;
 	}
 	// A small picture of the page: the menu bar's outlined items, the toolbar, the tab strip, a box with a

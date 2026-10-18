@@ -3183,7 +3183,8 @@ $ec_lang['lpn_theme_dark']='Dark';
 // 1990s. Rounded is the Light colors with soft, rounded shapes. Newspaper is black type on newsprint, set
 // like a printed newspaper. Arcade is a black screen with blue maze walls, like a 1980s arcade game. Space
 // is a night sky with stars and gold lettering, like a science-fiction film. Desktop is the light, frosted look
-// of a present-day computer's own windows.
+// of a present-day computer's own windows. Prairie is the Great Plains: a big blue sky over wheat, with a
+// water tower.
 $ec_lang['lpn_theme_hc']='High contrast';
 $ec_lang['lpn_theme_amber']='Amber';
 $ec_lang['lpn_theme_green']='Green';
@@ -3193,6 +3194,7 @@ $ec_lang['lpn_theme_desktop']='Desktop';
 $ec_lang['lpn_theme_newspaper']='Newspaper';
 $ec_lang['lpn_theme_arcade']='Arcade';
 $ec_lang['lpn_theme_space']='Space';
+$ec_lang['lpn_theme_prairie']='Prairie';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a

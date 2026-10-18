@@ -58,10 +58,10 @@ function ok(label, cond, detail) {
 const SHOTS = process.env.EC_THEME_SHOTS || '';
 if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: true }); }
 
-const ORDER = ['system', 'light', 'dark', 'hc', 'rounded', 'platinum', 'desktop', 'newspaper', 'amber', 'green', 'arcade', 'space'];
+const ORDER = ['system', 'light', 'dark', 'hc', 'rounded', 'platinum', 'desktop', 'newspaper', 'amber', 'green', 'arcade', 'space', 'prairie'];
 const KEYS = { system: 'lpn_theme_system', light: 'lpn_theme_light', dark: 'lpn_theme_dark', hc: 'lpn_theme_hc',
 	amber: 'lpn_theme_amber', green: 'lpn_theme_green', platinum: 'lpn_theme_platinum', rounded: 'lpn_theme_rounded', desktop: 'lpn_theme_desktop',
-	newspaper: 'lpn_theme_newspaper', arcade: 'lpn_theme_arcade', space: 'lpn_theme_space' };
+	newspaper: 'lpn_theme_newspaper', arcade: 'lpn_theme_arcade', space: 'lpn_theme_space', prairie: 'lpn_theme_prairie' };
 
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
@@ -170,7 +170,7 @@ async function main() {
 			const below = ORDER[Math.min(ORDER.length - 1, 2 + cols)];
 			ok('4. ArrowDown moves one row down (' + cols + ' to a row): ' + below, st.focus === below && st.theme === (below === 'hc' ? 'hc' : below), JSON.stringify(st));
 			await a.page.keyboard.press('End'); await a.settle(150);
-			ok('4. End: Space', (await state(a)).focus === 'space');
+			ok('4. End: Prairie', (await state(a)).focus === 'prairie');
 			await a.page.keyboard.press('Home'); await a.settle(150);
 			ok('4. Home: System', (await state(a)).focus === 'system');
 			await a.page.keyboard.press('ArrowRight'); await a.page.keyboard.press('ArrowRight'); await a.page.keyboard.press('ArrowRight'); await a.settle(150);

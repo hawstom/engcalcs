@@ -71,8 +71,8 @@ if (isset($html_desc) && trim((string)$html_desc) !== '') :
 <?php
 // THE THEME, SET BEFORE FIRST PAINT (Task 714; the gallery, dev/themes-plan.md). The visitor's
 // choice is System (the default), Light, Dark, High contrast, Rounded, Platinum, Desktop, Newspaper, Amber,
-// Green, Arcade or Space, kept in this browser alone: localStorage `lpn_theme` holds `light`, `dark`, `hc`,
-// `rounded`, `platinum`, `desktop`, `newspaper`, `amber`, `green`, `arcade` or `space`, and is absent for System. Anything else
+// Green, Arcade, Space or Prairie, kept in this browser alone: localStorage `lpn_theme` holds `light`, `dark`, `hc`,
+// `rounded`, `platinum`, `desktop`, `newspaper`, `amber`, `green`, `arcade`, `space` or `prairie`, and is absent for System. Anything else
 // stored there is read as System, so a theme retired later strands nobody.
 // <html data-theme> carries the RESOLVED theme, the one css/engcalcs.css paints: System becomes light,
 // dark (prefers-color-scheme) or high contrast (prefers-contrast: more), and High contrast becomes `hc` or
@@ -91,7 +91,7 @@ if ($type === 'EngCalcsApp') :
 ?>
 	<script>(function(){var d=document.documentElement,w=window,mq=function(s){return w.matchMedia?w.matchMedia(s):null;},
 	qd=mq('(prefers-color-scheme: dark)'),qc=mq('(prefers-contrast: more)'),
-	T=['system','light','dark','hc','rounded','platinum','desktop','newspaper','amber','green','arcade','space'],K={dark:1,'hc-dark':1,amber:1,green:1,arcade:1,space:1},m=null,p=null;
+	T=['system','light','dark','hc','rounded','platinum','desktop','newspaper','amber','green','arcade','space','prairie'],K={dark:1,'hc-dark':1,amber:1,green:1,arcade:1,space:1},m=null,p=null;
 	function ok(t){return T.indexOf(t)>=0;}
 	function g(){if(m){return m;}try{var t=localStorage.getItem('lpn_theme');return ok(t)?t:'system';}catch(e){return 'system';}}
 	function r(t){var k=!!(qd&&qd.matches);t=ok(t)?t:'system';if(t==='system'){t=qc&&qc.matches?'hc':(k?'dark':'light');}return t==='hc'&&k?'hc-dark':t;}

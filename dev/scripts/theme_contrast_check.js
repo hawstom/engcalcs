@@ -22,7 +22,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Every theme the head script can write on <html data-theme>, and its text ratio.
-const THEMES = { light: 4.5, dark: 4.5, hc: 7, 'hc-dark': 7, rounded: 4.5, platinum: 4.5, desktop: 4.5, newspaper: 4.5, amber: 4.5, green: 4.5, arcade: 4.5, space: 4.5 };
+const THEMES = { light: 4.5, dark: 4.5, hc: 7, 'hc-dark': 7, rounded: 4.5, platinum: 4.5, desktop: 4.5, newspaper: 4.5, amber: 4.5, green: 4.5, arcade: 4.5, space: 4.5, prairie: 4.5 };
 // Light shipped before this check; its weak pairs are reported, not failed.
 const INFO_ONLY = { light: true };
 
