@@ -4507,3 +4507,11 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: ar: dir rtl, right-aligned, colon on the correct side; "Chlorine" and custom-property names stay Latin; no Arabic font here so glyphs are boxes (not checked visually).
 - OBSERVED leftovers: "Closed: —" for an open pipe, "Is active?: ✓", "No pipe type chosen", "No fittings list chosen", "No pattern", "Demand pattern: (default: 1)"; extra Description lines print as unlabelled rows.
 - NOT CHECKED: harness mutation, dark theme, touch, ✓ glyph in the card (boxes in this headless font).
+
+## 2026-10-17, feat/label-beside (Steps 0, 1, 3 of the label port plan)
+
+- OBSERVED (Chromium, 9 views Net3/Novato/n600 at 1x/2x/4x, plus NovatoSI, Branford, Elm, bent n600): every label shown on master is drawn at the identical position on the branch; the level rung only adds labels. Step 1 is layout-identical.
+- OBSERVED: Step 0 quotes all found verbatim in feat/label-placer sources; none strengthened.
+- OBSERVED: no level label overlaps a label or node symbol, no leader crosses a leader, label or node. But many level labels with no leader are closer to ANOTHER pipe than their own (n600 2x: 100 of 137; Net3 2x: 9 of 14) and about 40% touch another pipe. Leaders appear only past a distance threshold, so a level label 25-45 px from its pipe has no leader. The harness checks N1/N3/N5 only, so it cannot see this.
+- OBSERVED: n600 1x pass 905 -> 1128 ms (R10 bound is 1 s).
+- Harnesses stay: they never measured "which pipe is this label for"; a metric of that kind is what a reviewer must add.
