@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**18 still to read on master**, of 25 untranslated keys, of 3050 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**23 still to read on master**, of 30 untranslated keys, of 3051 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,13 +29,25 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (25, 18 to read @@ NEEDS RULING)
+## lpn_  (30, 23 to read @@ NEEDS RULING)
 
+- **`lpn_diag_gpv_curve_order`**
+  > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
+  @@ NEEDS RULING
+- **`lpn_diag_valve_conflict`**
+  > These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:
+  @@ NEEDS RULING
 - **`lpn_ex_net1_scn_desc`**
   > Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.
   @@ NEEDS RULING
 - **`lpn_ex_net1_scn_title`**
   > EPANET Net1 with scenarios, gpm (US)
+  @@ NEEDS RULING
+- **`lpn_ex_valves_desc`**
+  > Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.
+  @@ NEEDS RULING
+- **`lpn_ex_valves_title`**
+  > Valve types, gpm (US)
   @@ NEEDS RULING
 - **`lpn_export_holds_base`**
   > It holds the Base scenario only.
@@ -49,6 +61,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_geojson_results_other`**
   > No results are included, because the results on screen belong to the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
+- **`lpn_gpv_one_point_note`**
+  > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
+  @@ NEEDS RULING
 - **`lpn_guide_cmp_byasset_def`**
   > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box.</p>
   @@ NEEDS RULING
@@ -111,7 +126,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**75 still to read**, of 79 new keys across 10 unmerged branch(es).
+**80 still to read**, of 84 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -121,8 +136,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### chore/batch-1018b (`daca5dac7`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -178,27 +191,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > {file} is too large to keep in browser storage, so it was not attached.
   @@ NEEDS RULING
 
-### feat/native-pbv-gpv (`9655a14fe`) — 5 new, 5 to read @@ NEEDS RULING
-
-- **`lpn_diag_gpv_curve_order`**
-  > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
-  @@ NEEDS RULING
-- **`lpn_diag_valve_conflict`**
-  > These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:
-  @@ NEEDS RULING
-- **`lpn_ex_valves_desc`**
-  > Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.
-  @@ NEEDS RULING
-- **`lpn_ex_valves_title`**
-  > Valve types, gpm (US)
-  @@ NEEDS RULING
-- **`lpn_gpv_one_point_note`**
-  > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
-  @@ NEEDS RULING
-
-### feat/scenario-example (`a6afa080a`) — already merged into chore/batch-1018b; its strings are listed there
-
-### feat/scenario-results (`4db53980e`) — adds no English strings
+### feat/native-pbv-gpv (`9655a14fe`) — adds no English strings
 
 ### feat/sqlite-reader (`9470877a6`) — 49 new, 49 to read @@ NEEDS RULING
 
@@ -381,4 +374,37 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_theme_space`**
   > Space
+  @@ NEEDS RULING
+
+### fix/settings-map-layout (`bc00393d2`) — 10 new, 10 to read @@ NEEDS RULING
+
+- **`lpn_settings_grp_angle`**
+  > Angle
+  @@ NEEDS RULING
+- **`lpn_settings_grp_fade`**
+  > Fade
+  @@ NEEDS RULING
+- **`lpn_settings_grp_positions`**
+  > Positions
+  @@ NEEDS RULING
+- **`lpn_settings_grp_resets`**
+  > Resets
+  @@ NEEDS RULING
+- **`lpn_settings_grp_show`**
+  > Show
+  @@ NEEDS RULING
+- **`lpn_settings_grp_size`**
+  > Size
+  @@ NEEDS RULING
+- **`lpn_settings_grp_thematic`**
+  > Thematic
+  @@ NEEDS RULING
+- **`lpn_settings_grp_zoom`**
+  > Zoom
+  @@ NEEDS RULING
+- **`lpn_settings_map_drawing`**
+  > Drawing
+  @@ NEEDS RULING
+- **`lpn_settings_map_options`**
+  > Options
   @@ NEEDS RULING

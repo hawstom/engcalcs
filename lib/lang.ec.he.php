@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='הושמטו מהרצה זו כי אין מהם מ
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='מוריד את פותר EPANET. הוא מורד פעם אחת ונשמר במכשיר זה, כך שהוא יעבוד לא מקוון לאחר מכן.';
 $ec_lang['lpn_engine_ready']='פותר EPANET נמצא כעת במכשיר זה, ופועל לא מקוון.';
-$ec_lang['lpn_engine_fetching_valve']='מוריד את פותר EPANET, כדי שניתן יהיה לפתור שסתום זה כעת וגם לא מקוון בהמשך.';
-$ec_lang['lpn_engine_ready_valve']='פותר EPANET נמצא כעת במכשיר הזה. אפשר כעת לפתור שסתומים שוברי לחץ ושסתומים כלליים (PBV, GPV) גם לא מקוון.';
 $ec_lang['lpn_engine_unavailable']='לא ניתן היה להוריד את פותר EPANET, הנדרש לפתרון שסתומים שוברי לחץ ושסתומים כלליים (PBV, GPV). לאחר התחברות אחת לאינטרנט, הפותר נשמר במכשיר הזה.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='הפותר נטען ב-{percent}%.';
 $ec_lang['lpn_engine_wait_bytes']='הפותר נטען עד כה ב-{kb} KB. הסך הכולל אינו זמין, כך שאחוז ההשלמה אינו ידוע.';
 $ec_lang['lpn_engine_needed_failed']='פותר EPANET עדיין לא נטען, אינו יכול להיטען, ורשת זו ניתנת לפתרון רק על ידו. הוא ייטען כאשר תהיו מחוברים לאינטרנט.';
 $ec_lang['lpn_engine_needed_failed_why']='רשת זו ניתנת לפתרון רק בפותר EPANET. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='אלה שסתומים שוברי לחץ או שסתומים כלליים, ורק פותר EPANET יכול לחשב אותם. לא ניתן היה לטעון את פותר EPANET, ולכן התוצאות האלה חסרות:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='שסתומים אלה מחוברים ישירות למאגר או למכל, הקובע את קו העומד ההידראולי בצומת זה, ולכן אין לשסתום מה לבקר. הוסיפו צינור קצר בין השסתום למאגר או למכל:';
 $ec_lang['lpn_diag_not_converged']='לא נמצא פתרון. בדקו ערכים בלתי אפשריים במציאות, כגון קוטר אפס.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} מוצג הפותר המובנה ב�
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='נפתר באמצעות פותר EPANET, בגלל השסתומים השוברי לחץ והשסתומים הכלליים האלה:';
 $ec_lang['lpn_unit_unknown']='שרטוט זה קובע יחידה שעמוד זה אינו תומך בה: {unit}. כל הערכים נשמרים ומוצגים בדיוק כפי שיובאו, ודבר לא שונה. אי אפשר לחשב דבר עד שהיחידה תיתמך, מפני שמקדם ההמרה שלה אינו ידוע.';
 $ec_lang['lpn_engine_manning_note']='הערה: עם חספוס Manning,‏ EPANET מעגל את הקבוע במשוואת Manning, כך שאובדן הלחץ יוצא נמוך בכ-0.6% מהצורה המדויקת.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------

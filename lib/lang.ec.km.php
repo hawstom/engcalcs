@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='ត្រូវបានលុបចេញពី�
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='កំពុងទាញយកឧបករណ៍ដោះស្រាយ EPANET។ វាត្រូវបានទាញយកតែម្ដង ហើយបន្ទាប់មករក្សាទុកនៅក្នុងឧបករណ៍នេះ ដូច្នេះវាដំណើរការដោយគ្មានអ៊ីនធឺណិតបន្ទាប់ពីនោះ។';
 $ec_lang['lpn_engine_ready']='ឧបករណ៍ដោះស្រាយ EPANET ស្ថិតនៅក្នុងឧបករណ៍នេះឥឡូវនេះ ហើយដំណើរការដោយគ្មានអ៊ីនធឺណិត។';
-$ec_lang['lpn_engine_fetching_valve']='កំពុងទាញយកឧបករណ៍ដោះស្រាយ EPANET ដូច្នេះវ៉ាល់នេះអាចដោះស្រាយបានឥឡូវនេះ និងដោយគ្មានអ៊ីនធឺណិតនៅពេលក្រោយ។';
-$ec_lang['lpn_engine_ready_valve']='ឧបករណ៍ដោះស្រាយ EPANET ឥឡូវនេះត្រូវបានរក្សាទុកនៅលើឧបករណ៍នេះ។ វ៉ាល់បំបែកសម្ពាធ និងវ៉ាល់គោលបំណងទូទៅ (PBV, GPV) អាចដោះស្រាយបានក្រៅបណ្ដាញឥឡូវនេះ។';
 $ec_lang['lpn_engine_unavailable']='មិនអាចទាញយកឧបករណ៍ដោះស្រាយ EPANET បានទេ ដែលត្រូវការដើម្បីដោះស្រាយវ៉ាល់បំបែកសម្ពាធ និងវ៉ាល់គោលបំណងទូទៅ (PBV, GPV)។ បន្ទាប់ពីតភ្ជាប់អ៊ីនធឺណិតម្ដង ឧបករណ៍ដោះស្រាយត្រូវបានរក្សាទុកនៅលើឧបករណ៍នេះ។';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='ឧបករណ៍ដោះស្រាយប�
 $ec_lang['lpn_engine_wait_bytes']='ឧបករណ៍ដោះស្រាយបានផ្ទុក {kb} KB រហូតមកដល់ពេលនេះ។ ចំនួនសរុបមិនមានទេ ដូច្នេះភាគរយនៃការបញ្ចប់មិនស្គាល់ទេ។';
 $ec_lang['lpn_engine_needed_failed']='ឧបករណ៍ដោះស្រាយ EPANET មិនទាន់ត្រូវបានផ្ទុកនៅឡើយទេ មិនអាចផ្ទុកបានទេ ហើយបណ្ដាញនេះអាចដោះស្រាយបានដោយវាតែប៉ុណ្ណោះ។ វានឹងត្រូវបានផ្ទុកនៅពេលអ្នកភ្ជាប់អ៊ីនធឺណិត។';
 $ec_lang['lpn_engine_needed_failed_why']='បណ្ដាញនេះអាចដោះស្រាយបានដោយឧបករណ៍ដោះស្រាយ EPANET តែប៉ុណ្ណោះ។ {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='ទាំងនេះជាវ៉ាល់បំបែកសម្ពាធ ឬវ៉ាល់គោលបំណងទូទៅ ហើយមានតែឧបករណ៍ដោះស្រាយ EPANET ប៉ុណ្ណោះដែលអាចគណនាវាបាន។ មិនអាចផ្ទុកឧបករណ៍ដោះស្រាយ EPANET បានទេ ដូច្នេះលទ្ធផលទាំងនេះបាត់៖';
 $ec_lang['lpn_diag_valve_on_fixed_head']='វ៉ាល់ទាំងនេះតភ្ជាប់ដោយផ្ទាល់ទៅអាងស្តុក ឬធុងទឹក ដែលកំណត់ក្បាលទឹកនៅថ្នាំងនោះ ដូច្នេះវ៉ាល់គ្មានអ្វីត្រូវត្រួតត្រាទេ។ សូមដាក់បំពង់ខ្លីមួយរវាងវ៉ាល់ និងអាងស្តុក ឬធុងទឹក៖';
 $ec_lang['lpn_diag_not_converged']='រកមិនឃើញដំណោះស្រាយទេ។ សូមពិនិត្យរកតម្លៃដែលមិនអាចមានក្នុងជីវិតពិត ដូចជាអង្កត់ផ្ចិតសូន្យ។';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} កំពុងបង្ហាញឧ
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='ដោះស្រាយដោយឧបករណ៍ដោះស្រាយ EPANET ដោយសារវ៉ាល់បំបែកសម្ពាធ និងវ៉ាល់គោលបំណងទូទៅទាំងនេះ៖';
 $ec_lang['lpn_unit_unknown']='គំនូរនេះចែងខ្នាតដែលទំព័រនេះមិនគាំទ្រ៖ {unit}។ តម្លៃទាំងអស់ត្រូវបានរក្សាទុក និងបង្ហាញយ៉ាងពិតប្រាកដតាមដែលបាននាំចូល ហើយគ្មានអ្វីត្រូវបានផ្លាស់ប្ដូរទេ។ គ្មានអ្វីអាចគណនាបានទេ រហូតដល់ខ្នាតត្រូវបានគាំទ្រ ព្រោះកត្តាបម្លែងរបស់វាមិនស្គាល់។';
 $ec_lang['lpn_engine_manning_note']='ចំណាំ៖ ជាមួយភាពក្រញ៉ោងម៉ាន់នីង EPANET បង្គត់ថេរក្នុងសមីការម៉ាន់នីង ដូច្នេះការបាត់បង់ក្បាលទឹកទាបជាងទម្រង់ពិតប្រាកដប្រហែល 0.6%។';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------

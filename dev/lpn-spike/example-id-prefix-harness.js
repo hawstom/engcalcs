@@ -36,7 +36,7 @@ ok('the examples folder holds the ten shipped examples', files.length === 10, fi
 // links are bare numbers, so its link labels keep L.
 const EXPECT = {
 	'Basic-example-US-units.lwn': ['', ''], 'Basic-example-SI-units.lwn': ['', ''],
-	'Elm-Street-Center.lwn': ['', 'L']
+	'Elm-Street-Center.lwn': ['', 'L'], 'Valves.lwn': ['', '']
 };
 files.forEach(function (f) {
 	const want = EXPECT[f] || ['N', 'L'];

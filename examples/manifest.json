@@ -78,6 +78,21 @@
             "thumb": "Elm-Street-Center.svg"
         },
         {
+            "file": "Valves.lwn",
+            "order": -3,
+            "titleKey": "lpn_ex_valves_title",
+            "descKey": "lpn_ex_valves_desc",
+            "title": "Valve types, gpm (US)",
+            "description": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
+            "system": "us",
+            "coords": "xy",
+            "work": "design",
+            "flow": "gpm",
+            "nodes": 14,
+            "links": 13,
+            "thumb": "Valves.svg"
+        },
+        {
             "file": "Net1-Scenarios.lwn",
             "order": -2,
             "titleKey": "lpn_ex_net1_scn_title",

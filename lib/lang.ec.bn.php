@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='এই রান থেকে বাদ দেও�
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='EPANET সমাধানকারী ডাউনলোড করা হচ্ছে। এটি একবার ডাউনলোড হয় এবং তারপর এই ডিভাইসে সংরক্ষিত থাকে, তাই পরে এটি অফলাইনেও কাজ করে।';
 $ec_lang['lpn_engine_ready']='EPANET সমাধানকারী এখন এই ডিভাইসে সংরক্ষিত এবং অফলাইনে কাজ করে।';
-$ec_lang['lpn_engine_fetching_valve']='EPANET সমাধানকারী ডাউনলোড করা হচ্ছে, যাতে এই ভালভটি এখনই এবং পরে অফলাইনেও সমাধান করা যায়।';
-$ec_lang['lpn_engine_ready_valve']='EPANET সমাধানকারী এখন এই ডিভাইসে সংরক্ষিত। চাপ ব্রেকার ও সাধারণ-উদ্দেশ্য ভালভ (PBV, GPV) এখন অফলাইনে সমাধান করা যায়।';
 $ec_lang['lpn_engine_unavailable']='EPANET সমাধানকারী ডাউনলোড করা যায়নি, যা চাপ ব্রেকার ও সাধারণ-উদ্দেশ্য ভালভ (PBV, GPV) সমাধান করতে প্রয়োজন। ইন্টারনেটে একবার সংযুক্ত হলে সমাধানকারী এই ডিভাইসে সংরক্ষিত থাকে।';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='সমাধানকারী {percent}% ল�
 $ec_lang['lpn_engine_wait_bytes']='সমাধানকারী এখন পর্যন্ত {kb} KB লোড হয়েছে। মোট পরিমাণ পাওয়া যাচ্ছে না, তাই সম্পূর্ণতার শতাংশ অজানা।';
 $ec_lang['lpn_engine_needed_failed']='EPANET সমাধানকারী এখনও লোড হয়নি, লোড করা যাচ্ছে না, এবং এই নেটওয়ার্ক শুধুমাত্র এটি দিয়েই সমাধান করা যায়। আপনি ইন্টারনেটে সংযুক্ত থাকলে এটি লোড হবে।';
 $ec_lang['lpn_engine_needed_failed_why']='এই নেটওয়ার্ক শুধু EPANET সমাধানকারী দিয়েই সমাধান করা যায়। {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='এগুলো চাপ ব্রেকার বা সাধারণ-উদ্দেশ্য ভালভ, এবং শুধু EPANET সমাধানকারীই এগুলো হিসাব করতে পারে। EPANET সমাধানকারী লোড করা যায়নি, তাই এই ফলাফলগুলো নেই:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='এই ভালভগুলো সরাসরি একটি জলাধার বা ট্যাংকের সাথে যুক্ত, যা ওই নোডে হাইড্রোলিক গ্রেড নির্ধারণ করে দেয়, তাই ভালভের নিয়ন্ত্রণ করার মতো কিছু নেই। ভালভ এবং জলাধার বা ট্যাংকের মাঝে একটি ছোট পাইপ বসান:';
 $ec_lang['lpn_diag_not_converged']='কোনো সমাধান পাওয়া যায়নি। বাস্তবে অসম্ভব মান আছে কিনা পরীক্ষা করুন, যেমন শূন্য ব্যাস।';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} এর পরিবর্তে ব�
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='EPANET সমাধানকারী দিয়ে সমাধান করা হয়েছে, এই চাপ ব্রেকার ও সাধারণ-উদ্দেশ্য ভালভগুলোর কারণে:';
 $ec_lang['lpn_unit_unknown']='এই অঙ্কনে এমন একটি একক উল্লেখ আছে যা এই পেজ সমর্থন করে না: {unit}। সব মান যেমন আমদানি করা হয়েছে ঠিক তেমন রাখা ও দেখানো হয়েছে, এবং কিছুই বদলানো হয়নি। একক সমর্থিত না হওয়া পর্যন্ত কিছু হিসাব করা যায় না, কারণ এর রূপান্তর গুণক জানা নেই।';
 $ec_lang['lpn_engine_manning_note']='দ্রষ্টব্য: ম্যানিং রাফনেসের ক্ষেত্রে EPANET ম্যানিং সমীকরণের ধ্রুবকটি রাউন্ড করে, তাই হেড ক্ষতি সঠিক রূপের চেয়ে প্রায় 0.6% কম হয়।';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------

@@ -108,6 +108,7 @@ function exampleWork($name) {
 		'Basic-example-SI-units.lwn' => 'design',
 		'Basic-example-US-units.lwn' => 'design',
 		'Elm-Street-Center.lwn' => 'design',
+		'Valves.lwn' => 'design',
 		'Net1.lwn' => 'maintenance',
 		'Net1-SI.lwn' => 'maintenance',
 		'Net1-Scenarios.lwn' => 'maintenance',

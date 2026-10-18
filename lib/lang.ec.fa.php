@@ -2712,8 +2712,6 @@ $ec_lang['lpn_omitted_note']='از این اجرا کنار گذاشته شدن�
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='در حال دانلود حل‌کنندهٔ EPANET. یک‌بار دانلود می‌شود و سپس روی این دستگاه ذخیره می‌شود، پس پس از آن بدون اینترنت کار می‌کند.';
 $ec_lang['lpn_engine_ready']='حل‌کنندهٔ EPANET اکنون روی این دستگاه ذخیره شده و بدون اینترنت کار می‌کند.';
-$ec_lang['lpn_engine_fetching_valve']='در حال دانلود حل‌کنندهٔ EPANET، تا این شیر اکنون و بعداً بدون اینترنت حل شود.';
-$ec_lang['lpn_engine_ready_valve']='حل‌کنندهٔ EPANET اکنون روی این دستگاه ذخیره شده است. شیرهای شکستن فشار و شیرهای عمومی (PBV، GPV) اکنون می‌توانند بدون اینترنت حل شوند.';
 $ec_lang['lpn_engine_unavailable']='دانلود حل‌کنندهٔ EPANET ممکن نشد، که برای حل شیرهای شکستن فشار و شیرهای عمومی (PBV، GPV) لازم است. پس از یک‌بار اتصال به اینترنت، حل‌کننده روی این دستگاه ذخیره می‌شود.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2731,7 +2729,6 @@ $ec_lang['lpn_engine_wait_pct']='حل‌کننده {percent}٪ بارگذاری 
 $ec_lang['lpn_engine_wait_bytes']='تاکنون {kb} کیلوبایت از حل‌کننده بارگذاری شده. مجموع در دسترس نیست، پس درصد تکمیل نامشخص است.';
 $ec_lang['lpn_engine_needed_failed']='حل‌گر EPANET هنوز بارگذاری نشده، نمی‌تواند بارگذاری شود، و این شبکه تنها با آن قابل حل است. هنگامی‌که به اینترنت متصل باشید بارگذاری خواهد شد.';
 $ec_lang['lpn_engine_needed_failed_why']='این شبکه را فقط حل‌کنندهٔ EPANET می‌تواند حل کند. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='این‌ها شیرهای شکستن فشار یا شیرهای عمومی‌اند، و فقط حل‌کنندهٔ EPANET می‌تواند آن‌ها را محاسبه کند. حل‌کنندهٔ EPANET بارگذاری نشد، پس این نتیجه‌ها وجود ندارند:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='این شیرها مستقیماً به یک مخزن یا تانک متصل‌اند، که خط تراز هیدرولیکی را در آن گره ثابت می‌کند، پس شیر چیزی برای کنترل ندارد. یک لولهٔ کوتاه میان شیر و مخزن یا تانک قرار دهید:';
 $ec_lang['lpn_diag_not_converged']='هیچ جوابی یافت نشد. مقدارهایی را که از نظر فیزیکی ناممکن‌اند بررسی کنید، مانند قطر صفر.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3590,7 +3587,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} به‌جای آن حل‌کننده
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='با حل‌کنندهٔ EPANET حل شد، به‌سبب این شیرهای شکستن فشار و شیرهای عمومی:';
 $ec_lang['lpn_unit_unknown']='این ترسیم واحدی را بیان می‌کند که این صفحه ارائه نمی‌دهد: {unit}. همه‌چیز درست همان‌گونه که وارد شده نگه داشته و نمایش داده می‌شود، و چیزی تغییر نکرده است. تا وقتی این صفحه آن واحد را نشناسد، هیچ محاسبه‌ای انجام نمی‌شود، چون نمی‌داند بزرگی یکی از آن‌ها چقدر است.';
 $ec_lang['lpn_engine_manning_note']='توجه: با زبری مانینگ، EPANET ثابت معادلهٔ مانینگ را گرد می‌کند، پس افت هد حدود 0.6٪ کمتر از شکل دقیق است.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------

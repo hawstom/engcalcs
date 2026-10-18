@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='Исключены из этого расчёта,
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='Загрузка расчётного ядра EPANET. Оно загружается один раз и затем хранится на этом устройстве, поэтому после этого работает без подключения к интернету.';
 $ec_lang['lpn_engine_ready']='Расчётное ядро EPANET теперь хранится на этом устройстве и работает без подключения к интернету.';
-$ec_lang['lpn_engine_fetching_valve']='Загрузка расчётного ядра EPANET, чтобы этот клапан можно было рассчитать сейчас и без подключения к интернету позже.';
-$ec_lang['lpn_engine_ready_valve']='Расчётное ядро EPANET теперь хранится на этом устройстве. Клапаны-гасители давления и клапаны общего назначения (PBV, GPV) теперь можно рассчитывать без подключения к интернету.';
 $ec_lang['lpn_engine_unavailable']='Не удалось загрузить расчётное ядро EPANET, которое необходимо для расчёта клапанов-гасителей давления и клапанов общего назначения (PBV, GPV). После одного подключения к интернету ядро хранится на этом устройстве.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='Расчётное ядро загружено 
 $ec_lang['lpn_engine_wait_bytes']='Расчётное ядро загружено на данный момент: {kb} КБ. Общий размер недоступен, поэтому процент выполнения неизвестен.';
 $ec_lang['lpn_engine_needed_failed']='Решатель EPANET ещё не загружен, не может быть загружен, а эту сеть может решить только он. Он будет загружен, когда у вас появится подключение к интернету.';
 $ec_lang['lpn_engine_needed_failed_why']='Эту сеть может рассчитать только расчётное ядро EPANET. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='Это клапаны-гасители давления или клапаны общего назначения, и рассчитать их может только расчётное ядро EPANET. Расчётное ядро EPANET не удалось загрузить, поэтому следующие результаты отсутствуют:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='Эти клапаны присоединены непосредственно к резервуару или баку, которые фиксируют гидравлический напор в этом узле, поэтому клапану нечем управлять. Вставьте короткую трубу между клапаном и резервуаром или баком:';
 $ec_lang['lpn_diag_not_converged']='Решение не найдено. Проверьте физически невозможные значения, например нулевой диаметр.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} Вместо этого показа
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='Рассчитано расчётным ядром EPANET из-за следующих клапанов-гасителей давления и клапанов общего назначения:';
 $ec_lang['lpn_unit_unknown']='В этом чертеже указана единица измерения, которую эта страница не поддерживает: {unit}. Все значения сохранены и показаны точно так, как импортированы, ничего не изменено. Расчёт невозможен, пока единица не поддерживается, потому что её коэффициент пересчёта неизвестен.';
 $ec_lang['lpn_engine_manning_note']='Примечание: при шероховатости по Маннингу EPANET округляет константу в формуле Маннинга, поэтому потери напора примерно на 0,6% меньше, чем по точной формуле.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------

@@ -339,10 +339,10 @@ console.log('\n--- model -> .inp -> model ---');
 		pb && pb.settingUnit === 'press', pb && pb.settingUnit);
 	ok('...and its fully-open minor loss', pb && pb.k === 1.5, pb && pb.k);
 
-	// Neither is native: both switch their own state inside the iteration, so both route to EPANET.
-	ok('both are EPANET-only, like every other active type',
-		!EngCalcs.lpnValveIsNative({ type: 'valve', valveType: 'PBV' }) &&
-		!EngCalcs.lpnValveIsNative({ type: 'valve', valveType: 'GPV' }));
+	// Both solve in either engine since Task 733 phase 2 (native-pbv-gpv-harness.js holds them).
+	ok('both are the built-in solver\'s fixed-law valves, since Task 733',
+		EngCalcs.lpnValveIsFixedLaw({ type: 'valve', valveType: 'PBV' }) &&
+		EngCalcs.lpnValveIsFixedLaw({ type: 'valve', valveType: 'GPV' }));
 }
 
 // ---------------------------------------------------------------------------
@@ -373,10 +373,9 @@ console.log('\n--- the native solver ---');
 		EngCalcs.lpnLinkK({ type: 'pipe', k: 3 }) === 3 &&
 		EngCalcs.lpnLinkK({ type: 'valve', valveType: 'PRV', setting: 40, k: 3 }) === 3);
 
-	// AN ACTIVE VALVE IS REFUSED BY NAME. This is the message a user meets when the EPANET module
-	// cannot be loaded (offline, blocked), and the whole reason this page writes its own
-	// diagnostics instead of surfacing EPANET's numbered errors.
-	const prvModel = {
+	// A CURVELESS GPV IS AN OPEN CONNECTION (Task 733; Tom, 2026-10-18), solved natively exactly as
+	// EPANET solves the zero-loss TCV js/lpn-epanet.js hands it, and refused by nobody.
+	const gpvModel = {
 		method: 'hw',
 		nodes: [
 			{ id: 'R', type: 'reservoir', elev: 0, head: 100 },
@@ -385,31 +384,15 @@ console.log('\n--- the native solver ---');
 		],
 		links: [
 			{ id: 'L1', type: 'pipe', from: 'R', to: 'J1', length: 200, diameter: 0.25, roughness: 130, k: 0, status: 'open' },
-			{ id: 'V7', type: 'valve', valveType: 'PBV', from: 'J1', to: 'J2', length: 0, diameter: 0.25, roughness: 150, setting: 40, k: 0, status: 'open' }
+			{ id: 'V7', type: 'valve', valveType: 'GPV', from: 'J1', to: 'J2', length: 0, diameter: 0.25, roughness: 150, setting: 0, k: 4, status: 'open', curvePoints: [] }
 		]
 	};
-	// A PBV, since Task 733 taught the built-in solver PRV, PSV and FCV (native-valve-harness.js
-	// holds those to EPANET); a pressure breaker is still EPANET's alone.
-	ok('a PBV is not native', !EngCalcs.lpnValveIsNative(prvModel.links[1]));
-	ok('a PRV, a PSV and an FCV are', ['PRV', 'PSV', 'FCV'].every((t) =>
-		EngCalcs.lpnValveIsNative({ type: 'valve', valveType: t })));
-	ok('a TCV is', EngCalcs.lpnValveIsNative({ type: 'valve', valveType: 'TCV' }));
-	ok('a pipe is', EngCalcs.lpnValveIsNative({ type: 'pipe' }));
-	ok('lpnEpanetOnlyValves names it', EngCalcs.lpnEpanetOnlyValves(prvModel).join(',') === 'V7');
-
-	const nativeIssues = EngCalcs.lpnDiagnose(prvModel, { engine: 'native' });
-	const refusal = nativeIssues.filter((i) => i.code === 'valve-needs-epanet')[0];
-	ok('the native engine refuses it', !!refusal, JSON.stringify(nativeIssues));
-	ok('...NAMING the valve', refusal && refusal.ids.join(',') === 'V7');
-	const solved = EngCalcs.lpnSolve(prvModel);
-	ok('...and lpnSolve carries that refusal out, rather than solving it wrong',
-		!solved.ok && solved.issues.some((i) => i.code === 'valve-needs-epanet'));
-
-	// AND THE EPANET PATH MUST NOT INHERIT THE REFUSAL. A caller that names no engine is asking
-	// "is this network sound?", which a PBV network is.
-	ok('a caller that names no engine gets no such issue',
-		EngCalcs.lpnDiagnose(prvModel).every((i) => i.code !== 'valve-needs-epanet'),
-		JSON.stringify(EngCalcs.lpnDiagnose(prvModel)));
+	ok('a curveless GPV is no fault for either engine', EngCalcs.lpnDiagnose(gpvModel).length === 0 &&
+		EngCalcs.lpnDiagnose(gpvModel, { engine: 'native' }).length === 0, JSON.stringify(EngCalcs.lpnDiagnose(gpvModel)));
+	const gpvSolved = EngCalcs.lpnSolve(gpvModel);
+	ok('...and solves natively as an open connection, its k ignored as a TCV\'s is',
+		gpvSolved.ok && gpvSolved.converged && Math.abs(gpvSolved.heads.J1 - gpvSolved.heads.J2) < 1e-4,
+		gpvSolved.ok ? String(gpvSolved.heads.J1 - gpvSolved.heads.J2) : JSON.stringify(gpvSolved.issues));
 
 	// EPANET's own placement rule, checked for BOTH engines because it is a fact about the drawing.
 	const onTank = {

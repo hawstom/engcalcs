@@ -92,6 +92,9 @@ const SOURCE_OF = {
 	// Net1.lwn re-saved by the page with a scenario tree (build_scenario_example.js): derived from a
 	// curated example, not imported, so its reference is scenario-example-harness.js and Net1.lwn.
 	'Net1-Scenarios.lwn': null,
+	// Valves.lwn is imported from dev/scripts/valve_example.inp by build_valve_example.js; its source is
+	// kept beside the builder, not in the reference folder, so the audit has no reference to compare.
+	'Valves.lwn': null,
 	// Net2 is Tom's own georeferenced project file (a Branford, Connecticut placement of EPA's Net2
 	// that he saved from the page), so the geographic placement, the labels and the text objects are
 	// the curation; Net2.inp is its source model.

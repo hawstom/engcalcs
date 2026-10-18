@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='له دې چلون څخه پاتې شول ځکه �
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='د EPANET حل کوونکی ډاونلوډ کیږي. یو ځل ډاونلوډ کیږي او بیا په دې وسیله کې ساتل کیږي، نو وروسته آفلاین کار کوي.';
 $ec_lang['lpn_engine_ready']='د EPANET حل کوونکی اوس په دې وسیله کې ساتل شوی او آفلاین کار کوي.';
-$ec_lang['lpn_engine_fetching_valve']='د EPANET حل کوونکی ډاونلوډ کیږي، ترڅو دا والو اوس او وروسته آفلاین حل شي.';
-$ec_lang['lpn_engine_ready_valve']='د EPANET حل کوونکی اوس په دې وسیله کې ساتل شوی. د فشار ماتوونکی او عمومي موخې والوونه (PBV، GPV) اوس آفلاین حل کیدی شي.';
 $ec_lang['lpn_engine_unavailable']='د EPANET حل کوونکی ډاونلوډ نشو، چې د فشار ماتوونکی او عمومي موخې والوونو (PBV، GPV) د حل لپاره اړین دی. له انټرنیټ سره د یوې اړیکې وروسته، حل کوونکی په دې وسیله کې ساتل کیږي.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='حل کوونکی {percent}% بار شوی.';
 $ec_lang['lpn_engine_wait_bytes']='حل کوونکی تر اوسه {kb} KB بار شوی. ټول اندازه شتون نلري، نو د بشپړتیا سلنه نامعلومه ده.';
 $ec_lang['lpn_engine_needed_failed']='د EPANET حل کوونکی تر اوسه نه دی بار شوی، نشي بارېدلی، او دا شبکه یوازې د هغه لخوا حل کیدلی شي. کله چې انټرنیټ سره وصل شئ نو بار به شي.';
 $ec_lang['lpn_engine_needed_failed_why']='دا شبکه یوازې د EPANET حل کوونکي حلولی شي. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='دا د فشار ماتوونکی یا عمومي موخې والوونه دي، او یوازې د EPANET حل کوونکی یې محاسبه کولی شي. د EPANET حل کوونکی نشو پورته کیدی، نو دا پایلې ورک دي:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='دا والوونه مستقیم له یوې ذخیرې یا ټانک سره وصل دي، چې په هغه نقطه کې هیدرولیکي کچه ټاکي، نو والو د کنټرول لپاره هیڅ نه لري. د والو او ذخیرې یا ټانک ترمنځ یو لنډ پایپ کېږدئ:';
 $ec_lang['lpn_diag_not_converged']='هیڅ حل ونه موندل شو. هغه ارزښتونه وګورئ چې په حقیقي ژوند کې ناممکن دي، لکه د صفر قطر.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} پر ځای یې دننه جوړ ش�
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='د EPANET حل کوونکي سره حل شو، د دې فشار ماتوونکی او عمومي موخې والوونو له امله:';
 $ec_lang['lpn_unit_unknown']='دا رسم یو واحد بیانوي چې دا پاڼه یې نه وړاندې کوي: {unit}. هرڅه لکه څنګه چې راغلي ساتل او ښودل کیږي، او هیڅ شی نه دی بدل شوی. تر هغه پورې چې دا پاڼه هغه واحد نه پیژني هیڅ ځواب نشي ورکړل کیدی، ځکه چې د هغه د اندازې پوهیدو لاره نشته.';
 $ec_lang['lpn_engine_manning_note']='یادونه: د مانینګ خشونت سره، EPANET د مانینګ په معادله کې ثابت ګرد کوي، نو د سر ضیاع د دقیقې بڼې په پرتله شاوخوا 0.6٪ ټیټه ده.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------

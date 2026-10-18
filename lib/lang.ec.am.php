@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='ወደ ማጠራቀሚያ ወይም ታንክ የ�
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='የEPANET ፈታች በማውረድ ላይ። አንድ ጊዜ ወርዶ በዚህ መሣሪያ ላይ ይቀመጣል፣ ስለዚህ ከዚያ በኋላ ከመስመር ውጭም ይሠራል።';
 $ec_lang['lpn_engine_ready']='የEPANET ፈታች አሁን በዚህ መሣሪያ ላይ ተቀምጧል፣ ከመስመር ውጭም ይሠራል።';
-$ec_lang['lpn_engine_fetching_valve']='የEPANET ፈታች በማውረድ ላይ፣ ይህ ቫልቭ አሁን እና በኋላ ከመስመር ውጭም ሊፈታ እንዲችል።';
-$ec_lang['lpn_engine_ready_valve']='የEPANET ፈታች አሁን በዚህ መሣሪያ ላይ ተቀምጧል። የግፊት መስበሪያ እና አጠቃላይ ዓላማ ቫልቮች (PBV፣ GPV) አሁን ከመስመር ውጭ ሊፈቱ ይችላሉ።';
 $ec_lang['lpn_engine_unavailable']='የግፊት መስበሪያ እና አጠቃላይ ዓላማ ቫልቮችን (PBV፣ GPV) ለመፍታት የሚያስፈልገውን የEPANET ፈታች ማውረድ አልተቻለም። ከኢንተርኔት ጋር አንድ ጊዜ ከተገናኙ በኋላ ፈታቹ በዚህ መሣሪያ ላይ ይቀመጣል።';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='ፈታች {percent}% ተጭኗል።';
 $ec_lang['lpn_engine_wait_bytes']='ፈታች እስካሁን {kb} ኪባ ተጭኗል። ጠቅላላው መጠን ስለማይታወቅ የተጠናቀቀው መቶኛ አይታወቅም።';
 $ec_lang['lpn_engine_needed_failed']='የEPANET ፈታች እስካሁን አልተጫነም፣ ሊጫንም አልቻለም፣ ይህ መረብ ደግሞ በእሱ ብቻ ሊፈታ ይችላል። ከኢንተርኔት ጋር ሲገናኙ ይጫናል።';
 $ec_lang['lpn_engine_needed_failed_why']='ይህ መረብ በEPANET ፈታች ብቻ ሊፈታ ይችላል። {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='እነዚህ የግፊት መስበሪያ ወይም አጠቃላይ ዓላማ ቫልቮች ናቸው፣ የEPANET ፈታች ብቻ ነው ሊያሰላቸው የሚችለው። የEPANET ፈታች ሊጫን አልቻለም፣ ስለዚህ እነዚህ ውጤቶች የሉም፦';
 $ec_lang['lpn_diag_valve_on_fixed_head']='እነዚህ ቫልቮች በቀጥታ ከማጠራቀሚያ ወይም ከታንክ ጋር ይገናኛሉ፣ ይህም በዚያ ነጥብ ላይ የሃይድሮሊክ ደረጃን ይወስናል፣ ስለዚህ ቫልቩ የሚቆጣጠረው ምንም የለም። በቫልቩና በማጠራቀሚያው ወይም በታንኩ መካከል አጭር ቧንቧ ያስገቡ፦';
 $ec_lang['lpn_diag_not_converged']='መፍትሄ አልተገኘም። እንደ ዜሮ ዲያሜትር ያሉ በእውነታው የማይቻሉ ዋጋዎችን ያረጋግጡ።';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} በምትኩ አብሮ የተሰራ�
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='በEPANET ፈታች ተፈትቷል፣ በእነዚህ የግፊት መስበሪያ እና አጠቃላይ ዓላማ ቫልቮች ምክንያት፦';
 $ec_lang['lpn_unit_unknown']='ይህ ስዕል ይህ ገጽ የማይደግፈውን መለኪያ ክፍል ይገልጻል፦ {unit}። ሁሉም ዋጋዎች እንደገቡ በትክክል ተጠብቀው ይታያሉ፣ ምንም አልተለወጠም። የመለወጫ ቅንጅቱ ስለማይታወቅ መለኪያ ክፍሉ እስኪደገፍ ድረስ ምንም ሊሰላ አይችልም።';
 $ec_lang['lpn_engine_manning_note']='ማስታወሻ፦ የማኒንግ ሻካሪነት ሲጠቀሙ፣ EPANET በማኒንግ እኩልታ ውስጥ ያለውን ቋሚ ቁጥር ስለሚያጠጋጋ፣ የሄድ ኪሳራው ከትክክለኛው ስሌት በግምት 0.6% ያንሳል።';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
