@@ -25,7 +25,7 @@
      "parent": "Import…"
     },
     {
-     "id": "file/file_import_menu/file_export_item_inp",
+     "id": "file/file_import_menu/file_import_inp",
      "label": "EPANET file…",
      "parent": "Import…"
     },
@@ -55,7 +55,7 @@
      "parent": "Import…"
     },
     {
-     "id": "file/file_import_menu/file_export_item_workspace",
+     "id": "file/file_import_menu/file_import_workspace",
      "label": "Workspace…",
      "parent": "Import…"
     },
@@ -227,7 +227,7 @@
      "parent": "Background image…"
     },
     {
-     "id": "map/backdrop_menu/fitting_remove",
+     "id": "map/backdrop_menu/backdrop_remove",
      "label": "Remove",
      "parent": "Background image…"
     },
@@ -547,6 +547,37 @@
     {
      "id": "scenario/scenario_delete",
      "label": "Delete scenario",
+     "parent": ""
+    }
+   ]
+  },
+  {
+   "id": "tab",
+   "label": "Project tab",
+   "commands": [
+    {
+     "id": "tab/project_rename",
+     "label": "Rename",
+     "parent": ""
+    },
+    {
+     "id": "tab/tab_duplicate",
+     "label": "Duplicate",
+     "parent": ""
+    },
+    {
+     "id": "tab/tab_move_left",
+     "label": "Move left",
+     "parent": ""
+    },
+    {
+     "id": "tab/tab_move_right",
+     "label": "Move right",
+     "parent": ""
+    },
+    {
+     "id": "tab/close",
+     "label": "Close",
      "parent": ""
     }
    ]

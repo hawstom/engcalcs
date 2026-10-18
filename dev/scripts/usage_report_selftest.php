@@ -396,7 +396,7 @@ $sigRows = array(
     "2026-10-11T00:00:00Z{$T}Looped-Network{$T}fr{$T}fr{$T}lpn{$T}cmd:tb/add-pump{$T}{$C2}{$T}visitor",
     "2026-10-11T00:00:01Z{$T}Looped-Network{$T}en{$T}en-us{$T}lpn{$T}cmd:tb/add-pump{$T}visit",
     "2026-10-11T00:00:02Z{$T}Looped-Network{$T}en{$T}en-us{$T}lpn{$T}cmd:tb/add-pump{$T}visit",
-    "2026-10-11T00:00:03Z{$T}Looped-Network{$T}en{$T}en-us{$T}lpn{$T}cmd:tab/tab_duplicate{$T}visit",
+    "2026-10-11T00:00:03Z{$T}Looped-Network{$T}en{$T}en-us{$T}lpn{$T}cmd:profile/profile_new{$T}visit",
     "2026-10-11T00:00:04Z{$T}Looped-Network{$T}en{$T}en-us{$T}lpn{$T}first:example{$T}visit",
 );
 file_put_contents("$dir2/engcalcs-signal.log", implode("\n", $sigRows) . "\n");
@@ -418,8 +418,8 @@ ec_ur_expect('a command nobody pressed is listed with zeros',
     isset($byId['edit/edit_delete_network']) && $byId['edit/edit_delete_network']['uses'] === 0
     && $byId['edit/edit_delete_network']['loads'] === 0 && $byId['edit/edit_delete_network']['browsers'] === 0);
 ec_ur_expect('an id the list does not know is shown, marked as not in the list, under its own menu',
-    isset($byId['tab/tab_duplicate']) && $byId['tab/tab_duplicate']['listed'] === false
-    && $byId['tab/tab_duplicate']['loads'] === 1 && isset($cmdRows['tab']));
+    isset($byId['profile/profile_new']) && $byId['profile/profile_new']['listed'] === false
+    && $byId['profile/profile_new']['loads'] === 1 && isset($cmdRows['profile']));
 ec_ur_expect('the cmd: rows stay out of the general signal series; the other lpn row stays in it',
     $rep2['series']['signal']['bucketTotals'] === array('visitor' => 0, 'visit' => 1),
     json_encode($rep2['series']['signal']['bucketTotals']));
@@ -436,9 +436,9 @@ $d2 = new DOMDocument();
 @$d2->loadHTML($html2);
 $x2 = new DOMXPath($d2);
 $cell = function ($id) use ($x2) {
-    foreach ($x2->query('//tr[td/code]') as $tr) {
-        $code = $tr->getElementsByTagName('code')->item(0);
-        if ($code && $code->textContent === $id) {
+    foreach ($x2->query('//table[thead/tr/th[.="uses (said yes)"]]//tr[td[@title]]') as $tr) {
+        $td = $tr->getElementsByTagName('td')->item(0);
+        if ($td->getAttribute('title') === $id) {
             $o = array();
             foreach ($tr->childNodes as $c) { if ($c->nodeName === 'td') { $o[] = trim($c->textContent); } }
             return $o;
@@ -446,14 +446,28 @@ $cell = function ($id) use ($x2) {
     }
     return null;
 };
+// The top block is the first table after its heading: path, browsers, page loads, most used first.
+$top = array();
+foreach ($x2->query('//h3[contains(., "Used in this window")]/following-sibling::table[1]//tr[td]') as $tr) {
+    $o = array();
+    foreach ($tr->childNodes as $c) { if ($c->nodeName === 'td') { $o[] = trim($c->textContent); } }
+    $top[] = $o;
+}
+ec_ur_expect('the top block lists the three used commands, most used first, buckets in separate columns',
+    count($top) === 3 && $top[0][0] === 'Toolbar, Pump' && $top[0][1] === '2' && $top[0][2] === '2'
+    && $top[1][1] === '1' && $top[1][2] === '0' && strpos($top[1][0], 'New project') !== false
+    && $top[2][1] === '0' && $top[2][2] === '1', json_encode($top));
+ec_ur_expect('the top block has three cells a row: no sum of the two buckets',
+    count($top) > 0 && count($top[0]) === 3);
 $pump = $cell('tb/add-pump');
-ec_ur_expect('the rendered row for the toolbar pump button reads 2 browsers, 2 uses, 2 page loads',
+ec_ur_expect('the by-menu row for the toolbar pump button reads 2 browsers, 2 uses, 2 page loads',
     $pump && $pump[1] === '2' && $pump[2] === '2' && $pump[3] === '2' && strpos($pump[0], 'Pump') !== false,
     json_encode($pump));
-$zero = $cell('map/clean_map');
-ec_ur_expect('an unused command renders as a row of zeros with its English label',
-    $zero && $zero[1] === '0' && $zero[2] === '0' && $zero[3] === '0' && strpos($zero[0], 'Clean map') !== false,
-    json_encode($zero));
+$unusedTxt = '';
+foreach ($x2->query('//p[@class="unused"]/span[@title="map/clean_map"]') as $sp) { $unusedTxt = $sp->textContent; }
+ec_ur_expect('an unused command is listed under "Not used in this window" with its English label, id in the tooltip',
+    $unusedTxt === 'Clean map', $unusedTxt);
+ec_ur_expect('an unused command has no row in a used table', $cell('map/clean_map') === null);
 foreach (glob("$dir2/{,.}*", GLOB_BRACE) ?: array() as $f) { if (is_file($f)) { @unlink($f); } }
 @rmdir($dir2);
 

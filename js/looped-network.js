@@ -49067,24 +49067,39 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// given or told to do is not visible here at all: `fn` runs after the id is taken.
 	var menuGroup = '';
 	var cmdKeyByLabel = null;
-	function cmdKeyFor(label) {
-		var pc, k, v;
+	// Where several keys carry the same words (Import > EPANET file... and Export > EPANET file...
+	// are two keys with one English text), the key sharing most name tokens with the PARENT's key
+	// wins, so an import row is named import_ and an export row export_. Ties go to the first key.
+	function cmdKeyFor(label, hint) {
+		var pc, k, v, list, best = '', bestScore = -1, want, i, sc;
 		if (!cmdKeyByLabel) {
 			cmdKeyByLabel = {};
 			pc = EngCalcs.pageConfig || {};
 			for (k in pc) {
 				v = pc[k];
-				if (typeof v === 'string' && k.indexOf('lpn_') === 0 && v && !cmdKeyByLabel.hasOwnProperty(v)) { cmdKeyByLabel[v] = k.slice(4); }
+				if (typeof v === 'string' && k.indexOf('lpn_') === 0 && v) {
+					if (!cmdKeyByLabel.hasOwnProperty(v)) { cmdKeyByLabel[v] = []; }
+					cmdKeyByLabel[v].push(k.slice(4));
+				}
 			}
 		}
 		v = String(label || '').replace(/^[\u2713\u26A0*\s]+/, '');
-		return cmdKeyByLabel.hasOwnProperty(v) ? cmdKeyByLabel[v] : '';
+		if (!cmdKeyByLabel.hasOwnProperty(v)) { return ''; }
+		list = cmdKeyByLabel[v];
+		want = String(hint || '').split('_');
+		for (i = 0; i < list.length; i++) {
+			sc = list[i].split('_').filter(function (t) { return t !== 'menu' && t !== 'item' && want.indexOf(t) >= 0; }).length;
+			if (sc > bestScore) { bestScore = sc; best = list[i]; }
+		}
+		return best;
 	}
 	function commandId(group, parentRow, row) {
-		var k = row ? cmdKeyFor(row.label) : '', p = '';
-		if (!group || !k || row.variable) { return ''; }
-		if (parentRow) { p = cmdKeyFor(parentRow.label); if (!p) { return ''; } p += '/'; }
-		return group + '/' + p + k;
+		var p = '', k;
+		if (!group || !row || row.variable) { return ''; }
+		if (parentRow) { p = cmdKeyFor(parentRow.label, group); if (!p) { return ''; } }
+		k = cmdKeyFor(row.label, p || group);
+		if (!k) { return ''; }
+		return group + '/' + (p ? p + '/' : '') + k;
 	}
 	function logCommandUse(id) {
 		if (id && EngCalcs.logSignal) { EngCalcs.logSignal('lpn', 'cmd:' + id); }
@@ -49096,7 +49111,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return '';
 	}
+	var menuCapture = null;   // set by lpnCommandCatalog() to read a menu's rows without opening it
 	function openMenu(anchor, rows, level, group) {
+		if (menuCapture) { menuCapture.push(rows); return; }
 		menuRestoreSeq++;
 		var els = menuEls(level), popup = els.popup, list = els.list;
 		if (!popup || !list) { return; }
@@ -81521,6 +81538,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			walk(m[0], guideMenuLabel('lpn_menu_' + m[0]), rows, null);
 		});
 		walk('scenario', pc.lpn_scenario_menu || 'Scenarios', scenarioMenuRows(), null);
+		try {
+			menuCapture = [];
+			if (library && library.openId) { openProjectMenu(library.openId, document.body); }
+			walk('tab', 'Project tab', menuCapture[0] || [], null);
+		} catch (err3) { /* the tab menu is listed when it can be built */ }
+		menuCapture = null;
 		toolbarIconIndex.forEach(function (b) {
 			var id = toolbarCommandId(b.el);
 			if (id) { out.push({ id: id, group: 'tb', groupLabel: 'Toolbar', parent: '', label: String(b.name || '') }); }

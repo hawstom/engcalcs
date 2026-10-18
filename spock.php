@@ -206,6 +206,8 @@ svg.chart .tick { font-size: 9px; fill: #777; font-family: ui-monospace, monospa
 footer { margin-top: 3rem; border-top: 1px solid var(--rule); padding-top: .8rem;
          font-size: .85rem; color: #555; }
 code { background: #f2f2f2; padding: 0 .2rem; }
+h4 { font-size: .95rem; margin: 1rem 0 .2rem; }
+p.unused { color: #777; font-size: .85rem; margin: .2rem 0 .8rem; }
 </style>
 </head>
 <body>
@@ -312,7 +314,7 @@ ur_table($signal, 'detail', 'Signal detail', 'log/engcalcs-signal.log, field 6',
 <p class="src">log/engcalcs-signal.log, rows whose field 5 is lpn and whose field 6 begins cmd:. One
 row per command per page load, taken when a menu command or a toolbar button is chosen. Only which
 command, never what it was given or which property or value was chosen in it. Commands nobody used
-in this window are listed with zeros, from lib/lpn-commands.json; that file and this log name the
+in this window are listed as not used, from lib/lpn-commands.json; that file and this log name the
 Looped Network page, which is also the EPANET++ page (both log the same page name, so they cannot
 be told apart here).</p>
 <?php
@@ -321,16 +323,43 @@ $cmdTot = $report['commands']['bucketTotals'];
 if (!$cmdTot['visitor'] && !$cmdTot['visit']) {
     echo '<p class="none">No command rows in this window.</p>';
 }
-foreach ($cmdGroups as $g) {
-    echo '<h3>' . ur_h($g['label']) . '</h3>';
-    echo '<table><thead><tr><th>command (and its id)</th><th>browsers (said yes)</th><th>uses (said yes)</th>'
+$cmdUsed = ecUsageCommandUsed($cmdGroups);
+echo '<h3>Used in this window, most used first</h3>';
+if (!$cmdUsed) {
+    echo '<p class="none">No command was used in this window.</p>';
+} else {
+    echo '<table><thead><tr><th>command</th><th>browsers (said yes)</th>'
        . '<th>page loads (everyone else)</th></tr></thead><tbody>';
-    foreach ($g['rows'] as $r) {
-        echo '<tr><td>' . ($r['parent'] !== '' ? ur_h($r['parent']) . ' &rsaquo; ' : '') . ur_h($r['label'])
-           . ($r['listed'] ? '' : ' <em>(not in the command list)</em>') . ' <code>' . ur_h($r['id'])
-           . '</code></td><td>' . $r['browsers'] . '</td><td>' . $r['uses'] . '</td><td>' . $r['loads'] . '</td></tr>';
+    foreach ($cmdUsed as $r) {
+        echo '<tr><td title="' . ur_h($r['id']) . '">' . ur_h($r['path']) . '</td><td>' . $r['browsers']
+           . '</td><td>' . $r['loads'] . '</td></tr>';
     }
     echo '</tbody></table>';
+}
+echo '<h3>By menu, in menu order</h3><p class="src">Hover a command to see its id in the log.</p>';
+foreach ($cmdGroups as $g) {
+    $used = array(); $unused = array();
+    foreach ($g['rows'] as $r) { if ($r['uses'] || $r['loads']) { $used[] = $r; } else { $unused[] = $r; } }
+    echo '<h4>' . ur_h($g['label']) . '</h4>';
+    if ($used) {
+        echo '<table><thead><tr><th>command</th><th>browsers (said yes)</th><th>uses (said yes)</th>'
+           . '<th>page loads (everyone else)</th></tr></thead><tbody>';
+        foreach ($used as $r) {
+            echo '<tr><td title="' . ur_h($r['id']) . '">' . ($r['parent'] !== '' ? ur_h($r['parent']) . ', ' : '')
+               . ur_h($r['label']) . ($r['listed'] ? '' : ' <em>(not in the command list)</em>')
+               . '</td><td>' . $r['browsers'] . '</td><td>' . $r['uses'] . '</td><td>' . $r['loads'] . '</td></tr>';
+        }
+        echo '</tbody></table>';
+    }
+    if ($unused) {
+        echo '<p class="unused">Not used in this window: ';
+        $bits = array();
+        foreach ($unused as $r) {
+            $bits[] = '<span title="' . ur_h($r['id']) . '">' . ($r['parent'] !== '' ? ur_h($r['parent']) . ', ' : '')
+                    . ur_h($r['label']) . '</span>';
+        }
+        echo implode('; ', $bits) . '.</p>';
+    }
 }
 ?>
 

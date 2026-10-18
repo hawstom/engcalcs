@@ -581,3 +581,29 @@ function ecUsageCommandRows(array $series, array $catalog)
     }
     return $out;
 }
+
+/**
+ * The commands used in the window, flat and most used first, as plain-words rows: path
+ * ("Water, Analyze, Fire flow analysis..."), id, browsers, uses and page loads. Ordered by browsers
+ * (said yes), then page loads, then uses, then path; the two buckets are columns, never added.
+ * $groups is ecUsageCommandRows()'s result.
+ */
+function ecUsageCommandUsed(array $groups)
+{
+    $out = array();
+    foreach ($groups as $g) {
+        foreach ($g['rows'] as $r) {
+            if (!$r['uses'] && !$r['loads']) { continue; }
+            $out[] = array(
+                'path' => $g['label'] . ', ' . ($r['parent'] !== '' ? $r['parent'] . ', ' : '') . $r['label'],
+                'id' => $r['id'], 'browsers' => $r['browsers'], 'uses' => $r['uses'], 'loads' => $r['loads']);
+        }
+    }
+    usort($out, function ($a, $b) {
+        if ($a['browsers'] !== $b['browsers']) { return $b['browsers'] - $a['browsers']; }
+        if ($a['loads'] !== $b['loads']) { return $b['loads'] - $a['loads']; }
+        if ($a['uses'] !== $b['uses']) { return $b['uses'] - $a['uses']; }
+        return strcmp($a['path'], $b['path']);
+    });
+    return $out;
+}

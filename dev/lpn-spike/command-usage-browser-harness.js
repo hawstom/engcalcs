@@ -107,7 +107,7 @@ async function main() {
 			ids.every((id) => ('cmd:' + id).replace(keep, '') === 'cmd:' + id && ('cmd:' + id).length <= cap),
 			ids.filter((id) => ('cmd:' + id).length > cap || ('cmd:' + id).replace(keep, '') !== 'cmd:' + id).join(', '));
 		ok('the five menus, the scenario menu and the toolbar are all present',
-			['file', 'edit', 'map', 'project', 'help', 'scenario', 'tb'].every((g) => cat.some((c) => c.group === g)));
+			['file', 'edit', 'map', 'project', 'help', 'scenario', 'tab', 'tb'].every((g) => cat.some((c) => c.group === g)));
 		const want = catalogJson(cat);
 		if (WRITE) {
 			fs.writeFileSync(CATALOG_FILE, want);
