@@ -36,8 +36,8 @@
 			var h = key.charAt(0) === 'n' ? nodeEls[key.slice(2)] : linkEls[key.slice(2)], r, c = svg.getBoundingClientRect(), x0, y0, x1, y1;
 			if (!h || !h.text) { return null; }
 			r = h.text.getBoundingClientRect();
-			x0 = Math.max(c.left, r.left - 90); y0 = Math.max(c.top, r.top - 70);
-			x1 = Math.min(c.right, r.right + 90); y1 = Math.min(c.bottom, r.bottom + 70);
+			x0 = Math.max(c.left, r.left - 170); y0 = Math.max(c.top, r.top - 110);
+			x1 = Math.min(c.right, r.right + 170); y1 = Math.min(c.bottom, r.bottom + 110);
 			return { x: x0, y: y0, width: x1 - x0, height: y1 - y0 };
 		},
 		read: function (tolPx, ambPx) {
