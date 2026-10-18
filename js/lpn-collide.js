@@ -1321,7 +1321,7 @@ EngCalcs.lpnCollide = (function () {
 		// The last sweep, and the whole of the pass when `clean` is off: the first clear side, a pipe
 		// under it or not, else the first side held only by labels this one outranks, else a drop.
 		function placeAny0(lbl, from, a0) {
-			var sides = sidesOf(lbl), i, c, b, verdict, fallback = null, fallbackBox = null, fallbackAt = a0;
+			var sides = sidesOf(lbl), i, c, b, verdict, fallback = null, fallbackBox = null, fallbackAt = a0, fallbackAcross = false;
 			var at = a0;
 			index.near(a0.x, a0.y, lbl._reach, local);
 			for (i = from || 0; i < sides.length; i++) {
@@ -1346,10 +1346,13 @@ EngCalcs.lpnCollide = (function () {
 					// kept as the fallback, taken if no clearer side follows.
 					if (verdict !== 'clear') { continue; }
 					if (strictOk(lbl, c, b, true)) { return commit(lbl, sides, c, b); }
-					// Not across another pipe, though: lying on it, a label reads as that pipe's whatever
-					// its leader says (pre-review, 2026-10-18, Net1's "Q=1866.2" on pipe 111).
-					if (!fallback && !(lbl.ownLink !== undefined && boxesOnLink(b, local, lbl.id)) && strictOk(lbl, c, b)) {
-						fallback = c; fallbackBox = b; fallbackAt = lbl.anchor;
+					// Across another pipe it reads as that pipe's whatever its leader says (pre-review,
+					// 2026-10-18, Net1's "Q=1866.2" on pipe 111), so such a side is the last resort,
+					// taken only where nothing else stands -- better than hiding the label (Net1's
+					// pipe 11, whose only room lies across its neighbours).
+					if ((!fallback || fallbackAcross) && strictOk(lbl, c, b)) {
+						var across = lbl.ownLink !== undefined && boxesOnLink(b, local, lbl.id);
+						if (!fallback || !across) { fallback = c; fallbackBox = b; fallbackAt = lbl.anchor; fallbackAcross = across; }
 					}
 					continue;
 				}

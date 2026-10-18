@@ -2718,7 +2718,7 @@ var EngCalcs = EngCalcs || {};
 	// COST: one strict first-fit over the labels tried, against the drawing; no node re-fit.
 	var LPN_INLINE_MAX_VIEW_FRAC = 0.25;
 	function insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list) {
-		var ground = { boxes: obs.boxes.slice(), segments: obs.segments.slice() }, byId = {}, min = leaderThreshold(), specs = [], out;
+		var ground = { boxes: obs.boxes.slice().concat(viewFrameBoxes()), segments: obs.segments.slice() }, byId = {}, min = leaderThreshold(), specs = [], out;
 		nodeLabels.forEach(function (sp) { byId[sp.id] = sp; });
 		placed.forEach(function (r) {
 			var sp = byId[r.id];
@@ -2742,6 +2742,29 @@ var EngCalcs = EngCalcs || {};
 			Object.assign(byId[id], it.spec);
 		});
 		return { placed: placed.map(function (r) { return res[r.id] || r; }), took: took };
+	}
+	// **A ONE-LINE LABEL LIES ON THE MAP AND OFF ITS FURNITURE** (pre-review, 2026-10-18: on a 390 px
+	// phone a line ran off the map's right edge and under the labels legend). The map's edges, as four
+	// boxes outside it, and every overlay on it (mapFurnitureRects(): the legends, the strips, the
+	// chip), in drawing units, as obstacles for insertInlineNodeLabels() alone: a stack is placed as
+	// it always was, and a line that would leave the map or sit under its furniture is not taken.
+	function viewFrameBoxes() {
+		var W = (svg && svg.clientWidth) || 0, H = (svg && svg.clientHeight) || 0, s0 = state.s || 1, out = [], big, cr;
+		if (!(W > 0) || !(H > 0)) { return out; }
+		function wx(px) { return (px - state.tx) / s0; }
+		function wy(py) { return (py - state.ty) / s0; }
+		function add(l, t, r, b) {
+			var c = Collide.box((wx(l) + wx(r)) / 2, (wy(t) + wy(b)) / 2, (r - l) / s0, (b - t) / s0, 0);
+			c.kind = 'symbol'; out.push(c);
+		}
+		big = Math.max(W, H);
+		add(-big, -big, 0, H + big); add(W, -big, W + big, H + big);
+		add(0, -big, W, 0); add(0, H, W, H + big);
+		try { cr = svg.getBoundingClientRect ? svg.getBoundingClientRect() : null; } catch (e) { cr = null; }
+		if (cr && cr.width > 0) {
+			mapFurnitureRects(cr).forEach(function (f) { add(f.l, f.t, f.r, f.b); });
+		}
+		return out;
 	}
 	// A drag frame's half: the labels that hold a line are set in it again, exactly as the content
 	// pass set them (it placed the same stacks first).

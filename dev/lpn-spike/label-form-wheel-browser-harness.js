@@ -94,11 +94,13 @@ const SCENES = [
 		named: [] },
 	{ key: 'n600', name: '600-junction downtown', file: 'dev/lpn-spike/fixtures/plain-downtown-n600-seed71.lwn', fit: true,
 		node: NET3_NODE, link: NET3_LINK, notches: [0, 6], named: [] },
-	{ key: 'net1', name: 'Net1 (gallery, US), zoomed out', cardKey: 'lpn_ex_net1_title', node: ['id', 'demand', 'elev', 'pressure'],
-		link: ['flow'], outToPipe: { id: '113', px: 54 }, notches: [0, 10], named: ['113'], shotAt: 0,
-		// Ten notches back in (four out from the card's view, Perry's notch 4): pipe 11's label is
-		// shown, and pipe 10's does not sit nearer pipe 11 than its own.
-		at10: { shown: ['11'], ownNearest: ['10'] } },
+	// Net1 wheeled OUT one notch at a time from the card's view, settling at each (Perry's path, and
+	// Tom's: his 2026-10-18 screenshot is 14 notches out, where pipe 113 showed no label with open
+	// ground east of it). At 4 out, pipe 11's label is shown and pipe 10's does not sit nearer pipe
+	// 111 than its own.
+	{ key: 'net1', name: 'Net1 (gallery, US), wheeled out', cardKey: 'lpn_ex_net1_title', node: ['id', 'demand', 'elev', 'pressure'],
+		link: ['flow'], step: true, notches: [-4, -14], named: ['113'], shotAt: -14,
+		at: { notch: -4, shown: ['11'], ownNearest: ['10'] } },
 	{ key: 'phone', name: 'Net3 (gallery, gpm) on a 390 px phone', cardKey: 'lpn_ex_net3_title', node: NET3_NODE, link: NET3_LINK,
 		notches: [3, 6], named: [], viewport: { width: 390, height: 844 } }
 ].filter((sc) => (process.env.LABEL_FORM_SCENES || 'net3,net1,phone').split(',').indexOf(sc.key) >= 0);
@@ -163,7 +165,10 @@ async function layOut(Session, browser, sc, mode, opts) {
 		const views = [], shotAt = sc.shotAt !== undefined ? sc.shotAt : sc.notches[sc.notches.length - 1];
 		let at = 0, named = {};
 		for (const k of sc.notches) {
-			await wheel(a.page, k - at); at = k;
+			if (sc.step) {
+				for (let i = 0; i < Math.abs(k - at); i++) { await wheel(a.page, k > at ? 1 : -1); await a.settle(900); }
+			} else { await wheel(a.page, k - at); }
+			at = k;
 			await a.settle(1500);
 			const v = await a.page.evaluate(([tol, amb]) => window.__lpnForm.read(tol, amb), [TOL_PX, AMBIG_PX]);
 			v.notch = k;
@@ -172,7 +177,7 @@ async function layOut(Session, browser, sc, mode, opts) {
 				named = await a.page.evaluate((ids) => window.__lpnForm.named(ids), sc.named);
 				if (opts && opts.shots && mode.shipped) {
 					fs.mkdirSync(opts.shots, { recursive: true });
-					await a.page.screenshot({ path: path.join(opts.shots, sc.key + '-' + (sc.outToPipe ? (out - k) + '-out' : k + '-in') + '.png') });
+					await a.page.screenshot({ path: path.join(opts.shots, sc.key + '-' + (k < 0 ? -k + '-out' : k + '-in') + '.png') });
 					for (const nm of (opts.clips && opts.clips[sc.key]) || []) {
 						const r = await a.page.evaluate((id) => window.__lpnForm.clipOf(id), nm);
 						if (r) { await a.page.screenshot({ path: path.join(opts.shots, sc.key + '-' + nm.replace(/[^A-Za-z0-9]+/g, '') + '.png'), clip: r }); }
@@ -250,11 +255,11 @@ async function main() {
 			for (const ref of refs) { extra.push({ ref, r: await layOut(Session, browser, sc, { ref }) }); }
 			on.views.forEach((v, i) => {
 				const w = off.views[i];
-				console.log(`        ${sc.outToPipe ? (on.out - v.notch) + ' out' : v.notch + ' in'}: shipped   ${row(v)}`);
-				console.log(`        ${' '.repeat(String(sc.outToPipe ? (on.out - v.notch) + ' out' : v.notch + ' in').length)}  reference ${row(w)}`);
+				console.log(`        ${v.notch < 0 ? -v.notch + ' out' : v.notch + ' in'}: shipped   ${row(v)}`);
+				console.log(`        ${' '.repeat(String(v.notch < 0 ? -v.notch + ' out' : v.notch + ' in').length)}  reference ${row(w)}`);
 				extra.forEach((e) => console.log(`          ${e.ref.padEnd(9)} ${row(e.r.views[i])}`));
 				console.log(`          e.g. one-line node labels ${v.ex.nodeInline.slice(0, 6).join(' ')}; leadered stacks ${v.ex.levelStacked.slice(0, 6).join(' ')}; leadered one-line ${v.ex.levelInline.slice(0, 6).join(' ')}`);
-				const tag = sc.name + ', ' + (sc.outToPipe ? (on.out - v.notch) + ' notches out' : v.notch + ' notches in');
+				const tag = sc.name + ', ' + (v.notch < 0 ? -v.notch + ' notches out' : v.notch + ' notches in');
 				// N1 that the reference draws too is not this work's: hand-placed labels on Net1 (Tom's
 				// screenshot: N10 and N11) and master's own node labels; it is printed in the row.
 				ok(tag + ': N1 = 0 for level pipe labels and one-line node labels, and no more N1 than the reference', v.N1mine.length === 0 && v.N1.length <= w.N1.length,
@@ -279,11 +284,11 @@ async function main() {
 			});
 			const A = on.views[on.views.length - 1];
 			const sum = (vs, k) => vs.reduce((t, v) => t + v[k], 0);
-			if (sc.at10) {
-				const v10 = on.views.find((v) => v.notch === 10);
-				sc.at10.shown.forEach((id) => ok(sc.name + ', 4 notches out: pipe ' + id + "'s label is shown", !!v10.pipeShown[id]));
-				sc.at10.ownNearest.forEach((id) => ok(sc.name + ', 4 notches out: pipe ' + id + "'s label, if level, is nearest its own pipe",
-					!v10.levelNear[id] || v10.levelNear[id].own <= v10.levelNear[id].other, JSON.stringify(v10.levelNear[id] || 'along')));
+			if (sc.at) {
+				const va = on.views.find((v) => v.notch === sc.at.notch), tg = sc.name + ', ' + (-sc.at.notch) + ' notches out';
+				sc.at.shown.forEach((id) => ok(tg + ': pipe ' + id + "'s label is shown", !!va.pipeShown[id]));
+				sc.at.ownNearest.forEach((id) => ok(tg + ': pipe ' + id + "'s label, if level, is nearest its own pipe",
+					!va.levelNear[id] || va.levelNear[id].own <= va.levelNear[id].other, JSON.stringify(va.levelNear[id] || 'along')));
 			}
 			ok(sc.name + ': the same view twice is the same drawing (a content pass where it stands)', on.again.sig === A.sig, firstDiff(A.sig, on.again.sig));
 			ok(sc.name + ': ...and the per-notch bank puts the notch back exactly (out two and back in two, twice)', on.back2.sig === on.back.sig, firstDiff(on.back.sig, on.back2.sig));
