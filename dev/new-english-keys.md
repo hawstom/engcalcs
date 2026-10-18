@@ -25,18 +25,9 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## Plain sentences to check  (1, 1 to read @@ NEEDS RULING)
+## Plain sentences to check  (0, none are stale)
 
-**These are your translator notes in `dev/plain-sentences.md`, not visitor wording.** Each was written
-against English that has since changed, or against a key that no longer exists. Say which: keep it
-as is, change it (give the new text), or remove it. CC applies your answer to the file.
-
-- **`consent_body`**
-  > May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.
-  *Why stale:* the English changed after this entry was written
-  *Written against:* May we save a random code in this browser so that we can count how many browsers use each part of this site? The code is made up on the spot, says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first.
-  *Current plain sentence:* May we save, store, keep, or put a random code, a string of letters and digits chosen by chance, in this browser so that we can count or tally how many browsers use each part of this site? The code is made up on the spot, created at that moment, says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first.
-  @@ NEEDS RULING
+Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
 None on master. Every English key here is present in at least one other language.
 
@@ -55,7 +46,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/roadmap-1017n (`574e7b9b3`) — adds no English strings
+### chore/roadmap-1017n (`39544b9fc`) — adds no English strings
 
 ### docs/import-export-scenario (`e19c09d2e`) — already merged into chore/roadmap-1017n; its strings are listed there
 
@@ -63,13 +54,13 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### docs/msx (`6ff053272`) — already merged into chore/roadmap-1017n; its strings are listed there
 
-### docs/privacy-plain (`fc3e5ddbc`) — adds no English strings
+### docs/privacy-plain (`8c5738a0f`) — adds no English strings
 
-### feat/command-usage (`8ff233b91`) — adds no English strings
+### feat/command-usage (`2746d27e6`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/label-beside (`79a4a98e0`) — adds no English strings
+### feat/label-beside (`8676cd1be`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 

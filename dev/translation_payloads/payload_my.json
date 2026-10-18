@@ -542,7 +542,7 @@
         }
     },
     "key_plain": {
-        "consent_body": "May we save, store, keep, or put a random code, a string of letters and digits chosen by chance, in this browser so that we can count or tally how many browsers use each part of this site? The code is made up on the spot, created at that moment, says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first."
+        "consent_body": "May we save, store, or keep a random code, a string of letters and digits chosen by chance, in this browser, so that we do not count you, or this browser, a second time? The code is made up on the spot, created at that moment, says nothing about you or your device, and records nothing you enter."
     },
     "key_notes": [],
     "key_concepts": {
