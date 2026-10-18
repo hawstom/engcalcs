@@ -119,7 +119,9 @@ function colour(v) {
 function readBlock(css) {
 	const a = css.indexOf('/* ec-colour-tokens:begin */'), b = css.indexOf('/* ec-colour-tokens:end */');
 	if (a < 0 || b < a) { throw new Error('theme_contrast_check: the token block markers are missing'); }
-	const text = css.slice(a, b).replace(/\/\*[\s\S]*?\*\//g, '');
+	// The theme blocks sit in `@media screen { ... }` (print is Light); the wrapper is dropped here, and its
+	// closing brace is skipped by the rule pattern below.
+	const text = css.slice(a, b).replace(/\/\*[\s\S]*?\*\//g, '').replace(/@media screen\s*\{/g, '');
 	const rules = [];
 	text.replace(/([^{}]+)\{([^{}]*)\}/g, (m, sel, body) => {
 		const decls = {};
@@ -137,7 +139,10 @@ function baseRule(rules) {
 function tokensFor(rules, theme) {
 	const base = baseRule(rules), set = Object.assign({}, base.decls);
 	rules.forEach((r) => {
-		if (r !== base && r.sel.split(',').map((s) => s.trim()).indexOf(':root[data-theme="' + theme + '"]') >= 0) { Object.assign(set, r.decls); }
+		const sels = r.sel.split(',').map((s) => s.trim());
+		const applies = sels.indexOf(':root[data-theme="' + theme + '"]') >= 0 ||
+			(theme !== 'light' && theme !== 'print' && sels.indexOf(':root:where([data-theme]:not([data-theme="light"]))') >= 0);
+		if (r !== base && applies) { Object.assign(set, r.decls); }
 	});
 	return set;
 }

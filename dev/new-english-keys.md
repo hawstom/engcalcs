@@ -1084,7 +1084,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Theme
   _Ruled OK 2026-10-17._
 - **`lpn_settings_theme_tip`**
-  > Choose the colors of the page. Point at a theme to see it on the page, and click it to keep it. System follows the settings of your device. The map drawing looks the same in every theme. This is a setting for this browser, not for the project.
+  > Choose the look of the page: its colors and, in some themes, its shapes and type. Each card shows the theme on this page before it is chosen. System follows the settings of the device. The map drawing stays as it is in every theme. This is a setting for this browser, not for the project.
   @@ NEEDS RULING
 - **`lpn_settings_units_one_project`**
   > Units are the same in every scenario.
@@ -1322,7 +1322,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**74 still to read**, of 77 new keys across 12 unmerged branch(es).
+**77 still to read**, of 80 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -1333,13 +1333,15 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/sprint-1017 (`a2f8af97f`) — adds no English strings
+### chore/handoff-1017s (`7c9fb5582`) — already merged into chore/sprint-1017; its strings are listed there
+
+### chore/sprint-1017 (`39f3d7147`) — adds no English strings
 
 ### docs/label-port (`7ec7a65cf`) — already merged into feat/label-beside; its strings are listed there
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/label-beside (`f35eb0041`) — adds no English strings
+### feat/label-beside (`3f21650fc`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a9071`) — 3 new, all ruled
 
@@ -1363,13 +1365,13 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c40`) — adds no English strings
 
-### feat/sheet-sync (`7e5cafa3e`) — 74 new, 74 to read @@ NEEDS RULING
+### feat/sheet-sync (`1c77e44cd`) — 77 new, 77 to read @@ NEEDS RULING
 
 - **`lpn_file_export_item_scnbook`**
   > Scenario workbook…
   @@ NEEDS RULING
 - **`lpn_file_export_scnbook_tip`**
-  > Download the scenarios and their alternatives as one .xlsx workbook: a Scenarios sheet naming the parent of each scenario and the alternative it uses in each category, an Alternatives sheet, a sheet for each category of asset values holding the overrides of each alternative by asset ID, and a Settings sheet. Values are as stored, in the project units, with the unit in each heading. Base values are the network itself and are not included. Edit it in a spreadsheet program, then read it back with File, Import, Import scenario workbook.
+  > Download the scenarios, their alternatives, and the overrides of each alternative as one .xlsx workbook, in the project units. Edit it in a spreadsheet program. Read it back with File, Import, Import scenario workbook.
   @@ NEEDS RULING
 - **`lpn_file_import_scnbook`**
   > Import scenario workbook…
@@ -1398,17 +1400,26 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_scnbook_col_alternative`**
   > Alternative
   @@ NEEDS RULING
+- **`lpn_scnbook_col_assets`**
+  > Assets
+  @@ NEEDS RULING
 - **`lpn_scnbook_col_change`**
   > Change
   @@ NEEDS RULING
 - **`lpn_scnbook_col_demands`**
   > Demand categories
   @@ NEEDS RULING
+- **`lpn_scnbook_col_fingerprint`**
+  > Asset ID check
+  @@ NEEDS RULING
 - **`lpn_scnbook_col_path`**
   > Path
   @@ NEEDS RULING
 - **`lpn_scnbook_col_project`**
   > In the project
+  @@ NEEDS RULING
+- **`lpn_scnbook_col_project_name`**
+  > Project
   @@ NEEDS RULING
 - **`lpn_scnbook_col_reason`**
   > Reason
@@ -1455,6 +1466,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_scnbook_no_unit`**
   > no unit
   @@ NEEDS RULING
+- **`lpn_scnbook_other_project`**
+  > This workbook was made from the project {book} ({n} assets), and the open project is {project} ({m} assets). Check that the workbook belongs to this project before applying its changes.
+  @@ NEEDS RULING
 - **`lpn_scnbook_pick`**
   > {scenario}: {category}
   @@ NEEDS RULING
@@ -1485,17 +1499,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_scnbook_sheet_alternatives`**
   > Alternatives
   @@ NEEDS RULING
+- **`lpn_scnbook_sheet_project`**
+  > Project
+  @@ NEEDS RULING
 - **`lpn_scnbook_value`**
   > {alternative}, {asset} {id}: {property}
   @@ NEEDS RULING
-- **`lpn_scnbook_why_asset_kind`**
-  > There is no kind of asset called {asset}, so this row was not used.
-  @@ NEEDS RULING
 - **`lpn_scnbook_why_asset_twice`**
   > A second row for {asset} {id} in this alternative. Only the first was read.
-  @@ NEEDS RULING
-- **`lpn_scnbook_why_base_name`**
-  > The name of Base is not changed by a workbook.
   @@ NEEDS RULING
 - **`lpn_scnbook_why_base_settings`**
   > The settings of Base are the project's own; change them in the Settings box. This row was not used.
@@ -1513,7 +1524,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > The column {column} is not a property of {category}, so its values were not read.
   @@ NEEDS RULING
 - **`lpn_scnbook_why_column_unit`**
-  > The column {column} is in {unit}, and this project uses {project}, so its values were not read.
+  > The column {column} was not used: its unit is {unit}, and the unit of {property} in this project is {project}.
   @@ NEEDS RULING
 - **`lpn_scnbook_why_gone`**
   > the drawing has no such asset, so the value was not changed.
@@ -1588,4 +1599,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > not TRUE or FALSE, so it was not used.
   @@ NEEDS RULING
 
-### feat/theme (`a40cca01a`) — adds no English strings
+### feat/theme (`994f7dd13`) — adds no English strings

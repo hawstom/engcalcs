@@ -480,8 +480,13 @@ Departures, each with its reason:
     Bootstrap's own, as before.
 11. **Touch: a tap keeps the theme**, so no "Keep" string. `?theme=` accepts any listed name; `system`
     clears the choice, which is the rescue.
-12. **Strings**: four names (`lpn_theme_hc`, `_amber`, `_green`, `_platinum`) and a reworded
-    `lpn_settings_theme_tip` (it said "light or dark colors").
+12. **Print is Light, in every theme** (pre-review fix). The theme blocks, and the rule that derives what
+    Light pins, are `@media screen` only, so on paper every token is its Light literal; Bootstrap's dark
+    switch is undone under `@media print`. This also fixes Dark, which printed its ink before this branch.
+13. **The hover card is opaque in every theme**, Light included (Bootstrap drew it at 90%, and in Green the
+    Properties box read through it).
+14. **Strings**: four names (`lpn_theme_hc`, `_amber`, `_green`, `_platinum`) and a reworded
+    `lpn_settings_theme_tip` (it said "light or dark colors"; now it names shapes and type too, and no pointing).
 
 ## Proposed ROADMAP row (Tom promotes; I do not edit the roadmap)
 

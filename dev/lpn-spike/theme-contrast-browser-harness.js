@@ -15,7 +15,12 @@
 //      paper), at 4.5:1. Elements the browser draws for itself (a native button or drop-down) and the
 //      map's own labels are left out: neither is chrome a theme paints.
 //   4. The theme took: <html data-theme> is that theme and the page's surface is that theme's form colour.
-//   5. No page errors.
+//   5. TEXT ON THE MAP'S PAPER (anything over the drawing with no surface of its own: "Something wrong
+//      here?", its "?", a label legend's words) reads at 4.5:1 against that paper in EVERY theme, Light too.
+//   6. PRINT IS LIGHT: with print emulated, every --ec-* token resolves to its Light value whatever theme was
+//      chosen, the page's own text is Bootstrap's light ink, and the label legend prints on white.
+//   7. The hover card (Settings, Show all properties on hover) is opaque: nothing reads through it.
+//   8. No page errors.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -97,13 +102,13 @@ function scanText() {
 		let opacity = 1, n = el, base = null; const layers = [];
 		const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
 		const onMap = cr && cx >= cr.left && cx <= cr.right && cy >= cr.top && cy <= Math.min(cr.bottom, innerHeight);
-		let native = false;
+		let native = false, paper = false;
 		while (n && n !== document.documentElement) {
 			const ns = getComputedStyle(n);
 			opacity *= +ns.opacity;
 			if (NATIVE.test(n.tagName) && n.tagName !== 'BUTTON') { native = true; }
 			if (n.tagName === 'BUTTON' && !n.className) { native = true; }
-			if (onMap && n.contains(cv)) { base = [255, 255, 255, 1]; break; }
+			if (onMap && n.contains(cv)) { base = [255, 255, 255, 1]; paper = true; break; }
 			const bg = parse(ns.backgroundColor);
 			if (bg[3] > 0) { if (bg[3] >= 1) { base = bg; break; } layers.push(bg); }
 			n = n.parentElement;
@@ -114,7 +119,7 @@ function scanText() {
 		let fg = parse(cs.color); fg = over([fg[0], fg[1], fg[2], fg[3] * opacity], b);
 		const x = lum(fg), y = lum(b);
 		const where = el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + (typeof el.className === 'string' && el.className ? '.' + el.className.trim().split(/\s+/)[0] : '');
-		out.push({ where, txt: txt.slice(0, 30), ratio: (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05) });
+		out.push({ where, paper, txt: txt.slice(0, 30), ratio: (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05) });
 	});
 	return out;
 }
@@ -129,6 +134,9 @@ async function main() {
 	const browser = await chromium.launch({ executablePath });
 	const tokenNames = Array.from(new Set([].concat(...Object.keys(check.THEMES).map((t) => check.pairs(t).map((p) => [p[0], p[1]]))).reduce((a, p) => a.concat(p), [])));
 	const summary = [];
+	const allTokens = Object.keys(check.themeDecls('light', fs.readFileSync(path.join(REPO, 'css', 'engcalcs.css'), 'utf8'))).map((n) => n)
+		.filter((n) => !/radius|border-w|bevel/.test(n));
+	let lightRef = null, lightLegend = null;
 
 	async function measure(s, choice, theme) {
 		await s.page.evaluate((t) => window.ecTheme.set(t), choice);
@@ -162,6 +170,30 @@ async function main() {
 			ok(theme + ': every text on the page reads at 4.5:1 or better where it sits (' + rows.length + ' read)', bad.length === 0,
 				bad.slice(0, 8).map((x) => x.where + ' "' + x.txt + '" ' + x.ratio.toFixed(2)).join('; '));
 		}
+		const onPaper = rows.filter((x) => x.paper), badPaper = onPaper.filter((x) => x.ratio < 4.5);
+		ok(theme + ': every text on the map\'s own paper reads at 4.5:1 against it (' + onPaper.length + ' read)', badPaper.length === 0 && onPaper.some((x) => /wrong/i.test(x.where + x.txt)),
+			badPaper.slice(0, 8).map((x) => x.where + ' "' + x.txt + '" ' + x.ratio.toFixed(2)).join('; ') || JSON.stringify(onPaper.map((x) => x.txt)));
+		// 7. the hover card
+		const node = await s.page.evaluate(() => { const c = document.querySelector('#lpn_canvas circle.lpn-node-junction'); const r = c.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+		await s.page.mouse.move(5, 300);
+		await s.settle(200);
+		await s.page.mouse.move(node.x, node.y, { steps: 3 });
+		await s.page.waitForSelector('.tooltip.lpn-hovercard.show', { timeout: 4000 }).catch(() => {});
+		await s.settle(400);
+		const card = await s.page.evaluate(() => { const t = document.querySelector('.tooltip.lpn-hovercard'); if (!t) { return null; } const i = t.querySelector('.tooltip-inner'); return { opacity: getComputedStyle(t).opacity, bg: getComputedStyle(i).backgroundColor }; });
+		ok(theme + ': the hover card is opaque (opacity 1, a solid surface)', !!card && card.opacity === '1' && !/rgba\(|\/ 0\./.test(card.bg), JSON.stringify(card));
+		await s.page.mouse.move(5, 300);
+		await s.settle(200);
+		// 6. print
+		await s.page.emulateMedia({ media: 'print' });
+		await s.settle(150);
+		const printed = await s.page.evaluate(resolveTokens, allTokens);
+		const pbody = await s.page.evaluate(() => ({ ink: getComputedStyle(document.body).color, legend: (function () { const l = document.getElementById('lpn_labels_legend'); return l ? getComputedStyle(l).backgroundColor : null; })() }));
+		await s.page.emulateMedia({ media: 'screen' });
+		await s.settle(150);
+		const off = allTokens.filter((t) => !printed[t] || !lightRef[t] || [0, 1, 2, 3].some((i) => Math.abs(printed[t][i] - lightRef[t][i]) > (i < 3 ? 0.6 : 0.002)));
+		ok(theme + ': printed, every one of ' + allTokens.length + ' tokens is its Light value', !off.length, off.slice(0, 6).join(', '));
+		ok(theme + ': printed, the page\'s text is Bootstrap\'s light ink and the label legend is on white', pbody.ink === 'rgb(33, 37, 41)' && pbody.legend === lightLegend, JSON.stringify(pbody) + ' light legend ' + lightLegend);
 		ok(theme + ': the page scan read the Settings box and the menu bar', rows.some((x) => /^span|^div|^h/.test(x.where)) && rows.length > 40, String(rows.length));
 		summary.push(theme + ': ' + n + ' pairs, worst ' + worst.toFixed(2) + ':1 (' + worstLabel + '), ' + rows.length + ' texts' + (strict ? '' : ', information only (' + bad.length + ' under 4.5)'));
 		if (SHOTS) { await s.page.screenshot({ path: path.join(SHOTS, 'theme-' + theme + '.png') }); }
@@ -180,12 +212,18 @@ async function main() {
 		const a = await Session.open(browser, 'light-os', { colorScheme: 'light' });
 		try {
 			await openPage(a);
+			await a.page.click('.ec-consent-btn').catch(() => {});
+			await a.page.evaluate(() => window.ecTheme.set('light'));
+			await a.settle(200);
+			lightRef = await a.page.evaluate(resolveTokens, allTokens);
+			lightLegend = await a.page.evaluate(() => { const l = document.getElementById('lpn_labels_legend'); return l ? getComputedStyle(l).backgroundColor : null; });
 			for (const t of ['light', 'dark', 'hc', 'amber', 'green', 'platinum']) { await measure(a, t, t); }
 			ok('no page errors (light device)', !a.errors.length, (a.errors[0] || '').slice(0, 200));
 		} finally { await a.close(); }
 		const b = await Session.open(browser, 'dark-os', { colorScheme: 'dark' });
 		try {
 			await openPage(b);
+			await b.page.click('.ec-consent-btn').catch(() => {});
 			await measure(b, 'hc', 'hc-dark');
 			ok('no page errors (dark device)', !b.errors.length, (b.errors[0] || '').slice(0, 200));
 		} finally { await b.close(); }

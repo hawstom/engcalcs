@@ -11,8 +11,9 @@
    gallery card in Settings is painted by its own theme's tokens and can never drift from the real page.
 
    Light is pinned. Where the derivation does not land on today's exact value (a tint the eye chose by hand),
-   the light-only rule below states the value, so the light page is what it always was; light-tokens-
-   browser-harness.js holds every token to the pinned master SHA. Dark keeps its hand-chosen values for the
+   this rule states the literal and the screen-only rule after it derives the token for every other theme,
+   so the light page, and every printed page, is what it always was; light-tokens-browser-harness.js holds
+   every token to the pinned master SHA. Dark keeps its hand-chosen values for the
    same reason. The other themes are seeds alone, plus a few named overrides; theme_contrast_check.js and
    theme-contrast-browser-harness.js hold every one of them to WCAG. */
 :root, .ec-theme-card {
@@ -83,7 +84,7 @@
 
 	/* ---- DERIVED FROM THE SEEDS ---- */
 	/* Text: steps from ink towards paper */
-	--ec-ink-strong: color-mix(in srgb, var(--ec-ink), var(--ec-ink-black) 35%);
+	--ec-ink-strong: #222;
 	--ec-ink-muted: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 83.3333%);
 	--ec-ink-subtle: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 75%);
 	--ec-neutral-ink: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 62.2549%);
@@ -110,61 +111,6 @@
 	--ec-gray-f7f7f7: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 3.9216%);
 	--ec-gray-fafafa: color-mix(in srgb, var(--ec-bg), var(--ec-ink) 2.451%);
 	/* Accent tints: hover, open, pressed, the forms' wash */
-	--ec-accent-hover-bg: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 8%);
-	--ec-accent-open-bg: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 16%);
-	--ec-hover-bg: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 14%);
-	--ec-hover-border: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 70%);
-	--ec-pressed-bg: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 22%);
-	--ec-pressed-border: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 80%);
-	--ec-select-bg: color-mix(in srgb, var(--ec-bg), var(--ec-select) 9%);
-	--ec-select-bg-strong: color-mix(in srgb, var(--ec-bg), var(--ec-select) 18%);
-	--ec-form-bg: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 3%);
-	--ec-form-border: color-mix(in srgb, var(--ec-accent), var(--ec-bg) 30%);
-	--ec-debug-grid: var(--ec-accent);
-	--ec-a-6-69-173-12: color-mix(in srgb, var(--ec-accent) 12%, transparent);
-	--ec-a-6-69-173-35: color-mix(in srgb, var(--ec-accent) 35%, transparent);
-	/* Status tints */
-	--ec-held-bg: color-mix(in srgb, var(--ec-bg), var(--ec-held) 15%);
-	--ec-error-bg-soft: color-mix(in srgb, var(--ec-bg), var(--ec-error-bg) 50%);
-	/* The value-named hues, each given the role it plays where it is used */
-	--ec-hue-037: color-mix(in srgb, var(--ec-accent), var(--ec-ink-black) 30%);
-	--ec-hue-05a: var(--ec-accent);
-	--ec-hue-0b0080: var(--ec-accent-open);
-	--ec-hue-12211f: var(--ec-ink-strong);
-	--ec-hue-1565c0: var(--ec-accent);
-	--ec-hue-17406b: var(--ec-accent-open);
-	--ec-hue-1976d2: var(--ec-accent);
-	--ec-hue-2a6ebb: var(--ec-accent-hover);
-	--ec-hue-3c4043: var(--ec-ink);
-	--ec-hue-5a6570: var(--ec-ink-muted);
-	--ec-hue-5f6368: var(--ec-ink-muted);
-	--ec-hue-667: var(--ec-ink-subtle);
-	--ec-hue-8ab: var(--ec-hover-border);
-	--ec-hue-b00020: var(--ec-bad-ink);
-	--ec-hue-c0392b: var(--ec-bad-ink);
-	--ec-hue-d99: color-mix(in srgb, var(--ec-bg), var(--ec-bad-ink) 45%);
-	--ec-hue-e8a33d: var(--ec-held);
-	--ec-hue-eef1f4: var(--ec-hover-bg);
-	--ec-hue-eef3fd: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 7%);
-	--ec-hue-eef4ff: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 7%);
-	--ec-hue-f4d4d4: color-mix(in srgb, var(--ec-bg), var(--ec-bad-ink) 17%);
-	--ec-hue-fdd: color-mix(in srgb, var(--ec-bg), var(--ec-bad-ink) 13%);
-	--ec-hue-fff3cd: var(--ec-held-bg);
-	--ec-hue-fff4e5: color-mix(in srgb, var(--ec-bg), var(--ec-held) 12%);
-	/* Translucent paper and ink */
-	--ec-a-60-64-67-14: color-mix(in srgb, var(--ec-ink) 14%, transparent);
-	--ec-a-60-64-67-5: color-mix(in srgb, var(--ec-ink) 50%, transparent);
-	--ec-a-128-128-128-4: color-mix(in srgb, var(--ec-neutral-ink) 40%, transparent);
-	--ec-a-128-128-128-45: color-mix(in srgb, var(--ec-neutral-ink) 45%, transparent);
-	--ec-map-overlay-bg: color-mix(in srgb, var(--ec-bg) 80%, transparent);
-	--ec-a-255-255-255-85: color-mix(in srgb, var(--ec-bg) 85%, transparent);
-	--ec-a-255-255-255-9: color-mix(in srgb, var(--ec-bg) 90%, transparent);
-	--ec-a-255-255-255-94: color-mix(in srgb, var(--ec-bg) 94%, transparent);
-}
-/* LIGHT, PINNED: the hand-chosen values the derivation does not land on exactly. A page with no data-theme
-   (the calculator pages) is light. */
-:root:not([data-theme]), :root[data-theme="light"], .ec-theme-card[data-theme="light"] {
-	--ec-ink-strong: #222;
 	--ec-accent-hover-bg: #eaf1fc;
 	--ec-accent-open-bg: #d7e6fb;
 	--ec-hover-bg: #def;
@@ -176,8 +122,12 @@
 	--ec-form-bg: #f7f9ff;
 	--ec-form-border: #66c;
 	--ec-debug-grid: blue;
+	--ec-a-6-69-173-12: color-mix(in srgb, var(--ec-accent) 12%, transparent);
+	--ec-a-6-69-173-35: color-mix(in srgb, var(--ec-accent) 35%, transparent);
+	/* Status tints */
 	--ec-held-bg: #fff3cd;
 	--ec-error-bg-soft: #fff0f0;
+	/* The value-named hues, each given the role it plays where it is used */
 	--ec-hue-037: #037;
 	--ec-hue-05a: #05a;
 	--ec-hue-0b0080: #0b0080;
@@ -194,14 +144,69 @@
 	--ec-hue-b00020: #b00020;
 	--ec-hue-c0392b: #c0392b;
 	--ec-hue-d99: #d99;
+	--ec-hue-e8a33d: var(--ec-held);
 	--ec-hue-eef1f4: #eef1f4;
 	--ec-hue-eef3fd: #eef3fd;
 	--ec-hue-eef4ff: #eef4ff;
 	--ec-hue-f4d4d4: #f4d4d4;
 	--ec-hue-fdd: #fdd;
+	--ec-hue-fff3cd: var(--ec-held-bg);
 	--ec-hue-fff4e5: #fff4e5;
+	/* Translucent paper and ink */
 	--ec-a-60-64-67-14: rgba(60, 64, 67, .14);
 	--ec-a-60-64-67-5: rgba(60, 64, 67, .5);
+	--ec-a-128-128-128-4: color-mix(in srgb, var(--ec-neutral-ink) 40%, transparent);
+	--ec-a-128-128-128-45: color-mix(in srgb, var(--ec-neutral-ink) 45%, transparent);
+	--ec-map-overlay-bg: color-mix(in srgb, var(--ec-bg) 80%, transparent);
+	--ec-a-255-255-255-85: color-mix(in srgb, var(--ec-bg) 85%, transparent);
+	--ec-a-255-255-255-9: color-mix(in srgb, var(--ec-bg) 90%, transparent);
+	--ec-a-255-255-255-94: color-mix(in srgb, var(--ec-bg) 94%, transparent);
+}
+/* THE OTHER THEMES DERIVE WHAT LIGHT PINS. Light states its hand-chosen tints as literals in the first rule;
+   every other theme on screen takes them from its seeds instead. Light is also what every theme PRINTS:
+   the theme blocks below are for the screen alone, so paper and ink are literal on paper whatever the
+   visitor chose (dev/themes-plan.md). */
+@media screen {
+/* `:where()` keeps this as weak as the first rule, so it beats the light literals and every theme block beats it. */
+:root:where([data-theme]:not([data-theme="light"])), .ec-theme-card:where(:not([data-theme="light"])) {
+	--ec-ink-strong: color-mix(in srgb, var(--ec-ink), var(--ec-ink-black) 35%);
+	--ec-accent-hover-bg: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 8%);
+	--ec-accent-open-bg: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 16%);
+	--ec-hover-bg: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 14%);
+	--ec-hover-border: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 70%);
+	--ec-pressed-bg: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 22%);
+	--ec-pressed-border: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 80%);
+	--ec-select-bg: color-mix(in srgb, var(--ec-bg), var(--ec-select) 9%);
+	--ec-select-bg-strong: color-mix(in srgb, var(--ec-bg), var(--ec-select) 18%);
+	--ec-form-bg: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 3%);
+	--ec-form-border: color-mix(in srgb, var(--ec-accent), var(--ec-bg) 30%);
+	--ec-debug-grid: var(--ec-accent);
+	--ec-held-bg: color-mix(in srgb, var(--ec-bg), var(--ec-held) 15%);
+	--ec-error-bg-soft: color-mix(in srgb, var(--ec-bg), var(--ec-error-bg) 50%);
+	--ec-hue-037: color-mix(in srgb, var(--ec-accent), var(--ec-ink-black) 30%);
+	--ec-hue-05a: var(--ec-accent);
+	--ec-hue-0b0080: var(--ec-accent-open);
+	--ec-hue-12211f: var(--ec-ink-strong);
+	--ec-hue-1565c0: var(--ec-accent);
+	--ec-hue-17406b: var(--ec-accent-open);
+	--ec-hue-1976d2: var(--ec-accent);
+	--ec-hue-2a6ebb: var(--ec-accent-hover);
+	--ec-hue-3c4043: var(--ec-ink);
+	--ec-hue-5a6570: var(--ec-ink-muted);
+	--ec-hue-5f6368: var(--ec-ink-muted);
+	--ec-hue-667: var(--ec-ink-subtle);
+	--ec-hue-8ab: var(--ec-hover-border);
+	--ec-hue-b00020: var(--ec-bad-ink);
+	--ec-hue-c0392b: var(--ec-bad-ink);
+	--ec-hue-d99: color-mix(in srgb, var(--ec-bg), var(--ec-bad-ink) 45%);
+	--ec-hue-eef1f4: var(--ec-hover-bg);
+	--ec-hue-eef3fd: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 7%);
+	--ec-hue-eef4ff: color-mix(in srgb, var(--ec-bg), var(--ec-accent) 7%);
+	--ec-hue-f4d4d4: color-mix(in srgb, var(--ec-bg), var(--ec-bad-ink) 17%);
+	--ec-hue-fdd: color-mix(in srgb, var(--ec-bg), var(--ec-bad-ink) 13%);
+	--ec-hue-fff4e5: color-mix(in srgb, var(--ec-bg), var(--ec-held) 12%);
+	--ec-a-60-64-67-14: color-mix(in srgb, var(--ec-ink) 14%, transparent);
+	--ec-a-60-64-67-5: color-mix(in srgb, var(--ec-ink) 50%, transparent);
 }
 /* THE THEMES. The page head (lib/HeadersFooters.lib.php, window.ecTheme) writes the RESOLVED theme on <html>:
    System becomes light, dark or high contrast by the operating system's preferences, and High contrast
@@ -515,12 +520,14 @@
 	--ec-bevel: inset 1px 1px 0 #fff, inset -1px -1px 0 #888;
 	--ec-bevel-in: inset 1px 1px 0 #888, inset -1px -1px 0 #fff;
 }
+}
 /* ec-colour-tokens:end */
-/* BOOTSTRAP FOLLOWS THE NEWER THEMES (Task 811). Bootstrap paints the page's own text, its links and its
+/* BOOTSTRAP FOLLOWS THE NEWER THEMES, ON SCREEN (Task 811). Bootstrap paints the page's own text, its links and its
    field edges from its own variables, light or dark by data-bs-theme; in Light and Dark that is what the page
    has always shown, so they are left alone. A theme with a palette of its own hands Bootstrap its tokens, or
    the Settings box would be written in Bootstrap's grey and the links in Bootstrap's blue. `:where()` keeps
    the link rule as weak as Bootstrap's own `a` rule, so every rule of this file that colours a link still wins. */
+@media screen {
 :root:is([data-theme="hc"], [data-theme="hc-dark"], [data-theme="amber"], [data-theme="green"], [data-theme="platinum"]) {
 	--bs-body-color: var(--ec-ink);
 	--bs-body-bg: var(--ec-bg);
@@ -533,6 +540,36 @@
 :where(:root[data-theme="hc"], :root[data-theme="hc-dark"], :root[data-theme="amber"], :root[data-theme="green"], :root[data-theme="platinum"]) a { color: var(--ec-accent); }
 /* "Saved in this browser" is faded by opacity, which lands under 4.5:1 on a phosphor or a pure-ink palette. */
 :root:is([data-theme="hc"], [data-theme="hc-dark"], [data-theme="amber"], [data-theme="green"], [data-theme="platinum"]) .lpn-saved { opacity: 1; color: var(--ec-ink-muted); }
+}
+/* PRINT IS LIGHT (Task 811). The theme blocks are screen-only, so the tokens print as Light; Bootstrap's own
+   dark switch (data-bs-theme="dark", written for Dark, Amber, Green and High contrast's dark palette) is
+   undone here with Bootstrap's light values, so the page's text prints dark on white. */
+@media print {
+	:root[data-bs-theme] {
+		color-scheme: light;
+		--bs-body-color: #212529;
+		--bs-body-color-rgb: 33, 37, 41;
+		--bs-body-bg: #fff;
+		--bs-body-bg-rgb: 255, 255, 255;
+		--bs-emphasis-color: #000;
+		--bs-emphasis-color-rgb: 0, 0, 0;
+		--bs-secondary-color: rgba(33, 37, 41, .75);
+		--bs-secondary-color-rgb: 33, 37, 41;
+		--bs-secondary-bg: #e9ecef;
+		--bs-secondary-bg-rgb: 233, 236, 239;
+		--bs-tertiary-color: rgba(33, 37, 41, .5);
+		--bs-tertiary-color-rgb: 33, 37, 41;
+		--bs-tertiary-bg: #f8f9fa;
+		--bs-tertiary-bg-rgb: 248, 249, 250;
+		--bs-heading-color: inherit;
+		--bs-link-color: #0d6efd;
+		--bs-link-color-rgb: 13, 110, 253;
+		--bs-link-hover-color: #0a58ca;
+		--bs-link-hover-color-rgb: 10, 88, 202;
+		--bs-border-color: #dee2e6;
+		--bs-border-color-translucent: rgba(0, 0, 0, .175);
+	}
+}
 
 /* ---------------------------------------------------------------------------------------------
    SELF-SUFFICIENCY BLOCK -- rules this suite needs that used to live only in the PARENT SITE.
@@ -6239,6 +6276,9 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
    pointer. It must never take a click. */
 .lpn-hovercard-anchor { position: fixed; width: 1px; height: 1px; pointer-events: none; }
 .tooltip.lpn-hovercard { pointer-events: none; }
+/* The hover card is a surface, not a glance: Bootstrap shows a tip at 90% opacity, which let the Properties
+   box read through it in Green (Task 811). Opaque in every theme. */
+.tooltip.lpn-hovercard { --bs-tooltip-opacity: 1; }
 .tooltip.lpn-hovercard { max-width: calc(100vw - 8px); }
 .tooltip.lpn-hovercard .tooltip-inner { text-align: start; max-width: min(24rem, calc(100vw - 8px)); max-height: calc(100vh - 8px); overflow: hidden; }
 .tooltip.lpn-hovercard-wide .tooltip-inner { max-width: min(46rem, calc(100vw - 8px)); }
