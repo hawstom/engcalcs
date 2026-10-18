@@ -38861,10 +38861,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			else { n.elev = (scnSetting('defaults') || {}).nodeElev; }   // base-write: a type change is Base's, and so is the ground it gives a node that had none
 		}
 		if (from === 'reservoir' && to === 'tank') {
-			// base-write: a type change is Base's; Tom's four values, see RESERVOIR_TO_TANK.
-			delete n.bottomElev;   // blank: the base stands on the ground, which is Elevation
-			for (k in RESERVOIR_TO_TANK) { if (Object.prototype.hasOwnProperty.call(RESERVOIR_TO_TANK, k)) { n[k] = RESERVOIR_TO_TANK[k]; } }
-			if (n.tok) { delete n.tok.bottomElev; delete n.tok.level; delete n.tok.minLevel; delete n.tok.maxLevel; }
+			// Tom's four values, see RESERVOIR_TO_TANK. A blank base stands on the ground, which is Elevation.
+			delete n.bottomElev;   // base-write: a type change is Base's, and a blank base is the ground
+			for (k in RESERVOIR_TO_TANK) { if (Object.prototype.hasOwnProperty.call(RESERVOIR_TO_TANK, k)) { n[k] = RESERVOIR_TO_TANK[k]; } }   // base-write: a type change is Base's
+			if (n.tok) { delete n.tok.bottomElev; delete n.tok.level; delete n.tok.minLevel; delete n.tok.maxLevel; }   // base-write: tokens of values the type change replaced
 		}
 		// The water surface, carried (waterSurfaceCarry()). Written after the strip, which has
 		// already taken the old property and any override map it left empty.
