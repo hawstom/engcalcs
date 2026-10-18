@@ -27,7 +27,7 @@ U.takeBrowserLock(NAME, 'EC_UGSET_LOCKED');
 const QUOTES = {
 	lpn_guide_text_settings_box: ['lpn_menu_project', 'lpn_tool_settings', 'calc_defaults', 'lpn_settings_wipe_btn', 'lpn_settings_search'],
 	lpn_guide_set_where_def: ['lpn_settings_sec_symbology', 'lpn_labels_heading_node', 'lpn_settings_sym_node_colors', 'lpn_labels_heading_link', 'lpn_settings_sym_link_colors',
-		'lpn_settings_sym_customer', 'lpn_settings_sym_all', 'lpn_settings_sec_map', 'lpn_settings_map_drawing', 'lpn_settings_map_options', 'lpn_settings_sec_assets',
+		'lpn_settings_sym_customer', 'lpn_settings_sym_all', 'lpn_menu_map', 'lpn_settings_page', 'lpn_settings_sec_assets',
 		'lpn_settings_id_prefixes', 'lpn_settings_defaults', 'lpn_settings_custom_props', 'lpn_settings_sec_calculation', 'lpn_view_units', 'lpn_time_menu',
 		'lpn_settings_hydraulics', 'lpn_settings_energy', 'lpn_settings_quality', 'lpn_settings_color_credits', 'lpn_saved_project', 'lpn_saved_browser',
 		'lpn_settings_runbox', 'lpn_tool_settings', 'lpn_settings_table_category', 'lpn_find_value'],
@@ -42,7 +42,8 @@ const TERMS = ['lpn_guide_set_where_term', 'lpn_guide_set_search_term', 'lpn_gui
 // The box's own order, by language key: [section, [sub-headings]].
 const STRUCTURE = [
 	['lpn_settings_sec_symbology', ['lpn_labels_heading_node', 'lpn_settings_sym_node_colors', 'lpn_labels_heading_link', 'lpn_settings_sym_link_colors', 'lpn_settings_sym_customer', 'lpn_settings_sym_all']],
-	['lpn_settings_sec_map', ['lpn_settings_map_drawing', 'lpn_settings_map_options']],
+	['lpn_menu_map', ['lpn_menu_map']],
+	['lpn_settings_page', ['lpn_settings_page']],
 	['lpn_settings_sec_assets', ['lpn_settings_id_prefixes', 'lpn_settings_defaults', 'lpn_settings_custom_props']],
 	['lpn_settings_sec_calculation', ['lpn_view_units', 'lpn_time_menu', 'lpn_settings_hydraulics', 'lpn_settings_energy', 'lpn_settings_quality']],
 	['lpn_settings_color_credits', []]
@@ -133,14 +134,13 @@ async function main() {
 		const want = [];
 		for (const [sec, subs] of STRUCTURE) { want.push({ head: true, text: await T(sec) }); for (const s of subs) { want.push({ head: false, text: await T(s) }); } }
 		ok('the sections and sub-headings are the ones the chapter lists, in its order', JSON.stringify(dom.map((d) => [d.head, d.text])) === JSON.stringify(want.map((d) => [d.head, d.text])), JSON.stringify(dom.map((d) => d.text)));
-		const pageName = await T('lpn_settings_map_options');
-		ok('every sub-heading is saved with the project', dom.filter((d) => !d.head).every((d) => d.saved === 'project'), JSON.stringify(dom.filter((d) => !d.head).map((d) => d.saved)));
+		const pageName = await T('lpn_settings_page');
+		ok('every sub-heading is saved with the project except Page, which is saved in this browser', dom.filter((d) => !d.head).every((d) => d.saved === (d.text === pageName ? 'browser' : 'project')), JSON.stringify(dom.filter((d) => !d.head).map((d) => d.saved)));
 		const marks = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_settings_box .lpn-set-subbody .lpn-saved[data-saved-class="browser"]')).map((m) => {
 			const body = m.closest('.lpn-set-subbody'), sub = body && body.previousElementSibling, row = m.closest('label, .lpn-set-row, div');
 			return { sub: sub ? sub.childNodes[0].textContent.trim() : '', row: row ? row.textContent.replace(/\s+/g, ' ').trim().slice(0, 40) : '' };
 		}));
-		const inPage = marks.filter((m) => m.sub === pageName), outsidePage = marks.filter((m) => m.sub !== pageName);
-		ok('under Options, four rows say Saved in this browser, as the chapter says', inPage.length === 4, JSON.stringify(inPage));
+		const outsidePage = marks.filter((m) => m.sub !== pageName);
 		ok('outside Page, one row says Saved in this browser: Show the run progress box, in Hydraulics',
 			outsidePage.length === 1 && outsidePage[0].sub === await T('lpn_settings_hydraulics') && outsidePage[0].row.indexOf(await T('lpn_settings_runbox')) === 0, JSON.stringify(outsidePage));
 		await closeBox('lpn_setbox_close');
@@ -158,7 +158,7 @@ async function main() {
 		// ---- 4. searching --------------------------------------------------------------------------
 		console.log('\n4. Searching');
 		await openSettings();
-		const visible = () => P.evaluate(() => Array.from(document.querySelectorAll('#lpn_settings_box [data-lpn-setting]')).filter((e) => e.getClientRects().length).map((e) => e.textContent.replace(/\s+/g, ' ').replace(/\s*\?\s*$/, '').trim()));
+		const visible = () => P.evaluate(() => Array.from(document.querySelectorAll('#lpn_settings_box [data-lpn-setting]')).filter((e) => e.getClientRects().length).map((e) => e.textContent.replace(/\s+/g, ' ').replace(/\s*\((p|b)\)\s*$/, '').replace(/\s*\?\s*$/, '').trim()));
 		const search = async (q) => { await P.fill('#lpn_setbox_filter', q); await settle(500); return visible(); };
 		const sym = await T('lpn_settings_symbol_opacity'), bd = await T('lpn_settings_backdrop_opacity'), em = await T('lpn_settings_emitter_exponent');
 		let v = await search('opacity');

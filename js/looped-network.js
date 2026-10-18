@@ -26791,7 +26791,7 @@ var EngCalcs = EngCalcs || {};
 		return pc.lpn_color_break_number ||
 			'A boundary must be a number. The map is unchanged.';
 	}
-	function buildColoringSection() { var out = withSetboxView(buildColoringSectionNow); markHeldSetboxRows(); return out; }
+	function buildColoringSection() { var out = withSetboxView(buildColoringSectionNow); markHeldSetboxRows(); markSavedShort(); return out; }
 	function buildColoringSectionNow() {
 		var pc = EngCalcs.pageConfig || {},
 			R = ramps(),
@@ -59720,6 +59720,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		m.textContent = pc['lpn_saved_' + cls] || '';
 		return m;
 	}
+	// **(p) OR (b) AFTER EVERY ROW UNDER MAP AND PAGE** (Tom, 2026-10-18), read off the row's own
+	// class or its (silent) sub-heading's; the legend above Map says what the letters mean. Run after
+	// each builder that writes a row there, and idempotent.
+	function markSavedShort() {
+		var pc = EngCalcs.pageConfig || {};
+		['lpn_set_sec_map', 'lpn_set_sec_page'].forEach(function (id) {
+			var sec = document.getElementById(id);
+			if (!sec) { return; }
+			[].forEach.call(sec.querySelectorAll('.lpn-set-row'), function (row) {
+				var lab = row.firstElementChild, body = row.closest('.lpn-set-subbody'),
+					sub = body && body.previousElementSibling,
+					cls = row.getAttribute('data-saved') || (sub && sub.getAttribute('data-saved')), m;
+				if (!lab || !cls || lab.querySelector('.lpn-saved-short')) { return; }
+				m = document.createElement('span');
+				m.className = 'lpn-saved lpn-saved-short';
+				m.setAttribute('data-saved-class', cls);
+				m.textContent = ' ' + (pc['lpn_saved_short_' + cls] || '');
+				m.title = pc['lpn_saved_' + cls] || '';
+				lab.appendChild(m);
+			});
+		});
+	}
 	function validatePrefix(p) { return !!p && !/[\s'"]/.test(p); }
 	// Fills SIX of the Settings box's hosts (Task 441, restructured): ID prefixes and starting values
 	// under New elements, map appearance and the page under Map and page, units and hydraulics under
@@ -59822,13 +59844,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			compBody = byId('lpn_set_hydraulics_fields'), qualBody = byId('lpn_set_quality_fields'),
 			energyBody = byId('lpn_set_energy_fields'),
 			pageBody = byId('lpn_set_page_fields'),
-			posBody = byId('lpn_set_pos_fields'), posBody2 = byId('lpn_set_pos_fields2');
-		if (!idBody || !defBody || !customBody || !mapBody || !unitsBody || !compBody || !qualBody || !energyBody || !pageBody || !posBody || !posBody2) { return; }
+			posBody = byId('lpn_set_pos_fields'), posBody2 = byId('lpn_set_pos_fields2'),
+			mapBody2 = byId('lpn_set_map_fields2');
+		if (!idBody || !defBody || !customBody || !mapBody || !unitsBody || !compBody || !qualBody || !energyBody || !pageBody || !posBody || !posBody2 || !mapBody2) { return; }
 		// **EVERY HOST THIS FUNCTION FILLS MUST ALSO BE CLEARED BY IT**, and a host left out of this
 		// line does not fail: it ACCUMULATES, so the box grows another copy of its rows on every
 		// rebuild, and rebuilding is what a settings change does. Measured on the water-quality host
 		// the day it was added -- seven Track rows after four switches.
-		[idBody, defBody, customBody, mapBody, unitsBody, compBody, qualBody, energyBody, pageBody, posBody, posBody2].forEach(clearFields);
+		[idBody, defBody, customBody, mapBody, unitsBody, compBody, qualBody, energyBody, pageBody, posBody, posBody2, mapBody2].forEach(clearFields);
 		// **A ROW IS A FLEX LINE, NOT A LABEL FOLLOWED BY A <br>.** Tom, 2026-08-18: "It can be
 		// longer and narrower ... A few things can wrap. Inputs can be shorter." A label that simply
 		// precedes its control cannot wrap without the control wrapping with it and cannot line its
@@ -60380,7 +60403,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// "Display" rather than Tom's first "Map sizes": the section also holds symbol and backdrop
 		// opacity, which are not sizes, and stranding those two in a group of their own would be
 		// more clicking than it saves.
-		// The small headings under Drawing and Options (Tom, 2026-10-18), which the index leaves out.
+		// The small headings under Map (Tom, 2026-10-18), which the index leaves out. Fade's two rows
+		// stand under Thematic, and Positions is a group of its own in Looped-Network.php.
 		// Each is a part, so the search filter still walks it row by row and hides the heading.
 		function minorGroup(target, text) {
 			var part = document.createElement('div'), head = document.createElement('div');
@@ -60394,10 +60418,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var sizeBody = minorGroup(mapBody, pc.lpn_settings_grp_size || 'Size'),
 			angleBody = minorGroup(mapBody, pc.lpn_settings_grp_angle || 'Angle'),
 			zoomBody = minorGroup(mapBody, pc.lpn_settings_grp_zoom || 'Zoom'),
-			fadeBody = minorGroup(mapBody, pc.lpn_settings_grp_fade || 'Fade'),
-			showBody = minorGroup(pageBody, pc.lpn_settings_grp_show || 'Show'),
-			thematicBody = minorGroup(pageBody, pc.lpn_settings_grp_thematic || 'Thematic'),
-			resetBody = minorGroup(pageBody, pc.lpn_settings_grp_resets || 'Resets');
+			showBody = minorGroup(mapBody2, pc.lpn_settings_grp_show || 'Show'),
+			thematicBody = minorGroup(mapBody2, pc.lpn_settings_grp_thematic || 'Thematic'),
+			fadeBody = thematicBody;
 		var sizeInput = document.createElement('input');
 		sizeInput.type = 'number'; sizeInput.className = 'ec-spin';
 		sizeInput.step = '1'; sizeInput.min = '1'; sizeInput.value = settings.textSize;
@@ -60690,8 +60713,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		areaHintInput.checked = areaHintShown();
 		areaHintSettingsCheck = areaHintInput;
 		areaHintInput.addEventListener('change', function () { setAreaHintShown(areaHintInput.checked); });
-		row(showBody, pc.lpn_settings_area_hint || 'Show the selection help', areaHintInput,
-			pc.lpn_settings_area_hint_tip, null, 'browser');
+		row(pageBody, pc.lpn_settings_area_hint || 'Show the selection help', areaHintInput,
+			pc.lpn_settings_area_hint_tip);
 		// The hover card's switch (Task 773). The same section and the same reason as the row above:
 		// a reading aid for the person at this screen, kept in this browser (LPN_HOVERCARD_KEY).
 		// Not offered where the card can never appear (a device that cannot hover).
@@ -60700,8 +60723,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			hoverCardInput.type = 'checkbox';
 			hoverCardInput.checked = hoverCardOn();
 			hoverCardInput.addEventListener('change', function () { setHoverCardOn(hoverCardInput.checked); });
-			row(showBody, pc.lpn_settings_hover_card || 'Show all properties on hover', hoverCardInput,
-				pc.lpn_settings_hover_card_tip, null, 'browser');
+			row(pageBody, pc.lpn_settings_hover_card || 'Show all properties on hover', hoverCardInput,
+				pc.lpn_settings_hover_card_tip);
 		}
 		// The override rings' own switch (Task 805): the same section and the same reason as the two
 		// rows above, kept in this browser (LPN_OVRMARKS_KEY). Map, Clean map hides the rings whatever
@@ -60711,8 +60734,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		ovrMarksInput.checked = overrideMarksPrefOn();
 		ovrMarksInput.id = 'lpn_set_ovrmarks';
 		ovrMarksInput.addEventListener('change', function () { setOverrideMarksPref(ovrMarksInput.checked); });
-		row(showBody, pc.lpn_settings_override_marks || 'Show override markers on the map', ovrMarksInput,
-			pc.lpn_settings_override_marks_tip, null, 'browser');
+		row(pageBody, pc.lpn_settings_override_marks || 'Show override markers on the map', ovrMarksInput,
+			pc.lpn_settings_override_marks_tip);
 		// The time series graphs on the map (Task 804): read-only here, a Presentation value whose
 		// override is marked and cleared like any other. Opened from an asset's right-click menu.
 		(function () {
@@ -60739,9 +60762,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		themeSelect.addEventListener('change', function () {
 			if (typeof window.ecTheme !== 'undefined') { window.ecTheme.set(themeSelect.value); }
 		});
-		row(thematicBody, pc.lpn_settings_theme || 'Theme', themeSelect, pc.lpn_settings_theme_tip, null, 'browser');
+		row(pageBody, pc.lpn_settings_theme || 'Theme', themeSelect, pc.lpn_settings_theme_tip);
 		var tail = document.createElement('div');
-		resetBody.appendChild(tail);
+		tail.style.marginTop = '6px';
+		pageBody.appendChild(tail);
 		// **THE EMITTER EXPONENT ROW IS BACK, TASK 553, AND THE OLD ARGUMENT AGAINST IT WAS WRONG BY
 		// THEN.** It was cut because "nothing in this app sets a junction's `emitter`, so the
 		// exponent adjusts nothing" -- true of a network somebody DRAWS, and false of one read from
@@ -61186,7 +61210,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		helpTip(wipeBtn, pc.lpn_reset_all_tip);
 		wipeBtn.addEventListener('click', wipeEverything);
 		tail.appendChild(wipeBtn);
-		[idBody, defBody, mapBody, unitsBody, compBody, energyBody, pageBody, posBody, posBody2].forEach(tipsIn);
+		[idBody, defBody, mapBody, unitsBody, compBody, energyBody, pageBody, posBody, posBody2, mapBody2].forEach(tipsIn);
+		markSavedShort();
 	}
 	// ================================================================================================
 	// THE SETTINGS BOX (ROADMAP Task 441, absorbing 284)
@@ -61231,7 +61256,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		time: 'lpn_set_sub_time',
 		// The Page sub-heading inside the Map section -- what the Hide these titles link opens at,
 		// so the switch it just threw is the first thing on screen.
-		page: 'lpn_set_sub_page'
+		page: 'lpn_set_sec_page'
 	};
 	// ---- WHERE THE BOX IS AND HOW BIG IT IS, REMEMBERED (Tom, 2026-08-19) -------------------
 	//
@@ -62081,6 +62106,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			[].forEach.call(sec.querySelectorAll('.lpn-set-sub'), function (sub) {
 				n++;
 				if (!sub.id) { sub.id = 'lpn_set_sub_auto' + n; }
+				// A silent sub-heading (Map, Page) is never shown, so it has no row in the index.
+				if (sub.classList.contains('lpn-set-sub-silent')) { return; }
 				link(sub, setboxHeadingText(sub), 'lpn-setbox-link-sub').setAttribute('data-sub', sub.id);
 			});
 		});

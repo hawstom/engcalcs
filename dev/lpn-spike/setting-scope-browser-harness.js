@@ -170,12 +170,18 @@ async function main() {
 		const indexText = await P(() => [...document.querySelectorAll('#lpn_setbox_index button')].map((b) => b.textContent).join('|'));
 		ok('the index names the headings alone, without the marker words',
 			classes.every((c) => !indexText.includes(words[c])), indexText.slice(0, 120));
-		const rowMarks = await P(() => [...document.querySelectorAll('#lpn_setbox_content .lpn-set-row .lpn-saved')].map((m) => {
+		const rowMarks = await P(() => [...document.querySelectorAll('#lpn_setbox_content .lpn-set-row .lpn-saved:not(.lpn-saved-short)')].map((m) => {
 			const row = m.closest('.lpn-set-row'), sub = row.closest('.lpn-set-subbody').previousElementSibling;
 			return { cls: m.getAttribute('data-saved-class'), row: row.getAttribute('data-saved'), heading: sub.getAttribute('data-saved') };
 		}));
 		ok('a row carries its own marker only where its home differs from its heading\'s',
 			rowMarks.length >= 1 && rowMarks.every((r) => r.cls === r.row && r.cls !== r.heading), JSON.stringify(rowMarks));
+		// Map and Page mark every row (p) or (b) instead (Tom, 2026-10-18).
+		const shortMarks = await P(() => [...document.querySelectorAll('#lpn_set_sec_map .lpn-set-row, #lpn_set_sec_page .lpn-set-row')].map((row) => {
+			const m = row.querySelector('.lpn-saved-short'), sub = row.closest('.lpn-set-subbody').previousElementSibling;
+			return { cls: m && m.getAttribute('data-saved-class'), home: row.getAttribute('data-saved') || sub.getAttribute('data-saved'), text: row.textContent.trim().slice(0, 30) };
+		}));
+		ok('every row under Map and Page ends in its own (p) or (b)', shortMarks.length >= 20 && shortMarks.every((r) => r.cls && r.cls === r.home), JSON.stringify(shortMarks.filter((r) => r.cls !== r.home)));
 
 		console.log('\n--- every value control is stored where its marker says ---');
 		const allControls = await P(TAG);

@@ -1193,31 +1193,36 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						</div>
 					</div>
 				</section>
+				<?php // **MAP AND PAGE ARE TWO SECTIONS, AND NEITHER HAS AN INDEXED SUB-HEADING** (Tom,
+				      // 2026-10-18). Map is cut by six small headings the index leaves out (.lpn-set-minor):
+				      // Size, Angle, Zoom, Positions, Show, Thematic. Page is the four rows kept in this
+				      // browser, and the two resets. Every row in both ends in (p) or (b), with the legend
+				      // above. The sub-heading in each is SILENT: hidden and out of the index, kept because
+				      // the saved class, the filter and the Settings table all read a row's sub-heading.
+				      // Positions is three builders' rows in one group: the labels legend, the colour legend
+				      // (buildColoringSection) and the along-the-line switch, in that order. ?>
 				<section id="lpn_set_sec_map" class="lpn-set-sec" data-set-sec="map">
-					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_map']?></h3>
+					<h3 class="lpn-set-head"><?=$ec_lang['lpn_menu_map']?></h3>
 					<div class="lpn-set-secbody">
-						<?php // Tom, 2026-10-18: two indexed sub-headings, Sizes (the numbers) and Options
-						      // (the legend corners, the switches, the theme, the resets), each
-						      // cut by small headings the index leaves out (.lpn-set-group). The minor
-						      // groups are built in JS except Positions, which three builders share:
-						      // the labels legend, the colour legend (buildColoringSection) and the
-						      // along-the-line switch, in that order. Options mixes project and
-						      // browser rows, so its browser rows carry their own marker. The colour-scheme
-						      // acknowledgements live in the Credits section, verbatim. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_mapDisplay" data-saved="project"><?=$ec_lang['lpn_settings_map_drawing']?><?=lpnSavedMark('project')?></div>
+						<div class="lpn-set-group lpn-set-legend"><?=htmlspecialchars($ec_lang['lpn_saved_short_project'] . ' ' . $ec_lang['lpn_saved_project'] . ', ' . $ec_lang['lpn_saved_short_browser'] . ' ' . $ec_lang['lpn_saved_browser'])?></div>
+						<div class="lpn-set-sub lpn-set-sub-silent" id="lpn_set_sub_mapDisplay" data-saved="project"><?=$ec_lang['lpn_menu_map']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_set_map_fields" class="lpn-set-part"></div>
-						</div>
-						<div class="lpn-set-sub" id="lpn_set_sub_page" data-saved="project"><?=$ec_lang['lpn_settings_map_options']?><?=lpnSavedMark('project')?></div>
-						<div class="lpn-set-subbody">
 							<div class="lpn-set-part">
 								<div class="lpn-set-group lpn-set-minor"><?=$ec_lang['lpn_settings_grp_positions']?></div>
 								<div id="lpn_set_pos_fields" class="lpn-set-part"></div>
 								<div id="lpn_set_colors_shared" class="lpn-set-part"></div>
 								<div id="lpn_set_pos_fields2" class="lpn-set-part"></div>
 							</div>
-							<div id="lpn_set_page_fields" class="lpn-set-part"></div>
+							<div id="lpn_set_map_fields2" class="lpn-set-part"></div>
 						</div>
+					</div>
+				</section>
+				<section id="lpn_set_sec_page" class="lpn-set-sec" data-set-sec="page">
+					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_page']?></h3>
+					<div class="lpn-set-secbody">
+						<div class="lpn-set-sub lpn-set-sub-silent" id="lpn_set_sub_page" data-saved="browser"><?=$ec_lang['lpn_settings_page']?><?=lpnSavedMark('browser')?></div>
+						<div class="lpn-set-subbody"><div id="lpn_set_page_fields" class="lpn-set-part"></div></div>
 					</div>
 				</section>
 				<?php // ---- Section: NEW ELEMENTS ----
@@ -2133,13 +2138,13 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 
 <script>
 EngCalcs.pageConfig = {
+	lpn_saved_short_project: <?=json_encode($ec_lang['lpn_saved_short_project'])?>,
+	lpn_saved_short_browser: <?=json_encode($ec_lang['lpn_saved_short_browser'])?>,
 	lpn_settings_grp_size: <?=json_encode($ec_lang['lpn_settings_grp_size'])?>,
 	lpn_settings_grp_angle: <?=json_encode($ec_lang['lpn_settings_grp_angle'])?>,
 	lpn_settings_grp_zoom: <?=json_encode($ec_lang['lpn_settings_grp_zoom'])?>,
-	lpn_settings_grp_fade: <?=json_encode($ec_lang['lpn_settings_grp_fade'])?>,
 	lpn_settings_grp_show: <?=json_encode($ec_lang['lpn_settings_grp_show'])?>,
 	lpn_settings_grp_thematic: <?=json_encode($ec_lang['lpn_settings_grp_thematic'])?>,
-	lpn_settings_grp_resets: <?=json_encode($ec_lang['lpn_settings_grp_resets'])?>,
 	lpn_tool_select: <?=json_encode($ec_lang['lpn_tool_select'])?>,
 	lpn_tool_add_junction: <?=json_encode($ec_lang['lpn_tool_add_junction'])?>,
 	lpn_tool_add_reservoir: <?=json_encode($ec_lang['lpn_tool_add_reservoir'])?>,

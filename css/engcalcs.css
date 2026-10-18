@@ -4034,6 +4034,10 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 .lpn-set-group { margin-top: 10px; font-weight: 600; opacity: .8; text-transform: none; }
 /* A small heading under Drawing or Options, left out of the index: a step below .lpn-set-sub. */
 .lpn-set-minor { margin-top: 6px; font-size: .85rem; font-style: italic; }
+/* Map and Page have no visible sub-heading; this one is read by code only. */
+.lpn-set-sub-silent { display: none; }
+.lpn-set-legend { margin-top: 4px; font-weight: normal; font-size: .8rem; }
+.lpn-saved-short { font-size: .8rem; opacity: .7; white-space: nowrap; }
 /* **ONE SMALL-TEXT TREATMENT FOR THE WHOLE BOX**, and it is .lpn-units-name's: .85em at .8 opacity.
    The notes under a sub-heading, the ramp acknowledgements, the name beside a unit select and --
    since Tom's 2026-08-19 audit -- the name of every setting row are one size and one opacity. A
