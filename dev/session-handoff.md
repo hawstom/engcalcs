@@ -18,8 +18,8 @@ lines rather than appending corrections.
 - **Never wrap `run_harnesses.sh` or `check_all.sh` in the browser lock**: each browser harness
   takes that lock itself, so the wrapper deadlocks every one (2026-09-25, 280 s NOT RUN apiece).
   Brief agents to write journals to the scratchpad while a suite runs in the main checkout.
-- Since 2026-10-02 (jasmine, 24 threads) `check_all.sh` runs four suites at once in slots, ~19 min since the browser lanes (Task 797; ~57 before)
-  each by 2026-10-15 (Task 797); run it with no outer flock. A branch cut before `f9829cee` still uses the single browser lock,
+- Since 2026-10-02 (jasmine, 24 threads) `check_all.sh` runs four suites at once in slots, ~36 min (two runs, 2026-10-17; Task 797);
+  run it with no outer flock. A branch cut before `f9829cee` still uses the single browser lock,
   so its browser harnesses can print `NOT RUN` under load: merge master into it first.
 
 ## RULINGS
@@ -98,10 +98,9 @@ lines rather than appending corrections.
 
 ## STATE — 2026-10-17 (twenty-fifth session, afternoon and evening, Arizona time)
 
-### Master: e8ba2bb67 (merge/1017c) unless he has typed a merge word since. Production: b7c99102 (10-09) when last read
+### Master: 4866c11d2 (sprint 1017 merged, green, pushed 2026-10-17 8:02 PM). Production: b7c99102 (10-09) when last read
 
-**Sprint 1017 is on `chore/sprint-1017`, green (check_all EXIT=0 on 90a948c17), pushed, NOT merged**:
-the classifier refused CC's master merge; it needs his typed word. It translates the 408 untranslated
+**Sprint 1017 is merged into master and ready to deploy**. It translates the 408 untranslated
 keys (98 of them he had not yet read) and 27 rewordings into 26 languages, Wave 0 rewrote 19 English
 strings (`dev/english-friction/1017-wave0.json`), cross-language QA fixed 237 strings
 (`dev/english-friction/1017-qa-report.md`), Task 809's halo words, the five dead keys joined on one
@@ -139,8 +138,7 @@ Deleted keys: `lpn_guide_text_notes_popup`; and from the 26 non-English files on
 
 ### Next job
 
-His merge word on `chore/sprint-1017`, then the suite on the merge commit and a push. Then his browser
-passes on the three branches above. Task 749 waits on his `.sqlite` sample.
+His pull of 4866c11d2 to deploy the sprint. His browser passes on the three branches above. Task 749 waits on his `.sqlite` sample.
 
 ### Traps met 2026-10-17 (twenty-fifth session)
 
