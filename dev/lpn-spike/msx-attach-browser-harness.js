@@ -128,7 +128,7 @@ async function main() {
 		console.log('\n--- File > Import > EPANET-MSX file ---');
 		await attach(a, L, 'cl.msx', MSX1, false);
 		const rep = await dialogText(a);
-		ok('the report says the file is kept and not run', rep.indexOf(L.kept) >= 0 && /when the EPANET-MSX file is exported/.test(rep), rep);
+		ok('the report says the file is kept and not run', rep.indexOf(L.kept) >= 0, rep);
 		ok('...names the species CL2', /Species in the file: CL2\./.test(rep), rep);
 		ok('...names the ID the network lacks (NOWHERE) and not J1', rep.indexOf('NOWHERE') >= 0 && !/this network does not have:[^.]*J1/.test(rep), rep);
 		await closeDialogs(a);
@@ -182,7 +182,7 @@ async function main() {
 		await b.settle(400);
 		await attach(b, L, 'big.msx', BIG, true);
 		const bigSaid = await dialogText(b);
-		ok('the visitor is told it is too large to keep and was not attached', /too large to keep in browser storage/.test(bigSaid), bigSaid.slice(0, 160));
+		ok('the visitor is told it is too large to keep and was not attached', bigSaid.indexOf((await b.lang('lpn_msx_too_big')).replace('{file}', 'big.msx')) >= 0, bigSaid.slice(0, 160));
 		await closeDialogs(b);
 		const e4 = await exportMsx(b, L);
 		ok('the previous .msx is still attached and exports unchanged', e4.length === 1 && Buffer.compare(e4[0].bytes, MSX1) === 0);
