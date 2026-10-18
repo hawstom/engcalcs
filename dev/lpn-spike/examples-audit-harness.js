@@ -89,6 +89,9 @@ const PUBLISHED = JSON.parse(fs.readFileSync(path.join(OUT_DIR, 'manifest.json')
 // behind. Adding an example forces a line here, which is the point.
 const SOURCE_OF = {
 	'Net1.lwn': 'Net1.inp',
+	// Net1.lwn re-saved by the page with a scenario tree (build_scenario_example.js): derived from a
+	// curated example, not imported, so its reference is scenario-example-harness.js and Net1.lwn.
+	'Net1-Scenarios.lwn': null,
 	// Net2 is Tom's own georeferenced project file (a Branford, Connecticut placement of EPA's Net2
 	// that he saved from the page), so the geographic placement, the labels and the text objects are
 	// the curation; Net2.inp is its source model.
@@ -409,10 +412,10 @@ const NET1_RULES = [
 ];
 PUBLISHED.forEach((file) => {
 	const open = openShipped(file);
-	const want = file === 'Net1.lwn' ? NET1_RULES : file === 'Net1-SI.lwn' ? NET1_RULES_SI : [];
+	const want = (file === 'Net1.lwn' || file === 'Net1-Scenarios.lwn') ? NET1_RULES : file === 'Net1-SI.lwn' ? NET1_RULES_SI : [];
 	ok(file + ' ships exactly the rules declared for it',
 		dump(open.rules || []) === dump(want), dump(open.rules || []).slice(0, 300));
-	if (file !== 'Net1.lwn' && file !== 'Net1-SI.lwn') { return; }
+	if (file !== 'Net1.lwn' && file !== 'Net1-SI.lwn' && file !== 'Net1-Scenarios.lwn') { return; }
 	// Every id a rule names is an id the project has -- libReadRule()'s own question, asked of the
 	// shipped file rather than of a box somebody is typing in.
 	const ids = {};

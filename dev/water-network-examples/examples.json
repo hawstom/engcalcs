@@ -6,6 +6,7 @@
 	"Basic-example-SI-units.lwn": { "key": "basic_si", "order": 10 },
 	"Basic-example-US-units.lwn": { "key": "basic_us", "order": 20 },
 	"Net1.lwn": { "key": "net1" },
+	"Net1-Scenarios.lwn": { "key": "net1_scn", "order": -2 },
 	"Net1-SI.lwn": { "key": "net1_si", "order": -1 },
 	"Net2-Branford-CT-SI.lwn": { "key": "net2_si", "order": -60 },
 	"Net2-Branford-CT.lwn": { "key": "net2", "order": -50 },
