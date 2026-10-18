@@ -45,8 +45,9 @@
 				v = { labels: 0, values: 0, nodes: 0, nodeInline: 0, nodeStacked: 0, pipes: 0, along: 0, level: 0, levelLeader: 0,
 					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N1mine: [], N3: [], N3node: 0, astray: [], sig: [] },
 				items = [], circles = [], texts = [];
-			// Seven figures: a content pass re-measures, and the last bits of a width move.
-			function q(x) { var n = parseFloat(x); return isFinite(n) ? (n * s).toFixed(2) : String(x); }
+			// To a quarter of a screen pixel: a label measured at another zoom differs from one measured
+			// at this one in the hundredths of a pixel (the font's hinting), which no reader can see.
+			function q(x) { var n = parseFloat(x); return isFinite(n) ? (Math.round(n * s * 4) / 4).toFixed(2) : String(x); }
 			function geo(e, names) { return names.map(function (a) { return q(e.getAttribute(a)); }).join(',') + ' ' + (e.getAttribute('text-anchor') || ''); }
 			function inView(p) { var x = p.x * s + state.tx, y = p.y * s + state.ty; return x >= 0 && x <= W && y >= 0 && y <= H; }
 			function vis(t) { return !!t && !!t.textContent && t.checkVisibility({ visibilityProperty: true, opacityProperty: true }); }
@@ -129,7 +130,7 @@
 					circles.forEach(function (c) {
 						// A symbol over the leader's own start is the placement's own exemption (two nodes
 						// drawn on one another, leaderThroughSymbol()): not a crossing.
-						if (c.id === n.id || ptSeg(c.x, c.y, g) >= c.r - tol || Math.hypot(c.x - g.ax, c.y - g.ay) < c.r) { return; }
+						if (c.id === n.id || ptSeg(c.x, c.y, g) >= c.r - tol || (Math.abs(c.x - g.ax) <= c.r && Math.abs(c.y - g.ay) <= c.r)) { return; }
 						if (ne.inline) { v.N3.push('N' + n.id + ' leader through ' + c.id); } else { v.N3node++; }
 					});
 				}

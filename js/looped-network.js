@@ -3015,7 +3015,7 @@ var EngCalcs = EngCalcs || {};
 	// *"Fully shedded links need to hide if they are still in conflict"*): a label with no such
 	// side stays hidden exactly as before. Only a lone label is tried; a chain keeps its stations.
 	// Longest pipe first, as the slide orders them, so the order is a function of the drawing.
-	var LPN_LEVEL_REACH_TEXT_HEIGHTS = 3, LPN_LEVEL_PAD_FRAC = 0.1, LPN_LEVEL_NEAR_FRAC = 0.5;
+	var LPN_LEVEL_REACH_TEXT_HEIGHTS = 3, LPN_LEVEL_PAD_FRAC = 0.1, LPN_LEVEL_NEAR_FRAC = 0.35;
 	// **A LEVEL LABEL CARRIES ITS LEADER UNLESS IT TOUCHES ITS PIPE** (pre-review of
 	// feat/label-beside, 2026-10-18: level labels 25-45 px from their pipe had no leader, because a
 	// data label draws one only past leaderThreshold(), and several sat as near another pipe as their

@@ -1227,20 +1227,26 @@ EngCalcs.lpnCollide = (function () {
 		// `near` (a margin): a side too close to draw a leader must leave the label's own pipe the
 		// nearest one (ownPipeNearest()).
 		var nearMargin = opts.near >= 0 ? opts.near : -1;
-		// `quietMax`: out to this distance a side whose own pipe is plainly the nearest may go without
-		// a leader (`lbl._quiet`), the reader's eye doing the leader's work; any other side beyond
+		// `quietMax`: out to this distance, a side whose leader cannot be drawn clean may still be taken
+		// without one (`lbl._quiet`) where its own pipe is plainly the nearest; every other side beyond
 		// `leaderMin` says whose it is with a leader.
 		var quietMax = opts.quietMax > leaderMin ? opts.quietMax : leaderMin;
 		function strictOk(lbl, c, b) {
-			var g, i, o, dist = Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y), far = dist > leaderMin,
+			var dist = Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y), far = dist > leaderMin,
 				near = function () { return nearMargin < 0 || lbl.ownLink === undefined || ownPipeNearest(b, local, lbl.ownLink, nearMargin); };
 			lbl._quiet = false;
 			if (lbl.ownLink !== undefined && boxesOnOwnLink(b, local, lbl.ownLink)) { return false; }
 			// A side near enough to draw no leader must say whose label it is by being nearest its own
 			// pipe; one far enough out to carry a leader says it with the leader.
 			if (!far) { return near(); }
+			// The leader first; only where no clean leader can be drawn (one starting inside an end
+			// node's symbol, on a pipe shorter than its own symbols) does a quiet side stand in.
+			if (leaderClear(lbl, c)) { return true; }
 			if (dist <= quietMax && near()) { lbl._quiet = true; return true; }
-			g = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id);
+			return false;
+		}
+		function leaderClear(lbl, c) {
+			var g = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id), i, o;
 			// Every symbol counts, the one round the anchor included: a pipe's anchor is no node's
 			// own, so a leader starting inside an end node's symbol runs through it.
 			for (i = 0; i < local.boxes.length; i++) {

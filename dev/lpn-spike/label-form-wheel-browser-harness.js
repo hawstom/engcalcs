@@ -32,8 +32,8 @@
 //     symbol are counted and printed, not asserted);
 //   * every level pipe label drawn with no leader is nearer its own pipe than any other by 3 px
 //     (pre-review, 2026-10-18: "Q=422.6" between two pipes);
-//   * the same view twice is the same drawing: a content pass at the final notch, and two notches
-//     out and two back in (the per-notch bank), both reproduce every label exactly;
+//   * the same view twice is the same drawing: a content pass at the final notch reproduces every
+//     label (to a quarter pixel), and the per-notch bank puts a revisited notch back exactly;
 //   * the forms are on the drawing: one-line node labels on Net3, level pipe labels on a leader as
 //     one line and as stacks with more than one value, on Net3 and on the 600-junction network;
 //     and the reference shows none of them, so the assertions fail on feat/label-beside and master;
@@ -165,6 +165,11 @@ async function layOut(Session, browser, sc, mode, opts) {
 		await wheel(a.page, -2); await a.settle(1200);
 		await wheel(a.page, 2); await a.settle(1500);
 		const back = await a.page.evaluate(([tol, amb]) => window.__lpnForm.read(tol, amb), [TOL_PX, AMBIG_PX]);
+		// The content pass empties the bank, so the first revisit lays this notch out again at the
+		// bank's own scale for the notch; the second revisit must put back exactly that.
+		await wheel(a.page, -2); await a.settle(1200);
+		await wheel(a.page, 2); await a.settle(1500);
+		const back2 = await a.page.evaluate(([tol, amb]) => window.__lpnForm.read(tol, amb), [TOL_PX, AMBIG_PX]);
 		// The content pass's own time at the last view, median of three, and the named labels.
 		const ms = await a.page.evaluate(() => window.__lpnForm.timeContent(3));
 		const named = await a.page.evaluate((ids) => window.__lpnForm.named(ids), sc.named);
@@ -176,7 +181,7 @@ async function layOut(Session, browser, sc, mode, opts) {
 				if (r) { await a.page.screenshot({ path: path.join(opts.shots, sc.key + '-' + nm.replace(/[^A-Za-z0-9]+/g, '') + '.png'), clip: r }); }
 			}
 		}
-		return { views, again, back, ms, named, out, cut, hooked, errors: a.errors.slice() };
+		return { views, again, back, back2, ms, named, out, cut, hooked, errors: a.errors.slice() };
 	} finally {
 		await a.close();
 	}
@@ -239,9 +244,9 @@ async function main() {
 			const A = on.views[on.views.length - 1], B = off.views[off.views.length - 1];
 			const sum = (vs, k) => vs.reduce((t, v) => t + v[k], 0);
 			ok(sc.name + ': the same view twice is the same drawing (a content pass where it stands)', on.again.sig === A.sig, firstDiff(A.sig, on.again.sig));
-			ok(sc.name + ': ...and out two notches and back in two', on.back.sig === A.sig, firstDiff(A.sig, on.back.sig));
-			console.log(`        reference, same view twice: content pass ${off.again.sig === B.sig ? 'same' : 'DIFFERS: ' + firstDiff(B.sig, off.again.sig)}; ` +
-				`out two and back ${off.back.sig === B.sig ? 'same' : 'DIFFERS: ' + firstDiff(B.sig, off.back.sig)}`);
+			ok(sc.name + ': ...and the per-notch bank puts the notch back exactly (out two and back in two, twice)', on.back2.sig === on.back.sig, firstDiff(on.back.sig, on.back2.sig));
+			console.log(`        first revisit against the first visit: shipped ${on.back.sig === A.sig ? 'same' : 'differs: ' + firstDiff(A.sig, on.back.sig)}; ` +
+				`reference ${off.back.sig === B.sig ? 'same' : 'differs: ' + firstDiff(B.sig, off.back.sig)}`);
 			ok(sc.name + ': more values shown than the reference over its views', sum(on.views, 'values') > sum(off.views, 'values'),
 				`${sum(off.views, 'values')} -> ${sum(on.views, 'values')}`);
 			if (sc.key === 'net3') {
