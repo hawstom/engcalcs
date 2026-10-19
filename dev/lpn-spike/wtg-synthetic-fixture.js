@@ -194,4 +194,31 @@ function buildSyntheticWtg(file, extraPy) {
 	execFileSync('python3', ['-I', '-c', PY, file].concat(extraPy ? [extraPy] : []));
 	return file;
 }
-module.exports = { buildSyntheticWtg };
+// Base options 48 (no adjustment); the Peak scenario (60) owns options 49 with a UNIT adjustment of 3.5
+// (scope 0, operation 2: multiply); the child 61 owns none and so takes its parent's. J1 gets a 4 L/s
+// unit demand load of 100 units. `onlyUnit` removes J1's and J3's normal demands (the real models' shape).
+function unitDemandExtra(unitAdjust, onlyUnit, baseAdjust) {
+	return `
+x('CREATE TABLE IdahoDemandNode_Demand_UnitDemandLoadCollection (ItemID, DomainElementID, AlternativeID, UnitDemandLoadCollection_UnitDemandLoadID, UnitDemandLoadCollection_NumberOfLoadingUnits, UnitDemandLoadCollection_UnitDemandBaseFlow, UnitDemandLoadCollection_UnitDemandPatternID)')
+x('CREATE TABLE EpaNetEngine_UnitDemandAdjustmentsCollection (ItemID, CalculationOptionsID, UnitDemandAdjustmentsCollection_UnitDemandScopeID, UnitDemandAdjustmentsCollection_UnitDemandID, UnitDemandAdjustmentsCollection_UnitDemandAdjustmentValue, UnitDemandAdjustmentsCollection_UnitDemandOrderIndex, UnitDemandOperation)')
+x("UPDATE IdahoDemandNode_Demand_Data SET UnitDemandLoadCollectionCount = 1 WHERE DomainElementID = 101")
+x('INSERT INTO IdahoDemandNode_Demand_UnitDemandLoadCollection VALUES (1, 101, 35, 9999, 100, ?, NULL)', (4 * L,))
+x('INSERT INTO EpaNetEngine VALUES (49,1,1,40,0.001,1.0837399580445e-05,1.0,1584489600,2,10,0,0.5,0,1,0,0,0)')
+x('INSERT INTO EpaNetEngine_TimeAnalysisType_EpsType VALUES (49,86400,3600,3600,0)')
+x('INSERT INTO HMIScenarioCalculationOptions VALUES (60, -1304441024, 49, 1)')
+x('INSERT INTO EpaNetEngine_UnitDemandAdjustmentsCollection VALUES (1, 49, 0, 0, ${unitAdjust}, 0, 2)')
+x('INSERT INTO EpaNetEngine_UnitDemandAdjustmentsCollection VALUES (2, 48, 0, 0, ${baseAdjust}, 0, 2)')
+x('UPDATE EpaNetEngine SET UnitDemandAdjustmentsCollectionCount = 1 WHERE CalculationOptionsID = 48')
+x('CREATE TABLE IdahoFireFlowNode_FireFlow_Data (DomainElementID, AlternativeID, FireFlow_HasLocalFireFlowConstraints, FireFlow_NeededFireFlow, FireFlow_FireFlowUpperLimit)')
+x('CREATE TABLE FireFlow_SystemData (AlternativeID, SystemNeededFireFlow, SystemFireFlowUpperLimit, SystemResidualPressure, SystemUseVelocityConstraint, SystemMaximumVelocity)')
+x('INSERT INTO HMIAlternative VALUES (38,NULL,26,0,1,1)'); lab[38] = 'Base 26'
+for sid in (58, 60, 61): x('INSERT INTO HMIScenarioAlternative VALUES (?,26,38,?)', (sid, 1 if sid == 58 else 0))
+x('INSERT INTO IdahoFireFlowNode_FireFlow_Data VALUES (101, 38, 1, ?, ?)', (20 * L, 30 * L))
+x('INSERT INTO IdahoFireFlowNode_FireFlow_Data VALUES (104, 38, 0, ?, ?)', (15 * L, 15 * L))
+x('INSERT INTO FireFlow_SystemData VALUES (38, ?, ?, ?, 1, 10.0)', (15 * L, 40 * L, 19.8))
+` + (onlyUnit ? `
+x('DELETE FROM IdahoDemandNode_Demand_DemandCollection')
+x('UPDATE IdahoDemandNode_Demand_Data SET DemandCollectionCount = 0')
+` : '');
+}
+module.exports = { buildSyntheticWtg, unitDemandExtra };

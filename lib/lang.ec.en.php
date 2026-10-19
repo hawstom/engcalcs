@@ -4878,6 +4878,7 @@ $ec_lang['lpn_wtg_note_tank_shape']='These tanks are not circular. Each was give
 $ec_lang['lpn_wtg_note_tank_demand']='Not imported: the demands at these tanks. An EPANET tank has no demand.';
 $ec_lang['lpn_wtg_note_emitter_unread']='Not imported: the emitter coefficients of these junctions, because the unit they are stored in is not yet confirmed.';
 $ec_lang['lpn_wtg_note_customer_demand']='Not imported: the customer demands at these junctions. Their base demands were imported.';
+$ec_lang['lpn_wtg_note_fireflow']='Not imported: the fire flow settings of the model. A needed fire flow stated at a junction was imported as that junction\'s Required fire flow; enter the rest in the fire flow window.';
 $ec_lang['lpn_wtg_note_unit_demand']='The demand at these junctions comes from unit demand loads. The flow of each load was imported as a demand; the loading units and the unit load were not.';
 $ec_lang['lpn_wtg_note_setting_pattern']='Not imported: the setting patterns of these valves.';
 $ec_lang['lpn_wtg_note_pattern_continuous']='These patterns are continuous in the model. Here each multiplier holds until the next time step.';

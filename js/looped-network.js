@@ -45250,6 +45250,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'wtg-tank-demand': ['lpn_wtg_note_tank_demand', 'Not imported: the demands at these tanks. An EPANET tank has no demand.'],
 		'wtg-emitter-unread': ['lpn_wtg_note_emitter_unread', 'Not imported: the emitter coefficients of these junctions, because the unit they are stored in is not yet confirmed.'],
 		'wtg-customer-demand': ['lpn_wtg_note_customer_demand', 'Not imported: the customer demands at these junctions. Their base demands were imported.'],
+		'wtg-fireflow': ['lpn_wtg_note_fireflow', 'Not imported: the fire flow settings of the model. A needed fire flow stated at a junction was imported as that junction\'s Required fire flow; enter the rest in the fire flow window.'],
 		'wtg-unit-demand': ['lpn_wtg_note_unit_demand', 'The demand at these junctions comes from unit demand loads. The flow of each load was imported as a demand; the loading units and the unit load were not.'],
 		'wtg-setting-pattern': ['lpn_wtg_note_setting_pattern', 'Not imported: the setting patterns of these valves.'],
 		'wtg-pattern-continuous': ['lpn_wtg_note_pattern_continuous', 'These patterns are continuous in the model. Here each multiplier holds until the next time step.'],
@@ -45370,6 +45371,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		(r.inactiveIds.links || []).forEach(function (i) { off[ovKeyFor('link', i)] = true; });
 		saved.nodes.forEach(function (n) { if (off[ovKeyFor('node', n.id)]) { n._active = false; } });   // base-write: an imported document is born in Base
 		saved.links.forEach(function (l) { if (off[ovKeyFor('link', l.id)]) { l._active = false; } });   // base-write: an imported document is born in Base
+		Object.keys(r.fireFlow || {}).forEach(function (id) {
+			saved.nodes.forEach(function (n) { if (n.id === id) { n._fireFlow = r.fireFlow[id]; } });   // base-write: an imported document is born in Base
+		});
 		var sid = {}, n = 0;
 		r.scenarios.forEach(function (s) { sid[s.fileId] = 's' + (++n); });
 		r.scenarios.forEach(function (s) {

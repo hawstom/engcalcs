@@ -4453,6 +4453,7 @@ EngCalcs.pageConfig = {
 	lpn_wtg_note_tank_demand: <?=json_encode($ec_lang['lpn_wtg_note_tank_demand'])?>,
 	lpn_wtg_note_emitter_unread: <?=json_encode($ec_lang['lpn_wtg_note_emitter_unread'])?>,
 	lpn_wtg_note_customer_demand: <?=json_encode($ec_lang['lpn_wtg_note_customer_demand'])?>,
+	lpn_wtg_note_fireflow: <?=json_encode($ec_lang['lpn_wtg_note_fireflow'])?>,
 	lpn_wtg_note_unit_demand: <?=json_encode($ec_lang['lpn_wtg_note_unit_demand'])?>,
 	lpn_wtg_note_setting_pattern: <?=json_encode($ec_lang['lpn_wtg_note_setting_pattern'])?>,
 	lpn_wtg_note_pattern_continuous: <?=json_encode($ec_lang['lpn_wtg_note_pattern_continuous'])?>,

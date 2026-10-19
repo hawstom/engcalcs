@@ -43,6 +43,7 @@
 		HMIGeometryScaledLength: 63, Physical_ValveDiameter: 63, Physical_DarcyWeisbachE: 63,
 		Physical_HazenWilliamsC: 252, Physical_PipeMannings: 252, Physical_CompositeMinorLoss: 252,
 		Physical_CalculatedMinorLossCoefficient: 252, DemandCollection_BaseFlow: 27, UnitDemandLoadCollection_UnitDemandBaseFlow: 27,
+		FireFlow_NeededFireFlow: 27, FireFlow_SystemNeededFireFlow: 27, FireFlow_SystemFireFlowUpperLimit: 27, FireFlow_SystemResidualPressure: 231,
 		Physical_TankBaseElevation: 63, Physical_TankMaximumElevation: 63, Physical_TankMinimumElevation: 63,
 		Physical_TankMaximumLevel: 63, Physical_TankMinimumLevel: 63, InitialSettings_TankInitialElevation: 63,
 		InitialSettings_TankInitialLevel: 63, CircularTankSectionType_TankDiameter: 63,
@@ -254,7 +255,8 @@
 		PressureValve_InitialSettings_PressureValveSetting_ValvePressureType: 1,
 		PressureValve_InitialSettings_PressureValveSetting_ValveHGLType: 1, PressureValve_Physical_Data: 1,
 		PRV_Physical_Data: 1, PSV_Physical_Data: 1, PBV_Physical_Data: 1, FCV_Physical_Data: 1, FCV_InitialSettings_Data: 1,
-		TCV_Physical_Data: 1, TCV_InitialSettings_Data: 1, GPV_Physical_Data: 1, IdahoFireFlowNode_Physical_Data: 1
+		TCV_Physical_Data: 1, TCV_InitialSettings_Data: 1, GPV_Physical_Data: 1, IdahoFireFlowNode_Physical_Data: 1,
+		IdahoFireFlowNode_FireFlow_Data: 1
 	};
 
 	function Model(db) {
@@ -1103,6 +1105,28 @@
 			note('wtg-pattern-default', ['1']);
 		}
 
+		// ---- fire flow. A junction that states its own needed flow (FireFlow_HasLocalFireFlowConstraints)
+		// becomes that junction's Required fire flow, in the project's flow unit, laid on by the page.
+		// The model's system-wide settings (needed flow, upper limit, residual pressure, velocity limit) and
+		// a junction's own upper limit have no home in the document, so they are reported with their values.
+		var fireFlow = {};
+		net.nodes.forEach(function (n) {
+			if (n.kind !== 'junction' || !get(n.e, S, 'FireFlow_HasLocalFireFlowConstraints')) { return; }
+			var q = get(n.e, S, 'FireFlow_NeededFireFlow');
+			if (typeof q === 'number' && q > 0) { fireFlow[n.id] = Number(Q(q, 'FireFlow_NeededFireFlow')); }
+		});
+		var ffSys = null, ffAlt = resolvedPick(S, 26);
+		if (M.has('FireFlow_SystemData') && ffAlt !== null) {
+			M.all('FireFlow_SystemData').forEach(function (r) { if (r.AlternativeID === ffAlt) { ffSys = r; } });
+		}
+		if (ffSys && ffSys.SystemNeededFireFlow > 0) {
+			var qu = flowKw, ffWords = [];
+			ffWords.push('needed flow ' + Q(ffSys.SystemNeededFireFlow, 'FireFlow_SystemNeededFireFlow') + ' ' + qu);
+			if (ffSys.SystemFireFlowUpperLimit > 0) { ffWords.push('upper limit ' + Q(ffSys.SystemFireFlowUpperLimit, 'FireFlow_SystemFireFlowUpperLimit') + ' ' + qu); }
+			if (ffSys.SystemResidualPressure > 0) { ffWords.push('residual pressure ' + P(ffSys.SystemResidualPressure, 'FireFlow_SystemResidualPressure') + ' ' + T.press); }
+			if (ffSys.SystemUseVelocityConstraint && ffSys.SystemMaximumVelocity > 0) { ffWords.push('velocity limit ' + num(us ? ffSys.SystemMaximumVelocity : ffSys.SystemMaximumVelocity * 0.3048) + (us ? ' ft/s' : ' m/s')); }
+			note('wtg-fireflow', ffWords);
+		}
 		// ---- what was not carried, by name
 		if (renamed.length) { note('wtg-id-changed', renamed); }
 		if (net.skipped.length) { note('wtg-element-unread', net.skipped); }
@@ -1166,7 +1190,7 @@
 				links: net.links.filter(function (l) { return !l.active && l.id; }).map(function (l) { return l.id; })
 					.concat(net.directed.filter(function (d) { return !d.active && d.id; }).map(function (d) { return d.id; })) },
 			counts: counts, baseScenario: labels[baseId], activeScenario: activeId ? labels[activeId] : null,
-			declaredUnits: declared
+			declaredUnits: declared, fireFlow: fireFlow
 		};
 	}
 

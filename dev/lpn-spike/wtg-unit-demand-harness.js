@@ -23,7 +23,7 @@ require(path.join(ROOT, 'js', 'lpn-inp.js'));
 require(path.join(ROOT, 'js', 'lpn-wtg.js'));
 const EC = globalThis.EngCalcs;
 EC.lpnSqliteSetEngine(initSqlJs, fs.readFileSync(path.join(ROOT, 'js', 'vendor', 'sql-wasm.wasm')));
-const { buildSyntheticWtg } = require('./wtg-synthetic-fixture.js');
+const { buildSyntheticWtg, unitDemandExtra: extra } = require('./wtg-synthetic-fixture.js');
 
 let fails = 0;
 function ok(name, cond, extra) {
@@ -40,27 +40,6 @@ function section(inp, name) {
 		if (on && l.trim() && l.trim()[0] !== ';') { out.push(l.trim().split(/\s+/)); }
 	}
 	return out;
-}
-
-// Base options 48 (no adjustment); the Peak scenario (60) owns options 49 with a UNIT adjustment of 3.5
-// (scope 0, operation 2: multiply); the child 61 owns none and so takes its parent's. J1 gets a 4 L/s
-// unit demand load of 100 units. `onlyUnit` removes J1's and J3's normal demands (the real models' shape).
-function extra(unitAdjust, onlyUnit, baseAdjust) {
-	return `
-x('CREATE TABLE IdahoDemandNode_Demand_UnitDemandLoadCollection (ItemID, DomainElementID, AlternativeID, UnitDemandLoadCollection_UnitDemandLoadID, UnitDemandLoadCollection_NumberOfLoadingUnits, UnitDemandLoadCollection_UnitDemandBaseFlow, UnitDemandLoadCollection_UnitDemandPatternID)')
-x('CREATE TABLE EpaNetEngine_UnitDemandAdjustmentsCollection (ItemID, CalculationOptionsID, UnitDemandAdjustmentsCollection_UnitDemandScopeID, UnitDemandAdjustmentsCollection_UnitDemandID, UnitDemandAdjustmentsCollection_UnitDemandAdjustmentValue, UnitDemandAdjustmentsCollection_UnitDemandOrderIndex, UnitDemandOperation)')
-x("UPDATE IdahoDemandNode_Demand_Data SET UnitDemandLoadCollectionCount = 1 WHERE DomainElementID = 101")
-x('INSERT INTO IdahoDemandNode_Demand_UnitDemandLoadCollection VALUES (1, 101, 35, 9999, 100, ?, NULL)', (4 * L,))
-x('INSERT INTO EpaNetEngine VALUES (49,1,1,40,0.001,1.0837399580445e-05,1.0,1584489600,2,10,0,0.5,0,1,0,0,0)')
-x('INSERT INTO EpaNetEngine_TimeAnalysisType_EpsType VALUES (49,86400,3600,3600,0)')
-x('INSERT INTO HMIScenarioCalculationOptions VALUES (60, -1304441024, 49, 1)')
-x('INSERT INTO EpaNetEngine_UnitDemandAdjustmentsCollection VALUES (1, 49, 0, 0, ${unitAdjust}, 0, 2)')
-x('INSERT INTO EpaNetEngine_UnitDemandAdjustmentsCollection VALUES (2, 48, 0, 0, ${baseAdjust}, 0, 2)')
-x('UPDATE EpaNetEngine SET UnitDemandAdjustmentsCollectionCount = 1 WHERE CalculationOptionsID = 48')
-` + (onlyUnit ? `
-x('DELETE FROM IdahoDemandNode_Demand_DemandCollection')
-x('UPDATE IdahoDemandNode_Demand_Data SET DemandCollectionCount = 0')
-` : '');
 }
 
 async function build(tag, unitAdjust, onlyUnit, baseAdjust) {
@@ -84,6 +63,9 @@ async function synthetic() {
 	ok('scenario Peak carries its own multiplier, 3.5', peak && peak.demandMultiplier === 3.5, JSON.stringify(peak && peak.demandMultiplier));
 	ok('its child takes the parent\'s calculation options, 3.5', small && small.demandMultiplier === 3.5);
 	ok('the Base scenario states no multiplier of its own', r.scenarios.every((s) => s.name !== r.baseScenario));
+	ok('J1 states its own needed fire flow, 20 L/s; J 3 does not (not local)', r.fireFlow && r.fireFlow.J1 === 20 && Object.keys(r.fireFlow).length === 1, JSON.stringify(r.fireFlow));
+	const ff = noteOf(r, 'wtg-fireflow');
+	ok('the system fire flow settings are reported with their values', ff && ff.ids.join('; ') === 'needed flow 15 LPS; upper limit 40 LPS; residual pressure 13.92083 m; velocity limit 3.048 m/s', ff && ff.ids.join('; '));
 
 	head('2. A scenario with the same adjustment as Base states none');
 	r = await build('same', 2.0, true, 2.0);

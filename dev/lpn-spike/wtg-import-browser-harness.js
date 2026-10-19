@@ -49,7 +49,7 @@ require(path.join(REPO, 'js', 'lpn-inp.js'));
 require(path.join(REPO, 'js', 'lpn-wtg.js'));
 const EC = globalThis.EngCalcs;
 EC.lpnSqliteSetEngine(initSqlJs, fs.readFileSync(path.join(REPO, 'js', 'vendor', 'sql-wasm.wasm')));
-const { buildSyntheticWtg } = require('./wtg-synthetic-fixture.js');
+const { buildSyntheticWtg, unitDemandExtra } = require('./wtg-synthetic-fixture.js');
 
 let checks = 0, failures = 0, Session;
 function ok(label, cond, detail) {
@@ -175,6 +175,33 @@ async function synthetic(browser) {
 }
 
 const EPS = 'EPS_Badapokharan_Operation as per design_base_model';
+// Unit demand loads, a scenario's own demand adjustment and a junction's own fire flow, from the
+// synthetic model's second shape (wtg-unit-demand-harness.js holds the reader side): they must
+// arrive in the stored project, not only in the reader's result.
+async function unitDemand(browser) {
+	console.log('\n--- 1b. unit demand loads, scenario demand multipliers and fire flow, in the stored project ---');
+	const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'lpn-wtg-ud-'));
+	const file = buildSyntheticWtg(path.join(tmp, 'Unit loads.wtg.sqlite'), unitDemandExtra(3.5, true, 2.0));
+	const a = await open(browser), h = helpers(a);
+	await a.newProject('si').catch(() => {});
+	await a.dismissGallery().catch(() => {});
+	await h.importVia('lpn_file_import_wtg', file);
+	const d = await a.waitDialog(20000);
+	ok('the report opens', !!d);
+	ok('...naming the unit demand loads and the fire flow settings',
+		!!d && d.text.indexOf(await a.lang('lpn_wtg_note_unit_demand')) > 0 && d.text.indexOf(await a.lang('lpn_wtg_note_fireflow')) > 0, d && d.text.slice(0, 200));
+	if (d) { await a.dialogClick(await a.lang('lpn_dialog_ok')); }
+	const doc = (await h.stored()).doc || {};
+	const peak = (doc.scenarios || []).filter((s) => s.name === 'Peak')[0];
+	ok('scenario Peak keeps its own demand multiplier, 3.5', peak && peak.demandMultiplier === 3.5, JSON.stringify(peak));
+	const j1 = (doc.nodes || []).filter((n) => n.id === 'J1')[0];
+	ok('J1 keeps its own required fire flow, 20', j1 && j1._fireFlow === 20, JSON.stringify(j1 && j1._fireFlow));
+	ok('J1 carries the unit load\'s flow, 4', j1 && j1._demand === 4, JSON.stringify(j1));
+	ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+	await a.close();
+	fs.rmSync(tmp, { recursive: true, force: true });
+}
+
 async function samples(browser) {
 	console.log('\n--- 2. the public WaterGEMS sample, against the .inp WaterGEMS exported ---');
 	const S = process.env.WTG_SAMPLES || '';
@@ -230,6 +257,7 @@ async function main() {
 	const browser = await chromium.launch({ executablePath });
 	try {
 		await synthetic(browser);
+		await unitDemand(browser);
 		await samples(browser);
 	} finally {
 		await browser.close();

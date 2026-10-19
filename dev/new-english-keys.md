@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**79 still to read on master**, of 86 untranslated keys, of 3105 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**80 still to read on master**, of 87 untranslated keys, of 3106 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (86, 79 to read @@ NEEDS RULING)
+## lpn_  (87, 80 to read @@ NEEDS RULING)
 
 - **`lpn_diag_gpv_curve_order`**
   > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
@@ -184,6 +184,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_wtg_note_emitter_unread`**
   > Not imported: the emitter coefficients of these junctions, because the unit they are stored in is not yet confirmed.
   @@ NEEDS RULING
+- **`lpn_wtg_note_fireflow`**
+  > Not imported: the fire flow settings of the model. A needed fire flow stated at a junction was imported as that junction's Required fire flow; enter the rest in the fire flow window.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_gpv_curve`**
   > These general purpose valves have no head loss curve in the file.
   @@ NEEDS RULING
@@ -294,7 +297,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**6 still to read**, of 10 new keys across 5 unmerged branch(es).
+**58 still to read**, of 62 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -311,7 +314,166 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-form (`d05fdb069`) — adds no English strings
 
-### feat/sqlite-reader (`e86aedf9e`) — adds no English strings
+### feat/network-update (`505f71207`) — 52 new, 52 to read @@ NEEDS RULING
+
+- **`lpn_file_export_item_msx`**
+  > EPANET-MSX file…
+  @@ NEEDS RULING
+- **`lpn_file_export_msx_tip`**
+  > Download the attached EPANET-MSX file exactly as it was imported.
+  @@ NEEDS RULING
+- **`lpn_file_import_msx`**
+  > EPANET-MSX file…
+  @@ NEEDS RULING
+- **`lpn_file_import_msx_tip`**
+  > Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.
+  @@ NEEDS RULING
+- **`lpn_inpup_ask_title`**
+  > Import {file}
+  @@ NEEDS RULING
+- **`lpn_inpup_base_note`**
+  > Base. Every scenario inherits Base, so choosing Base changes them all.
+  @@ NEEDS RULING
+- **`lpn_inpup_blank`**
+  > blank
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_base`**
+  > Base
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_new`**
+  > A new project
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_project`**
+  > This project, {project}
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_scenario`**
+  > {scenario}, open now
+  @@ NEEDS RULING
+- **`lpn_inpup_counts`**
+  > Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).
+  @@ NEEDS RULING
+- **`lpn_inpup_h_added`**
+  > Assets added
+  @@ NEEDS RULING
+- **`lpn_inpup_h_changed`**
+  > Values changed
+  @@ NEEDS RULING
+- **`lpn_inpup_h_kept`**
+  > Kept, not in the file
+  @@ NEEDS RULING
+- **`lpn_inpup_h_na`**
+  > Not applied
+  @@ NEEDS RULING
+- **`lpn_inpup_heading`**
+  > Imported {file} into {scenario} of {project}
+  @@ NEEDS RULING
+- **`lpn_inpup_how`**
+  > In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.
+  @@ NEEDS RULING
+- **`lpn_inpup_lead`**
+  > An EPANET file holds one set of values and no scenarios. Choose where to put them.
+  @@ NEEDS RULING
+- **`lpn_inpup_method_row`**
+  > Head loss formula: the file uses {file} and this project uses {project}.
+  @@ NEEDS RULING
+- **`lpn_inpup_more`**
+  > {n} more
+  @@ NEEDS RULING
+- **`lpn_inpup_na_general`**
+  > Positions of existing assets, connections, descriptions, patterns, curves, controls, rules, and options in the file were not applied.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_geo`**
+  > Assets only in the file ({n}) were not added, because the file and this project use different coordinate systems.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_msx`**
+  > The .msx file chosen with this file was not read. To attach it to this project, choose it alone.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_owned`**
+  > The pipe type states some values of these pipes, so those values were not changed: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_na_refs`**
+  > These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_na_roughness`**
+  > Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_type`**
+  > The file states a different type for these assets, so none of their values were changed: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_nothing`**
+  > Every value in the file that matches an asset here is already the same in {scenario}.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_heading`**
+  > Nothing was changed in {project}.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_lead`**
+  > The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.
+  @@ NEEDS RULING
+- **`lpn_inpup_row`**
+  > {id}, {property}: {old} to {new}
+  @@ NEEDS RULING
+- **`lpn_inpup_status`**
+  > Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).
+  @@ NEEDS RULING
+- **`lpn_inpup_title`**
+  > Update from EPANET file
+  @@ NEEDS RULING
+- **`lpn_inpup_undo`**
+  > Undo reverses all of it in one step.
+  @@ NEEDS RULING
+- **`lpn_inpup_unit_row`**
+  > {name}: the file uses {file} and this project uses {project}.
+  @@ NEEDS RULING
+- **`lpn_msx_attached_heading`**
+  > Attached EPANET-MSX file: {file}
+  @@ NEEDS RULING
+- **`lpn_msx_not_msx`**
+  > {file} does not look like an EPANET-MSX file: it has no [SPECIES] section.
+  @@ NEEDS RULING
+- **`lpn_msx_remove`**
+  > Remove
+  @@ NEEDS RULING
+- **`lpn_msx_removed`**
+  > Removed {file} from this project.
+  @@ NEEDS RULING
+- **`lpn_msx_replace`**
+  > Replace…
+  @@ NEEDS RULING
+- **`lpn_msx_report_heading`**
+  > Attached {file}
+  @@ NEEDS RULING
+- **`lpn_msx_report_kept`**
+  > This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.
+  @@ NEEDS RULING
+- **`lpn_msx_report_missing`**
+  > IDs in the file that this network does not have: {ids}.
+  @@ NEEDS RULING
+- **`lpn_msx_report_no_species`**
+  > No species are listed in the file.
+  @@ NEEDS RULING
+- **`lpn_msx_report_species`**
+  > Species in the file: {list}.
+  @@ NEEDS RULING
+- **`lpn_msx_too_big`**
+  > {file} is too large to keep in browser storage, so it was not attached.
+  @@ NEEDS RULING
+- **`lpn_quality_msx`**
+  > Multi-species (EPANET-MSX)
+  @@ NEEDS RULING
+- **`lpn_quality_msx_none`**
+  > No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.
+  @@ NEEDS RULING
+- **`lpn_quality_msx_species`**
+  > Species
+  @@ NEEDS RULING
+- **`lpn_quality_msx_species_tip`**
+  > The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.
+  @@ NEEDS RULING
+- **`lpn_result_msx_tip`**
+  > The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.
+  @@ NEEDS RULING
+
+### feat/sqlite-reader (`288858d44`) — adds no English strings
 
 ### feat/theme (`876ebef92`) — 10 new, 6 to read @@ NEEDS RULING
 
