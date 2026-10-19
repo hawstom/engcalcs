@@ -29,6 +29,7 @@ function makeRoot($repoRoot, $sitemapXml) {
     mkdir($dir . '/dev/scripts', 0777, true);
     copy($repoRoot . '/lib/Language.Settings.php', $dir . '/lib/Language.Settings.php');
     copy($repoRoot . '/lib/Canonical.lib.php',     $dir . '/lib/Canonical.lib.php');
+    copy($repoRoot . '/lib/GuideChapters.lib.php', $dir . '/lib/GuideChapters.lib.php');
     // The check lifts the FALLBACK origin out of config.inc.php rather than retyping it, so the
     // throwaway root needs one. A stub, not a copy: config.inc.php is the real bootstrap and
     // requiring it here would drag in the whole suite, while the only line that matters is this.
@@ -85,7 +86,8 @@ $HEC = 'https://hawsedc.com';
 //    application at its declared epanet-plus-plus.org address. The check must pass, or it fails
 //    everything and proves nothing.
 assertCase($repoRoot, $check, 'a clean sitemap passes',
-    wrap(["$HEC/engcalcs/About.php?lang=en", "$HEC/engcalcs/About.php?lang=es", "$LWN/app/?lang=en"]),
+    wrap(["$HEC/engcalcs/About.php?lang=en", "$HEC/engcalcs/About.php?lang=es", "$LWN/app/?lang=en",
+          "$LWN/engcalcs/User-Manual.php?lang=es", "$LWN/engcalcs/User-Manual.php?lang=es&chapter=scenarios"]),
     0, 'PASS');
 
 // 2. THE REAL DEFECT OF 2026-09-17, verbatim: an English-only page advertised at its bare path
@@ -139,6 +141,12 @@ assertCase($repoRoot, $check, 'a calculator advertised on the other origin is re
 assertCase($repoRoot, $check, 'the app advertised on the calculators\' origin is refused',
     wrap(["$HEC/app/?lang=en"]),
     1, 'the page nominates the origin https://epanet-plus-plus.org');
+
+// 10. A User Guide chapter that does not exist (Task 816). The page answers it with the index and a
+//     404, so a sitemap naming it advertises a URL that cannot be indexed under that name.
+assertCase($repoRoot, $check, 'a chapter address naming no chapter is refused',
+    wrap(["$LWN/engcalcs/User-Manual.php?lang=en&chapter=nonsense"]),
+    1, 'is not a chapter of the User Guide');
 
 echo ($fails ? "\nFAIL: $fails of $ran selftest cases failed.\n" : "\nPASS: all $ran selftest cases.\n");
 exit($fails ? 1 : 0);

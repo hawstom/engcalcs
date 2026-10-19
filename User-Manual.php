@@ -35,43 +35,42 @@ if ($ec_known) {
 }
 echoHeader("EngCalcsApp", $html_title, "", false);
 
-$ec_h = function ($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); };
 $ec_app = ecCanonicalOrigin('Looped-Network.php', CANONICAL_ORIGIN, EC_CANONICAL_HOST)
 	. ecCanonicalPath('Looped-Network.php') . '?lang=' . $clanguage;
 $ec_chapter_href = function ($slug, $lang) {
-	return 'User-Manual.php?lang=' . $lang . ($slug !== '' ? '&chapter=' . $slug : '');
+	return EC_SW_BASE . 'User-Manual.php?lang=' . $lang . ($slug !== '' ? '&chapter=' . $slug : '');
 };
 ?>
 <div class="ec-guide-page">
 <nav class="ec-guide-top d-print-none">
-	<a href="<?=$ec_h($ec_app)?>"><?=$ec_h($ec_lang['lpn_guide_page_open'])?></a>
+	<a href="<?=htmlspecialchars($ec_app)?>"><?=htmlspecialchars($ec_lang['lpn_guide_page_open'])?></a>
 <?php if ($ec_known) : ?>
-	<a href="<?=$ec_h($ec_chapter_href('', $clanguage))?>"><?=$ec_h($ec_manual)?></a>
+	<a href="<?=htmlspecialchars($ec_chapter_href('', $clanguage))?>"><?=htmlspecialchars($ec_manual)?></a>
 <?php endif; ?>
 </nav>
 <main>
 <?php if ($ec_known) : ?>
 <h1><?=$ec_heading?></h1>
 <?php foreach (ecGuideIntro($ec_slug) as $ec_para) : ?>
-<p><?=$ec_h($ec_para)?></p>
+<p><?=htmlspecialchars($ec_para)?></p>
 <?php endforeach; ?>
 <?=ecGuideDl($ec_slug)?>
 <?php else : ?>
-<h1><?=$ec_h($ec_manual)?></h1>
-<p><?=$ec_h($ec_lang['lpn_guide_page_desc'])?></p>
+<h1><?=htmlspecialchars($ec_manual)?></h1>
+<p><?=htmlspecialchars($ec_lang['lpn_guide_page_desc'])?></p>
 <?php endif; ?>
 </main>
-<nav class="ec-guide-chapters" aria-label="<?=$ec_h($ec_lang['lpn_guide_contents'])?>">
-<h2><?=$ec_h($ec_lang['lpn_guide_contents'])?></h2>
+<nav class="ec-guide-chapters" aria-label="<?=htmlspecialchars($ec_lang['lpn_guide_contents'])?>">
+<h2><?=htmlspecialchars($ec_lang['lpn_guide_contents'])?></h2>
 <ul>
 <?php foreach ($ec_chapters as $ec_s => $ec_c) : ?>
-	<li><?php if ($ec_s === $ec_slug && $ec_known) : ?><strong><?=$ec_lang[$ec_c['title']]?></strong><?php else : ?><a href="<?=$ec_h($ec_chapter_href($ec_s, $clanguage))?>"><?=$ec_lang[$ec_c['title']]?></a><?php endif; ?></li>
+	<li><?php if ($ec_s === $ec_slug && $ec_known) : ?><strong><?=$ec_lang[$ec_c['title']]?></strong><?php else : ?><a href="<?=htmlspecialchars($ec_chapter_href($ec_s, $clanguage))?>"><?=$ec_lang[$ec_c['title']]?></a><?php endif; ?></li>
 <?php endforeach; ?>
 </ul>
 </nav>
 <nav class="ec-guide-langs d-print-none" aria-label="Languages">
 <?php foreach ($all_language_settings as $ec_l => $ec_ls) : ?>
-	<a href="<?=$ec_h($ec_chapter_href($ec_known ? $ec_slug : '', $ec_l))?>" lang="<?=$ec_h($ec_l)?>" hreflang="<?=$ec_h($ec_l)?>"><?=$ec_ls['LANGNAME']?></a>
+	<a href="<?=htmlspecialchars($ec_chapter_href($ec_known ? $ec_slug : '', $ec_l))?>" lang="<?=htmlspecialchars($ec_l)?>" hreflang="<?=htmlspecialchars($ec_l)?>"><?=$ec_ls['LANGNAME']?></a>
 <?php endforeach; ?>
 </nav>
 </div>

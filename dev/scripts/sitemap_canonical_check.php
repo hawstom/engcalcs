@@ -92,12 +92,15 @@ if (is_file($root . '/lib/config.inc.php')
 $prettyToPage = array_flip(ecCanonicalPaths());
 
 $checked = 0;
+$seenLocs = [];
 $offSite = 0;
 $turnedAway = 0;
 $findings = [];
 
 foreach ($docs as $doc) foreach ($doc->url as $u) {
     $loc = (string)$u->loc;
+    if (isset($seenLocs[$loc])) { continue; }   // a URL both sitemaps list is judged once
+    $seenLocs[$loc] = true;
     if (!preg_match('#^(https?://[^/]+)(/.*)?$#', $loc, $lm)) { $turnedAway++; continue; }
     $origin = $lm[1];
     $rest   = isset($lm[2]) && $lm[2] !== '' ? $lm[2] : '/';

@@ -91,7 +91,7 @@ ok('the Guide has chapters to give an address to (' + slugs.length + ')', slugs.
 	ok(lang + ': the meta description is the chapter\'s opening, not the title', desc.length > 60 && desc.length <= 170 && plain(desc).indexOf(plain(ch.intro[0]).slice(0, 25)) === 0, desc);
 	ok(lang + ': a link opens the application, in this language', html.indexOf('href="https://epanet-plus-plus.org/app/?lang=' + lang + '">' + L.open) > 0);
 	ok(lang + ': the other chapters are linked', slugs.every((s) => s === slug || html.indexOf('chapter=' + s + '"') > 0));
-	ok(lang + ': the language links keep the chapter', (html.match(/<a href="User-Manual\.php\?lang=[a-z]{2}&amp;chapter=scenarios" lang=/g) || []).length === 27);
+	ok(lang + ': the language links keep the chapter', (html.match(/<a href="\/engcalcs\/User-Manual\.php\?lang=[a-z]{2}&amp;chapter=scenarios" lang=/g) || []).length === 27);
 });
 
 // 4. The same words as the application's own Guide.

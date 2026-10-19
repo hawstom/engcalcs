@@ -58,6 +58,7 @@ const EC_NON_CALCULATOR_PAGES = [
     'privacy.php'               => 'the privacy statement',
     'terms.php'                 => 'the terms of use',
     'Compare-Languages.php'     => 'a translation-QA view of one key across languages',
+    'User-Manual.php'           => 'the User Guide of the map application, one chapter per address: prose, no form',
     'Orifice-Drain-Time-Ref.php' => 'the derivation behind Orifice-Drain-Time.php: prose and algebra, no form',
 ];
 
