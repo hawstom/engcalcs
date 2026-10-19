@@ -66,13 +66,6 @@ the block.
 
 ## 100 — Next.
 
-- 100|717| **EPANET-MSX, multi-species water quality.**
-  **PROMOTED TO 100 by Tom, 2026-10-17**: *"it's an undisclosed EPANET parity issue."* First find each public parity claim that MSX makes untrue and qualify it (his call, as public claims); then build.
-  Tom, 2026-09-25: *"Multi-species MSX: Add it priority 50. I don't understand it, but we can learn.
-  Thank you, Mary!"* From Mary's `dev/agents/market-researcher/epanet-gap-audit.md`.
-  Tom, 2026-09-26 (R-320): *"This is an extension, not base EPANET. We can provide this, but it's
-  not a blocker for EPANET++."* His UI sketch: Settings, Quality holds a short list of parameters
-  with toggles plus an open-ended list of reactive species, no scarier than Custom Properties.
 - 100|733| **Grow the native solver, in phases, to everything EPANET's solves.** **PHASE 1 MERGED 2026-10-17** (`feat/native-valves`): PRV, PSV, FCV solve natively, matching EPANET 2.3.5 within 0.8 mm head (`native-valve-harness.js`); PBV and GPV still route to EPANET. Next: PBV/GPV, then EPS. Tom, 2026-09-26
   **PROMOTED TO 100 by Tom, 2026-10-17, as a long-term task: slow and careful.** Each phase is its own branch, matched against EPANET 2.3.5 on every shipped example before it merges.
   **PROMOTED TO 75 by Tom, 2026-10-14.**

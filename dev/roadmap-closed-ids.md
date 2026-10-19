@@ -745,3 +745,4 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|785| CLOSED 2026-10-17 (merged on Tom's word, `feat/guide-scenarios`): every Guide chapter rewritten to the code, each with a `user-guide-*-harness.js`; Screenshot audited only.
 - 0|741| CLOSED 2026-10-18 (Tom: "Close it."): the network generator is on master (dev/lpn-spike/label-bench/generator.js); round 5 ran on generated networks.
 - 0|810| CLOSED 2026-10-18: the features list was brought up to the software 2026-10-16/17 (dev/features-source.md, librewaternet.org features page).
+- 0|717| CLOSED 2026-10-19 (merged on Tom's word, `feat/msx`): an EPANET-MSX file attaches, opens with its `.inp`, runs through EPANET-MSX and exports; dev/msx-scope.md.
