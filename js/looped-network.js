@@ -37361,6 +37361,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!tsbList().length) { return; }
 		(window.requestAnimationFrame || setTimeout)(function () { tsbEnsureLayer(); tsbSync(); tsbList().forEach(tsbDraw); tsbPlaceAll(); });
 	}
+	// Every chart built afresh, its own selector included: a quantity's NAME changed under it (the
+	// EPANET-MSX species, Tom 2026-10-18), which a redraw alone leaves showing the old name.
+	function tsbRebuildAll() {
+		Object.keys(tsbEls).forEach(function (id) {
+			if (tsbEls[id].root.parentNode) { tsbEls[id].root.parentNode.removeChild(tsbEls[id].root); }
+			delete tsbEls[id];
+		});
+		tsbRefresh();
+	}
 	// Builds the elements for the list and removes those whose record is gone.
 	function tsbSync() {
 		var want = {};
@@ -65464,11 +65473,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (!settings.quality) { settings.quality = { mode: 'msx', traceNode: '' }; }
 			settings.quality.species = sel.value;
 			saveToStorage();
-			// The results are already in hand for every species: repaint, no new run.
+			// The results are already in hand for every species: repaint, no new run. The bubbles and
+			// the contour box name the quantity in their own selectors, so they are rebuilt too.
 			refreshLabelText();
 			refreshValueColors();
 			refreshPaneIfOpen();
 			refreshPopupIfOpen();
+			tsbRebuildAll();
+			refreshContour();
+			refreshContourBoxIfOpen();
 		});
 		setboxTag(rowFn(host, pc.lpn_quality_msx_species || 'Species', sel,
 			pc.lpn_quality_msx_species_tip), [['settings', 'quality']]);
