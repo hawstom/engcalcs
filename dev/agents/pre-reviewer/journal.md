@@ -4523,3 +4523,4 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED: harness mutation: sign, TINY slope floor, PBV Y sign caught; PBV open threshold (>) and q TINY floor NOT caught.
 - OBSERVED (pre-existing, master too): EPANET path ignores a GPV's Closed toggle once the session is warm.
 - OBSERVED: zero-flow GPV, first segment negative intercept: J3 differs 1.33 m (EPANET's own tie is noise-decided).
+2026-10-18 feat/msx b1a11204c. OBSERVED: harness 14/14; Net1+msx base/scenario export names match; IDs (j-1, Node.Two, 7, Res_A) survive .inp export; undo/redo of attach ok; 6MB attach not persisted past reload (saved silently-ish). 390px dialog fits. Merge with master conflicts only in dev/new-english-keys.md.
