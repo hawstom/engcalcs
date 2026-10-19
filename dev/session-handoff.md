@@ -95,48 +95,45 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-18 (twenty-sixth session, overnight and morning, Arizona time)
+## STATE — 2026-10-19 (twenty-seventh session, Arizona time)
 
-### Master: e202f28f2 pushed and green (batches 1-3). This branch's merge (roadmap closures, handoff) still needs its suite. Production: what he last pulled
+### Master: 607759f4d pushed and green. Production: what he last pulled
 
-Batches pushed 2026-10-18: 555a8899a (PBV unit, GPV warm close, scenario receipts, roughness note,
-Task 815, plain privacy.php, consent_body "so we don't count you again" in English, his word calls),
-af91792e5 (full/empty tank closes its link natively; Change type reservoir -> tank 0/0/1; routing
-harness flake; fire-flow multiplier guard; label rules sync; port plan on master), e202f28f2 (label
-settings memo, identical drawing). consent_body's 26 translations owed (EC_CONSENT_VERSION stays 2).
-Merged on his word: feat/scenario-example, feat/scenario-results (Task 752 step 1), feat/native-pbv-gpv
-(EPANET 2.3.5 error 220 note still owed to Luke Butler), fix/settings-map-layout (Map and Page
-sections; deleted keys lpn_settings_sec_map, lpn_settings_map_display).
-His calls 2026-10-18: feat/theme Dark map "Good", Platinum beside Desktop "Good", brief Ida on a
-Designer theme when there is budget, try water towers for Prairie's map menu buttons. feat/label-form:
-he likes it, slower pass approved, notes in dev/label-placement-goals.md §2.3 on the branch; no merge
-word yet. Budget is tight (NPS review urgencies): slow down. Open from
-scenario-results: flow shown as magnitude only; fire flow across scenarios still a gap.
-Closed: Tasks 815, 800, 721. Task 737 marked WAIT: sprint.
-
-- 2026-10-19: `feat/msx` merged on his word ("merge feat/msx"); Task 717 closed. Owed: his call on a
+- 2026-10-19: `feat/msx` merged on his word ("merge feat/msx"); Task 717 closed; the Find word list
+  gained `lpn_quality_msx_species` (user-guide-find-harness caught it on the merge). Owed: his call on a
   features-list line naming EPANET-MSX (public claim), and the MSX keys' translations at the next sprint.
+- Still owed from 10-18: consent_body's 26 translations (EC_CONSENT_VERSION stays 2); EPANET 2.3.5
+  error 220 note to Luke Butler; scenario-results shows flow as magnitude only; fire flow across
+  scenarios still a gap. Budget is tight (NPS review urgencies): Sonnet agents, few at a time.
 
-### Ready for his typed merge word (all reviewed by Perry, green but for payload freshness)
+### Branches waiting on him
 
-- `feat/theme` (8111): 13 themes; the map follows the theme; he loves Desktop and Prairie. His calls
-  pending: Dark's dark map reverses Task 714; whether a "Designer" theme (Ida, or a paid human) is wanted.
-- `feat/label-form` (8114) + `feat/label-beside` (8110): he likes label-form; round 2 running (Perry
-  found the one-line node trial hid node labels and IDs; fix: per-label no loss). His call after: the
-  pass is ~1.6 s per notch on n600 (master 0.8 s); keep the one-line node trial on large views?
-- `feat/sqlite-reader`: Task 749, never merges until done (his word).
-
-### Retired 2026-10-18
-
-`feat/sheet-sync` and the label bench (`feat/label-placer`, `-a`..`-d`, `feat/label-gang-search`):
-archived as tags `archive/<branch>` (read with `git show archive/feat/label-placer:<path>`),
-branches, worktrees and preview rows removed. Bench data stays in /home/haws/label-trials-work.
+- `feat/network-update` (8112, aa84eb7d9): Task 814 call 2, an `.inp` updates the open project (IDs
+  matched, kept never deleted, one undo, receipt dialog, units/formula mismatch refused). Perry
+  reviewed; all six findings fixed (a pump/valve add threw; now rolls back on any failure). Needs his
+  browser pass and his word on ~45 new `lpn_inpup_*` strings. Gaps: GeoJSON, `.msx` on the update
+  route, positions of existing assets. I kept the "new project or this project?" question: his call 1
+  was the export-loss confirmation, not this one.
+- `feat/theme` (8111): 13 themes. His calls: Dark map "Good"; brief Ida on a Designer theme when budget allows.
+- `feat/label-form` (8114) + `feat/label-beside` (8110): he likes label-form; no merge word yet.
+- `feat/sqlite-reader` (75ed1031f): Task 749, never merges until done (his word). His two real WaterCAD
+  models (`~/tom-files/2026-10-18/Bentley-EPS-Group/`, CLIENT FILES: never into the repo) now import
+  with unit demand loads, per-scenario demand multipliers (1.0/1.8/3.0) and junction fire flow, and
+  EPANET matches WaterCAD's xlsx results to their rounding. `EC_WTG_PRIVATE_DIR` runs the private
+  harness. Left: per-junction fire-flow caps and system fire-flow settings (nowhere to store), loading
+  units, write-back, a physically overriding scenario (still unseen). The xlsx holds only results.
 
 ### Next job
 
-Merge on his word; port plan steps 2 and 5 after label-form; Task 816; Task 814's network-into-open-
-project import (his call 2); Task 752 steps 2-3 (demand import, ODS/CSV in); a fire-flow-across-
-scenarios table; Task 733 phase 3 (EPS) slow and careful.
+Merge on his word; port plan steps 2 and 5 after label-form; Task 816; Task 814's GeoJSON route;
+Task 752 steps 2-3; a fire-flow-across-scenarios table; Task 749 write-back; Task 733 phase 3 slow.
+
+### Traps met 2026-10-19 (twenty-seventh session)
+
+- **`example-open-guard-harness.js` prints four FAIL lines on purpose** (its mutation control) and passes.
+  Grep for `FAILED:`, not `FAIL`, in a harness log.
+- **`label-pass-economy-browser-harness.js` and `settings-select-lag-harness.js` fail under load only**
+  (a label hit box differing at the 8th decimal; lag timing). Both passed alone.
 
 ### Traps met 2026-10-18 (twenty-sixth session)
 
