@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**48 still to read on master**, of 56 untranslated keys, of 3075 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**99 still to read on master**, of 107 untranslated keys, of 3126 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (56, 48 to read @@ NEEDS RULING)
+## lpn_  (107, 99 to read @@ NEEDS RULING)
 
 - **`lpn_diag_gpv_curve_order`**
   > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
@@ -69,6 +69,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_file_import_msx_tip`**
   > Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.
+  @@ NEEDS RULING
+- **`lpn_file_import_wtg`**
+  > WaterCAD or WaterGEMS model…
+  @@ NEEDS RULING
+- **`lpn_file_import_wtg_tip`**
+  > Open a WaterCAD or WaterGEMS model as a new project. Choose its .wtg.sqlite file, and also the .wtg file beside it so that its units come too. The file is read and never changed. Its scenarios come with it; each scenario's differences from Base become that scenario's overrides. Beta: tried on few models so far.
   @@ NEEDS RULING
 - **`lpn_geojson_results_other`**
   > No results are included, because the results on screen belong to the scenario {scenario}.
@@ -199,40 +205,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_survey_added_scenario`**
   > The nodes were added to {scenario}. In Base they are inactive.
   _Ruled 2026-10-18: I approved all._
-
----
-
-# Strings waiting on a branch
-
-**55 still to read**, of 59 new keys across 7 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### chore/roadmap-1018 (`23cec294a`) — adds no English strings
-
-### feat/desktop (`baba0f04d`) — adds no English strings
-
-### feat/label-beside (`8676cd1be`) — already merged into feat/label-form; its strings are listed there
-
-### feat/label-form (`d05fdb069`) — adds no English strings
-
-### feat/msx (`04faa760a`) — adds no English strings
-
-### feat/sqlite-reader (`9470877a6`) — 49 new, 49 to read @@ NEEDS RULING
-
-- **`lpn_file_import_wtg`**
-  > WaterCAD or WaterGEMS model…
-  @@ NEEDS RULING
-- **`lpn_file_import_wtg_tip`**
-  > Open a WaterCAD or WaterGEMS model as a new project. Choose its .wtg.sqlite file, and also the .wtg file beside it so that its units come too. The file is read and never changed. Its scenarios come with it; each scenario's differences from Base become that scenario's overrides. Beta: tried on few models so far.
-  @@ NEEDS RULING
 - **`lpn_wtg_engine`**
   > The SQLite reader could not be loaded, so {file} could not be opened. Check the connection and try again.
   @@ NEEDS RULING
@@ -258,7 +230,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > The database stores every number in US customary units (feet, cubic feet per second, psi). Each number was converted once to the project's units and rounded to the shortest decimal within 5 parts in 100 million, which gives back the number as it was entered.
   @@ NEEDS RULING
 - **`lpn_wtg_note_customer_demand`**
-  > Not imported: the customer demands and unit demands at these junctions. Their base demands were imported.
+  > Not imported: the customer demands at these junctions. Their base demands were imported.
   @@ NEEDS RULING
 - **`lpn_wtg_note_cv_closed`**
   > These pipes have a check valve and start closed. They were imported closed.
@@ -271,6 +243,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_wtg_note_emitter_unread`**
   > Not imported: the emitter coefficients of these junctions, because the unit they are stored in is not yet confirmed.
+  @@ NEEDS RULING
+- **`lpn_wtg_note_fireflow`**
+  > Not imported: the fire flow settings of the model. A needed fire flow stated at a junction was imported as that junction's Required fire flow; enter the rest in the fire flow window.
   @@ NEEDS RULING
 - **`lpn_wtg_note_gpv_curve`**
   > These general purpose valves have no head loss curve in the file.
@@ -350,6 +325,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_note_unit_assumed`**
   > The file does not state the stored unit of these fields, so the unit every example file states was assumed.
   @@ NEEDS RULING
+- **`lpn_wtg_note_unit_demand`**
+  > The demand at these junctions comes from unit demand loads. The flow of each load was imported as a demand; the loading units and the unit load were not.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_unit_unknown`**
   > Not converted: these fields, whose stored unit (shown in parentheses) this page does not know.
   @@ NEEDS RULING
@@ -374,6 +352,128 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_working`**
   > Reading {file}…
   @@ NEEDS RULING
+
+---
+
+# Strings waiting on a branch
+
+**38 still to read**, of 42 new keys across 6 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### feat/desktop (`baba0f04d`) — adds no English strings
+
+### feat/label-beside (`8676cd1be`) — already merged into feat/label-form; its strings are listed there
+
+### feat/label-form (`d05fdb069`) — adds no English strings
+
+### feat/network-update (`0b16ae345`) — 32 new, 32 to read @@ NEEDS RULING
+
+- **`lpn_inpup_ask_title`**
+  > Import {file}
+  @@ NEEDS RULING
+- **`lpn_inpup_base_note`**
+  > Base. Every scenario inherits Base, so choosing Base changes them all.
+  @@ NEEDS RULING
+- **`lpn_inpup_blank`**
+  > blank
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_base`**
+  > Base
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_new`**
+  > A new project
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_project`**
+  > This project, {project}
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_scenario`**
+  > {scenario}, open now
+  @@ NEEDS RULING
+- **`lpn_inpup_counts`**
+  > Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).
+  @@ NEEDS RULING
+- **`lpn_inpup_h_added`**
+  > Assets added
+  @@ NEEDS RULING
+- **`lpn_inpup_h_changed`**
+  > Values changed
+  @@ NEEDS RULING
+- **`lpn_inpup_h_kept`**
+  > Kept, not in the file
+  @@ NEEDS RULING
+- **`lpn_inpup_h_na`**
+  > Not applied
+  @@ NEEDS RULING
+- **`lpn_inpup_heading`**
+  > Imported {file} into {scenario} of {project}
+  @@ NEEDS RULING
+- **`lpn_inpup_how`**
+  > In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.
+  @@ NEEDS RULING
+- **`lpn_inpup_lead`**
+  > An EPANET file holds one set of values and no scenarios. Choose where to put them.
+  @@ NEEDS RULING
+- **`lpn_inpup_method_row`**
+  > Head loss formula: the file uses {file} and this project uses {project}.
+  @@ NEEDS RULING
+- **`lpn_inpup_more`**
+  > {n} more
+  @@ NEEDS RULING
+- **`lpn_inpup_na_general`**
+  > Positions of existing assets, connections, descriptions, patterns, curves, controls, rules, and options in the file were not applied.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_geo`**
+  > Assets only in the file ({n}) were not added, because the file and this project use different coordinate systems.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_msx`**
+  > The .msx file chosen with this file was not read. To attach it to this project, choose it alone.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_owned`**
+  > The pipe type states some values of these pipes, so those values were not changed: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_na_refs`**
+  > These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_na_roughness`**
+  > Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_type`**
+  > The file states a different type for these assets, so none of their values were changed: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_nothing`**
+  > Every value in the file that matches an asset here is already the same in {scenario}.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_heading`**
+  > Nothing was changed in {project}.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_lead`**
+  > The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.
+  @@ NEEDS RULING
+- **`lpn_inpup_row`**
+  > {id}, {property}: {old} to {new}
+  @@ NEEDS RULING
+- **`lpn_inpup_status`**
+  > Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).
+  @@ NEEDS RULING
+- **`lpn_inpup_title`**
+  > Update from EPANET file
+  @@ NEEDS RULING
+- **`lpn_inpup_undo`**
+  > Undo reverses all of it in one step.
+  @@ NEEDS RULING
+- **`lpn_inpup_unit_row`**
+  > {name}: the file uses {file} and this project uses {project}.
+  @@ NEEDS RULING
+
+### feat/sqlite-reader (`fb510f6de`) — adds no English strings
 
 ### feat/theme (`876ebef92`) — 10 new, 6 to read @@ NEEDS RULING
 
