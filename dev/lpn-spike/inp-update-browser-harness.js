@@ -92,7 +92,7 @@ async function main() {
 		const rec = await dialogText(a);
 		ok('no second project tab was made', (await a.tabs()).length === tabs0);
 		ok('the receipt names the change old to new', /J2, [^:]+: 10 to 15\.50/.test(rec) && /P1, [^:]+: 12 to 14/.test(rec), rec.slice(0, 260));
-		ok('the receipt lists the added assets and the "not applied" heading', rec.indexOf(T.lpn_inpup_h_added) >= 0 && rec.indexOf('J7') >= 0 && rec.indexOf(T.lpn_inpup_h_na) >= 0);
+		ok('the receipt lists the added assets by kind, and has no empty "not applied" part', rec.indexOf(T.lpn_inpup_h_added) >= 0 && rec.indexOf('Junction J7') >= 0 && rec.indexOf(T.lpn_inpup_h_na) < 0);
 		await a.page.click('#lpn_dialog_buttons button:visible');
 		await a.settle(500);
 		console.log('\n--- one undo puts it all back ---');

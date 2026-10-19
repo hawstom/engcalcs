@@ -2424,7 +2424,7 @@ $ec_lang['lpn_status_imported']='Opened {name} from a file, and added it to this
 $ec_lang['lpn_inpup_ask_title']='Import {file}';
 $ec_lang['lpn_inpup_lead']='An EPANET file holds one set of values and no scenarios. Choose where to put them.';
 $ec_lang['lpn_inpup_how']='In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.';
-$ec_lang['lpn_inpup_base_note']='Base. Every scenario inherits Base, so choosing Base changes them all.';
+$ec_lang['lpn_inpup_base_note']='Base. A scenario that holds its own value for an asset keeps it; the others take the new value.';
 $ec_lang['lpn_inpup_btn_new']='A new project';
 // {project} is a project name; it labels a button.
 $ec_lang['lpn_inpup_btn_project']='This project, {project}';
@@ -2446,7 +2446,7 @@ $ec_lang['lpn_inpup_blank']='blank';
 $ec_lang['lpn_inpup_h_added']='Assets added';
 $ec_lang['lpn_inpup_h_kept']='Kept, not in the file';
 $ec_lang['lpn_inpup_h_na']='Not applied';
-$ec_lang['lpn_inpup_na_general']='Positions of existing assets, connections, descriptions, patterns, curves, controls, rules, and options in the file were not applied.';
+$ec_lang['lpn_inpup_na_general']='The file also holds {items}. They were not applied.';
 $ec_lang['lpn_inpup_na_type']='The file states a different type for these assets, so none of their values were changed: {ids}';
 $ec_lang['lpn_inpup_na_owned']='The pipe type states some values of these pipes, so those values were not changed: {ids}';
 $ec_lang['lpn_inpup_na_roughness']='Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.';
@@ -2457,6 +2457,25 @@ $ec_lang['lpn_inpup_refused_heading']='Nothing was changed in {project}.';
 $ec_lang['lpn_inpup_refused_lead']='The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.';
 $ec_lang['lpn_inpup_unit_row']='{family}: the file uses {file} and this project uses {project}.';
 $ec_lang['lpn_inpup_method_row']='Head loss formula: the file uses {file} and this project uses {project}.';
+// {project} is a project name and {reason} the system's own error text. In t_*, the kind of asset that prefixes an ID in the receipt lists, as in 'Pipe 31'.
+$ec_lang['lpn_inpup_refused_lead_formula']='The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.';
+$ec_lang['lpn_inpup_refused_lead_both']='The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.';
+$ec_lang['lpn_inpup_na_cv']='A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}';
+$ec_lang['lpn_inpup_failed']='The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}';
+$ec_lang['lpn_inpup_i_positions']='positions of existing assets';
+$ec_lang['lpn_inpup_i_connections']='connections';
+$ec_lang['lpn_inpup_i_descriptions']='descriptions';
+$ec_lang['lpn_inpup_i_patterns']='patterns';
+$ec_lang['lpn_inpup_i_curves']='curves';
+$ec_lang['lpn_inpup_i_controls']='controls';
+$ec_lang['lpn_inpup_i_rules']='rules';
+$ec_lang['lpn_inpup_i_options']='options';
+$ec_lang['lpn_inpup_t_junction']='Junction';
+$ec_lang['lpn_inpup_t_reservoir']='Reservoir';
+$ec_lang['lpn_inpup_t_tank']='Tank';
+$ec_lang['lpn_inpup_t_pipe']='Pipe';
+$ec_lang['lpn_inpup_t_pump']='Pump';
+$ec_lang['lpn_inpup_t_valve']='Valve';
 // Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
 // API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
 // browser they test in. That is expected, not a bug.

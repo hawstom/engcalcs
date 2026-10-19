@@ -45335,6 +45335,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			out.push((pc.lpn_inpup_unit_row || '{family}: the file uses {file} and this project uses {project}.')
 				.replace('{family}', names[u]).replace('{file}', inpUnitOptionText(u, want[u])).replace('{project}', inpUnitOptionText(u, have[u])));
 		});
+		out.unitRows = out.length;
 		var fm = LPN_INP_UPDATE_METHOD[String(parsed.headloss || 'H-W').toUpperCase()] || 'hw';
 		if (fm !== frictionMethod()) {
 			out.push((pc.lpn_inpup_method_row || 'Head loss formula: the file uses {file} and this project uses {project}.')
@@ -45342,6 +45343,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return out;
 	}
+	// "Junction 31", "Pipe 31": a junction and a pipe may share an ID, so a list names the kind.
+	function inpTypeName(type) {
+		var pc = EngCalcs.pageConfig || {};
+		return ({ junction: pc.lpn_inpup_t_junction || 'Junction', reservoir: pc.lpn_inpup_t_reservoir || 'Reservoir',
+			tank: pc.lpn_inpup_t_tank || 'Tank', pipe: pc.lpn_inpup_t_pipe || 'Pipe', pump: pc.lpn_inpup_t_pump || 'Pump',
+			valve: pc.lpn_inpup_t_valve || 'Valve' })[type] || type;
+	}
+	function inpTL(type, id) { return inpTypeName(type) + ' ' + id; }
 	function inpNiceOld(v) {
 		var pc = EngCalcs.pageConfig || {};
 		return (v === undefined || v === null || v === '') ? (pc.lpn_inpup_blank || 'blank') : String(v);
@@ -45349,9 +45358,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// COMPARE ONLY: nothing in the project is written here. `rec` is the file read as a document
 	// (docFromInp()), which is what carries the file's own characters (`tok`) beside each number.
 	function inpUpdatePlan(parsed, name) {
-		var pc = EngCalcs.pageConfig || {}, plan = { refused: inpUpdateRefusals(parsed), changes: [], addedNodes: [], addedLinks: [],
+		var pc = EngCalcs.pageConfig || {}, plan = { refused: inpUpdateRefusals(parsed), changes: [], addedNodes: [], addedLinks: [], addedL: [], keptL: [], na: {},
 				keptNodes: [], keptLinks: [], typeDiffers: [], typeOwned: [], notAdded: false, dwRoughness: false, matched: 0 };
 		if (plan.refused.length) { return plan; }
+		function held(v) { return Array.isArray(v) ? v.length > 0 : (v && typeof v === 'object') ? Object.keys(v).length > 0 : !!v; }
+		['patterns', 'curves', 'controls', 'rules'].forEach(function (k) { if (held(parsed[k])) { plan.na[k] = true; } });
+		if (held(parsed.hydraulics) || held(parsed.qualityOptions) || held(parsed.fileOptions)) { plan.na.options = true; }
+		// A CV pipe is read as open (the importer reports it); its status is not compared or written.
+		var cvIds = {};
+		(parsed.dropped || []).forEach(function (d) { if (d.code === 'check-valve') { (d.ids || []).forEach(function (i) { cvIds[i] = true; }); } });
+		plan.cv = Object.keys(cvIds).map(function (i) { return inpTL('pipe', i); });
 		var rec = docFromInp(parsed, name), fileNode = {}, fileLink = {}, rawNode = {}, rawLink = {}, geoFile = parsed.mapUnits === 'degrees';
 		rec.nodes.forEach(function (n) { fileNode[n.id] = n; });
 		rec.links.forEach(function (l) { fileLink[l.id] = l; });
@@ -45362,10 +45378,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var dw = frictionMethod() === 'dw';
 		function compare(el, r, kind) {
 			var fields = LPN_INP_UPDATE_FIELDS[r.type] || [], ownedHere = false;
-			if (el.type !== r.type || (r.type === 'valve' && el.valveType !== r.valveType)) { plan.typeDiffers.push(el.id); return; }
+			if (el.type !== r.type || (r.type === 'valve' && el.valveType !== r.valveType)) { plan.typeDiffers.push(inpTL(el.type, el.id)); return; }
 			fields.forEach(function (f) {
 				var nv = r[f[1]], cur, tok = r.tok && typeof r.tok[f[1]] === 'string' ? r.tok[f[1]] : undefined;
 				if (nv === undefined || nv === null) { return; }
+				if (f[0] === 'status' && kind === 'link' && cvIds[el.id]) { return; }
 				if (f[0] === 'roughness' && dw) { plan.dwRoughness = true; return; }
 				if (kind === 'link' && pipeTypeOwns(el, f[0])) { ownedHere = true; return; }
 				cur = effective(el, f[0]);
@@ -45373,19 +45390,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				plan.changes.push({ el: el, kind: kind, id: el.id, prop: f[0], key: f[1], label: pc[f[2]] || f[3],
 					oldV: cur, newV: nv, tok: tok });
 			});
-			if (ownedHere) { plan.typeOwned.push(el.id); }
+			if (ownedHere) { plan.typeOwned.push(inpTL(el.type, el.id)); }
+			// What the file states and this update does not apply, noted only when it differs.
+			if (kind === 'node') {
+				var rw = plan.rawNode[el.id];
+				if (rw && (Math.abs(rw.x - effective(el, 'x')) > 1e-6 || Math.abs(rw.y - effective(el, 'y')) > 1e-6)) { plan.na.positions = true; }
+			} else if (r.from !== el.from || r.to !== el.to) { plan.na.connections = true; }
+			if (r.desc !== undefined && r.desc !== (el.desc || '')) { plan.na.descriptions = true; }
 			plan.matched++;
 		}
 		rec.nodes.forEach(function (r) {
 			var el = nodeById(r.id);
-			if (el) { compare(el, r, 'node'); } else { plan.addedNodes.push(r.id); }
+			if (el) { compare(el, r, 'node'); } else { plan.addedNodes.push(r.id); plan.addedL.push(inpTL(r.type, r.id)); }
 		});
 		rec.links.forEach(function (r) {
 			var el = linkById(r.id);
-			if (el) { compare(el, r, 'link'); } else { plan.addedLinks.push(r.id); }
+			if (el) { compare(el, r, 'link'); } else { plan.addedLinks.push(r.id); plan.addedL.push(inpTL(r.type, r.id)); }
 		});
-		doc.nodes.forEach(function (n) { if (!fileNode[n.id]) { plan.keptNodes.push(n.id); } });
-		doc.links.forEach(function (l) { if (!fileLink[l.id]) { plan.keptLinks.push(l.id); } });
+		doc.nodes.forEach(function (n) { if (!fileNode[n.id]) { plan.keptNodes.push(n.id); plan.keptL.push(inpTL(n.type, n.id)); } });
+		doc.links.forEach(function (l) { if (!fileLink[l.id]) { plan.keptLinks.push(l.id); plan.keptL.push(inpTL(l.type, l.id)); } });
 		return plan;
 	}
 	// WRITES the plan. The caller has taken the one undo snapshot and opened the target scenario.
@@ -45412,7 +45435,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					n = addNode(r.type, inwardX(raw.x), inwardY(raw.y), id), k;
 				for (k in r) {
 					if (!Object.prototype.hasOwnProperty.call(r, k) || k === 'id' || k === 'type' || k === 'x' || k === 'y' || k === 'tok') { continue; }
-					n[k] = JSON.parse(JSON.stringify(r[k]));   // base-write: a new asset is born in Base with the file's values
+					if (r[k] !== undefined) { n[k] = JSON.parse(JSON.stringify(r[k])); }   // base-write: a new asset is born in Base with the file's values
 				}
 				if (r.tok) {
 					n.tok = {};
@@ -45421,8 +45444,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				}
 				if (geo) { n[LPN_GEO_XSRC] = raw.x; n[LPN_GEO_YSRC] = raw.y; }
 				else if (raw.tok) { (n.tok || (n.tok = {})).x = raw.tok.x; n.tok.y = raw.tok.y; }
-				if (n.demandPattern && !patternIds[n.demandPattern]) { stripped.push(id); delete n.demandPattern; }   // base-write: a new asset is born in Base, and a reference to a pattern this project lacks is left out
-				if (n.headPattern && !patternIds[n.headPattern]) { stripped.push(id); delete n.headPattern; }   // base-write: a new asset is born in Base, and a reference to a pattern this project lacks is left out
+				if (n.demandPattern && !patternIds[n.demandPattern]) { stripped.push(inpTL(r.type, id)); delete n.demandPattern; }   // base-write: a new asset is born in Base, and a reference to a pattern this project lacks is left out
+				if (n.headPattern && !patternIds[n.headPattern]) { stripped.push(inpTL(r.type, id)); delete n.headPattern; }   // base-write: a new asset is born in Base, and a reference to a pattern this project lacks is left out
 				touch(n);
 			});
 			plan.addedLinks.forEach(function (id) {
@@ -45430,12 +45453,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					l = addLink(r.type, r.from, r.to, (raw.verts || []).map(function (v) { return { x: inwardX(v.x), y: inwardY(v.y) }; }), id), k;
 				for (k in r) {
 					if (!Object.prototype.hasOwnProperty.call(r, k) || k === 'id' || k === 'type' || k === 'from' || k === 'to' || k === 'verts' || k === 'tok') { continue; }
-					l[k] = JSON.parse(JSON.stringify(r[k]));   // base-write: a new asset is born in Base with the file's values
+					if (r[k] !== undefined) { l[k] = JSON.parse(JSON.stringify(r[k])); }   // base-write: a new asset is born in Base with the file's values
 				}
 				if (r.tok) { l.tok = JSON.parse(JSON.stringify(r.tok)); }   // base-write: the file's text for its numbers
-				if (l._curveId && !curveIds[l._curveId]) { stripped.push(id); delete l._curveId; }
+				if (l._curveId && !curveIds[l._curveId]) { stripped.push(inpTL(r.type, id)); delete l._curveId; }
 				if (l._efficCurveId && !curveIds[l._efficCurveId]) { delete l._efficCurveId; }
-				if (l.speedPattern && !patternIds[l.speedPattern]) { stripped.push(id); delete l.speedPattern; }   // base-write: a new asset is born in Base, and a reference to a pattern this project lacks is left out
+				if (l.speedPattern && !patternIds[l.speedPattern]) { stripped.push(inpTL(r.type, id)); delete l.speedPattern; }   // base-write: a new asset is born in Base, and a reference to a pattern this project lacks is left out
 				touch(l);
 			});
 		}
@@ -45464,7 +45487,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			if (plan.refused.length) {
 				p((pc.lpn_inpup_refused_heading || 'Nothing was changed in {project}.').replace('{project}', projName), true);
-				p(pc.lpn_inpup_refused_lead || 'The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.');
+				var uRows = plan.refused.unitRows, fRows = plan.refused.length - uRows;
+				p(uRows && fRows ? (pc.lpn_inpup_refused_lead_both || 'The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.')
+					: fRows ? (pc.lpn_inpup_refused_lead_formula || 'The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.')
+					: (pc.lpn_inpup_refused_lead || 'The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.'));
 				list(plan.refused);
 				return;
 			}
@@ -45475,25 +45501,29 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				.replace('{scenario}', scnName), true);
 			p((pc.lpn_inpup_counts || 'Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).')
 				.replace('{n}', String(nVals)).replace('{m}', String(Object.keys(nAssets).length))
-				.replace('{a}', String(nAdded)).replace('{k}', String(kept.length)) + ' ' +
-				(pc.lpn_inpup_undo || 'Undo reverses all of it in one step.'));
+				.replace('{a}', String(nAdded)).replace('{k}', String(kept.length)) +
+				(nVals || nAdded ? ' ' + (pc.lpn_inpup_undo || 'Undo reverses all of it in one step.') : ''));
 			if (!nVals && !nAdded) { p((pc.lpn_inpup_nothing || 'Every value in the file that matches an asset here is already the same in {scenario}.').replace('{scenario}', scnName)); }
 			if (nVals) {
 				p(pc.lpn_inpup_h_changed || 'Values changed', true);
 				list(plan.changes.slice(0, 200).map(function (c) {
-					return (pc.lpn_inpup_row || '{id}, {property}: {old} to {new}').replace('{id}', c.id).replace('{property}', c.label)
+					return (pc.lpn_inpup_row || '{id}, {property}: {old} to {new}').replace('{id}', inpTL(c.el.type, c.id)).replace('{property}', c.label)
 						.replace('{old}', inpNiceOld(c.oldV)).replace('{new}', c.tok !== undefined && parseFloat(c.tok) === c.newV ? c.tok : String(c.newV));
 				}).concat(nVals > 200 ? [(pc.lpn_inpup_more || '{n} more').replace('{n}', String(nVals - 200))] : []));
 			}
 			if (nAdded) {
 				p(pc.lpn_inpup_h_added || 'Assets added', true);
-				p(inpListIds(plan.addedNodes.concat(plan.addedLinks)));
+				p(inpListIds(plan.addedL));
 			}
 			if (kept.length) {
 				p(pc.lpn_inpup_h_kept || 'Kept, not in the file', true);
-				p(inpListIds(kept));
+				p(inpListIds(plan.keptL));
 			}
-			var na = [pc.lpn_inpup_na_general || 'Positions of existing assets, connections, descriptions, patterns, curves, controls, rules, and options in the file were not applied.'];
+			var na = [], naItems = ['positions', 'connections', 'descriptions', 'patterns', 'curves', 'controls', 'rules', 'options'].filter(function (k) { return plan.na[k]; })
+				.map(function (k) { return pc['lpn_inpup_i_' + k] || k; });
+			if (naItems.length) {
+				na.push((pc.lpn_inpup_na_general || 'The file also holds {items}. They were not applied.').replace('{items}', naItems.join(', ')));
+			}
 			if (plan.typeDiffers.length) { na.push((pc.lpn_inpup_na_type || 'The file states a different type for these assets, so none of their values were changed: {ids}').replace('{ids}', inpListIds(plan.typeDiffers))); }
 			if (plan.typeOwned.length) { na.push((pc.lpn_inpup_na_owned || 'The pipe type states some values of these pipes, so those values were not changed: {ids}').replace('{ids}', inpListIds(plan.typeOwned))); }
 			if (plan.dwRoughness) { na.push(pc.lpn_inpup_na_roughness || 'Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.'); }
@@ -45504,9 +45534,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (plan.stripped && plan.stripped.length) {
 				na.push((pc.lpn_inpup_na_refs || 'These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}').replace('{ids}', inpListIds(plan.stripped)));
 			}
+			if (plan.cv && plan.cv.length) { na.push((pc.lpn_inpup_na_cv || 'A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}').replace('{ids}', inpListIds(plan.cv))); }
 			if (msxFile) { na.push((pc.lpn_inpup_na_msx || 'The .msx file chosen with this file was not read. To attach it to this project, choose it alone.')); }
-			p(pc.lpn_inpup_h_na || 'Not applied', true);
-			list(na);
+			if (na.length) {
+				p(pc.lpn_inpup_h_na || 'Not applied', true);
+				list(na);
+			}
 		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { }, isDefault: true }],
 			{ title: pc.lpn_inpup_title || 'Update from EPANET file' });
 	}
@@ -45519,9 +45552,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		plan = inpWithScenario(scn.id, function () { return inpUpdatePlan(parsed, name); });
 		if (!plan.refused.length && (plan.changes.length || (!plan.notAdded && (plan.addedNodes.length || plan.addedLinks.length)))) {
 			saveUndoSnapshot();
-			touched = inpWithScenario(scn.id, function () { return inpUpdateApply(plan, parsed); });
-			afterPropertyEdits(touched);
-			refreshPopupIfOpen();
+			try {
+				touched = inpWithScenario(scn.id, function () { return inpUpdateApply(plan, parsed); });
+				afterPropertyEdits(touched);
+				refreshPopupIfOpen();
+			} catch (err) {
+				// A failure part way is never left as a half update: the one snapshot taken above goes back.
+				undo();
+				redoStack.length = 0;
+				openDialog(function (body) {
+					var e = document.createElement('p');
+					e.style.margin = '0 0 8px';
+					e.textContent = (pc.lpn_inpup_failed || 'The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}')
+						.replace('{project}', projectDisplayName(project)).replace('{reason}', String((err && err.message) || err));
+					body.appendChild(e);
+				}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { }, isDefault: true }], { title: pc.lpn_inpup_title || 'Update from EPANET file' });
+				return false;
+			}
 			setNotice((pc.lpn_inpup_status || 'Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).')
 				.replace('{project}', projectDisplayName(project)).replace('{file}', fileName).replace('{scenario}', scnName)
 				.replace('{n}', String(plan.changes.length)).replace('{a}', String(plan.notAdded ? 0 : plan.addedNodes.length + plan.addedLinks.length)));

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**80 still to read on master**, of 88 untranslated keys, of 3107 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**98 still to read on master**, of 106 untranslated keys, of 3125 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (88, 80 to read @@ NEEDS RULING)
+## lpn_  (106, 98 to read @@ NEEDS RULING)
 
 - **`lpn_diag_gpv_curve_order`**
   > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
@@ -86,7 +86,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Import {file}
   @@ NEEDS RULING
 - **`lpn_inpup_base_note`**
-  > Base. Every scenario inherits Base, so choosing Base changes them all.
+  > Base. A scenario that holds its own value for an asset keeps it; the others take the new value.
   @@ NEEDS RULING
 - **`lpn_inpup_blank`**
   > blank
@@ -106,6 +106,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_inpup_counts`**
   > Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).
   @@ NEEDS RULING
+- **`lpn_inpup_failed`**
+  > The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}
+  @@ NEEDS RULING
 - **`lpn_inpup_h_added`**
   > Assets added
   @@ NEEDS RULING
@@ -124,6 +127,30 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_inpup_how`**
   > In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.
   @@ NEEDS RULING
+- **`lpn_inpup_i_connections`**
+  > connections
+  @@ NEEDS RULING
+- **`lpn_inpup_i_controls`**
+  > controls
+  @@ NEEDS RULING
+- **`lpn_inpup_i_curves`**
+  > curves
+  @@ NEEDS RULING
+- **`lpn_inpup_i_descriptions`**
+  > descriptions
+  @@ NEEDS RULING
+- **`lpn_inpup_i_options`**
+  > options
+  @@ NEEDS RULING
+- **`lpn_inpup_i_patterns`**
+  > patterns
+  @@ NEEDS RULING
+- **`lpn_inpup_i_positions`**
+  > positions of existing assets
+  @@ NEEDS RULING
+- **`lpn_inpup_i_rules`**
+  > rules
+  @@ NEEDS RULING
 - **`lpn_inpup_lead`**
   > An EPANET file holds one set of values and no scenarios. Choose where to put them.
   @@ NEEDS RULING
@@ -133,8 +160,11 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_inpup_more`**
   > {n} more
   @@ NEEDS RULING
+- **`lpn_inpup_na_cv`**
+  > A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}
+  @@ NEEDS RULING
 - **`lpn_inpup_na_general`**
-  > Positions of existing assets, connections, descriptions, patterns, curves, controls, rules, and options in the file were not applied.
+  > The file also holds {items}. They were not applied.
   @@ NEEDS RULING
 - **`lpn_inpup_na_geo`**
   > Assets only in the file ({n}) were not added, because the file and this project use different coordinate systems.
@@ -163,11 +193,35 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_inpup_refused_lead`**
   > The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.
   @@ NEEDS RULING
+- **`lpn_inpup_refused_lead_both`**
+  > The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_lead_formula`**
+  > The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.
+  @@ NEEDS RULING
 - **`lpn_inpup_row`**
   > {id}, {property}: {old} to {new}
   @@ NEEDS RULING
 - **`lpn_inpup_status`**
   > Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).
+  @@ NEEDS RULING
+- **`lpn_inpup_t_junction`**
+  > Junction
+  @@ NEEDS RULING
+- **`lpn_inpup_t_pipe`**
+  > Pipe
+  @@ NEEDS RULING
+- **`lpn_inpup_t_pump`**
+  > Pump
+  @@ NEEDS RULING
+- **`lpn_inpup_t_reservoir`**
+  > Reservoir
+  @@ NEEDS RULING
+- **`lpn_inpup_t_tank`**
+  > Tank
+  @@ NEEDS RULING
+- **`lpn_inpup_t_valve`**
+  > Valve
   @@ NEEDS RULING
 - **`lpn_inpup_title`**
   > Update from EPANET file
@@ -317,7 +371,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-form (`d05fdb069`) — adds no English strings
 
-### feat/network-update (`da16f05fc`) — adds no English strings
+### feat/network-update (`84de54bd4`) — adds no English strings
 
 ### feat/sqlite-reader (`75ed1031f`) — 51 new, 51 to read @@ NEEDS RULING
 

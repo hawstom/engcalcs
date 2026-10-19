@@ -127,7 +127,7 @@ importText(B, 'b.inp');
 	ok('the receipt names the change old to new', t.indexOf('J2') >= 0 && t.indexOf('95') >= 0 && t.indexOf('97.50') >= 0, t.slice(0, 300));
 	ok('the receipt lists what was kept', t.indexOf(PC.lpn_inpup_h_kept) >= 0 && /P3/.test(t.slice(t.indexOf(PC.lpn_inpup_h_kept))));
 	ok('the receipt lists what was added', t.indexOf(PC.lpn_inpup_h_added) >= 0 && t.indexOf('J9') >= 0);
-	ok('the receipt lists what was not applied', t.indexOf(PC.lpn_inpup_h_na) >= 0);
+	ok('nothing to report as not applied: no such heading', t.indexOf(PC.lpn_inpup_h_na) < 0);
 	ok('the receipt never says sync', !/sync/i.test(t));
 	L.undo();
 	ok('ONE undo restores the project exactly', snap() === before);
@@ -177,6 +177,127 @@ console.log('\n--- the new-project route is unchanged ---');
 	press(PC.lpn_inpup_btn_new);
 	ok('a new project is made', L.projectCount() === n0 + 1);
 	ok('it holds the file, not a merge', L.getDoc().nodes.length === 5 && L.getDoc().links.length === 3 && L.linkById('P3') === null);
+}
+
+console.log('\n--- every link type adds: pump, each valve type, a check-valve pipe; and every ID renamed ---');
+{
+	const FULL = (ren) => {
+		const n = (x) => ren ? 'Z' + x : x;
+		return `[TITLE]
+all types
+
+[JUNCTIONS]
+ ${n('J1')} 100 0
+ ${n('J2')} 95 10
+ ${n('J3')} 90 10
+ ${n('J4')} 90 10
+ ${n('J5')} 90 10
+ ${n('J6')} 90 10
+ ${n('J7')} 90 10
+ ${n('J8')} 90 10
+
+[RESERVOIRS]
+ ${n('R1')} 200
+
+[TANKS]
+ ${n('T1')} 100 5 1 10 40 0
+
+[PIPES]
+ ${n('P1')} ${n('J1')} ${n('J2')} 1200 12 130 0 Open
+ ${n('P2')} ${n('J2')} ${n('J3')} 800 10 120 2 CV
+
+[PUMPS]
+ ${n('PU1')} ${n('R1')} ${n('J1')} HEAD C1
+
+[VALVES]
+ ${n('V1')} ${n('J3')} ${n('J4')} 8 PRV 40 0
+ ${n('V2')} ${n('J4')} ${n('J5')} 8 PSV 40 0
+ ${n('V3')} ${n('J5')} ${n('J6')} 8 FCV 100 0
+ ${n('V4')} ${n('J6')} ${n('J7')} 8 TCV 2 0
+ ${n('V5')} ${n('J7')} ${n('J8')} 8 PBV 10 0
+ ${n('V6')} ${n('J8')} ${n('T1')} 8 GPV C1 0
+
+[CURVES]
+ C1 0 100
+ C1 500 50
+ C1 1000 0
+
+[COORDINATES]
+ ${n('R1')} 0 0
+ ${n('J1')} 100 0
+ ${n('J2')} 200 0
+ ${n('J3')} 300 0
+ ${n('J4')} 400 0
+ ${n('J5')} 500 0
+ ${n('J6')} 600 0
+ ${n('J7')} 700 0
+ ${n('J8')} 800 0
+ ${n('T1')} 900 0
+
+[OPTIONS]
+ Units GPM
+ Headloss H-W
+
+[END]
+`;
+	};
+	importText(US({ j2elev: '95', j2dem: '120', r1head: '200', p1diam: '12' }), 'a2.inp');
+	press(PC.lpn_inpup_btn_new);
+	const before = snap();
+	for (const ren of [false, true]) {
+		importText(FULL(ren), 'full.inp');
+		press(dialogButtons()[1]);
+		const t = dialogText();
+		const id = (x) => (ren ? 'Z' : '') + x;
+		ok((ren ? 'renamed: ' : '') + 'the receipt appears', t.indexOf(PC.lpn_inpup_h_added) >= 0, t.slice(0, 120));
+		ok((ren ? 'renamed: ' : '') + 'the pump is added', !!L.linkById(id('PU1')) && L.linkById(id('PU1')).type === 'pump');
+		ok((ren ? 'renamed: ' : '') + 'all six valve types are added', ['V1', 'V2', 'V3', 'V4', 'V5', 'V6'].every((v, i) => { const l = L.linkById(id(v)); return l && l.type === 'valve' && l.valveType === ['PRV', 'PSV', 'FCV', 'TCV', 'PBV', 'GPV'][i]; }));
+		ok((ren ? 'renamed: ' : '') + 'the CV pipe is read as open and the receipt says so', !!L.linkById(id('P2')) && dialogText().indexOf('Pipe ' + id('P2')) >= 0 && dialogText().indexOf(PC.lpn_inpup_na_cv.split(':')[0]) >= 0);
+		ok((ren ? 'renamed: ' : '') + 'the tank is added', !!L.nodeById(id('T1')) && L.nodeById(id('T1')).type === 'tank');
+		L.undo();
+		ok((ren ? 'renamed: ' : '') + 'one undo restores the project', snap() === before);
+	}
+}
+
+console.log('\n--- a failure part way rolls everything back and says so ---');
+{
+	const T = US({ j2elev: '99', j2dem: '120', r1head: '200', p1diam: '12', addJ: ' J8 80 15 ;TRIGGER\n', addP: '', addC: ' J8 250 200\n' });
+	const before2 = snap(), realParse = JSON.parse;
+	JSON.parse = function (x) { if (x === '"TRIGGER"') { throw new Error('forced'); } return realParse.apply(this, arguments); };
+	try { importText(T, 't.inp'); press(dialogButtons()[1]); } finally { JSON.parse = realParse; }
+	const t = dialogText();
+	ok('the project is exactly as it was', snap() === before2, t.slice(0, 160));
+	ok('a dialog says nothing was changed', t.indexOf(PC.lpn_inpup_failed.split('{project}')[1].split('{reason}')[0].slice(0, 30)) >= 0 || /nothing in/.test(t), t.slice(0, 160));
+}
+
+console.log('\n--- the refusal lead fits the cause ---');
+{
+	const DW = US({ j2elev: '95', j2dem: '120', r1head: '200', p1diam: '12' }).replace('Headloss H-W', 'Headloss D-W');
+	importText(DW, 'dw.inp'); press(dialogButtons()[1]);
+	let t = dialogText();
+	ok('formula only: the formula lead, not the units lead', t.indexOf(PC.lpn_inpup_refused_lead_formula) >= 0 && t.indexOf(PC.lpn_inpup_refused_lead) < 0, t.slice(0, 200));
+	importText(DW.replace('Units GPM', 'Units LPS'), 'dw2.inp'); press(dialogButtons()[1]);
+	t = dialogText();
+	ok('both: the combined lead', t.indexOf(PC.lpn_inpup_refused_lead_both) >= 0, t.slice(0, 200));
+}
+
+console.log('\n--- the receipt only says what is true ---');
+{
+	importText(A, 'same.inp'); press(dialogButtons()[1]);
+	const t = dialogText();
+	ok('nothing changed: no undo sentence and no Not applied heading', t.indexOf(PC.lpn_inpup_undo) < 0 && t.indexOf(PC.lpn_inpup_h_na) < 0, t.slice(0, 200));
+	const SH = US({ j2elev: '95', j2dem: '120', r1head: '200', p1diam: '12' }).replace(' R1 0 100', ' R1 5 100');
+	importText(SH.replace('[END]', '[PATTERNS]\n PAT1 1 2\n\n[END]'), 'ni.inp'); press(dialogButtons()[1]);
+	const t2 = dialogText();
+	ok('only the kinds the file held are named', /positions of existing assets/.test(t2) && /patterns/.test(t2) && !/curves|rules|controls/.test(t2.slice(t2.indexOf(PC.lpn_inpup_h_na))), t2.slice(t2.indexOf(PC.lpn_inpup_h_na)));
+}
+
+console.log('\n--- a junction and a pipe sharing an ID are told apart ---');
+{
+	const SHARE = US({ j2elev: '95', j2dem: '120', r1head: '200', p1diam: '12' });
+	importText(SHARE.replace(' J3 90 0', ' P3 90 0').replace('J2 J3 1500', 'J2 P3 1500'), 'share.inp'); press(dialogButtons()[1]);
+	const t = dialogText();
+	ok('kept and added lists carry the kind', /Kept[^]*Junction J3/.test(t) && /Assets added\nJunction P3/.test(t) && /connections/.test(t), t.slice(0, 400));
 }
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
