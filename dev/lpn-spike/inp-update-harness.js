@@ -289,7 +289,7 @@ console.log('\n--- the receipt only says what is true ---');
 	const SH = US({ j2elev: '95', j2dem: '120', r1head: '200', p1diam: '12' }).replace(' R1 0 100', ' R1 5 100');
 	importText(SH.replace('[END]', '[PATTERNS]\n PAT1 1 2\n\n[END]'), 'ni.inp'); press(dialogButtons()[1]);
 	const t2 = dialogText();
-	ok('only the kinds the file held are named', /positions of existing assets/.test(t2) && /patterns/.test(t2) && !/curves|rules|controls/.test(t2.slice(t2.indexOf(PC.lpn_inpup_h_na))), t2.slice(t2.indexOf(PC.lpn_inpup_h_na)));
+	ok('only the kinds the file held are named', t2.indexOf(PC.lpn_inpup_i_positions) >= 0 && /patterns/.test(t2) && !/curves|rules|controls/.test(t2.slice(t2.indexOf(PC.lpn_inpup_h_na))), t2.slice(t2.indexOf(PC.lpn_inpup_h_na)));
 }
 
 console.log('\n--- a junction and a pipe sharing an ID are told apart ---');

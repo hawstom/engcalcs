@@ -45612,7 +45612,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			p(pc.lpn_inpup_lead || 'An EPANET file holds one set of values and no scenarios. Choose where to put them.');
 			p((pc.lpn_inpup_how || 'In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.'));
-			if (!inBase) { p(pc.lpn_inpup_base_note || 'Base. Every scenario inherits Base, so choosing Base changes them all.'); }
+			if (!inBase) { p(pc.lpn_inpup_base_note || 'Base. A scenario that holds its own value for an asset keeps it; the others take the new value.'); }
 		}, buttons, { title: (pc.lpn_inpup_ask_title || 'Import {file}').replace('{file}', fileName) });
 	}
 	function projectHasAssets() { return !!doc && ((doc.nodes && doc.nodes.length) || (doc.links && doc.links.length)); }
