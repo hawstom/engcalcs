@@ -118,7 +118,7 @@ ok('the detail charset could be read out of the endpoint', !!detailMatch);
 const keep = new RegExp('[^' + (detailMatch ? detailMatch[1] : 'A-Za-z0-9') + ']', 'g');
 const capMatch = /strlen\(\$detail\) > (\d+)/.exec(endpoint);
 const cap = capMatch ? parseInt(capMatch[1], 10) : 80;
-['wrong:none', 'wrong:no-fixed-head', 'wrong:unreachable', 'wrong:valve-needs-epanet',
+['wrong:none', 'wrong:no-fixed-head', 'wrong:unreachable', 'wrong:valve-conflict',
 	'wrong:not-converged', 'wrong:unit-unknown', 'wrong:status'].forEach(function (slug) {
 	ok('the endpoint keeps "' + slug + '" whole', slug.replace(keep, '') === slug && slug.length <= cap);
 });

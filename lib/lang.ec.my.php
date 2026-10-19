@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='ရေကန် သို့မဟုတ် ရေ
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='EPANET ဖြေရှင်းစက်ကို ဒေါင်းလုဒ်လုပ်နေသည်။ တစ်ကြိမ်သာ ဒေါင်းလုဒ်လုပ်ပြီး ဤစက်ပေါ်တွင် သိမ်းထားသဖြင့် နောက်ပိုင်းတွင် အင်တာနက်မလိုဘဲ အလုပ်လုပ်သည်။';
 $ec_lang['lpn_engine_ready']='EPANET ဖြေရှင်းစက်ကို ယခု ဤစက်ပေါ်တွင် သိမ်းထားပြီး အင်တာနက်မလိုဘဲ အလုပ်လုပ်သည်။';
-$ec_lang['lpn_engine_fetching_valve']='EPANET ဖြေရှင်းစက်ကို ဒေါင်းလုဒ်လုပ်နေသဖြင့် ဤဗားလ်ကို ယခုနှင့် နောက်ပိုင်း အင်တာနက်မလိုဘဲ ဖြေရှင်းနိုင်မည်။';
-$ec_lang['lpn_engine_ready_valve']='EPANET ဖြေရှင်းစက်ကို ယခု ဤစက်ပေါ်တွင် သိမ်းထားသည်။ ဖိအားဖြတ်ဗားလ်များနှင့် ယေဘုယျရည်ရွယ်ချက်ဗားလ်များ (PBV, GPV) ကို ယခု အင်တာနက်မလိုဘဲ ဖြေရှင်းနိုင်သည်။';
 $ec_lang['lpn_engine_unavailable']='ဖိအားဖြတ်ဗားလ်များနှင့် ယေဘုယျရည်ရွယ်ချက်ဗားလ်များ (PBV, GPV) ကို ဖြေရှင်းရန် လိုအပ်သော EPANET ဖြေရှင်းစက်ကို ဒေါင်းလုဒ်လုပ်၍ မရခဲ့ပါ။ အင်တာနက်ကို တစ်ကြိမ်ချိတ်ဆက်ပြီးနောက် ဖြေရှင်းစက်ကို ဤစက်ပေါ်တွင် သိမ်းထားသည်။';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='ဖြေရှင်းစက် {percent}% �
 $ec_lang['lpn_engine_wait_bytes']='ဖြေရှင်းစက် {kb} KB ယခုအထိ ဖွင့်ပြီးပါပြီ။ စုစုပေါင်း မရနိုင်သောကြောင့်၊ ပြီးဆုံးသည့် ရာခိုင်နှုန်းကို မသိနိုင်ပါ။';
 $ec_lang['lpn_engine_needed_failed']='EPANET ဖြေရှင်းစက်ကို မရရှိသေးပါ၊ ဖွင့်၍လည်း မရနိုင်ပါ၊ ဤကွန်ရက်ကို ၎င်းဖြင့်သာ ဖြေရှင်းနိုင်ပါသည်။ အင်တာနက်ချိတ်ဆက်ထားသောအခါ ၎င်းကို ဖွင့်ပါလိမ့်မည်။';
 $ec_lang['lpn_engine_needed_failed_why']='ဤကွန်ရက်ကို EPANET ဖြေရှင်းစက်ဖြင့်သာ ဖြေရှင်းနိုင်သည်။ {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='ဤဗားလ်များသည် ဖိအားဖြတ်ဗားလ် သို့မဟုတ် ယေဘုယျရည်ရွယ်ချက်ဗားလ်များဖြစ်ပြီး EPANET ဖြေရှင်းစက်သာ ၎င်းတို့ကို တွက်ချက်နိုင်သည်။ EPANET ဖြေရှင်းစက်ကို မတင်နိုင်သဖြင့် ဤရလဒ်များ ပျောက်နေသည်-';
 $ec_lang['lpn_diag_valve_on_fixed_head']='ဤဗားလ်များသည် ရေကန် သို့မဟုတ် ရေတိုက်သို့ တိုက်ရိုက်ချိတ်ထားပြီး ထို node ၏ HGL ကို ပုံသေသတ်မှတ်ထားသဖြင့် ဗားလ်တွင် ထိန်းချုပ်စရာ မရှိပါ။ ဗားလ်နှင့် ရေကန် သို့မဟုတ် ရေတိုက်ကြားတွင် ပိုက်လိုင်းတိုတစ်ခု ထည့်ပါ -';
 $ec_lang['lpn_diag_not_converged']='အဖြေ မတွေ့ရှိခဲ့ပါ။ အချင်းသုည ကဲ့သို့ လက်တွေ့ဘဝတွင် မဖြစ်နိုင်သော တန်ဖိုးများကို စစ်ဆေးပါ။';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} ထိုကြောင့် တ�
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='ဤဖိအားဖြတ်ဗားလ်များနှင့် ယေဘုယျရည်ရွယ်ချက်ဗားလ်များကြောင့် EPANET ဖြေရှင်းစက်ဖြင့် ဖြေရှင်းထားသည်-';
 $ec_lang['lpn_unit_unknown']='ဤပုံသည် ဤစာမျက်နှာ မပံ့ပိုးသော ယူနစ်တစ်ခုကို ဖော်ပြသည် - {unit}။ တန်ဖိုးအားလုံးကို တင်သွင်းသည့်အတိုင်း ထားပြီး ပြသကာ မည်သည့်အရာမျှ မပြောင်းပါ။ ယူနစ်ကို မပံ့ပိုးမချင်း ၎င်း၏ ပြောင်းလဲကိန်းမသိသဖြင့် မည်သည့်အရာမျှ တွက်ချက်၍ မရပါ။';
 $ec_lang['lpn_engine_manning_note']='မှတ်ချက် - Manning ကြမ်းတမ်းမှုကို သုံးလျှင် EPANET သည် Manning ညီမျှခြင်းရှိ ကိန်းသေကို ဝိုင်းထားသဖြင့် ဖိမြင့်ဆင့်ဆုံးရှုံးမှုသည် တိကျသောပုံစံထက် ၀.၆% ခန့် နိမ့်သည်။';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
@@ -3690,7 +3686,6 @@ $ec_lang['lpn_basemap_style_normal']='ပုံမှန်';
 $ec_lang['lpn_basemap_style_muted']='မှိန်သော';
 $ec_lang['lpn_basemap_style_faded']='ဖျော့သော';
 $ec_lang['lpn_basemap_style_grayscale']='မီးခိုးရောင်ဆင့်';
-$ec_lang['lpn_settings_map_display']='အသွင်အပြင်';
 // PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
 // to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
 // LPN_MAP_MIN in js/looped-network.js). Nothing renders these two keys now, so key_hygiene_check
@@ -3857,7 +3852,6 @@ $ec_lang['lpn_time_settings_open']='အချိန် ဆက်တင်မျ�
 // "Hydraulics" is EPANET's own name for the friction-method/accuracy/engine group, which also
 // leaves room for its siblings (Quality, Reactions) as they arrive.
 $ec_lang['lpn_settings_sec_symbology']='ပုံရိပ်ပြသမှု';
-$ec_lang['lpn_settings_sec_map']='မြေပုံနှင့် စာမျက်နှာ';
 $ec_lang['lpn_settings_sec_assets']='အစိတ်အပိုင်းများ';
 $ec_lang['lpn_settings_sec_calculation']='တွက်ချက်မှု';
 // ROADMAP Task 247. A customer label's CONTENT is the node rows above it (Tom: "Customer labels

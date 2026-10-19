@@ -9,8 +9,7 @@ lines rather than appending corrections.
 ## Before merging anything
 
 - **Feature branches alive, each awaiting Tom's browser pass**: see STATE below. A feature merges
-  into master on his typed word; there is no all-clear file, freeze or merge hook. Plus `feat/label-placer` (the seam; round-5 bench), `feat/label-gang-search` (bench only), and
-  builders `feat/label-placer-a`..`-d`, which never merge alone.
+  into master on his typed word; there is no all-clear file, freeze or merge hook. The label bench branches are archived as tags (see STATE).
 - **A branch that adds a key fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
 - **Merge master into a branch before merging it to master**, then run the suite on the merge:
@@ -96,51 +95,62 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-17 (twenty-fifth session, afternoon and evening, Arizona time)
+## STATE — 2026-10-18 (twenty-sixth session, overnight and morning, Arizona time)
 
-### Master: 45317389e (pushed 2026-10-17 9:39 PM; Tom deploys it). Production: 4866c11d2 (sprint 1017) or 45317389e
+### Master: e202f28f2 pushed and green (batches 1-3). This branch's merge (roadmap closures, handoff) still needs its suite. Production: what he last pulled
 
-**Sprint 1017 is merged into master and ready to deploy**. It translates the 408 untranslated
-keys (98 of them he had not yet read) and 27 rewordings into 26 languages, Wave 0 rewrote 19 English
-strings (`dev/english-friction/1017-wave0.json`), cross-language QA fixed 237 strings
-(`dev/english-friction/1017-qa-report.md`), Task 809's halo words, the five dead keys joined on one
-line in every file, and a new payload note: **Layout (box title)**, derived from the page by
-`dev/scripts/dock_box_titles.inc.php`, tells translators to put a dockable box title's subject word
-first (his auto-hide tab question). Every `.replace('{name}'` is now global (Copy upward says {name} twice).
-Deleted keys: `lpn_guide_text_notes_popup`; and from the 26 non-English files only, `lpn_guide_text_alt_box`,
-`lpn_guide_how_alt`, `lpn_alt_calc_options`, `lpn_scenario_duration_tip`, `lpn_scenario_hyd_step_tip`.
+Batches pushed 2026-10-18: 555a8899a (PBV unit, GPV warm close, scenario receipts, roughness note,
+Task 815, plain privacy.php, consent_body "so we don't count you again" in English, his word calls),
+af91792e5 (full/empty tank closes its link natively; Change type reservoir -> tank 0/0/1; routing
+harness flake; fire-flow multiplier guard; label rules sync; port plan on master), e202f28f2 (label
+settings memo, identical drawing). consent_body's 26 translations owed (EC_CONSENT_VERSION stays 2).
+Merged on his word: feat/scenario-example, feat/scenario-results (Task 752 step 1), feat/native-pbv-gpv
+(EPANET 2.3.5 error 220 note still owed to Luke Butler), fix/settings-map-layout (Map and Page
+sections; deleted keys lpn_settings_sec_map, lpn_settings_map_display).
+His calls 2026-10-18: feat/theme Dark map "Good", Platinum beside Desktop "Good", brief Ida on a
+Designer theme when there is budget, try water towers for Prairie's map menu buttons. feat/label-form:
+he likes it, slower pass approved, notes in dev/label-placement-goals.md §2.3 on the branch; no merge
+word yet. Budget is tight (NPS review urgencies): slow down. Open from
+scenario-results: flow shown as magnitude only; fire flow across scenarios still a gap.
+Closed: Tasks 815, 800, 721. Task 737 marked WAIT: sprint.
 
-### Branches he has passed once (2026-10-17); his notes are on Tasks 752, 811, 812 and 814
+### Ready for his typed merge word (all reviewed by Perry, green but for payload freshness)
 
-- `feat/sheet-sync` (row 8108): phase 1 of Task 752's old shape, the whole-tree workbook. Task 752 was
-  reshaped on market research (results by scenario, demand import, one scenario at a time); salvage, don't merge.
-- `feat/theme` (row 8111): Task 811. Colour themes only so far; he wants design themes on the same branch.
-- `feat/label-beside` (row 8110): Task 812. He saw no difference and no level label; the page shows no
-  zoom factor and he could not reach the 600-junction network. Short pipes should also try the level spot.
-- `docs/label-port`: the port plan (Task 813); merges with label-beside.
+- `feat/msx` (8112, /chlorine-decay.msx to attach to Net1): Task 717 phase 1. Then his calls on the
+  import-report sentence and landing-page MSX lines (dev/msx-scope.md).
+- `feat/theme` (8111): 13 themes; the map follows the theme; he loves Desktop and Prairie. His calls
+  pending: Dark's dark map reverses Task 714; whether a "Designer" theme (Ida, or a paid human) is wanted.
+- `feat/label-form` (8114) + `feat/label-beside` (8110): he likes label-form; round 2 running (Perry
+  found the one-line node trial hid node labels and IDs; fix: per-label no loss). His call after: the
+  pass is ~1.6 s per notch on n600 (master 0.8 s); keep the one-line node trial on large views?
+- `feat/sqlite-reader`: Task 749, never merges until done (his word).
 
-### Questions out to him
+### Retired 2026-10-18
 
-- Terms for Task 737 (am, my use one word for Scenario and Status): CC proposed two `dev/terms.md`
-  entries and a uniqueness group; he edits that file.
-- The import labels and four English fixes (`fix/menu-wording`) change English only; their 26
-  translations are owed. A mini-sprint needs his word.
-- His `lpn_sm_help` lacks Copy upward and the has-children delete reason: CC proposed two sentences.
-- Port 8202 never reaches jasmine from his browser; epanet-plus-plus.org is also on 8109.
-
-### Waiting to merge (next batch, one suite run)
-
-- `chore/752-reshape`: Task 752 reshaped on market research, the report filed, Task 809's cadence.
-- `fix/settings-clear-jump` (828185057, green on its harness): the real Settings jump, a 561 px pull
-  when a tip is showing during a redraw. A defect: merges on green.
-- `feat/sqlite-reader` (Task 749) is NOT in any batch: Tom, 2026-10-17, *"No merging it until it's done."*
-- WaterCAD samples found: `dev/agents/market-researcher/wtg-samples.md` (Zenodo 7162154, TSNet). Tom is
-  seeking a free EWB Bentley licence to make the one missing case, a child that overrides a value.
+`feat/sheet-sync` and the label bench (`feat/label-placer`, `-a`..`-d`, `feat/label-gang-search`):
+archived as tags `archive/<branch>` (read with `git show archive/feat/label-placer:<path>`),
+branches, worktrees and preview rows removed. Bench data stays in /home/haws/label-trials-work.
 
 ### Next job
 
-His pull to deploy. Task 814 before more of 752. Design themes on `feat/theme`. Find why label-beside
-shows nothing. Task 749 waits on his `.sqlite` sample.
+Merge on his word; port plan steps 2 and 5 after label-form; Task 816; Task 814's network-into-open-
+project import (his call 2); Task 752 steps 2-3 (demand import, ODS/CSV in); a fire-flow-across-
+scenarios table; Task 733 phase 3 (EPS) slow and careful.
+
+### Traps met 2026-10-18 (twenty-sixth session)
+
+- **My briefs told agents to add new keys to all 27 files**; the rule is English only (the others fall
+  back). It failed `lang syntax rules A-D` (identical-to-english). Brief: new keys in lib/lang.ec.en.php only.
+- **A merge run without GIT_AUTHOR_NAME took Tom as author.** Export the author env in the SAME command as
+  every merge; redo the batch from origin/master if it slips (unpushed, so cheap).
+- **His edit of new-english-keys.md arrived mid-suite in the main checkout**: moved by patch to a chore
+  worktree, then `git checkout --` in main before the suite ended, so the stamp still landed.
+- **Ida proposed restyling one consent button to stand out**; CLAUDE.md forbids it. Read seat advice against
+  the house rules before forwarding it.
+- **scenario-settings-routing-harness failed in five branch suites**: stray page debounces between cases
+  (fixed in the harness, fix/routing-harness-flake). Other multi-case harnesses may share the exposure.
+- **The previous session's open questions were invisible to him after /clear.** Read the last session's
+  final messages for unanswered questions before reporting.
 
 ### Traps met 2026-10-17 (twenty-fifth session)
 

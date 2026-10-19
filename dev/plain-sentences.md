@@ -27,8 +27,8 @@ Help for translators with one string at a time, where the English of that one st
 
 ### consent_body
 
-- English: May we save a random code in this browser so that we can count how many browsers use each part of this site? The code is made up on the spot, says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first.
-- Plain: May we save, store, keep, or put a random code, a string of letters and digits chosen by chance, in this browser so that we can count or tally how many browsers use each part of this site? The code is made up on the spot, created at that moment, says nothing about you or your device, and records nothing you enter. Without it we cannot tell your second visit from somebody else's first.
+- English: May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.
+- Plain: May we save, store, or keep a random code, a string of letters and digits chosen by chance, in this browser, so that we do not count you, or this browser, a second time? The code is made up on the spot, created at that moment, says nothing about you or your device, and records nothing you enter.
 
 ### consent_accept
 
@@ -571,11 +571,6 @@ Help for translators with one string at a time, where the English of that one st
 
 - English: Relative viscosity
 - Plain: Relative viscosity: how thick the fluid is compared with water at 20 °C. It changes the friction factor under Darcy-Weisbach and nothing else.
-
-### lpn_settings_map_display
-
-- English: Appearance
-- Plain: Appearance: how the map looks: sizes, opacity, and positions.
 
 ### lpn_settings_legend_position
 

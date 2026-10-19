@@ -56,6 +56,7 @@ Every heading on the page names its own log file and field number. In summary:
 | Language reach, how it was decided, raw tag | `log/engcalcs-lang.log` | 2, 3, 6 |
 | Unit preset clicks per day, and by raw tag | `log/engcalcs-signal.log` | 1, 5 and 6, 4 |
 | Behaviour signals per day, by kind and detail | `log/engcalcs-signal.log` | 1, 5, 6 |
+| Map commands used (every menu command and toolbar button, zeros included) | `log/engcalcs-signal.log` rows `lpn` / `cmd:` + `lib/lpn-commands.json` | 1, 5, 6 |
 | Contact funnel, viewed and sent per day | `log/engcalcs-human-view.log` + `log/engcalcs-contact-send.log` | 1, 2 |
 
 Every section above draws a PEOPLE chart and a PAGE LOADS chart, each an inline SVG bar chart with
@@ -113,3 +114,7 @@ meta plus an `X-Robots-Tag` header sent by the page itself.
 R-212 is a long project Tom will keep adding to. Phase 1 is the URL and the script above; further
 "scripted views" and graph requests belong in `dev/tom-review-queue.md` / `dev/ROADMAP.md` as they
 come, not anticipated here.
+
+## Map commands used (Task 815)
+
+One `lpn` / `cmd:<menu>/<command>` signal per command per page load, from the two click sites in `openMenu()` and one toolbar listener in `js/looped-network.js`. The id is the `lpn_` language key of the row's label; content rows (scenario names, recent files, tabs) log nothing. The zero rows come from `lib/lpn-commands.json`, which `dev/lpn-spike/command-usage-browser-harness.js --write` regenerates and the same harness (no flag) fails on when stale. The EPANET++ page logs the same page name, so the two are not separable here.

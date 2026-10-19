@@ -87,7 +87,7 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_set_id_fields', 'lpn_set_default_fields', 'lpn_set_custom_fields',
   'lpn_set_map_fields', 'lpn_set_units_fields',
   'lpn_set_hydraulics_fields', 'lpn_set_quality_fields', 'lpn_set_energy_fields',
-  'lpn_set_page_fields'
+  'lpn_set_page_fields', 'lpn_set_pos_fields', 'lpn_set_pos_fields2', 'lpn_set_map_fields2'
 ].forEach(ensure);
 
 global.document = {

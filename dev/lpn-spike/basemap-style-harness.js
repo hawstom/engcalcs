@@ -49,6 +49,7 @@ function find(id) {
 		if (e.id === id) { hit = e; return; }
 		(e.children || []).forEach(walk);
 	})(stub.byId.lpn_set_map_fields);
+	if (!hit) { (function walk(e) { if (!e || hit) { return; } if (e.id === id) { hit = e; return; } (e.children || []).forEach(walk); })(stub.byId.lpn_set_map_fields2); }
 	return hit;
 }
 const canvasFilter = () => stub.byId.lpn_canvas.style.getPropertyValue
