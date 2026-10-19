@@ -52,6 +52,7 @@ require $repoRoot . '/lib/Language.Settings.php';
 // declaration, read here and by ec_canonical_url(); this file requires it directly because it
 // runs outside a web request and never loads the bootstrap.
 require $repoRoot . '/lib/Canonical.lib.php';
+require $repoRoot . '/lib/GuideChapters.lib.php';
 $languages = array_keys($all_language_settings);
 
 // --- Multilingual pages ----------------------------------------------------------------------
@@ -91,6 +92,14 @@ foreach (glob($repoRoot . '/*.php') as $path) {
     $pages[] = $file;
 }
 sort($pages);
+// **A PAGE WITH SEVERAL ADDRESSES OF ITS OWN** (Task 816): User-Manual.php answers the index at
+// `?lang=xx` and each User Guide chapter at `?lang=xx&chapter=<slug>`, in every language. These are
+// the suffixes after `?lang=xx` that ecPageQuery() adds on the page; '' is the page itself. The
+// chapter list is the one the page reads, so a new chapter enters the sitemap with no second edit.
+$pageSuffixes = [
+    'User-Manual.php' => array_merge([''], array_map(function ($slug) { return '&chapter=' . $slug; },
+        array_keys(ecGuideChapters()))),
+];
 if ($notPages) {
     fwrite(STDERR, "NOT A PAGE, so kept out of the sitemap (no echoHeader() call): "
         . implode(', ', array_keys($notPages)) . "\n"
@@ -131,11 +140,13 @@ if ($onlyHost !== '') {
     foreach ($pages as $file) {
         if (!isset($byHost[$file][$onlyHost])) { continue; }
         $path = ecCanonicalPath('/engcalcs/' . $file);
-        foreach ($languages as $lang) {
-            $hx .= "  <url>\n    <loc>" . htmlspecialchars(ecCanonicalOrigin('/engcalcs/' . $file, $origin, $onlyHost)
-                 . $path . '?lang=' . $lang, ENT_XML1) . "</loc>\n"
-                 . "    <lastmod>" . gmdate('Y-m-d', filemtime($repoRoot . '/' . $file)) . "</lastmod>\n  </url>\n";
-            $hn++;
+        foreach ($pageSuffixes[$file] ?? [''] as $suffix) {
+            foreach ($languages as $lang) {
+                $hx .= "  <url>\n    <loc>" . htmlspecialchars(ecCanonicalOrigin('/engcalcs/' . $file, $origin, $onlyHost)
+                     . $path . '?lang=' . $lang . $suffix, ENT_XML1) . "</loc>\n"
+                     . "    <lastmod>" . gmdate('Y-m-d', filemtime($repoRoot . '/' . $file)) . "</lastmod>\n  </url>\n";
+                $hn++;
+            }
         }
     }
     $hx .= "</urlset>\n";
@@ -176,12 +187,14 @@ foreach ($pages as $file) {
         $count++;
         continue;
     }
-    foreach ($languages as $lang) {
-        $loc = $pageOrigin . $path . '?lang=' . $lang;
-        $xml .= "  <url>\n    <loc>" . htmlspecialchars($loc, ENT_XML1) . "</loc>\n"
-              . "    <lastmod>" . gmdate('Y-m-d', filemtime($repoRoot . '/' . $file)) . "</lastmod>\n"
-              . "  </url>\n";
-        $count++;
+    foreach ($pageSuffixes[$file] ?? [''] as $suffix) {
+        foreach ($languages as $lang) {
+            $loc = $pageOrigin . $path . '?lang=' . $lang . $suffix;
+            $xml .= "  <url>\n    <loc>" . htmlspecialchars($loc, ENT_XML1) . "</loc>\n"
+                  . "    <lastmod>" . gmdate('Y-m-d', filemtime($repoRoot . '/' . $file)) . "</lastmod>\n"
+                  . "  </url>\n";
+            $count++;
+        }
     }
 }
 $xml .= "</urlset>\n";

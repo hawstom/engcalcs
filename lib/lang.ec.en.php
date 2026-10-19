@@ -978,6 +978,9 @@ $ec_lang['lpn_guide_contents']='Contents';
 $ec_lang['lpn_guide_rail_hide']='Hide contents';
 $ec_lang['lpn_guide_rail_show']='Show contents';
 $ec_lang['lpn_guide_search']='Search the user manual';
+// The chapter pages of the user manual (Task 816), one address per chapter per language.
+$ec_lang['lpn_guide_page_open']='Open the application';
+$ec_lang['lpn_guide_page_desc']='The user manual for the pipe network modeling application, one page for each chapter, from the map and the Properties box to scenarios, fire flow analysis, and criticality analysis.';
 $ec_lang['lpn_guide_boxes_heading']='Boxes';
 $ec_lang['lpn_guide_boxes_intro']='Each box can be moved, resized, docked at the left or right of the map, or closed. The ? in a box\'s title bar opens its help.';
 // Tom's own wording, 2026-10-07 (his typo "to not" corrected). Below lpn_guide_boxes_intro.

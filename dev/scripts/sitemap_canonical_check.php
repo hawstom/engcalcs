@@ -42,19 +42,30 @@
 $repoRoot = dirname(__DIR__, 2);
 $root     = isset($argv[1]) && $argv[1] !== '' ? $argv[1] : $repoRoot;
 
-$out = [];
-$rc  = 0;
-exec('php ' . escapeshellarg($root . '/dev/scripts/generate_sitemap.php') . ' --stdout 2>/dev/null', $out, $rc);
-if ($rc !== 0 || !$out) {
-    fwrite(STDERR, "FAIL: generate_sitemap.php --stdout produced nothing (exit $rc).\n");
-    exit(1);
+// **THE HOST SITEMAPS ARE HELD TOO (Task 816).** A page canonical on another host's own front door is
+// left out of the main sitemap and listed by `generate_sitemap.php --host=<host>`, so a check that read
+// only the main one never saw the map application or the User Guide's chapter pages at all.
+$_SERVER['SCRIPT_NAME'] = 'sitemap_canonical_check.php';
+require_once $root . '/lib/Canonical.lib.php';
+$sources = ['' => ' --stdout'];
+foreach (ecCanonicalHostOrigins() as $byHost) {
+    foreach (array_keys($byHost) as $h) { $sources[$h] = ' --host=' . escapeshellarg($h); }
 }
-$xml = implode("\n", $out);
-
-$doc = @simplexml_load_string($xml);
-if ($doc === false) {
-    fwrite(STDERR, "FAIL: the generated sitemap is not well-formed XML.\n");
-    exit(1);
+$docs = [];
+foreach ($sources as $h => $flag) {
+    $out = [];
+    $rc  = 0;
+    exec('php ' . escapeshellarg($root . '/dev/scripts/generate_sitemap.php') . $flag . ' 2>/dev/null', $out, $rc);
+    if ($rc !== 0 || !$out) {
+        fwrite(STDERR, "FAIL: generate_sitemap.php$flag produced nothing (exit $rc).\n");
+        exit(1);
+    }
+    $d = @simplexml_load_string(implode("\n", $out));
+    if ($d === false) {
+        fwrite(STDERR, "FAIL: the sitemap from generate_sitemap.php$flag is not well-formed XML.\n");
+        exit(1);
+    }
+    $docs[] = $d;
 }
 
 // **SCOPE IS DECIDED ON THE PATH, NOT THE ORIGIN, and that changed on 2026-09-17.** The suite no
@@ -67,7 +78,7 @@ if ($doc === false) {
 // silence.
 $_SERVER['SCRIPT_NAME'] = 'sitemap_canonical_check.php';
 require $root . '/lib/Language.Settings.php';
-require $root . '/lib/Canonical.lib.php';
+require_once $root . '/lib/GuideChapters.lib.php';
 $languages = array_flip(array_keys($all_language_settings));
 
 // The fallback origin, read out of lib/config.inc.php exactly as the generator reads it, so this
@@ -85,7 +96,7 @@ $offSite = 0;
 $turnedAway = 0;
 $findings = [];
 
-foreach ($doc->url as $u) {
+foreach ($docs as $doc) foreach ($doc->url as $u) {
     $loc = (string)$u->loc;
     if (!preg_match('#^(https?://[^/]+)(/.*)?$#', $loc, $lm)) { $turnedAway++; continue; }
     $origin = $lm[1];
@@ -100,6 +111,9 @@ foreach ($doc->url as $u) {
     if (strpos($path, '/engcalcs/') !== 0 && !isset($prettyToPage[$path])) { $offSite++; continue; }
 
     // A URL shaped like nothing this suite emits has no expectation to compare against. Counted.
+    // A page with addresses of its own adds `&chapter=<slug>` after the language (ecPageQuery()).
+    $chapter = '';
+    if (preg_match('/^(lang=[^&]*)&chapter=([a-z0-9-]+)$/', $q, $cm)) { $q = $cm[1]; $chapter = $cm[2]; }
     if ($q !== '' && strpos($q, 'lang=') !== 0) { $turnedAway++; continue; }
 
     $checked++;
@@ -127,6 +141,15 @@ foreach ($doc->url as $u) {
     if (!isset($languages[$lang])) {
         $findings[] = "$loc\n      ?lang=$lang names no lib/lang.ec.$lang.php, so the page renders and canonicalises as en";
         continue;
+    }
+
+    // Leg 3b: a chapter address names a chapter that exists, on the one page that has chapters.
+    if ($chapter !== '') {
+        $pg = isset($prettyToPage[$path]) ? $prettyToPage[$path] : basename($path);
+        if ($pg !== 'User-Manual.php' || !ecGuideIsChapter($chapter)) {
+            $findings[] = "$loc\n      &chapter=$chapter is not a chapter of the User Guide, so the page answers 404";
+            continue;
+        }
     }
 
     // Leg 4: the ORIGIN must be the one the page nominates. **This is the leg of 2026-09-17.** For
