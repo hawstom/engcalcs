@@ -45421,8 +45421,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				}
 				if (geo) { n[LPN_GEO_XSRC] = raw.x; n[LPN_GEO_YSRC] = raw.y; }
 				else if (raw.tok) { (n.tok || (n.tok = {})).x = raw.tok.x; n.tok.y = raw.tok.y; }
-				if (n.demandPattern && !patternIds[n.demandPattern]) { stripped.push(id); delete n.demandPattern; }
-				if (n.headPattern && !patternIds[n.headPattern]) { stripped.push(id); delete n.headPattern; }
+				if (n.demandPattern && !patternIds[n.demandPattern]) { stripped.push(id); delete n.demandPattern; }   // base-write: a new asset is born in Base, and a reference to a pattern this project lacks is left out
+				if (n.headPattern && !patternIds[n.headPattern]) { stripped.push(id); delete n.headPattern; }   // base-write: a new asset is born in Base, and a reference to a pattern this project lacks is left out
 				touch(n);
 			});
 			plan.addedLinks.forEach(function (id) {
@@ -45435,7 +45435,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (r.tok) { l.tok = JSON.parse(JSON.stringify(r.tok)); }   // base-write: the file's text for its numbers
 				if (l._curveId && !curveIds[l._curveId]) { stripped.push(id); delete l._curveId; }
 				if (l._efficCurveId && !curveIds[l._efficCurveId]) { delete l._efficCurveId; }
-				if (l.speedPattern && !patternIds[l.speedPattern]) { stripped.push(id); delete l.speedPattern; }
+				if (l.speedPattern && !patternIds[l.speedPattern]) { stripped.push(id); delete l.speedPattern; }   // base-write: a new asset is born in Base, and a reference to a pattern this project lacks is left out
 				touch(l);
 			});
 		}

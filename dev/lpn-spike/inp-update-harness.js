@@ -165,7 +165,7 @@ console.log('\n--- a unit mismatch is refused by name ---');
 	importText(SI, 'si.inp');
 	press(dialogButtons()[1]);
 	const t = dialogText();
-	ok('nothing was changed', snap() === before && JSON.stringify(L.scenarios()) === scnBefore);
+	ok('the refusal leaves the project as it was', snap() === before && JSON.stringify(L.scenarios()) === scnBefore);
 	ok('the refusal names the flow unit of the file and of the project', /gpm/i.test(t) && /l\/s|lps|L\/s/i.test(t) && t.indexOf(PC.lpn_result_flow) >= 0, t.slice(0, 400));
 	ok('it says what to do instead', t.indexOf(PC.lpn_inpup_refused_lead) >= 0);
 }
