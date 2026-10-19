@@ -2938,6 +2938,7 @@ EngCalcs.pageConfig = {
 		'lpn_mixing_mixed',
 		'lpn_mixing_model',
 		'lpn_quality_initial',
+		'lpn_quality_msx_species',
 		'lpn_quality_named_avg_concentration',
 		'lpn_quality_named_concentration',
 		'lpn_reaction_bulk',
