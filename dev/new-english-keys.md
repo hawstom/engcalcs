@@ -128,7 +128,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/roadmap-1018 (`159f1d6ab`) — 29 new, 29 to read @@ NEEDS RULING
+### chore/roadmap-1018 (`23cec294a`) — 29 new, 29 to read @@ NEEDS RULING
 
 - **`lpn_diag_gpv_curve_order`**
   > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
@@ -224,7 +224,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-form (`d05fdb069`) — adds no English strings
 
-### feat/msx (`cbdfef883`) — adds no English strings
+### feat/msx (`040c02127`) — adds no English strings
 
 ### feat/sqlite-reader (`9470877a6`) — 49 new, 49 to read @@ NEEDS RULING
 

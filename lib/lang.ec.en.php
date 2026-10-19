@@ -2259,7 +2259,7 @@ $ec_lang['lpn_dialog_ok']='OK';
 $ec_lang['lpn_file_import_menu']='Import…';
 $ec_lang['lpn_file_import_inp']='EPANET file…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort).';
+$ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
 // File > Export is a submenu (Tom, 2026-10-06), so its rows drop the verb the heading carries. The

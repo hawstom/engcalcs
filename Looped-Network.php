@@ -220,7 +220,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // BOTH of EPANET's formats: .inp is its documented text interchange format, .net is what
 	      // its Windows UI saves when you press Save. The accept list only filters the PICKER; which
 	      // format a chosen file really is gets decided from its first bytes, not its name. ?>
-	<input type="file" id="lpn_inp_file" accept=".inp,.net,text/plain" style="display:none">
+	<input type="file" id="lpn_inp_file" accept=".inp,.net,.msx,text/plain" multiple style="display:none">
 	<input type="file" id="lpn_workspace_file" accept=".json,application/json" style="display:none">
 	<?php // File > Open as lat/lon… (Task 447). THE ONE PICKER THAT TAKES BOTH KINDS, because the row
 	      // it serves is the recovery path for a lon/lat network in either kind of file. Which reader

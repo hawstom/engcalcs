@@ -45151,7 +45151,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return null;
 	}
 
-	function importInpFromFile(file) {
+	// **AN `.inp` AND ITS `.msx` CHOSEN TOGETHER OPEN TOGETHER** (Tom, 2026-10-18: "One step: I want
+	// it."). Nothing in an `.inp` names its `.msx`, so the pair can only arrive as two files picked
+	// at once. The network lands first; the `.msx` then attaches to it, its lines inside the same
+	// import report. One `.msx` alone attaches to the open project, as its own Import row does.
+	function importInpFiles(files) {
+		var msx = files.filter(function (f) { return /\.msx$/i.test(f.name); })[0],
+			inp = files.filter(function (f) { return !/\.msx$/i.test(f.name); })[0];
+		if (!inp) { if (msx) { readMsxFile(msx); } return; }
+		importInpFromFile(inp, msx);
+	}
+	function readMsxFile(f, into) {
+		var reader = new FileReader();
+		reader.onload = function (ev) { attachMsx(ev.target.result, f.name, into); };
+		reader.readAsArrayBuffer(f);
+	}
+	function importInpFromFile(file, msxFile) {
 		// Logged on the attempt, not on success: somebody who arrives with an .inp file has already
 		// told us how they mean to start, and a parse failure is a first action that went wrong --
 		// which is a thing worth being able to see rather than a thing to hide from the histogram.
@@ -45160,7 +45175,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		reader.onload = function (ev) {
 			var text = inpTextFromBytes(ev.target.result, file.name);
 			if (text === null) { return; }   // inpTextFromBytes already said why
-			landInpText(text, file.name, false);
+			if (landInpText(text, file.name, false) && msxFile) { readMsxFile(msxFile, document.getElementById('lpn_dialog_body')); }
 		};
 		reader.onerror = function () { setWarning(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.'); };
 		// BYTES, not text: which of EPANET's two formats this is gets decided by the content (see
@@ -45227,6 +45242,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// out of the file -- so there is nothing to place, and georefStart() says exactly that
 		// rather than starting a wizard over coordinates that are already lon/lat.
 		if (asGeo) { renameToNumbered(id); convertAsLanded(); }
+		return true;
 	}
 	function pickInpFile() {
 		var input = document.getElementById('lpn_inp_file');
@@ -45299,7 +45315,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		pick.click();
 	}
-	function attachMsx(buf, fileName) {
+	// `into`, when given, is an open dialog body (the import report): the attach lines join it
+	// rather than replacing it with a second box.
+	function attachMsx(buf, fileName, into) {
 		var pc = EngCalcs.pageConfig || {}, r = msxBytesToText(buf), scan = msxScan(r.text), ids;
 		if (!scan.hasSpecies) {
 			setWarning((pc.lpn_msx_not_msx || '{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.').split('{file}').join(fileName));
@@ -45324,9 +45342,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			setWarning((pc.lpn_msx_too_big || '{file} is too large to keep in browser storage, so it was not attached.').split('{file}').join(fileName));
 			return;
 		}
-		openDialog(function (body) {
+		function report(body) {
 			var h = document.createElement('p'), p;
-			h.style.margin = '0 0 8px';
+			h.style.margin = into ? '10px 0 8px' : '0 0 8px';
 			h.style.fontWeight = 'bold';
 			h.textContent = (pc.lpn_msx_report_heading || 'Attached {file}').split('{file}').join(fileName);
 			body.appendChild(h);
@@ -45346,7 +45364,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				p.textContent = (pc.lpn_msx_report_missing || 'IDs in the file that this network does not have: {ids}.').split('{ids}').join(ids);
 				body.appendChild(p);
 			}
-		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
+		}
+		if (into) { report(into); }
+		else { openDialog(report, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]); }
 		rebuildSettingsBox();
 		if (qualityFieldsLabelled()) { requestLabelRefresh(); }
 		scheduleSolve();
@@ -54368,9 +54388,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var inpInput = document.getElementById('lpn_inp_file');
 		if (!inpInput) { return; }
 		inpInput.addEventListener('change', function () {
-			var f = inpInput.files[0];
+			var fs = Array.prototype.slice.call(inpInput.files);
 			inpInput.value = '';
-			if (f) { importInpFromFile(f); }
+			if (fs.length) { importInpFiles(fs); }
 		});
 		// A THIRD picker (Task 447), and this one deliberately takes both kinds: File > Open as
 		// lat/lon… is one act over either a project file or an `.inp`, and openAsGeoFile() decides

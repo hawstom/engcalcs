@@ -213,7 +213,17 @@ async function main() {
 		await c.settle(1200);
 		const ths = await c.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_pane_junctions th')).map((t) => t.textContent.trim()));
 		ok('the Junctions table heads a column with the first species in the file\'s unit, AS3 (UG/L)', ths.indexOf('AS3 (UG/L)') >= 0, ths.slice(-3).join(' | '));
-		ok('no uncaught page errors', a.errors.length === 0 && b.errors.length === 0 && c.errors.length === 0, a.errors.concat(b.errors, c.errors).slice(0, 2).join(' | '));
+		console.log('\n--- the .inp and its .msx chosen together open together (Tom, 2026-10-18) ---');
+		const d = await open(browser);
+		await d.page.setInputFiles('#lpn_inp_file', [
+			{ name: 'example.inp', mimeType: 'text/plain', buffer: fs.readFileSync(path.join(FIX, 'example.inp')) },
+			{ name: 'example.msx', mimeType: 'text/plain', buffer: fs.readFileSync(path.join(FIX, 'example.msx')) }]);
+		await d.settle(1500);
+		const both = await dialogText(d);
+		ok('one report names both files: the network imported and the .msx attached', /example\.inp/.test(both) && /Attached example\.msx/.test(both) && both.indexOf(L.kept) >= 0, both.slice(0, 200));
+		ok('...and Settings, Quality is now Multi-species', await d.page.evaluate(() => (EngCalcs.lpnDebug && EngCalcs.lpnDebug.settings ? EngCalcs.lpnDebug.settings().quality.mode : document.querySelector('#lpn_set_quality_fields select') && document.querySelector('#lpn_set_quality_fields select').value)) === 'msx');
+		ok('no uncaught page errors', a.errors.length === 0 && b.errors.length === 0 && c.errors.length === 0 && d.errors.length === 0, a.errors.concat(b.errors, c.errors, d.errors).slice(0, 2).join(' | '));
+		await d.close();
 		await c.close();
 		await b.close();
 		await a.close();
