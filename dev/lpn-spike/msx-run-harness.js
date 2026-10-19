@@ -201,6 +201,12 @@ const FIX = path.join(ROOT, 'dev', 'lpn-spike', 'fixtures', 'msx-example');
 	ok('a wall species has no value at a node, rather than a zero', L.nodeQualityValue(L.nodeById('C')) === undefined);
 	ok('...and has one on the pipe wall', L.linkQualityValue(L.linkById('5')) > 40, String(L.linkQualityValue(L.linkById('5'))));
 
+	// Tom, 2026-10-18: attaching an .msx to Net1 lost its Chlorine. Multi-species sets the chosen
+	// analysis aside; the .inp still states it in its own characters.
+	const qMsx = { mode: 'msx', before: 'chemical', src: 'Chlorine mg/L', traceNode: '' };
+	ok('an attached .msx leaves the .inp\'s own Quality line as the file wrote it', EngCalcs.lpnQualityText(qMsx) === 'Chlorine mg/L', EngCalcs.lpnQualityText(qMsx));
+	ok('...and a file that stated none still states none', EngCalcs.lpnQualityText({ mode: 'msx', before: 'none', traceNode: '' }) === '', JSON.stringify(EngCalcs.lpnQualityText({ mode: 'msx', before: 'none', traceNode: '' })));
+
 	console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));
 	process.exit(fails ? 1 : 0);
 })().catch(function (e) { console.error(e); process.exit(1); });

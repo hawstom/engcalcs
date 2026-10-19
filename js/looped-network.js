@@ -45301,8 +45301,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		doc.msx = { name: fileName, text: r.text, enc: r.enc };
 		// **ATTACHING IS ASKING FOR IT TO RUN** (Task 717, phase 2): the quality analysis becomes
 		// Multi-species, so the next extended-period run is an EPANET-MSX run. Settings, Calculation,
-		// Quality moves it back.
-		settings.quality = { mode: 'msx', traceNode: (settings.quality || {}).traceNode || '' };
+		// Quality moves it back. **ONLY THE CHOICE CHANGES** (Tom, 2026-10-18: Net1's Chlorine was
+		// lost): the chemical, its units and the trace node stay, and `before` is what Remove restores.
+		settings.quality = Object.assign({}, settings.quality || { traceNode: '' }, { mode: 'msx',
+			before: (settings.quality && settings.quality.mode !== 'msx') ? (settings.quality.mode || 'none') : ((settings.quality || {}).before || 'none') });
 		libCommit();
 		// **A FILE THE BROWSER CANNOT KEEP IS NOT "KEPT"**: the autosave just refused it, so it
 		// would be gone on reload. Put the previous state back, save that, and say so where it is seen.
@@ -45366,8 +45368,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{ label: pc.lpn_msx_remove || 'Remove', fn: function () {
 				saveUndoSnapshot();
 				doc.msx = null;
-				// Nothing left to run: a Multi-species analysis goes back to none.
-				if (settings.quality && settings.quality.mode === 'msx') { settings.quality = { mode: 'none', traceNode: '' }; }
+				// Nothing left to run: a Multi-species analysis goes back to what was chosen before it.
+				if (settings.quality && settings.quality.mode === 'msx') {
+					settings.quality = Object.assign({}, settings.quality, { mode: settings.quality.before || 'none' });
+					delete settings.quality.before;
+				}
 				libCommit();
 				rebuildSettingsBox();
 				scheduleSolve();

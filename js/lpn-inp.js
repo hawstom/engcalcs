@@ -1911,13 +1911,11 @@
 	 */
 	EngCalcs.lpnQualityText = function (q) {
 		var mode = (q && q.mode) || 'none', src = q && q.src, was;
-		// **EPANET-MSX (Task 717) RUNS BESIDE EPANET'S OWN QUALITY, WHICH IT NEEDS OFF**: an MSX
-		// study's `.inp` states `Quality NONE`. A file that said so keeps its own characters; one
-		// that said nothing still says nothing (NONE is EPANET's default); one that named an
-		// analysis now says NONE, because the user chose Multi-species over it.
+		// **EPANET-MSX (Task 717) LEAVES THE `.inp`'S OWN QUALITY LINE ALONE** (Tom, 2026-10-18):
+		// the solve turns EPANET's quality off in its copy, so the file still states the analysis
+		// that was chosen before Multi-species (`before`), in its own characters where untouched.
 		if (mode === 'msx') {
-			if (src === undefined || src === null || src === '') { return ''; }
-			return EngCalcs.lpnQualityParse(src).mode === 'none' ? String(src) : 'NONE';
+			return EngCalcs.lpnQualityText(Object.assign({}, q, { mode: q.before || 'none' }));
 		}
 		if (src !== undefined && src !== null && src !== '') {
 			was = EngCalcs.lpnQualityParse(src);
