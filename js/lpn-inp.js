@@ -1911,6 +1911,14 @@
 	 */
 	EngCalcs.lpnQualityText = function (q) {
 		var mode = (q && q.mode) || 'none', src = q && q.src, was;
+		// **EPANET-MSX (Task 717) RUNS BESIDE EPANET'S OWN QUALITY, WHICH IT NEEDS OFF**: an MSX
+		// study's `.inp` states `Quality NONE`. A file that said so keeps its own characters; one
+		// that said nothing still says nothing (NONE is EPANET's default); one that named an
+		// analysis now says NONE, because the user chose Multi-species over it.
+		if (mode === 'msx') {
+			if (src === undefined || src === null || src === '') { return ''; }
+			return EngCalcs.lpnQualityParse(src).mode === 'none' ? String(src) : 'NONE';
+		}
 		if (src !== undefined && src !== null && src !== '') {
 			was = EngCalcs.lpnQualityParse(src);
 			// **A CHEMICAL NOW HAS THE SAME "STILL MATCHES THE TOKEN?" TEST A TRACE NODE ALREADY

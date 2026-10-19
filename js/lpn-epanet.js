@@ -95,6 +95,8 @@
 		// both live in the binary output file and in a full report table, and that is where the
 		// reaction rate is now read from (Task 652; see the rateOn note inside lpnEpanetRun).
 		EN_LINKQUAL = 14,
+		// EPANET-MSX object and species codes (epanetmsx.h): MSX_NODE, MSX_LINK, MSX_SPECIES, MSX_WALL.
+		MSX_NODE = 0, MSX_LINK = 1, MSX_SPECIES = 3, MSX_WALL = 1,
 		EN_PUMP_EFFIC = 17;
 
 	// **THE STATISTICS AND OPTIONS THAT SAY WHETHER THE RUN CONVERGED** (ROADMAP Task 565).
@@ -2091,6 +2093,19 @@
 					qualOn = EngCalcs.lpnQualityRuns(model.quality),
 					qualityIsAge = qualOn && (model.quality || {}).mode === 'age',
 					/**
+					 * **EPANET-MSX, THE MULTI-SPECIES PASS** (ROADMAP Task 717, phase 2). The
+					 * attached `.msx` is the user's own text, handed to the engine as a COPY in
+					 * its in-memory filesystem and never rewritten. EPANET-MSX reads the
+					 * hydraulics this run saves (`saveHydFile`), so it is a second walk over the
+					 * same clock exactly as EPANET's own quality pass is, and it replaces that
+					 * pass: an MSX study states `Quality NONE` in its `.inp`, and this mode writes
+					 * no Quality line at all. Values leave in the units the `.msx` declares, per
+					 * species, converted by nobody (CLAUDE.md, "only the user touches a file's
+					 * numbers"); dev/lpn-spike/msx-run-harness.js anchors them.
+					 */
+					msxOn = !qualOn && (model.quality || {}).mode === 'msx' && !!(model.msx && model.msx.text),
+					msxOpened = false, msxSpecies = null,
+					/**
 					 * **THE REACTION RATE IS EPANET'S OWN NUMBER, READ OUT OF EPANET'S OWN BINARY
 					 * OUTPUT FILE** (ROADMAP Task 652). Nothing on this page computes it, and
 					 * nothing here may learn to.
@@ -2146,7 +2161,7 @@
 					// rather than a guess. See LPN_EPANET_READ_SPAN for why the third exists.
 					readSpan = rateOn ? EngCalcs.LPN_EPANET_READ_SPAN : 0,
 					runSpan = 1 - readSpan,
-					phase0 = 0, phaseSpan = qualOn ? runSpan / 2 : runSpan;
+					phase0 = 0, phaseSpan = (qualOn || msxOn) ? runSpan / 2 : runSpan;
 
 				// ALWAYS closed, on every path out. A Project is a WASM allocation inside a
 				// Workspace that outlives it, so a run that threw would otherwise leak the whole
@@ -2157,6 +2172,9 @@
 					if (closed) { return txt; }
 					closed = true;
 					try { p.closeQ(); } catch (e) { /* no quality pass, or already shut */ }
+					// MSX state is the engine's own global, not the Project's, so a run that opened
+					// it must close it or the next run inherits a half-finished one.
+					if (msxOpened) { try { p.msxClose(); } catch (e) { /* already shut */ } msxOpened = false; }
 					try { p.closeH(); } catch (e) { /* never opened, or already shut */ }
 					try { p.close(); } catch (e) { /* already torn down */ }
 					try { txt = ws.readFile('temp.rpt') || ''; } catch (e) { txt = ''; }
@@ -2220,7 +2238,7 @@
 					for (i = 0; i < model.nodes.length; i++) { nodeIdx[model.nodes[i].id] = p.getNodeIndex(model.nodes[i].id); }
 					for (i = 0; i < model.links.length; i++) { linkIdx[model.links[i].id] = p.getLinkIndex(model.links[i].id); }
 					p.openH();
-					p.initH(qualOn ? EN_SAVE : EN_NOSAVE);
+					p.initH((qualOn || msxOn) ? EN_SAVE : EN_NOSAVE);
 				} catch (e) {
 					// **THE REFUSAL** (Task 471). EPANET has our file and will not take it -- a
 					// dangling control, an id it cannot resolve. It resolves rather than rejects,
@@ -2370,7 +2388,9 @@
 							busyMs: busyMs,
 							frames: frames,
 							duration: duration, reportStart: reportStart, reportStep: reportStep,
-							quality: qualOn ? (model.quality || null) : null,
+							quality: (qualOn || msxOn) ? (model.quality || null) : null,
+							// The species EPANET-MSX ran, in the file's order: [{id, wall, units}].
+							msxSpecies: msxOn ? msxSpecies : undefined,
 							// **WHAT THE PUMPS COST, OR NULL WHERE THERE ARE NO PUMPS** (Task 566).
 							// Null and not an empty table: a network with nothing to pump has no
 							// energy answer, and a table of zeros reads as one.
@@ -2418,7 +2438,7 @@
 							// would leave frames with no water age beside the ones that have it.
 							// `solvedTo` is the last of them; nothing is carried past it, estimated or
 							// zeroed.
-							warnings: built.warnings, frames: kept, partial: kept.length > 0, solvedTo: last, qualityNotRun: !!qualOn,
+							warnings: built.warnings, frames: kept, partial: kept.length > 0, solvedTo: last, qualityNotRun: !!(qualOn || msxOn),
 							report: failedReport, stoppedAt: t,
 							cutOff: hydPhase ? EngCalcs.lpnRunCutOff(failedReport, model, tankStates) : null,
 							duration: duration, reportStart: reportStart, reportStep: reportStep
@@ -2485,6 +2505,72 @@
 						} catch (e) { failed(e); return; }
 						phase0 = runSpan / 2; phaseSpan = runSpan / 2; t = 0; guard = 0;
 						qslice();
+					}
+					/**
+					 * **THE MSX WALK** (Task 717). Same reporting grid, same frames, same slicing
+					 * as the quality walk above. Each frame gains `msxNodes` and `msxLinks`: per
+					 * element, one number per species in the `.msx`'s own order. A WALL species
+					 * lives on the pipe wall, so a node carries `null` for it rather than a value
+					 * the engine has no meaning for.
+					 */
+					function msxRead(tq) {
+						var f = frameAt[tq], k, s, n2, l2, row;
+						if (!f || !isReportTime(tq)) { return; }
+						f.msxNodes = {}; f.msxLinks = {};
+						for (k = 0; k < model.nodes.length; k++) {
+							n2 = model.nodes[k]; row = [];
+							for (s = 0; s < msxSpecies.length; s++) {
+								row.push(msxSpecies[s].wall ? null : p.msxGetQual(MSX_NODE, nodeIdx[n2.id], s + 1));
+							}
+							f.msxNodes[n2.id] = row;
+						}
+						for (k = 0; k < model.links.length; k++) {
+							l2 = model.links[k]; row = [];
+							for (s = 0; s < msxSpecies.length; s++) { row.push(p.msxGetQual(MSX_LINK, linkIdx[l2.id], s + 1)); }
+							f.msxLinks[l2.id] = row;
+						}
+					}
+					function msxSlice() {
+						var slice0 = nowMs(), finished = false, r;
+						try {
+							for (;;) {
+								r = p.msxStep();
+								t = r.t;
+								msxRead(t);
+								if (!(r.tleft > 0) || ++guard >= 1000000) { finished = true; break; }
+								if (nowMs() - slice0 >= sliceMs) { break; }
+							}
+						} catch (e) { failed(e); return; }
+						busyMs += nowMs() - slice0;
+						if (!finished) { tell(fractionNow()); setTimeout(msxSlice, 0); return; }
+						done();
+					}
+					function startMsx() {
+						var k, cnt, sp, id;
+						try {
+							hydPhase = false;
+							p.closeH();
+							p.saveHydFile('temp.hyd');
+							// A COPY of the user's characters, written to the engine's own disk.
+							ws.writeFile('temp.msx', String(model.msx.text));
+							p.msxOpen('temp.msx');
+							msxOpened = true;
+							p.msxUseHydFile('temp.hyd');
+							cnt = p.msxGetCount(MSX_SPECIES);
+							msxSpecies = [];
+							for (k = 1; k <= cnt; k++) {
+								sp = p.msxGetSpecies(k);
+								id = p.msxGetId(MSX_SPECIES, k);
+								// EPANET-MSX's own report heading: a bulk species per litre, a wall
+								// species per unit of the file's AREA_UNITS. A label, never a factor.
+								msxSpecies.push({ id: id, wall: sp.type === MSX_WALL, units: sp.units,
+									unitText: String(sp.units) + '/' + (sp.type === MSX_WALL ? EngCalcs.lpnMsxAreaUnits(model.msx.text) : 'L') });
+							}
+							p.msxInit(0);
+						} catch (e) { failed(e); return; }
+						phase0 = runSpan / 2; phaseSpan = runSpan / 2; t = 0; guard = 0;
+						try { msxRead(0); } catch (e) { failed(e); return; }
+						msxSlice();
 					}
 					function slice() {
 						var slice0 = nowMs(), finished = false, f, stepConv, esample;
@@ -2587,6 +2673,7 @@
 							return;
 						}
 						if (qualOn) { startQuality(); return; }
+						if (msxOn) { startMsx(); return; }
 						done();
 					}
 					tell(0);
@@ -2595,6 +2682,20 @@
 			});
 		});
 	}
+	/**
+	 * The `[OPTIONS] AREA_UNITS` an EPANET-MSX file states, as its own characters, or EPANET-MSX's
+	 * default `FT2` where it states none. Read only to NAME a wall species' unit.
+	 */
+	EngCalcs.lpnMsxAreaUnits = function (text) {
+		var sec = '', out = 'FT2';
+		String(text || '').split(/\r\n|\r|\n/).forEach(function (raw) {
+			var line = raw.split(';')[0].trim(), m = /^\[\s*([A-Za-z_]+)\s*\]/.exec(line), w;
+			if (m) { sec = m[1].toUpperCase(); return; }
+			w = line.split(/\s+/);
+			if (sec === 'OPTIONS' && w.length > 1 && /^AREA_UNITS$/i.test(w[0])) { out = w[1]; }
+		});
+		return out;
+	};
 	EngCalcs.lpnEpanetRun = function (model, options) {
 		var p;
 		try { p = epanetRunInner(model, options); } catch (e) { p = Promise.reject(e); }
