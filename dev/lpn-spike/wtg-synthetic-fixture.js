@@ -184,12 +184,14 @@ x('INSERT INTO EpaNetEngine_TimeAnalysisType_EpsType VALUES (48,86400,3600,3600,
 for e, l in lab.items():
     et = 2 if e in (1, 58, 60, 61) else 1 if e in (2, 30, 31, 32, 34, 35, 36, 37, 44, 70, 71) else 4 if e >= 200 else 3
     x('INSERT INTO HMIModelingElement VALUES (?,1,?,?,?)', (e, 1 if e in (1, 2, 102, 125, 201) else 0, et, l))
+if len(sys.argv) > 2:
+    exec(sys.argv[2])
 db.commit()
 `;
 
-/** Write the database to `file` and return the path. */
-function buildSyntheticWtg(file) {
-	execFileSync('python3', ['-I', '-c', PY, file]);
+/** Write the database to `file` and return the path. `extraPy` (optional) is Python run before the commit with `db`, `x`, `L` and `lab` in scope. */
+function buildSyntheticWtg(file, extraPy) {
+	execFileSync('python3', ['-I', '-c', PY, file].concat(extraPy ? [extraPy] : []));
 	return file;
 }
 module.exports = { buildSyntheticWtg };

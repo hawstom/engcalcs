@@ -45249,7 +45249,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'wtg-tank-section': ['lpn_wtg_note_tank_shape', 'These tanks are not circular. Each was given the diameter of a circle of the same area, or, where the shape is not known, the diameter stored with it.'],
 		'wtg-tank-demand': ['lpn_wtg_note_tank_demand', 'Not imported: the demands at these tanks. An EPANET tank has no demand.'],
 		'wtg-emitter-unread': ['lpn_wtg_note_emitter_unread', 'Not imported: the emitter coefficients of these junctions, because the unit they are stored in is not yet confirmed.'],
-		'wtg-customer-demand': ['lpn_wtg_note_customer_demand', 'Not imported: the customer demands and unit demands at these junctions. Their base demands were imported.'],
+		'wtg-customer-demand': ['lpn_wtg_note_customer_demand', 'Not imported: the customer demands at these junctions. Their base demands were imported.'],
+		'wtg-unit-demand': ['lpn_wtg_note_unit_demand', 'The demand at these junctions comes from unit demand loads. The flow of each load was imported as a demand; the loading units and the unit load were not.'],
 		'wtg-setting-pattern': ['lpn_wtg_note_setting_pattern', 'Not imported: the setting patterns of these valves.'],
 		'wtg-pattern-continuous': ['lpn_wtg_note_pattern_continuous', 'These patterns are continuous in the model. Here each multiplier holds until the next time step.'],
 		'wtg-pattern-calendar': ['lpn_wtg_note_pattern_calendar', 'Not imported: the day of the week and month multipliers of these patterns.'],
@@ -45373,6 +45374,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		r.scenarios.forEach(function (s) { sid[s.fileId] = 's' + (++n); });
 		r.scenarios.forEach(function (s) {
 			var rec = { id: sid[s.fileId], name: s.name, overrides: JSON.parse(JSON.stringify(s.overrides || {})) };
+			if (typeof s.demandMultiplier === 'number') { rec.demandMultiplier = s.demandMultiplier; }
 			if (s.parentFileId && sid[s.parentFileId]) { rec.parent = sid[s.parentFileId]; }
 			saved.scenarios.push(rec);
 		});

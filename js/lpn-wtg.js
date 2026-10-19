@@ -42,7 +42,7 @@
 		Physical_NodeElevation: 63, Physical_PipeDiameter: 63, Physical_UserDefinedLength: 63,
 		HMIGeometryScaledLength: 63, Physical_ValveDiameter: 63, Physical_DarcyWeisbachE: 63,
 		Physical_HazenWilliamsC: 252, Physical_PipeMannings: 252, Physical_CompositeMinorLoss: 252,
-		Physical_CalculatedMinorLossCoefficient: 252, DemandCollection_BaseFlow: 27,
+		Physical_CalculatedMinorLossCoefficient: 252, DemandCollection_BaseFlow: 27, UnitDemandLoadCollection_UnitDemandBaseFlow: 27,
 		Physical_TankBaseElevation: 63, Physical_TankMaximumElevation: 63, Physical_TankMinimumElevation: 63,
 		Physical_TankMaximumLevel: 63, Physical_TankMinimumLevel: 63, InitialSettings_TankInitialElevation: 63,
 		InitialSettings_TankInitialLevel: 63, CircularTankSectionType_TankDiameter: 63,
@@ -240,6 +240,7 @@
 	// The columns this reader reads, by table, so everything else that holds data can be named in
 	// the report as not read. A table absent here and holding rows for a live element is reported.
 	var READ_TABLES = {
+		IdahoDemandNode_Demand_UnitDemandLoadCollection: 1,
 		BaseIdahoNode_Physical_Data: 1, BaseIdahoNode_HmiDataSetGeometry_Data: 1, BaseIdahoNode_HMIActiveTopology_Data: 1,
 		BaseLink_HMIDataSetTopology_Data: 1, BaseLink_HmiDataSetGeometry_Data: 1, BaseLink_Physical_Data: 1,
 		BaseLink_HMIActiveTopology_Data: 1, IdahoPipe_Physical_Data: 1, IdahoPipe_InitialSettings_Data: 1,
@@ -523,7 +524,7 @@
 		// ---- the network as one scenario sees it, in storage units
 		function network(s) {
 			var net = { nodes: [], links: [], directed: [], skipped: [], inactive: [], tankInlets: [], tankDemands: [],
-				valveStatusGuess: [], pumpDefs: {}, unread: [], emitters: [], customerDemands: [], settingPatterns: [] };
+				valveStatusGuess: [], pumpDefs: {}, unread: [], emitters: [], customerDemands: [], unitDemands: [], settingPatterns: [] };
 			var ids = Object.keys(live).map(Number).sort(function (a, b) { return a - b; });
 			ids.forEach(function (e) {
 				var lab = labels[e];
@@ -559,7 +560,16 @@
 					n.demands = collection('IdahoDemandNode_Demand_DemandCollection', n.e, dHit).map(function (r) {
 						return { q: r.DemandCollection_BaseFlow, pat: r.DemandCollection_DemandPattern };
 					});
-					if (dHit && (dHit.row.UnitDemandLoadCollectionCount || 0) > 0) { net.customerDemands.push(n.label); }
+					// Unit demand loads (loading units times a unit load): each row stores its flow, which
+					// is what EPANET needs. The units and the unit load themselves are not carried.
+					var ul = collection('IdahoDemandNode_Demand_UnitDemandLoadCollection', n.e, dHit);
+					if (ul.length) {
+						ul.forEach(function (r) {
+							n.demands.push({ q: r.UnitDemandLoadCollection_UnitDemandBaseFlow, pat: r.UnitDemandLoadCollection_UnitDemandPatternID,
+								unit: true, field: 'UnitDemandLoadCollection_UnitDemandBaseFlow' });
+						});
+						net.unitDemands.push(n.label);
+					}
 					if (dHit && dHit.row.CustomerDemandCollection) { net.customerDemands.push(n.label); }
 					var em = get(n.e, s, 'Physical_EmitterCoefficient');
 					if (em) { net.emitters.push(n.label); }
@@ -697,16 +707,53 @@
 		}
 
 		// ---- calculation options (the Base scenario's EPANET engine)
-		var eng = null;
+		var eng = null, engFor = function () { return null; };
 		if (M.has('EpaNetEngine')) {
 			var engById = {};
 			M.all('EpaNetEngine').forEach(function (r) { engById[r.CalculationOptionsID] = r; });
 			Object.keys(S.calc).forEach(function (t) { var c = S.calc[t]; if (engById[c.id]) { eng = engById[c.id]; } });
+			engFor = function (sc) {
+				var found = null, g = 0, w = sc;
+				while (w && !found && g++ < 64) {
+					Object.keys(w.calc).forEach(function (t) { if (engById[w.calc[t].id] && !found) { found = engById[w.calc[t].id]; } });
+					w = !found && w.parent ? scen[w.parent] : null;
+				}
+				return found;
+			};
 		}
 		var eps = null;
 		if (eng && M.has('EpaNetEngine_TimeAnalysisType_EpsType')) {
 			M.all('EpaNetEngine_TimeAnalysisType_EpsType').forEach(function (r) { if (r.CalculationOptionsID === eng.CalculationOptionsID) { eps = r; } });
 		}
+		// ---- demand adjustments. WaterGEMS adjusts normal demands and unit demand loads separately; one
+		// adjustment of everything (scope 0, no pattern) by operation 2 (multiply) is EPANET's Demand
+		// Multiplier. Operation 2 meaning "multiply" is read off two real models (1.8 and 3.0 against
+		// WaterCAD's own average, maximum-day and peak-hour totals). Anything else is reported.
+		function adjustOf(engRow) {
+			var res = { normal: 1, unit: 1, stated: false, bad: false };
+			if (!engRow) { return res; }
+			[['EpaNetEngine_NormalDemandAdjustmentsCollection', 'Normal', 'normal'], ['EpaNetEngine_UnitDemandAdjustmentsCollection', 'Unit', 'unit']].forEach(function (d) {
+				if (!M.has(d[0])) { return; }
+				var rows = M.all(d[0]).filter(function (r) { return r.CalculationOptionsID === engRow.CalculationOptionsID; });
+				rows.forEach(function (r) {
+					var v = r[d[1] + 'DemandAdjustmentsCollection_' + d[1] + 'DemandAdjustmentValue'];
+					var scope = r[d[1] + 'DemandAdjustmentsCollection_' + d[1] + 'DemandScopeID'];
+					var pat = r[d[1] + 'DemandAdjustmentsCollection_DemandPatternID'];
+					var id = r[d[1] + 'DemandAdjustmentsCollection_' + d[1] + 'DemandID'];
+					if (rows.length === 1 && !scope && !pat && !id && r[d[1] + 'DemandOperation'] === 2 && typeof v === 'number') { res[d[2]] = v; res.stated = true; }
+					else { res.bad = true; }
+				});
+			});
+			return res;
+		}
+		var adjBase = adjustOf(eng);
+		var baseHasUnit = net.nodes.some(function (n) { return n.demands && n.demands.some(function (d) { return d.unit && d.q; }); });
+		var baseHasNormal = net.nodes.some(function (n) { return n.demands && n.demands.some(function (d) { return !d.unit && d.q; }); });
+		// The one multiplier EPANET has: the unit adjustment when every demand is a unit load, else the
+		// normal one, with the unit loads scaled by the ratio so each total stays WaterGEMS's.
+		function multOf(a, hasUnit, hasNormal) { return hasUnit && !hasNormal ? a.unit : a.normal; }
+		var multBase = multOf(adjBase, baseHasUnit, baseHasNormal);
+		var unitScale = baseHasUnit && baseHasNormal && multBase ? adjBase.unit / multBase : 1;
 		var method = eng ? eng.FrictionMethod : 1;
 		var headloss = method === 0 ? 'D-W' : method === 2 ? 'C-M' : 'H-W';
 		if (method !== 0 && method !== 1 && method !== 2 && eng) { note('wtg-friction-unknown', [String(method)]); }
@@ -729,10 +776,10 @@
 				counts.junctions++;
 				var d0 = (n.demands || [])[0];
 				junctions.push(' ' + n.id + '\t' + need(L(n.elev, 'Physical_NodeElevation'), 'elevation', n.label) + '\t' +
-					(d0 ? need(Q(d0.q, 'DemandCollection_BaseFlow'), 'demand', n.label) : '0') + '\t' + (d0 ? patternId(d0.pat) : '') + '\t;');
+					(d0 ? need(Q(d0.q * (d0.unit ? unitScale : 1), d0.field || 'DemandCollection_BaseFlow'), 'demand', n.label) : '0') + '\t' + (d0 ? patternId(d0.pat) : '') + '\t;');
 				if (n.demands && n.demands.length > 1) {
 					n.demands.forEach(function (d) {
-						demandsSec.push(' ' + n.id + '\t' + need(Q(d.q, 'DemandCollection_BaseFlow'), 'demand', n.label) + '\t' + patternId(d.pat) + '\t;');
+						demandsSec.push(' ' + n.id + '\t' + need(Q(d.q * (d.unit ? unitScale : 1), d.field || 'DemandCollection_BaseFlow'), 'demand', n.label) + '\t' + patternId(d.pat) + '\t;');
 					});
 				}
 			} else if (n.kind === 'reservoir') {
@@ -1042,17 +1089,8 @@
 			if (typeof eng.EpaNetEngine_CheckCutOff === 'number') { opt.push(' MAXCHECK           \t' + eng.EpaNetEngine_CheckCutOff); }
 			if (typeof eng.EpaNetEngine_DampingLimit === 'number') { opt.push(' DAMPLIMIT          \t' + num(eng.EpaNetEngine_DampingLimit)); }
 			if (typeof eng.EpaNetEngine_EmitterExponent === 'number') { opt.push(' Emitter Exponent   \t' + num(eng.EpaNetEngine_EmitterExponent)); }
-			// Demand adjustments: ONE adjustment of every demand (scope 0, no pattern) by operation 2
-			// is EPANET's Demand Multiplier. OBSERVED once, value 1, so operation 2 meaning "multiply"
-			// is read off Bentley's dialog order and holds only the identity case; anything else is
-			// reported, not applied.
-			var adj = M.has('EpaNetEngine_NormalDemandAdjustmentsCollection') ? M.all('EpaNetEngine_NormalDemandAdjustmentsCollection')
-				.filter(function (r) { return r.CalculationOptionsID === eng.CalculationOptionsID; }) : [];
-			var a0 = adj[0];
-			if (adj.length === 1 && !a0.NormalDemandAdjustmentsCollection_NormalDemandScopeID && !a0.NormalDemandAdjustmentsCollection_DemandPatternID &&
-				a0.NormalDemandOperation === 2 && typeof a0.NormalDemandAdjustmentsCollection_NormalDemandAdjustmentValue === 'number') {
-				opt.push(' Demand Multiplier  \t' + num(a0.NormalDemandAdjustmentsCollection_NormalDemandAdjustmentValue));
-			} else if (adj.length || eng.UnitDemandAdjustmentsCollectionCount) {
+			if (adjBase.stated) { opt.push(' Demand Multiplier  \t' + num(multBase)); }
+			if (adjBase.bad || (adjBase.stated && baseHasUnit && baseHasNormal && adjBase.unit !== adjBase.normal)) {
 				note('wtg-demand-adjustments', [labels[eng.CalculationOptionsID] || String(eng.CalculationOptionsID)]);
 			}
 			if (eng.EpaNetEngine_UsePressureDependentDemand) { note('wtg-pdd', []); }
@@ -1073,6 +1111,7 @@
 		if (net.tankDemands.length) { note('wtg-tank-demand', net.tankDemands); }
 		if (net.emitters.length) { note('wtg-emitter-unread', net.emitters); }
 		if (net.customerDemands.length) { note('wtg-customer-demand', net.customerDemands); }
+		if (net.unitDemands.length) { note('wtg-unit-demand', net.unitDemands); }
 		if (net.settingPatterns.length) { note('wtg-setting-pattern', net.settingPatterns); }
 		if (net.valveStatusGuess.length) { note('wtg-valve-closed', net.valveStatusGuess); }
 		if (net.inactive.length) { note('wtg-inactive', net.inactive); }
@@ -1116,7 +1155,8 @@
 		var tree = scenariosOf({
 			scen: scen, alts: alts, baseId: baseId, activeId: activeId, picksOf: picksOf, network: network,
 			baseNet: net, nodeIdOf: nodeIdOf, linkIdOf: linkIdOf, conv: conv, T: T, num: num, headloss: headloss,
-			M: M, live: live, labels: labels, index: index, tableType: tableType, note: note
+			M: M, live: live, labels: labels, index: index, tableType: tableType, note: note,
+			demand: { base: multBase, adjBase: adjBase, hasUnit: baseHasUnit, hasNormal: baseHasNormal, adjust: function (sc) { return adjustOf(engFor(sc)); }, multOf: multOf }
 		});
 
 		return {
@@ -1172,7 +1212,7 @@
 		var scenarios = [], alternatives = [], basePhys = physicalValues(ctx.baseNet, ctx), used = {};
 		var ids = Object.keys(ctx.scen).map(Number).sort(function (a, b) { return a - b; });
 		var basePicks = ctx.picksOf(ctx.scen[ctx.baseId]);
-		var namedAlts = [], otherCats = [], roots = [];
+		var namedAlts = [], otherCats = [], roots = [], badAdj = [];
 		ids.forEach(function (sid) {
 			var picks = ctx.picksOf(ctx.scen[sid]);
 			Object.keys(picks).forEach(function (t) { if (picks[t] !== null) { used[picks[t]] = true; } });
@@ -1180,6 +1220,11 @@
 			var s = ctx.scen[sid], rec = { fileId: sid, name: s.name, parentName: null, overrides: {} };
 			if (s.parent && s.parent !== ctx.baseId && ctx.scen[s.parent]) { rec.parentName = ctx.scen[s.parent].name; rec.parentFileId = s.parent; }
 			if (!s.parent) { roots.push(s.name); }
+			// Demand: a scenario's own adjustment, as the Demand Multiplier it overrides (the page's scenario
+			// record holds it as demandMultiplier).
+			var da = ctx.demand.adjust(s), dm = ctx.demand.multOf(da, ctx.demand.hasUnit, ctx.demand.hasNormal);
+			if (dm !== ctx.demand.base) { rec.demandMultiplier = dm; }
+			if (da.bad || (ctx.demand.hasUnit && ctx.demand.hasNormal && da.unit / (da.normal || 1) !== ctx.demand.adjBase.unit / (ctx.demand.adjBase.normal || 1))) { badAdj.push(s.name); }
 			Object.keys(picks).forEach(function (t) {
 				if (picks[t] === basePicks[t]) { return; }
 				if (Number(t) === 4) { namedAlts.push(s.name + ': ' + (ctx.alts[picks[t]] ? ctx.alts[picks[t]].name : picks[t])); }
@@ -1197,6 +1242,7 @@
 			scenarios.push(rec);
 		});
 		if (roots.length) { ctx.note('wtg-scenario-root', roots); }
+		if (badAdj.length) { ctx.note('wtg-demand-adjustments', badAdj); }
 		if (namedAlts.length) { ctx.note('wtg-scenario-alternative', namedAlts); }
 		if (otherCats.length) { ctx.note('wtg-scenario-category', otherCats); }
 

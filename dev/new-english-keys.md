@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**29 still to read on master**, of 36 untranslated keys, of 3055 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**79 still to read on master**, of 86 untranslated keys, of 3105 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (36, 29 to read @@ NEEDS RULING)
+## lpn_  (86, 79 to read @@ NEEDS RULING)
 
 - **`lpn_diag_gpv_curve_order`**
   > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
@@ -58,6 +58,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_export_leaves_alternatives`**
   > The alternatives stored in this project are not in the file.
   _Ruled 2026-10-18: GeoJSON alternatives string is approved._
+- **`lpn_file_import_wtg`**
+  > WaterCAD or WaterGEMS model…
+  @@ NEEDS RULING
+- **`lpn_file_import_wtg_tip`**
+  > Open a WaterCAD or WaterGEMS model as a new project. Choose its .wtg.sqlite file, and also the .wtg file beside it so that its units come too. The file is read and never changed. Its scenarios come with it; each scenario's differences from Base become that scenario's overrides. Beta: tried on few models so far.
+  @@ NEEDS RULING
 - **`lpn_geojson_results_other`**
   > No results are included, because the results on screen belong to the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
@@ -139,86 +145,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_survey_added_scenario`**
   > The nodes were added to {scenario}. In Base they are inactive.
   _Ruled 2026-10-18: I approved all._
-
----
-
-# Strings waiting on a branch
-
-**70 still to read**, of 74 new keys across 8 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### chore/batch-1018d (`b716a3956`) — adds no English strings
-
-### feat/desktop (`baba0f04d`) — adds no English strings
-
-### feat/label-beside (`8676cd1be`) — already merged into feat/label-form; its strings are listed there
-
-### feat/label-form (`d05fdb069`) — adds no English strings
-
-### feat/msx (`8b083e9d7`) — 15 new, 15 to read @@ NEEDS RULING
-
-- **`lpn_file_export_item_msx`**
-  > EPANET-MSX file…
-  @@ NEEDS RULING
-- **`lpn_file_export_msx_tip`**
-  > Download the attached EPANET-MSX file exactly as it was imported.
-  @@ NEEDS RULING
-- **`lpn_file_import_msx`**
-  > EPANET-MSX file…
-  @@ NEEDS RULING
-- **`lpn_file_import_msx_tip`**
-  > Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project and written back unchanged. It is not run.
-  @@ NEEDS RULING
-- **`lpn_msx_attached_heading`**
-  > Attached EPANET-MSX file: {file}
-  @@ NEEDS RULING
-- **`lpn_msx_not_msx`**
-  > {file} does not look like an EPANET-MSX file: it has no [SPECIES] section.
-  @@ NEEDS RULING
-- **`lpn_msx_remove`**
-  > Remove
-  @@ NEEDS RULING
-- **`lpn_msx_removed`**
-  > Removed {file} from this project.
-  @@ NEEDS RULING
-- **`lpn_msx_replace`**
-  > Replace…
-  @@ NEEDS RULING
-- **`lpn_msx_report_heading`**
-  > Attached {file}
-  @@ NEEDS RULING
-- **`lpn_msx_report_kept`**
-  > This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. This page does not run it.
-  @@ NEEDS RULING
-- **`lpn_msx_report_missing`**
-  > IDs in the file that this network does not have: {ids}.
-  @@ NEEDS RULING
-- **`lpn_msx_report_no_species`**
-  > No species are listed in the file.
-  @@ NEEDS RULING
-- **`lpn_msx_report_species`**
-  > Species in the file: {list}.
-  @@ NEEDS RULING
-- **`lpn_msx_too_big`**
-  > {file} is too large to keep in browser storage, so it was not attached.
-  @@ NEEDS RULING
-
-### feat/sqlite-reader (`9470877a6`) — 49 new, 49 to read @@ NEEDS RULING
-
-- **`lpn_file_import_wtg`**
-  > WaterCAD or WaterGEMS model…
-  @@ NEEDS RULING
-- **`lpn_file_import_wtg_tip`**
-  > Open a WaterCAD or WaterGEMS model as a new project. Choose its .wtg.sqlite file, and also the .wtg file beside it so that its units come too. The file is read and never changed. Its scenarios come with it; each scenario's differences from Base become that scenario's overrides. Beta: tried on few models so far.
-  @@ NEEDS RULING
 - **`lpn_wtg_engine`**
   > The SQLite reader could not be loaded, so {file} could not be opened. Check the connection and try again.
   @@ NEEDS RULING
@@ -244,7 +170,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > The database stores every number in US customary units (feet, cubic feet per second, psi). Each number was converted once to the project's units and rounded to the shortest decimal within 5 parts in 100 million, which gives back the number as it was entered.
   @@ NEEDS RULING
 - **`lpn_wtg_note_customer_demand`**
-  > Not imported: the customer demands and unit demands at these junctions. Their base demands were imported.
+  > Not imported: the customer demands at these junctions. Their base demands were imported.
   @@ NEEDS RULING
 - **`lpn_wtg_note_cv_closed`**
   > These pipes have a check valve and start closed. They were imported closed.
@@ -336,6 +262,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_note_unit_assumed`**
   > The file does not state the stored unit of these fields, so the unit every example file states was assumed.
   @@ NEEDS RULING
+- **`lpn_wtg_note_unit_demand`**
+  > The demand at these junctions comes from unit demand loads. The flow of each load was imported as a demand; the loading units and the unit load were not.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_unit_unknown`**
   > Not converted: these fields, whose stored unit (shown in parentheses) this page does not know.
   @@ NEEDS RULING
@@ -360,6 +289,29 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_working`**
   > Reading {file}…
   @@ NEEDS RULING
+
+---
+
+# Strings waiting on a branch
+
+**6 still to read**, of 10 new keys across 5 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### feat/desktop (`baba0f04d`) — adds no English strings
+
+### feat/label-beside (`8676cd1be`) — already merged into feat/label-form; its strings are listed there
+
+### feat/label-form (`d05fdb069`) — adds no English strings
+
+### feat/sqlite-reader (`e86aedf9e`) — adds no English strings
 
 ### feat/theme (`876ebef92`) — 10 new, 6 to read @@ NEEDS RULING
 
@@ -393,5 +345,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_theme_space`**
   > Space
   @@ NEEDS RULING
-
-### fix/settings-map-layout (`b416d8393`) — already merged into chore/batch-1018d; its strings are listed there
