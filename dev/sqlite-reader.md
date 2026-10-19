@@ -197,9 +197,72 @@ shared nodes outside the pump-to-tank path. On that path they do not, because th
 pump's flow through the export's PSV into the full tank while EPANET (and this import's direct
 inlet) shut it off: a question for the page's solver, not for this reader.
 
+## What two real models taught (2026-10-19)
+
+Two real WaterCAD models from a consulting firm, supplied by Tom (a full build-out and a phase 1 of
+one project, US units, steady state, one reservoir, no pump, tank, valve or control), each with the
+`.wtg`, the `.wtg.sqlite` and a spreadsheet of WaterCAD's own results for four scenarios. They are
+not in the repository and nothing from them is. The first working models, as against the public
+samples.
+
+- **They opened, imported and solved at once.** Both are schema 1.0.45 (the public samples are 1.0.44 and 1.0.38). What the reader had skipped was the whole demand.
+- **All their demand is a unit demand load**: a count of loading units times a unit load (area,
+  dwelling units, population), each row stored with its flow in ft3/s
+  (`IdahoDemandNode_Demand_UnitDemandLoadCollection`, owner row `Demand_Data` with
+  `UnitDemandLoadCollectionCount`). The reader had called this "customer demand" and imported zero,
+  so a solve showed no flow. Now each row's flow is a demand of its junction. The units and the unit
+  load themselves are not carried; a note says so (`wtg-unit-demand`).
+- **Their scenarios differ in one thing: the demand adjustment.** Average day, maximum day, peak
+  hour and maximum day plus fire flow all pick the same alternatives (every `HMIScenarioAlternative`
+  row points at the one demand, one Physical, one fire flow alternative); each scenario owns an
+  `HMIScenarioCalculationOptions` row, whose `EpaNetEngine` row has `UnitDemandAdjustmentsCollection`
+  (operation 2 = multiply, value 1.8 for maximum day, 3.0 for peak hour, no row for average day).
+  Operation 2 as multiply is now proved: WaterCAD's reservoir outflow is 1.8 and 3.0 times the
+  average day's. Unit demand loads and normal demands have separate adjustments; the reader makes
+  the one that governs the project's Demand Multiplier and a scenario's own value the scenario's
+  `demandMultiplier`. If both kinds of demand exist and the two adjustments differ, the unit loads
+  are scaled and the report says so.
+- **Alternatives that no scenario uses** exist here too (MDD, PHD, MDD+FF: children of the demand
+  alternative, the last holding larger unit loads). They are not Physical, so they are not carried;
+  the loss is the unit loads of an alternative no scenario picks.
+- **A scenario that overrides Physical data is still unseen.** These scenarios have no Physical
+  override at all.
+- **Fire flow is per junction.** `IdahoFireFlowNode_FireFlow_Data` has a "has local constraints"
+  flag, a needed flow and an upper limit per junction; `FireFlow_SystemData` has the system's
+  needed flow, upper limit, residual pressure and velocity limit. A junction's own needed flow
+  becomes its Required fire flow; the system numbers and every upper limit are reported with their
+  values (`wtg-fireflow`), because the document has no home for them.
+- **Duplicate labels**: two pipes share one label in a real model; the second takes `_2`, reported.
+  Nothing else in their naming needed a change.
+- **Results are not stored in the database.** Every results table (`Idaho*Results`) is empty; what
+  WaterCAD computed lives only in the spreadsheet.
+
+**The proof, aggregate only.** The reader's output was solved by EPANET at each scenario's demand
+multiplier and compared with WaterCAD's spreadsheet, junction by junction and pipe by pipe, for
+average day, maximum day and peak hour of both models (six comparisons, 54 junctions and 72 pipes
+counting both): the largest difference in hydraulic grade is 0.005 ft, in pipe velocity 0.005 ft/s,
+in pressure 0.53 psi and in flow 0.49 gpm. Those are exactly the spreadsheet's own rounding (grade to
+0.01 ft, pressure and flow to a whole psi and gpm), so the match is complete to what the
+spreadsheet can show. A fire flow check by bisection in EPANET against WaterCAD's available flow at
+each junction (maximum day, residual 19.8 psi, system minimum 19.8 psi, 10 ft/s) agreed within 1 %
+at 32 of 37 and 15 of 17 junctions; the rest are the junctions with local limits (upper limits of
+2,000 and 5,000 gpm), which the document cannot hold.
+
+`dev/lpn-spike/wtg-unit-demand-harness.js` holds the unit loads, the scenario multipliers and the
+fire flow on synthetic data, and when `EC_WTG_PRIVATE_DIR` names a folder of real models it asserts
+only that each opens, imports with demand, and solves with sane pressures (prints SKIPPED without it).
+`wtg-import-browser-harness.js` holds that the multiplier and the required fire flow reach the stored
+project.
+
+**The spreadsheet question.** A results spreadsheet cannot fill a gap in the model: everything that
+defines the network is in the database. What it adds is WaterCAD's answers (grade, pressure, flow,
+velocity, and the fire flow table of available flow, limiting junction and system minimum pressure at
+that flow), rounded to the report's precision. Use: a "WaterCAD says" column beside our result, and a
+check that an import reproduced the model. Not built.
+
 ## Unproven, and the sample that would prove it
 
-- **A scenario that overrides something.** No public file has one. The reader resolves a scenario
+- **A scenario that overrides Physical data.** Neither a public file nor a real one has one. The reader resolves a scenario
   through its alternatives and their parents (the patent's reading: a child alternative's rows hold
   its own values, the rest inherit) and writes every Physical value that differs from Base as that
   scenario's override; the synthetic fixture holds that path, not a real file. Needed: a small model
@@ -209,7 +272,7 @@ inlet) shut it off: a question for the page's solver, not for this reader.
 - **Whether a child alternative's row restates every column or only the changed ones** (the same
   sample answers it).
 - **US-unit models end to end** (Tnet3 is GPM-era data shown in L/s; no sample is a US model with its
-  `.inp`), FCV, PBV, GPV, constant-power and three-point pumps, emitters, customer and unit demands,
+  `.inp`), FCV, PBV, GPV, constant-power and three-point pumps, emitters, customer demands,
   `OperatingRangeType` 1, continuous patterns, and a stated spatial reference: each is read by the
   column layout the empty tables show, or reported, never guessed silently.
 - **Big files**: sql.js holds the whole file in memory (Bentley reports 6 GB for 7,000 pipes); a
