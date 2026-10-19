@@ -45533,7 +45533,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// takes the file as a new project, as it always did.
 	function inpAskDestination(text, fileName, msxFile) {
 		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), inBase = !!scn.isBase,
-			projName = projectDisplayName(project), buttons = [];
+			projName = projectDisplayName(project), buttons = [], seam = window.lpnInpDestination;
+		// THE HARNESS SEAM, as window.lpnDialogAnswerer is for askDialog(): only the headless DOM stub
+		// sets it, to 'new' so that the many harnesses that import one file after another still make
+		// a project each time. A real page has none and always asks.
+		if (typeof seam === 'string') {
+			if (seam === 'new') {
+				if (landInpText(text, fileName, false) && msxFile) { readMsxFile(msxFile, document.getElementById('lpn_dialog_body')); }
+			} else { updateProjectFromInp(text, fileName, seam, msxFile); }
+			return;
+		}
 		buttons.push({ label: pc.lpn_inpup_btn_new || 'A new project', isDefault: true,
 			fn: function () { if (landInpText(text, fileName, false) && msxFile) { readMsxFile(msxFile, document.getElementById('lpn_dialog_body')); } } });
 		if (inBase) {

@@ -96,6 +96,7 @@ const B = US({ j2elev: '97.50', j2dem: '130.0', r1head: '200', p1diam: '14', p3:
 	addJ: ' J9 80 15\n', addP: ' P9 J2 J9 500 6 100 0 Open\n', addC: ' J9 250 200\n' });
 const SI = A.replace('Units GPM', 'Units LPS');
 
+delete global.window.lpnInpDestination;   // drive the real question
 setUnitSet('us');
 
 console.log('\n--- nothing open: the file makes a new project, no question ---');
