@@ -76552,8 +76552,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// own hydraulics and a fire changes those; forcing it shut would starve the fire it is there to
 	// feed.
 	function fireFlowAtFrame(model) {
-		var f = EngCalcs.lpnTimeCurrentFrame ? EngCalcs.lpnTimeCurrentFrame() : null,
-			atLimit = {}, TOL = 1e-3;
+		return applyFrameToModel(model, EngCalcs.lpnTimeCurrentFrame ? EngCalcs.lpnTimeCurrentFrame() : null);
+	}
+	// **THE ONE SNAPSHOT, SHARED BY FIRE FLOW, CRITICALITY AND DEMAND SCALING** (Task 578). The
+	// condition at reporting step `t` of a run: the model assembled at that time (pattern
+	// multipliers, reservoir heads, pump speeds), then that step's frame laid over it (tank levels,
+	// link statuses). With `t` null it is the step on screen.
+	function analysisModelAt(t, frame) {
+		var model, prev = readTimeOverride;
+		if (t !== null && t !== undefined) { readTimeOverride = t; }
+		try { model = assembleModel(); } finally { readTimeOverride = prev; }
+		applyFrameToModel(model, frame);
+		return model;
+	}
+	function applyFrameToModel(model, f) {
+		var atLimit = {}, TOL = 1e-3;
 		if (!f || !f.heads) { return false; }
 		model.nodes.forEach(function (n) {
 			var h = f.heads[n.id];
@@ -76573,6 +76586,48 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		}
 		return true;
+	}
+
+	// **THE ANALYSES THAT NEED THE WHOLE RUN** (Task 578): fire flow at a chosen step, at the step of
+	// lowest pressure or at every step; criticality and demand scaling over the run. They are offered
+	// only where the project has a clock and the EPANET engine can be reached; anywhere else the
+	// step on screen is the only condition, as it always was.
+	function analysisCanRun() {
+		return effectiveTimesExtended() && !!EngCalcs.lpnEpanetRun;
+	}
+	function ffWhen() {
+		var w = (fireFlowAsk && fireFlowAsk.when) || 'now';
+		if (w === 'now' || !analysisCanRun() || !EngCalcs.lpnFireFlowSweepSteps) { return 'now'; }
+		return w;
+	}
+	// The run of the open scenario's model: the one on hand when it is this model's, else a new one.
+	function analysisRun(onProgress) {
+		var model = assembleModel(), fresh = EngCalcs.lpnTimeFreshRun ? EngCalcs.lpnTimeFreshRun(model) : null;
+		if (fresh) { return Promise.resolve(fresh); }
+		return EngCalcs.lpnEpanetRun(model, { onProgress: onProgress });
+	}
+	function analysisSteps(run, times) {
+		return times.map(function (t) {
+			return { t: t, build: function () { return analysisModelAt(t, EngCalcs.lpnTimeFrameResult(run, t)); } };
+		});
+	}
+	function ffNearestStep(times, t) {
+		var best = times[0];
+		times.forEach(function (x) { if (Math.abs(x - t) < Math.abs(best - t)) { best = x; } });
+		return best;
+	}
+	// The reporting steps of the open scenario's clock, for a picker.
+	function analysisStepOptions() {
+		return EngCalcs.lpnReportTimes(effectiveTimes()).map(function (t) { return [String(t), dsTimeText(t)]; });
+	}
+	function updateEpsRunBox(fraction) {
+		var pc = EngCalcs.pageConfig || {}, f = (typeof fraction === 'number' && isFinite(fraction))
+			? Math.max(0, Math.min(1, fraction)) : 0;
+		if (!ffRunUi) { return; }
+		ffRunUi.fill.style.width = Math.round(1000 * f) / 10 + '%';
+		ffRunUi.track.setAttribute('aria-valuenow', String(Math.round(1000 * f)));
+		ffRunUi.count.textContent = pc.lpn_eps_working || 'Running the extended-period simulation.';
+		ffRunUi.tally.textContent = '';
 	}
 
 	// ---- the marks on the map -------------------------------------------------------------------
@@ -76724,6 +76779,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			['selected', pc.lpn_ff_selected || 'Selected junctions']
 		], ask.scope);
 		ffRow(host, pc.lpn_ff_scope || 'Junctions to test', null, boxes.scope, '');
+
+		// **WHEN, ONLY WHERE THE PROJECT HAS A CLOCK** (Task 578).
+		if (analysisCanRun()) {
+			boxes.when = ffSelect([
+				['now', pc.lpn_when_now || 'The time step on screen'],
+				['hour', pc.lpn_when_hour || 'A chosen reporting step'],
+				['minp', pc.lpn_when_minp || 'The reporting step of lowest pressure'],
+				['all', pc.lpn_when_all || 'Every reporting step, worst case']
+			], ask.when || 'now');
+			ffRow(host, pc.lpn_when || 'Time step tested', null, boxes.when, '');
+			boxes.when.addEventListener('change', function () {
+				ask.when = boxes.when.value;
+				Object.keys(boxes).forEach(function (k) { ask[k] = boxes[k].value; });
+				buildFireFlowControls();
+			});
+			if ((ask.when || 'now') === 'hour') {
+				boxes.step = ffSelect(analysisStepOptions(), String(ask.step));
+				ask.step = boxes.step.value;
+				ffRow(host, pc.lpn_when_step || 'Reporting step', null, boxes.step, '');
+			}
+		}
 
 		boxes.required = ffInput(ask.required);
 		ffRow(host, pc.lpn_ff_required || 'Required fire flow', pc.lpn_ff_required_tip,
@@ -77034,6 +77110,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		case 7: return rec.effects ? ffLimitText(rec) : undefined;
 		case 8: return rec.solves;
 		case 9: return ffModesText(rec);
+		case 10: return rec.t;
 		}
 		return undefined;
 	}
@@ -77155,10 +77232,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			body,
 			shown,
 			sorted,
+			allSteps,
 			anyEffect;
 		if (!host) { return; }
 		host.innerHTML = '';
 		if (!set) { return; }
+		allSteps = !!(set.at && set.at.mode === 'all');
 
 		if (set.stopped) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_stopped || 'Stopped after {done} of {total} junctions. The results below are the ones already finished.')
@@ -77167,6 +77246,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		ffShownAt = dsNow();
 		ffEl('p', 'lpn-ff-summary', ffSummaryText(set), host);
 		dsTimeLines(host, fireFlowRunT);
+		if (set.at) {
+			if (set.at.mode === 'all') {
+				ffEl('p', 'lpn-ff-note', (pc.lpn_ff_at_all || 'Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.')
+					.replace('{n}', String(set.at.stepsDone)), host);
+			} else if (set.at.mode === 'minp') {
+				ffEl('p', 'lpn-ff-note', (pc.lpn_ff_at_minp || 'Tested at {time}, the reporting step with the lowest pressure among the junctions tested.')
+					.replace('{time}', dsTimeText(set.at.t)), host);
+			} else if (set.at.mode === 'hour') {
+				ffEl('p', 'lpn-ff-note', (pc.lpn_ff_at_step || 'Tested at reporting step {time}.')
+					.replace('{time}', dsTimeText(set.at.t)), host);
+			}
+		}
 		if (set.counts.error) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_summary_error || 'Junctions that could not be solved ({n}).')
 				.replace('{n}', String(set.counts.error)), host);
@@ -77215,7 +77306,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_ff_col_limit || 'Design limit',
 			pc.lpn_ff_col_solves || 'Runs',
 			pc.lpn_ff_col_modes || 'Failure modes'
-		]);
+		].concat(allSteps ? [pc.lpn_ff_col_hour || 'Lowest at'] : []));
 		shown.forEach(function (rec) {
 			var tr = ffEl('tr', 'lpn-ff-' + rec.state, null, body);
 			// **THE ID WEARS THE USER'S OWN LABEL PREFIX** (Tom, 2026-09-02: *"we need to apply here
@@ -77232,6 +77323,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ffCell(tr, ffLimitText(rec));
 			ffCell(tr, rec.solves === undefined ? FF_DASH : String(rec.solves));
 			ffCell(tr, ffModesText(rec));
+			if (allSteps) { ffCell(tr, typeof rec.t === 'number' ? dsTimeText(rec.t) : FF_DASH); }
 		});
 		ffMoreLine(host, sorted.length - shown.length);
 	}
@@ -77326,14 +77418,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The running tally is the sweep's own four states, counted as the records arrive. It is the
 	// "maybe some other progress stats" half of the ruling and it is the same three sentences the
 	// finished report opens with, so a reader is not learning a second vocabulary mid-run.
-	function updateFireFlowRunBox(done, counts, modes) {
+	function updateFireFlowRunBox(done, counts, modes, stepInfo) {
 		var pc = EngCalcs.pageConfig || {}, text;
 		if (!ffRunUi) { return; }
 		ffRunUi.fill.style.width =
 			(ffRunUi.total > 0 ? Math.round(1000 * done / ffRunUi.total) / 10 : 0) + '%';
 		ffRunUi.track.setAttribute('aria-valuenow', String(done));
-		ffRunUi.count.textContent = (pc.lpn_ff_working || 'Working: {done} of {total} junctions.')
-			.replace('{done}', String(done)).replace('{total}', String(ffRunUi.total));
+		ffRunUi.count.textContent = stepInfo
+			? (pc.lpn_ff_working_steps || 'Working: reporting step {step} of {steps}, junction {done} of {total}.')
+				.replace('{step}', String(stepInfo.step)).replace('{steps}', String(stepInfo.steps))
+				.replace('{done}', String(done - (stepInfo.step - 1) * stepInfo.total)).replace('{total}', String(stepInfo.total))
+			: (pc.lpn_ff_working || 'Working: {done} of {total} junctions.')
+				.replace('{done}', String(done)).replace('{total}', String(ffRunUi.total));
 		// The running tally reads the same independent modes the finished report does, or the
 		// dialog and the table it turns into would count the same run two different ways.
 		text = ffSummaryText({ modes: modes || { fire: 0, design: 0, clean: 0 } });
@@ -77389,6 +77485,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			maxVelocity = ffValue(ask.maxVelocity, 'lpn_u_velocity'),
 			design = null,
 			skipped = 0,
+			when = ffWhen(),
 			tally,
 			before;
 		if (fireFlowBusy) { return; }
@@ -77457,7 +77554,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// belt-and-braces assertion rather than a repair, and if it ever fires the fix is in
 		// whatever wrote to `doc`, not here.
 		before = JSON.stringify(doc);
-		fireFlowRunT = modelTimeSeconds();
+		// A run at a chosen step, or over the whole run, states its own time in its report; the
+		// "computed at / clock now at" line belongs to the step on screen alone.
+		fireFlowRunT = when === 'now' ? modelTimeSeconds() : null;
 		fireFlowBusy = true;
 		fireFlowStop = false;
 		fireFlowRun = null;
@@ -77470,33 +77569,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// **THE PROGRESS IS THE DIALOG'S, AND #lpn_status IS LEFT ALONE.** That box is the map's
 		// standing model diagnostic, true until the model changes; a count that ticked inside it
 		// made it look like a run indicator for as long as a sweep lasted.
-		openFireFlowRunBox(ids.length);
 		if (skipped) {
 			setNotice((pc.lpn_ff_skipped || '{n} selected elements are not junctions, so they were not tested.')
 				.replace('{n}', String(skipped)));
 		}
 
-		return EngCalcs.lpnFireFlowSweep(model, {
-			solve: engine.solve,
-			junctions: ids,
-			// **PER JUNCTION, WITH THE BOX'S NUMBER AS THE FALLBACK.** A function rather than a
-			// scalar, always -- one code path, so a project where nobody has typed a per-junction
-			// requirement is answered by the same line as one where everybody has.
-			required: fireFlowRequiredFor(required),
-			residual: residual,
-			design: design,
-			// The progress line is the whole reason the sweep yields between junctions: a
-			// synchronous solver in a promise chain never gives the browser a frame, so without it
-			// this text would appear once, at the end, saying it had finished.
-			onProgress: function (p) {
-				if (p.result && tally[p.result.state] !== undefined) { tally[p.result.state]++; }
-				// `p.modes` is the sweep's own running INDEPENDENT tally; `tally` stays the
-				// exclusive one and is still what carries the error count.
-				updateFireFlowRunBox(p.done, tally, p.modes);
-			},
-			shouldStop: function () { return fireFlowStop; }
-		}).then(function (set) {
+		function sweepOptions() {
+			return {
+				solve: engine.solve,
+				junctions: ids,
+				// **PER JUNCTION, WITH THE BOX'S NUMBER AS THE FALLBACK.** A function rather than a
+				// scalar, always -- one code path, so a project where nobody has typed a per-junction
+				// requirement is answered by the same line as one where everybody has.
+				required: fireFlowRequiredFor(required),
+				residual: residual,
+				design: design,
+				shouldStop: function () { return fireFlowStop; }
+			};
+		}
+		function finishRun(set, at) {
 			fireFlowBusy = false;
+			if (at) { set.at = at; }
 			fireFlowRun = set;
 			if (critBoxIsOpen()) { buildCriticalityControls(); }
 			if (dsBoxIsOpen()) { buildDemandScaleControls(); }
@@ -77506,7 +77599,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			rebuildFireFlowReport();
 			buildFireFlowControls();
 			return set;
-		}, function (err) {
+		}
+		function failRun(err) {
 			fireFlowBusy = false;
 			if (critBoxIsOpen()) { buildCriticalityControls(); }
 			if (dsBoxIsOpen()) { buildDemandScaleControls(); }
@@ -77514,7 +77608,57 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			buildFireFlowControls();
 			setStatus(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.', 'solve-error');
 			if (window.console && console.warn) { console.warn('fire flow sweep failed:', err); }
-		});
+		}
+
+		if (when === 'now') {
+			openFireFlowRunBox(ids.length);
+			return EngCalcs.lpnFireFlowSweep(model, Object.assign(sweepOptions(), {
+				// The progress line is the whole reason the sweep yields between junctions: a
+				// synchronous solver in a promise chain never gives the browser a frame, so without it
+				// this text would appear once, at the end, saying it had finished.
+				onProgress: function (p) {
+					if (p.result && tally[p.result.state] !== undefined) { tally[p.result.state]++; }
+					// `p.modes` is the sweep's own running INDEPENDENT tally; `tally` stays the
+					// exclusive one and is still what carries the error count.
+					updateFireFlowRunBox(p.done, tally, p.modes);
+				}
+			})).then(function (set) { return finishRun(set, null); }, failRun);
+		}
+
+		// THE WHOLE RUN FIRST, ONCE: every step below is built from its frames.
+		openFireFlowRunBox(1000, { update: updateEpsRunBox });
+		return analysisRun(function (p) { updateEpsRunBox(p && p.fraction); }, function () { return fireFlowStop; })
+		.then(function (run) {
+			var times, pick = null, stepList, nSteps;
+			if (fireFlowStop) { return finishRun({ ok: true, results: [], byId: {}, counts: tally, modes: { fire: 0, design: 0, clean: 0 },
+				requested: ids.length, residual: residual, design: null, solves: 0, stopped: true,
+				lossAccounting: EngCalcs.lpnFireFlowLossAccounting, isoCap: EngCalcs.lpnFireFlowIsoCap }, { mode: when, steps: 0, stepsDone: 0 }); }
+			if (!run || !run.ok || !run.frames || !run.frames.length) { return failRun(null); }
+			times = run.frames.map(function (f) { return f.t; });
+			if (when === 'hour') {
+				pick = ffNearestStep(times, +ask.step);
+				times = [pick];
+			} else if (when === 'minp') {
+				pick = EngCalcs.lpnEpsMinPressureStep(run.frames.map(function (f) { return EngCalcs.lpnTimeFrameResult(run, f.t); }), ids);
+				if (!pick) { return failRun(null); }
+				times = [pick.t];
+			}
+			stepList = analysisSteps(run, times);
+			nSteps = stepList.length;
+			openFireFlowRunBox(ids.length * nSteps);
+			function progress(p) {
+				if (p.result && tally[p.result.state] !== undefined && nSteps === 1) { tally[p.result.state]++; }
+				updateFireFlowRunBox(p.done, tally, p.modes, nSteps > 1 ? { step: p.step, steps: nSteps, total: ids.length } : null);
+			}
+			if (when === 'all') {
+				return EngCalcs.lpnFireFlowSweepSteps(Object.assign(sweepOptions(), { steps: stepList, onProgress: progress }))
+					.then(function (set) { return finishRun(set, { mode: 'all', steps: set.steps, stepsDone: set.stepsDone }); }, failRun);
+			}
+			return EngCalcs.lpnFireFlowSweep(stepList[0].build(), Object.assign(sweepOptions(), { onProgress: progress }))
+				.then(function (set) {
+					return finishRun(set, { mode: when, t: times[0], minp: when === 'minp' ? pick : null });
+				}, failRun);
+		}, failRun);
 	}
 	// Read by dev/browser-pass. Set by the run above, never by a user action -- a false here is a
 	// defect in whatever wrote to `doc`, not in this box.

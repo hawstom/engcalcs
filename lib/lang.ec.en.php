@@ -4662,6 +4662,20 @@ $ec_lang['lpn_ff_run_title']='Fire flow run';
 $ec_lang['lpn_ff_calculate']='Run';
 $ec_lang['lpn_ff_stop']='Stop';
 $ec_lang['lpn_ff_working']='Working: {done} of {total} junctions.';
+// The extended-period analyses (Task 578): fire flow at a chosen step, at the step of lowest
+// pressure or at every step; criticality and demand scaling over the whole run.
+$ec_lang['lpn_when']='Time step tested';
+$ec_lang['lpn_when_now']='The time step on screen';
+$ec_lang['lpn_when_hour']='A chosen reporting step';
+$ec_lang['lpn_when_minp']='The reporting step of lowest pressure';
+$ec_lang['lpn_when_all']='Every reporting step, worst case';
+$ec_lang['lpn_when_step']='Reporting step';
+$ec_lang['lpn_eps_working']='Running the extended-period simulation.';
+$ec_lang['lpn_ff_working_steps']='Working: reporting step {step} of {steps}, junction {done} of {total}.';
+$ec_lang['lpn_ff_col_hour']='Lowest at';
+$ec_lang['lpn_ff_at_step']='Tested at reporting step {time}.';
+$ec_lang['lpn_ff_at_minp']='Tested at {time}, the reporting step with the lowest pressure among the junctions tested.';
+$ec_lang['lpn_ff_at_all']='Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.';
 $ec_lang['lpn_ff_stopped']='Stopped after {done} of {total} junctions. The results below are the ones already finished.';
 $ec_lang['lpn_ff_cost']='This run solved the whole network {solves} times.';
 // The results are about the network as it stood when the run finished. Opening a different network
