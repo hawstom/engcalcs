@@ -276,7 +276,8 @@ async function main() {
 				});
 				ok(tag + ': no node label hidden, shortened or without its ID against the stacked layout of the same view', lossN.length === 0,
 					lossN.length + (lossN.length ? ': ' + lossN.slice(0, 5).join('; ') : ''));
-				ok(tag + ': no pipe runs through a one-line node label', v.struck.length === 0, v.struck.slice(0, 4).join('; '));
+				// Tom, 2026-10-18: pipes may run through one-line node labels; counted, not asserted.
+				console.log('        pipes through one-line node labels: ' + v.struck.length);
 				ok(tag + ': no level label or one-line node label overlaps another label, by the rotated glyph boxes', v.N1mine0.length === 0, v.N1mine0.slice(0, 3).join('; '));
 				ok(tag + ': every one-line node label lies within the map and off its legends', v.offView.length === 0, v.offView.slice(0, 4).join('; '));
 				ok(tag + ': every level label with no leader is nearest its own pipe', v.astray.length === 0, v.astray.slice(0, 4).join(' '));

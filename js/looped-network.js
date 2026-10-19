@@ -922,7 +922,7 @@ var EngCalcs = EngCalcs || {};
 	// The same label's one-line form, as insertInlineNodeLabels() places it: `w` its one-line width.
 	function inlineNodeSpec(n, fs, w) {
 		var d = defaultLabelOffset();
-		return { w: w, h: dataLabelBoxHeight(1), lines: null, leaderClean: true, offLinks: true,
+		return { w: w, h: dataLabelBoxHeight(1), lines: null, leaderClean: true, acrossPipes: true,
 			sides: inlineNodeSides(nodeAt(n), d, fs, Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS)) };
 	}
 	// **WHERE A ONE-LINE NODE LABEL MAY GO: EAST OR WEST OF ITS NODE** (Task 734, Tom 2026-09-26:

@@ -1310,7 +1310,7 @@ EngCalcs.lpnCollide = (function () {
 				verdict = boxesClearOf(b, local, pad, lbl.id);
 				if (verdict === 'blocked') { continue; }
 				if (first < 0) { first = i; }
-				if (verdict === 'clear' && !boxesOnLink(b, local, lbl.id) && !leaderThroughSymbol(lbl, c, local) &&
+				if (verdict === 'clear' && (lbl.acrossPipes || !boxesOnLink(b, local, lbl.id)) && !leaderThroughSymbol(lbl, c, local) &&
 						(!strict || strictOk(lbl, c, b, true))) {
 					return commit(lbl, sides, c, b);
 				}
@@ -1334,8 +1334,9 @@ EngCalcs.lpnCollide = (function () {
 				// `leaderClean`: a label whose leader may never pass through another node's symbol, even
 				// here (a one-line node label, Task 734: its ring reaches further east and west).
 				if (lbl.leaderClean && leaderThroughSymbol(lbl, c, local)) { continue; }
-				// `offLinks`: a label no pipe may run through, even here (a one-line node label: a
-				// pipe through a line of text strikes it through, pre-review 2026-10-18).
+				// `offLinks`: a label no pipe may run through, even here. A one-line node label is not
+				// one (`acrossPipes`; Tom, 2026-10-18: *"it would be okay for pipes to run through
+				// one-line node labels"*); the halo keeps the text legible over a pipe.
 				if (lbl.offLinks && boxesOnLink(labelLineBoxes(lbl, c), local, lbl.id)) { continue; }
 				// The STAIRCASE, not the block (Task 406): asking about the block would call a side
 				// occupied because of ground the short rows never cover.
