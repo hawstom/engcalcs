@@ -2455,7 +2455,7 @@ $ec_lang['lpn_inpup_na_refs']='These added assets refer to a pattern or curve th
 $ec_lang['lpn_inpup_na_msx']='The .msx file chosen with this file was not read. To attach it to this project, choose it alone.';
 $ec_lang['lpn_inpup_refused_heading']='Nothing was changed in {project}.';
 $ec_lang['lpn_inpup_refused_lead']='The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.';
-$ec_lang['lpn_inpup_unit_row']='{name}: the file uses {file} and this project uses {project}.';
+$ec_lang['lpn_inpup_unit_row']='{family}: the file uses {file} and this project uses {project}.';
 $ec_lang['lpn_inpup_method_row']='Head loss formula: the file uses {file} and this project uses {project}.';
 // Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
 // API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every

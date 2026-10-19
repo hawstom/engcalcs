@@ -176,7 +176,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Undo reverses all of it in one step.
   @@ NEEDS RULING
 - **`lpn_inpup_unit_row`**
-  > {name}: the file uses {file} and this project uses {project}.
+  > {family}: the file uses {file} and this project uses {project}.
   @@ NEEDS RULING
 - **`lpn_msx_attached_heading`**
   > Attached EPANET-MSX file: {file}
@@ -300,7 +300,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**56 still to read**, of 60 new keys across 6 unmerged branch(es).
+**57 still to read**, of 61 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -317,9 +317,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-form (`d05fdb069`) — adds no English strings
 
-### feat/network-update (`e3372d22a`) — adds no English strings
+### feat/network-update (`da16f05fc`) — adds no English strings
 
-### feat/sqlite-reader (`288858d44`) — 50 new, 50 to read @@ NEEDS RULING
+### feat/sqlite-reader (`75ed1031f`) — 51 new, 51 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
   > WaterCAD or WaterGEMS model…
@@ -365,6 +365,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_wtg_note_emitter_unread`**
   > Not imported: the emitter coefficients of these junctions, because the unit they are stored in is not yet confirmed.
+  @@ NEEDS RULING
+- **`lpn_wtg_note_fireflow`**
+  > Not imported: the fire flow settings of the model. A needed fire flow stated at a junction was imported as that junction's Required fire flow; enter the rest in the fire flow window.
   @@ NEEDS RULING
 - **`lpn_wtg_note_gpv_curve`**
   > These general purpose valves have no head loss curve in the file.

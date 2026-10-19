@@ -45332,8 +45332,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				lpn_u_flow: pc.lpn_result_flow || 'Flow' };
 		LPN_INP_UPDATE_UNITS.forEach(function (u) {
 			if (have[u] === want[u]) { return; }
-			out.push((pc.lpn_inpup_unit_row || '{name}: the file uses {file} and this project uses {project}.')
-				.replace('{name}', names[u]).replace('{file}', inpUnitOptionText(u, want[u])).replace('{project}', inpUnitOptionText(u, have[u])));
+			out.push((pc.lpn_inpup_unit_row || '{family}: the file uses {file} and this project uses {project}.')
+				.replace('{family}', names[u]).replace('{file}', inpUnitOptionText(u, want[u])).replace('{project}', inpUnitOptionText(u, have[u])));
 		});
 		var fm = LPN_INP_UPDATE_METHOD[String(parsed.headloss || 'H-W').toUpperCase()] || 'hw';
 		if (fm !== frictionMethod()) {
