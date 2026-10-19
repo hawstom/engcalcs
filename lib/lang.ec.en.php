@@ -2265,7 +2265,7 @@ $ec_lang['lpn_dialog_ok']='OK';
 $ec_lang['lpn_file_import_menu']='Import…';
 $ec_lang['lpn_file_import_inp']='EPANET file…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.';
+$ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
 // File > Export is a submenu (Tom, 2026-10-06), so its rows drop the verb the heading carries. The
@@ -2419,6 +2419,44 @@ $ec_lang['lpn_import_notes_heading']='This project was read in from an EPANET fi
 // the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
 // that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='Opened {name} from a file, and added it to this browser as a new project.';
+// Update the open project from an EPANET file (Task 814). Placeholders in braces are filled by the page.
+// {file} is a file name.
+$ec_lang['lpn_inpup_ask_title']='Import {file}';
+$ec_lang['lpn_inpup_lead']='An EPANET file holds one set of values and no scenarios. Choose where to put them.';
+$ec_lang['lpn_inpup_how']='In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.';
+$ec_lang['lpn_inpup_base_note']='Base. Every scenario inherits Base, so choosing Base changes them all.';
+$ec_lang['lpn_inpup_btn_new']='A new project';
+// {project} is a project name; it labels a button.
+$ec_lang['lpn_inpup_btn_project']='This project, {project}';
+// {scenario} is a scenario name; it labels a button.
+$ec_lang['lpn_inpup_btn_scenario']='{scenario}, open now';
+$ec_lang['lpn_inpup_btn_base']='Base';
+$ec_lang['lpn_inpup_title']='Update from EPANET file';
+// {file} is a file name, {scenario} a scenario name and {project} a project name.
+$ec_lang['lpn_inpup_heading']='Imported {file} into {scenario} of {project}';
+$ec_lang['lpn_inpup_counts']='Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).';
+$ec_lang['lpn_inpup_undo']='Undo reverses all of it in one step.';
+$ec_lang['lpn_inpup_nothing']='Every value in the file that matches an asset here is already the same in {scenario}.';
+$ec_lang['lpn_inpup_status']='Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).';
+$ec_lang['lpn_inpup_h_changed']='Values changed';
+// {id} is an asset ID, {property} a property name, {old} and {new} are values.
+$ec_lang['lpn_inpup_row']='{id}, {property}: {old} to {new}';
+$ec_lang['lpn_inpup_more']='{n} more';
+$ec_lang['lpn_inpup_blank']='blank';
+$ec_lang['lpn_inpup_h_added']='Assets added';
+$ec_lang['lpn_inpup_h_kept']='Kept, not in the file';
+$ec_lang['lpn_inpup_h_na']='Not applied';
+$ec_lang['lpn_inpup_na_general']='Positions of existing assets, connections, descriptions, patterns, curves, controls, rules, and options in the file were not applied.';
+$ec_lang['lpn_inpup_na_type']='The file states a different type for these assets, so none of their values were changed: {ids}';
+$ec_lang['lpn_inpup_na_owned']='The pipe type states some values of these pipes, so those values were not changed: {ids}';
+$ec_lang['lpn_inpup_na_roughness']='Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.';
+$ec_lang['lpn_inpup_na_geo']='Assets only in the file ({n}) were not added, because the file and this project use different coordinate systems.';
+$ec_lang['lpn_inpup_na_refs']='These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}';
+$ec_lang['lpn_inpup_na_msx']='The .msx file chosen with this file was not read. To attach it to this project, choose it alone.';
+$ec_lang['lpn_inpup_refused_heading']='Nothing was changed in {project}.';
+$ec_lang['lpn_inpup_refused_lead']='The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.';
+$ec_lang['lpn_inpup_unit_row']='{name}: the file uses {file} and this project uses {project}.';
+$ec_lang['lpn_inpup_method_row']='Head loss formula: the file uses {file} and this project uses {project}.';
 // Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
 // API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
 // browser they test in. That is expected, not a bug.

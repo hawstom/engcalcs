@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**48 still to read on master**, of 56 untranslated keys, of 3075 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**80 still to read on master**, of 88 untranslated keys, of 3107 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (56, 48 to read @@ NEEDS RULING)
+## lpn_  (88, 80 to read @@ NEEDS RULING)
 
 - **`lpn_diag_gpv_curve_order`**
   > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
@@ -81,6 +81,102 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_guide_cmp_byasset_term`**
   > Results by asset
+  @@ NEEDS RULING
+- **`lpn_inpup_ask_title`**
+  > Import {file}
+  @@ NEEDS RULING
+- **`lpn_inpup_base_note`**
+  > Base. Every scenario inherits Base, so choosing Base changes them all.
+  @@ NEEDS RULING
+- **`lpn_inpup_blank`**
+  > blank
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_base`**
+  > Base
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_new`**
+  > A new project
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_project`**
+  > This project, {project}
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_scenario`**
+  > {scenario}, open now
+  @@ NEEDS RULING
+- **`lpn_inpup_counts`**
+  > {n} values changed on {m} assets. {a} assets added. {k} assets kept that the file does not hold.
+  @@ NEEDS RULING
+- **`lpn_inpup_h_added`**
+  > Assets added
+  @@ NEEDS RULING
+- **`lpn_inpup_h_changed`**
+  > Values changed
+  @@ NEEDS RULING
+- **`lpn_inpup_h_kept`**
+  > Kept, not in the file
+  @@ NEEDS RULING
+- **`lpn_inpup_h_na`**
+  > Not applied
+  @@ NEEDS RULING
+- **`lpn_inpup_heading`**
+  > Updated {project} from {file}
+  @@ NEEDS RULING
+- **`lpn_inpup_how`**
+  > In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.
+  @@ NEEDS RULING
+- **`lpn_inpup_lead`**
+  > An EPANET file holds one set of values and no scenarios. Choose where to put them.
+  @@ NEEDS RULING
+- **`lpn_inpup_method_row`**
+  > Head loss formula: the file uses {file} and this project uses {project}.
+  @@ NEEDS RULING
+- **`lpn_inpup_more`**
+  > {n} more
+  @@ NEEDS RULING
+- **`lpn_inpup_na_general`**
+  > Positions of existing assets, connections, descriptions, patterns, curves, controls, rules, and options in the file were not applied.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_geo`**
+  > Assets only in the file ({n}) were not added, because the file and this project use different coordinate systems.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_msx`**
+  > The .msx file chosen with this file was not read. To attach it to this project, choose it alone.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_owned`**
+  > The pipe type states some values of these pipes, so those values were not changed: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_na_refs`**
+  > These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_na_roughness`**
+  > Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_type`**
+  > The file states a different type for these assets, so none of their values were changed: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_nothing`**
+  > Every value in the file that matches an asset here is already the same in {scenario}.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_heading`**
+  > Nothing was changed in {project}.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_lead`**
+  > The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.
+  @@ NEEDS RULING
+- **`lpn_inpup_row`**
+  > {id}, {property}: {old} to {new}
+  @@ NEEDS RULING
+- **`lpn_inpup_status`**
+  > Updated {project} from {file}: {n} values changed, {a} assets added.
+  @@ NEEDS RULING
+- **`lpn_inpup_title`**
+  > Update from EPANET file
+  @@ NEEDS RULING
+- **`lpn_inpup_undo`**
+  > Undo reverses all of it in one step.
+  @@ NEEDS RULING
+- **`lpn_inpup_unit_row`**
+  > {name}: the file uses {file} and this project uses {project}.
   @@ NEEDS RULING
 - **`lpn_msx_attached_heading`**
   > Attached EPANET-MSX file: {file}
@@ -204,7 +300,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**55 still to read**, of 59 new keys across 7 unmerged branch(es).
+**55 still to read**, of 59 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -215,17 +311,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/roadmap-1018 (`23cec294a`) — adds no English strings
-
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
 ### feat/label-beside (`8676cd1be`) — already merged into feat/label-form; its strings are listed there
 
 ### feat/label-form (`d05fdb069`) — adds no English strings
 
-### feat/msx (`04faa760a`) — adds no English strings
-
-### feat/sqlite-reader (`9470877a6`) — 49 new, 49 to read @@ NEEDS RULING
+### feat/sqlite-reader (`e86aedf9e`) — 49 new, 49 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
   > WaterCAD or WaterGEMS model…
