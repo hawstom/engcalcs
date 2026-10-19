@@ -6957,7 +6957,7 @@ var EngCalcs = EngCalcs || {};
 		'project.scenarioOrdered': null, 'project.compareSet': null,
 		// -- document objects: an element's reference varies, the object does not (CLAUDE.md)
 		patterns: null, curves: null, pipeTypes: null, fittingSets: null, profiles: null,
-		controls: null, rules: null, inpSections: null,
+		controls: null, rules: null, inpSections: null, msx: null,
 		// -- coordinate-bearing, and megabytes
 		backdrop: null,
 		// **A SCENARIO MAY HOLD ITS OWN VIEW** (Tom, 2026-10-06: *"A scenario may have map overrides,
@@ -11115,7 +11115,42 @@ var EngCalcs = EngCalcs || {};
 			out.tolerance = numOrUndef(qo.tolerance);
 			out.diffusivity = numOrUndef(qo.diffusivity);
 		}
+		// **EPANET-MSX (Task 717)**: the species shown is a choice of what to LOOK at, not of what
+		// to run -- every species in the `.msx` runs. '' means the file's first species.
+		if (out.mode === 'msx') { out.species = q.species ? String(q.species) : ''; }
 		return out;
+	}
+	// ---- EPANET-MSX RESULTS (Task 717, phase 2) ----------------------------------------------------
+	//
+	// **SPECIES, NOT CHEMICAL.** EPANET-MSX's own word: a species may be a chemical, a microbe or a
+	// surface-bound quantity, and "chemical" stays the single-chemical mode's word. Every number
+	// here is the engine's, in the unit the `.msx` declares (`MG/L` for a bulk species, `UG/M2` for
+	// a wall species, as EPANET-MSX's own report heads them), converted by nobody.
+	function msxSpeciesNames() {
+		return doc.msx ? msxScan(doc.msx.text).species : [];
+	}
+	// The species list the result in hand was run with, or null.
+	function msxResultSpecies() {
+		return lastSolveResult && lastSolveResult.qualityMode === 'msx' && lastSolveResult.msxSpecies || null;
+	}
+	// Index of the chosen species in the run's own list: the chosen name, else the first.
+	function msxChosenIndex() {
+		var list = msxResultSpecies(), want = qualitySetting().species, k;
+		if (!list || !list.length) { return -1; }
+		for (k = 0; k < list.length; k++) { if (list[k].id === want) { return k; } }
+		return 0;
+	}
+	function msxChosenName() {
+		var list = msxResultSpecies(), k = msxChosenIndex(), names;
+		if (list && k >= 0) { return list[k].id; }
+		names = msxSpeciesNames();
+		return qualitySetting().species || names[0] || '';
+	}
+	function msxValue(map, id) {
+		var k = msxChosenIndex(), row, v;
+		if (k < 0 || !map || !(row = map[id])) { return undefined; }
+		v = row[k];
+		return typeof v === 'number' && isFinite(v) ? v : undefined;
 	}
 	function numOrUndef(t) {
 		var v = parseFloat(t);
@@ -11270,6 +11305,10 @@ var EngCalcs = EngCalcs || {};
 		var id = qualityUnitId();
 		if (id) { return unitLabel(id); }
 		if (qualityMode() === 'chemical') { return concentrationUnitText(); }
+		if (qualityMode() === 'msx') {
+			var ml = msxResultSpecies(), mk = msxChosenIndex();
+			return ml && mk >= 0 ? ml[mk].unitText : '';
+		}
 		return qualityMode() === 'trace' ? '%' : '';
 	}
 	/**
@@ -11334,6 +11373,8 @@ var EngCalcs = EngCalcs || {};
 	function qualityLabel() {
 		var pc = EngCalcs.pageConfig || {}, mode = qualityMode(), nm;
 		if (mode === 'trace') { return pc.lpn_result_source_share || 'Source share'; }
+		// EPANET-MSX heads a result column with the species ID alone, and so does this page.
+		if (mode === 'msx') { return msxChosenName() || (pc.lpn_quality_msx_species || 'Species'); }
 		// EPANET's own word for the quantity, which is what an engineer reads on a report.
 		if (mode === 'chemical') {
 			nm = chemicalName();
@@ -11352,6 +11393,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function nodeQualityValue(n) {
 		var mode = qualityMode(), v;
+		if (mode === 'msx') { return lastSolveResult && msxResultSpecies() ? msxValue(lastSolveResult.msxNodes, n.id) : undefined; }
 		if (mode !== 'age' && mode !== 'trace' && mode !== 'chemical') { return undefined; }
 		if (!lastSolveResult || !lastSolveResult.qualities) { return undefined; }
 		if (lastSolveResult.qualityMode !== mode) { return undefined; }
@@ -11377,6 +11419,7 @@ var EngCalcs = EngCalcs || {};
 	function linkQualityLabel() {
 		var pc = EngCalcs.pageConfig || {}, mode = qualityMode(), nm;
 		if (mode === 'trace') { return pc.lpn_result_avg_source_share || 'Average source share'; }
+		if (mode === 'msx') { return msxChosenName() || (pc.lpn_quality_msx_species || 'Species'); }
 		if (mode === 'chemical') {
 			nm = chemicalName();
 			return nm ? (pc.lpn_quality_named_avg_concentration || 'Average {chemical} concentration').replace('{chemical}', nm)
@@ -11393,6 +11436,9 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function linkQualityValue(l) {
 		var mode = qualityMode(), v;
+		if (mode === 'msx') {
+			return lastSolveResult && msxResultSpecies() && !linkResultHeld(l) ? msxValue(lastSolveResult.msxLinks, l.id) : undefined;
+		}
 		if (mode !== 'age' && mode !== 'trace' && mode !== 'chemical') { return undefined; }
 		if (!lastSolveResult || !lastSolveResult.linkQualities || linkResultHeld(l)) { return undefined; }
 		if (lastSolveResult.qualityMode !== mode) { return undefined; }
@@ -37334,6 +37380,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!tsbList().length) { return; }
 		(window.requestAnimationFrame || setTimeout)(function () { tsbEnsureLayer(); tsbSync(); tsbList().forEach(tsbDraw); tsbPlaceAll(); });
 	}
+	// Every chart built afresh, its own selector included: a quantity's NAME changed under it (the
+	// EPANET-MSX species, Tom 2026-10-18), which a redraw alone leaves showing the old name.
+	function tsbRebuildAll() {
+		Object.keys(tsbEls).forEach(function (id) {
+			if (tsbEls[id].root.parentNode) { tsbEls[id].root.parentNode.removeChild(tsbEls[id].root); }
+			delete tsbEls[id];
+		});
+		tsbRefresh();
+	}
 	// Builds the elements for the list and removes those whose record is gone.
 	function tsbSync() {
 		var want = {};
@@ -40665,6 +40720,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// The carried EPANET sections, saved with the drawing for the same reason the rule text is:
 			// a project saved and reopened still holds everything its `.inp` stated.
 			inpSections: doc.inpSections || {},
+			// **THE ATTACHED EPANET-MSX FILE** (Task 717, phase 1): the user's own text, kept and never
+			// run. Written only when there is one, so a file without one is byte for byte what it was.
+			msx: doc.msx || undefined,
 			// Where the reader was looking. Not a reason to SAVE -- panning marks nothing dirty --
 			// but it rides along whenever something else does, so a file reopens where it was left.
 			view: currentView(),
@@ -41863,6 +41921,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		doc.controls = saved.controls || [];
 		doc.rules = saved.rules || [];
 		doc.inpSections = saved.inpSections || {};
+		doc.msx = saved.msx || null;
 		// A scenario tree from a later reader (shared alternatives, calculation sets) rides through
 		// verbatim; a scenario's own tree keys already do, on the scenario object.
 		LPN_TREE_KEYS.forEach(function (k) { if (saved[k] !== undefined) { doc[k] = saved[k]; } else { delete doc[k]; } });
@@ -45125,7 +45184,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return null;
 	}
 
-	function importInpFromFile(file) {
+	// **AN `.inp` AND ITS `.msx` CHOSEN TOGETHER OPEN TOGETHER** (Tom, 2026-10-18: "One step: I want
+	// it."). Nothing in an `.inp` names its `.msx`, so the pair can only arrive as two files picked
+	// at once. The network lands first; the `.msx` then attaches to it, its lines inside the same
+	// import report. One `.msx` alone attaches to the open project, as its own Import row does.
+	function importInpFiles(files) {
+		var msx = files.filter(function (f) { return /\.msx$/i.test(f.name); })[0],
+			inp = files.filter(function (f) { return !/\.msx$/i.test(f.name); })[0];
+		if (!inp) { if (msx) { readMsxFile(msx); } return; }
+		importInpFromFile(inp, msx);
+	}
+	function readMsxFile(f, into) {
+		var reader = new FileReader();
+		reader.onload = function (ev) { attachMsx(ev.target.result, f.name, into); };
+		reader.readAsArrayBuffer(f);
+	}
+	function importInpFromFile(file, msxFile) {
 		// Logged on the attempt, not on success: somebody who arrives with an .inp file has already
 		// told us how they mean to start, and a parse failure is a first action that went wrong --
 		// which is a thing worth being able to see rather than a thing to hide from the histogram.
@@ -45134,7 +45208,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		reader.onload = function (ev) {
 			var text = inpTextFromBytes(ev.target.result, file.name);
 			if (text === null) { return; }   // inpTextFromBytes already said why
-			landInpText(text, file.name, false);
+			if (landInpText(text, file.name, false) && msxFile) { readMsxFile(msxFile, document.getElementById('lpn_dialog_body')); }
 		};
 		reader.onerror = function () { setWarning(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.'); };
 		// BYTES, not text: which of EPANET's two formats this is gets decided by the content (see
@@ -45201,6 +45275,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// out of the file -- so there is nothing to place, and georefStart() says exactly that
 		// rather than starting a wizard over coordinates that are already lon/lat.
 		if (asGeo) { renameToNumbered(id); convertAsLanded(); }
+		return true;
 	}
 	function pickInpFile() {
 		var input = document.getElementById('lpn_inp_file');
@@ -45392,6 +45467,175 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				return rec;
 			});
 		}
+	}
+
+	// ---- EPANET-MSX, PHASE 1: CARRY THE FILE, SAY SO (ROADMAP Task 717) ---------------------------
+	//
+	// An EPANET-MSX study is two files, the `.inp` and a `.msx` that names its nodes and links. The
+	// `.msx` is attached to the OPEN project, stored as the user's own characters in `doc.msx`
+	// ({name, text, enc}) so it rides in serializeProject() and the project file, and written back
+	// byte for byte by File > Export > EPANET-MSX file. It is never parsed into the model and never
+	// run: the scan below only counts species and finds IDs this network lacks, to say so.
+	// `enc` is 'utf-8' or, for a file that is not valid UTF-8, 'latin1' (one byte per character),
+	// so the bytes written back are the bytes that came in.
+	function msxBytesToText(buf) {
+		var u8 = new Uint8Array(buf), i, s;
+		try { return { text: new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(u8), enc: 'utf-8' }; }
+		catch (e) {
+			s = '';
+			for (i = 0; i < u8.length; i++) { s += String.fromCharCode(u8[i]); }
+			return { text: s, enc: 'latin1' };
+		}
+	}
+	function msxTextToBytes(m) {
+		var i, u8;
+		if (m.enc === 'latin1') {
+			u8 = new Uint8Array(m.text.length);
+			for (i = 0; i < m.text.length; i++) { u8[i] = m.text.charCodeAt(i) & 255; }
+			return u8;
+		}
+		return new TextEncoder().encode(m.text);
+	}
+	// Species names and the IDs the file mentions that this network does not have.
+	function msxScan(text) {
+		var sec = '', species = [], missing = [], seen = {}, hasSpecies = false;
+		String(text).replace(/^(\uFEFF|\u00EF\u00BB\u00BF)/, '').split(/\r\n|\r|\n/).forEach(function (raw) {
+			var line = raw.split(';')[0].trim(), t, m = /^\[\s*([A-Za-z]+)\s*\]/.exec(line), id = null, kind = null;
+			if (m) { sec = m[1].toUpperCase(); if (sec === 'SPECIES') { hasSpecies = true; } return; }
+			if (!line) { return; }
+			t = line.split(/\s+/);
+			if (sec === 'SPECIES' && t.length > 1) { species.push(t[1]); }
+			else if (sec === 'QUALITY' && t.length > 1 && /^(NODE|LINK)$/i.test(t[0])) { id = t[1]; kind = t[0].toUpperCase(); }
+			else if (sec === 'SOURCES' && t.length > 1) { id = t[1]; kind = 'NODE'; }
+			else if (sec === 'PARAMETERS' && t.length > 1 && /^(PIPE|TANK)$/i.test(t[0])) { id = t[1]; kind = /^PIPE/i.test(t[0]) ? 'LINK' : 'NODE'; }
+			if (id !== null && !seen[kind + id]) {
+				seen[kind + id] = true;
+				if (!(kind === 'NODE' ? nodeById(id) : linkById(id))) { missing.push(id); }
+			}
+		});
+		return { hasSpecies: hasSpecies, species: species, missing: missing };
+	}
+	function openMsxRow() {
+		if (doc.msx) { showMsxAttached(); } else { pickMsxFile(); }
+	}
+	function pickMsxFile() {
+		var pick = document.createElement('input');
+		pick.type = 'file';
+		pick.id = 'lpn_msx_file';
+		pick.accept = '.msx,text/plain';
+		pick.addEventListener('change', function () {
+			var f = pick.files && pick.files[0], reader;
+			if (!f) { return; }
+			reader = new FileReader();
+			reader.onload = function (ev) { attachMsx(ev.target.result, f.name); };
+			reader.onerror = function () {
+				setWarning((EngCalcs.pageConfig || {}).lpn_survey_read_error || 'That file could not be read from your disk.');
+			};
+			reader.readAsArrayBuffer(f);
+		});
+		pick.click();
+	}
+	// `into`, when given, is an open dialog body (the import report): the attach lines join it
+	// rather than replacing it with a second box.
+	function attachMsx(buf, fileName, into) {
+		var pc = EngCalcs.pageConfig || {}, r = msxBytesToText(buf), scan = msxScan(r.text), ids;
+		if (!scan.hasSpecies) {
+			setWarning((pc.lpn_msx_not_msx || '{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.').split('{file}').join(fileName));
+			return;
+		}
+		var prevMsx = doc.msx || null, prevQuality = settings.quality ? Object.assign({}, settings.quality) : null;
+		saveUndoSnapshot();
+		doc.msx = { name: fileName, text: r.text, enc: r.enc };
+		// **ATTACHING IS ASKING FOR IT TO RUN** (Task 717, phase 2): the quality analysis becomes
+		// Multi-species, so the next extended-period run is an EPANET-MSX run. Settings, Calculation,
+		// Quality moves it back. **ONLY THE CHOICE CHANGES** (Tom, 2026-10-18: Net1's Chlorine was
+		// lost): the chemical, its units and the trace node stay, and `before` is what Remove restores.
+		settings.quality = Object.assign({}, settings.quality || { traceNode: '' }, { mode: 'msx',
+			before: (settings.quality && settings.quality.mode !== 'msx') ? (settings.quality.mode || 'none') : ((settings.quality || {}).before || 'none') });
+		libCommit();
+		// **A FILE THE BROWSER CANNOT KEEP IS NOT "KEPT"**: the autosave just refused it, so it
+		// would be gone on reload. Put the previous state back, save that, and say so where it is seen.
+		if (storageError) {
+			doc.msx = prevMsx;
+			settings.quality = prevQuality || settings.quality;
+			saveToStorage();
+			setWarning((pc.lpn_msx_too_big || '{file} is too large to keep in browser storage, so it was not attached.').split('{file}').join(fileName));
+			return;
+		}
+		function report(body) {
+			var h = document.createElement('p'), p;
+			h.style.margin = into ? '10px 0 8px' : '0 0 8px';
+			h.style.fontWeight = 'bold';
+			h.textContent = (pc.lpn_msx_report_heading || 'Attached {file}').split('{file}').join(fileName);
+			body.appendChild(h);
+			p = document.createElement('p');
+			p.style.margin = '0 0 6px';
+			p.textContent = pc.lpn_msx_report_kept || 'This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.';
+			body.appendChild(p);
+			p = document.createElement('p');
+			p.style.margin = '0 0 6px';
+			p.textContent = scan.species.length ? (pc.lpn_msx_report_species || 'Species in the file: {list}.').split('{list}').join(scan.species.join(', '))
+				: (pc.lpn_msx_report_no_species || 'No species are listed in the file.');
+			body.appendChild(p);
+			if (scan.missing.length) {
+				ids = scan.missing.slice(0, 12).join(', ') + (scan.missing.length > 12 ? ', …' : '');
+				p = document.createElement('p');
+				p.style.margin = '0';
+				p.textContent = (pc.lpn_msx_report_missing || 'IDs in the file that this network does not have: {ids}.').split('{ids}').join(ids);
+				body.appendChild(p);
+			}
+		}
+		if (into) { report(into); }
+		else { openDialog(report, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]); }
+		rebuildSettingsBox();
+		if (qualityFieldsLabelled()) { requestLabelRefresh(); }
+		scheduleSolve();
+	}
+	function showMsxAttached() {
+		var pc = EngCalcs.pageConfig || {}, m = doc.msx;
+		if (!m) { return; }
+		openDialog(function (body) {
+			var h = document.createElement('p'), ta = document.createElement('textarea');
+			h.style.margin = '0 0 8px';
+			h.style.fontWeight = 'bold';
+			h.textContent = (pc.lpn_msx_attached_heading || 'Attached EPANET-MSX file: {file}').split('{file}').join(m.name);
+			body.appendChild(h);
+			ta.id = 'lpn_msx_text';
+			ta.readOnly = true;
+			ta.rows = 14;
+			ta.cols = 70;
+			ta.style.width = '100%';
+			ta.style.fontFamily = 'monospace';
+			ta.value = m.text;
+			body.appendChild(ta);
+			ta = document.createElement('p');
+			ta.style.margin = '6px 0 0';
+			ta.textContent = pc.lpn_msx_report_kept || 'This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.';
+			body.appendChild(ta);
+		}, [
+			{ label: pc.lpn_msx_replace || 'Replace…', fn: function () { setTimeout(pickMsxFile, 0); } },
+			{ label: pc.lpn_msx_remove || 'Remove', fn: function () {
+				saveUndoSnapshot();
+				doc.msx = null;
+				// Nothing left to run: a Multi-species analysis goes back to what was chosen before it.
+				if (settings.quality && settings.quality.mode === 'msx') {
+					settings.quality = Object.assign({}, settings.quality, { mode: settings.quality.before || 'none' });
+					delete settings.quality.before;
+				}
+				libCommit();
+				rebuildSettingsBox();
+				scheduleSolve();
+				setNotice((pc.lpn_msx_removed || 'Removed {file} from this project.').split('{file}').join(m.name));
+			} },
+			{ label: pc.lpn_close || 'Close', isDefault: true, fn: function () { } }
+		]);
+	}
+	function exportMsxFile() {
+		var pcX = EngCalcs.pageConfig || {}, m = doc.msx, name;
+		if (!m) { return; }
+		name = inpExportBaseName() + '.msx';
+		downloadBlob(new Blob([msxTextToBytes(m)], { type: 'text/plain' }), name);
+		setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').split('{file}').join(name));
 	}
 
 	// ---- File > Import > GeoJSON network (ROADMAP Task 728, import half) -------------------------
@@ -51183,6 +51427,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			  tip: pc.lpn_file_import_survey_tip, fn: pickSurveyFile },
 			{ icon: 'open', label: pc.lpn_file_import_inp || 'EPANET file…',
 			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
+			// **EPANET-MSX (Task 717, phase 1)**: attaches the second file of a multi-species study to
+			// the open project; kept and written back, never run. With one attached, the row shows it.
+			{ icon: 'open', label: pc.lpn_file_import_msx || 'EPANET-MSX file…',
+			  tip: pc.lpn_file_import_msx_tip, fn: openMsxRow },
 			// A GeoJSON file as a network, through one mapping step (Task 728).
 			{ icon: 'open', label: pc.lpn_file_import_gjnet || 'GeoJSON network…',
 			  tip: pc.lpn_file_import_gjnet_tip, fn: pickGeoJsonNetFile },
@@ -51224,6 +51472,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// GeoJSON (Task 728): same verb, same kind of file.
 			{ icon: 'save', label: pc.lpn_file_export_item_geojson || 'GeoJSON file…',
 			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile },
+			// The attached EPANET-MSX file, as its own row so one click is one download. Only offered
+			// when the project holds one.
+			{ icon: 'save', label: pc.lpn_file_export_item_msx || 'EPANET-MSX file…', hidden: !doc.msx,
+			  tip: pc.lpn_file_export_msx_tip, fn: exportMsxFile },
 			// THE MODEL'S DATA for AutoCAD and every other DWG program (Task 772). Reading a DXF back
 			// is the DXF Interface Manager's import half, not built.
 			{ icon: 'save', label: pc.lpn_file_export_item_dxf || 'DXF file…',
@@ -54359,9 +54611,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var inpInput = document.getElementById('lpn_inp_file');
 		if (!inpInput) { return; }
 		inpInput.addEventListener('change', function () {
-			var f = inpInput.files[0];
+			var fs = Array.prototype.slice.call(inpInput.files);
 			inpInput.value = '';
-			if (f) { importInpFromFile(f); }
+			if (fs.length) { importInpFiles(fs); }
 		});
 		// A THIRD picker (Task 447), and this one deliberately takes both kinds: File > Open as
 		// lat/lon… is one act over either a project file or an `.inp`, and openAsGeoFile() decides
@@ -65363,6 +65615,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				['trace', pc.lpn_quality_trace || 'Source trace'],
 				['age', pc.lpn_result_water_age || 'Water age']
 			];
+		// **MULTI-SPECIES IS OFFERED WHERE THERE IS AN `.msx` TO RUN** (Task 717), or where it is
+		// already the setting, so a project whose file was removed can still be moved off it.
+		if (doc.msx || q.mode === 'msx') { opts.push(['msx', pc.lpn_quality_msx || 'Multi-species (EPANET-MSX)']); }
 		opts.forEach(function (o) {
 			var opt = document.createElement('option');
 			opt.value = o[0]; opt.textContent = o[1];
@@ -65435,6 +65690,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				pc.lpn_settings_quality_source_tip), [['settings', 'quality']]);
 		}
 		if (q.mode === 'chemical') { settingsChemicalRows(host, rowFn, noteFn); }
+		if (q.mode === 'msx') { settingsMsxRows(host, rowFn, noteFn); }
 		// **SAID PLAINLY, IN THE BOX, RATHER THAN LEFT TO BE DISCOVERED.** Water quality is carried
 		// along the flows over time, so there is no such thing as a water age at one instant -- it
 		// needs a total run time and it needs the EPANET engine, exactly as the run itself does.
@@ -65456,6 +65712,45 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * posture Task 530 settled for the fire-flow hydrant coefficient, and it is the same argument:
 	 * a plausible number in a box is read as our recommendation.
 	 */
+	/**
+	 * **WHICH EPANET-MSX SPECIES THE MAP, THE TABLES AND THE GRAPH SHOW** (Task 717). Every species
+	 * runs; this only chooses which one the page's one quality column reads, so changing it needs
+	 * no new run. The species are the `.msx`'s own, in its own order; the reactions stay in the
+	 * file, which File, Import, EPANET-MSX file shows.
+	 */
+	function settingsMsxRows(host, rowFn, noteFn) {
+		var pc = EngCalcs.pageConfig || {}, names = msxSpeciesNames(), cur = msxChosenName(),
+			sel = document.createElement('select');
+		if (!doc.msx) {
+			if (noteFn) {
+				noteFn(host, pc.lpn_quality_msx_none
+					|| 'No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.');
+			}
+			return;
+		}
+		names.forEach(function (nm) {
+			var o = document.createElement('option');
+			o.value = nm; o.textContent = nm;
+			if (nm === cur) { o.selected = true; }
+			sel.appendChild(o);
+		});
+		sel.addEventListener('change', function () {
+			if (!settings.quality) { settings.quality = { mode: 'msx', traceNode: '' }; }
+			settings.quality.species = sel.value;
+			saveToStorage();
+			// The results are already in hand for every species: repaint, no new run. The bubbles and
+			// the contour box name the quantity in their own selectors, so they are rebuilt too.
+			refreshLabelText();
+			refreshValueColors();
+			refreshPaneIfOpen();
+			refreshPopupIfOpen();
+			tsbRebuildAll();
+			refreshContour();
+			refreshContourBoxIfOpen();
+		});
+		setboxTag(rowFn(host, pc.lpn_quality_msx_species || 'Species', sel,
+			pc.lpn_quality_msx_species_tip), [['settings', 'quality']]);
+	}
 	function settingsChemicalRows(host, rowFn, noteFn) {
 		var pc = EngCalcs.pageConfig || {};
 		// **THE NAME AND ITS UNIT WERE ONE FIELD ("Chlorine mg/L") AND ARE NOW TWO** (R-323, Tom:
@@ -69851,7 +70146,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		readonlyField(fields, qualityLabel() + (u ? ' (' + u + ')' : ''), v,
 			mode === 'age' ? pc.lpn_result_water_age_tip
 				: mode === 'chemical' ? pc.lpn_result_concentration_tip
-					: pc.lpn_result_source_share_tip);
+					: mode === 'msx' ? pc.lpn_result_msx_tip
+						: pc.lpn_result_source_share_tip);
 	}
 	/**
 	 * **THE LINK'S OWN TAIL, ON THE SAME TERMS AS A NODE'S** (R-349, closing the gap Task 638 left:
@@ -69868,7 +70164,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		readonlyField(fields, linkQualityLabel() + (u ? ' (' + u + ')' : ''), v,
 			mode === 'age' ? pc.lpn_result_water_age_tip
 				: mode === 'chemical' ? pc.lpn_result_concentration_tip
-					: pc.lpn_result_source_share_tip);
+					: mode === 'msx' ? pc.lpn_result_msx_tip
+						: pc.lpn_result_source_share_tip);
 	}
 	function renderNodeFields(nodeId) {
 		var n = nodeById(nodeId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
@@ -73706,6 +74003,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// Diffusivity and Tolerance are not sent to the engine at all -- they mean something
 			// only to a reacting chemical, which this page carries and does not work out.
 			quality: qualitySetting(),
+			// **THE ATTACHED EPANET-MSX FILE, AS THE USER'S OWN TEXT** (Task 717, phase 2). Read by
+			// js/lpn-epanet.js under quality mode 'msx', which hands the engine a copy; never parsed
+			// into numbers here and never rewritten.
+			msx: doc.msx ? { text: doc.msx.text } : null,
 			// **THE REACTION COEFFICIENTS, AND THE ONE OF THEM THAT CARRIES A UNIT** (Task 566).
 			// Converted here, on a clone, for the same reason `hydraulics` is: this is the only
 			// place that knows the project's units, and `settings.reactions` is the document's own
@@ -74849,6 +75150,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function labelDefaultSuffix(group, field) {
 		if (field === 'quality') {
 			var mode = qualityMode();
+			if (mode === 'msx') { return qualityUnitText() ? ' ' + qualityUnitText() : ''; }
 			return mode === 'trace' ? '%' : mode === 'chemical' ? ' mg/L' : ' hr';
 		}
 		if (field === 'initQuality') { return ' mg/L'; }
@@ -74915,6 +75217,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			mode = qualityMode();
 			if (mode === 'trace') { return '%'; }
 			if (mode === 'chemical') { return ' ' + (concentrationUnitText() || 'mg/L'); }
+			if (mode === 'msx') { return qualityUnitText() ? ' ' + qualityUnitText() : ''; }
 			return ' ' + unitLabel(resultUnit('age'));
 		}
 		if (field === 'initQuality') { return ' ' + (concentrationUnitText() || 'mg/L'); }

@@ -1909,6 +1909,12 @@
 	 */
 	EngCalcs.lpnQualityText = function (q) {
 		var mode = (q && q.mode) || 'none', src = q && q.src, was;
+		// **EPANET-MSX (Task 717) LEAVES THE `.inp`'S OWN QUALITY LINE ALONE** (Tom, 2026-10-18):
+		// the solve turns EPANET's quality off in its copy, so the file still states the analysis
+		// that was chosen before Multi-species (`before`), in its own characters where untouched.
+		if (mode === 'msx') {
+			return EngCalcs.lpnQualityText(Object.assign({}, q, { mode: q.before || 'none' }));
+		}
 		if (src !== undefined && src !== null && src !== '') {
 			was = EngCalcs.lpnQualityParse(src);
 			// **A CHEMICAL NOW HAS THE SAME "STILL MATCHES THE TOKEN?" TEST A TRACE NODE ALREADY

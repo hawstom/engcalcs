@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "sw",
-        "expected_key_count": 3055,
-        "delta_key_count": 66,
-        "english_changed_key_count": 30,
+        "expected_key_count": 3075,
+        "delta_key_count": 87,
+        "english_changed_key_count": 31,
         "exempt_key_count": 46,
         "exempt_keys": [
             "u_imgd",
@@ -94,8 +94,29 @@
         "lpn_ex_valves_title": "Valve types, gpm (US)",
         "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_file_import_inp": "EPANET file…",
+        "lpn_file_import_inp_tip": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_file_import_msx": "EPANET-MSX file…",
+        "lpn_file_import_msx_tip": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.",
+        "lpn_file_export_item_msx": "EPANET-MSX file…",
+        "lpn_file_export_msx_tip": "Download the attached EPANET-MSX file exactly as it was imported.",
+        "lpn_msx_report_heading": "Attached {file}",
+        "lpn_msx_report_kept": "This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.",
+        "lpn_msx_report_species": "Species in the file: {list}.",
+        "lpn_msx_report_no_species": "No species are listed in the file.",
+        "lpn_msx_too_big": "{file} is too large to keep in browser storage, so it was not attached.",
+        "lpn_msx_report_missing": "IDs in the file that this network does not have: {ids}.",
+        "lpn_msx_not_msx": "{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.",
+        "lpn_msx_attached_heading": "Attached EPANET-MSX file: {file}",
+        "lpn_msx_replace": "Replace…",
+        "lpn_msx_remove": "Remove",
+        "lpn_msx_removed": "Removed {file} from this project.",
+        "lpn_quality_msx": "Multi-species (EPANET-MSX)",
+        "lpn_quality_msx_species": "Species",
+        "lpn_quality_msx_species_tip": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.",
+        "lpn_quality_msx_none": "No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.",
+        "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
         "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
         "lpn_notes_2_def": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
         "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
@@ -162,8 +183,29 @@
         "lpn_ex_valves_title": "Valve types, gpm (US)",
         "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_file_import_inp": "EPANET file…",
+        "lpn_file_import_inp_tip": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_file_import_msx": "EPANET-MSX file…",
+        "lpn_file_import_msx_tip": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.",
+        "lpn_file_export_item_msx": "EPANET-MSX file…",
+        "lpn_file_export_msx_tip": "Download the attached EPANET-MSX file exactly as it was imported.",
+        "lpn_msx_report_heading": "Attached {file}",
+        "lpn_msx_report_kept": "This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.",
+        "lpn_msx_report_species": "Species in the file: {list}.",
+        "lpn_msx_report_no_species": "No species are listed in the file.",
+        "lpn_msx_too_big": "{file} is too large to keep in browser storage, so it was not attached.",
+        "lpn_msx_report_missing": "IDs in the file that this network does not have: {ids}.",
+        "lpn_msx_not_msx": "{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.",
+        "lpn_msx_attached_heading": "Attached EPANET-MSX file: {file}",
+        "lpn_msx_replace": "Replace…",
+        "lpn_msx_remove": "Remove",
+        "lpn_msx_removed": "Removed {file} from this project.",
+        "lpn_quality_msx": "Multi-species (EPANET-MSX)",
+        "lpn_quality_msx_species": "Species",
+        "lpn_quality_msx_species_tip": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.",
+        "lpn_quality_msx_none": "No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.",
+        "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
         "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
         "lpn_notes_2_def": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
         "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
@@ -436,13 +478,34 @@
                 "next_translated": {
                     "key": "lpn_file_import_inp_tip",
                     "value": "Soma mtandao kutoka faili la EPANET, iwe faili la maandishi la .inp au faili la .net linalohifadhiwa na EPANET, na ulihifadhi katika kivinjari hiki kama mradi mpya.",
-                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort)."
+                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time."
                 }
             },
             "tip": {
                 "key": "lpn_file_import_inp_tip",
-                "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort).",
+                "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
                 "value": "Soma mtandao kutoka faili la EPANET, iwe faili la maandishi la .inp au faili la .net linalohifadhiwa na EPANET, na ulihifadhi katika kivinjari hiki kama mradi mpya."
+            }
+        },
+        "lpn_file_import_inp_tip": {
+            "reason": "english_changed",
+            "current_value": "Soma mtandao kutoka faili la EPANET, iwe faili la maandishi la .inp au faili la .net linalohifadhiwa na EPANET, na ulihifadhi katika kivinjari hiki kama mradi mpya.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp",
+                    "value": "Leta Faili la EPANET…",
+                    "english": "EPANET file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_menu",
+                    "value": "Hamisha…",
+                    "english": "Export…"
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_inp",
+                "english": "EPANET file…",
+                "value": "Leta Faili la EPANET…"
             }
         },
         "lpn_file_export_workspace_tip": {
@@ -480,6 +543,342 @@
                 "key": "lpn_file_import_workspace",
                 "english": "Workspace…",
                 "value": "Nafasi ya kazi…"
+            }
+        },
+        "lpn_file_import_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_msx_tip",
+                "english": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation."
+            }
+        },
+        "lpn_file_import_msx_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_msx",
+                "english": "EPANET-MSX file…"
+            }
+        },
+        "lpn_file_export_item_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_file_export_msx_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_kept": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_species": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_no_species": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_too_big": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_missing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_not_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_attached_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_replace": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_remove": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_removed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_quality_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_quality_msx_species": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "tip": {
+                "key": "lpn_quality_msx_species_tip",
+                "english": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species."
+            }
+        },
+        "lpn_quality_msx_species_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "label": {
+                "key": "lpn_quality_msx_species",
+                "english": "Species"
+            }
+        },
+        "lpn_quality_msx_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_result_msx_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Tumia faili la nafasi ya kazi lililohifadhiwa kwa Faili, Hamisha, Nafasi ya kazi: nafasi na ukubwa wa visanduku, kuegesha, ukubwa wa vidirisha na chaguo za onyesho za ukurasa huu, kama vile viputo vipi vya msaada na kadi ya kuelea vinaonyeshwa. Miradi yako na vidakuzi haviguswi.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Nafasi ya kazi imehifadhiwa kwenye {file}: mipangilio {n}.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
             }
         },
         "lpn_notes_1_def": {

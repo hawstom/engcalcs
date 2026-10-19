@@ -114,10 +114,11 @@ word yet. Budget is tight (NPS review urgencies): slow down. Open from
 scenario-results: flow shown as magnitude only; fire flow across scenarios still a gap.
 Closed: Tasks 815, 800, 721. Task 737 marked WAIT: sprint.
 
+- 2026-10-19: `feat/msx` merged on his word ("merge feat/msx"); Task 717 closed. Owed: his call on a
+  features-list line naming EPANET-MSX (public claim), and the MSX keys' translations at the next sprint.
+
 ### Ready for his typed merge word (all reviewed by Perry, green but for payload freshness)
 
-- `feat/msx` (8112, /chlorine-decay.msx to attach to Net1): Task 717 phase 1. Then his calls on the
-  import-report sentence and landing-page MSX lines (dev/msx-scope.md).
 - `feat/theme` (8111): 13 themes; the map follows the theme; he loves Desktop and Prairie. His calls
   pending: Dark's dark map reverses Task 714; whether a "Designer" theme (Ida, or a paid human) is wanted.
 - `feat/label-form` (8114) + `feat/label-beside` (8110): he likes label-form; round 2 running (Perry

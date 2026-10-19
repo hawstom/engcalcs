@@ -2265,7 +2265,7 @@ $ec_lang['lpn_dialog_ok']='OK';
 $ec_lang['lpn_file_import_menu']='Import…';
 $ec_lang['lpn_file_import_inp']='EPANET file…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort).';
+$ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
 // File > Export is a submenu (Tom, 2026-10-06), so its rows drop the verb the heading carries. The
@@ -2320,6 +2320,26 @@ $ec_lang['lpn_file_export_item_workspace']='Workspace…';
 $ec_lang['lpn_file_export_workspace_tip']='Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.';
 $ec_lang['lpn_file_import_workspace']='Workspace…';
 $ec_lang['lpn_file_import_workspace_tip']='Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.';
+$ec_lang['lpn_file_import_msx']='EPANET-MSX file…';
+$ec_lang['lpn_file_import_msx_tip']='Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.';
+$ec_lang['lpn_file_export_item_msx']='EPANET-MSX file…';
+$ec_lang['lpn_file_export_msx_tip']='Download the attached EPANET-MSX file exactly as it was imported.';
+$ec_lang['lpn_msx_report_heading']='Attached {file}';
+$ec_lang['lpn_msx_report_kept']='This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.';
+$ec_lang['lpn_msx_report_species']='Species in the file: {list}.';
+$ec_lang['lpn_msx_report_no_species']='No species are listed in the file.';
+$ec_lang['lpn_msx_too_big']='{file} is too large to keep in browser storage, so it was not attached.';
+$ec_lang['lpn_msx_report_missing']='IDs in the file that this network does not have: {ids}.';
+$ec_lang['lpn_msx_not_msx']='{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.';
+$ec_lang['lpn_msx_attached_heading']='Attached EPANET-MSX file: {file}';
+$ec_lang['lpn_msx_replace']='Replace…';
+$ec_lang['lpn_msx_remove']='Remove';
+$ec_lang['lpn_msx_removed']='Removed {file} from this project.';
+$ec_lang['lpn_quality_msx']='Multi-species (EPANET-MSX)';
+$ec_lang['lpn_quality_msx_species']='Species';
+$ec_lang['lpn_quality_msx_species_tip']='The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.';
+$ec_lang['lpn_quality_msx_none']='No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.';
+$ec_lang['lpn_result_msx_tip']='The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.';
 $ec_lang['lpn_workspace_exported']='Workspace saved to {file}: {n} settings.';
 $ec_lang['lpn_workspace_imported']='Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.';
 $ec_lang['lpn_workspace_ignored']='Entries ignored because they were not recognized: {u}.';

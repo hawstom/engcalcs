@@ -220,7 +220,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // BOTH of EPANET's formats: .inp is its documented text interchange format, .net is what
 	      // its Windows UI saves when you press Save. The accept list only filters the PICKER; which
 	      // format a chosen file really is gets decided from its first bytes, not its name. ?>
-	<input type="file" id="lpn_inp_file" accept=".inp,.net,text/plain" style="display:none">
+	<input type="file" id="lpn_inp_file" accept=".inp,.net,.msx,text/plain" multiple style="display:none">
 	<input type="file" id="lpn_workspace_file" accept=".json,application/json" style="display:none">
 	<?php // File > Open as lat/lon… (Task 447). THE ONE PICKER THAT TAKES BOTH KINDS, because the row
 	      // it serves is the recovery path for a lon/lat network in either kind of file. Which reader
@@ -2352,6 +2352,26 @@ EngCalcs.pageConfig = {
 	lpn_file_export_workspace_tip: <?=json_encode($ec_lang['lpn_file_export_workspace_tip'])?>,
 	lpn_file_import_workspace: <?=json_encode($ec_lang['lpn_file_import_workspace'])?>,
 	lpn_file_import_workspace_tip: <?=json_encode($ec_lang['lpn_file_import_workspace_tip'])?>,
+	lpn_file_import_msx: <?=json_encode($ec_lang['lpn_file_import_msx'])?>,
+	lpn_file_import_msx_tip: <?=json_encode($ec_lang['lpn_file_import_msx_tip'])?>,
+	lpn_file_export_item_msx: <?=json_encode($ec_lang['lpn_file_export_item_msx'])?>,
+	lpn_file_export_msx_tip: <?=json_encode($ec_lang['lpn_file_export_msx_tip'])?>,
+	lpn_msx_report_heading: <?=json_encode($ec_lang['lpn_msx_report_heading'])?>,
+	lpn_msx_report_kept: <?=json_encode($ec_lang['lpn_msx_report_kept'])?>,
+	lpn_msx_report_species: <?=json_encode($ec_lang['lpn_msx_report_species'])?>,
+	lpn_msx_report_no_species: <?=json_encode($ec_lang['lpn_msx_report_no_species'])?>,
+	lpn_msx_too_big: <?=json_encode($ec_lang['lpn_msx_too_big'])?>,
+	lpn_msx_report_missing: <?=json_encode($ec_lang['lpn_msx_report_missing'])?>,
+	lpn_msx_not_msx: <?=json_encode($ec_lang['lpn_msx_not_msx'])?>,
+	lpn_msx_attached_heading: <?=json_encode($ec_lang['lpn_msx_attached_heading'])?>,
+	lpn_msx_replace: <?=json_encode($ec_lang['lpn_msx_replace'])?>,
+	lpn_msx_remove: <?=json_encode($ec_lang['lpn_msx_remove'])?>,
+	lpn_msx_removed: <?=json_encode($ec_lang['lpn_msx_removed'])?>,
+	lpn_quality_msx: <?=json_encode($ec_lang['lpn_quality_msx'])?>,
+	lpn_quality_msx_species: <?=json_encode($ec_lang['lpn_quality_msx_species'])?>,
+	lpn_quality_msx_species_tip: <?=json_encode($ec_lang['lpn_quality_msx_species_tip'])?>,
+	lpn_quality_msx_none: <?=json_encode($ec_lang['lpn_quality_msx_none'])?>,
+	lpn_result_msx_tip: <?=json_encode($ec_lang['lpn_result_msx_tip'])?>,
 	lpn_workspace_exported: <?=json_encode($ec_lang['lpn_workspace_exported'])?>,
 	lpn_workspace_imported: <?=json_encode($ec_lang['lpn_workspace_imported'])?>,
 	lpn_workspace_ignored: <?=json_encode($ec_lang['lpn_workspace_ignored'])?>,
