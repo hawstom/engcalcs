@@ -4,10 +4,11 @@
 //   node dev/lpn-spike/msx-attach-browser-harness.js
 //
 // File > Import > EPANET-MSX file attaches dev/lpn-spike/fixtures/chlorine-decay.msx to an imported
-// network; the report says it is kept and not run, names the species and the ID the network lacks.
+// network; the report says it is kept and will run, names the species and the ID the network lacks.
 // File > Export > EPANET-MSX file (only present once one is attached) sends exactly ONE download,
 // byte-identical. A second file with a BOM, CRLF line ends and a non-UTF-8 byte round-trips too.
 // Save as, then Open in a fresh page, brings the file back; Remove takes the row away again.
+// Phase 2: EPA's EPANET-MSX example network runs its .msx and the Tables pane shows a species.
 'use strict';
 
 const fs = require('fs');
@@ -128,7 +129,7 @@ async function main() {
 		console.log('\n--- File > Import > EPANET-MSX file ---');
 		await attach(a, L, 'cl.msx', MSX1, false);
 		const rep = await dialogText(a);
-		ok('the report says the file is kept and not run', rep.indexOf(L.kept) >= 0, rep);
+		ok('the report says the file is kept and set to run', rep.indexOf(L.kept) >= 0, rep);
 		ok('...names the species CL2', /Species in the file: CL2\./.test(rep), rep);
 		ok('...names the ID the network lacks (NOWHERE) and not J1', rep.indexOf('NOWHERE') >= 0 && !/this network does not have:[^.]*J1/.test(rep), rep);
 		await closeDialogs(a);
@@ -196,7 +197,24 @@ async function main() {
 		await b.settle(600);
 		const rows2 = await exportRows(b, L);
 		ok('after Remove the Export row is gone', !rows2.some((t) => t.indexOf(L.expMsx) === 0), rows2.join(' | '));
-		ok('no uncaught page errors', a.errors.length === 0 && b.errors.length === 0, a.errors.concat(b.errors).slice(0, 2).join(' | '));
+		console.log('\n--- phase 2: EPA\'s EPANET-MSX example runs, and the Tables pane shows a species ---');
+		const c = await open(browser);
+		const FIX = path.join(__dirname, 'fixtures', 'msx-example');
+		await c.page.setInputFiles('#lpn_inp_file', { name: 'example.inp', mimeType: 'text/plain', buffer: fs.readFileSync(path.join(FIX, 'example.inp')) });
+		await c.settle(1500);
+		await closeDialogs(c);
+		await attach(c, L, 'example.msx', fs.readFileSync(path.join(FIX, 'example.msx')), false);
+		await closeDialogs(c);
+		await c.settle(4000);
+		ok('the run raised no diagnostic', !/error|refus|could not/i.test(await c.status()), await c.status());
+		await c.toolbarClick((await c.lang('lpn_time_last')).trim());
+		await c.settle(800);
+		await c.toolbarClick((await c.lang('lpn_pane_toggle')).trim());
+		await c.settle(1200);
+		const ths = await c.page.evaluate(() => Array.from(document.querySelectorAll('#lpn_pane_junctions th')).map((t) => t.textContent.trim()));
+		ok('the Junctions table heads a column with the first species in the file\'s unit, AS3 (UG/L)', ths.indexOf('AS3 (UG/L)') >= 0, ths.slice(-3).join(' | '));
+		ok('no uncaught page errors', a.errors.length === 0 && b.errors.length === 0 && c.errors.length === 0, a.errors.concat(b.errors, c.errors).slice(0, 2).join(' | '));
+		await c.close();
 		await b.close();
 		await a.close();
 	} finally {
