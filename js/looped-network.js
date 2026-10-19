@@ -77738,6 +77738,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	var critBusy = false;
 	var critStop = false;
 	var critSortState = { col: null, dir: 1 };
+	function critWhen() { return (critAsk.when === 'run' && analysisCanRun()) ? 'run' : 'now'; }
 	function critBoxEl() { return document.getElementById('lpn_crit_box'); }
 	function critBoxIsOpen() {
 		var box = critBoxEl();
@@ -77751,7 +77752,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function buildCriticalityControls() {
 		var pc = EngCalcs.pageConfig || {},
 			host = document.getElementById('lpn_crit_controls'),
-			scope, minP, skip, buttons, run, stop, engine;
+			scope, minP, skip, buttons, run, stop, engine, when;
 		if (!host) { return; }
 		host.innerHTML = '';
 		scope = ffSelect([
@@ -77760,6 +77761,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		], critAsk.scope);
 		scope.addEventListener('change', function () { critAsk.scope = scope.value; });
 		ffRow(host, pc.lpn_crit_scope || 'Links to break', null, scope, '');
+		// **THE WHOLE RUN, ONLY WHERE THE PROJECT HAS A CLOCK** (Task 578).
+		if (analysisCanRun()) {
+			when = ffSelect([
+				['now', pc.lpn_when_now || 'The time step on screen'],
+				['run', pc.lpn_when_run || 'The whole run']
+			], critAsk.when || 'now');
+			when.addEventListener('change', function () { critAsk.when = when.value; });
+			ffRow(host, pc.lpn_when || 'Time step tested', null, when, '');
+		}
 		skip = document.createElement('input');
 		skip.type = 'checkbox';
 		skip.checked = !!critAsk.skipDeadEnds;
@@ -77779,6 +77789,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		run.addEventListener('click', function () {
 			critAsk.scope = scope.value;
 			critAsk.skipDeadEnds = skip.checked;
+			if (when) { critAsk.when = when.value; }
 			critFireFlowAsk().minPressure = minP.value;
 			runCriticality();
 		});
@@ -77809,6 +77820,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		case 1: return rec.unserved;
 		case 2: return rec.cutOff ? rec.cutOff.length : undefined;
 		case 3: return rec.below ? rec.below.length : undefined;
+		case 4: return rec.run && rec.run.lowest ? rec.run.lowest.pressure : undefined;
+		case 5: return rec.run ? rec.run.belowSeconds : undefined;
+		case 6: return rec.run && rec.run.emptyAt ? rec.run.emptyAt.t : undefined;
 		}
 		return undefined;
 	}
@@ -77842,11 +77856,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Counted as the sentence reads: demand actually left unserved, or a junction actually below
 		// the minimum. A link that cuts off only zero-demand junctions shows them in its row, but it
 		// cut off no demand, so it is not counted here.
-		hit = set.results.filter(function (r) { return r.unserved > 0 || (r.below && r.below.length > 0); }).length;
+		hit = set.results.filter(function (r) {
+			return r.unserved > 0 || (r.below && r.below.length > 0) || (r.run && (r.run.emptyAt || r.run.stoppedAt));
+		}).length;
 		ffEl('p', 'lpn-ff-summary', (pc.lpn_crit_summary || 'Assets that leave demand unserved or drop a junction below {pressure} ({n} of {total}).')
 			.replace('{n}', String(hit)).replace('{total}', String(set.results.length))
 			.split('{pressure}').join(ffQty(set.minPressure, 'lpn_u_pressure')), host);
 		dsTimeLines(host, critRunT);
+		if (set.wholeRun) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_run_note || 'Each outage was run over the whole simulation ({n} reporting steps).')
+				.replace('{n}', String(set.wholeRun)), host);
+		}
 		if (set.skippedDeadEnds && set.skippedDeadEnds.length) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_skipped_dead || 'Dead-end links skipped: {n}. Each one cuts off everything beyond it.')
 				.replace('{n}', String(set.skippedDeadEnds.length)), host);
@@ -77864,7 +77884,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_crit_col_unserved || 'Demand not served',
 			pc.lpn_crit_col_cutoff || 'Junctions cut off',
 			pc.lpn_crit_col_below || 'Junctions below minimum'
-		], { state: critSortState, by: critSortBy });
+		].concat(set.wholeRun ? [
+			pc.lpn_crit_col_lowest || 'Lowest pressure',
+			pc.lpn_crit_col_hours || 'Hours below minimum',
+			pc.lpn_crit_col_empty || 'Tank empties'
+		] : []), { state: critSortState, by: critSortBy });
 		// Four columns, not ten: the headings wrap between words, never inside one (css/engcalcs.css).
 		if (body.parentNode && body.parentNode.classList) { body.parentNode.classList.add('lpn-crit-table'); }
 		shown.forEach(function (rec) {
@@ -77879,6 +77903,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// reason stands in the pressure column.
 			if (rec.below) { critIdsCell(tr, rec.below.map(function (b) { return b.id; })); }
 			else { ffCell(tr, ffReasonText(rec)); }
+			if (set.wholeRun) {
+				var atT = pc.lpn_at_time || '{value} at {time}', rn = rec.run;
+				ffCell(tr, rn && rn.lowest
+					? atT.replace('{value}', ffQty(rn.lowest.pressure, 'lpn_u_pressure')).replace('{time}', dsTimeText(rn.lowest.t))
+					: FF_DASH);
+				ffCell(tr, rn ? String(+(rn.belowSeconds / 3600).toFixed(1)) : FF_DASH);
+				ffCell(tr, rn && rn.emptyAt
+					? atT.replace('{value}', labelPrefixFor('node', 'id') + rn.emptyAt.id).replace('{time}', dsTimeText(rn.emptyAt.t))
+					: FF_DASH);
+			}
 		});
 		ffMoreLine(host, sorted.length - shown.length, true);
 	}
@@ -77905,14 +77939,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return { ids: ids, skipped: skipped };
 	}
 	function runCriticality() {
-		var pc = EngCalcs.pageConfig || {}, model, engine, pick, minPressure, before;
+		var pc = EngCalcs.pageConfig || {}, model, engine, pick, minPressure, before, whole, sweepSolve;
 		if (critBusy || !EngCalcs.lpnCriticalitySweep) { return Promise.resolve(null); }
 		if (fireFlowBusy || dsBusy) {
 			setNotice(pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.');
 			return Promise.resolve(null);
 		}
+		whole = critWhen() === 'run';
 		model = assembleModel();
-		fireFlowAtFrame(model);
+		// The whole run starts from the project's own starting state; the step on screen is laid over
+		// the model only when that step is what is being asked about.
+		if (!whole) { fireFlowAtFrame(model); }
 		pick = criticalityLinks(model);
 		if (!pick.ids.length) {
 			clearCriticalityRun(true);
@@ -77923,8 +77960,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		minPressure = ffValue(critFireFlowAsk().minPressure, 'lpn_u_pressure');
 		engine = engineFor(model);
+		// One EPANET run per outage, as every run is; the answer is handed to the sweep whole.
+		sweepSolve = whole ? function (m) {
+			return EngCalcs.lpnEpanetRun(m, {}).then(function (run) { return EngCalcs.lpnEpsRunResult(run, m); });
+		} : engine.solve;
 		before = JSON.stringify(doc);
-		critRunT = modelTimeSeconds();
+		critRunT = whole ? null : modelTimeSeconds();
 		critBusy = true;
 		critStop = false;
 		critRun = null;
@@ -77942,7 +77983,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				.replace('{n}', String(pick.skipped)));
 		}
 		return EngCalcs.lpnCriticalitySweep(model, {
-			solve: engine.solve,
+			solve: sweepSolve,
 			links: pick.ids,
 			skipDeadEnds: !!critAsk.skipDeadEnds,
 			minPressure: minPressure > 0 ? minPressure : 0,
@@ -77958,6 +77999,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				critRun = null;
 				setNotice(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.');
 			} else {
+				if (whole) { set.wholeRun = (set.baselineRun && set.baselineRun.steps) || 1; }
 				critRun = set;
 			}
 			rebuildCriticalityReport();

@@ -44,6 +44,9 @@ const L = loadLoopedNetwork(
 	"\t\trunFireFlowSweep: runFireFlowSweep,\n" +
 	"\t\tanalysisModelAt: analysisModelAt, analysisRun: analysisRun, assembleModel: assembleModel,\n" +
 	"\t\tengineFor: engineFor,\n" +
+	"\t\truncrit: runCriticality, critRun: function () { return critRun; },\n" +
+	"\t\tcritSet: function (k, v) { critAsk[k] = v; },\n" +
+	"\t\tminPressureSet: function (t) { if (!fireFlowAsk) { fireFlowAsk = fireFlowDefaults(); } fireFlowAsk.minPressure = t; },\n" +
 	"\t\tsetAsk: function (k, v) { if (!fireFlowAsk) { fireFlowAsk = fireFlowDefaults(); } fireFlowAsk[k] = v; },\n" +
 	"\t\task: function () { return fireFlowAsk; },\n" +
 	"\t\tffRun: function () { return fireFlowRun; },\n" +
@@ -166,6 +169,45 @@ async function sweepSelected(ids, when, extra) {
 	head('5. THE STEP ON SCREEN IS UNCHANGED');
 	const now = await sweepSelected(ids, 'now');
 	check(!now.at && now.stopped === false && ids.every((id) => now.byId[id]), 'no "at" record, every hydrant answered');
+
+	head('6. CRITICALITY OVER THE WHOLE RUN (Net1: pump 9 and pipe 10 are the only supply to the tank)');
+	open('Net1.lwn');
+	L.setEngine('epanet');
+	L.minPressureSet('40');
+	L.critSet('scope', 'all');
+	L.critSet('when', 'run');
+	const cr = await L.runcrit();
+	check(cr && cr.ok && cr.wholeRun === 25, 'the whole-run set says it covers 25 reporting steps');
+	// the independent reading: Net1 with the link removed, run once, tank level read off its frames
+	async function emptyOf(linkId) {
+		const m = L.assembleModel();
+		m.links = m.links.filter((l) => l.id !== linkId);
+		// a rule that names the link would be an input error to EPANET, as it is in the sweep's case model
+		if (Array.isArray(m.rules)) { m.rules = m.rules.filter((r) => !(r.links || []).includes(linkId)); }
+		const r = await EC.lpnEpanetRun(m, {});
+		const tank = m.nodes.find((n) => n.type === 'tank');
+		const f = r.frames.find((fr) => fr.levels[tank.id] <= (tank.minLevel || 0) + 1e-3);
+		return { tank: tank.id, t: f ? f.t : null, frames: r.frames, model: m };
+	}
+	for (const id of ['9', '10']) {
+		const rec = cr.byId[id], want = await emptyOf(id);
+		check(rec.run && rec.run.emptyAt && rec.run.emptyAt.id === want.tank && rec.run.emptyAt.t === want.t && want.t !== null,
+			`outage of link ${id}: the tank empties at ${rec.run && rec.run.emptyAt ? EC.lpnFormatTime(rec.run.emptyAt.t) : 'never'} (an independent run says ${want.t === null ? 'never' : EC.lpnFormatTime(want.t)})`);
+		check(rec.run.belowSeconds > 0 && EC.lpnCriticalitySeverity(rec) === 'fail', '  and it counts as a failure with hours below the minimum (' + rec.run.belowSeconds / 3600 + ' h)');
+		check(rec.run.lowest && rec.run.lowest.t < rec.run.emptyAt.t, '  and its lowest pressure is read before the tank emptied, not from a disconnected network');
+	}
+	{
+		const rec = cr.byId['11'], want = await emptyOf('11');
+		let lo = Infinity, at = null;
+		want.frames.forEach((f) => want.model.nodes.forEach((n) => {
+			if (n.type === 'junction' && f.pressures[n.id] < lo) { lo = f.pressures[n.id]; at = f.t; }
+		}));
+		check(rec.run.emptyAt === null && want.t === null, 'outage of link 11: no tank empties');
+		check(Math.abs(rec.run.lowest.pressure - lo) < 1e-9 && rec.run.lowest.t === at, `  and its lowest pressure over the run is the independent run's (${(lo / 0.703070).toFixed(2)} psi at ${EC.lpnFormatTime(at)})`);
+	}
+	L.critSet('when', 'now');
+	const cn = await L.runcrit();
+	check(cn.ok && !cn.wholeRun && cn.results.every((r) => r.run === undefined), 'the step on screen is unchanged: no run record on any row');
 
 	// Timings, not assertions: every junction of Net3.
 	if (process.env.EPS_TIMES) {

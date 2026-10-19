@@ -107,6 +107,24 @@ async function main() {
 		ok('the report says it is the worst of the reporting steps', report.indexOf(lead) >= 0, report.slice(0, 160));
 		await closeTool('lpn_ff_close');
 
+		console.log('\n--- Criticality, the whole run ---');
+		await openTool('lpn_crit_menu', 'lpn_crit_box');
+		const critWhen = '#lpn_crit_controls select:has(option[value="run"])';
+		ok('the box offers the whole run on a project with a clock', !!(await a.page.$(critWhen)));
+		await a.page.selectOption(critWhen, 'run');
+		await a.settle(200);
+		await pressRun('#lpn_crit_controls', runLabel);
+		await waitDone('#lpn_crit_report', 'the whole-run Criticality answer');
+		const ch = await heads('#lpn_crit_report');
+		const emptyHead = await a.lang('lpn_crit_col_empty');
+		ok('the table has the columns "' + emptyHead + '" and "' + await a.lang('lpn_crit_col_hours') + '"',
+			ch.indexOf(emptyHead) >= 0 && ch.indexOf(await a.lang('lpn_crit_col_hours')) >= 0, ch.join(' | '));
+		const crows = await a.page.$$eval('#lpn_crit_report tbody tr', (trs) => trs.map((tr) => [...tr.children].map((c) => c.textContent.trim())));
+		const ec = ch.indexOf(emptyHead);
+		const emptied = crows.filter((r) => /\d+:\d\d/.test(r[ec]));
+		ok('some outage empties the tank, with the time (such as "2 at 5:00")', emptied.length >= 1, JSON.stringify(emptied.slice(0, 2)));
+		await closeTool('lpn_crit_close');
+
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.join('\n'));
 	} finally {
 		await browser.close();
