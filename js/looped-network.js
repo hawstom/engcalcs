@@ -45321,7 +45321,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			body.appendChild(h);
 			p = document.createElement('p');
 			p.style.margin = '0 0 6px';
-			p.textContent = pc.lpn_msx_report_kept || 'This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. This page does not run it.';
+			p.textContent = pc.lpn_msx_report_kept || 'This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.';
 			body.appendChild(p);
 			p = document.createElement('p');
 			p.style.margin = '0 0 6px';
@@ -45359,7 +45359,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			body.appendChild(ta);
 			ta = document.createElement('p');
 			ta.style.margin = '6px 0 0';
-			ta.textContent = pc.lpn_msx_report_kept || 'This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. This page does not run it.';
+			ta.textContent = pc.lpn_msx_report_kept || 'This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.';
 			body.appendChild(ta);
 		}, [
 			{ label: pc.lpn_msx_replace || 'Replace…', fn: function () { setTimeout(pickMsxFile, 0); } },
