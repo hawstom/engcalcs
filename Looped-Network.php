@@ -3308,6 +3308,7 @@ EngCalcs.pageConfig = {
 	lpn_scnres_not_converged: <?=json_encode($ec_lang['lpn_scnres_not_converged'])?>,
 	lpn_scnres_not_converged_note: <?=json_encode($ec_lang['lpn_scnres_not_converged_note'])?>,
 	lpn_scnres_failed: <?=json_encode($ec_lang['lpn_scnres_failed'])?>,
+	lpn_scnres_flow_tip: <?=json_encode($ec_lang['lpn_scnres_flow_tip'])?>,
 	lpn_scnres_stale: <?=json_encode($ec_lang['lpn_scnres_stale'])?>,
 	lpn_reports_menu: <?=json_encode($ec_lang['lpn_reports_menu'])?>,
 	lpn_reports_epanet: <?=json_encode($ec_lang['lpn_reports_epanet'])?>,

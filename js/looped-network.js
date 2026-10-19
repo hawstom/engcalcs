@@ -78985,6 +78985,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 							var one = got[e.id] = {};
 							qs.forEach(function (q) {
 								one[q[0]] = kind.group === 'node' ? colorNodeValue(e, q[0]) : colorLinkValue(e, q[0]);
+								// Flow is shown as a magnitude everywhere else; here it keeps the solver's sign,
+								// which is the only way to see a reversal between scenarios (Tom, 2026-10-19).
+								if (q[0] === 'flow' && kind.group === 'link' && typeof one[q[0]] === 'number' &&
+									lastSolveResult && lastSolveResult.flows && lastSolveResult.flows[e.id] < 0) {
+									one[q[0]] = -one[q[0]];
+								}
 							});
 						});
 					});
@@ -79006,7 +79012,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function scnResShown(v, group, q) {
 		var d = (labelSettings.decimals[group] || {})[q];
 		if (typeof v !== 'number' || !isFinite(v)) { return ''; }
-		return (typeof d === 'number' && d >= 0 && d <= 10) ? v.toFixed(d) : ffNum(v);
+		var txt = (typeof d === 'number' && d >= 0 && d <= 10) ? v.toFixed(d) : ffNum(v);
+		// A flow carries its solver sign in both directions, so a reversal reads as + against -.
+		return (q === 'flow' && group === 'link' && v > 0) ? '+' + txt : txt;
 	}
 	// **A SPREADSHEET GETS THE FULL NUMBER, NOT THE ROUNDED ONE.** A difference between two scenarios
 	// is the reason to paste this, and a pressure rounded to one decimal hides a 0.04 psi one. Ten
@@ -79104,7 +79112,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				return d ? dir * d : a.i - b.i;
 			});
 		}
-		body = ffTable(sec, t.heads, { state: scnResState.sort, by: function (col) {
+		var flowTip = pc.lpn_scnres_flow_tip ||
+			'The sign of a flow is the solver\'s internal direction sign: positive runs from the From node to the To node, negative the reverse. It has no use outside this table except to show whether a flow changed direction between scenarios.';
+		var hasFlow = t.kind.group === 'link' && t.cols.some(function (c) { return c.q === 'flow'; });
+		body = ffTable(sec, t.heads.map(function (h, i) {
+			return (hasFlow && i > 0 && t.cols[i - 1].q === 'flow') ? [h, flowTip] : h;
+		}), { state: scnResState.sort, by: function (col) {
 			scnResState.sort = { col: col, dir: scnResState.sort.col === col ? -scnResState.sort.dir : 1 };
 			rebuildScenarioCompareReport();
 		} });
@@ -79116,6 +79129,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ffCell(tr, x.r[0]);
 			t.cols.forEach(function (c, k) { ffCell(tr, scnResShown(x.r[k + 1], t.kind.group, c.q), 'lpn-ff-num'); });
 		});
+		if (hasFlow) { ffEl('p', 'lpn-ff-note', flowTip, sec); }
 		t.failed.forEach(function (r) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_scnres_failed || '{scenario} could not be solved, so its columns are blank. {why}')
 				.replace('{scenario}', scenarioDisplayName(r.scn)).replace('{why}', r.why || ''), sec);

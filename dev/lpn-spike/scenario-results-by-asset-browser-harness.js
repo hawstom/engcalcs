@@ -226,6 +226,8 @@ async function main() {
 		const full10 = pipeRow10.split('\t');
 		ok('a copied number is the full one, the box shows it rounded', full10.length === 4 && /^-?\d+(\.\d+)?$/.test(full10[1]) &&
 			full10[1].length > shown10[1].length && Math.abs(+full10[1] - +shown10[1]) < 1, full10.join(' | ') + '  vs  ' + shown10.join(' | '));
+		ok('the copied flows carry the minus sign of a reversed one', lines.slice(1).some((l) => /^[^\t]*\t-\d/.test(l)), lines.slice(1).map((l) => l.split('\t')[1]).join(' '));
+		ok('the table carries the sign note', (await page.evaluate(() => document.getElementById('lpn_scnres').textContent)).indexOf((await L('lpn_scnres_flow_tip')).slice(0, 30)) >= 0);
 		const dls = [];
 		page.on('download', (d) => dls.push(d));
 		await page.click('#lpn_scnres_csv');
@@ -271,11 +273,21 @@ async function main() {
 			await showPane('pipes');
 			const fp = await paneCells('pipes', 'flow');
 			const fc = colOf(views.pipes, F, s);
-			ok(s + ': every pipe flow equals the Tables pane', fc > 0 && views.pipes.rows.every((r) => r[fc] === fp[r[0]]),
+			ok(s + ': every pipe flow equals the Tables pane', fc > 0 && views.pipes.rows.every((r) => r[fc].replace(/^[+-]/, '') === fp[r[0]]),
 				views.pipes.rows.map((r) => r[0] + '=' + r[fc] + '/' + fp[r[0]]).slice(0, 3).join(' '));
+			ok(s + ': every pipe flow cell leads with + or -, or is a bare zero', views.pipes.rows.every((r) => /^[+-]/.test(r[fc]) || +r[fc] === 0), views.pipes.rows.map((r) => r[fc]).join(' '));
 			await showPane('pumps');
 			const hp = await paneCells('pumps', 'headloss');
 			ok(s + ': the pump head equals the Tables pane', views.pumps.rows[0][colOf(views.pumps, PH, s)] === hp['9'], JSON.stringify(views.pumps.rows) + ' ' + JSON.stringify(hp));
+		}
+		{
+			const fb = colOf(views.pipes, F, 'Base'), fm = colOf(views.pipes, F, 'Max day');
+			const flipped = views.pipes.rows.filter((r) => /^-/.test(r[fb]) !== /^-/.test(r[fm]));
+			ok('a pipe that reverses between scenarios shows opposite signs (Base vs Max day)',
+				flipped.length > 0 && flipped.every((r) => /^[+-]/.test(r[fb]) && /^[+-]/.test(r[fm])),
+				flipped.map((r) => r[0] + ': ' + r[fb] + ' / ' + r[fm]).join('; '));
+			ok('a positive flow is not shown as a magnitude only',
+				views.pipes.rows.some((r) => /^\+\d/.test(r[fb])) && views.pipes.rows.some((r) => /^-\d/.test(r[fb])));
 		}
 		const mx = colOf(views.junctions, P, 'Max day'), bs = colOf(views.junctions, P, 'Base');
 		ok('more demand is less pressure at every junction', views.junctions.rows.every((r) => +r[mx] < +r[bs]));
