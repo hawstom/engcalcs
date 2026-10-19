@@ -104,11 +104,6 @@ the block.
   The concept layer exists (`dev/term-concepts.md`, `concept_check.php`; glossary terms carry a
   concept id and a definition, and payloads send the definition as the source). Head and HGL stay
   split (Tom, 2026-09-30).
-- 100|741| **The infinite map: generated networks for the label bench.**
-  **ROUND 5 DONE 2026-09-30** on `feat/label-placer`: generator, L-Town and C-Town, pre-registered protocol, `dev/label-trials/round-5-2026-09-29.md`; the five rule proposals were answered by Tom; his answers are in `dev/label-placement-rules.md`.
-  Tom, 2026-09-28, on threats to validity: *"It's all Net3. Where's the infinite map?"* A generator of
-  networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
-  utility-scale networks. Notes: dev/paper-notes-label-placement.md.
 - 100|681| **Economize the label layout: it is half the cost of a project switch.**
   **PROMOTED TO 100 by Tom, 2026-10-14.** (c)/(d) and (b) shipped. **2026-10-15 merged (`perf/switch-cost`, `perf/cross-shed`):**
   a cold switch no longer lays the labels out twice, and the crossing shed counts pairs once (identical output,
@@ -175,7 +170,8 @@ the block.
 - 100|814| **Classify every import and export by its scenario awareness.**
   Comes before Task 752 goes on. Tom, 2026-10-17: *"We must get perfect clarity about our standard handling of scen/alt in imp/exp, then we must apply it to every imp/exp command."* His three classes: current scenario, current project, separate project. For each command: how aware the format is of scenarios and alternatives, and how well it fits this project; an import from a less aware format asks where it goes (current or new scenario/alternative, current or new project); an export to one asks to confirm exporting part of the project; an equally aware one discloses that it is an export, not a save or a sync. Maybe one standard questionnaire or wizard.
   Inventory and standard: `dev/import-export-scenarios.md`. **Tom's calls, 2026-10-18:** no confirmation when the project is only Base; an `.inp` or GeoJSON network may land in the open project (IDs matched, values updated); the open scenario is the default; the receipt is a dialog (*"a major event that deserves a major answer ... unless there are visible results like the opening of a new tab"*); no "sync" until a live link exists.
-- 100|752| **Spreadsheet data in and out, one scenario at a time, as a file.**
+- 5|752| **Spreadsheet data in and out, one scenario at a time, as a file.**
+  **PARKED by Tom, 2026-10-18.** Step 1 (results by scenario, copied to a spreadsheet) shipped; steps 2 and 3 wait for a real user with a meter sheet.
   **RESHAPED 2026-10-17 on market research** (Tom: *"Reshape Task 752 that way."*; evidence in
   `dev/agents/market-researcher/spreadsheet-sync.md`). Modellers move element data one way (demands
   from meter or billing sheets, curves, patterns) and reports out; nobody found round-trips a scenario
@@ -193,11 +189,6 @@ the block.
   Tom's pass of `feat/label-beside` (2026-10-17): no difference from master seen on Net3 or Novato; not one level label seen; the page reports no zoom factor, so "at 2x" cannot be followed; he could not reach the 600-junction network. Short pipes should also try the level spot.
   Tom's pass of round 2 (2026-10-18, step 3 of the port plan): *"I can confirm that pipe labels on master have hidden more than desirable ... I find no regressions, though it doesn't reach out and ask me to shout and dance for joy."* What he looks for: *"Node labels that go inline instead of stacked and pipe labels that go out on a leader inline or stacked"*, each form chosen by *"Whichever shows more"*: `feat/label-form`, built on `feat/label-beside`.
 - 75|809| **Finish the translation-clarification follow-ups at the next sprint.** The halo words were fixed with sprint 1017 (cs obrys, sw ukingo). Cadence, Tom 2026-10-17: no more than about once a week; sprint 1017 took 3 h 20 min and 10% of his weekly budget. Open: `prefix_terms.inc.php` lists now only wire sense-qualified terms; glossary `context` and `translation_notes_xx` are not folded into `definition`/`translation_notes`; no check fails a term reaching no key.
-- 75|810| **Bring the features list up to what the software does.** Tom, 2026-10-16: *"I prefer to let you edit based on my
-  messages/prompts."* Missing from `dev/features-source.md`: scenarios and alternatives, with Presentation and Calculation overrides
-  for saved view layouts; converting coordinate systems and units; import and export of everything itemized; time series graphs on
-  the map; fire flow, criticality and demand scaling analysis; the pump energy report; every kind of graph; the extended libraries
-  (EPANET's plus pipe types and fittings). Public claims: `dev/positioning.md` rules; then librewaternet.org's build-features.php.
 - 75|539| **Gang the neighbour labels so their leaders stop crossing.**
   **DEMOTED TO 75 by Tom, 2026-10-11.**
   **PORTING THE BENCH TO MASTER, 2026-10-07** (Tom agreed D09: rules 1-3 as three defect branches;
