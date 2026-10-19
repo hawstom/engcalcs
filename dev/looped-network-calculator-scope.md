@@ -88,7 +88,8 @@ with a new reason, not an appeal to completeness.
   every tank **and every link touching one**, so a municipal model arrived missing whole branches.
   EPA's own Net1, Net2 and Net3 all have tanks.
 - ~~**Water quality.**~~ **SHIPPED through the EPANET engine**: water age, source trace, and one
-  reacting chemical (`lpn_notes_2_def`). **Multi-species (EPANET-MSX) stays cut.**
+  reacting chemical (`lpn_notes_2_def`), and multi-species EPANET-MSX from an attached `.msx`
+  (Task 717; `dev/msx-scope.md`).
 - ~~**Active pressure controls — PRV / PSV / FCV.**~~ **REOPENED AND SHIPPED, 2026-08-14 (ROADMAP
   Task 248 phase 2)** — the second entry ever to leave this list, and it left it in a way the
   original entry did not anticipate. The reason for the cut still stands word for word: *their

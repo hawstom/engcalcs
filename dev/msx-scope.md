@@ -117,6 +117,20 @@ ID absent from the network. Cost: one picker, one project field and migration, o
 branch, 3 to 5 English strings, one harness (round trip byte-identical, Net1 plus a stock MSX
 example). This alone retires rows 2 to 4 as a silent gap and sets up Phase 2.
 
+**Phase 2, BUILT on `feat/msx` (2026-10-18).** Attaching an `.msx` sets Quality to Multi-species
+(EPANET-MSX); an extended-period run then saves the hydraulics and runs every species through
+`msxOpen`/`msxInit`/`msxStep` on a copy of the file. Results per node and link, per species, per
+reporting time, in the units the file declares (bulk mass/L, wall mass/AREA_UNITS, as EPANET-MSX's
+own report heads them). A Species row under Settings, Calculation, Quality chooses which one the
+map, the Tables pane and the Graph show, with no new run. A wall species has no node value.
+Validation: `dev/lpn-spike/msx-run-harness.js` (Net1 one-species decay against EPANET's chemical
+run, worst 0.0057 mg/L over 275 values; EPA's arsenic example against its published `.rpt`, worst
+0.0054 over 250 values) and `msx-attach-browser-harness.js`. An `.msx` the engine refuses (an
+unknown ID, a syntax error) refuses the run, and EPANET-MSX's own error line is in the run report.
+Not built: a structured editor for species and reactions; per-species choice inside the colour,
+Tables and Graph controls themselves.
+
+The original Phase 2 estimate, kept for the record:
 **Phase 2, run it through the vendored WASM (about 2 to 3 weeks, its own branch).** The engine is
 already present, so the work is ours: an MSX transport next to `lpn_toolbar_run` (hydraulics via
 the existing EPANET path, then `msxUseHydFile`/`msxSolveQ`), a results model keyed
