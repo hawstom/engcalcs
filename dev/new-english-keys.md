@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**29 still to read on master**, of 36 untranslated keys, of 3055 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**48 still to read on master**, of 56 untranslated keys, of 3075 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (36, 29 to read @@ NEEDS RULING)
+## lpn_  (56, 48 to read @@ NEEDS RULING)
 
 - **`lpn_diag_gpv_curve_order`**
   > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
@@ -58,6 +58,18 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_export_leaves_alternatives`**
   > The alternatives stored in this project are not in the file.
   _Ruled 2026-10-18: GeoJSON alternatives string is approved._
+- **`lpn_file_export_item_msx`**
+  > EPANET-MSX file…
+  @@ NEEDS RULING
+- **`lpn_file_export_msx_tip`**
+  > Download the attached EPANET-MSX file exactly as it was imported.
+  @@ NEEDS RULING
+- **`lpn_file_import_msx`**
+  > EPANET-MSX file…
+  @@ NEEDS RULING
+- **`lpn_file_import_msx_tip`**
+  > Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.
+  @@ NEEDS RULING
 - **`lpn_geojson_results_other`**
   > No results are included, because the results on screen belong to the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
@@ -70,9 +82,57 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_guide_cmp_byasset_term`**
   > Results by asset
   @@ NEEDS RULING
+- **`lpn_msx_attached_heading`**
+  > Attached EPANET-MSX file: {file}
+  @@ NEEDS RULING
+- **`lpn_msx_not_msx`**
+  > {file} does not look like an EPANET-MSX file: it has no [SPECIES] section.
+  @@ NEEDS RULING
+- **`lpn_msx_remove`**
+  > Remove
+  @@ NEEDS RULING
+- **`lpn_msx_removed`**
+  > Removed {file} from this project.
+  @@ NEEDS RULING
+- **`lpn_msx_replace`**
+  > Replace…
+  @@ NEEDS RULING
+- **`lpn_msx_report_heading`**
+  > Attached {file}
+  @@ NEEDS RULING
+- **`lpn_msx_report_kept`**
+  > This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.
+  @@ NEEDS RULING
+- **`lpn_msx_report_missing`**
+  > IDs in the file that this network does not have: {ids}.
+  @@ NEEDS RULING
+- **`lpn_msx_report_no_species`**
+  > No species are listed in the file.
+  _Ruled 2026-10-18: "No species are listed in the file.": Approved._
+- **`lpn_msx_report_species`**
+  > Species in the file: {list}.
+  @@ NEEDS RULING
+- **`lpn_msx_too_big`**
+  > {file} is too large to keep in browser storage, so it was not attached.
+  @@ NEEDS RULING
 - **`lpn_pane_pasted_scenario`**
   > These values are overrides in the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
+- **`lpn_quality_msx`**
+  > Multi-species (EPANET-MSX)
+  @@ NEEDS RULING
+- **`lpn_quality_msx_none`**
+  > No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.
+  @@ NEEDS RULING
+- **`lpn_quality_msx_species`**
+  > Species
+  @@ NEEDS RULING
+- **`lpn_quality_msx_species_tip`**
+  > The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.
+  @@ NEEDS RULING
+- **`lpn_result_msx_tip`**
+  > The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.
+  @@ NEEDS RULING
 - **`lpn_roughness_method_note`**
   > ⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.
   _Ruled 2026-10-18: I agree._
@@ -144,7 +204,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**70 still to read**, of 74 new keys across 8 unmerged branch(es).
+**55 still to read**, of 59 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -155,7 +215,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/batch-1018d (`b716a3956`) — adds no English strings
+### chore/roadmap-1018 (`23cec294a`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -163,53 +223,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-form (`d05fdb069`) — adds no English strings
 
-### feat/msx (`8b083e9d7`) — 15 new, 15 to read @@ NEEDS RULING
-
-- **`lpn_file_export_item_msx`**
-  > EPANET-MSX file…
-  @@ NEEDS RULING
-- **`lpn_file_export_msx_tip`**
-  > Download the attached EPANET-MSX file exactly as it was imported.
-  @@ NEEDS RULING
-- **`lpn_file_import_msx`**
-  > EPANET-MSX file…
-  @@ NEEDS RULING
-- **`lpn_file_import_msx_tip`**
-  > Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project and written back unchanged. It is not run.
-  @@ NEEDS RULING
-- **`lpn_msx_attached_heading`**
-  > Attached EPANET-MSX file: {file}
-  @@ NEEDS RULING
-- **`lpn_msx_not_msx`**
-  > {file} does not look like an EPANET-MSX file: it has no [SPECIES] section.
-  @@ NEEDS RULING
-- **`lpn_msx_remove`**
-  > Remove
-  @@ NEEDS RULING
-- **`lpn_msx_removed`**
-  > Removed {file} from this project.
-  @@ NEEDS RULING
-- **`lpn_msx_replace`**
-  > Replace…
-  @@ NEEDS RULING
-- **`lpn_msx_report_heading`**
-  > Attached {file}
-  @@ NEEDS RULING
-- **`lpn_msx_report_kept`**
-  > This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. This page does not run it.
-  @@ NEEDS RULING
-- **`lpn_msx_report_missing`**
-  > IDs in the file that this network does not have: {ids}.
-  @@ NEEDS RULING
-- **`lpn_msx_report_no_species`**
-  > No species are listed in the file.
-  @@ NEEDS RULING
-- **`lpn_msx_report_species`**
-  > Species in the file: {list}.
-  @@ NEEDS RULING
-- **`lpn_msx_too_big`**
-  > {file} is too large to keep in browser storage, so it was not attached.
-  @@ NEEDS RULING
+### feat/msx (`04faa760a`) — adds no English strings
 
 ### feat/sqlite-reader (`9470877a6`) — 49 new, 49 to read @@ NEEDS RULING
 
@@ -393,5 +407,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_theme_space`**
   > Space
   @@ NEEDS RULING
-
-### fix/settings-map-layout (`b416d8393`) — already merged into chore/batch-1018d; its strings are listed there
