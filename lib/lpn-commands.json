@@ -30,6 +30,11 @@
      "parent": "Import…"
     },
     {
+     "id": "file/file_import_menu/file_import_msx",
+     "label": "EPANET-MSX file…",
+     "parent": "Import…"
+    },
+    {
      "id": "file/file_import_menu/file_import_gjnet",
      "label": "GeoJSON network…",
      "parent": "Import…"
@@ -67,6 +72,11 @@
     {
      "id": "file/file_export_menu/file_export_item_geojson",
      "label": "GeoJSON file…",
+     "parent": "Export…"
+    },
+    {
+     "id": "file/file_export_menu/file_export_item_msx",
+     "label": "EPANET-MSX file…",
      "parent": "Export…"
     },
     {

@@ -1269,13 +1269,11 @@
 		//   - TCV        a throttle: a minor loss on a zero-length link, so it solves in either
 		//                engine (EngCalcs.lpnLinkK).
 		//   - PRV/PSV/FCV  active controls whose open/active/closed state comes out of the solve.
-		//                Imported in full and solved by the EPANET engine, to which the page routes
-		//                automatically. Reported anyway -- a file that arrives needing a different
-		//                engine has changed for the reader, even though nothing was lost.
-		//   - PBV/GPV    still substituted with an open pipe. A GPV's whole behaviour lives in a
-		//                head-loss CURVE and a PBV's in a fixed pressure drop; this page has no
-		//                element for either, and inventing one from a curve id we do not store
-		//                would be the silent-substitution failure this module exists to avoid.
+		//                Imported in full and solved in either engine since Task 733. Filtered out of
+		//                the loss report (LPN_INP_NOT_A_LOSS) because nothing was lost.
+		//   - PBV/GPV    imported as valves of their own type (Task 248, below): a PBV with its
+		//                pressure drop, a GPV with its head-loss curve. Either engine since Task 733
+		//                phase 2.
 		//
 		// SETTING UNITS DIFFER BY TYPE and are fixed by the file's own flow-unit keyword, exactly
 		// as on the writing side (js/lpn-epanet.js): a PRV/PSV setting is a PRESSURE (psi in a US
@@ -1911,6 +1909,12 @@
 	 */
 	EngCalcs.lpnQualityText = function (q) {
 		var mode = (q && q.mode) || 'none', src = q && q.src, was;
+		// **EPANET-MSX (Task 717) LEAVES THE `.inp`'S OWN QUALITY LINE ALONE** (Tom, 2026-10-18):
+		// the solve turns EPANET's quality off in its copy, so the file still states the analysis
+		// that was chosen before Multi-species (`before`), in its own characters where untouched.
+		if (mode === 'msx') {
+			return EngCalcs.lpnQualityText(Object.assign({}, q, { mode: q.before || 'none' }));
+		}
 		if (src !== undefined && src !== null && src !== '') {
 			was = EngCalcs.lpnQualityParse(src);
 			// **A CHEMICAL NOW HAS THE SAME "STILL MATCHES THE TOKEN?" TEST A TRACE NODE ALREADY

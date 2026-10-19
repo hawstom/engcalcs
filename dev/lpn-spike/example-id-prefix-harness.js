@@ -30,13 +30,13 @@ function ok(name, cond, extra) {
 }
 
 const files = fs.readdirSync(ROOT + 'examples').filter(function (f) { return /\.lwn$/.test(f); });
-ok('the examples folder holds the nine shipped examples', files.length === 9, files.length);
+ok('the examples folder holds the eleven shipped examples', files.length === 11, files.length);
 
 // What each example's ID labels must say: '' where the IDs already carry a prefix. Elm Street's
 // links are bare numbers, so its link labels keep L.
 const EXPECT = {
 	'Basic-example-US-units.lwn': ['', ''], 'Basic-example-SI-units.lwn': ['', ''],
-	'Elm-Street-Center.lwn': ['', 'L']
+	'Elm-Street-Center.lwn': ['', 'L'], 'Valves.lwn': ['', '']
 };
 files.forEach(function (f) {
 	const want = EXPECT[f] || ['N', 'L'];

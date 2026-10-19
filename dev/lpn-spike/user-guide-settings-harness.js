@@ -27,7 +27,7 @@ U.takeBrowserLock(NAME, 'EC_UGSET_LOCKED');
 const QUOTES = {
 	lpn_guide_text_settings_box: ['lpn_menu_project', 'lpn_tool_settings', 'calc_defaults', 'lpn_settings_wipe_btn', 'lpn_settings_search'],
 	lpn_guide_set_where_def: ['lpn_settings_sec_symbology', 'lpn_labels_heading_node', 'lpn_settings_sym_node_colors', 'lpn_labels_heading_link', 'lpn_settings_sym_link_colors',
-		'lpn_settings_sym_customer', 'lpn_settings_sym_all', 'lpn_settings_sec_map', 'lpn_settings_map_display', 'lpn_settings_page', 'lpn_settings_sec_assets',
+		'lpn_settings_sym_customer', 'lpn_settings_sym_all', 'lpn_menu_map', 'lpn_settings_page', 'lpn_settings_sec_assets',
 		'lpn_settings_id_prefixes', 'lpn_settings_defaults', 'lpn_settings_custom_props', 'lpn_settings_sec_calculation', 'lpn_view_units', 'lpn_time_menu',
 		'lpn_settings_hydraulics', 'lpn_settings_energy', 'lpn_settings_quality', 'lpn_settings_color_credits', 'lpn_saved_project', 'lpn_saved_browser',
 		'lpn_settings_runbox', 'lpn_tool_settings', 'lpn_settings_table_category', 'lpn_find_value'],
@@ -42,7 +42,8 @@ const TERMS = ['lpn_guide_set_where_term', 'lpn_guide_set_search_term', 'lpn_gui
 // The box's own order, by language key: [section, [sub-headings]].
 const STRUCTURE = [
 	['lpn_settings_sec_symbology', ['lpn_labels_heading_node', 'lpn_settings_sym_node_colors', 'lpn_labels_heading_link', 'lpn_settings_sym_link_colors', 'lpn_settings_sym_customer', 'lpn_settings_sym_all']],
-	['lpn_settings_sec_map', ['lpn_settings_map_display', 'lpn_settings_page']],
+	['lpn_menu_map', ['lpn_menu_map']],
+	['lpn_settings_page', ['lpn_settings_page']],
 	['lpn_settings_sec_assets', ['lpn_settings_id_prefixes', 'lpn_settings_defaults', 'lpn_settings_custom_props']],
 	['lpn_settings_sec_calculation', ['lpn_view_units', 'lpn_time_menu', 'lpn_settings_hydraulics', 'lpn_settings_energy', 'lpn_settings_quality']],
 	['lpn_settings_color_credits', []]

@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='Z tohoto výpočtu vynecháno, protože z nich nev
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='Stahuje se řešič EPANET. Stáhne se jednou a poté se uloží v tomto zařízení, takže poté funguje offline.';
 $ec_lang['lpn_engine_ready']='Řešič EPANET je nyní v tomto zařízení a funguje offline.';
-$ec_lang['lpn_engine_fetching_valve']='Stahuje se řešič EPANET, aby bylo možné tento ventil řešit nyní a později offline.';
-$ec_lang['lpn_engine_ready_valve']='Řešič EPANET je nyní uložen v tomto zařízení. Ventily rušící tlak a obecné ventily (PBV, GPV) lze nyní řešit offline.';
 $ec_lang['lpn_engine_unavailable']='Řešič EPANET, který je nutný k řešení ventilů rušících tlak a obecných ventilů (PBV, GPV), se nepodařilo stáhnout. Po jednom připojení k internetu se řešič uloží v tomto zařízení.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='Řešič načten z {percent} %.';
 $ec_lang['lpn_engine_wait_bytes']='Řešič doposud načten {kb} KB. Celková velikost není známa, proto nelze určit procento dokončení.';
 $ec_lang['lpn_engine_needed_failed']='Řešič EPANET zatím nebyl načten, nelze jej načíst a tuto síť lze řešit pouze jím. Načte se, jakmile budete připojeni k internetu.';
 $ec_lang['lpn_engine_needed_failed_why']='Tuto síť lze řešit pouze řešičem EPANET. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='Jde o ventily rušící tlak nebo obecné ventily a počítat je umí pouze řešič EPANET. Řešič EPANET se nepodařilo načíst, proto tyto výsledky chybí:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='Tyto ventily jsou připojeny přímo ke zdroji nebo nádrži, které v tomto uzlu určují hydraulickou výšku, takže ventil nemá co regulovat. Vložte mezi ventil a zdroj nebo nádrž krátké potrubí:';
 $ec_lang['lpn_diag_not_converged']='Nebylo nalezeno žádné řešení. Zkontrolujte, zda nejsou zadány fyzikálně nemožné hodnoty, například nulový průměr.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} Místo něj se zobrazuje vestavěný
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='Vyřešeno pomocí řešiče EPANET kvůli těmto ventilům rušícím tlak a obecným ventilům:';
 $ec_lang['lpn_unit_unknown']='Tento výkres uvádí jednotku, kterou tato stránka nepodporuje: {unit}. Všechny hodnoty jsou zachovány a zobrazeny přesně tak, jak byly importovány, a nic nebylo změněno. Nic nelze vypočítat, dokud jednotka není podporována, protože její převodní činitel není znám.';
 $ec_lang['lpn_engine_manning_note']='Poznámka: u drsnosti podle Manninga EPANET zaokrouhluje konstantu v Manningově rovnici, takže ztráta tlakové výšky je asi o 0,6 % nižší než v přesném tvaru.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
@@ -3690,7 +3686,6 @@ $ec_lang['lpn_basemap_style_normal']='Normální';
 $ec_lang['lpn_basemap_style_muted']='Tlumený';
 $ec_lang['lpn_basemap_style_faded']='Vybledlý';
 $ec_lang['lpn_basemap_style_grayscale']='Odstíny šedi';
-$ec_lang['lpn_settings_map_display']='Vzhled';
 // PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
 // to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
 // LPN_MAP_MIN in js/looped-network.js). Nothing renders these two keys now, so key_hygiene_check
@@ -3857,7 +3852,6 @@ $ec_lang['lpn_time_settings_open']='Nastavení času';
 // "Hydraulics" is EPANET's own name for the friction-method/accuracy/engine group, which also
 // leaves room for its siblings (Quality, Reactions) as they arrive.
 $ec_lang['lpn_settings_sec_symbology']='Vizualizace';
-$ec_lang['lpn_settings_sec_map']='Mapa a stránka';
 $ec_lang['lpn_settings_sec_assets']='Prvky';
 $ec_lang['lpn_settings_sec_calculation']='Výpočet';
 // ROADMAP Task 247. A customer label's CONTENT is the node rows above it (Tom: "Customer labels

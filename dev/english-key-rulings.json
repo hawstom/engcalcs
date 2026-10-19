@@ -7552,6 +7552,11 @@
             "on": "The alternatives stored in this project are not in the file.",
             "ruled": "2026-10-18",
             "answer": "GeoJSON alternatives string is approved."
+        },
+        "lpn_msx_report_no_species": {
+            "on": "No species are listed in the file.",
+            "ruled": "2026-10-18",
+            "answer": "\"No species are listed in the file.\": Approved."
         }
     }
 }

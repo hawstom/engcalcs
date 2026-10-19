@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 3032,
-        "delta_key_count": 29,
-        "english_changed_key_count": 22,
+        "expected_key_count": 3075,
+        "delta_key_count": 87,
+        "english_changed_key_count": 31,
         "exempt_key_count": 24,
         "exempt_keys": [
             "calc_units_us",
@@ -56,19 +56,74 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: 流量\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: 流速\n- flow used, taken, or consumed\n    English: demand\n    Your language: 需水量\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: 压力\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: 节点\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: 水库\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: 节点\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: 默认\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: 水箱\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: 阀门\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: 自有数值\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: 形状\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: 流量\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: 流速\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: 水头\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: 水头损失\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: 局部水头损失\n- flow used, taken, or consumed\n    English: demand\n    Your language: 需水量\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: 压力\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: 节点\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: 水库\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: 节点\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: 默认\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- solver or the part that works out the answer\n    English: solver\n    Your language: 求解器\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: 水箱\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: 阀门\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: 自有数值\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: 用户\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: 形状\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
+        "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
+        "lpn_guide_cmp_byasset_term": "Results by asset",
+        "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box.<\/p>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
         "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_ex_net1_scn_title": "EPANET Net1 with scenarios, gpm (US)",
+        "lpn_ex_net1_scn_desc": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.",
+        "lpn_ex_valves_title": "Valve types, gpm (US)",
+        "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_file_import_inp": "EPANET file…",
+        "lpn_file_import_inp_tip": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_file_import_msx": "EPANET-MSX file…",
+        "lpn_file_import_msx_tip": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.",
+        "lpn_file_export_item_msx": "EPANET-MSX file…",
+        "lpn_file_export_msx_tip": "Download the attached EPANET-MSX file exactly as it was imported.",
+        "lpn_msx_report_heading": "Attached {file}",
+        "lpn_msx_report_kept": "This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.",
+        "lpn_msx_report_species": "Species in the file: {list}.",
+        "lpn_msx_report_no_species": "No species are listed in the file.",
+        "lpn_msx_too_big": "{file} is too large to keep in browser storage, so it was not attached.",
+        "lpn_msx_report_missing": "IDs in the file that this network does not have: {ids}.",
+        "lpn_msx_not_msx": "{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.",
+        "lpn_msx_attached_heading": "Attached EPANET-MSX file: {file}",
+        "lpn_msx_replace": "Replace…",
+        "lpn_msx_remove": "Remove",
+        "lpn_msx_removed": "Removed {file} from this project.",
+        "lpn_quality_msx": "Multi-species (EPANET-MSX)",
+        "lpn_quality_msx_species": "Species",
+        "lpn_quality_msx_species_tip": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.",
+        "lpn_quality_msx_none": "No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.",
+        "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+        "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
         "lpn_notes_2_def": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
         "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
+        "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.",
+        "lpn_engine_unavailable_why": "This network cannot be solved without the EPANET solver. {reason}",
+        "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Clear it to hide the text with the other labels once the view is wider than the labeling threshold set under Map.",
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+        "lpn_settings_grp_size": "Size",
+        "lpn_settings_grp_angle": "Angle",
+        "lpn_settings_grp_zoom": "Zoom",
+        "lpn_settings_grp_positions": "Positions",
+        "lpn_settings_grp_show": "Show",
+        "lpn_settings_grp_thematic": "Thematic",
+        "lpn_scncmp_menu_tip": "Table of scenarios with count of overrides, lowest pressure, and highest velocity, and a table of results by asset that copies to a spreadsheet",
+        "lpn_scncmp_progress": "Solving scenario {done} of {total}…",
+        "lpn_scncmp_stopped": "Stopped after {done} of {total} scenarios. The results below are the ones already finished.",
+        "lpn_scnres_title": "Results by asset",
+        "lpn_scnres_col": "{quantity} ({unit}), {scenario}",
+        "lpn_scnres_none": "Check at least one result to show.",
+        "lpn_scnres_empty": "This project has none of these assets.",
+        "lpn_scnres_copy_tip": "Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.",
+        "lpn_scnres_time_note": "A scenario with a total run time is read at the time step on screen, {time}, or at its last time step if its run ends sooner. Each heading shows the time read.",
+        "lpn_scnres_at_time": "({time})",
+        "lpn_scnres_steady": "(steady state)",
+        "lpn_scnres_not_converged": "(not converged)",
+        "lpn_scnres_not_converged_note": "A column marked {mark} shows the last results the solver reached before it stopped without converging.",
+        "lpn_scnres_failed": "{scenario} could not be solved, so its columns are blank. {why}",
+        "lpn_scnres_stale": "Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.",
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
         "lpn_library_import": "Libraries…",
         "lpn_ff_minpressure": "Lowest system pressure allowed",
@@ -81,6 +136,9 @@
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
         "lpn_file_import_dxf": "DXF shapes…",
         "lpn_file_import_shp": "Shapefile shapes…",
+        "lpn_diag_valve_conflict": "These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:",
+        "lpn_diag_gpv_curve_order": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:",
+        "lpn_gpv_one_point_note": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}",
         "lpn_export_holds_scenario": "It holds the scenario {scenario} only.",
         "lpn_export_holds_base": "It holds the Base scenario only.",
         "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
@@ -90,16 +148,71 @@
     },
     "keys": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
+        "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
+        "lpn_guide_cmp_byasset_term": "Results by asset",
+        "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box.<\/p>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
         "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_ex_net1_scn_title": "EPANET Net1 with scenarios, gpm (US)",
+        "lpn_ex_net1_scn_desc": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.",
+        "lpn_ex_valves_title": "Valve types, gpm (US)",
+        "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_file_import_inp": "EPANET file…",
+        "lpn_file_import_inp_tip": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_file_import_msx": "EPANET-MSX file…",
+        "lpn_file_import_msx_tip": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.",
+        "lpn_file_export_item_msx": "EPANET-MSX file…",
+        "lpn_file_export_msx_tip": "Download the attached EPANET-MSX file exactly as it was imported.",
+        "lpn_msx_report_heading": "Attached {file}",
+        "lpn_msx_report_kept": "This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.",
+        "lpn_msx_report_species": "Species in the file: {list}.",
+        "lpn_msx_report_no_species": "No species are listed in the file.",
+        "lpn_msx_too_big": "{file} is too large to keep in browser storage, so it was not attached.",
+        "lpn_msx_report_missing": "IDs in the file that this network does not have: {ids}.",
+        "lpn_msx_not_msx": "{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.",
+        "lpn_msx_attached_heading": "Attached EPANET-MSX file: {file}",
+        "lpn_msx_replace": "Replace…",
+        "lpn_msx_remove": "Remove",
+        "lpn_msx_removed": "Removed {file} from this project.",
+        "lpn_quality_msx": "Multi-species (EPANET-MSX)",
+        "lpn_quality_msx_species": "Species",
+        "lpn_quality_msx_species_tip": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.",
+        "lpn_quality_msx_none": "No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.",
+        "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+        "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
         "lpn_notes_2_def": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
         "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
+        "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.",
+        "lpn_engine_unavailable_why": "This network cannot be solved without the EPANET solver. {reason}",
+        "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Clear it to hide the text with the other labels once the view is wider than the labeling threshold set under Map.",
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+        "lpn_settings_grp_size": "Size",
+        "lpn_settings_grp_angle": "Angle",
+        "lpn_settings_grp_zoom": "Zoom",
+        "lpn_settings_grp_positions": "Positions",
+        "lpn_settings_grp_show": "Show",
+        "lpn_settings_grp_thematic": "Thematic",
+        "lpn_scncmp_menu_tip": "Table of scenarios with count of overrides, lowest pressure, and highest velocity, and a table of results by asset that copies to a spreadsheet",
+        "lpn_scncmp_progress": "Solving scenario {done} of {total}…",
+        "lpn_scncmp_stopped": "Stopped after {done} of {total} scenarios. The results below are the ones already finished.",
+        "lpn_scnres_title": "Results by asset",
+        "lpn_scnres_col": "{quantity} ({unit}), {scenario}",
+        "lpn_scnres_none": "Check at least one result to show.",
+        "lpn_scnres_empty": "This project has none of these assets.",
+        "lpn_scnres_copy_tip": "Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.",
+        "lpn_scnres_time_note": "A scenario with a total run time is read at the time step on screen, {time}, or at its last time step if its run ends sooner. Each heading shows the time read.",
+        "lpn_scnres_at_time": "({time})",
+        "lpn_scnres_steady": "(steady state)",
+        "lpn_scnres_not_converged": "(not converged)",
+        "lpn_scnres_not_converged_note": "A column marked {mark} shows the last results the solver reached before it stopped without converging.",
+        "lpn_scnres_failed": "{scenario} could not be solved, so its columns are blank. {why}",
+        "lpn_scnres_stale": "Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.",
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
         "lpn_library_import": "Libraries…",
         "lpn_ff_minpressure": "Lowest system pressure allowed",
@@ -112,6 +225,9 @@
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
         "lpn_file_import_dxf": "DXF shapes…",
         "lpn_file_import_shp": "Shapefile shapes…",
+        "lpn_diag_valve_conflict": "These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:",
+        "lpn_diag_gpv_curve_order": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:",
+        "lpn_gpv_one_point_note": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}",
         "lpn_export_holds_scenario": "It holds the scenario {scenario} only.",
         "lpn_export_holds_base": "It holds the Base scenario only.",
         "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
@@ -136,6 +252,54 @@
                 }
             }
         },
+        "lpn_guide_scn_marks_def": {
+            "reason": "english_changed",
+            "current_value": "<p>在地图上，在打开的方案中有覆盖值的元件以琥珀色圆环标出；从父方案或备选方案继承了覆盖值的元件，以灰色虚线圆环标出。对于需水量、管径、糙率、局部（次要）损失系数和长度，只有当“设置”、“可视化”、“节点标签”或“管道标签”在地图上显示该数值时才出现圆环；任何其他属性的覆盖值始终有圆环。在“表格”中，由打开的方案设定的数值，其单元格呈琥珀色，提示会指出保存它的备选方案，例如“物理备选：Larger main”。表格单元格菜单中的“显示方案”会对每个方案各列出一次每个元件。<\/p><p>“属性”中方案可以覆盖的每一行，左侧都有一个标记。实心圆点表示打开的方案覆盖了该数值；点击它可清除该覆盖值。空心圆点表示该数值是继承来的；点击它可将所显示的数值设为覆盖值。三角形表示位于其下的方案覆盖了该数值；点击它并经确认后，可清除这些覆盖值。被覆盖的行下方会显示它所替换的继承值，例如“基础情景：18”。“设置”框中只有实心圆点和三角形，因为在那里键入数值就会形成覆盖值。<\/p><p>要隐藏圆环，请清除“设置”、“地图与页面”、“页面”中的“在地图上显示覆盖值标记”，或选择“地图”、“清洁地图”。这两项都保存在本浏览器中，而不是项目中。无论哪种情况，“表格”都会标出覆盖值。<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_scn_marks_term",
+                    "value": "覆盖值在何处显示",
+                    "english": "Where overrides show"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_scn_make_term",
+                    "value": "创建和清除覆盖值",
+                    "english": "Making and clearing overrides"
+                }
+            }
+        },
+        "lpn_guide_cmp_byasset_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_cmp_run_def",
+                    "value": "<p>总运行时长大于 0 的方案，通过 EPANET 引擎在整个时段内运行。其最低压力和最高流速是所有时间步中的极值，每个值都附有其时刻。总运行时长为 0 的方案，则在某一时刻求解。总运行时长是方案可以覆盖的选项之一，因此同一张表可以同时包含这两种方案。<\/p>",
+                    "english": "<p>A scenario with a Total run time greater than 0 is run over the whole period through the EPANET engine. Its lowest pressure and highest velocity are the extremes over every time step, each shown with its time. A scenario with a Total run time of 0 is solved at one instant. The total run time is one of the options a scenario can override, so one table can hold both kinds.<\/p>"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_cmp_notes_term",
+                    "value": "注意事项",
+                    "english": "Points to note"
+                }
+            }
+        },
+        "lpn_guide_cmp_byasset_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_cmp_run_def",
+                    "value": "<p>总运行时长大于 0 的方案，通过 EPANET 引擎在整个时段内运行。其最低压力和最高流速是所有时间步中的极值，每个值都附有其时刻。总运行时长为 0 的方案，则在某一时刻求解。总运行时长是方案可以覆盖的选项之一，因此同一张表可以同时包含这两种方案。<\/p>",
+                    "english": "<p>A scenario with a Total run time greater than 0 is run over the whole period through the EPANET engine. Its lowest pressure and highest velocity are the extremes over every time step, each shown with its time. A scenario with a Total run time of 0 is solved at one instant. The total run time is one of the options a scenario can override, so one table can hold both kinds.<\/p>"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_cmp_notes_term",
+                    "value": "注意事项",
+                    "english": "Points to note"
+                }
+            }
+        },
         "lpn_guide_lib_import_def": {
             "reason": "english_changed",
             "current_value": "<p>“文件”、“导入…”、“导入库…”会打开另一个项目文件，并将其中整个库复制到本项目。名称在此处已被使用的项会被跳过并列出，因此此处已有的内容不会改变。当文件与项目用不同的单位表示同一个量时，会显示警告，而各项仍按原样导入。引用了本项目所没有的管件清单的管道类型会被列出；请从同一文件导入管件库来解决。<\/p>",
@@ -149,6 +313,22 @@
                     "key": "lpn_guide_lib_example_term",
                     "value": "Net1 上的示例",
                     "english": "Example on Net1"
+                }
+            }
+        },
+        "lpn_guide_set_where_def": {
+            "reason": "english_changed",
+            "current_value": "<p>该框左侧的列表可跳转到某个分区或小标题。各分区为：可视化（节点标签、节点颜色、管道标签、管道颜色、用户和全部）、地图与页面（外观和页面）、元件（ID 前缀、数值和自定义属性）、计算（单位、时间、水力计算、能耗和水质）以及致谢。每个小标题都说明其设置是“随项目保存”还是“保存在本浏览器中”。除“页面”下的设置和“水力计算”中的一行“显示运行进度框”（该行自己注明保存在本浏览器中）外，一切都随项目保存。<\/p><p>“表格”中的“设置”选项卡将同样的设置列为行，带有“类别”和“数值”，因此在那里也可以查找和核对某项设置。<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_set_where_term",
+                    "value": "分区，以及设置保存在何处",
+                    "english": "Sections, and where settings are saved"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_set_search_term",
+                    "value": "搜索",
+                    "english": "Searching"
                 }
             }
         },
@@ -200,6 +380,70 @@
                 }
             }
         },
+        "lpn_ex_net1_scn_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net1_si_desc",
+                    "value": "流量单位为升每秒，长度单位为米和毫米。这是一个虚构的 EPANET 示例，由加仑每分钟、英尺和英寸换算而来，含氯、1 个水库、1 个水箱、1 台水泵和两条基于规则的控制。",
+                    "english": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_net2_si_title",
+                    "value": "EPANET Net2，升\/秒（公制）",
+                    "english": "EPANET Net2, L\/s (SI)"
+                }
+            }
+        },
+        "lpn_ex_net1_scn_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net1_si_desc",
+                    "value": "流量单位为升每秒，长度单位为米和毫米。这是一个虚构的 EPANET 示例，由加仑每分钟、英尺和英寸换算而来，含氯、1 个水库、1 个水箱、1 台水泵和两条基于规则的控制。",
+                    "english": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_net2_si_title",
+                    "value": "EPANET Net2，升\/秒（公制）",
+                    "english": "EPANET Net2, L\/s (SI)"
+                }
+            }
+        },
+        "lpn_ex_valves_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net1_si_desc",
+                    "value": "流量单位为升每秒，长度单位为米和毫米。这是一个虚构的 EPANET 示例，由加仑每分钟、英尺和英寸换算而来，含氯、1 个水库、1 个水箱、1 台水泵和两条基于规则的控制。",
+                    "english": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_net2_si_title",
+                    "value": "EPANET Net2，升\/秒（公制）",
+                    "english": "EPANET Net2, L\/s (SI)"
+                }
+            }
+        },
+        "lpn_ex_valves_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net1_si_desc",
+                    "value": "流量单位为升每秒，长度单位为米和毫米。这是一个虚构的 EPANET 示例，由加仑每分钟、英尺和英寸换算而来，含氯、1 个水库、1 个水箱、1 台水泵和两条基于规则的控制。",
+                    "english": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_net2_si_title",
+                    "value": "EPANET Net2，升\/秒（公制）",
+                    "english": "EPANET Net2, L\/s (SI)"
+                }
+            }
+        },
         "lpn_file_import_inp": {
             "reason": "english_changed",
             "current_value": "导入 EPANET 文件…",
@@ -212,13 +456,34 @@
                 "next_translated": {
                     "key": "lpn_file_import_inp_tip",
                     "value": "从 EPANET 文件中读取管网，可以是 .inp 文本文件，也可以是 EPANET 保存的 .net 文件，并将其作为新项目保存在本浏览器中。",
-                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort)."
+                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time."
                 }
             },
             "tip": {
                 "key": "lpn_file_import_inp_tip",
-                "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort).",
+                "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
                 "value": "从 EPANET 文件中读取管网，可以是 .inp 文本文件，也可以是 EPANET 保存的 .net 文件，并将其作为新项目保存在本浏览器中。"
+            }
+        },
+        "lpn_file_import_inp_tip": {
+            "reason": "english_changed",
+            "current_value": "从 EPANET 文件中读取管网，可以是 .inp 文本文件，也可以是 EPANET 保存的 .net 文件，并将其作为新项目保存在本浏览器中。",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp",
+                    "value": "导入 EPANET 文件…",
+                    "english": "EPANET file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_menu",
+                    "value": "导出…",
+                    "english": "Export…"
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_inp",
+                "english": "EPANET file…",
+                "value": "导入 EPANET 文件…"
             }
         },
         "lpn_file_export_workspace_tip": {
@@ -258,6 +523,358 @@
                 "value": "工作区…"
             }
         },
+        "lpn_file_import_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_msx_tip",
+                "english": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation."
+            }
+        },
+        "lpn_file_import_msx_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_msx",
+                "english": "EPANET-MSX file…"
+            }
+        },
+        "lpn_file_export_item_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_file_export_msx_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_kept": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_species": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_no_species": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_too_big": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_missing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_not_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_attached_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_replace": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_remove": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_removed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_quality_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_quality_msx_species": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "tip": {
+                "key": "lpn_quality_msx_species_tip",
+                "english": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species."
+            }
+        },
+        "lpn_quality_msx_species_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "label": {
+                "key": "lpn_quality_msx_species",
+                "english": "Species"
+            }
+        },
+        "lpn_quality_msx_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_result_msx_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "工作区已保存到 {file}：{n} 项设置。",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_notes_1_def": {
+            "reason": "english_changed",
+            "current_value": "默认情况下，管网由 EPANET 求解器求解。设置总运行时长后，每个报告时间步依次计算：水箱充水和放水，需水量随其模式变化，工具栏可回放该运行。选中“尽可能使用内置求解器”时，单一时刻的解可以改由内置求解器求解，但延时模拟，或含压力断路阀、通用阀（PBV、GPV）的管网，始终由 EPANET 求解器求解。",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_1_term",
+                    "value": "求解方式",
+                    "english": "How it is solved"
+                },
+                "next_translated": {
+                    "key": "lpn_notes_2_term",
+                    "value": "本工具不做的事",
+                    "english": "What it does not do"
+                }
+            }
+        },
         "lpn_notes_2_def": {
             "reason": "english_changed",
             "current_value": "未对涌浪和水锤建模：所有结果均针对恒定流或缓变流，而不是阀门快速关闭引起的瞬态压力波。",
@@ -290,6 +907,59 @@
                 }
             }
         },
+        "lpn_engine_unavailable": {
+            "reason": "english_changed",
+            "current_value": "无法下载 EPANET 求解器，而求解压力断路阀和通用阀（PBV、GPV）必须使用它。联网一次后，求解器即保存在本设备上。",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_ready",
+                    "value": "EPANET 求解器现已保存在本设备上，可以离线使用。",
+                    "english": "The EPANET solver is now stored on this device and works offline."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_unavailable_why",
+                    "value": "没有 EPANET 求解器就无法求解压力断路阀和通用阀（PBV、GPV）。{reason}",
+                    "english": "This network cannot be solved without the EPANET solver. {reason}"
+                }
+            }
+        },
+        "lpn_engine_unavailable_why": {
+            "reason": "english_changed",
+            "current_value": "没有 EPANET 求解器就无法求解压力断路阀和通用阀（PBV、GPV）。{reason}",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "无法下载 EPANET 求解器，而求解压力断路阀和通用阀（PBV、GPV）必须使用它。联网一次后，求解器即保存在本设备上。",
+                    "english": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "正在加载 EPANET 求解器，您可以继续绘制。加载完成后即可获得结果。",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                }
+            }
+        },
+        "lpn_field_text_all_zoom_tip": {
+            "reason": "english_changed",
+            "current_value": "无论缩小到多远，都在图上保留此文字。取消勾选后，一旦视图宽度超过“地图和页面”中设置的标注阈值，此文字会与其他标签一同隐藏。",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_all_zoom",
+                    "value": "在所有缩放级别都显示",
+                    "english": "Show at all zoom levels"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_labels",
+                    "value": "标签",
+                    "english": "Labels"
+                }
+            },
+            "label": {
+                "key": "lpn_field_text_all_zoom",
+                "english": "Show at all zoom levels",
+                "value": "在所有缩放级别都显示"
+            }
+        },
         "lpn_sm_help": {
             "reason": "english_changed",
             "current_value": "方案和备选方案的工作方式：\\n\\n在“基本模式”下，备选方案被隐藏并自动处理，所有新方案都是“基础”方案的子方案。\\n\\n关闭“基本模式”后，可使用复杂的继承树，备选方案可以在各方案之间共享。但是，当需要新的备选方案关联时（在用户没有主动管理的情况下），编辑的默认行为是创建一个以当前方案命名的备选方案，这使每个方案各有一组独有的备选方案。\\n\\n属性和设置属于备选方案类别，这些类别显示为方案与备选方案表的列，也显示为“方案管理器”中的管理选项。\\n\\n覆盖值是在方案中创建的，但实际上属于与该方案关联的各备选方案；因此方案就像是通向其备选方案的一扇窗。备选方案与方案的关联在“方案管理器”右窗格或底部窗格的“方案”表中管理。创建新方案不会创建任何备选方案；新方案使用其父级的备选方案，直到创建的覆盖值需要新的备选方案。在方案中创建覆盖值时，它们保存在该方案对应的备选方案中；如果方案没有这样的备选方案，则会用该方案的名称创建一个新的备选方案。\\n\\n示例：您创建了一个“Figure: Node and link IDs”方案，并把一个“文字”编辑为“Node and Link IDs”。创建方案时，不会创建任何备选方案。但在您保存该“文字”的那一刻，会创建一个名为“Figure: Node and link IDs”的“文字”备选方案，其中带有“文字”值的覆盖值。在“基本模式”下，您看到的只是方案本身的一个覆盖值。\\n\\n“复制属性”只复制覆盖值。在“基础”以外的任何方案中，它只复制该元件在该方案中的覆盖值。\\n\\n如何管理方案：\\n\\n- 在顶部的列表中选择“方案”或某个备选方案类别，即可显示其树。\\n\\n- 用“添加子级”为所选项创建子级。“添加基础”会添加另一个“基础”，它起初是“基础”当前状态的副本；此后对“基础”的编辑不会改变它。新的子级以其父级命名；键入名称即可重命名。“复制”会复制所选备选方案。“向上合并”会把所选备选方案的覆盖值移入位于其上方、按名称选定的备选方案，所选备选方案随后继承这些值；它会先指出被它跳过的备选方案也覆盖的任何数值，这些数值不会改变。要复制方案，请在“基本模式”下使用“方案”菜单中的“复制方案”；它会复制方案的覆盖值，以及保存它们的备选方案。“添加基础”和“复制方案”各自都会创建备选方案：“添加基础”为新的“基础”在每个含有数值的类别中创建一个“基础”备选方案，“复制方案”则为保存该方案覆盖值的每个备选方案创建一个以副本命名的新备选方案。\\n\\n- 将一项拖到另一项上，使其成为该项的子级。移到新父级下的方案，会从它继承自己未覆盖的一切；它已覆盖的内容不变。将一项拖到两项之间可重新排序。\\n\\n- 点击一项即选中它。按 F2 或选择“重命名”，可重命名所选项。重命名方案时会询问是否同时重命名带有其名称的备选方案；在“基本模式”下它们会随之重命名，不再询问。双击方案或按 Enter 可将其设为当前方案。点击项旁边的箭头，或按左、右键，可折叠或展开它。右键单击一项，可使用与按钮相同的命令。\\n\\n- 按 Delete 或点击减号按钮，可删除所选项。正在使用的项不会被删除，消息会列出使用它的对象。在“基本模式”关闭时删除方案，会保留它所使用的备选方案。在“基本模式”开启时删除方案，还会删除其所有未被其他方案使用的备选方案。\\n\\n- 要使方案使用另一个备选方案（包括“基础”），请在“方案管理器”右窗格或“方案”表中该方案所在的行里选择它。在共享的备选方案中创建的覆盖值，会改变使用它的每一个方案。",
@@ -303,6 +973,363 @@
                     "key": "lpn_sm_delete_alt_ask",
                     "value": "删除备选方案 {name}？",
                     "english": "Delete the alternative {name}?"
+                }
+            }
+        },
+        "lpn_settings_engine_native_tip": {
+            "reason": "english_changed",
+            "current_value": "勾选此项可在可能的情况下使用内置求解器；否则将始终使用美国环保署（EPA）提供的 EPANET 求解器。延时模拟以及含压力断路阀和通用阀（PBV、GPV）的情况下，不会使用内置求解器。首次使用 EPANET 求解器时会下载约 650 KB 数据，此后保存在本设备上。当管道存在局部（次要）损失时，两种求解器在末位数字上会有差异：EPANET 对重力加速度取了取整后的数值，因此其局部损失会比精确算法略低。",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_engine_native",
+                    "value": "尽可能使用内置求解器",
+                    "english": "Use the built-in solver when possible"
+                },
+                "next_translated": {
+                    "key": "lpn_engine_loading",
+                    "value": "正在加载 EPANET 求解器…",
+                    "english": "Loading the EPANET solver…"
+                }
+            },
+            "label": {
+                "key": "lpn_settings_engine_native",
+                "english": "Use the built-in solver when possible",
+                "value": "尽可能使用内置求解器"
+            }
+        },
+        "lpn_settings_grp_size": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "灰度",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "标签图例位置",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_angle": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "灰度",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "标签图例位置",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_zoom": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "灰度",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "标签图例位置",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_positions": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "灰度",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "标签图例位置",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "灰度",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "标签图例位置",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_thematic": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "灰度",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "标签图例位置",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_scncmp_menu_tip": {
+            "reason": "english_changed",
+            "current_value": "方案表，列出覆盖值个数、最低压力和最高流速",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_title",
+                    "value": "方案对比",
+                    "english": "Scenario comparison"
+                },
+                "next_translated": {
+                    "key": "lpn_scncmp_running",
+                    "value": "正在求解每一个方案…",
+                    "english": "Solving every scenario…"
+                }
+            }
+        },
+        "lpn_scncmp_progress": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "每个方案都是基于绘图副本求解的。此处的操作不会更改本项目，您正在使用的方案也会保持不变。",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "延时模拟时长：{time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scncmp_stopped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "每个方案都是基于绘图副本求解的。此处的操作不会更改本项目，您正在使用的方案也会保持不变。",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "延时模拟时长：{time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "每个方案都是基于绘图副本求解的。此处的操作不会更改本项目，您正在使用的方案也会保持不变。",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "延时模拟时长：{time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_col": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "每个方案都是基于绘图副本求解的。此处的操作不会更改本项目，您正在使用的方案也会保持不变。",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "延时模拟时长：{time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "每个方案都是基于绘图副本求解的。此处的操作不会更改本项目，您正在使用的方案也会保持不变。",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "延时模拟时长：{time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_empty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "每个方案都是基于绘图副本求解的。此处的操作不会更改本项目，您正在使用的方案也会保持不变。",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "延时模拟时长：{time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_copy_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "每个方案都是基于绘图副本求解的。此处的操作不会更改本项目，您正在使用的方案也会保持不变。",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "延时模拟时长：{time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_time_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "每个方案都是基于绘图副本求解的。此处的操作不会更改本项目，您正在使用的方案也会保持不变。",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "延时模拟时长：{time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_at_time": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "每个方案都是基于绘图副本求解的。此处的操作不会更改本项目，您正在使用的方案也会保持不变。",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "延时模拟时长：{time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_steady": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "每个方案都是基于绘图副本求解的。此处的操作不会更改本项目，您正在使用的方案也会保持不变。",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "延时模拟时长：{time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_not_converged": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "每个方案都是基于绘图副本求解的。此处的操作不会更改本项目，您正在使用的方案也会保持不变。",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "延时模拟时长：{time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_not_converged_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "每个方案都是基于绘图副本求解的。此处的操作不会更改本项目，您正在使用的方案也会保持不变。",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "延时模拟时长：{time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "每个方案都是基于绘图副本求解的。此处的操作不会更改本项目，您正在使用的方案也会保持不变。",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "延时模拟时长：{time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_stale": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "每个方案都是基于绘图副本求解的。此处的操作不会更改本项目，您正在使用的方案也会保持不变。",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "延时模拟时长：{time}",
+                    "english": "For extended period simulation of {time}"
                 }
             }
         },
@@ -548,6 +1575,54 @@
                 "value": "将 ESRI shapefile 中的点、线和多边形作为形状读入本项目，并将属性列保留为属性。请选择 .zip，或同时选择 .shp 及其 .shx、.dbf 和 .prj（按住 Ctrl 或 Shift 可选择多个）。与项目坐标系不同的坐标会被转换，通知中会说明这一点。"
             }
         },
+        "lpn_diag_valve_conflict": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_pda_route",
+                    "value": "已使用 EPANET 求解器求解，因为需水量模型为压力驱动。",
+                    "english": "Solved with the EPANET solver, because the demand model is pressure driven."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_needs_epanet",
+                    "value": "需水量模型为压力驱动，只有 EPANET 求解器能够计算。EPANET 求解器未能加载，因此缺少这些结果。",
+                    "english": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing."
+                }
+            }
+        },
+        "lpn_diag_gpv_curve_order": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_pda_route",
+                    "value": "已使用 EPANET 求解器求解，因为需水量模型为压力驱动。",
+                    "english": "Solved with the EPANET solver, because the demand model is pressure driven."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_needs_epanet",
+                    "value": "需水量模型为压力驱动，只有 EPANET 求解器能够计算。EPANET 求解器未能加载，因此缺少这些结果。",
+                    "english": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing."
+                }
+            }
+        },
+        "lpn_gpv_one_point_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_pda_route",
+                    "value": "已使用 EPANET 求解器求解，因为需水量模型为压力驱动。",
+                    "english": "Solved with the EPANET solver, because the demand model is pressure driven."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_needs_epanet",
+                    "value": "需水量模型为压力驱动，只有 EPANET 求解器能够计算。EPANET 求解器未能加载，因此缺少这些结果。",
+                    "english": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing."
+                }
+            }
+        },
         "lpn_export_holds_scenario": {
             "reason": "missing",
             "current_value": null,
@@ -626,6 +1701,20 @@
     },
     "key_notes": [],
     "key_concepts": {
+        "lpn_guide_scn_marks_def": [
+            {
+                "concept": "family-tree-parent",
+                "plain_name": "A family tree parent",
+                "english_rendering": "parent",
+                "preferred_translation": ""
+            },
+            {
+                "concept": "family-tree-inherit",
+                "plain_name": "A family tree inherit-",
+                "english_rendering": "inherit",
+                "preferred_translation": ""
+            }
+        ],
         "lpn_sm_help": [
             {
                 "concept": "family-tree",

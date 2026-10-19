@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='Bu çalıştırmanın dışında bırakıldı, ç�
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='EPANET çözücüsü alınıyor. Bir kez indirilir ve ardından bu cihazda tutulur, böylece daha sonra çevrimdışı çalışır.';
 $ec_lang['lpn_engine_ready']='EPANET çözücüsü artık bu cihazda ve çevrimdışı çalışıyor.';
-$ec_lang['lpn_engine_fetching_valve']='EPANET çözücüsü alınıyor, böylece bu vana şimdi ve daha sonra çevrimdışı çözülebilir.';
-$ec_lang['lpn_engine_ready_valve']='EPANET çözücüsü artık bu cihazda saklanıyor. Basınç kırıcı ve genel amaçlı vanalar (PBV, GPV) artık çevrimdışı çözülebilir.';
 $ec_lang['lpn_engine_unavailable']='Basınç kırıcı ve genel amaçlı vanaları (PBV, GPV) çözmek için gerekli olan EPANET çözücüsü indirilemedi. İnternete bir kez bağlandıktan sonra çözücü bu cihazda saklanır.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='Çözücü %{percent} yüklendi.';
 $ec_lang['lpn_engine_wait_bytes']='Çözücü şimdiye kadar {kb} KB yüklendi. Toplam bilinmediğinden tamamlanma yüzdesi de bilinmiyor.';
 $ec_lang['lpn_engine_needed_failed']='EPANET çözücüsü henüz yüklenmedi, yüklenemiyor ve bu şebeke yalnızca onun tarafından çözülebilir. İnternete bağlandığınızda yüklenecektir.';
 $ec_lang['lpn_engine_needed_failed_why']='Bu şebeke yalnızca EPANET çözücüsüyle çözülebilir. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='Bunlar basınç kırıcı veya genel amaçlı vanalardır ve bunları yalnızca EPANET çözücüsü hesaplayabilir. EPANET çözücüsü yüklenemedi, bu yüzden şu sonuçlar eksik:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='Bu vanalar doğrudan bir rezervuara veya depoya bağlı, ve orada su seviyesi zaten belirlenmiş durumda, bu yüzden vananın kontrol edecek bir şeyi kalmıyor. Vana ile rezervuar veya depo arasına kısa bir boru ekleyin:';
 $ec_lang['lpn_diag_not_converged']='Bir çözüm bulunamadı. Sıfır çap gibi gerçek olamayacak değerleri kontrol edin.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} Bunun yerine yerleşik çözücü g�
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='EPANET çözücüsüyle çözüldü, çünkü şu basınç kırıcı ve genel amaçlı vanalar var:';
 $ec_lang['lpn_unit_unknown']='Bu çizim, bu sayfanın sunmadığı bir birim belirtiyor: {unit}. Her şey geldiği gibi tutulup gösterildi, hiçbir şey değiştirilmedi. Bu sayfa bu birimi tanımadığı sürece yanıt verilemez, çünkü ne kadar büyük olduğunu anlamanın bir yolu yoktur.';
 $ec_lang['lpn_engine_manning_note']='Not: Manning pürüzlülüğüyle EPANET, Manning denklemindeki sabiti yuvarlar; bu yüzden yük kaybı tam biçimden yaklaşık %0,6 daha düşüktür.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
@@ -3690,7 +3686,6 @@ $ec_lang['lpn_basemap_style_normal']='Normal';
 $ec_lang['lpn_basemap_style_muted']='Soluk';
 $ec_lang['lpn_basemap_style_faded']='Silik';
 $ec_lang['lpn_basemap_style_grayscale']='Gri tonlamalı';
-$ec_lang['lpn_settings_map_display']='Görünüm';
 // PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
 // to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
 // LPN_MAP_MIN in js/looped-network.js). Nothing renders these two keys now, so key_hygiene_check
@@ -3857,7 +3852,6 @@ $ec_lang['lpn_time_settings_open']='Zaman ayarları';
 // "Hydraulics" is EPANET's own name for the friction-method/accuracy/engine group, which also
 // leaves room for its siblings (Quality, Reactions) as they arrive.
 $ec_lang['lpn_settings_sec_symbology']='Görselleştirme';
-$ec_lang['lpn_settings_sec_map']='Harita ve sayfa';
 $ec_lang['lpn_settings_sec_assets']='Öğeler';
 $ec_lang['lpn_settings_sec_calculation']='Hesaplama';
 // ROADMAP Task 247. A customer label's CONTENT is the node rows above it (Tom: "Customer labels

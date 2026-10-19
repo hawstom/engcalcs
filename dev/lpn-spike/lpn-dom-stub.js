@@ -463,6 +463,7 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // building anything and the Track control is invisible to every harness -- the same silent hole
   // the fire-flow box's own note below describes.
   'lpn_set_hydraulics_fields', 'lpn_set_quality_fields', 'lpn_set_page_fields', 'lpn_set_time_fields',
+  'lpn_set_pos_fields', 'lpn_set_pos_fields2', 'lpn_set_map_fields2', 'lpn_set_sec_page',
   // Pump energy's own host (ROADMAP Task 566). Same silent hole: absent from this list,
   // rebuildSettings() returns at its guard and NOTHING in the Settings box is built for any
   // harness, not just the energy rows.

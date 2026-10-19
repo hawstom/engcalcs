@@ -220,7 +220,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // BOTH of EPANET's formats: .inp is its documented text interchange format, .net is what
 	      // its Windows UI saves when you press Save. The accept list only filters the PICKER; which
 	      // format a chosen file really is gets decided from its first bytes, not its name. ?>
-	<input type="file" id="lpn_inp_file" accept=".inp,.net,text/plain" style="display:none">
+	<input type="file" id="lpn_inp_file" accept=".inp,.net,.msx,text/plain" multiple style="display:none">
 	<input type="file" id="lpn_workspace_file" accept=".json,application/json" style="display:none">
 	<?php // File > Open as lat/lon… (Task 447). THE ONE PICKER THAT TAKES BOTH KINDS, because the row
 	      // it serves is the recovery path for a lon/lat network in either kind of file. Which reader
@@ -1193,26 +1193,34 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						</div>
 					</div>
 				</section>
+				<?php // **MAP AND PAGE ARE TWO SECTIONS, AND NEITHER HAS AN INDEXED SUB-HEADING** (Tom,
+				      // 2026-10-18). Map is cut by six small headings the index leaves out (.lpn-set-minor):
+				      // Size, Angle, Zoom, Positions, Show, Thematic. Page is the four rows kept in this
+				      // browser, and the two resets. Each is one saved class, so its marker stands on the
+				      // section heading. The sub-heading in each is SILENT: hidden and out of the index, kept because
+				      // the saved class, the filter and the Settings table all read a row's sub-heading.
+				      // Positions is three builders' rows in one group: the labels legend, the colour legend
+				      // (buildColoringSection) and the along-the-line switch, in that order. ?>
 				<section id="lpn_set_sec_map" class="lpn-set-sec" data-set-sec="map">
-					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_map']?></h3>
+					<h3 class="lpn-set-head"><?=$ec_lang['lpn_menu_map']?><?=lpnSavedMark('project')?></h3>
 					<div class="lpn-set-secbody">
-						<?php // Map appearance holds what is true of the WHOLE SHEET: the sizes, the two
-						      // legend positions, the thematic mode. Its heading sits immediately before
-						      // Text size, which is Tom's own placement.
-						      //
-						      // The colour-scheme acknowledgements are rendered into the shared host by
-						      // buildColoringSection(), VERBATIM out of EngCalcs.lpnRamps.CREDITS -- one
-						      // licence fixes its own wording, so it is never retyped here where it could
-						      // drift. Untranslated on purpose, exactly like the OpenStreetMap credit on
-						      // the map. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_mapDisplay" data-saved="project"><?=$ec_lang['lpn_settings_map_display']?><?=lpnSavedMark('project')?></div>
+						<div class="lpn-set-sub lpn-set-sub-silent" id="lpn_set_sub_mapDisplay" data-saved="project"><?=$ec_lang['lpn_menu_map']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_set_map_fields" class="lpn-set-part"></div>
-							<div id="lpn_set_colors_shared" class="lpn-set-part"></div>
+							<div class="lpn-set-part">
+								<div class="lpn-set-group lpn-set-minor"><?=$ec_lang['lpn_settings_grp_positions']?></div>
+								<div id="lpn_set_pos_fields" class="lpn-set-part"></div>
+								<div id="lpn_set_colors_shared" class="lpn-set-part"></div>
+								<div id="lpn_set_pos_fields2" class="lpn-set-part"></div>
+							</div>
+							<div id="lpn_set_map_fields2" class="lpn-set-part"></div>
 						</div>
-						<?php // Tom: "Change Calculator to Page and make it a heading." The one group in the
-						      // box that is NOT carried in the project file, which its note says out loud. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_page" data-saved="browser"><?=$ec_lang['lpn_settings_page']?><?=lpnSavedMark('browser')?></div>
+					</div>
+				</section>
+				<section id="lpn_set_sec_page" class="lpn-set-sec" data-set-sec="page">
+					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_page']?><?=lpnSavedMark('browser')?></h3>
+					<div class="lpn-set-secbody">
+						<div class="lpn-set-sub lpn-set-sub-silent" id="lpn_set_sub_page" data-saved="browser"><?=$ec_lang['lpn_settings_page']?><?=lpnSavedMark('browser')?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_page_fields" class="lpn-set-part"></div></div>
 					</div>
 				</section>
@@ -2119,6 +2127,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <template id="lpn_guide_more_lpn_scncmp_box"><dl>
 	<dt><?=$ec_lang['lpn_guide_cmp_cols_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_cols_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_cmp_run_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_run_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_cmp_byasset_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_byasset_def']?></dd>
 	<dt><?=$ec_lang['lpn_guide_cmp_notes_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_notes_def']?></dd>
 </dl></template>
 </div>
@@ -2128,6 +2137,11 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 
 <script>
 EngCalcs.pageConfig = {
+	lpn_settings_grp_size: <?=json_encode($ec_lang['lpn_settings_grp_size'])?>,
+	lpn_settings_grp_angle: <?=json_encode($ec_lang['lpn_settings_grp_angle'])?>,
+	lpn_settings_grp_zoom: <?=json_encode($ec_lang['lpn_settings_grp_zoom'])?>,
+	lpn_settings_grp_show: <?=json_encode($ec_lang['lpn_settings_grp_show'])?>,
+	lpn_settings_grp_thematic: <?=json_encode($ec_lang['lpn_settings_grp_thematic'])?>,
 	lpn_tool_select: <?=json_encode($ec_lang['lpn_tool_select'])?>,
 	lpn_tool_add_junction: <?=json_encode($ec_lang['lpn_tool_add_junction'])?>,
 	lpn_tool_add_reservoir: <?=json_encode($ec_lang['lpn_tool_add_reservoir'])?>,
@@ -2338,6 +2352,26 @@ EngCalcs.pageConfig = {
 	lpn_file_export_workspace_tip: <?=json_encode($ec_lang['lpn_file_export_workspace_tip'])?>,
 	lpn_file_import_workspace: <?=json_encode($ec_lang['lpn_file_import_workspace'])?>,
 	lpn_file_import_workspace_tip: <?=json_encode($ec_lang['lpn_file_import_workspace_tip'])?>,
+	lpn_file_import_msx: <?=json_encode($ec_lang['lpn_file_import_msx'])?>,
+	lpn_file_import_msx_tip: <?=json_encode($ec_lang['lpn_file_import_msx_tip'])?>,
+	lpn_file_export_item_msx: <?=json_encode($ec_lang['lpn_file_export_item_msx'])?>,
+	lpn_file_export_msx_tip: <?=json_encode($ec_lang['lpn_file_export_msx_tip'])?>,
+	lpn_msx_report_heading: <?=json_encode($ec_lang['lpn_msx_report_heading'])?>,
+	lpn_msx_report_kept: <?=json_encode($ec_lang['lpn_msx_report_kept'])?>,
+	lpn_msx_report_species: <?=json_encode($ec_lang['lpn_msx_report_species'])?>,
+	lpn_msx_report_no_species: <?=json_encode($ec_lang['lpn_msx_report_no_species'])?>,
+	lpn_msx_too_big: <?=json_encode($ec_lang['lpn_msx_too_big'])?>,
+	lpn_msx_report_missing: <?=json_encode($ec_lang['lpn_msx_report_missing'])?>,
+	lpn_msx_not_msx: <?=json_encode($ec_lang['lpn_msx_not_msx'])?>,
+	lpn_msx_attached_heading: <?=json_encode($ec_lang['lpn_msx_attached_heading'])?>,
+	lpn_msx_replace: <?=json_encode($ec_lang['lpn_msx_replace'])?>,
+	lpn_msx_remove: <?=json_encode($ec_lang['lpn_msx_remove'])?>,
+	lpn_msx_removed: <?=json_encode($ec_lang['lpn_msx_removed'])?>,
+	lpn_quality_msx: <?=json_encode($ec_lang['lpn_quality_msx'])?>,
+	lpn_quality_msx_species: <?=json_encode($ec_lang['lpn_quality_msx_species'])?>,
+	lpn_quality_msx_species_tip: <?=json_encode($ec_lang['lpn_quality_msx_species_tip'])?>,
+	lpn_quality_msx_none: <?=json_encode($ec_lang['lpn_quality_msx_none'])?>,
+	lpn_result_msx_tip: <?=json_encode($ec_lang['lpn_result_msx_tip'])?>,
 	lpn_workspace_exported: <?=json_encode($ec_lang['lpn_workspace_exported'])?>,
 	lpn_workspace_imported: <?=json_encode($ec_lang['lpn_workspace_imported'])?>,
 	lpn_workspace_ignored: <?=json_encode($ec_lang['lpn_workspace_ignored'])?>,
@@ -2904,6 +2938,7 @@ EngCalcs.pageConfig = {
 		'lpn_mixing_mixed',
 		'lpn_mixing_model',
 		'lpn_quality_initial',
+		'lpn_quality_msx_species',
 		'lpn_quality_named_avg_concentration',
 		'lpn_quality_named_concentration',
 		'lpn_reaction_bulk',
@@ -3140,8 +3175,6 @@ EngCalcs.pageConfig = {
 	lpn_roughness_method_note: <?=json_encode($ec_lang['lpn_roughness_method_note'])?>,
 	lpn_engine_fetching: <?=json_encode($ec_lang['lpn_engine_fetching'])?>,
 	lpn_engine_ready: <?=json_encode($ec_lang['lpn_engine_ready'])?>,
-	lpn_engine_fetching_valve: <?=json_encode($ec_lang['lpn_engine_fetching_valve'])?>,
-	lpn_engine_ready_valve: <?=json_encode($ec_lang['lpn_engine_ready_valve'])?>,
 	lpn_engine_unavailable: <?=json_encode($ec_lang['lpn_engine_unavailable'])?>,
 	lpn_engine_unavailable_why: <?=json_encode($ec_lang['lpn_engine_unavailable_why'])?>,
 <?php   // The Task 608 pair: the wait a reader is currently in, and the one failure a background
@@ -3152,7 +3185,6 @@ EngCalcs.pageConfig = {
 	lpn_engine_wait: <?=json_encode($ec_lang['lpn_engine_wait'])?>,
 	lpn_engine_wait_pct: <?=json_encode($ec_lang['lpn_engine_wait_pct'])?>,
 	lpn_engine_wait_bytes: <?=json_encode($ec_lang['lpn_engine_wait_bytes'])?>,
-	lpn_diag_valve_needs_epanet: <?=json_encode($ec_lang['lpn_diag_valve_needs_epanet'])?>,
 	lpn_diag_valve_on_fixed_head: <?=json_encode($ec_lang['lpn_diag_valve_on_fixed_head'])?>,
 	lpn_settings_default_is: <?=json_encode($ec_lang['lpn_settings_default_is'])?>,
 	lpn_diag_not_converged: <?=json_encode($ec_lang['lpn_diag_not_converged'])?>,
@@ -3263,6 +3295,20 @@ EngCalcs.pageConfig = {
 	lpn_scncmp_period_note: <?=json_encode($ec_lang['lpn_scncmp_period_note'])?>,
 	lpn_scncmp_current: <?=json_encode($ec_lang['lpn_scncmp_current'])?>,
 	lpn_scncmp_note: <?=json_encode($ec_lang['lpn_scncmp_note'])?>,
+	lpn_scncmp_progress: <?=json_encode($ec_lang['lpn_scncmp_progress'])?>,
+	lpn_scncmp_stopped: <?=json_encode($ec_lang['lpn_scncmp_stopped'])?>,
+	lpn_scnres_title: <?=json_encode($ec_lang['lpn_scnres_title'])?>,
+	lpn_scnres_col: <?=json_encode($ec_lang['lpn_scnres_col'])?>,
+	lpn_scnres_none: <?=json_encode($ec_lang['lpn_scnres_none'])?>,
+	lpn_scnres_empty: <?=json_encode($ec_lang['lpn_scnres_empty'])?>,
+	lpn_scnres_copy_tip: <?=json_encode($ec_lang['lpn_scnres_copy_tip'])?>,
+	lpn_scnres_time_note: <?=json_encode($ec_lang['lpn_scnres_time_note'])?>,
+	lpn_scnres_at_time: <?=json_encode($ec_lang['lpn_scnres_at_time'])?>,
+	lpn_scnres_steady: <?=json_encode($ec_lang['lpn_scnres_steady'])?>,
+	lpn_scnres_not_converged: <?=json_encode($ec_lang['lpn_scnres_not_converged'])?>,
+	lpn_scnres_not_converged_note: <?=json_encode($ec_lang['lpn_scnres_not_converged_note'])?>,
+	lpn_scnres_failed: <?=json_encode($ec_lang['lpn_scnres_failed'])?>,
+	lpn_scnres_stale: <?=json_encode($ec_lang['lpn_scnres_stale'])?>,
 	lpn_reports_menu: <?=json_encode($ec_lang['lpn_reports_menu'])?>,
 	lpn_reports_epanet: <?=json_encode($ec_lang['lpn_reports_epanet'])?>,
 	lpn_reports_status: <?=json_encode($ec_lang['lpn_reports_status'])?>,
@@ -4174,6 +4220,9 @@ EngCalcs.pageConfig = {
 	lpn_settings_pressure_exponent: <?=json_encode($ec_lang['lpn_settings_pressure_exponent'])?>,
 	lpn_settings_pressure_exponent_tip: <?=json_encode($ec_lang['lpn_settings_pressure_exponent_tip'])?>,
 	lpn_engine_pda_route: <?=json_encode($ec_lang['lpn_engine_pda_route'])?>,
+	lpn_diag_valve_conflict: <?=json_encode($ec_lang['lpn_diag_valve_conflict'])?>,
+	lpn_diag_gpv_curve_order: <?=json_encode($ec_lang['lpn_diag_gpv_curve_order'])?>,
+	lpn_gpv_one_point_note: <?=json_encode($ec_lang['lpn_gpv_one_point_note'])?>,
 	lpn_diag_pda_needs_epanet: <?=json_encode($ec_lang['lpn_diag_pda_needs_epanet'])?>,
 	lpn_result_delivered_demand: <?=json_encode($ec_lang['lpn_result_delivered_demand'])?>,
 	lpn_result_delivered_demand_tip: <?=json_encode($ec_lang['lpn_result_delivered_demand_tip'])?>,
@@ -4244,7 +4293,6 @@ EngCalcs.pageConfig = {
 	lpn_engine_loading: <?=json_encode($ec_lang['lpn_engine_loading'])?>,
 	lpn_engine_failed: <?=json_encode($ec_lang['lpn_engine_failed'])?>,
 	lpn_engine_failed_why: <?=json_encode($ec_lang['lpn_engine_failed_why'])?>,
-	lpn_engine_valve_route: <?=json_encode($ec_lang['lpn_engine_valve_route'])?>,
 	lpn_engine_manning_note: <?=json_encode($ec_lang['lpn_engine_manning_note'])?>,
 <?php   // EPANET said no (Task 471), and the controls it would have said no over (Task 466). ?>
 	lpn_engine_refused: <?=json_encode($ec_lang['lpn_engine_refused'])?>,
@@ -4289,7 +4337,6 @@ EngCalcs.pageConfig = {
 	lpn_basemap_style_muted: <?=json_encode($ec_lang['lpn_basemap_style_muted'])?>,
 	lpn_basemap_style_faded: <?=json_encode($ec_lang['lpn_basemap_style_faded'])?>,
 	lpn_basemap_style_grayscale: <?=json_encode($ec_lang['lpn_basemap_style_grayscale'])?>,
-	lpn_settings_map_display: <?=json_encode($ec_lang['lpn_settings_map_display'])?>,
 	lpn_settings_legend_position: <?=json_encode($ec_lang['lpn_settings_legend_position'])?>,
 	lpn_settings_legend_off: <?=json_encode($ec_lang['lpn_settings_legend_off'])?>,
 	lpn_settings_snap_off: <?=json_encode($ec_lang['lpn_settings_snap_off'])?>,

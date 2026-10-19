@@ -54,7 +54,7 @@ async function main() {
 		await a.settle(500);
 		const label = await a.lang('lpn_settings_text_halo');
 		const setRow = (v) => a.page.evaluate(([lab, val]) => {
-			const rows = Array.from(document.querySelectorAll('#lpn_set_map_fields > *'));
+			const rows = Array.from(document.querySelectorAll('#lpn_set_map_fields .lpn-set-row'));
 			const row = rows.find((r) => (r.textContent || '').indexOf(lab) >= 0);
 			const inp = row && row.querySelector('input');
 			if (!inp) { return null; }
@@ -63,7 +63,7 @@ async function main() {
 			return inp.value;
 		}, [label, v]);
 		const cur = () => a.page.evaluate((lab) => {
-			const row = Array.from(document.querySelectorAll('#lpn_set_map_fields > *')).find((r) => (r.textContent || '').indexOf(lab) >= 0);
+			const row = Array.from(document.querySelectorAll('#lpn_set_map_fields .lpn-set-row')).find((r) => (r.textContent || '').indexOf(lab) >= 0);
 			const inp = row && row.querySelector('input'); return inp ? inp.value : null;
 		}, label);
 		ok('the Settings row exists and shows 40', (await cur()) === '40', await cur());

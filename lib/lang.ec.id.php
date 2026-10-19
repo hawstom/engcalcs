@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='Dikecualikan dari proses ini karena tidak ada jalu
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='Mengambil penyelesai EPANET. Ini diunduh sekali lalu disimpan di perangkat ini, sehingga berfungsi luring setelahnya.';
 $ec_lang['lpn_engine_ready']='Penyelesai EPANET kini ada di perangkat ini, dan berfungsi luring.';
-$ec_lang['lpn_engine_fetching_valve']='Mengambil penyelesai EPANET, agar katup ini dapat diselesaikan sekarang dan secara luring nanti.';
-$ec_lang['lpn_engine_ready_valve']='Penyelesai EPANET kini tersimpan di perangkat ini. Katup pemecah tekanan dan katup serbaguna (PBV, GPV) kini dapat diselesaikan secara luring.';
 $ec_lang['lpn_engine_unavailable']='Penyelesai EPANET, yang diperlukan untuk menyelesaikan katup pemecah tekanan dan katup serbaguna (PBV, GPV), tidak dapat diunduh. Setelah satu kali tersambung ke internet, penyelesai disimpan di perangkat ini.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='Penyelesai dimuat {percent}%.';
 $ec_lang['lpn_engine_wait_bytes']='Penyelesai telah memuat {kb} KB sejauh ini. Total tidak tersedia, sehingga persentase penyelesaiannya tidak diketahui.';
 $ec_lang['lpn_engine_needed_failed']='Penyelesai EPANET belum dimuat, tidak dapat dimuat, dan jaringan ini hanya dapat diselesaikan olehnya. Penyelesai ini akan dimuat saat Anda tersambung ke internet.';
 $ec_lang['lpn_engine_needed_failed_why']='Jaringan ini hanya dapat diselesaikan oleh penyelesai EPANET. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='Ini adalah katup pemecah tekanan atau katup serbaguna, dan hanya penyelesai EPANET yang dapat menghitungnya. Penyelesai EPANET tidak dapat dimuat, sehingga hasil berikut tidak tersedia:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='Katup-katup ini tersambung langsung ke reservoir atau tangki, yang menetapkan garis tinggi tekan hidrolik pada simpul itu, sehingga katup tidak memiliki apa pun untuk dikendalikan. Pasang pipa pendek di antara katup dan reservoir atau tangki:';
 $ec_lang['lpn_diag_not_converged']='Tidak ditemukan solusi. Periksa apakah ada nilai yang tidak mungkin terjadi di dunia nyata, seperti diameter nol.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} Menampilkan penyelesai bawaan sebaga
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='Diselesaikan dengan penyelesai EPANET, karena katup pemecah tekanan dan katup serbaguna berikut:';
 $ec_lang['lpn_unit_unknown']='Gambar ini menyatakan satuan yang tidak didukung halaman ini: {unit}. Semua nilai dipertahankan dan ditampilkan persis seperti saat diimpor, dan tidak ada yang diubah. Tidak ada yang dapat dihitung sampai satuan didukung, karena faktor konversinya tidak diketahui.';
 $ec_lang['lpn_engine_manning_note']='Catatan: dengan kekasaran Manning, EPANET membulatkan konstanta dalam persamaan Manning, sehingga kehilangan tinggi tekan sekitar 0,6% lebih rendah daripada bentuk eksak.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
@@ -3690,7 +3686,6 @@ $ec_lang['lpn_basemap_style_normal']='Normal';
 $ec_lang['lpn_basemap_style_muted']='Redup';
 $ec_lang['lpn_basemap_style_faded']='Pudar';
 $ec_lang['lpn_basemap_style_grayscale']='Skala abu-abu';
-$ec_lang['lpn_settings_map_display']='Tampilan peta';
 // PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
 // to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
 // LPN_MAP_MIN in js/looped-network.js). Nothing renders these two keys now, so key_hygiene_check
@@ -3857,7 +3852,6 @@ $ec_lang['lpn_time_settings_open']='Pengaturan waktu';
 // "Hydraulics" is EPANET's own name for the friction-method/accuracy/engine group, which also
 // leaves room for its siblings (Quality, Reactions) as they arrive.
 $ec_lang['lpn_settings_sec_symbology']='Visualisasi';
-$ec_lang['lpn_settings_sec_map']='Peta dan halaman';
 $ec_lang['lpn_settings_sec_assets']='Elemen';
 $ec_lang['lpn_settings_sec_calculation']='Perhitungan';
 // ROADMAP Task 247. A customer label's CONTENT is the node rows above it (Tom: "Customer labels

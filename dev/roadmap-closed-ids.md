@@ -22,6 +22,8 @@ sentence**, so every close moves it — that is the whole connection, and it cos
 red builds on 2026-09-15 before anybody wrote it down.
 
 
+- 0|800| CLOSED 2026-10-18 (shipped 2026-10-16 with `feat/bentley-interop`; Tom asked "Done?"): List overrides shows one scenario's own overrides by category, inherited ones neither listed nor counted.
+- 0|721| CLOSED 2026-10-18 (stages 3 to 6 merged 2026-10-16 with `feat/bentley-interop`; Tom asked "Done?"): Bentley's scenario tree with alternatives per category, plus Calculation and the view (Presentation), Basic mode, the Scenario manager and the Scenarios table. Record: `dev/scenario-alternatives.md`; its advisers' list stays there for any later stage.
 - 0|815| CLOSED 2026-10-18 (merged on Tom's word, `feat/command-usage`): spock.php's Map commands used, most used first, by menu with unused commands named; one row per command per page load, never its inputs.
 - 0|711| CLOSED 2026-09-30 (fix/new-project-view). New project, Open example, Save as and every import now remember the outgoing tab's view through one helper, rememberOutgoingProject(), as openProject() always did. dev/lpn-spike/new-project-pan-harness.js fails on the old code.
 - 0|322| CLOSED 2026-09-30 on CC's evaluation (Tom: "CC to evaluate: 239, 322"). Half A is done (4 rows left, each stating why no blocking check can hold it); half B's method (count a construct, ask what it assumes) is recorded in dev/enforceable-rules-survey.md. A standing survey for new checks now conflicts with CLAUDE.md's narrower rule: add a check for a defect a visitor could hit that a person would miss.
@@ -741,3 +743,6 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|803| CLOSED 2026-10-17 (merged 10-16 with `feat/bentley-interop`): the Scenario manager's list offers All and All unused, so every unused alternative shows at a glance.
 - 0|799| CLOSED 2026-10-17 (merged on Tom's word, `option/pane-boxes`): right-click a bottom-pane tab, Open in a box; Tables and Graphs dock as boxes (browser key `lpn_paneboxes`).
 - 0|785| CLOSED 2026-10-17 (merged on Tom's word, `feat/guide-scenarios`): every Guide chapter rewritten to the code, each with a `user-guide-*-harness.js`; Screenshot audited only.
+- 0|741| CLOSED 2026-10-18 (Tom: "Close it."): the network generator is on master (dev/lpn-spike/label-bench/generator.js); round 5 ran on generated networks.
+- 0|810| CLOSED 2026-10-18: the features list was brought up to the software 2026-10-16/17 (dev/features-source.md, librewaternet.org features page).
+- 0|717| CLOSED 2026-10-19 (merged on Tom's word, `feat/msx`): an EPANET-MSX file attaches, opens with its `.inp`, runs through EPANET-MSX and exports; dev/msx-scope.md.

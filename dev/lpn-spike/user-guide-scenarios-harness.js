@@ -30,7 +30,7 @@ const QUOTES = {
 	lpn_guide_scn_open_def: ['lpn_menu_project', 'lpn_scenario_menu', 'lpn_scenario_label', 'lpn_scenario_overrides', 'lpn_scenario_base',
 		'lpn_sm_title', 'lpn_scenario_basic'],
 	lpn_guide_scn_marks_def: ['lpn_alt_cat_physical', 'lpn_pane_scn_show', 'lpn_settings_override_marks', 'lpn_clean_map', 'lpn_menu_map',
-		'lpn_tool_settings', 'lpn_settings_sec_map', 'lpn_settings_page', 'lpn_settings_sec_symbology', 'lpn_labels_heading_node', 'lpn_labels_heading_link'],
+		'lpn_tool_settings', 'lpn_settings_page', 'lpn_settings_sec_symbology', 'lpn_labels_heading_node', 'lpn_labels_heading_link'],
 	lpn_guide_scn_make_def: ['lpn_morph_menu', 'lpn_paste_props_menu', 'lpn_find_menu', ['lpn_sm_list_overrides', 'Override manager'], 'lpn_ovl_clear_selected',
 		'lpn_pane_clear_override', 'lpn_ovl_clear_all'],
 	lpn_guide_scn_scope_def: ['lpn_alt_cat_physical', 'lpn_alt_cat_demand', 'lpn_alt_cat_topology', 'lpn_alt_cat_initial', 'lpn_alt_cat_constituent',
@@ -44,12 +44,13 @@ const QUOTES = {
 	lpn_guide_cmp_cols_def: ['lpn_scenario_label', 'lpn_scncmp_current', 'lpn_scenario_overrides', 'bpn_demand_mult', 'lpn_time_duration',
 		'lpn_time_hyd_step', 'bpn_p_min', 'lpn_scncmp_col_maxvelocity'],
 	lpn_guide_cmp_run_def: ['lpn_time_duration'],
-	lpn_guide_cmp_notes_def: ['lpn_scncmp_same', 'lpn_sm_title']
+	lpn_guide_cmp_notes_def: ['lpn_scncmp_same', 'lpn_sm_title'],
+	lpn_guide_cmp_byasset_def: ['lpn_scnres_title', 'lpn_survey_codes_col_type', 'lpn_time_run_report_copy', 'lpn_full_download_csv']
 };
 // The terms of the two chapters, in order (the template in Looped-Network.php).
 const SM_TERMS = ['lpn_guide_scn_use_term', 'lpn_guide_scn_open_term', 'lpn_guide_scn_marks_term', 'lpn_guide_scn_make_term',
 	'lpn_guide_scn_scope_term', 'lpn_guide_scn_example_term', 'lpn_guide_scn_notes_term'];
-const CMP_TERMS = ['lpn_guide_cmp_cols_term', 'lpn_guide_cmp_run_term', 'lpn_guide_cmp_notes_term'];
+const CMP_TERMS = ['lpn_guide_cmp_cols_term', 'lpn_guide_cmp_run_term', 'lpn_guide_cmp_byasset_term', 'lpn_guide_cmp_notes_term'];
 
 async function main() {
 	const env = require(path.join(L.REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
@@ -98,9 +99,9 @@ async function main() {
 		const closeBox = (id) => P.evaluate((i) => { const x = document.getElementById(i); if (x) { x.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); } }, id);
 		const compareTable = async (want) => {
 			await a.menuClickSub(await T('lpn_reports_menu'), await T('lpn_scncmp_title'), 'project');
-			await a.waitFor(() => P.evaluate((w) => { const t = document.querySelector('#lpn_scncmp_report table'); return !!t && t.rows.length === w + 1; }, want), 'comparison table', 90000);
+			await a.waitFor(() => P.evaluate((w) => { const t = document.querySelector('#lpn_scncmp_report > .lpn-ff-tablewrap table'); return !!t && t.rows.length === w + 1; }, want), 'comparison table', 90000);
 			await settle(300);
-			const rows = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_scncmp_report table tr')).map((tr) => Array.from(tr.cells).map((c) => c.textContent.trim())));
+			const rows = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_scncmp_report > .lpn-ff-tablewrap table tr')).map((tr) => Array.from(tr.cells).map((c) => c.textContent.trim())));
 			await closeBox('lpn_scncmp_close');
 			await settle(300);
 			return rows;
@@ -114,7 +115,7 @@ async function main() {
 		ok('...it opens with the box\'s own help (Tom\'s wording), which the chapter follows', !!sm && (() => { const h = sm.text.indexOf(plain(enString('lpn_sm_help')).slice(0, 30)); return h >= 0 && h < sm.text.indexOf(enString('lpn_guide_scn_use_term')); })());
 		ok('...and carries the seven terms of the chapter, in order, after it', !!sm && SM_TERMS.every((k, i) => sm.dts[i] === enString(k)), sm && JSON.stringify(sm.dts));
 		ok('...and its tables (what can be overridden, the worked example)', !!sm && sm.tables.length === 2, sm && String(sm.tables.length));
-		ok('the Scenario comparison entry carries its three terms and its table', !!cmp && CMP_TERMS.every((k, i) => cmp.dts[i] === enString(k)) && cmp.tables.length === 1, cmp && JSON.stringify(cmp.dts));
+		ok('the Scenario comparison entry carries its four terms and its table', !!cmp && CMP_TERMS.every((k, i) => cmp.dts[i] === enString(k)) && cmp.tables.length === 1, cmp && JSON.stringify(cmp.dts));
 		ok('...and its opening paragraphs are the box text', !!cmp && cmp.text.indexOf(plain(enString('lpn_guide_text_scncmp_box')).slice(0, 30)) >= 0);
 		ok('a search for "dashed gray" shows the Scenario manager entry', await searchFinds(a, 'lpn_sm_box', 'dashed gray'));
 		ok('a search for "fixed head" shows the Scenario comparison entry', await searchFinds(a, 'lpn_scncmp_box', 'fixed head'));
@@ -209,8 +210,8 @@ async function main() {
 			}
 			return out.join(' < ');
 		}, await T('lpn_settings_override_marks'));
-		ok('Show override markers on the map sits under ' + (await T('lpn_settings_sec_map')) + ' and ' + (await T('lpn_settings_page')),
-			!!heads && heads.indexOf(await T('lpn_settings_page')) === 0 && heads.indexOf(await T('lpn_settings_sec_map')) > 0, heads);
+		ok('Show override markers on the map sits under ' + (await T('lpn_settings_page')) + ' and ' + (await T('lpn_settings_page')),
+			!!heads && heads.indexOf(await T('lpn_settings_page')) === 0 && heads.lastIndexOf('< ' + (await T('lpn_settings_page'))) > 0, heads);
 		const hasHead = (t) => P.evaluate((x) => Array.from(document.querySelectorAll('#lpn_settings_box .lpn-set-head, #lpn_settings_box .lpn-set-sub'))
 			.some((h) => h.textContent.trim().indexOf(x) === 0), t);
 		ok('the Settings box has the headings the chapters name: Symbology with Node labels and Link labels, Calculation with Hydraulics',
@@ -328,7 +329,7 @@ async function main() {
 		await openGuide(b);
 		const esSm = await entry(b.page, 'lpn_sm_box'), esCmp = await entry(b.page, 'lpn_scncmp_box');
 		ok('the Spanish page shows the Scenario manager entry with its seven terms', !!esSm && SM_TERMS.every((k, i) => esSm.dts[i] === esString(k)), esSm && JSON.stringify(esSm.dts.slice(0, 2)));
-		ok('...and the Scenario comparison entry with its three terms and its table', !!esCmp && CMP_TERMS.every((k, i) => esCmp.dts[i] === esString(k)) && esCmp.tables.length === 1);
+		ok('...and the Scenario comparison entry with its four terms and its table', !!esCmp && CMP_TERMS.every((k, i) => esCmp.dts[i] === esString(k)) && esCmp.tables.length === 1);
 		ok('...the entries are titled by the Spanish box titles', !!esSm && esSm.title.trim() === await b.lang('lpn_sm_title') && !!esCmp && esCmp.title.trim() === await b.lang('lpn_scncmp_title'), esSm && esSm.title);
 		ok('no page errors (Spanish)', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
 		await b.context.close().catch(() => {});

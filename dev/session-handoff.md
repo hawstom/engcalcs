@@ -9,8 +9,7 @@ lines rather than appending corrections.
 ## Before merging anything
 
 - **Feature branches alive, each awaiting Tom's browser pass**: see STATE below. A feature merges
-  into master on his typed word; there is no all-clear file, freeze or merge hook. Plus `feat/label-placer` (the seam; round-5 bench), `feat/label-gang-search` (bench only), and
-  builders `feat/label-placer-a`..`-d`, which never merge alone.
+  into master on his typed word; there is no all-clear file, freeze or merge hook. The label bench branches are archived as tags (see STATE).
 - **A branch that adds a key fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
 - **Merge master into a branch before merging it to master**, then run the suite on the merge:
@@ -96,51 +95,45 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-18 (twenty-sixth session, overnight, Arizona time)
+## STATE — 2026-10-19 (twenty-seventh session, Arizona time)
 
-### Master: batch 2 of 2026-10-18 (the last merge on master). Production: 4866c11d2 or 45317389e when last read
+### Master: 607759f4d pushed and green. Production: what he last pulled
 
-Pushed 2026-10-18: **555a8899a** (batch 1: PBV unit fix, GPV warm-close fix, scenario receipts, roughness
-note, Task 815, plainer privacy.php, consent_body "so we don't count you again" in English, his word
-calls) and batch 2 (full/empty tank closes its link in the built-in solver plus his Change-type
-defaults 0/0/1, routing-harness flake fix, fire-flow multiplier guard, label rules sync with the port
-plan now on master, his alternatives-string approval). **His pull deploys them.** consent_body's 26
-translations are owed (next sprint; EC_CONSENT_VERSION stays 2, same ask).
+- 2026-10-19: `feat/msx` merged on his word ("merge feat/msx"); Task 717 closed; the Find word list
+  gained `lpn_quality_msx_species` (user-guide-find-harness caught it on the merge). Owed: his call on a
+  features-list line naming EPANET-MSX (public claim), and the MSX keys' translations at the next sprint.
+- Still owed from 10-18: consent_body's 26 translations (EC_CONSENT_VERSION stays 2); EPANET 2.3.5
+  error 220 note to Luke Butler; scenario-results shows flow as magnitude only; fire flow across
+  scenarios still a gap. Budget is tight (NPS review urgencies): Sonnet agents, few at a time.
 
-### Feature branches waiting for his browser pass and typed merge word
+### Branches waiting on him
 
-- `feat/theme` (8111): round 3 in progress: map follows the theme (print and files stay Light), Desktop
-  (modern Mac look, no Apple names), Prairie (sky below the menus, menu buttons as galvanized tanks,
-  cloud toolbar, barn project tabs, fence lower chrome; Ida's direction in her journal). Perry reviewed round 2.
-- `feat/native-pbv-gpv` (8107): Task 733 phase 2 done through round 3: every valve type native, no valve
-  routes to EPANET, bad curves and forbidden valve pairs are data faults in both engines. Perry
-  confirmed the maths. Found: EPANET 2.3.5 checks error 220 only against non-adjacent valve rows
-  (input3.c valvedata/valvecheck); worth telling Luke Butler.
-- `feat/msx` (8112, sample at /chlorine-decay.msx): Task 717 phase 1; Perry: ready; round 2 fixes running.
-  When it merges, the import-report sentence and landing-page MSX lines (dev/msx-scope.md) are his call.
-- `feat/label-beside` (8110): his pass "no regressions"; held to judge with `feat/label-form`.
-- `feat/label-form` (building): inline/stacked node labels and leadered pipe labels, "whichever shows
-  more"; his /tmp/pipe-leader-missing.png case is a named harness case.
-- `feat/scenario-example` (8106): round 3: no hand-divided fire flow; the Description tells the reader
-  to run Fire flow analysis in Max day (his rule: a fire flow is never multiplied, only base demand).
-- `feat/sqlite-reader`: Task 749, never merges until done (his word). WaterGEMS import works on public
-  samples (kept in the scratchpad, never committed); a child that overrides a value is unproven.
-- `perf/label-settings-memo`: port plan step 1, building. Speed only; may merge on green.
-
-### Calls he made this session (all recorded in rulings, roadmap or docs)
-
-Task 814 calls 1-5 (dialog unless the result is visible; a network import may land in the open
-project); "Lowest system pressure allowed"; "the second pane"; family-tree terms "A family tree
-child" etc. plus a "For every translator" section in dev/terms.md that reaches every payload; MSX named
-in "What it does not do"; privacy.php: "is never used" is a fact, "will never" a promise; no fixed
-retention limit on counts; a curveless GPV solves as an open valve; Change type reservoir -> tank
-gives base = elevation, depths 0/0/1, start 0; a fire flow is never multiplied.
+- `feat/network-update` (8112, aa84eb7d9): Task 814 call 2, an `.inp` updates the open project (IDs
+  matched, kept never deleted, one undo, receipt dialog, units/formula mismatch refused). Perry
+  reviewed; all six findings fixed (a pump/valve add threw; now rolls back on any failure). Needs his
+  browser pass and his word on ~45 new `lpn_inpup_*` strings. Gaps: GeoJSON, `.msx` on the update
+  route, positions of existing assets. I kept the "new project or this project?" question: his call 1
+  was the export-loss confirmation, not this one.
+- `feat/theme` (8111): 13 themes. His calls: Dark map "Good"; brief Ida on a Designer theme when budget allows.
+- `feat/label-form` (8114) + `feat/label-beside` (8110): he likes label-form; no merge word yet.
+- `feat/sqlite-reader` (75ed1031f): Task 749, never merges until done (his word). His two real WaterCAD
+  models (`~/tom-files/2026-10-18/Bentley-EPS-Group/`, CLIENT FILES: never into the repo) now import
+  with unit demand loads, per-scenario demand multipliers (1.0/1.8/3.0) and junction fire flow, and
+  EPANET matches WaterCAD's xlsx results to their rounding. `EC_WTG_PRIVATE_DIR` runs the private
+  harness. Left: per-junction fire-flow caps and system fire-flow settings (nowhere to store), loading
+  units, write-back, a physically overriding scenario (still unseen). The xlsx holds only results.
 
 ### Next job
 
-His pull. His browser passes on the branches above. Port plan steps 2-5 after label-form. Task 816
-(Guide chapter pages). Task 814's network-into-open-project import (his call 2). Task 752's reshaped
-phase (results by scenario, demand import).
+Merge on his word; port plan steps 2 and 5 after label-form; Task 816; Task 814's GeoJSON route;
+Task 752 steps 2-3; a fire-flow-across-scenarios table; Task 749 write-back; Task 733 phase 3 slow.
+
+### Traps met 2026-10-19 (twenty-seventh session)
+
+- **`example-open-guard-harness.js` prints four FAIL lines on purpose** (its mutation control) and passes.
+  Grep for `FAILED:`, not `FAIL`, in a harness log.
+- **`label-pass-economy-browser-harness.js` and `settings-select-lag-harness.js` fail under load only**
+  (a label hit box differing at the 8th decimal; lag timing). Both passed alone.
 
 ### Traps met 2026-10-18 (twenty-sixth session)
 

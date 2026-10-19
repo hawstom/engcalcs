@@ -1027,7 +1027,7 @@ $ec_lang['lpn_guide_scn_use_def']='<p>Scenarios save many designs, views, or sit
 $ec_lang['lpn_guide_scn_open_term']='The open scenario';
 $ec_lang['lpn_guide_scn_open_def']='<p>The Scenario button in the status strip below the map names the open scenario and counts its overrides, as in Scenario: Base | No. of overrides: 0. Click it, or choose Water, Scenarios, to switch scenarios or to add, copy, rename, or delete one. Each scenario in the list shows its number of overrides in parentheses, and a check mark is at the open one. The Scenario manager row opens the tree of scenarios and alternatives. It is dimmed while Basic mode is checked.</p><p>The drawing, the labels, Properties, Tables, and the results all belong to the open scenario, and the page solves the open scenario only. Scenario comparison, described in its own entry, solves the others from copies. The open scenario is saved with the project.</p>';
 $ec_lang['lpn_guide_scn_marks_term']='Where overrides show';
-$ec_lang['lpn_guide_scn_marks_def']='<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.</p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.</p><p>To hide the rings, clear Show override markers on the map in Settings, Map and page, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.</p>';
+$ec_lang['lpn_guide_scn_marks_def']='<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.</p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.</p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.</p>';
 $ec_lang['lpn_guide_scn_make_term']='Making and clearing overrides';
 $ec_lang['lpn_guide_scn_make_def']='<p>With a scenario other than Base open, an edit to a value that scenarios can override is stored as an override in the open scenario, however it is made: typing in Properties, editing a cell in Tables, Replace in Find and replace, dragging a node or entering its coordinates, Morph (the new type is the override), or Paste properties to selection. A setting typed in the Settings box is stored as an override when scenarios can override that setting. Base is not changed. In Base, the same edits change the network itself and reach every scenario that has not overridden the value.</p><p>Delete acts differently. In a scenario, Delete does not remove an asset that exists in Base. It makes the asset inactive in the open scenario, and for a node also its pipes, and a message states this. The asset is still in the drawing and in the other scenarios. An asset drawn while a scenario is open is inactive in Base and active in that scenario, and Delete in that scenario removes it. Deleting an asset in Base also deletes its overrides in every scenario, after a question that counts them. Customers and Shapes belong to no scenario and are deleted outright.</p><p>The Override manager row of the Scenarios list opens a list of every override of the open scenario by category, each beside the inherited value it replaces. A time series graph on the map that the scenario opened, moved, or changed is a row of its own. Check rows and click Clear selected overrides, click Clear override in one row, or click Clear all overrides. Each value then returns to the inherited value, and Undo reverses it. Select an ID in the list to go to the asset on the map. The dot in Properties and the Clear override row in the cell menu of Tables clear one override at a time.</p>';
 $ec_lang['lpn_guide_scn_scope_term']='What a scenario can and cannot override';
@@ -1042,6 +1042,8 @@ $ec_lang['lpn_guide_cmp_cols_term']='What the table holds';
 $ec_lang['lpn_guide_cmp_cols_def']='<table class="lpn-notes-table"><tbody><tr><td>Scenario</td><td>The name of the scenario. The open scenario is marked (currently open).</td></tr><tr><td>No. of overrides</td><td>The overrides of the scenario itself, counted as in the Scenarios list. A calculation option such as the demand multiplier counts as one, and an override equal to the inherited value counts.</td></tr><tr><td>Demand multiplier, Total run time, Hydraulic time step</td><td>The values the scenario was solved under, its own or those of the project. A steady-state scenario shows a dash for the time step.</td></tr><tr><td>Lowest pressure</td><td>The lowest pressure at a junction, with its ID and the time it occurs. Reservoirs and tanks are left out because each has a fixed head.</td></tr><tr><td>Highest velocity</td><td>The highest velocity in a pipe or valve, with its ID and the time it occurs. Pumps are left out.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_cmp_run_term']='Steady-state and extended-period scenarios';
 $ec_lang['lpn_guide_cmp_run_def']='<p>A scenario with a Total run time greater than 0 is run over the whole period through the EPANET engine. Its lowest pressure and highest velocity are the extremes over every time step, each shown with its time. A scenario with a Total run time of 0 is solved at one instant. The total run time is one of the options a scenario can override, so one table can hold both kinds.</p>';
+$ec_lang['lpn_guide_cmp_byasset_term']='Results by asset';
+$ec_lang['lpn_guide_cmp_byasset_def']='<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box.</p>';
 $ec_lang['lpn_guide_cmp_notes_term']='Points to note';
 $ec_lang['lpn_guide_cmp_notes_def']='<ul><li>A scenario that cannot be solved shows the reason in place of its two results, for example that a junction has no path to a source after a pipe is made inactive. The other scenarios are still solved. A scenario that did not converge shows its last results and a message.</li><li>The block above the table, The same in every scenario, states the friction method, units, accuracy, and maximum trials. A setting that differs between scenarios is left out of the block.</li><li>There is no pass or fail threshold. Read the numbers against the design criteria of the system being modeled.</li><li>The example given in the Scenario manager entry compares three scenarios on Net1.</li></ul>';
 // The Libraries chapter, in the entry for the Libraries box (Task 785), copied in by renderGuideBoxes() from
@@ -1078,7 +1080,7 @@ $ec_lang['lpn_guide_prop_example_def']='<p>Open the Net1 example and click Pipe 
 // The Settings chapter, in the entry for the Settings box (Task 785), copied in by renderGuideBoxes() from
 // <template id="lpn_guide_more_lpn_settings_box">. Held by dev/lpn-spike/user-guide-settings-harness.js.
 $ec_lang['lpn_guide_set_where_term']='Sections, and where settings are saved';
-$ec_lang['lpn_guide_set_where_def']='<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map and page (Appearance and Page), Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.</p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.</p>';
+$ec_lang['lpn_guide_set_where_def']='<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.</p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.</p>';
 $ec_lang['lpn_guide_set_search_term']='Searching';
 $ec_lang['lpn_guide_set_search_def']='<p>Type one or more words in Search settings to list only the settings that mention all of them, in the name or in the tip. A word that matches a heading shows every setting under that heading. For example, opacity lists Symbol opacity (0 to 1) and Background image opacity (0 to 1); opacity symbol lists the first alone; and sprinklers lists Emitter exponent, whose tip mentions sprinklers and whose name does not. The search changes no setting.</p>';
 $ec_lang['lpn_guide_set_scn_term']='Settings in a scenario';
@@ -1275,6 +1277,10 @@ $ec_lang['lpn_ex_net1_title']='EPANET Net1 plus rule-based controls';
 $ec_lang['lpn_ex_net1_desc']='A fictional EPANET example with chlorine, 1 reservoir and 1 tank.';
 $ec_lang['lpn_ex_net1_si_title']='EPANET Net1 plus rule-based controls, L/s (SI)';
 $ec_lang['lpn_ex_net1_si_desc']='Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.';
+$ec_lang['lpn_ex_net1_scn_title']='EPANET Net1 with scenarios, gpm (US)';
+$ec_lang['lpn_ex_net1_scn_desc']='Gallons per minute, with feet and inches. EPANET\'s Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.';
+$ec_lang['lpn_ex_valves_title']='Valve types, gpm (US)';
+$ec_lang['lpn_ex_valves_desc']='Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.';
 $ec_lang['lpn_ex_net2_si_title']='EPANET Net2, L/s (SI)';
 $ec_lang['lpn_ex_net2_si_desc']='Liters per second, with meters and millimeters. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2, gpm (US)';
@@ -2259,7 +2265,7 @@ $ec_lang['lpn_dialog_ok']='OK';
 $ec_lang['lpn_file_import_menu']='Import…';
 $ec_lang['lpn_file_import_inp']='EPANET file…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort).';
+$ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
 // File > Export is a submenu (Tom, 2026-10-06), so its rows drop the verb the heading carries. The
@@ -2314,6 +2320,26 @@ $ec_lang['lpn_file_export_item_workspace']='Workspace…';
 $ec_lang['lpn_file_export_workspace_tip']='Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.';
 $ec_lang['lpn_file_import_workspace']='Workspace…';
 $ec_lang['lpn_file_import_workspace_tip']='Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.';
+$ec_lang['lpn_file_import_msx']='EPANET-MSX file…';
+$ec_lang['lpn_file_import_msx_tip']='Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.';
+$ec_lang['lpn_file_export_item_msx']='EPANET-MSX file…';
+$ec_lang['lpn_file_export_msx_tip']='Download the attached EPANET-MSX file exactly as it was imported.';
+$ec_lang['lpn_msx_report_heading']='Attached {file}';
+$ec_lang['lpn_msx_report_kept']='This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.';
+$ec_lang['lpn_msx_report_species']='Species in the file: {list}.';
+$ec_lang['lpn_msx_report_no_species']='No species are listed in the file.';
+$ec_lang['lpn_msx_too_big']='{file} is too large to keep in browser storage, so it was not attached.';
+$ec_lang['lpn_msx_report_missing']='IDs in the file that this network does not have: {ids}.';
+$ec_lang['lpn_msx_not_msx']='{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.';
+$ec_lang['lpn_msx_attached_heading']='Attached EPANET-MSX file: {file}';
+$ec_lang['lpn_msx_replace']='Replace…';
+$ec_lang['lpn_msx_remove']='Remove';
+$ec_lang['lpn_msx_removed']='Removed {file} from this project.';
+$ec_lang['lpn_quality_msx']='Multi-species (EPANET-MSX)';
+$ec_lang['lpn_quality_msx_species']='Species';
+$ec_lang['lpn_quality_msx_species_tip']='The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.';
+$ec_lang['lpn_quality_msx_none']='No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.';
+$ec_lang['lpn_result_msx_tip']='The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.';
 $ec_lang['lpn_workspace_exported']='Workspace saved to {file}: {n} settings.';
 $ec_lang['lpn_workspace_imported']='Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.';
 $ec_lang['lpn_workspace_ignored']='Entries ignored because they were not recognized: {u}.';
@@ -2635,7 +2661,7 @@ $ec_lang['lpn_notes_1_term']='How it is solved';
 // lpn_time_no_engine and lpn_engine_unavailable.** A note everybody reads should not carry a
 // failure explanation that the failure itself delivers. Task 605's rule is untouched -- every
 // sentence a reader meets only when something has gone wrong SURVIVES, and those two are it.
-$ec_lang['lpn_notes_1_def']='By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation or a network with a pressure breaker or general purpose valve (PBV, GPV) is always solved by the EPANET solver.';
+$ec_lang['lpn_notes_1_def']='By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.';
 $ec_lang['lpn_notes_2_term']='What it does not do';
 // **"Water quality chemistry is not modeled" WAS FLATLY FALSE** (Tom, 2026-09-10: *"Wrong
 // facts."*). A reacting chemical, bulk and wall reaction coefficients and a limiting
@@ -2716,12 +2742,10 @@ $ec_lang['lpn_roughness_method_note']='⚠ Pipes with a roughness outside the no
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='Downloading the EPANET solver. It is downloaded once and then stored on this device, so it works offline afterward.';
 $ec_lang['lpn_engine_ready']='The EPANET solver is now stored on this device and works offline.';
-$ec_lang['lpn_engine_fetching_valve']='Downloading the EPANET solver, so this valve can be solved now and offline later.';
-$ec_lang['lpn_engine_ready_valve']='The EPANET solver is now stored on this device. Pressure breaker and general purpose valves (PBV, GPV) can now be solved offline.';
-$ec_lang['lpn_engine_unavailable']='Could not download the EPANET solver, which is required to solve pressure breaker and general purpose valves (PBV, GPV). After one connection to the internet, the solver is stored on this device.';
+$ec_lang['lpn_engine_unavailable']='Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
-$ec_lang['lpn_engine_unavailable_why']='Pressure breaker and general purpose valves (PBV, GPV) cannot be solved without the EPANET solver. {reason}';
+$ec_lang['lpn_engine_unavailable_why']='This network cannot be solved without the EPANET solver. {reason}';
 $ec_lang['lpn_engine_needed_loading']='Loading EPANET solver while you build. Results will be available when completely loaded.';
 // **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
 // own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
@@ -2735,7 +2759,6 @@ $ec_lang['lpn_engine_wait_pct']='Solver {percent}% loaded.';
 $ec_lang['lpn_engine_wait_bytes']='Solver {kb} KB loaded so far. The total is not available, so the percentage of completion is unknown.';
 $ec_lang['lpn_engine_needed_failed']='The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
 $ec_lang['lpn_engine_needed_failed_why']='This network can only be solved by the EPANET solver. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='These are pressure breaker or general purpose valves, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='These valves connect directly to a reservoir or tank, which fixes the hydraulic grade at that node, so the valve has nothing to control. Insert a short pipe between the valve and the reservoir or tank:';
 $ec_lang['lpn_diag_not_converged']='No solution was found. Check for physically impossible values, such as a diameter of zero.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -2989,7 +3012,7 @@ $ec_lang['lpn_field_text_size']='Size multiplier';
 // from the labeling threshold and this switch is how a note is made to fade out with the generated
 // labels instead. Unticking it is the only way a Text object has ever hidden because of the zoom.
 $ec_lang['lpn_field_text_all_zoom']='Show at all zoom levels';
-$ec_lang['lpn_field_text_all_zoom_tip']='Keep this text on the drawing however far out you zoom. Clear it to hide the text with the other labels once the view is wider than the labeling threshold set under Map and page.';
+$ec_lang['lpn_field_text_all_zoom_tip']='Keep this text on the drawing however far out you zoom. Clear it to hide the text with the other labels once the view is wider than the labeling threshold set under Map.';
 $ec_lang['lpn_tool_labels']='Labels';
 $ec_lang['lpn_labels_heading_node']='Node labels';
 $ec_lang['lpn_labels_heading_link']='Link labels';
@@ -3587,14 +3610,13 @@ $ec_lang['lpn_settings_engine_native']='Use the built-in solver when possible';
 // EPANET whatever the box says, and the one-time download, which is the cost a visitor on a slow
 // connection actually pays.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_engine_native_tip']='Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations or pressure breaker and general purpose valves (PBV, GPV). The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.';
+$ec_lang['lpn_settings_engine_native_tip']='Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.';
 $ec_lang['lpn_engine_loading']='Loading the EPANET solver…';
 $ec_lang['lpn_engine_failed']='The EPANET solver could not be loaded. Showing the built-in solver instead.';
 $ec_lang['lpn_engine_failed_why']='{reason} Showing the built-in solver instead.';
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='Solved with the EPANET solver, because of these pressure breaker and general purpose valves:';
 $ec_lang['lpn_unit_unknown']='This drawing states a unit this page does not support: {unit}. All values are kept and displayed exactly as imported, and nothing was changed. Nothing can be computed until the unit is supported, because its conversion factor is unknown.';
 $ec_lang['lpn_engine_manning_note']='Note: with Manning roughness, EPANET rounds the constant in the Manning equation, so head loss is about 0.6% lower than the exact form.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
@@ -3696,7 +3718,14 @@ $ec_lang['lpn_basemap_style_normal']='Normal';
 $ec_lang['lpn_basemap_style_muted']='Muted';
 $ec_lang['lpn_basemap_style_faded']='Faded';
 $ec_lang['lpn_basemap_style_grayscale']='Grayscale';
-$ec_lang['lpn_settings_map_display']='Appearance';
+// The two sub-headings of Map and page, and the small headings under them that the index leaves
+// out (Tom, 2026-10-18).
+$ec_lang['lpn_settings_grp_size']='Size';
+$ec_lang['lpn_settings_grp_angle']='Angle';
+$ec_lang['lpn_settings_grp_zoom']='Zoom';
+$ec_lang['lpn_settings_grp_positions']='Positions';
+$ec_lang['lpn_settings_grp_show']='Show';
+$ec_lang['lpn_settings_grp_thematic']='Thematic';
 // PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
 // to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
 // LPN_MAP_MIN in js/looped-network.js). Nothing renders these two keys now, so key_hygiene_check
@@ -3863,7 +3892,6 @@ $ec_lang['lpn_time_settings_open']='Time settings';
 // "Hydraulics" is EPANET's own name for the friction-method/accuracy/engine group, which also
 // leaves room for its siblings (Quality, Reactions) as they arrive.
 $ec_lang['lpn_settings_sec_symbology']='Symbology';
-$ec_lang['lpn_settings_sec_map']='Map and page';
 $ec_lang['lpn_settings_sec_assets']='Assets';
 $ec_lang['lpn_settings_sec_calculation']='Calculation';
 // ROADMAP Task 247. A customer label's CONTENT is the node rows above it (Tom: "Customer labels
@@ -4065,7 +4093,7 @@ $ec_lang['lpn_energy_no_pumps']='This network has no pumps, so there is nothing 
 // re-keying are lpn_scenario_label and lpn_scenario_overrides, which already name the same two
 // things in the scenario menu.
 $ec_lang['lpn_scncmp_title']='Scenario comparison';
-$ec_lang['lpn_scncmp_menu_tip']='Table of scenarios with count of overrides, lowest pressure, and highest velocity';
+$ec_lang['lpn_scncmp_menu_tip']='Table of scenarios with count of overrides, lowest pressure, and highest velocity, and a table of results by asset that copies to a spreadsheet';
 $ec_lang['lpn_scncmp_running']='Solving every scenario…';
 $ec_lang['lpn_scncmp_empty']='Nothing has been drawn yet, so there is nothing to solve.';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Highest velocity';
@@ -4075,6 +4103,23 @@ $ec_lang['lpn_scncmp_same']='The same in every scenario';
 $ec_lang['lpn_scncmp_period_note']='Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole network, at the time shown.';
 $ec_lang['lpn_scncmp_current']='(currently open)';
 $ec_lang['lpn_scncmp_note']='Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.';
+$ec_lang['lpn_scncmp_progress']='Solving scenario {done} of {total}…';
+$ec_lang['lpn_scncmp_stopped']='Stopped after {done} of {total} scenarios. The results below are the ones already finished.';
+// Task 752: Results by asset, one row per asset and one column per result and scenario. The Asset
+// type menu reuses lpn_survey_codes_col_type; its choices reuse the lpn_pane_tab_* names; the
+// results reuse lpn_result_*; Copy and Download CSV reuse lpn_time_run_report_copy and lpn_full_download_csv.
+$ec_lang['lpn_scnres_title']='Results by asset';
+$ec_lang['lpn_scnres_col']='{quantity} ({unit}), {scenario}';
+$ec_lang['lpn_scnres_none']='Check at least one result to show.';
+$ec_lang['lpn_scnres_empty']='This project has none of these assets.';
+$ec_lang['lpn_scnres_copy_tip']='Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.';
+$ec_lang['lpn_scnres_time_note']='A scenario with a total run time is read at the time step on screen, {time}, or at its last time step if its run ends sooner. Each heading shows the time read.';
+$ec_lang['lpn_scnres_at_time']='({time})';
+$ec_lang['lpn_scnres_steady']='(steady state)';
+$ec_lang['lpn_scnres_not_converged']='(not converged)';
+$ec_lang['lpn_scnres_not_converged_note']='A column marked {mark} shows the last results the solver reached before it stopped without converging.';
+$ec_lang['lpn_scnres_failed']='{scenario} could not be solved, so its columns are blank. {why}';
+$ec_lang['lpn_scnres_stale']='Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.';
 $ec_lang['lpn_energy_over']='For extended period simulation of {time}';
 $ec_lang['lpn_energy_col_pump']='Pump';
 $ec_lang['lpn_energy_col_running']='% of run';
@@ -5024,6 +5069,9 @@ $ec_lang['lpn_settings_req_pressure_tip']='Enter the pressure at or above which 
 $ec_lang['lpn_settings_pressure_exponent']='Pressure exponent';
 $ec_lang['lpn_settings_pressure_exponent_tip']='Enter the exponent of the curve that rises from no flow at the minimum pressure to the full demand at the required pressure.';
 $ec_lang['lpn_engine_pda_route']='Solved with the EPANET solver, because the demand model is pressure driven.';
+$ec_lang['lpn_diag_valve_conflict']='These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:';
+$ec_lang['lpn_diag_gpv_curve_order']='The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:';
+$ec_lang['lpn_gpv_one_point_note']='⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}';
 $ec_lang['lpn_diag_pda_needs_epanet']='The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.';
 $ec_lang['lpn_result_delivered_demand']='Delivered demand';
 $ec_lang['lpn_result_delivered_demand_tip']='The flow this junction actually receives under the pressure driven demand model. It is less than the demand when the pressure is below the required pressure.';
