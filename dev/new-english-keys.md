@@ -104,7 +104,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > {scenario}, open now
   @@ NEEDS RULING
 - **`lpn_inpup_counts`**
-  > {n} values changed on {m} assets. {a} assets added. {k} assets kept that the file does not hold.
+  > Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).
   @@ NEEDS RULING
 - **`lpn_inpup_h_added`**
   > Assets added
@@ -119,7 +119,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Not applied
   @@ NEEDS RULING
 - **`lpn_inpup_heading`**
-  > Updated {project} from {file}
+  > Imported {file} into {scenario} of {project}
   @@ NEEDS RULING
 - **`lpn_inpup_how`**
   > In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.
@@ -167,7 +167,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > {id}, {property}: {old} to {new}
   @@ NEEDS RULING
 - **`lpn_inpup_status`**
-  > Updated {project} from {file}: {n} values changed, {a} assets added.
+  > Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).
   @@ NEEDS RULING
 - **`lpn_inpup_title`**
   > Update from EPANET file
@@ -300,7 +300,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**55 still to read**, of 59 new keys across 5 unmerged branch(es).
+**56 still to read**, of 60 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -317,7 +317,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-form (`d05fdb069`) — adds no English strings
 
-### feat/sqlite-reader (`e86aedf9e`) — 49 new, 49 to read @@ NEEDS RULING
+### feat/network-update (`e3372d22a`) — adds no English strings
+
+### feat/sqlite-reader (`288858d44`) — 50 new, 50 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
   > WaterCAD or WaterGEMS model…
@@ -350,7 +352,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > The database stores every number in US customary units (feet, cubic feet per second, psi). Each number was converted once to the project's units and rounded to the shortest decimal within 5 parts in 100 million, which gives back the number as it was entered.
   @@ NEEDS RULING
 - **`lpn_wtg_note_customer_demand`**
-  > Not imported: the customer demands and unit demands at these junctions. Their base demands were imported.
+  > Not imported: the customer demands at these junctions. Their base demands were imported.
   @@ NEEDS RULING
 - **`lpn_wtg_note_cv_closed`**
   > These pipes have a check valve and start closed. They were imported closed.
@@ -441,6 +443,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_wtg_note_unit_assumed`**
   > The file does not state the stored unit of these fields, so the unit every example file states was assumed.
+  @@ NEEDS RULING
+- **`lpn_wtg_note_unit_demand`**
+  > The demand at these junctions comes from unit demand loads. The flow of each load was imported as a demand; the loading units and the unit load were not.
   @@ NEEDS RULING
 - **`lpn_wtg_note_unit_unknown`**
   > Not converted: these fields, whose stored unit (shown in parentheses) this page does not know.
