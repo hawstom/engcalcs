@@ -11,6 +11,7 @@
 //   * no leader runs through a box other than its own anchor's symbol, and none is longer than reach;
 //   * labels in one column share the row lattice, so stacked labels touch without overlapping;
 //   * the same input gives the same output, and the input is not written to;
+//   * with `clear`, a leader keeps that far off every label box; with `view`, all of it stays inside;
 //   * 300 labels on a 1,200-pipe network place in under BUDGET_MS.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -162,6 +163,40 @@ function audit(name, labels, obs, out, reach) {
 	}
 	const out2 = C.placeExternalLabels([Object.assign({}, lbl, { anchor: { x: 0, y: 6 } })], { boxes: walled.boxes, segments: [] }, { rowH: ROW, pad: 0, reach: 120, linkCost: 15 });
 	ok(!out2[0].dropped && out2[0].form === 1, 'where only a one-row slot is free, the one-row form is taken', JSON.stringify({ form: out2[0].form, dropped: out2[0].dropped }));
+}
+
+// ---- 2c. clearance and the view (Perry, 2026-10-20) --------------------------------------------
+{
+	// On the seeded random networks, a leader within `clear` of a label box (not the box its anchor
+	// stands in) is counted: some at clear 0, none at clear 4.
+	function nearBoxes(c) {
+		let n = 0;
+		for (const seed of [1, 7, 42]) {
+			const r = rng(seed), { obs, nodes } = randomNet(r, 120, 900), pick = [];
+			for (let i = 0; i < nodes.length; i += 2) { pick.push(i); }
+			const labels = labelsAt(nodes, pick, r), out = C.placeExternalLabels(labels, obs, { rowH: ROW, pad: PAD, reach: 180, linkCost: 15, clear: c });
+			const boxes = obs.boxes.filter((b) => b.kind === 'label').concat(out.filter((q) => !q.dropped).map((q) => Object.assign(q.box, { who: q.id })));
+			out.forEach((q, k) => {
+				if (q.dropped) { return; }
+				const a = labels[k].anchor;
+				boxes.forEach((b) => {
+					if (b.who === q.id || (Math.abs(a.x - b.cx) <= b.w / 2 && Math.abs(a.y - b.cy) <= b.h / 2)) { return; }
+					if (C.segmentInBoxFraction(q.leader, C.box(b.cx, b.cy, b.w + 7.9, b.h + 7.9, 0)) > 0) { n++; }
+				});
+			});
+		}
+		return n;
+	}
+	const n0 = nearBoxes(0), n4 = nearBoxes(4);
+	ok(n0 > 0 && n4 === 0, 'with clear 4, no leader comes within 4 of a label box not its own', n0 + ' at clear 0, ' + n4 + ' at clear 4');
+	const sym = C.box(0, 0, 6, 6, 0); sym.kind = 'symbol';
+	const lbl = { id: 'n0', anchor: { x: 0, y: 0 }, w: 30, h: hOf(1), yOff: YOFF };
+	// the view: free ground only to the left of the anchor on screen, so the label goes left
+	const view = { x0: -200, y0: -200, x1: 10, y1: 200 };
+	const inView = C.placeExternalLabels([lbl], { boxes: [sym], segments: [] }, { rowH: ROW, pad: 0, reach: 120, linkCost: 15, view })[0];
+	ok(!inView.dropped && inView.box.cx + inView.box.w / 2 <= view.x1 && inView.box.cx - inView.box.w / 2 >= view.x0, 'the label lies inside the view it is given', JSON.stringify(inView.box));
+	const offView = C.placeExternalLabels([Object.assign({}, lbl, { anchor: { x: 300, y: 0 } })], { boxes: [], segments: [] }, { rowH: ROW, pad: 0, reach: 120, linkCost: 15, view })[0];
+	ok(offView.dropped, 'a label whose point is off the view is not set out on a leader from off the screen');
 }
 
 // ---- 3. seeded random networks ------------------------------------------------------------------

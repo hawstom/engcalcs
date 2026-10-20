@@ -294,10 +294,19 @@ Tom, 2026-10-20: *"we have still not found a way to approximate human artistic a
 leaders, and this makes us drop things that don't need to be dropped at network edges."* His hand
 arrangement of Net1 puts labels out in the open ground round the network, each on a straight
 leader, no two crossing. After every other placement step, each label still hidden is set in the
-nearest free run of text rows within 200 screen pixels of its node or pipe (a pipe label from its
+nearest free run of text rows within 150 screen pixels of its node or pipe (a pipe label from its
 middle or the 0.3/0.7 stations), on one world-wide row lattice so neighbours stack flush, hung
-right-justified when left of its point, on a straight leader that crosses no leader and runs
-through no label or symbol. Nothing already placed moves. The method is external (boundary)
+right-justified when left of its point, on a straight leader that crosses no leader, runs through
+no symbol, and keeps 3 px off every other label's whole box (not its staircase of rows). The
+label, its leader and its anchor stay on the screen. Nothing already placed moves, and an edit
+with Recalculate off redraws an outside label in the form it went out in, plus any value the
+edit changed, from the same leader end. Perry's 2026-10-20
+review measured the 200 px first cut: leaders struck other labels' words or ran flush under them,
+and on a phone ran off the screen. With these rules, against master: Net3 at 6 notches 131
+labels against 123, Novato at fit 127 against 115, on a phone 94 against 90, and no more
+leaders through a label box, whole-box overlaps or leaders off the screen than master. The cap
+of 150 against 200 cost two labels over five views and cut the longest leader from 183 to
+136 px; 120 cost two more. The method is external (boundary)
 labeling, Bekos, Kaufmann, Symvonis and Wolff 2007; the citation and what was and was not taken
 from it are at `Collide.placeExternalLabels()`. The nearest-to-open-ground label goes first: taken
 by row alone, inner labels' leaders walled off the edge labels. A pipe label goes out in the form

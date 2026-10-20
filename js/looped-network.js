@@ -3385,7 +3385,14 @@ var EngCalcs = EngCalcs || {};
 	// pixels of its node or pipe, flush against what is already drawn, on a straight leader that
 	// crosses no other leader and runs through no label or symbol. Nothing already placed moves.
 	// A pipe label taken out is drawn level, through the same seam as placeLevelPipeLabels()'s.
-	var LPN_EXTERNAL_REACH_PX = 200, LPN_EXTERNAL_LINK_COST_FRAC = 1.5;
+	var LPN_EXTERNAL_REACH_PX = 150, LPN_EXTERNAL_LINK_COST_FRAC = 1.5, LPN_EXTERNAL_CLEAR_PX = 3, LPN_EXTERNAL_EDGE_PX = 4;
+	// The map view in drawing units, LPN_EXTERNAL_EDGE_PX inside its edge: an outside label and its
+	// leader stay on the screen (Perry, 2026-10-20: on a phone, 14 leaders ran off it).
+	function externalView(s) {
+		var W = svg.clientWidth, H = svg.clientHeight, e = LPN_EXTERNAL_EDGE_PX;
+		if (!(W > 0 && H > 0)) { return null; }
+		return { x0: (e - state.tx) / s, y0: (e - state.ty) / s, x1: (W - e - state.tx) / s, y1: (H - e - state.ty) / s };
+	}
 	function placeExternalDroppedLabels(obs, nodeLabels, nodePlaced, ringLabels, ringPlaced, holders, fs) {
 		var specs = [], min = leaderThreshold(), s = state.s || 1, yOff = -fs * 0.85;
 		doc.nodes.forEach(function (n) { var ne = nodeEls[n.id]; if (ne) { ne.external = false; } });
@@ -3411,15 +3418,23 @@ var EngCalcs = EngCalcs || {};
 		nodePlaced.concat(ringPlaced).forEach(function (r) {
 			var spec = specOf[r.id], h = holders[r.id];
 			if (!spec || r.dropped || (h && (h.hiddenDropped || h.hiddenCrossed || h.levelBeside))) { return; }
-			(r.boxes && r.boxes.length ? r.boxes : (r.box ? [r.box] : [])).forEach(function (b) {
+			// Its rows, and the WHOLE box round them (Perry, 2026-10-20): a label set or a leader run in
+			// the notch of a right-justified staircase reads as lying on that label.
+			var bs = r.boxes && r.boxes.length ? r.boxes : (r.box ? [r.box] : []), x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity, flat = true;
+			bs.forEach(function (b) {
 				var c = Collide.box(b.cx, b.cy, b.w, b.h, b.a); c.kind = 'label'; ground.boxes.push(c);
+				if (b.a) { flat = false; }
+				x0 = Math.min(x0, b.cx - b.w / 2); x1 = Math.max(x1, b.cx + b.w / 2); y0 = Math.min(y0, b.cy - b.h / 2); y1 = Math.max(y1, b.cy + b.h / 2);
 			});
+			if (bs.length > 1 && flat) { var u = Collide.box((x0 + x1) / 2, (y0 + y1) / 2, x1 - x0, y1 - y0, 0); u.kind = 'label'; ground.boxes.push(u); }
 			if (Math.hypot(r.x - spec.anchor.x, r.y - spec.anchor.y) > min) {
 				ground.segments.push(Collide.segment(spec.anchor.x, spec.anchor.y, r.x, r.y, 'leader', r.id));
 			}
 		});
 		var out = perfDebugAccum('  ex:place', function () { return Collide.placeExternalLabels(specs, ground, { rowH: effectiveLineHeight(), pad: fs * LPN_LEVEL_PAD_FRAC * 2,
-			reach: LPN_EXTERNAL_REACH_PX / s, linkCost: fs * LPN_EXTERNAL_LINK_COST_FRAC }); });
+			reach: LPN_EXTERNAL_REACH_PX / s, linkCost: fs * LPN_EXTERNAL_LINK_COST_FRAC,
+			// A leader keeps this far off every other label; and all of it stays on the screen.
+			clear: LPN_EXTERNAL_CLEAR_PX / s, view: externalView(s) }); });
 		out.forEach(function (r, i) {
 			var sp = specs[i], h = sp.h0;
 			if (r.dropped) { return; }
@@ -16205,6 +16220,19 @@ var EngCalcs = EngCalcs || {};
 	// its neighbours, no collision avoidance. The next real content pass (a solve, a unit switch, a
 	// project reopen) recomputes everything properly; this is only what has to be true the instant
 	// an edit lands, with recalculate off and no solve running.
+	// **AN OUTSIDE LABEL KEEPS THE FORM IT WENT OUT IN** (Perry, 2026-10-20: with Recalculate off, an
+	// edit redrew Net1's L11 from "Q=1234.2" to its full three values, 57 px wider, out over ground
+	// the placement had given to others). It was set in the free ground at its shed size, so it is
+	// redrawn with the values it showed, plus any value the edit changed (the edit must show at
+	// once in the element's own label), hung from the same leader end. The next full pass places it
+	// afresh. Returns { all, shown }; `all` is new, `prevAll` and `shownBefore` the label's last.
+	function outsideLabelLines(all, prevAll, shownBefore) {
+		var was = {}, shownF = {}, shown;
+		(prevAll || []).forEach(function (ln) { if (ln.field !== undefined) { was[ln.field] = ln.text; } });
+		(shownBefore || []).forEach(function (ln) { if (ln.field !== undefined) { shownF[ln.field] = true; } });
+		shown = all.filter(function (ln) { return ln.field === undefined || shownF[ln.field] || was[ln.field] !== ln.text; });
+		return { all: all, shown: shown.length ? shown : all };
+	}
 	function refreshOneLabelInPlace(el) {
 		labelCacheTaint();
 		hoverCardHide();
@@ -16220,8 +16248,11 @@ var EngCalcs = EngCalcs || {};
 			lines = nodeLabelFieldLines(n, ls, null);
 			ne.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
-			ne.allLines = lines;
-			writeNodeLabelGlyphs(ne, n, lines, fsNow);
+			var keepForm = !!ne.external && !ne.empty;
+			if (keepForm) { lines = outsideLabelLines(lines, ne.allLines, ne.lines); }
+			ne.allLines = lines.all;
+			lines = keepForm ? lines.shown : lines;
+			writeNodeLabelGlyphs(ne, n, lines, fsNow, keepForm ? ne.inline : undefined);
 			if (oneLabelBatch) { oneLabelBatch.push({ holder: ne, node: n.id }); return; }
 			measureLabelWidths(ne);
 			layoutNodeLabel(n.id);
@@ -16231,7 +16262,10 @@ var EngCalcs = EngCalcs || {};
 			lines = linkLabelFieldLines(l, ls, null);
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
-			le.allLines = lines;
+			var outside = !!le.external && le.levelBeside && !le.levelForm && !le.empty;
+			if (outside) { lines = outsideLabelLines(lines, le.allLines, le.lines); }
+			le.allLines = outside ? lines.all : lines;
+			lines = outside ? lines.shown : lines;
 			writeLabelGlyphs(le, l, lines, fsNow);
 			if (oneLabelBatch) { oneLabelBatch.push({ holder: le, link: l.id }); return; }
 			measureLabelWidths(le);

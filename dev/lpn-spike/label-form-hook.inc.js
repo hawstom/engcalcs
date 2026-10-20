@@ -249,5 +249,92 @@
 		doc.links.forEach(function (l) { one('L' + l.id, linkEls[l.id]); });
 		return out;
 	};
+	// **WHOLE-BOX AUDIT** (Perry, 2026-10-20): each drawn label as ONE box, the rectangle round all its
+	// rows, not the staircase of rows read() tests. In screen pixels: pairs of labels whose boxes
+	// overlap by more than `tolPx`; leaders that run through, or within `clearPx` of, a label box not
+	// their own; leaders and external labels that leave the map view.
+	window.__lpnForm.audit = function (tolPx, clearPx) {
+		var s = state.s, W = svg.clientWidth, H = svg.clientHeight, boxes = [], segs = [], out = { overlaps: [], hits: [], offLeaders: [], offLabels: [] };
+		function vis(t) { return !!t && !!t.textContent && t.checkVisibility({ visibilityProperty: true, opacityProperty: true }); }
+		function sc(x, y) { return { x: x * s + state.tx, y: y * s + state.ty }; }
+		function boxOf(key, t) {
+			var b, m, a = 0, ox = 0, oy = 0, cx, cy, dx, dy, rad, p;
+			try { b = t.getBBox(); } catch (e) { return; }
+			if (!(b.width > 0)) { return; }
+			m = /rotate\(([-0-9.e]+)[ ,]+([-0-9.e]+)[ ,]+([-0-9.e]+)\)/.exec(t.getAttribute('transform') || '');
+			if (m) { a = +m[1]; ox = +m[2]; oy = +m[3]; }
+			rad = a * Math.PI / 180; cx = b.x + b.width / 2; cy = b.y + b.height / 2; dx = cx - ox; dy = cy - oy;
+			if (a) { cx = ox + dx * Math.cos(rad) - dy * Math.sin(rad); cy = oy + dx * Math.sin(rad) + dy * Math.cos(rad); }
+			p = sc(cx, cy);
+			boxes.push({ key: key, cx: p.x, cy: p.y, w: b.width * s, h: b.height * s, a: rad });
+		}
+		function leaderOf(key, h) {
+			var e = h && h.leader;
+			if (!e || e.style.display === 'none' || e.style.visibility === 'hidden' || e.getAttribute('x1') == null || !vis(h.text)) { return; }
+			var p = sc(+e.getAttribute('x1'), +e.getAttribute('y1')), q = sc(+e.getAttribute('x2'), +e.getAttribute('y2'));
+			segs.push({ key: key, ax: p.x, ay: p.y, bx: q.x, by: q.y, ext: !!h.external });
+		}
+		doc.nodes.forEach(function (n) { var h = nodeEls[n.id]; if (h && !h.empty && vis(h.text)) { boxOf('n' + n.id, h.text); leaderOf('n' + n.id, h); } });
+		doc.links.forEach(function (l) {
+			var h = linkEls[l.id];
+			if (!h || h.empty || !vis(h.text)) { return; }
+			boxOf('l' + l.id, h.text); leaderOf('l' + l.id, h);
+			(h.repeats || []).forEach(function (r) { if (vis(r.text)) { boxOf('l' + l.id, r.text); } });
+		});
+		doc.labels.forEach(function (lb) { var te = labelEls[lb.id]; if (te && vis(te.text)) { boxOf('t' + lb.id, te.text); } });
+		function onView(b) { return b.cx + b.w / 2 > 0 && b.cx - b.w / 2 < W && b.cy + b.h / 2 > 0 && b.cy - b.h / 2 < H; }
+		boxes = boxes.filter(onView);
+		function proj(b, ax) {
+			var c = b.cx * ax[0] + b.cy * ax[1], e = Math.abs(b.w / 2 * (Math.cos(b.a) * ax[0] + Math.sin(b.a) * ax[1])) +
+				Math.abs(b.h / 2 * (-Math.sin(b.a) * ax[0] + Math.cos(b.a) * ax[1]));
+			return [c - e, c + e];
+		}
+		function depth(p, q) {
+			var d = Infinity;
+			[p, q].forEach(function (b) {
+				[[Math.cos(b.a), Math.sin(b.a)], [-Math.sin(b.a), Math.cos(b.a)]].forEach(function (ax) {
+					var u = proj(p, ax), w = proj(q, ax); d = Math.min(d, Math.min(u[1], w[1]) - Math.max(u[0], w[0]));
+				});
+			});
+			return d;
+		}
+		function local(b, x, y) { var dx = x - b.cx, dy = y - b.cy; return { x: dx * Math.cos(-b.a) - dy * Math.sin(-b.a), y: dx * Math.sin(-b.a) + dy * Math.cos(-b.a) }; }
+		function segInBox(g, b, c) {
+			var p = local(b, g.ax, g.ay), q = local(b, g.bx, g.by), hw = b.w / 2 + c, hh = b.h / 2 + c, dx = q.x - p.x, dy = q.y - p.y, t0 = 0, t1 = 1,
+				P = [-dx, dx, -dy, dy], Q = [p.x + hw, hw - p.x, p.y + hh, hh - p.y], i, r;
+			for (i = 0; i < 4; i++) {
+				if (P[i] === 0) { if (Q[i] < 0) { return false; } continue; }
+				r = Q[i] / P[i];
+				if (P[i] < 0) { if (r > t1) { return false; } if (r > t0) { t0 = r; } } else { if (r < t0) { return false; } if (r < t1) { t1 = r; } }
+			}
+			return t1 - t0 > 1e-6;
+		}
+		var i, j;
+		for (i = 0; i < boxes.length; i++) {
+			for (j = i + 1; j < boxes.length; j++) {
+				if (boxes[i].key === boxes[j].key) { continue; }
+				var d = depth(boxes[i], boxes[j]);
+				if (d > tolPx) { out.overlaps.push(boxes[i].key + '~' + boxes[j].key + ' ' + d.toFixed(1)); }
+			}
+		}
+		segs.forEach(function (g) {
+			if ([[g.ax, g.ay], [g.bx, g.by]].some(function (p) { return p[0] < -2 || p[1] < -2 || p[0] > W + 2 || p[1] > H + 2; })) { out.offLeaders.push(g.key + (g.ext ? ' ext' : '')); }
+			boxes.forEach(function (b) {
+				if (b.key === g.key) { return; }
+				var p = local(b, g.ax, g.ay);
+				// a leader that starts inside a box is that box's overlap with the label's point, not a leader through it
+				if (Math.abs(p.x) <= b.w / 2 && Math.abs(p.y) <= b.h / 2) { return; }
+				if (segInBox(g, b, clearPx)) { out.hits.push(g.key + '>' + b.key + (g.ext ? ' ext' : '')); }
+			});
+		});
+		function offMap(key, h) {
+			if (!h || !h.external || !vis(h.text)) { return; }
+			var r = h.text.getBoundingClientRect(), c = svg.getBoundingClientRect();
+			if (r.left < c.left - 1 || r.right > c.right + 1 || r.top < c.top - 1 || r.bottom > c.bottom + 1) { out.offLabels.push(key); }
+		}
+		doc.nodes.forEach(function (n) { offMap('n' + n.id, nodeEls[n.id]); });
+		doc.links.forEach(function (l) { offMap('l' + l.id, linkEls[l.id]); });
+		return out;
+	};
 	// eslint-disable-next-line no-eval
 	window.__lpnForm.ev = function (src) { return eval(src); };

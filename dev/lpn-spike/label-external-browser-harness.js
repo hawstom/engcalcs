@@ -21,6 +21,11 @@
 //   * no view shows fewer labels than the reference refs;
 //   * every leader belongs to a drawn label and is no longer than 220 px (as
 //     label-leader-bound-browser-harness.js holds);
+//   * an external label redrawn in place (an edit with Recalculate off) keeps its words and leader;
+//   * no external leader runs through, or within CLEAR_PX of, any label's whole box; and no view
+//     has more whole-box label overlaps, leaders through a label box, or leaders off the screen
+//     than the refs (Perry, 2026-10-20, whose metrics these are: __lpnForm.audit());
+//   * no external label or its leader leaves the screen, a phone's in tall mode included;
 //   * the content pass at the last view of each scene is within BUDGET_FRAC of the first ref's
 //     (median of five), plus BUDGET_MS for timer noise.
 // Printed, for each mode: labels shown, labels hidden in view, leaders, leader crossings (all
@@ -66,7 +71,7 @@ function ok(label, cond, detail) {
 const MARKER = "\tdocument.addEventListener('DOMContentLoaded'";
 const HOOK = fs.readFileSync(path.join(__dirname, 'label-form-hook.inc.js'), 'utf8');
 const CUT = 'placeExternalDroppedLabels(obs, nodeLabels, nodePlaced, labels, placed, holders, fs);';
-const TOL_PX = 1.5, AMBIG_PX = 3, LEN_MAX_PX = 220;
+const TOL_PX = 1.5, AMBIG_PX = 3, LEN_MAX_PX = 220, CLEAR_PX = 2;
 // The pass-time budget: the external stage may add this fraction of the reference's content pass.
 const BUDGET_FRAC = 0.15, BUDGET_MS = 6;
 const NET3_NODE = ['id', 'pressure', 'demand', 'elev'], NET3_LINK = ['id', 'flow', 'velocity'];
@@ -77,9 +82,11 @@ const SCENES = [
 	{ key: 'net1', name: 'Net1 (gallery, US), wheeled out', cardKey: 'lpn_ex_net1_title', node: ['id', 'demand', 'elev', 'pressure'],
 		link: ['flow'], step: true, notches: [-4, -14] },
 	{ key: 'net3', name: 'Net3 (gallery, gpm)', cardKey: 'lpn_ex_net3_title', node: NET3_NODE, link: NET3_LINK, notches: [6, 9], shot: 'labels-margin-net3.png', shotAt: 6 },
+	// Perry, 2026-10-20: a phone in tall mode, where the free ground runs off the screen's edge.
+	{ key: 'net3phone', name: 'Net3 on a phone in tall mode', cardKey: 'lpn_ex_net3_title', node: NET3_NODE, link: NET3_LINK, notches: [6], viewport: { width: 390, height: 844 } },
 	{ key: 'novato', name: 'Net3 on the world map near Novato', file: 'dev/water-network-examples/Net3-Novato-CA-World.lwn', fit: true, noMax: true,
 		node: NET3_NODE, link: NET3_LINK, notches: [0, 3] }
-].filter((sc) => (process.env.LABEL_EXT_SCENES || 'net1tom,net3').split(',').indexOf(sc.key) >= 0);
+].filter((sc) => (process.env.LABEL_EXT_SCENES || 'net1tom,net3,net3phone').split(',').indexOf(sc.key) >= 0);
 
 async function wheel(page, n) {
 	const step = n > 0 ? -100 : 100;
@@ -153,6 +160,21 @@ async function layOut(Session, browser, sc, ref, shots) {
 				if (process.env.LABEL_EXT_PROBE_OUT) { fs.writeFileSync(process.env.LABEL_EXT_PROBE_OUT + '-' + k + '.json', pr); } else { console.log('        probe: ' + pr); }
 			}
 			const ls = await a.page.evaluate(() => window.__lpnForm.leaders());
+			const au = await a.page.evaluate(([t, c]) => window.__lpnForm.audit(t, c), [TOL_PX, CLEAR_PX]);
+			// An edit with Recalculate off redraws one label in place (refreshOneLabelInPlace()): an
+			// external one must keep its words and its leader where the pass put them (Perry, 2026-10-20).
+			const moved = ref ? [] : await a.page.evaluate(() => window.__lpnForm.ev(`(function () {
+				var out = [];
+				function rd(h) { var r = h.text.getBoundingClientRect(), e = h.leader;
+					return [r.left, r.top, r.right, r.bottom].concat(e ? [+e.getAttribute('x1'), +e.getAttribute('y1'), +e.getAttribute('x2'), +e.getAttribute('y2')] : [0, 0, 0, 0]).map(function (v, i) { return i < 4 ? v : v * state.s; }); }
+				doc.links.forEach(function (l) { var h = linkEls[l.id]; if (!h || !h.external) { return; }
+					var a = rd(h); refreshOneLabelInPlace(l); var b = rd(h);
+					if (a.some(function (v, i) { return Math.abs(v - b[i]) > 1; })) { out.push('L' + l.id + ' ' + a.map(Math.round).join(',') + ' -> ' + b.map(Math.round).join(',')); } });
+				doc.nodes.forEach(function (n) { var h = nodeEls[n.id]; if (!h || !h.external) { return; }
+					var a = rd(h); refreshOneLabelInPlace(n); var b = rd(h);
+					if (a.some(function (v, i) { return Math.abs(v - b[i]) > 1; })) { out.push('N' + n.id + ' ' + a.map(Math.round).join(',') + ' -> ' + b.map(Math.round).join(',')); } });
+				return out;
+			})()`));
 			const hidden = v.sig.split('\n').filter((x) => / hidden$/.test(x)).map((x) => x.split(' ')[0]);
 			let crossings = 0, extCross = 0;
 			const live = ls.filter((l) => !l.orphan);
@@ -162,7 +184,8 @@ async function layOut(Session, browser, sc, ref, shots) {
 				}
 			}
 			views.push({ notch: k, labels: v.labels, nodes: v.nodes, pipes: v.pipes, values: v.values, N1: v.N1.length, hidden,
-				leaders: live.length, crossings, extCross, ext: live.filter((l) => l.ext).length,
+				leaders: live.length, crossings, extCross, ext: live.filter((l) => l.ext).length, au, moved,
+				extLen: live.filter((l) => l.ext).map((l) => l.len),
 				long: ls.filter((l) => l.orphan || l.len > LEN_MAX_PX).map((l) => l.key + ' ' + l.len.toFixed(0) + (l.orphan ? ' orphan' : '')) });
 			if (shots && sc.shot && (sc.shotAt === undefined || sc.shotAt === k)) {
 				fs.mkdirSync(shots, { recursive: true });
@@ -194,7 +217,9 @@ async function layOut(Session, browser, sc, ref, shots) {
 
 function row(v) {
 	return `labels ${v.labels} (nodes ${v.nodes}, pipes ${v.pipes}), values ${v.values}, hidden in view ${v.hidden.length}, ` +
-		`leaders ${v.leaders} (external ${v.ext}), leader crossings ${v.crossings} (with an external one ${v.extCross}), overlaps ${v.N1}`;
+		`leaders ${v.leaders} (external ${v.ext}), leader crossings ${v.crossings} (with an external one ${v.extCross}), row overlaps ${v.N1}, ` +
+		`box overlaps ${v.au.overlaps.length}, leaders through a label box ${v.au.hits.length} (external ${v.au.hits.filter((h) => / ext$/.test(h)).length}), ` +
+		`leaders off screen ${v.au.offLeaders.length}, longest external leader ${v.extLen.length ? Math.max.apply(null, v.extLen).toFixed(0) : '-'} px`;
 }
 
 async function main() {
@@ -227,6 +252,16 @@ async function main() {
 					if (lost.length) { console.log('        hidden here, shown by ' + o.ref + ': ' + lost.join(' ')); }
 				});
 				ok(at + ': no leader to an external label crosses another leader', v.extCross === 0, String(v.extCross));
+				ok(at + ': an external label redrawn in place keeps its place and its leader', v.moved.length === 0, v.moved.slice(0, 3).join('; '));
+				const extHits = v.au.hits.filter((h) => / ext$/.test(h));
+				ok(at + ': no external leader runs through or within ' + CLEAR_PX + ' px of a label box', extHits.length === 0, extHits.slice(0, 6).join(' '));
+				ok(at + ': no external label or its leader off the screen', v.au.offLabels.length === 0 && !v.au.offLeaders.some((h) => / ext$/.test(h)), v.au.offLabels.concat(v.au.offLeaders.filter((h) => / ext$/.test(h))).join(' '));
+				others.forEach((o) => {
+					const w = o.r.views[i];
+					ok(at + ': box overlaps no more than ' + o.ref, v.au.overlaps.length <= w.au.overlaps.length, v.au.overlaps.length + ' vs ' + w.au.overlaps.length + ' ' + v.au.overlaps.filter((x) => w.au.overlaps.indexOf(x) < 0).join(' '));
+					ok(at + ': leaders through a label box no more than ' + o.ref, v.au.hits.length <= w.au.hits.length, v.au.hits.length + ' vs ' + w.au.hits.length + ' ' + v.au.hits.filter((x) => w.au.hits.indexOf(x) < 0).join(' '));
+					ok(at + ': leaders off screen no more than ' + o.ref, v.au.offLeaders.length <= w.au.offLeaders.length, v.au.offLeaders.length + ' vs ' + w.au.offLeaders.length);
+				});
 				ok(at + ': every leader on a drawn label, none over ' + LEN_MAX_PX + ' px', v.long.length === 0, v.long.slice(0, 4).join('; '));
 				others.forEach((o) => ok(at + ': no fewer labels than ' + o.ref, v.labels >= o.r.views[i].labels, v.labels + ' vs ' + o.r.views[i].labels));
 				if (sc.noneHidden) { ok(at + ': no node or pipe label on screen is hidden', v.hidden.length === 0, v.hidden.join(' ')); }

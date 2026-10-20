@@ -2344,11 +2344,15 @@ EngCalcs.lpnCollide = (function () {
 	// point as labelBoxAtEnd() hangs it: right of the end when the end is right of the anchor).
 	// obstacles: { boxes, segments }, everything on the map; segments of kind 'leader' may not be
 	// crossed, of kind 'link' may be crossed at `linkCost` world units each.
-	// opts: { rowH, pad, reach, linkCost, keep }. Returns one result per label, in input order:
+	// opts: { rowH, pad, reach, linkCost, keep, clear, view }: `clear`, how far a leader keeps off
+	// every label box but its own (Perry, 2026-10-20: a leader run flush under another label's words
+	// reads as that label's leader); `view` {x0, y0, x1, y1}, the screen in world units, which a
+	// label, its leader and its anchor stay inside (a phone in tall mode). Returns one result per label, in input order:
 	// { id, dropped } or { id, x, y, side, box, leader, d, form, at } (`at`: which of `anchors`).
 	function placeExternalLabels(labels, obstacles, opts) {
 		opts = opts || {};
 		var rowH = +opts.rowH, pad = +opts.pad || 0, reach = +opts.reach, linkCost = +opts.linkCost || 0,
+			clear = +opts.clear > 0 ? +opts.clear : 0, view = opts.view || null,
 			keep = opts.keep > 0 ? opts.keep : 8,
 			rows = new Map(), merged = new Map(), mine = { boxes: [], segments: [] }, results = {}, MAXROWS = 40000;
 		if (!(rowH > 0) || !(reach > 0) || !isFinite(rowH) || !isFinite(reach)) {
@@ -2439,8 +2443,10 @@ EngCalcs.lpnCollide = (function () {
 			if (!((i1 - i0 + 1) * (j1 - j0 + 1) <= 4096)) { bucket.set('big', (bucket.get('big') || []).concat([n])); return; }
 			for (i = i0; i <= i1; i++) { for (j = j0; j <= j1; j++) { c = bucket.get(bkey(i, j)); if (!c) { c = []; bucket.set(bkey(i, j), c); } c.push(n); } }
 		}
+		// A label box is tested `clear` larger all round, so it is binned that much larger.
+		function grown(b) { return (clear && b.kind !== 'symbol') ? box(b.cx, b.cy, b.w + 2 * clear, b.h + 2 * clear, b.a) : b; }
 		obstacles.boxes.forEach(function (b) {
-			var c = boxCorners(b);
+			var c = boxCorners(grown(b));
 			bin(b, Math.min(c[0].x, c[1].x, c[2].x, c[3].x), Math.min(c[0].y, c[1].y, c[2].y, c[3].y), Math.max(c[0].x, c[1].x, c[2].x, c[3].x), Math.max(c[0].y, c[1].y, c[2].y, c[3].y));
 		});
 		obstacles.segments.forEach(function (g) { bin(g, Math.min(g.ax, g.bx), Math.min(g.ay, g.by), Math.max(g.ax, g.bx), Math.max(g.ay, g.by)); });
@@ -2475,13 +2481,13 @@ EngCalcs.lpnCollide = (function () {
 					// station. Not a symbol over a pipe label's start: the leader would leave a node,
 					// and read as that node's (N3 in label-form-wheel-browser-harness.js)
 					if ((lbl.own === undefined || o.kind !== 'symbol') && Math.abs(g.ax - o.cx) <= o.w / 2 + 1e-9 && Math.abs(g.ay - o.cy) <= o.h / 2 + 1e-9) { return false; }
-					return segmentInBoxFraction(g, o) > 0;
+					return segmentInBoxFraction(g, grown(o)) > 0;
 				}
 				if (o.kind !== 'leader') { return false; }
 				return segmentsCross(g, o);
 			}
 			if (nearLeader(g, blocked)) { return -1; }
-			for (k = 0; k < mine.boxes.length; k++) { if (segmentInBoxFraction(g, mine.boxes[k]) > 0) { return -1; } }
+			for (k = 0; k < mine.boxes.length; k++) { if (segmentInBoxFraction(g, grown(mine.boxes[k])) > 0) { return -1; } }
 			for (k = 0; k < mine.segments.length; k++) { if (segmentsCross(g, mine.segments[k])) { return -1; } }
 			return n * linkCost;
 		}
@@ -2495,11 +2501,13 @@ EngCalcs.lpnCollide = (function () {
 			var anchors = lbl.anchors && lbl.anchors.length ? lbl.anchors : [lbl.anchor], ai, a, w = f.w, n = Math.max(1, Math.ceil(f.h / rowH - 1e-9)),
 				i0, i1, i, cands = [], gaps, k, g, y;
 			function cand(x, side) {
-				var d = Math.hypot(x - a.x, y - a.y);
+				var d = Math.hypot(x - a.x, y - a.y), bx0 = side === 'right' ? x : x - w;
+				if (view && (bx0 < view.x0 || bx0 + w > view.x1 || y + lbl.yOff < view.y0 || y + lbl.yOff + f.h > view.y1)) { return; }
 				if (d <= reach) { cands.push({ x: x, y: y, side: side, d: d, a: a, ai: ai }); }
 			}
 			for (ai = 0; ai < anchors.length; ai++) {
 			a = anchors[ai]; i0 = Math.floor((a.y - reach - f.h) / rowH); i1 = Math.floor((a.y + reach) / rowH);
+			if (view && (a.x < view.x0 || a.x > view.x1 || a.y < view.y0 || a.y > view.y1)) { continue; }
 			for (i = i0; i <= i1; i++) {
 				y = i * rowH - lbl.yOff;
 				if (D1 !== undefined && (Math.abs(y - a.y) < D0 || Math.abs(y - a.y) >= D1)) { continue; }
