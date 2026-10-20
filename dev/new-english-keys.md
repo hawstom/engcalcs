@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**98 still to read on master**, of 106 untranslated keys, of 3125 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**99 still to read on master**, of 107 untranslated keys, of 3126 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (106, 98 to read @@ NEEDS RULING)
+## lpn_  (107, 99 to read @@ NEEDS RULING)
 
 - **`lpn_diag_gpv_curve_order`**
   > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
@@ -77,7 +77,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
   @@ NEEDS RULING
 - **`lpn_guide_cmp_byasset_def`**
-  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box.</p>
+  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver's internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.</p>
   @@ NEEDS RULING
 - **`lpn_guide_cmp_byasset_term`**
   > Results by asset
@@ -307,6 +307,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_scnres_failed`**
   > {scenario} could not be solved, so its columns are blank. {why}
   @@ NEEDS RULING
+- **`lpn_scnres_flow_tip`**
+  > The sign of a flow is the solver's internal direction sign: positive runs from the From node to the To node, negative the reverse. It has no use outside this table except to show whether a flow changed direction between scenarios.
+  @@ NEEDS RULING
 - **`lpn_scnres_none`**
   > Check at least one result to show.
   @@ NEEDS RULING
@@ -354,7 +357,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**57 still to read**, of 61 new keys across 6 unmerged branch(es).
+**81 still to read**, of 85 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -365,13 +368,95 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### chore/batch-1019c (`4275a23ae`) — adds no English strings
+
 ### feat/desktop (`baba0f04d`) — adds no English strings
+
+### feat/eps-analysis (`bbeb3e827`) — 22 new, 22 to read @@ NEEDS RULING
+
+- **`lpn_at_time`**
+  > {value} at {time}
+  @@ NEEDS RULING
+- **`lpn_crit_col_empty`**
+  > Tank empties
+  @@ NEEDS RULING
+- **`lpn_crit_col_hours`**
+  > Hours below minimum
+  @@ NEEDS RULING
+- **`lpn_crit_col_lowest`**
+  > Lowest pressure
+  @@ NEEDS RULING
+- **`lpn_crit_run_note`**
+  > Each outage was run over the whole simulation ({n} reporting steps).
+  @@ NEEDS RULING
+- **`lpn_ds_empties_at`**
+  > ⚠ At a demand scale of {m}, a tank empties at {time}.
+  @@ NEEDS RULING
+- **`lpn_ds_limit_at`**
+  > Limiting reporting step: {time}.
+  @@ NEEDS RULING
+- **`lpn_ds_lowest_at_time`**
+  > At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}, at {time}.
+  @@ NEEDS RULING
+- **`lpn_ds_run_note`**
+  > Judged over the whole run, at every reporting step.
+  @@ NEEDS RULING
+- **`lpn_eps_working`**
+  > Running the extended-period simulation.
+  @@ NEEDS RULING
+- **`lpn_ff_at_all`**
+  > Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.
+  @@ NEEDS RULING
+- **`lpn_ff_at_minp`**
+  > Tested at {time}, the reporting step with the lowest pressure among the junctions tested.
+  @@ NEEDS RULING
+- **`lpn_ff_at_step`**
+  > Tested at reporting step {time}.
+  @@ NEEDS RULING
+- **`lpn_ff_col_hour`**
+  > Lowest at
+  @@ NEEDS RULING
+- **`lpn_ff_working_steps`**
+  > Working: reporting step {step} of {steps}, junction {done} of {total}.
+  @@ NEEDS RULING
+- **`lpn_when`**
+  > Time step tested
+  @@ NEEDS RULING
+- **`lpn_when_all`**
+  > Every reporting step, worst case
+  @@ NEEDS RULING
+- **`lpn_when_hour`**
+  > A chosen reporting step
+  @@ NEEDS RULING
+- **`lpn_when_minp`**
+  > The reporting step of lowest pressure
+  @@ NEEDS RULING
+- **`lpn_when_now`**
+  > The time step on screen
+  @@ NEEDS RULING
+- **`lpn_when_run`**
+  > The whole run
+  @@ NEEDS RULING
+- **`lpn_when_step`**
+  > Reporting step
+  @@ NEEDS RULING
+
+### feat/guide-page (`56674694d`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_guide_page_desc`**
+  > The user manual for the pipe network modeling application, one page for each chapter, from the map and the Properties box to scenarios, fire flow analysis, and criticality analysis.
+  @@ NEEDS RULING
+- **`lpn_guide_page_open`**
+  > Open the application
+  @@ NEEDS RULING
 
 ### feat/label-beside (`8676cd1be`) — already merged into feat/label-form; its strings are listed there
 
-### feat/label-form (`d05fdb069`) — adds no English strings
+### feat/label-form (`d05fdb069`) — already merged into feat/label-leader; its strings are listed there
 
-### feat/network-update (`84de54bd4`) — adds no English strings
+### feat/label-leader (`ce56b8cf9`) — adds no English strings
+
+### feat/network-update (`4275a23ae`) — already merged into chore/batch-1019c; its strings are listed there
 
 ### feat/sqlite-reader (`75ed1031f`) — 51 new, 51 to read @@ NEEDS RULING
 
@@ -561,3 +646,5 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_theme_space`**
   > Space
   @@ NEEDS RULING
+
+### fix/scenario-flow-sign (`032070dca`) — adds no English strings
