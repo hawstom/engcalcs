@@ -53003,6 +53003,33 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return { d: d, id: d.box.id, title: t ? dockTitleOf(d) : '' };
 		}).filter(function (e) { return !!e.title; });
 	}
+	// A box's text in the Guide: a paragraph of one line ending in a colon, with more after it, is a
+	// sub-heading (colon dropped); "- " paragraphs are list items. The same two rules as
+	// ecGuideIntroHtml() (lib/GuideChapters.lib.php), which draws the chapter's own page. The box's
+	// "?" tip keeps the raw text.
+	function guideBoxEntryParas(text, into) {
+		var paras = String(text).split(/\\n\\n|\n\n/).map(function (t) { return String(t).trim(); }).filter(function (t) { return t; }), ul = null;
+		paras.forEach(function (para, i) {
+			var node;
+			if (para.indexOf('- ') === 0) {
+				if (!ul) { ul = document.createElement('ul'); into.appendChild(ul); }
+				node = document.createElement('li');
+				node.textContent = para.slice(2);
+				ul.appendChild(node);
+				return;
+			}
+			ul = null;
+			if (i < paras.length - 1 && para.indexOf('\n') < 0 && /[:\uFF1A]$/.test(para)) {
+				node = document.createElement('h4');
+				node.className = 'lpn-guide-subhead';
+				node.textContent = para.replace(/[:\uFF1A]$/, '');
+			} else {
+				node = document.createElement('p');
+				node.textContent = para;
+			}
+			into.appendChild(node);
+		});
+	}
 	function renderGuideBoxes() {
 		var host = document.getElementById('lpn_guide_boxes'), pc = EngCalcs.pageConfig || {};
 		if (!host) { return; }
@@ -53022,12 +53049,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				(pc.lpn_guide_box_named || '{box} box').replace('{box}', e.title) : e.title;
 			en.appendChild(h);
 			h.tabIndex = -1;
-			(e.d.tipText || pc['lpn_guide_text_' + e.id.replace(/^lpn_/, '')] || '').split(/\\n\\n|\n\n/).forEach(function (para) {
-				if (!String(para).trim()) { return; }
-				p = document.createElement('p');
-				p.textContent = String(para).trim();
-				en.appendChild(p);
-			});
+			guideBoxEntryParas((e.d.tipText || pc['lpn_guide_text_' + e.id.replace(/^lpn_/, '')] || ''), en);
 			// A chapter longer than a paragraph or two (Find and replace, Tom 2026-10-07) is written in
 			// the page as <template id="lpn_guide_more_<box id>"> and copied in under its paragraphs.
 			var more = document.getElementById('lpn_guide_more_' + e.id);

@@ -6025,7 +6025,7 @@ html[dir="rtl"] .lpn-guide-rail-collapsed .lpn-guide-railtoggle svg { transform:
 	border-bottom: 1px solid var(--ec-border-strong);
 }
 .lpn-guidebox .lpn-guide-section:first-of-type > h2 { margin-top: .2em; }
-.lpn-guide-menu > h3, .lpn-guide-section dt {
+.lpn-guide-menu > h3, .lpn-guide-section dt, .lpn-guidebox h4.lpn-guide-subhead {
 	font-size: 1rem; font-weight: bold; margin: .9em 0 .3em; padding-bottom: .15em;
 	border-bottom: 1px solid var(--ec-border);
 }
@@ -7169,6 +7169,8 @@ textarea.lpn-desc-ta {
 .ec-guide-page h1 { font-size: 1.6rem; margin: 1rem 0 .75rem; }
 .ec-guide-page h2 { font-size: 1.2rem; margin-top: 1.5rem; }
 .ec-guide-page dt { font-weight: bold; margin-top: .9rem; }
+.ec-guide-page .lpn-guide-subhead { font-size: 1rem; font-weight: bold; margin: .9rem 0 .3rem; padding-bottom: .15em; border-bottom: 1px solid var(--ec-border); }
+.ec-guide-page ul { margin: 0 0 .6rem; }
 .ec-guide-page dt.lpn-guide-dup { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; margin: 0; }
 .ec-guide-page dd { margin-inline-start: 0; }
 .ec-guide-top a, .ec-guide-langs a { margin-inline-end: 1rem; }

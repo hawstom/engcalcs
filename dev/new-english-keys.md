@@ -549,7 +549,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**57 still to read**, of 61 new keys across 8 unmerged branch(es).
+**57 still to read**, of 61 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -560,13 +560,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/merge-1020a (`e4373b805`) — adds no English strings
-
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/duration-fire (`c221d72bf`) — already merged into chore/merge-1020a; its strings are listed there
-
-### feat/label-leader (`bcebdfa58`) — adds no English strings
+### feat/label-leader (`c087be63d`) — adds no English strings
 
 ### feat/sqlite-reader (`75ed1031f`) — 51 new, 51 to read @@ NEEDS RULING
 
@@ -726,7 +722,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/theme (`6221a4cae`) — already merged into feat/theme-tank; its strings are listed there
 
-### feat/theme-tank (`0055f8ed3`) — 10 new, 6 to read @@ NEEDS RULING
+### feat/theme-tank (`dfd847678`) — 10 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_theme_amber`**
   > Amber
