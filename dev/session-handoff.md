@@ -118,8 +118,8 @@ lines rather than appending corrections.
   view 24 labels vs 21 (none hidden), Net3 141 vs 123, Novato 133 vs 115, 0 crossings, ~5% time.
   Unlike his hand Net1: pipe labels go out short (Q only), some land inside loops, leaders any angle
   up to 200 px, ragged columns. Perry 10-20: counts confirmed, "drop fewer", not "arranged like a person"; three
-  defects (an edit slides an outside pipe label off its leader; long leaders through label text;
-  more off-screen leaders on a phone) sent back to a fix agent at handoff time: read its commits.
+  defects fixed in 8691fa30e (150 px cap; gain over master roughly halved: Net3 131 vs 123, Novato
+  127 vs 115); not re-reviewed by Perry.
 - `feat/flow-arrow` (8102), 5ebd338e2: double chevron, two unfilled closed heads (his /tmp/arrow.png).
 - `feat/geojson-into-project` (8101), cad86297c, Task 814: his two-paragraph wording in, verbatim.
   Ready on his word. The .inp twin `lpn_inpup_lead` still one line; asked whether to match.
@@ -141,6 +141,9 @@ Task 681 after label-leader/label-margin settle. Task 733 rules slice.
   `tail`. Merge first, copy his edited file in after.
 - **An outward-looking agent wrote its journal in the main checkout** while nothing was running;
   brief every agent to write journals to the scratchpad, always.
+- **A menu item's language key is its command ID** (`lib/lpn-commands.json`, usage counts). Reusing
+  another key for a menu row renamed the command; `lpn_file_export_item_msx` was restored for that.
+  Never point a menu row at a borrowed key. Only the full suite's browser harness caught it.
 - **`git -c user.name=$VAR` with spaces in the variable breaks**; set `GIT_AUTHOR_NAME` /
   `GIT_COMMITTER_NAME` in the environment instead.
 
