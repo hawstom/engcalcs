@@ -45516,7 +45516,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				var wtgNote = document.createElement('p');
 				wtgNote.style.margin = '0 0 8px';
 				wtgNote.style.fontWeight = 'bold';
-				wtgNote.textContent = String(pc.lpn_wtg_report_intro || 'This was a WaterCAD or WaterGEMS model. Bentley publishes no description of the file, so it is read by a layout learned from example files. It was imported as a new project, from its scenario {base} and {n} more scenarios. Compare the results with WaterGEMS before relying on them.')
+				wtgNote.textContent = String(pc.lpn_wtg_report_intro || 'This was a WaterCAD or WaterGEMS model. Bentley publishes no description of the file, so it is read by a layout learned from example files. It was imported as a new project, from its scenario {base} and further scenarios ({n}). Compare the results with WaterGEMS before relying on them.')
 					.split('{base}').join(lastWtg.base).split('{n}').join(String(lastWtg.n));
 				body.appendChild(wtgNote);
 			}

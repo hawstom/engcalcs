@@ -686,7 +686,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > The initial status of these valves was read from a code not yet confirmed in an example file.
   @@ NEEDS RULING
 - **`lpn_wtg_report_intro`**
-  > This was a WaterCAD or WaterGEMS model. Bentley publishes no description of the file, so it is read by a layout learned from example files. It was imported as a new project, from its scenario {base} and {n} more scenarios. Compare the results with WaterGEMS before relying on them.
+  > This was a WaterCAD or WaterGEMS model. Bentley publishes no description of the file, so it is read by a layout learned from example files. It was imported as a new project, from its scenario {base} and further scenarios ({n}). Compare the results with WaterGEMS before relying on them.
   @@ NEEDS RULING
 - **`lpn_wtg_report_lead`**
   > The list below shows what was changed on the way in, and what in the file was not imported:
@@ -702,7 +702,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**10 still to read**, of 14 new keys across 10 unmerged branch(es).
+**16 still to read**, of 24 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -713,17 +713,17 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/merge-1020c (`443aa95b0`) — adds no English strings
-
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/geojson-into-project (`400ab63ac`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/flow-arrow (`5ebd338e2`) — adds no English strings
+
+### feat/geojson-into-project (`cad86297c`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_gjup_h_notes`**
   > Reading the file
   @@ NEEDS RULING
 - **`lpn_gjup_lead`**
-  > A GeoJSON file holds one set of values and no scenarios. Choose where to put them.
+  > A GeoJSON file holds one set of values and no scenarios. Choose where to put them.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets only in the import are added, and assets only in this project are kept.
   @@ NEEDS RULING
 - **`lpn_gjup_title`**
   > Update from GeoJSON file
@@ -732,17 +732,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > custom properties
   @@ NEEDS RULING
 
-### feat/label-leader (`bcc926448`) — adds no English strings
+### feat/label-leader (`bcc926448`) — already merged into feat/label-margin; its strings are listed there
 
-### feat/label-margin (`bcc926448`) — already merged into feat/label-leader; its strings are listed there
-
-### feat/native-eps (`63bb8fb1f`) — already merged into chore/merge-1020c; its strings are listed there
-
-### feat/sqlite-reader (`03cdba2e7`) — adds no English strings
-
-### feat/theme (`6221a4cae`) — already merged into feat/theme-tank; its strings are listed there
-
-### feat/theme-tank (`89e313c5d`) — 10 new, 6 to read @@ NEEDS RULING
+### feat/label-margin (`764591a91`) — 10 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_theme_amber`**
   > Amber
@@ -775,4 +767,37 @@ build for that would be a gate nobody keeps. Refresh it with
   > Space
   @@ NEEDS RULING
 
-### fix/examples-guide (`77fced3fe`) — adds no English strings
+### feat/native-eps (`1b06b7275`) — 10 new, 6 to read @@ NEEDS RULING
+
+- **`lpn_theme_amber`**
+  > Amber
+  _Ruled OK 2026-10-17._
+- **`lpn_theme_arcade`**
+  > Arcade
+  @@ NEEDS RULING
+- **`lpn_theme_desktop`**
+  > Desktop
+  @@ NEEDS RULING
+- **`lpn_theme_green`**
+  > Green
+  _Ruled OK 2026-10-17._
+- **`lpn_theme_hc`**
+  > High contrast
+  _Ruled OK 2026-10-17._
+- **`lpn_theme_newspaper`**
+  > Newspaper
+  @@ NEEDS RULING
+- **`lpn_theme_platinum`**
+  > Platinum
+  _Ruled OK 2026-10-17._
+- **`lpn_theme_prairie`**
+  > Prairie
+  @@ NEEDS RULING
+- **`lpn_theme_rounded`**
+  > Rounded
+  @@ NEEDS RULING
+- **`lpn_theme_space`**
+  > Space
+  @@ NEEDS RULING
+
+### feat/sqlite-reader (`b4589acd6`) — adds no English strings
