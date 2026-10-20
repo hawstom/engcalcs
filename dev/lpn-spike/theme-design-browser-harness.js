@@ -124,7 +124,7 @@ function readDesign() {
 	const mc = cs(menu), bc = cs(box), tc = cs(title), ic = cs(icon), tb = cs(tabs);
 	return {
 		face: first(cs(body).fontFamily), faceFull: cs(body).fontFamily, size: cs(body).fontSize,
-		tank: mc.backgroundImage, menuCase: mc.textTransform, menuCaps: mc.fontVariantCaps, menuWeight: mc.fontWeight, btnRadius: mc.borderTopLeftRadius,
+		tank: mc.backgroundImage, tankPos: mc.backgroundPosition, tankSize: mc.backgroundSize, menuCase: mc.textTransform, menuCaps: mc.fontVariantCaps, menuWeight: mc.fontWeight, btnRadius: mc.borderTopLeftRadius,
 		boxRadius: bc.borderTopLeftRadius, boxFrame: bc.borderTopWidth + ' ' + bc.borderTopStyle, shadow: bc.boxShadow === 'none' ? 'none' : 'some',
 		titleCase: tc.textTransform, titleInk: tc.color === accent ? 'accent' : 'ink', titlePicture: tc.backgroundImage === 'none' ? 'none' : 'some',
 		tabsRule: tb.borderBottomWidth + ' ' + tb.borderBottomStyle, iconStroke: parseFloat(ic.strokeWidth), iconCap: ic.strokeLinecap,
@@ -343,7 +343,13 @@ async function main() {
 				if (t === 'prairie') {
 					ok('prairie: a menu is a tank, not a cloud: a squared corner', parseFloat(got.btnRadius) <= 3, got.btnRadius);
 					ok('prairie: a menu has cylinder shading across its width', /linear-gradient\(90deg/.test(got.tank), got.tank.slice(0, 80));
-					ok('prairie: a menu has corrugation rings', /repeating-linear-gradient\(0deg/.test(got.tank), got.tank.slice(0, 80));
+					ok('prairie: a menu has corrugation rings', /repeating-linear-gradient\(0deg/.test(got.tank) || (/linear-gradient\(180deg/.test(got.tank) && /100% 10px/.test(got.tankSize)), got.tank.slice(0, 80));
+					// Round 2 (Tom: "brushed stainless", "too white", no vertical seams): matte, so no near-white stop; vertical
+					// seams one or two to a course (a 40px tile with a seam), staggered by a 20px shift between courses.
+					const lum = (c) => { const f = (v) => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(c[0]) + .7152 * f(c[1]) + .0722 * f(c[2]); };
+					const solid = (got.tank.match(/rgb\((\d+), (\d+), (\d+)\)/g) || []).map((c) => c.match(/\d+/g).map(Number));
+					ok('prairie: the tank is matte, its brightest steel below luminance 0.6 (no near-white)', solid.length > 3 && Math.max(...solid.map(lum)) < 0.6, String(Math.max(...solid.map(lum)).toFixed(3)));
+					ok('prairie: the tank has vertical seams in three staggered courses (40px tiles across; the middle course shifted 20px)', (got.tank.match(/linear-gradient\(90deg/g) || []).length >= 4 && (got.tankSize.match(/40px 10px/g) || []).length >= 6 && /20px 15px/.test(got.tankPos), got.tankPos.slice(0, 120));
 					const greys = (got.tank.match(/rgb\((\d+), (\d+), (\d+)\)/g) || []).map((c) => c.match(/\d+/g).map(Number)).filter((c) => c[0] > 130);
 					ok('prairie: the tank is galvanized grey (red, green and blue within 20 of each other)', greys.length > 3 && greys.every((c) => Math.max(...c) - Math.min(...c) <= 20), String(greys.length));
 				} else {
