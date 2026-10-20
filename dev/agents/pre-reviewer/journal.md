@@ -4562,3 +4562,13 @@ UNVERIFIED: how it looks (column widths, 10-column fire flow table with extra co
 - OBSERVED: Net1 pipe 113 labelled at all 15 zooms (master 8/15, beside 11/15); pipe 11 Q=1234.2 hidden at notch 4 where beside showed it, and pipe 10's "Q=1866.2" sits under pipe 11 though its leader goes to pipe 10.
 - OBSERVED: 0 leader/leader crossings, 0 new leader-through-node; deterministic over 3 runs.
 - Decays: re-verify before citing.
+
+## 2026-10-20 feat/geojson-into-project (Task 814)
+- OBSERVED (real Chromium, probes p1/p2/p3 in scratchpad): Net3 export -> Peak -> edited GeoJSON -> "Peak, open now": receipt names Peak; elevation 147->154.5 as Peak override only; JNEW inactive in Base, active in Peak; one Undo restores doc (only nextId counters differ).
+- OBSERVED: .inp door unedited Net1 into Base-only: 0 changes; edited into scenario Alt: override only. Tank base 850->860 and pump blank->closed reported as real; closed<->open GeoJSON pump flips reported both ways.
+- OBSERVED: foreign GeoJSON asks destination FIRST, then mapping, then units refusal by name.
+- Gap: a .inp silent on a pump's status never reverts a Closed pump (nv undefined skipped); pre-existing.
+## 2026-10-20 Perry, feat/label-leader round 6 (88191ee39)
+OBSERVED (Chromium, own DOM counts, master e0ed97378 vs branch): Net3 6/9 notches and Novato fit/+3 identical to master (labels, values, leaders). Net1 SI/US wheel out: branch hides Pump Text at 8+ out (overprints Source), overlaps 5->2.
+OBSERVED: Tom's long leader reproduced by dropping a label above the map's top edge; identical on master. Not reproduced by 240 random wheel/pan/drag steps or r5 (bcebdfa58) wheel sweeps.
+OBSERVED: left-hung labels end-anchored (66 on Net3 at 9), leader ends touch words. LPN_COLUMN is two if-tests. Decays: re-verify.

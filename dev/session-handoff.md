@@ -95,51 +95,54 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-20 early (twenty-ninth session, Arizona time)
+## STATE — 2026-10-20 morning (thirtieth session, Arizona time)
 
-### Master: bcb00ba36 (label forms, EPS analyses, guide pages) plus this handoff. Production: what he last pulled
+### Master: e0ed97378 (duration fire merged on his word) plus this handoff. Production: what he last pulled
 
-- Merged on his word 10-19 night: `feat/label-form` (with `feat/label-beside`), `feat/eps-analysis`,
-  `feat/guide-page`. Task 816 closed. Suite 42 min on the merge. Their ports (8101, 8102, 8110, 8114)
-  were freed and reused.
-- epanet-plus-plus.org `sitemap-app.xml` regenerated (567 URLs: 27 app + 540 Guide pages), pushed
-  3f4484c; live after his pull of both repos. The Guide pages' three new keys show English in 26
-  languages until a sprint.
-- Both landing pages already carry the network-update features line (librewaternet a5baba9,
-  epanet-plus-plus fa1b74f).
-- Still owed: consent_body's 26 translations (EC_CONSENT_VERSION stays 2); MSX and EPS-analysis keys'
-  translations. Sprint only on his word, about weekly.
-- Key hygiene: 0 keys rendered by nothing; none deleted.
+- `feat/duration-fire` merged (Task 578's duration fire); its port 8101 now holds feat/geojson-into-project.
+- Roadmap: Task 818 (MCP server) added at 75 on his yes; Task 749 records his licence stance ("Let's
+  stay right": samples and public docs only; his WaterGEMS used as an ordinary user would).
+- Mary's MCP landscape (four thin EPANET MCP servers exist; fire flow, criticality and the open-in-app
+  link look unoccupied, unverified) is in her journal and wish list row 0q.
+- Still owed: consent_body's 26 translations; MSX, EPS-analysis, Guide-page and duration-fire keys'
+  translations. Sprint only on his word, about weekly. Key hygiene: none deleted.
 
-### Branches waiting on him (all pre-reviewed by Perry where a feature; reviews in that session's scratchpad, summarized here)
+### Branches waiting on him (each full suite green 10-20; the load-only reds passed alone)
 
-- `feat/label-leader` (8103), round 5, 7c41f6b3e: his rule "a label not at home gets a leader";
-  home = resting distance in any direction (nodes), touching its pipe (level pipe labels); left-hung
-  labels right-justified; Net1 wheel-out overlaps resolved (a dragged label that would cover goes out
-  on a long leader for that zoom; a Text hides only when its ink overprints another Text). His calls:
-  the rule costs Net3 ~7 of 145 labels at 9 in vs master; hiding his "Pump" Text at 14 out (it truly
-  overprints "Source"); pipe labels on leaders cost 27-40% of the pass, kept.
-- `feat/duration-fire` (8101), c221d72bf: "A fire for a stated duration" in Fire flow's Reporting step
-  tested; Perry confirmed the numbers by an independent .inp run; his six findings fixed (Fire junction
-  row, tank margin columns, tolerance stated, only valid start times, PDA shortfall verdict, select
-  width). His calls: 0.1 m recovery tolerance; column wording "Lowest water depth" (reused key) and
-  "Above lowest water depth".
-- `fix/examples-guide` (8102), 5de0786d7: Net1 SI, US, then Scenarios; US Net1 title/description
-  brought up to SI's; Scenario manager chapter: his two sections render as headings, the steps as a
-  list, his first section reordered (sentences verbatim). His call: the reorder of his own text.
-- `feat/theme` (8111), 6221a4cae: time-series bubble margins in all 13 themes (last time label whole,
-  clear of the grip; y-title gap tightened). Plus earlier rounds awaiting his word.
-- `feat/theme-tank` (8114), 0055f8ed3: Prairie menus as galvanized tanks (square edges, cylinder
-  shading, corrugation, flat lid) to compare with feat/theme's clouds. His call: tanks, clouds, or both.
-- `feat/sqlite-reader` (75ed1031f): Task 749, never merges until done (his word). Unchanged.
-- `feat/desktop`: untouched this session.
+- `feat/label-leader` (8103), bcc926448, round 6: his "Revert" of the always-a-leader rule done;
+  Net3/Novato equal to master (Perry's own counts). Kept: right-justified left-hung labels, one-line
+  node labels, a Text hidden only where it overprints another (Net1 "Pump" over "Source" at 7+ out).
+  The stacked-column prototype measured 1-3% more labels for 60-90% more pass time: removed. His
+  off-screen leader: Perry reproduced it by dropping a label above the map edge, same on master.
+- `fix/examples-guide` (8102), 77fced3fe: Scenario manager help back in production order, Basic mode
+  first, headings and list kept (R-419).
+- `feat/theme-tank` (8114), 89e313c5d: matte grey, no bottom shading, staggered vertical seams (R-420).
+  `feat/theme` (8111) unchanged; merge only one Prairie.
+- `feat/geojson-into-project` (8101), 400ab63ac, Task 814: GeoJSON network into the open project by
+  the .inp route's own code (one question, compare, receipt, undo). Perry: no blocker; "blank to
+  closed" in the receipt and the "Reading the file" heading are wording for him to see. Not built:
+  "a new scenario" as a destination (neither door has it).
+- `feat/native-eps` (no port; nothing visible), 63bb8fb1f, Task 733 slice 1: native EPS loop matching
+  EPANET 2.3.5 within 0.8 mm on 22 cases (Net3 without controls 0.77 mm, close to the bound). Plan
+  native-eps-plan.md on that branch. Capability: merges on his word.
+- `feat/sqlite-reader`: waits on the sample he can make in WaterGEMS (Base + a child changing one
+  diameter and one demand, an .inp per scenario). `feat/desktop`: untouched.
 
 ### Next job
 
-Merge on his word (the theme pair are siblings: merge only one Prairie). Task 681 (cull the label
-pass to the view) after label-leader settles: same code. Task 733 next phase (native EPS). Task 814's
-GeoJSON route. Criticality by valve segment. His mission questions of 10-19 (AI agents, MCP; social
-framing; Bentley install) were answered in the session report; if he says yes to an MCP task, add it.
+Merge on his word. Task 681 after label-leader settles. Task 733 slice 2 (controls) on feat/native-eps.
+Task 818 first step: Mary's row 0q (read the four servers' tool lists) before scoping.
+
+### Traps met 2026-10-20 (thirtieth session)
+
+- **The review queue declares its next free R-number.** Adding R-418..420 without advancing it failed
+  `review queue parses` and a full run was wasted. Advance the "Next free" line with every new row.
+- **`git merge --ff-only` of a chore branch put a plain commit on master** (hooks never fire on a
+  fast-forward). Always `--no-ff` into master.
+- **A new worktree has no `dev/browser-pass/node_modules`**: every browser harness then fails with
+  "Cannot find module playwright-core". Symlink it to the main checkout's when making a worktree.
+- **Four branch suites at once plus a Perry browser run** failed contour, label-drag-track,
+  setting-scope and settings-select-lag; all passed alone.
 
 ### Traps met 2026-10-20 (twenty-ninth session)
 
