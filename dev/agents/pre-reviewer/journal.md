@@ -4586,3 +4586,18 @@ UNVERIFIED: how it looks (column widths, 10-column fire flow table with extra co
 OBSERVED (Chromium, own DOM counts, master e0ed97378 vs branch): Net3 6/9 notches and Novato fit/+3 identical to master (labels, values, leaders). Net1 SI/US wheel out: branch hides Pump Text at 8+ out (overprints Source), overlaps 5->2.
 OBSERVED: Tom's long leader reproduced by dropping a label above the map's top edge; identical on master. Not reproduced by 240 random wheel/pan/drag steps or r5 (bcebdfa58) wheel sweeps.
 OBSERVED: left-hung labels end-anchored (66 on Net3 at 9), leader ends touch words. LPN_COLUMN is two if-tests. Decays: re-verify.
+
+## 2026-10-20 Perry, feat/sqlite-reader (b4589acd6), Task 749
+OBSERVED (Chromium via session.js, Tom's own two files): both files -> units GPM/ft/in/psi, Base J-1 P=42.72, TGH-1 heads 94.606/94.105 ft, P-2 2250 gpm, matching EPANET on WaterGEMS's own .inp exports. WaterGEMS .out (Base): 6.38278 fps, head 98.7987, P 42.7455 (EPANET 42.7239; SG 0.998 vs 1.0).
+OBSERVED: sqlite alone -> imports in LPS/SI, report says so; solve identical.
+OBSERVED: report says "from its scenario Base and 1 more scenarios" (plural defect). Report shows raw table names and HMIGeometryScaledLength.
+OBSERVED: fixture .wtg.sqlite 6.1 MB is the largest tracked file after js/looped-network.js (4.8 MB); no user name inside; holds Bentley schema SQL text.
+Decays: re-verify.
+
+## 2026-10-20 Perry, feat/label-margin (a4e28f48c) and feat/flow-arrow (5ebd338e2)
+OBSERVED (Chromium, own DOM measurement vs master): Net1 Tom view 24 vs 21, none hidden; Net3 6 notches 141 vs 123; Novato 133 vs 115; 0 leader/leader crossings (all views). Counts confirmed.
+OBSERVED: same view, N10/N11 cluster overprinted exactly as master; new external leaders longest ~200 px vs 46-61 on master; leader-through-label boxes Net3 6 notches 9 vs 1 (master), Novato 9 vs 1; text overlaps +1 (n101~l117); visible leaders striking "P=57.54".
+OBSERVED: pan stable (0 moves). Phone 390x844 Net3 6 notches: leaders half off screen 14 vs 6.
+OBSERVED: refreshOneLabelInPlace on an external pipe label: text moves 57-72 px left, leader unchanged (Net1 L11 524->467; Net3 l109, l117, l213, l215).
+OBSERVED arrow: path of two closed triangles, fill none, stroke map ink 0.25; same colour as pipe so interior is the pipe; dark/newspaper fine.
+Decays: re-verify.

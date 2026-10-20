@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 181 untranslated keys, of 3200 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read on master**, of 167 untranslated keys, of 3186 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (181, all ruled)
+## lpn_  (167, all ruled)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -39,9 +39,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-20._
 - **`lpn_crit_col_hours`**
   > Hours below minimum
-  _Ruled OK 2026-10-20._
-- **`lpn_crit_col_lowest`**
-  > Lowest pressure
   _Ruled OK 2026-10-20._
 - **`lpn_crit_col_lowest_tip`**
   > Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.
@@ -90,9 +87,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-20._
 - **`lpn_dur_col_end_nofire`**
   > Level at end without the fire
-  _Ruled OK 2026-10-20._
-- **`lpn_dur_col_fire`**
-  > Fire flow
   _Ruled OK 2026-10-20._
 - **`lpn_dur_col_low`**
   > Lowest level reached
@@ -211,9 +205,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_ff_working_steps`**
   > Working: reporting step {step} of {steps}, junction {done} of {total}.
   _Ruled OK 2026-10-20._
-- **`lpn_file_export_item_msx`**
-  > EPANET-MSX file…
-  _Ruled OK 2026-10-20._
 - **`lpn_file_export_msx_tip`**
   > Download the attached EPANET-MSX file exactly as it was imported.
   _Ruled OK 2026-10-20._
@@ -232,14 +223,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_guide_cmp_byasset_def`**
   > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver's internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.</p>
   _Ruled OK 2026-10-20._
-- **`lpn_guide_cmp_byasset_term`**
-  > Results by asset
-  _Ruled OK 2026-10-20._
 - **`lpn_guide_ff_dur_def`**
   > <p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.</p>
-  _Ruled OK 2026-10-20._
-- **`lpn_guide_ff_dur_term`**
-  > A fire for a stated duration
   _Ruled OK 2026-10-20._
 - **`lpn_guide_page_desc`**
   > {name} user manual: one page for each chapter, from the map and Properties to scenarios, fire flow analysis, and criticality analysis.
@@ -261,9 +246,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-20._
 - **`lpn_inpup_blank`**
   > blank
-  _Ruled OK 2026-10-20._
-- **`lpn_inpup_btn_base`**
-  > Base
   _Ruled OK 2026-10-20._
 - **`lpn_inpup_btn_new`**
   > A new project
@@ -376,24 +358,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_inpup_status`**
   > Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).
   _Ruled OK 2026-10-20._
-- **`lpn_inpup_t_junction`**
-  > Junction
-  _Ruled OK 2026-10-20._
-- **`lpn_inpup_t_pipe`**
-  > Pipe
-  _Ruled OK 2026-10-20._
-- **`lpn_inpup_t_pump`**
-  > Pump
-  _Ruled OK 2026-10-20._
-- **`lpn_inpup_t_reservoir`**
-  > Reservoir
-  _Ruled OK 2026-10-20._
-- **`lpn_inpup_t_tank`**
-  > Tank
-  _Ruled OK 2026-10-20._
-- **`lpn_inpup_t_valve`**
-  > Valve
-  _Ruled OK 2026-10-20._
 - **`lpn_inpup_title`**
   > Update from EPANET file
   _Ruled OK 2026-10-20._
@@ -408,9 +372,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-20._
 - **`lpn_msx_not_msx`**
   > {file} does not look like an EPANET-MSX file: it has no [SPECIES] section.
-  _Ruled OK 2026-10-20._
-- **`lpn_msx_remove`**
-  > Remove
   _Ruled OK 2026-10-20._
 - **`lpn_msx_removed`**
   > Removed {file} from this project.
@@ -508,9 +469,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_settings_grp_positions`**
   > Positions
   _Ruled OK 2026-10-20._
-- **`lpn_settings_grp_show`**
-  > Show
-  _Ruled OK 2026-10-20._
 - **`lpn_settings_grp_size`**
   > Size
   _Ruled OK 2026-10-20._
@@ -579,7 +537,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**4 still to read**, of 55 new keys across 9 unmerged branch(es).
+**5 still to read**, of 55 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -590,9 +548,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/merge-1020c (`b4a163e07`) — adds no English strings
+### chore/handoff-1020c (`08e67da1c`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
+
+### feat/flow-arrow (`5ebd338e2`) — adds no English strings
 
 ### feat/geojson-into-project (`cad86297c`) — 4 new, 4 to read @@ NEEDS RULING
 
@@ -609,13 +569,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > custom properties
   @@ NEEDS RULING
 
-### feat/label-leader (`bcc926448`) — adds no English strings
+### feat/label-leader (`bcc926448`) — already merged into feat/label-margin; its strings are listed there
 
-### feat/label-margin (`bcc926448`) — already merged into feat/label-leader; its strings are listed there
+### feat/label-margin (`a4e28f48c`) — adds no English strings
 
-### feat/native-eps (`63bb8fb1f`) — already merged into chore/merge-1020c; its strings are listed there
+### feat/native-eps (`1b06b7275`) — adds no English strings
 
-### feat/sqlite-reader (`42e5d726a`) — 51 new, all ruled
+### feat/sqlite-reader (`5e33ab69b`) — 51 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
   > WaterCAD or WaterGEMS model…
@@ -759,8 +719,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > The initial status of these valves was read from a code not yet confirmed in an example file.
   _Ruled OK 2026-10-20._
 - **`lpn_wtg_report_intro`**
-  > This was a WaterCAD or WaterGEMS model. Bentley publishes no description of the file, so it is read by a layout learned from example files. It was imported as a new project, from its scenario {base} and {n} more scenarios. Compare the results with WaterGEMS before relying on them.
-  _Ruled OK 2026-10-20._
+  > This was a WaterCAD or WaterGEMS model. Bentley publishes no description of the file, so it is read by a layout learned from example files. It was imported as a new project, from its scenario {base} and further scenarios ({n}). Compare the results with WaterGEMS before relying on them.
+  @@ NEEDS RULING
 - **`lpn_wtg_report_lead`**
   > The list below shows what was changed on the way in, and what in the file was not imported:
   _Ruled OK 2026-10-20._
@@ -771,6 +731,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/theme (`6221a4cae`) — already merged into chore/merge-1020c; its strings are listed there
-
-### fix/examples-guide (`77fced3fe`) — already merged into chore/merge-1020c; its strings are listed there
+### fix/key-reuse (`559fe3b8d`) — already merged into chore/handoff-1020c; its strings are listed there

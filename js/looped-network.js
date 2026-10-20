@@ -45853,9 +45853,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// "Junction 31", "Pipe 31": a junction and a pipe may share an ID, so a list names the kind.
 	function inpTypeName(type) {
 		var pc = EngCalcs.pageConfig || {};
-		return ({ junction: pc.lpn_inpup_t_junction || 'Junction', reservoir: pc.lpn_inpup_t_reservoir || 'Reservoir',
-			tank: pc.lpn_inpup_t_tank || 'Tank', pipe: pc.lpn_inpup_t_pipe || 'Pipe', pump: pc.lpn_inpup_t_pump || 'Pump',
-			valve: pc.lpn_inpup_t_valve || 'Valve' })[type] || type;
+		return ({ junction: pc.lpn_tool_add_junction || 'Junction', reservoir: pc.lpn_tool_add_reservoir || 'Reservoir',
+			tank: pc.lpn_tool_add_tank || 'Tank', pipe: pc.lpn_tool_add_pipe || 'Pipe', pump: pc.lpn_tool_add_pump || 'Pump',
+			valve: pc.lpn_tool_add_valve || 'Valve' })[type] || type;
 	}
 	function inpTL(type, id) { return inpTypeName(type) + ' ' + id; }
 	function inpNiceOld(v) {
@@ -46105,7 +46105,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		} else {
 			buttons.push({ label: (pc.lpn_inpup_btn_scenario || '{scenario}, open now').replace('{scenario}', scenarioDisplayName(scn)),
 				fn: function () { updateProjectFromInp(text, fileName, 'open', msxFile); } });
-			buttons.push({ label: pc.lpn_inpup_btn_base || 'Base',
+			buttons.push({ label: pc.lpn_scenario_base || 'Base',
 				fn: function () { updateProjectFromInp(text, fileName, 'base', msxFile); } });
 		}
 		buttons.push({ label: pc.lpn_cancel || 'Cancel', fn: function () { } });
@@ -46269,7 +46269,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			body.appendChild(ta);
 		}, [
 			{ label: pc.lpn_msx_replace || 'Replace…', fn: function () { setTimeout(pickMsxFile, 0); } },
-			{ label: pc.lpn_msx_remove || 'Remove', fn: function () {
+			{ label: pc.lpn_fitting_remove || 'Remove', fn: function () {
 				saveUndoSnapshot();
 				doc.msx = null;
 				// Nothing left to run: a Multi-species analysis goes back to what was chosen before it.
@@ -52126,7 +52126,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile },
 			// The attached EPANET-MSX file, as its own row so one click is one download. Only offered
 			// when the project holds one.
-			{ icon: 'save', label: pc.lpn_file_export_item_msx || 'EPANET-MSX file…', hidden: !doc.msx,
+			{ icon: 'save', label: pc.lpn_file_import_msx || 'EPANET-MSX file…', hidden: !doc.msx,
 			  tip: pc.lpn_file_export_msx_tip, fn: exportMsxFile },
 			// THE MODEL'S DATA for AutoCAD and every other DWG program (Task 772). Reading a DXF back
 			// is the DXF Interface Manager's import half, not built.
@@ -61719,7 +61719,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var sizeBody = minorGroup(mapBody, pc.lpn_settings_grp_size || 'Size'),
 			angleBody = minorGroup(mapBody, pc.lpn_settings_grp_angle || 'Angle'),
 			zoomBody = minorGroup(mapBody, pc.lpn_settings_grp_zoom || 'Zoom'),
-			showBody = minorGroup(mapBody2, pc.lpn_settings_grp_show || 'Show'),
+			showBody = minorGroup(mapBody2, pc.lpn_labels_col_show || 'Show'),
 			thematicBody = minorGroup(mapBody2, pc.lpn_settings_grp_thematic || 'Thematic'),
 			fadeBody = thematicBody;
 		var sizeInput = document.createElement('input');
@@ -79077,7 +79077,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				ffCell(tr, lv(t.finalNoFire));
 			});
 		}
-		body = durTable(host, [pc.lpn_when_step || 'Reporting step', pc.lpn_dur_col_fire || 'Fire flow',
+		body = durTable(host, [pc.lpn_when_step || 'Reporting step', pc.lpn_alt_cat_fireflow || 'Fire flow',
 			pc.lpn_dur_col_pressure || 'Pressure at the fire junction', pc.lpn_dur_col_nofire || 'Pressure without the fire']);
 		d.series.forEach(function (r) {
 			tr = ffEl('tr', null, null, body);
@@ -79312,7 +79312,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_crit_col_cutoff || 'Junctions cut off',
 			pc.lpn_crit_col_below || 'Junctions below minimum'
 		].concat(set.wholeRun ? [
-			[pc.lpn_crit_col_lowest || 'Lowest pressure', pc.lpn_crit_col_lowest_tip || 'Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.', true],
+			[pc.bpn_p_min || 'Lowest pressure', pc.lpn_crit_col_lowest_tip || 'Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.', true],
 			pc.lpn_crit_col_hours || 'Hours below minimum',
 			pc.lpn_crit_col_empty || 'Tank empties'
 		] : []), { state: critSortState, by: critSortBy });
