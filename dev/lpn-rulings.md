@@ -281,10 +281,9 @@ branch's and fails on any view with fewer labels or values than master.
 ### A column of one-line labels at the edge of a crowd: prototyped, off, does not pay
 
 Tom's 2026-10-20 screenshots show one-line labels stacked in a column to one side, each on a leader.
-`LPN_COLUMN` in `js/looped-network.js` (default `false`) adds far level candidates, west and east on
+The prototype (commit `88191ee39`, flag `LPN_COLUMN`; its code since removed) added far level candidates, west and east on
 a shared grid of columns and rows, for a one-line node label that lost something and a pipe label
-that would hide. Measured in Chromium, `LABEL_FORM_COLUMN=1 LABEL_FORM_SCENES=net3,novato node
-dev/lpn-spike/label-form-wheel-browser-harness.js`, against master's files: Net3 at 9 notches in
+that would hide. Measured in Chromium with the label-form wheel harness, against master's files: Net3 at 9 notches in
 145 -> 147 labels, content pass 142 -> 226 ms; Novato at fit 115 -> 119 labels, 133 -> 251 ms.
 Two to four labels (1-3%) for 60-90% more pass time, and more leaders nearer another pipe than their
-own. It stays off.
+own. Removed (Tom: *"A cost for no benefit is pointless."*).

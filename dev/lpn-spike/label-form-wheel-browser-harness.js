@@ -129,9 +129,6 @@ async function layOut(Session, browser, sc, mode, opts) {
 		const file = /lpn-collide\.js/.test(route.request().url()) ? 'lpn-collide.js' : 'looped-network.js';
 		let body = mode.ref ? refSource(mode.ref, file) : await resp.text();
 		if (file === 'looped-network.js') {
-			// LABEL_FORM_COLUMN=1: the stacked-column prototype switched on in the shipped layout
-			// (dev/lpn-rulings.md, "A column of one-line labels"); off in the file as committed.
-			if (mode.shipped && process.env.LABEL_FORM_COLUMN === '1') { body = body.replace('var LPN_COLUMN = false,', 'var LPN_COLUMN = true,'); }
 			if (mode.cut) {
 				CUTS.forEach(([from, to]) => { if (body.split(from).length === 2) { body = body.replace(from, to); cut++; } });
 			}
