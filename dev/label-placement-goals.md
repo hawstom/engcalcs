@@ -314,7 +314,7 @@ shed trailing values (per §2.2's link order) → set it level beside its pipe �
 on, that shed to its last value and is still crowded, found no clear station, yielded its ground
 to a node label, or is too long for its segment, is tried level beside its pipe as a free label with a leader, after every other
 label is placed and only where it breaks no never-rule, and only where a reader can tell its pipe:
-it carries a leader from its pipe unless it is at home (a resting corner of its station), and a side
+it carries a leader from its pipe unless it touches it (its home, `dev/lpn-rulings.md`), and a side
 nearer than that must leave its own pipe the nearest pipe to its rows. Its leader starts at the
 pipe's middle, or, when every side there is taken, at the nearest clear station (0.5, 0.35, 0.65,
 0.2, 0.8 of the pipe). Once every level label has its smallest form, each may take another form:

@@ -542,18 +542,22 @@ EngCalcs.lpnCollide = (function () {
 	// Task 807); every other label hangs on the nearest side.
 	// **A LABEL IN ITS HOME SPOT DRAWS NO LEADER; A LABEL ANYWHERE ELSE DRAWS ONE** (Tom,
 	// 2026-10-19: *"anything not in a home spot needs a leader"*). A label's home spots are its
-	// resting corners: the endpoint `off` (the page's resting offset) away from its anchor, on any of
-	// the four diagonals, the text hanging away from the anchor. A one-line node label has two more,
-	// level with its node east and west (`levelDy`, the endpoint's drop for a line centred on the
-	// node). Geometric, with no flag carried, so the placement passes and the renderer cannot
-	// disagree about it. The tolerance is float noise: a side either is a home spot or is not.
+	// resting places: its endpoint exactly the resting distance (`off`, the page's resting offset)
+	// from its anchor, in any direction, the text hanging away from the anchor, so the gap between
+	// the words and the node is the resting gap; the four diagonal corners are the first of them. A
+	// one-line node label has two more, level with its node east and west (`levelDy`, the
+	// endpoint's drop for a line centred on the node). (Only the four corners was tried first: it put
+	// a leader on every label rotated a few degrees round its node at the resting distance, and those
+	// leaders cost Net3 ten labels at 9 notches in against master; Perry's review, 2026-10-19.)
+	// Geometric, with no flag carried, so the placement passes and the renderer cannot disagree
+	// about it. The tolerance is float noise: a side either is a home spot or is not.
 	function atHome(anchor, end, off, levelDy) {
 		if (!anchor || !end || !off) { return false; }
 		var dx = Math.abs(off.x), dy = Math.abs(off.y),
 			tol = 1e-6 * Math.hypot(dx, dy) + 1e-9 * (Math.abs(anchor.x) + Math.abs(anchor.y)),
 			ey = end.y - anchor.y;
+		if (Math.abs(Math.hypot(end.x - anchor.x, ey) - Math.hypot(dx, dy)) <= tol) { return true; }
 		if (Math.abs(Math.abs(end.x - anchor.x) - dx) > tol) { return false; }
-		if (Math.abs(Math.abs(ey) - dy) <= tol) { return true; }
 		return levelDy !== undefined && levelDy !== null && Math.abs(ey - levelDy) <= tol;
 	}
 	// Whether a label of this spec at endpoint `c`, hung from `anchor`, draws a leader: never at
@@ -1256,6 +1260,17 @@ EngCalcs.lpnCollide = (function () {
 		// without one (`lbl._quiet`) where its own pipe is plainly the nearest; every other side beyond
 		// `leaderMin` says whose it is with a leader.
 		var quietMax = opts.quietMax > leaderMin ? opts.quietMax : leaderMin;
+		// `quietInSymbol`: a quiet side only where the label's own point lies inside a symbol, so no
+		// leader from it could be drawn clean at all (a pipe shorter than its end nodes' symbols).
+		var quietInSymbol = !!opts.quietInSymbol;
+		function anchorInSymbol(lbl) {
+			for (var k = 0; k < local.boxes.length; k++) {
+				var o = local.boxes[k];
+				// A node's symbol (`round`), inside its circle: the end of a pipe too short to clear it.
+				if (o.kind === 'symbol' && o.round && Math.hypot(o.cx - lbl.anchor.x, o.cy - lbl.anchor.y) < o.w / 2) { return true; }
+			}
+			return false;
+		}
 		// `clear`: the clean sweep and growth ask more of a side with a leader too: that its own pipe
 		// be the nearest to its rows (pre-review, 2026-10-18: Net1's "Q=1866.2" sat under the next
 		// pipe with its leader running back to its own). Only the last sweep, for a label with no
@@ -1271,7 +1286,7 @@ EngCalcs.lpnCollide = (function () {
 			// The leader first; only where no clean leader can be drawn (one starting inside an end
 			// node's symbol, on a pipe shorter than its own symbols) does a quiet side stand in.
 			if (leaderClear(lbl, c)) { return !clear || lbl.ownLink === undefined || ownPipeNearest(b, local, lbl.ownLink, 0); }
-			if (dist <= quietMax && near()) { lbl._quiet = true; return true; }
+			if (dist <= quietMax && (!quietInSymbol || anchorInSymbol(lbl)) && near()) { lbl._quiet = true; return true; }
 			return false;
 		}
 		function leaderClear(lbl, c) {
@@ -1281,6 +1296,10 @@ EngCalcs.lpnCollide = (function () {
 			for (i = 0; i < local.boxes.length; i++) {
 				o = local.boxes[i];
 				if (o.owner !== undefined && o.owner === lbl.id) { continue; }
+				// A node label's leader starts at its own node's centre, inside its own symbol, as every
+				// node label's leader is drawn (a pipe label has no own symbol; `ownLink` marks it).
+				if (lbl.ownLink === undefined && o.kind === 'symbol' &&
+					Math.abs(o.cx - lbl.anchor.x) <= o.w / 2 && Math.abs(o.cy - lbl.anchor.y) <= o.h / 2) { continue; }
 				if (segmentInBoxFraction(g, o) > 0) { return false; }
 			}
 			for (i = 0; i < local.segments.length; i++) {

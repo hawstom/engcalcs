@@ -43,7 +43,7 @@
 		read: function (tolPx, ambPx) {
 			var s = state.s, W = svg.clientWidth, H = svg.clientHeight, tol = tolPx / s, amb = ambPx / s,
 				v = { labels: 0, values: 0, nodes: 0, nodeInline: 0, nodeStacked: 0, pipes: 0, along: 0, level: 0, levelLeader: 0,
-					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N1mine: [], N1mine0: [], struck: [], offView: [], node: {}, levelNear: {}, leaderNearOther: 0, pipeShown: {}, ex: { nodeInline: [], levelStacked: [], levelInline: [] }, N3: [], N3node: 0, astray: [], sig: [], leadersNode: 0, leadersPipe: 0, homeBad: [], homeCount: 0, awayCount: 0, ragged: [], overlaps: [], textPx: +(effectiveFontSize() * state.s).toFixed(1), restPx: +(Math.hypot(defaultLabelOffset().x, defaultLabelOffset().y) * state.s).toFixed(1) },
+					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N1mine: [], N1mine0: [], struck: [], offView: [], node: {}, levelNear: {}, leaderNearOther: 0, pipeShown: {}, ex: { nodeInline: [], levelStacked: [], levelInline: [] }, N3: [], N3node: 0, astray: [], sig: [], leadersNode: 0, leadersPipe: 0, pipe: {}, textShown: {}, overKeys: {}, moved: {}, homeBad: [], homeCount: 0, awayCount: 0, ragged: [], overlaps: [], textPx: +(effectiveFontSize() * state.s).toFixed(1), restPx: +(Math.hypot(defaultLabelOffset().x, defaultLabelOffset().y) * state.s).toFixed(1) },
 				items = [], circles = [], texts = [];
 			// To a quarter of a screen pixel: a label measured at another zoom differs from one measured
 			// at this one in the hundredths of a pixel (the font's hinting), which no reader can see.
@@ -73,6 +73,33 @@
 					if (a) { cx = ox + dx * Math.cos(rad) - dy * Math.sin(rad); cy = oy + dx * Math.sin(rad) + dy * Math.cos(rad); }
 					return { cx: cx, cy: cy, w: r.x1 - r.x0, h: r.y1 - r.y0, a: rad };
 				});
+			}
+			// A Text's rows by their INK (Perry's review, 2026-10-19: "Pump" under "Source" reads cleanly
+			// while their line boxes overlap): each row's own box, inset by the canvas's text metrics for
+			// the same words in the same font, scaled by the row's own height. A Text drawn as one text
+			// node, with no rows of its own, is one row.
+			var inkCtx = document.createElement('canvas').getContext('2d');
+			function inkRowsOf(t) {
+				var cs = window.getComputedStyle(t), segs = [], i, c, out = [];
+				for (i = 0; i < t.childNodes.length; i++) { c = t.childNodes[i]; if (c.nodeType === 1) { segs.push(c); } }
+				if (!segs.length) { segs = [t]; }
+				inkCtx.font = cs.fontWeight + ' 100px ' + cs.fontFamily; inkCtx.textBaseline = 'alphabetic'; inkCtx.textAlign = 'left';
+				var m0 = /rotate\(([-0-9.e]+)[ ,]+([-0-9.e]+)[ ,]+([-0-9.e]+)\)/.exec(t.getAttribute('transform') || ''),
+					a = m0 ? +m0[1] : 0, ox = m0 ? +m0[2] : 0, oy = m0 ? +m0[3] : 0, rad = a * Math.PI / 180;
+				segs.forEach(function (e) {
+					var b, m, k, base, x0, x1, y0, y1, cx, cy, dx, dy;
+					try { b = e.getBBox(); } catch (err) { return; }
+					if (!(b.width > 0) || !String(e.textContent).trim()) { return; }
+					m = inkCtx.measureText(e.textContent);
+					k = b.height / (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent);
+					base = b.y + m.fontBoundingBoxAscent * k;
+					x0 = b.x - m.actualBoundingBoxLeft * k; x1 = b.x + m.actualBoundingBoxRight * k;
+					y0 = base - m.actualBoundingBoxAscent * k; y1 = base + m.actualBoundingBoxDescent * k;
+					cx = (x0 + x1) / 2; cy = (y0 + y1) / 2; dx = cx - ox; dy = cy - oy;
+					if (a) { cx = ox + dx * Math.cos(rad) - dy * Math.sin(rad); cy = oy + dx * Math.sin(rad) + dy * Math.cos(rad); }
+					out.push({ cx: cx, cy: cy, w: x1 - x0, h: y1 - y0, a: rad });
+				});
+				return out;
 			}
 			function axes(b) { return [[Math.cos(b.a), Math.sin(b.a)], [-Math.sin(b.a), Math.cos(b.a)]]; }
 			function proj(b, ax) {
@@ -123,23 +150,31 @@
 				var ne = nodeEls[n.id];
 				if (ne && ne.circle) { circles.push({ id: n.id, x: +ne.circle.getAttribute('cx'), y: +ne.circle.getAttribute('cy'), r: +ne.circle.getAttribute('r') }); }
 			});
+			// The labels a user moved, which the comparison against master holds to the letter.
+			doc.nodes.forEach(function (n) { if (n.lx !== undefined) { v.moved['N' + n.id] = true; } });
+			doc.links.forEach(function (l) { if (l.lx !== undefined) { v.moved['L' + l.id] = true; } });
 			doc.labels.forEach(function (lb) {
 				var te = labelEls[lb.id];
-				if (te && te.text && vis(te.text)) { rowsOf(te.text).forEach(function (b) { texts.push({ id: lb.id, b: b }); }); }
+				if (te && te.text && vis(te.text)) { v.textShown[lb.id] = true; inkRowsOf(te.text).forEach(function (b) { texts.push({ id: lb.id, b: b }); }); }
 			});
 			// HOME, read off the drawing (Tom, 2026-10-19: a label not in its home spot gets a leader;
 			// one in it does not). The text's own x/y is its endpoint, whichever way it is justified;
-			// home is the resting offset on a diagonal, or level with its node for a one-line label.
+			// home is the resting distance in any direction, or level with its node for a one-line label.
 			// Measured to a twentieth of a pixel, independently of the page's own predicate.
 			var dOff = defaultLabelOffset(), hx = Math.abs(dOff.x), hy = Math.abs(dOff.y), htol = 0.05 / s,
 				lvl = effectiveFontSize() * 0.85 - Geom.dataLabelBoxHeight(1, effectiveFontSize(), effectiveLineHeight()) / 2;
 			function atHomeDrawn(a, t, oneLine) {
 				var x = +t.getAttribute('x'), y = +t.getAttribute('y'), ey = y - a.y;
-				if (Math.abs(Math.abs(x - a.x) - hx) > htol) { return false; }
-				return Math.abs(Math.abs(ey) - hy) <= htol || (oneLine && Math.abs(ey - lvl) <= htol);
+				if (Math.abs(Math.hypot(x - a.x, ey) - Math.hypot(hx, hy)) <= htol) { return true; }
+				return oneLine && Math.abs(Math.abs(x - a.x) - hx) <= htol && Math.abs(ey - lvl) <= htol;
 			}
 			function homeCheck(key, a, h, oneLine) {
-				var home = atHomeDrawn(a, h.text, oneLine), led = !!leaderOf(h);
+				// A level pipe label is at home only touching its pipe (0.6 of a font size from its station).
+				// So is one whose station lies inside a node's symbol (a pipe shorter than its end nodes'
+				// symbols), which can draw no clean leader: it may stand quiet.
+				var touch = h.levelBeside && (Math.hypot(+h.text.getAttribute('x') - a.x, +h.text.getAttribute('y') - a.y) <= effectiveFontSize() * 0.6 + htol ||
+						circles.some(function (c) { return Math.hypot(c.x - a.x, c.y - a.y) < c.r; })),
+					home = h.levelBeside ? touch : atHomeDrawn(a, h.text, oneLine), led = !!leaderOf(h);
 				if (home) { v.homeCount++; } else { v.awayCount++; }
 				if (home === led) { v.homeBad.push(key + (home ? ' at home with a leader' : ' away from home with no leader')); }
 			}
@@ -157,7 +192,7 @@
 				var ne = nodeEls[n.id], k = (ne && ne.lines) ? ne.lines.length : 0, g;
 				if (!ne || ne.empty || !ne.text || !inView(nodeAt(n))) { return; }
 				if (!vis(ne.text)) { v.sig.push('n' + n.id + ' hidden'); v.node[n.id] = { n: 0, id: false }; return; }
-				v.node[n.id] = { n: k, id: (ne.lines || []).some(function (ln) { return ln.field === 'id'; }) };
+				v.node[n.id] = { n: k, id: (ne.lines || []).some(function (ln) { return ln.field === 'id'; }), text: ne.text.textContent };
 				v.sig.push('n' + n.id + ' ' + geo(ne.text, ['x', 'y']) + ' ' + ne.text.textContent + ' ' +
 					(leaderOf(ne) ? geo(ne.leader, ['x1', 'y1', 'x2', 'y2']) : ''));
 				if (leaderOf(ne)) { v.leadersNode++; }
@@ -210,6 +245,7 @@
 					raggedCheck('L' + l.id, la, le.text);
 				}
 				v.pipes++; v.values += f ? f.lines.length : (le.lines || []).length;
+				v.pipe[l.id] = { n: f ? f.lines.length : (le.lines || []).length, text: le.text.textContent };
 				rows = rowsOf(le.text);
 				(le.repeats || []).forEach(function (r) { if (vis(r.text)) { rows = rows.concat(rowsOf(r.text)); } });
 				items.push({ key: 'L' + l.id, rows: rows, mine: !!le.levelBeside });
@@ -246,13 +282,13 @@
 					for (j = i + 1; j < items.length; j++) {
 						items[j].rows.forEach(function (c) {
 							var d = depth(b, c);
-							if (d > tol) { v.N1.push(it.key + ' on ' + items[j].key + ' ' + (d * s).toFixed(1) + ' px'); if (it.mine || items[j].mine) { v.N1mine.push(v.N1[v.N1.length - 1]); } }
+							if (d > tol) { v.overKeys[it.key] = v.overKeys[items[j].key] = 1; v.N1.push(it.key + ' on ' + items[j].key + ' ' + (d * s).toFixed(1) + ' px'); if (it.mine || items[j].mine) { v.N1mine.push(v.N1[v.N1.length - 1]); } }
 							// Ours against any label, held to a quarter pixel: glyph boxes that touch.
 							if ((it.mine || items[j].mine) && d > 0.25 / s) { v.N1mine0.push(it.key + ' on ' + items[j].key + ' ' + (d * s).toFixed(2) + ' px'); }
 						});
 					}
-					circles.forEach(function (c) { if (ptBox(c.x, c.y, b) < c.r - tol) { v.N1.push(it.key + ' on node ' + c.id); if (it.mine) { v.N1mine.push(v.N1[v.N1.length - 1]); } } });
-					texts.forEach(function (t) { var d = depth(b, t.b); if (d > tol) { v.N1.push(it.key + ' on Text ' + t.id + ' ' + (d * s).toFixed(1) + ' px'); if (it.mine) { v.N1mine.push(v.N1[v.N1.length - 1]); } } });
+					circles.forEach(function (c) { if (ptBox(c.x, c.y, b) < c.r - tol) { v.overKeys[it.key] = 1; v.N1.push(it.key + ' on node ' + c.id); if (it.mine) { v.N1mine.push(v.N1[v.N1.length - 1]); } } });
+					texts.forEach(function (t) { var d = depth(b, t.b); if (d > tol) { v.overKeys[it.key] = v.overKeys['T' + t.id] = 1; v.N1.push(it.key + ' on Text ' + t.id + ' ' + (d * s).toFixed(1) + ' px'); if (it.mine) { v.N1mine.push(v.N1[v.N1.length - 1]); } } });
 				});
 			});
 			// Text on Text: two of the user's notes printed one over the other.
@@ -261,7 +297,7 @@
 				for (j = i + 1; j < texts.length; j++) {
 					if (texts[j].id === t.id) { continue; }
 					d = depth(t.b, texts[j].b);
-					if (d > tol) { v.N1.push('Text ' + t.id + ' on Text ' + texts[j].id + ' ' + (d * s).toFixed(1) + ' px'); }
+					if (d > tol) { v.overKeys['T' + t.id] = v.overKeys['T' + texts[j].id] = 1; v.N1.push('Text ' + t.id + ' on Text ' + texts[j].id + ' ' + (d * s).toFixed(1) + ' px'); }
 				}
 			});
 			// Every overlap of words with words: label on label, label on Text, Text on Text.
