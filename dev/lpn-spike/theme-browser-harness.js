@@ -5,12 +5,17 @@
 //
 // WHAT IT PROVES, with the browser's emulated colour scheme set both ways:
 //   1. System (the default, nothing stored) follows the emulated scheme: dark under a dark OS, light
-//      under a light one, and a scheme change while the page is open repaints with no reload.
+//      under a light one, and a scheme change while the page is open repaints with no reload. Since Task
+//      811 <html data-theme> carries the RESOLVED theme (dark or light here) and window.ecTheme.get() the
+//      choice (system); the choice is made in the gallery, by a real click on its card
+//      (theme-gallery-browser-harness.js proves the gallery itself).
 //   2. Dark pins dark under a light OS; Light pins light under a dark OS. Both repaint with no reload.
 //   3. The choice survives a reload, and the first paint already has it (the attribute is set by the
 //      head script, so the document element carries it before any stylesheet-dependent render).
-//   4. THE DRAWING DOES NOT CHANGE: the canvas paper and a pipe's and a node's ink compute to the same
-//      colours in every theme, and the canvas pixels of Net1 are byte-identical light and dark.
+//   4. THE DRAWING FOLLOWS THE THEME ON SCREEN (Task 811 round 3, which reverses Task 714's white map): white
+//      paper and the #1a6faf network in Light, Dark's own dark paper and lighter network ink in Dark, and
+//      System under a dark device draws exactly what Dark draws (theme-design-browser-harness.js proves the
+//      print and the exported files stay Light).
 //   5. The chrome DOES change: the page, the Settings box and the menu popup compute different colours.
 //   6. Browser furniture only: `lpn_theme` is the one key, System removes it, and the stored project
 //      holds no theme (nothing in it says "theme" or "dark"), saved while Dark was chosen.
@@ -72,11 +77,16 @@ async function main() {
 	const toPage = (page) => page.evaluate(() => { const h = document.getElementById('lpn_set_sub_page'); if (h) { h.scrollIntoView(); } });
 	const attrs = (page) => page.evaluate(() => ({
 		theme: document.documentElement.getAttribute('data-theme'),
+		choice: window.ecTheme ? window.ecTheme.get() : null,
 		bs: document.documentElement.getAttribute('data-bs-theme'),
 		stored: (function () { try { return localStorage.getItem('lpn_theme'); } catch (e) { return 'ERR'; } })()
 	}));
-	const colours = (page) => page.evaluate(() => {
-		const cs = (sel, prop) => { const e = document.querySelector(sel); return e ? getComputedStyle(e).getPropertyValue(prop) : null; };
+	// A token written as color-mix() computes as color(srgb ...); read back in the rgb() spelling the light
+	// set always printed, so the expected strings below stay what they were.
+	const NORM = (v) => { const m = /^color\(srgb ([^)]*)\)$/.exec(v || ''); if (!m) { return v; } const p = m[1].split(/[\s/]+/).filter(Boolean).map(parseFloat); const c = p.slice(0, 3).map((x) => Math.round(x * 255)).join(', '); return p.length > 3 && p[3] < 1 ? 'rgba(' + c + ', ' + p[3] + ')' : 'rgb(' + c + ')'; };
+	const colours = (page) => page.evaluate((normSrc) => {
+		const norm = new Function('return ' + normSrc)();
+		const cs = (sel, prop) => { const e = document.querySelector(sel); return e ? norm(getComputedStyle(e).getPropertyValue(prop)) : null; };
 		return {
 			body: cs('body', 'background-color'),
 			tabsBorder: cs('#lpn_tabs', 'border-bottom-color'),
@@ -88,7 +98,14 @@ async function main() {
 			nodeInk: cs('#lpn_canvas circle.lpn-node-junction', 'stroke'),
 			nodeFill: cs('#lpn_canvas circle.lpn-node-junction', 'fill')
 		};
-	});
+	}, NORM.toString());
+	// Choose a theme the way a visitor does: the Theme button, then a real click on the card.
+	const choose = async (page, t) => {
+		await page.click('#lpn_set_theme');
+		await page.waitForSelector('#lpn_theme_gallery', { state: 'visible' });
+		await page.click('#lpn_theme_gallery .lpn-theme-choice[data-theme-name="' + t + '"]');
+		await page.waitForSelector('#lpn_theme_gallery', { state: 'detached' });
+	};
 	const canvasPixels = async (page) => {
 		const box = await page.evaluate(() => { const r = document.getElementById('lpn_canvas').getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height, vw: innerWidth, vh: innerHeight }; });
 		const x = Math.max(0, box.x), y = Math.max(0, box.y);
@@ -109,7 +126,7 @@ async function main() {
 		return png;
 	};
 
-	// Text that sits on the map, not on a themed panel, is read against the map's own paper (white). For every
+	// Text that sits on the map, not on a themed panel, is read against the map's own paper. For every
 	// visible text element whose centre is over the canvas, walk up to the element that holds the canvas and
 	// composite the backgrounds met on the way; an element on no background of its own is on the paper. A
 	// themed panel (an overlay with its own background) is judged against that panel.
@@ -129,7 +146,7 @@ async function main() {
 			const cs = getComputedStyle(el); if (cs.visibility === 'hidden' || cs.display === 'none') { return; }
 			const layers = []; let n = el, solid = false;
 			while (n && n !== document.documentElement && !n.contains(cv)) { const bg = parse(getComputedStyle(n).backgroundColor); if (bg[3] > 0) { layers.push(bg); } if (bg[3] >= 1) { solid = true; break; } n = n.parentElement; }
-			let base = [255, 255, 255, 1]; if (solid) { base = layers.pop(); }
+			let base = parse(getComputedStyle(cv).backgroundColor); if (solid) { base = layers.pop(); }
 			layers.reverse(); let b = base; layers.forEach((l) => { b = over(l, b); });
 			let fg = parse(cs.color); fg = over([fg[0], fg[1], fg[2], fg[3] * (+cs.opacity || 1)], b);
 			const a = lum(fg), bb = lum(b);
@@ -172,7 +189,8 @@ async function main() {
 
 	// The colour legend is a panel of chrome over the map (Tom: "doesn't respond to Dark"); its swatches are data and
 	// never change. One is put on the map the way the page builds it (class names are the contract).
-	const legendLook = (page) => page.evaluate(() => {
+	const legendLook = (page) => page.evaluate((normSrc) => {
+		const norm = new Function('return ' + normSrc)();
 		let el = document.getElementById('lpn_theme_probe_legend');
 		if (!el) {
 			el = document.createElement('div'); el.id = 'lpn_theme_probe_legend'; el.className = 'lpn-color-legend'; el.style.cssText = 'right:60px;top:200px';
@@ -180,8 +198,8 @@ async function main() {
 			document.getElementById('lpn_canvas').parentElement.appendChild(el);
 		}
 		const cs = getComputedStyle(el), sw = getComputedStyle(el.querySelector('.lpn-color-swatch'));
-		return { bg: cs.backgroundColor, ink: cs.color, swatch: sw.backgroundColor, swatchEdge: sw.borderTopColor };
-	});
+		return { bg: norm(cs.backgroundColor), ink: norm(cs.color), swatch: norm(sw.backgroundColor), swatchEdge: norm(sw.borderTopColor) };
+	}, NORM.toString());
 	const shot = async (page, name) => { if (SHOTS) { await page.screenshot({ path: path.join(SHOTS, name) }); } };
 
 	try {
@@ -191,7 +209,7 @@ async function main() {
 		try {
 			await a.goto('Looped-Network.php');
 			const first = await attrs(a.page);
-			ok('1. first load: no stored choice, so System (data-theme=system), nothing stored', first.theme === 'system' && first.stored === null, JSON.stringify(first));
+			ok('1. first load: no stored choice, so System (resolved to data-theme=dark here), nothing stored', first.choice === 'system' && first.theme === 'dark' && first.stored === null, JSON.stringify(first));
 			ok('1. ...and Bootstrap is told dark', first.bs === 'dark', first.bs);
 			await a.settle(1200);
 			checkMapText('9. gallery, dark', await mapText(a.page), [/Open a copy|example/i, /Privacy/, /Something wrong/]);
@@ -215,16 +233,18 @@ async function main() {
 			const row = a.page.locator('label.lpn-set-row', { hasText: rowText }).first();
 			ok('Settings has the Theme row, named by its key', (await row.count()) === 1);
 			await toPage(a.page); await row.scrollIntoViewIfNeeded().catch(() => {});
-			const sel = row.locator('select');
-			const optTexts = await sel.locator('option').allTextContents();
-			ok('the choices are System, Light, Dark, in that order',
+			await a.page.click('#lpn_set_theme');
+			await a.page.waitForSelector('#lpn_theme_gallery', { state: 'visible' });
+			const optTexts = (await a.page.locator('#lpn_theme_gallery .lpn-theme-choice-name').allTextContents()).slice(0, 3);
+			ok('the choices begin System, Light, Dark, in that order',
 				JSON.stringify(optTexts) === JSON.stringify([await a.lang('lpn_theme_system'), await a.lang('lpn_theme_light'), await a.lang('lpn_theme_dark')]), JSON.stringify(optTexts));
-			ok('System is the selected choice by default', (await sel.inputValue()) === 'system');
+			ok('System is the kept choice by default', (await a.page.getAttribute('#lpn_theme_gallery .lpn-theme-choice[data-theme-name="system"]', 'aria-pressed')) === 'true');
+			await a.page.keyboard.press('Escape');
 			await shot(a.page, 'settings-dark.png');
 
 			// Light pins light under a dark OS, with no reload
 			let navs = 0; a.page.on('framenavigated', () => { navs++; });
-			await sel.selectOption('light');
+			await choose(a.page, 'light');
 			await a.settle(400);
 			let t = await attrs(a.page);
 			ok('2. Light under a dark OS: data-theme=light, stored, Bootstrap light', t.theme === 'light' && t.stored === 'light' && t.bs === 'light', JSON.stringify(t));
@@ -238,7 +258,7 @@ async function main() {
 			await shot(a.page, 'map-light-pinned-under-dark-os.png');
 
 			// Dark pins dark
-			await sel.selectOption('dark');
+			await choose(a.page, 'dark');
 			await a.settle(400);
 			t = await attrs(a.page);
 			ok('2. Dark: data-theme=dark, stored dark', t.theme === 'dark' && t.stored === 'dark' && t.bs === 'dark', JSON.stringify(t));
@@ -247,13 +267,13 @@ async function main() {
 			const darkColours = await colours(a.page);
 			const darkPx = await canvasPixels(a.page);
 
-			// 4. the drawing is the same
-			ok('4. canvas paper is white in both themes', lightColours.canvasPaper === LIGHT_BG && darkColours.canvasPaper === LIGHT_BG, lightColours.canvasPaper + ' / ' + darkColours.canvasPaper);
+			// 4. the drawing follows the theme
+			ok('4. canvas paper is white in Light and Dark\'s own dark in Dark', lightColours.canvasPaper === LIGHT_BG && darkColours.canvasPaper === DARK_BG, lightColours.canvasPaper + ' / ' + darkColours.canvasPaper);
 			ok('4. the scale bar is themed chrome: light text on a dark panel in dark, dark on light in light', darkColours.scaleInk === 'rgb(213, 216, 220)' && darkColours.scaleBg === 'rgba(30, 31, 34, 0.8)' && lightColours.scaleBg === 'rgba(255, 255, 255, 0.8)' && lightColours.scaleInk !== darkColours.scaleInk, JSON.stringify([lightColours.scaleInk, lightColours.scaleBg, darkColours.scaleInk, darkColours.scaleBg]));
-			ok('4. a pipe\'s ink is identical in both themes', lightColours.pipeInk === darkColours.pipeInk && lightColours.pipeInk !== null, lightColours.pipeInk + ' / ' + darkColours.pipeInk);
-			ok('4. a node\'s ink and fill are identical in both themes', lightColours.nodeInk === darkColours.nodeInk && lightColours.nodeFill === darkColours.nodeFill, [lightColours.nodeInk, darkColours.nodeInk, lightColours.nodeFill, darkColours.nodeFill].join(' '));
-			ok('4. the canvas pixels (paper and ink) are byte-identical light and dark', Buffer.compare(lightPx, darkPx) === 0 && Buffer.compare(sysPx, darkPx) === 0,
-				'light ' + lightPx.length + ' bytes, dark ' + darkPx.length + ' bytes');
+			ok('4. a pipe\'s ink is the theme\'s map ink: #1a6faf in Light, lighter in Dark', lightColours.pipeInk === 'rgb(26, 111, 175)' && darkColours.pipeInk === 'rgb(106, 174, 232)', lightColours.pipeInk + ' / ' + darkColours.pipeInk);
+			ok('4. a node\'s ink follows it', lightColours.nodeInk === 'rgb(26, 111, 175)' && darkColours.nodeInk === 'rgb(106, 174, 232)', [lightColours.nodeInk, darkColours.nodeInk, lightColours.nodeFill, darkColours.nodeFill].join(' '));
+			ok('4. the canvas pixels differ between Light and Dark, and System under a dark device is Dark to the byte', Buffer.compare(lightPx, darkPx) !== 0 && Buffer.compare(sysPx, darkPx) === 0,
+				'light ' + lightPx.length + ' bytes, dark ' + darkPx.length + ' bytes, system ' + sysPx.length);
 			// 5. the chrome changes
 			ok('5. the chrome differs between the themes (page, tab rule, menu ink)', lightColours.body !== darkColours.body || lightColours.tabsBorder !== darkColours.tabsBorder, '');
 			ok('5. the tab rule and menu ink differ', lightColours.tabsBorder !== darkColours.tabsBorder && lightColours.menuInk !== darkColours.menuInk, JSON.stringify([lightColours.tabsBorder, darkColours.tabsBorder, lightColours.menuInk, darkColours.menuInk]));
@@ -319,11 +339,11 @@ async function main() {
 			await a.settle(500);
 			const row2 = a.page.locator('label.lpn-set-row', { hasText: rowText }).first();
 			await toPage(a.page); await row2.scrollIntoViewIfNeeded().catch(() => {});
-			ok('3. ...the control shows the stored choice on a fresh page', (await row2.locator('select').inputValue()) === 'dark');
-			await row2.locator('select').selectOption('system');
+			ok('3. ...the control shows the stored choice on a fresh page', (await row2.locator('#lpn_set_theme').getAttribute('data-theme-choice')) === 'dark');
+			await choose(a.page, 'system');
 			await a.settle(300);
 			t = await attrs(a.page);
-			ok('1. back to System: the key is gone and data-theme is system', t.stored === null && t.theme === 'system' && t.bs === 'dark', JSON.stringify(t));
+			ok('1. back to System: the key is gone and the dark device decides', t.stored === null && t.choice === 'system' && t.theme === 'dark' && t.bs === 'dark', JSON.stringify(t));
 
 			// 1. a scheme change while open repaints with no reload
 			await a.page.emulateMedia({ colorScheme: 'light' });
@@ -345,7 +365,7 @@ async function main() {
 			await b.goto('Looped-Network.php');
 			let t = await attrs(b.page);
 			const sysTok = await b.page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--ec-bg').trim());
-			ok('1. System under a light OS paints light', t.theme === 'system' && t.bs === 'light' && sysTok === '#fff', JSON.stringify(t) + ' ' + sysTok);
+			ok('1. System under a light OS paints light', t.choice === 'system' && t.theme === 'light' && t.bs === 'light' && sysTok === '#fff', JSON.stringify(t) + ' ' + sysTok);
 			await b.settle(1200);
 			checkMapText('9. gallery, light', await mapText(b.page), [/Open a copy|example/i, /Privacy/, /Something wrong/]);
 			await b.openExampleCard(await b.lang('lpn_ex_net1_title'));
@@ -359,7 +379,7 @@ async function main() {
 			await b.settle(500);
 			const row = b.page.locator('label.lpn-set-row', { hasText: await b.lang('lpn_settings_theme') }).first();
 			await toPage(b.page); await row.scrollIntoViewIfNeeded().catch(() => {});
-			await row.locator('select').selectOption('dark');
+			await choose(b.page, 'dark');
 			await b.settle(400);
 			t = await attrs(b.page);
 			const tok = await b.page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--ec-bg').trim());

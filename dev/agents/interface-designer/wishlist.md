@@ -563,3 +563,9 @@ N. **One in-page "User guide" box replaces Help > Tables and Hotkeys and Help > 
 3. Measure with dev/browser-pass before building: popup height with a ticked override at 1280, 1024 and 390 px, and the "(inherited)" width in de, ru and fr.
 4. A harness look at the Settings held bar in an RTL language (physical-left shadow, no rtl twin found).
 5. Decide, with Tom: a Base-row arrow ("follow Base again"), and whether a click on a dot whose alternative is shared with non-descendants needs a confirm.
+
+## Added 2026-10-17 (themes)
+
+- **THEME GALLERY, branch 1.** Seed-derived tokens, hover-preview gallery in Settings > Page, High contrast, Amber, Green, Platinum, and the chrome-surface change ("the same, but better" #1). `dev/themes-plan.md`. Buys: Tom's fun-and-useful theme selector and the first real accessibility theme, on no new storage. Journal 2026-10-17.
+- **Ramp versus paper floor.** A check that every value ramp stop reads 3:1 against every theme's map paper, plus a halo rule for dark paper. Without it a display theme makes a velocity map lie by omission. SPECULATION on the exact fix; the defect is OBSERVED in the prototype.
+- **Contrast fixes in the default light theme** (warn-ink 3.69:1, help glyph 4.11:1, control borders 1.6:1). Small and measurable; independent of themes.
