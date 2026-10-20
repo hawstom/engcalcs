@@ -540,6 +540,29 @@ EngCalcs.lpnCollide = (function () {
 	// a label, so the far side is genuinely unreachable here and there is nothing to model.
 	// A label the user moved says which side its text hangs on (`side`, the page's hysteresis rule,
 	// Task 807); every other label hangs on the nearest side.
+	// **A LABEL IN ITS HOME SPOT DRAWS NO LEADER; A LABEL ANYWHERE ELSE DRAWS ONE** (Tom,
+	// 2026-10-19: *"anything not in a home spot needs a leader"*). A label's home spots are its
+	// resting corners: the endpoint `off` (the page's resting offset) away from its anchor, on any of
+	// the four diagonals, the text hanging away from the anchor. A one-line node label has two more,
+	// level with its node east and west (`levelDy`, the endpoint's drop for a line centred on the
+	// node). Geometric, with no flag carried, so the placement passes and the renderer cannot
+	// disagree about it. The tolerance is float noise: a side either is a home spot or is not.
+	function atHome(anchor, end, off, levelDy) {
+		if (!anchor || !end || !off) { return false; }
+		var dx = Math.abs(off.x), dy = Math.abs(off.y),
+			tol = 1e-6 * Math.hypot(dx, dy) + 1e-9 * (Math.abs(anchor.x) + Math.abs(anchor.y)),
+			ey = end.y - anchor.y;
+		if (Math.abs(Math.abs(end.x - anchor.x) - dx) > tol) { return false; }
+		if (Math.abs(Math.abs(ey) - dy) <= tol) { return true; }
+		return levelDy !== undefined && levelDy !== null && Math.abs(ey - levelDy) <= tol;
+	}
+	// Whether a label of this spec at endpoint `c`, hung from `anchor`, draws a leader: never at
+	// home (`spec.homeOff`, `spec.homeLevelDy`), otherwise past `leaderMin` (0: always). A spec
+	// without `homeOff` keeps the plain distance rule, for the callers that state none.
+	function drawsLeader(spec, anchor, c, leaderMin) {
+		if (spec && spec.homeOff && atHome(anchor, c, spec.homeOff, spec.homeLevelDy)) { return false; }
+		return Math.hypot(c.x - anchor.x, c.y - anchor.y) > (leaderMin > 0 ? leaderMin : 0);
+	}
 	function hangsRight(lbl, c) { return lbl.side ? lbl.side === 'right' : c.x >= lbl.anchor.x; }
 	function labelBoxAtEnd(lbl, c) {
 		var left = hangsRight(lbl, c) ? c.x : c.x - lbl.w;
@@ -1238,7 +1261,7 @@ EngCalcs.lpnCollide = (function () {
 		// pipe with its leader running back to its own). Only the last sweep, for a label with no
 		// such side, lets the leader alone say whose it is.
 		function strictOk(lbl, c, b, clear) {
-			var dist = Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y), far = dist > leaderMin,
+			var dist = Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y), far = drawsLeader(lbl, lbl.anchor, c, leaderMin),
 				near = function () { return nearMargin < 0 || lbl.ownLink === undefined || ownPipeNearest(b, local, lbl.ownLink, nearMargin); };
 			lbl._quiet = false;
 			if (lbl.ownLink !== undefined && boxesOnOwnLink(b, local, lbl.ownLink)) { return false; }
@@ -1273,7 +1296,7 @@ EngCalcs.lpnCollide = (function () {
 			// occupies rather than a rectangle around it.
 			b.forEach(function (cb) { index.addBox(obs.boxes.push(cb) - 1); });
 			var lead = null;
-			if (strict && !lbl._quiet && Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y) > leaderMin) {
+			if (strict && !lbl._quiet && drawsLeader(lbl, lbl.anchor, c, leaderMin)) {
 				lead = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id);
 				index.addSegment(obs.segments.push(lead) - 1);
 			}
@@ -1854,7 +1877,7 @@ EngCalcs.lpnCollide = (function () {
 			stats = { gangs: 0, considered: 0, moved: 0, trials: 0, brute: 0, gang: 0, before: 0 };
 		(labels || []).forEach(function (l) { specs[l.id] = l; });
 		function leaderAt(spec, c) {
-			return Math.hypot(c.x - spec.anchor.x, c.y - spec.anchor.y) > leaderMin
+			return drawsLeader(spec, spec.anchor, c, leaderMin)
 				? segment(spec.anchor.x, spec.anchor.y, c.x, c.y, 'leader', spec.id) : null;
 		}
 		out.forEach(function (r, i) {
@@ -2320,6 +2343,8 @@ EngCalcs.lpnCollide = (function () {
 		widestArc: widestArc,
 		polarCandidates: polarCandidates,
 		cardinalSides: cardinalSides,
+		atHome: atHome,
+		drawsLeader: drawsLeader,
 		placeLabelsFirstFit: placeLabelsFirstFit,
 		boxClearOf: boxClearOf,
 		boxesClearOf: boxesClearOf,

@@ -236,6 +236,20 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
 
 
 
+## A label's home spot, and the leader (Tom 2026-10-19)
+
+*"Let's say that anything not in a home spot needs a leader."* A data label's **home spot** is where
+it rests: its endpoint the resting offset (`defaultLabelOffset()`, which scales with the symbols)
+from its anchor on one of the four diagonals, its text hanging away from the anchor. A one-line node
+label has two more, level with its node, east and west. A pipe label's anchor is its pipe's
+half-way point, or for a level label the station it hangs from. A label anywhere else, however
+near, draws a leader; one at home never does (`Collide.atHome()`, `labelAtHome()`). Replaced a
+distance threshold, which could not say it: a label at rest already sits 15 to 25 px out. A label
+hung left of its point is **right-justified**, every row ending at its endpoint (*"labels on the
+left side be right-justified so that we don't have gaps"*). A moved label or a Text that would
+cover a Text, a symbol or another moved label at the current zoom is not drawn at that zoom
+(`hideCoveringMovedLabels()`, `crowdedTexts()`). `label-form-wheel-browser-harness.js`.
+
 ## A Description is lines and paragraphs (Task 806, Tom 2026-10-15)
 
 *"I think that all Description fields should allow multiple lines and paragraphs like most software

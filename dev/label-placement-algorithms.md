@@ -214,8 +214,8 @@ Corner attachment is QGIS behaviour. The defensible synthesis for a network draw
 > multiple of the stroke width. Attach that landing at the vertical centre of the **first** text
 > line. Suppress the leader below a leader tolerance.
 
-We already have the tolerance: `leaderThreshold()` in `js/looped-network.js` is ESRI's leader
-tolerance under a different name. We have neither the landing nor line attachment — today the leader
+We had the tolerance as a distance; since 2026-10-19 it is a place instead: a label in its home
+spot draws no leader and any other draws one (`labelAtHome()`, `dev/lpn-rulings.md`). We have neither the landing nor line attachment — today the leader
 meets the box's near vertical edge at the box's *vertical centre*, which on a five-line node label
 points at the middle row.
 

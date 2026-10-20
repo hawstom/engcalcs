@@ -39,7 +39,12 @@
 //     one line and as stacks with more than one value, on Net3 and on the 600-junction network;
 //     and the reference shows none of them, so the assertions fail on feat/label-beside and master;
 //   * no fewer labels shown than the reference, and more values;
-//   * Net1: pipe 113's label is shown, level, on a leader.
+//   * Net1: pipe 113's label is shown, level, on a leader;
+//   * Net1, read at every notch from 1 to 14 out: no label on a label, no label on a Text and no Text
+//     on a Text (Tom's 2026-10-19 screenshot at 14 out);
+//   * at every view: a label away from its home spot carries a leader and one at home does not
+//     (Tom, 2026-10-19), and every stack's rows end at its endpoint, right-justified when it hangs
+//     left of its point.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -82,8 +87,7 @@ function ok(label, cond, detail) {
 const CUTS = [
 	["placed = perfDebugAccum('  ns:inline', function () { return tryInlineNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf); });", ''],
 	['if (f.length) { sp.forms = f; }', ''],
-	['LPN_LEVEL_STATIONS.forEach(function (a) {', '[].forEach(function (a) {'],
-	['function levelLeaderMin() { return effectiveFontSize() * LPN_LEVEL_LEADER_FRAC; }', 'function levelLeaderMin() { return leaderThreshold(); }']
+	['LPN_LEVEL_STATIONS.forEach(function (a) {', '[].forEach(function (a) {']
 ];
 const MARKER = "\tdocument.addEventListener('DOMContentLoaded'";
 const HOOK = fs.readFileSync(path.join(__dirname, 'label-form-hook.inc.js'), 'utf8');
@@ -99,7 +103,7 @@ const SCENES = [
 	// ground east of it). At 4 out, pipe 11's label is shown and pipe 10's does not sit nearer pipe
 	// 111 than its own.
 	{ key: 'net1', name: 'Net1 (gallery, US), wheeled out', cardKey: 'lpn_ex_net1_title', node: ['id', 'demand', 'elev', 'pressure'],
-		link: ['flow'], step: true, notches: [-4, -14], named: ['113'], shotAt: -14,
+		link: ['flow'], step: true, sweep: true, notches: [-4, -14], named: ['113'], shotAt: -14,
 		at: { notch: -4, shown: ['11'], ownNearest: ['10'] } },
 	{ key: 'phone', name: 'Net3 (gallery, gpm) on a 390 px phone', cardKey: 'lpn_ex_net3_title', node: NET3_NODE, link: NET3_LINK,
 		notches: [3, 6], named: [], viewport: { width: 390, height: 844 } }
@@ -108,6 +112,9 @@ const SCENES = [
 // the per-label node comparison without a second session.
 const TRIAL = "placed = perfDebugAccum('  ns:inline', function () { return tryInlineNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf); });";
 const TOL_PX = 1.5, AMBIG_PX = 3;
+// LABEL_FORM_PERF=1: each view also prints what each aim of a content pass costs (?debug=perf's own
+// sums, median of five passes), so an aim that costs out of proportion can be named.
+const PERF = !!process.env.LABEL_FORM_PERF;
 
 async function wheel(page, n) {
 	const step = n > 0 ? -100 : 100;
@@ -136,7 +143,7 @@ async function layOut(Session, browser, sc, mode, opts) {
 		await route.fulfill({ response: resp, body: body });
 	});
 	try {
-		await a.goto('Looped-Network.php?ec_nolog=1');
+		await a.goto('Looped-Network.php?ec_nolog=1' + (PERF ? '&debug=perf' : ''));
 		await a.answerTrainingPanel().catch(() => {});
 		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 		if (sc.cardKey) {
@@ -162,16 +169,33 @@ async function layOut(Session, browser, sc, mode, opts) {
 			await wheel(a.page, -out);
 			await a.settle(1500);
 		}
-		const views = [], shotAt = sc.shotAt !== undefined ? sc.shotAt : sc.notches[sc.notches.length - 1];
+		const views = [], sweep = [], shotAt = sc.shotAt !== undefined ? sc.shotAt : sc.notches[sc.notches.length - 1];
 		let at = 0, named = {};
 		for (const k of sc.notches) {
 			if (sc.step) {
-				for (let i = 0; i < Math.abs(k - at); i++) { await wheel(a.page, k > at ? 1 : -1); await a.settle(900); }
+				for (let i = 0; i < Math.abs(k - at); i++) {
+					await wheel(a.page, k > at ? 1 : -1);
+					// The sweep reads every notch on the way, laid out as the wheel left it.
+					if (sc.sweep && mode.shipped) {
+						await a.settle(1500);
+						const w = await a.page.evaluate(([tol, amb]) => window.__lpnForm.read(tol, amb), [TOL_PX, AMBIG_PX]);
+						sweep.push({ notch: at + (k > at ? i + 1 : -(i + 1)), overlaps: w.overlaps, homeBad: w.homeBad, ragged: w.ragged, home: w.homeCount, away: w.awayCount });
+					} else { await a.settle(900); }
+				}
 			} else { await wheel(a.page, k - at); }
 			at = k;
 			await a.settle(1500);
 			const v = await a.page.evaluate(([tol, amb]) => window.__lpnForm.read(tol, amb), [TOL_PX, AMBIG_PX]);
 			v.notch = k;
+			if (PERF) {
+				v.perf = await a.page.evaluate(() => {
+					const runs = [];
+					for (let i = 0; i < 5; i++) { runs.push(window.__lpnForm.perf()); }
+					const out = {};
+					Object.keys(runs[2]).forEach((key) => { const xs = runs.map((r) => r[key] || 0).sort((p, q) => p - q); out[key] = xs[2]; });
+					return out;
+				});
+			}
 			if (k === shotAt) {
 				// The named labels and Tom's screenshots, as he meets them: laid out by the wheel's own pass.
 				named = await a.page.evaluate((ids) => window.__lpnForm.named(ids), sc.named);
@@ -208,7 +232,7 @@ async function layOut(Session, browser, sc, mode, opts) {
 		const back2 = await a.page.evaluate(([tol, amb]) => window.__lpnForm.read(tol, amb), [TOL_PX, AMBIG_PX]);
 		// The content pass's own time at the last view, median of three, and the named labels.
 		const ms = await a.page.evaluate(() => window.__lpnForm.timeContent(3));
-		return { views, again, back, back2, ms, named, out, cut, hooked, errors: a.errors.slice() };
+		return { views, sweep, again, back, back2, ms, named, out, cut, hooked, errors: a.errors.slice() };
 	} finally {
 		await a.close();
 	}
@@ -222,7 +246,7 @@ function firstDiff(a, b) {
 function row(v) {
 	return `labels ${v.labels} (nodes ${v.nodes}: ${v.nodeInline} one line, ${v.nodeStacked} stacked; pipes ${v.pipes}: ${v.along} along, ` +
 		`${v.level} level on a leader ${v.levelLeader}, ${v.levelInline} one line, ${v.levelStacked} stacked), values ${v.values}; ` +
-		`N1 ${v.N1.length} (${v.N1mine.length} ours) N3 ${v.N3.length} (node-label leaders through a symbol ${v.N3node}) astray ${v.astray.length}, leadered nearer another pipe ${v.leaderNearOther}, leaders drawn: nodes ${v.leadersNode} pipes ${v.leadersPipe} (threshold ${v.thrPx} px, text ${v.textPx} px)`;
+		`N1 ${v.N1.length} (${v.N1mine.length} ours) N3 ${v.N3.length} (node-label leaders through a symbol ${v.N3node}) astray ${v.astray.length}, leadered nearer another pipe ${v.leaderNearOther}, leaders drawn: nodes ${v.leadersNode} pipes ${v.leadersPipe}; labels at home ${v.homeCount}, away ${v.awayCount}`;
 }
 
 async function main() {
@@ -259,6 +283,9 @@ async function main() {
 				console.log(`        ${' '.repeat(String(v.notch < 0 ? -v.notch + ' out' : v.notch + ' in').length)}  reference ${row(w)}`);
 				console.log(`          no one-line node form, same view: node labels ${v.stacked.nodes} -> ${v.nodes}, node values ${Object.keys(v.stacked.node).reduce((t, k) => t + v.stacked.node[k].n, 0)} -> ${Object.keys(v.node).reduce((t, k) => t + v.node[k].n, 0)}; all labels ${v.stacked.labels} -> ${v.labels}, values ${v.stacked.values} -> ${v.values}`);
 				extra.forEach((e) => console.log(`          ${e.ref.padEnd(9)} ${row(e.r.views[i])}`));
+				[['shipped', v], ['reference', w]].forEach(([nm, x]) => {
+					if (x.perf) { console.log('          ' + nm + ' content pass by aim, ms (median of 5): ' + Object.keys(x.perf).sort((p, q) => x.perf[q] - x.perf[p]).filter((key) => x.perf[key] > 0).map((key) => key + ' ' + x.perf[key]).join(', ')); }
+				});
 				console.log(`          e.g. one-line node labels ${v.ex.nodeInline.slice(0, 6).join(' ')}; leadered stacks ${v.ex.levelStacked.slice(0, 6).join(' ')}; leadered one-line ${v.ex.levelInline.slice(0, 6).join(' ')}`);
 				const tag = sc.name + ', ' + (v.notch < 0 ? -v.notch + ' notches out' : v.notch + ' notches in');
 				// N1 that the reference draws too is not this work's: hand-placed labels on Net1 (Tom's
@@ -278,16 +305,27 @@ async function main() {
 					lossN.length + (lossN.length ? ': ' + lossN.slice(0, 5).join('; ') : ''));
 				// Tom, 2026-10-18: pipes may run through one-line node labels; counted, not asserted.
 				console.log('        pipes through one-line node labels: ' + v.struck.length);
-				// Tom, 2026-10-18: a leader of a text height or more is drawn; below it none. The threshold
-				// is the text height, or just past a label's resting offset where that is longer (an
-				// untouched label draws none).
-				ok(tag + ': a label a text height or more from its anchor carries a leader (threshold ' + v.thrPx + ' px, text ' + v.textPx + ' px, rest ' + v.restPx + ' px)',
-					v.thrPx <= Math.max(v.textPx, v.restPx * 1.05) + 0.2 && v.thrPx >= v.textPx - 0.2);
+				// Tom, 2026-10-19: *"anything not in a home spot needs a leader"*, and a label in its home
+				// spot draws none, however near or far (rest ${v.restPx} px out).
+				ok(tag + ': every label away from its home spot carries a leader, and none at home does (rest ' + v.restPx + ' px)',
+					v.homeBad.length === 0, v.homeBad.slice(0, 4).join('; '));
+				// Tom, 2026-10-19: a label left of its point is right-justified, with no ragged gap.
+				ok(tag + ': every stack ends its rows at its endpoint (right-justified on the left, left-justified on the right)',
+					v.ragged.length === 0, v.ragged.slice(0, 4).join('; '));
 				ok(tag + ': no level label or one-line node label overlaps another label, by the rotated glyph boxes', v.N1mine0.length === 0, v.N1mine0.slice(0, 3).join('; '));
 				ok(tag + ': every one-line node label lies within the map and off its legends', v.offView.length === 0, v.offView.slice(0, 4).join('; '));
 				ok(tag + ': every level label with no leader is nearest its own pipe', v.astray.length === 0, v.astray.slice(0, 4).join(' '));
 				ok(tag + ': no fewer labels than the reference, and no fewer values', v.labels >= w.labels && v.values >= w.values,
 					`${w.labels} -> ${v.labels} labels, ${w.values} -> ${v.values} values`);
+			});
+			// **NOTHING VISIBLE OVERLAPS, AT EVERY NOTCH OUT** (Tom's Net1 at 14 notches, 2026-10-19:
+			// "Tank" over N10 and N11, "Pump" over N11 and over "Source"): no label on a label, on a Text,
+			// and no Text on a Text, read off the glyphs at each notch from 1 to 14 out.
+			(on.sweep || []).forEach((w) => {
+				const t = sc.name + ', ' + (-w.notch) + ' out';
+				ok(t + ': no label on a label, no label on a Text, no Text on a Text', w.overlaps.length === 0, w.overlaps.slice(0, 4).join('; '));
+				ok(t + ': leaders exactly where a label is away from home (' + w.away + ' away, ' + w.home + ' at home), and no ragged stack',
+					w.homeBad.length === 0 && w.ragged.length === 0, w.homeBad.concat(w.ragged).slice(0, 4).join('; '));
 			});
 			const A = on.views[on.views.length - 1];
 			const sum = (vs, k) => vs.reduce((t, v) => t + v[k], 0);

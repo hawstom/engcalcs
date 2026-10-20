@@ -185,7 +185,7 @@ async function measure(file, mode, opts) {
 	const doc = L.getDoc(), nodeEls = L.nodeEls(), linkEls = L.linkEls(), labelEls = L.labelEls();
 
 	// The leader AS DRAWN. Two independent hides: updateDataLeader() sets `display` when the label
-	// is nearer its anchor than leaderThreshold(), and setLabelAssemblyHidden() sets `visibility`
+	// is at home (labelAtHome()), and setLabelAssemblyHidden() sets `visibility`
 	// when the whole assembly is out.
 	function drawnLeader(holder) {
 		const e = holder && holder.leader;
@@ -231,7 +231,8 @@ async function measure(file, mode, opts) {
 			if (!byLink[b.linkOwner]) { byLink[b.linkOwner] = []; }
 			byLink[b.linkOwner].push(b);
 		});
-		const textLabels = doc.labels.filter(function (lb) { return !!labelEls[lb.id]; });
+		// A Text another Text covers at this zoom is not drawn and is no obstacle (crowdedTexts()).
+		const textLabels = doc.labels.filter(function (lb) { return !!labelEls[lb.id] && !labelEls[lb.id].crowdHidden; });
 		if (textBoxes.length !== textLabels.length) {
 			throw new Error('label-crossing-harness: ' + textBoxes.length + ' unowned `label` boxes '
 				+ 'against ' + textLabels.length + ' Text objects with elements. The attribution '

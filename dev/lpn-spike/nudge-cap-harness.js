@@ -51,7 +51,8 @@ const L = loadLoopedNetwork(
 	// implementation detail measured from the default offset and is a slightly different quantity.
 	"\t\tlabelDistPx: function (id) { var n = nodeById(id), p = nodeLabelPos(n);\n" +
 	"\t\t\treturn Math.hypot(p.x - n.x, p.y - n.y) * state.s; },\n" +
-	"\t\tleaderThresholdPx: function () { return leaderThreshold() * state.s; },\n" +
+	// The farthest a label sits with no leader: its home spot, the resting offset (labelAtHome()).
+	"\t\tleaderThresholdPx: function () { var d = defaultLabelOffset(); return Math.hypot(d.x, d.y) * state.s; },\n" +
 	"\t\tsetZoom: function (s) { state.s = s; setTransform(); onZoomChanged(); },\n" +
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
@@ -140,7 +141,7 @@ console.log('--- no label is carried further than the reach, at any zoom ---');
 
 console.log('\n--- a label at the reach is still attached to its element ---');
 {
-	// The reach has to sit ABOVE the leader threshold, or the worst case is a label as far away as
+	// The reach has to sit ABOVE the farthest a label goes with no leader (its home spot), or the worst case is a label as far away as
 	// the rule allows with no line drawn to say whose it is -- which is what Tom photographed, and
 	// the half of the symptom that made it hard to read as a placement problem at all.
 	L.setZoom(22);
