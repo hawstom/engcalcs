@@ -278,7 +278,8 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 					}
 					if (p < minPressure && !baseBelow[m.nodes[j].id]) { any = true; }
 				}
-				if (any) { out.belowSeconds += r.reportStep; }
+				// the time spent below is the interval to the next step; the last step is an instant
+				if (any && i + 1 < r.frames.length) { out.belowSeconds += r.frames[i + 1].t - f.t; }
 			}
 			return out;
 		}

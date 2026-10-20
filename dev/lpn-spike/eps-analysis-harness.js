@@ -45,6 +45,7 @@ const L = loadLoopedNetwork(
 	"\t\tanalysisModelAt: analysisModelAt, analysisRun: analysisRun, assembleModel: assembleModel,\n" +
 	"\t\tengineFor: engineFor,\n" +
 	"\t\truncrit: runCriticality, critRun: function () { return critRun; },\n" +
+	"\t\tsetDm: function (v) { settings.hydraulics = settings.hydraulics || {}; settings.hydraulics.demandMultiplier = v; },\n" +
 	"\t\tcritSet: function (k, v) { critAsk[k] = v; },\n" +
 	"\t\tdsSet: function (k, v) { dsAsk[k] = v; }, runFind: runDemandScaleSearch, runScale: runDemandScale,\n" +
 	"\t\tdsSearch: function () { return dsSearch; }, dsRun: function () { return dsRun; },\n" +
@@ -172,6 +173,21 @@ async function sweepSelected(ids, when, extra) {
 	const now = await sweepSelected(ids, 'now');
 	check(!now.at && now.stopped === false && ids.every((id) => now.byId[id]), 'no "at" record, every hydrant answered');
 
+	head('5b. FIRE FLOW WHEN A TANK EMPTIES (Net1, demands x6)');
+	open('Net1.lwn');
+	L.setEngine('epanet');
+	L.setDm(6);
+	const rr = await L.analysisRun();
+	const emp = EC.lpnEpsTankEmptyAt(rr.frames, L.assembleModel(), null);
+	check(!!emp, 'at six times the demand the tank empties in the run (' + (emp ? EC.lpnFormatTime(emp.t) : 'never') + ')');
+	for (const w of ['minp', 'all']) {
+		const set = await sweepSelected(['11', '12', '13', '21', '22', '23', '31', '32'], w);
+		check(set.at.emptyT === emp.t, w + ': the set records the step the tank empties');
+		check(set.results.length === 8 && set.counts.error === 0, w + ': every junction answered, none an error (' + JSON.stringify(set.counts) + ')');
+		check(w === 'all' ? set.at.stepsDone === rr.frames.filter((f) => f.t < emp.t).length : set.at.t < emp.t, w + ': only steps before the tank empties were tested');
+	}
+	L.setDm(1);
+
 	head('6. CRITICALITY OVER THE WHOLE RUN (Net1: pump 9 and pipe 10 are the only supply to the tank)');
 	open('Net1.lwn');
 	L.setEngine('epanet');
@@ -195,7 +211,7 @@ async function sweepSelected(ids, when, extra) {
 		const rec = cr.byId[id], want = await emptyOf(id);
 		check(rec.run && rec.run.emptyAt && rec.run.emptyAt.id === want.tank && rec.run.emptyAt.t === want.t && want.t !== null,
 			`outage of link ${id}: the tank empties at ${rec.run && rec.run.emptyAt ? EC.lpnFormatTime(rec.run.emptyAt.t) : 'never'} (an independent run says ${want.t === null ? 'never' : EC.lpnFormatTime(want.t)})`);
-		check(rec.run.belowSeconds > 0 && EC.lpnCriticalitySeverity(rec) === 'fail', '  and it counts as a failure with hours below the minimum (' + rec.run.belowSeconds / 3600 + ' h)');
+		check(rec.run.belowSeconds === (24 * 3600 - rec.run.emptyAt.t) && EC.lpnCriticalitySeverity(rec) === 'fail', '  and it counts as a failure with the hours actually spent below the minimum, the last step an instant (' + rec.run.belowSeconds / 3600 + ' h)');
 		check(rec.run.lowest && rec.run.lowest.t < rec.run.emptyAt.t, '  and its lowest pressure is read before the tank emptied, not from a disconnected network');
 	}
 	{

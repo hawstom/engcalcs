@@ -76784,12 +76784,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// **WHEN, ONLY WHERE THE PROJECT HAS A CLOCK** (Task 578).
 		if (analysisCanRun()) {
 			boxes.when = ffSelect([
-				['now', pc.lpn_when_now || 'The time step on screen'],
+				['now', pc.lpn_when_now || 'The reporting step on screen'],
 				['hour', pc.lpn_when_hour || 'A chosen reporting step'],
 				['minp', pc.lpn_when_minp || 'The reporting step of lowest pressure'],
 				['all', pc.lpn_when_all || 'Every reporting step, worst case']
 			], ask.when || 'now');
-			ffRow(host, pc.lpn_when || 'Time step tested', null, boxes.when, '');
+			ffRow(host, pc.lpn_when || 'Reporting step tested', null, boxes.when, '');
 			boxes.when.addEventListener('change', function () {
 				ask.when = boxes.when.value;
 				Object.keys(boxes).forEach(function (k) { ask[k] = boxes[k].value; });
@@ -77006,12 +77006,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// The Worst-effect cell, with the element it names as a go-to link (Tom, 2026-09-28: *"In fire
 	// flow analysis, can every node have a hyperlink to go to it?"*).
-	function ffCriticalCell(row, rec) {
-		var parts = ffCriticalParts(rec), td;
+	function ffCriticalCell(row, rec, showStep) {
+		var parts = ffCriticalParts(rec), td, when = typeof rec.designT === 'number' ? rec.designT : rec.t,
+			tail = (showStep && typeof when === 'number') ? ' (' + dsTimeText(when) + ')' : '';
 		if (parts.plain !== undefined) { return ffCell(row, parts.plain); }
 		td = ffCell(row, parts.before);
 		ffGotoLink(td, parts.kind, parts.id, parts.idText);
-		td.appendChild(document.createTextNode(parts.after));
+		td.appendChild(document.createTextNode(parts.after + tail));
 		return td;
 	}
 	// **EVERY ID IN THE FIRE-FLOW TABLE GOES TO ITS ELEMENT** -- the same go-to as a Find result or
@@ -77247,6 +77248,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		ffShownAt = dsNow();
 		ffEl('p', 'lpn-ff-summary', ffSummaryText(set), host);
 		dsTimeLines(host, fireFlowRunT);
+		if (set.at && set.at.none) {
+			ffEl('p', 'lpn-ff-summary', (pc.lpn_ff_no_steps || 'A tank empties at {time}, before the first reporting step could be tested, so no step was tested.')
+				.replace('{time}', dsTimeText(set.at.emptyT)), host);
+			return;
+		}
+		if (set.at && set.at.emptyT !== null && set.at.emptyT !== undefined) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_tank_empties || 'A tank empties at {time}; steps from then on were not tested.')
+				.replace('{time}', dsTimeText(set.at.emptyT)), host);
+		}
 		if (set.at) {
 			if (set.at.mode === 'all') {
 				ffEl('p', 'lpn-ff-note', (pc.lpn_ff_at_all || 'Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.')
@@ -77307,7 +77317,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_ff_col_limit || 'Design limit',
 			pc.lpn_ff_col_solves || 'Runs',
 			pc.lpn_ff_col_modes || 'Failure modes'
-		].concat(allSteps ? [pc.lpn_ff_col_hour || 'Lowest at'] : []));
+		].concat(allSteps ? [pc.lpn_ff_col_hour || 'Step of lowest flow'] : []));
 		shown.forEach(function (rec) {
 			var tr = ffEl('tr', 'lpn-ff-' + rec.state, null, body);
 			// **THE ID WEARS THE USER'S OWN LABEL PREFIX** (Tom, 2026-09-02: *"we need to apply here
@@ -77320,7 +77330,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ffCell(tr, ffQtyOrWhy(rec, rec.pressureAtRequired, 'lpn_u_pressure'));
 			ffCell(tr, ffAvailableText(rec));
 			ffCell(tr, ffQtyOrWhy(rec, rec.residualAt, 'lpn_u_pressure'));
-			ffCriticalCell(tr, rec);
+			ffCriticalCell(tr, rec, allSteps);
 			ffCell(tr, ffLimitText(rec));
 			ffCell(tr, rec.solves === undefined ? FF_DASH : String(rec.solves));
 			ffCell(tr, ffModesText(rec));
@@ -77630,17 +77640,37 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		openFireFlowRunBox(1000, { update: updateEpsRunBox });
 		return analysisRun(function (p) { updateEpsRunBox(p && p.fraction); }, function () { return fireFlowStop; })
 		.then(function (run) {
-			var times, pick = null, stepList, nSteps;
+			var times, pick = null, stepList, nSteps, stopT, emptied, usable;
 			if (fireFlowStop) { return finishRun({ ok: true, results: [], byId: {}, counts: tally, modes: { fire: 0, design: 0, clean: 0 },
 				requested: ids.length, residual: residual, design: null, solves: 0, stopped: true,
 				lossAccounting: EngCalcs.lpnFireFlowLossAccounting, isoCap: EngCalcs.lpnFireFlowIsoCap }, { mode: when, steps: 0, stepsDone: 0 }); }
-			if (!run || !run.ok || !run.frames || !run.frames.length) { return failRun(null); }
-			times = run.frames.map(function (f) { return f.t; });
+			if (!run || !run.frames || !run.frames.length || (!run.ok && !run.partial)) { return failRun(null); }
+			// **STEPS FROM THE FIRST TANK-EMPTY ON ARE NOT TESTED**, as criticality reads a run: EPANET
+			// closes an empty tank and reports meaningless heads for what it fed. A run that stopped
+			// part-way ends there too.
+			stopT = Infinity;
+			emptied = EngCalcs.lpnEpsTankEmptyAt ? EngCalcs.lpnEpsTankEmptyAt(run.frames, assembleModel(), null) : null;
+			if (emptied) { stopT = emptied.t; }
+			if (!run.ok && typeof run.stoppedAt === 'number') { stopT = Math.min(stopT, run.stoppedAt); }
+			usable = run.frames.filter(function (f) { return f.t < stopT; });
+			if (!usable.length) {
+				return finishRun({ ok: true, results: [], byId: {}, counts: tally, modes: { fire: 0, design: 0, clean: 0 },
+					requested: ids.length, residual: residual, design: null, solves: 0, stopped: false,
+					lossAccounting: EngCalcs.lpnFireFlowLossAccounting, isoCap: EngCalcs.lpnFireFlowIsoCap },
+					{ mode: when, none: true, emptyT: stopT });
+			}
+			times = usable.map(function (f) { return f.t; });
 			if (when === 'hour') {
-				pick = ffNearestStep(times, +ask.step);
+				pick = ffNearestStep(run.frames.map(function (f) { return f.t; }), +ask.step);
+				if (pick >= stopT) {
+					return finishRun({ ok: true, results: [], byId: {}, counts: tally, modes: { fire: 0, design: 0, clean: 0 },
+						requested: ids.length, residual: residual, design: null, solves: 0, stopped: false,
+						lossAccounting: EngCalcs.lpnFireFlowLossAccounting, isoCap: EngCalcs.lpnFireFlowIsoCap },
+						{ mode: when, none: true, emptyT: stopT });
+				}
 				times = [pick];
 			} else if (when === 'minp') {
-				pick = EngCalcs.lpnEpsMinPressureStep(run.frames.map(function (f) { return EngCalcs.lpnTimeFrameResult(run, f.t); }), ids);
+				pick = EngCalcs.lpnEpsMinPressureStep(usable.map(function (f) { return EngCalcs.lpnTimeFrameResult(run, f.t); }), ids);
 				if (!pick) { return failRun(null); }
 				times = [pick.t];
 			}
@@ -77653,11 +77683,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			if (when === 'all') {
 				return EngCalcs.lpnFireFlowSweepSteps(Object.assign(sweepOptions(), { steps: stepList, onProgress: progress }))
-					.then(function (set) { return finishRun(set, { mode: 'all', steps: set.steps, stepsDone: set.stepsDone }); }, failRun);
+					.then(function (set) { return finishRun(set, { mode: 'all', steps: set.steps, stepsDone: set.stepsDone, emptyT: isFinite(stopT) ? stopT : null }); }, failRun);
 			}
 			return EngCalcs.lpnFireFlowSweep(stepList[0].build(), Object.assign(sweepOptions(), { onProgress: progress }))
 				.then(function (set) {
-					return finishRun(set, { mode: when, t: times[0], minp: when === 'minp' ? pick : null });
+					return finishRun(set, { mode: when, t: times[0], minp: when === 'minp' ? pick : null, emptyT: isFinite(stopT) ? stopT : null });
 				}, failRun);
 		}, failRun);
 	}
@@ -77765,11 +77795,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// **THE WHOLE RUN, ONLY WHERE THE PROJECT HAS A CLOCK** (Task 578).
 		if (analysisCanRun()) {
 			when = ffSelect([
-				['now', pc.lpn_when_now || 'The time step on screen'],
+				['now', pc.lpn_when_now || 'The reporting step on screen'],
 				['run', pc.lpn_when_run || 'The whole run']
 			], critAsk.when || 'now');
 			when.addEventListener('change', function () { critAsk.when = when.value; });
-			ffRow(host, pc.lpn_when || 'Time step tested', null, when, '');
+			ffRow(host, pc.lpn_when || 'Reporting step tested', null, when, '');
 		}
 		skip = document.createElement('input');
 		skip.type = 'checkbox';
@@ -77868,6 +77898,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_run_note || 'Each outage was run over the whole simulation ({n} reporting steps).')
 				.replace('{n}', String(set.wholeRun)), host);
 		}
+		if (set.wholeRun && set.results.some(function (r) { return r.run && r.run.emptyAt; })) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_crit_empty_note || 'Lowest pressures are read before a tank empties. Junctions below minimum include those left without a source from that step on.', host);
+		}
 		if (set.skippedDeadEnds && set.skippedDeadEnds.length) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_skipped_dead || 'Dead-end links skipped: {n}. Each one cuts off everything beyond it.')
 				.replace('{n}', String(set.skippedDeadEnds.length)), host);
@@ -77886,7 +77919,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_crit_col_cutoff || 'Junctions cut off',
 			pc.lpn_crit_col_below || 'Junctions below minimum'
 		].concat(set.wholeRun ? [
-			pc.lpn_crit_col_lowest || 'Lowest pressure',
+			[pc.lpn_crit_col_lowest || 'Lowest pressure', pc.lpn_crit_col_lowest_tip || 'Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.', true],
 			pc.lpn_crit_col_hours || 'Hours below minimum',
 			pc.lpn_crit_col_empty || 'Tank empties'
 		] : []), { state: critSortState, by: critSortBy });
@@ -77913,7 +77946,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				ffCell(tr, rn && rn.lowest
 					? atT.replace('{value}', ffQty(rn.lowest.pressure, 'lpn_u_pressure')).replace('{time}', dsTimeText(rn.lowest.t))
 					: FF_DASH);
-				ffCell(tr, rn ? String(+(rn.belowSeconds / 3600).toFixed(1)) : FF_DASH);
+				ffCell(tr, rn ? String(+(rn.belowSeconds / 3600).toFixed(1)) +
+					(typeof rn.stoppedAt === 'number' ? ' (' + (pc.lpn_crit_stopped_at || 'run stopped at {time}').replace('{time}', dsTimeText(rn.stoppedAt)) + ')' : '') : FF_DASH);
 				ffCell(tr, rn && rn.emptyAt
 					? atT.replace('{value}', labelPrefixFor('node', 'id') + rn.emptyAt.id).replace('{time}', dsTimeText(rn.emptyAt.t))
 					: FF_DASH);
@@ -78122,11 +78156,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// **THE WHOLE RUN, ONLY WHERE THE PROJECT HAS A CLOCK** (Task 578). Applies to both Run and Find.
 		if (analysisCanRun()) {
 			when = ffSelect([
-				['now', pc.lpn_when_now || 'The time step on screen'],
+				['now', pc.lpn_when_now || 'The reporting step on screen'],
 				['run', pc.lpn_when_run || 'The whole run']
 			], dsAsk.when || 'now');
 			when.addEventListener('change', function () { dsAsk.when = when.value; });
-			ffRow(host, pc.lpn_when || 'Time step tested', null, when, '');
+			ffRow(host, pc.lpn_when || 'Reporting step tested', null, when, '');
 		}
 		minP = ffInput(critFireFlowAsk().minPressure);
 		minP.addEventListener('change', function () { critFireFlowAsk().minPressure = minP.value; });
@@ -78373,7 +78407,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_ff_col_junction || 'Junction',
 			[pc.lpn_ds_col_scaled || 'Scaled', pc.lpn_ds_col_scaled_tip],
 			[pc.lpn_ds_col_unscaled || 'Unscaled', pc.lpn_ds_col_unscaled_tip]
-		].concat(set.wholeRun ? [pc.lpn_ff_col_hour || 'Lowest at'] : []), { state: dsSortState.p, by: function (col) { dsSortBy('p', col); } });
+		].concat(set.wholeRun ? [pc.lpn_ds_col_hour || 'Step of lowest pressure'] : []), { state: dsSortState.p, by: function (col) { dsSortBy('p', col); } });
 		dsSortRows(set.pressures.slice(0, DS_ROWS), dsSortState.p, 'pressure').forEach(function (x) {
 			var tr = ffEl('tr', x.pressure < set.minPressure ? 'lpn-crit-impact' : null, null, body);
 			ffGotoLink(ffCell(tr, ''), 'node', x.id, labelPrefixFor('node', 'id') + x.id);

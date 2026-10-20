@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**71 still to read on master**, of 79 untranslated keys, of 3098 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**77 still to read on master**, of 85 untranslated keys, of 3104 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (79, 71 to read @@ NEEDS RULING)
+## lpn_  (85, 77 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -43,17 +43,29 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_crit_col_lowest`**
   > Lowest pressure
   @@ NEEDS RULING
+- **`lpn_crit_col_lowest_tip`**
+  > Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.
+  @@ NEEDS RULING
 - **`lpn_crit_col_unserved_peak`**
   > Largest demand not served
   @@ NEEDS RULING
+- **`lpn_crit_empty_note`**
+  > Lowest pressures are read before a tank empties. Junctions below minimum include those left without a source from that step on.
+  @@ NEEDS RULING
 - **`lpn_crit_run_note`**
   > Each outage was run over the whole simulation ({n} reporting steps).
+  @@ NEEDS RULING
+- **`lpn_crit_stopped_at`**
+  > run stopped at {time}
   @@ NEEDS RULING
 - **`lpn_diag_gpv_curve_order`**
   > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
   @@ NEEDS RULING
 - **`lpn_diag_valve_conflict`**
   > These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:
+  @@ NEEDS RULING
+- **`lpn_ds_col_hour`**
+  > Step of lowest pressure
   @@ NEEDS RULING
 - **`lpn_ds_empties_at`**
   > ⚠ At a demand scale of {m}, a tank empties at {time}.
@@ -101,7 +113,13 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Tested at reporting step {time}.
   @@ NEEDS RULING
 - **`lpn_ff_col_hour`**
-  > Lowest at
+  > Step of lowest flow
+  @@ NEEDS RULING
+- **`lpn_ff_no_steps`**
+  > A tank empties at {time}, before the first reporting step could be tested, so no step was tested.
+  @@ NEEDS RULING
+- **`lpn_ff_tank_empties`**
+  > A tank empties at {time}; steps from then on were not tested.
   @@ NEEDS RULING
 - **`lpn_ff_working_steps`**
   > Working: reporting step {step} of {steps}, junction {done} of {total}.
@@ -248,7 +266,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > The nodes were added to {scenario}. In Base they are inactive.
   _Ruled 2026-10-18: I approved all._
 - **`lpn_when`**
-  > Time step tested
+  > Reporting step tested
   @@ NEEDS RULING
 - **`lpn_when_all`**
   > Every reporting step, worst case
@@ -260,7 +278,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > The reporting step of lowest pressure
   @@ NEEDS RULING
 - **`lpn_when_now`**
-  > The time step on screen
+  > The reporting step on screen
   @@ NEEDS RULING
 - **`lpn_when_run`**
   > The whole run
@@ -286,7 +304,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/eps-analysis (`4ea78096e`) — adds no English strings
+### feat/eps-analysis (`763cc1fb3`) — adds no English strings
 
 ### feat/guide-page (`3ada36350`) — 4 new, 4 to read @@ NEEDS RULING
 
