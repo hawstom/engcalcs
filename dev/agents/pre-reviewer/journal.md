@@ -4508,31 +4508,6 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED leftovers: "Closed: —" for an open pipe, "Is active?: ✓", "No pipe type chosen", "No fittings list chosen", "No pattern", "Demand pattern: (default: 1)"; extra Description lines print as unlabelled rows.
 - NOT CHECKED: harness mutation, dark theme, touch, ✓ glyph in the card (boxes in this headless font).
 
-## 2026-10-17, feat/label-beside (Steps 0, 1, 3 of the label port plan)
-
-- OBSERVED (Chromium, 9 views Net3/Novato/n600 at 1x/2x/4x, plus NovatoSI, Branford, Elm, bent n600): every label shown on master is drawn at the identical position on the branch; the level rung only adds labels. Step 1 is layout-identical.
-- OBSERVED: Step 0 quotes all found verbatim in feat/label-placer sources; none strengthened.
-- OBSERVED: no level label overlaps a label or node symbol, no leader crosses a leader, label or node. But many level labels with no leader are closer to ANOTHER pipe than their own (n600 2x: 100 of 137; Net3 2x: 9 of 14) and about 40% touch another pipe. Leaders appear only past a distance threshold, so a level label 25-45 px from its pipe has no leader. The harness checks N1/N3/N5 only, so it cannot see this.
-- OBSERVED: n600 1x pass 905 -> 1128 ms (R10 bound is 1 s).
-- Harnesses stay: they never measured "which pipe is this label for"; a metric of that kind is what a reviewer must add.
-
-## 2026-10-18, feat/label-beside round 2 (head 8676cd1be)
-
-- OBSERVED: Chromium 1920x1000 and 1400x900 via /usr/bin/google-chrome. Net3 at 6 notches: pipe labels 13 -> 38 (25 level), node labels 82 -> 82, none lost, none reworded. n600 fit: 13 -> 69 (56 level); 6 notches in: 52 -> 176 (124 level). 1400px: same Net3, n600 63 (52 level) at fit.
-- OBSERVED: 112 not reproducible: 5 reruns each Net3 and n600 byte-identical level sets.
-- OBSERVED: notch cost (long tasks) n600 ~1.0 s vs ~0.85 s master (headless); Net3 ~140 vs ~140.
-- OBSERVED: leaderless level labels as close to another pipe as their own (Net3 6 notches pipe 115, "Q=422.6"; n600 6 notches pipes 831, 8911, 4668, 4316, a stack "Q=1.3" over "Q=40.1"). n600 6 notches: label-box overlaps 7 -> 16 vs master (L9875 over N666, 29x14 px); n600 fit: 4 level-label boxes over a node dot.
-- Decays: re-verify before citing.
-
-## 2026-10-18, feat/label-form (head c2cbd03b2)
-
-- OBSERVED: Chromium 1920x1000, 1400x900, 390x844. Pass time (sum of long tasks per wheel notch, 3 reps): Net3 master 101 / beside 110 / form 168 / form without the one-line node trial 159 ms; n600 818 / 958 / 1617 / 1422 ms. Skipping the growth: time about -4%, values -37%.
-- OBSERVED: node labels worse than master and beside on Net3 at 9 notches (84 -> 79 labels, 177 -> 167 values, 12 lose their ID, e.g. N105 is just "P=51.27"); entirely the one-line node trial (skip it and node counts equal master exactly).
-- OBSERVED: a one-line node label struck through by a pipe ("N127, Qb=17.7, Z=56.00, P=44.52"); "L173 / Q=7963.3 / V=3.6" touches the rotated "Q=463.3"; at 390 px one-line node labels run off the right edge and under the legend.
-- OBSERVED: Net1 pipe 113 labelled at all 15 zooms (master 8/15, beside 11/15); pipe 11 Q=1234.2 hidden at notch 4 where beside showed it, and pipe 10's "Q=1866.2" sits under pipe 11 though its leader goes to pipe 10.
-- OBSERVED: 0 leader/leader crossings, 0 new leader-through-node; deterministic over 3 runs.
-- Decays: re-verify before citing.
-
 # Perry journal, feat/scenario-results f4fdf62df, 2026-10-18 (OBSERVED, decays; re-verify before citing)
 - OBSERVED: 6 steady scenarios on Net1 (multiplier, diameter, pipe closed, pipe inactive, node moved, DW method), 399 cells, match an independent Node epanet-js solve of hand-edited Net1.inp within display rounding. TSV full precision within 3e-4 relative (EPS@6h), 5e-5 steady.
 - OBSERVED: page shows |flow| (shownFlow) so direction lost in table and TSV.
@@ -4562,3 +4537,28 @@ OBSERVED: designT is set in lpn-fireflow.js sweepSteps but never displayed; "Low
 OBSERVED: Hours below minimum counts every frame incl. the final one as a full step (20 h for 5:00..24:00).
 OBSERVED: all existing fireflow/criticality/demand-scaling harnesses pass; new node + browser harnesses pass. No storage change. No em dashes in new strings.
 UNVERIFIED: how it looks (column widths, 10-column fire flow table with extra column).
+
+## 2026-10-17, feat/label-beside (Steps 0, 1, 3 of the label port plan)
+
+- OBSERVED (Chromium, 9 views Net3/Novato/n600 at 1x/2x/4x, plus NovatoSI, Branford, Elm, bent n600): every label shown on master is drawn at the identical position on the branch; the level rung only adds labels. Step 1 is layout-identical.
+- OBSERVED: Step 0 quotes all found verbatim in feat/label-placer sources; none strengthened.
+- OBSERVED: no level label overlaps a label or node symbol, no leader crosses a leader, label or node. But many level labels with no leader are closer to ANOTHER pipe than their own (n600 2x: 100 of 137; Net3 2x: 9 of 14) and about 40% touch another pipe. Leaders appear only past a distance threshold, so a level label 25-45 px from its pipe has no leader. The harness checks N1/N3/N5 only, so it cannot see this.
+- OBSERVED: n600 1x pass 905 -> 1128 ms (R10 bound is 1 s).
+- Harnesses stay: they never measured "which pipe is this label for"; a metric of that kind is what a reviewer must add.
+
+## 2026-10-18, feat/label-beside round 2 (head 8676cd1be)
+
+- OBSERVED: Chromium 1920x1000 and 1400x900 via /usr/bin/google-chrome. Net3 at 6 notches: pipe labels 13 -> 38 (25 level), node labels 82 -> 82, none lost, none reworded. n600 fit: 13 -> 69 (56 level); 6 notches in: 52 -> 176 (124 level). 1400px: same Net3, n600 63 (52 level) at fit.
+- OBSERVED: 112 not reproducible: 5 reruns each Net3 and n600 byte-identical level sets.
+- OBSERVED: notch cost (long tasks) n600 ~1.0 s vs ~0.85 s master (headless); Net3 ~140 vs ~140.
+- OBSERVED: leaderless level labels as close to another pipe as their own (Net3 6 notches pipe 115, "Q=422.6"; n600 6 notches pipes 831, 8911, 4668, 4316, a stack "Q=1.3" over "Q=40.1"). n600 6 notches: label-box overlaps 7 -> 16 vs master (L9875 over N666, 29x14 px); n600 fit: 4 level-label boxes over a node dot.
+- Decays: re-verify before citing.
+
+## 2026-10-18, feat/label-form (head c2cbd03b2)
+
+- OBSERVED: Chromium 1920x1000, 1400x900, 390x844. Pass time (sum of long tasks per wheel notch, 3 reps): Net3 master 101 / beside 110 / form 168 / form without the one-line node trial 159 ms; n600 818 / 958 / 1617 / 1422 ms. Skipping the growth: time about -4%, values -37%.
+- OBSERVED: node labels worse than master and beside on Net3 at 9 notches (84 -> 79 labels, 177 -> 167 values, 12 lose their ID, e.g. N105 is just "P=51.27"); entirely the one-line node trial (skip it and node counts equal master exactly).
+- OBSERVED: a one-line node label struck through by a pipe ("N127, Qb=17.7, Z=56.00, P=44.52"); "L173 / Q=7963.3 / V=3.6" touches the rotated "Q=463.3"; at 390 px one-line node labels run off the right edge and under the legend.
+- OBSERVED: Net1 pipe 113 labelled at all 15 zooms (master 8/15, beside 11/15); pipe 11 Q=1234.2 hidden at notch 4 where beside showed it, and pipe 10's "Q=1866.2" sits under pipe 11 though its leader goes to pipe 10.
+- OBSERVED: 0 leader/leader crossings, 0 new leader-through-node; deterministic over 3 runs.
+- Decays: re-verify before citing.

@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "bg",
-        "expected_key_count": 3126,
-        "delta_key_count": 138,
-        "english_changed_key_count": 31,
+        "expected_key_count": 3190,
+        "delta_key_count": 205,
+        "english_changed_key_count": 34,
         "exempt_key_count": 40,
         "exempt_keys": [
             "calc_units_us",
@@ -72,15 +72,21 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: водно количество\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: скорост\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: напор\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: загуба на напор\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: местни загуби\n- flow used, taken, or consumed\n    English: demand\n    Your language: Потребност\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Налягане\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: (no preferred translation yet: use your language's standard term)\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: по подразбиране\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- solver or the part that works out the answer\n    English: solver\n    Your language: решаващ модул\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: Цистерна\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: Вентил\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: Свои стойности\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: Абонат\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- note, remark, or description for people about one item\n    English: description (asset notes)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: Фигура\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: водно количество\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: скорост\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: напор\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: загуба на напор\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: местни загуби\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: дълбочина\n- flow used, taken, or consumed\n    English: demand\n    Your language: Потребност\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Налягане\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: (no preferred translation yet: use your language's standard term)\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: по подразбиране\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- solver or the part that works out the answer\n    English: solver\n    Your language: решаващ модул\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: Цистерна\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: Вентил\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: Свои стойности\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- time-step by time-step multipliers or factors for water use\n    English: demand pattern\n    Your language: (no preferred translation yet: use your language's standard term)\n- leave a value off the map when there is no room or space\n    English: drop (a label)\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the water in the tank is, its water level or depth\n    English: tank level\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: Абонат\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- note, remark, or description for people about one item\n    English: description (asset notes)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how much is lost, or how much it matters, if one piece fails or breaks\n    English: criticality\n    Your language: критичност\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: Фигура\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
+        "lpn_guide_page_open": "Open the application",
+        "lpn_guide_page_desc": "{name} user manual: one page for each chapter, from the map and Properties to scenarios, fire flow analysis, and criticality analysis.",
+        "lpn_guide_page_what": "{name} is a free web application for modeling water distribution networks, an extension of EPANET.",
+        "lpn_guide_page_missing": "There is no such chapter. The chapters are listed below.",
         "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
         "lpn_guide_cmp_byasset_term": "Results by asset",
         "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver's internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.<\/p>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
+        "lpn_guide_ff_dur_term": "A fire for a stated duration",
+        "lpn_guide_ff_dur_def": "<p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.<\/p>",
         "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_ex_net1_scn_title": "EPANET Net1 with scenarios, gpm (US)",
@@ -193,8 +199,69 @@
         "lpn_scnres_stale": "Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.",
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
         "lpn_library_import": "Libraries…",
+        "lpn_ff_intro": "Each junction in turn draws a fire flow on top of its existing demand. The run uses a copy of the network at the time step on screen, so nothing in the project is changed.\\n\\nWhen the project has an extended-period simulation, Reporting step tested selects the condition: the time step on screen, a chosen reporting step, the reporting step of lowest pressure among the junctions tested, or every reporting step. The last option runs the sweep at each reporting step with the tank levels, demand patterns, and link statuses of that step, and shows each junction at its own worst step, the step with the lowest available flow, in the Step of lowest flow column.\\n\\nFire flow is normally tested at maximum day demand, so set the network to that condition first.\\n\\nEach junction tested takes about 16 solves of the whole network, so a large system takes minutes: choose the junctions before you run, and stop at any time to keep the partial results.",
         "lpn_ff_minpressure": "Lowest system pressure allowed",
+        "lpn_when": "Reporting step tested",
+        "lpn_when_now": "The reporting step on screen",
+        "lpn_when_hour": "A chosen reporting step",
+        "lpn_when_minp": "The reporting step of lowest pressure",
+        "lpn_when_all": "Every reporting step, worst case",
+        "lpn_when_step": "Reporting step",
+        "lpn_when_run": "The whole run",
+        "lpn_dur_option": "A fire for a stated duration",
+        "lpn_dur_start": "Fire starts at",
+        "lpn_dur_junction": "Fire junction",
+        "lpn_dur_junction_none": "None selected. Select one junction on the map.",
+        "lpn_dur_junction_many": "Several are selected. Select one junction on the map.",
+        "lpn_dur_length": "Fire duration",
+        "lpn_dur_length_tip": "Hours and minutes, such as 2:00. The fire flow is the Required fire flow, drawn at the one junction selected on the map from the start time for this long. The whole extended-period simulation is run on a copy of the network and compared with the same run without the fire. The start and the duration must be whole multiples of the pattern time step. The system counts as recovered when, at the last reporting step, no junction is more than about 0.14 psi (1 kPa) and no tank more than about 0.3 ft (0.1 m) from the run without the fire.",
+        "lpn_dur_no_junction": "Select one junction for the fire.",
+        "lpn_dur_bad_time": "The start and the duration must be whole multiples of the pattern time step, {step}, and the fire must start within the run.",
+        "lpn_dur_head": "Fire flow of {flow} at junction {id}, from {start} to {end}.",
+        "lpn_dur_holds": "✓ Junction {id} holds at least {pressure} during the fire, above the residual pressure of {residual}, at {time}.",
+        "lpn_dur_shortfall": "⚠ Only {delivered} of the {flow} fire flow is delivered at junction {id}, at {time}, so the residual pressure is not a test of that fire.",
+        "lpn_dur_fails": "⚠ Junction {id} falls to {pressure} during the fire, below the residual pressure of {residual}, at {time}.",
+        "lpn_dur_lowest": "The lowest pressure anywhere is {pressure}, at junction {id}, at {time}.",
+        "lpn_dur_no_empty": "✓ No tank empties.",
+        "lpn_dur_empties": "⚠ Tank {id} empties at {time}. Pressures from that step on are not read.",
+        "lpn_dur_recovers": "✓ The system recovers after the fire: at {time}, the last reporting step, no junction differs from the run without the fire by more than {pressure} and no tank by more than {level}.",
+        "lpn_dur_not_back_tank": "⚠ At {time}, the last reporting step, tank {id} is not back to its level without the fire. The difference is {level}, against a tolerance of {tolerance}.",
+        "lpn_dur_not_back_junction": "⚠ At {time}, the last reporting step, junction {id} is not back to its pressure without the fire. The difference is {pressure}, against a tolerance of {tolerance}.",
+        "lpn_dur_recovery_to_end": "The fire lasts to the end of the run, so recovery after it is not assessed.",
+        "lpn_dur_recovery_cut": "The run stopped before its end, so recovery after the fire is not assessed.",
+        "lpn_dur_col_fire": "Fire flow",
+        "lpn_dur_col_pressure": "Pressure at the fire junction",
+        "lpn_dur_col_nofire": "Pressure without the fire",
+        "lpn_dur_col_low": "Lowest level reached",
+        "lpn_dur_col_margin": "Above lowest water depth",
+        "lpn_dur_col_drop": "Drop from start",
+        "lpn_dur_col_end": "Level at end",
+        "lpn_dur_col_end_nofire": "Level at end without the fire",
+        "lpn_at_time": "{value} at {time}",
+        "lpn_crit_col_lowest": "Lowest pressure",
+        "lpn_crit_col_hours": "Hours below minimum",
+        "lpn_crit_col_empty": "Tank empties",
+        "lpn_ds_run_note": "Judged over the whole run, at every reporting step.",
+        "lpn_ds_limit_at": "Limiting reporting step: {time}.",
+        "lpn_ds_empties_at": "⚠ At a demand scale of {m}, a tank empties at {time}.",
+        "lpn_ds_lowest_at_time": "At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}, at {time}.",
+        "lpn_crit_run_note": "Each outage was run over the whole simulation ({n} reporting steps).",
+        "lpn_eps_working": "Running the extended-period simulation.",
+        "lpn_ff_working_steps": "Working: reporting step {step} of {steps}, junction {done} of {total}.",
+        "lpn_ff_col_hour": "Step of lowest flow",
+        "lpn_ds_col_hour": "Step of lowest pressure",
+        "lpn_ff_no_steps": "A tank empties at {time}, before the first reporting step could be tested, so no step was tested.",
+        "lpn_ff_tank_empties": "A tank empties at {time}; steps from then on were not tested.",
+        "lpn_crit_col_lowest_tip": "Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.",
+        "lpn_crit_empty_note": "Lowest pressures are read before a tank empties. Junctions below minimum include those left without a source from that step on.",
+        "lpn_crit_stopped_at": "run stopped at {time}",
+        "lpn_ff_at_step": "Tested at reporting step {time}.",
+        "lpn_ff_at_minp": "Tested at {time}, the reporting step with the lowest pressure among the junctions tested.",
+        "lpn_ff_at_all": "Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.",
+        "lpn_crit_intro": "Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in the project is changed; the whole run is made on a copy.\\n\\nWhen the project has an extended-period simulation, Reporting step tested can be set to The whole run. Each outage is then simulated over the full run, and the table reports the lowest pressure and the reporting step at which it occurs, the hours any junction spends below the lowest pressure allowed, the reporting step at which a tank first empties, and the largest demand not served over the run. Lowest pressures are read only before a tank empties.",
         "lpn_crit_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_crit_col_unserved_peak": "Largest demand not served",
+        "lpn_ds_intro": "Press the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities.\\n\\nPress the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}.\\n\\nBoth work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. By default only the time step on screen is scaled, and levels and statuses are taken from it. When the project has an extended-period simulation, set Reporting step tested to The whole run to scale the demands over the entire run: every reporting step is judged, a tank that empties fails the scale, and the answer names the limiting reporting step.",
         "lpn_ds_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_file_import_survey": "Surveyed points…",
         "lpn_file_import_shapes": "GeoJSON shapes…",
@@ -215,12 +282,18 @@
     },
     "keys": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
+        "lpn_guide_page_open": "Open the application",
+        "lpn_guide_page_desc": "{name} user manual: one page for each chapter, from the map and Properties to scenarios, fire flow analysis, and criticality analysis.",
+        "lpn_guide_page_what": "{name} is a free web application for modeling water distribution networks, an extension of EPANET.",
+        "lpn_guide_page_missing": "There is no such chapter. The chapters are listed below.",
         "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
         "lpn_guide_cmp_byasset_term": "Results by asset",
         "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver's internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.<\/p>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
+        "lpn_guide_ff_dur_term": "A fire for a stated duration",
+        "lpn_guide_ff_dur_def": "<p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.<\/p>",
         "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_ex_net1_scn_title": "EPANET Net1 with scenarios, gpm (US)",
@@ -333,8 +406,69 @@
         "lpn_scnres_stale": "Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.",
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
         "lpn_library_import": "Libraries…",
+        "lpn_ff_intro": "Each junction in turn draws a fire flow on top of its existing demand. The run uses a copy of the network at the time step on screen, so nothing in the project is changed.\\n\\nWhen the project has an extended-period simulation, Reporting step tested selects the condition: the time step on screen, a chosen reporting step, the reporting step of lowest pressure among the junctions tested, or every reporting step. The last option runs the sweep at each reporting step with the tank levels, demand patterns, and link statuses of that step, and shows each junction at its own worst step, the step with the lowest available flow, in the Step of lowest flow column.\\n\\nFire flow is normally tested at maximum day demand, so set the network to that condition first.\\n\\nEach junction tested takes about 16 solves of the whole network, so a large system takes minutes: choose the junctions before you run, and stop at any time to keep the partial results.",
         "lpn_ff_minpressure": "Lowest system pressure allowed",
+        "lpn_when": "Reporting step tested",
+        "lpn_when_now": "The reporting step on screen",
+        "lpn_when_hour": "A chosen reporting step",
+        "lpn_when_minp": "The reporting step of lowest pressure",
+        "lpn_when_all": "Every reporting step, worst case",
+        "lpn_when_step": "Reporting step",
+        "lpn_when_run": "The whole run",
+        "lpn_dur_option": "A fire for a stated duration",
+        "lpn_dur_start": "Fire starts at",
+        "lpn_dur_junction": "Fire junction",
+        "lpn_dur_junction_none": "None selected. Select one junction on the map.",
+        "lpn_dur_junction_many": "Several are selected. Select one junction on the map.",
+        "lpn_dur_length": "Fire duration",
+        "lpn_dur_length_tip": "Hours and minutes, such as 2:00. The fire flow is the Required fire flow, drawn at the one junction selected on the map from the start time for this long. The whole extended-period simulation is run on a copy of the network and compared with the same run without the fire. The start and the duration must be whole multiples of the pattern time step. The system counts as recovered when, at the last reporting step, no junction is more than about 0.14 psi (1 kPa) and no tank more than about 0.3 ft (0.1 m) from the run without the fire.",
+        "lpn_dur_no_junction": "Select one junction for the fire.",
+        "lpn_dur_bad_time": "The start and the duration must be whole multiples of the pattern time step, {step}, and the fire must start within the run.",
+        "lpn_dur_head": "Fire flow of {flow} at junction {id}, from {start} to {end}.",
+        "lpn_dur_holds": "✓ Junction {id} holds at least {pressure} during the fire, above the residual pressure of {residual}, at {time}.",
+        "lpn_dur_shortfall": "⚠ Only {delivered} of the {flow} fire flow is delivered at junction {id}, at {time}, so the residual pressure is not a test of that fire.",
+        "lpn_dur_fails": "⚠ Junction {id} falls to {pressure} during the fire, below the residual pressure of {residual}, at {time}.",
+        "lpn_dur_lowest": "The lowest pressure anywhere is {pressure}, at junction {id}, at {time}.",
+        "lpn_dur_no_empty": "✓ No tank empties.",
+        "lpn_dur_empties": "⚠ Tank {id} empties at {time}. Pressures from that step on are not read.",
+        "lpn_dur_recovers": "✓ The system recovers after the fire: at {time}, the last reporting step, no junction differs from the run without the fire by more than {pressure} and no tank by more than {level}.",
+        "lpn_dur_not_back_tank": "⚠ At {time}, the last reporting step, tank {id} is not back to its level without the fire. The difference is {level}, against a tolerance of {tolerance}.",
+        "lpn_dur_not_back_junction": "⚠ At {time}, the last reporting step, junction {id} is not back to its pressure without the fire. The difference is {pressure}, against a tolerance of {tolerance}.",
+        "lpn_dur_recovery_to_end": "The fire lasts to the end of the run, so recovery after it is not assessed.",
+        "lpn_dur_recovery_cut": "The run stopped before its end, so recovery after the fire is not assessed.",
+        "lpn_dur_col_fire": "Fire flow",
+        "lpn_dur_col_pressure": "Pressure at the fire junction",
+        "lpn_dur_col_nofire": "Pressure without the fire",
+        "lpn_dur_col_low": "Lowest level reached",
+        "lpn_dur_col_margin": "Above lowest water depth",
+        "lpn_dur_col_drop": "Drop from start",
+        "lpn_dur_col_end": "Level at end",
+        "lpn_dur_col_end_nofire": "Level at end without the fire",
+        "lpn_at_time": "{value} at {time}",
+        "lpn_crit_col_lowest": "Lowest pressure",
+        "lpn_crit_col_hours": "Hours below minimum",
+        "lpn_crit_col_empty": "Tank empties",
+        "lpn_ds_run_note": "Judged over the whole run, at every reporting step.",
+        "lpn_ds_limit_at": "Limiting reporting step: {time}.",
+        "lpn_ds_empties_at": "⚠ At a demand scale of {m}, a tank empties at {time}.",
+        "lpn_ds_lowest_at_time": "At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}, at {time}.",
+        "lpn_crit_run_note": "Each outage was run over the whole simulation ({n} reporting steps).",
+        "lpn_eps_working": "Running the extended-period simulation.",
+        "lpn_ff_working_steps": "Working: reporting step {step} of {steps}, junction {done} of {total}.",
+        "lpn_ff_col_hour": "Step of lowest flow",
+        "lpn_ds_col_hour": "Step of lowest pressure",
+        "lpn_ff_no_steps": "A tank empties at {time}, before the first reporting step could be tested, so no step was tested.",
+        "lpn_ff_tank_empties": "A tank empties at {time}; steps from then on were not tested.",
+        "lpn_crit_col_lowest_tip": "Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.",
+        "lpn_crit_empty_note": "Lowest pressures are read before a tank empties. Junctions below minimum include those left without a source from that step on.",
+        "lpn_crit_stopped_at": "run stopped at {time}",
+        "lpn_ff_at_step": "Tested at reporting step {time}.",
+        "lpn_ff_at_minp": "Tested at {time}, the reporting step with the lowest pressure among the junctions tested.",
+        "lpn_ff_at_all": "Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.",
+        "lpn_crit_intro": "Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in the project is changed; the whole run is made on a copy.\\n\\nWhen the project has an extended-period simulation, Reporting step tested can be set to The whole run. Each outage is then simulated over the full run, and the table reports the lowest pressure and the reporting step at which it occurs, the hours any junction spends below the lowest pressure allowed, the reporting step at which a tank first empties, and the largest demand not served over the run. Lowest pressures are read only before a tank empties.",
         "lpn_crit_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_crit_col_unserved_peak": "Largest demand not served",
+        "lpn_ds_intro": "Press the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities.\\n\\nPress the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}.\\n\\nBoth work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. By default only the time step on screen is scaled, and levels and statuses are taken from it. When the project has an extended-period simulation, set Reporting step tested to The whole run to scale the demands over the entire run: every reporting step is judged, a tank that empties fails the scale, and the answer names the limiting reporting step.",
         "lpn_ds_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_file_import_survey": "Surveyed points…",
         "lpn_file_import_shapes": "GeoJSON shapes…",
@@ -367,6 +501,70 @@
                     "key": "lpn_time_run_tip",
                     "value": "Решава тази мрежа при всяка хидравлична времева стъпка.",
                     "english": "Solve this network at every hydraulic time step."
+                }
+            }
+        },
+        "lpn_guide_page_open": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_search",
+                    "value": "Търсене в ръководството",
+                    "english": "Search the user manual"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_boxes_heading",
+                    "value": "Кутии",
+                    "english": "Boxes"
+                }
+            }
+        },
+        "lpn_guide_page_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_search",
+                    "value": "Търсене в ръководството",
+                    "english": "Search the user manual"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_boxes_heading",
+                    "value": "Кутии",
+                    "english": "Boxes"
+                }
+            }
+        },
+        "lpn_guide_page_what": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_search",
+                    "value": "Търсене в ръководството",
+                    "english": "Search the user manual"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_boxes_heading",
+                    "value": "Кутии",
+                    "english": "Boxes"
+                }
+            }
+        },
+        "lpn_guide_page_missing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_search",
+                    "value": "Търсене в ръководството",
+                    "english": "Search the user manual"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_boxes_heading",
+                    "value": "Кутии",
+                    "english": "Boxes"
                 }
             }
         },
@@ -463,6 +661,38 @@
                     "key": "lpn_guide_ff_result_term",
                     "value": "Как се четат резултатите",
                     "english": "Reading the results"
+                }
+            }
+        },
+        "lpn_guide_ff_dur_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_ff_marks_def",
+                    "value": "<p>След изчисление кръгът на всеки изпитан възел е очертан на картата според резултата му, а очертанията се различават по щриха, както и по цвета. Изберете Избраните възли, за да изпитате само възлите, избрани на картата; всичко друго, което е избрано, се брои и не се изпитва. Спри прекратява изчислението и запазва вече завършените възли. Само един от анализите на противопожарното водно количество, критичността и мащабирането на потребността работи в даден момент.<\/p>",
+                    "english": "<p>After a run, the circle of each tested junction is outlined on the map according to its result, and the outlines differ in dash pattern as well as in color. Choose Selected junctions to test only the junctions selected on the map; anything else that is selected is counted and not tested. Stop ends a run and keeps the junctions already finished. Only one of the fire flow, criticality, and demand scaling analyses runs at a time.<\/p>"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_ff_example_term",
+                    "value": "Пример върху Net1",
+                    "english": "Example on Net1"
+                }
+            }
+        },
+        "lpn_guide_ff_dur_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_ff_marks_def",
+                    "value": "<p>След изчисление кръгът на всеки изпитан възел е очертан на картата според резултата му, а очертанията се различават по щриха, както и по цвета. Изберете Избраните възли, за да изпитате само възлите, избрани на картата; всичко друго, което е избрано, се брои и не се изпитва. Спри прекратява изчислението и запазва вече завършените възли. Само един от анализите на противопожарното водно количество, критичността и мащабирането на потребността работи в даден момент.<\/p>",
+                    "english": "<p>After a run, the circle of each tested junction is outlined on the map according to its result, and the outlines differ in dash pattern as well as in color. Choose Selected junctions to test only the junctions selected on the map; anything else that is selected is counted and not tested. Stop ends a run and keeps the junctions already finished. Only one of the fire flow, criticality, and demand scaling analyses runs at a time.<\/p>"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_ff_example_term",
+                    "value": "Пример върху Net1",
+                    "english": "Example on Net1"
                 }
             }
         },
@@ -2304,6 +2534,22 @@
                 "value": "Изберете друг проектен файл и копирайте цели библиотеки от него в този проект. Всичко, чието име вече е заето тук, се пропуска и изброява, така че нищо, което вече имате, не се променя."
             }
         },
+        "lpn_ff_intro": {
+            "reason": "english_changed",
+            "current_value": "От всеки възел поред се тегли противопожарно водно количество върху съществуващата му потребност. Изчислението използва копие на мрежата за времевата стъпка на екрана, така че нищо в проекта не се променя.\\n\\nПротивопожарното водно количество обикновено се изпитва при потребността в максималния ден, затова първо задайте мрежата на това състояние.\\n\\nВсеки изпитван възел отнема около 16 решения на цялата мрежа, така че голяма система отнема минути: изберете възлите, преди да изчислите, и спрете по всяко време, за да запазите частичните резултати.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_title",
+                    "value": "Противопожарно водно количество: анализ",
+                    "english": "Fire flow analysis"
+                },
+                "next_translated": {
+                    "key": "lpn_ff_scope",
+                    "value": "Възли за изпитване",
+                    "english": "Junctions to test"
+                }
+            }
+        },
         "lpn_ff_minpressure": {
             "reason": "english_changed",
             "current_value": "Най-ниско допустимо налягане другаде",
@@ -2325,6 +2571,950 @@
                 "value": "Възел, който пада под тази стойност, докато друг тегли своето противопожарно водно количество, се отчита като проектен проблем."
             }
         },
+        "lpn_when": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_when_now": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_when_hour": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_when_minp": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_when_all": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_when_step": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_when_run": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_option": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_start": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_junction": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_junction_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_junction_many": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_length": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            },
+            "tip": {
+                "key": "lpn_dur_length_tip",
+                "english": "Hours and minutes, such as 2:00. The fire flow is the Required fire flow, drawn at the one junction selected on the map from the start time for this long. The whole extended-period simulation is run on a copy of the network and compared with the same run without the fire. The start and the duration must be whole multiples of the pattern time step. The system counts as recovered when, at the last reporting step, no junction is more than about 0.14 psi (1 kPa) and no tank more than about 0.3 ft (0.1 m) from the run without the fire."
+            }
+        },
+        "lpn_dur_length_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            },
+            "label": {
+                "key": "lpn_dur_length",
+                "english": "Fire duration"
+            }
+        },
+        "lpn_dur_no_junction": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_bad_time": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_head": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_holds": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_shortfall": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_fails": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_lowest": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_no_empty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_empties": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_recovers": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_not_back_tank": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_not_back_junction": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_recovery_to_end": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_recovery_cut": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_col_fire": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_col_pressure": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_col_nofire": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_col_low": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_col_margin": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_col_drop": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_col_end": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_dur_col_end_nofire": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_at_time": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_crit_col_lowest": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            },
+            "tip": {
+                "key": "lpn_crit_col_lowest_tip",
+                "english": "Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step."
+            }
+        },
+        "lpn_crit_col_hours": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_crit_col_empty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_ds_run_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_ds_limit_at": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_ds_empties_at": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_ds_lowest_at_time": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_crit_run_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_eps_working": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_ff_working_steps": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_ff_col_hour": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_ds_col_hour": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_ff_no_steps": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_ff_tank_empties": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_crit_col_lowest_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            },
+            "label": {
+                "key": "lpn_crit_col_lowest",
+                "english": "Lowest pressure"
+            }
+        },
+        "lpn_crit_empty_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_crit_stopped_at": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_ff_at_step": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_ff_at_minp": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_ff_at_all": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_working",
+                    "value": "Работи: {done} от {total} възела.",
+                    "english": "Working: {done} of {total} junctions."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_stopped",
+                    "value": "Спряно след {done} от {total} възела. Резултатите по-долу са само вече завършените.",
+                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
+                }
+            }
+        },
+        "lpn_crit_intro": {
+            "reason": "english_changed",
+            "current_value": "Всеки обект се изважда поред от мрежата, а мрежата се решава за времевата стъпка на екрана в активния сценарий. Нищо в проекта не се променя; цялото изчисление се прави върху копие.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_title",
+                    "value": "Критичност: анализ",
+                    "english": "Criticality analysis"
+                },
+                "next_translated": {
+                    "key": "lpn_crit_scope",
+                    "value": "Връзки за прекъсване",
+                    "english": "Links to break"
+                }
+            }
+        },
         "lpn_crit_minpressure_tip": {
             "reason": "english_changed",
             "current_value": "Това е същото число като Най-ниско допустимо налягане другаде в Противопожарно водно количество: анализ. Промяната му тук го променя и там.",
@@ -2344,6 +3534,38 @@
                 "key": "lpn_crit_minpressure",
                 "english": "Lowest pressure allowed",
                 "value": "Най-ниско допустимо налягане"
+            }
+        },
+        "lpn_crit_col_unserved_peak": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_col_unserved",
+                    "value": "Неудовлетворена потребност",
+                    "english": "Demand not served"
+                },
+                "next_translated": {
+                    "key": "lpn_crit_col_cutoff",
+                    "value": "Откъснати възли",
+                    "english": "Junctions cut off"
+                }
+            }
+        },
+        "lpn_ds_intro": {
+            "reason": "english_changed",
+            "current_value": "Натиснете бутона Изчисли, за да умножите потребностите в избраните възли по мащаба на потребността и да видите налягането и скоростите.\\n\\nНатиснете бутона Намери, за да намерите най-големия мащаб на потребността, с точност до {step}, при който всички тези възли запазват поне най-ниското допустимо налягане; търсенето е от 0 до {max}.\\n\\nИ двете работят върху копие на мрежата, решено за времевата стъпка на екрана в активния сценарий, така че нищо в проекта не се променя. Мащабира се само тази времева стъпка, а нивата и състоянията се вземат от нея; за да изпитате пика, преместете часовника на пиковата потребност, преди да изчислите.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ds_title",
+                    "value": "Мащабиране на потребността",
+                    "english": "Demand scaling"
+                },
+                "next_translated": {
+                    "key": "lpn_ds_scope",
+                    "value": "Възли за мащабиране",
+                    "english": "Junctions to scale"
+                }
             }
         },
         "lpn_ds_minpressure_tip": {

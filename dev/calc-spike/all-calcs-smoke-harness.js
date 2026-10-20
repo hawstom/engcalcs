@@ -45,6 +45,8 @@ const NOT_CALCULATORS = new Set([
 	'Looped-Network.php',
 	// A reference table, not a calculator: it has a form but defines no pageCalculator.
 	'Orifice-Drain-Time-Ref.php',
+	// The User Guide's chapter pages (Task 816): prose, no calculator.
+	'User-Manual.php',
 	// Not a page at all: it emits the service worker as JavaScript (Task 318). Its own syntax is
 	// checked by dev/scripts/sw_manifest_check.php, which parses what it generates.
 	'sw.php',

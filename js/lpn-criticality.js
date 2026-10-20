@@ -101,6 +101,72 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 		return out;
 	}
 
+	// ---------------------------------------------------------------------------
+	// A WHOLE RUN AS ONE ANSWER (Task 578), shared with demand scaling
+	// ---------------------------------------------------------------------------
+	//
+	// An extended-period run is handed to a sweep in the shape of a one-instant solve, so the
+	// sweeps' own judging code stays what it was: `pressures` is each node's LOWEST pressure over the
+	// run, `pressureHour` the reporting step it occurs at, `velocities` each link's highest. The
+	// frames ride along (`frames`) for the one sweep that reads them again, and are dropped with the
+	// result. A run EPANET stopped part-way (a tank ran dry and left junctions with no source) keeps
+	// the periods it solved, and says where it stopped.
+	var TANK_TOL = 1e-3;
+	function tankEmptyAt(frames, model, exclude) {
+		var tanks = model.nodes.filter(function (n) { return n.type === 'tank' && !(exclude && exclude[n.id]); }),
+			i, j, f, lvl;
+		for (i = 0; i < frames.length; i++) {
+			f = frames[i];
+			for (j = 0; j < tanks.length; j++) {
+				lvl = f.levels ? f.levels[tanks[j].id] : undefined;
+				if (typeof lvl === 'number' && lvl <= (tanks[j].minLevel || 0) + TANK_TOL) {
+					return { id: tanks[j].id, t: f.t };
+				}
+			}
+		}
+		return null;
+	}
+	function runResult(run, model, options) {
+		var frames = (run && run.frames) || [], pressures = {}, hour = {}, velocities = {}, bad = false,
+			stopped = null, i, id, p, v, f, step, emptied, stopT = Infinity;
+		if (!run || (!run.ok && !frames.length)) {
+			return { ok: false, converged: false, issues: (run && run.issues) || [] };
+		}
+		emptied = tankEmptyAt(frames, model, null);
+		// `beforeEmpty`: read pressures and velocities only up to the step a tank empties. After it
+		// EPANET reports a head of minus millions of metres for every junction left with no source.
+		if (options && options.beforeEmpty) {
+			if (emptied) { stopT = emptied.t; }
+			if (!run.ok && typeof run.stoppedAt === 'number') { stopT = Math.min(stopT, run.stoppedAt); }
+		}
+		for (i = 0; i < frames.length; i++) {
+			f = frames[i];
+			if (f.t >= stopT) { break; }
+			if (f.converged === false) { bad = true; }
+			for (id in f.pressures) {
+				if (!Object.prototype.hasOwnProperty.call(f.pressures, id)) { continue; }
+				p = f.pressures[id];
+				if (typeof p === 'number' && isFinite(p) && (!(id in pressures) || p < pressures[id])) {
+					pressures[id] = p; hour[id] = f.t;
+				}
+			}
+			for (id in f.velocities) {
+				if (!Object.prototype.hasOwnProperty.call(f.velocities, id)) { continue; }
+				v = Math.abs(f.velocities[id]);
+				if (typeof v === 'number' && isFinite(v) && (!(id in velocities) || v > velocities[id])) { velocities[id] = v; }
+			}
+		}
+		if (!run.ok) {
+			stopped = { t: run.stoppedAt, tank: run.cutOff && run.cutOff.tankState === 'empty' ? run.cutOff.tank : null };
+		}
+		step = frames.length > 1 ? frames[1].t - frames[0].t : 0;
+		return {
+			ok: true, converged: !bad, issues: [], pressures: pressures, pressureHour: hour, velocities: velocities,
+			frames: frames, steps: frames.length, reportStep: step, stopped: stopped,
+			emptied: emptied
+		};
+	}
+
 	function solveOnce(solve, m) {
 		return Promise.resolve().then(function () { return solve(m); });
 	}
@@ -151,6 +217,9 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			reach0,
 			drop0 = {},
 			baseBelow = {},
+			baseEmpty = {},
+			baseRun = null,
+			baseFrames = null,
 			baseCut = 0;
 
 		if (typeof opts.solve !== 'function') {
@@ -182,6 +251,39 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			return out;
 		}
 
+		// What one outage did over the run: the lowest pressure and when, the time any connected
+		// junction (one not already low with nothing broken) spent below the limit, and the first
+		// tank to empty (one that did not already empty with nothing broken).
+		function runDigest(r, m) {
+			var out = { steps: r.steps, lowest: null, belowSeconds: 0, emptyAt: null, stoppedAt: null }, i, j, f, any, p;
+			out.emptyAt = tankEmptyAt(r.frames, m, baseEmpty);
+			if (r.stopped) {
+				out.stoppedAt = r.stopped.t;
+				if (!out.emptyAt && r.stopped.tank && !baseEmpty[r.stopped.tank]) {
+					out.emptyAt = { id: r.stopped.tank, t: r.stopped.t };
+				}
+			}
+			for (i = 0; i < r.frames.length; i++) {
+				f = r.frames[i];
+				any = false;
+				for (j = 0; j < m.nodes.length; j++) {
+					if (!isJunction[m.nodes[j].id]) { continue; }
+					p = f.pressures ? f.pressures[m.nodes[j].id] : undefined;
+					if (typeof p !== 'number' || !isFinite(p)) { continue; }
+					// **THE LOWEST PRESSURE IS READ BEFORE A TANK EMPTIES.** EPANET closes an empty tank, and a
+					// junction left with no source reports a head of minus millions of metres: not a pressure
+					// anybody can use. From that step on the row says the tank emptied and counts the time.
+					if (!(out.emptyAt && f.t >= out.emptyAt.t) && (!out.lowest || p < out.lowest.pressure)) {
+						out.lowest = { id: m.nodes[j].id, pressure: p, t: f.t };
+					}
+					if (p < minPressure && !baseBelow[m.nodes[j].id]) { any = true; }
+				}
+				// the time spent below is the interval to the next step; the last step is an instant
+				if (any && i + 1 < r.frames.length) { out.belowSeconds += r.frames[i + 1].t - f.t; }
+			}
+			return out;
+		}
+
 		function breakOne(id) {
 			var links, reach, drop = {}, cut = [], unserved = 0, m, rec;
 			rec = { id: id };
@@ -204,6 +306,16 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			});
 			rec.cutOff = cut;
 			rec.unserved = unserved;
+			// Over a whole run the demand not served is the LARGEST, over the reporting steps, of the
+			// cut-off junctions' demands in the intact run, and the step it occurs at.
+			if (baseFrames && cut.length) {
+				rec.unserved = 0;
+				baseFrames.forEach(function (f) {
+					var sum = 0;
+					cut.forEach(function (cid) { var d = f.demands ? f.demands[cid] : 0; sum += (typeof d === 'number' && isFinite(d)) ? d : 0; });
+					if (sum > rec.unserved) { rec.unserved = sum; rec.unservedAt = f.t; }
+				});
+			} else if (baseFrames) { rec.unserved = 0; }
 			m = caseModel(model, links, drop);
 			if (!m.nodes.some(function (n) { return isJunction[n.id]; })) {
 				rec.below = [];
@@ -221,8 +333,9 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 					return rec;
 				}
 				rec.below = belowIn(r, m).filter(function (b) { return !baseBelow[b.id]; });
+				if (r.frames) { rec.run = runDigest(r, m); }
 				rec.code = CODES.OK;
-				rec.state = (cut.length || rec.below.length) ? STATES.IMPACT : STATES.NONE;
+				rec.state = (cut.length || rec.below.length || (rec.run && (rec.run.emptyAt || rec.run.stoppedAt))) ? STATES.IMPACT : STATES.NONE;
 				return rec;
 			}, function (err) {
 				rec.state = STATES.ERROR;
@@ -252,6 +365,18 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			var bad = badResult(r);
 			if (bad) { return { ok: false, code: CODES.BASELINE_FAILED, cause: bad.code, issues: bad.issues }; }
 			belowIn(r, base).forEach(function (b) { baseBelow[b.id] = true; });
+			if (r.frames) {
+				baseFrames = r.frames;
+				(function () {
+					var e = tankEmptyAt(r.frames, base, null);
+					if (e) { baseEmpty[e.id] = true; }
+					// every tank empty in the intact run, not only the first
+					base.nodes.forEach(function (n) {
+						if (n.type === 'tank' && tankEmptyAt(r.frames, { nodes: [n] }, null)) { baseEmpty[n.id] = true; }
+					});
+					baseRun = runDigest(r, base);
+				}());
+			}
 			return next(0).then(function () {
 				var byId = {};
 				results.forEach(function (rec) { byId[rec.id] = rec; });
@@ -265,6 +390,8 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 					minPressure: minPressure,
 					baselineBelow: Object.keys(baseBelow).length,
 					baselineCutOff: baseCut,
+					baselineRun: baseRun,
+					baselineEmpty: Object.keys(baseEmpty),
 					solves: solves,
 					stopped: stopped
 				};
@@ -285,7 +412,7 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	//   'none'    nothing was lost.
 	var TIERS = ['fail', 'design', 'error', 'none'];
 	function severity(r) {
-		if (r.unserved > 0) { return 'fail'; }
+		if (r.unserved > 0 || (r.run && (r.run.emptyAt || r.run.stoppedAt))) { return 'fail'; }
 		if (r.state === STATES.ERROR) { return 'error'; }
 		if (r.state === STATES.IMPACT) { return 'design'; }
 		return 'none';
@@ -306,6 +433,8 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 		}).map(function (x) { return x.r; });
 	}
 
+	EngCalcs.lpnEpsRunResult = runResult;
+	EngCalcs.lpnEpsTankEmptyAt = tankEmptyAt;
 	EngCalcs.lpnCriticalitySweep = sweep;
 	EngCalcs.lpnCriticalityStates = STATES;
 	EngCalcs.lpnCriticalityCodes = CODES;

@@ -21,7 +21,7 @@ const { U, ok, enString, esString, plain, checkQuotes, openGuide, entry, finish 
 const NAME = 'user-guide-fireflow-harness';
 U.takeBrowserLock(NAME, 'EC_UGFF_LOCKED');
 
-const TERMS = ['lpn_guide_ff_asks_term', 'lpn_guide_ff_result_term', 'lpn_guide_ff_marks_term', 'lpn_guide_ff_example_term'];
+const TERMS = ['lpn_guide_ff_asks_term', 'lpn_guide_ff_result_term', 'lpn_guide_ff_marks_term', 'lpn_guide_ff_dur_term', 'lpn_guide_ff_example_term'];
 const COLS = ['lpn_ff_col_junction', 'lpn_ff_col_static', 'lpn_ff_col_required', 'lpn_ff_col_atrequired', 'lpn_ff_col_available', 'lpn_ff_col_residual', 'lpn_ff_col_affected', 'lpn_ff_col_limit', 'lpn_ff_col_solves', 'lpn_ff_col_modes'];
 async function main() {
 	const env = require(path.join(L.REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
@@ -31,6 +31,7 @@ async function main() {
 		lpn_guide_ff_asks_def: ['lpn_ff_required', 'lpn_ff_minpressure', 'lpn_ff_maxvelocity', 'lpn_ff_design_off'],
 		lpn_guide_ff_result_def: ['lpn_ff_col_static', 'lpn_ff_col_required', 'lpn_ff_col_atrequired', 'lpn_ff_col_available', 'lpn_ff_col_residual', 'lpn_ff_col_affected', 'lpn_ff_col_limit', 'lpn_ff_col_solves', 'lpn_ff_col_modes'],
 		lpn_guide_ff_marks_def: ['lpn_ff_selected', 'lpn_ff_stop'],
+		lpn_guide_ff_dur_def: ['lpn_dur_option', 'lpn_when', 'lpn_ff_required', 'lpn_dur_start', 'lpn_dur_length', 'lpn_ff_residual'],
 		lpn_guide_ff_example_def: ['lpn_menu_project', 'lpn_analyze_menu', 'lpn_ff_calculate']
 	});
 	ok('the example names the menu row without its ellipsis', plain(enString('lpn_guide_ff_example_def')).indexOf(enString('lpn_ff_menu').replace(/…$/, '')) >= 0);
@@ -46,7 +47,8 @@ async function main() {
 		await openGuide(a);
 		console.log('\n2. The entry');
 		const en = await entry(P, 'lpn_ff_box');
-		ok('the entry holds the chapter\'s four terms after the box\'s paragraphs', !!en && TERMS.every((k, i) => en.dts[i] === enString(k)) && en.paras >= 3, en && JSON.stringify(en.dts));
+		ok('the entry holds the chapter\'s five terms after the box\'s paragraphs', !!en && TERMS.every((k, i) => en.dts[i] === enString(k)) && en.paras >= 3, en && JSON.stringify(en.dts));
+		ok('the entry\'s help text describes the reporting step choices (its own paragraph, whole)', await P.evaluate((t) => document.body.innerText.replace(/\s+/g, ' ').indexOf(t.replace(/\s+/g, ' ')) >= 0, enString('lpn_ff_intro').split(/\\n\\n|\n\n/)[1]));
 		await P.evaluate(() => document.getElementById('lpn_hotkeys_close').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
 		await settle(400);
 
