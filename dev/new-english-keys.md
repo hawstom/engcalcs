@@ -537,7 +537,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**5 still to read**, of 55 new keys across 8 unmerged branch(es).
+**5 still to read**, of 55 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -547,6 +547,8 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### chore/handoff-1020c (`08e67da1c`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -569,7 +571,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-leader (`bcc926448`) — already merged into feat/label-margin; its strings are listed there
 
-### feat/label-margin (`764591a91`) — adds no English strings
+### feat/label-margin (`a4e28f48c`) — adds no English strings
 
 ### feat/native-eps (`1b06b7275`) — adds no English strings
 
@@ -729,4 +731,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### fix/key-reuse (`d2bd87a25`) — adds no English strings
+### fix/key-reuse (`559fe3b8d`) — already merged into chore/handoff-1020c; its strings are listed there
