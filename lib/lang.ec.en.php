@@ -1277,9 +1277,9 @@ $ec_lang['lpn_ex_basic_us_desc']='Two reservoirs, a pump, and a small loop. Gall
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
-$ec_lang['lpn_ex_net1_title']='EPANET Net1 plus rule-based controls';
+$ec_lang['lpn_ex_net1_title']='EPANET Net1 plus rule-based controls, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net1_desc']='A fictional EPANET example with chlorine, 1 reservoir and 1 tank.';
+$ec_lang['lpn_ex_net1_desc']='Gallons per minute, with feet and inches. A fictional EPANET example with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.';
 $ec_lang['lpn_ex_net1_si_title']='EPANET Net1 plus rule-based controls, L/s (SI)';
 $ec_lang['lpn_ex_net1_si_desc']='Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.';
 $ec_lang['lpn_ex_net1_scn_title']='EPANET Net1 with scenarios, gpm (US)';

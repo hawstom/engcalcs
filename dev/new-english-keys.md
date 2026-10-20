@@ -456,7 +456,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**57 still to read**, of 61 new keys across 9 unmerged branch(es).
+**57 still to read**, of 61 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -467,19 +467,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/batch-1019d (`a7d57f166`) — adds no English strings
-
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/eps-analysis (`b3e1b3612`) — already merged into chore/batch-1019d; its strings are listed there
-
-### feat/guide-page (`3ada36350`) — adds no English strings
-
-### feat/label-beside (`8676cd1be`) — already merged into chore/batch-1019d; its strings are listed there
-
-### feat/label-form (`d05fdb069`) — already merged into chore/batch-1019d; its strings are listed there
-
-### feat/label-leader (`ce56b8cf9`) — adds no English strings
+### feat/label-leader (`b468704c8`) — adds no English strings
 
 ### feat/sqlite-reader (`75ed1031f`) — 51 new, 51 to read @@ NEEDS RULING
 
@@ -637,7 +627,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   @@ NEEDS RULING
 
-### feat/theme (`876ebef92`) — 10 new, 6 to read @@ NEEDS RULING
+### feat/theme (`c4a70a5b5`) — 10 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_theme_amber`**
   > Amber
@@ -669,3 +659,5 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_theme_space`**
   > Space
   @@ NEEDS RULING
+
+### feat/theme-tank (`876ebef92`) — already merged into feat/theme; its strings are listed there
