@@ -50,7 +50,7 @@ const QUOTES = {
 // The terms of the two chapters, in order (the template in Looped-Network.php).
 const SM_TERMS = ['lpn_guide_scn_use_term', 'lpn_guide_scn_open_term', 'lpn_guide_scn_marks_term', 'lpn_guide_scn_make_term',
 	'lpn_guide_scn_scope_term', 'lpn_guide_scn_example_term', 'lpn_guide_scn_notes_term'];
-const CMP_TERMS = ['lpn_guide_cmp_cols_term', 'lpn_guide_cmp_run_term', 'lpn_guide_cmp_byasset_term', 'lpn_guide_cmp_notes_term'];
+const CMP_TERMS = ['lpn_guide_cmp_cols_term', 'lpn_guide_cmp_run_term', 'lpn_scnres_title', 'lpn_guide_cmp_notes_term'];
 
 async function main() {
 	const env = require(path.join(L.REPO, 'dev', 'browser-pass', 'lib', 'env.js'));

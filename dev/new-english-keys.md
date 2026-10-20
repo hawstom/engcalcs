@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**163 still to read on master**, of 171 untranslated keys, of 3190 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**149 still to read on master**, of 157 untranslated keys, of 3176 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (171, 163 to read @@ NEEDS RULING)
+## lpn_  (157, 149 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -39,9 +39,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_crit_col_hours`**
   > Hours below minimum
-  @@ NEEDS RULING
-- **`lpn_crit_col_lowest`**
-  > Lowest pressure
   @@ NEEDS RULING
 - **`lpn_crit_col_lowest_tip`**
   > Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.
@@ -90,9 +87,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_dur_col_end_nofire`**
   > Level at end without the fire
-  @@ NEEDS RULING
-- **`lpn_dur_col_fire`**
-  > Fire flow
   @@ NEEDS RULING
 - **`lpn_dur_col_low`**
   > Lowest level reached
@@ -211,9 +205,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_ff_working_steps`**
   > Working: reporting step {step} of {steps}, junction {done} of {total}.
   @@ NEEDS RULING
-- **`lpn_file_export_item_msx`**
-  > EPANET-MSX file…
-  @@ NEEDS RULING
 - **`lpn_file_export_msx_tip`**
   > Download the attached EPANET-MSX file exactly as it was imported.
   @@ NEEDS RULING
@@ -232,14 +223,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_guide_cmp_byasset_def`**
   > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver's internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.</p>
   @@ NEEDS RULING
-- **`lpn_guide_cmp_byasset_term`**
-  > Results by asset
-  @@ NEEDS RULING
 - **`lpn_guide_ff_dur_def`**
   > <p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.</p>
-  @@ NEEDS RULING
-- **`lpn_guide_ff_dur_term`**
-  > A fire for a stated duration
   @@ NEEDS RULING
 - **`lpn_guide_page_desc`**
   > {name} user manual: one page for each chapter, from the map and Properties to scenarios, fire flow analysis, and criticality analysis.
@@ -261,9 +246,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_inpup_blank`**
   > blank
-  @@ NEEDS RULING
-- **`lpn_inpup_btn_base`**
-  > Base
   @@ NEEDS RULING
 - **`lpn_inpup_btn_new`**
   > A new project
@@ -376,24 +358,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_inpup_status`**
   > Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).
   @@ NEEDS RULING
-- **`lpn_inpup_t_junction`**
-  > Junction
-  @@ NEEDS RULING
-- **`lpn_inpup_t_pipe`**
-  > Pipe
-  @@ NEEDS RULING
-- **`lpn_inpup_t_pump`**
-  > Pump
-  @@ NEEDS RULING
-- **`lpn_inpup_t_reservoir`**
-  > Reservoir
-  @@ NEEDS RULING
-- **`lpn_inpup_t_tank`**
-  > Tank
-  @@ NEEDS RULING
-- **`lpn_inpup_t_valve`**
-  > Valve
-  @@ NEEDS RULING
 - **`lpn_inpup_title`**
   > Update from EPANET file
   @@ NEEDS RULING
@@ -408,9 +372,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_msx_not_msx`**
   > {file} does not look like an EPANET-MSX file: it has no [SPECIES] section.
-  @@ NEEDS RULING
-- **`lpn_msx_remove`**
-  > Remove
   @@ NEEDS RULING
 - **`lpn_msx_removed`**
   > Removed {file} from this project.
@@ -508,9 +469,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_settings_grp_positions`**
   > Positions
   @@ NEEDS RULING
-- **`lpn_settings_grp_show`**
-  > Show
-  @@ NEEDS RULING
 - **`lpn_settings_grp_size`**
   > Size
   @@ NEEDS RULING
@@ -549,7 +507,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**57 still to read**, of 61 new keys across 8 unmerged branch(es).
+**61 still to read**, of 65 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -560,15 +518,63 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/merge-1020a (`e4373b805`) — adds no English strings
+### chore/merge-1020c (`b4a163e07`) — 10 new, 6 to read @@ NEEDS RULING
+
+- **`lpn_theme_amber`**
+  > Amber
+  _Ruled OK 2026-10-17._
+- **`lpn_theme_arcade`**
+  > Arcade
+  @@ NEEDS RULING
+- **`lpn_theme_desktop`**
+  > Desktop
+  @@ NEEDS RULING
+- **`lpn_theme_green`**
+  > Green
+  _Ruled OK 2026-10-17._
+- **`lpn_theme_hc`**
+  > High contrast
+  _Ruled OK 2026-10-17._
+- **`lpn_theme_newspaper`**
+  > Newspaper
+  @@ NEEDS RULING
+- **`lpn_theme_platinum`**
+  > Platinum
+  _Ruled OK 2026-10-17._
+- **`lpn_theme_prairie`**
+  > Prairie
+  @@ NEEDS RULING
+- **`lpn_theme_rounded`**
+  > Rounded
+  @@ NEEDS RULING
+- **`lpn_theme_space`**
+  > Space
+  @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/duration-fire (`c221d72bf`) — already merged into chore/merge-1020a; its strings are listed there
+### feat/geojson-into-project (`cad86297c`) — 4 new, 4 to read @@ NEEDS RULING
 
-### feat/label-leader (`bcebdfa58`) — adds no English strings
+- **`lpn_gjup_h_notes`**
+  > Reading the file
+  @@ NEEDS RULING
+- **`lpn_gjup_lead`**
+  > A GeoJSON file holds one set of values and no scenarios. Choose where to put them.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets only in the import are added, and assets only in this project are kept.
+  @@ NEEDS RULING
+- **`lpn_gjup_title`**
+  > Update from GeoJSON file
+  @@ NEEDS RULING
+- **`lpn_inpup_i_custom`**
+  > custom properties
+  @@ NEEDS RULING
 
-### feat/sqlite-reader (`75ed1031f`) — 51 new, 51 to read @@ NEEDS RULING
+### feat/label-leader (`bcc926448`) — adds no English strings
+
+### feat/label-margin (`bcc926448`) — already merged into feat/label-leader; its strings are listed there
+
+### feat/native-eps (`63bb8fb1f`) — already merged into chore/merge-1020c; its strings are listed there
+
+### feat/sqlite-reader (`42e5d726a`) — 51 new, 51 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
   > WaterCAD or WaterGEMS model…
@@ -724,39 +730,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   @@ NEEDS RULING
 
-### feat/theme (`6221a4cae`) — already merged into feat/theme-tank; its strings are listed there
+### feat/theme (`6221a4cae`) — already merged into chore/merge-1020c; its strings are listed there
 
-### feat/theme-tank (`0055f8ed3`) — 10 new, 6 to read @@ NEEDS RULING
-
-- **`lpn_theme_amber`**
-  > Amber
-  _Ruled OK 2026-10-17._
-- **`lpn_theme_arcade`**
-  > Arcade
-  @@ NEEDS RULING
-- **`lpn_theme_desktop`**
-  > Desktop
-  @@ NEEDS RULING
-- **`lpn_theme_green`**
-  > Green
-  _Ruled OK 2026-10-17._
-- **`lpn_theme_hc`**
-  > High contrast
-  _Ruled OK 2026-10-17._
-- **`lpn_theme_newspaper`**
-  > Newspaper
-  @@ NEEDS RULING
-- **`lpn_theme_platinum`**
-  > Platinum
-  _Ruled OK 2026-10-17._
-- **`lpn_theme_prairie`**
-  > Prairie
-  @@ NEEDS RULING
-- **`lpn_theme_rounded`**
-  > Rounded
-  @@ NEEDS RULING
-- **`lpn_theme_space`**
-  > Space
-  @@ NEEDS RULING
-
-### fix/examples-guide (`5de0786d7`) — adds no English strings
+### fix/examples-guide (`77fced3fe`) — already merged into chore/merge-1020c; its strings are listed there

@@ -139,7 +139,7 @@ console.log('\n--- a scenario is open: it is the default target, Base is untouch
 	const before = snap();
 	importText(B, 'b.inp');
 	const names = dialogButtons();
-	ok('the question offers the open scenario and Base', names[1] === PC.lpn_inpup_btn_scenario.replace('{scenario}', 'Peak') && names[2] === PC.lpn_inpup_btn_base, JSON.stringify(names));
+	ok('the question offers the open scenario and Base', names[1] === PC.lpn_inpup_btn_scenario.replace('{scenario}', 'Peak') && names[2] === PC.lpn_scenario_base, JSON.stringify(names));
 	press(names[1]);
 	const j2 = L.nodeById('J2');
 	ok('Base values are not changed', j2.elev === 95 && j2._demand === 120 && L.linkById('P1')._diameter === 12);
@@ -151,7 +151,7 @@ console.log('\n--- a scenario is open: it is the default target, Base is untouch
 	ok('undo restores the scenario and Base exactly', snap() === before && JSON.stringify(L.scenarios()) !== '');
 	// And Base chosen on purpose, from inside the scenario.
 	importText(B, 'b.inp');
-	press(PC.lpn_inpup_btn_base);
+	press(PC.lpn_scenario_base);
 	ok('Base chosen: Base takes the values', L.nodeById('J2').elev === 97.5);
 	ok('the open scenario stays open', L.getProject().activeScenario === sc.id);
 	L.undo();

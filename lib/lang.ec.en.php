@@ -1047,7 +1047,6 @@ $ec_lang['lpn_guide_cmp_cols_term']='What the table holds';
 $ec_lang['lpn_guide_cmp_cols_def']='<table class="lpn-notes-table"><tbody><tr><td>Scenario</td><td>The name of the scenario. The open scenario is marked (currently open).</td></tr><tr><td>No. of overrides</td><td>The overrides of the scenario itself, counted as in the Scenarios list. A calculation option such as the demand multiplier counts as one, and an override equal to the inherited value counts.</td></tr><tr><td>Demand multiplier, Total run time, Hydraulic time step</td><td>The values the scenario was solved under, its own or those of the project. A steady-state scenario shows a dash for the time step.</td></tr><tr><td>Lowest pressure</td><td>The lowest pressure at a junction, with its ID and the time it occurs. Reservoirs and tanks are left out because each has a fixed head.</td></tr><tr><td>Highest velocity</td><td>The highest velocity in a pipe or valve, with its ID and the time it occurs. Pumps are left out.</td></tr></tbody></table>';
 $ec_lang['lpn_guide_cmp_run_term']='Steady-state and extended-period scenarios';
 $ec_lang['lpn_guide_cmp_run_def']='<p>A scenario with a Total run time greater than 0 is run over the whole period through the EPANET engine. Its lowest pressure and highest velocity are the extremes over every time step, each shown with its time. A scenario with a Total run time of 0 is solved at one instant. The total run time is one of the options a scenario can override, so one table can hold both kinds.</p>';
-$ec_lang['lpn_guide_cmp_byasset_term']='Results by asset';
 $ec_lang['lpn_guide_cmp_byasset_def']='<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver\'s internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.</p>';
 $ec_lang['lpn_guide_cmp_notes_term']='Points to note';
 $ec_lang['lpn_guide_cmp_notes_def']='<ul><li>A scenario that cannot be solved shows the reason in place of its two results, for example that a junction has no path to a source after a pipe is made inactive. The other scenarios are still solved. A scenario that did not converge shows its last results and a message.</li><li>The block above the table, The same in every scenario, states the friction method, units, accuracy, and maximum trials. A setting that differs between scenarios is left out of the block.</li><li>There is no pass or fail threshold. Read the numbers against the design criteria of the system being modeled.</li><li>The example given in the Scenario manager entry compares three scenarios on Net1.</li></ul>';
@@ -1139,7 +1138,6 @@ $ec_lang['lpn_guide_ff_result_term']='Reading the results';
 $ec_lang['lpn_guide_ff_result_def']='<p>The summary counts the junctions that passed all checks, the junctions that failed the fire flow, and the junctions that affected the rest of the system. The table lists, for each junction tested, the Static pressure before any fire flow is drawn, the Required flow, the Pressure at required flow, the Available flow, the Residual held, the Worst effect and Design limit of the design check, the number of Runs, which is the number of solves of the whole network, and the Failure modes. A cell with no number shows a dash, never a zero. A junction that could not be solved shows its reason in place of numbers. The table prints at most 200 junctions and states how many it did not print.</p>';
 $ec_lang['lpn_guide_ff_marks_term']='Rings, Stop, and one analysis at a time';
 $ec_lang['lpn_guide_ff_marks_def']='<p>After a run, the circle of each tested junction is outlined on the map according to its result, and the outlines differ in dash pattern as well as in color. Choose Selected junctions to test only the junctions selected on the map; anything else that is selected is counted and not tested. Stop ends a run and keeps the junctions already finished. Only one of the fire flow, criticality, and demand scaling analyses runs at a time.</p>';
-$ec_lang['lpn_guide_ff_dur_term']='A fire for a stated duration';
 $ec_lang['lpn_guide_ff_dur_def']='<p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.</p>';
 $ec_lang['lpn_guide_ff_example_term']='Example on Net1';
 $ec_lang['lpn_guide_ff_example_def']='<p>Open the Net1 example, choose Water, Analyze, Fire flow analysis…, and click Run with the box as it opens. The time step is 0:00, and the run solves the whole network 135 times. Eight of the nine junctions pass all checks. Junction N32 fails the fire flow: its static pressure is 111 psi, only 1.19 psi remains at the required 1000 gpm, and its available flow is 892 gpm. Junction N31 can deliver 1339 gpm, and Junction N12 more than 10000 gpm.</p>';
@@ -2329,7 +2327,6 @@ $ec_lang['lpn_file_import_workspace']='Workspace…';
 $ec_lang['lpn_file_import_workspace_tip']='Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.';
 $ec_lang['lpn_file_import_msx']='EPANET-MSX file…';
 $ec_lang['lpn_file_import_msx_tip']='Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.';
-$ec_lang['lpn_file_export_item_msx']='EPANET-MSX file…';
 $ec_lang['lpn_file_export_msx_tip']='Download the attached EPANET-MSX file exactly as it was imported.';
 $ec_lang['lpn_msx_report_heading']='Attached {file}';
 $ec_lang['lpn_msx_report_kept']='This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.';
@@ -2340,7 +2337,6 @@ $ec_lang['lpn_msx_report_missing']='IDs in the file that this network does not h
 $ec_lang['lpn_msx_not_msx']='{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.';
 $ec_lang['lpn_msx_attached_heading']='Attached EPANET-MSX file: {file}';
 $ec_lang['lpn_msx_replace']='Replace…';
-$ec_lang['lpn_msx_remove']='Remove';
 $ec_lang['lpn_msx_removed']='Removed {file} from this project.';
 $ec_lang['lpn_quality_msx']='Multi-species (EPANET-MSX)';
 $ec_lang['lpn_quality_msx_species']='Species';
@@ -2437,7 +2433,6 @@ $ec_lang['lpn_inpup_btn_new']='A new project';
 $ec_lang['lpn_inpup_btn_project']='This project, {project}';
 // {scenario} is a scenario name; it labels a button.
 $ec_lang['lpn_inpup_btn_scenario']='{scenario}, open now';
-$ec_lang['lpn_inpup_btn_base']='Base';
 $ec_lang['lpn_inpup_title']='Update from EPANET file';
 // {file} is a file name, {scenario} a scenario name and {project} a project name.
 $ec_lang['lpn_inpup_heading']='Imported {file} into {scenario} of {project}';
@@ -2477,12 +2472,6 @@ $ec_lang['lpn_inpup_i_curves']='curves';
 $ec_lang['lpn_inpup_i_controls']='controls';
 $ec_lang['lpn_inpup_i_rules']='rules';
 $ec_lang['lpn_inpup_i_options']='options';
-$ec_lang['lpn_inpup_t_junction']='Junction';
-$ec_lang['lpn_inpup_t_reservoir']='Reservoir';
-$ec_lang['lpn_inpup_t_tank']='Tank';
-$ec_lang['lpn_inpup_t_pipe']='Pipe';
-$ec_lang['lpn_inpup_t_pump']='Pump';
-$ec_lang['lpn_inpup_t_valve']='Valve';
 // Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
 // API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
 // browser they test in. That is expected, not a bug.
@@ -3788,7 +3777,6 @@ $ec_lang['lpn_settings_grp_size']='Size';
 $ec_lang['lpn_settings_grp_angle']='Angle';
 $ec_lang['lpn_settings_grp_zoom']='Zoom';
 $ec_lang['lpn_settings_grp_positions']='Positions';
-$ec_lang['lpn_settings_grp_show']='Show';
 $ec_lang['lpn_settings_grp_thematic']='Thematic';
 // PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
 // to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
@@ -4758,7 +4746,6 @@ $ec_lang['lpn_dur_not_back_tank']='⚠ At {time}, the last reporting step, tank 
 $ec_lang['lpn_dur_not_back_junction']='⚠ At {time}, the last reporting step, junction {id} is not back to its pressure without the fire. The difference is {pressure}, against a tolerance of {tolerance}.';
 $ec_lang['lpn_dur_recovery_to_end']='The fire lasts to the end of the run, so recovery after it is not assessed.';
 $ec_lang['lpn_dur_recovery_cut']='The run stopped before its end, so recovery after the fire is not assessed.';
-$ec_lang['lpn_dur_col_fire']='Fire flow';
 $ec_lang['lpn_dur_col_pressure']='Pressure at the fire junction';
 $ec_lang['lpn_dur_col_nofire']='Pressure without the fire';
 $ec_lang['lpn_dur_col_low']='Lowest level reached';
@@ -4767,7 +4754,6 @@ $ec_lang['lpn_dur_col_drop']='Drop from start';
 $ec_lang['lpn_dur_col_end']='Level at end';
 $ec_lang['lpn_dur_col_end_nofire']='Level at end without the fire';
 $ec_lang['lpn_at_time']='{value} at {time}';
-$ec_lang['lpn_crit_col_lowest']='Lowest pressure';
 $ec_lang['lpn_crit_col_hours']='Hours below minimum';
 $ec_lang['lpn_crit_col_empty']='Tank empties';
 $ec_lang['lpn_ds_run_note']='Judged over the whole run, at every reporting step.';

@@ -106,6 +106,18 @@ function ecGuideMapDef() {
 }
 
 /**
+ * The language key holding a term. A term that is the same words as an interface label borrows that
+ * label's key instead of keeping its own copy.
+ *
+ * @param string $stem  a chapter term's stem.
+ * @return string       the language key.
+ */
+function ecGuideTermKey($stem) {
+    $alias = array('lpn_guide_cmp_byasset' => 'lpn_scnres_title', 'lpn_guide_ff_dur' => 'lpn_dur_option');
+    return isset($alias[$stem]) ? $alias[$stem] : $stem . '_term';
+}
+
+/**
  * The chapter's term and definition list, as HTML.
  *
  * @param string $slug  a chapter slug.
@@ -120,7 +132,8 @@ function ecGuideDl($slug) {
         $def = ($slug === 'map' && $stem === 'lpn_hotkeys_map') ? ecGuideMapDef() : $ec_lang[$stem . '_def'];
         // A term that only repeats its chapter's heading is marked, and the stylesheet hides it.
         $dup = ($stem === 'lpn_hotkeys_map' || $stem === 'lpn_hotkeys_snip') ? ' class="lpn-guide-dup"' : '';
-        $html .= "\t<dt" . $dup . '>' . $ec_lang[$stem . '_term'] . '</dt><dd>' . $def . "</dd>\n";
+        $termKey = ecGuideTermKey($stem);
+        $html .= "\t<dt" . $dup . '>' . $ec_lang[$termKey] . '</dt><dd>' . $def . "</dd>\n";
     }
     return $html . "</dl>";
 }
