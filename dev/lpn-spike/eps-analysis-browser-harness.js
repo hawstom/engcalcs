@@ -125,6 +125,21 @@ async function main() {
 		ok('some outage empties the tank, with the time (such as "2 at 5:00")', emptied.length >= 1, JSON.stringify(emptied.slice(0, 2)));
 		await closeTool('lpn_crit_close');
 
+		console.log('\n--- Demand scaling, the whole run ---');
+		await openTool('lpn_ds_menu', 'lpn_ds_box');
+		const dsWhen = '#lpn_ds_controls select:has(option[value="run"])';
+		ok('the box offers the whole run on a project with a clock', !!(await a.page.$(dsWhen)));
+		await a.page.selectOption(dsWhen, 'run');
+		await a.settle(200);
+		await pressRun('#lpn_ds_controls', await a.lang('lpn_find_btn'));
+		await waitDone('#lpn_ds_controls [data-ds="search"]', 'the whole-run Find answer');
+		const dsText = await txt('#lpn_ds_controls [data-ds="search"]');
+		const limitLead = (await a.lang('lpn_ds_limit_at')).split('{time}')[0];
+		const runLead = await a.lang('lpn_ds_run_note');
+		ok('Find says it judged the whole run', dsText.indexOf(runLead) >= 0, dsText.slice(0, 220));
+		ok('and names the limiting reporting step', dsText.indexOf(limitLead) >= 0 && /^\d+:\d\d/.test(dsText.slice(dsText.indexOf(limitLead) + limitLead.length)), dsText.slice(0, 220));
+		await closeTool('lpn_ds_close');
+
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.join('\n'));
 	} finally {
 		await browser.close();

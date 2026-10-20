@@ -46,6 +46,8 @@ const L = loadLoopedNetwork(
 	"\t\tengineFor: engineFor,\n" +
 	"\t\truncrit: runCriticality, critRun: function () { return critRun; },\n" +
 	"\t\tcritSet: function (k, v) { critAsk[k] = v; },\n" +
+	"\t\tdsSet: function (k, v) { dsAsk[k] = v; }, runFind: runDemandScaleSearch, runScale: runDemandScale,\n" +
+	"\t\tdsSearch: function () { return dsSearch; }, dsRun: function () { return dsRun; },\n" +
 	"\t\tminPressureSet: function (t) { if (!fireFlowAsk) { fireFlowAsk = fireFlowDefaults(); } fireFlowAsk.minPressure = t; },\n" +
 	"\t\tsetAsk: function (k, v) { if (!fireFlowAsk) { fireFlowAsk = fireFlowDefaults(); } fireFlowAsk[k] = v; },\n" +
 	"\t\task: function () { return fireFlowAsk; },\n" +
@@ -208,6 +210,69 @@ async function sweepSelected(ids, when, extra) {
 	L.critSet('when', 'now');
 	const cn = await L.runcrit();
 	check(cn.ok && !cn.wholeRun && cn.results.every((r) => r.run === undefined), 'the step on screen is unchanged: no run record on any row');
+
+	head('7. DEMAND SCALING OVER THE WHOLE RUN (Net3)');
+	open('Net3.lwn');
+	L.setEngine('epanet');
+	L.minPressureSet('20');
+	// Net3 has junctions near the river below 20 psi with no demand at all, so the question is asked of
+	// the hydrants, as a person would select them.
+	const dsIds = ['15', '35', '101', '123', '161', '209', '255'];
+	L.setSelectionList(dsIds.map((id) => ({ kind: 'node', id: id })));
+	L.dsSet('scope', 'selected');
+	L.dsSet('when', 'run');
+	t0 = Date.now();
+	await L.runFind();
+	const wholeMs = Date.now() - t0;
+	const ds = L.dsSearch();
+	check(ds && ds.outcome === 'found' && ds.wholeRun === true, `the whole-run Find answers: demand scale ${ds && ds.multiplier} (${wholeMs} ms, ${ds && ds.solves} runs)`);
+	const run3 = await L.analysisRun();
+	const minP = EC.lpnFireFlowPsiToHead(20);
+	// the independent reading: scale every demand, run the EPS, read every frame
+	async function passes(mult) {
+		const m = EC.lpnDemandScaleModel(L.assembleModel(), mult, dsIds);
+		const r = await EC.lpnEpanetRun(m, {});
+		if (!r.ok) { return { ok: false, why: 'run stopped' }; }
+		let lo = Infinity, at = null;
+		r.frames.forEach((f) => m.nodes.forEach((n) => {
+			if (dsIds.includes(n.id) && f.pressures[n.id] < lo) { lo = f.pressures[n.id]; at = f.t; }
+		}));
+		const empty = EC.lpnEpsTankEmptyAt(r.frames, m, null);
+		return { ok: lo >= minP && !empty, lo, at, empty };
+	}
+	const at = await passes(ds.multiplier), above = await passes(+(ds.multiplier + ds.step).toFixed(10));
+	check(at.ok, `at the answer (${ds.multiplier}) an independent run holds 20 psi at every step (lowest ${(at.lo / 0.703070).toFixed(2)} psi at ${EC.lpnFormatTime(at.at)})`);
+	check(!above.ok, `one step above it fails (${above.empty ? 'a tank empties' : (above.lo / 0.703070).toFixed(2) + ' psi at ' + EC.lpnFormatTime(above.at)})`);
+	check(ds.limit && (above.empty ? ds.limit.t === above.empty.t : ds.limit.t === above.at), `the limiting reporting step is ${ds.limit && EC.lpnFormatTime(ds.limit.t)}`);
+
+	// the single-instant answers at each reporting step, on the same frames
+	let minInstant = Infinity, minAt = null;
+	const instant = [];
+	for (let k = 0; k < run3.frames.length; k += 1) {
+		const tt = run3.frames[k].t;
+		const m = L.analysisModelAt(tt, EC.lpnTimeFrameResult(run3, tt));
+		const sr = await EC.lpnDemandScaleSearch(m, { solve: L.engineFor(m).solve, minPressure: minP, junctions: dsIds });
+		instant.push({ t: tt, m: sr.multiplier, outcome: sr.outcome });
+		if (sr.outcome === 'found' && sr.multiplier < minInstant) { minInstant = sr.multiplier; minAt = tt; }
+	}
+	console.log('    single-instant answers by step: ' + instant.map((x) => EC.lpnFormatTime(x.t) + '=' + x.m).join(' '));
+	const instAtLimit = instant.find((x) => x.t === ds.limit.t);
+	check(ds.multiplier <= instAtLimit.m + 1e-9, `the whole-run answer (${ds.multiplier}) is no larger than the single-instant answer at its limiting step ${EC.lpnFormatTime(ds.limit.t)} (${instAtLimit.m})`);
+	check(ds.multiplier <= minInstant + 1e-9, `and no larger than the lowest single-instant answer (${minInstant} at ${EC.lpnFormatTime(minAt)})`);
+
+	// Run at a scale, whole run: lowest pressure and its step per junction
+	L.dsSet('multiplier', String(ds.multiplier));
+	await L.runScale();
+	const dr = L.dsRun();
+	check(dr && dr.ok && dr.wholeRun && dr.below.length === 0 && !dr.emptied, 'Run at the answer: no junction below the limit over the run, no tank empties');
+	check(dr.pressures.length > 50 && dr.pressures.every((x) => typeof x.t === 'number'), '  and every junction names the step of its lowest pressure (' + dr.pressures.length + ' junctions, ' + dr.pressures.filter((x) => typeof x.t !== 'number').map((x) => x.id).join(',') + ')');
+	L.dsSet('multiplier', String(+(ds.multiplier + ds.step * 20).toFixed(10)));
+	await L.runScale();
+	const dr2 = L.dsRun();
+	check(dr2.ok && (dr2.below.length > 0 || dr2.emptied), 'Run well above the answer: junctions fall below the limit or a tank empties');
+	L.dsSet('when', 'now');
+	await L.runFind();
+	check(L.dsSearch().wholeRun === undefined && typeof L.dsSearch().multiplier === 'number', 'the step on screen is unchanged: no whole-run mark');
 
 	// Timings, not assertions: every junction of Net3.
 	if (process.env.EPS_TIMES) {

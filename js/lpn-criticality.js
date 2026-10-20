@@ -126,14 +126,22 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 		}
 		return null;
 	}
-	function runResult(run, model) {
+	function runResult(run, model, options) {
 		var frames = (run && run.frames) || [], pressures = {}, hour = {}, velocities = {}, bad = false,
-			stopped = null, i, id, p, v, f, step;
+			stopped = null, i, id, p, v, f, step, emptied, stopT = Infinity;
 		if (!run || (!run.ok && !frames.length)) {
 			return { ok: false, converged: false, issues: (run && run.issues) || [] };
 		}
+		emptied = tankEmptyAt(frames, model, null);
+		// `beforeEmpty`: read pressures and velocities only up to the step a tank empties. After it
+		// EPANET reports a head of minus millions of metres for every junction left with no source.
+		if (options && options.beforeEmpty) {
+			if (emptied) { stopT = emptied.t; }
+			if (!run.ok && typeof run.stoppedAt === 'number') { stopT = Math.min(stopT, run.stoppedAt); }
+		}
 		for (i = 0; i < frames.length; i++) {
 			f = frames[i];
+			if (f.t >= stopT) { break; }
 			if (f.converged === false) { bad = true; }
 			for (id in f.pressures) {
 				if (!Object.prototype.hasOwnProperty.call(f.pressures, id)) { continue; }
@@ -155,7 +163,7 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 		return {
 			ok: true, converged: !bad, issues: [], pressures: pressures, pressureHour: hour, velocities: velocities,
 			frames: frames, steps: frames.length, reportStep: step, stopped: stopped,
-			emptied: tankEmptyAt(frames, model, null)
+			emptied: emptied
 		};
 	}
 

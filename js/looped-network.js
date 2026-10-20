@@ -78083,6 +78083,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//
 	// **NO BOX MEMORY ACROSS PAGE LOADS**, like criticality: nothing is stored on a visitor's device.
 	var dsAsk = { scope: 'all', multiplier: '2' };
+	function dsWhen() { return (dsAsk.when === 'run' && analysisCanRun()) ? 'run' : 'now'; }
 	var dsRun = null;      // the last Run at a scale, or null
 	var dsSearch = null;   // the last search, or null
 	// **A REFUSED PRESS IS ANSWERED IN THE BOX, WHERE THE PRESS WAS** (Tom, 2026-10-02: *"It appears
@@ -78104,7 +78105,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function buildDemandScaleControls() {
 		var pc = EngCalcs.pageConfig || {},
 			host = document.getElementById('lpn_ds_controls'),
-			scope, minP, mult, buttons, run, find, stop, engine, other;
+			scope, minP, mult, buttons, run, find, stop, engine, other, when;
 		if (!host) { return; }
 		host.innerHTML = '';
 		scope = ffSelect([
@@ -78113,6 +78114,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		], dsAsk.scope);
 		scope.addEventListener('change', function () { dsAsk.scope = scope.value; buildDemandScaleControls(); });
 		ffRow(host, pc.lpn_ds_scope || 'Junctions to scale', null, scope, '');
+		// **THE WHOLE RUN, ONLY WHERE THE PROJECT HAS A CLOCK** (Task 578). Applies to both Run and Find.
+		if (analysisCanRun()) {
+			when = ffSelect([
+				['now', pc.lpn_when_now || 'The time step on screen'],
+				['run', pc.lpn_when_run || 'The whole run']
+			], dsAsk.when || 'now');
+			when.addEventListener('change', function () { dsAsk.when = when.value; });
+			ffRow(host, pc.lpn_when || 'Time step tested', null, when, '');
+		}
 		minP = ffInput(critFireFlowAsk().minPressure);
 		minP.addEventListener('change', function () { critFireFlowAsk().minPressure = minP.value; });
 		ffRow(host, pc.lpn_ds_minpressure || 'Lowest pressure allowed', pc.lpn_ds_minpressure_tip,
@@ -78121,6 +78131,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		refreshBoxTip('lpn_ds_box', dsBoxTip(engine));
 		other = fireFlowBusy || critBusy;
 		function take() {
+			if (when) { dsAsk.when = when.value; }
 			dsAsk.scope = scope.value;
 			dsAsk.multiplier = mult.value;
 			critFireFlowAsk().minPressure = minP.value;
@@ -78257,9 +78268,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				.replace('{m}', dsMult(rec.multiplier)).replace('{reason}', ffReasonText(rec)), host);
 			return;
 		}
+		if (rec.emptied) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ds_empties_at || '⚠ At a demand scale of {m}, a tank empties at {time}.')
+				.replace('{m}', dsMult(rec.multiplier)).replace('{time}', dsTimeText(rec.emptied.t)), host);
+		}
 		if (!rec.lowest) { return; }
-		dsSentence(host, 'lpn-ff-note', pc.lpn_ds_lowest_at || 'At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.',
-			'node', rec.lowest.id, { m: dsMult(rec.multiplier), pressure: ffQty(rec.lowest.pressure, 'lpn_u_pressure') });
+		dsSentence(host, 'lpn-ff-note', typeof rec.lowest.t === 'number'
+				? (pc.lpn_ds_lowest_at_time || 'At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}, at {time}.')
+				: (pc.lpn_ds_lowest_at || 'At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.'),
+			'node', rec.lowest.id, { m: dsMult(rec.multiplier), pressure: ffQty(rec.lowest.pressure, 'lpn_u_pressure'),
+				time: typeof rec.lowest.t === 'number' ? dsTimeText(rec.lowest.t) : '' });
+	}
+	function dsRunNote(host) {
+		var pc = EngCalcs.pageConfig || {};
+		ffEl('p', 'lpn-ff-note', pc.lpn_ds_run_note || 'Judged over the whole run, at every reporting step.', host);
 	}
 	function rebuildDemandScaleReport() {
 		var pc = EngCalcs.pageConfig || {},
@@ -78296,6 +78318,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				dsProbeLine(host, s.failing);
 			}
 			dsTimeLines(host, s.time);
+			if (s.wholeRun) {
+				dsRunNote(host);
+				if (s.limit) {
+					ffEl('p', 'lpn-ff-note', (pc.lpn_ds_limit_at || 'Limiting reporting step: {time}.')
+						.replace('{time}', dsTimeText(s.limit.t)), host);
+				}
+			}
 			dsScopeLine(host, s);
 			if (s.holding) { dsOutsideLine(host, s.holding.outside, s.holding.multiplier, s.minPressure); }
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
@@ -78314,9 +78343,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		verdict = set.below.length
 			? (pc.lpn_ds_scale_below || '⚠ At a demand scale of {m}, junctions below {pressure}: {n}.')
 				.replace('{n}', String(set.below.length))
-			: (pc.lpn_ds_scale_ok || '✓ At a demand scale of {m}, every junction keeps {pressure}.');
+			: (set.emptied
+				? (pc.lpn_ds_empties_at || '⚠ At a demand scale of {m}, a tank empties at {time}.').replace('{time}', dsTimeText(set.emptied.t))
+				: (pc.lpn_ds_scale_ok || '✓ At a demand scale of {m}, every junction keeps {pressure}.'));
 		ffEl('p', 'lpn-ff-summary', verdict.replace('{m}', dsMult(set.multiplier)).split('{pressure}').join(pressure), host);
 		dsTimeLines(host, set.time);
+		if (set.wholeRun) {
+			dsRunNote(host);
+			if (set.emptied && set.below.length) {
+				ffEl('p', 'lpn-ff-note', (pc.lpn_ds_empties_at || '⚠ At a demand scale of {m}, a tank empties at {time}.')
+					.replace('{m}', dsMult(set.multiplier)).replace('{time}', dsTimeText(set.emptied.t)), host);
+			}
+		}
 		dsScopeLine(host, set);
 		dsOutsideLine(host, set.outside, set.multiplier, set.minPressure);
 		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
@@ -78330,12 +78368,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_ff_col_junction || 'Junction',
 			[pc.lpn_ds_col_scaled || 'Scaled', pc.lpn_ds_col_scaled_tip],
 			[pc.lpn_ds_col_unscaled || 'Unscaled', pc.lpn_ds_col_unscaled_tip]
-		], { state: dsSortState.p, by: function (col) { dsSortBy('p', col); } });
+		].concat(set.wholeRun ? [pc.lpn_ff_col_hour || 'Lowest at'] : []), { state: dsSortState.p, by: function (col) { dsSortBy('p', col); } });
 		dsSortRows(set.pressures.slice(0, DS_ROWS), dsSortState.p, 'pressure').forEach(function (x) {
 			var tr = ffEl('tr', x.pressure < set.minPressure ? 'lpn-crit-impact' : null, null, body);
 			ffGotoLink(ffCell(tr, ''), 'node', x.id, labelPrefixFor('node', 'id') + x.id);
 			ffCell(tr, ffMaybeQty(x.pressure, 'lpn_u_pressure'));
 			ffCell(tr, ffMaybeQty(x.unscaled, 'lpn_u_pressure'));
+			if (set.wholeRun) { ffCell(tr, typeof x.t === 'number' ? dsTimeText(x.t) : FF_DASH); }
 		});
 		ffMoreLine(host, set.pressures.length - Math.min(DS_ROWS, set.pressures.length));
 		ffEl('div', 'lpn-ff-head', pc.lpn_ds_head_velocity || 'Highest velocities', host);
@@ -78377,7 +78416,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// and the refusal replaces that part's last answer (`which`), which no longer answers the
 	// question now on screen. See dsRefused.
 	function demandScaleCase(which) {
-		var pc = EngCalcs.pageConfig || {}, model, ids = null, isJ = {}, skipped = 0;
+		var pc = EngCalcs.pageConfig || {}, model, ids = null, isJ = {}, skipped = 0, whole;
 		function refuse(text) {
 			setNotice(text);
 			dsRefused = { which: which, text: text };
@@ -78386,8 +78425,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return null;
 		}
 		if (dsRefused && dsRefused.which === which) { dsRefused = null; }
+		whole = dsWhen() === 'run';
 		model = assembleModel();
-		fireFlowAtFrame(model);
+		// The whole run starts from the project's own starting state (Task 578).
+		if (!whole) { fireFlowAtFrame(model); }
 		model.nodes.forEach(function (n) { if (n.type === 'junction') { isJ[n.id] = true; } });
 		if (!Object.keys(isJ).length) {
 			return refuse(pc.lpn_ds_no_junctions || 'This project has no junctions yet, so there are no demands to scale.');
@@ -78405,7 +78446,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					.replace('{n}', String(skipped)));
 			}
 		}
-		return { model: model, ids: ids, engine: engineFor(model), time: dsNow() };
+		// One EPANET run per solve, the answer handed on whole: each node's lowest pressure over the
+		// run, and whether a tank emptied.
+		return { model: model, ids: ids, whole: whole, time: whole ? null : dsNow(),
+			engine: whole ? { epanet: true, solve: function (m) {
+				return EngCalcs.lpnEpanetRun(m, {}).then(function (run) { return EngCalcs.lpnEpsRunResult(run, m, { beforeEmpty: true }); });
+			} } : engineFor(model) };
 	}
 	function dsBegin() {
 		dsBusy = true;
@@ -78455,6 +78501,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}).then(function (set) {
 			if (c.ids) { set.scaledCount = c.ids.length; }
 			set.time = c.time;
+			if (c.whole) { set.wholeRun = true; }
 			dsRun = set;
 			dsEnd(before);
 			dsScrollTo('scale');
@@ -78478,6 +78525,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}).then(function (s) {
 			if (c.ids) { s.scaledCount = c.ids.length; }
 			s.time = c.time;
+			if (c.whole) { s.wholeRun = true; }
 			dsSearch = s;
 			dsEnd(before);
 			dsScrollTo('search');

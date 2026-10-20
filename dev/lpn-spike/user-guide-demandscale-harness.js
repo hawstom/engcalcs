@@ -53,7 +53,7 @@ async function main() {
 		await settle(1000);
 		const ins = () => P.evaluate(() => Array.from(document.querySelectorAll('#lpn_ds_controls input, #lpn_ds_controls select')).map((e) => e.value));
 		const def = await ins();
-		ok('the box opens with all junctions, 20 psi, and a demand scale of 2', JSON.stringify(def) === JSON.stringify(['all', '20', '2']), JSON.stringify(def));
+		ok('the box opens with all junctions, the time step on screen, 20 psi, and a demand scale of 2', JSON.stringify(def) === JSON.stringify(['all', 'now', '20', '2']), JSON.stringify(def));
 		const press = async (label, until) => {
 			await P.evaluate((t) => { Array.from(document.querySelectorAll('#lpn_ds_box button')).filter((x) => x.textContent.trim() === t)[0].click(); }, label);
 			await a.waitFor(() => P.evaluate((u) => document.getElementById('lpn_ds_box').innerText.indexOf(u) >= 0, until), 'result ' + until, 90000);
