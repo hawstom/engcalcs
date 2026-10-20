@@ -231,15 +231,12 @@ the block.
   - `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and the shed's victims rather than
     the count, so a model change that oscillates is caught instead of averaged away -- which is how
     the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
-- 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
-  Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
-  kept here so they are not lost in a closed block.
-  - **Picking an EPS frame.** The sweep answers one instant. A project with a clock has many, and
-    the honest question is which one a fire flow is checked at -- maximum day is the convention, and
-    the page has no way to say "run the sweep at hour 14".
-  - **The Run concept, in Tom's own sketch (2026-08-27):** *"a Run names a scenario among its
-    parameters."* A named Run would carry the scenario, the required flow, the residual and the
-    frame together, so a report says what it was a report OF.
+- 75|578| **Fire flow: the Run concept, extracted from 530.**
+  The EPS frame is built (Tom, 2026-10-19: *"why our fire flow analysis can't do an entire EPS"*): fire flow,
+  criticality and demand scaling each choose the step on screen or the whole run; see
+  `dev/lpn-spike/eps-analysis-harness.js`. What remains is the Run concept, in Tom's own sketch
+  (2026-08-27): *"a Run names a scenario among its parameters."* A named Run would carry the scenario,
+  the required flow, the residual and the frame together, so a report says what it was a report OF.
 - 75|623| **File loss judged only by people whose files are throwaway.**
   **TOM, 2026-09-18: *"I don't see anything actionable. Describe better or remove the task."* He is
   right and the [H] tag is struck: this was never a decision waiting on him, it was a STANDING
@@ -344,8 +341,6 @@ the block.
   what remains.
 - 75|813| **Pre-processing the network for label placement: methods, benefits, results.**
   Tom, 2026-10-17: *"continue our project toward inquiry about the hows/methods and whys/benefits/results of pre-processing the network for label placement efficiency."* Design and first experiment: `dev/label-trials/preprocessing-inquiry.md` on `docs/label-port`.
-- 75|816| **Give each User Guide chapter its own address in each language.**
-  Tom, 2026-10-17: *"Is the user manual crawlable and indexable by Google? And if so, how soon would we expect to be able to ask Google or Gemini or even Claude, Perplexity, Deepseek, Grok, or ChatGPT how scenarios work in EPANET++?"* Crawlable today, but the whole guide sits inside the app page, one address per language, so a search about one topic has no page to land on. A chapter page per language fixes that; each new page owes the parent site's `sitemap.xml` a regenerate (Tom, 2026-10-17: *"Yes, add it at 75."*).
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted

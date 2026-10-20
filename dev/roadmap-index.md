@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**81 open tasks.** Next (100): 7 · Soon (75): 10 · Someday (50): 28 · Maybe (25): 16 · Parked (5): 20
+**80 open tasks.** Next (100): 7 · Soon (75): 9 · Someday (50): 28 · Maybe (25): 16 · Parked (5): 20
 
 ## 100 — Next (7)
 
@@ -19,10 +19,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 812 — Port the label bench's proven findings to master, one branch each.
 - Task 814 — Classify every import and export by its scenario awareness.
 
-## 75 — Soon (10)
+## 75 — Soon (9)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
-- Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
+- Task 578 — Fire flow: the Run concept, extracted from 530.
 - Task 623 — File loss judged only by people whose files are throwaway.
 - Task 676 — Watch the sites, and send a derived weekly report.
 - Task 720 — Background layers from a GIS server.
@@ -30,7 +30,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
 - Task 809 — Finish the translation-clarification follow-ups at the next sprint.
 - Task 813 — Pre-processing the network for label placement: methods, benefits, results.
-- Task 816 — Give each User Guide chapter its own address in each language.
 
 ## 50 — Someday (28)
 
@@ -109,5 +108,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-73 of 81 titles are within 4–12 words. `!` marks the rest;
+72 of 80 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

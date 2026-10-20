@@ -182,6 +182,28 @@ additive if a real case for one ever appears.
 
 ---
 
+### 2.3 Space at the edges, and the curve of difficulty (Tom, 2026-10-18)
+
+From his browser pass of `feat/label-form`, quoted:
+
+- *"Many networks at many zoom levels are finite. For them, take advantage of the infinite space at
+  their edges to stack one-line leaders tidily."* An opportunistic standard, not yet scheduled: a
+  zoomed-out finite network can stack its edge labels in tidy columns of one-line labels on leaders.
+- *"Some networks or some zoom levels are either infinite or much bigger than a reasonable leader
+  reach. For them, we drop things when we must."*
+- *"There very often is a curve of difficulty for label placement where very close zooms are
+  trivial to solve, very far zooms are easy to solve with tidy columns of one-line labels, and
+  mid-level zooms are crowded and difficult."*
+- *"I hope that we are successfully (a) ignoring off-screen parts of the network and (b)
+  pre-processing the network geometry and saving placement solutions across sessions if feasible,
+  and obviously across zooms."* Not yet checked against the code.
+- Leaders: *"I would like to see leaders used sooner/shorter. ... except for a leader with less
+  than a text height of length, we want to show all labels connected with a leader."*
+- *"I think it would be okay for pipes to run through one-line node labels."*
+- *"Rearranging themselves is low cost as a design value. I think we can approve the increase"*
+  (the slower pass per zoom notch). *"What we need to be aiming for is 'Use attractive available
+  space opportunistically' and 'Be efficient'."*
+
 ## 3. The method
 
 Placement has **two outcomes, placed and dropped.** Free link labels and dragged labels are scored
@@ -283,8 +305,28 @@ reduce font → abbreviate → key-number, in the listed order. We have none of 
 is:
 
 ```
-shed trailing values (per §2.2's link order) → hide the label
+shed trailing values (per §2.2's link order) → set it level beside its pipe → hide the label
 ```
+
+**The level rung (Task 812, `placeLevelPipeLabels()`).** A lone pipe label, with "along the pipe"
+on, that shed to its last value and is still crowded, found no clear station, yielded its ground
+to a node label, or is too long for its segment, is tried level beside its pipe as a free label with a leader, after every other
+label is placed and only where it breaks no never-rule, and only where a reader can tell its pipe:
+it carries a leader from its pipe whenever it is more than 0.6 of a font size off it, and a side
+nearer than that must leave its own pipe the nearest pipe to its rows. Its leader starts at the
+pipe's middle, or, when every side there is taken, at the nearest clear station (0.5, 0.35, 0.65,
+0.2, 0.8 of the pipe). Once every level label has its smallest form, each may take another form:
+more of its values, one line or a stack, whichever shows more (Tom, 2026-10-18: *"Whichever shows
+more"*), at the station it stands on, without costing any other label its place. The hide stays the
+terminal rung.
+
+**A node label's two forms (Tasks 734 and 812, `tryInlineNodeLabels()`).** A node label is a stack,
+or its fields on one line, in the same order with the page's separator, east or west of its node.
+The stacked layout is decided first, shed, repaired and crossing-hidden as always; then a node label
+it dropped or shed values from tries its full content on one line, set into the ground that layout
+leaves, only where the line is clear of every label, symbol, Text, pipe and pipe label, on the map
+and off its legends, no wider than a quarter of the map. Nothing else moves, so no node label is
+hidden, shortened or loses its ID for it.
 
 **THE CASCADE HAS TWO ENTRANCES AND NEEDS THE SAME EXIT FOR BOTH.** A label enters it because it is
 too long for its segment, or because it conflicts with a neighbour — and for a long time only the

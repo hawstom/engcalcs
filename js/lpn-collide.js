@@ -813,12 +813,15 @@ EngCalcs.lpnCollide = (function () {
 			// obstacles are then scored against all seventeen candidates -- measured at 79ms against
 			// 43ms for the honest circle on a 220-label drawing. A broad-phase index that hands its
 			// output straight to the narrow phase is not an optimisation, it is a bigger problem.
+			// A query wider than one cell (a strict label's bigger form, growOne()) walks as many rings
+			// of cells as it needs; within one cell it is the 3x3 block, as it always was.
 			near: function (x, y, r, out) {
-				var i0 = Math.floor(x / cell) - 1, j0 = Math.floor(y / cell) - 1, i, j, c, k, idx, o;
+				var span = r > cell ? Math.ceil(r / cell) : 1,
+					i0 = Math.floor(x / cell) - span, j0 = Math.floor(y / cell) - span, i, j, c, k, idx, o;
 				stamp++;
 				out.boxes.length = 0; out.segments.length = 0;
-				for (i = i0; i <= i0 + 2; i++) {
-					for (j = j0; j <= j0 + 2; j++) {
+				for (i = i0; i <= i0 + 2 * span; i++) {
+					for (j = j0; j <= j0 + 2 * span; j++) {
 						c = cells.get(key(i, j));
 						if (!c) { continue; }
 						for (k = 0; k < c.boxes.length; k++) {
@@ -1169,13 +1172,22 @@ EngCalcs.lpnCollide = (function () {
 		// offset -- and `dev/lpn-spike/label-priority-harness.js`'s soundness assertion is what
 		// found it. So: furthest candidate endpoint, plus the label's full diagonal beyond it, plus
 		// the pad. Erring wide costs a few tests; erring narrow drops the assertion's whole point.
-		labels.forEach(function (l) {
+		function reachOf(l) {
 			var far = 0, i, s = l.sides && l.sides.length ? l.sides : [l.home];
 			for (i = 0; i < s.length; i++) {
-				far = Math.max(far, Math.hypot(s[i].x - l.anchor.x, s[i].y - l.anchor.y));
+				// A side may hang off its own point (`anchor`, a strict pipe label's other station);
+				// the ground round that point is asked for when the sweep reaches it.
+				var a = s[i].anchor || l.anchor;
+				far = Math.max(far, Math.hypot(s[i].x - a.x, s[i].y - a.y));
 			}
-			l._reach = far + Math.hypot(l.w, l.h) + pad;
+			return far + Math.hypot(l.w, l.h) + pad;
+		}
+		labels.forEach(function (l) {
+			l._reach = reachOf(l);
 			maxReach = Math.max(maxReach, l._reach);
+			// A strict label's other forms (`forms`, below) are NOT counted into the cell: growOne()
+			// asks for its wider ground by walking more cells, and a cell sized for the biggest form of
+			// any label made every other query on the drawing slower.
 		});
 		index = grid(maxReach, obs);
 		obs.boxes.forEach(function (b, i) { index.addBox(i); });
@@ -1204,31 +1216,102 @@ EngCalcs.lpnCollide = (function () {
 		// 23.9 per 100 shown, leaders through a node 697 -> 407, the page pass about 8% slower.
 		// `opts.clean === false` is the old single sweep, kept for the harness that measures it.
 		var clean = opts.clean !== false, waiting = [], seat = {};
+		// **STRICT: A SIDE IS TAKEN ONLY IF IT BREAKS NOTHING** (the level pipe label, dev/label-trials/port-plan.md Step 3). The
+		// labels handed in strictly are ones that would otherwise hide, so there is no fallback that
+		// costs a neighbour: a side held by a yielding label is blocked, the label may not lie on its
+		// own pipe (`ownLink`, R7: beside it, not on it), and a leader long enough to be drawn
+		// (`leaderMin`) may not pass through a symbol (N3), through a label, or across another
+		// leader. Its leader is committed with its rows, so a later label keeps off it.
+		// `lastPad` is the air the last sweep asks of a strict label, which has no other spot left;
+		// the slide along a pipe makes the same bargain (touching a neighbour beats hiding).
+		var strict = !!opts.strict, leaderMin = opts.leaderMin > 0 ? opts.leaderMin : 0,
+			lastPad = opts.lastPad >= 0 ? opts.lastPad : pad;
+		// `near` (a margin): a side too close to draw a leader must leave the label's own pipe the
+		// nearest one (ownPipeNearest()).
+		var nearMargin = opts.near >= 0 ? opts.near : -1;
+		// `quietMax`: out to this distance, a side whose leader cannot be drawn clean may still be taken
+		// without one (`lbl._quiet`) where its own pipe is plainly the nearest; every other side beyond
+		// `leaderMin` says whose it is with a leader.
+		var quietMax = opts.quietMax > leaderMin ? opts.quietMax : leaderMin;
+		// `clear`: the clean sweep and growth ask more of a side with a leader too: that its own pipe
+		// be the nearest to its rows (pre-review, 2026-10-18: Net1's "Q=1866.2" sat under the next
+		// pipe with its leader running back to its own). Only the last sweep, for a label with no
+		// such side, lets the leader alone say whose it is.
+		function strictOk(lbl, c, b, clear) {
+			var dist = Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y), far = dist > leaderMin,
+				near = function () { return nearMargin < 0 || lbl.ownLink === undefined || ownPipeNearest(b, local, lbl.ownLink, nearMargin); };
+			lbl._quiet = false;
+			if (lbl.ownLink !== undefined && boxesOnOwnLink(b, local, lbl.ownLink)) { return false; }
+			// A side near enough to draw no leader must say whose label it is by being nearest its own
+			// pipe; one far enough out to carry a leader says it with the leader.
+			if (!far) { return near(); }
+			// The leader first; only where no clean leader can be drawn (one starting inside an end
+			// node's symbol, on a pipe shorter than its own symbols) does a quiet side stand in.
+			if (leaderClear(lbl, c)) { return !clear || lbl.ownLink === undefined || ownPipeNearest(b, local, lbl.ownLink, 0); }
+			if (dist <= quietMax && near()) { lbl._quiet = true; return true; }
+			return false;
+		}
+		function leaderClear(lbl, c) {
+			var g = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id), i, o;
+			// Every symbol counts, the one round the anchor included: a pipe's anchor is no node's
+			// own, so a leader starting inside an end node's symbol runs through it.
+			for (i = 0; i < local.boxes.length; i++) {
+				o = local.boxes[i];
+				if (o.owner !== undefined && o.owner === lbl.id) { continue; }
+				if (segmentInBoxFraction(g, o) > 0) { return false; }
+			}
+			for (i = 0; i < local.segments.length; i++) {
+				o = local.segments[i];
+				if (o.owner !== undefined && o.owner === lbl.id) { continue; }
+				if (o.kind === 'leader' && segmentsCross(g, o)) { return false; }
+			}
+			return true;
+		}
 		function sidesOf(lbl) { return lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home]; }
 		function commit(lbl, sides, c, b) {
 			// EVERY line box is committed, so the next label sees the staircase this one really
 			// occupies rather than a rectangle around it.
 			b.forEach(function (cb) { index.addBox(obs.boxes.push(cb) - 1); });
+			var lead = null;
+			if (strict && !lbl._quiet && Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y) > leaderMin) {
+				lead = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id);
+				index.addSegment(obs.segments.push(lead) - 1);
+			}
 			return { id: lbl.id, x: c.x, y: c.y, dx: c.x - lbl.home.x, dy: c.y - lbl.home.y,
-				dropped: false, side: sides.indexOf(c),
+				dropped: false, side: sides.indexOf(c), anchor: c.anchor ? { x: c.anchor.x, y: c.anchor.y } : undefined,
 				// `box` stays the ONE box a reader draws and counts (?debug=boxes, the bench's
 				// overlap count); `boxes` is what the pass actually reserved.
-				box: labelBoxAtEnd(lbl, c), boxes: b, leader: null };
+				box: labelBoxAtEnd(lbl, c), boxes: b, leader: lead };
 		}
 		// The first sweep: CLEAN ground only. It also notes the first side that was not blocked
 		// outright, because ground only fills up between the sweeps: every side before that one is
 		// still blocked when the last sweep comes back for this label, so it starts there.
 		var startAt = {};
+		// **A SIDE MAY CARRY ITS OWN POINT** (`c.anchor`): a strict pipe label tried from another
+		// station of its pipe when its own point is boxed in, its leader drawn from there. The
+		// label's anchor is lent to the side for the tests and given back after.
 		function placeClean(lbl) {
+			var a0 = lbl.anchor;
+			try { return placeClean0(lbl, a0); } finally { lbl.anchor = a0; }
+		}
+		function placeAny(lbl, from) {
+			var a0 = lbl.anchor;
+			try { return placeAny0(lbl, from, a0); } finally { lbl.anchor = a0; }
+		}
+		function placeClean0(lbl, a0) {
 			var sides = sidesOf(lbl), i, c, b, verdict, first = -1;
-			index.near(lbl.anchor.x, lbl.anchor.y, lbl._reach, local);
+			var at = a0;
+			index.near(a0.x, a0.y, lbl._reach, local);
 			for (i = 0; i < sides.length; i++) {
 				c = sides[i];
+				lbl.anchor = c.anchor || a0;
+				if (lbl.anchor !== at) { at = lbl.anchor; index.near(at.x, at.y, lbl._reach, local); }
 				b = labelLineBoxes(lbl, c);
 				verdict = boxesClearOf(b, local, pad, lbl.id);
 				if (verdict === 'blocked') { continue; }
 				if (first < 0) { first = i; }
-				if (verdict === 'clear' && !boxesOnLink(b, local, lbl.id) && !leaderThroughSymbol(lbl, c, local)) {
+				if (verdict === 'clear' && !boxesOnLink(b, local, lbl.id) && !leaderThroughSymbol(lbl, c, local) &&
+						(!strict || strictOk(lbl, c, b, true))) {
 					return commit(lbl, sides, c, b);
 				}
 			}
@@ -1237,15 +1320,42 @@ EngCalcs.lpnCollide = (function () {
 		}
 		// The last sweep, and the whole of the pass when `clean` is off: the first clear side, a pipe
 		// under it or not, else the first side held only by labels this one outranks, else a drop.
-		function placeAny(lbl, from) {
-			var sides = sidesOf(lbl), i, c, b, verdict, fallback = null, fallbackBox = null;
-			index.near(lbl.anchor.x, lbl.anchor.y, lbl._reach, local);
+		function placeAny0(lbl, from, a0) {
+			var sides = sidesOf(lbl), i, c, b, verdict, fallback = null, fallbackBox = null, fallbackAt = a0, fallbackAcross = false;
+			var at = a0;
+			index.near(a0.x, a0.y, lbl._reach, local);
 			for (i = from || 0; i < sides.length; i++) {
 				c = sides[i];
+				// A side offered for clean ground only (`cleanOnly`, a level label's other stations)
+				// is not asked again here.
+				if (c.cleanOnly) { continue; }
+				lbl.anchor = c.anchor || a0;
+				if (lbl.anchor !== at) { at = lbl.anchor; index.near(at.x, at.y, lbl._reach, local); }
+				// `leaderClean`: a label whose leader may never pass through another node's symbol, even
+				// here (a one-line node label, Task 734: its ring reaches further east and west).
+				if (lbl.leaderClean && leaderThroughSymbol(lbl, c, local)) { continue; }
+				// `offLinks`: a label no pipe may run through, even here (a one-line node label: a
+				// pipe through a line of text strikes it through, pre-review 2026-10-18).
+				if (lbl.offLinks && boxesOnLink(labelLineBoxes(lbl, c), local, lbl.id)) { continue; }
 				// The STAIRCASE, not the block (Task 406): asking about the block would call a side
 				// occupied because of ground the short rows never cover.
 				b = labelLineBoxes(lbl, c);
-				verdict = lbl.dragged ? 'clear' : boxesClearOf(b, local, pad, lbl.id);
+				verdict = lbl.dragged ? 'clear' : boxesClearOf(b, local, strict ? lastPad : pad, lbl.id);
+				if (strict) {
+					// A side whose own pipe is the nearest wins; one that only its leader explains is
+					// kept as the fallback, taken if no clearer side follows.
+					if (verdict !== 'clear') { continue; }
+					if (strictOk(lbl, c, b, true)) { return commit(lbl, sides, c, b); }
+					// Across another pipe it reads as that pipe's whatever its leader says (pre-review,
+					// 2026-10-18, Net1's "Q=1866.2" on pipe 111), so such a side is the last resort,
+					// taken only where nothing else stands -- better than hiding the label (Net1's
+					// pipe 11, whose only room lies across its neighbours).
+					if ((!fallback || fallbackAcross) && strictOk(lbl, c, b)) {
+						var across = lbl.ownLink !== undefined && boxesOnLink(b, local, lbl.id);
+						if (!fallback || !across) { fallback = c; fallbackBox = b; fallbackAt = lbl.anchor; fallbackAcross = across; }
+					}
+					continue;
+				}
 				if (verdict === 'clear') { return commit(lbl, sides, c, b); }
 				// **A SIDE HELD ONLY BY SOMETHING THIS LABEL OUTRANKS IS KEPT AS A FALLBACK, not
 				// taken immediately.** A genuinely clear side on the other hand is still better, so
@@ -1253,7 +1363,15 @@ EngCalcs.lpnCollide = (function () {
 				// such a side existed is the ranking working backwards.
 				if (verdict === 'yielding' && !fallback) { fallback = c; fallbackBox = b; }
 			}
-			if (fallback) { return commit(lbl, sides, fallback, fallbackBox); }
+			if (fallback) {
+				if (strict) {
+					// Asked again where it stands, so the leader-or-quiet answer is this side's.
+					lbl.anchor = fallbackAt;
+					if (lbl.anchor !== at) { at = lbl.anchor; index.near(at.x, at.y, lbl._reach, local); }
+					strictOk(lbl, fallback, fallbackBox);
+				}
+				return commit(lbl, sides, fallback, fallbackBox);
+			}
 			// **DROPPED: NOTHING IS COMMITTED.** A label nobody can see is not an obstacle, so it
 			// must not go into the index -- otherwise it keeps ground clear for a label that is not
 			// drawn, and the drawing ends up emptier than the conflict warranted.
@@ -1265,13 +1383,109 @@ EngCalcs.lpnCollide = (function () {
 			if (r) { seat[lbl.id] = r; } else { waiting.push(lbl); }
 		});
 		waiting.forEach(function (lbl) { seat[lbl.id] = placeAny(lbl, startAt[lbl.id]); });
+		// **A STRICT LABEL'S OTHER FORMS: WHICHEVER SHOWS MORE** (Tom, 2026-10-18, asked which form a
+		// label should take when more than one fits: *"Whichever shows more"*). `lbl.forms` is a list
+		// of other shapes of the same label, { w, h, lines, nVal (how many values it shows) }, the caller's order being the
+		// order of preference among equals. Each is a fact about this label alone, so they come
+		// AFTER every label has its smallest form, and no label's growth costs another its place:
+		//   1. a label that found no side in its own form tries the others with the same number of
+		//      values (a stack where one line would not fit, or the reverse);
+		//   2. then, in drop order, every seated label tries the forms that show MORE values, most
+		//      first, on all its sides, against everything seated, and takes the first that fits.
+		// A label that moves to a bigger form gives back the ground of the smaller one, by moving
+		// its committed rows and leader out of the world, so a later label sees the ground free.
+		// The result says which form won (`form`, an index into `forms`; absent for the label's own).
+		var GROW_SLACK = 1;
+		function bury(r) {
+			(r.boxes || []).forEach(function (b) { b.cx = b.cy = 1e300; b.w = b.h = 0; });
+			if (r.leader) { r.leader.ax = r.leader.bx = r.leader.ay = r.leader.by = 1e300; }
+		}
+		function tryForm(lbl, f) {
+			var g = Object.assign({}, lbl, f), r;
+			g._reach = reachOf(g);
+			r = placeClean(g);
+			if (!r) { r = placeAny(g, 0); }
+			return r && !r.dropped ? r : null;
+		}
+		// **GROWING, A LABEL STAYS WHERE IT STANDS, OR AS NEAR**: the side it holds first, then the
+		// sides of its station no further out than that one (GROW_SLACK of its height more), on the
+		// last sweep's terms. The ground round it is asked for ONCE, wide enough for its biggest form,
+		// and every form is tried against that; measured on the 600-junction network, asking again
+		// per form was most of the growth's time.
+		function growOne(lbl, r) {
+			var all = sidesOf(lbl), at = all[r.side], a = r.anchor || lbl.anchor, a0 = lbl.anchor,
+				key = r.anchor ? r.anchor.x + ',' + r.anchor.y : '', d0, sides, now, want, k, i, f, g, b, c, nr, grew, reach = 0;
+			if (!at) { return r; }
+			d0 = Math.hypot(at.x - a.x, at.y - a.y);
+			sides = [at].concat(all.filter(function (q) {
+				return q !== at && (q.anchor ? q.anchor.x + ',' + q.anchor.y : '') === key &&
+					Math.hypot(q.x - a.x, q.y - a.y) <= d0 + GROW_SLACK * lbl.h;
+			}));
+			// Within the index's own cell (maxReach), which every form's reach was counted into.
+			var diag = Math.hypot(lbl.w, lbl.h);
+			sides.forEach(function (q) { reach = Math.max(reach, Math.hypot(q.x - a.x, q.y - a.y)); });
+			lbl.forms.forEach(function (q) { diag = Math.max(diag, Math.hypot(q.w, q.h)); });
+			reach += diag + pad;
+			now = r.form === undefined ? (lbl.nVal || 0) : (lbl.forms[r.form].nVal || 0);
+			index.near(a.x, a.y, reach, local);
+			try {
+				for (;;) {
+					want = Infinity;
+					lbl.forms.forEach(function (q) { if ((q.nVal || 0) > now && q.nVal < want) { want = q.nVal; } });
+					if (want === Infinity) { return r; }
+					grew = false;
+					for (k = 0; k < lbl.forms.length && !grew; k++) {
+						f = lbl.forms[k];
+						if ((f.nVal || 0) !== want) { continue; }
+						g = Object.assign({}, lbl, f);
+						g.anchor = a;
+						for (i = 0; i < sides.length; i++) {
+							c = sides[i];
+							b = labelLineBoxes(g, c);
+							if (boxesClearOf(b, local, lastPad, lbl.id) !== 'clear' || !strictOk(g, c, b, true)) { continue; }
+							nr = commit(g, all, c, b);
+							if (c.anchor) { nr.anchor = { x: c.anchor.x, y: c.anchor.y }; }
+							bury(r);
+							nr.form = k;
+							seat[lbl.id] = r = nr;
+							grew = true;
+							// What it just took is ground the next form must keep off, bar its own.
+							index.near(a.x, a.y, reach, local);
+							break;
+						}
+					}
+					if (!grew) { return r; }
+					now = want;
+				}
+			} finally { lbl.anchor = a0; }
+		}
+		if (strict) {
+			order.forEach(function (lbl) {
+				var r = seat[lbl.id], k, nr, own = lbl.nVal || 0;
+				if (!r || !r.dropped || !lbl.forms) { return; }
+				for (k = 0; k < lbl.forms.length; k++) {
+					if ((lbl.forms[k].nVal || 0) !== own) { continue; }
+					nr = tryForm(lbl, lbl.forms[k]);
+					if (nr) { nr.form = k; seat[lbl.id] = nr; return; }
+				}
+			});
+			// **ONE VALUE MORE AT A TIME, AND IT STOPS AT THE FIRST COUNT NOTHING FITS.** A form with
+			// one value more covers the ground of the form below it in the same shape, so where every
+			// form of n values fails, every form of more fails too; climbing finds the same most-values
+			// form as trying the biggest first, and a label with no room asks two forms, not all.
+			order.forEach(function (lbl) {
+				var r = seat[lbl.id];
+				if (!r || r.dropped || !lbl.forms) { return; }
+				growOne(lbl, r);
+			});
+		}
 		// The result keeps the drop order, so a reader of `out` sees the same sequence either way.
 		order.forEach(function (lbl) { out.push(seat[lbl.id]); });
 		// **THE INPUTS COME BACK EXACTLY AS THEY WENT IN.** placeLabels() makes the same promise, and
 		// for the same reason: a pass that scribbles on its arguments cannot be run twice on one
 		// drawing to check that it agrees with itself, which is the cheapest strong assertion there
 		// is -- and it is asserted.
-		labels.forEach(function (l) { delete l._reach; });
+		labels.forEach(function (l) { delete l._reach; delete l._quiet; });
 		return out;
 	}
 	// **CLEAR MEANS CLEAR OF THE HARD OBSTACLES, AND THE RANKS SAY WHICH THOSE ARE.** A first-fit has
@@ -1344,6 +1558,54 @@ EngCalcs.lpnCollide = (function () {
 		return false;
 	}
 
+	// The distance from a segment to a box, 0 where they meet: the segment is turned into the box's
+	// own frame, then it is the nearer of its ends to the rectangle and the rectangle's corners to it.
+	function segmentBoxDistance(g, b) {
+		var r = -(b.a || 0) * Math.PI / 180, c = Math.cos(r), s = Math.sin(r), hw = b.w / 2, hh = b.h / 2;
+		function loc(x, y) { var dx = x - b.cx, dy = y - b.cy; return { x: dx * c - dy * s, y: dx * s + dy * c }; }
+		var p = loc(g.ax, g.ay), q = loc(g.bx, g.by), best = Infinity, i, k;
+		if (segmentInBoxFraction(g, b) > 0) { return 0; }
+		function ptRect(t) { var dx = Math.max(Math.abs(t.x) - hw, 0), dy = Math.max(Math.abs(t.y) - hh, 0); return Math.hypot(dx, dy); }
+		function ptSeg(t) {
+			var vx = q.x - p.x, vy = q.y - p.y, L2 = vx * vx + vy * vy, u = L2 ? ((t.x - p.x) * vx + (t.y - p.y) * vy) / L2 : 0;
+			u = u < 0 ? 0 : (u > 1 ? 1 : u);
+			return Math.hypot(p.x + vx * u - t.x, p.y + vy * u - t.y);
+		}
+		best = Math.min(ptRect(p), ptRect(q));
+		for (i = -1; i <= 1; i += 2) { for (k = -1; k <= 1; k += 2) { best = Math.min(best, ptSeg({ x: i * hw, y: k * hh })); } }
+		return best;
+	}
+	// IS ITS OWN PIPE THE NEAREST ONE? The level rung's reading test: a level label with no leader
+	// says which pipe it belongs to only by being nearer that pipe than any other, by `margin` at
+	// least. Measured to the rows; asked of the pipes in reach (`local`).
+	function ownPipeNearest(boxes, obs, ownLink, margin) {
+		var own = Infinity, i, j, o, d;
+		for (j = 0; j < obs.segments.length; j++) {
+			o = obs.segments[j];
+			if (o.kind !== 'link' || o.owner !== ownLink) { continue; }
+			for (i = 0; i < boxes.length; i++) { d = segmentBoxDistance(o, boxes[i]); if (d < own) { own = d; } }
+		}
+		if (own === Infinity) { return false; }
+		for (j = 0; j < obs.segments.length; j++) {
+			o = obs.segments[j];
+			if (o.kind !== 'link' || o.owner === ownLink) { continue; }
+			for (i = 0; i < boxes.length; i++) { if (segmentBoxDistance(o, boxes[i]) < own + margin) { return false; } }
+		}
+		return true;
+	}
+	// Does any row lie on the label's OWN pipe? The strict first-fit's R7 test: a level pipe label
+	// sits beside its pipe, not across it. `ownLink` is the owner its pipe's segments carry.
+	function boxesOnOwnLink(boxes, obs, ownLink) {
+		var i, j, o;
+		for (j = 0; j < obs.segments.length; j++) {
+			o = obs.segments[j];
+			if (o.kind !== 'link' || o.owner !== ownLink) { continue; }
+			for (i = 0; i < boxes.length; i++) {
+				if (segmentInBoxFraction(o, boxes[i]) > 0) { return true; }
+			}
+		}
+		return false;
+	}
 	// Does the leader from the anchor to this endpoint pass through a symbol not its own (N3)? The
 	// first-fit draws no leader itself, but the renderer does, so ground reached across another
 	// node's symbol is not clean. The anchor's own symbol is the one that contains the anchor.
@@ -2060,6 +2322,8 @@ EngCalcs.lpnCollide = (function () {
 		placeLabelsFirstFit: placeLabelsFirstFit,
 		boxClearOf: boxClearOf,
 		boxesClearOf: boxesClearOf,
+		segmentBoxDistance: segmentBoxDistance,
+		ownPipeNearest: ownPipeNearest,
 		labelLineBoxes: labelLineBoxes,
 		RING_ANGLES: RING_ANGLES,
 		box: box,

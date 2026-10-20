@@ -105,7 +105,14 @@ const L = loadLoopedNetwork(
 	"\t\tmaxRungs: nodeShedMaxRungs,\n" +
 	"\t\trankedNodeFields: function () { return Object.keys(labelSettings.priority.node); },\n" +
 	"\t\tshedOrder: nodeShedOrder,\n" +
-	"\t\tfs: effectiveFontSize, scale: function () { return state.s; }"
+	"\t\tfs: effectiveFontSize, scale: function () { return state.s; }",
+	null,
+	// **THE SHED ALONE, WITHOUT THE ONE-LINE TRIAL BEFORE IT** (Task 734). tryInlineNodeLabels()
+	// runs first and seats some of the labels this harness counts shedding, so the pair rule's floor
+	// below would be measuring the trial too. Every other pass runs as shipped.
+	function (src) {
+		return src.replace("placed = perfDebugAccum('  ns:inline', function () { return tryInlineNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf); });", '');
+	}
 );
 L.buildLayers();
 L.setCanvas(1400, 900);

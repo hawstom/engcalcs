@@ -6133,3 +6133,14 @@ textarea.lpn-desc-ta {
 	.lpn-gjnet-table td[data-label]::before { content: attr(data-label) ": "; }
 	.lpn-gjnet-table select { max-width: 100%; }
 }
+
+/* The User Guide's chapter pages (Task 816): a reading measure, like the legal pages. */
+.ec-guide-page { max-width: 48rem; margin: 0 auto; padding: 1rem 16px 2rem; background: var(--ec-bg); color: var(--ec-ink); }
+.ec-guide-page h1 { font-size: 1.6rem; margin: 1rem 0 .75rem; }
+.ec-guide-page h2 { font-size: 1.2rem; margin-top: 1.5rem; }
+.ec-guide-page dt { font-weight: bold; margin-top: .9rem; }
+.ec-guide-page dt.lpn-guide-dup { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; margin: 0; }
+.ec-guide-page dd { margin-inline-start: 0; }
+.ec-guide-top a, .ec-guide-langs a { margin-inline-end: 1rem; }
+.ec-guide-langs { margin-top: 1.5rem; font-size: .9rem; }
+.ec-guide-langs a { display: inline-block; }
