@@ -5,6 +5,12 @@
 - **Rank honestly, including against myself.** Something I found is not thereby important.
 - **State the case once and do not campaign.**
 
+## 0q. Task 818 (MCP): matrix done 2026-10-20; remaining items (updated 2026-10-20)
+DONE: read all four servers' tools in source (journal 2026-10-20 second entry). Gap verified: no fire flow, no criticality sweep, no open-in-app link in KWR (8 tools), Eurecat (44), hjlrosales (33), Tamrakar (5, and it does not run EPANET). Recommended first slice: fire_flow at a named node plus the open-in-app link.
+1. A practitioner source for what engineers ask AI to do with a model (AWWA, Bentley/Autodesk community, r/CivilEngineering, eng-tips). Still only research papers. Cost: a morning; may return nothing.
+2. KWR IAHR paper (iahr.org/library/info?pid=40549, and pid=40712 the agentic one) tested chatbots and user tasks: unread. Cost: an hour.
+3. Re-check the four servers in 90 days: all are under five months old and the newest is five days old.
+
 ## 0p. Screenshots of WaterGEMS Scenarios/Alternatives managers and the EPANET Project Defaults dialog (2026-10-11)
 Tree look (icons, expanders, current-scenario marker, right-click menu) and whether EPANET's GUI refuses a blank Default Pattern are in no page I can read. One screenshot each from anyone with the software closes them. Cost: ten minutes of Tom's or a friend's time.
 
