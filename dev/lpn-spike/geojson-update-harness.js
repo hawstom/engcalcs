@@ -109,7 +109,7 @@ console.log('\n--- a child scenario is open: it receives the values, Base is unt
 	const names = dialogButtons();
 	ok('the question offers the open scenario and Base', names[1] === PC.lpn_inpup_btn_scenario.replace('{scenario}', 'Peak') && names[2] === PC.lpn_inpup_btn_base, JSON.stringify(names));
 	press(names[1]);
-	ok('Base keeps its value', L.nodeById('20').elev === baseElev20);
+	ok('Base holds the old value', L.nodeById('20').elev === baseElev20);
 	ok('the scenario reads the file value', L.effective(L.nodeById('20'), 'elev') === oldElev + 7);
 	ok('it is an override of the scenario, and nothing else is overridden but the new junction\'s activation', L.overrideCount(L.scenarios().filter(x => !x.isBase)[0]) === 2, String(L.overrideCount(L.scenarios().filter(x => !x.isBase)[0])));
 	ok('the new junction is inactive in Base and active in the scenario', L.nodeById('NEWJ')._active === false && L.effective(L.nodeById('NEWJ'), 'active') === true);

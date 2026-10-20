@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**163 still to read on master**, of 171 untranslated keys, of 3190 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**167 still to read on master**, of 175 untranslated keys, of 3194 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (171, 163 to read @@ NEEDS RULING)
+## lpn_  (175, 167 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -226,6 +226,15 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_geojson_results_other`**
   > No results are included, because the results on screen belong to the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
+- **`lpn_gjup_h_notes`**
+  > Reading the file
+  @@ NEEDS RULING
+- **`lpn_gjup_lead`**
+  > A GeoJSON file holds one set of values and no scenarios. Choose where to put them.
+  @@ NEEDS RULING
+- **`lpn_gjup_title`**
+  > Update from GeoJSON file
+  @@ NEEDS RULING
 - **`lpn_gpv_one_point_note`**
   > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
   @@ NEEDS RULING
@@ -306,6 +315,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_inpup_i_curves`**
   > curves
+  @@ NEEDS RULING
+- **`lpn_inpup_i_custom`**
+  > custom properties
   @@ NEEDS RULING
 - **`lpn_inpup_i_descriptions`**
   > descriptions
@@ -560,13 +572,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/merge-1020a (`e4373b805`) — adds no English strings
-
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/duration-fire (`c221d72bf`) — already merged into chore/merge-1020a; its strings are listed there
+### feat/geojson-into-project (`e4788e0ef`) — adds no English strings
 
-### feat/label-leader (`bcebdfa58`) — adds no English strings
+### feat/label-leader (`cbb7ad824`) — adds no English strings
+
+### feat/native-eps (`b62a05c57`) — adds no English strings
 
 ### feat/sqlite-reader (`75ed1031f`) — 51 new, 51 to read @@ NEEDS RULING
 
@@ -726,7 +738,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/theme (`6221a4cae`) — already merged into feat/theme-tank; its strings are listed there
 
-### feat/theme-tank (`0055f8ed3`) — 10 new, 6 to read @@ NEEDS RULING
+### feat/theme-tank (`89e313c5d`) — 10 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_theme_amber`**
   > Amber
@@ -759,4 +771,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Space
   @@ NEEDS RULING
 
-### fix/examples-guide (`5de0786d7`) — adds no English strings
+### fix/examples-guide (`c549eff85`) — adds no English strings
