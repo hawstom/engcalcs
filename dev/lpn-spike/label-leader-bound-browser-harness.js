@@ -1,13 +1,14 @@
-// NO LEADER RUNS OFF THE MAP OR FAR FROM ITS WORDS, in a real Chromium, at real wheel notches.
-// Run with:
+// NO LEADER RUNS TO NOWHERE, in a real Chromium, at real wheel notches. Run with:
 //   node dev/lpn-spike/label-leader-bound-browser-harness.js
 //
-// Tom's Net1 screenshot, 2026-10-20 (dev/label-trials/tom-1020/labels-bug-off-screen.png): the leader
-// of the label of N10 ran from the node up and off the top of the screen, while the label's words
-// stood to its lower left. A leader joins a label to its element, so both of its ends are on the map
-// and its far end is at the words. Asserted over every leader drawn, in every view: it belongs to a label
-// that is drawn (a leader left behind by a hidden label is the other way to run to nowhere), none is longer than a bound (LEN_MAX_PX), and its far end is within a few
-// text heights of the label's words (GAP_MAX_PX).
+// Tom's Net1 screenshot, 2026-10-20 (dev/label-trials/tom-1020/labels-bug-off-screen.png): a leader
+// by the label of N10 ran up and off the top of the screen, nowhere near any words. A leader joins
+// a label to its element. Asserted over every leader drawn, in every view of Net1 (wheeled in and
+// out, in six window sizes, and with N10's label dragged away first) and Net3: it belongs to a
+// label that is drawn (a leader left behind by a hidden label), it is no longer than LEN_MAX_PX
+// (except where the user dragged the label), and its far end is within GAP_MAX_PX of the label's
+// words. The bug itself did not reproduce in these views on the code Tom saw (bcebdfa58) or on this
+// branch, so this holds the invariant and is not shown to fail on the bug.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later

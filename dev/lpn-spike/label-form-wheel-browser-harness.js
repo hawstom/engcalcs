@@ -101,6 +101,8 @@ const SCENES = [
 	{ key: 'net1', name: 'Net1 (gallery, US), wheeled out', cardKey: 'lpn_ex_net1_title', node: ['id', 'demand', 'elev', 'pressure'],
 		link: ['flow'], step: true, notches: [-4, -14], named: ['113'], shotAt: -14,
 		at: { notch: -4, shown: ['11'], ownNearest: ['10'] } },
+	{ key: 'novato', name: 'Net3 on the world map near Novato', file: 'dev/water-network-examples/Net3-Novato-CA-World.lwn', fit: true, noMax: true,
+		node: NET3_NODE, link: NET3_LINK, notches: [0, 3], named: [] },
 	{ key: 'phone', name: 'Net3 (gallery, gpm) on a 390 px phone', cardKey: 'lpn_ex_net3_title', node: NET3_NODE, link: NET3_LINK,
 		notches: [3, 6], named: [], viewport: { width: 390, height: 844 } }
 ].filter((sc) => (process.env.LABEL_FORM_SCENES || 'net3,net1,phone').split(',').indexOf(sc.key) >= 0);
@@ -127,6 +129,9 @@ async function layOut(Session, browser, sc, mode, opts) {
 		const file = /lpn-collide\.js/.test(route.request().url()) ? 'lpn-collide.js' : 'looped-network.js';
 		let body = mode.ref ? refSource(mode.ref, file) : await resp.text();
 		if (file === 'looped-network.js') {
+			// LABEL_FORM_COLUMN=1: the stacked-column prototype switched on in the shipped layout
+			// (dev/lpn-rulings.md, "A column of one-line labels"); off in the file as committed.
+			if (mode.shipped && process.env.LABEL_FORM_COLUMN === '1') { body = body.replace('var LPN_COLUMN = false,', 'var LPN_COLUMN = true,'); }
 			if (mode.cut) {
 				CUTS.forEach(([from, to]) => { if (body.split(from).length === 2) { body = body.replace(from, to); cut++; } });
 			}
@@ -143,7 +148,8 @@ async function layOut(Session, browser, sc, mode, opts) {
 			await a.openExampleCard(await a.lang(sc.cardKey));
 		} else {
 			await a.page.evaluate((txt) => { localStorage.clear(); localStorage.setItem('lpn_project_wheel', txt); },
-				fs.readFileSync(path.join(REPO, sc.file), 'utf8'));
+				sc.noMax ? JSON.stringify(Object.assign(JSON.parse(fs.readFileSync(path.join(REPO, sc.file), 'utf8')), { settings: Object.assign({}, JSON.parse(fs.readFileSync(path.join(REPO, sc.file), 'utf8')).settings, { labelMaxWidth: null }) }))
+					: fs.readFileSync(path.join(REPO, sc.file), 'utf8'));
 			await a.reload();
 			await a.answerTrainingPanel().catch(() => {});
 			await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
