@@ -109,7 +109,16 @@ var EngCalcs = EngCalcs || {};
 	// hence textFactor(). Text rather than symbol factor: the threshold protects the reader's
 	// ability to tie a number back to its element, a judgment made at the scale of the text.
 	var LABEL_LEADER_THRESHOLD = 4;
-	function leaderThreshold() { return LABEL_LEADER_THRESHOLD * Math.max(textFactor(), symbolFactor()); }
+	// **A LABEL ONE TEXT HEIGHT FROM ITS ANCHOR CARRIES A LEADER** (Tom, 2026-10-18: *"except for a
+	// leader with less than a text height of length, we want to show all labels connected with a
+	// leader"*). The threshold was 4 x max(textFactor, symbolFactor), 1.6 text heights at the shipped
+	// sizes. It is now one text height, but never below just past the resting offset
+	// (hypot(2,2) x symbolFactor), so a label at rest, untouched, still draws none.
+	var LPN_LEADER_TEXT_HEIGHTS = 1, LPN_LEADER_REST_MARGIN = 1.05;
+	function leaderThreshold() {
+		var d = defaultLabelOffset();
+		return Math.max(LPN_LEADER_TEXT_HEIGHTS * effectiveFontSize(), LPN_LEADER_REST_MARGIN * Math.hypot(d.x, d.y));
+	}
 	function nodeLabelBase(n, full) {
 		var d = defaultLabelOffset(full);
 		return { x: nodeDrawX(n) + (n.lx !== undefined ? n.lx : d.x),

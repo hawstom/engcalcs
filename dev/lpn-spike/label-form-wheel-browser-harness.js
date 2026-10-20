@@ -222,7 +222,7 @@ function firstDiff(a, b) {
 function row(v) {
 	return `labels ${v.labels} (nodes ${v.nodes}: ${v.nodeInline} one line, ${v.nodeStacked} stacked; pipes ${v.pipes}: ${v.along} along, ` +
 		`${v.level} level on a leader ${v.levelLeader}, ${v.levelInline} one line, ${v.levelStacked} stacked), values ${v.values}; ` +
-		`N1 ${v.N1.length} (${v.N1mine.length} ours) N3 ${v.N3.length} (node-label leaders through a symbol ${v.N3node}) astray ${v.astray.length}, leadered nearer another pipe ${v.leaderNearOther}`;
+		`N1 ${v.N1.length} (${v.N1mine.length} ours) N3 ${v.N3.length} (node-label leaders through a symbol ${v.N3node}) astray ${v.astray.length}, leadered nearer another pipe ${v.leaderNearOther}, leaders drawn: nodes ${v.leadersNode} pipes ${v.leadersPipe} (threshold ${v.thrPx} px, text ${v.textPx} px)`;
 }
 
 async function main() {
@@ -278,6 +278,11 @@ async function main() {
 					lossN.length + (lossN.length ? ': ' + lossN.slice(0, 5).join('; ') : ''));
 				// Tom, 2026-10-18: pipes may run through one-line node labels; counted, not asserted.
 				console.log('        pipes through one-line node labels: ' + v.struck.length);
+				// Tom, 2026-10-18: a leader of a text height or more is drawn; below it none. The threshold
+				// is the text height, or just past a label's resting offset where that is longer (an
+				// untouched label draws none).
+				ok(tag + ': a label a text height or more from its anchor carries a leader (threshold ' + v.thrPx + ' px, text ' + v.textPx + ' px, rest ' + v.restPx + ' px)',
+					v.thrPx <= Math.max(v.textPx, v.restPx * 1.05) + 0.2 && v.thrPx >= v.textPx - 0.2);
 				ok(tag + ': no level label or one-line node label overlaps another label, by the rotated glyph boxes', v.N1mine0.length === 0, v.N1mine0.slice(0, 3).join('; '));
 				ok(tag + ': every one-line node label lies within the map and off its legends', v.offView.length === 0, v.offView.slice(0, 4).join('; '));
 				ok(tag + ': every level label with no leader is nearest its own pipe', v.astray.length === 0, v.astray.slice(0, 4).join(' '));
@@ -304,6 +309,7 @@ async function main() {
 			ok(sc.name + ': more values shown than the reference over its views', sum(on.views, 'values') > sum(off.views, 'values'),
 				`${sum(off.views, 'values')} -> ${sum(on.views, 'values')}`);
 			if (sc.key === 'net3') {
+				ok(sc.name + ': a pipe may run through a one-line node label, and some do', sum(on.views.map((v) => ({ n: v.struck.length })), 'n') >= 1, '');
 				ok(sc.name + ': one-line node labels are on the drawing, and the reference has none',
 					sum(on.views, 'nodeInline') >= 5 && sum(off.views, 'nodeInline') === 0, `${sum(off.views, 'nodeInline')} -> ${sum(on.views, 'nodeInline')}`);
 			}

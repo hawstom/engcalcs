@@ -43,7 +43,7 @@
 		read: function (tolPx, ambPx) {
 			var s = state.s, W = svg.clientWidth, H = svg.clientHeight, tol = tolPx / s, amb = ambPx / s,
 				v = { labels: 0, values: 0, nodes: 0, nodeInline: 0, nodeStacked: 0, pipes: 0, along: 0, level: 0, levelLeader: 0,
-					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N1mine: [], N1mine0: [], struck: [], offView: [], node: {}, levelNear: {}, leaderNearOther: 0, pipeShown: {}, ex: { nodeInline: [], levelStacked: [], levelInline: [] }, N3: [], N3node: 0, astray: [], sig: [] },
+					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N1mine: [], N1mine0: [], struck: [], offView: [], node: {}, levelNear: {}, leaderNearOther: 0, pipeShown: {}, ex: { nodeInline: [], levelStacked: [], levelInline: [] }, N3: [], N3node: 0, astray: [], sig: [], leadersNode: 0, leadersPipe: 0, thrPx: +(leaderThreshold() * state.s).toFixed(1), textPx: +(effectiveFontSize() * state.s).toFixed(1), restPx: +(Math.hypot(defaultLabelOffset().x, defaultLabelOffset().y) * state.s).toFixed(1) },
 				items = [], circles = [], texts = [];
 			// To a quarter of a screen pixel: a label measured at another zoom differs from one measured
 			// at this one in the hundredths of a pixel (the font's hinting), which no reader can see.
@@ -134,6 +134,7 @@
 				v.node[n.id] = { n: k, id: (ne.lines || []).some(function (ln) { return ln.field === 'id'; }) };
 				v.sig.push('n' + n.id + ' ' + geo(ne.text, ['x', 'y']) + ' ' + ne.text.textContent + ' ' +
 					(leaderOf(ne) ? geo(ne.leader, ['x1', 'y1', 'x2', 'y2']) : ''));
+				if (leaderOf(ne)) { v.leadersNode++; }
 				v.nodes++; v.values += k;
 				if (k > 1) { if (ne.inline) { v.nodeInline++; v.ex.nodeInline.push(n.id); } else { v.nodeStacked++; } }
 				var nrows = rowsOf(ne.text);
@@ -173,6 +174,7 @@
 				v.pipeShown[l.id] = true;
 				v.sig.push('l' + l.id + ' ' + geo(le.text, ['x', 'y']) + ' ' + (le.text.getAttribute('transform') || '').replace(/[-0-9.e]+/g, q) + ' ' +
 					le.text.textContent + ' ' + (leaderOf(le) ? geo(le.leader, ['x1', 'y1', 'x2', 'y2']) : ''));
+				if (leaderOf(le)) { v.leadersPipe++; }
 				v.pipes++; v.values += f ? f.lines.length : (le.lines || []).length;
 				rows = rowsOf(le.text);
 				(le.repeats || []).forEach(function (r) { if (vis(r.text)) { rows = rows.concat(rowsOf(r.text)); } });
