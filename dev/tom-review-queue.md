@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-417. (R-282 is taken on `feat/label-gang-search`.)
+**An ID is permanent and never reused.** Next free: R-421. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -154,3 +154,6 @@ judgement and does not belong to a script.
 - [ ] R-413 feat/bentley-interop | (bubble overrides, right-click remove) "This is not the action I want." (bubbles as rows in List overrides) "This sounds very promising as a general upgrade to List Overrides (which could become 'Manage overrides'), but I don't see any such actions available currently. Do this. I'd love to see it." -- 2026-10-16 build agent on feat/manage-override
 - [ ] R-414 feat/bentley-interop | (Elevation in a child scenario) "I like graying it out, though I am inclined to ask why it can't be a Physical override." -- 2026-10-16 agent on fix/elevation-override
 - [?] R-415 feat/bentley-interop | (units back to US) "Fotobi." "I don't have a good answer, and I am inclined to just keep observing." -- watching; no steps yet
+- [ ] R-418 feat/label-leader | (round 5) "(1) ... Please see issues at /tmp/labels*.png (2) Even so, I think this is a noticeable improvement on what is on production. (3) ... the pipe labels on leaders are costly. I am very happy to learn that the one-line labels are not costly, because they are a great trick that could be leveraged more as you see in the images I shared. (4) The justification helps. Thanks. (5) Leader trade acceptable? I guess not since I can't see it honored anywhere. A cost for no benefit is pointless. Revert." Images copied to dev/label-trials/tom-1020/: a leader running off the screen; one-line labels stacked in a column beside a crowd, each on a leader; "Leaders wanted" on Novato. -- round 6 on the branch
+- [ ] R-419 fix/examples-guide | "The re-ordering isn't better. We have to start with Basic mode because that's all a beginner wants to read. Restore the order at production with the headings formatting upgrade." -- round 2 on the branch
+- [ ] R-420 feat/theme-tank | "(1) I think there is promise in this direction. But the menus look more like brushed stainless steel buttons than like galvanized steel water tanks; maybe the brightest surface is too white and in general it comes across too shiny, where galvanized steel is usually perceive as a gray. ... with this aspect ratio, the mind says "Tank on hill", which is okay, but with that subconscious messaging, the bottom shading "feels" out of place. Also, I can see horizontal seams and several rivets, but I don't detect (a few or one or two per row?) vertical seams in a brickwork-like pattern. (2) The time series bubbles fit now on all themes." -- round 2 on the branch

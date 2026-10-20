@@ -123,6 +123,12 @@ async function main() {
 		});
 		const smParas = enString('lpn_sm_help').split('\\n\\n');
 		ok('...its two lines of Tom\'s help are headings, colon dropped, and its "- " lines a list', JSON.stringify(sub.heads) === JSON.stringify(smParas.filter((t) => /:$/.test(t)).map((t) => t.replace(/:$/, ''))) && sub.items === smParas.filter((t) => /^- /.test(t)).length && sub.dashParas === 0 && Number(sub.headBold) >= 600, JSON.stringify(sub));
+		// Tom, 2026-10-20: the order is production's: Basic mode first, because that is all a beginner wants to read.
+		{
+			const b = (n) => /Basic mode/.test(smParas[n]);
+			ok('...Tom\'s help puts Basic mode first, then the detail, and the entry shows it in that order', /:$/.test(smParas[0]) && b(1) && b(2) && !b(3) && !b(4) && !!sm &&
+				smParas.slice(0, 7).every((t, n, a) => n === 0 || sm.text.indexOf(plain(t).slice(0, 25)) > sm.text.indexOf(plain(a[n - 1]).slice(0, 25))));
+		}
 		ok('...and carries the seven terms of the chapter, in order, after it', !!sm && SM_TERMS.every((k, i) => sm.dts[i] === enString(k)), sm && JSON.stringify(sm.dts));
 		ok('...and its tables (what can be overridden, the worked example)', !!sm && sm.tables.length === 2, sm && String(sm.tables.length));
 		ok('the Scenario comparison entry carries its four terms and its table', !!cmp && CMP_TERMS.every((k, i) => cmp.dts[i] === enString(k)) && cmp.tables.length === 1, cmp && JSON.stringify(cmp.dts));
