@@ -456,7 +456,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**57 still to read**, of 61 new keys across 5 unmerged branch(es).
+**57 still to read**, of 61 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -661,3 +661,5 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 
 ### feat/theme-tank (`876ebef92`) — already merged into feat/theme; its strings are listed there
+
+### fix/examples-guide (`1b0b85de8`) — adds no English strings

@@ -66,7 +66,13 @@ ok('the Guide has chapters to give an address to (' + slugs.length + ')', slugs.
 	console.log('-- ' + lang + ' ' + slug);
 	ok(lang + ': the page is HTML with the chapter heading in an h1', html.indexOf('<h1>' + ch.title + '</h1>') > 0);
 	ok(lang + ': every term and definition of the chapter is in the page', ch.terms.every((t) => text.indexOf(plain(t[0])) >= 0 && text.indexOf(plain(t[1])) >= 0));
-	ok(lang + ': the opening paragraphs are in the page', ch.intro.length > 0 && ch.intro.every((p) => text.indexOf(plain(p)) >= 0));
+	ok(lang + ': the opening paragraphs are in the page', ch.intro.length > 0 && ch.intro.every((p) => text.indexOf(plain(p.replace(/^- /, '').replace(/[:\uFF1A]$/, ''))) >= 0));
+	// Tom, 2026-10-19: the two lines that head the Scenario manager's help are real headings, and its
+	// "- " lines are a real list, not paragraphs that begin with a hyphen.
+	const subs = (html.match(/<h2 class="lpn-guide-subhead">[^<]*<\/h2>/g) || []).map((h) => plain(h));
+	const heads = ch.intro.filter((p) => /[:\uFF1A]$/.test(p)).map((p) => p.replace(/[:\uFF1A]$/, ''));
+	ok(lang + ': the help\'s heading lines are h2 headings, colon dropped (' + subs.length + ')', subs.length === 2 && JSON.stringify(subs) === JSON.stringify(heads), JSON.stringify(subs));
+	ok(lang + ': its "- " lines are list items, none left as a paragraph', (html.match(/<li>/g) || []).length >= ch.intro.filter((p) => p.indexOf('- ') === 0).length && !/<p>- /.test(html));
 	if (lang === 'es') {
 		ok('es: the page is not the English text', text.indexOf(plain(EN.chapters[slug].terms[0][1])) < 0);
 	}

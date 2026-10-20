@@ -113,6 +113,16 @@ async function main() {
 		let sm = await entry(P, 'lpn_sm_box'), cmp = await entry(P, 'lpn_scncmp_box');
 		ok('the Scenario manager entry is in the Guide, titled by the box', !!sm && sm.title.trim() === await T('lpn_sm_title'), sm && sm.title);
 		ok('...it opens with the box\'s own help (Tom\'s wording), which the chapter follows', !!sm && (() => { const h = sm.text.indexOf(plain(enString('lpn_sm_help')).slice(0, 30)); return h >= 0 && h < sm.text.indexOf(enString('lpn_guide_scn_use_term')); })());
+		// Tom, 2026-10-19: "How scenarios and alternatives work" and "How to manage scenarios" are headings
+		// like the chapter's other sub-headings, not paragraphs ending in a colon; the "- " lines are a list.
+		const sub = await P.evaluate(() => {
+			const en = document.getElementById('lpn_guide_b_lpn_sm_box');
+			return { heads: Array.from(en.querySelectorAll('h4.lpn-guide-subhead')).map((h) => h.textContent), items: en.querySelectorAll(':scope > ul > li').length,
+				dashParas: Array.from(en.querySelectorAll(':scope > p')).filter((p) => /^- /.test(p.textContent)).length,
+				headBold: en.querySelector('h4.lpn-guide-subhead') ? getComputedStyle(en.querySelector('h4.lpn-guide-subhead')).fontWeight : '' };
+		});
+		const smParas = enString('lpn_sm_help').split('\\n\\n');
+		ok('...its two lines of Tom\'s help are headings, colon dropped, and its "- " lines a list', JSON.stringify(sub.heads) === JSON.stringify(smParas.filter((t) => /:$/.test(t)).map((t) => t.replace(/:$/, ''))) && sub.items === smParas.filter((t) => /^- /.test(t)).length && sub.dashParas === 0 && Number(sub.headBold) >= 600, JSON.stringify(sub));
 		ok('...and carries the seven terms of the chapter, in order, after it', !!sm && SM_TERMS.every((k, i) => sm.dts[i] === enString(k)), sm && JSON.stringify(sm.dts));
 		ok('...and its tables (what can be overridden, the worked example)', !!sm && sm.tables.length === 2, sm && String(sm.tables.length));
 		ok('the Scenario comparison entry carries its four terms and its table', !!cmp && CMP_TERMS.every((k, i) => cmp.dts[i] === enString(k)) && cmp.tables.length === 1, cmp && JSON.stringify(cmp.dts));
