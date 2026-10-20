@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**77 still to read on master**, of 85 untranslated keys, of 3104 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**128 still to read on master**, of 136 untranslated keys, of 3155 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (85, 77 to read @@ NEEDS RULING)
+## lpn_  (136, 128 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -143,10 +143,160 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
   @@ NEEDS RULING
 - **`lpn_guide_cmp_byasset_def`**
-  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box.</p>
+  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver's internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.</p>
   @@ NEEDS RULING
 - **`lpn_guide_cmp_byasset_term`**
   > Results by asset
+  @@ NEEDS RULING
+- **`lpn_inpup_ask_title`**
+  > Import {file}
+  @@ NEEDS RULING
+- **`lpn_inpup_base_note`**
+  > Base. A scenario that holds its own value for an asset keeps it; the others take the new value.
+  @@ NEEDS RULING
+- **`lpn_inpup_blank`**
+  > blank
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_base`**
+  > Base
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_new`**
+  > A new project
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_project`**
+  > This project, {project}
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_scenario`**
+  > {scenario}, open now
+  @@ NEEDS RULING
+- **`lpn_inpup_counts`**
+  > Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).
+  @@ NEEDS RULING
+- **`lpn_inpup_failed`**
+  > The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}
+  @@ NEEDS RULING
+- **`lpn_inpup_h_added`**
+  > Assets added
+  @@ NEEDS RULING
+- **`lpn_inpup_h_changed`**
+  > Values changed
+  @@ NEEDS RULING
+- **`lpn_inpup_h_kept`**
+  > Kept, not in the file
+  @@ NEEDS RULING
+- **`lpn_inpup_h_na`**
+  > Not applied
+  @@ NEEDS RULING
+- **`lpn_inpup_heading`**
+  > Imported {file} into {scenario} of {project}
+  @@ NEEDS RULING
+- **`lpn_inpup_how`**
+  > In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.
+  @@ NEEDS RULING
+- **`lpn_inpup_i_connections`**
+  > connections
+  @@ NEEDS RULING
+- **`lpn_inpup_i_controls`**
+  > controls
+  @@ NEEDS RULING
+- **`lpn_inpup_i_curves`**
+  > curves
+  @@ NEEDS RULING
+- **`lpn_inpup_i_descriptions`**
+  > descriptions
+  @@ NEEDS RULING
+- **`lpn_inpup_i_options`**
+  > options
+  @@ NEEDS RULING
+- **`lpn_inpup_i_patterns`**
+  > patterns
+  @@ NEEDS RULING
+- **`lpn_inpup_i_positions`**
+  > positions of existing assets
+  @@ NEEDS RULING
+- **`lpn_inpup_i_rules`**
+  > rules
+  @@ NEEDS RULING
+- **`lpn_inpup_lead`**
+  > An EPANET file holds one set of values and no scenarios. Choose where to put them.
+  @@ NEEDS RULING
+- **`lpn_inpup_method_row`**
+  > Head loss formula: the file uses {file} and this project uses {project}.
+  @@ NEEDS RULING
+- **`lpn_inpup_more`**
+  > {n} more
+  @@ NEEDS RULING
+- **`lpn_inpup_na_cv`**
+  > A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_na_general`**
+  > The file also holds {items}. They were not applied.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_geo`**
+  > Assets only in the file ({n}) were not added, because the file and this project use different coordinate systems.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_msx`**
+  > The .msx file chosen with this file was not read. To attach it to this project, choose it alone.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_owned`**
+  > The pipe type states some values of these pipes, so those values were not changed: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_na_refs`**
+  > These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_na_roughness`**
+  > Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_type`**
+  > The file states a different type for these assets, so none of their values were changed: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_nothing`**
+  > Every value in the file that matches an asset here is already the same in {scenario}.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_heading`**
+  > Nothing was changed in {project}.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_lead`**
+  > The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_lead_both`**
+  > The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_lead_formula`**
+  > The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.
+  @@ NEEDS RULING
+- **`lpn_inpup_row`**
+  > {id}, {property}: {old} to {new}
+  @@ NEEDS RULING
+- **`lpn_inpup_status`**
+  > Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).
+  @@ NEEDS RULING
+- **`lpn_inpup_t_junction`**
+  > Junction
+  @@ NEEDS RULING
+- **`lpn_inpup_t_pipe`**
+  > Pipe
+  @@ NEEDS RULING
+- **`lpn_inpup_t_pump`**
+  > Pump
+  @@ NEEDS RULING
+- **`lpn_inpup_t_reservoir`**
+  > Reservoir
+  @@ NEEDS RULING
+- **`lpn_inpup_t_tank`**
+  > Tank
+  @@ NEEDS RULING
+- **`lpn_inpup_t_valve`**
+  > Valve
+  @@ NEEDS RULING
+- **`lpn_inpup_title`**
+  > Update from EPANET file
+  @@ NEEDS RULING
+- **`lpn_inpup_undo`**
+  > Undo reverses all of it in one step.
+  @@ NEEDS RULING
+- **`lpn_inpup_unit_row`**
+  > {family}: the file uses {file} and this project uses {project}.
   @@ NEEDS RULING
 - **`lpn_msx_attached_heading`**
   > Attached EPANET-MSX file: {file}
@@ -222,6 +372,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_scnres_failed`**
   > {scenario} could not be solved, so its columns are blank. {why}
+  @@ NEEDS RULING
+- **`lpn_scnres_flow_tip`**
+  > The sign of a flow is the solver's internal direction sign: positive runs from the From node to the To node, negative the reverse. It has no use outside this table except to show whether a flow changed direction between scenarios.
   @@ NEEDS RULING
 - **`lpn_scnres_none`**
   > Check at least one result to show.
@@ -304,7 +457,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/eps-analysis (`763cc1fb3`) — adds no English strings
+### feat/eps-analysis (`a0f5dbe25`) — adds no English strings
 
 ### feat/guide-page (`3ada36350`) — 4 new, 4 to read @@ NEEDS RULING
 

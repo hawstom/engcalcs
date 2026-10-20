@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 3075,
-        "delta_key_count": 87,
+        "expected_key_count": 3126,
+        "delta_key_count": 138,
         "english_changed_key_count": 31,
         "exempt_key_count": 46,
         "exempt_keys": [
@@ -78,12 +78,12 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: ရေစီးနှုန်း\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: ရေအလျင်နှုန်း\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: ဖိမြင့်ဆင့်\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: ဖိမြင့်ဆင့်ဆုံးရှုံးမှု\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: ဒေသဆိုင်ရာ ဆုံးရှုံးမှု\n- flow used, taken, or consumed\n    English: demand\n    Your language: လိုအပ်ချက်\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: ဖိအား\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: ဆက်စပ်နေရာ\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: ရေကန်\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: ပုံမှန်\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- solver or the part that works out the answer\n    English: solver\n    Your language: ဖြေရှင်းစက်\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: ရေတိုက်\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: ဗားလ်\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: ကိုယ်ပိုင် တန်ဖိုးများ\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: ဖောက်သည်\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: ရေးဆွဲပုံ\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: ရေစီးနှုန်း\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: ရေအလျင်နှုန်း\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: ဖိမြင့်ဆင့်\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: ဖိမြင့်ဆင့်ဆုံးရှုံးမှု\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: ဒေသဆိုင်ရာ ဆုံးရှုံးမှု\n- flow used, taken, or consumed\n    English: demand\n    Your language: လိုအပ်ချက်\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: ဖိအား\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: ဆက်စပ်နေရာ\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: ရေကန်\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: ပုံမှန်\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- solver or the part that works out the answer\n    English: solver\n    Your language: ဖြေရှင်းစက်\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: ရေတိုက်\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: ဗားလ်\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: ကိုယ်ပိုင် တန်ဖိုးများ\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: ဖောက်သည်\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- note, remark, or description for people about one item\n    English: description (asset notes)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: ရေးဆွဲပုံ\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
         "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
         "lpn_guide_cmp_byasset_term": "Results by asset",
-        "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box.<\/p>",
+        "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver's internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.<\/p>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
@@ -94,7 +94,7 @@
         "lpn_ex_valves_title": "Valve types, gpm (US)",
         "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_file_import_inp": "EPANET file…",
-        "lpn_file_import_inp_tip": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
+        "lpn_file_import_inp_tip": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
         "lpn_file_import_msx": "EPANET-MSX file…",
@@ -117,6 +117,56 @@
         "lpn_quality_msx_species_tip": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.",
         "lpn_quality_msx_none": "No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.",
         "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+        "lpn_inpup_ask_title": "Import {file}",
+        "lpn_inpup_lead": "An EPANET file holds one set of values and no scenarios. Choose where to put them.",
+        "lpn_inpup_how": "In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.",
+        "lpn_inpup_base_note": "Base. A scenario that holds its own value for an asset keeps it; the others take the new value.",
+        "lpn_inpup_btn_new": "A new project",
+        "lpn_inpup_btn_project": "This project, {project}",
+        "lpn_inpup_btn_scenario": "{scenario}, open now",
+        "lpn_inpup_btn_base": "Base",
+        "lpn_inpup_title": "Update from EPANET file",
+        "lpn_inpup_heading": "Imported {file} into {scenario} of {project}",
+        "lpn_inpup_counts": "Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).",
+        "lpn_inpup_undo": "Undo reverses all of it in one step.",
+        "lpn_inpup_nothing": "Every value in the file that matches an asset here is already the same in {scenario}.",
+        "lpn_inpup_status": "Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).",
+        "lpn_inpup_h_changed": "Values changed",
+        "lpn_inpup_row": "{id}, {property}: {old} to {new}",
+        "lpn_inpup_more": "{n} more",
+        "lpn_inpup_blank": "blank",
+        "lpn_inpup_h_added": "Assets added",
+        "lpn_inpup_h_kept": "Kept, not in the file",
+        "lpn_inpup_h_na": "Not applied",
+        "lpn_inpup_na_general": "The file also holds {items}. They were not applied.",
+        "lpn_inpup_na_type": "The file states a different type for these assets, so none of their values were changed: {ids}",
+        "lpn_inpup_na_owned": "The pipe type states some values of these pipes, so those values were not changed: {ids}",
+        "lpn_inpup_na_roughness": "Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.",
+        "lpn_inpup_na_geo": "Assets only in the file ({n}) were not added, because the file and this project use different coordinate systems.",
+        "lpn_inpup_na_refs": "These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}",
+        "lpn_inpup_na_msx": "The .msx file chosen with this file was not read. To attach it to this project, choose it alone.",
+        "lpn_inpup_refused_heading": "Nothing was changed in {project}.",
+        "lpn_inpup_refused_lead": "The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.",
+        "lpn_inpup_unit_row": "{family}: the file uses {file} and this project uses {project}.",
+        "lpn_inpup_method_row": "Head loss formula: the file uses {file} and this project uses {project}.",
+        "lpn_inpup_refused_lead_formula": "The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.",
+        "lpn_inpup_refused_lead_both": "The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.",
+        "lpn_inpup_na_cv": "A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}",
+        "lpn_inpup_failed": "The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}",
+        "lpn_inpup_i_positions": "positions of existing assets",
+        "lpn_inpup_i_connections": "connections",
+        "lpn_inpup_i_descriptions": "descriptions",
+        "lpn_inpup_i_patterns": "patterns",
+        "lpn_inpup_i_curves": "curves",
+        "lpn_inpup_i_controls": "controls",
+        "lpn_inpup_i_rules": "rules",
+        "lpn_inpup_i_options": "options",
+        "lpn_inpup_t_junction": "Junction",
+        "lpn_inpup_t_reservoir": "Reservoir",
+        "lpn_inpup_t_tank": "Tank",
+        "lpn_inpup_t_pipe": "Pipe",
+        "lpn_inpup_t_pump": "Pump",
+        "lpn_inpup_t_valve": "Valve",
         "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
         "lpn_notes_2_def": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
         "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
@@ -145,6 +195,7 @@
         "lpn_scnres_not_converged": "(not converged)",
         "lpn_scnres_not_converged_note": "A column marked {mark} shows the last results the solver reached before it stopped without converging.",
         "lpn_scnres_failed": "{scenario} could not be solved, so its columns are blank. {why}",
+        "lpn_scnres_flow_tip": "The sign of a flow is the solver's internal direction sign: positive runs from the From node to the To node, negative the reverse. It has no use outside this table except to show whether a flow changed direction between scenarios.",
         "lpn_scnres_stale": "Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.",
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
         "lpn_library_import": "Libraries…",
@@ -172,7 +223,7 @@
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
         "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
         "lpn_guide_cmp_byasset_term": "Results by asset",
-        "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box.<\/p>",
+        "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver's internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.<\/p>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
@@ -183,7 +234,7 @@
         "lpn_ex_valves_title": "Valve types, gpm (US)",
         "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_file_import_inp": "EPANET file…",
-        "lpn_file_import_inp_tip": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
+        "lpn_file_import_inp_tip": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
         "lpn_file_import_msx": "EPANET-MSX file…",
@@ -206,6 +257,56 @@
         "lpn_quality_msx_species_tip": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.",
         "lpn_quality_msx_none": "No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.",
         "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+        "lpn_inpup_ask_title": "Import {file}",
+        "lpn_inpup_lead": "An EPANET file holds one set of values and no scenarios. Choose where to put them.",
+        "lpn_inpup_how": "In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.",
+        "lpn_inpup_base_note": "Base. A scenario that holds its own value for an asset keeps it; the others take the new value.",
+        "lpn_inpup_btn_new": "A new project",
+        "lpn_inpup_btn_project": "This project, {project}",
+        "lpn_inpup_btn_scenario": "{scenario}, open now",
+        "lpn_inpup_btn_base": "Base",
+        "lpn_inpup_title": "Update from EPANET file",
+        "lpn_inpup_heading": "Imported {file} into {scenario} of {project}",
+        "lpn_inpup_counts": "Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).",
+        "lpn_inpup_undo": "Undo reverses all of it in one step.",
+        "lpn_inpup_nothing": "Every value in the file that matches an asset here is already the same in {scenario}.",
+        "lpn_inpup_status": "Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).",
+        "lpn_inpup_h_changed": "Values changed",
+        "lpn_inpup_row": "{id}, {property}: {old} to {new}",
+        "lpn_inpup_more": "{n} more",
+        "lpn_inpup_blank": "blank",
+        "lpn_inpup_h_added": "Assets added",
+        "lpn_inpup_h_kept": "Kept, not in the file",
+        "lpn_inpup_h_na": "Not applied",
+        "lpn_inpup_na_general": "The file also holds {items}. They were not applied.",
+        "lpn_inpup_na_type": "The file states a different type for these assets, so none of their values were changed: {ids}",
+        "lpn_inpup_na_owned": "The pipe type states some values of these pipes, so those values were not changed: {ids}",
+        "lpn_inpup_na_roughness": "Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.",
+        "lpn_inpup_na_geo": "Assets only in the file ({n}) were not added, because the file and this project use different coordinate systems.",
+        "lpn_inpup_na_refs": "These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}",
+        "lpn_inpup_na_msx": "The .msx file chosen with this file was not read. To attach it to this project, choose it alone.",
+        "lpn_inpup_refused_heading": "Nothing was changed in {project}.",
+        "lpn_inpup_refused_lead": "The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.",
+        "lpn_inpup_unit_row": "{family}: the file uses {file} and this project uses {project}.",
+        "lpn_inpup_method_row": "Head loss formula: the file uses {file} and this project uses {project}.",
+        "lpn_inpup_refused_lead_formula": "The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.",
+        "lpn_inpup_refused_lead_both": "The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.",
+        "lpn_inpup_na_cv": "A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}",
+        "lpn_inpup_failed": "The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}",
+        "lpn_inpup_i_positions": "positions of existing assets",
+        "lpn_inpup_i_connections": "connections",
+        "lpn_inpup_i_descriptions": "descriptions",
+        "lpn_inpup_i_patterns": "patterns",
+        "lpn_inpup_i_curves": "curves",
+        "lpn_inpup_i_controls": "controls",
+        "lpn_inpup_i_rules": "rules",
+        "lpn_inpup_i_options": "options",
+        "lpn_inpup_t_junction": "Junction",
+        "lpn_inpup_t_reservoir": "Reservoir",
+        "lpn_inpup_t_tank": "Tank",
+        "lpn_inpup_t_pipe": "Pipe",
+        "lpn_inpup_t_pump": "Pump",
+        "lpn_inpup_t_valve": "Valve",
         "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
         "lpn_notes_2_def": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
         "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
@@ -234,6 +335,7 @@
         "lpn_scnres_not_converged": "(not converged)",
         "lpn_scnres_not_converged_note": "A column marked {mark} shows the last results the solver reached before it stopped without converging.",
         "lpn_scnres_failed": "{scenario} could not be solved, so its columns are blank. {why}",
+        "lpn_scnres_flow_tip": "The sign of a flow is the solver's internal direction sign: positive runs from the From node to the To node, negative the reverse. It has no use outside this table except to show whether a flow changed direction between scenarios.",
         "lpn_scnres_stale": "Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.",
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
         "lpn_library_import": "Libraries…",
@@ -478,12 +580,12 @@
                 "next_translated": {
                     "key": "lpn_file_import_inp_tip",
                     "value": "EPANET ဖိုင်တစ်ခု - .inp စာသားဖိုင် (သို့) EPANET သိမ်းဆည်းသော .net ဖိုင် တစ်ခုခုမှ ကွန်ရက်တစ်ခုကို ဖတ်ယူပြီး၊ ဤဘရောက်ဇာထဲတွင် ပရောဂျက်အသစ်တစ်ခုအဖြစ် သိမ်းဆည်းသည်။",
-                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time."
+                    "english": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time."
                 }
             },
             "tip": {
                 "key": "lpn_file_import_inp_tip",
-                "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
+                "english": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
                 "value": "EPANET ဖိုင်တစ်ခု - .inp စာသားဖိုင် (သို့) EPANET သိမ်းဆည်းသော .net ဖိုင် တစ်ခုခုမှ ကွန်ရက်တစ်ခုကို ဖတ်ယူပြီး၊ ဤဘရောက်ဇာထဲတွင် ပရောဂျက်အသစ်တစ်ခုအဖြစ် သိမ်းဆည်းသည်။"
             }
         },
@@ -878,6 +980,806 @@
                     "key": "lpn_workspace_exported",
                     "value": "လုပ်ငန်းခွင်ကို {file} သို့ သိမ်းပြီးပါပြီ - ဆက်တင် {n} ခု။",
                     "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_inpup_ask_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_lead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_how": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_base_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_btn_new": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_btn_project": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_btn_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_btn_base": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_counts": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_undo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_nothing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_status": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_h_changed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_row": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_more": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_blank": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_h_added": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_h_kept": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_h_na": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_general": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_type": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_owned": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_roughness": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_geo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_refs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_refused_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_refused_lead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_unit_row": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_method_row": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_refused_lead_formula": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_refused_lead_both": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_cv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_positions": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_connections": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_descriptions": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_patterns": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_curves": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_controls": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_rules": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_options": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_t_junction": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_t_reservoir": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_t_tank": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_t_pipe": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_t_pump": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_t_valve": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "ပရောဂျက်ဖိုင်",
+                    "english": "Project file"
                 }
             }
         },
@@ -1324,6 +2226,22 @@
             }
         },
         "lpn_scnres_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "အခြေအနေတိုင်းကို ပုံကြမ်း၏ မိတ္တူတစ်စောင်မှ ဖြေရှင်းသည်။ ဤနေရာရှိ မည်သည့်အရာမျှ ပရောဂျက်ကို မပြောင်းလဲစေပါ၊ သင်အလုပ်လုပ်နေသော အခြေအနေကိုလည်း ယခင်အတိုင်းပင် ချန်ထားသည်။",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "{time} ၏ အချိန်ကာလ အတုယူတွက်ချက်မှုအတွက်",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_flow_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
