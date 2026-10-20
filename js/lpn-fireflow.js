@@ -42,9 +42,10 @@
 //     the document the caller assembled it from. That is also why nothing here needs to know about
 //     setProp(): it writes no element property at all, and the results live in a record of their
 //     own beside the document rather than on it.
-//   * It has NO TIME DIMENSION. US practice loads fire flow onto maximum-day demand and evaluates
-//     one steady-state condition; nobody targets "the extended-period run as a whole". The caller
-//     hands over the model for the one condition it wants tested and says so in the interface.
+//   * sweep() has NO TIME DIMENSION. US practice loads fire flow onto maximum-day demand and
+//     evaluates one steady-state condition. The caller hands over the model for the one condition
+//     it wants tested and says so in the interface. A whole run is sweepSteps(), below: the same
+//     sweep once per reporting step, built by the caller, each junction's worst kept.
 
 var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	? require('./PipeHydraulics.lib.js')
@@ -318,16 +319,48 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 				// junction IS measured for what it would pull down.)*
 				if (ctx.design) { rec.effects = ctx.sideEffects(atReq.result, node.id); }
 
-				return probe(maxFlow).then(function (top) {
-					var problem3 = bad(top), lo, hi, loPressure;
-					if (problem3) { return errorOut(problem3, maxFlow); }
+				// **A FLOOR, WHEN THIS IS NOT THE FIRST STEP OF A WHOLE-RUN SWEEP.** The caller keeps
+				// each junction's lowest available flow from the steps already done; this step can only
+				// matter if it goes BELOW that. So the search stops as soon as the floor is shown to hold
+				// here, and the record says so (`floorHeld`). The minimum over the steps is exact.
+				var floor = ctx.floorFor ? ctx.floorFor(node.id) : undefined,
+					topQ = maxFlow, held = null, skipTop = false;
+				if (typeof floor === 'number' && floor < maxFlow) {
+					if (rec.holdsAtRequired) {
+						if (floor <= required) { held = required; } else { topQ = floor; }
+					} else if (floor <= 0) {
+						held = 0;
+					} else if (floor < required) {
+						topQ = floor;
+					} else {
+						skipTop = true;
+					}
+				}
+				if (held !== null) {
+					rec.available = held;
+					rec.floorHeld = true;
+					rec.code = CODES.OK;
+					rec.solves = solves;
+					return finish(rec);
+				}
+				if (skipTop) { return Promise.resolve(null).then(function () { return afterTop(null); }); }
+				return probe(topQ).then(afterTop);
+
+				function afterTop(top) {
+					var problem3 = top ? bad(top) : null, lo, hi, loPressure;
+					if (problem3) { return errorOut(problem3, topQ); }
 
 					// The residual still holds at a flow past any real hydrant. Report AT LEAST the
 					// ceiling; never report the ceiling as though the search had found it.
-					if (top.pressure >= residual) {
-						rec.available = maxFlow;
-						rec.atLeast = true;
-						rec.code = CODES.AT_LEAST;
+					if (top && top.pressure >= residual) {
+						rec.available = topQ;
+						if (topQ === maxFlow) {
+							rec.atLeast = true;
+							rec.code = CODES.AT_LEAST;
+						} else {
+							rec.floorHeld = true;
+							rec.code = CODES.OK;
+						}
 						rec.residualAt = top.pressure;
 						rec.solves = solves;
 						return finish(rec);
@@ -340,9 +373,9 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 					// The bracket starts already halved by the probe at the required flow, which is
 					// why the requirement is tested before the ceiling and not after it.
 					if (rec.holdsAtRequired) {
-						lo = required; loPressure = atReq.pressure; hi = maxFlow;
+						lo = required; loPressure = atReq.pressure; hi = topQ;
 					} else {
-						lo = 0; loPressure = rest.pressure; hi = required;
+						lo = 0; loPressure = rest.pressure; hi = (topQ < required) ? topQ : required;
 					}
 
 					function step() {
@@ -364,7 +397,7 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 						});
 					}
 					return step();
-				});
+				}
 			});
 		}).then(function (out) {
 			// The probe demand is put back whatever happened, including on an error path: the next
@@ -459,6 +492,7 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			maxFlow: maxFlow,
 			flowTol: flowTol,
 			design: design,
+			floorFor: typeof opts.floorFor === 'function' ? opts.floorFor : null,
 			requiredFor: typeof opts.required === 'function'
 				? opts.required
 				: function () { return opts.required; },
@@ -559,6 +593,153 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 		});
 	}
 
+	// ---------------------------------------------------------------------------
+	// A WHOLE RUN: the sweep at every reporting step, each junction's worst
+	// ---------------------------------------------------------------------------
+	//
+	// Tom, 2026-10-19: *"I am wondering why our fire flow analysis can't do an entire EPS."* The
+	// sweep above answers one instant; this asks it of every step the caller names and keeps, per
+	// junction, the step where the available flow is lowest. The caller builds each step's model
+	// (tank levels, patterns and statuses of that step) through ONE function, so this file stays
+	// pure and a step is not a second idea of "the condition tested".
+	//
+	// **COST.** After the first step each junction is tested against its own running minimum: a
+	// step that holds that flow stops there (`floorHeld`) and cannot lower the answer, so later
+	// steps cost about three solves a junction instead of sixteen. The minimum is exact.
+	function contribution(rec) {
+		var fire = rec.available === undefined || !(rec.available >= rec.required),
+			des = !!(rec.effects && (rec.effects.nodes.length || rec.effects.links.length));
+		return { fire: fire, design: des,
+			clean: rec.state !== STATES.ERROR && !fire && !des };
+	}
+	function summarize(results) {
+		var counts = { pass: 0, fail: 0, design: 0, error: 0 }, modes = { fire: 0, design: 0, clean: 0 };
+		results.forEach(function (r) {
+			var c = contribution(r);
+			counts[r.state]++;
+			if (c.fire) { modes.fire++; }
+			if (c.design) { modes.design++; }
+			if (c.clean) { modes.clean++; }
+		});
+		return { counts: counts, modes: modes };
+	}
+	// Which of two records for one junction is the worse answer. An error is worse than a
+	// junction below the residual at rest, which is worse than any flow.
+	function badness(r) {
+		if (r.state === STATES.ERROR) { return 3; }
+		return r.available === undefined ? 2 : 1;
+	}
+	function sweepSteps(options) {
+		var opts = options || {},
+			steps = opts.steps || [],
+			nJ = (opts.junctions || []).length,
+			worst = {}, order = [], floors = {}, designRec = {}, modes = { fire: 0, design: 0, clean: 0 },
+			solves = 0, stopped = false, stepsDone = 0, residual, maxFlow, design = null, requested = nJ;
+
+		function bump(rec, sign) {
+			var c = contribution(rec);
+			if (c.fire) { modes.fire += sign; }
+			if (c.design) { modes.design += sign; }
+			if (c.clean) { modes.clean += sign; }
+		}
+		function consider(r) {
+			var w = worst[r.id], replace = false, br, bw;
+			if (!w) { replace = true; }
+			else {
+				br = badness(r); bw = badness(w);
+				replace = br > bw || (br === bw && br === 1 && !r.floorHeld && r.available < w.available);
+			}
+			if (replace) {
+				if (w) { bump(w, -1); } else { order.push(r.id); }
+				worst[r.id] = r;
+				bump(r, 1);
+			}
+			if (r.effects && (r.effects.nodes.length || r.effects.links.length) && !designRec[r.id]) {
+				designRec[r.id] = r;
+			}
+			w = worst[r.id];
+			floors[r.id] = w.available !== undefined ? w.available
+				: (w.code === CODES.BELOW_AT_REST ? 0 : undefined);
+		}
+
+		function runStep(si) {
+			var st, model, o, k;
+			if (si >= steps.length) { return Promise.resolve(); }
+			if (opts.shouldStop && opts.shouldStop()) { stopped = true; return Promise.resolve(); }
+			st = steps[si];
+			model = st.build();
+			o = {};
+			for (k in opts) { if (Object.prototype.hasOwnProperty.call(opts, k)) { o[k] = opts[k]; } }
+			o.floorFor = function (id) { return floors[id]; };
+			o.onProgress = function (p) {
+				p.result.t = st.t;
+				consider(p.result);
+				if (opts.onProgress) {
+					opts.onProgress({ done: si * nJ + p.done, total: nJ * steps.length, step: si + 1,
+						steps: steps.length, id: p.id, result: p.result, modes: modes });
+				}
+			};
+			return sweep(model, o).then(function (set) {
+				solves += set.solves;
+				residual = set.residual; maxFlow = set.maxFlow; design = set.design;
+				if (set.stopped) { stopped = true; } else { stepsDone++; }
+				return runStep(si + 1);
+			});
+		}
+
+		return runStep(0).then(function () {
+			var results = order.map(function (id) {
+				var w = worst[id], d = designRec[id], c;
+				if (w.state === STATES.PASS && d && d !== w) {
+					c = {};
+					for (var k in w) { if (Object.prototype.hasOwnProperty.call(w, k)) { c[k] = w[k]; } }
+					c.state = STATES.DESIGN;
+					c.effects = d.effects;
+					c.designT = d.t;
+					return c;
+				}
+				return w;
+			}), tally = summarize(results), index = {};
+			results.forEach(function (r) { index[r.id] = r; });
+			return {
+				ok: true,
+				results: results,
+				byId: index,
+				counts: tally.counts,
+				modes: tally.modes,
+				requested: requested,
+				residual: residual,
+				maxFlow: maxFlow,
+				design: design,
+				solves: solves,
+				stopped: stopped,
+				steps: steps.length,
+				stepsDone: stepsDone,
+				lossAccounting: LOSS_ACCOUNTING,
+				isoCap: ISO_SINGLE_HYDRANT_CAP
+			};
+		});
+	}
+
+	// The reporting step at which the lowest pressure among `ids` occurs, from the frames of a run
+	// (Bentley's "EPS Fire Flow" convention: the sweep is made at that one step). A step that did
+	// not converge is skipped. Returns { index, t, pressure, id } or null.
+	function minPressureStep(frames, ids) {
+		var best = null;
+		(frames || []).forEach(function (f, i) {
+			if (!f || !f.pressures || f.converged === false) { return; }
+			(ids || Object.keys(f.pressures)).forEach(function (id) {
+				var p = f.pressures[id];
+				if (typeof p === 'number' && isFinite(p) && (!best || p < best.pressure)) {
+					best = { index: i, t: f.t, pressure: p, id: id };
+				}
+			});
+		});
+		return best;
+	}
+
+	EngCalcs.lpnFireFlowSweepSteps = sweepSteps;
+	EngCalcs.lpnEpsMinPressureStep = minPressureStep;
 	EngCalcs.lpnFireFlowSweep = sweep;
 	EngCalcs.lpnFireFlowStates = STATES;
 	EngCalcs.lpnFireFlowCodes = CODES;

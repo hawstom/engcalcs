@@ -77233,9 +77233,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//   * **THE LOSS ACCOUNTING IS STATED IN THE INTERFACE.** The demand goes on the junction
 	//     itself, which is the profession's default and what both inspectable tools do, so the box
 	//     says out loud that no hydrant, lateral or fitting loss is in these numbers.
-	//   * **ONE STEADY CONDITION.** US practice loads fire flow onto maximum-day demand and reads
-	//     one steady state. Where this project has a clock, the box says which condition it tested;
-	//     picking a frame is a later increment and nothing here pretends to do it.
+	//   * **A STEADY CONDITION, CHOSEN.** US practice loads fire flow onto maximum-day demand and reads
+	//     one steady state. Where this project has a clock, the box tests the step on screen, a chosen
+	//     reporting step, the step of lowest pressure, or every step with each junction's worst
+	//     (Task 578); the report says which. Each step is built by analysisModelAt().
 	//
 	// AND IT NEVER TOUCHES THE DOCUMENT. The engine solves from a copy whose nodes are copies, and
 	// the answers live in `fireFlowRun` beside the document -- not on an element, so setProp() and
@@ -77385,8 +77386,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// own hydraulics and a fire changes those; forcing it shut would starve the fire it is there to
 	// feed.
 	function fireFlowAtFrame(model) {
-		var f = EngCalcs.lpnTimeCurrentFrame ? EngCalcs.lpnTimeCurrentFrame() : null,
-			atLimit = {}, TOL = 1e-3;
+		return applyFrameToModel(model, EngCalcs.lpnTimeCurrentFrame ? EngCalcs.lpnTimeCurrentFrame() : null);
+	}
+	// **THE ONE SNAPSHOT, SHARED BY FIRE FLOW, CRITICALITY AND DEMAND SCALING** (Task 578). The
+	// condition at reporting step `t` of a run: the model assembled at that time (pattern
+	// multipliers, reservoir heads, pump speeds), then that step's frame laid over it (tank levels,
+	// link statuses). With `t` null it is the step on screen.
+	function analysisModelAt(t, frame) {
+		var model, prev = readTimeOverride;
+		if (t !== null && t !== undefined) { readTimeOverride = t; }
+		try { model = assembleModel(); } finally { readTimeOverride = prev; }
+		applyFrameToModel(model, frame);
+		return model;
+	}
+	function applyFrameToModel(model, f) {
+		var atLimit = {}, TOL = 1e-3;
 		if (!f || !f.heads) { return false; }
 		model.nodes.forEach(function (n) {
 			var h = f.heads[n.id];
@@ -77406,6 +77420,48 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		}
 		return true;
+	}
+
+	// **THE ANALYSES THAT NEED THE WHOLE RUN** (Task 578): fire flow at a chosen step, at the step of
+	// lowest pressure or at every step; criticality and demand scaling over the run. They are offered
+	// only where the project has a clock and the EPANET engine can be reached; anywhere else the
+	// step on screen is the only condition, as it always was.
+	function analysisCanRun() {
+		return effectiveTimesExtended() && !!EngCalcs.lpnEpanetRun;
+	}
+	function ffWhen() {
+		var w = (fireFlowAsk && fireFlowAsk.when) || 'now';
+		if (w === 'now' || !analysisCanRun() || !EngCalcs.lpnFireFlowSweepSteps) { return 'now'; }
+		return w;
+	}
+	// The run of the open scenario's model: the one on hand when it is this model's, else a new one.
+	function analysisRun(onProgress) {
+		var model = assembleModel(), fresh = EngCalcs.lpnTimeFreshRun ? EngCalcs.lpnTimeFreshRun(model) : null;
+		if (fresh) { return Promise.resolve(fresh); }
+		return EngCalcs.lpnEpanetRun(model, { onProgress: onProgress });
+	}
+	function analysisSteps(run, times) {
+		return times.map(function (t) {
+			return { t: t, build: function () { return analysisModelAt(t, EngCalcs.lpnTimeFrameResult(run, t)); } };
+		});
+	}
+	function ffNearestStep(times, t) {
+		var best = times[0];
+		times.forEach(function (x) { if (Math.abs(x - t) < Math.abs(best - t)) { best = x; } });
+		return best;
+	}
+	// The reporting steps of the open scenario's clock, for a picker.
+	function analysisStepOptions() {
+		return EngCalcs.lpnReportTimes(effectiveTimes()).map(function (t) { return [String(t), dsTimeText(t)]; });
+	}
+	function updateEpsRunBox(fraction) {
+		var pc = EngCalcs.pageConfig || {}, f = (typeof fraction === 'number' && isFinite(fraction))
+			? Math.max(0, Math.min(1, fraction)) : 0;
+		if (!ffRunUi) { return; }
+		ffRunUi.fill.style.width = Math.round(1000 * f) / 10 + '%';
+		ffRunUi.track.setAttribute('aria-valuenow', String(Math.round(1000 * f)));
+		ffRunUi.count.textContent = pc.lpn_eps_working || 'Running the extended-period simulation.';
+		ffRunUi.tally.textContent = '';
 	}
 
 	// ---- the marks on the map -------------------------------------------------------------------
@@ -77557,6 +77613,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			['selected', pc.lpn_ff_selected || 'Selected junctions']
 		], ask.scope);
 		ffRow(host, pc.lpn_ff_scope || 'Junctions to test', null, boxes.scope, '');
+
+		// **WHEN, ONLY WHERE THE PROJECT HAS A CLOCK** (Task 578).
+		if (analysisCanRun()) {
+			boxes.when = ffSelect([
+				['now', pc.lpn_when_now || 'The reporting step on screen'],
+				['hour', pc.lpn_when_hour || 'A chosen reporting step'],
+				['minp', pc.lpn_when_minp || 'The reporting step of lowest pressure'],
+				['all', pc.lpn_when_all || 'Every reporting step, worst case']
+			], ask.when || 'now');
+			ffRow(host, pc.lpn_when || 'Reporting step tested', null, boxes.when, '');
+			boxes.when.addEventListener('change', function () {
+				ask.when = boxes.when.value;
+				Object.keys(boxes).forEach(function (k) { ask[k] = boxes[k].value; });
+				buildFireFlowControls();
+			});
+			if ((ask.when || 'now') === 'hour') {
+				boxes.step = ffSelect(analysisStepOptions(), String(ask.step));
+				ask.step = boxes.step.value;
+				ffRow(host, pc.lpn_when_step || 'Reporting step', null, boxes.step, '');
+			}
+		}
 
 		boxes.required = ffInput(ask.required);
 		ffRow(host, pc.lpn_ff_required || 'Required fire flow', pc.lpn_ff_required_tip,
@@ -77762,12 +77839,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// The Worst-effect cell, with the element it names as a go-to link (Tom, 2026-09-28: *"In fire
 	// flow analysis, can every node have a hyperlink to go to it?"*).
-	function ffCriticalCell(row, rec) {
-		var parts = ffCriticalParts(rec), td;
+	function ffCriticalCell(row, rec, showStep) {
+		var parts = ffCriticalParts(rec), td, when = typeof rec.designT === 'number' ? rec.designT : rec.t,
+			tail = (showStep && typeof when === 'number') ? ' (' + dsTimeText(when) + ')' : '';
 		if (parts.plain !== undefined) { return ffCell(row, parts.plain); }
 		td = ffCell(row, parts.before);
 		ffGotoLink(td, parts.kind, parts.id, parts.idText);
-		td.appendChild(document.createTextNode(parts.after));
+		td.appendChild(document.createTextNode(parts.after + tail));
 		return td;
 	}
 	// **EVERY ID IN THE FIRE-FLOW TABLE GOES TO ITS ELEMENT** -- the same go-to as a Find result or
@@ -77867,6 +77945,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		case 7: return rec.effects ? ffLimitText(rec) : undefined;
 		case 8: return rec.solves;
 		case 9: return ffModesText(rec);
+		case 10: return rec.t;
 		}
 		return undefined;
 	}
@@ -77988,10 +78067,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			body,
 			shown,
 			sorted,
+			allSteps,
 			anyEffect;
 		if (!host) { return; }
 		host.innerHTML = '';
 		if (!set) { return; }
+		allSteps = !!(set.at && set.at.mode === 'all');
 
 		if (set.stopped) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_stopped || 'Stopped after {done} of {total} junctions. The results below are the ones already finished.')
@@ -78000,6 +78081,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		ffShownAt = dsNow();
 		ffEl('p', 'lpn-ff-summary', ffSummaryText(set), host);
 		dsTimeLines(host, fireFlowRunT);
+		if (set.at && set.at.none) {
+			ffEl('p', 'lpn-ff-summary', (pc.lpn_ff_no_steps || 'A tank empties at {time}, before the first reporting step could be tested, so no step was tested.')
+				.replace('{time}', dsTimeText(set.at.emptyT)), host);
+			return;
+		}
+		if (set.at && set.at.emptyT !== null && set.at.emptyT !== undefined) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_tank_empties || 'A tank empties at {time}; steps from then on were not tested.')
+				.replace('{time}', dsTimeText(set.at.emptyT)), host);
+		}
+		if (set.at) {
+			if (set.at.mode === 'all') {
+				ffEl('p', 'lpn-ff-note', (pc.lpn_ff_at_all || 'Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.')
+					.replace('{n}', String(set.at.stepsDone)), host);
+			} else if (set.at.mode === 'minp') {
+				ffEl('p', 'lpn-ff-note', (pc.lpn_ff_at_minp || 'Tested at {time}, the reporting step with the lowest pressure among the junctions tested.')
+					.replace('{time}', dsTimeText(set.at.t)), host);
+			} else if (set.at.mode === 'hour') {
+				ffEl('p', 'lpn-ff-note', (pc.lpn_ff_at_step || 'Tested at reporting step {time}.')
+					.replace('{time}', dsTimeText(set.at.t)), host);
+			}
+		}
 		if (set.counts.error) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_summary_error || 'Junctions that could not be solved ({n}).')
 				.replace('{n}', String(set.counts.error)), host);
@@ -78048,7 +78150,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_ff_col_limit || 'Design limit',
 			pc.lpn_ff_col_solves || 'Runs',
 			pc.lpn_ff_col_modes || 'Failure modes'
-		]);
+		].concat(allSteps ? [pc.lpn_ff_col_hour || 'Step of lowest flow'] : []));
 		shown.forEach(function (rec) {
 			var tr = ffEl('tr', 'lpn-ff-' + rec.state, null, body);
 			// **THE ID WEARS THE USER'S OWN LABEL PREFIX** (Tom, 2026-09-02: *"we need to apply here
@@ -78061,10 +78163,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ffCell(tr, ffQtyOrWhy(rec, rec.pressureAtRequired, 'lpn_u_pressure'));
 			ffCell(tr, ffAvailableText(rec));
 			ffCell(tr, ffQtyOrWhy(rec, rec.residualAt, 'lpn_u_pressure'));
-			ffCriticalCell(tr, rec);
+			ffCriticalCell(tr, rec, allSteps);
 			ffCell(tr, ffLimitText(rec));
 			ffCell(tr, rec.solves === undefined ? FF_DASH : String(rec.solves));
 			ffCell(tr, ffModesText(rec));
+			if (allSteps) { ffCell(tr, typeof rec.t === 'number' ? dsTimeText(rec.t) : FF_DASH); }
 		});
 		ffMoreLine(host, sorted.length - shown.length);
 	}
@@ -78159,14 +78262,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The running tally is the sweep's own four states, counted as the records arrive. It is the
 	// "maybe some other progress stats" half of the ruling and it is the same three sentences the
 	// finished report opens with, so a reader is not learning a second vocabulary mid-run.
-	function updateFireFlowRunBox(done, counts, modes) {
+	function updateFireFlowRunBox(done, counts, modes, stepInfo) {
 		var pc = EngCalcs.pageConfig || {}, text;
 		if (!ffRunUi) { return; }
 		ffRunUi.fill.style.width =
 			(ffRunUi.total > 0 ? Math.round(1000 * done / ffRunUi.total) / 10 : 0) + '%';
 		ffRunUi.track.setAttribute('aria-valuenow', String(done));
-		ffRunUi.count.textContent = (pc.lpn_ff_working || 'Working: {done} of {total} junctions.')
-			.replace('{done}', String(done)).replace('{total}', String(ffRunUi.total));
+		ffRunUi.count.textContent = stepInfo
+			? (pc.lpn_ff_working_steps || 'Working: reporting step {step} of {steps}, junction {done} of {total}.')
+				.replace('{step}', String(stepInfo.step)).replace('{steps}', String(stepInfo.steps))
+				.replace('{done}', String(done - (stepInfo.step - 1) * stepInfo.total)).replace('{total}', String(stepInfo.total))
+			: (pc.lpn_ff_working || 'Working: {done} of {total} junctions.')
+				.replace('{done}', String(done)).replace('{total}', String(ffRunUi.total));
 		// The running tally reads the same independent modes the finished report does, or the
 		// dialog and the table it turns into would count the same run two different ways.
 		text = ffSummaryText({ modes: modes || { fire: 0, design: 0, clean: 0 } });
@@ -78222,6 +78329,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			maxVelocity = ffValue(ask.maxVelocity, 'lpn_u_velocity'),
 			design = null,
 			skipped = 0,
+			when = ffWhen(),
 			tally,
 			before;
 		if (fireFlowBusy) { return; }
@@ -78290,7 +78398,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// belt-and-braces assertion rather than a repair, and if it ever fires the fix is in
 		// whatever wrote to `doc`, not here.
 		before = JSON.stringify(doc);
-		fireFlowRunT = modelTimeSeconds();
+		// A run at a chosen step, or over the whole run, states its own time in its report; the
+		// "computed at / clock now at" line belongs to the step on screen alone.
+		fireFlowRunT = when === 'now' ? modelTimeSeconds() : null;
 		fireFlowBusy = true;
 		fireFlowStop = false;
 		fireFlowRun = null;
@@ -78303,33 +78413,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// **THE PROGRESS IS THE DIALOG'S, AND #lpn_status IS LEFT ALONE.** That box is the map's
 		// standing model diagnostic, true until the model changes; a count that ticked inside it
 		// made it look like a run indicator for as long as a sweep lasted.
-		openFireFlowRunBox(ids.length);
 		if (skipped) {
 			setNotice((pc.lpn_ff_skipped || '{n} selected elements are not junctions, so they were not tested.')
 				.replace('{n}', String(skipped)));
 		}
 
-		return EngCalcs.lpnFireFlowSweep(model, {
-			solve: engine.solve,
-			junctions: ids,
-			// **PER JUNCTION, WITH THE BOX'S NUMBER AS THE FALLBACK.** A function rather than a
-			// scalar, always -- one code path, so a project where nobody has typed a per-junction
-			// requirement is answered by the same line as one where everybody has.
-			required: fireFlowRequiredFor(required),
-			residual: residual,
-			design: design,
-			// The progress line is the whole reason the sweep yields between junctions: a
-			// synchronous solver in a promise chain never gives the browser a frame, so without it
-			// this text would appear once, at the end, saying it had finished.
-			onProgress: function (p) {
-				if (p.result && tally[p.result.state] !== undefined) { tally[p.result.state]++; }
-				// `p.modes` is the sweep's own running INDEPENDENT tally; `tally` stays the
-				// exclusive one and is still what carries the error count.
-				updateFireFlowRunBox(p.done, tally, p.modes);
-			},
-			shouldStop: function () { return fireFlowStop; }
-		}).then(function (set) {
+		function sweepOptions() {
+			return {
+				solve: engine.solve,
+				junctions: ids,
+				// **PER JUNCTION, WITH THE BOX'S NUMBER AS THE FALLBACK.** A function rather than a
+				// scalar, always -- one code path, so a project where nobody has typed a per-junction
+				// requirement is answered by the same line as one where everybody has.
+				required: fireFlowRequiredFor(required),
+				residual: residual,
+				design: design,
+				shouldStop: function () { return fireFlowStop; }
+			};
+		}
+		function finishRun(set, at) {
 			fireFlowBusy = false;
+			if (at) { set.at = at; }
 			fireFlowRun = set;
 			if (critBoxIsOpen()) { buildCriticalityControls(); }
 			if (dsBoxIsOpen()) { buildDemandScaleControls(); }
@@ -78339,7 +78443,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			rebuildFireFlowReport();
 			buildFireFlowControls();
 			return set;
-		}, function (err) {
+		}
+		function failRun(err) {
 			fireFlowBusy = false;
 			if (critBoxIsOpen()) { buildCriticalityControls(); }
 			if (dsBoxIsOpen()) { buildDemandScaleControls(); }
@@ -78347,7 +78452,77 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			buildFireFlowControls();
 			setStatus(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.', 'solve-error');
 			if (window.console && console.warn) { console.warn('fire flow sweep failed:', err); }
-		});
+		}
+
+		if (when === 'now') {
+			openFireFlowRunBox(ids.length);
+			return EngCalcs.lpnFireFlowSweep(model, Object.assign(sweepOptions(), {
+				// The progress line is the whole reason the sweep yields between junctions: a
+				// synchronous solver in a promise chain never gives the browser a frame, so without it
+				// this text would appear once, at the end, saying it had finished.
+				onProgress: function (p) {
+					if (p.result && tally[p.result.state] !== undefined) { tally[p.result.state]++; }
+					// `p.modes` is the sweep's own running INDEPENDENT tally; `tally` stays the
+					// exclusive one and is still what carries the error count.
+					updateFireFlowRunBox(p.done, tally, p.modes);
+				}
+			})).then(function (set) { return finishRun(set, null); }, failRun);
+		}
+
+		// THE WHOLE RUN FIRST, ONCE: every step below is built from its frames.
+		openFireFlowRunBox(1000, { update: updateEpsRunBox });
+		return analysisRun(function (p) { updateEpsRunBox(p && p.fraction); }, function () { return fireFlowStop; })
+		.then(function (run) {
+			var times, pick = null, stepList, nSteps, stopT, emptied, usable;
+			if (fireFlowStop) { return finishRun({ ok: true, results: [], byId: {}, counts: tally, modes: { fire: 0, design: 0, clean: 0 },
+				requested: ids.length, residual: residual, design: null, solves: 0, stopped: true,
+				lossAccounting: EngCalcs.lpnFireFlowLossAccounting, isoCap: EngCalcs.lpnFireFlowIsoCap }, { mode: when, steps: 0, stepsDone: 0 }); }
+			if (!run || !run.frames || !run.frames.length || (!run.ok && !run.partial)) { return failRun(null); }
+			// **STEPS FROM THE FIRST TANK-EMPTY ON ARE NOT TESTED**, as criticality reads a run: EPANET
+			// closes an empty tank and reports meaningless heads for what it fed. A run that stopped
+			// part-way ends there too.
+			stopT = Infinity;
+			emptied = EngCalcs.lpnEpsTankEmptyAt ? EngCalcs.lpnEpsTankEmptyAt(run.frames, assembleModel(), null) : null;
+			if (emptied) { stopT = emptied.t; }
+			if (!run.ok && typeof run.stoppedAt === 'number') { stopT = Math.min(stopT, run.stoppedAt); }
+			usable = run.frames.filter(function (f) { return f.t < stopT; });
+			if (!usable.length) {
+				return finishRun({ ok: true, results: [], byId: {}, counts: tally, modes: { fire: 0, design: 0, clean: 0 },
+					requested: ids.length, residual: residual, design: null, solves: 0, stopped: false,
+					lossAccounting: EngCalcs.lpnFireFlowLossAccounting, isoCap: EngCalcs.lpnFireFlowIsoCap },
+					{ mode: when, none: true, emptyT: stopT });
+			}
+			times = usable.map(function (f) { return f.t; });
+			if (when === 'hour') {
+				pick = ffNearestStep(run.frames.map(function (f) { return f.t; }), +ask.step);
+				if (pick >= stopT) {
+					return finishRun({ ok: true, results: [], byId: {}, counts: tally, modes: { fire: 0, design: 0, clean: 0 },
+						requested: ids.length, residual: residual, design: null, solves: 0, stopped: false,
+						lossAccounting: EngCalcs.lpnFireFlowLossAccounting, isoCap: EngCalcs.lpnFireFlowIsoCap },
+						{ mode: when, none: true, emptyT: stopT });
+				}
+				times = [pick];
+			} else if (when === 'minp') {
+				pick = EngCalcs.lpnEpsMinPressureStep(usable.map(function (f) { return EngCalcs.lpnTimeFrameResult(run, f.t); }), ids);
+				if (!pick) { return failRun(null); }
+				times = [pick.t];
+			}
+			stepList = analysisSteps(run, times);
+			nSteps = stepList.length;
+			openFireFlowRunBox(ids.length * nSteps);
+			function progress(p) {
+				if (p.result && tally[p.result.state] !== undefined && nSteps === 1) { tally[p.result.state]++; }
+				updateFireFlowRunBox(p.done, tally, p.modes, nSteps > 1 ? { step: p.step, steps: nSteps, total: ids.length } : null);
+			}
+			if (when === 'all') {
+				return EngCalcs.lpnFireFlowSweepSteps(Object.assign(sweepOptions(), { steps: stepList, onProgress: progress }))
+					.then(function (set) { return finishRun(set, { mode: 'all', steps: set.steps, stepsDone: set.stepsDone, emptyT: isFinite(stopT) ? stopT : null }); }, failRun);
+			}
+			return EngCalcs.lpnFireFlowSweep(stepList[0].build(), Object.assign(sweepOptions(), { onProgress: progress }))
+				.then(function (set) {
+					return finishRun(set, { mode: when, t: times[0], minp: when === 'minp' ? pick : null, emptyT: isFinite(stopT) ? stopT : null });
+				}, failRun);
+		}, failRun);
 	}
 	// Read by dev/browser-pass. Set by the run above, never by a user action -- a false here is a
 	// defect in whatever wrote to `doc`, not in this box.
@@ -78427,6 +78602,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	var critBusy = false;
 	var critStop = false;
 	var critSortState = { col: null, dir: 1 };
+	function critWhen() { return (critAsk.when === 'run' && analysisCanRun()) ? 'run' : 'now'; }
 	function critBoxEl() { return document.getElementById('lpn_crit_box'); }
 	function critBoxIsOpen() {
 		var box = critBoxEl();
@@ -78440,7 +78616,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function buildCriticalityControls() {
 		var pc = EngCalcs.pageConfig || {},
 			host = document.getElementById('lpn_crit_controls'),
-			scope, minP, skip, buttons, run, stop, engine;
+			scope, minP, skip, buttons, run, stop, engine, when;
 		if (!host) { return; }
 		host.innerHTML = '';
 		scope = ffSelect([
@@ -78449,6 +78625,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		], critAsk.scope);
 		scope.addEventListener('change', function () { critAsk.scope = scope.value; });
 		ffRow(host, pc.lpn_crit_scope || 'Links to break', null, scope, '');
+		// **THE WHOLE RUN, ONLY WHERE THE PROJECT HAS A CLOCK** (Task 578).
+		if (analysisCanRun()) {
+			when = ffSelect([
+				['now', pc.lpn_when_now || 'The reporting step on screen'],
+				['run', pc.lpn_when_run || 'The whole run']
+			], critAsk.when || 'now');
+			when.addEventListener('change', function () { critAsk.when = when.value; });
+			ffRow(host, pc.lpn_when || 'Reporting step tested', null, when, '');
+		}
 		skip = document.createElement('input');
 		skip.type = 'checkbox';
 		skip.checked = !!critAsk.skipDeadEnds;
@@ -78468,6 +78653,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		run.addEventListener('click', function () {
 			critAsk.scope = scope.value;
 			critAsk.skipDeadEnds = skip.checked;
+			if (when) { critAsk.when = when.value; }
 			critFireFlowAsk().minPressure = minP.value;
 			runCriticality();
 		});
@@ -78498,6 +78684,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		case 1: return rec.unserved;
 		case 2: return rec.cutOff ? rec.cutOff.length : undefined;
 		case 3: return rec.below ? rec.below.length : undefined;
+		case 4: return rec.run && rec.run.lowest ? rec.run.lowest.pressure : undefined;
+		case 5: return rec.run ? rec.run.belowSeconds : undefined;
+		case 6: return rec.run && rec.run.emptyAt ? rec.run.emptyAt.t : undefined;
 		}
 		return undefined;
 	}
@@ -78531,11 +78720,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Counted as the sentence reads: demand actually left unserved, or a junction actually below
 		// the minimum. A link that cuts off only zero-demand junctions shows them in its row, but it
 		// cut off no demand, so it is not counted here.
-		hit = set.results.filter(function (r) { return r.unserved > 0 || (r.below && r.below.length > 0); }).length;
+		hit = set.results.filter(function (r) {
+			return r.unserved > 0 || (r.below && r.below.length > 0) || (r.run && (r.run.emptyAt || r.run.stoppedAt));
+		}).length;
 		ffEl('p', 'lpn-ff-summary', (pc.lpn_crit_summary || 'Assets that leave demand unserved or drop a junction below {pressure} ({n} of {total}).')
 			.replace('{n}', String(hit)).replace('{total}', String(set.results.length))
 			.split('{pressure}').join(ffQty(set.minPressure, 'lpn_u_pressure')), host);
 		dsTimeLines(host, critRunT);
+		if (set.wholeRun) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_run_note || 'Each outage was run over the whole simulation ({n} reporting steps).')
+				.replace('{n}', String(set.wholeRun)), host);
+		}
+		if (set.wholeRun && set.results.some(function (r) { return r.run && r.run.emptyAt; })) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_crit_empty_note || 'Lowest pressures are read before a tank empties. Junctions below minimum include those left without a source from that step on.', host);
+		}
 		if (set.skippedDeadEnds && set.skippedDeadEnds.length) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_skipped_dead || 'Dead-end links skipped: {n}. Each one cuts off everything beyond it.')
 				.replace('{n}', String(set.skippedDeadEnds.length)), host);
@@ -78550,10 +78748,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		shown = sorted.slice(0, FF_MAX_ROWS);
 		body = ffTable(host, [
 			pc.lpn_crit_col_asset || 'Asset',
-			pc.lpn_crit_col_unserved || 'Demand not served',
+			set.wholeRun ? (pc.lpn_crit_col_unserved_peak || 'Largest demand not served') : (pc.lpn_crit_col_unserved || 'Demand not served'),
 			pc.lpn_crit_col_cutoff || 'Junctions cut off',
 			pc.lpn_crit_col_below || 'Junctions below minimum'
-		], { state: critSortState, by: critSortBy });
+		].concat(set.wholeRun ? [
+			[pc.lpn_crit_col_lowest || 'Lowest pressure', pc.lpn_crit_col_lowest_tip || 'Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.', true],
+			pc.lpn_crit_col_hours || 'Hours below minimum',
+			pc.lpn_crit_col_empty || 'Tank empties'
+		] : []), { state: critSortState, by: critSortBy });
 		// Four columns, not ten: the headings wrap between words, never inside one (css/engcalcs.css).
 		if (body.parentNode && body.parentNode.classList) { body.parentNode.classList.add('lpn-crit-table'); }
 		shown.forEach(function (rec) {
@@ -78561,13 +78763,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// row means "the system failed to deliver" in both reports. 'none' is untinted, as a pass.
 			var tr = ffEl('tr', 'lpn-ff-' + EngCalcs.lpnCriticalitySeverity(rec), null, body);
 			ffGotoLink(ffCell(tr, ''), 'link', rec.id, labelPrefixFor('link', 'id') + rec.id);
-			ffCell(tr, typeof rec.unserved === 'number' ? ffQty(rec.unserved, 'lpn_u_flow') : FF_DASH);
+			ffCell(tr, typeof rec.unserved === 'number'
+				? (set.wholeRun && rec.unserved > 0 && typeof rec.unservedAt === 'number'
+					? (pc.lpn_at_time || '{value} at {time}').replace('{value}', ffQty(rec.unserved, 'lpn_u_flow')).replace('{time}', dsTimeText(rec.unservedAt))
+					: ffQty(rec.unserved, 'lpn_u_flow'))
+				: FF_DASH);
 			if (rec.cutOff) { critIdsCell(tr, rec.cutOff); } else { ffCell(tr, FF_DASH); }
 			// **A CASE THAT DID NOT SOLVE IS A ROW SAYING SO, NEVER AN ABORT.** What was cut off is
 			// known without a solve and is still printed; only the pressures are missing, so the
 			// reason stands in the pressure column.
 			if (rec.below) { critIdsCell(tr, rec.below.map(function (b) { return b.id; })); }
 			else { ffCell(tr, ffReasonText(rec)); }
+			if (set.wholeRun) {
+				var atT = pc.lpn_at_time || '{value} at {time}', rn = rec.run;
+				ffCell(tr, rn && rn.lowest
+					? atT.replace('{value}', ffQty(rn.lowest.pressure, 'lpn_u_pressure')).replace('{time}', dsTimeText(rn.lowest.t))
+					: FF_DASH);
+				ffCell(tr, rn ? String(+(rn.belowSeconds / 3600).toFixed(1)) +
+					(typeof rn.stoppedAt === 'number' ? ' (' + (pc.lpn_crit_stopped_at || 'run stopped at {time}').replace('{time}', dsTimeText(rn.stoppedAt)) + ')' : '') : FF_DASH);
+				ffCell(tr, rn && rn.emptyAt
+					? atT.replace('{value}', labelPrefixFor('node', 'id') + rn.emptyAt.id).replace('{time}', dsTimeText(rn.emptyAt.t))
+					: FF_DASH);
+			}
 		});
 		ffMoreLine(host, sorted.length - shown.length, true);
 	}
@@ -78594,14 +78811,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return { ids: ids, skipped: skipped };
 	}
 	function runCriticality() {
-		var pc = EngCalcs.pageConfig || {}, model, engine, pick, minPressure, before;
+		var pc = EngCalcs.pageConfig || {}, model, engine, pick, minPressure, before, whole, sweepSolve;
 		if (critBusy || !EngCalcs.lpnCriticalitySweep) { return Promise.resolve(null); }
 		if (fireFlowBusy || dsBusy) {
 			setNotice(pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.');
 			return Promise.resolve(null);
 		}
+		whole = critWhen() === 'run';
 		model = assembleModel();
-		fireFlowAtFrame(model);
+		// The whole run starts from the project's own starting state; the step on screen is laid over
+		// the model only when that step is what is being asked about.
+		if (!whole) { fireFlowAtFrame(model); }
 		pick = criticalityLinks(model);
 		if (!pick.ids.length) {
 			clearCriticalityRun(true);
@@ -78612,8 +78832,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		minPressure = ffValue(critFireFlowAsk().minPressure, 'lpn_u_pressure');
 		engine = engineFor(model);
+		// One EPANET run per outage, as every run is; the answer is handed to the sweep whole.
+		sweepSolve = whole ? function (m) {
+			return EngCalcs.lpnEpanetRun(m, {}).then(function (run) { return EngCalcs.lpnEpsRunResult(run, m); });
+		} : engine.solve;
 		before = JSON.stringify(doc);
-		critRunT = modelTimeSeconds();
+		critRunT = whole ? null : modelTimeSeconds();
 		critBusy = true;
 		critStop = false;
 		critRun = null;
@@ -78631,7 +78855,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				.replace('{n}', String(pick.skipped)));
 		}
 		return EngCalcs.lpnCriticalitySweep(model, {
-			solve: engine.solve,
+			solve: sweepSolve,
 			links: pick.ids,
 			skipDeadEnds: !!critAsk.skipDeadEnds,
 			minPressure: minPressure > 0 ? minPressure : 0,
@@ -78647,6 +78871,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				critRun = null;
 				setNotice(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.');
 			} else {
+				if (whole) { set.wholeRun = (set.baselineRun && set.baselineRun.steps) || 1; }
 				critRun = set;
 			}
 			rebuildCriticalityReport();
@@ -78720,16 +78945,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// the project; this one is a question asked of the network on screen, on a copy, and lives for the
 	// page load. It multiplies on top of the scenario's, and the box's tip says so.
 	//
-	// **ONE INSTANT, THE ONE ON SCREEN**, for an extended-period project as for the siblings: its
-	// demands at that time, its tank levels and its link statuses from the run. A peak step chosen
-	// for the user would need a run to know the tank levels at it, and would be a second idea of
-	// "the condition tested" beside fire flow's and criticality's. Move the clock to the peak first.
+	// **THE STEP ON SCREEN, OR THE WHOLE RUN** (Task 578), for an extended-period project as for the
+	// siblings. The step on screen is its demands at that time, its tank levels and its link statuses
+	// from the run. The whole run scales the base demands and judges every reporting step; a tank that
+	// empties fails the scale.
 	//
 	// **THE MINIMUM PRESSURE IS FIRE FLOW'S "LOWEST PRESSURE ALLOWED ELSEWHERE"**, shared exactly as
 	// criticality shares it: one fact about the utility, one box value.
 	//
 	// **NO BOX MEMORY ACROSS PAGE LOADS**, like criticality: nothing is stored on a visitor's device.
 	var dsAsk = { scope: 'all', multiplier: '2' };
+	function dsWhen() { return (dsAsk.when === 'run' && analysisCanRun()) ? 'run' : 'now'; }
 	var dsRun = null;      // the last Run at a scale, or null
 	var dsSearch = null;   // the last search, or null
 	// **A REFUSED PRESS IS ANSWERED IN THE BOX, WHERE THE PRESS WAS** (Tom, 2026-10-02: *"It appears
@@ -78751,7 +78977,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function buildDemandScaleControls() {
 		var pc = EngCalcs.pageConfig || {},
 			host = document.getElementById('lpn_ds_controls'),
-			scope, minP, mult, buttons, run, find, stop, engine, other;
+			scope, minP, mult, buttons, run, find, stop, engine, other, when;
 		if (!host) { return; }
 		host.innerHTML = '';
 		scope = ffSelect([
@@ -78760,6 +78986,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		], dsAsk.scope);
 		scope.addEventListener('change', function () { dsAsk.scope = scope.value; buildDemandScaleControls(); });
 		ffRow(host, pc.lpn_ds_scope || 'Junctions to scale', null, scope, '');
+		// **THE WHOLE RUN, ONLY WHERE THE PROJECT HAS A CLOCK** (Task 578). Applies to both Run and Find.
+		if (analysisCanRun()) {
+			when = ffSelect([
+				['now', pc.lpn_when_now || 'The reporting step on screen'],
+				['run', pc.lpn_when_run || 'The whole run']
+			], dsAsk.when || 'now');
+			when.addEventListener('change', function () { dsAsk.when = when.value; });
+			ffRow(host, pc.lpn_when || 'Reporting step tested', null, when, '');
+		}
 		minP = ffInput(critFireFlowAsk().minPressure);
 		minP.addEventListener('change', function () { critFireFlowAsk().minPressure = minP.value; });
 		ffRow(host, pc.lpn_ds_minpressure || 'Lowest pressure allowed', pc.lpn_ds_minpressure_tip,
@@ -78768,6 +79003,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		refreshBoxTip('lpn_ds_box', dsBoxTip(engine));
 		other = fireFlowBusy || critBusy;
 		function take() {
+			if (when) { dsAsk.when = when.value; }
 			dsAsk.scope = scope.value;
 			dsAsk.multiplier = mult.value;
 			critFireFlowAsk().minPressure = minP.value;
@@ -78904,9 +79140,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				.replace('{m}', dsMult(rec.multiplier)).replace('{reason}', ffReasonText(rec)), host);
 			return;
 		}
+		if (rec.emptied) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ds_empties_at || '⚠ At a demand scale of {m}, a tank empties at {time}.')
+				.replace('{m}', dsMult(rec.multiplier)).replace('{time}', dsTimeText(rec.emptied.t)), host);
+		}
 		if (!rec.lowest) { return; }
-		dsSentence(host, 'lpn-ff-note', pc.lpn_ds_lowest_at || 'At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.',
-			'node', rec.lowest.id, { m: dsMult(rec.multiplier), pressure: ffQty(rec.lowest.pressure, 'lpn_u_pressure') });
+		dsSentence(host, 'lpn-ff-note', typeof rec.lowest.t === 'number'
+				? (pc.lpn_ds_lowest_at_time || 'At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}, at {time}.')
+				: (pc.lpn_ds_lowest_at || 'At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.'),
+			'node', rec.lowest.id, { m: dsMult(rec.multiplier), pressure: ffQty(rec.lowest.pressure, 'lpn_u_pressure'),
+				time: typeof rec.lowest.t === 'number' ? dsTimeText(rec.lowest.t) : '' });
+	}
+	function dsRunNote(host) {
+		var pc = EngCalcs.pageConfig || {};
+		ffEl('p', 'lpn-ff-note', pc.lpn_ds_run_note || 'Judged over the whole run, at every reporting step.', host);
 	}
 	function rebuildDemandScaleReport() {
 		var pc = EngCalcs.pageConfig || {},
@@ -78943,6 +79190,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				dsProbeLine(host, s.failing);
 			}
 			dsTimeLines(host, s.time);
+			if (s.wholeRun) {
+				dsRunNote(host);
+				if (s.limit) {
+					ffEl('p', 'lpn-ff-note', (pc.lpn_ds_limit_at || 'Limiting reporting step: {time}.')
+						.replace('{time}', dsTimeText(s.limit.t)), host);
+				}
+			}
 			dsScopeLine(host, s);
 			if (s.holding) { dsOutsideLine(host, s.holding.outside, s.holding.multiplier, s.minPressure); }
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
@@ -78961,9 +79215,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		verdict = set.below.length
 			? (pc.lpn_ds_scale_below || '⚠ At a demand scale of {m}, junctions below {pressure}: {n}.')
 				.replace('{n}', String(set.below.length))
-			: (pc.lpn_ds_scale_ok || '✓ At a demand scale of {m}, every junction keeps {pressure}.');
+			: (set.emptied
+				? (pc.lpn_ds_empties_at || '⚠ At a demand scale of {m}, a tank empties at {time}.').replace('{time}', dsTimeText(set.emptied.t))
+				: (pc.lpn_ds_scale_ok || '✓ At a demand scale of {m}, every junction keeps {pressure}.'));
 		ffEl('p', 'lpn-ff-summary', verdict.replace('{m}', dsMult(set.multiplier)).split('{pressure}').join(pressure), host);
 		dsTimeLines(host, set.time);
+		if (set.wholeRun) {
+			dsRunNote(host);
+			if (set.emptied && set.below.length) {
+				ffEl('p', 'lpn-ff-note', (pc.lpn_ds_empties_at || '⚠ At a demand scale of {m}, a tank empties at {time}.')
+					.replace('{m}', dsMult(set.multiplier)).replace('{time}', dsTimeText(set.emptied.t)), host);
+			}
+		}
 		dsScopeLine(host, set);
 		dsOutsideLine(host, set.outside, set.multiplier, set.minPressure);
 		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
@@ -78977,12 +79240,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_ff_col_junction || 'Junction',
 			[pc.lpn_ds_col_scaled || 'Scaled', pc.lpn_ds_col_scaled_tip],
 			[pc.lpn_ds_col_unscaled || 'Unscaled', pc.lpn_ds_col_unscaled_tip]
-		], { state: dsSortState.p, by: function (col) { dsSortBy('p', col); } });
+		].concat(set.wholeRun ? [pc.lpn_ds_col_hour || 'Step of lowest pressure'] : []), { state: dsSortState.p, by: function (col) { dsSortBy('p', col); } });
 		dsSortRows(set.pressures.slice(0, DS_ROWS), dsSortState.p, 'pressure').forEach(function (x) {
 			var tr = ffEl('tr', x.pressure < set.minPressure ? 'lpn-crit-impact' : null, null, body);
 			ffGotoLink(ffCell(tr, ''), 'node', x.id, labelPrefixFor('node', 'id') + x.id);
 			ffCell(tr, ffMaybeQty(x.pressure, 'lpn_u_pressure'));
 			ffCell(tr, ffMaybeQty(x.unscaled, 'lpn_u_pressure'));
+			if (set.wholeRun) { ffCell(tr, typeof x.t === 'number' ? dsTimeText(x.t) : FF_DASH); }
 		});
 		ffMoreLine(host, set.pressures.length - Math.min(DS_ROWS, set.pressures.length));
 		ffEl('div', 'lpn-ff-head', pc.lpn_ds_head_velocity || 'Highest velocities', host);
@@ -79024,7 +79288,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// and the refusal replaces that part's last answer (`which`), which no longer answers the
 	// question now on screen. See dsRefused.
 	function demandScaleCase(which) {
-		var pc = EngCalcs.pageConfig || {}, model, ids = null, isJ = {}, skipped = 0;
+		var pc = EngCalcs.pageConfig || {}, model, ids = null, isJ = {}, skipped = 0, whole;
 		function refuse(text) {
 			setNotice(text);
 			dsRefused = { which: which, text: text };
@@ -79033,8 +79297,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return null;
 		}
 		if (dsRefused && dsRefused.which === which) { dsRefused = null; }
+		whole = dsWhen() === 'run';
 		model = assembleModel();
-		fireFlowAtFrame(model);
+		// The whole run starts from the project's own starting state (Task 578).
+		if (!whole) { fireFlowAtFrame(model); }
 		model.nodes.forEach(function (n) { if (n.type === 'junction') { isJ[n.id] = true; } });
 		if (!Object.keys(isJ).length) {
 			return refuse(pc.lpn_ds_no_junctions || 'This project has no junctions yet, so there are no demands to scale.');
@@ -79052,7 +79318,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					.replace('{n}', String(skipped)));
 			}
 		}
-		return { model: model, ids: ids, engine: engineFor(model), time: dsNow() };
+		// One EPANET run per solve, the answer handed on whole: each node's lowest pressure over the
+		// run, and whether a tank emptied.
+		return { model: model, ids: ids, whole: whole, time: whole ? null : dsNow(),
+			engine: whole ? { epanet: true, solve: function (m) {
+				return EngCalcs.lpnEpanetRun(m, {}).then(function (run) { return EngCalcs.lpnEpsRunResult(run, m, { beforeEmpty: true }); });
+			} } : engineFor(model) };
 	}
 	function dsBegin() {
 		dsBusy = true;
@@ -79102,6 +79373,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}).then(function (set) {
 			if (c.ids) { set.scaledCount = c.ids.length; }
 			set.time = c.time;
+			if (c.whole) { set.wholeRun = true; }
 			dsRun = set;
 			dsEnd(before);
 			dsScrollTo('scale');
@@ -79125,6 +79397,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}).then(function (s) {
 			if (c.ids) { s.scaledCount = c.ids.length; }
 			s.time = c.time;
+			if (c.whole) { s.wholeRun = true; }
 			dsSearch = s;
 			dsEnd(before);
 			dsScrollTo('search');

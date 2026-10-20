@@ -604,6 +604,16 @@
 	EC.lpnTimeNow = function () { return state.t; };
 
 	/**
+	 * The finished run on hand, if it is the run of THIS model (same fingerprint the edit test uses),
+	 * so an analysis that needs the whole run (fire flow at the hour of lowest pressure, say) does not
+	 * pay for a second one. null when there is none, it stopped part-way, or the model differs.
+	 */
+	EC.lpnTimeFreshRun = function (model) {
+		if (!state.run || state.run.partial || !state.runSig) { return null; }
+		return modelFingerprint(model) === state.runSig ? state.run : null;
+	};
+
+	/**
 	 * THE RUN AS IT STANDS AT THIS INSTANT, in the shape a solve returns -- levels, statuses and
 	 * demands included. null when there is no run.
 	 *
