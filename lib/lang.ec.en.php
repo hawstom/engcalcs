@@ -2439,6 +2439,9 @@ $ec_lang['lpn_inpup_btn_project']='This project, {project}';
 $ec_lang['lpn_inpup_btn_scenario']='{scenario}, open now';
 $ec_lang['lpn_inpup_btn_base']='Base';
 $ec_lang['lpn_inpup_title']='Update from EPANET file';
+$ec_lang['lpn_gjup_lead']='A GeoJSON file holds one set of values and no scenarios. Choose where to put them.';
+$ec_lang['lpn_gjup_title']='Update from GeoJSON file';
+$ec_lang['lpn_gjup_h_notes']='Reading the file';
 // {file} is a file name, {scenario} a scenario name and {project} a project name.
 $ec_lang['lpn_inpup_heading']='Imported {file} into {scenario} of {project}';
 $ec_lang['lpn_inpup_counts']='Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).';
@@ -2477,6 +2480,7 @@ $ec_lang['lpn_inpup_i_curves']='curves';
 $ec_lang['lpn_inpup_i_controls']='controls';
 $ec_lang['lpn_inpup_i_rules']='rules';
 $ec_lang['lpn_inpup_i_options']='options';
+$ec_lang['lpn_inpup_i_custom']='custom properties';
 $ec_lang['lpn_inpup_t_junction']='Junction';
 $ec_lang['lpn_inpup_t_reservoir']='Reservoir';
 $ec_lang['lpn_inpup_t_tank']='Tank';
