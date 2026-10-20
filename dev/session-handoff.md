@@ -95,27 +95,46 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-19 (twenty-seventh session, Arizona time)
+## STATE — 2026-10-19 evening (twenty-eighth session, Arizona time)
 
-### Master: 607759f4d pushed and green. Production: what he last pulled
+### Master: the merge of chore/batch-1019c and this handoff. Production: what he last pulled
 
-- 2026-10-19: `feat/msx` merged on his word ("merge feat/msx"); Task 717 closed; the Find word list
-  gained `lpn_quality_msx_species` (user-guide-find-harness caught it on the merge). Owed: his call on a
-  features-list line naming EPANET-MSX (public claim), and the MSX keys' translations at the next sprint.
-- Still owed from 10-18: consent_body's 26 translations (EC_CONSENT_VERSION stays 2); EPANET 2.3.5
-  error 220 note to Luke Butler; scenario-results shows flow as magnitude only; fire flow across
-  scenarios still a gap. Budget is tight (NPS review urgencies): Sonnet agents, few at a time.
+- Merged 10-19 evening: `feat/network-update` (Task 814 call 2; his word "I tried all, and all works
+  great. Wording is all great.") and `fix/scenario-flow-sign` (Results by asset keeps the solver's +/-
+  sign on flows; his wording for the tip and Guide). Port 8112 freed.
+- Landing pages: librewaternet.org and epanet-plus-plus.org features lists name "multi-species water
+  quality (EPANET-MSX)" (his "Yes. Do it."), pushed. A features line for the network update was drafted
+  ("Update the open project from an EPANET .inp: elements with matching IDs take the file's values, new
+  ones are added, nothing is deleted, and one undo reverses it.") and goes up once master is pushed.
+- Done and off the list: the error-220 note to Luke Butler (he sent it).
+- Still owed: consent_body's 26 translations (EC_CONSENT_VERSION stays 2); the MSX keys' translations.
+  Budget is tight: Sonnet agents, few at a time.
+- Key hygiene: 0 keys rendered by nothing; none deleted.
 
 ### Branches waiting on him
 
-- `feat/network-update` (8112, aa84eb7d9): Task 814 call 2, an `.inp` updates the open project (IDs
-  matched, kept never deleted, one undo, receipt dialog, units/formula mismatch refused). Perry
-  reviewed; all six findings fixed (a pump/valve add threw; now rolls back on any failure). Needs his
-  browser pass and his word on ~45 new `lpn_inpup_*` strings. Gaps: GeoJSON, `.msx` on the update
-  route, positions of existing assets. I kept the "new project or this project?" question: his call 1
-  was the export-loss confirmation, not this one.
-- `feat/theme` (8111): 13 themes. His calls: Dark map "Good"; brief Ida on a Designer theme when budget allows.
+- `feat/eps-analysis` (8102): Task 578 and his question "why our fire flow analysis can't do an entire
+  EPS". A "reporting step tested" row in fire flow (on screen / chosen step / step of lowest pressure /
+  every step, worst case), criticality (whole run: lowest pressure, hours below minimum, tank empties)
+  and demand scaling (whole run). Sue's research in her journal (Bentley's EPS Fire Flow = hour of
+  minimum pressure; duration fires are a separate, named-fire tool, not built). Perry confirmed the
+  numbers independently; his five findings (tank-empty steps, mixed instants, a contradiction note,
+  hours over-count by one step, one term) were being fixed at handoff. Check `git log` on the branch
+  and its check_all.log before telling him it is ready.
+- `feat/guide-page` (8101): Task 816, User-Manual.php?lang=xx&chapter=slug, 19 chapters x 27 languages
+  (513 URLs), canonical on epanet-plus-plus.org. Perry's findings fixed (product sentence, whole-sentence
+  descriptions, weak chapters dropped, 404 line). Three new keys untranslated: the other 26 languages
+  show English until a sprint. Needs a full check_all with master merged, his browser pass and merge
+  word; then the epanet-plus-plus.org sitemap.xml regenerate, commit, push, his pull.
+- `feat/label-leader` (8103), built on `feat/label-form` (8114) + `feat/label-beside` (8110): pipes may
+  run through one-line node labels; leader threshold one text height. Green. His call: resting labels
+  already sit 15-25 px out (more than a text height), so his literal leader rule would put a leader on
+  every label; shrink the resting offset, or leaders on resting labels? Answer to his 10-18 question:
+  off-screen parts are NOT ignored (every pass places the whole network), and nothing is saved across
+  sessions (only an in-memory bank per zoom notch). Culling to the view is the obvious next economy
+  (Task 681).
 - `feat/label-form` (8114) + `feat/label-beside` (8110): he likes label-form; no merge word yet.
+- `feat/theme` (8111): 13 themes. His calls: Dark map "Good"; brief Ida on a Designer theme when budget allows.
 - `feat/sqlite-reader` (75ed1031f): Task 749, never merges until done (his word). His two real WaterCAD
   models (`~/tom-files/2026-10-18/Bentley-EPS-Group/`, CLIENT FILES: never into the repo) now import
   with unit demand loads, per-scenario demand multipliers (1.0/1.8/3.0) and junction fire flow, and
@@ -125,8 +144,19 @@ lines rather than appending corrections.
 
 ### Next job
 
-Merge on his word; port plan steps 2 and 5 after label-form; Task 816; Task 814's GeoJSON route;
-Task 752 steps 2-3; a fire-flow-across-scenarios table; Task 749 write-back; Task 733 phase 3 slow.
+Merge on his word; the network-update features line on both sites after master is pushed; label
+culling to the view (Task 681) if he wants it; a named duration fire inside an EPS (Sue's stage 2);
+criticality by valve segment; Task 814's GeoJSON route; Task 749 write-back; Task 733 phase 3 slow.
+
+### Traps met 2026-10-19 evening (twenty-eighth session)
+
+- **A Python one-liner truncated Sue's journal**: `open(p,'w').write(x+open(p).read())` opens for
+  writing (truncating) before the read. Caught by the diff stat (3,016 deletions), restored. Read first.
+- **A subagent that waits on its own background check_all re-sends its report on every wake.** Stop it
+  with TaskStop once its suite is detached (setsid) and watch the log yourself.
+- **An agent's "byte-identical before and after" was wrong**: help-menu, tool-keys and all-calcs-smoke
+  caught the in-app Guide refactor. Run the suite before believing a refactor claim.
+- **new-project-pan-harness.js failed once under load**, passed alone.
 
 ### Traps met 2026-10-19 (twenty-seventh session)
 
