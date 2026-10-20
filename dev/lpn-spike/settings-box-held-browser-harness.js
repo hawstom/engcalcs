@@ -179,7 +179,7 @@ async function main() {
 			const tags = [];
 			document.querySelectorAll('#lpn_settings_box [data-lpn-setting]').forEach((el) => {
 				const body = el.closest('.lpn-set-subbody'), sub = body && body.previousElementSibling, sec = el.closest('.lpn-set-sec');
-				JSON.parse(el.getAttribute('data-lpn-setting')).forEach((p) => tags.push({ p, minor: idx[sub.id], major: idx[sec.id] }));
+				JSON.parse(el.getAttribute('data-lpn-setting')).forEach((p) => tags.push({ p, minor: idx[sub.id] || (sub.classList.contains('lpn-set-sub-silent') ? idx[sec.id] : undefined), major: idx[sec.id] }));
 			});
 			const bad = [], subs = Object.values(idx);
 			document.querySelectorAll('#lpn_pane_settings tbody tr').forEach((tr) => {

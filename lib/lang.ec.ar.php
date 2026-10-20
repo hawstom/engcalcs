@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='استُبعدت من هذا التشغيل لأن
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='جارٍ تحميل حلّال EPANET. يُنزَّل مرة واحدة ثم يُحفظ على هذا الجهاز، ليعمل لاحقاً دون اتصال بالإنترنت.';
 $ec_lang['lpn_engine_ready']='حلّال EPANET موجود الآن على هذا الجهاز، ويعمل دون اتصال بالإنترنت.';
-$ec_lang['lpn_engine_fetching_valve']='جارٍ تحميل حلّال EPANET، ليتم حل هذا الصمام الآن ودون اتصال بالإنترنت لاحقاً.';
-$ec_lang['lpn_engine_ready_valve']='حلّال EPANET موجود الآن على هذا الجهاز. يمكن الآن حلّ صمامات كاسر الضغط والصمامات عامة الغرض (PBV وGPV) دون اتصال بالإنترنت.';
 $ec_lang['lpn_engine_unavailable']='تعذّر تحميل حلّال EPANET، المطلوب لحلّ صمامات كاسر الضغط والصمامات عامة الغرض (PBV وGPV). بعد اتصال واحد بالإنترنت، يُحفظ الحلّال على هذا الجهاز.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='تم تحميل الحلّال بنسبة {perc
 $ec_lang['lpn_engine_wait_bytes']='تم تحميل {kb} كيلوبايت من الحلّال حتى الآن. الإجمالي غير متاح، فنسبة الاكتمال غير معروفة.';
 $ec_lang['lpn_engine_needed_failed']='لم يُحمَّل حلّال EPANET بعد، ولا يمكن تحميله الآن، وهذه الشبكة لا يمكن حلّها إلا به. سيُحمَّل عندما تكون متصلاً بالإنترنت.';
 $ec_lang['lpn_engine_needed_failed_why']='لا يمكن حلّ هذه الشبكة إلا بحلّال EPANET. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='هذه صمامات كاسرة للضغط أو عامة الغرض، ولا يمكن حسابها إلا بحلّال EPANET. تعذّر تحميل حلّال EPANET، لذا هذه النتائج مفقودة:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='هذه الصمامات موصولة مباشرة بخزان أو صهريج يثبّت الخط المتدرج الهيدروليكي عند تلك العقدة، فلا يبقى للصمام ما يتحكم به. ضع أنبوباً قصيراً بين الصمام والخزان أو الصهريج:';
 $ec_lang['lpn_diag_not_converged']='لم يُعثر على حل. تحقق من وجود قيم مستحيلة في الواقع، مثل قطر يساوي صفراً.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} يجري عرض الحلّال ال�
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='حُلَّت بحلّال EPANET، بسبب صمامات كاسر الضغط والصمامات عامة الغرض هذه:';
 $ec_lang['lpn_unit_unknown']='يذكر هذا الرسم وحدة لا تدعمها هذه الصفحة: {unit}. تُحفظ كل القيم وتُعرض تماماً كما استُوردت، ولم يتغير شيء. لا يمكن حساب أي شيء حتى تُدعم الوحدة، لأن معامل تحويلها غير معروف.';
 $ec_lang['lpn_engine_manning_note']='ملاحظة: مع خشونة مانينغ، يقرّب EPANET الثابت في معادلة مانينغ، فيكون فقدان الضغط أقل بنحو 0.6٪ من الصيغة الدقيقة.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
@@ -3690,7 +3686,6 @@ $ec_lang['lpn_basemap_style_normal']='عادي';
 $ec_lang['lpn_basemap_style_muted']='خافت';
 $ec_lang['lpn_basemap_style_faded']='باهت';
 $ec_lang['lpn_basemap_style_grayscale']='تدرّج رمادي';
-$ec_lang['lpn_settings_map_display']='المظهر';
 // PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
 // to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
 // LPN_MAP_MIN in js/looped-network.js). Nothing renders these two keys now, so key_hygiene_check
@@ -3857,7 +3852,6 @@ $ec_lang['lpn_time_settings_open']='إعدادات الوقت';
 // "Hydraulics" is EPANET's own name for the friction-method/accuracy/engine group, which also
 // leaves room for its siblings (Quality, Reactions) as they arrive.
 $ec_lang['lpn_settings_sec_symbology']='التصور المرئي';
-$ec_lang['lpn_settings_sec_map']='الخريطة والصفحة';
 $ec_lang['lpn_settings_sec_assets']='العناصر';
 $ec_lang['lpn_settings_sec_calculation']='الحساب';
 // ROADMAP Task 247. A customer label's CONTENT is the node rows above it (Tom: "Customer labels

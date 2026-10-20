@@ -232,6 +232,10 @@ function buildPayloads(array $opts, bool $quiet = false): array
                 'plain_notes' => 'key_plain[key] says in plain words what that one string means, other wordings joined by "or". Use whichever your language expresses most naturally and compactly; you are not bound to the literal English wording.',
                 'key_notes_notes' => 'key_notes[key] are notes about that one string: how much room it has, symbols to keep exactly, what it refers to. Follow them. They are instructions to you, never text to put in your file.',
                 'suggestion_box_notes' => 'Read suggestion_box and follow it. It is part of your instructions, not a footnote: a sprint does not close while a translator complaint is unanswered.',
+                // dev/terms.md's "For every translator" section: Tom's standing word on a whole
+                // family of words at once (the family-tree metaphor), which no per-key channel carries.
+                'translator_notes' => termsTranslatorNotes(),
+                'translator_notes_notes' => 'Read translator_notes and follow them. Each is true of every string you translate.',
                 'concept_notes' => 'Read concept_source and follow it. key_concepts lists, for a key that names a concept, its plain-words name, which is what you translate from; English is one rendering of it.',
                 'uniqueness_notes' => 'uniqueness_attention lists the few groups of concepts that sit side by side on one screen. Find unique names for each, and use each name the same way everywhere.',
             ],
@@ -878,6 +882,18 @@ function termIndexByName(array $terms): array
         $index[strtolower((string)$term['term'])] = $term;
     }
     return $index;
+}
+
+/**
+ * The paragraphs of dev/terms.md's "For every translator" section, after its first (which says
+ * what the section is for). Empty when the section is absent.
+ */
+function termsTranslatorNotes(): array
+{
+    $text = (string)@file_get_contents(__DIR__ . '/../terms.md');
+    if (!preg_match('/^## For every translator\n(.*?)(?=^## )/ms', $text, $m)) { return []; }
+    $paras = array_values(array_filter(array_map('trim', preg_split('/\n\s*\n/', $m[1]))));
+    return array_slice($paras, 1);
 }
 
 /**

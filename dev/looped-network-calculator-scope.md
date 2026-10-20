@@ -88,7 +88,8 @@ with a new reason, not an appeal to completeness.
   every tank **and every link touching one**, so a municipal model arrived missing whole branches.
   EPA's own Net1, Net2 and Net3 all have tanks.
 - ~~**Water quality.**~~ **SHIPPED through the EPANET engine**: water age, source trace, and one
-  reacting chemical (`lpn_notes_2_def`). **Multi-species (EPANET-MSX) stays cut.**
+  reacting chemical (`lpn_notes_2_def`), and multi-species EPANET-MSX from an attached `.msx`
+  (Task 717; `dev/msx-scope.md`).
 - ~~**Active pressure controls — PRV / PSV / FCV.**~~ **REOPENED AND SHIPPED, 2026-08-14 (ROADMAP
   Task 248 phase 2)** — the second entry ever to leave this list, and it left it in a way the
   original entry did not anticipate. The reason for the cut still stands word for word: *their
@@ -97,11 +98,9 @@ with a new reason, not an appeal to completeness.
   the day before and found EPANET ~9x faster than our own solver at the 21-node target and ~46x at
   201 nodes, so writing a second implementation of status switching would have been slower code for
   a problem the engine we already ship has solved. So:
-  - **PRV, PSV and FCV are real elements, and the EPANET engine solves them.** A network holding one
-    is routed to EPANET automatically and the status bar says so, without rewriting the user's own
-    engine preference — the setting is a preference, the routing is a fact about this network.
-    `js/lpn-solver.js` refuses such a network BY NAME (`valve-needs-epanet`) if the engine cannot be
-    reached, which is the offline case and the only one a user meets.
+  - **PRV, PSV and FCV are real elements.** They first shipped through the EPANET engine alone;
+    since Task 733 (2026-10-17) the built-in solver switches them by EPANET's own rules, and since
+    its phase 2 it solves a PBV and a GPV too, so no valve routes a network to EPANET any more.
   - **TCV works in both engines and needed no numerics at all.** A throttle valve is a minor loss on
     a zero-length link, which is arithmetic the solver already did for every pipe. So the old
     sentence — *a fixed minor-loss valve (a k-value on a pipe) is fine and is in scope* — was

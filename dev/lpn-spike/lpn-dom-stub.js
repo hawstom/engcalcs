@@ -463,6 +463,7 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // building anything and the Track control is invisible to every harness -- the same silent hole
   // the fire-flow box's own note below describes.
   'lpn_set_hydraulics_fields', 'lpn_set_quality_fields', 'lpn_set_page_fields', 'lpn_set_time_fields',
+  'lpn_set_pos_fields', 'lpn_set_pos_fields2', 'lpn_set_map_fields2', 'lpn_set_sec_page',
   // Pump energy's own host (ROADMAP Task 566). Same silent hole: absent from this list,
   // rebuildSettings() returns at its guard and NOTHING in the Settings box is built for any
   // harness, not just the energy rows.
@@ -884,6 +885,10 @@ global.window.lpnDialogAnswerer = function (req) {
   const f = (w !== stubDialogDefaults[kind]) ? w : g;
   return f.call(global.window, req.text, req.value);
 };
+// **AN EPANET FILE IMPORTED INTO A PROJECT WITH ASSETS IN IT NOW ASKS WHERE IT GOES** (Task 814). The
+// harnesses that import one file after another mean a new project each time, so the stub answers
+// 'new'; inp-update-harness.js deletes this to drive the real question.
+global.window.lpnInpDestination = 'new';
 global.navigator = { userAgent: 'node' };
 global.requestAnimationFrame = f => setTimeout(f, 0);
 // iconEl/setLabel come from js/Calculators.lib.js in the browser.

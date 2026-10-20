@@ -163,7 +163,9 @@ let run = null;
 		const tables = [];
 		(function walk(e) { (e.children || []).forEach(function (c) {
 			if (c._tag === 'table') { tables.push(c); } walk(c); }); })(host);
-		ok('with a run, it draws exactly one table', tables.length === 1, tables.length);
+		// The scenario table, then Results by asset under it (Task 752): two, and only two.
+		ok('with a run, it draws the scenario table and the results-by-asset table', tables.length === 2 &&
+			tables[1].id === 'lpn_scnres_table', tables.length);
 		const bodyRows = [];
 		(function walk(e) { (e.children || []).forEach(function (c) {
 			if (c._tag === 'tr') { bodyRows.push(c); } walk(c); }); })(tables[0]);

@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='Пропуснати в това изчислен�
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='Изтегляне на решаващия модул на EPANET. Той се изтегля веднъж и след това остава на това устройство, така че след това работи офлайн.';
 $ec_lang['lpn_engine_ready']='Решаващият модул на EPANET вече е на това устройство и работи офлайн.';
-$ec_lang['lpn_engine_fetching_valve']='Изтегляне на решаващия модул на EPANET, за да може този вентил да бъде решен сега, а по-късно — офлайн.';
-$ec_lang['lpn_engine_ready_valve']='Решаващият модул на EPANET вече е на това устройство. Вентилите-прекъсвачи на налягането и вентилите с общо предназначение (PBV, GPV) вече могат да се изчисляват офлайн.';
 $ec_lang['lpn_engine_unavailable']='Решаващият модул на EPANET, който е необходим за изчисляване на вентили-прекъсвачи на налягането и вентили с общо предназначение (PBV, GPV), не можа да бъде изтеглен. След едно свързване с интернет решаващият модул се запазва на това устройство.';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='Решаващият модул е зареде
 $ec_lang['lpn_engine_wait_bytes']='Решаващият модул е зареден дотук с {kb} KB. Общият размер не е наличен, затова процентът на завършеност е неизвестен.';
 $ec_lang['lpn_engine_needed_failed']='Решаващият модул EPANET все още не е зареден, не може да бъде зареден, а тази мрежа може да бъде решена само от него. Той ще бъде зареден, когато сте свързани с интернет.';
 $ec_lang['lpn_engine_needed_failed_why']='Тази мрежа може да се изчисли само с решаващия модул на EPANET. {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='Това са вентили-прекъсвачи на налягането или вентили с общо предназначение и само решаващият модул на EPANET може да ги изчисли. Решаващият модул на EPANET не можа да бъде зареден, затова тези резултати липсват:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='Тези вентили са свързани директно към резервоар или цистерна, които фиксират хидравличната линия на напора във възела, така че вентилът няма какво да регулира. Поставете къса тръба между вентила и резервоара или цистерната:';
 $ec_lang['lpn_diag_not_converged']='Не бе намерено решение. Проверете за стойности, невъзможни в реалността, например нулев диаметър.';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} Вместо това се пока�
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='Изчислено с решаващия модул на EPANET заради тези вентили-прекъсвачи на налягането и вентили с общо предназначение:';
 $ec_lang['lpn_unit_unknown']='Този чертеж посочва единица, която тази страница не поддържа: {unit}. Всички стойности са запазени и показани точно както са внесени и нищо не е променено. Нищо не може да се изчисли, докато единицата не бъде поддържана, защото коефициентът ѝ за преобразуване е неизвестен.';
 $ec_lang['lpn_engine_manning_note']='Забележка: при грапавост по Манинг EPANET закръгля константата в уравнението на Манинг, затова загубата на напор излиза около 0,6% по-ниска от точната форма.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
@@ -3690,7 +3686,6 @@ $ec_lang['lpn_basemap_style_normal']='Нормален';
 $ec_lang['lpn_basemap_style_muted']='Приглушен';
 $ec_lang['lpn_basemap_style_faded']='Избледнял';
 $ec_lang['lpn_basemap_style_grayscale']='Сивогама';
-$ec_lang['lpn_settings_map_display']='Изглед';
 // PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
 // to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
 // LPN_MAP_MIN in js/looped-network.js). Nothing renders these two keys now, so key_hygiene_check
@@ -3857,7 +3852,6 @@ $ec_lang['lpn_time_settings_open']='Настройки за времето';
 // "Hydraulics" is EPANET's own name for the friction-method/accuracy/engine group, which also
 // leaves room for its siblings (Quality, Reactions) as they arrive.
 $ec_lang['lpn_settings_sec_symbology']='Визуализация';
-$ec_lang['lpn_settings_sec_map']='Карта и страница';
 $ec_lang['lpn_settings_sec_assets']='Елементи';
 $ec_lang['lpn_settings_sec_calculation']='Изчисление';
 // ROADMAP Task 247. A customer label's CONTENT is the node rows above it (Tom: "Customer labels

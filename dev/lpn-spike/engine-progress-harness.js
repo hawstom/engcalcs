@@ -200,11 +200,11 @@ function line(L) {
 		_diameter: 200, _roughness: 130, _length: 1000, _k: 0, _status: 'open' });
 	return d;
 }
-function withPbv(L) {
+// A network only EPANET answers. Since Task 733 no valve is one (Tom, 2026-10-18: every type is
+// the built-in solver's), so it is the pressure-driven demand model (Task 762).
+function withEpanetOnly(L) {
 	const d = line(L);
-	d.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 0 });
-	d.links.push({ id: 'V1', type: 'valve', valveType: 'PBV', from: 'J1', to: 'J2', verts: [],
-		_diameter: 200, _setting: 40, _k: 0, _status: 'open' });
+	L.settings().hydraulics = { demandModel: 'PDA', minPressure: 0, reqPressure: 20, pressureExponent: 0.5 };
 	return d;
 }
 // **ONE INSTANCE PER SCENARIO.** epanetWarmState leaves 'cold' once and never returns, which is
@@ -289,7 +289,7 @@ console.log('\n--- a network only EPANET can solve keeps its own stronger senten
 	fakeLoader();
 	const L = fresh();
 	L.settings().engine = 'native';
-	withPbv(L);
+	withEpanetOnly(L);
 	L.runSolve();
 	ok('the banner is the needs-the-engine sentence', banner() === PC.lpn_engine_needed_loading,
 		JSON.stringify(banner()));
@@ -408,7 +408,7 @@ console.log('\n--- no bar where there is no download to report ---');
 	fakeLoader();
 	const L = fresh();
 	L.settings().engine = 'native';
-	withPbv(L);
+	withEpanetOnly(L);
 	L.runSolve();
 	ok('the needs-the-engine wait has a bar', barShown(), barEl.style.display);
 	gate.rej(new Error('offline'));

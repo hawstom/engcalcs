@@ -2710,8 +2710,6 @@ $ec_lang['lpn_omitted_note']='इस रन से छोड़े गए, क�
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='EPANET सॉल्वर लाया जा रहा है। यह एक बार डाउनलोड होता है और फिर इस डिवाइस पर रखा जाता है, ताकि बाद में यह ऑफ़लाइन भी काम करे।';
 $ec_lang['lpn_engine_ready']='EPANET सॉल्वर अब इस डिवाइस पर है, और ऑफ़लाइन काम करता है।';
-$ec_lang['lpn_engine_fetching_valve']='EPANET सॉल्वर लाया जा रहा है, ताकि इस वाल्व को अभी और आगे ऑफ़लाइन भी हल किया जा सके।';
-$ec_lang['lpn_engine_ready_valve']='EPANET सॉल्वर अब इस डिवाइस पर रखा है। दाब-विच्छेदक और सामान्य प्रयोजन वाल्व (PBV, GPV) अब ऑफ़लाइन भी हल किए जा सकते हैं।';
 $ec_lang['lpn_engine_unavailable']='EPANET सॉल्वर डाउनलोड नहीं हो सका, जो दाब-विच्छेदक और सामान्य प्रयोजन वाल्व (PBV, GPV) को हल करने के लिए आवश्यक है। इंटरनेट से एक बार जुड़ने के बाद सॉल्वर इस डिवाइस पर रखा जाता है।';
 // The cause-specific sibling: {reason} is lpn_time_engine_fetch_failed (only a download can reach this notice).
 // Offline keeps the sentence above. {wrong} in lpn_time_engine_run_failed is filled with lpn_wrong_btn.
@@ -2729,7 +2727,6 @@ $ec_lang['lpn_engine_wait_pct']='सॉल्वर {percent}% लोड हु�
 $ec_lang['lpn_engine_wait_bytes']='सॉल्वर अब तक {kb} KB लोड हुआ। कुल उपलब्ध नहीं है, इसलिए पूर्णता का प्रतिशत अज्ञात है।';
 $ec_lang['lpn_engine_needed_failed']='EPANET सॉल्वर अभी तक लोड नहीं हुआ है, लोड नहीं हो सकता, और यह नेटवर्क केवल इसी से हल किया जा सकता है। जब आप इंटरनेट से जुड़े होंगे, तब यह लोड होगा।';
 $ec_lang['lpn_engine_needed_failed_why']='इस नेटवर्क को केवल EPANET सॉल्वर हल कर सकता है। {reason}';
-$ec_lang['lpn_diag_valve_needs_epanet']='ये दाब-विच्छेदक या सामान्य प्रयोजन वाल्व हैं, और इनकी गणना केवल EPANET सॉल्वर कर सकता है। EPANET सॉल्वर लोड नहीं हो सका, इसलिए ये परिणाम उपलब्ध नहीं हैं:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='ये वाल्व सीधे किसी जलाशय या टैंक से जुड़े हैं, जो उस नोड पर हाइड्रॉलिक ग्रेड को स्थिर कर देता है, इसलिए वाल्व के नियंत्रित करने के लिए कुछ नहीं बचता। वाल्व और जलाशय या टैंक के बीच एक छोटा पाइप लगाएँ:';
 $ec_lang['lpn_diag_not_converged']='कोई हल नहीं मिला। ऐसे मान जाँचें जो वास्तविक जीवन में असंभव हों, जैसे शून्य व्यास।';
 // **THE NUMBERS ARE DRAWN AND MARKED, NOT THROWN AWAY** (ROADMAP Task 565). A solve that did not
@@ -3588,7 +3585,6 @@ $ec_lang['lpn_engine_failed_why']='{reason} इसके बजाय बिल�
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
 // the EPANET solver anyway, because it holds a valve the built-in solver does not calculate. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
-$ec_lang['lpn_engine_valve_route']='EPANET सॉल्वर से हल किया गया, इन दाब-विच्छेदक और सामान्य प्रयोजन वाल्व के कारण:';
 $ec_lang['lpn_unit_unknown']='इस ड्राइंग में ऐसी इकाई बताई गई है जिसे यह पृष्ठ समर्थित नहीं करता: {unit}। सभी मान जैसे आयात हुए वैसे ही रखे और दिखाए गए हैं, और कुछ नहीं बदला गया। इकाई समर्थित होने तक कुछ भी परिकलित नहीं किया जा सकता, क्योंकि उसका रूपांतरण गुणक अज्ञात है।';
 $ec_lang['lpn_engine_manning_note']='नोट: मैनिंग खुरदरापन के साथ, EPANET मैनिंग समीकरण के स्थिरांक को पूर्णांकित करता है, इसलिए हेड हानि सटीक रूप की तुलना में लगभग 0.6% कम आती है।';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
@@ -3690,7 +3686,6 @@ $ec_lang['lpn_basemap_style_normal']='सामान्य';
 $ec_lang['lpn_basemap_style_muted']='मंद';
 $ec_lang['lpn_basemap_style_faded']='फीका';
 $ec_lang['lpn_basemap_style_grayscale']='ग्रेस्केल';
-$ec_lang['lpn_settings_map_display']='रूप-रंग';
 // PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
 // to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
 // LPN_MAP_MIN in js/looped-network.js). Nothing renders these two keys now, so key_hygiene_check
@@ -3857,7 +3852,6 @@ $ec_lang['lpn_time_settings_open']='समय सेटिंग्स';
 // "Hydraulics" is EPANET's own name for the friction-method/accuracy/engine group, which also
 // leaves room for its siblings (Quality, Reactions) as they arrive.
 $ec_lang['lpn_settings_sec_symbology']='विज़ुअलाइज़ेशन';
-$ec_lang['lpn_settings_sec_map']='मानचित्र और पृष्ठ';
 $ec_lang['lpn_settings_sec_assets']='तत्व';
 $ec_lang['lpn_settings_sec_calculation']='गणना';
 // ROADMAP Task 247. A customer label's CONTENT is the node rows above it (Tom: "Customer labels

@@ -309,15 +309,18 @@ async function run(mutate, quiet) {
 		base();
 	}
 
-	say('\n--- 9. a reservoir keeps its surface; a node is refused a link type ---');
+	say('\n--- 9. a reservoir becomes an empty tank; a node is refused a link type ---');
 	{
 		const W = L.createScenario('W');
 		L.switchScenario(W.id);
 		morph([['node', '9'], ['link', '10']], 'tank');
 		const r9 = L.nodeById('9');
-		ok('9.1 reservoir 9 is a tank in W; its depth keeps the water surface (head 800 - ground)',
-			r9.type === 'tank' && L.effective(r9, 'elev') !== undefined && Math.abs(L.effective(r9, 'elev') + L.effective(r9, 'level') - 800) < 1e-9,
-			L.effective(r9, 'elev') + ' + ' + L.effective(r9, 'level'));
+		// Tom, 2026-10-18: a reservoir turned tank is born empty on its ground, depths 0 / 0 / 1;
+		// nothing of the head is carried.
+		ok('9.1 reservoir 9 is a tank in W, born empty on its ground: depths 0 / 0 / 1',
+			r9.type === 'tank' && L.effective(r9, 'elev') !== undefined && L.effective(r9, 'level') === 0 &&
+			L.effective(r9, 'minLevel') === 0 && L.effective(r9, 'maxLevel') === 1,
+			[L.effective(r9, 'elev'), L.effective(r9, 'level'), L.effective(r9, 'minLevel'), L.effective(r9, 'maxLevel')].join(','));
 		const said = L.lastNotice();
 		ok('9.2 ...and pipe 10, a link, is left as it is, said in the page\'s words', L.linkById('10').type === 'pipe' &&
 			said === String(PC.lpn_morph_other_kind).replace('{ids}', '10'), said);

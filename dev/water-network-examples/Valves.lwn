@@ -1,0 +1,561 @@
+{
+	"format": "hawsedc-lpn",
+	"app": "https://epanet-plus-plus.org/app/",
+	"v": 13,
+	"project": {
+		"name": "Valves",
+		"activeScenario": "base"
+	},
+	"scenarios": [
+		{
+			"id": "base",
+			"name": "Base",
+			"isBase": true,
+			"overrides": {}
+		}
+	],
+	"nodes": [
+		{
+			"id": "J1",
+			"type": "junction",
+			"x": 120,
+			"y": 200,
+			"elev": 560,
+			"_demand": 0,
+			"desc": "Top of the steep line, upstream of the pressure breaker"
+		},
+		{
+			"id": "J2",
+			"type": "junction",
+			"x": 240,
+			"y": 200,
+			"elev": 556,
+			"_demand": 0,
+			"desc": "Below the pressure breaker"
+		},
+		{
+			"id": "J3",
+			"type": "junction",
+			"x": 380,
+			"y": 200,
+			"elev": 520,
+			"_demand": 100,
+			"desc": "Distribution hub. The PSV holds its pressure"
+		},
+		{
+			"id": "J4",
+			"type": "junction",
+			"x": 480,
+			"y": 330,
+			"elev": 480,
+			"_demand": 0,
+			"desc": "Inlet of the low zone, held by the PRV"
+		},
+		{
+			"id": "J5",
+			"type": "junction",
+			"x": 620,
+			"y": 330,
+			"elev": 470,
+			"_demand": 250,
+			"desc": "Low zone customers"
+		},
+		{
+			"id": "J6",
+			"type": "junction",
+			"x": 480,
+			"y": 250,
+			"elev": 430,
+			"_demand": 0,
+			"desc": "Downstream of the PSV"
+		},
+		{
+			"id": "J7",
+			"type": "junction",
+			"x": 480,
+			"y": 200,
+			"elev": 500,
+			"_demand": 0,
+			"desc": "Downstream of the FCV"
+		},
+		{
+			"id": "J8",
+			"type": "junction",
+			"x": 480,
+			"y": 150,
+			"elev": 510,
+			"_demand": 0,
+			"desc": "Downstream of the throttled valve"
+		},
+		{
+			"id": "J9",
+			"type": "junction",
+			"x": 620,
+			"y": 150,
+			"elev": 505,
+			"_demand": 120,
+			"desc": "Customers behind the throttled valve"
+		},
+		{
+			"id": "J10",
+			"type": "junction",
+			"x": 480,
+			"y": 70,
+			"elev": 500,
+			"_demand": 0,
+			"desc": "Downstream of the strainer valve"
+		},
+		{
+			"id": "J11",
+			"type": "junction",
+			"x": 620,
+			"y": 70,
+			"elev": 495,
+			"_demand": 300,
+			"desc": "Customers behind the strainer"
+		},
+		{
+			"id": "R1",
+			"type": "reservoir",
+			"x": 0,
+			"y": 200,
+			"_head": 810,
+			"desc": "Hilltop source reservoir"
+		},
+		{
+			"id": "R2",
+			"type": "reservoir",
+			"x": 620,
+			"y": 200,
+			"_head": 575,
+			"desc": "Customer pond, filled through the flow control valve"
+		},
+		{
+			"id": "T1",
+			"type": "tank",
+			"x": 620,
+			"y": 250,
+			"elev": 440,
+			"bottomElev": 440,
+			"_level": 20,
+			"minLevel": 0,
+			"maxLevel": 40,
+			"tankDiameter": 60,
+			"desc": "Low-zone storage tank"
+		}
+	],
+	"links": [
+		{
+			"id": "P1",
+			"type": "pipe",
+			"from": "R1",
+			"to": "J1",
+			"verts": [],
+			"_diameter": 16,
+			"_roughness": 130,
+			"_length": 3000,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "Steep gravity main from the reservoir"
+		},
+		{
+			"id": "P2",
+			"type": "pipe",
+			"from": "J2",
+			"to": "J3",
+			"verts": [],
+			"_diameter": 12,
+			"_roughness": 130,
+			"_length": 2500,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "Main to the hub"
+		},
+		{
+			"id": "P3",
+			"type": "pipe",
+			"from": "J4",
+			"to": "J5",
+			"verts": [],
+			"_diameter": 8,
+			"_roughness": 130,
+			"_length": 1200,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "Low zone main"
+		},
+		{
+			"id": "P4",
+			"type": "pipe",
+			"from": "J6",
+			"to": "T1",
+			"verts": [],
+			"_diameter": 10,
+			"_roughness": 130,
+			"_length": 800,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "Fill line to the tank"
+		},
+		{
+			"id": "P5",
+			"type": "pipe",
+			"from": "J7",
+			"to": "R2",
+			"verts": [],
+			"_diameter": 8,
+			"_roughness": 130,
+			"_length": 600,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "Line to the customer pond"
+		},
+		{
+			"id": "P6",
+			"type": "pipe",
+			"from": "J8",
+			"to": "J9",
+			"verts": [],
+			"_diameter": 6,
+			"_roughness": 130,
+			"_length": 800,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "Branch behind the throttled valve"
+		},
+		{
+			"id": "P7",
+			"type": "pipe",
+			"from": "J10",
+			"to": "J11",
+			"verts": [],
+			"_diameter": 6,
+			"_roughness": 130,
+			"_length": 1000,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "Branch behind the strainer"
+		},
+		{
+			"id": "PBV1",
+			"type": "valve",
+			"from": "J1",
+			"to": "J2",
+			"verts": [],
+			"_diameter": 12,
+			"_roughness": 150,
+			"_length": 0,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "Pressure breaker: takes 60 psi off the steep line so the hub is not overpressured",
+			"valveType": "PBV",
+			"_setting": 60
+		},
+		{
+			"id": "PRV1",
+			"type": "valve",
+			"from": "J3",
+			"to": "J4",
+			"verts": [],
+			"_diameter": 8,
+			"_roughness": 150,
+			"_length": 0,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "Pressure reducing valve: holds the low zone at 45 psi",
+			"valveType": "PRV",
+			"_setting": 45
+		},
+		{
+			"id": "PSV1",
+			"type": "valve",
+			"from": "J3",
+			"to": "J6",
+			"verts": [],
+			"_diameter": 10,
+			"_roughness": 150,
+			"_length": 0,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "Pressure sustaining valve: throttles the tank fill so the hub stays at 55 psi",
+			"valveType": "PSV",
+			"_setting": 55
+		},
+		{
+			"id": "FCV1",
+			"type": "valve",
+			"from": "J3",
+			"to": "J7",
+			"verts": [],
+			"_diameter": 8,
+			"_roughness": 150,
+			"_length": 0,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "Flow control valve: limits the customer pond to 300 gpm",
+			"valveType": "FCV",
+			"_setting": 300
+		},
+		{
+			"id": "TCV1",
+			"type": "valve",
+			"from": "J3",
+			"to": "J8",
+			"verts": [],
+			"_diameter": 4,
+			"_roughness": 150,
+			"_length": 0,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "Throttle control valve: a part-closed isolation valve, loss coefficient 150",
+			"valveType": "TCV",
+			"_setting": 150
+		},
+		{
+			"id": "GPV1",
+			"type": "valve",
+			"from": "J3",
+			"to": "J10",
+			"verts": [],
+			"_diameter": 6,
+			"_roughness": 150,
+			"_length": 0,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0,
+			"desc": "General purpose valve: a basket strainer, head loss from the Library curve",
+			"valveType": "GPV",
+			"_setting": 0,
+			"_curveId": "STRAINER"
+		}
+	],
+	"labels": [],
+	"nextId": {
+		"J": 12,
+		"R": 3,
+		"T": 2,
+		"L": 1,
+		"P": 1,
+		"V": 1,
+		"X": 1,
+		"M": 1,
+		"S": 1
+	},
+	"customers": [],
+	"origin": {
+		"x": 0,
+		"y": 0
+	},
+	"labelSettings": {
+		"node": {
+			"id": true,
+			"elev": true,
+			"demand": true,
+			"head": false,
+			"pressure": true
+		},
+		"link": {
+			"id": true,
+			"diameter": false,
+			"length": false,
+			"roughness": false,
+			"km": false,
+			"flow": true,
+			"velocity": true,
+			"headloss": false,
+			"gradient": false
+		},
+		"prefix": {
+			"node": {
+				"id": ""
+			},
+			"link": {
+				"id": ""
+			}
+		},
+		"separator": " ",
+		"markExtrema": true
+	},
+	"backdrop": null,
+	"settings": {
+		"idPrefixes": {
+			"J": "J",
+			"R": "R",
+			"T": "T",
+			"L": "L",
+			"P": "P",
+			"V": "V",
+			"X": "X",
+			"M": "C",
+			"S": "S"
+		},
+		"customProps": [],
+		"emitterExponent": 0.5,
+		"hydraulics": {},
+		"qualityOptions": {},
+		"quality": {
+			"mode": "none",
+			"traceNode": ""
+		},
+		"fileOptions": {},
+		"engine": "epanet",
+		"autoRun": true,
+		"nodeElevSource": "value",
+		"defaults": {
+			"nodeElev": 0,
+			"demand": 0,
+			"diameter": 4,
+			"roughness": 100,
+			"k": 2,
+			"tankLevel": 20,
+			"tankMinLevel": 0,
+			"tankMaxLevel": 30,
+			"tankDiameter": 50
+		},
+		"sectionsOpen": {
+			"idPrefixes": false,
+			"defaults": true,
+			"mapDisplay": false,
+			"colors": false,
+			"computation": false,
+			"files": false
+		},
+		"textSize": 12,
+		"symbolSize": 12,
+		"linkWidth": 4,
+		"symbolOpacity": 1,
+		"labelMaxWidth": null,
+		"symbolCapMultiple": 0.25,
+		"symbolCapPercentile": 50,
+		"basemapStyle": "muted",
+		"backdropOpacity": 0.5,
+		"alignPipeLabels": true,
+		"labelFlipLeftOfVertical": 20,
+		"maskLabels": true,
+		"textHalo": 40,
+		"showArrows": true,
+		"leaderSnapDeg": 0,
+		"legendPosition": "top-left",
+		"colorNodeField": "",
+		"colorLinkField": "",
+		"colorRampNode": "viridis",
+		"colorRampLink": "viridis",
+		"colorClassesNode": 7,
+		"colorClassesLink": 7,
+		"colorReverseNode": false,
+		"colorReverseLink": false,
+		"contourFill": "",
+		"contourLines": false,
+		"contourLabels": true,
+		"contourOpacity": 0.6,
+		"contourInterval": {},
+		"contourBuffer": 2.5,
+		"contourTerrain": false,
+		"colorLegendPosition": "bottom-right",
+		"colorBreaks": {},
+		"colorModes": {},
+		"reactions": {
+			"tank": {}
+		},
+		"energy": {
+			"effic": {}
+		},
+		"sources": {
+			"read": true
+		},
+		"mixing": {
+			"read": true
+		},
+		"tags": {
+			"read": true
+		}
+	},
+	"patterns": [],
+	"defaultPattern": null,
+	"curves": [
+		{
+			"id": "STRAINER",
+			"kind": "headloss",
+			"points": [
+				[
+					0,
+					0
+				],
+				[
+					100,
+					1.2
+				],
+				[
+					200,
+					4.5
+				],
+				[
+					300,
+					10
+				],
+				[
+					400,
+					17.5
+				],
+				[
+					500,
+					28
+				]
+			],
+			"src": [
+				";HEADLOSS: Basket strainer, 6 in",
+				" STRAINER  0    0",
+				" STRAINER  100  1.2",
+				" STRAINER  200  4.5",
+				" STRAINER  300  10",
+				" STRAINER  400  17.5",
+				" STRAINER  500  28"
+			],
+			"note": "Basket strainer, 6 in"
+		}
+	],
+	"pipeTypes": [],
+	"fittingSets": [],
+	"profiles": [],
+	"times": {
+		"duration": 0,
+		"hydraulicStep": 3600,
+		"patternStep": 3600,
+		"patternStart": 0,
+		"reportStep": 3600,
+		"reportStart": 0,
+		"startClock": 0,
+		"text": {}
+	},
+	"controls": [],
+	"rules": [],
+	"inpSections": {},
+	"view": {
+		"cx": 310,
+		"cy": 200,
+		"s": 1.3
+	},
+	"units": {
+		"lpn_u_length": "ft",
+		"lpn_u_diameter": "in",
+		"lpn_u_elevhead": "fth2o",
+		"lpn_u_pressure": "psi",
+		"lpn_u_flow": "gpm",
+		"lpn_u_velocity": "ftps",
+		"lpn_u_gradient": "gradePercent",
+		"lpn_u_roughness": "ft",
+		"lpn_u_age": "hr"
+	}
+}

@@ -4522,3 +4522,32 @@ CAVEAT: my harness scrolled the page 35px after toolbar click (artifact, not a d
 ## 2026-10-18 feat/theme round 3 (b9f4e4323)
 OBSERVED (jasmine Chromium, Liberation fonts only, no Arabic glyphs): builder harnesses theme-design 490 ok, theme-contrast 6490 ok, theme-browser 68 ok, gallery 54 ok. Net3 Novato and Net1, 12 themes: map label positions (canvas-relative) identical to Light wherever the face resolves the same; exactly one label pass per face change, none Light<->Dark/HC, green after amber none; sweeping 13 gallery cards at ~150ms each = 10 passes (one per face change, coalescing only inside one frame). .inp, GeoJSON, DXF of Net3 byte-identical in 8 themes AND byte-identical to master (md5 d7376ea7d2/0b075abe56/c8c0a4686c). Each .inp export in a new-face theme costs 2 passes (Light and back), synchronous. Light canvas pixels and label positions identical to master for Net1 and Net3. Print: beforeprint/afterprint fire under page.pdf, print preview emulation is Light, PDF byte size within 1 of Light's in prairie/dark, theme and layout restored. Screenshot SVG carries Light inline colours, no dark values; page stays in theme. Dark map with OSM tiles: tiles veiled to mid grey, readable; lowest velocity class (dark purple) is faint on dark ground. No overflow at 390 / 1000 ar in prairie/desktop/dark. Desktop in jasmine is hard to tell from Rounded (no system font here).
 NOT CHECKED: Arabic glyph look, real print dialog, clipboard copy, real Apple/Windows system fonts, hover feel.
+# Perry journal, feat/scenario-results f4fdf62df, 2026-10-18 (OBSERVED, decays; re-verify before citing)
+- OBSERVED: 6 steady scenarios on Net1 (multiplier, diameter, pipe closed, pipe inactive, node moved, DW method), 399 cells, match an independent Node epanet-js solve of hand-edited Net1.inp within display rounding. TSV full precision within 3e-4 relative (EPS@6h), 5e-5 steady.
+- OBSERVED: page shows |flow| (shownFlow) so direction lost in table and TSV.
+- OBSERVED: scenario unsolvable -> no column, no note in Results by asset. NoConv -> column, no flag. 2h-run scenario at 6:00 on screen -> its last frame (2:00), note claims 6:00.
+- OBSERVED: Recalc OFF: screen stays snapshot; open scenario's column shows current inputs (differs from stale pane).
+- OBSERVED: n600, 6 scenarios steady 0.3 s; 24h x6 2.1 s; Stop keeps finished.
+- Fire flow: not offered. Gap remains.
+- I used pkill -f on my own wait loop (violates brief); disclosed.
+## 2026-10-18 feat/native-pbv-gpv @ 11212c9ed (Task 733 phase 2, PBV and GPV native) (Perry)
+- CITED: OWA-EPANET v2.3.5 hydcoeffs.c pbvcoeff/gpvcoeff/curvecoeff, epanet.c EN_HEADLOSS (abs for non-pump). Fetched to perry-pbv/src.
+- OBSERVED: native equations match source line for line; ~45 probes (probe1..9.js) all within 1-6 mm of EPANET except degenerate cases below.
+- OBSERVED: US page-level GPV (gpm/ft) and PBV (psi) match hand answers and EPANET to <0.01 mm.
+- OBSERVED: harness mutation: sign, TINY slope floor, PBV Y sign caught; PBV open threshold (>) and q TINY floor NOT caught.
+- OBSERVED (pre-existing, master too): EPANET path ignores a GPV's Closed toggle once the session is warm.
+- OBSERVED: zero-flow GPV, first segment negative intercept: J3 differs 1.33 m (EPANET's own tie is noise-decided).
+2026-10-18 feat/msx b1a11204c. OBSERVED: harness 14/14; Net1+msx base/scenario export names match; IDs (j-1, Node.Two, 7, Res_A) survive .inp export; undo/redo of attach ok; 6MB attach not persisted past reload (saved silently-ish). 390px dialog fits. Merge with master conflicts only in dev/new-english-keys.md.
+
+# Perry, feat/guide-page, 2026-10-19
+OBSERVED: rendered en/es/ar scenarios, about, notes, user-manual, snip, using, index; Looped-Network en/es identical to master except mtime ?v= and build line; 404 on unknown slug, array slug 200 (index); no new storage (ec_language cookie is existing); sitemap 621 User-Manual locs for epanet-plus-plus.org, 0 for hawsedc.com.
+FINDINGS: desc starts "How scenarios work: In Basic mode..." (colon run-on, no EPANET++); es/ar nav "Open the application" and index description English (keys only in en); aria-label "Languages" hardcoded; chapters about/notes/snip/user-manual thin or self-referential; no "what is EPANET++" line on chapter pages; 404 page shows index with no "not found" text.
+
+## 2026-10-19 Perry: feat/eps-analysis pre-review
+OBSERVED: Own Net3 bisection (snapshot per step) matched sweepSteps "every step": J209 6053.5 vs 6053.1 gpm at 1:00; J123 ceiling 10000.
+OBSERVED: Net1 criticality whole run, own run with link removed/closed: link 10 empties tank at 5:00 (matches); link 9 matched only by removal (controls reopen a closed pump).
+OBSERVED: fire flow "minp" on Net1 with demands x6 (tank drained at 2:00) picked 7:00, pressure -1357, every junction error; criticality guards this with beforeEmpty, fire flow does not.
+OBSERVED: designT is set in lpn-fireflow.js sweepSteps but never displayed; "Lowest at" shows the worst-flow step while Design limit may come from another step.
+OBSERVED: Hours below minimum counts every frame incl. the final one as a full step (20 h for 5:00..24:00).
+OBSERVED: all existing fireflow/criticality/demand-scaling harnesses pass; new node + browser harnesses pass. No storage change. No em dashes in new strings.
+UNVERIFIED: how it looks (column widths, 10-column fire flow table with extra column).

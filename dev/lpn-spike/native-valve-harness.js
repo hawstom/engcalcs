@@ -306,17 +306,19 @@ async function run() {
 		await compare({ name: n.name, model: chain(n.m, n.v), want: n.want });
 	}
 
-	console.log('-- the line the page routes on');
-	ok('PRV, PSV, FCV and TCV are native', ['PRV', 'PSV', 'FCV', 'TCV'].every((t) =>
-		EngCalcs.lpnValveIsNative({ type: 'valve', valveType: t })));
-	ok('PBV and GPV still need EPANET', ['PBV', 'GPV'].every((t) =>
-		!EngCalcs.lpnValveIsNative({ type: 'valve', valveType: t })));
-	// EPANET's input error 220 (project.c valvecheck): two PRVs in series. EPANET refuses it, so the
-	// built-in solver must not quietly answer it: those valves still route to EPANET.
+	console.log('-- the valve data faults');
+	// EPANET's input error 220 (project.c valvecheck): two PRVs in series. A data fault, refused by
+	// name whichever engine is chosen (Task 733; Tom, 2026-10-18) -- see lpnValveConflicts for why
+	// EPANET's own enforcement depends on row order and ours does not.
 	const series = line('PRV', 60);
 	series.nodes.push(jn('J4', 10, 5));
 	series.links.push(valve('V2', 'J2', 'J4', 'PRV', 30, 0.2));
-	ok('two PRVs in series still go to EPANET', EngCalcs.lpnEpanetOnlyValves(series).join(',') === 'V,V2');
+	ok('two PRVs in series are refused by name, for either engine',
+		EngCalcs.lpnDiagnose(series).some((i) => i.code === 'valve-conflict' && i.ids.join(',') === 'V,V2'));
+	const refusedSeries = await EngCalcs.lpnSolveEpanet(series, { moduleUrl: MODULE_URL });
+	ok('...including by the EPANET path, before EPANET sees the file',
+		!refusedSeries.ok && (refusedSeries.issues || []).some((i) => i.code === 'valve-conflict'),
+		JSON.stringify(refusedSeries.issues || refusedSeries.engineError));
 	ok('a PRV on a reservoir is still refused by name',
 		EngCalcs.lpnDiagnose({ nodes: [res('R', 50), jn('J', 0, 1)],
 			links: [valve('V', 'R', 'J', 'PRV', 20, 0.2)] }).some((i) => i.code === 'valve-on-fixed-head'));

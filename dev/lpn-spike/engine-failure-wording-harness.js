@@ -143,7 +143,7 @@ async function main() {
 	ok('...and another language\'s label is the one named', EC.lpnEngineReason('run').indexOf('Algo anda mal?') >= 0);
 	PC.lpn_wrong_btn = savedBtn;
 
-	console.log('\n--- banner 2: lpn_engine_unavailable (valve network, download fails) ---');
+	console.log('\n--- banner 2: lpn_engine_unavailable (a network that needs EPANET, download fails) ---');
 	const notice = global.document.getElementById('lpn_map_notice');
 	async function warm(onLine) {
 		setOnLine(onLine);
@@ -151,7 +151,7 @@ async function main() {
 		L2.buildLayers(); L2.seedDefaultInputs();
 		EC.lpnEpanetLoad = () => Promise.reject(new Error('Failed to fetch dynamically imported module'));
 		notice.textContent = '';
-		L2.warmEpanetEngine('valve');
+		L2.warmEpanetEngine('needed');
 		await wait(20);
 		return notice.textContent;
 	}
@@ -174,7 +174,8 @@ async function main() {
 		d.nodes.push({ id: 'J1', type: 'junction', x: 500, y: 0, elev: 0, _demand: 30 });
 		d.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 0 });
 		d.links.push({ id: 'L1', type: 'pipe', from: 'R1', to: 'J1', verts: [], _diameter: 200, _roughness: 130, _length: 1000, _k: 0, _status: 'open' });
-		d.links.push({ id: 'V1', type: 'valve', valveType: 'PBV', from: 'J1', to: 'J2', verts: [], _diameter: 200, _setting: 40, _k: 0, _status: 'open' });
+		// Pressure-driven: since Task 733 no valve is EPANET's alone (Tom, 2026-10-18).
+		L3.settings().hydraulics = { demandModel: 'PDA', minPressure: 0, reqPressure: 20, pressureExponent: 0.5 };
 		EC.lpnEpanetLoad = () => Promise.reject(new Error('Failed to fetch dynamically imported module'));
 		banner.textContent = '';
 		L3.warmEpanetEngine('background');
@@ -183,7 +184,7 @@ async function main() {
 		return banner.textContent;
 	}
 	let b = await needed(false);
-	ok('offline, the PBV network banner keeps today\'s sentence', b === PC.lpn_engine_needed_failed, JSON.stringify(b));
+	ok('offline, the EPANET-only network banner keeps today\'s sentence', b === PC.lpn_engine_needed_failed, JSON.stringify(b));
 	b = await needed(true);
 	ok('online, it names the failed download instead', b === PC.lpn_engine_needed_failed_why.replace('{reason}', EC.lpnEngineReason('fetch')), JSON.stringify(b));
 	const offTail = PC.lpn_engine_needed_failed.slice(PC.lpn_engine_needed_failed.lastIndexOf('. ', PC.lpn_engine_needed_failed.length - 2) + 2);

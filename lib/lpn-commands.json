@@ -1,0 +1,737 @@
+{
+ "groups": [
+  {
+   "id": "file",
+   "label": "File",
+   "commands": [
+    {
+     "id": "file/file_new",
+     "label": "New project…",
+     "parent": ""
+    },
+    {
+     "id": "file/file_open",
+     "label": "Open…",
+     "parent": ""
+    },
+    {
+     "id": "file/examples_menu",
+     "label": "Open example…",
+     "parent": ""
+    },
+    {
+     "id": "file/file_import_menu/file_import_survey",
+     "label": "Surveyed points…",
+     "parent": "Import…"
+    },
+    {
+     "id": "file/file_import_menu/file_import_inp",
+     "label": "EPANET file…",
+     "parent": "Import…"
+    },
+    {
+     "id": "file/file_import_menu/file_import_msx",
+     "label": "EPANET-MSX file…",
+     "parent": "Import…"
+    },
+    {
+     "id": "file/file_import_menu/file_import_gjnet",
+     "label": "GeoJSON network…",
+     "parent": "Import…"
+    },
+    {
+     "id": "file/file_import_menu/file_import_shapes",
+     "label": "GeoJSON shapes…",
+     "parent": "Import…"
+    },
+    {
+     "id": "file/file_import_menu/file_import_dxf",
+     "label": "DXF shapes…",
+     "parent": "Import…"
+    },
+    {
+     "id": "file/file_import_menu/file_import_shp",
+     "label": "Shapefile shapes…",
+     "parent": "Import…"
+    },
+    {
+     "id": "file/file_import_menu/library_import",
+     "label": "Libraries…",
+     "parent": "Import…"
+    },
+    {
+     "id": "file/file_import_menu/file_import_workspace",
+     "label": "Workspace…",
+     "parent": "Import…"
+    },
+    {
+     "id": "file/file_export_menu/file_export_item_inp",
+     "label": "EPANET file…",
+     "parent": "Export…"
+    },
+    {
+     "id": "file/file_export_menu/file_export_item_geojson",
+     "label": "GeoJSON file…",
+     "parent": "Export…"
+    },
+    {
+     "id": "file/file_export_menu/file_export_item_msx",
+     "label": "EPANET-MSX file…",
+     "parent": "Export…"
+    },
+    {
+     "id": "file/file_export_menu/file_export_item_dxf",
+     "label": "DXF file…",
+     "parent": "Export…"
+    },
+    {
+     "id": "file/file_export_menu/file_export_item_ods",
+     "label": "ODS file…",
+     "parent": "Export…"
+    },
+    {
+     "id": "file/file_export_menu/file_export_item_xlsx",
+     "label": "XLSX file…",
+     "parent": "Export…"
+    },
+    {
+     "id": "file/file_export_menu/file_export_item_csv",
+     "label": "CSV file…",
+     "parent": "Export…"
+    },
+    {
+     "id": "file/file_export_menu/file_export_item_workspace",
+     "label": "Workspace…",
+     "parent": "Export…"
+    },
+    {
+     "id": "file/file_save",
+     "label": "Save",
+     "parent": ""
+    },
+    {
+     "id": "file/file_saveas",
+     "label": "Save as…",
+     "parent": ""
+    },
+    {
+     "id": "file/file_convert_as",
+     "label": "Convert as…",
+     "parent": ""
+    },
+    {
+     "id": "file/file_saveall",
+     "label": "Save all",
+     "parent": ""
+    },
+    {
+     "id": "file/file_revert",
+     "label": "Revert",
+     "parent": ""
+    },
+    {
+     "id": "file/close",
+     "label": "Close",
+     "parent": ""
+    }
+   ]
+  },
+  {
+   "id": "edit",
+   "label": "Edit",
+   "commands": [
+    {
+     "id": "edit/tool_select",
+     "label": "Select",
+     "parent": ""
+    },
+    {
+     "id": "edit/tool_vertices",
+     "label": "Vertices",
+     "parent": ""
+    },
+    {
+     "id": "edit/tool_area_window",
+     "label": "Select a window",
+     "parent": ""
+    },
+    {
+     "id": "edit/tool_area_lasso",
+     "label": "Select a lasso",
+     "parent": ""
+    },
+    {
+     "id": "edit/tool_area_polygon",
+     "label": "Select a polygon",
+     "parent": ""
+    },
+    {
+     "id": "edit/tool_undo",
+     "label": "Undo",
+     "parent": ""
+    },
+    {
+     "id": "edit/find_menu",
+     "label": "Find and replace",
+     "parent": ""
+    },
+    {
+     "id": "edit/tool_delete",
+     "label": "Delete",
+     "parent": ""
+    },
+    {
+     "id": "edit/edit_delete_network",
+     "label": "Delete network",
+     "parent": ""
+    }
+   ]
+  },
+  {
+   "id": "map",
+   "label": "Map",
+   "commands": [
+    {
+     "id": "map/tool_zoom_extent",
+     "label": "Zoom to fit",
+     "parent": ""
+    },
+    {
+     "id": "map/tool_zoom_selection",
+     "label": "Zoom to selection",
+     "parent": ""
+    },
+    {
+     "id": "map/tool_zoom_window",
+     "label": "Zoom Window",
+     "parent": ""
+    },
+    {
+     "id": "map/screenshot_menu",
+     "label": "Screenshot",
+     "parent": ""
+    },
+    {
+     "id": "map/backdrop_menu/backdrop_add",
+     "label": "Add",
+     "parent": "Background image…"
+    },
+    {
+     "id": "map/backdrop_menu/backdrop_position",
+     "label": "Move",
+     "parent": "Background image…"
+    },
+    {
+     "id": "map/backdrop_menu/backdrop_scale",
+     "label": "Scale by picking",
+     "parent": "Background image…"
+    },
+    {
+     "id": "map/backdrop_menu/backdrop_scale_entry",
+     "label": "Scale by world file or by the size of one pixel on the map",
+     "parent": "Background image…"
+    },
+    {
+     "id": "map/backdrop_menu/backdrop_scale_from",
+     "label": "Scale from current size, around a point you pick",
+     "parent": "Background image…"
+    },
+    {
+     "id": "map/backdrop_menu/backdrop_remove",
+     "label": "Remove",
+     "parent": "Background image…"
+    },
+    {
+     "id": "map/map_attach_menu/map_attach_add",
+     "label": "Attach",
+     "parent": "World map…"
+    },
+    {
+     "id": "map/map_attach_menu/map_attach_readjust",
+     "label": "Re-adjust",
+     "parent": "World map…"
+    },
+    {
+     "id": "map/map_attach_menu/map_attach_scale_from",
+     "label": "Scale from the current size…",
+     "parent": "World map…"
+    },
+    {
+     "id": "map/map_attach_menu/map_attach_remove",
+     "label": "Detach",
+     "parent": "World map…"
+    },
+    {
+     "id": "map/clean_map",
+     "label": "Clean map",
+     "parent": ""
+    },
+    {
+     "id": "map/goto_menu",
+     "label": "Go to a latitude and longitude…",
+     "parent": ""
+    },
+    {
+     "id": "map/search_menu",
+     "label": "Search for a place by name…",
+     "parent": ""
+    }
+   ]
+  },
+  {
+   "id": "project",
+   "label": "Water",
+   "commands": [
+    {
+     "id": "project/menu_insert/tool_add_chain",
+     "label": "Junction Pipe Chain",
+     "parent": "Insert"
+    },
+    {
+     "id": "project/menu_insert/tool_add_junction",
+     "label": "Junction",
+     "parent": "Insert"
+    },
+    {
+     "id": "project/menu_insert/tool_add_reservoir",
+     "label": "Reservoir",
+     "parent": "Insert"
+    },
+    {
+     "id": "project/menu_insert/tool_add_tank",
+     "label": "Tank",
+     "parent": "Insert"
+    },
+    {
+     "id": "project/menu_insert/tool_add_pipe",
+     "label": "Pipe",
+     "parent": "Insert"
+    },
+    {
+     "id": "project/menu_insert/tool_add_pump",
+     "label": "Pump",
+     "parent": "Insert"
+    },
+    {
+     "id": "project/menu_insert/tool_add_valve",
+     "label": "Valve",
+     "parent": "Insert"
+    },
+    {
+     "id": "project/menu_insert/tool_add_meter",
+     "label": "Customer",
+     "parent": "Insert"
+    },
+    {
+     "id": "project/menu_insert/tool_add_text",
+     "label": "Text",
+     "parent": "Insert"
+    },
+    {
+     "id": "project/menu_insert/tool_add_shape",
+     "label": "Shape",
+     "parent": "Insert"
+    },
+    {
+     "id": "project/tool_settings",
+     "label": "Settings",
+     "parent": ""
+    },
+    {
+     "id": "project/library_menu",
+     "label": "Libraries",
+     "parent": ""
+    },
+    {
+     "id": "project/graphs_menu/ts_menu",
+     "label": "Time series",
+     "parent": "Graphs"
+    },
+    {
+     "id": "project/graphs_menu/profile_menu",
+     "label": "Profile",
+     "parent": "Graphs"
+    },
+    {
+     "id": "project/graphs_menu/contour_menu",
+     "label": "Contour",
+     "parent": "Graphs"
+    },
+    {
+     "id": "project/graphs_menu/freq_menu",
+     "label": "Frequency",
+     "parent": "Graphs"
+    },
+    {
+     "id": "project/graphs_menu/sysflow_menu",
+     "label": "Flow balance",
+     "parent": "Graphs"
+    },
+    {
+     "id": "project/tables_menu",
+     "label": "Tables",
+     "parent": ""
+    },
+    {
+     "id": "project/scenario_menu/sm_menu",
+     "label": "Scenario manager…",
+     "parent": "Scenarios"
+    },
+    {
+     "id": "project/scenario_menu/sm_list_overrides",
+     "label": "Override manager…",
+     "parent": "Scenarios"
+    },
+    {
+     "id": "project/scenario_menu/scenario_basic",
+     "label": "Basic mode",
+     "parent": "Scenarios"
+    },
+    {
+     "id": "project/scenario_menu/scenario_new",
+     "label": "New scenario…",
+     "parent": "Scenarios"
+    },
+    {
+     "id": "project/scenario_menu/scenario_copy",
+     "label": "Copy scenario",
+     "parent": "Scenarios"
+    },
+    {
+     "id": "project/scenario_menu/scenario_rename",
+     "label": "Rename scenario…",
+     "parent": "Scenarios"
+    },
+    {
+     "id": "project/scenario_menu/scenario_delete",
+     "label": "Delete scenario",
+     "parent": "Scenarios"
+    },
+    {
+     "id": "project/time_run",
+     "label": "Calculate",
+     "parent": ""
+    },
+    {
+     "id": "project/analyze_menu/ff_menu",
+     "label": "Fire flow analysis…",
+     "parent": "Analyze"
+    },
+    {
+     "id": "project/analyze_menu/crit_menu",
+     "label": "Criticality analysis…",
+     "parent": "Analyze"
+    },
+    {
+     "id": "project/analyze_menu/ds_menu",
+     "label": "Demand scaling…",
+     "parent": "Analyze"
+    },
+    {
+     "id": "project/reports_menu/energy_menu",
+     "label": "Pump energy",
+     "parent": "Reports"
+    },
+    {
+     "id": "project/reports_menu/scncmp_title",
+     "label": "Scenario comparison",
+     "parent": "Reports"
+    },
+    {
+     "id": "project/reports_menu/reports_epanet",
+     "label": "Run",
+     "parent": "Reports"
+    },
+    {
+     "id": "project/reports_menu/reports_status",
+     "label": "Status changes",
+     "parent": "Reports"
+    },
+    {
+     "id": "project/reports_menu/reports_calib",
+     "label": "Calibration",
+     "parent": "Reports"
+    },
+    {
+     "id": "project/reports_menu/reports_full",
+     "label": "Full",
+     "parent": "Reports"
+    },
+    {
+     "id": "project/morph_menu/tool_add_junction",
+     "label": "Junction",
+     "parent": "Morph"
+    },
+    {
+     "id": "project/morph_menu/tool_add_reservoir",
+     "label": "Reservoir",
+     "parent": "Morph"
+    },
+    {
+     "id": "project/morph_menu/tool_add_tank",
+     "label": "Tank",
+     "parent": "Morph"
+    },
+    {
+     "id": "project/morph_menu/tool_add_pipe",
+     "label": "Pipe",
+     "parent": "Morph"
+    },
+    {
+     "id": "project/morph_menu/tool_add_pump",
+     "label": "Pump",
+     "parent": "Morph"
+    },
+    {
+     "id": "project/morph_menu/tool_add_valve",
+     "label": "Valve",
+     "parent": "Morph"
+    }
+   ]
+  },
+  {
+   "id": "help",
+   "label": "Help",
+   "commands": [
+    {
+     "id": "help/help_walkthroughs",
+     "label": "Walkthroughs",
+     "parent": ""
+    },
+    {
+     "id": "help/help_manual",
+     "label": "User manual",
+     "parent": ""
+    },
+    {
+     "id": "help/help_fix",
+     "label": "Fix something",
+     "parent": ""
+    },
+    {
+     "id": "help/help_welcome",
+     "label": "Welcome page",
+     "parent": ""
+    },
+    {
+     "id": "help/help_screenshots",
+     "label": "Screenshot gallery",
+     "parent": ""
+    }
+   ]
+  },
+  {
+   "id": "scenario",
+   "label": "Scenarios",
+   "commands": [
+    {
+     "id": "scenario/sm_menu",
+     "label": "Scenario manager…",
+     "parent": ""
+    },
+    {
+     "id": "scenario/sm_list_overrides",
+     "label": "Override manager…",
+     "parent": ""
+    },
+    {
+     "id": "scenario/scenario_basic",
+     "label": "Basic mode",
+     "parent": ""
+    },
+    {
+     "id": "scenario/scenario_new",
+     "label": "New scenario…",
+     "parent": ""
+    },
+    {
+     "id": "scenario/scenario_copy",
+     "label": "Copy scenario",
+     "parent": ""
+    },
+    {
+     "id": "scenario/scenario_rename",
+     "label": "Rename scenario…",
+     "parent": ""
+    },
+    {
+     "id": "scenario/scenario_delete",
+     "label": "Delete scenario",
+     "parent": ""
+    }
+   ]
+  },
+  {
+   "id": "tab",
+   "label": "Project tab",
+   "commands": [
+    {
+     "id": "tab/project_rename",
+     "label": "Rename",
+     "parent": ""
+    },
+    {
+     "id": "tab/tab_duplicate",
+     "label": "Duplicate",
+     "parent": ""
+    },
+    {
+     "id": "tab/tab_move_left",
+     "label": "Move left",
+     "parent": ""
+    },
+    {
+     "id": "tab/tab_move_right",
+     "label": "Move right",
+     "parent": ""
+    },
+    {
+     "id": "tab/close",
+     "label": "Close",
+     "parent": ""
+    }
+   ]
+  },
+  {
+   "id": "tb",
+   "label": "Toolbar",
+   "commands": [
+    {
+     "id": "tb/open",
+     "label": "Open…",
+     "parent": ""
+    },
+    {
+     "id": "tb/save",
+     "label": "Save",
+     "parent": ""
+    },
+    {
+     "id": "tb/select",
+     "label": "Select",
+     "parent": ""
+    },
+    {
+     "id": "tb/select-area",
+     "label": "Select a window",
+     "parent": ""
+    },
+    {
+     "id": "tb/vertices",
+     "label": "Vertices",
+     "parent": ""
+    },
+    {
+     "id": "tb/delete",
+     "label": "Delete",
+     "parent": ""
+    },
+    {
+     "id": "tb/undo",
+     "label": "Undo",
+     "parent": ""
+    },
+    {
+     "id": "tb/add-chain",
+     "label": "Junction Pipe Chain",
+     "parent": ""
+    },
+    {
+     "id": "tb/add-junction",
+     "label": "Junction",
+     "parent": ""
+    },
+    {
+     "id": "tb/add-reservoir",
+     "label": "Reservoir",
+     "parent": ""
+    },
+    {
+     "id": "tb/add-tank",
+     "label": "Tank",
+     "parent": ""
+    },
+    {
+     "id": "tb/add-pipe",
+     "label": "Pipe",
+     "parent": ""
+    },
+    {
+     "id": "tb/add-pump",
+     "label": "Pump",
+     "parent": ""
+    },
+    {
+     "id": "tb/add-valve",
+     "label": "Valve",
+     "parent": ""
+    },
+    {
+     "id": "tb/add-meter",
+     "label": "Customer",
+     "parent": ""
+    },
+    {
+     "id": "tb/add-text",
+     "label": "Text",
+     "parent": ""
+    },
+    {
+     "id": "tb/add-shape",
+     "label": "Shape",
+     "parent": ""
+    },
+    {
+     "id": "tb/zoom-window",
+     "label": "Zoom to fit",
+     "parent": ""
+    },
+    {
+     "id": "tb/settings",
+     "label": "Settings",
+     "parent": ""
+    },
+    {
+     "id": "tb/run",
+     "label": "Calculate",
+     "parent": ""
+    },
+    {
+     "id": "tb/restart",
+     "label": "Go to the start",
+     "parent": ""
+    },
+    {
+     "id": "tb/step-back",
+     "label": "Step back",
+     "parent": ""
+    },
+    {
+     "id": "tb/play",
+     "label": "Play",
+     "parent": ""
+    },
+    {
+     "id": "tb/step-fwd",
+     "label": "Step forward",
+     "parent": ""
+    },
+    {
+     "id": "tb/end",
+     "label": "Go to the end",
+     "parent": ""
+    },
+    {
+     "id": "tb/find",
+     "label": "Find and replace",
+     "parent": ""
+    },
+    {
+     "id": "tb/pane-bottom",
+     "label": "Bottom panel",
+     "parent": ""
+    }
+   ]
+  }
+ ]
+}

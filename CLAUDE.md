@@ -184,9 +184,11 @@ it. **A core calculator, in scope in all 26 languages. Never call it "preview".*
   patterns, reservoir-head and pump-speed patterns, and `[RULES]`. The transport mounts in
   `lpn_toolbar_run`. The built-in solver solves one instant and is not getting a time dimension.
   **"No EPS yet" is false.**
-- **PRV, PSV, FCV and TCV solve in either engine; PBV and GPV through EPANET only.** Such a network
-  routes to EPANET automatically without rewriting the stored `engine` setting.
-  `EngCalcs.lpnValveIsNative` draws that line. Speed is no longer a reason to prefer either engine.
+- **Every valve type (PRV, PSV, FCV, TCV, PBV, GPV) solves in either engine; nothing about a valve
+  routes to EPANET.** Valve data EPANET refuses (a forbidden valve pair, an unreadable GPV curve) is
+  refused by name in both, by `EngCalcs.lpnDiagnose`. A pressure-driven demand model still routes to
+  EPANET, without rewriting the stored `engine` setting. Speed is no longer a reason to prefer either
+  engine.
 - **A curve is a document object; an element holds only a reference.** `doc.curves` holds
   `{id, kind, points, src, tok}`; the Library's Curves section is the only editor. The reference is
   scenario-overridable, the points are not. The three-point fit is derived, never stored. Four

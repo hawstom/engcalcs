@@ -9,8 +9,7 @@ lines rather than appending corrections.
 ## Before merging anything
 
 - **Feature branches alive, each awaiting Tom's browser pass**: see STATE below. A feature merges
-  into master on his typed word; there is no all-clear file, freeze or merge hook. Plus `feat/label-placer` (the seam; round-5 bench), `feat/label-gang-search` (bench only), and
-  builders `feat/label-placer-a`..`-d`, which never merge alone.
+  into master on his typed word; there is no all-clear file, freeze or merge hook. The label bench branches are archived as tags (see STATE).
 - **A branch that adds a key fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
 - **Merge master into a branch before merging it to master**, then run the suite on the merge:
@@ -96,51 +95,90 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-17 (twenty-fifth session, afternoon and evening, Arizona time)
+## STATE — 2026-10-19 evening (twenty-eighth session, Arizona time)
 
-### Master: 45317389e (pushed 2026-10-17 9:39 PM; Tom deploys it). Production: 4866c11d2 (sprint 1017) or 45317389e
+### Master: the merge of chore/batch-1019c and this handoff. Production: what he last pulled
 
-**Sprint 1017 is merged into master and ready to deploy**. It translates the 408 untranslated
-keys (98 of them he had not yet read) and 27 rewordings into 26 languages, Wave 0 rewrote 19 English
-strings (`dev/english-friction/1017-wave0.json`), cross-language QA fixed 237 strings
-(`dev/english-friction/1017-qa-report.md`), Task 809's halo words, the five dead keys joined on one
-line in every file, and a new payload note: **Layout (box title)**, derived from the page by
-`dev/scripts/dock_box_titles.inc.php`, tells translators to put a dockable box title's subject word
-first (his auto-hide tab question). Every `.replace('{name}'` is now global (Copy upward says {name} twice).
-Deleted keys: `lpn_guide_text_notes_popup`; and from the 26 non-English files only, `lpn_guide_text_alt_box`,
-`lpn_guide_how_alt`, `lpn_alt_calc_options`, `lpn_scenario_duration_tip`, `lpn_scenario_hyd_step_tip`.
+- Merged 10-19 evening: `feat/network-update` (Task 814 call 2; his word "I tried all, and all works
+  great. Wording is all great.") and `fix/scenario-flow-sign` (Results by asset keeps the solver's +/-
+  sign on flows; his wording for the tip and Guide). Port 8112 freed.
+- Landing pages: librewaternet.org and epanet-plus-plus.org features lists name "multi-species water
+  quality (EPANET-MSX)" (his "Yes. Do it."), pushed. A features line for the network update was drafted
+  ("Update the open project from an EPANET .inp: elements with matching IDs take the file's values, new
+  ones are added, nothing is deleted, and one undo reverses it.") and goes up once master is pushed.
+- Done and off the list: the error-220 note to Luke Butler (he sent it).
+- Still owed: consent_body's 26 translations (EC_CONSENT_VERSION stays 2); the MSX keys' translations.
+  Budget is tight: Sonnet agents, few at a time.
+- Key hygiene: 0 keys rendered by nothing; none deleted.
 
-### Branches he has passed once (2026-10-17); his notes are on Tasks 752, 811, 812 and 814
+### Branches waiting on him
 
-- `feat/sheet-sync` (row 8108): phase 1 of Task 752's old shape, the whole-tree workbook. Task 752 was
-  reshaped on market research (results by scenario, demand import, one scenario at a time); salvage, don't merge.
-- `feat/theme` (row 8111): Task 811. Colour themes only so far; he wants design themes on the same branch.
-- `feat/label-beside` (row 8110): Task 812. He saw no difference and no level label; the page shows no
-  zoom factor and he could not reach the 600-junction network. Short pipes should also try the level spot.
-- `docs/label-port`: the port plan (Task 813); merges with label-beside.
-
-### Questions out to him
-
-- Terms for Task 737 (am, my use one word for Scenario and Status): CC proposed two `dev/terms.md`
-  entries and a uniqueness group; he edits that file.
-- The import labels and four English fixes (`fix/menu-wording`) change English only; their 26
-  translations are owed. A mini-sprint needs his word.
-- His `lpn_sm_help` lacks Copy upward and the has-children delete reason: CC proposed two sentences.
-- Port 8202 never reaches jasmine from his browser; epanet-plus-plus.org is also on 8109.
-
-### Waiting to merge (next batch, one suite run)
-
-- `chore/752-reshape`: Task 752 reshaped on market research, the report filed, Task 809's cadence.
-- `fix/settings-clear-jump` (828185057, green on its harness): the real Settings jump, a 561 px pull
-  when a tip is showing during a redraw. A defect: merges on green.
-- `feat/sqlite-reader` (Task 749) is NOT in any batch: Tom, 2026-10-17, *"No merging it until it's done."*
-- WaterCAD samples found: `dev/agents/market-researcher/wtg-samples.md` (Zenodo 7162154, TSNet). Tom is
-  seeking a free EWB Bentley licence to make the one missing case, a child that overrides a value.
+- `feat/eps-analysis` (8102): Task 578 and his question "why our fire flow analysis can't do an entire
+  EPS". A "reporting step tested" row in fire flow (on screen / chosen step / step of lowest pressure /
+  every step, worst case), criticality (whole run: lowest pressure, hours below minimum, tank empties)
+  and demand scaling (whole run). Sue's research in her journal (Bentley's EPS Fire Flow = hour of
+  minimum pressure; duration fires are a separate, named-fire tool, not built). Perry confirmed the
+  numbers independently; his five findings (tank-empty steps, mixed instants, a contradiction note,
+  hours over-count by one step, one term) were being fixed at handoff. Check `git log` on the branch
+  and its check_all.log before telling him it is ready.
+- `feat/guide-page` (8101): Task 816, User-Manual.php?lang=xx&chapter=slug, 19 chapters x 27 languages
+  (513 URLs), canonical on epanet-plus-plus.org. Perry's findings fixed (product sentence, whole-sentence
+  descriptions, weak chapters dropped, 404 line). Three new keys untranslated: the other 26 languages
+  show English until a sprint. Needs a full check_all with master merged, his browser pass and merge
+  word; then the epanet-plus-plus.org sitemap.xml regenerate, commit, push, his pull.
+- `feat/label-leader` (8103), built on `feat/label-form` (8114) + `feat/label-beside` (8110): pipes may
+  run through one-line node labels; leader threshold one text height. Green. His call: resting labels
+  already sit 15-25 px out (more than a text height), so his literal leader rule would put a leader on
+  every label; shrink the resting offset, or leaders on resting labels? Answer to his 10-18 question:
+  off-screen parts are NOT ignored (every pass places the whole network), and nothing is saved across
+  sessions (only an in-memory bank per zoom notch). Culling to the view is the obvious next economy
+  (Task 681).
+- `feat/label-form` (8114) + `feat/label-beside` (8110): he likes label-form; no merge word yet.
+- `feat/theme` (8111): 13 themes. His calls: Dark map "Good"; brief Ida on a Designer theme when budget allows.
+- `feat/sqlite-reader` (75ed1031f): Task 749, never merges until done (his word). His two real WaterCAD
+  models (`~/tom-files/2026-10-18/Bentley-EPS-Group/`, CLIENT FILES: never into the repo) now import
+  with unit demand loads, per-scenario demand multipliers (1.0/1.8/3.0) and junction fire flow, and
+  EPANET matches WaterCAD's xlsx results to their rounding. `EC_WTG_PRIVATE_DIR` runs the private
+  harness. Left: per-junction fire-flow caps and system fire-flow settings (nowhere to store), loading
+  units, write-back, a physically overriding scenario (still unseen). The xlsx holds only results.
 
 ### Next job
 
-His pull to deploy. Task 814 before more of 752. Design themes on `feat/theme`. Find why label-beside
-shows nothing. Task 749 waits on his `.sqlite` sample.
+Merge on his word; the network-update features line on both sites after master is pushed; label
+culling to the view (Task 681) if he wants it; a named duration fire inside an EPS (Sue's stage 2);
+criticality by valve segment; Task 814's GeoJSON route; Task 749 write-back; Task 733 phase 3 slow.
+
+### Traps met 2026-10-19 evening (twenty-eighth session)
+
+- **A Python one-liner truncated Sue's journal**: `open(p,'w').write(x+open(p).read())` opens for
+  writing (truncating) before the read. Caught by the diff stat (3,016 deletions), restored. Read first.
+- **A subagent that waits on its own background check_all re-sends its report on every wake.** Stop it
+  with TaskStop once its suite is detached (setsid) and watch the log yourself.
+- **An agent's "byte-identical before and after" was wrong**: help-menu, tool-keys and all-calcs-smoke
+  caught the in-app Guide refactor. Run the suite before believing a refactor claim.
+- **new-project-pan-harness.js failed once under load**, passed alone.
+
+### Traps met 2026-10-19 (twenty-seventh session)
+
+- **`example-open-guard-harness.js` prints four FAIL lines on purpose** (its mutation control) and passes.
+  Grep for `FAILED:`, not `FAIL`, in a harness log.
+- **`label-pass-economy-browser-harness.js` and `settings-select-lag-harness.js` fail under load only**
+  (a label hit box differing at the 8th decimal; lag timing). Both passed alone.
+
+### Traps met 2026-10-18 (twenty-sixth session)
+
+- **My briefs told agents to add new keys to all 27 files**; the rule is English only (the others fall
+  back). It failed `lang syntax rules A-D` (identical-to-english). Brief: new keys in lib/lang.ec.en.php only.
+- **A merge run without GIT_AUTHOR_NAME took Tom as author.** Export the author env in the SAME command as
+  every merge; redo the batch from origin/master if it slips (unpushed, so cheap).
+- **His edit of new-english-keys.md arrived mid-suite in the main checkout**: moved by patch to a chore
+  worktree, then `git checkout --` in main before the suite ended, so the stamp still landed.
+- **Ida proposed restyling one consent button to stand out**; CLAUDE.md forbids it. Read seat advice against
+  the house rules before forwarding it.
+- **scenario-settings-routing-harness failed in five branch suites**: stray page debounces between cases
+  (fixed in the harness, fix/routing-harness-flake). Other multi-case harnesses may share the exposure.
+- **The previous session's open questions were invisible to him after /clear.** Read the last session's
+  final messages for unanswered questions before reporting.
 
 ### Traps met 2026-10-17 (twenty-fifth session)
 

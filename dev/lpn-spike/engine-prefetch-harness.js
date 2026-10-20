@@ -133,13 +133,11 @@ function line(L) {
 		_diameter: 200, _roughness: 130, _length: 1000, _k: 0, _status: 'open' });
 	return d;
 }
-// The same line with a PBV on the far end -- a valve only EPANET solves (since Task 733 a PRV is
-// the built-in solver's too). It may not sit on a fixed head, hence the second junction.
-function withPbv(L) {
+// A network only EPANET answers. Since Task 733 no valve is one (Tom, 2026-10-18: every type is
+// the built-in solver's), so it is the pressure-driven demand model (Task 762).
+function withEpanetOnly(L) {
 	const d = line(L);
-	d.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 0 });
-	d.links.push({ id: 'V1', type: 'valve', valveType: 'PBV', from: 'J1', to: 'J2', verts: [],
-		_diameter: 200, _setting: 40, _k: 0, _status: 'open' });
+	L.settings().hydraulics = { demandModel: 'PDA', minPressure: 0, reqPressure: 20, pressureExponent: 0.5 };
 	return d;
 }
 function fresh() {
@@ -246,14 +244,14 @@ console.log('\n--- the drawing becomes a network ---');
 // ------------------------------------------------------------------------------------------
 // 3. A NETWORK ONLY EPANET CAN SOLVE: THE CHECKBOX AND THE BANNER
 // ------------------------------------------------------------------------------------------
-console.log('\n--- a PBV, which the built-in solver does not solve ---');
+console.log('\n--- a pressure-driven network, which the built-in solver does not solve ---');
 {
 	fakeLoader();
 	const L = fresh();
 	// 'native' ON PURPOSE. It is the value that makes the next assertion mean something: if the
 	// page wrote settings.engine to force the routing, this is where it would show.
 	L.settings().engine = 'native';
-	withPbv(L);
+	withEpanetOnly(L);
 	L.runSolve();
 
 	ok('the fetch started for it', loads === 1, loads + ' fetches');
@@ -272,17 +270,10 @@ console.log('\n--- a PBV, which the built-in solver does not solve ---');
 	// thing the box is for, which is saying what they want for the network's OTHER states.
 	ok('...and it is NOT disabled, because three other things already say this', !!box && box.disabled === false,
 		box && box.disabled);
-	// Asked of the solver, not pinned in English: every valve type the built-in solver does NOT
-	// solve (EngCalcs.lpnValveIsNative) is named in the tip, and no type it does solve is.
+	// Since Task 733 every valve type is the built-in solver's, so the tip names none of them.
 	const tipText = PC.lpn_settings_engine_native_tip || '';
-	const epanetTypes = global.EngCalcs.lpnValveTypes.filter((t) =>
-		!global.EngCalcs.lpnValveIsNative({ type: 'valve', valveType: t }));
-	ok('...and the tip is where that fact lives permanently',
-		epanetTypes.length > 0 && epanetTypes.every((t) => new RegExp('\\b' + t + '\\b').test(tipText)),
-		'tip names ' + epanetTypes.join(', '));
-	ok('...and names no valve the built-in solver does solve',
-		global.EngCalcs.lpnValveTypes.filter((t) => epanetTypes.indexOf(t) < 0)
-			.every((t) => !new RegExp('\\b' + t + '\\b').test(tipText)), tipText);
+	ok('...and the tip names no valve type, since the built-in solver solves them all',
+		global.EngCalcs.lpnValveTypes.every((t) => !new RegExp('\\b' + t + '\\b').test(tipText)), tipText);
 	ok('...and names the other case too',
 		/extended period simulation/.test(PC.lpn_settings_engine_native_tip || ''), 'tip names the EPS case');
 	// The note that explained the greying went with the greying. Asserted as an ABSENCE, because a
@@ -305,7 +296,7 @@ console.log('\n--- a PBV, which the built-in solver does not solve ---');
 	// AND THE NETWORK GOING BACK TO ORDINARY CHANGES NOTHING ABOUT THE BOX, which is the point of
 	// not disabling it: there is no state to come back from.
 	const d = L.getDoc();
-	d.links.pop(); d.nodes.pop();          // the PBV and the junction beyond it
+	L.settings().hydraulics = {};          // demand-driven again
 	L.runSolve();
 	L.rebuildSettingsFields();
 	ok('deleting the valve leaves the checkbox exactly as it was',
@@ -323,7 +314,7 @@ console.log('\n--- and when it cannot be fetched at all ---');
 	fakeLoader();
 	const L = fresh();
 	L.settings().engine = 'native';
-	withPbv(L);
+	withEpanetOnly(L);
 	L.runSolve();
 	ok('the wait is on screen while it tries', banner() === PC.lpn_engine_needed_loading, JSON.stringify(banner()));
 	gate.rej(new Error('offline'));

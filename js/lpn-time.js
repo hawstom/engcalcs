@@ -158,6 +158,9 @@
 			// no entry at all rather than a zero. It rides beside linkQualities for the same
 			// namespace reason and under the same `qualityMode`.
 			linkRates: f.linkRates,
+			// **EPANET-MSX** (Task 717): per element, one value per species in the `.msx`'s own order,
+			// and the species list that says which is which. Under `qualityMode` 'msx' only.
+			msxNodes: f.msxNodes, msxLinks: f.msxLinks, msxSpecies: run.msxSpecies,
 			// Carried but NOT part of the steady-state contract: only this file's own readouts look
 			// at them, and only a run can produce them.
 			demands: f.demands, demandDeficits: f.demandDeficits, levels: f.levels, statuses: f.statuses, t: f.t,
@@ -215,6 +218,24 @@
 					statistic === 'MINIMUM' ? lo : statistic === 'MAXIMUM' ? hi : hi - lo;
 			}
 		}
+		// The EPANET-MSX arrays, per element and per species index, on the same terms.
+		['msxNodes', 'msxLinks'].forEach(function (mf) {
+			if (!base[mf]) { return; }
+			out[mf] = {};
+			Object.keys(base[mf]).forEach(function (mid) {
+				out[mf][mid] = base[mf][mid].map(function (x0, si) {
+					var vs = [], s0 = 0, mlo = Infinity, mhi = -Infinity;
+					frames.forEach(function (fr) {
+						var mv = fr[mf] && fr[mf][mid] && fr[mf][mid][si];
+						if (typeof mv === 'number' && isFinite(mv)) { vs.push(mv); }
+					});
+					if (!vs.length) { return null; }
+					vs.forEach(function (x) { s0 += x; if (x < mlo) { mlo = x; } if (x > mhi) { mhi = x; } });
+					return statistic === 'AVERAGED' ? s0 / vs.length :
+						statistic === 'MINIMUM' ? mlo : statistic === 'MAXIMUM' ? mhi : mhi - mlo;
+				});
+			});
+		});
 		return out;
 	};
 

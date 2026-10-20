@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "sr",
-        "expected_key_count": 3025,
-        "delta_key_count": 15,
-        "english_changed_key_count": 15,
+        "expected_key_count": 3126,
+        "delta_key_count": 138,
+        "english_changed_key_count": 31,
         "exempt_key_count": 43,
         "exempt_keys": [
             "calc_units_us",
@@ -53,6 +53,7 @@
         "out_of_scope_key_count": 5,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
         "active_prefixes": [
+            "consent",
             "lpn"
         ],
         "requested_prefix": null,
@@ -65,47 +66,361 @@
         "plain_notes": "key_plain[key] says in plain words what that one string means, other wordings joined by \"or\". Use whichever your language expresses most naturally and compactly; you are not bound to the literal English wording.",
         "key_notes_notes": "key_notes[key] are notes about that one string: how much room it has, symbols to keep exactly, what it refers to. Follow them. They are instructions to you, never text to put in your file.",
         "suggestion_box_notes": "Read suggestion_box and follow it. It is part of your instructions, not a footnote: a sprint does not close while a translator complaint is unanswered.",
+        "translator_notes": [
+            "Tree, parent, child and inherit are the words of a family tree. Use the everyday family words of your language."
+        ],
+        "translator_notes_notes": "Read translator_notes and follow them. Each is true of every string you translate.",
         "concept_notes": "Read concept_source and follow it. key_concepts lists, for a key that names a concept, its plain-words name, which is what you translate from; English is one rendering of it.",
         "uniqueness_notes": "uniqueness_attention lists the few groups of concepts that sit side by side on one screen. Find unique names for each, and use each name the same way everywhere."
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: проток\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Притисак\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: Фигура\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: проток\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: брзина\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: напор\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: губитак напора\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: локални губици\n- flow used, taken, or consumed\n    English: demand\n    Your language: Потрошња\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Притисак\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: (no preferred translation yet: use your language's standard term)\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: подразумевано\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- solver or the part that works out the answer\n    English: solver\n    Your language: решавач\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: Тенк\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: Вентил\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: Властите вредности\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: Потрошач\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- note, remark, or description for people about one item\n    English: description (asset notes)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: Фигура\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
+        "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
+        "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
+        "lpn_guide_cmp_byasset_term": "Results by asset",
+        "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver's internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.<\/p>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
+        "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
+        "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_ex_net1_scn_title": "EPANET Net1 with scenarios, gpm (US)",
+        "lpn_ex_net1_scn_desc": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.",
+        "lpn_ex_valves_title": "Valve types, gpm (US)",
+        "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_file_import_inp": "EPANET file…",
+        "lpn_file_import_inp_tip": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_file_import_msx": "EPANET-MSX file…",
+        "lpn_file_import_msx_tip": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.",
+        "lpn_file_export_item_msx": "EPANET-MSX file…",
+        "lpn_file_export_msx_tip": "Download the attached EPANET-MSX file exactly as it was imported.",
+        "lpn_msx_report_heading": "Attached {file}",
+        "lpn_msx_report_kept": "This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.",
+        "lpn_msx_report_species": "Species in the file: {list}.",
+        "lpn_msx_report_no_species": "No species are listed in the file.",
+        "lpn_msx_too_big": "{file} is too large to keep in browser storage, so it was not attached.",
+        "lpn_msx_report_missing": "IDs in the file that this network does not have: {ids}.",
+        "lpn_msx_not_msx": "{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.",
+        "lpn_msx_attached_heading": "Attached EPANET-MSX file: {file}",
+        "lpn_msx_replace": "Replace…",
+        "lpn_msx_remove": "Remove",
+        "lpn_msx_removed": "Removed {file} from this project.",
+        "lpn_quality_msx": "Multi-species (EPANET-MSX)",
+        "lpn_quality_msx_species": "Species",
+        "lpn_quality_msx_species_tip": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.",
+        "lpn_quality_msx_none": "No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.",
+        "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+        "lpn_inpup_ask_title": "Import {file}",
+        "lpn_inpup_lead": "An EPANET file holds one set of values and no scenarios. Choose where to put them.",
+        "lpn_inpup_how": "In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.",
+        "lpn_inpup_base_note": "Base. A scenario that holds its own value for an asset keeps it; the others take the new value.",
+        "lpn_inpup_btn_new": "A new project",
+        "lpn_inpup_btn_project": "This project, {project}",
+        "lpn_inpup_btn_scenario": "{scenario}, open now",
+        "lpn_inpup_btn_base": "Base",
+        "lpn_inpup_title": "Update from EPANET file",
+        "lpn_inpup_heading": "Imported {file} into {scenario} of {project}",
+        "lpn_inpup_counts": "Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).",
+        "lpn_inpup_undo": "Undo reverses all of it in one step.",
+        "lpn_inpup_nothing": "Every value in the file that matches an asset here is already the same in {scenario}.",
+        "lpn_inpup_status": "Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).",
+        "lpn_inpup_h_changed": "Values changed",
+        "lpn_inpup_row": "{id}, {property}: {old} to {new}",
+        "lpn_inpup_more": "{n} more",
+        "lpn_inpup_blank": "blank",
+        "lpn_inpup_h_added": "Assets added",
+        "lpn_inpup_h_kept": "Kept, not in the file",
+        "lpn_inpup_h_na": "Not applied",
+        "lpn_inpup_na_general": "The file also holds {items}. They were not applied.",
+        "lpn_inpup_na_type": "The file states a different type for these assets, so none of their values were changed: {ids}",
+        "lpn_inpup_na_owned": "The pipe type states some values of these pipes, so those values were not changed: {ids}",
+        "lpn_inpup_na_roughness": "Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.",
+        "lpn_inpup_na_geo": "Assets only in the file ({n}) were not added, because the file and this project use different coordinate systems.",
+        "lpn_inpup_na_refs": "These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}",
+        "lpn_inpup_na_msx": "The .msx file chosen with this file was not read. To attach it to this project, choose it alone.",
+        "lpn_inpup_refused_heading": "Nothing was changed in {project}.",
+        "lpn_inpup_refused_lead": "The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.",
+        "lpn_inpup_unit_row": "{family}: the file uses {file} and this project uses {project}.",
+        "lpn_inpup_method_row": "Head loss formula: the file uses {file} and this project uses {project}.",
+        "lpn_inpup_refused_lead_formula": "The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.",
+        "lpn_inpup_refused_lead_both": "The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.",
+        "lpn_inpup_na_cv": "A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}",
+        "lpn_inpup_failed": "The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}",
+        "lpn_inpup_i_positions": "positions of existing assets",
+        "lpn_inpup_i_connections": "connections",
+        "lpn_inpup_i_descriptions": "descriptions",
+        "lpn_inpup_i_patterns": "patterns",
+        "lpn_inpup_i_curves": "curves",
+        "lpn_inpup_i_controls": "controls",
+        "lpn_inpup_i_rules": "rules",
+        "lpn_inpup_i_options": "options",
+        "lpn_inpup_t_junction": "Junction",
+        "lpn_inpup_t_reservoir": "Reservoir",
+        "lpn_inpup_t_tank": "Tank",
+        "lpn_inpup_t_pipe": "Pipe",
+        "lpn_inpup_t_pump": "Pump",
+        "lpn_inpup_t_valve": "Valve",
+        "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
+        "lpn_notes_2_def": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
+        "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
+        "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.",
+        "lpn_engine_unavailable_why": "This network cannot be solved without the EPANET solver. {reason}",
+        "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Clear it to hide the text with the other labels once the view is wider than the labeling threshold set under Map.",
+        "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+        "lpn_settings_grp_size": "Size",
+        "lpn_settings_grp_angle": "Angle",
+        "lpn_settings_grp_zoom": "Zoom",
+        "lpn_settings_grp_positions": "Positions",
+        "lpn_settings_grp_show": "Show",
+        "lpn_settings_grp_thematic": "Thematic",
+        "lpn_scncmp_menu_tip": "Table of scenarios with count of overrides, lowest pressure, and highest velocity, and a table of results by asset that copies to a spreadsheet",
+        "lpn_scncmp_progress": "Solving scenario {done} of {total}…",
+        "lpn_scncmp_stopped": "Stopped after {done} of {total} scenarios. The results below are the ones already finished.",
+        "lpn_scnres_title": "Results by asset",
+        "lpn_scnres_col": "{quantity} ({unit}), {scenario}",
+        "lpn_scnres_none": "Check at least one result to show.",
+        "lpn_scnres_empty": "This project has none of these assets.",
+        "lpn_scnres_copy_tip": "Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.",
+        "lpn_scnres_time_note": "A scenario with a total run time is read at the time step on screen, {time}, or at its last time step if its run ends sooner. Each heading shows the time read.",
+        "lpn_scnres_at_time": "({time})",
+        "lpn_scnres_steady": "(steady state)",
+        "lpn_scnres_not_converged": "(not converged)",
+        "lpn_scnres_not_converged_note": "A column marked {mark} shows the last results the solver reached before it stopped without converging.",
+        "lpn_scnres_failed": "{scenario} could not be solved, so its columns are blank. {why}",
+        "lpn_scnres_flow_tip": "The sign of a flow is the solver's internal direction sign: positive runs from the From node to the To node, negative the reverse. It has no use outside this table except to show whether a flow changed direction between scenarios.",
+        "lpn_scnres_stale": "Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.",
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
         "lpn_library_import": "Libraries…",
-        "lpn_crit_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
-        "lpn_ds_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ff_minpressure": "Lowest system pressure allowed",
+        "lpn_crit_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ds_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_file_import_survey": "Surveyed points…",
         "lpn_file_import_shapes": "GeoJSON shapes…",
         "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
         "lpn_file_import_gjnet": "GeoJSON network…",
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
         "lpn_file_import_dxf": "DXF shapes…",
-        "lpn_file_import_shp": "Shapefile shapes…"
+        "lpn_file_import_shp": "Shapefile shapes…",
+        "lpn_diag_valve_conflict": "These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:",
+        "lpn_diag_gpv_curve_order": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:",
+        "lpn_gpv_one_point_note": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}",
+        "lpn_export_holds_scenario": "It holds the scenario {scenario} only.",
+        "lpn_export_holds_base": "It holds the Base scenario only.",
+        "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
+        "lpn_survey_added_scenario": "The nodes were added to {scenario}. In Base they are inactive.",
+        "lpn_pane_pasted_scenario": "These values are overrides in the scenario {scenario}.",
+        "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file."
     },
     "keys": {
+        "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
+        "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
+        "lpn_guide_cmp_byasset_term": "Results by asset",
+        "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver's internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.<\/p>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
+        "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
+        "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_ex_net1_scn_title": "EPANET Net1 with scenarios, gpm (US)",
+        "lpn_ex_net1_scn_desc": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.",
+        "lpn_ex_valves_title": "Valve types, gpm (US)",
+        "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_file_import_inp": "EPANET file…",
+        "lpn_file_import_inp_tip": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_file_import_msx": "EPANET-MSX file…",
+        "lpn_file_import_msx_tip": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.",
+        "lpn_file_export_item_msx": "EPANET-MSX file…",
+        "lpn_file_export_msx_tip": "Download the attached EPANET-MSX file exactly as it was imported.",
+        "lpn_msx_report_heading": "Attached {file}",
+        "lpn_msx_report_kept": "This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.",
+        "lpn_msx_report_species": "Species in the file: {list}.",
+        "lpn_msx_report_no_species": "No species are listed in the file.",
+        "lpn_msx_too_big": "{file} is too large to keep in browser storage, so it was not attached.",
+        "lpn_msx_report_missing": "IDs in the file that this network does not have: {ids}.",
+        "lpn_msx_not_msx": "{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.",
+        "lpn_msx_attached_heading": "Attached EPANET-MSX file: {file}",
+        "lpn_msx_replace": "Replace…",
+        "lpn_msx_remove": "Remove",
+        "lpn_msx_removed": "Removed {file} from this project.",
+        "lpn_quality_msx": "Multi-species (EPANET-MSX)",
+        "lpn_quality_msx_species": "Species",
+        "lpn_quality_msx_species_tip": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.",
+        "lpn_quality_msx_none": "No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.",
+        "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+        "lpn_inpup_ask_title": "Import {file}",
+        "lpn_inpup_lead": "An EPANET file holds one set of values and no scenarios. Choose where to put them.",
+        "lpn_inpup_how": "In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.",
+        "lpn_inpup_base_note": "Base. A scenario that holds its own value for an asset keeps it; the others take the new value.",
+        "lpn_inpup_btn_new": "A new project",
+        "lpn_inpup_btn_project": "This project, {project}",
+        "lpn_inpup_btn_scenario": "{scenario}, open now",
+        "lpn_inpup_btn_base": "Base",
+        "lpn_inpup_title": "Update from EPANET file",
+        "lpn_inpup_heading": "Imported {file} into {scenario} of {project}",
+        "lpn_inpup_counts": "Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).",
+        "lpn_inpup_undo": "Undo reverses all of it in one step.",
+        "lpn_inpup_nothing": "Every value in the file that matches an asset here is already the same in {scenario}.",
+        "lpn_inpup_status": "Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).",
+        "lpn_inpup_h_changed": "Values changed",
+        "lpn_inpup_row": "{id}, {property}: {old} to {new}",
+        "lpn_inpup_more": "{n} more",
+        "lpn_inpup_blank": "blank",
+        "lpn_inpup_h_added": "Assets added",
+        "lpn_inpup_h_kept": "Kept, not in the file",
+        "lpn_inpup_h_na": "Not applied",
+        "lpn_inpup_na_general": "The file also holds {items}. They were not applied.",
+        "lpn_inpup_na_type": "The file states a different type for these assets, so none of their values were changed: {ids}",
+        "lpn_inpup_na_owned": "The pipe type states some values of these pipes, so those values were not changed: {ids}",
+        "lpn_inpup_na_roughness": "Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.",
+        "lpn_inpup_na_geo": "Assets only in the file ({n}) were not added, because the file and this project use different coordinate systems.",
+        "lpn_inpup_na_refs": "These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}",
+        "lpn_inpup_na_msx": "The .msx file chosen with this file was not read. To attach it to this project, choose it alone.",
+        "lpn_inpup_refused_heading": "Nothing was changed in {project}.",
+        "lpn_inpup_refused_lead": "The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.",
+        "lpn_inpup_unit_row": "{family}: the file uses {file} and this project uses {project}.",
+        "lpn_inpup_method_row": "Head loss formula: the file uses {file} and this project uses {project}.",
+        "lpn_inpup_refused_lead_formula": "The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.",
+        "lpn_inpup_refused_lead_both": "The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.",
+        "lpn_inpup_na_cv": "A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}",
+        "lpn_inpup_failed": "The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}",
+        "lpn_inpup_i_positions": "positions of existing assets",
+        "lpn_inpup_i_connections": "connections",
+        "lpn_inpup_i_descriptions": "descriptions",
+        "lpn_inpup_i_patterns": "patterns",
+        "lpn_inpup_i_curves": "curves",
+        "lpn_inpup_i_controls": "controls",
+        "lpn_inpup_i_rules": "rules",
+        "lpn_inpup_i_options": "options",
+        "lpn_inpup_t_junction": "Junction",
+        "lpn_inpup_t_reservoir": "Reservoir",
+        "lpn_inpup_t_tank": "Tank",
+        "lpn_inpup_t_pipe": "Pipe",
+        "lpn_inpup_t_pump": "Pump",
+        "lpn_inpup_t_valve": "Valve",
+        "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
+        "lpn_notes_2_def": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
+        "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
+        "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.",
+        "lpn_engine_unavailable_why": "This network cannot be solved without the EPANET solver. {reason}",
+        "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Clear it to hide the text with the other labels once the view is wider than the labeling threshold set under Map.",
+        "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+        "lpn_settings_grp_size": "Size",
+        "lpn_settings_grp_angle": "Angle",
+        "lpn_settings_grp_zoom": "Zoom",
+        "lpn_settings_grp_positions": "Positions",
+        "lpn_settings_grp_show": "Show",
+        "lpn_settings_grp_thematic": "Thematic",
+        "lpn_scncmp_menu_tip": "Table of scenarios with count of overrides, lowest pressure, and highest velocity, and a table of results by asset that copies to a spreadsheet",
+        "lpn_scncmp_progress": "Solving scenario {done} of {total}…",
+        "lpn_scncmp_stopped": "Stopped after {done} of {total} scenarios. The results below are the ones already finished.",
+        "lpn_scnres_title": "Results by asset",
+        "lpn_scnres_col": "{quantity} ({unit}), {scenario}",
+        "lpn_scnres_none": "Check at least one result to show.",
+        "lpn_scnres_empty": "This project has none of these assets.",
+        "lpn_scnres_copy_tip": "Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.",
+        "lpn_scnres_time_note": "A scenario with a total run time is read at the time step on screen, {time}, or at its last time step if its run ends sooner. Each heading shows the time read.",
+        "lpn_scnres_at_time": "({time})",
+        "lpn_scnres_steady": "(steady state)",
+        "lpn_scnres_not_converged": "(not converged)",
+        "lpn_scnres_not_converged_note": "A column marked {mark} shows the last results the solver reached before it stopped without converging.",
+        "lpn_scnres_failed": "{scenario} could not be solved, so its columns are blank. {why}",
+        "lpn_scnres_flow_tip": "The sign of a flow is the solver's internal direction sign: positive runs from the From node to the To node, negative the reverse. It has no use outside this table except to show whether a flow changed direction between scenarios.",
+        "lpn_scnres_stale": "Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.",
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
         "lpn_library_import": "Libraries…",
-        "lpn_crit_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
-        "lpn_ds_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ff_minpressure": "Lowest system pressure allowed",
+        "lpn_crit_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ds_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_file_import_survey": "Surveyed points…",
         "lpn_file_import_shapes": "GeoJSON shapes…",
         "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
         "lpn_file_import_gjnet": "GeoJSON network…",
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
         "lpn_file_import_dxf": "DXF shapes…",
-        "lpn_file_import_shp": "Shapefile shapes…"
+        "lpn_file_import_shp": "Shapefile shapes…",
+        "lpn_diag_valve_conflict": "These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:",
+        "lpn_diag_gpv_curve_order": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:",
+        "lpn_gpv_one_point_note": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}",
+        "lpn_export_holds_scenario": "It holds the scenario {scenario} only.",
+        "lpn_export_holds_base": "It holds the Base scenario only.",
+        "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
+        "lpn_survey_added_scenario": "The nodes were added to {scenario}. In Base they are inactive.",
+        "lpn_pane_pasted_scenario": "These values are overrides in the scenario {scenario}.",
+        "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file."
     },
     "key_context": {
+        "consent_body": {
+            "reason": "english_changed",
+            "current_value": "Можемо ли да сачувамо насумичан код у овом прегледачу како бисмо бројали колико прегледача користи сваки део ове странице? Код се прави на лицу места, не говори ништа о вама нити о вашем уређају и не бележи ништа што унесете. Без њега не можемо разликовати вашу другу посету од нечије прве.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "template_printable_subtitle",
+                    "value": "Поднаслов за штампу",
+                    "english": "Printable Subtitle"
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_tip",
+                    "value": "Реши ову мрежу у сваком хидрауличком временском кораку.",
+                    "english": "Solve this network at every hydraulic time step."
+                }
+            }
+        },
+        "lpn_guide_scn_marks_def": {
+            "reason": "english_changed",
+            "current_value": "<p>На мапи, елемент који има сопствену вредност у отвореном сценарију обележен је ћилибарским прстеном, а елемент који наслеђује сопствену вредност од матичног сценарија или алтернативе обележен је испрекиданим сивим прстеном. За потрошњу, пречник, храпавост, коефицијент локалног (минорног) губитка и дужину, прстен се појављује само док Подешавања, Визуелизација, Ознаке чворова или Ознаке веза приказују ту вредност на мапи; сопствена вредност било ког другог својства увек има свој прстен. У Табелама, ћелија која садржи вредност постављену отвореним сценаријем је ћилибарска, а њена напомена именује алтернативу која је садржи, као у Физичка алт.: Већи цевовод. Прикажи сценарије, у менију ћелије табеле, наводи сваки елемент једном за сваки сценарио.<\/p><p>Сваки ред Својстава који сценарио може заменити има ознаку са леве стране. Пуна тачка значи да отворени сценарио замењује вредност; кликните на њу да уклоните сопствену вредност. Празна тачка значи да је вредност наслеђена; кликните на њу да приказану вредност учините сопственом. Троугао значи да сценарији испод овог замењују вредност; кликните на њега да уклоните њихове сопствене вредности, после потврде. Испод замењеног реда је наслеђена вредност коју он замењује, као у Основни сценарио: 18. Оквир Подешавања има само пуну тачку и троугао, јер је уписивање вредности тамо оно што прави сопствену вредност.<\/p><p>Да сакријете прстенове, уклоните ознаку са Прикажи ознаке сопствених вредности на мапи у Подешавања, Мапа и страница, Страница, или изаберите Мапа, Чиста мапа. Оба се чувају у овом прегледачу, а не у пројекту. Табеле означавају сопствене вредности у сваком случају.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_scn_marks_term",
+                    "value": "Где се виде сопствене вредности",
+                    "english": "Where overrides show"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_scn_make_term",
+                    "value": "Прављење и уклањање сопствених вредности",
+                    "english": "Making and clearing overrides"
+                }
+            }
+        },
+        "lpn_guide_cmp_byasset_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_cmp_run_def",
+                    "value": "<p>Сценарио са Укупним временом рада већим од 0 прорачунава се за цео период преко EPANET решавача. Његов најнижи притисак и највећа брзина су екстреми током сваког временског корака, свака приказана са својим временом. Сценарио са Укупним временом рада 0 решава се у једном тренутку. Укупно време рада је једна од опција које сценарио може заменити, па једна табела може садржати обе врсте.<\/p>",
+                    "english": "<p>A scenario with a Total run time greater than 0 is run over the whole period through the EPANET engine. Its lowest pressure and highest velocity are the extremes over every time step, each shown with its time. A scenario with a Total run time of 0 is solved at one instant. The total run time is one of the options a scenario can override, so one table can hold both kinds.<\/p>"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_cmp_notes_term",
+                    "value": "На шта треба обратити пажњу",
+                    "english": "Points to note"
+                }
+            }
+        },
+        "lpn_guide_cmp_byasset_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_cmp_run_def",
+                    "value": "<p>Сценарио са Укупним временом рада већим од 0 прорачунава се за цео период преко EPANET решавача. Његов најнижи притисак и највећа брзина су екстреми током сваког временског корака, свака приказана са својим временом. Сценарио са Укупним временом рада 0 решава се у једном тренутку. Укупно време рада је једна од опција које сценарио може заменити, па једна табела може садржати обе врсте.<\/p>",
+                    "english": "<p>A scenario with a Total run time greater than 0 is run over the whole period through the EPANET engine. Its lowest pressure and highest velocity are the extremes over every time step, each shown with its time. A scenario with a Total run time of 0 is solved at one instant. The total run time is one of the options a scenario can override, so one table can hold both kinds.<\/p>"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_cmp_notes_term",
+                    "value": "На шта треба обратити пажњу",
+                    "english": "Points to note"
+                }
+            }
+        },
         "lpn_guide_lib_import_def": {
             "reason": "english_changed",
             "current_value": "<p>Датотека, Увези…, Увези библиотеке… отвара другу пројектну датотеку и копира читаве библиотеке из ње у овај пројекат. Ставка чије је име већ употребљено овде прескаче се и наводи, па се ништа што већ постоји не мења. Приказује се упозорење када датотека и пројекат изражавају величину у различитим јединицама, а ставке се увозе како су записане. Типови цеви који упућују на листу фитинга коју овај пројекат нема су наведени; увезите библиотеку фитинга из исте датотеке да то решите.<\/p>",
@@ -122,6 +437,134 @@
                 }
             }
         },
+        "lpn_guide_set_where_def": {
+            "reason": "english_changed",
+            "current_value": "<p>Листа са леве стране оквира скаче на одељак или поднаслов. Одељци су Визуелизација (Ознаке чворова, Боје чворова, Ознаке веза, Боје веза, Потрошач и Све), Мапа и страница (Изглед и Страница), Елементи (Префикси ID-а, Почетне вредности и Прилагођена својства), Прорачун (Јединице, Време, Хидраулика, Енергија и Квалитет воде) и Заслуге. Сваки поднаслов наводи да ли су његова подешавања Сачувано уз пројекат или Сачувано у овом прегледачу. Све се чува са пројектом осим подешавања под Страница и једног реда у Хидраулици, Прикажи прозор напретка прорачуна, који сам наводи Сачувано у овом прегледачу.<\/p><p>Картица Подешавања у Табелама наводи иста подешавања као редове, са њиховом Категоријом и Вредношћу, па се подешавање може наћи и проверити и тамо.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_set_where_term",
+                    "value": "Одељци и где се подешавања чувају",
+                    "english": "Sections, and where settings are saved"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_set_search_term",
+                    "value": "Претрага",
+                    "english": "Searching"
+                }
+            }
+        },
+        "lpn_guide_ff_asks_def": {
+            "reason": "english_changed",
+            "current_value": "<p>Сваки испитивани чвор добија два теста, на копији мреже у временском кораку на екрану и у отвореном сценарију. Први пита колики проток чвор може да испоручи док одржава резидуални притисак. Проток се црпи на чвору, а поновљена решавања га сужавају, до границе једнаке 10000 gpm. Чвор који и на граници одржава резидуални притисак пријављује се као да испоручује више од границе. Други тест, пројектна провера, црпи потребан проток на чвору и пита да ли било који други чвор у његовом обиму пада испод Најнижи дозвољени притисак на другим местима, или да ли било која цев у његовом обиму ради изнад Највећа дозвољена брзина. Пројектна провера се не ради када је њен обим Ништа.<\/p><p>Чвор са својим Потребан противпожарни проток својством испитује се према тој вредности, а сваки други чвор према вредности у оквиру.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_ff_asks_term",
+                    "value": "Шта се тражи од сваког чвора",
+                    "english": "What is asked of each junction"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_ff_result_term",
+                    "value": "Читање резултата",
+                    "english": "Reading the results"
+                }
+            }
+        },
+        "lpn_guide_cr_case_def": {
+            "reason": "english_changed",
+            "current_value": "<p>За сваку везу у обиму, веза се чини неактивном на копији мреже, а копија се решава у временском кораку на екрану у отвореном сценарију. Један прорачун је једно решавање за сваку везу и још једно са ничим покиданим. Чвор остављен без отвореног пута до резервоара или тенка је одсечен: уклања се пре решавања, а његова потрошња се броји као Непокривена потрошња. Од чворова који су и даље повезани, Чворови испод минимума наводи оне чији притисак пада испод Најнижи дозвољени притисак. Чвор који је већ испод њега са ничим покиданим не рачуна се против ниједне везе, а сажетак наводи колико их има. Најнижи дозвољени притисак је исто подешавање као оквир Најнижи дозвољени притисак на другим местима у оквиру Противпожарни проток: анализа.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_cr_case_term",
+                    "value": "Шта ради сваки случај",
+                    "english": "What each case does"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_cr_dead_term",
+                    "value": "Слепи крајеви и листа",
+                    "english": "Dead ends, and the list"
+                }
+            }
+        },
+        "lpn_guide_ds_find_def": {
+            "reason": "english_changed",
+            "current_value": "<p>Пронађи тражи размере потрошње од 0 до 20, до најближих 0.01, за највећу при којој сваки изабрани чвор задржава најмање Најнижи дозвољени притисак. Пријављује размеру и најнижи притисак ту, и исто за следећи корак навише, где притисак први пут пада испод границе. Ако потрошња како је унета већ оставља чвор испод границе, одговор је означен знаком упозорења. Ако сваки чвор задржава границу при 20, одговор то каже. Заустави завршава претрагу без одговора. Најнижи дозвољени притисак је исто подешавање као оквир Најнижи дозвољени притисак на другим местима у оквиру Противпожарни проток: анализа.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_ds_find_term",
+                    "value": "Пронађи",
+                    "english": "Find"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_ds_scope_term",
+                    "value": "Чворови и временски корак",
+                    "english": "Junctions, and the time step"
+                }
+            }
+        },
+        "lpn_ex_net1_scn_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net1_si_desc",
+                    "value": "Литри у секунди, са метрима и милиметрима. Измишљени EPANET пример претворен из галона у минути, стопа и инча, са хлором, 1 резервоаром, 1 тенком, 1 пумпом и два управљања заснована на правилима.",
+                    "english": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_net2_si_desc",
+                    "value": "Литри у секунди, са метрима и милиметрима. EPANET пример у Бренфорду, Конектикат, претворен из галона у минути, стопа и инча: 35 чворова и 1 тенк, без резервоара, пумпе и вентила, отприлике 2 km са 4 km. Флуорид, нереактивна супстанца, улази на једном извору.",
+                    "english": "Liters per second, with meters and millimeters. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source."
+                }
+            }
+        },
+        "lpn_ex_net1_scn_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net1_si_desc",
+                    "value": "Литри у секунди, са метрима и милиметрима. Измишљени EPANET пример претворен из галона у минути, стопа и инча, са хлором, 1 резервоаром, 1 тенком, 1 пумпом и два управљања заснована на правилима.",
+                    "english": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_net2_si_desc",
+                    "value": "Литри у секунди, са метрима и милиметрима. EPANET пример у Бренфорду, Конектикат, претворен из галона у минути, стопа и инча: 35 чворова и 1 тенк, без резервоара, пумпе и вентила, отприлике 2 km са 4 km. Флуорид, нереактивна супстанца, улази на једном извору.",
+                    "english": "Liters per second, with meters and millimeters. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source."
+                }
+            }
+        },
+        "lpn_ex_valves_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net1_si_desc",
+                    "value": "Литри у секунди, са метрима и милиметрима. Измишљени EPANET пример претворен из галона у минути, стопа и инча, са хлором, 1 резервоаром, 1 тенком, 1 пумпом и два управљања заснована на правилима.",
+                    "english": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_net2_si_desc",
+                    "value": "Литри у секунди, са метрима и милиметрима. EPANET пример у Бренфорду, Конектикат, претворен из галона у минути, стопа и инча: 35 чворова и 1 тенк, без резервоара, пумпе и вентила, отприлике 2 km са 4 km. Флуорид, нереактивна супстанца, улази на једном извору.",
+                    "english": "Liters per second, with meters and millimeters. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source."
+                }
+            }
+        },
+        "lpn_ex_valves_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net1_si_desc",
+                    "value": "Литри у секунди, са метрима и милиметрима. Измишљени EPANET пример претворен из галона у минути, стопа и инча, са хлором, 1 резервоаром, 1 тенком, 1 пумпом и два управљања заснована на правилима.",
+                    "english": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_net2_si_desc",
+                    "value": "Литри у секунди, са метрима и милиметрима. EPANET пример у Бренфорду, Конектикат, претворен из галона у минути, стопа и инча: 35 чворова и 1 тенк, без резервоара, пумпе и вентила, отприлике 2 km са 4 km. Флуорид, нереактивна супстанца, улази на једном извору.",
+                    "english": "Liters per second, with meters and millimeters. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source."
+                }
+            }
+        },
         "lpn_file_import_inp": {
             "reason": "english_changed",
             "current_value": "Увези EPANET датотеку…",
@@ -134,13 +577,34 @@
                 "next_translated": {
                     "key": "lpn_file_import_inp_tip",
                     "value": "Учитава мрежу из EPANET датотеке, било текстуалне .inp датотеке или .net датотеке коју EPANET чува, и чува је у овом прегледачу као нови пројекат.",
-                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort)."
+                    "english": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time."
                 }
             },
             "tip": {
                 "key": "lpn_file_import_inp_tip",
-                "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort).",
+                "english": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
                 "value": "Учитава мрежу из EPANET датотеке, било текстуалне .inp датотеке или .net датотеке коју EPANET чува, и чува је у овом прегледачу као нови пројекат."
+            }
+        },
+        "lpn_file_import_inp_tip": {
+            "reason": "english_changed",
+            "current_value": "Учитава мрежу из EPANET датотеке, било текстуалне .inp датотеке или .net датотеке коју EPANET чува, и чува је у овом прегледачу као нови пројекат.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp",
+                    "value": "Увези EPANET датотеку…",
+                    "english": "EPANET file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_menu",
+                    "value": "Извези…",
+                    "english": "Export…"
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_inp",
+                "english": "EPANET file…",
+                "value": "Увези EPANET датотеку…"
             }
         },
         "lpn_file_export_workspace_tip": {
@@ -180,6 +644,1632 @@
                 "value": "Радни простор…"
             }
         },
+        "lpn_file_import_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_msx_tip",
+                "english": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation."
+            }
+        },
+        "lpn_file_import_msx_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_msx",
+                "english": "EPANET-MSX file…"
+            }
+        },
+        "lpn_file_export_item_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_file_export_msx_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_kept": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_species": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_no_species": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_too_big": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_missing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_not_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_attached_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_replace": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_remove": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_removed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_quality_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_quality_msx_species": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "tip": {
+                "key": "lpn_quality_msx_species_tip",
+                "english": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species."
+            }
+        },
+        "lpn_quality_msx_species_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "label": {
+                "key": "lpn_quality_msx_species",
+                "english": "Species"
+            }
+        },
+        "lpn_quality_msx_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_result_msx_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_inpup_ask_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_lead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_how": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_base_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_btn_new": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_btn_project": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_btn_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_btn_base": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_counts": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_undo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_nothing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_status": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_h_changed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_row": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_more": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_blank": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_h_added": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_h_kept": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_h_na": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_general": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_type": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_owned": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_roughness": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_geo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_refs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_refused_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_refused_lead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_unit_row": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_method_row": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_refused_lead_formula": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_refused_lead_both": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_cv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_positions": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_connections": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_descriptions": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_patterns": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_curves": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_controls": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_rules": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_options": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_t_junction": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_t_reservoir": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_t_tank": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_t_pipe": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_t_pump": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_t_valve": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Пројектна датотека",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_notes_1_def": {
+            "reason": "english_changed",
+            "current_value": "EPANET решавач подразумевано решава мрежу. Када је постављено укупно време рада, сваки временски корак извештаја израчунава се редом: тенкови се пуне и празне, потрошње прате своје обрасце, а трака алата репродукује прорачун. Са означеним Користи уграђени решавач кад је могуће, решење у једном тренутку може уместо тога решити уграђени решавач, али симулацију проширеног периода или мрежу са вентилом за обарање притиска или вентилом опште намене (PBV, GPV) увек решава EPANET решавач.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_1_term",
+                    "value": "Како се решава",
+                    "english": "How it is solved"
+                },
+                "next_translated": {
+                    "key": "lpn_notes_2_term",
+                    "value": "Шта не ради",
+                    "english": "What it does not do"
+                }
+            }
+        },
+        "lpn_notes_2_def": {
+            "reason": "english_changed",
+            "current_value": "Хидраулички удар није моделован: сви резултати важе за стационарно или споро променљиво струјање, а не за прелазни таласни притисак изазван наглим затварањем вентила.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_2_term",
+                    "value": "Шта не ради",
+                    "english": "What it does not do"
+                },
+                "next_translated": {
+                    "key": "lpn_notes_3_term",
+                    "value": "Чување пројеката",
+                    "english": "Saving projects"
+                }
+            }
+        },
+        "lpn_roughness_method_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_omitted_note",
+                    "value": "Изостављено из овог прорачуна јер од њих не води пут до резервоара или тенка: {ids}",
+                    "english": "Left out of this run because no path leads from them to a reservoir or tank: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_engine_fetching",
+                    "value": "Преузимање EPANET решавача. Преузима се једном и потом чува на овом уређају, тако да након тога ради и без интернета.",
+                    "english": "Downloading the EPANET solver. It is downloaded once and then stored on this device, so it works offline afterward."
+                }
+            }
+        },
+        "lpn_engine_unavailable": {
+            "reason": "english_changed",
+            "current_value": "EPANET решавач није могао да се преузме, а потребан је за решавање вентила за обарање притиска и вентила опште намене (PBV, GPV). После једног повезивања на интернет, решавач се чува на овом уређају.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_ready",
+                    "value": "EPANET решавач је сада на овом уређају и ради без интернета.",
+                    "english": "The EPANET solver is now stored on this device and works offline."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_unavailable_why",
+                    "value": "Вентили за обарање притиска и вентили опште намене (PBV, GPV) не могу се решити без EPANET решавача. {reason}",
+                    "english": "This network cannot be solved without the EPANET solver. {reason}"
+                }
+            }
+        },
+        "lpn_engine_unavailable_why": {
+            "reason": "english_changed",
+            "current_value": "Вентили за обарање притиска и вентили опште намене (PBV, GPV) не могу се решити без EPANET решавача. {reason}",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "EPANET решавач није могао да се преузме, а потребан је за решавање вентила за обарање притиска и вентила опште намене (PBV, GPV). После једног повезивања на интернет, решавач се чува на овом уређају.",
+                    "english": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "Учитавање EPANET решавача док градите. Резултати ће бити доступни када се потпуно учита.",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                }
+            }
+        },
+        "lpn_field_text_all_zoom_tip": {
+            "reason": "english_changed",
+            "current_value": "Задржи овај текст на цртежу без обзира колико се удаљите зумом. Искључите и текст се крије са осталим ознакама чим приказ постане шири од прага означавања постављеног под Мапа и страница.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_all_zoom",
+                    "value": "Прикажи на свим нивоима зума",
+                    "english": "Show at all zoom levels"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_labels",
+                    "value": "Ознаке",
+                    "english": "Labels"
+                }
+            },
+            "label": {
+                "key": "lpn_field_text_all_zoom",
+                "english": "Show at all zoom levels",
+                "value": "Прикажи на свим нивоима зума"
+            }
+        },
+        "lpn_sm_help": {
+            "reason": "english_changed",
+            "current_value": "Како раде сценарији и алтернативе:\\n\\nУ Основном режиму, алтернативе су сакривене и аутоматске, а сви нови сценарији су подређени сценарију Основа.\\n\\nКада је Основни режим искључен, доступно је сложено стабло наслеђивања, а алтернативе се могу делити међу сценаријима. Али подразумевано понашање измена када је потребна нова веза са алтернативом (у одсуству проактивног управљања од стране корисника) јесте да се направи алтернатива названа као тренутни сценарио, што даје сваком сценарију његов јединствен скуп алтернатива.\\n\\nСвојства и подешавања припадају категоријама алтернатива које се појављују као колоне табеле сценарија и алтернатива и као опције управљања у Менаџеру сценарија.\\n\\nСопствене вредности се праве у сценаријима, али стварно припадају одговарајућим алтернативама придруженим сценарију; сценарио је дакле као прозор ка својим алтернативама. Придруживањима алтернатива сценаријима управља се у десном панелу Менаџера сценарија или у табели Сценарији у доњем панелу. Прављење новог сценарија не прави никакве алтернативе; нови сценарио користи алтернативе свог родитеља док се не направе сопствене вредности којима су потребне нове алтернативе. Када се сопствене вредности праве у сценарију, чувају се у одговарајућој алтернативи за сценарио; ако сценарио нема такву алтернативу, прави се нова алтернатива са називом сценарија.\\n\\nПример: правите сценарио „Слика: ID-ови чворова и веза” и мењате Текст да гласи „ID-ови чворова и веза.” Када правите сценарио, не праве се никакве алтернативе. Али у тренутку када сачувате Текст, прави се алтернатива Текста названа „Слика: ID-ови чворова и веза” са сопственом вредношћу за вредност Текста. У Основном режиму то видите једноставно као сопствену вредност у самом сценарију.\\n\\nКопирај својства копира само сопствене вредности. У сваком сценарију осим Основе, копира само сопствене вредности које елемент има у том сценарију.\\n\\nКако управљати сценаријима:\\n\\n- Изаберите Сценарији или категорију алтернатива у листи на врху да прикажете њено стабло.\\n\\n- Направите подређени изабране ставке командом Додај подређени. Додај основу додаје још једну Основу, која почиње као копија Основе каква је сада; касније измене Основе је не мењају. Нови подређени назван је по свом родитељу; укуцајте назив да га преименујете. Копирај копира изабрану алтернативу. Споји навише премешта сопствене вредности изабране алтернативе у алтернативу изнад ње, изабрану по називу, а изабрана алтернатива их затим наслеђује; прво именује сваку вредност коју замењује и нека алтернатива коју прескаче; та вредност се не мења. Да копирате сценарио, користите Копирај сценарио у менију Сценарији, у Основном режиму; он копира сопствене вредности сценарија, са алтернативама које их садрже. Додај основу и Копирај сценарио свако прави алтернативе: Додај основу прави алтернативу Основа за нову Основу у свакој категорији која садржи вредности, а Копирај сценарио прави нову алтернативу, названу као копија, за сваку алтернативу која садржи сопствене вредности сценарија.\\n\\n- Превуците ставку на другу да постане њен подређени. Сценарио премештен под новог родитеља од њега наслеђује све што није заменио; оно што је заменио се не мења. Превуците ставку између две ставке да их преуредите.\\n\\n- Кликните на ставку да је изаберете. Притисните F2 или изаберите Преименуј да преименујете изабрану ставку. Преименовање сценарија пита да ли да се преименују алтернативе које носе његов назив; у Основном режиму се преименују заједно с њим, без питања. Двокликните сценарио или притисните Enter да постане тренутни. Кликните на стрелицу поред ставке или притисните Лево или Десно да је сажмете или проширите. Кликните десним тастером на ставку за исте команде као дугмад.\\n\\n- Притисните Delete или кликните на дугме минус да обришете изабрану ставку. Ставка у употреби се не брише, а порука именује оно што је користи. Брисање сценарија са искљученим Основним режимом задржава алтернативе које користи. Брисање сценарија са укљученим Основним режимом брише и сваку његову алтернативу коју не користи ниједан други сценарио.\\n\\n- Да сценарио користи другу алтернативу, укључујући Основу, изаберите је у реду сценарија у десном панелу Менаџера сценарија или у табели Сценарији. Сопствена вредност направљена у дељеној алтернативи мења сваки сценарио који је користи.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ovl_same_tip",
+                    "value": "Једнако наслеђеној вредности. И даље је сопствена вредност и броји се.",
+                    "english": "Equal to the inherited value. It is still an override, and it is counted."
+                },
+                "next_translated": {
+                    "key": "lpn_sm_delete_alt_ask",
+                    "value": "Обрисати алтернативу {name}?",
+                    "english": "Delete the alternative {name}?"
+                }
+            }
+        },
+        "lpn_settings_engine_native_tip": {
+            "reason": "english_changed",
+            "current_value": "Укључите ово да бисте, где је могуће, користили уграђени решавач. У супротном, увек се користи EPANET решавач америчке агенције EPA. Уграђени решавач се не користи за симулације проширеног периода нити за вентиле за обарање притиска и вентиле опште намене (PBV, GPV). При првом коришћењу EPANET решавача преузима се око 650 KB, који потом остаје сачуван на овом уређају. Где цев има локални (минорни) губитак, два решавача се разилазе у последњим цифрама: EPANET користи заокружену вредност гравитационог убрзања, па су његови локални губици веома благо нижи него у тачном облику.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_engine_native",
+                    "value": "Користи уграђени решавач када је могуће",
+                    "english": "Use the built-in solver when possible"
+                },
+                "next_translated": {
+                    "key": "lpn_engine_loading",
+                    "value": "Учитавање EPANET решавача…",
+                    "english": "Loading the EPANET solver…"
+                }
+            },
+            "label": {
+                "key": "lpn_settings_engine_native",
+                "english": "Use the built-in solver when possible",
+                "value": "Користи уграђени решавач када је могуће"
+            }
+        },
+        "lpn_settings_grp_size": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "Сиве нијансе",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Положај легенде ознака",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_angle": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "Сиве нијансе",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Положај легенде ознака",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_zoom": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "Сиве нијансе",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Положај легенде ознака",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_positions": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "Сиве нијансе",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Положај легенде ознака",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "Сиве нијансе",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Положај легенде ознака",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_thematic": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "Сиве нијансе",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Положај легенде ознака",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_scncmp_menu_tip": {
+            "reason": "english_changed",
+            "current_value": "Табела сценарија са бројем сопствених вредности, најнижим притиском и највећом брзином",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_title",
+                    "value": "Поређење сценарија",
+                    "english": "Scenario comparison"
+                },
+                "next_translated": {
+                    "key": "lpn_scncmp_running",
+                    "value": "Решавање сваког сценарија…",
+                    "english": "Solving every scenario…"
+                }
+            }
+        },
+        "lpn_scncmp_progress": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Сваки сценарио се решава из копије цртежа. Ништа овде не мења пројекат, а сценарио у коме радите остаје какав је био.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "За симулацију током продуженог периода од {time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scncmp_stopped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Сваки сценарио се решава из копије цртежа. Ништа овде не мења пројекат, а сценарио у коме радите остаје какав је био.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "За симулацију током продуженог периода од {time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Сваки сценарио се решава из копије цртежа. Ништа овде не мења пројекат, а сценарио у коме радите остаје какав је био.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "За симулацију током продуженог периода од {time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_col": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Сваки сценарио се решава из копије цртежа. Ништа овде не мења пројекат, а сценарио у коме радите остаје какав је био.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "За симулацију током продуженог периода од {time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Сваки сценарио се решава из копије цртежа. Ништа овде не мења пројекат, а сценарио у коме радите остаје какав је био.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "За симулацију током продуженог периода од {time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_empty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Сваки сценарио се решава из копије цртежа. Ништа овде не мења пројекат, а сценарио у коме радите остаје какав је био.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "За симулацију током продуженог периода од {time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_copy_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Сваки сценарио се решава из копије цртежа. Ништа овде не мења пројекат, а сценарио у коме радите остаје какав је био.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "За симулацију током продуженог периода од {time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_time_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Сваки сценарио се решава из копије цртежа. Ништа овде не мења пројекат, а сценарио у коме радите остаје какав је био.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "За симулацију током продуженог периода од {time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_at_time": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Сваки сценарио се решава из копије цртежа. Ништа овде не мења пројекат, а сценарио у коме радите остаје какав је био.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "За симулацију током продуженог периода од {time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_steady": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Сваки сценарио се решава из копије цртежа. Ништа овде не мења пројекат, а сценарио у коме радите остаје какав је био.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "За симулацију током продуженог периода од {time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_not_converged": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Сваки сценарио се решава из копије цртежа. Ништа овде не мења пројекат, а сценарио у коме радите остаје какав је био.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "За симулацију током продуженог периода од {time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_not_converged_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Сваки сценарио се решава из копије цртежа. Ништа овде не мења пројекат, а сценарио у коме радите остаје какав је био.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "За симулацију током продуженог периода од {time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Сваки сценарио се решава из копије цртежа. Ништа овде не мења пројекат, а сценарио у коме радите остаје какав је био.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "За симулацију током продуженог периода од {time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_flow_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Сваки сценарио се решава из копије цртежа. Ништа овде не мења пројекат, а сценарио у коме радите остаје какав је био.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "За симулацију током продуженог периода од {time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_stale": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Сваки сценарио се решава из копије цртежа. Ништа овде не мења пројекат, а сценарио у коме радите остаје какав је био.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "За симулацију током продуженог периода од {time}",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
         "lpn_full_needs_run": {
             "reason": "english_changed",
             "current_value": "Пун извештај наводи сваки чвор и сваку везу у сваком извештајном временском кораку. Притисните Израчунај, а затим отворите Вода, Извештаји, Пун извештај.",
@@ -215,6 +2305,27 @@
                 "key": "lpn_library_import_tip",
                 "english": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
                 "value": "Изаберите другу пројектну датотеку и копирајте целе библиотеке из ње у овај пројекат. Све чије је име овде већ заузето се прескаче и наводи, па се ништа што већ имате не мења."
+            }
+        },
+        "lpn_ff_minpressure": {
+            "reason": "english_changed",
+            "current_value": "Најнижи дозвољени притисак на другим местима",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_design_no_selection",
+                    "value": "Провера пројекта је постављена на изабране елементе, а ниједан елемент није изабран. Изаберите елементе или изаберите опцију Сви.",
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_minpressure_tip",
+                    "value": "Чвор који падне испод овога док други чвор повлачи свој противпожарни проток пријављује се као проблем у пројекту.",
+                    "english": "A junction that falls below this while another one is drawing its fire flow is reported as a design issue."
+                }
+            },
+            "tip": {
+                "key": "lpn_ff_minpressure_tip",
+                "english": "A junction that falls below this while another one is drawing its fire flow is reported as a design issue.",
+                "value": "Чвор који падне испод овога док други чвор повлачи свој противпожарни проток пријављује се као проблем у пројекту."
             }
         },
         "lpn_crit_minpressure_tip": {
@@ -400,12 +2511,190 @@
                 "english": "Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this.",
                 "value": "Прочитајте тачке, линије и полигоне из ESRI shapefile-а у овај пројекат као Фигуре, са колонама атрибута задржаним као својства. Изаберите или .zip, или .shp заједно са његовим .shx, .dbf и .prj (држите Ctrl или Shift да изаберете више датотека). Координате у координатном систему различитом од система пројекта се претварају, а обавештење то наводи."
             }
+        },
+        "lpn_diag_valve_conflict": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_pda_route",
+                    "value": "Решено EPANET решавачем, јер је модел потрошње вођен притиском.",
+                    "english": "Solved with the EPANET solver, because the demand model is pressure driven."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_needs_epanet",
+                    "value": "Модел потрошње је вођен притиском, а рачуна га само EPANET решавач. EPANET решавач није могао да се учита, па ови резултати недостају.",
+                    "english": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing."
+                }
+            }
+        },
+        "lpn_diag_gpv_curve_order": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_pda_route",
+                    "value": "Решено EPANET решавачем, јер је модел потрошње вођен притиском.",
+                    "english": "Solved with the EPANET solver, because the demand model is pressure driven."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_needs_epanet",
+                    "value": "Модел потрошње је вођен притиском, а рачуна га само EPANET решавач. EPANET решавач није могао да се учита, па ови резултати недостају.",
+                    "english": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing."
+                }
+            }
+        },
+        "lpn_gpv_one_point_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_pda_route",
+                    "value": "Решено EPANET решавачем, јер је модел потрошње вођен притиском.",
+                    "english": "Solved with the EPANET solver, because the demand model is pressure driven."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_needs_epanet",
+                    "value": "Модел потрошње је вођен притиском, а рачуна га само EPANET решавач. EPANET решавач није могао да се учита, па ови резултати недостају.",
+                    "english": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing."
+                }
+            }
+        },
+        "lpn_export_holds_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "Величина слике као умножак области на екрану. Већа је оштрија и прави већу датотеку.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_export_holds_base": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "Величина слике као умножак области на екрану. Већа је оштрија и прави већу датотеку.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_geojson_results_other": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "Величина слике као умножак области на екрану. Већа је оштрија и прави већу датотеку.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_added_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "Величина слике као умножак области на екрану. Већа је оштрија и прави већу датотеку.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_pane_pasted_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "Величина слике као умножак области на екрану. Већа је оштрија и прави већу датотеку.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_export_leaves_alternatives": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "Величина слике као умножак области на екрану. Већа је оштрија и прави већу датотеку.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
         }
     },
-    "key_plain": [],
+    "key_plain": {
+        "consent_body": "May we save, store, or keep a random code, a string of letters and digits chosen by chance, in this browser, so that we do not count you, or this browser, a second time? The code is made up on the spot, created at that moment, says nothing about you or your device, and records nothing you enter."
+    },
     "key_notes": [],
-    "key_concepts": [],
+    "key_concepts": {
+        "lpn_guide_scn_marks_def": [
+            {
+                "concept": "family-tree-parent",
+                "plain_name": "A family tree parent",
+                "english_rendering": "parent",
+                "preferred_translation": ""
+            },
+            {
+                "concept": "family-tree-inherit",
+                "plain_name": "A family tree inherit-",
+                "english_rendering": "inherit",
+                "preferred_translation": ""
+            }
+        ],
+        "lpn_sm_help": [
+            {
+                "concept": "family-tree",
+                "plain_name": "A family tree",
+                "english_rendering": "tree",
+                "preferred_translation": ""
+            },
+            {
+                "concept": "family-tree-parent",
+                "plain_name": "A family tree parent",
+                "english_rendering": "parent",
+                "preferred_translation": ""
+            },
+            {
+                "concept": "family-tree-child",
+                "plain_name": "A family tree child",
+                "english_rendering": "child",
+                "preferred_translation": ""
+            },
+            {
+                "concept": "family-tree-inherit",
+                "plain_name": "A family tree inherit-",
+                "english_rendering": "inherit",
+                "preferred_translation": ""
+            }
+        ]
+    },
     "uniqueness_attention": [
+        {
+            "instruction": "Find unique names for each.",
+            "members": [
+                {
+                    "plain_name": "what-if version, case, scenario, or arrangement of circumstances",
+                    "english_rendering": "scenario",
+                    "preferred_translation": ""
+                },
+                {
+                    "plain_name": "state of a link at a moment, open, closed, or active",
+                    "english_rendering": "status",
+                    "preferred_translation": ""
+                }
+            ]
+        },
         {
             "instruction": "Find unique names for each.",
             "members": [

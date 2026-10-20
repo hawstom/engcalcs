@@ -225,6 +225,13 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 		// a substitute for the neighbourhood's ordinary demand; it is on top of it. That is what
 		// every agency's max-day-plus-fire-flow criterion means, and it is what both inspectable
 		// tools do.
+		//
+		// **AND THE FIRE FLOW IS NEVER MULTIPLIED** (Tom, 2026-10-18: *"If base demand is 100, fire
+		// flow is 1000, and multiplier is 3.0, the fire flow analysis flow needs to be 1300, not
+		// 3300."*). `base` already carries the demand multiplier and the pattern: assembleModel()
+		// puts them in, and a one-instant solve hands EPANET no Demand Multiplier of its own. Should
+		// the engine ever be left to multiply instead, `q` must be divided by that multiplier here.
+		// dev/lpn-spike/fireflow-multiplier-harness.js holds it in both engines.
 		function probe(q) {
 			node.demand = base + q;
 			solves++;

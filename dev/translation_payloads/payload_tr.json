@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "tr",
-        "expected_key_count": 3025,
-        "delta_key_count": 15,
-        "english_changed_key_count": 15,
+        "expected_key_count": 3126,
+        "delta_key_count": 138,
+        "english_changed_key_count": 31,
         "exempt_key_count": 39,
         "exempt_keys": [
             "calc_units_us",
@@ -49,6 +49,7 @@
         "out_of_scope_key_count": 0,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
         "active_prefixes": [
+            "consent",
             "lpn"
         ],
         "requested_prefix": null,
@@ -61,47 +62,361 @@
         "plain_notes": "key_plain[key] says in plain words what that one string means, other wordings joined by \"or\". Use whichever your language expresses most naturally and compactly; you are not bound to the literal English wording.",
         "key_notes_notes": "key_notes[key] are notes about that one string: how much room it has, symbols to keep exactly, what it refers to. Follow them. They are instructions to you, never text to put in your file.",
         "suggestion_box_notes": "Read suggestion_box and follow it. It is part of your instructions, not a footnote: a sprint does not close while a translator complaint is unanswered.",
+        "translator_notes": [
+            "Tree, parent, child and inherit are the words of a family tree. Use the everyday family words of your language."
+        ],
+        "translator_notes_notes": "Read translator_notes and follow them. Each is true of every string you translate.",
         "concept_notes": "Read concept_source and follow it. key_concepts lists, for a key that names a concept, its plain-words name, which is what you translate from; English is one rendering of it.",
         "uniqueness_notes": "uniqueness_attention lists the few groups of concepts that sit side by side on one screen. Find unique names for each, and use each name the same way everywhere."
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: debi\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Basınç\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: düğüm\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: hat\n- water network project, file, or model\n    English: project (saved network)\n    Your language: proje\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: yangın debisi\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: Figür\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: debi\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: hız\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: yük\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: yük kaybı\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: yerel kayıp\n- flow used, taken, or consumed\n    English: demand\n    Your language: Talep\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: Basınç\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: çizmek\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: düğüm\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: rezervuar\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: düğüm\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: hat\n- water network project, file, or model\n    English: project (saved network)\n    Your language: proje\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: senaryo\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: varsayılan\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- solver or the part that works out the answer\n    English: solver\n    Your language: çözücü\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: Depo\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: Vana\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: Kendi değerleri\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: yangın debisi\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: Müşteri\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- note, remark, or description for people about one item\n    English: description (asset notes)\n    Your language: (no preferred translation yet: use your language's standard term)\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: Figür\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
+        "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
+        "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
+        "lpn_guide_cmp_byasset_term": "Results by asset",
+        "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver's internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.<\/p>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
+        "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
+        "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_ex_net1_scn_title": "EPANET Net1 with scenarios, gpm (US)",
+        "lpn_ex_net1_scn_desc": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.",
+        "lpn_ex_valves_title": "Valve types, gpm (US)",
+        "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_file_import_inp": "EPANET file…",
+        "lpn_file_import_inp_tip": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_file_import_msx": "EPANET-MSX file…",
+        "lpn_file_import_msx_tip": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.",
+        "lpn_file_export_item_msx": "EPANET-MSX file…",
+        "lpn_file_export_msx_tip": "Download the attached EPANET-MSX file exactly as it was imported.",
+        "lpn_msx_report_heading": "Attached {file}",
+        "lpn_msx_report_kept": "This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.",
+        "lpn_msx_report_species": "Species in the file: {list}.",
+        "lpn_msx_report_no_species": "No species are listed in the file.",
+        "lpn_msx_too_big": "{file} is too large to keep in browser storage, so it was not attached.",
+        "lpn_msx_report_missing": "IDs in the file that this network does not have: {ids}.",
+        "lpn_msx_not_msx": "{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.",
+        "lpn_msx_attached_heading": "Attached EPANET-MSX file: {file}",
+        "lpn_msx_replace": "Replace…",
+        "lpn_msx_remove": "Remove",
+        "lpn_msx_removed": "Removed {file} from this project.",
+        "lpn_quality_msx": "Multi-species (EPANET-MSX)",
+        "lpn_quality_msx_species": "Species",
+        "lpn_quality_msx_species_tip": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.",
+        "lpn_quality_msx_none": "No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.",
+        "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+        "lpn_inpup_ask_title": "Import {file}",
+        "lpn_inpup_lead": "An EPANET file holds one set of values and no scenarios. Choose where to put them.",
+        "lpn_inpup_how": "In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.",
+        "lpn_inpup_base_note": "Base. A scenario that holds its own value for an asset keeps it; the others take the new value.",
+        "lpn_inpup_btn_new": "A new project",
+        "lpn_inpup_btn_project": "This project, {project}",
+        "lpn_inpup_btn_scenario": "{scenario}, open now",
+        "lpn_inpup_btn_base": "Base",
+        "lpn_inpup_title": "Update from EPANET file",
+        "lpn_inpup_heading": "Imported {file} into {scenario} of {project}",
+        "lpn_inpup_counts": "Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).",
+        "lpn_inpup_undo": "Undo reverses all of it in one step.",
+        "lpn_inpup_nothing": "Every value in the file that matches an asset here is already the same in {scenario}.",
+        "lpn_inpup_status": "Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).",
+        "lpn_inpup_h_changed": "Values changed",
+        "lpn_inpup_row": "{id}, {property}: {old} to {new}",
+        "lpn_inpup_more": "{n} more",
+        "lpn_inpup_blank": "blank",
+        "lpn_inpup_h_added": "Assets added",
+        "lpn_inpup_h_kept": "Kept, not in the file",
+        "lpn_inpup_h_na": "Not applied",
+        "lpn_inpup_na_general": "The file also holds {items}. They were not applied.",
+        "lpn_inpup_na_type": "The file states a different type for these assets, so none of their values were changed: {ids}",
+        "lpn_inpup_na_owned": "The pipe type states some values of these pipes, so those values were not changed: {ids}",
+        "lpn_inpup_na_roughness": "Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.",
+        "lpn_inpup_na_geo": "Assets only in the file ({n}) were not added, because the file and this project use different coordinate systems.",
+        "lpn_inpup_na_refs": "These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}",
+        "lpn_inpup_na_msx": "The .msx file chosen with this file was not read. To attach it to this project, choose it alone.",
+        "lpn_inpup_refused_heading": "Nothing was changed in {project}.",
+        "lpn_inpup_refused_lead": "The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.",
+        "lpn_inpup_unit_row": "{family}: the file uses {file} and this project uses {project}.",
+        "lpn_inpup_method_row": "Head loss formula: the file uses {file} and this project uses {project}.",
+        "lpn_inpup_refused_lead_formula": "The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.",
+        "lpn_inpup_refused_lead_both": "The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.",
+        "lpn_inpup_na_cv": "A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}",
+        "lpn_inpup_failed": "The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}",
+        "lpn_inpup_i_positions": "positions of existing assets",
+        "lpn_inpup_i_connections": "connections",
+        "lpn_inpup_i_descriptions": "descriptions",
+        "lpn_inpup_i_patterns": "patterns",
+        "lpn_inpup_i_curves": "curves",
+        "lpn_inpup_i_controls": "controls",
+        "lpn_inpup_i_rules": "rules",
+        "lpn_inpup_i_options": "options",
+        "lpn_inpup_t_junction": "Junction",
+        "lpn_inpup_t_reservoir": "Reservoir",
+        "lpn_inpup_t_tank": "Tank",
+        "lpn_inpup_t_pipe": "Pipe",
+        "lpn_inpup_t_pump": "Pump",
+        "lpn_inpup_t_valve": "Valve",
+        "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
+        "lpn_notes_2_def": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
+        "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
+        "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.",
+        "lpn_engine_unavailable_why": "This network cannot be solved without the EPANET solver. {reason}",
+        "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Clear it to hide the text with the other labels once the view is wider than the labeling threshold set under Map.",
+        "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+        "lpn_settings_grp_size": "Size",
+        "lpn_settings_grp_angle": "Angle",
+        "lpn_settings_grp_zoom": "Zoom",
+        "lpn_settings_grp_positions": "Positions",
+        "lpn_settings_grp_show": "Show",
+        "lpn_settings_grp_thematic": "Thematic",
+        "lpn_scncmp_menu_tip": "Table of scenarios with count of overrides, lowest pressure, and highest velocity, and a table of results by asset that copies to a spreadsheet",
+        "lpn_scncmp_progress": "Solving scenario {done} of {total}…",
+        "lpn_scncmp_stopped": "Stopped after {done} of {total} scenarios. The results below are the ones already finished.",
+        "lpn_scnres_title": "Results by asset",
+        "lpn_scnres_col": "{quantity} ({unit}), {scenario}",
+        "lpn_scnres_none": "Check at least one result to show.",
+        "lpn_scnres_empty": "This project has none of these assets.",
+        "lpn_scnres_copy_tip": "Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.",
+        "lpn_scnres_time_note": "A scenario with a total run time is read at the time step on screen, {time}, or at its last time step if its run ends sooner. Each heading shows the time read.",
+        "lpn_scnres_at_time": "({time})",
+        "lpn_scnres_steady": "(steady state)",
+        "lpn_scnres_not_converged": "(not converged)",
+        "lpn_scnres_not_converged_note": "A column marked {mark} shows the last results the solver reached before it stopped without converging.",
+        "lpn_scnres_failed": "{scenario} could not be solved, so its columns are blank. {why}",
+        "lpn_scnres_flow_tip": "The sign of a flow is the solver's internal direction sign: positive runs from the From node to the To node, negative the reverse. It has no use outside this table except to show whether a flow changed direction between scenarios.",
+        "lpn_scnres_stale": "Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.",
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
         "lpn_library_import": "Libraries…",
-        "lpn_crit_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
-        "lpn_ds_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ff_minpressure": "Lowest system pressure allowed",
+        "lpn_crit_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ds_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_file_import_survey": "Surveyed points…",
         "lpn_file_import_shapes": "GeoJSON shapes…",
         "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
         "lpn_file_import_gjnet": "GeoJSON network…",
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
         "lpn_file_import_dxf": "DXF shapes…",
-        "lpn_file_import_shp": "Shapefile shapes…"
+        "lpn_file_import_shp": "Shapefile shapes…",
+        "lpn_diag_valve_conflict": "These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:",
+        "lpn_diag_gpv_curve_order": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:",
+        "lpn_gpv_one_point_note": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}",
+        "lpn_export_holds_scenario": "It holds the scenario {scenario} only.",
+        "lpn_export_holds_base": "It holds the Base scenario only.",
+        "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
+        "lpn_survey_added_scenario": "The nodes were added to {scenario}. In Base they are inactive.",
+        "lpn_pane_pasted_scenario": "These values are overrides in the scenario {scenario}.",
+        "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file."
     },
     "keys": {
+        "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
+        "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
+        "lpn_guide_cmp_byasset_term": "Results by asset",
+        "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver's internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.<\/p>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
+        "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
+        "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
+        "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_ex_net1_scn_title": "EPANET Net1 with scenarios, gpm (US)",
+        "lpn_ex_net1_scn_desc": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.",
+        "lpn_ex_valves_title": "Valve types, gpm (US)",
+        "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_file_import_inp": "EPANET file…",
+        "lpn_file_import_inp_tip": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
+        "lpn_file_import_msx": "EPANET-MSX file…",
+        "lpn_file_import_msx_tip": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.",
+        "lpn_file_export_item_msx": "EPANET-MSX file…",
+        "lpn_file_export_msx_tip": "Download the attached EPANET-MSX file exactly as it was imported.",
+        "lpn_msx_report_heading": "Attached {file}",
+        "lpn_msx_report_kept": "This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.",
+        "lpn_msx_report_species": "Species in the file: {list}.",
+        "lpn_msx_report_no_species": "No species are listed in the file.",
+        "lpn_msx_too_big": "{file} is too large to keep in browser storage, so it was not attached.",
+        "lpn_msx_report_missing": "IDs in the file that this network does not have: {ids}.",
+        "lpn_msx_not_msx": "{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.",
+        "lpn_msx_attached_heading": "Attached EPANET-MSX file: {file}",
+        "lpn_msx_replace": "Replace…",
+        "lpn_msx_remove": "Remove",
+        "lpn_msx_removed": "Removed {file} from this project.",
+        "lpn_quality_msx": "Multi-species (EPANET-MSX)",
+        "lpn_quality_msx_species": "Species",
+        "lpn_quality_msx_species_tip": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.",
+        "lpn_quality_msx_none": "No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.",
+        "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+        "lpn_inpup_ask_title": "Import {file}",
+        "lpn_inpup_lead": "An EPANET file holds one set of values and no scenarios. Choose where to put them.",
+        "lpn_inpup_how": "In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.",
+        "lpn_inpup_base_note": "Base. A scenario that holds its own value for an asset keeps it; the others take the new value.",
+        "lpn_inpup_btn_new": "A new project",
+        "lpn_inpup_btn_project": "This project, {project}",
+        "lpn_inpup_btn_scenario": "{scenario}, open now",
+        "lpn_inpup_btn_base": "Base",
+        "lpn_inpup_title": "Update from EPANET file",
+        "lpn_inpup_heading": "Imported {file} into {scenario} of {project}",
+        "lpn_inpup_counts": "Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).",
+        "lpn_inpup_undo": "Undo reverses all of it in one step.",
+        "lpn_inpup_nothing": "Every value in the file that matches an asset here is already the same in {scenario}.",
+        "lpn_inpup_status": "Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).",
+        "lpn_inpup_h_changed": "Values changed",
+        "lpn_inpup_row": "{id}, {property}: {old} to {new}",
+        "lpn_inpup_more": "{n} more",
+        "lpn_inpup_blank": "blank",
+        "lpn_inpup_h_added": "Assets added",
+        "lpn_inpup_h_kept": "Kept, not in the file",
+        "lpn_inpup_h_na": "Not applied",
+        "lpn_inpup_na_general": "The file also holds {items}. They were not applied.",
+        "lpn_inpup_na_type": "The file states a different type for these assets, so none of their values were changed: {ids}",
+        "lpn_inpup_na_owned": "The pipe type states some values of these pipes, so those values were not changed: {ids}",
+        "lpn_inpup_na_roughness": "Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.",
+        "lpn_inpup_na_geo": "Assets only in the file ({n}) were not added, because the file and this project use different coordinate systems.",
+        "lpn_inpup_na_refs": "These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}",
+        "lpn_inpup_na_msx": "The .msx file chosen with this file was not read. To attach it to this project, choose it alone.",
+        "lpn_inpup_refused_heading": "Nothing was changed in {project}.",
+        "lpn_inpup_refused_lead": "The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.",
+        "lpn_inpup_unit_row": "{family}: the file uses {file} and this project uses {project}.",
+        "lpn_inpup_method_row": "Head loss formula: the file uses {file} and this project uses {project}.",
+        "lpn_inpup_refused_lead_formula": "The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.",
+        "lpn_inpup_refused_lead_both": "The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.",
+        "lpn_inpup_na_cv": "A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}",
+        "lpn_inpup_failed": "The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}",
+        "lpn_inpup_i_positions": "positions of existing assets",
+        "lpn_inpup_i_connections": "connections",
+        "lpn_inpup_i_descriptions": "descriptions",
+        "lpn_inpup_i_patterns": "patterns",
+        "lpn_inpup_i_curves": "curves",
+        "lpn_inpup_i_controls": "controls",
+        "lpn_inpup_i_rules": "rules",
+        "lpn_inpup_i_options": "options",
+        "lpn_inpup_t_junction": "Junction",
+        "lpn_inpup_t_reservoir": "Reservoir",
+        "lpn_inpup_t_tank": "Tank",
+        "lpn_inpup_t_pipe": "Pipe",
+        "lpn_inpup_t_pump": "Pump",
+        "lpn_inpup_t_valve": "Valve",
+        "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
+        "lpn_notes_2_def": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
+        "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
+        "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.",
+        "lpn_engine_unavailable_why": "This network cannot be solved without the EPANET solver. {reason}",
+        "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Clear it to hide the text with the other labels once the view is wider than the labeling threshold set under Map.",
+        "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
+        "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
+        "lpn_settings_grp_size": "Size",
+        "lpn_settings_grp_angle": "Angle",
+        "lpn_settings_grp_zoom": "Zoom",
+        "lpn_settings_grp_positions": "Positions",
+        "lpn_settings_grp_show": "Show",
+        "lpn_settings_grp_thematic": "Thematic",
+        "lpn_scncmp_menu_tip": "Table of scenarios with count of overrides, lowest pressure, and highest velocity, and a table of results by asset that copies to a spreadsheet",
+        "lpn_scncmp_progress": "Solving scenario {done} of {total}…",
+        "lpn_scncmp_stopped": "Stopped after {done} of {total} scenarios. The results below are the ones already finished.",
+        "lpn_scnres_title": "Results by asset",
+        "lpn_scnres_col": "{quantity} ({unit}), {scenario}",
+        "lpn_scnres_none": "Check at least one result to show.",
+        "lpn_scnres_empty": "This project has none of these assets.",
+        "lpn_scnres_copy_tip": "Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.",
+        "lpn_scnres_time_note": "A scenario with a total run time is read at the time step on screen, {time}, or at its last time step if its run ends sooner. Each heading shows the time read.",
+        "lpn_scnres_at_time": "({time})",
+        "lpn_scnres_steady": "(steady state)",
+        "lpn_scnres_not_converged": "(not converged)",
+        "lpn_scnres_not_converged_note": "A column marked {mark} shows the last results the solver reached before it stopped without converging.",
+        "lpn_scnres_failed": "{scenario} could not be solved, so its columns are blank. {why}",
+        "lpn_scnres_flow_tip": "The sign of a flow is the solver's internal direction sign: positive runs from the From node to the To node, negative the reverse. It has no use outside this table except to show whether a flow changed direction between scenarios.",
+        "lpn_scnres_stale": "Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.",
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
         "lpn_library_import": "Libraries…",
-        "lpn_crit_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
-        "lpn_ds_minpressure_tip": "This is the same number as the Lowest pressure allowed elsewhere box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ff_minpressure": "Lowest system pressure allowed",
+        "lpn_crit_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
+        "lpn_ds_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_file_import_survey": "Surveyed points…",
         "lpn_file_import_shapes": "GeoJSON shapes…",
         "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
         "lpn_file_import_gjnet": "GeoJSON network…",
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
         "lpn_file_import_dxf": "DXF shapes…",
-        "lpn_file_import_shp": "Shapefile shapes…"
+        "lpn_file_import_shp": "Shapefile shapes…",
+        "lpn_diag_valve_conflict": "These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:",
+        "lpn_diag_gpv_curve_order": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:",
+        "lpn_gpv_one_point_note": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}",
+        "lpn_export_holds_scenario": "It holds the scenario {scenario} only.",
+        "lpn_export_holds_base": "It holds the Base scenario only.",
+        "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
+        "lpn_survey_added_scenario": "The nodes were added to {scenario}. In Base they are inactive.",
+        "lpn_pane_pasted_scenario": "These values are overrides in the scenario {scenario}.",
+        "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file."
     },
     "key_context": {
+        "consent_body": {
+            "reason": "english_changed",
+            "current_value": "Sitenin her bölümünü kaç tarayıcının kullandığını sayabilmemiz için bu tarayıcıya rastgele bir kod kaydedebilir miyiz? Kod o anda üretilir, sizin veya cihazınız hakkında hiçbir şey söylemez ve girdiğiniz hiçbir şeyi kaydetmez. Bu kod olmadan ikinci ziyaretinizi başka birinin ilk ziyaretinden ayırt edemeyiz.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "template_printable_subtitle",
+                    "value": "Yazdırılabilir Alt Başlık",
+                    "english": "Printable Subtitle"
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_tip",
+                    "value": "Bu şebekeyi her hidrolik zaman adımında çözer.",
+                    "english": "Solve this network at every hydraulic time step."
+                }
+            }
+        },
+        "lpn_guide_scn_marks_def": {
+            "reason": "english_changed",
+            "current_value": "<p>Haritada, açık senaryoda bir senaryo değeri olan varlık kehribar renkli bir halkayla, üst senaryodan veya alternatiften bir senaryo değeri devralan varlık ise kesikli gri bir halkayla çevrelenir. Talep, çap, pürüzlülük, küçük (yerel) kayıp katsayısı ve uzunluk için halka yalnızca Ayarlar, Görselleştirme, Düğüm etiketleri veya Hat etiketleri o değeri haritada gösterirken görünür; başka herhangi bir özelliğin senaryo değerinin halkası her zaman vardır. Tablolarda, açık senaryonun belirlediği bir değeri tutan hücre kehribar renklidir ve ipucu onu tutan alternatifi söyler; örneğin Fiziksel alt.: Daha büyük ana boru. Bir tablonun hücre menüsündeki Senaryoları göster, her varlığı her senaryo için bir kez listeler.<\/p><p>Bir senaryonun değiştirebildiği Özellikler satırlarının her birinin solunda bir işaret vardır. Dolu bir nokta, açık senaryonun değeri kendi senaryo değeriyle değiştirdiği anlamına gelir; senaryo değerini temizlemek için ona tıklayın. İçi boş bir nokta, değerin devralındığı anlamına gelir; gösterilen değeri bir senaryo değeri yapmak için ona tıklayın. Bir üçgen, bunun altındaki senaryoların değeri değiştirdiği anlamına gelir; onaydan sonra onların senaryo değerlerini temizlemek için ona tıklayın. Senaryo değeri olan bir satırın altında, onun yerini aldığı devralınan değer görünür; örneğin Temel senaryo: 18. Ayarlar kutusunda yalnızca dolu nokta ve üçgen vardır, çünkü orada bir değer yazmak senaryo değeri oluşturur.<\/p><p>Halkaları gizlemek için Ayarlar, Harita ve sayfa, Sayfa altındaki Senaryo değeri işaretlerini haritada göster ayarının işaretini kaldırın veya Harita, Temiz harita öğesini seçin. İkisi de projede değil, bu tarayıcıda tutulur. Tablolar her iki durumda da senaryo değerlerini işaretler.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_scn_marks_term",
+                    "value": "Senaryo değerleri nerede görünür",
+                    "english": "Where overrides show"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_scn_make_term",
+                    "value": "Senaryo değerlerini oluşturma ve temizleme",
+                    "english": "Making and clearing overrides"
+                }
+            }
+        },
+        "lpn_guide_cmp_byasset_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_cmp_run_def",
+                    "value": "<p>Toplam çalışma süresi 0'dan büyük olan bir senaryo, EPANET motoruyla tüm dönem boyunca çalıştırılır. En düşük basıncı ve en yüksek hızı, her biri zamanıyla birlikte gösterilen, her zaman adımındaki uç değerlerdir. Toplam çalışma süresi 0 olan bir senaryo tek bir anda çözülür. Toplam çalışma süresi bir senaryonun değiştirebildiği seçeneklerden biridir; bu yüzden tek bir tablo iki türü de tutabilir.<\/p>",
+                    "english": "<p>A scenario with a Total run time greater than 0 is run over the whole period through the EPANET engine. Its lowest pressure and highest velocity are the extremes over every time step, each shown with its time. A scenario with a Total run time of 0 is solved at one instant. The total run time is one of the options a scenario can override, so one table can hold both kinds.<\/p>"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_cmp_notes_term",
+                    "value": "Dikkat edilecek noktalar",
+                    "english": "Points to note"
+                }
+            }
+        },
+        "lpn_guide_cmp_byasset_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_cmp_run_def",
+                    "value": "<p>Toplam çalışma süresi 0'dan büyük olan bir senaryo, EPANET motoruyla tüm dönem boyunca çalıştırılır. En düşük basıncı ve en yüksek hızı, her biri zamanıyla birlikte gösterilen, her zaman adımındaki uç değerlerdir. Toplam çalışma süresi 0 olan bir senaryo tek bir anda çözülür. Toplam çalışma süresi bir senaryonun değiştirebildiği seçeneklerden biridir; bu yüzden tek bir tablo iki türü de tutabilir.<\/p>",
+                    "english": "<p>A scenario with a Total run time greater than 0 is run over the whole period through the EPANET engine. Its lowest pressure and highest velocity are the extremes over every time step, each shown with its time. A scenario with a Total run time of 0 is solved at one instant. The total run time is one of the options a scenario can override, so one table can hold both kinds.<\/p>"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_cmp_notes_term",
+                    "value": "Dikkat edilecek noktalar",
+                    "english": "Points to note"
+                }
+            }
+        },
         "lpn_guide_lib_import_def": {
             "reason": "english_changed",
             "current_value": "<p>Dosya, İçe aktar…, Kitaplıkları içe aktar… başka bir proje dosyasını açar ve ondan tüm kitaplıkları bu projeye kopyalar. Adı burada zaten kullanılan bir öğe atlanır ve listelenir; böylece burada zaten bulunan hiçbir şey değişmez. Dosya ve proje bir büyüklüğü farklı birimlerde belirtiyorsa bir uyarı gösterilir ve öğeler yazıldığı gibi içe aktarılır. Bu projede bulunmayan bir bağlantı parçası listesine başvuran boru türleri listelenir; bunları çözmek için bağlantı parçaları kitaplığını aynı dosyadan içe aktarın.<\/p>",
@@ -118,6 +433,134 @@
                 }
             }
         },
+        "lpn_guide_set_where_def": {
+            "reason": "english_changed",
+            "current_value": "<p>Kutunun solundaki liste bir bölüme veya alt başlığa atlar. Bölümler Görselleştirme (Düğüm etiketleri, Düğüm renkleri, Hat etiketleri, Hat renkleri, Müşteri ve Tümü), Harita ve sayfa (Görünüm ve Sayfa), Öğeler (ID önekleri, Değerler ve Özel özellikler), Hesaplama (Birimler, Zaman, Hidrolik, Enerji ve Su kalitesi) ve Emeği geçenlerdir. Her alt başlık, ayarlarının Projeyle kaydedildiğini mi yoksa Bu tarayıcıda kaydedildiğini mi bildirir. Sayfa altındaki ayarlar ve Hidrolik içindeki, kendisi Bu tarayıcıda kaydedilir diyen bir satır olan Çalıştırma ilerleme kutusunu göster dışında her şey projeyle birlikte kaydedilir.<\/p><p>Tablolardaki Ayarlar sekmesi aynı ayarları Kategori ve Değer ile satırlar olarak listeler; böylece bir ayar orada da bulunabilir ve denetlenebilir.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_set_where_term",
+                    "value": "Bölümler ve ayarların nerede kaydedildiği",
+                    "english": "Sections, and where settings are saved"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_set_search_term",
+                    "value": "Arama",
+                    "english": "Searching"
+                }
+            }
+        },
+        "lpn_guide_ff_asks_def": {
+            "reason": "english_changed",
+            "current_value": "<p>Sınanan her düğüm, şebekenin ekrandaki zaman adımında ve açık senaryodaki bir kopyası üzerinde iki sınav alır. Birincisi, düğümün kalıntı basıncı korurken ne kadar debi verebileceğini sorar. Düğümden bir debi çekilir ve tekrarlanan çözümler onu daraltır; üst sınır 10000 gpm'e eşittir. Üst sınırda hâlâ kalıntı basıncı koruyan bir düğüm, üst sınırdan fazlasını verdiği şeklinde bildirilir. İkinci sınav, tasarım denetimi, düğümden gereken debiyi çeker ve kapsamındaki başka bir düğümün Başka yerde izin verilen en düşük basıncın altına düşüp düşmediğini ya da kapsamındaki herhangi bir borunun İzin verilen en yüksek hızın üstünde çalışıp çalışmadığını sorar. Kapsamı Yok olduğunda tasarım denetimi yapılmaz.<\/p><p>Kendi Gereken yangın debisi özelliği olan bir düğüm bu değere göre, diğer her düğüm ise kutudaki değere göre sınanır.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_ff_asks_term",
+                    "value": "Her düğümden ne istenir",
+                    "english": "What is asked of each junction"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_ff_result_term",
+                    "value": "Sonuçları okuma",
+                    "english": "Reading the results"
+                }
+            }
+        },
+        "lpn_guide_cr_case_def": {
+            "reason": "english_changed",
+            "current_value": "<p>Kapsamdaki her hat için hat, şebekenin bir kopyasında etkin olmayan hale getirilir ve kopya, ekrandaki zaman adımında ve açık senaryoda çözülür. Bir çalıştırma, her hat için bir çözüm ve hiçbir şey bozulmadan bir çözüm daha demektir. Bir rezervuara veya depoya açık yolu kalmayan bir düğüm ayrılmıştır: çözümden önce kaldırılır ve talebi Karşılanmayan talep olarak sayılır. Hâlâ bağlı olan düğümlerden, Asgarinin altındaki düğümler basıncı İzin verilen en düşük basıncın altına düşenleri listeler. Hiçbir şey bozulmadan zaten onun altında olan bir düğüm hiçbir hat aleyhine sayılmaz ve özet kaç tane olduğunu bildirir. İzin verilen en düşük basınç, Yangın debisi analizinin Başka yerde izin verilen en düşük basınç kutusuyla aynı ayardır.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_cr_case_term",
+                    "value": "Her durumun yaptığı",
+                    "english": "What each case does"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_cr_dead_term",
+                    "value": "Çıkmaz uçlar ve liste",
+                    "english": "Dead ends, and the list"
+                }
+            }
+        },
+        "lpn_guide_ds_find_def": {
+            "reason": "english_changed",
+            "current_value": "<p>Bul, 0'dan 20'ye kadar talep ölçeklerini 0,01'e yakın aralıkla arar ve seçilen her düğümün en az İzin verilen en düşük basıncı koruduğu en büyük ölçeği bulur. Ölçeği ve oradaki en düşük basıncı, ve basıncın ilk kez sınırın altına düştüğü bir sonraki adım için aynısını bildirir. Girildiği gibi talepler zaten bir düğümü sınırın altında bırakıyorsa yanıt bir uyarı işaretiyle işaretlenir. 20'de her düğüm sınırı koruyorsa yanıt bunu söyler. Durdur bir aramayı yanıt vermeden bitirir. İzin verilen en düşük basınç, Yangın debisi analizinin Başka yerde izin verilen en düşük basınç kutusuyla aynı ayardır.<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_ds_find_term",
+                    "value": "Bul",
+                    "english": "Find"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_ds_scope_term",
+                    "value": "Düğümler ve zaman adımı",
+                    "english": "Junctions, and the time step"
+                }
+            }
+        },
+        "lpn_ex_net1_scn_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net1_si_desc",
+                    "value": "Saniyede litre, metre ve milimetre birimleriyle. Dakikada galon, fit ve inç biriminden dönüştürülmüş kurgusal bir EPANET örneği: klor, 1 rezervuar, 1 depo, 1 pompa ve iki kural tabanlı kontrol içerir.",
+                    "english": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_net2_si_title",
+                    "value": "EPANET Net2, L\/sn (SI)",
+                    "english": "EPANET Net2, L\/s (SI)"
+                }
+            }
+        },
+        "lpn_ex_net1_scn_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net1_si_desc",
+                    "value": "Saniyede litre, metre ve milimetre birimleriyle. Dakikada galon, fit ve inç biriminden dönüştürülmüş kurgusal bir EPANET örneği: klor, 1 rezervuar, 1 depo, 1 pompa ve iki kural tabanlı kontrol içerir.",
+                    "english": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_net2_si_title",
+                    "value": "EPANET Net2, L\/sn (SI)",
+                    "english": "EPANET Net2, L\/s (SI)"
+                }
+            }
+        },
+        "lpn_ex_valves_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net1_si_desc",
+                    "value": "Saniyede litre, metre ve milimetre birimleriyle. Dakikada galon, fit ve inç biriminden dönüştürülmüş kurgusal bir EPANET örneği: klor, 1 rezervuar, 1 depo, 1 pompa ve iki kural tabanlı kontrol içerir.",
+                    "english": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_net2_si_title",
+                    "value": "EPANET Net2, L\/sn (SI)",
+                    "english": "EPANET Net2, L\/s (SI)"
+                }
+            }
+        },
+        "lpn_ex_valves_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net1_si_desc",
+                    "value": "Saniyede litre, metre ve milimetre birimleriyle. Dakikada galon, fit ve inç biriminden dönüştürülmüş kurgusal bir EPANET örneği: klor, 1 rezervuar, 1 depo, 1 pompa ve iki kural tabanlı kontrol içerir.",
+                    "english": "Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_net2_si_title",
+                    "value": "EPANET Net2, L\/sn (SI)",
+                    "english": "EPANET Net2, L\/s (SI)"
+                }
+            }
+        },
         "lpn_file_import_inp": {
             "reason": "english_changed",
             "current_value": "EPANET dosyası içe aktar…",
@@ -130,13 +573,34 @@
                 "next_translated": {
                     "key": "lpn_file_import_inp_tip",
                     "value": "Bir EPANET dosyasından — ister .inp metin dosyası ister EPANET'in kaydettiği .net dosyası olsun — bir şebeke okur ve bu tarayıcıda yeni bir proje olarak kaydeder.",
-                    "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort)."
+                    "english": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time."
                 }
             },
             "tip": {
                 "key": "lpn_file_import_inp_tip",
-                "english": "Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort).",
+                "english": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
                 "value": "Bir EPANET dosyasından — ister .inp metin dosyası ister EPANET'in kaydettiği .net dosyası olsun — bir şebeke okur ve bu tarayıcıda yeni bir proje olarak kaydeder."
+            }
+        },
+        "lpn_file_import_inp_tip": {
+            "reason": "english_changed",
+            "current_value": "Bir EPANET dosyasından — ister .inp metin dosyası ister EPANET'in kaydettiği .net dosyası olsun — bir şebeke okur ve bu tarayıcıda yeni bir proje olarak kaydeder.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp",
+                    "value": "EPANET dosyası içe aktar…",
+                    "english": "EPANET file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_menu",
+                    "value": "Dışa aktar…",
+                    "english": "Export…"
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_inp",
+                "english": "EPANET file…",
+                "value": "EPANET dosyası içe aktar…"
             }
         },
         "lpn_file_export_workspace_tip": {
@@ -176,6 +640,1632 @@
                 "value": "Çalışma alanı…"
             }
         },
+        "lpn_file_import_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "tip": {
+                "key": "lpn_file_import_msx_tip",
+                "english": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation."
+            }
+        },
+        "lpn_file_import_msx_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "label": {
+                "key": "lpn_file_import_msx",
+                "english": "EPANET-MSX file…"
+            }
+        },
+        "lpn_file_export_item_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_file_export_msx_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_kept": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_species": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_no_species": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_too_big": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_report_missing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_not_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_attached_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_replace": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_remove": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_msx_removed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_quality_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_quality_msx_species": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "tip": {
+                "key": "lpn_quality_msx_species_tip",
+                "english": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species."
+            }
+        },
+        "lpn_quality_msx_species_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            },
+            "label": {
+                "key": "lpn_quality_msx_species",
+                "english": "Species"
+            }
+        },
+        "lpn_quality_msx_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_result_msx_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "Dosya, Dışa aktar, Çalışma alanı ile kaydedilmiş bir çalışma alanı dosyasını uygulayın: kutu konumları ve boyutları, yerleştirme, panel boyutları ve bu sayfanın görüntü seçenekleri, örneğin hangi yardım balonlarının ve fare üstü kartının gösterildiği. Projelerinize ve çerezlerinize dokunulmaz.",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "Çalışma alanı {file} dosyasına kaydedildi: {n} ayar.",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
+            }
+        },
+        "lpn_inpup_ask_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_lead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_how": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_base_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_btn_new": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_btn_project": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_btn_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_btn_base": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_counts": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_undo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_nothing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_status": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_h_changed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_row": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_more": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_blank": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_h_added": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_h_kept": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_h_na": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_general": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_type": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_owned": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_roughness": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_geo": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_refs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_refused_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_refused_lead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_unit_row": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_method_row": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_refused_lead_formula": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_refused_lead_both": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_na_cv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_positions": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_connections": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_descriptions": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_patterns": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_curves": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_controls": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_rules": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_i_options": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_t_junction": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_t_reservoir": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_t_tank": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_t_pipe": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_t_pump": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_inpup_t_valve": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "Proje dosyası",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_notes_1_def": {
+            "reason": "english_changed",
+            "current_value": "Varsayılan olarak şebeke EPANET çözücüsüyle çözülür. Bir toplam çalışma süresi belirlendiğinde her raporlama zaman adımı sırayla hesaplanır: depolar dolar ve boşalır, talepler desenlerini izler ve araç çubuğu çalıştırmayı oynatır. Mümkün olduğunda yerleşik çözücüyü kullan işaretliyken tek anlık bir çözüm yerleşik çözücüyle çözülebilir; ancak uzun süreli bir benzetim veya bir basınç kırıcı ya da genel amaçlı vana (PBV, GPV) içeren bir şebeke her zaman EPANET çözücüsüyle çözülür.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_1_term",
+                    "value": "Nasıl çözüldüğü",
+                    "english": "How it is solved"
+                },
+                "next_translated": {
+                    "key": "lpn_notes_2_term",
+                    "value": "Ne yapmadığı",
+                    "english": "What it does not do"
+                }
+            }
+        },
+        "lpn_notes_2_def": {
+            "reason": "english_changed",
+            "current_value": "Dalgalanma ve su darbesi modellenmez: tüm sonuçlar daimi veya yavaş değişen akış içindir, vananın hızla kapanmasının neden olduğu geçici basınç dalgası için değildir.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_2_term",
+                    "value": "Ne yapmadığı",
+                    "english": "What it does not do"
+                },
+                "next_translated": {
+                    "key": "lpn_notes_3_term",
+                    "value": "Projeleri kaydetme",
+                    "english": "Saving projects"
+                }
+            }
+        },
+        "lpn_roughness_method_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_omitted_note",
+                    "value": "Bu çalıştırmanın dışında bırakıldı, çünkü onlardan bir rezervuara veya depoya giden yol yok: {ids}",
+                    "english": "Left out of this run because no path leads from them to a reservoir or tank: {ids}"
+                },
+                "next_translated": {
+                    "key": "lpn_engine_fetching",
+                    "value": "EPANET çözücüsü alınıyor. Bir kez indirilir ve ardından bu cihazda tutulur, böylece daha sonra çevrimdışı çalışır.",
+                    "english": "Downloading the EPANET solver. It is downloaded once and then stored on this device, so it works offline afterward."
+                }
+            }
+        },
+        "lpn_engine_unavailable": {
+            "reason": "english_changed",
+            "current_value": "Basınç kırıcı ve genel amaçlı vanaları (PBV, GPV) çözmek için gerekli olan EPANET çözücüsü indirilemedi. İnternete bir kez bağlandıktan sonra çözücü bu cihazda saklanır.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_ready",
+                    "value": "EPANET çözücüsü artık bu cihazda ve çevrimdışı çalışıyor.",
+                    "english": "The EPANET solver is now stored on this device and works offline."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_unavailable_why",
+                    "value": "Basınç kırıcı ve genel amaçlı vanalar (PBV, GPV) EPANET çözücüsü olmadan çözülemez. {reason}",
+                    "english": "This network cannot be solved without the EPANET solver. {reason}"
+                }
+            }
+        },
+        "lpn_engine_unavailable_why": {
+            "reason": "english_changed",
+            "current_value": "Basınç kırıcı ve genel amaçlı vanalar (PBV, GPV) EPANET çözücüsü olmadan çözülemez. {reason}",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "Basınç kırıcı ve genel amaçlı vanaları (PBV, GPV) çözmek için gerekli olan EPANET çözücüsü indirilemedi. İnternete bir kez bağlandıktan sonra çözücü bu cihazda saklanır.",
+                    "english": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "Siz kurarken EPANET çözücüsü yükleniyor. Sonuçlar tamamen yüklendiğinde kullanılabilir olacak.",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                }
+            }
+        },
+        "lpn_field_text_all_zoom_tip": {
+            "reason": "english_changed",
+            "current_value": "Ne kadar uzaklaşırsanız uzaklaşın, bu metni çizimde tutar. İşareti kaldırırsanız, görünüm Harita ve sayfa altında ayarlanan etiketleme eşiğinden daha genişlediğinde metin, diğer etiketlerle birlikte gizlenir.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_all_zoom",
+                    "value": "Tüm yakınlaştırma düzeylerinde göster",
+                    "english": "Show at all zoom levels"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_labels",
+                    "value": "Etiketler",
+                    "english": "Labels"
+                }
+            },
+            "label": {
+                "key": "lpn_field_text_all_zoom",
+                "english": "Show at all zoom levels",
+                "value": "Tüm yakınlaştırma düzeylerinde göster"
+            }
+        },
+        "lpn_sm_help": {
+            "reason": "english_changed",
+            "current_value": "Senaryolar ve alternatifler nasıl çalışır:\\n\\nTemel modda alternatifler gizli ve otomatiktir ve tüm yeni senaryolar Temel senaryonun alt senaryosudur.\\n\\nTemel mod kapalıyken karmaşık bir devralma ağacı kullanılabilir ve alternatifler senaryolar arasında paylaşılabilir. Ancak yeni bir alternatif ilişkisi gerektiğinde (kullanıcı tarafından önceden yönetilmediğinde) düzenlemelerin varsayılan davranışı, geçerli senaryo gibi adlandırılmış bir alternatif oluşturmaktır; bu da her senaryoya kendine özgü bir alternatif kümesi verir.\\n\\nÖzellikler ve ayarlar, senaryolar ve alternatifler tablosunun sütunları olarak ve Senaryo yöneticisinde yönetim seçenekleri olarak görünen alternatif kategorilerine aittir.\\n\\nSenaryo değerleri senaryolarda oluşturulur, ancak gerçekte senaryoyla ilişkili alternatiflere aittir; yani bir senaryo, alternatiflerine açılan bir pencere gibidir. Alternatiflerin senaryolarla ilişkileri, Senaryo yöneticisinin sağ bölmesinde veya alt paneldeki Senaryolar tablosunda yönetilir. Yeni bir senaryo oluşturmak hiçbir alternatif oluşturmaz; yeni senaryo, yeni alternatifler gerektiren senaryo değerleri oluşturulana kadar üst senaryosunun alternatiflerini kullanır. Bir senaryoda senaryo değerleri oluşturulduğunda, senaryo için ilgili alternatiflerinde saklanırlar; senaryonun böyle bir alternatifi yoksa senaryonun adı kullanılarak yeni bir alternatif oluşturulur.\\n\\nÖrnek: \"Şekil: Düğüm ve hat ID'leri\" adlı bir senaryo oluşturur ve bir Metni \"Düğüm ve Hat ID'leri\" diyecek şekilde düzenlersiniz. Senaryoyu oluşturduğunuzda hiçbir alternatif oluşturulmaz. Ancak Metni kaydettiğiniz anda, Metin değeri senaryo değeriyle \"Şekil: Düğüm ve hat ID'leri\" adlı bir Metin alternatifi oluşturulur. Temel modda bunu yalnızca senaryonun kendisinde bir senaryo değeri olarak görürsünüz.\\n\\nÖzellikleri kopyala yalnızca senaryo değerlerini kopyalar. Temel dışındaki herhangi bir senaryoda, yalnızca varlığın o senaryoda sahip olduğu senaryo değerlerini kopyalar.\\n\\nSenaryolar nasıl yönetilir:\\n\\n- Ağacını göstermek için en üstteki listeden Senaryolar'ı veya bir alternatif kategorisini seçin.\\n\\n- Seçili öğenin bir alt öğesini Alt öğe ekle ile oluşturun. Temel ekle başka bir Temel ekler; bu, Temelin şimdiki halinin bir kopyası olarak başlar ve Temelde sonradan yapılan düzenlemeler onu değiştirmez. Yeni bir alt öğe üstünün adını alır; yeniden adlandırmak için bir ad yazın. Kopyala seçili alternatifi kopyalar. Yukarı birleştir, seçili alternatifin senaryo değerlerini adıyla seçilen üstündeki bir alternatife taşır ve seçili alternatif sonra bunları devralır; önce atladığı bir alternatifin de değiştirdiği, değişmeyecek bir değeri adlandırır. Bir senaryoyu kopyalamak için Temel modda Senaryolar menüsündeki Senaryoyu kopyala'yı kullanın; senaryonun senaryo değerlerini, onları tutan alternatiflerle birlikte kopyalar. Temel ekle ve Senaryoyu kopyala her biri alternatif oluşturur: Temel ekle, değer tutan her kategoride yeni Temel için bir Temel alternatif oluşturur ve Senaryoyu kopyala, senaryonun senaryo değerlerini tutan her alternatif için kopya gibi adlandırılmış yeni bir alternatif oluşturur.\\n\\n- Bir öğeyi başka birinin üzerine sürüklemek onu o öğenin alt öğesi yapar. Yeni bir üste taşınan senaryo, senaryo değeri yapmadığı her şeyi ondan devralır; senaryo değeri yaptıkları değişmez. İki öğe arasına sürüklemek onları yeniden sıralar.\\n\\n- Seçmek için bir öğeye tıklayın. Seçili öğeyi yeniden adlandırmak için F2'ye basın veya Yeniden adlandır'ı seçin. Bir senaryoyu yeniden adlandırmak, adını taşıyan alternatiflerin yeniden adlandırılıp adlandırılmayacağını sorar; Temel modda sormadan onunla birlikte yeniden adlandırılırlar. Bir senaryoyu geçerli yapmak için çift tıklayın veya Enter'a basın. Daraltmak veya genişletmek için öğenin yanındaki oka tıklayın veya Sol ya da Sağ'a basın. Düğmelerle aynı komutlar için bir öğeye sağ tıklayın.\\n\\n- Seçili öğeyi silmek için Delete'e basın veya eksi düğmesine tıklayın. Kullanımdaki bir öğe silinmez ve ileti onu neyin kullandığını adlandırır. Temel mod kapalıyken bir senaryoyu silmek kullandığı alternatifleri korur. Temel mod açıkken bir senaryoyu silmek, başka hiçbir senaryonun kullanmadığı alternatiflerini de siler.\\n\\n- Bir senaryoyu Temel dahil başka bir alternatifi kullandırmak için, onu Senaryo yöneticisinin sağ bölmesindeki veya Senaryolar tablosundaki senaryonun satırında seçin. Paylaşılan bir alternatifte yapılan senaryo değeri, onu kullanan her senaryoyu değiştirir.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ovl_same_tip",
+                    "value": "Devralınan değere eşit. Yine de bir senaryo değeridir ve sayılır.",
+                    "english": "Equal to the inherited value. It is still an override, and it is counted."
+                },
+                "next_translated": {
+                    "key": "lpn_sm_delete_alt_ask",
+                    "value": "{name} alternatifi silinsin mi?",
+                    "english": "Delete the alternative {name}?"
+                }
+            }
+        },
+        "lpn_settings_engine_native_tip": {
+            "reason": "english_changed",
+            "current_value": "Bunu etkinleştirirseniz yerleşik çözücü mümkün olduğunda kullanılır. Aksi halde ABD EPA'dan EPANET çözücüsü her zaman kullanılır. Yerleşik çözücü, uzun süreli benzetimler veya basınç kırıcı ve genel amaçlı vanalar (PBV, GPV) için kullanılmaz. EPANET çözücüsü ilk kez kullanıldığında yaklaşık 650 KB indirilir ve ardından bu cihazda tutulur. Bir boruda küçük (yerel) kayıp olduğunda, iki çözücü son basamaklarda farklılaşır: EPANET yer çekimi ivmesi için yuvarlatılmış bir değer kullandığından, onun küçük kayıpları tam ifadeye göre çok az daha düşük çıkar.",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_engine_native",
+                    "value": "Mümkün olduğunda yerleşik çözücüyü kullan",
+                    "english": "Use the built-in solver when possible"
+                },
+                "next_translated": {
+                    "key": "lpn_engine_loading",
+                    "value": "EPANET çözücüsü yükleniyor…",
+                    "english": "Loading the EPANET solver…"
+                }
+            },
+            "label": {
+                "key": "lpn_settings_engine_native",
+                "english": "Use the built-in solver when possible",
+                "value": "Mümkün olduğunda yerleşik çözücüyü kullan"
+            }
+        },
+        "lpn_settings_grp_size": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "Gri tonlamalı",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Etiket lejantı konumu",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_angle": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "Gri tonlamalı",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Etiket lejantı konumu",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_zoom": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "Gri tonlamalı",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Etiket lejantı konumu",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_positions": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "Gri tonlamalı",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Etiket lejantı konumu",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "Gri tonlamalı",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Etiket lejantı konumu",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_settings_grp_thematic": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_style_grayscale",
+                    "value": "Gri tonlamalı",
+                    "english": "Grayscale"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_legend_position",
+                    "value": "Etiket lejantı konumu",
+                    "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_scncmp_menu_tip": {
+            "reason": "english_changed",
+            "current_value": "Senaryo değeri sayısı, en düşük basınç ve en yüksek hız ile senaryoların tablosu",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_title",
+                    "value": "Senaryo karşılaştırması",
+                    "english": "Scenario comparison"
+                },
+                "next_translated": {
+                    "key": "lpn_scncmp_running",
+                    "value": "Her senaryo çözülüyor…",
+                    "english": "Solving every scenario…"
+                }
+            }
+        },
+        "lpn_scncmp_progress": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Her senaryo, çizimin bir kopyasından çözülür. Burada hiçbir şey projeyi değiştirmez ve üzerinde çalıştığınız senaryo olduğu gibi bırakılır.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "{time} süren zaman dilimi hesaplaması için",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scncmp_stopped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Her senaryo, çizimin bir kopyasından çözülür. Burada hiçbir şey projeyi değiştirmez ve üzerinde çalıştığınız senaryo olduğu gibi bırakılır.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "{time} süren zaman dilimi hesaplaması için",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Her senaryo, çizimin bir kopyasından çözülür. Burada hiçbir şey projeyi değiştirmez ve üzerinde çalıştığınız senaryo olduğu gibi bırakılır.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "{time} süren zaman dilimi hesaplaması için",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_col": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Her senaryo, çizimin bir kopyasından çözülür. Burada hiçbir şey projeyi değiştirmez ve üzerinde çalıştığınız senaryo olduğu gibi bırakılır.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "{time} süren zaman dilimi hesaplaması için",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Her senaryo, çizimin bir kopyasından çözülür. Burada hiçbir şey projeyi değiştirmez ve üzerinde çalıştığınız senaryo olduğu gibi bırakılır.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "{time} süren zaman dilimi hesaplaması için",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_empty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Her senaryo, çizimin bir kopyasından çözülür. Burada hiçbir şey projeyi değiştirmez ve üzerinde çalıştığınız senaryo olduğu gibi bırakılır.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "{time} süren zaman dilimi hesaplaması için",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_copy_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Her senaryo, çizimin bir kopyasından çözülür. Burada hiçbir şey projeyi değiştirmez ve üzerinde çalıştığınız senaryo olduğu gibi bırakılır.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "{time} süren zaman dilimi hesaplaması için",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_time_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Her senaryo, çizimin bir kopyasından çözülür. Burada hiçbir şey projeyi değiştirmez ve üzerinde çalıştığınız senaryo olduğu gibi bırakılır.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "{time} süren zaman dilimi hesaplaması için",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_at_time": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Her senaryo, çizimin bir kopyasından çözülür. Burada hiçbir şey projeyi değiştirmez ve üzerinde çalıştığınız senaryo olduğu gibi bırakılır.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "{time} süren zaman dilimi hesaplaması için",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_steady": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Her senaryo, çizimin bir kopyasından çözülür. Burada hiçbir şey projeyi değiştirmez ve üzerinde çalıştığınız senaryo olduğu gibi bırakılır.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "{time} süren zaman dilimi hesaplaması için",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_not_converged": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Her senaryo, çizimin bir kopyasından çözülür. Burada hiçbir şey projeyi değiştirmez ve üzerinde çalıştığınız senaryo olduğu gibi bırakılır.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "{time} süren zaman dilimi hesaplaması için",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_not_converged_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Her senaryo, çizimin bir kopyasından çözülür. Burada hiçbir şey projeyi değiştirmez ve üzerinde çalıştığınız senaryo olduğu gibi bırakılır.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "{time} süren zaman dilimi hesaplaması için",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Her senaryo, çizimin bir kopyasından çözülür. Burada hiçbir şey projeyi değiştirmez ve üzerinde çalıştığınız senaryo olduğu gibi bırakılır.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "{time} süren zaman dilimi hesaplaması için",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_flow_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Her senaryo, çizimin bir kopyasından çözülür. Burada hiçbir şey projeyi değiştirmez ve üzerinde çalıştığınız senaryo olduğu gibi bırakılır.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "{time} süren zaman dilimi hesaplaması için",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
+        "lpn_scnres_stale": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_note",
+                    "value": "Her senaryo, çizimin bir kopyasından çözülür. Burada hiçbir şey projeyi değiştirmez ve üzerinde çalıştığınız senaryo olduğu gibi bırakılır.",
+                    "english": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_over",
+                    "value": "{time} süren zaman dilimi hesaplaması için",
+                    "english": "For extended period simulation of {time}"
+                }
+            }
+        },
         "lpn_full_needs_run": {
             "reason": "english_changed",
             "current_value": "Tam rapor, her raporlama zaman adımındaki her düğümü ve her hattı listeler. Hesapla'ya basın, sonra Su, Raporlar, Tam rapor'u açın.",
@@ -211,6 +2301,27 @@
                 "key": "lpn_library_import_tip",
                 "english": "Choose another project file and copy whole libraries from it into this project. Anything whose name is already taken here is skipped and listed, so nothing you already have is changed.",
                 "value": "Başka bir proje dosyası seçin ve ondan bütün kitaplıkları bu projeye kopyalayın. Burada adı zaten kullanılan her şey atlanır ve listelenir, böylece sahip olduğunuz hiçbir şey değişmez."
+            }
+        },
+        "lpn_ff_minpressure": {
+            "reason": "english_changed",
+            "current_value": "Başka yerde izin verilen en düşük basınç",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_design_no_selection",
+                    "value": "Tasarım kontrolü Seçili olarak ayarlı, ama hiçbir öğe seçili değil. Öğeleri seçin veya Tümü seçeneğini seçin.",
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_minpressure_tip",
+                    "value": "Başka bir düğüm yangın debisini çekerken bunun altına düşen bir düğüm, tasarım sorunu olarak bildirilir.",
+                    "english": "A junction that falls below this while another one is drawing its fire flow is reported as a design issue."
+                }
+            },
+            "tip": {
+                "key": "lpn_ff_minpressure_tip",
+                "english": "A junction that falls below this while another one is drawing its fire flow is reported as a design issue.",
+                "value": "Başka bir düğüm yangın debisini çekerken bunun altına düşen bir düğüm, tasarım sorunu olarak bildirilir."
             }
         },
         "lpn_crit_minpressure_tip": {
@@ -396,12 +2507,190 @@
                 "english": "Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this.",
                 "value": "Bir ESRI shapefile dosyasındaki noktaları, çizgileri ve çokgenleri bu projeye Figür olarak okur; öznitelik sütunları özellik olarak korunur. .zip dosyasını ya da .shp dosyasını .shx, .dbf ve .prj dosyalarıyla birlikte seçin (birden çok dosya seçmek için Ctrl veya Shift tuşunu basılı tutun). Projeden farklı bir koordinat sistemindeki koordinatlar dönüştürülür ve bildirimde bu belirtilir."
             }
+        },
+        "lpn_diag_valve_conflict": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_pda_route",
+                    "value": "Talep modeli basınca dayalı olduğu için EPANET çözücüsüyle çözüldü.",
+                    "english": "Solved with the EPANET solver, because the demand model is pressure driven."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_needs_epanet",
+                    "value": "Talep modeli basınca dayalıdır ve onu yalnızca EPANET çözücüsü hesaplayabilir. EPANET çözücüsü yüklenemedi, bu yüzden bu sonuçlar eksik.",
+                    "english": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing."
+                }
+            }
+        },
+        "lpn_diag_gpv_curve_order": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_pda_route",
+                    "value": "Talep modeli basınca dayalı olduğu için EPANET çözücüsüyle çözüldü.",
+                    "english": "Solved with the EPANET solver, because the demand model is pressure driven."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_needs_epanet",
+                    "value": "Talep modeli basınca dayalıdır ve onu yalnızca EPANET çözücüsü hesaplayabilir. EPANET çözücüsü yüklenemedi, bu yüzden bu sonuçlar eksik.",
+                    "english": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing."
+                }
+            }
+        },
+        "lpn_gpv_one_point_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_pda_route",
+                    "value": "Talep modeli basınca dayalı olduğu için EPANET çözücüsüyle çözüldü.",
+                    "english": "Solved with the EPANET solver, because the demand model is pressure driven."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_pda_needs_epanet",
+                    "value": "Talep modeli basınca dayalıdır ve onu yalnızca EPANET çözücüsü hesaplayabilir. EPANET çözücüsü yüklenemedi, bu yüzden bu sonuçlar eksik.",
+                    "english": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing."
+                }
+            }
+        },
+        "lpn_export_holds_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "Görüntünün boyutu, ekrandaki alanın katı olarak. Daha büyük olanı daha keskindir ve daha büyük bir dosya oluşturur.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_export_holds_base": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "Görüntünün boyutu, ekrandaki alanın katı olarak. Daha büyük olanı daha keskindir ve daha büyük bir dosya oluşturur.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_geojson_results_other": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "Görüntünün boyutu, ekrandaki alanın katı olarak. Daha büyük olanı daha keskindir ve daha büyük bir dosya oluşturur.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_survey_added_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "Görüntünün boyutu, ekrandaki alanın katı olarak. Daha büyük olanı daha keskindir ve daha büyük bir dosya oluşturur.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_pane_pasted_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "Görüntünün boyutu, ekrandaki alanın katı olarak. Daha büyük olanı daha keskindir ve daha büyük bir dosya oluşturur.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_export_leaves_alternatives": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "Görüntünün boyutu, ekrandaki alanın katı olarak. Daha büyük olanı daha keskindir ve daha büyük bir dosya oluşturur.",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
         }
     },
-    "key_plain": [],
+    "key_plain": {
+        "consent_body": "May we save, store, or keep a random code, a string of letters and digits chosen by chance, in this browser, so that we do not count you, or this browser, a second time? The code is made up on the spot, created at that moment, says nothing about you or your device, and records nothing you enter."
+    },
     "key_notes": [],
-    "key_concepts": [],
+    "key_concepts": {
+        "lpn_guide_scn_marks_def": [
+            {
+                "concept": "family-tree-parent",
+                "plain_name": "A family tree parent",
+                "english_rendering": "parent",
+                "preferred_translation": ""
+            },
+            {
+                "concept": "family-tree-inherit",
+                "plain_name": "A family tree inherit-",
+                "english_rendering": "inherit",
+                "preferred_translation": ""
+            }
+        ],
+        "lpn_sm_help": [
+            {
+                "concept": "family-tree",
+                "plain_name": "A family tree",
+                "english_rendering": "tree",
+                "preferred_translation": ""
+            },
+            {
+                "concept": "family-tree-parent",
+                "plain_name": "A family tree parent",
+                "english_rendering": "parent",
+                "preferred_translation": ""
+            },
+            {
+                "concept": "family-tree-child",
+                "plain_name": "A family tree child",
+                "english_rendering": "child",
+                "preferred_translation": ""
+            },
+            {
+                "concept": "family-tree-inherit",
+                "plain_name": "A family tree inherit-",
+                "english_rendering": "inherit",
+                "preferred_translation": ""
+            }
+        ]
+    },
     "uniqueness_attention": [
+        {
+            "instruction": "Find unique names for each.",
+            "members": [
+                {
+                    "plain_name": "what-if version, case, scenario, or arrangement of circumstances",
+                    "english_rendering": "scenario",
+                    "preferred_translation": "senaryo"
+                },
+                {
+                    "plain_name": "state of a link at a moment, open, closed, or active",
+                    "english_rendering": "status",
+                    "preferred_translation": ""
+                }
+            ]
+        },
         {
             "instruction": "Find unique names for each.",
             "members": [
