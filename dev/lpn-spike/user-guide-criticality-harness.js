@@ -46,6 +46,7 @@ async function main() {
 		console.log('\n2. The entry');
 		const en = await entry(P, 'lpn_crit_box');
 		ok('the entry holds the chapter\'s three terms after the box\'s paragraphs', !!en && TERMS.every((k, i) => en.dts[i] === enString(k)) && en.paras >= 1, en && JSON.stringify(en.dts));
+		ok('the entry\'s help text describes the reporting step choices (its own paragraph, whole)', await P.evaluate((t) => document.body.innerText.replace(/\s+/g, ' ').indexOf(t.replace(/\s+/g, ' ')) >= 0, enString('lpn_crit_intro').split(/\\n\\n|\n\n/)[1]));
 		await P.evaluate(() => document.getElementById('lpn_hotkeys_close').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
 		await settle(400);
 

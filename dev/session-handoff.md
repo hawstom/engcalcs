@@ -95,58 +95,60 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-19 evening (twenty-eighth session, Arizona time)
+## STATE — 2026-10-20 early (twenty-ninth session, Arizona time)
 
-### Master: the merge of chore/batch-1019c and this handoff. Production: what he last pulled
+### Master: bcb00ba36 (label forms, EPS analyses, guide pages) plus this handoff. Production: what he last pulled
 
-- Merged 10-19 evening: `feat/network-update` (Task 814 call 2; his word "I tried all, and all works
-  great. Wording is all great.") and `fix/scenario-flow-sign` (Results by asset keeps the solver's +/-
-  sign on flows; his wording for the tip and Guide). Port 8112 freed.
-- Landing pages: librewaternet.org and epanet-plus-plus.org features lists name "multi-species water
-  quality (EPANET-MSX)" (his "Yes. Do it."), pushed. A features line for the network update was drafted
-  ("Update the open project from an EPANET .inp: elements with matching IDs take the file's values, new
-  ones are added, nothing is deleted, and one undo reverses it.") and goes up once master is pushed.
-- Done and off the list: the error-220 note to Luke Butler (he sent it).
-- Still owed: consent_body's 26 translations (EC_CONSENT_VERSION stays 2); the MSX keys' translations.
-  Budget is tight: Sonnet agents, few at a time.
+- Merged on his word 10-19 night: `feat/label-form` (with `feat/label-beside`), `feat/eps-analysis`,
+  `feat/guide-page`. Task 816 closed. Suite 42 min on the merge. Their ports (8101, 8102, 8110, 8114)
+  were freed and reused.
+- epanet-plus-plus.org `sitemap-app.xml` regenerated (567 URLs: 27 app + 540 Guide pages), pushed
+  3f4484c; live after his pull of both repos. The Guide pages' three new keys show English in 26
+  languages until a sprint.
+- Both landing pages already carry the network-update features line (librewaternet a5baba9,
+  epanet-plus-plus fa1b74f).
+- Still owed: consent_body's 26 translations (EC_CONSENT_VERSION stays 2); MSX and EPS-analysis keys'
+  translations. Sprint only on his word, about weekly.
 - Key hygiene: 0 keys rendered by nothing; none deleted.
 
-### Branches waiting on him
+### Branches waiting on him (all pre-reviewed by Perry where a feature; reviews in that session's scratchpad, summarized here)
 
-- `feat/eps-analysis` (8102): Task 578 and his question "why our fire flow analysis can't do an entire
-  EPS". A "reporting step tested" row in fire flow (on screen / chosen step / step of lowest pressure /
-  every step, worst case), criticality (whole run: lowest pressure, hours below minimum, tank empties)
-  and demand scaling (whole run). Sue's research in her journal (Bentley's EPS Fire Flow = hour of
-  minimum pressure; duration fires are a separate, named-fire tool, not built). Perry confirmed the
-  numbers independently; his five findings (tank-empty steps, mixed instants, a contradiction note,
-  hours over-count by one step, one term) were being fixed at handoff. Check `git log` on the branch
-  and its check_all.log before telling him it is ready.
-- `feat/guide-page` (8101): Task 816, User-Manual.php?lang=xx&chapter=slug, 19 chapters x 27 languages
-  (513 URLs), canonical on epanet-plus-plus.org. Perry's findings fixed (product sentence, whole-sentence
-  descriptions, weak chapters dropped, 404 line). Three new keys untranslated: the other 26 languages
-  show English until a sprint. Needs a full check_all with master merged, his browser pass and merge
-  word; then the epanet-plus-plus.org sitemap.xml regenerate, commit, push, his pull.
-- `feat/label-leader` (8103), built on `feat/label-form` (8114) + `feat/label-beside` (8110): pipes may
-  run through one-line node labels; leader threshold one text height. Green. His call: resting labels
-  already sit 15-25 px out (more than a text height), so his literal leader rule would put a leader on
-  every label; shrink the resting offset, or leaders on resting labels? Answer to his 10-18 question:
-  off-screen parts are NOT ignored (every pass places the whole network), and nothing is saved across
-  sessions (only an in-memory bank per zoom notch). Culling to the view is the obvious next economy
-  (Task 681).
-- `feat/label-form` (8114) + `feat/label-beside` (8110): he likes label-form; no merge word yet.
-- `feat/theme` (8111): 13 themes. His calls: Dark map "Good"; brief Ida on a Designer theme when budget allows.
-- `feat/sqlite-reader` (75ed1031f): Task 749, never merges until done (his word). His two real WaterCAD
-  models (`~/tom-files/2026-10-18/Bentley-EPS-Group/`, CLIENT FILES: never into the repo) now import
-  with unit demand loads, per-scenario demand multipliers (1.0/1.8/3.0) and junction fire flow, and
-  EPANET matches WaterCAD's xlsx results to their rounding. `EC_WTG_PRIVATE_DIR` runs the private
-  harness. Left: per-junction fire-flow caps and system fire-flow settings (nowhere to store), loading
-  units, write-back, a physically overriding scenario (still unseen). The xlsx holds only results.
+- `feat/label-leader` (8103), round 5, 7c41f6b3e: his rule "a label not at home gets a leader";
+  home = resting distance in any direction (nodes), touching its pipe (level pipe labels); left-hung
+  labels right-justified; Net1 wheel-out overlaps resolved (a dragged label that would cover goes out
+  on a long leader for that zoom; a Text hides only when its ink overprints another Text). His calls:
+  the rule costs Net3 ~7 of 145 labels at 9 in vs master; hiding his "Pump" Text at 14 out (it truly
+  overprints "Source"); pipe labels on leaders cost 27-40% of the pass, kept.
+- `feat/duration-fire` (8101), c221d72bf: "A fire for a stated duration" in Fire flow's Reporting step
+  tested; Perry confirmed the numbers by an independent .inp run; his six findings fixed (Fire junction
+  row, tank margin columns, tolerance stated, only valid start times, PDA shortfall verdict, select
+  width). His calls: 0.1 m recovery tolerance; column wording "Lowest water depth" (reused key) and
+  "Above lowest water depth".
+- `fix/examples-guide` (8102), 5de0786d7: Net1 SI, US, then Scenarios; US Net1 title/description
+  brought up to SI's; Scenario manager chapter: his two sections render as headings, the steps as a
+  list, his first section reordered (sentences verbatim). His call: the reorder of his own text.
+- `feat/theme` (8111), 6221a4cae: time-series bubble margins in all 13 themes (last time label whole,
+  clear of the grip; y-title gap tightened). Plus earlier rounds awaiting his word.
+- `feat/theme-tank` (8114), 0055f8ed3: Prairie menus as galvanized tanks (square edges, cylinder
+  shading, corrugation, flat lid) to compare with feat/theme's clouds. His call: tanks, clouds, or both.
+- `feat/sqlite-reader` (75ed1031f): Task 749, never merges until done (his word). Unchanged.
+- `feat/desktop`: untouched this session.
 
 ### Next job
 
-Merge on his word; the network-update features line on both sites after master is pushed; label
-culling to the view (Task 681) if he wants it; a named duration fire inside an EPS (Sue's stage 2);
-criticality by valve segment; Task 814's GeoJSON route; Task 749 write-back; Task 733 phase 3 slow.
+Merge on his word (the theme pair are siblings: merge only one Prairie). Task 681 (cull the label
+pass to the view) after label-leader settles: same code. Task 733 next phase (native EPS). Task 814's
+GeoJSON route. Criticality by valve segment. His mission questions of 10-19 (AI agents, MCP; social
+framing; Bentley install) were answered in the session report; if he says yes to an MCP task, add it.
+
+### Traps met 2026-10-20 (twenty-ninth session)
+
+- **Editing the main checkout while its suite runs** dirties the tree and the run cannot stamp. Make
+  even one-line roadmap edits in a chore worktree.
+- **A subagent's harness compared the branch with its own layout, not master**, so it passed while
+  Net3 labels lost fields. Perry caught it in Chromium; label harnesses now compare with master.
+- **Deleting a roadmap block by line count removed a neighbour heading** (roadmap 146.09). Delete a
+  block by its ID, never by line numbers read before an earlier edit.
 
 ### Traps met 2026-10-19 evening (twenty-eighth session)
 

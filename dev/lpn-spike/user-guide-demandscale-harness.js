@@ -45,6 +45,7 @@ async function main() {
 		console.log('\n2. The entry');
 		const en = await entry(P, 'lpn_ds_box');
 		ok('the entry holds the chapter\'s four terms after the box\'s paragraphs', !!en && TERMS.every((k, i) => en.dts[i] === enString(k)) && en.paras >= 3, en && JSON.stringify(en.dts));
+		ok('the entry\'s help text describes the reporting step choices (its own paragraph, whole)', await P.evaluate((t) => document.body.innerText.replace(/\s+/g, ' ').indexOf(t.replace(/\s+/g, ' ')) >= 0, enString('lpn_ds_intro').split(/\\n\\n|\n\n/)[2]));
 		await P.evaluate(() => document.getElementById('lpn_hotkeys_close').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
 		await settle(400);
 
@@ -53,7 +54,7 @@ async function main() {
 		await settle(1000);
 		const ins = () => P.evaluate(() => Array.from(document.querySelectorAll('#lpn_ds_controls input, #lpn_ds_controls select')).map((e) => e.value));
 		const def = await ins();
-		ok('the box opens with all junctions, 20 psi, and a demand scale of 2', JSON.stringify(def) === JSON.stringify(['all', '20', '2']), JSON.stringify(def));
+		ok('the box opens with all junctions, the time step on screen, 20 psi, and a demand scale of 2', JSON.stringify(def) === JSON.stringify(['all', 'now', '20', '2']), JSON.stringify(def));
 		const press = async (label, until) => {
 			await P.evaluate((t) => { Array.from(document.querySelectorAll('#lpn_ds_box button')).filter((x) => x.textContent.trim() === t)[0].click(); }, label);
 			await a.waitFor(() => P.evaluate((u) => document.getElementById('lpn_ds_box').innerText.indexOf(u) >= 0, until), 'result ' + until, 90000);

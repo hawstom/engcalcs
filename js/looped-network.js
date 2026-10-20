@@ -341,7 +341,7 @@ var EngCalcs = EngCalcs || {};
 		if (!holder.leader) { return; }
 		if (holder.empty) { holder.leader.style.display = 'none'; return; }
 		var d = Math.hypot(end.x - anchor.x, end.y - anchor.y);
-		if (d <= leaderThreshold()) { holder.leader.style.display = 'none'; return; }
+		if (holder.levelBeside ? (holder.levelQuiet || d <= levelLeaderMin()) : d <= leaderThreshold()) { holder.leader.style.display = 'none'; return; }
 		// A -> B, both world points, nothing derived: an endpoint computed from the label box would
 		// move when the box's pixel width did, and the angle with it (Task 328).
 		holder.leader.style.display = '';
@@ -419,7 +419,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	// `owner` is the node or pipe of a MOVED label (or `true`), else falsy for an automatic one.
 	function dataLabelOrigin(holder, anchor, end, owner, inHand) {
-		var w = labelBoxWidth(holder);
+		// `drawW`: a level pipe label drawn in another form than its banked one (syncLevelGlyphs()).
+		var w = holder.drawW !== undefined ? holder.drawW : labelBoxWidth(holder);
 		holder.side = owner ? movedLabelSide(holder, owner, anchor, end, inHand)
 			: (end.x >= anchor.x ? 'right' : 'left');
 		if (owner && owner !== true && owner.lside !== holder.side) { owner.lside = holder.side; }
@@ -457,8 +458,8 @@ var EngCalcs = EngCalcs || {};
 	// Local direction of the pipe AT the label's own point, not end-to-end: on a bent pipe the
 	// straight line between endpoints can lie at a completely different angle from the piece of pipe
 	// the label sits on. Falls back to the endpoints for an all-coincident link.
-	function linkDirectionAt(l, at) {
-		var pts = linkPointList(l), best = null, bestD = Infinity, i, ax, ay, bx, by, t, px, py, d;
+	function linkDirectionAt(l, at, pointList) {
+		var pts = pointList || linkPointList(l), best = null, bestD = Infinity, i, ax, ay, bx, by, t, px, py, d;
 		for (i = 0; i + 1 < pts.length; i++) {
 			ax = pts[i].x; ay = pts[i].y; bx = pts[i + 1].x; by = pts[i + 1].y;
 			var vx = bx - ax, vy = by - ay, len2 = vx * vx + vy * vy;
@@ -512,6 +513,12 @@ var EngCalcs = EngCalcs || {};
 	}
 	function linkLabelAligned(l) {
 		return !!scnSetting('alignPipeLabels') && l.lx === undefined && l.ly === undefined;
+	}
+	// Whether the label is DRAWN along its pipe this pass: the setting asks for it, and the pass did
+	// not have to set it level beside the pipe instead (placeLevelPipeLabels()).
+	function linkLabelDrawnAligned(l) {
+		var le = linkEls[l.id];
+		return linkLabelAligned(l) && !(le && le.levelBeside);
 	}
 	// ---- THE NEAREST OTHER PIPE IS ASKED FOR ONCE PER PASS, NOT ONCE PER LABEL -------------------
 	//
@@ -653,6 +660,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		le.segRow = segRow;
 		setMultilineText(le.text, linkLabelBase(l).x, rows);
+		le.levelGlyphs = null;
 		le.text.style.fontSize = fsNow;
 		(le.repeats || []).forEach(function (r) { r.text.style.fontSize = fsNow; });
 		le.rows = rows;
@@ -897,14 +905,51 @@ var EngCalcs = EngCalcs || {};
 	// where node-shed-harness.js requires 30. Placing labels further from their nodes rather than
 	// shedding a value is a design change nobody asked for.
 	function nodeFirstFitSpec(n, ne, fs) {
-		var d = defaultLabelOffset(), ctx = nodeContextFor(n.id),
+		var d = defaultLabelOffset(), ctx = nodeContextFor(n.id), s0 = state.s || 1, f = ne.inlineFrom,
 			reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS),
 			sides = Collide.cardinalSides(nodeAt(n), d,
 				(ctx && ctx.arcs) || Collide.openArcs([]), { raster: true, outer: reach });
+		// **A ONE-LINE LABEL IS PLACED AS THE STACK IT WAS FIRST, AND THEN SET IN ITS LINE** (Task 734,
+		// tryInlineNodeLabels()): the first-fit sees the stack the shed left (`inlineFrom`, its
+		// measures banked when the line was chosen), so every pass places the drawing's stacks
+		// exactly as the content pass did, and insertInlineNodeLabels() sets the line afterwards.
+		if (f) {
+			return { id: nodeLabelKey(n.id), anchor: nodeAt(n), home: nodeLabelBase(n),
+				dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
+				w: f.wPx / s0, h: dataLabelBoxHeight(f.lineCount), yOff: -fs * 0.85,
+				lines: f.rowWPx ? f.rowWPx.map(function (v) { return v / s0; }) : null };
+		}
 		return { id: nodeLabelKey(n.id), anchor: nodeAt(n), home: nodeLabelBase(n),
 			dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
 			w: labelBoxWidth(ne), h: dataLabelBoxHeight(ne.lineCount), yOff: -fs * 0.85,
 			lines: labelRowWidths(ne) };
+	}
+	// The same label's one-line form, as insertInlineNodeLabels() places it: `w` its one-line width.
+	function inlineNodeSpec(n, fs, w) {
+		var d = defaultLabelOffset();
+		return { w: w, h: dataLabelBoxHeight(1), lines: null, leaderClean: true, offLinks: true,
+			sides: inlineNodeSides(nodeAt(n), d, fs, Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS)) };
+	}
+	// **WHERE A ONE-LINE NODE LABEL MAY GO: EAST OR WEST OF ITS NODE** (Task 734, Tom 2026-09-26:
+	// *"where there is infinite space east or west, we might want to recognize that infinity and
+	// leverage it by using single-line concatenation of properties"*; 2026-10-18: *"Node labels that
+	// go inline instead of stacked"*). Level with the node first, east then west; then the four
+	// corners a stack would use; then rings out to `reach` within 35 degrees of level, nearest first.
+	// Nothing here is a fact about the zoom except through the symbol and text sizes, as for a stack.
+	var LPN_INLINE_NODE_ARC = 35;
+	function inlineNodeSides(a, d, fs, reach) {
+		var dx = Math.abs(d.x), dy = Math.abs(d.y), h1 = dataLabelBoxHeight(1),
+			cy = a.y + fs * 0.85 - h1 / 2, home = Math.hypot(dx, dy), out = [], ring;
+		out.push({ x: a.x + dx, y: cy, corner: -1, deg: 0 }, { x: a.x - dx, y: cy, corner: -1, deg: 180 });
+		[[1, -1], [-1, -1], [1, 1], [-1, 1]].forEach(function (c) {
+			out.push({ x: a.x + c[0] * dx, y: a.y + c[1] * dy, corner: -1, deg: null });
+		});
+		ring = Collide.polarCandidates(a, { start: -LPN_INLINE_NODE_ARC, end: LPN_INLINE_NODE_ARC }, home, reach, { rings: 3, tol: 0 }).concat(
+			Collide.polarCandidates(a, { start: 180 - LPN_INLINE_NODE_ARC, end: 180 + LPN_INLINE_NODE_ARC }, home, reach, { rings: 3, tol: 0 }));
+		ring.forEach(function (q, i) { q._r = Math.hypot(q.x - a.x, q.y - a.y); q._i = i; });
+		ring.sort(function (p, q) { return (p._r - q._r) || (p._i - q._i); });
+		ring.forEach(function (q) { delete q._r; delete q._i; out.push(q); });
+		return out;
 	}
 	// The drop order, as ONE rule both the prediction and the real pass read. The lexicographic drop
 	// key becomes an ORDINAL here, so js/lpn-collide.js sees one number and never has to know what a
@@ -1287,9 +1332,15 @@ var EngCalcs = EngCalcs || {};
 	// drawn at the OLD scale and multiplies by the NEW one -- the banked pixel width is then wrong by
 	// exactly the zoom ratio, making obstacle boxes enormous when you zoom out.
 	// It is a WRITE, which is why it belongs in the write half and not beside the measurement.
-	function writeNodeLabelGlyphs(ne, n, lines, fsNow) {
+	function writeNodeLabelGlyphs(ne, n, lines, fsNow, inline) {
 		labelCacheTaint();
-		var rows = composeRows(lines, true);   // a node label always stacks -- see composeRows()
+		// A node label stacks (composeRows()) unless the pass chose its ONE-LINE form (Task 734,
+		// tryInlineNodeLabels()): the same fields, in the same order, with the page's separator.
+		// The flag is the label's FORM, kept even when a shed leaves it one line, so the sides it is
+		// placed on (nodeFirstFitSpec()) stay those of the form it was tried in.
+		ne.inline = !!inline;
+		if (!ne.inline) { ne.inlineFrom = null; }
+		var rows = composeRows(lines, !ne.inline);
 		setMultilineText(ne.text, nodeLabelBase(n).x, rows);
 		ne.lineCount = rows.length;
 		ne.lines = lines;   // the FIELD lines, one per value, whatever shape they were drawn in
@@ -1479,7 +1530,7 @@ var EngCalcs = EngCalcs || {};
 	// would read as a different label rather than the same one said again.
 	function layoutLinkLabelAt(l, le, part, along, isPrimary, single) {
 		if (!isPrimary) { syncRepeatText(le, part); part.along = along; }
-		if (linkLabelAligned(l)) {
+		if (linkLabelDrawnAligned(l)) {
 			// le.alignedAlong is the station placeAlignedLabels() settled on during the collision
 			// pass. Undefined until that has run once (and for an empty label), in which case
 			// alignedLabelPlacement() falls back to the half-way default -- the same value the
@@ -1504,8 +1555,19 @@ var EngCalcs = EngCalcs || {};
 			lone = isPrimary && single,
 			mid = lone ? linkLabelMid(l) : linkLabelMid(l, along),
 			anchor = { x: mid.x, y: mid.y },
-			end = lone ? linkLabelPos(l) : { x: mid.x + d.x, y: mid.y + d.y },
-			org = dataLabelOrigin(isPrimary ? le : part, anchor, end, (lone && l.lx !== undefined) ? l : null, isPrimary && labelInHand(le));
+			end = lone ? linkLabelPos(l) : { x: mid.x + d.x, y: mid.y + d.y };
+		// A level label hangs off the station placeLevelPipeLabels() placed it from.
+		if (lone && le.levelBeside && le.levelAt) {
+			anchor = le.levelAt.along === null ? mid : Geom.pointAlongPolyline(linkPointList(l), le.levelAt.along);
+			end = { x: anchor.x + le.levelAt.ex, y: anchor.y + le.levelAt.ey };
+		}
+		var org = dataLabelOrigin(isPrimary ? le : part, anchor, end, (lone && l.lx !== undefined) ? l : null, isPrimary && labelInHand(le));
+		// **A LEVEL STACK HUNG LEFT IS FLUSH AGAINST ITS LEADER** (Task 812): its rows end at the
+		// leader's end, as the placement modelled them, rather than starting at the box's left edge.
+		if (lone && le.levelBeside && le.levelForm && le.levelForm.stacked && le.side === 'left') {
+			part.text.setAttribute('text-anchor', 'end');
+			org = { x: end.x, y: org.y };
+		}
 		repositionMultilineText(part.text, org.x, org.y);
 		if (isPrimary) { updateDataLeader(le, anchor, end); }
 	}
@@ -1524,9 +1586,13 @@ var EngCalcs = EngCalcs || {};
 		// still in conflict, no clear station on its pipe (placeStationedLabels()), standing on
 		// ground a node label has just taken (yieldStationedLabels()),
 		// or the losing half of a crossing nothing could repair (shedCrossingLabels(), Task 539).
-		var hideAll = le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenBlocked || !!le.hiddenYielded ||
-			!!le.hiddenCrossed;
+		// A label the pass set LEVEL BESIDE its pipe (placeLevelPipeLabels()) is drawn whatever hid it
+		// along the pipe, a crossing lost there included: level, it was placed clear of every leader.
+		var hideAll = le.levelBeside ? false
+			: (le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenBlocked || !!le.hiddenYielded || !!le.hiddenCrossed);
 		setLabelAssemblyHidden(le, hideAll);
+		syncLevelGlyphs(l, le);
+		if (le.levelBeside && le.levelForm) { le.drawW = le.levelForm.wPx / (state.s || 1); } else { delete le.drawW; }
 		var single = linkLabelStations(l).length === 1,
 			stations = perfDebugAccum('  lkL:stations', function () {
 				return single ? [le.alignedAlong] : drawnLinkLabelStations(l);
@@ -2577,7 +2643,7 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id];
 			if (!ne || ne.empty || !ne.allLines || !ne.lines) { return; }
-			if (ne.lines.length >= ne.allLines.length) { return; }
+			if (ne.lines.length >= ne.allLines.length && !ne.inline) { return; }
 			work.push({ n: n, ne: ne });
 		});
 		if (!work.length) { return; }
@@ -2633,6 +2699,140 @@ var EngCalcs = EngCalcs || {};
 		if (gone >= order.length - 1) { return null; }
 		return { lbl: lbl, n: n, ne: ne, all: all, order: order, gone: gone };
 	}
+	// **AFTER THE SHED, A NODE LABEL THAT LOST SOMETHING TRIES ONE LINE** (Tasks 734 and 812; Tom,
+	// 2026-10-18, on which form a node label takes when both fit: *"Whichever shows more"*).
+	//
+	// A node label has two forms, the stack and one line east or west of its node (inlineNodeSides()),
+	// its fields in the same order with the page's separator. Where nothing is lost the stack stays:
+	// a picture that changes for nothing is a cost (R11). So the one line is tried only where the
+	// stacked layout, shed and all, lost something: a node label it dropped, and one it shed values
+	// from. Each tries its FULL content on one line, ID included.
+	//
+	// **NO OTHER LABEL MOVES, SO NO LABEL PAYS FOR IT** (pre-review, 2026-10-18: a trial that re-ran
+	// the whole node placement and was judged on the drawing's total hid 9 of Net3's node labels and
+	// took the ID off 12, to show more pipe values). The stacked layout stands as it is, and the
+	// labels tried are set into the ground it leaves, in drop order, only where a line is clear of
+	// every label, symbol, Text and pipe, a pipe label included (it does not make one yield), with
+	// its leader through no node's symbol and across no leader (insertInlineNodeLabels()). A label
+	// that finds no such place keeps what the stacked layout gave it.
+	// **AND NO WIDER THAN A QUARTER OF THE MAP** (pre-review, 2026-10-18: on a 390 px phone a 150 px
+	// line ran off the map's edge and under its legend).
+	//
+	// Pure, like the rest of the pass: a label that took its line keeps the stack's measures
+	// (`inlineFrom`), so a drag frame lays out the same stacks and sets the same lines.
+	// COST: one strict first-fit over the labels tried, against the drawing; no node re-fit.
+	var LPN_INLINE_MAX_VIEW_FRAC = 0.25;
+	function insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list, ring) {
+		var ground = { boxes: obs.boxes.slice().concat(viewFrameBoxes()), segments: obs.segments.slice() }, byId = {}, min = leaderThreshold(), specs = [], out;
+		nodeLabels.forEach(function (sp) { byId[sp.id] = sp; });
+		// The ring pass's labels (free pipe labels, dragged ones) with the leaders the renderer draws.
+		ringForeigners(ring || []).forEach(function (f) {
+			f.boxes.forEach(function (b) { ground.boxes.push(b); });
+			if (f.leader) { ground.segments.push(f.leader); }
+		});
+		placed.forEach(function (r) {
+			var sp = byId[r.id];
+			if (r.dropped || !sp) { return; }
+			(r.boxes || (r.box ? [r.box] : [])).forEach(function (b) { ground.boxes.push(b); });
+			if (Math.hypot(r.x - sp.anchor.x, r.y - sp.anchor.y) > min) {
+				ground.segments.push(Collide.segment(sp.anchor.x, sp.anchor.y, r.x, r.y, 'leader', r.id));
+			}
+		});
+		list.forEach(function (it) {
+			var sp = byId[it.id];
+			if (sp) { specs.push(Object.assign({}, sp, it.spec)); }
+		});
+		if (!specs.length) { return { placed: placed, took: [] }; }
+		out = Collide.placeLabelsFirstFit(specs, ground, { pad: pad, lastPad: pad, strict: true, leaderMin: min });
+		var took = [], res = {};
+		out.forEach(function (r) { if (!r.dropped) { res[r.id] = r; took.push(r.id); } });
+		// The labels that took a line are that line from here on, for the repair and the hides after.
+		took.forEach(function (id) {
+			var it = list.filter(function (x) { return x.id === id; })[0];
+			Object.assign(byId[id], it.spec);
+		});
+		return { placed: placed.map(function (r) { return res[r.id] || r; }), took: took };
+	}
+	// **A ONE-LINE LABEL LIES ON THE MAP AND OFF ITS FURNITURE** (pre-review, 2026-10-18: on a 390 px
+	// phone a line ran off the map's right edge and under the labels legend). The map's edges, as four
+	// boxes outside it, and every overlay on it (mapFurnitureRects(): the legends, the strips, the
+	// chip), in drawing units, as obstacles for insertInlineNodeLabels() alone: a stack is placed as
+	// it always was, and a line that would leave the map or sit under its furniture is not taken.
+	function viewFrameBoxes() {
+		var W = (svg && svg.clientWidth) || 0, H = (svg && svg.clientHeight) || 0, s0 = state.s || 1, out = [], big, cr;
+		if (!(W > 0) || !(H > 0)) { return out; }
+		function wx(px) { return (px - state.tx) / s0; }
+		function wy(py) { return (py - state.ty) / s0; }
+		function add(l, t, r, b) {
+			var c = Collide.box((wx(l) + wx(r)) / 2, (wy(t) + wy(b)) / 2, (r - l) / s0, (b - t) / s0, 0);
+			c.kind = 'symbol'; out.push(c);
+		}
+		big = Math.max(W, H);
+		add(-big, -big, 0, H + big); add(W, -big, W + big, H + big);
+		add(0, -big, W, 0); add(0, H, W, H + big);
+		try { cr = svg.getBoundingClientRect ? svg.getBoundingClientRect() : null; } catch (e) { cr = null; }
+		if (cr && cr.width > 0) {
+			mapFurnitureRects(cr).forEach(function (f) { add(f.l, f.t, f.r, f.b); });
+		}
+		return out;
+	}
+	// A drag frame's half: the labels that hold a line are set in it again, exactly as the content
+	// pass set them (it placed the same stacks first).
+	function runInlineTrial(nodeLabels, placed, obs, pad, fsNow, ring) {
+		var byId = {}, nodeOf = {};
+		nodeLabels.forEach(function (l) { byId[l.id] = l; });
+		doc.nodes.forEach(function (n) { nodeOf[nodeLabelKey(n.id)] = n; });
+		inlineRing = ring;
+		placed = perfDebugAccum('  ns:inline', function () { return tryInlineNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf); });
+		inlineRing = null;
+		return placed;
+	}
+	var inlineRing = null;
+	function reinsertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, ring) {
+		var list = [];
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id];
+			if (ne && ne.inline && ne.inlineFrom && n.lx === undefined) {
+				list.push({ id: nodeLabelKey(n.id), spec: inlineNodeSpec(n, fs, labelBoxWidth(ne)) });
+			}
+		});
+		if (!list.length) { return placed; }
+		return insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list, ring).placed;
+	}
+	function tryInlineNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf) {
+		var fs = parseFloat(fsNow) || effectiveFontSize(), cand = [], s0 = state.s || 1,
+			maxPx = ((svg && svg.clientWidth) || 1920) * LPN_INLINE_MAX_VIEW_FRAC, reqs, res;
+		placed.forEach(function (r) {
+			var n = nodeOf[r.id], ne = n && nodeEls[n.id];
+			if (!ne || ne.empty || !ne.allLines || ne.allLines.length < 2 || !byId[r.id]) { return; }
+			if (r.dropped || (ne.lines && ne.lines.length < ne.allLines.length)) { cand.push({ id: r.id, n: n, ne: ne }); }
+		});
+		if (!cand.length) { lastInlineTrial = null; return placed; }
+		// **PRICED BEFORE IT IS DRAWN.** Each label's one-line width comes from measureLevelForms(), the
+		// same measurement in a hidden element, banked by content and size, so a revisited notch asks
+		// the browser nothing; only a label that takes its line is written.
+		reqs = measureLevelForms(cand.map(function (c) { return { lines: c.ne.allLines, stacked: false }; }), fsNow);
+		var list = [];
+		cand.forEach(function (c, k) {
+			var m = reqs[k].m;
+			if (!m || !(m.wPx > 0) || m.wPx > maxPx) { return; }
+			list.push({ id: c.id, c: c, spec: inlineNodeSpec(c.n, fs, m.wPx / s0) });
+		});
+		if (!list.length) { lastInlineTrial = null; return placed; }
+		res = insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list, inlineRing);
+		lastInlineTrial = { tried: list.length, took: res.took.length };
+		res.took.forEach(function (id) {
+			var it = list.filter(function (x) { return x.id === id; })[0], ne = it.c.ne,
+				from = { wPx: ne.twPx, rowWPx: ne.rowWPx ? ne.rowWPx.slice() : null, lineCount: ne.lineCount, lines: ne.lines.slice() };
+			writeNodeLabelGlyphs(ne, it.c.n, ne.allLines, fsNow, true);
+			ne.inlineFrom = from;
+			it.ne = ne;
+		});
+		res.took.forEach(function (id) { measureLabelWidths(list.filter(function (x) { return x.id === id; })[0].c.ne); });
+		return res.placed;
+	}
+	// What the last one-line trial did, for a harness to read. Not a decision input.
+	var lastInlineTrial = null;
 	function shedNodeLabelsForCrowding(nodeLabels, placed, obs, pad, fsNow) {
 		var byId = {}, nodeOf = {}, rungs = 0;
 		nodeLabels.forEach(function (l) { byId[l.id] = l; });
@@ -2671,7 +2871,7 @@ var EngCalcs = EngCalcs || {};
 			perfDebugAccum('  ns:glyphs', function () {
 				recs.forEach(function (rec) {
 					writeNodeLabelGlyphs(rec.ne, rec.n,
-						keptLines(rec.all, shedKeepSet(rec.all, rec.order, rec.gone + 1)), fsNow);
+						keptLines(rec.all, shedKeepSet(rec.all, rec.order, rec.gone + 1)), fsNow, rec.ne.inline);
 				});
 				recs.forEach(function (rec) { measureLabelWidths(rec.ne); });
 				recs.forEach(function (rec) {
@@ -2846,6 +3046,256 @@ var EngCalcs = EngCalcs || {};
 	// phase three). For ?debug=labels to print. Not a decision input: nothing in the pass reads it
 	// back.
 	var lastCrossingShed = null;
+	// **A PIPE LABEL THAT CANNOT LIE ALONG ITS PIPE IS TRIED LEVEL BESIDE IT BEFORE IT HIDES**
+	// (dev/label-trials/port-plan.md Step 3). Along the pipe, a label hides when it has
+	// shed to its last value and is still crowded, when no station on its pipe is clear, when a
+	// node label has taken its ground, or when it is too long for its segment. Measured on master
+	// (dev/label-trials/preprocessing/hide-reasons.js), those four exits hid 102 of Net3's 119 pipe
+	// labels at 2x and 231 of the 600-junction network's 343, and not one of them had tried a spot
+	// off its pipe. Here each tries one, level, as a free label with a
+	// leader: R14, *"Values outrank alignment"*, and R1, nearness to home given up before the label.
+	//
+	// **WHAT IT IS GIVEN IS ALREADY ITS SMALLEST FORM.** The crowding shed stops at one value, so a
+	// label still crowded, or too long for its segment, arrives here as that last value; a blocked
+	// or yielded one keeps the content it had.
+	//
+	// **LAST, AND STRICT, SO NOTHING ALREADY ON THE MAP MOVES.** It runs after every other label is
+	// placed, against all of them, their leaders included, and takes a side only if the side breaks
+	// nothing (Collide.placeLabelsFirstFit()'s `strict`): no overlap with a symbol, a label or a Text
+	// object (N1, N5), no leader through another node's symbol (N3), through a label or across a
+	// leader, and not on its own pipe (R7). **THE HIDE STAYS THE LAST EXIT** (Tom, 2026-08-17:
+	// *"Fully shedded links need to hide if they are still in conflict"*): a label with no such
+	// side stays hidden exactly as before. Only a lone label is tried; a chain keeps its stations.
+	// Longest pipe first, as the slide orders them, so the order is a function of the drawing.
+	var LPN_LEVEL_REACH_TEXT_HEIGHTS = 3, LPN_LEVEL_PAD_FRAC = 0.1, LPN_LEVEL_NEAR_FRAC = 0.35;
+	// **A LEVEL LABEL CARRIES ITS LEADER UNLESS IT TOUCHES ITS PIPE** (pre-review of
+	// feat/label-beside, 2026-10-18: level labels 25-45 px from their pipe had no leader, because a
+	// data label draws one only past leaderThreshold(), and several sat as near another pipe as their
+	// own). A level label is off its pipe by definition, so the leader is what says whose it is: it
+	// is drawn whenever the label's point is more than this many font sizes from the pipe's.
+	var LPN_LEVEL_LEADER_FRAC = 0.6, LPN_LEVEL_STATIONS = [0.5, 0.3, 0.7];
+	function levelLeaderMin() { return effectiveFontSize() * LPN_LEVEL_LEADER_FRAC; }
+	// **THE OTHER FORMS OF A LEVEL LABEL, MEASURED WITHOUT TOUCHING THE LABEL** (Task 812, Tom
+	// 2026-10-18: *"pipe labels that go out on a leader inline or stacked"*, and on which when both
+	// fit, *"Whichever shows more"*). Each candidate content is drawn once into a hidden scratch
+	// <text> of the same class and size, every write first and every read after, so a batch costs one
+	// layout; widths are kept by the text and the size it is drawn at, so a notch revisited reads them
+	// back for nothing.
+	// The label's own element is not touched: its banked widths are the along-the-pipe content's,
+	// and every pass before this one reasons from them.
+	var levelFormCache = Object.create(null), levelFormKeys = 0;
+	function levelFormKey(lines, stacked) {
+		return (stacked ? 'S' : 'I') + '\u0001' + labelSeparator() + '\u0001' +
+			lines.map(function (ln) { return ln.text; }).join('\u0001');
+	}
+	function measureLevelForms(reqs, fsNow) {
+		// Keyed on the size in WORLD units, as measuredTextWidth() keys its own: the browser lays
+		// text out at the size it is drawn, so a width measured at one zoom is not exactly another
+		// zoom's, and a cache shared across zooms would make a layout depend on the zooms before it.
+		var s = state.s || 1, px = (parseFloat(fsNow) || effectiveFontSize()).toPrecision(6), todo = [];
+		var seen = {}, dup = [];
+		reqs.forEach(function (q) {
+			q.key = px + '\u0002' + levelFormKey(q.lines, q.stacked);
+			var hit = levelFormCache[q.key];
+			if (hit) { q.m = hit; } else if (seen[q.key]) { dup.push(q); } else { seen[q.key] = q; todo.push(q); }
+		});
+		if (todo.length && labelsLayer) {
+			todo.forEach(function (q) {
+				q.t = el('text', { x: 0, y: 0, 'class': 'lpn-lbl' }, labelsLayer);
+				q.t.style.visibility = 'hidden';
+				q.t.style.fontSize = fsNow;
+				setMultilineText(q.t, 0, composeRows(q.lines, q.stacked));
+			});
+			todo.forEach(function (q) {
+				var h = { text: q.t }, w = 0;
+				try { w = q.t.getBBox().width; } catch (err) { w = 0; }
+				noteRowWidths(h);
+				q.m = { wPx: w * s, rowWPx: h.rowWPx ? h.rowWPx.slice() : null };
+			});
+			todo.forEach(function (q) {
+				if (q.t.parentNode) { q.t.parentNode.removeChild(q.t); }
+				delete q.t;
+				if (!(q.m.wPx > 0)) { return; }
+				if (levelFormKeys >= TEXT_MEASURE_MAX) { levelFormCache = Object.create(null); levelFormKeys = 0; }
+				levelFormCache[q.key] = q.m; levelFormKeys++;
+			});
+		}
+		dup.forEach(function (q) { q.m = seen[q.key].m; });
+		return reqs;
+	}
+	// The forms a level label may take besides the one it arrived in: every content from its full
+	// label down to the one the shed left it, each on one line and, with two values or more, as a
+	// stack. Most values first; between two forms showing the same values, the smaller footprint
+	// first, since it leaves more ground for the labels after it.
+	function levelFormRequests(le) {
+		var all = le.allLines || le.lines, base = le.lines || [], order, g, gBase, reqs = [], sets = [];
+		if (!all || !all.length || le.empty) { return []; }
+		order = shedOrder(all);
+		gBase = all.length - base.length;
+		for (g = 0; g <= gBase; g++) { sets.push(keptLines(all, shedKeepSet(all, order, g))); }
+		// The shed walks the same order, so its last rung is the content the label arrived in. If it
+		// is not (a label edited in place mid-pass), only the full label is offered beside it.
+		if (!sameLines(sets[sets.length - 1], base)) { sets = all.length > base.length ? [all] : []; }
+		else { sets.pop(); }
+		sets.forEach(function (ls) {
+			reqs.push({ lines: ls, stacked: false });
+			if (ls.length > 1) { reqs.push({ lines: ls, stacked: true }); }
+		});
+		if (base.length > 1) { reqs.push({ lines: base, stacked: true }); }
+		return reqs;
+	}
+	function levelFormsFrom(reqs) {
+		var out = [], s = state.s || 1;
+		reqs.forEach(function (q) {
+			if (!q.m || !(q.m.wPx > 0)) { return; }
+			var n = q.stacked ? q.lines.length : 1, w = q.m.wPx / s, h = dataLabelBoxHeight(n),
+				rows = q.stacked && q.m.rowWPx && q.m.rowWPx.length > 1 ? q.m.rowWPx.map(function (v) { return v / s; }) : null,
+				area = rows ? rows.reduce(function (a, v) { return a + v; }, 0) * (h / n) : w * h;
+			// The staircase, as drawn: a stack hung left of its point is drawn with its rows flush
+			// against the point (layoutLinkLabelAt()), as Collide.labelLineBoxes() models it.
+			out.push({ w: w, h: h, lines: rows, nVal: q.lines.length, area: area,
+				form: { lines: q.lines, stacked: q.stacked, key: levelFormKey(q.lines, q.stacked), wPx: q.m.wPx } });
+		});
+		out.sort(function (a, b) { return (b.nVal - a.nVal) || (a.area - b.area) || ((a.form.stacked ? 1 : 0) - (b.form.stacked ? 1 : 0)); });
+		return out;
+	}
+	function placeLevelPipeLabels(obs, nodeObs, nodeLabels, nodePlaced, ringLabels, ringPlaced, holders, fs) {
+		var specs = [], min = leaderThreshold(), d = defaultLabelOffset(), home0 = Math.hypot(d.x, d.y),
+			reach = Math.max(home0 * 3, fs * LPN_LEVEL_REACH_TEXT_HEIGHTS), byKey = {}, fsNow = fs + 'px';
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id];
+			if (le) { le.levelForm = null; le.levelAt = null; }
+			if (!le || le.empty || !linkLabelAligned(l) || linkLabelStations(l).length !== 1) { return; }
+			// **A LABEL TOO SHORT FOR ITS SEGMENT TRIES THE LEVEL SPOT TOO** (Tom, 2026-10-17: short
+			// pipes should also try the level spot). Along the pipe it still hides, as his 2026-08-14
+			// call has it (*"If a line is too short, its label must disappear"*): that is about lying
+			// along a line with no room, and a level label does not lie along it. It arrives in the
+			// form the shed left it, its last value, and hides as before if no side is clean.
+			// And one that lost a crossing along its pipe (shedCrossingLabels()): level, it is placed
+			// off every leader, so it crosses nothing (Tom's Net1 at 14 notches out, 2026-10-18).
+			if (!(linkLabelTooShort(l, le) || le.hiddenCrowded || le.hiddenBlocked || le.hiddenYielded || le.hiddenCrossed)) { return; }
+			var mid = linkLabelMid(l), pts = linkPointList(l), sides = [];
+			// The sides round one point of the pipe: its corners, then rings out to `reach` on either
+			// side of the pipe, nearest first. `at` marks a point other than the label's own.
+			function sidesAt(p, along, rings) {
+				var dir = linkDirectionAt(l, p, pts),
+					deg = Math.atan2(dir.by - dir.ay, dir.bx - dir.ax) * 180 / Math.PI,
+					arcs = Collide.openArcs([deg, deg + 180]),
+					out = Collide.cardinalSides(p, d, arcs, {}),
+					ring = Collide.polarCandidates(p, arcs[0], home0, reach, { rings: rings }).concat(
+						Collide.polarCandidates(p, arcs[1], home0, reach, { rings: rings }));
+				ring.forEach(function (q, i) { q._r = Math.hypot(q.x - p.x, q.y - p.y); q._i = i; });
+				ring.sort(function (a, b) { return (a._r - b._r) || (a._i - b._i); });
+				ring.forEach(function (q) { delete q._r; delete q._i; out.push(q); });
+				if (along !== null) { out.forEach(function (q) { q.anchor = p; q.along = along; }); }
+				return out;
+			}
+			sides = sidesAt(mid, null, 4);
+			// **AND THEN FROM THE NEAREST CLEAR STATION** (Task 812). The label's own point is dodged
+			// off the flow arrow at mid-pipe, which on a short pipe puts it by an end node, where
+			// every leader starts inside that node's symbol (Tom's Net1, 2026-10-18: the short
+			// pipe east of the top-right junction hid with open ground beside it). Its other
+			// stations come after every side of its own point, nearest the middle first.
+			// Only where the label's own point sits by an end node, within the corner offset of it:
+			// elsewhere a station of its own pipe adds a few labels for twice the level rung's time
+			// (measured on the 600-junction network at fit: 34 labels, the rung 290 -> 1,220 ms).
+			var ends = [nodeAt(nodeById(l.from)), nodeAt(nodeById(l.to))];
+			if (ends.some(function (e) { return e && Math.hypot(e.x - mid.x, e.y - mid.y) < home0; })) {
+				LPN_LEVEL_STATIONS.forEach(function (a) {
+					Array.prototype.push.apply(sides, sidesAt(Geom.pointAlongPolyline(pts, a), a, 2));
+				});
+			}
+			specs.push({ id: linkLabelKey(l.id), ownLink: linkLabelKey(l.id), anchor: mid, home: linkLabelBase(l),
+				dragged: false, sides: sides, len: Geom.polylineLength(linkPointList(l)),
+				w: labelBoxWidth(le), h: dataLabelBoxHeight(le.lineCount), yOff: -fs * 0.85,
+				lines: labelRowWidths(le), nVal: (le.lines || []).length, l: l });
+		});
+		// Every candidate's other forms, measured in one batch.
+		// **ONE BATCH FOR EVERY LABEL'S FORMS**: every hidden element written, then every one read,
+		// so a wheel notch at a size not yet measured costs one layout, not one per label.
+		perfDebugAccum('  lv:forms', function () {
+			var all = [];
+			specs.forEach(function (sp) { sp.reqs = levelFormRequests(linkEls[sp.l.id]); all = all.concat(sp.reqs); });
+			measureLevelForms(all, fsNow);
+			specs.forEach(function (sp) {
+				var f = levelFormsFrom(sp.reqs);
+				delete sp.reqs;
+				if (f.length) { sp.forms = f; }
+			});
+		});
+		if (!specs.length) { return; }
+		specs.sort(function (a, b) { return (b.len - a.len) || (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0)); });
+		specs.forEach(function (sp, i) { sp.priority = specs.length - i; byKey[sp.id] = sp; delete sp.len; });
+		// Everything on the map now: the drawing, the stationed labels, the dragged ones, and every
+		// node and free label the passes above placed, with the leaders the renderer will draw.
+		var ground = { boxes: nodeObs.boxes.slice(), segments: nodeObs.segments.slice() };
+		function addPlaced(spec, r) {
+			var h = holders[r.id];
+			if (!spec || r.dropped || (h && (h.hiddenDropped || h.hiddenCrossed))) { return; }
+			(r.boxes && r.boxes.length ? r.boxes : (r.box ? [r.box] : [])).forEach(function (b) {
+				var c = Collide.box(b.cx, b.cy, b.w, b.h, b.a); c.kind = 'label'; ground.boxes.push(c);
+			});
+			// **A STACK HUNG LEFT IS DRAWN WITH ITS ROWS FLUSH LEFT**, not flush right as
+			// Collide.labelLineBoxes() models it: dataLabelOrigin() puts the text's x at the box's
+			// left edge and every row starts there. So the rows as drawn are added too, or a level
+			// label fills the corner beside a short row that the drawing has covered (measured in
+			// Chromium: up to 10 px deep on Net3 at 2x).
+			if (!spec.side && spec.lines && spec.lines.length > 1 && r.x < spec.anchor.x) {
+				Collide.labelLineBoxes(Object.assign({}, spec, { side: 'right' }), { x: r.x - spec.w, y: r.y }).forEach(function (b) {
+					b.kind = 'label'; ground.boxes.push(b);
+				});
+			}
+			if (Math.hypot(r.x - spec.anchor.x, r.y - spec.anchor.y) > min) {
+				ground.segments.push(Collide.segment(spec.anchor.x, spec.anchor.y, r.x, r.y, 'leader', r.id));
+			}
+		}
+		var specOf = {};
+		nodeLabels.concat(ringLabels).forEach(function (sp) { specOf[sp.id] = sp; });
+		nodePlaced.concat(ringPlaced).forEach(function (r) { addPlaced(specOf[r.id], r); });
+		// **A LITTLE AIR, ON BOTH SWEEPS.** Every label here would otherwise hide, so it asks only a
+		// tenth of a font size of air -- but that much on the last sweep too: boxes allowed to touch
+		// drew glyphs overlapping by most of a pixel (pre-review, 2026-10-18: "L173 / Q=7963.3 / V=3.6"
+		// on the rotated "Q=463.3"), the letters standing a little outside the box the pass models. Measured against the full 0.35 pad on both
+		// sweeps (Net3 2x, the 600-junction network at 2x): 40 and 232 pipe labels shown against 35
+		// and 214.
+		// **AND IT MUST STILL SAY WHICH PIPE IT IS FOR** (pre-review, 2026-10-17: 115 of the 600-junction
+		// network's level labels at 2x sat nearer another pipe than their own, with no leader). A side
+		// near enough to draw no leader is taken only where its own pipe is the nearest pipe to its
+		// rows, by a fifth of a font size (`near`); a side further out carries a leader to its pipe,
+		// which says it instead. A label with no such side stays hidden.
+		var out = perfDebugAccum('  lv:fit', function () { return Collide.placeLabelsFirstFit(specs, ground, { pad: fs * LPN_LEVEL_PAD_FRAC, lastPad: fs * LPN_LEVEL_PAD_FRAC, strict: true,
+			leaderMin: levelLeaderMin(), quietMax: min, near: fs * LPN_LEVEL_NEAR_FRAC }); });
+		out.forEach(function (r) {
+			var sp = byKey[r.id], le = sp && linkEls[sp.l.id];
+			if (!le || r.dropped) { return; }
+			le.levelBeside = true;
+			le.levelForm = (r.form !== undefined && sp.forms && sp.forms[r.form]) ? sp.forms[r.form].form : null;
+			// No leader where the pass found its own pipe plainly the nearest (Collide's `quietMax`).
+			le.levelQuiet = !r.leader;
+			// Where its leader starts and its text hangs, from the station it was placed from.
+			var side = r.side >= 0 ? sp.sides[r.side] : null, a = r.anchor || sp.anchor;
+			le.levelAt = { along: side && side.along !== undefined ? side.along : null, ex: r.x - a.x, ey: r.y - a.y };
+			le.nudge = { x: r.dx, y: r.dy };
+			le.nudgeManual = false;
+			le.placedSide = r.side;
+			// On the map now, so the meters placed next keep off it. Its own kind: the passes and
+			// harnesses that read `label` boxes back out of this list attribute them by owner.
+			(r.boxes || [r.box]).forEach(function (b) { b.kind = 'levellabel'; b.levelOwner = sp.l.id; obs.boxes.push(b); });
+			if (r.leader) { obs.segments.push(r.leader); }
+		});
+		specs.forEach(function (sp) { delete sp.l; delete sp.forms; });
+	}
+	// **WHAT A LEVEL LABEL'S ELEMENT SHOWS** (Task 812). A level label in another form than the one
+	// it arrived in has that form written into its own <text>; anything else shows the content the
+	// pass along the pipe decided (`le.rows`). Written only on a change, so a pass that decides the
+	// same thing writes nothing. `le.levelGlyphs` names what is in the element, null for `le.rows`.
+	function syncLevelGlyphs(l, le) {
+		var want = (le.levelBeside && le.levelForm) ? le.levelForm.key : null;
+		if ((le.levelGlyphs || null) === want) { return; }
+		if (want) { setMultilineText(le.text, 0, composeRows(le.levelForm.lines, le.levelForm.stacked)); }
+		else if (le.rows) { setMultilineText(le.text, 0, le.rows); }
+		le.levelGlyphs = want;
+	}
 	function runLabelCollisionAvoidance(shedNodes) {
 		var fs = effectiveFontSize(), fsNow = fs + 'px', labels = [], nodeLabels = [], stationed = [],
 			obs = perfDebugAccum('  cl:obstacles', staticObstacles), holders = {};
@@ -2892,6 +3342,7 @@ var EngCalcs = EngCalcs || {};
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
 			le.hiddenBlocked = false;   // placeStationedLabels()'s own decision, made again below
+			le.levelBeside = false;     // placeLevelPipeLabels()'s, likewise
 			// A label nobody can see is not an obstacle. Skipping it here also clears its nudge, so
 			// zooming back in restores it where it belongs rather than where it was last pushed.
 			if (linkLabelTooShort(l, le)) { le.nudge = { x: 0, y: 0 }; return; }
@@ -2968,20 +3419,37 @@ var EngCalcs = EngCalcs || {};
 		// flicker every pass here is written to avoid. Measured, so the price is on the record: on
 		// Net3-World with every label field on the whole repair is 19-58 ms a pass, against 25-90 ms
 		// for ONE of the four to six placeLabelsFirstFit() calls the same pass already makes.
-		var repaired = perfDebugAccum('  cl:repair', function () { return Collide.repairCrossingGangs(nodeLabels, nodePlaced, nodeObs, {
+		// **A ONE-LINE NODE LABEL STAYS WHERE ITS FIRST-FIT PUT IT** (Task 734): the repair's trial
+		// slots do not keep a leader off other nodes' symbols, which a one-line label's longer reach
+		// east and west needs (`leaderClean`), so it takes part only as a fixed neighbour.
+		var fixedIds = {}, movable = nodeLabels.filter(function (sp) { if (sp.leaderClean) { fixedIds[sp.id] = true; } return !sp.leaderClean; }),
+			fixed = nodePlaced.filter(function (r) { return fixedIds[r.id]; }).map(function (r) {
+				var sp = nodeLabels.filter(function (q) { return q.id === r.id; })[0];
+				return r.dropped || !sp ? r : Object.assign({}, r, { leader: Collide.segment(sp.anchor.x, sp.anchor.y, r.x, r.y, 'leader', r.id) });
+			});
+		var repaired = perfDebugAccum('  cl:repair', function () { return Collide.repairCrossingGangs(movable,
+			nodePlaced.filter(function (r) { return !fixedIds[r.id]; }), nodeObs, {
 			pad: pad, leaderMin: leaderThreshold(),
 			// The closing count is a second sweep of the whole drawing for a number no decision
 			// reads, so it is taken only when the bench is open to print it.
 			report: debugOn('labels'),
-			foreign: crossingForeigners(obs).concat(ringForeigners(placed))
+			foreign: crossingForeigners(obs).concat(ringForeigners(placed), ringForeigners(fixed))
 		}); });
-		nodePlaced = repaired.results;
+		if (fixed.length) {
+			var byRid = {};
+			repaired.results.forEach(function (r) { byRid[r.id] = r; });
+			nodePlaced = nodePlaced.map(function (r) { return byRid[r.id] || r; });
+		} else { nodePlaced = repaired.results; }
 		lastGangRepair = repaired.stats;
 		// **AND WHATEVER SURVIVED THAT, ONE OF THE TWO LABELS GOES** (Task 539 phase three). The
 		// repair moves what it can show an improvement for; this closes the remainder, which is the
 		// only rung left once moving has run out. It must run HERE, after both placements and before
 		// the holders are written, because a hide is a DROP and the drop seam is the loop below.
 		lastCrossingShed = perfDebugAccum('  cl:crossShed', function () { return shedCrossingLabels(nodeLabels, nodePlaced, labels, placed, obs); });
+		// **AND LAST OF THE NODE STEPS, A LABEL THAT LOST SOMETHING TRIES ONE LINE** (Task 734): after
+		// the repair and the crossing hides, so not one of them sees it, and it can move nobody.
+		nodePlaced = shedNodes ? runInlineTrial(nodeLabels, nodePlaced, nodeObs, pad, fsNow, placed)
+			: reinsertInlineNodeLabels(nodeLabels, nodePlaced, nodeObs, pad, fs, placed);
 		placed.concat(nodePlaced).forEach(function (r) {
 			var h = holders[r.id];
 			if (!h) { return; }
@@ -2992,6 +3460,11 @@ var EngCalcs = EngCalcs || {};
 		// **THE YIELDER HAS TO ACTUALLY LEAVE, and until 2026-08-23 it never did.** See
 		// yieldStationedLabels() -- this is the one call site, and it must run after BOTH placements.
 		perfDebugAccum('  cl:yield', function () { yieldStationedLabels(nodePlaced, obs); });
+		// **AND A PIPE LABEL THAT COULD NOT LIE ALONG ITS PIPE IS TRIED LEVEL BESIDE IT** (placeLevelPipeLabels()).
+		// Last, on the ground every other label has left, so nothing already placed moves.
+		perfDebugAccum('  cl:level', function () {
+			placeLevelPipeLabels(obs, nodeObs, nodeLabels, nodePlaced, labels, placed, holders, fs);
+		});
 		labelDebugReport(labels.concat(nodeLabels), placed.concat(nodePlaced), obs);
 		// **THE METERS GO LAST, ON THE GROUND EVERYTHING ELSE HAS LEFT** (Task 247). They are the
 		// only labels on this page with two fixed positions and no relaxation, so they can only be
@@ -21401,6 +21874,8 @@ var EngCalcs = EngCalcs || {};
 		// on the map."*). Written here, the one place the subject is written, so no path can leave
 		// a bar on a row whose element has stopped being selected.
 		paneMarkMapSelAll();
+		// The Fire flow box shows which junction a duration fire would be drawn at.
+		if (typeof refreshFireJunctionRow === 'function') { refreshFireJunctionRow(); }
 	}
 	// ---- THE GO-TO MARK (Tom, 2026-09-28, "Preparing to make videos") ----
 	// *"Trying to build a selection set for fire flow ... In Tables, if I go to a Junction, it
@@ -41032,7 +41507,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// The glyphs have to be WRITTEN -- these are new elements -- but they are written
 				// from the content the shed already decided, so no cascade runs and nothing is
 				// measured.
-				if (c.lines && !c.empty) { writeNodeLabelGlyphs(ne, n, c.lines.slice(), fsNow); }
+				if (c.lines && !c.empty) { writeNodeLabelGlyphs(ne, n, c.lines.slice(), fsNow, c.inline); }
 				ne.allLines = c.allLines || (c.lines ? c.lines.slice() : ne.allLines);
 				ne.empty = c.empty; ne.lineCount = c.lineCount;
 				restoreBucketHolder(ne, c);
@@ -56087,8 +56562,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// stored as n.lx/n.ly, world units from the node center, same convention as a Text
 				// label's lb.x/lb.y offset from its anchor.
 				var nn = nodeById(t.dataset.nodelbl), posN = nodeLabelPos(nn), w4 = screenToWorld(e.clientX, e.clientY);
+				// **A LABEL PICKED UP IS A STACK** (Task 734): its one-line form is the placement's
+				// answer to a crowded view, and a label the user places is the user's, as a dragged
+				// pipe label stacks (composeRows()). Restacked before the grab point is measured.
+				if (nodeEls[t.dataset.nodelbl] && nodeEls[t.dataset.nodelbl].inline) {
+					writeNodeLabelGlyphs(nodeEls[t.dataset.nodelbl], nn, nodeEls[t.dataset.nodelbl].lines, effectiveFontSize() + 'px', false);
+					measureLabelWidths(nodeEls[t.dataset.nodelbl]);
+					layoutNodeLabel(t.dataset.nodelbl);
+				}
 				var neN = nodeEls[t.dataset.nodelbl],
 					gxN = neN ? w4.x - (neN.side === 'left' ? posN.x - labelBoxWidth(neN) : posN.x) : null;
+				// A label restacked under the cursor is narrower than the line that was grabbed: the grab
+				// point is held within the stack, so the stack comes to the cursor rather than the cursor
+				// being left beside it.
+				if (neN && gxN !== null) { gxN = Math.max(0, Math.min(labelBoxWidth(neN), gxN)); }
 				drag = { type: 'nodelbl', id: t.dataset.nodelbl, offX: posN.x - w4.x, offY: posN.y - w4.y, gx: gxN };
 				Object.assign(drag, common);
 			} else if (t.dataset.linklbl !== undefined) {
@@ -60192,7 +60679,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			hiddenShort: !!h.hiddenShort, hiddenCrowded: !!h.hiddenCrowded, hiddenYielded: !!h.hiddenYielded,
 			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
 			alignedAlong: h.alignedAlong, stationSides: h.stationSides ? h.stationSides.slice() : h.stationSides,
-			tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
+			levelBeside: !!h.levelBeside, levelForm: h.levelForm || null, levelAt: h.levelAt || null, levelQuiet: !!h.levelQuiet, inline: !!h.inline, inlineFrom: h.inlineFrom || null, tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
 			rowW: h.rowW ? h.rowW.slice() : null, rowWPx: h.rowWPx ? h.rowWPx.slice() : null,
 			segW: h.segW ? h.segW.slice() : null };
 	}
@@ -60245,7 +60732,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h.hiddenShort = c.hiddenShort; h.hiddenCrowded = c.hiddenCrowded; h.hiddenYielded = c.hiddenYielded;
 		h.hiddenBlocked = c.hiddenBlocked;
 		h.hiddenCrossed = c.hiddenCrossed; h.hiddenDropped = c.hiddenDropped;
-		h.alignedAlong = c.alignedAlong;
+		h.alignedAlong = c.alignedAlong; h.levelBeside = c.levelBeside; h.levelForm = c.levelForm || null; h.levelAt = c.levelAt || null; h.levelQuiet = !!c.levelQuiet; h.inlineFrom = c.inlineFrom || null;
 		h.stationSides = c.stationSides ? c.stationSides.slice() : c.stationSides;
 		h.tw = c.tw; h.twPx = c.twPx; h.width = c.width; h.widthPx = c.widthPx;
 		h.rowW = c.rowW ? c.rowW.slice() : null; h.rowWPx = c.rowWPx ? c.rowWPx.slice() : null;
@@ -60262,7 +60749,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			doc.nodes.forEach(function (n) {
 				var ne = nodeEls[n.id], c = e.nodes[n.id];
 				if (!ne || !c) { return; }
-				if (c.lines && !sameLines(ne.lines, c.lines)) { writeNodeLabelGlyphs(ne, n, c.lines.slice(), fsNow); }
+				if (c.lines && (!sameLines(ne.lines, c.lines) || !!ne.inline !== !!c.inline)) { writeNodeLabelGlyphs(ne, n, c.lines.slice(), fsNow, c.inline); }
 				ne.lineCount = c.lineCount;
 				restoreBucketHolder(ne, c);
 			});
@@ -77033,9 +77520,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//   * **THE LOSS ACCOUNTING IS STATED IN THE INTERFACE.** The demand goes on the junction
 	//     itself, which is the profession's default and what both inspectable tools do, so the box
 	//     says out loud that no hydrant, lateral or fitting loss is in these numbers.
-	//   * **ONE STEADY CONDITION.** US practice loads fire flow onto maximum-day demand and reads
-	//     one steady state. Where this project has a clock, the box says which condition it tested;
-	//     picking a frame is a later increment and nothing here pretends to do it.
+	//   * **A STEADY CONDITION, CHOSEN.** US practice loads fire flow onto maximum-day demand and reads
+	//     one steady state. Where this project has a clock, the box tests the step on screen, a chosen
+	//     reporting step, the step of lowest pressure, or every step with each junction's worst
+	//     (Task 578); the report says which. Each step is built by analysisModelAt().
 	//
 	// AND IT NEVER TOUCHES THE DOCUMENT. The engine solves from a copy whose nodes are copies, and
 	// the answers live in `fireFlowRun` beside the document -- not on an element, so setProp() and
@@ -77044,6 +77532,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	var fireFlowAsk = null;      // what is in the boxes, for this page load only
 	var fireFlowRun = null;      // the last run's result set, or null
 	var fireFlowRunT = null;     // the time step it was computed at (seconds)
+	var fireDurRun = null;       // the last fire for a stated duration, or null (Task 578)
 	var ffShownAt = null;
 	var fireFlowBusy = false;    // a run is in progress
 	var fireFlowStop = false;    // the Stop button was pressed
@@ -77185,8 +77674,21 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// own hydraulics and a fire changes those; forcing it shut would starve the fire it is there to
 	// feed.
 	function fireFlowAtFrame(model) {
-		var f = EngCalcs.lpnTimeCurrentFrame ? EngCalcs.lpnTimeCurrentFrame() : null,
-			atLimit = {}, TOL = 1e-3;
+		return applyFrameToModel(model, EngCalcs.lpnTimeCurrentFrame ? EngCalcs.lpnTimeCurrentFrame() : null);
+	}
+	// **THE ONE SNAPSHOT, SHARED BY FIRE FLOW, CRITICALITY AND DEMAND SCALING** (Task 578). The
+	// condition at reporting step `t` of a run: the model assembled at that time (pattern
+	// multipliers, reservoir heads, pump speeds), then that step's frame laid over it (tank levels,
+	// link statuses). With `t` null it is the step on screen.
+	function analysisModelAt(t, frame) {
+		var model, prev = readTimeOverride;
+		if (t !== null && t !== undefined) { readTimeOverride = t; }
+		try { model = assembleModel(); } finally { readTimeOverride = prev; }
+		applyFrameToModel(model, frame);
+		return model;
+	}
+	function applyFrameToModel(model, f) {
+		var atLimit = {}, TOL = 1e-3;
 		if (!f || !f.heads) { return false; }
 		model.nodes.forEach(function (n) {
 			var h = f.heads[n.id];
@@ -77206,6 +77708,54 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		}
 		return true;
+	}
+
+	// **THE ANALYSES THAT NEED THE WHOLE RUN** (Task 578): fire flow at a chosen step, at the step of
+	// lowest pressure or at every step; criticality and demand scaling over the run. They are offered
+	// only where the project has a clock and the EPANET engine can be reached; anywhere else the
+	// step on screen is the only condition, as it always was.
+	function analysisCanRun() {
+		return effectiveTimesExtended() && !!EngCalcs.lpnEpanetRun;
+	}
+	// **A FIRE FOR A STATED DURATION IS A CHOICE BESIDE "REPORTING STEP TESTED"**, not a box of its
+	// own: it needs the same clock, the same Required fire flow and Residual pressure to hold, and
+	// it is run by the same Run button. It tests nothing at a step; it asks a run a question.
+	function ffDurMode() {
+		return analysisCanRun() && !!EngCalcs.lpnDurFireModel && !!fireFlowAsk && fireFlowAsk.when === 'dur';
+	}
+	function ffWhen() {
+		var w = (fireFlowAsk && fireFlowAsk.when) || 'now';
+		if (w === 'now' || w === 'dur' || !analysisCanRun() || !EngCalcs.lpnFireFlowSweepSteps) { return 'now'; }
+		return w;
+	}
+	// The run of the open scenario's model: the one on hand when it is this model's, else a new one.
+	function analysisRun(onProgress) {
+		var model = assembleModel(), fresh = EngCalcs.lpnTimeFreshRun ? EngCalcs.lpnTimeFreshRun(model) : null;
+		if (fresh) { return Promise.resolve(fresh); }
+		return EngCalcs.lpnEpanetRun(model, { onProgress: onProgress });
+	}
+	function analysisSteps(run, times) {
+		return times.map(function (t) {
+			return { t: t, build: function () { return analysisModelAt(t, EngCalcs.lpnTimeFrameResult(run, t)); } };
+		});
+	}
+	function ffNearestStep(times, t) {
+		var best = times[0];
+		times.forEach(function (x) { if (Math.abs(x - t) < Math.abs(best - t)) { best = x; } });
+		return best;
+	}
+	// The reporting steps of the open scenario's clock, for a picker.
+	function analysisStepOptions() {
+		return EngCalcs.lpnReportTimes(effectiveTimes()).map(function (t) { return [String(t), dsTimeText(t)]; });
+	}
+	function updateEpsRunBox(fraction) {
+		var pc = EngCalcs.pageConfig || {}, f = (typeof fraction === 'number' && isFinite(fraction))
+			? Math.max(0, Math.min(1, fraction)) : 0;
+		if (!ffRunUi) { return; }
+		ffRunUi.fill.style.width = Math.round(1000 * f) / 10 + '%';
+		ffRunUi.track.setAttribute('aria-valuenow', String(Math.round(1000 * f)));
+		ffRunUi.count.textContent = pc.lpn_eps_working || 'Running the extended-period simulation.';
+		ffRunUi.tally.textContent = '';
 	}
 
 	// ---- the marks on the map -------------------------------------------------------------------
@@ -77241,6 +77791,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// no longer exists, so an edit clears it rather than leaving a picture that is quietly wrong.
 	// Called from scheduleSolve(), which is the one thing every edit on this page goes through.
 	function clearFireFlowRun(quiet) {
+		if (fireDurRun) {
+			fireDurRun = null;
+			if (ffBoxIsOpen()) { rebuildFireFlowReport(); buildFireFlowControls(); }
+			if (!quiet) {
+				setNotice((EngCalcs.pageConfig || {}).lpn_ff_stale ||
+					'The drawing changed, so the fire flow results were cleared. Run it again.');
+			}
+		}
 		if (!fireFlowRun) { return; }
 		fireFlowRun = null;
 		refreshFireFlowMarks();
@@ -77348,15 +77906,51 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			engine,
 			run,
 			stop,
-			clear;
+			clear,
+			dur;
 		if (!host) { return; }
 		host.innerHTML = '';
 
-		boxes.scope = ffSelect([
-			['all', pc.lpn_ff_all || 'All junctions'],
-			['selected', pc.lpn_ff_selected || 'Selected junctions']
-		], ask.scope);
-		ffRow(host, pc.lpn_ff_scope || 'Junctions to test', null, boxes.scope, '');
+		dur = ffDurMode();
+		if (!dur) {
+			boxes.scope = ffSelect([
+				['all', pc.lpn_ff_all || 'All junctions'],
+				['selected', pc.lpn_ff_selected || 'Selected junctions']
+			], ask.scope);
+			ffRow(host, pc.lpn_ff_scope || 'Junctions to test', null, boxes.scope, '');
+		}
+
+		// **WHEN, ONLY WHERE THE PROJECT HAS A CLOCK** (Task 578).
+		if (analysisCanRun()) {
+			boxes.when = ffSelect([
+				['now', pc.lpn_when_now || 'The reporting step on screen'],
+				['hour', pc.lpn_when_hour || 'A chosen reporting step'],
+				['minp', pc.lpn_when_minp || 'The reporting step of lowest pressure'],
+				['all', pc.lpn_when_all || 'Every reporting step, worst case']
+			].concat(EngCalcs.lpnDurFireModel
+				? [['dur', pc.lpn_dur_option || 'A fire for a stated duration']] : []), ask.when || 'now');
+			// Wide enough for its longest choice rather than the 8rem the other selects share.
+			boxes.when.className = 'lpn-ff-wide';
+			ffRow(host, pc.lpn_when || 'Reporting step tested', null, boxes.when, '');
+			boxes.when.addEventListener('change', function () {
+				ask.when = boxes.when.value;
+				Object.keys(boxes).forEach(function (k) { ask[k] = boxes[k].value; });
+				buildFireFlowControls();
+			});
+			if ((ask.when || 'now') === 'hour') {
+				boxes.step = ffSelect(analysisStepOptions(), String(ask.step));
+				ask.step = boxes.step.value;
+				ffRow(host, pc.lpn_when_step || 'Reporting step', null, boxes.step, '');
+			}
+			if (dur) {
+				durJunctionRow(host);
+				boxes.durStart = ffSelect(durStartOptions(), String(ask.durStart));
+				ask.durStart = boxes.durStart.value;
+				ffRow(host, pc.lpn_dur_start || 'Fire starts at', null, boxes.durStart, '');
+				boxes.durLen = ffInput(ask.durLen === undefined ? '2:00' : ask.durLen);
+				ffRow(host, pc.lpn_dur_length || 'Fire duration', pc.lpn_dur_length_tip, boxes.durLen, '');
+			}
+		}
 
 		boxes.required = ffInput(ask.required);
 		ffRow(host, pc.lpn_ff_required || 'Required fire flow', pc.lpn_ff_required_tip,
@@ -77365,7 +77959,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// junction actually states its own: a sentence about an exception nobody has made is noise,
 		// and the count is the useful half of it. It stays in the box when the explanations went
 		// behind its `?` (Tom, 2026-10-05): it reports this network, which a fixed tip cannot.
-		if (fireFlowOwnCount() > 0) {
+		if (!dur && fireFlowOwnCount() > 0) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_required_own ||
 				'Junctions with an individual required fire flow are tested against that value instead. Number of them: {n}.')
 				.replace('{n}', String(fireFlowOwnCount())), host);
@@ -77384,21 +77978,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// checkbox carries it. `ask.design` already carried the 'off'/'all'/'selected' string
 		// underneath the checkbox, and runFireFlowSweep()/ffDesignScope() never changed, so only the
 		// control built here changes back.
-		boxes.design = ffSelect([
-			['off', pc.lpn_ff_design_off || 'None'],
-			['all', pc.lpn_ff_design_all || 'All'],
-			['selected', pc.lpn_ff_design_selected || 'Selected']
-		], ffDesignScope(ask.design));
-		ffRow(host, pc.lpn_ff_design || 'Design check (effect on system)', pc.lpn_ff_design_tip,
-			boxes.design, '');
+		if (!dur) {
+			boxes.design = ffSelect([
+				['off', pc.lpn_ff_design_off || 'None'],
+				['all', pc.lpn_ff_design_all || 'All'],
+				['selected', pc.lpn_ff_design_selected || 'Selected']
+			], ffDesignScope(ask.design));
+			ffRow(host, pc.lpn_ff_design || 'Design check (effect on system)', pc.lpn_ff_design_tip,
+				boxes.design, '');
 
-		boxes.minPressure = ffInput(ask.minPressure);
-		ffRow(host, pc.lpn_ff_minpressure || 'Lowest system pressure allowed',
-			pc.lpn_ff_minpressure_tip, boxes.minPressure, unitLabel('lpn_u_pressure'));
+			boxes.minPressure = ffInput(ask.minPressure);
+			ffRow(host, pc.lpn_ff_minpressure || 'Lowest system pressure allowed',
+				pc.lpn_ff_minpressure_tip, boxes.minPressure, unitLabel('lpn_u_pressure'));
 
-		boxes.maxVelocity = ffInput(ask.maxVelocity);
-		ffRow(host, pc.lpn_ff_maxvelocity || 'Highest velocity allowed', pc.lpn_ff_maxvelocity_tip,
-			boxes.maxVelocity, unitLabel('lpn_u_velocity'));
+			boxes.maxVelocity = ffInput(ask.maxVelocity);
+			ffRow(host, pc.lpn_ff_maxvelocity || 'Highest velocity allowed', pc.lpn_ff_maxvelocity_tip,
+				boxes.maxVelocity, unitLabel('lpn_u_velocity'));
+		}
 
 		// **HOW HYDRANT LOSSES ARE ACCOUNTED FOR, BEHIND THE BOX'S `?`** (Tom, 2026-08-25: *"I want
 		// to be very explicit and transparent... about how we account if at all for hydrant losses
@@ -77416,7 +78012,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (critBusy || dsBusy) { run.title = pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.'; }
 		run.addEventListener('click', function () {
 			Object.keys(boxes).forEach(function (k) { ask[k] = boxes[k].value; });
-			runFireFlowSweep();
+			if (dur) { runDurationFire(); } else { runFireFlowSweep(); }
 		});
 		stop = ffEl('button', 'lpn-ff-stopbtn', pc.lpn_ff_stop || 'Stop', buttons);
 		stop.type = 'button';
@@ -77427,10 +78023,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// provide a button in that box to clear the rings."*). Disabled where there is nothing to
 		// clear, exactly as Stop is disabled where nothing is running. `true` (quiet): this is the
 		// user's own decision, not news to tell them about.
-		clear = ffEl('button', 'lpn-ff-clearbtn', pc.lpn_ff_clear || 'Clear rings', buttons);
-		clear.type = 'button';
-		clear.disabled = !fireFlowRun;
-		clear.addEventListener('click', function () { clearFireFlowRun(true); buildFireFlowControls(); });
+		// A fire for a stated duration draws no rings, so the button that clears them is not offered.
+		if (!dur) {
+			clear = ffEl('button', 'lpn-ff-clearbtn', pc.lpn_ff_clear || 'Clear rings', buttons);
+			clear.type = 'button';
+			clear.disabled = !fireFlowRun && !fireDurRun;
+			clear.addEventListener('click', function () { clearFireFlowRun(true); buildFireFlowControls(); });
+		}
 		// Remembered as it is typed, so closing the box and reopening it does not throw the
 		// criteria away.
 		Object.keys(boxes).forEach(function (k) {
@@ -77562,12 +78161,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// The Worst-effect cell, with the element it names as a go-to link (Tom, 2026-09-28: *"In fire
 	// flow analysis, can every node have a hyperlink to go to it?"*).
-	function ffCriticalCell(row, rec) {
-		var parts = ffCriticalParts(rec), td;
+	function ffCriticalCell(row, rec, showStep) {
+		var parts = ffCriticalParts(rec), td, when = typeof rec.designT === 'number' ? rec.designT : rec.t,
+			tail = (showStep && typeof when === 'number') ? ' (' + dsTimeText(when) + ')' : '';
 		if (parts.plain !== undefined) { return ffCell(row, parts.plain); }
 		td = ffCell(row, parts.before);
 		ffGotoLink(td, parts.kind, parts.id, parts.idText);
-		td.appendChild(document.createTextNode(parts.after));
+		td.appendChild(document.createTextNode(parts.after + tail));
 		return td;
 	}
 	// **EVERY ID IN THE FIRE-FLOW TABLE GOES TO ITS ELEMENT** -- the same go-to as a Find result or
@@ -77667,6 +78267,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		case 7: return rec.effects ? ffLimitText(rec) : undefined;
 		case 8: return rec.solves;
 		case 9: return ffModesText(rec);
+		case 10: return rec.t;
 		}
 		return undefined;
 	}
@@ -77788,10 +78389,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			body,
 			shown,
 			sorted,
+			allSteps,
 			anyEffect;
 		if (!host) { return; }
 		host.innerHTML = '';
+		if (fireDurRun) { renderDurationFire(host, fireDurRun); return; }
 		if (!set) { return; }
+		allSteps = !!(set.at && set.at.mode === 'all');
 
 		if (set.stopped) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_stopped || 'Stopped after {done} of {total} junctions. The results below are the ones already finished.')
@@ -77800,6 +78404,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		ffShownAt = dsNow();
 		ffEl('p', 'lpn-ff-summary', ffSummaryText(set), host);
 		dsTimeLines(host, fireFlowRunT);
+		if (set.at && set.at.none) {
+			ffEl('p', 'lpn-ff-summary', (pc.lpn_ff_no_steps || 'A tank empties at {time}, before the first reporting step could be tested, so no step was tested.')
+				.replace('{time}', dsTimeText(set.at.emptyT)), host);
+			return;
+		}
+		if (set.at && set.at.emptyT !== null && set.at.emptyT !== undefined) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_tank_empties || 'A tank empties at {time}; steps from then on were not tested.')
+				.replace('{time}', dsTimeText(set.at.emptyT)), host);
+		}
+		if (set.at) {
+			if (set.at.mode === 'all') {
+				ffEl('p', 'lpn-ff-note', (pc.lpn_ff_at_all || 'Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.')
+					.replace('{n}', String(set.at.stepsDone)), host);
+			} else if (set.at.mode === 'minp') {
+				ffEl('p', 'lpn-ff-note', (pc.lpn_ff_at_minp || 'Tested at {time}, the reporting step with the lowest pressure among the junctions tested.')
+					.replace('{time}', dsTimeText(set.at.t)), host);
+			} else if (set.at.mode === 'hour') {
+				ffEl('p', 'lpn-ff-note', (pc.lpn_ff_at_step || 'Tested at reporting step {time}.')
+					.replace('{time}', dsTimeText(set.at.t)), host);
+			}
+		}
 		if (set.counts.error) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_summary_error || 'Junctions that could not be solved ({n}).')
 				.replace('{n}', String(set.counts.error)), host);
@@ -77848,7 +78473,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_ff_col_limit || 'Design limit',
 			pc.lpn_ff_col_solves || 'Runs',
 			pc.lpn_ff_col_modes || 'Failure modes'
-		]);
+		].concat(allSteps ? [pc.lpn_ff_col_hour || 'Step of lowest flow'] : []));
 		shown.forEach(function (rec) {
 			var tr = ffEl('tr', 'lpn-ff-' + rec.state, null, body);
 			// **THE ID WEARS THE USER'S OWN LABEL PREFIX** (Tom, 2026-09-02: *"we need to apply here
@@ -77861,10 +78486,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ffCell(tr, ffQtyOrWhy(rec, rec.pressureAtRequired, 'lpn_u_pressure'));
 			ffCell(tr, ffAvailableText(rec));
 			ffCell(tr, ffQtyOrWhy(rec, rec.residualAt, 'lpn_u_pressure'));
-			ffCriticalCell(tr, rec);
+			ffCriticalCell(tr, rec, allSteps);
 			ffCell(tr, ffLimitText(rec));
 			ffCell(tr, rec.solves === undefined ? FF_DASH : String(rec.solves));
 			ffCell(tr, ffModesText(rec));
+			if (allSteps) { ffCell(tr, typeof rec.t === 'number' ? dsTimeText(rec.t) : FF_DASH); }
 		});
 		ffMoreLine(host, sorted.length - shown.length);
 	}
@@ -77959,14 +78585,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// The running tally is the sweep's own four states, counted as the records arrive. It is the
 	// "maybe some other progress stats" half of the ruling and it is the same three sentences the
 	// finished report opens with, so a reader is not learning a second vocabulary mid-run.
-	function updateFireFlowRunBox(done, counts, modes) {
+	function updateFireFlowRunBox(done, counts, modes, stepInfo) {
 		var pc = EngCalcs.pageConfig || {}, text;
 		if (!ffRunUi) { return; }
 		ffRunUi.fill.style.width =
 			(ffRunUi.total > 0 ? Math.round(1000 * done / ffRunUi.total) / 10 : 0) + '%';
 		ffRunUi.track.setAttribute('aria-valuenow', String(done));
-		ffRunUi.count.textContent = (pc.lpn_ff_working || 'Working: {done} of {total} junctions.')
-			.replace('{done}', String(done)).replace('{total}', String(ffRunUi.total));
+		ffRunUi.count.textContent = stepInfo
+			? (pc.lpn_ff_working_steps || 'Working: reporting step {step} of {steps}, junction {done} of {total}.')
+				.replace('{step}', String(stepInfo.step)).replace('{steps}', String(stepInfo.steps))
+				.replace('{done}', String(done - (stepInfo.step - 1) * stepInfo.total)).replace('{total}', String(stepInfo.total))
+			: (pc.lpn_ff_working || 'Working: {done} of {total} junctions.')
+				.replace('{done}', String(done)).replace('{total}', String(ffRunUi.total));
 		// The running tally reads the same independent modes the finished report does, or the
 		// dialog and the table it turns into would count the same run two different ways.
 		text = ffSummaryText({ modes: modes || { fire: 0, design: 0, clean: 0 } });
@@ -78022,6 +78652,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			maxVelocity = ffValue(ask.maxVelocity, 'lpn_u_velocity'),
 			design = null,
 			skipped = 0,
+			when = ffWhen(),
 			tally,
 			before;
 		if (fireFlowBusy) { return; }
@@ -78090,10 +78721,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// belt-and-braces assertion rather than a repair, and if it ever fires the fix is in
 		// whatever wrote to `doc`, not here.
 		before = JSON.stringify(doc);
-		fireFlowRunT = modelTimeSeconds();
+		// A run at a chosen step, or over the whole run, states its own time in its report; the
+		// "computed at / clock now at" line belongs to the step on screen alone.
+		fireFlowRunT = when === 'now' ? modelTimeSeconds() : null;
 		fireFlowBusy = true;
 		fireFlowStop = false;
 		fireFlowRun = null;
+		fireDurRun = null;
 		if (critBoxIsOpen()) { buildCriticalityControls(); }
 		if (dsBoxIsOpen()) { buildDemandScaleControls(); }
 		tally = { pass: 0, fail: 0, design: 0, error: 0 };
@@ -78103,33 +78737,27 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// **THE PROGRESS IS THE DIALOG'S, AND #lpn_status IS LEFT ALONE.** That box is the map's
 		// standing model diagnostic, true until the model changes; a count that ticked inside it
 		// made it look like a run indicator for as long as a sweep lasted.
-		openFireFlowRunBox(ids.length);
 		if (skipped) {
 			setNotice((pc.lpn_ff_skipped || '{n} selected elements are not junctions, so they were not tested.')
 				.replace('{n}', String(skipped)));
 		}
 
-		return EngCalcs.lpnFireFlowSweep(model, {
-			solve: engine.solve,
-			junctions: ids,
-			// **PER JUNCTION, WITH THE BOX'S NUMBER AS THE FALLBACK.** A function rather than a
-			// scalar, always -- one code path, so a project where nobody has typed a per-junction
-			// requirement is answered by the same line as one where everybody has.
-			required: fireFlowRequiredFor(required),
-			residual: residual,
-			design: design,
-			// The progress line is the whole reason the sweep yields between junctions: a
-			// synchronous solver in a promise chain never gives the browser a frame, so without it
-			// this text would appear once, at the end, saying it had finished.
-			onProgress: function (p) {
-				if (p.result && tally[p.result.state] !== undefined) { tally[p.result.state]++; }
-				// `p.modes` is the sweep's own running INDEPENDENT tally; `tally` stays the
-				// exclusive one and is still what carries the error count.
-				updateFireFlowRunBox(p.done, tally, p.modes);
-			},
-			shouldStop: function () { return fireFlowStop; }
-		}).then(function (set) {
+		function sweepOptions() {
+			return {
+				solve: engine.solve,
+				junctions: ids,
+				// **PER JUNCTION, WITH THE BOX'S NUMBER AS THE FALLBACK.** A function rather than a
+				// scalar, always -- one code path, so a project where nobody has typed a per-junction
+				// requirement is answered by the same line as one where everybody has.
+				required: fireFlowRequiredFor(required),
+				residual: residual,
+				design: design,
+				shouldStop: function () { return fireFlowStop; }
+			};
+		}
+		function finishRun(set, at) {
 			fireFlowBusy = false;
+			if (at) { set.at = at; }
 			fireFlowRun = set;
 			if (critBoxIsOpen()) { buildCriticalityControls(); }
 			if (dsBoxIsOpen()) { buildDemandScaleControls(); }
@@ -78139,7 +78767,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			rebuildFireFlowReport();
 			buildFireFlowControls();
 			return set;
-		}, function (err) {
+		}
+		function failRun(err) {
 			fireFlowBusy = false;
 			if (critBoxIsOpen()) { buildCriticalityControls(); }
 			if (dsBoxIsOpen()) { buildDemandScaleControls(); }
@@ -78147,11 +78776,295 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			buildFireFlowControls();
 			setStatus(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.', 'solve-error');
 			if (window.console && console.warn) { console.warn('fire flow sweep failed:', err); }
-		});
+		}
+
+		if (when === 'now') {
+			openFireFlowRunBox(ids.length);
+			return EngCalcs.lpnFireFlowSweep(model, Object.assign(sweepOptions(), {
+				// The progress line is the whole reason the sweep yields between junctions: a
+				// synchronous solver in a promise chain never gives the browser a frame, so without it
+				// this text would appear once, at the end, saying it had finished.
+				onProgress: function (p) {
+					if (p.result && tally[p.result.state] !== undefined) { tally[p.result.state]++; }
+					// `p.modes` is the sweep's own running INDEPENDENT tally; `tally` stays the
+					// exclusive one and is still what carries the error count.
+					updateFireFlowRunBox(p.done, tally, p.modes);
+				}
+			})).then(function (set) { return finishRun(set, null); }, failRun);
+		}
+
+		// THE WHOLE RUN FIRST, ONCE: every step below is built from its frames.
+		openFireFlowRunBox(1000, { update: updateEpsRunBox });
+		return analysisRun(function (p) { updateEpsRunBox(p && p.fraction); }, function () { return fireFlowStop; })
+		.then(function (run) {
+			var times, pick = null, stepList, nSteps, stopT, emptied, usable;
+			if (fireFlowStop) { return finishRun({ ok: true, results: [], byId: {}, counts: tally, modes: { fire: 0, design: 0, clean: 0 },
+				requested: ids.length, residual: residual, design: null, solves: 0, stopped: true,
+				lossAccounting: EngCalcs.lpnFireFlowLossAccounting, isoCap: EngCalcs.lpnFireFlowIsoCap }, { mode: when, steps: 0, stepsDone: 0 }); }
+			if (!run || !run.frames || !run.frames.length || (!run.ok && !run.partial)) { return failRun(null); }
+			// **STEPS FROM THE FIRST TANK-EMPTY ON ARE NOT TESTED**, as criticality reads a run: EPANET
+			// closes an empty tank and reports meaningless heads for what it fed. A run that stopped
+			// part-way ends there too.
+			stopT = Infinity;
+			emptied = EngCalcs.lpnEpsTankEmptyAt ? EngCalcs.lpnEpsTankEmptyAt(run.frames, assembleModel(), null) : null;
+			if (emptied) { stopT = emptied.t; }
+			if (!run.ok && typeof run.stoppedAt === 'number') { stopT = Math.min(stopT, run.stoppedAt); }
+			usable = run.frames.filter(function (f) { return f.t < stopT; });
+			if (!usable.length) {
+				return finishRun({ ok: true, results: [], byId: {}, counts: tally, modes: { fire: 0, design: 0, clean: 0 },
+					requested: ids.length, residual: residual, design: null, solves: 0, stopped: false,
+					lossAccounting: EngCalcs.lpnFireFlowLossAccounting, isoCap: EngCalcs.lpnFireFlowIsoCap },
+					{ mode: when, none: true, emptyT: stopT });
+			}
+			times = usable.map(function (f) { return f.t; });
+			if (when === 'hour') {
+				pick = ffNearestStep(run.frames.map(function (f) { return f.t; }), +ask.step);
+				if (pick >= stopT) {
+					return finishRun({ ok: true, results: [], byId: {}, counts: tally, modes: { fire: 0, design: 0, clean: 0 },
+						requested: ids.length, residual: residual, design: null, solves: 0, stopped: false,
+						lossAccounting: EngCalcs.lpnFireFlowLossAccounting, isoCap: EngCalcs.lpnFireFlowIsoCap },
+						{ mode: when, none: true, emptyT: stopT });
+				}
+				times = [pick];
+			} else if (when === 'minp') {
+				pick = EngCalcs.lpnEpsMinPressureStep(usable.map(function (f) { return EngCalcs.lpnTimeFrameResult(run, f.t); }), ids);
+				if (!pick) { return failRun(null); }
+				times = [pick.t];
+			}
+			stepList = analysisSteps(run, times);
+			nSteps = stepList.length;
+			openFireFlowRunBox(ids.length * nSteps);
+			function progress(p) {
+				if (p.result && tally[p.result.state] !== undefined && nSteps === 1) { tally[p.result.state]++; }
+				updateFireFlowRunBox(p.done, tally, p.modes, nSteps > 1 ? { step: p.step, steps: nSteps, total: ids.length } : null);
+			}
+			if (when === 'all') {
+				return EngCalcs.lpnFireFlowSweepSteps(Object.assign(sweepOptions(), { steps: stepList, onProgress: progress }))
+					.then(function (set) { return finishRun(set, { mode: 'all', steps: set.steps, stepsDone: set.stepsDone, emptyT: isFinite(stopT) ? stopT : null }); }, failRun);
+			}
+			return EngCalcs.lpnFireFlowSweep(stepList[0].build(), Object.assign(sweepOptions(), { onProgress: progress }))
+				.then(function (set) {
+					return finishRun(set, { mode: when, t: times[0], minp: when === 'minp' ? pick : null, emptyT: isFinite(stopT) ? stopT : null });
+				}, failRun);
+		}, failRun);
 	}
 	// Read by dev/browser-pass. Set by the run above, never by a user action -- a false here is a
 	// defect in whatever wrote to `doc`, not in this box.
 	var fireFlowDocGuard = true;
+
+	// ---- A FIRE FOR A STATED DURATION (Task 578) -----------------------------------------------
+	//
+	// Sue (the planning engineer seat), 2026-10-19: Bentley's Automated Fire Flow is one instant; a
+	// fire that lasts is the manual practice of a demand on a hydrant for a stated time, then a full
+	// extended-period run to see how storage drains. This is that practice, named, in fire flow's
+	// own box: one selected junction, the Required fire flow, a start, a duration.
+	//
+	// **ON A COPY, AND THE PROJECT'S OWN STARTING STATE.** js/lpn-durfire.js adds the fire as a
+	// second demand category on a copy of the junction, on its own pattern; the run is EPANET's. The
+	// answer is compared with the run without the fire (the one on hand, when it is this model's).
+	// The residual pressure is the box's own setting. `doc` is never written.
+	function durRefused(text) {
+		clearFireFlowRun(true);
+		analysisRefused(document.getElementById('lpn_ff_report'), text);
+	}
+	// The junctions selected on the map that a fire can be drawn at (active junctions only).
+	function durPicked() {
+		var picked = [];
+		selections.forEach(function (s) {
+			if (s.kind === 'node' && fireFlowJunctions().some(function (n) { return n.id === s.id; }) &&
+				picked.indexOf(s.id) < 0) { picked.push(s.id); }
+		});
+		return picked;
+	}
+	function durJunctionText() {
+		var pc = EngCalcs.pageConfig || {}, p = durPicked();
+		if (p.length === 1) { return labelPrefixFor('node', 'id') + p[0]; }
+		return p.length
+			? (pc.lpn_dur_junction_many || 'Several are selected. Select one junction on the map.')
+			: (pc.lpn_dur_junction_none || 'None selected. Select one junction on the map.');
+	}
+	function durJunctionRow(host) {
+		var pc = EngCalcs.pageConfig || {}, span = document.createElement('span');
+		span.id = 'lpn_ff_firejunction';
+		span.className = 'lpn-ff-firejunction';
+		span.textContent = durJunctionText();
+		ffRow(host, pc.lpn_dur_junction || 'Fire junction', null, span, '');
+	}
+	// Redrawn by setSelectionList(), so the row follows the map while the box stays open.
+	function refreshFireJunctionRow() {
+		var e = typeof document !== 'undefined' ? document.getElementById('lpn_ff_firejunction') : null;
+		if (e) { e.textContent = durJunctionText(); }
+	}
+	// Only the times a fire can start at: a whole pattern period, within the run, not its end.
+	function durStartOptions() {
+		var t = effectiveTimes() || {}, step = t.patternStep > 0 ? t.patternStep : 3600,
+			shift = t.patternStart > 0 ? t.patternStart : 0, dur = t.duration || 0;
+		return analysisStepOptions().filter(function (o) {
+			var x = +o[0];
+			return x < dur && Math.abs((x + shift) / step - Math.round((x + shift) / step)) < 1e-9;
+		});
+	}
+	function runDurationFire() {
+		var pc = EngCalcs.pageConfig || {},
+			ask = fireFlowAsk,
+			flow = ffValue(ask.required, 'lpn_u_flow'),
+			residual = ffValue(ask.residual, 'lpn_u_pressure'),
+			start = +ask.durStart,
+			len = EngCalcs.lpnParseTime(String(ask.durLen === undefined ? '' : ask.durLen).split(/\s+/), { typed: true }),
+			picked = durPicked(), model, built, before, codes = EngCalcs.lpnDurFireCodes || {}, baseRun = null;
+		if (fireFlowBusy) { return; }
+		if (critBusy || dsBusy) {
+			setNotice(pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.');
+			return;
+		}
+		if (picked.length !== 1) {
+			durRefused(pc.lpn_dur_no_junction || 'Select one junction for the fire.');
+			return;
+		}
+		if (!(flow > 0)) {
+			setNotice(pc.lpn_ff_required_tip || 'The flow required at a hydrant by the applicable fire code or fire authority. Each junction is tested against this value unless a required fire flow is entered for that junction.');
+			return;
+		}
+		model = assembleModel();
+		built = EngCalcs.lpnDurFireModel(model, {
+			nodeId: picked[0], flow: flow, start: start, duration: typeof len === 'number' ? len : NaN
+		});
+		if (!built.ok) {
+			durRefused((pc.lpn_dur_bad_time || 'The start and the duration must be whole multiples of the pattern time step, {step}, and the fire must start within the run.')
+				.replace('{step}', dsTimeText(built.step || (effectiveTimes() || {}).patternStep || 3600)));
+			return;
+		}
+		before = JSON.stringify(doc);
+		fireFlowRunT = null;
+		fireFlowBusy = true;
+		fireFlowStop = false;
+		fireFlowRun = null;
+		fireDurRun = null;
+		refreshFireFlowMarks();
+		if (critBoxIsOpen()) { buildCriticalityControls(); }
+		if (dsBoxIsOpen()) { buildDemandScaleControls(); }
+		rebuildFireFlowReport();
+		buildFireFlowControls();
+		openFireFlowRunBox(1000, { update: updateEpsRunBox });
+		function done() {
+			fireFlowBusy = false;
+			if (critBoxIsOpen()) { buildCriticalityControls(); }
+			if (dsBoxIsOpen()) { buildDemandScaleControls(); }
+			closeFireFlowRunBox();
+		}
+		return analysisRun(function (p) { updateEpsRunBox((p && p.fraction || 0) / 2); }).then(function (run) {
+			baseRun = run;
+			return EngCalcs.lpnEpanetRun(built.model, { onProgress: function (p) { updateEpsRunBox(0.5 + (p && p.fraction || 0) / 2); } });
+		}).then(function (fired) {
+			var d = (fired && baseRun) ? EngCalcs.lpnDurFireDigest({
+				model: model, fire: built.fire, residual: residual > 0 ? residual : 0, base: baseRun, fired: fired
+			}) : { ok: false };
+			done();
+			if (!d.ok) {
+				setStatus(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.', 'solve-error');
+			} else {
+				d.docGuard = (JSON.stringify(doc) === before);
+				fireDurRun = d;
+			}
+			rebuildFireFlowReport();
+			buildFireFlowControls();
+			return d;
+		}, function (err) {
+			done();
+			buildFireFlowControls();
+			setStatus(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.', 'solve-error');
+			if (window.console && console.warn) { console.warn('duration fire failed:', err); }
+			return null;
+		});
+	}
+	function durTable(parent, headings) {
+		var wrap = ffEl('div', 'lpn-ff-tablewrap', null, parent),
+			table = ffEl('table', 'lpn-ff-table', null, wrap),
+			hr = ffEl('tr', null, null, ffEl('thead', null, null, table));
+		headings.forEach(function (h) { ffEl('th', null, h, hr); });
+		return ffEl('tbody', null, null, table);
+	}
+	function renderDurationFire(host, d) {
+		var pc = EngCalcs.pageConfig || {}, f = d.fire, body, tr, R = d.recovery, tpl;
+		// A sentence, with its one junction or tank id as a go-to link where it has one.
+		function say(cls, text, id) {
+			if (id !== undefined && id !== null) { dsSentence(host, cls, text, 'node', id, {}); }
+			else { ffEl('p', cls, text, host); }
+		}
+		say('lpn-ff-summary', (pc.lpn_dur_head || 'Fire flow of {flow} at junction {id}, from {start} to {end}.')
+			.replace('{flow}', ffQty(f.flow, 'lpn_u_flow')).replace('{start}', dsTimeText(f.start))
+			.replace('{end}', dsTimeText(f.end)), f.nodeId);
+		if (d.shortfall) {
+			say('lpn-ff-summary', (pc.lpn_dur_shortfall || '⚠ Only {delivered} of the {flow} fire flow is delivered at junction {id}, at {time}, so the residual pressure is not a test of that fire.')
+				.replace('{delivered}', ffQty(Math.max(0, d.delivered.flow), 'lpn_u_flow')).replace('{flow}', ffQty(f.flow, 'lpn_u_flow'))
+				.replace('{time}', dsTimeText(d.delivered.t)), f.nodeId);
+		} else if (d.lowestAtFire) {
+			tpl = d.holds
+				? (pc.lpn_dur_holds || '✓ Junction {id} holds at least {pressure} during the fire, above the residual pressure of {residual}, at {time}.')
+				: (pc.lpn_dur_fails || '⚠ Junction {id} falls to {pressure} during the fire, below the residual pressure of {residual}, at {time}.');
+			say('lpn-ff-summary', tpl.split('{pressure}').join(ffQty(d.lowestAtFire.pressure, 'lpn_u_pressure'))
+				.replace('{residual}', ffQty(d.residual, 'lpn_u_pressure')).replace('{time}', dsTimeText(d.lowestAtFire.t)), f.nodeId);
+		}
+		if (d.lowest) {
+			say('lpn-ff-note', (pc.lpn_dur_lowest || 'The lowest pressure anywhere is {pressure}, at junction {id}, at {time}.')
+				.split('{pressure}').join(ffQty(d.lowest.pressure, 'lpn_u_pressure'))
+				.replace('{time}', dsTimeText(d.lowest.t)), d.lowest.id);
+		}
+		if (d.emptyAt) {
+			say('lpn-ff-summary', (pc.lpn_dur_empties || '⚠ Tank {id} empties at {time}. Pressures from that step on are not read.')
+				.replace('{time}', dsTimeText(d.emptyAt.t)), d.emptyAt.id);
+		} else if (d.tanks.length) {
+			say('lpn-ff-summary', pc.lpn_dur_no_empty || '✓ No tank empties.');
+		}
+		if (R) {
+			if (R.recovered) {
+				say('lpn-ff-summary', (pc.lpn_dur_recovers || '✓ The system recovers after the fire: at {time}, the last reporting step, no junction differs from the run without the fire by more than {pressure} and no tank by more than {level}.')
+					.replace('{time}', dsTimeText(R.t)).split('{pressure}').join(ffQty(R.tol, 'lpn_u_pressure'))
+					.split('{level}').join(ffQty(R.tol, 'lpn_u_elevhead')));
+			}
+			if (R.tank) {
+				say('lpn-ff-summary', (pc.lpn_dur_not_back_tank || '⚠ At {time}, the last reporting step, tank {id} is not back to its level without the fire. The difference is {level}, against a tolerance of {tolerance}.')
+					.replace('{time}', dsTimeText(R.t)).split('{level}').join(ffQty(R.tank.diff, 'lpn_u_elevhead'))
+					.replace('{tolerance}', ffQty(R.tol, 'lpn_u_elevhead')), R.tank.id);
+			}
+			if (R.junction) {
+				say('lpn-ff-summary', (pc.lpn_dur_not_back_junction || '⚠ At {time}, the last reporting step, junction {id} is not back to its pressure without the fire. The difference is {pressure}, against a tolerance of {tolerance}.')
+					.replace('{time}', dsTimeText(R.t)).split('{pressure}').join(ffQty(R.junction.diff, 'lpn_u_pressure'))
+					.replace('{tolerance}', ffQty(R.tol, 'lpn_u_pressure')), R.junction.id);
+			}
+		} else if (d.recoveryNote) {
+			say('lpn-ff-note', d.recoveryNote === 'to-end'
+				? (pc.lpn_dur_recovery_to_end || 'The fire lasts to the end of the run, so recovery after it is not assessed.')
+				: (pc.lpn_dur_recovery_cut || 'The run stopped before its end, so recovery after the fire is not assessed.'));
+		}
+		if (d.tanks.length) {
+			body = durTable(host, [pc.lpn_time_tank || 'Tank', pc.lpn_dur_col_low || 'Lowest level reached',
+				pc.lpn_field_tank_minlevel || 'Lowest water depth', pc.lpn_dur_col_margin || 'Above lowest water depth',
+				pc.lpn_dur_col_drop || 'Drop from start',
+				pc.lpn_dur_col_end || 'Level at end', pc.lpn_dur_col_end_nofire || 'Level at end without the fire']);
+			d.tanks.forEach(function (t) {
+				var lv = function (v) { return typeof v === 'number' ? ffQty(v, 'lpn_u_elevhead') : FF_DASH; };
+				tr = ffEl('tr', null, null, body);
+				ffCell(tr, labelPrefixFor('node', 'id') + t.id);
+				ffCell(tr, t.lowest ? (pc.lpn_at_time || '{value} at {time}').replace('{value}', lv(t.lowest.level))
+					.replace('{time}', dsTimeText(t.lowest.t)) : FF_DASH);
+				ffCell(tr, lv(t.min));
+				ffCell(tr, lv(t.margin));
+				ffCell(tr, lv(t.drop));
+				ffCell(tr, lv(t.final));
+				ffCell(tr, lv(t.finalNoFire));
+			});
+		}
+		body = durTable(host, [pc.lpn_when_step || 'Reporting step', pc.lpn_dur_col_fire || 'Fire flow',
+			pc.lpn_dur_col_pressure || 'Pressure at the fire junction', pc.lpn_dur_col_nofire || 'Pressure without the fire']);
+		d.series.forEach(function (r) {
+			tr = ffEl('tr', null, null, body);
+			ffCell(tr, dsTimeText(r.t));
+			ffCell(tr, r.fire ? ffQty(f.flow, 'lpn_u_flow') : FF_DASH);
+			ffCell(tr, typeof r.pressure === 'number' ? ffQty(r.pressure, 'lpn_u_pressure') : FF_DASH);
+			ffCell(tr, typeof r.pressureNoFire === 'number' ? ffQty(r.pressureNoFire, 'lpn_u_pressure') : FF_DASH);
+		});
+	}
 
 	function openFireFlowBox() {
 		var box = ffBoxEl();
@@ -78227,6 +79140,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	var critBusy = false;
 	var critStop = false;
 	var critSortState = { col: null, dir: 1 };
+	function critWhen() { return (critAsk.when === 'run' && analysisCanRun()) ? 'run' : 'now'; }
 	function critBoxEl() { return document.getElementById('lpn_crit_box'); }
 	function critBoxIsOpen() {
 		var box = critBoxEl();
@@ -78240,7 +79154,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function buildCriticalityControls() {
 		var pc = EngCalcs.pageConfig || {},
 			host = document.getElementById('lpn_crit_controls'),
-			scope, minP, skip, buttons, run, stop, engine;
+			scope, minP, skip, buttons, run, stop, engine, when;
 		if (!host) { return; }
 		host.innerHTML = '';
 		scope = ffSelect([
@@ -78249,6 +79163,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		], critAsk.scope);
 		scope.addEventListener('change', function () { critAsk.scope = scope.value; });
 		ffRow(host, pc.lpn_crit_scope || 'Links to break', null, scope, '');
+		// **THE WHOLE RUN, ONLY WHERE THE PROJECT HAS A CLOCK** (Task 578).
+		if (analysisCanRun()) {
+			when = ffSelect([
+				['now', pc.lpn_when_now || 'The reporting step on screen'],
+				['run', pc.lpn_when_run || 'The whole run']
+			], critAsk.when || 'now');
+			when.addEventListener('change', function () { critAsk.when = when.value; });
+			ffRow(host, pc.lpn_when || 'Reporting step tested', null, when, '');
+		}
 		skip = document.createElement('input');
 		skip.type = 'checkbox';
 		skip.checked = !!critAsk.skipDeadEnds;
@@ -78268,6 +79191,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		run.addEventListener('click', function () {
 			critAsk.scope = scope.value;
 			critAsk.skipDeadEnds = skip.checked;
+			if (when) { critAsk.when = when.value; }
 			critFireFlowAsk().minPressure = minP.value;
 			runCriticality();
 		});
@@ -78298,6 +79222,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		case 1: return rec.unserved;
 		case 2: return rec.cutOff ? rec.cutOff.length : undefined;
 		case 3: return rec.below ? rec.below.length : undefined;
+		case 4: return rec.run && rec.run.lowest ? rec.run.lowest.pressure : undefined;
+		case 5: return rec.run ? rec.run.belowSeconds : undefined;
+		case 6: return rec.run && rec.run.emptyAt ? rec.run.emptyAt.t : undefined;
 		}
 		return undefined;
 	}
@@ -78331,11 +79258,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// Counted as the sentence reads: demand actually left unserved, or a junction actually below
 		// the minimum. A link that cuts off only zero-demand junctions shows them in its row, but it
 		// cut off no demand, so it is not counted here.
-		hit = set.results.filter(function (r) { return r.unserved > 0 || (r.below && r.below.length > 0); }).length;
+		hit = set.results.filter(function (r) {
+			return r.unserved > 0 || (r.below && r.below.length > 0) || (r.run && (r.run.emptyAt || r.run.stoppedAt));
+		}).length;
 		ffEl('p', 'lpn-ff-summary', (pc.lpn_crit_summary || 'Assets that leave demand unserved or drop a junction below {pressure} ({n} of {total}).')
 			.replace('{n}', String(hit)).replace('{total}', String(set.results.length))
 			.split('{pressure}').join(ffQty(set.minPressure, 'lpn_u_pressure')), host);
 		dsTimeLines(host, critRunT);
+		if (set.wholeRun) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_run_note || 'Each outage was run over the whole simulation ({n} reporting steps).')
+				.replace('{n}', String(set.wholeRun)), host);
+		}
+		if (set.wholeRun && set.results.some(function (r) { return r.run && r.run.emptyAt; })) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_crit_empty_note || 'Lowest pressures are read before a tank empties. Junctions below minimum include those left without a source from that step on.', host);
+		}
 		if (set.skippedDeadEnds && set.skippedDeadEnds.length) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_skipped_dead || 'Dead-end links skipped: {n}. Each one cuts off everything beyond it.')
 				.replace('{n}', String(set.skippedDeadEnds.length)), host);
@@ -78350,10 +79286,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		shown = sorted.slice(0, FF_MAX_ROWS);
 		body = ffTable(host, [
 			pc.lpn_crit_col_asset || 'Asset',
-			pc.lpn_crit_col_unserved || 'Demand not served',
+			set.wholeRun ? (pc.lpn_crit_col_unserved_peak || 'Largest demand not served') : (pc.lpn_crit_col_unserved || 'Demand not served'),
 			pc.lpn_crit_col_cutoff || 'Junctions cut off',
 			pc.lpn_crit_col_below || 'Junctions below minimum'
-		], { state: critSortState, by: critSortBy });
+		].concat(set.wholeRun ? [
+			[pc.lpn_crit_col_lowest || 'Lowest pressure', pc.lpn_crit_col_lowest_tip || 'Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.', true],
+			pc.lpn_crit_col_hours || 'Hours below minimum',
+			pc.lpn_crit_col_empty || 'Tank empties'
+		] : []), { state: critSortState, by: critSortBy });
 		// Four columns, not ten: the headings wrap between words, never inside one (css/engcalcs.css).
 		if (body.parentNode && body.parentNode.classList) { body.parentNode.classList.add('lpn-crit-table'); }
 		shown.forEach(function (rec) {
@@ -78361,13 +79301,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// row means "the system failed to deliver" in both reports. 'none' is untinted, as a pass.
 			var tr = ffEl('tr', 'lpn-ff-' + EngCalcs.lpnCriticalitySeverity(rec), null, body);
 			ffGotoLink(ffCell(tr, ''), 'link', rec.id, labelPrefixFor('link', 'id') + rec.id);
-			ffCell(tr, typeof rec.unserved === 'number' ? ffQty(rec.unserved, 'lpn_u_flow') : FF_DASH);
+			ffCell(tr, typeof rec.unserved === 'number'
+				? (set.wholeRun && rec.unserved > 0 && typeof rec.unservedAt === 'number'
+					? (pc.lpn_at_time || '{value} at {time}').replace('{value}', ffQty(rec.unserved, 'lpn_u_flow')).replace('{time}', dsTimeText(rec.unservedAt))
+					: ffQty(rec.unserved, 'lpn_u_flow'))
+				: FF_DASH);
 			if (rec.cutOff) { critIdsCell(tr, rec.cutOff); } else { ffCell(tr, FF_DASH); }
 			// **A CASE THAT DID NOT SOLVE IS A ROW SAYING SO, NEVER AN ABORT.** What was cut off is
 			// known without a solve and is still printed; only the pressures are missing, so the
 			// reason stands in the pressure column.
 			if (rec.below) { critIdsCell(tr, rec.below.map(function (b) { return b.id; })); }
 			else { ffCell(tr, ffReasonText(rec)); }
+			if (set.wholeRun) {
+				var atT = pc.lpn_at_time || '{value} at {time}', rn = rec.run;
+				ffCell(tr, rn && rn.lowest
+					? atT.replace('{value}', ffQty(rn.lowest.pressure, 'lpn_u_pressure')).replace('{time}', dsTimeText(rn.lowest.t))
+					: FF_DASH);
+				ffCell(tr, rn ? String(+(rn.belowSeconds / 3600).toFixed(1)) +
+					(typeof rn.stoppedAt === 'number' ? ' (' + (pc.lpn_crit_stopped_at || 'run stopped at {time}').replace('{time}', dsTimeText(rn.stoppedAt)) + ')' : '') : FF_DASH);
+				ffCell(tr, rn && rn.emptyAt
+					? atT.replace('{value}', labelPrefixFor('node', 'id') + rn.emptyAt.id).replace('{time}', dsTimeText(rn.emptyAt.t))
+					: FF_DASH);
+			}
 		});
 		ffMoreLine(host, sorted.length - shown.length, true);
 	}
@@ -78394,14 +79349,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return { ids: ids, skipped: skipped };
 	}
 	function runCriticality() {
-		var pc = EngCalcs.pageConfig || {}, model, engine, pick, minPressure, before;
+		var pc = EngCalcs.pageConfig || {}, model, engine, pick, minPressure, before, whole, sweepSolve;
 		if (critBusy || !EngCalcs.lpnCriticalitySweep) { return Promise.resolve(null); }
 		if (fireFlowBusy || dsBusy) {
 			setNotice(pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.');
 			return Promise.resolve(null);
 		}
+		whole = critWhen() === 'run';
 		model = assembleModel();
-		fireFlowAtFrame(model);
+		// The whole run starts from the project's own starting state; the step on screen is laid over
+		// the model only when that step is what is being asked about.
+		if (!whole) { fireFlowAtFrame(model); }
 		pick = criticalityLinks(model);
 		if (!pick.ids.length) {
 			clearCriticalityRun(true);
@@ -78412,8 +79370,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		minPressure = ffValue(critFireFlowAsk().minPressure, 'lpn_u_pressure');
 		engine = engineFor(model);
+		// One EPANET run per outage, as every run is; the answer is handed to the sweep whole.
+		sweepSolve = whole ? function (m) {
+			return EngCalcs.lpnEpanetRun(m, {}).then(function (run) { return EngCalcs.lpnEpsRunResult(run, m); });
+		} : engine.solve;
 		before = JSON.stringify(doc);
-		critRunT = modelTimeSeconds();
+		critRunT = whole ? null : modelTimeSeconds();
 		critBusy = true;
 		critStop = false;
 		critRun = null;
@@ -78431,7 +79393,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				.replace('{n}', String(pick.skipped)));
 		}
 		return EngCalcs.lpnCriticalitySweep(model, {
-			solve: engine.solve,
+			solve: sweepSolve,
 			links: pick.ids,
 			skipDeadEnds: !!critAsk.skipDeadEnds,
 			minPressure: minPressure > 0 ? minPressure : 0,
@@ -78447,6 +79409,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				critRun = null;
 				setNotice(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.');
 			} else {
+				if (whole) { set.wholeRun = (set.baselineRun && set.baselineRun.steps) || 1; }
 				critRun = set;
 			}
 			rebuildCriticalityReport();
@@ -78520,16 +79483,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// the project; this one is a question asked of the network on screen, on a copy, and lives for the
 	// page load. It multiplies on top of the scenario's, and the box's tip says so.
 	//
-	// **ONE INSTANT, THE ONE ON SCREEN**, for an extended-period project as for the siblings: its
-	// demands at that time, its tank levels and its link statuses from the run. A peak step chosen
-	// for the user would need a run to know the tank levels at it, and would be a second idea of
-	// "the condition tested" beside fire flow's and criticality's. Move the clock to the peak first.
+	// **THE STEP ON SCREEN, OR THE WHOLE RUN** (Task 578), for an extended-period project as for the
+	// siblings. The step on screen is its demands at that time, its tank levels and its link statuses
+	// from the run. The whole run scales the base demands and judges every reporting step; a tank that
+	// empties fails the scale.
 	//
 	// **THE MINIMUM PRESSURE IS FIRE FLOW'S "LOWEST PRESSURE ALLOWED ELSEWHERE"**, shared exactly as
 	// criticality shares it: one fact about the utility, one box value.
 	//
 	// **NO BOX MEMORY ACROSS PAGE LOADS**, like criticality: nothing is stored on a visitor's device.
 	var dsAsk = { scope: 'all', multiplier: '2' };
+	function dsWhen() { return (dsAsk.when === 'run' && analysisCanRun()) ? 'run' : 'now'; }
 	var dsRun = null;      // the last Run at a scale, or null
 	var dsSearch = null;   // the last search, or null
 	// **A REFUSED PRESS IS ANSWERED IN THE BOX, WHERE THE PRESS WAS** (Tom, 2026-10-02: *"It appears
@@ -78551,7 +79515,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function buildDemandScaleControls() {
 		var pc = EngCalcs.pageConfig || {},
 			host = document.getElementById('lpn_ds_controls'),
-			scope, minP, mult, buttons, run, find, stop, engine, other;
+			scope, minP, mult, buttons, run, find, stop, engine, other, when;
 		if (!host) { return; }
 		host.innerHTML = '';
 		scope = ffSelect([
@@ -78560,6 +79524,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		], dsAsk.scope);
 		scope.addEventListener('change', function () { dsAsk.scope = scope.value; buildDemandScaleControls(); });
 		ffRow(host, pc.lpn_ds_scope || 'Junctions to scale', null, scope, '');
+		// **THE WHOLE RUN, ONLY WHERE THE PROJECT HAS A CLOCK** (Task 578). Applies to both Run and Find.
+		if (analysisCanRun()) {
+			when = ffSelect([
+				['now', pc.lpn_when_now || 'The reporting step on screen'],
+				['run', pc.lpn_when_run || 'The whole run']
+			], dsAsk.when || 'now');
+			when.addEventListener('change', function () { dsAsk.when = when.value; });
+			ffRow(host, pc.lpn_when || 'Reporting step tested', null, when, '');
+		}
 		minP = ffInput(critFireFlowAsk().minPressure);
 		minP.addEventListener('change', function () { critFireFlowAsk().minPressure = minP.value; });
 		ffRow(host, pc.lpn_ds_minpressure || 'Lowest pressure allowed', pc.lpn_ds_minpressure_tip,
@@ -78568,6 +79541,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		refreshBoxTip('lpn_ds_box', dsBoxTip(engine));
 		other = fireFlowBusy || critBusy;
 		function take() {
+			if (when) { dsAsk.when = when.value; }
 			dsAsk.scope = scope.value;
 			dsAsk.multiplier = mult.value;
 			critFireFlowAsk().minPressure = minP.value;
@@ -78704,9 +79678,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				.replace('{m}', dsMult(rec.multiplier)).replace('{reason}', ffReasonText(rec)), host);
 			return;
 		}
+		if (rec.emptied) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ds_empties_at || '⚠ At a demand scale of {m}, a tank empties at {time}.')
+				.replace('{m}', dsMult(rec.multiplier)).replace('{time}', dsTimeText(rec.emptied.t)), host);
+		}
 		if (!rec.lowest) { return; }
-		dsSentence(host, 'lpn-ff-note', pc.lpn_ds_lowest_at || 'At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.',
-			'node', rec.lowest.id, { m: dsMult(rec.multiplier), pressure: ffQty(rec.lowest.pressure, 'lpn_u_pressure') });
+		dsSentence(host, 'lpn-ff-note', typeof rec.lowest.t === 'number'
+				? (pc.lpn_ds_lowest_at_time || 'At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}, at {time}.')
+				: (pc.lpn_ds_lowest_at || 'At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.'),
+			'node', rec.lowest.id, { m: dsMult(rec.multiplier), pressure: ffQty(rec.lowest.pressure, 'lpn_u_pressure'),
+				time: typeof rec.lowest.t === 'number' ? dsTimeText(rec.lowest.t) : '' });
+	}
+	function dsRunNote(host) {
+		var pc = EngCalcs.pageConfig || {};
+		ffEl('p', 'lpn-ff-note', pc.lpn_ds_run_note || 'Judged over the whole run, at every reporting step.', host);
 	}
 	function rebuildDemandScaleReport() {
 		var pc = EngCalcs.pageConfig || {},
@@ -78743,6 +79728,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				dsProbeLine(host, s.failing);
 			}
 			dsTimeLines(host, s.time);
+			if (s.wholeRun) {
+				dsRunNote(host);
+				if (s.limit) {
+					ffEl('p', 'lpn-ff-note', (pc.lpn_ds_limit_at || 'Limiting reporting step: {time}.')
+						.replace('{time}', dsTimeText(s.limit.t)), host);
+				}
+			}
 			dsScopeLine(host, s);
 			if (s.holding) { dsOutsideLine(host, s.holding.outside, s.holding.multiplier, s.minPressure); }
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
@@ -78761,9 +79753,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		verdict = set.below.length
 			? (pc.lpn_ds_scale_below || '⚠ At a demand scale of {m}, junctions below {pressure}: {n}.')
 				.replace('{n}', String(set.below.length))
-			: (pc.lpn_ds_scale_ok || '✓ At a demand scale of {m}, every junction keeps {pressure}.');
+			: (set.emptied
+				? (pc.lpn_ds_empties_at || '⚠ At a demand scale of {m}, a tank empties at {time}.').replace('{time}', dsTimeText(set.emptied.t))
+				: (pc.lpn_ds_scale_ok || '✓ At a demand scale of {m}, every junction keeps {pressure}.'));
 		ffEl('p', 'lpn-ff-summary', verdict.replace('{m}', dsMult(set.multiplier)).split('{pressure}').join(pressure), host);
 		dsTimeLines(host, set.time);
+		if (set.wholeRun) {
+			dsRunNote(host);
+			if (set.emptied && set.below.length) {
+				ffEl('p', 'lpn-ff-note', (pc.lpn_ds_empties_at || '⚠ At a demand scale of {m}, a tank empties at {time}.')
+					.replace('{m}', dsMult(set.multiplier)).replace('{time}', dsTimeText(set.emptied.t)), host);
+			}
+		}
 		dsScopeLine(host, set);
 		dsOutsideLine(host, set.outside, set.multiplier, set.minPressure);
 		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
@@ -78777,12 +79778,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			pc.lpn_ff_col_junction || 'Junction',
 			[pc.lpn_ds_col_scaled || 'Scaled', pc.lpn_ds_col_scaled_tip],
 			[pc.lpn_ds_col_unscaled || 'Unscaled', pc.lpn_ds_col_unscaled_tip]
-		], { state: dsSortState.p, by: function (col) { dsSortBy('p', col); } });
+		].concat(set.wholeRun ? [pc.lpn_ds_col_hour || 'Step of lowest pressure'] : []), { state: dsSortState.p, by: function (col) { dsSortBy('p', col); } });
 		dsSortRows(set.pressures.slice(0, DS_ROWS), dsSortState.p, 'pressure').forEach(function (x) {
 			var tr = ffEl('tr', x.pressure < set.minPressure ? 'lpn-crit-impact' : null, null, body);
 			ffGotoLink(ffCell(tr, ''), 'node', x.id, labelPrefixFor('node', 'id') + x.id);
 			ffCell(tr, ffMaybeQty(x.pressure, 'lpn_u_pressure'));
 			ffCell(tr, ffMaybeQty(x.unscaled, 'lpn_u_pressure'));
+			if (set.wholeRun) { ffCell(tr, typeof x.t === 'number' ? dsTimeText(x.t) : FF_DASH); }
 		});
 		ffMoreLine(host, set.pressures.length - Math.min(DS_ROWS, set.pressures.length));
 		ffEl('div', 'lpn-ff-head', pc.lpn_ds_head_velocity || 'Highest velocities', host);
@@ -78824,7 +79826,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// and the refusal replaces that part's last answer (`which`), which no longer answers the
 	// question now on screen. See dsRefused.
 	function demandScaleCase(which) {
-		var pc = EngCalcs.pageConfig || {}, model, ids = null, isJ = {}, skipped = 0;
+		var pc = EngCalcs.pageConfig || {}, model, ids = null, isJ = {}, skipped = 0, whole;
 		function refuse(text) {
 			setNotice(text);
 			dsRefused = { which: which, text: text };
@@ -78833,8 +79835,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return null;
 		}
 		if (dsRefused && dsRefused.which === which) { dsRefused = null; }
+		whole = dsWhen() === 'run';
 		model = assembleModel();
-		fireFlowAtFrame(model);
+		// The whole run starts from the project's own starting state (Task 578).
+		if (!whole) { fireFlowAtFrame(model); }
 		model.nodes.forEach(function (n) { if (n.type === 'junction') { isJ[n.id] = true; } });
 		if (!Object.keys(isJ).length) {
 			return refuse(pc.lpn_ds_no_junctions || 'This project has no junctions yet, so there are no demands to scale.');
@@ -78852,7 +79856,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					.replace('{n}', String(skipped)));
 			}
 		}
-		return { model: model, ids: ids, engine: engineFor(model), time: dsNow() };
+		// One EPANET run per solve, the answer handed on whole: each node's lowest pressure over the
+		// run, and whether a tank emptied.
+		return { model: model, ids: ids, whole: whole, time: whole ? null : dsNow(),
+			engine: whole ? { epanet: true, solve: function (m) {
+				return EngCalcs.lpnEpanetRun(m, {}).then(function (run) { return EngCalcs.lpnEpsRunResult(run, m, { beforeEmpty: true }); });
+			} } : engineFor(model) };
 	}
 	function dsBegin() {
 		dsBusy = true;
@@ -78902,6 +79911,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}).then(function (set) {
 			if (c.ids) { set.scaledCount = c.ids.length; }
 			set.time = c.time;
+			if (c.whole) { set.wholeRun = true; }
 			dsRun = set;
 			dsEnd(before);
 			dsScrollTo('scale');
@@ -78925,6 +79935,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}).then(function (s) {
 			if (c.ids) { s.scaledCount = c.ids.length; }
 			s.time = c.time;
+			if (c.whole) { s.wholeRun = true; }
 			dsSearch = s;
 			dsEnd(before);
 			dsScrollTo('search');
@@ -82907,7 +83918,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			anchor: kind === 'node' ? nodeAt(x) : linkLabelMid(x),
 			leader: (L && L.style.display !== 'none') ? { x1: +L.getAttribute('x1'), y1: +L.getAttribute('y1'),
 				x2: +L.getAttribute('x2'), y2: +L.getAttribute('y2') } : null,
-			hidden: !!(h.text && h.text.style.visibility === 'hidden'), side: h.side, lside: x.lside, w: labelBoxWidth(h) };
+			hidden: !!(h.text && h.text.style.visibility === 'hidden'), side: h.side, lside: x.lside, w: labelBoxWidth(h),
+			inline: !!h.inline };
 	};
 	// Every command this page offers, with the id the usage log would carry for it (Task 815), for
 	// dev/lpn-spike/command-usage-browser-harness.js, which writes lib/lpn-commands.json from it and

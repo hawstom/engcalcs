@@ -2023,113 +2023,35 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <?php // The Find and replace chapter beyond its opening paragraphs (lpn_guide_text_find_popup):
       // renderGuideBoxes() copies this template into the box's entry. Tom, 2026-10-07: *"The Find
       // and Replace chapter says nothing about our query language (!!!)"*. ?>
-<template id="lpn_guide_more_lpn_find_popup"><dl>
-	<dt><?=$ec_lang['lpn_guide_find_query_term']?></dt><dd><?=$ec_lang['lpn_guide_find_query_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_find_examples_term']?></dt><dd><?=$ec_lang['lpn_guide_find_examples_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_find_results_term']?></dt><dd><?=$ec_lang['lpn_guide_find_results_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_find_replace_term']?></dt><dd><?=$ec_lang['lpn_guide_find_replace_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_find_notes_term']?></dt><dd><?=$ec_lang['lpn_guide_find_notes_def']?></dd>
-</dl></template>
+<template id="lpn_guide_more_lpn_find_popup"><?=ecGuideDl('find')?></template>
 <?php // The Scenarios chapter, after the Scenario manager's own help (lpn_sm_help) in its entry, and the
       // rest of the Scenario comparison chapter (Task 785). Same mechanism as the Find chapter above. ?>
-<template id="lpn_guide_more_lpn_sm_box"><dl>
-	<dt><?=$ec_lang['lpn_guide_scn_use_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_use_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_scn_open_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_open_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_scn_marks_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_marks_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_scn_make_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_make_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_scn_scope_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_scope_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_scn_example_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_example_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_scn_notes_term']?></dt><dd><?=$ec_lang['lpn_guide_scn_notes_def']?></dd>
-</dl></template>
+<template id="lpn_guide_more_lpn_sm_box"><?=ecGuideDl('scenarios')?></template>
 <?php // The Libraries chapter (Task 785), in the entry for the Libraries box. ?>
-<template id="lpn_guide_more_lpn_library_box"><dl>
-	<dt><?=$ec_lang['lpn_guide_lib_kinds_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_kinds_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_lib_refs_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_refs_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_lib_scn_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_scn_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_lib_ctl_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_ctl_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_lib_import_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_import_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_lib_example_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_example_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_lib_notes_term']?></dt><dd><?=$ec_lang['lpn_guide_lib_notes_def']?></dd>
-</dl></template>
+<template id="lpn_guide_more_lpn_library_box"><?=ecGuideDl('libraries')?></template>
 <?php // The Properties chapter (Task 785), in the entry for the Properties box. ?>
-<template id="lpn_guide_more_lpn_popup"><dl>
-	<dt><?=$ec_lang['lpn_guide_prop_open_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_open_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_prop_edit_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_edit_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_prop_id_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_id_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_prop_scn_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_scn_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_prop_multi_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_multi_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_prop_example_term']?></dt><dd><?=$ec_lang['lpn_guide_prop_example_def']?></dd>
-</dl></template>
+<template id="lpn_guide_more_lpn_popup"><?=ecGuideDl('properties')?></template>
 <?php // The Settings chapter (Task 785), in the entry for the Settings box. ?>
-<template id="lpn_guide_more_lpn_settings_box"><dl>
-	<dt><?=$ec_lang['lpn_guide_set_where_term']?></dt><dd><?=$ec_lang['lpn_guide_set_where_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_set_search_term']?></dt><dd><?=$ec_lang['lpn_guide_set_search_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_set_scn_term']?></dt><dd><?=$ec_lang['lpn_guide_set_scn_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_set_units_term']?></dt><dd><?=$ec_lang['lpn_guide_set_units_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_set_assets_term']?></dt><dd><?=$ec_lang['lpn_guide_set_assets_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_set_reset_term']?></dt><dd><?=$ec_lang['lpn_guide_set_reset_def']?></dd>
-</dl></template>
+<template id="lpn_guide_more_lpn_settings_box"><?=ecGuideDl('settings')?></template>
 <?php // The Fire flow analysis chapter (Task 785), in the entry for its box. ?>
-<template id="lpn_guide_more_lpn_ff_box"><dl>
-	<dt><?=$ec_lang['lpn_guide_ff_asks_term']?></dt><dd><?=$ec_lang['lpn_guide_ff_asks_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_ff_result_term']?></dt><dd><?=$ec_lang['lpn_guide_ff_result_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_ff_marks_term']?></dt><dd><?=$ec_lang['lpn_guide_ff_marks_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_ff_example_term']?></dt><dd><?=$ec_lang['lpn_guide_ff_example_def']?></dd>
-</dl></template>
+<template id="lpn_guide_more_lpn_ff_box"><?=ecGuideDl('fire-flow')?></template>
 <?php // The Criticality analysis chapter (Task 785). ?>
-<template id="lpn_guide_more_lpn_crit_box"><dl>
-	<dt><?=$ec_lang['lpn_guide_cr_case_term']?></dt><dd><?=$ec_lang['lpn_guide_cr_case_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_cr_dead_term']?></dt><dd><?=$ec_lang['lpn_guide_cr_dead_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_cr_example_term']?></dt><dd><?=$ec_lang['lpn_guide_cr_example_def']?></dd>
-</dl></template>
+<template id="lpn_guide_more_lpn_crit_box"><?=ecGuideDl('criticality')?></template>
 <?php // The Demand scaling chapter (Task 785). ?>
-<template id="lpn_guide_more_lpn_ds_box"><dl>
-	<dt><?=$ec_lang['lpn_guide_ds_run_term']?></dt><dd><?=$ec_lang['lpn_guide_ds_run_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_ds_find_term']?></dt><dd><?=$ec_lang['lpn_guide_ds_find_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_ds_scope_term']?></dt><dd><?=$ec_lang['lpn_guide_ds_scope_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_ds_example_term']?></dt><dd><?=$ec_lang['lpn_guide_ds_example_def']?></dd>
-</dl></template>
+<template id="lpn_guide_more_lpn_ds_box"><?=ecGuideDl('demand-scaling')?></template>
 <?php // The Pump energy chapter (Task 785). ?>
-<template id="lpn_guide_more_lpn_energy_box"><dl>
-	<dt><?=$ec_lang['lpn_guide_en_read_term']?></dt><dd><?=$ec_lang['lpn_guide_en_read_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_en_set_term']?></dt><dd><?=$ec_lang['lpn_guide_en_set_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_en_example_term']?></dt><dd><?=$ec_lang['lpn_guide_en_example_def']?></dd>
-</dl></template>
+<template id="lpn_guide_more_lpn_energy_box"><?=ecGuideDl('pump-energy')?></template>
 <?php // The Contour plot chapter (Task 785). ?>
-<template id="lpn_guide_more_lpn_contour_box"><dl>
-	<dt><?=$ec_lang['lpn_guide_ct_what_term']?></dt><dd><?=$ec_lang['lpn_guide_ct_what_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_ct_box_term']?></dt><dd><?=$ec_lang['lpn_guide_ct_box_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_ct_example_term']?></dt><dd><?=$ec_lang['lpn_guide_ct_example_def']?></dd>
-</dl></template>
+<template id="lpn_guide_more_lpn_contour_box"><?=ecGuideDl('contour-plot')?></template>
 <?php // The Run report, Status changes, and Full report chapters (Task 785). ?>
-<template id="lpn_guide_more_lpn_rptbox"><dl>
-	<dt><?=$ec_lang['lpn_guide_rr_what_term']?></dt><dd><?=$ec_lang['lpn_guide_rr_what_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_rr_example_term']?></dt><dd><?=$ec_lang['lpn_guide_rr_example_def']?></dd>
-</dl></template>
-<template id="lpn_guide_more_lpn_status_box"><dl>
-	<dt><?=$ec_lang['lpn_guide_st_what_term']?></dt><dd><?=$ec_lang['lpn_guide_st_what_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_st_example_term']?></dt><dd><?=$ec_lang['lpn_guide_st_example_def']?></dd>
-</dl></template>
-<template id="lpn_guide_more_lpn_full_box"><dl>
-	<dt><?=$ec_lang['lpn_guide_fr_what_term']?></dt><dd><?=$ec_lang['lpn_guide_fr_what_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_fr_example_term']?></dt><dd><?=$ec_lang['lpn_guide_fr_example_def']?></dd>
-</dl></template>
+<template id="lpn_guide_more_lpn_rptbox"><?=ecGuideDl('run-report')?></template>
+<template id="lpn_guide_more_lpn_status_box"><?=ecGuideDl('status-changes')?></template>
+<template id="lpn_guide_more_lpn_full_box"><?=ecGuideDl('full-report')?></template>
 <?php // The user manual's own entry (Task 785). ?>
-<template id="lpn_guide_more_lpn_hotkeys_popup"><dl>
-	<dt><?=$ec_lang['lpn_guide_own_example_term']?></dt><dd><?=$ec_lang['lpn_guide_own_example_def']?></dd>
-</dl></template>
+<template id="lpn_guide_more_lpn_hotkeys_popup"><?=ecGuideDl('user-manual')?></template>
 <?php // The Calibration chapter (Task 785). ?>
-<template id="lpn_guide_more_lpn_calib_box"><dl>
-	<dt><?=$ec_lang['lpn_guide_cal_what_term']?></dt><dd><?=$ec_lang['lpn_guide_cal_what_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_cal_file_term']?></dt><dd><?=$ec_lang['lpn_guide_cal_file_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_cal_example_term']?></dt><dd><?=$ec_lang['lpn_guide_cal_example_def']?></dd>
-</dl></template>
-<template id="lpn_guide_more_lpn_scncmp_box"><dl>
-	<dt><?=$ec_lang['lpn_guide_cmp_cols_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_cols_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_cmp_run_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_run_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_cmp_byasset_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_byasset_def']?></dd>
-	<dt><?=$ec_lang['lpn_guide_cmp_notes_term']?></dt><dd><?=$ec_lang['lpn_guide_cmp_notes_def']?></dd>
-</dl></template>
+<template id="lpn_guide_more_lpn_calib_box"><?=ecGuideDl('calibration')?></template>
+<template id="lpn_guide_more_lpn_scncmp_box"><?=ecGuideDl('scenario-comparison')?></template>
 </div>
 </div>
 	</div>
@@ -3601,6 +3523,63 @@ EngCalcs.pageConfig = {
 	lpn_ff_stop: <?=json_encode($ec_lang['lpn_ff_stop'])?>,
 	lpn_ff_clear: <?=json_encode($ec_lang['lpn_ff_clear'])?>,
 	lpn_ff_working: <?=json_encode($ec_lang['lpn_ff_working'])?>,
+	lpn_when: <?=json_encode($ec_lang['lpn_when'])?>,
+	lpn_when_now: <?=json_encode($ec_lang['lpn_when_now'])?>,
+	lpn_when_hour: <?=json_encode($ec_lang['lpn_when_hour'])?>,
+	lpn_when_minp: <?=json_encode($ec_lang['lpn_when_minp'])?>,
+	lpn_when_all: <?=json_encode($ec_lang['lpn_when_all'])?>,
+	lpn_when_step: <?=json_encode($ec_lang['lpn_when_step'])?>,
+	lpn_when_run: <?=json_encode($ec_lang['lpn_when_run'])?>,
+	lpn_dur_not_back_tank: <?=json_encode($ec_lang['lpn_dur_not_back_tank'])?>,
+	lpn_dur_not_back_junction: <?=json_encode($ec_lang['lpn_dur_not_back_junction'])?>,
+	lpn_dur_col_margin: <?=json_encode($ec_lang['lpn_dur_col_margin'])?>,
+	lpn_dur_col_drop: <?=json_encode($ec_lang['lpn_dur_col_drop'])?>,
+	lpn_dur_junction: <?=json_encode($ec_lang['lpn_dur_junction'])?>,
+	lpn_dur_junction_none: <?=json_encode($ec_lang['lpn_dur_junction_none'])?>,
+	lpn_dur_junction_many: <?=json_encode($ec_lang['lpn_dur_junction_many'])?>,
+	lpn_dur_shortfall: <?=json_encode($ec_lang['lpn_dur_shortfall'])?>,
+	lpn_dur_option: <?=json_encode($ec_lang['lpn_dur_option'])?>,
+	lpn_dur_start: <?=json_encode($ec_lang['lpn_dur_start'])?>,
+	lpn_dur_length: <?=json_encode($ec_lang['lpn_dur_length'])?>,
+	lpn_dur_length_tip: <?=json_encode($ec_lang['lpn_dur_length_tip'])?>,
+	lpn_dur_no_junction: <?=json_encode($ec_lang['lpn_dur_no_junction'])?>,
+	lpn_dur_bad_time: <?=json_encode($ec_lang['lpn_dur_bad_time'])?>,
+	lpn_dur_head: <?=json_encode($ec_lang['lpn_dur_head'])?>,
+	lpn_dur_holds: <?=json_encode($ec_lang['lpn_dur_holds'])?>,
+	lpn_dur_fails: <?=json_encode($ec_lang['lpn_dur_fails'])?>,
+	lpn_dur_lowest: <?=json_encode($ec_lang['lpn_dur_lowest'])?>,
+	lpn_dur_no_empty: <?=json_encode($ec_lang['lpn_dur_no_empty'])?>,
+	lpn_dur_empties: <?=json_encode($ec_lang['lpn_dur_empties'])?>,
+	lpn_dur_recovers: <?=json_encode($ec_lang['lpn_dur_recovers'])?>,
+	lpn_dur_recovery_to_end: <?=json_encode($ec_lang['lpn_dur_recovery_to_end'])?>,
+	lpn_dur_recovery_cut: <?=json_encode($ec_lang['lpn_dur_recovery_cut'])?>,
+	lpn_dur_col_fire: <?=json_encode($ec_lang['lpn_dur_col_fire'])?>,
+	lpn_dur_col_pressure: <?=json_encode($ec_lang['lpn_dur_col_pressure'])?>,
+	lpn_dur_col_nofire: <?=json_encode($ec_lang['lpn_dur_col_nofire'])?>,
+	lpn_dur_col_low: <?=json_encode($ec_lang['lpn_dur_col_low'])?>,
+	lpn_dur_col_end: <?=json_encode($ec_lang['lpn_dur_col_end'])?>,
+	lpn_dur_col_end_nofire: <?=json_encode($ec_lang['lpn_dur_col_end_nofire'])?>,
+	lpn_at_time: <?=json_encode($ec_lang['lpn_at_time'])?>,
+	lpn_crit_col_lowest: <?=json_encode($ec_lang['lpn_crit_col_lowest'])?>,
+	lpn_crit_col_hours: <?=json_encode($ec_lang['lpn_crit_col_hours'])?>,
+	lpn_crit_col_empty: <?=json_encode($ec_lang['lpn_crit_col_empty'])?>,
+	lpn_crit_run_note: <?=json_encode($ec_lang['lpn_crit_run_note'])?>,
+	lpn_ds_run_note: <?=json_encode($ec_lang['lpn_ds_run_note'])?>,
+	lpn_ds_limit_at: <?=json_encode($ec_lang['lpn_ds_limit_at'])?>,
+	lpn_ds_empties_at: <?=json_encode($ec_lang['lpn_ds_empties_at'])?>,
+	lpn_ds_lowest_at_time: <?=json_encode($ec_lang['lpn_ds_lowest_at_time'])?>,
+	lpn_eps_working: <?=json_encode($ec_lang['lpn_eps_working'])?>,
+	lpn_ff_working_steps: <?=json_encode($ec_lang['lpn_ff_working_steps'])?>,
+	lpn_ff_col_hour: <?=json_encode($ec_lang['lpn_ff_col_hour'])?>,
+	lpn_ds_col_hour: <?=json_encode($ec_lang['lpn_ds_col_hour'])?>,
+	lpn_ff_no_steps: <?=json_encode($ec_lang['lpn_ff_no_steps'])?>,
+	lpn_ff_tank_empties: <?=json_encode($ec_lang['lpn_ff_tank_empties'])?>,
+	lpn_crit_col_lowest_tip: <?=json_encode($ec_lang['lpn_crit_col_lowest_tip'])?>,
+	lpn_crit_empty_note: <?=json_encode($ec_lang['lpn_crit_empty_note'])?>,
+	lpn_crit_stopped_at: <?=json_encode($ec_lang['lpn_crit_stopped_at'])?>,
+	lpn_ff_at_step: <?=json_encode($ec_lang['lpn_ff_at_step'])?>,
+	lpn_ff_at_minp: <?=json_encode($ec_lang['lpn_ff_at_minp'])?>,
+	lpn_ff_at_all: <?=json_encode($ec_lang['lpn_ff_at_all'])?>,
 	lpn_ff_stopped: <?=json_encode($ec_lang['lpn_ff_stopped'])?>,
 	lpn_ff_cost: <?=json_encode($ec_lang['lpn_ff_cost'])?>,
 	lpn_ff_stale: <?=json_encode($ec_lang['lpn_ff_stale'])?>,
@@ -3617,6 +3596,7 @@ EngCalcs.pageConfig = {
 	lpn_crit_minpressure_tip: <?=json_encode($ec_lang['lpn_crit_minpressure_tip'])?>,
 	lpn_crit_col_asset: <?=json_encode($ec_lang['lpn_crit_col_asset'])?>,
 	lpn_crit_col_unserved: <?=json_encode($ec_lang['lpn_crit_col_unserved'])?>,
+	lpn_crit_col_unserved_peak: <?=json_encode($ec_lang['lpn_crit_col_unserved_peak'])?>,
 	lpn_crit_col_cutoff: <?=json_encode($ec_lang['lpn_crit_col_cutoff'])?>,
 	lpn_crit_col_below: <?=json_encode($ec_lang['lpn_crit_col_below'])?>,
 	lpn_crit_summary: <?=json_encode($ec_lang['lpn_crit_summary'])?>,
@@ -4747,6 +4727,9 @@ EngCalcs.pageConfig = {
       // looped-network.js for the same reason; absent, the Run button does nothing. ?>
 <script src="/engcalcs/js/lpn-criticality.js?v=<?=filemtime(__DIR__.'/js/lpn-criticality.js')?>"></script>
 <script src="/engcalcs/js/lpn-demandscale.js?v=<?=filemtime(__DIR__.'/js/lpn-demandscale.js')?>"></script>
+<?php // A fire for a stated duration inside a run (Task 578). Pure, BEFORE looped-network.js; absent, the
+      // box does not offer it. ?>
+<script src="/engcalcs/js/lpn-durfire.js?v=<?=filemtime(__DIR__.'/js/lpn-durfire.js')?>"></script>
 <?php // A table as TSV, CSV or ODS (Tom, 2026-10-06). Pure, no DOM; BEFORE looped-network.js, whose Tables
       // pane menu calls EngCalcs.lpnTableCsv() and lpnTableOds(). ?>
 <script src="/engcalcs/js/lpn-tablefile.js?v=<?=filemtime(__DIR__.'/js/lpn-tablefile.js')?>"></script>

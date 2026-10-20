@@ -48,9 +48,12 @@ function report(ok, label, detail) {
 	const { ROOT, loadLoopedNetwork, setUnitSet, settleEpanet, warmEpanet } = stub;
 	const Collide = require(ROOT + 'js/lpn-collide.js').lpnCollide;
 
-	let lastFirstFit = null, lastRing = null, lastObs = null;
+	let lastFirstFit = null, lastRing = null, lastObs = null, lastLevel = null;
 	const realFF = Collide.placeLabelsFirstFit;
+	// The strict call is the level pipe labels' (Task 812), placed after the node labels: kept
+	// apart, so it neither replaces the node labels' answer nor goes uncounted.
 	Collide.placeLabelsFirstFit = function (labels, obs, opts) {
+		if (opts && opts.strict) { return (lastLevel = realFF.call(this, labels, obs, opts)); }
 		return (lastFirstFit = realFF.call(this, labels, obs, opts));
 	};
 	const realRepair = Collide.repairCrossingGangs;
@@ -69,7 +72,7 @@ function report(ok, label, detail) {
 	await warmEpanet();
 
 	for (const sc of SCENES) {
-		lastFirstFit = lastRing = lastObs = null;
+		lastFirstFit = lastRing = lastObs = lastLevel = null;
 		const L = loadLoopedNetwork(
 			"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 			"\t\t\tworld = el('g', {}, svg);\n" +
@@ -134,11 +137,12 @@ function report(ok, label, detail) {
 		function shown(h) { return !!h && !!h.text && h.text.style.visibility !== 'hidden'; }
 		function drawnLabels() {
 			const out = [];
-			[lastFirstFit, lastRing].forEach(function (set) {
+			[lastFirstFit, lastRing, lastLevel].forEach(function (set) {
 				(set || []).forEach(function (r) {
 					if (r.dropped || !(r.box || (r.boxes && r.boxes.length))) { return; }
 					const h = r.id.charAt(0) === 'n' ? nodeEls[r.id.slice(2)] : linkEls[r.id.slice(2)];
 					if (!shown(h)) { return; }
+					if ((set === lastLevel) !== !!(r.id.charAt(0) === 'l' && h.levelBeside)) { return; }
 					out.push({ id: r.id, boxes: (r.boxes && r.boxes.length) ? r.boxes : [r.box] });
 				});
 			});
@@ -148,7 +152,7 @@ function report(ok, label, detail) {
 				(byLink[b.linkOwner] = byLink[b.linkOwner] || []).push(b);
 			});
 			Object.keys(byLink).forEach(function (id) {
-				if (shown(linkEls[id])) { out.push({ id: 'l:' + id, boxes: byLink[id] }); }
+				if (shown(linkEls[id]) && !linkEls[id].levelBeside) { out.push({ id: 'l:' + id, boxes: byLink[id] }); }
 			});
 			return out;
 		}

@@ -66,7 +66,7 @@ the block.
 
 ## 100 — Next.
 
-- 100|733| **Grow the native solver, in phases, to everything EPANET's solves.** **PHASE 1 MERGED 2026-10-17** (`feat/native-valves`): PRV, PSV, FCV solve natively, matching EPANET 2.3.5 within 0.8 mm head (`native-valve-harness.js`); PBV and GPV still route to EPANET. Next: PBV/GPV, then EPS. Tom, 2026-09-26
+- 100|733| **Grow the native solver, in phases, to everything EPANET's solves.** **PHASE 1 MERGED 2026-10-17** (`feat/native-valves`): PRV, PSV, FCV solve natively, matching EPANET 2.3.5 within 0.8 mm head (`native-valve-harness.js`); PBV and GPV merged 2026-10-18. Next: EPS. Tom, 2026-09-26
   **PROMOTED TO 100 by Tom, 2026-10-17, as a long-term task: slow and careful.** Each phase is its own branch, matched against EPANET 2.3.5 on every shipped example before it merges.
   **PROMOTED TO 75 by Tom, 2026-10-14.**
   (R-325): *"it would be fun and maybe wise ... to gradually, in phases, build out our native solver
@@ -150,6 +150,7 @@ the block.
   - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
     `labelPass` inside `buildDom` and a label-measurement count.
 - 100|749| **Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.**
+  **Stay on the right side of the licence** (Tom, 2026-10-20, having read it: *"Reverse enginering is prohibited ... Let's stay right."*). The reader is built only from openly licensed sample files and public documentation; nobody decompiles or probes Bentley's software, and his WaterGEMS is used only as an ordinary user would (does a file we wrote open, with the same results?).
   Tom, 2026-10-17: *"Proceed with the .sqllite branch. No merging it until it's done. This is another long project."* It lives on `feat/sqlite-reader` until then.
   Tom, 2026-10-17: *"I am working on getting us at least one .sqllite example in case you can't find or make one."*
   **PROMOTED TO 100 by Tom, 2026-10-14. Samples found 2026-10-17** (`dev/agents/market-researcher/wtg-samples.md`): Zenodo 7162154 (CC BY 4.0) has WaterGEMS `.wtg.sqlite` files, one with a child scenario that overrides nothing, and an `.inp` of the same model; TSNet (MIT) has two Base-only ones. **Still missing:** a child scenario that overrides a value, with its `.inp`; Tom may make one with a free EWB Bentley licence. Reader foundation on `feat/sqlite-reader`.
@@ -231,15 +232,13 @@ the block.
   - `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and the shed's victims rather than
     the count, so a model change that oscillates is caught instead of averaged away -- which is how
     the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
-- 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
-  Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
-  kept here so they are not lost in a closed block.
-  - **Picking an EPS frame.** The sweep answers one instant. A project with a clock has many, and
-    the honest question is which one a fire flow is checked at -- maximum day is the convention, and
-    the page has no way to say "run the sweep at hour 14".
-  - **The Run concept, in Tom's own sketch (2026-08-27):** *"a Run names a scenario among its
-    parameters."* A named Run would carry the scenario, the required flow, the residual and the
-    frame together, so a report says what it was a report OF.
+- 75|578| **Fire flow: the Run concept, extracted from 530.**
+  The EPS frame is built (Tom, 2026-10-19: *"why our fire flow analysis can't do an entire EPS"*): fire flow,
+  criticality and demand scaling each choose the step on screen or the whole run; see
+  `dev/lpn-spike/eps-analysis-harness.js`. What remains is the Run concept, in Tom's own sketch
+  (2026-08-27): *"a Run names a scenario among its parameters."* A named Run would carry the scenario,
+  the required flow, the residual and the frame together, so a report says what it was a report OF.
+  The duration fire is built (branch `feat/duration-fire`): a fire at one junction for a stated start and duration, run through the EPS, under Reporting step tested.
 - 75|623| **File loss judged only by people whose files are throwaway.**
   **TOM, 2026-09-18: *"I don't see anything actionable. Describe better or remove the task."* He is
   right and the [H] tag is struck: this was never a decision waiting on him, it was a STANDING
@@ -344,8 +343,6 @@ the block.
   what remains.
 - 75|813| **Pre-processing the network for label placement: methods, benefits, results.**
   Tom, 2026-10-17: *"continue our project toward inquiry about the hows/methods and whys/benefits/results of pre-processing the network for label placement efficiency."* Design and first experiment: `dev/label-trials/preprocessing-inquiry.md` on `docs/label-port`.
-- 75|816| **Give each User Guide chapter its own address in each language.**
-  Tom, 2026-10-17: *"Is the user manual crawlable and indexable by Google? And if so, how soon would we expect to be able to ask Google or Gemini or even Claude, Perplexity, Deepseek, Grok, or ChatGPT how scenarios work in EPANET++?"* Crawlable today, but the whole guide sits inside the app page, one address per language, so a search about one topic has no page to land on. A chapter page per language fixes that; each new page owes the parent site's `sitemap.xml` a regenerate (Tom, 2026-10-17: *"Yes, add it at 75."*).
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
@@ -358,6 +355,8 @@ the block.
     is a small always-on overlay, a viewport box, and — probably — click-to-go-there.
   - **It is a natural companion to the phone work**, where the screen is small enough that being lost
     is easy, and it is exactly the moment the label passes are already hiding text.
+- 75|818| **An MCP server, so an AI agent can run a network.**
+  Tom, 2026-10-20: *"Shall I add an MCP task to the roadmap at 75? Yes."* The solver, `.inp` reader and geometry already run without a browser, so it is mostly packaging. Tools: open an `.inp` and run it; fire flow, criticality, demand scaling; an SVG map and a plain report. The other half: a link that opens the network in the app with the answer on screen.
 - 50|217| **A suite-owned, multilingual Manning's n table, built from primary sources.** Tom,
   2026-08-05: *"No collision, but I am not into ownership/maintenance. If there is any viable way to
   outsource, I prefer it. But if we can add multilingual value with an n table, I'm game. Let's just
