@@ -80779,7 +80779,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		}
 		var flowTip = pc.lpn_scnres_flow_tip ||
-			'The sign of a flow is the solver\'s internal direction sign: positive runs from the From node to the To node, negative the reverse. It has no use outside this table except to show whether a flow changed direction between scenarios.';
+			'The sign of a flow is the solver\'s internal direction sign. It has no use outside the solver except to show here whether a flow changed direction between scenarios.';
 		var hasFlow = t.kind.group === 'link' && t.cols.some(function (c) { return c.q === 'flow'; });
 		body = ffTable(sec, t.heads.map(function (h, i) {
 			return (hasFlow && i > 0 && t.cols[i - 1].q === 'flow') ? [h, flowTip] : h;
