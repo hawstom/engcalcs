@@ -242,7 +242,7 @@ async function sweepSelected(ids, when, extra) {
 	}
 	const at = await passes(ds.multiplier), above = await passes(+(ds.multiplier + ds.step).toFixed(10));
 	check(at.ok, `at the answer (${ds.multiplier}) an independent run holds 20 psi at every step (lowest ${(at.lo / 0.703070).toFixed(2)} psi at ${EC.lpnFormatTime(at.at)})`);
-	check(!above.ok, `one step above it fails (${above.empty ? 'a tank empties' : (above.lo / 0.703070).toFixed(2) + ' psi at ' + EC.lpnFormatTime(above.at)})`);
+	check(!above.ok, `one step above it fails (${above.empty ? 'the tank runs dry' : (above.lo / 0.703070).toFixed(2) + ' psi at ' + EC.lpnFormatTime(above.at)})`);
 	check(ds.limit && (above.empty ? ds.limit.t === above.empty.t : ds.limit.t === above.at), `the limiting reporting step is ${ds.limit && EC.lpnFormatTime(ds.limit.t)}`);
 
 	// the single-instant answers at each reporting step, on the same frames

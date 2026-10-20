@@ -231,15 +231,12 @@ the block.
   - `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and the shed's victims rather than
     the count, so a model change that oscillates is caught instead of averaged away -- which is how
     the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
-- 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
-  Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
-  kept here so they are not lost in a closed block.
-  - **Picking an EPS frame.** The sweep answers one instant. A project with a clock has many, and
-    the honest question is which one a fire flow is checked at -- maximum day is the convention, and
-    the page has no way to say "run the sweep at hour 14".
-  - **The Run concept, in Tom's own sketch (2026-08-27):** *"a Run names a scenario among its
-    parameters."* A named Run would carry the scenario, the required flow, the residual and the
-    frame together, so a report says what it was a report OF.
+- 75|578| **Fire flow: the Run concept, extracted from 530.**
+  The EPS frame is built (Tom, 2026-10-19: *"why our fire flow analysis can't do an entire EPS"*): fire flow,
+  criticality and demand scaling each choose the step on screen or the whole run; see
+  `dev/lpn-spike/eps-analysis-harness.js`. What remains is the Run concept, in Tom's own sketch
+  (2026-08-27): *"a Run names a scenario among its parameters."* A named Run would carry the scenario,
+  the required flow, the residual and the frame together, so a report says what it was a report OF.
 - 75|623| **File loss judged only by people whose files are throwaway.**
   **TOM, 2026-09-18: *"I don't see anything actionable. Describe better or remove the task."* He is
   right and the [H] tag is struck: this was never a decision waiting on him, it was a STANDING

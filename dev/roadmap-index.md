@@ -22,7 +22,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 ## 75 — Soon (10)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
-- Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
+- Task 578 — Fire flow: the Run concept, extracted from 530.
 - Task 623 — File loss judged only by people whose files are throwaway.
 - Task 676 — Watch the sites, and send a derived weekly report.
 - Task 720 — Background layers from a GIS server.

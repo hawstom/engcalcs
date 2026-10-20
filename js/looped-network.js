@@ -76400,9 +76400,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//   * **THE LOSS ACCOUNTING IS STATED IN THE INTERFACE.** The demand goes on the junction
 	//     itself, which is the profession's default and what both inspectable tools do, so the box
 	//     says out loud that no hydrant, lateral or fitting loss is in these numbers.
-	//   * **ONE STEADY CONDITION.** US practice loads fire flow onto maximum-day demand and reads
-	//     one steady state. Where this project has a clock, the box says which condition it tested;
-	//     picking a frame is a later increment and nothing here pretends to do it.
+	//   * **A STEADY CONDITION, CHOSEN.** US practice loads fire flow onto maximum-day demand and reads
+	//     one steady state. Where this project has a clock, the box tests the step on screen, a chosen
+	//     reporting step, the step of lowest pressure, or every step with each junction's worst
+	//     (Task 578); the report says which. Each step is built by analysisModelAt().
 	//
 	// AND IT NEVER TOUCHES THE DOCUMENT. The engine solves from a copy whose nodes are copies, and
 	// the answers live in `fireFlowRun` beside the document -- not on an element, so setProp() and
@@ -78073,10 +78074,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// the project; this one is a question asked of the network on screen, on a copy, and lives for the
 	// page load. It multiplies on top of the scenario's, and the box's tip says so.
 	//
-	// **ONE INSTANT, THE ONE ON SCREEN**, for an extended-period project as for the siblings: its
-	// demands at that time, its tank levels and its link statuses from the run. A peak step chosen
-	// for the user would need a run to know the tank levels at it, and would be a second idea of
-	// "the condition tested" beside fire flow's and criticality's. Move the clock to the peak first.
+	// **THE STEP ON SCREEN, OR THE WHOLE RUN** (Task 578), for an extended-period project as for the
+	// siblings. The step on screen is its demands at that time, its tank levels and its link statuses
+	// from the run. The whole run scales the base demands and judges every reporting step; a tank that
+	// empties fails the scale.
 	//
 	// **THE MINIMUM PRESSURE IS FIRE FLOW'S "LOWEST PRESSURE ALLOWED ELSEWHERE"**, shared exactly as
 	// criticality shares it: one fact about the utility, one box value.

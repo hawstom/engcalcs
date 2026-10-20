@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**48 still to read on master**, of 56 untranslated keys, of 3075 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**70 still to read on master**, of 78 untranslated keys, of 3097 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,13 +29,43 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (56, 48 to read @@ NEEDS RULING)
+## lpn_  (78, 70 to read @@ NEEDS RULING)
 
+- **`lpn_at_time`**
+  > {value} at {time}
+  @@ NEEDS RULING
+- **`lpn_crit_col_empty`**
+  > Tank empties
+  @@ NEEDS RULING
+- **`lpn_crit_col_hours`**
+  > Hours below minimum
+  @@ NEEDS RULING
+- **`lpn_crit_col_lowest`**
+  > Lowest pressure
+  @@ NEEDS RULING
+- **`lpn_crit_run_note`**
+  > Each outage was run over the whole simulation ({n} reporting steps).
+  @@ NEEDS RULING
 - **`lpn_diag_gpv_curve_order`**
   > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
   @@ NEEDS RULING
 - **`lpn_diag_valve_conflict`**
   > These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:
+  @@ NEEDS RULING
+- **`lpn_ds_empties_at`**
+  > ⚠ At a demand scale of {m}, a tank empties at {time}.
+  @@ NEEDS RULING
+- **`lpn_ds_limit_at`**
+  > Limiting reporting step: {time}.
+  @@ NEEDS RULING
+- **`lpn_ds_lowest_at_time`**
+  > At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}, at {time}.
+  @@ NEEDS RULING
+- **`lpn_ds_run_note`**
+  > Judged over the whole run, at every reporting step.
+  @@ NEEDS RULING
+- **`lpn_eps_working`**
+  > Running the extended-period simulation.
   @@ NEEDS RULING
 - **`lpn_ex_net1_scn_desc`**
   > Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.
@@ -58,6 +88,21 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_export_leaves_alternatives`**
   > The alternatives stored in this project are not in the file.
   _Ruled 2026-10-18: GeoJSON alternatives string is approved._
+- **`lpn_ff_at_all`**
+  > Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.
+  @@ NEEDS RULING
+- **`lpn_ff_at_minp`**
+  > Tested at {time}, the reporting step with the lowest pressure among the junctions tested.
+  @@ NEEDS RULING
+- **`lpn_ff_at_step`**
+  > Tested at reporting step {time}.
+  @@ NEEDS RULING
+- **`lpn_ff_col_hour`**
+  > Lowest at
+  @@ NEEDS RULING
+- **`lpn_ff_working_steps`**
+  > Working: reporting step {step} of {steps}, junction {done} of {total}.
+  @@ NEEDS RULING
 - **`lpn_file_export_item_msx`**
   > EPANET-MSX file…
   @@ NEEDS RULING
@@ -199,12 +244,33 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_survey_added_scenario`**
   > The nodes were added to {scenario}. In Base they are inactive.
   _Ruled 2026-10-18: I approved all._
+- **`lpn_when`**
+  > Time step tested
+  @@ NEEDS RULING
+- **`lpn_when_all`**
+  > Every reporting step, worst case
+  @@ NEEDS RULING
+- **`lpn_when_hour`**
+  > A chosen reporting step
+  @@ NEEDS RULING
+- **`lpn_when_minp`**
+  > The reporting step of lowest pressure
+  @@ NEEDS RULING
+- **`lpn_when_now`**
+  > The time step on screen
+  @@ NEEDS RULING
+- **`lpn_when_run`**
+  > The whole run
+  @@ NEEDS RULING
+- **`lpn_when_step`**
+  > Reporting step
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**55 still to read**, of 59 new keys across 7 unmerged branch(es).
+**110 still to read**, of 114 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -215,17 +281,179 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/roadmap-1018 (`23cec294a`) — adds no English strings
-
 ### feat/desktop (`baba0f04d`) — adds no English strings
+
+### feat/eps-analysis (`9c5642345`) — adds no English strings
+
+### feat/guide-page (`a465c30ba`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_guide_page_desc`**
+  > The user manual for the pipe network modeling application, one page for each chapter, from the map and the Properties box to scenarios, fire flow analysis, and criticality analysis.
+  @@ NEEDS RULING
+- **`lpn_guide_page_open`**
+  > Open the application
+  @@ NEEDS RULING
 
 ### feat/label-beside (`8676cd1be`) — already merged into feat/label-form; its strings are listed there
 
-### feat/label-form (`d05fdb069`) — adds no English strings
+### feat/label-form (`d05fdb069`) — already merged into feat/label-leader; its strings are listed there
 
-### feat/msx (`04faa760a`) — adds no English strings
+### feat/label-leader (`ce56b8cf9`) — adds no English strings
 
-### feat/sqlite-reader (`9470877a6`) — 49 new, 49 to read @@ NEEDS RULING
+### feat/network-update (`4275a23ae`) — 50 new, 50 to read @@ NEEDS RULING
+
+- **`lpn_inpup_ask_title`**
+  > Import {file}
+  @@ NEEDS RULING
+- **`lpn_inpup_base_note`**
+  > Base. A scenario that holds its own value for an asset keeps it; the others take the new value.
+  @@ NEEDS RULING
+- **`lpn_inpup_blank`**
+  > blank
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_base`**
+  > Base
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_new`**
+  > A new project
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_project`**
+  > This project, {project}
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_scenario`**
+  > {scenario}, open now
+  @@ NEEDS RULING
+- **`lpn_inpup_counts`**
+  > Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).
+  @@ NEEDS RULING
+- **`lpn_inpup_failed`**
+  > The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}
+  @@ NEEDS RULING
+- **`lpn_inpup_h_added`**
+  > Assets added
+  @@ NEEDS RULING
+- **`lpn_inpup_h_changed`**
+  > Values changed
+  @@ NEEDS RULING
+- **`lpn_inpup_h_kept`**
+  > Kept, not in the file
+  @@ NEEDS RULING
+- **`lpn_inpup_h_na`**
+  > Not applied
+  @@ NEEDS RULING
+- **`lpn_inpup_heading`**
+  > Imported {file} into {scenario} of {project}
+  @@ NEEDS RULING
+- **`lpn_inpup_how`**
+  > In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.
+  @@ NEEDS RULING
+- **`lpn_inpup_i_connections`**
+  > connections
+  @@ NEEDS RULING
+- **`lpn_inpup_i_controls`**
+  > controls
+  @@ NEEDS RULING
+- **`lpn_inpup_i_curves`**
+  > curves
+  @@ NEEDS RULING
+- **`lpn_inpup_i_descriptions`**
+  > descriptions
+  @@ NEEDS RULING
+- **`lpn_inpup_i_options`**
+  > options
+  @@ NEEDS RULING
+- **`lpn_inpup_i_patterns`**
+  > patterns
+  @@ NEEDS RULING
+- **`lpn_inpup_i_positions`**
+  > positions of existing assets
+  @@ NEEDS RULING
+- **`lpn_inpup_i_rules`**
+  > rules
+  @@ NEEDS RULING
+- **`lpn_inpup_lead`**
+  > An EPANET file holds one set of values and no scenarios. Choose where to put them.
+  @@ NEEDS RULING
+- **`lpn_inpup_method_row`**
+  > Head loss formula: the file uses {file} and this project uses {project}.
+  @@ NEEDS RULING
+- **`lpn_inpup_more`**
+  > {n} more
+  @@ NEEDS RULING
+- **`lpn_inpup_na_cv`**
+  > A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_na_general`**
+  > The file also holds {items}. They were not applied.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_geo`**
+  > Assets only in the file ({n}) were not added, because the file and this project use different coordinate systems.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_msx`**
+  > The .msx file chosen with this file was not read. To attach it to this project, choose it alone.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_owned`**
+  > The pipe type states some values of these pipes, so those values were not changed: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_na_refs`**
+  > These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_na_roughness`**
+  > Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_type`**
+  > The file states a different type for these assets, so none of their values were changed: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_nothing`**
+  > Every value in the file that matches an asset here is already the same in {scenario}.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_heading`**
+  > Nothing was changed in {project}.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_lead`**
+  > The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_lead_both`**
+  > The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_lead_formula`**
+  > The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.
+  @@ NEEDS RULING
+- **`lpn_inpup_row`**
+  > {id}, {property}: {old} to {new}
+  @@ NEEDS RULING
+- **`lpn_inpup_status`**
+  > Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).
+  @@ NEEDS RULING
+- **`lpn_inpup_t_junction`**
+  > Junction
+  @@ NEEDS RULING
+- **`lpn_inpup_t_pipe`**
+  > Pipe
+  @@ NEEDS RULING
+- **`lpn_inpup_t_pump`**
+  > Pump
+  @@ NEEDS RULING
+- **`lpn_inpup_t_reservoir`**
+  > Reservoir
+  @@ NEEDS RULING
+- **`lpn_inpup_t_tank`**
+  > Tank
+  @@ NEEDS RULING
+- **`lpn_inpup_t_valve`**
+  > Valve
+  @@ NEEDS RULING
+- **`lpn_inpup_title`**
+  > Update from EPANET file
+  @@ NEEDS RULING
+- **`lpn_inpup_undo`**
+  > Undo reverses all of it in one step.
+  @@ NEEDS RULING
+- **`lpn_inpup_unit_row`**
+  > {family}: the file uses {file} and this project uses {project}.
+  @@ NEEDS RULING
+
+### feat/sqlite-reader (`75ed1031f`) — 51 new, 51 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
   > WaterCAD or WaterGEMS model…
@@ -258,7 +486,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > The database stores every number in US customary units (feet, cubic feet per second, psi). Each number was converted once to the project's units and rounded to the shortest decimal within 5 parts in 100 million, which gives back the number as it was entered.
   @@ NEEDS RULING
 - **`lpn_wtg_note_customer_demand`**
-  > Not imported: the customer demands and unit demands at these junctions. Their base demands were imported.
+  > Not imported: the customer demands at these junctions. Their base demands were imported.
   @@ NEEDS RULING
 - **`lpn_wtg_note_cv_closed`**
   > These pipes have a check valve and start closed. They were imported closed.
@@ -271,6 +499,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_wtg_note_emitter_unread`**
   > Not imported: the emitter coefficients of these junctions, because the unit they are stored in is not yet confirmed.
+  @@ NEEDS RULING
+- **`lpn_wtg_note_fireflow`**
+  > Not imported: the fire flow settings of the model. A needed fire flow stated at a junction was imported as that junction's Required fire flow; enter the rest in the fire flow window.
   @@ NEEDS RULING
 - **`lpn_wtg_note_gpv_curve`**
   > These general purpose valves have no head loss curve in the file.
@@ -350,6 +581,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_note_unit_assumed`**
   > The file does not state the stored unit of these fields, so the unit every example file states was assumed.
   @@ NEEDS RULING
+- **`lpn_wtg_note_unit_demand`**
+  > The demand at these junctions comes from unit demand loads. The flow of each load was imported as a demand; the loading units and the unit load were not.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_unit_unknown`**
   > Not converted: these fields, whose stored unit (shown in parentheses) this page does not know.
   @@ NEEDS RULING
@@ -406,4 +640,10 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_theme_space`**
   > Space
+  @@ NEEDS RULING
+
+### fix/scenario-flow-sign (`032070dca`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_scnres_flow_tip`**
+  > The sign of a flow is the solver's internal direction sign: positive runs from the From node to the To node, negative the reverse. It has no use outside this table except to show whether a flow changed direction between scenarios.
   @@ NEEDS RULING
