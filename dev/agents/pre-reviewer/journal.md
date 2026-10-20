@@ -4524,3 +4524,16 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED (pre-existing, master too): EPANET path ignores a GPV's Closed toggle once the session is warm.
 - OBSERVED: zero-flow GPV, first segment negative intercept: J3 differs 1.33 m (EPANET's own tie is noise-decided).
 2026-10-18 feat/msx b1a11204c. OBSERVED: harness 14/14; Net1+msx base/scenario export names match; IDs (j-1, Node.Two, 7, Res_A) survive .inp export; undo/redo of attach ok; 6MB attach not persisted past reload (saved silently-ish). 390px dialog fits. Merge with master conflicts only in dev/new-english-keys.md.
+
+# Perry, feat/guide-page, 2026-10-19
+OBSERVED: rendered en/es/ar scenarios, about, notes, user-manual, snip, using, index; Looped-Network en/es identical to master except mtime ?v= and build line; 404 on unknown slug, array slug 200 (index); no new storage (ec_language cookie is existing); sitemap 621 User-Manual locs for epanet-plus-plus.org, 0 for hawsedc.com.
+FINDINGS: desc starts "How scenarios work: In Basic mode..." (colon run-on, no EPANET++); es/ar nav "Open the application" and index description English (keys only in en); aria-label "Languages" hardcoded; chapters about/notes/snip/user-manual thin or self-referential; no "what is EPANET++" line on chapter pages; 404 page shows index with no "not found" text.
+
+## 2026-10-19 Perry: feat/eps-analysis pre-review
+OBSERVED: Own Net3 bisection (snapshot per step) matched sweepSteps "every step": J209 6053.5 vs 6053.1 gpm at 1:00; J123 ceiling 10000.
+OBSERVED: Net1 criticality whole run, own run with link removed/closed: link 10 empties tank at 5:00 (matches); link 9 matched only by removal (controls reopen a closed pump).
+OBSERVED: fire flow "minp" on Net1 with demands x6 (tank drained at 2:00) picked 7:00, pressure -1357, every junction error; criticality guards this with beforeEmpty, fire flow does not.
+OBSERVED: designT is set in lpn-fireflow.js sweepSteps but never displayed; "Lowest at" shows the worst-flow step while Design limit may come from another step.
+OBSERVED: Hours below minimum counts every frame incl. the final one as a full step (20 h for 5:00..24:00).
+OBSERVED: all existing fireflow/criticality/demand-scaling harnesses pass; new node + browser harnesses pass. No storage change. No em dashes in new strings.
+UNVERIFIED: how it looks (column widths, 10-column fire flow table with extra column).
