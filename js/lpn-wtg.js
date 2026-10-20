@@ -1180,6 +1180,7 @@
 			scen: scen, alts: alts, baseId: baseId, activeId: activeId, picksOf: picksOf, network: network,
 			baseNet: net, nodeIdOf: nodeIdOf, linkIdOf: linkIdOf, conv: conv, T: T, num: num, headloss: headloss,
 			M: M, live: live, labels: labels, index: index, tableType: tableType, note: note,
+			Q: Q, unitScale: unitScale,
 			demand: { base: multBase, adjBase: adjBase, hasUnit: baseHasUnit, hasNormal: baseHasNormal, adjust: function (sc) { return adjustOf(engFor(sc)); }, multOf: multOf }
 		});
 
@@ -1219,14 +1220,30 @@
 		return out;
 	}
 
+	// A junction's demand rows as one scenario's Demand alternative gives them, as this page's flow
+	// numbers: { 'n:ID': [q, ...] }. Each row's flow is stored in ft3/s and goes through the same
+	// conversion the Base [JUNCTIONS] line uses (dev/sqlite-reader.md, "A scenario that overrides Demand").
+	function demandValues(net, ctx) {
+		var out = {};
+		net.nodes.forEach(function (n) {
+			var id = ctx.nodeIdOf[n.e];
+			if (!id || n.kind !== 'junction') { return; }
+			out['n:' + id] = (n.demands || []).map(function (d) {
+				return Number(ctx.Q(d.q * (d.unit ? ctx.unitScale : 1), d.field || 'DemandCollection_BaseFlow'));
+			});
+		});
+		return out;
+	}
+
 	/**
 	 * The scenario tree beyond Base and the alternatives no scenario uses.
 	 *
 	 * **A SCENARIO'S DIFFERENCES FROM BASE BECOME ITS OWN OVERRIDES.** Each scenario is read through
 	 * its own alternatives, element by element, and every Physical value that resolves differently
 	 * from Base is written as an override of that scenario; the alternatives themselves (names,
-	 * sharing) are not carried yet, and the report names them. No public sample has a scenario that
-	 * differs from Base, so this path is proven only on a synthetic file (dev/sqlite-reader.md).
+	 * sharing) are not carried yet, and the report names them. Proven on a real child scenario
+	 * (dev/lpn-spike/wtg-tgh-harness.js): one diameter, one demand. A junction whose Demand differs from
+	 * Base's, one row each side, is an override of its `demand`.
 	 *
 	 * **AN ALTERNATIVE NO SCENARIO USES** is carried as a stored alternative of its own (a root
 	 * alternative is a "Base of its own" here, `root: true`), holding every Physical value it states,
@@ -1236,7 +1253,7 @@
 		var scenarios = [], alternatives = [], basePhys = physicalValues(ctx.baseNet, ctx), used = {};
 		var ids = Object.keys(ctx.scen).map(Number).sort(function (a, b) { return a - b; });
 		var basePicks = ctx.picksOf(ctx.scen[ctx.baseId]);
-		var namedAlts = [], otherCats = [], roots = [], badAdj = [];
+		var namedAlts = [], otherCats = [], roots = [], badAdj = [], baseDem = demandValues(ctx.baseNet, ctx);
 		ids.forEach(function (sid) {
 			var picks = ctx.picksOf(ctx.scen[sid]);
 			Object.keys(picks).forEach(function (t) { if (picks[t] !== null) { used[picks[t]] = true; } });
@@ -1251,6 +1268,7 @@
 			if (da.bad || (ctx.demand.hasUnit && ctx.demand.hasNormal && da.unit / (da.normal || 1) !== ctx.demand.adjBase.unit / (ctx.demand.adjBase.normal || 1))) { badAdj.push(s.name); }
 			Object.keys(picks).forEach(function (t) {
 				if (picks[t] === basePicks[t]) { return; }
+				if (Number(t) === 20) { return; }   // the Demand category is read below
 				if (Number(t) === 4) { namedAlts.push(s.name + ': ' + (ctx.alts[picks[t]] ? ctx.alts[picks[t]].name : picks[t])); }
 				else { otherCats.push(s.name + ': ' + (ctx.alts[picks[t]] ? ctx.alts[picks[t]].name : picks[t]) + ' (' + (ALT_TYPE_NAME[t] || t) + ')'); }
 			});
@@ -1261,6 +1279,17 @@
 						var b = basePhys[key] && basePhys[key][prop];
 						if (b !== mine[key][prop]) { (rec.overrides[key] || (rec.overrides[key] = {}))[prop] = mine[key][prop]; }
 					});
+				});
+			}
+			// Demand: a junction whose demand differs from Base's. One demand row each side: an override of
+			// the junction's demand. Several rows: not carried, and named.
+			if (picks[20] !== basePicks[20]) {
+				var dmine = demandValues(ctx.network(s), ctx), nameD = ctx.alts[picks[20]] ? ctx.alts[picks[20]].name : picks[20];
+				Object.keys(dmine).forEach(function (key) {
+					var a = baseDem[key] || [], b = dmine[key];
+					if (JSON.stringify(a) === JSON.stringify(b)) { return; }
+					if (a.length <= 1 && b.length <= 1) { (rec.overrides[key] || (rec.overrides[key] = {})).demand = b.length ? b[0] : 0; }
+					else { otherCats.push(s.name + ': ' + nameD + ' (Demand, ' + key.slice(2) + ' has several demands)'); }
 				});
 			}
 			scenarios.push(rec);

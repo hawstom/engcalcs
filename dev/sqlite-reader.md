@@ -260,17 +260,49 @@ velocity, and the fire flow table of available flow, limiting junction and syste
 that flow), rounded to the report's precision. Use: a "WaterCAD says" column beside our result, and a
 check that an import reproduced the model. Not built.
 
+## A scenario that overrides Physical and Demand (2026-10-20)
+
+`dev/lpn-spike/fixtures/wtg/WTG-tgh-1.wtg.sqlite` (6.3 MB), its `.wtg`, and WaterGEMS's own `.inp`
+export of each scenario, saved by Tom as an ordinary user of WaterGEMS: Base plus a child scenario
+TGH-1 that changes one pipe diameter (P-1, 8 to 10 in) and one demand (J-1, 0 to 1250 gpm). Three
+nodes (J-1, J-2, R-1), two pipes. Kept under `dev/lpn-spike/fixtures/` with the other fixtures; the
+sqlite is the one large file there. Every statement below is OBSERVED in this file.
+
+- **A child scenario's rows**: `HMIScenario` 38 has `ParentID` 1 (Base). Its `HMIScenarioAlternative`
+  rows are `IsLocal 1` for the two categories it changes (Physical type 4 to alternative 37, Demand
+  type 20 to alternative 36) and `IsLocal 0` (inherited) for every other category. The new
+  alternatives are children of Base's (`HMIAlternative.ParentID` 6 and 7).
+- **A child alternative's rows are for the changed elements only, and a row restates every column of
+  its table.** Physical alternative 37 has rows for pipe 33 only (`BaseLink_Physical_Data`,
+  `IdahoPipe_Physical_Data`, the latter holding the whole row with `Physical_PipeDiameter`
+  0.8333 ft); pipe 35 has none and inherits Base's. Resolution through the parent, as the reader
+  does it, is right.
+- **A Demand override is a row of `IdahoDemandNode_Demand_Data` at the child alternative** (J-1:
+  `DemandCollectionCount` 1, where Base has 0) **with its `IdahoDemandNode_Demand_DemandCollection`
+  row** (`DemandCollection_BaseFlow` 2.785 ft3/s = 1250 gpm). J-2 has no row at alternative 36 and
+  keeps Base's. The reader writes a junction whose demand list differs from Base's, with one row
+  each side, as an override of that junction's `demand`; several rows each side are named in the
+  report (`wtg-scenario-category`), not carried.
+- **Results** are in the `.out`/`.rpc`/`.dwh` files beside the model, not in the sqlite.
+- **Coordinates and elevations here** are in the `.wtg`'s display units (GPM, feet); the export's
+  coordinates are in feet with fifteen digits, the reader's with ten.
+
+**Proof**: `node dev/lpn-spike/wtg-tgh-harness.js`. Base read from the sqlite against the Base
+export, then Base with TGH-1's overrides laid on against the TGH-1 export: IDs, types, from and to,
+elevation, demand, head, x, y, length, diameter, roughness, minor loss, status; **60 values
+compared, all within 1e-6 relative** (the reader writes seven significant digits where WaterGEMS
+writes fifteen: length 81.32591 against 81.3259064580561). The overrides are exactly the two
+differences between the exports, `l:P-1 diameter 10` and `n:J-1 demand 1250`. Not compared: the
+export's `[OPTIONS]` and `[TIMES]` text (the reader writes its own, Duration 0, same units, head loss
+and viscosity).
+
 ## Unproven, and the sample that would prove it
 
-- **A scenario that overrides Physical data.** Neither a public file nor a real one has one. The reader resolves a scenario
-  through its alternatives and their parents (the patent's reading: a child alternative's rows hold
-  its own values, the rest inherit) and writes every Physical value that differs from Base as that
-  scenario's override; the synthetic fixture holds that path, not a real file. Needed: a small model
-  saved by WaterGEMS with Base plus a child that changes one pipe diameter and one demand, with an
-  `.inp` exported for each scenario. Also unread so far: alternatives other than Physical for a
-  scenario (named in the report), and the alternative names and sharing (overrides only).
-- **Whether a child alternative's row restates every column or only the changed ones** (the same
-  sample answers it).
+- **A scenario that overrides Physical data in more than a diameter, or a Demand alternative that
+  changes a junction with several demand rows.** The first is read the same way for every Physical
+  column (proved for one pipe's diameter); the second is named in the report, not carried.
+  Also unread: alternatives other than Physical and Demand for a scenario (named in the report), and
+  alternative names and sharing (overrides only).
 - **US-unit models end to end** (Tnet3 is GPM-era data shown in L/s; no sample is a US model with its
   `.inp`), FCV, PBV, GPV, constant-power and three-point pumps, emitters, customer demands,
   `OperatingRangeType` 1, continuous patterns, and a stated spatial reference: each is read by the

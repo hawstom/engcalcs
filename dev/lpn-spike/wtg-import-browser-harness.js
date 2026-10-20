@@ -202,6 +202,31 @@ async function unitDemand(browser) {
 	fs.rmSync(tmp, { recursive: true, force: true });
 }
 
+// Tom's WTG-tgh-1 (Base plus a child scenario changing a diameter and a demand), in the repository:
+// the import must put both overrides in the stored project (wtg-tgh-harness.js holds the reader side).
+async function tgh(browser) {
+	console.log('\n--- 1c. WTG-tgh-1: a child scenario with a diameter and a demand override ---');
+	const FX = path.join(REPO, 'dev', 'lpn-spike', 'fixtures', 'wtg');
+	const a = await open(browser), h = helpers(a);
+	await a.newProject('us').catch(() => {});
+	await a.dismissGallery().catch(() => {});
+	await h.importVia('lpn_file_import_wtg', [path.join(FX, 'WTG-tgh-1.wtg.sqlite'), path.join(FX, 'WTG-tgh-1.wtg')]);
+	const d = await a.waitDialog(30000);
+	ok('the report opens', !!d, d && d.text.slice(0, 200));
+	if (d) { await a.dialogClick(await a.lang('lpn_dialog_ok')); }
+	const doc = (await h.stored()).doc || {};
+	const ids = (doc.nodes || []).map((n) => n.id).sort().join(',');
+	ok('three nodes, two pipes', ids === 'J-1,J-2,R-1' && (doc.links || []).length === 2, ids);
+	const scn = (doc.scenarios || []).map((x) => x.name).join('|');
+	ok('Base and TGH-1', scn === 'Base|TGH-1', scn);
+	const t = (doc.scenarios || []).filter((x) => x.name === 'TGH-1')[0];
+	ok('TGH-1 overrides P-1 diameter 10 and J-1 demand 1250, nothing else', t && JSON.stringify(t.overrides) === '{"l:P-1":{"diameter":10},"n:J-1":{"demand":1250}}', JSON.stringify(t));
+	const p1 = (doc.links || []).filter((l) => l.id === 'P-1')[0], j1 = (doc.nodes || []).filter((n) => n.id === 'J-1')[0];
+	ok('Base keeps P-1 at 8 and J-1 at 0', p1 && p1._diameter === 8 && j1 && j1._demand === 0, JSON.stringify([p1 && p1._diameter, j1 && j1._demand]));
+	ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+	await a.close();
+}
+
 async function samples(browser) {
 	console.log('\n--- 2. the public WaterGEMS sample, against the .inp WaterGEMS exported ---');
 	const S = process.env.WTG_SAMPLES || '';
@@ -258,6 +283,7 @@ async function main() {
 	try {
 		await synthetic(browser);
 		await unitDemand(browser);
+		await tgh(browser);
 		await samples(browser);
 	} finally {
 		await browser.close();
