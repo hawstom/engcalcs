@@ -46248,7 +46248,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				libCommit();
 				rebuildSettingsBox();
 				scheduleSolve();
-				setNotice((pc.lpn_fitting_removed || 'Removed {file} from this project.').split('{file}').join(m.name));
+				setNotice((pc.lpn_msx_removed || 'Removed {file} from this project.').split('{file}').join(m.name));
 			} },
 			{ label: pc.lpn_close || 'Close', isDefault: true, fn: function () { } }
 		]);
