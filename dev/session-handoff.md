@@ -104,7 +104,7 @@ lines rather than appending corrections.
 - `lpn_theme` now stores one of twelve theme names, not only light/dark (same key, same exemption; told him).
 - His 220 key marks harvested; his rewrite of `lpn_scnres_flow_tip` applied. The Guide's
   `lpn_guide_cmp_byasset_def` carries a parallel sentence he has not edited; asked, not changed.
-- `fix/key-reuse` (defect track, merged on green): 14 untranslated duplicate keys deleted, each use
+- `fix/key-reuse` (defect track, merged on green): 13 untranslated duplicate keys deleted, each use
   pointed at the incumbent (list in the commit and his report). Left: translated pairs such as
   `lpn_file_import_inp` / `lpn_file_export_item_inp` ("EPANET file…"), which would need re-keying.
 - Still owed: consent_body's 26 translations; MSX, EPS-analysis, Guide-page, duration-fire and the
