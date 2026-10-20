@@ -117,7 +117,9 @@ lines rather than appending corrections.
   as a last stage; dropped labels go to the nearest open stretch on non-crossing leaders. Net1 at his
   view 24 labels vs 21 (none hidden), Net3 141 vs 123, Novato 133 vs 115, 0 crossings, ~5% time.
   Unlike his hand Net1: pipe labels go out short (Q only), some land inside loops, leaders any angle
-  up to 200 px, ragged columns. Perry reviewing at handoff time.
+  up to 200 px, ragged columns. Perry 10-20: counts confirmed, "drop fewer", not "arranged like a person"; three
+  defects (an edit slides an outside pipe label off its leader; long leaders through label text;
+  more off-screen leaders on a phone) sent back to a fix agent at handoff time: read its commits.
 - `feat/flow-arrow` (8102), 5ebd338e2: double chevron, two unfilled closed heads (his /tmp/arrow.png).
 - `feat/geojson-into-project` (8101), cad86297c, Task 814: his two-paragraph wording in, verbatim.
   Ready on his word. The .inp twin `lpn_inpup_lead` still one line; asked whether to match.
