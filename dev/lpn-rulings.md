@@ -236,30 +236,6 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
 
 
 
-## A label's home spot, and the leader (Tom 2026-10-19)
-
-*"Let's say that anything not in a home spot needs a leader."* A data label's **home spot** is where
-it rests: its endpoint exactly the resting distance (`defaultLabelOffset()`, which scales with the
-symbols) from its anchor, in any direction, its text hanging away from the anchor. A one-line node
-label has two more, level with its node, east and west. A level pipe label rests on its pipe, so its
-only home is touching it (within 0.6 of a font size of its station); a pipe so short that its station
-lies inside an end node's symbol can draw no clean leader, and its level label may stand without one
-within a text height, nearest its own pipe. A label anywhere else, however
-near, draws a leader; one at home never does (`Collide.atHome()`, `labelAtHome()`). Replaced a
-distance threshold, which could not say it: a label at rest already sits 15 to 25 px out. (Home as
-the four diagonal corners only was tried first; the leaders it added cost Net3 ten labels at 9
-notches in.) A label hung left of its point is **right-justified**, every row ending at its endpoint
-(*"labels on the left side be right-justified so that we don't have gaps"*).
-
-**What cannot move, at a zoom where it would cover something.** A Text whose ink lies on another
-Text's ink is not drawn at that zoom (`crowdedTexts()`); a Text is never hidden for a data label,
-which goes round it. A moved label that would lie on a Text or another moved label, by more than
-1.5 px of what is drawn, goes out on a leader as an automatic label does, at that zoom only (Tom,
-R-164: *"I am seeing dropping when I would have preferred to see longer leaders"*), and hides only
-where no spot is clear (`hideCoveringMovedLabels()`). A label in the hand, or put down in this
-session at the zoom shown or a farther one, is never moved. The leaders this rule adds take ground:
-on Net3 at 9 notches in, 138 labels against 145 before it. `label-form-wheel-browser-harness.js`.
-
 ## A Description is lines and paragraphs (Task 806, Tom 2026-10-15)
 
 *"I think that all Description fields should allow multiple lines and paragraphs like most software

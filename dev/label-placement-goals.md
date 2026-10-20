@@ -198,9 +198,7 @@ From his browser pass of `feat/label-form`, quoted:
   pre-processing the network geometry and saving placement solutions across sessions if feasible,
   and obviously across zooms."* Not yet checked against the code.
 - Leaders: *"I would like to see leaders used sooner/shorter. ... except for a leader with less
-  than a text height of length, we want to show all labels connected with a leader."* Refined
-  2026-10-19, when a label at rest was found to sit 15 to 25 px out already: *"anything not in a
-  home spot needs a leader"* (`dev/lpn-rulings.md`, "A label's home spot").
+  than a text height of length, we want to show all labels connected with a leader."*
 - *"I think it would be okay for pipes to run through one-line node labels."*
 - *"Rearranging themselves is low cost as a design value. I think we can approve the increase"*
   (the slower pass per zoom notch). *"What we need to be aiming for is 'Use attractive available
@@ -314,7 +312,7 @@ shed trailing values (per §2.2's link order) → set it level beside its pipe �
 on, that shed to its last value and is still crowded, found no clear station, yielded its ground
 to a node label, or is too long for its segment, is tried level beside its pipe as a free label with a leader, after every other
 label is placed and only where it breaks no never-rule, and only where a reader can tell its pipe:
-it carries a leader from its pipe unless it touches it (its home, `dev/lpn-rulings.md`), and a side
+it carries a leader from its pipe whenever it is more than 0.6 of a font size off it, and a side
 nearer than that must leave its own pipe the nearest pipe to its rows. Its leader starts at the
 pipe's middle, or, when every side there is taken, at the nearest clear station (0.5, 0.35, 0.65,
 0.2, 0.8 of the pipe). Once every level label has its smallest form, each may take another form:
@@ -456,10 +454,8 @@ keeps the halo proportional to the lettering at every text size, which is what
 
 A leader attaches at the **vertical centre of the NEAREST text line** — the top line when the anchor
 is above the label, the bottom line when it is below — on the box side facing the anchor, through a
-short horizontal landing, and is drawn for every label away from its home spot and for none at home
-(Tom, 2026-10-19: *"anything not in a home spot needs a leader"*; `labelAtHome()`). That replaced a
-leader tolerance, a distance (ESRI's term), which could not tell a label at rest from one moved a
-little.
+short horizontal landing, and is suppressed entirely below a leader tolerance (`leaderThreshold()`,
+which is ESRI's leader tolerance under another name).
 
 **NEAREST, not first, and that is a correction of an earlier reading of the standard** (Tom,
 2026-08-16: *"those rules about attachment at the top line of text seem to penalize leaders that are
@@ -488,8 +484,11 @@ without a rewrite.
 
 The collision pass must model whatever the renderer draws, or it scores a leader that does not exist.
 
-Recorded so it is not re-derived from the standard a third time: the landing and the line
-attachment are still to build.
+**Phase 1 needs none of this.** Both of its candidate positions sit at the resting offset, well
+inside `leaderThreshold()`, so an auto-placed node label never draws a leader at all — Tom,
+2026-08-16: *"I want to test Phase 1 and 2 without Phase 3, meaning with no leader scheme."* Leaders
+remain only where the user dragged a label there. This section is therefore Phase 3 work, and
+recording it now is what keeps it from being re-derived from the standard a third time.
 
 ---
 

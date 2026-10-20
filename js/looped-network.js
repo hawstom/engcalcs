@@ -103,28 +103,21 @@ var EngCalcs = EngCalcs || {};
 		var k = full ? symbolFactorFull() : symbolFactor();
 		return { x: DEFAULT_LABEL_OFFSET.x * k, y: DEFAULT_LABEL_OFFSET.y * k };
 	}
-	// **A LABEL IN ITS HOME SPOT DRAWS NO LEADER; A LABEL ANYWHERE ELSE DRAWS ONE, HOWEVER NEAR**
-	// (Tom, 2026-10-19: *"Let's say that anything not in a home spot needs a leader."*). It replaced
-	// a distance threshold (one text height, earlier 1.6), which could not say it: a label at rest
-	// already sits 15-25 px out, so any threshold short enough to catch a label moved a little also
-	// caught every label at rest. Home is Collide.atHome(): the four resting corners, the endpoint
-	// defaultLabelOffset() away on a diagonal, and for a one-line node label also level with its node
-	// east and west (inlineLevelDy()). dev/lpn-rulings.md, "Home spot".
-	function inlineLevelDy() { return effectiveFontSize() * 0.85 - dataLabelBoxHeight(1) / 2; }
-	function labelAtHome(anchor, end, oneLine) {
-		return Collide.atHome(anchor, end, defaultLabelOffset(), oneLine ? inlineLevelDy() : undefined);
-	}
-	// What a placement spec carries so js/lpn-collide.js asks the same question (drawsLeader()).
-	function homeSpec(spec, oneLine) {
-		spec.homeOff = defaultLabelOffset();
-		if (oneLine) { spec.homeLevelDy = inlineLevelDy(); } else { delete spec.homeLevelDy; }
-		return spec;
-	}
-	// The leader a placement draws, as an obstacle segment, or null at home: the one shape every
-	// pass that models drawn leaders asks for.
-	function drawnLeaderSeg(anchor, end, oneLine, key) {
-		if (labelAtHome(anchor, end, oneLine) || !(Math.hypot(end.x - anchor.x, end.y - anchor.y) > 0)) { return null; }
-		return Collide.segment(anchor.x, anchor.y, end.x, end.y, 'leader', key);
+	// Past this distance between the anchor and the label's rendered position (drag or nudge), a
+	// leader line is drawn. Comfortably above the default offset's resting distance (hypot(2,2)
+	// ~= 2.8) so an untouched label never shows one -- true only if it scales with that offset,
+	// hence textFactor(). Text rather than symbol factor: the threshold protects the reader's
+	// ability to tie a number back to its element, a judgment made at the scale of the text.
+	var LABEL_LEADER_THRESHOLD = 4;
+	// **A LABEL ONE TEXT HEIGHT FROM ITS ANCHOR CARRIES A LEADER** (Tom, 2026-10-18: *"except for a
+	// leader with less than a text height of length, we want to show all labels connected with a
+	// leader"*). The threshold was 4 x max(textFactor, symbolFactor), 1.6 text heights at the shipped
+	// sizes. It is now one text height, but never below just past the resting offset
+	// (hypot(2,2) x symbolFactor), so a label at rest, untouched, still draws none.
+	var LPN_LEADER_TEXT_HEIGHTS = 1, LPN_LEADER_REST_MARGIN = 1.05;
+	function leaderThreshold() {
+		var d = defaultLabelOffset();
+		return Math.max(LPN_LEADER_TEXT_HEIGHTS * effectiveFontSize(), LPN_LEADER_REST_MARGIN * Math.hypot(d.x, d.y));
 	}
 	function nodeLabelBase(n, full) {
 		var d = defaultLabelOffset(full);
@@ -357,7 +350,7 @@ var EngCalcs = EngCalcs || {};
 		if (!holder.leader) { return; }
 		if (holder.empty) { holder.leader.style.display = 'none'; return; }
 		var d = Math.hypot(end.x - anchor.x, end.y - anchor.y);
-		if (!(d > 0) || (holder.levelBeside ? (holder.levelQuiet || d <= levelTouch()) : labelAtHome(anchor, end, !!holder.inline))) { holder.leader.style.display = 'none'; return; }
+		if (holder.levelBeside ? (holder.levelQuiet || d <= levelLeaderMin()) : d <= leaderThreshold()) { holder.leader.style.display = 'none'; return; }
 		// A -> B, both world points, nothing derived: an endpoint computed from the label box would
 		// move when the box's pixel width did, and the angle with it (Task 328).
 		holder.leader.style.display = '';
@@ -449,18 +442,6 @@ var EngCalcs = EngCalcs || {};
 	function dataLabelBoxHeight(lineCount) {
 		return Geom.dataLabelBoxHeight(lineCount, effectiveFontSize(), effectiveLineHeight());
 	}
-	// **A LABEL LEFT OF ITS POINT IS RIGHT-JUSTIFIED** (Tom, 2026-10-19, on a stack west of its node
-	// with ragged gaps between its short rows and the node: *"labels on the left side be
-	// right-justified so that we don't have gaps"*). Every row ends at the endpoint, nearest the
-	// anchor; a label right of its point starts every row there. This is the staircase
-	// Collide.labelLineBoxes() always modelled, so the placement, the grab shape (syncLabelHit()
-	// reads text-anchor) and the halo (on the glyphs) now agree with the words. Returns the x to
-	// write. Written only on a change.
-	function justifyDataLabel(textEl, side, end, org) {
-		var want = side === 'left' ? 'end' : 'start';
-		if (textEl.getAttribute('text-anchor') !== want) { textEl.setAttribute('text-anchor', want); }
-		return want === 'end' ? end.x : org.x;
-	}
 	// LEGIBILITY BACKING IS A HALO ON THE GLYPHS AND LIVES ENTIRELY IN css/engcalcs.css (Task 376).
 	// NOT a rect: that needs an element per label, a pad constant, a transform kept in step, and a
 	// hide call at every place a label could go empty.
@@ -475,10 +456,10 @@ var EngCalcs = EngCalcs || {};
 		// **TWO WAYS, AND THEY ARE DELIBERATELY NOT ONE FLAG:** `hiddenDropped` says nowhere would
 		// fit and releases the ground, `hiddenCrossed` says this label lost a crossing nothing could
 		// repair (Task 539 phase three) and KEEPS the ground it stands on. See shedCrossingLabels().
-		setLabelAssemblyHidden(ne, !!ne.hiddenDropped || !!ne.hiddenCrossed || !!ne.hiddenFixed);
+		setLabelAssemblyHidden(ne, !!ne.hiddenDropped || !!ne.hiddenCrossed);
 		var anchor = nodeAt(n), end = nodeLabelPos(n),
-			org = dataLabelOrigin(ne, anchor, end, (n.lx !== undefined && !ne.fixedDisplaced) ? n : null, labelInHand(ne));
-		repositionMultilineText(ne.text, justifyDataLabel(ne.text, ne.side, end, org), org.y);
+			org = dataLabelOrigin(ne, anchor, end, n.lx !== undefined ? n : null, labelInHand(ne));
+		repositionMultilineText(ne.text, org.x, org.y);
 		updateDataLeader(ne, anchor, end);
 	}
 	// Same as layoutNodeLabel(), for a link's data label -- anchor is linkLabelMid(), which moves
@@ -927,11 +908,9 @@ var EngCalcs = EngCalcs || {};
 	// re-placed labels far enough out that the shed cascade stopped running -- 19 labels shedding
 	// where node-shed-harness.js requires 30. Placing labels further from their nodes rather than
 	// shedding a value is a design change nobody asked for.
-	// A moved label put out on a leader (hideCoveringMovedLabels()) may reach this far, in text heights.
-	var LPN_DISPLACED_REACH_TEXT_HEIGHTS = 8;
 	function nodeFirstFitSpec(n, ne, fs) {
 		var d = defaultLabelOffset(), ctx = nodeContextFor(n.id), s0 = state.s || 1, f = ne.inlineFrom,
-			reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * (ne.fixedDisplaced ? LPN_DISPLACED_REACH_TEXT_HEIGHTS : LPN_NODE_MIN_REACH_TEXT_HEIGHTS)),
+			reach = Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS),
 			sides = Collide.cardinalSides(nodeAt(n), d,
 				(ctx && ctx.arcs) || Collide.openArcs([]), { raster: true, outer: reach });
 		// **A ONE-LINE LABEL IS PLACED AS THE STACK IT WAS FIRST, AND THEN SET IN ITS LINE** (Task 734,
@@ -939,30 +918,22 @@ var EngCalcs = EngCalcs || {};
 		// measures banked when the line was chosen), so every pass places the drawing's stacks
 		// exactly as the content pass did, and insertInlineNodeLabels() sets the line afterwards.
 		if (f) {
-			return homeSpec({ id: nodeLabelKey(n.id), anchor: nodeAt(n), home: nodeLabelBase(n),
+			return { id: nodeLabelKey(n.id), anchor: nodeAt(n), home: nodeLabelBase(n),
 				dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
 				w: f.wPx / s0, h: dataLabelBoxHeight(f.lineCount), yOff: -fs * 0.85,
-				lines: f.rowWPx ? f.rowWPx.map(function (v) { return v / s0; }) : null });
+				lines: f.rowWPx ? f.rowWPx.map(function (v) { return v / s0; }) : null };
 		}
-		return homeSpec({ id: nodeLabelKey(n.id), anchor: nodeAt(n), home: nodeLabelBase(n),
+		return { id: nodeLabelKey(n.id), anchor: nodeAt(n), home: nodeLabelBase(n),
 			dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
 			w: labelBoxWidth(ne), h: dataLabelBoxHeight(ne.lineCount), yOff: -fs * 0.85,
-			lines: labelRowWidths(ne) });
+			lines: labelRowWidths(ne) };
 	}
 	// The same label's one-line form, as insertInlineNodeLabels() places it: `w` its one-line width.
 	function inlineNodeSpec(n, fs, w) {
 		var d = defaultLabelOffset();
 		return { w: w, h: dataLabelBoxHeight(1), lines: null, leaderClean: true, acrossPipes: true,
-			homeOff: d, homeLevelDy: inlineLevelDy(),
-			sides: inlineNodeSides(nodeAt(n), d, fs, inlineNodeReach(d, fs)) };
+			sides: inlineNodeSides(nodeAt(n), d, fs, Math.max(Math.hypot(d.x, d.y) * 3, fs * LPN_NODE_MIN_REACH_TEXT_HEIGHTS)) };
 	}
-	// **HOW FAR A ONE-LINE NODE LABEL REACHES: ONE TEXT HEIGHT, OR JUST PAST HOME** (Perry's review,
-	// 2026-10-19). It reached three resting offsets, but until the home rule its leader could not
-	// start inside its own symbol, so only sides near enough to draw none were ever taken. Once its
-	// leader could, one-line labels went out further and took the ground the level pipe labels after
-	// them had stood on (Net3 at 6 notches in: 27 one-line labels against master's 13, and five pipe
-	// labels master shows hidden). This is the reach those labels really had, now with a leader.
-	function inlineNodeReach(d, fs) { return Math.max(fs, 1.05 * Math.hypot(d.x, d.y)); }
 	// **WHERE A ONE-LINE NODE LABEL MAY GO: EAST OR WEST OF ITS NODE** (Task 734, Tom 2026-09-26:
 	// *"where there is infinite space east or west, we might want to recognize that infinity and
 	// leverage it by using single-line concatenation of properties"*; 2026-10-18: *"Node labels that
@@ -971,8 +942,8 @@ var EngCalcs = EngCalcs || {};
 	// Nothing here is a fact about the zoom except through the symbol and text sizes, as for a stack.
 	var LPN_INLINE_NODE_ARC = 35;
 	function inlineNodeSides(a, d, fs, reach) {
-		var dx = Math.abs(d.x), dy = Math.abs(d.y),
-			cy = a.y + inlineLevelDy(), home = Math.hypot(dx, dy), out = [], ring;
+		var dx = Math.abs(d.x), dy = Math.abs(d.y), h1 = dataLabelBoxHeight(1),
+			cy = a.y + fs * 0.85 - h1 / 2, home = Math.hypot(dx, dy), out = [], ring;
 		out.push({ x: a.x + dx, y: cy, corner: -1, deg: 0 }, { x: a.x - dx, y: cy, corner: -1, deg: 180 });
 		[[1, -1], [-1, -1], [1, 1], [-1, 1]].forEach(function (c) {
 			out.push({ x: a.x + c[0] * dx, y: a.y + c[1] * dy, corner: -1, deg: null });
@@ -996,11 +967,6 @@ var EngCalcs = EngCalcs || {};
 			return c !== 0 ? c : (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0));
 		});
 		nodeLabels.forEach(function (l, i) { l.priority = nodeLabels.length - i; delete l.dropKey; });
-		// A moved label put out on a leader is placed before every automatic one: the user asked for it.
-		nodeLabels.forEach(function (l) {
-			var ne = l.id.charAt(0) === 'n' && nodeEls[l.id.slice(2)];
-			if (ne && ne.fixedDisplaced) { l.priority += nodeLabels.length; }
-		});
 		return nodeLabels;
 	}
 	// **WHERE THE NODE LABELS ARE GOING, ANSWERED FROM THE DRAWING ALONE (Task 539).**
@@ -1038,99 +1004,17 @@ var EngCalcs = EngCalcs || {};
 	// to keep clear of it instead. Its rows and its drawn leader, exactly where the user put them;
 	// the node first-fit, its shed and the gang repair are handed these alongside the drawing's
 	// own obstacles. A drawing with no dragged label gets back the obstacles it came with.
-	// **A MOVED LABEL THAT WOULD LIE ON A TEXT OR ANOTHER MOVED LABEL GOES OUT ON A LEADER
-	// AT THIS ZOOM** (Tom's Net1, 14 wheel notches out, 2026-10-19: the "Tank" Text over the moved N10
-	// and N11 labels, "Pump" over N11). A moved label keeps the endpoint its user gave it, in drawing
-	// units, while its words are sized in screen pixels, so zooming out brings it onto whatever else
-	// cannot move. At a zoom where it would cover something it is placed as an automatic label is,
-	// first among them and with a longer reach, on a leader from its anchor (Tom, R-164: *"I am seeing
-	// dropping when I would have preferred to see longer leaders"*); it hides only where no spot is
-	// clear. Its stored endpoint is untouched, and it is back there when the view has room. Kept at
-	// home first, as the crossing shed keeps them: a tank's or reservoir's, a pump's or valve's, a
-	// node's, a pipe's; then by id. The label in the hand always stays, as does one put down at this
-	// zoom or closer. Sets `fixedDisplaced` on every holder; runs before anything is placed.
-	function hideCoveringMovedLabels(obs, fs) {
-		// Covering is a VISIBLE overlap: more than LPN_COVER_TOL_PX screen pixels deep.
-		var kept = [], list = [], tol = LPN_COVER_TOL_PX / (state.s || 1), idx;
-		function add(key, holder, anchor, end, owner, own) {
-			holder.hiddenFixed = false; holder.fixedDisplaced = false;
-			if (holder.empty) { return; }
-			list.push({ key: key, holder: holder, own: own, rank: crossingShedRank(key),
-				spec: { id: key, anchor: anchor, w: labelBoxWidth(holder), h: dataLabelBoxHeight(holder.lineCount), yOff: -fs * 0.85,
-					lines: labelRowWidths(holder), side: movedLabelSide(holder, owner, anchor, end, labelInHand(holder)) }, end: end });
-		}
-		doc.nodes.forEach(function (n) {
-			var ne = nodeEls[n.id];
-			if (ne) { ne.hiddenFixed = false; ne.fixedDisplaced = false; }
-			if (ne && n.lx !== undefined) { add(nodeLabelKey(n.id), ne, nodeAt(n), nodeLabelBase(n), n, n.id); }
-		});
-		doc.links.forEach(function (l) {
-			var le = linkEls[l.id];
-			if (le) { le.hiddenFixed = false; le.fixedDisplaced = false; }
-			if (le && l.lx !== undefined && !linkLabelTooShort(l, le)) { add(linkLabelKey(l.id), le, linkLabelMid(l), linkLabelBase(l), l, null); }
-		});
-		if (!list.length) { return; }
-		// Each drawn Text by its ink (textInkBox()), and the moved labels kept before this one:
-		// covering is words on words, what the eye sees. A node's symbol is not counted: a label the
-		// user dropped beside or across a node is where he wanted it.
-		var crowd = crowdedTexts();
-		obs.boxes.forEach(function (b) {
-			if (b.kind === 'label' && b.textOwner !== undefined && !crowd.hidden[b.textOwner]) {
-				var k = crowd.ink[b.textOwner] || b; k.kind = 'label'; kept.push(k);
-			}
-		});
-		// Indexed, and asked with each row shrunk by the tolerance; only a hit is checked exactly,
-		// where a moved node label's own symbol is let off.
-		idx = Collide.boxIndex(kept);
-		list.sort(function (a, b) { return (a.rank - b.rank) || (a.key < b.key ? -1 : (a.key > b.key ? 1 : 0)); });
-		list.forEach(function (it) {
-			var rows = Collide.labelLineBoxes(it.spec, it.end), on = it.own !== null ? nodeById(it.own) : null,
-				ox = on ? nodeDrawX(on) : 0, oy = on ? nodeDrawY(on) : 0;
-			// In the hand, or put down at this zoom or a closer one (`placedAtScale`, this session): the
-			// user's own placement, held exactly (label-leader-keep-harness.js, label-drag-track-harness.js).
-			var held = labelInHand(it.holder) || (it.holder.placedAtScale > 0 && (state.s || 1) >= it.holder.placedAtScale * (1 - 1e-9));
-			var covers = !held && rows.some(function (b) {
-				if (!idx.anyOverlap(Collide.box(b.cx, b.cy, Math.max(0, b.w - 2 * tol), Math.max(0, b.h - 2 * tol), b.a))) { return false; }
-				return kept.some(function (k) {
-					if (on && k.kind === 'symbol' && Math.abs(k.cx - ox) < 1e-9 && Math.abs(k.cy - oy) < 1e-9) { return false; }
-					// A node symbol is round: covered only where the row reaches inside the circle.
-					if (k.round) {
-						var ddx = Math.max(Math.abs(k.cx - b.cx) - b.w / 2, 0), ddy = Math.max(Math.abs(k.cy - b.cy) - b.h / 2, 0);
-						return Math.hypot(ddx, ddy) < k.w / 2 - tol;
-					}
-					return Collide.boxOverlapDepth(b, k) > tol;
-				});
-			});
-			if (covers) { it.holder.fixedDisplaced = true; return; }
-			rows.forEach(function (b) { kept.push(b); });
-		});
-	}
-	// How deep, in screen pixels, words must lie on words or on a node to cover them: past the
-	// antialiased edge of a glyph, as dev/lpn-spike/label-form-wheel-browser-harness.js measures it.
-	var LPN_COVER_TOL_PX = 1.5;
-	function displacedStillCovers(r, obs, fs) {
-		var tol = LPN_COVER_TOL_PX / (state.s || 1), crowd = crowdedTexts(), rows = (r.boxes && r.boxes.length) ? r.boxes : (r.box ? [r.box] : []);
-		return rows.some(function (b) {
-			return obs.boxes.some(function (k) {
-				if (k.kind === 'label' && k.textOwner !== undefined) { k = crowd.ink[k.textOwner] || k; }
-				else if (k.round) {
-					return Math.hypot(Math.max(Math.abs(k.cx - b.cx) - b.w / 2, 0), Math.max(Math.abs(k.cy - b.cy) - b.h / 2, 0)) < k.w / 2 - tol;
-				} else { return false; }
-				return Collide.boxOverlapDepth(b, k) > tol;
-			});
-		});
-	}
 	function withDraggedLabels(obs, fs) {
-		var boxes = [], segs = [];
-		hideCoveringMovedLabels(obs, fs);
+		var boxes = [], segs = [], min = leaderThreshold();
 		function add(key, holder, anchor, home, owner) {
-			if (!holder || holder.empty || holder.hiddenFixed || holder.fixedDisplaced) { return; }
+			if (!holder || holder.empty) { return; }
 			var spec = { id: key, anchor: anchor, home: home, w: labelBoxWidth(holder),
 				side: movedLabelSide(holder, owner, anchor, home, labelInHand(holder)),
 				h: dataLabelBoxHeight(holder.lineCount), yOff: -fs * 0.85, lines: labelRowWidths(holder) };
 			Collide.labelLineBoxes(spec, home).forEach(function (b) { boxes.push(b); });
-			var g = drawnLeaderSeg(anchor, home, false, key);
-			if (g) { segs.push(g); }
+			if (Math.hypot(home.x - anchor.x, home.y - anchor.y) > min) {
+				segs.push(Collide.segment(anchor.x, anchor.y, home.x, home.y, 'leader', key));
+			}
 		}
 		doc.nodes.forEach(function (n) {
 			if (n.lx !== undefined) { add(nodeLabelKey(n.id), nodeEls[n.id], nodeAt(n), nodeLabelBase(n), n); }
@@ -1157,13 +1041,11 @@ var EngCalcs = EngCalcs || {};
 			if (linkLabelAligned(l) || linkLabelStations(l).length > 1) { stationed.push(l); }
 		});
 		placeStationedLabels(stationed, obs, fs);
-		hideCoveringMovedLabels(obs, fs);
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id];
 			// A dragged node label is the user's own placement and never enters the first-fit; it is
-			// seeded at the position the user gave it, by the caller -- unless at this zoom it goes
-			// out on a leader (hideCoveringMovedLabels()).
-			if (!ne || ne.empty || (n.lx !== undefined && !ne.fixedDisplaced)) { return; }
+			// seeded at the position the user gave it, by the caller.
+			if (!ne || ne.empty || n.lx !== undefined) { return; }
 			specs.push(nodeFirstFitSpec(n, ne, fs));
 		});
 		if (!specs.length) { return []; }
@@ -1667,6 +1549,7 @@ var EngCalcs = EngCalcs || {};
 		// Unaligned: the transform is CLEARED rather than left behind -- a stale rotate on an
 		// element that is no longer aligned is invisible in the code and obvious on screen.
 		part.text.removeAttribute('transform');
+		part.text.setAttribute('text-anchor', 'start');
 		// The branch is here because its two halves must agree about WHICH POINT the label belongs
 		// to. linkLabelPos() is measured from the half-way point, where a drag offset and a collision
 		// nudge are stored, so a label rendered at any other station draws its leader to a place it
@@ -1682,10 +1565,14 @@ var EngCalcs = EngCalcs || {};
 			anchor = le.levelAt.along === null ? mid : Geom.pointAlongPolyline(linkPointList(l), le.levelAt.along);
 			end = { x: anchor.x + le.levelAt.ex, y: anchor.y + le.levelAt.ey };
 		}
-		var holder = isPrimary ? le : part,
-			org = dataLabelOrigin(holder, anchor, end, (lone && l.lx !== undefined && !le.fixedDisplaced) ? l : null, isPrimary && labelInHand(le));
-		// A label hung left is right-justified, flush against its leader (justifyDataLabel()).
-		repositionMultilineText(part.text, justifyDataLabel(part.text, holder.side, end, org), org.y);
+		var org = dataLabelOrigin(isPrimary ? le : part, anchor, end, (lone && l.lx !== undefined) ? l : null, isPrimary && labelInHand(le));
+		// **A LEVEL STACK HUNG LEFT IS FLUSH AGAINST ITS LEADER** (Task 812): its rows end at the
+		// leader's end, as the placement modelled them, rather than starting at the box's left edge.
+		if (lone && le.levelBeside && le.levelForm && le.levelForm.stacked && le.side === 'left') {
+			part.text.setAttribute('text-anchor', 'end');
+			org = { x: end.x, y: org.y };
+		}
+		repositionMultilineText(part.text, org.x, org.y);
 		if (isPrimary) { updateDataLeader(le, anchor, end); }
 	}
 	// **WHAT INSIDE HERE COSTS TOM A SECOND.** `lk:layout` is 1,000-1,530 ms for 119 pipes on his
@@ -1706,7 +1593,7 @@ var EngCalcs = EngCalcs || {};
 		// A label the pass set LEVEL BESIDE its pipe (placeLevelPipeLabels()) is drawn whatever hid it
 		// along the pipe, a crossing lost there included: level, it was placed clear of every leader.
 		var hideAll = le.levelBeside ? false
-			: (le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenBlocked || !!le.hiddenYielded || !!le.hiddenCrossed || !!le.hiddenFixed);
+			: (le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenBlocked || !!le.hiddenYielded || !!le.hiddenCrossed);
 		setLabelAssemblyHidden(le, hideAll);
 		syncLevelGlyphs(l, le);
 		if (le.levelBeside && le.levelForm) { le.drawW = le.levelForm.wPx / (state.s || 1); } else { delete le.drawW; }
@@ -1953,109 +1840,23 @@ var EngCalcs = EngCalcs || {};
 	// Pipes are SEGMENTS rather than boxes -- Net3 has 119 pipes, and chopped at three screen pixels
 	// a zoomed-in drawing produces thousands of boxes to test every candidate against. A diagonal
 	// pipe's bounding box is also mostly empty space, so boxing it pushes labels off clear ground.
-	// **A TEXT THAT LIES ON A TEXT KEPT BEFORE IT IS NOT DRAWN AT THIS ZOOM** (Tom's Net1, 14 wheel
-	// notches out, 2026-10-19: "Pump" printed across "Source"). A Text is a note sized in screen
-	// pixels at a point fixed in the drawing, so two that clear each other at one zoom meet at a
-	// zoom further out, and neither may move: one of them goes, as a data label goes when nothing
-	// fits, and it comes back when the view has room. Kept first: a Text shown at all zoom levels,
-	// then the larger, then the earlier in the file. A pure function of the view, decided wherever
-	// the obstacles are, and drawn by applyTextHidden().
-	function textObstacleBox(lb, le) {
-		var pt = textLabelPoint(lb);
-		return Geom.orientedLabelBox(pt.x, pt.y, textLabelWidth(le), textLabelHeight(lb),
-			labelHAlign(lb), labelVAlign(lb), textLabelSvgAngle(lb), effectiveFontSize(textSizeMult(lb)));
-	}
-	// **WHAT A TEXT'S INK COVERS, NOT ITS LINE BOXES** (Perry's review, 2026-10-19: at Net1 4 notches
-	// out "Pump" sits just under "Source" and reads cleanly, while their line boxes overlap by 8 px,
-	// the room above capitals and below a line with no descender). Each line's ink, measured once by
-	// the canvas's own text metrics at 100 px and scaled, about the line's central baseline, the one
-	// the Text is drawn on; turned with the Text. null where the browser cannot say, and the line
-	// boxes are used.
-	var textInkCache = Object.create(null), textInkCtx = null;
-	function textInkMetrics(lines, weight, family) {
-		var key = weight + '\u0001' + family + '\u0001' + lines.join('\u0002'), hit = textInkCache[key], ms;
-		if (hit !== undefined) { return hit; }
-		try {
-			if (!textInkCtx) { textInkCtx = document.createElement('canvas').getContext('2d'); }
-			textInkCtx.font = weight + ' 100px ' + family;
-			textInkCtx.textBaseline = 'alphabetic'; textInkCtx.textAlign = 'left';
-			ms = lines.map(function (ln) {
-				var m = textInkCtx.measureText(ln);
-				if (!(m && isFinite(m.actualBoundingBoxAscent))) { throw new Error('no ink metrics'); }
-				// About the CENTRAL baseline the Text is drawn on, the middle of the font's own box: the
-				// alphabetic baseline lies (ascent - descent) / 2 below it.
-				var mid = (m.fontBoundingBoxAscent - m.fontBoundingBoxDescent) / 2;
-				return { adv: m.width / 100, l: m.actualBoundingBoxLeft / 100, r: m.actualBoundingBoxRight / 100,
-					up: (m.actualBoundingBoxAscent - mid) / 100, dn: (m.actualBoundingBoxDescent + mid) / 100, blank: !String(ln).trim() };
-			});
-			hit = ms;
-		} catch (err) { hit = null; }
-		textInkCache[key] = hit;
-		return hit;
-	}
-	function textInkBox(lb, le, model) {
-		var fam = '', fs = effectiveFontSize(textSizeMult(lb)), lines = textLabelLines(lb), ms, pt, ha, b, lh, x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
-		try { fam = window.getComputedStyle(le.text).fontFamily || ''; } catch (err) { fam = ''; }
-		ms = fam ? textInkMetrics(lines, textLabelWeight(lb), fam) : null;
-		if (!ms) { return model; }
-		pt = textLabelPoint(lb); ha = labelHAlign(lb);
-		b = Geom.labelBoxAt(pt.x, pt.y, model.w, model.h, ha, labelVAlign(lb), fs);
-		lh = model.h / Math.max(1, lines.length);
-		ms.forEach(function (m, i) {
-			if (m.blank) { return; }
-			var adv = m.adv * fs, o = ha === 'middle' ? b.x + b.w / 2 - adv / 2 : ha === 'end' ? b.x + b.w - adv : b.x,
-				c = b.y + lh * (i + 0.5);
-			x0 = Math.min(x0, o - m.l * fs); x1 = Math.max(x1, o + m.r * fs);
-			y0 = Math.min(y0, c - m.up * fs); y1 = Math.max(y1, c + m.dn * fs);
-		});
-		if (!(x1 > x0) || !(y1 > y0)) { return model; }
-		var a = textLabelSvgAngle(lb) || 0, rad = a * Math.PI / 180, dx = (x0 + x1) / 2 - pt.x, dy = (y0 + y1) / 2 - pt.y;
-		return Collide.box(pt.x + dx * Math.cos(rad) - dy * Math.sin(rad), pt.y + dx * Math.sin(rad) + dy * Math.cos(rad), x1 - x0, y1 - y0, a);
-	}
-	function crowdedTexts() {
-		var out = { hidden: {}, box: {}, ink: {} }, ink = out.ink, list = [], kept = [], tol = 0.5 / (state.s || 1);
-		doc.labels.forEach(function (lb, i) {
-			var le = labelEls[lb.id]; if (!le) { return; }
-			out.box[lb.id] = textObstacleBox(lb, le);
-			ink[lb.id] = textInkBox(lb, le, out.box[lb.id]);
-			le.crowdHidden = false;
-			if (le.suppressed || !String(le.text && le.text.textContent || '').length) { return; }
-			list.push({ lb: lb, le: le, i: i, all: textAllZoom(lb) ? 1 : 0, size: textSizeMult(lb) });
-		});
-		list.sort(function (a, b) { return (b.all - a.all) || (b.size - a.size) || (a.i - b.i); });
-		// Hidden only where the ink of one truly lies on the ink of another, by more than half a pixel.
-		list.forEach(function (t) {
-			var bx = ink[t.lb.id];
-			if (kept.some(function (k) { return Collide.boxOverlapDepth(bx, k) > tol; })) {
-				t.le.crowdHidden = true; out.hidden[t.lb.id] = true; return;
-			}
-			kept.push(bx);
-		});
-		return out;
-	}
-	function applyTextHidden(le) {
-		var gone = !!le.suppressed || (!dataLabelsHidden && !!le.crowdHidden);
-		[le.text, le.leader, le.lblHit].forEach(function (e) {
-			if (e && e.classList) { e.classList.toggle('lpn-lbl-hidden', gone); }
-		});
-	}
 	function staticObstacles() {
 		var out = { boxes: [], segments: [] };
 		doc.nodes.forEach(function (n) {
 			var r = nodeRadius(n);
 			var sb = Collide.box(nodeDrawX(n), nodeDrawY(n), r * 2, r * 2, 0);
-			sb.kind = 'symbol'; sb.round = true;   // a node symbol is a circle (hideCoveringMovedLabels())
+			sb.kind = 'symbol';
 			out.boxes.push(sb);
 		});
 		// A TEXT LABEL IS AN OBSTACLE, NEVER A PARTICIPANT: the user typed those words and chose
 		// that spot, so a data label goes round it and never the reverse.
-		// **BUT TWO TEXTS CAN MEET, AND THEN ONE IS NOT DRAWN** (crowdedTexts()).
-		var crowd = crowdedTexts();
 		doc.labels.forEach(function (lb) {
-			var le = labelEls[lb.id]; if (!le || crowd.hidden[lb.id]) { return; }
+			var le = labelEls[lb.id]; if (!le) { return; }
 			var an = textAnchorPoint(lb), pt = textLabelPoint(lb),
 				px = pt.x, py = pt.y,
-				b = crowd.box[lb.id];
+				b = Geom.orientedLabelBox(px, py, textLabelWidth(le), textLabelHeight(lb),
+					labelHAlign(lb), labelVAlign(lb), textLabelSvgAngle(lb),
+					effectiveFontSize(textSizeMult(lb)));
 			b.kind = 'label';
 			// **THE BOX AND ITS OWN CALLOUT LINE ARE ONE OBJECT ON THE MAP, and a reader of this
 			// list has to be able to say so.** `linkOwner` already does that job for a stationed
@@ -2926,7 +2727,7 @@ var EngCalcs = EngCalcs || {};
 	// COST: one strict first-fit over the labels tried, against the drawing; no node re-fit.
 	var LPN_INLINE_MAX_VIEW_FRAC = 0.25;
 	function insertInlineNodeLabels(nodeLabels, placed, obs, pad, fs, list, ring) {
-		var ground = { boxes: obs.boxes.slice().concat(viewFrameBoxes()), segments: obs.segments.slice() }, byId = {}, specs = [], out;
+		var ground = { boxes: obs.boxes.slice().concat(viewFrameBoxes()), segments: obs.segments.slice() }, byId = {}, min = leaderThreshold(), specs = [], out;
 		nodeLabels.forEach(function (sp) { byId[sp.id] = sp; });
 		// The ring pass's labels (free pipe labels, dragged ones) with the leaders the renderer draws.
 		ringForeigners(ring || []).forEach(function (f) {
@@ -2937,15 +2738,16 @@ var EngCalcs = EngCalcs || {};
 			var sp = byId[r.id];
 			if (r.dropped || !sp) { return; }
 			(r.boxes || (r.box ? [r.box] : [])).forEach(function (b) { ground.boxes.push(b); });
-			var g = drawnLeaderSeg(sp.anchor, r, sp.homeLevelDy !== undefined, r.id);
-			if (g) { ground.segments.push(g); }
+			if (Math.hypot(r.x - sp.anchor.x, r.y - sp.anchor.y) > min) {
+				ground.segments.push(Collide.segment(sp.anchor.x, sp.anchor.y, r.x, r.y, 'leader', r.id));
+			}
 		});
 		list.forEach(function (it) {
 			var sp = byId[it.id];
 			if (sp) { specs.push(Object.assign({}, sp, it.spec)); }
 		});
 		if (!specs.length) { return { placed: placed, took: [] }; }
-		out = Collide.placeLabelsFirstFit(specs, ground, { pad: pad, lastPad: pad, strict: true, leaderMin: 0 });
+		out = Collide.placeLabelsFirstFit(specs, ground, { pad: pad, lastPad: pad, strict: true, leaderMin: min });
 		var took = [], res = {};
 		out.forEach(function (r) { if (!r.dropped) { res[r.id] = r; took.push(r.id); } });
 		// The labels that took a line are that line from here on, for the repair and the hides after.
@@ -3148,14 +2950,14 @@ var EngCalcs = EngCalcs || {};
 	}
 	// The ring pass's own labels, in the same shape: free link labels and dragged labels of either
 	// kind, which are drawn, carry leaders, and are not the gang repair's to move. Its leader is
-	// kept only when the renderer would draw one -- updateDataLeader() draws none at home, and a
-	// leader nobody sees cannot be crossed.
+	// kept only when the renderer would draw one -- updateDataLeader() hides a leader shorter than
+	// leaderThreshold(), and a leader nobody sees cannot be crossed.
 	function ringForeigners(placed) {
-		var out = [];
+		var min = leaderThreshold(), out = [];
 		placed.forEach(function (r) {
 			var bs = (r.boxes && r.boxes.length) ? r.boxes : (r.box ? [r.box] : []), g = r.leader;
 			if (r.dropped || !bs.length) { return; }
-			if (g && labelAtHome({ x: g.ax, y: g.ay }, { x: g.bx, y: g.by }, false)) { g = null; }
+			if (g && Math.hypot(g.bx - g.ax, g.by - g.ay) <= min) { g = null; }
 			out.push({ id: r.id, boxes: bs, leader: g });
 		});
 		return out;
@@ -3182,7 +2984,7 @@ var EngCalcs = EngCalcs || {};
 		return (x && (x.type === 'pump' || x.type === 'valve')) ? 1 : 3;
 	}
 	function shedCrossingLabels(nodeLabels, nodePlaced, ringLabels, ringPlaced, obs) {
-		var entries = [], specs = {}, res;
+		var min = leaderThreshold(), entries = [], specs = {}, res;
 		// **CLEARED FOR EVERY LABEL ON EVERY PASS**, for yieldStationedLabels()'s own reason: a
 		// label hidden once must be back in contention next time, or the drawing only ever loses
 		// labels.
@@ -3199,18 +3001,20 @@ var EngCalcs = EngCalcs || {};
 		}
 		// A node placement's leader is rebuilt from the anchor and the endpoint, which is what
 		// updateDataLeader() draws; the ring pass returns its own, already in the same shape. Both
-		// are dropped at home, because a leader the renderer does not draw cannot be crossed.
+		// are dropped below leaderThreshold(), because a leader the renderer does not draw cannot
+		// be crossed.
 		(nodePlaced || []).forEach(function (r) {
 			var s = specs[r.id], bs = boxesOf(r), g;
 			if (r.dropped || !s || !bs.length) { return; }
-			g = drawnLeaderSeg(s.anchor, r, s.homeLevelDy !== undefined, r.id);
+			g = Math.hypot(r.x - s.anchor.x, r.y - s.anchor.y) > min
+				? Collide.segment(s.anchor.x, s.anchor.y, r.x, r.y, 'leader', r.id) : null;
 			entries.push({ id: r.id, boxes: bs, leader: g, covers: true,
 				hideable: !s.dragged, rank: crossingShedRank(r.id) });
 		});
 		(ringPlaced || []).forEach(function (r) {
 			var s = specs[r.id], bs = boxesOf(r), g = r.leader;
 			if (r.dropped || !bs.length) { return; }
-			if (g && labelAtHome({ x: g.ax, y: g.ay }, { x: g.bx, y: g.by }, false)) { g = null; }
+			if (g && Math.hypot(g.bx - g.ax, g.by - g.ay) <= min) { g = null; }
 			entries.push({ id: r.id, boxes: bs, leader: g,
 				hideable: !!s && !s.dragged, rank: crossingShedRank(r.id) });
 		});
@@ -3268,20 +3072,13 @@ var EngCalcs = EngCalcs || {};
 	// side stays hidden exactly as before. Only a lone label is tried; a chain keeps its stations.
 	// Longest pipe first, as the slide orders them, so the order is a function of the drawing.
 	var LPN_LEVEL_REACH_TEXT_HEIGHTS = 3, LPN_LEVEL_PAD_FRAC = 0.1, LPN_LEVEL_NEAR_FRAC = 0.35;
-	// **A LEVEL LABEL CARRIES ITS LEADER UNLESS IT IS AT HOME, AND ITS HOME IS ON ITS PIPE** (Tom,
-	// 2026-10-19, "anything not in a home spot needs a leader"; Perry's review the same day). A pipe
-	// label rests on its pipe, as an aligned label lies, so a level label is at home only touching it
-	// (levelTouch()); a resting corner of its station is not home for it, since a corner nearer
-	// another pipe needs its leader to say whose it is. Every other side draws its leader, however
-	// near, and a side whose leader cannot be drawn clean is not taken -- with one exception: a pipe
-	// so short that its own point lies inside an end node's symbol can draw no clean leader at all,
-	// and its label may stand quiet, with none, within a text height, where its own pipe is plainly
-	// the nearest (Collide's `quietInSymbol`; short-line-label-harness.js). Without it a short pipe
-	// could never be labelled level.
-	var LPN_LEVEL_STATIONS = [0.5, 0.3, 0.7];
-	// Within this many font sizes of its pipe's point, a level label touches its pipe: at home.
-	var LPN_LEVEL_TOUCH_FRAC = 0.6;
-	function levelTouch() { return effectiveFontSize() * LPN_LEVEL_TOUCH_FRAC; }
+	// **A LEVEL LABEL CARRIES ITS LEADER UNLESS IT TOUCHES ITS PIPE** (pre-review of
+	// feat/label-beside, 2026-10-18: level labels 25-45 px from their pipe had no leader, because a
+	// data label draws one only past leaderThreshold(), and several sat as near another pipe as their
+	// own). A level label is off its pipe by definition, so the leader is what says whose it is: it
+	// is drawn whenever the label's point is more than this many font sizes from the pipe's.
+	var LPN_LEVEL_LEADER_FRAC = 0.6, LPN_LEVEL_STATIONS = [0.5, 0.3, 0.7];
+	function levelLeaderMin() { return effectiveFontSize() * LPN_LEVEL_LEADER_FRAC; }
 	// **THE OTHER FORMS OF A LEVEL LABEL, MEASURED WITHOUT TOUCHING THE LABEL** (Task 812, Tom
 	// 2026-10-18: *"pipe labels that go out on a leader inline or stacked"*, and on which when both
 	// fit, *"Whichever shows more"*). Each candidate content is drawn once into a hidden scratch
@@ -3367,7 +3164,7 @@ var EngCalcs = EngCalcs || {};
 		return out;
 	}
 	function placeLevelPipeLabels(obs, nodeObs, nodeLabels, nodePlaced, ringLabels, ringPlaced, holders, fs) {
-		var specs = [], d = defaultLabelOffset(), home0 = Math.hypot(d.x, d.y),
+		var specs = [], min = leaderThreshold(), d = defaultLabelOffset(), home0 = Math.hypot(d.x, d.y),
 			reach = Math.max(home0 * 3, fs * LPN_LEVEL_REACH_TEXT_HEIGHTS), byKey = {}, fsNow = fs + 'px';
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id];
@@ -3442,9 +3239,17 @@ var EngCalcs = EngCalcs || {};
 			(r.boxes && r.boxes.length ? r.boxes : (r.box ? [r.box] : [])).forEach(function (b) {
 				var c = Collide.box(b.cx, b.cy, b.w, b.h, b.a); c.kind = 'label'; ground.boxes.push(c);
 			});
-			// A stack hung left is drawn flush right, as Collide.labelLineBoxes() models it
-			// (layoutNodeLabel()), so its rows are the whole of its ground.
-			if (Collide.drawsLeader(spec, spec.anchor, r, 0)) {
+			// **A STACK HUNG LEFT IS DRAWN WITH ITS ROWS FLUSH LEFT**, not flush right as
+			// Collide.labelLineBoxes() models it: dataLabelOrigin() puts the text's x at the box's
+			// left edge and every row starts there. So the rows as drawn are added too, or a level
+			// label fills the corner beside a short row that the drawing has covered (measured in
+			// Chromium: up to 10 px deep on Net3 at 2x).
+			if (!spec.side && spec.lines && spec.lines.length > 1 && r.x < spec.anchor.x) {
+				Collide.labelLineBoxes(Object.assign({}, spec, { side: 'right' }), { x: r.x - spec.w, y: r.y }).forEach(function (b) {
+					b.kind = 'label'; ground.boxes.push(b);
+				});
+			}
+			if (Math.hypot(r.x - spec.anchor.x, r.y - spec.anchor.y) > min) {
 				ground.segments.push(Collide.segment(spec.anchor.x, spec.anchor.y, r.x, r.y, 'leader', r.id));
 			}
 		}
@@ -3463,13 +3268,13 @@ var EngCalcs = EngCalcs || {};
 		// rows, by a fifth of a font size (`near`); a side further out carries a leader to its pipe,
 		// which says it instead. A label with no such side stays hidden.
 		var out = perfDebugAccum('  lv:fit', function () { return Collide.placeLabelsFirstFit(specs, ground, { pad: fs * LPN_LEVEL_PAD_FRAC, lastPad: fs * LPN_LEVEL_PAD_FRAC, strict: true,
-			leaderMin: levelTouch(), quietMax: Math.max(fs, 1.05 * home0), quietInSymbol: true, near: fs * LPN_LEVEL_NEAR_FRAC }); });
+			leaderMin: levelLeaderMin(), quietMax: min, near: fs * LPN_LEVEL_NEAR_FRAC }); });
 		out.forEach(function (r) {
 			var sp = byKey[r.id], le = sp && linkEls[sp.l.id];
 			if (!le || r.dropped) { return; }
 			le.levelBeside = true;
 			le.levelForm = (r.form !== undefined && sp.forms && sp.forms[r.form]) ? sp.forms[r.form].form : null;
-			// No leader: at home (touching its pipe), or quiet (below).
+			// No leader where the pass found its own pipe plainly the nearest (Collide's `quietMax`).
 			le.levelQuiet = !r.leader;
 			// Where its leader starts and its text hangs, from the station it was placed from.
 			var side = r.side >= 0 ? sp.sides[r.side] : null, a = r.anchor || sp.anchor;
@@ -3501,29 +3306,27 @@ var EngCalcs = EngCalcs || {};
 		// **EVERY NODE LABEL STARTS FROM ITS FULL CONTENT** (Task 469), before anything is measured
 		// into a placement spec. Shedding down from whatever survived the last pass is a ratchet.
 		if (shedNodes) { unshedNodeLabels(fsNow); }
-		perfDebugAccum('  cl:movedHide', function () { hideCoveringMovedLabels(obs, fs); });
-		function addDataLabel(key, holder, anchor, home, dragged, lineCount, owner, displaced) {
+		function addDataLabel(key, holder, anchor, home, dragged, lineCount, owner) {
 			// Every nudge is cleared and re-derived from scratch on every pass, dragged or not, so
 			// the pass is IDEMPOTENT: running it twice on an unchanged drawing gives the same answer
 			// as running it once. Keeping the previous nudge and searching from there is what made
 			// the old relaxation accumulate drift on every frame of a drag.
 			holder.nudge = { x: 0, y: 0 };
-			// A displaced moved label is placed as an automatic one, measured from its stored endpoint.
-			holder.nudgeManual = !!dragged || !!displaced;
-			if (holder.empty || holder.hiddenFixed) { return; }   // nothing rendered -- no box to place
+			holder.nudgeManual = !!dragged;
+			if (holder.empty) { return; }   // nothing rendered -- no box to place
 			holders[key] = holder;
-			labels.push(homeSpec({
+			labels.push({
 				id: key, anchor: anchor, home: home, dragged: !!dragged,
 				side: dragged ? movedLabelSide(holder, owner, anchor, home, labelInHand(holder)) : undefined,
 				w: labelBoxWidth(holder), h: dataLabelBoxHeight(lineCount), yOff: -fs * 0.85,
 				lines: labelRowWidths(holder)
-			}));
+			});
 		}
 		// One auto-placed node label, as a first-fit participant. The spec is nodeFirstFitSpec()'s,
 		// because predictNodeLabelBoxes() builds the same one; this is the bookkeeping round it.
 		function addNodeFirstFit(n, ne) {
 			ne.nudge = { x: 0, y: 0 };
-			ne.nudgeManual = n.lx !== undefined;   // a displaced moved label (hideCoveringMovedLabels())
+			ne.nudgeManual = false;
 			if (ne.empty) { return; }
 			holders[nodeLabelKey(n.id)] = ne;
 			nodeLabels.push(nodeFirstFitSpec(n, ne, fs));
@@ -3534,7 +3337,7 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id]; if (!ne) { return; }
 			ne.hiddenDropped = false;
-			if (n.lx !== undefined && !ne.fixedDisplaced) {
+			if (n.lx !== undefined) {
 				addDataLabel(nodeLabelKey(n.id), ne, nodeAt(n), nodeLabelBase(n), true, ne.lineCount, n);
 				return;
 			}
@@ -3560,7 +3363,7 @@ var EngCalcs = EngCalcs || {};
 				return;
 			}
 			addDataLabel(linkLabelKey(l.id), le, linkLabelMid(l), linkLabelBase(l),
-				l.lx !== undefined && !le.fixedDisplaced, le.lineCount, l, le.fixedDisplaced);
+				l.lx !== undefined, le.lineCount, l);
 		});
 		// **LINKS PLACE FIRST, NODES SURVIVE FIRST** -- two different orders answering two different
 		// questions, exactly the split ESRI Maplex draws between label priority and what is left
@@ -3630,7 +3433,7 @@ var EngCalcs = EngCalcs || {};
 			});
 		var repaired = perfDebugAccum('  cl:repair', function () { return Collide.repairCrossingGangs(movable,
 			nodePlaced.filter(function (r) { return !fixedIds[r.id]; }), nodeObs, {
-			pad: pad, leaderMin: 0,
+			pad: pad, leaderMin: leaderThreshold(),
 			// The closing count is a second sweep of the whole drawing for a number no decision
 			// reads, so it is taken only when the bench is open to print it.
 			report: debugOn('labels'),
@@ -3657,9 +3460,6 @@ var EngCalcs = EngCalcs || {};
 			h.nudge = { x: r.dx, y: r.dy };
 			h.placedSide = r.side;
 			if (r.dropped) { h.hiddenDropped = true; }
-			// The ring pass scores rather than refuses, so a displaced moved pipe label it could not
-			// clear of a Text or a symbol hides instead (hideCoveringMovedLabels()).
-			if (h.fixedDisplaced && r.id.charAt(0) === 'l' && displacedStillCovers(r, obs, fs)) { h.hiddenFixed = true; }
 		});
 		// **THE YIELDER HAS TO ACTUALLY LEAVE, and until 2026-08-23 it never did.** See
 		// yieldStationedLabels() -- this is the one call site, and it must run after BOTH placements.
@@ -15957,7 +15757,6 @@ var EngCalcs = EngCalcs || {};
 	function updateLabelGeometry(id) {
 		labelCacheTaint();
 		var lb = labelById(id), le = labelEls[id], an = textAnchorPoint(lb), px, py, box, halfW, att, own = textOwnPoint(lb);
-		applyTextHidden(le);
 		if (!an) {
 			// repositionMultilineText(), not two setAttribute()s: every ROW of a multi-line label
 			// carries its own x, so moving the parent alone would strand the rows where they were
@@ -16372,7 +16171,7 @@ var EngCalcs = EngCalcs || {};
 			var n = doc.nodes[i], r = nodeRadius(n) + 0.2, ne = nodeEls[n.id] || {},
 				tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1,
 				nat = nodeAt(n),
-				nlx = ne.text ? +ne.text.getAttribute('x') - (ne.text.getAttribute('text-anchor') === 'end' ? tw : 0) : nat.x + 2, nly = ne.text ? +ne.text.getAttribute('y') : nat.y - 2;
+				nlx = ne.text ? +ne.text.getAttribute('x') : nat.x + 2, nly = ne.text ? +ne.text.getAttribute('y') : nat.y - 2;
 			inc(nat.x - r, nat.y - r); inc(nat.x + r, nat.y + r);
 			// **A LABEL THAT IS NOT DRAWN RESERVES NO ROOM.** Zoom-to-fit is a question about what is
 			// on the screen, so it asks the same question the renderer just answered, and settles at
@@ -16415,8 +16214,8 @@ var EngCalcs = EngCalcs || {};
 
 			if (lle && (ignoreDataLabels || linkLabelAligned(l))) { continue; }
 			if (lle) {
-				var ltw = labelBoxWidth(lle) || 8, llc = lle.lineCount || 1,
-					lx = +lle.text.getAttribute('x') - (lle.text.getAttribute('text-anchor') === 'end' ? ltw : 0), ly = +lle.text.getAttribute('y');
+				var lx = +lle.text.getAttribute('x'), ly = +lle.text.getAttribute('y'),
+					ltw = labelBoxWidth(lle) || 8, llc = lle.lineCount || 1;
 				inc(lx, ly - 2); inc(lx + ltw, ly + 0.6 + (llc - 1) * effectiveLineHeight());
 			}
 		}
@@ -57930,10 +57729,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// highlight on dragged labels for about a minute, maybe fading, maybe dashed, maybe
 			// animated so it's obviously temporary."*). The class drives a dashed outline that fades
 			// out on its own; re-adding it restarts the animation, so each drag re-announces.
-			// The zoom it was put down at: at this zoom and closer, it covers nothing it was not put
-			// on deliberately, and hideCoveringMovedLabels() leaves it exactly where it is.
-			var placedH = drag.type === 'nodelbl' ? nodeEls[drag.id] : drag.type === 'linklbl' ? linkEls[drag.id] : null;
-			if (placedH) { placedH.placedAtScale = state.s; }
 			markJustDragged(drag.type === 'nodelbl' ? (nodeEls[drag.id] && nodeEls[drag.id].text)
 				: drag.type === 'linklbl' ? (linkEls[drag.id] && linkEls[drag.id].text)
 				: (labelEls[drag.id] && labelEls[drag.id].text));
@@ -60523,11 +60318,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// property both read as off. Each shipped example now states `allZoom: true` on
 			// whichever of its own Text objects is the largest, which is what keeps a note like
 			// Net3's "Zoom in to see labels" readable when the labels have gone.
+			var gone = !isActive(lb) || (past && !textAllZoom(lb));
 			// The grab shape carries the class too -- see setLabelAssemblyHidden(): it is a sibling
-			// of the words, so nothing hides it by inheritance. applyTextHidden() adds a Text another
-			// Text covers (crowdedTexts()).
-			le.suppressed = !isActive(lb) || (past && !textAllZoom(lb));
-			applyTextHidden(le);
+			// of the words, so nothing hides it by inheritance.
+			[le.text, le.leader, le.lblHit].forEach(function (e) {
+				if (e && e.classList) { e.classList.toggle('lpn-lbl-hidden', gone); }
+			});
 		});
 	}
 	// **THE LABELING THRESHOLD OR THE WINDOW MOVED** (Task 705). **No longer an input to the symbol
@@ -60838,7 +60634,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lineCount: h.lineCount, shedCount: h.shedCount || 0,
 			hiddenShort: !!h.hiddenShort, hiddenCrowded: !!h.hiddenCrowded, hiddenYielded: !!h.hiddenYielded,
 			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
-			hiddenFixed: !!h.hiddenFixed, fixedDisplaced: !!h.fixedDisplaced, crowdHidden: !!h.crowdHidden,
 			alignedAlong: h.alignedAlong, stationSides: h.stationSides ? h.stationSides.slice() : h.stationSides,
 			levelBeside: !!h.levelBeside, levelForm: h.levelForm || null, levelAt: h.levelAt || null, levelQuiet: !!h.levelQuiet, inline: !!h.inline, inlineFrom: h.inlineFrom || null, tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
 			rowW: h.rowW ? h.rowW.slice() : null, rowWPx: h.rowWPx ? h.rowWPx.slice() : null,
@@ -60893,7 +60688,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h.hiddenShort = c.hiddenShort; h.hiddenCrowded = c.hiddenCrowded; h.hiddenYielded = c.hiddenYielded;
 		h.hiddenBlocked = c.hiddenBlocked;
 		h.hiddenCrossed = c.hiddenCrossed; h.hiddenDropped = c.hiddenDropped;
-		h.hiddenFixed = c.hiddenFixed; h.fixedDisplaced = c.fixedDisplaced; h.crowdHidden = c.crowdHidden;
 		h.alignedAlong = c.alignedAlong; h.levelBeside = c.levelBeside; h.levelForm = c.levelForm || null; h.levelAt = c.levelAt || null; h.levelQuiet = !!c.levelQuiet; h.inlineFrom = c.inlineFrom || null;
 		h.stationSides = c.stationSides ? c.stationSides.slice() : c.stationSides;
 		h.tw = c.tw; h.twPx = c.twPx; h.width = c.width; h.widthPx = c.widthPx;

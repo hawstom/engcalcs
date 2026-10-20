@@ -32,10 +32,7 @@ const L = loadLoopedNetwork(
 	"\t\tleaderOf: function (id) { var e = nodeEls[id].leader;\n" +
 	"\t\t\treturn e.style.display === 'none' ? null : { x1: +e.getAttribute('x1'), y1: +e.getAttribute('y1'),\n" +
 	"\t\t\t\tx2: +e.getAttribute('x2'), y2: +e.getAttribute('y2') }; },\n" +
-	// The box's LEFT edge: a label hung left is right-justified on its endpoint (text-anchor end).
-	"\t\ttextX: function (id) { var t = nodeEls[id].text; return +t.getAttribute('x') - (t.getAttribute('text-anchor') === 'end' ? labelBoxWidth(nodeEls[id]) : 0); },\n" +
-	"\t\ttextAnchorAttr: function (id) { return nodeEls[id].text.getAttribute('text-anchor'); },\n" +
-	"\t\ttextXAttr: function (id) { return +nodeEls[id].text.getAttribute('x'); },\n" +
+	"\t\ttextX: function (id) { return +nodeEls[id].text.getAttribute('x'); },\n" +
 	"\t\tboxWidth: function (id) { return labelBoxWidth(nodeEls[id]); },\n" +
 	"\t\tsideOf: function (id) { return nodeEls[id].side; },\n" +
 	// The headless DOM cannot measure text, so refreshLabelText() leaves every tw at the stub's one
@@ -76,7 +73,8 @@ console.log('=== the leader angle, across zoom and text size ===');
 
 // The stored offset IS point B, on both sides: up and to the LEFT of the node is the case that was
 // broken, up and to the RIGHT the one that always worked.
-// Away from home, so the leader is drawn at every zoom below (labelAtHome()).
+// Far enough out that the leader is drawn at every zoom below: leaderThreshold() itself scales with
+// the text, so a label 50 units away has no leader once the text is four times its nominal size.
 const CASES = [
 	{ name: 'dragged LEFT of the anchor (the broken case)', lx: -120, ly: -90, side: 'left' },
 	{ name: 'dragged RIGHT of the anchor (was already correct)', lx: 120, ly: -90, side: 'right' }
@@ -125,9 +123,6 @@ CASES.forEach(function (c) {
 	if (c.side === 'left') {
 		ok('  the TEXT does move with the zoom -- it is placed in pixels, and that is correct',
 			new Set(at.map(function (v) { return v.toFixed(6); })).size === ZOOMS.length, at.map(function (v) { return v.toFixed(2); }).join(' / '));
-		// Tom, 2026-10-19: a label left of its point is right-justified, its rows ending at the endpoint.
-		ok('  hanging left, the text is right-justified and ends ON the endpoint',
-			L.textAnchorAttr(n.id) === 'end' && Math.abs(L.textXAttr(n.id) - (n.x + c.lx)) < 1e-9, L.textAnchorAttr(n.id) + ' ' + L.textXAttr(n.id));
 	} else {
 		ok('  hanging right, the text starts ON the endpoint at every zoom',
 			at.every(function (v) { return Math.abs(v - (n.x + c.lx)) < 1e-9; }), at.join(' / '));

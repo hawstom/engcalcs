@@ -201,9 +201,8 @@ this file.
 
 ### leader **[RECORDS]**
 The line from an anchor to its label. Universal: ASME Y14.2 §4.9.3, ISO 128-22, QGIS **callout**,
-AutoCAD **MLEADER**. A label in its **home spot** draws none; every other label draws one, however
-near (Tom, 2026-10-19; `labelAtHome()`, `dev/lpn-rulings.md`). This replaced a **leader tolerance**
-(ESRI's term), a distance below which none was drawn.
+AutoCAD **MLEADER**. Below a **leader tolerance** (ESRI's term; `leaderThreshold()`,
+`js/looped-network.js:97`) no leader is drawn at all.
 
 ### needy / wealthy **[PROPOSE]** *(Tom's words, replacing "high order")*
 How much open ground a node has around it. Tom on the incumbent: *"high order is a poor term. And
