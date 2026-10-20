@@ -211,6 +211,30 @@ async function sweepSelected(ids, when, extra) {
 	const cn = await L.runcrit();
 	check(cn.ok && !cn.wholeRun && cn.results.every((r) => r.run === undefined), 'the step on screen is unchanged: no run record on any row');
 
+	head('6b. CRITICALITY WHOLE RUN: DEMAND NOT SERVED IS THE LARGEST OVER THE RUN');
+	open('Net3.lwn');
+	L.setEngine('epanet');
+	L.minPressureSet('20');
+	L.critSet('when', 'run');
+	const c3 = await L.runcrit();
+	const base3 = await L.analysisRun();
+	const peakOf = (rec) => {
+		let peak = 0, peakT = null;
+		base3.frames.forEach((f) => {
+			const sum = rec.cutOff.reduce((x, id) => x + f.demands[id], 0);
+			if (sum > peak) { peak = sum; peakT = f.t; }
+		});
+		return { peak, peakT };
+	};
+	const cutting = c3.results.filter((r) => r.cutOff && r.cutOff.length && peakOf(r).peak > 0);
+	check(cutting.length > 0, 'some Net3 outage cuts off a junction that has demand (' + cutting.map((r) => r.id).join(',') + ')');
+	cutting.forEach((r) => {
+		const w = peakOf(r);
+		check(Math.abs(r.unserved - w.peak) < 1e-12 && r.unservedAt === w.peakT,
+			`outage of link ${r.id} cuts off ${r.cutOff.join(',')}: demand not served is the run's own peak (${(w.peak * 15850.3231).toFixed(2)} gpm at ${EC.lpnFormatTime(w.peakT)})`);
+	});
+	L.critSet('when', 'now');
+
 	head('7. DEMAND SCALING OVER THE WHOLE RUN (Net3)');
 	open('Net3.lwn');
 	L.setEngine('epanet');

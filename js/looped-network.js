@@ -77882,7 +77882,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		shown = sorted.slice(0, FF_MAX_ROWS);
 		body = ffTable(host, [
 			pc.lpn_crit_col_asset || 'Asset',
-			pc.lpn_crit_col_unserved || 'Demand not served',
+			set.wholeRun ? (pc.lpn_crit_col_unserved_peak || 'Largest demand not served') : (pc.lpn_crit_col_unserved || 'Demand not served'),
 			pc.lpn_crit_col_cutoff || 'Junctions cut off',
 			pc.lpn_crit_col_below || 'Junctions below minimum'
 		].concat(set.wholeRun ? [
@@ -77897,7 +77897,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// row means "the system failed to deliver" in both reports. 'none' is untinted, as a pass.
 			var tr = ffEl('tr', 'lpn-ff-' + EngCalcs.lpnCriticalitySeverity(rec), null, body);
 			ffGotoLink(ffCell(tr, ''), 'link', rec.id, labelPrefixFor('link', 'id') + rec.id);
-			ffCell(tr, typeof rec.unserved === 'number' ? ffQty(rec.unserved, 'lpn_u_flow') : FF_DASH);
+			ffCell(tr, typeof rec.unserved === 'number'
+				? (set.wholeRun && rec.unserved > 0 && typeof rec.unservedAt === 'number'
+					? (pc.lpn_at_time || '{value} at {time}').replace('{value}', ffQty(rec.unserved, 'lpn_u_flow')).replace('{time}', dsTimeText(rec.unservedAt))
+					: ffQty(rec.unserved, 'lpn_u_flow'))
+				: FF_DASH);
 			if (rec.cutOff) { critIdsCell(tr, rec.cutOff); } else { ffCell(tr, FF_DASH); }
 			// **A CASE THAT DID NOT SOLVE IS A ROW SAYING SO, NEVER AN ABORT.** What was cut off is
 			// known without a solve and is still printed; only the pressures are missing, so the

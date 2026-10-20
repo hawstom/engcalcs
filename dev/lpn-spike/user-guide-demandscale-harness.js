@@ -45,6 +45,7 @@ async function main() {
 		console.log('\n2. The entry');
 		const en = await entry(P, 'lpn_ds_box');
 		ok('the entry holds the chapter\'s four terms after the box\'s paragraphs', !!en && TERMS.every((k, i) => en.dts[i] === enString(k)) && en.paras >= 3, en && JSON.stringify(en.dts));
+		ok('the entry describes the Time step tested choice', await P.evaluate((t) => document.body.innerText.indexOf(t) >= 0, enString('lpn_when')));
 		await P.evaluate(() => document.getElementById('lpn_hotkeys_close').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
 		await settle(400);
 

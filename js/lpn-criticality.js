@@ -219,6 +219,7 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			baseBelow = {},
 			baseEmpty = {},
 			baseRun = null,
+			baseFrames = null,
 			baseCut = 0;
 
 		if (typeof opts.solve !== 'function') {
@@ -304,6 +305,16 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			});
 			rec.cutOff = cut;
 			rec.unserved = unserved;
+			// Over a whole run the demand not served is the LARGEST, over the reporting steps, of the
+			// cut-off junctions' demands in the intact run, and the step it occurs at.
+			if (baseFrames && cut.length) {
+				rec.unserved = 0;
+				baseFrames.forEach(function (f) {
+					var sum = 0;
+					cut.forEach(function (cid) { var d = f.demands ? f.demands[cid] : 0; sum += (typeof d === 'number' && isFinite(d)) ? d : 0; });
+					if (sum > rec.unserved) { rec.unserved = sum; rec.unservedAt = f.t; }
+				});
+			} else if (baseFrames) { rec.unserved = 0; }
 			m = caseModel(model, links, drop);
 			if (!m.nodes.some(function (n) { return isJunction[n.id]; })) {
 				rec.below = [];
@@ -354,6 +365,7 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			if (bad) { return { ok: false, code: CODES.BASELINE_FAILED, cause: bad.code, issues: bad.issues }; }
 			belowIn(r, base).forEach(function (b) { baseBelow[b.id] = true; });
 			if (r.frames) {
+				baseFrames = r.frames;
 				(function () {
 					var e = tankEmptyAt(r.frames, base, null);
 					if (e) { baseEmpty[e.id] = true; }

@@ -3638,6 +3638,7 @@ EngCalcs.pageConfig = {
 	lpn_crit_minpressure_tip: <?=json_encode($ec_lang['lpn_crit_minpressure_tip'])?>,
 	lpn_crit_col_asset: <?=json_encode($ec_lang['lpn_crit_col_asset'])?>,
 	lpn_crit_col_unserved: <?=json_encode($ec_lang['lpn_crit_col_unserved'])?>,
+	lpn_crit_col_unserved_peak: <?=json_encode($ec_lang['lpn_crit_col_unserved_peak'])?>,
 	lpn_crit_col_cutoff: <?=json_encode($ec_lang['lpn_crit_col_cutoff'])?>,
 	lpn_crit_col_below: <?=json_encode($ec_lang['lpn_crit_col_below'])?>,
 	lpn_crit_summary: <?=json_encode($ec_lang['lpn_crit_summary'])?>,
