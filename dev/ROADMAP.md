@@ -66,7 +66,7 @@ the block.
 
 ## 100 — Next.
 
-- 100|733| **Grow the native solver, in phases, to everything EPANET's solves.** **PHASE 1 MERGED 2026-10-17** (`feat/native-valves`): PRV, PSV, FCV solve natively, matching EPANET 2.3.5 within 0.8 mm head (`native-valve-harness.js`); PBV and GPV merged 2026-10-18. EPS slice 1 (the time loop, no controls; within 0.8 mm of EPANET 2.3.5 on 22 cases) merged 2026-10-20 (`feat/native-eps`). Next: slice 2, controls. Tom, 2026-09-26
+- 100|733| **Grow the native solver, in phases, to everything EPANET's solves.** **PHASE 1 MERGED 2026-10-17** (`feat/native-valves`): PRV, PSV, FCV solve natively, matching EPANET 2.3.5 within 0.8 mm head (`native-valve-harness.js`); PBV and GPV merged 2026-10-18. EPS slice 1 (the time loop, no controls; within 0.8 mm of EPANET 2.3.5 on 22 cases) merged 2026-10-20 (`feat/native-eps`). Slice 2 (simple controls) built on `feat/native-eps`, within 0.8 mm on Net1, Net3 and 15 constructed cases; not wired to the page. Next: slice 3. Tom, 2026-09-26
   **PROMOTED TO 100 by Tom, 2026-10-17, as a long-term task: slow and careful.** Each phase is its own branch, matched against EPANET 2.3.5 on every shipped example before it merges.
   **PROMOTED TO 75 by Tom, 2026-10-14.**
   (R-325): *"it would be fun and maybe wise ... to gradually, in phases, build out our native solver
