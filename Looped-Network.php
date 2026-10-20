@@ -1942,7 +1942,10 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <?php // **USING THE GUIDE COMES FIRST** (Tom, 2026-10-07: *"Shouldn't 'Using the guide' be first?"*). ?>
 <section class="lpn-guide-section" data-guide-section="using">
 <h2><?=$ec_lang['lpn_guide_using_heading']?></h2>
-<?=ecGuideDl('using')?>
+<dl>
+	<dt><?=$ec_lang['lpn_guide_keys_term']?></dt><dd><?=$ec_lang['lpn_guide_keys_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_use_term']?></dt><dd><?=$ec_lang['lpn_guide_use_def']?></dd>
+</dl>
 </section>
 <section class="lpn-guide-section" data-guide-section="toolbar">
 <h2><?=$ec_lang['lpn_help_icons']?></h2>
@@ -1965,15 +1968,29 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 </section>
 <section class="lpn-guide-section" data-guide-section="map">
 <h2><?=$ec_lang['lpn_hotkeys_map_heading']?></h2>
-<?=ecGuideDl('map')?>
+<dl>
+	<dt class="lpn-guide-dup"><?=$ec_lang['lpn_hotkeys_map_term']?></dt><dd><?=str_replace('</tbody></table>', '<tr><td>W</td><td>' . $ec_lang['lpn_hotkeys_zoomwin_def'] . '</td></tr></tbody></table>', preg_replace('~</tr>~', '</tr><tr><td>1</td><td>' . $ec_lang['lpn_tool_add_chain'] . '</td></tr><tr><td>A</td><td>' . rtrim($ec_lang['lpn_tool_area_tip'], '.') . '</td></tr>', $ec_lang['lpn_hotkeys_map_def'], 1))?></dd>
+	<dt><?=$ec_lang['lpn_guide_map_undo_term']?></dt><dd><?=$ec_lang['lpn_guide_map_undo_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_map_del_term']?></dt><dd><?=$ec_lang['lpn_guide_map_del_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_map_esc_term']?></dt><dd><?=$ec_lang['lpn_guide_map_esc_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_map_letters_term']?></dt><dd><?=$ec_lang['lpn_guide_map_letters_def']?></dd>
+</dl>
 </section>
 <section class="lpn-guide-section" data-guide-section="snip">
 <h2><?=$ec_lang['lpn_hotkeys_snip_heading']?></h2>
-<?=ecGuideDl('snip')?>
+<dl>
+	<dt class="lpn-guide-dup"><?=$ec_lang['lpn_hotkeys_snip_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_snip_def']?></dd>
+</dl>
 </section>
 <section class="lpn-guide-section" data-guide-section="tables">
 <h2><?=$ec_lang['lpn_hotkeys_tables_heading']?></h2>
-<?=ecGuideDl('tables')?>
+<dl>
+	<dt><?=$ec_lang['lpn_notes_6_term']?></dt><dd><?=$ec_lang['lpn_notes_6_def']?></dd>
+	<dt><?=$ec_lang['lpn_notes_7_term']?></dt><dd><?=$ec_lang['lpn_notes_7_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_tbl_tabs_term']?></dt><dd><?=$ec_lang['lpn_guide_tbl_tabs_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_tbl_cell_term']?></dt><dd><?=$ec_lang['lpn_guide_tbl_cell_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_tbl_fill_term']?></dt><dd><?=$ec_lang['lpn_guide_tbl_fill_def']?></dd>
+</dl>
 </section>
 <section class="lpn-guide-section" data-guide-section="boxes">
 <h2><?=$ec_lang['lpn_guide_boxes_heading']?></h2>
@@ -1988,11 +2005,20 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 </section>
 <section class="lpn-guide-section" data-guide-section="about">
 <h2><?=$ec_lang['lpn_guide_about_heading']?></h2>
-<?=ecGuideDl('about')?>
+<dl>
+	<dt><?=$ec_lang['lpn_notes_1_term']?></dt><dd><?=$ec_lang['lpn_notes_1_def']?></dd>
+	<dt><?=$ec_lang['lpn_notes_2_term']?></dt><dd><?=$ec_lang['lpn_notes_2_def']?></dd>
+</dl>
 </section>
 <section class="lpn-guide-section" data-guide-section="notes">
 <h2><?=$ec_lang['lpn_help_notes']?></h2>
-<?=ecGuideDl('notes')?>
+<dl>
+	<dt><?=$ec_lang['lpn_notes_3_term']?></dt><dd><?=$ec_lang['lpn_notes_3_def']?></dd>
+	<dt><?=$ec_lang['lpn_notes_5_term']?></dt><dd><?=$ec_lang['lpn_notes_5_def']?></dd>
+	<dt><?=$ec_lang['lpn_notes_color_term']?></dt><dd><?=$ec_lang['lpn_notes_color_def']?></dd>
+	<dt><?=$ec_lang['lpn_notes_engine_term']?></dt><dd><?=$ec_lang['lpn_notes_engine_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_nt_example_term']?></dt><dd><?=$ec_lang['lpn_guide_nt_example_def']?></dd>
+</dl>
 </section>
 <?php // The Find and replace chapter beyond its opening paragraphs (lpn_guide_text_find_popup):
       // renderGuideBoxes() copies this template into the box's entry. Tom, 2026-10-07: *"The Find

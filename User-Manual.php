@@ -75,4 +75,4 @@ $ec_chapter_href = function ($slug, $lang) {
 </nav>
 </div>
 <?php
-echoFooter("EngCalcs", false, true, false);
+echoFooter("EngCalcs");

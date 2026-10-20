@@ -110,7 +110,7 @@ function ecGuideDl($slug) {
         $dup = ($stem === 'lpn_hotkeys_map' || $stem === 'lpn_hotkeys_snip') ? ' class="lpn-guide-dup"' : '';
         $html .= "\t<dt" . $dup . '>' . $ec_lang[$stem . '_term'] . '</dt><dd>' . $def . "</dd>\n";
     }
-    return $html . "</dl>\n";
+    return $html . "</dl>";
 }
 
 /**
