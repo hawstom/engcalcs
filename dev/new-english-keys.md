@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**156 still to read on master**, of 164 untranslated keys, of 3183 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**163 still to read on master**, of 171 untranslated keys, of 3190 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (164, 156 to read @@ NEEDS RULING)
+## lpn_  (171, 163 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -82,6 +82,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_dur_bad_time`**
   > The start and the duration must be whole multiples of the pattern time step, {step}, and the fire must start within the run.
   @@ NEEDS RULING
+- **`lpn_dur_col_drop`**
+  > Drop from start
+  @@ NEEDS RULING
 - **`lpn_dur_col_end`**
   > Level at end
   @@ NEEDS RULING
@@ -92,7 +95,10 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Fire flow
   @@ NEEDS RULING
 - **`lpn_dur_col_low`**
-  > Lowest level
+  > Lowest level reached
+  @@ NEEDS RULING
+- **`lpn_dur_col_margin`**
+  > Above lowest water depth
   @@ NEEDS RULING
 - **`lpn_dur_col_nofire`**
   > Pressure without the fire
@@ -112,11 +118,20 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_dur_holds`**
   > ✓ Junction {id} holds at least {pressure} during the fire, above the residual pressure of {residual}, at {time}.
   @@ NEEDS RULING
+- **`lpn_dur_junction`**
+  > Fire junction
+  @@ NEEDS RULING
+- **`lpn_dur_junction_many`**
+  > Several are selected. Select one junction on the map.
+  @@ NEEDS RULING
+- **`lpn_dur_junction_none`**
+  > None selected. Select one junction on the map.
+  @@ NEEDS RULING
 - **`lpn_dur_length`**
   > Fire duration
   @@ NEEDS RULING
 - **`lpn_dur_length_tip`**
-  > Hours and minutes, such as 2:00. The fire flow is the Required fire flow, drawn at the one junction selected on the map from the start time for this long. The whole extended-period simulation is run on a copy of the network and compared with the same run without the fire. The start and the duration must be whole multiples of the pattern time step.
+  > Hours and minutes, such as 2:00. The fire flow is the Required fire flow, drawn at the one junction selected on the map from the start time for this long. The whole extended-period simulation is run on a copy of the network and compared with the same run without the fire. The start and the duration must be whole multiples of the pattern time step. The system counts as recovered when, at the last reporting step, no junction is more than about 0.14 psi (1 kPa) and no tank more than about 0.3 ft (0.1 m) from the run without the fire.
   @@ NEEDS RULING
 - **`lpn_dur_lowest`**
   > The lowest pressure anywhere is {pressure}, at junction {id}, at {time}.
@@ -127,20 +142,26 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_dur_no_junction`**
   > Select one junction for the fire.
   @@ NEEDS RULING
-- **`lpn_dur_not_recovered`**
-  > ⚠ The system has not recovered by {time}, the last reporting step: {id} differs from the run without the fire by {pressure}.
+- **`lpn_dur_not_back_junction`**
+  > ⚠ At {time}, the last reporting step, junction {id} is not back to its pressure without the fire. The difference is {pressure}, against a tolerance of {tolerance}.
+  @@ NEEDS RULING
+- **`lpn_dur_not_back_tank`**
+  > ⚠ At {time}, the last reporting step, tank {id} is not back to its level without the fire. The difference is {level}, against a tolerance of {tolerance}.
   @@ NEEDS RULING
 - **`lpn_dur_option`**
   > A fire for a stated duration
   @@ NEEDS RULING
 - **`lpn_dur_recovers`**
-  > ✓ The system recovers after the fire: at {time}, the last reporting step, nothing differs from the run without the fire by more than {pressure}.
+  > ✓ The system recovers after the fire: at {time}, the last reporting step, no junction differs from the run without the fire by more than {pressure} and no tank by more than {level}.
   @@ NEEDS RULING
 - **`lpn_dur_recovery_cut`**
   > The run stopped before its end, so recovery after the fire is not assessed.
   @@ NEEDS RULING
 - **`lpn_dur_recovery_to_end`**
   > The fire lasts to the end of the run, so recovery after it is not assessed.
+  @@ NEEDS RULING
+- **`lpn_dur_shortfall`**
+  > ⚠ Only {delivered} of the {flow} fire flow is delivered at junction {id}, at {time}, so the residual pressure is not a test of that fire.
   @@ NEEDS RULING
 - **`lpn_dur_start`**
   > Fire starts at
@@ -528,7 +549,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**57 still to read**, of 61 new keys across 6 unmerged branch(es).
+**57 still to read**, of 61 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -541,7 +562,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/label-leader (`b468704c8`) — adds no English strings
+### feat/duration-fire (`eb5a81f50`) — adds no English strings
+
+### feat/label-leader (`23782dedb`) — adds no English strings
 
 ### feat/sqlite-reader (`75ed1031f`) — 51 new, 51 to read @@ NEEDS RULING
 
@@ -699,7 +722,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   @@ NEEDS RULING
 
-### feat/theme (`6221a4cae`) — 10 new, 6 to read @@ NEEDS RULING
+### feat/theme (`6221a4cae`) — already merged into feat/theme-tank; its strings are listed there
+
+### feat/theme-tank (`0055f8ed3`) — 10 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_theme_amber`**
   > Amber
@@ -731,7 +756,5 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_theme_space`**
   > Space
   @@ NEEDS RULING
-
-### feat/theme-tank (`6221a4cae`) — already merged into feat/theme; its strings are listed there
 
 ### fix/examples-guide (`5de0786d7`) — adds no English strings

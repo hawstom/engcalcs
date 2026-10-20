@@ -20,7 +20,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { ROOT, setUnitSet, loadLoopedNetwork, warmEpanet } = require('./lpn-dom-stub.js');
+const { ROOT, byId, setUnitSet, loadLoopedNetwork, warmEpanet } = require('./lpn-dom-stub.js');
 
 require(ROOT + 'js/lpn-inp.js');
 require(ROOT + 'js/lpn-patterns.js');
@@ -38,6 +38,7 @@ global.FileReader = function () {
 	};
 };
 const EC = global.EngCalcs;
+const PC = EC.pageConfig;
 
 let failures = 0;
 function check(ok, msg) {
@@ -56,6 +57,8 @@ const L = loadLoopedNetwork(
 	"\t\tsetAsk: function (k, v) { if (!fireFlowAsk) { fireFlowAsk = fireFlowDefaults(); } fireFlowAsk[k] = v; },\n" +
 	"\t\tsetSelectionList: setSelectionList,\n" +
 	"\t\tsetEngine: function (e) { settings.engine = e; },\n" +
+	"\t\texportInp: function () { var o = EngCalcs.lpnExportInp(inpExportDocument(), inpExportOptions()); return o && o.ok ? o.inp : null; },\n" +
+	"\t\tdurPicked: durPicked, durStartOptions: durStartOptions, durJunctionText: durJunctionText,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -84,6 +87,26 @@ function handMadeInp(node, gpm, firstPeriod, lastPeriod, periods, baseGpm) {
 		'[DEMANDS]\n;Junction        \tDemand      \tPattern         \tCategory\n ' + node + '\t' + baseGpm + '\t1\n ' + node + '\t' + gpm + '\tFIRE\n');
 	txt = txt.replace('[CURVES]', ' FIRE\t' + mult.join('\t') + '\n\n[CURVES]');
 	return txt;
+}
+// The same hand-made copy, but from the SHIPPED example as the page writes it (so its [RULES] ride
+// along): the fire is a second [DEMANDS] category on the FIRE pattern, the junction's own demand the first.
+function handMadeFromExport(inp, node, gpm, firstPeriod, lastPeriod, periods) {
+	const mult = [];
+	for (let k = 0; k < periods; k++) { mult.push(k >= firstPeriod && k <= lastPeriod ? 1 : 0); }
+	const lines = inp.split(/\r?\n/);
+	let sec = '', own = null;
+	lines.forEach((ln) => {
+		const m = /^\s*\[(\w+)\]/.exec(ln);
+		if (m) { sec = m[1].toUpperCase(); return; }
+		const w = ln.split(';')[0].trim().split(/\s+/);
+		if (sec === 'JUNCTIONS' && w[0] === node) { own = { demand: w[2] || '0', pattern: w[3] || '' }; }
+	});
+	if (!own) { throw new Error('junction ' + node + ' not in the exported file'); }
+	const rows = ' ' + node + '\t' + own.demand + (own.pattern ? '\t' + own.pattern : '') + '\n ' + node + '\t' + gpm + '\tFIRE\n';
+	let txt = inp;
+	if (/\[DEMANDS\]/i.test(txt)) { txt = txt.replace(/(\[DEMANDS\][^\n]*\n)/i, '$1' + rows); }
+	else { txt = txt.replace(/\[PATTERNS\]/i, '[DEMANDS]\n' + rows + '\n[PATTERNS]'); }
+	return txt.replace(/(\[PATTERNS\][^\n]*\n)/i, '$1 FIRE\t' + mult.join('\t') + '\n');
 }
 function framesOf(run) { return run.frames; }
 function maxDiff(a, b, key, ids) {
@@ -164,9 +187,83 @@ function maxDiff(a, b, key, ids) {
 	check(tk.id === tank && Math.abs(tk.lowest.level - tkLow.v) < 1e-6 && tk.lowest.t === tkLow.t, 'tank ' + tank + ' lowest level ' + (tk.lowest.level / 0.3048).toFixed(2) + ' ft at ' + EC.lpnFormatTime(tk.lowest.t));
 	const lastH = hand.frames[hand.frames.length - 1], lastN = none.frames[none.frames.length - 1];
 	check(Math.abs(tk.final - lastH.levels[tank]) < 1e-6 && Math.abs(tk.finalNoFire - lastN.levels[tank]) < 1e-6, 'level at the end, with and without the fire, equal the two runs');
-	let worst = 0; junc.concat([tank]).forEach((id) => { worst = Math.max(worst, Math.abs(lastH.pressures[id] - lastN.pressures[id])); });
-	check(d.recovery && Math.abs(d.recovery.worst.diff - worst) < 1e-6 && d.recovery.recovered === (worst <= 0.1),
-		'recovery: the largest difference at 24:00 is ' + (worst / PSI).toFixed(3) + ' psi, ' + (d.recovery.recovered ? 'recovered' : 'not recovered'));
+	let worstJ = 0, worstT = 0;
+	junc.forEach((id) => { worstJ = Math.max(worstJ, Math.abs(lastH.pressures[id] - lastN.pressures[id])); });
+	worstT = Math.abs(lastH.pressures[tank] - lastN.pressures[tank]);
+	check(d.recovery && d.recovery.tank && Math.abs(d.recovery.tank.diff - worstT) < 1e-6 && d.recovery.tank.id === tank,
+		'recovery: the tank is ' + (worstT / 0.3048).toFixed(2) + ' ft from its no-fire level at 24:00, stated as a level, past the 0.1 m tolerance');
+	check((worstJ > 0.1) === !!d.recovery.junction && d.recovery.recovered === false, 'and junctions are judged on their own: the largest pressure difference is ' + (worstJ / PSI).toFixed(3) + ' psi');
+	check(Math.abs(tk.min - 100 * 0.3048) < 1e-6 && Math.abs(tk.margin - (tk.lowest.level - tk.min)) < 1e-9 && Math.abs(tk.start - hand.frames[0].levels[tank]) < 1e-9 && Math.abs(tk.drop - (tk.start - tk.lowest.level)) < 1e-9,
+		'tank: minimum ' + (tk.min / 0.3048).toFixed(1) + ' ft, margin ' + (tk.margin / 0.3048).toFixed(2) + ' ft, drop from the start ' + (tk.drop / 0.3048).toFixed(2) + ' ft');
+	check(d.shortfall === false && Math.abs(d.delivered.flow - 2000 * GPM) < 1e-7, 'a demand-driven run delivers the whole fire flow (' + (d.delivered.flow / GPM).toFixed(2) + ' gpm)');
+
+	head('2b. THE SHIPPED EXAMPLE AS IT IS, [RULES] AND ALL (hand-made from the page\'s own export)');
+	for (const gpm of [2000, 4000]) {
+		openLwn();
+		L.setSelectionList([{ kind: 'node', id: '22' }]);
+		L.setAsk('required', String(gpm)); L.setAsk('durStart', String(8 * 3600)); L.setAsk('durLen', '4:00');
+		const exported = L.exportInp();
+		check(/\[RULES\]/i.test(exported) && /PUMP 9/i.test(exported.slice(exported.search(/\[RULES\]/i))), gpm + ' gpm: the export carries the example\'s [RULES] for pump 9');
+		await L.runDurationFire();
+		const dr = L.durRun();
+		L.importInp({ name: 'Net1-rules-fire.inp', _text: handMadeFromExport(exported, '22', gpm, 4, 5, 13) });
+		L.setEngine('epanet');
+		const hr = await L.analysisRun();
+		const hm = L.assembleModel();
+		check((hm.rules || []).length > 0, '  the hand-made copy kept the rules (' + (hm.rules || []).length + ')');
+		let pumpFlips = 0;
+		hr.frames.forEach((f, i) => { if (i && f.statuses && hr.frames[i - 1].statuses && f.statuses['9'] !== hr.frames[i - 1].statuses['9']) { pumpFlips++; } });
+		openLwn();
+		const mm = L.assembleModel();
+		const bb = EC.lpnDurFireModel(mm, { nodeId: '22', flow: gpm * GPM, start: 8 * 3600, duration: 4 * 3600 });
+		const tr2 = await EC.lpnEpanetRun(bb.model, {});
+		const dP = maxDiff(framesOf(tr2), framesOf(hr), 'pressures', ids), dL = maxDiff(framesOf(tr2), framesOf(hr), 'levels', [tank]);
+		check(dP.worst < 1e-6 && dL.worst < 1e-6, '  every pressure and the tank level equal the rule-driven hand-made run (worst ' + dP.worst.toExponential(1) + ' m, ' + dL.worst.toExponential(1) + ' m; pump 9 changes status ' + pumpFlips + ' times in it)');
+		const lowH = hr.frames.reduce((m, f) => Math.min(m, f.levels[tank]), Infinity);
+		check(Math.abs(dr.tanks[0].lowest.level - lowH) < 1e-6, '  and the box\'s tank lowest level is that run\'s (' + (lowH / 0.3048).toFixed(2) + ' ft)');
+	}
+
+	head('2c. THE START LIST OFFERS ONLY PATTERN PERIODS WITHIN THE RUN');
+	openLwn();
+	check(L.durStartOptions().map((o) => o[1]).join(' ') === '0:00 2:00 4:00 6:00 8:00 10:00 12:00 14:00 16:00 18:00 20:00 22:00', 'Net1 (2:00 pattern step, 24:00 run): ' + L.durStartOptions().map((o) => o[1]).join(' '));
+
+	head('2d. THE FIRE JUNCTION ROW FOLLOWS THE SELECTION');
+	L.setSelectionList([]);
+	check(/None selected/.test(L.durJunctionText()), 'nothing selected: "' + L.durJunctionText() + '"');
+	L.setSelectionList([{ kind: 'node', id: '22' }]);
+	check(L.durJunctionText() === 'N22' || /22$/.test(L.durJunctionText()), 'one junction: "' + L.durJunctionText() + '"');
+	L.setSelectionList([{ kind: 'node', id: '22' }, { kind: 'node', id: '21' }]);
+	check(/Several/.test(L.durJunctionText()), 'two: "' + L.durJunctionText() + '"');
+	L.setSelectionList([{ kind: 'node', id: '2' }]);
+	check(/None selected/.test(L.durJunctionText()), 'a tank is not a fire junction: "' + L.durJunctionText() + '"');
+
+	head('2e. PRESSURE-DRIVEN DEMAND: THE FIRE THE JUNCTION ACTUALLY GETS');
+	const pdaTxt = (txt) => txt.replace(/Demand Multiplier\s+1\.0/, 'Demand Multiplier 1.0\n Demand Model PDA\n Minimum Pressure 0\n Required Pressure 30\n Pressure Exponent 0.5');
+	L.importInp({ name: 'Net1-pda.inp', _text: pdaTxt(NET1) });
+	L.setEngine('epanet');
+	L.setSelectionList([{ kind: 'node', id: '22' }]);
+	L.setAsk('required', '6000'); L.setAsk('residual', '0'); L.setAsk('durStart', String(8 * 3600)); L.setAsk('durLen', '4:00');
+	await L.runDurationFire();
+	const pd2 = L.durRun();
+	const txtOf = (n) => (n.textContent !== undefined ? n.textContent : '') + (n.children || []).map(txtOf).join('');
+	const pdaReport = txtOf(byId.lpn_ff_report);
+	L.importInp({ name: 'Net1-pda-fire.inp', _text: pdaTxt(handMadeInp('22', 6000, 4, 5, 13, 200)) });
+	L.setEngine('epanet');
+	const pHand = await L.analysisRun();
+	L.importInp({ name: 'Net1-pda.inp', _text: pdaTxt(NET1) });
+	L.setEngine('epanet');
+	const pNone = await L.analysisRun();
+	let want = Infinity;
+	const emptied = EC.lpnEpsTankEmptyAt(pHand.frames, L.assembleModel(), null), stop = emptied ? emptied.t : Infinity;
+	pHand.frames.forEach((f, i) => { if (f.t >= 8 * 3600 && f.t < 12 * 3600 && f.t < stop) { want = Math.min(want, f.demands['22'] - pNone.frames[i].demands['22']); } });
+	check(pd2 && pd2.ok && pd2.shortfall === true, 'at 6,000 gpm under PDA the box flags a shortfall');
+	check(Math.abs(pd2.delivered.flow - want) < 1e-9 && want < 6000 * GPM * 0.99, 'the delivered flow is the run\'s own: ' + (pd2.delivered.flow / GPM).toFixed(1) + ' gpm of 6000 (the hand-made run says ' + (want / GPM).toFixed(1) + ', read before the tank empties at ' + (emptied ? EC.lpnFormatTime(emptied.t) : 'never') + ')');
+	check(pd2.holds === true || pd2.holds === false, 'the residual figure is still computed (' + (pd2.lowestAtFire ? (pd2.lowestAtFire.pressure / PSI).toFixed(2) : '-') + ' psi), but the box gives no tick on it while the shortfall stands');
+	{
+		const lead = PC.lpn_dur_shortfall.split('{delivered}')[0];
+		check(pdaReport.indexOf(lead) >= 0 && /5149/.test(pdaReport) && pdaReport.indexOf(PC.lpn_dur_holds.split('{id}')[0]) < 0 && pdaReport.indexOf(PC.lpn_dur_fails.split('{id}')[0]) < 0,
+			'the box says "' + pdaReport.slice(pdaReport.indexOf(lead), pdaReport.indexOf(lead) + 100) + '..." and gives neither the residual tick nor the residual failure');
+	}
 
 	head('3. THE SCENARIO\'S DEMAND MULTIPLIER DOES NOT SCALE THE FIRE');
 	openLwn();

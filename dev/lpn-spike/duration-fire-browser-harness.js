@@ -64,15 +64,6 @@ async function main() {
 		await a.page.evaluate(() => { EngCalcs.lpnTimeRunNow(); });
 		await a.waitFor(() => a.page.evaluate(() => EngCalcs.lpnTimeRunState().frames > 1), 'Net1 EPS frames', 120000);
 
-		// select junction 22 on the map, BEFORE the box opens over it
-		const pt = await a.page.evaluate(() => {
-			const el = document.querySelector('#lpn_canvas [data-node="22"]'), r = el.getBoundingClientRect();
-			return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-		});
-		await a.page.mouse.click(pt.x, pt.y);
-		await a.settle(600);
-		ok('junction 22 is selected on the map', (await a.page.evaluate(() => document.querySelectorAll('#lpn_canvas .lpn-selected').length)) >= 1);
-
 		await a.menuClickSub(await a.lang('lpn_analyze_menu'), await a.lang('lpn_ff_menu'), 'project');
 		await a.page.waitForSelector('#lpn_ff_box', { state: 'visible' });
 		const whenSel = '#lpn_ff_controls select:has(option[value="dur"])';
@@ -83,6 +74,25 @@ async function main() {
 		await a.settle(250);
 		const ctl = '#lpn_ff_controls';
 		ok('the junction-sweep rows are gone: no scope and no design check', !(await a.page.$(ctl + ' select:has(option[value="selected"])')));
+		const rowText = () => a.page.$eval('#lpn_ff_firejunction', (e) => e.textContent);
+		ok('the box is open before anything is selected, and its Fire junction row says so: "' + await rowText() + '"', (await rowText()) === await a.lang('lpn_dur_junction_none'));
+		// The box sits over the map: move it aside, then select junction 22 with the box still open.
+		await a.page.evaluate(() => { const b = document.getElementById('lpn_ff_box'); b.style.left = Math.max(0, window.innerWidth - b.getBoundingClientRect().width - 4) + 'px'; b.style.top = '820px'; });
+		await a.settle(200);
+		const pt = await a.page.evaluate(() => {
+			const el = document.querySelector('#lpn_canvas [data-node="22"]'), r = el.getBoundingClientRect(),
+				x = r.left + r.width / 2, y = r.top + r.height / 2, top = document.elementFromPoint(x, y);
+			return { x, y, covered: !(top && top.closest && top.closest('#lpn_canvas')), by: top ? (top.id || top.className || top.tagName) + ' in ' + ((top.closest('[id]') || {}).id) : null, vw: innerWidth, vh: innerHeight };
+		});
+		ok('junction 22 is not under the box once it is moved', !pt.covered, JSON.stringify(pt));
+		await a.page.mouse.click(pt.x, pt.y);
+		await a.settle(600);
+		ok('junction 22 is selected, and the row follows it live: "' + await rowText() + '"', /22$/.test(await rowText()));
+		const startTexts = await a.page.$$eval(ctl + ' select:has(option[value="28800"]) option', (os) => os.map((o) => o.textContent));
+		ok('the start list holds only 2:00 pattern periods inside the 24:00 run', startTexts.join(' ') === '0:00 2:00 4:00 6:00 8:00 10:00 12:00 14:00 16:00 18:00 20:00 22:00', startTexts.join(' '));
+		const wide = await a.page.$eval(ctl + ' select:has(option[value="dur"])', (sel) => ({ w: sel.clientWidth, sw: sel.scrollWidth }));
+		ok('the Reporting step tested select fits its longest choice', wide.w >= 150, JSON.stringify(wide));
+		ok('there is no Clear rings button for a duration fire', await a.page.$$eval(ctl + ' button.lpn-ff-clearbtn', (bs) => bs.every((b) => getComputedStyle(b).display === 'none')));
 		const labels = await a.page.$$eval(ctl + ' .lpn-ff-row', (rs) => rs.map((r) => r.textContent.trim()));
 		const startLabel = await a.lang('lpn_dur_start'), lenLabel = await a.lang('lpn_dur_length');
 		ok('the start and the duration are asked', labels.some((t) => t.indexOf(startLabel) === 0) && labels.some((t) => t.indexOf(lenLabel) === 0), JSON.stringify(labels));
@@ -120,7 +130,10 @@ async function main() {
 		ok('the residual verdict leads with a check or a warning', report.indexOf(holdsLead) > 0 || report.indexOf(failsLead) > 0);
 		ok('the tank verdict is there', report.indexOf(noEmpty) > 0 || report.indexOf(emptiesLead) > 0);
 		const tables = await a.page.$$eval('#lpn_ff_report table', (ts) => ts.map((t) => [...t.querySelectorAll('tbody tr')].map((tr) => [...tr.children].map((c) => c.textContent.trim()))));
-		ok('a tank table and a 25-step pressure table', tables.length === 2 && tables[0].length === 1 && tables[1].length === 25, tables.map((t) => t.length).join(','));
+		ok('a tank table with 7 columns and a 25-step pressure table', tables.length === 2 && tables[0].length === 1 && tables[0][0].length === 7 && tables[1].length === 25, tables.map((t) => t.length).join(',') + ' / ' + (tables[0][0] || []).join(' | '));
+		ok('the tank row gives its minimum (100 ft), margin, and drop from the start', /^100 ft/.test(tables[0][0][2]) && /ft/.test(tables[0][0][3]) && /ft/.test(tables[0][0][4]), tables[0][0].join(' | '));
+		const backLead = (await a.lang('lpn_dur_not_back_tank')).split('{id}')[0].replace('{time}', '24:00');
+		ok('the not-recovered verdict reads as information about the tank, with its tolerance', report.indexOf(backLead) > 0 && /tolerance of 0\.3/.test(report), report.slice(report.indexOf(backLead), report.indexOf(backLead) + 200));
 		const series = tables[1];
 		ok('the fire flow shows on 8:00 through 11:00 only', series.filter((r) => /gpm/.test(r[1])).map((r) => r[0]).join(' ') === '8:00 9:00 10:00 11:00', JSON.stringify(series.slice(7, 13)));
 		// the "without the fire" column is the run on screen

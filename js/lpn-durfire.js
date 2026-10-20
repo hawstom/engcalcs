@@ -39,6 +39,8 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	// How far a tank or a junction may sit from its no-fire value at the last step and still be
 	// called recovered: a tenth of a metre of head, about 0.14 psi.
 	var RECOVERED_TOL = 0.1;
+	// A fire flow delivered within this fraction of what was asked counts as delivered.
+	var DELIVERED_TOL = 0.01;
 
 	function patternIdFor(patterns) {
 		var id = PATTERN_ID, k = 1, used = {};
@@ -132,7 +134,7 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 		usable = frames.filter(function (f) { return f.t < stopT; });
 		out = {
 			ok: true, fire: fire, residual: opts.residual,
-			lowest: null, lowestAtFire: null, series: [], tanks: [],
+			lowest: null, lowestAtFire: null, delivered: null, shortfall: false, series: [], tanks: [],
 			emptyAt: firstEmpty, stoppedAt: (!fired.ok && typeof fired.stoppedAt === 'number') ? fired.stoppedAt : null,
 			steps: frames.length, usableSteps: usable.length,
 			recovery: null, recoveryNote: null
@@ -158,6 +160,18 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 				out.lowestAtFire = { pressure: pf, t: f.t };
 			}
 		});
+		// The fire flow actually delivered: the junction's demand with the fire less its demand
+		// without it. A demand-driven run always delivers the stated flow; a pressure-driven run
+		// delivers less where the pressure falls, and the residual test means nothing then.
+		frames.forEach(function (f) {
+			var b = baseAt[f.t], dF = f.demands ? f.demands[fire.nodeId] : undefined,
+				dB = b && b.demands ? b.demands[fire.nodeId] : undefined, got;
+			if (!(f.t >= fire.start && f.t < fire.end) || !(f.t < stopT) ||
+				typeof dF !== 'number' || typeof dB !== 'number') { return; }
+			got = dF - dB;
+			if (!out.delivered || got < out.delivered.flow) { out.delivered = { flow: got, t: f.t }; }
+		});
+		out.shortfall = !!(out.delivered && out.delivered.flow < fire.flow * (1 - DELIVERED_TOL));
 		out.holds = out.lowestAtFire ? out.lowestAtFire.pressure >= opts.residual : null;
 		tanks.forEach(function (t) {
 			var low = null, e = emptyAt(frames, t);
@@ -167,8 +181,12 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			});
 			last = frames[frames.length - 1];
 			lastBase = baseFrames[baseFrames.length - 1];
+			var start = frames.length && frames[0].levels ? frames[0].levels[t.id] : undefined;
 			out.tanks.push({
 				id: t.id, lowest: low, emptyAt: e,
+				min: t.minLevel || 0, start: start,
+				margin: low ? low.level - (t.minLevel || 0) : undefined,
+				drop: (low && typeof start === 'number') ? start - low.level : undefined,
 				final: last && last.levels ? last.levels[t.id] : undefined,
 				finalNoFire: lastBase && lastBase.levels ? lastBase.levels[t.id] : undefined
 			});
@@ -182,17 +200,24 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 		} else if (stopT < Infinity || !last || !lastBase || last.t !== lastBase.t) {
 			out.recoveryNote = 'cut-short';
 		} else {
-			var worst = null;
+			var worstJ = null, worstT = null;
 			model.nodes.forEach(function (n) {
-				var a, b;
+				var x, y, d;
 				if (n.type === 'reservoir') { return; }
-				a = last.pressures ? last.pressures[n.id] : undefined;
-				b = lastBase.pressures ? lastBase.pressures[n.id] : undefined;
-				if (typeof a === 'number' && typeof b === 'number' && isFinite(a) && isFinite(b) &&
-					(!worst || Math.abs(a - b) > worst.diff)) { worst = { id: n.id, diff: Math.abs(a - b) }; }
+				x = last.pressures ? last.pressures[n.id] : undefined;
+				y = lastBase.pressures ? lastBase.pressures[n.id] : undefined;
+				if (typeof x !== 'number' || typeof y !== 'number' || !isFinite(x) || !isFinite(y)) { return; }
+				d = Math.abs(x - y);
+				// A tank's pressure is its water depth, so its difference is a LEVEL difference.
+				if (n.type === 'tank') { if (!worstT || d > worstT.diff) { worstT = { id: n.id, diff: d }; } }
+				else if (!worstJ || d > worstJ.diff) { worstJ = { id: n.id, diff: d }; }
 			});
-			out.recovery = { t: last.t, worst: worst || { id: null, diff: 0 }, tol: RECOVERED_TOL,
-				recovered: !worst || worst.diff <= RECOVERED_TOL };
+			out.recovery = {
+				t: last.t, tol: RECOVERED_TOL,
+				junction: worstJ && worstJ.diff > RECOVERED_TOL ? worstJ : null,
+				tank: worstT && worstT.diff > RECOVERED_TOL ? worstT : null
+			};
+			out.recovery.recovered = !out.recovery.junction && !out.recovery.tank;
 		}
 		return out;
 	}

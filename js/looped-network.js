@@ -21869,6 +21869,8 @@ var EngCalcs = EngCalcs || {};
 		// on the map."*). Written here, the one place the subject is written, so no path can leave
 		// a bar on a row whose element has stopped being selected.
 		paneMarkMapSelAll();
+		// The Fire flow box shows which junction a duration fire would be drawn at.
+		if (typeof refreshFireJunctionRow === 'function') { refreshFireJunctionRow(); }
 	}
 	// ---- THE GO-TO MARK (Tom, 2026-09-28, "Preparing to make videos") ----
 	// *"Trying to build a selection set for fire flow ... In Tables, if I go to a Junction, it
@@ -77642,6 +77644,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				['all', pc.lpn_when_all || 'Every reporting step, worst case']
 			].concat(EngCalcs.lpnDurFireModel
 				? [['dur', pc.lpn_dur_option || 'A fire for a stated duration']] : []), ask.when || 'now');
+			// Wide enough for its longest choice rather than the 8rem the other selects share.
+			boxes.when.className = 'lpn-ff-wide';
 			ffRow(host, pc.lpn_when || 'Reporting step tested', null, boxes.when, '');
 			boxes.when.addEventListener('change', function () {
 				ask.when = boxes.when.value;
@@ -77654,7 +77658,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				ffRow(host, pc.lpn_when_step || 'Reporting step', null, boxes.step, '');
 			}
 			if (dur) {
-				boxes.durStart = ffSelect(analysisStepOptions(), String(ask.durStart));
+				durJunctionRow(host);
+				boxes.durStart = ffSelect(durStartOptions(), String(ask.durStart));
 				ask.durStart = boxes.durStart.value;
 				ffRow(host, pc.lpn_dur_start || 'Fire starts at', null, boxes.durStart, '');
 				boxes.durLen = ffInput(ask.durLen === undefined ? '2:00' : ask.durLen);
@@ -77733,10 +77738,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// provide a button in that box to clear the rings."*). Disabled where there is nothing to
 		// clear, exactly as Stop is disabled where nothing is running. `true` (quiet): this is the
 		// user's own decision, not news to tell them about.
-		clear = ffEl('button', 'lpn-ff-clearbtn', pc.lpn_ff_clear || 'Clear rings', buttons);
-		clear.type = 'button';
-		clear.disabled = !fireFlowRun && !fireDurRun;
-		clear.addEventListener('click', function () { clearFireFlowRun(true); buildFireFlowControls(); });
+		// A fire for a stated duration draws no rings, so the button that clears them is not offered.
+		if (!dur) {
+			clear = ffEl('button', 'lpn-ff-clearbtn', pc.lpn_ff_clear || 'Clear rings', buttons);
+			clear.type = 'button';
+			clear.disabled = !fireFlowRun && !fireDurRun;
+			clear.addEventListener('click', function () { clearFireFlowRun(true); buildFireFlowControls(); });
+		}
 		// Remembered as it is typed, so closing the box and reopening it does not throw the
 		// criteria away.
 		Object.keys(boxes).forEach(function (k) {
@@ -78574,6 +78582,43 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		clearFireFlowRun(true);
 		analysisRefused(document.getElementById('lpn_ff_report'), text);
 	}
+	// The junctions selected on the map that a fire can be drawn at (active junctions only).
+	function durPicked() {
+		var picked = [];
+		selections.forEach(function (s) {
+			if (s.kind === 'node' && fireFlowJunctions().some(function (n) { return n.id === s.id; }) &&
+				picked.indexOf(s.id) < 0) { picked.push(s.id); }
+		});
+		return picked;
+	}
+	function durJunctionText() {
+		var pc = EngCalcs.pageConfig || {}, p = durPicked();
+		if (p.length === 1) { return labelPrefixFor('node', 'id') + p[0]; }
+		return p.length
+			? (pc.lpn_dur_junction_many || 'Several are selected. Select one junction on the map.')
+			: (pc.lpn_dur_junction_none || 'None selected. Select one junction on the map.');
+	}
+	function durJunctionRow(host) {
+		var pc = EngCalcs.pageConfig || {}, span = document.createElement('span');
+		span.id = 'lpn_ff_firejunction';
+		span.className = 'lpn-ff-firejunction';
+		span.textContent = durJunctionText();
+		ffRow(host, pc.lpn_dur_junction || 'Fire junction', null, span, '');
+	}
+	// Redrawn by setSelectionList(), so the row follows the map while the box stays open.
+	function refreshFireJunctionRow() {
+		var e = typeof document !== 'undefined' ? document.getElementById('lpn_ff_firejunction') : null;
+		if (e) { e.textContent = durJunctionText(); }
+	}
+	// Only the times a fire can start at: a whole pattern period, within the run, not its end.
+	function durStartOptions() {
+		var t = effectiveTimes() || {}, step = t.patternStep > 0 ? t.patternStep : 3600,
+			shift = t.patternStart > 0 ? t.patternStart : 0, dur = t.duration || 0;
+		return analysisStepOptions().filter(function (o) {
+			var x = +o[0];
+			return x < dur && Math.abs((x + shift) / step - Math.round((x + shift) / step)) < 1e-9;
+		});
+	}
 	function runDurationFire() {
 		var pc = EngCalcs.pageConfig || {},
 			ask = fireFlowAsk,
@@ -78581,16 +78626,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			residual = ffValue(ask.residual, 'lpn_u_pressure'),
 			start = +ask.durStart,
 			len = EngCalcs.lpnParseTime(String(ask.durLen === undefined ? '' : ask.durLen).split(/\s+/), { typed: true }),
-			picked = [], model, built, before, codes = EngCalcs.lpnDurFireCodes || {}, baseRun = null;
+			picked = durPicked(), model, built, before, codes = EngCalcs.lpnDurFireCodes || {}, baseRun = null;
 		if (fireFlowBusy) { return; }
 		if (critBusy || dsBusy) {
 			setNotice(pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.');
 			return;
 		}
-		selections.forEach(function (s) {
-			if (s.kind === 'node' && fireFlowJunctions().some(function (n) { return n.id === s.id; }) &&
-				picked.indexOf(s.id) < 0) { picked.push(s.id); }
-		});
 		if (picked.length !== 1) {
 			durRefused(pc.lpn_dur_no_junction || 'Select one junction for the fire.');
 			return;
@@ -78668,7 +78709,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		say('lpn-ff-summary', (pc.lpn_dur_head || 'Fire flow of {flow} at junction {id}, from {start} to {end}.')
 			.replace('{flow}', ffQty(f.flow, 'lpn_u_flow')).replace('{start}', dsTimeText(f.start))
 			.replace('{end}', dsTimeText(f.end)), f.nodeId);
-		if (d.lowestAtFire) {
+		if (d.shortfall) {
+			say('lpn-ff-summary', (pc.lpn_dur_shortfall || '⚠ Only {delivered} of the {flow} fire flow is delivered at junction {id}, at {time}, so the residual pressure is not a test of that fire.')
+				.replace('{delivered}', ffQty(Math.max(0, d.delivered.flow), 'lpn_u_flow')).replace('{flow}', ffQty(f.flow, 'lpn_u_flow'))
+				.replace('{time}', dsTimeText(d.delivered.t)), f.nodeId);
+		} else if (d.lowestAtFire) {
 			tpl = d.holds
 				? (pc.lpn_dur_holds || '✓ Junction {id} holds at least {pressure} during the fire, above the residual pressure of {residual}, at {time}.')
 				: (pc.lpn_dur_fails || '⚠ Junction {id} falls to {pressure} during the fire, below the residual pressure of {residual}, at {time}.');
@@ -78688,11 +78733,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		if (R) {
 			if (R.recovered) {
-				say('lpn-ff-summary', (pc.lpn_dur_recovers || '✓ The system recovers after the fire: at {time}, the last reporting step, nothing differs from the run without the fire by more than {pressure}.')
-					.replace('{time}', dsTimeText(R.t)).split('{pressure}').join(ffQty(R.tol, 'lpn_u_pressure')));
-			} else {
-				say('lpn-ff-summary', (pc.lpn_dur_not_recovered || '⚠ The system has not recovered by {time}, the last reporting step: {id} differs from the run without the fire by {pressure}.')
-					.replace('{time}', dsTimeText(R.t)).split('{pressure}').join(ffQty(R.worst.diff, 'lpn_u_pressure')), R.worst.id);
+				say('lpn-ff-summary', (pc.lpn_dur_recovers || '✓ The system recovers after the fire: at {time}, the last reporting step, no junction differs from the run without the fire by more than {pressure} and no tank by more than {level}.')
+					.replace('{time}', dsTimeText(R.t)).split('{pressure}').join(ffQty(R.tol, 'lpn_u_pressure'))
+					.split('{level}').join(ffQty(R.tol, 'lpn_u_elevhead')));
+			}
+			if (R.tank) {
+				say('lpn-ff-summary', (pc.lpn_dur_not_back_tank || '⚠ At {time}, the last reporting step, tank {id} is not back to its level without the fire. The difference is {level}, against a tolerance of {tolerance}.')
+					.replace('{time}', dsTimeText(R.t)).split('{level}').join(ffQty(R.tank.diff, 'lpn_u_elevhead'))
+					.replace('{tolerance}', ffQty(R.tol, 'lpn_u_elevhead')), R.tank.id);
+			}
+			if (R.junction) {
+				say('lpn-ff-summary', (pc.lpn_dur_not_back_junction || '⚠ At {time}, the last reporting step, junction {id} is not back to its pressure without the fire. The difference is {pressure}, against a tolerance of {tolerance}.')
+					.replace('{time}', dsTimeText(R.t)).split('{pressure}').join(ffQty(R.junction.diff, 'lpn_u_pressure'))
+					.replace('{tolerance}', ffQty(R.tol, 'lpn_u_pressure')), R.junction.id);
 			}
 		} else if (d.recoveryNote) {
 			say('lpn-ff-note', d.recoveryNote === 'to-end'
@@ -78700,7 +78753,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				: (pc.lpn_dur_recovery_cut || 'The run stopped before its end, so recovery after the fire is not assessed.'));
 		}
 		if (d.tanks.length) {
-			body = durTable(host, [pc.lpn_time_tank || 'Tank', pc.lpn_dur_col_low || 'Lowest level',
+			body = durTable(host, [pc.lpn_time_tank || 'Tank', pc.lpn_dur_col_low || 'Lowest level reached',
+				pc.lpn_field_tank_minlevel || 'Lowest water depth', pc.lpn_dur_col_margin || 'Above lowest water depth',
+				pc.lpn_dur_col_drop || 'Drop from start',
 				pc.lpn_dur_col_end || 'Level at end', pc.lpn_dur_col_end_nofire || 'Level at end without the fire']);
 			d.tanks.forEach(function (t) {
 				var lv = function (v) { return typeof v === 'number' ? ffQty(v, 'lpn_u_elevhead') : FF_DASH; };
@@ -78708,6 +78763,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				ffCell(tr, labelPrefixFor('node', 'id') + t.id);
 				ffCell(tr, t.lowest ? (pc.lpn_at_time || '{value} at {time}').replace('{value}', lv(t.lowest.level))
 					.replace('{time}', dsTimeText(t.lowest.t)) : FF_DASH);
+				ffCell(tr, lv(t.min));
+				ffCell(tr, lv(t.margin));
+				ffCell(tr, lv(t.drop));
 				ffCell(tr, lv(t.final));
 				ffCell(tr, lv(t.finalNoFire));
 			});
