@@ -944,6 +944,23 @@ var EngCalcs = EngCalcs || {};
 	// corners a stack would use; then rings out to `reach` within 35 degrees of level, nearest first.
 	// Nothing here is a fact about the zoom except through the symbol and text sizes, as for a stack.
 	var LPN_INLINE_NODE_ARC = 35;
+	// **PROTOTYPE, OFF (2026-10-20): A COLUMN OF ONE-LINE LABELS AT THE EDGE OF A CROWD** (Tom's
+	// "human expectation" screenshots: one-line labels stacked in a column to one side, each on its
+	// own leader). Candidate endpoints for a label that has no room near its element: level, a few
+	// text heights out west and east, on a grid of columns and rows shared by every label, so that
+	// the labels that take them line up (a left-hung label is right-justified on its endpoint).
+	var LPN_COLUMN = false, LPN_COLUMN_DISTS = [5, 9, 13], LPN_COLUMN_ROWS = [0, 1, -1, 2, -2, 3, -3], LPN_COLUMN_WIDTH = 8;
+	function columnSides(p, fs) {
+		var out = [], h1 = dataLabelBoxHeight(1), rowH = h1 * 1.05, colW = fs * LPN_COLUMN_WIDTH, cy = p.y + fs * 0.85 - h1 / 2;
+		LPN_COLUMN_DISTS.forEach(function (m) {
+			[-1, 1].forEach(function (dir) {
+				var x = Math.round((p.x + dir * m * fs) / colW) * colW, k0 = Math.round(cy / rowH);
+				if ((x - p.x) * dir < m * fs * 0.6) { x += dir * colW; }
+				LPN_COLUMN_ROWS.forEach(function (r) { out.push({ x: x, y: (k0 + r) * rowH, corner: -1, deg: null }); });
+			});
+		});
+		return out;
+	}
 	function inlineNodeSides(a, d, fs, reach) {
 		var dx = Math.abs(d.x), dy = Math.abs(d.y), h1 = dataLabelBoxHeight(1),
 			cy = a.y + fs * 0.85 - h1 / 2, home = Math.hypot(dx, dy), out = [], ring;
@@ -956,6 +973,7 @@ var EngCalcs = EngCalcs || {};
 		ring.forEach(function (q, i) { q._r = Math.hypot(q.x - a.x, q.y - a.y); q._i = i; });
 		ring.sort(function (p, q) { return (p._r - q._r) || (p._i - q._i); });
 		ring.forEach(function (q) { delete q._r; delete q._i; out.push(q); });
+		if (LPN_COLUMN) { Array.prototype.push.apply(out, columnSides(a, fs)); }
 		return out;
 	}
 	// The drop order, as ONE rule both the prediction and the real pass read. The lexicographic drop
@@ -3275,6 +3293,7 @@ var EngCalcs = EngCalcs || {};
 				ring.forEach(function (q, i) { q._r = Math.hypot(q.x - p.x, q.y - p.y); q._i = i; });
 				ring.sort(function (a, b) { return (a._r - b._r) || (a._i - b._i); });
 				ring.forEach(function (q) { delete q._r; delete q._i; out.push(q); });
+				if (LPN_COLUMN && along === null) { Array.prototype.push.apply(out, columnSides(p, fs)); }
 				if (along !== null) { out.forEach(function (q) { q.anchor = p; q.along = along; }); }
 				return out;
 			}
