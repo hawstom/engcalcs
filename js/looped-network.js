@@ -46098,7 +46098,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// **THE ONE QUESTION, FOR EVERY FILE THAT MAY LAND IN THE OPEN PROJECT** (Task 814). `landNew()`
 	// makes the new project; `update(target)` lands in the open project, target 'open' or 'base'.
-	function askImportDestination(fileName, lead, landNew, update) {
+	function askImportDestination(fileName, lead, landNew, update, noHow) {
 		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), inBase = !!scn.isBase,
 			projName = projectDisplayName(project), buttons = [], seam = window.lpnInpDestination;
 		// THE HARNESS SEAM, as window.lpnDialogAnswerer is for askDialog(): only the headless DOM stub
@@ -46127,8 +46127,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				e.textContent = t;
 				body.appendChild(e);
 			}
-			p(lead);
-			p((pc.lpn_inpup_how || 'In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.'));
+			// A lead may carry its own paragraphs, written \n\n in the language file.
+			lead.split(/\\n\\n|\n\n/).forEach(function (para) { p(para); });
+			if (!noHow) { p((pc.lpn_inpup_how || 'In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.')); }
 			if (!inBase) { p(pc.lpn_inpup_base_note || 'Base. A scenario that holds its own value for an asset keeps it; the others take the new value.'); }
 		}, buttons, { title: (pc.lpn_inpup_ask_title || 'Import {file}').replace('{file}', fileName) });
 	}
@@ -46347,9 +46348,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// A project with something in it is asked where the file goes, as for an `.inp` (Task 814); a
 		// caller that hands in the mapping `choice` itself is a harness, and wants the new project.
 		if (!choice && projectHasAssets()) {
-			askImportDestination(fileName, pc.lpn_gjup_lead || 'A GeoJSON file holds one set of values and no scenarios. Choose where to put them.',
+			askImportDestination(fileName, pc.lpn_gjup_lead || 'A GeoJSON file holds one set of values and no scenarios. Choose where to put them.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets only in the import are added, and assets only in this project are kept.',
 				function () { landGeoJsonNetNew(scan, fileName, done, choice); },
-				function (target) { updateProjectFromGeoJson(scan, fileName, target, done); });
+				function (target) { updateProjectFromGeoJson(scan, fileName, target, done); }, true);
 			return;
 		}
 		landGeoJsonNetNew(scan, fileName, done, choice);

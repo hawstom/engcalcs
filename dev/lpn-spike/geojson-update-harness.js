@@ -85,7 +85,13 @@ console.log('\n--- Base only: the question, then update the open project ---');
 	const names = dialogButtons();
 	ok('one small question, the same as for an EPANET file: new project, this project, Cancel',
 		names.length === 3 && names[0] === PC.lpn_inpup_btn_new && names[2] === PC.lpn_cancel, JSON.stringify(names));
-	ok('its lead names a GeoJSON file', dialogText().indexOf(PC.lpn_gjup_lead) >= 0);
+	ok('its lead names a GeoJSON file', dialogText().indexOf('A GeoJSON file holds one set of values') >= 0);
+	{
+		const paras = PC.lpn_gjup_lead.split(/\\n\\n|\n\n/), dt = dialogText();
+		ok('the lead is two paragraphs, the second naming the matching by ID', paras.length === 2 && /matched by ID/.test(paras[1]));
+		ok('both are shown, as separate paragraphs, with no literal \\n', dt.indexOf(paras[0]) >= 0 && dt.indexOf(paras[1]) >= 0 && dt.indexOf('\\n') < 0);
+		ok('the EPANET how-paragraph is not repeated under it', dt.indexOf(PC.lpn_inpup_how) < 0);
+	}
 	press(names[1]);
 	ok('no second project was made', L.projectCount() === proj0);
 	ok('the changed value is updated', L.nodeById('20').elev === oldElev + 7, String(L.nodeById('20').elev));

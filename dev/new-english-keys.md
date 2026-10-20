@@ -230,7 +230,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Reading the file
   @@ NEEDS RULING
 - **`lpn_gjup_lead`**
-  > A GeoJSON file holds one set of values and no scenarios. Choose where to put them.
+  > A GeoJSON file holds one set of values and no scenarios. Choose where to put them.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets only in the import are added, and assets only in this project are kept.
   @@ NEEDS RULING
 - **`lpn_gjup_title`**
   > Update from GeoJSON file
@@ -561,7 +561,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**57 still to read**, of 61 new keys across 8 unmerged branch(es).
+**57 still to read**, of 61 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -572,15 +572,19 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### chore/merge-1020c (`443aa95b0`) — adds no English strings
+
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/geojson-into-project (`e4788e0ef`) — adds no English strings
+### feat/geojson-into-project (`400ab63ac`) — adds no English strings
 
-### feat/label-leader (`cbb7ad824`) — adds no English strings
+### feat/label-leader (`bcc926448`) — adds no English strings
 
-### feat/native-eps (`b62a05c57`) — adds no English strings
+### feat/label-margin (`bcc926448`) — already merged into feat/label-leader; its strings are listed there
 
-### feat/sqlite-reader (`75ed1031f`) — 51 new, 51 to read @@ NEEDS RULING
+### feat/native-eps (`63bb8fb1f`) — already merged into chore/merge-1020c; its strings are listed there
+
+### feat/sqlite-reader (`03cdba2e7`) — 51 new, 51 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
   > WaterCAD or WaterGEMS model…
@@ -771,4 +775,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Space
   @@ NEEDS RULING
 
-### fix/examples-guide (`c549eff85`) — adds no English strings
+### fix/examples-guide (`77fced3fe`) — adds no English strings

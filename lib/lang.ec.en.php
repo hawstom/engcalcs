@@ -2439,7 +2439,7 @@ $ec_lang['lpn_inpup_btn_project']='This project, {project}';
 $ec_lang['lpn_inpup_btn_scenario']='{scenario}, open now';
 $ec_lang['lpn_inpup_btn_base']='Base';
 $ec_lang['lpn_inpup_title']='Update from EPANET file';
-$ec_lang['lpn_gjup_lead']='A GeoJSON file holds one set of values and no scenarios. Choose where to put them.';
+$ec_lang['lpn_gjup_lead']='A GeoJSON file holds one set of values and no scenarios. Choose where to put them.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets only in the import are added, and assets only in this project are kept.';
 $ec_lang['lpn_gjup_title']='Update from GeoJSON file';
 $ec_lang['lpn_gjup_h_notes']='Reading the file';
 // {file} is a file name, {scenario} a scenario name and {project} a project name.
