@@ -59,5 +59,14 @@ ok('buildLinkEls records an arrow per polyline segment',
 	/var segCount = l\.verts\.length \+ 1, arrows = \[\]/.test(js));
 ok('...and hands them to the element record', /arrows: arrows,/.test(js));
 
+console.log('\n--- the arrow is a DOUBLE CHEVRON: two stroked, closed, unfilled heads (Tom, 2026-10-20) ---');
+const mk = /annotationEl\('path', \{\s*d: '([^']*)', fill: 'none',\s*'class': 'lpn-arrow'/.exec(js);
+ok('the arrow is built as a <path> with fill none', !!mk);
+if (mk) {
+	ok('...with exactly two subpaths', (mk[1].match(/M/g) || []).length === 2, mk[1]);
+	ok('...each closed (Z), so each head is a triangle, not an open ">"', (mk[1].match(/Z/g) || []).length === 2);
+}
+ok('the stylesheet does not fill it', !/fill:\s*(?!\s|none)/.test((/^\.lpn-arrow \{([^}]*)\}/m.exec(css) || ['', ''])[1]));
+
 console.log('\n' + (fails ? fails + ' FAILED' : 'all checks passed'));
 process.exit(fails ? 1 : 0);
