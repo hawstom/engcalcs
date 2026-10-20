@@ -1031,3 +1031,5 @@ Ranked low-middle, below the built rows; from Tom's question, not my own find. (
    those are defects in something already shipped on the branch.
 Correction to my 2026-10-08 row 4: Bentley DOES have Merge Alternative (35003.html). Our merge is the
 restricted form of a Bentley command, not an invention.
+
+- **2026-10-19, fire flow, criticality and demand scaling over an EPS** (rank: with Task 578). Fire flow EPS in two stages, not one: (1) hour picker plus "hour of minimum pressure" auto-pick (Bentley EPS Fire Flow tool shape); (2) a single named fire, flow x duration, inside the EPS, reporting tank low level and minimum pressure. Do NOT sweep-with-duration. Criticality over EPS: per-outage min pressure over run, hours below limit, unserved volume, tank emptied time; and outage by valve segment before it by pipe. Demand scaling over EPS: lowest priority, no cited demand.
