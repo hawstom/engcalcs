@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**163 still to read on master**, of 171 untranslated keys, of 3190 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**169 still to read on master**, of 181 untranslated keys, of 3200 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (171, 163 to read @@ NEEDS RULING)
+## lpn_  (181, 169 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -523,6 +523,36 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_survey_added_scenario`**
   > The nodes were added to {scenario}. In Base they are inactive.
   _Ruled 2026-10-18: I approved all._
+- **`lpn_theme_amber`**
+  > Amber
+  _Ruled OK 2026-10-17._
+- **`lpn_theme_arcade`**
+  > Arcade
+  @@ NEEDS RULING
+- **`lpn_theme_desktop`**
+  > Desktop
+  @@ NEEDS RULING
+- **`lpn_theme_green`**
+  > Green
+  _Ruled OK 2026-10-17._
+- **`lpn_theme_hc`**
+  > High contrast
+  _Ruled OK 2026-10-17._
+- **`lpn_theme_newspaper`**
+  > Newspaper
+  @@ NEEDS RULING
+- **`lpn_theme_platinum`**
+  > Platinum
+  _Ruled OK 2026-10-17._
+- **`lpn_theme_prairie`**
+  > Prairie
+  @@ NEEDS RULING
+- **`lpn_theme_rounded`**
+  > Rounded
+  @@ NEEDS RULING
+- **`lpn_theme_space`**
+  > Space
+  @@ NEEDS RULING
 - **`lpn_when`**
   > Reporting step tested
   @@ NEEDS RULING
@@ -549,7 +579,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**57 still to read**, of 61 new keys across 8 unmerged branch(es).
+**51 still to read**, of 51 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -560,13 +590,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/merge-1020a (`e4373b805`) — adds no English strings
-
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/duration-fire (`c221d72bf`) — already merged into chore/merge-1020a; its strings are listed there
-
-### feat/label-leader (`bcebdfa58`) — adds no English strings
+### feat/label-leader (`cbb7ad824`) — adds no English strings
 
 ### feat/sqlite-reader (`75ed1031f`) — 51 new, 51 to read @@ NEEDS RULING
 
@@ -726,37 +752,6 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/theme (`6221a4cae`) — already merged into feat/theme-tank; its strings are listed there
 
-### feat/theme-tank (`0055f8ed3`) — 10 new, 6 to read @@ NEEDS RULING
-
-- **`lpn_theme_amber`**
-  > Amber
-  _Ruled OK 2026-10-17._
-- **`lpn_theme_arcade`**
-  > Arcade
-  @@ NEEDS RULING
-- **`lpn_theme_desktop`**
-  > Desktop
-  @@ NEEDS RULING
-- **`lpn_theme_green`**
-  > Green
-  _Ruled OK 2026-10-17._
-- **`lpn_theme_hc`**
-  > High contrast
-  _Ruled OK 2026-10-17._
-- **`lpn_theme_newspaper`**
-  > Newspaper
-  @@ NEEDS RULING
-- **`lpn_theme_platinum`**
-  > Platinum
-  _Ruled OK 2026-10-17._
-- **`lpn_theme_prairie`**
-  > Prairie
-  @@ NEEDS RULING
-- **`lpn_theme_rounded`**
-  > Rounded
-  @@ NEEDS RULING
-- **`lpn_theme_space`**
-  > Space
-  @@ NEEDS RULING
+### feat/theme-tank (`ba35274f6`) — adds no English strings
 
 ### fix/examples-guide (`5de0786d7`) — adds no English strings
