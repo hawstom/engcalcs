@@ -237,6 +237,7 @@ the block.
   `dev/lpn-spike/eps-analysis-harness.js`. What remains is the Run concept, in Tom's own sketch
   (2026-08-27): *"a Run names a scenario among its parameters."* A named Run would carry the scenario,
   the required flow, the residual and the frame together, so a report says what it was a report OF.
+  The duration fire is built (branch `feat/duration-fire`): a fire at one junction for a stated start and duration, run through the EPS, under Reporting step tested.
 - 75|623| **File loss judged only by people whose files are throwaway.**
   **TOM, 2026-09-18: *"I don't see anything actionable. Describe better or remove the task."* He is
   right and the [H] tag is struck: this was never a decision waiting on him, it was a STANDING

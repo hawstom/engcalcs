@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**132 still to read on master**, of 140 untranslated keys, of 3159 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**156 still to read on master**, of 164 untranslated keys, of 3183 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (140, 132 to read @@ NEEDS RULING)
+## lpn_  (164, 156 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -78,6 +78,72 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_ds_run_note`**
   > Judged over the whole run, at every reporting step.
+  @@ NEEDS RULING
+- **`lpn_dur_bad_time`**
+  > The start and the duration must be whole multiples of the pattern time step, {step}, and the fire must start within the run.
+  @@ NEEDS RULING
+- **`lpn_dur_col_end`**
+  > Level at end
+  @@ NEEDS RULING
+- **`lpn_dur_col_end_nofire`**
+  > Level at end without the fire
+  @@ NEEDS RULING
+- **`lpn_dur_col_fire`**
+  > Fire flow
+  @@ NEEDS RULING
+- **`lpn_dur_col_low`**
+  > Lowest level
+  @@ NEEDS RULING
+- **`lpn_dur_col_nofire`**
+  > Pressure without the fire
+  @@ NEEDS RULING
+- **`lpn_dur_col_pressure`**
+  > Pressure at the fire junction
+  @@ NEEDS RULING
+- **`lpn_dur_empties`**
+  > ⚠ Tank {id} empties at {time}. Pressures from that step on are not read.
+  @@ NEEDS RULING
+- **`lpn_dur_fails`**
+  > ⚠ Junction {id} falls to {pressure} during the fire, below the residual pressure of {residual}, at {time}.
+  @@ NEEDS RULING
+- **`lpn_dur_head`**
+  > Fire flow of {flow} at junction {id}, from {start} to {end}.
+  @@ NEEDS RULING
+- **`lpn_dur_holds`**
+  > ✓ Junction {id} holds at least {pressure} during the fire, above the residual pressure of {residual}, at {time}.
+  @@ NEEDS RULING
+- **`lpn_dur_length`**
+  > Fire duration
+  @@ NEEDS RULING
+- **`lpn_dur_length_tip`**
+  > Hours and minutes, such as 2:00. The fire flow is the Required fire flow, drawn at the one junction selected on the map from the start time for this long. The whole extended-period simulation is run on a copy of the network and compared with the same run without the fire. The start and the duration must be whole multiples of the pattern time step.
+  @@ NEEDS RULING
+- **`lpn_dur_lowest`**
+  > The lowest pressure anywhere is {pressure}, at junction {id}, at {time}.
+  @@ NEEDS RULING
+- **`lpn_dur_no_empty`**
+  > ✓ No tank empties.
+  @@ NEEDS RULING
+- **`lpn_dur_no_junction`**
+  > Select one junction for the fire.
+  @@ NEEDS RULING
+- **`lpn_dur_not_recovered`**
+  > ⚠ The system has not recovered by {time}, the last reporting step: {id} differs from the run without the fire by {pressure}.
+  @@ NEEDS RULING
+- **`lpn_dur_option`**
+  > A fire for a stated duration
+  @@ NEEDS RULING
+- **`lpn_dur_recovers`**
+  > ✓ The system recovers after the fire: at {time}, the last reporting step, nothing differs from the run without the fire by more than {pressure}.
+  @@ NEEDS RULING
+- **`lpn_dur_recovery_cut`**
+  > The run stopped before its end, so recovery after the fire is not assessed.
+  @@ NEEDS RULING
+- **`lpn_dur_recovery_to_end`**
+  > The fire lasts to the end of the run, so recovery after it is not assessed.
+  @@ NEEDS RULING
+- **`lpn_dur_start`**
+  > Fire starts at
   @@ NEEDS RULING
 - **`lpn_eps_working`**
   > Running the extended-period simulation.
@@ -147,6 +213,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_guide_cmp_byasset_term`**
   > Results by asset
+  @@ NEEDS RULING
+- **`lpn_guide_ff_dur_def`**
+  > <p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_ff_dur_term`**
+  > A fire for a stated duration
   @@ NEEDS RULING
 - **`lpn_guide_page_desc`**
   > {name} user manual: one page for each chapter, from the map and Properties to scenarios, fire flow analysis, and criticality analysis.
@@ -456,7 +528,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**57 still to read**, of 61 new keys across 9 unmerged branch(es).
+**57 still to read**, of 61 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -467,19 +539,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/batch-1019d (`a7d57f166`) — adds no English strings
-
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/eps-analysis (`b3e1b3612`) — already merged into chore/batch-1019d; its strings are listed there
-
-### feat/guide-page (`3ada36350`) — adds no English strings
-
-### feat/label-beside (`8676cd1be`) — already merged into chore/batch-1019d; its strings are listed there
-
-### feat/label-form (`d05fdb069`) — already merged into chore/batch-1019d; its strings are listed there
-
-### feat/label-leader (`ce56b8cf9`) — adds no English strings
+### feat/label-leader (`b468704c8`) — adds no English strings
 
 ### feat/sqlite-reader (`75ed1031f`) — 51 new, 51 to read @@ NEEDS RULING
 
@@ -637,7 +699,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   @@ NEEDS RULING
 
-### feat/theme (`876ebef92`) — 10 new, 6 to read @@ NEEDS RULING
+### feat/theme (`6221a4cae`) — 10 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_theme_amber`**
   > Amber
@@ -669,3 +731,7 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_theme_space`**
   > Space
   @@ NEEDS RULING
+
+### feat/theme-tank (`6221a4cae`) — already merged into feat/theme; its strings are listed there
+
+### fix/examples-guide (`5de0786d7`) — adds no English strings
