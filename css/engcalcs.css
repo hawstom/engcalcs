@@ -142,6 +142,9 @@
 	--ec-barn-edge: transparent;
 	--ec-steel-bright: none;
 	--ec-tank-dome: none;
+	--ec-tank: none;
+	--ec-tank-bright: none;
+	--ec-tank-rim: none;
 	--ec-fence: none;
 	--ec-fence-grain: none;
 	--ec-fence-edge: transparent;
@@ -1233,6 +1236,17 @@
 	--ec-barn-edge: #7a6a50;
 	--ec-steel-bright: linear-gradient(#f7f9fa 0, #dde3e6 45%, #cfd6db 70%, #eef1f3 100%);
 	--ec-tank-dome: inset 0 2px 0 rgba(255, 255, 255, .75), inset 0 -2px 3px rgba(60, 70, 80, .18);
+	/* A galvanized cylinder: the lid band across the top, corrugation rings, a faint spangle, and the light
+	   running down the cylinder from a band left of centre to dark edges. Layers, top first. */
+	--ec-tank: linear-gradient(#7d8991 0, #7d8991 1px, #b4bec4 1px, #c3ccd1 4px, transparent 4px),
+		repeating-linear-gradient(0deg, rgba(70, 82, 92, .22) 0 1px, rgba(255, 255, 255, .28) 1px 2px, transparent 2px 8px),
+		radial-gradient(circle at 30% 40%, rgba(255, 255, 255, .22) 0 1px, transparent 2px) 0 0 / 11px 9px,
+		linear-gradient(90deg, #8b979f 0, #b9c2c8 9%, #eef1f2 30%, #dfe4e7 52%, #b4bdc3 80%, #87939b 100%);
+	--ec-tank-bright: linear-gradient(#7d8991 0, #7d8991 1px, #bcc6cc 1px, #cbd3d8 4px, transparent 4px),
+		repeating-linear-gradient(0deg, rgba(70, 82, 92, .22) 0 1px, rgba(255, 255, 255, .28) 1px 2px, transparent 2px 8px),
+		radial-gradient(circle at 30% 40%, rgba(255, 255, 255, .22) 0 1px, transparent 2px) 0 0 / 11px 9px,
+		linear-gradient(90deg, #949fa7 0, #c4ccd1 9%, #f8fafa 30%, #e8ecee 52%, #c0c8cd 80%, #909ba3 100%);
+	--ec-tank-rim: inset 1px 0 0 rgba(255, 255, 255, .5), inset -1px 0 0 rgba(50, 60, 70, .3), 0 2px 0 #6f7b84;
 	--ec-fence: linear-gradient(#bcae96 0, #b3a48c 50%, #a99a82 100%);
 	--ec-fence-grain: repeating-linear-gradient(90deg, rgba(60, 40, 20, .07) 0 1px, transparent 1px 9px), repeating-linear-gradient(0deg, rgba(60, 40, 20, .05) 0 1px, transparent 1px 4px);
 	--ec-fence-edge: #6e5d45;
@@ -1289,10 +1303,10 @@
    red would compete with it.) */
 @media screen {
 :root[data-theme="prairie"] .lpn-menubar-item {
-	background: var(--ec-steel); border: 1px solid var(--ec-steel-edge); border-radius: 12px / 50%; color: var(--ec-steel-ink); box-shadow: var(--ec-tank-dome);
+	background: var(--ec-tank); border: 1px solid var(--ec-steel-edge); border-radius: 2px; color: var(--ec-steel-ink); box-shadow: var(--ec-tank-rim);
 }
-:root[data-theme="prairie"] .lpn-menubar-item:hover { background: var(--ec-steel-bright); border-color: var(--ec-steel-edge); color: var(--ec-steel-ink); box-shadow: var(--ec-tank-dome), var(--ec-cloud-shadow); }
-:root[data-theme="prairie"] .lpn-menubar-item[aria-expanded="true"] { background: var(--ec-steel-bright); border-color: var(--ec-steel-edge); color: var(--ec-accent-hover); box-shadow: var(--ec-tank-dome); }
+:root[data-theme="prairie"] .lpn-menubar-item:hover { background: var(--ec-tank-bright); border-color: var(--ec-steel-edge); color: var(--ec-steel-ink); box-shadow: var(--ec-tank-rim); }
+:root[data-theme="prairie"] .lpn-menubar-item[aria-expanded="true"] { background: var(--ec-tank-bright); border-color: var(--ec-steel-edge); color: var(--ec-accent-hover); box-shadow: var(--ec-tank-rim); }
 :root[data-theme="prairie"] .lpn-pane-tab, :root[data-theme="prairie"] .lpn-pane-tab-menu {
 	background: var(--ec-fence-grain), var(--ec-fence); color: var(--ec-ink); border: 1px solid var(--ec-fence-edge); border-top-width: 2px; border-bottom: 0; border-radius: 0;
 }

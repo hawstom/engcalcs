@@ -96,7 +96,7 @@ const DESIGN = {
 		boxFrame: '4px double', titleCase: 'uppercase', tabsRule: '4px double', iconStroke: 2.5, picture: 'some', titleInk: 'accent' },
 	space: { face: 'Futura', size: '15px', menuCase: 'uppercase', btnRadius: '2px', boxRadius: '3px', titleCase: 'uppercase',
 		iconStroke: 1.5, picture: 'some', titleInk: 'accent' },
-	prairie: { face: 'Rockwell', size: '15px', menuCase: 'uppercase', menuWeight: '700', btnRadius: '12px 50%', boxRadius: '4px', boxFrame: '2px solid',
+	prairie: { face: 'Rockwell', size: '15px', menuCase: 'uppercase', menuWeight: '700', btnRadius: '2px', boxRadius: '4px', boxFrame: '2px solid',
 		titleCase: 'uppercase', tabsRule: '4px double', iconCap: 'square', picture: 'some', titleInk: 'accent', titlePicture: 'some' }
 };
 const KEYS = ['face', 'size', 'menuCase', 'menuCaps', 'menuWeight', 'btnRadius', 'boxRadius', 'boxFrame', 'shadow', 'titleCase', 'tabsRule', 'iconStroke', 'iconCap', 'picture', 'glow'];
@@ -124,7 +124,7 @@ function readDesign() {
 	const mc = cs(menu), bc = cs(box), tc = cs(title), ic = cs(icon), tb = cs(tabs);
 	return {
 		face: first(cs(body).fontFamily), faceFull: cs(body).fontFamily, size: cs(body).fontSize,
-		menuCase: mc.textTransform, menuCaps: mc.fontVariantCaps, menuWeight: mc.fontWeight, btnRadius: mc.borderTopLeftRadius,
+		tank: mc.backgroundImage, menuCase: mc.textTransform, menuCaps: mc.fontVariantCaps, menuWeight: mc.fontWeight, btnRadius: mc.borderTopLeftRadius,
 		boxRadius: bc.borderTopLeftRadius, boxFrame: bc.borderTopWidth + ' ' + bc.borderTopStyle, shadow: bc.boxShadow === 'none' ? 'none' : 'some',
 		titleCase: tc.textTransform, titleInk: tc.color === accent ? 'accent' : 'ink', titlePicture: tc.backgroundImage === 'none' ? 'none' : 'some',
 		tabsRule: tb.borderBottomWidth + ' ' + tb.borderBottomStyle, iconStroke: parseFloat(ic.strokeWidth), iconCap: ic.strokeLinecap,
@@ -337,6 +337,18 @@ async function main() {
 					const f = getComputedStyle(c.querySelector('.ec-tc-type')).fontFamily; c.remove(); return f;
 				}, t);
 				ok(t + ': the gallery card\'s "Aa" is set in the theme\'s face', card.split(',')[0].replace(/"/g, '').trim() === got.face, card);
+				// 4b: PRAIRIE'S MENUS ARE GALVANIZED WATER TANKS (Tom, 2026-10-19: square edges, cylinder shading, galvanized
+				// grey, not clouds): a squared corner, a light-to-dark-to-light gradient across the width (the lit cylinder),
+				// corrugation rings (a repeating horizontal gradient), and a grey fill with no colour cast. Other themes: none of it.
+				if (t === 'prairie') {
+					ok('prairie: a menu is a tank, not a cloud: a squared corner', parseFloat(got.btnRadius) <= 3, got.btnRadius);
+					ok('prairie: a menu has cylinder shading across its width', /linear-gradient\(90deg/.test(got.tank), got.tank.slice(0, 80));
+					ok('prairie: a menu has corrugation rings', /repeating-linear-gradient\(0deg/.test(got.tank), got.tank.slice(0, 80));
+					const greys = (got.tank.match(/rgb\((\d+), (\d+), (\d+)\)/g) || []).map((c) => c.match(/\d+/g).map(Number)).filter((c) => c[0] > 130);
+					ok('prairie: the tank is galvanized grey (red, green and blue within 20 of each other)', greys.length > 3 && greys.every((c) => Math.max(...c) - Math.min(...c) <= 20), String(greys.length));
+				} else {
+					ok(t + ': no tank shading outside Prairie', !/repeating-linear-gradient\(0deg/.test(got.tank));
+				}
 				// 5: print
 				await s.page.emulateMedia({ media: 'print' });
 				await s.settle(100);
