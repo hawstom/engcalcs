@@ -2274,6 +2274,7 @@ EngCalcs.pageConfig = {
 	lpn_file_import_workspace: <?=json_encode($ec_lang['lpn_file_import_workspace'])?>,
 	lpn_file_import_workspace_tip: <?=json_encode($ec_lang['lpn_file_import_workspace_tip'])?>,
 	lpn_file_import_msx: <?=json_encode($ec_lang['lpn_file_import_msx'])?>,
+	lpn_file_export_item_msx: <?=json_encode($ec_lang['lpn_file_export_item_msx'])?>,
 	lpn_file_import_msx_tip: <?=json_encode($ec_lang['lpn_file_import_msx_tip'])?>,
 	lpn_file_export_msx_tip: <?=json_encode($ec_lang['lpn_file_export_msx_tip'])?>,
 	lpn_msx_report_heading: <?=json_encode($ec_lang['lpn_msx_report_heading'])?>,

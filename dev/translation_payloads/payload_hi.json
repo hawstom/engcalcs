@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hi",
-        "expected_key_count": 3186,
-        "delta_key_count": 205,
+        "expected_key_count": 3187,
+        "delta_key_count": 206,
         "english_changed_key_count": 38,
         "exempt_key_count": 45,
         "exempt_keys": [
@@ -105,6 +105,7 @@
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
         "lpn_file_import_msx": "EPANET-MSX file…",
         "lpn_file_import_msx_tip": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.",
+        "lpn_file_export_item_msx": "EPANET-MSX file…",
         "lpn_file_export_msx_tip": "Download the attached EPANET-MSX file exactly as it was imported.",
         "lpn_msx_report_heading": "Attached {file}",
         "lpn_msx_report_kept": "This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.",
@@ -312,6 +313,7 @@
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
         "lpn_file_import_msx": "EPANET-MSX file…",
         "lpn_file_import_msx_tip": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.",
+        "lpn_file_export_item_msx": "EPANET-MSX file…",
         "lpn_file_export_msx_tip": "Download the attached EPANET-MSX file exactly as it was imported.",
         "lpn_msx_report_heading": "Attached {file}",
         "lpn_msx_report_kept": "This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.",
@@ -930,6 +932,22 @@
             "label": {
                 "key": "lpn_file_import_msx",
                 "english": "EPANET-MSX file…"
+            }
+        },
+        "lpn_file_export_item_msx": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_workspace_tip",
+                    "value": "फ़ाइल, निर्यात करें, कार्यक्षेत्र से सहेजी गई कार्यक्षेत्र फ़ाइल लागू करें: बॉक्स की स्थितियाँ और आकार, डॉकिंग, फलक आकार और इस पृष्ठ के प्रदर्शन विकल्प, जैसे कौन-से सहायता बबल और होवर कार्ड दिखाए जाते हैं। आपके प्रोजेक्ट और कुकीज़ को छुआ नहीं जाता।",
+                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
+                },
+                "next_translated": {
+                    "key": "lpn_workspace_exported",
+                    "value": "कार्यक्षेत्र {file} में सहेजा गया: {n} सेटिंग्स।",
+                    "english": "Workspace saved to {file}: {n} settings."
+                }
             }
         },
         "lpn_file_export_msx_tip": {

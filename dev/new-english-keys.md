@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 167 untranslated keys, of 3186 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read on master**, of 168 untranslated keys, of 3187 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (167, all ruled)
+## lpn_  (168, all ruled)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -204,6 +204,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-20._
 - **`lpn_ff_working_steps`**
   > Working: reporting step {step} of {steps}, junction {done} of {total}.
+  _Ruled OK 2026-10-20._
+- **`lpn_file_export_item_msx`**
+  > EPANET-MSX file…
   _Ruled OK 2026-10-20._
 - **`lpn_file_export_msx_tip`**
   > Download the attached EPANET-MSX file exactly as it was imported.
@@ -537,7 +540,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**5 still to read**, of 55 new keys across 9 unmerged branch(es).
+**5 still to read**, of 55 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -547,8 +550,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### chore/handoff-1020c (`08e67da1c`) — adds no English strings
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
@@ -571,7 +572,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-leader (`bcc926448`) — already merged into feat/label-margin; its strings are listed there
 
-### feat/label-margin (`a4e28f48c`) — adds no English strings
+### feat/label-margin (`8691fa30e`) — adds no English strings
 
 ### feat/native-eps (`1b06b7275`) — adds no English strings
 
@@ -730,5 +731,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_working`**
   > Reading {file}…
   _Ruled OK 2026-10-20._
-
-### fix/key-reuse (`559fe3b8d`) — already merged into chore/handoff-1020c; its strings are listed there

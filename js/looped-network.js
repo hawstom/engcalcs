@@ -52126,7 +52126,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile },
 			// The attached EPANET-MSX file, as its own row so one click is one download. Only offered
 			// when the project holds one.
-			{ icon: 'save', label: pc.lpn_file_import_msx || 'EPANET-MSX file…', hidden: !doc.msx,
+			{ icon: 'save', label: pc.lpn_file_export_item_msx || 'EPANET-MSX file…', hidden: !doc.msx,
 			  tip: pc.lpn_file_export_msx_tip, fn: exportMsxFile },
 			// THE MODEL'S DATA for AutoCAD and every other DWG program (Task 772). Reading a DXF back
 			// is the DXF Interface Manager's import half, not built.

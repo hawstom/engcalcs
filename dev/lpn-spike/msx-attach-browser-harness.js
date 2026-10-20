@@ -114,7 +114,7 @@ async function main() {
 	try {
 		const a = await open(browser);
 		const L = {};
-		for (const [k, key] of [['imp', 'lpn_file_import_menu'], ['impMsx', 'lpn_file_import_msx'], ['exp', 'lpn_file_export_menu'], ['expMsx', 'lpn_file_import_msx'],
+		for (const [k, key] of [['imp', 'lpn_file_import_menu'], ['impMsx', 'lpn_file_import_msx'], ['exp', 'lpn_file_export_menu'], ['expMsx', 'lpn_file_export_item_msx'],
 			['replace', 'lpn_msx_replace'], ['remove', 'lpn_fitting_remove'], ['kept', 'lpn_msx_report_kept'], ['saveas', 'lpn_file_saveas'], ['open', 'lpn_file_open']]) {
 			L[k] = (await a.lang(key)).trim();
 		}
