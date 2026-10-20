@@ -241,7 +241,7 @@
 			r = h.text ? h.text.getBoundingClientRect() : null; c = svg.getBoundingClientRect();
 			dx = (r && shown) ? Math.max(r.left - c.left - b.x, 0, b.x - (r.right - c.left)) : 0;
 			dy = (r && shown) ? Math.max(r.top - c.top - b.y, 0, b.y - (r.bottom - c.top)) : 0;
-			out.push({ key: key, orphan: !shown, len: Math.hypot(b.x - a.x, b.y - a.y),
+			out.push({ key: key, ext: !!h.external, orphan: !shown, len: Math.hypot(b.x - a.x, b.y - a.y),
 				off: [a, b].some(function (p) { return p.x < -2 || p.y < -2 || p.x > W + 2 || p.y > H + 2; }),
 				gap: Math.hypot(dx, dy), a: a, b: b, W: W, H: H, rect: r ? { l: r.left - c.left, t: r.top - c.top, r: r.right - c.left, b: r.bottom - c.top } : null });
 		}

@@ -3373,6 +3373,63 @@ var EngCalcs = EngCalcs || {};
 		});
 		specs.forEach(function (sp) { delete sp.l; delete sp.forms; });
 	}
+	// **AND LAST, WHAT EVERY PASS ABOVE DROPPED GOES OUT TO THE FREE GROUND, ON A LEADER** (Tom,
+	// 2026-10-20: *"this makes us drop things that don't need to be dropped at network edges"*).
+	// External labeling (Collide.placeExternalLabels(), which cites its method): each label still
+	// hidden here is set in the nearest free run of text rows within `LPN_EXTERNAL_REACH_PX` screen
+	// pixels of its node or pipe, flush against what is already drawn, on a straight leader that
+	// crosses no other leader and runs through no label or symbol. Nothing already placed moves.
+	// A pipe label taken out is drawn level, through the same seam as placeLevelPipeLabels()'s.
+	var LPN_EXTERNAL_REACH_PX = 200, LPN_EXTERNAL_LINK_COST_FRAC = 1.5;
+	function placeExternalDroppedLabels(obs, nodeLabels, nodePlaced, ringLabels, ringPlaced, holders, fs) {
+		var specs = [], min = leaderThreshold(), s = state.s || 1, yOff = -fs * 0.85;
+		doc.nodes.forEach(function (n) { var ne = nodeEls[n.id]; if (ne) { ne.external = false; } });
+		doc.links.forEach(function (l) { var le = linkEls[l.id]; if (le) { le.external = false; } });
+		nodeLabels.forEach(function (sp) {
+			var ne = holders[sp.id];
+			if (!ne || ne.empty || !(ne.hiddenDropped || ne.hiddenCrossed)) { return; }
+			specs.push({ id: sp.id, anchor: sp.anchor, home: sp.home, w: labelBoxWidth(ne), h: dataLabelBoxHeight(ne.lineCount), yOff: yOff, h0: ne });
+		});
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id];
+			if (!le || le.empty || le.levelBeside || l.lx !== undefined || linkLabelStations(l).length !== 1) { return; }
+			if (!(linkLabelTooShort(l, le) || le.hiddenCrowded || le.hiddenBlocked || le.hiddenYielded || le.hiddenCrossed)) { return; }
+			specs.push({ id: linkLabelKey(l.id), anchor: linkLabelMid(l), home: linkLabelBase(l), w: labelBoxWidth(le), h: dataLabelBoxHeight(le.lineCount), yOff: yOff, h0: le, l: l });
+		});
+		if (!specs.length) { return; }
+		// Everything on the map now, as placeLevelPipeLabels() reads it, and the level labels it set.
+		var ground = { boxes: obs.boxes.slice(), segments: obs.segments.slice() }, dragged = withDraggedLabels({ boxes: [], segments: [] }, fs), specOf = {};
+		ground.boxes = ground.boxes.concat(dragged.boxes); ground.segments = ground.segments.concat(dragged.segments);
+		nodeLabels.concat(ringLabels).forEach(function (sp) { specOf[sp.id] = sp; });
+		nodePlaced.concat(ringPlaced).forEach(function (r) {
+			var spec = specOf[r.id], h = holders[r.id];
+			if (!spec || r.dropped || (h && (h.hiddenDropped || h.hiddenCrossed || h.levelBeside))) { return; }
+			(r.boxes && r.boxes.length ? r.boxes : (r.box ? [r.box] : [])).forEach(function (b) {
+				var c = Collide.box(b.cx, b.cy, b.w, b.h, b.a); c.kind = 'label'; ground.boxes.push(c);
+			});
+			if (Math.hypot(r.x - spec.anchor.x, r.y - spec.anchor.y) > min) {
+				ground.segments.push(Collide.segment(spec.anchor.x, spec.anchor.y, r.x, r.y, 'leader', r.id));
+			}
+		});
+		var out = Collide.placeExternalLabels(specs, ground, { rowH: effectiveLineHeight(), pad: fs * LPN_LEVEL_PAD_FRAC * 2,
+			reach: LPN_EXTERNAL_REACH_PX / s, linkCost: fs * LPN_EXTERNAL_LINK_COST_FRAC });
+		out.forEach(function (r, i) {
+			var sp = specs[i], h = sp.h0;
+			if (r.dropped) { return; }
+			h.external = true;
+			h.nudge = { x: r.x - sp.home.x, y: r.y - sp.home.y };
+			h.nudgeManual = false;
+			h.placedSide = undefined;
+			if (sp.l) {
+				h.levelBeside = true; h.levelForm = null; h.levelQuiet = false;
+				h.levelAt = { along: null, ex: r.x - sp.anchor.x, ey: r.y - sp.anchor.y };
+				r.box.kind = 'levellabel'; r.box.levelOwner = sp.l.id;
+			} else {
+				h.hiddenDropped = false; h.hiddenCrossed = false;
+			}
+			obs.boxes.push(r.box); obs.segments.push(r.leader);
+		});
+	}
 	// **WHAT A LEVEL LABEL'S ELEMENT SHOWS** (Task 812). A level label in another form than the one
 	// it arrived in has that form written into its own <text>; anything else shows the content the
 	// pass along the pipe decided (`le.rows`). Written only on a change, so a pass that decides the
@@ -3552,6 +3609,9 @@ var EngCalcs = EngCalcs || {};
 		// Last, on the ground every other label has left, so nothing already placed moves.
 		perfDebugAccum('  cl:level', function () {
 			placeLevelPipeLabels(obs, nodeObs, nodeLabels, nodePlaced, labels, placed, holders, fs);
+		});
+		perfDebugAccum('  cl:external', function () {
+			placeExternalDroppedLabels(obs, nodeLabels, nodePlaced, labels, placed, holders, fs);
 		});
 		labelDebugReport(labels.concat(nodeLabels), placed.concat(nodePlaced), obs);
 		// **THE METERS GO LAST, ON THE GROUND EVERYTHING ELSE HAS LEFT** (Task 247). They are the
@@ -60720,7 +60780,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
 			crowdHidden: !!h.crowdHidden,
 			alignedAlong: h.alignedAlong, stationSides: h.stationSides ? h.stationSides.slice() : h.stationSides,
-			levelBeside: !!h.levelBeside, levelForm: h.levelForm || null, levelAt: h.levelAt || null, levelQuiet: !!h.levelQuiet, inline: !!h.inline, inlineFrom: h.inlineFrom || null, tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
+			levelBeside: !!h.levelBeside, levelForm: h.levelForm || null, levelAt: h.levelAt || null, levelQuiet: !!h.levelQuiet, external: !!h.external, inline: !!h.inline, inlineFrom: h.inlineFrom || null, tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
 			rowW: h.rowW ? h.rowW.slice() : null, rowWPx: h.rowWPx ? h.rowWPx.slice() : null,
 			segW: h.segW ? h.segW.slice() : null };
 	}
@@ -60774,7 +60834,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h.hiddenBlocked = c.hiddenBlocked;
 		h.hiddenCrossed = c.hiddenCrossed; h.hiddenDropped = c.hiddenDropped;
 		h.crowdHidden = c.crowdHidden;
-		h.alignedAlong = c.alignedAlong; h.levelBeside = c.levelBeside; h.levelForm = c.levelForm || null; h.levelAt = c.levelAt || null; h.levelQuiet = !!c.levelQuiet; h.inlineFrom = c.inlineFrom || null;
+		h.alignedAlong = c.alignedAlong; h.levelBeside = c.levelBeside; h.levelForm = c.levelForm || null; h.levelAt = c.levelAt || null; h.levelQuiet = !!c.levelQuiet; h.external = !!c.external; h.inlineFrom = c.inlineFrom || null;
 		h.stationSides = c.stationSides ? c.stationSides.slice() : c.stationSides;
 		h.tw = c.tw; h.twPx = c.twPx; h.width = c.width; h.widthPx = c.widthPx;
 		h.rowW = c.rowW ? c.rowW.slice() : null; h.rowWPx = c.rowWPx ? c.rowWPx.slice() : null;

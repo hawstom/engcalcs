@@ -2308,7 +2308,215 @@ EngCalcs.lpnCollide = (function () {
 			before: before, after: after };
 	}
 
+	// ---- external labels: out to the free ground, on a leader (Task 539, Tom 2026-10-20) --------
+	//
+	// Tom, 2026-10-20: *"we have still not found a way to approximate human artistic arrangement of
+	// leaders, and this makes us drop things that don't need to be dropped at network edges."* His
+	// own arrangement of Net1 (dev/label-trials/tom-1020/) pushes nearly every label out to the open
+	// ground round and beside the network, each on a thin straight leader, no two leaders crossing,
+	// the labels stacked flush against one another in columns.
+	//
+	// That is EXTERNAL (BOUNDARY) LABELING: Bekos, Kaufmann, Symvonis and Wolff, "Boundary labeling:
+	// models and efficient algorithms for rectangular maps", Computational Geometry 36 (2007); survey
+	// Bekos, Niedermann and Noellenburg, "External Labeling Techniques: A Taxonomy and Survey",
+	// Computer Graphics Forum 38(3) (2019). What is taken from it, and what is not:
+	//   * the labels go in free ground OUTSIDE the features, joined to their sites by straight
+	//     leaders (their "s-leaders"); never a third bend, never a curve;
+	//   * leaders do not cross one another. Bekos et al. get that from a length-minimal assignment of
+	//     sites to fixed slots on one side; here the slots are not fixed (the free ground is wherever
+	//     the drawing is not), so it is held directly: a candidate whose leader crosses a leader
+	//     already on the map is not taken. Zero crossings by construction, never by luck;
+	//   * the sites are taken in order of their coordinate across the boundary, top to bottom, the
+	//     standard ordering of one-sided boundary labeling, each to its nearest free slot. Nearest
+	//     first in that order is what keeps neighbouring leaders roughly parallel;
+	//   * NOT taken: the rectangular frame. The "boundary" here is the network's own outline, row by
+	//     row, which is how a concave edge (Novato's west side) gets labels into its bays. Every
+	//     label sits on one world-wide lattice of text rows, so labels stack flush in columns.
+	//
+	// It is a FALLBACK: it places only what the interior passes dropped, on the ground they left, so
+	// nothing they placed moves (the interior placer is not re-tuned by this). And it is values in,
+	// values out, so dev/lpn-spike/label-external-harness.js holds it without a browser.
+	//
+	// labels: [{ id, anchor:{x,y}, w, h, yOff }] in placement order (a label's box hangs off its end
+	// point as labelBoxAtEnd() hangs it: right of the end when the end is right of the anchor).
+	// obstacles: { boxes, segments }, everything on the map; segments of kind 'leader' may not be
+	// crossed, of kind 'link' may be crossed at `linkCost` world units each.
+	// opts: { rowH, pad, reach, linkCost, keep }. Returns one result per label, in input order:
+	// { id, dropped } or { id, x, y, side, box, leader, d }.
+	function placeExternalLabels(labels, obstacles, opts) {
+		opts = opts || {};
+		var rowH = +opts.rowH, pad = +opts.pad || 0, reach = +opts.reach, linkCost = +opts.linkCost || 0,
+			keep = opts.keep > 0 ? opts.keep : 8,
+			rows = new Map(), merged = new Map(), mine = { boxes: [], segments: [] }, results = {}, MAXROWS = 40000;
+		if (!(rowH > 0) || !(reach > 0) || !isFinite(rowH) || !isFinite(reach)) {
+			return labels.map(function (l) { return { id: l.id, dropped: true }; });
+		}
+		// THE ROWS ANY LABEL COULD USE, and only those: a label reaches `reach` from its anchor.
+		var need = 0;
+		labels.forEach(function (l) {
+			var a = Math.floor((l.anchor.y - reach - l.h) / rowH), b = Math.floor((l.anchor.y + reach) / rowH), i;
+			for (i = a; i <= b && need < MAXROWS; i++) { if (!rows.has(i)) { rows.set(i, []); need++; } }
+		});
+		function bandOf(i) { return [i * rowH - pad, (i + 1) * rowH + pad]; }
+		function addBoxRows(x0, y0, x1, y1) {
+			var i, a = Math.floor((y0 - pad) / rowH), b = Math.floor((y1 + pad) / rowH), r;
+			if (b - a > MAXROWS) { return; }
+			for (i = a; i <= b; i++) {
+				r = rows.get(i);
+				if (!r) { continue; }
+				var band = bandOf(i);
+				if (y1 <= band[0] || y0 >= band[1]) { continue; }
+				r.push([x0 - pad, x1 + pad]); merged.delete(i);
+			}
+		}
+		function addSegRows(g) {
+			var ya = Math.min(g.ay, g.by), yb = Math.max(g.ay, g.by), i, a = Math.floor((ya - pad) / rowH), b = Math.floor((yb + pad) / rowH), r, band, t0, t1, xa, xb;
+			if (b - a > MAXROWS) { return; }
+			for (i = a; i <= b; i++) {
+				r = rows.get(i);
+				if (!r) { continue; }
+				band = bandOf(i);
+				if (yb < band[0] || ya > band[1]) { continue; }
+				if (g.by === g.ay) { xa = Math.min(g.ax, g.bx); xb = Math.max(g.ax, g.bx); }
+				else {
+					t0 = (band[0] - g.ay) / (g.by - g.ay); t1 = (band[1] - g.ay) / (g.by - g.ay);
+					if (t0 > t1) { var tt = t0; t0 = t1; t1 = tt; }
+					t0 = Math.max(0, t0); t1 = Math.min(1, t1);
+					if (t0 > t1) { continue; }
+					xa = g.ax + (g.bx - g.ax) * t0; xb = g.ax + (g.bx - g.ax) * t1;
+					if (xa > xb) { var xt = xa; xa = xb; xb = xt; }
+				}
+				r.push([xa - pad, xb + pad]); merged.delete(i);
+			}
+		}
+		function addBox(b) {
+			var c = boxCorners(b), x0 = Math.min(c[0].x, c[1].x, c[2].x, c[3].x), x1 = Math.max(c[0].x, c[1].x, c[2].x, c[3].x),
+				y0 = Math.min(c[0].y, c[1].y, c[2].y, c[3].y), y1 = Math.max(c[0].y, c[1].y, c[2].y, c[3].y);
+			if (isFinite(x0) && isFinite(y0) && isFinite(x1) && isFinite(y1)) { addBoxRows(x0, y0, x1, y1); }
+		}
+		obstacles.boxes.forEach(addBox);
+		obstacles.segments.forEach(function (g) { if (isFinite(g.ax + g.ay + g.bx + g.by)) { addSegRows(g); } });
+		function mergedRow(i) {
+			var m = merged.get(i), r, out, k, cur;
+			if (m) { return m; }
+			r = (rows.get(i) || []).slice().sort(function (p, q) { return p[0] - q[0]; });
+			out = [];
+			for (k = 0; k < r.length; k++) {
+				if (cur && r[k][0] <= cur[1]) { if (r[k][1] > cur[1]) { cur[1] = r[k][1]; } }
+				else { cur = [r[k][0], r[k][1]]; out.push(cur); }
+			}
+			merged.set(i, out);
+			return out;
+		}
+		// The free stretches of rows i..i+n-1 between x0 and x1: what no row's occupied run covers.
+		function freeGaps(i, n, x0, x1) {
+			var all = [], k, j, m, out = [], at = x0;
+			for (k = 0; k < n; k++) {
+				if (!rows.has(i + k)) { return []; }
+				m = mergedRow(i + k);
+				for (j = 0; j < m.length; j++) { if (m[j][1] > x0 && m[j][0] < x1) { all.push(m[j]); } }
+			}
+			all.sort(function (p, q) { return p[0] - q[0]; });
+			for (k = 0; k < all.length; k++) {
+				if (all[k][0] > at) { out.push([at, all[k][0]]); }
+				if (all[k][1] > at) { at = all[k][1]; }
+				if (at >= x1) { break; }
+			}
+			if (at < x1) { out.push([at, x1]); }
+			return out;
+		}
+		var idx = grid(reach / 2, obstacles), near = { boxes: [], segments: [] }, ii;
+		for (ii = 0; ii < obstacles.boxes.length; ii++) { idx.addBox(ii); }
+		for (ii = 0; ii < obstacles.segments.length; ii++) { idx.addSegment(ii); }
+		// May this leader be drawn? Not through any box but the one its own anchor stands in, not
+		// across any leader; and what it costs in pipes crossed.
+		function leaderCost(lbl, g) {
+			var mx = (g.ax + g.bx) / 2, my = (g.ay + g.by) / 2, r = Math.hypot(g.bx - g.ax, g.by - g.ay) / 2 + pad, k, o, n = 0;
+			function blocked(o) {
+				if (o.kind === 'link') { return false; }
+				if (o.w !== undefined) {
+					// its own symbol, and any box its anchor stands in
+					if (Math.abs(lbl.anchor.x - o.cx) <= o.w / 2 + 1e-9 && Math.abs(lbl.anchor.y - o.cy) <= o.h / 2 + 1e-9) { return false; }
+					return segmentInBoxFraction(g, o) > 0;
+				}
+				if (o.kind !== 'leader') { return false; }
+				return segmentsCross(g, o);
+			}
+			idx.near(mx, my, r, near);
+			for (k = 0; k < near.boxes.length; k++) { if (blocked(near.boxes[k])) { return -1; } }
+			for (k = 0; k < near.segments.length; k++) {
+				o = near.segments[k];
+				if (o.kind === 'link') { if (linkCost && segmentsCross(g, o)) { n++; } continue; }
+				if (blocked(o)) { return -1; }
+			}
+			for (k = 0; k < mine.boxes.length; k++) { if (segmentInBoxFraction(g, mine.boxes[k]) > 0) { return -1; } }
+			for (k = 0; k < mine.segments.length; k++) { if (segmentsCross(g, mine.segments[k])) { return -1; } }
+			return n * linkCost;
+		}
+		// Every label's candidates on the ground as the interior passes left it: the nearest free slot
+		// within reach of each, at each row (no leader tested yet).
+		function candidatesOf(lbl) {
+			var a = lbl.anchor, w = lbl.w, n = Math.max(1, Math.ceil(lbl.h / rowH - 1e-9)),
+				i0 = Math.floor((a.y - reach - lbl.h) / rowH), i1 = Math.floor((a.y + reach) / rowH), i, cands = [], gaps, k, g, y;
+			function cand(x, side) {
+				var d = Math.hypot(x - a.x, y - a.y);
+				if (d <= reach) { cands.push({ x: x, y: y, side: side, d: d }); }
+			}
+			for (i = i0; i <= i1; i++) {
+				y = i * rowH - lbl.yOff;
+				gaps = freeGaps(i, n, a.x - reach - w, a.x + reach + w);
+				for (k = 0; k < gaps.length; k++) {
+					g = gaps[k];
+					if (g[1] - g[0] < w) { continue; }
+					if (g[1] <= a.x) { cand(g[1], 'left'); }
+					else if (g[0] >= a.x) { cand(g[0], 'right'); }
+					else {
+						if (a.x + w <= g[1]) { cand(a.x, 'right'); }
+						if (a.x - w >= g[0]) { cand(a.x - 1e-9 * Math.max(1, Math.abs(a.x)), 'left'); }
+					}
+				}
+			}
+			cands.sort(function (p, q) { return (p.d - q.d) || (p.y - q.y) || (p.x - q.x); });
+			return cands;
+		}
+		// **THE NEAREST TO OPEN GROUND GOES FIRST.** A label on the network's edge has free ground a
+		// short leader away; one deep inside needs a long leader out between the others. Taken in
+		// order of the anchor's row alone (the one-sided ordering), an inner label's long leader is
+		// placed first and walls off the edge labels it passes (measured on a 6 x 6 grid: 15 of the
+		// 20 edge labels placed, against 20 of 20 this way). Ties go by row, then column.
+		var order = labels.map(function (l, i) { var c = candidatesOf(l); return { l: l, i: i, d0: c.length ? c[0].d : Infinity }; });
+		order.sort(function (p, q) { return (p.d0 - q.d0) || (p.l.anchor.y - q.l.anchor.y) || (p.l.anchor.x - q.l.anchor.x) || (p.i - q.i); });
+		order.forEach(function (o) {
+			var lbl = o.l, a = lbl.anchor, w = lbl.w, cands = candidatesOf(lbl), k, best = null, tried = 0;
+			for (k = 0; k < cands.length && tried < keep; k++) {
+				var c = cands[k];
+				if (best && c.d >= best.score) { break; }
+				var seg = segment(a.x, a.y, c.x, c.y, 'leader', lbl.id), cost = leaderCost(lbl, seg);
+				if (cost < 0) { continue; }
+				tried++;
+				if (!best || c.d + cost < best.score) { best = { c: c, seg: seg, score: c.d + cost }; }
+			}
+			if (!best) { results[o.i] = { id: lbl.id, dropped: true }; return; }
+			var c0 = best.c, left = c0.side === 'right' ? c0.x : c0.x - w,
+				bx = box(left + w / 2, c0.y + lbl.yOff + lbl.h / 2, w, lbl.h, 0, 'label', lbl.id);
+			mine.boxes.push(bx); mine.segments.push(best.seg);
+			addBoxRows(left, c0.y + lbl.yOff, left + w, c0.y + lbl.yOff + lbl.h);
+			addSegRows(best.seg);
+			results[o.i] = { id: lbl.id, x: c0.x, y: c0.y, side: c0.side, box: bx, leader: best.seg, d: c0.d, dropped: false };
+		});
+		return labels.map(function (l, i) { return results[i]; });
+	}
+	// How many pairs of these leaders cross: the number external labeling holds at zero.
+	function leaderCrossingCount(segs) {
+		var n = 0, i, j;
+		for (i = 0; i < segs.length; i++) { for (j = i + 1; j < segs.length; j++) { if (segmentsCross(segs[i], segs[j])) { n++; } } }
+		return n;
+	}
+
+
 	return {
+		placeExternalLabels: placeExternalLabels,
+		leaderCrossingCount: leaderCrossingCount,
 		GOAL_WEIGHT: GOAL_WEIGHT,
 		ANGLE_TUNING: ANGLE_TUNING,
 		CORNERS: CORNERS,
