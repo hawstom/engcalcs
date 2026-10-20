@@ -116,11 +116,18 @@ async function measure(file, mode, opts) {
 	// already computed inside runLabelCollisionAvoidance(), and reaching it any other way means
 	// either editing js/looped-network.js or recomputing geometry that could then drift from what
 	// the drawing used.
-	let lastFirstFit = null, lastRing = null, lastObs = null;
+	let lastFirstFit = null, lastRing = null, lastObs = null, lastLevel = null;
 	const realFF = Collide.placeLabelsFirstFit;
+	// The strict call places the level pipe labels (Task 812), after the node labels: they are a
+	// third placement set, and must not stand in for the node labels' answer.
 	Collide.placeLabelsFirstFit = function (labels, obs, opts) {
 		const out = realFF.call(this, labels, obs, opts);
-		lastFirstFit = out;
+		// A strict call over node labels is the one-line insertion (Task 734), after the repair: the
+		// labels that took a line are drawn there, so they replace the repair's entries.
+		if (opts && opts.strict && labels.length && labels[0].id.charAt(0) === 'n') {
+			const took = {}; out.forEach(function (r) { if (!r.dropped) { took[r.id] = r; } });
+			if (lastFirstFit) { lastFirstFit = lastFirstFit.map(function (r) { return took[r.id] || r; }); }
+		} else if (opts && opts.strict) { lastLevel = out; } else { lastFirstFit = out; }
 		return out;
 	};
 	const realRing = Collide.placeLabels;
@@ -201,11 +208,12 @@ async function measure(file, mode, opts) {
 			const bare = id.slice(2);
 			return id.charAt(0) === 'n' ? nodeEls[bare] : linkEls[bare];
 		}
-		[lastFirstFit, lastRing].forEach(function (set) {
+		[lastFirstFit, lastRing, lastLevel].forEach(function (set) {
 			(set || []).forEach(function (r) {
 				if (r.dropped || !(r.box || (r.boxes && r.boxes.length))) { return; }
 				const h = holderFor(r.id);
 				if (!assemblyShown(h)) { return; }
+				if ((set === lastLevel) !== !!(r.id.charAt(0) === 'l' && h.levelBeside)) { return; }
 				out.push({ id: r.id, boxes: (r.boxes && r.boxes.length) ? r.boxes : [r.box],
 					leader: drawnLeader(h) });
 			});
@@ -234,7 +242,7 @@ async function measure(file, mode, opts) {
 			out.push({ id: 't:' + lb.id, boxes: [textBoxes[i]], leader: drawnLeader(labelEls[lb.id]) });
 		});
 		Object.keys(byLink).forEach(function (id) {
-			if (!assemblyShown(linkEls[id])) { return; }
+			if (!assemblyShown(linkEls[id]) || linkEls[id].levelBeside) { return; }
 			out.push({ id: 'l:' + id, boxes: byLink[id], leader: drawnLeader(linkEls[id]) });
 		});
 		return out;
