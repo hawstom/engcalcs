@@ -261,7 +261,7 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 	isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '',
 	isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : ''); ?>
 <?php foreach ($GLOBALS['all_language_settings'] as $key => $lang) : ?>
-					<a class="dropdown-item" lang="<?=htmlspecialchars($key, ENT_QUOTES, 'UTF-8')?>" href="<?=htmlspecialchars($ec_lang_switch_path, ENT_QUOTES, 'UTF-8')?>?lang=<?=$key?>" title="<?=$lang['LANGNAME']?>"><?=$lang['LANGNAME']?></a>
+					<a class="dropdown-item" lang="<?=htmlspecialchars($key, ENT_QUOTES, 'UTF-8')?>" href="<?=htmlspecialchars($ec_lang_switch_path, ENT_QUOTES, 'UTF-8')?>?lang=<?=$key?><?=htmlspecialchars(ecPageQuery(), ENT_QUOTES, 'UTF-8')?>" title="<?=$lang['LANGNAME']?>"><?=$lang['LANGNAME']?></a>
 <?php endforeach; ?>
 				</div>
 			</li>

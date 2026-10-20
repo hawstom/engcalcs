@@ -346,7 +346,7 @@ function ec_canonical_url($lang = null) {
     // one function feeds canonical, all 27 hreflang alternates and og:url, so they cannot disagree.
     // EC_CANONICAL_HOST lets a page declared per host (ecCanonicalHostOrigins(), Task 697) answer
     // for the host serving it: the map application on epanet-plus-plus.org nominates itself there.
-    return ecCanonicalOrigin($script, CANONICAL_ORIGIN, EC_CANONICAL_HOST) . $path . '?lang=' . $lang;
+    return ecCanonicalOrigin($script, CANONICAL_ORIGIN, EC_CANONICAL_HOST) . $path . '?lang=' . $lang . ecPageQuery();
 }
 
 $clanguage=chooseLanguage($all_language_settings);

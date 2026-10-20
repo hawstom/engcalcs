@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**128 still to read on master**, of 136 untranslated keys, of 3155 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**132 still to read on master**, of 140 untranslated keys, of 3159 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (136, 128 to read @@ NEEDS RULING)
+## lpn_  (140, 132 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -147,6 +147,18 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_guide_cmp_byasset_term`**
   > Results by asset
+  @@ NEEDS RULING
+- **`lpn_guide_page_desc`**
+  > {name} user manual: one page for each chapter, from the map and Properties to scenarios, fire flow analysis, and criticality analysis.
+  @@ NEEDS RULING
+- **`lpn_guide_page_missing`**
+  > There is no such chapter. The chapters are listed below.
+  @@ NEEDS RULING
+- **`lpn_guide_page_open`**
+  > Open the application
+  @@ NEEDS RULING
+- **`lpn_guide_page_what`**
+  > {name} is a free web application for modeling water distribution networks, an extension of EPANET.
   @@ NEEDS RULING
 - **`lpn_inpup_ask_title`**
   > Import {file}
@@ -444,7 +456,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**61 still to read**, of 65 new keys across 8 unmerged branch(es).
+**57 still to read**, of 61 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -455,28 +467,17 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### chore/batch-1019d (`a7d57f166`) — adds no English strings
+
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/eps-analysis (`a0f5dbe25`) — adds no English strings
+### feat/eps-analysis (`b3e1b3612`) — already merged into chore/batch-1019d; its strings are listed there
 
-### feat/guide-page (`3ada36350`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/guide-page (`3ada36350`) — adds no English strings
 
-- **`lpn_guide_page_desc`**
-  > {name} user manual: one page for each chapter, from the map and Properties to scenarios, fire flow analysis, and criticality analysis.
-  @@ NEEDS RULING
-- **`lpn_guide_page_missing`**
-  > There is no such chapter. The chapters are listed below.
-  @@ NEEDS RULING
-- **`lpn_guide_page_open`**
-  > Open the application
-  @@ NEEDS RULING
-- **`lpn_guide_page_what`**
-  > {name} is a free web application for modeling water distribution networks, an extension of EPANET.
-  @@ NEEDS RULING
+### feat/label-beside (`8676cd1be`) — already merged into chore/batch-1019d; its strings are listed there
 
-### feat/label-beside (`8676cd1be`) — already merged into feat/label-form; its strings are listed there
-
-### feat/label-form (`d05fdb069`) — already merged into feat/label-leader; its strings are listed there
+### feat/label-form (`d05fdb069`) — already merged into chore/batch-1019d; its strings are listed there
 
 ### feat/label-leader (`ce56b8cf9`) — adds no English strings
 
