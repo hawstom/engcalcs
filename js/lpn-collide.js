@@ -2337,12 +2337,15 @@ EngCalcs.lpnCollide = (function () {
 	// nothing they placed moves (the interior placer is not re-tuned by this). And it is values in,
 	// values out, so dev/lpn-spike/label-external-harness.js holds it without a browser.
 	//
-	// labels: [{ id, anchor:{x,y}, w, h, yOff }] in placement order (a label's box hangs off its end
+	// labels: [{ id, anchor:{x,y}, w, h, yOff, forms?, anchors?, own? }] (`forms`: [{w, h}], fullest
+	// first, each tried in turn -- the page passes none yet: giving a pipe label its full stack out
+	// here, measured on Novato at fit, shifted the next layout and lost three node labels; `anchors`: other points its leader may start from, a pipe's stations;
+	// `own`: the linkOwner of its own reservation, which its leader may cross) (a label's box hangs off its end
 	// point as labelBoxAtEnd() hangs it: right of the end when the end is right of the anchor).
 	// obstacles: { boxes, segments }, everything on the map; segments of kind 'leader' may not be
 	// crossed, of kind 'link' may be crossed at `linkCost` world units each.
 	// opts: { rowH, pad, reach, linkCost, keep }. Returns one result per label, in input order:
-	// { id, dropped } or { id, x, y, side, box, leader, d }.
+	// { id, dropped } or { id, x, y, side, box, leader, d, form, at } (`at`: which of `anchors`).
 	function placeExternalLabels(labels, obstacles, opts) {
 		opts = opts || {};
 		var rowH = +opts.rowH, pad = +opts.pad || 0, reach = +opts.reach, linkCost = +opts.linkCost || 0,
@@ -2425,45 +2428,81 @@ EngCalcs.lpnCollide = (function () {
 			if (at < x1) { out.push([at, x1]); }
 			return out;
 		}
-		var idx = grid(reach / 2, obstacles), near = { boxes: [], segments: [] }, ii;
-		for (ii = 0; ii < obstacles.boxes.length; ii++) { idx.addBox(ii); }
-		for (ii = 0; ii < obstacles.segments.length; ii++) { idx.addSegment(ii); }
+		// A BUCKET GRID OF BOUNDING BOXES, queried by the leader's own bounding box. (grid()'s
+		// radius query from the leader's middle walked a square of cells round a long leader's whole
+		// circle: on Net3 at 6 notches in, 330 of 470 ms over ten runs of this function.)
+		var cell = reach / 4, bucket = new Map(), all = [], stamp = 0, seen = [], ii;
+		function bkey(i, j) { return i * 4294967296 + j; }
+		function bin(o, x0, y0, x1, y1) {
+			var n = all.length, i, j, i0 = Math.floor(x0 / cell), i1 = Math.floor(x1 / cell), j0 = Math.floor(y0 / cell), j1 = Math.floor(y1 / cell), c;
+			all.push(o);
+			if (!((i1 - i0 + 1) * (j1 - j0 + 1) <= 4096)) { bucket.set('big', (bucket.get('big') || []).concat([n])); return; }
+			for (i = i0; i <= i1; i++) { for (j = j0; j <= j1; j++) { c = bucket.get(bkey(i, j)); if (!c) { c = []; bucket.set(bkey(i, j), c); } c.push(n); } }
+		}
+		obstacles.boxes.forEach(function (b) {
+			var c = boxCorners(b);
+			bin(b, Math.min(c[0].x, c[1].x, c[2].x, c[3].x), Math.min(c[0].y, c[1].y, c[2].y, c[3].y), Math.max(c[0].x, c[1].x, c[2].x, c[3].x), Math.max(c[0].y, c[1].y, c[2].y, c[3].y));
+		});
+		obstacles.segments.forEach(function (g) { bin(g, Math.min(g.ax, g.bx), Math.min(g.ay, g.by), Math.max(g.ax, g.bx), Math.max(g.ay, g.by)); });
+		function nearLeader(g, fn) {
+			var i, j, k, c, i0 = Math.floor(Math.min(g.ax, g.bx) / cell), i1 = Math.floor(Math.max(g.ax, g.bx) / cell),
+				j0 = Math.floor(Math.min(g.ay, g.by) / cell), j1 = Math.floor(Math.max(g.ay, g.by) / cell), big = bucket.get('big') || [];
+			stamp++;
+			for (k = 0; k < big.length; k++) { seen[big[k]] = stamp; if (fn(all[big[k]])) { return true; } }
+			for (i = i0; i <= i1; i++) {
+				for (j = j0; j <= j1; j++) {
+					c = bucket.get(bkey(i, j));
+					if (!c) { continue; }
+					for (k = 0; k < c.length; k++) {
+						if (seen[c[k]] === stamp) { continue; }
+						seen[c[k]] = stamp;
+						if (fn(all[c[k]])) { return true; }
+					}
+				}
+			}
+			return false;
+		}
 		// May this leader be drawn? Not through any box but the one its own anchor stands in, not
 		// across any leader; and what it costs in pipes crossed.
 		function leaderCost(lbl, g) {
-			var mx = (g.ax + g.bx) / 2, my = (g.ay + g.by) / 2, r = Math.hypot(g.bx - g.ax, g.by - g.ay) / 2 + pad, k, o, n = 0;
+			var k, n = 0;
 			function blocked(o) {
-				if (o.kind === 'link') { return false; }
+				if (o.kind === 'link') { if (linkCost && segmentsCross(g, o)) { n++; } return false; }
 				if (o.w !== undefined) {
-					// its own symbol, and any box its anchor stands in
-					if (Math.abs(lbl.anchor.x - o.cx) <= o.w / 2 + 1e-9 && Math.abs(lbl.anchor.y - o.cy) <= o.h / 2 + 1e-9) { return false; }
+					// its own reservation along its own pipe (`own`, a stationed label's linkOwner)
+					if (lbl.own !== undefined && o.linkOwner === lbl.own) { return false; }
+					// any box its leader starts inside: a node label's own symbol, a label over a pipe's
+					// station. Not a symbol over a pipe label's start: the leader would leave a node,
+					// and read as that node's (N3 in label-form-wheel-browser-harness.js)
+					if ((lbl.own === undefined || o.kind !== 'symbol') && Math.abs(g.ax - o.cx) <= o.w / 2 + 1e-9 && Math.abs(g.ay - o.cy) <= o.h / 2 + 1e-9) { return false; }
 					return segmentInBoxFraction(g, o) > 0;
 				}
 				if (o.kind !== 'leader') { return false; }
 				return segmentsCross(g, o);
 			}
-			idx.near(mx, my, r, near);
-			for (k = 0; k < near.boxes.length; k++) { if (blocked(near.boxes[k])) { return -1; } }
-			for (k = 0; k < near.segments.length; k++) {
-				o = near.segments[k];
-				if (o.kind === 'link') { if (linkCost && segmentsCross(g, o)) { n++; } continue; }
-				if (blocked(o)) { return -1; }
-			}
+			if (nearLeader(g, blocked)) { return -1; }
 			for (k = 0; k < mine.boxes.length; k++) { if (segmentInBoxFraction(g, mine.boxes[k]) > 0) { return -1; } }
 			for (k = 0; k < mine.segments.length; k++) { if (segmentsCross(g, mine.segments[k])) { return -1; } }
 			return n * linkCost;
 		}
 		// Every label's candidates on the ground as the interior passes left it: the nearest free slot
 		// within reach of each, at each row (no leader tested yet).
-		function candidatesOf(lbl) {
-			var a = lbl.anchor, w = lbl.w, n = Math.max(1, Math.ceil(lbl.h / rowH - 1e-9)),
-				i0 = Math.floor((a.y - reach - lbl.h) / rowH), i1 = Math.floor((a.y + reach) / rowH), i, cands = [], gaps, k, g, y;
+		function formsOf(lbl) { return lbl.forms && lbl.forms.length ? lbl.forms : [{ w: lbl.w, h: lbl.h }]; }
+		// Only the rows whose text lies between D0 and D1 of an anchor vertically: a leader is at least
+		// that long, so the search can go out band by band and stop at the first band nothing nearer
+		// can follow (bandedBest()).
+		function candidatesOf(lbl, f, D0, D1) {
+			var anchors = lbl.anchors && lbl.anchors.length ? lbl.anchors : [lbl.anchor], ai, a, w = f.w, n = Math.max(1, Math.ceil(f.h / rowH - 1e-9)),
+				i0, i1, i, cands = [], gaps, k, g, y;
 			function cand(x, side) {
 				var d = Math.hypot(x - a.x, y - a.y);
-				if (d <= reach) { cands.push({ x: x, y: y, side: side, d: d }); }
+				if (d <= reach) { cands.push({ x: x, y: y, side: side, d: d, a: a, ai: ai }); }
 			}
+			for (ai = 0; ai < anchors.length; ai++) {
+			a = anchors[ai]; i0 = Math.floor((a.y - reach - f.h) / rowH); i1 = Math.floor((a.y + reach) / rowH);
 			for (i = i0; i <= i1; i++) {
 				y = i * rowH - lbl.yOff;
+				if (D1 !== undefined && (Math.abs(y - a.y) < D0 || Math.abs(y - a.y) >= D1)) { continue; }
 				gaps = freeGaps(i, n, a.x - reach - w, a.x + reach + w);
 				for (k = 0; k < gaps.length; k++) {
 					g = gaps[k];
@@ -2476,7 +2515,8 @@ EngCalcs.lpnCollide = (function () {
 					}
 				}
 			}
-			cands.sort(function (p, q) { return (p.d - q.d) || (p.y - q.y) || (p.x - q.x); });
+			}
+			cands.sort(function (p, q) { return (p.d - q.d) || (p.ai - q.ai) || (p.y - q.y) || (p.x - q.x); });
 			return cands;
 		}
 		// **THE NEAREST TO OPEN GROUND GOES FIRST.** A label on the network's edge has free ground a
@@ -2484,25 +2524,44 @@ EngCalcs.lpnCollide = (function () {
 		// order of the anchor's row alone (the one-sided ordering), an inner label's long leader is
 		// placed first and walls off the edge labels it passes (measured on a 6 x 6 grid: 15 of the
 		// 20 edge labels placed, against 20 of 20 this way). Ties go by row, then column.
-		var order = labels.map(function (l, i) { var c = candidatesOf(l); return { l: l, i: i, d0: c.length ? c[0].d : Infinity }; });
+		// The best place for one form, or null: bands of rows outward from the anchors, each band's
+		// candidates nearest first, leaders tested, until no later band can hold anything nearer
+		// than the best found (a candidate in a band is at least the band's inner edge away).
+		// `probe`: the nearest candidate's distance only, with no leader tested (the ordering).
+		function bandedBest(lbl, f, probe) {
+			var D0 = 0, D1 = rowH * 4, best = null, cands, k, c, seg, cost, tried = 0;
+			while (D0 <= reach) {
+				cands = candidatesOf(lbl, f, D0, D1);
+				for (k = 0; k < cands.length; k++) {
+					c = cands[k];
+					if (probe) { if (!best || c.d < best.score) { best = { score: c.d }; } continue; }
+					if (tried >= keep || (best && c.d >= best.score)) { break; }
+					seg = segment(c.a.x, c.a.y, c.x, c.y, 'leader', lbl.id); cost = leaderCost(lbl, seg);
+					if (cost < 0) { continue; }
+					tried++;
+					if (!best || c.d + cost < best.score) { best = { c: c, seg: seg, score: c.d + cost, f: f }; }
+				}
+				if ((best && best.score <= D1) || tried >= keep) { break; }
+				D0 = D1; D1 *= 2;
+			}
+			return best;
+		}
+		var order = labels.map(function (l, i) { var b = bandedBest(l, formsOf(l)[0], true); return { l: l, i: i, d0: b ? b.score : Infinity }; });
 		order.sort(function (p, q) { return (p.d0 - q.d0) || (p.l.anchor.y - q.l.anchor.y) || (p.l.anchor.x - q.l.anchor.x) || (p.i - q.i); });
 		order.forEach(function (o) {
-			var lbl = o.l, a = lbl.anchor, w = lbl.w, cands = candidatesOf(lbl), k, best = null, tried = 0;
-			for (k = 0; k < cands.length && tried < keep; k++) {
-				var c = cands[k];
-				if (best && c.d >= best.score) { break; }
-				var seg = segment(a.x, a.y, c.x, c.y, 'leader', lbl.id), cost = leaderCost(lbl, seg);
-				if (cost < 0) { continue; }
-				tried++;
-				if (!best || c.d + cost < best.score) { best = { c: c, seg: seg, score: c.d + cost }; }
+			var lbl = o.l, forms = formsOf(lbl), fi, best = null;
+			// The first of its forms that has a place (the caller lists the fullest first).
+			for (fi = 0; fi < forms.length && !best; fi++) {
+				best = bandedBest(lbl, forms[fi], false);
+				if (best) { best.form = fi; }
 			}
 			if (!best) { results[o.i] = { id: lbl.id, dropped: true }; return; }
-			var c0 = best.c, left = c0.side === 'right' ? c0.x : c0.x - w,
-				bx = box(left + w / 2, c0.y + lbl.yOff + lbl.h / 2, w, lbl.h, 0, 'label', lbl.id);
+			var c0 = best.c, fw = best.f.w, fh = best.f.h, left = c0.side === 'right' ? c0.x : c0.x - fw,
+				bx = box(left + fw / 2, c0.y + lbl.yOff + fh / 2, fw, fh, 0, 'label', lbl.id);
 			mine.boxes.push(bx); mine.segments.push(best.seg);
-			addBoxRows(left, c0.y + lbl.yOff, left + w, c0.y + lbl.yOff + lbl.h);
+			addBoxRows(left, c0.y + lbl.yOff, left + fw, c0.y + lbl.yOff + fh);
 			addSegRows(best.seg);
-			results[o.i] = { id: lbl.id, x: c0.x, y: c0.y, side: c0.side, box: bx, leader: best.seg, d: c0.d, dropped: false };
+			results[o.i] = { id: lbl.id, x: c0.x, y: c0.y, side: c0.side, box: bx, leader: best.seg, d: c0.d, form: best.form, at: c0.ai, dropped: false };
 		});
 		return labels.map(function (l, i) { return results[i]; });
 	}

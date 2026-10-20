@@ -287,3 +287,19 @@ that would hide. Measured in Chromium with the label-form wheel harness, against
 145 -> 147 labels, content pass 142 -> 226 ms; Novato at fit 115 -> 119 labels, 133 -> 251 ms.
 Two to four labels (1-3%) for 60-90% more pass time, and more leaders nearer another pipe than their
 own. Removed (Tom: *"A cost for no benefit is pointless."*).
+
+## A label the placement drops goes out to free ground, on a leader
+
+Tom, 2026-10-20: *"we have still not found a way to approximate human artistic arrangement of
+leaders, and this makes us drop things that don't need to be dropped at network edges."* His hand
+arrangement of Net1 puts labels out in the open ground round the network, each on a straight
+leader, no two crossing. After every other placement step, each label still hidden is set in the
+nearest free run of text rows within 200 screen pixels of its node or pipe (a pipe label from its
+middle or the 0.3/0.7 stations), on one world-wide row lattice so neighbours stack flush, hung
+right-justified when left of its point, on a straight leader that crosses no leader and runs
+through no label or symbol. Nothing already placed moves. The method is external (boundary)
+labeling, Bekos, Kaufmann, Symvonis and Wolff 2007; the citation and what was and was not taken
+from it are at `Collide.placeExternalLabels()`. The nearest-to-open-ground label goes first: taken
+by row alone, inner labels' leaders walled off the edge labels. A pipe label goes out in the form
+the shed left it; its full stack was tried and refused (it shifted the next layout and lost node
+labels on Novato). `label-external-harness.js`, `label-external-browser-harness.js`.

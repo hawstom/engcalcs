@@ -25,7 +25,7 @@ function ok(cond, label, detail) {
 	if (!cond) { failures++; }
 	console.log((cond ? 'PASS  ' : 'FAIL  ') + label + (detail === undefined ? '' : '   ' + detail));
 }
-const BUDGET_MS = 150;
+const BUDGET_MS = 400;   // ~75 ms on an idle jasmine, ~200 ms under a full check_all
 const FS = 10, ROW = 12, PAD = 2, YOFF = -FS * 0.85;
 function hOf(k) { return FS * 1.1 + (k - 1) * ROW; }
 
@@ -145,6 +145,23 @@ function audit(name, labels, obs, out, reach) {
 	const labels = labelsAt(nodes, [4], null);
 	const out = C.placeExternalLabels(labels, obs, { rowH: ROW, pad: PAD, reach: 120, linkCost: 15 });
 	ok(out.length === 1 && out[0].dropped, 'a label with no free ground within reach is dropped');
+}
+
+// ---- 2b. forms: the first that has a place ------------------------------------------------------
+{
+	const { obs, nodes } = gridNet(3, 60);
+	const lbl = { id: 'n0', anchor: { x: nodes[0].x, y: nodes[0].y }, w: 30, h: hOf(1), yOff: YOFF,
+		forms: [{ w: 40, h: hOf(3) }, { w: 30, h: hOf(1) }] };
+	const out = C.placeExternalLabels([lbl], obs, { rowH: ROW, pad: PAD, reach: 120, linkCost: 15 });
+	ok(!out[0].dropped && out[0].form === 0 && Math.abs(out[0].box.h - hOf(3)) < 1e-9, 'the first form is taken where it has a place', JSON.stringify({ form: out[0].form }));
+	// walled in by boxes everywhere but one free slot one row high: only the second form fits
+	const walled = { boxes: [], segments: [] };
+	for (let y = -144; y <= 144; y += ROW) {
+		if (y === 0) { continue; }
+		const b = C.box(0, y + ROW / 2, 300, ROW, 0); b.kind = 'label'; walled.boxes.push(b);
+	}
+	const out2 = C.placeExternalLabels([Object.assign({}, lbl, { anchor: { x: 0, y: 6 } })], { boxes: walled.boxes, segments: [] }, { rowH: ROW, pad: 0, reach: 120, linkCost: 15 });
+	ok(!out2[0].dropped && out2[0].form === 1, 'where only a one-row slot is free, the one-row form is taken', JSON.stringify({ form: out2[0].form, dropped: out2[0].dropped }));
 }
 
 // ---- 3. seeded random networks ------------------------------------------------------------------

@@ -79,11 +79,14 @@ function ok(label, cond, detail) {
 }
 
 // The cuts that make the reference. Each must be found exactly once, or the harness says so.
+const EXTERNAL = 'placeExternalDroppedLabels(obs, nodeLabels, nodePlaced, labels, placed, holders, fs);';
 const CUTS = [
 	["placed = perfDebugAccum('  ns:inline', function () { return tryInlineNodeLabels(nodeLabels, placed, obs, pad, fsNow, byId, nodeOf); });", ''],
 	['if (f.length) { sp.forms = f; }', ''],
 	['LPN_LEVEL_STATIONS.forEach(function (a) {', '[].forEach(function (a) {'],
-	['function levelLeaderMin() { return effectiveFontSize() * LPN_LEVEL_LEADER_FRAC; }', 'function levelLeaderMin() { return leaderThreshold(); }']
+	['function levelLeaderMin() { return effectiveFontSize() * LPN_LEVEL_LEADER_FRAC; }', 'function levelLeaderMin() { return leaderThreshold(); }'],
+	// and no external labels (label-external-browser-harness.js), which feat/label-beside did not have
+	[EXTERNAL, '']
 ];
 const MARKER = "\tdocument.addEventListener('DOMContentLoaded'";
 const HOOK = fs.readFileSync(path.join(__dirname, 'label-form-hook.inc.js'), 'utf8');
@@ -133,6 +136,9 @@ async function layOut(Session, browser, sc, mode, opts) {
 				CUTS.forEach(([from, to]) => { if (body.split(from).length === 2) { body = body.replace(from, to); cut++; } });
 			}
 			if (!mode.cut && body.split(TRIAL).length === 2) { body = body.replace(TRIAL, 'if (!window.__lpnNoInline) { ' + TRIAL + ' }'); }
+			// The stacked layout of the same view has no external labels either: it is the trial's
+			// reference, and the external stage places whatever either layout drops.
+			if (!mode.cut && body.split(EXTERNAL).length === 2) { body = body.replace(EXTERNAL, 'if (!window.__lpnNoInline) { ' + EXTERNAL + ' }'); }
 			if (body.indexOf(MARKER) >= 0) { body = body.replace(MARKER, HOOK + MARKER); hooked++; }
 		}
 		await route.fulfill({ response: resp, body: body });

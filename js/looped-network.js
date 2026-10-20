@@ -3399,7 +3399,9 @@ var EngCalcs = EngCalcs || {};
 			var le = linkEls[l.id];
 			if (!le || le.empty || le.levelBeside || l.lx !== undefined || linkLabelStations(l).length !== 1) { return; }
 			if (!(linkLabelTooShort(l, le) || le.hiddenCrowded || le.hiddenBlocked || le.hiddenYielded || le.hiddenCrossed)) { return; }
-			specs.push({ id: linkLabelKey(l.id), anchor: linkLabelMid(l), home: linkLabelBase(l), w: labelBoxWidth(le), h: dataLabelBoxHeight(le.lineCount), yOff: yOff, h0: le, l: l });
+			specs.push({ id: linkLabelKey(l.id), anchor: linkLabelMid(l), home: linkLabelBase(l), w: labelBoxWidth(le), h: dataLabelBoxHeight(le.lineCount), yOff: yOff, h0: le, l: l, own: l.id,
+				// From its middle, or else a station either side of it (placeLevelPipeLabels()'s).
+				anchors: LPN_LEVEL_STATIONS.map(function (f, i) { return i ? Geom.pointAlongPolyline(linkPointList(l), f) : linkLabelMid(l); }) });
 		});
 		if (!specs.length) { return; }
 		// Everything on the map now, as placeLevelPipeLabels() reads it, and the level labels it set.
@@ -3416,18 +3418,18 @@ var EngCalcs = EngCalcs || {};
 				ground.segments.push(Collide.segment(spec.anchor.x, spec.anchor.y, r.x, r.y, 'leader', r.id));
 			}
 		});
-		var out = Collide.placeExternalLabels(specs, ground, { rowH: effectiveLineHeight(), pad: fs * LPN_LEVEL_PAD_FRAC * 2,
-			reach: LPN_EXTERNAL_REACH_PX / s, linkCost: fs * LPN_EXTERNAL_LINK_COST_FRAC });
+		var out = perfDebugAccum('  ex:place', function () { return Collide.placeExternalLabels(specs, ground, { rowH: effectiveLineHeight(), pad: fs * LPN_LEVEL_PAD_FRAC * 2,
+			reach: LPN_EXTERNAL_REACH_PX / s, linkCost: fs * LPN_EXTERNAL_LINK_COST_FRAC }); });
 		out.forEach(function (r, i) {
 			var sp = specs[i], h = sp.h0;
 			if (r.dropped) { return; }
 			h.external = true;
 			h.nudge = { x: r.x - sp.home.x, y: r.y - sp.home.y };
 			h.nudgeManual = false;
-			h.placedSide = undefined;
 			if (sp.l) {
 				h.levelBeside = true; h.levelForm = null; h.levelQuiet = false;
-				h.levelAt = { along: null, ex: r.x - sp.anchor.x, ey: r.y - sp.anchor.y };
+				var at = sp.anchors[r.at] || sp.anchor;
+				h.levelAt = { along: r.at ? LPN_LEVEL_STATIONS[r.at] : null, ex: r.x - at.x, ey: r.y - at.y };
 				r.box.kind = 'levellabel'; r.box.levelOwner = sp.l.id;
 			} else {
 				h.hiddenDropped = false; h.hiddenCrossed = false;

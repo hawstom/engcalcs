@@ -1,8 +1,10 @@
 // A DROPPED LABEL GOES OUT TO THE FREE GROUND, ON A LEADER (Task 539; Tom, 2026-10-20), in a real
 // Chromium, at real wheel notches, read off the drawing. Run with:
 //   node dev/lpn-spike/label-external-browser-harness.js
-//   LABEL_EXT_REFS=master,feat/label-leader   also lays out those refs' js/looped-network.js and
-//       js/lpn-collide.js and prints their counts beside ours (default: master)
+//   LABEL_EXT_REFS=master   lays out that ref's js/looped-network.js and js/lpn-collide.js and prints
+//       its counts beside ours (default: master; the ref must share this tree's PHP, so merge it first).
+//       'leader' is always laid out too: this file with the external stage cut out, which is
+//       feat/label-leader's placement on today's master.
 //   LABEL_EXT_SHOTS=<dir>   saves Tom's Net1 view and a Net3 view as PNGs
 //   LABEL_EXT_SCENES=net1tom,net1,net3,novato   (default: net1tom,net3)
 //
@@ -63,6 +65,7 @@ function ok(label, cond, detail) {
 
 const MARKER = "\tdocument.addEventListener('DOMContentLoaded'";
 const HOOK = fs.readFileSync(path.join(__dirname, 'label-form-hook.inc.js'), 'utf8');
+const CUT = 'placeExternalDroppedLabels(obs, nodeLabels, nodePlaced, labels, placed, holders, fs);';
 const TOL_PX = 1.5, AMBIG_PX = 3, LEN_MAX_PX = 220;
 // The pass-time budget: the external stage may add this fraction of the reference's content pass.
 const BUDGET_FRAC = 0.15, BUDGET_MS = 6;
@@ -95,16 +98,23 @@ function cross(p, q) {
 async function layOut(Session, browser, sc, ref, shots) {
 	const a = await Session.open(browser, NAME, { serviceWorkers: 'block', viewport: sc.viewport || { width: 1920, height: 1000 } });
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
+	if (process.env.LABEL_EXT_INIT && !ref) { await a.page.addInitScript(process.env.LABEL_EXT_INIT); }
 	let hooked = 0;
 	await a.page.route(/\/js\/(looped-network|lpn-collide)\.js/, async (route) => {
 		const resp = await route.fetch();
 		const file = /lpn-collide\.js/.test(route.request().url()) ? 'lpn-collide.js' : 'looped-network.js';
-		let body = ref ? refSource(ref, file) : await resp.text();
+		let body = (ref && ref !== 'leader') ? refSource(ref, file) : await resp.text();
+		if (ref === 'leader' && file === 'looped-network.js') {
+			if (body.split(CUT).length !== 2) { throw new Error('the external stage call is not in looped-network.js exactly once'); }
+			body = body.replace(CUT, '');
+		} else if (!ref && file === 'looped-network.js') {
+			body = body.replace(CUT, 'var __t0 = performance.now(); ' + CUT + ' window.__extMs = (window.__extMs || 0) + performance.now() - __t0; window.__extN = (window.__extN || 0) + 1;');
+		}
 		if (file === 'looped-network.js' && body.indexOf(MARKER) >= 0) { body = body.replace(MARKER, HOOK + MARKER); hooked++; }
 		await route.fulfill({ response: resp, body });
 	});
 	try {
-		await a.goto('Looped-Network.php?ec_nolog=1');
+		await a.goto('Looped-Network.php?ec_nolog=1' + (process.env.LABEL_EXT_DEBUG && !ref ? '&debug=perf' : ''));
 		await a.answerTrainingPanel().catch(() => {});
 		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 		if (sc.cardKey) {
@@ -138,6 +148,10 @@ async function layOut(Session, browser, sc, ref, shots) {
 			at = k;
 			await a.settle(1500);
 			const v = await a.page.evaluate(([tol, amb]) => window.__lpnForm.read(tol, amb), [TOL_PX, AMBIG_PX]);
+			if (process.env.LABEL_EXT_PROBE && !ref) {
+				const pr = JSON.stringify(await a.page.evaluate((src) => window.__lpnForm.ev(src), process.env.LABEL_EXT_PROBE));
+				if (process.env.LABEL_EXT_PROBE_OUT) { fs.writeFileSync(process.env.LABEL_EXT_PROBE_OUT + '-' + k + '.json', pr); } else { console.log('        probe: ' + pr); }
+			}
 			const ls = await a.page.evaluate(() => window.__lpnForm.leaders());
 			const hidden = v.sig.split('\n').filter((x) => / hidden$/.test(x)).map((x) => x.split(' ')[0]);
 			let crossings = 0, extCross = 0;
@@ -169,9 +183,10 @@ async function layOut(Session, browser, sc, ref, shots) {
 				await a.page.screenshot({ path: path.join(shots, name), clip: sc.key === 'net1tom' ? clip : undefined });
 			}
 		}
+		await a.page.evaluate(() => { window.__extMs = 0; window.__extN = 0; });
 		const ms = await a.page.evaluate(() => window.__lpnForm.timeContent(5));
-		const perf = await a.page.evaluate(() => window.__lpnForm.perf());
-		return { views, ms, ext: perf['cl:external'] || 0, hooked, errors: a.errors.slice() };
+		const ext = await a.page.evaluate(() => window.__extN ? +(window.__extMs / window.__extN).toFixed(1) : 0);
+		return { views, ms, ext, hooked, errors: a.errors.slice() };
 	} finally {
 		await a.close();
 	}
@@ -195,7 +210,7 @@ async function main() {
 	}
 	const browser = await chromium.launch({ executablePath });
 	const shots = process.env.LABEL_EXT_SHOTS || '';
-	const refs = (process.env.LABEL_EXT_REFS || 'master').split(',').filter(Boolean);
+	const refs = ['leader'].concat((process.env.LABEL_EXT_REFS || 'master').split(',').filter(Boolean));
 	try {
 		for (const sc of SCENES) {
 			console.log('=== ' + sc.name + ' ===');
@@ -207,6 +222,10 @@ async function main() {
 				const at = sc.name + ', ' + v.notch + ' notches';
 				console.log('        ' + 'this branch'.padEnd(18) + row(v));
 				others.forEach((o) => console.log('        ' + o.ref.padEnd(18) + row(o.r.views[i])));
+				others.forEach((o) => {
+					const lost = v.hidden.filter((h) => o.r.views[i].hidden.indexOf(h) < 0);
+					if (lost.length) { console.log('        hidden here, shown by ' + o.ref + ': ' + lost.join(' ')); }
+				});
 				ok(at + ': no leader to an external label crosses another leader', v.extCross === 0, String(v.extCross));
 				ok(at + ': every leader on a drawn label, none over ' + LEN_MAX_PX + ' px', v.long.length === 0, v.long.slice(0, 4).join('; '));
 				others.forEach((o) => ok(at + ': no fewer labels than ' + o.ref, v.labels >= o.r.views[i].labels, v.labels + ' vs ' + o.r.views[i].labels));
