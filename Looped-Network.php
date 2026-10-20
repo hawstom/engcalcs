@@ -3530,6 +3530,35 @@ EngCalcs.pageConfig = {
 	lpn_when_all: <?=json_encode($ec_lang['lpn_when_all'])?>,
 	lpn_when_step: <?=json_encode($ec_lang['lpn_when_step'])?>,
 	lpn_when_run: <?=json_encode($ec_lang['lpn_when_run'])?>,
+	lpn_dur_not_back_tank: <?=json_encode($ec_lang['lpn_dur_not_back_tank'])?>,
+	lpn_dur_not_back_junction: <?=json_encode($ec_lang['lpn_dur_not_back_junction'])?>,
+	lpn_dur_col_margin: <?=json_encode($ec_lang['lpn_dur_col_margin'])?>,
+	lpn_dur_col_drop: <?=json_encode($ec_lang['lpn_dur_col_drop'])?>,
+	lpn_dur_junction: <?=json_encode($ec_lang['lpn_dur_junction'])?>,
+	lpn_dur_junction_none: <?=json_encode($ec_lang['lpn_dur_junction_none'])?>,
+	lpn_dur_junction_many: <?=json_encode($ec_lang['lpn_dur_junction_many'])?>,
+	lpn_dur_shortfall: <?=json_encode($ec_lang['lpn_dur_shortfall'])?>,
+	lpn_dur_option: <?=json_encode($ec_lang['lpn_dur_option'])?>,
+	lpn_dur_start: <?=json_encode($ec_lang['lpn_dur_start'])?>,
+	lpn_dur_length: <?=json_encode($ec_lang['lpn_dur_length'])?>,
+	lpn_dur_length_tip: <?=json_encode($ec_lang['lpn_dur_length_tip'])?>,
+	lpn_dur_no_junction: <?=json_encode($ec_lang['lpn_dur_no_junction'])?>,
+	lpn_dur_bad_time: <?=json_encode($ec_lang['lpn_dur_bad_time'])?>,
+	lpn_dur_head: <?=json_encode($ec_lang['lpn_dur_head'])?>,
+	lpn_dur_holds: <?=json_encode($ec_lang['lpn_dur_holds'])?>,
+	lpn_dur_fails: <?=json_encode($ec_lang['lpn_dur_fails'])?>,
+	lpn_dur_lowest: <?=json_encode($ec_lang['lpn_dur_lowest'])?>,
+	lpn_dur_no_empty: <?=json_encode($ec_lang['lpn_dur_no_empty'])?>,
+	lpn_dur_empties: <?=json_encode($ec_lang['lpn_dur_empties'])?>,
+	lpn_dur_recovers: <?=json_encode($ec_lang['lpn_dur_recovers'])?>,
+	lpn_dur_recovery_to_end: <?=json_encode($ec_lang['lpn_dur_recovery_to_end'])?>,
+	lpn_dur_recovery_cut: <?=json_encode($ec_lang['lpn_dur_recovery_cut'])?>,
+	lpn_dur_col_fire: <?=json_encode($ec_lang['lpn_dur_col_fire'])?>,
+	lpn_dur_col_pressure: <?=json_encode($ec_lang['lpn_dur_col_pressure'])?>,
+	lpn_dur_col_nofire: <?=json_encode($ec_lang['lpn_dur_col_nofire'])?>,
+	lpn_dur_col_low: <?=json_encode($ec_lang['lpn_dur_col_low'])?>,
+	lpn_dur_col_end: <?=json_encode($ec_lang['lpn_dur_col_end'])?>,
+	lpn_dur_col_end_nofire: <?=json_encode($ec_lang['lpn_dur_col_end_nofire'])?>,
 	lpn_at_time: <?=json_encode($ec_lang['lpn_at_time'])?>,
 	lpn_crit_col_lowest: <?=json_encode($ec_lang['lpn_crit_col_lowest'])?>,
 	lpn_crit_col_hours: <?=json_encode($ec_lang['lpn_crit_col_hours'])?>,
@@ -4688,6 +4717,9 @@ EngCalcs.pageConfig = {
       // looped-network.js for the same reason; absent, the Run button does nothing. ?>
 <script src="/engcalcs/js/lpn-criticality.js?v=<?=filemtime(__DIR__.'/js/lpn-criticality.js')?>"></script>
 <script src="/engcalcs/js/lpn-demandscale.js?v=<?=filemtime(__DIR__.'/js/lpn-demandscale.js')?>"></script>
+<?php // A fire for a stated duration inside a run (Task 578). Pure, BEFORE looped-network.js; absent, the
+      // box does not offer it. ?>
+<script src="/engcalcs/js/lpn-durfire.js?v=<?=filemtime(__DIR__.'/js/lpn-durfire.js')?>"></script>
 <?php // A table as TSV, CSV or ODS (Tom, 2026-10-06). Pure, no DOM; BEFORE looped-network.js, whose Tables
       // pane menu calls EngCalcs.lpnTableCsv() and lpnTableOds(). ?>
 <script src="/engcalcs/js/lpn-tablefile.js?v=<?=filemtime(__DIR__.'/js/lpn-tablefile.js')?>"></script>

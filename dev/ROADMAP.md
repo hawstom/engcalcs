@@ -150,6 +150,7 @@ the block.
   - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
     `labelPass` inside `buildDom` and a label-measurement count.
 - 100|749| **Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.**
+  **Stay on the right side of the licence** (Tom, 2026-10-20, having read it: *"Reverse enginering is prohibited ... Let's stay right."*). The reader is built only from openly licensed sample files and public documentation; nobody decompiles or probes Bentley's software, and his WaterGEMS is used only as an ordinary user would (does a file we wrote open, with the same results?).
   Tom, 2026-10-17: *"Proceed with the .sqllite branch. No merging it until it's done. This is another long project."* It lives on `feat/sqlite-reader` until then.
   Tom, 2026-10-17: *"I am working on getting us at least one .sqllite example in case you can't find or make one."*
   **PROMOTED TO 100 by Tom, 2026-10-14. Samples found 2026-10-17** (`dev/agents/market-researcher/wtg-samples.md`): Zenodo 7162154 (CC BY 4.0) has WaterGEMS `.wtg.sqlite` files, one with a child scenario that overrides nothing, and an `.inp` of the same model; TSNet (MIT) has two Base-only ones. **Still missing:** a child scenario that overrides a value, with its `.inp`; Tom may make one with a free EWB Bentley licence. Reader foundation on `feat/sqlite-reader`.
@@ -237,6 +238,7 @@ the block.
   `dev/lpn-spike/eps-analysis-harness.js`. What remains is the Run concept, in Tom's own sketch
   (2026-08-27): *"a Run names a scenario among its parameters."* A named Run would carry the scenario,
   the required flow, the residual and the frame together, so a report says what it was a report OF.
+  The duration fire is built (branch `feat/duration-fire`): a fire at one junction for a stated start and duration, run through the EPS, under Reporting step tested.
 - 75|623| **File loss judged only by people whose files are throwaway.**
   **TOM, 2026-09-18: *"I don't see anything actionable. Describe better or remove the task."* He is
   right and the [H] tag is struck: this was never a decision waiting on him, it was a STANDING
@@ -353,6 +355,8 @@ the block.
     is a small always-on overlay, a viewport box, and — probably — click-to-go-there.
   - **It is a natural companion to the phone work**, where the screen is small enough that being lost
     is easy, and it is exactly the moment the label passes are already hiding text.
+- 75|818| **An MCP server, so an AI agent can run a network.**
+  Tom, 2026-10-20: *"Shall I add an MCP task to the roadmap at 75? Yes."* The solver, `.inp` reader and geometry already run without a browser, so it is mostly packaging. Tools: open an `.inp` and run it; fire flow, criticality, demand scaling; an SVG map and a plain report. The other half: a link that opens the network in the app with the answer on screen.
 - 50|217| **A suite-owned, multilingual Manning's n table, built from primary sources.** Tom,
   2026-08-05: *"No collision, but I am not into ownership/maintenance. If there is any viable way to
   outsource, I prefer it. But if we can add multilingual value with an n table, I'm game. Let's just

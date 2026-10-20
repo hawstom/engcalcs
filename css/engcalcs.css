@@ -5186,6 +5186,8 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
 .lpn-ff-row { display: flex; align-items: baseline; gap: .5em; margin: .25em 0; }
 .lpn-ff-row > span:first-child { flex: 1 1 auto; }
 .lpn-ff-row > input, .lpn-ff-row > select { flex: 0 0 8rem; min-width: 0; }
+.lpn-ff-row > select.lpn-ff-wide { flex: 0 1 auto; max-width: 70%; }
+.lpn-ff-firejunction { flex: 0 1 60%; min-width: 0; text-align: right; }
 .lpn-ff-unit { flex: 0 0 4rem; color: var(--ec-ink-muted); font-size: .9em; }
 .lpn-ff-head { font-weight: bold; margin: .8em 0 .3em; }
 .lpn-ff-note { margin: .3em 0; font-size: .9em; color: var(--ec-gray-444); }
