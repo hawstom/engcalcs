@@ -43,7 +43,7 @@
 		read: function (tolPx, ambPx) {
 			var s = state.s, W = svg.clientWidth, H = svg.clientHeight, tol = tolPx / s, amb = ambPx / s,
 				v = { labels: 0, values: 0, nodes: 0, nodeInline: 0, nodeStacked: 0, pipes: 0, along: 0, level: 0, levelLeader: 0,
-					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N1mine: [], N1mine0: [], struck: [], offView: [], node: {}, levelNear: {}, leaderNearOther: 0, pipeShown: {}, ex: { nodeInline: [], levelStacked: [], levelInline: [] }, N3: [], N3node: 0, astray: [], sig: [], leadersNode: 0, leadersPipe: 0, thrPx: +(leaderThreshold() * state.s).toFixed(1), textPx: +(effectiveFontSize() * state.s).toFixed(1), restPx: +(Math.hypot(defaultLabelOffset().x, defaultLabelOffset().y) * state.s).toFixed(1) },
+					levelInline: 0, levelStacked: 0, levelGrown: 0, N1: [], N1mine: [], N1mine0: [], struck: [], offView: [], node: {}, levelNear: {}, leaderNearOther: 0, pipeShown: {}, ex: { nodeInline: [], levelStacked: [], levelInline: [] }, N3: [], N3node: 0, astray: [], sig: [] },
 				items = [], circles = [], texts = [];
 			// To a quarter of a screen pixel: a label measured at another zoom differs from one measured
 			// at this one in the hundredths of a pixel (the font's hinting), which no reader can see.
@@ -134,7 +134,6 @@
 				v.node[n.id] = { n: k, id: (ne.lines || []).some(function (ln) { return ln.field === 'id'; }) };
 				v.sig.push('n' + n.id + ' ' + geo(ne.text, ['x', 'y']) + ' ' + ne.text.textContent + ' ' +
 					(leaderOf(ne) ? geo(ne.leader, ['x1', 'y1', 'x2', 'y2']) : ''));
-				if (leaderOf(ne)) { v.leadersNode++; }
 				v.nodes++; v.values += k;
 				if (k > 1) { if (ne.inline) { v.nodeInline++; v.ex.nodeInline.push(n.id); } else { v.nodeStacked++; } }
 				var nrows = rowsOf(ne.text);
@@ -174,7 +173,6 @@
 				v.pipeShown[l.id] = true;
 				v.sig.push('l' + l.id + ' ' + geo(le.text, ['x', 'y']) + ' ' + (le.text.getAttribute('transform') || '').replace(/[-0-9.e]+/g, q) + ' ' +
 					le.text.textContent + ' ' + (leaderOf(le) ? geo(le.leader, ['x1', 'y1', 'x2', 'y2']) : ''));
-				if (leaderOf(le)) { v.leadersPipe++; }
 				v.pipes++; v.values += f ? f.lines.length : (le.lines || []).length;
 				rows = rowsOf(le.text);
 				(le.repeats || []).forEach(function (r) { if (vis(r.text)) { rows = rows.concat(rowsOf(r.text)); } });
@@ -229,6 +227,27 @@
 	window.__lpnForm.perf = function () {
 		perfDebugSums = {}; var t0 = performance.now(); refreshLabelText(); var o = perfDebugSums || {}; o.total = performance.now() - t0; perfDebugSums = null;
 		var r = {}; Object.keys(o).forEach(function (k) { r[k.trim()] = Math.round(o[k]); }); return r;
+	};
+	// Every leader drawn, in screen pixels: its two ends, its length, whether an end is off the map
+	// view, and how far its label's words are from its far end. For label-leader-bound-browser-harness.js.
+	window.__lpnForm.leaders = function () {
+		var W = svg.clientWidth, H = svg.clientHeight, out = [];
+		function sc(x, y) { return { x: x * state.s + state.tx, y: y * state.s + state.ty }; }
+		function one(key, h) {
+			var e = h && h.leader, a, b, r, c, dx, dy;
+			if (!e || e.style.display === 'none' || e.style.visibility === 'hidden' || e.getAttribute('x1') == null) { return; }
+			var shown = !h.text || (!!h.text.textContent && h.text.checkVisibility({ visibilityProperty: true }));
+			a = sc(+e.getAttribute('x1'), +e.getAttribute('y1')); b = sc(+e.getAttribute('x2'), +e.getAttribute('y2'));
+			r = h.text ? h.text.getBoundingClientRect() : null; c = svg.getBoundingClientRect();
+			dx = (r && shown) ? Math.max(r.left - c.left - b.x, 0, b.x - (r.right - c.left)) : 0;
+			dy = (r && shown) ? Math.max(r.top - c.top - b.y, 0, b.y - (r.bottom - c.top)) : 0;
+			out.push({ key: key, orphan: !shown, len: Math.hypot(b.x - a.x, b.y - a.y),
+				off: [a, b].some(function (p) { return p.x < -2 || p.y < -2 || p.x > W + 2 || p.y > H + 2; }),
+				gap: Math.hypot(dx, dy), a: a, b: b, W: W, H: H, rect: r ? { l: r.left - c.left, t: r.top - c.top, r: r.right - c.left, b: r.bottom - c.top } : null });
+		}
+		doc.nodes.forEach(function (n) { one('N' + n.id, nodeEls[n.id]); });
+		doc.links.forEach(function (l) { one('L' + l.id, linkEls[l.id]); });
+		return out;
 	};
 	// eslint-disable-next-line no-eval
 	window.__lpnForm.ev = function (src) { return eval(src); };
