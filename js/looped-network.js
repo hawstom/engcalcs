@@ -36530,7 +36530,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		LPN_TS_Y_LABEL_PX = 22, LPN_TS_X_LABEL_PX = 52,
 		// Below this much plot the axis title gives way rather than the drawing -- the same rule
 		// profileLayout() applies to the station title, and for the same reason.
-		LPN_TS_MIN_PLOT_H = 110;
+		LPN_TS_MIN_PLOT_H = 110,
+		// The y title's column (it sits at x = 12, 11 px tall) and the gap kept beside it.
+		LPN_TS_TITLE_COL = 19, LPN_TS_TICK_GAP = 3;
 
 	// `group` is 'node' or 'link'; `field` is one of tsFieldOptions()'s keys. Both per group, so
 	// switching to Links and back does not throw away the question that was being asked about nodes.
@@ -36643,7 +36645,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			h = r && r.height > 0 ? Math.round(r.height) : LPN_TS_H,
 			title, bottom, height;
 		title = (h - LPN_TS_MARGIN.top - LPN_TS_MARGIN.bottom) >= LPN_TS_MIN_PLOT_H;
-		bottom = title ? LPN_TS_MARGIN.bottom : 22;
+		bottom = title ? LPN_TS_MARGIN.bottom : 32;
 		height = Math.max(40, h - LPN_TS_MARGIN.top - bottom);
 		return {
 			w: w, h: h, axisTitle: title, titleY: h - 6,
@@ -36934,6 +36936,29 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			frames.map(function (f) { return tsHours(f.t); }), { ticks: 5, maxTicks: 8, minSpan: 1 });
 		yB = EngCalcs.lpnProfile.axisBounds(values, lay.y);
 		svg = el('svg', { viewBox: '0 0 ' + lay.w + ' ' + lay.h, class: 'lpn-profile-svg' }, host);
+		// **THE MARGINS FOLLOW THE INK** (Tom, 2026-10-19, on the Rounded theme's graph bubble: no margin
+		// at the lower right, the last time label cut off, and a wide gap between the y title and its
+		// numbers). The left margin is the y title's column plus the widest y label this theme's face
+		// draws; the right margin is half the last time label, so it ends inside the frame.
+		(function () {
+			var probe = el('text', { class: 'lpn-profile-tick' }, svg), yw = 0, xw = 0, last = EngCalcs.lpnProfile.ticks(xB), right, left;
+			function wid(str) {
+				var w = 0;
+				probe.textContent = str;
+				try { w = probe.getComputedTextLength(); } catch (e) { w = 0; }
+				return w > 0 ? w : str.length * 6;
+			}
+			EngCalcs.lpnProfile.ticks(yB).forEach(function (v) { yw = Math.max(yw, wid(String(plainRound(v, 2)))); });
+			if (last.length) {
+				xw = wid(EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(last[last.length - 1] * 3600) : String(plainRound(last[last.length - 1], 2)));
+			}
+			svg.removeChild(probe);
+			left = Math.max(30, Math.ceil(LPN_TS_TITLE_COL + yw + LPN_TS_TICK_GAP + 5));
+			right = Math.max(LPN_TS_MARGIN.right, Math.ceil(xw / 2) + 4);
+			lay = Object.create(lay);
+			lay.box = { left: left, top: box.top, width: Math.max(40, lay.w - left - right), height: box.height };
+			box = lay.box;
+		}());
 		function X(v) { return EngCalcs.lpnProfile.plotX(v, xB, box); }
 		function Y(v) { return EngCalcs.lpnProfile.plotY(v, yB, box); }
 
