@@ -1038,7 +1038,7 @@ var EngCalcs = EngCalcs || {};
 	// to keep clear of it instead. Its rows and its drawn leader, exactly where the user put them;
 	// the node first-fit, its shed and the gang repair are handed these alongside the drawing's
 	// own obstacles. A drawing with no dragged label gets back the obstacles it came with.
-	// **A MOVED LABEL THAT WOULD LIE ON A TEXT, A SYMBOL OR ANOTHER MOVED LABEL GOES OUT ON A LEADER
+	// **A MOVED LABEL THAT WOULD LIE ON A TEXT OR ANOTHER MOVED LABEL GOES OUT ON A LEADER
 	// AT THIS ZOOM** (Tom's Net1, 14 wheel notches out, 2026-10-19: the "Tank" Text over the moved N10
 	// and N11 labels, "Pump" over N11). A moved label keeps the endpoint its user gave it, in drawing
 	// units, while its words are sized in screen pixels, so zooming out brings it onto whatever else
@@ -1047,8 +1047,8 @@ var EngCalcs = EngCalcs || {};
 	// dropping when I would have preferred to see longer leaders"*); it hides only where no spot is
 	// clear. Its stored endpoint is untouched, and it is back there when the view has room. Kept at
 	// home first, as the crossing shed keeps them: a tank's or reservoir's, a pump's or valve's, a
-	// node's, a pipe's; then by id. The label in the hand always stays, as does a label that lies only
-	// on its own node. Sets `fixedDisplaced` on every holder; runs before anything is placed.
+	// node's, a pipe's; then by id. The label in the hand always stays, as does one put down at this
+	// zoom or closer. Sets `fixedDisplaced` on every holder; runs before anything is placed.
 	function hideCoveringMovedLabels(obs, fs) {
 		// Covering is a VISIBLE overlap: more than LPN_COVER_TOL_PX screen pixels deep.
 		var kept = [], list = [], tol = LPN_COVER_TOL_PX / (state.s || 1), idx;
@@ -1070,12 +1070,12 @@ var EngCalcs = EngCalcs || {};
 			if (le && l.lx !== undefined && !linkLabelTooShort(l, le)) { add(linkLabelKey(l.id), le, linkLabelMid(l), linkLabelBase(l), l, null); }
 		});
 		if (!list.length) { return; }
-		// Node symbols, and each drawn Text by its ink (textInkBox()): covering is what the eye sees.
-		// A pump's or valve's square box is not its drawn shape, and stays out.
+		// Each drawn Text by its ink (textInkBox()), and the moved labels kept before this one:
+		// covering is words on words, what the eye sees. A node's symbol is not counted: a label the
+		// user dropped beside or across a node is where he wanted it.
 		var crowd = crowdedTexts();
 		obs.boxes.forEach(function (b) {
-			if (b.kind === 'symbol' && b.round) { kept.push(b); }
-			else if (b.kind === 'label' && b.textOwner !== undefined && !crowd.hidden[b.textOwner]) {
+			if (b.kind === 'label' && b.textOwner !== undefined && !crowd.hidden[b.textOwner]) {
 				var k = crowd.ink[b.textOwner] || b; k.kind = 'label'; kept.push(k);
 			}
 		});
@@ -1086,7 +1086,10 @@ var EngCalcs = EngCalcs || {};
 		list.forEach(function (it) {
 			var rows = Collide.labelLineBoxes(it.spec, it.end), on = it.own !== null ? nodeById(it.own) : null,
 				ox = on ? nodeDrawX(on) : 0, oy = on ? nodeDrawY(on) : 0;
-			var covers = !labelInHand(it.holder) && rows.some(function (b) {
+			// In the hand, or put down at this zoom or a closer one (`placedAtScale`, this session): the
+			// user's own placement, held exactly (label-leader-keep-harness.js, label-drag-track-harness.js).
+			var held = labelInHand(it.holder) || (it.holder.placedAtScale > 0 && (state.s || 1) >= it.holder.placedAtScale * (1 - 1e-9));
+			var covers = !held && rows.some(function (b) {
 				if (!idx.anyOverlap(Collide.box(b.cx, b.cy, Math.max(0, b.w - 2 * tol), Math.max(0, b.h - 2 * tol), b.a))) { return false; }
 				return kept.some(function (k) {
 					if (on && k.kind === 'symbol' && Math.abs(k.cx - ox) < 1e-9 && Math.abs(k.cy - oy) < 1e-9) { return false; }
@@ -57925,6 +57928,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// highlight on dragged labels for about a minute, maybe fading, maybe dashed, maybe
 			// animated so it's obviously temporary."*). The class drives a dashed outline that fades
 			// out on its own; re-adding it restarts the animation, so each drag re-announces.
+			// The zoom it was put down at: at this zoom and closer, it covers nothing it was not put
+			// on deliberately, and hideCoveringMovedLabels() leaves it exactly where it is.
+			var placedH = drag.type === 'nodelbl' ? nodeEls[drag.id] : drag.type === 'linklbl' ? linkEls[drag.id] : null;
+			if (placedH) { placedH.placedAtScale = state.s; }
 			markJustDragged(drag.type === 'nodelbl' ? (nodeEls[drag.id] && nodeEls[drag.id].text)
 				: drag.type === 'linklbl' ? (linkEls[drag.id] && linkEls[drag.id].text)
 				: (labelEls[drag.id] && labelEls[drag.id].text));

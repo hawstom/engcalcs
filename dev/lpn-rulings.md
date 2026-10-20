@@ -253,10 +253,11 @@ notches in.) A label hung left of its point is **right-justified**, every row en
 
 **What cannot move, at a zoom where it would cover something.** A Text whose ink lies on another
 Text's ink is not drawn at that zoom (`crowdedTexts()`); a Text is never hidden for a data label,
-which goes round it. A moved label that would lie on a Text, a node or another moved label, by more
-than 1.5 px of what is drawn, goes out on a leader as an automatic label does, at that zoom only
-(Tom, R-164: *"I am seeing dropping when I would have preferred to see longer leaders"*), and hides
-only where no spot is clear (`hideCoveringMovedLabels()`). The leaders this rule adds take ground:
+which goes round it. A moved label that would lie on a Text or another moved label, by more than
+1.5 px of what is drawn, goes out on a leader as an automatic label does, at that zoom only (Tom,
+R-164: *"I am seeing dropping when I would have preferred to see longer leaders"*), and hides only
+where no spot is clear (`hideCoveringMovedLabels()`). A label in the hand, or put down in this
+session at the zoom shown or a farther one, is never moved. The leaders this rule adds take ground:
 on Net3 at 9 notches in, 138 labels against 145 before it. `label-form-wheel-browser-harness.js`.
 
 ## A Description is lines and paragraphs (Task 806, Tom 2026-10-15)
