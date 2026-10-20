@@ -83,9 +83,15 @@ async function main() {
 		const res = await a.page.evaluate(({ pairs, rows }) => {
 			const probe = document.createElement('i');
 			document.body.appendChild(probe);
-			const paint = (prop, v) => { probe.style.cssText = 'border:1px solid;box-shadow:none'; probe.style.setProperty(prop, v); return getComputedStyle(probe).getPropertyValue(prop); };
+			// A token derived by color-mix() (Task 811, dev/themes-plan.md) computes as color(srgb ...); the same
+			// colour as the literal, so it is read back in the rgb() spelling before the two are compared.
+			const norm = (v) => (v == null ? v : String(v).replace(/color\(srgb ([\d.e-]+) ([\d.e-]+) ([\d.e-]+)(?: \/ ([\d.]+))?\)/g, (m, r, g, b, al) => {
+				const c = [r, g, b].map((x) => Math.round(parseFloat(x) * 255)).join(', ');
+				return al !== undefined && parseFloat(al) < 1 ? 'rgba(' + c + ', ' + parseFloat(al) + ')' : 'rgb(' + c + ')';
+			}));
+			const paint = (prop, v) => { probe.style.cssText = 'border:1px solid;box-shadow:none'; probe.style.setProperty(prop, v); return norm(getComputedStyle(probe).getPropertyValue(prop)); };
 			const pairOut = pairs.map(([prop, lit, now]) => [paint(prop, lit), paint(prop, now)]);
-			const rowOut = rows.map(([sel, prop]) => { const el = document.querySelector(sel); return el ? getComputedStyle(el).getPropertyValue(prop) : null; });
+			const rowOut = rows.map(([sel, prop]) => { const el = document.querySelector(sel); return el ? norm(getComputedStyle(el).getPropertyValue(prop)) : null; });
 			return { pairOut, rowOut };
 		}, { pairs: PAIRS, rows: ROWS });
 

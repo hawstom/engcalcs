@@ -706,8 +706,13 @@ var EngCalcs = EngCalcs || {};
 	 * Bounded, and cleared whole rather than evicted one by one: a drawing whose labels are all
 	 * distinct gets one lookup per measurement and nothing worse.
 	 */
-	var textMeasureCache = Object.create(null), textMeasureKeys = 0;
+	var textMeasureCache = Object.create(null), textMeasureKeys = 0, textMeasureHits = 0;
 	var TEXT_MEASURE_MAX = 20000;
+	// **THE MAP'S FACE IS PART OF THE KEY** (Task 811, round 3): a theme may set the map's lettering in
+	// another face or weight (--ec-map-font, --ec-map-weight, css/engcalcs.css), and the same string is
+	// then a different width. Keyed rather than cleared, so going back to a theme already seen reuses
+	// every width it measured.
+	var mapFaceKey = '';
 	// `fontWorld` is the size the string is drawn at. Zero or missing means the answer cannot be
 	// attributed to a size, so the real measurement is taken and nothing is banked.
 	function measuredTextWidth(el, str, fontWorld, measure) {
@@ -717,10 +722,10 @@ var EngCalcs = EngCalcs || {};
 		// size differing in the last bits -- which is a different key, and a measured 87% of the
 		// hits lost for a size difference of one part in ten million. Six significant figures is
 		// four orders of magnitude finer than the quantisation the measurement itself carries.
-		var k = ((el && el.getAttribute && el.getAttribute('class')) || '')
+		var k = mapFaceKey + '\u0000' + ((el && el.getAttribute && el.getAttribute('class')) || '')
 			+ '\u0000' + fontWorld.toPrecision(6) + '\u0000' + str,
 			hit = textMeasureCache[k], w;
-		if (hit !== undefined) { return hit; }
+		if (hit !== undefined) { textMeasureHits++; return hit; }
 		w = measure();
 		if (isFinite(w) && w >= 0) {
 			if (textMeasureKeys >= TEXT_MEASURE_MAX) {
@@ -2393,7 +2398,7 @@ var EngCalcs = EngCalcs || {};
 		// an unbounded panel takes most of the window. Hence a max-width plus
 		// `overflow-wrap:anywhere` on the readout, which breaks the long token instead.
 		box.setAttribute('style', 'position:fixed;left:8px;bottom:8px;z-index:35;background:var(--ec-bg);'
-			+ 'border:1px solid var(--ec-ink);padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3);'
+			+ 'border:var(--ec-box-border);padding:8px;font:12px/1.4 monospace;box-shadow:var(--ec-box-shadow);'
 			+ 'max-height:70vh;max-width:min(26em,45vw);overflow:auto');
 		function row(label, get, set, step, hint) {
 			var l = document.createElement('label'), i = document.createElement('input');
@@ -17394,7 +17399,7 @@ var EngCalcs = EngCalcs || {};
 		// top-right. The width is capped for the reason the label bench states -- a fixed box with
 		// no width sizes to its widest child, and a tile key has no wrap opportunity.
 		box.setAttribute('style', 'position:fixed;right:8px;bottom:8px;z-index:35;background:var(--ec-bg);'
-			+ 'border:1px solid var(--ec-ink);padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3);'
+			+ 'border:var(--ec-box-border);padding:8px;font:12px/1.4 monospace;box-shadow:var(--ec-box-shadow);'
 			+ 'max-height:70vh;max-width:min(30em,45vw);overflow:auto;white-space:pre-wrap;'
 			+ 'overflow-wrap:anywhere');
 		var h = document.createElement('div');
@@ -37000,7 +37005,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		LPN_TS_Y_LABEL_PX = 22, LPN_TS_X_LABEL_PX = 52,
 		// Below this much plot the axis title gives way rather than the drawing -- the same rule
 		// profileLayout() applies to the station title, and for the same reason.
-		LPN_TS_MIN_PLOT_H = 110;
+		LPN_TS_MIN_PLOT_H = 110,
+		// The y title's column (it sits at x = 12, 11 px tall) and the gap kept beside it.
+		LPN_TS_TITLE_COL = 19, LPN_TS_TICK_GAP = 3;
 
 	// `group` is 'node' or 'link'; `field` is one of tsFieldOptions()'s keys. Both per group, so
 	// switching to Links and back does not throw away the question that was being asked about nodes.
@@ -37113,7 +37120,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			h = r && r.height > 0 ? Math.round(r.height) : LPN_TS_H,
 			title, bottom, height;
 		title = (h - LPN_TS_MARGIN.top - LPN_TS_MARGIN.bottom) >= LPN_TS_MIN_PLOT_H;
-		bottom = title ? LPN_TS_MARGIN.bottom : 22;
+		bottom = title ? LPN_TS_MARGIN.bottom : 32;
 		height = Math.max(40, h - LPN_TS_MARGIN.top - bottom);
 		return {
 			w: w, h: h, axisTitle: title, titleY: h - 6,
@@ -37404,6 +37411,29 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			frames.map(function (f) { return tsHours(f.t); }), { ticks: 5, maxTicks: 8, minSpan: 1 });
 		yB = EngCalcs.lpnProfile.axisBounds(values, lay.y);
 		svg = el('svg', { viewBox: '0 0 ' + lay.w + ' ' + lay.h, class: 'lpn-profile-svg' }, host);
+		// **THE MARGINS FOLLOW THE INK** (Tom, 2026-10-19, on the Rounded theme's graph bubble: no margin
+		// at the lower right, the last time label cut off, and a wide gap between the y title and its
+		// numbers). The left margin is the y title's column plus the widest y label this theme's face
+		// draws; the right margin is half the last time label, so it ends inside the frame.
+		(function () {
+			var probe = el('text', { class: 'lpn-profile-tick' }, svg), yw = 0, xw = 0, last = EngCalcs.lpnProfile.ticks(xB), right, left;
+			function wid(str) {
+				var w = 0;
+				probe.textContent = str;
+				try { w = probe.getComputedTextLength(); } catch (e) { w = 0; }
+				return w > 0 ? w : str.length * 6;
+			}
+			EngCalcs.lpnProfile.ticks(yB).forEach(function (v) { yw = Math.max(yw, wid(String(plainRound(v, 2)))); });
+			if (last.length) {
+				xw = wid(EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(last[last.length - 1] * 3600) : String(plainRound(last[last.length - 1], 2)));
+			}
+			svg.removeChild(probe);
+			left = Math.max(30, Math.ceil(LPN_TS_TITLE_COL + yw + LPN_TS_TICK_GAP + 5));
+			right = Math.max(LPN_TS_MARGIN.right, Math.ceil(xw / 2) + 4);
+			lay = Object.create(lay);
+			lay.box = { left: left, top: box.top, width: Math.max(40, lay.w - left - right), height: box.height };
+			box = lay.box;
+		}());
 		function X(v) { return EngCalcs.lpnProfile.plotX(v, xB, box); }
 		function Y(v) { return EngCalcs.lpnProfile.plotY(v, yB, box); }
 
@@ -43556,7 +43586,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var opts = inpExportOptions(), out, inpName = base + '.inp',
 				picName = picBase + '.bmp', worldName = picBase + '.bpw', zipName = base + '.zip';
 			if (pic) { opts.backdropFile = picName; }
-			out = EngCalcs.lpnExportInp(inpExportDocument(), opts);
+			// A Text's [LABELS] corner is placed from its measured width, so it is measured in Light's
+			// face whatever the theme (Task 811 round 3): the file is the same file in every theme.
+			out = withLightMap(function () { return EngCalcs.lpnExportInp(inpExportDocument(), opts); });
 			if (!out || !out.ok) {
 				setNotice((pcX.lpn_inp_export_refused || 'This project cannot be written as an EPANET file: {detail}')
 					.split('{detail}').join((out && out.detail) || '?'));
@@ -52971,6 +53003,33 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			return { d: d, id: d.box.id, title: t ? dockTitleOf(d) : '' };
 		}).filter(function (e) { return !!e.title; });
 	}
+	// A box's text in the Guide: a paragraph of one line ending in a colon, with more after it, is a
+	// sub-heading (colon dropped); "- " paragraphs are list items. The same two rules as
+	// ecGuideIntroHtml() (lib/GuideChapters.lib.php), which draws the chapter's own page. The box's
+	// "?" tip keeps the raw text.
+	function guideBoxEntryParas(text, into) {
+		var paras = String(text).split(/\\n\\n|\n\n/).map(function (t) { return String(t).trim(); }).filter(function (t) { return t; }), ul = null;
+		paras.forEach(function (para, i) {
+			var node;
+			if (para.indexOf('- ') === 0) {
+				if (!ul) { ul = document.createElement('ul'); into.appendChild(ul); }
+				node = document.createElement('li');
+				node.textContent = para.slice(2);
+				ul.appendChild(node);
+				return;
+			}
+			ul = null;
+			if (i < paras.length - 1 && para.indexOf('\n') < 0 && /[:\uFF1A]$/.test(para)) {
+				node = document.createElement('h4');
+				node.className = 'lpn-guide-subhead';
+				node.textContent = para.replace(/[:\uFF1A]$/, '');
+			} else {
+				node = document.createElement('p');
+				node.textContent = para;
+			}
+			into.appendChild(node);
+		});
+	}
 	function renderGuideBoxes() {
 		var host = document.getElementById('lpn_guide_boxes'), pc = EngCalcs.pageConfig || {};
 		if (!host) { return; }
@@ -52990,12 +53049,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				(pc.lpn_guide_box_named || '{box} box').replace('{box}', e.title) : e.title;
 			en.appendChild(h);
 			h.tabIndex = -1;
-			(e.d.tipText || pc['lpn_guide_text_' + e.id.replace(/^lpn_/, '')] || '').split(/\\n\\n|\n\n/).forEach(function (para) {
-				if (!String(para).trim()) { return; }
-				p = document.createElement('p');
-				p.textContent = String(para).trim();
-				en.appendChild(p);
-			});
+			guideBoxEntryParas((e.d.tipText || pc['lpn_guide_text_' + e.id.replace(/^lpn_/, '')] || ''), en);
 			// A chapter longer than a paragraph or two (Find and replace, Tom 2026-10-07) is written in
 			// the page as <template id="lpn_guide_more_<box id>"> and copied in under its paragraphs.
 			var more = document.getElementById('lpn_guide_more_' + e.id);
@@ -54056,7 +54110,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// A deep copy of the map's SVG with every computed style written onto its element, hidden
 	// elements dropped, and every raster inlined. `out.droppedBasemap` reports a tile left out.
 	function snipCloneSvg(out) {
+		// **COPIED AS LIGHT, WHATEVER THE THEME** (Task 811 round 3): a screenshot leaves the page, and what
+		// leaves the page is the drawing everyone else sees. withLightMap() lends the page Light and Light's
+		// label layout for the length of this synchronous copy.
+		return withLightMap(function () { return snipCloneSvgNow(out); });
+	}
+	function snipCloneSvgNow(out) {
 		var clone = svg.cloneNode(true), pending = [];
+		out.paper = window.getComputedStyle(svg).backgroundColor || 'white';
 		function walk(o, c) {
 			var cs = window.getComputedStyle(o);
 			if (cs.display === 'none') { c.parentNode.removeChild(c); return; }
@@ -54147,16 +54208,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				var c = document.createElement('canvas'), ctx;
 				c.width = W; c.height = H;
 				ctx = c.getContext('2d');
-				ctx.fillStyle = window.getComputedStyle(svg).backgroundColor || 'white';
+				ctx.fillStyle = out.paper;
 				ctx.fillRect(0, 0, W, H);
 				ctx.drawImage(im, 0, 0, W, H);
 				ctx.save();
 				ctx.scale(W / r.w, H / r.h);
 				ctx.translate(-r.x, -r.y);
 				ctx.beginPath(); ctx.rect(r.x, r.y, r.w, r.h); ctx.clip();
-				snipLegends().forEach(function (lg) {
-					var lr = lg.getBoundingClientRect();
-					if (lr.right > r.x && lr.left < r.x + r.w && lr.bottom > r.y && lr.top < r.y + r.h) { snipPaintHtml(ctx, lg); }
+				// The legends are painted from their computed styles, so they too are read in Light.
+				withLightMap(function () {
+					snipLegends().forEach(function (lg) {
+						var lr = lg.getBoundingClientRect();
+						if (lr.right > r.x && lr.left < r.x + r.w && lr.bottom > r.y && lr.top < r.y + r.h) { snipPaintHtml(ctx, lg); }
+					});
 				});
 				ctx.restore();
 				if (poly) {
@@ -54178,6 +54242,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}, function (err) { URL.revokeObjectURL(url); throw err; });
 		});
 	}
+	// For the harnesses (Task 811 round 3): the whole visible map rendered exactly as the screenshot
+	// renders it, as a data: URL, so a theme can be proved not to reach the picture.
+	// `at` is an optional rectangle in the map's own pixels ({x, y, w, h} from its top-left corner), so the same
+	// piece of the drawing can be asked for under chrome of different heights.
+	EngCalcs.lpnRenderMapPng = function (at) {
+		var sr = svg.getBoundingClientRect(), r = at ? { x: sr.left + svg.clientLeft + at.x, y: sr.top + svg.clientTop + at.y, w: at.w, h: at.h } : snipMapRect();
+		return renderScreenshot(r, null).then(function (o) {
+			return new Promise(function (resolve) { var f = new FileReader(); f.onload = function () { resolve(f.result); }; f.readAsDataURL(o.blob); });
+		});
+	};
 	function snipDownload(blob) {
 		var a = document.createElement('a'), url = URL.createObjectURL(blob);
 		a.href = url;
@@ -55364,6 +55438,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 		} catch (err) { /* localStorage/history can throw (private mode) -- non-fatal, just skip the wipe */ }
 		svg = document.getElementById('lpn_canvas');
+		mapFaceKey = readMapFaceKey();   // the face the first layout is measured in (Task 811 round 3)
 		world = el('g', {}, svg);
 		// BELOW the user's own backdrop image: a registered plan sheet is the thing the person put
 		// there on purpose, and a street map is context behind it.
@@ -60556,7 +60631,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// A meter moved by hand re-draws its own geometry, which is per notch too and so cannot
 			// carry the taint; its position is read here instead.
 			JSON.stringify(doc.customers || []),
-			georef ? 1 : 0, georefActive() ? 1 : 0].join('|') +
+			georef ? 1 : 0, georefActive() ? 1 : 0, mapFaceKey].join('|') +
 			// The open scenario's own settings, where it holds any (stage 3): nothing at all in a
 			// project that has none, so this key is the one it always was.
 			(own ? '|' + JSON.stringify(own) : '');
@@ -60885,6 +60960,167 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * abbreviation you will read tomorrow is written while you are still looking at the long form
 	 * that produced it.
 	 */
+	// ---- THE THEME GALLERY (dev/themes-plan.md) ----
+	// Settings > Map and page > Page > Theme is a button showing the chosen theme as a small picture of the
+	// page and its name. It opens a gallery of the same pictures, one per theme. Each picture is real
+	// markup painted by its own theme's tokens (`.ec-theme-card[data-theme]` shares the token rules with
+	// <html>, css/engcalcs.css), so a card can never drift from what the page becomes, and a theme added to
+	// the stylesheet and to window.ecTheme.list appears here with no further work.
+	//
+	// **TRY, THEN KEEP.** Pointing at a card, or reaching it with the arrow keys, repaints the whole page in
+	// that theme (window.ecTheme.preview(), which stores nothing). A click, Enter or Space keeps it
+	// (window.ecTheme.set(), the one writer of `lpn_theme`). Escape, a click outside the gallery, Tab out of
+	// it, or the pointer leaving it puts the kept theme back. On a touch screen there is no pointing, so a
+	// tap keeps the theme it lands on, and another tap changes it again.
+	function themeLabel(pc, t) {
+		var names = { system: pc.lpn_theme_system || 'System', light: pc.lpn_theme_light || 'Light', dark: pc.lpn_theme_dark || 'Dark',
+			hc: pc.lpn_theme_hc || 'High contrast', amber: pc.lpn_theme_amber || 'Amber', green: pc.lpn_theme_green || 'Green',
+			platinum: pc.lpn_theme_platinum || 'Platinum', rounded: pc.lpn_theme_rounded || 'Rounded',
+			desktop: pc.lpn_theme_desktop || 'Desktop', newspaper: pc.lpn_theme_newspaper || 'Newspaper', arcade: pc.lpn_theme_arcade || 'Arcade', space: pc.lpn_theme_space || 'Space', prairie: pc.lpn_theme_prairie || 'Prairie' };
+		return names[t] || t;
+	}
+	// A small picture of the page: the menu bar's outlined items, the toolbar, the tab strip, a box with a
+	// sample of the theme's lettering ("Aa", hidden from a screen reader with the rest of the card: it is a
+	// picture of a face, not a word), a notice, and a patch of the map (whose paper and ink no theme changes).
+	function themeMiniature(t) {
+		var c = document.createElement('span');
+		c.className = 'ec-theme-card';
+		c.setAttribute('aria-hidden', 'true');
+		c.setAttribute('data-theme', window.ecTheme.resolve(t));
+		c.setAttribute('data-theme-choice', t);
+		c.innerHTML = '<span class="ec-tc-menu"><i></i><i></i><i></i></span>' +
+			'<span class="ec-tc-tool"><i></i><i></i><i></i><i></i><i></i></span>' +
+			'<span class="ec-tc-tabs"><i></i><i class="ec-tc-cur"></i></span>' +
+			'<span class="ec-tc-panel"><b class="ec-tc-type">Aa</b><i></i><i class="ec-tc-link"></i></span>' +
+			'<span class="ec-tc-map"><svg viewBox="0 0 70 34" preserveAspectRatio="none"><path d="M6 26 L26 12 L48 20 L64 7"/>' +
+			'<circle cx="26" cy="12" r="2.6"/><circle cx="48" cy="20" r="2.6"/></svg><span class="ec-tc-note"></span></span>';
+		return c;
+	}
+	function themeGalleryClose(keep, refocus) {
+		var g = document.getElementById('lpn_theme_gallery');
+		if (!g) { return; }
+		if (!keep) { window.ecTheme.preview(null); }
+		if (g._lpnOff) { g._lpnOff(); }
+		if (g.parentNode) { g.parentNode.removeChild(g); }
+		var btn = document.getElementById('lpn_set_theme');
+		if (btn) {
+			btn.setAttribute('aria-expanded', 'false');
+			themeButtonPaint(btn);
+			if (refocus) { btn.focus(); }
+		}
+	}
+	function themeButtonPaint(btn) {
+		var pc = EngCalcs.pageConfig || {}, t = window.ecTheme.get(), name = document.createElement('span');
+		btn.textContent = '';
+		btn.appendChild(themeMiniature(t));
+		name.className = 'lpn-theme-btn-name';
+		name.textContent = themeLabel(pc, t);
+		btn.appendChild(name);
+		btn.setAttribute('data-theme-choice', t);
+	}
+	function themeGalleryOpen(btn) {
+		var pc = EngCalcs.pageConfig || {}, kept = window.ecTheme.get(), cards = [];
+		themeGalleryClose(false, false);
+		var g = document.createElement('div');
+		g.id = 'lpn_theme_gallery';
+		g.className = 'lpn-theme-gallery d-print-none';
+		g.setAttribute('role', 'group');
+		g.setAttribute('aria-label', pc.lpn_settings_theme || 'Theme');
+		function previewing(card) {
+			cards.forEach(function (c) { c.classList.toggle('lpn-theme-previewing', c === card); });
+		}
+		window.ecTheme.list.forEach(function (t, i) {
+			var b = document.createElement('button'), name = document.createElement('span');
+			b.type = 'button';
+			b.className = 'lpn-theme-choice';
+			b.setAttribute('data-theme-name', t);
+			b.setAttribute('aria-pressed', t === kept ? 'true' : 'false');
+			b.tabIndex = t === kept ? 0 : -1;
+			b.style.setProperty('--lpn-theme-i', String(i));
+			b.appendChild(themeMiniature(t));
+			name.className = 'lpn-theme-choice-name';
+			name.textContent = themeLabel(pc, t);
+			b.appendChild(name);
+			b.addEventListener('mouseenter', function () { window.ecTheme.preview(t); previewing(b); });
+			b.addEventListener('focus', function () {
+				cards.forEach(function (c) { c.tabIndex = c === b ? 0 : -1; });
+				window.ecTheme.preview(t); previewing(b);
+			});
+			b.addEventListener('click', function () { window.ecTheme.set(t); themeGalleryClose(true, true); });
+			cards.push(b);
+			g.appendChild(b);
+		});
+		g.addEventListener('mouseleave', function () { window.ecTheme.preview(null); previewing(null); });
+		// The arrow keys walk the grid (left and right swap on a right-to-left page), Home and End go to the
+		// ends. Consumed here so the map's own keys never see them.
+		g.addEventListener('keydown', function (e) {
+			var i = cards.indexOf(document.activeElement), cols = 1, rtl = (getComputedStyle(g).direction === 'rtl'), to = -1;
+			if (i < 0) { return; }
+			while (cols < cards.length && cards[cols].offsetTop === cards[0].offsetTop) { cols++; }
+			if (e.key === 'ArrowRight') { to = i + (rtl ? -1 : 1); }
+			else if (e.key === 'ArrowLeft') { to = i + (rtl ? 1 : -1); }
+			else if (e.key === 'ArrowDown') { to = i + cols; }
+			else if (e.key === 'ArrowUp') { to = i - cols; }
+			else if (e.key === 'Home') { to = 0; }
+			else if (e.key === 'End') { to = cards.length - 1; }
+			else { return; }
+			e.preventDefault();
+			e.stopPropagation();
+			cards[Math.max(0, Math.min(cards.length - 1, to))].focus();
+		});
+		g.addEventListener('focusout', function (e) {
+			var to = e.relatedTarget;
+			// Focus going to the Theme button is its click arriving; the click closes the gallery itself.
+			if (to && !g.contains(to) && !btn.contains(to)) { themeGalleryClose(false, false); }
+		});
+		// Escape in the capture phase, because the gallery is the innermost thing on screen; it is consumed only
+		// while the gallery is open. A press outside the gallery (not on its own button, which toggles) reverts.
+		function onKey(e) {
+			if (e.key !== 'Escape' && e.key !== 'Esc') { return; }
+			e.preventDefault();
+			e.stopPropagation();
+			themeGalleryClose(false, true);
+		}
+		function onDown(e) {
+			if (g.contains(e.target) || (btn.contains && btn.contains(e.target))) { return; }
+			themeGalleryClose(false, false);
+		}
+		function onResize() { themeGalleryClose(false, false); }
+		document.addEventListener('keydown', onKey, true);
+		document.addEventListener('pointerdown', onDown, true);
+		window.addEventListener('resize', onResize);
+		g._lpnOff = function () {
+			document.removeEventListener('keydown', onKey, true);
+			document.removeEventListener('pointerdown', onDown, true);
+			window.removeEventListener('resize', onResize);
+		};
+		document.body.appendChild(g);
+		// Under the button, or above it when the window has no room below; kept inside the window.
+		var r = btn.getBoundingClientRect(), w = g.offsetWidth, h = g.offsetHeight, vw = window.innerWidth, vh = window.innerHeight;
+		var left = rtlPage() ? r.right - w : r.left, top = r.bottom + 4;
+		if (top + h > vh - 4 && r.top - h - 4 >= 4) { top = r.top - h - 4; }
+		g.style.left = Math.max(4, Math.min(vw - w - 4, left)) + 'px';
+		g.style.top = Math.max(4, Math.min(vh - h - 4, top)) + 'px';
+		btn.setAttribute('aria-expanded', 'true');
+		var start = cards.filter(function (c) { return c.getAttribute('aria-pressed') === 'true'; })[0] || cards[0];
+		start.focus({ preventScroll: true });
+	}
+	function rtlPage() { return (document.documentElement.getAttribute('dir') || '').toLowerCase() === 'rtl'; }
+	function themeControl() {
+		var btn = document.createElement('button');
+		btn.type = 'button';
+		btn.id = 'lpn_set_theme';
+		btn.className = 'lpn-theme-btn';
+		btn.setAttribute('aria-haspopup', 'true');
+		btn.setAttribute('aria-expanded', 'false');
+		themeButtonPaint(btn);
+		btn.addEventListener('click', function (e) {
+			// The row is a <label>, and a click on its words arrives here too.
+			e.preventDefault();
+			if (document.getElementById('lpn_theme_gallery')) { themeGalleryClose(false, false); } else { themeGalleryOpen(btn); }
+		});
+		return btn;
+	}
 	// **THE SUB-HEADINGS ARE IN THE MARKUP NOW AND THIS FILLS THEM** (Task 441, restructured). The
 	// rows below did not move between categories by being re-parented at run time -- each one is
 	// appended to the host that stands under its own sub-heading in Looped-Network.php, so where a
@@ -61811,23 +62047,15 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			setboxTag(row(showBody, pc.lpn_settings_row_bubbles || 'Time series graphs on the map', v), [['bubbles']]);
 		}());
 
-		// The theme (Task 714, Phase 3; dev/theming-plan.md): System, Light or Dark. The same section and
-		// the same reason as the two rows above: it is a fact about the screen and the eyes at it, so it
-		// lives in this browser (`lpn_theme`, written by window.ecTheme in the page head) and never in
-		// serializeProject(). It repaints with no reload, because the head script owns the attribute.
-		var themeSelect = document.createElement('select');
-		themeSelect.id = 'lpn_set_theme';
-		[['system', pc.lpn_theme_system || 'System'], ['light', pc.lpn_theme_light || 'Light'],
-			['dark', pc.lpn_theme_dark || 'Dark']].forEach(function (o) {
-			var opt = document.createElement('option');
-			opt.value = o[0]; opt.textContent = o[1];
-			if (typeof window.ecTheme !== 'undefined' && window.ecTheme.get() === o[0]) { opt.selected = true; }
-			themeSelect.appendChild(opt);
-		});
-		themeSelect.addEventListener('change', function () {
-			if (typeof window.ecTheme !== 'undefined') { window.ecTheme.set(themeSelect.value); }
-		});
-		row(pageBody, pc.lpn_settings_theme || 'Theme', themeSelect, pc.lpn_settings_theme_tip);
+		// The theme (Task 714; the gallery, dev/themes-plan.md). The same section and the same
+		// reason as the rows above: it is a fact about the screen and the eyes at it, so it lives in this
+		// browser (`lpn_theme`, written by window.ecTheme in the page head) and never in serializeProject().
+		// The control is a button showing the chosen theme as a small picture; it opens the gallery, where
+		// pointing at a card (or reaching it with the arrow keys) repaints the whole page in that theme, a
+		// click or Enter keeps it, and Escape, a click elsewhere or the pointer leaving puts the kept one back.
+		if (typeof window.ecTheme !== 'undefined') {
+			row(pageBody, pc.lpn_settings_theme || 'Theme', themeControl(), pc.lpn_settings_theme_tip);
+		}
 		var tail = document.createElement('div');
 		tail.style.marginTop = '6px';
 		pageBody.appendChild(tail);
@@ -76049,6 +76277,84 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	if (typeof window !== 'undefined' && window.addEventListener) {
 		window.addEventListener('beforeprint', function () { flushLabelRefresh(); });
 	}
+	/**
+	 * ---- THE MAP FOLLOWS THE THEME (Task 811, round 3; dev/themes-plan.md) ----
+	 *
+	 * Colours need nothing here: the drawing reads its paper, ink, lettering and marks from --ec-map-*
+	 * tokens, so a theme repaints it with no JavaScript at all. **The FACE is the one thing that moves
+	 * geometry**: a label set in a wider face is a wider label, so where a theme changes the map's face or
+	 * weight the widths are measured again and the labels placed again, ONCE (requestLabelRefresh()
+	 * coalesces a run of changes, so sweeping the pointer across the gallery is one pass at the end).
+	 * A theme with Light's face (Dark, High contrast) moves nothing and runs no pass.
+	 *
+	 * **WHAT LEAVES THE PAGE IS LIGHT.** Paper prints Light by the stylesheet (the theme blocks are
+	 * screen-only), and the screenshot copies the map as Light (snipCloneSvg()). Both must also be
+	 * LAID OUT in Light's face, or Light's lettering would stand where the theme's wider words were
+	 * placed: withLightMap() lends the page Light for the length of one synchronous task, lays the labels
+	 * out in its face, runs the export, and puts the theme and its layout back before anything paints.
+	 */
+	function readMapFaceKey() {
+		if (!svg || typeof getComputedStyle !== 'function') { return ''; }
+		var cs = getComputedStyle(svg);
+		return (cs.getPropertyValue('--ec-map-font') || '').trim() + '|' + (cs.getPropertyValue('--ec-map-weight') || '').trim();
+	}
+	var mapFaceSync = false, mapRelabels = 0, labelPassTotal = 0;
+	function mapFollowTheme() {
+		var k = readMapFaceKey();
+		if (!svg || k === mapFaceKey) { return; }
+		var first = !mapFaceKey;
+		mapFaceKey = k;
+		if (first) { return; }   // the page's first reading: the build that follows lays everything out
+		mapRelabels++;
+		labelCacheTaint();
+		refreshTextLabelSizes();
+		if (mapFaceSync) { refreshLabelText(); } else { requestLabelRefresh(); }
+	}
+	if (typeof window !== 'undefined' && window.addEventListener) {
+		window.addEventListener('ec-theme', mapFollowTheme);
+	}
+	// Run `fn` with the page in Light and the labels laid out in Light's face, and put everything back
+	// before returning. Whatever `fn` returns is returned.
+	function withLightMap(fn) {
+		var T = window.ecTheme, prev, out;
+		if (!T || T.resolve(T.previewing() || T.get()) === 'light') { return fn(); }
+		prev = T.previewing();
+		mapFaceSync = true;
+		try {
+			flushLabelRefresh();
+			T.preview('light');
+			mapFollowTheme();
+			out = fn();
+		} finally {
+			T.preview(prev);
+			mapFollowTheme();
+			mapFaceSync = false;
+		}
+		return out;
+	}
+	// Printing: Light's layout for the paper, the theme's back afterwards.
+	var printLight = null;
+	if (typeof window !== 'undefined' && window.addEventListener) {
+		window.addEventListener('beforeprint', function () {
+			var T = window.ecTheme;
+			if (!T || T.resolve(T.previewing() || T.get()) === 'light') { return; }
+			printLight = { prev: T.previewing() };
+			mapFaceSync = true;
+			try { T.preview('light'); mapFollowTheme(); } finally { mapFaceSync = false; }
+		});
+		window.addEventListener('afterprint', function () {
+			if (!printLight) { return; }
+			var T = window.ecTheme, prev = printLight.prev;
+			printLight = null;
+			mapFaceSync = true;
+			try { T.preview(prev); mapFollowTheme(); } finally { mapFaceSync = false; }
+		});
+	}
+	// For the harnesses: how many times the map was laid out again for a theme, how many content passes
+	// ran, and the measurement bank's size and hits.
+	EngCalcs.lpnMapThemeStats = function () {
+		return { face: mapFaceKey, relabels: mapRelabels, passes: labelPassTotal, measureKeys: textMeasureKeys, measureHits: textMeasureHits };
+	};
 	function refreshLabelText() {
 		// **OFF MEANS OFF: NO CONTENT PASS FOR LETTERING NOBODY IS DRAWING** (Tom, 2026-09-17).
 		// This is the expensive half -- it composes every node's and link's text, writes the glyphs,
@@ -76062,6 +76368,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// part of this pass a suppressor has no business cancelling.
 		// A synchronous pass answers every request made before it (see requestLabelRefresh()).
 		labelRefreshPending = false;
+		labelPassTotal++;
 		labelCacheTaint();
 		hoverCardHide();
 		if (dataLabelsHidden) { labelWorkSkipped = true; refreshLabelPassTail(); return; }
@@ -80472,7 +80779,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			});
 		}
 		var flowTip = pc.lpn_scnres_flow_tip ||
-			'The sign of a flow is the solver\'s internal direction sign: positive runs from the From node to the To node, negative the reverse. It has no use outside this table except to show whether a flow changed direction between scenarios.';
+			'The sign of a flow is the solver\'s internal direction sign. It has no use outside the solver except to show here whether a flow changed direction between scenarios.';
 		var hasFlow = t.kind.group === 'link' && t.cols.some(function (c) { return c.q === 'flow'; });
 		body = ffTable(sec, t.heads.map(function (h, i) {
 			return (hasFlow && i > 0 && t.cols[i - 1].q === 'flow') ? [h, flowTip] : h;

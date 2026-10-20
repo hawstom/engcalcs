@@ -1040,7 +1040,7 @@ $ec_lang['lpn_guide_scn_scope_def']='<table class="lpn-notes-table"><tbody><tr><
 $ec_lang['lpn_guide_scn_example_term']='Example on Net1';
 $ec_lang['lpn_guide_scn_example_def']='<p>Open the Net1 example. Choose Water, Scenarios, New scenario…, type Larger main, and click OK. Select Pipe 10 on the map and enter 24 for Diameter in Properties; Base has 18 in., shown beneath the field as Base scenario: 18. Choose Base in the Scenarios list, choose New scenario… again, type Max day, and enter 1.8 for Demand multiplier in Settings, Calculation, Hydraulics. Then choose Water, Reports, Scenario comparison.</p><table class="lpn-notes-table"><tbody><tr><td>Scenario</td><td>No. of overrides</td><td>Demand multiplier</td><td>Lowest pressure</td><td>Highest velocity</td></tr><tr><td>Base</td><td>0</td><td>1</td><td>108 psi at N32, 14:00</td><td>2.76 ft/sec at L11, 16:00</td></tr><tr><td>Larger main</td><td>1</td><td>1</td><td>109 psi at N32, 14:00</td><td>2.87 ft/sec at L11, 16:00</td></tr><tr><td>Max day</td><td>1</td><td>1.8</td><td>15.77 psi at N32, 9:00</td><td>3.49 ft/sec at L10, 8:00</td></tr></tbody></table><p>The total run time is 24:00 in all three, so each lowest pressure and highest velocity is the extreme over the day, at the time shown. The larger main raises the lowest pressure by about 1 psi. A multiplier of 1.8 lowers it to 15.77 psi at 9:00, and the highest velocity moves to Pipe 10. Each scenario holds one override, and Base keeps its values.</p>';
 $ec_lang['lpn_guide_scn_notes_term']='Points to note';
-$ec_lang['lpn_guide_scn_notes_def']='<ul><li>An override equal to the inherited value is still an override. It is counted, and Override manager marks it (same).</li><li>Basic mode is a setting for this browser, not for the project. It is disabled for a project whose scenarios and alternatives it cannot show. Alternatives and the Scenario manager are described in the help at the top of this entry.</li><li>Undo keeps 20 steps. Each step restores the scenarios and the open scenario along with the drawing, so adding, renaming, and deleting a scenario can be undone.</li><li>Exporting an EPANET file writes the open scenario only, with the values and node positions that scenario reads. The scenarios themselves are recorded in the project file only.</li></ul>';
+$ec_lang['lpn_guide_scn_notes_def']='<ul><li>An override equal to the inherited value is still an override. It is counted, and Override manager marks it (same).</li><li>Basic mode is a setting for this browser, not for the project. It is disabled for a project whose scenarios and alternatives it cannot show. Alternatives and the Scenario manager are described under How scenarios and alternatives work and How to manage scenarios, at the top of this entry.</li><li>Undo keeps 20 steps. Each step restores the scenarios and the open scenario along with the drawing, so adding, renaming, and deleting a scenario can be undone.</li><li>Exporting an EPANET file writes the open scenario only, with the values and node positions that scenario reads. The scenarios themselves are recorded in the project file only.</li></ul>';
 // The Scenario comparison chapter beyond its opening paragraphs (lpn_guide_text_scncmp_box), copied into
 // the box's entry by renderGuideBoxes() from <template id="lpn_guide_more_lpn_scncmp_box">. Task 785.
 $ec_lang['lpn_guide_cmp_cols_term']='What the table holds';
@@ -1277,9 +1277,9 @@ $ec_lang['lpn_ex_basic_us_desc']='Two reservoirs, a pump, and a small loop. Gall
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
-$ec_lang['lpn_ex_net1_title']='EPANET Net1 plus rule-based controls';
+$ec_lang['lpn_ex_net1_title']='EPANET Net1 plus rule-based controls, gpm (US)';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ex_net1_desc']='A fictional EPANET example with chlorine, 1 reservoir and 1 tank.';
+$ec_lang['lpn_ex_net1_desc']='Gallons per minute, with feet and inches. A fictional EPANET example with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.';
 $ec_lang['lpn_ex_net1_si_title']='EPANET Net1 plus rule-based controls, L/s (SI)';
 $ec_lang['lpn_ex_net1_si_desc']='Liters per second, with meters and millimeters. A fictional EPANET example converted from gallons per minute, feet, and inches, with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.';
 $ec_lang['lpn_ex_net1_scn_title']='EPANET Net1 with scenarios, gpm (US)';
@@ -3252,10 +3252,28 @@ $ec_lang['lpn_settings_override_marks_tip']='Show the amber ring on an asset wit
 $ec_lang['lpn_clean_map']='Clean map';
 $ec_lang['lpn_clean_map_tip']='Checked: the zoom buttons, the street map and satellite button, the Messages button and the notices, the selection help, the feedback button, and the override rings are hidden. Cleared: they are shown. Errors are still shown on the map, and every notice is still kept in Messages. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_settings_theme']='Theme';
-$ec_lang['lpn_settings_theme_tip']='Choose light or dark colors for the page. System follows the setting of your device. The map drawing looks the same in every theme. This is a setting for this browser, not for the project.';
+$ec_lang['lpn_settings_theme_tip']='Choose the look of the page: its colors and, in some themes, its shapes and type. Each card shows the theme on this page before it is chosen. System follows the settings of the device. On screen the map follows the theme too; printed pages, screenshots and exported files are always drawn in Light. This is a setting for this browser, not for the project.';
 $ec_lang['lpn_theme_system']='System';
 $ec_lang['lpn_theme_light']='Light';
 $ec_lang['lpn_theme_dark']='Dark';
+// More themes (dev/themes-plan.md). A name, shown under a small picture of the page in that
+// theme. High contrast is black on white, or white on black when the device is set to dark. Amber and
+// Green are the one-color screens of early computer terminals. Platinum is the gray desktop of the late
+// 1990s. Rounded is the Light colors with soft, rounded shapes. Newspaper is black type on newsprint, set
+// like a printed newspaper. Arcade is a black screen with blue maze walls, like a 1980s arcade game. Space
+// is a night sky with stars and gold lettering, like a science-fiction film. Desktop is the light, frosted look
+// of a present-day computer's own windows. Prairie is the Great Plains: a big blue sky over wheat, with a
+// water tower.
+$ec_lang['lpn_theme_hc']='High contrast';
+$ec_lang['lpn_theme_amber']='Amber';
+$ec_lang['lpn_theme_green']='Green';
+$ec_lang['lpn_theme_platinum']='Platinum';
+$ec_lang['lpn_theme_rounded']='Rounded';
+$ec_lang['lpn_theme_desktop']='Desktop';
+$ec_lang['lpn_theme_newspaper']='Newspaper';
+$ec_lang['lpn_theme_arcade']='Arcade';
+$ec_lang['lpn_theme_space']='Space';
+$ec_lang['lpn_theme_prairie']='Prairie';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
 // NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
 // a NEW asset is created with; "starting" reads as the initial condition of a run, which on a
@@ -4171,7 +4189,7 @@ $ec_lang['lpn_scnres_steady']='(steady state)';
 $ec_lang['lpn_scnres_not_converged']='(not converged)';
 $ec_lang['lpn_scnres_not_converged_note']='A column marked {mark} shows the last results the solver reached before it stopped without converging.';
 $ec_lang['lpn_scnres_failed']='{scenario} could not be solved, so its columns are blank. {why}';
-$ec_lang['lpn_scnres_flow_tip']='The sign of a flow is the solver\'s internal direction sign: positive runs from the From node to the To node, negative the reverse. It has no use outside this table except to show whether a flow changed direction between scenarios.';
+$ec_lang['lpn_scnres_flow_tip']='The sign of a flow is the solver\'s internal direction sign. It has no use outside the solver except to show here whether a flow changed direction between scenarios.';
 $ec_lang['lpn_scnres_stale']='Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.';
 $ec_lang['lpn_energy_over']='For extended period simulation of {time}';
 $ec_lang['lpn_energy_col_pump']='Pump';

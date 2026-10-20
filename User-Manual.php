@@ -55,9 +55,7 @@ $ec_chapter_href = function ($slug, $lang) {
 <?php endif; ?>
 <?php if ($ec_known) : ?>
 <h1><?=$ec_heading?></h1>
-<?php foreach (ecGuideIntro($ec_slug) as $ec_para) : ?>
-<p><?=htmlspecialchars($ec_para)?></p>
-<?php endforeach; ?>
+<?=ecGuideIntroHtml($ec_slug)?>
 <?=ecGuideDl($ec_slug)?>
 <?php else : ?>
 <h1><?=htmlspecialchars($ec_manual)?></h1>
