@@ -50,7 +50,7 @@ function chapters(lang) {
 	const script = "$_SERVER['SCRIPT_NAME']='x';require 'lib/Canonical.lib.php';require 'lib/GuideChapters.lib.php';" +
 		"require 'lib/lang.ec.en.php';" + (lang === 'en' ? '' : "require 'lib/lang.ec." + lang + ".php';") +
 		"$o=array();foreach(ecGuidePageChapters() as $s=>$c){$o[$s]=array('title'=>$ec_lang[$c['title']],'intro'=>ecGuideIntro($s)," +
-		"'dl'=>ecGuideDl($s),'terms'=>array_map(function($t) use($ec_lang){return array($ec_lang[$t.'_term'],$ec_lang[$t.'_def']);},$c['terms']));}" +
+		"'dl'=>ecGuideDl($s),'terms'=>array_map(function($t) use($ec_lang){return array($ec_lang[ecGuideTermKey($t)],$ec_lang[$t.'_def']);},$c['terms']));}" +
 		"echo json_encode(array('chapters'=>$o,'manual'=>$ec_lang['lpn_help_manual'],'open'=>$ec_lang['lpn_guide_page_open'],'missing'=>$ec_lang['lpn_guide_page_missing']));";
 	return JSON.parse(php(['-r', script]));
 }
