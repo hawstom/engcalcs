@@ -13,7 +13,7 @@
 // six-pixels-a-character measure cannot test. So each drawing is laid out twice in Chromium: as
 // shipped, and with the skip switched off by rewriting its threshold on the way to the browser (the
 // served file is otherwise byte for byte the shipped one). Every label element on the canvas -- text,
-// rows, leader, visibility -- must serialise identically, on Net1, Net3 and Net3 on the world map
+// rows, leader, visibility -- must serialise identically (every number to a millionth, sameElement()), on Net1, Net3 and Net3 on the world map
 // near Novato, every node and link label field on, at the opening view and after three wheel
 // bursts. And the shipped run must take FEWER text measurements (getBBox) than the reference on the
 // drawing whose pipes shed, or the skip is not doing anything and the comparison proves nothing.
@@ -132,13 +132,41 @@ async function layOut(Session, browser, file, skipOn) {
 			await a.page.mouse.move(r.x, r.y);
 			for (let k = 0; k < Math.abs(n); k++) { await a.page.mouse.wheel(0, n < 0 ? -100 : 100); await a.page.waitForTimeout(60); }
 			await a.settle(2000);
-			views.push(await drawn(a.page));
+			// **STILL, NOT MERELY WAITED FOR.** Under a loaded machine a pass can land after a fixed
+			// wait, so the drawing is read until two readings 400 ms apart agree (at most 8 s more).
+			let v = await drawn(a.page);
+			for (let t = 0; t < 20; t++) {
+				await a.page.waitForTimeout(400);
+				const w = await drawn(a.page);
+				if (w.join('\n') === v.join('\n')) { break; }
+				v = w;
+			}
+			views.push(v);
 		}
 		const bbox = await a.page.evaluate(() => window.__bboxCalls);
 		return { views, bbox, rewritten, errors: a.errors.slice() };
 	} finally {
 		await a.close();
 	}
+}
+
+// **THE SAME ELEMENT, TO A MILLIONTH.** Every word must match; every number must agree to one part
+// in a million. A label set level beside its pipe and hung left of its anchor (placeLevelPipeLabels())
+// is placed by its measured width, and getBBox() returns that width with a jitter of about one part
+// in ten million that depends on what was drawn and measured before it, which the skip changes by
+// design. Measured on Net3 near Novato: x 0.03366097606990883 against 0.03366097979519913, a ten-
+// millionth of a pixel on screen. A label moved, shed, hidden or turned still differs in a word or
+// by far more than that.
+function sameElement(a, b) {
+	if (a === b) { return true; }
+	if (typeof a !== 'string' || typeof b !== 'string') { return false; }
+	const NUM = /-?\d+(?:\.\d+)?(?:e[-+]?\d+)?/g;
+	if (a.replace(NUM, '#') !== b.replace(NUM, '#')) { return false; }
+	const x = a.match(NUM) || [], y = b.match(NUM) || [];
+	return x.length === y.length && x.every((t, i) => {
+		const p = +t, q = +y[i];
+		return Math.abs(p - q) <= 1e-6 * Math.max(Math.abs(p), Math.abs(q)) + 1e-12;
+	});
 }
 
 async function main() {
@@ -167,7 +195,7 @@ async function main() {
 				const A = ship.views[i], B = ref.views[i];
 				const shown = A.filter((s) => s.indexOf('<text') === 0).length;
 				let firstDiff = -1;
-				for (let k = 0; k < Math.max(A.length, B.length); k++) { if (A[k] !== B[k]) { firstDiff = k; break; } }
+				for (let k = 0; k < Math.max(A.length, B.length); k++) { if (!sameElement(A[k], B[k])) { firstDiff = k; break; } }
 				ok('view ' + i + ' (' + (i ? (n < 0 ? n + ' notches in' : n + ' notches out') : 'opening') + '): every label drawn identically',
 					firstDiff < 0 && A.length > 0, shown + ' texts shown of ' + A.length + ' elements' +
 					(firstDiff < 0 ? '' : '; first difference at element ' + firstDiff + ': ' + String(A[firstDiff]).slice(0, 160) + '  vs  ' + String(B[firstDiff]).slice(0, 160)));

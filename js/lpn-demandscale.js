@@ -67,6 +67,17 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			c = {};
 			for (j in n) { if (Object.prototype.hasOwnProperty.call(n, j)) { c[j] = n[j]; } }
 			c.demand = ((typeof n.demand === 'number' && isFinite(n.demand)) ? n.demand : 0) * m;
+			// A run reads the BASE demand and its pattern, not the instant's `demand` (Task 578), so the
+			// base, and every category row of it, is scaled too. A one-instant solve ignores both.
+			if (typeof n.demandBase === 'number' && isFinite(n.demandBase)) { c.demandBase = n.demandBase * m; }
+			if (Array.isArray(n.demands)) {
+				c.demands = n.demands.map(function (d) {
+					var row = {}, k2;
+					for (k2 in d) { if (Object.prototype.hasOwnProperty.call(d, k2)) { row[k2] = d[k2]; } }
+					row.base = (d.base || 0) * m;
+					return row;
+				});
+			}
 			return c;
 		});
 		return out;
@@ -88,6 +99,13 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 				thrown: String(err && err.message || err) };
 		});
 	}
+	// A whole-run result (EngCalcs.lpnEpsRunResult) says whether a tank emptied or the run stopped
+	// part-way; either one fails the scale, and names the step.
+	function emptiedOf(r) {
+		if (r && r.emptied) { return r.emptied; }
+		if (r && r.stopped) { return { id: r.stopped.tank || null, t: r.stopped.t, stopped: true }; }
+		return null;
+	}
 	function defaultYield() {
 		if (typeof setTimeout === 'function') {
 			return new Promise(function (resolve) { setTimeout(resolve, 0); });
@@ -105,7 +123,9 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 		junctionIds(model).forEach(function (id) {
 			var p = r.pressures ? r.pressures[id] : undefined;
 			if (keep && !keep[id]) { return; }
-			if (typeof p === 'number' && isFinite(p)) { out.push({ id: id, pressure: p }); }
+			if (typeof p === 'number' && isFinite(p)) {
+				out.push({ id: id, pressure: p, t: r.pressureHour ? r.pressureHour[id] : undefined });
+			}
 		});
 		return out.sort(function (a, b) { return a.pressure - b.pressure; });
 	}
@@ -160,7 +180,7 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 					velocityList(model, b.result).forEach(function (x) { vBase[x.id] = x.velocity; });
 				}
 				pressures = pressureList(model, c.result).map(function (x) {
-					return { id: x.id, pressure: x.pressure, unscaled: pBase[x.id] };
+					return { id: x.id, pressure: x.pressure, unscaled: pBase[x.id], t: x.t };
 				});
 				velocities = velocityList(model, c.result).map(function (x) {
 					return { id: x.id, velocity: x.velocity, unscaled: vBase[x.id] };
@@ -169,6 +189,7 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 					ok: true,
 					multiplier: m,
 					minPressure: minP,
+					emptied: emptiedOf(c.result),
 					pressures: pressures,
 					velocities: velocities,
 					below: pressures.filter(function (x) { return x.pressure < minP && (!judged || judged[x.id]); })
@@ -226,7 +247,8 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 				if (c.ok) {
 					list = pressureList(model, c.result, scaled);
 					rec.lowest = list.length ? list[0] : null;
-					rec.holds = !list.length || list[0].pressure >= minP;
+					rec.emptied = emptiedOf(c.result);
+					rec.holds = (!list.length || list[0].pressure >= minP) && !rec.emptied;
 					// Junctions outside the selection that are below the limit at this scale: disclosed,
 					// never judged, so they leave `holds` alone.
 					rec.outside = scaled ? pressureList(model, c.result).filter(function (x) {
@@ -249,6 +271,12 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 				holding: lo === null ? undefined : probes[lo],
 				failing: hi === null ? undefined : probes[hi],
 				belowAtOne: probes[one] ? !probes[one].holds : undefined,
+				// The reporting step that ends the answer, for a whole run: where a tank empties at
+				// the first scale that fails, else where the lowest pressure occurs there.
+				limit: (hi !== null && probes[hi]) ? (probes[hi].emptied
+					? { t: probes[hi].emptied.t, id: probes[hi].emptied.id, emptied: true }
+					: (probes[hi].lowest && typeof probes[hi].lowest.t === 'number'
+						? { t: probes[hi].lowest.t, id: probes[hi].lowest.id } : undefined)) : undefined,
 				max: mAt(top),
 				step: step,
 				minPressure: minP,

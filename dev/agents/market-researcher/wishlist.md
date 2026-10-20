@@ -5,6 +5,11 @@
 - **Rank honestly, including against myself.** Something I found is not thereby important.
 - **State the case once and do not campaign.**
 
+## 0q. Task 818 (MCP): a real matrix of the four existing EPANET MCP servers, and a practitioner source (2026-10-20)
+1. Read each of the four servers' source tool lists (KWR, Eurecat, hjlrosales, Tamrakar) and write a real matrix against Task 818's tools. Cost: an hour. Turns the first-of-kind guess into a fact.
+2. Find a practitioner source for what engineers ask AI to do with a model (AWWA ACE/Utility Management, Bentley/Autodesk community, r/CivilEngineering, eng-tips). Searches so far found only research papers. Cost: a morning; may return nothing, which is a result.
+3. Check whether the KWR IAHR paper lists tested chatbots and user tasks (page redirected; unread).
+
 ## 0p. Screenshots of WaterGEMS Scenarios/Alternatives managers and the EPANET Project Defaults dialog (2026-10-11)
 Tree look (icons, expanders, current-scenario marker, right-click menu) and whether EPANET's GUI refuses a blank Default Pattern are in no page I can read. One screenshot each from anyone with the software closes them. Cost: ten minutes of Tom's or a friend's time.
 

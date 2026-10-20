@@ -885,6 +885,10 @@ global.window.lpnDialogAnswerer = function (req) {
   const f = (w !== stubDialogDefaults[kind]) ? w : g;
   return f.call(global.window, req.text, req.value);
 };
+// **AN EPANET FILE IMPORTED INTO A PROJECT WITH ASSETS IN IT NOW ASKS WHERE IT GOES** (Task 814). The
+// harnesses that import one file after another mean a new project each time, so the stub answers
+// 'new'; inp-update-harness.js deletes this to drive the real question.
+global.window.lpnInpDestination = 'new';
 global.navigator = { userAgent: 'node' };
 global.requestAnimationFrame = f => setTimeout(f, 0);
 // iconEl/setLabel come from js/Calculators.lib.js in the browser.
@@ -1066,6 +1070,7 @@ Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-fireflow.js'));
 // Criticality analysis, for the same reason.
 Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-criticality.js'));
 Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-demandscale.js'));
+Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-durfire.js'));
 Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-tablefile.js'));
 // The [RULES] grammar (ROADMAP Task 248.03). In the SHARED stub rather than per-harness, because
 // looped-network.js's modelRules() reaches it on EVERY model assembly -- so a harness that merely

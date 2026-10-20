@@ -63,6 +63,7 @@ require_once('Language.Settings.php');
 // ec_canonical_url() calls it, and HeadersFooters.lib.php builds canonical, hreflang and og:url
 // from that one function.
 require_once('Canonical.lib.php');
+require_once('GuideChapters.lib.php');
 
 // Load the language functions and set current language.
 require_once('Language.lib.php');

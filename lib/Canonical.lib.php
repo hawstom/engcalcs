@@ -98,6 +98,8 @@ function ecCanonicalOrigins() {
         // EVERY host serving the map application nominates epanet-plus-plus.org, librewaternet.org
         // included; the brand NAME stays per host (ecAppBrandCurrent() in lib/config.inc.php).
         'Looped-Network.php' => 'https://epanet-plus-plus.org',
+        // The User Guide's chapter pages (Task 816) belong to the application they document.
+        'User-Manual.php' => 'https://epanet-plus-plus.org',
     );
 }
 
@@ -127,6 +129,11 @@ function ecCanonicalOrigins() {
 function ecCanonicalHostOrigins() {
     return array(
         'Looped-Network.php' => array(
+            'epanet-plus-plus.org' => 'https://epanet-plus-plus.org',
+        ),
+        // The chapter pages are the application's own front door too, so they are listed in that
+        // host's sitemap (generate_sitemap.php --host=) and never in hawsedc.com's.
+        'User-Manual.php' => array(
             'epanet-plus-plus.org' => 'https://epanet-plus-plus.org',
         ),
     );
@@ -321,4 +328,21 @@ function ecCanonicalPath($scriptName) {
     // /index.php collapses to the directory URL, so the suite front page has one address.
     if (substr($path, -10) === '/index.php') { $path = substr($path, 0, -9); }
     return $path;
+}
+
+/**
+ * The extra query a page adds to its own address after ?lang=, or ''.
+ *
+ * **A PAGE WITH SEVERAL ADDRESSES OF ITS OWN STATES WHICH ONE IT IS** (Task 816). User-Manual.php
+ * is one script answering at a chapter per address (`?lang=es&chapter=scenarios`), so the canonical,
+ * the 27 hreflang alternates, og:url and the language menu must all carry the chapter, and they all
+ * read it here. The page sets the global $ec_page_query to `chapter=<slug>` from a slug it has
+ * already matched against ecGuideChapters(); this accepts only that shape, so nothing a client sent
+ * can introduce another parameter.
+ *
+ * @return string  '' or '&name=value'.
+ */
+function ecPageQuery() {
+    $q = isset($GLOBALS['ec_page_query']) ? (string)$GLOBALS['ec_page_query'] : '';
+    return preg_match('/^[a-z]+=[a-z0-9-]+$/', $q) ? '&' . $q : '';
 }

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**99 still to read on master**, of 107 untranslated keys, of 3126 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**163 still to read on master**, of 171 untranslated keys, of 3190 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,13 +29,145 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (107, 99 to read @@ NEEDS RULING)
+## lpn_  (171, 163 to read @@ NEEDS RULING)
 
+- **`lpn_at_time`**
+  > {value} at {time}
+  @@ NEEDS RULING
+- **`lpn_crit_col_empty`**
+  > Tank empties
+  @@ NEEDS RULING
+- **`lpn_crit_col_hours`**
+  > Hours below minimum
+  @@ NEEDS RULING
+- **`lpn_crit_col_lowest`**
+  > Lowest pressure
+  @@ NEEDS RULING
+- **`lpn_crit_col_lowest_tip`**
+  > Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.
+  @@ NEEDS RULING
+- **`lpn_crit_col_unserved_peak`**
+  > Largest demand not served
+  @@ NEEDS RULING
+- **`lpn_crit_empty_note`**
+  > Lowest pressures are read before a tank empties. Junctions below minimum include those left without a source from that step on.
+  @@ NEEDS RULING
+- **`lpn_crit_run_note`**
+  > Each outage was run over the whole simulation ({n} reporting steps).
+  @@ NEEDS RULING
+- **`lpn_crit_stopped_at`**
+  > run stopped at {time}
+  @@ NEEDS RULING
 - **`lpn_diag_gpv_curve_order`**
   > The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:
   @@ NEEDS RULING
 - **`lpn_diag_valve_conflict`**
   > These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:
+  @@ NEEDS RULING
+- **`lpn_ds_col_hour`**
+  > Step of lowest pressure
+  @@ NEEDS RULING
+- **`lpn_ds_empties_at`**
+  > ⚠ At a demand scale of {m}, a tank empties at {time}.
+  @@ NEEDS RULING
+- **`lpn_ds_limit_at`**
+  > Limiting reporting step: {time}.
+  @@ NEEDS RULING
+- **`lpn_ds_lowest_at_time`**
+  > At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}, at {time}.
+  @@ NEEDS RULING
+- **`lpn_ds_run_note`**
+  > Judged over the whole run, at every reporting step.
+  @@ NEEDS RULING
+- **`lpn_dur_bad_time`**
+  > The start and the duration must be whole multiples of the pattern time step, {step}, and the fire must start within the run.
+  @@ NEEDS RULING
+- **`lpn_dur_col_drop`**
+  > Drop from start
+  @@ NEEDS RULING
+- **`lpn_dur_col_end`**
+  > Level at end
+  @@ NEEDS RULING
+- **`lpn_dur_col_end_nofire`**
+  > Level at end without the fire
+  @@ NEEDS RULING
+- **`lpn_dur_col_fire`**
+  > Fire flow
+  @@ NEEDS RULING
+- **`lpn_dur_col_low`**
+  > Lowest level reached
+  @@ NEEDS RULING
+- **`lpn_dur_col_margin`**
+  > Above lowest water depth
+  @@ NEEDS RULING
+- **`lpn_dur_col_nofire`**
+  > Pressure without the fire
+  @@ NEEDS RULING
+- **`lpn_dur_col_pressure`**
+  > Pressure at the fire junction
+  @@ NEEDS RULING
+- **`lpn_dur_empties`**
+  > ⚠ Tank {id} empties at {time}. Pressures from that step on are not read.
+  @@ NEEDS RULING
+- **`lpn_dur_fails`**
+  > ⚠ Junction {id} falls to {pressure} during the fire, below the residual pressure of {residual}, at {time}.
+  @@ NEEDS RULING
+- **`lpn_dur_head`**
+  > Fire flow of {flow} at junction {id}, from {start} to {end}.
+  @@ NEEDS RULING
+- **`lpn_dur_holds`**
+  > ✓ Junction {id} holds at least {pressure} during the fire, above the residual pressure of {residual}, at {time}.
+  @@ NEEDS RULING
+- **`lpn_dur_junction`**
+  > Fire junction
+  @@ NEEDS RULING
+- **`lpn_dur_junction_many`**
+  > Several are selected. Select one junction on the map.
+  @@ NEEDS RULING
+- **`lpn_dur_junction_none`**
+  > None selected. Select one junction on the map.
+  @@ NEEDS RULING
+- **`lpn_dur_length`**
+  > Fire duration
+  @@ NEEDS RULING
+- **`lpn_dur_length_tip`**
+  > Hours and minutes, such as 2:00. The fire flow is the Required fire flow, drawn at the one junction selected on the map from the start time for this long. The whole extended-period simulation is run on a copy of the network and compared with the same run without the fire. The start and the duration must be whole multiples of the pattern time step. The system counts as recovered when, at the last reporting step, no junction is more than about 0.14 psi (1 kPa) and no tank more than about 0.3 ft (0.1 m) from the run without the fire.
+  @@ NEEDS RULING
+- **`lpn_dur_lowest`**
+  > The lowest pressure anywhere is {pressure}, at junction {id}, at {time}.
+  @@ NEEDS RULING
+- **`lpn_dur_no_empty`**
+  > ✓ No tank empties.
+  @@ NEEDS RULING
+- **`lpn_dur_no_junction`**
+  > Select one junction for the fire.
+  @@ NEEDS RULING
+- **`lpn_dur_not_back_junction`**
+  > ⚠ At {time}, the last reporting step, junction {id} is not back to its pressure without the fire. The difference is {pressure}, against a tolerance of {tolerance}.
+  @@ NEEDS RULING
+- **`lpn_dur_not_back_tank`**
+  > ⚠ At {time}, the last reporting step, tank {id} is not back to its level without the fire. The difference is {level}, against a tolerance of {tolerance}.
+  @@ NEEDS RULING
+- **`lpn_dur_option`**
+  > A fire for a stated duration
+  @@ NEEDS RULING
+- **`lpn_dur_recovers`**
+  > ✓ The system recovers after the fire: at {time}, the last reporting step, no junction differs from the run without the fire by more than {pressure} and no tank by more than {level}.
+  @@ NEEDS RULING
+- **`lpn_dur_recovery_cut`**
+  > The run stopped before its end, so recovery after the fire is not assessed.
+  @@ NEEDS RULING
+- **`lpn_dur_recovery_to_end`**
+  > The fire lasts to the end of the run, so recovery after it is not assessed.
+  @@ NEEDS RULING
+- **`lpn_dur_shortfall`**
+  > ⚠ Only {delivered} of the {flow} fire flow is delivered at junction {id}, at {time}, so the residual pressure is not a test of that fire.
+  @@ NEEDS RULING
+- **`lpn_dur_start`**
+  > Fire starts at
+  @@ NEEDS RULING
+- **`lpn_eps_working`**
+  > Running the extended-period simulation.
   @@ NEEDS RULING
 - **`lpn_ex_net1_scn_desc`**
   > Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.
@@ -58,6 +190,27 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_export_leaves_alternatives`**
   > The alternatives stored in this project are not in the file.
   _Ruled 2026-10-18: GeoJSON alternatives string is approved._
+- **`lpn_ff_at_all`**
+  > Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.
+  @@ NEEDS RULING
+- **`lpn_ff_at_minp`**
+  > Tested at {time}, the reporting step with the lowest pressure among the junctions tested.
+  @@ NEEDS RULING
+- **`lpn_ff_at_step`**
+  > Tested at reporting step {time}.
+  @@ NEEDS RULING
+- **`lpn_ff_col_hour`**
+  > Step of lowest flow
+  @@ NEEDS RULING
+- **`lpn_ff_no_steps`**
+  > A tank empties at {time}, before the first reporting step could be tested, so no step was tested.
+  @@ NEEDS RULING
+- **`lpn_ff_tank_empties`**
+  > A tank empties at {time}; steps from then on were not tested.
+  @@ NEEDS RULING
+- **`lpn_ff_working_steps`**
+  > Working: reporting step {step} of {steps}, junction {done} of {total}.
+  @@ NEEDS RULING
 - **`lpn_file_export_item_msx`**
   > EPANET-MSX file…
   @@ NEEDS RULING
@@ -70,12 +223,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_file_import_msx_tip`**
   > Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.
   @@ NEEDS RULING
-- **`lpn_file_import_wtg`**
-  > WaterCAD or WaterGEMS model…
-  @@ NEEDS RULING
-- **`lpn_file_import_wtg_tip`**
-  > Open a WaterCAD or WaterGEMS model as a new project. Choose its .wtg.sqlite file, and also the .wtg file beside it so that its units come too. The file is read and never changed. Its scenarios come with it; each scenario's differences from Base become that scenario's overrides. Beta: tried on few models so far.
-  @@ NEEDS RULING
 - **`lpn_geojson_results_other`**
   > No results are included, because the results on screen belong to the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
@@ -83,10 +230,178 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
   @@ NEEDS RULING
 - **`lpn_guide_cmp_byasset_def`**
-  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box.</p>
+  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver's internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.</p>
   @@ NEEDS RULING
 - **`lpn_guide_cmp_byasset_term`**
   > Results by asset
+  @@ NEEDS RULING
+- **`lpn_guide_ff_dur_def`**
+  > <p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.</p>
+  @@ NEEDS RULING
+- **`lpn_guide_ff_dur_term`**
+  > A fire for a stated duration
+  @@ NEEDS RULING
+- **`lpn_guide_page_desc`**
+  > {name} user manual: one page for each chapter, from the map and Properties to scenarios, fire flow analysis, and criticality analysis.
+  @@ NEEDS RULING
+- **`lpn_guide_page_missing`**
+  > There is no such chapter. The chapters are listed below.
+  @@ NEEDS RULING
+- **`lpn_guide_page_open`**
+  > Open the application
+  @@ NEEDS RULING
+- **`lpn_guide_page_what`**
+  > {name} is a free web application for modeling water distribution networks, an extension of EPANET.
+  @@ NEEDS RULING
+- **`lpn_inpup_ask_title`**
+  > Import {file}
+  @@ NEEDS RULING
+- **`lpn_inpup_base_note`**
+  > Base. A scenario that holds its own value for an asset keeps it; the others take the new value.
+  @@ NEEDS RULING
+- **`lpn_inpup_blank`**
+  > blank
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_base`**
+  > Base
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_new`**
+  > A new project
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_project`**
+  > This project, {project}
+  @@ NEEDS RULING
+- **`lpn_inpup_btn_scenario`**
+  > {scenario}, open now
+  @@ NEEDS RULING
+- **`lpn_inpup_counts`**
+  > Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).
+  @@ NEEDS RULING
+- **`lpn_inpup_failed`**
+  > The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}
+  @@ NEEDS RULING
+- **`lpn_inpup_h_added`**
+  > Assets added
+  @@ NEEDS RULING
+- **`lpn_inpup_h_changed`**
+  > Values changed
+  @@ NEEDS RULING
+- **`lpn_inpup_h_kept`**
+  > Kept, not in the file
+  @@ NEEDS RULING
+- **`lpn_inpup_h_na`**
+  > Not applied
+  @@ NEEDS RULING
+- **`lpn_inpup_heading`**
+  > Imported {file} into {scenario} of {project}
+  @@ NEEDS RULING
+- **`lpn_inpup_how`**
+  > In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.
+  @@ NEEDS RULING
+- **`lpn_inpup_i_connections`**
+  > connections
+  @@ NEEDS RULING
+- **`lpn_inpup_i_controls`**
+  > controls
+  @@ NEEDS RULING
+- **`lpn_inpup_i_curves`**
+  > curves
+  @@ NEEDS RULING
+- **`lpn_inpup_i_descriptions`**
+  > descriptions
+  @@ NEEDS RULING
+- **`lpn_inpup_i_options`**
+  > options
+  @@ NEEDS RULING
+- **`lpn_inpup_i_patterns`**
+  > patterns
+  @@ NEEDS RULING
+- **`lpn_inpup_i_positions`**
+  > positions of existing assets
+  @@ NEEDS RULING
+- **`lpn_inpup_i_rules`**
+  > rules
+  @@ NEEDS RULING
+- **`lpn_inpup_lead`**
+  > An EPANET file holds one set of values and no scenarios. Choose where to put them.
+  @@ NEEDS RULING
+- **`lpn_inpup_method_row`**
+  > Head loss formula: the file uses {file} and this project uses {project}.
+  @@ NEEDS RULING
+- **`lpn_inpup_more`**
+  > {n} more
+  @@ NEEDS RULING
+- **`lpn_inpup_na_cv`**
+  > A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_na_general`**
+  > The file also holds {items}. They were not applied.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_geo`**
+  > Assets only in the file ({n}) were not added, because the file and this project use different coordinate systems.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_msx`**
+  > The .msx file chosen with this file was not read. To attach it to this project, choose it alone.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_owned`**
+  > The pipe type states some values of these pipes, so those values were not changed: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_na_refs`**
+  > These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_na_roughness`**
+  > Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.
+  @@ NEEDS RULING
+- **`lpn_inpup_na_type`**
+  > The file states a different type for these assets, so none of their values were changed: {ids}
+  @@ NEEDS RULING
+- **`lpn_inpup_nothing`**
+  > Every value in the file that matches an asset here is already the same in {scenario}.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_heading`**
+  > Nothing was changed in {project}.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_lead`**
+  > The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_lead_both`**
+  > The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.
+  @@ NEEDS RULING
+- **`lpn_inpup_refused_lead_formula`**
+  > The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.
+  @@ NEEDS RULING
+- **`lpn_inpup_row`**
+  > {id}, {property}: {old} to {new}
+  @@ NEEDS RULING
+- **`lpn_inpup_status`**
+  > Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).
+  @@ NEEDS RULING
+- **`lpn_inpup_t_junction`**
+  > Junction
+  @@ NEEDS RULING
+- **`lpn_inpup_t_pipe`**
+  > Pipe
+  @@ NEEDS RULING
+- **`lpn_inpup_t_pump`**
+  > Pump
+  @@ NEEDS RULING
+- **`lpn_inpup_t_reservoir`**
+  > Reservoir
+  @@ NEEDS RULING
+- **`lpn_inpup_t_tank`**
+  > Tank
+  @@ NEEDS RULING
+- **`lpn_inpup_t_valve`**
+  > Valve
+  @@ NEEDS RULING
+- **`lpn_inpup_title`**
+  > Update from EPANET file
+  @@ NEEDS RULING
+- **`lpn_inpup_undo`**
+  > Undo reverses all of it in one step.
+  @@ NEEDS RULING
+- **`lpn_inpup_unit_row`**
+  > {family}: the file uses {file} and this project uses {project}.
   @@ NEEDS RULING
 - **`lpn_msx_attached_heading`**
   > Attached EPANET-MSX file: {file}
@@ -163,6 +478,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_scnres_failed`**
   > {scenario} could not be solved, so its columns are blank. {why}
   @@ NEEDS RULING
+- **`lpn_scnres_flow_tip`**
+  > The sign of a flow is the solver's internal direction sign: positive runs from the From node to the To node, negative the reverse. It has no use outside this table except to show whether a flow changed direction between scenarios.
+  @@ NEEDS RULING
 - **`lpn_scnres_none`**
   > Check at least one result to show.
   @@ NEEDS RULING
@@ -205,6 +523,59 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_survey_added_scenario`**
   > The nodes were added to {scenario}. In Base they are inactive.
   _Ruled 2026-10-18: I approved all._
+- **`lpn_when`**
+  > Reporting step tested
+  @@ NEEDS RULING
+- **`lpn_when_all`**
+  > Every reporting step, worst case
+  @@ NEEDS RULING
+- **`lpn_when_hour`**
+  > A chosen reporting step
+  @@ NEEDS RULING
+- **`lpn_when_minp`**
+  > The reporting step of lowest pressure
+  @@ NEEDS RULING
+- **`lpn_when_now`**
+  > The reporting step on screen
+  @@ NEEDS RULING
+- **`lpn_when_run`**
+  > The whole run
+  @@ NEEDS RULING
+- **`lpn_when_step`**
+  > Reporting step
+  @@ NEEDS RULING
+
+---
+
+# Strings waiting on a branch
+
+**57 still to read**, of 61 new keys across 8 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### chore/merge-1020a (`e4373b805`) — adds no English strings
+
+### feat/desktop (`baba0f04d`) — adds no English strings
+
+### feat/duration-fire (`c221d72bf`) — already merged into chore/merge-1020a; its strings are listed there
+
+### feat/label-leader (`bcebdfa58`) — adds no English strings
+
+### feat/sqlite-reader (`75ed1031f`) — 51 new, 51 to read @@ NEEDS RULING
+
+- **`lpn_file_import_wtg`**
+  > WaterCAD or WaterGEMS model…
+  @@ NEEDS RULING
+- **`lpn_file_import_wtg_tip`**
+  > Open a WaterCAD or WaterGEMS model as a new project. Choose its .wtg.sqlite file, and also the .wtg file beside it so that its units come too. The file is read and never changed. Its scenarios come with it; each scenario's differences from Base become that scenario's overrides. Beta: tried on few models so far.
+  @@ NEEDS RULING
 - **`lpn_wtg_engine`**
   > The SQLite reader could not be loaded, so {file} could not be opened. Check the connection and try again.
   @@ NEEDS RULING
@@ -353,129 +724,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Reading {file}…
   @@ NEEDS RULING
 
----
+### feat/theme (`6221a4cae`) — already merged into feat/theme-tank; its strings are listed there
 
-# Strings waiting on a branch
-
-**38 still to read**, of 42 new keys across 6 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### feat/desktop (`baba0f04d`) — adds no English strings
-
-### feat/label-beside (`8676cd1be`) — already merged into feat/label-form; its strings are listed there
-
-### feat/label-form (`d05fdb069`) — adds no English strings
-
-### feat/network-update (`0b16ae345`) — 32 new, 32 to read @@ NEEDS RULING
-
-- **`lpn_inpup_ask_title`**
-  > Import {file}
-  @@ NEEDS RULING
-- **`lpn_inpup_base_note`**
-  > Base. Every scenario inherits Base, so choosing Base changes them all.
-  @@ NEEDS RULING
-- **`lpn_inpup_blank`**
-  > blank
-  @@ NEEDS RULING
-- **`lpn_inpup_btn_base`**
-  > Base
-  @@ NEEDS RULING
-- **`lpn_inpup_btn_new`**
-  > A new project
-  @@ NEEDS RULING
-- **`lpn_inpup_btn_project`**
-  > This project, {project}
-  @@ NEEDS RULING
-- **`lpn_inpup_btn_scenario`**
-  > {scenario}, open now
-  @@ NEEDS RULING
-- **`lpn_inpup_counts`**
-  > Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).
-  @@ NEEDS RULING
-- **`lpn_inpup_h_added`**
-  > Assets added
-  @@ NEEDS RULING
-- **`lpn_inpup_h_changed`**
-  > Values changed
-  @@ NEEDS RULING
-- **`lpn_inpup_h_kept`**
-  > Kept, not in the file
-  @@ NEEDS RULING
-- **`lpn_inpup_h_na`**
-  > Not applied
-  @@ NEEDS RULING
-- **`lpn_inpup_heading`**
-  > Imported {file} into {scenario} of {project}
-  @@ NEEDS RULING
-- **`lpn_inpup_how`**
-  > In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.
-  @@ NEEDS RULING
-- **`lpn_inpup_lead`**
-  > An EPANET file holds one set of values and no scenarios. Choose where to put them.
-  @@ NEEDS RULING
-- **`lpn_inpup_method_row`**
-  > Head loss formula: the file uses {file} and this project uses {project}.
-  @@ NEEDS RULING
-- **`lpn_inpup_more`**
-  > {n} more
-  @@ NEEDS RULING
-- **`lpn_inpup_na_general`**
-  > Positions of existing assets, connections, descriptions, patterns, curves, controls, rules, and options in the file were not applied.
-  @@ NEEDS RULING
-- **`lpn_inpup_na_geo`**
-  > Assets only in the file ({n}) were not added, because the file and this project use different coordinate systems.
-  @@ NEEDS RULING
-- **`lpn_inpup_na_msx`**
-  > The .msx file chosen with this file was not read. To attach it to this project, choose it alone.
-  @@ NEEDS RULING
-- **`lpn_inpup_na_owned`**
-  > The pipe type states some values of these pipes, so those values were not changed: {ids}
-  @@ NEEDS RULING
-- **`lpn_inpup_na_refs`**
-  > These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}
-  @@ NEEDS RULING
-- **`lpn_inpup_na_roughness`**
-  > Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.
-  @@ NEEDS RULING
-- **`lpn_inpup_na_type`**
-  > The file states a different type for these assets, so none of their values were changed: {ids}
-  @@ NEEDS RULING
-- **`lpn_inpup_nothing`**
-  > Every value in the file that matches an asset here is already the same in {scenario}.
-  @@ NEEDS RULING
-- **`lpn_inpup_refused_heading`**
-  > Nothing was changed in {project}.
-  @@ NEEDS RULING
-- **`lpn_inpup_refused_lead`**
-  > The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.
-  @@ NEEDS RULING
-- **`lpn_inpup_row`**
-  > {id}, {property}: {old} to {new}
-  @@ NEEDS RULING
-- **`lpn_inpup_status`**
-  > Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).
-  @@ NEEDS RULING
-- **`lpn_inpup_title`**
-  > Update from EPANET file
-  @@ NEEDS RULING
-- **`lpn_inpup_undo`**
-  > Undo reverses all of it in one step.
-  @@ NEEDS RULING
-- **`lpn_inpup_unit_row`**
-  > {name}: the file uses {file} and this project uses {project}.
-  @@ NEEDS RULING
-
-### feat/sqlite-reader (`fb510f6de`) — adds no English strings
-
-### feat/theme (`876ebef92`) — 10 new, 6 to read @@ NEEDS RULING
+### feat/theme-tank (`0055f8ed3`) — 10 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_theme_amber`**
   > Amber
@@ -507,3 +758,5 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_theme_space`**
   > Space
   @@ NEEDS RULING
+
+### fix/examples-guide (`5de0786d7`) — adds no English strings

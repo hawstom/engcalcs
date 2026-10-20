@@ -978,6 +978,11 @@ $ec_lang['lpn_guide_contents']='Contents';
 $ec_lang['lpn_guide_rail_hide']='Hide contents';
 $ec_lang['lpn_guide_rail_show']='Show contents';
 $ec_lang['lpn_guide_search']='Search the user manual';
+// The chapter pages of the user manual (Task 816), one address per chapter per language.
+$ec_lang['lpn_guide_page_open']='Open the application';
+$ec_lang['lpn_guide_page_desc']='{name} user manual: one page for each chapter, from the map and Properties to scenarios, fire flow analysis, and criticality analysis.';
+$ec_lang['lpn_guide_page_what']='{name} is a free web application for modeling water distribution networks, an extension of EPANET.';
+$ec_lang['lpn_guide_page_missing']='There is no such chapter. The chapters are listed below.';
 $ec_lang['lpn_guide_boxes_heading']='Boxes';
 $ec_lang['lpn_guide_boxes_intro']='Each box can be moved, resized, docked at the left or right of the map, or closed. The ? in a box\'s title bar opens its help.';
 // Tom's own wording, 2026-10-07 (his typo "to not" corrected). Below lpn_guide_boxes_intro.
@@ -1043,7 +1048,7 @@ $ec_lang['lpn_guide_cmp_cols_def']='<table class="lpn-notes-table"><tbody><tr><t
 $ec_lang['lpn_guide_cmp_run_term']='Steady-state and extended-period scenarios';
 $ec_lang['lpn_guide_cmp_run_def']='<p>A scenario with a Total run time greater than 0 is run over the whole period through the EPANET engine. Its lowest pressure and highest velocity are the extremes over every time step, each shown with its time. A scenario with a Total run time of 0 is solved at one instant. The total run time is one of the options a scenario can override, so one table can hold both kinds.</p>';
 $ec_lang['lpn_guide_cmp_byasset_term']='Results by asset';
-$ec_lang['lpn_guide_cmp_byasset_def']='<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box.</p>';
+$ec_lang['lpn_guide_cmp_byasset_def']='<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver\'s internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.</p>';
 $ec_lang['lpn_guide_cmp_notes_term']='Points to note';
 $ec_lang['lpn_guide_cmp_notes_def']='<ul><li>A scenario that cannot be solved shows the reason in place of its two results, for example that a junction has no path to a source after a pipe is made inactive. The other scenarios are still solved. A scenario that did not converge shows its last results and a message.</li><li>The block above the table, The same in every scenario, states the friction method, units, accuracy, and maximum trials. A setting that differs between scenarios is left out of the block.</li><li>There is no pass or fail threshold. Read the numbers against the design criteria of the system being modeled.</li><li>The example given in the Scenario manager entry compares three scenarios on Net1.</li></ul>';
 // The Libraries chapter, in the entry for the Libraries box (Task 785), copied in by renderGuideBoxes() from
@@ -1134,6 +1139,8 @@ $ec_lang['lpn_guide_ff_result_term']='Reading the results';
 $ec_lang['lpn_guide_ff_result_def']='<p>The summary counts the junctions that passed all checks, the junctions that failed the fire flow, and the junctions that affected the rest of the system. The table lists, for each junction tested, the Static pressure before any fire flow is drawn, the Required flow, the Pressure at required flow, the Available flow, the Residual held, the Worst effect and Design limit of the design check, the number of Runs, which is the number of solves of the whole network, and the Failure modes. A cell with no number shows a dash, never a zero. A junction that could not be solved shows its reason in place of numbers. The table prints at most 200 junctions and states how many it did not print.</p>';
 $ec_lang['lpn_guide_ff_marks_term']='Rings, Stop, and one analysis at a time';
 $ec_lang['lpn_guide_ff_marks_def']='<p>After a run, the circle of each tested junction is outlined on the map according to its result, and the outlines differ in dash pattern as well as in color. Choose Selected junctions to test only the junctions selected on the map; anything else that is selected is counted and not tested. Stop ends a run and keeps the junctions already finished. Only one of the fire flow, criticality, and demand scaling analyses runs at a time.</p>';
+$ec_lang['lpn_guide_ff_dur_term']='A fire for a stated duration';
+$ec_lang['lpn_guide_ff_dur_def']='<p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.</p>';
 $ec_lang['lpn_guide_ff_example_term']='Example on Net1';
 $ec_lang['lpn_guide_ff_example_def']='<p>Open the Net1 example, choose Water, Analyze, Fire flow analysis…, and click Run with the box as it opens. The time step is 0:00, and the run solves the whole network 135 times. Eight of the nine junctions pass all checks. Junction N32 fails the fire flow: its static pressure is 111 psi, only 1.19 psi remains at the required 1000 gpm, and its available flow is 892 gpm. Junction N31 can deliver 1339 gpm, and Junction N12 more than 10000 gpm.</p>';
 // The Criticality analysis chapter (Task 785). Held by dev/lpn-spike/user-guide-criticality-harness.js.
@@ -2265,7 +2272,7 @@ $ec_lang['lpn_dialog_ok']='OK';
 $ec_lang['lpn_file_import_menu']='Import…';
 $ec_lang['lpn_file_import_inp']='EPANET file…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.';
+$ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
 // File > Export is a submenu (Tom, 2026-10-06), so its rows drop the verb the heading carries. The
@@ -2419,6 +2426,63 @@ $ec_lang['lpn_import_notes_heading']='This project was read in from an EPANET fi
 // the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
 // that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='Opened {name} from a file, and added it to this browser as a new project.';
+// Update the open project from an EPANET file (Task 814). Placeholders in braces are filled by the page.
+// {file} is a file name.
+$ec_lang['lpn_inpup_ask_title']='Import {file}';
+$ec_lang['lpn_inpup_lead']='An EPANET file holds one set of values and no scenarios. Choose where to put them.';
+$ec_lang['lpn_inpup_how']='In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.';
+$ec_lang['lpn_inpup_base_note']='Base. A scenario that holds its own value for an asset keeps it; the others take the new value.';
+$ec_lang['lpn_inpup_btn_new']='A new project';
+// {project} is a project name; it labels a button.
+$ec_lang['lpn_inpup_btn_project']='This project, {project}';
+// {scenario} is a scenario name; it labels a button.
+$ec_lang['lpn_inpup_btn_scenario']='{scenario}, open now';
+$ec_lang['lpn_inpup_btn_base']='Base';
+$ec_lang['lpn_inpup_title']='Update from EPANET file';
+// {file} is a file name, {scenario} a scenario name and {project} a project name.
+$ec_lang['lpn_inpup_heading']='Imported {file} into {scenario} of {project}';
+$ec_lang['lpn_inpup_counts']='Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).';
+$ec_lang['lpn_inpup_undo']='Undo reverses all of it in one step.';
+$ec_lang['lpn_inpup_nothing']='Every value in the file that matches an asset here is already the same in {scenario}.';
+$ec_lang['lpn_inpup_status']='Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).';
+$ec_lang['lpn_inpup_h_changed']='Values changed';
+// {id} is an asset ID, {property} a property name, {old} and {new} are values.
+$ec_lang['lpn_inpup_row']='{id}, {property}: {old} to {new}';
+$ec_lang['lpn_inpup_more']='{n} more';
+$ec_lang['lpn_inpup_blank']='blank';
+$ec_lang['lpn_inpup_h_added']='Assets added';
+$ec_lang['lpn_inpup_h_kept']='Kept, not in the file';
+$ec_lang['lpn_inpup_h_na']='Not applied';
+$ec_lang['lpn_inpup_na_general']='The file also holds {items}. They were not applied.';
+$ec_lang['lpn_inpup_na_type']='The file states a different type for these assets, so none of their values were changed: {ids}';
+$ec_lang['lpn_inpup_na_owned']='The pipe type states some values of these pipes, so those values were not changed: {ids}';
+$ec_lang['lpn_inpup_na_roughness']='Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.';
+$ec_lang['lpn_inpup_na_geo']='Assets only in the file ({n}) were not added, because the file and this project use different coordinate systems.';
+$ec_lang['lpn_inpup_na_refs']='These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}';
+$ec_lang['lpn_inpup_na_msx']='The .msx file chosen with this file was not read. To attach it to this project, choose it alone.';
+$ec_lang['lpn_inpup_refused_heading']='Nothing was changed in {project}.';
+$ec_lang['lpn_inpup_refused_lead']='The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.';
+$ec_lang['lpn_inpup_unit_row']='{family}: the file uses {file} and this project uses {project}.';
+$ec_lang['lpn_inpup_method_row']='Head loss formula: the file uses {file} and this project uses {project}.';
+// {project} is a project name and {reason} the system's own error text. In t_*, the kind of asset that prefixes an ID in the receipt lists, as in 'Pipe 31'.
+$ec_lang['lpn_inpup_refused_lead_formula']='The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.';
+$ec_lang['lpn_inpup_refused_lead_both']='The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.';
+$ec_lang['lpn_inpup_na_cv']='A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}';
+$ec_lang['lpn_inpup_failed']='The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}';
+$ec_lang['lpn_inpup_i_positions']='positions of existing assets';
+$ec_lang['lpn_inpup_i_connections']='connections';
+$ec_lang['lpn_inpup_i_descriptions']='descriptions';
+$ec_lang['lpn_inpup_i_patterns']='patterns';
+$ec_lang['lpn_inpup_i_curves']='curves';
+$ec_lang['lpn_inpup_i_controls']='controls';
+$ec_lang['lpn_inpup_i_rules']='rules';
+$ec_lang['lpn_inpup_i_options']='options';
+$ec_lang['lpn_inpup_t_junction']='Junction';
+$ec_lang['lpn_inpup_t_reservoir']='Reservoir';
+$ec_lang['lpn_inpup_t_tank']='Tank';
+$ec_lang['lpn_inpup_t_pipe']='Pipe';
+$ec_lang['lpn_inpup_t_pump']='Pump';
+$ec_lang['lpn_inpup_t_valve']='Valve';
 // Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
 // API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
 // browser they test in. That is expected, not a bug.
@@ -4119,6 +4183,7 @@ $ec_lang['lpn_scnres_steady']='(steady state)';
 $ec_lang['lpn_scnres_not_converged']='(not converged)';
 $ec_lang['lpn_scnres_not_converged_note']='A column marked {mark} shows the last results the solver reached before it stopped without converging.';
 $ec_lang['lpn_scnres_failed']='{scenario} could not be solved, so its columns are blank. {why}';
+$ec_lang['lpn_scnres_flow_tip']='The sign of a flow is the solver\'s internal direction sign: positive runs from the From node to the To node, negative the reverse. It has no use outside this table except to show whether a flow changed direction between scenarios.';
 $ec_lang['lpn_scnres_stale']='Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.';
 $ec_lang['lpn_energy_over']='For extended period simulation of {time}';
 $ec_lang['lpn_energy_col_pump']='Pump';
@@ -4613,7 +4678,7 @@ $ec_lang['lpn_analyze_menu_tip']='Analyses that run the network on a copy: fire 
 $ec_lang['lpn_ff_menu']='Fire flow analysis…';
 $ec_lang['lpn_ff_menu_tip']='Test each selected junction for fire flow, and check the effect on the rest of the system';
 $ec_lang['lpn_ff_title']='Fire flow analysis';
-$ec_lang['lpn_ff_intro']='Each junction in turn draws a fire flow on top of its existing demand. The run uses a copy of the network at the time step on screen, so nothing in the project is changed.\n\nFire flow is normally tested at maximum day demand, so set the network to that condition first.\n\nEach junction tested takes about 16 solves of the whole network, so a large system takes minutes: choose the junctions before you run, and stop at any time to keep the partial results.';
+$ec_lang['lpn_ff_intro']='Each junction in turn draws a fire flow on top of its existing demand. The run uses a copy of the network at the time step on screen, so nothing in the project is changed.\n\nWhen the project has an extended-period simulation, Reporting step tested selects the condition: the time step on screen, a chosen reporting step, the reporting step of lowest pressure among the junctions tested, or every reporting step. The last option runs the sweep at each reporting step with the tank levels, demand patterns, and link statuses of that step, and shows each junction at its own worst step, the step with the lowest available flow, in the Step of lowest flow column.\n\nFire flow is normally tested at maximum day demand, so set the network to that condition first.\n\nEach junction tested takes about 16 solves of the whole network, so a large system takes minutes: choose the junctions before you run, and stop at any time to keep the partial results.';
 $ec_lang['lpn_ff_scope']='Junctions to test';
 $ec_lang['lpn_ff_all']='All junctions';
 $ec_lang['lpn_ff_selected']='Selected junctions';
@@ -4662,6 +4727,66 @@ $ec_lang['lpn_ff_run_title']='Fire flow run';
 $ec_lang['lpn_ff_calculate']='Run';
 $ec_lang['lpn_ff_stop']='Stop';
 $ec_lang['lpn_ff_working']='Working: {done} of {total} junctions.';
+// The extended-period analyses (Task 578): fire flow at a chosen step, at the step of lowest
+// pressure or at every step; criticality and demand scaling over the whole run.
+$ec_lang['lpn_when']='Reporting step tested';
+$ec_lang['lpn_when_now']='The reporting step on screen';
+$ec_lang['lpn_when_hour']='A chosen reporting step';
+$ec_lang['lpn_when_minp']='The reporting step of lowest pressure';
+$ec_lang['lpn_when_all']='Every reporting step, worst case';
+$ec_lang['lpn_when_step']='Reporting step';
+$ec_lang['lpn_when_run']='The whole run';
+// A fire for a stated duration inside the run (Task 578): a choice beside Reporting step tested, in the Fire flow analysis box.
+$ec_lang['lpn_dur_option']='A fire for a stated duration';
+$ec_lang['lpn_dur_start']='Fire starts at';
+$ec_lang['lpn_dur_junction']='Fire junction';
+$ec_lang['lpn_dur_junction_none']='None selected. Select one junction on the map.';
+$ec_lang['lpn_dur_junction_many']='Several are selected. Select one junction on the map.';
+$ec_lang['lpn_dur_length']='Fire duration';
+$ec_lang['lpn_dur_length_tip']='Hours and minutes, such as 2:00. The fire flow is the Required fire flow, drawn at the one junction selected on the map from the start time for this long. The whole extended-period simulation is run on a copy of the network and compared with the same run without the fire. The start and the duration must be whole multiples of the pattern time step. The system counts as recovered when, at the last reporting step, no junction is more than about 0.14 psi (1 kPa) and no tank more than about 0.3 ft (0.1 m) from the run without the fire.';
+$ec_lang['lpn_dur_no_junction']='Select one junction for the fire.';
+$ec_lang['lpn_dur_bad_time']='The start and the duration must be whole multiples of the pattern time step, {step}, and the fire must start within the run.';
+$ec_lang['lpn_dur_head']='Fire flow of {flow} at junction {id}, from {start} to {end}.';
+$ec_lang['lpn_dur_holds']='✓ Junction {id} holds at least {pressure} during the fire, above the residual pressure of {residual}, at {time}.';
+$ec_lang['lpn_dur_shortfall']='⚠ Only {delivered} of the {flow} fire flow is delivered at junction {id}, at {time}, so the residual pressure is not a test of that fire.';
+$ec_lang['lpn_dur_fails']='⚠ Junction {id} falls to {pressure} during the fire, below the residual pressure of {residual}, at {time}.';
+$ec_lang['lpn_dur_lowest']='The lowest pressure anywhere is {pressure}, at junction {id}, at {time}.';
+$ec_lang['lpn_dur_no_empty']='✓ No tank empties.';
+$ec_lang['lpn_dur_empties']='⚠ Tank {id} empties at {time}. Pressures from that step on are not read.';
+$ec_lang['lpn_dur_recovers']='✓ The system recovers after the fire: at {time}, the last reporting step, no junction differs from the run without the fire by more than {pressure} and no tank by more than {level}.';
+$ec_lang['lpn_dur_not_back_tank']='⚠ At {time}, the last reporting step, tank {id} is not back to its level without the fire. The difference is {level}, against a tolerance of {tolerance}.';
+$ec_lang['lpn_dur_not_back_junction']='⚠ At {time}, the last reporting step, junction {id} is not back to its pressure without the fire. The difference is {pressure}, against a tolerance of {tolerance}.';
+$ec_lang['lpn_dur_recovery_to_end']='The fire lasts to the end of the run, so recovery after it is not assessed.';
+$ec_lang['lpn_dur_recovery_cut']='The run stopped before its end, so recovery after the fire is not assessed.';
+$ec_lang['lpn_dur_col_fire']='Fire flow';
+$ec_lang['lpn_dur_col_pressure']='Pressure at the fire junction';
+$ec_lang['lpn_dur_col_nofire']='Pressure without the fire';
+$ec_lang['lpn_dur_col_low']='Lowest level reached';
+$ec_lang['lpn_dur_col_margin']='Above lowest water depth';
+$ec_lang['lpn_dur_col_drop']='Drop from start';
+$ec_lang['lpn_dur_col_end']='Level at end';
+$ec_lang['lpn_dur_col_end_nofire']='Level at end without the fire';
+$ec_lang['lpn_at_time']='{value} at {time}';
+$ec_lang['lpn_crit_col_lowest']='Lowest pressure';
+$ec_lang['lpn_crit_col_hours']='Hours below minimum';
+$ec_lang['lpn_crit_col_empty']='Tank empties';
+$ec_lang['lpn_ds_run_note']='Judged over the whole run, at every reporting step.';
+$ec_lang['lpn_ds_limit_at']='Limiting reporting step: {time}.';
+$ec_lang['lpn_ds_empties_at']='⚠ At a demand scale of {m}, a tank empties at {time}.';
+$ec_lang['lpn_ds_lowest_at_time']='At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}, at {time}.';
+$ec_lang['lpn_crit_run_note']='Each outage was run over the whole simulation ({n} reporting steps).';
+$ec_lang['lpn_eps_working']='Running the extended-period simulation.';
+$ec_lang['lpn_ff_working_steps']='Working: reporting step {step} of {steps}, junction {done} of {total}.';
+$ec_lang['lpn_ff_col_hour']='Step of lowest flow';
+$ec_lang['lpn_ds_col_hour']='Step of lowest pressure';
+$ec_lang['lpn_ff_no_steps']='A tank empties at {time}, before the first reporting step could be tested, so no step was tested.';
+$ec_lang['lpn_ff_tank_empties']='A tank empties at {time}; steps from then on were not tested.';
+$ec_lang['lpn_crit_col_lowest_tip']='Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.';
+$ec_lang['lpn_crit_empty_note']='Lowest pressures are read before a tank empties. Junctions below minimum include those left without a source from that step on.';
+$ec_lang['lpn_crit_stopped_at']='run stopped at {time}';
+$ec_lang['lpn_ff_at_step']='Tested at reporting step {time}.';
+$ec_lang['lpn_ff_at_minp']='Tested at {time}, the reporting step with the lowest pressure among the junctions tested.';
+$ec_lang['lpn_ff_at_all']='Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.';
 $ec_lang['lpn_ff_stopped']='Stopped after {done} of {total} junctions. The results below are the ones already finished.';
 $ec_lang['lpn_ff_cost']='This run solved the whole network {solves} times.';
 // The results are about the network as it stood when the run finished. Opening a different network
@@ -4764,7 +4889,7 @@ $ec_lang['lpn_ff_err_unknown']='No result. Error code: {code}';
 $ec_lang['lpn_crit_menu']='Criticality analysis…';
 $ec_lang['lpn_crit_menu_tip']='Remove each pipe, pump, and valve from the network in turn and report the effect on the system.';
 $ec_lang['lpn_crit_title']='Criticality analysis';
-$ec_lang['lpn_crit_intro']='Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in the project is changed; the whole run is made on a copy.';
+$ec_lang['lpn_crit_intro']='Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in the project is changed; the whole run is made on a copy.\n\nWhen the project has an extended-period simulation, Reporting step tested can be set to The whole run. Each outage is then simulated over the full run, and the table reports the lowest pressure and the reporting step at which it occurs, the hours any junction spends below the lowest pressure allowed, the reporting step at which a tank first empties, and the largest demand not served over the run. Lowest pressures are read only before a tank empties.';
 $ec_lang['lpn_crit_scope']='Links to break';
 $ec_lang['lpn_crit_scope_tip']='All pipes, pumps, and valves, or only those selected on the map. Choose the set before you run.';
 $ec_lang['lpn_crit_scope_all']='All links';
@@ -4773,6 +4898,7 @@ $ec_lang['lpn_crit_minpressure']='Lowest pressure allowed';
 $ec_lang['lpn_crit_minpressure_tip']='This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.';
 $ec_lang['lpn_crit_col_asset']='Asset';
 $ec_lang['lpn_crit_col_unserved']='Demand not served';
+$ec_lang['lpn_crit_col_unserved_peak']='Largest demand not served';
 $ec_lang['lpn_crit_col_cutoff']='Junctions cut off';
 $ec_lang['lpn_crit_col_below']='Junctions below minimum';
 $ec_lang['lpn_crit_summary']='Assets that leave demand unserved or drop a junction below {pressure} ({n} of {total}).';
@@ -4801,7 +4927,7 @@ $ec_lang['lpn_crit_skipped_dead']='Dead-end links skipped: {n}. Each one cuts of
 $ec_lang['lpn_ds_menu']='Demand scaling…';
 $ec_lang['lpn_ds_menu_tip']='Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.';
 $ec_lang['lpn_ds_title']='Demand scaling';
-$ec_lang['lpn_ds_intro']='Press the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities.\n\nPress the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}.\n\nBoth work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. Only that time step is scaled, and levels and statuses are taken from it; to test the peak, move the clock to the peak demand before you run.';
+$ec_lang['lpn_ds_intro']='Press the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities.\n\nPress the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}.\n\nBoth work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. By default only the time step on screen is scaled, and levels and statuses are taken from it. When the project has an extended-period simulation, set Reporting step tested to The whole run to scale the demands over the entire run: every reporting step is judged, a tank that empties fails the scale, and the answer names the limiting reporting step.';
 $ec_lang['lpn_ds_scope']='Junctions to scale';
 $ec_lang['lpn_ds_scope_all']='All junctions';
 $ec_lang['lpn_ds_scope_selected']='Selected junctions';

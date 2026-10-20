@@ -5186,6 +5186,8 @@ html[dir="rtl"] .lpn-sm-icon svg { transform: scaleX(-1); }
 .lpn-ff-row { display: flex; align-items: baseline; gap: .5em; margin: .25em 0; }
 .lpn-ff-row > span:first-child { flex: 1 1 auto; }
 .lpn-ff-row > input, .lpn-ff-row > select { flex: 0 0 8rem; min-width: 0; }
+.lpn-ff-row > select.lpn-ff-wide { flex: 0 1 auto; max-width: 70%; }
+.lpn-ff-firejunction { flex: 0 1 60%; min-width: 0; text-align: right; }
 .lpn-ff-unit { flex: 0 0 4rem; color: var(--ec-ink-muted); font-size: .9em; }
 .lpn-ff-head { font-weight: bold; margin: .8em 0 .3em; }
 .lpn-ff-note { margin: .3em 0; font-size: .9em; color: var(--ec-gray-444); }
@@ -6133,3 +6135,14 @@ textarea.lpn-desc-ta {
 	.lpn-gjnet-table td[data-label]::before { content: attr(data-label) ": "; }
 	.lpn-gjnet-table select { max-width: 100%; }
 }
+
+/* The User Guide's chapter pages (Task 816): a reading measure, like the legal pages. */
+.ec-guide-page { max-width: 48rem; margin: 0 auto; padding: 1rem 16px 2rem; background: var(--ec-bg); color: var(--ec-ink); }
+.ec-guide-page h1 { font-size: 1.6rem; margin: 1rem 0 .75rem; }
+.ec-guide-page h2 { font-size: 1.2rem; margin-top: 1.5rem; }
+.ec-guide-page dt { font-weight: bold; margin-top: .9rem; }
+.ec-guide-page dt.lpn-guide-dup { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; margin: 0; }
+.ec-guide-page dd { margin-inline-start: 0; }
+.ec-guide-top a, .ec-guide-langs a { margin-inline-end: 1rem; }
+.ec-guide-langs { margin-top: 1.5rem; font-size: .9rem; }
+.ec-guide-langs a { display: inline-block; }

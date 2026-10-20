@@ -499,8 +499,8 @@ console.log('\n--- one home for the concept ---');
 	// **AND ONE MORE EACH FOR A SCENARIO'S OWN VIEW COMING BACK IN** (inwardViewOf()).
 	// +1 each: the GeoJSON Shape import's one crossing (Task 779, landGeoJsonShapes()).
 	// +1 each in gisPlanarPoint() and +1 each in landShapefileShapes(): the DXF and shapefile Shape imports (Task 779).
-	ok('inwardX has one definition and 49 call sites', count(/inwardX\(/g) === 50, count(/inwardX\(/g));
-	ok('inwardY has one definition and 50 call sites', count(/inwardY\(/g) === 51, count(/inwardY\(/g));
+	ok('inwardX has one definition and 51 call sites', count(/inwardX\(/g) === 52, count(/inwardX\(/g));
+	ok('inwardY has one definition and 52 call sites', count(/inwardY\(/g) === 53, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

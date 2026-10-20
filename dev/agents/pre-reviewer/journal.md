@@ -4524,3 +4524,51 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED (pre-existing, master too): EPANET path ignores a GPV's Closed toggle once the session is warm.
 - OBSERVED: zero-flow GPV, first segment negative intercept: J3 differs 1.33 m (EPANET's own tie is noise-decided).
 2026-10-18 feat/msx b1a11204c. OBSERVED: harness 14/14; Net1+msx base/scenario export names match; IDs (j-1, Node.Two, 7, Res_A) survive .inp export; undo/redo of attach ok; 6MB attach not persisted past reload (saved silently-ish). 390px dialog fits. Merge with master conflicts only in dev/new-english-keys.md.
+
+# Perry, feat/guide-page, 2026-10-19
+OBSERVED: rendered en/es/ar scenarios, about, notes, user-manual, snip, using, index; Looped-Network en/es identical to master except mtime ?v= and build line; 404 on unknown slug, array slug 200 (index); no new storage (ec_language cookie is existing); sitemap 621 User-Manual locs for epanet-plus-plus.org, 0 for hawsedc.com.
+FINDINGS: desc starts "How scenarios work: In Basic mode..." (colon run-on, no EPANET++); es/ar nav "Open the application" and index description English (keys only in en); aria-label "Languages" hardcoded; chapters about/notes/snip/user-manual thin or self-referential; no "what is EPANET++" line on chapter pages; 404 page shows index with no "not found" text.
+
+## 2026-10-19 Perry: feat/eps-analysis pre-review
+OBSERVED: Own Net3 bisection (snapshot per step) matched sweepSteps "every step": J209 6053.5 vs 6053.1 gpm at 1:00; J123 ceiling 10000.
+OBSERVED: Net1 criticality whole run, own run with link removed/closed: link 10 empties tank at 5:00 (matches); link 9 matched only by removal (controls reopen a closed pump).
+OBSERVED: fire flow "minp" on Net1 with demands x6 (tank drained at 2:00) picked 7:00, pressure -1357, every junction error; criticality guards this with beforeEmpty, fire flow does not.
+OBSERVED: designT is set in lpn-fireflow.js sweepSteps but never displayed; "Lowest at" shows the worst-flow step while Design limit may come from another step.
+OBSERVED: Hours below minimum counts every frame incl. the final one as a full step (20 h for 5:00..24:00).
+OBSERVED: all existing fireflow/criticality/demand-scaling harnesses pass; new node + browser harnesses pass. No storage change. No em dashes in new strings.
+UNVERIFIED: how it looks (column widths, 10-column fire flow table with extra column).
+
+## 2026-10-17, feat/label-beside (Steps 0, 1, 3 of the label port plan)
+
+- OBSERVED (Chromium, 9 views Net3/Novato/n600 at 1x/2x/4x, plus NovatoSI, Branford, Elm, bent n600): every label shown on master is drawn at the identical position on the branch; the level rung only adds labels. Step 1 is layout-identical.
+- OBSERVED: Step 0 quotes all found verbatim in feat/label-placer sources; none strengthened.
+- OBSERVED: no level label overlaps a label or node symbol, no leader crosses a leader, label or node. But many level labels with no leader are closer to ANOTHER pipe than their own (n600 2x: 100 of 137; Net3 2x: 9 of 14) and about 40% touch another pipe. Leaders appear only past a distance threshold, so a level label 25-45 px from its pipe has no leader. The harness checks N1/N3/N5 only, so it cannot see this.
+- OBSERVED: n600 1x pass 905 -> 1128 ms (R10 bound is 1 s).
+- Harnesses stay: they never measured "which pipe is this label for"; a metric of that kind is what a reviewer must add.
+
+## 2026-10-18, feat/label-beside round 2 (head 8676cd1be)
+
+- OBSERVED: Chromium 1920x1000 and 1400x900 via /usr/bin/google-chrome. Net3 at 6 notches: pipe labels 13 -> 38 (25 level), node labels 82 -> 82, none lost, none reworded. n600 fit: 13 -> 69 (56 level); 6 notches in: 52 -> 176 (124 level). 1400px: same Net3, n600 63 (52 level) at fit.
+- OBSERVED: 112 not reproducible: 5 reruns each Net3 and n600 byte-identical level sets.
+- OBSERVED: notch cost (long tasks) n600 ~1.0 s vs ~0.85 s master (headless); Net3 ~140 vs ~140.
+- OBSERVED: leaderless level labels as close to another pipe as their own (Net3 6 notches pipe 115, "Q=422.6"; n600 6 notches pipes 831, 8911, 4668, 4316, a stack "Q=1.3" over "Q=40.1"). n600 6 notches: label-box overlaps 7 -> 16 vs master (L9875 over N666, 29x14 px); n600 fit: 4 level-label boxes over a node dot.
+- Decays: re-verify before citing.
+
+## 2026-10-18, feat/label-form (head c2cbd03b2)
+
+- OBSERVED: Chromium 1920x1000, 1400x900, 390x844. Pass time (sum of long tasks per wheel notch, 3 reps): Net3 master 101 / beside 110 / form 168 / form without the one-line node trial 159 ms; n600 818 / 958 / 1617 / 1422 ms. Skipping the growth: time about -4%, values -37%.
+- OBSERVED: node labels worse than master and beside on Net3 at 9 notches (84 -> 79 labels, 177 -> 167 values, 12 lose their ID, e.g. N105 is just "P=51.27"); entirely the one-line node trial (skip it and node counts equal master exactly).
+- OBSERVED: a one-line node label struck through by a pipe ("N127, Qb=17.7, Z=56.00, P=44.52"); "L173 / Q=7963.3 / V=3.6" touches the rotated "Q=463.3"; at 390 px one-line node labels run off the right edge and under the legend.
+- OBSERVED: Net1 pipe 113 labelled at all 15 zooms (master 8/15, beside 11/15); pipe 11 Q=1234.2 hidden at notch 4 where beside showed it, and pipe 10's "Q=1866.2" sits under pipe 11 though its leader goes to pipe 10.
+- OBSERVED: 0 leader/leader crossings, 0 new leader-through-node; deterministic over 3 runs.
+- Decays: re-verify before citing.
+
+## 2026-10-20 feat/geojson-into-project (Task 814)
+- OBSERVED (real Chromium, probes p1/p2/p3 in scratchpad): Net3 export -> Peak -> edited GeoJSON -> "Peak, open now": receipt names Peak; elevation 147->154.5 as Peak override only; JNEW inactive in Base, active in Peak; one Undo restores doc (only nextId counters differ).
+- OBSERVED: .inp door unedited Net1 into Base-only: 0 changes; edited into scenario Alt: override only. Tank base 850->860 and pump blank->closed reported as real; closed<->open GeoJSON pump flips reported both ways.
+- OBSERVED: foreign GeoJSON asks destination FIRST, then mapping, then units refusal by name.
+- Gap: a .inp silent on a pump's status never reverts a Closed pump (nv undefined skipped); pre-existing.
+## 2026-10-20 Perry, feat/label-leader round 6 (88191ee39)
+OBSERVED (Chromium, own DOM counts, master e0ed97378 vs branch): Net3 6/9 notches and Novato fit/+3 identical to master (labels, values, leaders). Net1 SI/US wheel out: branch hides Pump Text at 8+ out (overprints Source), overlaps 5->2.
+OBSERVED: Tom's long leader reproduced by dropping a label above the map's top edge; identical on master. Not reproduced by 240 random wheel/pan/drag steps or r5 (bcebdfa58) wheel sweeps.
+OBSERVED: left-hung labels end-anchored (66 on Net3 at 9), leader ends touch words. LPN_COLUMN is two if-tests. Decays: re-verify.

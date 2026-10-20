@@ -95,48 +95,80 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-18 (twenty-sixth session, overnight and morning, Arizona time)
+## STATE — 2026-10-20 morning (thirtieth session, Arizona time)
 
-### Master: e202f28f2 pushed and green (batches 1-3). This branch's merge (roadmap closures, handoff) still needs its suite. Production: what he last pulled
+### Master: e0ed97378 (duration fire merged on his word) plus this handoff. Production: what he last pulled
 
-Batches pushed 2026-10-18: 555a8899a (PBV unit, GPV warm close, scenario receipts, roughness note,
-Task 815, plain privacy.php, consent_body "so we don't count you again" in English, his word calls),
-af91792e5 (full/empty tank closes its link natively; Change type reservoir -> tank 0/0/1; routing
-harness flake; fire-flow multiplier guard; label rules sync; port plan on master), e202f28f2 (label
-settings memo, identical drawing). consent_body's 26 translations owed (EC_CONSENT_VERSION stays 2).
-Merged on his word: feat/scenario-example, feat/scenario-results (Task 752 step 1), feat/native-pbv-gpv
-(EPANET 2.3.5 error 220 note still owed to Luke Butler), fix/settings-map-layout (Map and Page
-sections; deleted keys lpn_settings_sec_map, lpn_settings_map_display).
-His calls 2026-10-18: feat/theme Dark map "Good", Platinum beside Desktop "Good", brief Ida on a
-Designer theme when there is budget, try water towers for Prairie's map menu buttons. feat/label-form:
-he likes it, slower pass approved, notes in dev/label-placement-goals.md §2.3 on the branch; no merge
-word yet. Budget is tight (NPS review urgencies): slow down. Open from
-scenario-results: flow shown as magnitude only; fire flow across scenarios still a gap.
-Closed: Tasks 815, 800, 721. Task 737 marked WAIT: sprint.
+- `feat/duration-fire` merged (Task 578's duration fire); its port 8101 now holds feat/geojson-into-project.
+- Roadmap: Task 818 (MCP server) added at 75 on his yes; Task 749 records his licence stance ("Let's
+  stay right": samples and public docs only; his WaterGEMS used as an ordinary user would).
+- Mary's MCP landscape (four thin EPANET MCP servers exist; fire flow, criticality and the open-in-app
+  link look unoccupied, unverified) is in her journal and wish list row 0q.
+- Still owed: consent_body's 26 translations; MSX, EPS-analysis, Guide-page and duration-fire keys'
+  translations. Sprint only on his word, about weekly. Key hygiene: none deleted.
 
-- 2026-10-19: `feat/msx` merged on his word ("merge feat/msx"); Task 717 closed. Owed: his call on a
-  features-list line naming EPANET-MSX (public claim), and the MSX keys' translations at the next sprint.
+### Branches waiting on him (each full suite green 10-20; the load-only reds passed alone)
 
-### Ready for his typed merge word (all reviewed by Perry, green but for payload freshness)
-
-- `feat/theme` (8111): 13 themes; the map follows the theme; he loves Desktop and Prairie. His calls
-  pending: Dark's dark map reverses Task 714; whether a "Designer" theme (Ida, or a paid human) is wanted.
-- `feat/label-form` (8114) + `feat/label-beside` (8110): he likes label-form; round 2 running (Perry
-  found the one-line node trial hid node labels and IDs; fix: per-label no loss). His call after: the
-  pass is ~1.6 s per notch on n600 (master 0.8 s); keep the one-line node trial on large views?
-- `feat/sqlite-reader`: Task 749, never merges until done (his word).
-
-### Retired 2026-10-18
-
-`feat/sheet-sync` and the label bench (`feat/label-placer`, `-a`..`-d`, `feat/label-gang-search`):
-archived as tags `archive/<branch>` (read with `git show archive/feat/label-placer:<path>`),
-branches, worktrees and preview rows removed. Bench data stays in /home/haws/label-trials-work.
+- `feat/label-leader` (8103), bcc926448, round 6: his "Revert" of the always-a-leader rule done;
+  Net3/Novato equal to master (Perry's own counts). Kept: right-justified left-hung labels, one-line
+  node labels, a Text hidden only where it overprints another (Net1 "Pump" over "Source" at 7+ out).
+  The stacked-column prototype measured 1-3% more labels for 60-90% more pass time: removed. His
+  off-screen leader: Perry reproduced it by dropping a label above the map edge, same on master.
+- `fix/examples-guide` (8102), 77fced3fe: Scenario manager help back in production order, Basic mode
+  first, headings and list kept (R-419).
+- `feat/theme-tank` (8114), 89e313c5d: matte grey, no bottom shading, staggered vertical seams (R-420).
+  `feat/theme` (8111) unchanged; merge only one Prairie.
+- `feat/geojson-into-project` (8101), 400ab63ac, Task 814: GeoJSON network into the open project by
+  the .inp route's own code (one question, compare, receipt, undo). Perry: no blocker; "blank to
+  closed" in the receipt and the "Reading the file" heading are wording for him to see. Not built:
+  "a new scenario" as a destination (neither door has it).
+- `feat/native-eps` (no port; nothing visible), 63bb8fb1f, Task 733 slice 1: native EPS loop matching
+  EPANET 2.3.5 within 0.8 mm on 22 cases (Net3 without controls 0.77 mm, close to the bound). Plan
+  native-eps-plan.md on that branch. Capability: merges on his word.
+- `feat/sqlite-reader`: waits on the sample he can make in WaterGEMS (Base + a child changing one
+  diameter and one demand, an .inp per scenario). `feat/desktop`: untouched.
 
 ### Next job
 
-Merge on his word; port plan steps 2 and 5 after label-form; Task 816; Task 814's network-into-open-
-project import (his call 2); Task 752 steps 2-3 (demand import, ODS/CSV in); a fire-flow-across-
-scenarios table; Task 733 phase 3 (EPS) slow and careful.
+Merge on his word. Task 681 after label-leader settles. Task 733 slice 2 (controls) on feat/native-eps.
+Task 818 first step: Mary's row 0q (read the four servers' tool lists) before scoping.
+
+### Traps met 2026-10-20 (thirtieth session)
+
+- **The review queue declares its next free R-number.** Adding R-418..420 without advancing it failed
+  `review queue parses` and a full run was wasted. Advance the "Next free" line with every new row.
+- **`git merge --ff-only` of a chore branch put a plain commit on master** (hooks never fire on a
+  fast-forward). Always `--no-ff` into master.
+- **A new worktree has no `dev/browser-pass/node_modules`**: every browser harness then fails with
+  "Cannot find module playwright-core". Symlink it to the main checkout's when making a worktree.
+- **Four branch suites at once plus a Perry browser run** failed contour, label-drag-track,
+  setting-scope and settings-select-lag; all passed alone.
+
+### Traps met 2026-10-20 (twenty-ninth session)
+
+- **Editing the main checkout while its suite runs** dirties the tree and the run cannot stamp. Make
+  even one-line roadmap edits in a chore worktree.
+- **A subagent's harness compared the branch with its own layout, not master**, so it passed while
+  Net3 labels lost fields. Perry caught it in Chromium; label harnesses now compare with master.
+- **Deleting a roadmap block by line count removed a neighbour heading** (roadmap 146.09). Delete a
+  block by its ID, never by line numbers read before an earlier edit.
+
+### Traps met 2026-10-19 evening (twenty-eighth session)
+
+- **A Python one-liner truncated Sue's journal**: `open(p,'w').write(x+open(p).read())` opens for
+  writing (truncating) before the read. Caught by the diff stat (3,016 deletions), restored. Read first.
+- **A subagent that waits on its own background check_all re-sends its report on every wake.** Stop it
+  with TaskStop once its suite is detached (setsid) and watch the log yourself.
+- **An agent's "byte-identical before and after" was wrong**: help-menu, tool-keys and all-calcs-smoke
+  caught the in-app Guide refactor. Run the suite before believing a refactor claim.
+- **new-project-pan-harness.js failed once under load**, passed alone.
+
+### Traps met 2026-10-19 (twenty-seventh session)
+
+- **`example-open-guard-harness.js` prints four FAIL lines on purpose** (its mutation control) and passes.
+  Grep for `FAILED:`, not `FAIL`, in a harness log.
+- **`label-pass-economy-browser-harness.js` and `settings-select-lag-harness.js` fail under load only**
+  (a label hit box differing at the 8th decimal; lag timing). Both passed alone.
 
 ### Traps met 2026-10-18 (twenty-sixth session)
 
