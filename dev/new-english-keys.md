@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**163 still to read on master**, of 171 untranslated keys, of 3190 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**214 still to read on master**, of 222 untranslated keys, of 3241 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (171, 163 to read @@ NEEDS RULING)
+## lpn_  (222, 214 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -222,6 +222,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   @@ NEEDS RULING
 - **`lpn_file_import_msx_tip`**
   > Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.
+  @@ NEEDS RULING
+- **`lpn_file_import_wtg`**
+  > WaterCAD or WaterGEMS model…
+  @@ NEEDS RULING
+- **`lpn_file_import_wtg_tip`**
+  > Open a WaterCAD or WaterGEMS model as a new project. Choose its .wtg.sqlite file, and also the .wtg file beside it so that its units come too. The file is read and never changed. Its scenarios come with it; each scenario's differences from Base become that scenario's overrides. Beta: tried on few models so far.
   @@ NEEDS RULING
 - **`lpn_geojson_results_other`**
   > No results are included, because the results on screen belong to the scenario {scenario}.
@@ -544,38 +550,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_when_step`**
   > Reporting step
   @@ NEEDS RULING
-
----
-
-# Strings waiting on a branch
-
-**57 still to read**, of 61 new keys across 8 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### chore/merge-1020a (`e4373b805`) — adds no English strings
-
-### feat/desktop (`baba0f04d`) — adds no English strings
-
-### feat/duration-fire (`c221d72bf`) — already merged into chore/merge-1020a; its strings are listed there
-
-### feat/label-leader (`bcebdfa58`) — adds no English strings
-
-### feat/sqlite-reader (`75ed1031f`) — 51 new, 51 to read @@ NEEDS RULING
-
-- **`lpn_file_import_wtg`**
-  > WaterCAD or WaterGEMS model…
-  @@ NEEDS RULING
-- **`lpn_file_import_wtg_tip`**
-  > Open a WaterCAD or WaterGEMS model as a new project. Choose its .wtg.sqlite file, and also the .wtg file beside it so that its units come too. The file is read and never changed. Its scenarios come with it; each scenario's differences from Base become that scenario's overrides. Beta: tried on few models so far.
-  @@ NEEDS RULING
 - **`lpn_wtg_engine`**
   > The SQLite reader could not be loaded, so {file} could not be opened. Check the connection and try again.
   @@ NEEDS RULING
@@ -724,9 +698,51 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   @@ NEEDS RULING
 
+---
+
+# Strings waiting on a branch
+
+**10 still to read**, of 14 new keys across 10 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### chore/merge-1020c (`443aa95b0`) — adds no English strings
+
+### feat/desktop (`baba0f04d`) — adds no English strings
+
+### feat/geojson-into-project (`400ab63ac`) — 4 new, 4 to read @@ NEEDS RULING
+
+- **`lpn_gjup_h_notes`**
+  > Reading the file
+  @@ NEEDS RULING
+- **`lpn_gjup_lead`**
+  > A GeoJSON file holds one set of values and no scenarios. Choose where to put them.
+  @@ NEEDS RULING
+- **`lpn_gjup_title`**
+  > Update from GeoJSON file
+  @@ NEEDS RULING
+- **`lpn_inpup_i_custom`**
+  > custom properties
+  @@ NEEDS RULING
+
+### feat/label-leader (`bcc926448`) — adds no English strings
+
+### feat/label-margin (`bcc926448`) — already merged into feat/label-leader; its strings are listed there
+
+### feat/native-eps (`63bb8fb1f`) — already merged into chore/merge-1020c; its strings are listed there
+
+### feat/sqlite-reader (`03cdba2e7`) — adds no English strings
+
 ### feat/theme (`6221a4cae`) — already merged into feat/theme-tank; its strings are listed there
 
-### feat/theme-tank (`0055f8ed3`) — 10 new, 6 to read @@ NEEDS RULING
+### feat/theme-tank (`89e313c5d`) — 10 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_theme_amber`**
   > Amber
@@ -759,4 +775,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Space
   @@ NEEDS RULING
 
-### fix/examples-guide (`5de0786d7`) — adds no English strings
+### fix/examples-guide (`77fced3fe`) — adds no English strings
