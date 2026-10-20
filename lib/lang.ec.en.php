@@ -1043,7 +1043,7 @@ $ec_lang['lpn_guide_cmp_cols_def']='<table class="lpn-notes-table"><tbody><tr><t
 $ec_lang['lpn_guide_cmp_run_term']='Steady-state and extended-period scenarios';
 $ec_lang['lpn_guide_cmp_run_def']='<p>A scenario with a Total run time greater than 0 is run over the whole period through the EPANET engine. Its lowest pressure and highest velocity are the extremes over every time step, each shown with its time. A scenario with a Total run time of 0 is solved at one instant. The total run time is one of the options a scenario can override, so one table can hold both kinds.</p>';
 $ec_lang['lpn_guide_cmp_byasset_term']='Results by asset';
-$ec_lang['lpn_guide_cmp_byasset_def']='<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box.</p>';
+$ec_lang['lpn_guide_cmp_byasset_def']='<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver\'s internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.</p>';
 $ec_lang['lpn_guide_cmp_notes_term']='Points to note';
 $ec_lang['lpn_guide_cmp_notes_def']='<ul><li>A scenario that cannot be solved shows the reason in place of its two results, for example that a junction has no path to a source after a pipe is made inactive. The other scenarios are still solved. A scenario that did not converge shows its last results and a message.</li><li>The block above the table, The same in every scenario, states the friction method, units, accuracy, and maximum trials. A setting that differs between scenarios is left out of the block.</li><li>There is no pass or fail threshold. Read the numbers against the design criteria of the system being modeled.</li><li>The example given in the Scenario manager entry compares three scenarios on Net1.</li></ul>';
 // The Libraries chapter, in the entry for the Libraries box (Task 785), copied in by renderGuideBoxes() from
@@ -2265,7 +2265,7 @@ $ec_lang['lpn_dialog_ok']='OK';
 $ec_lang['lpn_file_import_menu']='Import…';
 $ec_lang['lpn_file_import_inp']='EPANET file…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.';
+$ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
 // File > Export is a submenu (Tom, 2026-10-06), so its rows drop the verb the heading carries. The
@@ -2419,6 +2419,63 @@ $ec_lang['lpn_import_notes_heading']='This project was read in from an EPANET fi
 // the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
 // that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='Opened {name} from a file, and added it to this browser as a new project.';
+// Update the open project from an EPANET file (Task 814). Placeholders in braces are filled by the page.
+// {file} is a file name.
+$ec_lang['lpn_inpup_ask_title']='Import {file}';
+$ec_lang['lpn_inpup_lead']='An EPANET file holds one set of values and no scenarios. Choose where to put them.';
+$ec_lang['lpn_inpup_how']='In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.';
+$ec_lang['lpn_inpup_base_note']='Base. A scenario that holds its own value for an asset keeps it; the others take the new value.';
+$ec_lang['lpn_inpup_btn_new']='A new project';
+// {project} is a project name; it labels a button.
+$ec_lang['lpn_inpup_btn_project']='This project, {project}';
+// {scenario} is a scenario name; it labels a button.
+$ec_lang['lpn_inpup_btn_scenario']='{scenario}, open now';
+$ec_lang['lpn_inpup_btn_base']='Base';
+$ec_lang['lpn_inpup_title']='Update from EPANET file';
+// {file} is a file name, {scenario} a scenario name and {project} a project name.
+$ec_lang['lpn_inpup_heading']='Imported {file} into {scenario} of {project}';
+$ec_lang['lpn_inpup_counts']='Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).';
+$ec_lang['lpn_inpup_undo']='Undo reverses all of it in one step.';
+$ec_lang['lpn_inpup_nothing']='Every value in the file that matches an asset here is already the same in {scenario}.';
+$ec_lang['lpn_inpup_status']='Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).';
+$ec_lang['lpn_inpup_h_changed']='Values changed';
+// {id} is an asset ID, {property} a property name, {old} and {new} are values.
+$ec_lang['lpn_inpup_row']='{id}, {property}: {old} to {new}';
+$ec_lang['lpn_inpup_more']='{n} more';
+$ec_lang['lpn_inpup_blank']='blank';
+$ec_lang['lpn_inpup_h_added']='Assets added';
+$ec_lang['lpn_inpup_h_kept']='Kept, not in the file';
+$ec_lang['lpn_inpup_h_na']='Not applied';
+$ec_lang['lpn_inpup_na_general']='The file also holds {items}. They were not applied.';
+$ec_lang['lpn_inpup_na_type']='The file states a different type for these assets, so none of their values were changed: {ids}';
+$ec_lang['lpn_inpup_na_owned']='The pipe type states some values of these pipes, so those values were not changed: {ids}';
+$ec_lang['lpn_inpup_na_roughness']='Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.';
+$ec_lang['lpn_inpup_na_geo']='Assets only in the file ({n}) were not added, because the file and this project use different coordinate systems.';
+$ec_lang['lpn_inpup_na_refs']='These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}';
+$ec_lang['lpn_inpup_na_msx']='The .msx file chosen with this file was not read. To attach it to this project, choose it alone.';
+$ec_lang['lpn_inpup_refused_heading']='Nothing was changed in {project}.';
+$ec_lang['lpn_inpup_refused_lead']='The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.';
+$ec_lang['lpn_inpup_unit_row']='{family}: the file uses {file} and this project uses {project}.';
+$ec_lang['lpn_inpup_method_row']='Head loss formula: the file uses {file} and this project uses {project}.';
+// {project} is a project name and {reason} the system's own error text. In t_*, the kind of asset that prefixes an ID in the receipt lists, as in 'Pipe 31'.
+$ec_lang['lpn_inpup_refused_lead_formula']='The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.';
+$ec_lang['lpn_inpup_refused_lead_both']='The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.';
+$ec_lang['lpn_inpup_na_cv']='A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}';
+$ec_lang['lpn_inpup_failed']='The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}';
+$ec_lang['lpn_inpup_i_positions']='positions of existing assets';
+$ec_lang['lpn_inpup_i_connections']='connections';
+$ec_lang['lpn_inpup_i_descriptions']='descriptions';
+$ec_lang['lpn_inpup_i_patterns']='patterns';
+$ec_lang['lpn_inpup_i_curves']='curves';
+$ec_lang['lpn_inpup_i_controls']='controls';
+$ec_lang['lpn_inpup_i_rules']='rules';
+$ec_lang['lpn_inpup_i_options']='options';
+$ec_lang['lpn_inpup_t_junction']='Junction';
+$ec_lang['lpn_inpup_t_reservoir']='Reservoir';
+$ec_lang['lpn_inpup_t_tank']='Tank';
+$ec_lang['lpn_inpup_t_pipe']='Pipe';
+$ec_lang['lpn_inpup_t_pump']='Pump';
+$ec_lang['lpn_inpup_t_valve']='Valve';
 // Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
 // API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
 // browser they test in. That is expected, not a bug.
@@ -4119,6 +4176,7 @@ $ec_lang['lpn_scnres_steady']='(steady state)';
 $ec_lang['lpn_scnres_not_converged']='(not converged)';
 $ec_lang['lpn_scnres_not_converged_note']='A column marked {mark} shows the last results the solver reached before it stopped without converging.';
 $ec_lang['lpn_scnres_failed']='{scenario} could not be solved, so its columns are blank. {why}';
+$ec_lang['lpn_scnres_flow_tip']='The sign of a flow is the solver\'s internal direction sign: positive runs from the From node to the To node, negative the reverse. It has no use outside this table except to show whether a flow changed direction between scenarios.';
 $ec_lang['lpn_scnres_stale']='Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.';
 $ec_lang['lpn_energy_over']='For extended period simulation of {time}';
 $ec_lang['lpn_energy_col_pump']='Pump';

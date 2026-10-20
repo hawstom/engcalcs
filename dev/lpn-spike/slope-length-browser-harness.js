@@ -295,6 +295,9 @@ async function main() {
 			'[OPTIONS]', 'Units GPM', 'Headloss H-W', '', '[END]', ''].join('\n');
 		const [chooser] = await Promise.all([page.waitForEvent('filechooser'), a.menuClickSub(await S('lpn_file_import_menu'), await S('lpn_file_import_inp'))]);
 		await chooser.setFiles({ name: 'slope.inp', mimeType: 'text/plain', buffer: Buffer.from(inp, 'utf8') });
+		await a.settle(600);
+		// The project has assets, so the file is asked where it goes (Task 814): a new project.
+		await page.click('#lpn_dialog_buttons button');
 		await a.settle(1500);
 		await page.keyboard.press('Escape');
 		await a.settle(600);
