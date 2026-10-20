@@ -98,7 +98,7 @@ sort($pages);
 // chapter list is the one the page reads, so a new chapter enters the sitemap with no second edit.
 $pageSuffixes = [
     'User-Manual.php' => array_merge([''], array_map(function ($slug) { return '&chapter=' . $slug; },
-        array_keys(ecGuideChapters()))),
+        array_keys(ecGuidePageChapters()))),
 ];
 if ($notPages) {
     fwrite(STDERR, "NOT A PAGE, so kept out of the sitemap (no echoHeader() call): "

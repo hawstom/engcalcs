@@ -30,10 +30,10 @@ function ecGuideChapters() {
     return array(
         'using' => array('title' => 'lpn_guide_using_heading', 'intro' => array(), 'terms' => array('lpn_guide_keys', 'lpn_guide_use')),
         'map' => array('title' => 'lpn_hotkeys_map_heading', 'intro' => array(), 'terms' => array('lpn_hotkeys_map', 'lpn_guide_map_undo', 'lpn_guide_map_del', 'lpn_guide_map_esc', 'lpn_guide_map_letters')),
-        'snip' => array('title' => 'lpn_hotkeys_snip_heading', 'intro' => array(), 'terms' => array('lpn_hotkeys_snip')),
+        'snip' => array('page' => false, 'title' => 'lpn_hotkeys_snip_heading', 'intro' => array(), 'terms' => array('lpn_hotkeys_snip')),
         'tables' => array('title' => 'lpn_hotkeys_tables_heading', 'intro' => array(), 'terms' => array('lpn_notes_6', 'lpn_notes_7', 'lpn_guide_tbl_tabs', 'lpn_guide_tbl_cell', 'lpn_guide_tbl_fill')),
         'about' => array('title' => 'lpn_guide_about_heading', 'intro' => array(), 'terms' => array('lpn_notes_1', 'lpn_notes_2')),
-        'notes' => array('title' => 'lpn_help_notes', 'intro' => array(), 'terms' => array('lpn_notes_3', 'lpn_notes_5', 'lpn_notes_color', 'lpn_notes_engine', 'lpn_guide_nt_example')),
+        'notes' => array('page' => false, 'title' => 'lpn_help_notes', 'intro' => array(), 'terms' => array('lpn_notes_3', 'lpn_notes_5', 'lpn_notes_color', 'lpn_notes_engine', 'lpn_guide_nt_example')),
         'find' => array('title' => 'lpn_find_title', 'intro' => array('lpn_guide_text_find_popup'), 'terms' => array('lpn_guide_find_query', 'lpn_guide_find_examples', 'lpn_guide_find_results', 'lpn_guide_find_replace', 'lpn_guide_find_notes')),
         'scenarios' => array('title' => 'lpn_sm_title', 'intro' => array('lpn_sm_help'), 'terms' => array('lpn_guide_scn_use', 'lpn_guide_scn_open', 'lpn_guide_scn_marks', 'lpn_guide_scn_make', 'lpn_guide_scn_scope', 'lpn_guide_scn_example', 'lpn_guide_scn_notes')),
         'libraries' => array('title' => 'lpn_library_menu', 'intro' => array('lpn_guide_text_library_box'), 'terms' => array('lpn_guide_lib_kinds', 'lpn_guide_lib_refs', 'lpn_guide_lib_scn', 'lpn_guide_lib_ctl', 'lpn_guide_lib_import', 'lpn_guide_lib_example', 'lpn_guide_lib_notes')),
@@ -47,15 +47,27 @@ function ecGuideChapters() {
         'run-report' => array('title' => 'lpn_time_run_report', 'intro' => array('lpn_guide_text_rptbox'), 'terms' => array('lpn_guide_rr_what', 'lpn_guide_rr_example')),
         'status-changes' => array('title' => 'lpn_status_title', 'intro' => array('lpn_guide_text_status_box'), 'terms' => array('lpn_guide_st_what', 'lpn_guide_st_example')),
         'full-report' => array('title' => 'lpn_full_title', 'intro' => array('lpn_guide_text_full_box'), 'terms' => array('lpn_guide_fr_what', 'lpn_guide_fr_example')),
-        'user-manual' => array('title' => 'lpn_help_manual', 'intro' => array('lpn_guide_text_hotkeys_popup'), 'terms' => array('lpn_guide_own_example')),
+        'user-manual' => array('page' => false, 'title' => 'lpn_help_manual', 'intro' => array('lpn_guide_text_hotkeys_popup'), 'terms' => array('lpn_guide_own_example')),
         'calibration' => array('title' => 'lpn_calib_title', 'intro' => array('lpn_guide_text_calib_box'), 'terms' => array('lpn_guide_cal_what', 'lpn_guide_cal_file', 'lpn_guide_cal_example')),
         'scenario-comparison' => array('title' => 'lpn_scncmp_title', 'intro' => array('lpn_guide_text_scncmp_box'), 'terms' => array('lpn_guide_cmp_cols', 'lpn_guide_cmp_run', 'lpn_guide_cmp_byasset', 'lpn_guide_cmp_notes')),
     );
 }
 
-/** True when $slug is a chapter. The only test a request value goes through. */
+/**
+ * The chapters that get a page of their own. A chapter marked 'page' => false is drawn in the
+ * application's Guide and has no page: its words make no sense alone (Screenshot is a table of
+ * two keys, Notes on this page is about the page it sits on, and the User manual chapter is the
+ * index's own title).
+ *
+ * @return array<string,array>
+ */
+function ecGuidePageChapters() {
+    return array_filter(ecGuideChapters(), function ($c) { return !isset($c['page']) || $c['page']; });
+}
+
+/** True when $slug has a page. The only test a request value goes through. */
 function ecGuideIsChapter($slug) {
-    $c = ecGuideChapters();
+    $c = ecGuidePageChapters();
     return is_string($slug) && isset($c[$slug]);
 }
 
@@ -114,34 +126,39 @@ function ecGuideDl($slug) {
 }
 
 /**
- * The text of a chapter with its markup removed, for a meta description: the opening paragraph(s) if
- * the chapter has any, otherwise the first definition. Cut at a word, to at most $max characters.
+ * A meta description for a chapter: whole sentences only, never cut, about $max characters.
+ *
+ * The sentences come from the chapter's opening paragraphs (a paragraph that ends in a colon only
+ * introduces a list and is skipped, as is a bullet), or from the first definition when it has none.
+ * Sentences are added while they fit; the first is used whole even when it is longer than $max.
  *
  * @param string $slug
- * @param int    $max
+ * @param int    $max  budget for the sentences (the caller adds its own prefix).
  * @return string
  */
-function ecGuideSummary($slug, $max = 155) {
+function ecGuideSummary($slug, $max = 130) {
     global $ec_lang;
     $c = ecGuideChapters();
     if (!isset($c[$slug])) { return ''; }
-    $intro = ecGuideIntro($slug);
-    if ($intro) {
-        // A short opening line ("How scenarios work:") says little alone, so paragraphs are added
-        // until there is enough to be a description.
-        $text = '';
-        foreach ($intro as $para) {
-            $text .= ($text === '' ? '' : ' ') . $para;
-            if (mb_strlen($text, 'UTF-8') >= 90) { break; }
-        }
-    } else {
-        $stem = $c[$slug]['terms'][0];
-        $text = $ec_lang[$stem . '_term'] . '. ' . $ec_lang[$stem . '_def'];
+    $paras = array();
+    foreach (ecGuideIntro($slug) as $p) {
+        if (preg_match('/[:：]$/u', $p) || $p[0] === '-') { continue; }
+        $paras[] = $p;
     }
-    $text = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags($text), ENT_QUOTES, 'UTF-8')));
-    if (mb_strlen($text, 'UTF-8') <= $max) { return $text; }
-    $cut = mb_substr($text, 0, $max, 'UTF-8');
-    $sp = mb_strrpos($cut, ' ', 0, 'UTF-8');
-    if ($sp !== false && $sp > $max / 2) { $cut = mb_substr($cut, 0, $sp, 'UTF-8'); }
-    return rtrim($cut, " ,;:.-") . '…';
+    if (!$paras) {
+        $stem = $c[$slug]['terms'][0];
+        $paras[] = $ec_lang[$stem . '_def'];
+    }
+    $out = '';
+    foreach ($paras as $p) {
+        $p = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags(preg_replace('~</(td|tr|p|li)>~', '. ', $p)), ENT_QUOTES, 'UTF-8')));
+        foreach (preg_split('/(?<=[.!?。！？])\s+/u', $p) as $sentence) {
+            $sentence = trim($sentence);
+            if ($sentence === '' || $sentence === '.') { continue; }
+            $try = $out === '' ? $sentence : $out . ' ' . $sentence;
+            if ($out !== '' && mb_strlen($try, 'UTF-8') > $max) { return $out; }
+            $out = $try;
+        }
+    }
+    return $out;
 }

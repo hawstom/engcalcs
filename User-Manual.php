@@ -17,7 +17,7 @@
  */
 require_once('lib/base.inc.php');
 
-$ec_chapters = ecGuideChapters();
+$ec_chapters = ecGuidePageChapters();
 $ec_slug = isset($_GET['chapter']) && is_string($_GET['chapter']) ? $_GET['chapter'] : '';
 $ec_known = ecGuideIsChapter($ec_slug);
 if ($ec_slug !== '' && !$ec_known) { http_response_code(404); }
@@ -28,10 +28,10 @@ if ($ec_known) {
 	$ec_page_query = 'chapter=' . $ec_slug;
 	$ec_heading = $ec_lang[$ec_chapters[$ec_slug]['title']];
 	$html_title = $ec_heading . ' - ' . $ec_manual . ' - ' . $ec_brand;
-	$html_desc = ecGuideSummary($ec_slug);
+	$html_desc = $ec_brand . ' - ' . $ec_manual . '. ' . ecGuideSummary($ec_slug);
 } else {
 	$html_title = $ec_manual . ' - ' . $ec_brand;
-	$html_desc = $ec_lang['lpn_guide_page_desc'];
+	$html_desc = str_replace('{name}', $ec_brand, $ec_lang['lpn_guide_page_desc']);
 }
 echoHeader("EngCalcsApp", $html_title, "", false);
 
@@ -49,6 +49,10 @@ $ec_chapter_href = function ($slug, $lang) {
 <?php endif; ?>
 </nav>
 <main>
+<p class="ec-guide-what"><?=htmlspecialchars(str_replace('{name}', $ec_brand, $ec_lang['lpn_guide_page_what']))?></p>
+<?php if ($ec_slug !== '' && !$ec_known) : ?>
+<p><?=htmlspecialchars($ec_lang['lpn_guide_page_missing'])?></p>
+<?php endif; ?>
 <?php if ($ec_known) : ?>
 <h1><?=$ec_heading?></h1>
 <?php foreach (ecGuideIntro($ec_slug) as $ec_para) : ?>
@@ -57,7 +61,7 @@ $ec_chapter_href = function ($slug, $lang) {
 <?=ecGuideDl($ec_slug)?>
 <?php else : ?>
 <h1><?=htmlspecialchars($ec_manual)?></h1>
-<p><?=htmlspecialchars($ec_lang['lpn_guide_page_desc'])?></p>
+<p><?=htmlspecialchars(str_replace('{name}', $ec_brand, $ec_lang['lpn_guide_page_desc']))?></p>
 <?php endif; ?>
 </main>
 <nav class="ec-guide-chapters" aria-label="<?=htmlspecialchars($ec_lang['lpn_guide_contents'])?>">

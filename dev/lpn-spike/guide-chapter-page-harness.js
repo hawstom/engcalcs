@@ -49,7 +49,7 @@ const norm = (html) => String(html).replace(/\s+/g, '');
 function chapters(lang) {
 	const script = "$_SERVER['SCRIPT_NAME']='x';require 'lib/Canonical.lib.php';require 'lib/GuideChapters.lib.php';" +
 		"require 'lib/lang.ec.en.php';" + (lang === 'en' ? '' : "require 'lib/lang.ec." + lang + ".php';") +
-		"$o=array();foreach(ecGuideChapters() as $s=>$c){$o[$s]=array('title'=>$ec_lang[$c['title']],'intro'=>ecGuideIntro($s)," +
+		"$o=array();foreach(ecGuidePageChapters() as $s=>$c){$o[$s]=array('title'=>$ec_lang[$c['title']],'intro'=>ecGuideIntro($s)," +
 		"'dl'=>ecGuideDl($s),'terms'=>array_map(function($t) use($ec_lang){return array($ec_lang[$t.'_term'],$ec_lang[$t.'_def']);},$c['terms']));}" +
 		"echo json_encode(array('chapters'=>$o,'manual'=>$ec_lang['lpn_help_manual'],'open'=>$ec_lang['lpn_guide_page_open']));";
 	return JSON.parse(php(['-r', script]));
@@ -57,7 +57,7 @@ function chapters(lang) {
 
 const EN = chapters('en'), ES = chapters('es');
 const slugs = Object.keys(EN.chapters);
-ok('the Guide has chapters to give an address to (' + slugs.length + ')', slugs.length >= 20);
+ok('the Guide has chapters to give an address to (' + slugs.length + ')', slugs.length >= 19);
 
 [['en', EN], ['es', ES]].forEach(([lang, L]) => {
 	const slug = 'scenarios', ch = L.chapters[slug];
@@ -88,7 +88,12 @@ ok('the Guide has chapters to give an address to (' + slugs.length + ')', slugs.
 		alts.every((a) => /href="https:\/\/epanet-plus-plus\.org\/engcalcs\/User-Manual\.php\?lang=[a-z]{2}&amp;chapter=scenarios"$/.test(a)));
 	ok(lang + ': x-default is the English chapter', html.indexOf('hreflang="x-default" href="https://epanet-plus-plus.org/engcalcs/User-Manual.php?lang=en&amp;chapter=scenarios"') > 0);
 	const desc = (html.match(/<meta name="Description" content="([^"]*)"/) || [])[1] || '';
-	ok(lang + ': the meta description is the chapter\'s opening, not the title', desc.length > 60 && desc.length <= 170 && plain(desc).indexOf(plain(ch.intro[0]).slice(0, 25)) === 0, desc);
+	const dplain = plain(desc);
+	ok(lang + ': the meta description names the product and the manual, then whole sentences from the chapter',
+		dplain.indexOf('EPANET++ - ' + plain(L.manual) + '. ') === 0 && /[.!?]$/.test(dplain) && dplain.indexOf(':') < 0 &&
+		plain(ch.intro.join(' ')).indexOf(dplain.slice(dplain.indexOf('. ') + 2).split(/(?<=[.!?]) /)[0]) >= 0, desc);
+	ok(lang + ': the meta description is short enough to show (' + dplain.length + ')', dplain.length <= 200);
+	ok(lang + ': the page says what the product is, above the chapter', html.indexOf('class="ec-guide-what">EPANET++ ') > 0 && html.indexOf('ec-guide-what') < html.indexOf('<h1>'));
 	ok(lang + ': a link opens the application, in this language', html.indexOf('href="https://epanet-plus-plus.org/app/?lang=' + lang + '">' + L.open) > 0);
 	ok(lang + ': the other chapters are linked', slugs.every((s) => s === slug || html.indexOf('chapter=' + s + '"') > 0));
 	ok(lang + ': the language links keep the chapter', (html.match(/<a href="\/engcalcs\/User-Manual\.php\?lang=[a-z]{2}&amp;chapter=scenarios" lang=/g) || []).length === 27);
@@ -114,6 +119,10 @@ const idx = render('User-Manual.php', 'es');
 ok('the index lists every chapter', slugs.every((s) => idx.indexOf('chapter=' + s + '"') > 0));
 ok('the index canonical is the bare page in the language', idx.indexOf('<link rel="canonical" href="https://epanet-plus-plus.org/engcalcs/User-Manual.php?lang=es" />') > 0);
 ok('the index carries no chapter text', slugs.every((s) => plain(idx).indexOf(plain(ES.chapters[s].terms[0][1]).slice(0, 60)) < 0));
+['snip', 'notes', 'user-manual', 'nonsense'].forEach((x) => {
+	const u = render('User-Manual.php', 'en', 'chapter=' + x);
+	ok('chapter ' + x + ' has no page: it shows the index and a not-found line', !slugs.includes(x) && u.indexOf('There is no such chapter') > 0 && u.indexOf('<link rel="canonical" href="https://epanet-plus-plus.org/engcalcs/User-Manual.php?lang=en" />') > 0);
+});
 const unk = render('User-Manual.php', 'en', 'chapter=nonsense');
 ok('an unknown chapter renders the index and does not echo the request', unk.indexOf('nonsense') < 0 && unk.indexOf('<link rel="canonical" href="https://epanet-plus-plus.org/engcalcs/User-Manual.php?lang=en" />') > 0);
 const ar = render('User-Manual.php', 'ar', 'chapter=map');
