@@ -51,7 +51,7 @@ function chapters(lang) {
 		"require 'lib/lang.ec.en.php';" + (lang === 'en' ? '' : "require 'lib/lang.ec." + lang + ".php';") +
 		"$o=array();foreach(ecGuidePageChapters() as $s=>$c){$o[$s]=array('title'=>$ec_lang[$c['title']],'intro'=>ecGuideIntro($s)," +
 		"'dl'=>ecGuideDl($s),'terms'=>array_map(function($t) use($ec_lang){return array($ec_lang[$t.'_term'],$ec_lang[$t.'_def']);},$c['terms']));}" +
-		"echo json_encode(array('chapters'=>$o,'manual'=>$ec_lang['lpn_help_manual'],'open'=>$ec_lang['lpn_guide_page_open']));";
+		"echo json_encode(array('chapters'=>$o,'manual'=>$ec_lang['lpn_help_manual'],'open'=>$ec_lang['lpn_guide_page_open'],'missing'=>$ec_lang['lpn_guide_page_missing']));";
 	return JSON.parse(php(['-r', script]));
 }
 
@@ -121,7 +121,7 @@ ok('the index canonical is the bare page in the language', idx.indexOf('<link re
 ok('the index carries no chapter text', slugs.every((s) => plain(idx).indexOf(plain(ES.chapters[s].terms[0][1]).slice(0, 60)) < 0));
 ['snip', 'notes', 'user-manual', 'nonsense'].forEach((x) => {
 	const u = render('User-Manual.php', 'en', 'chapter=' + x);
-	ok('chapter ' + x + ' has no page: it shows the index and a not-found line', !slugs.includes(x) && u.indexOf('There is no such chapter') > 0 && u.indexOf('<link rel="canonical" href="https://epanet-plus-plus.org/engcalcs/User-Manual.php?lang=en" />') > 0);
+	ok('chapter ' + x + ' has no page: it shows the index and a not-found line', !slugs.includes(x) && u.indexOf(EN.missing) > 0 && u.indexOf('<link rel="canonical" href="https://epanet-plus-plus.org/engcalcs/User-Manual.php?lang=en" />') > 0);
 });
 const unk = render('User-Manual.php', 'en', 'chapter=nonsense');
 ok('an unknown chapter renders the index and does not echo the request', unk.indexOf('nonsense') < 0 && unk.indexOf('<link rel="canonical" href="https://epanet-plus-plus.org/engcalcs/User-Manual.php?lang=en" />') > 0);
