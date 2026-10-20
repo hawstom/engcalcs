@@ -95,43 +95,52 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-20 morning (thirtieth session, Arizona time)
+## STATE — 2026-10-20 afternoon (thirty-first session, Arizona time)
 
-### Master: e0ed97378 (duration fire merged on his word) plus this handoff. Production: what he last pulled
+### Master: 6733e4e0a (theme, native EPS slice 1, examples guide, on his word) plus fix/key-reuse and this handoff. Production: what he last pulled
 
-- `feat/duration-fire` merged (Task 578's duration fire); its port 8101 now holds feat/geojson-into-project.
-- Roadmap: Task 818 (MCP server) added at 75 on his yes; Task 749 records his licence stance ("Let's
-  stay right": samples and public docs only; his WaterGEMS used as an ordinary user would).
-- Mary's MCP landscape (four thin EPANET MCP servers exist; fire flow, criticality and the open-in-app
-  link look unoccupied, unverified) is in her journal and wish list row 0q.
-- Still owed: consent_body's 26 translations; MSX, EPS-analysis, Guide-page and duration-fire keys'
-  translations. Sprint only on his word, about weekly. Key hygiene: none deleted.
+- Merged on his word: `feat/theme` (Prairie with clouds), `feat/native-eps` slice 1, `fix/examples-guide`.
+  `feat/theme-tank` discarded on his word ("it looked like a prison"), archived as tag `archive/feat-theme-tank`.
+- `lpn_theme` now stores one of twelve theme names, not only light/dark (same key, same exemption; told him).
+- His 220 key marks harvested; his rewrite of `lpn_scnres_flow_tip` applied. The Guide's
+  `lpn_guide_cmp_byasset_def` carries a parallel sentence he has not edited; asked, not changed.
+- `fix/key-reuse` (defect track, merged on green): 14 untranslated duplicate keys deleted, each use
+  pointed at the incumbent (list in the commit and his report). Left: translated pairs such as
+  `lpn_file_import_inp` / `lpn_file_export_item_inp` ("EPANET file…"), which would need re-keying.
+- Still owed: consent_body's 26 translations; MSX, EPS-analysis, Guide-page, duration-fire and the
+  rest of the 167 untranslated keys. Sprint only on his word, about weekly.
 
-### Branches waiting on him (each full suite green 10-20; the load-only reds passed alone)
+### Branches waiting on him (pushed; quick checks and node harnesses green; no full suite yet)
 
-- `feat/label-leader` (8103), bcc926448, round 6: his "Revert" of the always-a-leader rule done;
-  Net3/Novato equal to master (Perry's own counts). Kept: right-justified left-hung labels, one-line
-  node labels, a Text hidden only where it overprints another (Net1 "Pump" over "Source" at 7+ out).
-  The stacked-column prototype measured 1-3% more labels for 60-90% more pass time: removed. His
-  off-screen leader: Perry reproduced it by dropping a label above the map edge, same on master.
-- `fix/examples-guide` (8102), 77fced3fe: Scenario manager help back in production order, Basic mode
-  first, headings and list kept (R-419).
-- `feat/theme-tank` (8114), 89e313c5d: matte grey, no bottom shading, staggered vertical seams (R-420).
-  `feat/theme` (8111) unchanged; merge only one Prairie.
-- `feat/geojson-into-project` (8101), 400ab63ac, Task 814: GeoJSON network into the open project by
-  the .inp route's own code (one question, compare, receipt, undo). Perry: no blocker; "blank to
-  closed" in the receipt and the "Reading the file" heading are wording for him to see. Not built:
-  "a new scenario" as a destination (neither door has it).
-- `feat/native-eps` (no port; nothing visible), 63bb8fb1f, Task 733 slice 1: native EPS loop matching
-  EPANET 2.3.5 within 0.8 mm on 22 cases (Net3 without controls 0.77 mm, close to the bound). Plan
-  native-eps-plan.md on that branch. Capability: merges on his word.
-- `feat/sqlite-reader`: waits on the sample he can make in WaterGEMS (Base + a child changing one
-  diameter and one demand, an .inp per scenario). `feat/desktop`: untouched.
+- `feat/label-leader` (8103), bcc926448: he "might be willing to merge"; asked for his typed word.
+- `feat/label-margin` (8105), a4e28f48c, built on label-leader: boundary labeling (Bekos et al. 2007)
+  as a last stage; dropped labels go to the nearest open stretch on non-crossing leaders. Net1 at his
+  view 24 labels vs 21 (none hidden), Net3 141 vs 123, Novato 133 vs 115, 0 crossings, ~5% time.
+  Unlike his hand Net1: pipe labels go out short (Q only), some land inside loops, leaders any angle
+  up to 200 px, ragged columns. Perry reviewing at handoff time.
+- `feat/flow-arrow` (8102), 5ebd338e2: double chevron, two unfilled closed heads (his /tmp/arrow.png).
+- `feat/geojson-into-project` (8101), cad86297c, Task 814: his two-paragraph wording in, verbatim.
+  Ready on his word. The .inp twin `lpn_inpup_lead` still one line; asked whether to match.
+- `feat/sqlite-reader` (8104), 5e33ab69b, Task 749: his WaterGEMS sample reads; Base and TGH-1 match
+  WaterGEMS's .inp exports and solve to EPANET's numbers (Perry, real Chromium). Wording for him in
+  Perry's journal entry of 10-20. 6.1 MB fixture in dev/lpn-spike/fixtures/wtg/: asked him.
+- `feat/native-eps` (no port), 1b06b7275, Task 733 slice 2: simple controls; Net3 with controls
+  within 0.14 mm head. Nothing on the page calls the native loop yet. Next: rules (own slice).
+- `feat/desktop`: untouched.
 
 ### Next job
 
-Merge on his word. Task 681 after label-leader settles. Task 733 slice 2 (controls) on feat/native-eps.
-Task 818 first step: Mary's row 0q (read the four servers' tool lists) before scoping.
+Merge on his word. Task 818 first slice per Mary (fire_flow tool + open-in-app link) when he says go.
+Task 681 after label-leader/label-margin settle. Task 733 rules slice.
+
+### Traps met 2026-10-20 (thirty-first session)
+
+- **A merge into a worktree with Tom's uncommitted file in it refuses silently** when piped to
+  `tail`. Merge first, copy his edited file in after.
+- **An outward-looking agent wrote its journal in the main checkout** while nothing was running;
+  brief every agent to write journals to the scratchpad, always.
+- **`git -c user.name=$VAR` with spaces in the variable breaks**; set `GIT_AUTHOR_NAME` /
+  `GIT_COMMITTER_NAME` in the environment instead.
 
 ### Traps met 2026-10-20 (thirtieth session)
 
