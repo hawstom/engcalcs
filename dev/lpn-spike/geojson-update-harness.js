@@ -85,7 +85,7 @@ console.log('\n--- Base only: the question, then update the open project ---');
 	const names = dialogButtons();
 	ok('one small question, the same as for an EPANET file: new project, this project, Cancel',
 		names.length === 3 && names[0] === PC.lpn_inpup_btn_new && names[2] === PC.lpn_cancel, JSON.stringify(names));
-	ok('its lead names a GeoJSON file', dialogText().indexOf('A GeoJSON file holds one set of values') >= 0);
+	ok('its lead names a GeoJSON file', dialogText().indexOf(PC.lpn_gjup_lead.split(/\\n\\n|\n\n/)[0]) >= 0);
 	{
 		const paras = PC.lpn_gjup_lead.split(/\\n\\n|\n\n/), dt = dialogText();
 		ok('the lead is two paragraphs, the second stating the rule', paras.length === 2 && paras[1].length > 0 && paras[1] !== paras[0]);
