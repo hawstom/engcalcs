@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 168 untranslated keys, of 3187 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**1 still to read on master**, of 168 untranslated keys, of 3187 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (168, all ruled)
+## lpn_  (168, 1 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -224,8 +224,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
   _Ruled OK 2026-10-20._
 - **`lpn_guide_cmp_byasset_def`**
-  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver's internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.</p>
-  _Ruled OK 2026-10-20._
+  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.</p>
+  @@ NEEDS RULING
 - **`lpn_guide_ff_dur_def`**
   > <p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.</p>
   _Ruled OK 2026-10-20._
@@ -540,7 +540,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**5 still to read**, of 55 new keys across 7 unmerged branch(es).
+**4 still to read**, of 54 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -553,9 +553,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/flow-arrow (`5ebd338e2`) — adds no English strings
+### feat/flow-arrow (`ba35f09bf`) — adds no English strings
 
-### feat/geojson-into-project (`cad86297c`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/geojson-into-project (`7cc47d9a2`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_gjup_h_notes`**
   > Reading the file
@@ -566,15 +566,8 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_gjup_title`**
   > Update from GeoJSON file
   @@ NEEDS RULING
-- **`lpn_inpup_i_custom`**
-  > custom properties
-  @@ NEEDS RULING
-
-### feat/label-leader (`bcc926448`) — already merged into feat/label-margin; its strings are listed there
 
 ### feat/label-margin (`8691fa30e`) — adds no English strings
-
-### feat/native-eps (`1b06b7275`) — adds no English strings
 
 ### feat/sqlite-reader (`5e33ab69b`) — 51 new, 1 to read @@ NEEDS RULING
 
