@@ -24,9 +24,13 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
    uses EPANET as it does today. Test: `native-eps-harness.js` (constructed networks that fill to
    and empty to a limit, report step shorter than the hydraulic step, pattern step and start, report
    start, demand categories; Net2; Net1 and Net3 with controls stripped for both engines).
-2. **Simple controls** (`[CONTROLS]`: timer, clock time, tank level, node pressure; link status and
-   setting actions; `controltimestep()`). Test: Net1 and Net3 with their own controls, against
-   `reference/Net3.rpt` and EPANET at every step; a control that fires inside a step.
+2. **Simple controls (built).** `[CONTROLS]`: AT TIME, AT CLOCKTIME, tank level, junction pressure;
+   OPEN/CLOSED and numeric settings on pipes, pumps (speed) and every valve; `controls()`,
+   `controltimestep()`, `pswitch()`. Refused by name: a control conditioned on a reservoir, a
+   junction-pressure control on a valve, a numeric setting EPANET rejects (GPV, negative).
+   Tests: `native-eps-harness.js` (Net1 and Net3 with their controls; 15 constructed cases, one
+   per control kind, crossings inside a step, a tie) and `native-eps-examples-harness.js` (the
+   five gallery examples with controls, through the page's own `assembleModel()`).
 3. **Pump speed patterns and pump status** (`demands()` applies a pump's pattern each period).
    Test: `pattern-attach.inp`, Net3 with a speed pattern added.
 4. **`[RULES]`** (`ruletimestep()`, rule step). Test: the Net1 rules examples
@@ -50,6 +54,18 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
   level just under the limit when EPANET calls the tank not full. Measured, not assumed.
 - A stripped-controls Net1 or Net3 is a harder tank test than the controlled day (pumps never stop,
   tanks run to a limit), so slice 2 adds the controls back rather than replacing this test.
+
+## What slice 2 learned
+
+- A link a full tank shut (EPANET's TEMPCLOSED) STARTS THE NEXT SOLVE SHUT. That decides a
+  junction-pressure control: a timer shutting the only other supply leaves the junction cut off at
+  the first trial, its head collapses, and `pswitch()` re-opens the pipe in the same solve. EPANET's
+  frames show it never shut. `lpnSolve` takes `tempClosed` for this; without it the case is metres off.
+- A control compares statuses as EPANET's numbers (XHEAD and TEMPCLOSED are below CLOSED), so the
+  loop keeps each link's EPANET status between steps, not only open/closed.
+- Opening a pump by OPEN sets its speed to 1, not back to its stated speed (input3.c controldata()).
+- The one gap measured is not a control's: EPANET's minor loss uses g rounded to 32.2 ft/s2
+  (0.02517), so a large TCV coefficient moves heads by millimetres. The TCV case keeps its loss small.
 
 ## Wording
 
