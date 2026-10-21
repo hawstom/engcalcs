@@ -145,6 +145,8 @@ function laid(base, flat) {
 	ok('no pump, valve or pipe is left out (no "unlinked" or "unjoined" note)', !r.notes.some((n) => n.code === 'wtg-directed-unlinked' || n.code === 'wtg-link-unjoined'),
 		JSON.stringify(r.notes.filter((n) => n.code === 'wtg-directed-unlinked' || n.code === 'wtg-link-unjoined')));
 
+	ok('a GPV with no curve is not reported by the reader as well as by the .inp parser (one claim, not two)', !r.notes.some((n) => n.code === 'wtg-gpv-nocurve'));
+	ok('the .inp parser reports it once, for GPV-1', (base.dropped || []).filter((d) => d.code === 'gpv-curve-missing').length === 1);
 	// A pump node with several pipes: the pipe the model calls downstream is on the outlet, every other on the inlet.
 	const pmp1 = base.links.filter((l) => l.id === 'PMP-1')[0];
 	const at = (id) => base.links.filter((l) => l.id === id)[0];

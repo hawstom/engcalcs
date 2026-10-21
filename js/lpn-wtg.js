@@ -954,7 +954,8 @@
 				setting = need(U(d.tcvK), 'setting', d.label);
 			} else if (d.vtype === 'GPV') {
 				var gid = gpvCurveId(d.gpvCurve);
-				if (gid) { setting = gid; } else if (loud) { note('wtg-gpv-nocurve', [d.label]); }
+				if (gid) { setting = gid; }
+				// A GPV with no curve is reported once, by the .inp reader (gpv-curve-missing), which sees the setting the file states.
 			}
 			return setting;
 		}

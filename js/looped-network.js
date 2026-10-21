@@ -45511,7 +45511,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// is no substitution to report. The remaining three say which outcome a valve met -- kept
 			// and solvable here, kept but needing the EPANET engine, or turned back into a pipe.
 			case 'valve-tcv': return pc.lpn_inp_drop_tcv || 'These throttle valves were imported as throttle valves, with the loss stated in the file.';
-			case 'valve-active': return pc.lpn_inp_drop_valve_active || 'These valves control pressure or flow, and their status changes with hydraulic conditions. They were imported without loss of data, and this page solves them.';
+			case 'valve-active': return pc.lpn_inp_drop_valve_active || 'These valves control pressure or flow, and their status changes with hydraulic conditions. Each valve\'s own data was imported in full, and this page solves them.';
 			// 'valve-dropped' IS NO LONGER EMITTED (Task 248): PBV and GPV are real elements and
 			// arrive as themselves. The case is kept so an older saved report still renders a
 			// sentence rather than a blank; delete the key once nothing can produce it.
@@ -45910,14 +45910,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'wtg-inactive': ['lpn_wtg_note_inactive', 'These elements are inactive in the model and were imported inactive.'],
 		'wtg-controls-unread': ['lpn_wtg_note_controls_unread', 'Not imported: these controls, which this page does not yet read from a WaterGEMS model. Each is shown as WaterGEMS states it.'],
 		'wtg-scenario-root': ['lpn_wtg_note_scenario_root', 'These scenarios have no parent in the model. Here every scenario descends from Base, so each was made a child of Base.'],
-		'wtg-alternatives': ['lpn_wtg_note_scenario_alternative', 'These alternatives were imported with their names, each in the category shown in parentheses. An alternative holds only the values in which it differs from its parent, and each scenario uses the alternatives it uses in the model.'],
+		'wtg-alternatives': ['lpn_wtg_note_scenario_alternative', 'These alternatives were imported with their names, each in the category shown in parentheses. An alternative holds only the values in which it differs from its parent, and each scenario uses the alternatives it uses in the model. To see them, choose Water, Scenarios, clear Basic mode, then choose Scenario manager.'],
 		'wtg-scenario-category': ['lpn_wtg_note_scenario_category', 'Not imported: the alternatives these scenarios use in categories this page has no counterpart for (for example Operational, Age, and Trace). There the scenario has the Base values.'],
 		'wtg-alternative-unused': ['lpn_wtg_note_alternative_unused', 'No scenario uses these alternatives. Each was imported as an alternative of its own, so that a scenario can use it.'],
 		'wtg-active-scenario': ['lpn_wtg_note_active_scenario', 'The model was open on the scenario shown in parentheses. This project opens on Base.'],
 		'wtg-pump-extended': ['lpn_wtg_note_pump_extended', 'These pump curves are extended beyond their points in WaterGEMS. Only the points were imported.'],
-		'wtg-pump-nodef': ['lpn_wtg_note_pump_curve', 'These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. Give each a curve before calculating.'],
-		'wtg-pump-deftype': ['lpn_wtg_note_pump_curve', 'These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. Give each a curve before calculating.'],
-		'wtg-pump-nocurve': ['lpn_wtg_note_pump_curve', 'These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. Give each a curve before calculating.'],
+		'wtg-pump-nodef': ['lpn_wtg_note_pump_curve', 'These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. A pump with no curve cannot run in either engine, so results shown before each has a curve are not meaningful.'],
+		'wtg-pump-deftype': ['lpn_wtg_note_pump_curve', 'These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. A pump with no curve cannot run in either engine, so results shown before each has a curve are not meaningful.'],
+		'wtg-pump-nocurve': ['lpn_wtg_note_pump_curve', 'These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. A pump with no curve cannot run in either engine, so results shown before each has a curve are not meaningful.'],
 		'wtg-pump-efficiency': ['lpn_wtg_note_pump_efficiency', 'Not imported: the efficiency of these pump definitions, which is neither a constant nor a list of points.'],
 		'wtg-pump-vsp': ['lpn_wtg_note_pump_vsp', 'These pumps are variable-speed pumps in the model. They were imported as fixed-speed pumps.'],
 		'wtg-tcv-coefficient': ['lpn_wtg_note_tcv_coefficient', 'These throttle control valves state a discharge coefficient rather than a minor loss coefficient. The minor loss coefficient stored with each was used.'],

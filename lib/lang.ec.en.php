@@ -2384,7 +2384,7 @@ $ec_lang['lpn_inp_drop_tank_curve']='These tanks are not straight-sided: the fil
 // a loss; the first two are reported because the reader deserves to know what became of a valve
 // their file states, not because anything was thrown away.
 $ec_lang['lpn_inp_drop_tcv']='These throttle valves were imported as throttle valves, with the loss stated in the file.';
-$ec_lang['lpn_inp_drop_valve_active']='These valves control pressure or flow, and their status changes with hydraulic conditions. They were imported without loss of data, and this page solves them.';
+$ec_lang['lpn_inp_drop_valve_active']='These valves control pressure or flow, and their status changes with hydraulic conditions. Each valve\'s own data was imported in full, and this page solves them.';
 $ec_lang['lpn_inp_drop_valve']='These valves are described by a curve or by a fixed pressure drop, and this page has no such asset. They were imported as open pipes, so the network remains connected, but pressure and flow are no longer controlled at those locations.';
 $ec_lang['lpn_inp_drop_cv']='In EPANET these pipes allow flow in one direction only (check valves). They were imported as ordinary pipes, so flow may now pass in either direction.';
 $ec_lang['lpn_inp_drop_demands']='These junctions had more than one demand. The demands were added together into the single demand this page holds.';
@@ -5014,12 +5014,12 @@ $ec_lang['lpn_wtg_note_id_changed']='These names are not valid EPANET IDs or rep
 $ec_lang['lpn_wtg_note_inactive']='These elements are inactive in the model and were imported inactive.';
 $ec_lang['lpn_wtg_note_controls_unread']='Not imported: these controls, which this page does not yet read from a WaterGEMS model. Each is shown as WaterGEMS states it.';
 $ec_lang['lpn_wtg_note_scenario_root']='These scenarios have no parent in the model. Here every scenario descends from Base, so each was made a child of Base.';
-$ec_lang['lpn_wtg_note_scenario_alternative']='These alternatives were imported with their names, each in the category shown in parentheses. An alternative holds only the values in which it differs from its parent, and each scenario uses the alternatives it uses in the model.';
+$ec_lang['lpn_wtg_note_scenario_alternative']='These alternatives were imported with their names, each in the category shown in parentheses. An alternative holds only the values in which it differs from its parent, and each scenario uses the alternatives it uses in the model. To see them, choose Water, Scenarios, clear Basic mode, then choose Scenario manager.';
 $ec_lang['lpn_wtg_note_scenario_category']='Not imported: the alternatives these scenarios use in categories this page has no counterpart for (for example Operational, Age, and Trace). There the scenario has the Base values.';
 $ec_lang['lpn_wtg_note_alternative_unused']='No scenario uses these alternatives. Each was imported as an alternative of its own, so that a scenario can use it.';
 $ec_lang['lpn_wtg_note_active_scenario']='The model was open on the scenario shown in parentheses. This project opens on Base.';
 $ec_lang['lpn_wtg_note_pump_extended']='These pump curves are extended beyond their points in WaterGEMS. Only the points were imported.';
-$ec_lang['lpn_wtg_note_pump_curve']='These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. Give each a curve before calculating.';
+$ec_lang['lpn_wtg_note_pump_curve']='These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. A pump with no curve cannot run in either engine, so results shown before each has a curve are not meaningful.';
 $ec_lang['lpn_wtg_note_pump_efficiency']='Not imported: the efficiency of these pump definitions, which is neither a constant nor a list of points.';
 $ec_lang['lpn_wtg_note_pump_vsp']='These pumps are variable-speed pumps in the model. They were imported as fixed-speed pumps.';
 $ec_lang['lpn_wtg_note_tcv_coefficient']='These throttle control valves state a discharge coefficient rather than a minor loss coefficient. The minor loss coefficient stored with each was used.';

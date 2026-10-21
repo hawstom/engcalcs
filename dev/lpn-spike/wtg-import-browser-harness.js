@@ -223,6 +223,8 @@ async function tgh(browser) {
 	ok('...naming the split of pump and valve nodes, the continuous pattern, the alternatives and the pump batteries',
 		!!d && d.text.indexOf(await a.lang('lpn_wtg_note_directed_split')) > 0 && d.text.indexOf(await a.lang('lpn_wtg_note_pattern_continuous')) > 0 &&
 		d.text.indexOf(await a.lang('lpn_wtg_note_scenario_alternative')) > 0 && d.text.indexOf(await a.lang('lpn_wtg_note_pump_battery')) > 0, d && d.text.slice(0, 300));
+	ok('...saying where to see the alternatives: Water, Scenarios, clear Basic mode, Scenario manager', !!d && d.text.indexOf('choose Water, Scenarios, clear Basic mode, then choose Scenario manager') > 0);
+	ok('...naming the missing GPV curve once', !!d && d.text.split(await a.lang('lpn_inp_drop_gpv_curve')).length === 2);
 	ok('...and not saying any pipe, pump or valve was left out', !!d && d.text.indexOf(await a.lang('lpn_wtg_note_link_unjoined')) < 0);
 	if (d) { await a.dialogClick(await a.lang('lpn_dialog_ok')); }
 	const doc = (await h.stored()).doc || {};
