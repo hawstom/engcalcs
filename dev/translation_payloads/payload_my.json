@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 3187,
-        "delta_key_count": 206,
+        "expected_key_count": 3185,
+        "delta_key_count": 204,
         "english_changed_key_count": 38,
         "exempt_key_count": 46,
         "exempt_keys": [
@@ -116,7 +116,6 @@
         "lpn_msx_report_missing": "IDs in the file that this network does not have: {ids}.",
         "lpn_msx_not_msx": "{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.",
         "lpn_msx_attached_heading": "Attached EPANET-MSX file: {file}",
-        "lpn_msx_replace": "Replace…",
         "lpn_msx_removed": "Removed {file} from this project.",
         "lpn_quality_msx": "Multi-species (EPANET-MSX)",
         "lpn_quality_msx_species": "Species",
@@ -253,7 +252,6 @@
         "lpn_ds_empties_at": "⚠ At a demand scale of {m}, a tank empties at {time}.",
         "lpn_ds_lowest_at_time": "At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}, at {time}.",
         "lpn_crit_run_note": "Each outage was run over the whole simulation ({n} reporting steps).",
-        "lpn_eps_working": "Running the extended-period simulation.",
         "lpn_ff_working_steps": "Working: reporting step {step} of {steps}, junction {done} of {total}.",
         "lpn_ff_col_hour": "Step of lowest flow",
         "lpn_ds_col_hour": "Step of lowest pressure",
@@ -324,7 +322,6 @@
         "lpn_msx_report_missing": "IDs in the file that this network does not have: {ids}.",
         "lpn_msx_not_msx": "{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.",
         "lpn_msx_attached_heading": "Attached EPANET-MSX file: {file}",
-        "lpn_msx_replace": "Replace…",
         "lpn_msx_removed": "Removed {file} from this project.",
         "lpn_quality_msx": "Multi-species (EPANET-MSX)",
         "lpn_quality_msx_species": "Species",
@@ -461,7 +458,6 @@
         "lpn_ds_empties_at": "⚠ At a demand scale of {m}, a tank empties at {time}.",
         "lpn_ds_lowest_at_time": "At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}, at {time}.",
         "lpn_crit_run_note": "Each outage was run over the whole simulation ({n} reporting steps).",
-        "lpn_eps_working": "Running the extended-period simulation.",
         "lpn_ff_working_steps": "Working: reporting step {step} of {steps}, junction {done} of {total}.",
         "lpn_ff_col_hour": "Step of lowest flow",
         "lpn_ds_col_hour": "Step of lowest pressure",
@@ -1080,22 +1076,6 @@
             }
         },
         "lpn_msx_attached_heading": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_file_import_workspace_tip",
-                    "value": "ဖိုင်၊ ထုတ်ယူရန်၊ လုပ်ငန်းခွင် ဖြင့် သိမ်းထားသော လုပ်ငန်းခွင်ဖိုင်ကို အသုံးပြုပါ - ဘောက်စ်တည်နေရာနှင့် အရွယ်အစားများ၊ ကပ်ထားမှု၊ ပင်န်အရွယ်အစားများနှင့် မည်သည့် အကူအညီပူဖောင်းများနှင့် hover ကတ်ကို ပြသည်ဟူသော ဤစာမျက်နှာ၏ ပြသမှု ရွေးစရာများ။ သင့်ပရောဂျက်များနှင့် ကွတ်ကီးများကို မထိပါ။",
-                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
-                },
-                "next_translated": {
-                    "key": "lpn_workspace_exported",
-                    "value": "လုပ်ငန်းခွင်ကို {file} သို့ သိမ်းပြီးပါပြီ - ဆက်တင် {n} ခု။",
-                    "english": "Workspace saved to {file}: {n} settings."
-                }
-            }
-        },
-        "lpn_msx_replace": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -3313,22 +3293,6 @@
             }
         },
         "lpn_crit_run_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_working",
-                    "value": "လုပ်ဆောင်နေဆဲ - ဆက်စပ်နေရာ {total} ခုအနက် {done} ခု။",
-                    "english": "Working: {done} of {total} junctions."
-                },
-                "next_translated": {
-                    "key": "lpn_ff_stopped",
-                    "value": "ဆက်စပ်နေရာ {total} ခုအနက် {done} ခု ပြီးနောက် ရပ်တန့်သွားသည်။ အောက်ပါ အဖြေများသည် ပြီးစီးပြီးသား အဖြေများ ဖြစ်သည်။",
-                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
-                }
-            }
-        },
-        "lpn_eps_working": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

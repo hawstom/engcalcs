@@ -59,5 +59,20 @@ ok('buildLinkEls records an arrow per polyline segment',
 	/var segCount = l\.verts\.length \+ 1, arrows = \[\]/.test(js));
 ok('...and hands them to the element record', /arrows: arrows,/.test(js));
 
+console.log('\n--- the arrow is ONE notched dart: a stroked, closed, unfilled four-point outline (Tom, 2026-10-20) ---');
+const mk = /annotationEl\('path', \{\s*d: '([^']*)', fill: 'none',\s*'class': 'lpn-arrow'/.exec(js);
+ok('the arrow is built as a <path> with fill none', !!mk);
+if (mk) {
+	ok('...with exactly one subpath, closed', (mk[1].match(/M/g) || []).length === 1 && (mk[1].match(/Z/g) || []).length === 1, mk[1]);
+	const pts = (mk[1].match(/-?\d+(\.\d+)?,-?\d+(\.\d+)?/g) || []).map((q) => q.split(',').map(Number));
+	ok('...four points', pts.length === 4, JSON.stringify(pts));
+	if (pts.length === 4) {
+		ok('...tip is on the pipe line (y 0) and furthest forward', pts[0][1] === 0 && pts.every((q) => q[0] <= pts[0][0]));
+		ok('...two barbs mirror each other behind the tip', pts[1][0] === pts[3][0] && pts[1][1] === -pts[3][1] && pts[1][1] !== 0 && pts[1][0] < pts[0][0]);
+		ok('...notch is on the shaft, ahead of the barbs and behind the tip', pts[2][1] === 0 && pts[2][0] > pts[1][0] && pts[2][0] < pts[0][0]);
+	}
+}
+ok('the stylesheet does not fill it', !/fill:\s*(?!\s|none)/.test((/^\.lpn-arrow \{([^}]*)\}/m.exec(css) || ['', ''])[1]));
+
 console.log('\n' + (fails ? fails + ' FAILED' : 'all checks passed'));
 process.exit(fails ? 1 : 0);

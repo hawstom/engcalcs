@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**11 still to read on master**, of 221 untranslated keys, of 3240 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**11 still to read on master**, of 219 untranslated keys, of 3238 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (221, 11 to read @@ NEEDS RULING)
+## lpn_  (219, 11 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -159,9 +159,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-20._
 - **`lpn_dur_start`**
   > Fire starts at
-  _Ruled OK 2026-10-20._
-- **`lpn_eps_working`**
-  > Running the extended-period simulation.
   _Ruled OK 2026-10-20._
 - **`lpn_ex_net1_scn_desc`**
   > Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.
@@ -384,9 +381,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-20._
 - **`lpn_msx_removed`**
   > Removed {file} from this project.
-  _Ruled OK 2026-10-20._
-- **`lpn_msx_replace`**
-  > Replace…
   _Ruled OK 2026-10-20._
 - **`lpn_msx_report_heading`**
   > Attached {file}
@@ -699,7 +693,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**8 still to read**, of 8 new keys across 9 unmerged branch(es).
+**9 still to read**, of 9 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -710,15 +704,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-1021 (`7a2d757bf`) — adds no English strings
-
-### chore/key-audit (`4ea68256b`) — adds no English strings
-
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/flow-arrow (`5d3b6acb0`) — adds no English strings
-
-### feat/geojson-into-project (`3ffa8d22c`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/geojson-into-project (`62d4faa42`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_gjup_h_notes`**
   > Reading the file
@@ -730,7 +718,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Update from GeoJSON file
   @@ NEEDS RULING
 
-### feat/import-export-menu (`4dd6748aa`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/import-export-menu (`a9f804e9b`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_export_confirm_lead`**
   > The {format} holds one scenario, and this project has {n}.
@@ -747,9 +735,10 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_file_group_tables`**
   > Tables
   @@ NEEDS RULING
+- **`lpn_menu_back`**
+  > Back
+  @@ NEEDS RULING
 
-### feat/sqlite-reader (`110f29428`) — adds no English strings
+### feat/sqlite-reader (`18e70d1f5`) — adds no English strings
 
 ### fix/bottom-pane-lag (`3bb531211`) — adds no English strings
-
-### fix/settings-index-scroll (`17325746b`) — adds no English strings
