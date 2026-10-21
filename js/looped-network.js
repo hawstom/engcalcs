@@ -459,7 +459,7 @@ var EngCalcs = EngCalcs || {};
 		// **TWO WAYS, AND THEY ARE DELIBERATELY NOT ONE FLAG:** `hiddenDropped` says nowhere would
 		// fit and releases the ground, `hiddenCrossed` says this label lost a crossing nothing could
 		// repair (Task 539 phase three) and KEEPS the ground it stands on. See shedCrossingLabels().
-		setLabelAssemblyHidden(ne, !!ne.hiddenDropped || !!ne.hiddenCrossed);
+		setLabelAssemblyHidden(ne, !!ne.hiddenDropped || !!ne.hiddenCrossed || !!ne.hiddenOverprint);
 		var anchor = nodeAt(n), end = nodeLabelPos(n),
 			org = dataLabelOrigin(ne, anchor, end, n.lx !== undefined ? n : null, labelInHand(ne));
 		repositionMultilineText(ne.text, justifyDataLabel(ne.text, ne.side, end, org), org.y);
@@ -1595,7 +1595,7 @@ var EngCalcs = EngCalcs || {};
 		// or the losing half of a crossing nothing could repair (shedCrossingLabels(), Task 539).
 		// A label the pass set LEVEL BESIDE its pipe (placeLevelPipeLabels()) is drawn whatever hid it
 		// along the pipe, a crossing lost there included: level, it was placed clear of every leader.
-		var hideAll = le.levelBeside ? false
+		var hideAll = le.hiddenOverprint ? true : le.levelBeside ? false
 			: (le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenBlocked || !!le.hiddenYielded || !!le.hiddenCrossed);
 		setLabelAssemblyHidden(le, hideAll);
 		syncLevelGlyphs(l, le);
@@ -60889,6 +60889,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lineCount: h.lineCount, shedCount: h.shedCount || 0,
 			hiddenShort: !!h.hiddenShort, hiddenCrowded: !!h.hiddenCrowded, hiddenYielded: !!h.hiddenYielded,
 			hiddenBlocked: !!h.hiddenBlocked, hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
+			hiddenOverprint: !!h.hiddenOverprint,
 			crowdHidden: !!h.crowdHidden,
 			alignedAlong: h.alignedAlong, stationSides: h.stationSides ? h.stationSides.slice() : h.stationSides,
 			levelBeside: !!h.levelBeside, levelForm: h.levelForm || null, levelAt: h.levelAt || null, levelQuiet: !!h.levelQuiet, external: !!h.external, inline: !!h.inline, inlineFrom: h.inlineFrom || null, tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
@@ -60944,6 +60945,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h.hiddenShort = c.hiddenShort; h.hiddenCrowded = c.hiddenCrowded; h.hiddenYielded = c.hiddenYielded;
 		h.hiddenBlocked = c.hiddenBlocked;
 		h.hiddenCrossed = c.hiddenCrossed; h.hiddenDropped = c.hiddenDropped;
+		h.hiddenOverprint = !!c.hiddenOverprint;
 		h.crowdHidden = c.crowdHidden;
 		h.alignedAlong = c.alignedAlong; h.levelBeside = c.levelBeside; h.levelForm = c.levelForm || null; h.levelAt = c.levelAt || null; h.levelQuiet = !!c.levelQuiet; h.external = !!c.external; h.inlineFrom = c.inlineFrom || null;
 		h.stationSides = c.stationSides ? c.stationSides.slice() : c.stationSides;
@@ -77148,6 +77150,95 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **`shedNodes` IS THE CONTENT/POSITION LINE, AND ONLY TWO CALLERS PASS IT** (Task 469):
 	// refreshLabelTextPass() and the debounced scheduleReshed(). Everything else here -- every frame
 	// of a drag -- is position only, and places the content the last content pass decided.
+	// **NO TWO DRAWN LABELS OVERPRINT, AND THIS IS THE STAGE THAT MAKES IT TRUE** (Tom, 2026-10-20,
+	// Net1 zoomed out: N10 and N11 printed over each other, and N9 under the Text "Source": *"hard
+	// failure ... unreleasable"*). The placement passes above reason in a MODEL of each label, and
+	// they leave a user-dragged label exactly where it was put (goal 1) -- so two dragged labels, or
+	// a dragged label and a Text object, or any pair whose model and drawing differ by a pixel, can
+	// still end up with glyph rows on each other. This reads what was DRAWN, row by row, once every
+	// label is laid out, and hides the less important label of each pair. Hiding is allowed;
+	// overprinting is not. A Text object is the user's own words and is never the one hidden here
+	// (two Texts meeting is crowdedTexts()'s). Importance: an outside (leader) label first, then a
+	// pipe, a junction, a pump or valve, a reservoir or tank last (crossingShedRank()); then the id.
+	// The flag, `hiddenOverprint`, is cleared before each pass and travels with the zoom bank.
+	// dev/lpn-spike/label-overlap-sweep-browser-harness.js holds it.
+	var LPN_OVERPRINT_TOL_PX = 0.75;
+	function guardLabelOverprint() {
+		var s = state.s || 1, tol = LPN_OVERPRINT_TOL_PX / s, items = [], i, j, k, hid = 0;
+		function rowsOf(t) {
+			var m = /rotate\(([-0-9.e]+)[ ,]+([-0-9.e]+)[ ,]+([-0-9.e]+)\)/.exec(t.getAttribute('transform') || ''),
+				a = m ? +m[1] : 0, ox = m ? +m[2] : 0, oy = m ? +m[3] : 0, rad = a * Math.PI / 180, rows = [], cur = null, c, b, n;
+			for (n = 0; n < t.childNodes.length; n++) {
+				c = t.childNodes[n];
+				if (c.nodeType !== 1) { continue; }
+				try { b = c.getBBox(); } catch (e) { continue; }
+				if (!(b.width > 0)) { continue; }
+				if (c.getAttribute('x') != null || !cur) { cur = { x0: b.x, y0: b.y, x1: b.x + b.width, y1: b.y + b.height }; rows.push(cur); }
+				else { cur.x0 = Math.min(cur.x0, b.x); cur.y0 = Math.min(cur.y0, b.y); cur.x1 = Math.max(cur.x1, b.x + b.width); cur.y1 = Math.max(cur.y1, b.y + b.height); }
+			}
+			if (!rows.length) {
+				try { b = t.getBBox(); } catch (e) { return []; }
+				if (b.width > 0) { rows.push({ x0: b.x, y0: b.y, x1: b.x + b.width, y1: b.y + b.height }); }
+			}
+			return rows.map(function (r) {
+				var cx = (r.x0 + r.x1) / 2, cy = (r.y0 + r.y1) / 2, dx = cx - ox, dy = cy - oy;
+				if (a) { cx = ox + dx * Math.cos(rad) - dy * Math.sin(rad); cy = oy + dx * Math.sin(rad) + dy * Math.cos(rad); }
+				return Collide.box(cx, cy, r.x1 - r.x0, r.y1 - r.y0, a);
+			});
+		}
+		function add(key, holder, rank, ext, els) {
+			var rows = [], cx = 0, cy = 0, rr = 0;
+			els.forEach(function (t) {
+				if (t && t.textContent && t.style.visibility !== 'hidden' && !(t.classList && t.classList.contains('lpn-lbl-hidden'))) { rows = rows.concat(rowsOf(t)); }
+			});
+			if (!rows.length) { return; }
+			rows.forEach(function (r) { cx += r.cx; cy += r.cy; });
+			cx /= rows.length; cy /= rows.length;
+			rows.forEach(function (r) { rr = Math.max(rr, Math.hypot(r.cx - cx, r.cy - cy) + Math.hypot(r.w, r.h) / 2); });
+			items.push({ key: key, holder: holder, rank: rank, ext: ext ? 1 : 0, rows: rows, cx: cx, cy: cy, r: rr, bad: false });
+		}
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id];
+			if (ne && !ne.empty) { add('n:' + n.id, ne, crossingShedRank('n:' + n.id) + 1, ne.external, [ne.text]); }
+		});
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id];
+			if (le && !le.empty) { add('l:' + l.id, le, crossingShedRank('l:' + l.id) + 1, le.external, [le.text].concat((le.repeats || []).map(function (r) { return r.text; }))); }
+		});
+		doc.labels.forEach(function (lb) {
+			var te = labelEls[lb.id];
+			if (te) { add('t:' + lb.id, null, 0, false, [te.text]); }
+		});
+		if (items.length < 2) { return; }
+		items.sort(function (a, b) { return (a.cx - a.r) - (b.cx - b.r); });
+		// The pairs whose rows meet, by a sweep on the left edge and a circle test, then the rows.
+		var nb = items.map(function () { return []; });
+		for (i = 0; i < items.length; i++) {
+			for (j = i + 1; j < items.length && items[j].cx - items[j].r <= items[i].cx + items[i].r; j++) {
+				if (items[i].key === items[j].key || (!items[i].holder && !items[j].holder)) { continue; }
+				if (Math.hypot(items[i].cx - items[j].cx, items[i].cy - items[j].cy) > items[i].r + items[j].r) { continue; }
+				hit: for (k = 0; k < items[i].rows.length; k++) {
+					for (var q = 0; q < items[j].rows.length; q++) {
+						if (Collide.boxOverlapDepth(items[i].rows[k], items[j].rows[q]) > tol) { nb[i].push(j); nb[j].push(i); break hit; }
+					}
+				}
+			}
+		}
+		// Most important first; one is kept only if nothing kept before it overprints it.
+		var order = items.map(function (it, n) { return n; }).filter(function (n) { return nb[n].length; });
+		order.sort(function (a, b) {
+			var x = items[a], y = items[b];
+			return (x.ext - y.ext) || (x.rank - y.rank) || (x.key < y.key ? -1 : (x.key > y.key ? 1 : 0));
+		});
+		order.forEach(function (n) {
+			var it = items[n];
+			if (nb[n].some(function (o) { return !items[o].bad && items[o].decided; })) { it.bad = true; }
+			it.decided = true;
+			if (it.bad && it.holder) { it.holder.hiddenOverprint = true; setLabelAssemblyHidden(it.holder, true); hid++; }
+		});
+		lastOverprintHidden = hid;
+	}
+	var lastOverprintHidden = 0;
 	var lastLayoutScale = null;
 	function relayoutLabels(shedNodes) {
 		labelCacheTaint();   // the zoom-bucket bank: any layout it did not ask for empties it
@@ -77187,6 +77278,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		beginLinkGeomHold(); // one segment index for the whole pass -- see linkSegIndex()
 		try {
 			perfDebugLap(null);
+			// Every label is laid out as the passes decide; guardLabelOverprint() then reads the drawing.
+			doc.nodes.forEach(function (n) { if (nodeEls[n.id]) { nodeEls[n.id].hiddenOverprint = false; } });
+			doc.links.forEach(function (l) { if (linkEls[l.id]) { linkEls[l.id].hiddenOverprint = false; } });
 			runLabelCollisionAvoidance(shedNodes);
 			perfDebugLap('   rlCollide');
 			doc.nodes.forEach(function (n) { if (nodeEls[n.id]) { layoutNodeLabel(n.id); } });
@@ -77194,6 +77288,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			doc.links.forEach(function (l) { if (linkEls[l.id]) { layoutLinkLabel(l.id); } });
 			perfDebugLap('   rlLinks');
 			doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
+			perfDebugLap('   rlTexts');
+			guardLabelOverprint();
+			perfDebugLap('   rlOverprint');
 		} finally { endMapBoxHold(); endLinkGeomHold(); }
 	}
 	function runSolve() {
