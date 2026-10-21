@@ -24,6 +24,11 @@
             "on": "Lowest pressure",
             "ruled": "2026-09-04"
         },
+        "consent_body": {
+            "on": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
+            "ruled": "2026-10-18",
+            "answer": "Yes! That's the right question."
+        },
         "lpn_about_credits": {
             "on": "Credits",
             "ruled": "2026-09-14",
@@ -188,6 +193,11 @@
             "on": "{n} selected.",
             "ruled": "2026-09-09",
             "answer": "OK"
+        },
+        "lpn_at_time": {
+            "on": "{value} at {time}",
+            "ruled": "2026-10-20",
+            "answer": "OK."
         },
         "lpn_basemap_hide": {
             "on": "Hide street map",
@@ -1064,9 +1074,39 @@
             "ruled": "2026-10-01",
             "answer": "OK."
         },
+        "lpn_crit_col_empty": {
+            "on": "Tank empties",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_crit_col_hours": {
+            "on": "Hours below minimum",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_crit_col_lowest": {
+            "on": "Lowest pressure",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_crit_col_lowest_tip": {
+            "on": "Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
         "lpn_crit_col_unserved": {
             "on": "Demand not served",
             "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_col_unserved_peak": {
+            "on": "Largest demand not served",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_crit_empty_note": {
+            "on": "Lowest pressures are read before a tank empties. Junctions below minimum include those left without a source from that step on.",
+            "ruled": "2026-10-20",
             "answer": "OK."
         },
         "lpn_crit_intro": {
@@ -1102,6 +1142,11 @@
         "lpn_crit_no_selection": {
             "on": "No links are selected. Select links or choose All links.",
             "ruled": "2026-10-03",
+            "answer": "OK."
+        },
+        "lpn_crit_run_note": {
+            "on": "Each outage was run over the whole simulation ({n} reporting steps).",
+            "ruled": "2026-10-20",
             "answer": "OK."
         },
         "lpn_crit_scope": {
@@ -1152,6 +1197,11 @@
         "lpn_crit_stopped": {
             "on": "Stopped after {done} of {total} assets. The results below are the ones already finished.",
             "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_stopped_at": {
+            "on": "run stopped at {time}",
+            "ruled": "2026-10-20",
             "answer": "OK."
         },
         "lpn_crit_summary": {
@@ -1344,6 +1394,11 @@
             "on": "Remove this demand",
             "ruled": "2026-08-29"
         },
+        "lpn_diag_gpv_curve_order": {
+            "on": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
         "lpn_diag_not_converged_drawn": {
             "on": "The solve did not converge. These numbers are the last iteration, not an answer. Do not use them.",
             "ruled": "2026-09-02"
@@ -1364,6 +1419,11 @@
         "lpn_diag_pda_pressures": {
             "on": "Required pressure must be greater than Minimum pressure. Change one of them in Settings.",
             "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_diag_valve_conflict": {
+            "on": "These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:",
+            "ruled": "2026-10-20",
             "answer": "OK."
         },
         "lpn_dock_autohide": {
@@ -1401,6 +1461,11 @@
             "ruled": "2026-10-03",
             "answer": "OK."
         },
+        "lpn_ds_col_hour": {
+            "on": "Step of lowest pressure",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
         "lpn_ds_col_link": {
             "on": "Link",
             "ruled": "2026-10-03",
@@ -1424,6 +1489,11 @@
         "lpn_ds_col_unscaled_tip": {
             "on": "With the demands as they are in the active scenario at this time step, the same value the map shows.",
             "ruled": "2026-10-03",
+            "answer": "OK."
+        },
+        "lpn_ds_empties_at": {
+            "on": "⚠ At a demand scale of {m}, a tank empties at {time}.",
+            "ruled": "2026-10-20",
             "answer": "OK."
         },
         "lpn_ds_eps_note": {
@@ -1476,9 +1546,19 @@
             "ruled": "2026-10-03",
             "answer": "OK."
         },
+        "lpn_ds_limit_at": {
+            "on": "Limiting reporting step: {time}.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
         "lpn_ds_lowest_at": {
             "on": "At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.",
             "ruled": "2026-10-03",
+            "answer": "OK."
+        },
+        "lpn_ds_lowest_at_time": {
+            "on": "At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}, at {time}.",
+            "ruled": "2026-10-20",
             "answer": "OK."
         },
         "lpn_ds_menu": {
@@ -1534,6 +1614,11 @@
         "lpn_ds_run": {
             "on": "Run",
             "ruled": "2026-10-03",
+            "answer": "OK."
+        },
+        "lpn_ds_run_note": {
+            "on": "Judged over the whole run, at every reporting step.",
+            "ruled": "2026-10-20",
             "answer": "OK."
         },
         "lpn_ds_scale_below": {
@@ -1599,6 +1684,151 @@
         "lpn_ds_title": {
             "on": "Demand scaling",
             "ruled": "2026-10-03",
+            "answer": "OK."
+        },
+        "lpn_dur_bad_time": {
+            "on": "The start and the duration must be whole multiples of the pattern time step, {step}, and the fire must start within the run.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_col_drop": {
+            "on": "Drop from start",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_col_end": {
+            "on": "Level at end",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_col_end_nofire": {
+            "on": "Level at end without the fire",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_col_fire": {
+            "on": "Fire flow",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_col_low": {
+            "on": "Lowest level reached",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_col_margin": {
+            "on": "Above lowest water depth",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_col_nofire": {
+            "on": "Pressure without the fire",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_col_pressure": {
+            "on": "Pressure at the fire junction",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_empties": {
+            "on": "⚠ Tank {id} empties at {time}. Pressures from that step on are not read.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_fails": {
+            "on": "⚠ Junction {id} falls to {pressure} during the fire, below the residual pressure of {residual}, at {time}.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_head": {
+            "on": "Fire flow of {flow} at junction {id}, from {start} to {end}.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_holds": {
+            "on": "✓ Junction {id} holds at least {pressure} during the fire, above the residual pressure of {residual}, at {time}.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_junction": {
+            "on": "Fire junction",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_junction_many": {
+            "on": "Several are selected. Select one junction on the map.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_junction_none": {
+            "on": "None selected. Select one junction on the map.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_length": {
+            "on": "Fire duration",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_length_tip": {
+            "on": "Hours and minutes, such as 2:00. The fire flow is the Required fire flow, drawn at the one junction selected on the map from the start time for this long. The whole extended-period simulation is run on a copy of the network and compared with the same run without the fire. The start and the duration must be whole multiples of the pattern time step. The system counts as recovered when, at the last reporting step, no junction is more than about 0.14 psi (1 kPa) and no tank more than about 0.3 ft (0.1 m) from the run without the fire.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_lowest": {
+            "on": "The lowest pressure anywhere is {pressure}, at junction {id}, at {time}.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_no_empty": {
+            "on": "✓ No tank empties.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_no_junction": {
+            "on": "Select one junction for the fire.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_not_back_junction": {
+            "on": "⚠ At {time}, the last reporting step, junction {id} is not back to its pressure without the fire. The difference is {pressure}, against a tolerance of {tolerance}.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_not_back_tank": {
+            "on": "⚠ At {time}, the last reporting step, tank {id} is not back to its level without the fire. The difference is {level}, against a tolerance of {tolerance}.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_option": {
+            "on": "A fire for a stated duration",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_recovers": {
+            "on": "✓ The system recovers after the fire: at {time}, the last reporting step, no junction differs from the run without the fire by more than {pressure} and no tank by more than {level}.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_recovery_cut": {
+            "on": "The run stopped before its end, so recovery after the fire is not assessed.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_recovery_to_end": {
+            "on": "The fire lasts to the end of the run, so recovery after it is not assessed.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_shortfall": {
+            "on": "⚠ Only {delivered} of the {flow} fire flow is delivered at junction {id}, at {time}, so the residual pressure is not a test of that fire.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_dur_start": {
+            "on": "Fire starts at",
+            "ruled": "2026-10-20",
             "answer": "OK."
         },
         "lpn_dxf_note_blocks": {
@@ -1821,6 +2051,46 @@
             "ruled": "2026-09-23",
             "answer": "OK."
         },
+        "lpn_eps_working": {
+            "on": "Running the extended-period simulation.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_ex_net1_scn_desc": {
+            "on": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_ex_net1_scn_title": {
+            "on": "EPANET Net1 with scenarios, gpm (US)",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_ex_valves_desc": {
+            "on": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_ex_valves_title": {
+            "on": "Valve types, gpm (US)",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_export_holds_base": {
+            "on": "It holds the Base scenario only.",
+            "ruled": "2026-10-18",
+            "answer": "I approved all."
+        },
+        "lpn_export_holds_scenario": {
+            "on": "It holds the scenario {scenario} only.",
+            "ruled": "2026-10-18",
+            "answer": "I approved all."
+        },
+        "lpn_export_leaves_alternatives": {
+            "on": "The alternatives stored in this project are not in the file.",
+            "ruled": "2026-10-18",
+            "answer": "GeoJSON alternatives string is approved."
+        },
         "lpn_ff_accounting": {
             "on": "Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral, and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.",
             "ruled": "2026-09-01"
@@ -1836,6 +2106,21 @@
         "lpn_ff_all": {
             "on": "All",
             "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_ff_at_all": {
+            "on": "Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_ff_at_minp": {
+            "on": "Tested at {time}, the reporting step with the lowest pressure among the junctions tested.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_ff_at_step": {
+            "on": "Tested at reporting step {time}.",
+            "ruled": "2026-10-20",
             "answer": "OK."
         },
         "lpn_ff_atleast": {
@@ -1862,6 +2147,11 @@
         "lpn_ff_col_available": {
             "on": "Available flow",
             "ruled": "2026-09-01"
+        },
+        "lpn_ff_col_hour": {
+            "on": "Step of lowest flow",
+            "ruled": "2026-10-20",
+            "answer": "OK."
         },
         "lpn_ff_col_junction": {
             "on": "Junction",
@@ -2036,6 +2326,11 @@
             "ruled": "2026-09-30",
             "answer": "Both should indeed follow the same form, and it's not easy. \"No junctions are selected. Select junctions or select the All option.\" \"…no assets are selected. Select assets or select the All option.\""
         },
+        "lpn_ff_no_steps": {
+            "on": "A tank empties at {time}, before the first reporting step could be tested, so no step was tested.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
         "lpn_ff_not_checked": {
             "on": "Not checked",
             "ruled": "2026-09-02"
@@ -2145,6 +2440,11 @@
             "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
+        "lpn_ff_tank_empties": {
+            "on": "A tank empties at {time}; steps from then on were not tested.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
         "lpn_ff_title": {
             "on": "Fire flow",
             "ruled": "2026-09-01"
@@ -2152,6 +2452,11 @@
         "lpn_ff_working": {
             "on": "Working: {done} of {total} junctions.",
             "ruled": "2026-09-01"
+        },
+        "lpn_ff_working_steps": {
+            "on": "Working: reporting step {step} of {steps}, junction {done} of {total}.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
         },
         "lpn_field_account": {
             "on": "Account number",
@@ -2384,6 +2689,11 @@
             "ruled": "2026-09-28",
             "answer": "OK."
         },
+        "lpn_file_export_item_msx": {
+            "on": "EPANET-MSX file…",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
         "lpn_file_export_item_scnbook": {
             "on": "Scenario workbook…",
             "ruled": "2026-10-17",
@@ -2393,6 +2703,11 @@
             "on": "Export…",
             "ruled": "2026-10-09",
             "answer": "Change File, 'Export to...' to 'Export...'."
+        },
+        "lpn_file_export_msx_tip": {
+            "on": "Download the attached EPANET-MSX file exactly as it was imported.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
         },
         "lpn_file_export_scnbook_tip": {
             "on": "Download the scenarios, their alternatives, and the overrides of each alternative as one .xlsx workbook, in the project units. Edit it in a spreadsheet program. Read it back with File, Import, Import scenario workbook.",
@@ -2419,6 +2734,16 @@
             "ruled": "2026-10-01",
             "answer": "OK."
         },
+        "lpn_file_import_msx": {
+            "on": "EPANET-MSX file…",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_file_import_msx_tip": {
+            "on": "Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
         "lpn_file_import_scnbook": {
             "on": "Import scenario workbook…",
             "ruled": "2026-10-17",
@@ -2443,6 +2768,16 @@
             "on": "Apply a workspace file saved with File, Export, Workspace: box positions and sizes, docking, pane sizes and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
             "ruled": "2026-10-09",
             "answer": "Use proposed (Tom, calls page round 3)."
+        },
+        "lpn_file_import_wtg": {
+            "on": "WaterCAD or WaterGEMS model…",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_file_import_wtg_tip": {
+            "on": "Open a WaterCAD or WaterGEMS model as a new project. Choose its .wtg.sqlite file, and also the .wtg file beside it so that its units come too. The file is read and never changed. Its scenarios come with it; each scenario's differences from Base become that scenario's overrides. Beta: tried on few models so far.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
         },
         "lpn_find_conn_no_fixed": {
             "on": "This network has no reservoir or tank, so it has no source to reach. Only \"no links\" and \"no open links\" can be searched.",
@@ -2782,6 +3117,11 @@
             "on": "Full report",
             "ruled": "2026-09-26",
             "answer": "OK."
+        },
+        "lpn_geojson_results_other": {
+            "on": "No results are included, because the results on screen belong to the scenario {scenario}.",
+            "ruled": "2026-10-18",
+            "answer": "I approved all."
         },
         "lpn_geomap": {
             "on": "georeferenced",
@@ -3170,6 +3510,11 @@
             "on": "The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can use the same curve, and editing it there changes all of them. This valve holds only the reference; the points themselves are read and edited under Libraries, Curves.",
             "ruled": "2026-09-06"
         },
+        "lpn_gpv_one_point_note": {
+            "on": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
         "lpn_graphs_menu": {
             "on": "Graphs",
             "ruled": "2026-10-03",
@@ -3179,6 +3524,16 @@
             "on": "When the pointer leaves, a box without focus hides after a short delay. A box with focus hides when you click outside it, press Esc, or Tab out of it with the pointer elsewhere.",
             "ruled": "2026-10-08",
             "answer": "Calls page 8 October (round 2): his own text"
+        },
+        "lpn_guide_cmp_byasset_def": {
+            "on": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver's internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.</p>",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_guide_cmp_byasset_term": {
+            "on": "Results by asset",
+            "ruled": "2026-10-20",
+            "answer": "OK."
         },
         "lpn_guide_cmp_cols_def": {
             "on": "<table class=\"lpn-notes-table\"><tbody><tr><td>Scenario</td><td>The name of the scenario. The open scenario is marked (currently open).</td></tr><tr><td>No. of overrides</td><td>The overrides of the scenario itself, counted as in the Scenarios list. A calculation option such as the demand multiplier counts as one, and an override equal to the inherited value counts.</td></tr><tr><td>Demand multiplier, Total run time, Hydraulic time step</td><td>The values the scenario was solved under, its own or those of the project. A steady-state scenario shows a dash for the time step.</td></tr><tr><td>Lowest pressure</td><td>The lowest pressure at a junction, with its ID and the time it occurs. Reservoirs and tanks are left out because each has a fixed head.</td></tr><tr><td>Highest velocity</td><td>The highest velocity in a pipe or valve, with its ID and the time it occurs. Pumps are left out.</td></tr></tbody></table>",
@@ -3214,6 +3569,16 @@
             "on": "A dimmed name is a button that is currently hidden on the toolbar.",
             "ruled": "2026-10-08",
             "answer": "Calls page 8 October: Use as written"
+        },
+        "lpn_guide_ff_dur_def": {
+            "on": "<p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.</p>",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_guide_ff_dur_term": {
+            "on": "A fire for a stated duration",
+            "ruled": "2026-10-20",
+            "answer": "OK."
         },
         "lpn_guide_find_examples_term": {
             "on": "Examples on Net3",
@@ -3288,6 +3653,26 @@
         "lpn_guide_lib_scn_term": {
             "on": "Libraries and scenarios",
             "ruled": "2026-10-17",
+            "answer": "OK."
+        },
+        "lpn_guide_page_desc": {
+            "on": "{name} user manual: one page for each chapter, from the map and Properties to scenarios, fire flow analysis, and criticality analysis.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_guide_page_missing": {
+            "on": "There is no such chapter. The chapters are listed below.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_guide_page_open": {
+            "on": "Open the application",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_guide_page_what": {
+            "on": "{name} is a free web application for modeling water distribution networks, an extension of EPANET.",
+            "ruled": "2026-10-20",
             "answer": "OK."
         },
         "lpn_guide_prop_edit_def": {
@@ -3643,6 +4028,256 @@
             "on": "EPANET files contain no coordinate system, so this file will not initially be georeferenced. To place it on a world map, use Map, World map… To convert its coordinates, use File, Convert as…",
             "ruled": "2026-09-25",
             "answer": "Edited."
+        },
+        "lpn_inpup_ask_title": {
+            "on": "Import {file}",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_base_note": {
+            "on": "Base. A scenario that holds its own value for an asset keeps it; the others take the new value.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_blank": {
+            "on": "blank",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_btn_base": {
+            "on": "Base",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_btn_new": {
+            "on": "A new project",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_btn_project": {
+            "on": "This project, {project}",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_btn_scenario": {
+            "on": "{scenario}, open now",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_counts": {
+            "on": "Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_failed": {
+            "on": "The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_h_added": {
+            "on": "Assets added",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_h_changed": {
+            "on": "Values changed",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_h_kept": {
+            "on": "Kept, not in the file",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_h_na": {
+            "on": "Not applied",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_heading": {
+            "on": "Imported {file} into {scenario} of {project}",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_how": {
+            "on": "In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_i_connections": {
+            "on": "connections",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_i_controls": {
+            "on": "controls",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_i_curves": {
+            "on": "curves",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_i_descriptions": {
+            "on": "descriptions",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_i_options": {
+            "on": "options",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_i_patterns": {
+            "on": "patterns",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_i_positions": {
+            "on": "positions of existing assets",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_i_rules": {
+            "on": "rules",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_lead": {
+            "on": "An EPANET file holds one set of values and no scenarios. Choose where to put them.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_method_row": {
+            "on": "Head loss formula: the file uses {file} and this project uses {project}.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_more": {
+            "on": "{n} more",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_na_cv": {
+            "on": "A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_na_general": {
+            "on": "The file also holds {items}. They were not applied.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_na_geo": {
+            "on": "Assets only in the file ({n}) were not added, because the file and this project use different coordinate systems.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_na_msx": {
+            "on": "The .msx file chosen with this file was not read. To attach it to this project, choose it alone.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_na_owned": {
+            "on": "The pipe type states some values of these pipes, so those values were not changed: {ids}",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_na_refs": {
+            "on": "These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_na_roughness": {
+            "on": "Roughness was not applied, because this project uses the Darcy-Weisbach formula and roughness is not compared in that case.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_na_type": {
+            "on": "The file states a different type for these assets, so none of their values were changed: {ids}",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_nothing": {
+            "on": "Every value in the file that matches an asset here is already the same in {scenario}.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_refused_heading": {
+            "on": "Nothing was changed in {project}.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_refused_lead": {
+            "on": "The units of the file differ from the units of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_refused_lead_both": {
+            "on": "The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_refused_lead_formula": {
+            "on": "The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_row": {
+            "on": "{id}, {property}: {old} to {new}",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_status": {
+            "on": "Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_t_junction": {
+            "on": "Junction",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_t_pipe": {
+            "on": "Pipe",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_t_pump": {
+            "on": "Pump",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_t_reservoir": {
+            "on": "Reservoir",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_t_tank": {
+            "on": "Tank",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_t_valve": {
+            "on": "Valve",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_title": {
+            "on": "Update from EPANET file",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_undo": {
+            "on": "Undo reverses all of it in one step.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_inpup_unit_row": {
+            "on": "{family}: the file uses {file} and this project uses {project}.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
         },
         "lpn_labels_col_show": {
             "on": "Show",
@@ -4377,6 +5012,61 @@
             "ruled": "2026-10-08",
             "answer": "Calls page 8 October: Use as written"
         },
+        "lpn_msx_attached_heading": {
+            "on": "Attached EPANET-MSX file: {file}",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_msx_not_msx": {
+            "on": "{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_msx_remove": {
+            "on": "Remove",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_msx_removed": {
+            "on": "Removed {file} from this project.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_msx_replace": {
+            "on": "Replace…",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_msx_report_heading": {
+            "on": "Attached {file}",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_msx_report_kept": {
+            "on": "This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_msx_report_missing": {
+            "on": "IDs in the file that this network does not have: {ids}.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_msx_report_no_species": {
+            "on": "No species are listed in the file.",
+            "ruled": "2026-10-18",
+            "answer": "\"No species are listed in the file.\": Approved."
+        },
+        "lpn_msx_report_species": {
+            "on": "Species in the file: {list}.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_msx_too_big": {
+            "on": "{file} is too large to keep in browser storage, so it was not attached.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
         "lpn_multi_applied": {
             "on": "Set {prop} on {n}.",
             "ruled": "2026-09-09",
@@ -4452,6 +5142,11 @@
             "on": "List of customers added at this node (because this was nearest). Customer demands are in addition to other demands listed here. A customer is edited where it sits on the map or in the Customers table.",
             "ruled": "2026-09-23",
             "answer": "Edited."
+        },
+        "lpn_notes_2_def": {
+            "on": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
+            "ruled": "2026-10-18",
+            "answer": "Tom, 2026-10-18, to the MSX sentence proposed for this list: \"I agree.\""
         },
         "lpn_notes_6_def": {
             "on": "<table class=\"lpn-notes-table\"><tbody><tr><td>Select column</td><td>Click heading</td></tr><tr><td>Add or extend column selection</td><td>Ctrl+click or Shift+click another heading</td></tr><tr><td>Move (reorder) selected column(s)</td><td>Drag or use Manage columns… in right-click or ⋮ menu</td></tr><tr><td>Menu ⋮ and sort arrow.</td><td>Hover a heading's top corner, or select or Tab into a heading</td></tr><tr><td>Hide, Show all, or Manage visibility and order</td><td>Right-click heading or ⋮ menu in heading top right corner</td></tr><tr><td>Sort by column</td><td>Arrow icon in heading top right corner</td></tr><tr><td>Paste as new rows at end of table</td><td>Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V</td></tr></tbody></table>",
@@ -4848,6 +5543,11 @@
             "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
+        "lpn_pane_pasted_scenario": {
+            "on": "These values are overrides in the scenario {scenario}.",
+            "ruled": "2026-10-18",
+            "answer": "I approved all."
+        },
         "lpn_pane_scn_cur_only": {
             "on": "Current scenario only",
             "ruled": "2026-10-16",
@@ -5157,6 +5857,26 @@
             "ruled": "2026-10-07",
             "answer": "Technical-English interview: Use proposed"
         },
+        "lpn_quality_msx": {
+            "on": "Multi-species (EPANET-MSX)",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_quality_msx_none": {
+            "on": "No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_quality_msx_species": {
+            "on": "Species",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_quality_msx_species_tip": {
+            "on": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
         "lpn_quality_named_avg_concentration": {
             "on": "Average {chemical} concentration",
             "ruled": "2026-09-28",
@@ -5366,6 +6086,11 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
+        "lpn_result_msx_tip": {
+            "on": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
         "lpn_result_pressure": {
             "on": "Pressure",
             "ruled": "2026-09-01"
@@ -5419,6 +6144,11 @@
         "lpn_result_water_age_tip": {
             "on": "How long the water reaching this point has been in the system. There is no standard number to compare it against, so read it as a measurement and judge it yourself.",
             "ruled": "2026-09-01"
+        },
+        "lpn_roughness_method_note": {
+            "on": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
+            "ruled": "2026-10-18",
+            "answer": "I agree."
         },
         "lpn_rule_dangling_note": {
             "on": "These rules refer to an element that is no longer in this project, so they were ignored in this run: {ids}",
@@ -5735,6 +6465,11 @@
             "ruled": "2026-10-05",
             "answer": "Edited"
         },
+        "lpn_scncmp_progress": {
+            "on": "Solving scenario {done} of {total}…",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
         "lpn_scncmp_running": {
             "on": "Solving every scenario…",
             "ruled": "2026-09-04"
@@ -5744,9 +6479,79 @@
             "ruled": "2026-10-05",
             "answer": "OK."
         },
+        "lpn_scncmp_stopped": {
+            "on": "Stopped after {done} of {total} scenarios. The results below are the ones already finished.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
         "lpn_scncmp_title": {
             "on": "Scenario comparison",
             "ruled": "2026-09-04"
+        },
+        "lpn_scnres_at_time": {
+            "on": "({time})",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_scnres_col": {
+            "on": "{quantity} ({unit}), {scenario}",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_scnres_copy_tip": {
+            "on": "Copy the table as tab-separated text, to paste into a spreadsheet. Numbers are copied in full, without rounding.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_scnres_empty": {
+            "on": "This project has none of these assets.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_scnres_failed": {
+            "on": "{scenario} could not be solved, so its columns are blank. {why}",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_scnres_flow_tip": {
+            "on": "The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show here whether a flow changed direction between scenarios.",
+            "ruled": "2026-10-20",
+            "answer": "Edited."
+        },
+        "lpn_scnres_none": {
+            "on": "Check at least one result to show.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_scnres_not_converged": {
+            "on": "(not converged)",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_scnres_not_converged_note": {
+            "on": "A column marked {mark} shows the last results the solver reached before it stopped without converging.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_scnres_stale": {
+            "on": "Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_scnres_steady": {
+            "on": "(steady state)",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_scnres_time_note": {
+            "on": "A scenario with a total run time is read at the time step on screen, {time}, or at its last time step if its run ends sooner. Each heading shows the time read.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_scnres_title": {
+            "on": "Results by asset",
+            "ruled": "2026-10-20",
+            "answer": "OK."
         },
         "lpn_search_refused": {
             "on": "Place-name search is off, and nothing was sent. The Go to a latitude and longitude command still works.",
@@ -5865,6 +6670,36 @@
         "lpn_settings_flow_change_tip": {
             "on": "An additional test the solver must pass before it stops: the maximum change in any one pipe's flow from one trial to the next. Zero means do not apply this test. Only the EPANET solver reads this box.",
             "ruled": "2026-09-02"
+        },
+        "lpn_settings_grp_angle": {
+            "on": "Angle",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_settings_grp_positions": {
+            "on": "Positions",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_settings_grp_show": {
+            "on": "Show",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_settings_grp_size": {
+            "on": "Size",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_settings_grp_thematic": {
+            "on": "Thematic",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_settings_grp_zoom": {
+            "on": "Zoom",
+            "ruled": "2026-10-20",
+            "answer": "OK."
         },
         "lpn_settings_head_error": {
             "on": "Head error limit",
@@ -6724,6 +7559,11 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
+        "lpn_survey_added_scenario": {
+            "on": "The nodes were added to {scenario}. In Base they are inactive.",
+            "ruled": "2026-10-18",
+            "answer": "I approved all."
+        },
         "lpn_survey_axis_east": {
             "on": "Easting",
             "ruled": "2026-09-23",
@@ -7149,9 +7989,19 @@
             "ruled": "2026-10-17",
             "answer": "OK."
         },
+        "lpn_theme_arcade": {
+            "on": "Arcade",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
         "lpn_theme_dark": {
             "on": "Dark",
             "ruled": "2026-10-17",
+            "answer": "OK."
+        },
+        "lpn_theme_desktop": {
+            "on": "Desktop",
+            "ruled": "2026-10-20",
             "answer": "OK."
         },
         "lpn_theme_green": {
@@ -7169,9 +8019,29 @@
             "ruled": "2026-10-17",
             "answer": "OK."
         },
+        "lpn_theme_newspaper": {
+            "on": "Newspaper",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
         "lpn_theme_platinum": {
             "on": "Platinum",
             "ruled": "2026-10-17",
+            "answer": "OK."
+        },
+        "lpn_theme_prairie": {
+            "on": "Prairie",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_theme_rounded": {
+            "on": "Rounded",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_theme_space": {
+            "on": "Space",
+            "ruled": "2026-10-20",
             "answer": "OK."
         },
         "lpn_theme_system": {
@@ -7447,6 +8317,41 @@
             "ruled": "2026-09-25",
             "answer": "OK."
         },
+        "lpn_when": {
+            "on": "Reporting step tested",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_when_all": {
+            "on": "Every reporting step, worst case",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_when_hour": {
+            "on": "A chosen reporting step",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_when_minp": {
+            "on": "The reporting step of lowest pressure",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_when_now": {
+            "on": "The reporting step on screen",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_when_run": {
+            "on": "The whole run",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_when_step": {
+            "on": "Reporting step",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
         "lpn_workspace_confirm": {
             "on": "Replace this browser's workspace layout with the one in the file?",
             "ruled": "2026-10-08",
@@ -7465,6 +8370,251 @@
             "on": "Report an error on this page. This opens a box to select the problem, add a comment, and enter an email address if a reply is wanted. All fields are optional, and nothing is sent until you press Send.",
             "ruled": "2026-10-07",
             "answer": "Calls page 7 October: Use proposed"
+        },
+        "lpn_wtg_engine": {
+            "on": "The SQLite reader could not be loaded, so {file} could not be opened. Check the connection and try again.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_need_sqlite": {
+            "on": "Choose the model's .wtg.sqlite file. The .wtg file holds only how the model is displayed; it can be chosen with it.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_not_sqlite": {
+            "on": "{file} is not a SQLite database, so it is not a WaterCAD or WaterGEMS model file. A zipped model must be unzipped first.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_not_wtg": {
+            "on": "{file} is a SQLite database, but not a WaterCAD or WaterGEMS model.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_active_scenario": {
+            "on": "The model was open on the scenario shown in parentheses. This project opens on Base.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_alternative_unused": {
+            "on": "No scenario uses these Physical alternatives. Each was imported as an alternative of its own, holding the values it states, so that a scenario can use it.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_controls_unread": {
+            "on": "Not imported: these controls, which this page does not yet read from a WaterGEMS model. Each is shown as WaterGEMS states it.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_converted": {
+            "on": "The database stores every number in US customary units (feet, cubic feet per second, psi). Each number was converted once to the project's units and rounded to the shortest decimal within 5 parts in 100 million, which gives back the number as it was entered.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_customer_demand": {
+            "on": "Not imported: the customer demands at these junctions. Their base demands were imported.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_cv_closed": {
+            "on": "These pipes have a check valve and start closed. They were imported closed.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_directed_split": {
+            "on": "In WaterGEMS a pump or valve is a node between two pipes. Each of these was imported as a pump or valve link between two new junctions at its elevation, named after it with -U (upstream) and -D (downstream).",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_element_unread": {
+            "on": "Not imported: these elements, of a kind this page does not model. The kind is shown in parentheses.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_emitter_unread": {
+            "on": "Not imported: the emitter coefficients of these junctions, because the unit they are stored in is not yet confirmed.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_fireflow": {
+            "on": "Not imported: the fire flow settings of the model. A needed fire flow stated at a junction was imported as that junction's Required fire flow; enter the rest in the fire flow window.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_gpv_curve": {
+            "on": "These general purpose valves have no head loss curve in the file.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_id_changed": {
+            "on": "These names are not valid EPANET IDs or repeat another name, so each was given the ID shown in parentheses.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_inactive": {
+            "on": "These elements are inactive in the model and were imported inactive.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_link_unjoined": {
+            "on": "Not imported: these pipes, pumps, or valves, whose ends are not two different imported nodes, or which do not sit between exactly two pipes.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_no_geometry": {
+            "on": "These nodes have no location in the file and were placed at 0, 0.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_options": {
+            "on": "Not imported: these calculation options (demand adjustments, pressure-dependent demand, or a friction method code this page does not know). Where the model states no EPANET options, the defaults were used.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_pattern_calendar": {
+            "on": "Not imported: the day of the week and month multipliers of these patterns.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_pattern_continuous": {
+            "on": "These patterns are continuous in the model. Here each multiplier holds until the next time step.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_pattern_irregular": {
+            "on": "These patterns have times that are not whole multiples of the pattern time step. Each was read at that time step.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_pattern_other": {
+            "on": "These patterns differ from EPANET patterns in their start time, their last multiplier, or their name (EPANET applies a pattern named 1 to every demand with no pattern). Check them.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_pump_curve": {
+            "on": "These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. Give each a curve before calculating.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_pump_efficiency": {
+            "on": "Not imported: the efficiency of these pump definitions, which is neither a constant nor a list of points.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_pump_extended": {
+            "on": "These pump curves are extended beyond their points in WaterGEMS. Only the points were imported.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_pump_vsp": {
+            "on": "These pumps are variable-speed pumps in the model. They were imported as fixed-speed pumps.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_scenario_alternative": {
+            "on": "These scenarios use a Physical alternative other than the one Base uses. The values in which it differs from Base were imported as the scenario's own overrides; the alternative itself was not imported.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_scenario_category": {
+            "on": "Not imported: the alternatives these scenarios use in categories other than Physical. There the scenario has the Base values.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_scenario_root": {
+            "on": "These scenarios have no parent in the model. Here every scenario descends from Base, so each was made a child of Base.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_setting_pattern": {
+            "on": "Not imported: the setting patterns of these valves.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_srs": {
+            "on": "The model states the spatial reference shown. Its coordinates were imported as plain x and y.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_tables_unread": {
+            "on": "Not imported: the data in these tables of the database, which this page does not read (for example transient, fire flow, and energy cost data).",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_tank_demand": {
+            "on": "Not imported: the demands at these tanks. An EPANET tank has no demand.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_tank_inlet": {
+            "on": "These tanks fill through a separate inlet at the top in WaterGEMS. An EPANET tank has no such inlet, so the inlet pipe joins the tank at its base.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_tank_shape": {
+            "on": "These tanks are not circular. Each was given the diameter of a circle of the same area, or, where the shape is not known, the diameter stored with it.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_tcv_coefficient": {
+            "on": "These throttle control valves state a discharge coefficient rather than a minor loss coefficient. The minor loss coefficient stored with each was used.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_unconverted": {
+            "on": "These values are stored in a unit this page does not know and were set to 0. Check them before calculating.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_unit_assumed": {
+            "on": "The file does not state the stored unit of these fields, so the unit every example file states was assumed.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_unit_demand": {
+            "on": "The demand at these junctions comes from unit demand loads. The flow of each load was imported as a demand; the loading units and the unit load were not.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_unit_unknown": {
+            "on": "Not converted: these fields, whose stored unit (shown in parentheses) this page does not know.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_units_assumed": {
+            "on": "No .wtg file was chosen with the database, so the units the model is displayed in are not known. The project uses the units that go with the flow unit shown in parentheses. To keep the model's own units, import it again and choose both files.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_units_differ": {
+            "on": "WaterGEMS displays these quantities in other units. Here they are in the project's units.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_note_valve_status": {
+            "on": "The initial status of these valves was read from a code not yet confirmed in an example file.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_report_intro": {
+            "on": "This was a WaterCAD or WaterGEMS model. Bentley publishes no description of the file, so it is read by a layout learned from example files. It was imported as a new project, from its scenario {base} and {n} more scenarios. Compare the results with WaterGEMS before relying on them.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_report_lead": {
+            "on": "The list below shows what was changed on the way in, and what in the file was not imported:",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_unreadable": {
+            "on": "{file} could not be read as a SQLite database. It may be damaged.",
+            "ruled": "2026-10-20",
+            "answer": "OK."
+        },
+        "lpn_wtg_working": {
+            "on": "Reading {file}…",
+            "ruled": "2026-10-20",
+            "answer": "OK."
         },
         "lpn_xymap": {
             "on": "local",
@@ -7507,56 +8657,6 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
-        },
-        "lpn_roughness_method_note": {
-            "on": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
-            "ruled": "2026-10-18",
-            "answer": "I agree."
-        },
-        "lpn_notes_2_def": {
-            "on": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
-            "ruled": "2026-10-18",
-            "answer": "Tom, 2026-10-18, to the MSX sentence proposed for this list: \"I agree.\""
-        },
-        "consent_body": {
-            "on": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
-            "ruled": "2026-10-18",
-            "answer": "Yes! That's the right question."
-        },
-        "lpn_export_holds_scenario": {
-            "on": "It holds the scenario {scenario} only.",
-            "ruled": "2026-10-18",
-            "answer": "I approved all."
-        },
-        "lpn_export_holds_base": {
-            "on": "It holds the Base scenario only.",
-            "ruled": "2026-10-18",
-            "answer": "I approved all."
-        },
-        "lpn_geojson_results_other": {
-            "on": "No results are included, because the results on screen belong to the scenario {scenario}.",
-            "ruled": "2026-10-18",
-            "answer": "I approved all."
-        },
-        "lpn_survey_added_scenario": {
-            "on": "The nodes were added to {scenario}. In Base they are inactive.",
-            "ruled": "2026-10-18",
-            "answer": "I approved all."
-        },
-        "lpn_pane_pasted_scenario": {
-            "on": "These values are overrides in the scenario {scenario}.",
-            "ruled": "2026-10-18",
-            "answer": "I approved all."
-        },
-        "lpn_export_leaves_alternatives": {
-            "on": "The alternatives stored in this project are not in the file.",
-            "ruled": "2026-10-18",
-            "answer": "GeoJSON alternatives string is approved."
-        },
-        "lpn_msx_report_no_species": {
-            "on": "No species are listed in the file.",
-            "ruled": "2026-10-18",
-            "answer": "\"No species are listed in the file.\": Approved."
         }
     }
 }

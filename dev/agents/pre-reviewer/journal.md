@@ -4508,6 +4508,20 @@ also read the live document and the status bar before calling it a defect.
 - OBSERVED leftovers: "Closed: —" for an open pipe, "Is active?: ✓", "No pipe type chosen", "No fittings list chosen", "No pattern", "Demand pattern: (default: 1)"; extra Description lines print as unlabelled rows.
 - NOT CHECKED: harness mutation, dark theme, touch, ✓ glyph in the card (boxes in this headless font).
 
+## 2026-10-17 feat/theme @ c57fc21e3 (Task 811, theme gallery) (Perry)
+- OBSERVED (real Chromium, Net1): the branch's own harnesses pass (gallery 54, contrast 2976, light-tokens 339, theme 68). Light vs master computed-style diff: only the planned changes (grey band, darker status/? colour, field edges, the new Theme button). Gallery works by mouse, keyboard (harness) and touch at 390 px (tap keeps and closes, nothing overflows).
+- OBSERVED: calculator pages (Manning-Pipe-Flow, Hazen-Williams) ignore lpn_theme entirely (white); consistent with plan "Branch 3", but the stored choice does not reach them.
+- OBSERVED: DEFECT. @media print: no literal paper. Under Amber/Green/Dark the body text colour stays theme ink in print (amber 255,176,0 on white) and the map legend prints as a dark box; Tables print area inherits the same ink. Plan promised print literal.
+- OBSERVED: es page shows English theme names and "Theme" (keys untranslated, expected until sprint).
+- NOT CHECKED: Recalculate-off stale look under themes (CSS is opacity .5, theme-neutral), harness mutation, RTL gallery visually, Guide box in Green/Platinum.
+
+## 2026-10-18 feat/theme round 2 (02b3b2be5)
+OBSERVED (jasmine Chromium, Liberation fonts only): 10 themes at 1300/800(ar)/390 px, zero sideways scroll; map label positions (81 text boxes, relative to map) identical in every theme; only third-party host seen is tile.openstreetmap.org (pre-existing); no @font-face/@import/url(http) added. Amber/Green: Settings > Node labels header "Use units" splits to "Use / uni / ts" and the "Initial quality" prefix box reads "Ini" (15 px mono widens columns). Newspaper in Arabic shows blank text (jasmine has no Arabic glyphs; Light shows tofu), unverifiable here. Map is white inside Amber/Green/Arcade/Space (known). Rounded = Light + pills + softer boxes. Icons only change stroke weight/caps, none redrawn. Platinum name = Apple UI term (low risk, name only).
+CAVEAT: my harness scrolled the page 35px after toolbar click (artifact, not a defect). Did not byte-compare Light to master.
+
+## 2026-10-18 feat/theme round 3 (b9f4e4323)
+OBSERVED (jasmine Chromium, Liberation fonts only, no Arabic glyphs): builder harnesses theme-design 490 ok, theme-contrast 6490 ok, theme-browser 68 ok, gallery 54 ok. Net3 Novato and Net1, 12 themes: map label positions (canvas-relative) identical to Light wherever the face resolves the same; exactly one label pass per face change, none Light<->Dark/HC, green after amber none; sweeping 13 gallery cards at ~150ms each = 10 passes (one per face change, coalescing only inside one frame). .inp, GeoJSON, DXF of Net3 byte-identical in 8 themes AND byte-identical to master (md5 d7376ea7d2/0b075abe56/c8c0a4686c). Each .inp export in a new-face theme costs 2 passes (Light and back), synchronous. Light canvas pixels and label positions identical to master for Net1 and Net3. Print: beforeprint/afterprint fire under page.pdf, print preview emulation is Light, PDF byte size within 1 of Light's in prairie/dark, theme and layout restored. Screenshot SVG carries Light inline colours, no dark values; page stays in theme. Dark map with OSM tiles: tiles veiled to mid grey, readable; lowest velocity class (dark purple) is faint on dark ground. No overflow at 390 / 1000 ar in prairie/desktop/dark. Desktop in jasmine is hard to tell from Rounded (no system font here).
+NOT CHECKED: Arabic glyph look, real print dialog, clipboard copy, real Apple/Windows system fonts, hover feel.
 # Perry journal, feat/scenario-results f4fdf62df, 2026-10-18 (OBSERVED, decays; re-verify before citing)
 - OBSERVED: 6 steady scenarios on Net1 (multiplier, diameter, pipe closed, pipe inactive, node moved, DW method), 399 cells, match an independent Node epanet-js solve of hand-edited Net1.inp within display rounding. TSV full precision within 3e-4 relative (EPS@6h), 5e-5 steady.
 - OBSERVED: page shows |flow| (shownFlow) so direction lost in table and TSV.
@@ -4562,3 +4576,28 @@ UNVERIFIED: how it looks (column widths, 10-column fire flow table with extra co
 - OBSERVED: Net1 pipe 113 labelled at all 15 zooms (master 8/15, beside 11/15); pipe 11 Q=1234.2 hidden at notch 4 where beside showed it, and pipe 10's "Q=1866.2" sits under pipe 11 though its leader goes to pipe 10.
 - OBSERVED: 0 leader/leader crossings, 0 new leader-through-node; deterministic over 3 runs.
 - Decays: re-verify before citing.
+
+## 2026-10-20 feat/geojson-into-project (Task 814)
+- OBSERVED (real Chromium, probes p1/p2/p3 in scratchpad): Net3 export -> Peak -> edited GeoJSON -> "Peak, open now": receipt names Peak; elevation 147->154.5 as Peak override only; JNEW inactive in Base, active in Peak; one Undo restores doc (only nextId counters differ).
+- OBSERVED: .inp door unedited Net1 into Base-only: 0 changes; edited into scenario Alt: override only. Tank base 850->860 and pump blank->closed reported as real; closed<->open GeoJSON pump flips reported both ways.
+- OBSERVED: foreign GeoJSON asks destination FIRST, then mapping, then units refusal by name.
+- Gap: a .inp silent on a pump's status never reverts a Closed pump (nv undefined skipped); pre-existing.
+## 2026-10-20 Perry, feat/label-leader round 6 (88191ee39)
+OBSERVED (Chromium, own DOM counts, master e0ed97378 vs branch): Net3 6/9 notches and Novato fit/+3 identical to master (labels, values, leaders). Net1 SI/US wheel out: branch hides Pump Text at 8+ out (overprints Source), overlaps 5->2.
+OBSERVED: Tom's long leader reproduced by dropping a label above the map's top edge; identical on master. Not reproduced by 240 random wheel/pan/drag steps or r5 (bcebdfa58) wheel sweeps.
+OBSERVED: left-hung labels end-anchored (66 on Net3 at 9), leader ends touch words. LPN_COLUMN is two if-tests. Decays: re-verify.
+
+## 2026-10-20 Perry, feat/sqlite-reader (b4589acd6), Task 749
+OBSERVED (Chromium via session.js, Tom's own two files): both files -> units GPM/ft/in/psi, Base J-1 P=42.72, TGH-1 heads 94.606/94.105 ft, P-2 2250 gpm, matching EPANET on WaterGEMS's own .inp exports. WaterGEMS .out (Base): 6.38278 fps, head 98.7987, P 42.7455 (EPANET 42.7239; SG 0.998 vs 1.0).
+OBSERVED: sqlite alone -> imports in LPS/SI, report says so; solve identical.
+OBSERVED: report says "from its scenario Base and 1 more scenarios" (plural defect). Report shows raw table names and HMIGeometryScaledLength.
+OBSERVED: fixture .wtg.sqlite 6.1 MB is the largest tracked file after js/looped-network.js (4.8 MB); no user name inside; holds Bentley schema SQL text.
+Decays: re-verify.
+
+## 2026-10-20 Perry, feat/label-margin (a4e28f48c) and feat/flow-arrow (5ebd338e2)
+OBSERVED (Chromium, own DOM measurement vs master): Net1 Tom view 24 vs 21, none hidden; Net3 6 notches 141 vs 123; Novato 133 vs 115; 0 leader/leader crossings (all views). Counts confirmed.
+OBSERVED: same view, N10/N11 cluster overprinted exactly as master; new external leaders longest ~200 px vs 46-61 on master; leader-through-label boxes Net3 6 notches 9 vs 1 (master), Novato 9 vs 1; text overlaps +1 (n101~l117); visible leaders striking "P=57.54".
+OBSERVED: pan stable (0 moves). Phone 390x844 Net3 6 notches: leaders half off screen 14 vs 6.
+OBSERVED: refreshOneLabelInPlace on an external pipe label: text moves 57-72 px left, leader unchanged (Net1 L11 524->467; Net3 l109, l117, l213, l215).
+OBSERVED arrow: path of two closed triangles, fill none, stroke map ink 0.25; same colour as pipe so interior is the pipe; dark/newspaper fine.
+Decays: re-verify.

@@ -50,7 +50,7 @@ const QUOTES = {
 // The terms of the two chapters, in order (the template in Looped-Network.php).
 const SM_TERMS = ['lpn_guide_scn_use_term', 'lpn_guide_scn_open_term', 'lpn_guide_scn_marks_term', 'lpn_guide_scn_make_term',
 	'lpn_guide_scn_scope_term', 'lpn_guide_scn_example_term', 'lpn_guide_scn_notes_term'];
-const CMP_TERMS = ['lpn_guide_cmp_cols_term', 'lpn_guide_cmp_run_term', 'lpn_guide_cmp_byasset_term', 'lpn_guide_cmp_notes_term'];
+const CMP_TERMS = ['lpn_guide_cmp_cols_term', 'lpn_guide_cmp_run_term', 'lpn_scnres_title', 'lpn_guide_cmp_notes_term'];
 
 async function main() {
 	const env = require(path.join(L.REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
@@ -113,6 +113,22 @@ async function main() {
 		let sm = await entry(P, 'lpn_sm_box'), cmp = await entry(P, 'lpn_scncmp_box');
 		ok('the Scenario manager entry is in the Guide, titled by the box', !!sm && sm.title.trim() === await T('lpn_sm_title'), sm && sm.title);
 		ok('...it opens with the box\'s own help (Tom\'s wording), which the chapter follows', !!sm && (() => { const h = sm.text.indexOf(plain(enString('lpn_sm_help')).slice(0, 30)); return h >= 0 && h < sm.text.indexOf(enString('lpn_guide_scn_use_term')); })());
+		// Tom, 2026-10-19: "How scenarios and alternatives work" and "How to manage scenarios" are headings
+		// like the chapter's other sub-headings, not paragraphs ending in a colon; the "- " lines are a list.
+		const sub = await P.evaluate(() => {
+			const en = document.getElementById('lpn_guide_b_lpn_sm_box');
+			return { heads: Array.from(en.querySelectorAll('h4.lpn-guide-subhead')).map((h) => h.textContent), items: en.querySelectorAll(':scope > ul > li').length,
+				dashParas: Array.from(en.querySelectorAll(':scope > p')).filter((p) => /^- /.test(p.textContent)).length,
+				headBold: en.querySelector('h4.lpn-guide-subhead') ? getComputedStyle(en.querySelector('h4.lpn-guide-subhead')).fontWeight : '' };
+		});
+		const smParas = enString('lpn_sm_help').split('\\n\\n');
+		ok('...its two lines of Tom\'s help are headings, colon dropped, and its "- " lines a list', JSON.stringify(sub.heads) === JSON.stringify(smParas.filter((t) => /:$/.test(t)).map((t) => t.replace(/:$/, ''))) && sub.items === smParas.filter((t) => /^- /.test(t)).length && sub.dashParas === 0 && Number(sub.headBold) >= 600, JSON.stringify(sub));
+		// Tom, 2026-10-20: the order is production's: Basic mode first, because that is all a beginner wants to read.
+		{
+			const b = (n) => /Basic mode/.test(smParas[n]);
+			ok('...Tom\'s help puts Basic mode first, then the detail, and the entry shows it in that order', /:$/.test(smParas[0]) && b(1) && b(2) && !b(3) && !b(4) && !!sm &&
+				smParas.slice(0, 7).every((t, n, a) => n === 0 || sm.text.indexOf(plain(t).slice(0, 25)) > sm.text.indexOf(plain(a[n - 1]).slice(0, 25))));
+		}
 		ok('...and carries the seven terms of the chapter, in order, after it', !!sm && SM_TERMS.every((k, i) => sm.dts[i] === enString(k)), sm && JSON.stringify(sm.dts));
 		ok('...and its tables (what can be overridden, the worked example)', !!sm && sm.tables.length === 2, sm && String(sm.tables.length));
 		ok('the Scenario comparison entry carries its four terms and its table', !!cmp && CMP_TERMS.every((k, i) => cmp.dts[i] === enString(k)) && cmp.tables.length === 1, cmp && JSON.stringify(cmp.dts));

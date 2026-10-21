@@ -43,6 +43,10 @@ const ROWS = [
 	['#lpn_menu_file', 'border-top-color', 'ec-accent-open'],
 	['#lpn_menu_file', 'background-color', 'ec-accent-open-bg'],
 	['#lpn_toolbar', 'border-bottom-color', 'ec-gray-d6d6d6'],
+	['#lpn_menubar', 'background-color', 'ec-chrome-bg'],
+	['#lpn_toolbar', 'background-color', 'ec-chrome-bg'],
+	['#lpn_tabs', 'background-color', 'ec-chrome-bg'],
+	['#lpn_set_theme', 'border-top-color', 'ec-control-border'],
 	['#lpn_tabs', 'border-bottom-color', 'ec-gray-999'],
 	['#lpn_tabs .lpn-tab', 'background-color', 'ec-gray-ececec'],
 	['#lpn_tabs .lpn-tab', 'border-top-color', 'ec-gray-999'],
@@ -112,7 +116,8 @@ async function main() {
 			for (const sheet of document.styleSheets) {
 				let rules; try { rules = sheet.cssRules; } catch (e) { continue; }
 				for (const r of rules) {
-					if (r.selectorText === ':root') {
+					// The first rule is `:root, .ec-theme-card` since the gallery cards share it (Task 811).
+					if (r.selectorText && r.selectorText.split(',')[0].trim() === ':root') {
 						for (let i = 0; i < r.style.length; i++) { if (/^--ec-/.test(r.style[i])) { declared.push(r.style[i]); } }
 					}
 				}

@@ -24,7 +24,7 @@ global.confirm = global.window.confirm = function () { return true; };
 setUnitSet('us');
 const L = loadLoopedNetwork(
 	"\t\tapplySaved: applySaved, buildDom: buildDom, serialize: serializeProject, geoOptions: geoJsonExportOptions,\n" +
-	"\t\tland: landGeoJsonNetText, getDoc: function () { return doc; }, undo: undo, getProject: function () { return project; },\n" +
+	"\t\tland: landGeoJsonNetText, askInp: inpAskDestination, getDoc: function () { return doc; }, undo: undo, getProject: function () { return project; },\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario,\n" +
 	"\t\teffective: effective, nodeById: nodeById, linkById: linkById,\n" +
 	"\t\tprojectCount: function () { return library.projects.length; },\n" +
@@ -113,7 +113,7 @@ console.log('\n--- a child scenario is open: it receives the values, Base is unt
 	const baseElev20 = L.nodeById('20').elev;
 	importText(TEXT, 'edited.geojson');
 	const names = dialogButtons();
-	ok('the question offers the open scenario and Base', names[1] === PC.lpn_inpup_btn_scenario.replace('{scenario}', 'Peak') && names[2] === PC.lpn_inpup_btn_base, JSON.stringify(names));
+	ok('the question offers the open scenario and Base', names[1] === PC.lpn_inpup_btn_scenario.replace('{scenario}', 'Peak') && names[2] === PC.lpn_scenario_base, JSON.stringify(names));
 	press(names[1]);
 	ok('Base holds the old value', L.nodeById('20').elev === baseElev20);
 	ok('the scenario reads the file value', L.effective(L.nodeById('20'), 'elev') === oldElev + 7);
@@ -125,7 +125,7 @@ console.log('\n--- a child scenario is open: it receives the values, Base is unt
 	ok('one undo restores the scenario and Base exactly', snap() === before);
 	// And Base, chosen on purpose from inside the scenario.
 	importText(TEXT, 'edited.geojson');
-	press(PC.lpn_inpup_btn_base);
+	press(PC.lpn_scenario_base);
 	ok('Base chosen: Base takes the value', L.nodeById('20').elev === oldElev + 7);
 	ok('the open scenario stays open', L.getProject().activeScenario === sc.id);
 	L.undo();
@@ -142,6 +142,18 @@ console.log('\n--- a file in other units is refused by name ---');
 	const t = dialogText();
 	ok('the refusal leaves the project as it was', snap() === before);
 	ok('it names the flow unit and says what to do instead', t.indexOf(PC.lpn_result_flow) >= 0 && t.indexOf(PC.lpn_inpup_refused_lead) >= 0, t.slice(0, 300));
+}
+
+console.log('\n--- the EPANET file box has the same two paragraphs ---');
+{
+	clearDialog();
+	L.askInp('x.inp', 'x.inp', null);
+	const paras = PC.lpn_inpup_lead.split(/\\n\\n|\n\n/), dt = dialogText();
+	const count = (h, n) => h.split(n).length - 1;
+	ok('the .inp lead is two paragraphs, the second naming the matching by ID', paras.length === 2 && /matched by ID/.test(paras[1]));
+	ok('the .inp box shows both paragraphs once, with no literal \\n', count(dt, paras[0]) === 1 && count(dt, paras[1]) === 1 && dt.indexOf('\\n') < 0);
+	ok('no old explanation paragraph is repeated under it', dt.indexOf(PC.lpn_inpup_how) < 0);
+	press(PC.lpn_cancel);
 }
 
 (async () => {

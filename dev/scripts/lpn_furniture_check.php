@@ -158,7 +158,7 @@ const EC_LPN_FURNITURE = [
     // asset. A reading aid for the person at the screen; written only when OFF.
     'lpn_hovercard'   => 'whether the full-label hover card is shown, for this browser',
     // The theme (Task 714): System, Light or Dark. How the page looks to the person at the screen.
-    'lpn_theme'       => 'whether the page is light, dark or follows the device (System), for this browser',
+    'lpn_theme'       => 'which theme the page is in (light, dark, high contrast, rounded, platinum, desktop, newspaper, amber, green, arcade, space, prairie) or follows the device (System), for this browser',
     'lpn_areahint'    => 'whether the area-selection help bubble is shown',
     // Hidden amber messages (Tom, 2026-10-09, H09: "this should not be lost on reload."). Which
     // messages this reader hid is a fact about the person at the screen: the open project's id and a
