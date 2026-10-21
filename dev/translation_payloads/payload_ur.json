@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "ur",
-        "expected_key_count": 3190,
-        "delta_key_count": 205,
-        "english_changed_key_count": 34,
+        "expected_key_count": 3187,
+        "delta_key_count": 206,
+        "english_changed_key_count": 38,
         "exempt_key_count": 42,
         "exempt_keys": [
             "u_imgd",
@@ -82,15 +82,16 @@
         "lpn_guide_page_what": "{name} is a free web application for modeling water distribution networks, an extension of EPANET.",
         "lpn_guide_page_missing": "There is no such chapter. The chapters are listed below.",
         "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
-        "lpn_guide_cmp_byasset_term": "Results by asset",
-        "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver's internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.<\/p>",
+        "lpn_guide_scn_notes_def": "<ul><li>An override equal to the inherited value is still an override. It is counted, and Override manager marks it (same).<\/li><li>Basic mode is a setting for this browser, not for the project. It is disabled for a project whose scenarios and alternatives it cannot show. Alternatives and the Scenario manager are described under How scenarios and alternatives work and How to manage scenarios, at the top of this entry.<\/li><li>Undo keeps 20 steps. Each step restores the scenarios and the open scenario along with the drawing, so adding, renaming, and deleting a scenario can be undone.<\/li><li>Exporting an EPANET file writes the open scenario only, with the values and node positions that scenario reads. The scenarios themselves are recorded in the project file only.<\/li><\/ul>",
+        "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.<\/p>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
-        "lpn_guide_ff_dur_term": "A fire for a stated duration",
         "lpn_guide_ff_dur_def": "<p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.<\/p>",
         "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_ex_net1_title": "EPANET Net1 plus rule-based controls, gpm (US)",
+        "lpn_ex_net1_desc": "Gallons per minute, with feet and inches. A fictional EPANET example with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
         "lpn_ex_net1_scn_title": "EPANET Net1 with scenarios, gpm (US)",
         "lpn_ex_net1_scn_desc": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.",
         "lpn_ex_valves_title": "Valve types, gpm (US)",
@@ -112,7 +113,6 @@
         "lpn_msx_not_msx": "{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.",
         "lpn_msx_attached_heading": "Attached EPANET-MSX file: {file}",
         "lpn_msx_replace": "Replace…",
-        "lpn_msx_remove": "Remove",
         "lpn_msx_removed": "Removed {file} from this project.",
         "lpn_quality_msx": "Multi-species (EPANET-MSX)",
         "lpn_quality_msx_species": "Species",
@@ -126,7 +126,6 @@
         "lpn_inpup_btn_new": "A new project",
         "lpn_inpup_btn_project": "This project, {project}",
         "lpn_inpup_btn_scenario": "{scenario}, open now",
-        "lpn_inpup_btn_base": "Base",
         "lpn_inpup_title": "Update from EPANET file",
         "lpn_inpup_heading": "Imported {file} into {scenario} of {project}",
         "lpn_inpup_counts": "Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).",
@@ -163,25 +162,29 @@
         "lpn_inpup_i_controls": "controls",
         "lpn_inpup_i_rules": "rules",
         "lpn_inpup_i_options": "options",
-        "lpn_inpup_t_junction": "Junction",
-        "lpn_inpup_t_reservoir": "Reservoir",
-        "lpn_inpup_t_tank": "Tank",
-        "lpn_inpup_t_pipe": "Pipe",
-        "lpn_inpup_t_pump": "Pump",
-        "lpn_inpup_t_valve": "Valve",
         "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
         "lpn_notes_2_def": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
         "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
         "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.",
         "lpn_engine_unavailable_why": "This network cannot be solved without the EPANET solver. {reason}",
         "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Clear it to hide the text with the other labels once the view is wider than the labeling threshold set under Map.",
+        "lpn_settings_theme_tip": "Choose the look of the page: its colors and, in some themes, its shapes and type. Each card shows the theme on this page before it is chosen. System follows the settings of the device. On screen the map follows the theme too; printed pages, screenshots and exported files are always drawn in Light. This is a setting for this browser, not for the project.",
+        "lpn_theme_hc": "High contrast",
+        "lpn_theme_amber": "Amber",
+        "lpn_theme_green": "Green",
+        "lpn_theme_platinum": "Platinum",
+        "lpn_theme_rounded": "Rounded",
+        "lpn_theme_desktop": "Desktop",
+        "lpn_theme_newspaper": "Newspaper",
+        "lpn_theme_arcade": "Arcade",
+        "lpn_theme_space": "Space",
+        "lpn_theme_prairie": "Prairie",
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
         "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
         "lpn_settings_grp_size": "Size",
         "lpn_settings_grp_angle": "Angle",
         "lpn_settings_grp_zoom": "Zoom",
         "lpn_settings_grp_positions": "Positions",
-        "lpn_settings_grp_show": "Show",
         "lpn_settings_grp_thematic": "Thematic",
         "lpn_scncmp_menu_tip": "Table of scenarios with count of overrides, lowest pressure, and highest velocity, and a table of results by asset that copies to a spreadsheet",
         "lpn_scncmp_progress": "Solving scenario {done} of {total}…",
@@ -197,7 +200,7 @@
         "lpn_scnres_not_converged": "(not converged)",
         "lpn_scnres_not_converged_note": "A column marked {mark} shows the last results the solver reached before it stopped without converging.",
         "lpn_scnres_failed": "{scenario} could not be solved, so its columns are blank. {why}",
-        "lpn_scnres_flow_tip": "The sign of a flow is the solver's internal direction sign: positive runs from the From node to the To node, negative the reverse. It has no use outside this table except to show whether a flow changed direction between scenarios.",
+        "lpn_scnres_flow_tip": "The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show here whether a flow changed direction between scenarios.",
         "lpn_scnres_stale": "Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.",
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
         "lpn_library_import": "Libraries…",
@@ -231,7 +234,6 @@
         "lpn_dur_not_back_junction": "⚠ At {time}, the last reporting step, junction {id} is not back to its pressure without the fire. The difference is {pressure}, against a tolerance of {tolerance}.",
         "lpn_dur_recovery_to_end": "The fire lasts to the end of the run, so recovery after it is not assessed.",
         "lpn_dur_recovery_cut": "The run stopped before its end, so recovery after the fire is not assessed.",
-        "lpn_dur_col_fire": "Fire flow",
         "lpn_dur_col_pressure": "Pressure at the fire junction",
         "lpn_dur_col_nofire": "Pressure without the fire",
         "lpn_dur_col_low": "Lowest level reached",
@@ -240,7 +242,6 @@
         "lpn_dur_col_end": "Level at end",
         "lpn_dur_col_end_nofire": "Level at end without the fire",
         "lpn_at_time": "{value} at {time}",
-        "lpn_crit_col_lowest": "Lowest pressure",
         "lpn_crit_col_hours": "Hours below minimum",
         "lpn_crit_col_empty": "Tank empties",
         "lpn_ds_run_note": "Judged over the whole run, at every reporting step.",
@@ -289,15 +290,16 @@
         "lpn_guide_page_what": "{name} is a free web application for modeling water distribution networks, an extension of EPANET.",
         "lpn_guide_page_missing": "There is no such chapter. The chapters are listed below.",
         "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
-        "lpn_guide_cmp_byasset_term": "Results by asset",
-        "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver's internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.<\/p>",
+        "lpn_guide_scn_notes_def": "<ul><li>An override equal to the inherited value is still an override. It is counted, and Override manager marks it (same).<\/li><li>Basic mode is a setting for this browser, not for the project. It is disabled for a project whose scenarios and alternatives it cannot show. Alternatives and the Scenario manager are described under How scenarios and alternatives work and How to manage scenarios, at the top of this entry.<\/li><li>Undo keeps 20 steps. Each step restores the scenarios and the open scenario along with the drawing, so adding, renaming, and deleting a scenario can be undone.<\/li><li>Exporting an EPANET file writes the open scenario only, with the values and node positions that scenario reads. The scenarios themselves are recorded in the project file only.<\/li><\/ul>",
+        "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.<\/p>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
-        "lpn_guide_ff_dur_term": "A fire for a stated duration",
         "lpn_guide_ff_dur_def": "<p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.<\/p>",
         "lpn_guide_cr_case_def": "<p>For each link in the scope, the link is made inactive on a copy of the network, and the copy is solved at the time step on screen in the open scenario. A run is one solve for each link and one more with nothing broken. A junction left with no open path to a reservoir or tank is cut off: it is removed before the solve, and its demand is counted as Demand not served. Of the junctions still connected, Junctions below minimum lists those whose pressure falls below the Lowest pressure allowed. A junction that is already below it with nothing broken is not counted against any link, and the summary states how many there are. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
         "lpn_guide_ds_find_def": "<p>Find searches demand scales from 0 to 20, to the nearest 0.01, for the largest one at which every chosen junction keeps at least the Lowest pressure allowed. It reports the scale and the lowest pressure there, and the same for the next step up, where the pressure first falls below the limit. If the demands as entered already leave a junction below the limit, the answer is marked with a warning sign. If every junction keeps the limit at 20, the answer says so. Stop ends a search without an answer. Lowest pressure allowed is the same setting as the Lowest system pressure allowed box of the Fire flow analysis.<\/p>",
+        "lpn_ex_net1_title": "EPANET Net1 plus rule-based controls, gpm (US)",
+        "lpn_ex_net1_desc": "Gallons per minute, with feet and inches. A fictional EPANET example with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
         "lpn_ex_net1_scn_title": "EPANET Net1 with scenarios, gpm (US)",
         "lpn_ex_net1_scn_desc": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.",
         "lpn_ex_valves_title": "Valve types, gpm (US)",
@@ -319,7 +321,6 @@
         "lpn_msx_not_msx": "{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.",
         "lpn_msx_attached_heading": "Attached EPANET-MSX file: {file}",
         "lpn_msx_replace": "Replace…",
-        "lpn_msx_remove": "Remove",
         "lpn_msx_removed": "Removed {file} from this project.",
         "lpn_quality_msx": "Multi-species (EPANET-MSX)",
         "lpn_quality_msx_species": "Species",
@@ -333,7 +334,6 @@
         "lpn_inpup_btn_new": "A new project",
         "lpn_inpup_btn_project": "This project, {project}",
         "lpn_inpup_btn_scenario": "{scenario}, open now",
-        "lpn_inpup_btn_base": "Base",
         "lpn_inpup_title": "Update from EPANET file",
         "lpn_inpup_heading": "Imported {file} into {scenario} of {project}",
         "lpn_inpup_counts": "Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).",
@@ -370,25 +370,29 @@
         "lpn_inpup_i_controls": "controls",
         "lpn_inpup_i_rules": "rules",
         "lpn_inpup_i_options": "options",
-        "lpn_inpup_t_junction": "Junction",
-        "lpn_inpup_t_reservoir": "Reservoir",
-        "lpn_inpup_t_tank": "Tank",
-        "lpn_inpup_t_pipe": "Pipe",
-        "lpn_inpup_t_pump": "Pump",
-        "lpn_inpup_t_valve": "Valve",
         "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
         "lpn_notes_2_def": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
         "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
         "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.",
         "lpn_engine_unavailable_why": "This network cannot be solved without the EPANET solver. {reason}",
         "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Clear it to hide the text with the other labels once the view is wider than the labeling threshold set under Map.",
+        "lpn_settings_theme_tip": "Choose the look of the page: its colors and, in some themes, its shapes and type. Each card shows the theme on this page before it is chosen. System follows the settings of the device. On screen the map follows the theme too; printed pages, screenshots and exported files are always drawn in Light. This is a setting for this browser, not for the project.",
+        "lpn_theme_hc": "High contrast",
+        "lpn_theme_amber": "Amber",
+        "lpn_theme_green": "Green",
+        "lpn_theme_platinum": "Platinum",
+        "lpn_theme_rounded": "Rounded",
+        "lpn_theme_desktop": "Desktop",
+        "lpn_theme_newspaper": "Newspaper",
+        "lpn_theme_arcade": "Arcade",
+        "lpn_theme_space": "Space",
+        "lpn_theme_prairie": "Prairie",
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
         "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
         "lpn_settings_grp_size": "Size",
         "lpn_settings_grp_angle": "Angle",
         "lpn_settings_grp_zoom": "Zoom",
         "lpn_settings_grp_positions": "Positions",
-        "lpn_settings_grp_show": "Show",
         "lpn_settings_grp_thematic": "Thematic",
         "lpn_scncmp_menu_tip": "Table of scenarios with count of overrides, lowest pressure, and highest velocity, and a table of results by asset that copies to a spreadsheet",
         "lpn_scncmp_progress": "Solving scenario {done} of {total}…",
@@ -404,7 +408,7 @@
         "lpn_scnres_not_converged": "(not converged)",
         "lpn_scnres_not_converged_note": "A column marked {mark} shows the last results the solver reached before it stopped without converging.",
         "lpn_scnres_failed": "{scenario} could not be solved, so its columns are blank. {why}",
-        "lpn_scnres_flow_tip": "The sign of a flow is the solver's internal direction sign: positive runs from the From node to the To node, negative the reverse. It has no use outside this table except to show whether a flow changed direction between scenarios.",
+        "lpn_scnres_flow_tip": "The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show here whether a flow changed direction between scenarios.",
         "lpn_scnres_stale": "Recalculate is off, so the results on the map and in the Tables pane are from an earlier solve. The {scenario} columns here are solved from the current inputs and may differ from them.",
         "lpn_full_needs_run": "The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.",
         "lpn_library_import": "Libraries…",
@@ -438,7 +442,6 @@
         "lpn_dur_not_back_junction": "⚠ At {time}, the last reporting step, junction {id} is not back to its pressure without the fire. The difference is {pressure}, against a tolerance of {tolerance}.",
         "lpn_dur_recovery_to_end": "The fire lasts to the end of the run, so recovery after it is not assessed.",
         "lpn_dur_recovery_cut": "The run stopped before its end, so recovery after the fire is not assessed.",
-        "lpn_dur_col_fire": "Fire flow",
         "lpn_dur_col_pressure": "Pressure at the fire junction",
         "lpn_dur_col_nofire": "Pressure without the fire",
         "lpn_dur_col_low": "Lowest level reached",
@@ -447,7 +450,6 @@
         "lpn_dur_col_end": "Level at end",
         "lpn_dur_col_end_nofire": "Level at end without the fire",
         "lpn_at_time": "{value} at {time}",
-        "lpn_crit_col_lowest": "Lowest pressure",
         "lpn_crit_col_hours": "Hours below minimum",
         "lpn_crit_col_empty": "Tank empties",
         "lpn_ds_run_note": "Judged over the whole run, at every reporting step.",
@@ -586,19 +588,19 @@
                 }
             }
         },
-        "lpn_guide_cmp_byasset_term": {
-            "reason": "missing",
-            "current_value": null,
+        "lpn_guide_scn_notes_def": {
+            "reason": "english_changed",
+            "current_value": "<ul><li>وراثتی قدر کے برابر اپنی قدر پھر بھی اپنی قدر ہے۔ اسے گنا جاتا ہے، اور اپنی قدروں کا مینیجر اسے (same) سے نشان زد کرتا ہے۔<\/li><li>بنیادی موڈ اس براؤزر کی ترتیب ہے، پراجیکٹ کی نہیں۔ ایسے پراجیکٹ کے لیے یہ غیر فعال ہوتا ہے جس کے منظرنامے اور متبادلات کو یہ دکھا نہیں سکتا۔ متبادلات اور منظرنامہ مینیجر اس اندراج کے شروع کی مدد میں بیان ہیں۔<\/li><li>کالعدم کریں 20 مراحل رکھتا ہے۔ ہر مرحلہ ڈرائنگ کے ساتھ منظرناموں اور کھلے ہوئے منظرنامے کو بھی بحال کرتا ہے، اس لیے منظرنامہ شامل کرنا، نام بدلنا اور حذف کرنا کالعدم ہو سکتا ہے۔<\/li><li>EPANET فائل برآمد کرنا صرف کھلے ہوئے منظرنامے کو لکھتا ہے، ان قدروں اور نوڈ کی جگہوں کے ساتھ جو وہ منظرنامہ پڑھتا ہے۔ منظرنامے خود صرف پراجیکٹ فائل میں درج ہوتے ہیں۔<\/li><\/ul>",
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_guide_cmp_run_def",
-                    "value": "<p>جس منظرنامے کا کل رن کا وقت 0 سے زیادہ ہو، وہ پوری مدت کے لیے EPANET انجن کے ذریعے چلایا جاتا ہے۔ اس کا سب سے کم دباؤ اور سب سے زیادہ رفتار ہر ٹائم اسٹیپ کی انتہائیں ہیں، ہر ایک اپنے وقت کے ساتھ دکھائی جاتی ہے۔ جس منظرنامے کا کل رن کا وقت 0 ہو وہ ایک لمحے پر حل ہوتا ہے۔ کل رن کا وقت ان آپشنز میں سے ہے جنہیں منظرنامہ اپنی قدر سے بدل سکتا ہے، اس لیے ایک جدول میں دونوں قسمیں ہو سکتی ہیں۔<\/p>",
-                    "english": "<p>A scenario with a Total run time greater than 0 is run over the whole period through the EPANET engine. Its lowest pressure and highest velocity are the extremes over every time step, each shown with its time. A scenario with a Total run time of 0 is solved at one instant. The total run time is one of the options a scenario can override, so one table can hold both kinds.<\/p>"
-                },
-                "next_translated": {
-                    "key": "lpn_guide_cmp_notes_term",
+                    "key": "lpn_guide_scn_notes_term",
                     "value": "قابل ذکر نکات",
                     "english": "Points to note"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_cmp_cols_term",
+                    "value": "جدول میں کیا ہے",
+                    "english": "What the table holds"
                 }
             }
         },
@@ -666,22 +668,6 @@
                 }
             }
         },
-        "lpn_guide_ff_dur_term": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_guide_ff_marks_def",
-                    "value": "<p>رن کے بعد، ہر آزمائے گئے جنکشن کے دائرے کا خاکہ نقشے پر اس کے نتیجے کے مطابق بنتا ہے، اور خاکے رنگ کے ساتھ ڈیش کے نمونے میں بھی مختلف ہوتے ہیں۔ صرف نقشے پر منتخب جنکشنز کو آزمانے کے لیے منتخب جنکشنز چنیں؛ جو کچھ اور منتخب ہو اسے گنا جاتا ہے اور آزمایا نہیں جاتا۔ روکیں رن ختم کرتا ہے اور مکمل ہو چکے جنکشنز کو رکھتا ہے۔ فائر فلو، نازکی، اور طلب اسکیلنگ کے تجزیوں میں سے ایک وقت میں صرف ایک چلتا ہے۔<\/p>",
-                    "english": "<p>After a run, the circle of each tested junction is outlined on the map according to its result, and the outlines differ in dash pattern as well as in color. Choose Selected junctions to test only the junctions selected on the map; anything else that is selected is counted and not tested. Stop ends a run and keeps the junctions already finished. Only one of the fire flow, criticality, and demand scaling analyses runs at a time.<\/p>"
-                },
-                "next_translated": {
-                    "key": "lpn_guide_ff_example_term",
-                    "value": "Net1 پر مثال",
-                    "english": "Example on Net1"
-                }
-            }
-        },
         "lpn_guide_ff_dur_def": {
             "reason": "missing",
             "current_value": null,
@@ -727,6 +713,38 @@
                     "key": "lpn_guide_ds_scope_term",
                     "value": "جنکشنز، اور ٹائم اسٹیپ",
                     "english": "Junctions, and the time step"
+                }
+            }
+        },
+        "lpn_ex_net1_title": {
+            "reason": "english_changed",
+            "current_value": "EPANET Net1 اور قواعد پر مبنی کنٹرولز",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_basic_us_desc",
+                    "value": "دو ریزروائر، ایک پمپ اور ایک چھوٹا لوپ۔ گیلن فی منٹ، فٹ اور انچ کے ساتھ۔",
+                    "english": "Two reservoirs, a pump, and a small loop. Gallons per minute, with feet and inches."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_net1_desc",
+                    "value": "کلورین کے ساتھ ایک فرضی EPANET مثال، 1 ریزروائر اور 1 ٹینک۔",
+                    "english": "Gallons per minute, with feet and inches. A fictional EPANET example with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls."
+                }
+            }
+        },
+        "lpn_ex_net1_desc": {
+            "reason": "english_changed",
+            "current_value": "کلورین کے ساتھ ایک فرضی EPANET مثال، 1 ریزروائر اور 1 ٹینک۔",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net1_title",
+                    "value": "EPANET Net1 اور قواعد پر مبنی کنٹرولز",
+                    "english": "EPANET Net1 plus rule-based controls, gpm (US)"
+                },
+                "next_translated": {
+                    "key": "lpn_ex_net1_si_title",
+                    "value": "EPANET Net1 اور قواعد پر مبنی کنٹرولز، L\/s (SI)",
+                    "english": "EPANET Net1 plus rule-based controls, L\/s (SI)"
                 }
             }
         },
@@ -1089,22 +1107,6 @@
                 }
             }
         },
-        "lpn_msx_remove": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_file_import_workspace_tip",
-                    "value": "فائل، برآمد، ورک اسپیس سے محفوظ کی گئی ورک اسپیس فائل لاگو کریں: باکس کی جگہیں اور سائز، ڈاکنگ، پین کے سائز اور اس صفحے کے ڈسپلے اختیارات، جیسے کون سے مدد کے بلبلے اور ہوور کارڈ دکھائے جائیں۔ آپ کے پراجیکٹس اور کوکیز کو چھوا نہیں جاتا۔",
-                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
-                },
-                "next_translated": {
-                    "key": "lpn_workspace_exported",
-                    "value": "ورک اسپیس {file} میں محفوظ ہو گئی: {n} ترتیبات۔",
-                    "english": "Workspace saved to {file}: {n} settings."
-                }
-            }
-        },
         "lpn_msx_removed": {
             "reason": "missing",
             "current_value": null,
@@ -1306,22 +1308,6 @@
             }
         },
         "lpn_inpup_btn_scenario": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_status_imported",
-                    "value": "{name} کو فائل سے کھولا گیا، اور اسے اس براؤزر میں ایک نئے پراجیکٹ کے طور پر شامل کر دیا گیا۔",
-                    "english": "Opened {name} from a file, and added it to this browser as a new project."
-                },
-                "next_translated": {
-                    "key": "lpn_file_type_desc",
-                    "value": "پراجیکٹ فائل",
-                    "english": "Project file"
-                }
-            }
-        },
-        "lpn_inpup_btn_base": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -1913,102 +1899,6 @@
                 }
             }
         },
-        "lpn_inpup_t_junction": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_status_imported",
-                    "value": "{name} کو فائل سے کھولا گیا، اور اسے اس براؤزر میں ایک نئے پراجیکٹ کے طور پر شامل کر دیا گیا۔",
-                    "english": "Opened {name} from a file, and added it to this browser as a new project."
-                },
-                "next_translated": {
-                    "key": "lpn_file_type_desc",
-                    "value": "پراجیکٹ فائل",
-                    "english": "Project file"
-                }
-            }
-        },
-        "lpn_inpup_t_reservoir": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_status_imported",
-                    "value": "{name} کو فائل سے کھولا گیا، اور اسے اس براؤزر میں ایک نئے پراجیکٹ کے طور پر شامل کر دیا گیا۔",
-                    "english": "Opened {name} from a file, and added it to this browser as a new project."
-                },
-                "next_translated": {
-                    "key": "lpn_file_type_desc",
-                    "value": "پراجیکٹ فائل",
-                    "english": "Project file"
-                }
-            }
-        },
-        "lpn_inpup_t_tank": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_status_imported",
-                    "value": "{name} کو فائل سے کھولا گیا، اور اسے اس براؤزر میں ایک نئے پراجیکٹ کے طور پر شامل کر دیا گیا۔",
-                    "english": "Opened {name} from a file, and added it to this browser as a new project."
-                },
-                "next_translated": {
-                    "key": "lpn_file_type_desc",
-                    "value": "پراجیکٹ فائل",
-                    "english": "Project file"
-                }
-            }
-        },
-        "lpn_inpup_t_pipe": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_status_imported",
-                    "value": "{name} کو فائل سے کھولا گیا، اور اسے اس براؤزر میں ایک نئے پراجیکٹ کے طور پر شامل کر دیا گیا۔",
-                    "english": "Opened {name} from a file, and added it to this browser as a new project."
-                },
-                "next_translated": {
-                    "key": "lpn_file_type_desc",
-                    "value": "پراجیکٹ فائل",
-                    "english": "Project file"
-                }
-            }
-        },
-        "lpn_inpup_t_pump": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_status_imported",
-                    "value": "{name} کو فائل سے کھولا گیا، اور اسے اس براؤزر میں ایک نئے پراجیکٹ کے طور پر شامل کر دیا گیا۔",
-                    "english": "Opened {name} from a file, and added it to this browser as a new project."
-                },
-                "next_translated": {
-                    "key": "lpn_file_type_desc",
-                    "value": "پراجیکٹ فائل",
-                    "english": "Project file"
-                }
-            }
-        },
-        "lpn_inpup_t_valve": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_status_imported",
-                    "value": "{name} کو فائل سے کھولا گیا، اور اسے اس براؤزر میں ایک نئے پراجیکٹ کے طور پر شامل کر دیا گیا۔",
-                    "english": "Opened {name} from a file, and added it to this browser as a new project."
-                },
-                "next_translated": {
-                    "key": "lpn_file_type_desc",
-                    "value": "پراجیکٹ فائل",
-                    "english": "Project file"
-                }
-            }
-        },
         "lpn_notes_1_def": {
             "reason": "english_changed",
             "current_value": "بطور ڈیفالٹ نیٹ ورک EPANET سولور سے حل ہوتا ہے۔ جب کل رن کا وقت مقرر ہو تو ہر رپورٹنگ ٹائم اسٹیپ ترتیب سے حساب کیا جاتا ہے: ٹینک بھرتے اور خالی ہوتے ہیں، طلب اپنے پیٹرن کی پیروی کرتی ہے، اور ٹول بار رن کو دوبارہ چلاتا ہے۔ جب جہاں ممکن ہو بلٹ اِن سولور استعمال کریں نشان زد ہو، تو ایک لمحے کا حل اس کے بجائے بلٹ اِن سولور سے حل ہو سکتا ہے، لیکن توسیعی مدت کا سمولیشن یا ایسا نیٹ ورک جس میں پریشر بریکر یا عمومی مقصد کا والو (PBV، GPV) ہو ہمیشہ EPANET سولور سے حل ہوتا ہے۔",
@@ -2110,6 +2000,187 @@
                 "value": "ہر زوم سطح پر دکھائیں"
             }
         },
+        "lpn_settings_theme_tip": {
+            "reason": "english_changed",
+            "current_value": "صفحے کے لیے ہلکے یا گہرے رنگ چنیں۔ سسٹم آپ کے آلے کی ترتیب کی پیروی کرتا ہے۔ نقشے کی ڈرائنگ ہر تھیم میں ایک جیسی دکھائی دیتی ہے۔ یہ اس براؤزر کی ترتیب ہے، پراجیکٹ کی نہیں۔",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_theme",
+                    "value": "تھیم",
+                    "english": "Theme"
+                },
+                "next_translated": {
+                    "key": "lpn_theme_system",
+                    "value": "سسٹم",
+                    "english": "System"
+                }
+            },
+            "label": {
+                "key": "lpn_settings_theme",
+                "english": "Theme",
+                "value": "تھیم"
+            }
+        },
+        "lpn_theme_hc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_theme_dark",
+                    "value": "گہرا",
+                    "english": "Dark"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "ID سابقے",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_theme_amber": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_theme_dark",
+                    "value": "گہرا",
+                    "english": "Dark"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "ID سابقے",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_theme_green": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_theme_dark",
+                    "value": "گہرا",
+                    "english": "Dark"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "ID سابقے",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_theme_platinum": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_theme_dark",
+                    "value": "گہرا",
+                    "english": "Dark"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "ID سابقے",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_theme_rounded": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_theme_dark",
+                    "value": "گہرا",
+                    "english": "Dark"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "ID سابقے",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_theme_desktop": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_theme_dark",
+                    "value": "گہرا",
+                    "english": "Dark"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "ID سابقے",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_theme_newspaper": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_theme_dark",
+                    "value": "گہرا",
+                    "english": "Dark"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "ID سابقے",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_theme_arcade": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_theme_dark",
+                    "value": "گہرا",
+                    "english": "Dark"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "ID سابقے",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_theme_space": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_theme_dark",
+                    "value": "گہرا",
+                    "english": "Dark"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "ID سابقے",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_theme_prairie": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_theme_dark",
+                    "value": "گہرا",
+                    "english": "Dark"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "ID سابقے",
+                    "english": "ID prefixes"
+                }
+            }
+        },
         "lpn_sm_help": {
             "reason": "english_changed",
             "current_value": "منظرنامے اور متبادلات کیسے کام کرتے ہیں:\\n\\nبنیادی موڈ میں متبادلات چھپے اور خودکار ہوتے ہیں، اور تمام نئے منظرنامے بنیاد منظرنامے کے ماتحت ہوتے ہیں۔\\n\\nبنیادی موڈ بند ہو تو ایک پیچیدہ وراثتی درخت دستیاب ہوتا ہے، اور متبادلات منظرناموں کے درمیان مشترک ہو سکتے ہیں۔ لیکن جب نئے متبادل کا تعلق درکار ہو (صارف کے فعال انتظام کی غیر موجودگی میں) تو ترامیم کا ڈیفالٹ رویہ یہ ہے کہ موجودہ منظرنامے کے نام پر ایک متبادل بنایا جائے، جو ہر منظرنامے کو متبادلات کا اپنا الگ مجموعہ دیتا ہے۔\\n\\nخصوصیات اور ترتیبات متبادلات کے زمروں سے تعلق رکھتی ہیں جو منظرناموں اور متبادلات کے جدول کے کالم کے طور پر اور منظرنامہ مینیجر میں انتظام کے آپشنز کے طور پر نظر آتے ہیں۔\\n\\nاپنی قدریں منظرناموں میں بنتی ہیں، لیکن وہ حقیقت میں منظرنامے سے وابستہ متعلقہ متبادلات کی ہوتی ہیں؛ اس لیے منظرنامہ اپنے متبادلات کی کھڑکی جیسا ہے۔ متبادلات کا منظرناموں سے تعلق منظرنامہ مینیجر کے دائیں پینل میں یا نچلے پینل کے منظرناموں کے جدول میں سنبھالا جاتا ہے۔ نیا منظرنامہ بنانے سے کوئی متبادل نہیں بنتا؛ نیا منظرنامہ اپنے والد کے متبادلات استعمال کرتا ہے جب تک ایسی اپنی قدریں نہ بنیں جنہیں نئے متبادلات کی ضرورت ہو۔ جب منظرنامے میں اپنی قدریں بنتی ہیں تو وہ منظرنامے کے متعلقہ متبادل میں محفوظ ہوتی ہیں؛ اگر منظرنامے کا ایسا متبادل نہ ہو تو منظرنامے کے نام سے نیا متبادل بنایا جاتا ہے۔\\n\\nمثال: آپ \"Figure: Node and link IDs\" منظرنامہ بناتے ہیں اور ایک متن کو \"Node and Link IDs.\" کہنے کے لیے ایڈٹ کرتے ہیں۔ منظرنامہ بنانے پر کوئی متبادل نہیں بنتا۔ لیکن جس لمحے آپ متن محفوظ کرتے ہیں، \"Figure: Node and link IDs\" نام کا متن کا متبادل متن کی قدر کی اپنی قدر کے ساتھ بن جاتا ہے۔ بنیادی موڈ میں آپ اسے خود منظرنامے میں محض ایک اپنی قدر کے طور پر دیکھتے ہیں۔\\n\\nخصوصیات کاپی کریں صرف اپنی قدریں کاپی کرتا ہے۔ بنیاد کے سوا کسی منظرنامے میں، یہ صرف وہ اپنی قدریں کاپی کرتا ہے جو اثاثے کی اس منظرنامے میں ہوں۔\\n\\nمنظرنامے کیسے سنبھالیں:\\n\\n- اوپر کی فہرست میں منظرنامے یا متبادلات کا کوئی زمرہ چنیں تاکہ اس کا درخت دکھایا جائے۔\\n\\n- منتخب آئٹم کا ماتحت ماتحت شامل کریں سے بنائیں۔ بنیاد شامل کریں ایک اور بنیاد شامل کرتا ہے، جو بنیاد کی موجودہ حالت کی کاپی کے طور پر شروع ہوتی ہے؛ بنیاد میں بعد کی ترامیم اسے نہیں بدلتیں۔ نیا ماتحت اپنے والد کے نام پر ہوتا ہے؛ نام بدلنے کے لیے نام ٹائپ کریں۔ کاپی کریں منتخب متبادل کی کاپی بناتا ہے۔ اوپر ضم کریں منتخب متبادل کی اپنی قدریں اس سے اوپر کے ایک متبادل میں، جو نام سے چنا جاتا ہے، منتقل کرتا ہے، اور منتخب متبادل پھر انہیں وراثت میں لیتا ہے؛ یہ پہلے ایسی کسی قدر کا نام بتاتا ہے جسے چھوڑا جانے والا کوئی متبادل بھی اپنی قدر سے بدلتا ہے، جو بدلی نہیں جاتی۔ منظرنامہ کاپی کرنے کے لیے، بنیادی موڈ میں، منظرنامے مینو میں منظرنامہ کاپی کریں استعمال کریں؛ یہ منظرنامے کی اپنی قدریں ان متبادلات کے ساتھ کاپی کرتا ہے جو انہیں رکھتے ہیں۔ بنیاد شامل کریں اور منظرنامہ کاپی کریں ہر ایک متبادلات بناتے ہیں: بنیاد شامل کریں ہر اس زمرے میں جس میں قدریں ہوں نئی بنیاد کے لیے بنیاد متبادل بناتا ہے، اور منظرنامہ کاپی کریں ہر اس متبادل کے لیے جو منظرنامے کی اپنی قدریں رکھتا ہو، کاپی کے نام پر ایک نیا متبادل بناتا ہے۔\\n\\n- کسی آئٹم کو دوسرے پر گھسیٹیں تاکہ وہ اس آئٹم کا ماتحت بن جائے۔ نئے والد کے تحت منتقل کیا گیا منظرنامہ اس سے وہ سب کچھ وراثت میں لیتا ہے جسے اس نے اپنی قدر سے نہیں بدلا؛ جسے اس نے بدلا ہے وہ نہیں بدلتا۔ دو آئٹمز کے درمیان آئٹم گھسیٹیں تاکہ ان کی ترتیب بدلے۔\\n\\n- کسی آئٹم کو منتخب کرنے کے لیے اس پر کلک کریں۔ منتخب آئٹم کا نام بدلنے کے لیے F2 دبائیں یا نام بدلیں چنیں۔ منظرنامے کا نام بدلنے پر پوچھا جاتا ہے کہ کیا اس کا نام رکھنے والے متبادلات کا نام بھی بدلا جائے؛ بنیادی موڈ میں وہ بغیر پوچھے ساتھ بدل جاتے ہیں۔ منظرنامے کو موجودہ بنانے کے لیے اس پر ڈبل کلک کریں یا Enter دبائیں۔ آئٹم کے پاس تیر پر کلک کریں یا اسے سمیٹنے یا پھیلانے کے لیے بائیں یا دائیں دبائیں۔ بٹنوں جیسے ہی احکامات کے لیے آئٹم پر دائیں کلک کریں۔\\n\\n- منتخب آئٹم حذف کرنے کے لیے Delete دبائیں یا مائنس بٹن پر کلک کریں۔ استعمال میں آئٹم حذف نہیں ہوتا، اور پیغام بتاتا ہے کہ اسے کون استعمال کرتا ہے۔ بنیادی موڈ بند ہو تو منظرنامہ حذف کرنے سے اس کے استعمال کردہ متبادلات رہتے ہیں۔ بنیادی موڈ آن ہو تو منظرنامہ حذف کرنے سے اس کے وہ متبادلات بھی حذف ہوتے ہیں جنہیں کوئی دوسرا منظرنامہ استعمال نہیں کرتا۔\\n\\n- منظرنامے کو کوئی دوسرا متبادل، بشمول بنیاد، استعمال کروانے کے لیے، اسے منظرنامہ مینیجر کے دائیں پینل یا منظرناموں کے جدول میں منظرنامے کی قطار میں چنیں۔ مشترک متبادل میں کی گئی اپنی قدر اسے استعمال کرنے والے ہر منظرنامے کو بدل دیتی ہے۔",
@@ -2196,22 +2267,6 @@
             }
         },
         "lpn_settings_grp_positions": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_basemap_style_grayscale",
-                    "value": "گرے اسکیل",
-                    "english": "Grayscale"
-                },
-                "next_translated": {
-                    "key": "lpn_settings_legend_position",
-                    "value": "لیبلز کی کلید کی جگہ",
-                    "english": "Labels legend position"
-                }
-            }
-        },
-        "lpn_settings_grp_show": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -3029,22 +3084,6 @@
                 }
             }
         },
-        "lpn_dur_col_fire": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_working",
-                    "value": "کام جاری: {total} میں سے {done} جنکشن۔",
-                    "english": "Working: {done} of {total} junctions."
-                },
-                "next_translated": {
-                    "key": "lpn_ff_stopped",
-                    "value": "{total} میں سے {done} جنکشن کے بعد روکا گیا۔ نیچے دیے نتائج وہی ہیں جو پہلے ہی مکمل ہو چکے ہیں۔",
-                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
-                }
-            }
-        },
         "lpn_dur_col_pressure": {
             "reason": "missing",
             "current_value": null,
@@ -3171,26 +3210,6 @@
                     "value": "{total} میں سے {done} جنکشن کے بعد روکا گیا۔ نیچے دیے نتائج وہی ہیں جو پہلے ہی مکمل ہو چکے ہیں۔",
                     "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
                 }
-            }
-        },
-        "lpn_crit_col_lowest": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_working",
-                    "value": "کام جاری: {total} میں سے {done} جنکشن۔",
-                    "english": "Working: {done} of {total} junctions."
-                },
-                "next_translated": {
-                    "key": "lpn_ff_stopped",
-                    "value": "{total} میں سے {done} جنکشن کے بعد روکا گیا۔ نیچے دیے نتائج وہی ہیں جو پہلے ہی مکمل ہو چکے ہیں۔",
-                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
-                }
-            },
-            "tip": {
-                "key": "lpn_crit_col_lowest_tip",
-                "english": "Read only before a tank empties. After that step, junctions left without a source report meaningless pressures; the Tank empties column gives the step."
             }
         },
         "lpn_crit_col_hours": {
@@ -3415,10 +3434,6 @@
                     "value": "{total} میں سے {done} جنکشن کے بعد روکا گیا۔ نیچے دیے نتائج وہی ہیں جو پہلے ہی مکمل ہو چکے ہیں۔",
                     "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
                 }
-            },
-            "label": {
-                "key": "lpn_crit_col_lowest",
-                "english": "Lowest pressure"
             }
         },
         "lpn_crit_empty_note": {
@@ -3866,6 +3881,14 @@
                 "english_rendering": "parent",
                 "preferred_translation": ""
             },
+            {
+                "concept": "family-tree-inherit",
+                "plain_name": "A family tree inherit-",
+                "english_rendering": "inherit",
+                "preferred_translation": ""
+            }
+        ],
+        "lpn_guide_scn_notes_def": [
             {
                 "concept": "family-tree-inherit",
                 "plain_name": "A family tree inherit-",

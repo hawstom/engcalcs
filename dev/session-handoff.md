@@ -95,43 +95,43 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-20 morning (thirtieth session, Arizona time)
+## STATE — 2026-10-20 evening (thirty-second session, Arizona time)
 
-### Master: e0ed97378 (duration fire merged on his word) plus this handoff. Production: what he last pulled
+### Master: native EPS slice 2 and label-leader merged on his word, plus chore/handoff-1020d. Production: what he last pulled
 
-- `feat/duration-fire` merged (Task 578's duration fire); its port 8101 now holds feat/geojson-into-project.
-- Roadmap: Task 818 (MCP server) added at 75 on his yes; Task 749 records his licence stance ("Let's
-  stay right": samples and public docs only; his WaterGEMS used as an ordinary user would).
-- Mary's MCP landscape (four thin EPANET MCP servers exist; fire flow, criticality and the open-in-app
-  link look unoccupied, unverified) is in her journal and wish list row 0q.
-- Still owed: consent_body's 26 translations; MSX, EPS-analysis, Guide-page and duration-fire keys'
-  translations. Sprint only on his word, about weekly. Key hygiene: none deleted.
+- Merged on his word: `feat/native-eps` (slice 2, simple controls), `feat/label-leader` ("merge this to
+  master", with lessons for the study in `dev/label-trials/tom-1020/lessons.md`).
+- Guide's `lpn_guide_cmp_byasset_def` flow-sign sentence now matches his tip rewrite (he: "Yes. Match.").
+- New Task 819 (organize Import and Export, plan with him first); his box-title instruction on Task 809;
+  his MCP words on Task 818 ("plan and get clarity before building").
+- **He cannot see jasmine:/tmp from lantana.** Put pictures for him in
+  `~/webdev/worktrees/_panel/www/img/` and link `http://localhost:8080/img/<name>.png`.
+- Still owed: consent_body's 26 translations; the untranslated keys. Sprint only on his word.
 
-### Branches waiting on him (each full suite green 10-20; the load-only reds passed alone)
+### Branches waiting on him
 
-- `feat/label-leader` (8103), bcc926448, round 6: his "Revert" of the always-a-leader rule done;
-  Net3/Novato equal to master (Perry's own counts). Kept: right-justified left-hung labels, one-line
-  node labels, a Text hidden only where it overprints another (Net1 "Pump" over "Source" at 7+ out).
-  The stacked-column prototype measured 1-3% more labels for 60-90% more pass time: removed. His
-  off-screen leader: Perry reproduced it by dropping a label above the map edge, same on master.
-- `fix/examples-guide` (8102), 77fced3fe: Scenario manager help back in production order, Basic mode
-  first, headings and list kept (R-419).
-- `feat/theme-tank` (8114), 89e313c5d: matte grey, no bottom shading, staggered vertical seams (R-420).
-  `feat/theme` (8111) unchanged; merge only one Prairie.
-- `feat/geojson-into-project` (8101), 400ab63ac, Task 814: GeoJSON network into the open project by
-  the .inp route's own code (one question, compare, receipt, undo). Perry: no blocker; "blank to
-  closed" in the receipt and the "Reading the file" heading are wording for him to see. Not built:
-  "a new scenario" as a destination (neither door has it).
-- `feat/native-eps` (no port; nothing visible), 63bb8fb1f, Task 733 slice 1: native EPS loop matching
-  EPANET 2.3.5 within 0.8 mm on 22 cases (Net3 without controls 0.77 mm, close to the bound). Plan
-  native-eps-plan.md on that branch. Capability: merges on his word.
-- `feat/sqlite-reader`: waits on the sample he can make in WaterGEMS (Base + a child changing one
-  diameter and one demand, an .inp per scenario). `feat/desktop`: untouched.
+- `feat/label-margin` (8105): he called its Net1 overlaps "unreleaseable"; an agent is fixing them.
+- `feat/flow-arrow` (8102): rejected; he wants ONE outlined head with a notched back, line through it.
+- `feat/geojson-into-project` (8101): ready; the .inp box gets the same second paragraph ("Yes. Match.").
+- `feat/sqlite-reader` (8104): fixture to leave the repo (squash-merge it so master never carries it).
+- `feat/desktop`: untouched.
 
 ### Next job
 
-Merge on his word. Task 681 after label-leader settles. Task 733 slice 2 (controls) on feat/native-eps.
-Task 818 first step: Mary's row 0q (read the four servers' tool lists) before scoping.
+Plan Tasks 819 (Import/Export) and 818 (MCP) with him before building. Task 681 after
+label-margin settles. Task 733 rules slice.
+
+### Traps met 2026-10-20 (thirty-first session)
+
+- **A merge into a worktree with Tom's uncommitted file in it refuses silently** when piped to
+  `tail`. Merge first, copy his edited file in after.
+- **An outward-looking agent wrote its journal in the main checkout** while nothing was running;
+  brief every agent to write journals to the scratchpad, always.
+- **A menu item's language key is its command ID** (`lib/lpn-commands.json`, usage counts). Reusing
+  another key for a menu row renamed the command; `lpn_file_export_item_msx` was restored for that.
+  Never point a menu row at a borrowed key. Only the full suite's browser harness caught it.
+- **`git -c user.name=$VAR` with spaces in the variable breaks**; set `GIT_AUTHOR_NAME` /
+  `GIT_COMMITTER_NAME` in the environment instead.
 
 ### Traps met 2026-10-20 (thirtieth session)
 

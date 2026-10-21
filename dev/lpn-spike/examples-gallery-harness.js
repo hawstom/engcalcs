@@ -140,8 +140,9 @@ console.log('\n-- the gallery runs Net3, Net2, Elm Street, Net1, then the two ba
 {
 	const f = examples.map(e => e.file);
 	report(f.slice(-2).join() === 'Basic-example-SI-units.lwn,Basic-example-US-units.lwn', 'the two basics are the last two cards', f.slice(-3).join());
-	report(f[f.length - 3] === 'Net1.lwn', 'Net1 sits just before them');
-	report(f[f.length - 4] === 'Net1-SI.lwn', 'Net1 SI sits just before Net1');
+	report(f[f.length - 3] === 'Net1-Scenarios.lwn', 'Net1 with scenarios sits just before them, after both Net1s');
+	report(f[f.length - 4] === 'Net1.lwn', 'Net1 US sits just before the scenarios version');
+	report(f[f.length - 5] === 'Net1-SI.lwn', 'Net1 SI sits just before Net1 US');
 }
 
 console.log('\n-- card descriptions read from the language file --');
@@ -304,6 +305,21 @@ console.log('\n-- layout: a deliberate order, not an accident of equal size --')
 		'Net2-Branford-CT.lwn', 'Elm-Street-Center.lwn'].forEach(function (f, i) {
 		report(examples[i].file === f, 'wall position ' + (i + 1) + ' is ' + f, examples[i].file);
 	});
+	// Tom, 2026-10-19: Net1 follows Net2 and Net3 (SI first, then US), narrated alike, and the
+	// scenarios version comes after both.
+	const pos = function (f) { return examples.findIndex(function (e) { return e.file === f; }); };
+	report(pos('Net1-SI.lwn') >= 0 && pos('Net1-SI.lwn') < pos('Net1.lwn') && pos('Net1.lwn') < pos('Net1-Scenarios.lwn'),
+		'Net1 is SI first, then US, then the scenarios version', [pos('Net1-SI.lwn'), pos('Net1.lwn'), pos('Net1-Scenarios.lwn')].join(','));
+	const n1si = examples[pos('Net1-SI.lwn')], n1us = examples[pos('Net1.lwn')];
+	if (n1si && n1us) {
+		report(/gpm \(US\)$/.test(n1us.title) && /L\/s \(SI\)$/.test(n1si.title),
+			'the Net1 titles name their unit system like Net2 and Net3', n1us.title);
+		report(/^Gallons per minute, with feet and inches\./.test(n1us.description),
+			'the US Net1 opens its description by naming its units, like the SI one');
+		const tail = function (d) { return d.replace(/^[^.]*\.\s*/, '').replace(/converted from gallons per minute, feet, and inches, /, ''); };
+		report(tail(n1si.description) === tail(n1us.description),
+			'the US Net1 narrates what the SI one does (same inventory)', tail(n1us.description));
+	}
 	let sorted = true;
 	for (let i = 1; i < examples.length; i++) {
 		const a = examples[i - 1], b = examples[i];

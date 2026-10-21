@@ -69,25 +69,37 @@ if (isset($html_desc) && trim((string)$html_desc) !== '') :
 	<?=$html_head?>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 <?php
-// THE THEME, SET BEFORE FIRST PAINT (Task 714, Phase 3; dev/theming-plan.md). The visitor's choice is
-// System, Light or Dark, kept in this browser alone (localStorage `lpn_theme`, written only by Settings >
-// Map and page > Page > Theme, and only for Light or Dark). It becomes <html data-theme="system|light|dark">
-// and css/engcalcs.css does the rest; System follows the operating system through prefers-color-scheme.
+// THE THEME, SET BEFORE FIRST PAINT (Task 714; the gallery, dev/themes-plan.md). The visitor's
+// choice is System (the default), Light, Dark, High contrast, Rounded, Platinum, Desktop, Newspaper, Amber,
+// Green, Arcade, Space or Prairie, kept in this browser alone: localStorage `lpn_theme` holds `light`, `dark`, `hc`,
+// `rounded`, `platinum`, `desktop`, `newspaper`, `amber`, `green`, `arcade`, `space` or `prairie`, and is absent for System. Anything else
+// stored there is read as System, so a theme retired later strands nobody.
+// <html data-theme> carries the RESOLVED theme, the one css/engcalcs.css paints: System becomes light,
+// dark (prefers-color-scheme) or high contrast (prefers-contrast: more), and High contrast becomes `hc` or
+// `hc-dark` by the colour scheme; both follow a change of the device setting while the page is open.
 // data-bs-theme is Bootstrap's own switch, so its fields and buttons follow too. THE LOOPED-NETWORK PAGE
 // ONLY: the calculator pages are not themed (a light Bootstrap navbar and the parent site's stylesheet are
 // not tokens), and a page with no data-theme stays light under any system. The script is inline and ahead
 // of the stylesheets on purpose: a dark-mode visitor must never see a white flash while a file loads.
-// window.ecTheme.set() is the one writer, and the one place the two attributes are kept in step; with
-// storage blocked the choice still holds until the page is closed. No consent is needed: a preference
-// the visitor set (dev/cookie-storage-inventory.md).
+// window.ecTheme.set() is the one writer; preview() repaints without storing anything (the gallery in
+// Settings), and preview(null) returns to the stored choice. Every repaint fires `ec-theme` on window, which
+// the map listens to (its lettering may change face, js/looped-network.js mapFollowTheme()). `?theme=system` in the address is the rescue
+// for a visitor who chose a theme they cannot read: it clears the choice (any other listed name sets it).
+// With storage blocked the choice still holds until the page is closed. No consent is needed: a
+// preference the visitor set (dev/cookie-storage-inventory.md).
 if ($type === 'EngCalcsApp') :
 ?>
-	<script>(function(){var d=document.documentElement,q=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null,c='system',m=null;
-	function g(){if(m){return m;}try{var t=localStorage.getItem('lpn_theme');return t==='light'||t==='dark'?t:'system';}catch(e){return 'system';}}
-	function a(){c=g();d.setAttribute('data-theme',c);
-	d.setAttribute('data-bs-theme',c==='dark'||(c==='system'&&q&&q.matches)?'dark':'light');}
-	a();if(q&&q.addEventListener){q.addEventListener('change',a);}
-	window.ecTheme={get:g,set:function(t){m=t==='light'||t==='dark'?t:null;try{if(t==='light'||t==='dark'){localStorage.setItem('lpn_theme',t);}else{localStorage.removeItem('lpn_theme');}}catch(e){}a();}};})();</script>
+	<script>(function(){var d=document.documentElement,w=window,mq=function(s){return w.matchMedia?w.matchMedia(s):null;},
+	qd=mq('(prefers-color-scheme: dark)'),qc=mq('(prefers-contrast: more)'),
+	T=['system','light','dark','hc','rounded','platinum','desktop','newspaper','amber','green','arcade','space','prairie'],K={dark:1,'hc-dark':1,amber:1,green:1,arcade:1,space:1},m=null,p=null;
+	function ok(t){return T.indexOf(t)>=0;}
+	function g(){if(m){return m;}try{var t=localStorage.getItem('lpn_theme');return ok(t)?t:'system';}catch(e){return 'system';}}
+	function r(t){var k=!!(qd&&qd.matches);t=ok(t)?t:'system';if(t==='system'){t=qc&&qc.matches?'hc':(k?'dark':'light');}return t==='hc'&&k?'hc-dark':t;}
+	function a(){var t=r(p||g());d.setAttribute('data-theme',t);d.setAttribute('data-bs-theme',K[t]?'dark':'light');try{w.dispatchEvent(new Event('ec-theme'));}catch(e){}}
+	function s(t){m=ok(t)?t:'system';try{if(m!=='system'){localStorage.setItem('lpn_theme',m);}else{localStorage.removeItem('lpn_theme');}}catch(e){}p=null;a();}
+	try{var u=/[?&]theme=([a-z]+)/.exec(location.search);if(u&&ok(u[1])){s(u[1]);}}catch(e){}
+	a();[qd,qc].forEach(function(q){if(q&&q.addEventListener){q.addEventListener('change',a);}});
+	w.ecTheme={list:T.slice(),get:g,set:s,resolve:r,preview:function(t){p=ok(t)?t:null;a();},previewing:function(){return p;}};})();</script>
 <?php endif; ?>
 	<title><?=$calc_name ? $safe_name . ' — ' . $html_title : $html_title?></title>
 <?php
