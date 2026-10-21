@@ -2051,11 +2051,6 @@
             "ruled": "2026-09-23",
             "answer": "OK."
         },
-        "lpn_eps_working": {
-            "on": "Running the extended-period simulation.",
-            "ruled": "2026-10-20",
-            "answer": "OK."
-        },
         "lpn_ex_net1_scn_desc": {
             "on": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.",
             "ruled": "2026-10-20",
@@ -5029,11 +5024,6 @@
         },
         "lpn_msx_removed": {
             "on": "Removed {file} from this project.",
-            "ruled": "2026-10-20",
-            "answer": "OK."
-        },
-        "lpn_msx_replace": {
-            "on": "Replace…",
             "ruled": "2026-10-20",
             "answer": "OK."
         },

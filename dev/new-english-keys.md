@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**7 still to read on master**, of 171 untranslated keys, of 3190 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**7 still to read on master**, of 169 untranslated keys, of 3188 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (171, 7 to read @@ NEEDS RULING)
+## lpn_  (169, 7 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -159,9 +159,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-20._
 - **`lpn_dur_start`**
   > Fire starts at
-  _Ruled OK 2026-10-20._
-- **`lpn_eps_working`**
-  > Running the extended-period simulation.
   _Ruled OK 2026-10-20._
 - **`lpn_ex_net1_scn_desc`**
   > Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.
@@ -388,9 +385,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_msx_removed`**
   > Removed {file} from this project.
   _Ruled OK 2026-10-20._
-- **`lpn_msx_replace`**
-  > Replace…
-  _Ruled OK 2026-10-20._
 - **`lpn_msx_report_heading`**
   > Attached {file}
   _Ruled OK 2026-10-20._
@@ -549,7 +543,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**1 still to read**, of 51 new keys across 5 unmerged branch(es).
+**16 still to read**, of 59 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -562,13 +556,30 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/flow-arrow (`8f1edc51e`) — adds no English strings
+### feat/geojson-into-project (`3ffa8d22c`) — adds no English strings
 
-### feat/geojson-into-project (`c4c7caa0b`) — adds no English strings
+### feat/import-export-menu (`a9f804e9b`) — 6 new, 6 to read @@ NEEDS RULING
 
-### feat/label-margin (`ab69e6389`) — adds no English strings
+- **`lpn_export_confirm_lead`**
+  > The {format} holds one scenario, and this project has {n}.
+  @@ NEEDS RULING
+- **`lpn_export_confirm_title`**
+  > Export {format}
+  @@ NEEDS RULING
+- **`lpn_file_group_network`**
+  > Network
+  @@ NEEDS RULING
+- **`lpn_file_group_shapes`**
+  > Shapes
+  @@ NEEDS RULING
+- **`lpn_file_group_tables`**
+  > Tables
+  @@ NEEDS RULING
+- **`lpn_menu_back`**
+  > Back
+  @@ NEEDS RULING
 
-### feat/sqlite-reader (`e9506da4c`) — 51 new, 1 to read @@ NEEDS RULING
+### feat/sqlite-reader (`18e70d1f5`) — 53 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
   > WaterCAD or WaterGEMS model…
@@ -591,9 +602,12 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_note_active_scenario`**
   > The model was open on the scenario shown in parentheses. This project opens on Base.
   _Ruled OK 2026-10-20._
+- **`lpn_wtg_note_alternative_nameonly`**
+  > These alternatives were imported by name only, so that each scenario keeps its choice of them. Their values were not imported, because this page does not read that kind of data from a WaterGEMS model.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_alternative_unused`**
-  > No scenario uses these Physical alternatives. Each was imported as an alternative of its own, holding the values it states, so that a scenario can use it.
-  _Ruled OK 2026-10-20._
+  > No scenario uses these alternatives. Each was imported as an alternative of its own, so that a scenario can use it.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_controls_unread`**
   > Not imported: these controls, which this page does not yet read from a WaterGEMS model. Each is shown as WaterGEMS states it.
   _Ruled OK 2026-10-20._
@@ -607,8 +621,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > These pipes have a check valve and start closed. They were imported closed.
   _Ruled OK 2026-10-20._
 - **`lpn_wtg_note_directed_split`**
-  > In WaterGEMS a pump or valve is a node between two pipes. Each of these was imported as a pump or valve link between two new junctions at its elevation, named after it with -U (upstream) and -D (downstream).
-  _Ruled OK 2026-10-20._
+  > In WaterGEMS a pump or valve is a node between pipes. Each of these was imported as a pump or valve link between two new junctions at its elevation, named after it with -U (upstream) and -D (downstream). The pipe the model calls downstream joins the -D junction and every other pipe at the node joins the -U junction, as WaterGEMS does in its own EPANET file.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_element_unread`**
   > Not imported: these elements, of a kind this page does not model. The kind is shown in parentheses.
   _Ruled OK 2026-10-20._
@@ -628,8 +642,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > These elements are inactive in the model and were imported inactive.
   _Ruled OK 2026-10-20._
 - **`lpn_wtg_note_link_unjoined`**
-  > Not imported: these pipes, pumps, or valves, whose ends are not two different imported nodes, or which do not sit between exactly two pipes.
-  _Ruled OK 2026-10-20._
+  > Not imported: these pipes, pumps, or valves, whose ends are not two different imported nodes, or a pump or valve at a node with no downstream pipe or no other pipe.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_no_geometry`**
   > These nodes have no location in the file and were placed at 0, 0.
   _Ruled OK 2026-10-20._
@@ -640,17 +654,20 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not imported: the day of the week and month multipliers of these patterns.
   _Ruled OK 2026-10-20._
 - **`lpn_wtg_note_pattern_continuous`**
-  > These patterns are continuous in the model. Here each multiplier holds until the next time step.
-  _Ruled OK 2026-10-20._
+  > These patterns are continuous in the model: the multiplier changes in a straight line between points. An EPANET pattern is stepwise, so each was written as WaterGEMS writes it for EPANET: the starting multiplier, then the value on that line at every pattern time step.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_pattern_irregular`**
   > These patterns have times that are not whole multiples of the pattern time step. Each was read at that time step.
   _Ruled OK 2026-10-20._
 - **`lpn_wtg_note_pattern_other`**
   > These patterns differ from EPANET patterns in their start time, their last multiplier, or their name (EPANET applies a pattern named 1 to every demand with no pattern). Check them.
   _Ruled OK 2026-10-20._
+- **`lpn_wtg_note_pump_battery`**
+  > These variable speed pump batteries were imported as one pump each at relative speed 1, as WaterGEMS writes them to an EPANET file. Their lag pumps and speed control were not imported.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_pump_curve`**
-  > These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. Give each a curve before calculating.
-  _Ruled OK 2026-10-20._
+  > These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. A pump with no curve cannot run in either engine, so results shown before each has a curve are not meaningful.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_pump_efficiency`**
   > Not imported: the efficiency of these pump definitions, which is neither a constant nor a list of points.
   _Ruled OK 2026-10-20._
@@ -661,11 +678,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > These pumps are variable-speed pumps in the model. They were imported as fixed-speed pumps.
   _Ruled OK 2026-10-20._
 - **`lpn_wtg_note_scenario_alternative`**
-  > These scenarios use a Physical alternative other than the one Base uses. The values in which it differs from Base were imported as the scenario's own overrides; the alternative itself was not imported.
-  _Ruled OK 2026-10-20._
+  > These alternatives were imported with their names, each in the category shown in parentheses. An alternative holds only the values in which it differs from its parent, and each scenario uses the alternatives it uses in the model. To see them, choose Water, Scenarios, clear Basic mode, then choose Scenario manager.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_scenario_category`**
-  > Not imported: the alternatives these scenarios use in categories other than Physical. There the scenario has the Base values.
-  _Ruled OK 2026-10-20._
+  > Not imported: the alternatives these scenarios use in categories this page has no counterpart for (for example Operational, Age, and Trace). There the scenario has the Base values.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_scenario_root`**
   > These scenarios have no parent in the model. Here every scenario descends from Base, so each was made a child of Base.
   _Ruled OK 2026-10-20._
@@ -723,3 +740,5 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_working`**
   > Reading {file}…
   _Ruled OK 2026-10-20._
+
+### fix/bottom-pane-lag (`3bb531211`) — adds no English strings
