@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**1 still to read on master**, of 168 untranslated keys, of 3187 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**1 still to read on master**, of 166 untranslated keys, of 3185 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (168, 1 to read @@ NEEDS RULING)
+## lpn_  (166, 1 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -159,9 +159,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-20._
 - **`lpn_dur_start`**
   > Fire starts at
-  _Ruled OK 2026-10-20._
-- **`lpn_eps_working`**
-  > Running the extended-period simulation.
   _Ruled OK 2026-10-20._
 - **`lpn_ex_net1_scn_desc`**
   > Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.
@@ -379,9 +376,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_msx_removed`**
   > Removed {file} from this project.
   _Ruled OK 2026-10-20._
-- **`lpn_msx_replace`**
-  > Replace…
-  _Ruled OK 2026-10-20._
 - **`lpn_msx_report_heading`**
   > Attached {file}
   _Ruled OK 2026-10-20._
@@ -540,7 +534,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**4 still to read**, of 54 new keys across 5 unmerged branch(es).
+**4 still to read**, of 54 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -551,25 +545,27 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### chore/handoff-1021 (`5de48ef3c`) — adds no English strings
+
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/flow-arrow (`ba35f09bf`) — adds no English strings
+### feat/flow-arrow (`5d3b6acb0`) — adds no English strings
 
-### feat/geojson-into-project (`7cc47d9a2`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/geojson-into-project (`3ffa8d22c`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_gjup_h_notes`**
   > Reading the file
   @@ NEEDS RULING
 - **`lpn_gjup_lead`**
-  > A GeoJSON file holds one set of values and no scenarios. Choose where to put them.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets only in the import are added, and assets only in this project are kept.
+  > Choose where to import this file. Note that GeoJSON files don't include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
   @@ NEEDS RULING
 - **`lpn_gjup_title`**
   > Update from GeoJSON file
   @@ NEEDS RULING
 
-### feat/label-margin (`8691fa30e`) — adds no English strings
+### feat/label-margin (`ab69e6389`) — adds no English strings
 
-### feat/sqlite-reader (`5e33ab69b`) — 51 new, 1 to read @@ NEEDS RULING
+### feat/sqlite-reader (`42a4e1785`) — 51 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
   > WaterCAD or WaterGEMS model…

@@ -46363,7 +46363,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ta.textContent = pc.lpn_msx_report_kept || 'This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.';
 			body.appendChild(ta);
 		}, [
-			{ label: pc.lpn_msx_replace || 'Replace…', fn: function () { setTimeout(pickMsxFile, 0); } },
+			{ label: (pc.lpn_replace_btn || 'Replace') + '…', fn: function () { setTimeout(pickMsxFile, 0); } },
 			{ label: pc.lpn_fitting_remove || 'Remove', fn: function () {
 				saveUndoSnapshot();
 				doc.msx = null;
@@ -77877,7 +77877,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!ffRunUi) { return; }
 		ffRunUi.fill.style.width = Math.round(1000 * f) / 10 + '%';
 		ffRunUi.track.setAttribute('aria-valuenow', String(Math.round(1000 * f)));
-		ffRunUi.count.textContent = pc.lpn_eps_working || 'Running the extended-period simulation.';
+		ffRunUi.count.textContent = pc.lpn_time_running || 'Running the extended period simulation.';
 		ffRunUi.tally.textContent = '';
 	}
 
