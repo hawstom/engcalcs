@@ -45947,20 +45947,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// The refusals, as rows. A units mismatch is refused by NAME and never converted.
 	function inpUpdateRefusals(parsed) {
-		var pc = EngCalcs.pageConfig || {}, want = inpUnitSelections(parsed), have = readUnitSelections(), out = [],
+		return inpRefusalRows(inpUnitSelections(parsed), LPN_INP_UPDATE_METHOD[String(parsed.headloss || 'H-W').toUpperCase()] || 'hw',
+			String(parsed.headloss || 'H-W').toUpperCase());
+	}
+	// The rows, for any source: `want` the units the file states by family, `fm` its friction method
+	// key and `fmLabel` how to name it. A family the file does not state (undefined) is not compared.
+	function inpRefusalRows(want, fm, fmLabel) {
+		var pc = EngCalcs.pageConfig || {}, have = readUnitSelections(), out = [],
 			names = { lpn_u_length: pc.lpn_field_length || 'Length', lpn_u_diameter: pc.lpn_field_diameter || 'Diameter',
 				lpn_u_elevhead: pc.lpn_field_elev || 'Elevation', lpn_u_pressure: pc.lpn_result_pressure || 'Pressure',
 				lpn_u_flow: pc.lpn_result_flow || 'Flow' };
 		LPN_INP_UPDATE_UNITS.forEach(function (u) {
-			if (have[u] === want[u]) { return; }
+			if (want[u] === undefined || have[u] === want[u]) { return; }
 			out.push((pc.lpn_inpup_unit_row || '{family}: the file uses {file} and this project uses {project}.')
 				.replace('{family}', names[u]).replace('{file}', inpUnitOptionText(u, want[u])).replace('{project}', inpUnitOptionText(u, have[u])));
 		});
 		out.unitRows = out.length;
-		var fm = LPN_INP_UPDATE_METHOD[String(parsed.headloss || 'H-W').toUpperCase()] || 'hw';
 		if (fm !== frictionMethod()) {
 			out.push((pc.lpn_inpup_method_row || 'Head loss formula: the file uses {file} and this project uses {project}.')
-				.replace('{file}', String(parsed.headloss || 'H-W').toUpperCase()).replace('{project}', frictionMethodLabel()));
+				.replace('{file}', fmLabel).replace('{project}', frictionMethodLabel()));
 		}
 		return out;
 	}
@@ -45979,23 +45984,35 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// COMPARE ONLY: nothing in the project is written here. `rec` is the file read as a document
 	// (docFromInp()), which is what carries the file's own characters (`tok`) beside each number.
 	function inpUpdatePlan(parsed, name) {
-		var pc = EngCalcs.pageConfig || {}, plan = { refused: inpUpdateRefusals(parsed), changes: [], addedNodes: [], addedLinks: [], addedL: [], keptL: [], na: {},
-				keptNodes: [], keptLinks: [], typeDiffers: [], typeOwned: [], notAdded: false, dwRoughness: false, matched: 0 };
-		if (plan.refused.length) { return plan; }
+		var refused = inpUpdateRefusals(parsed), na = {};
+		if (refused.length) { return inpPlanFromSource({ refused: refused }); }
 		function held(v) { return Array.isArray(v) ? v.length > 0 : (v && typeof v === 'object') ? Object.keys(v).length > 0 : !!v; }
-		['patterns', 'curves', 'controls', 'rules'].forEach(function (k) { if (held(parsed[k])) { plan.na[k] = true; } });
-		if (held(parsed.hydraulics) || held(parsed.qualityOptions) || held(parsed.fileOptions)) { plan.na.options = true; }
+		['patterns', 'curves', 'controls', 'rules'].forEach(function (k) { if (held(parsed[k])) { na[k] = true; } });
+		if (held(parsed.hydraulics) || held(parsed.qualityOptions) || held(parsed.fileOptions)) { na.options = true; }
 		// A CV pipe is read as open (the importer reports it); its status is not compared or written.
 		var cvIds = {};
 		(parsed.dropped || []).forEach(function (d) { if (d.code === 'check-valve') { (d.ids || []).forEach(function (i) { cvIds[i] = true; }); } });
-		plan.cv = Object.keys(cvIds).map(function (i) { return inpTL('pipe', i); });
-		var rec = docFromInp(parsed, name), fileNode = {}, fileLink = {}, rawNode = {}, rawLink = {}, geoFile = parsed.mapUnits === 'degrees';
-		rec.nodes.forEach(function (n) { fileNode[n.id] = n; });
-		rec.links.forEach(function (l) { fileLink[l.id] = l; });
+		var rawNode = {}, rawLink = {};
 		parsed.nodes.forEach(function (n) { rawNode[n.id] = n; });
 		parsed.links.forEach(function (l) { rawLink[l.id] = l; });
+		return inpPlanFromSource({ refused: [], na: na, cv: cvIds, rec: docFromInp(parsed, name), rawNode: rawNode, rawLink: rawLink,
+			geoFile: parsed.mapUnits === 'degrees' });
+	}
+	// **THE ONE COMPARE, FOR EVERY FORMAT THAT LANDS IN THE OPEN PROJECT** (Task 814): an EPANET file
+	// and a GeoJSON network each reduce themselves to `src` and this does the rest, so the two cannot
+	// drift. `src`: refused (rows), na (set of not-applied keys), cv (ids read as open), rec (the file
+	// as a document: nodes, links), rawNode/rawLink (the file's own positions, outside the document
+	// frame), geoFile (the positions are longitude and latitude).
+	function inpPlanFromSource(src) {
+		var pc = EngCalcs.pageConfig || {}, plan = { refused: src.refused, changes: [], addedNodes: [], addedLinks: [], addedL: [], keptL: [], na: src.na || {},
+				keptNodes: [], keptLinks: [], typeDiffers: [], typeOwned: [], notAdded: false, dwRoughness: false, matched: 0 };
+		if (plan.refused.length) { return plan; }
+		var cvIds = src.cv || {}, rec = src.rec, fileNode = {}, fileLink = {}, rawNode = src.rawNode, rawLink = src.rawLink;
+		plan.cv = Object.keys(cvIds).map(function (i) { return inpTL('pipe', i); });
+		rec.nodes.forEach(function (n) { fileNode[n.id] = n; });
+		rec.links.forEach(function (l) { fileLink[l.id] = l; });
 		plan.rec = rec; plan.rawNode = rawNode; plan.rawLink = rawLink;
-		plan.notAdded = geoFile !== isLatLonProject();
+		plan.notAdded = !!src.geoFile !== isLatLonProject();
 		var dw = frictionMethod() === 'dw';
 		function compare(el, r, kind) {
 			var fields = LPN_INP_UPDATE_FIELDS[r.type] || [], ownedHere = false;
@@ -46007,6 +46024,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (f[0] === 'roughness' && dw) { plan.dwRoughness = true; return; }
 				if (kind === 'link' && pipeTypeOwns(el, f[0])) { ownedHere = true; return; }
 				cur = effective(el, f[0]);
+				// A blank is a meaning, not a difference: a tank with no base stands on its ground, and a
+				// pump or pipe with no status is open. Asking the value the blank MEANS keeps a file that
+				// states the same thing from being listed as a change.
+				if ((cur === undefined || cur === null || cur === '') && f[0] === 'bottomElev' && el.type === 'tank' && tankBottom(el) === nv) { return; }
+				if ((cur === undefined || cur === null || cur === '') && f[0] === 'status' && nv === 'open') { return; }
 				if (cur === nv) { return; }
 				plan.changes.push({ el: el, kind: kind, id: el.id, prop: f[0], key: f[1], label: pc[f[2]] || f[3],
 					oldV: cur, newV: nv, tok: tok });
@@ -46033,7 +46055,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return plan;
 	}
 	// WRITES the plan. The caller has taken the one undo snapshot and opened the target scenario.
-	function inpUpdateApply(plan, parsed) {
+	function inpUpdateApply(plan) {
 		var touched = [], seen = {}, curveIds = {}, patternIds = {}, stripped = [];
 		docCurvesRead().forEach(function (c) { curveIds[c.id] = true; });
 		(doc.patterns || []).forEach(function (p) { patternIds[p.id] = true; });
@@ -46089,7 +46111,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function inpListIds(ids) { return ids.length > 12 ? ids.slice(0, 12).join(', ') + ' ...' : ids.join(', '); }
 	// The receipt: a dialog, because it is a major event (Tom, 2026-10-18). `plan` is null when the
 	// update was refused; `refused` then holds the rows.
-	function showInpUpdateReceipt(plan, fileName, scnName, msxFile) {
+	function showInpUpdateReceipt(plan, fileName, scnName, msxFile, kind) {
 		var pc = EngCalcs.pageConfig || {}, projName = projectDisplayName(project);
 		openDialog(function (body) {
 			function p(text, bold) {
@@ -46140,7 +46162,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				p(pc.lpn_inpup_h_kept || 'Kept, not in the file', true);
 				p(inpListIds(plan.keptL));
 			}
-			var na = [], naItems = ['positions', 'connections', 'descriptions', 'patterns', 'curves', 'controls', 'rules', 'options'].filter(function (k) { return plan.na[k]; })
+			var na = [], naItems = ['positions', 'connections', 'descriptions', 'patterns', 'curves', 'controls', 'rules', 'options', 'custom'].filter(function (k) { return plan.na[k]; })
 				.map(function (k) { return pc['lpn_inpup_i_' + k] || k; });
 			if (naItems.length) {
 				na.push((pc.lpn_inpup_na_general || 'The file also holds {items}. They were not applied.').replace('{items}', naItems.join(', ')));
@@ -46161,20 +46183,35 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				p(pc.lpn_inpup_h_na || 'Not applied', true);
 				list(na);
 			}
+			if (plan.noteLines && plan.noteLines.length) {
+				p(pc.lpn_gjup_h_notes || 'Reading the file', true);
+				list(plan.noteLines);
+			}
 		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { }, isDefault: true }],
-			{ title: pc.lpn_inpup_title || 'Update from EPANET file' });
+			{ title: inpUpdateTitle(kind) });
+	}
+	function inpUpdateTitle(kind) {
+		var pc = EngCalcs.pageConfig || {};
+		return kind === 'geojson' ? (pc.lpn_gjup_title || 'Update from GeoJSON file') : (pc.lpn_inpup_title || 'Update from EPANET file');
 	}
 	// Compare, apply as one step, say what happened. `target` is 'open' (the open scenario) or 'base'.
 	function updateProjectFromInp(text, fileName, target, msxFile) {
 		var pc = EngCalcs.pageConfig || {}, parsed = EngCalcs.lpnInpParse ? EngCalcs.lpnInpParse(text) : { ok: false };
 		if (!parsed.ok) { setWarning(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.'); return false; }
-		var name = String(fileName).replace(/\.inp$/i, '') || String(fileName),
+		var name = String(fileName).replace(/\.inp$/i, '') || String(fileName);
+		return updateProjectWithPlan(function () { return inpUpdatePlan(parsed, name); }, fileName, target, msxFile, 'inp');
+	}
+	// **THE ONE LANDING IN THE OPEN PROJECT, FOR EVERY FORMAT** (Task 814): `makePlan()` compares and
+	// writes nothing (it runs with the target scenario open); the apply, the one undo step, the
+	// failure rollback, the notice and the receipt dialog are the same whatever the file was.
+	function updateProjectWithPlan(makePlan, fileName, target, msxFile, kind) {
+		var pc = EngCalcs.pageConfig || {},
 			scn = target === 'base' ? baseScenario() : activeScenario(), scnName = scenarioDisplayName(scn), plan, touched;
-		plan = inpWithScenario(scn.id, function () { return inpUpdatePlan(parsed, name); });
+		plan = inpWithScenario(scn.id, makePlan);
 		if (!plan.refused.length && (plan.changes.length || (!plan.notAdded && (plan.addedNodes.length || plan.addedLinks.length)))) {
 			saveUndoSnapshot();
 			try {
-				touched = inpWithScenario(scn.id, function () { return inpUpdateApply(plan, parsed); });
+				touched = inpWithScenario(scn.id, function () { return inpUpdateApply(plan); });
 				afterPropertyEdits(touched);
 				refreshPopupIfOpen();
 			} catch (err) {
@@ -46187,40 +46224,45 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					e.textContent = (pc.lpn_inpup_failed || 'The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}')
 						.replace('{project}', projectDisplayName(project)).replace('{reason}', String((err && err.message) || err));
 					body.appendChild(e);
-				}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { }, isDefault: true }], { title: pc.lpn_inpup_title || 'Update from EPANET file' });
+				}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { }, isDefault: true }], { title: inpUpdateTitle(kind) });
 				return false;
 			}
 			setNotice((pc.lpn_inpup_status || 'Imported {file} into {scenario} of {project}. Values changed ({n}). Assets added ({a}).')
 				.replace('{project}', projectDisplayName(project)).replace('{file}', fileName).replace('{scenario}', scnName)
 				.replace('{n}', String(plan.changes.length)).replace('{a}', String(plan.notAdded ? 0 : plan.addedNodes.length + plan.addedLinks.length)));
 		}
-		showInpUpdateReceipt(plan, fileName, scnName, msxFile);
+		showInpUpdateReceipt(plan, fileName, scnName, msxFile, kind);
 		return !plan.refused.length;
 	}
 	// The one small question. Asked only when the open project has something in it; an empty one
 	// takes the file as a new project, as it always did.
 	function inpAskDestination(text, fileName, msxFile) {
+		var pc = EngCalcs.pageConfig || {};
+		function landNew() { if (landInpText(text, fileName, false) && msxFile) { readMsxFile(msxFile, document.getElementById('lpn_dialog_body')); } }
+		askImportDestination(fileName, pc.lpn_inpup_lead || 'Choose where to import this file. Note that EPANET files don\'t include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.',
+			landNew, function (target) { updateProjectFromInp(text, fileName, target, msxFile); });
+	}
+	// **THE ONE QUESTION, FOR EVERY FILE THAT MAY LAND IN THE OPEN PROJECT** (Task 814). `landNew()`
+	// makes the new project; `update(target)` lands in the open project, target 'open' or 'base'.
+	function askImportDestination(fileName, lead, landNew, update) {
 		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), inBase = !!scn.isBase,
 			projName = projectDisplayName(project), buttons = [], seam = window.lpnInpDestination;
 		// THE HARNESS SEAM, as window.lpnDialogAnswerer is for askDialog(): only the headless DOM stub
 		// sets it, to 'new' so that the many harnesses that import one file after another still make
 		// a project each time. A real page has none and always asks.
 		if (typeof seam === 'string') {
-			if (seam === 'new') {
-				if (landInpText(text, fileName, false) && msxFile) { readMsxFile(msxFile, document.getElementById('lpn_dialog_body')); }
-			} else { updateProjectFromInp(text, fileName, seam, msxFile); }
+			if (seam === 'new') { landNew(); } else { update(seam); }
 			return;
 		}
-		buttons.push({ label: pc.lpn_inpup_btn_new || 'A new project', isDefault: true,
-			fn: function () { if (landInpText(text, fileName, false) && msxFile) { readMsxFile(msxFile, document.getElementById('lpn_dialog_body')); } } });
+		buttons.push({ label: pc.lpn_inpup_btn_new || 'A new project', isDefault: true, fn: landNew });
 		if (inBase) {
 			buttons.push({ label: (pc.lpn_inpup_btn_project || 'This project, {project}').replace('{project}', projName),
-				fn: function () { updateProjectFromInp(text, fileName, 'open', msxFile); } });
+				fn: function () { update('open'); } });
 		} else {
 			buttons.push({ label: (pc.lpn_inpup_btn_scenario || '{scenario}, open now').replace('{scenario}', scenarioDisplayName(scn)),
-				fn: function () { updateProjectFromInp(text, fileName, 'open', msxFile); } });
+				fn: function () { update('open'); } });
 			buttons.push({ label: pc.lpn_scenario_base || 'Base',
-				fn: function () { updateProjectFromInp(text, fileName, 'base', msxFile); } });
+				fn: function () { update('base'); } });
 		}
 		buttons.push({ label: pc.lpn_cancel || 'Cancel', fn: function () { } });
 		openDialog(function (body) {
@@ -46231,9 +46273,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				e.textContent = t;
 				body.appendChild(e);
 			}
-			p(pc.lpn_inpup_lead || 'An EPANET file holds one set of values and no scenarios. Choose where to put them.');
-			p((pc.lpn_inpup_how || 'In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.'));
-			if (!inBase) { p(pc.lpn_inpup_base_note || 'Base. A scenario that holds its own value for an asset keeps it; the others take the new value.'); }
+			// A lead may carry its own paragraphs, written \n\n in the language file.
+			var leadParas = lead.split(/\\n\\n|\n\n/);
+			leadParas.forEach(function (para) { p(para); });
+			// A lead of one paragraph (a translation not yet updated) still gets the matching rule beneath it.
+			if (leadParas.length < 2) { p((pc.lpn_inpup_how || 'In this project, assets are matched by ID. Values are changed on matching assets, assets unique to the file are added, and assets unique to this project are left unaltered.')); }
+			if (!inBase) { p(pc.lpn_inpup_base_note || 'Choosing Base doesn\'t clear any scenario overrides.'); }
 		}, buttons, { title: (pc.lpn_inpup_ask_title || 'Import {file}').replace('{file}', fileName) });
 	}
 	function projectHasAssets() { return !!doc && ((doc.nodes && doc.nodes.length) || (doc.links && doc.links.length)); }
@@ -46448,8 +46493,73 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (done) { done({ ok: false, error: scan.error, message: msg.replace('{file}', fileName) }); }
 			return;
 		}
+		// A project with something in it is asked where the file goes, as for an `.inp` (Task 814); a
+		// caller that hands in the mapping `choice` itself is a harness, and wants the new project.
+		if (!choice && projectHasAssets()) {
+			askImportDestination(fileName, pc.lpn_gjup_lead || 'Choose where to import this file. Note that GeoJSON files don\'t include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.',
+				function () { landGeoJsonNetNew(scan, fileName, done, choice); },
+				function (target) { updateProjectFromGeoJson(scan, fileName, target, done); });
+			return;
+		}
+		landGeoJsonNetNew(scan, fileName, done, choice);
+	}
+	function landGeoJsonNetNew(scan, fileName, done, choice) {
 		if (scan.ours || choice) { finishGeoJsonNet(scan, fileName, choice || null, done); return; }
 		openGeoJsonNetMapping(scan, fileName, function (ch) { finishGeoJsonNet(scan, fileName, ch, done); });
+	}
+	// ---- A GEOJSON NETWORK UPDATES THE OPEN PROJECT (Task 814) -----------------------------------
+	//
+	// The same landing as an EPANET file, by the same code: this builds the network from the file
+	// (the mapping step first, for a file this page did not write), reduces it to the shape
+	// inpPlanFromSource() compares, and hands it to updateProjectWithPlan(). Units and head loss
+	// formula must match the project's (refused by name otherwise); the target is the open scenario
+	// unless Base is chosen; one undo step; the receipt is a dialog naming the scenario.
+	function geoJsonNetNoteLines(net) {
+		var CAP = 50;
+		return (net.notes || []).filter(function (n) { return n.code !== 'not-in-geojson'; }).map(function (n) {
+			var ids = n.ids.slice(0, CAP).join(', ');
+			if (n.ids.length > CAP) { ids += ' ' + ((EngCalcs.pageConfig || {}).lpn_gjnet_and_more || 'and {n} more').replace('{n}', n.ids.length - CAP); }
+			return geoJsonNetNoteText(n, net) + (n.ids.length ? ' (' + ids + ')' : '');
+		});
+	}
+	function geoJsonPlanSource(net) {
+		var raw = { node: {}, link: {} }, na = {};
+		net.nodes.forEach(function (n) { raw.node[n.id] = { x: n.x, y: n.y }; });
+		net.links.forEach(function (l) { raw.link[l.id] = { verts: (l.verts || []).map(function (v) { return { x: v.x, y: v.y }; }) }; });
+		if ((net.patterns || []).length) { na.patterns = true; }
+		if ((net.curves || []).length) { na.curves = true; }
+		if ((net.customProps || []).length) { na.custom = true; }
+		return { refused: [], na: na, cv: {}, rec: { nodes: net.nodes, links: net.links }, rawNode: raw.node, rawLink: raw.link, geoFile: true };
+	}
+	function updateProjectFromGeoJson(scan, fileName, target, done) {
+		function land(net, refusedRows) {
+			var ok = updateProjectWithPlan(function () {
+				var plan = refusedRows && refusedRows.length ? inpPlanFromSource({ refused: refusedRows })
+					: inpPlanFromSource(geoJsonPlanSource(net));
+				if (net) { plan.noteLines = geoJsonNetNoteLines(net); }
+				return plan;
+			}, fileName, target, null, 'geojson');
+			if (done) { done({ ok: ok, updated: true, net: net }); }
+		}
+		var before = readUnitSelections(), net, rows;
+		if (scan.ours) {
+			net = EngCalcs.lpnGeoJsonNetBuild(scan, { prefixes: settings.idPrefixes, method: settings.method || 'hw' });
+			rows = inpRefusalRows(net.units || {}, net.method || frictionMethod(), geoJsonMethodLabel(net.method));
+			land(net, rows);
+			return;
+		}
+		openGeoJsonNetMapping(scan, fileName, function (ch) {
+			// The mapping step offers the project's own units; one changed away from them is refused.
+			rows = inpRefusalRows(ch.units || {}, frictionMethod(), frictionMethodLabel());
+			if (rows.length) { land(null, rows); return; }
+			net = EngCalcs.lpnGeoJsonNetBuild(scan, { mapping: ch.mapping, units: before, tolerance: ch.tolerance,
+				prefixes: settings.idPrefixes, defaults: geoJsonNetDefaults([]), method: settings.method || 'hw' });
+			land(net, null);
+		});
+	}
+	function geoJsonMethodLabel(m) {
+		var pc = EngCalcs.pageConfig || {};
+		return m === 'dw' ? (pc.bpn_method_dw || 'Darcy-Weisbach') : m === 'manning' ? (pc.bpn_method_manning || 'Manning') : (pc.bpn_method_hw || 'Hazen-Williams');
 	}
 	// The unit selectors a mapping target can name, and the names each offers.
 	function geoJsonNetUnitsOffered() {

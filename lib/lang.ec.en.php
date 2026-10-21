@@ -2425,15 +2425,18 @@ $ec_lang['lpn_status_imported']='Opened {name} from a file, and added it to this
 // Update the open project from an EPANET file (Task 814). Placeholders in braces are filled by the page.
 // {file} is a file name.
 $ec_lang['lpn_inpup_ask_title']='Import {file}';
-$ec_lang['lpn_inpup_lead']='An EPANET file holds one set of values and no scenarios. Choose where to put them.';
-$ec_lang['lpn_inpup_how']='In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.';
-$ec_lang['lpn_inpup_base_note']='Base. A scenario that holds its own value for an asset keeps it; the others take the new value.';
+$ec_lang['lpn_inpup_lead']='Choose where to import this file. Note that EPANET files don\'t include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.';
+$ec_lang['lpn_inpup_how']='In this project, assets are matched by ID. Values are changed on matching assets, assets unique to the file are added, and assets unique to this project are left unaltered.';
+$ec_lang['lpn_inpup_base_note']='Choosing Base doesn\'t clear any scenario overrides.';
 $ec_lang['lpn_inpup_btn_new']='A new project';
 // {project} is a project name; it labels a button.
 $ec_lang['lpn_inpup_btn_project']='This project, {project}';
 // {scenario} is a scenario name; it labels a button.
 $ec_lang['lpn_inpup_btn_scenario']='{scenario}, open now';
 $ec_lang['lpn_inpup_title']='Update from EPANET file';
+$ec_lang['lpn_gjup_lead']='Choose where to import this file. Note that GeoJSON files don\'t include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.';
+$ec_lang['lpn_gjup_title']='Update from GeoJSON file';
+$ec_lang['lpn_gjup_h_notes']='Reading the file';
 // {file} is a file name, {scenario} a scenario name and {project} a project name.
 $ec_lang['lpn_inpup_heading']='Imported {file} into {scenario} of {project}';
 $ec_lang['lpn_inpup_counts']='Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).';
