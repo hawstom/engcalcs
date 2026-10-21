@@ -65,7 +65,7 @@ plus records, the way `js/lpn-net.js` turns a `.net` into `.inp` text: the page 
 route every EPANET file takes (`landInpText()`'s steps: units strip first, `docFromInp()`, arrival
 saved, one report). What an `.inp` cannot say is returned beside it and laid onto the document by
 `wtgLayOnto()` in `js/looped-network.js`: inactive elements (`_active: false`), the scenarios beyond
-Base with their overrides, and the alternatives no scenario uses. Every difference is a note
+Base with the stored alternatives they name (`treeOf()`, below), and the alternatives no scenario uses. Every difference is a note
 `{code, ids}` in the import report (`LPN_WTG_NOTE`, keys `lpn_wtg_note_*`); nothing is dropped
 silently. `EngCalcs.lpnWtgDisplayUnits(xmlText)` reads the `.wtg` beside it for the display units.
 
@@ -106,9 +106,9 @@ the column layout of a kind no sample uses (FCV, GPV) is visible even without ro
   2 scenario, 3 network element, 4 support (pattern, pump definition, control), 5 calculation options.
 - **Classes**: one-column tables (`IdahoJunction`, `IdahoReservoir`, `IdahoTank`, `ConventionalTank`,
   `IdahoPipe` (also `AddedForINPConversion`), `StandardPump`, `BaseValve`, `PRV`, `PSV`, `TCV`...)
-  list the elements of each class. **A pump or valve is a NODE** (`BaseDirectedNode`) between two
-  pipes; `BaseDirectedNode_HMIDataSetTopology_Data.HMITopologyDownstreamLinkID` names the downstream
-  one. Anything else live (Tnet0's `DischargeToAtmosphere` "D2A-3", spot elevations...) is reported.
+  list the elements of each class. **A pump or valve is a NODE** (`BaseDirectedNode`) between pipes, and
+  may have any number of them; `BaseDirectedNode_HMIDataSetTopology_Data.HMITopologyDownstreamLinkID`
+  names the downstream one. A variable speed pump battery (`VariableSpeedPumpBattery`) is such a node too. Anything else live (Tnet0's `DischargeToAtmosphere` "D2A-3", spot elevations...) is reported.
 - **Values**: `<Class>_<Group>_Data(DomainElementID, AlternativeID, ...)`, one row per element per
   alternative; collections add `ItemID` (`IdahoDemandNode_Demand_DemandCollection`,
   `ConventionalTank_Physical_DepthRatioVolumeRatioCurve`). A column can move between versions: a
@@ -163,7 +163,7 @@ Unknown and therefore not converted (reported if a value is present): 28 (emitte
   1 average area, 2 variable area (EPS: depth ratio x active range, volume ratio x active volume
   gives the `.inp`'s curve exactly). `Physical_HasSeparateInlet` = WaterGEMS's top inlet, which its
   own EPANET export models as a PSV and a 0.001-long pipe; here the pipe joins the tank, reported.
-- Patterns: `IdahoPattern` (start multiplier, start time of day, `PatternFormat` 0 stepwise) and
+- Patterns: `IdahoPattern` (start multiplier, start time of day, `PatternFormat` 0 stepwise, 1 continuous) and
   `IdahoPattern_PatternCurve` (seconds from start, multiplier; the last point closes the cycle). A
   reservoir's `Physical_HglPattern` multiplies its elevation (withdrawal model: R-2 at 1 m, pattern
   from 56).
@@ -262,11 +262,11 @@ check that an import reproduced the model. Not built.
 
 ## A scenario that overrides Physical and Demand (2026-10-20)
 
-`WTG-tgh-1.wtg.sqlite` (6.3 MB; kept outside the repository, in `~/tom-files/2026-10-19/` or the folder `WTG_TGH_DIR` names), its `.wtg`, and WaterGEMS's own `.inp`
-export of each scenario, saved by Tom as an ordinary user of WaterGEMS: Base plus a child scenario
-TGH-1 that changes one pipe diameter (P-1, 8 to 10 in) and one demand (J-1, 0 to 1250 gpm). Three
-nodes (J-1, J-2, R-1), two pipes. Kept outside the repository (the sqlite is 6 MB):
-`~/tom-files/2026-10-19/`, or the folder `WTG_TGH_DIR` names; the harnesses print NOT RUN without it. Every statement below is OBSERVED in this file.
+`WTG-tgh-1.wtg.sqlite` (6.3 MB; kept outside the repository, in `~/tom-files/2026-10-19/` or the folder `WTG_TGH_DIR` names;
+the harnesses print NOT RUN without it), its `.wtg`, and WaterGEMS's own `.inp` export of each scenario, saved by Tom
+as an ordinary user of WaterGEMS: Base plus a child scenario TGH-1. Tom first saved a three-node model whose
+TGH-1 changed one pipe diameter and one demand, then saved a larger one over it (below); the rows
+described here held in both. Every statement below is OBSERVED in this file.
 
 - **A child scenario's rows**: `HMIScenario` 38 has `ParentID` 1 (Base). Its `HMIScenarioAlternative`
   rows are `IsLocal 1` for the two categories it changes (Physical type 4 to alternative 37, Demand
@@ -282,27 +282,78 @@ nodes (J-1, J-2, R-1), two pipes. Kept outside the repository (the sqlite is 6 M
   row** (`DemandCollection_BaseFlow` 2.785 ft3/s = 1250 gpm). J-2 has no row at alternative 36 and
   keeps Base's. The reader writes a junction whose demand list differs from Base's, with one row
   each side, as an override of that junction's `demand`; several rows each side are named in the
-  report (`wtg-scenario-category`), not carried.
+  report (`wtg-alternative-partial`), not carried.
 - **Results** are in the `.out`/`.rpc`/`.dwh` files beside the model, not in the sqlite.
 - **Coordinates and elevations here** are in the `.wtg`'s display units (GPM, feet); the export's
   coordinates are in feet with fifteen digits, the reader's with ten.
 
-**Proof**: `node dev/lpn-spike/wtg-tgh-harness.js`. Base read from the sqlite against the Base
-export, then Base with TGH-1's overrides laid on against the TGH-1 export: IDs, types, from and to,
-elevation, demand, head, x, y, length, diameter, roughness, minor loss, status; **60 values
-compared, all within 1e-6 relative** (the reader writes seven significant digits where WaterGEMS
-writes fifteen: length 81.32591 against 81.3259064580561). The overrides are exactly the two
-differences between the exports, `l:P-1 diameter 10` and `n:J-1 demand 1250`. Not compared: the
-export's `[OPTIONS]` and `[TIMES]` text (the reader writes its own, Duration 0, same units, head loss
-and viscosity).
+**Proof**: `node dev/lpn-spike/wtg-tgh-harness.js`, below. Not compared: the export's `[OPTIONS]` and
+`[TIMES]` text (the reader writes its own: same units, head loss and viscosity).
+
+## Pumps and valves as nodes, a continuous pattern, and the alternatives themselves (2026-10-20)
+
+Tom's second sample, saved over the first (`WTG-tgh-1`, same folder): a reservoir, two tanks, three pumps (one a
+variable speed pump battery), one valve of each type (PRV, PSV, PBV, FCV, TCV, GPV), 33 pipes, a continuous
+pattern, and a child scenario TGH-1, with WaterGEMS's own `.inp` export of Base and of TGH-1. Every statement is
+OBSERVED in it. `node dev/lpn-spike/wtg-tgh-harness.js` compares the reader with both exports (1,373 values).
+
+- **WaterGEMS's own export of a pump or valve node**: two junctions at the node's position, named after the node's
+  ID number, not its label (`46-A`, `46-B` for PMP-1), the pump or valve a link between them. **The one
+  downstream pipe the database names joins B; every other pipe at the node joins A**, whichever way it points
+  (PMP-1 has three pipes on A and one on B). The reader did this for a node with exactly two pipes only, and
+  dropped every node with more; the nine nodes of this sample and 21 pipes beside them were reported as not
+  imported. It now does what the export does for any number of pipes. Names stay `<label>-U` and `<label>-D`,
+  and the two junctions are still drawn apart (a quarter along the first inlet pipe and the outlet pipe) so the
+  link has a length on the map.
+- **A variable speed pump battery** is written by the export as one pump with `HEAD <curve> SPEED 1`; so here, from
+  its own definition (`Physical_VspbDefinition`). Its lag pumps, control node and target are not read.
+- **A pump definition type 2 with efficiency type 1** (motor efficiency 100): the export writes a one-point
+  EFFICIENCY curve at flow 0 holding the motor efficiency; so here. Type 1 is read from this one sample.
+- **A GPV's curve and a tank's volume curve** reach `[CURVES]` for any scenario that states one, exactly as the Base
+  pass writes them (`gpvCurveId()`, `tankFacts()`).
+- **A continuous pattern**: ten points over 24 hours, a starting multiplier of 1 and the first point 0.2, came out
+  of WaterGEMS's export as **26 multipliers at the one-hour step**: the starting multiplier, then the straight
+  line between points sampled at 0, 1, ... 24 hours, both ends included. The reader writes exactly that, at a
+  pattern step that is the gcd of the point times and the hydraulic time step, and the report says the pattern
+  was continuous. (The same pattern read as a stepwise one by the old reader came out as 24 different
+  multipliers.) Whether WaterGEMS's own solver reads the line, or the export's shifted samples, is not
+  known; the file is the only thing compared.
+- **Alternatives, as the page stores them** (`treeOf()` in `js/lpn-wtg.js`; the tree is
+  `dev/scenario-alternatives.md`, "Stages 4 and 5"). Every alternative a scenario names becomes a stored
+  alternative **of the same name** in the category its type matches: Physical (4), Demand (20), Initial
+  settings (21), Fire flow (26), Active topology (3) with their values read; Constituent (24), Energy cost (28)
+  and User data (100) by name only; the other types (Geometry, Topology, Operational, Age, Trace, Pressure
+  Dependent Demand, ...) have no counterpart and are named in the report. An alternative holds only the values in
+  which it differs from its parent alternative and hangs from it; a root alternative that is not Base's is "a Base
+  of its own" holding every value it has rows for. A scenario names the alternatives it uses where they differ
+  from its parent scenario's (`'base'` where it goes back to Base's), so **two scenarios that share an
+  alternative name one record**, and a scenario's parent is its parent scenario. Alternatives no scenario uses
+  are imported too.
+- **Whatever an alternative cannot say stays the scenario's own override**: the importer lays the alternatives on in
+  the order the page resolves them and writes the difference from what WaterGEMS computes for the scenario. In
+  TGH-1 that is the two tank depths: Physical moves the tank's base to 120 ft while the water surface stays at
+  139 ft, so the depth is 19 ft; the page stores depth, WaterGEMS stores surface elevation. **A scenario that
+  names an alternative can therefore also carry overrides.** An alternative picked by no scenario loses such a
+  cross-category effect silently; it is rare, and the report does not name it.
+- **What an alternative holds, and the report names when it cannot**: Physical: junction elevation,
+  reservoir head, tank base elevation (both `elev` and `bottomElev`, as import writes them), levels, diameter and
+  volume curve, pipe diameter, length, roughness and minor loss, valve diameter and minor loss, pump and GPV
+  curve references, the elevation of the two junctions beside a pump or valve. Initial settings: pipe, valve
+  and pump status, valve setting, pump speed, tank depth. Demand: a junction's one demand (several demands at a
+  junction, and a demand pattern, are named, not carried). Fire flow: a junction's needed flow. Active topology:
+  active or not. Of these only Physical and Demand have a real sample (TGH-1); the rest are built from the schema
+  and held by a synthetic model (`wtg-alternatives-harness.js`, section 2), **untested on real data**.
+- **Proof**: `wtg-alternatives-harness.js` imports TGH-1 into the page, opens Base and then TGH-1, and reads 211
+  and 210 values through the page's own `effective()` against the two exports; its second section holds sharing,
+  a grandchild alternative, a return to Base, and the categories above on a synthetic model.
 
 ## Unproven, and the sample that would prove it
 
 - **A scenario that overrides Physical data in more than a diameter, or a Demand alternative that
   changes a junction with several demand rows.** The first is read the same way for every Physical
   column (proved for one pipe's diameter); the second is named in the report, not carried.
-  Also unread: alternatives other than Physical and Demand for a scenario (named in the report), and
-  alternative names and sharing (overrides only).
+  Alternatives other than Physical and Demand are built from the schema (synthetic model only); Geometry,
+  Topology, Operational, Age, Trace and the other types with no counterpart are named in the report.
 - **US-unit models end to end** (Tnet3 is GPM-era data shown in L/s; no sample is a US model with its
   `.inp`), FCV, PBV, GPV, constant-power and three-point pumps, emitters, customer demands,
   `OperatingRangeType` 1, continuous patterns, and a stated spatial reference: each is read by the
