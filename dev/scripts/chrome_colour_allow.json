@@ -3,11 +3,11 @@
 	"css_rules": [
 		{
 			"path": "^\\.lpn-(node|link-halo|lbl|leader|service|meter|custhandle|marquee|rubberband|contour-(line|label|break))",
-			"reason": "map symbology: the drawing's own ink, deliberately never themed (dev/theming-plan.md, Phase 2)"
+			"reason": "map symbology: the colours that MEAN something (fire-flow verdicts, the override amber and grey, the pending red). The paper, the network ink, the lettering, the halo and the selection are --ec-map-* tokens that follow the theme on screen and print as Light (Task 811 round 3, dev/themes-plan.md)"
 		},
 		{
 			"path": "^\\.lpn-shape",
-			"reason": "map symbology: a Shape, the user's own drawn annotation, in the drawing's ink (Task 779)"
+			"reason": "map symbology: a Shape, the user's own drawn annotation (Task 779); its default ink is the --ec-map-shape token"
 		},
 		{
 			"path": "^\\.lpn-link-symbol-backdrop",
@@ -19,15 +19,15 @@
 		},
 		{
 			"path": "^@keyframes lpn-just-",
-			"reason": "map symbology: the drag/move flash on a node, drawn in the drawing's red"
+			"reason": "map symbology: the drag/move flash on a node, drawn in the drawing's red (the dark beat is --ec-map-ink)"
 		},
 		{
 			"path": "^\\.lpn-examples-(welcome|h|sub|msg|legal|blank)|^\\.lpn-example-thumb$|^#lpn_wrong_btn",
-			"reason": "text and paper that sit directly on the map's tiles or white paper, which no theme changes: the gallery's own words, the thumbnails' white paper and the strip's Something wrong here? cell keep map ink"
+			"reason": "an example thumbnail keeps its own white paper in every theme (a picture of a drawing); the words that sit on the map's paper take the --ec-map-* tokens"
 		},
 		{
 			"path": "^#lpn_canvas$",
-			"reason": "map symbology: the drawing's own white paper (--lpn-map-bg)"
+			"reason": "map symbology: the drawing's paper, --lpn-map-bg, which is the --ec-map-paper token"
 		},
 		{
 			"path": "^\\.lpn-color-swatch",
@@ -51,13 +51,13 @@
 		],
 		"counts": {
 			"Branched-Network.php": 5,
-			"Looped-Network.php": 3,
+			"Looped-Network.php": 1,
 			"lib/HeadersFooters.lib.php": 1,
 			"lib/Icons.lib.php": 1,
 			"lib/WebManifest.lib.php": 2
 		},
 		"_notes": {
-			"Looped-Network.php": "the map canvas's own white paper, plus one comment",
+			"Looped-Network.php": "one comment (the map canvas's paper and frame are tokens since Task 811 round 3)",
 			"Branched-Network.php": "legend keys that match the drawn sketch layers (data colours)",
 			"lib/*.php": "web-manifest and meta theme colours, which must be literals"
 		}

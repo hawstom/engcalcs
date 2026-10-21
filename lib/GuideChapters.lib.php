@@ -95,6 +95,38 @@ function ecGuideIntro($slug) {
 }
 
 /**
+ * The chapter's opening paragraphs as HTML, with a sub-heading and a list made real.
+ *
+ * A paragraph that is one line ending in a colon, with something after it, is a sub-heading (its
+ * colon dropped); a paragraph that begins "- " is a list item, and neighbouring items share one list.
+ * Everything else is a paragraph. The application's Guide applies the same two rules in
+ * guideBoxEntryParas() (js/looped-network.js); the box's "?" tip still shows the raw text.
+ *
+ * @param string $slug  a chapter slug.
+ * @param string $h     the heading element for a sub-heading (h2 on a chapter page).
+ * @return string
+ */
+function ecGuideIntroHtml($slug, $h = 'h2') {
+    $paras = ecGuideIntro($slug);
+    $html = '';
+    $inList = false;
+    $n = count($paras);
+    foreach ($paras as $i => $p) {
+        $isLi = strncmp($p, '- ', 2) === 0;
+        if ($inList && !$isLi) { $html .= "</ul>\n"; $inList = false; }
+        if ($isLi) {
+            if (!$inList) { $html .= "<ul>\n"; $inList = true; }
+            $html .= '<li>' . htmlspecialchars(substr($p, 2)) . "</li>\n";
+        } elseif ($i < $n - 1 && strpos($p, "\n") === false && preg_match('/[:：]$/u', $p)) {
+            $html .= '<' . $h . ' class="lpn-guide-subhead">' . htmlspecialchars(preg_replace('/[:：]$/u', '', $p)) . '</' . $h . ">\n";
+        } else {
+            $html .= '<p>' . htmlspecialchars($p) . "</p>\n";
+        }
+    }
+    return $html . ($inList ? "</ul>\n" : '');
+}
+
+/**
  * The definition of the Map chapter's first row: the keyboard table, with the three rows the
  * application adds from other keys. Moved here from Looped-Network.php unchanged.
  */
@@ -103,6 +135,18 @@ function ecGuideMapDef() {
     return str_replace('</tbody></table>', '<tr><td>W</td><td>' . $ec_lang['lpn_hotkeys_zoomwin_def'] . '</td></tr></tbody></table>',
         preg_replace('~</tr>~', '</tr><tr><td>1</td><td>' . $ec_lang['lpn_tool_add_chain'] . '</td></tr><tr><td>A</td><td>'
             . rtrim($ec_lang['lpn_tool_area_tip'], '.') . '</td></tr>', $ec_lang['lpn_hotkeys_map_def'], 1));
+}
+
+/**
+ * The language key holding a term. A term that is the same words as an interface label borrows that
+ * label's key instead of keeping its own copy.
+ *
+ * @param string $stem  a chapter term's stem.
+ * @return string       the language key.
+ */
+function ecGuideTermKey($stem) {
+    $alias = array('lpn_guide_cmp_byasset' => 'lpn_scnres_title', 'lpn_guide_ff_dur' => 'lpn_dur_option');
+    return isset($alias[$stem]) ? $alias[$stem] : $stem . '_term';
 }
 
 /**
@@ -120,7 +164,8 @@ function ecGuideDl($slug) {
         $def = ($slug === 'map' && $stem === 'lpn_hotkeys_map') ? ecGuideMapDef() : $ec_lang[$stem . '_def'];
         // A term that only repeats its chapter's heading is marked, and the stylesheet hides it.
         $dup = ($stem === 'lpn_hotkeys_map' || $stem === 'lpn_hotkeys_snip') ? ' class="lpn-guide-dup"' : '';
-        $html .= "\t<dt" . $dup . '>' . $ec_lang[$stem . '_term'] . '</dt><dd>' . $def . "</dd>\n";
+        $termKey = ecGuideTermKey($stem);
+        $html .= "\t<dt" . $dup . '>' . $ec_lang[$termKey] . '</dt><dd>' . $def . "</dd>\n";
     }
     return $html . "</dl>";
 }

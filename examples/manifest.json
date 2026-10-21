@@ -93,23 +93,8 @@
             "thumb": "Valves.svg"
         },
         {
-            "file": "Net1-Scenarios.lwn",
-            "order": -2,
-            "titleKey": "lpn_ex_net1_scn_title",
-            "descKey": "lpn_ex_net1_scn_desc",
-            "title": "EPANET Net1 with scenarios, gpm (US)",
-            "description": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.",
-            "system": "us",
-            "coords": "xy",
-            "work": "maintenance",
-            "flow": "gpm",
-            "nodes": 11,
-            "links": 13,
-            "thumb": "Net1-Scenarios.svg"
-        },
-        {
             "file": "Net1-SI.lwn",
-            "order": -1,
+            "order": -2,
             "titleKey": "lpn_ex_net1_si_title",
             "descKey": "lpn_ex_net1_si_desc",
             "title": "EPANET Net1 plus rule-based controls, L/s (SI)",
@@ -124,11 +109,11 @@
         },
         {
             "file": "Net1.lwn",
-            "order": 0,
+            "order": -1,
             "titleKey": "lpn_ex_net1_title",
             "descKey": "lpn_ex_net1_desc",
-            "title": "EPANET Net1 plus rule-based controls",
-            "description": "A fictional EPANET example with chlorine, 1 reservoir and 1 tank.",
+            "title": "EPANET Net1 plus rule-based controls, gpm (US)",
+            "description": "Gallons per minute, with feet and inches. A fictional EPANET example with chlorine, 1 reservoir, 1 tank, 1 pump, and two rule-based controls.",
             "system": "us",
             "coords": "xy",
             "work": "maintenance",
@@ -136,6 +121,21 @@
             "nodes": 11,
             "links": 13,
             "thumb": "Net1.svg"
+        },
+        {
+            "file": "Net1-Scenarios.lwn",
+            "order": 0,
+            "titleKey": "lpn_ex_net1_scn_title",
+            "descKey": "lpn_ex_net1_scn_desc",
+            "title": "EPANET Net1 with scenarios, gpm (US)",
+            "description": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.",
+            "system": "us",
+            "coords": "xy",
+            "work": "maintenance",
+            "flow": "gpm",
+            "nodes": 11,
+            "links": 13,
+            "thumb": "Net1-Scenarios.svg"
         },
         {
             "file": "Basic-example-SI-units.lwn",

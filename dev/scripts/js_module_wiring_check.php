@@ -60,10 +60,12 @@ const EC_LPN_EDITOR = 'looped-network.js';
 const EC_HARNESS_STUBS = ['dev/lpn-spike/lpn-dom-stub.js', 'dev/lpn-spike/bootstrap.js'];
 
 /**
- * Modules no page loads with a `<script>` tag, and why that is right. Empty today: every
- * `js/*.js` in this repo is on at least one page.
+ * Modules no page loads with a `<script>` tag, and why that is right. Each is a slice of a
+ * staged build that must not reach a visitor until Tom says so; the harness named loads it.
  */
-const EC_UNREFERENCED_MODULES = [];
+const EC_UNREFERENCED_MODULES = [
+    'lpn-native-run.js' => 'Task 733 phase 3, slice 1: the built-in solver\'s period loop, held to EPANET by dev/lpn-spike/native-eps-harness.js and not yet called by the page (dev/native-eps-plan.md)',
+];
 
 /**
  * Modules `Looped-Network.php` loads before the editor that the SHARED stub deliberately does not

@@ -49,7 +49,7 @@ Derived from `EC_LPN_FURNITURE` in `dev/scripts/lpn_furniture_check.php`; the ch
 | `lpn_hovercard` | Settings > Map and page > Page > Show all properties on hover |
 | `lpn_ovrmarks` | Settings > Map and page > Page > Show override markers on the map |
 | `lpn_cleanmap` | Map > Clean map |
-| `lpn_theme` | Settings > Map and page > Page > Theme (System, Light, Dark) |
+| `lpn_theme` | Settings > Map and page > Page > Theme (the gallery: System, Light, Dark, High contrast, Amber, Green, Platinum) |
 | `lpn_msghidden` | The x on a message in the amber box on the map (and Show in the message history): which messages this reader hid |
 | `lpn_areahint` | Settings > Map and page > Page > Show the selection help, and the bubble's own checkbox |
 | `lpn_survey_format` | The column order last chosen when importing a surveyed point list |
@@ -86,7 +86,7 @@ rows) are counted only when present. Regenerate with
 | `lpn_set_sub_custLbl` | 8 | 8 | 0 | 0 |
 | `lpn_set_sub_nodeLink` | 1 | 1 | 0 | 0 |
 | `lpn_set_sub_mapDisplay` | 19 | 19 | 0 | 0 |
-| `lpn_set_sub_page` | 4 | 0 | 4 | 0 |
+| `lpn_set_sub_page` | 3 | 0 | 3 | 0 |
 | `lpn_set_sub_idPrefixes` | 7 | 7 | 0 | 0 |
 | `lpn_set_sub_defaults` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_customProps` | 10 | 10 | 0 | 0 |
@@ -95,13 +95,12 @@ rows) are counted only when present. Regenerate with
 | `lpn_set_sub_hydraulics` | 17 | 16 | 1 | 0 |
 | `lpn_set_sub_energy` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_quality` | 2 | 2 | 0 | 0 |
-| **Total** | 134 | 129 | 5 | 0 |
+| **Total** | 133 | 129 | 4 | 0 |
 
 Controls whose home is not their heading's default, as observed:
 
 - `lpn_set_sub_page`: Show the selection help -- browser
 - `lpn_set_sub_page`: Show all properties on hover -- browser
 - `lpn_set_sub_page`: Show override markers on the map -- browser
-- `lpn_set_sub_page`: Theme -- browser
 - `lpn_set_sub_hydraulics`: Show the run progress box -- browser
 <!-- INVENTORY:END -->
