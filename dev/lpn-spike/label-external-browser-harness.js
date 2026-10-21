@@ -78,7 +78,7 @@ const NET3_NODE = ['id', 'pressure', 'demand', 'elev'], NET3_LINK = ['id', 'flow
 const SCENES = [
 	// Tom's screenshots of 2026-10-20: Net1, node ID, Qb, Z, P and pipe ID, Q, V, pipe 11 about 90 px.
 	{ key: 'net1tom', name: "Net1 at Tom's view", cardKey: 'lpn_ex_net1_title', node: ['id', 'demand', 'elev', 'pressure'],
-		link: ['id', 'flow', 'velocity'], outToPipe: { id: '11', px: 90 }, notches: [0], viewport: { width: 1100, height: 750 }, noneHidden: true, shot: 'labels-margin-net1.png' },
+		link: ['id', 'flow', 'velocity'], outToPipe: { id: '11', px: 90 }, notches: [0], viewport: { width: 1100, height: 750 }, noneHidden: true, hiddenOk: ['n9'], shot: 'labels-margin-net1.png' },
 	{ key: 'net1', name: 'Net1 (gallery, US), wheeled out', cardKey: 'lpn_ex_net1_title', node: ['id', 'demand', 'elev', 'pressure'],
 		link: ['flow'], step: true, notches: [-4, -14] },
 	{ key: 'net3', name: 'Net3 (gallery, gpm)', cardKey: 'lpn_ex_net3_title', node: NET3_NODE, link: NET3_LINK, notches: [6, 9], shot: 'labels-margin-net3.png', shotAt: 6 },
@@ -264,7 +264,9 @@ async function main() {
 				});
 				ok(at + ': every leader on a drawn label, none over ' + LEN_MAX_PX + ' px', v.long.length === 0, v.long.slice(0, 4).join('; '));
 				others.forEach((o) => ok(at + ': no fewer labels than ' + o.ref, v.labels >= o.r.views[i].labels, v.labels + ' vs ' + o.r.views[i].labels));
-				if (sc.noneHidden) { ok(at + ': no node or pipe label on screen is hidden', v.hidden.length === 0, v.hidden.join(' ')); }
+				// hiddenOk: N9's label is dragged onto the Text "Source" in Net1; hiding it beats overprinting it
+				// (guardLabelOverprint(), label-overlap-sweep-browser-harness.js).
+				if (sc.noneHidden) { const gone = v.hidden.filter((h) => (sc.hiddenOk || []).indexOf(h) < 0); ok(at + ': no node or pipe label on screen is hidden' + ((sc.hiddenOk || []).length ? ' (but ' + sc.hiddenOk.join(' ') + ', dragged onto a Text)' : ''), gone.length === 0, gone.join(' ')); }
 				if (v.ext === 0 && v.hidden.length) { console.log('        (no external label placed in this view)'); }
 			});
 			const ref0 = others[0] && others[0].r;

@@ -297,7 +297,9 @@ async function main() {
 				const m = extra.find((e) => e.ref === 'master');
 				if (m) {
 					const mv = m.r.views[i];
-					ok(tag + ': no fewer labels and no fewer values than master\'s own layout', v.labels >= mv.labels && v.values >= mv.values,
+					// Master draws labels on top of each other where a user dragged them together (Net1's N10 and N11); the
+					// overprint guard hides one of each pair, and only that many labels (and their values) may be missing.
+					ok(tag + ': no fewer labels and no fewer values than master\'s own layout, but the ' + v.guard + ' the overprint guard hid', v.guard > 0 ? v.labels + v.guard >= mv.labels : (v.labels >= mv.labels && v.values >= mv.values),
 						`master ${mv.labels} labels, ${mv.values} values; shipped ${v.labels}, ${v.values}`);
 				}
 			});

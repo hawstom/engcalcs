@@ -219,7 +219,32 @@ function mkEl(tag, svgNS) {
     // CHAR_W is a nominal advance per character. It is not a real font metric and nothing may read a
     // precise width off it; what a harness may rely on is only that width RISES with characters and
     // FALLS when characters go.
-    getBBox() { return { x: 0, y: 0, width: this._textWidth(), height: 10 }; },
+    // **A <text> OR <tspan> THAT STATES A POSITION IS MEASURED WHERE IT STANDS**, as a real getBBox() does:
+    // anchored by its text-anchor at its x, the first row's baseline at y with the later rows each
+    // dy further down (an `em` dy is the font size times its number). Every other element keeps the
+    // origin box, which is all anything measured here until the overprint guard read one label
+    // against another (guardLabelOverprint(): with every label at the origin it hid them all).
+    getBBox() {
+      const width = this._textWidth(), tag = this.tagName || this.nodeName || '';
+      const named = (e, a) => { for (let n = e; n; n = n.parentNode) { const v = n.getAttribute && n.getAttribute(a); if (v != null) { return v; } } return null; };
+      const isText = /^(text|tspan)$/i.test(tag), tx = isText ? parseFloat(named(this, 'x')) : NaN;
+      if (!isText || !isFinite(tx)) { return { x: 0, y: 0, width, height: 10 }; }
+      const fs = this._fontSize(), anchor = named(this, 'text-anchor');
+      const dyOf = (e) => { const d = e.getAttribute && e.getAttribute('dy'); if (d == null) { return 0; } const n = parseFloat(d); return /em$/.test(String(d)) ? n * fs : (isFinite(n) ? n : 0); };
+      const text = /^text$/i.test(tag) ? this : this.parentNode;
+      let rowsBefore = 0, y = parseFloat(text.getAttribute('y')) || 0, first = true;
+      const kids = text.children || [];
+      let top = y;
+      for (const c of kids) {
+        y += dyOf(c);
+        if (first) { top = y; first = false; }
+        if (c === this) { break; }
+      }
+      const rows = /^text$/i.test(tag) ? Math.max(1, kids.filter((c) => c.getAttribute && c.getAttribute('x') != null).length) : 1;
+      const x = anchor === 'end' ? tx - width : (anchor === 'middle' ? tx - width / 2 : tx);
+      const base = /^text$/i.test(tag) ? top : y;
+      return { x, y: base - fs * 0.85, width, height: fs * 1.2 * rows };
+    },
     _textLength() {
       // A <text> owns its tspans' characters; a tspan owns its own.
       //

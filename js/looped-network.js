@@ -77164,7 +77164,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// dev/lpn-spike/label-overlap-sweep-browser-harness.js holds it.
 	var LPN_OVERPRINT_TOL_PX = 0.75;
 	function guardLabelOverprint() {
-		var s = state.s || 1, tol = LPN_OVERPRINT_TOL_PX / s, items = [], i, j, k, hid = 0;
+		var s = state.s || 1, tol = LPN_OVERPRINT_TOL_PX / s, items = [], i, j, k, hid = 0, ri, rj;
 		function rowsOf(t) {
 			var m = /rotate\(([-0-9.e]+)[ ,]+([-0-9.e]+)[ ,]+([-0-9.e]+)\)/.exec(t.getAttribute('transform') || ''),
 				a = m ? +m[1] : 0, ox = m ? +m[2] : 0, oy = m ? +m[3] : 0, rad = a * Math.PI / 180, rows = [], cur = null, c, b, n;
@@ -77186,28 +77186,45 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				return Collide.box(cx, cy, r.x1 - r.x0, r.y1 - r.y0, a);
 			});
 		}
+		// One box per label to find the neighbours (a single getBBox() each); its rows are read only for a
+		// label that has one.
+		function whole(t) {
+			var m = /rotate\(([-0-9.e]+)[ ,]+([-0-9.e]+)[ ,]+([-0-9.e]+)\)/.exec(t.getAttribute('transform') || ''), b, cx, cy, dx, dy, rad;
+			try { b = t.getBBox(); } catch (e) { return null; }
+			if (!(b.width > 0)) { return null; }
+			cx = b.x + b.width / 2; cy = b.y + b.height / 2;
+			if (m) { rad = +m[1] * Math.PI / 180; dx = cx - +m[2]; dy = cy - +m[3]; cx = +m[2] + dx * Math.cos(rad) - dy * Math.sin(rad); cy = +m[3] + dx * Math.sin(rad) + dy * Math.cos(rad); }
+			return { cx: cx, cy: cy, r: Math.hypot(b.width, b.height) / 2 };
+		}
 		function add(key, holder, rank, ext, els) {
-			var rows = [], cx = 0, cy = 0, rr = 0;
+			var parts = [], x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
 			els.forEach(function (t) {
-				if (t && t.textContent && t.style.visibility !== 'hidden' && !(t.classList && t.classList.contains('lpn-lbl-hidden'))) { rows = rows.concat(rowsOf(t)); }
+				var w;
+				if (!t || !t.textContent || t.style.visibility === 'hidden' || (t.classList && t.classList.contains('lpn-lbl-hidden'))) { return; }
+				w = whole(t);
+				if (!w) { return; }
+				parts.push({ el: t, w: w });
+				x0 = Math.min(x0, w.cx - w.r); x1 = Math.max(x1, w.cx + w.r); y0 = Math.min(y0, w.cy - w.r); y1 = Math.max(y1, w.cy + w.r);
 			});
-			if (!rows.length) { return; }
-			rows.forEach(function (r) { cx += r.cx; cy += r.cy; });
-			cx /= rows.length; cy /= rows.length;
-			rows.forEach(function (r) { rr = Math.max(rr, Math.hypot(r.cx - cx, r.cy - cy) + Math.hypot(r.w, r.h) / 2); });
-			items.push({ key: key, holder: holder, rank: rank, ext: ext ? 1 : 0, rows: rows, cx: cx, cy: cy, r: rr, bad: false });
+			if (!parts.length) { return; }
+			items.push({ key: key, holder: holder, rank: rank, ext: ext ? 1 : 0, parts: parts, rows: null,
+				cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, r: Math.hypot(x1 - x0, y1 - y0) / 2, bad: false });
+		}
+		function rowsFor(it) {
+			if (!it.rows) { it.rows = []; it.parts.forEach(function (p) { it.rows = it.rows.concat(rowsOf(p.el)); }); }
+			return it.rows;
 		}
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id];
-			if (ne && !ne.empty) { add('n:' + n.id, ne, crossingShedRank('n:' + n.id) + 1, ne.external, [ne.text]); }
+			if (ne && !ne.empty) { add('n#' + n.id, ne, crossingShedRank('n#' + n.id) + 1, ne.external, [ne.text]); }
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id];
-			if (le && !le.empty) { add('l:' + l.id, le, crossingShedRank('l:' + l.id) + 1, le.external, [le.text].concat((le.repeats || []).map(function (r) { return r.text; }))); }
+			if (le && !le.empty) { add('l#' + l.id, le, crossingShedRank('l#' + l.id) + 1, le.external, [le.text].concat((le.repeats || []).map(function (r) { return r.text; }))); }
 		});
 		doc.labels.forEach(function (lb) {
 			var te = labelEls[lb.id];
-			if (te) { add('t:' + lb.id, null, 0, false, [te.text]); }
+			if (te) { add('t#' + lb.id, null, 0, false, [te.text]); }
 		});
 		if (items.length < 2) { return; }
 		items.sort(function (a, b) { return (a.cx - a.r) - (b.cx - b.r); });
@@ -77217,9 +77234,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			for (j = i + 1; j < items.length && items[j].cx - items[j].r <= items[i].cx + items[i].r; j++) {
 				if (items[i].key === items[j].key || (!items[i].holder && !items[j].holder)) { continue; }
 				if (Math.hypot(items[i].cx - items[j].cx, items[i].cy - items[j].cy) > items[i].r + items[j].r) { continue; }
-				hit: for (k = 0; k < items[i].rows.length; k++) {
-					for (var q = 0; q < items[j].rows.length; q++) {
-						if (Collide.boxOverlapDepth(items[i].rows[k], items[j].rows[q]) > tol) { nb[i].push(j); nb[j].push(i); break hit; }
+				ri = rowsFor(items[i]); rj = rowsFor(items[j]);
+				hit: for (k = 0; k < ri.length; k++) {
+					for (var q = 0; q < rj.length; q++) {
+						if (Collide.boxOverlapDepth(ri[k], rj[q]) > tol) { nb[i].push(j); nb[j].push(i); break hit; }
 					}
 				}
 			}

@@ -221,6 +221,8 @@
 			});
 			v.labels = v.nodes + v.pipes;
 			v.sig = v.sig.join('\n');
+			// Labels guardLabelOverprint() hid at the last pass (0 where a ref has no such guard).
+			v.guard = typeof lastOverprintHidden === 'number' ? lastOverprintHidden : 0;
 			return v;
 		}
 	};
