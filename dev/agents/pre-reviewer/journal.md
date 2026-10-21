@@ -4608,3 +4608,12 @@ OBSERVED: Base does NOT solve in EPANET (Error 110, pumps have no curve in Base)
 OBSERVED: Basic mode is ON by default; Scenario manager row dimmed; alternatives tree (Physical/Demand, both named TGH-1) only after unchecking Basic mode. Scenario button says "TGH-1 (61)".
 OBSERVED: harness mutation (linear interpolation -> stepwise) fails wtg-tgh-harness against the export. wtg-import-browser-harness does not solve TGH against the exports; only structural.
 Decays: re-verify.
+
+## 2026-10-21 Perry, feat/import-export-menu (fc45cda4b), Task 819
+OBSERVED (Chromium, own probes in scratchpad p819): 1024x700, 800x600, 1600x900: third level opens at x = fly-out right - 5 px, no cover, on screen. Real-mouse diagonal hover Import>Network>EPANET file, Shapes switch, plain-row grace close all fine. Keyboard Right/Left/Escape one level at a time fine.
+OBSERVED: phone 390x844 (touch): third level lands at left 180-378, covers the Import fly-out rows Shapes, Surveyed points, Libraries (elementFromPoint says covered); a tap where Shapes is runs EPANET file. Network > EPANET file itself imports Net2.inp fine.
+OBSERVED: dir=rtl emulation: Export>Network third level opens at 844-1014 over the File menu (right of a flipped-left fly-out); emulation only.
+OBSERVED: a fresh project (localStorage cleared) is Base only on branch and master. "7" is harness data. Note: a.answerTrainingPanel installs window.lpnDialogAnswerer which auto-presses Export; delete it or confirmations vanish (cost me one false alarm).
+OBSERVED: Net1 Tables XLSX: sheets Junctions..Pumps, Text, Settings, Scenarios, Patterns, Curves-Pump_head, Controls (2), Rules (2 rules, 5 lines each, no blank lines). Net3: Controls 6, no Rules sheet (none). Confirm box on Net1-Scenarios quoted; Cancel and Escape write nothing; Export writes.
+OBSERVED: .inp export of Novato byte-identical to master.
+Decays: re-verify.
