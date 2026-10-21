@@ -119,7 +119,11 @@ lines rather than appending corrections.
 - `feat/sqlite-reader` (8104): alternatives, pump/valve nodes, continuous patterns; Perry passed it
   (solves agree with WaterGEMS's .inp exports to 1e-5). His Base has three pumps with no curve and
   cannot solve, in WaterGEMS too. Squash-merge it. His "import or only export?" is open; prompt later.
-- `feat/import-export-menu` (8105): Task 819 built to his interview answers.
+- `feat/import-export-menu` (8105): Task 819 built to his interview answers; a third menu level
+  (on a phone it replaces the fly-out with a Back row). Perry passed it after the phone fix. Its
+  three group rows reuse `lpn_calib_network`, `lpn_pane_tab_shapes`, `lpn_tables_menu`.
+- **Seam:** whichever of `feat/import-export-menu` and `feat/sqlite-reader` merges second moves the
+  WaterGEMS Import row into `importNetworkRows()` with its own `key:` (comment above that function).
 - `feat/desktop`: untouched.
 
 ### Next job
