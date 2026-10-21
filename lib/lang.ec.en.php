@@ -5241,3 +5241,5 @@ $ec_lang['lpn_geojson_results_other']='No results are included, because the resu
 $ec_lang['lpn_survey_added_scenario']='The nodes were added to {scenario}. In Base they are inactive.';
 $ec_lang['lpn_pane_pasted_scenario']='These values are overrides in the scenario {scenario}.';
 $ec_lang['lpn_export_leaves_alternatives']='The alternatives stored in this project are not in the file.';
+$ec_lang['lpn_export_confirm_title']='Export {format}';
+$ec_lang['lpn_export_confirm_lead']='The {format} holds one scenario, and this project has {n}.';

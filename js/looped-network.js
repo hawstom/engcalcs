@@ -43668,21 +43668,30 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return ' ' + out;
 	}
 	/**
-	 * **A FILE THAT LEAVES SCENARIOS BEHIND IS ANSWERED WITH A DIALOG** (Tom, 2026-10-18: *"Dialog, I
-	 * say. It's a major event that deserves a major answer."*). Only when the project has more than
-	 * Base; with Base alone nothing is left and the status line is enough. `already` is true when
-	 * another dialog (the .inp's flattening report) is open and has taken the sentence into itself.
+	 * **A FILE THAT LEAVES SCENARIOS BEHIND IS CONFIRMED BEFORE IT IS WRITTEN** (Tom, 2026-10-18:
+	 * *"Dialog, I say. It's a major event that deserves a major answer."*; 2026-10-20: *"keep one row
+	 * per format, and add the confirmation only where something is left behind"*). It used to be an
+	 * OK to dismiss AFTER the download, which could not be answered No. Now it is asked first, with
+	 * Export and Cancel, and says which scenario goes out. Only when the project has more than Base
+	 * or any stored alternative; with Base alone nothing is left and nothing is asked. `rowKey` is
+	 * the export row's language key, which names the file kind in the box; `run` is the export.
+	 * (The attached EPANET-MSX file is written back as it came in, so it never asks.)
 	 */
-	var exportDialogShown = false;
-	function exportScenarioDialog(text, already) {
-		var pcX = EngCalcs.pageConfig || {};
-		if (!exportLeavesSomething() || already) { return; }
-		openDialog(function (body) {
-			var p = document.createElement('p');
-			p.style.margin = '0';
-			p.textContent = text;
-			body.appendChild(p);
-		}, [{ label: pcX.lpn_dialog_ok || 'OK', fn: function () { } }]);
+	function confirmExportLeaves(rowKey, run) {
+		var pcX = EngCalcs.pageConfig || {}, fmt, lead;
+		if (!exportLeavesSomething()) { run(); return; }
+		fmt = String(pcX[rowKey] || '').replace(/\u2026$/, '');
+		lead = scenarios.length > 1
+			? (pcX.lpn_export_confirm_lead || 'The {format} holds one scenario, and this project has {n}.')
+				.split('{format}').join(fmt).split('{n}').join(String(scenarios.length)) + ' '
+			: '';
+		askDialog({
+			kind: 'confirm',
+			title: (pcX.lpn_export_confirm_title || 'Export {format}').split('{format}').join(fmt),
+			text: lead + exportScenarioSentence().replace(/^\s+/, ''),
+			ok: pcX.lpn_export_table_go || 'Export',
+			cancel: pcX.lpn_cancel || 'Cancel'
+		}, function (yes) { if (yes) { run(); } });
 	}
 	function exportInpFile() {
 		var pcX = EngCalcs.pageConfig || {}, base = inpExportBaseName(),
@@ -43718,9 +43727,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				setNotice((pic === false
 					? (pcX.lpn_status_inp_exported_no_picture || 'Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.')
 					: (pcX.lpn_status_inp_exported || 'Exported {file}.')).split('{file}').join(inpName) + tail);
-				exportDialogShown = false;
 				showInpExportFlattening(out.differences, inpName);
-				exportScenarioDialog(lastNoticeText, exportDialogShown);
 				return;
 			}
 			var built;
@@ -43737,9 +43744,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					.split('{picture}').join('\u0003').split('{world}').join('\u0004')
 					.split('\u0001').join(zipName).split('\u0002').join(inpName)
 					.split('\u0003').join(picName).split('\u0004').join(worldName) + tail);
-				exportDialogShown = false;
 				showInpExportFlattening(out.differences, inpName);
-				exportScenarioDialog(lastNoticeText, exportDialogShown);
 			}, function () {
 				// No archive, so no picture: the bare .inp, written again without a FILE line, and said.
 				finish(false);
@@ -43838,7 +43843,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				(out.hasResults ? (pcX.lpn_geojson_results_in || 'The results on screen are included.')
 					: staleScn ? (pcX.lpn_geojson_results_other || 'No results are included, because the results on screen belong to the scenario {scenario}.').split('{scenario}').join(staleScn)
 					: (pcX.lpn_geojson_results_out || 'No results are included, because the network is not solved.')));
-			exportScenarioDialog(lastNoticeText, false);
 		});
 	}
 	// ---- IMPORT GeoJSON SHAPES (Task 779) ----------------------------------------------------------
@@ -44709,7 +44713,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			? (pcX.lpn_dxf_exported_geo || 'Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.')
 				.replace('{file}', a.download).replace('{crs}', dxfCrsName(frame.code)) + exportScenarioSentence()
 			: (pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) + exportScenarioSentence());
-		exportScenarioDialog(lastNoticeText, false);
 	}
 	/**
 	 * **THE EXPORT ALERT** (ROADMAP Task 465 slice 5; Tom, 2026-09-06, on a library pipe being
@@ -44771,7 +44774,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			said.push((pc.lpn_inp_export_flat_fittings || 'An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of pipes here ({n}) is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.')
 				.replace('{n}', String(fittings.ids.length)));
 		}
-		exportDialogShown = true;
 		openDialog(function (body) {
 			var h = document.createElement('p'), lead = document.createElement('p'),
 				ul = document.createElement('ul');
@@ -52282,10 +52284,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var pc = EngCalcs.pageConfig || {};
 		return [
 			{ icon: 'save', label: pc.lpn_file_export_item_inp || 'EPANET file…', key: 'lpn_file_export_item_inp',
-			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
+			  tip: pc.lpn_file_export_inp_tip, fn: function () { confirmExportLeaves('lpn_file_export_item_inp', exportInpFile); } },
 			// GeoJSON (Task 728): same verb, same kind of file.
 			{ icon: 'save', label: pc.lpn_file_export_item_geojson || 'GeoJSON file…', key: 'lpn_file_export_item_geojson',
-			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile },
+			  tip: pc.lpn_file_export_geojson_tip, fn: function () { confirmExportLeaves('lpn_file_export_item_geojson', exportGeoJsonFile); } },
 			// The attached EPANET-MSX file, as its own row so one click is one download. Only offered
 			// when the project holds one. It is written back exactly as it came in, so nothing of a
 			// scenario is left behind and it asks nothing.
@@ -52294,7 +52296,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// THE MODEL'S DATA for AutoCAD and every other DWG program (Task 772). Reading a DXF back
 			// is the DXF Interface Manager's import half, not built.
 			{ icon: 'save', label: pc.lpn_file_export_item_dxf || 'DXF file…', key: 'lpn_file_export_item_dxf',
-			  tip: pc.lpn_file_export_dxf_tip, fn: exportDxfFile }
+			  tip: pc.lpn_file_export_dxf_tip, fn: function () { confirmExportLeaves('lpn_file_export_item_dxf', exportDxfFile); } }
 		];
 	}
 	function exportTableRows() {
