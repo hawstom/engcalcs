@@ -95,31 +95,46 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-20 evening (thirty-second session, Arizona time)
+## STATE — 2026-10-21 (thirty-third session, Arizona time)
 
-### Master: native EPS slice 2 and label-leader merged on his word, plus chore/handoff-1020d. Production: what he last pulled
+### Master: flow-arrow merged on his word, with fix/settings-index-scroll, chore/key-audit and chore/handoff-1021
 
-- Merged on his word: `feat/native-eps` (slice 2, simple controls), `feat/label-leader` ("merge this to
-  master", with lessons for the study in `dev/label-trials/tom-1020/lessons.md`).
-- Guide's `lpn_guide_cmp_byasset_def` flow-sign sentence now matches his tip rewrite (he: "Yes. Match.").
-- New Task 819 (organize Import and Export, plan with him first); his box-title instruction on Task 809;
-  his MCP words on Task 818 ("plan and get clarity before building").
-- **He cannot see jasmine:/tmp from lantana.** Put pictures for him in
-  `~/webdev/worktrees/_panel/www/img/` and link `http://localhost:8080/img/<name>.png`.
+- Production is what he last pulled; epanet-plus-plus.org/app was at c375f221 on 2026-10-21.
+- **Canonical landing page is now epanet-plus-plus.org** (Tom, MCP interview m5). Push it like the others.
+- Two production reports did NOT reproduce headlessly (Chromium, many sizes, DPR, throttle, themes):
+  the bottom pane taking ~4.5 s per open/close after the first on Net3, and the cursor lagging on the
+  first half of Net3 link 233. Both measured at 15-180 ms. Waiting on his browser, OS, a private
+  window with extensions off, and ideally a DevTools Performance recording. `fix/bottom-pane-lag`
+  holds only a ceiling harness (`bottom-pane-toggle-lag-harness.js`, passes on master); not merged.
+- Key audit deleted `lpn_eps_working` and `lpn_msx_replace` (untranslated duplicates) and added the
+  blocking check `new keys not duplicates` (`new_key_duplicate_check.php`, with an allow-list).
+- Interview answers (Tasks 818, 819) are on the roadmap. MCP is slow; WaterGEMS and performance first.
+  Mary's use-case paper answers his two questions: `dev/agents/market-researcher/mcp-use-cases.md`.
+- `feat/label-margin` archived as tag `archive/feat/label-margin` and folded into Task 813's study (his word).
 - Still owed: consent_body's 26 translations; the untranslated keys. Sprint only on his word.
 
 ### Branches waiting on him
 
-- `feat/label-margin` (8105): he called its Net1 overlaps "unreleaseable"; an agent is fixing them.
-- `feat/flow-arrow` (8102): rejected; he wants ONE outlined head with a notched back, line through it.
-- `feat/geojson-into-project` (8101): ready; the .inp box gets the same second paragraph ("Yes. Match.").
-- `feat/sqlite-reader` (8104): fixture to leave the repo (squash-merge it so master never carries it).
+- `feat/geojson-into-project` (8101): his three-paragraph wording applied to both import boxes; ready.
+- `feat/sqlite-reader` (8104): alternatives, pump/valve nodes, continuous patterns; Perry passed it
+  (solves agree with WaterGEMS's .inp exports to 1e-5). His Base has three pumps with no curve and
+  cannot solve, in WaterGEMS too. Squash-merge it. His "import or only export?" is open; prompt later.
+- `feat/import-export-menu` (8105): Task 819 built to his interview answers.
 - `feat/desktop`: untouched.
 
 ### Next job
 
-Plan Tasks 819 (Import/Export) and 818 (MCP) with him before building. Task 681 after
-label-margin settles. Task 733 rules slice.
+Task 819 browser pass; Task 749 his pass and the import/export question; the two unreproduced
+performance reports once he answers. Task 681. Task 733 rules slice.
+
+### Traps met 2026-10-21 (thirty-third session)
+
+- **Agents sharing one scratchpad overwrote each other's `full.log`.** Brief each agent to name its
+  logs after its branch.
+- **Tom's sample files can change under a branch**: he saved a bigger WTG-tgh-1 over the old one, and
+  the branch's harness failed on a fixture nobody had touched in git. Check file dates in tom-files first.
+- **`new_english_keys.php --write` refuses after a conflicted merge** even when the file equals
+  master's; check `git diff master -- dev/new-english-keys.md` is empty before `--force`.
 
 ### Traps met 2026-10-20 (thirty-first session)
 
