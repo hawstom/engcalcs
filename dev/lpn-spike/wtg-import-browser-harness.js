@@ -162,7 +162,9 @@ async function synthetic(browser) {
 	const scn = (doc.scenarios || []).map((s) => s.name);
 	ok('Base and the two scenarios', scn.join('|') === 'Base|Peak|Peak, small main', scn.join('|'));
 	const small = (doc.scenarios || []).filter((s) => s.name === 'Peak, small main')[0], peak = (doc.scenarios || []).filter((s) => s.name === 'Peak')[0];
-	ok('"Peak, small main" is a child of Peak with P2 at 200 mm', small && peak && small.parent === peak.id && JSON.stringify(small.overrides) === '{"l:P2":{"diameter":200}}', JSON.stringify(small));
+	const smallAlt = (doc.alternatives || []).filter((x) => small && x.id === (small.alternatives || {}).physical)[0];
+	ok('"Peak, small main" is a child of Peak and names the stored Physical alternative "Small main", which holds P2 at 200 mm',
+		small && peak && small.parent === peak.id && smallAlt && smallAlt.name === 'Small main' && JSON.stringify(smallAlt.values) === '{"l:P2":{"diameter":200}}' && !Object.keys(small.overrides).length, JSON.stringify([small, smallAlt]));
 	const alt = (doc.alternatives || []).filter((x) => x.name === 'Rehab')[0];
 	ok('the unused alternative "Rehab" is stored, Physical, a Base of its own', alt && alt.category === 'physical' && alt.root === true && alt.values['l:P3'].diameter === 350, JSON.stringify(alt));
 	const heads = await h.solved();
@@ -202,10 +204,11 @@ async function unitDemand(browser) {
 	fs.rmSync(tmp, { recursive: true, force: true });
 }
 
-// Tom's WTG-tgh-1 (Base plus a child scenario changing a diameter and a demand), outside the repository (WTG_TGH_DIR):
-// the import must put both overrides in the stored project (wtg-tgh-harness.js holds the reader side).
+// Tom's WTG-tgh-1 (pump and valve nodes, two tanks, a continuous pattern, and a child scenario with a Physical and a Demand
+// alternative), outside the repository (WTG_TGH_DIR): the import must put the links, the alternatives and the scenario in
+// the stored project, and the page must solve it (wtg-tgh-harness.js and wtg-alternatives-harness.js hold the reader and the tree).
 async function tgh(browser) {
-	console.log('\n--- 1c. WTG-tgh-1: a child scenario with a diameter and a demand override ---');
+	console.log('\n--- 1c. WTG-tgh-1: nine pump and valve nodes, a continuous pattern, a child scenario with two alternatives ---');
 	const FX = process.env.WTG_TGH_DIR || '/home/haws/tom-files/2026-10-19';
 	if (!fs.existsSync(path.join(FX, 'WTG-tgh-1.wtg.sqlite'))) {
 		console.log('NOT RUN (fixture not present: ' + path.join(FX, 'WTG-tgh-1.wtg.sqlite') + ')');
@@ -217,16 +220,27 @@ async function tgh(browser) {
 	await h.importVia('lpn_file_import_wtg', [path.join(FX, 'WTG-tgh-1.wtg.sqlite'), path.join(FX, 'WTG-tgh-1.wtg')]);
 	const d = await a.waitDialog(30000);
 	ok('the report opens', !!d, d && d.text.slice(0, 200));
+	ok('...naming the split of pump and valve nodes, the continuous pattern, the alternatives and the pump batteries',
+		!!d && d.text.indexOf(await a.lang('lpn_wtg_note_directed_split')) > 0 && d.text.indexOf(await a.lang('lpn_wtg_note_pattern_continuous')) > 0 &&
+		d.text.indexOf(await a.lang('lpn_wtg_note_scenario_alternative')) > 0 && d.text.indexOf(await a.lang('lpn_wtg_note_pump_battery')) > 0, d && d.text.slice(0, 300));
+	ok('...and not saying any pipe, pump or valve was left out', !!d && d.text.indexOf(await a.lang('lpn_wtg_note_link_unjoined')) < 0);
 	if (d) { await a.dialogClick(await a.lang('lpn_dialog_ok')); }
 	const doc = (await h.stored()).doc || {};
-	const ids = (doc.nodes || []).map((n) => n.id).sort().join(',');
-	ok('three nodes, two pipes', ids === 'J-1,J-2,R-1' && (doc.links || []).length === 2, ids);
+	ok('31 nodes and 42 links: nothing left out', (doc.nodes || []).length === 31 && (doc.links || []).length === 42, (doc.nodes || []).length + ' ' + (doc.links || []).length);
+	const types = {};
+	(doc.links || []).forEach((l) => { types[l.type] = (types[l.type] || 0) + 1; });
+	ok('33 pipes, 3 pumps, 6 valves', types.pipe === 33 && types.pump === 3 && types.valve === 6, JSON.stringify(types));
 	const scn = (doc.scenarios || []).map((x) => x.name).join('|');
 	ok('Base and TGH-1', scn === 'Base|TGH-1', scn);
 	const t = (doc.scenarios || []).filter((x) => x.name === 'TGH-1')[0];
-	ok('TGH-1 overrides P-1 diameter 10 and J-1 demand 1250, nothing else', t && JSON.stringify(t.overrides) === '{"l:P-1":{"diameter":10},"n:J-1":{"demand":1250}}', JSON.stringify(t));
-	const p1 = (doc.links || []).filter((l) => l.id === 'P-1')[0], j1 = (doc.nodes || []).filter((n) => n.id === 'J-1')[0];
-	ok('Base keeps P-1 at 8 and J-1 at 0', p1 && p1._diameter === 8 && j1 && j1._demand === 0, JSON.stringify([p1 && p1._diameter, j1 && j1._demand]));
+	const alts = (doc.alternatives || []);
+	ok('two stored alternatives named TGH-1, Physical and Demand, which scenario TGH-1 names', alts.length === 2 && alts.every((x) => x.name === 'TGH-1') && t && t.alternatives &&
+		alts.some((x) => x.category === 'physical' && x.id === t.alternatives.physical) && alts.some((x) => x.category === 'demand' && x.id === t.alternatives.demand), JSON.stringify(t));
+	const p1 = (doc.links || []).filter((l) => l.id === 'P-1')[0];
+	ok('Base keeps P-1 at 8 inches', p1 && p1._diameter === 8, JSON.stringify(p1 && p1._diameter));
+	const phys = alts.filter((x) => x.category === 'physical')[0];
+	ok('the Physical alternative holds P-1 at 10', phys && phys.values['l:P-1'].diameter === 10);
+	ok('the pump and GPV curves of the scenario are in the project\'s library', (doc.curves || []).some((c) => c.kind === 'head') && (doc.curves || []).some((c) => c.kind === 'headloss'), (doc.curves || []).map((c) => c.id).join());
 	ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	await a.close();
 }

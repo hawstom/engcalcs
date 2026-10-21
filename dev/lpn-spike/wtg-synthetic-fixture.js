@@ -221,4 +221,38 @@ x('DELETE FROM IdahoDemandNode_Demand_DemandCollection')
 x('UPDATE IdahoDemandNode_Demand_Data SET DemandCollectionCount = 0')
 ` : '');
 }
-module.exports = { buildSyntheticWtg, unitDemandExtra };
+
+// A tree of alternatives on the synthetic model: scenario 62 "Shared A" (child of Base) names the same Physical
+// alternative 70 as "Peak, small main" and also an Initial settings alternative (P4 closed) and an Operational one;
+// 63 "Deep" (child of Peak) names alternative 72, a child of 70 that changes P3, a Demand alternative (J3 3 L/s)
+// and a Constituent one (name only); 64 "Reset" (child of "Peak, small main") goes back to Base's Physical alternative.
+function alternativesExtra() {
+	return `
+TYPES2 = dict(TYPES)
+TYPES2[24] = 40
+x('INSERT INTO HMIAlternative VALUES (40,NULL,24,0,1,1)'); lab[40] = 'Base 24'
+x('INSERT INTO HMIModelingElement VALUES (40,1,0,1,?)', ('Base 24',))
+for sid in (58, 60, 61): x('INSERT INTO HMIScenarioAlternative VALUES (?,24,40,?)', (sid, 1 if sid == 58 else 0))
+def alt(a, par, typ, name):
+    x('INSERT INTO HMIAlternative VALUES (?,?,?,0,1,2)', (a, par, typ))
+    x('INSERT INTO HMIModelingElement VALUES (?,1,0,1,?)', (a, name))
+def scen(sid, par, name, picks):
+    x('INSERT INTO HMIScenario VALUES (?,?,0,1)', (sid, par))
+    x('INSERT INTO HMIModelingElement VALUES (?,1,0,2,?)', (sid, name))
+    for t, a in TYPES2.items():
+        x('INSERT INTO HMIScenarioAlternative VALUES (?,?,?,?)', (sid, t, picks.get(t, a), 1 if t in picks else 0))
+alt(72, 70, 4, 'Smaller P3')
+alt(73, 36, 21, 'P4 closed')
+alt(74, 35, 20, 'Hot J3')
+alt(75, 37, 22, 'Night controls')
+alt(76, 40, 24, 'Chlorine 1')
+x('INSERT INTO IdahoPipe_Physical_Data VALUES (122,72,?,130,0.0005,0.012,0,0.5,1,0)', (180 / 304.8,))
+x('INSERT INTO IdahoPipe_InitialSettings_Data VALUES (123,73,1)')
+x("INSERT INTO IdahoDemandNode_Demand_Data VALUES (104,74,'',1,0)")
+x('INSERT INTO IdahoDemandNode_Demand_DemandCollection VALUES (4,104,74,?,NULL)', (3.0 * L,))
+scen(62, 58, 'Shared A', {4: 70, 21: 73, 22: 75})
+scen(63, 60, 'Deep', {4: 72, 20: 74, 24: 76})
+scen(64, 61, 'Reset', {4: 34})
+`;
+}
+module.exports = { buildSyntheticWtg, unitDemandExtra, alternativesExtra };

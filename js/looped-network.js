@@ -45902,7 +45902,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'wtg-units-assumed': ['lpn_wtg_note_units_assumed', 'No .wtg file was chosen with the database, so the units the model is displayed in are not known. The project uses the units that go with the flow unit shown in parentheses. To keep the model\'s own units, import it again and choose both files.'],
 		'wtg-units-differ': ['lpn_wtg_note_units_differ', 'WaterGEMS displays these quantities in other units. Here they are in the project\'s units.'],
 		'wtg-converted': ['lpn_wtg_note_converted', 'The database stores every number in US customary units (feet, cubic feet per second, psi). Each number was converted once to the project\'s units and rounded to the shortest decimal within 5 parts in 100 million, which gives back the number as it was entered.'],
-		'wtg-directed-split': ['lpn_wtg_note_directed_split', 'In WaterGEMS a pump or valve is a node between two pipes. Each of these was imported as a pump or valve link between two new junctions at its elevation, named after it with -U (upstream) and -D (downstream).'],
+		'wtg-directed-split': ['lpn_wtg_note_directed_split', 'In WaterGEMS a pump or valve is a node between pipes. Each of these was imported as a pump or valve link between two new junctions at its elevation, named after it with -U (upstream) and -D (downstream). The pipe the model calls downstream joins the -D junction and every other pipe at the node joins the -U junction, as WaterGEMS does in its own EPANET file.'],
 		'wtg-tank-inlet': ['lpn_wtg_note_tank_inlet', 'These tanks fill through a separate inlet at the top in WaterGEMS. An EPANET tank has no such inlet, so the inlet pipe joins the tank at its base.'],
 		'wtg-tables-unread': ['lpn_wtg_note_tables_unread', 'Not imported: the data in these tables of the database, which this page does not read (for example transient, fire flow, and energy cost data).'],
 		'wtg-element-unread': ['lpn_wtg_note_element_unread', 'Not imported: these elements, of a kind this page does not model. The kind is shown in parentheses.'],
@@ -45910,9 +45910,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'wtg-inactive': ['lpn_wtg_note_inactive', 'These elements are inactive in the model and were imported inactive.'],
 		'wtg-controls-unread': ['lpn_wtg_note_controls_unread', 'Not imported: these controls, which this page does not yet read from a WaterGEMS model. Each is shown as WaterGEMS states it.'],
 		'wtg-scenario-root': ['lpn_wtg_note_scenario_root', 'These scenarios have no parent in the model. Here every scenario descends from Base, so each was made a child of Base.'],
-		'wtg-scenario-alternative': ['lpn_wtg_note_scenario_alternative', 'These scenarios use a Physical alternative other than the one Base uses. The values in which it differs from Base were imported as the scenario\'s own overrides; the alternative itself was not imported.'],
-		'wtg-scenario-category': ['lpn_wtg_note_scenario_category', 'Not imported: the alternatives these scenarios use in categories other than Physical. There the scenario has the Base values.'],
-		'wtg-alternative-unused': ['lpn_wtg_note_alternative_unused', 'No scenario uses these Physical alternatives. Each was imported as an alternative of its own, holding the values it states, so that a scenario can use it.'],
+		'wtg-alternatives': ['lpn_wtg_note_scenario_alternative', 'These alternatives were imported with their names, each in the category shown in parentheses. An alternative holds only the values in which it differs from its parent, and each scenario uses the alternatives it uses in the model.'],
+		'wtg-scenario-category': ['lpn_wtg_note_scenario_category', 'Not imported: the alternatives these scenarios use in categories this page has no counterpart for (for example Operational, Age, and Trace). There the scenario has the Base values.'],
+		'wtg-alternative-unused': ['lpn_wtg_note_alternative_unused', 'No scenario uses these alternatives. Each was imported as an alternative of its own, so that a scenario can use it.'],
 		'wtg-active-scenario': ['lpn_wtg_note_active_scenario', 'The model was open on the scenario shown in parentheses. This project opens on Base.'],
 		'wtg-pump-extended': ['lpn_wtg_note_pump_extended', 'These pump curves are extended beyond their points in WaterGEMS. Only the points were imported.'],
 		'wtg-pump-nodef': ['lpn_wtg_note_pump_curve', 'These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. Give each a curve before calculating.'],
@@ -45932,7 +45932,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'wtg-fireflow': ['lpn_wtg_note_fireflow', 'Not imported: the fire flow settings of the model. A needed fire flow stated at a junction was imported as that junction\'s Required fire flow; enter the rest in the fire flow window.'],
 		'wtg-unit-demand': ['lpn_wtg_note_unit_demand', 'The demand at these junctions comes from unit demand loads. The flow of each load was imported as a demand; the loading units and the unit load were not.'],
 		'wtg-setting-pattern': ['lpn_wtg_note_setting_pattern', 'Not imported: the setting patterns of these valves.'],
-		'wtg-pattern-continuous': ['lpn_wtg_note_pattern_continuous', 'These patterns are continuous in the model. Here each multiplier holds until the next time step.'],
+		'wtg-pattern-continuous': ['lpn_wtg_note_pattern_continuous', 'These patterns are continuous in the model: the multiplier changes in a straight line between points. An EPANET pattern is stepwise, so each was written as WaterGEMS writes it for EPANET: the starting multiplier, then the value on that line at every pattern time step.'],
 		'wtg-pattern-calendar': ['lpn_wtg_note_pattern_calendar', 'Not imported: the day of the week and month multipliers of these patterns.'],
 		'wtg-pattern-irregular': ['lpn_wtg_note_pattern_irregular', 'These patterns have times that are not whole multiples of the pattern time step. Each was read at that time step.'],
 		'wtg-pattern-end': ['lpn_wtg_note_pattern_other', 'These patterns differ from EPANET patterns in their start time, their last multiplier, or their name (EPANET applies a pattern named 1 to every demand with no pattern). Check them.'],
@@ -45943,14 +45943,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'wtg-no-options': ['lpn_wtg_note_options', 'Not imported: these calculation options (demand adjustments, pressure-dependent demand, or a friction method code this page does not know). Where the model states no EPANET options, the defaults were used.'],
 		'wtg-friction-unknown': ['lpn_wtg_note_options', 'Not imported: these calculation options (demand adjustments, pressure-dependent demand, or a friction method code this page does not know). Where the model states no EPANET options, the defaults were used.'],
 		'wtg-srs': ['lpn_wtg_note_srs', 'The model states the spatial reference shown. Its coordinates were imported as plain x and y.'],
-		'wtg-link-unjoined': ['lpn_wtg_note_link_unjoined', 'Not imported: these pipes, pumps, or valves, whose ends are not two different imported nodes, or which do not sit between exactly two pipes.'],
-		'wtg-link-loop': ['lpn_wtg_note_link_unjoined', 'Not imported: these pipes, pumps, or valves, whose ends are not two different imported nodes, or which do not sit between exactly two pipes.'],
-		'wtg-directed-unlinked': ['lpn_wtg_note_link_unjoined', 'Not imported: these pipes, pumps, or valves, whose ends are not two different imported nodes, or which do not sit between exactly two pipes.'],
+		'wtg-link-unjoined': ['lpn_wtg_note_link_unjoined', 'Not imported: these pipes, pumps, or valves, whose ends are not two different imported nodes, or a pump or valve at a node with no downstream pipe or no other pipe.'],
+		'wtg-link-loop': ['lpn_wtg_note_link_unjoined', 'Not imported: these pipes, pumps, or valves, whose ends are not two different imported nodes, or a pump or valve at a node with no downstream pipe or no other pipe.'],
+		'wtg-directed-unlinked': ['lpn_wtg_note_link_unjoined', 'Not imported: these pipes, pumps, or valves, whose ends are not two different imported nodes, or a pump or valve at a node with no downstream pipe or no other pipe.'],
 		'wtg-no-geometry': ['lpn_wtg_note_no_geometry', 'These nodes have no location in the file and were placed at 0, 0.'],
 		'wtg-unconverted': ['lpn_wtg_note_unconverted', 'These values are stored in a unit this page does not know and were set to 0. Check them before calculating.'],
 		'wtg-unit-unknown': ['lpn_wtg_note_unit_unknown', 'Not converted: these fields, whose stored unit (shown in parentheses) this page does not know.'],
 		'wtg-unit-assumed': ['lpn_wtg_note_unit_assumed', 'The file does not state the stored unit of these fields, so the unit every example file states was assumed.'],
-		'wtg-cv-closed': ['lpn_wtg_note_cv_closed', 'These pipes have a check valve and start closed. They were imported closed.']
+		'wtg-cv-closed': ['lpn_wtg_note_cv_closed', 'These pipes have a check valve and start closed. They were imported closed.'],
+		'wtg-alternative-nameonly': ['lpn_wtg_note_alternative_nameonly', 'These alternatives were imported by name only, so that each scenario keeps its choice of them. Their values were not imported, because this page does not read that kind of data from a WaterGEMS model.'],
+		'wtg-alternative-partial': ['lpn_wtg_note_alternative_partial', 'Not imported: these differences between an alternative and its parent, which this page cannot hold (several demands at a junction, or a demand pattern). The rest of the alternative was imported.'],
+		'wtg-pump-battery': ['lpn_wtg_note_pump_battery', 'These variable speed pump batteries were imported as one pump each at relative speed 1, as WaterGEMS writes them to an EPANET file. Their lag pumps and speed control were not imported.']
 	};
 	function wtgNoteText(code) {
 		var pc = EngCalcs.pageConfig || {}, t = LPN_WTG_NOTE[code];
@@ -46053,17 +46056,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		Object.keys(r.fireFlow || {}).forEach(function (id) {
 			saved.nodes.forEach(function (n) { if (n.id === id) { n._fireFlow = r.fireFlow[id]; } });   // base-write: an imported document is born in Base
 		});
-		var sid = {}, n = 0;
+		var sid = {}, n = 0, aid = {}, k = 0;
 		r.scenarios.forEach(function (s) { sid[s.fileId] = 's' + (++n); });
+		(r.alternatives || []).forEach(function (a) { aid[a.fileId] = 'a' + (++k); });
+		// The reader's scenario names the alternatives it uses, by the model's own IDs; here they become the
+		// stored ones. 'base' is the Base alternative of a category, as the Scenarios table's pick-list has it.
 		r.scenarios.forEach(function (s) {
 			var rec = { id: sid[s.fileId], name: s.name, overrides: JSON.parse(JSON.stringify(s.overrides || {})) };
 			if (typeof s.demandMultiplier === 'number') { rec.demandMultiplier = s.demandMultiplier; }
 			if (s.parentFileId && sid[s.parentFileId]) { rec.parent = sid[s.parentFileId]; }
+			Object.keys(s.alternatives || {}).forEach(function (cat) {
+				var v = s.alternatives[cat], to = v === LPN_BASE_CHOICE ? LPN_BASE_CHOICE : aid[v];
+				if (to) { (rec.alternatives || (rec.alternatives = {}))[cat] = to; }
+			});
 			saved.scenarios.push(rec);
 		});
-		if (r.alternatives.length) {
-			var aid = {}, k = 0;
-			r.alternatives.forEach(function (a) { aid[a.fileId] = 'a' + (++k); });
+		if ((r.alternatives || []).length) {
 			saved.alternatives = r.alternatives.map(function (a) {
 				var rec = { id: aid[a.fileId], category: a.category, name: a.name, parent: (a.parentFileId && aid[a.parentFileId]) || null };
 				if (a.root) { rec.root = true; }

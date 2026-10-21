@@ -122,7 +122,11 @@ async function synthetic() {
 	ok('two scenarios beyond Base', r.scenarios.length === 2);
 	ok('Peak overrides nothing', peak && Object.keys(peak.overrides).length === 0);
 	ok('Peak, small main is a child of Peak', small && small.parentName === 'Peak');
-	ok('its child Physical alternative overrides exactly P2 diameter 200', small && JSON.stringify(small.overrides) === '{"l:P2":{"diameter":200}}', JSON.stringify(small && small.overrides));
+	const smallAlt = small && r.alternatives.filter((a) => a.fileId === (small.alternatives || {}).physical)[0];
+	ok('it names its child Physical alternative, which holds exactly P2 diameter 200 and hangs from Base', smallAlt && JSON.stringify(smallAlt.values) === '{"l:P2":{"diameter":200}}' && !smallAlt.parentFileId && !smallAlt.root,
+		JSON.stringify(smallAlt));
+	ok('it names nothing else, and Peak names nothing', Object.keys(small.alternatives).join() === 'physical' && Object.keys(peak.alternatives).length === 0, JSON.stringify([small.alternatives, peak.alternatives]));
+	ok('nothing is left over as its own override, and its differences from Base are exactly P2 diameter 200', Object.keys(small.overrides).length === 0 && JSON.stringify(small.differences) === '{"l:P2":{"diameter":200}}', JSON.stringify([small.overrides, small.differences]));
 	const alt = r.alternatives.filter((a) => a.name === 'Rehab')[0];
 	ok('the unused root alternative is carried as a Base of its own', alt && alt.root === true && alt.category === 'physical');
 	ok('holding only the elements it has rows for, with its own P3 diameter 350 and J1 elevation 11',

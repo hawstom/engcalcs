@@ -1,14 +1,17 @@
-// THE WaterGEMS CHILD-SCENARIO SAMPLE, js/lpn-wtg.js -- ROADMAP Task 749. Run with:
+// THE WaterGEMS PUMP-AND-VALVE, CONTINUOUS-PATTERN AND SCENARIO SAMPLE, js/lpn-wtg.js -- ROADMAP Task 749. Run with:
 //
 //   node dev/lpn-spike/wtg-tgh-harness.js
 //
-// WTG-tgh-1.wtg.sqlite (kept outside the repository, see WTG_TGH_DIR below) is a model Tom saved in WaterGEMS as an ordinary user: Base plus a
-// child scenario TGH-1 that changes one pipe diameter (P-1, 8 to 10 in) and one demand (J-1, 0 to
-// 1250 gpm). The two `.inp` files beside it are WaterGEMS's own exports of each scenario. The reader's
-// Base is compared with the Base export element by element, and Base with TGH-1's overrides laid on is
-// compared with the TGH-1 export; the overrides must be exactly the differences between the two exports.
-// Tolerance: 1e-6 relative on numbers (the reader writes seven significant digits where WaterGEMS's
-// export writes fifteen). Record: dev/sqlite-reader.md, "A scenario that overrides Physical and Demand".
+// WTG-tgh-1.wtg.sqlite (kept outside the repository, see WTG_TGH_DIR below) is a model Tom saved in WaterGEMS as an ordinary user:
+// a reservoir, two tanks, three pumps (one a variable speed pump battery) and one valve of each type (PRV, PSV, PBV, FCV, TCV,
+// GPV), each pump or valve a NODE with three or four pipes, a continuous demand pattern, and a child scenario TGH-1 that changes
+// pipe diameters, junction elevations and demands, both tanks, the pump definitions and the GPV curve. The two `.inp` files
+// beside it are WaterGEMS's own exports of each scenario. The reader's Base is compared with the Base export element by
+// element, and Base with TGH-1's alternatives and overrides laid on (as a stored tree resolves them) is compared with the
+// TGH-1 export. WaterGEMS's export names a pump's two junctions after the node's ID (46-A, 46-B); the reader names them
+// after the pump (PMP-1-U, PMP-1-D); the comparison renames the export's to match. Tolerance: 1e-6 relative on numbers (the
+// reader writes seven significant digits where WaterGEMS's export writes fifteen).
+// Record: dev/sqlite-reader.md, "Pumps and valves as nodes, a continuous pattern, and the alternatives themselves".
 'use strict';
 
 const fs = require('fs');
@@ -37,8 +40,24 @@ function same(a, b) {
 	if (typeof a === 'number' && typeof b === 'number') { return Math.abs(a - b) <= 1e-9 + 1e-6 * Math.abs(b); }
 	return a === b;
 }
-const FIELDS = ['type', 'elev', 'demand', 'head', 'x', 'y', 'length', 'diameter', 'roughness', 'k', 'status', 'from', 'to'];
-// Every element of `ours` against `theirs`: same IDs, same kinds, same values in FIELDS.
+function pointsSame(a, b) {
+	return !!a && !!b && a.length === b.length && a.every((p, i) => same(p[0], b[i][0]) && same(p[1], b[i][1]));
+}
+const curveOf = (parsed, id) => (parsed.curves.filter((c) => c.id === id)[0] || {}).points || null;
+
+// WaterGEMS's names for a pump or valve's two junctions, renamed to the reader's.
+function rename(theirs) {
+	const alias = {};
+	theirs.links.forEach((l) => { if (l.type === 'pump' || l.type === 'valve') { alias[l.from] = l.id + '-U'; alias[l.to] = l.id + '-D'; } });
+	theirs.nodes.forEach((n) => { if (alias[n.id]) { n.id = alias[n.id]; n.split = true; } });
+	theirs.links.forEach((l) => { l.from = alias[l.from] || l.from; l.to = alias[l.to] || l.to; });
+	return theirs;
+}
+const FIELDS = ['type', 'elev', 'demand', 'head', 'x', 'y', 'level', 'minLevel', 'maxLevel', 'length', 'diameter', 'roughness', 'k', 'status', 'from', 'to',
+	'valveType', 'setting', 'speed'];
+// Every element of `ours` against `theirs`: same IDs, same kinds, same values in FIELDS; a pump or valve's two
+// junctions are drawn at different places by the two writers (positions skipped); a pump's diameter, a valve's length and
+// roughness, and the diameter of a tank with a volume curve are not used by EPANET.
 function diffNetworks(ours, theirs) {
 	const out = [];
 	['nodes', 'links'].forEach((kind) => {
@@ -49,12 +68,63 @@ function diffNetworks(ours, theirs) {
 			if (!o[id]) { return; }
 			FIELDS.forEach((f) => {
 				if (t[id][f] === undefined && o[id][f] === undefined) { return; }
+				if ((f === 'x' || f === 'y') && t[id].split) { return; }
+				if (t[id].type === 'pump' && f === 'diameter') { return; }
+				// A pump with no SPEED keyword runs at relative speed 1, which WaterGEMS writes out once it has a curve.
+				if (f === 'speed' && t[id].type === 'pump') { compared++; if (!same(o[id].speed === undefined ? 1 : o[id].speed, t[id].speed === undefined ? 1 : t[id].speed)) { out.push(kind + ' ' + id + ' speed'); } return; }
+				if (t[id].type === 'valve' && (f === 'length' || f === 'roughness')) { return; }
+				if (t[id].type === 'tank' && f === 'diameter' && t[id].volCurve) { return; }
 				compared++;
 				if (!same(o[id][f], t[id][f])) { out.push(kind + ' ' + id + ' ' + f + ': ours ' + o[id][f] + ', theirs ' + t[id][f]); }
 			});
+			if (t[id].type === 'pump') {
+				['curveId', 'efficCurveId'].forEach((f) => {
+					const a = o[id][f] ? curveOf(ours, o[id][f]) : null, b = t[id][f] ? curveOf(theirs, t[id][f]) : null;
+					compared++;
+					if (!(a === null && b === null) && !pointsSame(a, b)) { out.push(kind + ' ' + id + ' ' + f + ': ours ' + JSON.stringify(a) + ', theirs ' + JSON.stringify(b)); }
+				});
+			}
+			if (t[id].type === 'valve' && t[id].valveType === 'GPV') {
+				compared++;
+				const a = o[id].curveId ? curveOf(ours, o[id].curveId) : null, b = t[id].curveId ? curveOf(theirs, t[id].curveId) : null;
+				if (!(a === null && b === null) && !pointsSame(a, b)) { out.push(kind + ' ' + id + ' GPV curve: ours ' + JSON.stringify(a) + ', theirs ' + JSON.stringify(b)); }
+			}
+			if (t[id].type === 'tank') {
+				compared++;
+				const a = o[id].volCurve ? curveOf(ours, o[id].volCurve) : null, b = t[id].volCurve ? curveOf(theirs, t[id].volCurve) : null;
+				if (!(a === null && b === null) && !pointsSame(a, b)) { out.push(kind + ' ' + id + ' volume curve: ours ' + JSON.stringify(a) + ', theirs ' + JSON.stringify(b)); }
+			}
 		});
 	});
 	return out;
+}
+// A stored scenario, resolved the way the page resolves it: its alternatives' chains laid onto Base, then its own overrides.
+function resolve(r, scn) {
+	const byId = Object.fromEntries(r.alternatives.map((a) => [a.fileId, a]));
+	const out = {};
+	function lay(values) { Object.keys(values).forEach((k) => { out[k] = Object.assign(out[k] || {}, values[k]); }); }
+	Object.keys(scn.alternatives || {}).forEach((cat) => {
+		const pick = scn.alternatives[cat];
+		if (pick === 'base') { return; }
+		const chain = [];
+		for (let a = byId[pick]; a; a = byId[a.parentFileId]) { chain.unshift(a); }
+		chain.forEach((a) => lay(a.values));
+	});
+	lay(scn.overrides || {});
+	return out;
+}
+const PROP = { tankDiameter: 'diameter', bottomElev: null, active: null };
+function laid(base, flat) {
+	const lay = JSON.parse(JSON.stringify(base));
+	Object.keys(flat).forEach((key) => {
+		const e = (key[0] === 'l' ? lay.links : lay.nodes).filter((x) => x.id === key.slice(2))[0];
+		if (!e) { throw new Error('no element ' + key); }
+		Object.keys(flat[key]).forEach((p) => {
+			const to = p in PROP ? PROP[p] : p;
+			if (to) { e[to] = flat[key][p]; }
+		});
+	});
+	return lay;
 }
 
 (async () => {
@@ -66,37 +136,57 @@ function diffNetworks(ours, theirs) {
 	ok('flow units from the .wtg: GPM', r.flowUnits === 'GPM', r.flowUnits);
 	ok('Base scenario is named Base', r.baseScenario === 'Base', r.baseScenario);
 	const base = EC.lpnInpParse(r.inp);
-	const tBase = EC.lpnInpParse(fs.readFileSync(path.join(FX, 'WTG-export-tgh-1-Base.inp'), 'utf8'));
-	const tScen = EC.lpnInpParse(fs.readFileSync(path.join(FX, 'WTG-export-tgh-1-TGH-1.inp'), 'utf8'));
+	const tBase = rename(EC.lpnInpParse(fs.readFileSync(path.join(FX, 'WTG-export-tgh-1-Base.inp'), 'utf8')));
+	const tScen = rename(EC.lpnInpParse(fs.readFileSync(path.join(FX, 'WTG-export-tgh-1-TGH-1.inp'), 'utf8')));
 	ok('all three parse', base.ok && tBase.ok && tScen.ok);
-	ok('3 nodes and 2 links', base.nodes.length === 3 && base.links.length === 2, base.nodes.length + ' ' + base.links.length);
+	ok('every node and link of the export is read (' + tBase.nodes.length + ' nodes, ' + tBase.links.length + ' links)',
+		base.nodes.length === tBase.nodes.length && base.links.length === tBase.links.length, base.nodes.length + ' ' + base.links.length);
+	ok('the nine pump and valve nodes are links: 3 pumps, 6 valves', base.links.filter((l) => l.type === 'pump').length === 3 && base.links.filter((l) => l.type === 'valve').length === 6);
+	ok('no pump, valve or pipe is left out (no "unlinked" or "unjoined" note)', !r.notes.some((n) => n.code === 'wtg-directed-unlinked' || n.code === 'wtg-link-unjoined'),
+		JSON.stringify(r.notes.filter((n) => n.code === 'wtg-directed-unlinked' || n.code === 'wtg-link-unjoined')));
+
+	// A pump node with several pipes: the pipe the model calls downstream is on the outlet, every other on the inlet.
+	const pmp1 = base.links.filter((l) => l.id === 'PMP-1')[0];
+	const at = (id) => base.links.filter((l) => l.id === id)[0];
+	ok('PMP-1: P-1 (downstream) leaves the outlet; P-2, P-3 and P-16 meet the inlet',
+		pmp1 && at('P-1').from === pmp1.to && at('P-2').to === pmp1.from && at('P-3').from === pmp1.from && at('P-16').to === pmp1.from);
 
 	// Base against WaterGEMS's Base export.
 	const d0 = diffNetworks(base, tBase);
 	ok('Base: every element and value matches the Base export', d0.length === 0, d0.join('; '));
 
-	// The scenario.
-	ok('one scenario beyond Base, named TGH-1', r.scenarios.length === 1 && r.scenarios[0].name === 'TGH-1');
-	const ov = (r.scenarios[0] || {}).overrides || {};
-	// The differences between the two exports, as overrides: the ground truth.
-	const truth = {};
-	tScen.links.forEach((l) => { const b = tBase.links.filter((x) => x.id === l.id)[0]; ['diameter', 'length', 'roughness', 'k'].forEach((f) => { if (!same(l[f], b[f])) { (truth['l:' + l.id] = truth['l:' + l.id] || {})[f] = l[f]; } }); });
-	tScen.nodes.forEach((n) => { const b = tBase.nodes.filter((x) => x.id === n.id)[0]; ['elev', 'demand', 'head'].forEach((f) => { if (!same(n[f], b[f])) { (truth['n:' + n.id] = truth['n:' + n.id] || {})[f] = n[f]; } }); });
-	console.log('       the exports differ in: ' + JSON.stringify(truth));
-	ok('the overrides are exactly the differences between the exports', JSON.stringify(ov) === JSON.stringify(truth), JSON.stringify(ov));
-	ok('the diameter override is P-1 = 10', ov['l:P-1'] && ov['l:P-1'].diameter === 10);
-	ok('the demand override is J-1 = 1250', ov['n:J-1'] && ov['n:J-1'].demand === 1250);
-	ok('no override is dropped silently: no "category" or "alternative" note remains for Demand',
-		!r.notes.some((n) => n.code === 'wtg-scenario-category'), JSON.stringify(r.notes.filter((n) => n.code === 'wtg-scenario-category')));
+	// The continuous pattern: ten points over 24 hours, written at the one-hour step as WaterGEMS writes it (26 values).
+	const pat = base.patterns[0], tpat = tBase.patterns[0];
+	ok('the continuous pattern is written as WaterGEMS writes it: ' + (tpat ? tpat.multipliers.length : 0) + ' multipliers',
+		pat && tpat && pat.multipliers.length === tpat.multipliers.length && pat.multipliers.every((m, i) => same(m, tpat.multipliers[i])),
+		JSON.stringify(pat && pat.multipliers));
+	ok('the report says the pattern was continuous', r.notes.some((n) => n.code === 'wtg-pattern-continuous'));
+	ok('the pattern time step is one hour, as the export states', /Pattern Timestep\s+1:00/.test(r.inp));
 
-	// Base with the overrides laid on, against the scenario export.
-	const lay = JSON.parse(JSON.stringify(base));
-	Object.keys(ov).forEach((key) => {
-		const e = (key[0] === 'l' ? lay.links : lay.nodes).filter((x) => x.id === key.slice(2))[0];
-		Object.keys(ov[key]).forEach((p) => { e[p] = ov[key][p]; });
-	});
-	const d1 = diffNetworks(lay, tScen);
-	ok('TGH-1: Base with its overrides matches the TGH-1 export', d1.length === 0, d1.join('; '));
+	// The scenario and its alternatives.
+	ok('one scenario beyond Base, named TGH-1', r.scenarios.length === 1 && r.scenarios[0].name === 'TGH-1');
+	const scn = r.scenarios[0] || {};
+	ok('it uses two alternatives, both named TGH-1: Physical and Demand', scn.alternatives && Object.keys(scn.alternatives).sort().join() === 'demand,physical' &&
+		scn.alternatives.physical !== scn.alternatives.demand, JSON.stringify(scn.alternatives));
+	const altOf = (cat) => r.alternatives.filter((a) => a.fileId === (scn.alternatives || {})[cat])[0] || {};
+	ok('the Physical alternative is named TGH-1 and hangs from Base', altOf('physical').name === 'TGH-1' && altOf('physical').category === 'physical' && !altOf('physical').parentFileId && !altOf('physical').root);
+	ok('the Demand alternative is named TGH-1 and holds the three changed demands', altOf('demand').name === 'TGH-1' &&
+		JSON.stringify(altOf('demand').values) === JSON.stringify({ 'n:J-11': { demand: 200 }, 'n:J-12': { demand: 1000 }, 'n:J-13': { demand: 500 } }), JSON.stringify(altOf('demand').values));
+	ok('the Physical alternative holds the 33 pipe diameters, the tanks, the pump and GPV curves and the pump node elevations',
+		Object.keys(altOf('physical').values || {}).length > 40 && altOf('physical').values['l:P-1'].diameter === 10 && altOf('physical').values['n:T-1'].tankDiameter === 50 &&
+		altOf('physical').values['l:GPV-1'].curveId && altOf('physical').values['l:PMP-1'].curveId && altOf('physical').values['n:PMP-3-U'].elev === 100);
+	ok('what an alternative cannot say stays the scenario\'s own: the tank depths (they follow the base elevation)',
+		JSON.stringify(scn.overrides) === JSON.stringify({ 'n:T-1': { level: 19 }, 'n:T-2': { level: 19 } }), JSON.stringify(scn.overrides));
+
+	// The differences between the two exports, as the ground truth for what the scenario changes.
+	console.log('       the exports differ in ' + diffNetworks(tScen, tBase).length + ' values');
+	const lay0 = laid(base, resolve(r, scn));
+	const d1 = diffNetworks(lay0, tScen);
+	ok('TGH-1: Base with its alternatives and overrides matches the TGH-1 export', d1.length === 0, d1.join('; '));
+	ok('the alternatives and the overrides together are exactly the scenario\'s differences from Base', (function () {
+		const a = resolve(r, scn), b = scn.differences;
+		return Object.keys(b).every((k) => JSON.stringify(a[k]) === JSON.stringify(b[k])) && Object.keys(a).every((k) => JSON.stringify(a[k]) === JSON.stringify(b[k]));
+	}()));
 	console.log('       ' + compared + ' values compared');
 	db.close();
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nAll passed.');

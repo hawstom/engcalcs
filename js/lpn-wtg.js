@@ -250,7 +250,7 @@
 		IdahoDemandNode_Demand_Data: 1, IdahoDemandNode_Demand_DemandCollection: 1,
 		IdahoReservoir_Physical_Data: 1, ConventionalTank_Physical_Data: 1, ConventionalTank_InitialSettings_Data: 1,
 		ConventionalTank_Physical_DepthRatioVolumeRatioCurve: 1, IdahoTank_Physical_Data: 1,
-		BasePump_InitialSettings_Data: 1, StandardPump_Physical_Data: 1,
+		BasePump_InitialSettings_Data: 1, StandardPump_Physical_Data: 1, VariableSpeedPumpBattery_Physical_Data: 1,
 		BaseValve_Physical_Data: 1, BaseValve_InitialSettings_Data: 1, PressureValve_InitialSettings_Data: 1,
 		PressureValve_InitialSettings_PressureValveSetting_ValvePressureType: 1,
 		PressureValve_InitialSettings_PressureValveSetting_ValveHGLType: 1, PressureValve_Physical_Data: 1,
@@ -535,6 +535,9 @@
 				if (is(e, 'IdahoReservoir')) { net.nodes.push({ e: e, label: lab, kind: 'reservoir' }); return; }
 				if (is(e, 'ConventionalTank')) { net.nodes.push({ e: e, label: lab, kind: 'tank' }); return; }
 				if (is(e, 'StandardPump')) { net.directed.push({ e: e, label: lab, kind: 'pump' }); return; }
+				// A variable speed pump battery is one node between pipes, like a pump; WaterGEMS's own EPANET
+				// export writes it as one pump at relative speed 1 (OBSERVED, WTG-tgh-1).
+				if (is(e, 'VariableSpeedPumpBattery')) { net.directed.push({ e: e, label: lab, kind: 'pump', battery: true }); return; }
 				if (is(e, 'BaseValve')) {
 					var vt = null;
 					VALVE_TYPES.forEach(function (v) { if (is(e, v)) { vt = v; } });
@@ -624,10 +627,10 @@
 				d.elev = get(d.e, s, 'Physical_NodeElevation');
 				d.downLink = dn ? dn.row.HMITopologyDownstreamLinkID : null;
 				if (d.kind === 'pump') {
-					d.def = get(d.e, s, 'Physical_PumpDefinitionID');
+					d.def = d.battery ? get(d.e, s, 'Physical_VspbDefinition') : get(d.e, s, 'Physical_PumpDefinitionID');
 					d.speed = get(d.e, s, 'InitialSettings_RelativeSpeedFactor');
 					d.off = get(d.e, s, 'PumpStatus') === 1;
-					d.vsp = !!get(d.e, s, 'Physical_IsVariableSpeedPump');
+					d.vsp = d.battery || !!get(d.e, s, 'Physical_IsVariableSpeedPump');
 				} else {
 					d.diameter = get(d.e, s, 'Physical_ValveDiameter');
 					d.k = get(d.e, s, 'Physical_SpecifyLocalMinorLoss') === 0
@@ -697,9 +700,16 @@
 			});
 			if (weekly) { patWeekly.push(labels[sid]); }
 			if (r.PatternFormat === 1) { patContinuous.push(labels[sid]); }
-			patterns[sid] = { sid: sid, label: labels[sid], start: r.IdahoPattern_PatternStartingMultiplier, pts: pts, times: times, startTime: r.IdahoPattern_PatternStartTime };
+			patterns[sid] = { sid: sid, label: labels[sid], start: r.IdahoPattern_PatternStartingMultiplier, pts: pts, times: times, startTime: r.IdahoPattern_PatternStartTime,
+				continuous: r.PatternFormat === 1 };
 			times.forEach(function (t) { if (t > 0) { patternStep = patternStep === null ? Math.round(t) : gcd(patternStep, t); } });
 		});
+		// A continuous pattern is sampled at the pattern time step, which must not be coarser than the
+		// hydraulic time step, or the samples would miss the line between points.
+		if (patContinuous.length) {
+			var hstepPre = (eng && eng.TimeAnalysisType === 1 && eps && eps.EpsType_HydraulicTimeStep > 0) ? eps.EpsType_HydraulicTimeStep : 3600;
+			patternStep = patternStep === null ? Math.round(hstepPre) : gcd(patternStep, hstepPre);
+		}
 		var usedPatterns = {};
 		function patternId(sid) {
 			if (sid === null || sid === undefined || !patterns[sid]) { return ''; }
@@ -766,10 +776,55 @@
 		var counts = { junctions: 0, reservoirs: 0, tanks: 0, pipes: 0, pumps: 0, valves: 0, splitJunctions: 0 };
 		var unconverted = [];
 		function need(v, what, label) {
-			if (v === null) { unconverted.push(label + ': ' + what); return '0'; }
+			if (v === null) { if (unconverted.indexOf(label + ': ' + what) < 0) { unconverted.push(label + ': ' + what); } return '0'; }
 			return v;
 		}
 
+		// A tank as one scenario sees it, in the project's units and as the `.inp` states it: base elevation,
+		// the three levels measured from the base, the diameter, and the ID of its volume curve ('' for none).
+		// `loud` is true for the Base pass, which alone reports what it cannot carry.
+		var tankCurveOf = {};
+		function tankFacts(n, loud) {
+			var lv = function (elevField, levelField, elevV, levelV) {
+				// OperatingRangeType 0 states elevations, 1 levels (OBSERVED 0 in every sample).
+				if (n.rangeType === 1) { return L(levelV, levelField); }
+				var e1 = conv(elevV, elevField, T.len), b1 = conv(n.base, 'Physical_TankBaseElevation', T.len);
+				return (e1 === null || b1 === null) ? null : num(e1 - b1);
+			};
+			var f = { init: lv('InitialSettings_TankInitialElevation', 'InitialSettings_TankInitialLevel', n.initElev, n.initLevel),
+				minL: lv('Physical_TankMinimumElevation', 'Physical_TankMinimumLevel', n.minElev, n.minLevel),
+				maxL: lv('Physical_TankMaximumElevation', 'Physical_TankMaximumLevel', n.maxElev, n.maxLevel), curve: '' };
+			var diam = conv(n.diameter, 'CircularTankSectionType_TankDiameter', T.len);
+			diam = diam === null ? null : num(diam);
+			if (n.section === 1) {
+				var a = conv(n.area, 'NonCircularTankSectionType_TankAverageArea', T.area);
+				diam = a === null ? null : num(Math.sqrt(4 * a / Math.PI));
+				if (loud) { note('wtg-tank-area', [n.label]); }
+			} else if (n.section === 2) {
+				// Depth and volume ratios of the active range (OBSERVED: ratio 1 at the maximum level,
+				// the volume ratio times the total active volume giving the .inp's volumes).
+				var minN = Number(f.minL), maxN = Number(f.maxL);
+				var act = conv(n.activeVol, 'VariableAreaTankSectionType_TotalActiveVolume', T.vol);
+				var inact = conv(n.inactiveVol || 0, 'Physical_InactiveVolume', T.vol) || 0;
+				if (act !== null && n.curve.length) {
+					var sig = n.e + '|' + minN + '|' + maxN + '|' + act + '|' + inact + '|' + JSON.stringify(n.curve);
+					if (tankCurveOf[sig] === undefined) {
+						var cid = makeId(n.label, 'TANK-' + n.e, curveIds);
+						curves.push(';VOLUME: ' + n.label);
+						n.curve.forEach(function (p) {
+							curves.push(' ' + cid + '\t' + num(minN + p[0] * (maxN - minN)) + '\t' + num(inact + p[1] * act));
+						});
+						tankCurveOf[sig] = cid;
+					}
+					f.curve = tankCurveOf[sig];
+				}
+			} else if (n.section !== 0 && n.section !== null && n.section !== undefined) {
+				if (loud) { note('wtg-tank-section', [n.label + ' (' + n.section + ')']); }
+			}
+			f.diam = diam;
+			f.base = L(n.base, 'Physical_TankBaseElevation');
+			return f;
+		}
 		net.nodes.forEach(function (n) {
 			n.id = makeId(n.label, n.kind.toUpperCase() + '-' + n.e, nodeIds);
 			nodeIdOf[n.e] = n.id;
@@ -789,38 +844,7 @@
 				reservoirs.push(' ' + n.id + '\t' + need(L(n.elev, 'Physical_NodeElevation'), 'head', n.label) + '\t' + patternId(n.pattern) + '\t;');
 			} else {
 				counts.tanks++;
-				var lv = function (elevField, levelField, elevV, levelV) {
-					// OperatingRangeType 0 states elevations, 1 levels (OBSERVED 0 in every sample).
-					if (n.rangeType === 1) { return L(levelV, levelField); }
-					var e1 = conv(elevV, elevField, T.len), b1 = conv(n.base, 'Physical_TankBaseElevation', T.len);
-					return (e1 === null || b1 === null) ? null : num(e1 - b1);
-				};
-				var init = lv('InitialSettings_TankInitialElevation', 'InitialSettings_TankInitialLevel', n.initElev, n.initLevel);
-				var minL = lv('Physical_TankMinimumElevation', 'Physical_TankMinimumLevel', n.minElev, n.minLevel);
-				var maxL = lv('Physical_TankMaximumElevation', 'Physical_TankMaximumLevel', n.maxElev, n.maxLevel);
-				var diam = D(n.diameter, 'CircularTankSectionType_TankDiameter'), volCurve = '';
-				diam = conv(n.diameter, 'CircularTankSectionType_TankDiameter', T.len);
-				diam = diam === null ? null : num(diam);
-				if (n.section === 1) {
-					var a = conv(n.area, 'NonCircularTankSectionType_TankAverageArea', T.area);
-					diam = a === null ? null : num(Math.sqrt(4 * a / Math.PI));
-					note('wtg-tank-area', [n.label]);
-				} else if (n.section === 2) {
-					// Depth and volume ratios of the active range (OBSERVED: ratio 1 at the maximum level,
-					// the volume ratio times the total active volume giving the .inp's volumes).
-					var minN = Number(minL), maxN = Number(maxL);
-					var act = conv(n.activeVol, 'VariableAreaTankSectionType_TotalActiveVolume', T.vol);
-					var inact = conv(n.inactiveVol || 0, 'Physical_InactiveVolume', T.vol) || 0;
-					if (act !== null && n.curve.length) {
-						volCurve = makeId(n.label, 'TANK-' + n.e, curveIds);
-						curves.push(';VOLUME: ' + n.label);
-						n.curve.forEach(function (p) {
-							curves.push(' ' + volCurve + '\t' + num(minN + p[0] * (maxN - minN)) + '\t' + num(inact + p[1] * act));
-						});
-					}
-				} else if (n.section !== 0 && n.section !== null && n.section !== undefined) {
-					note('wtg-tank-section', [n.label + ' (' + n.section + ')']);
-				}
+				var tf = tankFacts(n, true), init = tf.init, minL = tf.minL, maxL = tf.maxL, diam = tf.diam, volCurve = tf.curve;
 				tanks.push(' ' + n.id + '\t' + need(L(n.base, 'Physical_TankBaseElevation'), 'base elevation', n.label) + '\t' +
 					need(init, 'initial level', n.label) + '\t' + need(minL, 'minimum level', n.label) + '\t' + need(maxL, 'maximum level', n.label) + '\t' +
 					need(diam, 'diameter', n.label) + '\t' + need(V(n.inactiveVol || 0, 'Physical_InactiveVolume'), 'inactive volume', n.label) + '\t' + volCurve + '\t;');
@@ -830,12 +854,119 @@
 		// Pumps and valves are NODES in WaterGEMS, each between an upstream and a downstream pipe.
 		// Each becomes a link between two new junctions placed a quarter of the way along those pipes'
 		// end segments, named after it with -U and -D, at its elevation; the pipes keep their lengths.
-		var splitIds = [], splitAt = {}, curveOfDef = {};
+		var splitIds = [], splitAt = {}, curveOfDef = {}, gpvCurveOf = {};
+		// The curves a pump definition gives a pump: its head curve and its efficiency curve, written into
+		// [CURVES] once per definition, whichever pump (or scenario) names it. Notes name what is not carried.
+		function pumpDefCurves(defId) {
+			var def = defId === null || defId === undefined ? null : ((M.all('IdahoPumpDefinition').filter(function (r) { return r.SupportElementID === defId; })[0]) || null);
+			if (!def) { return { def: null, h: null, e: null }; }
+			if (curveOfDef[defId] === undefined) {
+				var pts = [], dt = def.PumpDefinitionType, cid = makeId(labels[defId], 'PUMPDEF-' + defId, curveIds);
+				var pq = function (v, f) { return conv(v, f, 'flow'); }, ph = function (v, f) { return conv(v, f, T.len); };
+				// PumpDefinitionType: 0 constant power, 1 design point, 2 standard three-point,
+				// 3 standard extended, 4 custom extended, 5 multiple point (OBSERVED 1 and 5;
+				// the rest by Bentley's own list order, dev/sqlite-reader.md).
+				if (dt === 1) {
+					pts = [[pq(def.DesignDischarge, 'DesignDischarge'), ph(def.DesignHead, 'DesignHead')]];
+				} else if (dt === 2 || dt === 3) {
+					pts = [[0, ph(def.ShutoffHead, 'ShutoffHead')], [pq(def.DesignDischarge, 'DesignDischarge'), ph(def.DesignHead, 'DesignHead')],
+						[pq(def.MaxOperatingDischarge, 'MaxOperatingDischarge'), ph(def.MaxOperatingHead, 'MaxOperatingHead')]];
+					if (dt === 3) { note('wtg-pump-extended', [labels[defId]]); }
+				} else if (dt === 4 || dt === 5) {
+					pts = M.all('IdahoPumpDefinition_PumpCurve').filter(function (r) { return r.SupportElementID === defId; })
+						.sort(function (a, b) { return a.ItemID - b.ItemID; })
+						.map(function (r) { return [pq(r.PumpCurve_Discharge, 'PumpCurve_Discharge'), ph(r.PumpCurve_Head, 'PumpCurve_Head')]; });
+					if (dt === 4) { note('wtg-pump-extended', [labels[defId]]); }
+				} else {
+					note('wtg-pump-deftype', [labels[defId] + ' (' + dt + ')']);
+				}
+				if (pts.length && pts.every(function (p) { return p[0] !== null && p[1] !== null; })) {
+					curves.push(';PUMP: ' + labels[defId]);
+					pts.forEach(function (p) { curves.push(' ' + cid + '\t' + num(p[0]) + '\t' + num(p[1])); });
+					curveOfDef[defId] = cid;
+				} else {
+					curveOfDef[defId] = null;
+				}
+				// Efficiency: PumpEfficiencyType 0 constant (OBSERVED), written as WaterGEMS's own
+				// export writes it, a one-point curve at the design flow.
+				var effType = def.PumpEfficiencyType;
+				if (effType === 0 && M.has('IdahoPumpDefinition_PumpEfficiencyType_ConstantEfficiencyType')) {
+					var ce = M.all('IdahoPumpDefinition_PumpEfficiencyType_ConstantEfficiencyType').filter(function (r) { return r.SupportElementID === defId; })[0];
+					if (ce) {
+						var eid = makeId(labels[defId] + 'E', 'PUMPDEF-' + defId + 'E', curveIds);
+						var qd = pq(def.DesignDischarge, 'DesignDischarge');
+						if (!qd && pts.length) { qd = pts[Math.min(1, pts.length - 1)][0]; }
+						curves.push(';EFFICIENCY: ' + labels[defId]);
+						curves.push(' ' + eid + '\t' + num(qd || 1) + '\t' + num(ce.ConstantEfficiencyType_PumpEfficiency));
+						curveOfDef[defId + 'E'] = eid;
+					}
+				} else if (effType === 2 && M.has('IdahoPumpDefinition_DischargeEfficiencyCurve')) {
+					var ec = M.all('IdahoPumpDefinition_DischargeEfficiencyCurve').filter(function (r) { return r.SupportElementID === defId; })
+						.sort(function (a, b) { return a.ItemID - b.ItemID; });
+					if (ec.length) {
+						var eid2 = makeId(labels[defId] + 'E', 'PUMPDEF-' + defId + 'E', curveIds);
+						curves.push(';EFFICIENCY: ' + labels[defId]);
+						ec.forEach(function (r) { curves.push(' ' + eid2 + '\t' + num(pq(r.DischargeEfficiencyCurve_Discharge, 'DischargeEfficiencyCurve_Discharge')) + '\t' + num(r.DischargeEfficiencyCurve_Efficiency)); });
+						curveOfDef[defId + 'E'] = eid2;
+					}
+				} else if (effType === 1 && typeof def.IdahoPumpDefinition_MotorEfficiency === 'number') {
+					// OBSERVED once (WTG-tgh-1, motor efficiency 100): WaterGEMS's export writes a one-point
+					// EFFICIENCY curve at flow 0 holding the motor efficiency.
+					var eid3 = makeId(labels[defId] + 'E', 'PUMPDEF-' + defId + 'E', curveIds);
+					curves.push(';EFFICIENCY: ' + labels[defId]);
+					curves.push(' ' + eid3 + '\t0\t' + num(def.IdahoPumpDefinition_MotorEfficiency));
+					curveOfDef[defId + 'E'] = eid3;
+				} else if (effType !== undefined && effType !== null) {
+					note('wtg-pump-efficiency', [labels[defId] + ' (' + effType + ')']);
+				}
+			}
+			return { def: def, h: curveOfDef[defId] || null, e: curveOfDef[defId + 'E'] || null };
+		}
+		// A valve's setting as the `.inp` states it: a pressure, a flow, a throttle's coefficient, or a GPV's curve
+		// ID. `loud` is true for the Base pass, which alone reports what it cannot carry.
+		function gpvCurveId(sid) {
+			var gp = M.has('GpvHeadlossCurve_GpvHeadlossFlowCurve') ? M.all('GpvHeadlossCurve_GpvHeadlossFlowCurve').filter(function (r) { return r.SupportElementID === sid; })
+				.sort(function (a, b) { return a.ItemID - b.ItemID; }) : [];
+			if (!gp.length) { return null; }
+			if (gpvCurveOf[sid] === undefined) {
+				var gid = makeId(labels[sid], 'GPV-' + sid, curveIds);
+				curves.push(';HEADLOSS: ' + labels[sid]);
+				gp.forEach(function (r) { curves.push(' ' + gid + '\t' + num(conv(r.GpvHeadlossFlowCurve_GpvFlow, 'GpvHeadlossFlowCurve_GpvFlow', 'flow')) + '\t' + num(conv(r.GpvHeadlossFlowCurve_GpvHeadloss, 'GpvHeadlossFlowCurve_GpvHeadloss', T.len))); });
+				gpvCurveOf[sid] = gid;
+			}
+			return gpvCurveOf[sid];
+		}
+		function valveSettingOf(d, loud) {
+			var setting = '0';
+			if (d.vtype === 'PRV' || d.vtype === 'PSV' || d.vtype === 'PBV') {
+				// PressureValveSetting 0 states a pressure, 1 a hydraulic grade (OBSERVED 0).
+				if (d.settingKind === 1) {
+					var h = conv(d.hgl, 'ValveHGLType_ValveHGLSetting', T.len), z = conv(d.elev, 'Physical_NodeElevation', T.len);
+					setting = (h === null || z === null) ? need(null, 'setting', d.label)
+						: num(us ? (h - z) * BENTLEY_PSI_PER_M * FT : (h - z));
+				} else {
+					setting = need(P(d.pressure, 'ValvePressureType_ValvePressureSetting'), 'setting', d.label);
+				}
+			} else if (d.vtype === 'FCV') {
+				setting = need(Q(d.flow, 'InitialSettings_FlowSetting'), 'setting', d.label);
+			} else if (d.vtype === 'TCV') {
+				if (d.tcvType !== 1 && loud) { note('wtg-tcv-coefficient', [d.label]); }
+				setting = need(U(d.tcvK), 'setting', d.label);
+			} else if (d.vtype === 'GPV') {
+				var gid = gpvCurveId(d.gpvCurve);
+				if (gid) { setting = gid; } else if (loud) { note('wtg-gpv-nocurve', [d.label]); }
+			}
+			return setting;
+		}
 		net.directed.forEach(function (d) {
+			// The node's DOWNSTREAM pipe (named by the database) joins the pump or valve's outlet. Every
+			// other pipe at the node joins its inlet: WaterGEMS's own EPANET export does exactly this
+			// (OBSERVED, WTG-tgh-1: a pump node with three pipes beside its outlet pipe), so a node with
+			// more than two pipes is no different from one with two.
 			var adj = net.links.filter(function (l) { return l.from === d.e || l.to === d.e; });
 			var down = adj.filter(function (l) { return l.e === d.downLink; })[0];
-			var up = adj.filter(function (l) { return l !== down; })[0];
-			if (adj.length !== 2 || !down || !up) {
+			var ups = adj.filter(function (l) { return l !== down; }), up = ups[0];
+			if (!down || !up) {
 				note('wtg-directed-unlinked', [d.label + ' (' + adj.length + ')']);
 				d.unlinked = true;
 				return;
@@ -855,104 +986,27 @@
 			coords.push(' ' + dId + '\t' + XY(dPt[0]) + '\t' + XY(dPt[1]));
 			counts.splitJunctions += 2;
 			splitIds.push(d.label);
-			splitAt[d.e] = { up: up.e, down: down.e, uId: uId, dId: dId, uPt: uPt, dPt: dPt };
+			splitAt[d.e] = { down: down.e, uId: uId, dId: dId, uPt: uPt, dPt: dPt };
 			d.id = makeId(d.label, d.kind.toUpperCase() + '-' + d.e, linkIds);
 			linkIdOf[d.e] = d.id;
 			verts.push(' ' + d.id + '\t' + XY(d.x) + '\t' + XY(d.y));
 			if (d.kind === 'pump') {
 				counts.pumps++;
 				var params = '';
-				if (d.vsp) { note('wtg-pump-vsp', [d.label]); }
-				var def = (M.all('IdahoPumpDefinition').filter(function (r) { return r.SupportElementID === d.def; })[0]) || null;
-				if (!def) {
+				if (d.battery) { note('wtg-pump-battery', [d.label]); } else if (d.vsp) { note('wtg-pump-vsp', [d.label]); }
+				var pcv = pumpDefCurves(d.def);
+				if (!pcv.def) {
 					note('wtg-pump-nodef', [d.label]);
 				} else {
-					if (curveOfDef[d.def] === undefined) {
-						var pts = [], dt = def.PumpDefinitionType, cid = makeId(labels[d.def], 'PUMPDEF-' + d.def, curveIds);
-						var pq = function (v, f) { return conv(v, f, 'flow'); }, ph = function (v, f) { return conv(v, f, T.len); };
-						// PumpDefinitionType: 0 constant power, 1 design point, 2 standard three-point,
-						// 3 standard extended, 4 custom extended, 5 multiple point (OBSERVED 1 and 5;
-						// the rest by Bentley's own list order, dev/sqlite-reader.md).
-						if (dt === 1) {
-							pts = [[pq(def.DesignDischarge, 'DesignDischarge'), ph(def.DesignHead, 'DesignHead')]];
-						} else if (dt === 2 || dt === 3) {
-							pts = [[0, ph(def.ShutoffHead, 'ShutoffHead')], [pq(def.DesignDischarge, 'DesignDischarge'), ph(def.DesignHead, 'DesignHead')],
-								[pq(def.MaxOperatingDischarge, 'MaxOperatingDischarge'), ph(def.MaxOperatingHead, 'MaxOperatingHead')]];
-							if (dt === 3) { note('wtg-pump-extended', [labels[d.def]]); }
-						} else if (dt === 4 || dt === 5) {
-							pts = M.all('IdahoPumpDefinition_PumpCurve').filter(function (r) { return r.SupportElementID === d.def; })
-								.sort(function (a, b) { return a.ItemID - b.ItemID; })
-								.map(function (r) { return [pq(r.PumpCurve_Discharge, 'PumpCurve_Discharge'), ph(r.PumpCurve_Head, 'PumpCurve_Head')]; });
-							if (dt === 4) { note('wtg-pump-extended', [labels[d.def]]); }
-						} else {
-							note('wtg-pump-deftype', [labels[d.def] + ' (' + dt + ')']);
-						}
-						if (pts.length && pts.every(function (p) { return p[0] !== null && p[1] !== null; })) {
-							curves.push(';PUMP: ' + labels[d.def]);
-							pts.forEach(function (p) { curves.push(' ' + cid + '\t' + num(p[0]) + '\t' + num(p[1])); });
-							curveOfDef[d.def] = cid;
-						} else {
-							curveOfDef[d.def] = null;
-						}
-						// Efficiency: PumpEfficiencyType 0 constant (OBSERVED), written as WaterGEMS's own
-						// export writes it, a one-point curve at the design flow.
-						var effType = def.PumpEfficiencyType;
-						if (effType === 0 && M.has('IdahoPumpDefinition_PumpEfficiencyType_ConstantEfficiencyType')) {
-							var ce = M.all('IdahoPumpDefinition_PumpEfficiencyType_ConstantEfficiencyType').filter(function (r) { return r.SupportElementID === d.def; })[0];
-							if (ce) {
-								var eid = makeId(labels[d.def] + 'E', 'PUMPDEF-' + d.def + 'E', curveIds);
-								var qd = pq(def.DesignDischarge, 'DesignDischarge');
-								if (!qd && pts.length) { qd = pts[Math.min(1, pts.length - 1)][0]; }
-								curves.push(';EFFICIENCY: ' + labels[d.def]);
-								curves.push(' ' + eid + '\t' + num(qd || 1) + '\t' + num(ce.ConstantEfficiencyType_PumpEfficiency));
-								curveOfDef[d.def + 'E'] = eid;
-							}
-						} else if (effType === 2 && M.has('IdahoPumpDefinition_DischargeEfficiencyCurve')) {
-							var ec = M.all('IdahoPumpDefinition_DischargeEfficiencyCurve').filter(function (r) { return r.SupportElementID === d.def; })
-								.sort(function (a, b) { return a.ItemID - b.ItemID; });
-							if (ec.length) {
-								var eid2 = makeId(labels[d.def] + 'E', 'PUMPDEF-' + d.def + 'E', curveIds);
-								curves.push(';EFFICIENCY: ' + labels[d.def]);
-								ec.forEach(function (r) { curves.push(' ' + eid2 + '\t' + num(pq(r.DischargeEfficiencyCurve_Discharge, 'DischargeEfficiencyCurve_Discharge')) + '\t' + num(r.DischargeEfficiencyCurve_Efficiency)); });
-								curveOfDef[d.def + 'E'] = eid2;
-							}
-						} else if (effType !== undefined && effType !== null) {
-							note('wtg-pump-efficiency', [labels[d.def] + ' (' + effType + ')']);
-						}
-					}
-					if (curveOfDef[d.def]) { params = 'HEAD ' + curveOfDef[d.def]; } else { note('wtg-pump-nocurve', [d.label]); }
-					if (curveOfDef[d.def + 'E']) { energy.push(' Pump \t' + d.id + '\tEfficiency\t' + curveOfDef[d.def + 'E']); }
+					if (pcv.h) { params = 'HEAD ' + pcv.h; } else { note('wtg-pump-nocurve', [d.label]); }
+					if (pcv.e) { energy.push(' Pump \t' + d.id + '\tEfficiency\t' + pcv.e); }
 				}
 				if (d.speed !== undefined && d.speed !== null && d.speed !== 1) { params += (params ? '\t' : '') + 'SPEED ' + num(d.speed); }
 				pumps.push(' ' + d.id + '\t' + uId + '\t' + dId + '\t' + params + '\t;');
 				if (d.off) { statusLines.push(' ' + d.id + '\tClosed'); }
 			} else {
 				counts.valves++;
-				var setting = '0';
-				if (d.vtype === 'PRV' || d.vtype === 'PSV' || d.vtype === 'PBV') {
-					// PressureValveSetting 0 states a pressure, 1 a hydraulic grade (OBSERVED 0).
-					if (d.settingKind === 1) {
-						var h = conv(d.hgl, 'ValveHGLType_ValveHGLSetting', T.len), z = conv(d.elev, 'Physical_NodeElevation', T.len);
-						setting = (h === null || z === null) ? need(null, 'setting', d.label)
-							: num(us ? (h - z) * BENTLEY_PSI_PER_M * FT : (h - z));
-					} else {
-						setting = need(P(d.pressure, 'ValvePressureType_ValvePressureSetting'), 'setting', d.label);
-					}
-				} else if (d.vtype === 'FCV') {
-					setting = need(Q(d.flow, 'InitialSettings_FlowSetting'), 'setting', d.label);
-				} else if (d.vtype === 'TCV') {
-					if (d.tcvType !== 1) { note('wtg-tcv-coefficient', [d.label]); }
-					setting = need(U(d.tcvK), 'setting', d.label);
-				} else if (d.vtype === 'GPV') {
-					var gp = M.has('GpvHeadlossCurve_GpvHeadlossFlowCurve') ? M.all('GpvHeadlossCurve_GpvHeadlossFlowCurve').filter(function (r) { return r.SupportElementID === d.gpvCurve; })
-						.sort(function (a, b) { return a.ItemID - b.ItemID; }) : [];
-					if (gp.length) {
-						var gid = makeId(labels[d.gpvCurve], 'GPV-' + d.gpvCurve, curveIds);
-						curves.push(';HEADLOSS: ' + labels[d.gpvCurve]);
-						gp.forEach(function (r) { curves.push(' ' + gid + '\t' + num(conv(r.GpvHeadlossFlowCurve_GpvFlow, 'GpvHeadlossFlowCurve_GpvFlow', 'flow')) + '\t' + num(conv(r.GpvHeadlossFlowCurve_GpvHeadloss, 'GpvHeadlossFlowCurve_GpvHeadloss', T.len))); });
-						setting = gid;
-					} else { note('wtg-gpv-nocurve', [d.label]); }
-				}
+				var setting = valveSettingOf(d, true);
 				valves.push(' ' + d.id + '\t' + uId + '\t' + dId + '\t' + need(D(d.diameter, 'Physical_ValveDiameter'), 'diameter', d.label) + '\t' +
 					d.vtype + '\t' + setting + '\t' + need(U(d.k || 0), 'minor loss', d.label) + '\t;');
 				// ValveSetting 0 active (no status), 1 inactive, which EPANET calls Open (OBSERVED: Tnet3's
@@ -966,7 +1020,7 @@
 		net.links.forEach(function (l) {
 			var a = l.from, b = l.to, pts = l.pts ? l.pts.slice() : null, fromId, toId;
 			fromId = splitAt[a] ? (splitAt[a].down === l.e ? splitAt[a].dId : splitAt[a].uId) : nodeIdOf[a];
-			toId = splitAt[b] ? (splitAt[b].up === l.e ? splitAt[b].uId : splitAt[b].dId) : nodeIdOf[b];
+			toId = splitAt[b] ? (splitAt[b].down === l.e ? splitAt[b].dId : splitAt[b].uId) : nodeIdOf[b];
 			if (!fromId || !toId) {
 				note('wtg-link-unjoined', [l.label]);
 				return;
@@ -1029,6 +1083,25 @@
 			patternId(r.SupportElementID);
 			if (!p.pts.length) {
 				mult = [p.start];
+			} else if (p.continuous) {
+				// CONTINUOUS: the multiplier is the straight line between points, which EPANET has not. Written as
+				// WaterGEMS's own EPANET export writes it (OBSERVED, WTG-tgh-1: ten points over 24 hours came out as
+				// 26 multipliers at a one-hour step): the starting multiplier first, then the line's value at the
+				// time of each step from 0 to the last point, both ends included.
+				var tEnd = p.times[p.times.length - 1];
+				var line = function (time) {
+					var q;
+					if (time <= p.times[0]) { return p.pts[0].PatternCurve_Multiplier; }
+					for (q = 1; q < p.times.length; q++) {
+						if (time <= p.times[q] + 1e-6) {
+							var f = p.times[q] === p.times[q - 1] ? 1 : (time - p.times[q - 1]) / (p.times[q] - p.times[q - 1]);
+							return p.pts[q - 1].PatternCurve_Multiplier + f * (p.pts[q].PatternCurve_Multiplier - p.pts[q - 1].PatternCurve_Multiplier);
+						}
+					}
+					return p.pts[p.pts.length - 1].PatternCurve_Multiplier;
+				};
+				mult = [p.start];
+				for (t = 0; t <= tEnd + 1e-6; t += step) { mult.push(Number(line(t).toPrecision(10))); }
 			} else {
 				var total = p.times[p.times.length - 1];
 				var at = function (time) {
@@ -1156,6 +1229,17 @@
 		});
 		if (unreadTables.length) { note('wtg-tables-unread', unreadTables); }
 
+		// ---- scenarios and alternatives beyond Base, as records for the page (treeOf below). Before the file
+		// is assembled: an alternative's pump curve, GPV curve or tank volume curve is written into [CURVES].
+		var tree = treeOf({
+			scen: scen, alts: alts, baseId: baseId, activeId: activeId, picksOf: picksOf, network: network,
+			baseNet: net, nodeIdOf: nodeIdOf, linkIdOf: linkIdOf, splitAt: splitAt, conv: conv, T: T, num: num, headloss: headloss,
+			M: M, live: live, labels: labels, index: index, tableType: tableType, note: note, get: get,
+			Q: Q, unitScale: unitScale, patternId: patternId, tankFacts: tankFacts, valveSettingOf: valveSettingOf,
+			gpvCurveId: gpvCurveId, pumpDefCurves: pumpDefCurves,
+			demand: { base: multBase, adjBase: adjBase, hasUnit: baseHasUnit, hasNormal: baseHasNormal, adjust: function (sc) { return adjustOf(engFor(sc)); }, multOf: multOf }
+		});
+
 		out.push('[TITLE]', (labels[baseId] ? 'Scenario: ' + labels[baseId] : ''), '');
 		out.push('[JUNCTIONS]', ';ID\tElev\tDemand\tPattern'); out = out.concat(junctions); out.push('');
 		out.push('[RESERVOIRS]', ';ID\tHead\tPattern'); out = out.concat(reservoirs); out.push('');
@@ -1175,15 +1259,6 @@
 		if (verts.length) { out.push('[VERTICES]', ';Link\tX-Coord\tY-Coord'); out = out.concat(verts); out.push(''); }
 		out.push('[END]', '');
 
-		// ---- scenarios and alternatives beyond Base, as records for the page (scenariosOf below)
-		var tree = scenariosOf({
-			scen: scen, alts: alts, baseId: baseId, activeId: activeId, picksOf: picksOf, network: network,
-			baseNet: net, nodeIdOf: nodeIdOf, linkIdOf: linkIdOf, conv: conv, T: T, num: num, headloss: headloss,
-			M: M, live: live, labels: labels, index: index, tableType: tableType, note: note,
-			Q: Q, unitScale: unitScale,
-			demand: { base: multBase, adjBase: adjBase, hasUnit: baseHasUnit, hasNormal: baseHasNormal, adjust: function (sc) { return adjustOf(engFor(sc)); }, multOf: multOf }
-		});
-
 		return {
 			ok: true, inp: out.join('\n'), notes: notes, flowUnits: flowKw, unitSystem: us ? 'us' : 'si',
 			scenarios: tree.scenarios, alternatives: tree.alternatives, inactive: net.inactive.map(function (lab) { return lab; }),
@@ -1195,145 +1270,287 @@
 		};
 	}
 
-	// The values a scenario's alternatives give each element, in this page's property names and the
-	// project's units: what is compared against Base to find a scenario's overrides, and what a
-	// stored alternative holds. Physical only for now (the one category a sample varies).
-	function physicalValues(net, ctx) {
-		var out = {}, T = ctx.T, num = ctx.num, conv = ctx.conv;
-		function put(key, prop, v) { if (v !== null && v !== undefined) { (out[key] || (out[key] = {}))[prop] = v; } }
+	// WaterGEMS's alternative types, to this page's categories (dev/scenario-alternatives.md). A category
+	// in READ_CATS has its values read; the others are carried by name and sharing only. A type missing
+	// here (Geometry, Topology, Operational, Age, Trace, Pressure Dependent Demand, ...) has no
+	// counterpart on this page and is named in the report.
+	var NATIVE_CAT = { 3: 'topology', 4: 'physical', 20: 'demand', 21: 'initial', 26: 'fireflow', 24: 'constituent', 28: 'energy', 100: 'userdata' };
+	var READ_CATS = { topology: 1, physical: 1, demand: 1, initial: 1, fireflow: 1 };
+
+	// Every value this reader carries for the elements of one network (one scenario's view of the model), in this
+	// page's property names and the project's units, as { category: { 'n:ID' | 'l:ID': { prop: value } } }.
+	// What is compared against Base to find a scenario's or an alternative's differences. A property that
+	// starts with an underscore is read to be compared but cannot be carried (the report names it).
+	function allValues(net, ctx) {
+		var out = { physical: {}, initial: {}, topology: {}, fireflow: {}, demand: {} }, T = ctx.T, num = ctx.num, conv = ctx.conv;
+		function put(cat, key, prop, v) {
+			if (v === null || v === undefined || (typeof v === 'number' && !isFinite(v))) { return; }
+			(out[cat][key] || (out[cat][key] = {}))[prop] = v;
+		}
 		function n2(v, f, t) { var c = conv(v, f, t); return c === null ? null : Number(num(c)); }
+		function numOrNull(v) { return v === null || v === undefined ? null : Number(v); }
 		net.nodes.forEach(function (n) {
-			var id = ctx.nodeIdOf[n.e];
+			var id = ctx.nodeIdOf[n.e], key = 'n:' + id;
 			if (!id) { return; }
-			if (n.kind === 'junction') { put('n:' + id, 'elev', n2(n.elev, 'Physical_NodeElevation', T.len)); }
-			if (n.kind === 'reservoir') { put('n:' + id, 'head', n2(n.elev, 'Physical_NodeElevation', T.len)); }
+			put('topology', key, 'active', !!n.active);
+			if (n.kind === 'junction') {
+				put('physical', key, 'elev', n2(n.elev, 'Physical_NodeElevation', T.len));
+				var list = (n.demands || []).map(function (d) {
+					return Number(ctx.Q(d.q * (d.unit ? ctx.unitScale : 1), d.field || 'DemandCollection_BaseFlow'));
+				});
+				if (list.length <= 1) { put('demand', key, 'demand', list.length ? list[0] : 0); } else { put('demand', key, '_multi', JSON.stringify(list)); }
+				var pats = (n.demands || []).map(function (d) { return ctx.patternId(d.pat); });
+				if (pats.some(function (x) { return x; })) { put('demand', key, '_pat', pats.join(',')); }
+				if (ctx.get(n.e, ctx.sc, 'FireFlow_HasLocalFireFlowConstraints')) {
+					var q = ctx.get(n.e, ctx.sc, 'FireFlow_NeededFireFlow');
+					if (typeof q === 'number' && q > 0) { put('fireflow', key, 'fireFlow', Number(ctx.Q(q, 'FireFlow_NeededFireFlow'))); }
+				}
+			} else if (n.kind === 'reservoir') {
+				put('physical', key, 'head', n2(n.elev, 'Physical_NodeElevation', T.len));
+			} else {
+				var f = ctx.tankFacts(n, false), base = numOrNull(f.base);
+				put('physical', key, 'elev', base); put('physical', key, 'bottomElev', base);
+				put('physical', key, 'minLevel', numOrNull(f.minL)); put('physical', key, 'maxLevel', numOrNull(f.maxL));
+				put('physical', key, 'tankDiameter', numOrNull(f.diam)); put('physical', key, 'volCurve', f.curve || '');
+				put('initial', key, 'level', numOrNull(f.init));
+			}
 		});
 		net.links.forEach(function (l) {
-			var id = ctx.linkIdOf[l.e];
+			var id = ctx.linkIdOf[l.e], key = 'l:' + id;
 			if (!id) { return; }
-			put('l:' + id, 'diameter', n2(l.diameter, 'Physical_PipeDiameter', T.diam));
-			put('l:' + id, 'length', n2(l.length, l.lengthField, T.len));
-			if (ctx.headloss === 'D-W') { put('l:' + id, 'roughness', n2(l.dw, 'Physical_DarcyWeisbachE', T.rough)); }
-			else { put('l:' + id, 'roughness', l.hw === null || l.hw === undefined ? null : Number(num(ctx.headloss === 'C-M' ? l.n : l.hw))); }
-			put('l:' + id, 'k', l.k === null || l.k === undefined ? 0 : Number(num(l.k)));
+			put('physical', key, 'diameter', n2(l.diameter, 'Physical_PipeDiameter', T.diam));
+			put('physical', key, 'length', n2(l.length, l.lengthField, T.len));
+			if (ctx.headloss === 'D-W') { put('physical', key, 'roughness', n2(l.dw, 'Physical_DarcyWeisbachE', T.rough)); }
+			else { put('physical', key, 'roughness', l.hw === null || l.hw === undefined ? null : Number(num(ctx.headloss === 'C-M' ? l.n : l.hw))); }
+			put('physical', key, 'k', l.k === null || l.k === undefined ? 0 : Number(num(l.k)));
+			put('initial', key, 'status', l.closed ? 'closed' : 'open');
+			put('topology', key, 'active', !!l.active);
+		});
+		net.directed.forEach(function (d) {
+			var id = ctx.linkIdOf[d.e], key = 'l:' + id, sp = ctx.splitAt[d.e];
+			if (!id || !sp) { return; }
+			put('topology', key, 'active', !!d.active);
+			['n:' + sp.uId, 'n:' + sp.dId].forEach(function (nk) { put('physical', nk, 'elev', n2(d.elev, 'Physical_NodeElevation', T.len)); });
+			if (d.kind === 'pump') {
+				var pc = ctx.pumpDefCurves(d.def);
+				put('physical', key, 'curveId', pc.h || ''); put('physical', key, 'efficCurveId', pc.e || '');
+				put('initial', key, 'speed', d.speed === undefined || d.speed === null ? 1 : Number(d.speed));
+				put('initial', key, 'status', d.off ? 'closed' : 'open');
+			} else {
+				put('physical', key, 'diameter', n2(d.diameter, 'Physical_ValveDiameter', T.diam));
+				put('physical', key, 'k', Number(num(d.k || 0)));
+				if (d.vtype === 'GPV') { put('physical', key, 'curveId', ctx.gpvCurveId(d.gpvCurve) || ''); }
+				else { put('initial', key, 'setting', numOrNull(ctx.valveSettingOf(d, false))); }
+				put('initial', key, 'status', d.status === 2 ? 'closed' : 'open');
+			}
 		});
 		return out;
 	}
-
-	// A junction's demand rows as one scenario's Demand alternative gives them, as this page's flow
-	// numbers: { 'n:ID': [q, ...] }. Each row's flow is stored in ft3/s and goes through the same
-	// conversion the Base [JUNCTIONS] line uses (dev/sqlite-reader.md, "A scenario that overrides Demand").
-	function demandValues(net, ctx) {
-		var out = {};
-		net.nodes.forEach(function (n) {
-			var id = ctx.nodeIdOf[n.e];
-			if (!id || n.kind !== 'junction') { return; }
-			out['n:' + id] = (n.demands || []).map(function (d) {
-				return Number(ctx.Q(d.q * (d.unit ? ctx.unitScale : 1), d.field || 'DemandCollection_BaseFlow'));
+	function cloneVals(v) { return JSON.parse(JSON.stringify(v)); }
+	// What `a` states that `ref` does not, as { values: { category: { key: { prop: v } } }, lost: ['key prop', ...] }.
+	function diffVals(a, ref) {
+		var out = {}, lost = [];
+		Object.keys(a).forEach(function (cat) {
+			Object.keys(a[cat]).forEach(function (key) {
+				var mine = a[cat][key], theirs = (ref[cat] && ref[cat][key]) || {};
+				if (cat === 'demand' && mine._multi !== theirs._multi) { lost.push(key.slice(2) + ' (several demands)'); return; }
+				Object.keys(mine).forEach(function (prop) {
+					if (JSON.stringify(mine[prop]) === JSON.stringify(theirs[prop])) { return; }
+					if (prop.charAt(0) === '_') { if (prop === '_pat') { lost.push(key.slice(2) + ' (demand pattern)'); } return; }
+					((out[cat] || (out[cat] = {}))[key] || (out[cat][key] = {}))[prop] = mine[prop];
+				});
 			});
+		});
+		return { values: out, lost: lost };
+	}
+	function overlayVals(state, values) {
+		Object.keys(values).forEach(function (cat) {
+			Object.keys(values[cat]).forEach(function (key) {
+				var tgt = (state[cat] || (state[cat] = {}));
+				tgt[key] = Object.assign(tgt[key] || {}, values[cat][key]);
+			});
+		});
+	}
+	function flatten(values) {
+		var out = {};
+		Object.keys(values).forEach(function (cat) {
+			Object.keys(values[cat]).forEach(function (key) { out[key] = Object.assign(out[key] || {}, values[cat][key]); });
 		});
 		return out;
 	}
 
 	/**
-	 * The scenario tree beyond Base and the alternatives no scenario uses.
+	 * The scenario tree and the alternatives of a WaterGEMS model, as this page holds them
+	 * (dev/scenario-alternatives.md, "Stages 4 and 5: the stored tree"; dev/sqlite-reader.md).
 	 *
-	 * **A SCENARIO'S DIFFERENCES FROM BASE BECOME ITS OWN OVERRIDES.** Each scenario is read through
-	 * its own alternatives, element by element, and every Physical value that resolves differently
-	 * from Base is written as an override of that scenario; the alternatives themselves (names,
-	 * sharing) are not carried yet, and the report names them. Proven on a real child scenario
-	 * (dev/lpn-spike/wtg-tgh-harness.js): one diameter, one demand. A junction whose Demand differs from
-	 * Base's, one row each side, is an override of its `demand`.
+	 * **EVERY ALTERNATIVE A SCENARIO NAMES BECOMES A STORED ALTERNATIVE OF THE SAME NAME**, in the category
+	 * that matches its type (Physical, Demand, Initial settings, Fire flow, Active topology; Constituent,
+	 * Energy cost and User data by name only), holding only the values in which it differs from its parent
+	 * alternative, and hanging from that parent. A scenario names the alternatives it uses where they differ
+	 * from its parent scenario's, so an alternative two scenarios share is one record both name. A scenario's
+	 * parent is its parent scenario. **WHAT AN ALTERNATIVE CANNOT SAY IS A SCENARIO'S OWN OVERRIDE**: after
+	 * the alternatives are laid on, whatever still differs from what WaterGEMS computes for the scenario
+	 * (a tank's depth, which follows its base elevation) is written as the scenario's own override, so the
+	 * imported scenario always reads the values the model states. The scenario's `differences` (everything
+	 * that differs from Base) is kept beside it for the harnesses.
 	 *
-	 * **AN ALTERNATIVE NO SCENARIO USES** is carried as a stored alternative of its own (a root
-	 * alternative is a "Base of its own" here, `root: true`), holding every Physical value it states,
-	 * so it can be picked later. A child alternative hangs from its parent.
+	 * **AN ALTERNATIVE WITH NO PARENT** that is not Base's is "a Base of its own" (`root: true`) holding every
+	 * value it has rows for. An alternative no scenario uses is imported too, so a scenario can use it.
 	 */
-	function scenariosOf(ctx) {
-		var scenarios = [], alternatives = [], basePhys = physicalValues(ctx.baseNet, ctx), used = {};
-		var ids = Object.keys(ctx.scen).map(Number).sort(function (a, b) { return a - b; });
+	function treeOf(ctx) {
+		var scenarios = [], alternatives = [], used = {}, lostNames = [], nameOnly = [], noHome = [], roots = [], badAdj = [];
 		var basePicks = ctx.picksOf(ctx.scen[ctx.baseId]);
-		var namedAlts = [], otherCats = [], roots = [], badAdj = [], baseDem = demandValues(ctx.baseNet, ctx);
+		var baseVals = allValues(ctx.baseNet, Object.assign({}, ctx, { sc: ctx.scen[ctx.baseId] }));
+		function fakeWith(type, aid) {
+			var f = { id: -1, parent: null, picks: {}, local: {}, calc: {} };
+			Object.keys(basePicks).forEach(function (t) { f.picks[t] = basePicks[t]; f.local[t] = true; });
+			f.picks[type] = aid;
+			return f;
+		}
+		function netVals(sc) { return allValues(ctx.network(sc), Object.assign({}, ctx, { sc: sc })); }
+		var altVals = {};
+		function valsOfAlt(aid) {
+			if (!altVals[aid]) { altVals[aid] = netVals(fakeWith(ctx.alts[aid].type, aid)); }
+			return altVals[aid];
+		}
+		function importable(aid) {
+			var a = ctx.alts[aid];
+			return !!(a && !a.deleted && NATIVE_CAT[a.type] && basePicks[a.type] !== aid);
+		}
+		function parentOf(aid) {   // the parent alternative that is itself imported; null when it hangs from Base
+			var a = ctx.alts[aid], p = a.parent;
+			return (p !== null && p !== undefined && p !== basePicks[a.type] && importable(p)) ? p : null;
+		}
+		function isRoot(aid) { var a = ctx.alts[aid]; return a.parent === null || a.parent === undefined; }
+		var diffOfAlt = {};
+		function diffAlt(aid) {
+			if (!diffOfAlt[aid]) {
+				var p = parentOf(aid);
+				diffOfAlt[aid] = diffVals(valsOfAlt(aid), p === null ? baseVals : valsOfAlt(p));
+			}
+			return diffOfAlt[aid];
+		}
+		// The elements that have rows of their own at an alternative (a root alternative states every value
+		// it has rows for, and no others).
+		function hasRows(aid) {
+			var has = {}, type = ctx.alts[aid].type;
+			Object.keys(READ_TABLES).forEach(function (t) {
+				if (!ctx.M.has(t) || !ctx.M.cols[t].DomainElementID || !ctx.M.cols[t].AlternativeID) { return; }
+				var m = ctx.index(t);
+				if (ctx.tableType[t] !== type) { return; }
+				Object.keys(m).forEach(function (e) { if (m[e][aid] !== undefined) { has[e] = true; } });
+			});
+			return has;
+		}
+		function keyToElement() {
+			var map = {};
+			Object.keys(ctx.nodeIdOf).forEach(function (e) { map['n:' + ctx.nodeIdOf[e]] = e; });
+			Object.keys(ctx.linkIdOf).forEach(function (e) { map['l:' + ctx.linkIdOf[e]] = e; });
+			Object.keys(ctx.splitAt).forEach(function (e) { map['n:' + ctx.splitAt[e].uId] = e; map['n:' + ctx.splitAt[e].dId] = e; });
+			return map;
+		}
+		// The stored record of each imported alternative (values filled in when the records are made).
+		var recOf = {};
+		function valuesOfRecord(aid) {
+			var cat = NATIVE_CAT[ctx.alts[aid].type], byKey = {};
+			if (!READ_CATS[cat]) { return {}; }
+			if (isRoot(aid)) {
+				var has = hasRows(aid), k2e = keyToElement(), full = valsOfAlt(aid)[cat] || {};
+				Object.keys(full).forEach(function (key) { if (has[k2e[key]]) { byKey[key] = full[key]; } });
+			} else {
+				byKey = (diffAlt(aid).values[cat]) || {};
+			}
+			return cloneVals(byKey);
+		}
+		// Which stored values an alternative's chain gives a category, laid onto a copy of Base's.
+		function chainOf(aid) {
+			var chain = [], g = 0;
+			while (aid !== null && g++ < 64) { chain.unshift(aid); aid = parentOf(aid); }
+			return chain;
+		}
+		function applyChain(state, aid) {
+			var cat = NATIVE_CAT[ctx.alts[aid].type];
+			state[cat] = cloneVals(baseVals[cat] || {});
+			if (!READ_CATS[cat]) { return; }
+			chainOf(aid).forEach(function (a) {
+				var vals = {};
+				vals[cat] = valuesOfRecord(a);
+				overlayVals(state, vals);
+			});
+		}
+		var made = {};
+		function recordFor(aid) {
+			if (made[aid]) { return made[aid]; }
+			var a = ctx.alts[aid], cat = NATIVE_CAT[a.type], p = parentOf(aid);
+			var rec = { fileId: aid, name: a.name, category: cat, values: {} };
+			if (p !== null) { rec.parentFileId = p; recordFor(p); }
+			else if (isRoot(aid)) { rec.root = true; }
+			rec.values = valuesOfRecord(aid);
+			if (READ_CATS[cat]) { diffAlt(aid).lost.forEach(function (x) { lostNames.push(a.name + ': ' + x); }); }
+			else { nameOnly.push(a.name + ' (' + (ALT_TYPE_NAME[a.type] || a.type) + ')'); }
+			made[aid] = rec;
+			return rec;
+		}
+
+		var ids = Object.keys(ctx.scen).map(Number).sort(function (a, b) { return a - b; });
 		ids.forEach(function (sid) {
-			var picks = ctx.picksOf(ctx.scen[sid]);
-			Object.keys(picks).forEach(function (t) { if (picks[t] !== null) { used[picks[t]] = true; } });
-			if (sid === ctx.baseId) { return; }
-			var s = ctx.scen[sid], rec = { fileId: sid, name: s.name, parentName: null, overrides: {} };
-			if (s.parent && s.parent !== ctx.baseId && ctx.scen[s.parent]) { rec.parentName = ctx.scen[s.parent].name; rec.parentFileId = s.parent; }
+			var pk = ctx.picksOf(ctx.scen[sid]);
+			Object.keys(pk).forEach(function (t) { if (pk[t] !== null) { used[pk[t]] = true; } });
+		});
+		var built = {};
+		function build(sid) {
+			if (built[sid]) { return built[sid]; }
+			var s = ctx.scen[sid], P = (s.parent && s.parent !== ctx.baseId && ctx.scen[s.parent]) ? ctx.scen[s.parent] : null;
+			built[sid] = { picks: ctx.picksOf(s), final: baseVals, pending: true };   // a parent loop falls back to Base
+			var up = P ? build(P.id) : null;
+			var picks = built[sid].picks, rec = { fileId: sid, name: s.name, parentName: null, overrides: {}, alternatives: {} };
+			if (P) { rec.parentName = P.name; rec.parentFileId = P.id; }
 			if (!s.parent) { roots.push(s.name); }
-			// Demand: a scenario's own adjustment, as the Demand Multiplier it overrides (the page's scenario
-			// record holds it as demandMultiplier).
+			var state = cloneVals(up ? up.final : baseVals);
 			var da = ctx.demand.adjust(s), dm = ctx.demand.multOf(da, ctx.demand.hasUnit, ctx.demand.hasNormal);
 			if (dm !== ctx.demand.base) { rec.demandMultiplier = dm; }
 			if (da.bad || (ctx.demand.hasUnit && ctx.demand.hasNormal && da.unit / (da.normal || 1) !== ctx.demand.adjBase.unit / (ctx.demand.adjBase.normal || 1))) { badAdj.push(s.name); }
 			Object.keys(picks).forEach(function (t) {
-				if (picks[t] === basePicks[t]) { return; }
-				if (Number(t) === 20) { return; }   // the Demand category is read below
-				if (Number(t) === 4) { namedAlts.push(s.name + ': ' + (ctx.alts[picks[t]] ? ctx.alts[picks[t]].name : picks[t])); }
-				else { otherCats.push(s.name + ': ' + (ctx.alts[picks[t]] ? ctx.alts[picks[t]].name : picks[t]) + ' (' + (ALT_TYPE_NAME[t] || t) + ')'); }
+				var pS = picks[t], pP = up ? up.picks[t] : basePicks[t], cat = NATIVE_CAT[t];
+				if (pS === pP || pS === null) { return; }
+				if (!cat) { noHome.push(s.name + ': ' + (ctx.alts[pS] ? ctx.alts[pS].name : pS) + ' (' + (ALT_TYPE_NAME[t] || t) + ')'); return; }
+				if (pS === basePicks[t]) {
+					rec.alternatives[cat] = 'base';
+					state[cat] = cloneVals(baseVals[cat] || {});
+					return;
+				}
+				if (!importable(pS)) { noHome.push(s.name + ': ' + (ctx.alts[pS] ? ctx.alts[pS].name : pS) + ' (' + (ALT_TYPE_NAME[t] || t) + ')'); return; }
+				recordFor(pS);
+				rec.alternatives[cat] = pS;
+				applyChain(state, pS);
 			});
-			if (picks[4] !== basePicks[4]) {
-				var mine = physicalValues(ctx.network(s), ctx);
-				Object.keys(mine).forEach(function (key) {
-					Object.keys(mine[key]).forEach(function (prop) {
-						var b = basePhys[key] && basePhys[key][prop];
-						if (b !== mine[key][prop]) { (rec.overrides[key] || (rec.overrides[key] = {}))[prop] = mine[key][prop]; }
-					});
-				});
-			}
-			// Demand: a junction whose demand differs from Base's. One demand row each side: an override of
-			// the junction's demand. Several rows: not carried, and named.
-			if (picks[20] !== basePicks[20]) {
-				var dmine = demandValues(ctx.network(s), ctx), nameD = ctx.alts[picks[20]] ? ctx.alts[picks[20]].name : picks[20];
-				Object.keys(dmine).forEach(function (key) {
-					var a = baseDem[key] || [], b = dmine[key];
-					if (JSON.stringify(a) === JSON.stringify(b)) { return; }
-					if (a.length <= 1 && b.length <= 1) { (rec.overrides[key] || (rec.overrides[key] = {})).demand = b.length ? b[0] : 0; }
-					else { otherCats.push(s.name + ': ' + nameD + ' (Demand, ' + key.slice(2) + ' has several demands)'); }
-				});
-			}
-			scenarios.push(rec);
+			var truth = netVals(s);
+			rec.overrides = flatten(diffVals(truth, state).values);
+			rec.differences = flatten(diffVals(truth, baseVals).values);
+			built[sid].final = truth;
+			built[sid].rec = rec;
+			return built[sid];
+		}
+		ids.forEach(function (sid) {
+			if (sid === ctx.baseId) { return; }
+			scenarios.push(build(sid).rec);
 		});
+		// Alternatives no scenario uses are imported too, so a scenario can use them.
+		var unused = [];
+		Object.keys(ctx.alts).map(Number).sort(function (a, b) { return a - b; }).forEach(function (aid) {
+			if (!importable(aid)) { return; }
+			var had = !!made[aid];
+			recordFor(aid);
+			if (!used[aid] && !had) { unused.push(ctx.alts[aid].name); }
+		});
+		Object.keys(made).map(Number).sort(function (a, b) { return a - b; }).forEach(function (aid) { alternatives.push(made[aid]); });
 		if (roots.length) { ctx.note('wtg-scenario-root', roots); }
 		if (badAdj.length) { ctx.note('wtg-demand-adjustments', badAdj); }
-		if (namedAlts.length) { ctx.note('wtg-scenario-alternative', namedAlts); }
-		if (otherCats.length) { ctx.note('wtg-scenario-category', otherCats); }
-
-		// Alternatives no live scenario uses, Physical only.
-		Object.keys(ctx.alts).map(Number).sort(function (a, b) { return a - b; }).forEach(function (aid) {
-			var a = ctx.alts[aid];
-			if (a.deleted || used[aid] || a.type !== 4) { return; }
-			var fake = { id: -1, parent: null, picks: {}, local: {}, calc: {} };
-			Object.keys(basePicks).forEach(function (t) { fake.picks[t] = basePicks[t]; fake.local[t] = true; });
-			fake.picks[4] = aid;
-			var vals = physicalValues(ctx.network(fake), ctx), rec = { fileId: aid, name: a.name, category: 'physical', values: {} };
-			if (a.parent && ctx.alts[a.parent] && a.parent !== basePicks[4]) { rec.parentFileId = a.parent; }
-			if (!a.parent) {
-				// A root alternative states every value: carry them all, as a Base of its own does.
-				rec.root = true;
-				// Only the elements it has rows for: an element added after it was made has none.
-				var has = {};
-				['BaseIdahoNode_Physical_Data', 'IdahoPipe_Physical_Data', 'BaseLink_Physical_Data'].forEach(function (t) {
-					var m = ctx.index(t);
-					Object.keys(m).forEach(function (e) { if (m[e][aid] !== undefined) { has[e] = true; } });
-				});
-				Object.keys(vals).forEach(function (key) {
-					var eid = null;
-					Object.keys(ctx.nodeIdOf).forEach(function (e) { if ('n:' + ctx.nodeIdOf[e] === key) { eid = e; } });
-					Object.keys(ctx.linkIdOf).forEach(function (e) { if ('l:' + ctx.linkIdOf[e] === key) { eid = e; } });
-					if (eid !== null && has[eid]) { rec.values[key] = vals[key]; }
-				});
-			} else {
-				Object.keys(vals).forEach(function (key) {
-					Object.keys(vals[key]).forEach(function (prop) {
-						var b = basePhys[key] && basePhys[key][prop];
-						if (b !== vals[key][prop]) { (rec.values[key] || (rec.values[key] = {}))[prop] = vals[key][prop]; }
-					});
-				});
-			}
-			alternatives.push(rec);
-		});
-		if (alternatives.length) { ctx.note('wtg-alternative-unused', alternatives.map(function (r) { return r.name; })); }
+		if (noHome.length) { ctx.note('wtg-scenario-category', noHome); }
+		if (nameOnly.length) { ctx.note('wtg-alternative-nameonly', nameOnly); }
+		if (lostNames.length) { ctx.note('wtg-alternative-partial', lostNames); }
+		if (unused.length) { ctx.note('wtg-alternative-unused', unused); }
+		if (alternatives.length) { ctx.note('wtg-alternatives', alternatives.map(function (r) { return r.name + ' (' + (ALT_TYPE_NAME[ctx.alts[r.fileId].type] || r.category) + ')'; })); }
 		if (ctx.activeId && ctx.activeId !== ctx.baseId && ctx.scen[ctx.activeId]) { ctx.note('wtg-active-scenario', [ctx.scen[ctx.activeId].name]); }
 		return { scenarios: scenarios, alternatives: alternatives };
 	}
