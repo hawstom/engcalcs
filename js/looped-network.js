@@ -13626,15 +13626,16 @@ var EngCalcs = EngCalcs || {};
 				'class': 'lpn-vhandle', 'data-link': l.id, 'data-vidx': i
 			}, linksLayer));
 		}
-		// Flow-direction arrows, matching EPANET: an open chevron ">" per POLYLINE SEGMENT, so a bent
-		// pipe gets one arrow on each straight run. NOT a filled triangle -- that reads as absorbed
-		// into the pipe's own colour. Hidden until a solve result exists. Points +x by default,
-		// protruding to +-1.2 world units; positioned and rotated entirely via `transform` in
-		// updateArrow(), never via its own x/y/points.
+		// Flow-direction arrows: a NOTCHED DART per POLYLINE SEGMENT: one unfilled closed head, tip
+		// forward, two barbs swept back and joined at a notch on the shaft (Tom, 2026-10-20: a plain
+		// open ">" was mistaken for a label leader; his drawing /tmp/arrow.png). A bent pipe gets one on each straight run. NOT filled -- that reads as
+		// absorbed into the pipe's own colour. Hidden until a solve result exists. Points +x by
+		// default, tip at +0.8 on the pipe line, barbs at -0.8 and +-1.0 across, notch at -0.3;
+		// positioned and rotated entirely via `transform` in updateArrow(), never via its own x/y.
 		var segCount = l.verts.length + 1, arrows = [], j;
 		for (j = 0; j < segCount; j++) {
-			arrows.push(annotationEl('polyline', {
-				points: '-0.8,-1.2 0.8,0 -0.8,1.2', fill: 'none',
+			arrows.push(annotationEl('path', {
+				d: 'M0.8,0 L-0.8,-1 L-0.3,0 L-0.8,1 Z', fill: 'none',
 				'class': 'lpn-arrow', 'data-link': l.id, style: 'display:none'
 			}, linksLayer));
 		}
@@ -46381,7 +46382,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			ta.textContent = pc.lpn_msx_report_kept || 'This EPANET-MSX file is kept with the project and written back unchanged when the EPANET-MSX file is exported. Water quality is set to Multi-species (EPANET-MSX) under Settings, Calculation, Quality, so an extended period simulation runs every species in the file.';
 			body.appendChild(ta);
 		}, [
-			{ label: pc.lpn_msx_replace || 'Replace…', fn: function () { setTimeout(pickMsxFile, 0); } },
+			{ label: (pc.lpn_replace_btn || 'Replace') + '…', fn: function () { setTimeout(pickMsxFile, 0); } },
 			{ label: pc.lpn_fitting_remove || 'Remove', fn: function () {
 				saveUndoSnapshot();
 				doc.msx = null;
@@ -62853,6 +62854,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		head = sec && sec.querySelector ? sec.querySelector('.lpn-set-head') : null;
 		target.style.scrollMarginTop =
 			(head && head !== target ? Math.ceil(head.getBoundingClientRect().height) : 0) + 'px';
+		// **A SECTION HEADING IS STICKY, SO IT IS NEVER THE THING TO SCROLL TO.** One whose section
+		// is already scrolled past rides at the BOTTOM of that section, and scrollIntoView() aims at
+		// where an element is now: the jump then showed only the end of the section (Tom: Map, from
+		// a lower section). The section's own top edge is where its heading really begins.
+		if (head && head === target && sec.scrollIntoView) { target = sec; }
 		target.scrollIntoView({ block: 'start' });
 	}
 	function setboxEl() { return document.getElementById('lpn_settings_box'); }
@@ -77994,7 +78000,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!ffRunUi) { return; }
 		ffRunUi.fill.style.width = Math.round(1000 * f) / 10 + '%';
 		ffRunUi.track.setAttribute('aria-valuenow', String(Math.round(1000 * f)));
-		ffRunUi.count.textContent = pc.lpn_eps_working || 'Running the extended-period simulation.';
+		ffRunUi.count.textContent = pc.lpn_time_running || 'Running the extended period simulation.';
 		ffRunUi.tally.textContent = '';
 	}
 

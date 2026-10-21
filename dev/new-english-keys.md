@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**8 still to read on master**, of 174 untranslated keys, of 3193 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**8 still to read on master**, of 172 untranslated keys, of 3191 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (174, 8 to read @@ NEEDS RULING)
+## lpn_  (172, 8 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -159,9 +159,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-20._
 - **`lpn_dur_start`**
   > Fire starts at
-  _Ruled OK 2026-10-20._
-- **`lpn_eps_working`**
-  > Running the extended-period simulation.
   _Ruled OK 2026-10-20._
 - **`lpn_ex_net1_scn_desc`**
   > Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.
@@ -397,9 +394,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_msx_removed`**
   > Removed {file} from this project.
   _Ruled OK 2026-10-20._
-- **`lpn_msx_replace`**
-  > Replace…
-  _Ruled OK 2026-10-20._
 - **`lpn_msx_report_heading`**
   > Attached {file}
   _Ruled OK 2026-10-20._
@@ -583,7 +577,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Update from GeoJSON file
   @@ NEEDS RULING
 
-### feat/import-export-menu (`fc45cda4b`) — adds no English strings
+### feat/import-export-menu (`1913fb732`) — adds no English strings
 
 ### feat/sqlite-reader (`18e70d1f5`) — 53 new, 10 to read @@ NEEDS RULING
 

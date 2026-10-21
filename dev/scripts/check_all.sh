@@ -503,6 +503,7 @@ run_check "stale claim selftest"         blocking php dev/scripts/stale_claim_se
 # that never shipped, and cannot go quietly stale after somebody edits the source.
 run_check "features list fresh"          blocking php dev/scripts/generate_features.php --check
 run_check "new english keys listed"     blocking php dev/scripts/new_english_keys.php --check
+run_check "new keys not duplicates"    blocking php dev/scripts/new_key_duplicate_check.php
 
 # Tom, 2026-09-06: *"dev/new-english-keys.md: I edited it. I already ruled on many of these. You are
 # losing my rulings."* Third time. The --write refusal above already stops a regeneration from
