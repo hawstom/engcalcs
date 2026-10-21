@@ -3246,7 +3246,7 @@ var EngCalcs = EngCalcs || {};
 			// The staircase, as drawn: a stack hung left of its point is drawn with its rows flush
 			// against the point (layoutLinkLabelAt()), as Collide.labelLineBoxes() models it.
 			out.push({ w: w, h: h, lines: rows, nVal: q.lines.length, area: area,
-				form: { lines: q.lines, stacked: q.stacked, key: levelFormKey(q.lines, q.stacked), wPx: q.m.wPx } });
+				form: { lines: q.lines, stacked: q.stacked, key: levelFormKey(q.lines, q.stacked), wPx: q.m.wPx, rowWPx: q.m.rowWPx || null } });
 		});
 		out.sort(function (a, b) { return (b.nVal - a.nVal) || (a.area - b.area) || ((a.form.stacked ? 1 : 0) - (b.form.stacked ? 1 : 0)); });
 		return out;
@@ -3849,12 +3849,24 @@ var EngCalcs = EngCalcs || {};
 			lh = fs * 1.2,
 			rowsPx = (hold && hold.rowWPx && hold.rowWPx.length) ? hold.rowWPx : null,
 			wPx = (hold && (hold.twPx || hold.widthPx)) || 0,
+			form = (hold && hold.text === textEl && hold.levelBeside && hold.levelForm && hold.levelGlyphs === hold.levelForm.key) ? hold.levelForm : null,
 			n = rowsPx ? rowsPx.length : labelHitRowCount(textEl),
 			hAlign = textEl.getAttribute('text-anchor') || 'start',
 			db = textEl.getAttribute('dominant-baseline'),
 			vAlign = db === 'hanging' ? 'hanging' : (db === 'central' ? 'middle' : 'baseline'),
 			wMax = rowsPx ? Math.max.apply(null, rowsPx) / s : wPx / s,
 			box, d = '', i, rw, rx, ry, tr;
+		// **A LEVEL PIPE LABEL SHOWN IN ANOTHER FORM IS GRABBED AS THAT FORM** (syncLevelGlyphs()).
+		// The holder's banked widths belong to the content the shed settled on; the level pass then
+		// writes a different form (the whole line, or a stack) into the same <text> without measuring
+		// it, so the banked figures describe words that are no longer drawn -- on Net3 a 118 px line
+		// was grabbed over 53 px of it. The form carries the widths it was priced from.
+		if (form) {
+			wPx = form.wPx;
+			rowsPx = (form.stacked && form.rowWPx && form.rowWPx.length > 1) ? form.rowWPx : [form.wPx];
+			n = rowsPx.length;
+			wMax = Math.max.apply(null, rowsPx) / s;
+		}
 		// An EMPTY label has no words to grab. Its banked width is whatever it last said, so
 		// without this a label the toggles just emptied would keep a phantom box on the map.
 		if (!(wMax > 0) || !String(textEl.textContent || '').length) { hit.setAttribute('d', ''); return; }
