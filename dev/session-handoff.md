@@ -101,11 +101,6 @@ lines rather than appending corrections.
 
 - Production is what he last pulled; epanet-plus-plus.org/app was at c375f221 on 2026-10-21.
 - **Canonical landing page is now epanet-plus-plus.org** (Tom, MCP interview m5). Push it like the others.
-- Two production reports did NOT reproduce headlessly (Chromium, many sizes, DPR, throttle, themes):
-  the bottom pane taking ~4.5 s per open/close after the first on Net3, and the cursor lagging on the
-  first half of Net3 link 233. Both measured at 15-180 ms. Waiting on his browser, OS, a private
-  window with extensions off, and ideally a DevTools Performance recording. `fix/bottom-pane-lag`
-  holds only a ceiling harness (`bottom-pane-toggle-lag-harness.js`, passes on master); not merged.
 - Key audit deleted `lpn_eps_working` and `lpn_msx_replace` (untranslated duplicates) and added the
   blocking check `new keys not duplicates` (`new_key_duplicate_check.php`, with an allow-list).
 - Interview answers (Tasks 818, 819) are on the roadmap. MCP is slow; WaterGEMS and performance first.
