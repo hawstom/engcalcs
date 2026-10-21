@@ -105,7 +105,7 @@ const EC_DYNAMIC_STORAGE_SITES = [
         'names'   => ['lpn_pane', 'lpn_rpane', 'lpn_panecols', 'lpn_setbox', 'lpn_findbox', 'lpn_libbox',
             'lpn_ffbox', 'lpn_energybox', 'lpn_cmpbox', 'lpn_reportbox', 'lpn_statusbox', 'lpn_fullbox',
             'lpn_contourbox', 'lpn_notesbox', 'lpn_hotkeysbox', 'lpn_snipbox', 'lpn_runbox',
-            'lpn_scnbasic', 'lpn_areahint', 'lpn_survey_format', 'bpn_sketch_toggles', 'lpn_dockbox',
+            'lpn_scnbasic', 'lpn_areahint', 'lpn_calchint', 'lpn_survey_format', 'bpn_sketch_toggles', 'lpn_dockbox',
             'lpn_smbox', 'lpn_paneboxes'],
         'literal' => true,
         'workspace' => true,
