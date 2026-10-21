@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**11 still to read on master**, of 222 untranslated keys, of 3241 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**10 still to read on master**, of 221 untranslated keys, of 3240 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (222, 11 to read @@ NEEDS RULING)
+## lpn_  (221, 10 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -559,9 +559,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_wtg_note_alternative_nameonly`**
   > These alternatives were imported by name only, so that each scenario keeps its choice of them. Their values were not imported, because this page does not read that kind of data from a WaterGEMS model.
   @@ NEEDS RULING
-- **`lpn_wtg_note_alternative_partial`**
-  > Not imported: these differences between an alternative and its parent, which this page cannot hold (several demands at a junction, or a demand pattern). The rest of the alternative was imported.
-  @@ NEEDS RULING
 - **`lpn_wtg_note_alternative_unused`**
   > No scenario uses these alternatives. Each was imported as an alternative of its own, so that a scenario can use it.
   @@ NEEDS RULING
@@ -735,6 +732,6 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-margin (`ab69e6389`) — adds no English strings
 
-### feat/sqlite-reader (`42a4e1785`) — adds no English strings
+### feat/sqlite-reader (`241ec747a`) — adds no English strings
 
 ### fix/settings-index-scroll (`17325746b`) — adds no English strings

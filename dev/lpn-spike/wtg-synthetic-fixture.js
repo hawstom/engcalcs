@@ -253,6 +253,12 @@ x('INSERT INTO IdahoDemandNode_Demand_DemandCollection VALUES (4,104,74,?,NULL)'
 scen(62, 58, 'Shared A', {4: 70, 21: 73, 22: 75})
 scen(63, 60, 'Deep', {4: 72, 20: 74, 24: 76})
 scen(64, 61, 'Reset', {4: 34})
+alt(77, 35, 20, 'Three at J1')
+x("INSERT INTO IdahoDemandNode_Demand_Data VALUES (101,77,'',3,0)")
+x('INSERT INTO IdahoDemandNode_Demand_DemandCollection VALUES (5,101,77,?,200)', (3.0 * L,))
+x('INSERT INTO IdahoDemandNode_Demand_DemandCollection VALUES (6,101,77,?,NULL)', (1.0 * L,))
+x('INSERT INTO IdahoDemandNode_Demand_DemandCollection VALUES (7,101,77,?,NULL)', (0.5 * L,))
+scen(65, 58, 'Busy', {20: 77})
 `;
 }
 module.exports = { buildSyntheticWtg, unitDemandExtra, alternativesExtra };

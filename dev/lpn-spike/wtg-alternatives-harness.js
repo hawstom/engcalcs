@@ -80,7 +80,7 @@ async function tree() {
 	const sc = (name) => r.scenarios.filter((x) => x.name === name)[0] || {};
 	const alt = (fileId) => r.alternatives.filter((x) => x.fileId === fileId)[0] || {};
 	const shared = sc('Shared A'), small = sc('Peak, small main'), deep = sc('Deep'), reset = sc('Reset');
-	ok('five scenarios beyond Base', r.scenarios.length === 5, r.scenarios.map((x) => x.name).join());
+	ok('six scenarios beyond Base', r.scenarios.length === 6, r.scenarios.map((x) => x.name).join());
 	ok('"Shared A" and "Peak, small main" name the same Physical alternative, one record', shared.alternatives.physical === small.alternatives.physical && alt(shared.alternatives.physical).name === 'Small main' &&
 		r.alternatives.filter((x) => x.name === 'Small main').length === 1, JSON.stringify([shared.alternatives, small.alternatives]));
 	ok('"Smaller P3" hangs from "Small main" and holds only P3', alt(deep.alternatives.physical).name === 'Smaller P3' && alt(deep.alternatives.physical).parentFileId === small.alternatives.physical &&
@@ -89,6 +89,11 @@ async function tree() {
 		JSON.stringify(alt(shared.alternatives.initial)));
 	ok('"Hot J3" is a Demand alternative holding J_3 at 3', alt(deep.alternatives.demand).category === 'demand' && JSON.stringify(alt(deep.alternatives.demand).values) === '{"n:J_3":{"demand":3}}',
 		JSON.stringify(alt(deep.alternatives.demand)));
+	const busy = sc('Busy');
+	ok('"Three at J1" holds J1\'s whole list of three demands, with the pattern of the first', alt(busy.alternatives.demand).name === 'Three at J1' &&
+		JSON.stringify(alt(busy.alternatives.demand).values['n:J1']) && alt(busy.alternatives.demand).values['n:J1'].demands &&
+		alt(busy.alternatives.demand).values['n:J1'].demands.map((d) => d.base).join() === '3,1,0.5' && !!alt(busy.alternatives.demand).values['n:J1'].demands[0].pattern &&
+		alt(busy.alternatives.demand).values['n:J1'].demands[1].pattern === null, JSON.stringify(alt(busy.alternatives.demand)));
 	ok('"Chlorine 1" (Constituent) is carried by name, with no values', alt(deep.alternatives.constituent).name === 'Chlorine 1' && alt(deep.alternatives.constituent).category === 'constituent' &&
 		!Object.keys(alt(deep.alternatives.constituent).values).length);
 	ok('"Deep" is a child of Peak, "Reset" a child of "Peak, small main", "Shared A" a child of Base', deep.parentName === 'Peak' && reset.parentName === 'Peak, small main' && shared.parentName === null);
@@ -106,7 +111,7 @@ async function tree() {
 	L.seedDefaultInputs();
 	ok('lands', !!L.landWtgResult(r, 'Alternatives.wtg.sqlite'));
 	const doc = L.getDoc(), scns = L.getScenarios(), byName = (n) => scns.filter((x) => x.name === n)[0];
-	ok('six alternatives are stored (Rehab, which no scenario uses, among them)', (doc.alternatives || []).length === 6, (doc.alternatives || []).map((a) => a.name).join());
+	ok('seven alternatives are stored (Rehab, which no scenario uses, among them)', (doc.alternatives || []).length === 7, (doc.alternatives || []).map((a) => a.name).join());
 	ok('the two scenarios that share "Small main" name one stored record', byName('Shared A').alternatives.physical === byName('Peak, small main').alternatives.physical);
 	const stored = (id) => (doc.alternatives || []).filter((a) => a.id === id)[0] || {};
 	ok('"Smaller P3" is stored with "Small main" as its parent', stored(byName('Deep').alternatives.physical).parent === byName('Shared A').alternatives.physical);
@@ -121,6 +126,9 @@ async function tree() {
 		L.effective(L.nodeById('J_3'), 'demand') === 3 && L.effective(L.linkById('P4'), 'status') === 'open');
 	ok('Peak, small main: P2 200, P3 250', dia('Peak, small main', 'P2') === 200 && L.effective(L.linkById('P3'), 'diameter') === 250);
 	ok('Reset: P2 back to 300', dia('Reset', 'P2') === 300);
+	L.switchScenario(byName('Busy').id);
+	const rows = L.effective(L.nodeById('J1'), 'demands');
+	ok('Busy: J1 has three demands, 3, 1 and 0.5 L/s, the first on the pattern', Array.isArray(rows) && rows.length === 3 && rows.map((x) => x.base).join() === '3,1,0.5' && !!rows[0].pattern, JSON.stringify(rows));
 	fs.rmSync(tmp, { recursive: true, force: true });
 }
 

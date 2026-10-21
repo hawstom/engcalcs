@@ -281,8 +281,8 @@ described here held in both. Every statement below is OBSERVED in this file.
   `DemandCollectionCount` 1, where Base has 0) **with its `IdahoDemandNode_Demand_DemandCollection`
   row** (`DemandCollection_BaseFlow` 2.785 ft3/s = 1250 gpm). J-2 has no row at alternative 36 and
   keeps Base's. The reader writes a junction whose demand list differs from Base's, with one row
-  each side, as an override of that junction's `demand`; several rows each side are named in the
-  report (`wtg-alternative-partial`), not carried.
+  each side and the same pattern, as that junction's `demand`; any other difference (several rows, or
+  another pattern) as the junction's whole `demands` list, the way the page holds a scenario's own demand table.
 - **Results** are in the `.out`/`.rpc`/`.dwh` files beside the model, not in the sqlite.
 - **Coordinates and elevations here** are in the `.wtg`'s display units (GPM, feet); the export's
   coordinates are in feet with fifteen digits, the reader's with ten.
@@ -339,8 +339,8 @@ OBSERVED in it. `node dev/lpn-spike/wtg-tgh-harness.js` compares the reader with
   reservoir head, tank base elevation (both `elev` and `bottomElev`, as import writes them), levels, diameter and
   volume curve, pipe diameter, length, roughness and minor loss, valve diameter and minor loss, pump and GPV
   curve references, the elevation of the two junctions beside a pump or valve. Initial settings: pipe, valve
-  and pump status, valve setting, pump speed, tank depth. Demand: a junction's one demand (several demands at a
-  junction, and a demand pattern, are named, not carried). Fire flow: a junction's needed flow. Active topology:
+  and pump status, valve setting, pump speed, tank depth. Demand: a junction's demand, or its whole list of
+  demands where there are several or the pattern differs. Fire flow: a junction's needed flow. Active topology:
   active or not. Of these only Physical and Demand have a real sample (TGH-1); the rest are built from the schema
   and held by a synthetic model (`wtg-alternatives-harness.js`, section 2), **untested on real data**.
 - **Proof**: `wtg-alternatives-harness.js` imports TGH-1 into the page, opens Base and then TGH-1, and reads 211
@@ -349,9 +349,8 @@ OBSERVED in it. `node dev/lpn-spike/wtg-tgh-harness.js` compares the reader with
 
 ## Unproven, and the sample that would prove it
 
-- **A scenario that overrides Physical data in more than a diameter, or a Demand alternative that
-  changes a junction with several demand rows.** The first is read the same way for every Physical
-  column (proved for one pipe's diameter); the second is named in the report, not carried.
+- **A Demand alternative that changes a junction with several demand rows** is carried as the junction's
+  whole `demands` list (synthetic model only; Tom's sample changes single demands).
   Alternatives other than Physical and Demand are built from the schema (synthetic model only); Geometry,
   Topology, Operational, Age, Trace and the other types with no counterpart are named in the report.
 - **US-unit models end to end** (Tnet3 is GPM-era data shown in L/s; no sample is a US model with its

@@ -5045,7 +5045,6 @@ $ec_lang['lpn_wtg_note_unit_unknown']='Not converted: these fields, whose stored
 $ec_lang['lpn_wtg_note_unit_assumed']='The file does not state the stored unit of these fields, so the unit every example file states was assumed.';
 $ec_lang['lpn_wtg_note_cv_closed']='These pipes have a check valve and start closed. They were imported closed.';
 $ec_lang['lpn_wtg_note_alternative_nameonly']='These alternatives were imported by name only, so that each scenario keeps its choice of them. Their values were not imported, because this page does not read that kind of data from a WaterGEMS model.';
-$ec_lang['lpn_wtg_note_alternative_partial']='Not imported: these differences between an alternative and its parent, which this page cannot hold (several demands at a junction, or a demand pattern). The rest of the alternative was imported.';
 $ec_lang['lpn_wtg_note_pump_battery']='These variable speed pump batteries were imported as one pump each at relative speed 1, as WaterGEMS writes them to an EPANET file. Their lag pumps and speed control were not imported.';
 $ec_lang['lpn_gjnet_refuse_crs']='{file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.';
 $ec_lang['lpn_gjnet_refuse_empty']='{file} contains no points or lines.';

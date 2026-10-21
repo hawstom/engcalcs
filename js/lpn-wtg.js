@@ -1295,12 +1295,12 @@
 			put('topology', key, 'active', !!n.active);
 			if (n.kind === 'junction') {
 				put('physical', key, 'elev', n2(n.elev, 'Physical_NodeElevation', T.len));
-				var list = (n.demands || []).map(function (d) {
-					return Number(ctx.Q(d.q * (d.unit ? ctx.unitScale : 1), d.field || 'DemandCollection_BaseFlow'));
+				// The demand rows in this page's flow numbers (one conversion, the one the Base [JUNCTIONS] line uses),
+				// each with its pattern ID; a junction with none has one row of 0.
+				var rows = (n.demands || []).map(function (d) {
+					return { base: Number(ctx.Q(d.q * (d.unit ? ctx.unitScale : 1), d.field || 'DemandCollection_BaseFlow')), pattern: ctx.patternId(d.pat) || null, category: null };
 				});
-				if (list.length <= 1) { put('demand', key, 'demand', list.length ? list[0] : 0); } else { put('demand', key, '_multi', JSON.stringify(list)); }
-				var pats = (n.demands || []).map(function (d) { return ctx.patternId(d.pat); });
-				if (pats.some(function (x) { return x; })) { put('demand', key, '_pat', pats.join(',')); }
+				put('demand', key, 'demands', rows.length ? rows : [{ base: 0, pattern: null, category: null }]);
 				if (ctx.get(n.e, ctx.sc, 'FireFlow_HasLocalFireFlowConstraints')) {
 					var q = ctx.get(n.e, ctx.sc, 'FireFlow_NeededFireFlow');
 					if (typeof q === 'number' && q > 0) { put('fireflow', key, 'fireFlow', Number(ctx.Q(q, 'FireFlow_NeededFireFlow'))); }
@@ -1347,27 +1347,44 @@
 		return out;
 	}
 	function cloneVals(v) { return JSON.parse(JSON.stringify(v)); }
-	// What `a` states that `ref` does not, as { values: { category: { key: { prop: v } } }, lost: ['key prop', ...] }.
+	// What `a` states that `ref` does not, as { values: { category: { key: { prop: v } } } }. A junction whose
+	// demand differs is one `demand` when both sides state one row with the same pattern (a scenario retyping the
+	// base), else the whole list as `demands`, as the page holds a scenario's own demand table.
 	function diffVals(a, ref) {
-		var out = {}, lost = [];
+		var out = {};
+		function put(cat, key, prop, v) { ((out[cat] || (out[cat] = {}))[key] || (out[cat][key] = {}))[prop] = v; }
 		Object.keys(a).forEach(function (cat) {
 			Object.keys(a[cat]).forEach(function (key) {
 				var mine = a[cat][key], theirs = (ref[cat] && ref[cat][key]) || {};
-				if (cat === 'demand' && mine._multi !== theirs._multi) { lost.push(key.slice(2) + ' (several demands)'); return; }
 				Object.keys(mine).forEach(function (prop) {
 					if (JSON.stringify(mine[prop]) === JSON.stringify(theirs[prop])) { return; }
-					if (prop.charAt(0) === '_') { if (prop === '_pat') { lost.push(key.slice(2) + ' (demand pattern)'); } return; }
-					((out[cat] || (out[cat] = {}))[key] || (out[cat][key] = {}))[prop] = mine[prop];
+					if (prop === 'demands') {
+						var b = theirs.demands || [{ base: 0, pattern: null, category: null }];
+						if (mine.demands.length === 1 && b.length === 1 && mine.demands[0].pattern === b[0].pattern) { put(cat, key, 'demand', mine.demands[0].base); }
+						else { put(cat, key, 'demands', cloneVals(mine.demands)); }
+						return;
+					}
+					put(cat, key, prop, mine[prop]);
 				});
 			});
 		});
-		return { values: out, lost: lost };
+		return { values: out };
 	}
+	// Values laid onto a state (the same shape as allValues()). A `demand` retypes row 0's base of the junction's list.
 	function overlayVals(state, values) {
 		Object.keys(values).forEach(function (cat) {
 			Object.keys(values[cat]).forEach(function (key) {
-				var tgt = (state[cat] || (state[cat] = {}));
-				tgt[key] = Object.assign(tgt[key] || {}, values[cat][key]);
+				var tgt = (state[cat] || (state[cat] = {})), cur = tgt[key] || (tgt[key] = {});
+				Object.keys(values[cat][key]).forEach(function (prop) {
+					var v = values[cat][key][prop];
+					if (prop === 'demand') {
+						var rows = cur.demands ? cloneVals(cur.demands) : [{ base: 0, pattern: null, category: null }];
+						rows[0].base = v;
+						cur.demands = rows;
+					} else {
+						cur[prop] = cloneVals(v);
+					}
+				});
 			});
 		});
 	}
@@ -1398,7 +1415,7 @@
 	 * value it has rows for. An alternative no scenario uses is imported too, so a scenario can use it.
 	 */
 	function treeOf(ctx) {
-		var scenarios = [], alternatives = [], used = {}, lostNames = [], nameOnly = [], noHome = [], roots = [], badAdj = [];
+		var scenarios = [], alternatives = [], used = {}, nameOnly = [], noHome = [], roots = [], badAdj = [];
 		var basePicks = ctx.picksOf(ctx.scen[ctx.baseId]);
 		var baseVals = allValues(ctx.baseNet, Object.assign({}, ctx, { sc: ctx.scen[ctx.baseId] }));
 		function fakeWith(type, aid) {
@@ -1486,8 +1503,7 @@
 			if (p !== null) { rec.parentFileId = p; recordFor(p); }
 			else if (isRoot(aid)) { rec.root = true; }
 			rec.values = valuesOfRecord(aid);
-			if (READ_CATS[cat]) { diffAlt(aid).lost.forEach(function (x) { lostNames.push(a.name + ': ' + x); }); }
-			else { nameOnly.push(a.name + ' (' + (ALT_TYPE_NAME[a.type] || a.type) + ')'); }
+			if (!READ_CATS[cat]) { nameOnly.push(a.name + ' (' + (ALT_TYPE_NAME[a.type] || a.type) + ')'); }
 			made[aid] = rec;
 			return rec;
 		}
@@ -1548,7 +1564,6 @@
 		if (badAdj.length) { ctx.note('wtg-demand-adjustments', badAdj); }
 		if (noHome.length) { ctx.note('wtg-scenario-category', noHome); }
 		if (nameOnly.length) { ctx.note('wtg-alternative-nameonly', nameOnly); }
-		if (lostNames.length) { ctx.note('wtg-alternative-partial', lostNames); }
 		if (unused.length) { ctx.note('wtg-alternative-unused', unused); }
 		if (alternatives.length) { ctx.note('wtg-alternatives', alternatives.map(function (r) { return r.name + ' (' + (ALT_TYPE_NAME[ctx.alts[r.fileId].type] || r.category) + ')'; })); }
 		if (ctx.activeId && ctx.activeId !== ctx.baseId && ctx.scen[ctx.activeId]) { ctx.note('wtg-active-scenario', [ctx.scen[ctx.activeId].name]); }

@@ -45952,7 +45952,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'wtg-unit-assumed': ['lpn_wtg_note_unit_assumed', 'The file does not state the stored unit of these fields, so the unit every example file states was assumed.'],
 		'wtg-cv-closed': ['lpn_wtg_note_cv_closed', 'These pipes have a check valve and start closed. They were imported closed.'],
 		'wtg-alternative-nameonly': ['lpn_wtg_note_alternative_nameonly', 'These alternatives were imported by name only, so that each scenario keeps its choice of them. Their values were not imported, because this page does not read that kind of data from a WaterGEMS model.'],
-		'wtg-alternative-partial': ['lpn_wtg_note_alternative_partial', 'Not imported: these differences between an alternative and its parent, which this page cannot hold (several demands at a junction, or a demand pattern). The rest of the alternative was imported.'],
 		'wtg-pump-battery': ['lpn_wtg_note_pump_battery', 'These variable speed pump batteries were imported as one pump each at relative speed 1, as WaterGEMS writes them to an EPANET file. Their lag pumps and speed control were not imported.']
 	};
 	function wtgNoteText(code) {
