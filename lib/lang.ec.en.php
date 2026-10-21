@@ -5073,9 +5073,6 @@ $ec_lang['lpn_geojson_import_parts_one']='One multipart feature imported as one 
 $ec_lang['lpn_geojson_import_local']='GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.';
 $ec_lang['lpn_geojson_import_unreadable']='{file} is not a GeoJSON file: {detail}';
 // Groups inside File > Import and File > Export (Task 819): Network, Shapes, Tables.
-$ec_lang['lpn_file_group_network']='Network';
-$ec_lang['lpn_file_group_shapes']='Shapes';
-$ec_lang['lpn_file_group_tables']='Tables';
 $ec_lang['lpn_menu_back']='Back';
 $ec_lang['lpn_file_import_dxf']='DXF file…';
 $ec_lang['lpn_file_import_dxf_tip']='Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion.';

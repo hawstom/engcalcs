@@ -41,7 +41,7 @@ if (process.env[LOCK_ENV] !== '1') {
 // to CSV is one .csv file.
 // [key, extension, opens a box first, group's top-level index (null: a row of the fly-out itself), index in the group].
 // Task 819: the fly-out holds Network and Tables as groups (a third level), then Workspace.
-const TOP = ['lpn_file_group_network', 'lpn_file_group_tables', 'lpn_file_export_item_workspace'];
+const TOP = ['lpn_calib_network', 'lpn_tables_menu', 'lpn_file_export_item_workspace'];
 const ROWS = [['lpn_file_export_item_inp', '.inp', false, 0, 0], ['lpn_file_export_item_geojson', '.geojson', false, 0, 1],
 	['lpn_file_export_item_dxf', '.dxf', false, 0, 2],
 	['lpn_file_export_item_ods', '.ods', true, 1, 0], ['lpn_file_export_item_xlsx', '.xlsx', true, 1, 1], ['lpn_file_export_item_csv', '.csv', true, 1, 2],

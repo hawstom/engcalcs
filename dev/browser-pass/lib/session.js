@@ -135,7 +135,7 @@ class Session {
 	}
 	// A row in the FLY-OUT (Task 264): "New project…" opens a second popup beside the first, and the
 	// command is in there. Two clicks in the page, one sentence in a spec.
-	// `groupKey` (a language key such as 'lpn_file_group_shapes') names the group to look in when two groups
+	// `groupKey` (a language key such as 'lpn_pane_tab_shapes') names the group to look in when two groups
 	// hold a row of the same name (Import > Network > GeoJSON file and Import > Shapes > GeoJSON file).
 	async menuClickSub(parent, child, which = 'file', groupKey = null) {
 		await this.openMenu(which);

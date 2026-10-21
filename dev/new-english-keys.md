@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**8 still to read on master**, of 172 untranslated keys, of 3191 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**5 still to read on master**, of 169 untranslated keys, of 3188 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (172, 8 to read @@ NEEDS RULING)
+## lpn_  (169, 5 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -214,15 +214,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_file_export_msx_tip`**
   > Download the attached EPANET-MSX file exactly as it was imported.
   _Ruled OK 2026-10-20._
-- **`lpn_file_group_network`**
-  > Network
-  @@ NEEDS RULING
-- **`lpn_file_group_shapes`**
-  > Shapes
-  @@ NEEDS RULING
-- **`lpn_file_group_tables`**
-  > Tables
-  @@ NEEDS RULING
 - **`lpn_file_import_msx`**
   > EPANET-MSX file…
   _Ruled OK 2026-10-20._
@@ -565,7 +556,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/geojson-into-project (`3ffa8d22c`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/geojson-into-project (`62d4faa42`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_gjup_h_notes`**
   > Reading the file
@@ -577,9 +568,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Update from GeoJSON file
   @@ NEEDS RULING
 
-### feat/import-export-menu (`1913fb732`) — adds no English strings
+### feat/import-export-menu (`a9f804e9b`) — adds no English strings
 
-### feat/sqlite-reader (`18e70d1f5`) — 53 new, 10 to read @@ NEEDS RULING
+### feat/sqlite-reader (`0c85b385c`) — 53 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
   > WaterCAD or WaterGEMS model…

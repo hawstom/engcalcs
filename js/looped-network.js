@@ -52282,8 +52282,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function importMenuRows() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			{ icon: 'open', label: pc.lpn_file_group_network || 'Network', submenu: importNetworkRows },
-			{ icon: 'open', label: pc.lpn_file_group_shapes || 'Shapes', submenu: importShapeRows },
+			{ icon: 'open', label: pc.lpn_calib_network || 'Network', submenu: importNetworkRows },
+			{ icon: 'open', label: pc.lpn_pane_tab_shapes || 'Shapes', submenu: importShapeRows },
 			// **IMPORT SURVEYED POINTS (Task 592), AND IT IS A FILE ROW BY TOM'S OWN VOTE** (2026-09-17:
 			// *"Probably Settings is a bad place for Import survey points. That traditionally goes
 			// under File or Water. But Map might make sense. My vote is File since they come from a
@@ -52346,8 +52346,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function exportMenuRows() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			{ icon: 'save', label: pc.lpn_file_group_network || 'Network', submenu: exportNetworkRows },
-			{ icon: 'save', label: pc.lpn_file_group_tables || 'Tables', submenu: exportTableRows },
+			{ icon: 'save', label: pc.lpn_calib_network || 'Network', submenu: exportNetworkRows },
+			{ icon: 'save', label: pc.lpn_tables_menu || 'Tables', submenu: exportTableRows },
 			{ separator: true },
 			// Workspace (Tom, 2026-10-07): the twin of File > Import > Workspace. Stays the last row.
 			{ icon: 'save', label: pc.lpn_file_export_item_workspace || 'Workspace…',

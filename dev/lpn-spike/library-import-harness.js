@@ -739,8 +739,8 @@ head('12. the wizard has a row in the File menu, beside the rows that open a pro
 	const netRows = L.importNetworkRows().map(r => String(r.label || ''));
 	const shapeRows = L.importShapeRows().map(r => String(r.label || ''));
 	check(subRows.length === 5 &&
-		subRows[0].indexOf(String(pc.lpn_file_group_network)) >= 0 &&
-		subRows[1].indexOf(String(pc.lpn_file_group_shapes)) >= 0 &&
+		subRows[0].indexOf(String(pc.lpn_calib_network)) >= 0 &&
+		subRows[1].indexOf(String(pc.lpn_pane_tab_shapes)) >= 0 &&
 		subRows[2].indexOf(String(pc.lpn_file_import_survey)) >= 0 &&
 		subRows[3].indexOf(String(pc.lpn_library_import)) >= 0 &&
 		subRows[4].indexOf(String(pc.lpn_file_import_workspace)) >= 0,

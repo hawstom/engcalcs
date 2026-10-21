@@ -87,8 +87,8 @@ async function main() {
 		// A name the page does not have is "undefined" on master; the shortened names are the point.
 		const tx = async (k) => (await L(k).catch(() => '')).trim();
 		const importLabel = await tx('lpn_file_import_menu'), exportLabel = await tx('lpn_file_export_menu');
-		const netL = await tx('lpn_file_group_network').catch(() => 'Network'), shapesL = await tx('lpn_file_group_shapes').catch(() => 'Shapes'),
-			tablesL = await tx('lpn_file_group_tables').catch(() => 'Tables');
+		const netL = await tx('lpn_calib_network').catch(() => 'Network'), shapesL = await tx('lpn_pane_tab_shapes').catch(() => 'Shapes'),
+			tablesL = await tx('lpn_tables_menu').catch(() => 'Tables');
 		ok('the page supplies the group names Network, Shapes and Tables', netL === 'Network' && shapesL === 'Shapes' && tablesL === 'Tables', [netL, shapesL, tablesL].join('|'));
 
 		// ---- M1 ----------------------------------------------------------------------------------

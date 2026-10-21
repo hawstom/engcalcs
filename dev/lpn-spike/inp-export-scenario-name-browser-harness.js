@@ -74,7 +74,7 @@ async function main() {
 			await clickRow('#lpn_menu_list button.lpn-menu-row', (await L('lpn_file_export_menu')).trim());
 			await page.waitForSelector('#lpn_menu_list2 button.lpn-menu-row', { state: 'attached' });
 			// The formats are in the Network group (Task 819), and a project with more than Base is asked first.
-			await clickRow('#lpn_menu_list2 button.lpn-menu-row', (await L('lpn_file_group_network')).trim());
+			await clickRow('#lpn_menu_list2 button.lpn-menu-row', (await L('lpn_calib_network')).trim());
 			await page.waitForSelector('#lpn_menu_list3 button.lpn-menu-row', { state: 'attached' });
 			await clickRow('#lpn_menu_list3 button.lpn-menu-row', (await L('lpn_file_export_item_inp')).trim());
 			await a.settle(500);
