@@ -35,6 +35,11 @@
      "parent": "Import…"
     },
     {
+     "id": "file/file_import_menu/file_import_wtg",
+     "label": "WaterCAD or WaterGEMS model…",
+     "parent": "Import…"
+    },
+    {
      "id": "file/file_import_menu/file_import_shapes",
      "label": "GeoJSON file…",
      "parent": "Import…"
