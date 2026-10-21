@@ -284,7 +284,9 @@ async function realChromeExport(exe, url) {
 		await click(`document.getElementById('lpn_menu_file')`); await sleep(500);
 		// The export commands are in the Export... fly-out: its parent row, then the row in it.
 		await click(`Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(EngCalcs.pageConfig.lpn_file_export_menu) === 0)`); await sleep(500);
-		const clicked = await click(`Array.from(document.querySelectorAll('#lpn_menu_list2 button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(EngCalcs.pageConfig.lpn_file_export_item_inp) === 0)`);
+		// ...which holds its formats in a Network group (Task 819), a third level.
+		await click(`document.querySelector('#lpn_menu_list2 button.lpn-menu-row[aria-haspopup]')`); await sleep(500);
+		const clicked = await click(`Array.from(document.querySelectorAll('#lpn_menu_list3 button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(EngCalcs.pageConfig.lpn_file_export_item_inp) === 0)`);
 		ok('real Chrome: File > Export EPANET file was clicked with a real mouse event', clicked);
 		for (let i = 0; i < 100; i++) { const f = fs.readdirSync(dl); if (f.length && !f.some((n) => /crdownload$/.test(n))) { break; } await sleep(100); }
 		await sleep(2500);   // room for any further download to arrive, or to be held by the limit

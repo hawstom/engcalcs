@@ -20,11 +20,6 @@
      "parent": ""
     },
     {
-     "id": "file/file_import_menu/file_import_survey",
-     "label": "Surveyed points…",
-     "parent": "Import…"
-    },
-    {
      "id": "file/file_import_menu/file_import_inp",
      "label": "EPANET file…",
      "parent": "Import…"
@@ -36,22 +31,27 @@
     },
     {
      "id": "file/file_import_menu/file_import_gjnet",
-     "label": "GeoJSON network…",
+     "label": "GeoJSON file…",
      "parent": "Import…"
     },
     {
      "id": "file/file_import_menu/file_import_shapes",
-     "label": "GeoJSON shapes…",
+     "label": "GeoJSON file…",
      "parent": "Import…"
     },
     {
      "id": "file/file_import_menu/file_import_dxf",
-     "label": "DXF shapes…",
+     "label": "DXF file…",
      "parent": "Import…"
     },
     {
      "id": "file/file_import_menu/file_import_shp",
-     "label": "Shapefile shapes…",
+     "label": "Shapefile…",
+     "parent": "Import…"
+    },
+    {
+     "id": "file/file_import_menu/file_import_survey",
+     "label": "Surveyed points…",
      "parent": "Import…"
     },
     {

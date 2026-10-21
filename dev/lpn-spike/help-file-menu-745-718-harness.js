@@ -161,10 +161,11 @@ console.log('\n-- Task 718: Recent files sits directly above Close --');
 console.log('\n-- Task 718: the three import rows are one Import submenu --');
 {
 	const fileBody = fnBody(src, 'function fileMenuRows', '\n\tfunction ');
-	const importRowsBody = fnBody(src, 'function importMenuRows', '\n\tfunction ');
+	const importRowsBody = fnBody(src, 'function importMenuRows', '\n\tfunction ') +
+		fnBody(src, 'function importNetworkRows', '\n\tfunction ');
 	report(!!importRowsBody, 'importMenuRows() exists');
 	['pickSurveyFile', 'pickInpFile', 'libImportPick'].forEach(function (fn) {
-		report(importRowsBody.indexOf(fn) > 0, fn + ' is one of the submenu rows');
+		report(importRowsBody.indexOf(fn) > 0, fn + ' is one of the submenu rows (directly or in its Network group)');
 	});
 	report(/label: pc\.lpn_file_import_menu[^,]*, submenu: importMenuRows/.test(fileBody),
 		'the File menu opens them through one submenu row');

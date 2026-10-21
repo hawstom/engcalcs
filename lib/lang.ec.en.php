@@ -2281,8 +2281,8 @@ $ec_lang['lpn_file_export_item_geojson']='GeoJSON file…';
 $ec_lang['lpn_file_export_item_ods']='ODS file…';
 $ec_lang['lpn_file_export_item_xlsx']='XLSX file…';
 $ec_lang['lpn_file_export_item_csv']='CSV file…';
-$ec_lang['lpn_file_export_tables_tip']='Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings. Results are included for the scenario last calculated only.';
-$ec_lang['lpn_file_export_csv_tip']='Download a table as the Tables pane shows it. One table comes as a single CSV file with no libraries. Several tables or scenarios come as one zip file of CSV files, with a file for each library their IDs refer to. Results are included for the scenario last calculated only.';
+$ec_lang['lpn_file_export_tables_tip']='Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library that has entries: patterns, curves, pipe types, fittings, controls, and rules. Results are included for the scenario last calculated only.';
+$ec_lang['lpn_file_export_csv_tip']='Download a table as the Tables pane shows it. One table comes as a single CSV file with no libraries. Several tables or scenarios come as one zip file of CSV files, with a file for each library that has entries. Results are included for the scenario last calculated only.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards.';
 $ec_lang['lpn_status_inp_exported']='Exported {file}.';
@@ -2341,7 +2341,7 @@ $ec_lang['lpn_msx_removed']='Removed {file} from this project.';
 $ec_lang['lpn_quality_msx']='Multi-species (EPANET-MSX)';
 $ec_lang['lpn_quality_msx_species']='Species';
 $ec_lang['lpn_quality_msx_species_tip']='The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.';
-$ec_lang['lpn_quality_msx_none']='No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.';
+$ec_lang['lpn_quality_msx_none']='No EPANET-MSX file is attached to this project. Attach one with File, Import, Network, EPANET-MSX file.';
 $ec_lang['lpn_result_msx_tip']='The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.';
 $ec_lang['lpn_workspace_exported']='Workspace saved to {file}: {n} settings.';
 $ec_lang['lpn_workspace_imported']='Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.';
@@ -2425,15 +2425,18 @@ $ec_lang['lpn_status_imported']='Opened {name} from a file, and added it to this
 // Update the open project from an EPANET file (Task 814). Placeholders in braces are filled by the page.
 // {file} is a file name.
 $ec_lang['lpn_inpup_ask_title']='Import {file}';
-$ec_lang['lpn_inpup_lead']='An EPANET file holds one set of values and no scenarios. Choose where to put them.';
-$ec_lang['lpn_inpup_how']='In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.';
-$ec_lang['lpn_inpup_base_note']='Base. A scenario that holds its own value for an asset keeps it; the others take the new value.';
+$ec_lang['lpn_inpup_lead']='Choose where to import this file. Note that EPANET files don\'t include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.';
+$ec_lang['lpn_inpup_how']='In this project, assets are matched by ID. Values are changed on matching assets, assets unique to the file are added, and assets unique to this project are left unaltered.';
+$ec_lang['lpn_inpup_base_note']='Choosing Base doesn\'t clear any scenario overrides.';
 $ec_lang['lpn_inpup_btn_new']='A new project';
 // {project} is a project name; it labels a button.
 $ec_lang['lpn_inpup_btn_project']='This project, {project}';
 // {scenario} is a scenario name; it labels a button.
 $ec_lang['lpn_inpup_btn_scenario']='{scenario}, open now';
 $ec_lang['lpn_inpup_title']='Update from EPANET file';
+$ec_lang['lpn_gjup_lead']='Choose where to import this file. Note that GeoJSON files don\'t include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.';
+$ec_lang['lpn_gjup_title']='Update from GeoJSON file';
+$ec_lang['lpn_gjup_h_notes']='Reading the file';
 // {file} is a file name, {scenario} a scenario name and {project} a project name.
 $ec_lang['lpn_inpup_heading']='Imported {file} into {scenario} of {project}';
 $ec_lang['lpn_inpup_counts']='Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).';
@@ -4987,9 +4990,9 @@ $ec_lang['lpn_file_import_survey']='Surveyed points…';
 $ec_lang['lpn_file_import_survey_tip']='Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.';
 // GeoJSON import of Shapes (Task 779). Only points, lines and polygons come in, as Shapes; the
 // network is imported from an EPANET file. Every feature not imported is named in the report.
-$ec_lang['lpn_file_import_shapes']='GeoJSON shapes…';
-$ec_lang['lpn_file_import_shapes_tip']='Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.';
-$ec_lang['lpn_file_import_gjnet']='GeoJSON network…';
+$ec_lang['lpn_file_import_shapes']='GeoJSON file…';
+$ec_lang['lpn_file_import_shapes_tip']='Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, Network, EPANET file or File, Import, Network, GeoJSON file. The project must be georeferenced or state a coordinate system.';
+$ec_lang['lpn_file_import_gjnet']='GeoJSON file…';
 $ec_lang['lpn_file_import_gjnet_tip']='Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.';
 $ec_lang['lpn_file_import_wtg']='WaterCAD or WaterGEMS model…';
 $ec_lang['lpn_file_import_wtg_tip']='Open a WaterCAD or WaterGEMS model as a new project. Choose its .wtg.sqlite file, and also the .wtg file beside it so that its units come too. The file is read and never changed. Its scenarios come with it; each scenario\'s differences from Base become that scenario\'s overrides. Beta: tried on few models so far.';
@@ -5125,9 +5128,11 @@ $ec_lang['lpn_geojson_import_parts']='{n} multipart features imported as one Sha
 $ec_lang['lpn_geojson_import_parts_one']='One multipart feature imported as one Shape for each part.';
 $ec_lang['lpn_geojson_import_local']='GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.';
 $ec_lang['lpn_geojson_import_unreadable']='{file} is not a GeoJSON file: {detail}';
-$ec_lang['lpn_file_import_dxf']='DXF shapes…';
+// Groups inside File > Import and File > Export (Task 819): Network, Shapes, Tables.
+$ec_lang['lpn_menu_back']='Back';
+$ec_lang['lpn_file_import_dxf']='DXF file…';
 $ec_lang['lpn_file_import_dxf_tip']='Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion.';
-$ec_lang['lpn_file_import_shp']='Shapefile shapes…';
+$ec_lang['lpn_file_import_shp']='Shapefile…';
 $ec_lang['lpn_file_import_shp_tip']='Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this.';
 $ec_lang['lpn_dxf_import_skipped']='{n} entities not imported: {list}.';
 $ec_lang['lpn_dxf_import_skipped_one']='One entity not imported: {list}.';
@@ -5288,3 +5293,5 @@ $ec_lang['lpn_geojson_results_other']='No results are included, because the resu
 $ec_lang['lpn_survey_added_scenario']='The nodes were added to {scenario}. In Base they are inactive.';
 $ec_lang['lpn_pane_pasted_scenario']='These values are overrides in the scenario {scenario}.';
 $ec_lang['lpn_export_leaves_alternatives']='The alternatives stored in this project are not in the file.';
+$ec_lang['lpn_export_confirm_title']='Export {format}';
+$ec_lang['lpn_export_confirm_lead']='The {format} holds one scenario, and this project has {n}.';

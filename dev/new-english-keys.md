@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**11 still to read on master**, of 219 untranslated keys, of 3238 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**5 still to read on master**, of 169 untranslated keys, of 3188 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (219, 11 to read @@ NEEDS RULING)
+## lpn_  (169, 5 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -172,6 +172,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_ex_valves_title`**
   > Valve types, gpm (US)
   _Ruled OK 2026-10-20._
+- **`lpn_export_confirm_lead`**
+  > The {format} holds one scenario, and this project has {n}.
+  @@ NEEDS RULING
+- **`lpn_export_confirm_title`**
+  > Export {format}
+  @@ NEEDS RULING
 - **`lpn_export_holds_base`**
   > It holds the Base scenario only.
   _Ruled 2026-10-18: I approved all._
@@ -213,12 +219,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-20._
 - **`lpn_file_import_msx_tip`**
   > Attach an EPANET-MSX file (.msx) to this project, or show the one already attached. It is kept with the project, written back unchanged, and run by the EPANET-MSX engine in an extended period simulation.
-  _Ruled OK 2026-10-20._
-- **`lpn_file_import_wtg`**
-  > WaterCAD or WaterGEMS model…
-  _Ruled OK 2026-10-20._
-- **`lpn_file_import_wtg_tip`**
-  > Open a WaterCAD or WaterGEMS model as a new project. Choose its .wtg.sqlite file, and also the .wtg file beside it so that its units come too. The file is read and never changed. Its scenarios come with it; each scenario's differences from Base become that scenario's overrides. Beta: tried on few models so far.
   _Ruled OK 2026-10-20._
 - **`lpn_geojson_results_other`**
   > No results are included, because the results on screen belong to the scenario {scenario}.
@@ -373,6 +373,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_inpup_unit_row`**
   > {family}: the file uses {file} and this project uses {project}.
   _Ruled OK 2026-10-20._
+- **`lpn_menu_back`**
+  > Back
+  @@ NEEDS RULING
 - **`lpn_msx_attached_heading`**
   > Attached EPANET-MSX file: {file}
   _Ruled OK 2026-10-20._
@@ -407,8 +410,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Multi-species (EPANET-MSX)
   _Ruled OK 2026-10-20._
 - **`lpn_quality_msx_none`**
-  > No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.
-  _Ruled OK 2026-10-20._
+  > No EPANET-MSX file is attached to this project. Attach one with File, Import, Network, EPANET-MSX file.
+  @@ NEEDS RULING
 - **`lpn_quality_msx_species`**
   > Species
   _Ruled OK 2026-10-20._
@@ -534,6 +537,46 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-20._
 - **`lpn_when_step`**
   > Reporting step
+  _Ruled OK 2026-10-20._
+
+---
+
+# Strings waiting on a branch
+
+**13 still to read**, of 56 new keys across 5 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### feat/desktop (`baba0f04d`) — adds no English strings
+
+### feat/geojson-into-project (`62d4faa42`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_gjup_h_notes`**
+  > Reading the file
+  @@ NEEDS RULING
+- **`lpn_gjup_lead`**
+  > Choose where to import this file. Note that GeoJSON files don't include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
+  @@ NEEDS RULING
+- **`lpn_gjup_title`**
+  > Update from GeoJSON file
+  @@ NEEDS RULING
+
+### feat/import-export-menu (`a9f804e9b`) — adds no English strings
+
+### feat/sqlite-reader (`0c85b385c`) — 53 new, 10 to read @@ NEEDS RULING
+
+- **`lpn_file_import_wtg`**
+  > WaterCAD or WaterGEMS model…
+  _Ruled OK 2026-10-20._
+- **`lpn_file_import_wtg_tip`**
+  > Open a WaterCAD or WaterGEMS model as a new project. Choose its .wtg.sqlite file, and also the .wtg file beside it so that its units come too. The file is read and never changed. Its scenarios come with it; each scenario's differences from Base become that scenario's overrides. Beta: tried on few models so far.
   _Ruled OK 2026-10-20._
 - **`lpn_wtg_engine`**
   > The SQLite reader could not be loaded, so {file} could not be opened. Check the connection and try again.
@@ -688,57 +731,5 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_wtg_working`**
   > Reading {file}…
   _Ruled OK 2026-10-20._
-
----
-
-# Strings waiting on a branch
-
-**9 still to read**, of 9 new keys across 5 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### feat/desktop (`baba0f04d`) — adds no English strings
-
-### feat/geojson-into-project (`62d4faa42`) — 3 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_gjup_h_notes`**
-  > Reading the file
-  @@ NEEDS RULING
-- **`lpn_gjup_lead`**
-  > Choose where to import this file. Note that GeoJSON files don't include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
-  @@ NEEDS RULING
-- **`lpn_gjup_title`**
-  > Update from GeoJSON file
-  @@ NEEDS RULING
-
-### feat/import-export-menu (`a9f804e9b`) — 6 new, 6 to read @@ NEEDS RULING
-
-- **`lpn_export_confirm_lead`**
-  > The {format} holds one scenario, and this project has {n}.
-  @@ NEEDS RULING
-- **`lpn_export_confirm_title`**
-  > Export {format}
-  @@ NEEDS RULING
-- **`lpn_file_group_network`**
-  > Network
-  @@ NEEDS RULING
-- **`lpn_file_group_shapes`**
-  > Shapes
-  @@ NEEDS RULING
-- **`lpn_file_group_tables`**
-  > Tables
-  @@ NEEDS RULING
-- **`lpn_menu_back`**
-  > Back
-  @@ NEEDS RULING
-
-### feat/sqlite-reader (`18e70d1f5`) — adds no English strings
 
 ### fix/bottom-pane-lag (`3bb531211`) — adds no English strings

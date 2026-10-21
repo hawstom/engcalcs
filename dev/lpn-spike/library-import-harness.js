@@ -50,6 +50,8 @@ const L = loadLoopedNetwork(
 	"\t\tundoDepth: function () { return undoStack.length; }, undo: undo,\n" +
 	"\t\tlibImportUnitDiffs: libImportUnitDiffs, openFileMenu: openFileMenu,\n" +
 	"\t\timportMenuRows: importMenuRows,\n" +
+	"\t\timportNetworkRows: importNetworkRows,\n" +
+	"\t\timportShapeRows: importShapeRows,\n" +
 	"\t\trebuildLibraryBox: rebuildLibraryBox, setLibSection: function (s) { libSection = s; },\n" +
 	"\t\tlibCurveRunnable: libCurveRunnable,\n" +
 	"\t\tbuildCurveSection: buildCurveSection, buildPipeTypeSection: buildPipeTypeSection,\n" +
@@ -733,22 +735,21 @@ head('12. the wizard has a row in the File menu, beside the rows that open a pro
 	// removal cannot leave the wizard unreachable.
 	check(subRows.filter(t => t.indexOf(String(pc.lpn_library_import)) >= 0).length === 1,
 		'and the submenu row is the one door that remains');
-	// Task 718's three import rows in the order it built (surveyed points, EPANET file, libraries),
-	// then Workspace (2026-10-07), with GeoJSON, DXF and shapefile Shapes (Task 779) after the EPANET
-	// file, the EPANET-MSX file (Task 717) and the GeoJSON network (Task 728) next, then the WaterCAD or
-	// WaterGEMS model (Task 749), the third network.
-	check(subRows.length === 10 &&
-		subRows[0].indexOf(String(pc.lpn_file_import_survey)) >= 0 &&
-		subRows[1].indexOf(String(pc.lpn_file_import_inp)) >= 0 &&
-		subRows[2].indexOf(String(pc.lpn_file_import_msx)) >= 0 &&
-		subRows[3].indexOf(String(pc.lpn_file_import_gjnet)) >= 0 &&
-		subRows[4].indexOf(String(pc.lpn_file_import_wtg)) >= 0 &&
-		subRows[5].indexOf(String(pc.lpn_file_import_shapes)) >= 0 &&
-		subRows[6].indexOf(String(pc.lpn_file_import_dxf)) >= 0 &&
-		subRows[7].indexOf(String(pc.lpn_file_import_shp)) >= 0 &&
-		subRows[8].indexOf(String(pc.lpn_library_import)) >= 0 &&
-		subRows[9].indexOf(String(pc.lpn_file_import_workspace)) >= 0,
-		`the import rows stand in order: surveyed points, EPANET file, EPANET-MSX file, GeoJSON network, WaterGEMS model, GeoJSON shapes, DXF shapes, shapefile shapes, libraries, workspace: ${JSON.stringify(subRows)}`);
+	// Task 819: Network and Shapes groups first, then surveyed points, libraries, and Workspace last.
+	const netRows = L.importNetworkRows().map(r => String(r.label || ''));
+	const shapeRows = L.importShapeRows().map(r => String(r.label || ''));
+	check(subRows.length === 5 &&
+		subRows[0].indexOf(String(pc.lpn_calib_network)) >= 0 &&
+		subRows[1].indexOf(String(pc.lpn_pane_tab_shapes)) >= 0 &&
+		subRows[2].indexOf(String(pc.lpn_file_import_survey)) >= 0 &&
+		subRows[3].indexOf(String(pc.lpn_library_import)) >= 0 &&
+		subRows[4].indexOf(String(pc.lpn_file_import_workspace)) >= 0,
+		`the import rows stand in order: Network, Shapes, surveyed points, libraries, workspace: ${JSON.stringify(subRows)}`);
+	check(netRows.length === 4 && netRows[0] === String(pc.lpn_file_import_inp) && netRows[1] === String(pc.lpn_file_import_msx) &&
+		netRows[2] === String(pc.lpn_file_import_gjnet) && netRows[3] === String(pc.lpn_file_import_wtg),
+		`Network holds the EPANET file, EPANET-MSX file, GeoJSON file and WaterGEMS model (Task 749): ${JSON.stringify(netRows)}`);
+	check(shapeRows.length === 3 && shapeRows[0] === String(pc.lpn_file_import_shapes) && shapeRows[1] === String(pc.lpn_file_import_dxf) &&
+		shapeRows[2] === String(pc.lpn_file_import_shp), `Shapes holds the GeoJSON, DXF and Shapefile rows: ${JSON.stringify(shapeRows)}`);
 }());
 
 console.log('\n' + (failures ? failures + ' FAILURE(S)' : 'All library-import checks passed.'));
