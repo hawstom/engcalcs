@@ -132,7 +132,7 @@ async function ownFile(browser, titleKey, file, units) {
 	await h.importVia({ name: file, mimeType: 'application/geo+json', buffer: Buffer.from(text || '') });
 	// The example is open, so the file is first asked where it goes (Task 814); the new project is the answer here.
 	const q = await a.waitDialog(4000);
-	ok(file + ': an open project is asked where the file goes', !!q && q.text.indexOf(await L('lpn_gjup_lead')) === 0, q && q.text.slice(0, 120));
+	ok(file + ': an open project is asked where the file goes', !!q && q.text.indexOf((await L('lpn_gjup_lead')).split(/\\n\\n|\n\n/)[0]) === 0, q && q.text.slice(0, 120));
 	if (q) { await a.dialogClick(await L('lpn_inpup_btn_new')); }
 	const d = await a.waitDialog(4000);
 	ok(file + ': no mapping is asked; the report opens, headed with the file name',
@@ -286,7 +286,7 @@ async function main() {
 		await h.importVia({ name: 'nad83.geojson', mimeType: 'application/geo+json', buffer: Buffer.from(nadFile) });
 		// The project now holds the earlier import, so the file is asked where it goes (Task 814).
 		d = await a.waitDialog(4000);
-		if (d && d.text.indexOf(await L('lpn_gjup_lead')) === 0) { await a.dialogClick(await L('lpn_inpup_btn_new')); }
+		if (d && d.text.indexOf((await L('lpn_gjup_lead')).split(/\\n\\n|\n\n/)[0]) === 0) { await a.dialogClick(await L('lpn_inpup_btn_new')); }
 		d = await a.waitDialog(4000);
 		ok('a NAD83 file is not refused: the mapping step opens', !!d && d.text.indexOf((await L('lpn_gjnet_refuse_crs')).slice(0, 12)) < 0 && await P.evaluate(() => !!document.querySelector('#lpn_dialog_body table[data-kind]')), d && d.text.slice(0, 120));
 		await a.dialogClick(await L('lpn_library_import_go'));

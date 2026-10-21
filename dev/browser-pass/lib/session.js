@@ -158,16 +158,46 @@ class Session {
 			return;
 		}
 		if (!here.some((r) => r.label === child)) {
+			const back = (await this.lang('lpn_menu_back').catch(() => 'Back')).trim();
+			const reopen = async () => {
+				await this.closeMenu();
+				await this.openMenu(which);
+				await this._clickRow('#lpn_menu_list', parent);
+				await this.page.waitForSelector('#lpn_menu_popup2', { state: 'visible' });
+			};
+			let tried = false;
 			for (const g of here.filter((r) => r.group)) {
-				await this._clickRow('#lpn_menu_list2', g.label);
-				await this.page.waitForSelector('#lpn_menu_popup3', { state: 'visible' });
-				if ((await rowsOf('#lpn_menu_list3')).some((r) => r.label === child)) {
-					await this._clickRow('#lpn_menu_list3', child);
+				if (tried) { await reopen(); }
+				tried = true;
+				// Hovering a group row already opens it, and on a phone-width page it opens IN PLACE, so the
+				// row under the pointer is gone before a click lands. Hover first; click only if nothing opened.
+				const opened = (b) => {
+					const p3 = document.getElementById('lpn_menu_popup3'), first = document.querySelector('#lpn_menu_list2 button.lpn-menu-row');
+					return (p3 && getComputedStyle(p3).display !== 'none' && p3.getBoundingClientRect().width > 0) || (!!first && first.textContent.trim() === b);
+				};
+				for (const r of await this.page.$$('#lpn_menu_list2 button.lpn-menu-row')) {
+					if ((await r.evaluate((e) => { const a = e.querySelector('.lpn-menu-arrow'); return (a ? e.textContent.replace(a.textContent, '') : e.textContent).trim(); })) === g.label) { await r.hover(); break; }
+				}
+				await this.page.waitForTimeout(300);
+				if (!(await this.page.evaluate(opened, back))) { await this._clickRow('#lpn_menu_list2', g.label); }
+				// On a phone the group takes the fly-out's place, under a Back row, instead of a third level.
+				await this.page.waitForFunction((b) => {
+					const p3 = document.getElementById('lpn_menu_popup3'), first = document.querySelector('#lpn_menu_list2 button.lpn-menu-row');
+					return (p3 && getComputedStyle(p3).display !== 'none' && p3.getBoundingClientRect().width > 0) || (first && first.textContent.trim() === b);
+				}, back);
+				const inPlace = await this.page.evaluate((b) => {
+					const first = document.querySelector('#lpn_menu_list2 button.lpn-menu-row');
+					return !!first && first.textContent.trim() === b;
+				}, back);
+				const sel = inPlace ? '#lpn_menu_list2' : '#lpn_menu_list3';
+				if ((await rowsOf(sel)).some((r) => r.label === child)) {
+					await this._clickRow(sel, child);
 					await this.settle();
 					await this._confirmExportIfAsked(parent, child);
 					return;
 				}
 			}
+			if (tried) { await reopen(); }
 		}
 		await this._clickRow('#lpn_menu_list2', child);
 		await this.settle();
