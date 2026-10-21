@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 168 untranslated keys, of 3187 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**4 still to read on master**, of 171 untranslated keys, of 3190 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (168, all ruled)
+## lpn_  (171, 4 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -220,6 +220,15 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_geojson_results_other`**
   > No results are included, because the results on screen belong to the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
+- **`lpn_gjup_h_notes`**
+  > Reading the file
+  @@ NEEDS RULING
+- **`lpn_gjup_lead`**
+  > A GeoJSON file holds one set of values and no scenarios. Choose where to put them.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets only in the import are added, and assets only in this project are kept.
+  @@ NEEDS RULING
+- **`lpn_gjup_title`**
+  > Update from GeoJSON file
+  @@ NEEDS RULING
 - **`lpn_gpv_one_point_note`**
   > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
   _Ruled OK 2026-10-20._
@@ -308,8 +317,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > rules
   _Ruled OK 2026-10-20._
 - **`lpn_inpup_lead`**
-  > An EPANET file holds one set of values and no scenarios. Choose where to put them.
-  _Ruled OK 2026-10-20._
+  > An EPANET file holds one set of values and no scenarios. Choose where to put them.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets only in the import are added, and assets only in this project are kept.
+  @@ NEEDS RULING
 - **`lpn_inpup_method_row`**
   > Head loss formula: the file uses {file} and this project uses {project}.
   _Ruled OK 2026-10-20._
@@ -540,7 +549,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**5 still to read**, of 55 new keys across 7 unmerged branch(es).
+**1 still to read**, of 51 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -553,28 +562,11 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/flow-arrow (`5ebd338e2`) — adds no English strings
+### feat/flow-arrow (`ba35f09bf`) — adds no English strings
 
-### feat/geojson-into-project (`cad86297c`) — 4 new, 4 to read @@ NEEDS RULING
-
-- **`lpn_gjup_h_notes`**
-  > Reading the file
-  @@ NEEDS RULING
-- **`lpn_gjup_lead`**
-  > A GeoJSON file holds one set of values and no scenarios. Choose where to put them.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets only in the import are added, and assets only in this project are kept.
-  @@ NEEDS RULING
-- **`lpn_gjup_title`**
-  > Update from GeoJSON file
-  @@ NEEDS RULING
-- **`lpn_inpup_i_custom`**
-  > custom properties
-  @@ NEEDS RULING
-
-### feat/label-leader (`bcc926448`) — already merged into feat/label-margin; its strings are listed there
+### feat/geojson-into-project (`7cc47d9a2`) — adds no English strings
 
 ### feat/label-margin (`8691fa30e`) — adds no English strings
-
-### feat/native-eps (`1b06b7275`) — adds no English strings
 
 ### feat/sqlite-reader (`5e33ab69b`) — 51 new, 1 to read @@ NEEDS RULING
 

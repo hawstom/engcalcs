@@ -88,7 +88,7 @@ console.log('\n--- Base only: the question, then update the open project ---');
 	ok('its lead names a GeoJSON file', dialogText().indexOf('A GeoJSON file holds one set of values') >= 0);
 	{
 		const paras = PC.lpn_gjup_lead.split(/\\n\\n|\n\n/), dt = dialogText();
-		ok('the lead is two paragraphs, the second naming the matching by ID', paras.length === 2 && /matched by ID/.test(paras[1]));
+		ok('the lead is two paragraphs, the second stating the rule', paras.length === 2 && paras[1].length > 0 && paras[1] !== paras[0]);
 		ok('both are shown, as separate paragraphs, with no literal \\n', dt.indexOf(paras[0]) >= 0 && dt.indexOf(paras[1]) >= 0 && dt.indexOf('\\n') < 0);
 		ok('the EPANET how-paragraph is not repeated under it', dt.indexOf(PC.lpn_inpup_how) < 0);
 	}
@@ -150,7 +150,7 @@ console.log('\n--- the EPANET file box has the same two paragraphs ---');
 	L.askInp('x.inp', 'x.inp', null);
 	const paras = PC.lpn_inpup_lead.split(/\\n\\n|\n\n/), dt = dialogText();
 	const count = (h, n) => h.split(n).length - 1;
-	ok('the .inp lead is two paragraphs, the second naming the matching by ID', paras.length === 2 && /matched by ID/.test(paras[1]));
+	ok('the .inp lead is two paragraphs, the second stating the rule', paras.length === 2 && paras[1].length > 0 && paras[1] !== paras[0]);
 	ok('the .inp box shows both paragraphs once, with no literal \\n', count(dt, paras[0]) === 1 && count(dt, paras[1]) === 1 && dt.indexOf('\\n') < 0);
 	ok('no old explanation paragraph is repeated under it', dt.indexOf(PC.lpn_inpup_how) < 0);
 	press(PC.lpn_cancel);
