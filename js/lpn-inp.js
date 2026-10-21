@@ -2517,7 +2517,7 @@
 			// the three this line states.
 			if (k0 === 'PUMP' && w[1] && w[2]) {
 				k2 = String(w[2]).toUpperCase();
-				if (k2 === 'EFFIC' && w[3]) { out.effic[w[1]] = w[3]; }
+				if ((k2 === 'EFFIC' || k2 === 'EFFICIENCY') && w[3]) { out.effic[w[1]] = w[3]; }
 				else if (k2 === 'PRICE') { reactSet(out.price, w[1], reactNum(w[3])); }
 				else if (k2 === 'PATTERN' && w[3]) { out.pattern[w[1]] = w[3]; }
 			}
