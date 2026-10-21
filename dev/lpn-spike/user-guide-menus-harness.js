@@ -55,7 +55,13 @@ async function main() {
 			rows: Array.from(b.querySelectorAll('.lpn-guide-row')).map((r) => ({ n: r.querySelector('.lpn-guide-name').textContent, sub: r.classList.contains('lpn-guide-sub'), ctx: r.querySelector('.lpn-guide-name').getAttribute('data-guide-ctx') || '' })) })));
 		ok('five menus in order: File, Edit, Map, Water, Help, and none for Language', JSON.stringify(blocks.map((b) => b.id)) === JSON.stringify(['lpn_menu_file', 'lpn_menu_edit', 'lpn_menu_map', 'lpn_menu_project', 'lpn_menu_help']), JSON.stringify(blocks.map((b) => b.head)));
 		const all = [].concat(...blocks.map((b) => b.rows));
-		ok('a fly-out row is indented under its parent, one level only', all.some((r) => r.sub) && all.filter((r) => r.sub).every((r) => r.ctx.indexOf('›') < 0), String(all.filter((r) => r.sub).length));
+		// Task 819: File > Import and File > Export hold groups (Network, Shapes, Tables), so a row there can sit
+		// two levels down (ctx "Import… › Network"). Nowhere else is a fly-out more than one level deep.
+		const fileRows = blocks.filter((b) => b.id === 'lpn_menu_file').map((b) => b.rows)[0] || [];
+		const others = [].concat(...blocks.filter((b) => b.id !== 'lpn_menu_file').map((b) => b.rows));
+		ok('a fly-out row is indented under its parent; only File\'s Import and Export go a second level down',
+			all.some((r) => r.sub) && others.filter((r) => r.sub).every((r) => r.ctx.indexOf('›') < 0)
+			&& fileRows.filter((r) => r.sub).every((r) => r.ctx.split('›').length <= 2), String(all.filter((r) => r.sub).length));
 		const water = blocks.filter((b) => b.id === 'lpn_menu_project')[0];
 		ok('no row named from the project: Base is not listed in the Water menu', water.rows.every((r) => r.n !== enString('lpn_scenario_base')));
 		const zs = await T('lpn_tool_zoom_selection');

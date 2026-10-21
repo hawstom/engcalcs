@@ -296,7 +296,7 @@ console.log('\n-- every popover goes through the one placer, which is the whole 
 		'the Settings box is a standing box, not an anchored pull-down');
 	report(/clampPanel\(/.test(extract('openSettingsBox')),
 		'...and it is clamped into the viewport, so a remembered position always comes back');
-	report(/openPanelAtAnchor\(popup, anchor\.getBoundingClientRect\(\), !!level\)/.test(extract('openMenu')),
+	report(/openPanelAtAnchor\(popup, anchor\.getBoundingClientRect\(\), !!level, preferLeft\)/.test(extract('openMenu')),
 		'the menus and their fly-outs');
 	// Matched on the PLACER, not on the anchor expression. This read `panel, menu.getBounding...`
 	// until 2026-08-16, when the anchor moved off the removed toolbar button and gained a fallback
@@ -333,7 +333,7 @@ console.log('\n-- clicking the menu bar dismisses an open popover (Tom, 2026-08-
 	report(!/#lpn_menubar/.test(tabs), 'the menu bar is no longer exempt from the dismissal');
 	report(!/#lpn_toolbar/.test(tabs), 'nor is the toolbar');
 	report(/viewPopoverAnchor/.test(tabs), 'the control that OPENED the popover is exempt instead');
-	report(/closest\('#lpn_menu_popup, #lpn_menu_popup2'\)/.test(tabs),
+	report(/closest\('#lpn_menu_popup, #lpn_menu_popup2, #lpn_menu_popup3'\)/.test(tabs),
 		'and a menu row stays exempt, since rows are what open these panels');
 	report(/if \(!except\) \{ viewPopoverAnchor = null; \}/.test(extract('closeViewPopovers')),
 		'and closing them all forgets it, so a stale button cannot go on being exempt');

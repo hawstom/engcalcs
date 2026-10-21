@@ -35524,12 +35524,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// column holds an ID, and an ID is worth something in a spreadsheet only when the thing it names
 	// is in the same workbook. One sheet per library that has any entry, ID first so the frozen
 	// column and a lookup both key on it, the numbers as the Library box holds them (what the user
-	// typed, in the project's units, which the headings name). Controls and rules are left out: they
-	// refer to assets, not the other way round.
+	// typed, in the project's units, which the headings name). **Controls and rules ride along too**
+	// (Tom, 2026-10-20: *"a network is useless without them"*): they refer to assets, not the other
+	// way round, but a workbook that leaves out the statements that run the pumps and valves is not
+	// the whole network.
 	//   Patterns: one row a pattern, its ID and Description, then its multipliers across, headed by period number 1, 2, 3...
 	//   Curves: one sheet per curve type present, one row a point, headed as the Library heads it.
 	//   Pipe types: one row a type, one column a property it may state; blank where it states none.
 	//   Fittings: one row a fitting of a list, so a list's coefficients can be summed in place.
+	//   Controls: one row a control, its Description and the statement as the Library shows it.
+	//   Rules: one row a line of a rule, so a rule reads down the sheet; ID and Description repeat.
 	function libraryExportSheets() {
 		var pc = EngCalcs.pageConfig || {}, out = [], idH = pc.lpn_field_id || 'ID',
 			descH = pc.lpn_library_curve_note_label || 'Description', libName = pc.lpn_library_curves || 'Curves';
@@ -35578,6 +35582,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (sets.length) {
 			out.push({ name: pc.lpn_library_fittings || 'Fittings', rows: frows, numeric: [false, false, false, true, true],
 				heads: [idH, descH, pc.lpn_fitting_name || 'Fitting', pc.lpn_fitting_qty || 'Quantity', pc.lpn_fitting_k || 'Coefficient'] });
+		}
+		var ctls = libControlsRead();
+		if (ctls.length) {
+			out.push({ name: pc.lpn_library_controls || 'Controls', heads: [descH, pc.lpn_library_controls || 'Controls'], numeric: [false, false],
+				rows: ctls.map(function (c) { return [txt(c.note), libControlText(c)]; }) });
+		}
+		var ruleLines = libRulesRead(), rrows = [];
+		libRuleEntries(ruleLines).forEach(function (e) {
+			var desc = libRuleDesc(ruleLines, e);
+			libRuleBody(ruleLines, e).forEach(function (line) { rrows.push([txt(e.name), txt(desc), txt(line)]); });
+		});
+		if (rrows.length) {
+			out.push({ name: pc.lpn_library_rules || 'Rules', heads: [idH, descH, pc.lpn_library_rules || 'Rules'], numeric: [false, false, false], rows: rrows });
 		}
 		return out;
 	}
@@ -43652,21 +43669,30 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return ' ' + out;
 	}
 	/**
-	 * **A FILE THAT LEAVES SCENARIOS BEHIND IS ANSWERED WITH A DIALOG** (Tom, 2026-10-18: *"Dialog, I
-	 * say. It's a major event that deserves a major answer."*). Only when the project has more than
-	 * Base; with Base alone nothing is left and the status line is enough. `already` is true when
-	 * another dialog (the .inp's flattening report) is open and has taken the sentence into itself.
+	 * **A FILE THAT LEAVES SCENARIOS BEHIND IS CONFIRMED BEFORE IT IS WRITTEN** (Tom, 2026-10-18:
+	 * *"Dialog, I say. It's a major event that deserves a major answer."*; 2026-10-20: *"keep one row
+	 * per format, and add the confirmation only where something is left behind"*). It used to be an
+	 * OK to dismiss AFTER the download, which could not be answered No. Now it is asked first, with
+	 * Export and Cancel, and says which scenario goes out. Only when the project has more than Base
+	 * or any stored alternative; with Base alone nothing is left and nothing is asked. `rowKey` is
+	 * the export row's language key, which names the file kind in the box; `run` is the export.
+	 * (The attached EPANET-MSX file is written back as it came in, so it never asks.)
 	 */
-	var exportDialogShown = false;
-	function exportScenarioDialog(text, already) {
-		var pcX = EngCalcs.pageConfig || {};
-		if (!exportLeavesSomething() || already) { return; }
-		openDialog(function (body) {
-			var p = document.createElement('p');
-			p.style.margin = '0';
-			p.textContent = text;
-			body.appendChild(p);
-		}, [{ label: pcX.lpn_dialog_ok || 'OK', fn: function () { } }]);
+	function confirmExportLeaves(rowKey, run) {
+		var pcX = EngCalcs.pageConfig || {}, fmt, lead;
+		if (!exportLeavesSomething()) { run(); return; }
+		fmt = String(pcX[rowKey] || '').replace(/\u2026$/, '');
+		lead = scenarios.length > 1
+			? (pcX.lpn_export_confirm_lead || 'The {format} holds one scenario, and this project has {n}.')
+				.split('{format}').join(fmt).split('{n}').join(String(scenarios.length)) + ' '
+			: '';
+		askDialog({
+			kind: 'confirm',
+			title: (pcX.lpn_export_confirm_title || 'Export {format}').split('{format}').join(fmt),
+			text: lead + exportScenarioSentence().replace(/^\s+/, ''),
+			ok: pcX.lpn_export_table_go || 'Export',
+			cancel: pcX.lpn_cancel || 'Cancel'
+		}, function (yes) { if (yes) { run(); } });
 	}
 	function exportInpFile() {
 		var pcX = EngCalcs.pageConfig || {}, base = inpExportBaseName(),
@@ -43702,9 +43728,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				setNotice((pic === false
 					? (pcX.lpn_status_inp_exported_no_picture || 'Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.')
 					: (pcX.lpn_status_inp_exported || 'Exported {file}.')).split('{file}').join(inpName) + tail);
-				exportDialogShown = false;
 				showInpExportFlattening(out.differences, inpName);
-				exportScenarioDialog(lastNoticeText, exportDialogShown);
 				return;
 			}
 			var built;
@@ -43721,9 +43745,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					.split('{picture}').join('\u0003').split('{world}').join('\u0004')
 					.split('\u0001').join(zipName).split('\u0002').join(inpName)
 					.split('\u0003').join(picName).split('\u0004').join(worldName) + tail);
-				exportDialogShown = false;
 				showInpExportFlattening(out.differences, inpName);
-				exportScenarioDialog(lastNoticeText, exportDialogShown);
 			}, function () {
 				// No archive, so no picture: the bare .inp, written again without a FILE line, and said.
 				finish(false);
@@ -43822,7 +43844,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				(out.hasResults ? (pcX.lpn_geojson_results_in || 'The results on screen are included.')
 					: staleScn ? (pcX.lpn_geojson_results_other || 'No results are included, because the results on screen belong to the scenario {scenario}.').split('{scenario}').join(staleScn)
 					: (pcX.lpn_geojson_results_out || 'No results are included, because the network is not solved.')));
-			exportScenarioDialog(lastNoticeText, false);
 		});
 	}
 	// ---- IMPORT GeoJSON SHAPES (Task 779) ----------------------------------------------------------
@@ -44693,7 +44714,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			? (pcX.lpn_dxf_exported_geo || 'Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.')
 				.replace('{file}', a.download).replace('{crs}', dxfCrsName(frame.code)) + exportScenarioSentence()
 			: (pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) + exportScenarioSentence());
-		exportScenarioDialog(lastNoticeText, false);
 	}
 	/**
 	 * **THE EXPORT ALERT** (ROADMAP Task 465 slice 5; Tom, 2026-09-06, on a library pipe being
@@ -44755,7 +44775,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			said.push((pc.lpn_inp_export_flat_fittings || 'An EPANET file cannot hold the list of elbows, valves and tees in your project file. The minor loss coefficient of pipes here ({n}) is added up from a fittings list. The total goes into the file exactly as it stands, so nothing about the answers changes.')
 				.replace('{n}', String(fittings.ids.length)));
 		}
-		exportDialogShown = true;
 		openDialog(function (body) {
 			var h = document.createElement('p'), lead = document.createElement('p'),
 				ul = document.createElement('ul');
@@ -50295,10 +50314,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// convention, and NOT a replacement of the parent's contents in the one popup. The disconnection
 	// also hides a dismissal bug: a menu that legitimately swaps its contents looks exactly like one
 	// that has been closed.
+	// **A THIRD LEVEL, FOR THE GROUPS INSIDE File > Import AND File > Export ONLY** (Task 819): a
+	// fly-out row such as Network opens its rows beside the Import fly-out. Level 2 is popup3.
 	function menuEls(level) {
-		return level
-			? { popup: document.getElementById('lpn_menu_popup2'), list: document.getElementById('lpn_menu_list2') }
-			: { popup: document.getElementById('lpn_menu_popup'), list: document.getElementById('lpn_menu_list') };
+		var n = level === 2 ? '3' : level ? '2' : '';
+		return { popup: document.getElementById('lpn_menu_popup' + n), list: document.getElementById('lpn_menu_list' + n) };
 	}
 	// **A MENU'S OWN TIP MUST NOT COVER THE MENU** (Tom, 2026-09-12, on the Water pull-down: *"its
 	// tip opens and obscures my view of the menu items ... it's the only menu that has a tip. But
@@ -50319,9 +50339,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// when its fly-out opens and restored when that fly-out shuts, while the menu-bar button's stays
 	// parked underneath -- one shared list would hand the Water button its tooltip back while its
 	// own menu was still standing open.
-	var tipParked = [null, null];
+	var tipParked = [null, null, null];
 	function parkAnchorTip(anchor, level) {
-		var i = level ? 1 : 0;
+		var i = level || 0;
 		unparkAnchorTip(i);
 		if (!anchor || !anchor.title) { return; }
 		tipParked[i] = { el: anchor, title: anchor.title };
@@ -50378,7 +50398,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var p = '', k;
 		if (!group || !row || row.variable) { return ''; }
 		if (parentRow) { p = cmdKeyFor(parentRow.label, group); if (!p) { return ''; } }
-		k = cmdKeyFor(row.label, p || group);
+		// A row that says which key it is (`key:`) is never guessed from its words. Needed once two
+		// rows of one menu share a label (Import > Network > GeoJSON file and Import > Shapes > GeoJSON file).
+		k = row.key ? String(row.key).replace(/^lpn_/, '') : cmdKeyFor(row.label, p || group);
 		if (!k) { return ''; }
 		return group + '/' + (p ? p + '/' : '') + k;
 	}
@@ -50396,6 +50418,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function openMenu(anchor, rows, level, group) {
 		if (menuCapture) { menuCapture.push(rows); return; }
 		menuRestoreSeq++;
+		var wasKb = menuKbIntent;
+		if (level === 1) { closeSubMenu2(); menuL1 = { anchor: anchor, rows: rows }; }   // a new fly-out never inherits the last one's group
 		var els = menuEls(level), popup = els.popup, list = els.list;
 		if (!popup || !list) { return; }
 		if (!level) {
@@ -50415,14 +50439,17 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			closeViewPopovers();
 		}
 		parkAnchorTip(anchor, level);
-		var rowGroup = menuGroup, rowParent = level && anchor ? anchor.__lpnRow || null : null;
+		// A row in a group inside a fly-out (level 2) is logged under the TOP submenu's key, so the
+		// usage id of Import > Network > EPANET file stays what it was when the row sat in Import itself.
+		var rowGroup = menuGroup, rowParent = level === 1 && anchor ? anchor.__lpnRow || null : level === 2 ? menuRootRow : null;
+		if (level === 1) { menuRootRow = rowParent; }
 		list.innerHTML = '';
 		list.setAttribute('role', 'menu');
 		var mnemonics = menuMnemonics(rows);
 		if (level) {
 			// The row that opened this fly-out: Left and Escape return focus to it, and its
 			// aria-expanded tells a screen reader the fly-out is out (Task 748).
-			subOpener = anchor;
+			if (level === 2) { subOpener2 = anchor; } else { subOpener = anchor; }
 			if (anchor.setAttribute) { anchor.setAttribute('aria-expanded', 'true'); }
 		}
 		rows.forEach(function (r, ri) {
@@ -50504,7 +50531,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// document dismissal in wireTabs(), which by then cannot find the row inside the
 				// popup and would close what was just opened. That was Tom's "File New has no
 				// options. And it does nothing."
-				b.addEventListener('click', function (e) { e.stopPropagation(); openMenu(b, r.submenu(), 1); });
+				b.addEventListener('click', function (e) { e.stopPropagation(); openMenu(b, r.submenu(), (level || 0) + 1); });
 				// **HOVER-TO-OPEN IS FOR POINTERS THAT CAN HOVER, AND ONLY THOSE** (Tom, 2026-08-29:
 				// *"Map.Insert menu is broken on phone. Does nothing."*).
 				//
@@ -50519,15 +50546,20 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				// touchscreen laptop answers it correctly for the pointer actually in use, and the
 				// same media query already decides the profile chooser's vocabulary.
 				if (canHover()) {
-					b.addEventListener('mouseenter', function () { cancelSubClose(); openMenu(b, r.submenu(), 1); });
+					b.addEventListener('mouseenter', function () { cancelSubClose(); cancelSub2Close(); openMenu(b, r.submenu(), (level || 0) + 1); });
 				}
 			} else if (level) {
+				if (r.keepOpen) { b.addEventListener('click', function (e) { e.stopPropagation(); r.fn(e); }); list.appendChild(b); return; }
 				// A row INSIDE the fly-out keeps it open. This is the whole of Tom's "it disappears
 				// before the mouse can reach it; it honestly seems to disappear BECAUSE you reach
 				// it" (2026-08-10) -- and it did: the dismiss-on-hover below was attached to every
 				// plain row at every level, so entering "Blank project" closed the menu that
 				// "Blank project" was in.
-				if (canHover()) { b.addEventListener('mouseenter', cancelSubClose); }
+				// A plain row in the fly-out takes a group's third level with it, after the grace period;
+				// a plain row in the third level keeps both open.
+				if (canHover()) {
+					b.addEventListener('mouseenter', function () { cancelSubClose(); if (level === 2) { cancelSub2Close(); } else { scheduleSub2Close(); } });
+				}
 				b.addEventListener('click', function (e) { logCommandUse(commandId(rowGroup, rowParent, r)); closeMenu(); r.fn(e); dismissTipsAfterCommand(); });
 			} else {
 				// Moving onto a plain row in the PARENT dismisses the fly-out, as every desktop menu
@@ -50545,7 +50577,32 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// aligned) rather than below it, which is what makes it read as a branch of the parent
 		// instead of a replacement for it; a top-level menu hangs under its menu-bar button and,
 		// like every other panel here, gives up height rather than covering that button.
-		openPanelAtAnchor(popup, anchor.getBoundingClientRect(), !!level);
+		var preferLeft = false;
+		if (level === 2) {
+			// The third level opens on the side the second one took, so it never lands on the menu
+			// the second one flipped away from (right-to-left pages, a menu at the right edge).
+			var q1 = document.getElementById('lpn_menu_popup').getBoundingClientRect(), q2 = document.getElementById('lpn_menu_popup2').getBoundingClientRect();
+			preferLeft = q2.left < q1.left;
+		}
+		openPanelAtAnchor(popup, anchor.getBoundingClientRect(), !!level, preferLeft);
+		if (level === 2 && menuL1) {
+			// **NO ROW OF ANY OPEN LEVEL IS EVER COVERED** (pre-review, phone 390 px). Where the third
+			// level has no room beside its parent it would land on the parent's other rows, and a tap
+			// meant for Shapes would open the EPANET file picker. It then takes the fly-out's place
+			// instead: the group's rows under a Back row that restores the fly-out.
+			var a1 = document.getElementById('lpn_menu_popup').getBoundingClientRect(), a2 = document.getElementById('lpn_menu_popup2').getBoundingClientRect(),
+				a3 = popup.getBoundingClientRect();
+			// A few pixels of shared border and padding is how a fly-out sits beside its row; a real overlap is wider.
+			var hits = function (u, v) { return u.left < v.right - 12 && v.left < u.right - 12 && u.top < v.bottom - 1 && v.top < u.bottom - 1; };
+			if (hits(a3, a1) || hits(a3, a2)) {
+				var pcB = EngCalcs.pageConfig || {}, keep = menuL1;
+				closeSubMenu2();
+				menuKbIntent = wasKb;
+				openMenu(keep.anchor, [{ label: pcB.lpn_menu_back || 'Back', keepOpen: true,
+					fn: function () { openMenu(keep.anchor, keep.rows, 1); } }].concat(rows), 1);
+				return;
+			}
+		}
 		// Rows are built fresh on every open, so their tips are new DOM every time and need arming --
 		// this is exactly the case ROADMAP Task 173 added initTips(root) for (a tooltip built after
 		// page load is dead on touch without it).
@@ -50566,6 +50623,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// opens a fly-out and Left closes it, Escape closes one level and returns focus to its opener,
 	// Tab closes the menu and goes on, Enter/Space are the buttons' own click.
 	var subOpener = null;
+	var subOpener2 = null;   // the group row (level 1) that opened the third level
+	var menuL1 = null;       // the anchor and rows of the open fly-out, so a group can take its place on a narrow window
+	var menuRootRow = null;  // the top submenu's row (Import…, Export…) while a third level is open
 	var menuKbIntent = false;
 	// Counts menu interactions. The deferred focus restore below runs from a timer, which a busy page
 	// can delay past the person's next keystrokes (input outranks timers); a restore whose number is
@@ -50597,13 +50657,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var ret = kbdModeReturn;   // the element that had focus before a chord or F10 (cleared by the click handler below)
 		var boxVisible = function (id) { var b = document.getElementById(id); return !!b && b.getClientRects().length > 0; };
 		var boxesBefore = ESCAPE_SCOPED_BOXES.filter(boxVisible);
-		if (t && t.closest && t.closest('#lpn_menu_popup, #lpn_menu_popup2') && opener) {
+		if (t && t.closest && t.closest('#lpn_menu_popup, #lpn_menu_popup2, #lpn_menu_popup3') && opener) {
 			setTimeout(function () {
 				if (seq !== menuRestoreSeq) { return; }   // a later menu interaction owns focus
 				// The closed menu's row still holds focus until the browser's next focus fix-up, so
 				// "dropped" means body, or a control inside either closed menu panel.
 				var a = document.activeElement;
-				var dropped = !a || a === document.body || !!(a.closest && a.closest('#lpn_menu_popup, #lpn_menu_popup2'));
+				var dropped = !a || a === document.body || !!(a.closest && a.closest('#lpn_menu_popup, #lpn_menu_popup2, #lpn_menu_popup3'));
 				var still = document.getElementById('lpn_menu_popup');
 				if (still && still.style.display === 'block') { return; }   // a fly-out opened; keys own focus
 				if (!dropped) { return; }
@@ -50728,9 +50788,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if ((k === 'ArrowLeft' || k === 'ArrowRight') && window.getComputedStyle(document.documentElement).direction === 'rtl') {
 			k = k === 'ArrowLeft' ? 'ArrowRight' : 'ArrowLeft';
 		}
-		var pop = document.getElementById('lpn_menu_popup'), sub = document.getElementById('lpn_menu_popup2');
+		var pop = document.getElementById('lpn_menu_popup'), sub = document.getElementById('lpn_menu_popup2'),
+			sub3 = document.getElementById('lpn_menu_popup3');
 		var open = !!pop && pop.style.display === 'block';
 		var subOpen = !!sub && sub.style.display === 'block';
+		var sub3Open = !!sub3 && sub3.style.display === 'block';
 		if (!open) {
 			// Closed: a menu-bar button holding focus walks the bar, and Down/Up open its menu.
 			if (!ae || !ae.classList || !ae.classList.contains('lpn-menubar-item')) { return; }
@@ -50750,11 +50812,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}
 			return;
 		}
-		var inSub = subOpen && sub.contains(ae), inPop = pop.contains(ae);
+		var inSub3 = sub3Open && sub3.contains(ae), inSub = subOpen && sub.contains(ae), inPop = pop.contains(ae);
 		var onAnchor = !!openMenuAnchor && ae === openMenuAnchor;
 		// Focus elsewhere on the page: the menu was opened with the mouse, and the page-wide
 		// Escape and click-away dismissals own it.
-		if (!inSub && !inPop && !onAnchor) { return; }
+		if (!inSub && !inSub3 && !inPop && !onAnchor) { return; }
 		var anchor = openMenuAnchor;
 		function stop() { e.preventDefault(); e.stopPropagation(); }
 		if (k === 'Tab') {
@@ -50764,38 +50826,41 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		if (k === 'Escape') {
 			stop();
-			if (subOpen) { var so = subOpener; closeSubMenu(); menuFocus(inSub || onAnchor ? so : ae); }
+			if (sub3Open) { var so3 = subOpener2; closeSubMenu2(); menuFocus(inSub3 || onAnchor ? so3 : ae); }
+			else if (subOpen) { var so = subOpener; closeSubMenu(); menuFocus(inSub || onAnchor ? so : ae); }
 			else { closeMenu(); menuFocus(anchor); }
 			return;
 		}
 		if (k === 'ArrowDown' || k === 'ArrowUp' || k === 'Home' || k === 'End') {
 			stop();
-			var items = menuRowsOf(inSub ? document.getElementById('lpn_menu_list2') : document.getElementById('lpn_menu_list'));
+			var items = menuRowsOf(document.getElementById(inSub3 ? 'lpn_menu_list3' : inSub ? 'lpn_menu_list2' : 'lpn_menu_list'));
 			if (!items.length) { return; }
 			var i = items.indexOf(ae), n = items.length, to;
 			if (k === 'Home') { to = 0; }
 			else if (k === 'End') { to = n - 1; }
 			else if (k === 'ArrowDown') { to = i < 0 ? 0 : (i + 1) % n; }
 			else { to = i < 0 ? n - 1 : (i - 1 + n) % n; }
-			if (!inSub && subOpen) { closeSubMenu(); }   // leaving the parent row takes its fly-out with it
+			if (!inSub && !inSub3 && subOpen) { closeSubMenu(); }   // leaving the parent row takes its fly-out with it
+			else if (inSub && sub3Open) { closeSubMenu2(); }
 			items[to].focus();
 			return;
 		}
 		if (k === 'ArrowRight') {
 			stop();
-			if (inPop && ae.getAttribute && ae.getAttribute('aria-haspopup') === 'menu') { menuKbOpen(ae); }
+			if ((inPop || inSub) && ae.getAttribute && ae.getAttribute('aria-haspopup') === 'menu') { menuKbOpen(ae); }
 			else { menuBarMove(1, anchor); }
 			return;
 		}
 		if (k === 'ArrowLeft') {
 			stop();
-			if (inSub) { var so2 = subOpener; closeSubMenu(); menuFocus(so2); }
+			if (inSub3) { var so4 = subOpener2; closeSubMenu2(); menuFocus(so4); }
+			else if (inSub) { var so2 = subOpener; closeSubMenu(); menuFocus(so2); }
 			else { menuBarMove(-1, anchor); }
 			return;
 		}
 		// A row's mnemonic: a fly-out row opens its fly-out with focus inside, a command row runs.
 		// The key is swallowed even on a disabled row, so a letter never falls through to a tool key.
-		var hit = menuRowForKey(inSub ? sub : pop, e);
+		var hit = menuRowForKey(inSub3 ? sub3 : inSub ? sub : pop, e);
 		if (hit) {
 			stop();
 			if (hit.disabled) { return; }
@@ -50834,7 +50899,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return !!bar && bar.classList.contains('lpn-kbdmode');
 	}
 	function inMenuChrome(el) {
-		return !!el && !!el.closest && !!el.closest('#lpn_menubar, #lpn_menu_popup, #lpn_menu_popup2');
+		return !!el && !!el.closest && !!el.closest('#lpn_menubar, #lpn_menu_popup, #lpn_menu_popup2, #lpn_menu_popup3');
 	}
 	function kbdModeEnter() {
 		var bar = document.getElementById('lpn_menubar');
@@ -50910,7 +50975,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}, true);
 	document.addEventListener('click', function (e) {
 		var t = e.target;
-		if (kbdModeOn() && t && t.closest && t.closest('#lpn_menu_popup .lpn-menu-row:not([aria-haspopup]), #lpn_menu_popup2 .lpn-menu-row')) { kbdModeExit(false); }
+		if (kbdModeOn() && t && t.closest && t.closest('#lpn_menu_popup .lpn-menu-row:not([aria-haspopup]), #lpn_menu_popup2 .lpn-menu-row, #lpn_menu_popup3 .lpn-menu-row')) { kbdModeExit(false); }
 	}, true);
 	// The classic fly-out grace period. Travelling from the parent row to its fly-out is a DIAGONAL
 	// move across the rows below, so dismissing on the first row entered makes the submenu
@@ -50937,8 +51002,25 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		cancelSubClose();
 		subCloseTimer = setTimeout(function () { subCloseTimer = null; closeSubMenu(); }, SUB_CLOSE_MS);
 	}
+	// The third level (a group inside the Import or Export fly-out), closed apart from its parent.
+	var sub2CloseTimer = null;
+	function cancelSub2Close() {
+		if (sub2CloseTimer) { clearTimeout(sub2CloseTimer); sub2CloseTimer = null; }
+	}
+	function scheduleSub2Close() {
+		cancelSub2Close();
+		sub2CloseTimer = setTimeout(function () { sub2CloseTimer = null; closeSubMenu2(); }, SUB_CLOSE_MS);
+	}
+	function closeSubMenu2() {
+		cancelSub2Close();
+		hidePanel(document.getElementById('lpn_menu_popup3'));
+		unparkAnchorTip(2);
+		if (subOpener2 && subOpener2.setAttribute) { subOpener2.setAttribute('aria-expanded', 'false'); }
+		subOpener2 = null;
+	}
 	function closeSubMenu() {
 		cancelSubClose();
+		closeSubMenu2();
 		hidePanel(document.getElementById('lpn_menu_popup2'));
 		unparkAnchorTip(1);
 		if (subOpener && subOpener.setAttribute) { subOpener.setAttribute('aria-expanded', 'false'); }
@@ -52164,82 +52246,110 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// mapMenuRows() takes from openMapMenu(): a harness can ask what the submenu offers without
 	// driving a popup. Each row is unchanged from the flat list it moved out of -- same icon, same
 	// label key, same tip, same handler.
-	function importMenuRows() {
+	// **THE IMPORT FLY-OUT HAS TWO GROUPS** (Task 819; Tom, 2026-10-20: submenus for networks and for
+	// shapes, *"very simple and intuitive"*). Network and Shapes open a third level, so Import reads
+	// like Export. The rows inside a group carry shortened names (GeoJSON file…, DXF file…) because
+	// the group already says what the file becomes. Each row keeps its own language key (it IS the
+	// command's usage id) and says so in `key:`, since two rows now share the words "GeoJSON file…".
+	// **ANOTHER NETWORK READER (the WaterCAD / WaterGEMS model…) IS ONE LINE IN importNetworkRows(),
+	// after GeoJSON file…**; nothing else changes.
+	function importNetworkRows() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			// **IMPORT SURVEYED POINTS (Task 592), AND IT IS A FILE ROW BY TOM'S OWN VOTE** (2026-09-17:
-			// *"Probably Settings is a bad place for Import survey points. That traditionally goes
-			// under File or Water. But Map might make sense. My vote is File since they come from a
-			// file."*). It lived under Settings > New assets, on the argument that it makes new
-			// assets and takes the new-asset values; that argument is still true and is not where a
-			// person looks. A command named after a FILE belongs with the other file commands.
-			{ icon: 'position', label: pc.lpn_file_import_survey || 'Surveyed points…',
-			  tip: pc.lpn_file_import_survey_tip, fn: pickSurveyFile },
-			{ icon: 'open', label: pc.lpn_file_import_inp || 'EPANET file…',
+			{ icon: 'open', label: pc.lpn_file_import_inp || 'EPANET file…', key: 'lpn_file_import_inp',
 			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
 			// **EPANET-MSX (Task 717, phase 1)**: attaches the second file of a multi-species study to
 			// the open project; kept and written back, never run. With one attached, the row shows it.
-			{ icon: 'open', label: pc.lpn_file_import_msx || 'EPANET-MSX file…',
+			{ icon: 'open', label: pc.lpn_file_import_msx || 'EPANET-MSX file…', key: 'lpn_file_import_msx',
 			  tip: pc.lpn_file_import_msx_tip, fn: openMsxRow },
 			// A GeoJSON file as a network, through one mapping step (Task 728).
-			{ icon: 'open', label: pc.lpn_file_import_gjnet || 'GeoJSON network…',
-			  tip: pc.lpn_file_import_gjnet_tip, fn: pickGeoJsonNetFile },
+			{ icon: 'open', label: pc.lpn_file_import_gjnet || 'GeoJSON file…', key: 'lpn_file_import_gjnet',
+			  tip: pc.lpn_file_import_gjnet_tip, fn: pickGeoJsonNetFile }
+		];
+	}
+	function importShapeRows() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
 			// The points, lines and polygons of a GeoJSON file, as Shapes (Task 779).
-			{ icon: 'open', label: pc.lpn_file_import_shapes || 'GeoJSON shapes…',
+			{ icon: 'open', label: pc.lpn_file_import_shapes || 'GeoJSON file…', key: 'lpn_file_import_shapes',
 			  tip: pc.lpn_file_import_shapes_tip, fn: pickGeoJsonFile },
-			{ icon: 'open', label: pc.lpn_file_import_dxf || 'DXF shapes…',
+			{ icon: 'open', label: pc.lpn_file_import_dxf || 'DXF file…', key: 'lpn_file_import_dxf',
 			  tip: pc.lpn_file_import_dxf_tip, fn: pickDxfShapesFile },
-			{ icon: 'open', label: pc.lpn_file_import_shp || 'Shapefile shapes…',
-			  tip: pc.lpn_file_import_shp_tip, fn: pickShapefile },
+			{ icon: 'open', label: pc.lpn_file_import_shp || 'Shapefile…', key: 'lpn_file_import_shp',
+			  tip: pc.lpn_file_import_shp_tip, fn: pickShapefile }
+		];
+	}
+	function importMenuRows() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			{ icon: 'open', label: pc.lpn_calib_network || 'Network', submenu: importNetworkRows },
+			{ icon: 'open', label: pc.lpn_pane_tab_shapes || 'Shapes', submenu: importShapeRows },
+			// **IMPORT SURVEYED POINTS (Task 592), AND IT IS A FILE ROW BY TOM'S OWN VOTE** (2026-09-17:
+			// *"Probably Settings is a bad place for Import survey points. That traditionally goes
+			// under File or Water. But Map might make sense. My vote is File since they come from a
+			// file."*). A command named after a FILE belongs with the other file commands.
+			{ icon: 'position', label: pc.lpn_file_import_survey || 'Surveyed points…',
+			  tip: pc.lpn_file_import_survey_tip, fn: pickSurveyFile },
 			// **THE LIBRARY IMPORT WIZARD'S OWN DOOR, AND ITS ONLY ONE** (Task 611). Tom,
 			// 2026-09-17: *"Move the button to the File menu. I thought you already did that."* Then
-			// 2026-09-18: *"Remove buttons except at the File menu."* The Libraries box carried the
-			// same button in each of its three sections until he used it, on his own earlier sentence
-			// asking for the wizard *"available from every applicable library"*; his later word wins,
-			// and the earlier one should have been questioned rather than built. **Do not put a
-			// button back in the Libraries box.**
+			// 2026-09-18: *"Remove buttons except at the File menu."* **Do not put a button back in
+			// the Libraries box.**
 			{ icon: 'open', label: pc.lpn_library_import || 'Libraries…',
 			  tip: pc.lpn_library_import_tip, fn: libImportPick },
 			// **WORKSPACE (Tom, 2026-10-07)**: the browser-scoped layout and preferences, from a file.
-			// Under File > Import because it comes from a file, by the same vote that put surveyed
-			// points here; Settings holds the settings themselves and this is a file command.
+			// Stays the last row, outside both groups: it is not a network or a shape.
 			{ icon: 'open', label: pc.lpn_file_import_workspace || 'Workspace…',
 			  tip: pc.lpn_file_import_workspace_tip, fn: pickWorkspaceFile }
 		];
 	}
 	// The Export fly-out, a function of its own for the reason importMenuRows() is: a harness can ask
-	// what it offers without driving a popup. **ADDING AN EXPORT IS ONE LINE HERE**, nothing in
-	// openFileMenu() changes. Each is a DOWNLOAD and never a live handle (Task 281): a file we hand
-	// over, not one this page keeps writing to, which is why Export is not a second Save as.
-	function exportMenuRows() {
+	// what it offers without driving a popup. **THE TWO GROUPS MIRROR IMPORT'S** (Task 819; Tom,
+	// 2026-10-20): Network (the formats a network goes out in) and Tables (the files the Tables pane
+	// writes, through the box that asks which tables and scenarios), then Workspace, last.
+	// **ADDING AN EXPORT IS ONE LINE** in the group it belongs to; nothing in openFileMenu() changes.
+	// Each is a DOWNLOAD and never a live handle (Task 281): a file we hand over, not one this page
+	// keeps writing to, which is why Export is not a second Save as.
+	function exportNetworkRows() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			{ icon: 'save', label: pc.lpn_file_export_item_inp || 'EPANET file…',
-			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
+			{ icon: 'save', label: pc.lpn_file_export_item_inp || 'EPANET file…', key: 'lpn_file_export_item_inp',
+			  tip: pc.lpn_file_export_inp_tip, fn: function () { confirmExportLeaves('lpn_file_export_item_inp', exportInpFile); } },
 			// GeoJSON (Task 728): same verb, same kind of file.
-			{ icon: 'save', label: pc.lpn_file_export_item_geojson || 'GeoJSON file…',
-			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile },
+			{ icon: 'save', label: pc.lpn_file_export_item_geojson || 'GeoJSON file…', key: 'lpn_file_export_item_geojson',
+			  tip: pc.lpn_file_export_geojson_tip, fn: function () { confirmExportLeaves('lpn_file_export_item_geojson', exportGeoJsonFile); } },
 			// The attached EPANET-MSX file, as its own row so one click is one download. Only offered
-			// when the project holds one.
-			{ icon: 'save', label: pc.lpn_file_export_item_msx || 'EPANET-MSX file…', hidden: !doc.msx,
+			// when the project holds one. It is written back exactly as it came in, so nothing of a
+			// scenario is left behind and it asks nothing.
+			{ icon: 'save', label: pc.lpn_file_export_item_msx || 'EPANET-MSX file…', hidden: !doc.msx, key: 'lpn_file_export_item_msx',
 			  tip: pc.lpn_file_export_msx_tip, fn: exportMsxFile },
 			// THE MODEL'S DATA for AutoCAD and every other DWG program (Task 772). Reading a DXF back
 			// is the DXF Interface Manager's import half, not built.
-			{ icon: 'save', label: pc.lpn_file_export_item_dxf || 'DXF file…',
-			  tip: pc.lpn_file_export_dxf_tip, fn: exportDxfFile },
-			// **THE TABLES, BY FORMAT** (Tom, 2026-10-07: *"File, Export to, and we are adding
-			// ODS/XLSX/CSV. And we include Libraries"*). Each row opens the box that asks which tables
-			// and which scenarios; the format is the row. Rows are named for the file, like the three
-			// above, each tip says what it carries.
-			{ separator: true },
-			{ icon: 'save', label: pc.lpn_file_export_item_ods || 'ODS file…',
+			{ icon: 'save', label: pc.lpn_file_export_item_dxf || 'DXF file…', key: 'lpn_file_export_item_dxf',
+			  tip: pc.lpn_file_export_dxf_tip, fn: function () { confirmExportLeaves('lpn_file_export_item_dxf', exportDxfFile); } }
+		];
+	}
+	function exportTableRows() {
+		var pc = EngCalcs.pageConfig || {};
+		// **THE TABLES, BY FORMAT** (Tom, 2026-10-07: *"File, Export to, and we are adding
+		// ODS/XLSX/CSV. And we include Libraries"*). Each row opens the box that asks which tables
+		// and which scenarios; the format is the row. Rows are named for the file, each tip says
+		// what it carries.
+		return [
+			{ icon: 'save', label: pc.lpn_file_export_item_ods || 'ODS file…', key: 'lpn_file_export_item_ods',
 			  tip: pc.lpn_file_export_tables_tip, fn: function () { openExportTableBox('ods'); } },
-			{ icon: 'save', label: pc.lpn_file_export_item_xlsx || 'XLSX file…',
+			{ icon: 'save', label: pc.lpn_file_export_item_xlsx || 'XLSX file…', key: 'lpn_file_export_item_xlsx',
 			  tip: pc.lpn_file_export_tables_tip, fn: function () { openExportTableBox('xlsx'); } },
-			{ icon: 'save', label: pc.lpn_file_export_item_csv || 'CSV file…',
-			  tip: pc.lpn_file_export_csv_tip, fn: function () { openExportTableBox('csv'); } },
+			{ icon: 'save', label: pc.lpn_file_export_item_csv || 'CSV file…', key: 'lpn_file_export_item_csv',
+			  tip: pc.lpn_file_export_csv_tip, fn: function () { openExportTableBox('csv'); } }
+		];
+	}
+	function exportMenuRows() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			{ icon: 'save', label: pc.lpn_calib_network || 'Network', submenu: exportNetworkRows },
+			{ icon: 'save', label: pc.lpn_tables_menu || 'Tables', submenu: exportTableRows },
 			{ separator: true },
-			// Workspace (Tom, 2026-10-07): the twin of File > Import > Workspace.
+			// Workspace (Tom, 2026-10-07): the twin of File > Import > Workspace. Stays the last row.
 			{ icon: 'save', label: pc.lpn_file_export_item_workspace || 'Workspace…',
 			  tip: pc.lpn_file_export_workspace_tip, fn: exportWorkspaceFile }
 		];
@@ -52802,9 +52912,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					if (!r.label) { return; }
 					e = { menuId: m.id, menuLabel: menuLabel, row: r, depth: depth, parent: parent };
 					out.push(e);
-					if (r.submenu && depth === 0) {
+					if (r.submenu && depth <= 1) {
 						try { sub = r.submenu() || []; } catch (err2) { sub = []; }
-						walk(sub, 1, e);
+						walk(sub, depth + 1, e);
 					}
 				});
 			})(rows, 0, null);
@@ -52869,8 +52979,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return svgEl;
 	}
 	function guidePathEl(e) {
-		var p = guideSpan('lpn-guide-path'), parts = [e.menuLabel];
-		if (e.parent) { parts.push(e.parent.row.label); }
+		var p = guideSpan('lpn-guide-path'), parts = [e.menuLabel], anc, chain = [];
+		for (anc = e.parent; anc; anc = anc.parent) { chain.unshift(anc.row.label); }
+		parts = parts.concat(chain);
 		parts.push(e.row.label);
 		parts.forEach(function (w, i) {
 			if (i) { p.appendChild(guideChevron()); }
@@ -53402,11 +53513,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Whatever menu the last card opened is closed before the next card acts and when its ring fades,
 	// unless the reader has moved into it (pointer over it, or focus inside it) in the meantime.
 	function guideCloseOpened(onlyIfUntouched) {
-		var pop = document.getElementById('lpn_menu_popup'), pop2 = document.getElementById('lpn_menu_popup2');
+		var pop = document.getElementById('lpn_menu_popup'), pop2 = document.getElementById('lpn_menu_popup2'), pop3 = document.getElementById('lpn_menu_popup3');
 		clearTimeout(guideMenuT);
 		if (!guideOpenedMenu) { return; }
-		if (onlyIfUntouched && ((pop && pop.matches(':hover')) || (pop2 && pop2.matches(':hover'))
-				|| (pop && pop.contains(document.activeElement)) || (pop2 && pop2.contains(document.activeElement)))) { guideOpenedMenu = false; return; }
+		if (onlyIfUntouched && ((pop && pop.matches(':hover')) || (pop2 && pop2.matches(':hover')) || (pop3 && pop3.matches(':hover'))
+				|| (pop && pop.contains(document.activeElement)) || (pop2 && pop2.contains(document.activeElement))
+				|| (pop3 && pop3.contains(document.activeElement)))) { guideOpenedMenu = false; return; }
 		guideOpenedMenu = false;
 		if (pop && pop.style.display === 'block' && openMenuAnchor === guideMenuAnchor) { closeMenu(); }
 	}
@@ -53449,11 +53561,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		guideOpenedMenu = true;
 		guideMenuAnchor = btn;
 		if (e.depth) {
-			opener = guideMenuRowIn('lpn_menu_list', e.parent.row);
+			var top = e.parent.parent || e.parent;
+			opener = guideMenuRowIn('lpn_menu_list', top.row);
 			if (!opener) { return false; }
 			if (opener.disabled || !opener.__lpnRow.submenu) { return guidePoint(opener); }
 			openMenu(opener, opener.__lpnRow.submenu(), 1);
 			target = guideMenuRowIn('lpn_menu_list2', e.row);
+			if (e.parent.parent) {
+				opener = guideMenuRowIn('lpn_menu_list2', e.parent.row);
+				if (!opener) { return false; }
+				openMenu(opener, opener.__lpnRow.submenu(), 2);
+				target = guideMenuRowIn('lpn_menu_list3', e.row);
+			}
 		} else {
 			target = guideMenuRowIn('lpn_menu_list', e.row);
 		}
@@ -53504,7 +53623,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	// ---- `?` opens the guide at the control under the pointer or holding focus ----
 	var guideHoverEl = null;
-	var GUIDE_SUBJECTS = '#lpn_toolbar button, #lpn_menu_popup button.lpn-menu-row, #lpn_menu_popup2 button.lpn-menu-row';
+	var GUIDE_SUBJECTS = '#lpn_toolbar button, #lpn_menu_popup button.lpn-menu-row, #lpn_menu_popup2 button.lpn-menu-row, #lpn_menu_popup3 button.lpn-menu-row';
 	document.addEventListener('mouseover', function (e) {
 		guideHoverEl = e.target && e.target.closest ? e.target.closest(GUIDE_SUBJECTS) : null;
 	}, true);
@@ -53521,10 +53640,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!t) { return null; }
 		if (t.closest('#lpn_toolbar')) { return { kind: 'toolbar', el: t }; }
 		if (!t.__lpnRow) { return null; }
-		inSub = !!t.closest('#lpn_menu_popup2');
+		inSub = !!t.closest('#lpn_menu_popup2, #lpn_menu_popup3');
 		return {
 			kind: 'menu', row: t.__lpnRow, menuId: openMenuAnchor ? openMenuAnchor.id : '',
-			parentRow: inSub && subOpener ? subOpener.__lpnRow || null : null
+			parentRow: t.closest('#lpn_menu_popup3') ? (subOpener2 && subOpener2.__lpnRow) || null
+				: inSub && subOpener ? subOpener.__lpnRow || null : null
 		};
 	}
 	function guideRowFor(subject) {
@@ -55277,6 +55397,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// and a close armed by the parent must not fire in that gap.
 		var subPopup = document.getElementById('lpn_menu_popup2');
 		if (subPopup) { subPopup.addEventListener('mouseenter', cancelSubClose); }
+		var subPopup3 = document.getElementById('lpn_menu_popup3');
+		if (subPopup3) { subPopup3.addEventListener('mouseenter', function () { cancelSubClose(); cancelSub2Close(); }); }
 		// **A GESTURE THAT BEGAN INSIDE A BOX NEVER DISMISSES IT** (Tom, 2026-08-18).
 		//
 		// The report, and it is a real one for anybody who selects text the way most people do: you
@@ -55335,7 +55457,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				(openMenuAnchor.contains && openMenuAnchor.contains(from)));
 			// A click in the FLY-OUT is a click in the menu. Without this the submenu's own rows
 			// would dismiss the pull-down under them mid-click.
-			var inSub = sub && sub.style.display === 'block' && sub.contains(from);
+			var sub3 = document.getElementById('lpn_menu_popup3');
+			var inSub = (sub && sub.style.display === 'block' && sub.contains(from)) || (sub3 && sub3.style.display === 'block' && sub3.contains(from));
 			var startedInMenu = gestureStartInMenu;
 			gestureStartInMenu = false;
 			if (popup && popup.style.display === 'block' && !popup.contains(from) && !inSub
@@ -55355,7 +55478,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// other buttons, which are exactly the clicks a user means as "away".
 			var onOpener = viewPopoverAnchor && (from === viewPopoverAnchor ||
 				(viewPopoverAnchor.contains && viewPopoverAnchor.contains(from)));
-			var inMenu = from.closest && from.closest('#lpn_menu_popup, #lpn_menu_popup2');
+			var inMenu = from.closest && from.closest('#lpn_menu_popup, #lpn_menu_popup2, #lpn_menu_popup3');
 			if (!inside && !onOpener && !inMenu) { closeViewPopovers(); }
 		});
 		// The workspace picker, wired ahead of the rest for the same reason the library one is.
@@ -66685,7 +66808,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (!doc.msx) {
 			if (noteFn) {
 				noteFn(host, pc.lpn_quality_msx_none
-					|| 'No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.');
+					|| 'No EPANET-MSX file is attached to this project. Attach one with File, Import, Network, EPANET-MSX file.');
 			}
 			return;
 		}
@@ -70242,7 +70365,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// per box (Task 372) -- they were four copies of the same six lines and had already drifted.
 	// `ar` is the anchor's rect; `beside` is the fly-out case, which sits at the anchor's right edge
 	// and top rather than under it, so it is allowed to share the anchor's rows.
-	function openPanelAtAnchor(panel, ar, beside) {
+	function openPanelAtAnchor(panel, ar, beside, preferLeft) {
 		var body = panelBody(panel), r, at;
 		panel.style.display = 'block';
 		resetPanelHeight(panel, body);
@@ -70270,7 +70393,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					Math.min(ar.bottom, window.innerHeight - h - POPUP_EDGE)) + 'px';
 				return null;
 			}
-			var wantLeft = roomRight ? ar.right : ar.left - r.width;
+			var wantLeft = (roomRight && !(preferLeft && roomLeft)) ? ar.right : ar.left - r.width;
 			panel.style.left = Math.max(POPUP_EDGE, Math.min(wantLeft, window.innerWidth - r.width - POPUP_EDGE)) + 'px';
 			// **A FLY-OUT'S FLOOR IS THE VIEWPORT, NOT chromeFloor()** (Tom, 2026-08-27: File > New
 			// project's fly-out *"is too low"*). The chrome floor is the bottom of the menu bar,
@@ -84056,7 +84179,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				if (!r || r.separator || r.heading || r.variable || !r.label) { return; }
 				if (r.submenu) {
 					try { sub = r.submenu() || []; } catch (err) { sub = []; }
-					if (!parentRow) { walk(group, groupLabel, sub, r); }
+					// A group inside a fly-out (Import > Network) lists its rows under the TOP submenu.
+					walk(group, groupLabel, sub, parentRow || r);
 					return;
 				}
 				id = commandId(group, parentRow, r);

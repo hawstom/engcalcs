@@ -106,7 +106,8 @@ async function main() {
 		await key('Escape');
 		ok('Escape closes only the fly-out', !(await shown('lpn_menu_popup2')) && await shown('lpn_menu_popup'));
 		ok('...focus back on the row', await focusText() === subRow.t);
-		await key('ArrowRight'); await key('ArrowDown');
+		// Import's first two rows are groups (Network, Shapes: Right opens them, Task 819); the third is plain.
+		await key('ArrowRight'); await key('ArrowDown'); await key('ArrowDown');
 		await key('ArrowRight');
 		ok('...the Edit menu is open', await page.$eval('#lpn_menu_edit', (e) => e.getAttribute('aria-expanded')) === 'true');
 		ok('...and the fly-out is gone', !(await shown('lpn_menu_popup2')));

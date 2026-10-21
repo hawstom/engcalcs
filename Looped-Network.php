@@ -1559,6 +1559,11 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <div id="lpn_menu_popup2" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:1851;background:var(--ec-box-bg);border:var(--ec-box-border);padding:4px;box-shadow:var(--ec-box-shadow)">
 	<div id="lpn_menu_list2"></div>
 </div>
+<?php // The THIRD level, used only by File > Import and File > Export (a group row such as Network opens
+      // its rows beside the Import fly-out). One element more, same reason as the second. ?>
+<div id="lpn_menu_popup3" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:1851;background:var(--ec-box-bg);border:var(--ec-box-border);padding:4px;box-shadow:var(--ec-box-shadow)">
+	<div id="lpn_menu_list3"></div>
+</div>
 <?php // ONE dialog, reused for every question that has to be answered before anything else happens:
       // the close prompt, the read-only choice when somebody else has the file, and the first-run
       // file training panel. Deliberately NOT window.confirm(): showSaveFilePicker() needs a live
@@ -2326,6 +2331,8 @@ EngCalcs.pageConfig = {
 	lpn_geojson_results_in: <?=json_encode($ec_lang['lpn_geojson_results_in'])?>,
 	lpn_geojson_results_out: <?=json_encode($ec_lang['lpn_geojson_results_out'])?>,
 	lpn_export_leaves_alternatives: <?=json_encode($ec_lang['lpn_export_leaves_alternatives'])?>,
+	lpn_export_confirm_title: <?=json_encode($ec_lang['lpn_export_confirm_title'])?>,
+	lpn_export_confirm_lead: <?=json_encode($ec_lang['lpn_export_confirm_lead'])?>,
 	lpn_export_holds_scenario: <?=json_encode($ec_lang['lpn_export_holds_scenario'])?>,
 	lpn_export_holds_base: <?=json_encode($ec_lang['lpn_export_holds_base'])?>,
 	lpn_geojson_results_other: <?=json_encode($ec_lang['lpn_geojson_results_other'])?>,
@@ -4463,6 +4470,7 @@ EngCalcs.pageConfig = {
 	lpn_file_import_survey: <?=json_encode($ec_lang['lpn_file_import_survey'])?>,
 	lpn_file_import_survey_tip: <?=json_encode($ec_lang['lpn_file_import_survey_tip'])?>,
 	lpn_file_import_shapes: <?=json_encode($ec_lang['lpn_file_import_shapes'])?>,
+	lpn_menu_back: <?=json_encode($ec_lang['lpn_menu_back'])?>,
 	lpn_file_import_shapes_tip: <?=json_encode($ec_lang['lpn_file_import_shapes_tip'])?>,
 	lpn_file_import_gjnet: <?=json_encode($ec_lang['lpn_file_import_gjnet'])?>,
 	lpn_file_import_gjnet_tip: <?=json_encode($ec_lang['lpn_file_import_gjnet_tip'])?>,
