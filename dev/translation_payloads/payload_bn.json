@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 3185,
-        "delta_key_count": 204,
-        "english_changed_key_count": 38,
+        "expected_key_count": 3191,
+        "delta_key_count": 212,
+        "english_changed_key_count": 40,
         "exempt_key_count": 48,
         "exempt_keys": [
             "u_imgd",
@@ -104,6 +104,8 @@
         "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_file_import_inp": "EPANET file…",
         "lpn_file_import_inp_tip": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
+        "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library that has entries: patterns, curves, pipe types, fittings, controls, and rules. Results are included for the scenario last calculated only.",
+        "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. One table comes as a single CSV file with no libraries. Several tables or scenarios come as one zip file of CSV files, with a file for each library that has entries. Results are included for the scenario last calculated only.",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
         "lpn_file_import_msx": "EPANET-MSX file…",
@@ -122,16 +124,19 @@
         "lpn_quality_msx": "Multi-species (EPANET-MSX)",
         "lpn_quality_msx_species": "Species",
         "lpn_quality_msx_species_tip": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.",
-        "lpn_quality_msx_none": "No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.",
+        "lpn_quality_msx_none": "No EPANET-MSX file is attached to this project. Attach one with File, Import, Network, EPANET-MSX file.",
         "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
         "lpn_inpup_ask_title": "Import {file}",
-        "lpn_inpup_lead": "An EPANET file holds one set of values and no scenarios. Choose where to put them.",
-        "lpn_inpup_how": "In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.",
-        "lpn_inpup_base_note": "Base. A scenario that holds its own value for an asset keeps it; the others take the new value.",
+        "lpn_inpup_lead": "Choose where to import this file. Note that EPANET files don't include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.",
+        "lpn_inpup_how": "In this project, assets are matched by ID. Values are changed on matching assets, assets unique to the file are added, and assets unique to this project are left unaltered.",
+        "lpn_inpup_base_note": "Choosing Base doesn't clear any scenario overrides.",
         "lpn_inpup_btn_new": "A new project",
         "lpn_inpup_btn_project": "This project, {project}",
         "lpn_inpup_btn_scenario": "{scenario}, open now",
         "lpn_inpup_title": "Update from EPANET file",
+        "lpn_gjup_lead": "Choose where to import this file. Note that GeoJSON files don't include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.",
+        "lpn_gjup_title": "Update from GeoJSON file",
+        "lpn_gjup_h_notes": "Reading the file",
         "lpn_inpup_heading": "Imported {file} into {scenario} of {project}",
         "lpn_inpup_counts": "Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).",
         "lpn_inpup_undo": "Undo reverses all of it in one step.",
@@ -271,12 +276,13 @@
         "lpn_ds_intro": "Press the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities.\\n\\nPress the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}.\\n\\nBoth work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. By default only the time step on screen is scaled, and levels and statuses are taken from it. When the project has an extended-period simulation, set Reporting step tested to The whole run to scale the demands over the entire run: every reporting step is judged, a tank that empties fails the scale, and the answer names the limiting reporting step.",
         "lpn_ds_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_file_import_survey": "Surveyed points…",
-        "lpn_file_import_shapes": "GeoJSON shapes…",
-        "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
-        "lpn_file_import_gjnet": "GeoJSON network…",
+        "lpn_file_import_shapes": "GeoJSON file…",
+        "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, Network, EPANET file or File, Import, Network, GeoJSON file. The project must be georeferenced or state a coordinate system.",
+        "lpn_file_import_gjnet": "GeoJSON file…",
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
-        "lpn_file_import_dxf": "DXF shapes…",
-        "lpn_file_import_shp": "Shapefile shapes…",
+        "lpn_menu_back": "Back",
+        "lpn_file_import_dxf": "DXF file…",
+        "lpn_file_import_shp": "Shapefile…",
         "lpn_diag_valve_conflict": "These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:",
         "lpn_diag_gpv_curve_order": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:",
         "lpn_gpv_one_point_note": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}",
@@ -285,7 +291,9 @@
         "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
         "lpn_survey_added_scenario": "The nodes were added to {scenario}. In Base they are inactive.",
         "lpn_pane_pasted_scenario": "These values are overrides in the scenario {scenario}.",
-        "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file."
+        "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file.",
+        "lpn_export_confirm_title": "Export {format}",
+        "lpn_export_confirm_lead": "The {format} holds one scenario, and this project has {n}."
     },
     "keys": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
@@ -310,6 +318,8 @@
         "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
         "lpn_file_import_inp": "EPANET file…",
         "lpn_file_import_inp_tip": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
+        "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library that has entries: patterns, curves, pipe types, fittings, controls, and rules. Results are included for the scenario last calculated only.",
+        "lpn_file_export_csv_tip": "Download a table as the Tables pane shows it. One table comes as a single CSV file with no libraries. Several tables or scenarios come as one zip file of CSV files, with a file for each library that has entries. Results are included for the scenario last calculated only.",
         "lpn_file_export_workspace_tip": "Download a small file holding the layout of this page: where the panes, table columns and boxes sit, their sizes, and which are open, docked or hidden, plus the display options of this page, such as which help bubbles and the hover card are shown. Your projects, project settings and cookies (language, consent, units) are not in it. Load it on another screen or browser with File, Import, Workspace.",
         "lpn_file_import_workspace_tip": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched.",
         "lpn_file_import_msx": "EPANET-MSX file…",
@@ -328,16 +338,19 @@
         "lpn_quality_msx": "Multi-species (EPANET-MSX)",
         "lpn_quality_msx_species": "Species",
         "lpn_quality_msx_species_tip": "The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.",
-        "lpn_quality_msx_none": "No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.",
+        "lpn_quality_msx_none": "No EPANET-MSX file is attached to this project. Attach one with File, Import, Network, EPANET-MSX file.",
         "lpn_result_msx_tip": "The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.",
         "lpn_inpup_ask_title": "Import {file}",
-        "lpn_inpup_lead": "An EPANET file holds one set of values and no scenarios. Choose where to put them.",
-        "lpn_inpup_how": "In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.",
-        "lpn_inpup_base_note": "Base. A scenario that holds its own value for an asset keeps it; the others take the new value.",
+        "lpn_inpup_lead": "Choose where to import this file. Note that EPANET files don't include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.",
+        "lpn_inpup_how": "In this project, assets are matched by ID. Values are changed on matching assets, assets unique to the file are added, and assets unique to this project are left unaltered.",
+        "lpn_inpup_base_note": "Choosing Base doesn't clear any scenario overrides.",
         "lpn_inpup_btn_new": "A new project",
         "lpn_inpup_btn_project": "This project, {project}",
         "lpn_inpup_btn_scenario": "{scenario}, open now",
         "lpn_inpup_title": "Update from EPANET file",
+        "lpn_gjup_lead": "Choose where to import this file. Note that GeoJSON files don't include scenarios.\\n\\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.",
+        "lpn_gjup_title": "Update from GeoJSON file",
+        "lpn_gjup_h_notes": "Reading the file",
         "lpn_inpup_heading": "Imported {file} into {scenario} of {project}",
         "lpn_inpup_counts": "Values changed ({n}), on assets ({m}). Assets added ({a}). Assets kept that the file does not hold ({k}).",
         "lpn_inpup_undo": "Undo reverses all of it in one step.",
@@ -477,12 +490,13 @@
         "lpn_ds_intro": "Press the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities.\\n\\nPress the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}.\\n\\nBoth work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. By default only the time step on screen is scaled, and levels and statuses are taken from it. When the project has an extended-period simulation, set Reporting step tested to The whole run to scale the demands over the entire run: every reporting step is judged, a tank that empties fails the scale, and the answer names the limiting reporting step.",
         "lpn_ds_minpressure_tip": "This is the same number as the Lowest system pressure allowed box of the Fire flow analysis. Changing it here changes it there.",
         "lpn_file_import_survey": "Surveyed points…",
-        "lpn_file_import_shapes": "GeoJSON shapes…",
-        "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
-        "lpn_file_import_gjnet": "GeoJSON network…",
+        "lpn_file_import_shapes": "GeoJSON file…",
+        "lpn_file_import_shapes_tip": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, Network, EPANET file or File, Import, Network, GeoJSON file. The project must be georeferenced or state a coordinate system.",
+        "lpn_file_import_gjnet": "GeoJSON file…",
         "lpn_gjnet_note_not_held": "A GeoJSON file does not hold controls, rules, time settings, Text items, EPANET options, or the pipe type, fittings, and efficiency curve libraries, so none of these was imported.",
-        "lpn_file_import_dxf": "DXF shapes…",
-        "lpn_file_import_shp": "Shapefile shapes…",
+        "lpn_menu_back": "Back",
+        "lpn_file_import_dxf": "DXF file…",
+        "lpn_file_import_shp": "Shapefile…",
         "lpn_diag_valve_conflict": "These control valves are joined to each other in a way EPANET does not allow, such as two pressure reducing valves in series. Insert a short pipe between them:",
         "lpn_diag_gpv_curve_order": "The head loss curves of these general purpose valves cannot be read: each flow must be greater than the one before it, and a curve with one point needs a flow above zero:",
         "lpn_gpv_one_point_note": "⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}",
@@ -491,7 +505,9 @@
         "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
         "lpn_survey_added_scenario": "The nodes were added to {scenario}. In Base they are inactive.",
         "lpn_pane_pasted_scenario": "These values are overrides in the scenario {scenario}.",
-        "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file."
+        "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file.",
+        "lpn_export_confirm_title": "Export {format}",
+        "lpn_export_confirm_lead": "The {format} holds one scenario, and this project has {n}."
     },
     "key_context": {
         "consent_body": {
@@ -854,6 +870,38 @@
                 "key": "lpn_file_import_inp",
                 "english": "EPANET file…",
                 "value": "EPANET ফাইল আমদানি করুন…"
+            }
+        },
+        "lpn_file_export_tables_tip": {
+            "reason": "english_changed",
+            "current_value": "টেবিল প্যানেল যেভাবে টেবিলগুলো দেখায় সেভাবে ডাউনলোড করুন, একটি ওয়ার্কবুকে প্রতিটি টেবিলের জন্য (এবং আপনার বেছে নেওয়া প্রতিটি দৃশ্যকল্পের জন্য) একটি শিট সহ, এবং সেগুলোর ID যে লাইব্রেরিগুলোর উল্লেখ করে তাদের প্রতিটির জন্য একটি শিট: প্যাটার্ন, কার্ভ, পাইপের ধরন ও ফিটিংস। ফলাফল শুধু সর্বশেষ গণনা করা দৃশ্যকল্পের জন্য থাকে।",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_item_csv",
+                    "value": "CSV ফাইল…",
+                    "english": "CSV file…"
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_csv_tip",
+                    "value": "টেবিল প্যানেল যেভাবে একটি টেবিল দেখায় সেভাবে ডাউনলোড করুন। একটি টেবিল লাইব্রেরি ছাড়া একটি CSV ফাইল হিসেবে আসে। একাধিক টেবিল বা দৃশ্যকল্প CSV ফাইলের একটি zip ফাইল হিসেবে আসে, সেগুলোর ID যে লাইব্রেরির উল্লেখ করে তার প্রতিটির জন্য একটি ফাইলসহ। ফলাফল শুধু সর্বশেষ গণনা করা দৃশ্যকল্পের জন্য থাকে।",
+                    "english": "Download a table as the Tables pane shows it. One table comes as a single CSV file with no libraries. Several tables or scenarios come as one zip file of CSV files, with a file for each library that has entries. Results are included for the scenario last calculated only."
+                }
+            }
+        },
+        "lpn_file_export_csv_tip": {
+            "reason": "english_changed",
+            "current_value": "টেবিল প্যানেল যেভাবে একটি টেবিল দেখায় সেভাবে ডাউনলোড করুন। একটি টেবিল লাইব্রেরি ছাড়া একটি CSV ফাইল হিসেবে আসে। একাধিক টেবিল বা দৃশ্যকল্প CSV ফাইলের একটি zip ফাইল হিসেবে আসে, সেগুলোর ID যে লাইব্রেরির উল্লেখ করে তার প্রতিটির জন্য একটি ফাইলসহ। ফলাফল শুধু সর্বশেষ গণনা করা দৃশ্যকল্পের জন্য থাকে।",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_export_tables_tip",
+                    "value": "টেবিল প্যানেল যেভাবে টেবিলগুলো দেখায় সেভাবে ডাউনলোড করুন, একটি ওয়ার্কবুকে প্রতিটি টেবিলের জন্য (এবং আপনার বেছে নেওয়া প্রতিটি দৃশ্যকল্পের জন্য) একটি শিট সহ, এবং সেগুলোর ID যে লাইব্রেরিগুলোর উল্লেখ করে তাদের প্রতিটির জন্য একটি শিট: প্যাটার্ন, কার্ভ, পাইপের ধরন ও ফিটিংস। ফলাফল শুধু সর্বশেষ গণনা করা দৃশ্যকল্পের জন্য থাকে।",
+                    "english": "Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library that has entries: patterns, curves, pipe types, fittings, controls, and rules. Results are included for the scenario last calculated only."
+                },
+                "next_translated": {
+                    "key": "lpn_file_export_inp_tip",
+                    "value": "এই নেটওয়ার্কটি EPANET .inp ফাইল হিসেবে ডাউনলোড করুন (প্রযোজ্য হলে ছবিসহ একটি zip ফাইলে)। .inp ফরম্যাট যা ধারণ করতে পারে না তা পরে আপনাকে তালিকা আকারে দেখানো হয়।",
+                    "english": "Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards."
+                }
             }
         },
         "lpn_file_export_workspace_tip": {
@@ -1310,6 +1358,54 @@
             }
         },
         "lpn_inpup_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "একটি ফাইল থেকে {name} খোলা হয়েছে, এবং এটি এই ব্রাউজারে একটি নতুন প্রকল্প হিসেবে যোগ করা হয়েছে।",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "প্রকল্প ফাইল",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_gjup_lead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "একটি ফাইল থেকে {name} খোলা হয়েছে, এবং এটি এই ব্রাউজারে একটি নতুন প্রকল্প হিসেবে যোগ করা হয়েছে।",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "প্রকল্প ফাইল",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_gjup_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_status_imported",
+                    "value": "একটি ফাইল থেকে {name} খোলা হয়েছে, এবং এটি এই ব্রাউজারে একটি নতুন প্রকল্প হিসেবে যোগ করা হয়েছে।",
+                    "english": "Opened {name} from a file, and added it to this browser as a new project."
+                },
+                "next_translated": {
+                    "key": "lpn_file_type_desc",
+                    "value": "প্রকল্প ফাইল",
+                    "english": "Project file"
+                }
+            }
+        },
+        "lpn_gjup_h_notes": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -3609,12 +3705,12 @@
                 "next_translated": {
                     "key": "lpn_file_import_shapes_tip",
                     "value": "একটি GeoJSON ফাইলের বিন্দু, রেখা ও বহুভুজ এই প্রকল্পে চিত্র হিসেবে পড়ুন। ফাইলের নেটওয়ার্ক অ্যাসেট ইম্পোর্ট করা হয় না; নেটওয়ার্ক একটি EPANET ফাইল থেকে বা GeoJSON নেটওয়ার্ক ইম্পোর্ট করুন দিয়ে ইম্পোর্ট করুন। প্রকল্পটি জিওরেফারেন্সড হতে হবে অথবা একটি স্থানাঙ্ক পদ্ধতি উল্লেখ করতে হবে।",
-                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system."
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, Network, EPANET file or File, Import, Network, GeoJSON file. The project must be georeferenced or state a coordinate system."
                 }
             },
             "tip": {
                 "key": "lpn_file_import_shapes_tip",
-                "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.",
+                "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, Network, EPANET file or File, Import, Network, GeoJSON file. The project must be georeferenced or state a coordinate system.",
                 "value": "একটি GeoJSON ফাইলের বিন্দু, রেখা ও বহুভুজ এই প্রকল্পে চিত্র হিসেবে পড়ুন। ফাইলের নেটওয়ার্ক অ্যাসেট ইম্পোর্ট করা হয় না; নেটওয়ার্ক একটি EPANET ফাইল থেকে বা GeoJSON নেটওয়ার্ক ইম্পোর্ট করুন দিয়ে ইম্পোর্ট করুন। প্রকল্পটি জিওরেফারেন্সড হতে হবে অথবা একটি স্থানাঙ্ক পদ্ধতি উল্লেখ করতে হবে।"
             }
         },
@@ -3625,17 +3721,17 @@
                 "previous_translated": {
                     "key": "lpn_file_import_shapes",
                     "value": "GeoJSON চিত্র ইম্পোর্ট করুন…",
-                    "english": "GeoJSON shapes…"
+                    "english": "GeoJSON file…"
                 },
                 "next_translated": {
                     "key": "lpn_file_import_gjnet",
                     "value": "GeoJSON নেটওয়ার্ক ইম্পোর্ট করুন…",
-                    "english": "GeoJSON network…"
+                    "english": "GeoJSON file…"
                 }
             },
             "label": {
                 "key": "lpn_file_import_shapes",
-                "english": "GeoJSON shapes…",
+                "english": "GeoJSON file…",
                 "value": "GeoJSON চিত্র ইম্পোর্ট করুন…"
             }
         },
@@ -3646,7 +3742,7 @@
                 "previous_translated": {
                     "key": "lpn_file_import_shapes_tip",
                     "value": "একটি GeoJSON ফাইলের বিন্দু, রেখা ও বহুভুজ এই প্রকল্পে চিত্র হিসেবে পড়ুন। ফাইলের নেটওয়ার্ক অ্যাসেট ইম্পোর্ট করা হয় না; নেটওয়ার্ক একটি EPANET ফাইল থেকে বা GeoJSON নেটওয়ার্ক ইম্পোর্ট করুন দিয়ে ইম্পোর্ট করুন। প্রকল্পটি জিওরেফারেন্সড হতে হবে অথবা একটি স্থানাঙ্ক পদ্ধতি উল্লেখ করতে হবে।",
-                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system."
+                    "english": "Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, Network, EPANET file or File, Import, Network, GeoJSON file. The project must be georeferenced or state a coordinate system."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_gjnet_tip",
@@ -3673,6 +3769,22 @@
                     "key": "lpn_geojson_import_done",
                     "value": "{file} থেকে {n}টি চিত্র ইম্পোর্ট করা হয়েছে।",
                     "english": "{n} Shapes imported from {file}."
+                }
+            }
+        },
+        "lpn_menu_back": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_geojson_import_unreadable",
+                    "value": "{file} একটি GeoJSON ফাইল নয়: {detail}",
+                    "english": "{file} is not a GeoJSON file: {detail}"
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_dxf",
+                    "value": "DXF চিত্র ইম্পোর্ট করুন…",
+                    "english": "DXF file…"
                 }
             }
         },
@@ -3827,6 +3939,30 @@
             }
         },
         "lpn_export_leaves_alternatives": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "স্ক্রিনের এলাকার গুণিতক হিসেবে ছবির আকার। বড়টি বেশি স্পষ্ট এবং ফাইল বড় করে।",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_export_confirm_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "স্ক্রিনের এলাকার গুণিতক হিসেবে ছবির আকার। বড়টি বেশি স্পষ্ট এবং ফাইল বড় করে।",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_export_confirm_lead": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
