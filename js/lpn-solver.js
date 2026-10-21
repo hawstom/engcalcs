@@ -918,7 +918,7 @@ EngCalcs.lpnSolve = function (model, options) {
 	// EPANET WORKS IN FEET AND CFS, so each of its constants is converted here, once, by the unit it
 	// carries, and the arithmetic below is EPANET's in SI. The two BIGs are conductances (cfs per
 	// ft), the two smalls are resistances (ft per cfs), the tolerances a head and a flow.
-	var vStat = [], vc = [], vSet = [], vHset = [],
+	var vStat = [], vc = [], vSet = [], vHset = [], vFixed = [],
 		hydIn = model.hydraulics || {},
 		VFT = 0.3048,
 		VCFS = VFT * VFT * VFT,
@@ -936,7 +936,13 @@ EngCalcs.lpnSolve = function (model, options) {
 		X = null;
 	for (k = 0; k < links.length; k++) {
 		if (links[k].status === 'closed' || !EngCalcs.lpnValveIsControl(links[k])) { continue; }
-		vStat[k] = 'active';
+		// **A VALVE FIXED OPEN** (`valveFixed: 'open'`) is EPANET's OPEN status with its setting
+		// MISSING -- what a simple control's `LINK v OPEN` leaves (hydraul.c controls(), with
+		// input3.c controldata() setting MISSING for a valve). It is a plain minor loss and its
+		// state is never re-decided: hydstatus.c valvestatus() and linkstatus() both skip a valve
+		// whose setting is MISSING. Only js/lpn-native-run.js sets it; nothing on the page does.
+		vStat[k] = links[k].valveFixed === 'open' ? 'open' : 'active';
+		if (links[k].valveFixed === 'open') { vFixed[k] = true; }
 		vc.push(k);
 		vSet[k] = links[k].setting || 0;
 		// A PRV holds the head at its DOWNSTREAM node, a PSV at its UPSTREAM one, each at that
@@ -1124,7 +1130,14 @@ EngCalcs.lpnSolve = function (model, options) {
 	}
 	for (k = 0; k < links.length; k++) {
 		if (links[k].status === 'closed' || vStat[k] !== undefined) { continue; }
-		if (tFull[links[k].from] || tEmpty[links[k].from] || tFull[links[k].to] || tEmpty[links[k].to]) { tk.push(k); }
+		if (tFull[links[k].from] || tEmpty[links[k].from] || tFull[links[k].to] || tEmpty[links[k].to]) {
+			tk.push(k);
+			// **A LINK THE LAST TIME STEP'S TANK SHUT STARTS THIS SOLVE SHUT** (`tempClosed`, ids),
+			// as EPANET's does: its TEMPCLOSED status carries from one step's solve into the next
+			// until the first status check re-opens it (hydstatus.c linkstatus()). Only
+			// js/lpn-native-run.js passes it; a single-instant solve has no last step.
+			if (opts.tempClosed && opts.tempClosed[links[k].id]) { tClosed[k] = 1; }
+		}
 	}
 	// q is the flow OUT of the tank, as tankstatus() is handed it.
 	function tankShuts(id, q) {
@@ -1155,7 +1168,7 @@ EngCalcs.lpnSolve = function (model, options) {
 			k2 = vc[v];
 			lk = links[k2];
 			t = String(lk.valveType).toUpperCase();
-			if (t !== 'PRV' && t !== 'PSV') { continue; }
+			if ((t !== 'PRV' && t !== 'PSV') || vFixed[k2]) { continue; }
 			s0 = vStat[k2];
 			s1 = s0;
 			h1 = headAt(lk.from, Hv);
@@ -1198,7 +1211,7 @@ EngCalcs.lpnSolve = function (model, options) {
 		for (v = 0; v < vc.length; v++) {
 			k2 = vc[v];
 			lk = links[k2];
-			if (String(lk.valveType).toUpperCase() !== 'FCV') { continue; }
+			if (String(lk.valveType).toUpperCase() !== 'FCV' || vFixed[k2]) { continue; }
 			s0 = vStat[k2];
 			s1 = s0;
 			dh = headAt(lk.from, Hv) - headAt(lk.to, Hv);
@@ -1526,9 +1539,22 @@ EngCalcs.lpnSolve = function (model, options) {
 			// CONVERGED, BUT ONLY IF NO VALVE WANTS TO CHANGE: the pressure valves were checked
 			// above, and the FCVs are checked now (hydsolver.c: "Quit if no status changes occur").
 			// A change restarts the count toward the next periodic check and the stall watch.
-			if (X !== null || tk.length) {
+			if (X !== null || tk.length || opts.pswitch) {
 				var flowChange = X !== null ? flowValveStatus(H) : false;
 				if (tankLinkStatus()) { flowChange = true; }
+				// **A CONTROL ON A JUNCTION'S PRESSURE IS DECIDED HERE, INSIDE THE SOLVE** (hydsolver.c
+				// hydsolve() calls pswitch() after linkstatus() on a converged trial). Only
+				// js/lpn-native-run.js passes `opts.pswitch`: it is handed the solved heads, may change
+				// a pipe's or a pump's status (and a pump's curve) on the link objects this solve
+				// holds, and says whether it did. A link it shut carries no flow from here on; one it
+				// opened restarts from the same first guess every link gets.
+				if (opts.pswitch && opts.pswitch(function (id) { return headAt(id, H); })) {
+					flowChange = true;
+					for (k = 0; k < links.length; k++) {
+						if (links[k].status === 'closed') { Q[k] = 0; }
+						else if (Q[k] === 0) { Q[k] = 0.3 * Math.PI * links[k].diameter * links[k].diameter / 4; }
+					}
+				}
 				if (valveChange || flowChange) {
 					nextCheck = iter + checkFreq;
 					bestChange = Infinity;
@@ -1559,6 +1585,10 @@ EngCalcs.lpnSolve = function (model, options) {
 	// the same code js/lpn-epanet.js gives it, so the page says it whichever engine answered.
 	var onePoint = EngCalcs.lpnGpvsWith(model, 'gpv-one-point');
 	if (onePoint.length > 0) { report.warnings = [{ code: 'gpv-one-point', ids: onePoint }]; }
+	// The links a full or empty tank shut for this answer (EPANET's TEMPCLOSED), by id: the
+	// extended-period loop needs them, because a simple control compares against that status.
+	report.tankClosed = [];
+	for (k = 0; k < tk.length; k++) { if (tClosed[tk[k]]) { report.tankClosed.push(links[tk[k]].id); } }
 	return report;
 };
 

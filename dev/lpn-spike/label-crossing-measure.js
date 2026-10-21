@@ -231,7 +231,8 @@ async function measure(file, mode, opts) {
 			if (!byLink[b.linkOwner]) { byLink[b.linkOwner] = []; }
 			byLink[b.linkOwner].push(b);
 		});
-		const textLabels = doc.labels.filter(function (lb) { return !!labelEls[lb.id]; });
+		// A Text another Text covers at this zoom is not drawn and is no obstacle (crowdedTexts()).
+		const textLabels = doc.labels.filter(function (lb) { return !!labelEls[lb.id] && !labelEls[lb.id].crowdHidden; });
 		if (textBoxes.length !== textLabels.length) {
 			throw new Error('label-crossing-harness: ' + textBoxes.length + ' unowned `label` boxes '
 				+ 'against ' + textLabels.length + ' Text objects with elements. The attribution '

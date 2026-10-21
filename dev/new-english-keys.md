@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**4 still to read on master**, of 171 untranslated keys, of 3190 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**7 still to read on master**, of 171 untranslated keys, of 3190 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (171, 4 to read @@ NEEDS RULING)
+## lpn_  (171, 7 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -224,7 +224,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Reading the file
   @@ NEEDS RULING
 - **`lpn_gjup_lead`**
-  > A GeoJSON file holds one set of values and no scenarios. Choose where to put them.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets only in the import are added, and assets only in this project are kept.
+  > Choose where to import this file. Note that GeoJSON files don't include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
   @@ NEEDS RULING
 - **`lpn_gjup_title`**
   > Update from GeoJSON file
@@ -233,8 +233,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
   _Ruled OK 2026-10-20._
 - **`lpn_guide_cmp_byasset_def`**
-  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. A flow keeps the solver's internal direction sign: positive runs from the From node to the To node, and negative is the reverse. The sign has no use outside this table except to show whether a flow changed direction between scenarios.</p>
-  _Ruled OK 2026-10-20._
+  > <p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.</p>
+  @@ NEEDS RULING
 - **`lpn_guide_ff_dur_def`**
   > <p>When the project has an extended-period simulation, choose A fire for a stated duration under Reporting step tested. The Required fire flow is then drawn at the one junction selected on the map, starting at the time in Fire starts at and lasting for the Fire duration, both whole multiples of the pattern time step. The whole simulation is run on a copy of the network and compared with the same simulation without the fire. The summary states whether the junction holds the Residual pressure to hold during the fire, the lowest pressure anywhere, whether any tank empties, and whether the system recovers after the fire. One table gives the lowest level of each tank, and another gives the pressure at the fire junction at every reporting step.</p>
   _Ruled OK 2026-10-20._
@@ -254,8 +254,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Import {file}
   _Ruled OK 2026-10-20._
 - **`lpn_inpup_base_note`**
-  > Base. A scenario that holds its own value for an asset keeps it; the others take the new value.
-  _Ruled OK 2026-10-20._
+  > Choosing Base doesn't clear any scenario overrides.
+  @@ NEEDS RULING
 - **`lpn_inpup_blank`**
   > blank
   _Ruled OK 2026-10-20._
@@ -290,8 +290,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Imported {file} into {scenario} of {project}
   _Ruled OK 2026-10-20._
 - **`lpn_inpup_how`**
-  > In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.
-  _Ruled OK 2026-10-20._
+  > In this project, assets are matched by ID. Values are changed on matching assets, assets unique to the file are added, and assets unique to this project are left unaltered.
+  @@ NEEDS RULING
 - **`lpn_inpup_i_connections`**
   > connections
   _Ruled OK 2026-10-20._
@@ -317,7 +317,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > rules
   _Ruled OK 2026-10-20._
 - **`lpn_inpup_lead`**
-  > An EPANET file holds one set of values and no scenarios. Choose where to put them.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets only in the import are added, and assets only in this project are kept.
+  > Choose where to import this file. Note that EPANET files don't include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
   @@ NEEDS RULING
 - **`lpn_inpup_method_row`**
   > Head loss formula: the file uses {file} and this project uses {project}.
@@ -562,13 +562,13 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/flow-arrow (`ba35f09bf`) — adds no English strings
+### feat/flow-arrow (`8f1edc51e`) — adds no English strings
 
-### feat/geojson-into-project (`7cc47d9a2`) — adds no English strings
+### feat/geojson-into-project (`c4c7caa0b`) — adds no English strings
 
-### feat/label-margin (`8691fa30e`) — adds no English strings
+### feat/label-margin (`ab69e6389`) — adds no English strings
 
-### feat/sqlite-reader (`5e33ab69b`) — 51 new, 1 to read @@ NEEDS RULING
+### feat/sqlite-reader (`e9506da4c`) — 51 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
   > WaterCAD or WaterGEMS model…
