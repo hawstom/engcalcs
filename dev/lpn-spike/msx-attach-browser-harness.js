@@ -98,7 +98,13 @@ async function exportRows(a, L) {
 		r.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
 	}, L.exp);
 	await a.page.waitForSelector('#lpn_menu_popup2', { state: 'visible' });
-	const rows = await a.page.$$eval('#lpn_menu_list2 button.lpn-menu-row', (els) => els.map((b) => b.textContent.trim()));
+	// The export formats are in the Network group, the fly-out's first row (Task 819).
+	await a.page.evaluate(() => {
+		const r = document.querySelector('#lpn_menu_list2 button.lpn-menu-row[aria-haspopup]');
+		r.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+	});
+	await a.page.waitForSelector('#lpn_menu_popup3', { state: 'visible' });
+	const rows = await a.page.$$eval('#lpn_menu_list3 button.lpn-menu-row', (els) => els.map((b) => b.textContent.trim()));
 	await a.closeMenu();
 	return rows;
 }

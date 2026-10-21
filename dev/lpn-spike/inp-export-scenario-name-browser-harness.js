@@ -73,7 +73,12 @@ async function main() {
 			await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
 			await clickRow('#lpn_menu_list button.lpn-menu-row', (await L('lpn_file_export_menu')).trim());
 			await page.waitForSelector('#lpn_menu_list2 button.lpn-menu-row', { state: 'attached' });
-			await clickRow('#lpn_menu_list2 button.lpn-menu-row', (await L('lpn_file_export_item_inp')).trim());
+			// The formats are in the Network group (Task 819), and a project with more than Base is asked first.
+			await clickRow('#lpn_menu_list2 button.lpn-menu-row', (await L('lpn_file_group_network')).trim());
+			await page.waitForSelector('#lpn_menu_list3 button.lpn-menu-row', { state: 'attached' });
+			await clickRow('#lpn_menu_list3 button.lpn-menu-row', (await L('lpn_file_export_item_inp')).trim());
+			await a.settle(500);
+			if (await a.dialog()) { await a.dialogClick((await L('lpn_export_table_go')).trim()); }
 			await p;
 			await page.keyboard.press('Escape');
 			await a.settle(600);

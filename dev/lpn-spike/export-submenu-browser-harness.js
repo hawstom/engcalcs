@@ -39,10 +39,13 @@ if (process.env[LOCK_ENV] !== '1') {
 
 // [key, extension, opens a box first]. The box opens on the Current table (Junctions), and one table
 // to CSV is one .csv file.
-const ROWS = [['lpn_file_export_item_inp', '.inp'], ['lpn_file_export_item_geojson', '.geojson'],
-	['lpn_file_export_item_dxf', '.dxf'],
-	['lpn_file_export_item_ods', '.ods', true], ['lpn_file_export_item_xlsx', '.xlsx', true], ['lpn_file_export_item_csv', '.csv', true],
-	['lpn_file_export_item_workspace', '.json']];
+// [key, extension, opens a box first, group's top-level index (null: a row of the fly-out itself), index in the group].
+// Task 819: the fly-out holds Network and Tables as groups (a third level), then Workspace.
+const TOP = ['lpn_file_group_network', 'lpn_file_group_tables', 'lpn_file_export_item_workspace'];
+const ROWS = [['lpn_file_export_item_inp', '.inp', false, 0, 0], ['lpn_file_export_item_geojson', '.geojson', false, 0, 1],
+	['lpn_file_export_item_dxf', '.dxf', false, 0, 2],
+	['lpn_file_export_item_ods', '.ods', true, 1, 0], ['lpn_file_export_item_xlsx', '.xlsx', true, 1, 1], ['lpn_file_export_item_csv', '.csv', true, 1, 2],
+	['lpn_file_export_item_workspace', '.json', false, null, 2]];
 let checks = 0, failures = 0, Session;
 function ok(label, cond, detail) {
 	checks++;
@@ -79,7 +82,7 @@ async function main() {
 			const a = await open(browser);
 			const menuLabel = (await a.lang('lpn_file_export_menu')).trim();
 			const want = [];
-			for (const r of ROWS) { want.push((await a.lang(r[0])).trim()); }
+			for (const k of TOP) { want.push((await a.lang(k)).trim()); }
 			const cur = () => a.page.evaluate(() => (document.activeElement.textContent || '').replace(/[▸\s]+$/, '').trim());
 			const openFile = async () => {
 				if (how === 'mouse') { await a.page.click('#lpn_menu_file'); }
@@ -106,22 +109,36 @@ async function main() {
 			await openSub();
 			ok('the fly-out is shown', await subShown(a));
 			const got = await subTexts(a);
-			ok('it holds every export row, in order', JSON.stringify(got) === JSON.stringify(want), got.join(' | '));
+			ok('it holds Network, Tables and Workspace, in order', JSON.stringify(got) === JSON.stringify(want), got.join(' | '));
 			ok('no row repeats the word Export', got.every((t) => !/^Export/i.test(t)));
 			const heading = await a.page.$$eval('#lpn_menu_list2 .lpn-menu-heading', (els) => els.map((e) => e.textContent.trim()));
 			ok('the Export submenu has no heading row (Tom, 2026-10-09)', heading.length === 0, JSON.stringify(heading));
 			ok('the File row says Export… and not Export to…', menuLabel === 'Export…', menuLabel);
 			for (let i = 0; i < ROWS.length; i++) {
 				if (i > 0) { await a.page.keyboard.press('Escape'); await a.settle(200); await openFile(); await openSub(); }
+				const [rowKey, , , grp, idx] = ROWS[i];
+				const rowLabel = (await a.lang(rowKey)).trim();
 				let dl = null;
 				const p = a.page.waitForEvent('download', { timeout: 8000 }).then((d) => { dl = d; }, () => {});
+				const clickIn = (list, l) => a.page.evaluate(([ls, t]) => {
+					const r = Array.from(document.querySelectorAll('#' + ls + ' button.lpn-menu-row')).find((x) => x.textContent.trim().indexOf(t) === 0);
+					r.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+				}, [list, l]);
 				if (how === 'mouse') {
-					await a.page.evaluate((l) => {
-						const r = Array.from(document.querySelectorAll('#lpn_menu_list2 button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(l) === 0);
-						r.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
-					}, want[i]);
+					if (grp !== null) {
+						await clickIn('lpn_menu_list2', want[grp]);
+						await a.page.waitForSelector('#lpn_menu_popup3', { state: 'visible' });
+						await clickIn('lpn_menu_list3', rowLabel);
+					} else { await clickIn('lpn_menu_list2', rowLabel); }
 				} else {
-					for (let k = 0; k < i; k++) { await a.page.keyboard.press('ArrowDown'); }
+					const downs = grp !== null ? grp : idx;
+					for (let k = 0; k < downs; k++) { await a.page.keyboard.press('ArrowDown'); }
+					if (grp !== null) {
+						await a.page.keyboard.press('ArrowRight');
+						await a.page.waitForSelector('#lpn_menu_popup3', { state: 'visible' });
+						for (let k = 0; k < idx; k++) { await a.page.keyboard.press('ArrowDown'); }
+					}
+					ok(rowLabel + ' has keyboard focus', await cur() === rowLabel, await cur());
 					await a.page.keyboard.press('Enter');
 				}
 				if (ROWS[i][2]) {
@@ -132,7 +149,7 @@ async function main() {
 					});
 				}
 				await p;
-				ok(want[i] + ' downloads one file ending ' + ROWS[i][1], !!dl && dl.suggestedFilename().endsWith(ROWS[i][1]), dl && dl.suggestedFilename());
+				ok(rowLabel + ' downloads one file ending ' + ROWS[i][1], !!dl && dl.suggestedFilename().endsWith(ROWS[i][1]), dl && dl.suggestedFilename());
 				await a.settle(400);
 			}
 			ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));

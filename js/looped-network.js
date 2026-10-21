@@ -35523,12 +35523,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// column holds an ID, and an ID is worth something in a spreadsheet only when the thing it names
 	// is in the same workbook. One sheet per library that has any entry, ID first so the frozen
 	// column and a lookup both key on it, the numbers as the Library box holds them (what the user
-	// typed, in the project's units, which the headings name). Controls and rules are left out: they
-	// refer to assets, not the other way round.
+	// typed, in the project's units, which the headings name). **Controls and rules ride along too**
+	// (Tom, 2026-10-20: *"a network is useless without them"*): they refer to assets, not the other
+	// way round, but a workbook that leaves out the statements that run the pumps and valves is not
+	// the whole network.
 	//   Patterns: one row a pattern, its ID and Description, then its multipliers across, headed by period number 1, 2, 3...
 	//   Curves: one sheet per curve type present, one row a point, headed as the Library heads it.
 	//   Pipe types: one row a type, one column a property it may state; blank where it states none.
 	//   Fittings: one row a fitting of a list, so a list's coefficients can be summed in place.
+	//   Controls: one row a control, its Description and the statement as the Library shows it.
+	//   Rules: one row a line of a rule, so a rule reads down the sheet; ID and Description repeat.
 	function libraryExportSheets() {
 		var pc = EngCalcs.pageConfig || {}, out = [], idH = pc.lpn_field_id || 'ID',
 			descH = pc.lpn_library_curve_note_label || 'Description', libName = pc.lpn_library_curves || 'Curves';
@@ -35577,6 +35581,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (sets.length) {
 			out.push({ name: pc.lpn_library_fittings || 'Fittings', rows: frows, numeric: [false, false, false, true, true],
 				heads: [idH, descH, pc.lpn_fitting_name || 'Fitting', pc.lpn_fitting_qty || 'Quantity', pc.lpn_fitting_k || 'Coefficient'] });
+		}
+		var ctls = libControlsRead();
+		if (ctls.length) {
+			out.push({ name: pc.lpn_library_controls || 'Controls', heads: [descH, pc.lpn_library_controls || 'Controls'], numeric: [false, false],
+				rows: ctls.map(function (c) { return [txt(c.note), libControlText(c)]; }) });
+		}
+		var ruleLines = libRulesRead(), rrows = [];
+		libRuleEntries(ruleLines).forEach(function (e) {
+			var desc = libRuleDesc(ruleLines, e);
+			libRuleBody(ruleLines, e).forEach(function (line) { rrows.push([txt(e.name), txt(desc), txt(line)]); });
+		});
+		if (rrows.length) {
+			out.push({ name: pc.lpn_library_rules || 'Rules', heads: [idH, descH, pc.lpn_library_rules || 'Rules'], numeric: [false, false, false], rows: rrows });
 		}
 		return out;
 	}
@@ -52255,38 +52272,53 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		];
 	}
 	// The Export fly-out, a function of its own for the reason importMenuRows() is: a harness can ask
-	// what it offers without driving a popup. **ADDING AN EXPORT IS ONE LINE HERE**, nothing in
-	// openFileMenu() changes. Each is a DOWNLOAD and never a live handle (Task 281): a file we hand
-	// over, not one this page keeps writing to, which is why Export is not a second Save as.
-	function exportMenuRows() {
+	// what it offers without driving a popup. **THE TWO GROUPS MIRROR IMPORT'S** (Task 819; Tom,
+	// 2026-10-20): Network (the formats a network goes out in) and Tables (the files the Tables pane
+	// writes, through the box that asks which tables and scenarios), then Workspace, last.
+	// **ADDING AN EXPORT IS ONE LINE** in the group it belongs to; nothing in openFileMenu() changes.
+	// Each is a DOWNLOAD and never a live handle (Task 281): a file we hand over, not one this page
+	// keeps writing to, which is why Export is not a second Save as.
+	function exportNetworkRows() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			{ icon: 'save', label: pc.lpn_file_export_item_inp || 'EPANET file…',
+			{ icon: 'save', label: pc.lpn_file_export_item_inp || 'EPANET file…', key: 'lpn_file_export_item_inp',
 			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
 			// GeoJSON (Task 728): same verb, same kind of file.
-			{ icon: 'save', label: pc.lpn_file_export_item_geojson || 'GeoJSON file…',
+			{ icon: 'save', label: pc.lpn_file_export_item_geojson || 'GeoJSON file…', key: 'lpn_file_export_item_geojson',
 			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile },
 			// The attached EPANET-MSX file, as its own row so one click is one download. Only offered
-			// when the project holds one.
-			{ icon: 'save', label: pc.lpn_file_export_item_msx || 'EPANET-MSX file…', hidden: !doc.msx,
+			// when the project holds one. It is written back exactly as it came in, so nothing of a
+			// scenario is left behind and it asks nothing.
+			{ icon: 'save', label: pc.lpn_file_export_item_msx || 'EPANET-MSX file…', hidden: !doc.msx, key: 'lpn_file_export_item_msx',
 			  tip: pc.lpn_file_export_msx_tip, fn: exportMsxFile },
 			// THE MODEL'S DATA for AutoCAD and every other DWG program (Task 772). Reading a DXF back
 			// is the DXF Interface Manager's import half, not built.
-			{ icon: 'save', label: pc.lpn_file_export_item_dxf || 'DXF file…',
-			  tip: pc.lpn_file_export_dxf_tip, fn: exportDxfFile },
-			// **THE TABLES, BY FORMAT** (Tom, 2026-10-07: *"File, Export to, and we are adding
-			// ODS/XLSX/CSV. And we include Libraries"*). Each row opens the box that asks which tables
-			// and which scenarios; the format is the row. Rows are named for the file, like the three
-			// above, each tip says what it carries.
-			{ separator: true },
-			{ icon: 'save', label: pc.lpn_file_export_item_ods || 'ODS file…',
+			{ icon: 'save', label: pc.lpn_file_export_item_dxf || 'DXF file…', key: 'lpn_file_export_item_dxf',
+			  tip: pc.lpn_file_export_dxf_tip, fn: exportDxfFile }
+		];
+	}
+	function exportTableRows() {
+		var pc = EngCalcs.pageConfig || {};
+		// **THE TABLES, BY FORMAT** (Tom, 2026-10-07: *"File, Export to, and we are adding
+		// ODS/XLSX/CSV. And we include Libraries"*). Each row opens the box that asks which tables
+		// and which scenarios; the format is the row. Rows are named for the file, each tip says
+		// what it carries.
+		return [
+			{ icon: 'save', label: pc.lpn_file_export_item_ods || 'ODS file…', key: 'lpn_file_export_item_ods',
 			  tip: pc.lpn_file_export_tables_tip, fn: function () { openExportTableBox('ods'); } },
-			{ icon: 'save', label: pc.lpn_file_export_item_xlsx || 'XLSX file…',
+			{ icon: 'save', label: pc.lpn_file_export_item_xlsx || 'XLSX file…', key: 'lpn_file_export_item_xlsx',
 			  tip: pc.lpn_file_export_tables_tip, fn: function () { openExportTableBox('xlsx'); } },
-			{ icon: 'save', label: pc.lpn_file_export_item_csv || 'CSV file…',
-			  tip: pc.lpn_file_export_csv_tip, fn: function () { openExportTableBox('csv'); } },
+			{ icon: 'save', label: pc.lpn_file_export_item_csv || 'CSV file…', key: 'lpn_file_export_item_csv',
+			  tip: pc.lpn_file_export_csv_tip, fn: function () { openExportTableBox('csv'); } }
+		];
+	}
+	function exportMenuRows() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			{ icon: 'save', label: pc.lpn_file_group_network || 'Network', submenu: exportNetworkRows },
+			{ icon: 'save', label: pc.lpn_file_group_tables || 'Tables', submenu: exportTableRows },
 			{ separator: true },
-			// Workspace (Tom, 2026-10-07): the twin of File > Import > Workspace.
+			// Workspace (Tom, 2026-10-07): the twin of File > Import > Workspace. Stays the last row.
 			{ icon: 'save', label: pc.lpn_file_export_item_workspace || 'Workspace…',
 			  tip: pc.lpn_file_export_workspace_tip, fn: exportWorkspaceFile }
 		];

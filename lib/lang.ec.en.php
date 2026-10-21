@@ -2281,8 +2281,8 @@ $ec_lang['lpn_file_export_item_geojson']='GeoJSON file…';
 $ec_lang['lpn_file_export_item_ods']='ODS file…';
 $ec_lang['lpn_file_export_item_xlsx']='XLSX file…';
 $ec_lang['lpn_file_export_item_csv']='CSV file…';
-$ec_lang['lpn_file_export_tables_tip']='Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library their IDs refer to: patterns, curves, pipe types, and fittings. Results are included for the scenario last calculated only.';
-$ec_lang['lpn_file_export_csv_tip']='Download a table as the Tables pane shows it. One table comes as a single CSV file with no libraries. Several tables or scenarios come as one zip file of CSV files, with a file for each library their IDs refer to. Results are included for the scenario last calculated only.';
+$ec_lang['lpn_file_export_tables_tip']='Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library that has entries: patterns, curves, pipe types, fittings, controls, and rules. Results are included for the scenario last calculated only.';
+$ec_lang['lpn_file_export_csv_tip']='Download a table as the Tables pane shows it. One table comes as a single CSV file with no libraries. Several tables or scenarios come as one zip file of CSV files, with a file for each library that has entries. Results are included for the scenario last calculated only.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards.';
 $ec_lang['lpn_status_inp_exported']='Exported {file}.';
