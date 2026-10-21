@@ -95,45 +95,31 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-20 afternoon (thirty-first session, Arizona time)
+## STATE — 2026-10-20 evening (thirty-second session, Arizona time)
 
-### Master: 6733e4e0a (theme, native EPS slice 1, examples guide, on his word) plus fix/key-reuse and this handoff. Production: what he last pulled
+### Master: native EPS slice 2 and label-leader merged on his word, plus chore/handoff-1020d. Production: what he last pulled
 
-- Merged on his word: `feat/theme` (Prairie with clouds), `feat/native-eps` slice 1, `fix/examples-guide`.
-  `feat/theme-tank` discarded on his word ("it looked like a prison"), archived as tag `archive/feat-theme-tank`.
-- `lpn_theme` now stores one of twelve theme names, not only light/dark (same key, same exemption; told him).
-- His 220 key marks harvested; his rewrite of `lpn_scnres_flow_tip` applied. The Guide's
-  `lpn_guide_cmp_byasset_def` carries a parallel sentence he has not edited; asked, not changed.
-- `fix/key-reuse` (defect track, merged on green): 13 untranslated duplicate keys deleted, each use
-  pointed at the incumbent (list in the commit and his report). Left: translated pairs such as
-  `lpn_file_import_inp` / `lpn_file_export_item_inp` ("EPANET file…"), which would need re-keying.
-- Still owed: consent_body's 26 translations; MSX, EPS-analysis, Guide-page, duration-fire and the
-  rest of the 167 untranslated keys. Sprint only on his word, about weekly.
+- Merged on his word: `feat/native-eps` (slice 2, simple controls), `feat/label-leader` ("merge this to
+  master", with lessons for the study in `dev/label-trials/tom-1020/lessons.md`).
+- Guide's `lpn_guide_cmp_byasset_def` flow-sign sentence now matches his tip rewrite (he: "Yes. Match.").
+- New Task 819 (organize Import and Export, plan with him first); his box-title instruction on Task 809;
+  his MCP words on Task 818 ("plan and get clarity before building").
+- **He cannot see jasmine:/tmp from lantana.** Put pictures for him in
+  `~/webdev/worktrees/_panel/www/img/` and link `http://localhost:8080/img/<name>.png`.
+- Still owed: consent_body's 26 translations; the untranslated keys. Sprint only on his word.
 
-### Branches waiting on him (pushed; quick checks and node harnesses green; no full suite yet)
+### Branches waiting on him
 
-- `feat/label-leader` (8103), bcc926448: he "might be willing to merge"; asked for his typed word.
-- `feat/label-margin` (8105), a4e28f48c, built on label-leader: boundary labeling (Bekos et al. 2007)
-  as a last stage; dropped labels go to the nearest open stretch on non-crossing leaders. Net1 at his
-  view 24 labels vs 21 (none hidden), Net3 141 vs 123, Novato 133 vs 115, 0 crossings, ~5% time.
-  Unlike his hand Net1: pipe labels go out short (Q only), some land inside loops, leaders any angle
-  up to 200 px, ragged columns. Perry 10-20: counts confirmed, "drop fewer", not "arranged like a person"; three
-  defects fixed in 8691fa30e (150 px cap; gain over master roughly halved: Net3 131 vs 123, Novato
-  127 vs 115); not re-reviewed by Perry.
-- `feat/flow-arrow` (8102), 5ebd338e2: double chevron, two unfilled closed heads (his /tmp/arrow.png).
-- `feat/geojson-into-project` (8101), cad86297c, Task 814: his two-paragraph wording in, verbatim.
-  Ready on his word. The .inp twin `lpn_inpup_lead` still one line; asked whether to match.
-- `feat/sqlite-reader` (8104), 5e33ab69b, Task 749: his WaterGEMS sample reads; Base and TGH-1 match
-  WaterGEMS's .inp exports and solve to EPANET's numbers (Perry, real Chromium). Wording for him in
-  Perry's journal entry of 10-20. 6.1 MB fixture in dev/lpn-spike/fixtures/wtg/: asked him.
-- `feat/native-eps` (no port), 1b06b7275, Task 733 slice 2: simple controls; Net3 with controls
-  within 0.14 mm head. Nothing on the page calls the native loop yet. Next: rules (own slice).
+- `feat/label-margin` (8105): he called its Net1 overlaps "unreleaseable"; an agent is fixing them.
+- `feat/flow-arrow` (8102): rejected; he wants ONE outlined head with a notched back, line through it.
+- `feat/geojson-into-project` (8101): ready; the .inp box gets the same second paragraph ("Yes. Match.").
+- `feat/sqlite-reader` (8104): fixture to leave the repo (squash-merge it so master never carries it).
 - `feat/desktop`: untouched.
 
 ### Next job
 
-Merge on his word. Task 818 first slice per Mary (fire_flow tool + open-in-app link) when he says go.
-Task 681 after label-leader/label-margin settle. Task 733 rules slice.
+Plan Tasks 819 (Import/Export) and 818 (MCP) with him before building. Task 681 after
+label-margin settles. Task 733 rules slice.
 
 ### Traps met 2026-10-20 (thirty-first session)
 
