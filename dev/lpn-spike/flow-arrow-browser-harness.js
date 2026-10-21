@@ -1,9 +1,9 @@
-// FLOW ARROW IS A DOUBLE CHEVRON, IN THE REAL PAGE (Tom, 2026-10-20: "To avoid our flow arrows being
-// mistaken for leaders, can we try a double chevron unfilled closed arrow?").
+// FLOW ARROW IS ONE NOTCHED OUTLINE DART, IN THE REAL PAGE (Tom, 2026-10-20: flow arrows must not be
+// mistaken for leaders; his drawing is a single unfilled head with a swept-back notched rear).
 //
 //   node dev/lpn-spike/flow-arrow-browser-harness.js [out.png]
 //
-// Net1, calculated. Asserts every drawn .lpn-arrow is a path of two closed subpaths (two heads),
+// Net1, calculated. Asserts every drawn .lpn-arrow is a path of one closed four-point subpath,
 // whose computed fill is none and stroke is the pipe's own. Saves a PNG of the map when a path is
 // given. EC_REPO points the run at another checkout (used to photograph master "before").
 // Takes /tmp/engcalcs-browser.lock itself; never wrap it in that lock.
@@ -60,8 +60,12 @@ async function main() {
 		ok('some arrows are drawn after a solve', info.length > 0);
 		if (OUT === undefined || process.env.EC_BEFORE !== '1') {
 			ok('each is a <path>', info.every((i) => i.tag === 'path'));
-			ok('each has exactly two closed heads (two M, two Z)',
-				info.every((i) => (i.d.match(/M/g) || []).length === 2 && (i.d.match(/Z/gi) || []).length === 2));
+			ok('each is ONE closed head (one M, one Z) of four points',
+				info.every((i) => (i.d.match(/M/g) || []).length === 1 && (i.d.match(/Z/gi) || []).length === 1 &&
+					(i.d.match(/-?\d+(\.\d+)?,-?\d+(\.\d+)?/g) || []).length === 4));
+			ok('the tip is on the pipe line and the notch is on the shaft',
+				info.every((i) => { const q = i.d.match(/-?\d+(\.\d+)?,-?\d+(\.\d+)?/g).map((t) => t.split(',').map(Number));
+					return q[0][1] === 0 && q[2][1] === 0 && q[2][0] < q[0][0] && q[2][0] > q[1][0]; }));
 			ok('none is filled', info.every((i) => i.fill === 'none'));
 			ok('all are stroked', info.every((i) => i.stroke && i.stroke !== 'none' && i.sw > 0));
 		}

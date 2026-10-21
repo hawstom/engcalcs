@@ -13533,16 +13533,16 @@ var EngCalcs = EngCalcs || {};
 				'class': 'lpn-vhandle', 'data-link': l.id, 'data-vidx': i
 			}, linksLayer));
 		}
-		// Flow-direction arrows: a DOUBLE CHEVRON per POLYLINE SEGMENT, two unfilled closed triangular
-		// heads nested one behind the other (Tom, 2026-10-20: a single open ">" was mistaken for a
-		// label leader). A bent pipe gets one on each straight run. NOT filled -- that reads as
+		// Flow-direction arrows: a NOTCHED DART per POLYLINE SEGMENT: one unfilled closed head, tip
+		// forward, two barbs swept back and joined at a notch on the shaft (Tom, 2026-10-20: a plain
+		// open ">" was mistaken for a label leader; his drawing /tmp/arrow.png). A bent pipe gets one on each straight run. NOT filled -- that reads as
 		// absorbed into the pipe's own colour. Hidden until a solve result exists. Points +x by
-		// default, spanning -0.8..0.8 along the pipe (as the single chevron did) and +-1.0 across;
+		// default, tip at +0.8 on the pipe line, barbs at -0.8 and +-1.0 across, notch at -0.3;
 		// positioned and rotated entirely via `transform` in updateArrow(), never via its own x/y.
 		var segCount = l.verts.length + 1, arrows = [], j;
 		for (j = 0; j < segCount; j++) {
 			arrows.push(annotationEl('path', {
-				d: 'M-0.8,-1 L0.2,0 L-0.8,1 Z M-0.2,-1 L0.8,0 L-0.2,1 Z', fill: 'none',
+				d: 'M0.8,0 L-0.8,-1 L-0.3,0 L-0.8,1 Z', fill: 'none',
 				'class': 'lpn-arrow', 'data-link': l.id, style: 'display:none'
 			}, linksLayer));
 		}
