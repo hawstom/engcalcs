@@ -4601,3 +4601,10 @@ OBSERVED: pan stable (0 moves). Phone 390x844 Net3 6 notches: leaders half off s
 OBSERVED: refreshOneLabelInPlace on an external pipe label: text moves 57-72 px left, leader unchanged (Net1 L11 524->467; Net3 l109, l117, l213, l215).
 OBSERVED arrow: path of two closed triangles, fill none, stroke map ink 0.25; same colour as pipe so interior is the pipe; dark/newspaper fine.
 Decays: re-verify.
+
+## 2026-10-21 Perry, feat/sqlite-reader (110f29428), Task 749 alternatives/pump-valve nodes/continuous patterns
+OBSERVED (Chromium, Tom's two files, own probe): import ok, 31 nodes/42 links GPM. Page solve of the import vs page solve of WaterGEMS's own .inp exports: Base heads/pressures max diff 1.4e-5, flows 1e-7; TGH-1 heads 1.5e-6, flows 5e-8 (31 nodes, 42 links, split nodes mapped 46-A->PMP-1-U).
+OBSERVED: Base does NOT solve in EPANET (Error 110, pumps have no curve in Base); page falls back to built-in, amber banner. WaterGEMS's own Base run (.rpc 478 B) produced nothing either. WaterGEMS's TGH-1 run itself is pathological (head error 1e10, supplied 0 gpm at t=0, pumps closed); page shows P-2 9966 gpm V=40.7: EPANET on the export, not WaterGEMS.
+OBSERVED: Basic mode is ON by default; Scenario manager row dimmed; alternatives tree (Physical/Demand, both named TGH-1) only after unchecking Basic mode. Scenario button says "TGH-1 (61)".
+OBSERVED: harness mutation (linear interpolation -> stepwise) fails wtg-tgh-harness against the export. wtg-import-browser-harness does not solve TGH against the exports; only structural.
+Decays: re-verify.
