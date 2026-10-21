@@ -76,3 +76,6 @@ dev/screenshots/*
 #
 # If you need what it holds, it is still on disk; it is simply not a thing git reports.
 dev/new-english-keys.rejected.md
+
+# WaterGEMS sample model (6 MB sqlite): kept in ~/tom-files, found by WTG_TGH_DIR
+dev/lpn-spike/fixtures/wtg/

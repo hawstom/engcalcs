@@ -202,11 +202,15 @@ async function unitDemand(browser) {
 	fs.rmSync(tmp, { recursive: true, force: true });
 }
 
-// Tom's WTG-tgh-1 (Base plus a child scenario changing a diameter and a demand), in the repository:
+// Tom's WTG-tgh-1 (Base plus a child scenario changing a diameter and a demand), outside the repository (WTG_TGH_DIR):
 // the import must put both overrides in the stored project (wtg-tgh-harness.js holds the reader side).
 async function tgh(browser) {
 	console.log('\n--- 1c. WTG-tgh-1: a child scenario with a diameter and a demand override ---');
-	const FX = path.join(REPO, 'dev', 'lpn-spike', 'fixtures', 'wtg');
+	const FX = process.env.WTG_TGH_DIR || '/home/haws/tom-files/2026-10-19';
+	if (!fs.existsSync(path.join(FX, 'WTG-tgh-1.wtg.sqlite'))) {
+		console.log('NOT RUN (fixture not present: ' + path.join(FX, 'WTG-tgh-1.wtg.sqlite') + ')');
+		return;
+	}
 	const a = await open(browser), h = helpers(a);
 	await a.newProject('us').catch(() => {});
 	await a.dismissGallery().catch(() => {});

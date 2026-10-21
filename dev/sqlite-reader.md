@@ -262,11 +262,11 @@ check that an import reproduced the model. Not built.
 
 ## A scenario that overrides Physical and Demand (2026-10-20)
 
-`dev/lpn-spike/fixtures/wtg/WTG-tgh-1.wtg.sqlite` (6.3 MB), its `.wtg`, and WaterGEMS's own `.inp`
+`WTG-tgh-1.wtg.sqlite` (6.3 MB; kept outside the repository, in `~/tom-files/2026-10-19/` or the folder `WTG_TGH_DIR` names), its `.wtg`, and WaterGEMS's own `.inp`
 export of each scenario, saved by Tom as an ordinary user of WaterGEMS: Base plus a child scenario
 TGH-1 that changes one pipe diameter (P-1, 8 to 10 in) and one demand (J-1, 0 to 1250 gpm). Three
-nodes (J-1, J-2, R-1), two pipes. Kept under `dev/lpn-spike/fixtures/` with the other fixtures; the
-sqlite is the one large file there. Every statement below is OBSERVED in this file.
+nodes (J-1, J-2, R-1), two pipes. Kept outside the repository (the sqlite is 6 MB):
+`~/tom-files/2026-10-19/`, or the folder `WTG_TGH_DIR` names; the harnesses print NOT RUN without it. Every statement below is OBSERVED in this file.
 
 - **A child scenario's rows**: `HMIScenario` 38 has `ParentID` 1 (Base). Its `HMIScenarioAlternative`
   rows are `IsLocal 1` for the two categories it changes (Physical type 4 to alternative 37, Demand

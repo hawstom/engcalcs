@@ -2,7 +2,7 @@
 //
 //   node dev/lpn-spike/wtg-tgh-harness.js
 //
-// fixtures/wtg/WTG-tgh-1.wtg.sqlite is a model Tom saved in WaterGEMS as an ordinary user: Base plus a
+// WTG-tgh-1.wtg.sqlite (kept outside the repository, see WTG_TGH_DIR below) is a model Tom saved in WaterGEMS as an ordinary user: Base plus a
 // child scenario TGH-1 that changes one pipe diameter (P-1, 8 to 10 in) and one demand (J-1, 0 to
 // 1250 gpm). The two `.inp` files beside it are WaterGEMS's own exports of each scenario. The reader's
 // Base is compared with the Base export element by element, and Base with TGH-1's overrides laid on is
@@ -14,7 +14,12 @@
 const fs = require('fs');
 const path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
-const FX = path.join(__dirname, 'fixtures', 'wtg');
+// The fixtures are large and not in the repository: WTG_TGH_DIR names the folder holding them.
+const FX = process.env.WTG_TGH_DIR || '/home/haws/tom-files/2026-10-19';
+if (!fs.existsSync(path.join(FX, 'WTG-tgh-1.wtg.sqlite'))) {
+	console.log('NOT RUN (fixture not present: ' + path.join(FX, 'WTG-tgh-1.wtg.sqlite') + ')');
+	process.exit(0);
+}
 require('./bootstrap.js');
 const initSqlJs = require(path.join(ROOT, 'js', 'vendor', 'sql-wasm.js'));
 require(path.join(ROOT, 'js', 'lpn-sqlite.js'));
