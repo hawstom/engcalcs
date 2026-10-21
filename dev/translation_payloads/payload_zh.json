@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 3187,
-        "delta_key_count": 206,
+        "expected_key_count": 3185,
+        "delta_key_count": 204,
         "english_changed_key_count": 38,
         "exempt_key_count": 24,
         "exempt_keys": [
@@ -94,7 +94,6 @@
         "lpn_msx_report_missing": "IDs in the file that this network does not have: {ids}.",
         "lpn_msx_not_msx": "{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.",
         "lpn_msx_attached_heading": "Attached EPANET-MSX file: {file}",
-        "lpn_msx_replace": "Replace…",
         "lpn_msx_removed": "Removed {file} from this project.",
         "lpn_quality_msx": "Multi-species (EPANET-MSX)",
         "lpn_quality_msx_species": "Species",
@@ -231,7 +230,6 @@
         "lpn_ds_empties_at": "⚠ At a demand scale of {m}, a tank empties at {time}.",
         "lpn_ds_lowest_at_time": "At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}, at {time}.",
         "lpn_crit_run_note": "Each outage was run over the whole simulation ({n} reporting steps).",
-        "lpn_eps_working": "Running the extended-period simulation.",
         "lpn_ff_working_steps": "Working: reporting step {step} of {steps}, junction {done} of {total}.",
         "lpn_ff_col_hour": "Step of lowest flow",
         "lpn_ds_col_hour": "Step of lowest pressure",
@@ -302,7 +300,6 @@
         "lpn_msx_report_missing": "IDs in the file that this network does not have: {ids}.",
         "lpn_msx_not_msx": "{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.",
         "lpn_msx_attached_heading": "Attached EPANET-MSX file: {file}",
-        "lpn_msx_replace": "Replace…",
         "lpn_msx_removed": "Removed {file} from this project.",
         "lpn_quality_msx": "Multi-species (EPANET-MSX)",
         "lpn_quality_msx_species": "Species",
@@ -439,7 +436,6 @@
         "lpn_ds_empties_at": "⚠ At a demand scale of {m}, a tank empties at {time}.",
         "lpn_ds_lowest_at_time": "At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}, at {time}.",
         "lpn_crit_run_note": "Each outage was run over the whole simulation ({n} reporting steps).",
-        "lpn_eps_working": "Running the extended-period simulation.",
         "lpn_ff_working_steps": "Working: reporting step {step} of {steps}, junction {done} of {total}.",
         "lpn_ff_col_hour": "Step of lowest flow",
         "lpn_ds_col_hour": "Step of lowest pressure",
@@ -1058,22 +1054,6 @@
             }
         },
         "lpn_msx_attached_heading": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_file_import_workspace_tip",
-                    "value": "应用通过“文件”、“导出”、“工作区”保存的工作区文件：框的位置和大小、停靠、窗格大小，以及本页面的显示选项，如显示哪些帮助气泡和悬停卡片。不会更改您的项目和 Cookie。",
-                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
-                },
-                "next_translated": {
-                    "key": "lpn_workspace_exported",
-                    "value": "工作区已保存到 {file}：{n} 项设置。",
-                    "english": "Workspace saved to {file}: {n} settings."
-                }
-            }
-        },
-        "lpn_msx_replace": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -3291,22 +3271,6 @@
             }
         },
         "lpn_crit_run_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_working",
-                    "value": "正在处理：{total} 个节点中的第 {done} 个。",
-                    "english": "Working: {done} of {total} junctions."
-                },
-                "next_translated": {
-                    "key": "lpn_ff_stopped",
-                    "value": "已在 {total} 个节点中完成 {done} 个后停止。下方结果为已完成的部分。",
-                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
-                }
-            }
-        },
-        "lpn_eps_working": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

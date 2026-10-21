@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sr",
-        "expected_key_count": 3187,
-        "delta_key_count": 206,
+        "expected_key_count": 3185,
+        "delta_key_count": 204,
         "english_changed_key_count": 38,
         "exempt_key_count": 43,
         "exempt_keys": [
@@ -113,7 +113,6 @@
         "lpn_msx_report_missing": "IDs in the file that this network does not have: {ids}.",
         "lpn_msx_not_msx": "{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.",
         "lpn_msx_attached_heading": "Attached EPANET-MSX file: {file}",
-        "lpn_msx_replace": "Replace…",
         "lpn_msx_removed": "Removed {file} from this project.",
         "lpn_quality_msx": "Multi-species (EPANET-MSX)",
         "lpn_quality_msx_species": "Species",
@@ -250,7 +249,6 @@
         "lpn_ds_empties_at": "⚠ At a demand scale of {m}, a tank empties at {time}.",
         "lpn_ds_lowest_at_time": "At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}, at {time}.",
         "lpn_crit_run_note": "Each outage was run over the whole simulation ({n} reporting steps).",
-        "lpn_eps_working": "Running the extended-period simulation.",
         "lpn_ff_working_steps": "Working: reporting step {step} of {steps}, junction {done} of {total}.",
         "lpn_ff_col_hour": "Step of lowest flow",
         "lpn_ds_col_hour": "Step of lowest pressure",
@@ -321,7 +319,6 @@
         "lpn_msx_report_missing": "IDs in the file that this network does not have: {ids}.",
         "lpn_msx_not_msx": "{file} does not look like an EPANET-MSX file: it has no [SPECIES] section.",
         "lpn_msx_attached_heading": "Attached EPANET-MSX file: {file}",
-        "lpn_msx_replace": "Replace…",
         "lpn_msx_removed": "Removed {file} from this project.",
         "lpn_quality_msx": "Multi-species (EPANET-MSX)",
         "lpn_quality_msx_species": "Species",
@@ -458,7 +455,6 @@
         "lpn_ds_empties_at": "⚠ At a demand scale of {m}, a tank empties at {time}.",
         "lpn_ds_lowest_at_time": "At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}, at {time}.",
         "lpn_crit_run_note": "Each outage was run over the whole simulation ({n} reporting steps).",
-        "lpn_eps_working": "Running the extended-period simulation.",
         "lpn_ff_working_steps": "Working: reporting step {step} of {steps}, junction {done} of {total}.",
         "lpn_ff_col_hour": "Step of lowest flow",
         "lpn_ds_col_hour": "Step of lowest pressure",
@@ -1077,22 +1073,6 @@
             }
         },
         "lpn_msx_attached_heading": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_file_import_workspace_tip",
-                    "value": "Примените датотеку радног простора сачуваног преко Датотека, Извези, Радни простор: положаје и величине оквира, прикачињање, величине панела и опције приказа ове странице, као што су који облачићи помоћи и картица при пролазу показивача су приказани. Ваши пројекти и колачићи се не дирају.",
-                    "english": "Apply a workspace file saved with File, Export, Workspace: the layout of the panes, table columns and boxes, and the display options of this page, such as which help bubbles and the hover card are shown. Your projects and cookies are not touched."
-                },
-                "next_translated": {
-                    "key": "lpn_workspace_exported",
-                    "value": "Радни простор сачуван у {file}: {n} подешавања.",
-                    "english": "Workspace saved to {file}: {n} settings."
-                }
-            }
-        },
-        "lpn_msx_replace": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -3310,22 +3290,6 @@
             }
         },
         "lpn_crit_run_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_working",
-                    "value": "У току: {done} од {total} чворова.",
-                    "english": "Working: {done} of {total} junctions."
-                },
-                "next_translated": {
-                    "key": "lpn_ff_stopped",
-                    "value": "Заустављено после {done} од {total} чворова. Резултати испод су они који су већ завршени.",
-                    "english": "Stopped after {done} of {total} junctions. The results below are the ones already finished."
-                }
-            }
-        },
-        "lpn_eps_working": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
