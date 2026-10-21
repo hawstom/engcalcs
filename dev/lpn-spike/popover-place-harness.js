@@ -333,7 +333,7 @@ console.log('\n-- clicking the menu bar dismisses an open popover (Tom, 2026-08-
 	report(!/#lpn_menubar/.test(tabs), 'the menu bar is no longer exempt from the dismissal');
 	report(!/#lpn_toolbar/.test(tabs), 'nor is the toolbar');
 	report(/viewPopoverAnchor/.test(tabs), 'the control that OPENED the popover is exempt instead');
-	report(/closest\('#lpn_menu_popup, #lpn_menu_popup2'\)/.test(tabs),
+	report(/closest\('#lpn_menu_popup, #lpn_menu_popup2, #lpn_menu_popup3'\)/.test(tabs),
 		'and a menu row stays exempt, since rows are what open these panels');
 	report(/if \(!except\) \{ viewPopoverAnchor = null; \}/.test(extract('closeViewPopovers')),
 		'and closing them all forgets it, so a stale button cannot go on being exempt');

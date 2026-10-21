@@ -133,7 +133,7 @@ console.log('\n--- one door ---');
 	const js = fs.readFileSync(path.join(ROOT, 'js/looped-network.js'), 'utf8');
 	ok('the menu bar still puts its tip on the button as a title',
 		/if \(m\.tip\) \{ b\.title = m\.tip; b\.className \+= ' ec-help'; \}/.test(js));
-	ok('parking is per level, two slots', /var tipParked = \[null, null\];/.test(js));
+	ok('parking is per level, three slots (the third level is Import and Export groups, Task 819)', /var tipParked = \[null, null, null\];/.test(js));
 	// openMenu parks and the two closers unpark. A third place doing either is a second opinion
 	// about when a tooltip is allowed, which is how this comes back.
 	// CALLS only -- the lookbehind drops the `function` that defines each, which is what made the
@@ -143,8 +143,8 @@ console.log('\n--- one door ---');
 	const parkCalls = (js.match(/(?<!un)(?<!function )parkAnchorTip\(/g) || []).length;
 	const unparkCalls = (js.match(/(?<!function )unparkAnchorTip\(/g) || []).length;
 	ok('parkAnchorTip is called once, from openMenu', parkCalls === 1, String(parkCalls));
-	ok('unparkAnchorTip is called three times: the two closers, and parkAnchorTip itself',
-		unparkCalls === 3, String(unparkCalls));
+	ok('unparkAnchorTip is called four times: the three closers (pull-down, fly-out, third level), and parkAnchorTip itself',
+		unparkCalls === 4, String(unparkCalls));
 	// The tip itself must still exist: "delete the tip" was never the fix.
 	const en = fs.readFileSync(path.join(ROOT, 'lib/lang.ec.en.php'), 'utf8');
 	ok('and lpn_menu_project_tip is still a defined string',
