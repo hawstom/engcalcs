@@ -2342,7 +2342,7 @@ $ec_lang['lpn_msx_removed']='Removed {file} from this project.';
 $ec_lang['lpn_quality_msx']='Multi-species (EPANET-MSX)';
 $ec_lang['lpn_quality_msx_species']='Species';
 $ec_lang['lpn_quality_msx_species_tip']='The EPANET-MSX species the map colors, the Tables pane and the Graph pane show. Every species in the file is computed in the same run, so changing this needs no new run. Values are in the units the EPANET-MSX file declares: mass per liter for a bulk species, mass per unit area for a wall species.';
-$ec_lang['lpn_quality_msx_none']='No EPANET-MSX file is attached to this project. Attach one with File, Import, EPANET-MSX file.';
+$ec_lang['lpn_quality_msx_none']='No EPANET-MSX file is attached to this project. Attach one with File, Import, Network, EPANET-MSX file.';
 $ec_lang['lpn_result_msx_tip']='The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.';
 $ec_lang['lpn_workspace_exported']='Workspace saved to {file}: {n} settings.';
 $ec_lang['lpn_workspace_imported']='Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}.';
@@ -4989,9 +4989,9 @@ $ec_lang['lpn_file_import_survey']='Surveyed points…';
 $ec_lang['lpn_file_import_survey_tip']='Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.';
 // GeoJSON import of Shapes (Task 779). Only points, lines and polygons come in, as Shapes; the
 // network is imported from an EPANET file. Every feature not imported is named in the report.
-$ec_lang['lpn_file_import_shapes']='GeoJSON shapes…';
-$ec_lang['lpn_file_import_shapes_tip']='Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, EPANET file or File, Import, GeoJSON network. The project must be georeferenced or state a coordinate system.';
-$ec_lang['lpn_file_import_gjnet']='GeoJSON network…';
+$ec_lang['lpn_file_import_shapes']='GeoJSON file…';
+$ec_lang['lpn_file_import_shapes_tip']='Read the points, lines, and polygons of a GeoJSON file into this project as Shapes. Network assets in the file are not imported; import the network with File, Import, Network, EPANET file or File, Import, Network, GeoJSON file. The project must be georeferenced or state a coordinate system.';
+$ec_lang['lpn_file_import_gjnet']='GeoJSON file…';
 $ec_lang['lpn_file_import_gjnet_tip']='Open a GeoJSON file as a new project. Points are imported as junctions, reservoirs, or tanks, and lines as pipes. A file exported from this page is read as written; for any other file, one step maps its fields to properties and units.';
 $ec_lang['lpn_gjnet_refuse_crs']='{file} states the coordinate system {crs}. GeoJSON positions are WGS 84 latitude and longitude (RFC 7946), and this page does not convert a GeoJSON file from another system. Export the layer from the GIS in EPSG:4326 (WGS 84), then import that file.';
 $ec_lang['lpn_gjnet_refuse_empty']='{file} contains no points or lines.';
@@ -5074,9 +5074,13 @@ $ec_lang['lpn_geojson_import_parts']='{n} multipart features imported as one Sha
 $ec_lang['lpn_geojson_import_parts_one']='One multipart feature imported as one Shape for each part.';
 $ec_lang['lpn_geojson_import_local']='GeoJSON positions are latitude and longitude, and this project has no place on the Earth to which they can be converted. Georeference it first with Map, World map, Attach, then import again.';
 $ec_lang['lpn_geojson_import_unreadable']='{file} is not a GeoJSON file: {detail}';
-$ec_lang['lpn_file_import_dxf']='DXF shapes…';
+// Groups inside File > Import and File > Export (Task 819): Network, Shapes, Tables.
+$ec_lang['lpn_file_group_network']='Network';
+$ec_lang['lpn_file_group_shapes']='Shapes';
+$ec_lang['lpn_file_group_tables']='Tables';
+$ec_lang['lpn_file_import_dxf']='DXF file…';
 $ec_lang['lpn_file_import_dxf_tip']='Read the points, lines, and polylines of an ASCII DXF file into this project as Shapes, with each layer name kept as a property. Other entities are counted and listed, not imported. The coordinates are read as the X and Y of this project, with no conversion.';
-$ec_lang['lpn_file_import_shp']='Shapefile shapes…';
+$ec_lang['lpn_file_import_shp']='Shapefile…';
 $ec_lang['lpn_file_import_shp_tip']='Read the points, lines, and polygons of an ESRI shapefile into this project as Shapes, with the attribute columns kept as properties. Select either the .zip or the .shp together with its .shx, .dbf, and .prj (hold Ctrl or Shift to select several). Coordinates in a different coordinate system from the project are converted, and the notice states this.';
 $ec_lang['lpn_dxf_import_skipped']='{n} entities not imported: {list}.';
 $ec_lang['lpn_dxf_import_skipped_one']='One entity not imported: {list}.';
