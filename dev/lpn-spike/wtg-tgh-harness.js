@@ -8,9 +8,9 @@
 // pipe diameters, junction elevations and demands, both tanks, the pump definitions and the GPV curve. The two `.inp` files
 // beside it are WaterGEMS's own exports of each scenario. The reader's Base is compared with the Base export element by
 // element, and Base with TGH-1's alternatives and overrides laid on (as a stored tree resolves them) is compared with the
-// TGH-1 export. WaterGEMS's export names a pump's two junctions after the node's ID (46-A, 46-B); the reader names them
-// after the pump (PMP-1-U, PMP-1-D); the comparison renames the export's to match. Tolerance: 1e-6 relative on numbers (the
-// reader writes seven significant digits where WaterGEMS's export writes fifteen).
+// TGH-1 export. A pump or valve's two junctions are named and placed as the export names and places them (46-A, 46-B for
+// PMP-1, both at the pump's position), so the comparison renames nothing and compares positions too. Tolerance: 1e-6 relative
+// on numbers (the reader writes seven significant digits where WaterGEMS's export writes fifteen).
 // Record: dev/sqlite-reader.md, "Pumps and valves as nodes, a continuous pattern, and the alternatives themselves".
 'use strict';
 
@@ -45,18 +45,9 @@ function pointsSame(a, b) {
 }
 const curveOf = (parsed, id) => (parsed.curves.filter((c) => c.id === id)[0] || {}).points || null;
 
-// WaterGEMS's names for a pump or valve's two junctions, renamed to the reader's.
-function rename(theirs) {
-	const alias = {};
-	theirs.links.forEach((l) => { if (l.type === 'pump' || l.type === 'valve') { alias[l.from] = l.id + '-U'; alias[l.to] = l.id + '-D'; } });
-	theirs.nodes.forEach((n) => { if (alias[n.id]) { n.id = alias[n.id]; n.split = true; } });
-	theirs.links.forEach((l) => { l.from = alias[l.from] || l.from; l.to = alias[l.to] || l.to; });
-	return theirs;
-}
 const FIELDS = ['type', 'elev', 'demand', 'head', 'x', 'y', 'level', 'minLevel', 'maxLevel', 'length', 'diameter', 'roughness', 'k', 'status', 'from', 'to',
 	'valveType', 'setting', 'speed'];
-// Every element of `ours` against `theirs`: same IDs, same kinds, same values in FIELDS; a pump or valve's two
-// junctions are drawn at different places by the two writers (positions skipped); a pump's diameter, a valve's length and
+// Every element of `ours` against `theirs`: same IDs, same kinds, same values in FIELDS, positions included; a pump's diameter, a valve's length and
 // roughness, and the diameter of a tank with a volume curve are not used by EPANET.
 function diffNetworks(ours, theirs) {
 	const out = [];
@@ -68,7 +59,6 @@ function diffNetworks(ours, theirs) {
 			if (!o[id]) { return; }
 			FIELDS.forEach((f) => {
 				if (t[id][f] === undefined && o[id][f] === undefined) { return; }
-				if ((f === 'x' || f === 'y') && t[id].split) { return; }
 				if (t[id].type === 'pump' && f === 'diameter') { return; }
 				// A pump with no SPEED keyword runs at relative speed 1, which WaterGEMS writes out once it has a curve.
 				if (f === 'speed' && t[id].type === 'pump') { compared++; if (!same(o[id].speed === undefined ? 1 : o[id].speed, t[id].speed === undefined ? 1 : t[id].speed)) { out.push(kind + ' ' + id + ' speed'); } return; }
@@ -136,8 +126,8 @@ function laid(base, flat) {
 	ok('flow units from the .wtg: GPM', r.flowUnits === 'GPM', r.flowUnits);
 	ok('Base scenario is named Base', r.baseScenario === 'Base', r.baseScenario);
 	const base = EC.lpnInpParse(r.inp);
-	const tBase = rename(EC.lpnInpParse(fs.readFileSync(path.join(FX, 'WTG-export-tgh-1-Base.inp'), 'utf8')));
-	const tScen = rename(EC.lpnInpParse(fs.readFileSync(path.join(FX, 'WTG-export-tgh-1-TGH-1.inp'), 'utf8')));
+	const tBase = (EC.lpnInpParse(fs.readFileSync(path.join(FX, 'WTG-export-tgh-1-Base.inp'), 'utf8')));
+	const tScen = (EC.lpnInpParse(fs.readFileSync(path.join(FX, 'WTG-export-tgh-1-TGH-1.inp'), 'utf8')));
 	ok('all three parse', base.ok && tBase.ok && tScen.ok);
 	ok('every node and link of the export is read (' + tBase.nodes.length + ' nodes, ' + tBase.links.length + ' links)',
 		base.nodes.length === tBase.nodes.length && base.links.length === tBase.links.length, base.nodes.length + ' ' + base.links.length);
@@ -152,6 +142,24 @@ function laid(base, flat) {
 	const at = (id) => base.links.filter((l) => l.id === id)[0];
 	ok('PMP-1: P-1 (downstream) leaves the outlet; P-2, P-3 and P-16 meet the inlet',
 		pmp1 && at('P-1').from === pmp1.to && at('P-2').to === pmp1.from && at('P-3').from === pmp1.from && at('P-16').to === pmp1.from);
+
+	// Tom, 2026-10-21: *"Please check against the Bentley inp export that has upstream and downstream nodes coincident with
+	// pump/valve."* Every pump and valve: its two junctions are the export's, by name, at the node's own position.
+	const tRaw = EC.lpnInpParse(fs.readFileSync(path.join(FX, 'WTG-export-tgh-1-Base.inp'), 'utf8'));
+	const pv = base.links.filter((l) => l.type === 'pump' || l.type === 'valve');
+	const nOf = (net, id) => net.nodes.filter((n) => n.id === id)[0] || {};
+	const pvBad = pv.filter((l) => {
+		const t = tRaw.links.filter((x) => x.id === l.id)[0];
+		const a = nOf(base, l.from), b = nOf(base, l.to);
+		return !t || t.from !== l.from || t.to !== l.to || a.x !== b.x || a.y !== b.y || !same(a.x, nOf(tRaw, t.from).x) || !same(a.y, nOf(tRaw, t.from).y);
+	}).map((l) => l.id + ' ' + l.from + ' ' + l.to);
+	ok('all nine pumps and valves join the export\'s own two junctions (46-A to 46-B ...), drawn on top of each other at the node',
+		pv.length === 9 && pvBad.length === 0, pvBad.join('; '));
+	const pipeBad = base.links.filter((l) => l.type === 'pipe').filter((l) => {
+		const t = tRaw.links.filter((x) => x.id === l.id)[0];
+		return !t || t.from !== l.from || t.to !== l.to;
+	}).map((l) => l.id);
+	ok('every pipe runs between the same two nodes as in the export', pipeBad.length === 0, pipeBad.join(' '));
 
 	// Base against WaterGEMS's Base export.
 	const d0 = diffNetworks(base, tBase);
@@ -174,9 +182,11 @@ function laid(base, flat) {
 	ok('the Physical alternative is named TGH-1 and hangs from Base', altOf('physical').name === 'TGH-1' && altOf('physical').category === 'physical' && !altOf('physical').parentFileId && !altOf('physical').root);
 	ok('the Demand alternative is named TGH-1 and holds the three changed demands', altOf('demand').name === 'TGH-1' &&
 		JSON.stringify(altOf('demand').values) === JSON.stringify({ 'n:J-11': { demand: 200 }, 'n:J-12': { demand: 1000 }, 'n:J-13': { demand: 500 } }), JSON.stringify(altOf('demand').values));
-	ok('the Physical alternative holds the 33 pipe diameters, the tanks, the pump and GPV curves and the pump node elevations',
-		Object.keys(altOf('physical').values || {}).length > 40 && altOf('physical').values['l:P-1'].diameter === 10 && altOf('physical').values['n:T-1'].tankDiameter === 50 &&
-		altOf('physical').values['l:GPV-1'].curveId && altOf('physical').values['l:PMP-1'].curveId && altOf('physical').values['n:PMP-3-U'].elev === 100);
+	// The model of 2026-10-21: PMP-3 has its curve in Base too, and the GPV node is at elevation 0 in TGH-1.
+	ok('the Physical alternative holds the 33 pipe diameters, the tanks, the pump and GPV curves and the GPV node elevation',
+		Object.keys(altOf('physical').values || {}).length === 40 && altOf('physical').values['l:P-1'].diameter === 10 && altOf('physical').values['n:T-1'].tankDiameter === 50 &&
+		altOf('physical').values['l:GPV-1'].curveId && altOf('physical').values['l:PMP-1'].curveId &&
+		altOf('physical').values['n:62-A'].elev === 0 && altOf('physical').values['n:62-B'].elev === 0);
 	ok('what an alternative cannot say stays the scenario\'s own: the tank depths (they follow the base elevation)',
 		JSON.stringify(scn.overrides) === JSON.stringify({ 'n:T-1': { level: 19 }, 'n:T-2': { level: 19 } }), JSON.stringify(scn.overrides));
 

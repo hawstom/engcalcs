@@ -152,7 +152,7 @@ async function synthetic(browser) {
 	const doc = after.doc || {};
 	ok('a NEW project, named after the file', after.count === before.count + 1 && after.id !== before.id && doc.project && doc.project.name === 'Synthetic model', JSON.stringify(doc.project));
 	const ids = (doc.nodes || []).map((n) => n.id).sort().join(',');
-	ok('its nodes: the four imported, and the four beside the pump and valve', ids === 'J1,J_3,PMP1-D,PMP1-U,PRV1-D,PRV1-U,R1,T1', ids);
+	ok('its nodes: the four imported, and the four beside the pump and valve', ids === '110-A,110-B,111-A,111-B,J1,J_3,R1,T1', ids);
 	const lk = (doc.links || []).map((l) => l.id + ':' + l.type).sort().join(',');
 	ok('its links: five pipes, the pump and the PRV', lk === 'P1:pipe,P2:pipe,P3:pipe,P4:pipe,P5:pipe,PMP1:pump,PRV1:valve', lk);
 	const j3 = (doc.nodes || []).filter((n) => n.id === 'J_3')[0];
@@ -273,10 +273,12 @@ async function samples(browser) {
 	const ours = await h.solved();
 	await h.markSolve();
 	await h.importVia('lpn_file_import_inp', inpFile);
-	const d2 = await a.waitDialog(20000);
-	if (d2) { await a.dialogClick(await L('lpn_dialog_ok')); }
+	// An .inp opened over a project first asks where it goes (master, Task 814): a new project, as before.
+	let d2 = await a.waitDialog(20000);
+	if (d2 && d2.buttons.indexOf(await L('lpn_inpup_btn_new')) >= 0) { await a.dialogClick(await L('lpn_inpup_btn_new')); d2 = await a.waitDialog(20000); }
+	if (d2 && d2.buttons.indexOf(await L('lpn_dialog_ok')) >= 0) { await a.dialogClick(await L('lpn_dialog_ok')); }
 	const theirs = await h.solved();
-	const alias = (id) => ({ 3: 'U1-D', 4: 'U1-U' }[id] || id);
+	const alias = (id) => ({ 3: '96-B', 4: '96-A' }[id] || id);
 	const shared = {};
 	// Set aside: 1 and 2, the tank-inlet construction WaterGEMS's export adds, and 3 and 4, the pump's
 	// two junctions, whose heads hang on that construction: through the export's PSV into the full tank

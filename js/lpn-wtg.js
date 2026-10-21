@@ -852,8 +852,10 @@
 		});
 
 		// Pumps and valves are NODES in WaterGEMS, each between an upstream and a downstream pipe.
-		// Each becomes a link between two new junctions placed a quarter of the way along those pipes'
-		// end segments, named after it with -U and -D, at its elevation; the pipes keep their lengths.
+		// Each becomes a link between two new junctions AT ITS OWN POSITION and elevation, named after
+		// its element ID number with -A (upstream) and -B (downstream): exactly what WaterGEMS's own
+		// EPANET export writes (46-A, 46-B for PMP-1; OBSERVED, WTG-tgh-1, 2026-10-21), so the two files
+		// compare line for line (Tom, 2026-10-21). The pipes keep their lengths.
 		var splitIds = [], splitAt = {}, curveOfDef = {}, gpvCurveOf = {};
 		// The curves a pump definition gives a pump: its head curve and its efficiency curve, written into
 		// [CURVES] once per definition, whichever pump (or scenario) names it. Notes name what is not carried.
@@ -972,25 +974,17 @@
 				d.unlinked = true;
 				return;
 			}
-			function towards(l) {
-				var pts = l.pts, near, far;
-				if (!pts || pts.length < 2) { return [d.x, d.y]; }
-				if (l.to === d.e) { near = pts[pts.length - 1]; far = pts[pts.length - 2]; } else { near = pts[0]; far = pts[1]; }
-				return [near[0] + 0.25 * (far[0] - near[0]), near[1] + 0.25 * (far[1] - near[1])];
-			}
-			var uId = makeId(d.label + '-U', 'NODE-' + d.e + '-U', nodeIds), dId = makeId(d.label + '-D', 'NODE-' + d.e + '-D', nodeIds);
-			var uPt = towards(up), dPt = towards(down);
+			var uId = makeId(d.e + '-A', 'NODE-' + d.e + '-A', nodeIds), dId = makeId(d.e + '-B', 'NODE-' + d.e + '-B', nodeIds);
 			var elev = need(L(d.elev, 'Physical_NodeElevation'), 'elevation', d.label);
 			junctions.push(' ' + uId + '\t' + elev + '\t0\t\t;');
 			junctions.push(' ' + dId + '\t' + elev + '\t0\t\t;');
-			coords.push(' ' + uId + '\t' + XY(uPt[0]) + '\t' + XY(uPt[1]));
-			coords.push(' ' + dId + '\t' + XY(dPt[0]) + '\t' + XY(dPt[1]));
+			coords.push(' ' + uId + '\t' + XY(d.x) + '\t' + XY(d.y));
+			coords.push(' ' + dId + '\t' + XY(d.x) + '\t' + XY(d.y));
 			counts.splitJunctions += 2;
-			splitIds.push(d.label);
-			splitAt[d.e] = { down: down.e, uId: uId, dId: dId, uPt: uPt, dPt: dPt };
+			splitIds.push(d.label + ' (' + uId + ', ' + dId + ')');
+			splitAt[d.e] = { down: down.e, uId: uId, dId: dId };
 			d.id = makeId(d.label, d.kind.toUpperCase() + '-' + d.e, linkIds);
 			linkIdOf[d.e] = d.id;
-			verts.push(' ' + d.id + '\t' + XY(d.x) + '\t' + XY(d.y));
 			if (d.kind === 'pump') {
 				counts.pumps++;
 				var params = '';
@@ -1000,7 +994,7 @@
 					note('wtg-pump-nodef', [d.label]);
 				} else {
 					if (pcv.h) { params = 'HEAD ' + pcv.h; } else { note('wtg-pump-nocurve', [d.label]); }
-					if (pcv.e) { energy.push(' Pump \t' + d.id + '\tEfficiency\t' + pcv.e); }
+					if (pcv.e) { energy.push(' Pump \t' + d.id + '\tEffic\t' + pcv.e); }
 				}
 				if (d.speed !== undefined && d.speed !== null && d.speed !== 1) { params += (params ? '\t' : '') + 'SPEED ' + num(d.speed); }
 				pumps.push(' ' + d.id + '\t' + uId + '\t' + dId + '\t' + params + '\t;');

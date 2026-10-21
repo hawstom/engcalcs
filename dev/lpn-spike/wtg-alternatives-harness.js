@@ -39,6 +39,7 @@ const INJECT =
 	"\t\tgetDoc: function () { return doc; }, getScenarios: function () { return scenarios; }, getProject: function () { return project; },\n" +
 	"\t\tseedDefaultInputs: seedDefaultInputs, effective: effective, switchScenario: switchScenario, baseScenario: baseScenario,\n" +
 	"\t\tnodeById: nodeById, linkById: linkById, landWtgResult: landWtgResult, serializeProject: serializeProject,\n" +
+	"\t\tinpExportDocument: inpExportDocument, inpExportOptions: inpExportOptions,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -56,12 +57,43 @@ function same(a, b) {
 	return a === b;
 }
 function pointsSame(a, b) { return !!a && !!b && a.length === b.length && a.every((p, i) => same(p[0], b[i][0]) && same(p[1], b[i][1])); }
-function rename(theirs) {
-	const alias = {};
-	theirs.links.forEach((l) => { if (l.type === 'pump' || l.type === 'valve') { alias[l.from] = l.id + '-U'; alias[l.to] = l.id + '-D'; } });
-	theirs.nodes.forEach((n) => { if (alias[n.id]) { n.id = alias[n.id]; } });
-	theirs.links.forEach((l) => { l.from = alias[l.from] || l.from; l.to = alias[l.to] || l.to; });
-	return theirs;
+
+// A whole extended-period run in EPANET (epanet-js): heads and flows at every hydraulic time step.
+async function epsRun(inpText) {
+	const mod = await import('file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js'));
+	const ws = new mod.Workspace();
+	await ws.loadModule();
+	const p = new mod.Project(ws);
+	ws.writeFile('h.inp', inpText);
+	p.open('h.inp', 'h.rpt', 'h.out');
+	p.openH(); p.initH(0);
+	const steps = [];
+	let dt;
+	do {
+		const t = p.runH(), heads = {}, flows = {};
+		for (let i = 1; i <= p.getCount(0); i++) { heads[p.getNodeId(i)] = p.getNodeValue(i, 10); }
+		for (let i = 1; i <= p.getCount(2); i++) { flows[p.getLinkId(i)] = p.getLinkValue(i, 8); }
+		steps.push({ t, heads, flows });
+		dt = p.nextH();
+	} while (dt > 0);
+	p.closeH(); p.close();
+	return steps;
+}
+function epsWorst(ours, theirs) {
+	const out = { nh: 0, nq: 0, h: { d: 0 }, q: { d: 0 }, missing: [] };
+	theirs.forEach((ts, i) => {
+		const os = ours[i];
+		if (!os || os.t !== ts.t) { out.missing.push('step ' + ts.t); return; }
+		[['heads', 'h', 'nh'], ['flows', 'q', 'nq']].forEach(([k, w, n]) => {
+			Object.keys(ts[k]).forEach((id) => {
+				if (os[k][id] === undefined) { out.missing.push(id); return; }
+				out[n]++;
+				const d = Math.abs(os[k][id] - ts[k][id]);
+				if (d > out[w].d) { out[w] = { d, id, t: ts.t }; }
+			});
+		});
+	});
+	return out;
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -137,8 +169,8 @@ async function tree() {
 	const display = EC.lpnWtgDisplayUnits(fs.readFileSync(path.join(FX, 'WTG-tgh-1.wtg'), 'utf8'));
 	const r = EC.lpnWtgRead(db, { display });
 	db.close();
-	const tBase = rename(EC.lpnInpParse(fs.readFileSync(path.join(FX, 'WTG-export-tgh-1-Base.inp'), 'utf8')));
-	const tScen = rename(EC.lpnInpParse(fs.readFileSync(path.join(FX, 'WTG-export-tgh-1-TGH-1.inp'), 'utf8')));
+	const tBase = (EC.lpnInpParse(fs.readFileSync(path.join(FX, 'WTG-export-tgh-1-Base.inp'), 'utf8')));
+	const tScen = (EC.lpnInpParse(fs.readFileSync(path.join(FX, 'WTG-export-tgh-1-TGH-1.inp'), 'utf8')));
 
 	const L = loadLoopedNetwork(INJECT, null);
 	setUnitSet('us');
@@ -165,7 +197,8 @@ async function tree() {
 		let n = 0;
 		theirs.nodes.forEach((tn) => {
 			const el = L.nodeById(tn.id);
-			if (!el) { if (!/-[UD]$/.test(tn.id)) { bad.push('node ' + tn.id + ' missing'); } return; }
+			// A pump or valve's two junctions carry the export's own names (46-A, 46-B), so every node is compared.
+			if (!el) { bad.push('node ' + tn.id + ' missing'); return; }
 			(NODE_PROPS[el.type] || []).forEach((p) => {
 				if (el.type === 'tank' && p === 'tankDiameter' && tn.volCurve) { return; }
 				n++;
@@ -209,6 +242,19 @@ async function tree() {
 	console.log('\n--- TGH-1 open ---');
 	L.switchScenario(t.id);
 	holds('TGH-1', tScen);
+	// Tom, 2026-10-21: *"I can't confirm similar results."* The page's own .inp of TGH-1, and WaterGEMS's export of
+	// it, solved by the same engine over the whole 24-hour run: the same IDs, so every node and link compares by name.
+	{
+		const out = EC.lpnExportInp(L.inpExportDocument(), L.inpExportOptions());
+		ok('TGH-1 exports as an .inp with nothing it cannot hold', out.ok && !(out.differences || []).length, JSON.stringify(out.differences));
+		const ours = await epsRun(out.inp), theirs = await epsRun(fs.readFileSync(path.join(FX, 'WTG-export-tgh-1-TGH-1.inp'), 'utf8'));
+		const w = epsWorst(ours, theirs);
+		console.log('       ' + ours.length + ' and ' + theirs.length + ' time steps; ' + w.nh + ' heads, largest difference ' + w.h.d.toExponential(2) + ' ft (' + w.h.id + ' at ' + w.h.t + ' s); ' +
+			w.nq + ' flows, largest ' + w.q.d.toExponential(2) + ' gpm (' + w.q.id + ' at ' + w.q.t + ' s)');
+		ok('...and it solves as WaterGEMS\'s export does: the same time steps, every head within 0.01 ft and every flow within 0.01 gpm',
+			ours.length === theirs.length && ours.length > 24 && w.missing.length === 0 && w.nh === 31 * ours.length && w.nq === 42 * ours.length && w.h.d < 0.01 && w.q.d < 0.01,
+			w.missing.slice(0, 6).join(' '));
+	}
 	L.switchScenario(L.baseScenario().id);
 	holds('Base again', tBase);
 

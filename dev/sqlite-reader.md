@@ -179,7 +179,7 @@ Unknown and therefore not converted (reported if a value is present): 28 (emitte
 `dev/lpn-spike/wtg-import-harness.js` (Node). The EPS model against the `.inp` WaterGEMS exported
 from it, read through `lpnInpParse()` both: **33 nodes and 32 links each** once WaterGEMS's own
 additions are set aside (its tank-inlet construction: junctions 1 and 2, PSV 1, pipe 2; and its
-renames: pipes 3 and 4 are U1-A and U1-B, junctions 4 and 3 are U1-U and U1-D). **310 attribute values
+renames: pipes 3 and 4 are U1-A and U1-B, junctions 4 and 3 are 96-A and 96-B). **310 attribute values
 compared; three differ, each explained**: U1-B ends at the tank (the export routes it to the inlet
 construction), U1-B is a check valve in the database (the export writes it Open beside a pump), and
 the tank's diameter (10 ft stored, 1 ft written by the export; unused, the tank has a volume curve).
@@ -302,9 +302,19 @@ OBSERVED in it. `node dev/lpn-spike/wtg-tgh-harness.js` compares the reader with
   downstream pipe the database names joins B; every other pipe at the node joins A**, whichever way it points
   (PMP-1 has three pipes on A and one on B). The reader did this for a node with exactly two pipes only, and
   dropped every node with more; the nine nodes of this sample and 21 pipes beside them were reported as not
-  imported. It now does what the export does for any number of pipes. Names stay `<label>-U` and `<label>-D`,
-  and the two junctions are still drawn apart (a quarter along the first inlet pipe and the outlet pipe) so the
-  link has a length on the map.
+  imported. It now does what the export does for any number of pipes, **and names and places the two junctions as
+  the export does** (`<element ID>-A`, `<element ID>-B`, both at the node; Tom, 2026-10-21: *"Our method of
+  converting pumps and valves is unsatisfactory. Please check against the Bentley inp export that has upstream and
+  downstream nodes coincident with pump/valve."*). The earlier `<label>-U`/`<label>-D`, drawn a quarter along the
+  pipes, kept the link a visible length but made the two files impossible to compare side by side. The page's
+  own `.inp` of TGH-1 and WaterGEMS's, solved by EPANET over the 24-hour run, agree at every one of 29 time steps
+  to 0.0004 ft of head and 0.004 gpm of flow (`wtg-alternatives-harness.js`).
+- **Pump curves are named after the pump definition, not the pump.** The export writes one curve per pump
+  (`PMP-1`, `PMP-3`, `VSPB-2`, identical points); here a definition several pumps share is one curve, because a
+  scenario that changes a pump's definition changes which curve it names, never a curve's points.
+- **WaterGEMS's own results** (`.wtg_1_38.out`) are a Bentley variant of EPANET's binary file (EPANET's magic
+  number at both ends, its own layout between) and are not read. Its run log (`.rpc`) for this model reports a
+  head error of 10^10 and pumps switching on and off within one step, so it is no reference for this model.
 - **A variable speed pump battery** is written by the export as one pump with `HEAD <curve> SPEED 1`; so here, from
   its own definition (`Physical_VspbDefinition`). Its lag pumps, control node and target are not read.
 - **A pump definition type 2 with efficiency type 1** (motor efficiency 100): the export writes a one-point

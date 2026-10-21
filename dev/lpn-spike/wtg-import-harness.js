@@ -89,11 +89,14 @@ async function synthetic() {
 	ok('first demand 2.5 L/s on PAT1 in [JUNCTIONS]', jById.J1 && jById.J1[2] === '2.5' && jById.J1[3] === 'PAT1', JSON.stringify(jById.J1));
 	const dem = section(inp, 'DEMANDS');
 	ok('both demands of J1 in [DEMANDS]', dem.length === 2 && dem[1][1] === '1', JSON.stringify(dem));
-	ok('pump and PRV become links between -U and -D junctions at their elevations',
-		!!jById['PMP1-U'] && jById['PMP1-D'][1] === '30' && !!jById['PRV1-U'] && jById['PRV1-D'][1] === '20');
-	ok('pump PMP1 runs PMP1-U to PMP1-D on its curve', PU.length === 1 && PU[0].slice(0, 5).join(' ') === 'PMP1 PMP1-U PMP1-D HEAD CRV-1', JSON.stringify(PU));
-	ok('the pipe upstream of the pump ends at PMP1-U, the one downstream starts at PMP1-D',
-		pById.P1 && pById.P1[2] === 'PMP1-U' && pById.P2 && pById.P2[1] === 'PMP1-D');
+	// Named as WaterGEMS's own export names them: the node's element ID, then -A (upstream) and -B (downstream).
+	ok('pump and PRV become links between -A and -B junctions at their elevations',
+		!!jById['110-A'] && jById['110-B'][1] === '30' && !!jById['111-A'] && jById['111-B'][1] === '20', JSON.stringify(J.map((t) => t[0])));
+	ok('pump PMP1 runs 110-A to 110-B on its curve', PU.length === 1 && PU[0].slice(0, 5).join(' ') === 'PMP1 110-A 110-B HEAD CRV-1', JSON.stringify(PU));
+	ok('the pipe upstream of the pump ends at 110-A, the one downstream starts at 110-B',
+		pById.P1 && pById.P1[2] === '110-A' && pById.P2 && pById.P2[1] === '110-B');
+	const XYof = Object.fromEntries(section(inp, 'COORDINATES').map((t) => [t[0], t.slice(1).join(' ')]));
+	ok('both junctions are drawn at the pump node, on top of each other', XYof['110-A'] && XYof['110-A'] === XYof['110-B'] && XYof['111-A'] === XYof['111-B'], XYof['110-A'] + ' | ' + XYof['110-B']);
 	ok('user-defined length 250 m is the pipe length; the pipe without one takes the scaled 160 m',
 		pById.P2[3] === '250' && pById.P4[3] === '160', pById.P2[3] + ' ' + pById.P4[3]);
 	ok('diameter 300 mm, roughness C 130', pById.P2[4] === '300' && pById.P2[5] === '130');
@@ -113,7 +116,7 @@ async function synthetic() {
 	ok('relative viscosity 0.985218 as WaterGEMS exports it', /Viscosity\s+0\.9852181\b/.test(inp));
 	ok('spot elevation reported, not imported', (noteOf(r, 'wtg-element-unread') || { ids: [] }).ids.indexOf('SPOT-1 (IdahoSpotElevation)') >= 0);
 	ok('inactive J 3 reported and listed for the page', r.inactiveIds.nodes.indexOf('J_3') >= 0);
-	ok('the pump and valve split is reported', (noteOf(r, 'wtg-directed-split') || { ids: [] }).ids.join() === 'PMP1,PRV1');
+	ok('the pump and valve split is reported', (noteOf(r, 'wtg-directed-split') || { ids: [] }).ids.join() === 'PMP1 (110-A, 110-B),PRV1 (111-A, 111-B)');
 	ok('transient (Hammer) data named as not read', (noteOf(r, 'wtg-tables-unread') || { ids: [] }).ids.indexOf('IdahoPipe_Hammer_Data') >= 0);
 	ok('no .wtg given: the units are said to be assumed', !!noteOf(r, 'wtg-units-assumed'));
 	ok('storage units from the schema blob: diameter is feet (63)', r.declaredUnits.Physical_PipeDiameter === 63);
@@ -134,7 +137,7 @@ async function synthetic() {
 		JSON.stringify(alt && alt.values));
 	const sol = await epanetSolve(inp);
 	ok('EPANET solves the written file', Object.keys(sol.heads).length === J.length + 2 && isFinite(sol.heads.J1), 'J1 head ' + sol.heads.J1);
-	ok('the PRV holds 22 m downstream (head 42 at its 20 m elevation)', Math.abs(sol.heads['PRV1-D'] - 42) < 0.01 || sol.flows.PRV1 <= 1e-9, String(sol.heads['PRV1-D']));
+	ok('the PRV holds 22 m downstream (head 42 at its 20 m elevation)', Math.abs(sol.heads['111-B'] - 42) < 0.01 || sol.flows.PRV1 <= 1e-9, String(sol.heads['111-B']));
 	db.close();
 	fs.rmSync(tmp, { recursive: true, force: true });
 }
@@ -147,9 +150,10 @@ const EPS = 'EPS_Badapokharan_Operation as per design_base_model';
 
 // WaterGEMS's own export renames and adds (dev/sqlite-reader.md, "The EPS model against its .inp"):
 // the pump node U1 becomes junctions 4 and 3 with pipes 3 and 4 for U1-A and U1-B, and T01's top inlet
-// becomes junctions 2 and 1, PSV 1 and a 0.001-long pipe 2. This reader names them after the pump
-// (U1-U, U1-D) and joins the inlet pipe to the tank, so those are the mapped and the expected extras.
-const NODE_ALIAS = { 4: 'U1-U', 3: 'U1-D' };
+// becomes junctions 2 and 1, PSV 1 and a 0.001-long pipe 2. This reader names the pump's two junctions as
+// WaterGEMS 2024's own export does (Tom's WTG-tgh-1, 2026-10-21), after the node's element ID (96-A, 96-B), and
+// joins the inlet pipe to the tank, so those are the mapped and the expected extras.
+const NODE_ALIAS = { 4: '96-A', 3: '96-B' };
 const LINK_ALIAS = { 3: 'U1-A', 4: 'U1-B' };
 const THEIRS_ONLY = { nodes: ['1', '2'], links: ['1', '2'] };
 
@@ -231,7 +235,8 @@ async function samples() {
 	//   U1-B Status CV vs Open: the database states a check valve on U1-B; the export drops it beside a pump;
 	//   T01 diameter 3.048 vs 0.3048: a tank with a volume curve, where EPANET ignores the diameter; the
 	//   database's circular diameter is 10 ft and the export writes 1 ft.
-	//   3 and 4 x and y: where the two new junctions beside the pump are drawn is each writer's own.
+	//   3 and 4 x and y: this sample's export draws the pump's two junctions apart; Tom's WaterGEMS (WTG-tgh-1,
+	//   2026-10-21) draws them on top of each other at the pump node, and so does the reader.
 	const EXPECTED = ['4 to T01 vs 2', '4 Status CV vs OPEN', 'T01 diameter 3.048 vs 0.304800000001219'];
 	const unexpected = diffs.filter((d) => EXPECTED.indexOf(d) < 0 && !/^[34] [xy] /.test(d));
 	ok('no difference beyond the explained ones', unexpected.length === 0, unexpected.join('; '));
