@@ -50417,7 +50417,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function openMenu(anchor, rows, level, group) {
 		if (menuCapture) { menuCapture.push(rows); return; }
 		menuRestoreSeq++;
-		if (level === 1) { closeSubMenu2(); }   // a new fly-out never inherits the last one's group
+		var wasKb = menuKbIntent;
+		if (level === 1) { closeSubMenu2(); menuL1 = { anchor: anchor, rows: rows }; }   // a new fly-out never inherits the last one's group
 		var els = menuEls(level), popup = els.popup, list = els.list;
 		if (!popup || !list) { return; }
 		if (!level) {
@@ -50547,6 +50548,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					b.addEventListener('mouseenter', function () { cancelSubClose(); cancelSub2Close(); openMenu(b, r.submenu(), (level || 0) + 1); });
 				}
 			} else if (level) {
+				if (r.keepOpen) { b.addEventListener('click', function (e) { e.stopPropagation(); r.fn(e); }); list.appendChild(b); return; }
 				// A row INSIDE the fly-out keeps it open. This is the whole of Tom's "it disappears
 				// before the mouse can reach it; it honestly seems to disappear BECAUSE you reach
 				// it" (2026-08-10) -- and it did: the dismiss-on-hover below was attached to every
@@ -50574,7 +50576,32 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// aligned) rather than below it, which is what makes it read as a branch of the parent
 		// instead of a replacement for it; a top-level menu hangs under its menu-bar button and,
 		// like every other panel here, gives up height rather than covering that button.
-		openPanelAtAnchor(popup, anchor.getBoundingClientRect(), !!level);
+		var preferLeft = false;
+		if (level === 2) {
+			// The third level opens on the side the second one took, so it never lands on the menu
+			// the second one flipped away from (right-to-left pages, a menu at the right edge).
+			var q1 = document.getElementById('lpn_menu_popup').getBoundingClientRect(), q2 = document.getElementById('lpn_menu_popup2').getBoundingClientRect();
+			preferLeft = q2.left < q1.left;
+		}
+		openPanelAtAnchor(popup, anchor.getBoundingClientRect(), !!level, preferLeft);
+		if (level === 2 && menuL1) {
+			// **NO ROW OF ANY OPEN LEVEL IS EVER COVERED** (pre-review, phone 390 px). Where the third
+			// level has no room beside its parent it would land on the parent's other rows, and a tap
+			// meant for Shapes would open the EPANET file picker. It then takes the fly-out's place
+			// instead: the group's rows under a Back row that restores the fly-out.
+			var a1 = document.getElementById('lpn_menu_popup').getBoundingClientRect(), a2 = document.getElementById('lpn_menu_popup2').getBoundingClientRect(),
+				a3 = popup.getBoundingClientRect();
+			// A few pixels of shared border and padding is how a fly-out sits beside its row; a real overlap is wider.
+			var hits = function (u, v) { return u.left < v.right - 12 && v.left < u.right - 12 && u.top < v.bottom - 1 && v.top < u.bottom - 1; };
+			if (hits(a3, a1) || hits(a3, a2)) {
+				var pcB = EngCalcs.pageConfig || {}, keep = menuL1;
+				closeSubMenu2();
+				menuKbIntent = wasKb;
+				openMenu(keep.anchor, [{ label: pcB.lpn_menu_back || 'Back', keepOpen: true,
+					fn: function () { openMenu(keep.anchor, keep.rows, 1); } }].concat(rows), 1);
+				return;
+			}
+		}
 		// Rows are built fresh on every open, so their tips are new DOM every time and need arming --
 		// this is exactly the case ROADMAP Task 173 added initTips(root) for (a tooltip built after
 		// page load is dead on touch without it).
@@ -50596,6 +50623,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// Tab closes the menu and goes on, Enter/Space are the buttons' own click.
 	var subOpener = null;
 	var subOpener2 = null;   // the group row (level 1) that opened the third level
+	var menuL1 = null;       // the anchor and rows of the open fly-out, so a group can take its place on a narrow window
 	var menuRootRow = null;  // the top submenu's row (Import…, Export…) while a third level is open
 	var menuKbIntent = false;
 	// Counts menu interactions. The deferred focus restore below runs from a timer, which a busy page
@@ -70331,7 +70359,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// per box (Task 372) -- they were four copies of the same six lines and had already drifted.
 	// `ar` is the anchor's rect; `beside` is the fly-out case, which sits at the anchor's right edge
 	// and top rather than under it, so it is allowed to share the anchor's rows.
-	function openPanelAtAnchor(panel, ar, beside) {
+	function openPanelAtAnchor(panel, ar, beside, preferLeft) {
 		var body = panelBody(panel), r, at;
 		panel.style.display = 'block';
 		resetPanelHeight(panel, body);
@@ -70359,7 +70387,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					Math.min(ar.bottom, window.innerHeight - h - POPUP_EDGE)) + 'px';
 				return null;
 			}
-			var wantLeft = roomRight ? ar.right : ar.left - r.width;
+			var wantLeft = (roomRight && !(preferLeft && roomLeft)) ? ar.right : ar.left - r.width;
 			panel.style.left = Math.max(POPUP_EDGE, Math.min(wantLeft, window.innerWidth - r.width - POPUP_EDGE)) + 'px';
 			// **A FLY-OUT'S FLOOR IS THE VIEWPORT, NOT chromeFloor()** (Tom, 2026-08-27: File > New
 			// project's fly-out *"is too low"*). The chrome floor is the bottom of the menu bar,

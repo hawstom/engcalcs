@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**7 still to read on master**, of 173 untranslated keys, of 3192 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**8 still to read on master**, of 174 untranslated keys, of 3193 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (173, 7 to read @@ NEEDS RULING)
+## lpn_  (174, 8 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -385,6 +385,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_inpup_unit_row`**
   > {family}: the file uses {file} and this project uses {project}.
   _Ruled OK 2026-10-20._
+- **`lpn_menu_back`**
+  > Back
+  @@ NEEDS RULING
 - **`lpn_msx_attached_heading`**
   > Attached EPANET-MSX file: {file}
   _Ruled OK 2026-10-20._
@@ -555,7 +558,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**12 still to read**, of 56 new keys across 8 unmerged branch(es).
+**13 still to read**, of 56 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -566,13 +569,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-1021 (`bd389a34f`) — adds no English strings
-
-### chore/key-audit (`4ea68256b`) — adds no English strings
-
 ### feat/desktop (`baba0f04d`) — adds no English strings
-
-### feat/flow-arrow (`5d3b6acb0`) — adds no English strings
 
 ### feat/geojson-into-project (`3ffa8d22c`) — 3 new, 3 to read @@ NEEDS RULING
 
@@ -586,9 +583,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Update from GeoJSON file
   @@ NEEDS RULING
 
-### feat/label-margin (`ab69e6389`) — adds no English strings
+### feat/import-export-menu (`fc45cda4b`) — adds no English strings
 
-### feat/sqlite-reader (`110f29428`) — 53 new, 9 to read @@ NEEDS RULING
+### feat/sqlite-reader (`18e70d1f5`) — 53 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
   > WaterCAD or WaterGEMS model…
@@ -675,8 +672,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > These variable speed pump batteries were imported as one pump each at relative speed 1, as WaterGEMS writes them to an EPANET file. Their lag pumps and speed control were not imported.
   @@ NEEDS RULING
 - **`lpn_wtg_note_pump_curve`**
-  > These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. Give each a curve before calculating.
-  _Ruled OK 2026-10-20._
+  > These pumps have a definition this page does not read (constant power, or none), so they have no pump curve. A pump with no curve cannot run in either engine, so results shown before each has a curve are not meaningful.
+  @@ NEEDS RULING
 - **`lpn_wtg_note_pump_efficiency`**
   > Not imported: the efficiency of these pump definitions, which is neither a constant nor a list of points.
   _Ruled OK 2026-10-20._
@@ -687,7 +684,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > These pumps are variable-speed pumps in the model. They were imported as fixed-speed pumps.
   _Ruled OK 2026-10-20._
 - **`lpn_wtg_note_scenario_alternative`**
-  > These alternatives were imported with their names, each in the category shown in parentheses. An alternative holds only the values in which it differs from its parent, and each scenario uses the alternatives it uses in the model.
+  > These alternatives were imported with their names, each in the category shown in parentheses. An alternative holds only the values in which it differs from its parent, and each scenario uses the alternatives it uses in the model. To see them, choose Water, Scenarios, clear Basic mode, then choose Scenario manager.
   @@ NEEDS RULING
 - **`lpn_wtg_note_scenario_category`**
   > Not imported: the alternatives these scenarios use in categories this page has no counterpart for (for example Operational, Age, and Trace). There the scenario has the Base values.
@@ -750,4 +747,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### fix/settings-index-scroll (`17325746b`) — adds no English strings
+### fix/bottom-pane-lag (`3bb531211`) — adds no English strings

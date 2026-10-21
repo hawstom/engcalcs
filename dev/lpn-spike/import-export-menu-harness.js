@@ -45,11 +45,11 @@ function ok(label, cond, detail) {
 }
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
-async function load(browser, Session, d) {
-	const a = await Session.open(browser, NAME, { serviceWorkers: 'block', acceptDownloads: true, viewport: { width: 1600, height: 1000 } });
+async function load(browser, Session, d, ctx, url) {
+	const a = await Session.open(browser, NAME, Object.assign({ serviceWorkers: 'block', acceptDownloads: true, viewport: { width: 1600, height: 1000 } }, ctx || {}));
 	const page = a.page;
 	await page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
-	await a.goto('Looped-Network.php?ec_nolog=1');
+	await a.goto(url || 'Looped-Network.php?ec_nolog=1');
 	await page.evaluate((txt) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', txt); }, JSON.stringify(d));
 	await a.reload();
 	await a.answerTrainingPanel().catch(() => {});
@@ -282,6 +282,83 @@ async function main() {
 			ok('Base alone, ' + row + ': no confirmation, and the file is written', !!got && !(dlg && dlg.buttons.indexOf(exportBtn) >= 0), dlg ? dlg.text.slice(0, 80) : '');
 			if (dlg) { await bp.keyboard.press('Escape'); await b.settle(200); }
 		}
+
+		// ---- M7 ----------------------------------------------------------------------------------
+		console.log('\n--- M7. placement: a phone, and right-to-left ---');
+		// Every row of every open level must be what a finger or pointer lands on at its centre.
+		const covered = (pg) => pg.evaluate(() => {
+			const bad = [];
+			['', '2', '3'].forEach((n) => {
+				const pop = document.getElementById('lpn_menu_popup' + n);
+				if (!pop || pop.style.display !== 'block') { return; }
+				Array.from(pop.querySelectorAll('button.lpn-menu-row')).forEach((row) => {
+					const r = row.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+					const off = x < 0 || y < 0 || x > window.innerWidth || y > window.innerHeight;
+					const hit = document.elementFromPoint(x, y);
+					if (off || !hit || (hit !== row && !row.contains(hit))) { bad.push('popup' + (n || '1') + ':' + row.textContent.trim().slice(0, 18)); }
+				});
+			});
+			return bad;
+		});
+		const openLevels = (pg) => pg.evaluate(() => ['', '2', '3'].filter((n) => document.getElementById('lpn_menu_popup' + n).style.display === 'block').length);
+		const tapRow = async (pg, list, text) => {
+			const h = await pg.evaluateHandle(([l, t]) => Array.from(document.querySelectorAll('#' + l + ' button.lpn-menu-row')).find((b) => b.textContent.replace(/[▸\s]+$/, '').trim() === t), [list, text]);
+			const el = h.asElement();
+			if (!el) { throw new Error('no row ' + text + ' in ' + list); }
+			await el.tap();
+			await pg.waitForTimeout(500);
+		};
+		const ph = await load(browser, Session, d, { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+		ph.autoConfirmExport = false;
+		const pp = ph.page;
+		pp.on('pageerror', (e) => errors.push(String(e && e.message)));
+		await pp.tap('#lpn_menu_file');
+		await pp.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+		await tapRow(pp, 'lpn_menu_list', importLabel);
+		ok('phone: the Import fly-out leaves no row covered', same(await covered(pp), []), JSON.stringify(await covered(pp)));
+		await tapRow(pp, 'lpn_menu_list2', 'Network');
+		ok('phone: Network leaves no row of any open level covered', same(await covered(pp), []), JSON.stringify(await covered(pp)));
+		const phRows = labels(await rowsOf(pp, 3)).concat(labels(await rowsOf(pp, 2)));
+		ok('phone: the EPANET file row, Shapes and Surveyed points can all be tapped (in the group panel or the fly-out)',
+			['EPANET file…'].every((t) => phRows.indexOf(t) >= 0) && (await openLevels(pp)) >= 2, JSON.stringify(phRows));
+		// Whatever panel holds the group's rows, a tap on Shapes must not open the EPANET file picker.
+		let picked = null;
+		pp.once('filechooser', () => { picked = true; });
+		const back = labels(await rowsOf(pp, 2))[0] === 'Back';
+		if (back) {
+			await tapRow(pp, 'lpn_menu_list2', 'Back');
+			ok('phone: Back restores the Import fly-out', same(labels(await rowsOf(pp, 2)).slice(0, 2), ['Network', 'Shapes']), JSON.stringify(labels(await rowsOf(pp, 2))));
+			await tapRow(pp, 'lpn_menu_list2', 'Shapes');
+			ok('phone: Shapes shows its own rows, and no file picker opened', !picked && labels(await rowsOf(pp, 2)).concat(labels(await rowsOf(pp, 3))).indexOf('DXF file…') >= 0 && same(await covered(pp), []), JSON.stringify(await covered(pp)));
+		} else {
+			ok('phone: the third level sits clear of its parent, so Shapes is still tappable', false, 'no Back row and the rows overlap');
+		}
+		await ph.close();
+
+		// Right-to-left: the third level flips the way the second one did.
+		const rtlCheck = async (label, ctxUrl) => {
+			const r = await load(browser, Session, d, { viewport: { width: 1000, height: 800 } }, ctxUrl);
+			const rp = r.page;
+			rp.on('pageerror', (e) => errors.push(String(e && e.message)));
+			if (!ctxUrl) { await rp.evaluate(() => { document.documentElement.dir = 'rtl'; }); }
+			await rp.click('#lpn_menu_file');
+			await rp.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+			await tapRowMouse(rp, 'lpn_menu_list', (await r.lang('lpn_file_export_menu')).trim());
+			await tapRowMouse(rp, 'lpn_menu_list2', null, true);
+			const bad = await covered(rp);
+			ok(label + ': Export > Network leaves no row of any open level covered', same(bad, []), JSON.stringify(bad));
+			await r.close();
+		};
+		async function tapRowMouse(pg, list, text, firstGroup) {
+			await pg.evaluate(([l, t, fg]) => {
+				const rows = Array.from(document.querySelectorAll('#' + l + ' button.lpn-menu-row'));
+				const r = fg ? rows.find((b) => b.getAttribute('aria-haspopup')) : rows.find((b) => b.textContent.replace(/[▸\s]+$/, '').trim() === t);
+				r.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+			}, [list, text, !!firstGroup]);
+			await pg.waitForTimeout(500);
+		}
+		await rtlCheck('RTL (dir=rtl)', null);
+		await rtlCheck('Arabic page', 'Looped-Network.php?ec_nolog=1&lang=ar');
 		ok('no uncaught page error', errors.length === 0, errors.join(' | '));
 	} catch (e) {
 		ok('harness error: ' + e.message, false);

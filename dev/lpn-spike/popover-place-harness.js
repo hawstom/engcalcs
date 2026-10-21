@@ -296,7 +296,7 @@ console.log('\n-- every popover goes through the one placer, which is the whole 
 		'the Settings box is a standing box, not an anchored pull-down');
 	report(/clampPanel\(/.test(extract('openSettingsBox')),
 		'...and it is clamped into the viewport, so a remembered position always comes back');
-	report(/openPanelAtAnchor\(popup, anchor\.getBoundingClientRect\(\), !!level\)/.test(extract('openMenu')),
+	report(/openPanelAtAnchor\(popup, anchor\.getBoundingClientRect\(\), !!level, preferLeft\)/.test(extract('openMenu')),
 		'the menus and their fly-outs');
 	// Matched on the PLACER, not on the anchor expression. This read `panel, menu.getBounding...`
 	// until 2026-08-16, when the anchor moved off the removed toolbar button and gained a fallback
