@@ -64096,7 +64096,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// again" is window furniture (`lpn_calchint`, localStorage only, written only when asked).
 	var LPN_CALCHINT_KEY = 'lpn_calchint', calcHintFlashTimer = 0;
 	function calcHintMuted() {
-		try { return localStorage.getItem(LPN_CALCHINT_KEY) === '0'; } catch (e) { return false; }
+		try { return localStorage.getItem('lpn_calchint') === '0'; } catch (e) { return false; }
 	}
 	function calcHintHide() {
 		var el = document.getElementById('lpn_setbox_calchint'), row;
@@ -64123,13 +64123,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		el.setAttribute('role', 'status');
 		msg = document.createElement('span');
 		msg.className = 'lpn-calchint-text';
-		msg.textContent = pc.lpn_calc_hint || 'When \u201cRecalculate automatically\u201d is on, this command is not needed.';
+		msg.textContent = pc.lpn_calc_hint || 'When “Recalculate automatically” is on, this command is not needed.';
 		mute = document.createElement('button');
 		mute.type = 'button';
 		mute.className = 'lpn-calchint-mute';
-		mute.textContent = pc.lpn_calc_hint_mute || 'Don\u2019t show this again';
+		mute.textContent = pc.lpn_calc_hint_mute || 'Don’t show this again';
 		mute.addEventListener('click', function () {
-			try { localStorage.setItem(LPN_CALCHINT_KEY, '0'); } catch (e) {}
+			try { localStorage.setItem('lpn_calchint', '0'); } catch (e) {}
 			calcHintHide();
 		});
 		x = document.createElement('button');
