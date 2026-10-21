@@ -62731,6 +62731,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		head = sec && sec.querySelector ? sec.querySelector('.lpn-set-head') : null;
 		target.style.scrollMarginTop =
 			(head && head !== target ? Math.ceil(head.getBoundingClientRect().height) : 0) + 'px';
+		// **A SECTION HEADING IS STICKY, SO IT IS NEVER THE THING TO SCROLL TO.** One whose section
+		// is already scrolled past rides at the BOTTOM of that section, and scrollIntoView() aims at
+		// where an element is now: the jump then showed only the end of the section (Tom: Map, from
+		// a lower section). The section's own top edge is where its heading really begins.
+		if (head && head === target && sec.scrollIntoView) { target = sec; }
 		target.scrollIntoView({ block: 'start' });
 	}
 	function setboxEl() { return document.getElementById('lpn_settings_box'); }
