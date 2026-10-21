@@ -101,6 +101,8 @@ const SCENES = [
 	{ key: 'net1', name: 'Net1 (gallery, US), wheeled out', cardKey: 'lpn_ex_net1_title', node: ['id', 'demand', 'elev', 'pressure'],
 		link: ['flow'], step: true, notches: [-4, -14], named: ['113'], shotAt: -14,
 		at: { notch: -4, shown: ['11'], ownNearest: ['10'] } },
+	{ key: 'novato', name: 'Net3 on the world map near Novato', file: 'dev/water-network-examples/Net3-Novato-CA-World.lwn', fit: true, noMax: true,
+		node: NET3_NODE, link: NET3_LINK, notches: [0, 3], named: [] },
 	{ key: 'phone', name: 'Net3 (gallery, gpm) on a 390 px phone', cardKey: 'lpn_ex_net3_title', node: NET3_NODE, link: NET3_LINK,
 		notches: [3, 6], named: [], viewport: { width: 390, height: 844 } }
 ].filter((sc) => (process.env.LABEL_FORM_SCENES || 'net3,net1,phone').split(',').indexOf(sc.key) >= 0);
@@ -143,7 +145,8 @@ async function layOut(Session, browser, sc, mode, opts) {
 			await a.openExampleCard(await a.lang(sc.cardKey));
 		} else {
 			await a.page.evaluate((txt) => { localStorage.clear(); localStorage.setItem('lpn_project_wheel', txt); },
-				fs.readFileSync(path.join(REPO, sc.file), 'utf8'));
+				sc.noMax ? JSON.stringify(Object.assign(JSON.parse(fs.readFileSync(path.join(REPO, sc.file), 'utf8')), { settings: Object.assign({}, JSON.parse(fs.readFileSync(path.join(REPO, sc.file), 'utf8')).settings, { labelMaxWidth: null }) }))
+					: fs.readFileSync(path.join(REPO, sc.file), 'utf8'));
 			await a.reload();
 			await a.answerTrainingPanel().catch(() => {});
 			await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
@@ -239,7 +242,7 @@ async function main() {
 	const browser = await chromium.launch({ executablePath });
 	const shots = process.env.LABEL_FORM_SHOTS || '';
 	const clips = process.env.LABEL_FORM_CLIPS ? JSON.parse(process.env.LABEL_FORM_CLIPS) : null;
-	const refs = (process.env.LABEL_FORM_REF || '').split(',').filter(Boolean);
+	const refs = (process.env.LABEL_FORM_REF || 'master').split(',').filter(Boolean);
 	try {
 		const src = fs.readFileSync(path.join(REPO, 'js', 'looped-network.js'), 'utf8');
 		ok('every cut the reference makes is found exactly once in the shipped file', CUTS.every(([f]) => src.split(f).length === 2));
@@ -282,6 +285,15 @@ async function main() {
 				ok(tag + ': every level label with no leader is nearest its own pipe', v.astray.length === 0, v.astray.slice(0, 4).join(' '));
 				ok(tag + ': no fewer labels than the reference, and no fewer values', v.labels >= w.labels && v.values >= w.values,
 					`${w.labels} -> ${v.labels} labels, ${w.values} -> ${v.values} values`);
+				// **NEVER FEWER LABELS THAN MASTER'S OWN LAYOUT** (Tom, 2026-10-20, on a leader rule that
+				// cost Net3 at 9 notches 145 -> 138: "A cost for no benefit is pointless."). The reference
+				// above is this branch with the forms cut; this one is master's files, laid out here.
+				const m = extra.find((e) => e.ref === 'master');
+				if (m) {
+					const mv = m.r.views[i];
+					ok(tag + ': no fewer labels and no fewer values than master\'s own layout', v.labels >= mv.labels && v.values >= mv.values,
+						`master ${mv.labels} labels, ${mv.values} values; shipped ${v.labels}, ${v.values}`);
+				}
 			});
 			const A = on.views[on.views.length - 1];
 			const sum = (vs, k) => vs.reduce((t, v) => t + v[k], 0);

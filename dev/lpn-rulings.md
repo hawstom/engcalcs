@@ -267,3 +267,23 @@ copy, a fill and the multi-element Properties box; the cell's tip shows the line
 map label shows the first line and an ellipsis. CSV and XLSX/ODS keep real line breaks (a
 spreadsheet cell holds them), GeoJSON is JSON, and DXF writes the caret escape `^J`.
 `description-lines-harness.js`, `description-lines-browser-harness.js`.
+
+## Label leaders: master's rule stands; a leader that costs labels is refused
+
+Tom, 2026-10-20, asked whether a rule that a label away from home always gets a leader was worth
+Net3 at 9 notches in showing 138 labels against master's 145: *"A cost for no benefit is pointless.
+Revert."* The leader threshold is master's again, and a pipe may not run through a one-line node
+label. Kept from that work: a label hung left is right-justified (every row ends at the leader's
+end), and a Text that another Text kept before it overprints is not drawn at that zoom
+(`crowdedTexts()`). `label-form-wheel-browser-harness.js` lays out master's own files beside the
+branch's and fails on any view with fewer labels or values than master.
+
+### A column of one-line labels at the edge of a crowd: prototyped, off, does not pay
+
+Tom's 2026-10-20 screenshots show one-line labels stacked in a column to one side, each on a leader.
+The prototype (commit `88191ee39`, flag `LPN_COLUMN`; its code since removed) added far level candidates, west and east on
+a shared grid of columns and rows, for a one-line node label that lost something and a pipe label
+that would hide. Measured in Chromium with the label-form wheel harness, against master's files: Net3 at 9 notches in
+145 -> 147 labels, content pass 142 -> 226 ms; Novato at fit 115 -> 119 labels, 133 -> 251 ms.
+Two to four labels (1-3%) for 60-90% more pass time, and more leaders nearer another pipe than their
+own. Removed (Tom: *"A cost for no benefit is pointless."*).
