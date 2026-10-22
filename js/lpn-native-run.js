@@ -1,4 +1,4 @@
-// lpn-native-run.js -- THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP, SLICES 1 TO 5 (Task 733, phase 3).
+// lpn-native-run.js -- THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP, SLICES 1 TO 6 (Task 733, phase 3).
 //
 // js/lpn-solver.js solves ONE INSTANT. This file walks the clock around it, the way EPANET's own
 // runH()/nextH() loop does (hydraul.c), and holds the one piece of state an instant does not have:
@@ -87,11 +87,30 @@
 // tanktimestep(), controls(), controltimestep() and the rules need no change: they already read the
 // volume through tankVolume()/tankGrade(), which are now the curve's when there is one.
 //
+// SLICE 6, PUMP ENERGY, also from OWA-EPANET 2.3.5 (hydraul.c, output.c, report.c):
+//   getenergy()     hydraul.c -- a pump's kW = head across it (ft) x flow (cfs) x specific gravity / 8.814 /
+//                   efficiency x 0.7457; zero when the link is CLOSED, XHEAD or TEMPCLOSED (status <= CLOSED).
+//                   Efficiency is the global one (default 75 percent) or the pump's EFFIC curve read at its
+//                   flow brought to full speed (q / speed, in the file's flow unit), then "Sarbu and Borza"
+//                   100 - (100 - e) x (1 / speed)^0.1, held between 1 and 100 percent.
+//   getallpumpsenergy(), nexthyd()  hydraul.c -- power and efficiency are read from each step's solution
+//                   BEFORE the step is chosen (rules and controls act after), and a pump whose efficiency
+//                   reads 0 (closed) is skipped.
+//   addenergy()     hydraul.c -- per step of hstep seconds (one hour when the duration is 0, nothing at
+//                   the final instant): time on line, efficiency x dt, kW/Q x dt, kWh, the largest kW, and
+//                   cost = price x kW x dt, the price being the pump's own (when above 0) or the global
+//                   one, times the pump's price pattern or else the global pattern, at period
+//                   (time + pattern start) / pattern step; Emax is the largest sum of kW over the pumps
+//                   that were on line at one step.
+//   saveenergy()    output.c -- the report's numbers: usage as a share of the duration, efficiency, kW and
+//                   kWh/flow averaged over the time on line, cost per day (x 24 / duration), and the
+//                   demand charge = Emax x Demand Charge; writeenergy() (report.c) prints the totals line.
+//
 // WHAT IT REFUSES, by name, so the caller can hand the network to the EPANET engine exactly as it
 // does for anything the built-in solver cannot do (see EngCalcs.lpnNativeRunRefusals): a rule the
 // loop does not copy exactly (a rule on a pipe's roughness, a reservoir's level or pressure, a
 // GPV's setting; one EPANET itself rejects when it reads the file), a speed pattern that is not the page's (a pump without its unscaled curve, a pattern the model
-// lacks, a negative multiplier), a tank that names a volume curve it has no usable rows for (or one EPANET refuses), water quality, EPANET-MSX, pump energy, a
+// lacks, a negative multiplier), a tank that names a volume curve it has no usable rows for (or one EPANET refuses), water quality, EPANET-MSX, pump energy EPANET itself refuses to read (a price pattern the model lacks, a negative price or demand charge, a global efficiency of 0 or less, an efficiency curve whose flows do not increase), a
 // control on a junction's pressure that acts on a valve, a control conditioned on a reservoir, and
 // what lpnDiagnose refuses of the built-in solver (a pressure-driven demand model). Each one is a
 // later slice (dev/native-eps-plan.md), or a case nobody has asked for that EPANET's own code makes
@@ -123,7 +142,10 @@
 		FT3 = FT * FT * FT,                // m3 per ft3          (Ucf[VOLUME], input1.c)
 		LPS_PER_CFS = 28.317,              // L/s per cfs         (LPSperCFS, which is NOT 1000 / 0.0283168466)
 		QZERO = 1e-6,                      // cfs                 (consts.h)
-		EDGE = 1e-9;                       // m, the hair a not-quite-full level is kept under its limit
+		EDGE = 1e-9,                       // m, the hair a not-quite-full level is kept under its limit
+		KW_PER_HP = 0.7457,                // types.h KWperHP
+		CBIG = 1e8,                        // consts.h, the conductance pumpcoeff() gives a pump at setting 0
+		EPUMP = 75;                        // input1.c / types.h EPUMP, the default pump efficiency (percent)
 
 	function tankHasArea(n) { return n.type === 'tank' && n.diameter > 0; }
 	// The rows of a tank's volume curve, [[level m, volume m3], ...], exactly as the bridge writes them
@@ -229,9 +251,7 @@
 		q = model.quality;
 		if (q && q.mode && q.mode !== 'none') { add('native-run-quality', [], true); }
 		if (model.msx) { add('native-run-quality', [], true); }
-		if (model.energy && (model.links || []).some(function (l) { return l.type === 'pump'; })) {
-			add('native-run-energy', [], true);
-		}
+		add('native-run-energy', energyConfig(model).bad);
 		return out;
 	};
 
@@ -279,6 +299,17 @@
 		ctl = compileControls(model, links, nodeById, tankById, warnings);
 		var speedPat = [];   // [k, pattern id] of each pump on a speed pattern (slice 3)
 		links.forEach(function (l, k) { if (ls[k].kind === 'pump' && l.speedPattern) { speedPat.push([k, l.speedPattern]); } });
+
+		// ---- PUMP ENERGY (slice 6): the pumps EPANET would list, in file order, with their sums ----
+		var ecfg = energyConfig(model), epumps = [], emax = 0, anyPumpLink = false;
+		links.forEach(function (l, k) {
+			var pe;
+			if (l.type === 'pump') { anyPumpLink = true; }
+			if (ls[k].kind !== 'pump') { return; }
+			pe = ecfg.per[String(l.id)] || null;
+			epumps.push({ k: k, id: l.id, from: l.from, to: l.to, pe: pe, p: 0, e: 0, q: 0,
+				hours: 0, eff: 0, perFlow: 0, kwh: 0, maxKw: 0, cost: 0 });
+		});
 
 		// ---- RULES (slice 4): compiled once; evaluated inside the step, by ruleTimestep() below ----
 		var rules = [], linkIxById = {}, curById = {}, dsys = 0, ruleStep = 0, nodeTypeOf = {}, linkOfId = {};
@@ -521,6 +552,44 @@
 			} while (dt > 0);
 			return now - tnow;
 		}
+		// hydraul.c getallpumpsenergy(): each pump's power and efficiency from this step's solution.
+		function pumpsEnergyNow() {
+			epumps.forEach(function (pu) {
+				var st = ls[pu.k], h1 = nodeHeadM(pu.from) / FT, h2 = nodeHeadM(pu.to) / FT, q = (res.flows[pu.id] || 0) * 1000 / LPS_PER_CFS, r;
+				// hydcoeffs.c pumpcoeff(): a pump at setting 0 is a link of conductance 1/CBIG, so the flow
+				// EPANET holds for it is the head difference over CBIG (a few millionths of a cfs), where
+				// the built-in solver, which shuts it, holds 0. getenergy() reads that flow.
+				if (st.k === 0 && st.s > CLOSED) { q = (h1 - h2) / CBIG; }
+				r = pumpEnergyNow(ecfg, pu.pe, st.s, st.k, q, h1, h2);
+				pu.p = r[0]; pu.e = r[1]; pu.q = q;
+			});
+		}
+		function nodeHeadM(id) {
+			var tk = tankById[String(id)];
+			return tk ? tk.h * FT : res.heads[id];
+		}
+		// hydraul.c addenergy(): the step of `hstep` seconds starting at htime.
+		function addEnergy(hstep) {
+			var dt, f0 = 1, psum = 0;
+			if (dur === 0) { dt = 1; } else if (htime < dur) { dt = hstep / 3600; } else { dt = 0; }
+			if (dt === 0) { return; }
+			if (ecfg.epat) { f0 = mult(ecfg.epat, htime); }
+			epumps.forEach(function (pu) {
+				var q, c;
+				if (pu.e === 0) { return; }                       // a closed pump is skipped
+				q = Math.max(QZERO, Math.abs(pu.q));
+				c = pu.pe && pu.pe.ecost > 0 ? pu.pe.ecost : ecfg.ecost;
+				if (pu.pe && pu.pe.epat) { c *= mult(pu.pe.epat, htime); } else { c *= f0; }
+				psum += pu.p;
+				pu.hours += dt;
+				pu.eff += pu.e * dt;
+				pu.perFlow += pu.p / q * dt;
+				pu.kwh += pu.p * dt;
+				pu.maxKw = Math.max(pu.maxKw, pu.p);
+				pu.cost += c * pu.p * dt;
+			});
+			emax = Math.max(emax, psum);
+		}
 		rtime = repStep;
 
 		for (;;) {
@@ -568,7 +637,9 @@
 			if (isReportTime(htime)) {
 				frames.push(frameOf(model, cur, res, htime, tanks, ls));
 			}
-			if (!(htime < dur)) { break; }
+			// hydraul.c nexthyd(): getallpumpsenergy() reads the solve just made, before the step is chosen
+			pumpsEnergyNow();
+			if (!(htime < dur)) { if (dur === 0) { addEnergy(0); } break; }
 			// ---- hydraul.c timestep() ----
 			tstep = hydStep;
 			nextPat = (Math.floor((htime + patStart) / patStep) + 1) * patStep - htime;
@@ -589,12 +660,16 @@
 			tstep = controlTimestep(ctl, ls, tankById, htime, tStart, tstep);
 			// hydraul.c timestep(): rules, when there are any, move the tanks themselves
 			if (rules.length) { tstep = ruleTimestep(tstep); } else { tankLevels(tstep); }
+			addEnergy(tstep);   // nexthyd(): addenergy(hydstep), with the clock not yet moved
 			tanks.forEach(function (tk) { levelNow[tk.id] = solverLevel(tk); });
 			htime += tstep;
 			if (htime >= rtime) { rtime += repStep; }
 			if (++guard >= 100000) { break; }
 		}
-		return { ok: true, engine: 'native', frames: frames, warnings: warnings, duration: dur, solveTimes: solveTimes };
+		return { ok: true, engine: 'native', frames: frames, warnings: warnings, duration: dur, solveTimes: solveTimes,
+			// What the pumps used and cost, or null for a model with no pump (the page's own rule,
+			// js/lpn-epanet.js). A pump without a curve is a pipe to EPANET and is not listed.
+			energy: anyPumpLink ? energySummary(ecfg, epumps, emax, dur) : null };
 	};
 
 	// ---- SIMPLE CONTROLS (slice 2) -----------------------------------------------------------------
@@ -947,6 +1022,117 @@
 			rules.push(r);
 		});
 		return { rules: rules, bad: bad };
+	}
+
+
+	// ---- PUMP ENERGY (slice 6) ---------------------------------------------------------------------
+	//
+	// input3.c energydata(): the [ENERGY] section as EPANET holds it, from `model.energy` (the shape
+	// js/looped-network.js docEnergy() hands both engines: globalEfficiency, globalPrice, globalPattern,
+	// demandCharge, and per pump price, pattern, effic (a curve name) with efficCurves[name] = [[m3/s,
+	// percent], ...]). It follows what js/lpn-epanet.js WRITES, because that is what EPANET reads: a
+	// value only when stated, and a per-pump row only for a pump that went out as a pump (one with a
+	// curve; a curveless pump is a pipe there and has no energy). `bad` lists what EPANET refuses to read:
+	// error 217 (a negative price, a global efficiency of 0 or less), 213 (a negative demand charge), 205
+	// (a pattern the file lacks) and 230 (a curve whose x does not increase).
+	function energyConfig(model) {
+		var e = model.energy || {}, bad = [], pats = {}, pumps = {}, c, y, curves;
+		function has(v) { return !(v === undefined || v === null || v === ''); }
+		c = { epump: EPUMP, ecost: 0, epat: null, dcost: 0, per: {}, bad: bad, spGrav: 1 };
+		((model.time && model.time.patterns) || []).forEach(function (p) { pats[String(p.id)] = true; });
+		(model.links || []).forEach(function (l) { if (l.type === 'pump' && (l.h0 > 0 || l.a > 0)) { pumps[String(l.id)] = true; } });
+		if (model.hydraulics && typeof model.hydraulics.specificGravity === 'number' && isFinite(model.hydraulics.specificGravity)) {
+			c.spGrav = model.hydraulics.specificGravity;
+		}
+		if (has(e.globalEfficiency)) {
+			y = Number(e.globalEfficiency);
+			if (!(y > 0)) { bad.push('Global Efficiency'); } else { c.epump = y; }
+		}
+		if (has(e.globalPrice)) {
+			y = Number(e.globalPrice);
+			if (!(y >= 0)) { bad.push('Global Price'); } else { c.ecost = y; }
+		}
+		if (has(e.globalPattern)) {
+			if (!pats[String(e.globalPattern)]) { bad.push('Global Pattern'); } else { c.epat = String(e.globalPattern); }
+		}
+		if (has(e.demandCharge)) {
+			y = Number(e.demandCharge);
+			if (!(y >= 0)) { bad.push('Demand Charge'); } else { c.dcost = y; }
+		}
+		function per(id) { return c.per[id] || (c.per[id] = { ecost: 0, epat: null, curve: null }); }
+		Object.keys(e.price || {}).forEach(function (id) {
+			if (!pumps[id] || !has(e.price[id])) { return; }
+			y = Number(e.price[id]);
+			if (!(y >= 0)) { bad.push(id); } else { per(id).ecost = y; }
+		});
+		Object.keys(e.pattern || {}).forEach(function (id) {
+			if (!pumps[id] || !has(e.pattern[id])) { return; }
+			if (!pats[String(e.pattern[id])]) { bad.push(id); } else { per(id).epat = String(e.pattern[id]); }
+		});
+		curves = e.efficCurves || {};
+		Object.keys(e.effic || {}).forEach(function (id) {
+			var nm = e.effic[id], pts = nm ? curves[nm] : null, i, x = [], v = [];
+			if (!pumps[id] || !pts || !pts.length) { return; }   // js/lpn-epanet.js writes no EFFIC row
+			for (i = 0; i < pts.length; i++) {
+				if (!isFinite(pts[i][0]) || !isFinite(pts[i][1])) { return; }
+				x.push(pts[i][0] * 1000); v.push(pts[i][1]);       // m3/s to L/s, as the file states it
+			}
+			for (i = 1; i < x.length; i++) { if (!(x[i] > x[i - 1])) { bad.push(id); return; } }
+			per(id).curve = { x: x, y: v };
+		});
+		return c;
+	}
+
+	// hydraul.c getenergy() for one pump: [kW, efficiency as a fraction], or [0, 0] when it is shut.
+	// `headFt` gives a node's head in feet, `qCfs` the pump's flow in cfs, `status` and `speed` are its
+	// EPANET status code and setting.
+	function pumpEnergyNow(cfg, pe, status, speed, qCfs, h1Ft, h2Ft) {
+		var q, dh, e, q4eff;
+		if (status <= CLOSED) { return [0, 0]; }
+		q = Math.abs(qCfs);
+		dh = Math.abs(h1Ft - h2Ft);
+		e = cfg.epump;
+		if (pe && pe.curve) {
+			q4eff = q / speed * LPS_PER_CFS;                      // the flow at full speed, in L/s (Ucf[FLOW])
+			e = interp(pe.curve.x, pe.curve.y, q4eff);
+			e = 100 - ((100 - e) * Math.pow(1 / speed, 0.1));      // Sarbu and Borza pump speed adjustment
+		}
+		e = e <= 100 ? e : 100;                                   // C's MIN and MAX, which differ from
+		e = e >= 1 ? e : 1;                                       // Math.min/max when e is NaN
+		e /= 100;
+		return [dh * q * cfg.spGrav / 8.814 / e * KW_PER_HP, e];
+	}
+
+	// output.c saveenergy() and report.c writeenergy(): the accumulated sums as the report states them,
+	// in the shape js/lpn-epanet.js lpnEnergySummary() returns (a fraction, never a percent, for usage and
+	// avgEfficiency; kwh and cost over the whole run), with EPANET's own report columns beside them
+	// (kwhPerM3 for the "Kw-hr /m3" column, costPerDay for "Cost /day").
+	function energySummary(cfg, list, emax, dur) {
+		var out = { pumps: [], energyCost: 0, kwh: 0, peakKw: emax, demandCharge: 0, totalCost: 0,
+				costPerDay: 0, totalCostPerDay: 0, duration: dur }, hdur = dur / 3600;
+		list.forEach(function (pu) {
+			var t = pu.hours, row;
+			row = {
+				id: pu.id,
+				onSeconds: t * 3600,
+				usage: hdur === 0 ? t : t / hdur,                  // saveenergy(): with no duration it stays hours
+				avgKw: t > 0 ? pu.kwh / t : 0,
+				peakKw: pu.maxKw,
+				avgEfficiency: t > 0 ? pu.eff / t : 0,
+				kwh: pu.kwh,
+				cost: pu.cost,
+				kwhPerM3: t > 0 ? pu.perFlow / t * (1000 / LPS_PER_CFS / 3600) : 0,
+				costPerDay: hdur === 0 ? pu.cost * 24 : pu.cost * 24 / hdur
+			};
+			out.pumps.push(row);
+			out.kwh += pu.kwh;
+			out.energyCost += pu.cost;
+			out.costPerDay += row.costPerDay;
+		});
+		out.demandCharge = emax * cfg.dcost;
+		out.totalCost = out.energyCost + out.demandCharge;
+		out.totalCostPerDay = out.costPerDay + out.demandCharge;
+		return out;
 	}
 
 	// One tank in EPANET's internal units (input1.c, input3.c).
