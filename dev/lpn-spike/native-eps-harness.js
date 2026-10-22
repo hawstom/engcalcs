@@ -1,4 +1,4 @@
-// THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP, HELD TO EPANET'S OWN ANSWER (Task 733, phase 3, slices 1-3).
+// THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP, HELD TO EPANET'S OWN ANSWER (Task 733, phase 3, slices 1-4).
 //
 //   node dev/lpn-spike/native-eps-harness.js
 //
@@ -37,6 +37,18 @@
 // speed-pattern fixture) and Net3 with a speed pattern added to pump 335, and to pump 10 (stated
 // Closed, under its two timers), with Net3's controls.
 //
+// SLICE 4, [RULES]. Rules are written as the page's text, read by lpn-rules.js and converted to SI by
+// the same call assembleModel() makes (head and pressure in metres, a flow in L/s here), so the model
+// carries `rules` as the page hands them to both engines. Constructed cases: a tank-level rule that
+// fires BETWEEN hydraulic steps (the case asserts the native loop solved at a time off the hourly
+// grid, which is the step being shortened, and that EPANET shows the pump switching), TIME and
+// CLOCKTIME premises (equality within the increment, >= and <, across midnight, a start clock), ELSE
+// actions, PRIORITY (higher wins, a tie keeps the first, the order of the rules), AND/OR chains, a rule
+// and a simple control on the same link, a numeric action (pump speed, PRV and FCV settings, a pipe
+// given 0), premises on junction pressure, link flow, link status, a pump's setting, system and node
+// demand, a tank's fill and drain time, and a 30-minute hydraulic step. Then EPA's Net1 WITH the two
+// rules the gallery ships on it (the example departs from Net1.inp from 10 AM by design).
+//
 // EVERY CASE MUST EXERCISE WHAT IT NAMES: a tank case asserts that EPANET's own tank reached the
 // limit (or moved at least a stated amount), so a case that quietly stopped moving a tank fails
 // instead of passing on a flat line.
@@ -60,6 +72,7 @@ require('./bootstrap.js');
 const EngCalcs = require(path.join(ROOT, 'js', 'lpn-solver.js'));
 global.EngCalcs = EngCalcs;
 require(path.join(ROOT, 'js', 'lpn-patterns.js'));
+Object.assign(EngCalcs, require(path.join(ROOT, 'js', 'lpn-rules.js')));
 require(path.join(ROOT, 'js', 'lpn-inp.js'));
 require(path.join(ROOT, 'js', 'lpn-epanet.js'));
 require(path.join(ROOT, 'js', 'lpn-time.js'));
@@ -273,10 +286,144 @@ const PATTERN_CASES = [
 	{ name: 'a stated SPEED 0.85, no pattern', model: patternedPump({ level: 4, speed: 0.85 }), moves: 'T', minSwing: 0.5 }
 ];
 
+
+// ---- slice 4: [RULES] -----------------------------------------------------------------------------
+// The text is read by the page's own grammar and converted the way assembleModel() converts it:
+// metres, and a flow stated in L/s here becomes m3/s; a setting is converted by what its link is.
+function withRules(m, text, convert) {
+	const linkOf = (id) => m.links.find((l) => String(l.id) === String(id));
+	const kindOf = (c) => {
+		const l = linkOf(c.id);
+		if (!l) { return 'none'; }
+		if (l.type === 'pipe') { return 'roughness'; }
+		if (l.type !== 'valve') { return 'none'; }
+		const vt = String(l.valveType || 'TCV').toUpperCase();
+		return vt === 'PRV' || vt === 'PSV' || vt === 'PBV' ? 'pressure' : vt === 'FCV' ? 'flow' : 'none';
+	};
+	const conv = convert || ((v, kind) => (kind === 'flow' ? v / 1000 : v));
+	const blocks = EngCalcs.lpnRuleParse(text.trim().split('\n').map((x) => x.trim()));
+	blocks.forEach((b) => { if (!b.ok) { throw new Error('rule ' + b.name + ' is not read by the page grammar'); } });
+	m.rules = blocks.map((b) => EngCalcs.lpnRuleConvert(b, conv, kindOf));
+	return m;
+}
+const ruled = (m, text, convert) => withRules(m, text, convert);
+// R (100 m) -> P1 -> J -> V (a valve) -> K (demand) -> P2 -> a low, wide tank T that K fills, so the
+// valve passes water forward all day.
+function lowTankValveLine(vt, setting) {
+	const m = valveLine(vt, setting, []);
+	const t = m.nodes.find((n) => n.id === 'T');
+	Object.assign(t, tank('T', 20, 4, 0.5, 12, 40));
+	return m;
+}
+const RULE_CASES = [
+	{ name: 'tank level: pump CLOSED when T is ABOVE 8 m, OPEN when BELOW 4 m (fires between hydraulic steps)', offGrid: true,
+		model: ruled(pumpedTank({ level: 3, p3: 'closed', controls: [] }),
+			'RULE 1\nIF TANK T LEVEL ABOVE 8\nTHEN PUMP PU STATUS IS CLOSED\nRULE 2\nIF TANK T LEVEL BELOW 4\nTHEN PUMP PU STATUS IS OPEN'),
+		statusOf: 'PU', switches: 3 },
+	{ name: 'TIME: pipe shut when TIME = 5 (inside the increment), opened when 9:30 <= TIME < 12',
+		model: ruled(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18 }),
+			'RULE T1\nIF SYSTEM TIME = 5\nTHEN PIPE P1 STATUS IS CLOSED\nRULE T2\nIF SYSTEM TIME >= 9:30\nAND SYSTEM TIME < 12\nTHEN PIPE P1 STATUS IS OPEN'),
+		statusOf: 'P1', closedAt: [6, 7, 8, 9], openAt: [4, 10, 13] },
+	{ name: 'TIME with units: 90 MINUTES and 2 HOURS premises',
+		model: ruled(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18 }),
+			'RULE U1\nIF SYSTEM TIME = 90 MIN\nTHEN PIPE P1 STATUS IS CLOSED\nRULE U2\nIF SYSTEM TIME > 2 HOURS\nAND SYSTEM TIME < 3 HOURS\nTHEN PIPE P1 STATUS IS OPEN'),
+		statusOf: 'P1', closedAt: [2], openAt: [1, 3, 5] },
+	{ name: 'TIME <> (not equal): P2 is shut only in the increment that contains hour 20',
+		model: ruled(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 40 }),
+			'RULE U3\nIF SYSTEM TIME <> 20 HOURS\nTHEN PIPE P2 STATUS IS OPEN\nELSE PIPE P2 STATUS IS CLOSED'),
+		statusOf: 'P2', closedAt: [20], openAt: [19, 21] },
+	{ name: 'CLOCKTIME across midnight, starting 10 PM, 48 h: shut at 12:30 AM, open from 5 AM to 8 AM, and again the next night',
+		model: (() => { const m = ruled(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18 }),
+			'RULE C1\nIF SYSTEM CLOCKTIME = 12:30 AM\nTHEN PIPE P1 STATUS IS CLOSED\nRULE C2\nIF SYSTEM CLOCKTIME >= 5 AM\nAND SYSTEM CLOCKTIME < 8 AM\nTHEN PIPE P1 STATUS IS OPEN');
+			m.time.times.startClock = 22 * H; return m; })(),
+		statusOf: 'P1', closedAt: [3, 4, 5, 27, 28], openAt: [2, 8, 9, 12, 31] },
+	{ name: 'CLOCKTIME = 12 AM met exactly at the end of the increment that crosses midnight',
+		model: (() => { const m = ruled(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18 }),
+			'RULE M1\nIF SYSTEM CLOCKTIME = 12 AM\nTHEN PIPE P1 STATUS IS CLOSED\nRULE M2\nIF SYSTEM CLOCKTIME = 3 AM\nTHEN PIPE P1 STATUS IS OPEN');
+			m.time.times.startClock = 22 * H; return m; })(),
+		statusOf: 'P1', closedAt: [3, 4], openAt: [1, 6] },
+	{ name: 'ELSE: pump CLOSED while T is ABOVE 6 m, otherwise OPEN',
+		model: ruled(pumpedTank({ level: 3, p3: 'closed', controls: [] }),
+			'RULE E1\nIF TANK T LEVEL ABOVE 6\nTHEN PUMP PU STATUS IS CLOSED\nELSE PUMP PU STATUS IS OPEN'),
+		statusOf: 'PU', switches: 4 },
+	{ name: 'PRIORITY: the higher-priority OPEN beats an earlier CLOSED (rule order does not matter)',
+		model: ruled(pumpedTank({ level: 6, q: 15, p3: 'closed', controls: [] }),
+			'RULE A\nIF SYSTEM TIME >= 4\nTHEN PUMP PU STATUS IS CLOSED\nPRIORITY 1\nRULE B\nIF SYSTEM TIME >= 4\nTHEN PUMP PU STATUS IS OPEN\nPRIORITY 3\nRULE C\nIF SYSTEM TIME >= 20\nTHEN PUMP PU STATUS IS CLOSED\nPRIORITY 5'),
+		statusOf: 'PU', openAt: [3, 5, 12, 19], closedAt: [21, 30] },
+	{ name: 'PRIORITY: a later, higher-priority CLOSED replaces an earlier OPEN on the list',
+		model: ruled(pumpedTank({ level: 6, q: 15, p3: 'closed', controls: [] }),
+			'RULE A\nIF SYSTEM TIME >= 4\nTHEN PUMP PU STATUS IS OPEN\nPRIORITY 1\nRULE B\nIF SYSTEM TIME >= 8\nTHEN PUMP PU STATUS IS CLOSED\nPRIORITY 2\nRULE C\nIF SYSTEM TIME >= 8\nTHEN PUMP PU STATUS IS OPEN\nPRIORITY 2\nRULE D\nIF SYSTEM TIME >= 11\nTHEN PUMP PU STATUS IS OPEN\nPRIORITY 5'),
+		statusOf: 'PU', closedAt: [9, 10], openAt: [7, 12, 30] },
+	{ name: 'PRIORITY: equal priority, the first rule on the list keeps the link',
+		model: ruled(pumpedTank({ level: 6, q: 15, p3: 'closed', controls: [] }),
+			'RULE A\nIF SYSTEM TIME >= 5\nAND SYSTEM TIME < 8\nTHEN PUMP PU STATUS IS CLOSED\nRULE B\nIF SYSTEM TIME >= 5\nAND SYSTEM TIME < 8\nTHEN PUMP PU STATUS IS OPEN\nRULE D\nIF SYSTEM TIME >= 8\nTHEN PUMP PU STATUS IS OPEN'),
+		statusOf: 'PU', closedAt: [6, 7], openAt: [4, 9, 20] },
+	{ name: 'AND / OR chain: pump OPEN when T is BELOW 3 m OR TIME >= 30, AND J pressure is ABOVE 20 m',
+		model: ruled(pumpedTank({ level: 4, pu: 'closed', p3: 'closed', controls: [] }),
+			'RULE O1\nIF TANK T LEVEL BELOW 3\nOR SYSTEM TIME >= 30\nAND JUNCTION J PRESSURE ABOVE 20\nTHEN PUMP PU STATUS IS OPEN\nRULE O2\nIF TANK T LEVEL ABOVE 5.5\nTHEN PUMP PU STATUS IS CLOSED'),
+		statusOf: 'PU', switches: 2 },
+	{ name: 'a rule and a simple control on one link: AT TIME 6 opens the pump, a rule shuts it at TIME >= 6 a moment later',
+		model: ruled(pumpedTank({ level: 4, p3: 'closed', controls: [ctl('PU', OPEN_, at(6))] }),
+			'RULE R6\nIF SYSTEM TIME >= 6\nAND SYSTEM TIME < 6.5\nTHEN PUMP PU STATUS IS CLOSED\nRULE R8\nIF SYSTEM TIME >= 8\nTHEN PUMP PU STATUS IS OPEN'),
+		statusOf: 'PU', closedAt: [7], openAt: [5, 6, 9] },
+	{ name: 'a rule and a tank-level control on one pump (the control re-fires every step)',
+		model: ruled(pumpedTank({ level: 5, q: 15, p3: 'closed', controls: [ctl('PU', SHUT, ifNode('T', 'above', 8)), ctl('PU', OPEN_, ifNode('T', 'below', 4))] }),
+			'RULE X\nIF SYSTEM TIME >= 10\nAND SYSTEM TIME < 14\nTHEN PUMP PU STATUS IS CLOSED'),
+		statusOf: 'PU', closedAt: [11, 12, 13], moves: 'T', minSwing: 0.5 },
+	{ name: 'a numeric action: pump speed 0.7 when T is ABOVE 7 m, 1.1 BELOW 5 m (STATUS IS a number is a setting)', offGrid: true,
+		model: ruled(pumpedTank({ level: 4, p3: 'closed', controls: [] }),
+			'RULE S1\nIF TANK T LEVEL ABOVE 7\nTHEN PUMP PU SETTING IS 0.7\nRULE S2\nIF TANK T LEVEL BELOW 5\nTHEN PUMP PU STATUS IS 1.1'),
+		moves: 'T', minSwing: 1 },
+	{ name: 'a pump set to 0 is closed, set again above 0 is open',
+		model: ruled(pumpedTank({ level: 4, p3: 'closed', controls: [] }),
+			'RULE Z1\nIF SYSTEM TIME >= 6\nAND SYSTEM TIME < 10\nTHEN PUMP PU SETTING IS 0\nELSE PUMP PU SETTING IS 0.9'),
+		statusOf: 'PU', closedAt: [7, 9], openAt: [5, 11] },
+	{ name: 'a pipe given a number: 0 closes it, anything else opens it',
+		model: ruled(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18 }),
+			'RULE N1\nIF SYSTEM TIME >= 5\nAND SYSTEM TIME < 8\nTHEN PIPE P1 SETTING IS 0\nELSE PIPE P1 SETTING IS 1'),
+		statusOf: 'P1', closedAt: [6, 7], openAt: [4, 9] },
+	{ name: 'PRV: setting 20 m from 4:00 to 9:00, otherwise 35 m, closed 5:00 to 7:30, then its setting again',
+		model: ruled(lowTankValveLine('PRV', 30),
+			'RULE V1\nIF SYSTEM TIME >= 4\nAND SYSTEM TIME < 9\nTHEN VALVE V SETTING IS 20\nELSE VALVE V SETTING IS 35\nRULE V2\nIF SYSTEM TIME >= 5\nAND SYSTEM TIME < 7.5\nTHEN VALVE V STATUS IS CLOSED\nPRIORITY 1'),
+		statusOf: 'V', closedAt: [6, 7], openAt: [5, 8, 20] },
+	{ name: 'FCV: 40 L/s while T is BELOW 6 m, otherwise 15 L/s (settings stated in L/s)',
+		model: ruled(valveLine('FCV', 0.025, []),
+			'RULE F1\nIF TANK T LEVEL BELOW 6\nTHEN VALVE V SETTING IS 40\nELSE VALVE V SETTING IS 15'),
+		moves: 'T', minSwing: 0.5 },
+	{ name: 'a junction\'s pressure, a pipe\'s flow and a pump\'s setting as premises',
+		model: ruled(pumpedTank({ level: 5, q: 25, p3: 'closed', controls: [] }),
+			'RULE J1\nIF JUNCTION J PRESSURE BELOW 58\nAND PIPE P2 FLOW BELOW 30\nTHEN PIPE P3 STATUS IS OPEN\nRULE J2\nIF PUMP PU SETTING BELOW 0.9\nTHEN PIPE P3 STATUS IS CLOSED\nRULE J3\nIF TANK T LEVEL ABOVE 6\nTHEN PUMP PU SETTING IS 0.8\nRULE J4\nIF TANK T LEVEL BELOW 4\nTHEN PUMP PU SETTING IS 1'),
+		moves: 'T', minSwing: 0.5 },
+	{ name: 'a link\'s status and the system demand as premises',
+		model: ruled(pumpedTank({ level: 5, q: 25, p3: 'closed', controls: [] }),
+			'RULE D1\nIF SYSTEM DEMAND ABOVE 40\nAND LINK P3 STATUS IS CLOSED\nTHEN LINK P3 STATUS IS OPEN\nRULE D2\nIF SYSTEM DEMAND BELOW 20\nAND LINK P3 STATUS IS OPEN\nTHEN LINK P3 STATUS IS CLOSED\nRULE D3\nIF NODE J DEMAND ABOVE 50\nTHEN PUMP PU STATUS IS CLOSED\nELSE PUMP PU STATUS IS OPEN'),
+		statusOf: 'P3', switches: 2 },
+	{ name: 'a tank\'s FILLTIME and DRAINTIME (in hours) as premises',
+		model: ruled(pumpedTank({ level: 5, q: 25, p3: 'closed', controls: [] }),
+			'RULE L1\nIF TANK T FILLTIME BELOW 3\nTHEN PUMP PU STATUS IS CLOSED\nRULE L2\nIF TANK T DRAINTIME BELOW 3\nTHEN PUMP PU STATUS IS OPEN'),
+		statusOf: 'PU', switches: 2 },
+	{ name: 'a reservoir\'s HEAD as a premise, on a head pattern',
+		model: ruled(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18, rPattern: 'RH',
+			rhm: [1, 1, 0.97, 0.94, 0.9, 0.9, 0.94, 0.98, 1.02, 1.04, 1.04, 1.02] }),
+			'RULE H1\nIF RESERVOIR R HEAD BELOW 76\nTHEN PIPE P2 STATUS IS CLOSED\nELSE PIPE P2 STATUS IS OPEN'),
+		statusOf: 'P2', switches: 2 },
+	{ name: 'hydraulic step 30 min (rule step 3 min), report 30 min: tank-level rule on a pump', offGrid: true,
+		model: ruled(pumpedTank({ level: 3, p3: 'closed', controls: [], times: { hydraulicStep: H / 2, reportStep: H / 2, patternStep: H } }),
+			'RULE 1\nIF TANK T LEVEL ABOVE 8\nTHEN PUMP PU STATUS IS CLOSED\nRULE 2\nIF TANK T LEVEL BELOW 4\nTHEN PUMP PU STATUS IS OPEN'),
+		statusOf: 'PU', switches: 3 },
+	{ name: 'a pattern step of 2 h with a rule on a tank level: the rule cuts the hour, the pattern boundary cuts it too', offGrid: true,
+		model: ruled(pumpedTank({ level: 3, p3: 'closed', controls: [], times: { patternStep: 2 * H } }),
+			'RULE 1\nIF TANK T LEVEL ABOVE 7.3\nTHEN PUMP PU STATUS IS CLOSED\nRULE 2\nIF TANK T LEVEL BELOW 3.6\nTHEN PUMP PU STATUS IS OPEN'),
+		statusOf: 'PU', switches: 3 },
+	{ name: 'a tank that FILLS to its limit under a rule that never fires', reaches: 'max',
+		model: ruled(lineWithTank({ level: 2, min: 0.5, max: 3, dia: 10, q: 12 }),
+			'RULE Q1\nIF SYSTEM TIME >= 100\nTHEN PIPE P1 STATUS IS CLOSED') }
+];
+
 // ---- EPA's examples ------------------------------------------------------------------------------
 // `pumps` gives a pump its page-like model (pageLikePump) with the file's own speed and pattern, or
 // with a pattern added: { id: [patternId, multipliers] }.
-function loadEpa(file, stripped, pumps) {
+function loadEpa(file, stripped, pumps, rulesText) {
 	const parsed = EngCalcs.lpnInpParse(fs.readFileSync(path.join(__dirname, 'reference', file), 'utf8'));
 	if (!parsed.ok) { throw new Error(file + ' does not parse: ' + parsed.error); }
 	const m = buildModel(EngCalcs, parsed);
@@ -289,12 +436,15 @@ function loadEpa(file, stripped, pumps) {
 			pageLikePump(l, pl.speed, add ? add[0] : pl.speedPattern);
 		});
 	}
+	// Net1 is a US file: the rules' levels are feet, the model is metres.
+	if (rulesText) { withRules(m, rulesText, (v, kind) => (kind === 'head' || kind === 'pressure' ? v * 0.3048 : kind === 'flow' ? v / 1000 : v)); }
 	return { model: m, hadControls: parsed.controls.length };
 }
 
 const MODULE_URL = 'file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js');
 
 async function compare(c) {
+	if (process.env.ONLY && c.name.indexOf(process.env.ONLY) < 0) { return; }   // debugging: one case
 	const model = c.model;
 	model.hydraulics = Object.assign({ accuracy: 1e-5 }, model.hydraulics || {});
 	const epa = await EngCalcs.lpnEpanetRun(JSON.parse(JSON.stringify(model)));
@@ -302,6 +452,13 @@ async function compare(c) {
 	if (!epa.ok || !nat.ok) {
 		ok(c.name, false, `ok native=${nat.ok} epanet=${epa.ok} ` + JSON.stringify(nat.issues || epa.issues || ''));
 		return;
+	}
+	if (process.env.DUMP) {
+		epa.frames.forEach((fe, i) => {
+			const fn = nat.frames[i];
+			console.log(fe.t / H + 'h  ' + model.nodes.map((n) => n.id + ' ' + fe.heads[n.id].toFixed(3) + '/' + fn.heads[n.id].toFixed(3)).join('  ') + '   ' +
+				model.links.map((l) => l.id + ' ' + (fe.flows[l.id] * 1000).toFixed(2) + '/' + (fn.flows[l.id] * 1000).toFixed(2) + fe.statuses[l.id][0] + fn.statuses[l.id][0]).join('  '));
+		});
 	}
 	const sameSteps = epa.frames.length === nat.frames.length &&
 		epa.frames.every((f, i) => f.t === nat.frames[i].t);
@@ -363,12 +520,19 @@ async function compare(c) {
 		if (c.switches && sw < c.switches) { exercised = false; }
 		why += `${why ? '; ' : ''}${c.statusOf} switched ${sw}x`;
 	}
+	// A rule that acts between hydraulic steps shortens the step: the native loop must have solved
+	// at a time that is not a whole number of hours.
+	if (c.offGrid) {
+		const off = (nat.solveTimes || []).filter((t) => t % H !== 0).length;
+		if (!off) { exercised = false; }
+		why += `${why ? '; ' : ''}${off} solves off the hourly grid`;
+	}
 	ok(c.name, sameSteps && dH <= HEAD_TOL && dL <= HEAD_TOL && dQ <= qTol && unconv === 0 && exercised && stDiff === 0,
 		`steps ${nat.frames.length}/${epa.frames.length}${sameSteps ? '' : ' DIFFER'}  ` +
 		`dH=${dH.toExponential(2)} m @${atH}  dLevel=${dL.toExponential(2)} m @${atL || '-'}  ` +
 		`dQ=${dQ.toExponential(2)} m3/s @${atQ} (tol ${qTol.toExponential(1)})` +
 		(unconv ? ` ${unconv} UNCONVERGED` : '') + (stDiff ? ` ${stDiff} STATUS DIFFERENCES` : '') +
-		(c.moves || c.reaches || c.statusOf ? `  [${why}${exercised ? '' : ' NOT EXERCISED'}]` : ''));
+		(c.moves || c.reaches || c.statusOf || c.offGrid ? `  [${why}${exercised ? '' : ' NOT EXERCISED'}]` : ''));
 	return { dH, dL, dQ };
 }
 
@@ -414,6 +578,32 @@ async function run() {
 	await compare({ name: 'Net3 with its controls stripped, both pumps on speed patterns', moves: '*', minSwing: 0.5,
 		model: loadEpa('Net3.inp', true, { 10: ['S10', [0.9, 1, 1.1, 1]], 335: ['S335', [1, 0.9, 0.95, 1.05, 1.1, 1]] }).model });
 
+	console.log('-- slice 4: [RULES], constructed');
+	for (const c of RULE_CASES) { await compare(c); }
+	console.log('-- slice 4: EPA\'s Net1 WITH the two rules the gallery ships on it (CLOCKTIME windows, tank 2 LEVEL in feet), and variations');
+	{
+		const text = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'Net1.lwn'), 'utf8')).rules.join('\n');
+		const withR = loadEpa('Net1.inp', false, false, text);
+		ok('Net1 carries both gallery rules', withR.model.rules.length === 2);
+		await compare({ name: 'Net1 with its controls AND the gallery rules, 24 h (pump 9)', model: withR.model, statusOf: '9', switches: 3 });
+		await compare({ name: 'Net1 with the gallery rules and its controls stripped', statusOf: '9', switches: 1,
+			model: loadEpa('Net1.inp', true, false, text).model });
+		await compare({ name: 'Net1, rules shutting pump 9 above 130 ft and opening it below 118 ft (priority 2)', statusOf: '9', switches: 1, offGrid: true,
+			model: loadEpa('Net1.inp', false, false, 'RULE W\nIF TANK 2 LEVEL ABOVE 130\nTHEN PUMP 9 STATUS IS CLOSED\nRULE X\nIF TANK 2 LEVEL BELOW 118\nTHEN PUMP 9 STATUS IS OPEN\nPRIORITY 2').model });
+	}
+
+	{
+		// Net3 (feet, 3 tanks, 2 pumps and a bypass) with its controls replaced by rules that do the same
+		// work and more: the tank-1 pair as multi-action rules, pump 10 by the clock, a tank-3 rule.
+		const NET3_RULES = 'RULE A\nIF TANK 1 LEVEL BELOW 17.1\nTHEN PUMP 335 STATUS IS OPEN\nAND PIPE 330 STATUS IS CLOSED\nRULE B\nIF TANK 1 LEVEL ABOVE 19.1\nTHEN PUMP 335 STATUS IS CLOSED\nAND PIPE 330 STATUS IS OPEN\n' +
+			'RULE C\nIF SYSTEM CLOCKTIME >= 1 AM\nAND SYSTEM CLOCKTIME < 3 PM\nTHEN PUMP 10 STATUS IS OPEN\nELSE PUMP 10 STATUS IS CLOSED\n' +
+			'RULE D\nIF TANK 3 LEVEL ABOVE 31\nOR TANK 2 LEVEL ABOVE 39\nTHEN PUMP 10 STATUS IS CLOSED\nPRIORITY 2';
+		await compare({ name: 'Net3, controls replaced by rules (multi-action, ELSE, OR, PRIORITY), 24 h', statusOf: '10', switches: 2,
+			model: loadEpa('Net3.inp', true, false, NET3_RULES).model });
+		await compare({ name: 'Net3 with its controls AND tank-1 rules with other levels (rule and control on one pump)', statusOf: '335', switches: 1, offGrid: true,
+			model: loadEpa('Net3.inp', false, false, 'RULE A\nIF TANK 1 LEVEL BELOW 18\nTHEN PUMP 335 STATUS IS OPEN\nRULE B\nIF TANK 1 LEVEL ABOVE 18.6\nTHEN PUMP 335 STATUS IS CLOSED').model });
+	}
+
 	console.log('-- refusals (the caller falls back to EPANET)');
 	const base = () => JSON.parse(JSON.stringify(CASES[0].model));
 	const refusal = (name, mut, code) => {
@@ -427,7 +617,35 @@ async function run() {
 		m.links.push({ id: 'V9', type: 'valve', valveType: 'PRV', from: 'J', to: 'T', diameter: 0.2, setting: 20, k: 0, length: 0, status: 'open' });
 		m.time.controls = [{ link: 'V9', action: { status: 'closed' }, condition: { kind: 'node', node: 'J', cmp: 'below', value: 20 } }];
 	}, 'native-run-control-unsupported');
-	refusal('rules', (m) => { m.rules = [{ id: 'R1' }]; }, 'native-run-rules');
+	// a rule the loop does not copy, or that EPANET itself rejects on reading the file
+	const ruleRefusal = (name, text, mut, id) => {
+		const m = base();
+		m.nodes.push(jn('K', 5, 0));
+		m.links.push(pipe('P9', 'J', 'K', 100, 0.1));
+		if (mut) { mut(m); }
+		withRules(m, text);
+		const r = EngCalcs.lpnNativeRun(m);
+		ok('refuses a rule: ' + name, r.ok === false && r.refused === true && r.frames === undefined &&
+			r.issues.some((i) => i.code === 'native-run-rules' && i.ids.indexOf(id || 'Q') >= 0), JSON.stringify(r.issues || ''));
+	};
+	const gpv = (m) => { m.links.push({ id: 'G', type: 'valve', valveType: 'GPV', from: 'J', to: 'K', diameter: 0.1, setting: 1, k: 0, length: 0, status: 'open' }); };
+	ruleRefusal('a premise on a pipe\'s roughness', 'RULE Q\nIF PIPE P1 SETTING ABOVE 100\nTHEN PIPE P9 STATUS IS CLOSED');
+	ruleRefusal('a premise on a reservoir\'s pressure', 'RULE Q\nIF RESERVOIR R PRESSURE ABOVE 1\nTHEN PIPE P9 STATUS IS CLOSED');
+	ruleRefusal('a premise on a GPV\'s setting', 'RULE Q\nIF VALVE G SETTING ABOVE 1\nTHEN PIPE P9 STATUS IS CLOSED', gpv);
+	ruleRefusal('FILLTIME on a junction (EPANET error 201)', 'RULE Q\nIF NODE J FILLTIME BELOW 1\nTHEN PIPE P9 STATUS IS CLOSED');
+	ruleRefusal('a time EPANET cannot read (error 202)', 'RULE Q\nIF SYSTEM TIME > 25 PM\nTHEN PIPE P9 STATUS IS CLOSED');
+	ruleRefusal('a negative setting in an action (error 202)', 'RULE Q\nIF SYSTEM TIME > 2\nTHEN PUMP PU SETTING IS -1',
+		(m) => { m.links.push(pageLikePump({ id: 'PU', type: 'pump', from: 'R', to: 'J', h0: 50, a: 1, b: 2, status: 'open' })); });
+	ruleRefusal('a numeric action on a GPV (error 202)', 'RULE Q\nIF SYSTEM TIME > 2\nTHEN VALVE G SETTING IS 3', gpv);
+	ruleRefusal('an action on a check valve (error 207)', 'RULE Q\nIF SYSTEM TIME > 2\nTHEN PIPE C STATUS IS CLOSED',
+		(m) => { m.links.push(Object.assign(pipe('C', 'J', 'K', 100, 0.1), { status: 'cv' })); });
+	ruleRefusal('a hydraulic step under 10 s (a rule step of zero)', 'RULE Q\nIF SYSTEM TIME > 2\nTHEN PIPE P9 STATUS IS CLOSED',
+		(m) => { m.time.times.hydraulicStep = 5; }, 'Rule Timestep');
+	{
+		const m = base(); m.rules = [{ id: 'R1' }];
+		const r = EngCalcs.lpnNativeRun(m);
+		ok('refuses a rule record it cannot read (no name or clauses)', r.refused === true && r.issues.some((i) => i.code === 'native-run-rules'), JSON.stringify(r.issues || ''));
+	}
 	refusal('a speed pattern on a pump without its unscaled curve (not the page\'s model)', (m) => { m.links.push({ id: 'PU', type: 'pump', from: 'R', to: 'J', speedPattern: 'D', h0: 50, a: 1, b: 2 }); }, 'native-run-speed-pattern');
 	refusal('a speed pattern the model lacks', (m) => { m.links.push(pageLikePump({ id: 'PU', type: 'pump', from: 'R', to: 'J', h0: 50, a: 1, b: 2, status: 'open' }, 1, 'NOPE')); }, 'native-run-speed-pattern');
 	refusal('a speed pattern with a negative multiplier', (m) => { m.time.patterns.push(pat('NEG', [1, -0.5]));

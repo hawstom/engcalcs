@@ -1,4 +1,4 @@
-// lpn-native-run.js -- THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP, SLICES 1 TO 3 (Task 733, phase 3).
+// lpn-native-run.js -- THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP, SLICES 1 TO 4 (Task 733, phase 3).
 //
 // js/lpn-solver.js solves ONE INSTANT. This file walks the clock around it, the way EPANET's own
 // runH()/nextH() loop does (hydraul.c), and holds the one piece of state an instant does not have:
@@ -42,11 +42,40 @@
 //                   pattern holds only until the next step, in EPANET and here alike.
 //   pumpdata()      input3.c -- a pump's SPEED is its starting setting, and a SPEED of 0 is a pump
 //                   that is OPEN at speed 0: no flow (pumpcoeff()), but its status reads open.
+// SLICE 4, RULE-BASED CONTROLS ([RULES]), also from OWA-EPANET 2.3.5 (rules.c, hydraul.c):
+//   input1.c        -- the rule time step is a tenth of the (adjusted) hydraulic step, in whole
+//                   seconds, and never more than the hydraulic step.
+//   ruletimestep()  hydraul.c -- instead of one tanklevels() over the whole step, the clock is
+//                   walked in rule steps (the first only up to the next multiple of the rule
+//                   step), the tanks are moved by each increment, and checkrules() is asked after
+//                   each; the first increment at which an action is actually TAKEN ends the step.
+//                   So a rule firing between hydraulic steps shortens the step, and the tanks are
+//                   already where they stood at that moment.
+//   checkrules()    rules.c -- every rule in file order; premises true adds its THEN actions to the
+//                   action list, false its ELSE actions. A link already on the list keeps its
+//                   action unless the new rule's PRIORITY is strictly higher. The list is built by
+//                   pushing on the front, so actions are taken last-added first (order never
+//                   matters, one action per link).
+//   evalpremises()  rules.c -- the first premise is an AND; an OR premise is judged only while the
+//                   result so far is false, an AND premise ends the rule at the first false result.
+//   checkvalue()    rules.c -- node and link values are those of the LAST solve (tank levels moved
+//                   by tanklevels() since), judged in the file's units with a tolerance of 0.001,
+//                   and with EPANET's own lopsided <= and >= (LE is false above value - tol).
+//   checktime()     rules.c -- TIME and CLOCKTIME compare the END of the increment; `=` and `<>`
+//                   ask whether the stated second fell inside it (past midnight too).
+//   checkstatus()   rules.c -- anything at or below CLOSED reads closed, ACTIVE reads active.
+//   takeactions()   rules.c -- OPEN on a closed link and CLOSED on an open one are setlinkstatus();
+//                   a number is setlinksetting(), taken only when it differs from the link's
+//                   setting by more than 0.001 in EPANET's internal units (feet of head, cfs). A
+//                   pipe given a number is opened (non-zero) or closed (zero). ACTIVE does nothing
+//                   but still holds its link's place on the action list.
+//   hour()          input2.c -- how "10 AM", "13:30", "36 HOURS" become seconds.
 // Times are whole seconds, as EPANET's are.
 //
 // WHAT IT REFUSES, by name, so the caller can hand the network to the EPANET engine exactly as it
-// does for anything the built-in solver cannot do (see EngCalcs.lpnNativeRunRefusals): rules, a
-// speed pattern that is not the page's (a pump without its unscaled curve, a pattern the model
+// does for anything the built-in solver cannot do (see EngCalcs.lpnNativeRunRefusals): a rule the
+// loop does not copy exactly (a rule on a pipe's roughness, a reservoir's level or pressure, a
+// GPV's setting; one EPANET itself rejects when it reads the file), a speed pattern that is not the page's (a pump without its unscaled curve, a pattern the model
 // lacks, a negative multiplier), a tank on a volume curve, water quality, EPANET-MSX, pump energy, a
 // control on a junction's pressure that acts on a valve, a control conditioned on a reservoir, and
 // what lpnDiagnose refuses of the built-in solver (a pressure-driven demand model). Each one is a
@@ -106,7 +135,12 @@
 			if (l.type === 'pipe' && l.status === 'cv') { ids.push(String(c.link)); }
 		});
 		add('native-run-control-unsupported', ids);
-		if (model.rules && model.rules.length) { add('native-run-rules', [], true); }
+		if (model.rules && model.rules.length) {
+			var rp = parseRules(model, nodeType, linkOf);
+			if (rp.bad.length) { add('native-run-rules', rp.bad); }
+			// input1.c: a rule step of zero (a hydraulic step under 10 s) is EPANET's `% 0`.
+			else if (hydStepOf(time.times) < 10) { add('native-run-rules', ['Rule Timestep']); }
+		}
 		// A speed pattern is run only on the page's own model of a pump: the curve at speed 1 beside
 		// it (h0Base/aBase), which is also the only pump js/lpn-epanet.js writes a PATTERN for
 		// (pumpEps). A pump with no curve is a pipe to both engines and its pattern means nothing.
@@ -150,7 +184,7 @@
 	 */
 	EC.lpnNativeRun = function (model, options) {
 		var opts = options || {}, refusals = EC.lpnNativeRunRefusals(model), tm, times, dur,
-			patStep, patStart, repStep, hydStep, tStart, byPat = {}, dm, tanks = [], frames = [], warnings = [],
+			patStep, patStart, repStep, hydStep, tStart, byPat = {}, dm, tanks = [], frames = [], warnings = [], solveTimes = [],
 			htime = 0, rtime, guard = 0, res, stepModel, tstep, t, nextPat, dmult, levelNow = {}, cur,
 			links, ls, ctl, tankById = {}, nodeById = {};
 		if (refusals.length) { return { ok: false, refused: true, issues: refusals }; }
@@ -184,24 +218,36 @@
 		var speedPat = [];   // [k, pattern id] of each pump on a speed pattern (slice 3)
 		links.forEach(function (l, k) { if (ls[k].kind === 'pump' && l.speedPattern) { speedPat.push([k, l.speedPattern]); } });
 
+		// ---- RULES (slice 4): compiled once; evaluated inside the step, by ruleTimestep() below ----
+		var rules = [], linkIxById = {}, curById = {}, dsys = 0, ruleStep = 0, nodeTypeOf = {}, linkOfId = {};
+		links.forEach(function (l, k) { linkIxById[String(l.id)] = k; linkOfId[String(l.id)] = l; });
+		model.nodes.forEach(function (n) { nodeTypeOf[String(n.id)] = n.type; });
+		if (model.rules && model.rules.length) {
+			rules = parseRules(model, nodeTypeOf, linkOfId).rules;
+			ruleStep = Math.min(Math.floor(hydStep / 10), hydStep);   // input1.c adjustdata()
+		}
+
 		function mult(patId, time) {
 			var p = patId ? byPat[String(patId)] : null;
 			return p ? EC.lpnPatternValue(p, time, patStep, patStart) : 1;
 		}
 		function stepNodes(time) {
+			dsys = 0;   // hydraul.c demands(): Dsystem, the demand categories above zero
 			return model.nodes.map(function (n) {
-				var c, sum;
+				var c, sum, dj;
 				if (n.type === 'junction') {
 					if (n.demands && n.demands.length) {
 						sum = 0;
-						n.demands.forEach(function (r) { sum += (r.base || 0) * mult(r.pattern, time) * dmult; });
+						n.demands.forEach(function (r) { dj = (r.base || 0) * mult(r.pattern, time) * dmult; if (dj > 0) { dsys += dj; } sum += dj; });
 						c = Object.assign({}, n); c.demand = sum;
 						return c;
 					}
 					if (typeof n.demandBase === 'number') {
 						c = Object.assign({}, n); c.demand = n.demandBase * mult(n.demandPattern, time) * dmult;
+						if (c.demand > 0) { dsys += c.demand; }
 						return c;
 					}
+					if (n.demand > 0) { dsys += n.demand; }
 					return n;
 				}
 				if (n.type === 'reservoir' && n.headPattern && typeof n.headBase === 'number') {
@@ -244,6 +290,175 @@
 				return any;
 			};
 		}
+		// hydraul.c tanklevels()
+		function tankLevels(dt) {
+			tanks.forEach(function (tk) {
+				var q = tk.q;
+				if (Math.abs(q) <= QZERO) { return; }
+				tk.V += q * dt;
+				if (tk.V + q >= tk.Vmax) { tk.V = tk.Vmax; }
+				else if (tk.V - q <= tk.Vmin) { tk.V = tk.Vmin; }
+				tk.h = tk.Hmin + (tk.V - tk.Vmin) / tk.A;
+			});
+		}
+		// The head (m) of a node as rules.c reads NodeHead: a tank's from its volume, any other
+		// node's from the last solve.
+		function headNow(id) {
+			var tk = tankById[id];
+			return tk ? tk.h * FT : res.heads[id];
+		}
+		// rules.c checkvalue(): the numbers are the file's (LPS: metres, L/s), tolerance 0.001.
+		function ruleValue(p) {
+			var n, tk, x, i, q;
+			if (p.sys) { return dsys * 1000; }
+			if (p.link) {
+				i = linkIxById[p.link];
+				if (p.attr === 'FLOW') { return Math.abs(res.flows[p.link] || 0) * 1000; }
+				x = ls[i].k;                                      // SETTING
+				return x === MISSING ? null : x * p.scale;
+			}
+			n = nodeById[p.node]; tk = tankById[p.node];
+			switch (p.attr) {
+			case 'DEMAND':
+				if (tk) { return tk.q * LPS_PER_CFS; }
+				if (n.type === 'junction') { return (curById[p.node].demand || 0) * 1000; }
+				q = 0;                                            // a reservoir: net inflow, as newflows() sums it
+				links.forEach(function (l) {
+					var f = res.flows[l.id] || 0;
+					if (l.to === n.id) { q += f; }
+					if (l.from === n.id) { q -= f; }
+				});
+				return q * 1000;
+			case 'HEAD': case 'GRADE': return headNow(p.node);
+			case 'LEVEL': case 'PRESSURE': return headNow(p.node) - (n.elev || 0);
+			case 'FILLTIME':
+				if (!tk || !(tk.q > 1e-6)) { return null; }       // TINY, consts.h; a reservoir has no area
+				return (tk.Vmax - tk.V) / tk.q;
+			case 'DRAINTIME':
+				if (!tk || !(tk.q < -1e-6)) { return null; }
+				return (tk.Vmin - tk.V) / tk.q;
+			}
+			return null;
+		}
+		// rules.c checkpremise(), t1..t2 being the increment just taken
+		function checkPremise(p, t1, t2) {
+			var x, v, st, j, tol = RTOL;
+			if (p.attr === 'TIME' || p.attr === 'CLOCKTIME') {
+				if (p.attr === 'CLOCKTIME') { t1 = (t1 + tStart) % SEC_PER_DAY; t2 = (t2 + tStart) % SEC_PER_DAY; }
+				x = p.value;
+				switch (p.rel) {
+				case R_LT: return t2 < x;
+				case R_LE: return t2 <= x;
+				case R_GT: return t2 > x;
+				case R_GE: return t2 >= x;
+				default:   // equality: did the stated second fall inside the increment?
+					j = t2 < t1 ? (x >= t1 || x <= t2) : (x >= t1 && x <= t2);   // e.g. 11:00 pm to 1:00 am
+					return p.rel === R_EQ ? j : !j;
+				}
+			}
+			if (p.never) { return false; }
+			if (p.status > A_NUMBER) {                            // checkstatus()
+				st = ls[linkIxById[p.link]].s;
+				j = st <= CLOSED ? A_CLOSED : st === ACTIVE ? A_ACTIVE : A_OPEN;
+				return (j === p.status && p.rel === R_EQ) || (j !== p.status && p.rel === R_NE);
+			}
+			v = ruleValue(p);
+			if (v === null) { return false; }
+			x = p.value;
+			switch (p.rel) {
+			case R_EQ: return !(Math.abs(v - x) > tol);
+			case R_NE: return !(Math.abs(v - x) < tol);
+			case R_LT: return !(v > x + tol);
+			case R_LE: return !(v > x - tol);
+			case R_GT: return !(v < x - tol);
+			case R_GE: return !(v < x + tol);
+			}
+			return false;
+		}
+		// rules.c evalpremises()
+		function evalPremises(r, t1, t2) {
+			var result = true, i, p;
+			for (i = 0; i < r.prem.length; i++) {
+				p = r.prem[i];
+				if (p.logop === 'OR') {
+					if (result === false) { result = checkPremise(p, t1, t2); }
+				} else {
+					if (result === false) { return false; }
+					result = checkPremise(p, t1, t2);
+				}
+			}
+			return result;
+		}
+		// rules.c setlinkstatus(), setlinksetting()
+		function setStatus(st, open) {
+			if (open) {
+				if (st.kind === 'pump') { st.k = 1; }
+				if (st.kind === 'valve' && st.vt !== 'GPV') { st.k = MISSING; }
+				st.s = OPEN;
+			} else {
+				if (st.kind === 'pump') { st.k = 0; }
+				if (st.kind === 'valve' && st.vt !== 'GPV') { st.k = MISSING; }
+				st.s = CLOSED;
+			}
+		}
+		function setSetting(st, x) {
+			if (st.kind === 'pump') {
+				st.k = x;
+				if (x > 0 && st.s <= CLOSED) { st.s = OPEN; }
+				if (x === 0 && st.s > CLOSED) { st.s = CLOSED; }
+			} else if (st.vt === 'FCV') {
+				st.k = x; st.s = ACTIVE;
+			} else {
+				if (st.k === MISSING && st.s <= CLOSED) { st.s = OPEN; }
+				st.k = x;
+			}
+		}
+		// rules.c checkrules() with takeactions(): returns how many actions changed something
+		function checkRules(t1, t2) {
+			var list = [], taken = 0;
+			function onList(r, a) {   // onactionlist(): a link on the list stays, unless outranked
+				var i;
+				for (i = 0; i < list.length; i++) {
+					if (list[i].a.link === a.link) {
+						if (r.priority > list[i].r.priority) { list[i] = { a: a, r: r }; }
+						return true;
+					}
+				}
+				return false;
+			}
+			rules.forEach(function (r) {
+				var acts = evalPremises(r, t1, t2) ? r.then : r.els;
+				acts.forEach(function (a) { if (!onList(r, a)) { list.push({ a: a, r: r }); } });
+			});
+			for (var q = list.length - 1; q >= 0; q--) {   // the list is built from the front
+				var a = list[q].a, st = ls[linkIxById[a.link]], flag = false, x, v;
+				if (a.status === A_OPEN && st.s <= CLOSED) { setStatus(st, true); flag = true; }
+				else if (a.status === A_CLOSED && st.s > CLOSED) { setStatus(st, false); flag = true; }
+				else if (a.setting !== null) {
+					x = a.setting; v = st.k;
+					// EPANET compares in its internal units: feet of head, cubic feet per second.
+					if (st.vt === 'PRV' || st.vt === 'PSV' || st.vt === 'PBV') { x /= FT; v /= FT; }
+					else if (st.vt === 'FCV') { x = x * 1000 / LPS_PER_CFS; v = v * 1000 / LPS_PER_CFS; }
+					if (Math.abs(x - v) > RTOL) { setSetting(st, a.setting); flag = true; }
+				}
+				if (flag) { taken++; }
+			}
+			return taken;
+		}
+		// hydraul.c ruletimestep(): walk the step in rule steps, moving the tanks, until a rule acts
+		function ruleTimestep(tstepIn) {
+			var tnow = htime, tmax = tnow + tstepIn, now = tnow, dt = ruleStep, dt1 = ruleStep - (tnow % ruleStep);
+			dt = Math.min(dt, tstepIn); dt1 = Math.min(dt1, tstepIn);
+			if (dt1 === 0) { dt1 = dt; }
+			do {
+				now += dt1;
+				tankLevels(dt1);
+				if (checkRules(now - dt1 + 1, now)) { break; }
+				dt = Math.min(dt, tmax - now);
+				dt1 = dt;
+			} while (dt > 0);
+			return now - tnow;
+		}
 		rtime = repStep;
 
 		for (;;) {
@@ -257,6 +472,7 @@
 			});
 			controls(ctl, ls, tankById, htime, tStart);
 			cur = stepNodes(htime);
+			cur.forEach(function (n) { curById[String(n.id)] = n; });
 			var stepLinks = links.map(function (l, k) { return applyLink(Object.assign({}, l), ls[k]); });
 			stepModel = Object.assign({}, model, { nodes: cur, links: stepLinks });
 			delete stepModel.time;
@@ -275,6 +491,7 @@
 			res = EC.lpnSolve(stepModel, sOpts);
 			if (!res.ok) { return { ok: false, issues: res.issues || [], t: htime }; }
 			readBack(stepModel, stepLinks, ls, res);
+			solveTimes.push(htime);
 			// A tank's net inflow, from the link flows the solve returned (a link a full or empty tank
 			// shut reports no flow, which is what keeps the level from passing its limits).
 			tanks.forEach(function (tk) {
@@ -308,20 +525,14 @@
 				if (ts > 0 && ts < tstep) { tstep = ts; }
 			});
 			tstep = controlTimestep(ctl, ls, tankById, htime, tStart, tstep);
-			tanks.forEach(function (tk) {   // tanklevels()
-				var q = tk.q;
-				if (Math.abs(q) <= QZERO) { return; }
-				tk.V += q * tstep;
-				if (tk.V + q >= tk.Vmax) { tk.V = tk.Vmax; }
-				else if (tk.V - q <= tk.Vmin) { tk.V = tk.Vmin; }
-				tk.h = tk.Hmin + (tk.V - tk.Vmin) / tk.A;
-				levelNow[tk.id] = solverLevel(tk);
-			});
+			// hydraul.c timestep(): rules, when there are any, move the tanks themselves
+			if (rules.length) { tstep = ruleTimestep(tstep); } else { tankLevels(tstep); }
+			tanks.forEach(function (tk) { levelNow[tk.id] = solverLevel(tk); });
 			htime += tstep;
 			if (htime >= rtime) { rtime += repStep; }
 			if (++guard >= 100000) { break; }
 		}
-		return { ok: true, engine: 'native', frames: frames, warnings: warnings, duration: dur };
+		return { ok: true, engine: 'native', frames: frames, warnings: warnings, duration: dur, solveTimes: solveTimes };
 	};
 
 	// ---- SIMPLE CONTROLS (slice 2) -----------------------------------------------------------------
@@ -540,6 +751,142 @@
 			}
 		});
 		return tstep;
+	}
+
+	// ---- RULES (slice 4) ---------------------------------------------------------------------------
+
+	// input1.c adjustdata(): the hydraulic step as EPANET settles it (never past the pattern or report step).
+	function hydStepOf(timesIn) {
+		var t = Object.assign({}, EC.lpnTimesDefaults(), timesIn || {}),
+			h = t.hydraulicStep > 0 ? t.hydraulicStep : 3600,
+			p = t.patternStep > 0 ? t.patternStep : 3600,
+			r = t.reportStep > 0 ? t.reportStep : p;
+		if (h > p) { h = p; }
+		if (h > r) { h = r; }
+		return h;
+	}
+
+	// input2.c match(): the keyword must be the START of the token, not case-sensitive.
+	function starts(tok, kw) { return String(tok || '').toUpperCase().indexOf(kw) === 0; }
+	// input2.c getfloat(): strtod over the whole token.
+	function getFloat(tok) {
+		return /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(String(tok)) ? parseFloat(tok) : NaN;
+	}
+	// input2.c hour(): a time in hours, or -1. `text` is the premise's value words ("10 AM", "13:30").
+	function hourOf(text) {
+		var w = String(text || '').trim().split(/\s+/), units = w.length > 1 ? w[1] : '', parts, y = [0, 0, 0], n, v, i;
+		if (w.length > 2 || !w[0]) { return -1; }
+		parts = w[0].split(':').filter(function (x) { return x.length; });
+		n = parts.length;
+		if (n < 1 || n > 3) { return -1; }
+		for (i = 0; i < n; i++) { v = getFloat(parts[i]); if (isNaN(v)) { return -1; } y[i] = v; }
+		if (n === 1) {
+			if (!units) { return y[0]; }
+			if (starts(units, 'SEC')) { return y[0] / 3600; }
+			if (starts(units, 'MIN')) { return y[0] / 60; }
+			if (starts(units, 'HOU')) { return y[0]; }
+			if (starts(units, 'DAY')) { return y[0] * 24; }
+		}
+		if (n > 1) { y[0] = y[0] + y[1] / 60 + y[2] / 3600; }
+		if (!units) { return y[0]; }
+		if (starts(units, 'AM')) { return y[0] >= 13 ? -1 : y[0] >= 12 ? y[0] - 12 : y[0]; }
+		if (starts(units, 'PM')) { return y[0] >= 13 ? -1 : y[0] >= 12 ? y[0] : y[0] + 12; }
+		return -1;
+	}
+
+	// rules.c enums
+	var R_EQ = 0, R_NE = 1, R_LE = 2, R_GE = 3, R_LT = 4, R_GT = 5,
+		A_NUMBER = 0, A_OPEN = 1, A_CLOSED = 2, A_ACTIVE = 3,
+		RELOP = { '=': R_EQ, IS: R_EQ, '<>': R_NE, NOT: R_NE, '<=': R_LE, '>=': R_GE, '<': R_LT, BELOW: R_LT, '>': R_GT, ABOVE: R_GT },
+		RTOL = 1e-3;                        // rules.c checkvalue()/takeactions() tolerance
+
+	function statusWord(tok) {
+		return starts(tok, 'OPEN') ? A_OPEN : starts(tok, 'CLOSED') ? A_CLOSED : starts(tok, 'ACTIVE') ? A_ACTIVE : A_NUMBER;
+	}
+
+	/**
+	 * rules.c newpremise()/newaction()/newpriority(): `model.rules` (the converted blocks
+	 * assembleModel() hands both engines, SI values) as EPANET holds them. `bad` lists the names of
+	 * the rules this loop does not copy exactly, or that EPANET would reject on reading the file.
+	 */
+	function parseRules(model, nodeType, linkOf) {
+		var rules = [], bad = [];
+		(model.rules || []).forEach(function (b, ri) {
+			var name = b && b.name ? String(b.name) : '#' + (ri + 1), r, state = 'cond', fail = false;
+			if (!b || !b.name || !Array.isArray(b.clauses)) { bad.push(name); return; }
+			r = { name: name, prem: [], then: [], els: [], priority: 0 };
+			b.clauses.forEach(function (c) {
+				var p, a, l, x, s, v, w;
+				if (fail) { return; }
+				if (c.part === 'priority') { r.priority = c.value; if (!isFinite(c.value)) { fail = true; } return; }
+				if (!c.ok) { fail = true; return; }
+				if (c.part === 'cond') {
+					p = { logop: c.join === 'OR' ? 'OR' : 'AND', rel: RELOP[c.rel], attr: c.attr, status: A_NUMBER, value: 0 };
+					if (p.rel === undefined) { fail = true; return; }
+					if (c.object === 'SYSTEM') {
+						p.sys = true;
+						if (c.attr === 'TIME' || c.attr === 'CLOCKTIME') {
+							x = hourOf(c.valueText);
+							if (x < 0) { fail = true; return; }
+							p.value = Math.trunc(x * 3600);
+						} else if (c.attr === 'DEMAND') {
+							p.value = c.value * 1000;                    // L/s, the file's flow unit
+						} else { fail = true; return; }
+					} else if (c.attr === 'FLOW' || c.attr === 'STATUS' || c.attr === 'SETTING') {
+						l = linkOf[c.id];
+						if (!l) { fail = true; return; }
+						p.link = String(c.id);
+						if (c.attr === 'STATUS') {
+							s = statusWord(c.valueText);
+							if (s !== A_NUMBER) { p.status = s; } else { p.never = true; }   // checkvalue() has no STATUS
+						} else if (c.attr === 'FLOW') {
+							p.value = c.value * 1000;
+						} else {
+							// A setting: a pump's speed, a valve's setting. A pipe's is its roughness
+							// and a GPV's a curve, neither copied.
+							if (l.type === 'pipe' || (l.type === 'valve' && String(l.valveType).toUpperCase() === 'GPV')) { fail = true; return; }
+							p.value = c.kind === 'flow' ? c.value * 1000 : c.value;
+							p.scale = c.kind === 'flow' ? 1000 : 1;
+						}
+					} else {
+						// a node's DEMAND, HEAD, GRADE, LEVEL, PRESSURE, FILLTIME or DRAINTIME
+						if (!nodeType[String(c.id)]) { fail = true; return; }
+						p.node = String(c.id);
+						if (c.attr === 'FILLTIME' || c.attr === 'DRAINTIME') {
+							if (nodeType[p.node] === 'junction') { fail = true; return; }   // error 201 in EPANET
+							if (!isFinite(c.value)) { fail = true; return; }
+							p.value = c.value * 3600;
+						} else {
+							if (!isFinite(c.value)) { fail = true; return; }
+							if (nodeType[p.node] === 'reservoir' && (c.attr === 'LEVEL' || c.attr === 'PRESSURE')) { fail = true; return; }
+							p.value = c.attr === 'DEMAND' ? c.value * 1000 : c.value;
+						}
+					}
+					r.prem.push(p);
+					state = 'cond';
+					return;
+				}
+				// an action: THEN or ELSE opens its list, AND continues the one in force
+				if (c.join === 'THEN') { state = 'then'; } else if (c.join === 'ELSE') { state = 'else'; }
+				l = linkOf[c.id];
+				if (!l || (l.type === 'pipe' && l.status === 'cv')) { fail = true; return; }   // errors 204 and 207
+				a = { link: String(c.id), status: A_NUMBER, setting: null };
+				w = String(c.valueText || '');
+				s = statusWord(w);
+				if (s !== A_NUMBER) { a.status = s; }
+				else {
+					v = c.value;
+					if (!isFinite(v) || !(v >= 0)) { fail = true; return; }          // error 202
+					if (l.type === 'valve' && String(l.valveType).toUpperCase() === 'GPV') { fail = true; return; }
+					if (l.type === 'pipe') { a.status = v === 0 ? A_CLOSED : A_OPEN; }
+					else { a.setting = v; }
+				}
+				(state === 'else' ? r.els : r.then).push(a);
+			});
+			if (fail || !r.prem.length || !r.then.length) { bad.push(name); return; }
+			rules.push(r);
+		});
+		return { rules: rules, bad: bad };
 	}
 
 	// One tank in EPANET's internal units (input1.c, input3.c).

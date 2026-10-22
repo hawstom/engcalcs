@@ -1,4 +1,4 @@
-// THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP ON THE SHIPPED EXAMPLES (Task 733, phase 3, slices 2-3).
+// THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP ON THE SHIPPED EXAMPLES (Task 733, phase 3, slices 2-4).
 //
 //   node dev/lpn-spike/native-eps-examples-harness.js
 //
@@ -8,13 +8,14 @@
 // EngCalcs.lpnNativeRun and by EngCalcs.lpnEpanetRun (the vendored EPANET 2.3.5). At every reporting
 // step every head, tank level and link flow must agree, and every link's open/closed status.
 //
-// AS SHIPPED, every one of them is refused by name (each runs water quality and states [ENERGY],
-// and the Net1 ones have [RULES] as well), which is the caller's cue to use EPANET and the answer
-// the slice owes it. So each is then compared with what the loop does not yet own TAKEN OFF, from
-// both engines alike: water quality and pump energy, which change no head or flow in EPANET (quality
-// is worked out after the hydraulics; energy is bookkeeping), and [RULES], which DO change the
-// hydraulics -- an example compared without its rules says so in its name. Each example must have
-// controls; an example losing them fails rather than passing on nothing.
+// AS SHIPPED, every one of them is refused by name (each runs water quality and states [ENERGY]),
+// which is the caller's cue to use EPANET and the answer the slice owes it. So each is then compared
+// with what the loop does not yet own TAKEN OFF, from both engines alike: water quality and pump
+// energy, which change no head or flow in EPANET (quality is worked out after the hydraulics; energy
+// is bookkeeping). SLICE 4 owns [RULES], so the three Net1 examples (Net1, Net1-SI, Net1-Scenarios)
+// are compared WITH their rules, which DO change the hydraulics, and each must arrive on the model
+// with them and with its pump switching. Each example must have controls; an example losing them
+// fails rather than passing on nothing.
 //
 // SLICE 3, PUMP SPEED PATTERNS. No gallery example ships one, so every example with a pump and a
 // period (a duration; the Basic examples and Elm Street are single instants) is
@@ -66,6 +67,7 @@ function withSpeedPattern(file) {
 }
 
 async function compare(file, text) {
+	const rulesInDoc = !text && (docOf(file).rules || []).length > 0;
 	L.applySaved(L.acceptImportedText(text || fs.readFileSync(ROOT + 'examples/' + file, 'utf8')));
 	EC.lpnTimeArrived();
 	const model = L.currentModel();
@@ -87,10 +89,11 @@ async function compare(file, text) {
 			refused.map((r) => r.code).join(', '));
 	}
 	const hadRules = !!(model.rules && model.rules.length);
-	delete model.quality; delete model.msx; delete model.energy; delete model.rules;
+	if (!text && rulesInDoc && !hadRules) { ok(file + ' reaches the model with its rules', false, 'no rules on the model'); return; }
+	delete model.quality; delete model.msx; delete model.energy;
 	const still = EC.lpnNativeRunRefusals(model);
 	if (still.length) { ok(file + ' with quality, energy and rules off', false, 'still refused: ' + JSON.stringify(still)); return; }
-	file += hadRules ? ', quality, energy AND RULES off' : ', quality and energy off';
+	file += hadRules ? `, quality and energy off, ${model.rules.length} RULES on` : ', quality and energy off';
 	const epa = await EC.lpnEpanetRun(JSON.parse(JSON.stringify(model)));
 	const nat = EC.lpnNativeRun(model);
 	if (!epa.ok || !nat.ok) { ok(file, false, `ok native=${nat.ok} epanet=${epa.ok} ` + JSON.stringify(nat.issues || epa.issues || '')); return; }
