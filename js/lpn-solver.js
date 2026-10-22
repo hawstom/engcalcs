@@ -1814,7 +1814,7 @@ EngCalcs.lpnCustomPumpCoeffs = function (c, s, q, gradMin) {
 //
 //   1 point                    -- POWER LAW H = h0 - a Q^b through shutoff 1.33334 H at zero flow,
 //                                 the point, and zero head at twice its flow. b is then
-//                                 ln(1.33334/0.33334)/ln 2 = 1.99996, not 2: EPANET's own number.
+//                                 ln(1.33334/0.33334)/ln 2 = 1.99998, not 2: EPANET's own number.
 //   3 points, the first at Q=0 -- POWER LAW through all three, h0 the first head.
 //   anything else              -- CUSTOM: two points, three not starting at zero, four or more.
 //                                 EPANET uses the points themselves, as straight segments
