@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**14 still to read on master**, of 174 untranslated keys, of 3193 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**17 still to read on master**, of 177 untranslated keys, of 3196 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (174, 14 to read @@ NEEDS RULING)
+## lpn_  (177, 17 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -532,6 +532,15 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_theme_space`**
   > Space
   _Ruled OK 2026-10-20._
+- **`lpn_time_run_see_report`**
+  > See the {report}.
+  @@ NEEDS RULING
+- **`lpn_time_run_unbalanced`**
+  > Time steps not balanced ({n}).
+  @@ NEEDS RULING
+- **`lpn_time_run_warnings`**
+  > Warnings ({n}).
+  @@ NEEDS RULING
 - **`lpn_when`**
   > Reporting step tested
   _Ruled OK 2026-10-20._
@@ -558,7 +567,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**16 still to read**, of 59 new keys across 7 unmerged branch(es).
+**16 still to read**, of 59 new keys across 8 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -580,13 +589,13 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/import-export-receipts (`9b361e3b2`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/import-export-receipts (`f67b90856`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_calib_scenario`**
   > Compared with the results of the scenario {scenario}.
   @@ NEEDS RULING
 - **`lpn_pane_pasted_overrides`**
-  > Overrides added ({n}).
+  > New overrides ({n}).
   @@ NEEDS RULING
 - **`lpn_run_of_scenario`**
   > Results of the scenario {scenario}.
@@ -594,7 +603,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/native-eps-3 (`8ba86b1a0`) — adds no English strings
 
-### feat/sqlite-reader (`192fa5a63`) — 53 new, 10 to read @@ NEEDS RULING
+### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
   > WaterCAD or WaterGEMS model…
@@ -669,7 +678,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not imported: the day of the week and month multipliers of these patterns.
   _Ruled OK 2026-10-20._
 - **`lpn_wtg_note_pattern_continuous`**
-  > These patterns are continuous in the model: the multiplier changes in a straight line between points. An EPANET pattern is stepwise, so each was written as WaterGEMS writes it for EPANET: the starting multiplier, then the value on that line at every pattern time step.
+  > These patterns are continuous in the model: the multiplier changes in a straight line between points. An EPANET pattern is stepwise, so each was written as WaterGEMS writes it for EPANET: the starting multiplier, then the value on that line at every pattern time step. WaterGEMS's own solver instead applies a continuous pattern as the average over each time step, so results will not match WaterGEMS hour by hour.
   @@ NEEDS RULING
 - **`lpn_wtg_note_pattern_irregular`**
   > These patterns have times that are not whole multiples of the pattern time step. Each was read at that time step.
@@ -755,6 +764,8 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_working`**
   > Reading {file}…
   _Ruled OK 2026-10-20._
+
+### feat/theme-default (`c926197b3`) — adds no English strings
 
 ### feat/value-source (`e1b009518`) — 1 new, 1 to read @@ NEEDS RULING
 
