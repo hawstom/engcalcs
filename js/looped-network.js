@@ -1973,12 +1973,11 @@ var EngCalcs = EngCalcs || {};
 			// to EVERY label, its own link's included: the link's label belongs beside its volute,
 			// never on it. Left out, labels were written over valves (the label bench, round 6:
 			// 51 at five zooms on one bent-and-valved network). The box is positionPumpSymbol()'s:
-			// the END nodes' midpoint, turned to the from->to line, pumpSymbolSize() square.
+			// linkSymbolPlace()'s point and angle, pumpSymbolSize() square.
 			if (le && le.symbolG) {
-				a = nodeAt(nodeById(l.from)); b = nodeAt(nodeById(l.to)); sz = pumpSymbolSize(l.type);
-				if (a && b) {
-					vb = Collide.box((a.x + b.x) / 2, (a.y + b.y) / 2, sz, sz,
-						Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI);
+				sz = pumpSymbolSize(l.type); a = linkSymbolPlace(l);
+				if (a) {
+					vb = Collide.box(a.x, a.y, sz, sz, a.angle);
 					vb.kind = 'symbol';
 					out.boxes.push(vb);
 				}
@@ -3247,7 +3246,7 @@ var EngCalcs = EngCalcs || {};
 			// The staircase, as drawn: a stack hung left of its point is drawn with its rows flush
 			// against the point (layoutLinkLabelAt()), as Collide.labelLineBoxes() models it.
 			out.push({ w: w, h: h, lines: rows, nVal: q.lines.length, area: area,
-				form: { lines: q.lines, stacked: q.stacked, key: levelFormKey(q.lines, q.stacked), wPx: q.m.wPx } });
+				form: { lines: q.lines, stacked: q.stacked, key: levelFormKey(q.lines, q.stacked), wPx: q.m.wPx, rowWPx: q.m.rowWPx || null } });
 		});
 		out.sort(function (a, b) { return (b.nVal - a.nVal) || (a.area - b.area) || ((a.form.stacked ? 1 : 0) - (b.form.stacked ? 1 : 0)); });
 		return out;
@@ -3850,12 +3849,24 @@ var EngCalcs = EngCalcs || {};
 			lh = fs * 1.2,
 			rowsPx = (hold && hold.rowWPx && hold.rowWPx.length) ? hold.rowWPx : null,
 			wPx = (hold && (hold.twPx || hold.widthPx)) || 0,
+			form = (hold && hold.text === textEl && hold.levelBeside && hold.levelForm && hold.levelGlyphs === hold.levelForm.key) ? hold.levelForm : null,
 			n = rowsPx ? rowsPx.length : labelHitRowCount(textEl),
 			hAlign = textEl.getAttribute('text-anchor') || 'start',
 			db = textEl.getAttribute('dominant-baseline'),
 			vAlign = db === 'hanging' ? 'hanging' : (db === 'central' ? 'middle' : 'baseline'),
 			wMax = rowsPx ? Math.max.apply(null, rowsPx) / s : wPx / s,
 			box, d = '', i, rw, rx, ry, tr;
+		// **A LEVEL PIPE LABEL SHOWN IN ANOTHER FORM IS GRABBED AS THAT FORM** (syncLevelGlyphs()).
+		// The holder's banked widths belong to the content the shed settled on; the level pass then
+		// writes a different form (the whole line, or a stack) into the same <text> without measuring
+		// it, so the banked figures describe words that are no longer drawn -- on Net3 a 118 px line
+		// was grabbed over 53 px of it. The form carries the widths it was priced from.
+		if (form) {
+			wPx = form.wPx;
+			rowsPx = (form.stacked && form.rowWPx && form.rowWPx.length > 1) ? form.rowWPx : [form.wPx];
+			n = rowsPx.length;
+			wMax = Math.max.apply(null, rowsPx) / s;
+		}
 		// An EMPTY label has no words to grab. Its banked width is whatever it last said, so
 		// without this a label the toggles just emptied would keep a phantom box on the map.
 		if (!(wMax > 0) || !String(textEl.textContent || '').length) { hit.setAttribute('d', ''); return; }
@@ -13789,18 +13800,25 @@ var EngCalcs = EngCalcs || {};
 	// The pump-orientation rule, verified over all 25 angles at 15-degree steps: rotate to point the
 	// discharge at the `to` node, and flip vertically first whenever the pipe runs west (dx < 0), or
 	// the tail swings under the casing for every westward pump. The boundary is on dx, never dy: at
-	// dx = 0 the tail lands horizontal and either variant is right. Positioned from the link's own
-	// from/to nodes only, ignoring verts.
+	// dx = 0 the tail lands horizontal and either variant is right. Positioned by linkSymbolPlace().
 
+	// **A PUMP OR VALVE SITS AT THE HALF-WAY POINT OF THE WHOLE POLYLINE, TURNED TO THE SEGMENT IT
+	// LANDS ON** -- the same station the link's label and the DXF block use. It used to take the END
+	// nodes' chord, which on a bent pipe is off the pipe altogether (the WTG import, 2026-10-19).
+	// One answer for the drawing, the hit shape and the label obstacle box.
+	function linkSymbolPlace(l) {
+		var pts = linkPointList(l), p = Geom.pointAlongPolyline(pts, 0.5),
+			si = Geom.segmentAtFraction(pts, 0.5).index, a = pts[si], b = pts[si + 1];
+		if (!b) { return null; }
+		return { x: p.x, y: p.y, angle: Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI, flip: (b.x - a.x) < 0 };
+	}
 	function positionPumpSymbol(id) {
 		var l = linkById(id), le = linkEls[id];
 		if (!le || !le.symbolG) { return; }
-		var a = nodeAt(nodeById(l.from)), b = nodeAt(nodeById(l.to)),
-			mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2,
-			angle = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI,
-			flip = (b.x - a.x) < 0;
+		var pl = linkSymbolPlace(l);
+		if (!pl) { return; }
 		le.symbolG.setAttribute('transform',
-			'translate(' + mx + ',' + my + ') rotate(' + angle + ')' + (flip ? ' scale(1,-1)' : ''));
+			'translate(' + pl.x + ',' + pl.y + ') rotate(' + pl.angle + ')' + (pl.flip ? ' scale(1,-1)' : ''));
 		// The grab shape is a CHILD of symbolG, so it takes that rotate and flip for nothing: the
 		// pointer meets the volute at the angle it is drawn at, and the rotate/flip rule is still
 		// written exactly once. Its own box is set by resizePumpSymbol().
@@ -24105,14 +24123,13 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	// Where the map has to go to show this element. A link has no point of its own, so it is the
-	// midpoint of its ends -- good enough to put a pipe on screen, and it needs no vertex walk.
+	// half-way point along its whole length, so a bent pipe is found on the pipe.
 	function findPointOf(cand) {
 		var a, b;
 		if (cand.group === 'node') { return nodeAt(cand.el); }
 		if (cand.group === 'link') {
-			a = nodeAt(nodeById(cand.el.from)); b = nodeAt(nodeById(cand.el.to));
-			if (!a || !b) { return null; }
-			return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+			if (!nodeAt(nodeById(cand.el.from)) || !nodeAt(nodeById(cand.el.to))) { return null; }
+			return pointAlongLink(cand.el, 0.5);
 		}
 		if (cand.group === 'customer') { return customerPoint(cand.el); }
 		if (cand.group === 'shape') { var sb = shapeBox(cand.el); return sb ? { x: (sb.x0 + sb.x1) / 2, y: (sb.y0 + sb.y1) / 2 } : null; }
