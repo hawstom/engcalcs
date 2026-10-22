@@ -342,6 +342,7 @@ const CONDITIONAL_DISPLAY = [
 	[/^refreshScenariosTab$/, /^b$/, 'the Scenarios tab button in the Tables pane strip: shown with Basic mode off, hidden with it on'],
 	[/^paintEngineBanner$/, /^el$/, 'the engine-wait banner across the top of the map: text only'],
 	[/^tsbPlaceAll$/, /^rec\.root$/, 'a time series graph bubble (Task 784) shown or hidden by whether its asset is on the map; see the NOT_A_PANEL entry for the same bubble'],
+	[/^showRunReportScenario$/, /^el$/, 'the scenario line inside the open Run report box: text only, shown when the project holds more than Base'],
 	[/^openDialog$/, /^title$/, 'the modal dialog\'s own title band (Task 710): shown when a question names one, inside #lpn_dialog, holding no control']
 ];
 // What section 2c owns instead, as function + element.
