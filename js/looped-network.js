@@ -41269,7 +41269,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// the key, and "exactly as a brand-new visitor would see it" has to mean that too.
 			// Erasing a key we no longer write is the one direction that is always safe.
 			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY, LPN_SCNBASIC_KEY, LPN_HOVERCARD_KEY,
-			LPN_CLEANMAP_KEY, LPN_OVRMARKS_KEY,
+			LPN_CLEANMAP_KEY, LPN_OVRMARKS_KEY, LPN_CALCHINT_KEY,
 			// 'lpn_theme' (Task 714): a literal because the key is owned by the page head's window.ecTheme.
 			'lpn_theme'];
 		try {
@@ -55035,6 +55035,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// under at the foot of the file, not a function in scope here.
 					if (EngCalcs.lpnTimeRunNow) { EngCalcs.lpnTimeRunNow(); }
 					else { runSolve(); }
+					calcHintMaybe();
 				}
 			},
 			// **FIRE FLOW AND CRITICALITY SIT IN AN ANALYZE FLY-OUT, WITH CALCULATE** (Task 754;
@@ -64175,8 +64176,62 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		initTipsIn(box);
 		if (!setboxLayout.open) { setboxLayout.open = true; saveSetboxLayout(); }
 	}
+	// ---- THE CALCULATE HINT (Tom, 2026-10-21) --------------------------------------------------
+	//
+	// Tom: *"Our usage logs show that people are using the Water, Calculate button, which makes no
+	// sense."* With Recalculate automatically on the command does nothing the page was not already
+	// doing, so choosing it opens Settings at that row, marks the row, and says so once per press
+	// until the visitor asks never to be told again. **THE COMMAND STILL RUNS**; the hint never
+	// blocks it. The one door is the Water menu row: the toolbar button is hidden while the setting
+	// is on, and an automatic recalculation never passes through here. The remembered "do not show
+	// again" is window furniture (`lpn_calchint`, localStorage only, written only when asked).
+	var LPN_CALCHINT_KEY = 'lpn_calchint', calcHintFlashTimer = 0;
+	function calcHintMuted() {
+		try { return localStorage.getItem('lpn_calchint') === '0'; } catch (e) { return false; }
+	}
+	function calcHintHide() {
+		var row;
+		if (calcHintFlashTimer) { clearTimeout(calcHintFlashTimer); calcHintFlashTimer = 0; }
+		row = document.querySelector('#lpn_settings_box .lpn-set-row-flash');
+		if (row) { row.classList.remove('lpn-set-row-flash'); }
+	}
+	// The message is the page's one question box (askDialog), centred over the map like every other
+	// alert (Tom, 2026-10-21: "That is not a standard alert. Put a box in the middle of the map.").
+	// Settings opens behind it at once with the row marked, so the row is already in view when OK is
+	// pressed.
+	function calcHintMaybe() {
+		var pc = EngCalcs.pageConfig || {}, box, row, rows, i, hold;
+		if (scnSetting('autoRun') === false || calcHintMuted()) { return; }
+		openSettingsBox('calc');
+		box = setboxEl();
+		calcHintHide();
+		rows = box ? box.querySelectorAll('[data-lpn-setting]') : [];
+		for (i = 0; i < rows.length; i++) {
+			if (rows[i].getAttribute('data-lpn-setting') === '[["settings","autoRun"]]') { row = rows[i]; break; }
+		}
+		hideOpenTips();
+		if (row) {
+			row.classList.add('lpn-set-row-flash');
+			if (row.scrollIntoView) { row.scrollIntoView({ block: 'center' }); }
+			// Transient, like every mark in this box: it goes on a timer or at the first press inside.
+			hold = function () { box.removeEventListener('pointerdown', hold, true); calcHintHide(); };
+			box.addEventListener('pointerdown', hold, true);
+			calcHintFlashTimer = setTimeout(function () { calcHintFlashTimer = 0; row.classList.remove('lpn-set-row-flash'); }, 6000);
+		}
+		askDialog({
+			kind: 'choice',
+			text: pc.lpn_calc_hint || 'When “Recalculate automatically” is on, this command is not needed.',
+			choices: [
+				{ label: pc.lpn_dialog_ok || 'OK', value: 'ok', isDefault: true, cancel: true },
+				{ label: pc.lpn_calc_hint_mute || 'Don’t show this again', value: 'mute' }
+			]
+		}, function (v) {
+			if (v === 'mute') { try { localStorage.setItem('lpn_calchint', '0'); } catch (e) {} }
+		});
+	}
 	function closeSettingsBox() {
 		var box = setboxEl();
+		calcHintHide();
 		hidePanel(box);
 		// **GUARDED, AND HERE THAT IS NOT AN OPTIMISATION.** Escape calls this on every press,
 		// whether or not the box is showing, so an unguarded write would put a storage write on a

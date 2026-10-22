@@ -1779,6 +1779,8 @@ $ec_lang['lpn_run_menu_tip']='Run simulation. Unnecessary when "Recalculate auto
 $ec_lang['lpn_settings_auto_run']='Recalculate automatically';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_auto_run_tip']='Turn off if recalculation is too slow. While this is on, the Calculate button is hidden.';
+$ec_lang['lpn_calc_hint']='When “Recalculate automatically” is on, this command is not needed.';
+$ec_lang['lpn_calc_hint_mute']='Don’t show this again';
 // **AN EDIT SAYS NOTHING AT ALL WHEN THE SWITCH IS OFF** (Tom, 2026-09-19: *"Recalc off Old
 // values: Leave in place stale. Don't clear. Trust the user."*). `lpn_manual_results_cleared`
 // stood here for part of one day and is DELETED, English-only, never translated: it announced a
