@@ -5440,6 +5440,21 @@ var EngCalcs = EngCalcs || {};
 		var ov = localOverrideMap(activeScenario(), categoryOf(prop, elGroup(el)))[ovKey(el)];
 		return !!(ov && Object.prototype.hasOwnProperty.call(ov, prop));
 	}
+	// **WHERE AN INHERITED VALUE COMES FROM, BY NAME**: the nearest layer of the chain the open
+	// scenario resolves through (treeLayers()) that states any of `props` for this element, else
+	// Base. A scenario's layer is named for the scenario, a stored alternative's for itself. Read for
+	// the hollow dot's tip, so it only runs when a row's marker is built.
+	function inheritedSourceName(el, props) {
+		var key = ovKey(el), has = Object.prototype.hasOwnProperty, layers = treeLayers(activeScenario(), categoryOf(props[0], elGroup(el))), i, map, ov;
+		for (i = 0; i < layers.length; i++) {
+			map = layers[i].kind === 'scn' ? layers[i].obj.overrides : (layers[i].kind === 'alt' ? layers[i].obj.values : null);
+			ov = plainObject(map) ? map[key] : null;
+			if (plainObject(ov) && props.some(function (p) { return has.call(ov, p); })) {
+				return layers[i].kind === 'scn' ? scenarioDisplayName(layers[i].obj) : String(layers[i].obj.name || '');
+			}
+		}
+		return scenarioDisplayName(baseScenario());
+	}
 	// Base's OWN value for a property, ignoring whatever the active scenario says -- what the
 	// popup shows beside an overridden field, and what clearing a marker returns the field to.
 	function baseValue(el, prop) {
@@ -69763,7 +69778,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				refreshPopupIfOpen();
 			}));
 		} else {
-			g.appendChild(ovmCell('lpn-ovm-hollow', pc.lpn_ovm_dot_set || 'Inherited. Click to make it an override in this scenario, holding the value shown.', function () {
+			g.appendChild(ovmCell('lpn-ovm-hollow', (pc.lpn_ovm_dot_set_from || 'Inherited from {name}. Click to make it an override in this scenario, holding the value shown.').split('{name}').join(inheritedSourceName(o.el, o.props)), function () {
 				saveUndoSnapshot();
 				o.set();
 				afterPropertyEdit(o.el);
