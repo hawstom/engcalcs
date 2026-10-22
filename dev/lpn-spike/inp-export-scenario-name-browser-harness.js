@@ -80,8 +80,10 @@ async function main() {
 			await a.settle(500);
 			if (await a.dialog()) { await a.dialogClick((await L('lpn_export_table_go')).trim()); }
 			await p;
-			await page.keyboard.press('Escape');
 			await a.settle(600);
+			// Every export ends in a receipt dialog (Task 814); the visitor presses OK.
+			if (await a.dialog()) { await a.dialogClick((await L('lpn_dialog_ok')).trim()); }
+			await a.settle(300);
 			return dl ? dl.suggestedFilename() : null;
 		};
 		const toScenario = async (name) => {

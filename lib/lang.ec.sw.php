@@ -4376,7 +4376,6 @@ $ec_lang['lpn_fitting_other']='Kiungio kingine';
 // pipe type loses its INDIRECTION while every number still goes out byte for byte, and a fittings
 // list loses its ITEMISATION while the total goes out exactly as it stood. It names EPANET because
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
-$ec_lang['lpn_inp_export_flat_heading']='{file} imehifadhiwa';
 $ec_lang['lpn_inp_export_flat_lead']='Faili la EPANET lililohamishwa ni sawa kwa hesabu na mradi huu. Lakini halina nafasi kwa mambo yafuatayo:';
 $ec_lang['lpn_inp_export_flat_types']='Mabomba hapa ({n}) yanarejelea aina za bomba ({t}). Kwenye faili kila bomba kati ya hayo lina nakala yake ya namba, hivyo matokeo ni yale yale. Kisichoweza kuhifadhiwa na faili ni aina ya bomba yenyewe, kwa hiyo uhusiano kati ya ufafanuzi mmoja na kila bomba linalouitumia unarekodiwa kwenye faili la mradi pekee.';
 $ec_lang['lpn_inp_export_flat_coords']='Faili la EPANET lina nafasi moja kwa kila kifundo. Senario hii inaweka {n} kati yake mahali pengine, na hizo ndizo nafasi zilizo kwenye faili. Kila senario nyingine huhifadhi nafasi zake kwenye faili la mradi pekee.';

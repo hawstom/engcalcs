@@ -88,7 +88,7 @@ L.seedDefaultInputs();
 // two fully open gate valves at 0.2, which is 4 x 0.6 + 2 x 0.2 = 2.8 exactly.
 function fixture() {
 	return {
-		v: 11, format: 'hawsedc-lpn', project: { name: 'fittings', activeScenario: 'base' },
+		v: 11, format: 'hawsedc-lpn', project: { name: 'plain', activeScenario: 'base' },
 		scenarios: [
 			{ id: 'base', name: 'Base', isBase: true, overrides: {} },
 			{ id: 's1', name: 'Refitted', overrides: {} }

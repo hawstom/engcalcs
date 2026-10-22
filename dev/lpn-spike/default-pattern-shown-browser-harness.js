@@ -108,6 +108,8 @@ async function main() {
 			await a.menuClickSub(await a.lang('lpn_file_export_menu'), await a.lang('lpn_file_export_item_inp'), 'file');
 			for (let i = 0; i < 60 && got.length < 1; i++) { await a.page.waitForTimeout(100); }
 			a.page.off('download', onDl);
+			await a.settle(500);
+			await closeDialogs();   // the export's receipt dialog (Task 814)
 			if (!got.length) { return ''; }
 			let buf = fs.readFileSync(await got[0].path());
 			if (buf.readUInt32LE(0) === 0x04034b50) {
