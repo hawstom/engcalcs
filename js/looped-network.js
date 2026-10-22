@@ -5592,6 +5592,10 @@ var EngCalcs = EngCalcs || {};
 	// {id, own, inh} naming it on both sides; a held set no graph of which differs is the one item it
 	// always was, so a set equal to what it replaces still counts, as every override does.
 	function ovlIsBubbleSet(it) { return !!it.path && it.path.length === 1 && it.path[0] === 'bubbles'; }
+	function ovlSetsEqual(x, y) {
+		var sig = function (l) { return tsbClean(l || []).map(ovlBubbleSig).sort().join('|'); };
+		return sig(x) === sig(y);
+	}
 	function ovlBubbleSig(b) { return JSON.stringify(tsbClean([b])[0] || null); }
 	function ovlBubbleItems(it, inh) {
 		var own = Array.isArray(it.value) ? it.value : [], from = inh && !inh.none && Array.isArray(inh.value) ? inh.value : [],
@@ -5642,6 +5646,8 @@ var EngCalcs = EngCalcs || {};
 			if (!el) { return { none: true }; }
 			if (it.prop === 'demands') {
 				rows = [{ base: baseValue(el, 'demand') }];
+				if (el.demandPattern !== undefined) { rows[0].pattern = el.demandPattern; }
+				if (el.demandCategory !== undefined) { rows[0].category = el.demandCategory; }
 				(el.extraDemands || []).forEach(function (d) { rows.push(d); });
 				return { value: rows };
 			}
@@ -82409,6 +82415,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	//
 	// The groups: [{cat, name, items: [{asset, id, group, property, value, inherited, valueTip, inhTip}]}],
 	// in category order, the scenario's own values before the alternative it names.
+	// Two stored values equal EXACTLY, not as the list prints them: numbers by value (18.0000004 is not 18),
+	// lists and objects member by member (`tok`, the typed characters, is not a value). A member that is absent, null or an empty string counts the
+	// same as one that is missing, because the holders write it either way. The "(same)" mark and the
+	// Clear overrides equal to inherited button both read this, so they cannot disagree.
+	function ovlValuesEqual(a, b) {
+		var ka, kb, i, has = Object.prototype.hasOwnProperty;
+		function blank(v) { return v === undefined || v === null || v === ''; }
+		if (blank(a) || blank(b)) { return blank(a) && blank(b); }
+		if (Array.isArray(a) || Array.isArray(b)) {
+			if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) { return false; }
+			for (i = 0; i < a.length; i++) { if (!ovlValuesEqual(a[i], b[i])) { return false; } }
+			return true;
+		}
+		if (typeof a === 'object' && typeof b === 'object') {
+			ka = Object.keys(a).filter(function (k) { return k !== 'tok' && !blank(a[k]); });
+			kb = Object.keys(b).filter(function (k) { return k !== 'tok' && !blank(b[k]); });
+			if (ka.length !== kb.length) { return false; }
+			for (i = 0; i < ka.length; i++) { if (!has.call(b, ka[i]) || !ovlValuesEqual(a[ka[i]], b[ka[i]])) { return false; } }
+			return true;
+		}
+		return a === b;
+	}
 	function ownOverrideGroups(scn) {
 		var groups = [], byHolder = {};
 		ownOverrideItems(scn).forEach(function (it) {
@@ -82434,7 +82462,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			o.inherited = own.text; o.inhTip = own.tip;
 			// Equal to what it replaces, and still counted (Tom, 2026-10-05: *"It's still an override?
 			// Yes."*): said beside the value, so the count needs no explaining.
-			o.same = !inh.none && o.value === o.inherited && (o.valueTip || '') === (o.inhTip || '');
+			o.same = !inh.none && ovlValuesEqual(it.value, inh.value);
 			o.item = it;
 			g.items.push(o);
 		});
@@ -82458,7 +82486,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			lp = smLeafParts(it.path);
 			own = tsbSummaryText(it.value); inh = tsbSummaryText(it.inhList);
 			return { asset: lp.owner, id: null, group: null, gone: false, property: lp.setting, value: own, valueTip: '',
-				inherited: inh, inhTip: '', same: true, item: it };
+				inherited: inh, inhTip: '', same: ovlSetsEqual(it.value, it.inhList), item: it };
 		}
 		rec = b.own || b.inh;
 		parts = smItemParts(ovKeyFor(rec.g === 'link' ? 'link' : 'node', rec.n), '');
@@ -82523,7 +82551,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (dialogIsOpen()) { smActListOverrides(key, top); }
 		}
 		openDialog(function (body) {
-			var bar, all;
+			var bar, all, same, sameItems;
 			ffEl('p', 'lpn-dialog-msg', (pc.lpn_scenario_overrides || 'No. of overrides') + ': ' + n, body);
 			if (!n) { ffEl('p', 'lpn-ff-note', pc.lpn_sm_list_overrides_none || 'This scenario has no overrides.', body); }
 			else { ffEl('p', 'lpn-ff-note', pc.lpn_ovl_note || 'These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Clear an override to restore the inherited value; Undo reverses it. Select an ID to go to the asset on the map.', body); }
@@ -82535,6 +82563,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				clearSel.addEventListener('click', function () {
 					var items = picks.filter(function (p) { return p.box.checked; }).map(function (p) { return p.o.item; });
 					if (items.length) { clearNow(items); }
+				});
+				sameItems = [];
+				groups.forEach(function (g) { g.items.forEach(function (o) { if (o.same) { sameItems.push(o.item); } }); });
+				same = ffEl('button', 'lpn-ovl-clearsame', pc.lpn_ovl_clear_same || 'Clear overrides equal to inherited', bar);
+				same.type = 'button';
+				same.disabled = !sameItems.length;
+				same.addEventListener('click', function () {
+					closeDialog();
+					askDialog({ kind: 'confirm', text: (pc.lpn_ovl_clear_same_ask || 'Clear the overrides of {name} that equal the inherited value ({n} total)? Each value stays as it is and is inherited again. Undo reverses this.')
+						.replace('{n}', String(sameItems.length)).replace(/\{name\}/g, scenarioDisplayName(scn)) }, function (yes) {
+						if (yes) { ovlClearItems(scn, sameItems); }
+						smActListOverrides(key);
+					});
 				});
 				all = ffEl('button', 'lpn-ovl-clearall', pc.lpn_ovl_clear_all || 'Clear all overrides', bar);
 				all.type = 'button';
