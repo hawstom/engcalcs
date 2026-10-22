@@ -64116,63 +64116,44 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		try { return localStorage.getItem('lpn_calchint') === '0'; } catch (e) { return false; }
 	}
 	function calcHintHide() {
-		var el = document.getElementById('lpn_setbox_calchint'), row;
-		if (el && el.parentNode) { el.parentNode.removeChild(el); }
+		var row;
 		if (calcHintFlashTimer) { clearTimeout(calcHintFlashTimer); calcHintFlashTimer = 0; }
 		row = document.querySelector('#lpn_settings_box .lpn-set-row-flash');
 		if (row) { row.classList.remove('lpn-set-row-flash'); }
 	}
+	// The message is the page's one question box (askDialog), centred over the map like every other
+	// alert (Tom, 2026-10-21: "That is not a standard alert. Put a box in the middle of the map.").
+	// Settings opens behind it at once with the row marked, so the row is already in view when OK is
+	// pressed.
 	function calcHintMaybe() {
-		var pc = EngCalcs.pageConfig || {}, box, host, el, msg, mute, x, row, rows, i, hold;
+		var pc = EngCalcs.pageConfig || {}, box, row, rows, i, hold;
 		if (scnSetting('autoRun') === false || calcHintMuted()) { return; }
 		openSettingsBox('calc');
 		box = setboxEl();
-		host = box && box.querySelector('.lpn-setbox-body');
-		if (!host) { return; }
 		calcHintHide();
-		rows = box.querySelectorAll('[data-lpn-setting]');
+		rows = box ? box.querySelectorAll('[data-lpn-setting]') : [];
 		for (i = 0; i < rows.length; i++) {
 			if (rows[i].getAttribute('data-lpn-setting') === '[["settings","autoRun"]]') { row = rows[i]; break; }
 		}
-		el = document.createElement('div');
-		el.id = 'lpn_setbox_calchint';
-		el.className = 'lpn-calchint';
-		el.setAttribute('role', 'status');
-		msg = document.createElement('span');
-		msg.className = 'lpn-calchint-text';
-		msg.textContent = pc.lpn_calc_hint || 'When “Recalculate automatically” is on, this command is not needed.';
-		mute = document.createElement('button');
-		mute.type = 'button';
-		mute.className = 'lpn-calchint-mute';
-		mute.textContent = pc.lpn_calc_hint_mute || 'Don’t show this again';
-		mute.addEventListener('click', function () {
-			try { localStorage.setItem('lpn_calchint', '0'); } catch (e) {}
-			calcHintHide();
-		});
-		x = document.createElement('button');
-		x.type = 'button';
-		x.className = 'lpn-calchint-x';
-		x.textContent = '\u00d7';
-		x.title = pc.lpn_close || 'Close';
-		x.setAttribute('aria-label', pc.lpn_close || 'Close');
-		x.addEventListener('click', calcHintHide);
-		el.appendChild(msg);
-		el.appendChild(mute);
-		el.appendChild(x);
-		host.insertBefore(el, host.firstChild);
 		hideOpenTips();
 		if (row) {
 			row.classList.add('lpn-set-row-flash');
-			// Scrolled under the sticky heading and the hint, as every jump in this box is.
 			if (row.scrollIntoView) { row.scrollIntoView({ block: 'center' }); }
 			// Transient, like every mark in this box: it goes on a timer or at the first press inside.
-			hold = function (e) {
-				if (e && e.target && el.contains(e.target)) { return; }
-				box.removeEventListener('pointerdown', hold, true); calcHintHide();
-			};
+			hold = function () { box.removeEventListener('pointerdown', hold, true); calcHintHide(); };
 			box.addEventListener('pointerdown', hold, true);
 			calcHintFlashTimer = setTimeout(function () { calcHintFlashTimer = 0; row.classList.remove('lpn-set-row-flash'); }, 6000);
 		}
+		askDialog({
+			kind: 'choice',
+			text: pc.lpn_calc_hint || 'When “Recalculate automatically” is on, this command is not needed.',
+			choices: [
+				{ label: pc.lpn_dialog_ok || 'OK', value: 'ok', isDefault: true, cancel: true },
+				{ label: pc.lpn_calc_hint_mute || 'Don’t show this again', value: 'mute' }
+			]
+		}, function (v) {
+			if (v === 'mute') { try { localStorage.setItem('lpn_calchint', '0'); } catch (e) {} }
+		});
 	}
 	function closeSettingsBox() {
 		var box = setboxEl();

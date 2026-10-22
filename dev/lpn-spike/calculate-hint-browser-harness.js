@@ -44,12 +44,13 @@ const SHOT = (n) => { try { require('fs').mkdirSync(IMG, { recursive: true }); }
 
 const STATE = () => {
 	const box = document.getElementById('lpn_settings_box');
-	const hint = document.getElementById('lpn_setbox_calchint');
+	const dlg = document.getElementById('lpn_dialog');
+	const hint = dlg && dlg.style.display === 'block' ? dlg : null;
 	const flash = box && box.querySelector('.lpn-set-row-flash');
 	const rect = (e) => { if (!e) { return null; } const r = e.getBoundingClientRect(); return { l: r.left, t: r.top, r: r.right, b: r.bottom, w: r.width, h: r.height }; };
 	return {
 		boxOpen: !!box && box.style.display === 'flex',
-		hint: !!hint && hint.offsetParent !== null, hintText: hint ? hint.querySelector('.lpn-calchint-text').textContent : '',
+		hint: !!hint, hintText: hint ? hint.querySelector('.lpn-dialog-msg').textContent : '', hintRect: rect(hint), buttons: hint ? [...hint.querySelectorAll('#lpn_dialog_buttons button')].map((b) => b.textContent) : [], custom: !!document.querySelector('.lpn-calchint'),
 		flashRow: flash ? flash.textContent.slice(0, 60) : null,
 		flashRect: rect(flash), boxRect: rect(box), iw: window.innerWidth, ih: window.innerHeight,
 		doc: document.documentElement.scrollWidth > window.innerWidth + 1,
@@ -64,11 +65,11 @@ async function run(Session, browser, viewport, tag) {
 		await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 		await a.goto('Looped-Network.php');
 		await a.answerTrainingPanel().catch(() => {});
-		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } try { localStorage.removeItem('lpn_calchint'); } catch (e) {} });
+		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } try { localStorage.removeItem('lpn_calchint'); } catch (e) {} delete window.lpnDialogAnswerer; });
 		await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
 		await a.settle(1200);
 		const calc = await a.lang('lpn_time_run');
-		out.hintText = await a.lang('lpn_calc_hint');
+		out.hintText = await a.lang('lpn_calc_hint'); out.mute = await a.lang('lpn_calc_hint_mute');
 		out.before = await a.page.evaluate(STATE);
 		await a.page.evaluate(() => { window.__runs = 0; const f = EngCalcs.lpnTimeRunNow; EngCalcs.lpnTimeRunNow = function () { window.__runs++; return f.apply(this, arguments); }; });
 		await a.menuClick(calc, 'project');
@@ -77,8 +78,17 @@ async function run(Session, browser, viewport, tag) {
 		out.on1 = await a.page.evaluate(STATE);
 		await a.page.mouse.move(2, 2); await a.settle(500);
 		await a.page.screenshot({ path: SHOT(tag === 'desktop' ? 'calculate-hint.png' : 'calculate-hint-phone.png') });
+		// OK closes the box and remembers nothing.
+		await a.page.click('#lpn_dialog_buttons button:nth-child(1)');
+		await a.settle(300);
+		out.afterOk = await a.page.evaluate(STATE);
+		out.storedOk = await a.page.evaluate(() => { try { return localStorage.getItem('lpn_calchint'); } catch (e) { return 'err'; } });
+		await a.page.evaluate(() => { document.getElementById('lpn_setbox_close').click(); });
+		await a.settle(300);
+		await a.menuClick(calc, 'project');
+		await a.settle(900);
 		// Dismiss forever.
-		await a.page.click('.lpn-calchint-mute');
+		await a.page.click('#lpn_dialog_buttons button:nth-child(2)');
 		await a.settle(300);
 		out.afterMute = await a.page.evaluate(STATE);
 		out.stored = await a.page.evaluate(() => { try { return localStorage.getItem('lpn_calchint'); } catch (e) { return 'err'; } });
@@ -122,6 +132,11 @@ async function main() {
 			ok(tag + ': Calculate opens Settings', m.on1.boxOpen);
 			ok(tag + ': Recalculate automatically row is highlighted', !!m.on1.flashRow && m.on1.flashRow.indexOf('Recalculate automatically') === 0, m.on1.flashRow);
 			ok(tag + ': highlighted row is on screen inside the box', !!m.on1.flashRect && !!m.on1.boxRect && m.on1.flashRect.t >= m.on1.boxRect.t && m.on1.flashRect.b <= m.on1.boxRect.b + 1 && m.on1.flashRect.b <= m.on1.ih, JSON.stringify([m.on1.flashRect, m.on1.boxRect]));
+			const R = m.on1.hintRect, cx = R ? (R.l + R.r) / 2 : -1, cy = R ? (R.t + R.b) / 2 : -1;
+			ok(tag + ': standard dialog box, centred over the page, within the screen', !!R && Math.abs(cx - m.on1.iw / 2) < 40 && R.l >= 0 && R.r <= m.on1.iw && R.b <= m.on1.ih && cy > 0.2 * m.on1.ih && cy < 0.8 * m.on1.ih, JSON.stringify(R));
+			ok(tag + ': buttons are OK and Don\'t show this again', m.on1.buttons.length === 2 && m.on1.buttons[0] === 'OK' && m.on1.buttons[1] === m.mute, JSON.stringify(m.on1.buttons));
+			ok(tag + ': no custom notice element', !m.on1.custom);
+			ok(tag + ': OK closes it and stores nothing', !m.afterOk.hint && m.storedOk === null, String(m.storedOk));
 			ok(tag + ': notice shows Tom\'s sentence', m.on1.hint && m.on1.hintText === m.hintText && /not needed/.test(m.hintText), m.on1.hintText);
 			ok(tag + ': Calculate still calculated', m.runs === 1);
 			ok(tag + ': no sideways scroll', !m.on1.doc);

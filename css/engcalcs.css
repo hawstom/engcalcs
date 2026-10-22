@@ -5258,14 +5258,6 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    in the footer where nothing has to be read past it, and this line scrolls the reader to it and
    marks it for a moment. */
 .lpn-set-creditlink { font-size: .85em; margin: 0 0 4px; }
-.lpn-calchint {
-	display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px;
-	margin: 0 0 6px; padding: 6px 8px;
-	background: var(--ec-hue-fff3cd); border: 1px solid var(--ec-hue-e8a33d); border-radius: var(--ec-radius-s);
-}
-.lpn-calchint-text { flex: 1 1 14rem; }
-.lpn-calchint-mute { background: none; border: 0; padding: 4px 2px; color: inherit; text-decoration: underline; cursor: pointer; font: inherit; }
-.lpn-calchint-x { background: none; border: 0; padding: 0 6px; color: inherit; cursor: pointer; font-size: 1.3em; line-height: 1; }
 .lpn-set-flash { outline: 2px solid var(--ec-select); outline-offset: 2px; }
 /* **A NUMBER BOX IS AS WIDE AS THE NUMBERS IT HOLDS** (Tom, 2026-08-19: "Some inputs are
    gratuitously wide. Comprehensive list: Map appearance, New element prefixes and values, time,
