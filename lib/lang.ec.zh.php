@@ -4376,7 +4376,6 @@ $ec_lang['lpn_fitting_other']='其他管件';
 // pipe type loses its INDIRECTION while every number still goes out byte for byte, and a fittings
 // list loses its ITEMISATION while the total goes out exactly as it stood. It names EPANET because
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
-$ec_lang['lpn_inp_export_flat_heading']='已保存 {file}';
 $ec_lang['lpn_inp_export_flat_lead']='导出的 EPANET 文件在数值上与本项目等效，但它无法容纳以下内容：';
 $ec_lang['lpn_inp_export_flat_types']='此处引用了管道类型（{t}）的管道（{n}）。在文件中，每条管道都会各自携带一份完整的数值副本，因此计算结果不变。文件无法保留管道类型本身，因此“编辑一个定义即可让所有引用它的管道随之改变”这一特性，只有您自己的项目文件才能记录。';
 $ec_lang['lpn_inp_export_flat_coords']='EPANET 文件为每个节点只保存一个位置。本方案将其中 {n} 个节点放在了别处，文件中保存的就是这些位置。其他每个方案的位置仅保留在项目文件中。';

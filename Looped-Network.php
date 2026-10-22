@@ -2731,7 +2731,6 @@ EngCalcs.pageConfig = {
 	lpn_fitting_entrance: <?=json_encode($ec_lang['lpn_fitting_entrance'])?>,
 	lpn_fitting_exit: <?=json_encode($ec_lang['lpn_fitting_exit'])?>,
 	lpn_fitting_other: <?=json_encode($ec_lang['lpn_fitting_other'])?>,
-	lpn_inp_export_flat_heading: <?=json_encode($ec_lang['lpn_inp_export_flat_heading'])?>,
 	lpn_inp_export_flat_lead: <?=json_encode($ec_lang['lpn_inp_export_flat_lead'])?>,
 	lpn_inp_export_flat_types: <?=json_encode($ec_lang['lpn_inp_export_flat_types'])?>,
 	lpn_inp_export_flat_fittings: <?=json_encode($ec_lang['lpn_inp_export_flat_fittings'])?>,

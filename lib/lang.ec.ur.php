@@ -4376,7 +4376,6 @@ $ec_lang['lpn_fitting_other']='دیگر فٹنگ';
 // pipe type loses its INDIRECTION while every number still goes out byte for byte, and a fittings
 // list loses its ITEMISATION while the total goes out exactly as it stood. It names EPANET because
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
-$ec_lang['lpn_inp_export_flat_heading']='{file} محفوظ ہو گیا';
 $ec_lang['lpn_inp_export_flat_lead']='برآمد کی گئی EPANET فائل عددی طور پر اس پراجیکٹ کے مساوی ہے۔ لیکن اس میں درج ذیل چیزوں کے لیے کوئی جگہ نہیں ہے:';
 $ec_lang['lpn_inp_export_flat_types']='یہاں پائپ ({n}) پائپ اقسام ({t}) کا حوالہ دیتے ہیں۔ فائل میں ان میں سے ہر پائپ اعداد کی اپنی کاپی رکھتا ہے، اس لیے جوابات وہی ہیں۔ فائل پائپ کی قسم خود نہیں رکھ سکتی، اس لیے ایک تعریف اور اسے استعمال کرنے والے ہر پائپ کے درمیان رابطہ صرف پراجیکٹ فائل میں درج ہوتا ہے۔';
 $ec_lang['lpn_inp_export_flat_coords']='ایک EPANET فائل ہر نوڈ کے لیے ایک پوزیشن رکھتی ہے۔ یہ منظرنامہ ان میں سے {n} کو کہیں اور رکھتا ہے، اور یہی وہ پوزیشنیں ہیں جو فائل میں ہیں۔ ہر دوسرا منظرنامہ اپنی پوزیشنیں صرف آپ کی پراجیکٹ فائل میں رکھتا ہے۔';

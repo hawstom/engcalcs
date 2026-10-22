@@ -4376,7 +4376,6 @@ $ec_lang['lpn_fitting_other']='نور فیتینګ';
 // pipe type loses its INDIRECTION while every number still goes out byte for byte, and a fittings
 // list loses its ITEMISATION while the total goes out exactly as it stood. It names EPANET because
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
-$ec_lang['lpn_inp_export_flat_heading']='خوندي شوی {file}';
 $ec_lang['lpn_inp_export_flat_lead']='صادر شوی د EPANET فایل د دې پروژې سره په شمېرو کې مساوي دی. خو دا د لاندې شیانو لپاره ځای نلري:';
 $ec_lang['lpn_inp_export_flat_types']='دلته پایپونه ({n}) د پایپ ډولونو ({t}) ته اشاره کوي. په فایل کې له دغو پایپونو هر یو د شمېرو خپله کاپي لري، نو ځوابونه یو شان دي. هغه څه چې فایل یې نشي ساتلی د پایپ ډول پخپله دی، نو د یو تعریف او هر هغه پایپ ترمنځ اړیکه چې کاروي یې یوازې په پروژه فایل کې ثبتیږي.';
 $ec_lang['lpn_inp_export_flat_coords']='د EPANET فایل د هرې نقطې لپاره یو ځای ساتي. دا سناریو له دوی {n} بل چیرته ځای پر ځای کوي، او دا په فایل کې ځایونه دي. هره بله سناریو خپل ځایونه یوازې په پروژه فایل کې ساتي.';
