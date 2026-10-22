@@ -5,6 +5,9 @@
 - **Rank honestly, including against myself.** Something I found is not thereby important.
 - **State the case once and do not campaign.**
 
+## 0r. Close the AI-assistant data question with one licence holder (2026-10-21)
+Bentley Copilot, Autodesk Assistant (InfoWater 2027.x) and the epanet-js agent publish no provider, price or data-handling page I can read. A person with a licence can open the Assistant settings and Autodesk's AI transparency card, and ask Iterating (support@epanetjs.com) the three questions. Also: the KWR Water Research PDF needs real text extraction (poppler) to read the failure modes. Cost: an hour and a package. See ai-agent-box.md section 7.
+
 ## 0q. Task 818 (MCP): matrix done 2026-10-20; remaining items (updated 2026-10-20)
 DONE: read all four servers' tools in source (journal 2026-10-20 second entry). Gap verified: no fire flow, no criticality sweep, no open-in-app link in KWR (8 tools), Eurecat (44), hjlrosales (33), Tamrakar (5, and it does not run EPANET). Recommended first slice: fire_flow at a named node plus the open-in-app link.
 1. A practitioner source for what engineers ask AI to do with a model (AWWA, Bentley/Autodesk community, r/CivilEngineering, eng-tips). Still only research papers. Cost: a morning; may return nothing.

@@ -113,8 +113,9 @@ lines rather than appending corrections.
 - **Report to Tom in `~/tom-files/messenger.md`**, overwritten each time; one line per paragraph, no hard wraps (Tom, 2026-10-21).
 - Merged 2026-10-21 on his word: `feat/import-export-menu` (Task 819) and `feat/geojson-into-project` (814's GeoJSON slice; 814 stays open).
 - `feat/sqlite-reader` (8104): being reworked on his verdict that our pump/valve conversion is unsatisfactory; match Bentley's own .inp export (coincident upstream/downstream nodes). It owns the seam: its WaterGEMS row moves into `importNetworkRows()`. His "import or only export?": *"Export is more important for submittal to reviewers or utilities."*
-- `fix/pump-valve-bent-pipe`, `fix/label-leader-hit`, `feat/calculate-hint`: in progress 2026-10-21.
-- Link 233 is a spatial hover HOLE over about half a multi-line label on a leader, not a delay (his correction). He saw it on label-margin, served again read-only on 8102 from tag `archive/feat/label-margin`; drop that row once fixed.
+- Merged 2026-10-21 as defect fixes (eba58064c): pump/valve symbol at half the polyline; label grab shape follows the level form drawn (the link 233 hole); `PUMP id Efficiency` read like EFFIC. `feat/calculate-hint` (8101) waits on his pass; it adds browser key `lpn_calchint` (told him).
+- Link 233 was a grab shape left at the short form's width after a zoom, not a delay. Asked him to recheck on master's preview; port 8102 (tag `archive/feat/label-margin`, worktree `archive-label-margin`) goes once he is satisfied.
+- Open calls for him: the sqlite pump/valve note's new wording; whether a zero-length pump/valve symbol turns with its pipes.
 - Bottom pane delay: he blames a Markdown Reader browser extension, now uninstalled. Closed unless it returns.
 - MCP: *"This doesn't sound very interesting to me"*; by "buying and selling" he meant *"What's the big idea?"* Not pursued.
 - `feat/desktop`: untouched.
