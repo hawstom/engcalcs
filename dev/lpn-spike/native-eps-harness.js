@@ -1,4 +1,4 @@
-// THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP, HELD TO EPANET'S OWN ANSWER (Task 733, phase 3, slices 1-2).
+// THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP, HELD TO EPANET'S OWN ANSWER (Task 733, phase 3, slices 1-3).
 //
 //   node dev/lpn-spike/native-eps-harness.js
 //
@@ -27,11 +27,22 @@
 // switching at least as often as it says), and that both engines report the same status for it at
 // every step. dev/lpn-spike/native-eps-examples-harness.js does the same for the shipped gallery.
 //
+// SLICE 3, PUMP SPEED PATTERNS. A pump on a pattern is given the page's own model of it (the curve
+// at speed 1 as h0Base/aBase beside its stated speed and pattern, as assembleModel() hands it), and
+// constructed cases cover: a pattern alone, one with zeros (the pump off), a pump stated Closed that
+// its pattern opens, a control that shuts a patterned pump and the next step's pattern re-opening
+// it, a tank control that holds one off, a junction-pressure control on one, a pattern step that is
+// not the hydraulic step, a stated SPEED the pattern discards, a pattern too slow to lift (EPANET's
+// XHEAD), and a stated SPEED 0 (open, no flow). Then EPA-side: pattern-attach.inp (the suite's own
+// speed-pattern fixture) and Net3 with a speed pattern added to pump 335, and to pump 10 (stated
+// Closed, under its two timers), with Net3's controls.
+//
 // EVERY CASE MUST EXERCISE WHAT IT NAMES: a tank case asserts that EPANET's own tank reached the
 // limit (or moved at least a stated amount), so a case that quietly stopped moving a tank fails
 // instead of passing on a flat line.
 //
-// THE REFUSALS. A network the slices cannot run (a rule, a speed pattern, a volume curve, water
+// THE REFUSALS. A network the slices cannot run (a rule, a speed pattern on a pump the page did not
+// model, a volume curve, water
 // quality, pump energy, a control on a reservoir, a junction-pressure control on a valve) must come
 // back refused by name and run nothing, so the caller falls back to EPANET.
 //
@@ -216,12 +227,68 @@ const CONTROL_CASES = [
 		statusOf: 'V', closedAt: [12, 14], openAt: [11, 15] }
 ];
 
+// ---- slice 3: pump speed patterns -------------------------------------------------------------------
+// The page's own model of a pump (js/looped-network.js assembleModel()): the curve at speed 1 as
+// h0Base/aBase, the stated speed and pattern beside it, the document's own status as statusBase.
+function pageLikePump(l, speed, speedPattern) {
+	l.h0Base = l.h0; l.aBase = l.a; l.statusBase = l.status;
+	l.speed = speed === undefined ? 1 : speed;
+	l.speedPattern = speedPattern || null;
+	return l;
+}
+function patternedPump(o) {
+	const m = pumpedTank(Object.assign({ p3: 'closed', controls: [] }, o));
+	if (o.mults) { m.time.patterns.push(pat('S', o.mults)); }
+	pageLikePump(m.links.find((l) => l.id === 'PU'), o.speed, o.mults ? 'S' : null);
+	return m;
+}
+const SPD = [1, 1, 0.9, 0.85, 0.8, 0.9, 1, 1.1, 1.15, 1.2, 1.1, 1, 1, 0.95, 0.9, 0.95, 1, 1.1, 1.2, 1.15, 1.05, 1, 0.95, 0.9];
+const NIGHT_OFF = [0, 0, 0, 0, 0, 1, 1, 1.1, 1.1, 1, 1, 1, 1, 1, 1, 1, 1, 1.1, 1.1, 1, 1, 1, 0, 0];
+const PATTERN_CASES = [
+	{ name: 'speed pattern, hourly, 48 h', model: patternedPump({ level: 4, mults: SPD }), moves: 'T', minSwing: 0.5 },
+	{ name: 'speed pattern with zeros: the pump off 0-5 h and 22-24 h', model: patternedPump({ level: 6, q: 15, mults: NIGHT_OFF }),
+		statusOf: 'PU', closedAt: [0, 4, 22, 24], openAt: [5, 12, 29], switches: 4 },
+	{ name: 'stated Closed, on a pattern: the pattern opens it at the first step', model: patternedPump({ level: 4, pu: 'closed', mults: SPD }),
+		statusOf: 'PU', openAt: [0, 1, 10, 40] },
+	{ name: 'AT TIME shuts a patterned pump at 5:30; the 6:00 step\'s pattern re-opens it (30 min report)',
+		model: patternedPump({ level: 4, mults: SPD, controls: [ctl('PU', SHUT, at(5.5))], times: { duration: 24 * H, reportStep: H / 2 } }),
+		statusOf: 'PU', closedAt: [5.5], openAt: [5, 6, 6.5] },
+	{ name: 'tank level holds a patterned pump off ABOVE 8 m (re-fired every step), on BELOW 4 m',
+		model: patternedPump({ level: 5, q: 15, mults: SPD, controls: [ctl('PU', SHUT, ifNode('T', 'above', 8)), ctl('PU', OPEN_, ifNode('T', 'below', 4))] }),
+		moves: 'T', minSwing: 2.5, capped: 8.01 },
+	{ name: 'junction pressure shuts a patterned pump ABOVE 80 m (inside the solve)',
+		model: patternedPump({ level: 5, mults: SPD, controls: [ctl('PU', SHUT, ifNode('J', 'above', 80))] }),
+		statusOf: 'PU', switches: 2 },
+	{ name: 'pattern step 2 h, pattern start 1 h, hydraulic step 1 h', model: patternedPump({ level: 4, mults: SPD,
+		times: { duration: 48 * H, patternStep: 2 * H, patternStart: H } }), moves: 'T', minSwing: 0.5 },
+	{ name: 'a stated SPEED 1.3 is discarded by its pattern', model: patternedPump({ level: 4, speed: 1.3, mults: SPD }), moves: 'T', minSwing: 0.5 },
+	{ name: 'a pattern too slow to lift into the tank (EPANET XHEAD)', model: patternedPump({ level: 4, q: 10,
+		mults: [1, 1, 0.55, 0.55, 0.55, 1, 1, 1, 0.5, 0.5, 1, 1] }), statusOf: 'PU', closedAt: [2, 3, 4, 8, 9], openAt: [1, 5, 10], switches: 4 },
+	// The built-in solver's own defect this slice found: a pump pushed backwards was shut with Y = 0,
+	// which kept the reverse flow the trial had reached (21.6 L/s through a pump EPANET held at 0).
+	{ name: 'a single instant: a pump too slow to lift (SPEED 0.55) is XHEAD, no reverse flow', model: patternedPump({ level: 7, q: 10, speed: 0.55,
+		times: { duration: 0 } }), statusOf: 'PU', closedAt: [0] },
+	{ name: 'a stated SPEED 0, no pattern: OPEN at speed 0, no flow', model: patternedPump({ level: 5, q: 8, speed: 0, p3: 'open' }),
+		statusOf: 'PU', openAt: [0, 12, 47], moves: 'T', minSwing: 0.1 },
+	{ name: 'a stated SPEED 0.85, no pattern', model: patternedPump({ level: 4, speed: 0.85 }), moves: 'T', minSwing: 0.5 }
+];
+
 // ---- EPA's examples ------------------------------------------------------------------------------
-function loadEpa(file, stripped) {
+// `pumps` gives a pump its page-like model (pageLikePump) with the file's own speed and pattern, or
+// with a pattern added: { id: [patternId, multipliers] }.
+function loadEpa(file, stripped, pumps) {
 	const parsed = EngCalcs.lpnInpParse(fs.readFileSync(path.join(__dirname, 'reference', file), 'utf8'));
 	if (!parsed.ok) { throw new Error(file + ' does not parse: ' + parsed.error); }
 	const m = buildModel(EngCalcs, parsed);
 	if (stripped) { m.time.controls = []; }
+	if (pumps) {
+		m.links.filter((l) => l.type === 'pump').forEach((l) => {
+			const pl = parsed.links.find((x) => x.id === l.id), add = pumps === true ? null : pumps[l.id];
+			if (pumps !== true && !add) { return; }
+			if (add) { m.time.patterns.push(pat(add[0], add[1])); }
+			pageLikePump(l, pl.speed, add ? add[0] : pl.speedPattern);
+		});
+	}
 	return { model: m, hadControls: parsed.controls.length };
 }
 
@@ -267,6 +334,12 @@ async function compare(c) {
 	if (c.moves) {
 		const sw = range[c.moves === '*' ? tankIds[0] : c.moves].hi - range[c.moves === '*' ? tankIds[0] : c.moves].lo;
 		exercised = sw >= c.minSwing; why = `swing ${sw.toFixed(2)} m`;
+	}
+	// The tank's level in EPANET's frames stays at or under `capped` (a control holding it there).
+	if (c.capped) {
+		const hi = range[tankIds[0]].hi;
+		if (!(hi <= c.capped)) { exercised = false; }
+		why += `; highest ${hi.toFixed(3)} m`;
 	}
 	if (c.reaches) {
 		const tk = model.nodes.find((n) => n.type === 'tank');
@@ -324,6 +397,23 @@ async function run() {
 	await compare({ name: 'Net3 with its controls, 24 h (pump 10 on the clock; 335 and 330 on tank 1)', model: n3c.model, statusOf: '10', openAt: [1, 14], closedAt: [0, 15] });
 	await compare({ name: 'Net3 with its controls: pump 335 / bypass 330', model: loadEpa('Net3.inp', false).model, statusOf: '335', switches: 1 });
 
+	console.log('-- slice 3: pump speed patterns, constructed');
+	for (const c of PATTERN_CASES) { await compare(c); }
+	console.log('-- slice 3: pattern-attach.inp and Net3 with speed patterns');
+	{
+		const pa = loadEpa('pattern-attach.inp', false, true);
+		const pu = pa.model.links.find((l) => l.id === 'PU1');
+		ok('pattern-attach.inp: PU1 states SPEED 1.2 and PATTERN PSPD', pu.speed === 1.2 && pu.speedPattern === 'PSPD');
+		await compare({ name: 'pattern-attach.inp, 11 h (reservoir head pattern, pump speed pattern)', model: pa.model });
+	}
+	await compare({ name: 'Net3 with its controls, pump 335 on a speed pattern', statusOf: '335', switches: 1, moves: '*', minSwing: 0.5,
+		model: loadEpa('Net3.inp', false, { 335: ['S335', [1, 1, 0.95, 0.9, 0.9, 0.95, 1, 1.05, 1.1, 1.1, 1.05, 1]] }).model });
+	await compare({ name: 'Net3 with its controls, pump 10 (stated Closed, two timers) on a pattern off at night', statusOf: '10',
+		closedAt: [0, 3, 22], openAt: [6, 12, 16],
+		model: loadEpa('Net3.inp', false, { 10: ['S10', [0, 0, 0, 0, 0, 0, 1, 1, 1.1, 1.1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.9, 0.9, 0, 0]] }).model });
+	await compare({ name: 'Net3 with its controls stripped, both pumps on speed patterns', moves: '*', minSwing: 0.5,
+		model: loadEpa('Net3.inp', true, { 10: ['S10', [0.9, 1, 1.1, 1]], 335: ['S335', [1, 0.9, 0.95, 1.05, 1.1, 1]] }).model });
+
 	console.log('-- refusals (the caller falls back to EPANET)');
 	const base = () => JSON.parse(JSON.stringify(CASES[0].model));
 	const refusal = (name, mut, code) => {
@@ -338,7 +428,10 @@ async function run() {
 		m.time.controls = [{ link: 'V9', action: { status: 'closed' }, condition: { kind: 'node', node: 'J', cmp: 'below', value: 20 } }];
 	}, 'native-run-control-unsupported');
 	refusal('rules', (m) => { m.rules = [{ id: 'R1' }]; }, 'native-run-rules');
-	refusal('a pump on a speed pattern', (m) => { m.links.push({ id: 'PU', type: 'pump', from: 'R', to: 'J', speedPattern: 'D', h0: 50, a: 1, b: 2 }); }, 'native-run-speed-pattern');
+	refusal('a speed pattern on a pump without its unscaled curve (not the page\'s model)', (m) => { m.links.push({ id: 'PU', type: 'pump', from: 'R', to: 'J', speedPattern: 'D', h0: 50, a: 1, b: 2 }); }, 'native-run-speed-pattern');
+	refusal('a speed pattern the model lacks', (m) => { m.links.push(pageLikePump({ id: 'PU', type: 'pump', from: 'R', to: 'J', h0: 50, a: 1, b: 2, status: 'open' }, 1, 'NOPE')); }, 'native-run-speed-pattern');
+	refusal('a speed pattern with a negative multiplier', (m) => { m.time.patterns.push(pat('NEG', [1, -0.5]));
+		m.links.push(pageLikePump({ id: 'PU', type: 'pump', from: 'R', to: 'J', h0: 50, a: 1, b: 2, status: 'open' }, 1, 'NEG')); }, 'native-run-speed-pattern');
 	refusal('a tank on a volume curve', (m) => { m.nodes.find((n) => n.id === 'T').volCurveName = 'V1'; }, 'native-run-volume-curve');
 	refusal('water quality', (m) => { m.quality = { mode: 'age' }; }, 'native-run-quality');
 	refusal('a tank starting above its maximum', (m) => { m.nodes.find((n) => n.id === 'T').level = 99; }, 'native-run-tank-levels');

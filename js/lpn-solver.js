@@ -1149,7 +1149,8 @@ EngCalcs.lpnSolve = function (model, options) {
 		for (t = 0; t < tk.length; t++) {
 			k2 = tk[t];
 			was = tClosed[k2];
-			tClosed[k2] = tankShuts(links[k2].from, Q[k2]) || tankShuts(links[k2].to, -Q[k2]) ? 1 : 0;
+			// tankstatus() returns for a link already shut, and a pump that cannot lift (XHEAD) is.
+			tClosed[k2] = !pX[k2] && (tankShuts(links[k2].from, Q[k2]) || tankShuts(links[k2].to, -Q[k2])) ? 1 : 0;
 			if (tClosed[k2] !== was) { change = true; }
 		}
 		return change;
@@ -1158,6 +1159,35 @@ EngCalcs.lpnSolve = function (model, options) {
 	function headAt(id, Hv) {
 		var ix = junctionIndex[id];
 		return ix === undefined ? byId[id].head : Hv[ix];
+	}
+
+	// ---- A PUMP THAT CANNOT LIFT (Task 733, phase 3, slice 3) ------------------------------------
+	//
+	// hydstatus.c pumpstatus(), through linkstatus(): at each status check a pump with a curve whose
+	// head gain exceeds its shutoff head (at its speed, which h0 already carries) by more than HTOL
+	// is XHEAD -- shut, as a closed link is (hydcoeffs.c: P = 1/CBIG, Y = its flow) -- and one that
+	// was XHEAD is re-opened first and judged again on the same heads. EPANET has no other guard on
+	// a pump pushed backwards: an OPEN pump's curve is evaluated on |Q| and goes on giving head, so
+	// reverse flow is undone by the curve itself or ends in XHEAD. `opts.xhead` (ids) starts a pump
+	// shut, as a pump XHEAD at the end of one time step starts the next; only js/lpn-native-run.js
+	// passes it.
+	var pumps = [], pX = new Uint8Array(links.length);
+	for (k = 0; k < links.length; k++) {
+		// A closed one too: a junction-pressure control can open it inside the solve (opts.pswitch).
+		if (links[k].type !== 'pump' || !(links[k].h0 > 0 || links[k].a > 0)) { continue; }
+		pumps.push(k);
+		if (opts.xhead && opts.xhead[links[k].id]) { pX[k] = 1; }
+	}
+	function pumpLinkStatus(Hv) {
+		var change = false, t, k2, was;
+		for (t = 0; t < pumps.length; t++) {
+			k2 = pumps[t];
+			was = pX[k2];
+			pX[k2] = links[k2].status !== 'closed' &&
+				headAt(links[k2].to, Hv) - headAt(links[k2].from, Hv) > links[k2].h0 + V_HTOL ? 1 : 0;
+			if (pX[k2] !== was) { change = true; }
+		}
+		return change;
 	}
 
 	// hydstatus.c prvstatus() / psvstatus(), through valvestatus(): checked after EVERY iteration
@@ -1273,7 +1303,7 @@ EngCalcs.lpnSolve = function (model, options) {
 			q = Q[k];
 			aq = Math.abs(q);
 
-			if (tClosed[k]) {
+			if (tClosed[k] || pX[k]) {
 				// hydcoeffs.c: a closed link's coefficients are P = 1/CBIG, Y = its flow.
 				G[k] = V_CBIG_INV;
 				y[k] = q;
@@ -1295,9 +1325,16 @@ EngCalcs.lpnSolve = function (model, options) {
 					G[k] = 1 / p;
 					y[k] = h / p;
 				} else if (q < 0) {
-					// A pump WITH a curve, pushed backwards, is treated as closed for this iteration.
-					G[k] = 1e-8;
-					y[k] = 0;
+					// A pump WITH a curve, pushed backwards: hydcoeffs.c pumpcoeff() evaluates the
+					// curve on |Q|, so the pump still gives head and the next trial pushes the flow
+					// forward again; a pump that cannot lift at all is shut by pumpLinkStatus().
+					// This used to treat it as closed with Y = 0, which kept whatever reverse flow
+					// the trial had reached: 21.6 L/s backwards through a pump EPANET held at zero.
+					p = link.a * link.b * Math.pow(qp, link.b - 1);
+					h = -link.h0 + p * q / link.b;
+					if (!(p > gradMin)) { p = gradMin; h = -link.h0 + p * q; }   // its RQtol line
+					G[k] = 1 / p;
+					y[k] = h / p;
 				} else {
 					h = -(link.h0 - link.a * Math.pow(qp, link.b));
 					p = link.a * link.b * Math.pow(qp, link.b - 1);
@@ -1539,8 +1576,9 @@ EngCalcs.lpnSolve = function (model, options) {
 			// CONVERGED, BUT ONLY IF NO VALVE WANTS TO CHANGE: the pressure valves were checked
 			// above, and the FCVs are checked now (hydsolver.c: "Quit if no status changes occur").
 			// A change restarts the count toward the next periodic check and the stall watch.
-			if (X !== null || tk.length || opts.pswitch) {
+			if (X !== null || tk.length || pumps.length || opts.pswitch) {
 				var flowChange = X !== null ? flowValveStatus(H) : false;
+				if (pumpLinkStatus(H)) { flowChange = true; }
 				if (tankLinkStatus()) { flowChange = true; }
 				// **A CONTROL ON A JUNCTION'S PRESSURE IS DECIDED HERE, INSIDE THE SOLVE** (hydsolver.c
 				// hydsolve() calls pswitch() after linkstatus() on a converged trial). Only
@@ -1567,8 +1605,9 @@ EngCalcs.lpnSolve = function (model, options) {
 		}
 		// The periodic check on FCVs and links to tanks, every CheckFreq trials up to MaxCheck
 		// (hydsolver.c).
-		if ((X !== null || tk.length) && iter <= maxCheck && iter === nextCheck) {
+		if ((X !== null || tk.length || pumps.length) && iter <= maxCheck && iter === nextCheck) {
 			if (X !== null) { flowValveStatus(H); }
+			pumpLinkStatus(H);
 			tankLinkStatus();
 			nextCheck += checkFreq;
 		}
@@ -1576,6 +1615,7 @@ EngCalcs.lpnSolve = function (model, options) {
 	// A link a tank closed reports as EPANET reports any closed link (epanet.c EN_getlinkvalue):
 	// no flow, velocity or head loss. lpnReport reads that off a 'closed' state.
 	for (k = 0; k < tk.length; k++) { if (tClosed[tk[k]]) { vStat[tk[k]] = 'closed'; } }
+	for (k = 0; k < pumps.length; k++) { if (pX[pumps[k]]) { vStat[pumps[k]] = 'closed'; } }
 
 	// The report reads one state per valve; a PBV's or GPV's is the law it was last solved under.
 	for (k = 0; k < links.length; k++) { if (fStat[k] !== undefined) { vStat[k] = fStat[k]; } }
@@ -1589,6 +1629,9 @@ EngCalcs.lpnSolve = function (model, options) {
 	// extended-period loop needs them, because a simple control compares against that status.
 	report.tankClosed = [];
 	for (k = 0; k < tk.length; k++) { if (tClosed[tk[k]]) { report.tankClosed.push(links[tk[k]].id); } }
+	// And the pumps the solve ended with shut because they cannot lift (EPANET's XHEAD), likewise.
+	report.pumpXhead = [];
+	for (k = 0; k < pumps.length; k++) { if (pX[pumps[k]]) { report.pumpXhead.push(links[pumps[k]].id); } }
 	return report;
 };
 

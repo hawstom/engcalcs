@@ -1,5 +1,4 @@
-// THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP ON THE SHIPPED EXAMPLES THAT HAVE CONTROLS (Task 733,
-// phase 3, slice 2).
+// THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP ON THE SHIPPED EXAMPLES (Task 733, phase 3, slices 2-3).
 //
 //   node dev/lpn-spike/native-eps-examples-harness.js
 //
@@ -16,6 +15,13 @@
 // is worked out after the hydraulics; energy is bookkeeping), and [RULES], which DO change the
 // hydraulics -- an example compared without its rules says so in its name. Each example must have
 // controls; an example losing them fails rather than passing on nothing.
+//
+// SLICE 3, PUMP SPEED PATTERNS. No gallery example ships one, so every example with a pump and a
+// period (a duration; the Basic examples and Elm Street are single instants) is
+// opened again with a speed pattern ADDED to the document (one new pattern, named by each of its
+// pumps), through the same page path, and compared the same way. Each must still have its pumps on
+// the pattern when it reaches the model, and the pattern must move the pumps' speed; an example
+// whose pumps lost it fails.
 //
 // TOLERANCE is native-eps-harness.js's, at Accuracy 1e-5 in both engines.
 //
@@ -44,22 +50,42 @@ function ok(name, cond, extra) {
 	if (cond) { pass++; } else { fail++; }
 }
 
-const EXAMPLES = fs.readdirSync(ROOT + 'examples').filter((f) => /\.lwn$/.test(f)).filter((f) => {
-	const d = JSON.parse(fs.readFileSync(ROOT + 'examples/' + f, 'utf8'));
-	return (d.controls || []).length > 0;
-});
+const ALL = fs.readdirSync(ROOT + 'examples').filter((f) => /\.lwn$/.test(f));
+const docOf = (f) => JSON.parse(fs.readFileSync(ROOT + 'examples/' + f, 'utf8'));
+const EXAMPLES = ALL.filter((f) => (docOf(f).controls || []).length > 0);
+const PUMPED = ALL.filter((f) => (docOf(f).links || []).some((l) => l.type === 'pump') &&
+	((docOf(f).times || {}).duration > 0));
+const SPEED = [1, 1, 0.95, 0.9, 0.9, 0.95, 1, 1.05, 1.1, 1.1, 1.05, 1];
 
-async function compare(file) {
-	L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + 'examples/' + file, 'utf8')));
+// The example's text with SPEED added to its patterns and named by every pump.
+function withSpeedPattern(file) {
+	const d = docOf(file);
+	d.patterns = (d.patterns || []).concat([{ id: 'SPEED', multipliers: SPEED }]);
+	d.links.forEach((l) => { if (l.type === 'pump') { l.speedPattern = 'SPEED'; } });
+	return JSON.stringify(d);
+}
+
+async function compare(file, text) {
+	L.applySaved(L.acceptImportedText(text || fs.readFileSync(ROOT + 'examples/' + file, 'utf8')));
 	EC.lpnTimeArrived();
 	const model = L.currentModel();
 	const nCtl = ((model.time && model.time.controls) || []).length;
-	if (!nCtl) { ok(file + ' reaches the model with its controls', false, 'no controls on the model'); return; }
+	if (!text && !nCtl) { ok(file + ' reaches the model with its controls', false, 'no controls on the model'); return; }
+	if (text) {
+		const pumps = model.links.filter((l) => l.type === 'pump');
+		if (!pumps.length || !pumps.every((l) => l.speedPattern === 'SPEED' && l.h0Base !== undefined)) {
+			ok(file + ' reaches the model with its pumps on the speed pattern', false, JSON.stringify(pumps.map((l) => [l.id, l.speedPattern])));
+			return;
+		}
+		file += ' with a speed pattern on ' + pumps.map((l) => l.id).join(', ');
+	}
 	model.hydraulics = Object.assign({}, model.hydraulics || {}, { accuracy: 1e-5 });
 	const refused = EC.lpnNativeRunRefusals(model);
 	const r0 = EC.lpnNativeRun(model);
-	ok(file + ' as shipped: refused by name, so the caller uses EPANET', refused.length > 0 && r0.refused === true,
-		refused.map((r) => r.code).join(', '));
+	if (!text) {
+		ok(file + ' as shipped: refused by name, so the caller uses EPANET', refused.length > 0 && r0.refused === true,
+			refused.map((r) => r.code).join(', '));
+	}
 	const hadRules = !!(model.rules && model.rules.length);
 	delete model.quality; delete model.msx; delete model.energy; delete model.rules;
 	const still = EC.lpnNativeRunRefusals(model);
@@ -91,10 +117,18 @@ async function compare(file) {
 		});
 	}
 	const qTol = Math.max(FLOW_TOL, FLOW_REL * qMax);
-	ok(`${file}, ${nCtl} controls`, same && dH <= HEAD_TOL && dL <= HEAD_TOL && dQ <= qTol && st === 0 && sw > 0,
+	// A speed-pattern case need not switch a status; its pumps' flow must move with the pattern.
+	let qSwing = 0;
+	if (text && same) {
+		model.links.filter((l) => l.type === 'pump').forEach((l) => {
+			const q = epa.frames.map((f) => f.flows[l.id]);
+			qSwing = Math.max(qSwing, Math.max(...q) - Math.min(...q));
+		});
+	}
+	ok(`${file}, ${nCtl} controls`, same && dH <= HEAD_TOL && dL <= HEAD_TOL && dQ <= qTol && st === 0 && (text ? qSwing > 1e-3 : sw > 0),
 		`steps ${nat.frames.length}/${epa.frames.length}${same ? '' : ' DIFFER'}  dH=${dH.toExponential(2)} m @${atH}  ` +
 		`dLevel=${dL.toExponential(2)} m @${atL || '-'}  dQ=${dQ.toExponential(2)} m3/s @${atQ} (tol ${qTol.toExponential(1)})  ` +
-		`[${sw} status changes in EPANET's frames${st ? `; ${st} STATUS DIFFERENCES` : ''}]`);
+		`[${sw} status changes in EPANET's frames${text ? `; pump flow swing ${(qSwing * 1000).toFixed(1)} L/s` : ''}${st ? `; ${st} STATUS DIFFERENCES` : ''}]`);
 }
 
 (async function () {
@@ -102,6 +136,8 @@ async function compare(file) {
 	await warmEpanet();
 	ok('the gallery has examples with controls', EXAMPLES.length >= 2, EXAMPLES.join(', '));
 	for (const f of EXAMPLES) { await compare(f); }
+	ok('the gallery has examples with pumps', PUMPED.length >= 4, PUMPED.join(', '));
+	for (const f of PUMPED) { await compare(f, withSpeedPattern(f)); }
 	console.log(`\n${pass} passed, ${fail} failed`);
 	process.exit(fail ? 1 : 0);
 })().catch((e) => { console.error(e); process.exit(2); });
