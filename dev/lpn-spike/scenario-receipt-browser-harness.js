@@ -207,7 +207,7 @@ async function main() {
 		await reopen(d6);
 		const e0 = await doExport('lpn_file_export_item_inp');
 		// Task 814: a receipt dialog now ends every export, but with Base alone it claims nothing is left behind.
-		ok('R6 Base alone, no alternatives: no question, a receipt, no sentence about what is left', !(e0.asked && /holds one scenario/.test(e0.asked)) && !!e0.dialog && /Elm-Street\.inp/.test(e0.dialog) && !/It holds/.test(e0.dialog) && !/It holds/.test(e0.notice), e0.dialog + ' | ' + e0.notice);
+		ok('R6 Base alone, no alternatives: no question, a receipt, no sentence about what is left', !(e0.asked && e0.asked.indexOf((await L('lpn_export_confirm_lead')).split('{format}')[1].split('{n}')[0]) >= 0) && !!e0.dialog && /Elm-Street\.inp/.test(e0.dialog) && !/It holds/.test(e0.dialog) && !/It holds/.test(e0.notice), e0.dialog + ' | ' + e0.notice);
 		d6.alternatives = [{ id: 'a1', category: 'physical', name: 'A', parent: null }, { id: 'a2', category: 'physical', name: 'B', parent: 'a1', values: {} }];
 		await reopen(d6);
 		const e1 = await doExport('lpn_file_export_item_geojson');
