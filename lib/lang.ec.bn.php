@@ -1659,7 +1659,6 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}। {all}-এর মধ্যে 
 $ec_lang['lpn_ovm_child_ask']='অধস্তন নিজস্ব মান মুছবেন (মোট {n}টি)?';
 $ec_lang['lpn_ovm_child_tip']='অধস্তন দৃশ্যকল্পগুলো এই মানের নিজস্ব মান দেয় (মোট {n}টি)। তাদের নিজস্ব মান মুছতে ক্লিক করুন।';
 $ec_lang['lpn_ovm_dot_clear']='মুছতে ক্লিক করুন।';
-$ec_lang['lpn_ovm_dot_set']='উত্তরাধিকারসূত্রে পাওয়া। দেখানো মান ধরে রেখে এই দৃশ্যকল্পে এটিকে নিজস্ব মান করতে ক্লিক করুন।';
 $ec_lang['lpn_pane_clear_override']='নিজস্ব মান মুছুন';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3309,7 +3308,6 @@ $ec_lang['lpn_scenario_delete_has_children']='{name} দৃশ্যকল্প
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='ভিত্তি দৃশ্যকল্প: {value}';
 $ec_lang['lpn_scenario_deactivated']='{scenario}-এ {id} নেটওয়ার্ক থেকে বাদ দেওয়া হয়েছে। এটি অঙ্কনে এবং অন্য দৃশ্যকল্পগুলোতে থাকে।';
 $ec_lang['lpn_scenario_delete_in_base']='অঙ্কন থেকে সরাতে {base} দৃশ্যকল্পে এটি মুছুন।';
 $ec_lang['lpn_scenario_only_deleted']='{id} মুছে ফেলা হয়েছে। এটি শুধু {scenario}-এর অংশ ছিল।';
@@ -3390,7 +3388,6 @@ $ec_lang['lpn_sm_unused_none']='কিছু নেই';
 $ec_lang['lpn_sm_all_row_tip']='এটি তার বিভাগের গাছে খুলতে ডাবল-ক্লিক করুন।';
 $ec_lang['lpn_sm_compare_tip']='দৃশ্যকল্প তুলনায় অন্তর্ভুক্ত করুন';
 $ec_lang['lpn_sm_inherited']='উত্তরাধিকারসূত্রে পাওয়া';
-$ec_lang['lpn_sm_shared_note']='ভাগ করা হয়েছে: {list}';
 $ec_lang['lpn_scncmp_none_checked']='তুলনার জন্য কোনো দৃশ্যকল্পে টিক দেওয়া নেই। দৃশ্যকল্প ব্যবস্থাপকে দৃশ্যকল্পে টিক দিন।';
 $ec_lang['lpn_time_scn_overrides']='দৃশ্যকল্পের নিজস্ব মান:';
 $ec_lang['lpn_settings_table_major']='প্রধান শিরোনাম';
@@ -3444,7 +3441,6 @@ $ec_lang['lpn_settings_row_new_asset']='নতুন অ্যাসেট: {set
 $ec_lang['lpn_settings_row_default']='{value} (ডিফল্ট)';
 $ec_lang['lpn_settings_row_view_value']='কেন্দ্র {x}, {y}; স্কেল {s}';
 $ec_lang['lpn_settings_held_in']='{scenario}-এ নিজস্ব মান।';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='মানচিত্রের কেন্দ্র';
 $ec_lang['lpn_settings_view_scale']='মানচিত্রের স্কেল';
 $ec_lang['lpn_settings_view_scale_tip']='মানচিত্রের কেন্দ্রে স্কেল, 1:N হিসেবে। সেই স্কেলে জুম করতে 1:2000 টাইপ করুন, অথবা শুধু 2000।';

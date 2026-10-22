@@ -1659,7 +1659,6 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}. Menampilkan {n} dari {all}.';
 $ec_lang['lpn_ovm_child_ask']='Hapus nilai khusus anak ({n} total)?';
 $ec_lang['lpn_ovm_child_tip']='Skenario anak memberi nilai khusus pada nilai ini ({n} total). Klik untuk menghapus nilai khusus mereka.';
 $ec_lang['lpn_ovm_dot_clear']='Klik untuk menghapusnya.';
-$ec_lang['lpn_ovm_dot_set']='Diwarisi. Klik untuk menjadikannya nilai khusus dalam skenario ini, dengan nilai yang ditampilkan.';
 $ec_lang['lpn_pane_clear_override']='Hapus nilai khusus';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3309,7 +3308,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Skenario {name} tidak dapat dihapu
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Skenario Dasar: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} dikecualikan dari jaringan pada {scenario}. Aset tetap ada di gambar dan di skenario lain.';
 $ec_lang['lpn_scenario_delete_in_base']='Untuk menghapusnya dari gambar, hapus di skenario {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} dihapus. Elemen ini hanya bagian dari {scenario}.';
@@ -3390,7 +3388,6 @@ $ec_lang['lpn_sm_unused_none']='Tidak ada';
 $ec_lang['lpn_sm_all_row_tip']='Klik ganda untuk membukanya dalam pohon kategorinya.';
 $ec_lang['lpn_sm_compare_tip']='Sertakan dalam Perbandingan skenario';
 $ec_lang['lpn_sm_inherited']='diwarisi';
-$ec_lang['lpn_sm_shared_note']='Dibagi dengan: {list}';
 $ec_lang['lpn_scncmp_none_checked']='Tidak ada skenario yang dicentang untuk dibandingkan. Centang skenario di Manajer skenario.';
 $ec_lang['lpn_time_scn_overrides']='Nilai khusus skenario:';
 $ec_lang['lpn_settings_table_major']='Judul utama';
@@ -3444,7 +3441,6 @@ $ec_lang['lpn_settings_row_new_asset']='Aset baru: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (default)';
 $ec_lang['lpn_settings_row_view_value']='Pusat {x}, {y}; skala {s}';
 $ec_lang['lpn_settings_held_in']='Nilai khusus di {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Pusat peta';
 $ec_lang['lpn_settings_view_scale']='Skala peta';
 $ec_lang['lpn_settings_view_scale_tip']='Skala di pusat peta, sebagai 1:N. Ketik 1:2000, atau cukup 2000, untuk memperbesar ke skala itu.';

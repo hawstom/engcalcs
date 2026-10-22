@@ -8,6 +8,12 @@
 //   V3  the solid dot's click is the reset: elevation turns hollow and now says "Inherited from Peak".
 //   V4  Base shows no dot and no hollow dot.
 //   V5  a phone-width page keeps the marker on screen and the box without sideways scroll.
+// THE FILLED DOT'S TIP (Tom, 2026-10-22), scenarios built through the real menus (scenario-ui-helper.js):
+//   V6  Basic mode: "Click to clear override and restore 710, the value in Base." and nothing about an
+//       alternative; no note line (.lpn-ov-note) under any row.
+//   V7  Basic mode off, an alternative nobody else names: the second sentence, on its own line.
+//   V8  Basic mode off, another scenario names the same alternative: the sentence lists it.
+//   V9  a child whose parent is not Base: names the parent and the parent's value.
 'use strict';
 const path = require('path');
 const fs = require('fs');
@@ -16,6 +22,7 @@ const REPO = path.resolve(__dirname, '..', '..');
 const LOCK_FILE = process.env.EC_BROWSER_LOCK || '/tmp/engcalcs-browser.lock';
 const LOCK_ENV = 'EC_VALSRC_LOCKED';
 const NAME = 'value-source-browser-harness';
+const U = require('./scenario-ui-helper.js');
 if (process.env[LOCK_ENV] !== '1') {
 	let has = false;
 	try { execFileSync('which', ['flock'], { stdio: 'ignore' }); has = true; } catch (e) { /* none */ }
@@ -85,7 +92,7 @@ async function main() {
 		// The independent walk: nearest of Fire, Peak, Base that states the property.
 		const chain = [['Fire', d.scenarios.find((s) => s.id === 'fire')], ['Peak', d.scenarios.find((s) => s.id === 'peak')]];
 		const src = (prop) => { for (const [n, s] of chain) { if (s.overrides['n:10'] && prop in s.overrides['n:10']) { return n; } } return 'Base'; };
-		ok('V1 Fire: elevation is the one solid dot', dots.length === 1 && /Fire/.test(dots[0].tip), JSON.stringify(dots));
+		ok('V1 Fire: elevation is the one solid dot, and its tip restores Peak\'s 701', dots.length === 1 && dots[0].tip === (await a.lang('lpn_ovm_dot_clear_to')).replace('{value}', '701').replace('{parent}', 'Peak'), JSON.stringify(dots));
 		ok('V1 ...and the rest are hollow dots', hol.length > 3, String(hol.length));
 		const inh = (n) => hol.filter((x) => x.tip.indexOf('Inherited from ' + n + '.') === 0);
 		ok('V2 exactly one row inherits from Peak (demand), matching the stored chain (' + src('demand') + ')', src('demand') === 'Peak' && inh('Peak').length === 1, JSON.stringify(inh('Peak')));
@@ -117,6 +124,76 @@ async function main() {
 		ok('V5 markers present and on screen', m.length > 3 && m.every((x) => x.rect.w > 0 && x.rect.l >= 0 && x.rect.r <= fit.vw), JSON.stringify({ n: m.length, fit }));
 		ok('V5 no sideways scroll in the box', fit.sw <= fit.cw + 1, JSON.stringify(fit));
 		ok('V5 the tip still names the source', m.some((x) => x.tip.indexOf('Inherited from Peak.') === 0), '');
+
+		console.log('--- V6-V9. the filled dot\'s tip, scenarios built through the menus ---');
+		{
+			const ctx = await U.openNet1(browser, NAME + '-tip');
+			const P = ctx.P;
+			const dotTip = () => P.evaluate(() => {
+				const d = document.querySelector('#lpn_popup_fields .lpn-ovm-dot');
+				return d ? { tip: d.getAttribute('aria-label'), lines: !!d.dataset.ecTipLines, notes: document.querySelectorAll('#lpn_popup_fields .lpn-ov-note, #lpn_popup_fields .lpn-ov-base').length } : null;
+			});
+			const reopen = async () => {
+				await P.evaluate(() => { const b = document.getElementById('lpn_popup_close'); if (b && b.offsetParent) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })); } });
+				await ctx.a.settle(300);
+				await U.openProperties(ctx, 'node', '10');
+			};
+			const ELEV = await U.lang(ctx, 'lpn_field_elev');
+			const BASEN = await U.lang(ctx, 'lpn_scenario_base');
+			const first = (k, vals) => k.replace('{value}', vals.v).replace('{parent}', vals.p);
+			const CLEAR = await U.lang(ctx, 'lpn_ovm_dot_clear_to'), ALT = await U.lang(ctx, 'lpn_ovm_dot_alt'), ALTS = await U.lang(ctx, 'lpn_ovm_dot_alt_shared');
+			const baseElev = JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8')).nodes.find((n) => n.id === '10').elev;
+			const s1 = await U.createScenarioViaMenu(ctx);
+			await U.openProperties(ctx, 'node', '10');
+			await U.typeProperty(ctx, ELEV, '730');
+			let t = await dotTip();
+			ok('V6 Basic mode: the tip says what Clear restores and from where, and nothing else', !!t && t.tip === first(CLEAR, { v: String(baseElev), p: BASEN }), JSON.stringify(t));
+			ok('V6 ...no note line is drawn under any row', !!t && t.notes === 0, JSON.stringify(t));
+			ok('V6 ...and the tip keeps line breaks for the second sentence', !!t && t.lines);
+
+			await U.setBasicMode(ctx, false);
+			await reopen();
+			const doc1 = await U.storedProject(ctx);
+			const sc1 = doc1.scenarios.find((x) => x.id === s1.scenario.id);
+			const alt1 = doc1.alternatives.find((x) => x.id === sc1.alternatives.physical);
+			t = await dotTip();
+			ok('V7 Basic mode off, nobody else names the alternative: the sentence without a list, on its own line',
+				!!t && t.tip === first(CLEAR, { v: String(baseElev), p: BASEN }) + '\n' + ALT.replace('{alternative}', alt1.name), JSON.stringify(t));
+			ok('V7 ...still no note line', !!t && t.notes === 0);
+
+			// Another scenario names the same alternative (the Share edits setup), then the project is read back.
+			await P.evaluate(([altId]) => {
+				const i = JSON.parse(localStorage.getItem('lpn_index') || '{}').openId, k = 'lpn_project_' + i, d = JSON.parse(localStorage.getItem(k));
+				d.scenarios.push({ id: 'sharer', name: 'Shares it', overrides: {}, alternatives: { physical: altId } });
+				localStorage.setItem(k, JSON.stringify(d));
+			}, [alt1.id]);
+			await ctx.a.reload();
+			await ctx.a.settle(2500);
+			await P.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
+			await U.openProperties(ctx, 'node', '10');
+			t = await dotTip();
+			ok('V8 Basic mode off, another scenario names the alternative: Tom\'s sentence with the list',
+				!!t && t.tip === first(CLEAR, { v: String(baseElev), p: BASEN }) + '\n' + ALTS.replace('{alternative}', alt1.name).replace('{list}', 'Shares it'), JSON.stringify(t));
+
+			// A child of the scenario that holds the override: its own override restores the parent's value.
+			// (New scenario makes a child of Base; the parent is then pointed at the first scenario.)
+			const s2 = await U.createScenarioViaMenu(ctx);
+			await P.evaluate(([sid, pid]) => {
+				const i = JSON.parse(localStorage.getItem('lpn_index') || '{}').openId, k = 'lpn_project_' + i, d = JSON.parse(localStorage.getItem(k));
+				d.scenarios.find((x) => x.id === sid).parent = pid;
+				localStorage.setItem(k, JSON.stringify(d));
+			}, [s2.scenario.id, sc1.id]);
+			await ctx.a.reload();
+			await ctx.a.settle(2500);
+			await P.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
+			await U.openProperties(ctx, 'node', '10');
+			await U.typeProperty(ctx, ELEV, '745');
+			t = await dotTip();
+			ok('V9 a child of a scenario: names that scenario and its value (730), not Base\'s', !!t && t.tip.split('\n')[0] === first(CLEAR, { v: '730', p: sc1.name }), JSON.stringify(t));
+			ok('V9 ...and no note line', !!t && t.notes === 0);
+			ok('V6-V9 no page error', ctx.a.errors.length === 0, ctx.a.errors.slice(0, 2).join(' | '));
+			await ctx.a.close();
+		}
 
 		ok('no page error', errors.length === 0, JSON.stringify(errors).slice(0, 400));
 	} finally {

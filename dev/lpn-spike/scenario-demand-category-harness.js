@@ -110,14 +110,14 @@ function table(id) {
 		add: findAll(kids, 'BUTTON').filter(b => b.textContent.indexOf(PC.lpn_demand_add) >= 0)[0],
 		// The table's own marker (Task 790's gutter) sits right before the block that holds it: the
 		// identity band above carries the coordinates' markers, a different override entirely. Its
-		// note, while it is an override, is the first one after the table.
+		// tip, while it is an override, says what Clear restores.
 		marker: (function () {
 			const blk = kids.filter((k) => k === t || findAll([k], 'TABLE').indexOf(t) >= 0)[0], i = kids.indexOf(blk);
 			const g = i > 0 && String(kids[i - 1].className) === 'lpn-ovm' ? kids[i - 1] : null;
 			if (!g) { return null; }
 			const dot = g.children.filter((c) => /lpn-ovm-(dot|hollow)/.test(c.className))[0];
-			const note = kids.slice(i).filter((k) => k.className === 'lpn-ov-note')[0];
-			return { dot: dot, on: !!dot && /lpn-ovm-dot/.test(dot.className), textContent: note ? findAll([note], 'SPAN').map((x) => x.textContent).join('') : '' };
+			// What Clear restores is told by the filled dot's tip (Tom, 2026-10-22), not a line under the table.
+			return { dot: dot, on: !!dot && /lpn-ovm-dot/.test(dot.className), textContent: dot && /lpn-ovm-dot/.test(dot.className) ? String(dot.title || '') : '' };
 		}())
 	};
 }

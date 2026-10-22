@@ -1659,7 +1659,6 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}. {n} von {all} werden angezeigt.
 $ec_lang['lpn_ovm_child_ask']='Untergeordnete Überschreibungen löschen (insgesamt {n})?';
 $ec_lang['lpn_ovm_child_tip']='Untergeordnete Szenarien überschreiben diesen Wert (insgesamt {n}). Klicken, um ihre Überschreibungen zu löschen.';
 $ec_lang['lpn_ovm_dot_clear']='Klicken, um sie zu löschen.';
-$ec_lang['lpn_ovm_dot_set']='Geerbt. Klicken, um daraus eine Überschreibung in diesem Szenario mit dem angezeigten Wert zu machen.';
 $ec_lang['lpn_pane_clear_override']='Überschreibung löschen';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3309,7 +3308,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Das Szenario {name} kann nicht gel
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Basisszenario: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} ist in {scenario} nicht Teil des Netzes. Es verbleibt in der Zeichnung und in den anderen Szenarien.';
 $ec_lang['lpn_scenario_delete_in_base']='Um es aus der Zeichnung zu entfernen, löschen Sie es im Szenario {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} ist gelöscht. Es gehörte nur zu {scenario}.';
@@ -3390,7 +3388,6 @@ $ec_lang['lpn_sm_unused_none']='Keine';
 $ec_lang['lpn_sm_all_row_tip']='Doppelklicken, um sie in ihrem Kategoriebaum zu öffnen.';
 $ec_lang['lpn_sm_compare_tip']='In den Szenarienvergleich einbeziehen';
 $ec_lang['lpn_sm_inherited']='geerbt';
-$ec_lang['lpn_sm_shared_note']='Gemeinsam genutzt mit: {list}';
 $ec_lang['lpn_scncmp_none_checked']='Für den Vergleich ist kein Szenario angehakt. Haken Sie Szenarien in der Szenarioverwaltung an.';
 $ec_lang['lpn_time_scn_overrides']='Szenario-Überschreibungen:';
 $ec_lang['lpn_settings_table_major']='Hauptüberschrift';
@@ -3444,7 +3441,6 @@ $ec_lang['lpn_settings_row_new_asset']='Neue Elemente: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (Standard)';
 $ec_lang['lpn_settings_row_view_value']='Mittelpunkt {x}, {y}; Maßstab {s}';
 $ec_lang['lpn_settings_held_in']='Überschreibung in {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Kartenmittelpunkt';
 $ec_lang['lpn_settings_view_scale']='Kartenmaßstab';
 $ec_lang['lpn_settings_view_scale_tip']='Der Maßstab in der Kartenmitte als 1:N. Geben Sie 1:2000 oder nur 2000 ein, um auf diesen Maßstab zu zoomen.';

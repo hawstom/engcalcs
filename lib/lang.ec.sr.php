@@ -1659,7 +1659,6 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}. Приказано {n} од {al
 $ec_lang['lpn_ovm_child_ask']='Уклонити сопствене вредности подређених сценарија (укупно {n})?';
 $ec_lang['lpn_ovm_child_tip']='Подређени сценарији замењују ову вредност (укупно {n}). Кликните да уклоните њихове сопствене вредности.';
 $ec_lang['lpn_ovm_dot_clear']='Кликните да је уклоните.';
-$ec_lang['lpn_ovm_dot_set']='Наслеђено. Кликните да то постане сопствена вредност у овом сценарију, са приказаном вредношћу.';
 $ec_lang['lpn_pane_clear_override']='Уклони сопствену вредност';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3309,7 +3308,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Сценарио {name} не мо�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Основни сценарио: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} је изван мреже у сценарију {scenario}. И даље је на цртежу и у вашим осталим сценаријима.';
 $ec_lang['lpn_scenario_delete_in_base']='Да бисте га уклонили са цртежа, обришите га у сценарију {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} је обрисан. Био је део само сценарија {scenario}.';
@@ -3390,7 +3388,6 @@ $ec_lang['lpn_sm_unused_none']='Ништа';
 $ec_lang['lpn_sm_all_row_tip']='Двокликните да га отворите у стаблу његове категорије.';
 $ec_lang['lpn_sm_compare_tip']='Укључи у Поређење сценарија';
 $ec_lang['lpn_sm_inherited']='наслеђено';
-$ec_lang['lpn_sm_shared_note']='Дели се са: {list}';
 $ec_lang['lpn_scncmp_none_checked']='Ниједан сценарио није означен за поређење. Означите сценарије у Менаџеру сценарија.';
 $ec_lang['lpn_time_scn_overrides']='Сопствене вредности сценарија:';
 $ec_lang['lpn_settings_table_major']='Главни наслов';
@@ -3444,7 +3441,6 @@ $ec_lang['lpn_settings_row_new_asset']='Нови елементи: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (подразумевано)';
 $ec_lang['lpn_settings_row_view_value']='Центар {x}, {y}; размера {s}';
 $ec_lang['lpn_settings_held_in']='Сопствена вредност у {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Центар мапе';
 $ec_lang['lpn_settings_view_scale']='Размера мапе';
 $ec_lang['lpn_settings_view_scale_tip']='Размера у центру мапе, као 1:N. Упишите 1:2000, или само 2000, да зумирате на ту размеру.';

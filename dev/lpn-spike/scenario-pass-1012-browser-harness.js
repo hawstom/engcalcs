@@ -15,7 +15,7 @@
 //       a paste in another scenario writes there (Base unchanged) and names the alternative it made;
 //   M2  in Basic mode a new scenario is a child of Base, even made while Fig 5 is current;
 //   F7  the menu's New and Rename refuse a name already used;
-//   F8  "Shared with" names a scenario that names the alternative, not a child that inherits it.
+//   F8  the filled dot's tip names a scenario that names the alternative, not a child that inherits it.
 //   Q2  the line beside an override says what Clear override restores, named by where it comes from
 //       (the parent scenario, or Base);
 //   Q3  an .inp export from Fig 5 writes Fig 5's Text position, as it writes its node values.
@@ -426,7 +426,7 @@ async function main() {
 		}
 
 		// ---- F8 ----
-		console.log('\n--- F8. "Shared with" counts only scenarios that name the alternative ---');
+		console.log('\n--- F8. the dot\'s tip lists only scenarios that name the alternative ---');
 		await openProject((d) => {
 			d.alternatives = [{ id: 'a1', category: 'physical', name: 'Fig 4', parent: null, values: { 'n:10': { elev: 700 } } }];
 			byId(d.scenarios, 'f4').alternatives = { physical: 'a1' };
@@ -434,10 +434,11 @@ async function main() {
 			d.project.activeScenario = 'f4';
 		}, true);
 		await clickNode('10');
-		const shared = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup .lpn-ov-shared')).map((e) => e.textContent.trim()));
-		const want = (await L('lpn_sm_shared_note')).replace('{list}', 'Fig 9');
-		ok('F8 in Fig 4 the elevation note names Fig 9, which names the alternative, and not Fig 5, which inherits it',
-			shared.length > 0 && shared.every((t) => t === want), JSON.stringify(shared));
+		const dotTipOf = () => page.evaluate(() => { const d = document.querySelector('#lpn_popup_fields .lpn-ovm-dot'); return d ? d.getAttribute('aria-label') : ''; });
+		const sharedTip = await dotTipOf();
+		const want = (await L('lpn_ovm_dot_alt_shared')).replace('{alternative}', 'Fig 4').replace('{list}', 'Fig 9');
+		ok('F8 in Fig 4 the elevation dot\'s tip names Fig 9, which names the alternative, and not Fig 5, which inherits it',
+			sharedTip.split('\n')[1] === want && sharedTip.indexOf('Fig 5') === -1, JSON.stringify(sharedTip));
 
 		// ---- Q2 in Properties ----
 		console.log('\n--- Q2. Properties says what Clear override restores, and from where ---');
@@ -446,15 +447,15 @@ async function main() {
 			byId(d.scenarios, 'f5').overrides = { 'n:10': { elev: 730 } };
 		});
 		await clickNode('10');
-		let lines = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup .lpn-ov-base')).filter((e) => !e.classList.contains('lpn-ov-shared')).map((e) => e.textContent.trim()));
-		const HB = await L('lpn_settings_held_base'), await0bv = await L('lpn_scenario_base_value');
-		ok('Q2 in Fig 5 the elevation line names Fig 4 and its 720', lines.some((t) => t === HB.replace('{base}', 'Fig 4').replace('{value}', '720')), JSON.stringify(lines));
+		const CT = await L('lpn_ovm_dot_clear_to');
+		let tip = await dotTipOf();
+		ok('Q2 in Fig 5 the elevation dot\'s tip names Fig 4 and its 720', tip.split('\n')[0] === CT.replace('{value}', '720').replace('{parent}', 'Fig 4'), JSON.stringify(tip));
 		await page.evaluate(() => { const p = document.getElementById('lpn_popup_close'); if (p && p.offsetParent) { p.click(); } });
 		await scenarioMenu('Fig 4');
 		await clickNode('10');
-		lines = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_popup .lpn-ov-base')).filter((e) => !e.classList.contains('lpn-ov-shared')).map((e) => e.textContent.trim()));
+		tip = await dotTipOf();
 		const baseElev = String(byId(JSON.parse(fs.readFileSync(path.join(REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8')).nodes, '10').elev);
-		ok('Q2 in Fig 4, a child of Base, it reads Base scenario: ' + baseElev, lines.some((t) => t === (await0bv).replace('{value}', baseElev)), JSON.stringify(lines));
+		ok('Q2 in Fig 4, a child of Base, it restores Base\'s ' + baseElev, tip.split('\n')[0] === CT.replace('{value}', baseElev).replace('{parent}', await L('lpn_scenario_base')), JSON.stringify(tip));
 
 		// ---- q01: what Basic mode can show; Copy scenario ----
 		console.log('\n--- q01. a project Basic mode cannot show turns it off; Copy scenario in Basic mode ---');

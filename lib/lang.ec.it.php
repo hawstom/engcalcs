@@ -1659,7 +1659,6 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}. Mostrati {n} di {all}.';
 $ec_lang['lpn_ovm_child_ask']='Cancellare i valori personalizzati degli scenari figli (in totale {n})?';
 $ec_lang['lpn_ovm_child_tip']='Gli scenari figli personalizzano questo valore (in totale {n}). Fare clic per cancellare i loro valori personalizzati.';
 $ec_lang['lpn_ovm_dot_clear']='Fare clic per cancellarlo.';
-$ec_lang['lpn_ovm_dot_set']='Ereditato. Fare clic per renderlo un valore personalizzato in questo scenario, con il valore mostrato.';
 $ec_lang['lpn_pane_clear_override']='Cancella valore personalizzato';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3309,7 +3308,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Lo scenario {name} non può essere
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Scenario base: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} è escluso dalla rete in {scenario}. Rimane comunque nel disegno e negli altri scenari.';
 $ec_lang['lpn_scenario_delete_in_base']='Per rimuoverlo dal disegno, eliminalo nello scenario {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} è eliminato. Faceva parte solo di {scenario}.';
@@ -3390,7 +3388,6 @@ $ec_lang['lpn_sm_unused_none']='Nessuna';
 $ec_lang['lpn_sm_all_row_tip']='Fare doppio clic per aprirla nel suo albero di categoria.';
 $ec_lang['lpn_sm_compare_tip']='Includere in Scenari: confronto';
 $ec_lang['lpn_sm_inherited']='ereditato';
-$ec_lang['lpn_sm_shared_note']='Condivisa con: {list}';
 $ec_lang['lpn_scncmp_none_checked']='Nessuno scenario è selezionato per il confronto. Seleziona gli scenari nel riquadro Scenari: gestione.';
 $ec_lang['lpn_time_scn_overrides']='Valori personalizzati dello scenario:';
 $ec_lang['lpn_settings_table_major']='Titolo principale';
@@ -3444,7 +3441,6 @@ $ec_lang['lpn_settings_row_new_asset']='Nuovi elementi: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (predefinito)';
 $ec_lang['lpn_settings_row_view_value']='Centro {x}, {y}; scala {s}';
 $ec_lang['lpn_settings_held_in']='Valore personalizzato in {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Centro della mappa';
 $ec_lang['lpn_settings_view_scale']='Scala della mappa';
 $ec_lang['lpn_settings_view_scale_tip']='La scala al centro della mappa, come 1:N. Digita 1:2000, o solo 2000, per ingrandire a quella scala.';

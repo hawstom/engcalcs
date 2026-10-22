@@ -1659,7 +1659,6 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}។ បង្ហាញ {n} ក្
 $ec_lang['lpn_ovm_child_ask']='សម្អាតតម្លៃផ្ទាល់ខ្លួនរបស់កូន ({n} សរុប)?';
 $ec_lang['lpn_ovm_child_tip']='សេណារីយ៉ូកូនមានតម្លៃផ្ទាល់ខ្លួនសម្រាប់តម្លៃនេះ ({n} សរុប)។ ចុចដើម្បីសម្អាតតម្លៃផ្ទាល់ខ្លួនរបស់ពួកវា។';
 $ec_lang['lpn_ovm_dot_clear']='ចុចដើម្បីសម្អាតវា។';
-$ec_lang['lpn_ovm_dot_set']='បានទទួលមរតក។ ចុចដើម្បីធ្វើឲ្យវាជាតម្លៃផ្ទាល់ខ្លួនក្នុងសេណារីយ៉ូនេះ ដោយរក្សាតម្លៃដែលបានបង្ហាញ។';
 $ec_lang['lpn_pane_clear_override']='សម្អាតតម្លៃផ្ទាល់ខ្លួន';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3309,7 +3308,6 @@ $ec_lang['lpn_scenario_delete_has_children']='សេណារីយ៉ូ {name}
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='សេណារីយ៉ូមូលដ្ឋាន៖ {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} ត្រូវបានដកចេញពីបណ្ដាញក្នុង {scenario}។ វានៅតែស្ថិតក្នុងគំនូរ និងក្នុងសេណារីយ៉ូផ្សេងទៀត។';
 $ec_lang['lpn_scenario_delete_in_base']='ដើម្បីដកវាចេញពីគំនូរ សូមលុបវាក្នុងសេណារីយ៉ូ {base}។';
 $ec_lang['lpn_scenario_only_deleted']='{id} ត្រូវបានលុប។ វាជាផ្នែកនៃ {scenario} តែប៉ុណ្ណោះ។';
@@ -3390,7 +3388,6 @@ $ec_lang['lpn_sm_unused_none']='គ្មាន';
 $ec_lang['lpn_sm_all_row_tip']='ចុចទ្វេដងដើម្បីបើកវាក្នុងដើមឈើប្រភេទរបស់វា។';
 $ec_lang['lpn_sm_compare_tip']='រួមបញ្ចូលក្នុងការប្រៀបធៀបសេណារីយ៉ូ';
 $ec_lang['lpn_sm_inherited']='បានទទួលមរតក';
-$ec_lang['lpn_sm_shared_note']='ចែករំលែកជាមួយ៖ {list}';
 $ec_lang['lpn_scncmp_none_checked']='គ្មានសេណារីយ៉ូណាត្រូវបានធីកសម្រាប់ការប្រៀបធៀបទេ។ ធីកសេណារីយ៉ូក្នុង កម្មវិធីគ្រប់គ្រងសេណារីយ៉ូ។';
 $ec_lang['lpn_time_scn_overrides']='តម្លៃផ្ទាល់ខ្លួនរបស់សេណារីយ៉ូ៖';
 $ec_lang['lpn_settings_table_major']='ចំណងជើងធំ';
@@ -3444,7 +3441,6 @@ $ec_lang['lpn_settings_row_new_asset']='ធាតុថ្មី៖ {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (លំនាំដើម)';
 $ec_lang['lpn_settings_row_view_value']='ចំណុចកណ្ដាល {x}, {y}; មាត្រដ្ឋាន {s}';
 $ec_lang['lpn_settings_held_in']='តម្លៃផ្ទាល់ខ្លួនក្នុង {scenario}។';
-$ec_lang['lpn_settings_held_base']='{base}៖ {value}';
 $ec_lang['lpn_settings_view_center']='ចំណុចកណ្ដាលផែនទី';
 $ec_lang['lpn_settings_view_scale']='មាត្រដ្ឋានផែនទី';
 $ec_lang['lpn_settings_view_scale_tip']='មាត្រដ្ឋាននៅចំណុចកណ្ដាលនៃផែនទី ជា 1:N។ វាយ 1:2000 ឬគ្រាន់តែ 2000 ដើម្បីពង្រីកទៅមាត្រដ្ឋាននោះ។';

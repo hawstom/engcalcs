@@ -1659,7 +1659,6 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}. {all} نه {n} ښودل کیږ�
 $ec_lang['lpn_ovm_child_ask']='د فرعي ځانګړو ارزښتونو پاکول ({n} ټول)؟';
 $ec_lang['lpn_ovm_child_tip']='فرعي سناریوګانې دا ارزښت ځانګړی کوي ({n} ټول). د دوی ځانګړي ارزښتونو پاکولو لپاره کلیک وکړئ.';
 $ec_lang['lpn_ovm_dot_clear']='د پاکولو لپاره کلیک وکړئ.';
-$ec_lang['lpn_ovm_dot_set']='میراثي. په دې سناریو کې یې د ځانګړي ارزښت جوړولو لپاره کلیک وکړئ، د ښودل شوي ارزښت سره.';
 $ec_lang['lpn_pane_clear_override']='خپل ارزښت پاکول';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3309,7 +3308,6 @@ $ec_lang['lpn_scenario_delete_has_children']='سناریو {name} نشي ړنګ�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='د اساس سناریو: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} په {scenario} کې د شبکې نه بهر دی. دا لاهم په انځور کې دی، او ستاسو په نورو سناریوګانو کې هم.';
 $ec_lang['lpn_scenario_delete_in_base']='له انځور څخه یې لرې کولو لپاره، یې په {base} سناریو کې ړنګ کړئ.';
 $ec_lang['lpn_scenario_only_deleted']='{id} ړنګ شو. دا یوازې د {scenario} برخه وه.';
@@ -3390,7 +3388,6 @@ $ec_lang['lpn_sm_unused_none']='هیڅ';
 $ec_lang['lpn_sm_all_row_tip']='دوه ځلې کلیک وکړئ ترڅو په خپل کټګورۍ ونه کې یې پرانیزئ.';
 $ec_lang['lpn_sm_compare_tip']='سناریو: پرتله کې شاملول';
 $ec_lang['lpn_sm_inherited']='میراثي';
-$ec_lang['lpn_sm_shared_note']='سره شریک: {list}';
 $ec_lang['lpn_scncmp_none_checked']='هیڅ سناریو د پرتلې لپاره نه ده ټاکل شوې. په سناریو: مدیر کې سناریوګانې وټاکئ.';
 $ec_lang['lpn_time_scn_overrides']='د سناریو خپل ارزښتونه:';
 $ec_lang['lpn_settings_table_major']='لوی سرلیک';
@@ -3444,7 +3441,6 @@ $ec_lang['lpn_settings_row_new_asset']='نوې شتمنۍ: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (ډیفالټ)';
 $ec_lang['lpn_settings_row_view_value']='مرکز {x}، {y}؛ پیمانه {s}';
 $ec_lang['lpn_settings_held_in']='په {scenario} کې ځانګړی ارزښت.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='د نقشې مرکز';
 $ec_lang['lpn_settings_view_scale']='د نقشې پیمانه';
 $ec_lang['lpn_settings_view_scale_tip']='د نقشې په مرکز کې پیمانه، لکه 1:N. 1:2000، یا یوازې 2000 ولیکئ، ترڅو هغه پیمانې ته زوم شي.';

@@ -7473,12 +7473,13 @@ var EngCalcs = EngCalcs || {};
 	// market researcher's call, 2026-10-09; Tom, 2026-10-05: *editing a shared alternative changes
 	// every scenario that uses it*). Names the other scenarios using what the open scenario writes
 	// to, in the given categories; '' when it writes to its own values or nobody else uses it.
-	function smSharedText(cats) {
-		var scn = activeScenario(), names = [], seen = {}, pc = EngCalcs.pageConfig || {};
-		if (!scn || plainBase(scn)) { return ''; }
+	function smStoredIn(cats) {
+		var scn = activeScenario(), names = [], seen = {}, alt = null;
+		if (!scn || plainBase(scn)) { return null; }
 		cats.forEach(function (cat) {
 			var t = writeTargetFor(scn, cat);
 			if (!t || t.kind === 'scn') { return; }
+			if (alt === null) { alt = String(t.obj.name || ''); }
 			// **ONLY SCENARIOS THAT NAME IT** (Sue, 2026-10-12): a child that inherits it is
 			// inheritance, the point of a child, not the sharing "Share edits" sets up.
 			storedUsers(t.kind === 'calc' ? 'calc' : 'alt', t.obj.id).scenarios.forEach(function (id) {
@@ -7486,7 +7487,7 @@ var EngCalcs = EngCalcs || {};
 				if (u && u.id !== scn.id && !seen[u.id]) { seen[u.id] = true; names.push(scenarioDisplayName(u)); }
 			});
 		});
-		return names.length ? (pc.lpn_sm_shared_note || 'Shared with: {list}').replace('{list}', names.join(', ')) : '';
+		return alt === null ? null : { alt: alt, users: names };
 	}
 	// **THE SCENARIOS A COMPARISON SOLVES** (H06): the checked set stored in the project; with none
 	// stored, every scenario, so an old file behaves as before.
@@ -40539,7 +40540,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				morphDropStrays(el, morphDesc(el, morphTypeIn(el, activeScenario()), morphBaseOf(el, 'valveType')));
 				buildDom();
 			},
-			line: function () { return inheritedLine(function () { return names[el.type] || el.type; }); }
+			parts: function () { return inheritedParts(function () { return names[el.type] || el.type; }); }
 		});
 	}
 	// ---- The examples gallery (ROADMAP Task 314) ---------------------------------------------
@@ -69783,17 +69784,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// 2026-10-12): the parent scenario's value as it resolves there, named; Base's in Base's words.
 	// The category of the marker whose line is being written, for Base (ovmGutter()).
 	var inheritedLineCat = null;
-	function inheritedLine(fn) {
-		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), par = parentScenarioOf(scn), v;
+	function inheritedParts(fn) {
+		var scn = activeScenario(), par = parentScenarioOf(scn), v;
 		// Base naming an alternative: what Clear restores is that alternative's parent's value, so the
-		// line reads Base with the alternative's parent named in its place, for that moment.
+		// value is read with the alternative's parent in place of the alternative, for that moment.
 		if (scn.isBase && inheritedLineCat !== null && basePick(scn, inheritedLineCat) !== undefined) {
 			v = withBasePick(scn, inheritedLineCat, (writeTargetFor(scn, inheritedLineCat).obj || {}).parent, fn);
-			return (pc.lpn_scenario_base_value || 'Base scenario: {value}').replace('{value}', v);
+			return { value: v, name: scenarioDisplayName(baseScenario()) };
 		}
 		v = paneInScenario(par, fn);
-		if (!par || par.isBase) { return (pc.lpn_scenario_base_value || 'Base scenario: {value}').replace('{value}', v); }
-		return (pc.lpn_settings_held_base || '{base}: {value}').split('{base}').join(scenarioDisplayName(par)).split('{value}').join(v);
+		return { value: v, name: scenarioDisplayName(!par || par.isBase ? baseScenario() : par) };
 	}
 	// ---- THE OVERRIDE MARKER: A DOT AND A DOWN TRIANGLE (Task 790) ----
 	//
@@ -69913,8 +69913,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return kids[i];
 	}
 	/**
-	 * The gutter for the row just appended. `o`: {el, props, on, set(), clear(), line(), cats}. `line`
-	 * says what Clear would restore (Tom, 2026-10-12), shown under the row while it is an override.
+	 * The gutter for the row just appended. `o`: {el, props, on, set(), clear(), parts(), cats}. `parts`
+	 * says what Clear would restore and from where (Tom, 2026-10-12), told by the filled dot's tip.
 	 */
 	// The gutter's room, given to the rows and to the ID line above them (#lpn_popup_title), so
 	// every line of the box starts at one x.
@@ -69922,8 +69922,24 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var t = fields.id === 'lpn_popup_fields' ? document.getElementById('lpn_popup_title') : null;
 		[fields, t].forEach(function (e) { if (e && e.classList) { e.classList.add(cls); } });
 	}
+	// **THE FILLED DOT'S TIP SAYS WHAT CLEAR RESTORES, FROM WHERE, AND WHO ELSE IS REACHED** (Tom,
+	// 2026-10-22). The second sentence, on its own line, only with Basic mode off and a stored
+	// alternative written: Basic mode hides alternatives.
+	function ovmClearTip(o) {
+		var pc = EngCalcs.pageConfig || {}, p, st, tip;
+		inheritedLineCat = o.cats[0];
+		try { p = o.parts(); } finally { inheritedLineCat = null; }
+		tip = (pc.lpn_ovm_dot_clear_to || 'Click to clear override and restore {value}, the value in {parent}.').split('{value}').join(p.value).split('{parent}').join(p.name);
+		st = scenarioBasicMode ? null : smStoredIn(o.cats);
+		if (st) {
+			tip += '\n' + (st.users.length
+				? (pc.lpn_ovm_dot_alt_shared || 'This override is stored in alternative "{alternative}", also used by {list}, so clear or edits change them too.').split('{alternative}').join(st.alt).split('{list}').join(st.users.join(', '))
+				: (pc.lpn_ovm_dot_alt || 'This override is stored in alternative "{alternative}".').split('{alternative}').join(st.alt));
+		}
+		return tip;
+	}
 	function ovmGutter(fields, o) {
-		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), start, g, kids, n, note, base, shared, baseHere;
+		var pc = EngCalcs.pageConfig || {}, scn = activeScenario(), start, g, kids, n, baseHere, dot;
 		if (!o.el || scenarios.length < 2 || !isOverridable(o.el, o.props[0])) { return; }
 		start = ovmRowStart(fields);
 		if (!start) { return; }
@@ -69940,13 +69956,14 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		g.className = 'lpn-ovm';
 		if (baseHere) { /* the triangle alone */ }
 		else if (o.on) {
-			g.appendChild(ovmCell('lpn-ovm-dot', (pc.lpn_settings_held_in || 'Override in {scenario}.').split('{scenario}').join(scenarioDisplayName(scn)) +
-				' ' + (pc.lpn_ovm_dot_clear || 'Click to clear it.'), function () {
+			dot = ovmCell('lpn-ovm-dot', ovmClearTip(o), function () {
 				saveUndoSnapshot();
 				o.clear();
 				afterPropertyEdit(o.el);
 				refreshPopupIfOpen();
-			}));
+			});
+			dot.dataset.ecTipLines = '1';
+			g.appendChild(dot);
 		} else {
 			g.appendChild(ovmCell('lpn-ovm-hollow', (pc.lpn_ovm_dot_set_from || 'Inherited from {name}. Click to make it an override in this scenario, holding the value shown.').split('{name}').join(inheritedSourceName(o.el, o.props)), function () {
 				saveUndoSnapshot();
@@ -69966,24 +69983,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			}));
 		} else { g.appendChild(ovmCell('lpn-ovm-none')); }
 		fields.insertBefore(g, start);
-		if (!o.on || baseHere) { return; }
-		// While it is an override: what Clear restores, and who else the alternative reaches.
-		note = document.createElement('div');
-		note.className = 'lpn-ov-note';
-		base = document.createElement('span');
-		base.className = 'lpn-ov-base';
-		inheritedLineCat = o.cats[0];
-		try { base.textContent = o.line(); } finally { inheritedLineCat = null; }
-		note.appendChild(base);
-		shared = smSharedText(o.cats);
-		if (shared) {
-			base = document.createElement('span');
-			base.className = 'lpn-ov-base lpn-ov-shared';
-			base.textContent = ' ' + shared;
-			note.appendChild(base);
-		}
-		// Under the row: after the row's own <br>.
-		fields.appendChild(note);
 	}
 	function overrideMarker(fields, el, prop, format) {
 		if (!el || !isOverridable(el, prop)) { return; }
@@ -69993,7 +69992,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// an edit, so it changes no number by itself.
 			set: function () { setOverride(el, prop, effective(el, prop)); },
 			clear: function () { clearOverride(el, prop); },
-			line: function () { return inheritedLine(function () { return (format || formatPropValue)(effective(el, prop)); }); }
+			parts: function () { return inheritedParts(function () { return (format || formatPropValue)(effective(el, prop)); }); }
 		});
 	}
 	// **THE DEMAND TABLE'S ONE MARKER** (R-369), over the two properties a scenario can hold for this
@@ -70010,8 +70009,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				else { setOverride(n, 'demand', effective(n, 'demand')); }
 			},
 			clear: function () { clearOverride(n, 'demands'); clearOverride(n, 'demand'); },
-			line: function () {
-				return inheritedLine(function () { return ownDemandRows(n).map(function (d) { return formatPropValue(d.base); }).join(' + '); });
+			parts: function () {
+				return inheritedParts(function () { return ownDemandRows(n).map(function (d) { return formatPropValue(d.base); }).join(' + '); });
 			}
 		});
 	}
@@ -70024,7 +70023,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			el: lb, props: ['x', 'y'], on: !inBaseFor(categoryOf('x', 'label')) && (hasOverride(lb, 'x') || hasOverride(lb, 'y')), cats: [categoryOf('x', 'label')],
 			set: function () { setProp(lb, 'x', effective(lb, 'x')); setProp(lb, 'y', effective(lb, 'y')); relayoutLabels(); },
 			clear: function () { clearOverride(lb, 'x'); clearOverride(lb, 'y'); relayoutLabels(); },
-			line: function () { return inheritedLine(function () { return coordText(labelCoordAxis(lb, 1)) + ', ' + coordText(labelCoordAxis(lb, 2)); }); }
+			parts: function () { return inheritedParts(function () { return coordText(labelCoordAxis(lb, 1)) + ', ' + coordText(labelCoordAxis(lb, 2)); }); }
 		});
 	}
 	// Completes an ordinary value edit. Ending a field helper at scheduleSolve() alone is a THIRD of

@@ -1659,7 +1659,6 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}. {all} öğeden {n} tanesi göst
 $ec_lang['lpn_ovm_child_ask']='Alt senaryo değerleri temizlensin mi (toplam {n})?';
 $ec_lang['lpn_ovm_child_tip']='Alt senaryolar bu değeri değiştiriyor (toplam {n}). Senaryo değerlerini temizlemek için tıklayın.';
 $ec_lang['lpn_ovm_dot_clear']='Temizlemek için tıklayın.';
-$ec_lang['lpn_ovm_dot_set']='Devralınmış. Bu senaryoda, gösterilen değeri tutan bir senaryo değeri yapmak için tıklayın.';
 $ec_lang['lpn_pane_clear_override']='Senaryo değerini temizle';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3309,7 +3308,6 @@ $ec_lang['lpn_scenario_delete_has_children']='{name} senaryosu silinemez, çünk
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Temel senaryo: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id}, {scenario} içinde şebeke dışında. Hâlâ çizimde ve diğer senaryolarınızda bulunuyor.';
 $ec_lang['lpn_scenario_delete_in_base']='Çizimden kaldırmak için {base} senaryosunda silin.';
 $ec_lang['lpn_scenario_only_deleted']='{id} silindi. Yalnızca {scenario} senaryosunun parçasıydı.';
@@ -3390,7 +3388,6 @@ $ec_lang['lpn_sm_unused_none']='Yok';
 $ec_lang['lpn_sm_all_row_tip']='Kategori ağacında açmak için çift tıklayın.';
 $ec_lang['lpn_sm_compare_tip']='Senaryo karşılaştırmasına dahil et';
 $ec_lang['lpn_sm_inherited']='devralınmış';
-$ec_lang['lpn_sm_shared_note']='Paylaşılan: {list}';
 $ec_lang['lpn_scncmp_none_checked']='Karşılaştırma için hiçbir senaryo işaretli değil. Senaryo yöneticisinde senaryoları işaretleyin.';
 $ec_lang['lpn_time_scn_overrides']='Senaryo değerleri:';
 $ec_lang['lpn_settings_table_major']='Ana başlık';
@@ -3444,7 +3441,6 @@ $ec_lang['lpn_settings_row_new_asset']='Yeni varlıklar: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (varsayılan)';
 $ec_lang['lpn_settings_row_view_value']='Merkez {x}, {y}; ölçek {s}';
 $ec_lang['lpn_settings_held_in']='{scenario} içinde senaryo değeri.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Harita merkezi';
 $ec_lang['lpn_settings_view_scale']='Harita ölçeği';
 $ec_lang['lpn_settings_view_scale_tip']='Haritanın merkezindeki ölçek, 1:N olarak. O ölçeğe yakınlaştırmak için 1:2000 veya yalnızca 2000 yazın.';

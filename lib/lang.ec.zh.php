@@ -1659,7 +1659,6 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}。显示 {all} 中的 {n}。';
 $ec_lang['lpn_ovm_child_ask']='清除子方案的覆盖值（共 {n} 个）？';
 $ec_lang['lpn_ovm_child_tip']='子方案覆盖了此数值（共 {n} 个）。点击可清除它们的覆盖值。';
 $ec_lang['lpn_ovm_dot_clear']='点击可清除。';
-$ec_lang['lpn_ovm_dot_set']='继承而来。点击可使其成为此方案中的覆盖值，保持所显示的数值。';
 $ec_lang['lpn_pane_clear_override']='清除覆盖值';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3309,7 +3308,6 @@ $ec_lang['lpn_scenario_delete_has_children']='方案 {name} 无法删除，因�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='基础情景：{value}';
 $ec_lang['lpn_scenario_deactivated']='{id} 在 {scenario} 中被排除在管网之外。它仍保留在图纸和其他方案中。';
 $ec_lang['lpn_scenario_delete_in_base']='要将其从图纸中移除，请在{base}方案中删除。';
 $ec_lang['lpn_scenario_only_deleted']='{id} 已删除。它仅属于 {scenario}。';
@@ -3390,7 +3388,6 @@ $ec_lang['lpn_sm_unused_none']='无';
 $ec_lang['lpn_sm_all_row_tip']='双击可在其类别树中打开。';
 $ec_lang['lpn_sm_compare_tip']='纳入“方案对比”';
 $ec_lang['lpn_sm_inherited']='继承';
-$ec_lang['lpn_sm_shared_note']='与以下对象共享：{list}';
 $ec_lang['lpn_scncmp_none_checked']='没有勾选任何方案用于对比。请在“方案管理器”中勾选方案。';
 $ec_lang['lpn_time_scn_overrides']='方案覆盖值：';
 $ec_lang['lpn_settings_table_major']='主标题';
@@ -3444,7 +3441,6 @@ $ec_lang['lpn_settings_row_new_asset']='新元件：{setting}';
 $ec_lang['lpn_settings_row_default']='{value}（默认）';
 $ec_lang['lpn_settings_row_view_value']='中心 {x}，{y}；比例尺 {s}';
 $ec_lang['lpn_settings_held_in']='{scenario} 中的覆盖值。';
-$ec_lang['lpn_settings_held_base']='{base}：{value}';
 $ec_lang['lpn_settings_view_center']='地图中心';
 $ec_lang['lpn_settings_view_scale']='地图比例尺';
 $ec_lang['lpn_settings_view_scale_tip']='地图中心处的比例尺，格式为 1:N。键入 1:2000 或直接键入 2000，即可缩放到该比例尺。';

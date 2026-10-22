@@ -1659,7 +1659,6 @@ $ec_lang['lpn_pane_scn_filter_note']='{filters}. Показани са {n} от 
 $ec_lang['lpn_ovm_child_ask']='Да се изчистят ли стойностите на дъщерните сценарии (общо {n})?';
 $ec_lang['lpn_ovm_child_tip']='Дъщерни сценарии заместват тази стойност (общо {n}). Щракнете, за да изчистите техните стойности.';
 $ec_lang['lpn_ovm_dot_clear']='Щракнете, за да я изчистите.';
-$ec_lang['lpn_ovm_dot_set']='Наследена. Щракнете, за да я направите своя стойност в този сценарий със същата показана стойност.';
 $ec_lang['lpn_pane_clear_override']='Изчистване на собствената стойност';
 // The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
 // Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
@@ -3309,7 +3308,6 @@ $ec_lang['lpn_scenario_delete_has_children']='Сценарият {name} не м�
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
 // The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
 // Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
-$ec_lang['lpn_scenario_base_value']='Базов сценарий: {value}';
 $ec_lang['lpn_scenario_deactivated']='В {scenario} {id} е изключен от мрежата. Остава в чертежа и в другите сценарии.';
 $ec_lang['lpn_scenario_delete_in_base']='За да го премахнете от чертежа, изтрийте го в сценарий {base}.';
 $ec_lang['lpn_scenario_only_deleted']='{id} е изтрит. Той е бил част само от {scenario}.';
@@ -3390,7 +3388,6 @@ $ec_lang['lpn_sm_unused_none']='Няма';
 $ec_lang['lpn_sm_all_row_tip']='Щракнете двукратно, за да го отворите в дървото на категорията му.';
 $ec_lang['lpn_sm_compare_tip']='Включи в Сценарии: сравнение';
 $ec_lang['lpn_sm_inherited']='наследена';
-$ec_lang['lpn_sm_shared_note']='Споделена с: {list}';
 $ec_lang['lpn_scncmp_none_checked']='Няма сценарий, отметнат за сравнение. Отметнете сценарии в Сценарния мениджър.';
 $ec_lang['lpn_time_scn_overrides']='Свои стойности на сценария:';
 $ec_lang['lpn_settings_table_major']='Основно заглавие';
@@ -3444,7 +3441,6 @@ $ec_lang['lpn_settings_row_new_asset']='Нови елементи: {setting}';
 $ec_lang['lpn_settings_row_default']='{value} (по подразбиране)';
 $ec_lang['lpn_settings_row_view_value']='Център {x}, {y}; мащаб {s}';
 $ec_lang['lpn_settings_held_in']='Своя стойност в {scenario}.';
-$ec_lang['lpn_settings_held_base']='{base}: {value}';
 $ec_lang['lpn_settings_view_center']='Център на картата';
 $ec_lang['lpn_settings_view_scale']='Мащаб на картата';
 $ec_lang['lpn_settings_view_scale_tip']='Мащабът в центъра на картата, във вида 1:N. Въведете 1:2000 или просто 2000, за да увеличите до този мащаб.';
