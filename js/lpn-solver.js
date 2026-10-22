@@ -1118,14 +1118,17 @@ EngCalcs.lpnSolve = function (model, options) {
 	// if the flow still points that way. EPANET does it at t = 0 too, so without it a pump feeding a
 	// full tank pushed water in that EPANET keeps out. Only a tank with a diameter (diameter 0 is a
 	// reservoir to EPANET, input3.c) and levels EPANET accepts (min <= level <= max). The bridge
-	// writes no Overflow column, so no tank here can overflow.
+	// writes no Overflow column, so no tank the page builds can overflow (`overflow` below).
 	var tk = [], tFull = {}, tEmpty = {}, tClosed = new Uint8Array(links.length);
 	for (i = 0; i < nodes.length; i++) {
 		var tn = nodes[i];
 		if (tn.type !== 'tank' || !(tn.diameter > 0) || typeof tn.level !== 'number' ||
 			typeof tn.minLevel !== 'number' || typeof tn.maxLevel !== 'number' ||
 			tn.minLevel > tn.level || tn.level > tn.maxLevel) { continue; }
-		if (tn.level >= tn.maxLevel) { tFull[tn.id] = true; }
+		// A tank that CAN OVERFLOW takes inflow at its limit (`overflow`, the .inp's ninth column):
+		// tankstatus() skips the full-tank closure when CanOverflow is set. Only a hand-built model
+		// states it (the page has no such field), and the built-in loop then spills the excess.
+		if (tn.level >= tn.maxLevel && !tn.overflow) { tFull[tn.id] = true; }
 		if (tn.level <= tn.minLevel) { tEmpty[tn.id] = true; }
 	}
 	for (k = 0; k < links.length; k++) {
