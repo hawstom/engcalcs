@@ -70,8 +70,8 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
    charge on the peak of the SUM, and the totals line. Returned as `result.energy` (shape below). Refused
    by name (`native-run-energy`): what EPANET refuses to read (a price pattern the model lacks, a negative
    price or demand charge, a global efficiency of 0 or less, an efficiency curve whose flows do not
-   increase). Tests: `native-eps-energy-harness.js` (the Net3 report, 13 priced and unpriced Net3 and
-   constructed cases, Net1 with controls and rules, 7 refusals) and `native-eps-examples-harness.js`
+   increase). Tests: `native-eps-energy-harness.js` (46 checks: the reader held to the Net3 report, 10 Net3
+   cases, 20 constructed cases, 3 Net1 cases, 7 refusals) and `native-eps-examples-harness.js`
    (the five pumped gallery examples with a price, pattern, demand charge and efficiency curves added
    through `assembleModel()`, with and without a speed pattern, in US and SI units).
 7. **Wiring to the page**, last, and only on Tom's word: `lpnTimeRun` uses the native loop when the
@@ -218,8 +218,8 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
   kWh-per-flow column is a ratio of two tiny numbers. The loop reproduces the flow for the energy only.
 - **Near-zero flow is the one column that will not agree.** A pump left open with a demand of 0 carries
   numerical noise in EPANET (about 1e-7 cfs) and exactly 0 in the built-in solver; kWh per m3 divides
-  power by flow (floored at 1e-6 cfs), so the hours spent there differ by up to 10 percent of that
-  column. Average kW, peak kW, usage, efficiency and cost agreed to 1e-7 on the same case. The harness's
+  power by flow (floored at 1e-6 cfs), so the hours spent there moved that column by 3 to 12 percent
+  in the case measured. Average kW, peak kW, usage, efficiency and cost agreed to 1e-7 on the same case. The harness's
   two-pump case therefore keeps a demand above 0 in the off hours.
 - **The speed enters the efficiency twice.** The curve is read at q / speed (in L/s, the file's unit),
   and the answer is then pulled toward 100 by the Sarbu and Borza factor, 100 - (100 - e) x (1/speed)^0.1.
