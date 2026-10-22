@@ -18,7 +18,7 @@ const fs = require('fs');
 const path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
 // The fixtures are large and not in the repository: WTG_TGH_DIR names the folder holding them.
-const FX = process.env.WTG_TGH_DIR || '/home/haws/tom-files/2026-10-19';
+const FX = process.env.WTG_TGH_DIR || '/home/haws/webdev/fixtures/wtg-tgh-1';
 if (!fs.existsSync(path.join(FX, 'WTG-tgh-1.wtg.sqlite'))) {
 	console.log('NOT RUN (fixture not present: ' + path.join(FX, 'WTG-tgh-1.wtg.sqlite') + ')');
 	process.exit(0);
@@ -136,7 +136,10 @@ function laid(base, flat) {
 		JSON.stringify(r.notes.filter((n) => n.code === 'wtg-directed-unlinked' || n.code === 'wtg-link-unjoined')));
 
 	ok('a GPV with no curve is not reported by the reader as well as by the .inp parser (one claim, not two)', !r.notes.some((n) => n.code === 'wtg-gpv-nocurve'));
-	ok('the .inp parser reports it once, for GPV-1', (base.dropped || []).filter((d) => d.code === 'gpv-curve-missing').length === 1);
+	// The model of 2026-10-21 18:46 states GPV-1's curve in Base, so neither reports one missing.
+	ok('GPV-1 has its curve in Base: the .inp parser reports no curve missing', (base.dropped || []).filter((d) => d.code === 'gpv-curve-missing').length === 0);
+	// WaterGEMS's "Continue if unbalanced", as its export writes it; without it EPANET stops the run at the first step that will not balance.
+	ok('"Continue if unbalanced" is carried: Unbalanced Continue 0, as the export writes it', /Unbalanced\s+Continue 0/.test(r.inp) && /UNBALANCED CONTINUE 0/.test(fs.readFileSync(path.join(FX, 'WTG-export-tgh-1-Base.inp'), 'utf8')));
 	// A pump node with several pipes: the pipe the model calls downstream is on the outlet, every other on the inlet.
 	const pmp1 = base.links.filter((l) => l.id === 'PMP-1')[0];
 	const at = (id) => base.links.filter((l) => l.id === id)[0];
@@ -165,7 +168,7 @@ function laid(base, flat) {
 	const d0 = diffNetworks(base, tBase);
 	ok('Base: every element and value matches the Base export', d0.length === 0, d0.join('; '));
 
-	// The continuous pattern: ten points over 24 hours, written at the one-hour step as WaterGEMS writes it (26 values).
+	// The continuous pattern: ten points over 24 hours, the first at 1:00, written at the one-hour step as WaterGEMS writes it (25 values).
 	const pat = base.patterns[0], tpat = tBase.patterns[0];
 	ok('the continuous pattern is written as WaterGEMS writes it: ' + (tpat ? tpat.multipliers.length : 0) + ' multipliers',
 		pat && tpat && pat.multipliers.length === tpat.multipliers.length && pat.multipliers.every((m, i) => same(m, tpat.multipliers[i])),
@@ -180,15 +183,15 @@ function laid(base, flat) {
 		scn.alternatives.physical !== scn.alternatives.demand, JSON.stringify(scn.alternatives));
 	const altOf = (cat) => r.alternatives.filter((a) => a.fileId === (scn.alternatives || {})[cat])[0] || {};
 	ok('the Physical alternative is named TGH-1 and hangs from Base', altOf('physical').name === 'TGH-1' && altOf('physical').category === 'physical' && !altOf('physical').parentFileId && !altOf('physical').root);
-	ok('the Demand alternative is named TGH-1 and holds the three changed demands', altOf('demand').name === 'TGH-1' &&
-		JSON.stringify(altOf('demand').values) === JSON.stringify({ 'n:J-11': { demand: 200 }, 'n:J-12': { demand: 1000 }, 'n:J-13': { demand: 500 } }), JSON.stringify(altOf('demand').values));
-	// The model of 2026-10-21: PMP-3 has its curve in Base too, and the GPV node is at elevation 0 in TGH-1.
-	ok('the Physical alternative holds the 33 pipe diameters, the tanks, the pump and GPV curves and the GPV node elevation',
-		Object.keys(altOf('physical').values || {}).length === 40 && altOf('physical').values['l:P-1'].diameter === 10 && altOf('physical').values['n:T-1'].tankDiameter === 50 &&
-		altOf('physical').values['l:GPV-1'].curveId && altOf('physical').values['l:PMP-1'].curveId &&
-		altOf('physical').values['n:62-A'].elev === 0 && altOf('physical').values['n:62-B'].elev === 0);
-	ok('what an alternative cannot say stays the scenario\'s own: the tank depths (they follow the base elevation)',
-		JSON.stringify(scn.overrides) === JSON.stringify({ 'n:T-1': { level: 19 }, 'n:T-2': { level: 19 } }), JSON.stringify(scn.overrides));
+	// The model of 2026-10-21 18:46: TGH-1 still names its Demand alternative, which now changes nothing.
+	ok('the Demand alternative is named TGH-1 and, in this save, holds no change', altOf('demand').name === 'TGH-1' &&
+		JSON.stringify(altOf('demand').values) === '{}', JSON.stringify(altOf('demand').values));
+	// Base states every pump curve and the GPV curve, so the Physical alternative holds the 33 pipe diameters, the two tanks and the GPV node elevation.
+	ok('the Physical alternative holds the 33 pipe diameters, both tanks and the GPV node elevation (37 elements)',
+		Object.keys(altOf('physical').values || {}).length === 37 && altOf('physical').values['l:P-1'].diameter === 10 && altOf('physical').values['n:T-1'].tankDiameter === 50 &&
+		altOf('physical').values['n:T-2'].volCurve === 'T-2' && altOf('physical').values['n:62-A'].elev === 0 && altOf('physical').values['n:62-B'].elev === 0,
+		Object.keys(altOf('physical').values || {}).length);
+	ok('the scenario keeps no override of its own (the tank depths are Base\'s)', JSON.stringify(scn.overrides) === '{}', JSON.stringify(scn.overrides));
 
 	// The differences between the two exports, as the ground truth for what the scenario changes.
 	console.log('       the exports differ in ' + diffNetworks(tScen, tBase).length + ' values');

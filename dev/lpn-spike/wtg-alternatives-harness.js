@@ -16,7 +16,7 @@ const fs = require('fs');
 const path = require('path');
 const stub = require('./lpn-dom-stub.js');
 const { ROOT, setUnitSet, loadLoopedNetwork } = stub;
-const FX = process.env.WTG_TGH_DIR || '/home/haws/tom-files/2026-10-19';
+const FX = process.env.WTG_TGH_DIR || '/home/haws/webdev/fixtures/wtg-tgh-1';
 if (!fs.existsSync(path.join(FX, 'WTG-tgh-1.wtg.sqlite'))) {
 	console.log('NOT RUN (fixture not present: ' + path.join(FX, 'WTG-tgh-1.wtg.sqlite') + ')');
 	process.exit(0);
@@ -79,11 +79,30 @@ async function epsRun(inpText) {
 	p.closeH(); p.close();
 	return steps;
 }
-function epsWorst(ours, theirs) {
-	const out = { nh: 0, nq: 0, h: { d: 0 }, q: { d: 0 }, missing: [] };
+// The times (s) at which EPANET reports the run "Unbalanced after N trials", from its own status report. At such a step
+// the heads and flows are wherever the last trial left them, and a change in the 8th digit of a pipe length moves
+// them by 100 gpm (measured on WTG-tgh-1, TGH-1 at 1:00), so they are compared for time steps only, not values.
+async function unbalancedTimes(inpText) {
+	const mod = await import('file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js'));
+	const ws = new mod.Workspace();
+	await ws.loadModule();
+	const p = new mod.Project(ws);
+	ws.writeFile('u.inp', inpText.replace(/^\[OPTIONS\]/m, '[REPORT]\n Status Yes\n\n[OPTIONS]'));
+	p.open('u.inp', 'u.rpt', 'u.out');
+	p.solveH(); p.close();
+	const out = {};
+	(ws.readFile('u.rpt') || '').split('\n').forEach((line) => {
+		const m = /^\s*(\d+):(\d\d):(\d\d): Unbalanced after/.exec(line);
+		if (m) { out[(+m[1]) * 3600 + (+m[2]) * 60 + (+m[3])] = true; }
+	});
+	return out;
+}
+function epsWorst(ours, theirs, skip) {
+	const out = { nh: 0, nq: 0, h: { d: 0 }, q: { d: 0 }, missing: [], skipped: 0 };
 	theirs.forEach((ts, i) => {
 		const os = ours[i];
 		if (!os || os.t !== ts.t) { out.missing.push('step ' + ts.t); return; }
+		if (skip && skip[ts.t]) { out.skipped++; return; }
 		[['heads', 'h', 'nh'], ['flows', 'q', 'nq']].forEach(([k, w, n]) => {
 			Object.keys(ts[k]).forEach((id) => {
 				if (os[k][id] === undefined) { out.missing.push(id); return; }
@@ -187,7 +206,8 @@ async function tree() {
 		doc.alternatives.every((a) => a.name === 'TGH-1') && doc.alternatives.map((a) => a.category).sort().join() === 'demand,physical', JSON.stringify((doc.alternatives || []).map((a) => [a.id, a.name, a.category])));
 	const named = (cat) => (doc.alternatives || []).filter((a) => a.id === (t.alternatives || {})[cat])[0];
 	ok('scenario TGH-1 names them', !!named('physical') && !!named('demand'), JSON.stringify(t.alternatives));
-	ok('its own overrides are the two tank depths only (they follow the base elevation)', JSON.stringify(t.overrides) === '{"n:T-1":{"level":19},"n:T-2":{"level":19}}', JSON.stringify(t.overrides));
+	// The model of 2026-10-21 18:46: the tank depths are Base's, so the scenario keeps no override of its own.
+	ok('it keeps no override of its own', !t.overrides || JSON.stringify(t.overrides) === '{}', JSON.stringify(t.overrides));
 
 	// The page reads each element as the export states it.
 	const NODE_PROPS = { junction: ['elev', 'demand'], reservoir: ['head'], tank: ['level', 'minLevel', 'maxLevel', 'tankDiameter'] };
@@ -248,11 +268,16 @@ async function tree() {
 		const out = EC.lpnExportInp(L.inpExportDocument(), L.inpExportOptions());
 		ok('TGH-1 exports as an .inp with nothing it cannot hold', out.ok && !(out.differences || []).length, JSON.stringify(out.differences));
 		const ours = await epsRun(out.inp), theirs = await epsRun(fs.readFileSync(path.join(FX, 'WTG-export-tgh-1-TGH-1.inp'), 'utf8'));
-		const w = epsWorst(ours, theirs);
-		console.log('       ' + ours.length + ' and ' + theirs.length + ' time steps; ' + w.nh + ' heads, largest difference ' + w.h.d.toExponential(2) + ' ft (' + w.h.id + ' at ' + w.h.t + ' s); ' +
+		// 0.2 gpm, not 0.01: this model balances only to EPANET's Accuracy 0.001, and WaterGEMS's own file with nothing but its pipe
+		// lengths rounded to 8 digits moves P-10 by 0.10 gpm at 2:00 (measured, 2026-10-21 18:46 save).
+		const tText = fs.readFileSync(path.join(FX, 'WTG-export-tgh-1-TGH-1.inp'), 'utf8');
+		const skip = await unbalancedTimes(tText), skipOurs = await unbalancedTimes(out.inp);
+		const w = epsWorst(ours, theirs, skip);
+		ok('both files fail to balance at the same time steps (' + Object.keys(skip).map((x) => x + ' s').join(', ') + ')', JSON.stringify(skip) === JSON.stringify(skipOurs), JSON.stringify(skipOurs));
+		console.log('       ' + ours.length + ' and ' + theirs.length + ' time steps, ' + w.skipped + ' of them unbalanced and not compared; ' + w.nh + ' heads, largest difference ' + w.h.d.toExponential(2) + ' ft (' + w.h.id + ' at ' + w.h.t + ' s); ' +
 			w.nq + ' flows, largest ' + w.q.d.toExponential(2) + ' gpm (' + w.q.id + ' at ' + w.q.t + ' s)');
-		ok('...and it solves as WaterGEMS\'s export does: the same time steps, every head within 0.01 ft and every flow within 0.01 gpm',
-			ours.length === theirs.length && ours.length > 24 && w.missing.length === 0 && w.nh === 31 * ours.length && w.nq === 42 * ours.length && w.h.d < 0.01 && w.q.d < 0.01,
+		ok('...and it solves as WaterGEMS\'s export does: the same time steps, and at every balanced one every head within 0.01 ft and every flow within 0.2 gpm',
+			ours.length === theirs.length && ours.length > 24 && w.missing.length === 0 && w.nh === 31 * (ours.length - w.skipped) && w.nq === 42 * (ours.length - w.skipped) && w.h.d < 0.01 && w.q.d < 0.2,
 			w.missing.slice(0, 6).join(' '));
 	}
 	L.switchScenario(L.baseScenario().id);

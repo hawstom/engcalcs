@@ -1080,13 +1080,20 @@
 				mult = [p.start];
 			} else if (p.continuous) {
 				// CONTINUOUS: the multiplier is the straight line between points, which EPANET has not. Written as
-				// WaterGEMS's own EPANET export writes it (OBSERVED, WTG-tgh-1: ten points over 24 hours came out as
-				// 26 multipliers at a one-hour step): the starting multiplier first, then the line's value at the
-				// time of each step from 0 to the last point, both ends included.
+				// WaterGEMS's own EPANET export writes it: the starting multiplier at time 0, then the line's value
+				// at each step up to the last point, the line running from (0, starting multiplier) to the first
+				// point. OBSERVED twice: a first point at 1:00 gave 25 multipliers over 24 hours (WTG-tgh-1 of
+				// 2026-10-21 18:46); a first point at 0:00 gave 26, the starting multiplier and then the point's
+				// own value at 0:00 (the 14:50 save of the same model). WaterGEMS's OWN solver does not use these
+				// samples: its results file holds, at each hydraulic step, the line's average over the step
+				// (0.5 at 1:00 between points 0.2 at 1:00 and 0.8 at 2:00), so the export, and this, run its
+				// demands half a step early. dev/sqlite-reader.md, "A continuous pattern".
 				var tEnd = p.times[p.times.length - 1];
 				var line = function (time) {
 					var q;
-					if (time <= p.times[0]) { return p.pts[0].PatternCurve_Multiplier; }
+					if (time <= p.times[0]) {
+						return p.times[0] > 0 ? p.start + (time / p.times[0]) * (p.pts[0].PatternCurve_Multiplier - p.start) : p.pts[0].PatternCurve_Multiplier;
+					}
 					for (q = 1; q < p.times.length; q++) {
 						if (time <= p.times[q] + 1e-6) {
 							var f = p.times[q] === p.times[q - 1] ? 1 : (time - p.times[q - 1]) / (p.times[q] - p.times[q - 1]);
@@ -1096,7 +1103,7 @@
 					return p.pts[p.pts.length - 1].PatternCurve_Multiplier;
 				};
 				mult = [p.start];
-				for (t = 0; t <= tEnd + 1e-6; t += step) { mult.push(Number(line(t).toPrecision(10))); }
+				for (t = p.times[0] > 1e-6 ? step : 0; t <= tEnd + 1e-6; t += step) { mult.push(Number(line(t).toPrecision(10))); }
 			} else {
 				var total = p.times[p.times.length - 1];
 				var at = function (time) {
@@ -1159,6 +1166,14 @@
 			if (typeof eng.EpaNetEngine_CheckCutOff === 'number') { opt.push(' MAXCHECK           \t' + eng.EpaNetEngine_CheckCutOff); }
 			if (typeof eng.EpaNetEngine_DampingLimit === 'number') { opt.push(' DAMPLIMIT          \t' + num(eng.EpaNetEngine_DampingLimit)); }
 			if (typeof eng.EpaNetEngine_EmitterExponent === 'number') { opt.push(' Emitter Exponent   \t' + num(eng.EpaNetEngine_EmitterExponent)); }
+			// "Continue if unbalanced" with its extra trials, as WaterGEMS's export writes it (UNBALANCED CONTINUE 0).
+			// Left out, EPANET's default is Stop, and a run that fails to balance at one step ends there: WTG-tgh-1's
+			// TGH-1 stopped at 0:23 of 24 hours.
+			if (eng.EpaNetEngine_ContinueIfUnbalanced === 1) {
+				opt.push(' Unbalanced         \tContinue ' + (typeof eng.EpaNetEngine_ExtraIterations === 'number' ? eng.EpaNetEngine_ExtraIterations : 0));
+			} else if (eng.EpaNetEngine_ContinueIfUnbalanced === 0) {
+				opt.push(' Unbalanced         \tStop');
+			}
 			if (adjBase.stated) { opt.push(' Demand Multiplier  \t' + num(multBase)); }
 			if (adjBase.bad || (adjBase.stated && baseHasUnit && baseHasNormal && adjBase.unit !== adjBase.normal)) {
 				note('wtg-demand-adjustments', [labels[eng.CalculationOptionsID] || String(eng.CalculationOptionsID)]);

@@ -209,7 +209,7 @@ async function unitDemand(browser) {
 // the stored project, and the page must solve it (wtg-tgh-harness.js and wtg-alternatives-harness.js hold the reader and the tree).
 async function tgh(browser) {
 	console.log('\n--- 1c. WTG-tgh-1: nine pump and valve nodes, a continuous pattern, a child scenario with two alternatives ---');
-	const FX = process.env.WTG_TGH_DIR || '/home/haws/tom-files/2026-10-19';
+	const FX = process.env.WTG_TGH_DIR || '/home/haws/webdev/fixtures/wtg-tgh-1';
 	if (!fs.existsSync(path.join(FX, 'WTG-tgh-1.wtg.sqlite'))) {
 		console.log('NOT RUN (fixture not present: ' + path.join(FX, 'WTG-tgh-1.wtg.sqlite') + ')');
 		return;
@@ -224,7 +224,8 @@ async function tgh(browser) {
 		!!d && d.text.indexOf(await a.lang('lpn_wtg_note_directed_split')) > 0 && d.text.indexOf(await a.lang('lpn_wtg_note_pattern_continuous')) > 0 &&
 		d.text.indexOf(await a.lang('lpn_wtg_note_scenario_alternative')) > 0 && d.text.indexOf(await a.lang('lpn_wtg_note_pump_battery')) > 0, d && d.text.slice(0, 300));
 	ok('...saying where to see the alternatives (the note that points to the Scenario manager)', !!d && d.text.indexOf(await a.lang('lpn_wtg_note_scenario_alternative')) > 0);
-	ok('...naming the missing GPV curve once', !!d && d.text.split(await a.lang('lpn_inp_drop_gpv_curve')).length === 2);
+	// The save of 2026-10-21 18:46 states GPV-1's curve in Base.
+	ok('...and no missing GPV curve (Base states it)', !!d && d.text.indexOf(await a.lang('lpn_inp_drop_gpv_curve')) < 0);
 	ok('...and not saying any pipe, pump or valve was left out', !!d && d.text.indexOf(await a.lang('lpn_wtg_note_link_unjoined')) < 0);
 	if (d) { await a.dialogClick(await a.lang('lpn_dialog_ok')); }
 	const doc = (await h.stored()).doc || {};
@@ -242,7 +243,7 @@ async function tgh(browser) {
 	ok('Base keeps P-1 at 8 inches', p1 && p1._diameter === 8, JSON.stringify(p1 && p1._diameter));
 	const phys = alts.filter((x) => x.category === 'physical')[0];
 	ok('the Physical alternative holds P-1 at 10', phys && phys.values['l:P-1'].diameter === 10);
-	ok('the pump and GPV curves of the scenario are in the project\'s library', (doc.curves || []).some((c) => c.kind === 'head') && (doc.curves || []).some((c) => c.kind === 'headloss'), (doc.curves || []).map((c) => c.id).join());
+	ok('the pump and GPV curves are in the project\'s library', (doc.curves || []).some((c) => c.kind === 'head') && (doc.curves || []).some((c) => c.kind === 'headloss'), (doc.curves || []).map((c) => c.id).join());
 	ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	await a.close();
 }

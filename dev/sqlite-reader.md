@@ -262,7 +262,7 @@ check that an import reproduced the model. Not built.
 
 ## A scenario that overrides Physical and Demand (2026-10-20)
 
-`WTG-tgh-1.wtg.sqlite` (6.3 MB; kept outside the repository, in `~/tom-files/2026-10-19/` or the folder `WTG_TGH_DIR` names;
+`WTG-tgh-1.wtg.sqlite` (6.3 MB; kept outside the repository, in `~/webdev/fixtures/wtg-tgh-1/` (a copy of Tom's save of 2026-10-21 18:46, which he is keeping stable) or the folder `WTG_TGH_DIR` names;
 the harnesses print NOT RUN without it), its `.wtg`, and WaterGEMS's own `.inp` export of each scenario, saved by Tom
 as an ordinary user of WaterGEMS: Base plus a child scenario TGH-1. Tom first saved a three-node model whose
 TGH-1 changed one pipe diameter and one demand, then saved a larger one over it (below); the rows
@@ -307,27 +307,40 @@ OBSERVED in it. `node dev/lpn-spike/wtg-tgh-harness.js` compares the reader with
   converting pumps and valves is unsatisfactory. Please check against the Bentley inp export that has upstream and
   downstream nodes coincident with pump/valve."*). The earlier `<label>-U`/`<label>-D`, drawn a quarter along the
   pipes, kept the link a visible length but made the two files impossible to compare side by side. The page's
-  own `.inp` of TGH-1 and WaterGEMS's, solved by EPANET over the 24-hour run, agree at every one of 29 time steps
-  to 0.0004 ft of head and 0.004 gpm of flow (`wtg-alternatives-harness.js`).
+  own `.inp` of TGH-1 and WaterGEMS's, solved by EPANET over the 24-hour run, take the same 27 time steps, fail
+  to balance at the same two (0:23 and 1:00), and at every other agree to 0.0007 ft of head and 0.09 gpm of flow
+  (18:46 save; `wtg-alternatives-harness.js`). At an unbalanced step the numbers are wherever the last trial left them:
+  rounding the export's own pipe lengths to 8 digits moves a flow there by 120 gpm.
 - **Pump curves are named after the pump definition, not the pump.** The export writes one curve per pump
   (`PMP-1`, `PMP-3`, `VSPB-2`, identical points); here a definition several pumps share is one curve, because a
   scenario that changes a pump's definition changes which curve it names, never a curve's points.
-- **WaterGEMS's own results** (`.wtg_1_38.out`) are a Bentley variant of EPANET's binary file (EPANET's magic
-  number at both ends, its own layout between) and are not read. Its run log (`.rpc`) for this model reports a
-  head error of 10^10 and pumps switching on and off within one step, so it is no reference for this model.
+- **WaterGEMS's own results** (`.wtg_<n>_<scenario ID>.out`, `_1_1` Base and `_1_38` TGH-1) are EPANET's binary
+  layout with Bentley's changes, decoded by hand on the 18:46 save and not read by the page: four header words
+  (magic, version 202601, 100000000, the specific gravity as a float), then EPANET's counts (nodes, tanks, links, pumps,
+  valves), IDs in 16-byte fields from byte 1413 (WaterGEMS element ID numbers; a pump or valve node's two junctions are
+  `1000000nn` pairs, PMP-1's 100000092 and 100000093, whose order matches the export's -A and -B), EPANET's link ends,
+  types, tank list, elevations, lengths and diameters, the pump energy block, and then 2,280 bytes per reported step:
+  demand twice, head, pressure, two empty node blocks, then link flow at +744 bytes. At 0:00 of Base it gives PMP-1
+  2,710.9 gpm and +5.67 ft, exactly what EPANET gives on the Base export. Its run log for TGH-1 reports "UNBALANCED after
+  40 trials" at nearly every step and heads of millions of feet from 4:00, so it is no reference for that scenario.
+- **WaterGEMS's own solver averages a continuous pattern over each step**: its results file holds J-2's demand at
+  multipliers 0.2, 0.5, 0.825, 0.875 at 0:00, 1:00, 2:00, 3:00, the line's mean over the following hour, where its export
+  (and so this reader) writes the line's value at the start of each hour, 0.2, 0.2, 0.8, 0.85. The export runs its
+  demands half a step early; this reader follows the export, which is what the harnesses compare.
+- **"Continue if unbalanced"** (`EpaNetEngine_ContinueIfUnbalanced` 1, `EpaNetEngine_ExtraIterations` 0) is written as
+  `Unbalanced Continue 0`, as the export writes it. Without it EPANET's default, Stop, ended TGH-1's run at 0:23.
 - **A variable speed pump battery** is written by the export as one pump with `HEAD <curve> SPEED 1`; so here, from
   its own definition (`Physical_VspbDefinition`). Its lag pumps, control node and target are not read.
 - **A pump definition type 2 with efficiency type 1** (motor efficiency 100): the export writes a one-point
   EFFICIENCY curve at flow 0 holding the motor efficiency; so here. Type 1 is read from this one sample.
 - **A GPV's curve and a tank's volume curve** reach `[CURVES]` for any scenario that states one, exactly as the Base
   pass writes them (`gpvCurveId()`, `tankFacts()`).
-- **A continuous pattern**: ten points over 24 hours, a starting multiplier of 1 and the first point 0.2, came out
-  of WaterGEMS's export as **26 multipliers at the one-hour step**: the starting multiplier, then the straight
-  line between points sampled at 0, 1, ... 24 hours, both ends included. The reader writes exactly that, at a
-  pattern step that is the gcd of the point times and the hydraulic time step, and the report says the pattern
-  was continuous. (The same pattern read as a stepwise one by the old reader came out as 24 different
-  multipliers.) Whether WaterGEMS's own solver reads the line, or the export's shifted samples, is not
-  known; the file is the only thing compared.
+- **A continuous pattern** is written as WaterGEMS's export writes it: the starting multiplier at 0:00, then the line's
+  value at each step up to the last point, the line running from (0:00, starting multiplier) to the first point. Seen
+  twice: a first point at 1:00 gave 25 multipliers over 24 hours (18:46 save); a first point at 0:00 gave 26, the
+  starting multiplier and then the point's own value at 0:00 (14:50 save). The pattern step is the gcd of the point
+  times and the hydraulic time step, and the report says the pattern was continuous. (The same pattern read as a
+  stepwise one by the old reader came out as 24 different multipliers.)
 - **Alternatives, as the page stores them** (`treeOf()` in `js/lpn-wtg.js`; the tree is
   `dev/scenario-alternatives.md`, "Stages 4 and 5"). Every alternative a scenario names becomes a stored
   alternative **of the same name** in the category its type matches: Physical (4), Demand (20), Initial

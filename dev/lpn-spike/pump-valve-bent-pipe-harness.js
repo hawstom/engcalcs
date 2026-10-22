@@ -111,7 +111,7 @@ function along(pts, f) {
 	});
 
 	console.log('\n2. TOM\'S WATERGEMS EXPORT (skipped when the file is not there)');
-	const tom = process.env.WTG_TGH_INP || path.join(process.env.HOME || '', 'tom-files/2026-10-19/WTG-export-tgh-1-TGH-1.inp');
+	const tom = process.env.WTG_TGH_INP || path.join(process.env.WTG_TGH_DIR || '/home/haws/webdev/fixtures/wtg-tgh-1', 'WTG-export-tgh-1-TGH-1.inp');
 	if (!fs.existsSync(tom)) { console.log('  NOT RUN  ' + tom + ' not found'); } else {
 		open(fs.readFileSync(tom, 'utf8'), 'tgh');
 		const d2 = L.getDoc(), e2 = L.linkEls();
