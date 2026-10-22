@@ -66,7 +66,7 @@ function exampleQueries() {
 const ROWS = [
 	{ ids: ['Junction 60', 'Pipe 60'] },
 	{ ids: ['Junction 10', 'Junction 40', 'Junction 50', 'Junction 20', 'Junction 153'], ordered: true },
-	{ ids: ['Pipe 60', 'Pipe 329', 'Pipe 125', 'Pipe 123', 'Pipe 149'], ordered: true },
+	{ ids: ['Pipe 60', 'Pipe 125', 'Pipe 329', 'Pipe 123', 'Pipe 149'], ordered: true },
 	{ ids: ['Junction 10', 'Junction 20', 'Junction 40', 'Junction 50', 'Pipe 60', 'Pipe 125', 'Pipe 329'] },
 	{ ids: ['Junction 10', 'Junction 20', 'Junction 40', 'Junction 50'], inner: [] },
 	{ ids: ['Pipe 330'] },
