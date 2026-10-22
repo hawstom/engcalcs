@@ -1,4 +1,4 @@
-// lpn-native-run.js -- THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP, SLICES 1 TO 4 (Task 733, phase 3).
+// lpn-native-run.js -- THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP, SLICES 1 TO 5 (Task 733, phase 3).
 //
 // js/lpn-solver.js solves ONE INSTANT. This file walks the clock around it, the way EPANET's own
 // runH()/nextH() loop does (hydraul.c), and holds the one piece of state an instant does not have:
@@ -72,11 +72,26 @@
 //   hour()          input2.c -- how "10 AM", "13:30", "36 HOURS" become seconds.
 // Times are whole seconds, as EPANET's are.
 //
+// SLICE 5, TANK VOLUME CURVES, MINIMUM VOLUME AND OVERFLOW, also from OWA-EPANET 2.3.5:
+//   inittanks()     input1.c -- a tank on a VOLUME curve takes its minimum, maximum and initial volumes
+//                   from the curve read at MinLvl, MaxLvl and InitLvl; a stated MinVol is then ignored.
+//   tankdata()      input3.c -- with no curve Vmin is MinVol when above 0 (else area x MinLvl) and the
+//                   others are measured up from it, so a stated MinVol only moves the zero of the scale.
+//   tankvolume(), tankgrade(), interp()  hydraul.c, project.c -- level to volume and back by linear
+//                   interpolation on the curve, never extrapolating past either end; the curve stays in
+//                   the file's units (here metres and cubic metres, as js/lpn-epanet.js writes it).
+//   tankstatus()    hydstatus.c -- a full tank closes the link into it unless CanOverflow is set; an
+//                   overflowing tank at its maximum keeps taking the inflow, tanklevels() holds its
+//                   volume at Vmax, and the excess is the tank's reported inflow.
+//   validate.c      a curve that does not reach from MinLvl to MaxLvl is error 225.
+// tanktimestep(), controls(), controltimestep() and the rules need no change: they already read the
+// volume through tankVolume()/tankGrade(), which are now the curve's when there is one.
+//
 // WHAT IT REFUSES, by name, so the caller can hand the network to the EPANET engine exactly as it
 // does for anything the built-in solver cannot do (see EngCalcs.lpnNativeRunRefusals): a rule the
 // loop does not copy exactly (a rule on a pipe's roughness, a reservoir's level or pressure, a
 // GPV's setting; one EPANET itself rejects when it reads the file), a speed pattern that is not the page's (a pump without its unscaled curve, a pattern the model
-// lacks, a negative multiplier), a tank on a volume curve, water quality, EPANET-MSX, pump energy, a
+// lacks, a negative multiplier), a tank that names a volume curve it has no usable rows for (or one EPANET refuses), water quality, EPANET-MSX, pump energy, a
 // control on a junction's pressure that acts on a valve, a control conditioned on a reservoir, and
 // what lpnDiagnose refuses of the built-in solver (a pressure-driven demand model). Each one is a
 // later slice (dev/native-eps-plan.md), or a case nobody has asked for that EPANET's own code makes
@@ -111,6 +126,47 @@
 		EDGE = 1e-9;                       // m, the hair a not-quite-full level is kept under its limit
 
 	function tankHasArea(n) { return n.type === 'tank' && n.diameter > 0; }
+	// The rows of a tank's volume curve, [[level m, volume m3], ...], exactly as the bridge writes them
+	// (js/lpn-epanet.js: a curve goes out only with a name AND rows), or null.
+	function curveRows(n) {
+		var r = n.volCurveSI, i;
+		if (!n.volCurve || !r || r.length < 2) { return null; }
+		for (i = 0; i < r.length; i++) {
+			if (!(isFinite(r[i][0]) && isFinite(r[i][1]))) { return null; }
+			if (i && !(r[i][0] > r[i - 1][0])) { return null; }   // input3.c curvedata(): X must increase (error 230)
+		}
+		// validate.c: the curve must reach from MinLvl to MaxLvl, within TINY (error 225); EPANET
+		// refuses to run otherwise, so the built-in loop names it rather than inventing an answer.
+		if (n.minLevel < r[0][0] - 1e-6 || n.maxLevel > r[r.length - 1][0] + 1e-6) { return null; }
+		return r;
+	}
+	// project.c interp(): linear on a data curve, never extrapolating past either end; a step in x
+	// of under TINY (1e-6) returns the upper y.
+	function interp(x, y, xx) {
+		var n = x.length, k, dx, dy;
+		if (n === 0) { return 0; }
+		if (xx <= x[0]) { return y[0]; }
+		for (k = 1; k < n; k++) {
+			if (x[k] >= xx) {
+				dx = x[k] - x[k - 1]; dy = y[k] - y[k - 1];
+				if (Math.abs(dx) < 1e-6) { return y[k]; }
+				return y[k] - (x[k] - xx) * dy / dx;
+			}
+		}
+		return y[n - 1];
+	}
+	// hydraul.c tankvolume(): the cylinder (Vmin + (h - Hmin) x A) when there is no curve; with one,
+	// the curve read at the level in the curve's own units (the file's, here metres and cubic
+	// metres), brought to cubic feet. `h` is a head in feet.
+	function tankVolume(tk, h) {
+		if (!tk.cx) { return tk.Vmin + (h - tk.Hmin) * tk.A; }
+		return interp(tk.cx, tk.cy, (h - tk.El) * FT) / FT3;
+	}
+	// hydraul.c tankgrade(): the other way, interpolating the curve with volume as the abscissa.
+	function tankGrade(tk, v) {
+		if (!tk.cx) { return tk.Hmin + (v - tk.Vmin) / tk.A; }
+		return tk.El + interp(tk.cy, tk.cx, v * FT3) / FT;
+	}
 
 	/**
 	 * The reasons the built-in solver cannot run this model's period, as `{code, ids}` records, or
@@ -154,7 +210,13 @@
 		add('native-run-speed-pattern', ids);
 		ids = [];
 		(model.nodes || []).forEach(function (n) {
-			if (n.type === 'tank' && (n.volCurve || n.volCurveName)) { ids.push(n.id); }
+			// SLICE 5 RUNS A VOLUME CURVE THE PAGE HANDED OVER (`volCurve` with `volCurveSI`, the
+			// level in metres and the volume in cubic metres, js/lpn-time.js lpnTankVolumeAttach). A
+			// tank that NAMES a curve the model carries no usable rows for is refused: the bridge
+			// would write it as a cylinder, which of the two was meant is not ours to say. So is a
+			// curve EPANET itself will not run (fewer than two rows, X not increasing, not reaching
+			// from MinLvl to MaxLvl: validate.c error 225).
+			if (n.type === 'tank' && (n.volCurveName || n.volCurve) && !curveRows(n)) { ids.push(n.id); }
 		});
 		add('native-run-volume-curve', ids);
 		ids = [];
@@ -298,7 +360,7 @@
 				tk.V += q * dt;
 				if (tk.V + q >= tk.Vmax) { tk.V = tk.Vmax; }
 				else if (tk.V - q <= tk.Vmin) { tk.V = tk.Vmin; }
-				tk.h = tk.Hmin + (tk.V - tk.Vmin) / tk.A;
+				tk.h = tankGrade(tk, tk.V);
 			});
 		}
 		// The head (m) of a node as rules.c reads NodeHead: a tank's from its volume, any other
@@ -704,9 +766,7 @@
 		return out;
 	}
 
-	// hydraul.c tankvolume(), no volume curve (slice 5 refuses one).
-	function tankVolume(tk, h) { return tk.Vmin + (h - tk.Hmin) * tk.A; }
-
+	
 	// hydraul.c controls(): the tank, time and time-of-day controls, before the step's solve.
 	function controls(ctl, ls, tankById, htime, tStart) {
 		ctl.forEach(function (c) {
@@ -891,8 +951,13 @@
 
 	// One tank in EPANET's internal units (input1.c, input3.c).
 	function tankState(n) {
+		// input3.c tankdata(): Vmin = area x MinLvl, or the stated MinVol when above 0; V0 and Vmax
+		// are measured up from it. input1.c inittanks(): a VOLUME CURVE replaces all three with the
+		// curve read at MinLvl, InitLvl and MaxLvl (a stated MinVol is then ignored) and the area is
+		// no longer used by tankvolume()/tankgrade().
 		var area = Math.PI * n.diameter * n.diameter / 4,
-			vminM = area * n.minLevel,
+			rows = curveRows(n),
+			vminM = n.minVolume > 0 ? n.minVolume : area * n.minLevel,
 			El = (n.elev || 0) / FT,
 			tk = {
 				id: n.id, node: n, El: El,
@@ -902,6 +967,13 @@
 				Vmax: (vminM + area * (n.maxLevel - n.minLevel)) / FT3,
 				V: (vminM + area * (n.level - n.minLevel)) / FT3
 			};
+		if (rows) {
+			tk.cx = rows.map(function (r) { return r[0]; });
+			tk.cy = rows.map(function (r) { return r[1]; });
+			tk.Vmin = interp(tk.cx, tk.cy, n.minLevel) / FT3;
+			tk.Vmax = interp(tk.cx, tk.cy, n.maxLevel) / FT3;
+			tk.V = interp(tk.cx, tk.cy, n.level) / FT3;
+		}
 		tk.h = El + n.level / FT;   // hydraul.c initialises the grade to H0, not to tankgrade(V0)
 		return tk;
 	}

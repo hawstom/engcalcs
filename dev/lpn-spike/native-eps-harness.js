@@ -441,6 +441,84 @@ function loadEpa(file, stripped, pumps, rulesText) {
 	return { model: m, hadControls: parsed.controls.length };
 }
 
+// ---- slice 5: tank volume curves, minimum volume, overflow ---------------------------------------
+// The model's tank states a volume curve as the page hands it over (js/lpn-time.js
+// lpnTankVolumeAttach): `volCurve` (the name) and `volCurveSI`, [[level m, volume m3], ...].
+// `minVolume` (m3) and `overflow` are not on the page; a hand-built model states them and the bridge
+// (js/lpn-epanet.js) writes MinVol and the Overflow column for EPANET.
+// A STRAIGHT-SIDED curve of an 18 m tank (254.469 m2 a metre) must give the cylinder's answer, which
+// is the first check; the others are narrow at the bottom (a cone: 0.25 of the area at 2 m, widening
+// to 3x the 12 m mean) and a stepped hourglass.
+const CYL18 = (lo, hi) => { const a = Math.PI * 18 * 18 / 4; return [[lo, a * lo], [hi, a * hi]]; };
+const NARROW = [[0, 0], [1, 5], [2, 20], [4, 120], [6, 340], [8, 700], [10, 1200], [12, 1900], [14, 2800]];
+const HOURGLASS = [[0, 0], [3, 150], [5, 190], [6, 200], [8, 330], [12, 1200]];
+function onCurve(m, rows, extra) {
+	const t = m.nodes.find((n) => n.type === 'tank');
+	t.volCurve = 'C1'; t.volCurveSI = rows;
+	return Object.assign(t, extra || {}) && m;
+}
+const withTank = (m, extra) => { Object.assign(m.nodes.find((n) => n.type === 'tank'), extra); return m; };
+// A tank of the 18 m size fed from the reservoir with a light demand: it fills to its limit and,
+// if it can overflow, keeps taking the inflow there.
+const feedPast = (extra, rows) => {
+	const m = lineWithTank({ level: 2, min: 0.5, max: 4, dia: 18, q: 4 });
+	if (rows) { onCurve(m, rows); }
+	return withTank(m, extra);
+};
+const SLICE5_CASES = [
+	{ name: 'a straight-sided curve gives the cylinder\'s answer (tank on a demand pattern, 48 h)',
+		model: onCurve(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18 }), CYL18(0, 14)), moves: 'T', minSwing: 0.5 },
+	{ name: 'curve tank narrow at the bottom, on a demand pattern, 48 h',
+		model: onCurve(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18 }), NARROW), moves: 'T', minSwing: 0.5 },
+	{ name: 'curve tank fills to its limit (a FULL event) and stays full',
+		model: onCurve(lineWithTank({ level: 2, min: 0.5, max: 4, dia: 18, q: 4 }), NARROW), reaches: 'max' },
+	{ name: 'curve tank empties to its limit (an EMPTY event) and stays empty',
+		model: onCurve(lineWithTank({ level: 2, min: 0.5, max: 12, dia: 18, q: 30, rHead: 60.2 }), NARROW), reaches: 'min' },
+	{ name: 'hourglass curve (narrow at 3 to 6 m), a swing through the neck',
+		model: onCurve(lineWithTank({ level: 7, min: 0.5, max: 12, dia: 18 }), HOURGLASS), moves: 'T', minSwing: 2 },
+	{ name: 'curve that starts above the base (rows from 1 m; the tank\'s lowest level is 1 m) and runs past the maximum',
+		model: onCurve(lineWithTank({ level: 4, min: 1, max: 8, dia: 18 }), NARROW.slice(1)), moves: 'T', minSwing: 0.5 },
+	{ name: 'minimum volume 300 m3 stated, no curve',
+		model: withTank(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18 }), { minVolume: 300 }), moves: 'T', minSwing: 0.5 },
+	{ name: 'minimum volume stated, no curve, tank fills to its limit and empties again',
+		model: withTank(lineWithTank({ level: 2, min: 0.5, max: 3, dia: 10, q: 12 }), { minVolume: 40 }), reaches: 'max' },
+	{ name: 'minimum volume 300 m3 stated WITH a curve (EPANET reads the curve and ignores it)',
+		model: onCurve(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18 }), NARROW, { minVolume: 300 }), moves: 'T', minSwing: 0.5 },
+	{ name: 'overflow: the tank fed past full keeps the inflow open and spills (no curve)',
+		model: feedPast({ overflow: true }), reaches: 'max', spills: 'P2' },
+	{ name: 'overflow: the same tank without overflow shuts at full (nothing spills)',
+		model: feedPast({}), reaches: 'max', spills: 'P2', spillsNot: true },
+	{ name: 'overflow on a curve tank fed past full',
+		model: feedPast({ overflow: true }, NARROW), reaches: 'max', spills: 'P2' },
+	{ name: 'overflow tank that fills, spills, and then drains below full on the demand pattern',
+		model: withTank(lineWithTank({ level: 2, min: 0.5, max: 5, dia: 18, q: 40 }), { overflow: true }), moves: 'T', minSwing: 0.5 },
+	{ name: 'pumped overflow tank (pump keeps pushing at full)',
+		model: withTank(pumpedTank({ level: 6, q: 8, max: 8, controls: [], p3: 'closed' }), { overflow: true }), reaches: 'max', spills: 'P2' },
+	{ name: 'curve tank with a rule (pump off above 8 m, on below 4 m)',
+		model: onCurve(ruled(pumpedTank({ level: 5, q: 15, p3: 'closed', controls: [] }),
+			'RULE UP\nIF TANK T LEVEL ABOVE 8\nTHEN PUMP PU STATUS IS CLOSED\nRULE DN\nIF TANK T LEVEL BELOW 4\nTHEN PUMP PU STATUS IS OPEN'), NARROW),
+		statusOf: 'PU', switches: 2, moves: 'T', minSwing: 0.5 },
+	{ name: 'curve tank with a FILLTIME rule',
+		model: onCurve(ruled(pumpedTank({ level: 3, q: 15, p3: 'closed', controls: [] }),
+			'RULE F\nIF TANK T FILLTIME BELOW 2.5\nTHEN PUMP PU STATUS IS CLOSED\nRULE G\nIF TANK T LEVEL BELOW 2\nTHEN PUMP PU STATUS IS OPEN'), HOURGLASS),
+		moves: 'T', minSwing: 0.5 },
+	// A control crossing at a LOW net inflow is timing-sensitive between any two engines: the two
+	// solves differ by up to 1e-7 m3/s in a flow, a tank takes that into its volume (0.001 m3 over
+	// a day), and at 2 L/s 0.001 m3 is half a second of the time to the control level, which
+	// EPANET rounds to a whole second. In a steep curve a second is millimetres. These cases cross
+	// their control levels at tens of litres per second, in a day.
+	{ name: 'curve tank with tank-level controls (pump off ABOVE 8 m, on BELOW 2 m, volume taken from the curve)',
+		model: onCurve(pumpedTank({ level: 3.3, q: 40, p3: 'closed', times: { duration: 24 * H }, controls: [ctl('PU', SHUT, ifNode('T', 'above', 8)), ctl('PU', OPEN_, ifNode('T', 'below', 2))] }), NARROW),
+		statusOf: 'PU', switches: 2 },
+	{ name: 'curve tank with a timer and a tank-level control together (hourglass)',
+		model: onCurve(pumpedTank({ level: 4, q: 40, p3: 'closed', times: { duration: 24 * H }, controls: [ctl('PU', SHUT, at(10)), ctl('PU', OPEN_, ifNode('T', 'below', 2.5))] }), HOURGLASS),
+		statusOf: 'PU', switches: 1 },
+	{ name: 'overflow tank with a rule and a control',
+		model: withTank(ruled(pumpedTank({ level: 7, q: 6, max: 8, p3: 'closed', controls: [ctl('PU', SHUT, at(30))] }),
+			'RULE R\nIF SYSTEM TIME >= 40\nTHEN PUMP PU STATUS IS OPEN'), { overflow: true }),
+		reaches: 'max', spills: 'P2', statusOf: 'PU', switches: 2 }
+];
+
 const MODULE_URL = 'file://' + path.join(ROOT, 'js', 'vendor', 'epanet-js.js');
 
 async function compare(c) {
@@ -456,7 +534,7 @@ async function compare(c) {
 	if (process.env.DUMP) {
 		epa.frames.forEach((fe, i) => {
 			const fn = nat.frames[i];
-			console.log(fe.t / H + 'h  ' + model.nodes.map((n) => n.id + ' ' + fe.heads[n.id].toFixed(3) + '/' + fn.heads[n.id].toFixed(3)).join('  ') + '   ' +
+			console.log(fe.t / H + 'h  ' + model.nodes.filter((n) => n.type === 'tank').map((n) => 'level diff ' + ((fn.levels[n.id] - fe.levels[n.id]) * 1000).toFixed(3) + ' mm').join(' ') + '  ' + model.nodes.map((n) => n.id + ' ' + fe.heads[n.id].toFixed(3) + '/' + fn.heads[n.id].toFixed(3)).join('  ') + '   ' +
 				model.links.map((l) => l.id + ' ' + (fe.flows[l.id] * 1000).toFixed(2) + '/' + (fn.flows[l.id] * 1000).toFixed(2) + fe.statuses[l.id][0] + fn.statuses[l.id][0]).join('  '));
 		});
 	}
@@ -500,8 +578,10 @@ async function compare(c) {
 	}
 	if (c.reaches) {
 		const tk = model.nodes.find((n) => n.type === 'tank');
+		// At or past the limit: EPANET snaps a tank to its limit only when it is within a second of
+		// flow of it (tanklevels()), so a draining tank can rest a little below its minimum.
 		const want = c.reaches === 'max' ? tk.maxLevel : tk.minLevel;
-		const lim = tankIds.map((id) => epa.frames.filter((f) => Math.abs(f.levels[id] - want) < 1e-6).length)[0];
+		const lim = tankIds.map((id) => epa.frames.filter((f) => (c.reaches === 'max' ? f.levels[id] >= want - 1e-4 : f.levels[id] <= want + 1e-4)).length)[0];
 		exercised = lim >= 3; why = `${lim} frames at the ${c.reaches}`;
 	}
 	// A controlled link must be in the state the case names at the hours it names, in EPANET's own
@@ -527,12 +607,21 @@ async function compare(c) {
 		if (!off) { exercised = false; }
 		why += `${why ? '; ' : ''}${off} solves off the hourly grid`;
 	}
+	// An overflowing tank at its limit keeps taking the inflow (EPANET's frames show the link still
+	// carrying water at the end); one that cannot overflow shuts it. Both engines must show it.
+	if (c.spills && sameSteps) {
+		const last = epa.frames[epa.frames.length - 1], lastN = nat.frames[nat.frames.length - 1],
+			q = Math.abs(last.flows[c.spills]), qN = Math.abs(lastN.flows[c.spills]);
+		const spilling = q > 1e-4;
+		exercised = exercised && (c.spillsNot ? !spilling : spilling) && (c.spillsNot ? qN < 1e-4 : qN > 1e-4);
+		why += `${why ? '; ' : ''}${c.spills} carries ${(q * 1000).toFixed(2)} L/s into the full tank at the end`;
+	}
 	ok(c.name, sameSteps && dH <= HEAD_TOL && dL <= HEAD_TOL && dQ <= qTol && unconv === 0 && exercised && stDiff === 0,
 		`steps ${nat.frames.length}/${epa.frames.length}${sameSteps ? '' : ' DIFFER'}  ` +
 		`dH=${dH.toExponential(2)} m @${atH}  dLevel=${dL.toExponential(2)} m @${atL || '-'}  ` +
 		`dQ=${dQ.toExponential(2)} m3/s @${atQ} (tol ${qTol.toExponential(1)})` +
 		(unconv ? ` ${unconv} UNCONVERGED` : '') + (stDiff ? ` ${stDiff} STATUS DIFFERENCES` : '') +
-		(c.moves || c.reaches || c.statusOf || c.offGrid ? `  [${why}${exercised ? '' : ' NOT EXERCISED'}]` : ''));
+		(c.moves || c.reaches || c.statusOf || c.offGrid || c.spills ? `  [${why}${exercised ? '' : ' NOT EXERCISED'}]` : ''));
 	return { dH, dL, dQ };
 }
 
@@ -604,6 +693,28 @@ async function run() {
 			model: loadEpa('Net3.inp', false, false, 'RULE A\nIF TANK 1 LEVEL BELOW 18\nTHEN PUMP 335 STATUS IS OPEN\nRULE B\nIF TANK 1 LEVEL ABOVE 18.6\nTHEN PUMP 335 STATUS IS CLOSED').model });
 	}
 
+	console.log('-- slice 5: tank volume curves, minimum volume, overflow');
+	for (const c of SLICE5_CASES) { await compare(c); }
+	{
+		// A stated minimum volume with no curve only moves the zero of the volume scale: the answer
+		// must be the one without it, in EPANET and in the loop alike.
+		const a = lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18 }), b = withTank(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18 }), { minVolume: 300 });
+		const ra = EngCalcs.lpnNativeRun(a), rb = EngCalcs.lpnNativeRun(b);
+		let d = 0; ra.frames.forEach((f, i) => { d = Math.max(d, Math.abs(f.levels.T - rb.frames[i].levels.T)); });
+		ok('a stated minimum volume with no curve does not change the loop\'s levels', ra.ok && rb.ok && d < 1e-9, d.toExponential(2));
+		const ea = await EngCalcs.lpnEpanetRun(JSON.parse(JSON.stringify(Object.assign(a, { hydraulics: { accuracy: 1e-5 } })))),
+			eb = await EngCalcs.lpnEpanetRun(JSON.parse(JSON.stringify(Object.assign(b, { hydraulics: { accuracy: 1e-5 } }))));
+		let de = 0; ea.frames.forEach((f, i) => { de = Math.max(de, Math.abs(f.levels.T - eb.frames[i].levels.T)); });
+		ok('...nor EPANET\'s', ea.ok && eb.ok && de < 1e-6, de.toExponential(2));
+	}
+	{
+		// The curve really changes the answer: the narrow-bottom tank's levels differ from the cylinder's.
+		const cyl = EngCalcs.lpnNativeRun(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18 })),
+			cur = EngCalcs.lpnNativeRun(onCurve(lineWithTank({ level: 4, min: 0.5, max: 12, dia: 18 }), NARROW));
+		let d = 0; cyl.frames.forEach((f, i) => { d = Math.max(d, Math.abs(f.levels.T - cur.frames[i].levels.T)); });
+		ok('a narrow-bottom curve moves the tank differently from the cylinder', d > 0.5, d.toFixed(2) + ' m');
+	}
+
 	console.log('-- refusals (the caller falls back to EPANET)');
 	const base = () => JSON.parse(JSON.stringify(CASES[0].model));
 	const refusal = (name, mut, code) => {
@@ -650,7 +761,15 @@ async function run() {
 	refusal('a speed pattern the model lacks', (m) => { m.links.push(pageLikePump({ id: 'PU', type: 'pump', from: 'R', to: 'J', h0: 50, a: 1, b: 2, status: 'open' }, 1, 'NOPE')); }, 'native-run-speed-pattern');
 	refusal('a speed pattern with a negative multiplier', (m) => { m.time.patterns.push(pat('NEG', [1, -0.5]));
 		m.links.push(pageLikePump({ id: 'PU', type: 'pump', from: 'R', to: 'J', h0: 50, a: 1, b: 2, status: 'open' }, 1, 'NEG')); }, 'native-run-speed-pattern');
-	refusal('a tank on a volume curve', (m) => { m.nodes.find((n) => n.id === 'T').volCurveName = 'V1'; }, 'native-run-volume-curve');
+	refusal('a tank naming a volume curve the model carries no rows for', (m) => { m.nodes.find((n) => n.id === 'T').volCurveName = 'V1'; }, 'native-run-volume-curve');
+	refusal('a volume curve that stops short of the tank\'s maximum (EPANET error 225)', (m) => { Object.assign(m.nodes.find((n) => n.id === 'T'), { volCurve: 'C1', volCurveSI: NARROW.slice(0, 7) }); }, 'native-run-volume-curve');
+	refusal('a volume curve that starts above the tank\'s minimum (EPANET error 225)', (m) => { Object.assign(m.nodes.find((n) => n.id === 'T'), { volCurve: 'C1', volCurveSI: NARROW.slice(2) }); }, 'native-run-volume-curve');
+	refusal('a volume curve whose levels do not increase', (m) => { Object.assign(m.nodes.find((n) => n.id === 'T'), { volCurve: 'C1', volCurveSI: [[0, 0], [5, 50], [5, 60], [14, 900]] }); }, 'native-run-volume-curve');
+	refusal('a tank on a volume curve with one row', (m) => { Object.assign(m.nodes.find((n) => n.id === 'T'), { volCurve: 'C1', volCurveSI: [[0, 0]] }); }, 'native-run-volume-curve');
+	{
+		const m = base(); onCurve(m, NARROW);
+		ok('a tank on a usable volume curve is no longer refused', !EngCalcs.lpnNativeRunRefusals(m).some((r) => r.code === 'native-run-volume-curve'));
+	}
 	refusal('water quality', (m) => { m.quality = { mode: 'age' }; }, 'native-run-quality');
 	refusal('a tank starting above its maximum', (m) => { m.nodes.find((n) => n.id === 'T').level = 99; }, 'native-run-tank-levels');
 	{

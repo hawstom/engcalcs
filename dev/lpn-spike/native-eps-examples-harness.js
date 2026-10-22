@@ -1,4 +1,4 @@
-// THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP ON THE SHIPPED EXAMPLES (Task 733, phase 3, slices 2-4).
+// THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP ON THE SHIPPED EXAMPLES (Task 733, phase 3, slices 2-5).
 //
 //   node dev/lpn-spike/native-eps-examples-harness.js
 //
@@ -23,6 +23,13 @@
 // pumps), through the same page path, and compared the same way. Each must still have its pumps on
 // the pattern when it reaches the model, and the pattern must move the pumps' speed; an example
 // whose pumps lost it fails.
+//
+// SLICE 5, TANK VOLUME CURVES. No gallery example ships one, so every example with a tank and a period
+// is opened again with a VOLUME curve ADDED to the document for each tank (a bowl: a third narrower at
+// the bottom than the cylinder of the stated diameter, in the document's own level and length units,
+// which is the unit the page's lpnTankVolumeAttach() converts), through the same page path, and
+// compared the same way. Each tank must arrive on the model with its curve rows in metres and cubic
+// metres, and the curve must move the tank's level away from the cylinder's.
 //
 // TOLERANCE is native-eps-harness.js's, at Accuracy 1e-5 in both engines.
 //
@@ -134,6 +141,77 @@ async function compare(file, text) {
 		`[${sw} status changes in EPANET's frames${text ? `; pump flow swing ${(qSwing * 1000).toFixed(1)} L/s` : ''}${st ? `; ${st} STATUS DIFFERENCES` : ''}]`);
 }
 
+const TANKED = ALL.filter((f) => (docOf(f).nodes || []).some((n) => n.type === 'tank') && ((docOf(f).times || {}).duration > 0));
+
+// The example's text with a VOLUME curve added for each tank. Levels and the diameter are in the
+// document's units (a level in the elevation unit, a diameter in the length unit; the two are the same
+// foot or the same metre in every example), the volume in that unit cubed.
+function withVolumeCurves(file) {
+	const d = docOf(file);
+	d.curves = d.curves || [];
+	d.nodes.forEach((n) => {
+		if (n.type !== 'tank') { return; }
+		const top = n.maxLevel * 1.2, a = Math.PI * n.tankDiameter * n.tankDiameter / 4, pts = [];
+		for (let i = 0; i <= 12; i++) {
+			const L = top * i / 12;
+			pts.push([+L.toFixed(6), +(a * L * (0.65 + 0.35 * L / top)).toFixed(6)]);
+		}
+		d.curves.push({ id: 'BOWL' + n.id, kind: 'VOLUME', points: pts });
+		n.volCurve = 'BOWL' + n.id;
+	});
+	return JSON.stringify(d);
+}
+async function compareCurves(file) {
+	const text = withVolumeCurves(file);
+	L.applySaved(L.acceptImportedText(text));
+	EC.lpnTimeArrived();
+	const model = L.currentModel();
+	const tanks = model.nodes.filter((n) => n.type === 'tank');
+	if (!tanks.length || !tanks.every((n) => n.volCurve && n.volCurveSI && n.volCurveSI.length > 2)) {
+		ok(file + ' reaches the model with its tanks on volume curves', false, JSON.stringify(tanks.map((n) => [n.id, n.volCurve, (n.volCurveSI || []).length])));
+		return;
+	}
+	model.hydraulics = Object.assign({}, model.hydraulics || {}, { accuracy: 1e-5 });
+	delete model.quality; delete model.msx; delete model.energy;
+	const still = EC.lpnNativeRunRefusals(model);
+	if (still.length) { ok(file + ' with volume curves, quality and energy off', false, 'still refused: ' + JSON.stringify(still)); return; }
+	const label = file + ' with ' + tanks.length + ' tank' + (tanks.length > 1 ? 's' : '') + ' on a volume curve, quality and energy off';
+	const epa = await EC.lpnEpanetRun(JSON.parse(JSON.stringify(model)));
+	const nat = EC.lpnNativeRun(model);
+	if (!epa.ok || !nat.ok) { ok(label, false, `ok native=${nat.ok} epanet=${epa.ok} ` + JSON.stringify(nat.issues || epa.issues || '')); return; }
+	// the same document without the curves: the cylinder
+	const plain = (() => { L.applySaved(L.acceptImportedText(fs.readFileSync(ROOT + 'examples/' + file, 'utf8'))); EC.lpnTimeArrived();
+		const m = L.currentModel(); m.hydraulics = Object.assign({}, m.hydraulics || {}, { accuracy: 1e-5 }); delete m.quality; delete m.msx; delete m.energy; return m; })();
+	const cyl = EC.lpnNativeRun(plain);
+	const same = epa.frames.length === nat.frames.length && epa.frames.every((f, i) => f.t === nat.frames[i].t);
+	let dH = 0, atH = '', dL = 0, atL = '', dQ = 0, atQ = '', qMax = 0, st = 0, shape = 0;
+	if (same) {
+		epa.frames.forEach((fe, i) => {
+			const fn = nat.frames[i];
+			model.nodes.forEach((n) => {
+				const d = Math.abs(fn.heads[n.id] - fe.heads[n.id]);
+				if (d > dH) { dH = d; atH = n.id + '@' + fe.t / H + 'h'; }
+				if (n.type === 'tank') {
+					const dl = Math.abs(fn.levels[n.id] - fe.levels[n.id]);
+					if (dl > dL) { dL = dl; atL = n.id + '@' + fe.t / H + 'h'; }
+					if (cyl.ok && cyl.frames[i]) { shape = Math.max(shape, Math.abs(cyl.frames[i].levels[n.id] - fe.levels[n.id])); }
+				}
+			});
+			model.links.forEach((l) => {
+				qMax = Math.max(qMax, Math.abs(fe.flows[l.id]));
+				const d = Math.abs(fn.flows[l.id] - fe.flows[l.id]);
+				if (d > dQ) { dQ = d; atQ = l.id + '@' + fe.t / H + 'h'; }
+				if (fn.statuses[l.id] !== fe.statuses[l.id]) { st++; }
+			});
+		});
+	}
+	const qTol = Math.max(FLOW_TOL, FLOW_REL * qMax);
+	ok(label, same && dH <= HEAD_TOL && dL <= HEAD_TOL && dQ <= qTol && st === 0 && shape > 1e-3,
+		`steps ${nat.frames.length}/${epa.frames.length}${same ? '' : ' DIFFER'}  dH=${dH.toExponential(2)} m @${atH}  ` +
+		`dLevel=${dL.toExponential(2)} m @${atL || '-'}  dQ=${dQ.toExponential(2)} m3/s @${atQ} (tol ${qTol.toExponential(1)})  ` +
+		`[the curve moves a level ${shape.toFixed(3)} m from the cylinder's${st ? `; ${st} STATUS DIFFERENCES` : ''}]`);
+}
+
 (async function () {
 	setUnitSet('us');
 	await warmEpanet();
@@ -141,6 +219,8 @@ async function compare(file, text) {
 	for (const f of EXAMPLES) { await compare(f); }
 	ok('the gallery has examples with pumps', PUMPED.length >= 4, PUMPED.join(', '));
 	for (const f of PUMPED) { await compare(f, withSpeedPattern(f)); }
+	ok('the gallery has examples with tanks and a period', TANKED.length >= 5, TANKED.join(', '));
+	for (const f of TANKED) { await compareCurves(f); }
 	console.log(`\n${pass} passed, ${fail} failed`);
 	process.exit(fail ? 1 : 0);
 })().catch((e) => { console.error(e); process.exit(2); });

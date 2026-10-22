@@ -405,9 +405,14 @@
 						curves.push(vrows.join('\n'));
 					}
 				}
+				// **MinVol AND Overflow ARE WRITTEN ONLY WHEN THE MODEL STATES THEM** (`minVolume` in
+				// cubic metres, `overflow` true). The page holds neither, so its model never does; a
+				// model built by hand (dev/lpn-spike/native-eps-harness.js, Task 733 slice 5) can, and
+				// the built-in loop (js/lpn-native-run.js) then copies what EPANET does with them.
+				// The ninth column needs the eighth, and `*` is EPANET's own "no curve".
 				tanks.push(' ' + n.id + '  ' + (n.elev || 0) + '  ' + (n.level || 0) + '  ' +
-					(n.minLevel || 0) + '  ' + (n.maxLevel || 0) + '  ' + (n.diameter || 0) + '  0' +
-					(vname ? '  ' + vname : ''));
+					(n.minLevel || 0) + '  ' + (n.maxLevel || 0) + '  ' + (n.diameter || 0) + '  ' + (n.minVolume > 0 ? n.minVolume : 0) +
+					(vname || n.overflow ? '  ' + (vname || '*') : '') + (n.overflow ? '  YES' : ''));
 			} else {
 				// Demand m3/s -> L/s.
 				// **UNDER `eps` THE DEMAND IS THE BASE DEMAND AND THE PATTERN IS NAMED BESIDE IT**, so
@@ -1315,7 +1320,8 @@
 				'\u0001' + (n.type === 'tank' && n.volCurve ? n.volCurve : '') +
 				'\u0001' + (n.type === 'tank' && n.volCurveSI
 					? n.volCurveSI.map(function (q) { return q[0] + ',' + q[1]; }).join(';')
-					: ''));
+					: '') +
+				'\u0001' + (n.type === 'tank' ? (n.minVolume > 0 ? n.minVolume : 0) + (n.overflow ? 'Y' : '') : ''));
 		}
 		for (i = 0; i < model.links.length; i++) {
 			l = model.links[i];
@@ -1506,7 +1512,7 @@
 				// every time rather than skipped, for the same reason the emitter below is: a tank
 				// that HAD a curve and lost it must not go on filling on the old shape's schedule.
 				p.setTankData(idx, n.elev || 0, n.level || 0, n.minLevel || 0,
-					n.maxLevel || 0, n.diameter || 0, 0,
+					n.maxLevel || 0, n.diameter || 0, n.minVolume > 0 ? n.minVolume : 0,
 					(n.volCurve && n.volCurveSI && n.volCurveSI.length) ? 'V_' + n.volCurve : '');
 			} else {
 				// Demand m3/s -> L/s. Empty pattern id = no time pattern, matching the [JUNCTIONS]
