@@ -28145,7 +28145,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function paneColNodeResult(key, label, unit) {
 		return { key: key, label: label, result: true, unit: unit, dec: paneResultDecimals('node', key),
-			get: function (n) { return colorNodeValue(n, key); } };
+			get: function (n) { return key === 'demandActual' ? inRunScenario(function () { return colorNodeValue(n, key); }) : colorNodeValue(n, key); } };
 	}
 	// **WHAT A JUNCTION RECEIVES UNDER PRESSURE-DRIVEN ANALYSIS** (Task 762), as two result
 	// columns that exist only while the Demand model is PDA, the way the quality columns exist only
@@ -33718,6 +33718,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			} finally { endMapBoxHold(); }
 		}
 		completeEdit(null);
+		refreshScenarioStatus();   // the override count follows a bulk write
 		refreshPopupIfOpen();
 		// **THE NEW ROWS STAY SELECTED**, from where the paste began to the last one made, so the
 		// clerk is looking at what they just added rather than at the row above it.
@@ -37268,6 +37269,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			.map(function (e) { return e.id; });
 	}
 
+	// **A RESULT AND THE INPUTS NEXT TO IT COME FROM ONE RUN.** With Recalculate off the open
+	// scenario can differ from the one the kept result was solved in (`_scn`, stamped when the
+	// solve is stored). A column that is an input resolved at read time (the Demand beside the
+	// pressures) must be read in that run's scenario, or a report prints Peak's pressures beside
+	// Base's demands. Open scenario when the result carries no stamp, the scenario is gone, or a
+	// scenario-view swap is already in force (paneInScenario() chose the scenario on purpose).
+	function inRunScenario(fn, runId) {
+		var id = runId || (lastSolveResult && lastSolveResult._scn), i;
+		if (!id || id === project.activeScenario || paneScnSwapDepth) { return fn(); }
+		for (i = 0; i < scenarios.length; i++) { if (scenarios[i].id === id) { return paneInScenario(scenarios[i], fn); } }
+		return fn();
+	}
 	// **READ THE PAGE'S OWN ACCESSORS AS OF ONE FRAME OF THE RUN.** Two things decide what
 	// colorNodeValue()/colorLinkValue() answer, and this swaps both: `lastSolveResult`, which is
 	// every solved quantity, and the pattern clock, which is every quantity resolved from a
@@ -83225,10 +83238,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * that same step, and the swap can never leave the map parked at the wrong moment.
 	 */
 	function fullReportRows() {
-		var frames = reportFrames(), rows = [];
+		var frames = reportFrames(), rows = [], runId = lastSolveResult && lastSolveResult._scn;
 		if (!frames.length && lastSolveResult) { frames = [lastSolveResult]; }
 		frames.forEach(function (f) {
-			tsAsOfFrame(f, function () {
+			tsAsOfFrame(f, function () { inRunScenario(function () {
 				var t = typeof f.t === 'number' ? f.t : 0;
 				doc.nodes.forEach(function (n) {
 					rows.push({
@@ -83247,7 +83260,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						status: linkStatusText(l)
 					});
 				});
-			});
+			}, runId); });
 		});
 		return rows;
 	}
