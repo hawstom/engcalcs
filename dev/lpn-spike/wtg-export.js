@@ -259,6 +259,11 @@ function writeWtg(SQL, templateBytes, parsed, schedule, opts) {
 	ratios.sort((p, q) => p - q);
 	const coordScale = ratios.length ? Math.round(ratios[Math.floor(ratios.length / 2)] / 10) * 10 || 1000 : 1000;
 	report.coordScaleFtPerMapUnit = coordScale;
+	// Extent of the drawn map in feet: sizes the symbols (see symbolMultiplier()).
+	{
+		const xs = nodes.map((n) => n.x * coordScale), ys = nodes.map((n) => n.y * coordScale);
+		report.extentFt = xs.length ? Math.max(Math.max.apply(null, xs) - Math.min.apply(null, xs), Math.max.apply(null, ys) - Math.min.apply(null, ys)) : 0;
+	}
 	const P = (n) => [n.x * coordScale, n.y * coordScale];
 
 	// ---- patterns (support) ----
@@ -493,7 +498,14 @@ function writeWtg(SQL, templateBytes, parsed, schedule, opts) {
 // The .wtg beside it (XML presentation file): the template's, with the deleted scenario's
 // references taken out. Without them WaterGEMS would be asked to open a view on scenario 38.
 // ---------------------------------------------------------------------------------------------
-function patchWtgXml(text, removedScenarios, keepScenario, removedAlternatives) {
+// WaterGEMS draws a symbol 4 ft across (and text 4 ft high at the default scale) times these two
+// multipliers, whatever the map covers. The template covers about 410 ft, where 1 is right; the
+// openly licensed samples that span thousands of feet carry 10 to 20 (Zenodo 7162154: 4,600 ft, 10;
+// TSNet tnet3: 26,000 ft, 20). Keep the template's proportion: extent / 500 ft, at least 1.
+function symbolMultiplier(extentFt) {
+	return Math.max(1, Math.round((extentFt || 0) / 500));
+}
+function patchWtgXml(text, removedScenarios, keepScenario, removedAlternatives, extentFt) {
 	const eol = text.indexOf('\r\n') >= 0 ? '\r\n' : '\n';
 	const lines = text.split(eol);
 	const gone = new Set(removedScenarios.map(String)), goneAlt = new Set(removedAlternatives.map(String));
@@ -517,6 +529,12 @@ function patchWtgXml(text, removedScenarios, keepScenario, removedAlternatives) 
 	// Results were computed in the template's own project; the files holding them are not shipped, so
 	// no scenario is marked computed.
 	t = t.replace(/ScenarioComputeStatus="\d+"/g, 'ScenarioComputeStatus="0"');
+	// Symbols and text sized to the map's extent.
+	if (extentFt > 0) {
+		const m = String(symbolMultiplier(extentFt));
+		t = t.replace(/(<DrawingOptions [^>]*?)SymbolSizeMultiplier="[^"]*"/, '$1SymbolSizeMultiplier="' + m + '"');
+		t = t.replace(/(<DrawingOptions [^>]*?)TextHeightMultiplier="[^"]*"/, '$1TextHeightMultiplier="' + m + '"');
+	}
 	// Likewise a new identity for the presentation file.
 	t = t.replace(/(<StorageFileHeader [^>]*\bId=")[0-9a-f-]{36}(")/, '$1' + require('crypto').randomUUID() + '$2');
 	return t;
@@ -561,7 +579,7 @@ async function epanetReference(inpText, watchLinks, snapshotNodes, snapshotLinks
 	return { initial: initial, changes: changes, snapshots: snaps, steps: steps };
 }
 
-module.exports = { writeWtg, patchWtgXml, epanetReference, smartLabel, GPM_TO_CFS };
+module.exports = { writeWtg, patchWtgXml, symbolMultiplier, epanetReference, smartLabel, GPM_TO_CFS };
 
 // ---------------------------------------------------------------------------------------------
 // Command line: three files of rising difficulty, so a failure in WaterGEMS says where it began.
@@ -598,7 +616,7 @@ if (require.main === module) {
 			fs.mkdirSync(dir, { recursive: true });
 			fs.writeFileSync(path.join(dir, v.name + '.wtg.sqlite'), out.bytes);
 			if (args.wtg) {
-				fs.writeFileSync(path.join(dir, v.name + '.wtg'), patchWtgXml(fs.readFileSync(args.wtg, 'utf8'), out.report.removedChildScenarios, 1, out.report.removedChildAlternatives));
+				fs.writeFileSync(path.join(dir, v.name + '.wtg'), patchWtgXml(fs.readFileSync(args.wtg, 'utf8'), out.report.removedChildScenarios, 1, out.report.removedChildAlternatives, out.report.extentFt));
 			}
 			const rows = ['kind,id,hour,head_ft,pressure_psi,demand_gpm,flow_gpm'];
 			Object.keys(r.snapshots).map(Number).sort((a, b) => a - b).forEach((t) => {

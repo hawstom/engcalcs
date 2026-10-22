@@ -74,7 +74,7 @@ function head(t) { console.log('\n' + t); }
 	const sqlitePath = path.join(tmp, 'Net3.wtg.sqlite'), wtgPath = path.join(tmp, 'Net3.wtg');
 	fs.writeFileSync(sqlitePath, out.bytes);
 	if (fs.existsSync(TPL_WTG)) {
-		fs.writeFileSync(wtgPath, lib.patchWtgXml(fs.readFileSync(TPL_WTG, 'utf8'), R.removedChildScenarios, 1, R.removedChildAlternatives));
+		fs.writeFileSync(wtgPath, lib.patchWtgXml(fs.readFileSync(TPL_WTG, 'utf8'), R.removedChildScenarios, 1, R.removedChildAlternatives, R.extentFt));
 	}
 
 	// ---- 2. a different SQLite agrees the file is sound ----
@@ -195,6 +195,9 @@ function head(t) { console.log('\n' + t); }
 		const x = fs.readFileSync(wtgPath, 'utf8');
 		ok('no reference to the removed scenario or its alternatives remains',
 			!/ScenarioId="38"|ScenarioID="38"|Identifier="3[678]"/.test(x), '');
+		const m = /<DrawingOptions [^>]*SymbolSizeMultiplier="([^"]*)"[^>]*TextHeightMultiplier="([^"]*)"/.exec(x);
+		ok('symbols and text scale with the map: Net3 spans ' + Math.round(R.extentFt) + ' ft, multipliers ' + (m && m[1]) + ' / ' + (m && m[2]),
+			!!m && m[1] === String(lib.symbolMultiplier(R.extentFt)) && m[2] === m[1] && Number(m[1]) >= 40, '');
 		ok('the XML is still well formed enough to count: equal numbers of < and >', (x.match(/</g) || []).length === (x.match(/>/g) || []).length);
 	} else { console.log('  (no template .wtg found)'); }
 
