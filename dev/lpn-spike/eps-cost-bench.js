@@ -22,12 +22,6 @@ function curvePointsFor(parsed, id) {
 	const c = (parsed.curves || []).find((x) => x.id === id);
 	return c ? EngCalcs.lpnCurvePoints(c) : [];
 }
-// At most three, sampled at the ends and the middle -- js/looped-network.js's pumpFitPoints().
-function fitPts(pts) {
-	if (pts.length <= 3) { return pts; }
-	const s = pts.slice().sort((u, v) => u[0] - v[0]);
-	return [s[0], s[Math.floor((s.length - 1) / 2)], s[s.length - 1]];
-}
 
 const fs = require('fs');
 const path = require('path');
@@ -66,11 +60,11 @@ function buildModel(parsed) {
 			out.setting = l.settingUnit ? l.setting * S[l.settingUnit] : l.setting;
 		}
 		if (l.type === 'pump') {
-			// The curve is the DOCUMENT'S (Task 586) and the pump names it. At most three points
-			// reach the fit, exactly as pumpFit() samples a longer one on the page.
+			// The curve is the DOCUMENT'S (Task 586) and the pump names it. Every point reaches
+			// lpnPumpFromCurve, exactly as pumpFit() hands them on the page.
 			const pts = curvePointsFor(parsed, l.curveId);
 			const fit = pts.length
-				? EngCalcs.lpnPumpFromCurve(fitPts(pts).map((pt) => [pt[0] * S.flow, pt[1] * S.head]))
+				? EngCalcs.lpnPumpFromCurve(pts.map((pt) => [pt[0] * S.flow, pt[1] * S.head]))
 				: { h0: 0, a: 0, b: 2 };
 			out.h0 = fit.h0; out.a = fit.a; out.b = fit.b;
 			out.curveSI = pts.map((pt) => [pt[0] * S.flow, pt[1] * S.head]);

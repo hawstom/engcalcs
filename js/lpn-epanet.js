@@ -1202,26 +1202,26 @@
 	var session = null;
 
 	/**
-	 * **THE POINTS A PUMP'S CURVE STATES TO EPANET, IN SI** (Task 586). `[0, y]` first in every
-	 * branch, because EPANET fits a DIFFERENT curve through samples whose first point has Q > 0.
+	 * **THE POINTS A PUMP'S CURVE STATES TO EPANET, IN SI** (Task 586). `[0, y]` first when
+	 * sampled, because EPANET reads three samples whose first point has Q > 0 as a DIFFERENT curve.
 	 *
-	 * **MORE THAN THREE POINTS GO OUT AS THEMSELVES; THREE OR FEWER GO OUT AS THE FIT'S OWN
-	 * SAMPLING, AND THAT LINE IS DELIBERATE.** EPANET reads a 3-point curve by fitting exactly our
-	 * own H = h0 - a Q^b, and a 1-point one by its shutoff-1.33H/runout-2Q rule, which is the rule
-	 * EngCalcs.lpnPumpFromCurve already copies -- so for those the sampled fit and the typed points
-	 * describe the same pump, and sampling keeps every answer this page has ever given unchanged. A
-	 * TWO-point curve is the one EPANET reads as a piecewise-linear custom curve where we read a
-	 * power law, so it stays on the fit too: changing it would move an answer without buying the
-	 * user's own numbers back, which is what this task is for.
-	 *
-	 * Past three the two really differ, and the file's own curve is the honest input: sampling it
-	 * at three places was rewriting a manufacturer's curve into a three-point approximation of
-	 * itself. It is also the only branch that can move an answer, and it moves it toward the pump
-	 * the user typed.
+	 * **A CUSTOM CURVE GOES OUT AS ITSELF; A POWER-LAW ONE AS THE FIT'S OWN SAMPLING.** EPANET reads
+	 * a curve of one point, or of three starting at zero flow, as a power law, and
+	 * EngCalcs.lpnPumpFromCurve fits exactly that one, so for those the sampled fit and the typed
+	 * points describe the same pump, and sampling keeps the speed baked into h0/a on the warm
+	 * path. Every other curve -- two points, three not starting at zero, four or more -- EPANET
+	 * runs as straight segments between the points it states, and so does the built-in solver
+	 * (fix/pump-curve-multipoint), so the points themselves are the only honest input. That used to
+	 * be drawn at more than three points, which left a two-point curve running as a parabola here
+	 * and as a straight line in a file a visitor exported.
 	 */
+	function isCustomCurve(link) {
+		var real = link.curveSI || [];
+		return real.length > 0 && !!EngCalcs.lpnPumpFromCurve(real).custom;
+	}
 	function pumpCurveSamples(link, h0, a) {
 		var real = link.curveSI || [], pts = [0, 0.5, 0.9], xs = [], ys = [], j, q, qMax;
-		if (real.length > 3) {
+		if (isCustomCurve(link)) {
 			return {
 				real: true,
 				x: real.map(function (pt) { return pt[0] * 1000; }),
@@ -1340,7 +1340,7 @@
 				// which is the stale answer this signature exists to make impossible.
 				'\u0001' + (l.type === 'pump'
 					? String((l.curveSI || []).length)
-						+ ((l.curveSI || []).length > 3 ? ':' + l.speed + ':' + l.speedPattern : '')
+						+ (isCustomCurve(l) ? ':' + l.speed + ':' + l.speedPattern : '')
 					: '') +
 				'\u0001' + (l.type === 'valve' ? String(l.valveType || 'TCV').toUpperCase() : '') +
 				// **A GPV'S CURVE IS IN THE SIGNATURE, AND IT HAS TO BE.** Every other valve's behaviour

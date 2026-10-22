@@ -380,10 +380,11 @@ Rules, stated as rules because each is silently wrong when broken:
   highest/lowest head-loss marks** (Tom, 2026-10-02: *"Yes, pumps left out of highest head
   loss."*). The equation and the 1/2/3-point cases are documented in the page's own Notes
   list (`lpn_notes_5`), with a one-line pointer under the popup's curve table.
-  **The FIT reads at most three points and is derived, never stored** (`pumpFitPoints()` samples a
-  longer curve at its ends and its middle). EPANET is handed the curve's REAL points once there are
-  more than three of them, which is what stopped a five-point manufacturer's curve being rewritten
-  twice on the way through. `js/looped-network.js`.
+  **A pump curve is read as EPANET reads it, in both engines** (`EngCalcs.lpnPumpFromCurve`): one
+  point, or three starting at zero flow, is a power-law FIT, derived and never stored; any other
+  curve is CUSTOM, used as straight segments between its own points, and EPANET is handed those
+  points. A longer curve used to be cut to its ends and middle for a three-point fit, which ran a
+  different pump in the built-in solver (`dev/lpn-spike/pump-curve-multipoint-harness.js`).
 - **Versioning:** `v` is a monotonic integer. `v > CURRENT` refuses to load and says so — never
   silently drop unknown fields. `v < CURRENT` runs an ordered chain of pure migrations, keeping a
   `_backup` copy first, because there is no undo in localStorage.
