@@ -252,7 +252,7 @@ all types
 		ok((ren ? 'renamed: ' : '') + 'the receipt appears', t.indexOf(PC.lpn_inpup_h_added) >= 0, t.slice(0, 120));
 		ok((ren ? 'renamed: ' : '') + 'the pump is added', !!L.linkById(id('PU1')) && L.linkById(id('PU1')).type === 'pump');
 		ok((ren ? 'renamed: ' : '') + 'all six valve types are added', ['V1', 'V2', 'V3', 'V4', 'V5', 'V6'].every((v, i) => { const l = L.linkById(id(v)); return l && l.type === 'valve' && l.valveType === ['PRV', 'PSV', 'FCV', 'TCV', 'PBV', 'GPV'][i]; }));
-		ok((ren ? 'renamed: ' : '') + 'the CV pipe is read as open and the receipt says so', !!L.linkById(id('P2')) && dialogText().indexOf('Pipe ' + id('P2')) >= 0 && dialogText().indexOf(PC.lpn_inpup_na_cv.split(':')[0]) >= 0);
+		ok((ren ? 'renamed: ' : '') + 'the CV pipe is added as a check valve', !!L.linkById(id('P2')) && L.linkById(id('P2'))._status === 'cv', L.linkById(id('P2')) && L.linkById(id('P2'))._status);
 		ok((ren ? 'renamed: ' : '') + 'the tank is added', !!L.nodeById(id('T1')) && L.nodeById(id('T1')).type === 'tank');
 		L.undo();
 		ok((ren ? 'renamed: ' : '') + 'one undo restores the project', snap() === before);

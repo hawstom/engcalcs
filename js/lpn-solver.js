@@ -1155,6 +1155,35 @@ EngCalcs.lpnSolve = function (model, options) {
 		return change;
 	}
 
+	// ---- CHECK-VALVE PIPES (status 'cv') -- Task 733's seam: self-contained status logic only ----
+	//
+	// **A CV PIPE IS A PIPE THAT SHUTS AGAINST REVERSE FLOW**, by EPANET 2.3.5's own rule
+	// (hydstatus.c cvstatus(), called from linkstatus()): with the head across it (start minus end)
+	// outside HTOL, it closes if the head is reversed or the flow is reversed beyond QTOL, and
+	// opens otherwise; inside HTOL it closes only on reversed flow and otherwise keeps its state.
+	// Checked where linkstatus() is -- every CheckFreq trials up to MaxCheck, and on a converged
+	// trial -- and a shut one takes a closed link's coefficients (hydcoeffs.c pipecoeff()), as a
+	// tank-shut link does. It starts open (inithyd()), unless `opts.cvClosed` names it: the last
+	// time step's answer, which EPANET carries into the next solve.
+	var cvk = [], cvShut = new Uint8Array(links.length);
+	for (k = 0; k < links.length; k++) {
+		if (links[k].type !== 'pipe' || links[k].status !== 'cv') { continue; }
+		cvk.push(k);
+		if (opts.cvClosed && opts.cvClosed[links[k].id]) { cvShut[k] = 1; }
+	}
+	function cvLinkStatus(Hv) {
+		var change = false, c, k2, dh, s;
+		for (c = 0; c < cvk.length; c++) {
+			k2 = cvk[c];
+			dh = headAt(links[k2].from, Hv) - headAt(links[k2].to, Hv);
+			s = cvShut[k2];
+			if (Math.abs(dh) > V_HTOL) { s = (dh < -V_HTOL || Q[k2] < -V_QTOL) ? 1 : 0; }
+			else if (Q[k2] < -V_QTOL) { s = 1; }
+			if (s !== cvShut[k2]) { cvShut[k2] = s; change = true; }
+		}
+		return change;
+	}
+
 	function headAt(id, Hv) {
 		var ix = junctionIndex[id];
 		return ix === undefined ? byId[id].head : Hv[ix];
@@ -1273,7 +1302,7 @@ EngCalcs.lpnSolve = function (model, options) {
 			q = Q[k];
 			aq = Math.abs(q);
 
-			if (tClosed[k]) {
+			if (tClosed[k] || cvShut[k]) {
 				// hydcoeffs.c: a closed link's coefficients are P = 1/CBIG, Y = its flow.
 				G[k] = V_CBIG_INV;
 				y[k] = q;
@@ -1539,8 +1568,9 @@ EngCalcs.lpnSolve = function (model, options) {
 			// CONVERGED, BUT ONLY IF NO VALVE WANTS TO CHANGE: the pressure valves were checked
 			// above, and the FCVs are checked now (hydsolver.c: "Quit if no status changes occur").
 			// A change restarts the count toward the next periodic check and the stall watch.
-			if (X !== null || tk.length || opts.pswitch) {
+			if (X !== null || tk.length || cvk.length || opts.pswitch) {
 				var flowChange = X !== null ? flowValveStatus(H) : false;
+				if (cvLinkStatus(H)) { flowChange = true; }
 				if (tankLinkStatus()) { flowChange = true; }
 				// **A CONTROL ON A JUNCTION'S PRESSURE IS DECIDED HERE, INSIDE THE SOLVE** (hydsolver.c
 				// hydsolve() calls pswitch() after linkstatus() on a converged trial). Only
@@ -1567,8 +1597,9 @@ EngCalcs.lpnSolve = function (model, options) {
 		}
 		// The periodic check on FCVs and links to tanks, every CheckFreq trials up to MaxCheck
 		// (hydsolver.c).
-		if ((X !== null || tk.length) && iter <= maxCheck && iter === nextCheck) {
+		if ((X !== null || tk.length || cvk.length) && iter <= maxCheck && iter === nextCheck) {
 			if (X !== null) { flowValveStatus(H); }
+			cvLinkStatus(H);
 			tankLinkStatus();
 			nextCheck += checkFreq;
 		}
@@ -1576,6 +1607,8 @@ EngCalcs.lpnSolve = function (model, options) {
 	// A link a tank closed reports as EPANET reports any closed link (epanet.c EN_getlinkvalue):
 	// no flow, velocity or head loss. lpnReport reads that off a 'closed' state.
 	for (k = 0; k < tk.length; k++) { if (tClosed[tk[k]]) { vStat[tk[k]] = 'closed'; } }
+	// A shut check valve reports the same way, and its state is the answer (`statuses`, `cvClosed`).
+	for (k = 0; k < cvk.length; k++) { if (cvShut[cvk[k]]) { vStat[cvk[k]] = 'closed'; } }
 
 	// The report reads one state per valve; a PBV's or GPV's is the law it was last solved under.
 	for (k = 0; k < links.length; k++) { if (fStat[k] !== undefined) { vStat[k] = fStat[k]; } }
@@ -1589,6 +1622,12 @@ EngCalcs.lpnSolve = function (model, options) {
 	// extended-period loop needs them, because a simple control compares against that status.
 	report.tankClosed = [];
 	for (k = 0; k < tk.length; k++) { if (tClosed[tk[k]]) { report.tankClosed.push(links[tk[k]].id); } }
+	report.cvClosed = [];
+	report.statuses = {};
+	for (k = 0; k < cvk.length; k++) {
+		report.statuses[links[cvk[k]].id] = cvShut[cvk[k]] ? 'closed' : 'open';
+		if (cvShut[cvk[k]]) { report.cvClosed.push(links[cvk[k]].id); }
+	}
 	return report;
 };
 

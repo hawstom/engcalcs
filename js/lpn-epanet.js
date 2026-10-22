@@ -588,7 +588,9 @@
 				pipes.push(' ' + link.id + '  ' + link.from + '  ' + link.to + '  ' +
 					link.length + '  ' + (link.diameter * 1000) + '  ' +
 					roughnessFor(method, link) + '  ' + (link.k || 0) + '  ' +
-					(link.status === 'closed' ? 'Closed' : 'Open'));
+					// A CHECK-VALVE PIPE IS WRITTEN CV, EPANET's own token, and EPANET solves the
+					// one-way rule itself (hydstatus.c cvstatus()).
+					(link.status === 'closed' ? 'Closed' : link.status === 'cv' ? 'CV' : 'Open'));
 			}
 		}
 
@@ -1360,7 +1362,10 @@
 				// and opened by its control at 1:00, 30 psi low at Junction 10 against the run it was
 				// asked to reproduce, while the same model opened cold was right to 0.0001 psi. So a
 				// pump opening or shutting reopens the Project from its text, which is always right.
-				'\u0001' + (l.type === 'pump' ? (l.status === 'closed' ? 'shut' : 'open') : ''));
+				'\u0001' + (l.type === 'pump' ? (l.status === 'closed' ? 'shut' : 'open') : '') +
+				// **A CHECK-VALVE PIPE IS A LINK TYPE TO EPANET** (CVPIPE, fixed when the file is read),
+				// and error 207 refuses EN_INITSTATUS on one, so turning CV on or off reopens the Project.
+				'\u0001' + (l.type === 'pipe' && l.status === 'cv' ? 'cv' : ''));
 		}
 		// U+0001 between fields and U+0002 between records, because an id is user-typed: with a
 		// plain separator a node called "A|B" could forge another network's signature, and the
@@ -1574,6 +1579,8 @@
 			}
 			// Valves never reach this line -- they `continue` above, having written their own
 			// status BEFORE their setting. See that comment for why the order cannot be shared.
+			// A CV pipe is skipped: EPANET decides its status itself, and refuses to be told (207).
+			if (l.type === 'pipe' && l.status === 'cv') { continue; }
 			p.setLinkValue(idx, EN_INITSTATUS, l.status === 'closed' ? 0 : 1);
 		}
 	}
@@ -1738,7 +1745,7 @@
 				// engine's statistics instead. See convergenceOf().
 				var conv = convergenceOf(p);
 
-				var heads = {}, pressures = {}, flows = {}, headlosses = {}, velocities = {},
+				var heads = {}, pressures = {}, flows = {}, headlosses = {}, velocities = {}, statuses = {},
 					demands = null, deficits = null, pda = EngCalcs.lpnDemandModelIsPda(model),
 					i, n, k, link, idx;
 				// **UNDER PDA A JUNCTION RECEIVES WHAT ITS PRESSURE ALLOWS** (Task 762). EN_DEMAND is
@@ -1763,6 +1770,9 @@
 					flows[link.id] = p.getLinkValue(idx, EN_FLOW) / 1000;
 					velocities[link.id] = p.getLinkValue(idx, EN_VELOCITY);
 					headlosses[link.id] = p.getLinkValue(idx, EN_HEADLOSS);
+					// A check-valve pipe's state is the solve's answer, so it is reported, as the
+					// built-in solver reports it.
+					if (link.status === 'cv') { statuses[link.id] = p.getLinkValue(idx, EN_STATUS) > 0 ? 'open' : 'closed'; }
 				}
 
 				// closeH() but NOT close(): the hydraulics workspace is per-solve, the parsed
@@ -1794,7 +1804,8 @@
 					demandDeficits: deficits,
 					flows: flows,
 					headlosses: headlosses,
-					velocities: velocities
+					velocities: velocities,
+					statuses: statuses
 				};
 			} catch (e) {
 				// A Project that threw part-way through is of unknown state -- half its values
