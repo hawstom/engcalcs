@@ -151,6 +151,16 @@ function writeWtg(SQL, templateBytes, parsed, schedule, opts) {
 		pipe: findProto(db, 69, 'pressure pipe'), pump: findProto(db, 68, 'pump'),
 		pattern: findSupportProto(db, 50, 'pattern'), pumpDef: findSupportProto(db, 51, 'pump definition')
 	};
+	// Valves and the GPV headloss curve: optional prototypes, needed only when the network has a valve.
+	const VALVE_TYPE_ID = { PRV: 64, PSV: 65, PBV: 66, FCV: 60, TCV: 61, GPV: 62 };
+	const valveProto = {};
+	Object.keys(VALVE_TYPE_ID).forEach((k) => {
+		const r = rowsOf(db, 'SELECT m.ElementID AS id FROM HMIModelingElement m JOIN HMIDomainElement d ON d.DomainElementID = m.ElementID '
+			+ 'WHERE d.DomainElementTypeID = ? AND d.IsDeleted = 0 AND m.IsDeleted = 0 ORDER BY m.ElementID', [VALVE_TYPE_ID[k]]);
+		if (r.length) { valveProto[k] = collectPrototype(db, tables, r[0].id, baseAlts); }
+	});
+	const gpvCurveRows = rowsOf(db, 'SELECT SupportElementID AS id FROM HMISupportElement WHERE SupportElementTypeID = 63 AND IsDeleted = 0 ORDER BY SupportElementID');
+	const gpvCurveProto = gpvCurveRows.length ? collectPrototype(db, tables, gpvCurveRows[0].id, baseAlts) : null;
 	// A pump prototype must be a plain Standard pump (a pump station's or battery's pump has more rows).
 	const proto = {};
 	Object.keys(protoIds).forEach((k) => { proto[k] = collectPrototype(db, tables, protoIds[k], baseAlts); });
@@ -199,8 +209,8 @@ function writeWtg(SQL, templateBytes, parsed, schedule, opts) {
 	// ---- ids and labels ----
 	let nextId = DEFAULT_MAX + 1;
 	const newId = () => nextId++;
-	const live = { 55: 0, 56: 0, 52: 0, 69: 0, 68: 0 };
-	const supportLive = { 50: 0, 51: 0, 54: 0, 55: 0, 56: 0 };
+	const live = { 55: 0, 56: 0, 52: 0, 69: 0, 68: 0, 64: 0, 65: 0, 66: 0, 60: 0, 61: 0, 62: 0 };
+	const supportLive = { 50: 0, 51: 0, 54: 0, 55: 0, 56: 0, 63: 0 };
 
 	function modeling(id, type, label, notes) {
 		insert(db, 'HMIModelingElement', {
@@ -316,6 +326,40 @@ function writeWtg(SQL, templateBytes, parsed, schedule, opts) {
 	});
 	carried('pump curves: ' + Object.keys(pumpDefId).length + ' three-point pump definitions, constant efficiency ' + (opts.efficiency || 75) + ' %');
 
+	// ---- GPV headloss curves (support type 63): flow gpm -> ft3/s, headloss ft ----
+	const gpvCurveId = {};
+	links.filter((l) => l.type === 'valve' && String(l.valveType).toUpperCase() === 'GPV').forEach((v) => {
+		const c = curveById[v.curveId];
+		if (!c || !c.points || c.points.length < 2) { throw new Error('GPV ' + v.id + ': the headloss curve ' + v.curveId + ' is not in the file.'); }
+		if (gpvCurveId[c.id]) { return; }
+		if (!gpvCurveProto) { throw new Error('The template holds no GPV headloss curve to copy.'); }
+		const id = newId(); gpvCurveId[c.id] = id;
+		supportElement(id, 63, c.id, 'EPANET headloss curve ' + c.id);
+		cloneRows(gpvCurveProto, id, { GpvHeadlossCurve_GpvHeadlossFlowCurve: 1 }, { GpvHeadlossCurve: { GpvHeadlossFlowCurveCount: c.points.length } });
+		c.points.forEach((p) => {
+			db.run('INSERT INTO GpvHeadlossCurve_GpvHeadlossFlowCurve (SupportElementID, GpvHeadlossFlowCurve_GpvFlow, GpvHeadlossFlowCurve_GpvHeadloss) VALUES (?,?,?)', [id, p[0] * GPM_TO_CFS, p[1]]);
+		});
+	});
+
+	// ---- tank volume curves ----
+	const tankPhysAlt = (proto.tank.filter((r) => r.table === 'ConventionalTank_Physical_Data')[0] || { row: {} }).row.AlternativeID;
+	function volumeCurveRows(n, vc) {
+		// Linear interpolation of the curve at the tank's minimum and maximum level, then the points between.
+		const pts = vc.points.slice().sort((a, b) => a[0] - b[0]);
+		const at = (d) => {
+			if (d < pts[0][0] - 1e-9 || d > pts[pts.length - 1][0] + 1e-9) { throw new Error('Tank ' + n.id + ': volume curve ' + vc.id + ' does not cover its level range ' + n.minLevel + ' to ' + n.maxLevel + '.'); }
+			for (let i = 1; i < pts.length; i++) {
+				if (d <= pts[i][0] + 1e-12) { const f = pts[i][0] === pts[i - 1][0] ? 0 : (d - pts[i - 1][0]) / (pts[i][0] - pts[i - 1][0]); return pts[i - 1][1] + f * (pts[i][1] - pts[i - 1][1]); }
+			}
+			return pts[pts.length - 1][1];
+		};
+		const lo = n.minLevel, hi = n.maxLevel, vLo = at(lo), vHi = at(hi);
+		const inner = pts.filter((p) => p[0] > lo + 1e-9 && p[0] < hi - 1e-9);
+		const rows = [[lo, vLo]].concat(inner).concat([[hi, vHi]]);
+		const active = vHi - vLo;
+		return { alt: tankPhysAlt, inactive: vLo, active: active, points: rows.map((p) => [(p[0] - lo) / (hi - lo), active > 0 ? (p[1] - vLo) / active : 0]) };
+	}
+
 	// ---- nodes ----
 	const elId = {};            // EPANET node id -> ElementID
 	const defaultPattern = parsed.defaultPattern;
@@ -346,13 +390,24 @@ function writeWtg(SQL, templateBytes, parsed, schedule, opts) {
 			nJ++;
 		} else if (n.type === 'reservoir') {
 			domainElement(id, 56, n.id);
-			if (n.headPattern) { lost('head pattern on reservoir ' + n.id); }
-			cloneRows(proto.reservoir, id, null, Object.assign({}, geo, { BaseIdahoNode_Physical_Data: { Physical_NodeElevation: n.head } }));
+			const resOv = Object.assign({}, geo, { BaseIdahoNode_Physical_Data: { Physical_NodeElevation: n.head } });
+			if (n.headPattern) {
+				if (patId[n.headPattern] === undefined) { throw new Error('Reservoir ' + n.id + ' names head pattern ' + n.headPattern + ', which the file does not define.'); }
+				resOv.IdahoReservoir_Physical_Data = { Physical_HglPattern: patId[n.headPattern] };
+			}
+			cloneRows(proto.reservoir, id, null, resOv);
 			nR++;
 		} else if (n.type === 'tank') {
 			domainElement(id, 52, n.id);
-			if (n.volCurve || n.minVol) { lost('volume curve / minimum volume on tank ' + n.id); }
-			cloneRows(proto.tank, id, null, Object.assign({}, geo, {
+			// A volume curve: EPANET gives depth above the tank bottom and volume (ft3). WaterGEMS holds
+			// the active range as depth ratio and volume ratio (OBSERVED in Tom's saved TGH-1 scenario
+			// against its .inp: depth 16.2 of 1..20 is ratio 0.8; volume / total active volume), the total
+			// active volume, the inactive volume below the minimum level, and TankSection 2.
+			const vc = n.volCurve ? curveById[n.volCurve] : null;
+			let tankSection = null;
+			if (n.volCurve && !(vc && vc.points && vc.points.length >= 2)) { throw new Error('Tank ' + n.id + ' names volume curve ' + n.volCurve + ', which the file does not define.'); }
+			if (vc) { tankSection = volumeCurveRows(n, vc); }
+			cloneRows(proto.tank, id, tankSection ? { ConventionalTank_Physical_DepthRatioVolumeRatioCurve: 1 } : null, Object.assign({}, geo, {
 				BaseIdahoNode_Physical_Data: { Physical_NodeElevation: n.elev },
 				ConventionalTank_Physical_Data: {
 					Physical_TankBaseElevation: n.elev, Physical_TankMinimumElevation: n.elev + n.minLevel,
@@ -362,6 +417,14 @@ function writeWtg(SQL, templateBytes, parsed, schedule, opts) {
 				},
 				ConventionalTank_InitialSettings_Data: { InitialSettings_TankInitialElevation: n.elev + n.level }
 			}));
+			if (tankSection) {
+				db.run('UPDATE ConventionalTank_Physical_Data SET TankSection = 2, VariableAreaTankSectionType_TotalActiveVolume = ?, Physical_InactiveVolume = ?, DepthRatioVolumeRatioCurveCount = ? WHERE DomainElementID = ? AND AlternativeID = ?',
+					[tankSection.active, tankSection.inactive, tankSection.points.length, id, tankSection.alt]);
+				tankSection.points.forEach((p) => {
+					db.run('INSERT INTO ConventionalTank_Physical_DepthRatioVolumeRatioCurve (DomainElementID, AlternativeID, DepthRatioVolumeRatioCurve_DepthRatio, DepthRatioVolumeRatioCurve_VolumeRatio) VALUES (?,?,?,?)',
+						[id, tankSection.alt, p[0], p[1]]);
+				});
+			}
 			nT++;
 		} else {
 			throw new Error('Node ' + n.id + ' is of kind ' + n.type + ', which the spike does not write.');
@@ -388,7 +451,46 @@ function writeWtg(SQL, templateBytes, parsed, schedule, opts) {
 			IdahoPipe_InitialSettings_Data: { PipeStatus: closed ? 1 : 0 }
 		});
 	}
-	// Pass 1: ordinary pipes (so they take consecutive ids), then the pumps.
+	// A valve is a NODE between two pipes, as a pump is (Tom's saved TGH-1 and its .inp export: PRV-2 is a
+	// node with pipes 57-A and 57-B). Its elevation is the DOWNSTREAM node's, because an EPANET pressure
+	// valve states its setting at the downstream node and WaterGEMS states it at the valve.
+	// Closed valves are carried by closing the upstream pipe.
+	const psiToFt = 115.52457081915186 / 50;        // the HGL WaterGEMS stored beside a 50 psi setting (TGH-1)
+	let nValve = 0;
+	function writeValve(l) {
+		const vt = String(l.valveType || '').toUpperCase();
+		if (!valveProto[vt]) { throw new Error('Valve ' + l.id + ' is a ' + vt + ', and the template holds no ' + vt + ' to copy.'); }
+		const a = nodeById[l.from], b = nodeById[l.to];
+		const mid = [(P(a)[0] + P(b)[0]) / 2, (P(a)[1] + P(b)[1]) / 2];
+		const valveId = newId(), aId = newId(), bId = newId();
+		const ov = {
+			BaseDirectedNode_HmiDataSetGeometry_Data: { HMIGeometry: wkbPoint(mid[0], mid[1]) },
+			BaseDirectedNode_HMIDataSetTopology_Data: { HMITopologyDownstreamLinkID: bId },
+			BaseDirectedNode_Physical_Data: { Physical_NodeElevation: b.type === 'reservoir' ? b.head : b.elev },
+			BaseValve_Physical_Data: { Physical_ValveDiameter: l.diameter * IN_TO_FT, Physical_CompositeMinorLoss: l.k || 0 }
+		};
+		if (vt === 'PRV' || vt === 'PSV' || vt === 'PBV') {
+			ov.PressureValve_InitialSettings_PressureValveSetting_ValvePressureType = { ValvePressureType_ValvePressureSetting: l.setting };
+			ov.PressureValve_InitialSettings_PressureValveSetting_ValveHGLType = { ValveHGLType_ValveHGLSetting: l.setting * psiToFt };
+			ov.PressureValve_InitialSettings_Data = { PressureValveSetting: 0 };
+		} else if (vt === 'FCV') {
+			ov.FCV_InitialSettings_Data = { InitialSettings_FlowSetting: l.setting * GPM_TO_CFS };
+		} else if (vt === 'TCV') {
+			ov.TCV_InitialSettings_Data = { InitialSettings_HeadlossCoefficient: l.setting, TCVCoefficientType: 1 };
+		} else if (vt === 'GPV') {
+			if (!(l.curveId && gpvCurveId[l.curveId])) { throw new Error('GPV ' + l.id + ' has no headloss curve.'); }
+			ov.GPV_Physical_Data = { Physical_GpvHeadlossCurveID: gpvCurveId[l.curveId] };
+		}
+		domainElement(valveId, VALVE_TYPE_ID[vt], l.id);
+		cloneRows(valveProto[vt], valveId, null, ov);
+		const closed = String(l.status || '').toUpperCase() === 'CLOSED';
+		pipeRows(aId, l.id + '-A', elId['n:' + l.from], valveId, [P(a), mid], 1, 99, 130, 0, closed, false);
+		pipeRows(bId, l.id + '-B', valveId, elId['n:' + l.to], [mid, P(b)], 1, 99, 130, 0, false, false);
+		pipeElId[l.id] = aId;
+		report.counts['valve' + vt] = (report.counts['valve' + vt] || 0) + 1;
+		nValve++; nAdded += 2;
+	}
+	// Pass 1: ordinary pipes (so they take consecutive ids), then the pumps and valves.
 	links.forEach((l) => {
 		if (l.type !== 'pipe') { return; }
 		const id = newId(); pipeElId[l.id] = id;
@@ -401,6 +503,7 @@ function writeWtg(SQL, templateBytes, parsed, schedule, opts) {
 	});
 	links.forEach((l) => {
 		if (l.type === 'pipe') { return; }
+		if (l.type === 'valve') { writeValve(l); return; }
 		if (l.type !== 'pump') { throw new Error('Link ' + l.id + ' is a ' + l.type + ', which the spike does not write.'); }
 		// A pump is a NODE between two pipes. Upstream pipe "<id>-A", downstream "<id>-B", both
 		// 1 ft long and 99 in across as WaterGEMS's own .inp import makes them (EPS sample: length 1,
@@ -415,16 +518,19 @@ function writeWtg(SQL, templateBytes, parsed, schedule, opts) {
 			BaseDirectedNode_HmiDataSetGeometry_Data: { HMIGeometry: wkbPoint(mid[0], mid[1]) },
 			BaseDirectedNode_HMIDataSetTopology_Data: { HMITopologyDownstreamLinkID: bId },
 			BaseDirectedNode_Physical_Data: { Physical_NodeElevation: a.type === 'reservoir' ? a.head : a.elev },
-			StandardPump_Physical_Data: { Physical_PumpDefinitionID: pumpDefId[l.curveId] }
+			StandardPump_Physical_Data: { Physical_PumpDefinitionID: pumpDefId[l.curveId] },
+			BasePump_InitialSettings_Data: { InitialSettings_RelativeSpeedFactor: l.speed > 0 ? l.speed : 1 }
 		});
+		if (l.speedPattern) { lost('speed pattern ' + l.speedPattern + ' on pump ' + l.id + ' (the table exists, no sample states it)'); }
+		if (l.power) { lost('constant power on pump ' + l.id); }
 		const closed = (initialStatus[l.id] || (String(l.status || '').toUpperCase() === 'CLOSED' ? 'closed' : 'open')) === 'closed';
 		pipeRows(aId, l.id + '-A', elId['n:' + l.from], pumpId, [P(a), mid], 1, 99, 130, 0, closed, false);
 		pipeRows(bId, l.id + '-B', pumpId, elId['n:' + l.to], [mid, P(b)], 1, 99, 130, 0, false, false);
 		pipeElId[l.id] = aId;     // pump on/off is carried by the upstream pipe's status
 		nPump++; nAdded += 2;
 	});
-	report.counts.pipes = nPipe; report.counts.pumps = nPump; report.counts.pumpConnectingPipes = nAdded;
-	carried('junctions ' + nJ + ', reservoirs ' + nR + ', tanks ' + nT + ', pipes ' + nPipe + ', pumps ' + nPump + ' (each a node with ' + 2 + ' added 1 ft pipes)');
+	report.counts.pipes = nPipe; report.counts.pumps = nPump; report.counts.valves = nValve; report.counts.pumpConnectingPipes = nAdded;
+	carried('junctions ' + nJ + ', reservoirs ' + nR + ', tanks ' + nT + ', pipes ' + nPipe + ', pumps ' + nPump + ' (each a node with ' + 2 + ' added 1 ft pipes), valves ' + nValve);
 
 	// ---- controls ----
 	// Three support elements per control: a condition, an action, and the control that joins them.
@@ -463,12 +569,16 @@ function writeWtg(SQL, templateBytes, parsed, schedule, opts) {
 
 	// ---- analysis options: the template's own EPS options already read 24 h, 1 h step; set them explicitly ----
 	const T = parsed.times;
+	// Specific gravity and relative viscosity as the file states them (EPANET: 1 and 1). A pressure valve's
+	// psi setting becomes a head by the specific gravity, so a file that states 0.998 needs it carried.
+	const hy = parsed.hydraulics || {};
+	const sg = hy.specificGravity > 0 ? hy.specificGravity : 1.0, visc = hy.viscosity > 0 ? hy.viscosity : 1.0;
 	db.run('UPDATE EpaNetEngine_TimeAnalysisType_EpsType SET EpsType_Duration = ?, EpsType_HydraulicTimeStep = ?', [T.duration, T.hydraulicStep]);
 	// EPANET's own physical constants for the file (specific gravity 1.0; relative viscosity 1.0 is
 	// 1.1e-5 ft2/s) and its "Unbalanced Continue 10". Hazen-Williams never reads the viscosity.
 	db.run('UPDATE EpaNetEngine SET TimeAnalysisType = 1, FrictionMethod = 1, EpaNetEngine_AnalysisStartTime = ?, '
-		+ 'EpaNetEngine_LiquidSpecificGravity = 1.0, EpaNetEngine_LiquidKinematicViscosity = 1.1e-5, EpaNetEngine_ExtraIterations = 10',
-		[EPOCH_2000 + (T.startClock || 0)]);
+		+ 'EpaNetEngine_LiquidSpecificGravity = ?, EpaNetEngine_LiquidKinematicViscosity = ?, EpaNetEngine_ExtraIterations = 10',
+		[EPOCH_2000 + (T.startClock || 0), sg, 1.1e-5 * visc]);
 
 	// ---- counts, dataset notes ----
 	db.run('UPDATE HMIElementTypeCount SET Count = 0 WHERE ElementType IN (3,4)');

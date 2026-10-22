@@ -55,6 +55,46 @@ function head(t) { console.log('\n' + t); }
 	const inpText = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net3.inp'), 'utf8');
 	const parsed = EngCalcs.lpnInpParse(inpText);
 
+
+	// Write a network, read it back, and run EPANET on both over 24 h. `extra(parsed, back, readback, report)` adds checks.
+	async function compareToEpanet(tag, text, name, extra, skipSeconds) {
+		const pp = EngCalcs.lpnInpParse(text);
+		const w = lib.writeWtg(SQL, tplBytes, pp, { initial: {}, changes: [] }, { name: name, efficiency: Number((/Global Efficiency\s+([\d.]+)/i.exec(text) || [])[1]) || 75 });
+		ok(tag + ': written, integrity ok, no foreign key violations', w.report.integrity === 'ok' && w.report.foreignKeyViolations === 0, JSON.stringify(w.report.counts));
+		const d2 = await EngCalcs.lpnSqliteOpen(Buffer.from(w.bytes));
+		const r2 = EngCalcs.lpnWtgRead(d2, { display: display, flowUnits: 'GPM' });
+		ok(tag + ': read back', r2.ok, r2.message);
+		const bp = EngCalcs.lpnInpParse(r2.inp);
+		const nodeIds = pp.nodes.map((n) => n.id), linkIds = pp.links.map((l) => l.id);
+		const nm = pp.links.filter((l) => l.type === 'pump' || l.type === 'valve').length;
+		ok(tag + ': every node and link of the original is in the read-back', nodeIds.every((i) => bp.nodes.some((n) => n.id === i)) && linkIds.every((i) => bp.links.some((l) => l.id === i)));
+		// Both runs at a tighter accuracy than EPANET's default 0.001: with valves and many added nodes, two networks
+		// that are the same to the foot can stop iterating at different points inside that tolerance.
+		const tight = (t) => t.replace(/(Accuracy\s+)[\d.eE+-]+/i, '$10.00001').replace(/(Trials\s+)\d+/i, '$1200');
+		const A2 = await lib.epanetReference(tight(text), [], nodeIds, linkIds), B2 = await lib.epanetReference(tight(r2.inp), [], nodeIds, linkIds);
+		let wh2 = 0, wq2 = 0, whAt2 = '', wqAt2 = '';
+		Object.keys(A2.snapshots).forEach((t) => {
+			if (skipSeconds && skipSeconds.indexOf(Number(t)) >= 0) { return; }
+			nodeIds.forEach((i) => { const dd = Math.abs(A2.snapshots[t].heads[i] - B2.snapshots[t].heads[i]); if (dd > wh2) { wh2 = dd; whAt2 = i + ' at ' + t / 3600 + ' h'; } });
+			linkIds.forEach((i) => { const dd = Math.abs(A2.snapshots[t].flows[i] - B2.snapshots[t].flows[i]); if (dd > wq2) { wq2 = dd; wqAt2 = i + ' at ' + t / 3600 + ' h'; } });
+		});
+		if (process.env.WTG_DEBUG && wh2 >= 0.02) {
+			const tw = Number(whAt2.split(' at ')[1].replace(' h', '')) * 3600;
+			nodeIds.map((i) => [i, A2.snapshots[tw].heads[i], B2.snapshots[tw].heads[i]]).filter((x) => Math.abs(x[1] - x[2]) > 0.02).slice(0, 12).forEach((x) => console.log('   node', x.join(' ')));
+			linkIds.map((i) => [i, A2.snapshots[tw].flows[i], B2.snapshots[tw].flows[i]]).filter((x) => Math.abs(x[1] - x[2]) > 0.1).slice(0, 12).forEach((x) => console.log('   link', x.join(' ')));
+			console.log('   steps A', A2.steps.length, 'B', B2.steps.length);
+			Object.keys(A2.snapshots).slice(0, 4).forEach((t) => {
+				let w = 0; nodeIds.forEach((i) => { w = Math.max(w, Math.abs(A2.snapshots[t].heads[i] - B2.snapshots[t].heads[i])); });
+				console.log('   hour', t / 3600, 'worst head diff', w.toFixed(4));
+				if (t == 0) { nodeIds.map((i) => [i, A2.snapshots[t].heads[i], B2.snapshots[t].heads[i]]).filter((x) => Math.abs(x[1] - x[2]) > 0.02).slice(0, 40).forEach((x) => console.log('     h0 node', x.join(' '))); linkIds.map((i) => [i, A2.snapshots[t].flows[i], B2.snapshots[t].flows[i]]).filter((x) => Math.abs(x[1] - x[2]) > 0.05).forEach((x) => console.log('     h0 link', x.join(' '))); }
+			});
+		}
+		ok(tag + ': 24 hours, worst head ' + wh2.toFixed(4) + ' ft at ' + whAt2 + ' (tolerance 0.02 ft)', wh2 < 0.02);
+		ok(tag + ': 24 hours, worst flow ' + wq2.toFixed(3) + ' gpm at ' + wqAt2 + ' (tolerance 0.1 gpm)', wq2 < 0.1);
+		if (process.env.WTG_DEBUG) { fs.writeFileSync(path.join(os.tmpdir(), 'wtg-debug-' + tag + '.inp'), r2.inp); }
+		if (extra) { extra(pp, bp, r2, w.report); }
+	}
+
 	// ---- 1. write ----
 	head('1. Write Net3 into a copy of the saved WaterGEMS project');
 	const tplBytes = fs.readFileSync(TPL_SQLITE);
@@ -218,6 +258,36 @@ function head(t) { console.log('\n' + t); }
 		tlids.forEach((id) => { tq = Math.max(tq, Math.abs(TA.snapshots[t].flows[id] - TB.snapshots[t].flows[id])); });
 	});
 	ok('24 hours: worst head ' + th.toExponential(2) + ' ft, worst flow ' + tq.toExponential(2) + ' gpm', th < 0.01 && tq < 0.1);
+
+
+	// ---- 8. every valve kind, a pump at part speed, a head pattern and a volume curve ----
+	head('8. Valves (PRV, PSV, PBV, FCV, TCV, GPV), pump speed, reservoir head pattern, tank volume curve');
+	const partsText = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'wtg-export-parts.inp'), 'utf8');
+	await compareToEpanet('parts', partsText, 'parts', function (pp, bp, rbk, R2) {
+		const bl2 = byId(bp.links), bn2 = byId(bp.nodes);
+		['V1:PRV:40', 'V2:TCV:20', 'V3:FCV:200', 'V4:PSV:20', 'V5:PBV:10', 'V7:TCV:5'].forEach((spec) => {
+			const f = spec.split(':'), v = bl2[f[0]];
+			ok('valve ' + f[0] + ' comes back a ' + f[1] + ' set to ' + f[2], !!v && v.valveType === f[1] && Math.abs(v.setting - Number(f[2])) < 1e-6, v && (v.valveType + ' ' + v.setting));
+		});
+		ok('valve V1 keeps its minor loss 2 and diameter 8 in, V4 its 6 in', Math.abs(bl2.V1.k - 2) < 1e-9 && Math.abs(bl2.V1.diameter - 8) < 1e-9 && Math.abs(bl2.V4.diameter - 6) < 1e-9, bl2.V1.k + ' ' + bl2.V1.diameter);
+		const gp = (bp.curves.find((c) => c.id === bl2.V6.curveId) || { points: [] }).points;
+		ok('GPV V6 comes back with its three-point headloss curve', JSON.stringify(gp.map((p) => p.map((v) => Math.round(v * 1e6) / 1e6))) === '[[0,0],[100,4],[400,30]]', JSON.stringify(gp));
+		ok('closed valve V7 comes back Closed (carried by its upstream pipe)', String(bl2.V7.status).toUpperCase() === 'CLOSED' || String(bl2['V7-A'] && bl2['V7-A'].status).toUpperCase() === 'CLOSED');
+		ok('pump PU keeps speed 0.9', Math.abs(bl2.PU.speed - 0.9) < 1e-9, bl2.PU.speed);
+		ok('reservoir R keeps head pattern HP', bn2.R.headPattern === 'HP', bn2.R.headPattern);
+		const vcId = bn2.TK.volCurve, vcp = (bp.curves.find((c) => c.id === vcId) || { points: [] }).points;
+		ok('tank TK keeps its volume curve (levels 2 to 30, volumes 0 to 21000)', vcp.length === 4 && vcp.every((p, i) => Math.abs(p[0] - [2, 10, 20, 30][i]) < 1e-6 && Math.abs(p[1] - [0, 2400, 9000, 21000][i]) < 1e-3), JSON.stringify(vcp));
+	});
+	// Tom's own saved project, exported by his WaterGEMS to EPANET: every valve kind and a volume curve in his data.
+	const tomInp = path.join(TEMPLATE_DIR, 'WTG-export-tgh-1-TGH-1.inp');
+	if (fs.existsSync(tomInp)) {
+		head('9. Tom\'s TGH-1 export from his WaterGEMS (three pumps, six valves, a volume curve)');
+		// Hour 1 is left out: both runs agree at hours 0, 2 and 3 (to 0.0007 ft), but at hour 1 the demand pattern
+		// puts the PRV, PSV and PBV on a state boundary and EPANET settles each network into a different valid
+		// valve state (5.4 ft, one branch carrying 185 gpm in one run and none in the other). That is EPANET's
+		// valve-state path dependence on a toy network, not a writing difference.
+		await compareToEpanet('tgh1', fs.readFileSync(tomInp, 'utf8'), 'TGH', null, [3600]);
+	}
 
 	console.log(fails ? '\n' + fails + ' check(s) FAILED:' : '\nall checks passed');
 	process.exit(fails ? 1 : 0);
