@@ -10,9 +10,15 @@
 //       only L12, and the solved numbers are identical to before.
 //   C4  The button is off when no row is marked "(same)".
 //   C5  One Undo brings back all three rows, and the solved numbers are still identical.
+//   D1  Exact values: a diameter of 14.0000004 over Base's 14 prints the same but is NOT "(same)" and
+//       is not cleared; a demand list differing from Base only in its pattern is NOT "(same)" either.
+//   D2  Two scenarios share one alternative: clearing in A clears the shared alternative, so B's
+//       count falls too (as Clear all overrides already does). One Undo brings both back.
+//   D3  At a phone width (390 px) the dialog and its three buttons sit inside the window, unclipped.
 //   C6  A Spanish page shows the button (English fallback text) and asks in the page's dialog.
 'use strict';
 const path = require('path');
+const fs = require('fs');
 const U = require('./scenario-ui-helper.js');
 const NAME = 'clear-same-overrides-browser-harness';
 U.takeBrowserLock(NAME, 'EC_CLEAR_SAME_LOCKED');
@@ -157,12 +163,69 @@ async function main() {
 		await press('#lpn_dialog_body button.lpn-ovl-clearsame');
 		await settle(500);
 		const askEs = await askText();
-		ok('C6 it asks in the dialog with the count and name', askEs !== null && askEs.indexOf('(2)') >= 0 && askEs.indexOf(CHILD) >= 0, String(askEs));
+		ok('C6 it asks in the dialog with the count and name', askEs !== null && askEs.indexOf('(2 total)') >= 0 && askEs.indexOf(CHILD) >= 0, String(askEs));
 		const lbl = await P.evaluate(() => Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).map((b) => b.textContent.trim()));
 		await pressDialog(lbl[0]);
 		await settle(1200);
 		ok('C6 confirming there leaves 1 override', (await ovKeys(CHILD)).length === 1, JSON.stringify(await ovKeys(CHILD)));
 		ok('no uncaught page errors on the Spanish page', a.errors.length === 0, a.errors.slice(0, 3).join(' | '));
+
+		console.log('--- D. exact values, a shared alternative, a phone width ---');
+		const net = JSON.parse(fs.readFileSync(path.join(U.REPO, 'dev', 'water-network-examples', 'Net1.lwn'), 'utf8'));
+		net.alternatives = [
+			{ id: 'a1', category: 'physical', name: 'Pipes', parent: null, values: { 'l:10': { diameter: 18 }, 'l:11': { diameter: 14.0000004 } } },
+			{ id: 'a2', category: 'demand', name: 'Demands', parent: null, values: { 'n:11': { demands: [{ base: 150 }] }, 'n:12': { demands: [{ base: 150, pattern: '1' }] } } }];
+		net.scenarios.push({ id: 'sa', name: 'Shares A', overrides: {}, alternatives: { physical: 'a1', demand: 'a2' } },
+			{ id: 'sb', name: 'Shares B', overrides: {}, alternatives: { physical: 'a1', demand: 'a2' } });
+		net.project = Object.assign({}, net.project, { activeScenario: 'base' });
+		await P.evaluate((txt) => { localStorage.clear(); localStorage.setItem('lpn_project_hover', txt); }, JSON.stringify(net));
+		await a.goto('Looped-Network.php?ec_nolog=1');
+		await a.answerTrainingPanel().catch(() => {});
+		await P.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
+		await settle(2500);
+		ctx.strings = {};
+		const saved = () => P.evaluate(() => JSON.parse(localStorage.getItem('lpn_project_hover')));
+		const altVals = async (id) => Object.keys((((await saved()).alternatives || []).find((x) => x.id === id) || {}).values || {}).sort();
+		const MOe = await L('lpn_sm_list_overrides');
+		const openMgr = async (name) => { await scenarioMenu(name); await scenarioMenu(MOe); await settle(500); return dialog(); };
+		d = await openMgr('Shares A');
+		ok('D1 four rows; only the pipe equal to Base and the demand equal to Base are (same)', !!d && d.rows === 4 && d.marked === 2, JSON.stringify(d && [d.rows, d.marked, d.markedIds]));
+		ok('D1 14.0000004 (prints as 14) and the demand differing only in pattern are not marked', !!d && d.markedIds.length === 2 && d.markedIds.some((t) => /10/.test(t)) && d.markedIds.some((t) => /11/.test(t)) && !d.markedIds.some((t) => /12/.test(t)), JSON.stringify(d && d.markedIds));
+		await press('#lpn_dialog_body button.lpn-ovl-clearsame');
+		await settle(500);
+		const ask2 = await askText();
+		const want2 = (await L('lpn_ovl_clear_same_ask')).replace('{n}', '2').replace('{name}', 'Shares A');
+		ok('D1 it asks: ' + want2, ask2 !== null && ask2.indexOf(want2) >= 0, String(ask2));
+		await pressDialog(await L('lpn_dialog_ok'));
+		await settle(1200);
+		ok('D1 the alternatives keep the 14.0000004 pipe and the pattern demand only', JSON.stringify(await altVals('a1')) === '["l:11"]' && JSON.stringify(await altVals('a2')) === '["n:12"]', JSON.stringify([await altVals('a1'), await altVals('a2')]));
+		const sv2 = await saved();
+		ok('D1 the kept values are untouched', sv2.alternatives.find((x) => x.id === 'a1').values['l:11'].diameter === 14.0000004 && sv2.alternatives.find((x) => x.id === 'a2').values['n:12'].demands[0].pattern === '1');
+		d = await dialog();
+		ok('D1 the manager of A now counts 2 with no (same) row and the button off', !!d && d.rows === 2 && d.marked === 0 && d.sameOff === true, JSON.stringify(d && [d.rows, d.marked, d.sameOff]));
+		await pressDialog(await L('lpn_dialog_ok'));
+		d = await openMgr('Shares B');
+		ok('D2 Shares B, using the same alternatives, counts 2 as well (was 4)', !!d && d.rows === 2, JSON.stringify(d && d.rows));
+		await pressDialog(await L('lpn_dialog_ok'));
+		await P.mouse.click(5, 5).catch(() => {}); await P.keyboard.press('Escape'); await P.keyboard.press('Control+z'); await settle(1200);
+		ok('D2 one Undo brings back all four overrides in both alternatives', JSON.stringify(await altVals('a1')) === '["l:10","l:11"]' && JSON.stringify(await altVals('a2')) === '["n:11","n:12"]', JSON.stringify([await altVals('a1'), await altVals('a2')]));
+		d = await openMgr('Shares B');
+		ok('D2 Shares B counts 4 again', !!d && d.rows === 4 && d.marked === 2, JSON.stringify(d && [d.rows, d.marked]));
+		await pressDialog(await L('lpn_dialog_ok'));
+		d = await openMgr('Shares A');
+		ok('D2 Shares A counts 4 again, 2 marked', !!d && d.rows === 4 && d.marked === 2);
+		await P.setViewportSize({ width: 390, height: 800 });
+		await settle(800);
+		const fit = await P.evaluate(() => {
+			const box = document.getElementById('lpn_dialog'), body = document.getElementById('lpn_dialog_body'), W = window.innerWidth;
+			const r = box.getBoundingClientRect();
+			const btns = Array.from(body.querySelectorAll('.lpn-ovl-bar button')).map((b) => { const q = b.getBoundingClientRect(); return { t: b.textContent, l: Math.round(q.left), r: Math.round(q.right), clipped: b.scrollWidth > b.clientWidth + 1 }; });
+			return { W, left: Math.round(r.left), right: Math.round(r.right), btns, bodyOver: body.scrollWidth > body.clientWidth + 1, bodyRight: Math.round(body.getBoundingClientRect().right) };
+		});
+		ok('D3 at 390 px the dialog is inside the window', fit.left >= 0 && fit.right <= fit.W, JSON.stringify(fit));
+		ok('D3 the three buttons are inside the window and unclipped', fit.btns.length === 3 && fit.btns.every((b) => b.l >= 0 && b.r <= fit.W && !b.clipped), JSON.stringify(fit.btns));
+		ok('D3 the dialog body has no sideways overflow of its buttons', fit.btns.every((b) => b.r <= fit.bodyRight + 1), JSON.stringify([fit.bodyRight, fit.bodyOver]));
+		ok('no uncaught page errors in D', a.errors.length === 0, a.errors.slice(0, 3).join(' | '));
 		await a.close();
 	} finally {
 		await browser.close();
