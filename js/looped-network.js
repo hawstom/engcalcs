@@ -8525,7 +8525,7 @@ var EngCalcs = EngCalcs || {};
 				choices: findChoiceDefs('status').map(function (o) { return o[0]; }),
 				label: pc.lpn_field_closed || 'Closed',
 				applies: function () { return true; },
-				get: function (l) { return effective(l, 'status') === 'closed' ? 'closed' : 'open'; },
+				get: function (l) { return linkStoredStatus(l); },
 				set: function (l, v) { l._status = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// **THE THREE PUMP-ONLY INPUTS (gap #5).** Speed is overridable (2026-10-12), and the
 			// write is the same clamp paneColPumpSpeed() applies: a blank, a zero or a negative all
@@ -10637,15 +10637,6 @@ var EngCalcs = EngCalcs || {};
 	// than none, because the map, the popup, the report and the file would each answer differently.
 	function elementCurve(l, prop) { return curveById(effective(l, prop || 'curveId')); }
 	function resolveCurvePoints(l) { return curvePointsOf(elementCurve(l, 'curveId')); }
-	// **AT MOST THREE POINTS, FOR THE FIT ALONE.** EngCalcs.lpnPumpFromCurve reads 1 to 3 pairs, so
-	// a longer curve is sampled at its ends and its middle -- the fitted curve then spans the pump's
-	// real operating range rather than only its low-flow end. DERIVED, and nothing writes it back:
-	// the document keeps every point, which is the whole of what Task 586 bought.
-	function pumpFitPoints(pts) {
-		if (pts.length <= 3) { return pts; }
-		var sorted = pts.slice().sort(function (u, v) { return u[0] - v[0]; });
-		return [sorted[0], sorted[Math.floor((sorted.length - 1) / 2)], sorted[sorted.length - 1]];
-	}
 	// A PUMP'S FITTED CURVE IS DERIVED, SO IT IS NOT STORED (ROADMAP Task 390 step 5).
 	//
 	// h0/a/b are the SI coefficients of H = h0 - a Q^b that js/lpn-solver.js reads. curvePoints are
@@ -10658,8 +10649,13 @@ var EngCalcs = EngCalcs || {};
 	// Derived at the solver handoff there is nothing to keep in step, nothing to migrate, and no
 	// field on a link that anything but the user writes. The cost is one three-point curve fit per
 	// pump per solve, at this suite's target scale of ~10-20 nodes.
+	//
+	// **EVERY POINT REACHES IT** (fix/pump-curve-multipoint). EngCalcs.lpnPumpFromCurve reads the
+	// curve as EPANET does: a power law from one point or from three starting at zero flow, and
+	// otherwise the points themselves (`custom`). A longer curve used to be cut to its ends and its
+	// middle for a three-point fit, which EPANET never does.
 	function pumpFit(l) {
-		var pts = pumpFitPoints(resolveCurvePoints(l));
+		var pts = resolveCurvePoints(l);
 		if (pts.length === 0) {
 			// No curve entered yet: h0 = a = 0, so H = h0 - a Q^b is identically zero and the pump
 			// is simply a connection that neither adds nor loses head. The solver has its own
@@ -12104,10 +12100,19 @@ var EngCalcs = EngCalcs || {};
 	}
 	// The document's own status, never the run's -- linkStatusOf()'s second road on its own.
 	function linkInitialStatusText(l) {
-		var pc = EngCalcs.pageConfig || {};
-		return effective(l, 'status') === 'closed'
+		var pc = EngCalcs.pageConfig || {}, st = linkStoredStatus(l);
+		if (st === 'cv') { return pc.lpn_result_status_cv || 'CV'; }
+		return st === 'closed'
 			? (pc.lpn_result_status_closed || 'Closed')
 			: (pc.lpn_result_status_open || 'Open');
+	}
+	// **THE STORED STATUS AS ONE OF ITS THREE CODES**: 'open', 'closed', or 'cv' -- a check-valve
+	// pipe, EPANET's CV, which passes flow only from its start node to its end node and is shut by
+	// the solve when the flow would reverse. Only a pipe can be one; anything else reads as open.
+	function linkStoredStatus(l) {
+		var st = effective(l, 'status');
+		if (st === 'closed') { return 'closed'; }
+		return st === 'cv' && l.type === 'pipe' ? 'cv' : 'open';
 	}
 	// A pipe's reaction coefficient in force: its own where it states one, else the network's
 	// (`settings.reactions.globalBulk` / `globalWall`), in the document's own units -- the pair
@@ -13806,11 +13811,56 @@ var EngCalcs = EngCalcs || {};
 	// LANDS ON** -- the same station the link's label and the DXF block use. It used to take the END
 	// nodes' chord, which on a bent pipe is off the pipe altogether (the WTG import, 2026-10-19).
 	// One answer for the drawing, the hit shape and the label obstacle box.
+	//
+	// **A ZERO-LENGTH PUMP OR VALVE HAS NO DIRECTION OF ITS OWN** (WaterGEMS/Bentley exports them with
+	// both end nodes on one point, 46-A over 46-B). Tom, 2026-10-21, asked whether it should line up
+	// with its pipes: *"Bentley points the symbol at the downstream pipe. I guess my answer is Yes."*
+	// So it takes the direction from its end node (node 2) toward the far end of the first segment of
+	// another link at that node (that link's first vertex, else its other node); failing that, the
+	// same from the upstream node, the upstream link running INTO the pump, so flow continues through;
+	// failing both, 0 degrees. Several links at one node: the FIRST in doc.links order, so the answer
+	// never changes between redraws. A candidate whose far end is also on the point is skipped.
+	var ZERO_LEN_EPS = 1e-6;
+	function zeroLengthDirection(l, pts) {
+		var n1 = nodeById(l.from), n2 = nodeById(l.to), c = pts[0], i, o, p, q, far;
+		function farEnd(o, node) {
+			// the first point of `o`, walking away from `node`
+			return o.from === node.id ? (o.verts.length ? o.verts[0] : nodeAt(nodeById(o.to)))
+				: (o.verts.length ? o.verts[o.verts.length - 1] : nodeAt(nodeById(o.from)));
+		}
+		for (i = 0; i < doc.links.length; i++) {
+			o = doc.links[i];
+			if (o === l || (o.from !== n2.id && o.to !== n2.id)) { continue; }
+			far = farEnd(o, n2);
+			if (far && Math.hypot(far.x - c.x, far.y - c.y) > ZERO_LEN_EPS) {
+				return { dx: far.x - c.x, dy: far.y - c.y };
+			}
+		}
+		for (i = 0; i < doc.links.length; i++) {
+			o = doc.links[i];
+			if (o === l || (o.from !== n1.id && o.to !== n1.id)) { continue; }
+			far = farEnd(o, n1);
+			if (far && Math.hypot(far.x - c.x, far.y - c.y) > ZERO_LEN_EPS) {
+				return { dx: c.x - far.x, dy: c.y - far.y };
+			}
+		}
+		return null;
+	}
 	function linkSymbolPlace(l) {
 		var pts = linkPointList(l), p = Geom.pointAlongPolyline(pts, 0.5),
-			si = Geom.segmentAtFraction(pts, 0.5).index, a = pts[si], b = pts[si + 1];
+			si = Geom.segmentAtFraction(pts, 0.5).index, a = pts[si], b = pts[si + 1], dx, dy, zl, k, m;
 		if (!b) { return null; }
-		return { x: p.x, y: p.y, angle: Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI, flip: (b.x - a.x) < 0 };
+		dx = b.x - a.x; dy = b.y - a.y;
+		zl = true;
+		for (k = 1; k < pts.length; k++) {
+			m = Math.hypot(pts[k].x - pts[0].x, pts[k].y - pts[0].y);
+			if (m > ZERO_LEN_EPS) { zl = false; break; }
+		}
+		if (zl) {
+			zl = zeroLengthDirection(l, pts);
+			dx = zl ? zl.dx : 0; dy = zl ? zl.dy : 0;
+		}
+		return { x: p.x, y: p.y, angle: Math.atan2(dy, dx) * 180 / Math.PI, flip: dx < 0 };
 	}
 	function positionPumpSymbol(id) {
 		var l = linkById(id), le = linkEls[id];
@@ -23552,7 +23602,8 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (prop === 'status') {
 			return [['open', pc.lpn_result_status_open || 'Open'],
-				['closed', pc.lpn_result_status_closed || 'Closed']];
+				['closed', pc.lpn_result_status_closed || 'Closed'],
+				['cv', pc.lpn_result_status_cv || 'CV']];
 		}
 		if (prop === 'mixingModel') { return paneColMixingModel().choices(); }
 		// The four dose types, from the one list the popup and the table draw (called with no node,
@@ -23936,7 +23987,7 @@ var EngCalcs = EngCalcs || {};
 		// linkStatusOf()'s solved-run reading, which is a RESULT; this is what paneColClosed()'s
 		// own checkbox reads and writes, so a search and a bulk edit agree with the table cell.
 		if (prop === 'status') {
-			return cand.group === 'link' ? (effective(cand.el, 'status') === 'closed' ? 'closed' : 'open') : undefined;
+			return cand.group === 'link' ? linkStoredStatus(cand.el) : undefined;
 		}
 		// **THE THREE PUMP-ONLY INPUTS** (Task 708, gap #5), all overridable, read through
 		// effective(); speed with the same "blank/zero/negative means 1" rule paneColPumpSpeed()
@@ -28090,7 +28141,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	}
 	function paneColNodeResult(key, label, unit) {
 		return { key: key, label: label, result: true, unit: unit, dec: paneResultDecimals('node', key),
-			get: function (n) { return colorNodeValue(n, key); } };
+			get: function (n) { return key === 'demandActual' ? inRunScenario(function () { return colorNodeValue(n, key); }) : colorNodeValue(n, key); } };
 	}
 	// **WHAT A JUNCTION RECEIVES UNDER PRESSURE-DRIVEN ANALYSIS** (Task 762), as two result
 	// columns that exist only while the Demand model is PDA, the way the quality columns exist only
@@ -28383,10 +28434,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **SHUT IS NOT THE SAME QUESTION AS "part of this network"**, and both belong here: Active is
 	// whether the scenario contains the link at all, Closed is whether water can pass through the one
 	// it contains. EPANET's `[STATUS]`, and overridable like every other property on the popup.
+	// An unticked Closed leaves a check valve one: only a link that IS closed is opened by it.
 	function paneColClosed() {
 		return { key: 'closed', label: 'lpn_field_closed', bool: true, em: 2, prop: 'status',
 			get: function (l) { return effective(l, 'status') === 'closed'; },
-			set: function (l, v) { setProp(l, 'status', v ? 'closed' : 'open'); } };
+			set: function (l, v) {
+				if (v) { setProp(l, 'status', 'closed'); } else if (effective(l, 'status') === 'closed') { setProp(l, 'status', 'open'); }
+			} };
+	}
+	// **A CHECK VALVE IS THE SAME PROPERTY** (`status` 'cv', EPANET's CV), pipes only. EPANET has one
+	// status per pipe, so ticking CV opens a closed pipe and ticking Closed ends a check valve; an
+	// unticked CV leaves a closed pipe closed.
+	function paneColCheckValve() {
+		return { key: 'cv', label: 'lpn_field_cv', bool: true, em: 2, prop: 'status',
+			get: function (l) { return effective(l, 'status') === 'cv'; },
+			set: function (l, v) {
+				if (v) { setProp(l, 'status', 'cv'); } else if (effective(l, 'status') === 'cv') { setProp(l, 'status', 'open'); }
+			} };
 	}
 	// The library references. A pipe type states diameter, roughness and more; choosing one goes
 	// through setPipeType(), the same door the popup's chooser uses, because that is what knows how
@@ -29027,7 +29091,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{
 				id: 'pipes', panel: 'lpn_pane_pipes', label: 'lpn_pane_tab_pipes',
 				group: 'link', type: 'pipe',
-				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive(), paneColClosed()].concat(paneColEnds(), [
+				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive(), paneColClosed(), paneColCheckValve()].concat(paneColEnds(), [
 					paneColPipeType(),
 					paneColDiameter(),
 					// TYPING A LENGTH TURNS AUTO OFF, which is exactly what the popup's own box does
@@ -33554,7 +33618,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			srcRows, srcCols = 0, nRows, nCols, r, cIdx, line, txt, lineOffset = 0,
 			wrote = 0, refused = 0, dropped = 0, col, el, canCreate = paneCanCreate(spec),
 			creates = [], plan, made, created = [], firstId, i,
-			overflow = (opts && opts.overflow) || '', mayAsk = false, extra;
+			overflow = (opts && opts.overflow) || '', mayAsk = false, extra,
+			ovBefore = overrideCount(activeScenario());
 		// **APPENDING, EVERY LINE IS A NEW ROW**, read from the table's first column, and the block
 		// begins past the last existing row so not one of them can be written.
 		if (opts && opts.append) {
@@ -33650,6 +33715,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			} finally { endMapBoxHold(); }
 		}
 		completeEdit(null);
+		refreshScenarioStatus();   // the override count follows a bulk write
 		refreshPopupIfOpen();
 		// **THE NEW ROWS STAY SELECTED**, from where the paste began to the last one made, so the
 		// clerk is looking at what they just added rather than at the row above it.
@@ -33663,8 +33729,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// eleven read-only cells is a paste the user believes landed. A paste that made rows says
 		// how many, because a clerk who typed 400 rows needs to know 400 landed, not how many
 		// cells changed.
-		var pasteScn = activeScenario(), pasteTail = (pasteScn && !pasteScn.isBase && (wrote || created.length))
-			? ' ' + String(pc.lpn_pane_pasted_scenario || 'These values are overrides in the scenario {scenario}.').split('{scenario}').join(scenarioDisplayName(pasteScn)) : '';
+		// The count is of NEW overrides only, and is left out at zero: a paste over cells that were
+		// already overrides would otherwise read "Pasted cells (3) ... (0)", a seeming contradiction.
+		var pasteScn = activeScenario(), pasteNew = pasteScn ? Math.max(0, overrideCount(pasteScn) - ovBefore) : 0,
+			pasteTail = (pasteScn && !pasteScn.isBase && (wrote || created.length))
+			? ' ' + String(pc.lpn_pane_pasted_scenario || 'These values are overrides in the scenario {scenario}.').split('{scenario}').join(scenarioDisplayName(pasteScn))
+			+ (pasteNew ? ' ' + String(pc.lpn_pane_pasted_overrides || 'New overrides ({n}).').replace('{n}', String(pasteNew)) : '') : '';
 		if (created.length) {
 			setNotice(String(refused + dropped
 				? (pc.lpn_pane_pasted_rows_skipped || 'Pasted rows ({n}). Rows added to the network ({created}). Cells not changed ({skipped}).')
@@ -37200,6 +37270,18 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			.map(function (e) { return e.id; });
 	}
 
+	// **A RESULT AND THE INPUTS NEXT TO IT COME FROM ONE RUN.** With Recalculate off the open
+	// scenario can differ from the one the kept result was solved in (`_scn`, stamped when the
+	// solve is stored). A column that is an input resolved at read time (the Demand beside the
+	// pressures) must be read in that run's scenario, or a report prints Peak's pressures beside
+	// Base's demands. Open scenario when the result carries no stamp, the scenario is gone, or a
+	// scenario-view swap is already in force (paneInScenario() chose the scenario on purpose).
+	function inRunScenario(fn, runId) {
+		var id = runId || (lastSolveResult && lastSolveResult._scn), i;
+		if (!id || id === project.activeScenario || paneScnSwapDepth) { return fn(); }
+		for (i = 0; i < scenarios.length; i++) { if (scenarios[i].id === id) { return paneInScenario(scenarios[i], fn); } }
+		return fn();
+	}
 	// **READ THE PAGE'S OWN ACCESSORS AS OF ONE FRAME OF THE RUN.** Two things decide what
 	// colorNodeValue()/colorLinkValue() answer, and this swaps both: `lastSolveResult`, which is
 	// every solved quantity, and the pattern clock, which is every quantity resolved from a
@@ -41192,7 +41274,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// the key, and "exactly as a brand-new visitor would see it" has to mean that too.
 			// Erasing a key we no longer write is the one direction that is always safe.
 			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY, LPN_SCNBASIC_KEY, LPN_HOVERCARD_KEY,
-			LPN_CLEANMAP_KEY, LPN_OVRMARKS_KEY,
+			LPN_CLEANMAP_KEY, LPN_OVRMARKS_KEY, LPN_CALCHINT_KEY,
 			// 'lpn_theme' (Task 714): a literal because the key is owned by the page head's window.ecTheme.
 			'lpn_theme'];
 		try {
@@ -45553,6 +45635,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// sentence rather than a blank; delete the key once nothing can produce it.
 			case 'valve-dropped': return pc.lpn_inp_drop_valve || 'These valves are described by a curve or by a fixed pressure drop, and this page has no such asset. They were imported as open pipes, so the network remains connected, but pressure and flow are no longer controlled at those locations.';
 			case 'gpv-curve-missing': return pc.lpn_inp_drop_gpv_curve || 'This valve refers to a head loss curve that is not in the file. The valve was imported without a curve, so it remains fully open until a curve is chosen.';
+			// 'check-valve' IS NO LONGER EMITTED: a CV pipe is kept as one (status 'cv'). Kept, like
+			// 'valve-dropped', because a pipe imported before that still wears the note, and for that
+			// pipe it is still true.
 			case 'check-valve': return pc.lpn_inp_drop_cv || 'In EPANET these pipes allow flow in one direction only (check valves). They were imported as ordinary pipes, so flow may now pass in either direction.';
 			// 'demand-categories' IS NO LONGER EMITTED (Task 468): a junction holds its demands as a
 			// LIST, so nothing is added together and there is no difference to report. Kept, like
@@ -46006,26 +46091,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		function held(v) { return Array.isArray(v) ? v.length > 0 : (v && typeof v === 'object') ? Object.keys(v).length > 0 : !!v; }
 		['patterns', 'curves', 'controls', 'rules'].forEach(function (k) { if (held(parsed[k])) { na[k] = true; } });
 		if (held(parsed.hydraulics) || held(parsed.qualityOptions) || held(parsed.fileOptions)) { na.options = true; }
-		// A CV pipe is read as open (the importer reports it); its status is not compared or written.
-		var cvIds = {};
-		(parsed.dropped || []).forEach(function (d) { if (d.code === 'check-valve') { (d.ids || []).forEach(function (i) { cvIds[i] = true; }); } });
 		var rawNode = {}, rawLink = {};
 		parsed.nodes.forEach(function (n) { rawNode[n.id] = n; });
 		parsed.links.forEach(function (l) { rawLink[l.id] = l; });
-		return inpPlanFromSource({ refused: [], na: na, cv: cvIds, rec: docFromInp(parsed, name), rawNode: rawNode, rawLink: rawLink,
+		return inpPlanFromSource({ refused: [], na: na, rec: docFromInp(parsed, name), rawNode: rawNode, rawLink: rawLink,
 			geoFile: parsed.mapUnits === 'degrees' });
 	}
 	// **THE ONE COMPARE, FOR EVERY FORMAT THAT LANDS IN THE OPEN PROJECT** (Task 814): an EPANET file
 	// and a GeoJSON network each reduce themselves to `src` and this does the rest, so the two cannot
-	// drift. `src`: refused (rows), na (set of not-applied keys), cv (ids read as open), rec (the file
+	// drift. `src`: refused (rows), na (set of not-applied keys), rec (the file
 	// as a document: nodes, links), rawNode/rawLink (the file's own positions, outside the document
 	// frame), geoFile (the positions are longitude and latitude).
 	function inpPlanFromSource(src) {
 		var pc = EngCalcs.pageConfig || {}, plan = { refused: src.refused, changes: [], addedNodes: [], addedLinks: [], addedL: [], keptL: [], na: src.na || {},
 				keptNodes: [], keptLinks: [], typeDiffers: [], typeOwned: [], notAdded: false, dwRoughness: false, matched: 0 };
 		if (plan.refused.length) { return plan; }
-		var cvIds = src.cv || {}, rec = src.rec, fileNode = {}, fileLink = {}, rawNode = src.rawNode, rawLink = src.rawLink;
-		plan.cv = Object.keys(cvIds).map(function (i) { return inpTL('pipe', i); });
+		var rec = src.rec, fileNode = {}, fileLink = {}, rawNode = src.rawNode, rawLink = src.rawLink;
 		rec.nodes.forEach(function (n) { fileNode[n.id] = n; });
 		rec.links.forEach(function (l) { fileLink[l.id] = l; });
 		plan.rec = rec; plan.rawNode = rawNode; plan.rawLink = rawLink;
@@ -46037,7 +46118,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			fields.forEach(function (f) {
 				var nv = r[f[1]], cur, tok = r.tok && typeof r.tok[f[1]] === 'string' ? r.tok[f[1]] : undefined;
 				if (nv === undefined || nv === null) { return; }
-				if (f[0] === 'status' && kind === 'link' && cvIds[el.id]) { return; }
 				if (f[0] === 'roughness' && dw) { plan.dwRoughness = true; return; }
 				if (kind === 'link' && pipeTypeOwns(el, f[0])) { ownedHere = true; return; }
 				cur = effective(el, f[0]);
@@ -46194,7 +46274,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (plan.stripped && plan.stripped.length) {
 				na.push((pc.lpn_inpup_na_refs || 'These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}').replace('{ids}', inpListIds(plan.stripped)));
 			}
-			if (plan.cv && plan.cv.length) { na.push((pc.lpn_inpup_na_cv || 'A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}').replace('{ids}', inpListIds(plan.cv))); }
 			if (msxFile) { na.push((pc.lpn_inpup_na_msx || 'The .msx file chosen with this file was not read. To attach it to this project, choose it alone.')); }
 			if (na.length) {
 				p(pc.lpn_inpup_h_na || 'Not applied', true);
@@ -46546,7 +46625,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if ((net.patterns || []).length) { na.patterns = true; }
 		if ((net.curves || []).length) { na.curves = true; }
 		if ((net.customProps || []).length) { na.custom = true; }
-		return { refused: [], na: na, cv: {}, rec: { nodes: net.nodes, links: net.links }, rawNode: raw.node, rawLink: raw.link, geoFile: true };
+		return { refused: [], na: na, rec: { nodes: net.nodes, links: net.links }, rawNode: raw.node, rawLink: raw.link, geoFile: true };
 	}
 	function updateProjectFromGeoJson(scan, fileName, target, done) {
 		function land(net, refusedRows) {
@@ -54961,6 +55040,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 					// under at the foot of the file, not a function in scope here.
 					if (EngCalcs.lpnTimeRunNow) { EngCalcs.lpnTimeRunNow(); }
 					else { runSolve(); }
+					calcHintMaybe();
 				}
 			},
 			// **FIRE FLOW AND CRITICALITY SIT IN AN ANALYZE FLY-OUT, WITH CALCULATE** (Task 754;
@@ -64101,8 +64181,62 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		initTipsIn(box);
 		if (!setboxLayout.open) { setboxLayout.open = true; saveSetboxLayout(); }
 	}
+	// ---- THE CALCULATE HINT (Tom, 2026-10-21) --------------------------------------------------
+	//
+	// Tom: *"Our usage logs show that people are using the Water, Calculate button, which makes no
+	// sense."* With Recalculate automatically on the command does nothing the page was not already
+	// doing, so choosing it opens Settings at that row, marks the row, and says so once per press
+	// until the visitor asks never to be told again. **THE COMMAND STILL RUNS**; the hint never
+	// blocks it. The one door is the Water menu row: the toolbar button is hidden while the setting
+	// is on, and an automatic recalculation never passes through here. The remembered "do not show
+	// again" is window furniture (`lpn_calchint`, localStorage only, written only when asked).
+	var LPN_CALCHINT_KEY = 'lpn_calchint', calcHintFlashTimer = 0;
+	function calcHintMuted() {
+		try { return localStorage.getItem('lpn_calchint') === '0'; } catch (e) { return false; }
+	}
+	function calcHintHide() {
+		var row;
+		if (calcHintFlashTimer) { clearTimeout(calcHintFlashTimer); calcHintFlashTimer = 0; }
+		row = document.querySelector('#lpn_settings_box .lpn-set-row-flash');
+		if (row) { row.classList.remove('lpn-set-row-flash'); }
+	}
+	// The message is the page's one question box (askDialog), centred over the map like every other
+	// alert (Tom, 2026-10-21: "That is not a standard alert. Put a box in the middle of the map.").
+	// Settings opens behind it at once with the row marked, so the row is already in view when OK is
+	// pressed.
+	function calcHintMaybe() {
+		var pc = EngCalcs.pageConfig || {}, box, row, rows, i, hold;
+		if (scnSetting('autoRun') === false || calcHintMuted()) { return; }
+		openSettingsBox('calc');
+		box = setboxEl();
+		calcHintHide();
+		rows = box ? box.querySelectorAll('[data-lpn-setting]') : [];
+		for (i = 0; i < rows.length; i++) {
+			if (rows[i].getAttribute('data-lpn-setting') === '[["settings","autoRun"]]') { row = rows[i]; break; }
+		}
+		hideOpenTips();
+		if (row) {
+			row.classList.add('lpn-set-row-flash');
+			if (row.scrollIntoView) { row.scrollIntoView({ block: 'center' }); }
+			// Transient, like every mark in this box: it goes on a timer or at the first press inside.
+			hold = function () { box.removeEventListener('pointerdown', hold, true); calcHintHide(); };
+			box.addEventListener('pointerdown', hold, true);
+			calcHintFlashTimer = setTimeout(function () { calcHintFlashTimer = 0; row.classList.remove('lpn-set-row-flash'); }, 6000);
+		}
+		askDialog({
+			kind: 'choice',
+			text: pc.lpn_calc_hint || 'When “Recalculate automatically” is on, this command is not needed.',
+			choices: [
+				{ label: pc.lpn_dialog_ok || 'OK', value: 'ok', isDefault: true, cancel: true },
+				{ label: pc.lpn_calc_hint_mute || 'Don’t show this again', value: 'mute' }
+			]
+		}, function (v) {
+			if (v === 'mute') { try { localStorage.setItem('lpn_calchint', '0'); } catch (e) {} }
+		});
+	}
 	function closeSettingsBox() {
 		var box = setboxEl();
+		calcHintHide();
 		hidePanel(box);
 		// **GUARDED, AND HERE THAT IS NOT AN OPTIMISATION.** Escape calls this on every press,
 		// whether or not the box is showing, so an unguarded write would put a storage write on a
@@ -67396,12 +67530,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **IT DRAWS WHAT THE SOLVER APPLIES**, which is the rule libSparkline's step line follows and
 	// is the whole reason this is not one function for both kinds:
 	//
-	//   - A PUMP runs on the FITTED curve H = h0 - a Q^b (EngCalcs.lpnPumpFromCurve), never on
-	//     straight lines between the typed points. On a ONE-POINT curve there is no line to draw at
-	//     all -- EPANET's rule turns that single duty point into shutoff 1.33H and runout 2Q, a fact
-	//     about the pump the user is running that the table cannot show and this chart can.
-	//   - A GPV's head loss is interpolated LINEARLY between its points, so straight segments are
-	//     what it applies.
+	//   - A PUMP on one point, or on three starting at zero flow, runs on the FITTED curve
+	//     H = h0 - a Q^b (EngCalcs.lpnPumpFromCurve). On a ONE-POINT curve there is no line to
+	//     draw at all -- EPANET's rule turns that single duty point into shutoff 1.33H and runout
+	//     2Q, a fact about the pump the user is running that the table cannot show and this chart can.
+	//   - Any other pump curve is CUSTOM, and a GPV's head loss is too: both are interpolated
+	//     LINEARLY between their points, so straight segments are what they apply.
 	//
 	// The fit is plain algebra on the pairs and carries no units of its own, so it runs on the
 	// DISPLAY numbers and converts nothing. pumpFit() is the one site that crosses to SI, and this
@@ -67418,21 +67552,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		xs = pts.map(function (p) { return +p[0]; });
 		ys = pts.map(function (p) { return +p[1]; });
 		if (xs.concat(ys).some(function (v) { return !isFinite(v); })) { return el; }
-		// **pumpFitPoints() FIRST, BECAUSE THAT IS WHAT THE SOLVER READS.** lpnPumpFromCurve() sorts
-		// and takes the first three pairs it is given, so handing it a five-point curve whole drew a
-		// fit through its three LOWEST flows while pumpFit() fits the first, the middle and the last.
-		// The line on the chart and the equation under the type selector are the same fit as the run.
-		fit = isPump && EngCalcs.lpnPumpFromCurve ? EngCalcs.lpnPumpFromCurve(pumpFitPoints(pts.map(function (p) {
+		// **THE SAME READING OF THE CURVE AS THE RUN** (lpnPumpFromCurve, every point, EPANET's
+		// rule): a power law from one point or three starting at zero flow, drawn as that fitted
+		// curve; anything else is a CUSTOM curve the solver applies as straight segments between the
+		// points, and that is drawn exactly as a GPV's is, below.
+		fit = isPump && EngCalcs.lpnPumpFromCurve ? EngCalcs.lpnPumpFromCurve(pts.map(function (p) {
 			return [+p[0], +p[1]];
-		}))) : null;
-		if (fit && !(isFinite(fit.h0) && isFinite(fit.a) && isFinite(fit.b))) { fit = null; }
+		})) : null;
+		if (fit && (fit.custom || !(isFinite(fit.h0) && isFinite(fit.a) && isFinite(fit.b)))) { fit = null; }
 		// **A PUMP CURVE IS FRAMED ON THE ORIGIN**, because shutoff head and runout flow are the two
 		// ends a person reads it by, and a frame that started at the first typed point would hide
 		// both. A GPV curve is framed on its own points: its x range is whatever flows it covers,
 		// and zero need not be one of them.
-		xlo = fit ? 0 : Math.min.apply(null, xs);
+		// A custom pump curve is framed on the origin too, its segments drawn as typed.
+		xlo = (fit || isPump) ? Math.min(0, Math.min.apply(null, xs)) : Math.min.apply(null, xs);
 		xhi = fit ? Math.max.apply(null, xs) * 1.15 : Math.max.apply(null, xs);
-		ylo = fit ? 0 : Math.min.apply(null, ys);
+		ylo = (fit || isPump) ? Math.min(0, Math.min.apply(null, ys)) : Math.min.apply(null, ys);
 		yhi = fit ? Math.max(fit.h0, Math.max.apply(null, ys)) * 1.05 : Math.max.apply(null, ys);
 		// A ONE-POINT GPV curve, or a flat one, is a real curve and must not divide by zero -- the
 		// same guard libSparkline gives a flat pattern.
@@ -67971,9 +68106,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * prints the equation it fitted under the type selector, and this is the same thing said the
 	 * same way.
 	 *
-	 * **IT IS THE FIT THE RUN USES, NOT A SECOND ONE.** pumpFitPoints() picks the first, middle and
-	 * last of a longer curve exactly as pumpFit() does, so the printed equation, the line on the
-	 * chart and the head the built-in solver applies are one thing. The arithmetic runs on the
+	 * **IT IS THE FIT THE RUN USES, NOT A SECOND ONE.** lpnPumpFromCurve() reads every point, as
+	 * pumpFit() hands them, so the printed equation, the line on the chart and the head the
+	 * built-in solver applies are one thing; a curve EPANET runs as straight segments prints none. The arithmetic runs on the
 	 * DISPLAY numbers and converts nothing, which is why the tip says the units are the table's:
 	 * pumpFit() is the one site that crosses to SI and this is deliberately not a second one.
 	 *
@@ -67990,10 +68125,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// three quarters our convention and none of it the user's, and printing it beside the
 		// number they just typed reads as though they had described it.
 		if (!c || c.kind !== 'head' || !pts || pts.length < 2 || !EngCalcs.lpnPumpFromCurve) { return ''; }
-		fit = EngCalcs.lpnPumpFromCurve(pumpFitPoints(pts.map(function (p) {
+		fit = EngCalcs.lpnPumpFromCurve(pts.map(function (p) {
 			return [+p[0], +p[1]];
-		})));
-		if (!fit || !(isFinite(fit.h0) && isFinite(fit.a) && isFinite(fit.b))) { return ''; }
+		}));
+		// A CUSTOM curve (two points, three not starting at zero flow, four or more) has no
+		// equation: both engines run it as straight lines between its points, and the chart shows
+		// those.
+		if (!fit || fit.custom || !(isFinite(fit.h0) && isFinite(fit.a) && isFinite(fit.b))) { return ''; }
 		// The bare quantity names rather than curveAxisLabels(), whose entries carry their unit in
 		// brackets: "Head (ft) = 300 - 0.000196 Flow (gpm)^2" reads as an exponent on the unit.
 		return (pc.lpn_result_head || 'Head') + ' = ' + libEqNum(fit.h0)
@@ -72624,6 +72762,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		endField(fields, l, 'from');
 		endField(fields, l, 'to');
 		closedField(fields, l, linkId);
+		if (l.type === 'pipe') { checkValveField(fields, l); }
 		customPropFields(fields, l);
 		activeField(fields, l);
 		if (lastSolveResult && !linkResultHeld(l) && lastSolveResult.flows[linkId] !== undefined) {
@@ -73719,6 +73858,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// stored token: "Base: open" beside a box labelled Closed is one negation more than a
 		// reader should have to do, and it needs no key of its own.
 		overrideMarker(fields, l, 'status', function (v) { return formatPropValue(v === 'closed'); });
+	}
+	// **CHECK VALVE (CV)**, a pipe's third status beside open and closed: the same `status`
+	// property the Closed box writes, so the two boxes are one EPANET status column and ticking
+	// either one clears the other. Same shape as closedField(), box first, then words.
+	function checkValveField(fields, l) {
+		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
+			input = document.createElement('input'), text = document.createElement('span');
+		input.type = 'checkbox';
+		input.checked = effective(l, 'status') === 'cv';
+		input.addEventListener('change', function () {
+			saveUndoSnapshot();
+			setProp(l, 'status', input.checked ? 'cv' : 'open');
+			afterPropertyEdit(l);
+			refreshPopupIfOpen();
+		});
+		setFieldLabel(text, pc.lpn_field_cv || 'Check valve (CV)', pc.lpn_field_cv_tip);
+		label.appendChild(input);
+		label.appendChild(document.createTextNode(' '));
+		label.appendChild(text);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+		overrideMarker(fields, l, 'status', function (v) { return formatPropValue(v === 'cv'); });
 	}
 	// A dropdown field. `options` is [[value, label], ...]. The only popup control that is not a
 	// number or a checkbox, added for the valve type (Task 248 phase 2) -- a valve's type decides
@@ -75128,6 +75289,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				out.statusBase = out.status;
 				if (!(s > 0)) { out.status = 'closed'; }
 				out.h0Base = fit.h0; out.aBase = fit.a;
+				// The speed itself, for a CUSTOM curve (fit.custom), which js/lpn-solver.js reads
+				// off curveSI below and turns by the affinity laws itself: its h0 above is only the
+				// shutoff head at speed, and its a is 0. The instant's speed, as h0 carries it.
+				out.pumpSpeed = s;
 				out.speed = pumpSpeedOf(l);   // base-write: the solver's model, not an asset
 				out.speedPattern = effective(l, 'speedPattern') || null;   // base-write: the solver's model, not an asset
 				// **AND THE CURVE'S REAL POINTS RIDE ALONG, IN SI** (Task 586). The native solver has
@@ -78074,6 +78239,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (f.statuses) {
 			model.links.forEach(function (l) {
 				var st = f.statuses[l.id];
+				// A check valve decides for itself, as a valve does: it shuts on its own hydraulics.
+				if (l.status === 'cv') { return; }
 				if (st === 'open') { l.status = 'open'; return; }
 				if (st !== 'closed' || l.type === 'valve') { return; }
 				if (atLimit[l.from] || atLimit[l.to]) { return; }
@@ -81258,6 +81425,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return !!box && box.style.display !== 'none' && box.style.display !== '';
 	}
 	/** The engine's own report for the last run, or '' -- js/lpn-time.js owns it. */
+	function showRunReportScenario() {
+		var el = document.getElementById('lpn_rptbox_scn'), line = lastRunScenarioLine('lpn_run_of_scenario', 'Results of the scenario {scenario}.');
+		if (!el) { return; }
+		el.textContent = line;
+		el.style.display = line ? '' : 'none';
+	}
 	function lastRunReportText() {
 		return (EngCalcs.lpnTimeLastReport && EngCalcs.lpnTimeLastReport()) || '';
 	}
@@ -81281,6 +81454,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		closeMenu();
 		hideOpenTips();
 		pre.textContent = text || noReport;
+		showRunReportScenario();
 		box.style.display = 'flex';
 		// Centred the first time, remembered after that (Tom, 2026-09-08) -- placeBoxRemembered().
 		placePanelForScreen(box, function () { placeBoxRemembered(box, rptboxLayout); });
@@ -81357,6 +81531,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// blanking it: an empty <pre> under a title claiming a report is the empty box this page
 		// refuses to show anywhere else.
 		if (lastRunReportText()) { pre.textContent = lastRunReportText(); }
+		showRunReportScenario();
 	}
 	function closeEnergyBox() {
 		hidePanel(energyBoxEl());
@@ -83135,10 +83310,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * that same step, and the swap can never leave the map parked at the wrong moment.
 	 */
 	function fullReportRows() {
-		var frames = reportFrames(), rows = [];
+		var frames = reportFrames(), rows = [], runId = lastSolveResult && lastSolveResult._scn;
 		if (!frames.length && lastSolveResult) { frames = [lastSolveResult]; }
 		frames.forEach(function (f) {
-			tsAsOfFrame(f, function () {
+			tsAsOfFrame(f, function () { inRunScenario(function () {
 				var t = typeof f.t === 'number' ? f.t : 0;
 				doc.nodes.forEach(function (n) {
 					rows.push({
@@ -83157,7 +83332,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 						status: linkStatusText(l)
 					});
 				});
-			});
+			}, runId); });
 		});
 		return rows;
 	}
@@ -83202,8 +83377,30 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		document.body.removeChild(a);
 		setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
 	}
+	/**
+	 * **THE SCENARIO THE LAST RUN WAS OF** (Task 814, defect 5). The Full report, the EPANET run
+	 * report and the Calibration report all read "the last run", which with Recalculate off need not
+	 * be the open scenario. The solve is tagged with its scenario (`_scn`); this returns that
+	 * scenario's name, or '' when the run is untagged or the project holds only Base (nothing to
+	 * tell apart).
+	 */
+	function lastRunScenarioName() {
+		var id = lastSolveResult && lastSolveResult._scn, i;
+		if (!id || scenarios.length < 2) { return ''; }
+		for (i = 0; i < scenarios.length; i++) {
+			if (scenarios[i].id === id) { return scenarioDisplayName(scenarios[i]) || id; }
+		}
+		return '';
+	}
+	function lastRunScenarioLine(key, fallback) {
+		var name = lastRunScenarioName(), pc = EngCalcs.pageConfig || {};
+		return name ? String(pc[key] || fallback).split('{scenario}').join(name) : '';
+	}
 	function fullReportFilename(ext) {
-		var name = sanitizeFilename((typeof project === 'object' && project && project.name) || 'Project');
+		var name = sanitizeFilename((typeof project === 'object' && project && project.name) || 'Project'),
+			scn = lastRunScenarioName(), id = lastSolveResult && lastSolveResult._scn;
+		// Base keeps the project name alone, as the .inp export does.
+		if (scn && id !== 'base') { name += '-' + sanitizeFilename(scn); }
 		return name + '-Full report.' + ext;
 	}
 	function downloadFullReportCsv() {
@@ -83221,6 +83418,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h = document.createElement('h2');
 		h.textContent = pc.lpn_full_title || 'Full report';
 		wrap.appendChild(h);
+		if (lastRunScenarioName()) {
+			h = document.createElement('h3');
+			h.textContent = lastRunScenarioLine('lpn_run_of_scenario', 'Results of the scenario {scenario}.');
+			wrap.appendChild(h);
+		}
 		if (!rows.length) {
 			h = document.createElement('p');
 			h.textContent = pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.';
@@ -83316,6 +83518,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		frames = reportFrames();
 		if (!frames.length && lastSolveResult) { frames = [lastSolveResult]; }
+		if (lastRunScenarioName()) {
+			ffEl('p', 'lpn-ff-note', lastRunScenarioLine('lpn_run_of_scenario', 'Results of the scenario {scenario}.'), host).id = 'lpn_full_scenario_note';
+		}
 		ffEl('p', 'lpn-ff-note', pc.lpn_full_note || 'One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.', host);
 		ffEl('p', 'lpn-ff-note', (pc.lpn_full_row_count || 'Rows ({n}).').replace('{n}', String(rows.length)), host);
 		if (fullReportStepIndex >= frames.length || fullReportStepIndex < 0) { fullReportStepIndex = 0; }
@@ -83515,6 +83720,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_file || '{file}: measurements ({n}) at locations ({m}).')
 			.replace('{file}', file.name).replace('{n}', String(file.parsed.obs.length))
 			.replace('{m}', String(file.parsed.order.length)), host);
+		if (lastRunScenarioName()) {
+			ffEl('p', 'lpn-ff-note', lastRunScenarioLine('lpn_calib_scenario', 'Compared with the results of the scenario {scenario}.'), host).id = 'lpn_calib_scenario_note';
+		}
 		if (unit) {
 			ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_units || 'The file\'s values are read in this project\'s units: {unit}.')
 				.replace('{unit}', unit), host).id = 'lpn_calib_units_note';

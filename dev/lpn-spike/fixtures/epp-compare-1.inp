@@ -1,0 +1,96 @@
+[TITLE]
+epp-compare-1
+
+[JUNCTIONS]
+ J-1	62	0
+ J-2	64	0
+ J-3	110	50	DMD-1
+ J-4	125	75	DMD-1
+ J-5	118	100	DMD-1
+ J-6	98	60	DMD-1
+ J-7	48	65	DMD-1
+ J-8	42	90	DMD-1
+ J-9	55	50	DMD-1
+ J-10	90	40	DMD-1
+ J-11	82	60	DMD-1
+ J-12	105	45	DMD-1
+
+[RESERVOIRS]
+ R-1	100
+
+[TANKS]
+ T-1	225	14	2	25	40	0
+
+[PIPES]
+ P-1	R-1	J-1	150	12	130	0	Open
+ P-2	J-2	J-3	400	12	130	0	CV
+ P-3	J-3	J-4	800	10	120	0	Open
+ P-4	J-4	J-5	700	10	120	0	Open
+ P-5	J-5	J-6	900	8	120	0	Open
+ P-6	J-6	J-3	650	8	120	0	Open
+ P-7	J-5	T-1	600	12	130	0	Open
+ P-8	J-7	J-8	600	8	120	0	Open
+ P-9	J-8	J-9	500	6	110	0	Open
+ P-10	J-10	J-11	450	6	110	0	Open
+ P-11	J-11	J-12	550	6	110	0	Open
+ P-12	J-12	J-5	750	8	120	0	Open
+
+[PUMPS]
+ PMP-1	J-1	J-2	HEAD PC-1
+
+[VALVES]
+ PRV-1	J-4	J-7	8	PRV	50	0
+ FCV-1	J-6	J-10	6	FCV	20	0
+
+[CURVES]
+;PUMP: three-point curve, flow (gpm) and head (ft)
+PC-1  0     200
+PC-1  600   150
+PC-1  1200  60
+
+[PATTERNS]
+ DMD-1	0.6	0.5	0.45	0.45	0.5	0.7
+ DMD-1	1.0	1.3	1.4	1.3	1.2	1.1
+ DMD-1	1.0	0.95	0.9	0.95	1.1	1.4
+ DMD-1	1.6	1.5	1.2	1.0	0.8	0.7
+
+[CONTROLS]
+LINK PMP-1 OPEN IF NODE T-1 BELOW 8
+LINK PMP-1 CLOSED IF NODE T-1 ABOVE 22
+
+[TIMES]
+ Duration	24:00
+ Hydraulic Timestep	1:00
+ Pattern Timestep	1:00
+ Pattern Start	0:00
+ Report Timestep	1:00
+ Report Start	0:00
+ Start ClockTime	0:00
+
+[OPTIONS]
+ Units	GPM
+ Headloss	H-W
+ Accuracy	0.001
+ Trials	40
+ Viscosity	1
+ Specific Gravity	1
+ Demand Multiplier	1
+ Unbalanced	Continue	10
+
+[COORDINATES]
+ J-1	200	0
+ J-2	400	0
+ J-3	800	0
+ J-4	1600	0
+ J-5	2400	0
+ J-6	1600	-800
+ J-7	1600	800
+ J-8	2200	800
+ J-9	2800	800
+ J-10	1600	-1500
+ J-11	2200	-1500
+ J-12	2800	-1500
+ R-1	0	0
+ T-1	3000	300
+
+[END]

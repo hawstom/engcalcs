@@ -1466,6 +1466,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<button type="button" id="lpn_rptbox_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
 		<div class="lpn-box-tools"><button type="button" id="lpn_rptbox_copy" class="lpn-rptbox-copy"><?=$ec_lang['lpn_time_run_report_copy']?></button></div>
+		<p id="lpn_rptbox_scn" class="lpn-ff-note" style="display:none"></p>
 		<pre id="lpn_rptbox_pre" class="lpn-rptbox-pre"></pre>
 	</div>
 </div>
@@ -2338,6 +2339,9 @@ EngCalcs.pageConfig = {
 	lpn_geojson_results_other: <?=json_encode($ec_lang['lpn_geojson_results_other'])?>,
 	lpn_survey_added_scenario: <?=json_encode($ec_lang['lpn_survey_added_scenario'])?>,
 	lpn_pane_pasted_scenario: <?=json_encode($ec_lang['lpn_pane_pasted_scenario'])?>,
+	lpn_pane_pasted_overrides: <?=json_encode($ec_lang['lpn_pane_pasted_overrides'])?>,
+	lpn_run_of_scenario: <?=json_encode($ec_lang['lpn_run_of_scenario'])?>,
+	lpn_calib_scenario: <?=json_encode($ec_lang['lpn_calib_scenario'])?>,
 	lpn_find_menu: <?=json_encode($ec_lang['lpn_find_menu'])?>,
 	lpn_copy_props_menu: <?=json_encode($ec_lang['lpn_copy_props_menu'])?>,
 	lpn_copy_props_done: <?=json_encode($ec_lang['lpn_copy_props_done'])?>,
@@ -2605,6 +2609,9 @@ EngCalcs.pageConfig = {
 <?php   // The run box (Task 450). Three new strings; `lpn_time_running` above says what it says
         // while it works, and `lpn_close` is the word already on every other dismiss control here. ?>
 	lpn_time_run_done: <?=json_encode($ec_lang['lpn_time_run_done'])?>,
+	lpn_time_run_unbalanced: <?=json_encode($ec_lang['lpn_time_run_unbalanced'])?>,
+	lpn_time_run_warnings: <?=json_encode($ec_lang['lpn_time_run_warnings'])?>,
+	lpn_time_run_see_report: <?=json_encode($ec_lang['lpn_time_run_see_report'])?>,
 	lpn_time_runbox_hide: <?=json_encode($ec_lang['lpn_time_runbox_hide'])?>,
 	lpn_time_run_failed: <?=json_encode($ec_lang['lpn_time_run_failed'])?>,
 	lpn_time_run_fell_back: <?=json_encode($ec_lang['lpn_time_run_fell_back'])?>,
@@ -2882,6 +2889,7 @@ EngCalcs.pageConfig = {
 		'lpn_result_pump_head',
 		'lpn_result_source_share',
 		'lpn_result_status_closed',
+		'lpn_result_status_cv',
 		'lpn_result_status_open',
 		'lpn_result_tank_volume',
 		'lpn_result_velocity',
@@ -2998,6 +3006,8 @@ EngCalcs.pageConfig = {
 	bpn_roughness_tip: <?=json_encode($ec_lang['bpn_roughness_tip'])?>,
 	lpn_field_closed: <?=json_encode($ec_lang['lpn_field_closed'])?>,
 	lpn_field_closed_tip: <?=json_encode($ec_lang['lpn_field_closed_tip'])?>,
+	lpn_field_cv: <?=json_encode($ec_lang['lpn_field_cv'])?>,
+	lpn_field_cv_tip: <?=json_encode($ec_lang['lpn_field_cv_tip'])?>,
 	lpn_field_x: <?=json_encode($ec_lang['lpn_field_x'])?>,
 	lpn_field_y: <?=json_encode($ec_lang['lpn_field_y'])?>,
 	lpn_field_text_size: <?=json_encode($ec_lang['lpn_field_text_size'])?>,
@@ -3141,6 +3151,7 @@ EngCalcs.pageConfig = {
 	lpn_result_status: <?=json_encode($ec_lang['lpn_result_status'])?>,
 	lpn_result_status_open: <?=json_encode($ec_lang['lpn_result_status_open'])?>,
 	lpn_result_status_closed: <?=json_encode($ec_lang['lpn_result_status_closed'])?>,
+	lpn_result_status_cv: <?=json_encode($ec_lang['lpn_result_status_cv'])?>,
 	lpn_settings_quality: <?=json_encode($ec_lang['lpn_settings_quality'])?>,
 	lpn_settings_quality_track: <?=json_encode($ec_lang['lpn_settings_quality_track'])?>,
 	lpn_settings_quality_track_tip: <?=json_encode($ec_lang['lpn_settings_quality_track_tip'])?>,
@@ -3485,6 +3496,8 @@ EngCalcs.pageConfig = {
 	lpn_run_menu_tip: <?=json_encode($ec_lang['lpn_run_menu_tip'])?>,
 	lpn_settings_auto_run: <?=json_encode($ec_lang['lpn_settings_auto_run'])?>,
 	lpn_settings_auto_run_tip: <?=json_encode($ec_lang['lpn_settings_auto_run_tip'])?>,
+	lpn_calc_hint: <?=json_encode($ec_lang['lpn_calc_hint'])?>,
+	lpn_calc_hint_mute: <?=json_encode($ec_lang['lpn_calc_hint_mute'])?>,
 	lpn_settings_runbox: <?=json_encode($ec_lang['lpn_settings_runbox'])?>,
 	lpn_settings_runbox_tip: <?=json_encode($ec_lang['lpn_settings_runbox_tip'])?>,
 	lpn_time_run_slow: <?=json_encode($ec_lang['lpn_time_run_slow'])?>,
@@ -3813,7 +3826,6 @@ EngCalcs.pageConfig = {
 	lpn_inpup_method_row: <?=json_encode($ec_lang['lpn_inpup_method_row'])?>,
 	lpn_inpup_refused_lead_formula: <?=json_encode($ec_lang['lpn_inpup_refused_lead_formula'])?>,
 	lpn_inpup_refused_lead_both: <?=json_encode($ec_lang['lpn_inpup_refused_lead_both'])?>,
-	lpn_inpup_na_cv: <?=json_encode($ec_lang['lpn_inpup_na_cv'])?>,
 	lpn_inpup_failed: <?=json_encode($ec_lang['lpn_inpup_failed'])?>,
 	lpn_inpup_i_positions: <?=json_encode($ec_lang['lpn_inpup_i_positions'])?>,
 	lpn_inpup_i_connections: <?=json_encode($ec_lang['lpn_inpup_i_connections'])?>,

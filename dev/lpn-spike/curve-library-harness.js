@@ -272,7 +272,12 @@ const FIVE = [
 	// The OLD behaviour, reproduced exactly: strip `curveSI` and the writer falls back to the fit's
 	// own [0, 0.5, 0.9] sampling, which is the branch it still takes for three points or fewer.
 	const asBefore = JSON.parse(JSON.stringify(model));
-	asBefore.links.forEach((l) => { if (l.type === 'pump') { l.curveSI = [l.curveSI[0], l.curveSI[2], l.curveSI[4]]; } });
+	asBefore.links.forEach((l) => {
+		if (l.type !== 'pump') { return; }
+		l.curveSI = [l.curveSI[0], l.curveSI[2], l.curveSI[4]];
+		const f = EngCalcs.lpnPumpFromCurve(l.curveSI);
+		l.h0 = f.h0; l.a = f.a; l.b = f.b;
+	});
 	const before = await EngCalcs.lpnSolveEpanet(asBefore);
 	check(before.ok, 'and so does the same network reduced to three points, as it used to be');
 	if (now.ok && before.ok) {
@@ -598,11 +603,12 @@ const FIVE = [
 	check(line2[0]._tag === 'select', `line 2 leads with the type selector: ${line2[0]._tag}`);
 	check(fieldNames[2] === 'Curve type' && fieldNames[3] === 'Equation',
 		`and its two fields are named EPANET's way: ${fieldNames.slice(2, 4).join(' | ')}`);
-	// **THE EQUATION IS THE FIT THE RUN USES.** C1 in the four-kind file is 0/300 and 250/290, which
-	// fits h = 300 - a Q^2 with a = 10/62500 = 1.6e-4.
+	// **THE EQUATION IS THE FIT THE RUN USES, AND THERE IS NONE WHERE THE RUN FITS NOTHING.** C1 in
+	// the four-kind file is 0/300 and 250/290: two points, which EPANET (and so the built-in solver,
+	// fix/pump-curve-multipoint) runs as the straight line between them, so no equation is printed.
 	const eq = line2.filter((e) => e._tag === 'output')[0];
-	check(!!eq && /^Head = 300 - 0\.00016 Flow\^2$/.test(String(eq._text)),
-		`the equation is printed under the type, in the table's own units: ${eq && eq._text}`);
+	check(!!eq && eq._text === '' && eq.parentNode.style.display === 'none',
+		`a two-point curve prints no equation, since both engines run it as a straight line: ${eq && eq._text}`);
 	check(String(eq.title || '').length > 0 && /ec-help/.test(String(eq['class'] || '')),
 		'and it carries the tip that says it is worked out every time and never stored');
 	// **THE PLOT IS BELOW ALL THE INPUTS** (Tom's (b)). It was directly under the header, with the
@@ -638,16 +644,18 @@ const FIVE = [
 			`a head curve with ${points.length} point(s) has an equation field, hidden and empty`);
 		L.getDoc().curves.pop();
 	});
-	// The other side of the same line: two points DO print one, so the guard above is a threshold
-	// and not a feature that stopped working.
+	// The other side of the same line: three points from zero flow, the curve EPANET fits, DO print
+	// one, in the table's own units (300 - a Q^b through 250/290 and 500/250: b = ln 5 / ln 2), so
+	// the guard above is a threshold and not a feature that stopped working.
 	{
-		const two = { id: 'TWO', kind: 'head', points: [[0, 300], [250, 290]] };
-		L.getDoc().curves.push(two);
-		const twoHost = document.createElement('div');
-		L.buildCurveEntry(twoHost, two);
-		const twoEq = textIn(twoHost.children[0], []).filter((e) => e._tag === 'output')[0];
-		check(!!twoEq && /^Head = /.test(String(twoEq._text)) && twoEq.parentNode.style.display !== 'none',
-			`the second point is what brings the equation: ${twoEq && twoEq._text}`);
+		const three = { id: 'THREE', kind: 'head', points: [[0, 300], [250, 290], [500, 250]] };
+		L.getDoc().curves.push(three);
+		const threeHost = document.createElement('div');
+		L.buildCurveEntry(threeHost, three);
+		const threeEq = textIn(threeHost.children[0], []).filter((e) => e._tag === 'output')[0];
+		check(!!threeEq && /^Head = 300 - 0\.00\d+ Flow\^2\.322$/.test(String(threeEq._text)) &&
+			threeEq.parentNode.style.display !== 'none',
+			`three points from zero flow print the fitted equation: ${threeEq && threeEq._text}`);
 		L.getDoc().curves.pop();
 	}
 

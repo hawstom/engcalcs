@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**11 still to read on master**, of 172 untranslated keys, of 3191 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**17 still to read on master**, of 182 untranslated keys, of 3201 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,11 +29,20 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (172, 11 to read @@ NEEDS RULING)
+## lpn_  (182, 17 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
   _Ruled OK 2026-10-20._
+- **`lpn_calc_hint`**
+  > When “Recalculate automatically” is on, this command is not needed.
+  @@ NEEDS RULING
+- **`lpn_calc_hint_mute`**
+  > Don’t show this again
+  @@ NEEDS RULING
+- **`lpn_calib_scenario`**
+  > Compared with the results of the scenario {scenario}.
+  @@ NEEDS RULING
 - **`lpn_crit_col_empty`**
   > Tank empties
   _Ruled OK 2026-10-20._
@@ -208,6 +217,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_ff_working_steps`**
   > Working: reporting step {step} of {steps}, junction {done} of {total}.
   _Ruled OK 2026-10-20._
+- **`lpn_field_cv`**
+  > Check valve (CV)
+  _Ruled 2026-10-22: Approved._
+- **`lpn_field_cv_tip`**
+  > This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.
+  _Ruled 2026-10-22: Approved._
 - **`lpn_file_export_item_msx`**
   > EPANET-MSX file…
   _Ruled OK 2026-10-20._
@@ -328,9 +343,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_inpup_more`**
   > {n} more
   _Ruled OK 2026-10-20._
-- **`lpn_inpup_na_cv`**
-  > A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}
-  _Ruled OK 2026-10-20._
 - **`lpn_inpup_na_general`**
   > The file also holds {items}. They were not applied.
   _Ruled OK 2026-10-20._
@@ -412,6 +424,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_msx_too_big`**
   > {file} is too large to keep in browser storage, so it was not attached.
   _Ruled OK 2026-10-20._
+- **`lpn_pane_pasted_overrides`**
+  > New overrides ({n}).
+  @@ NEEDS RULING
 - **`lpn_pane_pasted_scenario`**
   > These values are overrides in the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
@@ -430,9 +445,15 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_result_msx_tip`**
   > The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.
   _Ruled OK 2026-10-20._
+- **`lpn_result_status_cv`**
+  > CV
+  @@ NEEDS RULING
 - **`lpn_roughness_method_note`**
   > ⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.
   _Ruled 2026-10-18: I agree._
+- **`lpn_run_of_scenario`**
+  > Results of the scenario {scenario}.
+  @@ NEEDS RULING
 - **`lpn_scncmp_progress`**
   > Solving scenario {done} of {total}…
   _Ruled OK 2026-10-20._
@@ -526,6 +547,15 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_theme_space`**
   > Space
   _Ruled OK 2026-10-20._
+- **`lpn_time_run_see_report`**
+  > See the {report}.
+  _Ruled 2026-10-22: Approved._
+- **`lpn_time_run_unbalanced`**
+  > Time steps not balanced ({n}).
+  _Ruled 2026-10-22: Approved._
+- **`lpn_time_run_warnings`**
+  > Warnings ({n}).
+  _Ruled 2026-10-22: Approved._
 - **`lpn_when`**
   > Reporting step tested
   _Ruled OK 2026-10-20._
@@ -552,7 +582,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**10 still to read**, of 53 new keys across 3 unmerged branch(es).
+**11 still to read**, of 54 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -565,7 +595,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/sqlite-reader (`0c85b385c`) — 53 new, 10 to read @@ NEEDS RULING
+### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
   > WaterCAD or WaterGEMS model…
@@ -607,7 +637,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > These pipes have a check valve and start closed. They were imported closed.
   _Ruled OK 2026-10-20._
 - **`lpn_wtg_note_directed_split`**
-  > In WaterGEMS a pump or valve is a node between pipes. Each of these was imported as a pump or valve link between two new junctions at its elevation, named after it with -U (upstream) and -D (downstream). The pipe the model calls downstream joins the -D junction and every other pipe at the node joins the -U junction, as WaterGEMS does in its own EPANET file.
+  > WaterGEMS models each pump and valve as a node. Each was imported as a pump or valve link between two new junctions at the node's location and elevation, as in WaterGEMS's own EPANET export. The junctions take the node's WaterGEMS ID number with the suffix -A (inlet side) or -B (outlet side), listed in parentheses. The pipe WaterGEMS designates as downstream connects to the -B junction; all other pipes at the node connect to the -A junction.
   @@ NEEDS RULING
 - **`lpn_wtg_note_element_unread`**
   > Not imported: these elements, of a kind this page does not model. The kind is shown in parentheses.
@@ -640,7 +670,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not imported: the day of the week and month multipliers of these patterns.
   _Ruled OK 2026-10-20._
 - **`lpn_wtg_note_pattern_continuous`**
-  > These patterns are continuous in the model: the multiplier changes in a straight line between points. An EPANET pattern is stepwise, so each was written as WaterGEMS writes it for EPANET: the starting multiplier, then the value on that line at every pattern time step.
+  > These patterns are continuous in the model: the multiplier changes in a straight line between points. An EPANET pattern is stepwise, so each was written as WaterGEMS writes it for EPANET: the starting multiplier, then the value on that line at every pattern time step. WaterGEMS's own solver instead applies a continuous pattern as the average over each time step, so results will not match WaterGEMS hour by hour.
   @@ NEEDS RULING
 - **`lpn_wtg_note_pattern_irregular`**
   > These patterns have times that are not whole multiples of the pattern time step. Each was read at that time step.
@@ -726,5 +756,13 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_working`**
   > Reading {file}…
   _Ruled OK 2026-10-20._
+
+### feat/theme-default (`c926197b3`) — adds no English strings
+
+### feat/value-source (`e1b009518`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_ovm_dot_set_from`**
+  > Inherited from {name}. Click to make it an override in this scenario, holding the value shown.
+  @@ NEEDS RULING
 
 ### fix/bottom-pane-lag (`3bb531211`) — adds no English strings

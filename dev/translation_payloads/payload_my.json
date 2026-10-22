@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 3191,
-        "delta_key_count": 212,
-        "english_changed_key_count": 40,
+        "expected_key_count": 3201,
+        "delta_key_count": 226,
+        "english_changed_key_count": 44,
         "exempt_key_count": 46,
         "exempt_keys": [
             "u_imgd",
@@ -78,16 +78,19 @@
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
     "concept_source": "## Concepts are the source\n\nEach concept is named in plain words, with its synonyms joined by \"or\". That plain name\nis the authoritative source; the English term is one rendering of it, as yours will be.\nWhere key_concepts lists a concept for a key, translate the thing the plain name\ndescribes, and give that concept the same word in every key that cites it. Where a\nconcept also has a definition, it is the author's own and outranks everything else.\nWhere a key has no key_concepts entry, the English is the source, as before.\n\nuniqueness_attention lists the few groups of concepts that sit side by side on one\nscreen. Find unique names for each.",
-    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: ရေစီးနှုန်း\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: ရေအလျင်နှုန်း\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: ဖိမြင့်ဆင့်\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: ဖိမြင့်ဆင့်ဆုံးရှုံးမှု\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: ဒေသဆိုင်ရာ ဆုံးရှုံးမှု\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: လိုအပ်ချက်\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: ဖိအား\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: ဆက်စပ်နေရာ\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: ရေကန်\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: ပုံမှန်\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- solver or the part that works out the answer\n    English: solver\n    Your language: ဖြေရှင်းစက်\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: ရေတိုက်\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: ဗားလ်\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: ကိုယ်ပိုင် တန်ဖိုးများ\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- time-step by time-step multipliers or factors for water use\n    English: demand pattern\n    Your language: (no preferred translation yet: use your language's standard term)\n- leave a value off the map when there is no room or space\n    English: drop (a label)\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the water in the tank is, its water level or depth\n    English: tank level\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: ဖောက်သည်\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- note, remark, or description for people about one item\n    English: description (asset notes)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how much is lost, or how much it matters, if one piece fails or breaks\n    English: criticality\n    Your language: အရေးပါမှု\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: ရေးဆွဲပုံ\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
+    "glossary": "Technical terms used by the strings in this batch. Each is named first in plain words, with synonyms joined by \"or\"; that name is what the term means. Then its English rendering and your language's preferred translation.\n- flow quantity or amount of water passing per time\n    English: flow (Q)\n    Your language: ရေစီးနှုန်း\n- speed quantity or how fast the water moves\n    English: velocity (v)\n    Your language: ရေအလျင်နှုန်း\n- energy per weight of water as an elevation, height, or level\n    English: head (H)\n    Your language: ဖိမြင့်ဆင့်\n- energy per weight of water lost along the way, as a drop in elevation, height, or level\n    English: head loss (h_L)\n    Your language: ဖိမြင့်ဆင့်ဆုံးရှုံးမှု\n- part, stretch, or section of the channel length\n    English: reach\n    Your language: ပိုက်အပိုင်း\n- energy loss at spots, points, or places like joints or bends\n    English: minor loss (h_m)\n    Your language: ဒေသဆိုင်ရာ ဆုံးရှုံးမှု\n- how deep the flowing water is\n    English: flow depth (y)\n    Your language: (no preferred translation yet: use your language's standard term)\n- flow used, taken, or consumed\n    English: demand\n    Your language: လိုအပ်ချက်\n- pressure or how hard the water presses, pushes, or squeezes\n    English: pressure (p)\n    Your language: ဖိအား\n- elevation, height, or level of a point\n    English: elevation (z)\n    Your language: အမြင့်\n- make a picture, drawing, or diagram of the network\n    English: draw (a diagram)\n    Your language: (no preferred translation yet: use your language's standard term)\n- junction or node where pipes meet, join, or connect and water can be taken out\n    English: junction\n    Your language: ဆက်စပ်နေရာ\n- node that is a water source whose level never moves, stays fixed, or holds constant\n    English: reservoir\n    Your language: ရေကန်\n- pipe network connection, meeting, or joining point\n    English: node\n    Your language: (no preferred translation yet: use your language's standard term)\n- pipe network connector, such as a pipe, pump, or valve\n    English: link\n    Your language: (no preferred translation yet: use your language's standard term)\n- curve, graph, or line telling how the energy per weight of water added by a pump changes as its flow changes\n    English: pump curve\n    Your language: ရေတင်စက် ကွေးမျဉ်း\n- water network project, file, or model\n    English: project (saved network)\n    Your language: (no preferred translation yet: use your language's standard term)\n- what-if version, case, scenario, or arrangement of circumstances\n    English: scenario\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Project state as a collection of contributing overrides.\n- starting or preset value, before anyone changes it\n    English: default (setting)\n    Your language: ပုံမှန်\n- counting or adding one to a total\n    English: count (tally)\n    Your language: (no preferred translation yet: use your language's standard term)\n- solver or the part that works out the answer\n    English: solver\n    Your language: ဖြေရှင်းစက်\n- tank, basin, vessel, or storage whose water rises and falls\n    English: tank\n    Your language: ရေတိုက်\n- valve, device, or fitting that controls flow or pressure\n    English: valve\n    Your language: ဗားလ်\n- value that this what-if version changes or replaces\n    English: override (scenario value)\n    Your language: ကိုယ်ပိုင် တန်ဖိုးများ\n- water needed to fight or put out a fire\n    English: fire flow\n    Your language: (no preferred translation yet: use your language's standard term)\n- time-step by time-step multipliers or factors for water use\n    English: demand pattern\n    Your language: (no preferred translation yet: use your language's standard term)\n- leave a value off the map when there is no room or space\n    English: drop (a label)\n    Your language: (no preferred translation yet: use your language's standard term)\n- simulation run or one go of working out the network\n    English: run (a simulation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how deep the water in the tank is, its water level or depth\n    English: tank level\n    Your language: (no preferred translation yet: use your language's standard term)\n- open, letting water through, passing, or flowing\n    English: open (link status)\n    Your language: (no preferred translation yet: use your language's standard term)\n- share from a given source at a given point\n    English: source trace\n    Your language: (no preferred translation yet: use your language's standard term)\n    Definition: Share from a given source at a given point.\n- route, way, or line the side view follows\n    English: path (profile route)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how the map shows, displays, or marks things with colour, size, and words\n    English: symbology\n    Your language: (no preferred translation yet: use your language's standard term)\n- someone, a home, or a business that gets water from a pipe\n    English: customer\n    Your language: ဖောက်သည်\n- potential energy per weight of water from elevation and pressure, as an elevation, height, or level\n    English: hydraulic head (node value)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, values, or names the program writes beside a pipe or point\n    English: label (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- words, notes, or captions you type onto the map\n    English: text (map annotation)\n    Your language: (no preferred translation yet: use your language's standard term)\n- note, remark, or description for people about one item\n    English: description (asset notes)\n    Your language: (no preferred translation yet: use your language's standard term)\n- how much is lost, or how much it matters, if one piece fails or breaks\n    English: criticality\n    Your language: အရေးပါမှု\n- drawn point, line, or area with no water meaning, just a picture\n    English: Shape\n    Your language: ရေးဆွဲပုံ\n- project placed on the earth, with real-world coordinates\n    English: georeferenced (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- project drawn on its own flat grid, with no place on the earth\n    English: local (project mode)\n    Your language: (no preferred translation yet: use your language's standard term)\n- short code that names one item, like J-1 or P-12\n    English: ID (element identifier)\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree\n    English: tree\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree parent\n    English: parent\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree child\n    English: child\n    Your language: (no preferred translation yet: use your language's standard term)\n- A family tree inherit-\n    English: inherit\n    Your language: (no preferred translation yet: use your language's standard term)",
     "keys_to_translate": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
         "lpn_guide_page_open": "Open the application",
         "lpn_guide_page_desc": "{name} user manual: one page for each chapter, from the map and Properties to scenarios, fire flow analysis, and criticality analysis.",
         "lpn_guide_page_what": "{name} is a free web application for modeling water distribution networks, an extension of EPANET.",
         "lpn_guide_page_missing": "There is no such chapter. The chapters are listed below.",
+        "lpn_guide_find_examples_def": "<p>Open the Net3 example to follow these. Pressure is in psi and velocity in ft\/s.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td><code>Everything.ID equal to '60'<\/code><\/td><td>Junction 60 and Pipe 60. A junction and a pipe can have the same ID, so an ID search under Everything can return more than one asset.<\/td><\/tr><tr><td><code>Junction.Pressure below 40<\/code><\/td><td>Junctions 10, 40, 50, 20, and 153, lowest pressure first. Junction 10 is at -0.6 psi, a negative pressure that requires review.<\/td><\/tr><tr><td><code>Pipe.Velocity 5 highest<\/code><\/td><td>Pipes 60, 125, 329, 123, and 149, highest velocity first. Pipe 60 carries 9.3 ft\/s.<\/td><\/tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5<\/code><\/td><td>Junctions 10, 20, 40, and 50, and Pipes 60, 125, and 329: low pressures and high velocities in one list.<\/td><\/tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100<\/code><\/td><td>Junctions 10, 20, 40, and 50, the low pressures on high ground. Both conditions must name the same kind of asset: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3<\/code> matches nothing, because no asset is both a junction and a pipe.<\/td><\/tr><tr><td><code>Pipe.Closed equal to 'closed'<\/code><\/td><td>Pipe 330, the one pipe that is closed in the Net3 file.<\/td><\/tr><tr><td><code>Junction.Connectivity no open path to a source<\/code><\/td><td>Nothing, as the file is distributed. With Pipe 247 closed (see Replace and Undo), Junctions 215, 217, 219, and 225: the junctions that a break on Pipe 247 would leave without supply. Repeating this for each pipe is a criticality analysis.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
+        "lpn_guide_scn_example_def": "<p>Open the Net1 example. Choose Water, Scenarios, New scenario…, type Larger main, and click OK. Select Pipe 10 on the map and enter 24 for Diameter in Properties; Base has 18 in., shown beneath the field as Base scenario: 18. Choose Base in the Scenarios list, choose New scenario… again, type Max day, and enter 1.8 for Demand multiplier in Settings, Calculation, Hydraulics. Then choose Water, Reports, Scenario comparison.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td>Scenario<\/td><td>No. of overrides<\/td><td>Demand multiplier<\/td><td>Lowest pressure<\/td><td>Highest velocity<\/td><\/tr><tr><td>Base<\/td><td>0<\/td><td>1<\/td><td>108 psi at N32, 14:00<\/td><td>2.76 ft\/sec at L11, 16:00<\/td><\/tr><tr><td>Larger main<\/td><td>1<\/td><td>1<\/td><td>109 psi at N32, 14:00<\/td><td>2.87 ft\/sec at L11, 16:00<\/td><\/tr><tr><td>Max day<\/td><td>1<\/td><td>1.8<\/td><td>15.78 psi at N32, 9:00<\/td><td>3.49 ft\/sec at L10, 9:00<\/td><\/tr><\/tbody><\/table><p>The total run time is 24:00 in all three, so each lowest pressure and highest velocity is the extreme over the day, at the time shown. The larger main raises the lowest pressure by about 1 psi. A multiplier of 1.8 lowers it to 15.78 psi at 9:00, and the highest velocity moves to Pipe 10. Each scenario holds one override, and Base keeps its values.<\/p>",
         "lpn_guide_scn_notes_def": "<ul><li>An override equal to the inherited value is still an override. It is counted, and Override manager marks it (same).<\/li><li>Basic mode is a setting for this browser, not for the project. It is disabled for a project whose scenarios and alternatives it cannot show. Alternatives and the Scenario manager are described under How scenarios and alternatives work and How to manage scenarios, at the top of this entry.<\/li><li>Undo keeps 20 steps. Each step restores the scenarios and the open scenario along with the drawing, so adding, renaming, and deleting a scenario can be undone.<\/li><li>Exporting an EPANET file writes the open scenario only, with the values and node positions that scenario reads. The scenarios themselves are recorded in the project file only.<\/li><\/ul>",
         "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.<\/p>",
+        "lpn_guide_lib_kinds_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Patterns<\/td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.<\/td><\/tr><tr><td>Curves<\/td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the Curves link opens this section.<\/td><\/tr><tr><td>Pipe types<\/td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.<\/td><\/tr><tr><td>Fittings<\/td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.<\/td><\/tr><tr><td>Controls<\/td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value<\/code>. Under each, the box states whether it was understood.<\/td><\/tr><tr><td>Rules<\/td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
@@ -100,6 +103,9 @@
         "lpn_ex_net1_scn_desc": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.",
         "lpn_ex_valves_title": "Valve types, gpm (US)",
         "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
+        "lpn_result_status_cv": "CV",
+        "lpn_calc_hint": "When “Recalculate automatically” is on, this command is not needed.",
+        "lpn_calc_hint_mute": "Don’t show this again",
         "lpn_file_import_inp": "EPANET file…",
         "lpn_file_import_inp_tip": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
         "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library that has entries: patterns, curves, pipe types, fittings, controls, and rules. Results are included for the scenario last calculated only.",
@@ -160,7 +166,6 @@
         "lpn_inpup_method_row": "Head loss formula: the file uses {file} and this project uses {project}.",
         "lpn_inpup_refused_lead_formula": "The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.",
         "lpn_inpup_refused_lead_both": "The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.",
-        "lpn_inpup_na_cv": "A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}",
         "lpn_inpup_failed": "The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}",
         "lpn_inpup_i_positions": "positions of existing assets",
         "lpn_inpup_i_connections": "connections",
@@ -172,9 +177,12 @@
         "lpn_inpup_i_options": "options",
         "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
         "lpn_notes_2_def": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
+        "lpn_notes_5_def": "A pump curve is entered in Water, Libraries, as a Pump head curve, and the pump states that curve in Properties. Both solvers read it as EPANET reads it. One point uses EPANET’s rule: the head at zero flow is 1.33334 times the head entered, and the highest flow is 2 times the flow entered. A curve of one point and a curve of three points that begins at zero flow are fitted as H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it, and the Equation line shows the fit. Any other curve (two points, three points that do not begin at zero flow, or four or more points) is used as straight lines between its points, and the first and last lines are extended beyond the ends of the curve. A pump with no curve stated adds no head. The curve is not truncated where the head reaches zero, so a flow greater than the curve can deliver produces a negative head. The remedy is a larger pump or a smaller demand, not a different curve.",
         "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
         "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.",
         "lpn_engine_unavailable_why": "This network cannot be solved without the EPANET solver. {reason}",
+        "lpn_field_cv": "Check valve (CV)",
+        "lpn_field_cv_tip": "This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.",
         "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Clear it to hide the text with the other labels once the view is wider than the labeling threshold set under Map.",
         "lpn_settings_theme_tip": "Choose the look of the page: its colors and, in some themes, its shapes and type. Each card shows the theme on this page before it is chosen. System follows the settings of the device. On screen the map follows the theme too; printed pages, screenshots and exported files are always drawn in Light. This is a setting for this browser, not for the project.",
         "lpn_theme_hc": "High contrast",
@@ -194,6 +202,9 @@
         "lpn_settings_grp_zoom": "Zoom",
         "lpn_settings_grp_positions": "Positions",
         "lpn_settings_grp_thematic": "Thematic",
+        "lpn_time_run_unbalanced": "Time steps not balanced ({n}).",
+        "lpn_time_run_warnings": "Warnings ({n}).",
+        "lpn_time_run_see_report": "See the {report}.",
         "lpn_scncmp_menu_tip": "Table of scenarios with count of overrides, lowest pressure, and highest velocity, and a table of results by asset that copies to a spreadsheet",
         "lpn_scncmp_progress": "Solving scenario {done} of {total}…",
         "lpn_scncmp_stopped": "Stopped after {done} of {total} scenarios. The results below are the ones already finished.",
@@ -289,6 +300,9 @@
         "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
         "lpn_survey_added_scenario": "The nodes were added to {scenario}. In Base they are inactive.",
         "lpn_pane_pasted_scenario": "These values are overrides in the scenario {scenario}.",
+        "lpn_pane_pasted_overrides": "New overrides ({n}).",
+        "lpn_run_of_scenario": "Results of the scenario {scenario}.",
+        "lpn_calib_scenario": "Compared with the results of the scenario {scenario}.",
         "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file.",
         "lpn_export_confirm_title": "Export {format}",
         "lpn_export_confirm_lead": "The {format} holds one scenario, and this project has {n}."
@@ -299,9 +313,12 @@
         "lpn_guide_page_desc": "{name} user manual: one page for each chapter, from the map and Properties to scenarios, fire flow analysis, and criticality analysis.",
         "lpn_guide_page_what": "{name} is a free web application for modeling water distribution networks, an extension of EPANET.",
         "lpn_guide_page_missing": "There is no such chapter. The chapters are listed below.",
+        "lpn_guide_find_examples_def": "<p>Open the Net3 example to follow these. Pressure is in psi and velocity in ft\/s.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td><code>Everything.ID equal to '60'<\/code><\/td><td>Junction 60 and Pipe 60. A junction and a pipe can have the same ID, so an ID search under Everything can return more than one asset.<\/td><\/tr><tr><td><code>Junction.Pressure below 40<\/code><\/td><td>Junctions 10, 40, 50, 20, and 153, lowest pressure first. Junction 10 is at -0.6 psi, a negative pressure that requires review.<\/td><\/tr><tr><td><code>Pipe.Velocity 5 highest<\/code><\/td><td>Pipes 60, 125, 329, 123, and 149, highest velocity first. Pipe 60 carries 9.3 ft\/s.<\/td><\/tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5<\/code><\/td><td>Junctions 10, 20, 40, and 50, and Pipes 60, 125, and 329: low pressures and high velocities in one list.<\/td><\/tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100<\/code><\/td><td>Junctions 10, 20, 40, and 50, the low pressures on high ground. Both conditions must name the same kind of asset: <code>Junction.Pressure below 40 AND Pipe.Velocity above 3<\/code> matches nothing, because no asset is both a junction and a pipe.<\/td><\/tr><tr><td><code>Pipe.Closed equal to 'closed'<\/code><\/td><td>Pipe 330, the one pipe that is closed in the Net3 file.<\/td><\/tr><tr><td><code>Junction.Connectivity no open path to a source<\/code><\/td><td>Nothing, as the file is distributed. With Pipe 247 closed (see Replace and Undo), Junctions 215, 217, 219, and 225: the junctions that a break on Pipe 247 would leave without supply. Repeating this for each pipe is a criticality analysis.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_scn_marks_def": "<p>On the map, an asset that has an override in the open scenario is ringed in amber, and an asset that inherits an override from a parent scenario or alternative is ringed with a dashed gray line. For demand, diameter, roughness, minor (local) loss coefficient, and length, a ring appears only while Settings, Symbology, Node labels or Link labels shows that value on the map; an override of any other property always has its ring. In Tables, a cell that holds a value set by the open scenario is amber, and its tip names the alternative that holds it, as in Physical alt.: Larger main. Show scenarios, in the cell menu of a table, lists every asset once for each scenario.<\/p><p>Each row of Properties that a scenario can override has a mark at its left. A solid dot means the open scenario overrides the value; click it to clear the override. A hollow dot means the value is inherited; click it to make the value shown an override. A triangle means scenarios below this one override the value; click it to clear their overrides, after a confirmation. Beneath an overridden row is the inherited value it replaces, as in Base scenario: 18. The Settings box has the solid dot and the triangle only, because typing a value there is what makes an override.<\/p><p>To hide the rings, clear Show override markers on the map in Settings, Page, or choose Map, Clean map. Both are kept in this browser, not in the project. Tables marks overrides either way.<\/p>",
+        "lpn_guide_scn_example_def": "<p>Open the Net1 example. Choose Water, Scenarios, New scenario…, type Larger main, and click OK. Select Pipe 10 on the map and enter 24 for Diameter in Properties; Base has 18 in., shown beneath the field as Base scenario: 18. Choose Base in the Scenarios list, choose New scenario… again, type Max day, and enter 1.8 for Demand multiplier in Settings, Calculation, Hydraulics. Then choose Water, Reports, Scenario comparison.<\/p><table class=\"lpn-notes-table\"><tbody><tr><td>Scenario<\/td><td>No. of overrides<\/td><td>Demand multiplier<\/td><td>Lowest pressure<\/td><td>Highest velocity<\/td><\/tr><tr><td>Base<\/td><td>0<\/td><td>1<\/td><td>108 psi at N32, 14:00<\/td><td>2.76 ft\/sec at L11, 16:00<\/td><\/tr><tr><td>Larger main<\/td><td>1<\/td><td>1<\/td><td>109 psi at N32, 14:00<\/td><td>2.87 ft\/sec at L11, 16:00<\/td><\/tr><tr><td>Max day<\/td><td>1<\/td><td>1.8<\/td><td>15.78 psi at N32, 9:00<\/td><td>3.49 ft\/sec at L10, 9:00<\/td><\/tr><\/tbody><\/table><p>The total run time is 24:00 in all three, so each lowest pressure and highest velocity is the extreme over the day, at the time shown. The larger main raises the lowest pressure by about 1 psi. A multiplier of 1.8 lowers it to 15.78 psi at 9:00, and the highest velocity moves to Pipe 10. Each scenario holds one override, and Base keeps its values.<\/p>",
         "lpn_guide_scn_notes_def": "<ul><li>An override equal to the inherited value is still an override. It is counted, and Override manager marks it (same).<\/li><li>Basic mode is a setting for this browser, not for the project. It is disabled for a project whose scenarios and alternatives it cannot show. Alternatives and the Scenario manager are described under How scenarios and alternatives work and How to manage scenarios, at the top of this entry.<\/li><li>Undo keeps 20 steps. Each step restores the scenarios and the open scenario along with the drawing, so adding, renaming, and deleting a scenario can be undone.<\/li><li>Exporting an EPANET file writes the open scenario only, with the values and node positions that scenario reads. The scenarios themselves are recorded in the project file only.<\/li><\/ul>",
         "lpn_guide_cmp_byasset_def": "<p>Below the table, Results by asset lists one row per asset of the type chosen in Asset type, with one column for each checked result in each scenario, for example the pressure at every junction in Base, Max day, and Peak hour. A scenario with a total run time is read at the time step on screen, or at its last time step if its run ends sooner, and each heading shows the time read. A scenario that cannot be solved keeps blank columns and a note that says why, and a scenario that did not converge is marked (not converged) in its headings. Copy puts the table on the clipboard as tab-separated text, ready to paste into a spreadsheet. Download CSV saves the same table as a file. Both carry the units in the headings and the numbers in full, without the rounding shown in the box. The sign of a flow is the solver's internal direction sign. It has no use outside the solver except to show in this table whether a flow changed direction between scenarios.<\/p>",
+        "lpn_guide_lib_kinds_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Patterns<\/td><td>A list of multipliers that repeats for as long as a run lasts, one multiplier for each pattern time step. A new pattern is 24 multipliers of 1. Pasting a spreadsheet column fills the Multipliers box. The default demand pattern is marked (default) and is chosen in Settings, Calculation, Hydraulics.<\/td><\/tr><tr><td>Curves<\/td><td>Four kinds, chosen as the Curve type: Pump head, Pump efficiency, Tank volume, and Valve head loss. The points are entered in a grid that accepts a pasted spreadsheet column or lines copied from an EPANET file. A pump head curve with one point or with three points that begin at zero flow is fitted, and the Equation line shows the fit; one point is read as the design point, with a shutoff head of 1.33334 times its head and a maximum flow of 2 times its flow, as EPANET reads it. Any other pump head curve, and each of the other kinds, joins its points with straight lines. A pump or valve states its curve in Properties, where the Curves link opens this section.<\/td><\/tr><tr><td>Pipe types<\/td><td>A definition of diameter, roughness, and reaction coefficients that several pipes refer to. A property may be left blank in the definition and then entered for each pipe. In Properties, the values a pipe type states are disabled, and Detach from pipe type copies them into the pipe and stops the pipe using the type.<\/td><\/tr><tr><td>Fittings<\/td><td>Lists of fittings with a quantity for each, added up to one minor (local) loss coefficient, k, for a pipe or pipe type. The fittings offered are the thirteen in Table 3.3 of the EPANET 2.2 user manual and Other fitting. Choosing one copies its coefficient into the row, where it can be changed.<\/td><\/tr><tr><td>Controls<\/td><td>One statement each, in EPANET syntax, as in <code>LINK id OPEN IF NODE id BELOW value<\/code>. Under each, the box states whether it was understood.<\/td><\/tr><tr><td>Rules<\/td><td>Several lines each, in EPANET syntax: RULE, IF, AND, OR, THEN, ELSE, and PRIORITY. Under each, the box states whether it was read.<\/td><\/tr><\/tbody><\/table>",
         "lpn_guide_lib_import_def": "<p>File, Import…, Libraries… opens another project file and copies whole libraries from it into this project. An item whose name is already used here is skipped and listed, so nothing already here is changed. A warning is shown when the file and the project state a quantity in different units, and the items are imported as written. Pipe types that refer to a fittings list this project does not have are listed; import the fittings library from the same file to resolve them.<\/p>",
         "lpn_guide_set_where_def": "<p>The list at the left of the box jumps to a section or a sub-heading. The sections are Symbology (Node labels, Node colors, Link labels, Link colors, Customer, and All), Map, Page, Assets (ID prefixes, Values, and Custom properties), Calculation (Units, Time, Hydraulics, Energy, and Quality), and Credits. Each sub-heading states whether its settings are Saved with the project or Saved in this browser. Everything is saved with the project except the settings under Page and one row in Hydraulics, Show the run progress box, which states Saved in this browser itself.<\/p><p>The Settings tab in Tables lists the same settings as rows, with their Category and Value, so a setting can also be found and audited there.<\/p>",
         "lpn_guide_ff_asks_def": "<p>Each tested junction gets two tests, on a copy of the network at the time step on screen and in the open scenario. The first asks how much flow the junction can deliver while it holds the residual pressure. A flow is drawn at the junction, and repeated solves narrow it down, up to a ceiling equal to 10000 gpm. A junction that still holds the residual pressure at the ceiling is reported as delivering more than the ceiling. The second test, the design check, draws the required flow at the junction and asks whether any other junction in its scope falls below the Lowest system pressure allowed, or any pipe in its scope runs above the Highest velocity allowed. The design check is not made when its scope is None.<\/p><p>A junction with its own Required fire flow property is tested against that value, and every other junction against the value in the box.<\/p>",
@@ -314,6 +331,9 @@
         "lpn_ex_net1_scn_desc": "Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.",
         "lpn_ex_valves_title": "Valve types, gpm (US)",
         "lpn_ex_valves_desc": "Gallons per minute, with feet and inches. A hilltop reservoir feeds a hub through a PBV, with a PRV, PSV, FCV, TCV, and GPV branching off it, each one controlling at the solved state.",
+        "lpn_result_status_cv": "CV",
+        "lpn_calc_hint": "When “Recalculate automatically” is on, this command is not needed.",
+        "lpn_calc_hint_mute": "Don’t show this again",
         "lpn_file_import_inp": "EPANET file…",
         "lpn_file_import_inp_tip": "Create a new project from an EPANET file, or, when a project is open, update it from the file. The file is either the .inp export format (preferred) or the native .net format (last resort). To open an EPANET-MSX model as well, choose its .msx file at the same time.",
         "lpn_file_export_tables_tip": "Download the tables as the Tables pane shows them, in one workbook with a sheet for each table (and for each scenario you choose), plus a sheet for each library that has entries: patterns, curves, pipe types, fittings, controls, and rules. Results are included for the scenario last calculated only.",
@@ -374,7 +394,6 @@
         "lpn_inpup_method_row": "Head loss formula: the file uses {file} and this project uses {project}.",
         "lpn_inpup_refused_lead_formula": "The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.",
         "lpn_inpup_refused_lead_both": "The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.",
-        "lpn_inpup_na_cv": "A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}",
         "lpn_inpup_failed": "The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}",
         "lpn_inpup_i_positions": "positions of existing assets",
         "lpn_inpup_i_connections": "connections",
@@ -386,9 +405,12 @@
         "lpn_inpup_i_options": "options",
         "lpn_notes_1_def": "By default the network is solved by the EPANET solver. When a total run time is set, each reporting time step is calculated in sequence: tanks fill and drain, demands follow their patterns, and the toolbar plays back the run. With Use the built-in solver when possible checked, a single instant solution can be solved by the built-in solver instead, but an extended period simulation is always solved by the EPANET solver.",
         "lpn_notes_2_def": "Surge and water hammer are not modeled: all results are for steady or slowly varying flow, not for the transient pressure wave caused by rapid valve closure. Multi-species water quality (EPANET-MSX) is not modeled. Water age, source trace, and one reacting chemical are.",
+        "lpn_notes_5_def": "A pump curve is entered in Water, Libraries, as a Pump head curve, and the pump states that curve in Properties. Both solvers read it as EPANET reads it. One point uses EPANET’s rule: the head at zero flow is 1.33334 times the head entered, and the highest flow is 2 times the flow entered. A curve of one point and a curve of three points that begins at zero flow are fitted as H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it, and the Equation line shows the fit. Any other curve (two points, three points that do not begin at zero flow, or four or more points) is used as straight lines between its points, and the first and last lines are extended beyond the ends of the curve. A pump with no curve stated adds no head. The curve is not truncated where the head reaches zero, so a flow greater than the curve can deliver produces a negative head. The remedy is a larger pump or a smaller demand, not a different curve.",
         "lpn_roughness_method_note": "⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.",
         "lpn_engine_unavailable": "Could not download the EPANET solver, which is required to solve this network. After one connection to the internet, the solver is stored on this device.",
         "lpn_engine_unavailable_why": "This network cannot be solved without the EPANET solver. {reason}",
+        "lpn_field_cv": "Check valve (CV)",
+        "lpn_field_cv_tip": "This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.",
         "lpn_field_text_all_zoom_tip": "Keep this text on the drawing however far out you zoom. Clear it to hide the text with the other labels once the view is wider than the labeling threshold set under Map.",
         "lpn_settings_theme_tip": "Choose the look of the page: its colors and, in some themes, its shapes and type. Each card shows the theme on this page before it is chosen. System follows the settings of the device. On screen the map follows the theme too; printed pages, screenshots and exported files are always drawn in Light. This is a setting for this browser, not for the project.",
         "lpn_theme_hc": "High contrast",
@@ -408,6 +430,9 @@
         "lpn_settings_grp_zoom": "Zoom",
         "lpn_settings_grp_positions": "Positions",
         "lpn_settings_grp_thematic": "Thematic",
+        "lpn_time_run_unbalanced": "Time steps not balanced ({n}).",
+        "lpn_time_run_warnings": "Warnings ({n}).",
+        "lpn_time_run_see_report": "See the {report}.",
         "lpn_scncmp_menu_tip": "Table of scenarios with count of overrides, lowest pressure, and highest velocity, and a table of results by asset that copies to a spreadsheet",
         "lpn_scncmp_progress": "Solving scenario {done} of {total}…",
         "lpn_scncmp_stopped": "Stopped after {done} of {total} scenarios. The results below are the ones already finished.",
@@ -503,6 +528,9 @@
         "lpn_geojson_results_other": "No results are included, because the results on screen belong to the scenario {scenario}.",
         "lpn_survey_added_scenario": "The nodes were added to {scenario}. In Base they are inactive.",
         "lpn_pane_pasted_scenario": "These values are overrides in the scenario {scenario}.",
+        "lpn_pane_pasted_overrides": "New overrides ({n}).",
+        "lpn_run_of_scenario": "Results of the scenario {scenario}.",
+        "lpn_calib_scenario": "Compared with the results of the scenario {scenario}.",
         "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file.",
         "lpn_export_confirm_title": "Export {format}",
         "lpn_export_confirm_lead": "The {format} holds one scenario, and this project has {n}."
@@ -588,6 +616,22 @@
                 }
             }
         },
+        "lpn_guide_find_examples_def": {
+            "reason": "english_changed",
+            "current_value": "<p>ဤဥပမာများကို လိုက်လုပ်ရန် Net3 ဥပမာကို ဖွင့်ပါ။ ဖိအားကို psi ဖြင့်၊ ရေအလျင်နှုန်းကို ft\/s ဖြင့် ဖော်ပြထားသည်။<\/p><table class=\"lpn-notes-table\"><tbody><tr><td><code>Everything.ID equal to '60'<\/code><\/td><td>ဆက်စပ်နေရာ 60 နှင့် ပိုက်လိုင်း 60။ ဆက်စပ်နေရာတစ်ခုနှင့် ပိုက်လိုင်းတစ်ခုတွင် ID တူနိုင်သဖြင့် အားလုံး အောက်ရှိ ID ရှာဖွေမှုက အစိတ်အပိုင်း တစ်ခုထက်ပို ပြန်ပေးနိုင်သည်။<\/td><\/tr><tr><td><code>Junction.Pressure below 40<\/code><\/td><td>ဆက်စပ်နေရာ 10၊ 40၊ 50၊ 20 နှင့် 153၊ အနိမ့်ဆုံးဖိအားကို ဦးစွာ ပြသည်။ ဆက်စပ်နေရာ 10 သည် -0.6 psi ဖြစ်ပြီး ပြန်လည်စစ်ဆေးရန် လိုအပ်သော အနုတ်ဖိအား ဖြစ်သည်။<\/td><\/tr><tr><td><code>Pipe.Velocity 5 highest<\/code><\/td><td>ပိုက်လိုင်း 60၊ 125၊ 329၊ 123 နှင့် 149၊ အမြင့်ဆုံးရေအလျင်နှုန်းကို ဦးစွာ ပြသည်။ ပိုက်လိုင်း 60 တွင် 9.3 ft\/s ရှိသည်။<\/td><\/tr><tr><td><code>Junction.Pressure below 20 OR Pipe.Velocity above 5<\/code><\/td><td>ဆက်စပ်နေရာ 10၊ 20၊ 40 နှင့် 50၊ ပိုက်လိုင်း 60၊ 125 နှင့် 329၊ စာရင်းတစ်ခုတည်းတွင် ဖိအားနိမ့်ခြင်းနှင့် ရေအလျင်နှုန်းမြင့်ခြင်း။<\/td><\/tr><tr><td><code>Junction.Pressure below 40 AND Junction.Elevation above 100<\/code><\/td><td>ဆက်စပ်နေရာ 10၊ 20၊ 40 နှင့် 50၊ မြင့်သောမြေပေါ်ရှိ ဖိအားနိမ့်သော နေရာများ။ အခြေအနေနှစ်ခုစလုံးသည် အစိတ်အပိုင်းအမျိုးအစား တူညီရမည်၊ <code>Junction.Pressure below 40 AND Pipe.Velocity above 3<\/code> သည် ဘာမျှ မကိုက်ညီပါ၊ အကြောင်းမှာ အစိတ်အပိုင်းတစ်ခုသည် ဆက်စပ်နေရာရော ပိုက်လိုင်းရော မဖြစ်နိုင်သောကြောင့်ဖြစ်သည်။<\/td><\/tr><tr><td><code>Pipe.Closed equal to 'closed'<\/code><\/td><td>ပိုက်လိုင်း 330၊ Net3 ဖိုင်တွင် ပိတ်ထားသော တစ်ခုတည်းသော ပိုက်လိုင်း။<\/td><\/tr><tr><td><code>Junction.Connectivity no open path to a source<\/code><\/td><td>ဖိုင်ကို ဖြန့်ဝေထားသည့်အတိုင်းဆိုလျှင် ဘာမျှမရှိပါ။ ပိုက်လိုင်း 247 ကို ပိတ်ထားလျှင် (အစားထိုးခြင်းနှင့် ပြန်ဖျက်ခြင်း ကိုကြည့်ပါ) ဆက်စပ်နေရာ 215၊ 217၊ 219 နှင့် 225 ဖြစ်ပြီး ပိုက်လိုင်း 247 ပျက်စီးလျှင် ရေပေးသွင်းမှုမရှိတော့မည့် ဆက်စပ်နေရာများ ဖြစ်သည်။ ၎င်းကို ပိုက်လိုင်းတစ်ခုချင်းစီအတွက် ထပ်လုပ်ခြင်းသည် အရေးပါမှု ခွဲခြမ်းစိတ်ဖြာမှု ဖြစ်သည်။<\/td><\/tr><\/tbody><\/table>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_find_examples_term",
+                    "value": "Net3 ပေါ်ရှိ ဥပမာများ",
+                    "english": "Examples on Net3"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_find_results_term",
+                    "value": "ရလဒ်များ၊ ရွေးချယ်မှုနှင့် ဇယားများ",
+                    "english": "Results, the selection, and Tables"
+                }
+            }
+        },
         "lpn_guide_scn_marks_def": {
             "reason": "english_changed",
             "current_value": "<p>မြေပုံပေါ်တွင် ဖွင့်ထားသော အခြေအနေ၌ ကိုယ်ပိုင်တန်ဖိုးရှိသော အစိတ်အပိုင်းကို အမ်ဘာရောင် စက်ဝိုင်းဖြင့် ဝိုင်းထားပြီး မိဘ အခြေအနေ သို့မဟုတ် အစားထိုးရွေးချယ်မှုမှ ကိုယ်ပိုင်တန်ဖိုးကို ဆက်ခံသော အစိတ်အပိုင်းကို မီးခိုးရောင် မျဉ်းပြတ်ဖြင့် ဝိုင်းထားသည်။ လိုအင်၊ အချင်း၊ ကြမ်းတမ်းမှု၊ ဒေသဆိုင်ရာ ဆုံးရှုံးမှုကိန်းနှင့် အလျားတို့အတွက် ဆက်တင်များ၊ ပုံရိပ်ပြသမှု၊ နေရာ အညွှန်းများ သို့မဟုတ် ဆက်သွယ်မှု အညွှန်းများက ထိုတန်ဖိုးကို မြေပုံပေါ်တွင် ပြနေစဉ်မှသာ စက်ဝိုင်းပေါ်ပြီး အခြားဂုဏ်သတ္တိတိုင်း၏ ကိုယ်ပိုင်တန်ဖိုးတွင် စက်ဝိုင်း အမြဲပါသည်။ ဇယားများတွင် ဖွင့်ထားသော အခြေအနေက သတ်မှတ်သော တန်ဖိုးပါသည့် ကွက်သည် အမ်ဘာရောင်ဖြစ်ပြီး ၎င်း၏ အကြံပြုချက်က ထိုတန်ဖိုးကို ထားသော အစားထိုးရွေးချယ်မှုကို အမည်ပေးသည်၊ ဥပမာ ရုပ်ပိုင်း အစားထိုး - ပိုကြီးသော ပိုက်ကြီး။ ဇယားတစ်ခု၏ ကွက်မီနူးရှိ အခြေအနေများ ပြရန် က အစိတ်အပိုင်းတိုင်းကို အခြေအနေတစ်ခုစီအတွက် တစ်ကြိမ်စီ စာရင်းပြသည်။<\/p><p>အခြေအနေတစ်ခုက ကိုယ်ပိုင်တန်ဖိုးပေးနိုင်သော ဂုဏ်သတ္တိများ၏ တန်းတစ်ခုစီ၏ ဘယ်ဘက်တွင် အမှတ်အသားတစ်ခု ရှိသည်။ အစိုင်အခဲအစက်က ဖွင့်ထားသော အခြေအနေက တန်ဖိုးကို ကိုယ်ပိုင်သတ်မှတ်ထားကြောင်း ဆိုလိုသည်၊ ၎င်းကို နှိပ်လျှင် ကိုယ်ပိုင်တန်ဖိုးကို ဖယ်ရှားသည်။ အလွတ်အစက်က တန်ဖိုးကို ဆက်ခံထားကြောင်း ဆိုလိုသည်၊ ၎င်းကို နှိပ်လျှင် ပြထားသောတန်ဖိုးကို ကိုယ်ပိုင်တန်ဖိုးအဖြစ် သတ်မှတ်သည်။ တြိဂံက ဤအခြေအနေအောက်ရှိ အခြေအနေများက တန်ဖိုးကို ကိုယ်ပိုင်သတ်မှတ်ထားကြောင်း ဆိုလိုသည်၊ အတည်ပြုမေးခွန်းပြီးနောက် ၎င်းကို နှိပ်လျှင် ထိုအခြေအနေများ၏ ကိုယ်ပိုင်တန်ဖိုးများကို ဖယ်ရှားသည်။ ကိုယ်ပိုင်တန်ဖိုးတန်းအောက်တွင် ၎င်းအစားထိုးသော ဆက်ခံတန်ဖိုးကို ပြသည်၊ ဥပမာ အခြေခံ အခြေအနေ - 18။ ဆက်တင်များ ဘောက်စ်တွင် အစိုင်အခဲအစက်နှင့် တြိဂံသာ ရှိသည်၊ အဘယ်ကြောင့်ဆိုသော် ထိုနေရာတွင် တန်ဖိုးရိုက်ထည့်လိုက်ခြင်းကိုက ကိုယ်ပိုင်တန်ဖိုးဖြစ်စေသောကြောင့် ဖြစ်သည်။<\/p><p>စက်ဝိုင်းများကို ဖျောက်ရန် ဆက်တင်များ၊ မြေပုံနှင့် စာမျက်နှာ၊ စာမျက်နှာ ရှိ မြေပုံပေါ်တွင် ကိုယ်ပိုင်တန်ဖိုး အမှတ်အသားများ ပြရန် ကို အမှန်ခြစ်ဖယ်ပါ၊ သို့မဟုတ် မြေပုံ၊ မြေပုံ သန့်ရှင်းစေရန် ကို ရွေးချယ်ပါ။ နှစ်ခုလုံးကို ပရောဂျက်တွင်မဟုတ်ဘဲ ဤဘရောက်ဇာတွင် သိမ်းထားသည်။ ဇယားများသည် နည်းလမ်းနှစ်မျိုးလုံးဖြင့် ကိုယ်ပိုင်တန်ဖိုးများကို အမှတ်အသားပြုသည်။<\/p>",
@@ -601,6 +645,22 @@
                     "key": "lpn_guide_scn_make_term",
                     "value": "ကိုယ်ပိုင်တန်ဖိုးများ ဖန်တီးခြင်းနှင့် ဖယ်ရှားခြင်း",
                     "english": "Making and clearing overrides"
+                }
+            }
+        },
+        "lpn_guide_scn_example_def": {
+            "reason": "english_changed",
+            "current_value": "<p>Net1 ဥပမာကို ဖွင့်ပါ။ ရေ၊ အခြေအနေများ၊ အခြေအနေအသစ်… ကို ရွေးချယ်ပြီး ပိုကြီးသော ပိုက်ကြီး ဟု ရိုက်ထည့်ကာ အိုကေ ကို နှိပ်ပါ။ မြေပုံပေါ်တွင် ပိုက် 10 ကို ရွေးပြီး ဂုဏ်သတ္တိများရှိ အချင်း တွင် 24 ကို ထည့်ပါ။ အခြေခံ တွင် 18 လက်မ ရှိပြီး ကွက်အောက်တွင် အခြေခံ အခြေအနေ - 18 ဟု ပြသည်။ အခြေအနေများ စာရင်းတွင် အခြေခံ ကို ရွေးချယ်ပြီး အခြေအနေအသစ်… ကို ထပ်ရွေးကာ အမြင့်ဆုံးနေ့ ဟု ရိုက်ထည့်ပါ၊ ထို့နောက် ဆက်တင်များ၊ တွက်ချက်မှု၊ ဟိုက်ဒရောလစ် ရှိ လိုအင် မြှောက်ကိန်း တွင် 1.8 ကို ထည့်ပါ။ ထို့နောက် ရေ၊ အစီရင်ခံစာများ၊ အခြေအနေ နှိုင်းယှဉ်ချက် ကို ရွေးချယ်ပါ။<\/p><table class=\"lpn-notes-table\"><tbody><tr><td>အခြေအနေ<\/td><td>ကိုယ်ပိုင်တန်ဖိုး အရေအတွက်<\/td><td>လိုအင် မြှောက်ကိန်း<\/td><td>အနိမ့်ဆုံးဖိအား<\/td><td>အမြင့်ဆုံးရေအလျင်နှုန်း<\/td><\/tr><tr><td>အခြေခံ<\/td><td>0<\/td><td>1<\/td><td>N32 တွင် 108 psi၊ 14:00<\/td><td>L11 တွင် 2.76 ft\/sec၊ 16:00<\/td><\/tr><tr><td>ပိုကြီးသော ပိုက်ကြီး<\/td><td>1<\/td><td>1<\/td><td>N32 တွင် 109 psi၊ 14:00<\/td><td>L11 တွင် 2.87 ft\/sec၊ 16:00<\/td><\/tr><tr><td>အမြင့်ဆုံးနေ့<\/td><td>1<\/td><td>1.8<\/td><td>N32 တွင် 15.78 psi၊ 9:00<\/td><td>L10 တွင် 3.49 ft\/sec၊ 9:00<\/td><\/tr><\/tbody><\/table><p>စုစုပေါင်းလည်ပတ်ချိန်သည် သုံးခုလုံးတွင် 24:00 ဖြစ်သောကြောင့် အနိမ့်ဆုံးဖိအားနှင့် အမြင့်ဆုံးရေအလျင်နှုန်းတစ်ခုစီသည် ပြထားသော အချိန်တွင် တစ်နေ့တာအတွင်း အစွန်းဆုံးတန်ဖိုး ဖြစ်သည်။ ပိုကြီးသော ပိုက်ကြီးသည် အနိမ့်ဆုံးဖိအားကို 1 psi ခန့် မြှင့်တင်သည်။ မြှောက်ကိန်း 1.8 သည် ၎င်းကို 9:00 တွင် 15.78 psi သို့ နှိမ့်ချပြီး အမြင့်ဆုံးရေအလျင်နှုန်းသည် ပိုက် 10 သို့ ရွှေ့သွားသည်။ အခြေအနေတစ်ခုစီတွင် ကိုယ်ပိုင်တန်ဖိုးတစ်ခုစီ ရှိပြီး အခြေခံ သည် ၎င်း၏ တန်ဖိုးများကို ဆက်ထားသည်။<\/p>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_scn_example_term",
+                    "value": "Net1 ပေါ်ရှိ ဥပမာ",
+                    "english": "Example on Net1"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_scn_notes_term",
+                    "value": "သတိပြုရန် အချက်များ",
+                    "english": "Points to note"
                 }
             }
         },
@@ -633,6 +693,22 @@
                     "key": "lpn_guide_cmp_notes_term",
                     "value": "သတိပြုရန် အချက်များ",
                     "english": "Points to note"
+                }
+            }
+        },
+        "lpn_guide_lib_kinds_def": {
+            "reason": "english_changed",
+            "current_value": "<table class=\"lpn-notes-table\"><tbody><tr><td>ပုံစံများ<\/td><td>လည်ပတ်မှု ကြာသရွေ့ ထပ်ခါထပ်ခါ ဖြစ်နေသော မြှောက်ကိန်းစာရင်း၊ ပုံစံ အချိန်အဆင့်တစ်ခုစီအတွက် မြှောက်ကိန်းတစ်ခု။ ပုံစံအသစ်သည် 1 ဖြစ်သော မြှောက်ကိန်း 24 ခုဖြစ်သည်။ spreadsheet ကော်လံတစ်ခုကို ကူးထည့်လျှင် မြှောက်ကိန်းများ ကွက်ကို ဖြည့်သည်။ မူလ လိုအင်ပုံစံကို (မူလ) ဟု အမှတ်အသားပြုပြီး ဆက်တင်များ၊ တွက်ချက်မှု၊ ဟိုက်ဒရောလစ် တွင် ရွေးချယ်သည်။<\/td><\/tr><tr><td>ကွေးမျဉ်းများ<\/td><td>ကွေးမျဉ်း အမျိုးအစား အဖြစ် ရွေးချယ်ရသော အမျိုးအစားလေးမျိုး - ရေတင်စက် ဖိမြင့်ဆင့်၊ ရေတင်စက် ထိရောက်မှု၊ ရေတိုက် ထုထည်နှင့် ဗားလ် ဖိမြင့်ဆင့်ဆုံးရှုံးမှု။ အမှတ်များကို spreadsheet ကော်လံတစ်ခု သို့မဟုတ် EPANET ဖိုင်မှ ကူးထားသော လိုင်းများကို ကူးထည့်နိုင်သော ဇယားကွက်တွင် ထည့်သည်။ ရေတင်စက် ဖိမြင့်ဆင့် ကွေးမျဉ်းကို ၎င်း၏ အမှတ်များအတွင်းမှ ဖြတ်၍ ကိုက်ညီအောင် ဆွဲပြီး ညီမျှခြင်း လိုင်းက ထိုကိုက်ညီမှုကို ပြသည်။ အမှတ်တစ်ခုကို EPANET ဖတ်သည့်အတိုင်း ဒီဇိုင်းအမှတ်အဖြစ် ဖတ်ပြီး ပိတ်ဖိမြင့်ဆင့်မှာ ၎င်း၏ ဖိမြင့်ဆင့်၏ 1.33334 ဆ၊ အမြင့်ဆုံးရေစီးနှုန်းမှာ ၎င်း၏ ရေစီးနှုန်း၏ 2 ဆ ဖြစ်သည်။ အခြားအမျိုးအစားများသည် ၎င်းတို့၏ အမှတ်များကို မျဉ်းဖြောင့်များဖြင့် ဆက်သည်။ ရေတင်စက် သို့မဟုတ် ဗားလ်တစ်ခုသည် ၎င်း၏ ကွေးမျဉ်းကို ဂုဏ်သတ္တိများတွင် ဖော်ပြပြီး ထိုနေရာရှိ ကွေးမျဉ်းများ လင့်ခ်က ဤအပိုင်းကို ဖွင့်သည်။<\/td><\/tr><tr><td>ပိုက်အမျိုးအစားများ<\/td><td>ပိုက်များစွာ ရည်ညွှန်းသော အချင်း၊ ကြမ်းတမ်းမှုနှင့် တုံ့ပြန်မှုကိန်းများ၏ အဓိပ္ပာယ်ဖွင့်ဆိုချက်။ ဂုဏ်သတ္တိတစ်ခုကို အဓိပ္ပာယ်ဖွင့်ဆိုချက်တွင် ဗလာထားပြီး ပိုက်တစ်ခုစီအတွက် ထည့်နိုင်သည်။ ဂုဏ်သတ္တိများတွင် ပိုက်အမျိုးအစားက ဖော်ပြထားသော တန်ဖိုးများကို ပိတ်ထားပြီး ပိုက်အမျိုးအစားမှ ခွဲထုတ်ရန် က ၎င်းတို့ကို ပိုက်ထဲသို့ ကူးထည့်ကာ ပိုက်က ထိုအမျိုးအစားကို မသုံးတော့ပေ။<\/td><\/tr><tr><td>ချိတ်ဆက်ပစ္စည်းများ<\/td><td>ပိုက် သို့မဟုတ် ပိုက်အမျိုးအစားတစ်ခုအတွက် ဒေသဆိုင်ရာ ဆုံးရှုံးမှုကိန်း k တစ်ခုအဖြစ် ပေါင်းထည့်သော ချိတ်ဆက်ပစ္စည်း စာရင်းများ၊ တစ်ခုစီတွင် အရေအတွက်ပါသည်။ ပေးထားသော ချိတ်ဆက်ပစ္စည်းများမှာ EPANET 2.2 အသုံးပြုသူလက်စွဲ ဇယား 3.3 ရှိ ဆယ့်သုံးမျိုးနှင့် အခြား ချိတ်ဆက်ပစ္စည်း ဖြစ်သည်။ တစ်ခုကို ရွေးလျှင် ၎င်း၏ ကိန်းကို တန်းထဲသို့ ကူးထည့်ပြီး ပြောင်းနိုင်သည်။<\/td><\/tr><tr><td>ထိန်းချုပ်မှုများ<\/td><td>EPANET စာလုံးပေါင်းဖွဲ့ပုံဖြင့် တစ်ခုစီတွင် ကြေညာချက်တစ်ခုစီ၊ ဥပမာ <code>LINK id OPEN IF NODE id BELOW value<\/code>။ တစ်ခုစီအောက်တွင် ဘောက်စ်က ၎င်းကို နားလည်သည်၊ မနားလည်သည်ကို ဖော်ပြသည်။<\/td><\/tr><tr><td>စည်းမျဉ်းများ<\/td><td>EPANET စာလုံးပေါင်းဖွဲ့ပုံဖြင့် တစ်ခုစီတွင် လိုင်းများစွာ - RULE၊ IF၊ AND၊ OR၊ THEN၊ ELSE နှင့် PRIORITY။ တစ်ခုစီအောက်တွင် ဘောက်စ်က ၎င်းကို ဖတ်နိုင်သည်၊ မဖတ်နိုင်သည်ကို ဖော်ပြသည်။<\/td><\/tr><\/tbody><\/table>",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_guide_lib_kinds_term",
+                    "value": "အပိုင်းတစ်ခုစီတွင် ပါသည်များ",
+                    "english": "What each section holds"
+                },
+                "next_translated": {
+                    "key": "lpn_guide_lib_refs_term",
+                    "value": "အမည်ပြောင်းခြင်း၊ ဖျက်ခြင်းနှင့် ထိုအရာကို ရည်ညွှန်းသည်များ",
+                    "english": "Renaming, deleting, and what refers to an item"
                 }
             }
         },
@@ -825,6 +901,54 @@
                     "key": "lpn_ex_net2_si_desc",
                     "value": "တစ်စက္ကန့်လျှင် လီတာ၊ မီတာနှင့် မီလီမီတာ ဖြင့်။ ကော်နက်တီကတ်ပြည်နယ် ဘရန်ဖို့ဒ်ရှိ EPANET နမူနာတစ်ခုကို တစ်မိနစ်လျှင် ဂါလန်၊ ပေနှင့် လက်မမှ ပြောင်းထားသည် - ဆက်စပ်နေရာ ၃၅ ခုနှင့် ရေတိုက် ၁ ခု၊ ရေကန်၊ ရေတင်စက်နှင့် ဗားလ် မပါဘဲ၊ ၂ ကီလိုမီတာ × ၄ ကီလိုမီတာခန့်။ ဓာတ်မပြုသော ဖလိုရိုက်သည် ရင်းမြစ်တစ်ခုမှ ဝင်ရောက်သည်။",
                     "english": "Liters per second, with meters and millimeters. An EPANET example at Branford, Connecticut, converted from gallons per minute, feet, and inches: 35 junctions and 1 tank, with no reservoir, no pump, and no valves, about 2 km by 4 km. Fluoride, a non-reactive substance, enters at one source."
+                }
+            }
+        },
+        "lpn_result_status_cv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_result_status_closed",
+                    "value": "ပိတ်ထားသည်",
+                    "english": "Closed"
+                },
+                "next_translated": {
+                    "key": "lpn_result_head",
+                    "value": "ဖိမြင့်ဆင့်",
+                    "english": "Head"
+                }
+            }
+        },
+        "lpn_calc_hint": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_auto_run_tip",
+                    "value": "ပြန်တွက်ချက်ခြင်း အလွန်နှေးလျှင် ပိတ်ပါ။ ဤဆက်တင်ကို ဖွင့်ထားစဉ် တွက်ချက်ရန် ခလုတ်ကို ဖျောက်ထားသည်။",
+                    "english": "Turn off if recalculation is too slow. While this is on, the Calculate button is hidden."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_slow",
+                    "value": "ဤကွန်ရက်ကို တွက်ချက်ရန် {secs} စက္ကန့် ကြာခဲ့ပြီး၊ ပြောင်းလဲမှုတိုင်းနောက်တွင် ပြန်တွက်ချက်ရန် သတ်မှတ်ထားသည်။ ၎င်းကို ရပ်တန့်ပြီး Calculate ခလုတ် ပြန်ရရန်၊ ဆက်တင်များ ထဲ၊ တွက်ချက်မှု၊ ဟိုက်ဒရောလစ် အောက်ရှိ “အလိုအလျောက် ပြန်တွက်ချက်ရန်” ကို ပိတ်ပါ။",
+                    "english": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics."
+                }
+            }
+        },
+        "lpn_calc_hint_mute": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_auto_run_tip",
+                    "value": "ပြန်တွက်ချက်ခြင်း အလွန်နှေးလျှင် ပိတ်ပါ။ ဤဆက်တင်ကို ဖွင့်ထားစဉ် တွက်ချက်ရန် ခလုတ်ကို ဖျောက်ထားသည်။",
+                    "english": "Turn off if recalculation is too slow. While this is on, the Calculate button is hidden."
+                },
+                "next_translated": {
+                    "key": "lpn_time_run_slow",
+                    "value": "ဤကွန်ရက်ကို တွက်ချက်ရန် {secs} စက္ကန့် ကြာခဲ့ပြီး၊ ပြောင်းလဲမှုတိုင်းနောက်တွင် ပြန်တွက်ချက်ရန် သတ်မှတ်ထားသည်။ ၎င်းကို ရပ်တန့်ပြီး Calculate ခလုတ် ပြန်ရရန်၊ ဆက်တင်များ ထဲ၊ တွက်ချက်မှု၊ ဟိုက်ဒရောလစ် အောက်ရှိ “အလိုအလျောက် ပြန်တွက်ချက်ရန်” ကို ပိတ်ပါ။",
+                    "english": "This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics."
                 }
             }
         },
@@ -1819,22 +1943,6 @@
                 }
             }
         },
-        "lpn_inpup_na_cv": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_status_imported",
-                    "value": "{name} ကို ဖိုင်တစ်ခုမှ ဖွင့်ပြီး၊ ဤဘရောက်ဇာထဲသို့ ပရောဂျက်အသစ်တစ်ခုအဖြစ် ထည့်သွင်းလိုက်ပါသည်။",
-                    "english": "Opened {name} from a file, and added it to this browser as a new project."
-                },
-                "next_translated": {
-                    "key": "lpn_file_type_desc",
-                    "value": "ပရောဂျက်ဖိုင်",
-                    "english": "Project file"
-                }
-            }
-        },
         "lpn_inpup_failed": {
             "reason": "missing",
             "current_value": null,
@@ -2011,6 +2119,22 @@
                 }
             }
         },
+        "lpn_notes_5_def": {
+            "reason": "english_changed",
+            "current_value": "ရေတင်စက်တစ်ခုသည် H = H₀ − aQ^b ကို လိုက်သည်၊ ဤတွင် H သည် ရေတင်စက်က ပေါင်းထည့်ပေးသော ဖိမြင့်ဆင့်ဖြစ်ပြီး Q သည် ၎င်းမှတစ်ဆင့် ရေစီးနှုန်းဖြစ်သည်။ ကွေးမျဉ်း၏ အမှတ်များကို ရေ၊ စာရင်းများ တွင် ရေတင်စက် ဖိမြင့်ဆင့် ကွေးမျဉ်းအဖြစ် ထည့်ပြီး ရေတင်စက်က ထိုကွေးမျဉ်းကို ဂုဏ်သတ္တိများတွင် ဖော်ပြသည်။ ရေစီးနှုန်းသုညတွင် ဖိမြင့်ဆင့်၊ ပုံမှန်အလုပ်လုပ်သည့်အမှတ်နှင့် အမြင့်ဆုံးရေစီးနှုန်းအမှတ်ဟူသော အမှတ်သုံးခုသည် H₀၊ a နှင့် b ကို တိုက်ရိုက်ကိုက်ညီစေပြီး ထုတ်ပြန်ထားသော ကွေးမျဉ်းကို အနီးကပ်ဆုံး လိုက်သည်။ အမှတ်နှစ်ခုသည် ရေစီးနှုန်းသုညတွင် အထွတ်ရှိသော ပါရာဘိုလာ (b = 2) ကို ကိုက်ညီစေသည်။ အမှတ်တစ်ခုက EPANET ၏ စည်းမျဉ်းကို သုံးသည်- ရေစီးနှုန်းသုညတွင် ဖိမြင့်ဆင့်သည် ထည့်သော ဖိမြင့်ဆင့်၏ 1.33334 ဆဖြစ်ပြီး အမြင့်ဆုံးရေစီးနှုန်းသည် ထည့်သော ရေစီးနှုန်း၏ 2 ဆဖြစ်ကာ ၎င်းမှ b = 2 ထပ်ရသည်။ ကွေးမျဉ်း မဖော်ပြထားသော ရေတင်စက်သည် ဖိမြင့်ဆင့် မပေါင်းထည့်ပါ။ ဖိမြင့်ဆင့်သုညသို့ ရောက်သည့်နေရာတွင် ကွေးမျဉ်းကို မဖြတ်သဖြင့် ကွေးမျဉ်းက ပေးနိုင်သည်ထက် ပိုသော ရေစီးနှုန်းသည် အနုတ်ဖိမြင့်ဆင့်ကို ထုတ်သည်။ ဖြေရှင်းနည်းမှာ ကွေးမျဉ်းကိုက်ညီမှု မတူခြင်း မဟုတ်ဘဲ ပိုကြီးသော ရေတင်စက် သို့မဟုတ် ပိုသေးသော လိုအင်ဖြစ်သည်။ ကွေးမျဉ်းတစ်ခုတွင် အမှတ်သုံးခုထက်ပိုနိုင်သည်။ EPANET ဖြေရှင်းစက်သည် ၎င်းတို့အားလုံးကို ရပြီး ၎င်းတို့ကြား တန်ဖိုးကြားဖြည့်သည်၊ ညီမျှခြင်း လိုင်းနှင့် တွင်ပါ ဖြေရှင်းစက်က အနိမ့်ဆုံး၊ အလယ်နှင့် အမြင့်ဆုံး အမှတ်များကို သုံးသည်။",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_notes_5_term",
+                    "value": "ရေတင်စက် ကွေးမျဉ်း",
+                    "english": "Pump curve"
+                },
+                "next_translated": {
+                    "key": "lpn_notes_6_term",
+                    "value": "ဇယား ကော်လံများ အကူအညီ",
+                    "english": "Table columns help"
+                }
+            }
+        },
         "lpn_roughness_method_note": {
             "reason": "missing",
             "current_value": null,
@@ -2057,6 +2181,46 @@
                     "value": "သင်တည်ဆောက်နေစဉ် EPANET ဖြေရှင်းစက်ကို ဖွင့်နေသည်။ အပြည့်အဝ ဖွင့်ပြီးသောအခါ အဖြေများ ရရှိနိုင်ပါလိမ့်မည်။",
                     "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
                 }
+            }
+        },
+        "lpn_field_cv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_closed",
+                    "value": "ပိတ်",
+                    "english": "Closed"
+                },
+                "next_translated": {
+                    "key": "lpn_field_closed_tip",
+                    "value": "ရေဖြတ်သန်း၍ မရစေရန် ဤပိုက်လိုင်းကို ပိတ်ပါ။ ပိုက်လိုင်းသည် မြေပုံပေါ်တွင် ဆက်ရှိပြီး ၎င်း၏ ဂဏန်းအားလုံးကို ဆက်ထားကာ မည်သည့်အချိန်မဆို ပြန်ဖွင့်နိုင်သည်။",
+                    "english": "Close this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and it can be opened again at any time."
+                }
+            },
+            "tip": {
+                "key": "lpn_field_cv_tip",
+                "english": "This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV."
+            }
+        },
+        "lpn_field_cv_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_closed",
+                    "value": "ပိတ်",
+                    "english": "Closed"
+                },
+                "next_translated": {
+                    "key": "lpn_field_closed_tip",
+                    "value": "ရေဖြတ်သန်း၍ မရစေရန် ဤပိုက်လိုင်းကို ပိတ်ပါ။ ပိုက်လိုင်းသည် မြေပုံပေါ်တွင် ဆက်ရှိပြီး ၎င်း၏ ဂဏန်းအားလုံးကို ဆက်ထားကာ မည်သည့်အချိန်မဆို ပြန်ဖွင့်နိုင်သည်။",
+                    "english": "Close this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and it can be opened again at any time."
+                }
+            },
+            "label": {
+                "key": "lpn_field_cv",
+                "english": "Check valve (CV)"
             }
         },
         "lpn_field_text_all_zoom_tip": {
@@ -2375,6 +2539,54 @@
                     "key": "lpn_settings_legend_position",
                     "value": "အညွှန်းများ သော့ချက် တည်နေရာ",
                     "english": "Labels legend position"
+                }
+            }
+        },
+        "lpn_time_run_unbalanced": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_done",
+                    "value": "လည်ပတ်မှု ပြီးဆုံးပါပြီ။ အစီရင်ခံချိန်များ - {frames}။ ကြာချိန် - {secs} စက္ကန့်။",
+                    "english": "The run finished. Reporting time steps: {frames}. Time taken: {secs} s."
+                },
+                "next_translated": {
+                    "key": "lpn_time_runbox_hide",
+                    "value": "ဤဘောက်စ်ကို နောက်ထပ် မပြပါနှင့်",
+                    "english": "Do not show this box again"
+                }
+            }
+        },
+        "lpn_time_run_warnings": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_done",
+                    "value": "လည်ပတ်မှု ပြီးဆုံးပါပြီ။ အစီရင်ခံချိန်များ - {frames}။ ကြာချိန် - {secs} စက္ကန့်။",
+                    "english": "The run finished. Reporting time steps: {frames}. Time taken: {secs} s."
+                },
+                "next_translated": {
+                    "key": "lpn_time_runbox_hide",
+                    "value": "ဤဘောက်စ်ကို နောက်ထပ် မပြပါနှင့်",
+                    "english": "Do not show this box again"
+                }
+            }
+        },
+        "lpn_time_run_see_report": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_done",
+                    "value": "လည်ပတ်မှု ပြီးဆုံးပါပြီ။ အစီရင်ခံချိန်များ - {frames}။ ကြာချိန် - {secs} စက္ကန့်။",
+                    "english": "The run finished. Reporting time steps: {frames}. Time taken: {secs} s."
+                },
+                "next_translated": {
+                    "key": "lpn_time_runbox_hide",
+                    "value": "ဤဘောက်စ်ကို နောက်ထပ် မပြပါနှင့်",
+                    "english": "Do not show this box again"
                 }
             }
         },
@@ -3925,6 +4137,42 @@
             }
         },
         "lpn_pane_pasted_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "မျက်နှာပြင်ပေါ်ရှိ နယ်ပယ်၏ ဆအဖြစ် ပြသော ပုံအရွယ်။ ပိုကြီးလျှင် ပိုကြည်လင်ပြီး ဖိုင်ပိုကြီးသည်။",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_pane_pasted_overrides": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "မျက်နှာပြင်ပေါ်ရှိ နယ်ပယ်၏ ဆအဖြစ် ပြသော ပုံအရွယ်။ ပိုကြီးလျှင် ပိုကြည်လင်ပြီး ဖိုင်ပိုကြီးသည်။",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_run_of_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "မျက်နှာပြင်ပေါ်ရှိ နယ်ပယ်၏ ဆအဖြစ် ပြသော ပုံအရွယ်။ ပိုကြီးလျှင် ပိုကြည်လင်ပြီး ဖိုင်ပိုကြီးသည်။",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_calib_scenario": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
