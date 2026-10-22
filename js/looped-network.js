@@ -8525,7 +8525,7 @@ var EngCalcs = EngCalcs || {};
 				choices: findChoiceDefs('status').map(function (o) { return o[0]; }),
 				label: pc.lpn_field_closed || 'Closed',
 				applies: function () { return true; },
-				get: function (l) { return effective(l, 'status') === 'closed' ? 'closed' : 'open'; },
+				get: function (l) { return linkStoredStatus(l); },
 				set: function (l, v) { l._status = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// **THE THREE PUMP-ONLY INPUTS (gap #5).** Speed is overridable (2026-10-12), and the
 			// write is the same clamp paneColPumpSpeed() applies: a blank, a zero or a negative all
@@ -12104,10 +12104,19 @@ var EngCalcs = EngCalcs || {};
 	}
 	// The document's own status, never the run's -- linkStatusOf()'s second road on its own.
 	function linkInitialStatusText(l) {
-		var pc = EngCalcs.pageConfig || {};
-		return effective(l, 'status') === 'closed'
+		var pc = EngCalcs.pageConfig || {}, st = linkStoredStatus(l);
+		if (st === 'cv') { return pc.lpn_result_status_cv || 'CV'; }
+		return st === 'closed'
 			? (pc.lpn_result_status_closed || 'Closed')
 			: (pc.lpn_result_status_open || 'Open');
+	}
+	// **THE STORED STATUS AS ONE OF ITS THREE CODES**: 'open', 'closed', or 'cv' -- a check-valve
+	// pipe, EPANET's CV, which passes flow only from its start node to its end node and is shut by
+	// the solve when the flow would reverse. Only a pipe can be one; anything else reads as open.
+	function linkStoredStatus(l) {
+		var st = effective(l, 'status');
+		if (st === 'closed') { return 'closed'; }
+		return st === 'cv' && l.type === 'pipe' ? 'cv' : 'open';
 	}
 	// A pipe's reaction coefficient in force: its own where it states one, else the network's
 	// (`settings.reactions.globalBulk` / `globalWall`), in the document's own units -- the pair
@@ -23597,7 +23606,8 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (prop === 'status') {
 			return [['open', pc.lpn_result_status_open || 'Open'],
-				['closed', pc.lpn_result_status_closed || 'Closed']];
+				['closed', pc.lpn_result_status_closed || 'Closed'],
+				['cv', pc.lpn_result_status_cv || 'CV']];
 		}
 		if (prop === 'mixingModel') { return paneColMixingModel().choices(); }
 		// The four dose types, from the one list the popup and the table draw (called with no node,
@@ -23981,7 +23991,7 @@ var EngCalcs = EngCalcs || {};
 		// linkStatusOf()'s solved-run reading, which is a RESULT; this is what paneColClosed()'s
 		// own checkbox reads and writes, so a search and a bulk edit agree with the table cell.
 		if (prop === 'status') {
-			return cand.group === 'link' ? (effective(cand.el, 'status') === 'closed' ? 'closed' : 'open') : undefined;
+			return cand.group === 'link' ? linkStoredStatus(cand.el) : undefined;
 		}
 		// **THE THREE PUMP-ONLY INPUTS** (Task 708, gap #5), all overridable, read through
 		// effective(); speed with the same "blank/zero/negative means 1" rule paneColPumpSpeed()
@@ -28428,10 +28438,23 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **SHUT IS NOT THE SAME QUESTION AS "part of this network"**, and both belong here: Active is
 	// whether the scenario contains the link at all, Closed is whether water can pass through the one
 	// it contains. EPANET's `[STATUS]`, and overridable like every other property on the popup.
+	// An unticked Closed leaves a check valve one: only a link that IS closed is opened by it.
 	function paneColClosed() {
 		return { key: 'closed', label: 'lpn_field_closed', bool: true, em: 2, prop: 'status',
 			get: function (l) { return effective(l, 'status') === 'closed'; },
-			set: function (l, v) { setProp(l, 'status', v ? 'closed' : 'open'); } };
+			set: function (l, v) {
+				if (v) { setProp(l, 'status', 'closed'); } else if (effective(l, 'status') === 'closed') { setProp(l, 'status', 'open'); }
+			} };
+	}
+	// **A CHECK VALVE IS THE SAME PROPERTY** (`status` 'cv', EPANET's CV), pipes only. EPANET has one
+	// status per pipe, so ticking CV opens a closed pipe and ticking Closed ends a check valve; an
+	// unticked CV leaves a closed pipe closed.
+	function paneColCheckValve() {
+		return { key: 'cv', label: 'lpn_field_cv', bool: true, em: 2, prop: 'status',
+			get: function (l) { return effective(l, 'status') === 'cv'; },
+			set: function (l, v) {
+				if (v) { setProp(l, 'status', 'cv'); } else if (effective(l, 'status') === 'cv') { setProp(l, 'status', 'open'); }
+			} };
 	}
 	// The library references. A pipe type states diameter, roughness and more; choosing one goes
 	// through setPipeType(), the same door the popup's chooser uses, because that is what knows how
@@ -29072,7 +29095,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			{
 				id: 'pipes', panel: 'lpn_pane_pipes', label: 'lpn_pane_tab_pipes',
 				group: 'link', type: 'pipe',
-				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive(), paneColClosed()].concat(paneColEnds(), [
+				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive(), paneColClosed(), paneColCheckValve()].concat(paneColEnds(), [
 					paneColPipeType(),
 					paneColDiameter(),
 					// TYPING A LENGTH TURNS AUTO OFF, which is exactly what the popup's own box does
@@ -45598,6 +45621,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			// sentence rather than a blank; delete the key once nothing can produce it.
 			case 'valve-dropped': return pc.lpn_inp_drop_valve || 'These valves are described by a curve or by a fixed pressure drop, and this page has no such asset. They were imported as open pipes, so the network remains connected, but pressure and flow are no longer controlled at those locations.';
 			case 'gpv-curve-missing': return pc.lpn_inp_drop_gpv_curve || 'This valve refers to a head loss curve that is not in the file. The valve was imported without a curve, so it remains fully open until a curve is chosen.';
+			// 'check-valve' IS NO LONGER EMITTED: a CV pipe is kept as one (status 'cv'). Kept, like
+			// 'valve-dropped', because a pipe imported before that still wears the note, and for that
+			// pipe it is still true.
 			case 'check-valve': return pc.lpn_inp_drop_cv || 'In EPANET these pipes allow flow in one direction only (check valves). They were imported as ordinary pipes, so flow may now pass in either direction.';
 			// 'demand-categories' IS NO LONGER EMITTED (Task 468): a junction holds its demands as a
 			// LIST, so nothing is added together and there is no difference to report. Kept, like
@@ -46051,26 +46077,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		function held(v) { return Array.isArray(v) ? v.length > 0 : (v && typeof v === 'object') ? Object.keys(v).length > 0 : !!v; }
 		['patterns', 'curves', 'controls', 'rules'].forEach(function (k) { if (held(parsed[k])) { na[k] = true; } });
 		if (held(parsed.hydraulics) || held(parsed.qualityOptions) || held(parsed.fileOptions)) { na.options = true; }
-		// A CV pipe is read as open (the importer reports it); its status is not compared or written.
-		var cvIds = {};
-		(parsed.dropped || []).forEach(function (d) { if (d.code === 'check-valve') { (d.ids || []).forEach(function (i) { cvIds[i] = true; }); } });
 		var rawNode = {}, rawLink = {};
 		parsed.nodes.forEach(function (n) { rawNode[n.id] = n; });
 		parsed.links.forEach(function (l) { rawLink[l.id] = l; });
-		return inpPlanFromSource({ refused: [], na: na, cv: cvIds, rec: docFromInp(parsed, name), rawNode: rawNode, rawLink: rawLink,
+		return inpPlanFromSource({ refused: [], na: na, rec: docFromInp(parsed, name), rawNode: rawNode, rawLink: rawLink,
 			geoFile: parsed.mapUnits === 'degrees' });
 	}
 	// **THE ONE COMPARE, FOR EVERY FORMAT THAT LANDS IN THE OPEN PROJECT** (Task 814): an EPANET file
 	// and a GeoJSON network each reduce themselves to `src` and this does the rest, so the two cannot
-	// drift. `src`: refused (rows), na (set of not-applied keys), cv (ids read as open), rec (the file
+	// drift. `src`: refused (rows), na (set of not-applied keys), rec (the file
 	// as a document: nodes, links), rawNode/rawLink (the file's own positions, outside the document
 	// frame), geoFile (the positions are longitude and latitude).
 	function inpPlanFromSource(src) {
 		var pc = EngCalcs.pageConfig || {}, plan = { refused: src.refused, changes: [], addedNodes: [], addedLinks: [], addedL: [], keptL: [], na: src.na || {},
 				keptNodes: [], keptLinks: [], typeDiffers: [], typeOwned: [], notAdded: false, dwRoughness: false, matched: 0 };
 		if (plan.refused.length) { return plan; }
-		var cvIds = src.cv || {}, rec = src.rec, fileNode = {}, fileLink = {}, rawNode = src.rawNode, rawLink = src.rawLink;
-		plan.cv = Object.keys(cvIds).map(function (i) { return inpTL('pipe', i); });
+		var rec = src.rec, fileNode = {}, fileLink = {}, rawNode = src.rawNode, rawLink = src.rawLink;
 		rec.nodes.forEach(function (n) { fileNode[n.id] = n; });
 		rec.links.forEach(function (l) { fileLink[l.id] = l; });
 		plan.rec = rec; plan.rawNode = rawNode; plan.rawLink = rawLink;
@@ -46082,7 +46104,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			fields.forEach(function (f) {
 				var nv = r[f[1]], cur, tok = r.tok && typeof r.tok[f[1]] === 'string' ? r.tok[f[1]] : undefined;
 				if (nv === undefined || nv === null) { return; }
-				if (f[0] === 'status' && kind === 'link' && cvIds[el.id]) { return; }
 				if (f[0] === 'roughness' && dw) { plan.dwRoughness = true; return; }
 				if (kind === 'link' && pipeTypeOwns(el, f[0])) { ownedHere = true; return; }
 				cur = effective(el, f[0]);
@@ -46239,7 +46260,6 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (plan.stripped && plan.stripped.length) {
 				na.push((pc.lpn_inpup_na_refs || 'These added assets refer to a pattern or curve that this project does not have, so the reference was left out: {ids}').replace('{ids}', inpListIds(plan.stripped)));
 			}
-			if (plan.cv && plan.cv.length) { na.push((pc.lpn_inpup_na_cv || 'A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}').replace('{ids}', inpListIds(plan.cv))); }
 			if (msxFile) { na.push((pc.lpn_inpup_na_msx || 'The .msx file chosen with this file was not read. To attach it to this project, choose it alone.')); }
 			if (na.length) {
 				p(pc.lpn_inpup_h_na || 'Not applied', true);
@@ -46591,7 +46611,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if ((net.patterns || []).length) { na.patterns = true; }
 		if ((net.curves || []).length) { na.curves = true; }
 		if ((net.customProps || []).length) { na.custom = true; }
-		return { refused: [], na: na, cv: {}, rec: { nodes: net.nodes, links: net.links }, rawNode: raw.node, rawLink: raw.link, geoFile: true };
+		return { refused: [], na: na, rec: { nodes: net.nodes, links: net.links }, rawNode: raw.node, rawLink: raw.link, geoFile: true };
 	}
 	function updateProjectFromGeoJson(scan, fileName, target, done) {
 		function land(net, refusedRows) {
@@ -72669,6 +72689,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		endField(fields, l, 'from');
 		endField(fields, l, 'to');
 		closedField(fields, l, linkId);
+		if (l.type === 'pipe') { checkValveField(fields, l); }
 		customPropFields(fields, l);
 		activeField(fields, l);
 		if (lastSolveResult && !linkResultHeld(l) && lastSolveResult.flows[linkId] !== undefined) {
@@ -73764,6 +73785,28 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// stored token: "Base: open" beside a box labelled Closed is one negation more than a
 		// reader should have to do, and it needs no key of its own.
 		overrideMarker(fields, l, 'status', function (v) { return formatPropValue(v === 'closed'); });
+	}
+	// **CHECK VALVE (CV)**, a pipe's third status beside open and closed: the same `status`
+	// property the Closed box writes, so the two boxes are one EPANET status column and ticking
+	// either one clears the other. Same shape as closedField(), box first, then words.
+	function checkValveField(fields, l) {
+		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
+			input = document.createElement('input'), text = document.createElement('span');
+		input.type = 'checkbox';
+		input.checked = effective(l, 'status') === 'cv';
+		input.addEventListener('change', function () {
+			saveUndoSnapshot();
+			setProp(l, 'status', input.checked ? 'cv' : 'open');
+			afterPropertyEdit(l);
+			refreshPopupIfOpen();
+		});
+		setFieldLabel(text, pc.lpn_field_cv || 'Check valve (CV)', pc.lpn_field_cv_tip);
+		label.appendChild(input);
+		label.appendChild(document.createTextNode(' '));
+		label.appendChild(text);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+		overrideMarker(fields, l, 'status', function (v) { return formatPropValue(v === 'cv'); });
 	}
 	// A dropdown field. `options` is [[value, label], ...]. The only popup control that is not a
 	// number or a checkbox, added for the valve type (Task 248 phase 2) -- a valve's type decides
@@ -78119,6 +78162,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (f.statuses) {
 			model.links.forEach(function (l) {
 				var st = f.statuses[l.id];
+				// A check valve decides for itself, as a valve does: it shuts on its own hydraulics.
+				if (l.status === 'cv') { return; }
 				if (st === 'open') { l.status = 'open'; return; }
 				if (st !== 'closed' || l.type === 'valve') { return; }
 				if (atLimit[l.from] || atLimit[l.to]) { return; }

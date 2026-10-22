@@ -92,7 +92,9 @@
 			if (cond.kind === 'node' && nodeType[String(cond.node)] === 'junction' && l.type === 'valve') { ids.push(String(c.link)); return; }
 			// EPANET refuses these when it reads the file (input3.c controldata(): error 207, 211).
 			if (!act.status && l.type === 'valve' && String(l.valveType).toUpperCase() === 'GPV') { ids.push(String(c.link)); return; }
-			if (!act.status && l.type !== 'valve' && !(act.setting >= 0)) { ids.push(String(c.link)); }
+			if (!act.status && l.type !== 'valve' && !(act.setting >= 0)) { ids.push(String(c.link)); return; }
+			// ...and a control on a check-valve pipe (error 207, "attempt to control a CV").
+			if (l.type === 'pipe' && l.status === 'cv') { ids.push(String(c.link)); }
 		});
 		add('native-run-control-unsupported', ids);
 		if (model.rules && model.rules.length) { add('native-run-rules', [], true); }
@@ -237,6 +239,9 @@
 			if (ctl.some(function (c) { return c.on === 'junction'; })) { sOpts.pswitch = pswitch(stepLinks); }
 			sOpts.tempClosed = {};
 			ls.forEach(function (st, k) { if (st.s === TEMPCLOSED) { sOpts.tempClosed[links[k].id] = true; } });
+			// A check valve the last step shut starts this solve shut, as EPANET carries its status.
+			sOpts.cvClosed = {};
+			ls.forEach(function (st, k) { if (st.kind === 'cv' && st.s === CLOSED) { sOpts.cvClosed[links[k].id] = true; } });
 			res = EC.lpnSolve(stepModel, sOpts);
 			if (!res.ok) { return { ok: false, issues: res.issues || [], t: htime }; }
 			readBack(stepModel, stepLinks, ls, res);
@@ -336,6 +341,8 @@
 			else { st.s = ACTIVE; st.k = l.setting || 0; }
 			return st;
 		}
+		// A check-valve pipe (status 'cv') starts OPEN and the solve decides it (Task 733's seam).
+		if (l.type === 'pipe' && l.status === 'cv') { st.kind = 'cv'; return st; }
 		st.s = l.status === 'closed' ? CLOSED : OPEN;
 		return st;
 	}
@@ -367,19 +374,25 @@
 			c.setting = st.k;
 			return c;
 		}
+		if (st.kind === 'cv') { c.status = 'cv'; return c; }
 		c.status = st.s === CLOSED ? 'closed' : 'open';
 		return c;
 	}
 
 	// What the solve ended with, in EPANET's codes, for the controls to compare.
 	function readBack(stepModel, stepLinks, ls, res) {
-		var tankShut = {}, byId = {};
+		var tankShut = {}, byId = {}, cvShut = {};
 		(res.tankClosed || []).forEach(function (id) { tankShut[String(id)] = true; });
+		(res.cvClosed || []).forEach(function (id) { cvShut[String(id)] = true; });
 		stepModel.nodes.forEach(function (n) { byId[String(n.id)] = n; });
 		stepLinks.forEach(function (l, k) {
 			var st = ls[k], vs, gain;
 			if (st.kind === 'pipe') {
 				if (st.s !== CLOSED) { st.s = tankShut[String(l.id)] ? TEMPCLOSED : OPEN; }
+				return;
+			}
+			if (st.kind === 'cv') {
+				st.s = cvShut[String(l.id)] ? CLOSED : tankShut[String(l.id)] ? TEMPCLOSED : OPEN;
 				return;
 			}
 			if (st.kind === 'pump') {

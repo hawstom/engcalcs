@@ -1373,6 +1373,7 @@ $ec_lang['lpn_result_reaction_rate']='Reaction rate';
 $ec_lang['lpn_result_status']='Status';
 $ec_lang['lpn_result_status_open']='Open';
 $ec_lang['lpn_result_status_closed']='Closed';
+$ec_lang['lpn_result_status_cv']='CV';
 $ec_lang['lpn_result_head']='Head';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_result_head_tip']='Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement.';
@@ -2465,7 +2466,6 @@ $ec_lang['lpn_inpup_method_row']='Head loss formula: the file uses {file} and th
 // {project} is a project name and {reason} the system's own error text. In t_*, the kind of asset that prefixes an ID in the receipt lists, as in 'Pipe 31'.
 $ec_lang['lpn_inpup_refused_lead_formula']='The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.';
 $ec_lang['lpn_inpup_refused_lead_both']='The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.';
-$ec_lang['lpn_inpup_na_cv']='A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}';
 $ec_lang['lpn_inpup_failed']='The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}';
 $ec_lang['lpn_inpup_i_positions']='positions of existing assets';
 $ec_lang['lpn_inpup_i_connections']='connections';
@@ -3034,6 +3034,8 @@ $ec_lang['lpn_method_switch_confirm']='Changing the friction method does not cha
 // Active, which is a different question -- whether the scenario contains the link at all
 // (paneColClosed() in js/looped-network.js) -- and stays "Active".
 $ec_lang['lpn_field_closed']='Closed';
+$ec_lang['lpn_field_cv']='Check valve (CV)';
+$ec_lang['lpn_field_cv_tip']='This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.';
 $ec_lang['lpn_field_closed_tip']='Close this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and it can be opened again at any time.';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
