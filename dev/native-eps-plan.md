@@ -198,12 +198,11 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
   not read yet: per pump `kwhPerM3` and `costPerDay` (EPANET's "Kw-hr /m3" and "Cost /day" columns,
   the file being SI) and at the top `costPerDay` and `totalCostPerDay` (EPANET's "Total Cost" line).
   A harness case asserts every field of the page's summary is present.
-- **The truth is the engine's binary output, not the page's figure.** The page's own energy result
-  (`lpnEnergyAccumulate` on `EN_ENERGY` samples) is NOT addenergy(): it calls a pump "on line" when its
-  power is above 0, where EPANET does when its efficiency reads above 0 (open, whatever the flow), and
-  it reads nothing for a single instant (the step is 0), where EPANET adds one hour. The loop copies
-  EPANET, so on a pump left open with no flow the two engines' energy results will differ by that
-  definition, not by arithmetic. Slice 7 should pick one on purpose. The harness reads the energy
+- **The truth is the engine's binary output, not the page's figure.** The page's energy result
+  (`lpnEnergyAccumulate` on `EN_ENERGY` samples) now counts as `addenergy()` does (Task 821, Tom
+  2026-10-22 "Count as EPANET does"): a pump is on line while its efficiency reads above 0 (open, whatever
+  the flow), and a single instant counts as one hour; `energy-count-harness.js` holds it. The loop and the page
+  now agree on the definition. The harness reads the energy
   block of `temp.out` after `solveH()` / `saveH()` (single precision, four digits beyond the report)
   and holds that reader to the printed report to its rounding.
 - **Status first, then flow.** `getenergy()` returns 0 power and 0 efficiency for a link whose status is
