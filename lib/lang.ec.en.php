@@ -3925,6 +3925,9 @@ $ec_lang['lpn_time_run']='Calculate';
 // 'lpn_close' is already the word on every other dismiss control on this page, so both are
 // borrowed rather than re-keyed.
 $ec_lang['lpn_time_run_done']='The run finished. Reporting time steps: {frames}. Time taken: {secs} s.';
+$ec_lang['lpn_time_run_unbalanced']='Time steps not balanced ({n}).';
+$ec_lang['lpn_time_run_warnings']='Warnings ({n}).';
+$ec_lang['lpn_time_run_see_report']='See the {report}.';
 $ec_lang['lpn_time_runbox_hide']='Do not show this box again';
 $ec_lang['lpn_settings_runbox']='Show the run progress box';
 $ec_lang['lpn_settings_runbox_tip']='A box that reports the progress and outcome of a run. With it turned off, a finished run says the same thing in the status line for a few seconds instead. This is a setting for this browser, not for the project.';
