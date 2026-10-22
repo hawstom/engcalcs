@@ -97,15 +97,10 @@ lines rather than appending corrections.
 
 ## STATE — 2026-10-21 (thirty-third session, Arizona time)
 
-### Master: flow-arrow merged on his word, with fix/settings-index-scroll, chore/key-audit and chore/handoff-1021
+### Master: import-export-menu and geojson-into-project merged on his word
 
 - Production is what he last pulled; epanet-plus-plus.org/app was at c375f221 on 2026-10-21.
 - **Canonical landing page is now epanet-plus-plus.org** (Tom, MCP interview m5). Push it like the others.
-- Two production reports did NOT reproduce headlessly (Chromium, many sizes, DPR, throttle, themes):
-  the bottom pane taking ~4.5 s per open/close after the first on Net3, and the cursor lagging on the
-  first half of Net3 link 233. Both measured at 15-180 ms. Waiting on his browser, OS, a private
-  window with extensions off, and ideally a DevTools Performance recording. `fix/bottom-pane-lag`
-  holds only a ceiling harness (`bottom-pane-toggle-lag-harness.js`, passes on master); not merged.
 - Key audit deleted `lpn_eps_working` and `lpn_msx_replace` (untranslated duplicates) and added the
   blocking check `new keys not duplicates` (`new_key_duplicate_check.php`, with an allow-list).
 - Interview answers (Tasks 818, 819) are on the roadmap. MCP is slow; WaterGEMS and performance first.
@@ -115,15 +110,13 @@ lines rather than appending corrections.
 
 ### Branches waiting on him
 
-- `feat/geojson-into-project` (8101): his three-paragraph wording applied to both import boxes; ready.
-- `feat/sqlite-reader` (8104): alternatives, pump/valve nodes, continuous patterns; Perry passed it
-  (solves agree with WaterGEMS's .inp exports to 1e-5). His Base has three pumps with no curve and
-  cannot solve, in WaterGEMS too. Squash-merge it. His "import or only export?" is open; prompt later.
-- `feat/import-export-menu` (8105): Task 819 built to his interview answers; a third menu level
-  (on a phone it replaces the fly-out with a Back row). Perry passed it after the phone fix. Its
-  three group rows reuse `lpn_calib_network`, `lpn_pane_tab_shapes`, `lpn_tables_menu`.
-- **Seam:** whichever of `feat/import-export-menu` and `feat/sqlite-reader` merges second moves the
-  WaterGEMS Import row into `importNetworkRows()` with its own `key:` (comment above that function).
+- **Report to Tom in `~/tom-files/messenger.md`**, overwritten each time; one line per paragraph, no hard wraps (Tom, 2026-10-21).
+- Merged 2026-10-21 on his word: `feat/import-export-menu` (Task 819) and `feat/geojson-into-project` (814's GeoJSON slice; 814 stays open).
+- `feat/sqlite-reader` (8104): being reworked on his verdict that our pump/valve conversion is unsatisfactory; match Bentley's own .inp export (coincident upstream/downstream nodes). It owns the seam: its WaterGEMS row moves into `importNetworkRows()`. His "import or only export?": *"Export is more important for submittal to reviewers or utilities."*
+- `fix/pump-valve-bent-pipe`, `fix/label-leader-hit`, `feat/calculate-hint`: in progress 2026-10-21.
+- Link 233 is a spatial hover HOLE over about half a multi-line label on a leader, not a delay (his correction). He saw it on label-margin, served again read-only on 8102 from tag `archive/feat/label-margin`; drop that row once fixed.
+- Bottom pane delay: he blames a Markdown Reader browser extension, now uninstalled. Closed unless it returns.
+- MCP: *"This doesn't sound very interesting to me"*; by "buying and selling" he meant *"What's the big idea?"* Not pursued.
 - `feat/desktop`: untouched.
 
 ### Next job

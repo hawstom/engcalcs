@@ -167,6 +167,9 @@ const FIXTURE = [
 	// And the [ENERGY] row itself is still read the way Task 566 reads it.
 	const energy = EngCalcs.lpnEnergyParse((parsed.inpSections || {}).ENERGY || []);
 	check(energy.effic.P1 === 'E1', `the EFFIC row still names the curve: ${JSON.stringify(energy.effic.P1)}`);
+	// EPANET also reads the keyword spelled out, as WaterGEMS's own export writes it.
+	const spelled = EngCalcs.lpnEnergyParse(['PUMP\tP1\tEfficiency\tE1']);
+	check(spelled.effic.P1 === 'E1', `an Efficiency row names the curve too: ${JSON.stringify(spelled.effic.P1)}`);
 
 	// =========================================================================================
 	head('2. Import then export is BYTE-IDENTICAL, the whole file');

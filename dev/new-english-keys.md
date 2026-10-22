@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**5 still to read on master**, of 169 untranslated keys, of 3188 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**11 still to read on master**, of 172 untranslated keys, of 3191 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (169, 5 to read @@ NEEDS RULING)
+## lpn_  (172, 11 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -223,6 +223,15 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_geojson_results_other`**
   > No results are included, because the results on screen belong to the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
+- **`lpn_gjup_h_notes`**
+  > Reading the file
+  @@ NEEDS RULING
+- **`lpn_gjup_lead`**
+  > Choose where to import this file. Note that GeoJSON files don't include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
+  @@ NEEDS RULING
+- **`lpn_gjup_title`**
+  > Update from GeoJSON file
+  @@ NEEDS RULING
 - **`lpn_gpv_one_point_note`**
   > ⚠ These general purpose valves have a head loss curve with only one point, so their head loss was taken as proportional to flow, through that point: {ids}
   _Ruled OK 2026-10-20._
@@ -248,8 +257,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Import {file}
   _Ruled OK 2026-10-20._
 - **`lpn_inpup_base_note`**
-  > Base. A scenario that holds its own value for an asset keeps it; the others take the new value.
-  _Ruled OK 2026-10-20._
+  > Choosing Base doesn't clear any scenario overrides.
+  @@ NEEDS RULING
 - **`lpn_inpup_blank`**
   > blank
   _Ruled OK 2026-10-20._
@@ -284,8 +293,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > Imported {file} into {scenario} of {project}
   _Ruled OK 2026-10-20._
 - **`lpn_inpup_how`**
-  > In this project, assets are matched by ID. Values are changed on matching assets, assets only in the file are added, and assets only in the project are kept.
-  _Ruled OK 2026-10-20._
+  > In this project, assets are matched by ID. Values are changed on matching assets, assets unique to the file are added, and assets unique to this project are left unaltered.
+  @@ NEEDS RULING
 - **`lpn_inpup_i_connections`**
   > connections
   _Ruled OK 2026-10-20._
@@ -311,8 +320,8 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   > rules
   _Ruled OK 2026-10-20._
 - **`lpn_inpup_lead`**
-  > An EPANET file holds one set of values and no scenarios. Choose where to put them.
-  _Ruled OK 2026-10-20._
+  > Choose where to import this file. Note that EPANET files don't include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
+  @@ NEEDS RULING
 - **`lpn_inpup_method_row`**
   > Head loss formula: the file uses {file} and this project uses {project}.
   _Ruled OK 2026-10-20._
@@ -543,7 +552,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**13 still to read**, of 56 new keys across 5 unmerged branch(es).
+**10 still to read**, of 53 new keys across 3 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -555,20 +564,6 @@ build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
 ### feat/desktop (`baba0f04d`) — adds no English strings
-
-### feat/geojson-into-project (`62d4faa42`) — 3 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_gjup_h_notes`**
-  > Reading the file
-  @@ NEEDS RULING
-- **`lpn_gjup_lead`**
-  > Choose where to import this file. Note that GeoJSON files don't include scenarios.\n\nOn import, assets are matched by ID. Values are changed on matching assets, assets unique to the import are added, and assets unique to this project are left unaltered.
-  @@ NEEDS RULING
-- **`lpn_gjup_title`**
-  > Update from GeoJSON file
-  @@ NEEDS RULING
-
-### feat/import-export-menu (`a9f804e9b`) — adds no English strings
 
 ### feat/sqlite-reader (`0c85b385c`) — 53 new, 10 to read @@ NEEDS RULING
 
