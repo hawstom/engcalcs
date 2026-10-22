@@ -51,8 +51,18 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
    controls stripped, and with other rules; Net3 with rules in place of its controls, and with extra
    rules beside them; 10 rule refusals) and `native-eps-examples-harness.js` (the three Net1 examples with
    their rules, through `assembleModel()`).
-5. **Tank volume curves, minimum volume, overflow** (`tankvolume()` / `tankgrade()` interpolation).
-   Test: a tank on a curve against EPANET across a full and an empty event.
+5. **Tank volume curves, minimum volume, overflow (built).** `tankvolume()` / `tankgrade()` /
+   `interp()` on the curve, `inittanks()` (a curve sets Vmin, Vmax and V0), MinVol with no curve,
+   and CanOverflow (`tankstatus()`). `tanktimestep()`, controls and rules needed no change: they read
+   the volume through the two functions. Refused by name (`native-run-volume-curve`): a tank that
+   names a curve with no usable rows, one row, X not increasing, or a curve that does not reach from
+   MinLvl to MaxLvl (EPANET's error 225). Tests: `native-eps-harness.js` (19 constructed cases: a
+   straight-sided curve equal to the cylinder, a narrow-bottom curve, an hourglass, a full and an
+   empty event, MinVol with and without a curve, overflow with and without a curve, a pumped
+   overflow tank, a curve tank under a rule, a FILLTIME rule, controls, and an overflow tank under a
+   rule and a control; 5 curve refusals) and `native-eps-examples-harness.js` (every gallery example
+   with a tank and a period, a bowl-shaped curve added to each tank through `assembleModel()`, in US
+   and SI units).
 6. **Pump energy** (`addenergy()`): kWh, cost, peak. Test: Net3's energy report.
 7. **Wiring to the page**, last, and only on Tom's word: `lpnTimeRun` uses the native loop when the
    engine setting is built-in and nothing is refused; the transport, frames and Run box are
@@ -136,6 +146,36 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
 - The rule time step the page never states: `Rule Timestep` is not written to the EPANET input, so
   EPANET always uses its default and so does the loop. If the page ever lets a visitor set it, the
   bridge and the loop must both read it.
+
+## What slice 5 learned
+
+- **The page has no minimum volume and no overflow.** `assembleModel()` carries a tank's curve
+  (`volCurve` and `volCurveSI`, level in metres and volume in cubic metres, converted by
+  `lpnTankVolumeAttach()` from the document's elevation unit and its cube) and nothing else; the
+  bridge always wrote MinVol 0 and no Overflow column. The model now accepts `minVolume` (m3) and
+  `overflow` (true) on a tank, the bridge writes them when present, and the solver does not shut a
+  link into a full overflowing tank. Only a hand-built model states them. The `.inp` importer reads
+  neither. Giving the visitor either is a page decision, not a solver one.
+- **A stated MinVol with no curve changes nothing a visitor can see.** Vmin, V0 and Vmax all move by
+  the same amount and the level is measured from Vmin, so levels, flows and timing are identical in
+  both engines (tested to 1e-9 m). With a curve EPANET overwrites it. It matters only to a person
+  reading the volume itself.
+- **An overflowing tank at its maximum is just a fixed head that takes water.** The link stays open,
+  `tanklevels()` holds V at Vmax, and the whole inflow shows as the tank's net inflow. `tanktimestep()`
+  ignores a full tank with inflow (`h < Hmax` is false), so it never cuts the step.
+- **A draining tank can rest a little below its minimum.** `tanklevels()` snaps to Vmin only when
+  `V - q <= Vmin`, which for a draining tank (q negative) means V is already a second of flow below
+  it. Both engines did it to 2e-5 m; a harness that asks "is it at the minimum" needs a tolerance, not
+  equality.
+- **Timing at a low flow is the one sensitivity.** The two solves differ by up to 1e-7 m3/s in a flow;
+  over a day that is 0.001 m3 in a tank, which at 2 L/s is half a second of the time to a control
+  level, and EPANET rounds that time to a whole second. In a narrow part of a curve a second is
+  millimetres (5 mm in an hourglass neck), and it compounds through later events. Not a defect in
+  either engine; the cases that cross control levels use tens of litres per second over a day. A
+  slow drain into a steep curve under a tank-level control will show it again.
+- A curve is read in the file's own units whatever EPANET's internal ones are (`tankvolume()` converts
+  the level to the curve's unit and the volume back), so the native loop interpolates the SI rows as
+  given and converts the answer.
 
 ## Wording
 
