@@ -100,18 +100,16 @@ lines rather than appending corrections.
 - Production is what he last pulled; epanet-plus-plus.org/app was at c375f221 on 2026-10-21. **Canonical landing page is epanet-plus-plus.org.**
 - **Report to Tom in `~/tom-files/messenger.md`**, overwritten each time; one line per paragraph, no hard wraps (Tom, 2026-10-21). He empties it between sessions.
 - Still owed: consent_body's 26 translations; the untranslated keys. Sprint only on his word.
-- Merged 2026-10-21 as defect fixes: pump/valve symbol at half the polyline, and a zero-length one points along its downstream pipe (his "Yes"); label grab shape follows the drawn level form (link 233; he confirmed it was one-line, "Thanks"); `PUMP id Efficiency`; CV pipes kept, exported and solved natively (Properties/Tables "Check valve (CV)"); run box names unbalanced steps and warnings; paste refreshes the override count and the Full report reads one run's inputs; built-in solver reads multi-point pump curves as EPANET's custom curves (a two-point curve no longer prints an equation: his call owed).
+- Merged 2026-10-21 as defect fixes: pump/valve symbol at half the polyline, and a zero-length one points along its downstream pipe (his "Yes"); label grab shape follows the drawn level form (link 233; he confirmed it was one-line, "Thanks"); `PUMP id Efficiency`; CV pipes kept, exported and solved natively (Properties/Tables "Check valve (CV)"); run box names unbalanced steps and warnings; paste refreshes the override count and the Full report reads one run's inputs; built-in solver reads multi-point pump curves as EPANET's custom curves (a two-point curve no longer prints an equation; Tom, 2026-10-22: *"Follow EPANET, I suppose."*, so it stays custom, as EPANET reads it).
 - `label-pass-economy-browser-harness.js` failed once alone at a9acc8e65 while agents ran checks; 29/29 three times after. Load flake.
 - Map labels still resolve Demand from the open scenario with Recalculate off (fix/scenario-report-mix left them); worth a task.
 
 ### Branches waiting on him (ports in ~/webdev/worktrees/_panel/ports.conf)
 
 - `feat/sqlite-reader` (8104, Task 749): Bentley-style pump/valve junctions (46-A/46-B coincident), Unbalanced Continue, continuous-pattern start fixed, pattern-averaging caveat in the report; fixture is his 18:46 save copied to `~/webdev/fixtures/wtg-tgh-1/` (he keeps it stable). Perry passed it. Owed by him: where he read "12 psi" (WaterGEMS's saved PMP-1 head change is -5.8 psi at step 0); whether to import WaterGEMS's hourly-averaged continuous patterns instead of Bentley's export values. Summaries: the sqlite-pmp1-summary page on the panel (localhost:8080/img/).
-- `feat/calculate-hint` (8101): the page's standard dialog; Perry passed it. Stores `lpn_calchint` (told him).
-- `feat/import-export-receipts` (8103, Task 814 items 4-5): reports name the run's scenario; "New overrides (n)." Perry passed it.
+- Merged 2026-10-22 on his typed word: `feat/calculate-hint` (stores `lpn_calchint`), `feat/import-export-receipts`, `feat/native-eps-3` (its reverse-flow pump branch now sends a custom-curve pump through `customPumpCoeffs()`; three cannot-lift cases added to `pump-curve-multipoint-harness.js`).
 - `feat/value-source` (8105, Sue's wish): hollow-dot tip "Inherited from {name}."
 - `feat/theme-default` (8106, Task 811): gentle default refinement; screenshots `_panel/www/img/theme-default-*`.
-- `feat/native-eps-3` (Task 733 slice 3): pump speed patterns and XHEAD; not wired. Merging it also changes one-instant built-in results for a pump pushed backwards. SEAM with the merged multi-point pump fix: its reverse-flow pump branch must call `customPumpCoeffs()` when `pCurve[k]` is set (merge master into it first).
 - Port 8102 (the archived label-margin preview) dropped 2026-10-21 once link 233 was settled.
 - His "Ask your AI agent" box is on Task 818 with Mary's (`dev/agents/market-researcher/ai-agent-box.md`) and Sue's findings. A comparison model for WaterGEMS is in `~/tom-files/2026-10-21/`.
 - `feat/desktop`: untouched.
