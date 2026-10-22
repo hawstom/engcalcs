@@ -95,6 +95,9 @@ async function main() {
 			return rows;
 		};
 		const calculate = async () => {
+			// With Recalculate automatically on, Water > Calculate opens the Calculate hint over the map
+			// (feat/calculate-hint); this chapter is about the run, so the hint is muted as a visitor would.
+			await P.evaluate(() => { try { localStorage.setItem('lpn_calchint', '0'); } catch (e) {} });
 			await a.menuClick(await T('lpn_time_run'), 'project');
 			await a.waitFor(() => P.evaluate(() => EngCalcs.lpnTimeRunState().frames > 1), 'extended-period frames', 120000);
 			await settle(800);
