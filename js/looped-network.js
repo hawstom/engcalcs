@@ -33664,9 +33664,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// eleven read-only cells is a paste the user believes landed. A paste that made rows says
 		// how many, because a clerk who typed 400 rows needs to know 400 landed, not how many
 		// cells changed.
-		var pasteScn = activeScenario(), pasteTail = (pasteScn && !pasteScn.isBase && (wrote || created.length))
+		// The count is of NEW overrides only, and is left out at zero: a paste over cells that were
+		// already overrides would otherwise read "Pasted cells (3) ... (0)", a seeming contradiction.
+		var pasteScn = activeScenario(), pasteNew = pasteScn ? Math.max(0, overrideCount(pasteScn) - ovBefore) : 0,
+			pasteTail = (pasteScn && !pasteScn.isBase && (wrote || created.length))
 			? ' ' + String(pc.lpn_pane_pasted_scenario || 'These values are overrides in the scenario {scenario}.').split('{scenario}').join(scenarioDisplayName(pasteScn))
-			+ ' ' + String(pc.lpn_pane_pasted_overrides || 'Overrides added ({n}).').replace('{n}', String(Math.max(0, overrideCount(pasteScn) - ovBefore))) : '';
+			+ (pasteNew ? ' ' + String(pc.lpn_pane_pasted_overrides || 'New overrides ({n}).').replace('{n}', String(pasteNew)) : '') : '';
 		if (created.length) {
 			setNotice(String(refused + dropped
 				? (pc.lpn_pane_pasted_rows_skipped || 'Pasted rows ({n}). Rows added to the network ({created}). Cells not changed ({skipped}).')

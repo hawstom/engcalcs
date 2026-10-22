@@ -168,7 +168,7 @@ async function main() {
 		ok('F3 a demand cell is there to paste into', await paste('7.5'));
 		await a.settle(400);
 		const np = await notice();
-		ok('F3 the notice counts the overrides added (1)', /Overrides added \(1\)\./.test(np), np);
+		ok('F3 the notice counts the new overrides (1)', /New overrides \(1\)\./.test(np), np);
 
 		console.log('--- F4. Base alone: no scenario line ---');
 		const d4 = JSON.parse(JSON.stringify(d));
