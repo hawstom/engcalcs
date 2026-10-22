@@ -102,7 +102,7 @@ async function main() {
 		ok('C1 exactly two rows are marked (same), pipes 10 and 11', !!d && d.marked === 2 && d.markedIds.every((t) => /\b1[01]\b/.test(t)) && !d.markedIds.some((t) => /\b12\b/.test(t)), JSON.stringify(d && d.markedIds));
 
 		console.log('--- C2. the button asks first ---');
-		ok('C2 the button reads "Clear overrides equal to inherited" and is on', !!d && d.sameLabel === 'Clear overrides equal to inherited' && d.sameOff === false, JSON.stringify(d && [d.sameLabel, d.sameOff]));
+		ok('C2 the button reads as lpn_ovl_clear_same and is on', !!d && d.sameLabel === (await L('lpn_ovl_clear_same')) && d.sameOff === false, JSON.stringify(d && [d.sameLabel, d.sameOff]));
 		await press('#lpn_dialog_body button.lpn-ovl-clearsame');
 		await settle(500);
 		const ask = await askText();
