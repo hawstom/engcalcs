@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**17 still to read on master**, of 177 untranslated keys, of 3196 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**17 still to read on master**, of 182 untranslated keys, of 3201 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,11 +29,20 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (177, 17 to read @@ NEEDS RULING)
+## lpn_  (182, 17 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
   _Ruled OK 2026-10-20._
+- **`lpn_calc_hint`**
+  > When “Recalculate automatically” is on, this command is not needed.
+  @@ NEEDS RULING
+- **`lpn_calc_hint_mute`**
+  > Don’t show this again
+  @@ NEEDS RULING
+- **`lpn_calib_scenario`**
+  > Compared with the results of the scenario {scenario}.
+  @@ NEEDS RULING
 - **`lpn_crit_col_empty`**
   > Tank empties
   _Ruled OK 2026-10-20._
@@ -210,10 +219,10 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-20._
 - **`lpn_field_cv`**
   > Check valve (CV)
-  @@ NEEDS RULING
+  _Ruled 2026-10-22: Approved._
 - **`lpn_field_cv_tip`**
   > This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.
-  @@ NEEDS RULING
+  _Ruled 2026-10-22: Approved._
 - **`lpn_file_export_item_msx`**
   > EPANET-MSX file…
   _Ruled OK 2026-10-20._
@@ -415,6 +424,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_msx_too_big`**
   > {file} is too large to keep in browser storage, so it was not attached.
   _Ruled OK 2026-10-20._
+- **`lpn_pane_pasted_overrides`**
+  > New overrides ({n}).
+  @@ NEEDS RULING
 - **`lpn_pane_pasted_scenario`**
   > These values are overrides in the scenario {scenario}.
   _Ruled 2026-10-18: I approved all._
@@ -439,6 +451,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_roughness_method_note`**
   > ⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.
   _Ruled 2026-10-18: I agree._
+- **`lpn_run_of_scenario`**
+  > Results of the scenario {scenario}.
+  @@ NEEDS RULING
 - **`lpn_scncmp_progress`**
   > Solving scenario {done} of {total}…
   _Ruled OK 2026-10-20._
@@ -534,13 +549,13 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
   _Ruled OK 2026-10-20._
 - **`lpn_time_run_see_report`**
   > See the {report}.
-  @@ NEEDS RULING
+  _Ruled 2026-10-22: Approved._
 - **`lpn_time_run_unbalanced`**
   > Time steps not balanced ({n}).
-  @@ NEEDS RULING
+  _Ruled 2026-10-22: Approved._
 - **`lpn_time_run_warnings`**
   > Warnings ({n}).
-  @@ NEEDS RULING
+  _Ruled 2026-10-22: Approved._
 - **`lpn_when`**
   > Reporting step tested
   _Ruled OK 2026-10-20._
@@ -567,7 +582,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**16 still to read**, of 59 new keys across 8 unmerged branch(es).
+**11 still to read**, of 54 new keys across 5 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -578,30 +593,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/calculate-hint (`bca3d9d23`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_calc_hint`**
-  > When “Recalculate automatically” is on, this command is not needed.
-  @@ NEEDS RULING
-- **`lpn_calc_hint_mute`**
-  > Don’t show this again
-  @@ NEEDS RULING
-
 ### feat/desktop (`baba0f04d`) — adds no English strings
-
-### feat/import-export-receipts (`f67b90856`) — 3 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_calib_scenario`**
-  > Compared with the results of the scenario {scenario}.
-  @@ NEEDS RULING
-- **`lpn_pane_pasted_overrides`**
-  > New overrides ({n}).
-  @@ NEEDS RULING
-- **`lpn_run_of_scenario`**
-  > Results of the scenario {scenario}.
-  @@ NEEDS RULING
-
-### feat/native-eps-3 (`8ba86b1a0`) — adds no English strings
 
 ### feat/sqlite-reader (`7e11a538a`) — 53 new, 10 to read @@ NEEDS RULING
 

@@ -8642,6 +8642,31 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
+        },
+        "lpn_field_cv": {
+            "on": "Check valve (CV)",
+            "ruled": "2026-10-22",
+            "answer": "Approved."
+        },
+        "lpn_field_cv_tip": {
+            "on": "This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.",
+            "ruled": "2026-10-22",
+            "answer": "Approved."
+        },
+        "lpn_time_run_unbalanced": {
+            "on": "Time steps not balanced ({n}).",
+            "ruled": "2026-10-22",
+            "answer": "Approved."
+        },
+        "lpn_time_run_warnings": {
+            "on": "Warnings ({n}).",
+            "ruled": "2026-10-22",
+            "answer": "Approved."
+        },
+        "lpn_time_run_see_report": {
+            "on": "See the {report}.",
+            "ruled": "2026-10-22",
+            "answer": "Approved."
         }
     }
 }
