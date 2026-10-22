@@ -1922,15 +1922,15 @@
 			if (!s || !a) { return; }
 			kw = (typeof s.kw === 'number' && isFinite(s.kw)) ? s.kw : 0;
 			total += kw;
-			// **ZERO POWER IS A PUMP THAT IS NOT RUNNING, AND IT IS NOT ON LINE.** Counting it
-			// would drag the average efficiency of a pump that ran beautifully for eight hours
-			// towards zero, and would make the usage factor say 100% of every pump in the model.
-			// EPANET's own rule is the pump's STATUS rather than its power, and the two agree
-			// wherever a control switches the pump: Net3's two usage factors come out at EPA's own
-			// 58.33% and 28.74% (dev/lpn-spike/energy-anchor-harness.js). They part on a pump left
-			// OPEN with nothing to deliver, which draws a whisper and reads here as running --
-			// measured, stated, and the honest reading of a pump nobody switched off.
-			if (!(kw > 0)) { return; }
+			// **ON LINE IS EPANET'S WORD: THE PUMP IS OPEN, WHICH IS WHEN ITS EFFICIENCY READS ABOVE
+			// 0, WHATEVER IT DELIVERS** (Task 821; hydraul.c addenergy() skips a pump whose
+			// efficiency is 0). getenergy() returns 0 power and 0 efficiency for a pump whose status
+			// is closed, temporarily closed or unable to lift (XHEAD), and a positive efficiency
+			// (never under 1 percent) for every other one, even with no flow at all. The page used to
+			// ask for power above 0; the two parted on a pump left open with nothing to deliver, and
+			// the page's Energy box now counts it as the engine's own report does
+			// (dev/lpn-spike/energy-count-harness.js).
+			if (!(typeof s.effic === 'number' && s.effic > 0)) { return; }
 			a.onSeconds += dt;
 			a.kwh += kw * hours;
 			a.effSum += ((typeof s.effic === 'number' && isFinite(s.effic)) ? s.effic : 0) * dt;
@@ -2674,7 +2674,10 @@
 									}
 								}
 								tstep = p.nextH();
-								if (pumpIds.length) { EngCalcs.lpnEnergyAccumulate(energyAcc, esample, tstep); }
+								// **A SINGLE INSTANT COUNTS AS ONE HOUR**, as EPANET's addenergy() does when
+								// the duration is 0 (nextH() then returns 0): the box shows the pump's
+								// power for an hour, not a table of nothing.
+								if (pumpIds.length) { EngCalcs.lpnEnergyAccumulate(energyAcc, esample, duration === 0 ? 3600 : tstep); }
 								// A guard, not a policy: a network that somehow never advances would hang
 								// the tab. 100000 steps is far past any real model at any real timestep.
 								if (!(tstep > 0) || ++guard >= 100000) { finished = true; break; }
