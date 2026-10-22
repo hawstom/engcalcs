@@ -5445,11 +5445,10 @@ var EngCalcs = EngCalcs || {};
 	// Base. A scenario's layer is named for the scenario, a stored alternative's for itself. Read for
 	// the hollow dot's tip, so it only runs when a row's marker is built.
 	function inheritedSourceName(el, props) {
-		var key = ovKey(el), has = Object.prototype.hasOwnProperty, layers = treeLayers(activeScenario(), categoryOf(props[0], elGroup(el))), i, map, ov;
+		var cat = categoryOf(props[0], elGroup(el)), key = ovKey(el), layers = treeLayers(activeScenario(), cat), i, held;
 		for (i = 0; i < layers.length; i++) {
-			map = layers[i].kind === 'scn' ? layers[i].obj.overrides : (layers[i].kind === 'alt' ? layers[i].obj.values : null);
-			ov = plainObject(map) ? map[key] : null;
-			if (plainObject(ov) && props.some(function (p) { return has.call(ov, p); })) {
+			held = (layerValuesByCategory(layers[i])[cat] || {})[key] || [];
+			if (held.some(function (pv) { return props.indexOf(pv[0]) >= 0; })) {
 				return layers[i].kind === 'scn' ? scenarioDisplayName(layers[i].obj) : String(layers[i].obj.name || '');
 			}
 		}
