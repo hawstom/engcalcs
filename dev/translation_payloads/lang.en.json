@@ -1032,6 +1032,7 @@
         "lpn_result_status": "Status",
         "lpn_result_status_open": "Open",
         "lpn_result_status_closed": "Closed",
+        "lpn_result_status_cv": "CV",
         "lpn_result_head": "Head",
         "lpn_result_head_tip": "Potential energy of the water at this node, written as a height of water column. It is an absolute height, where pressure is a gauge measurement.",
         "lpn_result_depth": "Depth",
@@ -1611,7 +1612,6 @@
         "lpn_inpup_method_row": "Head loss formula: the file uses {file} and this project uses {project}.",
         "lpn_inpup_refused_lead_formula": "The head loss formula of the file differs from the formula of this project, and this page does not convert roughness values. Import the file as a new project, or open a project that uses the same formula.",
         "lpn_inpup_refused_lead_both": "The units and the head loss formula of the file differ from those of this project, and this page does not convert numbers in a file. Import the file as a new project, or open a project that uses the same units and formula.",
-        "lpn_inpup_na_cv": "A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}",
         "lpn_inpup_failed": "The update stopped before it finished, so nothing in {project} was changed. Import the file as a new project to open it. Reason: {reason}",
         "lpn_inpup_i_positions": "positions of existing assets",
         "lpn_inpup_i_connections": "connections",
@@ -1819,6 +1819,8 @@
         "lpn_field_auto": "Auto",
         "lpn_method_switch_confirm": "Changing the friction method does not change the roughness numbers already entered on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?",
         "lpn_field_closed": "Closed",
+        "lpn_field_cv": "Check valve (CV)",
+        "lpn_field_cv_tip": "This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.",
         "lpn_field_closed_tip": "Close this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and it can be opened again at any time.",
         "lpn_field_x": "X",
         "lpn_field_y": "Y",
@@ -3193,7 +3195,7 @@
         "lpn_export_confirm_title": "Export {format}",
         "lpn_export_confirm_lead": "The {format} holds one scenario, and this project has {n}."
     },
-    "count": 3191,
+    "count": 3193,
     "active_prefixes": [
         "about",
         "bpn",

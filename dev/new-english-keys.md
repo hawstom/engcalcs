@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**11 still to read on master**, of 172 untranslated keys, of 3191 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**14 still to read on master**, of 174 untranslated keys, of 3193 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (172, 11 to read @@ NEEDS RULING)
+## lpn_  (174, 14 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -208,6 +208,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_ff_working_steps`**
   > Working: reporting step {step} of {steps}, junction {done} of {total}.
   _Ruled OK 2026-10-20._
+- **`lpn_field_cv`**
+  > Check valve (CV)
+  @@ NEEDS RULING
+- **`lpn_field_cv_tip`**
+  > This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.
+  @@ NEEDS RULING
 - **`lpn_file_export_item_msx`**
   > EPANET-MSX file…
   _Ruled OK 2026-10-20._
@@ -328,9 +334,6 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_inpup_more`**
   > {n} more
   _Ruled OK 2026-10-20._
-- **`lpn_inpup_na_cv`**
-  > A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}
-  _Ruled OK 2026-10-20._
 - **`lpn_inpup_na_general`**
   > The file also holds {items}. They were not applied.
   _Ruled OK 2026-10-20._
@@ -430,6 +433,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_result_msx_tip`**
   > The value of this EPANET-MSX species, computed by the EPANET-MSX engine, in the units the EPANET-MSX file declares. For a link it is the average along the link.
   _Ruled OK 2026-10-20._
+- **`lpn_result_status_cv`**
+  > CV
+  @@ NEEDS RULING
 - **`lpn_roughness_method_note`**
   > ⚠ Pipes with a roughness outside the normal range for {method}: {n}. The values are unchanged and may have been entered for another friction method.
   _Ruled 2026-10-18: I agree._
@@ -552,7 +558,7 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 
 # Strings waiting on a branch
 
-**10 still to read**, of 53 new keys across 3 unmerged branch(es).
+**16 still to read**, of 59 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -563,9 +569,32 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### feat/calculate-hint (`bca3d9d23`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_calc_hint`**
+  > When “Recalculate automatically” is on, this command is not needed.
+  @@ NEEDS RULING
+- **`lpn_calc_hint_mute`**
+  > Don’t show this again
+  @@ NEEDS RULING
+
 ### feat/desktop (`baba0f04d`) — adds no English strings
 
-### feat/sqlite-reader (`0c85b385c`) — 53 new, 10 to read @@ NEEDS RULING
+### feat/import-export-receipts (`9b361e3b2`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_calib_scenario`**
+  > Compared with the results of the scenario {scenario}.
+  @@ NEEDS RULING
+- **`lpn_pane_pasted_overrides`**
+  > Overrides added ({n}).
+  @@ NEEDS RULING
+- **`lpn_run_of_scenario`**
+  > Results of the scenario {scenario}.
+  @@ NEEDS RULING
+
+### feat/native-eps-3 (`8ba86b1a0`) — adds no English strings
+
+### feat/sqlite-reader (`192fa5a63`) — 53 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_file_import_wtg`**
   > WaterCAD or WaterGEMS model…
@@ -607,7 +636,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > These pipes have a check valve and start closed. They were imported closed.
   _Ruled OK 2026-10-20._
 - **`lpn_wtg_note_directed_split`**
-  > In WaterGEMS a pump or valve is a node between pipes. Each of these was imported as a pump or valve link between two new junctions at its elevation, named after it with -U (upstream) and -D (downstream). The pipe the model calls downstream joins the -D junction and every other pipe at the node joins the -U junction, as WaterGEMS does in its own EPANET file.
+  > WaterGEMS models each pump and valve as a node. Each was imported as a pump or valve link between two new junctions at the node's location and elevation, as in WaterGEMS's own EPANET export. The junctions take the node's WaterGEMS ID number with the suffix -A (inlet side) or -B (outlet side), listed in parentheses. The pipe WaterGEMS designates as downstream connects to the -B junction; all other pipes at the node connect to the -A junction.
   @@ NEEDS RULING
 - **`lpn_wtg_note_element_unread`**
   > Not imported: these elements, of a kind this page does not model. The kind is shown in parentheses.
@@ -726,5 +755,11 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_wtg_working`**
   > Reading {file}…
   _Ruled OK 2026-10-20._
+
+### feat/value-source (`e1b009518`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_ovm_dot_set_from`**
+  > Inherited from {name}. Click to make it an override in this scenario, holding the value shown.
+  @@ NEEDS RULING
 
 ### fix/bottom-pane-lag (`3bb531211`) — adds no English strings
