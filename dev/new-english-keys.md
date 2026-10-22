@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**17 still to read on master**, of 182 untranslated keys, of 3201 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**22 still to read on master**, of 187 untranslated keys, of 3205 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -29,7 +29,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 Every entry in `dev/plain-sentences.md` matches the English it was written against.
 
-## lpn_  (182, 17 to read @@ NEEDS RULING)
+## lpn_  (187, 22 to read @@ NEEDS RULING)
 
 - **`lpn_at_time`**
   > {value} at {time}
@@ -169,6 +169,9 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_dur_start`**
   > Fire starts at
   _Ruled OK 2026-10-20._
+- **`lpn_dxf_exported_geo_tail`**
+  > Its coordinates are {crs}, in meters, not latitude and longitude.
+  @@ NEEDS RULING
 - **`lpn_ex_net1_scn_desc`**
   > Gallons per minute, with feet and inches. EPANET's Net1 with four scenarios under Base, the average day: Max day (demand multiplier 1.5) and Peak hour (2.25), each with a main break child, and the two children share one alternative. To test fire flow, make Max day current, select junction 23, choose Water, Analyze, Fire flow analysis, and enter a Required fire flow of 1,500 gpm.
   _Ruled OK 2026-10-20._
@@ -196,6 +199,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_export_leaves_alternatives`**
   > The alternatives stored in this project are not in the file.
   _Ruled 2026-10-18: GeoJSON alternatives string is approved._
+- **`lpn_export_receipt_heading`**
+  > Exported {file} from {scenario} of {project}.
+  @@ NEEDS RULING
+- **`lpn_export_receipt_note`**
+  > This is an export, not a save: this project is not connected to the file.
+  @@ NEEDS RULING
 - **`lpn_ff_at_all`**
   > Worst of {n} reporting steps. Each row shows the step with the lowest available flow for that junction.
   _Ruled OK 2026-10-20._
@@ -424,6 +433,12 @@ Every entry in `dev/plain-sentences.md` matches the English it was written again
 - **`lpn_msx_too_big`**
   > {file} is too large to keep in browser storage, so it was not attached.
   _Ruled OK 2026-10-20._
+- **`lpn_ovl_clear_same`**
+  > Clear overrides equal to inherited
+  @@ NEEDS RULING
+- **`lpn_ovl_clear_same_ask`**
+  > Clear the overrides of {name} that equal the inherited value ({n} total)? Each value stays as it is and is inherited again. Undo reverses this.
+  @@ NEEDS RULING
 - **`lpn_pane_pasted_overrides`**
   > New overrides ({n}).
   @@ NEEDS RULING
@@ -757,12 +772,12 @@ build for that would be a gate nobody keeps. Refresh it with
   > Reading {file}…
   _Ruled OK 2026-10-20._
 
-### feat/theme-default (`c926197b3`) — adds no English strings
-
-### feat/value-source (`e1b009518`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/value-source (`7fc9e5a41`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_ovm_dot_set_from`**
   > Inherited from {name}. Click to make it an override in this scenario, holding the value shown.
   @@ NEEDS RULING
+
+### feat/wtg-export (`431463258`) — adds no English strings
 
 ### fix/bottom-pane-lag (`3bb531211`) — adds no English strings
