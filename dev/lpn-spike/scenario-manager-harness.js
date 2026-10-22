@@ -62,7 +62,7 @@ const INJECT =
 	"\t\tbasicMode: function () { return scenarioBasicMode; }, setBasicMode: setScenarioBasicMode,\n" +
 	"\t\tlastNotice: function () { return lastNoticeText; }, promote: promoteImplicitAlternative,\n" +
 	"\t\talternativeFor: alternativeFor, libInactiveIds: libInactiveIds, smInUseBy: smInUseBy, smInUseText: smInUseText,\n" +
-	"\t\toverrideCount: overrideCount, smSharedText: smSharedText, scenarioTableCols: scenarioTableCols, scenarioTableRows: scenarioTableRows,\n" +
+	"\t\toverrideCount: overrideCount, smStoredIn: smStoredIn, scenarioTableCols: scenarioTableCols, scenarioTableRows: scenarioTableRows,\n" +
 	"\t\tsmImplicitKey: smImplicitKey, onlyInThisScenario: onlyInThisScenario, deleteElement: deleteElement, noticeLog: function () { return noticeLog; },\n" +
 	"\t\ttouchTree: touchTree, ovKey: ovKey, smParseCell: smParseCell, scenarioById: scenarioById, basicModeMisfit: basicModeMisfit,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
@@ -345,9 +345,11 @@ async function run(mutate, quiet) {
 	ok('10.3 the label and tip', /\d/.test(L.smUsedByText('demand', kept.id).text) && /Q/.test(L.smUsedByText('demand', kept.id).tip));
 	ok('10.4 nothing is inactive, so no standing control note', L.libInactiveIds('control').length === 0);
 	L.switchScenario(Q.id);
-	ok('10.5 an override written into a shared alternative says who else uses it', /Copy_of_Q_2/.test(L.smSharedText(['demand'])) && !/\bQ\b/.test(L.smSharedText(['demand']).replace('Copy_of_Q_2', '')), L.smSharedText(['demand']));
-	ok('10.6 ...nothing for a category it does not share, nor in Base', L.smSharedText(['physical']) === '' && (L.switchScenario(BASE), L.smSharedText(['demand']) === ''));
-	ok('10.7 ...and nothing for a scenario writing to its own values', (L.switchScenario(R.id), L.smAssign(R.id, 'demand', ''), L.smSharedText(['demand']) === ''));
+	// The names of the other scenarios using what the open scenario writes to ('' for none), from smStoredIn().
+	function sharedWith(cats) { const r = L.smStoredIn(cats); return r ? r.users.join(', ') : ''; }
+	ok('10.5 an override written into a shared alternative says who else uses it', /Copy_of_Q_2/.test(sharedWith(['demand'])) && !/\bQ\b/.test(sharedWith(['demand']).replace('Copy_of_Q_2', '')), sharedWith(['demand']));
+	ok('10.6 ...nothing for a category it does not share, nor in Base', sharedWith(['physical']) === '' && (L.switchScenario(BASE), sharedWith(['demand']) === ''));
+	ok('10.7 ...and nothing for a scenario writing to its own values', (L.switchScenario(R.id), L.smAssign(R.id, 'demand', ''), sharedWith(['demand']) === ''));
 	L.switchScenario(BASE);
 
 	say('--- 10a. the override count includes what an assigned alternative brings ---');
