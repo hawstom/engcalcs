@@ -245,16 +245,19 @@ Ranked by how likely a visitor is to be wrong afterwards, and how much work is l
    the screen holds a stale snapshot of the scenario last calculated, while the values and the stored
    `scenario` name are the open scenario's. **Likely, not reproduced.** Fix: attach results only when
    they belong to the open scenario, or name the scenario they belong to. GeoJSON and DXF file names
-   also lack the scenario that `.inp` has.
+   also lack the scenario that `.inp` has. **Built** (`scenario-receipt-browser-harness.js` R1, R2).
 3. **Survey points imported in a scenario other than Base exist only there** (9). The nodes are
    inactive in Base; the visitor sees them, switches to Base, and they are gone. Nothing said which
-   scenario received them. Fix: a first line in the report; later the wizard.
+   scenario received them. Fix: a first line in the report; later the wizard. **Built** (`lpn_survey_added_scenario`, R3).
 4. **Tables paste into a scenario makes overrides without saying so** (18). A pasted column of 400
    diameters in Peak becomes 400 overrides; the notice counts cells but names no scenario and does
-   not say they are overrides. Fix: the receipt wording above.
+   not say they are overrides. Fix: the receipt wording above. **Built**: the notice names the scenario, says the values are overrides, and counts those added ("Overrides added (n)."); `import-export-receipts-browser-harness.js` F3.
 5. **Full report, Run report and Calibration are tied to "the last run"** (31-33, 15). The file name
    and the comparison do not say which scenario that run was. Not traced to the row level. Fix: name
-   the scenario in the file name and heading.
+   the scenario in the file name and heading. **Built**: the Full report (box note, printed heading, CSV
+   name), the Run report and the Calibration report name the scenario of the run (`_scn` on the last
+   solve), only when the project holds more than Base; Base keeps the bare file name
+   (`import-export-receipts-browser-harness.js` F1, F2, F4).
 6. **A GeoJSON file this page wrote is "read as written" and its `scenario` property is ignored** (8).
    The scenario's values become Base of a new project with no mention. Folded into 7 and 8 under the
    standard (their receipt says "as the Base scenario").

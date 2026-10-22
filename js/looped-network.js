@@ -33618,7 +33618,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			srcRows, srcCols = 0, nRows, nCols, r, cIdx, line, txt, lineOffset = 0,
 			wrote = 0, refused = 0, dropped = 0, col, el, canCreate = paneCanCreate(spec),
 			creates = [], plan, made, created = [], firstId, i,
-			overflow = (opts && opts.overflow) || '', mayAsk = false, extra;
+			overflow = (opts && opts.overflow) || '', mayAsk = false, extra,
+			ovBefore = overrideCount(activeScenario());
 		// **APPENDING, EVERY LINE IS A NEW ROW**, read from the table's first column, and the block
 		// begins past the last existing row so not one of them can be written.
 		if (opts && opts.append) {
@@ -33728,8 +33729,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// eleven read-only cells is a paste the user believes landed. A paste that made rows says
 		// how many, because a clerk who typed 400 rows needs to know 400 landed, not how many
 		// cells changed.
-		var pasteScn = activeScenario(), pasteTail = (pasteScn && !pasteScn.isBase && (wrote || created.length))
-			? ' ' + String(pc.lpn_pane_pasted_scenario || 'These values are overrides in the scenario {scenario}.').split('{scenario}').join(scenarioDisplayName(pasteScn)) : '';
+		// The count is of NEW overrides only, and is left out at zero: a paste over cells that were
+		// already overrides would otherwise read "Pasted cells (3) ... (0)", a seeming contradiction.
+		var pasteScn = activeScenario(), pasteNew = pasteScn ? Math.max(0, overrideCount(pasteScn) - ovBefore) : 0,
+			pasteTail = (pasteScn && !pasteScn.isBase && (wrote || created.length))
+			? ' ' + String(pc.lpn_pane_pasted_scenario || 'These values are overrides in the scenario {scenario}.').split('{scenario}').join(scenarioDisplayName(pasteScn))
+			+ (pasteNew ? ' ' + String(pc.lpn_pane_pasted_overrides || 'New overrides ({n}).').replace('{n}', String(pasteNew)) : '') : '';
 		if (created.length) {
 			setNotice(String(refused + dropped
 				? (pc.lpn_pane_pasted_rows_skipped || 'Pasted rows ({n}). Rows added to the network ({created}). Cells not changed ({skipped}).')
@@ -81420,6 +81425,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		return !!box && box.style.display !== 'none' && box.style.display !== '';
 	}
 	/** The engine's own report for the last run, or '' -- js/lpn-time.js owns it. */
+	function showRunReportScenario() {
+		var el = document.getElementById('lpn_rptbox_scn'), line = lastRunScenarioLine('lpn_run_of_scenario', 'Results of the scenario {scenario}.');
+		if (!el) { return; }
+		el.textContent = line;
+		el.style.display = line ? '' : 'none';
+	}
 	function lastRunReportText() {
 		return (EngCalcs.lpnTimeLastReport && EngCalcs.lpnTimeLastReport()) || '';
 	}
@@ -81443,6 +81454,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		closeMenu();
 		hideOpenTips();
 		pre.textContent = text || noReport;
+		showRunReportScenario();
 		box.style.display = 'flex';
 		// Centred the first time, remembered after that (Tom, 2026-09-08) -- placeBoxRemembered().
 		placePanelForScreen(box, function () { placeBoxRemembered(box, rptboxLayout); });
@@ -81519,6 +81531,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// blanking it: an empty <pre> under a title claiming a report is the empty box this page
 		// refuses to show anywhere else.
 		if (lastRunReportText()) { pre.textContent = lastRunReportText(); }
+		showRunReportScenario();
 	}
 	function closeEnergyBox() {
 		hidePanel(energyBoxEl());
@@ -83364,8 +83377,30 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		document.body.removeChild(a);
 		setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
 	}
+	/**
+	 * **THE SCENARIO THE LAST RUN WAS OF** (Task 814, defect 5). The Full report, the EPANET run
+	 * report and the Calibration report all read "the last run", which with Recalculate off need not
+	 * be the open scenario. The solve is tagged with its scenario (`_scn`); this returns that
+	 * scenario's name, or '' when the run is untagged or the project holds only Base (nothing to
+	 * tell apart).
+	 */
+	function lastRunScenarioName() {
+		var id = lastSolveResult && lastSolveResult._scn, i;
+		if (!id || scenarios.length < 2) { return ''; }
+		for (i = 0; i < scenarios.length; i++) {
+			if (scenarios[i].id === id) { return scenarioDisplayName(scenarios[i]) || id; }
+		}
+		return '';
+	}
+	function lastRunScenarioLine(key, fallback) {
+		var name = lastRunScenarioName(), pc = EngCalcs.pageConfig || {};
+		return name ? String(pc[key] || fallback).split('{scenario}').join(name) : '';
+	}
 	function fullReportFilename(ext) {
-		var name = sanitizeFilename((typeof project === 'object' && project && project.name) || 'Project');
+		var name = sanitizeFilename((typeof project === 'object' && project && project.name) || 'Project'),
+			scn = lastRunScenarioName(), id = lastSolveResult && lastSolveResult._scn;
+		// Base keeps the project name alone, as the .inp export does.
+		if (scn && id !== 'base') { name += '-' + sanitizeFilename(scn); }
 		return name + '-Full report.' + ext;
 	}
 	function downloadFullReportCsv() {
@@ -83383,6 +83418,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		h = document.createElement('h2');
 		h.textContent = pc.lpn_full_title || 'Full report';
 		wrap.appendChild(h);
+		if (lastRunScenarioName()) {
+			h = document.createElement('h3');
+			h.textContent = lastRunScenarioLine('lpn_run_of_scenario', 'Results of the scenario {scenario}.');
+			wrap.appendChild(h);
+		}
 		if (!rows.length) {
 			h = document.createElement('p');
 			h.textContent = pc.lpn_full_needs_run || 'The full report lists every node and every link at every reporting time step. Press Calculate, then open Water, Reports, Full.';
@@ -83478,6 +83518,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		frames = reportFrames();
 		if (!frames.length && lastSolveResult) { frames = [lastSolveResult]; }
+		if (lastRunScenarioName()) {
+			ffEl('p', 'lpn-ff-note', lastRunScenarioLine('lpn_run_of_scenario', 'Results of the scenario {scenario}.'), host).id = 'lpn_full_scenario_note';
+		}
 		ffEl('p', 'lpn-ff-note', pc.lpn_full_note || 'One row per node or link per reporting time step, in the units shown on the Tables pane. A blank cell is a column that quantity does not have. Download or print carries every time step; the table below shows one at a time.', host);
 		ffEl('p', 'lpn-ff-note', (pc.lpn_full_row_count || 'Rows ({n}).').replace('{n}', String(rows.length)), host);
 		if (fullReportStepIndex >= frames.length || fullReportStepIndex < 0) { fullReportStepIndex = 0; }
@@ -83677,6 +83720,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_file || '{file}: measurements ({n}) at locations ({m}).')
 			.replace('{file}', file.name).replace('{n}', String(file.parsed.obs.length))
 			.replace('{m}', String(file.parsed.order.length)), host);
+		if (lastRunScenarioName()) {
+			ffEl('p', 'lpn-ff-note', lastRunScenarioLine('lpn_calib_scenario', 'Compared with the results of the scenario {scenario}.'), host).id = 'lpn_calib_scenario_note';
+		}
 		if (unit) {
 			ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_units || 'The file\'s values are read in this project\'s units: {unit}.')
 				.replace('{unit}', unit), host).id = 'lpn_calib_units_note';

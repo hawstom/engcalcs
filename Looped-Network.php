@@ -1466,6 +1466,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<button type="button" id="lpn_rptbox_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
 		<div class="lpn-box-tools"><button type="button" id="lpn_rptbox_copy" class="lpn-rptbox-copy"><?=$ec_lang['lpn_time_run_report_copy']?></button></div>
+		<p id="lpn_rptbox_scn" class="lpn-ff-note" style="display:none"></p>
 		<pre id="lpn_rptbox_pre" class="lpn-rptbox-pre"></pre>
 	</div>
 </div>
@@ -2338,6 +2339,9 @@ EngCalcs.pageConfig = {
 	lpn_geojson_results_other: <?=json_encode($ec_lang['lpn_geojson_results_other'])?>,
 	lpn_survey_added_scenario: <?=json_encode($ec_lang['lpn_survey_added_scenario'])?>,
 	lpn_pane_pasted_scenario: <?=json_encode($ec_lang['lpn_pane_pasted_scenario'])?>,
+	lpn_pane_pasted_overrides: <?=json_encode($ec_lang['lpn_pane_pasted_overrides'])?>,
+	lpn_run_of_scenario: <?=json_encode($ec_lang['lpn_run_of_scenario'])?>,
+	lpn_calib_scenario: <?=json_encode($ec_lang['lpn_calib_scenario'])?>,
 	lpn_find_menu: <?=json_encode($ec_lang['lpn_find_menu'])?>,
 	lpn_copy_props_menu: <?=json_encode($ec_lang['lpn_copy_props_menu'])?>,
 	lpn_copy_props_done: <?=json_encode($ec_lang['lpn_copy_props_done'])?>,
