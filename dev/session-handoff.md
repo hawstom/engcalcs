@@ -106,7 +106,7 @@ lines rather than appending corrections.
 
 ### Branches waiting on him (ports in ~/webdev/worktrees/_panel/ports.conf)
 
-- `feat/sqlite-reader` (8104, Task 749): Bentley-style pump/valve junctions (46-A/46-B coincident), Unbalanced Continue, continuous-pattern start fixed, pattern-averaging caveat in the report; fixture is his 18:46 save copied to `~/webdev/fixtures/wtg-tgh-1/` (he keeps it stable). Perry passed it. Owed by him: where he read "12 psi" (WaterGEMS's saved PMP-1 head change is -5.8 psi at step 0); whether to import WaterGEMS's hourly-averaged continuous patterns instead of Bentley's export values. Summaries: `_panel/www/img/sqlite-pmp1-summary.md`.
+- `feat/sqlite-reader` (8104, Task 749): Bentley-style pump/valve junctions (46-A/46-B coincident), Unbalanced Continue, continuous-pattern start fixed, pattern-averaging caveat in the report; fixture is his 18:46 save copied to `~/webdev/fixtures/wtg-tgh-1/` (he keeps it stable). Perry passed it. Owed by him: where he read "12 psi" (WaterGEMS's saved PMP-1 head change is -5.8 psi at step 0); whether to import WaterGEMS's hourly-averaged continuous patterns instead of Bentley's export values. Summaries: the sqlite-pmp1-summary page on the panel (localhost:8080/img/).
 - `feat/calculate-hint` (8101): the page's standard dialog; Perry passed it. Stores `lpn_calchint` (told him).
 - `feat/import-export-receipts` (8103, Task 814 items 4-5): reports name the run's scenario; "New overrides (n)." Perry passed it.
 - `feat/value-source` (8105, Sue's wish): hollow-dot tip "Inherited from {name}."
