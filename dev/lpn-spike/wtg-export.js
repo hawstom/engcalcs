@@ -713,8 +713,9 @@ if (require.main === module) {
 		const variants = [
 			{ dir: '1-tiny', name: 'Tiny', inp: path.join(ref, 'wtg-export-tiny.inp'), controls: true },
 			{ dir: '2-net3-hour-zero', name: 'Net3', inp: path.join(ref, 'Net3.inp'), controls: false },
-			{ dir: '3-net3', name: 'Net3', inp: path.join(ref, 'Net3.inp'), controls: true }
-		];
+			{ dir: '3-net3', name: 'Net3', inp: path.join(ref, 'Net3.inp'), controls: true },
+			{ dir: '4-valves-and-more', name: 'Parts', inp: path.join(ref, 'wtg-export-parts.inp'), controls: false }
+		].filter((v) => !args.only || args.only.split(',').indexOf(v.dir) >= 0);
 		for (const v of variants) {
 			const inpText = fs.readFileSync(v.inp, 'utf8');
 			const parsed = EngCalcs.lpnInpParse(inpText);

@@ -65,15 +65,16 @@ Net3 is US customary, GPM, Hazen-Williams, 24 h extended period at a 1 h step. T
 |---|---|---|
 | Title | `HMIDomainDataSet.Notes`; Name = the file name | |
 | Junction (92) | `IdahoJunction` (element type 55) | Elevation ft to `Physical_NodeElevation`. Base demand gpm to ft3/s (x 0.00222800929672, measured from Tom's file) as a row of `IdahoDemandNode_Demand_DemandCollection`, with the pattern's element ID. A junction on the default pattern gets it named explicitly. |
-| Reservoir (2: River, Lake) | `IdahoReservoir` (56) | Head to `Physical_NodeElevation` (WaterGEMS's reservoir elevation is its grade). |
-| Tank (3) | `ConventionalTank` (52), circular, operating range by elevation | Base elevation = Net3 elevation; minimum / maximum / initial elevation = elevation + level; diameter ft; area from the diameter. |
+| Reservoir (2: River, Lake) | `IdahoReservoir` (56) | Head to `Physical_NodeElevation` (WaterGEMS's reservoir elevation is its grade). A head pattern is the `Physical_HglPattern` reference (unverified in WaterGEMS: that it multiplies the head the way EPANET's does). |
+| Tank (3) | `ConventionalTank` (52), circular, operating range by elevation | Base elevation = Net3 elevation; minimum / maximum / initial elevation = elevation + level; diameter ft; area from the diameter. A **volume curve** makes it a variable-area tank (`TankSection` 2): depth ratio = (depth - minimum level) / (maximum - minimum), volume ratio = (volume - volume at minimum) / active volume, inactive volume = volume at the minimum level (Tom's TGH-1 scenario against its `.inp`). |
 | Pipe (117) | `IdahoPipe` (69) | Ends in `BaseLink_HMIDataSetTopology_Data`; length as a *user-defined* length (flag 1, so the stated length is used, not the drawn one); diameter in to ft; Hazen-Williams C; minor loss K in both minor-loss fields; status Open/Closed to `PipeStatus` 0/1; a check valve to `Physical_HasCheckValve`. |
+| Valve (PRV, PSV, PBV, FCV, TCV, GPV) | **A valve node** (types 64, 65, 66, 60, 61, 62) **between two pipes** `<id>-A`, `<id>-B`, as a pump is | Diameter in to ft; pressure settings psi (as the `.inp` states them, with the HGL beside them); FCV gpm to ft3/s; TCV loss coefficient; GPV a headloss curve (support type 63; flow to ft3/s, head ft). The node's elevation is the downstream node's, because an EPANET pressure valve states its setting there. A closed valve closes its upstream pipe. All measured against Tom's saved TGH-1 and its `.inp` export. |
 | Pump (2) | **A pump node** `StandardPump` (68) **between two pipes** | See below. |
 | Pump curve (2, three points) | `IdahoPumpDefinition` (support type 51), type 2 "standard three point" | Point 0 is the shutoff head; point 1 the design flow and head; point 2 the maximum operating flow and head. Constant pump efficiency from `[ENERGY]` (75), motor efficiency 100. |
 | Patterns (5) | `IdahoPattern` (support type 50), stepwise | Starting multiplier = first value; point k states the value from k hours on; the last point closes the cycle with the first value again (the convention found by matching TSNet's `tnet3` pattern against its `.inp`). |
 | Controls (6) | `IdahoControl` / `IdahoControlCondition` / `IdahoControlAction` (support types 54 / 56 / 55) | See "Controls". |
 | `[TIMES]` | `EpaNetEngine_TimeAnalysisType_EpsType`: duration 86400 s, hydraulic step 3600 s | Start 00:00. The template already read EPS 24 h / 1 h; the writer states it. |
-| `[OPTIONS]` | `EpaNetEngine`: Hazen-Williams (`FrictionMethod` 1), specific gravity 1.0, kinematic viscosity 1.1e-5 ft2/s (EPANET's relative viscosity 1.0), extra iterations 10 | Trials 40, accuracy 0.001, check frequency 2, check cut-off 10, damping limit 0, emitter exponent 0.5 were already the template's defaults, equal to Net3's. |
+| `[OPTIONS]` | `EpaNetEngine`: Hazen-Williams (`FrictionMethod` 1), specific gravity and relative viscosity as the file states them (Net3: 1.0 and 1.0; kinematic viscosity is the relative value x 1.1e-5 ft2/s), extra iterations 10 | Trials 40, accuracy 0.001, check frequency 2, check cut-off 10, damping limit 0, emitter exponent 0.5 were already the template's defaults, equal to Net3's. |
 | `[COORDINATES]` | `HMIGeometry`, a WKB point in feet | EPANET map units have no unit. One scale for the whole map, 750 ft per unit, is the median of (stated pipe length / drawn distance). Lengths do not depend on it. |
 | Labels | `HMIModelingElement.Label` = the EPANET ID; `SmartLabel` = the label with each run of digits padded to seven | The ID column (a number, 31 upward) is separate from the label, as in WaterGEMS. |
 
@@ -111,9 +112,8 @@ import already keeps). In the spike they are in `report.notCarried`.
 | Energy price and price pattern | not written | price 0 |
 | Pipe material, install year | no EPANET field | every pipe keeps the template's default material (Ductile Iron) |
 | Emitter coefficient | storage unit not measured | none in Net3 |
-| Tank volume curve, minimum volume, mixing model | codes written but untested | none in Net3 |
-| Reservoir head pattern, pump speed pattern | tables exist, unproven | none in Net3 |
-| Valves of any kind | prototypes exist in the template (PRV 64, PSV 65, PBV 66, FCV 60, TCV 61, GPV 62) but not written | none in Net3 |
+| Tank minimum volume (a volume curve is carried), mixing model | the minimum-volume column is not kept by our `.inp` reader; mixing codes unseen | none in Net3 |
+| Pump speed pattern, constant-power and multiple-point pumps | tables exist, no sample states them | none in Net3 |
 | Pumps other than three-point (power, multiple point, custom) | tables exist | none in Net3 |
 | Non-US units | storage units measured for US only | |
 | Scenarios and their overrides | not written (see below) | Net3 has none |
@@ -124,6 +124,10 @@ import already keeps). In the spike they are in `report.notCarried`.
 `node dev/lpn-spike/wtg-export-harness.js` (needs Tom's fixture and the reader from `feat/sqlite-reader`;
 prints NOT RUN without them):
 
+- `wtg-export-parts.inp` (every valve kind, a pump at speed 0.9, a head-pattern reservoir, a volume-curve tank), and
+  Tom's own TGH-1 `.inp` export, are written, read back (settings, GPV curve, volume curve, speed, pattern) and run
+  in EPANET at accuracy 0.00001: 0.0004 ft and 0.002 gpm for the first; 0.0007 ft and 0.009 gpm for the second
+  except hour 1, where EPANET settles the two networks into different valid pressure-valve states (5.4 ft).
 - Net3 written: 92 junctions, 2 reservoirs, 3 tanks, 117 pipes, 2 pumps (each with 2 added pipes),
   5 patterns, 2 pump definitions, 6 controls. 220 live elements, none soft-deleted, 406 tables as in the
   template.
@@ -226,6 +230,98 @@ from a sample, and a failure to open gives the user nothing, where the `.inp` al
 to keep the `.inp` as the baseline and treat the `.wtg` export as the carrier for scenarios and the extra
 data**, built only if Tom's test shows WaterGEMS accepts what we write. If the test fails at the first file,
 the answer to "are we aiming to interoperate through `.inp` files" is yes, by default.
+
+## The drawing size ("the elements come in very tiny")
+
+**Cause.** WaterGEMS draws a symbol 4 ft across and text 4 ft high (public Bentley documentation: the default
+symbol height is 4.0 ft in real-world units and the default annotation is 0.1 in at the plot scale), times two
+numbers in the `.wtg`'s `DrawingOptions`: `SymbolSizeMultiplier` and `TextHeightMultiplier`. The template
+carried 1 and 1, which is right for Tom's TGH-1, a model 410 ft across. Net3 as we draw it is 27,645 ft across,
+so a 4 ft symbol is 1/7,000 of the map. The openly licensed samples show the remedy people use: Zenodo 7162154
+(4,600 ft) carries 10 and 10, TSNet's `tnet3` (26,000 ft) carries 20 and 20, and a consulting firm's model
+(13,000 ft) carries scale 6000 with multipliers 1. The scaled-drawing flag, `Scale` 480 and `ScaleSI` 500 are the same in
+every file and were not the cause.
+
+**Fix.** `patchWtgXml` sets both multipliers to extent / 500 ft (at least 1), which keeps the template's
+symbol-to-map proportion: Net3 gets 55, the tiny network 8. The harness checks it. Unverified: that the
+symbols then look right in WaterGEMS (Tom's eye on `wtg-export-2/1-net3`).
+
+## Inventory: EPANET against what the writer exports
+
+"Writes" means written and read back by our reader, and (where it affects hydraulics) agreed with EPANET over 24 h
+by the harness. "Evidence" is what shows how WaterGEMS stores it.
+
+| EPANET item | Writes today | Evidence for how WaterGEMS stores it | Can we write it without a new file from Tom |
+|---|---|---|---|
+| `[JUNCTIONS]`, demand, pattern | yes | Tom's fixture, Zenodo, TSNet | done |
+| Several demands on one junction | no (first only) | the table is a collection (`IdahoDemandNode_Demand_DemandCollection`), one row per demand | yes, same table, more rows; not done because the parser keeps one |
+| `[EMITTERS]` | no | column `Physical_EmitterCoefficient` exists (all zero in every file); no `.inp` pairs a nonzero value with its stored number, so the storage unit is unknown | **no: ask 2** |
+| `[RESERVOIRS]` head, pattern | head yes; pattern yes | column `Physical_HglPattern` (reader reads it); no sample states a nonzero one | written; semantics unproven in WaterGEMS |
+| `[TANKS]` cylindrical | yes | all samples | done |
+| `[TANKS]` volume curve | yes | Tom's TGH-1 child scenario against `WTG-export-tgh-1-TGH-1.inp` | done |
+| `[TANKS]` minimum volume, mixing | no | mixing is a coded integer (`TankMixingModel`, 1 = mixed, no other value seen) | mixed only; others need a sample |
+| `[PIPES]` open, closed, check valve | yes | Tom's fixture, Zenodo | done |
+| `[PUMPS]` three-point HEAD curve | yes | Tom's fixture, Zenodo | done |
+| `[PUMPS]` SPEED | yes | `InitialSettings_RelativeSpeedFactor` | done |
+| `[PUMPS]` multiple-point curve | no | type 5 is read by the reader; no sample with the rows in our hands | **no: ask 3** |
+| `[PUMPS]` POWER, speed PATTERN | no | table `ConstantPowerType_PumpPower` exists, zero in every file | no |
+| `[VALVES]` PRV PSV PBV FCV TCV GPV | yes | Tom's TGH-1 and its `.inp` | done |
+| `[STATUS]` closed pipe, pump, valve | yes (through the upstream pipe) | `PipeStatus` | done |
+| `[PATTERNS]` | yes | Zenodo, TSNet | done |
+| `[CURVES]` pump, headloss, volume | yes | as above | done |
+| `[CURVES]` efficiency curve | constant only | `PumpEfficiencyType` 0 constant, 2 curve (reader reads 2) | a curve: not yet written; no new file needed, but nothing in Net3 uses it |
+| `[ENERGY]` global efficiency | yes | constant efficiency | done |
+| `[ENERGY]` price, price pattern, demand charge | no | `EnergyCost_EnergyPricingID` points at an energy-pricing support element; no sample holds one | no |
+| `[CONTROLS]` AT TIME, AT CLOCKTIME | yes, as clock-time controls | the one sample control (Zenodo) | done; see the warning on control sets below |
+| `[CONTROLS]` IF NODE (tank) BELOW / ABOVE | frozen schedule only | the tables exist (`..._ControlConditionTankType.TankAttribute`, `..._ElementType.ElementType_TankLevel`, `CompareOperator`); the codes are in no file we may use | **no: ask 1** |
+| `[RULES]` | no | composite conditions and an ELSE action tables exist; no codes | no (after ask 1) |
+| `[QUALITY]`, `[REACTIONS]`, `[SOURCES]` | no | trace and constituent tables exist; nothing stored in any file | no |
+| `[TIMES]` duration, hydraulic step, start | yes | | done |
+| `[TIMES]` pattern step, report step | pattern step through each pattern's points; report step not written | `EpsType_ReportingTimeStep` | yes, not done: no effect on results |
+| `[OPTIONS]` friction method | Hazen-Williams only | `FrictionMethod` | Darcy-Weisbach and Chezy-Manning: codes unseen |
+| `[OPTIONS]` specific gravity, viscosity | yes | TGH-1 (0.998 changes a psi setting by 0.2 percent) | done |
+| `[OPTIONS]` trials, accuracy, unbalanced | the template's defaults, which equal EPANET's | | done |
+| `[COORDINATES]`, `[VERTICES]` | yes, in feet at one scale | | done |
+| `[LABELS]`, `[BACKDROP]`, `[TAGS]` | no | | no equivalent worth the effort |
+| Units other than US/GPM | refused | storage units measured for US only | yes in principle: SI conversions are the schema's own storage units |
+
+**Control sets (a warning that needs Tom's eyes).** The only sample control (Zenodo) sits in a project whose
+operational alternative holds a NULL control set (`Operational_SystemData.Operational_IdahoControlSetID`), as
+Tom's fixture and our files do. The reader's own note says a project with a control set holds its controls
+there. If WaterGEMS applies only controls that a control set names, then our six clock controls exist in the
+file but do not fire. Ask 1 answers this at the same time, because it makes WaterGEMS create a control set.
+Until then, `3-net3`'s agreement with EPANET after hour 1 is the thing to look at (the pump `10` should start
+at 1:00).
+
+## The smallest asks of Tom
+
+Three, one thing per file, each starting from the tiny project (`wtg-export/1-tiny/Tiny.wtg`, which Tom has
+already opened) so that nothing has to be drawn. Where a menu name below is a guess it says so; Tom reports
+what he sees instead.
+
+**Ask 1: a tank-level control (closes tank-level controls, and the control-set question).**
+1. Open `Tiny.wtg`. File > Save As: `wtg-control-1`.
+2. Open the controls editor: Components > Controls (if the menu differs, look for "Controls" or for the Operational alternative in the Explorer).
+3. New condition, "simple": element type Tank, element `T1`, attribute Level (or "Tank Level"), operator "less than", value 5 ft. Name it `T1-low`.
+4. A second condition the same way: "greater than", 15 ft, `T1-high`.
+5. New action, "simple": element Pipe `PU1-A`, attribute Status, value Open. Name `Open-pump`. A second action, status Closed, `Close-pump`.
+6. New control (logical): IF `T1-low` THEN `Open-pump`. A second: IF `T1-high` THEN `Close-pump`.
+7. If WaterGEMS has "control sets": make a set containing both controls and make it the active one in the Base operational alternative. If it does not ask, do nothing.
+8. Compute, and note whether the pump pipe closes when the tank passes 15 ft.
+9. File > Save, close WaterGEMS, and send `wtg-control-1.wtg` and `wtg-control-1.wtg.sqlite`.
+
+**Ask 2: an emitter (closes emitters, and the storage unit).**
+1. Open `Tiny.wtg`. File > Save As: `wtg-emitter-1`.
+2. Double-click junction `J1`. Find the Emitter Coefficient field (probably under Physical). Type 5. Note the unit it shows.
+3. File > Save. Then export to EPANET the way you did for `WTG-export-tgh-1-Base.inp`, as `wtg-emitter-1.inp`.
+4. Send the `.wtg`, `.wtg.sqlite` and `.inp`.
+
+**Ask 3: a five-point pump curve (closes multiple-point pumps).**
+1. Open `Tiny.wtg`. File > Save As: `wtg-pump-curve-1`.
+2. Open the pump definition `Pump Curve 1` (Components > Pump Definitions). Change its type to "Multiple Point" (or "Multi-point curve").
+3. Enter five points, flow gpm and head ft: 0 150; 150 140; 300 120; 450 95; 600 60.
+4. File > Save. Export to EPANET as `wtg-pump-curve-1.inp`.
+5. Send the `.wtg`, `.wtg.sqlite` and `.inp`.
 
 ## Reproduce
 
