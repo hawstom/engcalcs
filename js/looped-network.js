@@ -28405,7 +28405,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// status per pipe, so ticking CV opens a closed pipe and ticking Closed ends a check valve; an
 	// unticked CV leaves a closed pipe closed.
 	function paneColCheckValve() {
-		return { key: 'cv', label: 'lpn_result_status_cv', bool: true, em: 2, prop: 'status',
+		return { key: 'cv', label: 'lpn_field_cv', bool: true, em: 2, prop: 'status',
 			get: function (l) { return effective(l, 'status') === 'cv'; },
 			set: function (l, v) {
 				if (v) { setProp(l, 'status', 'cv'); } else if (effective(l, 'status') === 'cv') { setProp(l, 'status', 'open'); }
