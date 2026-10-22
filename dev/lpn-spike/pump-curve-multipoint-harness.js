@@ -201,6 +201,13 @@ const SIX = [[0, 46], [20, 45.5], [40, 43.5], [60, 40], [80, 34], [100, 25]];
 		ok('  ...and the flow really is past it', ref.q.PU / LPS > 80, (ref.q.PU / LPS).toFixed(2) + ' L/s');
 	});
 
+	// The seam with feat/native-eps-3: a custom-curve pump pushed backwards, or unable to lift.
+	await instant('6 points, held above its shutoff head (cannot lift)', SIX, { r2: 160, demand: 0 }, (ref) => {
+		ok('  ...and EPANET really holds it at zero', Math.abs(ref.q.PU / LPS) < 1e-3, (ref.q.PU / LPS).toFixed(4) + ' L/s');
+	});
+	await instant('2 points, held above its shutoff head (cannot lift)', [[0, 40], [80, 20]], { r2: 150, demand: 5 });
+	await instant('6 points at speed 0.8, held near its shutoff head', SIX, { speed: 0.8, r2: 129, demand: 5 });
+
 	console.log('-- extended period (js/lpn-native-run.js)');
 	await extended('6 points, 24 h into a tank', SIX);
 	await extended('2 points at speed 0.95, 24 h into a tank', [[0, 40], [80, 20]], { speed: 0.95 });

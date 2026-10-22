@@ -1,4 +1,4 @@
-// lpn-native-run.js -- THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP, SLICES 1 AND 2 (Task 733, phase 3).
+// lpn-native-run.js -- THE BUILT-IN SOLVER'S EXTENDED-PERIOD LOOP, SLICES 1 TO 3 (Task 733, phase 3).
 //
 // js/lpn-solver.js solves ONE INSTANT. This file walks the clock around it, the way EPANET's own
 // runH()/nextH() loop does (hydraul.c), and holds the one piece of state an instant does not have:
@@ -34,11 +34,20 @@
 //                   its link's status or setting.
 //   setlinkstatus()/pumpcoeff() -- a pump's setting is its speed, applied to the curve by the
 //                   affinity laws (h0 s^2, a s^(2-b)); OPEN is speed 1, CLOSED speed 0.
+// SLICE 3, PUMP SPEED PATTERNS AND A PUMP'S STARTING STATE, also from OWA-EPANET 2.3.5:
+//   demands()       hydraul.c -- at EVERY hydraulic step, before the controls, a pump on a pattern
+//                   is handed that period's multiplier as its speed (setlinksetting()): above 0 it
+//                   OPENS a pump that is shut for any reason, a stated Closed or a control's
+//                   included; exactly 0 shuts an open one. So a control that shuts a pump on a
+//                   pattern holds only until the next step, in EPANET and here alike.
+//   pumpdata()      input3.c -- a pump's SPEED is its starting setting, and a SPEED of 0 is a pump
+//                   that is OPEN at speed 0: no flow (pumpcoeff()), but its status reads open.
 // Times are whole seconds, as EPANET's are.
 //
 // WHAT IT REFUSES, by name, so the caller can hand the network to the EPANET engine exactly as it
 // does for anything the built-in solver cannot do (see EngCalcs.lpnNativeRunRefusals): rules, a
-// pump on a speed pattern, a tank on a volume curve, water quality, EPANET-MSX, pump energy, a
+// speed pattern that is not the page's (a pump without its unscaled curve, a pattern the model
+// lacks, a negative multiplier), a tank on a volume curve, water quality, EPANET-MSX, pump energy, a
 // control on a junction's pressure that acts on a valve, a control conditioned on a reservoir, and
 // what lpnDiagnose refuses of the built-in solver (a pressure-driven demand model). Each one is a
 // later slice (dev/native-eps-plan.md), or a case nobody has asked for that EPANET's own code makes
@@ -98,8 +107,16 @@
 		});
 		add('native-run-control-unsupported', ids);
 		if (model.rules && model.rules.length) { add('native-run-rules', [], true); }
+		// A speed pattern is run only on the page's own model of a pump: the curve at speed 1 beside
+		// it (h0Base/aBase), which is also the only pump js/lpn-epanet.js writes a PATTERN for
+		// (pumpEps). A pump with no curve is a pipe to both engines and its pattern means nothing.
 		ids = [];
-		(model.links || []).forEach(function (l) { if (l.type === 'pump' && l.speedPattern) { ids.push(l.id); } });
+		(model.links || []).forEach(function (l) {
+			var p;
+			if (l.type !== 'pump' || !l.speedPattern || !(l.h0 > 0 || l.a > 0)) { return; }
+			p = ((model.time && model.time.patterns) || []).filter(function (x) { return String(x.id) === String(l.speedPattern); })[0];
+			if (l.h0Base === undefined || !p || (p.multipliers || []).some(function (v) { return !(v >= 0); })) { ids.push(l.id); }
+		});
 		add('native-run-speed-pattern', ids);
 		ids = [];
 		(model.nodes || []).forEach(function (n) {
@@ -164,6 +181,8 @@
 		links = model.links;
 		ls = links.map(linkState);
 		ctl = compileControls(model, links, nodeById, tankById, warnings);
+		var speedPat = [];   // [k, pattern id] of each pump on a speed pattern (slice 3)
+		links.forEach(function (l, k) { if (ls[k].kind === 'pump' && l.speedPattern) { speedPat.push([k, l.speedPattern]); } });
 
 		function mult(patId, time) {
 			var p = patId ? byPat[String(patId)] : null;
@@ -229,6 +248,13 @@
 
 		for (;;) {
 			// ---- hydraul.c runhyd(): demands(), then controls(), then the solve ----
+			// demands()' last loop, setlinksetting() on a pump: the multiplier IS the speed.
+			speedPat.forEach(function (sp) {
+				var st = ls[sp[0]], v = mult(sp[1], htime);
+				st.k = v;
+				if (v > 0 && st.s <= CLOSED) { st.s = OPEN; }
+				if (v === 0 && st.s > CLOSED) { st.s = CLOSED; }
+			});
 			controls(ctl, ls, tankById, htime, tStart);
 			cur = stepNodes(htime);
 			var stepLinks = links.map(function (l, k) { return applyLink(Object.assign({}, l), ls[k]); });
@@ -238,10 +264,14 @@
 			if (opts.tol) { sOpts.tol = opts.tol; }
 			if (ctl.some(function (c) { return c.on === 'junction'; })) { sOpts.pswitch = pswitch(stepLinks); }
 			sOpts.tempClosed = {};
-			ls.forEach(function (st, k) { if (st.s === TEMPCLOSED) { sOpts.tempClosed[links[k].id] = true; } });
+			sOpts.xhead = {};   // and a pump that could not lift starts the next solve shut, as XHEAD does
 			// A check valve the last step shut starts this solve shut, as EPANET carries its status.
 			sOpts.cvClosed = {};
-			ls.forEach(function (st, k) { if (st.kind === 'cv' && st.s === CLOSED) { sOpts.cvClosed[links[k].id] = true; } });
+			ls.forEach(function (st, k) {
+				if (st.s === TEMPCLOSED) { sOpts.tempClosed[links[k].id] = true; }
+				if (st.s === XHEAD && st.kind === 'pump') { sOpts.xhead[links[k].id] = true; }
+				if (st.kind === 'cv' && st.s === CLOSED) { sOpts.cvClosed[links[k].id] = true; }
+			});
 			res = EC.lpnSolve(stepModel, sOpts);
 			if (!res.ok) { return { ok: false, issues: res.issues || [], t: htime }; }
 			readBack(stepModel, stepLinks, ls, res);
@@ -323,8 +353,10 @@
 			st.a = l.aBase !== undefined ? l.aBase : l.a;
 			st.b = l.b;
 			// input3.c changestatus(): a pump stated Closed has setting 0; otherwise its speed.
+			// A page model states its speed (0 included: OPEN at speed 0, pumpdata()); a speed pattern
+			// replaces it at the first step, before anything is solved.
 			st.s = closed ? CLOSED : OPEN;
-			st.k = closed ? 0 : (l.h0Base !== undefined && l.speed > 0 ? l.speed : 1);
+			st.k = closed ? 0 : (l.h0Base !== undefined && l.speed >= 0 ? l.speed : 1);
 			return st;
 		}
 		if (l.type === 'valve') {
@@ -385,12 +417,12 @@
 
 	// What the solve ended with, in EPANET's codes, for the controls to compare.
 	function readBack(stepModel, stepLinks, ls, res) {
-		var tankShut = {}, byId = {}, cvShut = {};
+		var tankShut = {}, xhead = {}, cvShut = {};
 		(res.tankClosed || []).forEach(function (id) { tankShut[String(id)] = true; });
+		(res.pumpXhead || []).forEach(function (id) { xhead[String(id)] = true; });
 		(res.cvClosed || []).forEach(function (id) { cvShut[String(id)] = true; });
-		stepModel.nodes.forEach(function (n) { byId[String(n.id)] = n; });
 		stepLinks.forEach(function (l, k) {
-			var st = ls[k], vs, gain;
+			var st = ls[k], vs;
 			if (st.kind === 'pipe') {
 				if (st.s !== CLOSED) { st.s = tankShut[String(l.id)] ? TEMPCLOSED : OPEN; }
 				return;
@@ -400,13 +432,13 @@
 				return;
 			}
 			if (st.kind === 'pump') {
-				if (st.s === CLOSED || st.k === 0) { return; }
-				// hydstatus.c pumpstatus(): head gain above the speed-adjusted shutoff head is XHEAD;
-				// then tankstatus(), which can shut it as it can any link to a tank.
-				gain = (headOf(l.to) - headOf(l.from)) / FT;
-				st.s = OPEN;
-				if (gain > st.k * st.k * st.h0 / FT + HTOL) { st.s = XHEAD; }
-				if (tankShut[String(l.id)]) { st.s = TEMPCLOSED; }
+				if (st.s === CLOSED) { return; }
+				// linkstatus(): XHEAD and TEMPCLOSED re-open, and a pump at speed 0 is not judged
+				// by pumpstatus(), so it ends the solve OPEN (a speed pattern at 0 shut it already).
+				if (st.k === 0) { st.s = OPEN; return; }
+				// hydstatus.c pumpstatus() (XHEAD, a pump that cannot lift) then tankstatus(), both
+				// decided inside the solve, which reports each (res.pumpXhead, res.tankClosed).
+				st.s = xhead[String(l.id)] ? XHEAD : tankShut[String(l.id)] ? TEMPCLOSED : OPEN;
 				return;
 			}
 			if (st.k === MISSING || !(st.vt === 'PRV' || st.vt === 'PSV' || st.vt === 'FCV')) { return; }
@@ -414,10 +446,6 @@
 			st.s = vs === 'open' ? OPEN : vs === 'closed' ? CLOSED : vs === 'xpressure' ? XPRESSURE :
 				vs === 'xfcv' ? XFCV : ACTIVE;
 		});
-		function headOf(id) {
-			var h = res.heads[id];
-			return typeof h === 'number' ? h : (byId[String(id)] && byId[String(id)].head) || 0;
-		}
 	}
 
 	// input3.c controldata() and input1.c adjustdata(): each control as EPANET holds it. A control
@@ -558,10 +586,10 @@
 			}
 			f.demands[n.id] = n.type === 'junction' ? (n.demand || 0) : 0;
 		});
-		// epanet.c EN_getlinkvalue(EN_STATUS): anything `<= CLOSED` reads closed, a pump at speed 0 too.
+		// epanet.c EN_getlinkvalue(EN_STATUS): anything `<= CLOSED` reads closed. A pump at speed 0
+		// reads OPEN when it is OPEN (a stated SPEED 0); one a control or a pattern set to 0 is CLOSED.
 		model.links.forEach(function (l, k) {
-			var st = ls[k];
-			f.statuses[l.id] = (st.s <= CLOSED || (st.kind === 'pump' && st.k === 0)) ? 'closed' : 'open';
+			f.statuses[l.id] = ls[k].s <= CLOSED ? 'closed' : 'open';
 		});
 		return f;
 	}
