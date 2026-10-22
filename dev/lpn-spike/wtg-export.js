@@ -470,7 +470,8 @@ function writeWtg(SQL, templateBytes, parsed, schedule, opts) {
 	Object.keys(live).forEach((k) => { db.run('UPDATE HMIElementTypeCount SET Count = ? WHERE ElementType = 3 AND ElementTypeID = ?', [live[k], Number(k)]); });
 	Object.keys(supportLive).forEach((k) => { db.run('UPDATE HMIElementTypeCount SET Count = ? WHERE ElementType = 4 AND ElementTypeID = ?', [supportLive[k], Number(k)]); });
 	db.run('UPDATE HMIElementTypeCount SET Count = 1 WHERE ElementType IN (1,2) AND Count > 1');
-	db.run('UPDATE HMIDomainDataSet SET Name = ?, Notes = ?', [opts.name || 'Net3', String(parsed.title || '').trim()]);
+	// A new project identity, so WaterGEMS does not take this for the saved project it was made from.
+	db.run('UPDATE HMIDomainDataSet SET Name = ?, Notes = ?, Guid = randomblob(16)', [opts.name || 'Net3', String(parsed.title || '').trim()]);
 
 	// ---- integrity ----
 	const integ = rowsOf(db, 'PRAGMA integrity_check')[0].integrity_check;
@@ -516,6 +517,8 @@ function patchWtgXml(text, removedScenarios, keepScenario, removedAlternatives) 
 	// Results were computed in the template's own project; the files holding them are not shipped, so
 	// no scenario is marked computed.
 	t = t.replace(/ScenarioComputeStatus="\d+"/g, 'ScenarioComputeStatus="0"');
+	// Likewise a new identity for the presentation file.
+	t = t.replace(/(<StorageFileHeader [^>]*\bId=")[0-9a-f-]{36}(")/, '$1' + require('crypto').randomUUID() + '$2');
 	return t;
 }
 
@@ -561,33 +564,51 @@ async function epanetReference(inpText, watchLinks, snapshotNodes, snapshotLinks
 module.exports = { writeWtg, patchWtgXml, epanetReference, smartLabel, GPM_TO_CFS };
 
 // ---------------------------------------------------------------------------------------------
-// Command line
+// Command line: three files of rising difficulty, so a failure in WaterGEMS says where it began.
+//   1-tiny              reservoir, pump, junction on a pattern, tank (the pump node is the risk)
+//   2-net3-hour-zero    Net3 with its starting statuses and NO controls (every control is the risk)
+//   3-net3              Net3 with the six clock-time controls
 // ---------------------------------------------------------------------------------------------
 if (require.main === module) {
 	(async function () {
 		const args = {};
 		for (let i = 2; i < process.argv.length; i += 2) { args[process.argv[i].replace(/^--/, '')] = process.argv[i + 1]; }
-		if (!args.template) { console.error('usage: node dev/lpn-spike/wtg-export.js --template <x.wtg.sqlite> [--wtg <x.wtg>] [--inp Net3.inp] [--out dir] [--name Net3]'); process.exit(2); }
+		if (!args.template) { console.error('usage: node dev/lpn-spike/wtg-export.js --template <x.wtg.sqlite> [--wtg <x.wtg>] [--out dir]'); process.exit(2); }
 		require('./bootstrap.js');
 		const EngCalcs = require(path.join(ROOT, 'js', 'lpn-solver.js')); global.EngCalcs = EngCalcs;
 		require(path.join(ROOT, 'js', 'lpn-patterns.js')); require(path.join(ROOT, 'js', 'lpn-inp.js'));
 		const initSqlJs = require(require('./wtg-sqljs.js').sqlJsPath());
 		const SQL = await initSqlJs({ wasmBinary: fs.readFileSync(require('./wtg-sqljs.js').wasmPath()) });
-		const inpText = fs.readFileSync(args.inp || path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net3.inp'), 'utf8');
-		const parsed = EngCalcs.lpnInpParse(inpText);
-		const name = args.name || 'Net3', outDir = args.out || path.join(ROOT, 'dev', 'wtg-export-out');
-		fs.mkdirSync(outDir, { recursive: true });
-		const watch = parsed.links.filter((l) => l.type === 'pump').map((l) => l.id).concat(parsed.controls.map((c) => c.link));
-		const watchSet = Array.from(new Set(watch));
-		const ref = await epanetReference(inpText, watchSet, parsed.nodes.map((n) => n.id), parsed.links.map((l) => l.id));
-		const out = writeWtg(SQL, fs.readFileSync(args.template), parsed, { initial: ref.initial, changes: ref.changes }, { name: name, efficiency: Number((/Global Efficiency\s+([\d.]+)/i.exec(inpText) || [])[1]) || 75 });
-		fs.writeFileSync(path.join(outDir, name + '.wtg.sqlite'), out.bytes);
-		if (args.wtg) {
-			const txt = fs.readFileSync(args.wtg, 'utf8');
-			fs.writeFileSync(path.join(outDir, name + '.wtg'), patchWtgXml(txt, out.report.removedChildScenarios, 1, out.report.removedChildAlternatives));
+		const outRoot = args.out || path.join(ROOT, 'dev', 'wtg-export-out');
+		const tplBytes = fs.readFileSync(args.template);
+		const ref = path.join(ROOT, 'dev', 'lpn-spike', 'reference');
+		const variants = [
+			{ dir: '1-tiny', name: 'Tiny', inp: path.join(ref, 'wtg-export-tiny.inp'), controls: true },
+			{ dir: '2-net3-hour-zero', name: 'Net3', inp: path.join(ref, 'Net3.inp'), controls: false },
+			{ dir: '3-net3', name: 'Net3', inp: path.join(ref, 'Net3.inp'), controls: true }
+		];
+		for (const v of variants) {
+			const inpText = fs.readFileSync(v.inp, 'utf8');
+			const parsed = EngCalcs.lpnInpParse(inpText);
+			const watch = Array.from(new Set(parsed.links.filter((l) => l.type === 'pump').map((l) => l.id).concat(parsed.controls.map((c) => c.link))));
+			const r = await epanetReference(inpText, watch, parsed.nodes.map((n) => n.id), parsed.links.map((l) => l.id));
+			const out = writeWtg(SQL, tplBytes, parsed, { initial: r.initial, changes: v.controls ? r.changes : [] },
+				{ name: v.name, efficiency: Number((/Global Efficiency\s+([\d.]+)/i.exec(inpText) || [])[1]) || 75 });
+			const dir = path.join(outRoot, v.dir);
+			fs.mkdirSync(dir, { recursive: true });
+			fs.writeFileSync(path.join(dir, v.name + '.wtg.sqlite'), out.bytes);
+			if (args.wtg) {
+				fs.writeFileSync(path.join(dir, v.name + '.wtg'), patchWtgXml(fs.readFileSync(args.wtg, 'utf8'), out.report.removedChildScenarios, 1, out.report.removedChildAlternatives));
+			}
+			const rows = ['kind,id,hour,head_ft,pressure_psi,demand_gpm,flow_gpm'];
+			Object.keys(r.snapshots).map(Number).sort((a, b) => a - b).forEach((t) => {
+				const sn = r.snapshots[t];
+				parsed.nodes.forEach((n) => { rows.push(['node', n.id, t / 3600, sn.heads[n.id].toFixed(3), sn.pressures[n.id].toFixed(3), sn.demands[n.id].toFixed(3), ''].join(',')); });
+				parsed.links.forEach((l) => { rows.push(['link', l.id, t / 3600, '', '', '', sn.flows[l.id].toFixed(3)].join(',')); });
+			});
+			fs.writeFileSync(path.join(dir, v.name + '-EPANET-results.csv'), rows.join('\n') + '\n');
+			console.log(v.dir, JSON.stringify(out.report.counts), 'integrity', out.report.integrity, 'fk', out.report.foreignKeyViolations);
 		}
-		fs.writeFileSync(path.join(outDir, name + '.export-report.json'), JSON.stringify({ report: out.report, reference: ref }, null, 1));
-		console.log(JSON.stringify(out.report.counts), 'integrity', out.report.integrity, 'fk violations', out.report.foreignKeyViolations);
-		console.log('written to', outDir);
+		console.log('written under', outRoot);
 	}()).catch((e) => { console.error(e); process.exit(1); });
 }

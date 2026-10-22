@@ -198,6 +198,24 @@ function head(t) { console.log('\n' + t); }
 		ok('the XML is still well formed enough to count: equal numbers of < and >', (x.match(/</g) || []).length === (x.match(/>/g) || []).length);
 	} else { console.log('  (no template .wtg found)'); }
 
+	// ---- 7. the smallest network, which is the first file Tom is asked to open ----
+	head('7. The tiny network (reservoir, pump, junction on a pattern, tank)');
+	const tinyText = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'wtg-export-tiny.inp'), 'utf8');
+	const tp = EngCalcs.lpnInpParse(tinyText);
+	const tw = lib.writeWtg(SQL, tplBytes, tp, { initial: {}, changes: [] }, { name: 'Tiny', efficiency: 75 });
+	ok('written, integrity ok', tw.report.integrity === 'ok' && tw.report.foreignKeyViolations === 0 && tw.report.counts.pumps === 1 && tw.report.counts.tanks === 1);
+	const tdb = await EngCalcs.lpnSqliteOpen(Buffer.from(tw.bytes));
+	const trb = EngCalcs.lpnWtgRead(tdb, { display: display, flowUnits: 'GPM' });
+	ok('read back', trb.ok, trb.message);
+	const tids = tp.nodes.map((n) => n.id), tlids = tp.links.map((l) => l.id);
+	const TA = await lib.epanetReference(tinyText, [], tids, tlids), TB = await lib.epanetReference(trb.inp, [], tids, tlids);
+	let th = 0, tq = 0;
+	Object.keys(TA.snapshots).forEach((t) => {
+		tids.forEach((id) => { th = Math.max(th, Math.abs(TA.snapshots[t].heads[id] - TB.snapshots[t].heads[id])); });
+		tlids.forEach((id) => { tq = Math.max(tq, Math.abs(TA.snapshots[t].flows[id] - TB.snapshots[t].flows[id])); });
+	});
+	ok('24 hours: worst head ' + th.toExponential(2) + ' ft, worst flow ' + tq.toExponential(2) + ' gpm', th < 0.01 && tq < 0.1);
+
 	console.log(fails ? '\n' + fails + ' check(s) FAILED:' : '\nall checks passed');
 	process.exit(fails ? 1 : 0);
 }()).catch((e) => { console.error(e); process.exit(1); });
