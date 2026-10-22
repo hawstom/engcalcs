@@ -4154,11 +4154,6 @@
             "ruled": "2026-10-20",
             "answer": "OK."
         },
-        "lpn_inpup_na_cv": {
-            "on": "A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}",
-            "ruled": "2026-10-20",
-            "answer": "OK."
-        },
         "lpn_inpup_na_general": {
             "on": "The file also holds {items}. They were not applied.",
             "ruled": "2026-10-20",
@@ -8647,6 +8642,31 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
+        },
+        "lpn_field_cv": {
+            "on": "Check valve (CV)",
+            "ruled": "2026-10-22",
+            "answer": "Approved."
+        },
+        "lpn_field_cv_tip": {
+            "on": "This pipe passes water only from its start node to its end node, as a check valve does. If the flow would reverse, the pipe closes until it can flow forward again. EPANET calls this status CV.",
+            "ruled": "2026-10-22",
+            "answer": "Approved."
+        },
+        "lpn_time_run_unbalanced": {
+            "on": "Time steps not balanced ({n}).",
+            "ruled": "2026-10-22",
+            "answer": "Approved."
+        },
+        "lpn_time_run_warnings": {
+            "on": "Warnings ({n}).",
+            "ruled": "2026-10-22",
+            "answer": "Approved."
+        },
+        "lpn_time_run_see_report": {
+            "on": "See the {report}.",
+            "ruled": "2026-10-22",
+            "answer": "Approved."
         }
     }
 }

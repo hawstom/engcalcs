@@ -1112,17 +1112,15 @@
 			r = rows[i];
 			if (!r[0]) { continue; }
 			var st = (r[7] || 'OPEN').toUpperCase();
-			// A check valve is a cut element. It is imported as an OPEN pipe -- the same pipe
-			// minus the one-way rule -- because dropping it would disconnect the network, and the
-			// caller reports it so the user knows the direction constraint is gone.
-			if (st === 'CV') { drop('check-valve', [r[0]], null, 'link'); st = 'OPEN'; }
+			// A CHECK VALVE IS KEPT (status 'cv'): a pipe that passes flow only from its start node
+			// to its end node, solved by either engine and written back as CV.
 			var pipe = {
 				id: r[0], type: 'pipe', from: r[1], to: r[2],
 				length: num(r[3]),                    // stays in the FILE's length unit -- see header
 				diameter: num(r[4]),                  // stays in the FILE's pipe-diameter unit
 				roughness: num(r[5]),                 // dimensionless C for H-W; see headloss note
 				k: num(r[6]),
-				status: st === 'CLOSED' ? 'closed' : 'open',
+				status: st === 'CLOSED' ? 'closed' : st === 'CV' ? 'cv' : 'open',
 				verts: []
 			};
 			readDesc(pipe, r);
@@ -3075,6 +3073,8 @@
 				continue;
 			}
 			var status = eff(lk, 'status') === 'closed' ? 'Closed' : 'Open',
+				// EPANET's own token for a check-valve pipe; only a pipe row has the column for it.
+				pipeStatus = lk.type === 'pipe' && eff(lk, 'status') === 'cv' ? 'CV' : status,
 				dia = n(cDia, lk, '_diameter', eff(lk, 'diameter') || 0);
 			if (lk.type === 'valve') {
 				var vt = (lk.valveType || 'TCV').toUpperCase(),
@@ -3154,7 +3154,7 @@
 					dia,
 					n(PLAIN, lk, '_roughness', eff(lk, 'roughness') || 0),
 					minorLossText(lk),
-					status]) + descOf(lk));
+					pipeStatus]) + descOf(lk));
 			}
 			for (j = 0; j < (lk.verts || []).length; j++) {
 				verts.push(row([lk.id,

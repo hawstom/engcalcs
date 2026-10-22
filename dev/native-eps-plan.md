@@ -31,8 +31,15 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
    Tests: `native-eps-harness.js` (Net1 and Net3 with their controls; 15 constructed cases, one
    per control kind, crossings inside a step, a tie) and `native-eps-examples-harness.js` (the
    five gallery examples with controls, through the page's own `assembleModel()`).
-3. **Pump speed patterns and pump status** (`demands()` applies a pump's pattern each period).
-   Test: `pattern-attach.inp`, Net3 with a speed pattern added.
+3. **Pump speed patterns and pump status (built).** `demands()` hands a patterned pump its
+   multiplier as its speed at every hydraulic step, before the controls (`setlinksetting()`); a
+   stated SPEED 0 is open at speed 0; and the built-in solver now has EPANET's `pumpstatus()`
+   (XHEAD, a pump that cannot lift), which it lacked even for one instant. Refused by name: a
+   speed pattern on a pump without the page's unscaled curve, a pattern the model lacks, a
+   negative multiplier. Tests: `native-eps-harness.js` (12 constructed cases, `pattern-attach.inp`,
+   Net3 with patterns on pump 335, on pump 10, and on both with controls stripped) and
+   `native-eps-examples-harness.js` (the five gallery examples with a period and a pump, a speed
+   pattern added to the document).
 4. **`[RULES]`** (`ruletimestep()`, rule step). Test: the Net1 rules examples
    (`net1-rules-harness.js`), rules that fire between hydraulic steps.
 5. **Tank volume curves, minimum volume, overflow** (`tankvolume()` / `tankgrade()` interpolation).
@@ -66,6 +73,23 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
 - Opening a pump by OPEN sets its speed to 1, not back to its stated speed (input3.c controldata()).
 - The one gap measured is not a control's: EPANET's minor loss uses g rounded to 32.2 ft/s2
   (0.02517), so a large TCV coefficient moves heads by millimetres. The TCV case keeps its loss small.
+
+## What slice 3 learned
+
+- A pattern overrides a control every step: `demands()` runs before `controls()` at each
+  hydraulic step, so a timer that shuts a patterned pump holds only until the next step, and a
+  tank control holds it off only because it re-fires each step while the level is over it.
+- A pump stated Closed with a pattern runs from the first step (multiplier above 0 opens it).
+- The built-in solver shut a pump pushed backwards with Y = 0, which kept the trial's reverse
+  flow: 0.61 m and 17.8 L/s wrong on one instant, 91 m over a day. It now evaluates the curve on
+  |Q| as `pumpcoeff()` does and shuts a pump that cannot lift by `pumpstatus()`'s XHEAD test.
+  An XHEAD pump starts the next step shut, as TEMPCLOSED does (`lpnSolve` `xhead`).
+- Net1 with a pattern on pump 9 is 0.63 mm off at one frame (21:00) and 0.03 mm either side: the
+  tank reaches its control level on that report time, and the two engines' whole-second rounding
+  of the time to it falls on opposite sides. Inside the tolerance; noted so nobody chases it.
+- Not this slice's: a pump curve of more than three points is interpolated by EPANET and fitted
+  by the built-in solver (every engine-agnostic solve has this gap), and Elm Street Center differs
+  by 1.8 mm on one instant on master too.
 
 ## Wording
 
