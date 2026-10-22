@@ -365,7 +365,7 @@ function build(unitSet) {
 	console.log('\n--- a choice property is picked from a <select>, in Spanish (Task 708 pre-review) ---');
 	const n = build();
 	const es = {
-		lpn_result_status_open: 'Abierto', lpn_result_status_closed: 'Cerrado',
+		lpn_result_status_open: 'Abierto', lpn_result_status_closed: 'Cerrado', lpn_result_status_cv: 'VR',
 		lpn_field_closed: 'Cerrada',
 		lpn_mixing_mixed: 'Mezcla completa', lpn_mixing_2comp: 'Mezcla en dos compartimentos',
 		lpn_mixing_fifo: 'Flujo pistón FIFO', lpn_mixing_lifo: 'Flujo pistón LIFO'
@@ -378,7 +378,7 @@ function build(unitSet) {
 	L.buildPanel();
 	const statusOptions = L.selectOptions(L.selectAt(L.findControlsBox(), 4));
 	ok('the Find value select offers the Spanish words, not the English codes',
-		JSON.stringify(statusOptions) === JSON.stringify([['open', es.lpn_result_status_open], ['closed', es.lpn_result_status_closed]]),
+		JSON.stringify(statusOptions) === JSON.stringify([['open', es.lpn_result_status_open], ['closed', es.lpn_result_status_closed], ['cv', es.lpn_result_status_cv]]),
 		JSON.stringify(statusOptions));
 	L.chooseOption(L.selectAt(L.findControlsBox(), 4), 'closed');
 	L.pressFind();
@@ -468,7 +468,7 @@ function build(unitSet) {
 	L.chooseOption(L.selectAt(L.findControlsBox(), 2), 'status');
 	const afterBack = L.selectOptions(L.selectAt(L.findControlsBox(), 4));
 	ok('switching back to Shut shows the choice select again',
-		JSON.stringify(afterBack.map(function (o) { return o[0]; })) === JSON.stringify(['open', 'closed']),
+		JSON.stringify(afterBack.map(function (o) { return o[0]; })) === JSON.stringify(['open', 'closed', 'cv']),
 		JSON.stringify(afterBack));
 	ok('...defaulted to the first choice, not left on the empty string the diameter box left behind',
 		L.findValue() === 'open', JSON.stringify(L.findValue()));

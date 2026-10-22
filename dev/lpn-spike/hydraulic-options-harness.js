@@ -425,11 +425,14 @@ function optModel(hyd) {
 		// **THE CHECK VALVE IS NOT DECORATION.** CheckFreq and MaxCheck govern how often EPANET
 		// re-examines a check valve's open/shut state, so a network without one could not possibly
 		// show them acting, and "no effect" measured on it would prove nothing at all.
+		// **IT POINTS A TO C, WITH ITS FLOW**, so the loop stands. Until CV pipes were kept it went
+		// to the engine as an ordinary open pipe; pointed C to A it now shuts, the loop is gone,
+		// Accuracy 1 converges exactly, and CheckFreq/MaxCheck move B by 2e-14 m (measured).
 		links: [
 			{ id: 'P1', type: 'pipe', from: 'R', to: 'A', length: 500, diameter: 0.3, roughness: 130, k: 0, status: 'open' },
 			{ id: 'P2', type: 'pipe', from: 'A', to: 'B', length: 800, diameter: 0.2, roughness: 120, k: 0, status: 'open' },
 			{ id: 'P3', type: 'pipe', from: 'B', to: 'C', length: 600, diameter: 0.15, roughness: 110, k: 0, status: 'open' },
-			{ id: 'P4', type: 'pipe', from: 'C', to: 'A', length: 700, diameter: 0.15, roughness: 110, k: 0, status: 'cv' }
+			{ id: 'P4', type: 'pipe', from: 'A', to: 'C', length: 700, diameter: 0.15, roughness: 110, k: 0, status: 'cv' }
 		]
 	};
 }

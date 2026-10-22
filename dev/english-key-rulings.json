@@ -4154,11 +4154,6 @@
             "ruled": "2026-10-20",
             "answer": "OK."
         },
-        "lpn_inpup_na_cv": {
-            "on": "A check valve status is not supported, so these pipes were read as open and their status was not changed: {ids}",
-            "ruled": "2026-10-20",
-            "answer": "OK."
-        },
         "lpn_inpup_na_general": {
             "on": "The file also holds {items}. They were not applied.",
             "ruled": "2026-10-20",

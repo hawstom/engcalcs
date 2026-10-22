@@ -95,34 +95,26 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-21 (thirty-third session, Arizona time)
+## STATE — 2026-10-21 evening (thirty-fourth session, Arizona time)
 
-### Master: import-export-menu and geojson-into-project merged on his word
-
-- Production is what he last pulled; epanet-plus-plus.org/app was at c375f221 on 2026-10-21.
-- **Canonical landing page is now epanet-plus-plus.org** (Tom, MCP interview m5). Push it like the others.
-- Key audit deleted `lpn_eps_working` and `lpn_msx_replace` (untranslated duplicates) and added the
-  blocking check `new keys not duplicates` (`new_key_duplicate_check.php`, with an allow-list).
-- Interview answers (Tasks 818, 819) are on the roadmap. MCP is slow; WaterGEMS and performance first.
-  Mary's use-case paper answers his two questions: `dev/agents/market-researcher/mcp-use-cases.md`.
-- `feat/label-margin` archived as tag `archive/feat/label-margin` and folded into Task 813's study (his word).
+- Production is what he last pulled; epanet-plus-plus.org/app was at c375f221 on 2026-10-21. **Canonical landing page is epanet-plus-plus.org.**
+- **Report to Tom in `~/tom-files/messenger.md`**, overwritten each time; one line per paragraph, no hard wraps (Tom, 2026-10-21). He empties it between sessions.
 - Still owed: consent_body's 26 translations; the untranslated keys. Sprint only on his word.
+- Merged 2026-10-21 as defect fixes: pump/valve symbol at half the polyline, and a zero-length one points along its downstream pipe (his "Yes"); label grab shape follows the drawn level form (link 233; he confirmed it was one-line, "Thanks"); `PUMP id Efficiency`; CV pipes kept, exported and solved natively (Properties/Tables "Check valve (CV)"); run box names unbalanced steps and warnings; paste refreshes the override count and the Full report reads one run's inputs; built-in solver reads multi-point pump curves as EPANET's custom curves (a two-point curve no longer prints an equation: his call owed).
+- `label-pass-economy-browser-harness.js` failed once alone at a9acc8e65 while agents ran checks; 29/29 three times after. Load flake.
+- Map labels still resolve Demand from the open scenario with Recalculate off (fix/scenario-report-mix left them); worth a task.
 
-### Branches waiting on him
+### Branches waiting on him (ports in ~/webdev/worktrees/_panel/ports.conf)
 
-- **Report to Tom in `~/tom-files/messenger.md`**, overwritten each time; one line per paragraph, no hard wraps (Tom, 2026-10-21).
-- Merged 2026-10-21 on his word: `feat/import-export-menu` (Task 819) and `feat/geojson-into-project` (814's GeoJSON slice; 814 stays open).
-- `feat/sqlite-reader` (8104): being reworked on his verdict that our pump/valve conversion is unsatisfactory; match Bentley's own .inp export (coincident upstream/downstream nodes). It owns the seam: its WaterGEMS row moves into `importNetworkRows()`. His "import or only export?": *"Export is more important for submittal to reviewers or utilities."*
-- `fix/pump-valve-bent-pipe`, `fix/label-leader-hit`, `feat/calculate-hint`: in progress 2026-10-21.
-- Link 233 is a spatial hover HOLE over about half a multi-line label on a leader, not a delay (his correction). He saw it on label-margin, served again read-only on 8102 from tag `archive/feat/label-margin`; drop that row once fixed.
-- Bottom pane delay: he blames a Markdown Reader browser extension, now uninstalled. Closed unless it returns.
-- MCP: *"This doesn't sound very interesting to me"*; by "buying and selling" he meant *"What's the big idea?"* Not pursued.
+- `feat/sqlite-reader` (8104, Task 749): Bentley-style pump/valve junctions (46-A/46-B coincident), Unbalanced Continue, continuous-pattern start fixed, pattern-averaging caveat in the report; fixture is his 18:46 save copied to `~/webdev/fixtures/wtg-tgh-1/` (he keeps it stable). Perry passed it. Owed by him: where he read "12 psi" (WaterGEMS's saved PMP-1 head change is -5.8 psi at step 0); whether to import WaterGEMS's hourly-averaged continuous patterns instead of Bentley's export values. Summaries: the sqlite-pmp1-summary page on the panel (localhost:8080/img/).
+- `feat/calculate-hint` (8101): the page's standard dialog; Perry passed it. Stores `lpn_calchint` (told him).
+- `feat/import-export-receipts` (8103, Task 814 items 4-5): reports name the run's scenario; "New overrides (n)." Perry passed it.
+- `feat/value-source` (8105, Sue's wish): hollow-dot tip "Inherited from {name}."
+- `feat/theme-default` (8106, Task 811): gentle default refinement; screenshots `_panel/www/img/theme-default-*`.
+- `feat/native-eps-3` (Task 733 slice 3): pump speed patterns and XHEAD; not wired. Merging it also changes one-instant built-in results for a pump pushed backwards. SEAM with the merged multi-point pump fix: its reverse-flow pump branch must call `customPumpCoeffs()` when `pCurve[k]` is set (merge master into it first).
+- Port 8102 (the archived label-margin preview) dropped 2026-10-21 once link 233 was settled.
+- His "Ask your AI agent" box is on Task 818 with Mary's (`dev/agents/market-researcher/ai-agent-box.md`) and Sue's findings. A comparison model for WaterGEMS is in `~/tom-files/2026-10-21/`.
 - `feat/desktop`: untouched.
-
-### Next job
-
-Task 819 browser pass; Task 749 his pass and the import/export question; the two unreproduced
-performance reports once he answers. Task 681. Task 733 rules slice.
 
 ### Traps met 2026-10-21 (thirty-third session)
 
