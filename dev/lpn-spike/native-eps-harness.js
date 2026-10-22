@@ -55,7 +55,7 @@
 //
 // THE REFUSALS. A network the slices cannot run (a rule, a speed pattern on a pump the page did not
 // model, a volume curve, water
-// quality, pump energy, a control on a reservoir, a junction-pressure control on a valve) must come
+// quality, pump energy EPANET refuses, a control on a reservoir, a junction-pressure control on a valve) must come
 // back refused by name and run nothing, so the caller falls back to EPANET.
 //
 // TOLERANCE is native-valve-harness.js's: 0.8 mm of head (and of tank level), 0.002 L/s of flow or

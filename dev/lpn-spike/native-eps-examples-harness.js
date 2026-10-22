@@ -31,6 +31,14 @@
 // compared the same way. Each tank must arrive on the model with its curve rows in metres and cubic
 // metres, and the curve must move the tank's level away from the cylinder's.
 //
+// SLICE 6, PUMP ENERGY. No gallery example states a price, so every example with a pump and a period is
+// opened again with an [ENERGY] added to the document (a global efficiency, price, price pattern and demand
+// charge, a price of the pump's own on the first pump, and an efficiency curve in the document's own flow
+// unit on every pump, scaled to its head curve), through the same page path, and the loop's energy (usage,
+// efficiency, kWh per m3, average and peak kW, cost per day, demand charge) is held to what EPANET 2.3.5
+// itself accumulates (native-eps-energy-truth.js), with the example's own controls and rules in force. The
+// same again with a speed pattern on the pumps, where the speed enters the efficiency.
+//
 // TOLERANCE is native-eps-harness.js's, at Accuracy 1e-5 in both engines.
 //
 // Copyright 2009 Thomas Gail Haws
@@ -40,6 +48,7 @@
 const fs = require('fs');
 const { ROOT, setUnitSet, loadLoopedNetwork, warmEpanet } = require('./lpn-dom-stub.js');
 const { EXAMPLE_EXPORTS } = require('./example-fixture.js');
+const T = require('./native-eps-energy-truth.js');
 
 require(ROOT + 'js/lpn-inp.js');
 require(ROOT + 'js/lpn-patterns.js');
@@ -141,6 +150,49 @@ async function compare(file, text) {
 		`[${sw} status changes in EPANET's frames${text ? `; pump flow swing ${(qSwing * 1000).toFixed(1)} L/s` : ''}${st ? `; ${st} STATUS DIFFERENCES` : ''}]`);
 }
 
+// The example's text with an [ENERGY] added. Efficiency points are in the document's flow unit, which is the
+// unit of its pump head curves' x axis, so each pump's curve is scaled to its own head curve's largest flow.
+function withEnergyDoc(file, speed) {
+	const d = JSON.parse(speed ? withSpeedPattern(file) : fs.readFileSync(ROOT + 'examples/' + file, 'utf8'));
+	d.patterns = (d.patterns || []).concat([{ id: 'TARIFF', multipliers: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1.4, 2, 2, 2, 1.4, 1, 0.8, 0.5] }]);
+	d.settings = d.settings || {};
+	d.settings.energy = { globalEfficiency: 70, globalPrice: 0.11, demandCharge: 7, globalPattern: 'TARIFF', effic: {} };
+	d.curves = d.curves || [];
+	let first = true;
+	d.links.forEach((l) => {
+		if (l.type !== 'pump') { return; }
+		const hc = d.curves.find((c) => c.id === l._curveId), cmax = hc ? Math.max(...hc.points.map((p) => p[0])) : 1000;
+		const id = 'EFF' + l.id;
+		d.curves.push({ id, kind: 'effic', points: [[0, 25], [0.4 * cmax, 60], [0.8 * cmax, 78], [1.2 * cmax, 70], [2 * cmax, 40]] });
+		l._efficCurveId = id;
+		if (first) { l.energyPrice = 0.16; first = false; }
+	});
+	return JSON.stringify(d);
+}
+async function compareEnergy(file, speed) {
+	L.applySaved(L.acceptImportedText(withEnergyDoc(file, speed)));
+	EC.lpnTimeArrived();
+	const model = L.currentModel();
+	const pumps = model.links.filter((l) => l.type === 'pump');
+	const label = file + (speed ? ' with a speed pattern,' : '') + ' with an [ENERGY] added (price, pattern, demand charge, efficiency curve on ' + pumps.map((l) => l.id).join(', ') + '), pump energy';
+	const e = model.energy || {};
+	if (!(e.globalPrice === 0.11 && e.globalPattern === 'TARIFF' && pumps.every((l) => (e.efficCurves || {})[(e.effic || {})[l.id]]))) {
+		ok(label, false, 'the energy did not reach the model: ' + JSON.stringify(e).slice(0, 300));
+		return;
+	}
+	model.hydraulics = Object.assign({}, model.hydraulics || {}, { accuracy: 1e-5 });
+	delete model.quality; delete model.msx;
+	const nat = EC.lpnNativeRun(model);
+	if (!nat.ok) { ok(label, false, 'native: ' + JSON.stringify(nat.issues || '')); return; }
+	const tr = await T.truth(EC, model);
+	const df = T.diff(nat.energy, tr.bin);
+	const rows = nat.energy ? nat.energy.pumps : [];
+	ok(label, df.good && rows.length === pumps.length && nat.energy.totalCostPerDay > 0 && nat.energy.demandCharge > 0 && rows.some((r) => r.usage > 0.05 && r.avgEfficiency > 0.2 && Math.abs(r.avgEfficiency - 0.7) > 1e-3),
+		'worst gaps: usage ' + df.worst.usage.toExponential(1) + ', efficiency ' + df.worst.avgEfficiency.toExponential(1) + ', kWh/m3 ' + df.worst.kwhPerM3.toExponential(1) +
+		', avg kW ' + df.worst.avgKw.toExponential(1) + ', peak kW ' + df.worst.peakKw.toExponential(1) + ', cost ' + df.worst.costPerDay.toExponential(1) +
+		'  [' + rows.map((r) => r.id + ' ' + (r.usage * 100).toFixed(1) + '% ' + r.avgKw.toFixed(1) + ' kW ' + (r.avgEfficiency * 100).toFixed(1) + '%').join(', ') + '; demand ' + nat.energy.demandCharge.toFixed(1) + ']' + df.detail);
+}
+
 const TANKED = ALL.filter((f) => (docOf(f).nodes || []).some((n) => n.type === 'tank') && ((docOf(f).times || {}).duration > 0));
 
 // The example's text with a VOLUME curve added for each tank. Levels and the diameter are in the
@@ -219,6 +271,7 @@ async function compareCurves(file) {
 	for (const f of EXAMPLES) { await compare(f); }
 	ok('the gallery has examples with pumps', PUMPED.length >= 4, PUMPED.join(', '));
 	for (const f of PUMPED) { await compare(f, withSpeedPattern(f)); }
+	for (const f of PUMPED) { await compareEnergy(f, false); await compareEnergy(f, true); }
 	ok('the gallery has examples with tanks and a period', TANKED.length >= 5, TANKED.join(', '));
 	for (const f of TANKED) { await compareCurves(f); }
 	console.log(`\n${pass} passed, ${fail} failed`);

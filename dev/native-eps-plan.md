@@ -63,7 +63,17 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
    rule and a control; 5 curve refusals) and `native-eps-examples-harness.js` (every gallery example
    with a tank and a period, a bowl-shaped curve added to each tank through `assembleModel()`, in US
    and SI units).
-6. **Pump energy** (`addenergy()`): kWh, cost, peak. Test: Net3's energy report.
+6. **Pump energy (built).** `getenergy()` / `getallpumpsenergy()` / `addenergy()` / `saveenergy()`:
+   per pump the usage factor, average efficiency (a global percent, or the pump's EFFIC curve at its
+   flow brought to full speed, with the Sarbu and Borza speed adjustment), kWh per m3, average and peak
+   kW and cost per day; the global and per-pump price, global and per-pump price pattern, the demand
+   charge on the peak of the SUM, and the totals line. Returned as `result.energy` (shape below). Refused
+   by name (`native-run-energy`): what EPANET refuses to read (a price pattern the model lacks, a negative
+   price or demand charge, a global efficiency of 0 or less, an efficiency curve whose flows do not
+   increase). Tests: `native-eps-energy-harness.js` (the Net3 report, 13 priced and unpriced Net3 and
+   constructed cases, Net1 with controls and rules, 7 refusals) and `native-eps-examples-harness.js`
+   (the five pumped gallery examples with a price, pattern, demand charge and efficiency curves added
+   through `assembleModel()`, with and without a speed pattern, in US and SI units).
 7. **Wiring to the page**, last, and only on Tom's word: `lpnTimeRun` uses the native loop when the
    engine setting is built-in and nothing is refused; the transport, frames and Run box are
    unchanged because the frames have the shape `lpnEpanetRun` resolves to. Water quality and
@@ -176,6 +186,58 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
 - A curve is read in the file's own units whatever EPANET's internal ones are (`tankvolume()` converts
   the level to the curve's unit and the volume back), so the native loop interpolates the SI rows as
   given and converts the answer.
+
+## What slice 6 learned
+
+- **The result's shape (what slice 7 wires, and what the page already reads).** `lpnNativeRun(...)
+  .energy` is `null` when the model has no link of type pump, else the object `lpnEpanetRun(...)
+  .energy` is (js/lpn-epanet.js `lpnEnergySummary`): `{pumps: [{id, onSeconds, usage, avgKw, peakKw,
+  avgEfficiency, kwh, cost}], energyCost, kwh, peakKw, demandCharge, totalCost, duration}`. `usage` and
+  `avgEfficiency` are fractions, never percents; `kwh` and `cost` are over the whole run;
+  `peakKw` (top level) is the largest sum of kW at one step. The loop ADDS four fields the page does
+  not read yet: per pump `kwhPerM3` and `costPerDay` (EPANET's "Kw-hr /m3" and "Cost /day" columns,
+  the file being SI) and at the top `costPerDay` and `totalCostPerDay` (EPANET's "Total Cost" line).
+  A harness case asserts every field of the page's summary is present.
+- **The truth is the engine's binary output, not the page's figure.** The page's own energy result
+  (`lpnEnergyAccumulate` on `EN_ENERGY` samples) is NOT addenergy(): it calls a pump "on line" when its
+  power is above 0, where EPANET does when its efficiency reads above 0 (open, whatever the flow), and
+  it reads nothing for a single instant (the step is 0), where EPANET adds one hour. The loop copies
+  EPANET, so on a pump left open with no flow the two engines' energy results will differ by that
+  definition, not by arithmetic. Slice 7 should pick one on purpose. The harness reads the energy
+  block of `temp.out` after `solveH()` / `saveH()` (single precision, four digits beyond the report)
+  and holds that reader to the printed report to its rounding.
+- **Status first, then flow.** `getenergy()` returns 0 power and 0 efficiency for a link whose status is
+  at or below CLOSED (XHEAD, TEMPCLOSED included), and `addenergy()` skips a pump whose efficiency is 0.
+  Power and efficiency are read from each solve BEFORE the step is chosen (`nexthyd()` calls
+  `getallpumpsenergy()` first), so a rule or control acting at the end of the step changes nothing in
+  that step's energy; the step's length is the one `timestep()` returned, rules and tank events included.
+  The final instant adds nothing; a duration of 0 adds one hour.
+- **A pump at setting 0 that is OPEN carries a flow.** `pumpcoeff()` makes it a link of conductance
+  1/CBIG (1e-8), so EPANET holds (head difference in ft) / 1e8 cfs through it; the built-in solver shuts
+  it and holds 0. Power is then a thousandth of a kW and the efficiency 1 percent (the clamp), and the
+  kWh-per-flow column is a ratio of two tiny numbers. The loop reproduces the flow for the energy only.
+- **Near-zero flow is the one column that will not agree.** A pump left open with a demand of 0 carries
+  numerical noise in EPANET (about 1e-7 cfs) and exactly 0 in the built-in solver; kWh per m3 divides
+  power by flow (floored at 1e-6 cfs), so the hours spent there differ by up to 10 percent of that
+  column. Average kW, peak kW, usage, efficiency and cost agreed to 1e-7 on the same case. The harness's
+  two-pump case therefore keeps a demand above 0 in the off hours.
+- **The speed enters the efficiency twice.** The curve is read at q / speed (in L/s, the file's unit),
+  and the answer is then pulled toward 100 by the Sarbu and Borza factor, 100 - (100 - e) x (1/speed)^0.1.
+  Both are in the harness (a pattern from 0.8 to 1.2 on a curve pump).
+- **Price pattern period** is `(time + pattern start) / pattern step`, taken at the START of the step and
+  held for it, wrapped on the pattern's length; a pump's own pattern replaces the global one (the global
+  pattern then does not multiply the pump's own price), and a pump price above 0 replaces the global price.
+- **Net3, to the digit.** Usage 58.33 and 28.74 percent and average kW 62.06 and 309.38 as EPA's report
+  prints; the peak of pump 335 is 310.78 here and 310.79 in the published file, for the engine and the
+  loop alike (the engine build differs from the one that wrote Net3.rpt). The harness compares the loop
+  with the engine, not with the file.
+- **Tolerances (energy-truth module).** Usage 1e-4 of a fraction (one second is 1.2e-5 of a day) and
+  1e-4 relative on everything else, with a floor of 1e-4 of the column's largest value; efficiency on a
+  curve 5e-4. Measured worst across all cases: usage 1.2e-5, efficiency 1.3e-6, everything else 7e-5 (cost
+  on Net3 with a price pattern, where a step cut one second apart lands in a dearer hour).
+- **Not copied, by design.** A pump with no curve is a pipe to EPANET and is not listed in the loop's
+  energy (the page lists it with a pipe's kW); `Global Efficiency` and prices are read as the bridge
+  writes them (a value only when stated). The page cannot state a rule step, so it stays EPANET's default.
 
 ## Wording
 
