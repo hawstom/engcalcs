@@ -4,7 +4,7 @@ Task 814, branch `docs/import-export-scenario`, 2026-10-17. Tom's brief: *"We mu
 about our standard handling of scen/alt in imp/exp, then we must apply it to every imp/exp command."*
 His three classes: current scenario, current project, separate project. This file is the inventory
 (part 1), the standard (part 2), the draft English (part 3), the defects ranked (part 4), and the
-questions only Tom can answer (part 5). Nothing here is built except rows 7 and 8 landing in the open project (Task 814). Line numbers are `master` at
+questions only Tom can answer (part 5). Built on master (Tasks 814, 819): rows 7 and 8 landing in the open project; the question before exports 21-23 and their `<project>-<scenario>` file names; reports and paste notices naming their scenario. The receipt after exports 21-23 is on `feat/export-scenario-confirm` (2026-10-22). Read the code before briefing a row: this inventory lagged the code once already. Line numbers are `master` at
 `459363356`; the two branches are read from `feat/sheet-sync` and `feat/sqlite-reader`.
 
 Terms used. **Aware** means the format can carry what the project's model carries: scenarios, the
