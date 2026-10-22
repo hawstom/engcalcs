@@ -544,6 +544,9 @@
 			// `running` above is what it says while it works, borrowed rather than re-keyed: it is
 			// already the sentence the status bar uses for exactly this moment.
 			runDone: pageConfig.lpn_time_run_done || 'The run finished. Reporting time steps: {frames}. Time taken: {secs} s.',
+			runUnbalanced: pageConfig.lpn_time_run_unbalanced || 'Time steps not balanced ({n}).',
+			runWarnings: pageConfig.lpn_time_run_warnings || 'Warnings ({n}).',
+			runSeeReport: pageConfig.lpn_time_run_see_report || 'See the {report}.',
 			runBoxHide: pageConfig.lpn_time_runbox_hide || 'Do not show this box again',
 			runFailed: pageConfig.lpn_time_run_failed || 'The run did not finish, so there are no results for the later times.',
 			// ---- a REFUSED run (Task 471) ----
@@ -1625,7 +1628,7 @@
 	// That keeps this whole feature inside this file: js/looped-network.js needs no new element, no
 	// new id and no new call site for it.
 
-	var boxState = { open: false, suppressed: false, phase: 'idle', fraction: 0, frames: 0, ms: 0, reportLength: 0, message: '', token: 0 },
+	var boxState = { open: false, suppressed: false, phase: 'idle', fraction: 0, frames: 0, ms: 0, reportLength: 0, message: '', token: 0, unbalanced: 0, warnings: 0 },
 		boxReport = '',
 		boxUi = null;
 	// **THE LAST RUN'S REPORT OUTLIVES THE BOX, and is kept whether or not a box was ever shown.**
@@ -1647,7 +1650,7 @@
 	}
 	function boxStart(token) {
 		boxState = { open: true, suppressed: boxSuppressed(), phase: 'running', fraction: 0,
-			frames: 0, ms: 0, reportLength: 0, message: '', token: token };
+			frames: 0, ms: 0, reportLength: 0, message: '', token: token, unbalanced: 0, warnings: 0 };
 		boxReport = '';
 		renderBox(true);
 	}
@@ -1669,6 +1672,13 @@
 		boxState.ms = ms;
 		boxReport = (run && run.report) || '';
 		boxState.reportLength = boxReport.length;
+		// **A RUN THAT WARNED SAYS SO** (pre-review, 2026-10-21). The report always held the
+		// warnings; the map did not, so a reader scrubbing to a step EPANET could not balance saw
+		// a pipe at 56 ft/s and nothing to suspect. Unbalanced steps are the engine's own count
+		// (`stepsUnconverged`); the rest are the report's WARNING lines, less "System unbalanced",
+		// which is the same steps again.
+		boxState.unbalanced = (run && run.stepsUnconverged) || 0;
+		boxState.warnings = countReportWarnings(boxReport);
 		// **WITH THE BOX OFF, THE SAME SENTENCE GOES TO THE STATUS LINE AND THEN LEAVES** (Tom,
 		// 2026-09-12: *"just see the time steps and run time in the banner briefly"*). The same
 		// string, so there is one wording and one translation; the box is what was obnoxious, not
@@ -1705,7 +1715,7 @@
 		renderBox(true);
 	}
 	function boxHide() {
-		boxState = { open: false, suppressed: false, phase: 'idle', fraction: 0, frames: 0, ms: 0, reportLength: 0, message: '', token: 0 };
+		boxState = { open: false, suppressed: false, phase: 'idle', fraction: 0, frames: 0, ms: 0, reportLength: 0, message: '', token: 0, unbalanced: 0, warnings: 0 };
 		boxReport = '';
 		renderBox(true);
 	}
@@ -1736,15 +1746,27 @@
 		});
 	}
 
+	function countReportWarnings(report) {
+		var n = 0;
+		String(report || '').split('\n').forEach(function (line) {
+			if (/^\s*WARNING:/.test(line) && !/System (hydraulically )?unbalanced/i.test(line)) { n++; }
+		});
+		return n;
+	}
+
 	function boxMessage(S) {
 		if (boxState.phase === 'running') { return S.running; }
 		if (boxState.phase === 'failed') { return boxState.message || S.runFailed; }
-		return S.runDone
+		var line = S.runDone
 			.replace('{frames}', String(boxState.frames))
 			// Two decimals under a second, one above it. A 40 ms run printed as "0.0 s" reads as
 			// "no time was measured" rather than "it was quick", which is the opposite of what the
 			// number is there to say.
 			.replace('{secs}', (boxState.ms / 1000).toFixed(boxState.ms < 1000 ? 2 : 1));
+		if (boxState.unbalanced > 0) { line += ' ' + S.runUnbalanced.replace('{n}', String(boxState.unbalanced)); }
+		if (boxState.warnings > 0) { line += ' ' + S.runWarnings.replace('{n}', String(boxState.warnings)); }
+		if (boxState.unbalanced > 0 || boxState.warnings > 0) { line += ' ' + S.runSeeReport.replace('{report}', S.runReport); }
+		return line;
 	}
 
 	/**
@@ -1880,7 +1902,9 @@
 	EC.lpnTimeRunBoxState = function () {
 		return {
 			open: boxState.open, phase: boxState.phase, fraction: boxState.fraction,
-			frames: boxState.frames, ms: boxState.ms, reportLength: boxState.reportLength
+			frames: boxState.frames, ms: boxState.ms, reportLength: boxState.reportLength,
+			unbalanced: boxState.unbalanced, warnings: boxState.warnings,
+			text: boxState.phase === 'done' ? boxMessage(strings()) : ''
 		};
 	};
 	/**
