@@ -13806,11 +13806,56 @@ var EngCalcs = EngCalcs || {};
 	// LANDS ON** -- the same station the link's label and the DXF block use. It used to take the END
 	// nodes' chord, which on a bent pipe is off the pipe altogether (the WTG import, 2026-10-19).
 	// One answer for the drawing, the hit shape and the label obstacle box.
+	//
+	// **A ZERO-LENGTH PUMP OR VALVE HAS NO DIRECTION OF ITS OWN** (WaterGEMS/Bentley exports them with
+	// both end nodes on one point, 46-A over 46-B). Tom, 2026-10-21, asked whether it should line up
+	// with its pipes: *"Bentley points the symbol at the downstream pipe. I guess my answer is Yes."*
+	// So it takes the direction from its end node (node 2) toward the far end of the first segment of
+	// another link at that node (that link's first vertex, else its other node); failing that, the
+	// same from the upstream node, the upstream link running INTO the pump, so flow continues through;
+	// failing both, 0 degrees. Several links at one node: the FIRST in doc.links order, so the answer
+	// never changes between redraws. A candidate whose far end is also on the point is skipped.
+	var ZERO_LEN_EPS = 1e-6;
+	function zeroLengthDirection(l, pts) {
+		var n1 = nodeById(l.from), n2 = nodeById(l.to), c = pts[0], i, o, p, q, far;
+		function farEnd(o, node) {
+			// the first point of `o`, walking away from `node`
+			return o.from === node.id ? (o.verts.length ? o.verts[0] : nodeAt(nodeById(o.to)))
+				: (o.verts.length ? o.verts[o.verts.length - 1] : nodeAt(nodeById(o.from)));
+		}
+		for (i = 0; i < doc.links.length; i++) {
+			o = doc.links[i];
+			if (o === l || (o.from !== n2.id && o.to !== n2.id)) { continue; }
+			far = farEnd(o, n2);
+			if (far && Math.hypot(far.x - c.x, far.y - c.y) > ZERO_LEN_EPS) {
+				return { dx: far.x - c.x, dy: far.y - c.y };
+			}
+		}
+		for (i = 0; i < doc.links.length; i++) {
+			o = doc.links[i];
+			if (o === l || (o.from !== n1.id && o.to !== n1.id)) { continue; }
+			far = farEnd(o, n1);
+			if (far && Math.hypot(far.x - c.x, far.y - c.y) > ZERO_LEN_EPS) {
+				return { dx: c.x - far.x, dy: c.y - far.y };
+			}
+		}
+		return null;
+	}
 	function linkSymbolPlace(l) {
 		var pts = linkPointList(l), p = Geom.pointAlongPolyline(pts, 0.5),
-			si = Geom.segmentAtFraction(pts, 0.5).index, a = pts[si], b = pts[si + 1];
+			si = Geom.segmentAtFraction(pts, 0.5).index, a = pts[si], b = pts[si + 1], dx, dy, zl, k, m;
 		if (!b) { return null; }
-		return { x: p.x, y: p.y, angle: Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI, flip: (b.x - a.x) < 0 };
+		dx = b.x - a.x; dy = b.y - a.y;
+		zl = true;
+		for (k = 1; k < pts.length; k++) {
+			m = Math.hypot(pts[k].x - pts[0].x, pts[k].y - pts[0].y);
+			if (m > ZERO_LEN_EPS) { zl = false; break; }
+		}
+		if (zl) {
+			zl = zeroLengthDirection(l, pts);
+			dx = zl ? zl.dx : 0; dy = zl ? zl.dy : 0;
+		}
+		return { x: p.x, y: p.y, angle: Math.atan2(dy, dx) * 180 / Math.PI, flip: dx < 0 };
 	}
 	function positionPumpSymbol(id) {
 		var l = linkById(id), le = linkEls[id];
