@@ -45969,7 +45969,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		'wtg-fireflow': ['lpn_wtg_note_fireflow', 'Not imported: the fire flow settings of the model. A needed fire flow stated at a junction was imported as that junction\'s Required fire flow; enter the rest in the fire flow window.'],
 		'wtg-unit-demand': ['lpn_wtg_note_unit_demand', 'The demand at these junctions comes from unit demand loads. The flow of each load was imported as a demand; the loading units and the unit load were not.'],
 		'wtg-setting-pattern': ['lpn_wtg_note_setting_pattern', 'Not imported: the setting patterns of these valves.'],
-		'wtg-pattern-continuous': ['lpn_wtg_note_pattern_continuous', 'These patterns are continuous in the model: the multiplier changes in a straight line between points. An EPANET pattern is stepwise, so each was written as WaterGEMS writes it for EPANET: the starting multiplier, then the value on that line at every pattern time step.'],
+		'wtg-pattern-continuous': ['lpn_wtg_note_pattern_continuous', 'These patterns are continuous in the model: the multiplier changes in a straight line between points. An EPANET pattern is stepwise, so each was written as WaterGEMS writes it for EPANET: the starting multiplier, then the value on that line at every pattern time step. WaterGEMS\'s own solver instead applies a continuous pattern as the average over each time step, so results will not match WaterGEMS hour by hour.'],
 		'wtg-pattern-calendar': ['lpn_wtg_note_pattern_calendar', 'Not imported: the day of the week and month multipliers of these patterns.'],
 		'wtg-pattern-irregular': ['lpn_wtg_note_pattern_irregular', 'These patterns have times that are not whole multiples of the pattern time step. Each was read at that time step.'],
 		'wtg-pattern-end': ['lpn_wtg_note_pattern_other', 'These patterns differ from EPANET patterns in their start time, their last multiplier, or their name (EPANET applies a pattern named 1 to every demand with no pattern). Check them.'],
@@ -46077,7 +46077,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		stampProjectSaved(id);
 		renderTabs();
 		// The reader's notes first: they are about the model; the parser's are about the text it made.
-		parsed.dropped = r.notes.concat(parsed.dropped);
+		// The parser's pumping-cost sentence says "This EPANET file includes pumping cost modelling
+		// data", which is false here: the only [ENERGY] lines the reader writes are one efficiency per
+		// pump (a one-point curve at the motor efficiency), no price, pattern or demand charge. Nothing
+		// is left to report, so the sentence is dropped rather than given a WaterGEMS variant.
+		parsed.dropped = r.notes.concat(parsed.dropped.filter(function (n) { return n.code !== 'energy'; }));
 		lastWtg = { base: r.baseScenario || 'Base', n: r.scenarios.length };
 		try { showInpReport(parsed, fileName); } finally { lastWtg = null; }
 		return id;

@@ -225,6 +225,8 @@ async function tgh(browser) {
 		d.text.indexOf(await a.lang('lpn_wtg_note_scenario_alternative')) > 0 && d.text.indexOf(await a.lang('lpn_wtg_note_pump_battery')) > 0, d && d.text.slice(0, 300));
 	ok('...saying where to see the alternatives (the note that points to the Scenario manager)', !!d && d.text.indexOf(await a.lang('lpn_wtg_note_scenario_alternative')) > 0);
 	// The save of 2026-10-21 18:46 states GPV-1's curve in Base.
+	ok('...the continuous pattern note says WaterGEMS averages over each time step', !!d && d.text.indexOf(await a.lang('lpn_wtg_note_pattern_continuous')) > 0 && /WaterGEMS.s own solver/.test(await a.lang('lpn_wtg_note_pattern_continuous')));
+	ok('...and no EPANET pumping cost sentence (the file is not an EPANET file)', !!d && d.text.indexOf(await a.lang('lpn_inp_drop_energy')) < 0);
 	ok('...and no missing GPV curve (Base states it)', !!d && d.text.indexOf(await a.lang('lpn_inp_drop_gpv_curve')) < 0);
 	ok('...and not saying any pipe, pump or valve was left out', !!d && d.text.indexOf(await a.lang('lpn_wtg_note_link_unjoined')) < 0);
 	if (d) { await a.dialogClick(await a.lang('lpn_dialog_ok')); }
