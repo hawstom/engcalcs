@@ -102,7 +102,7 @@ lines rather than appending corrections.
 - Still owed: consent_body's 26 translations; the untranslated keys. Sprint only on his word.
 - Two-point pump curve: Tom, 2026-10-22: *"Follow EPANET, I suppose."* It stays custom, as EPANET reads it (master already does this).
 - His "Ask your AI agent" idea (Task 818): his 10-22 correction is on the roadmap; Mary's answer is `dev/agents/market-researcher/ai-agent-interface.md` (a documented in-page API: read, change a copy, solve repeatedly). Brainstorm only; he said "We have our hands full".
-- WaterGEMS: he worked out labels himself (12, "It's hard to use, but it works"). Export test files for him: `~/tom-files/2026-10-22/wtg-export/` (readme inside); results of his opening them decide whether `feat/wtg-export` becomes a product (`dev/wtg-export.md` on that branch).
+- WaterGEMS: he worked out labels himself (12, "It's hard to use, but it works"). Export test files for him: `~/tom-files/2026-10-22/wtg-export/` (readme inside); results of his opening them decide whether `feat/wtg-export` becomes a product; its write-up lives only on that branch until it merges (`git show feat/wtg-export:dev/wtg-export.md`).
 - Load flakes seen 2026-10-22 in master's suite: `new-project-pan-harness.js` (passed alone twice), `label-form-n600-browser-harness` (an agent's run).
 
 ### Branches waiting on him (ports in ~/webdev/worktrees/_panel/ports.conf)
