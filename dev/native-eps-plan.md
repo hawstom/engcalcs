@@ -47,9 +47,9 @@ the tank's level as state. `js/lpn-native-run.js` is that loop and adds no hydra
    (`native-run-rules`, the rule's name): a premise on a pipe's roughness, a reservoir's level or
    pressure, a GPV's setting; a rule EPANET rejects when it reads the file (FILLTIME on a junction, an
    unreadable time, a negative or GPV setting, an action on a check valve); a hydraulic step under 10 s.
-   Tests: `native-eps-harness.js` (26 constructed cases, Net1 with the gallery rules, with its
+   Tests: `native-eps-harness.js` (25 constructed cases, Net1 with the gallery rules, with its
    controls stripped, and with other rules; Net3 with rules in place of its controls, and with extra
-   rules beside them; 11 refusals) and `native-eps-examples-harness.js` (the three Net1 examples with
+   rules beside them; 10 rule refusals) and `native-eps-examples-harness.js` (the three Net1 examples with
    their rules, through `assembleModel()`).
 5. **Tank volume curves, minimum volume, overflow** (`tankvolume()` / `tankgrade()` interpolation).
    Test: a tank on a curve against EPANET across a full and an empty event.
