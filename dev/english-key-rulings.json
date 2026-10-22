@@ -3999,11 +3999,6 @@
             "ruled": "2026-10-15",
             "answer": "Yes. \"Pasted cells ({n})\" etc."
         },
-        "lpn_inp_export_flat_heading": {
-            "on": "Saved {file}",
-            "ruled": "2026-09-09",
-            "answer": "OK"
-        },
         "lpn_inp_export_flat_inactive_controls": {
             "on": "These controls and rules refer to an asset that is inactive in this scenario, so they are not in the file: {ids}",
             "ruled": "2026-10-16",

@@ -4376,7 +4376,6 @@ $ec_lang['lpn_fitting_other']='ሌላ ማገናኛ';
 // pipe type loses its INDIRECTION while every number still goes out byte for byte, and a fittings
 // list loses its ITEMISATION while the total goes out exactly as it stood. It names EPANET because
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
-$ec_lang['lpn_inp_export_flat_heading']='{file} ተቀምጧል';
 $ec_lang['lpn_inp_export_flat_lead']='የተላከው የEPANET ፋይል ከዚህ ፕሮጀክት ጋር በቁጥር ተመጣጣኝ ነው። ነገር ግን ለሚከተሉት ነገሮች ቦታ የለውም፦';
 $ec_lang['lpn_inp_export_flat_types']='እዚህ ያሉ ቧንቧዎች ({n}) የቧንቧ ዓይነቶችን ({t}) ይጠቅሳሉ። በፋይሉ ውስጥ እያንዳንዱ ከእነዚያ ቧንቧዎች የቁጥሮቹን የራሱን ቅጂ ይይዛል፣ ስለዚህ መልሶቹ ተመሳሳይ ናቸው። ፋይሉ መያዝ የማይችለው የቧንቧ ዓይነቱን ራሱ ነው፣ ስለዚህ በአንድ ትርጉምና እሱን በሚጠቀም እያንዳንዱ ቧንቧ መካከል ያለው ግንኙነት የሚመዘገበው በፕሮጀክት ፋይሉ ውስጥ ብቻ ነው።';
 $ec_lang['lpn_inp_export_flat_coords']='የEPANET ፋይል ለእያንዳንዱ ነጥብ አንድ ቦታ ይይዛል። ይህ ሁኔታ ከእነሱ {n} በሌላ ቦታ ያስቀምጣል፣ በፋይሉ ውስጥ ያሉትም እነዚያ ቦታዎች ናቸው። እያንዳንዱ ሌላ ሁኔታ ቦታዎቹን በፕሮጀክት ፋይሉ ውስጥ ብቻ ይይዛል።';

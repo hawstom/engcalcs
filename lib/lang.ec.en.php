@@ -3475,6 +3475,8 @@ $ec_lang['lpn_ovl_note']='These are the values this scenario sets itself in the 
 $ec_lang['lpn_ovl_clear_selected']='Clear selected overrides';
 $ec_lang['lpn_ovl_clear_all']='Clear all overrides';
 $ec_lang['lpn_ovl_clear_all_ask']='Clear all the overrides ({n}) of {name}? Each value returns to the inherited value. Undo reverses this.';
+$ec_lang['lpn_ovl_clear_same']='Clear overrides equal to inherited';
+$ec_lang['lpn_ovl_clear_same_ask']='Clear the overrides of {name} that equal the inherited value ({n} total)? Each value stays as it is and is inherited again. Undo reverses this.';
 $ec_lang['lpn_ovl_pick_tip']='Select this override for the Clear selected overrides button.';
 $ec_lang['lpn_ovl_bubble_off']='Not on the map';
 $ec_lang['lpn_ovl_bubble_moved']='{quantity}, moved or resized';
@@ -4515,7 +4517,6 @@ $ec_lang['lpn_fitting_other']='Other fitting';
 // pipe type loses its INDIRECTION while every number still goes out byte for byte, and a fittings
 // list loses its ITEMISATION while the total goes out exactly as it stood. It names EPANET because
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
-$ec_lang['lpn_inp_export_flat_heading']='Saved {file}';
 $ec_lang['lpn_inp_export_flat_lead']='The exported EPANET file is numerically equivalent to this project. But it has no place for the following things:';
 $ec_lang['lpn_inp_export_flat_types']='Pipes ({n}) here refer to pipe types ({t}). In the file each of those pipes carries its own copy of the numbers, so the answers are the same. What the file cannot hold is the pipe type itself, so the link between one definition and every pipe that uses it is recorded only in the project file.';
 $ec_lang['lpn_inp_export_flat_coords']='An EPANET file holds one position for each node. This scenario places {n} of them somewhere else, and those are the positions in the file. Every other scenario keeps its positions in the project file only.';
@@ -5253,3 +5254,6 @@ $ec_lang['lpn_calib_scenario']='Compared with the results of the scenario {scena
 $ec_lang['lpn_export_leaves_alternatives']='The alternatives stored in this project are not in the file.';
 $ec_lang['lpn_export_confirm_title']='Export {format}';
 $ec_lang['lpn_export_confirm_lead']='The {format} holds one scenario, and this project has {n}.';
+$ec_lang['lpn_export_receipt_heading']='Exported {file} from {scenario} of {project}.';
+$ec_lang['lpn_export_receipt_note']='This is an export, not a save: this project is not connected to the file.';
+$ec_lang['lpn_dxf_exported_geo_tail']='Its coordinates are {crs}, in meters, not latitude and longitude.';

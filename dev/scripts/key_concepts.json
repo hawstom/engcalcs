@@ -378,6 +378,9 @@
         "lpn_ovl_clear_all_ask": [
             "family-tree-inherit"
         ],
+        "lpn_ovl_clear_same_ask": [
+            "family-tree-inherit"
+        ],
         "lpn_ovl_col_inherited": [
             "family-tree-inherit"
         ],

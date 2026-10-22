@@ -1576,7 +1576,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <div id="lpn_dialog_backdrop" class="d-print-none" style="display:none;position:fixed;z-index:1860;left:0;top:0;right:0;bottom:0;background:var(--ec-a-0-0-0-25)"></div>
 <?php // **AND EVERY QUESTION THE PAGE ASKS** (Task 710): askDialog() in js/looped-network.js puts each
       // former alert/confirm/prompt in here, with the same title bar as the page's other boxes. ?>
-<div id="lpn_dialog" class="d-print-none lpn-dialog" role="dialog" aria-modal="true" aria-describedby="lpn_dialog_body" style="display:none;position:fixed;z-index:1870;left:50%;top:20%;transform:translateX(-50%);background:var(--ec-bg);border:1px solid var(--ec-ink);box-shadow:2px 2px 12px var(--ec-a-0-0-0-4)">
+<div id="lpn_dialog" class="d-print-none lpn-dialog" role="dialog" aria-modal="true" aria-describedby="lpn_dialog_body" style="display:none;position:fixed;z-index:1870;left:50%;top:20%;transform:translateX(-50%);background:var(--ec-box-bg);border:var(--ec-box-border);box-shadow:var(--ec-box-shadow)">
 	<div id="lpn_dialog_title" class="lpn-setbox-title" style="display:none"></div>
 	<div id="lpn_dialog_body"></div>
 	<div id="lpn_dialog_buttons" style="margin-top:10px;text-align:right"></div>
@@ -2334,6 +2334,9 @@ EngCalcs.pageConfig = {
 	lpn_export_leaves_alternatives: <?=json_encode($ec_lang['lpn_export_leaves_alternatives'])?>,
 	lpn_export_confirm_title: <?=json_encode($ec_lang['lpn_export_confirm_title'])?>,
 	lpn_export_confirm_lead: <?=json_encode($ec_lang['lpn_export_confirm_lead'])?>,
+	lpn_export_receipt_heading: <?=json_encode($ec_lang['lpn_export_receipt_heading'])?>,
+	lpn_export_receipt_note: <?=json_encode($ec_lang['lpn_export_receipt_note'])?>,
+	lpn_dxf_exported_geo_tail: <?=json_encode($ec_lang['lpn_dxf_exported_geo_tail'])?>,
 	lpn_export_holds_scenario: <?=json_encode($ec_lang['lpn_export_holds_scenario'])?>,
 	lpn_export_holds_base: <?=json_encode($ec_lang['lpn_export_holds_base'])?>,
 	lpn_geojson_results_other: <?=json_encode($ec_lang['lpn_geojson_results_other'])?>,
@@ -2728,7 +2731,6 @@ EngCalcs.pageConfig = {
 	lpn_fitting_entrance: <?=json_encode($ec_lang['lpn_fitting_entrance'])?>,
 	lpn_fitting_exit: <?=json_encode($ec_lang['lpn_fitting_exit'])?>,
 	lpn_fitting_other: <?=json_encode($ec_lang['lpn_fitting_other'])?>,
-	lpn_inp_export_flat_heading: <?=json_encode($ec_lang['lpn_inp_export_flat_heading'])?>,
 	lpn_inp_export_flat_lead: <?=json_encode($ec_lang['lpn_inp_export_flat_lead'])?>,
 	lpn_inp_export_flat_types: <?=json_encode($ec_lang['lpn_inp_export_flat_types'])?>,
 	lpn_inp_export_flat_fittings: <?=json_encode($ec_lang['lpn_inp_export_flat_fittings'])?>,
@@ -4125,6 +4127,8 @@ EngCalcs.pageConfig = {
 	lpn_ovl_clear_selected: <?=json_encode($ec_lang['lpn_ovl_clear_selected'])?>,
 	lpn_ovl_clear_all: <?=json_encode($ec_lang['lpn_ovl_clear_all'])?>,
 	lpn_ovl_clear_all_ask: <?=json_encode($ec_lang['lpn_ovl_clear_all_ask'])?>,
+	lpn_ovl_clear_same: <?=json_encode($ec_lang['lpn_ovl_clear_same'])?>,
+	lpn_ovl_clear_same_ask: <?=json_encode($ec_lang['lpn_ovl_clear_same_ask'])?>,
 	lpn_ovl_pick_tip: <?=json_encode($ec_lang['lpn_ovl_pick_tip'])?>,
 	lpn_ovl_bubble_off: <?=json_encode($ec_lang['lpn_ovl_bubble_off'])?>,
 	lpn_ovl_bubble_moved: <?=json_encode($ec_lang['lpn_ovl_bubble_moved'])?>,

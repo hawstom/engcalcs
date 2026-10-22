@@ -4376,7 +4376,6 @@ $ec_lang['lpn_fitting_other']='គ្រឿងបំពង់ផ្សេងទ�
 // pipe type loses its INDIRECTION while every number still goes out byte for byte, and a fittings
 // list loses its ITEMISATION while the total goes out exactly as it stood. It names EPANET because
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
-$ec_lang['lpn_inp_export_flat_heading']='បានរក្សាទុក {file}';
 $ec_lang['lpn_inp_export_flat_lead']='ឯកសារ EPANET ដែលបាននាំចេញ ស្មើនឹងគម្រោងនេះខាងលេខ។ ប៉ុន្តែវាគ្មានកន្លែងសម្រាប់អ្វីៗខាងក្រោមទេ៖';
 $ec_lang['lpn_inp_export_flat_types']='បំពង់នៅទីនេះ ({n}) យោងទៅប្រភេទបំពង់ ({t})។ នៅក្នុងឯកសារ បំពង់នីមួយៗមានច្បាប់ចម្លងលេខរបស់ខ្លួន ដូច្នេះលទ្ធផលដូចគ្នា។ អ្វីដែលឯកសារមិនអាចផ្ទុកបានគឺប្រភេទបំពង់ខ្លួនវា ដូច្នេះតំណរវាងនិយមន័យមួយ និងបំពង់ទាំងអស់ដែលប្រើវាត្រូវបានកត់ត្រាតែក្នុងឯកសារគម្រោងប៉ុណ្ណោះ។';
 $ec_lang['lpn_inp_export_flat_coords']='ឯកសារ EPANET ផ្ទុកទីតាំងមួយសម្រាប់ថ្នាំងនីមួយៗ។ សេណារីយ៉ូនេះដាក់ {n} ក្នុងចំណោមវាទៅកន្លែងផ្សេង ហើយទាំងនោះគឺជាទីតាំងក្នុងឯកសារ។ សេណារីយ៉ូផ្សេងទៀតរក្សាទីតាំងរបស់វាក្នុងឯកសារគម្រោងប៉ុណ្ណោះ។';

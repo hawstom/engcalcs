@@ -4376,7 +4376,6 @@ $ec_lang['lpn_fitting_other']='Diğer bağlantı parçası';
 // pipe type loses its INDIRECTION while every number still goes out byte for byte, and a fittings
 // list loses its ITEMISATION while the total goes out exactly as it stood. It names EPANET because
 // the reader has just asked for an EPANET file, which is the test a mention has to pass.
-$ec_lang['lpn_inp_export_flat_heading']='{file} kaydedildi';
 $ec_lang['lpn_inp_export_flat_lead']='Dışa aktarılan EPANET dosyası sayısal olarak bu projeyle eşdeğerdir. Ancak aşağıdaki şeyler için bir yeri yoktur:';
 $ec_lang['lpn_inp_export_flat_types']='Buradaki borular ({n}) boru türlerine ({t}) başvuruyor. Dosyada bu boruların her biri sayıların kendi kopyasını taşır, bu yüzden sonuçlar aynıdır. Dosyanın tutamadığı şey boru türünün kendisidir; bu yüzden bir tanım ile onu kullanan her boru arasındaki bağ yalnızca proje dosyasında kaydedilir.';
 $ec_lang['lpn_inp_export_flat_coords']='Bir EPANET dosyası her düğüm için tek bir konum tutar. Bu senaryo bunlardan {n} tanesini başka bir yere yerleştiriyor, ve dosyadaki konumlar bunlardır. Diğer her senaryo kendi konumlarını yalnızca proje dosyanızda tutar.';

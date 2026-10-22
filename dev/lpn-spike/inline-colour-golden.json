@@ -1,5 +1,5 @@
 {
-	"pinned": "1920777d",
+	"pinned": "f49cabaf2",
 	"rows": [
 		{
 			"sel": "#lpn_label_bench",
@@ -9,17 +9,17 @@
 		{
 			"sel": "#lpn_label_bench",
 			"prop": "border-top-color",
-			"value": "rgb(51, 51, 51)"
+			"value": "rgb(204, 204, 204)"
 		},
 		{
 			"sel": "#lpn_label_bench",
 			"prop": "border-left-color",
-			"value": "rgb(51, 51, 51)"
+			"value": "rgb(204, 204, 204)"
 		},
 		{
 			"sel": "#lpn_label_bench",
 			"prop": "box-shadow",
-			"value": "rgba(0, 0, 0, 0.3) 2px 2px 6px 0px"
+			"value": "rgba(0, 0, 0, 0.14) 0px 1px 3px 0px, rgba(0, 0, 0, 0.16) 0px 6px 20px 0px"
 		},
 		{
 			"sel": "#lpn_label_bench_out",
@@ -39,12 +39,12 @@
 		{
 			"sel": "#lpn_tile_bench",
 			"prop": "border-top-color",
-			"value": "rgb(51, 51, 51)"
+			"value": "rgb(204, 204, 204)"
 		},
 		{
 			"sel": "#lpn_tile_bench",
 			"prop": "box-shadow",
-			"value": "rgba(0, 0, 0, 0.3) 2px 2px 6px 0px"
+			"value": "rgba(0, 0, 0, 0.14) 0px 1px 3px 0px, rgba(0, 0, 0, 0.16) 0px 6px 20px 0px"
 		},
 		{
 			"sel": "#lpn_menu_popup hr",
