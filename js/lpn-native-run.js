@@ -355,6 +355,10 @@
 			c.status = 'open';
 			c.h0 = st.h0 * st.k * st.k;
 			c.a = st.a * Math.pow(st.k, 2 - st.b);
+			// A custom (multi-point) curve is turned by js/lpn-solver.js itself, from its points
+			// (curveSI) and this speed; h0 above is then its shutoff head at speed. Only a page
+			// model's: one without h0Base states its speed already in h0 and pumpSpeed.
+			if (c.h0Base !== undefined) { c.pumpSpeed = st.k; }
 			return c;
 		}
 		if (st.kind === 'valve') {

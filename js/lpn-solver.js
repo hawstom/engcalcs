@@ -1273,6 +1273,35 @@ EngCalcs.lpnSolve = function (model, options) {
 		return false;
 	}
 
+	// ---- A PUMP ON A CUSTOM CURVE (fix/pump-curve-multipoint) -------------------------------------
+	//
+	// EPANET reads a pump curve as a power law only when it has ONE point, or THREE starting at zero
+	// flow (validate.c pumpcurvepump()); every other curve -- two points, three not starting at
+	// zero, four or more -- is CUSTOM, and hydcoeffs.c pumpcoeff() reads it as straight segments
+	// between the points it states (EngCalcs.lpnPumpFromCurve). This used to fit three points to
+	// every curve, so a manufacturer's six-point curve ran on a different pump here than in EPANET.
+	//
+	// `pCurve[k]` is that curve, in SI, read from `link.curveSI` (the curve's own points), and
+	// `pSpeed[k]` the speed the pump turns at for this solve (`link.pumpSpeed`, which
+	// assembleModel() and js/lpn-native-run.js applyLink() set beside the scaled h0; 1 when absent).
+	// A power-law pump keeps its h0/a/b and is not touched here.
+	//
+	// SEAM with feat/native-eps-3, which rewrites the pump branch of the iteration below: both of
+	// its curve evaluations (forward and reversed flow) must go through customPumpCoeffs() when
+	// pCurve[k] is set. Its XHEAD test reads link.h0, which for a custom curve is the shutoff head
+	// at speed (EPANET's Hmax, the curve's first head), so that half needs nothing.
+	var pCurve = [], pSpeed = [], pcFit;
+	for (k = 0; k < links.length; k++) {
+		pCurve[k] = null;
+		if (links[k].type !== 'pump' || !links[k].curveSI || !links[k].curveSI.length) { continue; }
+		pcFit = EngCalcs.lpnPumpFromCurve(links[k].curveSI);
+		if (pcFit && pcFit.custom) {
+			pCurve[k] = pcFit;
+			pSpeed[k] = typeof links[k].pumpSpeed === 'number' && links[k].pumpSpeed > 0 ? links[k].pumpSpeed : 1;
+		}
+	}
+	function customPumpCoeffs(k2, q2) { return EngCalcs.lpnCustomPumpCoeffs(pCurve[k2], pSpeed[k2], q2, gradMin); }
+
 	for (iter = 1; iter <= maxIter; iter++) {
 		var link,
 			res,
@@ -1327,6 +1356,12 @@ EngCalcs.lpnSolve = function (model, options) {
 					// A pump WITH a curve, pushed backwards, is treated as closed for this iteration.
 					G[k] = 1e-8;
 					y[k] = 0;
+				} else if (pCurve[k]) {
+					res = customPumpCoeffs(k, q);
+					h = res[0];
+					p = res[1];
+					G[k] = 1 / p;
+					y[k] = h / p;
 				} else {
 					h = -(link.h0 - link.a * Math.pow(qp, link.b));
 					p = link.a * link.b * Math.pow(qp, link.b - 1);
@@ -1716,7 +1751,10 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 			// this page, and no floor/extrapolation check on the curve either: a pump has exactly
 			// the curve the user entered for it and does exactly what that curve says, including
 			// past its own zero-head flow.
-			headlosses[link.id] = -(link.h0 - link.a * Math.pow(Math.max(Math.abs(Q[k]), EngCalcs.lpnQMin), link.b));
+			var pcR = link.curveSI && link.curveSI.length ? EngCalcs.lpnPumpFromCurve(link.curveSI) : null;
+			headlosses[link.id] = pcR && pcR.custom
+				? EngCalcs.lpnCustomPumpCoeffs(pcR, link.pumpSpeed > 0 ? link.pumpSpeed : 1, Q[k])[0]
+				: -(link.h0 - link.a * Math.pow(Math.max(Math.abs(Q[k]), EngCalcs.lpnQMin), link.b));
 		} else {
 			aq = Math.abs(Q[k]);
 			if (method === 'dw') {
@@ -1751,72 +1789,74 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 	};
 };
 
-// Pump curve H = h0 - a Q^b from 1, 2 or 3 points, matching EPANET so that the
-// same curve means the same thing in both tools.
+// hydcoeffs.c pumpcoeff()'s CUSTOM branch with curvecoeff(), for a curve lpnPumpFromCurve() calls
+// custom (`c.x`, `c.y`, SI, flows rising) turning at speed `s`: the segment holding the
+// speed-adjusted flow |q|/s -- the first one below the curve's first point, the last one past its
+// last, each extended as a straight line -- gives intercept h0 and slope r, and the head LOSS is
+// -h0 s^2 - r s q with gradient -r s. Returned as [loss, gradient], `q` signed.
+EngCalcs.lpnCustomPumpCoeffs = function (c, s, q, gradMin) {
+	'use strict';
+	var x = c.x, y = c.y, n = x.length, qs = Math.abs(q) / s, j = 0, r, hi, p;
+	while (j < n && x[j] < qs) { j++; }
+	if (j === 0) { j = 1; } else if (j === n) { j = n - 1; }
+	r = (y[j] - y[j - 1]) / (x[j] - x[j - 1]);
+	hi = y[j - 1] - r * x[j - 1];
+	p = -r * s;
+	// EPANET refuses a curve whose head does not fall at every point (error 227), so it never
+	// meets a flat or rising segment; the floor only keeps a solve finite if one arrives.
+	if (gradMin !== undefined && !(p > gradMin)) { p = gradMin; }
+	return [-hi * s * s + p * q, p];
+};
+
+// A PUMP CURVE AS EPANET 2.3.5 READS IT (validate.c pumpcurvepump(), powerfuncpump(),
+// customcurvepump()), so the same curve is the same pump in both engines. Points are [Q, H] pairs
+// in any one consistent unit set; they are taken in order of flow.
 //
-//   1 point  -- EPANET's rule: shutoff head is 1.33334 x the design head and
-//               maximum flow is 2 x the design flow, which forces b = 2 exactly.
-//   2 points -- b = 2 with the vertex at zero flow, the same parabola
-//               bpnParabolaHead uses in branched-network.js.
-//   3 points -- the general power-law fit. If the first point is at Q = 0 it gives
-//               h0 directly; otherwise h0, a and b are all fitted.
+//   1 point                    -- POWER LAW H = h0 - a Q^b through shutoff 1.33334 H at zero flow,
+//                                 the point, and zero head at twice its flow. b is then
+//                                 ln(1.33334/0.33334)/ln 2 = 1.99996, not 2: EPANET's own number.
+//   3 points, the first at Q=0 -- POWER LAW through all three, h0 the first head.
+//   anything else              -- CUSTOM: two points, three not starting at zero, four or more.
+//                                 EPANET uses the points themselves, as straight segments
+//                                 (EngCalcs.lpnCustomPumpCoeffs). Returned as { custom: true, x, y,
+//                                 h0: the first head, a: 0, b: 1 }: h0 is EPANET's Hmax, the shutoff
+//                                 head its XHEAD test compares against, and a = 0 leaves nothing
+//                                 that reads the power-law form a curve to misread.
+//
+// This used to fit a power law to every curve -- a parabola through two points, a free fit through
+// three not starting at zero, and the lowest, middle and highest of a longer one -- so every one of
+// those ran on a different pump in the built-in solver than in EPANET
+// (dev/lpn-spike/pump-curve-multipoint-harness.js).
 EngCalcs.lpnPumpFromCurve = function (points) {
 	'use strict';
 	var p = points.slice().sort(function (u, v) { return u[0] - v[0]; }),
-		q1,
-		h1,
-		q2,
-		h2,
-		q3,
-		h3,
 		h0,
 		b,
-		lo,
-		hi,
-		mid,
-		i,
-		target,
-		f;
+		h4;
 
 	if (p.length === 1) {
+		// powerfuncpump(h0 = 1.33334 h1, h1, h2 = 0, q1, q2 = 2 q1).
 		h0 = 1.33334 * p[0][1];
-		return { h0: h0, a: (h0 - p[0][1]) / (p[0][0] * p[0][0]), b: 2 };
+		h4 = h0 - p[0][1];
+		b = Math.log(h0 / h4) / Math.log(2);
+		return { h0: h0, a: h4 / Math.pow(p[0][0], b), b: b };
 	}
 
-	if (p.length === 2) {
-		// Vertex at zero flow: h = h0 - a Q^2 through both points.
-		q1 = p[0][0]; h1 = p[0][1];
-		q2 = p[1][0]; h2 = p[1][1];
-		if (q1 === 0) { return { h0: h1, a: (h1 - h2) / (q2 * q2), b: 2 }; }
-		var aa = (h1 - h2) / (q2 * q2 - q1 * q1);
-		return { h0: h1 + aa * q1 * q1, a: aa, b: 2 };
+	if (p.length === 3 && p[0][0] === 0) {
+		// powerfuncpump(h0, h1, h2, q1, q2): (h0-h2)/(h0-h1) = (q2/q1)^b.
+		h0 = p[0][1];
+		b = Math.log((h0 - p[2][1]) / (h0 - p[1][1])) / Math.log(p[2][0] / p[1][0]);
+		return { h0: h0, a: (h0 - p[1][1]) / Math.pow(p[1][0], b), b: b };
 	}
 
-	q1 = p[0][0]; h1 = p[0][1];
-	q2 = p[1][0]; h2 = p[1][1];
-	q3 = p[2][0]; h3 = p[2][1];
-
-	if (q1 === 0) {
-		// h0 is given. (h0-h2)/(h0-h3) = (q2/q3)^b solves for b directly.
-		h0 = h1;
-		b = Math.log((h0 - h2) / (h0 - h3)) / Math.log(q2 / q3);
-		return { h0: h0, a: (h0 - h2) / Math.pow(q2, b), b: b };
-	}
-
-	// General case: eliminate h0 and a, leaving one monotone equation in b.
-	target = (h1 - h2) / (h1 - h3);
-	f = function (bb) {
-		return (Math.pow(q2, bb) - Math.pow(q1, bb)) / (Math.pow(q3, bb) - Math.pow(q1, bb));
+	return {
+		custom: true,
+		x: p.map(function (q) { return q[0]; }),
+		y: p.map(function (q) { return q[1]; }),
+		h0: p.length ? p[0][1] : 0,
+		a: 0,
+		b: 1
 	};
-	lo = 0.1;
-	hi = 10;
-	for (i = 0; i < 200; i++) {
-		mid = (lo + hi) / 2;
-		if (f(mid) > target) { lo = mid; } else { hi = mid; }
-	}
-	b = (lo + hi) / 2;
-	var a = (h1 - h2) / (Math.pow(q2, b) - Math.pow(q1, b));
-	return { h0: h1 + a * Math.pow(q1, b), a: a, b: b };
 };
 
 if (typeof module !== 'undefined' && module.exports) {

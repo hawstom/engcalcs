@@ -10637,15 +10637,6 @@ var EngCalcs = EngCalcs || {};
 	// than none, because the map, the popup, the report and the file would each answer differently.
 	function elementCurve(l, prop) { return curveById(effective(l, prop || 'curveId')); }
 	function resolveCurvePoints(l) { return curvePointsOf(elementCurve(l, 'curveId')); }
-	// **AT MOST THREE POINTS, FOR THE FIT ALONE.** EngCalcs.lpnPumpFromCurve reads 1 to 3 pairs, so
-	// a longer curve is sampled at its ends and its middle -- the fitted curve then spans the pump's
-	// real operating range rather than only its low-flow end. DERIVED, and nothing writes it back:
-	// the document keeps every point, which is the whole of what Task 586 bought.
-	function pumpFitPoints(pts) {
-		if (pts.length <= 3) { return pts; }
-		var sorted = pts.slice().sort(function (u, v) { return u[0] - v[0]; });
-		return [sorted[0], sorted[Math.floor((sorted.length - 1) / 2)], sorted[sorted.length - 1]];
-	}
 	// A PUMP'S FITTED CURVE IS DERIVED, SO IT IS NOT STORED (ROADMAP Task 390 step 5).
 	//
 	// h0/a/b are the SI coefficients of H = h0 - a Q^b that js/lpn-solver.js reads. curvePoints are
@@ -10658,8 +10649,13 @@ var EngCalcs = EngCalcs || {};
 	// Derived at the solver handoff there is nothing to keep in step, nothing to migrate, and no
 	// field on a link that anything but the user writes. The cost is one three-point curve fit per
 	// pump per solve, at this suite's target scale of ~10-20 nodes.
+	//
+	// **EVERY POINT REACHES IT** (fix/pump-curve-multipoint). EngCalcs.lpnPumpFromCurve reads the
+	// curve as EPANET does: a power law from one point or from three starting at zero flow, and
+	// otherwise the points themselves (`custom`). A longer curve used to be cut to its ends and its
+	// middle for a three-point fit, which EPANET never does.
 	function pumpFit(l) {
-		var pts = pumpFitPoints(resolveCurvePoints(l));
+		var pts = resolveCurvePoints(l);
 		if (pts.length === 0) {
 			// No curve entered yet: h0 = a = 0, so H = h0 - a Q^b is identically zero and the pump
 			// is simply a connection that neither adds nor loses head. The solver has its own
@@ -67461,12 +67457,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// **IT DRAWS WHAT THE SOLVER APPLIES**, which is the rule libSparkline's step line follows and
 	// is the whole reason this is not one function for both kinds:
 	//
-	//   - A PUMP runs on the FITTED curve H = h0 - a Q^b (EngCalcs.lpnPumpFromCurve), never on
-	//     straight lines between the typed points. On a ONE-POINT curve there is no line to draw at
-	//     all -- EPANET's rule turns that single duty point into shutoff 1.33H and runout 2Q, a fact
-	//     about the pump the user is running that the table cannot show and this chart can.
-	//   - A GPV's head loss is interpolated LINEARLY between its points, so straight segments are
-	//     what it applies.
+	//   - A PUMP on one point, or on three starting at zero flow, runs on the FITTED curve
+	//     H = h0 - a Q^b (EngCalcs.lpnPumpFromCurve). On a ONE-POINT curve there is no line to
+	//     draw at all -- EPANET's rule turns that single duty point into shutoff 1.33H and runout
+	//     2Q, a fact about the pump the user is running that the table cannot show and this chart can.
+	//   - Any other pump curve is CUSTOM, and a GPV's head loss is too: both are interpolated
+	//     LINEARLY between their points, so straight segments are what they apply.
 	//
 	// The fit is plain algebra on the pairs and carries no units of its own, so it runs on the
 	// DISPLAY numbers and converts nothing. pumpFit() is the one site that crosses to SI, and this
@@ -67483,21 +67479,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		xs = pts.map(function (p) { return +p[0]; });
 		ys = pts.map(function (p) { return +p[1]; });
 		if (xs.concat(ys).some(function (v) { return !isFinite(v); })) { return el; }
-		// **pumpFitPoints() FIRST, BECAUSE THAT IS WHAT THE SOLVER READS.** lpnPumpFromCurve() sorts
-		// and takes the first three pairs it is given, so handing it a five-point curve whole drew a
-		// fit through its three LOWEST flows while pumpFit() fits the first, the middle and the last.
-		// The line on the chart and the equation under the type selector are the same fit as the run.
-		fit = isPump && EngCalcs.lpnPumpFromCurve ? EngCalcs.lpnPumpFromCurve(pumpFitPoints(pts.map(function (p) {
+		// **THE SAME READING OF THE CURVE AS THE RUN** (lpnPumpFromCurve, every point, EPANET's
+		// rule): a power law from one point or three starting at zero flow, drawn as that fitted
+		// curve; anything else is a CUSTOM curve the solver applies as straight segments between the
+		// points, and that is drawn exactly as a GPV's is, below.
+		fit = isPump && EngCalcs.lpnPumpFromCurve ? EngCalcs.lpnPumpFromCurve(pts.map(function (p) {
 			return [+p[0], +p[1]];
-		}))) : null;
-		if (fit && !(isFinite(fit.h0) && isFinite(fit.a) && isFinite(fit.b))) { fit = null; }
+		})) : null;
+		if (fit && (fit.custom || !(isFinite(fit.h0) && isFinite(fit.a) && isFinite(fit.b)))) { fit = null; }
 		// **A PUMP CURVE IS FRAMED ON THE ORIGIN**, because shutoff head and runout flow are the two
 		// ends a person reads it by, and a frame that started at the first typed point would hide
 		// both. A GPV curve is framed on its own points: its x range is whatever flows it covers,
 		// and zero need not be one of them.
-		xlo = fit ? 0 : Math.min.apply(null, xs);
+		// A custom pump curve is framed on the origin too, its segments drawn as typed.
+		xlo = (fit || isPump) ? Math.min(0, Math.min.apply(null, xs)) : Math.min.apply(null, xs);
 		xhi = fit ? Math.max.apply(null, xs) * 1.15 : Math.max.apply(null, xs);
-		ylo = fit ? 0 : Math.min.apply(null, ys);
+		ylo = (fit || isPump) ? Math.min(0, Math.min.apply(null, ys)) : Math.min.apply(null, ys);
 		yhi = fit ? Math.max(fit.h0, Math.max.apply(null, ys)) * 1.05 : Math.max.apply(null, ys);
 		// A ONE-POINT GPV curve, or a flat one, is a real curve and must not divide by zero -- the
 		// same guard libSparkline gives a flat pattern.
@@ -68036,9 +68033,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	 * prints the equation it fitted under the type selector, and this is the same thing said the
 	 * same way.
 	 *
-	 * **IT IS THE FIT THE RUN USES, NOT A SECOND ONE.** pumpFitPoints() picks the first, middle and
-	 * last of a longer curve exactly as pumpFit() does, so the printed equation, the line on the
-	 * chart and the head the built-in solver applies are one thing. The arithmetic runs on the
+	 * **IT IS THE FIT THE RUN USES, NOT A SECOND ONE.** lpnPumpFromCurve() reads every point, as
+	 * pumpFit() hands them, so the printed equation, the line on the chart and the head the
+	 * built-in solver applies are one thing; a curve EPANET runs as straight segments prints none. The arithmetic runs on the
 	 * DISPLAY numbers and converts nothing, which is why the tip says the units are the table's:
 	 * pumpFit() is the one site that crosses to SI and this is deliberately not a second one.
 	 *
@@ -68055,10 +68052,13 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// three quarters our convention and none of it the user's, and printing it beside the
 		// number they just typed reads as though they had described it.
 		if (!c || c.kind !== 'head' || !pts || pts.length < 2 || !EngCalcs.lpnPumpFromCurve) { return ''; }
-		fit = EngCalcs.lpnPumpFromCurve(pumpFitPoints(pts.map(function (p) {
+		fit = EngCalcs.lpnPumpFromCurve(pts.map(function (p) {
 			return [+p[0], +p[1]];
-		})));
-		if (!fit || !(isFinite(fit.h0) && isFinite(fit.a) && isFinite(fit.b))) { return ''; }
+		}));
+		// A CUSTOM curve (two points, three not starting at zero flow, four or more) has no
+		// equation: both engines run it as straight lines between its points, and the chart shows
+		// those.
+		if (!fit || fit.custom || !(isFinite(fit.h0) && isFinite(fit.a) && isFinite(fit.b))) { return ''; }
 		// The bare quantity names rather than curveAxisLabels(), whose entries carry their unit in
 		// brackets: "Head (ft) = 300 - 0.000196 Flow (gpm)^2" reads as an exponent on the unit.
 		return (pc.lpn_result_head || 'Head') + ' = ' + libEqNum(fit.h0)
@@ -75216,6 +75216,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				out.statusBase = out.status;
 				if (!(s > 0)) { out.status = 'closed'; }
 				out.h0Base = fit.h0; out.aBase = fit.a;
+				// The speed itself, for a CUSTOM curve (fit.custom), which js/lpn-solver.js reads
+				// off curveSI below and turns by the affinity laws itself: its h0 above is only the
+				// shutoff head at speed, and its a is 0. The instant's speed, as h0 carries it.
+				out.pumpSpeed = s;
 				out.speed = pumpSpeedOf(l);   // base-write: the solver's model, not an asset
 				out.speedPattern = effective(l, 'speedPattern') || null;   // base-write: the solver's model, not an asset
 				// **AND THE CURVE'S REAL POINTS RIDE ALONG, IN SI** (Task 586). The native solver has
