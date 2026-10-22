@@ -82496,7 +82496,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			if (dialogIsOpen()) { smActListOverrides(key, top); }
 		}
 		openDialog(function (body) {
-			var bar, all;
+			var bar, all, same, sameItems;
 			ffEl('p', 'lpn-dialog-msg', (pc.lpn_scenario_overrides || 'No. of overrides') + ': ' + n, body);
 			if (!n) { ffEl('p', 'lpn-ff-note', pc.lpn_sm_list_overrides_none || 'This scenario has no overrides.', body); }
 			else { ffEl('p', 'lpn-ff-note', pc.lpn_ovl_note || 'These are the values this scenario sets itself in the alternatives it uses, each with the value it replaces. Values it inherits are neither listed nor counted. Clear an override to restore the inherited value; Undo reverses it. Select an ID to go to the asset on the map.', body); }
@@ -82508,6 +82508,19 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				clearSel.addEventListener('click', function () {
 					var items = picks.filter(function (p) { return p.box.checked; }).map(function (p) { return p.o.item; });
 					if (items.length) { clearNow(items); }
+				});
+				sameItems = [];
+				groups.forEach(function (g) { g.items.forEach(function (o) { if (o.same) { sameItems.push(o.item); } }); });
+				same = ffEl('button', 'lpn-ovl-clearsame', pc.lpn_ovl_clear_same || 'Clear overrides equal to inherited', bar);
+				same.type = 'button';
+				same.disabled = !sameItems.length;
+				same.addEventListener('click', function () {
+					closeDialog();
+					askDialog({ kind: 'confirm', text: (pc.lpn_ovl_clear_same_ask || 'Clear the overrides equal to the inherited value ({n}) of {name}? Each value stays as it is and is inherited again. Undo reverses this.')
+						.replace('{n}', String(sameItems.length)).replace(/\{name\}/g, scenarioDisplayName(scn)) }, function (yes) {
+						if (yes) { ovlClearItems(scn, sameItems); }
+						smActListOverrides(key);
+					});
 				});
 				all = ffEl('button', 'lpn-ovl-clearall', pc.lpn_ovl_clear_all || 'Clear all overrides', bar);
 				all.type = 'button';
