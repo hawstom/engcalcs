@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 3201,
-        "delta_key_count": 226,
+        "expected_key_count": 3205,
+        "delta_key_count": 231,
         "english_changed_key_count": 44,
         "exempt_key_count": 32,
         "exempt_keys": [
@@ -181,6 +181,8 @@
         "lpn_theme_arcade": "Arcade",
         "lpn_theme_space": "Space",
         "lpn_theme_prairie": "Prairie",
+        "lpn_ovl_clear_same": "Clear overrides equal to inherited",
+        "lpn_ovl_clear_same_ask": "Clear the overrides of {name} that equal the inherited value ({n} total)? Each value stays as it is and is inherited again. Undo reverses this.",
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
         "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
         "lpn_settings_grp_size": "Size",
@@ -291,7 +293,10 @@
         "lpn_calib_scenario": "Compared with the results of the scenario {scenario}.",
         "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file.",
         "lpn_export_confirm_title": "Export {format}",
-        "lpn_export_confirm_lead": "The {format} holds one scenario, and this project has {n}."
+        "lpn_export_confirm_lead": "The {format} holds one scenario, and this project has {n}.",
+        "lpn_export_receipt_heading": "Exported {file} from {scenario} of {project}.",
+        "lpn_export_receipt_note": "This is an export, not a save: this project is not connected to the file.",
+        "lpn_dxf_exported_geo_tail": "Its coordinates are {crs}, in meters, not latitude and longitude."
     },
     "keys": {
         "consent_body": "May we save a random code in this browser, so we don't count you again? The code is made up on the spot, says nothing about you or your device, and records nothing you enter.",
@@ -409,6 +414,8 @@
         "lpn_theme_arcade": "Arcade",
         "lpn_theme_space": "Space",
         "lpn_theme_prairie": "Prairie",
+        "lpn_ovl_clear_same": "Clear overrides equal to inherited",
+        "lpn_ovl_clear_same_ask": "Clear the overrides of {name} that equal the inherited value ({n} total)? Each value stays as it is and is inherited again. Undo reverses this.",
         "lpn_sm_help": "How scenarios and alternatives work:\\n\\nIn Basic mode, alternatives are hidden and automatic, and all new scenarios are children of the Base scenario.\\n\\nWith Basic mode off, a complex inheritance tree is available, and alternatives can be shared among scenarios. But the default behavior of edits when a new alternative association is needed (in the absence of proactive user management) is to create an alternative named like the current scenario, which gives each scenario its unique set of alternatives.\\n\\nProperties and settings belong to alternatives categories that appear as columns of the scenarios and alternatives table and as management options in Scenario manager.\\n\\nOverrides are created in scenarios, but they really belong to the respective alternatives associated with the scenario; so a scenario is like a window to its alternatives. Associations of alternatives to scenarios are managed in the second pane of the Scenario manager or in the Scenarios table in the bottom pane. Creating a new scenario creates no alternatives; the new scenario uses its parent's alternatives until overrides are created that need new alternatives. When overrides are created in a scenario, they are stored in their respective alternative for the scenario; if the scenario has no such alternative, a new alternative is created using the name of the scenario.\\n\\nExample: You create a \"Figure: Node and link IDs\" scenario and edit a Text to say \"Node and Link IDs.\" When you create the scenario, no alternatives are created. But at the moment you save the Text, a Text alternative called \"Figure: Node and link IDs\" is created with the override for the Text value. In Basic mode, you see this as simply an override in the scenario itself.\\n\\nCopy properties copies only overrides. In any scenario other than Base, it copies only the overrides the asset has in that scenario.\\n\\nHow to manage scenarios:\\n\\n- Choose Scenarios or an alternatives category in the list at the top to show its tree.\\n\\n- Create a child of the selected item with Add child. Add base adds another Base, which starts as a copy of Base as it is now; later edits to Base do not change it. A new child is named after its parent; type a name to rename it. Copy copies the selected alternative. Merge upward moves the overrides of the selected alternative into an alternative above it, chosen by name, and the selected alternative then inherits them; it first names any value an alternative it skips also overrides, which is not changed. To copy a scenario, use Copy scenario in the Scenarios menu, in Basic mode; it copies the scenario's overrides, with the alternatives that hold them. Add base and Copy scenario each create alternatives: Add base creates a Base alternative for the new Base in each category that holds values, and Copy scenario creates a new alternative, named like the copy, for each alternative that holds the scenario's overrides.\\n\\n- Drag an item onto another to make it a child of that item. A scenario moved to a new parent inherits from it everything it has not overridden; what it has overridden does not change. Drag an item between two items to reorder them.\\n\\n- Click an item to select it. Press F2 or choose Rename to rename the selected item. Renaming a scenario asks whether to rename the alternatives that carry its name; in Basic mode they are renamed with it, without asking. Double-click a scenario or press Enter to make it current. Click the arrow beside an item or press Left or Right to collapse or expand it. Right-click an item for the same commands as the buttons.\\n\\n- Press Delete or click the minus button to delete the selected item. An item in use is not deleted, and the message names what uses it. Deleting a scenario with Basic mode off keeps the alternatives it uses. Deleting a scenario with Basic mode on also deletes each of its alternatives that no other scenario uses.\\n\\n- To make a scenario use another alternative, including Base, choose it in the scenario's row of the second pane of the Scenario manager or the Scenarios table. An override made in a shared alternative changes every scenario that uses it.",
         "lpn_settings_engine_native_tip": "Enable this to use the built-in solver where possible. Otherwise, the EPANET solver from the US EPA is always used. The built-in solver is not used for extended period simulations. The first time the EPANET solver is used, about 650 KB is downloaded and then kept on this device. Where a pipe has a minor (local) loss, the two solvers differ in the last digits: EPANET uses a rounded value of gravitational acceleration, so its minor losses are very slightly lower than the exact form.",
         "lpn_settings_grp_size": "Size",
@@ -519,7 +526,10 @@
         "lpn_calib_scenario": "Compared with the results of the scenario {scenario}.",
         "lpn_export_leaves_alternatives": "The alternatives stored in this project are not in the file.",
         "lpn_export_confirm_title": "Export {format}",
-        "lpn_export_confirm_lead": "The {format} holds one scenario, and this project has {n}."
+        "lpn_export_confirm_lead": "The {format} holds one scenario, and this project has {n}.",
+        "lpn_export_receipt_heading": "Exported {file} from {scenario} of {project}.",
+        "lpn_export_receipt_note": "This is an export, not a save: this project is not connected to the file.",
+        "lpn_dxf_exported_geo_tail": "Its coordinates are {crs}, in meters, not latitude and longitude."
     },
     "key_context": {
         "consent_body": {
@@ -2411,6 +2421,38 @@
                 }
             }
         },
+        "lpn_ovl_clear_same": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ovl_clear_all_ask",
+                    "value": "សម្អាតតម្លៃផ្ទាល់ខ្លួនទាំងអស់ ({n}) របស់ {name} ឬទេ? តម្លៃនីមួយៗត្រឡប់ទៅតម្លៃដែលទទួលមរតក។ ត្រឡប់ក្រោយ ត្រឡប់វាវិញ។",
+                    "english": "Clear all the overrides ({n}) of {name}? Each value returns to the inherited value. Undo reverses this."
+                },
+                "next_translated": {
+                    "key": "lpn_ovl_pick_tip",
+                    "value": "ជ្រើសរើសតម្លៃផ្ទាល់ខ្លួននេះសម្រាប់ប៊ូតុង សម្អាតតម្លៃផ្ទាល់ខ្លួនដែលបានជ្រើសរើស។",
+                    "english": "Select this override for the Clear selected overrides button."
+                }
+            }
+        },
+        "lpn_ovl_clear_same_ask": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ovl_clear_all_ask",
+                    "value": "សម្អាតតម្លៃផ្ទាល់ខ្លួនទាំងអស់ ({n}) របស់ {name} ឬទេ? តម្លៃនីមួយៗត្រឡប់ទៅតម្លៃដែលទទួលមរតក។ ត្រឡប់ក្រោយ ត្រឡប់វាវិញ។",
+                    "english": "Clear all the overrides ({n}) of {name}? Each value returns to the inherited value. Undo reverses this."
+                },
+                "next_translated": {
+                    "key": "lpn_ovl_pick_tip",
+                    "value": "ជ្រើសរើសតម្លៃផ្ទាល់ខ្លួននេះសម្រាប់ប៊ូតុង សម្អាតតម្លៃផ្ទាល់ខ្លួនដែលបានជ្រើសរើស។",
+                    "english": "Select this override for the Clear selected overrides button."
+                }
+            }
+        },
         "lpn_sm_help": {
             "reason": "english_changed",
             "current_value": "របៀបដែលសេណារីយ៉ូ និងជម្រើសជំនួសដំណើរការ៖\\n\\nក្នុងរបៀបមូលដ្ឋាន ជម្រើសជំនួសត្រូវបានលាក់ និងស្វ័យប្រវត្តិ ហើយសេណារីយ៉ូថ្មីទាំងអស់ជាកូនរបស់សេណារីយ៉ូ មូលដ្ឋាន។\\n\\nពេលបិទរបៀបមូលដ្ឋាន ដើមឈើទទួលមរតកស្មុគស្មាញអាចប្រើបាន ហើយជម្រើសជំនួសអាចត្រូវបានចែករំលែករវាងសេណារីយ៉ូ។ ប៉ុន្តែអាកប្បកិរិយាលំនាំដើមនៃការកែសម្រួលពេលត្រូវការទំនាក់ទំនងជម្រើសជំនួសថ្មី (ក្នុងករណីគ្មានការគ្រប់គ្រងសកម្មពីអ្នកប្រើ) គឺបង្កើតជម្រើសជំនួសមួយដែលមានឈ្មោះដូចសេណារីយ៉ូបច្ចុប្បន្ន ដែលផ្ដល់ឲ្យសេណារីយ៉ូនីមួយៗនូវសំណុំជម្រើសជំនួសតែមួយគត់របស់វា។\\n\\nលក្ខណៈសម្បត្តិ និងការកំណត់ជារបស់ប្រភេទជម្រើសជំនួស ដែលបង្ហាញជាជួរឈរនៃតារាងសេណារីយ៉ូ និងជម្រើសជំនួស ហើយជាជម្រើសគ្រប់គ្រងក្នុង កម្មវិធីគ្រប់គ្រងសេណារីយ៉ូ។\\n\\nតម្លៃផ្ទាល់ខ្លួនត្រូវបានបង្កើតក្នុងសេណារីយ៉ូ ប៉ុន្តែពួកវាពិតជារបស់ជម្រើសជំនួសរៀងៗខ្លួនដែលទាក់ទងនឹងសេណារីយ៉ូ ដូច្នេះសេណារីយ៉ូប្រៀបដូចជាបង្អួចទៅកាន់ជម្រើសជំនួសរបស់វា។ ទំនាក់ទំនងរវាងជម្រើសជំនួសនិងសេណារីយ៉ូត្រូវបានគ្រប់គ្រងក្នុងផ្ទាំងស្ដាំនៃ កម្មវិធីគ្រប់គ្រងសេណារីយ៉ូ ឬក្នុងតារាងសេណារីយ៉ូនៅផ្ទាំងខាងក្រោម។ ការបង្កើតសេណារីយ៉ូថ្មីមិនបង្កើតជម្រើសជំនួសទេ សេណារីយ៉ូថ្មីប្រើជម្រើសជំនួសរបស់មេរបស់វា រហូតដល់តម្លៃផ្ទាល់ខ្លួនដែលត្រូវការជម្រើសជំនួសថ្មីត្រូវបានបង្កើត។ ពេលតម្លៃផ្ទាល់ខ្លួនត្រូវបានបង្កើតក្នុងសេណារីយ៉ូ ពួកវាត្រូវបានរក្សាទុកក្នុងជម្រើសជំនួសរៀងៗខ្លួនសម្រាប់សេណារីយ៉ូ ប្រសិនបើសេណារីយ៉ូគ្មានជម្រើសជំនួសបែបនោះទេ ជម្រើសជំនួសថ្មីត្រូវបានបង្កើតដោយប្រើឈ្មោះរបស់សេណារីយ៉ូ។\\n\\nឧទាហរណ៍៖ អ្នកបង្កើតសេណារីយ៉ូ \"Figure: Node and link IDs\" ហើយកែសម្រួលអត្ថបទមួយឲ្យនិយាយថា \"Node and Link IDs\"។ ពេលអ្នកបង្កើតសេណារីយ៉ូ គ្មានជម្រើសជំនួសណាត្រូវបានបង្កើតទេ។ ប៉ុន្តែនៅពេលអ្នករក្សាទុកអត្ថបទ ជម្រើសជំនួសអត្ថបទមួយឈ្មោះ \"Figure: Node and link IDs\" ត្រូវបានបង្កើតជាមួយតម្លៃផ្ទាល់ខ្លួនសម្រាប់តម្លៃអត្ថបទ។ ក្នុងរបៀបមូលដ្ឋាន អ្នកឃើញវាជាតម្លៃផ្ទាល់ខ្លួនធម្មតាក្នុងសេណារីយ៉ូខ្លួនឯង។\\n\\nចម្លងលក្ខណៈសម្បត្តិ ចម្លងតែតម្លៃផ្ទាល់ខ្លួនប៉ុណ្ណោះ។ ក្នុងសេណារីយ៉ូណាក៏ដោយក្រៅពី មូលដ្ឋាន វាចម្លងតែតម្លៃផ្ទាល់ខ្លួនដែលធាតុមានក្នុងសេណារីយ៉ូនោះ។\\n\\nរបៀបគ្រប់គ្រងសេណារីយ៉ូ៖\\n\\n- ជ្រើសរើស សេណារីយ៉ូ ឬប្រភេទជម្រើសជំនួសក្នុងបញ្ជីនៅខាងលើ ដើម្បីបង្ហាញដើមឈើរបស់វា។\\n\\n- បង្កើតកូនរបស់ធាតុដែលបានជ្រើសរើសដោយ បន្ថែមកូន។ បន្ថែមមូលដ្ឋាន បន្ថែម មូលដ្ឋាន មួយទៀត ដែលចាប់ផ្ដើមជាច្បាប់ចម្លងនៃ មូលដ្ឋាន ដូចដែលវាជាឥឡូវ ការកែសម្រួលនៅពេលក្រោយចំពោះ មូលដ្ឋាន មិនផ្លាស់ប្ដូរវាទេ។ កូនថ្មីត្រូវបានដាក់ឈ្មោះតាមមេរបស់វា វាយឈ្មោះដើម្បីប្ដូរឈ្មោះ។ ចម្លង ចម្លងជម្រើសជំនួសដែលបានជ្រើសរើស។ បញ្ចូលឡើងលើ ផ្លាស់ទីតម្លៃផ្ទាល់ខ្លួនរបស់ជម្រើសជំនួសដែលបានជ្រើសរើសទៅក្នុងជម្រើសជំនួសមួយខាងលើវា ដែលជ្រើសរើសតាមឈ្មោះ ហើយបន្ទាប់មកជម្រើសជំនួសដែលបានជ្រើសរើសទទួលមរតកពួកវា វាដាក់ឈ្មោះមុនសិននូវតម្លៃណាមួយដែលជម្រើសជំនួសដែលវារំលងក៏មានតម្លៃផ្ទាល់ខ្លួនដែរ ដែលមិនត្រូវបានផ្លាស់ប្ដូរ។ ដើម្បីចម្លងសេណារីយ៉ូ សូមប្រើ ចម្លងសេណារីយ៉ូ ក្នុងម៉ឺនុយសេណារីយ៉ូ ក្នុងរបៀបមូលដ្ឋាន វាចម្លងតម្លៃផ្ទាល់ខ្លួនរបស់សេណារីយ៉ូ ជាមួយជម្រើសជំនួសដែលរក្សាពួកវា។ បន្ថែមមូលដ្ឋាន និង ចម្លងសេណារីយ៉ូ នីមួយៗបង្កើតជម្រើសជំនួស៖ បន្ថែមមូលដ្ឋាន បង្កើតជម្រើសជំនួស មូលដ្ឋាន សម្រាប់មូលដ្ឋានថ្មីក្នុងគ្រប់ប្រភេទដែលមានតម្លៃ ហើយ ចម្លងសេណារីយ៉ូ បង្កើតជម្រើសជំនួសថ្មីដែលមានឈ្មោះដូចច្បាប់ចម្លង សម្រាប់ជម្រើសជំនួសនីមួយៗដែលរក្សាតម្លៃផ្ទាល់ខ្លួនរបស់សេណារីយ៉ូ។\\n\\n- អូសធាតុមួយទៅលើធាតុមួយទៀតដើម្បីធ្វើឲ្យវាជាកូនរបស់ធាតុនោះ។ សេណារីយ៉ូដែលត្រូវបានផ្លាស់ទីទៅមេថ្មីទទួលមរតកពីមេនោះនូវអ្វីៗទាំងអស់ដែលវាមិនទាន់មានតម្លៃផ្ទាល់ខ្លួន អ្វីដែលវាមានតម្លៃផ្ទាល់ខ្លួនរួចហើយមិនផ្លាស់ប្ដូរទេ។ អូសធាតុមួយរវាងធាតុពីរដើម្បីតម្រៀបឡើងវិញ។\\n\\n- ចុចធាតុមួយដើម្បីជ្រើសរើសវា។ ចុច F2 ឬជ្រើសរើស ប្ដូរឈ្មោះ ដើម្បីប្ដូរឈ្មោះធាតុដែលបានជ្រើសរើស។ ការប្ដូរឈ្មោះសេណារីយ៉ូសួរថាតើត្រូវប្ដូរឈ្មោះជម្រើសជំនួសដែលមានឈ្មោះរបស់វាដែរឬទេ ក្នុងរបៀបមូលដ្ឋាន ពួកវាត្រូវបានប្ដូរឈ្មោះជាមួយវា ដោយមិនសួរ។ ចុចទ្វេដងលើសេណារីយ៉ូ ឬចុច Enter ដើម្បីធ្វើឲ្យវាជាបច្ចុប្បន្ន។ ចុចព្រួញនៅជាប់ធាតុមួយ ឬចុច Left ឬ Right ដើម្បីបត់ ឬពង្រីកវា។ ចុចខាងស្ដាំលើធាតុមួយសម្រាប់ពាក្យបញ្ជាដូចគ្នានឹងប៊ូតុង។\\n\\n- ចុច Delete ឬចុចប៊ូតុងដកដើម្បីលុបធាតុដែលបានជ្រើសរើស។ ធាតុដែលកំពុងប្រើមិនត្រូវបានលុបទេ ហើយសារដាក់ឈ្មោះអ្វីដែលប្រើវា។ ការលុបសេណារីយ៉ូពេលបិទរបៀបមូលដ្ឋានរក្សាជម្រើសជំនួសដែលវាប្រើ។ ការលុបសេណារីយ៉ូពេលបើករបៀបមូលដ្ឋានក៏លុបជម្រើសជំនួសនីមួយៗរបស់វាដែលគ្មានសេណារីយ៉ូផ្សេងប្រើដែរ។\\n\\n- ដើម្បីធ្វើឲ្យសេណារីយ៉ូប្រើជម្រើសជំនួសមួយទៀត រួមទាំង មូលដ្ឋាន សូមជ្រើសរើសវាក្នុងជួរដេករបស់សេណារីយ៉ូនៅផ្ទាំងស្ដាំនៃ កម្មវិធីគ្រប់គ្រងសេណារីយ៉ូ ឬតារាងសេណារីយ៉ូ។ តម្លៃផ្ទាល់ខ្លួនដែលធ្វើក្នុងជម្រើសជំនួសដែលចែករំលែកផ្លាស់ប្ដូរគ្រប់សេណារីយ៉ូដែលប្រើវា។",
@@ -4205,6 +4247,42 @@
                 },
                 "next_translated": null
             }
+        },
+        "lpn_export_receipt_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "ទំហំរូបភាពជាច្រើនដងនៃតំបន់នៅលើអេក្រង់។ ធំជាងច្បាស់ជាង ហើយធ្វើឲ្យឯកសារធំជាង។",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_export_receipt_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "ទំហំរូបភាពជាច្រើនដងនៃតំបន់នៅលើអេក្រង់។ ធំជាងច្បាស់ជាង ហើយធ្វើឲ្យឯកសារធំជាង។",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_dxf_exported_geo_tail": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_screenshot_scale_tip",
+                    "value": "ទំហំរូបភាពជាច្រើនដងនៃតំបន់នៅលើអេក្រង់។ ធំជាងច្បាស់ជាង ហើយធ្វើឲ្យឯកសារធំជាង។",
+                    "english": "The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file."
+                },
+                "next_translated": null
+            }
         }
     },
     "key_plain": {
@@ -4227,6 +4305,14 @@
             }
         ],
         "lpn_guide_scn_notes_def": [
+            {
+                "concept": "family-tree-inherit",
+                "plain_name": "A family tree inherit-",
+                "english_rendering": "inherit",
+                "preferred_translation": ""
+            }
+        ],
+        "lpn_ovl_clear_same_ask": [
             {
                 "concept": "family-tree-inherit",
                 "plain_name": "A family tree inherit-",

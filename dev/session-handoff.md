@@ -97,7 +97,7 @@ lines rather than appending corrections.
 
 ## STATE — 2026-10-22 early morning (thirty-fifth session, Arizona time)
 
-- Production is what he last pulled; epanet-plus-plus.org/app was at c375f221 on 2026-10-21. **Canonical landing page is epanet-plus-plus.org.** Master pushed at 34a1bccd9 (2026-10-22).
+- Production is what he last pulled; epanet-plus-plus.org/app was at c375f221 on 2026-10-21. **Canonical landing page is epanet-plus-plus.org.** Merged 2026-10-22 on his word: theme-default, native-eps-6 (4, 5, 6), export-scenario-confirm, clear-same-overrides.
 - **Report to Tom in `~/tom-files/messenger.md`**, overwritten each time; one line per paragraph, no hard wraps (Tom, 2026-10-21). He empties it between sessions. The 2026-10-22 report there holds his open questions: read it before reporting.
 - Still owed: consent_body's 26 translations; the untranslated keys. Sprint only on his word.
 - Two-point pump curve: Tom, 2026-10-22: *"Follow EPANET, I suppose."* It stays custom, as EPANET reads it (master already does this).
@@ -107,11 +107,7 @@ lines rather than appending corrections.
 
 ### Branches waiting on him (ports in ~/webdev/worktrees/_panel/ports.conf)
 
-- `feat/native-eps-4`, `-5`, `-6` (Task 733 slices 4 [RULES], 5 tank volume curves/min volume/overflow, 6 pump energy; stacked, each green, nothing visible on the page). Merge on his word; merging -6 brings all three. Slice 7 (wiring) only on his word; Task 821 first.
-- `feat/export-scenario-confirm` (8101, Task 814): one receipt dialog after every .inp/GeoJSON/DXF export; deleted `lpn_inp_export_flat_heading`. Perry passed it. His calls owed: two boxes in a row; does a Base-only export need a receipt.
-- `feat/clear-same-overrides` (8103, Sue's wish): Override manager button clearing "(same)" rows; "(same)" now compares stored values. Perry passed it on the second look.
 - `feat/value-source` (8105, Sue's wish): hollow-dot tip "Inherited from {name}." His item 6 question ("Max day: ✓ Shared with: Peak hour with main break") is about master's existing override note under an overridden row (`inheritedLine()` + `smSharedText()`), not this branch; explained and rewording proposed in the 10-22 report.
-- `feat/theme-default` (8106, Task 811): he said "I agree that it's better. Continue or recommend a merge." Recommended a merge; waits on his typed word.
 - `feat/wtg-export` (no port; a spike, dev scripts only): see above.
 - `feat/sqlite-reader` (8104, Task 749): he doubts import is feasible (10-22); kept as what we learned. Owed by him from before: where he read "12 psi"; whether to import WaterGEMS's hourly-averaged continuous patterns.
 - `feat/desktop`, `fix/bottom-pane-lag`: untouched.
